@@ -49,3 +49,26 @@ export function fromGlobalIds<T extends string, IsStringId extends boolean = fal
     ids: globalIds.map((id) => (id ? fromGlobalId(id, type, isString).id : null)),
   };
 }
+
+export function fromMultipleGlobalIds<T extends string>(
+  globalIds: string[],
+  types: ({ type: T; isString?: boolean } | T)[]
+) {
+  return globalIds.map((id) => {
+    const resolvedTypes = types.map((t) => {
+      try {
+        if (typeof t === "string") {
+          return fromGlobalId(id, t);
+        } else {
+          return fromGlobalId(id, t.type, t.isString);
+        }
+      } catch {}
+      return null;
+    });
+    const match = resolvedTypes.find((t) => t !== null);
+    if (!match) {
+      throw new Error(`Couldn't find a type match for globalId ${id}`);
+    }
+    return match;
+  });
+}

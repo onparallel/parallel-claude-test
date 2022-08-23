@@ -4284,8 +4284,9 @@ export interface NexusGenArgTypes {
     };
     movePetitions: {
       // args
-      dst: string; // String!
-      src: string[]; // [ID!]!
+      destination: string; // String!
+      source: string; // String!
+      targets: string[]; // [ID!]!
       type: NexusGenEnums["PetitionBaseType"]; // PetitionBaseType!
     };
     petitionAttachmentDownloadLink: {

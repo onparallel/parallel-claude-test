@@ -970,9 +970,25 @@ type Mutation {
   modifyPetitionCustomProperty(key: String!, petitionId: GID!, value: String): PetitionBase!
 
   """
-  Moves a group of petitions or folders to another folder
+  Moves a group of petitions or folders to another folder.
   """
-  movePetitions(dst: String!, src: [ID!]!, type: PetitionBaseType!): Success!
+  movePetitions(
+    """
+    Destination path.
+    """
+    destination: String!
+
+    """
+    Base path of the entries to move.
+    """
+    source: String!
+
+    """
+    Petition and PetitionFolder GIDs targeted to be moved
+    """
+    targets: [ID!]!
+    type: PetitionBaseType!
+  ): Success!
 
   """
   Generates a download link for a petition attachment

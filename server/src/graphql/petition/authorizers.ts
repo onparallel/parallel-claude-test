@@ -12,7 +12,7 @@ import {
   PetitionStatus,
 } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
-import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { fromMultipleGlobalIds, toGlobalId } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
 import { Arg, ArgAuthorizer } from "../helpers/authorize";
 
@@ -538,44 +538,74 @@ export const petitionHasStatus = createPetitionAuthorizer(
 export function userHasAccessToPetitionsAndFolders<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, string[]>
+  TArg extends Arg<TypeName, FieldName, string[]>,
+  TArg2 extends Arg<TypeName, FieldName, string>
 >(
-  argName: TArg,
-  permissionTypes?: PetitionPermissionType[]
+  targetIdsArg: TArg,
+  petitionBaseTypeArg: TArg2,
+  permissionTypes: PetitionPermissionType[]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const ids = unMaybeArray(args[argName] as unknown as string[]);
+      const ids = unMaybeArray(args[targetIdsArg] as unknown as string[]);
       if (ids.length === 0) {
         return true;
       }
 
-      const decodedIds = ids.map((id) => {
-        try {
-          return fromGlobalId(id, "Petition");
-        } catch {
-          return fromGlobalId(id, "PetitionFolder", true);
-        }
-      });
-
-      const [folders, petitions] = partition(
-        decodedIds,
+      const [folderPaths, petitionIds] = partition(
+        fromMultipleGlobalIds(ids, ["Petition", { type: "PetitionFolder", isString: true }]),
         (decoded) => decoded.type === "PetitionFolder"
       );
-      const [hasPetitionAccess, hasFolderAccess] = await Promise.all([
-        ctx.petitions.userHasAccessToPetitions(
-          ctx.user!.id,
-          petitions.map((p) => p.id as number),
-          permissionTypes
-        ),
-        ctx.petitions.userHasAccessToFolders(
-          ctx.user!.id,
-          folders.map((f) => f.id as string),
-          permissionTypes
-        ),
-      ]);
 
-      return hasPetitionAccess && hasFolderAccess;
+      // can't target root folder
+      if (folderPaths.some((f) => (f.id as string) === "/")) {
+        return false;
+      }
+
+      return await ctx.petitions.userHasAccessToPetitionsAndFolders(
+        ctx.user!.id,
+        ctx.user!.org_id,
+        (args[petitionBaseTypeArg] as unknown as string) === "TEMPLATE",
+        petitionIds.map((p) => p.id as number),
+        folderPaths.map((f) => f.id as string),
+        permissionTypes
+      );
+    } catch {}
+    return false;
+  };
+}
+
+export function petitionsAndFoldersMatchesPath<
+  TypeName extends string,
+  FieldName extends string,
+  TArgIds extends Arg<TypeName, FieldName, string[]>,
+  TArgPath extends Arg<TypeName, FieldName, string>
+>(argNameIds: TArgIds, argNamePath: TArgPath): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const ids = unMaybeArray(args[argNameIds] as unknown as string[]);
+      if (ids.length === 0) {
+        return true;
+      }
+
+      const source = args[argNamePath] as unknown as string;
+      const [folderPaths, petitionIds] = partition(
+        fromMultipleGlobalIds(ids, ["Petition", { type: "PetitionFolder", isString: true }]),
+        (decoded) => decoded.type === "PetitionFolder"
+      );
+
+      if (petitionIds.length > 0) {
+        const petitions = await ctx.petitions.loadPetition(petitionIds.map((p) => p.id as number));
+        if (!petitions.every((p) => p && p.path === source)) {
+          return false;
+        }
+      }
+
+      if (!folderPaths.every((fp) => (fp.id as string).startsWith(source))) {
+        return false;
+      }
+
+      return true;
     } catch {}
     return false;
   };

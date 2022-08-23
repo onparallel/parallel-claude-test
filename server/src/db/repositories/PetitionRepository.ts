@@ -188,44 +188,6 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
-  async getUserPetitionsOnFolder(userId: number, paths: string[]) {
-    return await this.raw<Petition>(
-      /* sql */ `
-      select p.*
-        from petition_permission pp join petition p on p.id = pp.petition_id
-        where pp.user_id = ?
-          and p.path like any (?)
-          and p.deleted_at is null 
-          and pp.deleted_at is null
-          and pp.user_group_id is null
-        group by p.id;
-    `,
-      [userId, this.sqlArray(paths.map((path) => `${path}%`))]
-    );
-  }
-
-  async userHasAccessToFolders(
-    userId: number,
-    paths: string[],
-    permissionTypes?: PetitionPermissionType[]
-  ) {
-    if (paths.length === 0) {
-      return true;
-    }
-    // list the petitions of the user inside passed paths with any permission
-    const petitions = await this.getUserPetitionsOnFolder(userId, paths);
-    if (petitions.length === 0) {
-      return false;
-    }
-
-    // check minimal permissions on those petitions
-    return await this.userHasAccessToPetitions(
-      userId,
-      petitions.map((p) => p.id),
-      permissionTypes
-    );
-  }
-
   async userHasAccessToPetitions(
     userId: number,
     petitionIds: number[],
@@ -1358,19 +1320,6 @@ export class PetitionRepository extends BaseRepository {
         },
         "*"
       );
-  }
-
-  async updatePetitionPaths(petitionIds: number[], from: string, to: string, updatedBy: string) {
-    await this.raw(
-      /* SQL */ `
-      update petition p
-      set "path" = concat(?::text, substring("path", length(?) + 1)),
-      updated_at = NOW(),
-      updated_by = ?
-      where p.id in ?
-    `,
-      [to, from, updatedBy, this.sqlIn(petitionIds)]
-    );
   }
 
   async closePetition(petitionId: number, updatedBy: string, t?: Knex.Transaction) {
@@ -5060,5 +5009,77 @@ export class PetitionRepository extends BaseRepository {
     );
 
     return paths.map((p) => p.path).filter((path) => path !== "/");
+  }
+
+  async userHasAccessToPetitionsAndFolders(
+    userId: number,
+    orgId: number,
+    isTemplate: boolean,
+    petitionIds: number[],
+    folderPaths: string[],
+    permissionTypes: PetitionPermissionType[]
+  ) {
+    if (permissionTypes.length === 0) {
+      throw new Error(`Expected permissionTypes array to have at least one value`);
+    }
+    const permissions = await this.raw<{ petition_id: number; type: PetitionPermissionType }>(
+      /* SQL */ `
+        select p.id as petition_id, pp.type from petition p left join petition_permission pp on pp.petition_id = p.id
+        where pp.user_id = ? and pp.from_user_group_id is null and pp.deleted_at is null
+        and p.is_template = ? and p.deleted_at is null and p.org_id = ?
+        and (p.id in ? or p.path like any (?::text[]));
+      `,
+      [
+        userId,
+        isTemplate,
+        orgId,
+        this.sqlIn(petitionIds.length > 0 ? petitionIds : [-1]),
+        this.sqlArray(folderPaths.map((path) => `${path}%`)),
+      ]
+    );
+
+    const ids = permissions.map((p) => p.petition_id);
+
+    return (
+      // every matched petition must have one of the permissions defined in permissionTypes
+      permissions.every((p) => permissionTypes.includes(p.type)) &&
+      // every passed petitionId must be included in the result
+      petitionIds.every((id) => ids.includes(id))
+    );
+  }
+
+  async updatePetitionPaths(
+    petitionIds: number[],
+    folderPaths: string[],
+    source: string,
+    destination: string,
+    isTemplate: boolean,
+    user: User
+  ) {
+    await this.raw(
+      /* SQL */ `
+        with user_petition_ids as (
+          select p.id from petition p join petition_permission pp on pp.petition_id = p.id
+          where pp.user_id = ? and pp.from_user_group_id is null and pp.deleted_at is null
+          and p.is_template = ? and p.deleted_at is null and p.org_id = ?
+          and (p.id in ? or p.path like any (?::text[]))
+        )
+        update petition p
+        set "path" = concat(?::text, substring("path", length(?) + 1)),
+        updated_at = NOW(),
+        updated_by = ?
+        from user_petition_ids ids where ids.id = p.id;
+      `,
+      [
+        user.id,
+        isTemplate,
+        user.org_id,
+        this.sqlIn(petitionIds.length > 0 ? petitionIds : [-1]),
+        this.sqlArray(folderPaths.map((path) => `${path}%`)),
+        destination,
+        source,
+        `User:${user.id}`,
+      ]
+    );
   }
 }
