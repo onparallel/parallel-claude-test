@@ -25,6 +25,7 @@ import {
   PetitionBaseType,
   PetitionSharedWithFilter,
   PetitionStatus,
+  Petitions_movePetitionsDocument,
   Petitions_PetitionBaseOrFolderFragment,
   Petitions_petitionsDocument,
   Petitions_updatePetitionDocument,
@@ -229,6 +230,7 @@ function Petitions() {
   }, []);
 
   const [updatePetition] = useMutation(Petitions_updatePetitionDocument);
+  const [movePetitions] = useMutation(Petitions_movePetitionsDocument);
   const showRenameDialog = useRenameDialog();
 
   const handleRenameClick = useCallback(async () => {
@@ -240,7 +242,18 @@ function Petitions() {
           type: row.__typename,
           isDisabled: false,
         });
-        console.log("New folder name: ", newName);
+
+        await movePetitions({
+          variables: {
+            targets: [row.folderId],
+            source: row.path,
+            destination: stateRef.current.path.concat(newName, "/"),
+            type: stateRef.current.type,
+          },
+          onCompleted: () => {
+            refetch();
+          },
+        });
       } else if (row.__typename === "Petition" || row.__typename === "PetitionTemplate") {
         const petition = row;
         if (petition) {
@@ -488,6 +501,16 @@ const _mutations = [
         id
         name
       }
+    }
+  `,
+  gql`
+    mutation Petitions_movePetitions(
+      $targets: [ID!]!
+      $source: String!
+      $destination: String!
+      $type: PetitionBaseType!
+    ) {
+      movePetitions(targets: $targets, source: $source, destination: $destination, type: $type)
     }
   `,
 ];

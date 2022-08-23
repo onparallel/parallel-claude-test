@@ -576,7 +576,7 @@ export interface Mutation {
   markSignatureIntegrationAsDefault: OrgIntegration;
   /** Adds, edits or deletes a custom property on the petition */
   modifyPetitionCustomProperty: PetitionBase;
-  /** Moves a group of petitions or folders to another folder */
+  /** Moves a group of petitions or folders to another folder. */
   movePetitions: Success;
   /** Generates a download link for a petition attachment */
   petitionAttachmentDownloadLink: FileUploadDownloadLinkResult;
@@ -1134,8 +1134,9 @@ export interface MutationmodifyPetitionCustomPropertyArgs {
 }
 
 export interface MutationmovePetitionsArgs {
-  dst: Scalars["String"];
-  src: Array<Scalars["ID"]>;
+  destination: Scalars["String"];
+  source: Scalars["String"];
+  targets: Array<Scalars["ID"]>;
   type: PetitionBaseType;
 }
 
@@ -20286,6 +20287,15 @@ export type Petitions_updatePetitionMutation = {
     | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
 };
 
+export type Petitions_movePetitionsMutationVariables = Exact<{
+  targets: Array<Scalars["ID"]> | Scalars["ID"];
+  source: Scalars["String"];
+  destination: Scalars["String"];
+  type: PetitionBaseType;
+}>;
+
+export type Petitions_movePetitionsMutation = { movePetitions: Success };
+
 export type NewPetition_PetitionBaseOrFolder_Petition_Fragment = { __typename?: "Petition" };
 
 export type NewPetition_PetitionBaseOrFolder_PetitionFolder_Fragment = {
@@ -29902,6 +29912,19 @@ export const Petitions_updatePetitionDocument = gql`
 ` as unknown as DocumentNode<
   Petitions_updatePetitionMutation,
   Petitions_updatePetitionMutationVariables
+>;
+export const Petitions_movePetitionsDocument = gql`
+  mutation Petitions_movePetitions(
+    $targets: [ID!]!
+    $source: String!
+    $destination: String!
+    $type: PetitionBaseType!
+  ) {
+    movePetitions(targets: $targets, source: $source, destination: $destination, type: $type)
+  }
+` as unknown as DocumentNode<
+  Petitions_movePetitionsMutation,
+  Petitions_movePetitionsMutationVariables
 >;
 export const NewPetition_templatesDocument = gql`
   query NewPetition_templates(

@@ -199,8 +199,6 @@ export type EffectivePetitionUserPermission = {
   user: User;
 };
 
-export type EntityType = "Contact" | "Organization" | "Petition" | "User";
-
 export type FeatureFlag =
   | "AUTO_ANONYMIZE"
   | "CUSTOM_HOST_UI"
@@ -544,6 +542,8 @@ export type Mutation = {
   markSignatureIntegrationAsDefault: OrgIntegration;
   /** Adds, edits or deletes a custom property on the petition */
   modifyPetitionCustomProperty: PetitionBase;
+  /** Moves a group of petitions or folders to another folder. */
+  movePetitions: Success;
   /** Generates a download link for a petition attachment */
   petitionAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the petition attachment was correctly uploaded to S3 */
@@ -1097,6 +1097,13 @@ export type MutationmodifyPetitionCustomPropertyArgs = {
   key: Scalars["String"];
   petitionId: Scalars["GID"];
   value?: InputMaybe<Scalars["String"]>;
+};
+
+export type MutationmovePetitionsArgs = {
+  destination: Scalars["String"];
+  source: Scalars["String"];
+  targets: Array<Scalars["ID"]>;
+  type: PetitionBaseType;
 };
 
 export type MutationpetitionAttachmentDownloadLinkArgs = {
@@ -2636,6 +2643,7 @@ export type PetitionTemplate = PetitionBase & {
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
   customProperties: Scalars["JSONObject"];
+  defaultPath: Scalars["String"];
   defaultPermissions: Array<TemplateDefaultPermission>;
   /** Description of the template. */
   description: Maybe<Scalars["JSON"]>;
@@ -3027,6 +3035,8 @@ export type Query = {
   petitionEvents: Array<PetitionEvent>;
   /** A field of the petition. */
   petitionField: PetitionField;
+  /** Lists every path of the user's petitions as a string array */
+  petitionFolders: Array<Scalars["String"]>;
   /** The petitions of the user */
   petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
@@ -3090,8 +3100,8 @@ export type QueryglobalIdDecodeArgs = {
 };
 
 export type QueryglobalIdEncodeArgs = {
-  id: Scalars["Int"];
-  type: EntityType;
+  id: Scalars["String"];
+  type: Scalars["String"];
 };
 
 export type QueryisValidPublicPetitionLinkSlugArgs = {
@@ -3137,6 +3147,10 @@ export type QuerypetitionEventsArgs = {
 export type QuerypetitionFieldArgs = {
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+};
+
+export type QuerypetitionFoldersArgs = {
+  type: PetitionBaseType;
 };
 
 export type QuerypetitionsArgs = {
@@ -3633,6 +3647,7 @@ export type UpdatePetitionInput = {
   completingMessageBody?: InputMaybe<Scalars["JSON"]>;
   completingMessageSubject?: InputMaybe<Scalars["String"]>;
   deadline?: InputMaybe<Scalars["DateTime"]>;
+  defaultPath?: InputMaybe<Scalars["String"]>;
   description?: InputMaybe<Scalars["JSON"]>;
   emailBody?: InputMaybe<Scalars["JSON"]>;
   emailSubject?: InputMaybe<Scalars["String"]>;

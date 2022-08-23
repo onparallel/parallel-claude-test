@@ -1,9 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
 import {
-  Box,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
   Button,
   Container,
   Flex,
@@ -18,7 +14,6 @@ import {
 } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { NakedLink } from "@parallel/components/common/Link";
 import { PathBreadcrumbs } from "@parallel/components/common/PathBreadcrumbs";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -62,7 +57,7 @@ import {
 } from "@parallel/utils/queryState";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 

@@ -835,7 +835,7 @@ function _PetitionSettings({
           }
         >
           <Button size="sm" id="default-path" onClick={handleChangeDefaultPath}>
-            Change
+            <FormattedMessage id="generic.change" defaultMessage="Change" />
           </Button>
         </SettingsRow>
       ) : null}

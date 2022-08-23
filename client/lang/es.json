@@ -1766,12 +1766,12 @@
   },
   {
     "term": "component.new-folder-dialog.folder-name-label",
-    "definition": "",
+    "definition": "Nombre de la carpeta",
     "context": "Folder name"
   },
   {
     "term": "component.new-folder-dialog.header",
-    "definition": "",
+    "definition": "Nueva carpeta",
     "context": "New folder"
   },
   {
@@ -2901,7 +2901,7 @@
   },
   {
     "term": "component.petition-settings.default-path",
-    "definition": "",
+    "definition": "Carpeta para parallels creados:",
     "context": "Folder for created parallels:"
   },
   {
@@ -4150,11 +4150,6 @@
     "context": "Change name"
   },
   {
-    "term": "component.rename-dialog.max-length-error",
-    "definition": "El nombre no puede superar los {max} caracteres",
-    "context": "Name cannot exceed {max} characters"
-  },
-  {
     "term": "component.rename-dialog.header-petition",
     "definition": "Renombrar parallel",
     "context": "Rename parallel"
@@ -4168,6 +4163,21 @@
     "term": "component.rename-dialog.header-template",
     "definition": "Renombrar plantilla",
     "context": "Rename template"
+  },
+  {
+    "term": "component.rename-dialog.max-length-error",
+    "definition": "El nombre no puede superar los {max} carácteres",
+    "context": "Name cannot exceed {max} characters"
+  },
+  {
+    "term": "component.rename-dialog.no-slash-error",
+    "definition": "El nombre no puede contener el carácter \"/\"",
+    "context": "Name can't contain the slash character /"
+  },
+  {
+    "term": "component.rename-dialog.required-error",
+    "definition": "Por favor, ingrese un nombre",
+    "context": "Please enter a name"
   },
   {
     "term": "component.replies-field-comment.mark-as-unread",
@@ -4331,18 +4341,13 @@
   },
   {
     "term": "component.select-folder-dialog.currently-in",
-    "definition": "",
-    "context": "Currently selected folder: {folder}"
+    "definition": "Carpeta actual: {folder}",
+    "context": "Current folder: {folder}"
   },
   {
     "term": "component.select-folder-dialog.header",
-    "definition": "",
+    "definition": "Seleccione carpeta",
     "context": "Select folder"
-  },
-  {
-    "term": "component.select-folder-dialog.move",
-    "definition": "",
-    "context": "Move"
   },
   {
     "term": "component.send-button.schedule",
@@ -5325,6 +5330,11 @@
     "context": "Cancel"
   },
   {
+    "term": "generic.change",
+    "definition": "Cambiar",
+    "context": "Change"
+  },
+  {
     "term": "generic.changes-saved",
     "definition": "Guardado",
     "context": "Saved"
@@ -5421,7 +5431,7 @@
   },
   {
     "term": "generic.create-folder",
-    "definition": "",
+    "definition": "Crear carpeta",
     "context": "Create folder"
   },
   {
@@ -5576,12 +5586,12 @@
   },
   {
     "term": "generic.folder",
-    "definition": "",
+    "definition": "Carpeta",
     "context": "Folder"
   },
   {
     "term": "generic.folder-directory",
-    "definition": "",
+    "definition": "Directorio de carpetas",
     "context": "Folder directory"
   },
   {
@@ -6033,6 +6043,11 @@
     "term": "generic.saving-changes",
     "definition": "Guardando...",
     "context": "Saving..."
+  },
+  {
+    "term": "generic.select",
+    "definition": "Seleccionar",
+    "context": "Select"
   },
   {
     "term": "generic.select-an-option",

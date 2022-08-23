@@ -4150,11 +4150,6 @@
     "context": "Change name"
   },
   {
-    "term": "component.rename-dialog.max-length-error",
-    "definition": "Name cannot exceed {max} characters",
-    "context": "Name cannot exceed {max} characters"
-  },
-  {
     "term": "component.rename-dialog.header-petition",
     "definition": "Rename parallel",
     "context": "Rename parallel"
@@ -4168,6 +4163,21 @@
     "term": "component.rename-dialog.header-template",
     "definition": "Rename template",
     "context": "Rename template"
+  },
+  {
+    "term": "component.rename-dialog.max-length-error",
+    "definition": "Name cannot exceed {max} characters",
+    "context": "Name cannot exceed {max} characters"
+  },
+  {
+    "term": "component.rename-dialog.no-slash-error",
+    "definition": "Name can't contain the slash character /",
+    "context": "Name can't contain the slash character /"
+  },
+  {
+    "term": "component.rename-dialog.required-error",
+    "definition": "Please enter a name",
+    "context": "Please enter a name"
   },
   {
     "term": "component.replies-field-comment.mark-as-unread",
@@ -4331,18 +4341,13 @@
   },
   {
     "term": "component.select-folder-dialog.currently-in",
-    "definition": "Currently selected folder: {folder}",
-    "context": "Currently selected folder: {folder}"
+    "definition": "Current folder: {folder}",
+    "context": "Current folder: {folder}"
   },
   {
     "term": "component.select-folder-dialog.header",
     "definition": "Select folder",
     "context": "Select folder"
-  },
-  {
-    "term": "component.select-folder-dialog.move",
-    "definition": "Move",
-    "context": "Move"
   },
   {
     "term": "component.send-button.schedule",
@@ -5325,6 +5330,11 @@
     "context": "Cancel"
   },
   {
+    "term": "generic.change",
+    "definition": "Change",
+    "context": "Change"
+  },
+  {
     "term": "generic.changes-saved",
     "definition": "Saved",
     "context": "Saved"
@@ -6033,6 +6043,11 @@
     "term": "generic.saving-changes",
     "definition": "Saving...",
     "context": "Saving..."
+  },
+  {
+    "term": "generic.select",
+    "definition": "Select",
+    "context": "Select"
   },
   {
     "term": "generic.select-an-option",
