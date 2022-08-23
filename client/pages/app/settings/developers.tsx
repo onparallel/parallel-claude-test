@@ -164,7 +164,7 @@ function Developers() {
               defaultMessage="Personal Access Tokens can be used to access the <a>Parallel API</a>."
               values={{
                 a: (chunks: any) => (
-                  <NormalLink href="/developers/api" target="_blank">
+                  <NormalLink href="https://www.onparallel.com/developers/api" target="_blank">
                     {chunks}
                   </NormalLink>
                 ),
