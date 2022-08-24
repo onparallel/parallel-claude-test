@@ -30,7 +30,7 @@ export const RecipientViewFooter = Object.assign(
               values={{
                 parallel: (
                   <NakedLink
-                    href="/?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients"
+                    href={`https://www.onparallel.com/${intl.locale}?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients`}
                     passHref
                   >
                     <Flex as="a" marginLeft={2.5}>
@@ -60,15 +60,7 @@ export const RecipientViewFooter = Object.assign(
           </ListItem>
           <ListItem>
             <Link
-              href="/security?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients"
-              target="_blank"
-            >
-              <FormattedMessage id="recipient-view.security-link" defaultMessage="About security" />
-            </Link>
-          </ListItem>
-          <ListItem>
-            <Link
-              href="/legal/terms?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients"
+              href={`https://www.onparallel.com/${intl.locale}/legal/terms?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients`}
               target="_blank"
             >
               <FormattedMessage id="public.terms.title" defaultMessage="Terms & Conditions" />

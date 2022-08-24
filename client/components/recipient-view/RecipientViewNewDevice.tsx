@@ -14,7 +14,7 @@ import { useCodeExpiredToast } from "@parallel/utils/useCodeExpiredToast";
 import { isPast } from "date-fns";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import { useTone } from "../common/ToneProvider";
 
@@ -35,6 +35,7 @@ interface RecipientViewNewDeviceProps {
 }
 
 export function RecipientViewNewDevice({ organization, email }: RecipientViewNewDeviceProps) {
+  const intl = useIntl();
   const codeExpiredToast = useCodeExpiredToast();
   const router = useRouter();
   const { query } = router;
@@ -192,7 +193,7 @@ export function RecipientViewNewDevice({ organization, email }: RecipientViewNew
           right={0}
           bottom={0}
           as="a"
-          href="/?ref=parallel_public_link"
+          href={`https://www.onparallel.com/${intl.locale}?ref=parallel_public_link`}
           target="_blank"
           backgroundColor="gray.200"
           borderTopLeftRadius="xl"

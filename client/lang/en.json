@@ -8645,11 +8645,6 @@
     "context": "Review and sign"
   },
   {
-    "term": "recipient-view.security-link",
-    "definition": "About security",
-    "context": "About security"
-  },
-  {
     "term": "recipient-view.send-code",
     "definition": "Send verification code",
     "context": "Send verification code"

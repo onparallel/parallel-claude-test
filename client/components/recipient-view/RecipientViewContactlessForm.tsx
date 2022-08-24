@@ -474,7 +474,7 @@ export function RecipientViewContactlessForm({
           right={0}
           bottom={0}
           as="a"
-          href="/?ref=parallel_public_link"
+          href={`https://www.onparallel.com/${intl.locale}?ref=parallel_public_link`}
           target="_blank"
           backgroundColor="gray.200"
           borderTopLeftRadius="xl"

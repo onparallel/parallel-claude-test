@@ -261,7 +261,7 @@ function PublicPetitionLink({
           </SimpleGrid>
           <Spacer />
           <Flex justifyContent="flex-end">
-            <NakedLink href="/?ref=parallel_public_link">
+            <NakedLink href={`https://www.onparallel.com/${intl.locale}?ref=parallel_public_link`}>
               <Box
                 as="a"
                 target="_blank"
