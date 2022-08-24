@@ -11,6 +11,7 @@ import {
   queryField,
   stringArg,
 } from "nexus";
+import { sort, uniq } from "remeda";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import { authenticate, authenticateAnd, or } from "../helpers/authorize";
@@ -264,10 +265,22 @@ export const petitionFolders = queryField("petitionFolders", {
     type: nonNull("PetitionBaseType"),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.getUserPetitionFoldersList(
+    function pathAndParents(path: string): string[] {
+      if (path.split("/").length > 2) {
+        return [path, ...pathAndParents(path.replace(/^(.*\/).+$/, "$1"))];
+      }
+      return [path];
+    }
+
+    const petitionPaths = await ctx.petitions.getUserPetitionFoldersList(
       ctx.user!.id,
       ctx.user!.org_id,
       args.type === "TEMPLATE"
     );
+
+    const fullPaths = uniq(
+      petitionPaths.flatMap((path) => pathAndParents(path)).filter((p) => p !== "/")
+    );
+    return sort(fullPaths, (a, b) => a.localeCompare(b));
   },
 });

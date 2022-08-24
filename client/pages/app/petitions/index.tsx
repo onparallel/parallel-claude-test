@@ -277,12 +277,25 @@ function Petitions() {
   const showMoveFolderDialog = useMoveToFolderDialog();
   const handleMoveToClick = useCallback(async () => {
     try {
-      await showMoveFolderDialog({
+      const destinationPath = await showMoveFolderDialog({
         type: stateRef.current.type,
         currentPath: stateRef.current.path,
         disabledPaths: selectedRowsRef.current
           .filter(isTypename("PetitionFolder"))
           .map((r) => r.path),
+      });
+      await movePetitions({
+        variables: {
+          targets: selectedRowsRef.current.map((c) =>
+            c.__typename === "PetitionFolder" ? c.folderId : (c as any).id
+          ),
+          source: stateRef.current.path,
+          destination: destinationPath,
+          type: stateRef.current.type,
+        },
+        onCompleted: () => {
+          refetch();
+        },
       });
     } catch {}
   }, []);

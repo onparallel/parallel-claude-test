@@ -131,24 +131,31 @@ export function GenericFolderDialog({
   const showNewFolderNameDialog = useNewFolderNameDialog();
   async function handleCreateNewFolder() {
     try {
-      const node = document.querySelector<HTMLElement>(`[data-folder-path="${selectedPath}"]`);
-      const isExpanded = node?.parentElement?.getAttribute("aria-expanded") === "true";
       const name = await showNewFolderNameDialog({});
       const path = selectedPath + name + "/";
       const id = treeViewData!.length;
       const parent = treeViewData!.find((n) => n.path === selectedPath)!;
-      setTreeViewData([
-        ...treeViewData!.map((n) =>
-          n.id === parent.id ? { ...n, children: [...n.children, id] } : n
-        ),
-        {
-          id: treeViewData!.length,
-          name: "",
-          parent: parent.id,
-          path: path,
-          children: [],
-        },
-      ]);
+      if (
+        // if new folder name already exists as children on the selectedPath, skip
+        !parent.children.some(
+          (childrenId) => treeViewData!.find((n) => n.id === childrenId)!.path === path
+        )
+      ) {
+        setTreeViewData([
+          ...treeViewData!.map((n) =>
+            n.id === parent.id ? { ...n, children: [...n.children, id] } : n
+          ),
+          {
+            id: treeViewData!.length,
+            name: "",
+            parent: parent.id,
+            path: path,
+            children: [],
+          },
+        ]);
+      }
+      const node = document.querySelector<HTMLElement>(`[data-folder-path="${selectedPath}"]`);
+      const isExpanded = node?.parentElement?.getAttribute("aria-expanded") === "true";
       if (!isExpanded) {
         await dblClickPathItem(selectedPath);
       }

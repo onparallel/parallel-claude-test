@@ -5008,7 +5008,7 @@ export class PetitionRepository extends BaseRepository {
       [userId, isTemplate, orgId]
     );
 
-    return paths.map((p) => p.path).filter((path) => path !== "/");
+    return paths.map((p) => p.path);
   }
 
   async userHasAccessToPetitionsAndFolders(

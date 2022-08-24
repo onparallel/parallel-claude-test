@@ -56,8 +56,10 @@ describe("Petition Folders", () => {
         "/A/",
         "/A/AA/",
         "/B/",
+        "/B/BA/",
         "/B/BA/BAA/",
         "/B/BA/BAB/",
+        "/B/BB/",
         "/B/BB/BBA/",
         "/C/",
         "/D/",
@@ -99,7 +101,26 @@ describe("Petition Folders", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data!.petitionFolders).toEqual(["/PRIVATE/PATH/"]);
+      expect(data!.petitionFolders).toEqual(["/PRIVATE/", "/PRIVATE/PATH/"]);
+    });
+
+    it("splits paths on all levels", async () => {
+      await mocks.knex.from("petition").update("deleted_at", new Date());
+      await mocks.createRandomPetitions(user.org_id, user.id, 1, () => ({
+        path: "/A/B/C/D/",
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($type: PetitionBaseType!) {
+            petitionFolders(type: $type)
+          }
+        `,
+        { type: "PETITION" }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data!.petitionFolders).toEqual(["/A/", "/A/B/", "/A/B/C/", "/A/B/C/D/"]);
     });
   });
 
