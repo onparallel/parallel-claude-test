@@ -633,12 +633,16 @@ export class Mocks {
     );
   }
 
-  async sharePetitionWithGroups(petitionId: number, userGroupIds: number[]) {
+  async sharePetitionWithGroups(
+    petitionId: number,
+    userGroupIds: number[],
+    permissionType?: PetitionPermissionType
+  ) {
     await this.knex<PetitionPermission>("petition_permission").insert(
       userGroupIds.map((groupId) => ({
         petition_id: petitionId,
         user_group_id: groupId,
-        type: "WRITE",
+        type: permissionType ?? "WRITE",
       }))
     );
 
@@ -651,7 +655,7 @@ export class Mocks {
         petition_id: petitionId,
         from_user_group_id: m.user_group_id,
         user_id: m.user_id,
-        type: "WRITE",
+        type: permissionType ?? "WRITE",
       }))
     );
   }

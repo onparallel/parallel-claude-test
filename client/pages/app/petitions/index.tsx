@@ -23,6 +23,7 @@ import {
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
 import {
   PetitionBaseType,
+  PetitionPermissionType,
   PetitionSharedWithFilter,
   PetitionStatus,
   Petitions_movePetitionsDocument,
@@ -55,7 +56,7 @@ import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { MouseEvent, PropsWithChildren, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { pick } from "remeda";
+import { isDefined, pick, sort as sortFn } from "remeda";
 
 const SORTING = ["name", "createdAt", "sentAt"] as const;
 
@@ -286,9 +287,7 @@ function Petitions() {
       });
       await movePetitions({
         variables: {
-          targets: selectedRowsRef.current.map((c) =>
-            c.__typename === "PetitionFolder" ? c.folderId : (c as any).id
-          ),
+          targets: selectedRowsRef.current.map(rowKeyProp),
           source: stateRef.current.path,
           destination: destinationPath,
           type: stateRef.current.type,
@@ -304,10 +303,36 @@ function Petitions() {
 
   const context = useMemo(() => ({ user: me! }), [me]);
 
+  const minimumPermission = useMemo(() => {
+    return sortFn(
+      selectedRowsRef.current
+        .map((r) =>
+          r.__typename === "PetitionFolder"
+            ? r.minimumPermissionType
+            : r.__typename === "Petition" || r.__typename === "PetitionTemplate"
+            ? r.myEffectivePermission!.permissionType
+            : null
+        )
+        .filter(isDefined),
+      (permission) => {
+        switch (permission) {
+          case "READ":
+            return -1;
+          case "WRITE":
+            return 0;
+          case "OWNER":
+            return 1;
+        }
+      }
+    )[0];
+  }, [selectedRowsRef.current.length]);
+
   const actions = usePetitionListActions({
     user: me,
     type: state.type,
     selectedCount: selectedIds.length,
+    hasSelectedFolders: selectedRowsRef.current.some((c) => c.__typename === "PetitionFolder"),
+    minimumPermission,
     onRenameClick: handleRenameClick,
     onDeleteClick: handleDeleteClick,
     onCloneAsTemplateClick: handleCloneAsTemplate,
@@ -532,6 +557,8 @@ function usePetitionListActions({
   user,
   type,
   selectedCount,
+  hasSelectedFolders,
+  minimumPermission,
   onRenameClick,
   onShareClick,
   onCloneClick,
@@ -543,6 +570,8 @@ function usePetitionListActions({
   user: any;
   type: PetitionBaseType;
   selectedCount: number;
+  hasSelectedFolders: boolean;
+  minimumPermission: PetitionPermissionType;
   onRenameClick: () => void;
   onShareClick: () => void;
   onCloneClick: () => void;
@@ -555,7 +584,7 @@ function usePetitionListActions({
     {
       key: "rename",
       onClick: onRenameClick,
-      isDisabled: selectedCount !== 1,
+      isDisabled: selectedCount !== 1 || minimumPermission === "READ",
       leftIcon: <EditSimpleIcon />,
       children: (
         <FormattedMessage id="page.petitions-list.actions-rename" defaultMessage="Rename" />
@@ -572,6 +601,7 @@ function usePetitionListActions({
       : [
           {
             key: "clone",
+            isDisabled: hasSelectedFolders,
             onClick: onCloneClick,
             leftIcon: <CopyIcon />,
             children: (
@@ -581,6 +611,7 @@ function usePetitionListActions({
           {
             key: "move-to",
             onClick: onMoveToClick,
+            isDisabled: minimumPermission === "READ",
             leftIcon: <FolderIcon />,
             children: (
               <FormattedMessage
@@ -594,7 +625,7 @@ function usePetitionListActions({
       ? {
           key: "saveAsTemplate",
           onClick: onCloneAsTemplateClick,
-          isDisabled: selectedCount !== 1,
+          isDisabled: selectedCount !== 1 || hasSelectedFolders,
           leftIcon: <CopyIcon />,
           children: (
             <FormattedMessage
@@ -606,7 +637,7 @@ function usePetitionListActions({
       : {
           key: "useTemplate",
           onClick: onUseTemplateClick,
-          isDisabled: selectedCount !== 1,
+          isDisabled: selectedCount !== 1 || hasSelectedFolders,
           leftIcon: <PaperPlaneIcon />,
           children: (
             <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />

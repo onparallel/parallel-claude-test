@@ -22,6 +22,53 @@ describe("Petition Folders", () => {
     await testClient.stop();
   });
 
+  describe("petitions", () => {
+    it("searches a folder", async () => {
+      const [petition] = await mocks.createRandomPetitions(user.org_id, user.id, 1, () => ({
+        path: "/my-shared-folder/",
+      }));
+      const [group] = await mocks.createUserGroups(1, user.org_id);
+      await mocks.insertUserGroupMembers(group.id, [user.id]);
+      await mocks.sharePetitionWithGroups(petition.id, [group.id], "READ");
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($search: String, $filters: PetitionFilter) {
+            petitions(search: $search, offset: 0, limit: 100, filters: $filters) {
+              totalCount
+              items {
+                __typename
+                ... on PetitionBase {
+                  petitionId: id
+                }
+                ... on PetitionFolder {
+                  id
+                  minimumPermissionType
+
+                  petitionCount
+                }
+              }
+            }
+          }
+        `,
+        { search: "my-shared-folder", filters: { path: "/" } }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data!.petitions).toEqual({
+        totalCount: 1,
+        items: [
+          {
+            __typename: "PetitionFolder",
+            id: toGlobalId<string>("PetitionFolder", "/my-shared-folder/"),
+            minimumPermissionType: "OWNER",
+            petitionCount: 1,
+          },
+        ],
+      });
+    });
+  });
+
   describe("petitionFolders", () => {
     beforeEach(async () => {
       await mocks.knex.from("petition").update({ deleted_at: new Date() });

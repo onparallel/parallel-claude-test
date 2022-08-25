@@ -380,10 +380,18 @@ export class PetitionRepository extends BaseRepository {
     const builders: Knex.QueryCallbackWithArgs[] = [
       (q) =>
         q
-          .joinRaw(
-            /* sql */ `join petition_permission pp on p.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null`,
-            [userId]
+          .with(
+            "effective_permissions",
+            this.knex.raw(
+              /* sql */ `
+              select p.id as petition_id, min(pp.type) as effective_type, min(pp.created_at) as last_used_at
+              from petition p join petition_permission pp on p.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null
+              group by p.id
+            `,
+              [userId]
+            )
           )
+          .joinRaw(/* sql */ `join effective_permissions ep on p.id = ep.petition_id`)
           .joinRaw(/* sql */ `left join petition_message pm on p.id = pm.petition_id`)
           .where("p.org_id", orgId)
           .whereNull("p.deleted_at")
@@ -578,7 +586,7 @@ export class PetitionRepository extends BaseRepository {
           this.knex.raw(/* sql */ `min(coalesce(pm.scheduled_at, pm.created_at)) as sent_at`),
           opts.sortBy?.some((s) => s.field === "lastUsedAt")
             ? this.knex.raw(
-                /* sql */ `greatest(max(t.t_last_used_at), min(pp.created_at)) as last_used_at`
+                /* sql */ `greatest(max(t.t_last_used_at), min(ep.last_used_at)) as last_used_at`
               )
             : this.knex.raw(/* sql */ `null as last_used_at`)
         );
@@ -614,7 +622,7 @@ export class PetitionRepository extends BaseRepository {
                       filters!.path!,
                     ]),
                     this.knex.raw(/* sql */ `count(distinct p.id)::int as petition_count`),
-                    this.knex.raw(/* sql */ `max(pp.type) as min_permission`)
+                    this.knex.raw(/* sql */ `max(ep.effective_type) as min_permission`)
                   )
                   .groupBy("_name")
               )
