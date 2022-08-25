@@ -1,3 +1,4 @@
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
@@ -11,6 +12,7 @@ import {
   useRadioGroup,
 } from "@chakra-ui/react";
 import { AddIcon, RepeatIcon } from "@parallel/chakra/icons";
+import { PetitionListHeader_movePetitionsDocument } from "@parallel/graphql/__types";
 import type { PetitionsQueryState } from "@parallel/pages/app/petitions";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
@@ -78,11 +80,24 @@ export function PetitionListHeader({
   });
 
   const showCreateFolderDialog = useCreateFolderDialog();
+  const [movePetitions] = useMutation(PetitionListHeader_movePetitionsDocument);
   const handleCreateFolder = async () => {
     try {
-      const data = await showCreateFolderDialog({ isTemplate: state.type === "TEMPLATE" });
-      console.log("name: ", data.name);
-      console.log("petition / template ID's: ", data.ids);
+      const data = await showCreateFolderDialog({
+        isTemplate: state.type === "TEMPLATE",
+        currentPath: state.path,
+      });
+      await movePetitions({
+        variables: {
+          targets: data.petitions.map((p) => p.id),
+          source: state.path,
+          destination: `${state.path}${data.name}/`,
+          type: state.type,
+        },
+        onCompleted: () => {
+          onReload();
+        },
+      });
     } catch {}
   };
 
@@ -241,3 +256,16 @@ function SearchInButton(props: RadioProps) {
     </Button>
   );
 }
+
+const _mutations = [
+  gql`
+    mutation PetitionListHeader_movePetitions(
+      $targets: [ID!]!
+      $source: String!
+      $destination: String!
+      $type: PetitionBaseType!
+    ) {
+      movePetitions(targets: $targets, source: $source, destination: $destination, type: $type)
+    }
+  `,
+];

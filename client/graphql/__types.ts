@@ -7918,6 +7918,65 @@ export type ConfirmPetitionSignersDialog_PetitionSignatureRequestFragment = {
   };
 };
 
+export type CreateFolderDialog_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  name?: string | null;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
+};
+
+export type CreateFolderDialog_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  name?: string | null;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
+};
+
+export type CreateFolderDialog_PetitionBaseFragment =
+  | CreateFolderDialog_PetitionBase_Petition_Fragment
+  | CreateFolderDialog_PetitionBase_PetitionTemplate_Fragment;
+
+export type CreateFolderDialog_petitionsQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  search?: InputMaybe<Scalars["String"]>;
+  sortBy?: InputMaybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
+  filters?: InputMaybe<PetitionFilter>;
+}>;
+
+export type CreateFolderDialog_petitionsQuery = {
+  petitions: {
+    __typename?: "PetitionBaseOrFolderPagination";
+    items: Array<
+      | {
+          __typename?: "Petition";
+          id: string;
+          name?: string | null;
+          myEffectivePermission?: {
+            __typename?: "EffectivePetitionUserPermission";
+            permissionType: PetitionPermissionType;
+          } | null;
+        }
+      | { __typename?: "PetitionFolder" }
+      | {
+          __typename?: "PetitionTemplate";
+          id: string;
+          name?: string | null;
+          myEffectivePermission?: {
+            __typename?: "EffectivePetitionUserPermission";
+            permissionType: PetitionPermissionType;
+          } | null;
+        }
+    >;
+  };
+};
+
 export type CreateReferenceDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -9618,6 +9677,15 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   alias?: string | null;
   hasCommentsEnabled: boolean;
 };
+
+export type PetitionListHeader_movePetitionsMutationVariables = Exact<{
+  targets: Array<Scalars["ID"]> | Scalars["ID"];
+  source: Scalars["String"];
+  destination: Scalars["String"];
+  type: PetitionBaseType;
+}>;
+
+export type PetitionListHeader_movePetitionsMutation = { movePetitions: Success };
 
 export type PetitionListTagFilter_TagFragment = {
   __typename?: "Tag";
@@ -23330,6 +23398,15 @@ export const CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragmentDoc = gq
     isDefault
   }
 ` as unknown as DocumentNode<CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment, unknown>;
+export const CreateFolderDialog_PetitionBaseFragmentDoc = gql`
+  fragment CreateFolderDialog_PetitionBase on PetitionBase {
+    id
+    name
+    myEffectivePermission {
+      permissionType
+    }
+  }
+` as unknown as DocumentNode<CreateFolderDialog_PetitionBaseFragment, unknown>;
 export const CreateReferenceDialog_PetitionFieldFragmentDoc = gql`
   fragment CreateReferenceDialog_PetitionField on PetitionField {
     id
@@ -27549,6 +27626,25 @@ export const AddPetitionAccessDialog_createPetitionAccessDocument = gql`
   AddPetitionAccessDialog_createPetitionAccessMutation,
   AddPetitionAccessDialog_createPetitionAccessMutationVariables
 >;
+export const CreateFolderDialog_petitionsDocument = gql`
+  query CreateFolderDialog_petitions(
+    $offset: Int!
+    $limit: Int!
+    $search: String
+    $sortBy: [QueryPetitions_OrderBy!]
+    $filters: PetitionFilter
+  ) {
+    petitions(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filters: $filters) {
+      items {
+        ...CreateFolderDialog_PetitionBase
+      }
+    }
+  }
+  ${CreateFolderDialog_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  CreateFolderDialog_petitionsQuery,
+  CreateFolderDialog_petitionsQueryVariables
+>;
 export const GenericFolderDialog_foldersDocument = gql`
   query GenericFolderDialog_folders($type: PetitionBaseType!) {
     petitionFolders(type: $type)
@@ -28048,6 +28144,19 @@ export const DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument = 
 ` as unknown as DocumentNode<
   DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation,
   DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables
+>;
+export const PetitionListHeader_movePetitionsDocument = gql`
+  mutation PetitionListHeader_movePetitions(
+    $targets: [ID!]!
+    $source: String!
+    $destination: String!
+    $type: PetitionBaseType!
+  ) {
+    movePetitions(targets: $targets, source: $source, destination: $destination, type: $type)
+  }
+` as unknown as DocumentNode<
+  PetitionListHeader_movePetitionsMutation,
+  PetitionListHeader_movePetitionsMutationVariables
 >;
 export const PetitionListTagFilter_tagsDocument = gql`
   query PetitionListTagFilter_tags($search: String) {

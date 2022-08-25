@@ -860,6 +860,16 @@
     "context": "Create folder"
   },
   {
+    "term": "component.create-folder-dialog.no-options",
+    "definition": "No pudimos encontrar {isTemplate, select, true{ninguna plantilla} other{ningún parallel}} con permisos de <i>Editor</i> en la carpeta actual",
+    "context": "We could not find any {isTemplate, select, true{template} other{parallel}} with <i>Editor</i> permission in the current folder"
+  },
+  {
+    "term": "component.create-folder-dialog.no-petitions-selected-error",
+    "definition": "Por favor, seleccione al menos {isTemplate, select, true{una plantilla} other{un parallel}} en la carpeta actual",
+    "context": "Please, select at least one {isTemplate, select, true{template} other{parallel}} in the current folder"
+  },
+  {
     "term": "component.create-group-dialog.confirm-button",
     "definition": "Crear equipo",
     "context": "Create team"
@@ -5656,7 +5666,7 @@
   },
   {
     "term": "generic.forms.invalid-folder-name-error",
-    "definition": "Por favor, indtroduzca el nombre de la carpeta",
+    "definition": "Por favor, introduzca el nombre de la carpeta",
     "context": "Please, enter the folder name"
   },
   {

@@ -860,6 +860,16 @@
     "context": "Create folder"
   },
   {
+    "term": "component.create-folder-dialog.no-options",
+    "definition": "We could not find any {isTemplate, select, true{template} other{parallel}} with <i>Editor</i> permission in the current folder",
+    "context": "We could not find any {isTemplate, select, true{template} other{parallel}} with <i>Editor</i> permission in the current folder"
+  },
+  {
+    "term": "component.create-folder-dialog.no-petitions-selected-error",
+    "definition": "Please, select at least one {isTemplate, select, true{template} other{parallel}} in the current folder",
+    "context": "Please, select at least one {isTemplate, select, true{template} other{parallel}} in the current folder"
+  },
+  {
     "term": "component.create-group-dialog.confirm-button",
     "definition": "Create team",
     "context": "Create team"

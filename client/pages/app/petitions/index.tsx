@@ -132,6 +132,7 @@ function Petitions() {
     setQueryState((current) => ({
       ...current,
       status: null,
+      path: "/",
       type,
       page: 1,
       // avoid invalid filter/sort combinations
