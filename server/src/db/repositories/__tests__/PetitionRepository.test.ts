@@ -1073,4 +1073,90 @@ describe("repositories/PetitionRepository", () => {
       });
     });
   });
+
+  describe("getUserPetitionsInsideFolders", () => {
+    let orgUser: User;
+    let otherOrgUser: User;
+    let userPetitions: Petition[];
+    let orgUserPetitions: Petition[];
+    let otherOrgUserPetitions: Petition[];
+
+    beforeAll(async () => {
+      [orgUser] = await mocks.createRandomUsers(user.org_id, 1);
+      const [otherOrg] = await mocks.createRandomOrganizations(1);
+      [otherOrgUser] = await mocks.createRandomUsers(otherOrg.id, 1);
+    });
+
+    beforeEach(async () => {
+      await mocks.knex.from("petition").update("deleted_at", new Date());
+
+      userPetitions = await mocks.createRandomPetitions(user.org_id, user.id, 5, (i) => ({
+        path: ["/", "/common/", "/A/B/C/", "/A/B/C/D/E/", "/templates/"][i],
+        is_template: i === 4,
+      }));
+      orgUserPetitions = await mocks.createRandomPetitions(orgUser.org_id, orgUser.id, 1, () => ({
+        path: "/commmon/",
+      }));
+      otherOrgUserPetitions = await mocks.createRandomPetitions(
+        otherOrgUser.org_id,
+        otherOrgUser.id,
+        1,
+        () => ({ path: "/common/" })
+      );
+    });
+
+    it("gets only the user's petitions on the passed folders", async () => {
+      const _petitions = await petitions.getUserPetitionsInsideFolders(
+        ["/common/", "/A/B/C/"],
+        false,
+        user
+      );
+
+      expect(_petitions.map((p) => pick(p, ["id", "path", "is_template"]))).toEqual([
+        {
+          id: userPetitions[2].id,
+          path: "/A/B/C/",
+          is_template: false,
+        },
+        {
+          id: userPetitions[3].id,
+          path: "/A/B/C/D/E/",
+          is_template: false,
+        },
+        {
+          id: userPetitions[1].id,
+          path: "/common/",
+          is_template: false,
+        },
+      ]);
+    });
+
+    it("gets only PETITION type", async () => {
+      const _petitions = await petitions.getUserPetitionsInsideFolders(
+        ["/templates/"],
+        false,
+        user
+      );
+      expect(_petitions).toHaveLength(0);
+    });
+
+    it("returns only 1 petition if having multiple permissions", async () => {
+      const [group] = await mocks.createUserGroups(1, user.org_id);
+      await mocks.insertUserGroupMembers(group.id, [user.id]);
+      const [petition] = await mocks.createRandomPetitions(user.org_id, user.id, 1, () => ({
+        path: "/shared-with-group/",
+      }));
+      await mocks.sharePetitionWithGroups(petition.id, [group.id]);
+
+      const result = await petitions.getUserPetitionsInsideFolders(
+        ["/shared-with-group/"],
+        false,
+        user
+      );
+
+      expect(result.map((r) => pick(r, ["id", "path"]))).toEqual([
+        { id: petition.id, path: "/shared-with-group/" },
+      ]);
+    });
+  });
 });

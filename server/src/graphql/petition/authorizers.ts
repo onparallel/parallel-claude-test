@@ -1,4 +1,5 @@
 import { ApolloError } from "apollo-server-express";
+import { ArgsValue } from "nexus/dist/core";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { countBy, isDefined, partition, uniq } from "remeda";
 import {
@@ -537,17 +538,15 @@ export const petitionHasStatus = createPetitionAuthorizer(
 
 export function userHasAccessToPetitionsAndFolders<
   TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, string[]>,
-  TArg2 extends Arg<TypeName, FieldName, string>
+  FieldName extends string
 >(
-  targetIdsArg: TArg,
-  petitionBaseTypeArg: TArg2,
-  permissionTypes: PetitionPermissionType[]
+  targetIdsProp: (args: ArgsValue<TypeName, FieldName>) => string[],
+  petitionBaseTypeProps: (args: ArgsValue<TypeName, FieldName>) => "PETITION" | "TEMPLATE",
+  permissionTypes?: PetitionPermissionType[]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const ids = unMaybeArray(args[targetIdsArg] as unknown as string[]);
+      const ids = targetIdsProp(args);
       if (ids.length === 0) {
         return true;
       }
@@ -565,7 +564,7 @@ export function userHasAccessToPetitionsAndFolders<
       return await ctx.petitions.userHasAccessToPetitionsAndFolders(
         ctx.user!.id,
         ctx.user!.org_id,
-        (args[petitionBaseTypeArg] as unknown as string) === "TEMPLATE",
+        petitionBaseTypeProps(args) === "TEMPLATE",
         petitionIds.map((p) => p.id as number),
         folderPaths.map((f) => f.id as string),
         permissionTypes

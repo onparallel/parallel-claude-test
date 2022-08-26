@@ -89,6 +89,11 @@ export interface NexusGenInputs {
     firstName: string; // String!
     lastName?: string | null; // String
   };
+  DeleteFoldersInput: {
+    // input type
+    folderIds: string[]; // [ID!]!
+    type: NexusGenEnums["PetitionBaseType"]; // PetitionBaseType!
+  };
   FileUploadInput: {
     // input type
     contentType: string; // String!
@@ -4212,8 +4217,9 @@ export interface NexusGenArgTypes {
     deletePetitions: {
       // args
       dryrun?: boolean | null; // Boolean
+      folders?: NexusGenInputs["DeleteFoldersInput"] | null; // DeleteFoldersInput
       force?: boolean | null; // Boolean
-      ids: NexusGenScalars["GID"][]; // [GID!]!
+      ids?: NexusGenScalars["GID"][] | null; // [GID!]
     };
     deleteSignatureIntegration: {
       // args

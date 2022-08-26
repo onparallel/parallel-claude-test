@@ -226,6 +226,11 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 """
 scalar DateTime
 
+input DeleteFoldersInput {
+  folderIds: [ID!]!
+  type: PetitionBaseType!
+}
+
 """
 The effective permission for a petition and user
 """
@@ -878,15 +883,16 @@ type Mutation {
   deletePetitionReply(petitionId: GID!, replyId: GID!): PetitionField!
 
   """
-  Delete parallels.
+  Delete petitions and folders.
   """
   deletePetitions(
     """
     If true, this will do a dry-run of the mutation to throw possible errors but it will not perform any modification in DB
     """
     dryrun: Boolean = false
+    folders: DeleteFoldersInput
     force: Boolean = false
-    ids: [GID!]!
+    ids: [GID!]
   ): Success!
 
   """

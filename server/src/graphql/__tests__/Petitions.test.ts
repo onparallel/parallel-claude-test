@@ -2018,6 +2018,20 @@ describe("GraphQL/Petitions", () => {
       await mocks.clearSharedPetitions();
     });
 
+    it("sends error if not passing ids nor folders", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($ids: [GID!], $folders: DeleteFoldersInput) {
+            deletePetitions(ids: $ids, folders: $folders)
+          }
+        `,
+        { ids: null, folders: null }
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
     it("deletes a user petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`

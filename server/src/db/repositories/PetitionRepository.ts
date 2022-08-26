@@ -5025,11 +5025,8 @@ export class PetitionRepository extends BaseRepository {
     isTemplate: boolean,
     petitionIds: number[],
     folderPaths: string[],
-    permissionTypes: PetitionPermissionType[]
+    permissionTypes: PetitionPermissionType[] = []
   ) {
-    if (permissionTypes.length === 0) {
-      throw new Error(`Expected permissionTypes array to have at least one value`);
-    }
     const permissions = await this.raw<{ petition_id: number; type: PetitionPermissionType }>(
       /* SQL */ `
         select p.id as petition_id, pp.type from petition p left join petition_permission pp on pp.petition_id = p.id
@@ -5050,7 +5047,8 @@ export class PetitionRepository extends BaseRepository {
 
     return (
       // every matched petition must have one of the permissions defined in permissionTypes
-      permissions.every((p) => permissionTypes.includes(p.type)) &&
+      (permissionTypes.length === 0 ||
+        permissions.every((p) => permissionTypes.includes(p.type))) &&
       // every passed petitionId must be included in the result
       petitionIds.every((id) => ids.includes(id))
     );
@@ -5088,6 +5086,25 @@ export class PetitionRepository extends BaseRepository {
         source,
         `User:${user.id}`,
       ]
+    );
+  }
+
+  async getUserPetitionsInsideFolders(paths: string[], isTemplate: boolean, user: User) {
+    return await this.raw<Petition>(
+      /* sql */ `
+      select p.* from petition p join petition_permission pp on p.id = pp.petition_id
+      where 
+            pp.user_id = ?
+        and pp.from_user_group_id is null
+        and pp.deleted_at is null
+        and p.org_id = ?
+        and p.is_template = ?
+        and p.deleted_at is null
+        and p.path like any (?::text[])
+        group by p.id
+        order by p.path asc, p.id asc;
+    `,
+      [user.id, user.org_id, isTemplate, this.sqlArray(paths.map((path) => `${path}%`))]
     );
   }
 }

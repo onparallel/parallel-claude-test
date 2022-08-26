@@ -14,7 +14,7 @@ import {
 } from "nexus";
 import { outdent } from "outdent";
 import pMap from "p-map";
-import { isDefined, omit, partition, zip } from "remeda";
+import { isDefined, omit, partition, uniq, zip } from "remeda";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
 import { isValueCompatible } from "../../../db/helpers/utils";
 import {
@@ -25,7 +25,12 @@ import {
   PetitionPermission,
 } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
-import { fromGlobalId, fromMultipleGlobalIds, toGlobalId } from "../../../util/globalId";
+import {
+  fromGlobalId,
+  fromGlobalIds,
+  fromMultipleGlobalIds,
+  toGlobalId,
+} from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { getRequiredPetitionSendCredits } from "../../../util/organizationUsageLimits";
 import { withError } from "../../../util/promises/withError";
@@ -34,9 +39,7 @@ import { userHasAccessToContactGroups } from "../../contact/authorizers";
 import {
   and,
   argIsDefined,
-  authenticate,
   authenticateAnd,
-  chain,
   ifArgDefined,
   ifArgEquals,
   ifSomeDefined,
@@ -279,11 +282,27 @@ export const clonePetitions = mutationField("clonePetitions", {
 });
 
 export const deletePetitions = mutationField("deletePetitions", {
-  description: "Delete parallels.",
+  description: "Delete petitions and folders.",
   type: "Success",
-  authorize: chain(authenticate(), userHasAccessToPetitions("ids")),
+  authorize: authenticateAnd(
+    ifArgDefined("ids", userHasAccessToPetitions("ids" as never)),
+    ifArgDefined(
+      "folders",
+      userHasAccessToPetitionsAndFolders(
+        (args) => args.folders!.folderIds,
+        (args) => args.folders!.type
+      )
+    )
+  ),
   args: {
-    ids: nonNull(list(nonNull(globalIdArg("Petition")))),
+    ids: list(nonNull(globalIdArg("Petition"))),
+    folders: inputObjectType({
+      name: "DeleteFoldersInput",
+      definition(t) {
+        t.nonNull.field("type", { type: "PetitionBaseType" });
+        t.nonNull.list.nonNull.id("folderIds");
+      },
+    }).asArg(),
     force: booleanArg({ default: false }),
     dryrun: booleanArg({
       default: false,
@@ -291,7 +310,11 @@ export const deletePetitions = mutationField("deletePetitions", {
         "If true, this will do a dry-run of the mutation to throw possible errors but it will not perform any modification in DB",
     }),
   },
-  validateArgs: notEmptyArray((args) => args.ids, "ids"),
+  validateArgs: validateAnd(
+    validIsDefined((args) => args.ids ?? args.folders, "ids or folders"),
+    notEmptyArray((args) => args.ids, "ids"),
+    notEmptyArray((args) => args.folders?.folderIds, "folders.folderIds")
+  ),
   resolve: async (_, args, ctx) => {
     function petitionIsSharedByOwner(p: PetitionPermission[]) {
       return (
@@ -314,15 +337,32 @@ export const deletePetitions = mutationField("deletePetitions", {
       );
     }
 
+    let petitionIds = args.ids ?? [];
+    if (isDefined(args.folders)) {
+      const folderIds = fromGlobalIds(args.folders.folderIds, "PetitionFolder", true).ids;
+      const folderPetitions = await ctx.petitions.getUserPetitionsInsideFolders(
+        folderIds,
+        args.folders.type === "TEMPLATE",
+        ctx.user!
+      );
+      petitionIds.push(...folderPetitions.map((p) => p.id));
+    }
+
+    petitionIds = uniq(petitionIds);
+    if (petitionIds.length === 0) {
+      // nothing to delete
+      return SUCCESS;
+    }
+
     // user permissions grouped by permission_id
-    const userPermissions = await ctx.petitions.loadUserPermissionsByPetitionId(args.ids);
+    const userPermissions = await ctx.petitions.loadUserPermissionsByPetitionId(petitionIds);
 
     if (userPermissions.some(userHasAccessViaGroup)) {
       throw new ApolloError(
         "Can't delete a petition shared with a group",
         "DELETE_GROUP_PETITION_ERROR",
         {
-          petitionIds: zip(args.ids, userPermissions)
+          petitionIds: zip(petitionIds, userPermissions)
             .filter(([, permissions]) => userHasAccessViaGroup(permissions))
             .map(([id]) => toGlobalId("Petition", id)),
         }
@@ -334,14 +374,14 @@ export const deletePetitions = mutationField("deletePetitions", {
         "Petition to delete is shared to another user",
         "DELETE_SHARED_PETITION_ERROR",
         {
-          petitionIds: zip(args.ids, userPermissions)
+          petitionIds: zip(petitionIds, userPermissions)
             .filter(([, permissions]) => petitionIsSharedByOwner(permissions))
             .map(([id]) => toGlobalId("Petition", id)),
         }
       );
     }
 
-    const petitions = await ctx.petitions.loadPetition(args.ids);
+    const petitions = await ctx.petitions.loadPetition(petitionIds);
     const publicTemplates = petitions.filter((p) => p && p.is_template && p.template_public);
     if (publicTemplates.length > 0) {
       throw new ApolloError("Can't delete a public template", "DELETE_PUBLIC_TEMPLATE_ERROR", {
@@ -356,7 +396,7 @@ export const deletePetitions = mutationField("deletePetitions", {
     await ctx.petitions.withTransaction(async (t) => {
       // delete my permissions to the petitions
       const deletedPermissions = await ctx.petitions.deleteUserPermissions(
-        args.ids,
+        petitionIds,
         ctx.user!.id,
         ctx.user!,
         t
@@ -2061,7 +2101,11 @@ export const movePetitions = mutationField("movePetitions", {
   description: "Moves a group of petitions or folders to another folder.",
   type: "Success",
   authorize: authenticateAnd(
-    userHasAccessToPetitionsAndFolders("targets", "type", ["OWNER", "WRITE"]),
+    userHasAccessToPetitionsAndFolders(
+      (args) => args.targets,
+      (args) => args.type,
+      ["OWNER", "WRITE"]
+    ),
     petitionsAndFoldersMatchesPath("targets", "source")
   ),
   args: {
