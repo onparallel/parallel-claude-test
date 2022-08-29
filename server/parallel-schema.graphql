@@ -2251,6 +2251,7 @@ type Petition implements PetitionBase {
   name: String
   organization: Organization!
   owner: User!
+  path: String!
 
   """
   The permissions linked to the petition
@@ -2545,6 +2546,7 @@ interface PetitionBase {
   name: String
   organization: Organization!
   owner: User!
+  path: String!
 
   """
   The permissions linked to the petition
@@ -3597,6 +3599,7 @@ type PetitionTemplate implements PetitionBase {
   name: String
   organization: Organization!
   owner: User!
+  path: String!
 
   """
   The permissions linked to the petition

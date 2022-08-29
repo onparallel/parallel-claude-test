@@ -206,6 +206,11 @@ export interface CreatedAt {
   createdAt: Scalars["DateTime"];
 }
 
+export interface DeleteFoldersInput {
+  folderIds: Array<Scalars["ID"]>;
+  type: PetitionBaseType;
+}
+
 /** The effective permission for a petition and user */
 export interface EffectivePetitionUserPermission {
   __typename?: "EffectivePetitionUserPermission";
@@ -544,7 +549,7 @@ export interface Mutation {
   deletePetitionFieldComment: PetitionField;
   /** Deletes a reply to a petition field. */
   deletePetitionReply: PetitionField;
-  /** Delete parallels. */
+  /** Delete petitions and folders. */
   deletePetitions: Success;
   /** Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests */
   deleteSignatureIntegration: Result;
@@ -1062,8 +1067,9 @@ export interface MutationdeletePetitionReplyArgs {
 
 export interface MutationdeletePetitionsArgs {
   dryrun?: InputMaybe<Scalars["Boolean"]>;
+  folders?: InputMaybe<DeleteFoldersInput>;
   force?: InputMaybe<Scalars["Boolean"]>;
-  ids: Array<Scalars["GID"]>;
+  ids?: InputMaybe<Array<Scalars["GID"]>>;
 }
 
 export interface MutationdeleteSignatureIntegrationArgs {
@@ -1969,6 +1975,7 @@ export interface Petition extends PetitionBase {
   name?: Maybe<Scalars["String"]>;
   organization: Organization;
   owner: User;
+  path: Scalars["String"];
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   /** The progress of the petition. */
@@ -2124,6 +2131,7 @@ export interface PetitionBase {
   name?: Maybe<Scalars["String"]>;
   organization: Organization;
   owner: User;
+  path: Scalars["String"];
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   /** The reminders configuration for the petition. */
@@ -2767,6 +2775,7 @@ export interface PetitionTemplate extends PetitionBase {
   name?: Maybe<Scalars["String"]>;
   organization: Organization;
   owner: User;
+  path: Scalars["String"];
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   /** The public link linked to this template */
@@ -4206,6 +4215,22 @@ export type PetitionFieldSelect_PetitionFieldFragment = {
   options: { [key: string]: any };
 };
 
+export type PetitionName_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  name?: string | null;
+  path: string;
+};
+
+export type PetitionName_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  name?: string | null;
+  path: string;
+};
+
+export type PetitionName_PetitionBaseFragment =
+  | PetitionName_PetitionBase_Petition_Fragment
+  | PetitionName_PetitionBase_PetitionTemplate_Fragment;
+
 export type PetitionProgressBar_PetitionFieldProgressFragment = {
   __typename?: "PetitionFieldProgress";
   approved: number;
@@ -4756,6 +4781,7 @@ export type PetitionHeader_PetitionFragment = {
   isAnonymized: boolean;
   name?: string | null;
   updatedAt: string;
+  path: string;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
@@ -4806,6 +4832,7 @@ export type PetitionLayout_PetitionBase_Petition_Fragment = {
   isRestricted: boolean;
   isAnonymized: boolean;
   updatedAt: string;
+  path: string;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
@@ -4821,6 +4848,7 @@ export type PetitionLayout_PetitionBase_PetitionTemplate_Fragment = {
   isPublic: boolean;
   isRestricted: boolean;
   updatedAt: string;
+  path: string;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -4874,6 +4902,7 @@ export type PetitionTemplateHeader_PetitionTemplateFragment = {
   isRestricted: boolean;
   name?: string | null;
   updatedAt: string;
+  path: string;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -13719,6 +13748,7 @@ export type PetitionActivity_PetitionFragment = {
   deadline?: string | null;
   isRestricted: boolean;
   updatedAt: string;
+  path: string;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
@@ -14537,6 +14567,7 @@ export type PetitionActivity_updatePetitionMutation = {
         deadline?: string | null;
         isRestricted: boolean;
         updatedAt: string;
+        path: string;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -15419,6 +15450,7 @@ export type PetitionActivity_petitionQuery = {
         deadline?: string | null;
         isRestricted: boolean;
         updatedAt: string;
+        path: string;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -16286,6 +16318,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   anonymizeAfterMonths?: number | null;
   anonymizePurpose?: string | null;
   updatedAt: string;
+  path: string;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
@@ -16421,6 +16454,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   anonymizeAfterMonths?: number | null;
   anonymizePurpose?: string | null;
   updatedAt: string;
+  path: string;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -16655,6 +16689,7 @@ export type PetitionCompose_updatePetitionMutation = {
         anonymizeAfterMonths?: number | null;
         anonymizePurpose?: string | null;
         updatedAt: string;
+        path: string;
         currentSignatureRequest?: {
           __typename?: "PetitionSignatureRequest";
           id: string;
@@ -16756,6 +16791,7 @@ export type PetitionCompose_updatePetitionMutation = {
         anonymizeAfterMonths?: number | null;
         anonymizePurpose?: string | null;
         updatedAt: string;
+        path: string;
         remindersConfig?: {
           __typename?: "RemindersConfig";
           offset: number;
@@ -16848,6 +16884,7 @@ export type PetitionCompose_updateFieldPositionsMutation = {
         isRestricted: boolean;
         isAnonymized: boolean;
         updatedAt: string;
+        path: string;
         fields: Array<{ __typename?: "PetitionField"; id: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -16863,6 +16900,7 @@ export type PetitionCompose_updateFieldPositionsMutation = {
         isPublic: boolean;
         isRestricted: boolean;
         updatedAt: string;
+        path: string;
         fields: Array<{ __typename?: "PetitionField"; id: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -16906,6 +16944,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
           isRestricted: boolean;
           isAnonymized: boolean;
           updatedAt: string;
+          path: string;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
@@ -16921,6 +16960,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
           isPublic: boolean;
           isRestricted: boolean;
           updatedAt: string;
+          path: string;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
@@ -16981,6 +17021,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           isRestricted: boolean;
           isAnonymized: boolean;
           updatedAt: string;
+          path: string;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
@@ -16996,6 +17037,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           isPublic: boolean;
           isRestricted: boolean;
           updatedAt: string;
+          path: string;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
@@ -17040,6 +17082,7 @@ export type PetitionCompose_deletePetitionFieldMutation = {
         isRestricted: boolean;
         isAnonymized: boolean;
         updatedAt: string;
+        path: string;
         fields: Array<{ __typename?: "PetitionField"; id: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -17055,6 +17098,7 @@ export type PetitionCompose_deletePetitionFieldMutation = {
         isPublic: boolean;
         isRestricted: boolean;
         updatedAt: string;
+        path: string;
         fields: Array<{ __typename?: "PetitionField"; id: string }>;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -17246,6 +17290,7 @@ export type PetitionCompose_petitionQuery = {
         anonymizeAfterMonths?: number | null;
         anonymizePurpose?: string | null;
         updatedAt: string;
+        path: string;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -17384,6 +17429,7 @@ export type PetitionCompose_petitionQuery = {
         anonymizeAfterMonths?: number | null;
         anonymizePurpose?: string | null;
         updatedAt: string;
+        path: string;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -17517,6 +17563,7 @@ export type PetitionMessages_PetitionBase_Petition_Fragment = {
   isRestricted: boolean;
   isAnonymized: boolean;
   updatedAt: string;
+  path: string;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
@@ -17539,6 +17586,7 @@ export type PetitionMessages_PetitionBase_PetitionTemplate_Fragment = {
   closingEmailBody?: any | null;
   name?: string | null;
   updatedAt: string;
+  path: string;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -17639,6 +17687,7 @@ export type PetitionMessages_petitionQuery = {
         isRestricted: boolean;
         isAnonymized: boolean;
         updatedAt: string;
+        path: string;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
@@ -17660,6 +17709,7 @@ export type PetitionMessages_petitionQuery = {
         closingEmailBody?: any | null;
         name?: string | null;
         updatedAt: string;
+        path: string;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -17687,6 +17737,7 @@ export type PetitionMessages_updatePetitionMutation = {
         isRestricted: boolean;
         isAnonymized: boolean;
         updatedAt: string;
+        path: string;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
@@ -17708,6 +17759,7 @@ export type PetitionMessages_updatePetitionMutation = {
         closingEmailBody?: any | null;
         name?: string | null;
         updatedAt: string;
+        path: string;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -17729,6 +17781,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   deadline?: string | null;
   isRestricted: boolean;
   updatedAt: string;
+  path: string;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
@@ -17914,6 +17967,7 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
   isPublic: boolean;
   isRestricted: boolean;
   updatedAt: string;
+  path: string;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -18096,6 +18150,7 @@ export type PetitionPreview_updatePetitionMutation = {
         deadline?: string | null;
         isRestricted: boolean;
         updatedAt: string;
+        path: string;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -18284,6 +18339,7 @@ export type PetitionPreview_updatePetitionMutation = {
         isPublic: boolean;
         isRestricted: boolean;
         updatedAt: string;
+        path: string;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -18427,6 +18483,7 @@ export type PetitionPreview_completePetitionMutation = {
     deadline?: string | null;
     isRestricted: boolean;
     updatedAt: string;
+    path: string;
     accesses: Array<{
       __typename?: "PetitionAccess";
       id: string;
@@ -18622,6 +18679,7 @@ export type PetitionPreview_petitionQuery = {
         deadline?: string | null;
         isRestricted: boolean;
         updatedAt: string;
+        path: string;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -18810,6 +18868,7 @@ export type PetitionPreview_petitionQuery = {
         isPublic: boolean;
         isRestricted: boolean;
         updatedAt: string;
+        path: string;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -18988,6 +19047,7 @@ export type PetitionReplies_PetitionFragment = {
   deadline?: string | null;
   isRestricted: boolean;
   updatedAt: string;
+  path: string;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
@@ -19292,6 +19352,7 @@ export type PetitionReplies_updatePetitionMutation = {
         isRestricted: boolean;
         isAnonymized: boolean;
         updatedAt: string;
+        path: string;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
@@ -19306,6 +19367,7 @@ export type PetitionReplies_updatePetitionMutation = {
         isPublic: boolean;
         isRestricted: boolean;
         updatedAt: string;
+        path: string;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -19329,6 +19391,7 @@ export type PetitionReplies_closePetitionMutation = {
     deadline?: string | null;
     isRestricted: boolean;
     updatedAt: string;
+    path: string;
     accesses: Array<{
       __typename?: "PetitionAccess";
       id: string;
@@ -19517,6 +19580,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
     deadline?: string | null;
     isRestricted: boolean;
     updatedAt: string;
+    path: string;
     accesses: Array<{
       __typename?: "PetitionAccess";
       id: string;
@@ -19807,6 +19871,7 @@ export type PetitionReplies_petitionQuery = {
         deadline?: string | null;
         isRestricted: boolean;
         updatedAt: string;
+        path: string;
         accesses: Array<{
           __typename?: "PetitionAccess";
           id: string;
@@ -19984,8 +20049,9 @@ export type Petitions_UserFragment = { __typename?: "User"; role: OrganizationRo
 
 export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
   __typename?: "Petition";
-  sentAt?: string | null;
   id: string;
+  path: string;
+  sentAt?: string | null;
   name?: string | null;
   createdAt: string;
   status: PetitionStatus;
@@ -20063,8 +20129,9 @@ export type Petitions_PetitionBaseOrFolder_PetitionFolder_Fragment = {
 export type Petitions_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   isPublic: boolean;
-  descriptionExcerpt?: string | null;
   id: string;
+  path: string;
+  descriptionExcerpt?: string | null;
   name?: string | null;
   createdAt: string;
   locale: PetitionLocale;
@@ -20189,8 +20256,9 @@ export type Petitions_petitionsQuery = {
     items: Array<
       | {
           __typename?: "Petition";
-          sentAt?: string | null;
           id: string;
+          path: string;
+          sentAt?: string | null;
           name?: string | null;
           createdAt: string;
           status: PetitionStatus;
@@ -20271,8 +20339,9 @@ export type Petitions_petitionsQuery = {
       | {
           __typename?: "PetitionTemplate";
           isPublic: boolean;
-          descriptionExcerpt?: string | null;
           id: string;
+          path: string;
+          descriptionExcerpt?: string | null;
           name?: string | null;
           createdAt: string;
           locale: PetitionLocale;
@@ -22266,24 +22335,45 @@ export type useDeleteContacts_ContactFragment = {
   email: string;
 };
 
-export type ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment = {
+export type useDeletePetitions_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
+  path: string;
   name?: string | null;
 };
 
-export type ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment = {
+export type useDeletePetitions_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
+  path: string;
   name?: string | null;
 };
 
-export type ConfirmDeletePetitionsDialog_PetitionBaseFragment =
-  | ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment
-  | ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment;
+export type useDeletePetitions_PetitionBaseFragment =
+  | useDeletePetitions_PetitionBase_Petition_Fragment
+  | useDeletePetitions_PetitionBase_PetitionTemplate_Fragment;
+
+export type useDeletePetitions_PetitionFolderFragment = {
+  __typename?: "PetitionFolder";
+  path: string;
+  folderId: string;
+};
+
+export type useDeletePetitions_petitionsQueryVariables = Exact<{
+  ids: Array<Scalars["GID"]> | Scalars["GID"];
+}>;
+
+export type useDeletePetitions_petitionsQuery = {
+  petitionsById: Array<
+    | { __typename?: "Petition"; id: string; name?: string | null; path: string }
+    | { __typename?: "PetitionTemplate"; id: string; name?: string | null; path: string }
+    | null
+  >;
+};
 
 export type useDeletePetitions_deletePetitionsMutationVariables = Exact<{
-  ids: Array<Scalars["GID"]> | Scalars["GID"];
+  ids?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  folders?: InputMaybe<DeleteFoldersInput>;
   force?: InputMaybe<Scalars["Boolean"]>;
   dryrun?: InputMaybe<Scalars["Boolean"]>;
 }>;
@@ -24225,6 +24315,20 @@ export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<HeaderNameEditable_PetitionBaseFragment, unknown>;
+export const PetitionName_PetitionBaseFragmentDoc = gql`
+  fragment PetitionName_PetitionBase on PetitionBase {
+    name
+    path
+  }
+` as unknown as DocumentNode<PetitionName_PetitionBaseFragment, unknown>;
+export const useDeletePetitions_PetitionBaseFragmentDoc = gql`
+  fragment useDeletePetitions_PetitionBase on PetitionBase {
+    id
+    path
+    ...PetitionName_PetitionBase
+  }
+  ${PetitionName_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<useDeletePetitions_PetitionBaseFragment, unknown>;
 export const PetitionHeader_PetitionFragmentDoc = gql`
   fragment PetitionHeader_Petition on Petition {
     id
@@ -24238,8 +24342,10 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
       permissionType
     }
     ...HeaderNameEditable_PetitionBase
+    ...useDeletePetitions_PetitionBase
   }
   ${HeaderNameEditable_PetitionBaseFragmentDoc}
+  ${useDeletePetitions_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionHeader_PetitionFragment, unknown>;
 export const PetitionTemplateHeader_PetitionTemplateFragmentDoc = gql`
   fragment PetitionTemplateHeader_PetitionTemplate on PetitionTemplate {
@@ -24248,8 +24354,10 @@ export const PetitionTemplateHeader_PetitionTemplateFragmentDoc = gql`
     isPublic
     isRestricted
     ...HeaderNameEditable_PetitionBase
+    ...useDeletePetitions_PetitionBase
   }
   ${HeaderNameEditable_PetitionBaseFragmentDoc}
+  ${useDeletePetitions_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionTemplateHeader_PetitionTemplateFragment, unknown>;
 export const PetitionLayout_PetitionBaseFragmentDoc = gql`
   fragment PetitionLayout_PetitionBase on PetitionBase {
@@ -26630,6 +26738,12 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
   ${PetitionSignatureCellContent_PetitionFragmentDoc}
   ${TemplateActiveSettingsIcons_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<usePetitionsTableColumns_PetitionBaseFragment, unknown>;
+export const useDeletePetitions_PetitionFolderFragmentDoc = gql`
+  fragment useDeletePetitions_PetitionFolder on PetitionFolder {
+    folderId: id
+    path
+  }
+` as unknown as DocumentNode<useDeletePetitions_PetitionFolderFragment, unknown>;
 export const usePetitionsTableColumns_PetitionFolderFragmentDoc = gql`
   fragment usePetitionsTableColumns_PetitionFolder on PetitionFolder {
     folderId: id
@@ -26639,6 +26753,7 @@ export const usePetitionsTableColumns_PetitionFolderFragmentDoc = gql`
 export const Petitions_PetitionBaseOrFolderFragmentDoc = gql`
   fragment Petitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
     ... on PetitionBase {
+      ...useDeletePetitions_PetitionBase
       ...usePetitionsTableColumns_PetitionBase
       myEffectivePermission {
         permissionType
@@ -26648,12 +26763,15 @@ export const Petitions_PetitionBaseOrFolderFragmentDoc = gql`
       isPublic
     }
     ... on PetitionFolder {
+      ...useDeletePetitions_PetitionFolder
       ...usePetitionsTableColumns_PetitionFolder
       path
       minimumPermissionType
     }
   }
+  ${useDeletePetitions_PetitionBaseFragmentDoc}
   ${usePetitionsTableColumns_PetitionBaseFragmentDoc}
+  ${useDeletePetitions_PetitionFolderFragmentDoc}
   ${usePetitionsTableColumns_PetitionFolderFragmentDoc}
 ` as unknown as DocumentNode<Petitions_PetitionBaseOrFolderFragment, unknown>;
 export const TemplateCard_PetitionTemplateFragmentDoc = gql`
@@ -27232,12 +27350,6 @@ export const usePetitionCommentsMutations_PetitionFieldCommentFragmentDoc = gql`
   }
   ${PetitionFieldComment_PetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<usePetitionCommentsMutations_PetitionFieldCommentFragment, unknown>;
-export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
-  fragment ConfirmDeletePetitionsDialog_PetitionBase on PetitionBase {
-    id
-    name
-  }
-` as unknown as DocumentNode<ConfirmDeletePetitionsDialog_PetitionBaseFragment, unknown>;
 export const useUpdateIsReadNotification_PetitionFieldCommentFragmentDoc = gql`
   fragment useUpdateIsReadNotification_PetitionFieldComment on PetitionFieldComment {
     id
@@ -30663,9 +30775,26 @@ export const useDeleteContacts_deleteContactsDocument = gql`
   useDeleteContacts_deleteContactsMutation,
   useDeleteContacts_deleteContactsMutationVariables
 >;
+export const useDeletePetitions_petitionsDocument = gql`
+  query useDeletePetitions_petitions($ids: [GID!]!) {
+    petitionsById(ids: $ids) {
+      id
+      ...PetitionName_PetitionBase
+    }
+  }
+  ${PetitionName_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  useDeletePetitions_petitionsQuery,
+  useDeletePetitions_petitionsQueryVariables
+>;
 export const useDeletePetitions_deletePetitionsDocument = gql`
-  mutation useDeletePetitions_deletePetitions($ids: [GID!]!, $force: Boolean, $dryrun: Boolean) {
-    deletePetitions(ids: $ids, force: $force, dryrun: $dryrun)
+  mutation useDeletePetitions_deletePetitions(
+    $ids: [GID!]
+    $folders: DeleteFoldersInput
+    $force: Boolean
+    $dryrun: Boolean
+  ) {
+    deletePetitions(ids: $ids, folders: $folders, force: $force, dryrun: $dryrun)
   }
 ` as unknown as DocumentNode<
   useDeletePetitions_deletePetitionsMutation,

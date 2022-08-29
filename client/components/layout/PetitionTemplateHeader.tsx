@@ -56,8 +56,8 @@ export const PetitionTemplateHeader = Object.assign(
     const deletePetitions = useDeletePetitions();
     const handleDeleteClick = async function () {
       try {
-        await deletePetitions([petition.id]);
-        router.push("/app/petitions");
+        await deletePetitions([petition], "TEMPLATE");
+        router.push("/app/petitions?type=TEMPLATE");
       } catch {}
     };
 
@@ -306,8 +306,10 @@ export const PetitionTemplateHeader = Object.assign(
           isPublic
           isRestricted
           ...HeaderNameEditable_PetitionBase
+          ...useDeletePetitions_PetitionBase
         }
         ${HeaderNameEditable.fragments.PetitionBase}
+        ${useDeletePetitions.fragments.PetitionBase}
       `,
       Query: gql`
         fragment PetitionTemplateHeader_Query on Query {

@@ -70,7 +70,7 @@ export const PetitionHeader = Object.assign(
     const deletePetitions = useDeletePetitions();
     const handleDeleteClick = async function () {
       try {
-        await deletePetitions([petition.id]);
+        await deletePetitions([petition], "PETITION");
         router.push("/app/petitions/");
       } catch {}
     };
@@ -431,8 +431,10 @@ export const PetitionHeader = Object.assign(
             permissionType
           }
           ...HeaderNameEditable_PetitionBase
+          ...useDeletePetitions_PetitionBase
         }
         ${HeaderNameEditable.fragments.PetitionBase}
+        ${useDeletePetitions.fragments.PetitionBase}
       `,
       Query: gql`
         fragment PetitionHeader_Query on Query {

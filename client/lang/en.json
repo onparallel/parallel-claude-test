@@ -1000,24 +1000,44 @@
     "context": "Any applications or scripts using this event {count, plural, =1 {subscription} other {subscriptions}} will no longer receive event notifications from Parallel."
   },
   {
-    "term": "component.delete-petitions.confirm-delete-petition.body",
-    "definition": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected parallels}}?",
-    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected parallels}}?"
+    "term": "component.delete-petitions.confirm-delete-folders.body-part",
+    "definition": "{count, plural, =1{<b>#</b> folder} other {<b>#</b> folders}}",
+    "context": "{count, plural, =1{<b>#</b> folder} other {<b>#</b> folders}}"
   },
   {
-    "term": "component.delete-petitions.confirm-delete-petition.header",
-    "definition": "Delete {count, plural, =1 {parallel} other {parallels}}",
-    "context": "Delete {count, plural, =1 {parallel} other {parallels}}"
+    "term": "component.delete-petitions.confirm-delete-folders.header-part",
+    "definition": "{count, plural, =1{# folder} other {# folders}}",
+    "context": "{count, plural, =1{# folder} other {# folders}}"
   },
   {
-    "term": "component.delete-petitions.confirm-delete-template.body",
-    "definition": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected templates}}?",
-    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected templates}}?"
+    "term": "component.delete-petitions.confirm-delete-petitions.body",
+    "definition": "Are you sure you want to delete {petitionsAndFolders}?",
+    "context": "Are you sure you want to delete {petitionsAndFolders}?"
   },
   {
-    "term": "component.delete-petitions.confirm-delete-template.header",
-    "definition": "Delete {count, plural, =1 {template} other {templates}}",
-    "context": "Delete {count, plural, =1 {template} other {templates}}"
+    "term": "component.delete-petitions.confirm-delete-petitions.body-part",
+    "definition": "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected parallels}}",
+    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected parallels}}"
+  },
+  {
+    "term": "component.delete-petitions.confirm-delete-petitions.header",
+    "definition": "Delete {petitionsAndFolders}",
+    "context": "Delete {petitionsAndFolders}"
+  },
+  {
+    "term": "component.delete-petitions.confirm-delete-petitions.header-part",
+    "definition": "{count, plural, =1{# parallel} other {# parallels}}",
+    "context": "{count, plural, =1{# parallel} other {# parallels}}"
+  },
+  {
+    "term": "component.delete-petitions.confirm-delete-templates.body-part",
+    "definition": "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected templates}}",
+    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected templates}}"
+  },
+  {
+    "term": "component.delete-petitions.confirm-delete-templates.header-part",
+    "definition": "{count, plural, =1{# template} other {# templates}}",
+    "context": "{count, plural, =1{# template} other {# templates}}"
   },
   {
     "term": "component.delete-petitions.error-header",
@@ -1031,8 +1051,8 @@
   },
   {
     "term": "component.delete-petitions.group-error-singular",
-    "definition": "The {name} {type, select, PETITION {parallel} other{template}} cannot be deleted because it has been shared with you through a team.",
-    "context": "The {name} {type, select, PETITION {parallel} other{template}} cannot be deleted because it has been shared with you through a team."
+    "definition": "The <b>{name}</b> {type, select, PETITION {parallel} other{template}} cannot be deleted because it has been shared with you through a team.",
+    "context": "The <b>{name}</b> {type, select, PETITION {parallel} other{template}} cannot be deleted because it has been shared with you through a team."
   },
   {
     "term": "component.delete-petitions.public-templates-error-plural",
@@ -1041,18 +1061,18 @@
   },
   {
     "term": "component.delete-petitions.public-templates-error-singular",
-    "definition": "The {name} template cannot be deleted because it is public.",
-    "context": "The {name} template cannot be deleted because it is public."
+    "definition": "The <b>{name}</b> template cannot be deleted because it is public.",
+    "context": "The <b>{name}</b> template cannot be deleted because it is public."
+  },
+  {
+    "term": "component.delete-shared-petitions-dialog.body-2",
+    "definition": "Are you sure you want to delete the following {isTemplate, select, true{templates} other{parallels}}?",
+    "context": "Are you sure you want to delete the following {isTemplate, select, true{templates} other{parallels}}?"
   },
   {
     "term": "component.delete-shared-petitions-dialog.petition-body-1",
     "definition": "You shared {count, plural, =1{this parallel} other{these parallels}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{parallel} other{parallels}}.",
     "context": "You shared {count, plural, =1{this parallel} other{these parallels}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{parallel} other{parallels}}."
-  },
-  {
-    "term": "component.delete-shared-petitions-dialog.petition-body-2",
-    "definition": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the <b>#</b> selected parallels}}?",
-    "context": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the <b>#</b> selected parallels}}?"
   },
   {
     "term": "component.delete-shared-petitions-dialog.petition-header",
@@ -1063,11 +1083,6 @@
     "term": "component.delete-shared-petitions-dialog.template-body-1",
     "definition": "You shared {count, plural, =1{this template} other{these templates}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{template} other{templates}}.",
     "context": "You shared {count, plural, =1{this template} other{these templates}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{template} other{templates}}."
-  },
-  {
-    "term": "component.delete-shared-petitions-dialog.template-body-2",
-    "definition": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the <b>#</b> selected templates}}?",
-    "context": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the <b>#</b> selected templates}}?"
   },
   {
     "term": "component.delete-shared-petitions-dialog.template-header",

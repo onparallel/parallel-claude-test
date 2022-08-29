@@ -312,8 +312,10 @@ export const deletePetitions = mutationField("deletePetitions", {
   },
   validateArgs: validateAnd(
     validIsDefined((args) => args.ids ?? args.folders, "ids or folders"),
-    notEmptyArray((args) => args.ids, "ids"),
-    notEmptyArray((args) => args.folders?.folderIds, "folders.folderIds")
+    notEmptyArray(
+      (args) => ((args.ids ?? []) as any[]).concat(args.folders?.folderIds ?? []),
+      "ids or folders"
+    )
   ),
   resolve: async (_, args, ctx) => {
     function petitionIsSharedByOwner(p: PetitionPermission[]) {

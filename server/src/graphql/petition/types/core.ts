@@ -296,6 +296,7 @@ export const PetitionBase = interfaceType({
         return (await ctx.organizations.loadOrganizationTheme(o.document_organization_theme_id))!;
       },
     });
+    t.nonNull.string("path");
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   sourceType: "db.Petition",

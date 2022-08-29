@@ -1295,6 +1295,7 @@ export interface NexusGenFieldTypes {
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
+    path: string; // String!
     permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
     progress: NexusGenRootTypes["PetitionProgress"]; // PetitionProgress!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
@@ -1658,6 +1659,7 @@ export interface NexusGenFieldTypes {
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
+    path: string; // String!
     permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
     publicLink: NexusGenRootTypes["PublicPetitionLink"] | null; // PublicPetitionLink
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
@@ -2280,6 +2282,7 @@ export interface NexusGenFieldTypes {
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
+    path: string; // String!
     permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
     selectedDocumentTheme: NexusGenRootTypes["OrganizationTheme"]; // OrganizationTheme!
@@ -2870,6 +2873,7 @@ export interface NexusGenFieldTypeNames {
     name: "String";
     organization: "Organization";
     owner: "User";
+    path: "String";
     permissions: "PetitionPermission";
     progress: "PetitionProgress";
     remindersConfig: "RemindersConfig";
@@ -3233,6 +3237,7 @@ export interface NexusGenFieldTypeNames {
     name: "String";
     organization: "Organization";
     owner: "User";
+    path: "String";
     permissions: "PetitionPermission";
     publicLink: "PublicPetitionLink";
     remindersConfig: "RemindersConfig";
@@ -3855,6 +3860,7 @@ export interface NexusGenFieldTypeNames {
     name: "String";
     organization: "Organization";
     owner: "User";
+    path: "String";
     permissions: "PetitionPermission";
     remindersConfig: "RemindersConfig";
     selectedDocumentTheme: "OrganizationTheme";

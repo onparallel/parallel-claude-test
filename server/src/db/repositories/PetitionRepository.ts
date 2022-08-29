@@ -5030,7 +5030,7 @@ export class PetitionRepository extends BaseRepository {
     const permissions = await this.raw<{ petition_id: number; type: PetitionPermissionType }>(
       /* SQL */ `
         select p.id as petition_id, pp.type from petition p left join petition_permission pp on pp.petition_id = p.id
-        where pp.user_id = ? and pp.from_user_group_id is null and pp.deleted_at is null
+        where pp.user_id = ? and pp.deleted_at is null
         and p.is_template = ? and p.deleted_at is null and p.org_id = ?
         and (p.id in ? or p.path like any (?::text[]));
       `,
@@ -5066,7 +5066,7 @@ export class PetitionRepository extends BaseRepository {
       /* SQL */ `
         with user_petition_ids as (
           select p.id from petition p join petition_permission pp on pp.petition_id = p.id
-          where pp.user_id = ? and pp.from_user_group_id is null and pp.deleted_at is null
+          where pp.user_id = ? and pp.deleted_at is null
           and p.is_template = ? and p.deleted_at is null and p.org_id = ?
           and (p.id in ? or p.path like any (?::text[]))
         )
@@ -5095,7 +5095,6 @@ export class PetitionRepository extends BaseRepository {
       select p.* from petition p join petition_permission pp on p.id = pp.petition_id
       where 
             pp.user_id = ?
-        and pp.from_user_group_id is null
         and pp.deleted_at is null
         and p.org_id = ?
         and p.is_template = ?
