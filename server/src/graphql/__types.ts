@@ -89,16 +89,16 @@ export interface NexusGenInputs {
     firstName: string; // String!
     lastName?: string | null; // String
   };
-  DeleteFoldersInput: {
-    // input type
-    folderIds: string[]; // [ID!]!
-    type: NexusGenEnums["PetitionBaseType"]; // PetitionBaseType!
-  };
   FileUploadInput: {
     // input type
     contentType: string; // String!
     filename: string; // String!
     size: number; // Int!
+  };
+  FoldersInput: {
+    // input type
+    folderIds: string[]; // [ID!]!
+    type: NexusGenEnums["PetitionBaseType"]; // PetitionBaseType!
   };
   ImageOptions: {
     // input type
@@ -4223,7 +4223,7 @@ export interface NexusGenArgTypes {
     deletePetitions: {
       // args
       dryrun?: boolean | null; // Boolean
-      folders?: NexusGenInputs["DeleteFoldersInput"] | null; // DeleteFoldersInput
+      folders?: NexusGenInputs["FoldersInput"] | null; // FoldersInput
       force?: boolean | null; // Boolean
       ids?: NexusGenScalars["GID"][] | null; // [GID!]
     };
@@ -4973,7 +4973,8 @@ export interface NexusGenArgTypes {
     };
     petitionsById: {
       // args
-      ids: NexusGenScalars["GID"][]; // [GID!]!
+      folders?: NexusGenInputs["FoldersInput"] | null; // FoldersInput
+      ids?: NexusGenScalars["GID"][] | null; // [GID!]
     };
     publicLicenseCode: {
       // args

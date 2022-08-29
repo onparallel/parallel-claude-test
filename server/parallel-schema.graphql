@@ -226,11 +226,6 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 """
 scalar DateTime
 
-input DeleteFoldersInput {
-  folderIds: [ID!]!
-  type: PetitionBaseType!
-}
-
 """
 The effective permission for a petition and user
 """
@@ -309,6 +304,11 @@ enum FilterSharedWithOperator {
   NOT_IS_OWNER
   NOT_SHARED_WITH
   SHARED_WITH
+}
+
+input FoldersInput {
+  folderIds: [ID!]!
+  type: PetitionBaseType!
 }
 
 scalar GID
@@ -890,7 +890,7 @@ type Mutation {
     If true, this will do a dry-run of the mutation to throw possible errors but it will not perform any modification in DB
     """
     dryrun: Boolean = false
-    folders: DeleteFoldersInput
+    folders: FoldersInput
     force: Boolean = false
     ids: [GID!]
   ): Success!
@@ -4341,7 +4341,7 @@ type Query {
     """
     sortBy: [QueryPetitions_OrderBy!]
   ): PetitionBaseOrFolderPagination!
-  petitionsById(ids: [GID!]!): [PetitionBase]!
+  petitionsById(folders: FoldersInput, ids: [GID!]): [PetitionBase]!
   publicLicenseCode(code: String!, token: ID!): PublicLicenseCode
   publicOrgLogoUrl(id: GID!): String
 

@@ -2021,7 +2021,7 @@ describe("GraphQL/Petitions", () => {
     it("sends error if not passing ids nor folders", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($ids: [GID!], $folders: DeleteFoldersInput) {
+          mutation ($ids: [GID!], $folders: FoldersInput) {
             deletePetitions(ids: $ids, folders: $folders)
           }
         `,

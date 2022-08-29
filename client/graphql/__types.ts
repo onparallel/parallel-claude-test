@@ -206,11 +206,6 @@ export interface CreatedAt {
   createdAt: Scalars["DateTime"];
 }
 
-export interface DeleteFoldersInput {
-  folderIds: Array<Scalars["ID"]>;
-  type: PetitionBaseType;
-}
-
 /** The effective permission for a petition and user */
 export interface EffectivePetitionUserPermission {
   __typename?: "EffectivePetitionUserPermission";
@@ -281,6 +276,11 @@ export type FilterSharedWithOperator =
   | "NOT_IS_OWNER"
   | "NOT_SHARED_WITH"
   | "SHARED_WITH";
+
+export interface FoldersInput {
+  folderIds: Array<Scalars["ID"]>;
+  type: PetitionBaseType;
+}
 
 export interface GenerateUserAuthTokenResponse {
   __typename?: "GenerateUserAuthTokenResponse";
@@ -1067,7 +1067,7 @@ export interface MutationdeletePetitionReplyArgs {
 
 export interface MutationdeletePetitionsArgs {
   dryrun?: InputMaybe<Scalars["Boolean"]>;
-  folders?: InputMaybe<DeleteFoldersInput>;
+  folders?: InputMaybe<FoldersInput>;
   force?: InputMaybe<Scalars["Boolean"]>;
   ids?: InputMaybe<Array<Scalars["GID"]>>;
 }
@@ -3269,7 +3269,8 @@ export interface QuerypetitionsArgs {
 }
 
 export interface QuerypetitionsByIdArgs {
-  ids: Array<Scalars["GID"]>;
+  folders?: InputMaybe<FoldersInput>;
+  ids?: InputMaybe<Array<Scalars["GID"]>>;
 }
 
 export interface QuerypublicLicenseCodeArgs {
@@ -8023,10 +8024,11 @@ export type GenericFolderDialog_foldersQueryVariables = Exact<{
 
 export type GenericFolderDialog_foldersQuery = { petitionFolders: Array<string> };
 
-export type PetitionSharingModal_Petition_Petition_Fragment = {
+export type PetitionSharingModal_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
   name?: string | null;
+  path: string;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -8037,6 +8039,7 @@ export type PetitionSharingModal_Petition_Petition_Fragment = {
           name: string;
           initials: string;
           memberCount: number;
+          imMember: boolean;
         };
       }
     | {
@@ -8058,10 +8061,11 @@ export type PetitionSharingModal_Petition_Petition_Fragment = {
   } | null;
 };
 
-export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
+export type PetitionSharingModal_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
+  path: string;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -8072,6 +8076,7 @@ export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
           name: string;
           initials: string;
           memberCount: number;
+          imMember: boolean;
         };
       }
     | {
@@ -8093,9 +8098,9 @@ export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
   } | null;
 };
 
-export type PetitionSharingModal_PetitionFragment =
-  | PetitionSharingModal_Petition_Petition_Fragment
-  | PetitionSharingModal_Petition_PetitionTemplate_Fragment;
+export type PetitionSharingModal_PetitionBaseFragment =
+  | PetitionSharingModal_PetitionBase_Petition_Fragment
+  | PetitionSharingModal_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionSharingModal_PetitionUserPermissionFragment = {
   __typename?: "PetitionUserPermission";
@@ -8119,6 +8124,7 @@ export type PetitionSharingModal_PetitionUserGroupPermissionFragment = {
     name: string;
     initials: string;
     memberCount: number;
+    imMember: boolean;
   };
 };
 
@@ -8137,6 +8143,7 @@ export type PetitionSharingModal_UserGroupFragment = {
   name: string;
   initials: string;
   memberCount: number;
+  imMember: boolean;
 };
 
 export type PetitionSharingModal_addPetitionPermissionMutationVariables = Exact<{
@@ -8155,6 +8162,7 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
         __typename?: "Petition";
         id: string;
         name?: string | null;
+        path: string;
         permissions: Array<
           | {
               __typename?: "PetitionUserGroupPermission";
@@ -8165,6 +8173,7 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
                 name: string;
                 initials: string;
                 memberCount: number;
+                imMember: boolean;
               };
             }
           | {
@@ -8189,6 +8198,7 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
         __typename?: "PetitionTemplate";
         id: string;
         name?: string | null;
+        path: string;
         permissions: Array<
           | {
               __typename?: "PetitionUserGroupPermission";
@@ -8199,6 +8209,7 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
                 name: string;
                 initials: string;
                 memberCount: number;
+                imMember: boolean;
               };
             }
           | {
@@ -8234,6 +8245,7 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
         __typename?: "Petition";
         id: string;
         name?: string | null;
+        path: string;
         permissions: Array<
           | {
               __typename?: "PetitionUserGroupPermission";
@@ -8244,6 +8256,7 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
                 name: string;
                 initials: string;
                 memberCount: number;
+                imMember: boolean;
               };
             }
           | {
@@ -8268,6 +8281,7 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
         __typename?: "PetitionTemplate";
         id: string;
         name?: string | null;
+        path: string;
         permissions: Array<
           | {
               __typename?: "PetitionUserGroupPermission";
@@ -8278,6 +8292,7 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
                 name: string;
                 initials: string;
                 memberCount: number;
+                imMember: boolean;
               };
             }
           | {
@@ -8314,6 +8329,7 @@ export type PetitionSharingModal_editPetitionPermissionMutation = {
     __typename?: "Petition";
     id: string;
     name?: string | null;
+    path: string;
     permissions: Array<
       | {
           __typename?: "PetitionUserGroupPermission";
@@ -8324,6 +8340,7 @@ export type PetitionSharingModal_editPetitionPermissionMutation = {
             name: string;
             initials: string;
             memberCount: number;
+            imMember: boolean;
           };
         }
       | {
@@ -8357,6 +8374,7 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
         __typename?: "Petition";
         id: string;
         name?: string | null;
+        path: string;
         permissions: Array<
           | {
               __typename?: "PetitionUserGroupPermission";
@@ -8367,6 +8385,7 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
                 name: string;
                 initials: string;
                 memberCount: number;
+                imMember: boolean;
               };
             }
           | {
@@ -8391,6 +8410,7 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
         __typename?: "PetitionTemplate";
         id: string;
         name?: string | null;
+        path: string;
         permissions: Array<
           | {
               __typename?: "PetitionUserGroupPermission";
@@ -8401,6 +8421,7 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
                 name: string;
                 initials: string;
                 memberCount: number;
+                imMember: boolean;
               };
             }
           | {
@@ -8425,7 +8446,8 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
 };
 
 export type PetitionSharingModal_petitionsQueryVariables = Exact<{
-  petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
+  petitionIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  folders?: InputMaybe<FoldersInput>;
 }>;
 
 export type PetitionSharingModal_petitionsQuery = {
@@ -8434,6 +8456,7 @@ export type PetitionSharingModal_petitionsQuery = {
         __typename?: "Petition";
         id: string;
         name?: string | null;
+        path: string;
         permissions: Array<
           | {
               __typename?: "PetitionUserGroupPermission";
@@ -8444,6 +8467,7 @@ export type PetitionSharingModal_petitionsQuery = {
                 name: string;
                 initials: string;
                 memberCount: number;
+                imMember: boolean;
               };
             }
           | {
@@ -8468,6 +8492,7 @@ export type PetitionSharingModal_petitionsQuery = {
         __typename?: "PetitionTemplate";
         id: string;
         name?: string | null;
+        path: string;
         permissions: Array<
           | {
               __typename?: "PetitionUserGroupPermission";
@@ -8478,6 +8503,7 @@ export type PetitionSharingModal_petitionsQuery = {
                 name: string;
                 initials: string;
                 memberCount: number;
+                imMember: boolean;
               };
             }
           | {
@@ -22367,15 +22393,15 @@ export type useDeletePetitions_petitionsQueryVariables = Exact<{
 
 export type useDeletePetitions_petitionsQuery = {
   petitionsById: Array<
-    | { __typename?: "Petition"; id: string; name?: string | null; path: string }
-    | { __typename?: "PetitionTemplate"; id: string; name?: string | null; path: string }
+    | { __typename?: "Petition"; id: string; path: string; name?: string | null }
+    | { __typename?: "PetitionTemplate"; id: string; path: string; name?: string | null }
     | null
   >;
 };
 
 export type useDeletePetitions_deletePetitionsMutationVariables = Exact<{
   ids?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  folders?: InputMaybe<DeleteFoldersInput>;
+  folders?: InputMaybe<FoldersInput>;
   force?: InputMaybe<Scalars["Boolean"]>;
   dryrun?: InputMaybe<Scalars["Boolean"]>;
 }>;
@@ -23550,6 +23576,7 @@ export const PetitionSharingModal_UserGroupFragmentDoc = gql`
     name
     initials
     memberCount
+    imMember
   }
 ` as unknown as DocumentNode<PetitionSharingModal_UserGroupFragment, unknown>;
 export const PetitionSharingModal_PetitionUserGroupPermissionFragmentDoc = gql`
@@ -23561,10 +23588,11 @@ export const PetitionSharingModal_PetitionUserGroupPermissionFragmentDoc = gql`
   }
   ${PetitionSharingModal_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<PetitionSharingModal_PetitionUserGroupPermissionFragment, unknown>;
-export const PetitionSharingModal_PetitionFragmentDoc = gql`
-  fragment PetitionSharingModal_Petition on PetitionBase {
+export const PetitionSharingModal_PetitionBaseFragmentDoc = gql`
+  fragment PetitionSharingModal_PetitionBase on PetitionBase {
     id
     name
+    path
     permissions {
       ... on PetitionUserPermission {
         ...PetitionSharingModal_PetitionUserPermission
@@ -23579,7 +23607,7 @@ export const PetitionSharingModal_PetitionFragmentDoc = gql`
   }
   ${PetitionSharingModal_PetitionUserPermissionFragmentDoc}
   ${PetitionSharingModal_PetitionUserGroupPermissionFragmentDoc}
-` as unknown as DocumentNode<PetitionSharingModal_PetitionFragment, unknown>;
+` as unknown as DocumentNode<PetitionSharingModal_PetitionBaseFragment, unknown>;
 export const TemplateDetailsModal_UserFragmentDoc = gql`
   fragment TemplateDetailsModal_User on User {
     id
@@ -27786,10 +27814,10 @@ export const PetitionSharingModal_addPetitionPermissionDocument = gql`
       subscribe: $subscribe
       message: $message
     ) {
-      ...PetitionSharingModal_Petition
+      ...PetitionSharingModal_PetitionBase
     }
   }
-  ${PetitionSharingModal_PetitionFragmentDoc}
+  ${PetitionSharingModal_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionSharingModal_addPetitionPermissionMutation,
   PetitionSharingModal_addPetitionPermissionMutationVariables
@@ -27805,10 +27833,10 @@ export const PetitionSharingModal_removePetitionPermissionDocument = gql`
       userIds: $userIds
       userGroupIds: $userGroupIds
     ) {
-      ...PetitionSharingModal_Petition
+      ...PetitionSharingModal_PetitionBase
     }
   }
-  ${PetitionSharingModal_PetitionFragmentDoc}
+  ${PetitionSharingModal_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionSharingModal_removePetitionPermissionMutation,
   PetitionSharingModal_removePetitionPermissionMutationVariables
@@ -27826,10 +27854,10 @@ export const PetitionSharingModal_editPetitionPermissionDocument = gql`
       userGroupIds: $userGroupIds
       permissionType: $permissionType
     ) {
-      ...PetitionSharingModal_Petition
+      ...PetitionSharingModal_PetitionBase
     }
   }
-  ${PetitionSharingModal_PetitionFragmentDoc}
+  ${PetitionSharingModal_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionSharingModal_editPetitionPermissionMutation,
   PetitionSharingModal_editPetitionPermissionMutationVariables
@@ -27837,21 +27865,21 @@ export const PetitionSharingModal_editPetitionPermissionDocument = gql`
 export const PetitionSharingModal_transferPetitionOwnershipDocument = gql`
   mutation PetitionSharingModal_transferPetitionOwnership($petitionId: GID!, $userId: GID!) {
     transferPetitionOwnership(petitionIds: [$petitionId], userId: $userId) {
-      ...PetitionSharingModal_Petition
+      ...PetitionSharingModal_PetitionBase
     }
   }
-  ${PetitionSharingModal_PetitionFragmentDoc}
+  ${PetitionSharingModal_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionSharingModal_transferPetitionOwnershipMutation,
   PetitionSharingModal_transferPetitionOwnershipMutationVariables
 >;
 export const PetitionSharingModal_petitionsDocument = gql`
-  query PetitionSharingModal_petitions($petitionIds: [GID!]!) {
-    petitionsById(ids: $petitionIds) {
-      ...PetitionSharingModal_Petition
+  query PetitionSharingModal_petitions($petitionIds: [GID!], $folders: FoldersInput) {
+    petitionsById(ids: $petitionIds, folders: $folders) {
+      ...PetitionSharingModal_PetitionBase
     }
   }
-  ${PetitionSharingModal_PetitionFragmentDoc}
+  ${PetitionSharingModal_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionSharingModal_petitionsQuery,
   PetitionSharingModal_petitionsQueryVariables
@@ -30781,10 +30809,10 @@ export const useDeletePetitions_petitionsDocument = gql`
   query useDeletePetitions_petitions($ids: [GID!]!) {
     petitionsById(ids: $ids) {
       id
-      ...PetitionName_PetitionBase
+      ...useDeletePetitions_PetitionBase
     }
   }
-  ${PetitionName_PetitionBaseFragmentDoc}
+  ${useDeletePetitions_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<
   useDeletePetitions_petitionsQuery,
   useDeletePetitions_petitionsQueryVariables
@@ -30792,7 +30820,7 @@ export const useDeletePetitions_petitionsDocument = gql`
 export const useDeletePetitions_deletePetitionsDocument = gql`
   mutation useDeletePetitions_deletePetitions(
     $ids: [GID!]
-    $folders: DeleteFoldersInput
+    $folders: FoldersInput
     $force: Boolean
     $dryrun: Boolean
   ) {

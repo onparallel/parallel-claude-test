@@ -1049,7 +1049,7 @@ describe("Petition Folders", () => {
     it("deletes a folder with my petitions", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($folders: DeleteFoldersInput) {
+          mutation ($folders: FoldersInput) {
             deletePetitions(folders: $folders)
           }
         `,
@@ -1199,7 +1199,7 @@ describe("Petition Folders", () => {
     it("don't delete templates folders if passing type PETITION", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($folders: DeleteFoldersInput) {
+          mutation ($folders: FoldersInput) {
             deletePetitions(folders: $folders)
           }
         `,

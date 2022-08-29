@@ -306,6 +306,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       const res = await showPetitionSharingDialog({
         userId: me.id,
         petitionIds: [petition.id],
+        type: "PETITION",
       });
       if (res?.close) {
         router.push("/app/petitions");

@@ -107,7 +107,7 @@ export function TemplateDetailsModal({
       const res = await showPetitionSharingDialog({
         userId: me.id,
         petitionIds: [template.id],
-        isTemplate: true,
+        type: "TEMPLATE",
       });
       if (res?.close) {
         props.onClose();

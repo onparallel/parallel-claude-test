@@ -12,16 +12,20 @@ import {
   stringArg,
 } from "nexus";
 import { isDefined, sort, uniq } from "remeda";
-import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
-import { authenticate, authenticateAnd, or } from "../helpers/authorize";
+import { authenticate, authenticateAnd, ifArgDefined, or } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
+import { validateAnd } from "../helpers/validateArgs";
+import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { PETITION_FOLDER_REGEX, validateRegex } from "../helpers/validators/validateRegex";
+import { validIsDefined } from "../helpers/validators/validIsDefined";
 import {
   fieldsBelongsToPetition,
   petitionsArePublicTemplates,
   userHasAccessToPetitions,
+  userHasAccessToPetitionsAndFolders,
 } from "./authorizers";
 import { validatePublicPetitionLinkSlug } from "./validations";
 
@@ -127,13 +131,47 @@ export const petitionQuery = queryField("petition", {
 export const petitionsByIdQuery = queryField("petitionsById", {
   type: list(nullable("PetitionBase")),
   args: {
-    ids: nonNull(list(nonNull(globalIdArg("Petition")))),
+    ids: list(nonNull(globalIdArg("Petition"))),
+    folders: "FoldersInput",
   },
   authorize: authenticateAnd(
-    or(userHasAccessToPetitions("ids"), petitionsArePublicTemplates("ids"))
+    ifArgDefined(
+      (args) => args.ids,
+      or(userHasAccessToPetitions("ids" as never), petitionsArePublicTemplates("ids" as never))
+    ),
+    ifArgDefined(
+      (args) => args.folders,
+      userHasAccessToPetitionsAndFolders(
+        (args) => args.folders!.folderIds,
+        (args) => args.folders!.type
+      )
+    )
+  ),
+  validateArgs: validateAnd(
+    validIsDefined((args) => args.ids ?? args.folders, "ids or folders"),
+    notEmptyArray(
+      (args) => ((args.ids ?? []) as any[]).concat(args.folders?.folderIds ?? []),
+      "ids or folders"
+    )
   ),
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.loadPetition(args.ids);
+    let petitionIds = args.ids ?? [];
+    if (isDefined(args.folders)) {
+      const folderIds = fromGlobalIds(args.folders.folderIds, "PetitionFolder", true).ids;
+      const folderPetitions = await ctx.petitions.getUserPetitionsInsideFolders(
+        folderIds,
+        args.folders.type === "TEMPLATE",
+        ctx.user!
+      );
+      petitionIds.push(...folderPetitions.map((p) => p.id));
+    }
+
+    petitionIds = uniq(petitionIds);
+    if (petitionIds.length === 0) {
+      // nothing to return
+      return [];
+    }
+    return await ctx.petitions.loadPetition(petitionIds);
   },
 });
 

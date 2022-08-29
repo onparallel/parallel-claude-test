@@ -256,6 +256,11 @@ export type FilterSharedWithOperator =
   | "NOT_SHARED_WITH"
   | "SHARED_WITH";
 
+export type FoldersInput = {
+  folderIds: Array<Scalars["ID"]>;
+  type: PetitionBaseType;
+};
+
 export type GenerateUserAuthTokenResponse = {
   apiKey: Scalars["String"];
   userAuthToken: UserAuthenticationToken;
@@ -510,7 +515,7 @@ export type Mutation = {
   deletePetitionFieldComment: PetitionField;
   /** Deletes a reply to a petition field. */
   deletePetitionReply: PetitionField;
-  /** Delete parallels. */
+  /** Delete petitions and folders. */
   deletePetitions: Success;
   /** Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests */
   deleteSignatureIntegration: Result;
@@ -1028,8 +1033,9 @@ export type MutationdeletePetitionReplyArgs = {
 
 export type MutationdeletePetitionsArgs = {
   dryrun?: InputMaybe<Scalars["Boolean"]>;
+  folders?: InputMaybe<FoldersInput>;
   force?: InputMaybe<Scalars["Boolean"]>;
-  ids: Array<Scalars["GID"]>;
+  ids?: InputMaybe<Array<Scalars["GID"]>>;
 };
 
 export type MutationdeleteSignatureIntegrationArgs = {
@@ -1924,6 +1930,7 @@ export type Petition = PetitionBase & {
   name: Maybe<Scalars["String"]>;
   organization: Organization;
   owner: User;
+  path: Scalars["String"];
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   /** The progress of the petition. */
@@ -2074,6 +2081,7 @@ export type PetitionBase = {
   name: Maybe<Scalars["String"]>;
   organization: Organization;
   owner: User;
+  path: Scalars["String"];
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   /** The reminders configuration for the petition. */
@@ -2686,6 +2694,7 @@ export type PetitionTemplate = PetitionBase & {
   name: Maybe<Scalars["String"]>;
   organization: Organization;
   owner: User;
+  path: Scalars["String"];
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   /** The public link linked to this template */
@@ -3150,6 +3159,7 @@ export type QuerypetitionFieldArgs = {
 };
 
 export type QuerypetitionFoldersArgs = {
+  currentPath?: InputMaybe<Scalars["String"]>;
   type: PetitionBaseType;
 };
 
@@ -3162,7 +3172,8 @@ export type QuerypetitionsArgs = {
 };
 
 export type QuerypetitionsByIdArgs = {
-  ids: Array<Scalars["GID"]>;
+  folders?: InputMaybe<FoldersInput>;
+  ids?: InputMaybe<Array<Scalars["GID"]>>;
 };
 
 export type QuerypublicLicenseCodeArgs = {

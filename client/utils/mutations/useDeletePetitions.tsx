@@ -109,7 +109,8 @@ export function useDeletePetitions() {
           );
 
           const errorCode = error.graphQLErrors[0]?.extensions?.code as string | undefined;
-          const conflictingPetitions = data.petitionsById;
+          const conflictingPetitions = data.petitionsById ?? [];
+
           // can't delete a petition that was shared to me via group
           if (errorCode === "DELETE_GROUP_PETITION_ERROR") {
             await showErrorDialog({
@@ -311,7 +312,7 @@ function ConfirmDeleteSharedPetitionsDialog({
     fetchPolicy: "cache-and-network",
   });
 
-  const petitions = data?.petitionsById;
+  const petitions = data?.petitionsById ?? [];
   const isTemplate = type === "TEMPLATE";
 
   const count = petitionIds.length;
@@ -413,10 +414,10 @@ const _queries = [
     query useDeletePetitions_petitions($ids: [GID!]!) {
       petitionsById(ids: $ids) {
         id
-        ...PetitionName_PetitionBase
+        ...useDeletePetitions_PetitionBase
       }
     }
-    ${PetitionName.fragments.PetitionBase}
+    ${useDeletePetitions.fragments.PetitionBase}
   `,
 ];
 
@@ -424,7 +425,7 @@ const _mutations = [
   gql`
     mutation useDeletePetitions_deletePetitions(
       $ids: [GID!]
-      $folders: DeleteFoldersInput
+      $folders: FoldersInput
       $force: Boolean
       $dryrun: Boolean
     ) {

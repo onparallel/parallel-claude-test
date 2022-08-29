@@ -198,8 +198,14 @@ function Petitions() {
     try {
       await showPetitionSharingDialog({
         userId: me.id,
-        petitionIds: selectedIdsRef.current,
-        isTemplate: state.type === "TEMPLATE",
+        petitionIds: selectedRowsRef.current
+          .filter((c) => c.__typename !== "PetitionFolder")
+          .map((p) => (p as any).id as string),
+        folderIds: selectedRowsRef.current
+          .filter((c) => c.__typename === "PetitionFolder")
+          .map((p) => (p as any).folderId as string),
+        type: state.type,
+        currentPath: stateRef.current.path,
       });
     } catch {}
   };

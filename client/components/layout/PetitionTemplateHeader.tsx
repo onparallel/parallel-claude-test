@@ -90,7 +90,7 @@ export const PetitionTemplateHeader = Object.assign(
         const res = await showPetitionSharingDialog({
           userId: me.id,
           petitionIds: [petition.id],
-          isTemplate: true,
+          type: "TEMPLATE",
         });
 
         if (res?.close) {

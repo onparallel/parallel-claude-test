@@ -978,3 +978,11 @@ export const PublicPetitionLink = objectType({
     });
   },
 });
+
+export const FoldersInput = inputObjectType({
+  name: "FoldersInput",
+  definition(t) {
+    t.nonNull.field("type", { type: "PetitionBaseType" });
+    t.nonNull.list.nonNull.id("folderIds");
+  },
+});

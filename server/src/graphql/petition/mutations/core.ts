@@ -296,13 +296,7 @@ export const deletePetitions = mutationField("deletePetitions", {
   ),
   args: {
     ids: list(nonNull(globalIdArg("Petition"))),
-    folders: inputObjectType({
-      name: "DeleteFoldersInput",
-      definition(t) {
-        t.nonNull.field("type", { type: "PetitionBaseType" });
-        t.nonNull.list.nonNull.id("folderIds");
-      },
-    }).asArg(),
+    folders: "FoldersInput",
     force: booleanArg({ default: false }),
     dryrun: booleanArg({
       default: false,
