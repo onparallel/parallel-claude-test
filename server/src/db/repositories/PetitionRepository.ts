@@ -2081,6 +2081,10 @@ export class PetitionRepository extends BaseRepository {
           document_organization_theme_id: sourcePetition!.template_public
             ? defaultOrganizationTheme.id
             : sourcePetition!.document_organization_theme_id,
+          path:
+            sourcePetition!.is_template && data?.is_template === false
+              ? sourcePetition!.default_path // if creating a petition from a template, use default_path
+              : sourcePetition!.path, // else, use path
           ...data,
         },
         t

@@ -11,12 +11,13 @@ import {
   queryField,
   stringArg,
 } from "nexus";
-import { sort, uniq } from "remeda";
+import { isDefined, sort, uniq } from "remeda";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import { authenticate, authenticateAnd, or } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
+import { PETITION_FOLDER_REGEX, validateRegex } from "../helpers/validators/validateRegex";
 import {
   fieldsBelongsToPetition,
   petitionsArePublicTemplates,
@@ -263,7 +264,9 @@ export const petitionFolders = queryField("petitionFolders", {
   authorize: authenticate(),
   args: {
     type: nonNull("PetitionBaseType"),
+    currentPath: stringArg(),
   },
+  validateArgs: validateRegex((args) => args.currentPath, "currentPath", PETITION_FOLDER_REGEX),
   resolve: async (_, args, ctx) => {
     function pathAndParents(path: string): string[] {
       if (path.split("/").length > 2) {
@@ -279,7 +282,10 @@ export const petitionFolders = queryField("petitionFolders", {
     );
 
     const fullPaths = uniq(
-      petitionPaths.flatMap((path) => pathAndParents(path)).filter((p) => p !== "/")
+      [...petitionPaths, args.currentPath]
+        .filter(isDefined)
+        .flatMap((path) => pathAndParents(path))
+        .filter((p) => p !== "/")
     );
     return sort(fullPaths, (a, b) => a.localeCompare(b));
   },

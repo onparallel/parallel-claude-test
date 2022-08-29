@@ -3256,6 +3256,7 @@ export interface QuerypetitionFieldArgs {
 }
 
 export interface QuerypetitionFoldersArgs {
+  currentPath?: InputMaybe<Scalars["String"]>;
   type: PetitionBaseType;
 }
 
@@ -8017,6 +8018,7 @@ export type CreateReferenceDialog_PetitionFieldFragment = {
 
 export type GenericFolderDialog_foldersQueryVariables = Exact<{
   type: PetitionBaseType;
+  currentPath?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type GenericFolderDialog_foldersQuery = { petitionFolders: Array<string> };
@@ -27758,8 +27760,8 @@ export const CreateFolderDialog_petitionsDocument = gql`
   CreateFolderDialog_petitionsQueryVariables
 >;
 export const GenericFolderDialog_foldersDocument = gql`
-  query GenericFolderDialog_folders($type: PetitionBaseType!) {
-    petitionFolders(type: $type)
+  query GenericFolderDialog_folders($type: PetitionBaseType!, $currentPath: String) {
+    petitionFolders(type: $type, currentPath: $currentPath)
   }
 ` as unknown as DocumentNode<
   GenericFolderDialog_foldersQuery,

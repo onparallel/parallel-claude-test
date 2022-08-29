@@ -50,7 +50,7 @@ export function GenericFolderDialog({
 }: DialogProps<GenericFolderDialogProps, string>) {
   const intl = useIntl();
   const { data } = useQuery(GenericFolderDialog_foldersDocument, {
-    variables: { type },
+    variables: { type, currentPath },
     fetchPolicy: "network-only",
   });
   const [selectedPath, setSelectedPath] = useState(currentPath);
@@ -280,8 +280,8 @@ export function GenericFolderDialog({
 
 const _queries = [
   gql`
-    query GenericFolderDialog_folders($type: PetitionBaseType!) {
-      petitionFolders(type: $type)
+    query GenericFolderDialog_folders($type: PetitionBaseType!, $currentPath: String) {
+      petitionFolders(type: $type, currentPath: $currentPath)
     }
   `,
 ];

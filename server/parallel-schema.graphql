@@ -4313,7 +4313,7 @@ type Query {
   """
   Lists every path of the user's petitions as a string array
   """
-  petitionFolders(type: PetitionBaseType!): [String!]!
+  petitionFolders(currentPath: String, type: PetitionBaseType!): [String!]!
 
   """
   The petitions of the user

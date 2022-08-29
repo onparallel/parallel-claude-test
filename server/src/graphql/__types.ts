@@ -4960,6 +4960,7 @@ export interface NexusGenArgTypes {
     };
     petitionFolders: {
       // args
+      currentPath?: string | null; // String
       type: NexusGenEnums["PetitionBaseType"]; // PetitionBaseType!
     };
     petitions: {
