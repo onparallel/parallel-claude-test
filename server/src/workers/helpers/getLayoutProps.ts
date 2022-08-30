@@ -1,10 +1,12 @@
 import { isDefined } from "remeda";
 import { WorkerContext } from "../../context";
+import { BrandTheme } from "../../util/BrandTheme";
 
 export async function getLayoutProps(orgId: number, ctx: WorkerContext) {
-  const [org, logoPath] = await Promise.all([
+  const [org, logoPath, brandTheme] = await Promise.all([
     ctx.organizations.loadOrg(orgId),
     ctx.organizations.loadOrgLogoPath(orgId),
+    ctx.organizations.loadOrgBrandTheme(orgId),
   ]);
   const logoUrl = isDefined(logoPath)
     ? await ctx.images.getImageUrl(logoPath, { resize: { width: 400 } })
@@ -26,7 +28,7 @@ export async function getLayoutProps(orgId: number, ctx: WorkerContext) {
     logoAlt: logoUrl ? org.name : "Parallel",
     emailFrom: org.custom_email_from ?? emailFrom,
     tone: org.preferred_tone,
-    theme: org.brand_theme,
     removeParallelBranding: hasRemoveParallelBranding,
+    theme: (brandTheme!.data ?? {}) as BrandTheme,
   };
 }

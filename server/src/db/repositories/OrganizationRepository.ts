@@ -5,7 +5,7 @@ import { indexBy } from "remeda";
 import { Config, CONFIG } from "../../config";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { unMaybeArray } from "../../util/arrays";
-import { defaultBrandTheme } from "../../util/BrandTheme";
+import { BrandTheme, defaultBrandTheme } from "../../util/BrandTheme";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { Maybe, MaybeArray } from "../../util/types";
@@ -479,6 +479,30 @@ export class OrganizationRepository extends BaseRepository {
       .update(
         {
           ...data,
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*"
+      );
+    return theme;
+  }
+
+  async updateOrganizationBrandThemeDataByOrgId(
+    orgId: number,
+    data: Partial<BrandTheme>,
+    updatedBy: string,
+    t?: Knex.Transaction
+  ) {
+    const [theme] = await this.from("organization_theme", t)
+      .where({
+        org_id: orgId,
+        type: "BRAND",
+        is_default: true,
+        deleted_at: null,
+      })
+      .update(
+        {
+          data: this.knex.raw(/* sql */ `"data" || ?::jsonb`, [JSON.stringify(data)]),
           updated_at: this.now(),
           updated_by: updatedBy,
         },

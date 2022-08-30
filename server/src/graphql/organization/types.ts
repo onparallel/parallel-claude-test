@@ -317,8 +317,10 @@ export const Organization = objectType({
         };
       },
     });
+    /** @deprecated */
     t.nonNull.field("preferredTone", {
       type: "Tone",
+      deprecation: "use brandTheme.preferredTone",
       description: "The preferred tone of organization.",
       resolve: (o) => {
         return o.preferred_tone;
@@ -340,7 +342,15 @@ export const Organization = objectType({
         return o.pdf_document_theme ?? defaultPdfDocumentTheme;
       },
     });
-    t.nonNull.jsonObject("brandTheme", {
+    t.nonNull.field("brandTheme", {
+      type: objectType({
+        name: "OrganizationBrandThemeData",
+        definition(t) {
+          t.nullable.string("fontFamily");
+          t.nonNull.string("color");
+          t.nonNull.field("preferredTone", { type: "Tone" });
+        },
+      }),
       resolve: async (o, _, ctx) => {
         const theme = await ctx.organizations.loadOrgBrandTheme(o.id);
         return theme?.data ?? defaultBrandTheme;

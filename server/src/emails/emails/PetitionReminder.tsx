@@ -1,6 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { FORMATS } from "../../util/dates";
 import { Maybe } from "../../util/types";
 import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../components/CompleteInfoButton";
@@ -11,8 +12,6 @@ import { Layout, LayoutProps } from "../components/Layout";
 import { disclaimer, greetingReminder } from "../components/texts";
 import { UserMessageBox } from "../components/UserMessageBox";
 import { WhyWeUseParallel } from "../components/WhyWeUseParallel";
-import { FORMATS } from "../../util/dates";
-import { Tone } from "../utils/types";
 
 export type PetitionReminderProps = {
   emailSubject: Maybe<string>;
@@ -26,7 +25,6 @@ export type PetitionReminderProps = {
   bodyPlainText: string | null;
   deadline: Date | null;
   keycode: string;
-  tone: Tone;
   removeWhyWeUseParallel: boolean;
   removeParallelBranding: boolean;
 } & LayoutProps;
@@ -71,12 +69,12 @@ const email: Email<PetitionReminderProps> = {
       deadline,
       keycode,
       parallelUrl,
-      tone,
+      theme,
     }: PetitionReminderProps,
     intl: IntlShape
   ) {
     return outdent`
-      ${greetingReminder({ name, fullName, tone }, intl)}
+      ${greetingReminder({ name, fullName, tone: theme.preferredTone }, intl)}
       
       ${intl.formatMessage(
         {
@@ -84,7 +82,7 @@ const email: Email<PetitionReminderProps> = {
           defaultMessage:
             "We remind you that {senderName} ({senderEmail}) shared with you an access to Parallel in which there is still some information to be completed.",
         },
-        { senderName, senderEmail, tone }
+        { senderName, senderEmail, tone: theme.preferredTone }
       )}
       
       ${bodyPlainText}
@@ -95,7 +93,7 @@ const email: Email<PetitionReminderProps> = {
           defaultMessage:
             "{tone, select, INFORMAL{You have} other{There are currently}} {pending}/{total} fields pending.",
         },
-        { pending: missingFieldCount, total: totalFieldCount, tone }
+        { pending: missingFieldCount, total: totalFieldCount, tone: theme.preferredTone }
       )}
       ${
         deadline
@@ -154,7 +152,6 @@ const email: Email<PetitionReminderProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
-    tone,
     removeWhyWeUseParallel,
     removeParallelBranding,
     theme,
@@ -174,13 +171,12 @@ const email: Email<PetitionReminderProps> = {
           defaultMessage: "Stop receiving reminders",
         })}
         utmCampaign="recipients"
-        tone={tone}
         removeParallelBranding={removeParallelBranding}
         theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingReminder name={name} fullName={fullName} tone={tone} />
+            <GreetingReminder name={name} fullName={fullName} tone={theme.preferredTone} />
 
             <MjmlText lineHeight="24px">
               <FormattedMessage
@@ -189,7 +185,7 @@ const email: Email<PetitionReminderProps> = {
                 values={{
                   senderName: <b>{senderName}</b>,
                   senderEmail: <b>{senderEmail}</b>,
-                  tone,
+                  tone: theme.preferredTone,
                 }}
               />
             </MjmlText>
@@ -205,7 +201,11 @@ const email: Email<PetitionReminderProps> = {
                 <FormattedMessage
                   id="reminder.pending-fields-count"
                   defaultMessage="{tone, select, INFORMAL{You have} other{There are currently}} {pending}/{total} fields pending."
-                  values={{ pending: missingFieldCount, total: totalFieldCount, tone }}
+                  values={{
+                    pending: missingFieldCount,
+                    total: totalFieldCount,
+                    tone: theme.preferredTone,
+                  }}
                 />
               </li>
             </MjmlText>
@@ -234,7 +234,7 @@ const email: Email<PetitionReminderProps> = {
             ) : null}
             <MjmlSpacer height="10px" />
             <CompleteInfoButton
-              tone={tone}
+              tone={theme.preferredTone}
               href={`${parallelUrl}/${intl.locale}/petition/${keycode}`}
             />
             <MjmlSpacer height="10px" />
@@ -242,7 +242,7 @@ const email: Email<PetitionReminderProps> = {
           </MjmlColumn>
         </MjmlSection>
         {removeWhyWeUseParallel || removeParallelBranding ? null : (
-          <WhyWeUseParallel assetsUrl={assetsUrl} tone={tone} />
+          <WhyWeUseParallel assetsUrl={assetsUrl} tone={theme.preferredTone} />
         )}
       </Layout>
     );

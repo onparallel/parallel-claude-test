@@ -1,17 +1,8 @@
-import { ChakraProvider, extendTheme, useTheme } from "@chakra-ui/react";
-import { ReactNode } from "react";
-import Color from "color";
 import { gql } from "@apollo/client";
-
-export interface OrganizationBrandTheme {
-  fontFamily: string | null;
-  color: string;
-}
-
-export const defaultOrganizationBrandTheme: OrganizationBrandTheme = {
-  fontFamily: null,
-  color: "#6059f7",
-};
+import { ChakraProvider, extendTheme, useTheme } from "@chakra-ui/react";
+import { OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragment } from "@parallel/graphql/__types";
+import Color from "color";
+import { ReactNode } from "react";
 
 export function OverrideWithOrganizationTheme({
   children,
@@ -20,7 +11,7 @@ export function OverrideWithOrganizationTheme({
 }: {
   children: ReactNode;
   cssVarsRoot?: string;
-  brandTheme: OrganizationBrandTheme;
+  brandTheme: OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragment;
 }) {
   const theme = useTheme();
   const customTheme = extendTheme({
@@ -46,16 +37,10 @@ export function OverrideWithOrganizationTheme({
 }
 
 OverrideWithOrganizationTheme.fragments = {
-  Organization: gql`
-    fragment OverrideWithOrganizationTheme_Organization on Organization {
-      id
-      brandTheme
-    }
-  `,
-  PublicOrganization: gql`
-    fragment OverrideWithOrganizationTheme_PublicOrganization on PublicOrganization {
-      id
-      brandTheme
+  OrganizationBrandThemeData: gql`
+    fragment OverrideWithOrganizationTheme_OrganizationBrandThemeData on OrganizationBrandThemeData {
+      color
+      fontFamily
     }
   `,
 };

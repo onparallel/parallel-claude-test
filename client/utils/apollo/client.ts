@@ -203,6 +203,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
         },
         Organization: {
           fields: {
+            brandTheme: { merge: true },
             users: { merge: false },
             usageLimits: { merge: true },
             integrations: { merge: false },

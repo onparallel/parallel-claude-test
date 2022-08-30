@@ -145,8 +145,10 @@ export const PublicPetition = objectType({
         return signature ? (signature.status === "COMPLETED" ? "COMPLETED" : "STARTED") : null;
       },
     });
+    /** @deprecated */
     t.nonNull.field("tone", {
       type: "Tone",
+      deprecation: "use organization.brandTheme.preferredTone",
       description: "The preferred tone of organization.",
       resolve: async (root, _, ctx) => {
         const org = (await ctx.organizations.loadOrg(root.org_id))!;
@@ -432,12 +434,15 @@ export const PublicOrganization = objectType({
         return await ctx.featureFlags.orgHasFeatureFlag(root.id, "REMOVE_PARALLEL_BRANDING");
       },
     });
+    /** @deprecated */
     t.nonNull.field("tone", {
+      deprecation: "use brandTheme.preferredTone",
       type: "Tone",
       description: "The preferred tone of organization.",
       resolve: (o) => o.preferred_tone,
     });
-    t.nonNull.jsonObject("brandTheme", {
+    t.nonNull.field("brandTheme", {
+      type: "OrganizationBrandThemeData",
       resolve: async (o, _, ctx) => {
         const theme = await ctx.organizations.loadOrgBrandTheme(o.id);
         return theme?.data ?? defaultBrandTheme;

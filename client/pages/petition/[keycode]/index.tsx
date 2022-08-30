@@ -24,7 +24,7 @@ function RecipientViewVerify({
   organization,
 }: RecipientViewVerify_verifyPublicAccessMutation["verifyPublicAccess"]) {
   return (
-    <ToneProvider value={organization!.tone}>
+    <ToneProvider value={organization!.brandTheme.preferredTone}>
       <OverrideWithOrganizationTheme cssVarsRoot="body" brandTheme={organization!.brandTheme}>
         <Head>
           <title>{organization!.name}</title>
@@ -106,15 +106,19 @@ RecipientViewVerify.mutations = [
         cookieValue
         email
         organization {
+          id
           ...RecipientViewContactlessForm_PublicOrganization
           ...RecipientViewNewDevice_PublicOrganization
-          tone
-          brandTheme
+          brandTheme {
+            preferredTone
+            ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
+          }
         }
       }
     }
     ${RecipientViewContactlessForm.fragments.PublicOrganization}
     ${RecipientViewNewDevice.fragments.PublicOrganization}
+    ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
   `,
 ];
 

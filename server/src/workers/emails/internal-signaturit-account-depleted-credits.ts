@@ -3,6 +3,7 @@ import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
 import InternalSignaturitAccountDepletedCredits from "../../emails/emails/InternalSignaturitAccountDepletedCredits";
 import { buildFrom } from "../../emails/utils/buildFrom";
+import { defaultBrandTheme } from "../../util/BrandTheme";
 import { toGlobalId } from "../../util/globalId";
 
 export async function internalSignaturitAccountDepletedCredits(
@@ -24,6 +25,7 @@ export async function internalSignaturitAccountDepletedCredits(
       organizationName: org!.name,
       petitionGID: toGlobalId("Petition", payload.petitionId),
       userEmail: userData!.email,
+      theme: defaultBrandTheme,
     },
     { locale: "es" }
   );

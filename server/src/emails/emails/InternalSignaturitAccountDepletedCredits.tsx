@@ -55,7 +55,6 @@ const email: Email<InternalSignaturitAccountDepletedCreditsProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         title="¡Acción necesaria!"
-        tone="INFORMAL"
         omitGdprDisclaimer
         theme={theme}
       >

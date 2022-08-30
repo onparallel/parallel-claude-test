@@ -6,12 +6,10 @@ import { ClosingThanks } from "../components/ClosingThanks";
 import { GreetingContact } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
 import { closing, gdprDisclaimer, greetingContact } from "../components/texts";
-import { Tone } from "../utils/types";
 
 type SignatureCancelledProps = {
   signerName: string;
   signatureProvider: string;
-  tone: Tone;
 } & LayoutProps;
 
 /** Email sent to signers to let them know the signature process has been cancelled by the user. */
@@ -29,11 +27,11 @@ const email: Email<SignatureCancelledProps> = {
     });
   },
   text(
-    { signerName: fullName, signatureProvider, tone }: SignatureCancelledProps,
+    { signerName: fullName, signatureProvider, theme }: SignatureCancelledProps,
     intl: IntlShape
   ) {
     return outdent`
-      ${greetingContact({ name: fullName, fullName, tone }, intl)}
+      ${greetingContact({ name: fullName, fullName, tone: theme.preferredTone }, intl)}
       
       ${intl.formatMessage(
         {
@@ -41,7 +39,7 @@ const email: Email<SignatureCancelledProps> = {
           defaultMessage:
             "The signing process sent through {signatureProvider} has been cancelled by the sender.",
         },
-        { signatureProvider, tone }
+        { signatureProvider, tone: theme.preferredTone }
       )}
 
 
@@ -57,7 +55,6 @@ const email: Email<SignatureCancelledProps> = {
     logoAlt,
     logoUrl,
     signatureProvider,
-    tone,
     removeParallelBranding,
     theme,
   }: SignatureCancelledProps) {
@@ -74,24 +71,23 @@ const email: Email<SignatureCancelledProps> = {
           defaultMessage: "Cancelled signature request",
         })}
         utmCampaign="recipients"
-        tone={tone}
         removeParallelBranding={removeParallelBranding}
         theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingContact name={fullName} fullName={fullName} tone={tone} />
+            <GreetingContact name={fullName} fullName={fullName} tone={theme.preferredTone} />
             <MjmlText>
               <FormattedMessage
                 id="signature-cancelled.text"
                 defaultMessage="The signing process sent through {signatureProvider} has been cancelled by the sender."
                 values={{
                   signatureProvider,
-                  tone,
+                  tone: theme.preferredTone,
                 }}
               />
             </MjmlText>
-            <ClosingThanks tone={tone} />
+            <ClosingThanks tone={theme.preferredTone} />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

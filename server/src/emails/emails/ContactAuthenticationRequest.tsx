@@ -6,7 +6,6 @@ import { ClosingParallelTeam } from "../components/ClosingParallelTeam";
 import { GreetingContact } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
 import { closing, greetingContact } from "../components/texts";
-import { Tone } from "../utils/types";
 
 export type ContactAuthenticationRequest = {
   name: string;
@@ -14,7 +13,6 @@ export type ContactAuthenticationRequest = {
   browserName: string;
   osName: string;
   code: string;
-  tone: Tone;
   isContactVerification: boolean;
 } & LayoutProps;
 
@@ -25,18 +23,18 @@ const email: Email<ContactAuthenticationRequest> = {
       defaultMessage: "Parallel",
     });
   },
-  subject({ code, tone }, intl) {
+  subject({ code, theme }, intl) {
     return intl.formatMessage(
       {
         id: "verification-code-request.subject",
         defaultMessage: "{code} is your verification code on Parallel",
       },
-      { code, tone }
+      { code, tone: theme.preferredTone }
     );
   },
-  text({ name, fullName, code, browserName, osName, tone, isContactVerification }, intl) {
+  text({ name, fullName, code, browserName, osName, isContactVerification, theme }, intl) {
     return outdent`
-      ${greetingContact({ name, fullName, tone }, intl)}
+      ${greetingContact({ name, fullName, tone: theme.preferredTone }, intl)}
       ${
         isContactVerification
           ? intl.formatMessage(
@@ -45,7 +43,7 @@ const email: Email<ContactAuthenticationRequest> = {
                 defaultMessage:
                   "Please use the following verification code to access the information:",
               },
-              { tone }
+              { tone: theme.preferredTone }
             )
           : intl.formatMessage(
               {
@@ -53,7 +51,7 @@ const email: Email<ContactAuthenticationRequest> = {
                 defaultMessage:
                   "Please use the following verification code on the unrecognized device.",
               },
-              { tone }
+              { tone: theme.preferredTone }
             )
       }
 
@@ -82,7 +80,7 @@ const email: Email<ContactAuthenticationRequest> = {
           defaultMessage:
             "This verification code will expire in 30 minutes, please make sure you use it as soon as possible.",
         },
-        { tone }
+        { tone: theme.preferredTone }
       )}
       
       ${closing({}, intl)}
@@ -98,7 +96,6 @@ const email: Email<ContactAuthenticationRequest> = {
     assetsUrl,
     logoUrl,
     logoAlt,
-    tone,
     removeParallelBranding,
     isContactVerification,
     theme,
@@ -111,19 +108,18 @@ const email: Email<ContactAuthenticationRequest> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         utmCampaign="recipients"
-        tone={tone}
         removeParallelBranding={removeParallelBranding}
         theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingContact name={name} fullName={fullName} tone={tone} />
+            <GreetingContact name={name} fullName={fullName} tone={theme.preferredTone} />
             {isContactVerification ? (
               <MjmlText>
                 <FormattedMessage
                   id="verification-code-request.instructions-contact"
                   defaultMessage="Please use the following verification code to access the information:"
-                  values={{ tone }}
+                  values={{ tone: theme.preferredTone }}
                 />
               </MjmlText>
             ) : (
@@ -131,7 +127,7 @@ const email: Email<ContactAuthenticationRequest> = {
                 <FormattedMessage
                   id="verification-code-request.instructions"
                   defaultMessage="Please use the following verification code on the unrecognized device."
-                  values={{ tone }}
+                  values={{ tone: theme.preferredTone }}
                 />
               </MjmlText>
             )}
@@ -163,7 +159,7 @@ const email: Email<ContactAuthenticationRequest> = {
               <FormattedMessage
                 id="verification-code-request.expiry"
                 defaultMessage="This verification code will expire in 30 minutes, please make sure you use it as soon as possible."
-                values={{ tone }}
+                values={{ tone: theme.preferredTone }}
               />
             </MjmlText>
             <ClosingParallelTeam />

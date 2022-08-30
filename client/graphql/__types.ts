@@ -720,7 +720,10 @@ export interface Mutation {
   updateOrganizationLogo: Organization;
   /** updates the PDF_DOCUMENT theme of the organization */
   updateOrganizationPdfDocumentTheme: Organization;
-  /** Changes the organization preferred tone */
+  /**
+   * Changes the organization preferred tone
+   * @deprecated use updateOrganizationBrandTheme instead
+   */
   updateOrganizationPreferredTone: Organization;
   /** Applies a given tier to the organization */
   updateOrganizationTier: SupportMethodResponse;
@@ -1720,7 +1723,7 @@ export interface Organization extends Timestamps {
   /** The total number of active users */
   activeUserCount: Scalars["Int"];
   anonymizePetitionsAfterMonths?: Maybe<Scalars["Int"]>;
-  brandTheme: Scalars["JSONObject"];
+  brandTheme: OrganizationBrandThemeData;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
@@ -1749,7 +1752,10 @@ export interface Organization extends Timestamps {
   /** @deprecated Not used anymore. Use themes.pdfDocument[0].data */
   pdfDocumentTheme: Scalars["JSONObject"];
   pdfDocumentThemes: Array<OrganizationTheme>;
-  /** The preferred tone of organization. */
+  /**
+   * The preferred tone of organization.
+   * @deprecated use brandTheme.preferredTone
+   */
   preferredTone: Tone;
   /** The status of the organization. */
   status: OrganizationStatus;
@@ -1787,9 +1793,17 @@ export interface OrganizationusersArgs {
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy>>;
 }
 
+export interface OrganizationBrandThemeData {
+  __typename?: "OrganizationBrandThemeData";
+  color: Scalars["String"];
+  fontFamily?: Maybe<Scalars["String"]>;
+  preferredTone: Tone;
+}
+
 export interface OrganizationBrandThemeInput {
   color?: InputMaybe<Scalars["String"]>;
   fontFamily?: InputMaybe<Scalars["String"]>;
+  preferredTone?: InputMaybe<Tone>;
 }
 
 export interface OrganizationDocumentThemeInput {
@@ -2008,7 +2022,10 @@ export interface Petition extends PetitionBase {
   status: PetitionStatus;
   /** The tags linked to the petition */
   tags: Array<Tag>;
-  /** The preferred tone of organization. */
+  /**
+   * The preferred tone of organization.
+   * @deprecated use organization.brandTheme.preferredTone
+   */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -2156,7 +2173,10 @@ export interface PetitionBase {
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
   tags: Array<Tag>;
-  /** The preferred tone of organization. */
+  /**
+   * The preferred tone of organization.
+   * @deprecated use organization.brandTheme.preferredTone
+   */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -2802,7 +2822,10 @@ export interface PetitionTemplate extends PetitionBase {
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
   tags: Array<Tag>;
-  /** The preferred tone of organization. */
+  /**
+   * The preferred tone of organization.
+   * @deprecated use organization.brandTheme.preferredTone
+   */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -2907,7 +2930,7 @@ export interface PublicLicenseCode {
 /** A public view of an organization */
 export interface PublicOrganization {
   __typename?: "PublicOrganization";
-  brandTheme: Scalars["JSONObject"];
+  brandTheme: OrganizationBrandThemeData;
   /** If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled */
   hasRemoveParallelBranding: Scalars["Boolean"];
   /** The ID of the organization. */
@@ -2916,7 +2939,10 @@ export interface PublicOrganization {
   logoUrl?: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
-  /** The preferred tone of organization. */
+  /**
+   * The preferred tone of organization.
+   * @deprecated use brandTheme.preferredTone
+   */
   tone: Tone;
 }
 
@@ -2963,7 +2989,10 @@ export interface PublicPetition extends Timestamps {
   signatureStatus?: Maybe<PublicSignatureStatus>;
   /** The status of the petition. */
   status: PetitionStatus;
-  /** The preferred tone of organization. */
+  /**
+   * The preferred tone of organization.
+   * @deprecated use organization.brandTheme.preferredTone
+   */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -4133,16 +4162,10 @@ export type Mention_PetitionFieldCommentMentionFragment =
   | Mention_PetitionFieldCommentMention_PetitionFieldCommentUserGroupMention_Fragment
   | Mention_PetitionFieldCommentMention_PetitionFieldCommentUserMention_Fragment;
 
-export type OverrideWithOrganizationTheme_OrganizationFragment = {
-  __typename?: "Organization";
-  id: string;
-  brandTheme: { [key: string]: any };
-};
-
-export type OverrideWithOrganizationTheme_PublicOrganizationFragment = {
-  __typename?: "PublicOrganization";
-  id: string;
-  brandTheme: { [key: string]: any };
+export type OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragment = {
+  __typename?: "OrganizationBrandThemeData";
+  color: string;
+  fontFamily?: string | null;
 };
 
 export type PetitionFieldComment_PetitionFieldCommentFragment = {
@@ -5826,9 +5849,13 @@ export type BrandingGeneral_UserFragment = {
     __typename?: "Organization";
     id: string;
     name: string;
-    preferredTone: Tone;
-    brandTheme: { [key: string]: any };
     logoUrl?: string | null;
+    brandTheme: {
+      __typename?: "OrganizationBrandThemeData";
+      color: string;
+      fontFamily?: string | null;
+      preferredTone: Tone;
+    };
   };
 };
 
@@ -5840,14 +5867,6 @@ export type BrandingGeneral_updateOrgLogoMutation = {
   updateOrganizationLogo: { __typename?: "Organization"; id: string; logoUrl?: string | null };
 };
 
-export type BrandingGeneral_updateOrganizationPreferredToneMutationVariables = Exact<{
-  tone: Tone;
-}>;
-
-export type BrandingGeneral_updateOrganizationPreferredToneMutation = {
-  updateOrganizationPreferredTone: { __typename?: "Organization"; id: string; preferredTone: Tone };
-};
-
 export type BrandingGeneral_updateOrganizationBrandThemeMutationVariables = Exact<{
   data: OrganizationBrandThemeInput;
 }>;
@@ -5856,8 +5875,20 @@ export type BrandingGeneral_updateOrganizationBrandThemeMutation = {
   updateOrganizationBrandTheme: {
     __typename?: "Organization";
     id: string;
-    brandTheme: { [key: string]: any };
+    brandTheme: {
+      __typename?: "OrganizationBrandThemeData";
+      color: string;
+      fontFamily?: string | null;
+      preferredTone: Tone;
+    };
   };
+};
+
+export type BrandingGeneralPreview_OrganizatioNBrandThemeDataFragment = {
+  __typename?: "OrganizationBrandThemeData";
+  preferredTone: Tone;
+  color: string;
+  fontFamily?: string | null;
 };
 
 export type BrandingGeneralPreview_UserFragment = {
@@ -5865,11 +5896,15 @@ export type BrandingGeneralPreview_UserFragment = {
   fullName?: string | null;
   organization: {
     __typename?: "Organization";
-    name: string;
-    preferredTone: Tone;
-    logoUrl?: string | null;
     id: string;
-    brandTheme: { [key: string]: any };
+    name: string;
+    logoUrl?: string | null;
+    brandTheme: {
+      __typename?: "OrganizationBrandThemeData";
+      preferredTone: Tone;
+      color: string;
+      fontFamily?: string | null;
+    };
   };
 };
 
@@ -13092,13 +13127,17 @@ export type OrganizationBranding_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      preferredTone: Tone;
-      brandTheme: { [key: string]: any };
       logoUrl?: string | null;
       iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+      brandTheme: {
+        __typename?: "OrganizationBrandThemeData";
+        color: string;
+        fontFamily?: string | null;
+        preferredTone: Tone;
       };
       pdfDocumentThemes: Array<{
         __typename?: "OrganizationTheme";
@@ -16533,7 +16572,6 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
   status: PetitionStatus;
   id: string;
-  tone: Tone;
   isRestricted: boolean;
   isAnonymized: boolean;
   name?: string | null;
@@ -16586,6 +16624,15 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       fullName: string;
     } | null>;
   } | null;
+  organization: {
+    __typename?: "Organization";
+    id: string;
+    brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
+    usageLimits: {
+      __typename?: "OrganizationUsageLimit";
+      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+    };
+  };
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -16658,14 +16705,6 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     timezone: string;
     weekdaysOnly: boolean;
   } | null;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
-  };
 };
 
 export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
@@ -16673,7 +16712,6 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   isPublic: boolean;
   description?: any | null;
   id: string;
-  tone: Tone;
   isRestricted: boolean;
   isAnonymized: boolean;
   name?: string | null;
@@ -16772,7 +16810,6 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       }
   >;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
-  organization: { __typename?: "Organization"; customHost?: string | null };
   signatureConfig?: {
     __typename?: "SignatureConfig";
     title?: string | null;
@@ -17505,7 +17542,6 @@ export type PetitionCompose_petitionQuery = {
         __typename: "Petition";
         status: PetitionStatus;
         id: string;
-        tone: Tone;
         isRestricted: boolean;
         isAnonymized: boolean;
         name?: string | null;
@@ -17558,6 +17594,19 @@ export type PetitionCompose_petitionQuery = {
             fullName: string;
           } | null>;
         } | null;
+        organization: {
+          __typename?: "Organization";
+          id: string;
+          brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
+          usageLimits: {
+            __typename?: "OrganizationUsageLimit";
+            petitions: {
+              __typename?: "OrganizationUsagePetitionLimit";
+              limit: number;
+              used: number;
+            };
+          };
+        };
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -17630,25 +17679,12 @@ export type PetitionCompose_petitionQuery = {
           timezone: string;
           weekdaysOnly: boolean;
         } | null;
-        organization: {
-          __typename?: "Organization";
-          id: string;
-          usageLimits: {
-            __typename?: "OrganizationUsageLimit";
-            petitions: {
-              __typename?: "OrganizationUsagePetitionLimit";
-              limit: number;
-              used: number;
-            };
-          };
-        };
       }
     | {
         __typename: "PetitionTemplate";
         isPublic: boolean;
         description?: any | null;
         id: string;
-        tone: Tone;
         isRestricted: boolean;
         isAnonymized: boolean;
         name?: string | null;
@@ -17747,7 +17783,6 @@ export type PetitionCompose_petitionQuery = {
             }
         >;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
-        organization: { __typename?: "Organization"; customHost?: string | null };
         signatureConfig?: {
           __typename?: "SignatureConfig";
           title?: string | null;
@@ -17786,7 +17821,6 @@ export type PetitionQuery = {
 export type PetitionMessages_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
-  tone: Tone;
   name?: string | null;
   locale: PetitionLocale;
   deadline?: string | null;
@@ -17805,7 +17839,6 @@ export type PetitionMessages_PetitionBase_Petition_Fragment = {
 export type PetitionMessages_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  tone: Tone;
   emailSubject?: string | null;
   emailBody?: any | null;
   isRestricted: boolean;
@@ -17910,7 +17943,6 @@ export type PetitionMessages_petitionQuery = {
     | {
         __typename?: "Petition";
         id: string;
-        tone: Tone;
         name?: string | null;
         locale: PetitionLocale;
         deadline?: string | null;
@@ -17928,7 +17960,6 @@ export type PetitionMessages_petitionQuery = {
     | {
         __typename?: "PetitionTemplate";
         id: string;
-        tone: Tone;
         emailSubject?: string | null;
         emailBody?: any | null;
         isRestricted: boolean;
@@ -17960,7 +17991,6 @@ export type PetitionMessages_updatePetitionMutation = {
     | {
         __typename?: "Petition";
         id: string;
-        tone: Tone;
         name?: string | null;
         locale: PetitionLocale;
         deadline?: string | null;
@@ -17978,7 +18008,6 @@ export type PetitionMessages_updatePetitionMutation = {
     | {
         __typename?: "PetitionTemplate";
         id: string;
-        tone: Tone;
         emailSubject?: string | null;
         emailBody?: any | null;
         isRestricted: boolean;
@@ -18002,7 +18031,6 @@ export type PetitionMessages_updatePetitionMutation = {
 export type PetitionPreview_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
-  tone: Tone;
   isAnonymized: boolean;
   status: PetitionStatus;
   name?: string | null;
@@ -18040,6 +18068,15 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
       } | null>;
     };
   }>;
+  organization: {
+    __typename?: "Organization";
+    id: string;
+    brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
+    usageLimits: {
+      __typename?: "OrganizationUsageLimit";
+      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+    };
+  };
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -18178,20 +18215,11 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     timezone: string;
     weekdaysOnly: boolean;
   } | null;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
-  };
 };
 
 export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  tone: Tone;
   isAnonymized: boolean;
   name?: string | null;
   locale: PetitionLocale;
@@ -18340,10 +18368,14 @@ export type PetitionPreview_QueryFragment = {
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
-      name: string;
       id: string;
-      brandTheme: { [key: string]: any };
+      name: string;
       iconUrl92?: string | null;
+      brandTheme: {
+        __typename?: "OrganizationBrandThemeData";
+        color: string;
+        fontFamily?: string | null;
+      };
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -18371,7 +18403,6 @@ export type PetitionPreview_updatePetitionMutation = {
     | {
         __typename?: "Petition";
         id: string;
-        tone: Tone;
         isAnonymized: boolean;
         status: PetitionStatus;
         name?: string | null;
@@ -18409,6 +18440,19 @@ export type PetitionPreview_updatePetitionMutation = {
             } | null>;
           };
         }>;
+        organization: {
+          __typename?: "Organization";
+          id: string;
+          brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
+          usageLimits: {
+            __typename?: "OrganizationUsageLimit";
+            petitions: {
+              __typename?: "OrganizationUsagePetitionLimit";
+              limit: number;
+              used: number;
+            };
+          };
+        };
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -18547,23 +18591,10 @@ export type PetitionPreview_updatePetitionMutation = {
           timezone: string;
           weekdaysOnly: boolean;
         } | null;
-        organization: {
-          __typename?: "Organization";
-          id: string;
-          usageLimits: {
-            __typename?: "OrganizationUsageLimit";
-            petitions: {
-              __typename?: "OrganizationUsagePetitionLimit";
-              limit: number;
-              used: number;
-            };
-          };
-        };
       }
     | {
         __typename?: "PetitionTemplate";
         id: string;
-        tone: Tone;
         isAnonymized: boolean;
         name?: string | null;
         locale: PetitionLocale;
@@ -18704,7 +18735,6 @@ export type PetitionPreview_completePetitionMutation = {
   completePetition: {
     __typename?: "Petition";
     id: string;
-    tone: Tone;
     isAnonymized: boolean;
     status: PetitionStatus;
     name?: string | null;
@@ -18742,6 +18772,15 @@ export type PetitionPreview_completePetitionMutation = {
         } | null>;
       };
     }>;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
     myEffectivePermission?: {
       __typename?: "EffectivePetitionUserPermission";
       permissionType: PetitionPermissionType;
@@ -18880,14 +18919,6 @@ export type PetitionPreview_completePetitionMutation = {
       timezone: string;
       weekdaysOnly: boolean;
     } | null;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
-    };
   };
 };
 
@@ -18900,7 +18931,6 @@ export type PetitionPreview_petitionQuery = {
     | {
         __typename?: "Petition";
         id: string;
-        tone: Tone;
         isAnonymized: boolean;
         status: PetitionStatus;
         name?: string | null;
@@ -18938,6 +18968,19 @@ export type PetitionPreview_petitionQuery = {
             } | null>;
           };
         }>;
+        organization: {
+          __typename?: "Organization";
+          id: string;
+          brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
+          usageLimits: {
+            __typename?: "OrganizationUsageLimit";
+            petitions: {
+              __typename?: "OrganizationUsagePetitionLimit";
+              limit: number;
+              used: number;
+            };
+          };
+        };
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -19076,23 +19119,10 @@ export type PetitionPreview_petitionQuery = {
           timezone: string;
           weekdaysOnly: boolean;
         } | null;
-        organization: {
-          __typename?: "Organization";
-          id: string;
-          usageLimits: {
-            __typename?: "OrganizationUsageLimit";
-            petitions: {
-              __typename?: "OrganizationUsagePetitionLimit";
-              limit: number;
-              used: number;
-            };
-          };
-        };
       }
     | {
         __typename?: "PetitionTemplate";
         id: string;
-        tone: Tone;
         isAnonymized: boolean;
         name?: string | null;
         locale: PetitionLocale;
@@ -19246,10 +19276,14 @@ export type PetitionPreview_userQuery = {
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
-      name: string;
       id: string;
-      brandTheme: { [key: string]: any };
+      name: string;
       iconUrl92?: string | null;
+      brandTheme: {
+        __typename?: "OrganizationBrandThemeData";
+        color: string;
+        fontFamily?: string | null;
+      };
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -21654,7 +21688,6 @@ export type RecipientView_PublicPetitionAccessFragment = {
     status: PetitionStatus;
     deadline?: string | null;
     isRecipientViewContentsHidden: boolean;
-    tone: Tone;
     signatureStatus?: PublicSignatureStatus | null;
     isCompletingMessageEnabled: boolean;
     completingMessageBody?: string | null;
@@ -21667,6 +21700,12 @@ export type RecipientView_PublicPetitionAccessFragment = {
       id: string;
       fullName: string;
     }>;
+    organization: {
+      __typename?: "PublicOrganization";
+      id: string;
+      hasRemoveParallelBranding: boolean;
+      brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
+    };
     fields: Array<{
       __typename?: "PublicPetitionField";
       type: PetitionFieldType;
@@ -21723,11 +21762,6 @@ export type RecipientView_PublicPetitionAccessFragment = {
         email: string;
       }>;
     } | null;
-    organization: {
-      __typename?: "PublicOrganization";
-      id: string;
-      hasRemoveParallelBranding: boolean;
-    };
   } | null;
   granter?: {
     __typename?: "PublicUser";
@@ -21737,11 +21771,15 @@ export type RecipientView_PublicPetitionAccessFragment = {
     email: string;
     organization: {
       __typename?: "PublicOrganization";
+      id: string;
       hasRemoveParallelBranding: boolean;
       name: string;
       logoUrl?: string | null;
-      id: string;
-      brandTheme: { [key: string]: any };
+      brandTheme: {
+        __typename?: "OrganizationBrandThemeData";
+        color: string;
+        fontFamily?: string | null;
+      };
     };
   } | null;
   contact?: {
@@ -21767,11 +21805,16 @@ export type RecipientView_PublicPetitionFragment = {
   status: PetitionStatus;
   deadline?: string | null;
   isRecipientViewContentsHidden: boolean;
-  tone: Tone;
   signatureStatus?: PublicSignatureStatus | null;
   isCompletingMessageEnabled: boolean;
   completingMessageBody?: string | null;
   completingMessageSubject?: string | null;
+  organization: {
+    __typename?: "PublicOrganization";
+    id: string;
+    hasRemoveParallelBranding: boolean;
+    brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
+  };
   fields: Array<{
     __typename?: "PublicPetitionField";
     type: PetitionFieldType;
@@ -21835,11 +21878,6 @@ export type RecipientView_PublicPetitionFragment = {
     firstName: string;
     email: string;
   }>;
-  organization: {
-    __typename?: "PublicOrganization";
-    id: string;
-    hasRemoveParallelBranding: boolean;
-  };
 };
 
 export type RecipientView_PublicPetitionFieldFragment = {
@@ -21903,11 +21941,16 @@ export type RecipientView_publicCompletePetitionMutation = {
     status: PetitionStatus;
     deadline?: string | null;
     isRecipientViewContentsHidden: boolean;
-    tone: Tone;
     signatureStatus?: PublicSignatureStatus | null;
     isCompletingMessageEnabled: boolean;
     completingMessageBody?: string | null;
     completingMessageSubject?: string | null;
+    organization: {
+      __typename?: "PublicOrganization";
+      id: string;
+      hasRemoveParallelBranding: boolean;
+      brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
+    };
     fields: Array<{
       __typename?: "PublicPetitionField";
       type: PetitionFieldType;
@@ -21971,11 +22014,6 @@ export type RecipientView_publicCompletePetitionMutation = {
       firstName: string;
       email: string;
     }>;
-    organization: {
-      __typename?: "PublicOrganization";
-      id: string;
-      hasRemoveParallelBranding: boolean;
-    };
   };
 };
 
@@ -21992,7 +22030,6 @@ export type RecipientView_accessQuery = {
       status: PetitionStatus;
       deadline?: string | null;
       isRecipientViewContentsHidden: boolean;
-      tone: Tone;
       signatureStatus?: PublicSignatureStatus | null;
       isCompletingMessageEnabled: boolean;
       completingMessageBody?: string | null;
@@ -22005,6 +22042,12 @@ export type RecipientView_accessQuery = {
         id: string;
         fullName: string;
       }>;
+      organization: {
+        __typename?: "PublicOrganization";
+        id: string;
+        hasRemoveParallelBranding: boolean;
+        brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
+      };
       fields: Array<{
         __typename?: "PublicPetitionField";
         type: PetitionFieldType;
@@ -22061,11 +22104,6 @@ export type RecipientView_accessQuery = {
           email: string;
         }>;
       } | null;
-      organization: {
-        __typename?: "PublicOrganization";
-        id: string;
-        hasRemoveParallelBranding: boolean;
-      };
     } | null;
     granter?: {
       __typename?: "PublicUser";
@@ -22075,11 +22113,15 @@ export type RecipientView_accessQuery = {
       email: string;
       organization: {
         __typename?: "PublicOrganization";
+        id: string;
         hasRemoveParallelBranding: boolean;
         name: string;
         logoUrl?: string | null;
-        id: string;
-        brandTheme: { [key: string]: any };
+        brandTheme: {
+          __typename?: "OrganizationBrandThemeData";
+          color: string;
+          fontFamily?: string | null;
+        };
       };
     } | null;
     contact?: {
@@ -22117,11 +22159,16 @@ export type RecipientViewVerify_verifyPublicAccessMutation = {
     email?: string | null;
     organization?: {
       __typename?: "PublicOrganization";
-      tone: Tone;
-      brandTheme?: { [key: string]: any } | null;
+      id: string;
       name: string;
       hasRemoveParallelBranding: boolean;
       logoUrl340?: string | null;
+      brandTheme: {
+        __typename?: "OrganizationBrandThemeData";
+        preferredTone: Tone;
+        color: string;
+        fontFamily?: string | null;
+      };
     } | null;
   };
 };
@@ -24037,23 +24084,35 @@ export const BrandingDocumentTheme_UserFragmentDoc = gql`
   ${DocumentThemePreview_OrganizationFragmentDoc}
   ${BrandingDocumentTheme_OrganizationThemeFragmentDoc}
 ` as unknown as DocumentNode<BrandingDocumentTheme_UserFragment, unknown>;
-export const OverrideWithOrganizationTheme_OrganizationFragmentDoc = gql`
-  fragment OverrideWithOrganizationTheme_Organization on Organization {
-    id
-    brandTheme
+export const OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragmentDoc = gql`
+  fragment OverrideWithOrganizationTheme_OrganizationBrandThemeData on OrganizationBrandThemeData {
+    color
+    fontFamily
   }
-` as unknown as DocumentNode<OverrideWithOrganizationTheme_OrganizationFragment, unknown>;
+` as unknown as DocumentNode<
+  OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragment,
+  unknown
+>;
+export const BrandingGeneralPreview_OrganizatioNBrandThemeDataFragmentDoc = gql`
+  fragment BrandingGeneralPreview_OrganizatioNBrandThemeData on OrganizationBrandThemeData {
+    preferredTone
+    ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
+  }
+  ${OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragmentDoc}
+` as unknown as DocumentNode<BrandingGeneralPreview_OrganizatioNBrandThemeDataFragment, unknown>;
 export const BrandingGeneralPreview_UserFragmentDoc = gql`
   fragment BrandingGeneralPreview_User on User {
     fullName
     organization {
+      id
       name
-      preferredTone
       logoUrl(options: { resize: { width: 600 } })
-      ...OverrideWithOrganizationTheme_Organization
+      brandTheme {
+        ...BrandingGeneralPreview_OrganizatioNBrandThemeData
+      }
     }
   }
-  ${OverrideWithOrganizationTheme_OrganizationFragmentDoc}
+  ${BrandingGeneralPreview_OrganizatioNBrandThemeDataFragmentDoc}
 ` as unknown as DocumentNode<BrandingGeneralPreview_UserFragment, unknown>;
 export const BrandingGeneral_UserFragmentDoc = gql`
   fragment BrandingGeneral_User on User {
@@ -24063,8 +24122,11 @@ export const BrandingGeneral_UserFragmentDoc = gql`
     organization {
       id
       name
-      preferredTone
-      brandTheme
+      brandTheme {
+        color
+        fontFamily
+        preferredTone
+      }
       logoUrl(options: { resize: { width: 600 } })
     }
     ...BrandingGeneralPreview_User
@@ -26479,7 +26541,12 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
     id
     ...PetitionLayout_PetitionBase
     ...PetitionSettings_PetitionBase
-    tone
+    organization {
+      id
+      brandTheme {
+        preferredTone
+      }
+    }
     isRestricted
     fields {
       ...PetitionCompose_PetitionField
@@ -26639,7 +26706,6 @@ export const PetitionTemplateClosingMessageCard_PetitionTemplateFragmentDoc = gq
 export const PetitionMessages_PetitionBaseFragmentDoc = gql`
   fragment PetitionMessages_PetitionBase on PetitionBase {
     id
-    tone
     ...PetitionLayout_PetitionBase
     ... on PetitionTemplate {
       ...PetitionTemplateRequestMessageCard_PetitionTemplate
@@ -26884,7 +26950,12 @@ export const useLiquidScope_PetitionBaseFragmentDoc = gql`
 export const PetitionPreview_PetitionBaseFragmentDoc = gql`
   fragment PetitionPreview_PetitionBase on PetitionBase {
     id
-    tone
+    organization {
+      id
+      brandTheme {
+        preferredTone
+      }
+    }
     isAnonymized
     myEffectivePermission {
       permissionType
@@ -26945,9 +27016,12 @@ export const PetitionPreview_QueryFragmentDoc = gql`
     me {
       id
       organization {
+        id
         name
         ...isUsageLimitsReached_Organization
-        ...OverrideWithOrganizationTheme_Organization
+        brandTheme {
+          ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
+        }
       }
       ...useSendPetitionHandler_User
       ...ConfirmPetitionSignersDialog_User
@@ -26955,7 +27029,7 @@ export const PetitionPreview_QueryFragmentDoc = gql`
   }
   ${PetitionLayout_QueryFragmentDoc}
   ${isUsageLimitsReached_OrganizationFragmentDoc}
-  ${OverrideWithOrganizationTheme_OrganizationFragmentDoc}
+  ${OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragmentDoc}
   ${useSendPetitionHandler_UserFragmentDoc}
   ${ConfirmPetitionSignersDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreview_QueryFragment, unknown>;
@@ -27769,7 +27843,12 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     status
     deadline
     isRecipientViewContentsHidden
-    tone
+    organization {
+      id
+      brandTheme {
+        preferredTone
+      }
+    }
     fields {
       ...RecipientView_PublicPetitionField
       ...useGetPageFields_PublicPetitionField
@@ -27851,12 +27930,6 @@ export const RecipientView_PublicUserFragmentDoc = gql`
   ${RecipientViewContentsCard_PublicUserFragmentDoc}
   ${useCompletingMessageDialog_PublicUserFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_PublicUserFragment, unknown>;
-export const OverrideWithOrganizationTheme_PublicOrganizationFragmentDoc = gql`
-  fragment OverrideWithOrganizationTheme_PublicOrganization on PublicOrganization {
-    id
-    brandTheme
-  }
-` as unknown as DocumentNode<OverrideWithOrganizationTheme_PublicOrganizationFragment, unknown>;
 export const RecipientView_PublicPetitionMessageFragmentDoc = gql`
   fragment RecipientView_PublicPetitionMessage on PublicPetitionMessage {
     id
@@ -27893,8 +27966,11 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
     granter {
       ...RecipientView_PublicUser
       organization {
+        id
         hasRemoveParallelBranding
-        ...OverrideWithOrganizationTheme_PublicOrganization
+        brandTheme {
+          ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
+        }
       }
     }
     contact {
@@ -27909,7 +27985,7 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
   ${RecipientView_PublicPetitionFragmentDoc}
   ${useRecipientViewConfirmPetitionSignersDialog_PublicContactFragmentDoc}
   ${RecipientView_PublicUserFragmentDoc}
-  ${OverrideWithOrganizationTheme_PublicOrganizationFragmentDoc}
+  ${OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragmentDoc}
   ${RecipientViewHeader_PublicContactFragmentDoc}
   ${RecipientView_PublicPetitionMessageFragmentDoc}
   ${RecipientViewPetitionField_PublicPetitionAccessFragmentDoc}
@@ -28344,22 +28420,15 @@ export const BrandingGeneral_updateOrgLogoDocument = gql`
   BrandingGeneral_updateOrgLogoMutation,
   BrandingGeneral_updateOrgLogoMutationVariables
 >;
-export const BrandingGeneral_updateOrganizationPreferredToneDocument = gql`
-  mutation BrandingGeneral_updateOrganizationPreferredTone($tone: Tone!) {
-    updateOrganizationPreferredTone(tone: $tone) {
-      id
-      preferredTone
-    }
-  }
-` as unknown as DocumentNode<
-  BrandingGeneral_updateOrganizationPreferredToneMutation,
-  BrandingGeneral_updateOrganizationPreferredToneMutationVariables
->;
 export const BrandingGeneral_updateOrganizationBrandThemeDocument = gql`
   mutation BrandingGeneral_updateOrganizationBrandTheme($data: OrganizationBrandThemeInput!) {
     updateOrganizationBrandTheme(data: $data) {
       id
-      brandTheme
+      brandTheme {
+        color
+        fontFamily
+        preferredTone
+      }
     }
   }
 ` as unknown as DocumentNode<
@@ -31154,15 +31223,19 @@ export const RecipientViewVerify_verifyPublicAccessDocument = gql`
       cookieValue
       email
       organization {
+        id
         ...RecipientViewContactlessForm_PublicOrganization
         ...RecipientViewNewDevice_PublicOrganization
-        tone
-        brandTheme
+        brandTheme {
+          preferredTone
+          ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
+        }
       }
     }
   }
   ${RecipientViewContactlessForm_PublicOrganizationFragmentDoc}
   ${RecipientViewNewDevice_PublicOrganizationFragmentDoc}
+  ${OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragmentDoc}
 ` as unknown as DocumentNode<
   RecipientViewVerify_verifyPublicAccessMutation,
   RecipientViewVerify_verifyPublicAccessMutationVariables

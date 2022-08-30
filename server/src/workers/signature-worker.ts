@@ -79,8 +79,6 @@ async function startSignatureProcess(
       throw new Error(`Expected theme of type PDF_DOCUMENT on Petition:${petition.id}`);
     }
 
-    const brandTheme = await ctx.organizations.loadOrgBrandTheme(org!.id);
-
     // send request to signature client
     const data = await signatureClient.startSignatureRequest(
       toGlobalId("Petition", petition.id),
@@ -309,8 +307,6 @@ async function updateOrganizationBranding(payload: { orgId: number }, ctx: Worke
     return;
   }
 
-  const brandTheme = await ctx.organizations.loadOrgBrandTheme(organization!.id);
-
   await pMap(
     signatureIntegrations as SignatureOrgIntegration[],
     async (integration) => {
@@ -325,13 +321,16 @@ async function updateOrganizationBranding(payload: { orgId: number }, ctx: Worke
       const client = ctx.signature.getClient(integration);
 
       for (const [key, brandingId] of Object.entries(definedBrandingIds)) {
-        const [locale, tone] = key.split("_");
+        const [locale, tone]: [string, Tone] = key.split("_");
         try {
           await client.updateBranding(brandingId, {
             locale: locale.toLowerCase(),
             templateData: {
               ...layoutProps,
-              tone: tone as Tone,
+              theme: {
+                ...layoutProps.theme,
+                preferredTone: tone,
+              },
             },
           });
         } catch (error) {

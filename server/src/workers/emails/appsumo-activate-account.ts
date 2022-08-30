@@ -2,6 +2,7 @@ import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import AppSumoActivateAccount from "../../emails/emails/AppSumoActivateAccount";
 import { buildFrom } from "../../emails/utils/buildFrom";
+import { defaultBrandTheme } from "../../util/BrandTheme";
 
 export async function appSumoActivateAccount(
   payload: { redirectUrl: string; email: string },
@@ -15,6 +16,7 @@ export async function appSumoActivateAccount(
       parallelUrl: context.config.misc.parallelUrl,
       logoUrl: `${context.config.misc.assetsUrl}/static/emails/logo.png`,
       logoAlt: "Parallel",
+      theme: defaultBrandTheme,
     },
     { locale: "en" }
   );

@@ -686,7 +686,10 @@ export type Mutation = {
   updateOrganizationLogo: Organization;
   /** updates the PDF_DOCUMENT theme of the organization */
   updateOrganizationPdfDocumentTheme: Organization;
-  /** Changes the organization preferred tone */
+  /**
+   * Changes the organization preferred tone
+   * @deprecated use updateOrganizationBrandTheme instead
+   */
   updateOrganizationPreferredTone: Organization;
   /** Applies a given tier to the organization */
   updateOrganizationTier: SupportMethodResponse;
@@ -1683,7 +1686,7 @@ export type Organization = Timestamps & {
   /** The total number of active users */
   activeUserCount: Scalars["Int"];
   anonymizePetitionsAfterMonths: Maybe<Scalars["Int"]>;
-  brandTheme: Scalars["JSONObject"];
+  brandTheme: OrganizationBrandThemeData;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
@@ -1712,7 +1715,10 @@ export type Organization = Timestamps & {
   /** @deprecated Not used anymore. Use themes.pdfDocument[0].data */
   pdfDocumentTheme: Scalars["JSONObject"];
   pdfDocumentThemes: Array<OrganizationTheme>;
-  /** The preferred tone of organization. */
+  /**
+   * The preferred tone of organization.
+   * @deprecated use brandTheme.preferredTone
+   */
   preferredTone: Tone;
   /** The status of the organization. */
   status: OrganizationStatus;
@@ -1750,9 +1756,16 @@ export type OrganizationusersArgs = {
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy>>;
 };
 
+export type OrganizationBrandThemeData = {
+  color: Scalars["String"];
+  fontFamily: Maybe<Scalars["String"]>;
+  preferredTone: Tone;
+};
+
 export type OrganizationBrandThemeInput = {
   color?: InputMaybe<Scalars["String"]>;
   fontFamily?: InputMaybe<Scalars["String"]>;
+  preferredTone?: InputMaybe<Tone>;
 };
 
 export type OrganizationDocumentThemeInput = {
@@ -1963,7 +1976,10 @@ export type Petition = PetitionBase & {
   status: PetitionStatus;
   /** The tags linked to the petition */
   tags: Array<Tag>;
-  /** The preferred tone of organization. */
+  /**
+   * The preferred tone of organization.
+   * @deprecated use organization.brandTheme.preferredTone
+   */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -2106,7 +2122,10 @@ export type PetitionBase = {
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
   tags: Array<Tag>;
-  /** The preferred tone of organization. */
+  /**
+   * The preferred tone of organization.
+   * @deprecated use organization.brandTheme.preferredTone
+   */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -2721,7 +2740,10 @@ export type PetitionTemplate = PetitionBase & {
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
   tags: Array<Tag>;
-  /** The preferred tone of organization. */
+  /**
+   * The preferred tone of organization.
+   * @deprecated use organization.brandTheme.preferredTone
+   */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -2821,7 +2843,7 @@ export type PublicLicenseCode = {
 
 /** A public view of an organization */
 export type PublicOrganization = {
-  brandTheme: Scalars["JSONObject"];
+  brandTheme: OrganizationBrandThemeData;
   /** If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled */
   hasRemoveParallelBranding: Scalars["Boolean"];
   /** The ID of the organization. */
@@ -2830,7 +2852,10 @@ export type PublicOrganization = {
   logoUrl: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
-  /** The preferred tone of organization. */
+  /**
+   * The preferred tone of organization.
+   * @deprecated use brandTheme.preferredTone
+   */
   tone: Tone;
 };
 
@@ -2876,7 +2901,10 @@ export type PublicPetition = Timestamps & {
   signatureStatus: Maybe<PublicSignatureStatus>;
   /** The status of the petition. */
   status: PetitionStatus;
-  /** The preferred tone of organization. */
+  /**
+   * The preferred tone of organization.
+   * @deprecated use organization.brandTheme.preferredTone
+   */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];

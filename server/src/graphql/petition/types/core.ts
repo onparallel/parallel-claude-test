@@ -258,8 +258,10 @@ export const PetitionBase = interfaceType({
         return root.signature_config;
       },
     });
+    /** @deprecated */
     t.nonNull.field("tone", {
       type: "Tone",
+      deprecation: "use organization.brandTheme.preferredTone",
       description: "The preferred tone of organization.",
       resolve: async (root, _, ctx) => {
         const org = (await ctx.organizations.loadOrg(root.org_id))!;

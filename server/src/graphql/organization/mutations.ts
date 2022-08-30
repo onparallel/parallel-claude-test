@@ -15,6 +15,7 @@ import { isDefined, pick } from "remeda";
 import { OrganizationTheme } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
+import { removeKeys } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
 import { authenticateAnd, userIsSuperAdmin } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
@@ -79,8 +80,10 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
   },
 });
 
+/** @deprecated */
 export const updateOrganizationPreferredTone = mutationField("updateOrganizationPreferredTone", {
   description: "Changes the organization preferred tone",
+  deprecation: "use updateOrganizationBrandTheme instead",
   type: "Organization",
   args: {
     tone: nonNull(arg({ type: "Tone" })),
@@ -126,7 +129,8 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
         name: "OrganizationBrandThemeInput",
         definition(t) {
           t.nullable.string("fontFamily");
-          t.string("color");
+          t.nullable.string("color");
+          t.nullable.field("preferredTone", { type: "Tone" });
         },
       }).asArg()
     ),
@@ -136,26 +140,20 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
     validateHexColor((args) => args.data.color, "data.color")
   ),
   resolve: async (_, args, ctx) => {
-    const orgTheme = (await ctx.organizations.loadOrgBrandTheme(ctx.user!.org_id))!;
-    const theme = orgTheme.data;
-
-    await ctx.organizations.updateOrganizationTheme(
-      orgTheme.id,
-      {
-        data: {
-          color: args.data.color ?? theme.color,
-          fontFamily: args.data.fontFamily !== undefined ? args.data.fontFamily : theme.fontFamily,
+    await ctx.organizations.updateOrganizationBrandThemeDataByOrgId(
+      ctx.user!.org_id,
+      removeKeys(
+        {
+          color: args.data.color ?? undefined,
+          fontFamily: args.data.fontFamily,
+          preferredTone: args.data.preferredTone ?? undefined,
         },
-      },
+        ([_, value]) => value !== undefined
+      ),
       `User:${ctx.user!.id}`
     );
 
-    if (
-      (isDefined(args.data.color) && theme?.color !== args.data.color) ||
-      (args.data.fontFamily !== undefined && theme?.fontFamily !== args.data.fontFamily)
-    ) {
-      await ctx.signature.updateBranding(ctx.user!.org_id);
-    }
+    await ctx.signature.updateBranding(ctx.user!.org_id);
     return (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
   },
 });

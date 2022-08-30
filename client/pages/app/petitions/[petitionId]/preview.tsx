@@ -277,7 +277,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 
   const scope = useLiquidScope(petition, petition.__typename === "PetitionTemplate");
   return (
-    <ToneProvider value={petition.tone}>
+    <ToneProvider value={petition.organization.brandTheme.preferredTone}>
       <PetitionLayout
         key={petition.id}
         me={me}
@@ -417,7 +417,12 @@ PetitionPreview.fragments = {
   PetitionBase: gql`
     fragment PetitionPreview_PetitionBase on PetitionBase {
       id
-      tone
+      organization {
+        id
+        brandTheme {
+          preferredTone
+        }
+      }
       isAnonymized
       myEffectivePermission {
         permissionType
@@ -478,9 +483,12 @@ PetitionPreview.fragments = {
       me {
         id
         organization {
+          id
           name
           ...isUsageLimitsReached_Organization
-          ...OverrideWithOrganizationTheme_Organization
+          brandTheme {
+            ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
+          }
         }
         ...useSendPetitionHandler_User
         ...ConfirmPetitionSignersDialog_User
@@ -490,7 +498,7 @@ PetitionPreview.fragments = {
     ${useSendPetitionHandler.fragments.User}
     ${isUsageLimitsReached.fragments.Organization}
     ${ConfirmPetitionSignersDialog.fragments.User}
-    ${OverrideWithOrganizationTheme.fragments.Organization}
+    ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
   `,
 };
 

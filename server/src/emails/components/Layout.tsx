@@ -20,7 +20,8 @@ import {
 import { FC, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { URLSearchParams } from "url";
-import { OrganizationBrandTheme, ThemeProvider, useTheme } from "../utils/ThemeProvider";
+import { BrandTheme } from "../../util/BrandTheme";
+import { ThemeProvider, useTheme } from "../utils/ThemeProvider";
 import { GdprDisclaimer } from "./GdprDisclaimer";
 
 export type LayoutProps = {
@@ -34,21 +35,20 @@ export type LayoutProps = {
   optOutUrl?: string;
   optOutText?: string;
   omitGdprDisclaimer?: boolean;
-  tone?: string;
   utmCampaign?: string;
   removeParallelBranding?: boolean;
-  theme?: OrganizationBrandTheme;
+  theme: BrandTheme;
 };
 
 export const Layout: FC<LayoutProps> = function Layout({ theme, ...props }) {
   return (
-    <ThemeProvider theme={theme ?? {}}>
+    <ThemeProvider theme={theme}>
       <ThemedLayout {...props} />
     </ThemeProvider>
   );
 };
 
-const ThemedLayout: FC<LayoutProps> = function ThemedLayout({
+const ThemedLayout: FC<Omit<LayoutProps, "theme">> = function ThemedLayout({
   title,
   logoUrl,
   logoAlt,
@@ -60,7 +60,6 @@ const ThemedLayout: FC<LayoutProps> = function ThemedLayout({
   useAlternativeSlogan,
   omitGdprDisclaimer,
   utmCampaign,
-  tone,
   removeParallelBranding,
 }) {
   const { locale } = useIntl();
@@ -134,7 +133,7 @@ const ThemedLayout: FC<LayoutProps> = function ThemedLayout({
                     <FormattedMessage
                       id="footer.slogan.alternative"
                       defaultMessage="Create your own <b>parallel</b>"
-                      values={{ tone }}
+                      values={{ tone: theme.tone }}
                     />
                   </MjmlButton>
                 ) : (

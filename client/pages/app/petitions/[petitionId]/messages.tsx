@@ -79,7 +79,6 @@ PetitionMessages.fragments = {
   PetitionBase: gql`
     fragment PetitionMessages_PetitionBase on PetitionBase {
       id
-      tone
       ...PetitionLayout_PetitionBase
       ... on PetitionTemplate {
         ...PetitionTemplateRequestMessageCard_PetitionTemplate

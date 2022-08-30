@@ -31,7 +31,6 @@ import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import {
   BrandingGeneral_updateOrganizationBrandThemeDocument,
-  BrandingGeneral_updateOrganizationPreferredToneDocument,
   BrandingGeneral_updateOrgLogoDocument,
   BrandingGeneral_UserFragment,
   Maybe,
@@ -76,7 +75,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
   } = useForm<BrandingGeneralData>({
     mode: "onChange",
     defaultValues: {
-      tone: user.organization.preferredTone,
+      tone: user.organization.brandTheme.preferredTone,
       color: user.organization.brandTheme.color,
       fontFamily: user.organization.brandTheme.fontFamily ?? "DEFAULT",
       logo: user.organization.logoUrl,
@@ -84,7 +83,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
   });
   useAutoConfirmDiscardChangesDialog(isDirty);
 
-  const tone = watch("tone");
+  const preferredTone = watch("tone");
   const color = watch("color");
 
   const isLight =
@@ -113,9 +112,6 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
   const [updateLogo, { loading: updateLogoLoading }] = useMutation(
     BrandingGeneral_updateOrgLogoDocument
   );
-  const [changePreferredTone, { loading: updateToneLoading }] = useMutation(
-    BrandingGeneral_updateOrganizationPreferredToneDocument
-  );
   const [updateOrganizationBrandTheme, { loading: updateBrandLoading }] = useMutation(
     BrandingGeneral_updateOrganizationBrandThemeDocument
   );
@@ -131,20 +127,14 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
         const { color, fontFamily, tone, logo } = dirtyFields;
 
         try {
-          if (color || fontFamily) {
+          if (color || fontFamily || tone) {
             await updateOrganizationBrandTheme({
               variables: {
                 data: {
                   color: data.color,
                   fontFamily: data.fontFamily !== "DEFAULT" ? data.fontFamily : null,
+                  preferredTone: data.tone,
                 },
-              },
-            });
-          }
-          if (tone) {
-            await changePreferredTone({
-              variables: {
-                tone: data.tone,
               },
             });
           }
@@ -367,7 +357,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
             width={{ base: "auto", sm: "fit-content" }}
             colorScheme="primary"
             isDisabled={!isDirty || !isValid}
-            isLoading={updateBrandLoading || updateLogoLoading || updateToneLoading}
+            isLoading={updateBrandLoading || updateLogoLoading}
           >
             <FormattedMessage
               id="component.branding-general.save-changes"
@@ -378,7 +368,11 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
         <Divider borderColor="gray.300" />
         <ParallelBrandingSwitch hasRemovedParallelBranding={user.hasRemovedParallelBranding} />
       </Stack>
-      <BrandingGeneralPreview user={user} brand={{ color, fontFamily }} tone={tone} logo={logo} />
+      <BrandingGeneralPreview
+        user={user}
+        brand={{ color, fontFamily, preferredTone }}
+        logo={logo}
+      />
     </Stack>
   );
 }
@@ -392,8 +386,11 @@ BrandingGeneral.fragments = {
       organization {
         id
         name
-        preferredTone
-        brandTheme
+        brandTheme {
+          color
+          fontFamily
+          preferredTone
+        }
         logoUrl(options: { resize: { width: 600 } })
       }
       ...BrandingGeneralPreview_User
@@ -412,18 +409,14 @@ BrandingGeneral.mutations = [
     }
   `,
   gql`
-    mutation BrandingGeneral_updateOrganizationPreferredTone($tone: Tone!) {
-      updateOrganizationPreferredTone(tone: $tone) {
-        id
-        preferredTone
-      }
-    }
-  `,
-  gql`
     mutation BrandingGeneral_updateOrganizationBrandTheme($data: OrganizationBrandThemeInput!) {
       updateOrganizationBrandTheme(data: $data) {
         id
-        brandTheme
+        brandTheme {
+          color
+          fontFamily
+          preferredTone
+        }
       }
     }
   `,

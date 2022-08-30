@@ -81,10 +81,17 @@ const email: Email<SignatureCancelledDeclinedBySignerProps> = {
     assetsUrl,
     logoAlt,
     logoUrl,
+    theme,
   }: SignatureCancelledDeclinedBySignerProps) {
     const intl = useIntl();
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+        theme={theme}
+      >
         <MjmlSection padding="0">
           <MjmlColumn>
             <GreetingUser name={userName} />

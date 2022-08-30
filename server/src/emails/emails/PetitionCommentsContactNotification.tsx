@@ -10,7 +10,6 @@ import {
   PetitionFieldAndCommentsProps,
 } from "../components/PetitionFieldAndCommentsList";
 import { closing, greetingContact } from "../components/texts";
-import { Tone } from "../utils/types";
 
 export type PetitionCommentsContactNotificationProps = {
   contactFullName: string;
@@ -18,7 +17,6 @@ export type PetitionCommentsContactNotificationProps = {
   keycode: string;
   emailSubject: string | null;
   fields: PetitionFieldAndCommentsProps["fields"];
-  tone: Tone;
 } & LayoutProps;
 
 const email: Email<PetitionCommentsContactNotificationProps> = {
@@ -28,13 +26,13 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
       defaultMessage: "Parallel",
     });
   },
-  subject({ emailSubject, tone }, intl: IntlShape) {
+  subject({ emailSubject, theme }, intl: IntlShape) {
     return intl.formatMessage(
       {
         id: "petition-comments-contact-notification.subject",
         defaultMessage: "New comments on {subject, select, null{your parallel} other{{subject}}}",
       },
-      { subject: emailSubject, tone }
+      { subject: emailSubject, tone: theme.preferredTone }
     );
   },
   text(
@@ -45,13 +43,13 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
       keycode,
       parallelUrl,
       emailSubject,
-      tone,
+      theme,
     }: PetitionCommentsContactNotificationProps,
     intl: IntlShape
   ) {
     const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
     return outdent`
-      ${greetingContact({ name, fullName, tone }, intl)}
+      ${greetingContact({ name, fullName, tone: theme.preferredTone }, intl)}
 
       ${intl.formatMessage(
         {
@@ -81,7 +79,6 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
     logoUrl,
     logoAlt,
     emailSubject,
-    tone,
     removeParallelBranding,
     theme,
   }: PetitionCommentsContactNotificationProps) {
@@ -96,13 +93,12 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         utmCampaign="recipients"
-        tone={tone}
         removeParallelBranding={removeParallelBranding}
         theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingContact name={name} fullName={fullName} tone={tone} />
+            <GreetingContact name={name} fullName={fullName} tone={theme.preferredTone} />
 
             <MjmlText>
               <FormattedMessage
@@ -111,7 +107,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
                 values={{
                   count: commentCount,
                   subject: emailSubject ? <b>{emailSubject}</b> : null,
-                  tone,
+                  tone: theme.preferredTone,
                 }}
               />
             </MjmlText>
@@ -130,7 +126,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
               <FormattedMessage
                 id="petition-comments-contact-notification.access-button"
                 defaultMessage="Click here to reply"
-                values={{ tone }}
+                values={{ tone: theme.preferredTone }}
               />
             </Button>
           </MjmlColumn>

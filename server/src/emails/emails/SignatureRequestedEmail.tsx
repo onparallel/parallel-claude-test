@@ -7,14 +7,12 @@ import { GreetingContact } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
 import { closing, gdprDisclaimer, greetingContact } from "../components/texts";
 import { UserMessageBox } from "../components/UserMessageBox";
-import { Tone } from "../utils/types";
 
 type SignatureRequestedProps = {
   emailBody: string | null;
   signerName: string;
   documentName: string;
   signButton: string;
-  tone: Tone;
 } & LayoutProps;
 
 /** Email sent to signers with access to the signing URL. */
@@ -32,11 +30,11 @@ const email: Email<SignatureRequestedProps> = {
     });
   },
   text(
-    { signerName: fullName, documentName, signButton, emailBody, tone }: SignatureRequestedProps,
+    { signerName: fullName, documentName, signButton, emailBody, theme }: SignatureRequestedProps,
     intl: IntlShape
   ) {
     return outdent`
-      ${greetingContact({ name: fullName, fullName, tone }, intl)}
+      ${greetingContact({ name: fullName, fullName, tone: theme.preferredTone }, intl)}
 
       ${intl.formatMessage(
         {
@@ -44,7 +42,7 @@ const email: Email<SignatureRequestedProps> = {
           defaultMessage:
             "You have received a signature request to sign a document titled {documentName}.",
         },
-        { documentName, tone }
+        { documentName, tone: theme.preferredTone }
       )}
 
       ${emailBody}
@@ -70,7 +68,6 @@ const email: Email<SignatureRequestedProps> = {
     signButton,
     documentName,
     emailBody,
-    tone,
     removeParallelBranding,
     theme,
   }: SignatureRequestedProps) {
@@ -87,18 +84,17 @@ const email: Email<SignatureRequestedProps> = {
           defaultMessage: "Signature requested",
         })}
         utmCampaign="recipients"
-        tone={tone}
         removeParallelBranding={removeParallelBranding}
         theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingContact name={fullName} fullName={fullName} tone={tone} />
+            <GreetingContact name={fullName} fullName={fullName} tone={theme.preferredTone} />
             <MjmlText>
               <FormattedMessage
                 id="signature-requested.text"
                 defaultMessage="You have received a signature request to sign a document titled {documentName}."
-                values={{ documentName, tone }}
+                values={{ documentName, tone: theme.preferredTone }}
               />
             </MjmlText>
 
@@ -113,7 +109,7 @@ const email: Email<SignatureRequestedProps> = {
             <MjmlText align="center" fontSize="16px">
               {`${signButton}`}
             </MjmlText>
-            <ClosingThanks tone={tone} />
+            <ClosingThanks tone={theme.preferredTone} />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

@@ -119,6 +119,7 @@ export interface NexusGenInputs {
     // input type
     color?: string | null; // String
     fontFamily?: string | null; // String
+    preferredTone?: NexusGenEnums["Tone"] | null; // Tone
   };
   OrganizationDocumentThemeInput: {
     // input type
@@ -452,6 +453,12 @@ export interface NexusGenObjects {
     source: NexusGenEnums["OrgLicenseSource"]; // OrgLicenseSource!
   };
   Organization: db.Organization;
+  OrganizationBrandThemeData: {
+    // root type
+    color: string; // String!
+    fontFamily?: string | null; // String
+    preferredTone: NexusGenEnums["Tone"]; // Tone!
+  };
   OrganizationPagination: {
     // root type
     items: NexusGenRootTypes["Organization"][]; // [Organization!]!
@@ -1200,7 +1207,7 @@ export interface NexusGenFieldTypes {
     _id: number; // Int!
     activeUserCount: number; // Int!
     anonymizePetitionsAfterMonths: number | null; // Int
-    brandTheme: NexusGenScalars["JSONObject"]; // JSONObject!
+    brandTheme: NexusGenRootTypes["OrganizationBrandThemeData"]; // OrganizationBrandThemeData!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customHost: string | null; // String
     features: NexusGenRootTypes["FeatureFlagNameValue"][]; // [FeatureFlagNameValue!]!
@@ -1219,6 +1226,12 @@ export interface NexusGenFieldTypes {
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     usageLimits: NexusGenRootTypes["OrganizationUsageLimit"]; // OrganizationUsageLimit!
     users: NexusGenRootTypes["UserPagination"]; // UserPagination!
+  };
+  OrganizationBrandThemeData: {
+    // field return type
+    color: string; // String!
+    fontFamily: string | null; // String
+    preferredTone: NexusGenEnums["Tone"]; // Tone!
   };
   OrganizationPagination: {
     // field return type
@@ -1723,7 +1736,7 @@ export interface NexusGenFieldTypes {
   };
   PublicOrganization: {
     // field return type
-    brandTheme: NexusGenScalars["JSONObject"]; // JSONObject!
+    brandTheme: NexusGenRootTypes["OrganizationBrandThemeData"]; // OrganizationBrandThemeData!
     hasRemoveParallelBranding: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     logoUrl: string | null; // String
@@ -2780,7 +2793,7 @@ export interface NexusGenFieldTypeNames {
     _id: "Int";
     activeUserCount: "Int";
     anonymizePetitionsAfterMonths: "Int";
-    brandTheme: "JSONObject";
+    brandTheme: "OrganizationBrandThemeData";
     createdAt: "DateTime";
     customHost: "String";
     features: "FeatureFlagNameValue";
@@ -2799,6 +2812,12 @@ export interface NexusGenFieldTypeNames {
     updatedAt: "DateTime";
     usageLimits: "OrganizationUsageLimit";
     users: "UserPagination";
+  };
+  OrganizationBrandThemeData: {
+    // field return type name
+    color: "String";
+    fontFamily: "String";
+    preferredTone: "Tone";
   };
   OrganizationPagination: {
     // field return type name
@@ -3303,7 +3322,7 @@ export interface NexusGenFieldTypeNames {
   };
   PublicOrganization: {
     // field return type name
-    brandTheme: "JSONObject";
+    brandTheme: "OrganizationBrandThemeData";
     hasRemoveParallelBranding: "Boolean";
     id: "GID";
     logoUrl: "String";

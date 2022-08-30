@@ -9,7 +9,7 @@ export async function up(knex: Knex): Promise<void> {
 
   await knex.raw(
     /* sql */ `
-    insert into "organization_theme" (org_id, name, type, is_default, data)
+    insert into "organization_theme" (org_id, name, type, is_default, data, created_by, updated_by)
     select
     id,
     'Default',
@@ -17,8 +17,11 @@ export async function up(knex: Knex): Promise<void> {
     true,
     jsonb_build_object(
       'color', coalesce(brand_theme->>'color', ?),
-      'fontFamily', coalesce(brand_theme->>'fontFamily', ?)
-    )
+      'fontFamily', coalesce(brand_theme->>'fontFamily', ?),
+      'preferredTone', "preferred_tone"
+    ),
+    "created_by",
+    "updated_by"
     from "organization" order by id
     `,
     [defaultBrandTheme.color, defaultBrandTheme.fontFamily]

@@ -10,7 +10,6 @@ import { Layout, LayoutProps } from "../components/Layout";
 import { disclaimer } from "../components/texts";
 import { UserMessageBox } from "../components/UserMessageBox";
 import { WhyWeUseParallel } from "../components/WhyWeUseParallel";
-import { Tone } from "../utils/types";
 
 export type AccessDelegatedEmailProps = {
   senderName: string;
@@ -22,7 +21,6 @@ export type AccessDelegatedEmailProps = {
   bodyPlainText: string;
   deadline: Date | null;
   keycode: string;
-  tone: Tone;
   removeWhyWeUseParallel: boolean;
   removeParallelBranding: boolean;
 } & LayoutProps;
@@ -37,7 +35,7 @@ const email: Email<AccessDelegatedEmailProps> = {
       { senderName }
     );
   },
-  subject({ senderName, emailSubject, tone }, intl) {
+  subject({ senderName, emailSubject, theme }, intl) {
     return intl.formatMessage(
       {
         id: "access-delegated-email.subject",
@@ -47,7 +45,7 @@ const email: Email<AccessDelegatedEmailProps> = {
       {
         senderName,
         subject: emailSubject,
-        tone,
+        tone: theme.preferredTone,
       }
     );
   },
@@ -61,7 +59,7 @@ const email: Email<AccessDelegatedEmailProps> = {
       deadline,
       keycode,
       parallelUrl,
-      tone,
+      theme,
     },
     intl
   ) {
@@ -72,7 +70,13 @@ const email: Email<AccessDelegatedEmailProps> = {
           defaultMessage:
             "{senderName} ({senderEmail}) has asked you to complete the information requested by {petitionOwnerFullName} ({petitionOwnerEmail}):",
         },
-        { senderName, senderEmail, petitionOwnerFullName, petitionOwnerEmail, tone }
+        {
+          senderName,
+          senderEmail,
+          petitionOwnerFullName,
+          petitionOwnerEmail,
+          tone: theme.preferredTone,
+        }
       )}
 
       ${bodyPlainText}
@@ -113,7 +117,6 @@ const email: Email<AccessDelegatedEmailProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
-    tone,
     removeWhyWeUseParallel,
     removeParallelBranding,
     theme,
@@ -127,7 +130,6 @@ const email: Email<AccessDelegatedEmailProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         utmCampaign="recipients"
-        tone={tone}
         removeParallelBranding={removeParallelBranding}
         theme={theme}
       >
@@ -142,7 +144,7 @@ const email: Email<AccessDelegatedEmailProps> = {
                   senderEmail: <b>{senderEmail}</b>,
                   petitionOwnerFullName: <b>{petitionOwnerFullName}</b>,
                   petitionOwnerEmail: <b>{petitionOwnerEmail}</b>,
-                  tone,
+                  tone: theme.preferredTone,
                 }}
               />
             </MjmlText>
@@ -169,13 +171,16 @@ const email: Email<AccessDelegatedEmailProps> = {
               </MjmlText>
             ) : null}
             <MjmlSpacer height="10px" />
-            <CompleteInfoButton tone={tone} href={`${parallelUrl}/${locale}/petition/${keycode}`} />
+            <CompleteInfoButton
+              tone={theme.preferredTone}
+              href={`${parallelUrl}/${locale}/petition/${keycode}`}
+            />
             <MjmlSpacer height="10px" />
             <Disclaimer email={senderEmail} />
           </MjmlColumn>
         </MjmlSection>
         {removeWhyWeUseParallel || removeParallelBranding ? null : (
-          <WhyWeUseParallel assetsUrl={assetsUrl} tone={tone} />
+          <WhyWeUseParallel assetsUrl={assetsUrl} tone={theme.preferredTone} />
         )}
       </Layout>
     );

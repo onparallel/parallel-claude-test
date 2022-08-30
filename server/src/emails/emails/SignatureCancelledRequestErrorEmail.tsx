@@ -92,6 +92,7 @@ const email: Email<SignatureCancelledRequestErrorProps> = {
     assetsUrl,
     logoAlt,
     logoUrl,
+    theme,
   }: SignatureCancelledRequestErrorProps) {
     const intl = useIntl();
     return (
@@ -100,6 +101,7 @@ const email: Email<SignatureCancelledRequestErrorProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
+        theme={theme}
         contentHeading={
           <Alert>
             <FormattedMessage

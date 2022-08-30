@@ -1,45 +1,32 @@
 import { createContext, PropsWithChildren, useContext } from "react";
 import Color from "color";
+import { Tone } from "../../db/__types";
+import { BrandTheme } from "../../util/BrandTheme";
 
 type EmailThemeColor = Record<50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900, "string">;
 
 export type EmailTheme = {
   fontFamily: string | undefined;
   colors: Record<"primary", EmailThemeColor>;
+  tone: Tone;
 };
-
-export interface OrganizationBrandTheme {
-  fontFamily?: string;
-  color?: string;
-}
 
 const ThemeContext = createContext<EmailTheme | undefined>(undefined);
 
-export function ThemeProvider({
-  theme,
-  children,
-}: PropsWithChildren<{ theme: OrganizationBrandTheme }>) {
-  const value = {
-    colors: {
-      primary: theme?.color
-        ? generateOrganizationPallete(theme!.color)
-        : {
-            50: "#f8f8ff",
-            100: "#dddbff",
-            200: "#b0acfb",
-            300: "#938eff",
-            400: "#746eff",
-            500: "#6059f7",
-            600: "#5650de",
-            700: "#433ead",
-            800: "#332f80",
-            900: "#282666",
-          },
-    },
-    fontFamily: theme?.fontFamily ?? undefined,
-  } as EmailTheme;
-
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+export function ThemeProvider({ theme, children }: PropsWithChildren<{ theme: BrandTheme }>) {
+  return (
+    <ThemeContext.Provider
+      value={
+        {
+          colors: { primary: generateOrganizationPallete(theme.color) },
+          fontFamily: theme.fontFamily,
+          tone: theme.preferredTone,
+        } as EmailTheme
+      }
+    >
+      {children}
+    </ThemeContext.Provider>
+  );
 }
 
 export function useTheme() {

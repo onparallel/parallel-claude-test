@@ -10,7 +10,6 @@ import { disclaimer } from "../components/texts";
 import { UserMessageBox } from "../components/UserMessageBox";
 import { WhyWeUseParallel } from "../components/WhyWeUseParallel";
 import { FORMATS } from "../../util/dates";
-import { Tone } from "../utils/types";
 import { Button } from "../components/Button";
 
 export type PetitionMessageProps = {
@@ -21,7 +20,6 @@ export type PetitionMessageProps = {
   bodyPlainText: string;
   deadline: Date | null;
   keycode: string;
-  tone: Tone;
   removeWhyWeUseParallel: boolean;
   removeParallelBranding: boolean;
   showNextButton: boolean;
@@ -40,14 +38,14 @@ const email: Email<PetitionMessageProps> = {
   subject({ subject }) {
     return subject || "";
   },
-  text({ senderName, senderEmail, bodyPlainText, deadline, keycode, parallelUrl, tone }, intl) {
+  text({ senderName, senderEmail, bodyPlainText, deadline, keycode, parallelUrl, theme }, intl) {
     return outdent`
       ${intl.formatMessage(
         {
           id: "new-petition.text",
           defaultMessage: "{senderName} ({senderEmail}) has shared an access to Parallel:",
         },
-        { senderName, senderEmail, tone }
+        { senderName, senderEmail, tone: theme.preferredTone }
       )}
 
       ${bodyPlainText}
@@ -94,7 +92,6 @@ const email: Email<PetitionMessageProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
-    tone,
     removeWhyWeUseParallel,
     removeParallelBranding,
     showNextButton,
@@ -115,7 +112,6 @@ const email: Email<PetitionMessageProps> = {
           defaultMessage: "Stop receiving emails",
         })}
         utmCampaign="recipients"
-        tone={tone}
         removeParallelBranding={removeParallelBranding}
         theme={theme}
       >
@@ -128,7 +124,7 @@ const email: Email<PetitionMessageProps> = {
                 values={{
                   senderName: <b>{senderName}</b>,
                   senderEmail: <b>{senderEmail}</b>,
-                  tone,
+                  tone: theme.preferredTone,
                 }}
               />
             </MjmlText>
@@ -164,7 +160,7 @@ const email: Email<PetitionMessageProps> = {
               </Button>
             ) : (
               <CompleteInfoButton
-                tone={tone}
+                tone={theme.preferredTone}
                 href={`${parallelUrl}/${intl.locale}/petition/${keycode}`}
               />
             )}
@@ -173,7 +169,7 @@ const email: Email<PetitionMessageProps> = {
           </MjmlColumn>
         </MjmlSection>
         {removeWhyWeUseParallel || removeParallelBranding ? null : (
-          <WhyWeUseParallel assetsUrl={assetsUrl} tone={tone} />
+          <WhyWeUseParallel assetsUrl={assetsUrl} tone={theme.preferredTone} />
         )}
       </Layout>
     );

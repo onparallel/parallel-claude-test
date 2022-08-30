@@ -6,13 +6,11 @@ import { ClosingThanks } from "../components/ClosingThanks";
 import { GreetingContact } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
 import { closing, gdprDisclaimer, greetingContact } from "../components/texts";
-import { Tone } from "../utils/types";
 
 type SignatureCompletedProps = {
   documentName: string | null;
   signerName: string;
   signatureProvider: string;
-  tone: Tone;
 } & LayoutProps;
 
 /** Email sent to signers to let them know the signature process has been completed. Comes with the signed document attached. */
@@ -30,11 +28,11 @@ const email: Email<SignatureCompletedProps> = {
     });
   },
   text(
-    { signerName: fullName, signatureProvider, tone }: SignatureCompletedProps,
+    { signerName: fullName, signatureProvider, theme }: SignatureCompletedProps,
     intl: IntlShape
   ) {
     return outdent`
-      ${greetingContact({ name: fullName, fullName, tone }, intl)}
+      ${greetingContact({ name: fullName, fullName, tone: theme.preferredTone }, intl)}
 
       ${intl.formatMessage(
         {
@@ -42,7 +40,7 @@ const email: Email<SignatureCompletedProps> = {
           defaultMessage:
             "Please find attached a copy of the document you just signed through {signatureProvider}.",
         },
-        { signatureProvider, tone }
+        { signatureProvider, tone: theme.preferredTone }
       )}
 
       ${closing({}, intl)}
@@ -57,7 +55,7 @@ const email: Email<SignatureCompletedProps> = {
     logoAlt,
     logoUrl,
     signatureProvider,
-    tone,
+
     removeParallelBranding,
     theme,
   }: SignatureCompletedProps) {
@@ -74,24 +72,23 @@ const email: Email<SignatureCompletedProps> = {
           defaultMessage: "Signature request completed",
         })}
         utmCampaign="recipients"
-        tone={tone}
         removeParallelBranding={removeParallelBranding}
         theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingContact name={fullName} fullName={fullName} tone={tone} />
+            <GreetingContact name={fullName} fullName={fullName} tone={theme.preferredTone} />
             <MjmlText>
               <FormattedMessage
                 id="signature-completed.text"
                 defaultMessage="Please find attached a copy of the document you just signed through {signatureProvider}."
                 values={{
                   signatureProvider,
-                  tone,
+                  tone: theme.preferredTone,
                 }}
               />
             </MjmlText>
-            <ClosingThanks tone={tone} />
+            <ClosingThanks tone={theme.preferredTone} />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

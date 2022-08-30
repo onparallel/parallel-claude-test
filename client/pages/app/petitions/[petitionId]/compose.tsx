@@ -431,7 +431,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     myEffectivePermission === "READ";
 
   return (
-    <ToneProvider value={petition.tone}>
+    <ToneProvider value={petition.organization.brandTheme.preferredTone}>
       <PetitionLayout
         key={petition.id}
         me={me}
@@ -604,7 +604,12 @@ PetitionCompose.fragments = {
         id
         ...PetitionLayout_PetitionBase
         ...PetitionSettings_PetitionBase
-        tone
+        organization {
+          id
+          brandTheme {
+            preferredTone
+          }
+        }
         isRestricted
         fields {
           ...PetitionCompose_PetitionField

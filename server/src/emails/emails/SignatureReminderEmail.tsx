@@ -6,13 +6,11 @@ import { ClosingThanks } from "../components/ClosingThanks";
 import { GreetingReminder } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
 import { closing, gdprDisclaimer, greetingReminder } from "../components/texts";
-import { Tone } from "../utils/types";
 
 type SignatureReminderProps = {
   signerName: string;
   documentName: string;
   signButton: string;
-  tone: Tone;
 } & LayoutProps;
 
 /** Email sent to signers with access to the signing URL. */
@@ -30,11 +28,11 @@ const email: Email<SignatureReminderProps> = {
     });
   },
   text(
-    { signerName: fullName, documentName, signButton, tone }: SignatureReminderProps,
+    { signerName: fullName, documentName, signButton, theme }: SignatureReminderProps,
     intl: IntlShape
   ) {
     return outdent`
-      ${greetingReminder({ fullName, name: fullName, tone }, intl)}
+      ${greetingReminder({ fullName, name: fullName, tone: theme.preferredTone }, intl)}
 
       ${intl.formatMessage(
         {
@@ -42,7 +40,7 @@ const email: Email<SignatureReminderProps> = {
           defaultMessage:
             "You have a pending signature request to sign a document titled {documentName}.",
         },
-        { documentName, tone }
+        { documentName, tone: theme.preferredTone }
       )}
 
       ${intl.formatMessage({
@@ -65,7 +63,6 @@ const email: Email<SignatureReminderProps> = {
     logoUrl,
     signButton,
     documentName,
-    tone,
     removeParallelBranding,
     theme,
   }: SignatureReminderProps) {
@@ -82,18 +79,17 @@ const email: Email<SignatureReminderProps> = {
           defaultMessage: "Signature reminder",
         })}
         utmCampaign="recipients"
-        tone={tone}
         removeParallelBranding={removeParallelBranding}
         theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingReminder name={fullName} fullName={fullName} tone={tone} />
+            <GreetingReminder name={fullName} fullName={fullName} tone={theme.preferredTone} />
             <MjmlText>
               <FormattedMessage
                 id="signature-reminder.text"
                 defaultMessage="You have a pending signature request to sign a document titled {documentName}."
-                values={{ documentName, tone }}
+                values={{ documentName, tone: theme.preferredTone }}
               />
             </MjmlText>
 
@@ -106,7 +102,7 @@ const email: Email<SignatureReminderProps> = {
             <MjmlText align="center" fontSize="16px">
               {`${signButton}`}
             </MjmlText>
-            <ClosingThanks tone={tone} />
+            <ClosingThanks tone={theme.preferredTone} />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

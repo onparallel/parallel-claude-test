@@ -8,7 +8,6 @@ import { GreetingContact } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
 import { greetingContact } from "../components/texts";
 import { WhyWeUseParallel } from "../components/WhyWeUseParallel";
-import { Tone } from "../utils/types";
 
 export type PublicPetitionLinkAccessProps = {
   emailSubject: Maybe<string>;
@@ -17,7 +16,6 @@ export type PublicPetitionLinkAccessProps = {
   senderName: string;
   petitionTitle: string;
   keycode: string;
-  tone: Tone;
   removeWhyWeUseParallel: boolean;
   removeParallelBranding: boolean;
 } & LayoutProps;
@@ -35,16 +33,16 @@ const email: Email<PublicPetitionLinkAccessProps> = {
   subject({ emailSubject, petitionTitle }) {
     return emailSubject || petitionTitle;
   },
-  text({ name, fullName, petitionTitle, keycode, parallelUrl, tone }, intl) {
+  text({ name, fullName, petitionTitle, keycode, parallelUrl, theme }, intl) {
     return outdent`
-      ${greetingContact({ name, fullName, tone }, intl)}
+      ${greetingContact({ name, fullName, tone: theme.preferredTone }, intl)}
       
       ${intl.formatMessage(
         {
           id: "public-petition-link.text-1",
           defaultMessage: "We send you the requested access to {petitionTitle}.",
         },
-        { petitionTitle, tone }
+        { petitionTitle, tone: theme.preferredTone }
       )}
 
       ${intl.formatMessage(
@@ -53,7 +51,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
           defaultMessage:
             "The information will be automatically saved on the platform, and you can continue the process later through the same link.",
         },
-        { tone }
+        { tone: theme.preferredTone }
       )}
 
       ${intl.formatMessage(
@@ -62,7 +60,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
           defaultMessage:
             "If you have any questions or comments you can contact us in the designated spaces on the platform.",
         },
-        { tone }
+        { tone: theme.preferredTone }
       )}
 
       ${intl.formatMessage({
@@ -82,7 +80,6 @@ const email: Email<PublicPetitionLinkAccessProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
-    tone,
     removeWhyWeUseParallel,
     removeParallelBranding,
     theme,
@@ -96,32 +93,31 @@ const email: Email<PublicPetitionLinkAccessProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         utmCampaign="recipients"
-        tone={tone}
         removeParallelBranding={removeParallelBranding}
         theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingContact name={name} fullName={fullName} tone={tone} />
+            <GreetingContact name={name} fullName={fullName} tone={theme.preferredTone} />
             <MjmlText>
               <FormattedMessage
                 id="public-petition-link.text-1"
                 defaultMessage="We send you the requested access to {petitionTitle}."
-                values={{ petitionTitle: <b>{petitionTitle}</b>, tone }}
+                values={{ petitionTitle: <b>{petitionTitle}</b>, tone: theme.preferredTone }}
               />
             </MjmlText>
             <MjmlText>
               <FormattedMessage
                 id="public-petition-link.text-2"
                 defaultMessage="The information will be automatically saved on the platform, and you can continue the process later through the same link."
-                values={{ tone }}
+                values={{ tone: theme.preferredTone }}
               />
             </MjmlText>
             <MjmlText>
               <FormattedMessage
                 id="public-petition-link.text-3"
                 defaultMessage="If you have any questions or comments you can contact us in the designated spaces on the platform."
-                values={{ tone }}
+                values={{ tone: theme.preferredTone }}
               />
             </MjmlText>
           </MjmlColumn>
@@ -129,11 +125,14 @@ const email: Email<PublicPetitionLinkAccessProps> = {
 
         <MjmlSection>
           <MjmlColumn>
-            <CompleteInfoButton tone={tone} href={`${parallelUrl}/${locale}/petition/${keycode}`} />
+            <CompleteInfoButton
+              tone={theme.preferredTone}
+              href={`${parallelUrl}/${locale}/petition/${keycode}`}
+            />
           </MjmlColumn>
         </MjmlSection>
         {removeWhyWeUseParallel || removeParallelBranding ? null : (
-          <WhyWeUseParallel assetsUrl={assetsUrl} tone={tone} />
+          <WhyWeUseParallel assetsUrl={assetsUrl} tone={theme.preferredTone} />
         )}
       </Layout>
     );

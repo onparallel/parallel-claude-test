@@ -77,7 +77,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   const recipients = petition!.recipients;
   const message = access!.message;
 
-  const tone = petition.tone;
+  const tone = petition.organization.brandTheme.preferredTone;
 
   const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage, {
     hideInternalFields: true,
@@ -490,8 +490,11 @@ RecipientView.fragments = {
         granter {
           ...RecipientView_PublicUser
           organization {
+            id
             hasRemoveParallelBranding
-            ...OverrideWithOrganizationTheme_PublicOrganization
+            brandTheme {
+              ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
+            }
           }
         }
         contact {
@@ -509,7 +512,7 @@ RecipientView.fragments = {
       ${useRecipientViewConfirmPetitionSignersDialog.fragments.PublicContact}
       ${RecipientViewPetitionField.fragments.PublicPetitionAccess}
       ${this.PublicPetitionMessage}
-      ${OverrideWithOrganizationTheme.fragments.PublicOrganization}
+      ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
     `;
   },
   get PublicPetitionMessage() {
@@ -527,7 +530,12 @@ RecipientView.fragments = {
         status
         deadline
         isRecipientViewContentsHidden
-        tone
+        organization {
+          id
+          brandTheme {
+            preferredTone
+          }
+        }
         fields {
           ...RecipientView_PublicPetitionField
           ...useGetPageFields_PublicPetitionField

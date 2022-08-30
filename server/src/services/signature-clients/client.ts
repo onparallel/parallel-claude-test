@@ -3,7 +3,7 @@ import {
   SignatureProvider,
 } from "../../db/repositories/IntegrationRepository";
 import { Tone } from "../../db/__types";
-import { OrganizationBrandTheme } from "../../emails/utils/ThemeProvider";
+import { BrandTheme } from "../../util/BrandTheme";
 import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
 
 type Document = {
@@ -30,9 +30,8 @@ export type SignatureOptions = {
     logoAlt: string;
     parallelUrl: string;
     assetsUrl: string;
-    tone: Tone;
     removeParallelBranding: boolean;
-    theme: OrganizationBrandTheme;
+    theme: BrandTheme;
   };
   events_url?: string;
   signingMode?: "parallel" | "sequential";

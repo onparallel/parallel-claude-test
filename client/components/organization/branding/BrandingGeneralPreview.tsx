@@ -10,22 +10,22 @@ import {
   Text,
   UnorderedList,
 } from "@chakra-ui/react";
+import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import {
-  OrganizationBrandTheme,
-  OverrideWithOrganizationTheme,
-} from "@parallel/components/common/OverrideWithOrganizationTheme";
-import { BrandingGeneralPreview_UserFragment, Maybe, Tone } from "@parallel/graphql/__types";
+  BrandingGeneralPreview_OrganizatioNBrandThemeDataFragment,
+  BrandingGeneralPreview_UserFragment,
+  Maybe,
+} from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 
 interface BrandingGeneralPreviewProps {
   user: BrandingGeneralPreview_UserFragment;
-  brand: OrganizationBrandTheme;
-  tone: Tone;
+  brand: BrandingGeneralPreview_OrganizatioNBrandThemeDataFragment;
   logo: Maybe<File> | string;
 }
 
-export function BrandingGeneralPreview({ user, brand, tone, logo }: BrandingGeneralPreviewProps) {
+export function BrandingGeneralPreview({ user, brand, logo }: BrandingGeneralPreviewProps) {
   const objectUrl = useMemo(() => {
     return logo && typeof logo !== "string"
       ? URL.createObjectURL(logo)
@@ -79,14 +79,14 @@ export function BrandingGeneralPreview({ user, brand, tone, logo }: BrandingGene
                 <FormattedMessage
                   id="component.branding-general-preview.greetings"
                   defaultMessage="{tone, select, INFORMAL{Hello <b>[Recipient Name]</b>!} other{Dear <b>[Recipient Name]</b>,}}"
-                  values={{ tone }}
+                  values={{ tone: brand.preferredTone }}
                 />
               </Text>
               <Text>
                 <FormattedMessage
                   id="component.branding-general-preview.body"
                   defaultMessage="We remind you that <b>{name}</b> sent you a parallel and some of the requested information has not yet been submitted."
-                  values={{ tone, name: user.fullName }}
+                  values={{ tone: brand.preferredTone, name: user.fullName }}
                 />
               </Text>
             </Stack>
@@ -110,7 +110,7 @@ export function BrandingGeneralPreview({ user, brand, tone, logo }: BrandingGene
                 <FormattedMessage
                   id="component.branding-general-preview.pending-fields"
                   defaultMessage="{tone, select, INFORMAL{You have 12/40 fields pending} other{There are currently 12/40 fields pending}}"
-                  values={{ tone }}
+                  values={{ tone: brand.preferredTone }}
                 />
               </ListItem>
             </UnorderedList>
@@ -146,16 +146,29 @@ export function BrandingGeneralPreview({ user, brand, tone, logo }: BrandingGene
 }
 
 BrandingGeneralPreview.fragments = {
-  User: gql`
-    fragment BrandingGeneralPreview_User on User {
-      fullName
-      organization {
-        name
+  get OrganizatioNBrandThemeData() {
+    return gql`
+      fragment BrandingGeneralPreview_OrganizatioNBrandThemeData on OrganizationBrandThemeData {
         preferredTone
-        logoUrl(options: { resize: { width: 600 } })
-        ...OverrideWithOrganizationTheme_Organization
+        ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
       }
-    }
-    ${OverrideWithOrganizationTheme.fragments.Organization}
-  `,
+      ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
+    `;
+  },
+  get User() {
+    return gql`
+      fragment BrandingGeneralPreview_User on User {
+        fullName
+        organization {
+          id
+          name
+          logoUrl(options: { resize: { width: 600 } })
+          brandTheme {
+            ...BrandingGeneralPreview_OrganizatioNBrandThemeData
+          }
+        }
+      }
+      ${this.OrganizatioNBrandThemeData}
+    `;
+  },
 };

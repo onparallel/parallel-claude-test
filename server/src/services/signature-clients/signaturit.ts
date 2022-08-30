@@ -87,7 +87,7 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
     opts: SignatureOptions
   ) {
     const locale = opts.locale;
-    const tone = opts.templateData?.tone ?? "INFORMAL";
+    const tone = opts.templateData?.theme.preferredTone ?? "INFORMAL";
 
     const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as BrandingIdKey;
     let brandingId = this.settings[key];
