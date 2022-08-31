@@ -25,12 +25,43 @@ export function TimelineAccessActivatedEvent({ event, userId }: TimelineAccessAc
       }
     >
       {event.access.isContactless ? (
+        event.access.delegateGranter ? (
+          <FormattedMessage
+            id="timeline.contactless-access-activated-description.delegated"
+            defaultMessage="{delegateIsYou, select, true {You} other {{delegate}}} created a link access as {userIsYou, select, true {you} other {{user}}} {timeAgo}"
+            values={{
+              delegateIsYou: userId === event.access.delegateGranter.id,
+              delegate: <UserReference user={event.access.delegateGranter} />,
+              userIsYou: userId === event.user?.id,
+              user: <UserReference user={event.user} />,
+              timeAgo: (
+                <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+              ),
+            }}
+          />
+        ) : (
+          <FormattedMessage
+            id="timeline.contactless-access-activated-description"
+            defaultMessage="{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}"
+            values={{
+              userIsYou: userId === event.user?.id,
+              user: <UserReference user={event.user} />,
+              timeAgo: (
+                <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+              ),
+            }}
+          />
+        )
+      ) : event.access.delegateGranter ? (
         <FormattedMessage
-          id="timeline.contactless-access-activated-description"
-          defaultMessage="{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}"
+          id="timeline.access-activated-description.delegated"
+          defaultMessage="{delegateIsYou, select, true {You} other {{delegate}}} gave access to {contact} as {userIsYou, select, true {you} other {{user}}} {timeAgo}"
           values={{
+            delegateIsYou: userId === event.access.delegateGranter.id,
+            delegate: <UserReference user={event.access.delegateGranter} />,
             userIsYou: userId === event.user?.id,
             user: <UserReference user={event.user} />,
+            contact: <ContactReference contact={event.access.contact} />,
             timeAgo: (
               <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
             ),
@@ -61,6 +92,9 @@ TimelineAccessActivatedEvent.fragments = {
         ...UserReference_User
       }
       access {
+        delegateGranter {
+          ...UserReference_User
+        }
         contact {
           ...ContactReference_Contact
         }

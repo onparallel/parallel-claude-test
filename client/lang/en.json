@@ -8940,6 +8940,11 @@
     "context": "{userIsYou, select, true {You} other {{user}}} gave access to {contact} {timeAgo}"
   },
   {
+    "term": "timeline.access-activated-description.delegated",
+    "definition": "{delegateIsYou, select, true {You} other {{delegate}}} gave access to {contact} as {userIsYou, select, true {you} other {{user}}} {timeAgo}",
+    "context": "{delegateIsYou, select, true {You} other {{delegate}}} gave access to {contact} as {userIsYou, select, true {you} other {{user}}} {timeAgo}"
+  },
+  {
     "term": "timeline.access-deactivated-auto-description",
     "definition": "The access for {contact} was removed because the email bounced {timeAgo}",
     "context": "The access for {contact} was removed because the email bounced {timeAgo}"
@@ -8998,6 +9003,11 @@
     "term": "timeline.contactless-access-activated-description",
     "definition": "{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}"
+  },
+  {
+    "term": "timeline.contactless-access-activated-description.delegated",
+    "definition": "{delegateIsYou, select, true {You} other {{delegate}}} created a link access as {userIsYou, select, true {you} other {{user}}} {timeAgo}",
+    "context": "{delegateIsYou, select, true {You} other {{delegate}}} created a link access as {userIsYou, select, true {you} other {{user}}} {timeAgo}"
   },
   {
     "term": "timeline.contactless-access-deactivated-manual-description",

@@ -5936,6 +5936,12 @@ export type PetitionActivityTimeline_PetitionFragment = {
           access: {
             __typename?: "PetitionAccess";
             isContactless: boolean;
+            delegateGranter?: {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              status: UserStatus;
+            } | null;
             contact?: {
               __typename?: "Contact";
               id: string;
@@ -6577,6 +6583,12 @@ export type PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment
   access: {
     __typename?: "PetitionAccess";
     isContactless: boolean;
+    delegateGranter?: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      status: UserStatus;
+    } | null;
     contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
@@ -7345,6 +7357,12 @@ export type TimelineAccessActivatedEvent_AccessActivatedEventFragment = {
   access: {
     __typename?: "PetitionAccess";
     isContactless: boolean;
+    delegateGranter?: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      status: UserStatus;
+    } | null;
     contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
@@ -13653,6 +13671,12 @@ export type PetitionActivity_PetitionFragment = {
           access: {
             __typename?: "PetitionAccess";
             isContactless: boolean;
+            delegateGranter?: {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              status: UserStatus;
+            } | null;
             contact?: {
               __typename?: "Contact";
               id: string;
@@ -14465,6 +14489,12 @@ export type PetitionActivity_updatePetitionMutation = {
                 access: {
                   __typename?: "PetitionAccess";
                   isContactless: boolean;
+                  delegateGranter?: {
+                    __typename?: "User";
+                    id: string;
+                    fullName?: string | null;
+                    status: UserStatus;
+                  } | null;
                   contact?: {
                     __typename?: "Contact";
                     id: string;
@@ -15341,6 +15371,12 @@ export type PetitionActivity_petitionQuery = {
                 access: {
                   __typename?: "PetitionAccess";
                   isContactless: boolean;
+                  delegateGranter?: {
+                    __typename?: "User";
+                    id: string;
+                    fullName?: string | null;
+                    status: UserStatus;
+                  } | null;
                   contact?: {
                     __typename?: "Contact";
                     id: string;
@@ -24274,6 +24310,9 @@ export const TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc = gql`
       ...UserReference_User
     }
     access {
+      delegateGranter {
+        ...UserReference_User
+      }
       contact {
         ...ContactReference_Contact
       }
