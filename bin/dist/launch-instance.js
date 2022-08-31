@@ -3,16 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const aws_sdk_1 = __importDefault(require("aws-sdk"));
+const client_ec2_1 = require("@aws-sdk/client-ec2");
+const credential_providers_1 = require("@aws-sdk/credential-providers"); // ES6 import
 const chalk_1 = __importDefault(require("chalk"));
 const child_process_1 = require("child_process");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 const wait_1 = require("./utils/wait");
-aws_sdk_1.default.config.credentials = new aws_sdk_1.default.SharedIniFileCredentials({
-    profile: "parallel-deploy",
-});
-aws_sdk_1.default.config.region = "eu-central-1";
 const INSTANCE_TYPES = {
     production: "t2.large",
     staging: "t2.medium",
@@ -26,7 +23,9 @@ const REGION = "eu-central-1";
 const AVAILABILITY_ZONE = `${REGION}a`;
 const ENHANCED_MONITORING = true;
 const OPS_DIR = "/home/ec2-user/parallel/ops/prod";
-const ec2 = new aws_sdk_1.default.EC2();
+const ec2 = new client_ec2_1.EC2Client({
+    credentials: (0, credential_providers_1.fromIni)({ profile: "parallel-deploy" }),
+});
 async function main() {
     const { commit: _commit, env } = await yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")
@@ -41,8 +40,7 @@ async function main() {
         description: "The environment for the build",
     }).argv;
     const commit = _commit.slice(0, 7);
-    const result = await ec2
-        .runInstances({
+    const result = await ec2.send(new client_ec2_1.RunInstancesCommand({
         ImageId: IMAGE_ID,
         KeyName: KEY_NAME,
         SecurityGroupIds: SECURITY_GROUP_IDS,
@@ -79,15 +77,14 @@ async function main() {
                 ],
             },
         ],
-    })
-        .promise();
+    }));
     const instanceId = result.Instances[0].InstanceId;
     const ipAddress = result.Instances[0].PrivateIpAddress;
     console.log((0, chalk_1.default) `Launched instance {bold ${instanceId}} on {bold ${ipAddress}}`);
     await (0, wait_1.wait)(5000);
     await (0, wait_1.waitFor)(async () => {
         var _a, _b, _c;
-        const result = await ec2.describeInstances({ InstanceIds: [instanceId] }).promise();
+        const result = await ec2.send(new client_ec2_1.DescribeInstancesCommand({ InstanceIds: [instanceId] }));
         return ((_c = (_b = (_a = result.Reservations) === null || _a === void 0 ? void 0 : _a[0].Instances) === null || _b === void 0 ? void 0 : _b[0].State) === null || _c === void 0 ? void 0 : _c.Name) === "running";
     }, (0, chalk_1.default) `Instance {yellow pending}. Waiting 10 more seconds...`, 10000);
     console.log((0, chalk_1.default) `Instance {green ✓ running}`);

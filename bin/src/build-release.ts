@@ -1,14 +1,8 @@
-import AWS from "aws-sdk";
 import chalk from "chalk";
 import { execSync } from "child_process";
 import yargs from "yargs";
 import { run } from "./utils/run";
 import { token } from "./utils/token";
-
-AWS.config.credentials = new AWS.SharedIniFileCredentials({
-  profile: "parallel-deploy",
-});
-AWS.config.region = "eu-central-1";
 
 const WORK_DIR = "/home/ec2-user";
 

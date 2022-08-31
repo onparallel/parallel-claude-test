@@ -1,15 +1,22 @@
-import AWS from "aws-sdk";
+import {
+  DescribeInstancesCommand,
+  EC2Client,
+  StopInstancesCommand,
+  TerminateInstancesCommand,
+} from "@aws-sdk/client-ec2";
+import {
+  DescribeLoadBalancersCommand,
+  ElasticLoadBalancingClient,
+} from "@aws-sdk/client-elastic-load-balancing";
+import { fromIni } from "@aws-sdk/credential-providers";
 import chalk from "chalk";
 import yargs from "yargs";
 import { run } from "./utils/run";
 
-AWS.config.credentials = new AWS.SharedIniFileCredentials({
-  profile: "parallel-deploy",
+const ec2 = new EC2Client({ credentials: fromIni({ profile: "parallel-deploy" }) });
+const elb = new ElasticLoadBalancingClient({
+  credentials: fromIni({ profile: "parallel-deploy" }),
 });
-AWS.config.region = "eu-central-1";
-
-const ec2 = new AWS.EC2();
-const elb = new AWS.ELB();
 
 async function main() {
   const { env, "dry-run": dryRun } = await yargs
@@ -25,17 +32,17 @@ async function main() {
     }).argv;
 
   const liveInstances = await elb
-    .describeLoadBalancers({ LoadBalancerNames: [`parallel-${env}`] })
-    .promise()
+    .send(new DescribeLoadBalancersCommand({ LoadBalancerNames: [`parallel-${env}`] }))
     .then((r) => r.LoadBalancerDescriptions![0].Instances!.map((i) => i.InstanceId!));
   const instances = await ec2
-    .describeInstances({
-      Filters: [
-        { Name: "tag-key", Values: ["Release"] },
-        { Name: "tag:Environment", Values: [env] },
-      ],
-    })
-    .promise()
+    .send(
+      new DescribeInstancesCommand({
+        Filters: [
+          { Name: "tag-key", Values: ["Release"] },
+          { Name: "tag:Environment", Values: [env] },
+        ],
+      })
+    )
     .then((r) => r.Reservations!.flatMap((r) => r.Instances!));
   for (const instance of instances) {
     const instanceId = instance.InstanceId!;
@@ -45,7 +52,7 @@ async function main() {
       if (instanceState === "running") {
         console.log(chalk`Stopping instance {bold ${instanceId}} {yellow {bold ${instanceName}}}`);
         if (!dryRun) {
-          await ec2.stopInstances({ InstanceIds: [instanceId] }).promise();
+          await ec2.send(new StopInstancesCommand({ InstanceIds: [instanceId] }));
         }
       } else if (instanceState === "stopped" || instanceState === "stopping") {
         const match = instance.StateTransitionReason?.match(/^User initiated \((.*)\)$/);
@@ -57,7 +64,7 @@ async function main() {
               chalk`Terminating instance {bold ${instanceId}} {red {bold ${instanceName}}}`
             );
             if (!dryRun) {
-              await ec2.terminateInstances({ InstanceIds: [instanceId] }).promise();
+              await ec2.send(new TerminateInstancesCommand({ InstanceIds: [instanceId] }));
             }
           }
         }

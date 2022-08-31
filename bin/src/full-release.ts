@@ -1,12 +1,6 @@
-import AWS from "aws-sdk";
 import { execSync } from "child_process";
 import yargs from "yargs";
 import { run } from "./utils/run";
-
-AWS.config.credentials = new AWS.SharedIniFileCredentials({
-  profile: "parallel-deploy",
-});
-AWS.config.region = "eu-central-1";
 
 async function main() {
   const { commit: _commit, env } = await yargs

@@ -3,16 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const chalk_1 = __importDefault(require("chalk"));
 const child_process_1 = require("child_process");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 const token_1 = require("./utils/token");
-aws_sdk_1.default.config.credentials = new aws_sdk_1.default.SharedIniFileCredentials({
-    profile: "parallel-deploy",
-});
-aws_sdk_1.default.config.region = "eu-central-1";
 const WORK_DIR = "/home/ec2-user";
 async function main() {
     const { commit: _commit, env } = await yargs_1.default

@@ -1,18 +1,28 @@
-import AWS from "aws-sdk";
+import {
+  CloudFrontClient,
+  CreateInvalidationCommand,
+  ListDistributionsCommand,
+} from "@aws-sdk/client-cloudfront";
+import { DescribeInstancesCommand, EC2Client } from "@aws-sdk/client-ec2";
+import {
+  DeregisterInstancesFromLoadBalancerCommand,
+  DescribeInstanceHealthCommand,
+  DescribeLoadBalancersCommand,
+  ElasticLoadBalancingClient,
+  RegisterInstancesWithLoadBalancerCommand,
+} from "@aws-sdk/client-elastic-load-balancing";
+import { fromIni } from "@aws-sdk/credential-providers";
 import chalk from "chalk";
 import { execSync } from "child_process";
 import yargs from "yargs";
 import { run } from "./utils/run";
 import { waitFor } from "./utils/wait";
 
-AWS.config.credentials = new AWS.SharedIniFileCredentials({
-  profile: "parallel-deploy",
+const ec2 = new EC2Client({ credentials: fromIni({ profile: "parallel-deploy" }) });
+const elb = new ElasticLoadBalancingClient({
+  credentials: fromIni({ profile: "parallel-deploy" }),
 });
-AWS.config.region = "eu-central-1";
-
-const ec2 = new AWS.EC2();
-const elb = new AWS.ELB();
-const cloudfront = new AWS.CloudFront();
+const cloudfront = new CloudFrontClient({ credentials: fromIni({ profile: "parallel-deploy" }) });
 const OPS_DIR = "/home/ec2-user/main/ops/prod";
 
 async function main() {
@@ -33,14 +43,15 @@ async function main() {
   const buildId = `parallel-${env}-${commit}`;
 
   const newInstances = await ec2
-    .describeInstances({
-      Filters: [
-        { Name: "tag:Release", Values: [commit] },
-        { Name: "tag:Environment", Values: [env] },
-        { Name: "instance-state-name", Values: ["running"] },
-      ],
-    })
-    .promise()
+    .send(
+      new DescribeInstancesCommand({
+        Filters: [
+          { Name: "tag:Release", Values: [commit] },
+          { Name: "tag:Environment", Values: [env] },
+          { Name: "instance-state-name", Values: ["running"] },
+        ],
+      })
+    )
     .then((r) =>
       r.Reservations!.flatMap((r) => r.Instances!).map((i) => ({ InstanceId: i.InstanceId }))
     );
@@ -50,16 +61,16 @@ async function main() {
   }
 
   const oldInstances = await elb
-    .describeLoadBalancers({ LoadBalancerNames: [`parallel-${env}`] })
-    .promise()
+    .send(new DescribeLoadBalancersCommand({ LoadBalancerNames: [`parallel-${env}`] }))
     .then((r) => r.LoadBalancerDescriptions![0].Instances!);
 
   const oldInstancesFull = oldInstances.length
     ? await ec2
-        .describeInstances({
-          InstanceIds: oldInstances.map((i) => i.InstanceId!),
-        })
-        .promise()
+        .send(
+          new DescribeInstancesCommand({
+            InstanceIds: oldInstances.map((i) => i.InstanceId!),
+          })
+        )
         .then((r) => r.Reservations!.flatMap((r) => r.Instances!))
     : [];
 
@@ -77,37 +88,41 @@ async function main() {
   );
 
   console.log(chalk.yellow`Registering new instances on LB`);
-  await elb
-    .registerInstancesWithLoadBalancer({
+  await elb.send(
+    new RegisterInstancesWithLoadBalancerCommand({
       LoadBalancerName: `parallel-${env}`,
       Instances: newInstances,
     })
-    .promise();
+  );
 
   console.log(chalk.yellow`Creating invalidation for static files`);
   const distributionId = await cloudfront
-    .listDistributions()
-    .promise()
+    .send(new ListDistributionsCommand({}))
     .then(
       (result) =>
         result.DistributionList!.Items!.find((d) =>
-          d.Origins.Items.some((o) => o.Id === `S3-parallel-static-${env}`)
+          d.Origins!.Items!.some((o) => o.Id === `S3-parallel-static-${env}`)
         )!.Id
     );
   // find distribution for
-  await cloudfront
-    .createInvalidation({
+  await cloudfront.send(
+    new CreateInvalidationCommand({
       DistributionId: distributionId,
       InvalidationBatch: { CallerReference: buildId, Paths: { Quantity: 1, Items: ["/static/*"] } },
     })
-    .promise();
+  );
+
   console.log(chalk.green.bold`Invalidation created`);
 
   await waitFor(
     async () => {
       return await elb
-        .describeInstanceHealth({ LoadBalancerName: `parallel-${env}`, Instances: newInstances })
-        .promise()
+        .send(
+          new DescribeInstanceHealthCommand({
+            LoadBalancerName: `parallel-${env}`,
+            Instances: newInstances,
+          })
+        )
         .then((r) => r.InstanceStates!.every((i) => i.State === "InService"));
     },
     chalk.yellow.italic`...Waiting for new instances to become healthy`,
@@ -117,17 +132,22 @@ async function main() {
 
   if (oldInstances.length) {
     console.log(chalk.yellow`Deregistering old instances on LB`);
-    await elb
-      .deregisterInstancesFromLoadBalancer({
+    await elb.send(
+      new DeregisterInstancesFromLoadBalancerCommand({
         LoadBalancerName: `parallel-${env}`,
         Instances: oldInstances,
       })
-      .promise();
+    );
+
     await waitFor(
       async () => {
         return await elb
-          .describeInstanceHealth({ LoadBalancerName: `parallel-${env}`, Instances: oldInstances })
-          .promise()
+          .send(
+            new DescribeInstanceHealthCommand({
+              LoadBalancerName: `parallel-${env}`,
+              Instances: oldInstances,
+            })
+          )
           .then((r) => r.InstanceStates!.every((i) => i.State === "OutOfService"));
       },
       chalk.yellow.italic`...Waiting for old instances to become out of service`,
@@ -137,10 +157,11 @@ async function main() {
   }
 
   const newInstancesFull = await ec2
-    .describeInstances({
-      InstanceIds: newInstances.map((i) => i.InstanceId!),
-    })
-    .promise()
+    .send(
+      new DescribeInstancesCommand({
+        InstanceIds: newInstances.map((i) => i.InstanceId!),
+      })
+    )
     .then((r) => r.Reservations!.flatMap((r) => r.Instances!));
 
   await Promise.all(

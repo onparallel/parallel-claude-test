@@ -1,14 +1,10 @@
-import AWS from "aws-sdk";
+import { DescribeInstancesCommand, EC2Client, RunInstancesCommand } from "@aws-sdk/client-ec2";
+import { fromIni } from "@aws-sdk/credential-providers"; // ES6 import
 import chalk from "chalk";
 import { execSync } from "child_process";
 import yargs from "yargs";
 import { run } from "./utils/run";
-import { waitFor, wait } from "./utils/wait";
-
-AWS.config.credentials = new AWS.SharedIniFileCredentials({
-  profile: "parallel-deploy",
-});
-AWS.config.region = "eu-central-1";
+import { wait, waitFor } from "./utils/wait";
 
 const INSTANCE_TYPES = {
   production: "t2.large",
@@ -24,7 +20,9 @@ const AVAILABILITY_ZONE = `${REGION}a`;
 const ENHANCED_MONITORING = true;
 const OPS_DIR = "/home/ec2-user/parallel/ops/prod";
 
-const ec2 = new AWS.EC2();
+const ec2 = new EC2Client({
+  credentials: fromIni({ profile: "parallel-deploy" }),
+});
 
 async function main() {
   const { commit: _commit, env } = await yargs
@@ -42,8 +40,8 @@ async function main() {
 
   const commit = _commit.slice(0, 7);
 
-  const result = await ec2
-    .runInstances({
+  const result = await ec2.send(
+    new RunInstancesCommand({
       ImageId: IMAGE_ID,
       KeyName: KEY_NAME,
       SecurityGroupIds: SECURITY_GROUP_IDS,
@@ -81,14 +79,14 @@ async function main() {
         },
       ],
     })
-    .promise();
+  );
   const instanceId = result.Instances![0].InstanceId!;
   const ipAddress = result.Instances![0].PrivateIpAddress!;
   console.log(chalk`Launched instance {bold ${instanceId}} on {bold ${ipAddress}}`);
   await wait(5000);
   await waitFor(
     async () => {
-      const result = await ec2.describeInstances({ InstanceIds: [instanceId] }).promise();
+      const result = await ec2.send(new DescribeInstancesCommand({ InstanceIds: [instanceId] }));
       return result.Reservations?.[0].Instances?.[0].State?.Name === "running";
     },
     chalk`Instance {yellow pending}. Waiting 10 more seconds...`,

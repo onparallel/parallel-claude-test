@@ -3,34 +3,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const aws_sdk_1 = __importDefault(require("aws-sdk"));
+const client_ec2_1 = require("@aws-sdk/client-ec2");
+const client_elastic_load_balancing_1 = require("@aws-sdk/client-elastic-load-balancing");
+const credential_providers_1 = require("@aws-sdk/credential-providers");
 const chalk_1 = __importDefault(require("chalk"));
 const cli_table3_1 = __importDefault(require("cli-table3"));
 const run_1 = require("./utils/run");
-aws_sdk_1.default.config.credentials = new aws_sdk_1.default.SharedIniFileCredentials({
-    profile: "parallel-deploy",
+const ec2 = new client_ec2_1.EC2Client({ credentials: (0, credential_providers_1.fromIni)({ profile: "parallel-deploy" }) });
+const elb = new client_elastic_load_balancing_1.ElasticLoadBalancingClient({
+    credentials: (0, credential_providers_1.fromIni)({ profile: "parallel-deploy" }),
 });
-aws_sdk_1.default.config.region = "eu-central-1";
-const ec2 = new aws_sdk_1.default.EC2();
-const elb = new aws_sdk_1.default.ELB();
 async function main() {
     const instances = await ec2
-        .describeInstances({
+        .send(new client_ec2_1.DescribeInstancesCommand({
         Filters: [{ Name: "tag-key", Values: ["Release"] }],
-    })
-        .promise()
+    }))
         .then((r) => r.Reservations.flatMap((r) => r.Instances));
-    const loadBalancers = await elb
-        .describeLoadBalancers({
+    const loadBalancers = await elb.send(new client_elastic_load_balancing_1.DescribeLoadBalancersCommand({
         LoadBalancerNames: ["parallel-staging", "parallel-production"],
-    })
-        .promise();
+    }));
     const instancesToLb = {};
     const instancesToLbState = {};
     for (const lb of loadBalancers.LoadBalancerDescriptions) {
-        const descriptions = await elb
-            .describeInstanceHealth({ LoadBalancerName: lb.LoadBalancerName })
-            .promise();
+        const descriptions = await elb.send(new client_elastic_load_balancing_1.DescribeInstanceHealthCommand({
+            LoadBalancerName: lb.LoadBalancerName,
+        }));
         for (const state of descriptions.InstanceStates) {
             if (state.State === "InService") {
                 instancesToLb[state.InstanceId] = lb.LoadBalancerName;

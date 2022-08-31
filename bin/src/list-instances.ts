@@ -1,36 +1,42 @@
-import AWS from "aws-sdk";
+import { DescribeInstancesCommand, EC2Client } from "@aws-sdk/client-ec2";
+import {
+  DescribeInstanceHealthCommand,
+  DescribeLoadBalancersCommand,
+  ElasticLoadBalancingClient,
+} from "@aws-sdk/client-elastic-load-balancing";
+import { fromIni } from "@aws-sdk/credential-providers";
 import chalk from "chalk";
 import Table from "cli-table3";
 import { run } from "./utils/run";
 
-AWS.config.credentials = new AWS.SharedIniFileCredentials({
-  profile: "parallel-deploy",
+const ec2 = new EC2Client({ credentials: fromIni({ profile: "parallel-deploy" }) });
+const elb = new ElasticLoadBalancingClient({
+  credentials: fromIni({ profile: "parallel-deploy" }),
 });
-AWS.config.region = "eu-central-1";
-
-const ec2 = new AWS.EC2();
-const elb = new AWS.ELB();
 
 async function main() {
   const instances = await ec2
-    .describeInstances({
-      Filters: [{ Name: "tag-key", Values: ["Release"] }],
-    })
-    .promise()
+    .send(
+      new DescribeInstancesCommand({
+        Filters: [{ Name: "tag-key", Values: ["Release"] }],
+      })
+    )
     .then((r) => r.Reservations!.flatMap((r) => r.Instances!));
 
-  const loadBalancers = await elb
-    .describeLoadBalancers({
+  const loadBalancers = await elb.send(
+    new DescribeLoadBalancersCommand({
       LoadBalancerNames: ["parallel-staging", "parallel-production"],
     })
-    .promise();
+  );
 
   const instancesToLb: Record<string, string> = {};
   const instancesToLbState: Record<string, string> = {};
   for (const lb of loadBalancers.LoadBalancerDescriptions!) {
-    const descriptions = await elb
-      .describeInstanceHealth({ LoadBalancerName: lb.LoadBalancerName! })
-      .promise();
+    const descriptions = await elb.send(
+      new DescribeInstanceHealthCommand({
+        LoadBalancerName: lb.LoadBalancerName!,
+      })
+    );
     for (const state of descriptions.InstanceStates!) {
       if (state.State === "InService") {
         instancesToLb[state.InstanceId!] = lb.LoadBalancerName!;
