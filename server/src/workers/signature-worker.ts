@@ -334,7 +334,7 @@ async function updateOrganizationBranding(payload: { orgId: number }, ctx: Worke
         const [locale, tone] = key.split("_");
         try {
           await client.updateBranding(brandingId, {
-            locale,
+            locale: locale.toLowerCase(),
             templateData: {
               ...layoutProps,
               tone: tone as Tone,
@@ -343,7 +343,7 @@ async function updateOrganizationBranding(payload: { orgId: number }, ctx: Worke
             },
           });
         } catch (error) {
-          console.error(
+          ctx.logger.error(
             `Error updating ${key} branding on OrgIntegration:${integration.id}:`,
             error
           );
