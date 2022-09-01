@@ -89,6 +89,7 @@ function customMessageUserInviteResponse(): Handler {
           userName: firstName!,
           organizationName: organizationName!,
           organizationUser: organizationUser!,
+          isNewUser: true, // invites sent by aws cognito will always be on new users
           ...layoutProps(req.context.config.misc),
         },
         { locale }

@@ -355,9 +355,19 @@
     "context": "{name, select, null {Hi,} other {Hi {name},}}"
   },
   {
-    "term": "invitation.details",
+    "term": "invitation.access-parallel",
+    "definition": "Acceder",
+    "context": "Log in"
+  },
+  {
+    "term": "invitation.details.new-user",
     "definition": "Para empezar, accede con tu dirección de correo y contraseña temporal:",
     "context": "Get started by logging in with your email and temporary password:"
+  },
+  {
+    "term": "invitation.details.registered-user",
+    "definition": "Accede con tu usuario y contraseña y podrás elegir a qué organización quieres entrar.",
+    "context": "Log in with your email and password and then choose which organization you want to work on."
   },
   {
     "term": "invitation.email",

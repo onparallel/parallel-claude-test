@@ -9,6 +9,7 @@
         }
       },
       "args": {
+        "isNewUser": false,
         "email": "mariano@onparallel.com",
         "password": "password",
         "organizationUser": "Derek Lou",
@@ -20,6 +21,7 @@
         "logoAlt": "Parallel"
       },
       "argTypes": {
+        "isNewUser": { "control": { "type": "boolean" } },
         "email": { "control": { "type": "text" } },
         "password": { "control": { "type": "text" } },
         "organizationUser": { "control": { "type": "text" } },

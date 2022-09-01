@@ -12,6 +12,7 @@ import { PetitionEvent, SystemEvent } from "../db/events";
 import { unMaybeArray } from "../util/arrays";
 import { awsLogger } from "../util/awsLogger";
 import { MaybeArray } from "../util/types";
+import { EmailPayload } from "../workers/email-sender";
 import { ILogger, LOGGER } from "./logger";
 import { IStorage, Storage, STORAGE_FACTORY } from "./storage";
 
@@ -35,7 +36,7 @@ export interface IAws {
       organizationUser: string;
       locale: string;
     },
-    sendEmail?: boolean
+    sendInviteEmail?: boolean
   ): Promise<string>;
   resetUserPassword(
     email: string,
@@ -192,10 +193,19 @@ export class Aws implements IAws {
       organizationUser: string;
       locale: string;
     },
-    sendEmail?: boolean
+    sendInviteEmail?: boolean
   ) {
     try {
       const user = await this.getUser(email);
+      if (sendInviteEmail) {
+        await this.sendInvitationEmail({
+          user_cognito_id: user.Username!,
+          is_new_user: false,
+          locale: clientMetadata.locale,
+          org_name: clientMetadata.organizationName,
+          org_user: clientMetadata.organizationUser,
+        });
+      }
       return user.Username!;
     } catch (error: any) {
       if (error.code === "UserNotFoundException") {
@@ -204,7 +214,7 @@ export class Aws implements IAws {
             UserPoolId: this.config.cognito.defaultPoolId,
             Username: email,
             TemporaryPassword: password ?? undefined,
-            MessageAction: sendEmail ? undefined : "SUPPRESS",
+            MessageAction: sendInviteEmail ? undefined : "SUPPRESS",
             UserAttributes: [
               { Name: "email", Value: email },
               { Name: "given_name", Value: firstName },
@@ -298,5 +308,15 @@ export class Aws implements IAws {
         ClientMetadata: clientMetadata,
       })
       .promise();
+  }
+
+  private async sendInvitationEmail(payload: EmailPayload["invitation"]) {
+    await this.enqueueMessages("email-sender", {
+      groupId: `user-invite-${payload.user_cognito_id}`,
+      body: {
+        type: "invitation",
+        payload,
+      },
+    });
   }
 }

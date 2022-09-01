@@ -6,6 +6,7 @@ import { commentsUserNotification } from "./emails/comments-user-notification";
 import { contactAuthenticationRequest } from "./emails/contact-authentication-request";
 import { developerWebhookFailed } from "./emails/developer-webhook-failed";
 import { internalSignaturitAccountDepletedCredits } from "./emails/internal-signaturit-account-depleted-credits";
+import { invitation } from "./emails/invitation";
 import { organizationLimitsReached } from "./emails/organization-limits-reached";
 import { petitionAccessDelegated } from "./emails/petition-access-delegated";
 import { petitionClosedNotification } from "./emails/petition-closed-notification";
@@ -39,6 +40,7 @@ const builders = {
   "signature-cancelled-no-credits-left": signatureCancelledNoCreditsLeft,
   "signature-cancelled-request-error": signatureCancelledRequestError,
   "signature-cancelled-declined-by-signer": signatureCancelledDeclinedBySigner,
+  invitation,
 };
 
 export type EmailType = keyof typeof builders;

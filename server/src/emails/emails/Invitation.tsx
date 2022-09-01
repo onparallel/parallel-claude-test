@@ -9,11 +9,12 @@ import { greetingUser } from "../components/texts";
 import { WhatsParallel } from "../components/WhatsParallel";
 
 export type InvitationProps = {
-  email: string;
-  password: string;
+  email?: string;
+  password?: string;
   organizationUser: string;
   organizationName: string;
   userName: string;
+  isNewUser: boolean;
 } & LayoutProps;
 
 const email: Email<InvitationProps> = {
@@ -42,7 +43,15 @@ const email: Email<InvitationProps> = {
         );
   },
   text(
-    { userName, organizationName, organizationUser, parallelUrl, email, password }: InvitationProps,
+    {
+      userName,
+      organizationName,
+      organizationUser,
+      parallelUrl,
+      email,
+      password,
+      isNewUser,
+    }: InvitationProps,
     intl: IntlShape
   ) {
     return outdent`
@@ -66,26 +75,33 @@ const email: Email<InvitationProps> = {
             { organizationName }
           )
     }
+    ${
+      isNewUser
+        ? `${intl.formatMessage({
+            id: "invitation.details.new-user",
+            defaultMessage: "Get started by logging in with your email and temporary password:",
+          })}
 
-    ${intl.formatMessage({
-      id: "invitation.details",
-      defaultMessage: "Get started by logging in with your email and temporary password:",
-    })}
-
-    ${intl.formatMessage(
-      {
-        id: "invitation.email",
-        defaultMessage: "Email: {email}",
-      },
-      { email }
-    )}
-    ${intl.formatMessage(
-      {
-        id: "invitation.password",
-        defaultMessage: "Password: {password}",
-      },
-      { password }
-    )}
+  ${intl.formatMessage(
+    {
+      id: "invitation.email",
+      defaultMessage: "Email: {email}",
+    },
+    { email }
+  )}
+  ${intl.formatMessage(
+    {
+      id: "invitation.password",
+      defaultMessage: "Password: {password}",
+    },
+    { password }
+  )}`
+        : `${intl.formatMessage({
+            id: "invitation.details.registered-user",
+            defaultMessage:
+              "Log in with your email and password and then choose which organization you want to work on.",
+          })}`
+    }
 
     ${intl.formatMessage({
       id: "invitation.website",
@@ -106,6 +122,7 @@ const email: Email<InvitationProps> = {
     organizationName,
     organizationUser,
     theme,
+    isNewUser,
   }: InvitationProps) {
     const { locale } = useIntl();
     return (
@@ -135,29 +152,40 @@ const email: Email<InvitationProps> = {
                 />
               )}
             </MjmlText>
-            <MjmlText>
-              <FormattedMessage
-                id="invitation.details"
-                defaultMessage="Get started by logging in with your email and temporary password:"
-              />
-            </MjmlText>
-            <MjmlSection backgroundColor="#F4F7F9" borderRadius="5px" padding="12px 16px">
+            {isNewUser ? (
+              <>
+                <MjmlText>
+                  <FormattedMessage
+                    id="invitation.details.new-user"
+                    defaultMessage="Get started by logging in with your email and temporary password:"
+                  />
+                </MjmlText>
+                <MjmlSection backgroundColor="#F4F7F9" borderRadius="5px" padding="12px 16px">
+                  <MjmlText>
+                    <FormattedMessage
+                      id="invitation.email"
+                      defaultMessage="Email: {email}"
+                      values={{ email: <b>{email}</b> }}
+                    />
+                  </MjmlText>
+                  <MjmlSpacer height="10px" />
+                  <MjmlText>
+                    <FormattedMessage
+                      id="invitation.password"
+                      defaultMessage="Password: {password}"
+                      values={{ password: <b>{password}</b> }}
+                    />
+                  </MjmlText>
+                </MjmlSection>
+              </>
+            ) : (
               <MjmlText>
                 <FormattedMessage
-                  id="invitation.email"
-                  defaultMessage="Email: {email}"
-                  values={{ email: <b>{email}</b> }}
+                  id="invitation.details.registered-user"
+                  defaultMessage="Log in with your email and password and then choose which organization you want to work on."
                 />
               </MjmlText>
-              <MjmlSpacer height="10px" />
-              <MjmlText>
-                <FormattedMessage
-                  id="invitation.password"
-                  defaultMessage="Password: {password}"
-                  values={{ password: <b>{password}</b> }}
-                />
-              </MjmlText>
-            </MjmlSection>
+            )}
             {organizationUser.length ? (
               <MjmlText>
                 <FormattedMessage
@@ -172,7 +200,11 @@ const email: Email<InvitationProps> = {
         <MjmlSection>
           <MjmlColumn>
             <Button href={`${parallelUrl}/${locale}/login`} fontWeight={500}>
-              <FormattedMessage id="invitation.join-parallel" defaultMessage="Join Parallel" />
+              {isNewUser ? (
+                <FormattedMessage id="invitation.join-parallel" defaultMessage="Join Parallel" />
+              ) : (
+                <FormattedMessage id="invitation.access-parallel" defaultMessage="Log in" />
+              )}
             </Button>
           </MjmlColumn>
         </MjmlSection>
