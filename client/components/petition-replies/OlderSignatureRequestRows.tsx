@@ -11,6 +11,7 @@ import { NakedLink } from "../common/Link";
 import { NetDocumentsIconButton } from "../common/NetDocumentsLink";
 import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
 import { SignerReference } from "../common/SignerReference";
+import { PetitionSignatureRequestSignerStatusIcon } from "./PetitionSignatureRequestSignerStatusIcon";
 import { PetitionSignatureRequestStatusText } from "./PetitionSignatureRequestStatusText";
 
 export function OlderSignatureRequestRows({
@@ -48,8 +49,20 @@ export function OlderSignatureRequestRows({
               </Text>
             ) : (
               <FormattedList
-                value={signature.signatureConfig.signers.map((signer, index) => (
-                  <SignerReference signer={signer} key={index} />
+                value={signature.signerStatus.map((sStatus, index) => (
+                  <Fragment key={index}>
+                    <SignerReference signer={sStatus.signer} />
+                    <PetitionSignatureRequestSignerStatusIcon
+                      signerStatus={{
+                        ...sStatus,
+                        // show X icon on pending signers for older signature requests
+                        status: sStatus.status === "PENDING" ? "DECLINED" : sStatus.status,
+                      }}
+                      position="relative"
+                      top={-0.5}
+                      marginX={0.5}
+                    />
+                  </Fragment>
                 ))}
               />
             )}
@@ -113,10 +126,11 @@ OlderSignatureRequestRows.fragments = {
       id
       status
       ...PetitionSignatureRequestStatusText_PetitionSignatureRequest
-      signatureConfig {
-        signers {
+      signerStatus {
+        signer {
           ...SignerReference_PetitionSigner
         }
+        ...PetitionSignatureRequestSignerStatusIcon_SignerStatus
       }
       petition {
         id
@@ -127,5 +141,6 @@ OlderSignatureRequestRows.fragments = {
     }
     ${PetitionSignatureRequestStatusText.fragments.PetitionSignatureRequest}
     ${SignerReference.fragments.PetitionSigner}
+    ${PetitionSignatureRequestSignerStatusIcon.fragments.SignerStatus}
   `,
 };

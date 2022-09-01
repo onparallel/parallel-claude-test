@@ -10637,10 +10637,15 @@ export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
   isAnonymized: boolean;
   auditTrailFilename?: string | null;
   cancelReason?: string | null;
-  signatureConfig: {
-    __typename?: "SignatureConfig";
-    signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string } | null>;
-  };
+  signerStatus: Array<{
+    __typename?: "PetitionSignatureRequestSignerStatus";
+    status: string;
+    sentAt?: string | null;
+    openedAt?: string | null;
+    signedAt?: string | null;
+    declinedAt?: string | null;
+    signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
+  }>;
   petition: { __typename?: "Petition"; id: string };
 };
 
@@ -11007,7 +11012,6 @@ export type PetitionSignaturesCard_PetitionFragment = {
         email: string;
         firstName: string;
         lastName?: string | null;
-        fullName: string;
       } | null>;
     };
     signerStatus: Array<{
@@ -11090,7 +11094,6 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
               email: string;
               firstName: string;
               lastName?: string | null;
-              fullName: string;
             } | null>;
           };
           signerStatus: Array<{
@@ -19404,7 +19407,6 @@ export type PetitionReplies_PetitionFragment = {
         email: string;
         firstName: string;
         lastName?: string | null;
-        fullName: string;
       } | null>;
     };
     signerStatus: Array<{
@@ -19837,7 +19839,6 @@ export type PetitionReplies_closePetitionMutation = {
           email: string;
           firstName: string;
           lastName?: string | null;
-          fullName: string;
         } | null>;
       };
       signerStatus: Array<{
@@ -20073,7 +20074,6 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
           email: string;
           firstName: string;
           lastName?: string | null;
-          fullName: string;
         } | null>;
       };
       signerStatus: Array<{
@@ -20411,7 +20411,6 @@ export type PetitionReplies_petitionQuery = {
               email: string;
               firstName: string;
               lastName?: string | null;
-              fullName: string;
             } | null>;
           };
           signerStatus: Array<{
@@ -23225,7 +23224,6 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
               email: string;
               firstName: string;
               lastName?: string | null;
-              fullName: string;
             } | null>;
           };
           signerStatus: Array<{
@@ -27086,10 +27084,11 @@ export const OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc = gql
     id
     status
     ...PetitionSignatureRequestStatusText_PetitionSignatureRequest
-    signatureConfig {
-      signers {
+    signerStatus {
+      signer {
         ...SignerReference_PetitionSigner
       }
+      ...PetitionSignatureRequestSignerStatusIcon_SignerStatus
     }
     petition {
       id
@@ -27100,6 +27099,7 @@ export const OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc = gql
   }
   ${PetitionSignatureRequestStatusText_PetitionSignatureRequestFragmentDoc}
   ${SignerReference_PetitionSignerFragmentDoc}
+  ${PetitionSignatureRequestSignerStatusIcon_SignerStatusFragmentDoc}
 ` as unknown as DocumentNode<OlderSignatureRequestRows_PetitionSignatureRequestFragment, unknown>;
 export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
   fragment PetitionSignaturesCard_Petition on Petition {
