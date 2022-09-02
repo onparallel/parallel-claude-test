@@ -295,6 +295,13 @@ export class Auth implements IAuth {
           res.status(401).send({ error: "UnknownError" });
           return;
         }
+        await this.cognito
+          .adminUpdateUserAttributes({
+            Username: email,
+            UserPoolId: this.config.cognito.defaultPoolId,
+            UserAttributes: [{ Name: "email_verified", Value: "true" }],
+          })
+          .promise();
         await this.trackSessionLogin(user);
         const token = await this.storeSessionInRedis(challenge.AuthenticationResult as any);
         this.setSession(res, token);

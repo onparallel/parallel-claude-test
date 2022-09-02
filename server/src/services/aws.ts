@@ -207,7 +207,6 @@ export class Aws implements IAws {
             MessageAction: sendEmail ? undefined : "SUPPRESS",
             UserAttributes: [
               { Name: "email", Value: email },
-              { Name: "email_verified", Value: "True" },
               { Name: "given_name", Value: firstName },
               { Name: "family_name", Value: lastName },
             ],
@@ -253,6 +252,7 @@ export class Aws implements IAws {
         ClientId: this.config.cognito.clientId,
         ClientMetadata: clientMetadata,
         UserAttributes: [
+          { Name: "email", Value: email },
           { Name: "given_name", Value: firstName },
           { Name: "family_name", Value: lastName },
         ],
