@@ -161,7 +161,7 @@ export class PetitionBinder implements IPetitionBinder {
   }
 
   private async merge(paths: string[], opts?: { maxOutputSize?: number; outputFileName?: string }) {
-    const DPIValues = [300, 144, 110, 96, 72];
+    const DPIValues = [144, 110, 96, 72];
     let iteration = -1;
     let mergedFileSize = 0;
     const file = resolve(this.temporaryDirectory, `${random(10)}.pdf`);
