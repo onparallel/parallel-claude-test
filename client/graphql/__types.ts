@@ -10545,7 +10545,6 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery = {
 
 export type CopyOrDownloadReplyButton_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
-  content: { [key: string]: any };
   metadata: { [key: string]: any };
   isAnonymized: boolean;
   field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
@@ -26889,7 +26888,6 @@ export const PetitionPreview_QueryFragmentDoc = gql`
 ` as unknown as DocumentNode<PetitionPreview_QueryFragment, unknown>;
 export const CopyOrDownloadReplyButton_PetitionFieldReplyFragmentDoc = gql`
   fragment CopyOrDownloadReplyButton_PetitionFieldReply on PetitionFieldReply {
-    content
     metadata
     isAnonymized
     field {

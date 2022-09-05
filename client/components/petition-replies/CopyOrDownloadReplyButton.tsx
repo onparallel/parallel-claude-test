@@ -17,26 +17,24 @@ import { PetitionRepliesFieldAction } from "./PetitionRepliesFieldReply";
 
 interface CopyOrDownloadReplyButtonProps {
   reply: CopyOrDownloadReplyButton_PetitionFieldReplyFragment;
+  content: any;
   onAction: (action: PetitionRepliesFieldAction) => void;
 }
 
-export function CopyOrDownloadReplyButton({ reply, onAction }: CopyOrDownloadReplyButtonProps) {
+export function CopyOrDownloadReplyButton({
+  reply,
+  content,
+  onAction,
+}: CopyOrDownloadReplyButtonProps) {
   const intl = useIntl();
-  const isTextLikeType = ["TEXT", "SHORT_TEXT", "SELECT"].includes(reply.field!.type);
 
   return (
-    <Stack spacing={1} paddingRight={2} borderRight="2px solid" borderColor="gray.200">
-      {isTextLikeType ? (
-        <CopyToClipboardButton
-          size="xs"
-          text={reply.content.value}
-          isDisabled={reply.isAnonymized}
-        />
-      ) : reply.field!.type === "NUMBER" ? (
+    <Stack spacing={1} paddingRight={2}>
+      {reply.field!.type === "NUMBER" ? (
         <CopyToClipboardButton
           size="xs"
           isDisabled={reply.isAnonymized}
-          text={intl.formatNumber(reply.content.value, {
+          text={intl.formatNumber(content, {
             minimumFractionDigits: 0,
             maximumFractionDigits: 20,
           })}
@@ -45,61 +43,20 @@ export function CopyOrDownloadReplyButton({ reply, onAction }: CopyOrDownloadRep
         <CopyToClipboardButton
           size="xs"
           isDisabled={reply.isAnonymized}
-          text={intl.formatDate(reply.content.value, {
+          text={intl.formatDate(content, {
             ...FORMATS.L,
             timeZone: "UTC",
           })}
         />
-      ) : reply.field!.type === "PHONE" ? (
-        <CopyToClipboardButton
-          size="xs"
-          text={reply.content.value}
-          isDisabled={reply.isAnonymized}
-        />
       ) : isFileTypeField(reply.field!.type) ? (
         <ReplyDownloadButton
-          isDisabled={reply.isAnonymized || reply.content.uploadComplete === false}
-          contentType={reply.content.contentType}
+          isDisabled={reply.isAnonymized || content.uploadComplete === false}
+          contentType={content.contentType}
           onDownload={(preview) => onAction(preview ? "PREVIEW_FILE" : "DOWNLOAD_FILE")}
         />
-      ) : reply.field!.type === "DYNAMIC_SELECT" ? (
-        <Stack spacing={1}>
-          {reply.isAnonymized ? (
-            <CopyToClipboardButton size="xs" text={""} isDisabled />
-          ) : (
-            (reply.content.value as [string, string | null][]).map(([label, value], index) => (
-              <CopyToClipboardButton
-                isDisabled={reply.isAnonymized}
-                key={index}
-                aria-label={intl.formatMessage(
-                  {
-                    id: "petition-replies.petition-field-reply.copy-dynamic-select-reply",
-                    defaultMessage: "Copy {label} to clipboard",
-                  },
-                  { label }
-                )}
-                size="xs"
-                text={value ?? ""}
-              />
-            ))
-          )}
-        </Stack>
-      ) : reply.field!.type === "CHECKBOX" ? (
-        <Stack spacing={1}>
-          {reply.isAnonymized ? (
-            <CopyToClipboardButton size="xs" text={""} isDisabled />
-          ) : (
-            (reply.content.value as string[])?.map((value, index) => (
-              <CopyToClipboardButton
-                key={index}
-                size="xs"
-                text={value}
-                isDisabled={reply.isAnonymized}
-              />
-            ))
-          )}
-        </Stack>
-      ) : null}
+      ) : (
+        <CopyToClipboardButton size="xs" text={content} isDisabled={reply.isAnonymized} />
+      )}
       {reply.metadata.EXTERNAL_ID_CUATRECASAS ? (
         <NetDocumentsIconButton
           externalId={reply.metadata.EXTERNAL_ID_CUATRECASAS}
@@ -114,7 +71,6 @@ export function CopyOrDownloadReplyButton({ reply, onAction }: CopyOrDownloadRep
 CopyOrDownloadReplyButton.fragments = {
   PetitionFieldReply: gql`
     fragment CopyOrDownloadReplyButton_PetitionFieldReply on PetitionFieldReply {
-      content
       metadata
       isAnonymized
       field {

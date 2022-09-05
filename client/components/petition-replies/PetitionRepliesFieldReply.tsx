@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, List, ListItem, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
+import { Box, Grid, GridItem, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import {
   PetitionFieldReplyStatus,
@@ -10,6 +10,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { formatNumberWithPrefix } from "@parallel/utils/formatNumberWithPrefix";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { FieldOptions } from "@parallel/utils/petitionFields";
+import { Fragment } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
@@ -34,130 +35,135 @@ export function PetitionRepliesFieldReply({
   isDisabled,
 }: PetitionRepliesFieldReplyProps) {
   const intl = useIntl();
-  const isTextLikeType = ["TEXT", "SHORT_TEXT", "SELECT"].includes(reply.field!.type);
+  const singleContents = isFileTypeField(reply.field!.type)
+    ? [reply.content]
+    : Array.isArray(reply.content.value)
+    ? reply.field!.type === "DYNAMIC_SELECT"
+      ? reply.content.value.map((v) => v[1])
+      : reply.content.value
+    : [reply.content.value];
+
   return (
-    <Flex>
-      <CopyOrDownloadReplyButton reply={reply} onAction={onAction} />
-      <Flex flexDirection="column" justifyContent="center" flex="1" marginLeft={2}>
-        {reply.isAnonymized ? (
-          <ReplyNotAvailable type={reply.field?.type} />
-        ) : isTextLikeType ? (
-          <BreakLines>{reply.content.value}</BreakLines>
-        ) : reply.field!.type === "NUMBER" ? (
-          <Text wordBreak="break-all" whiteSpace="pre">
-            {formatNumberWithPrefix(
-              reply.content.value,
-              reply.field!.options as FieldOptions["NUMBER"]
+    <Grid templateColumns="auto 1fr auto">
+      {singleContents.map((content, i) => (
+        <Fragment key={i}>
+          <GridItem borderRight="2px solid" borderColor="gray.200" paddingBottom={1}>
+            <CopyOrDownloadReplyButton reply={reply} content={content} onAction={onAction} />
+          </GridItem>
+          <GridItem marginLeft={2} paddingBottom={1}>
+            {reply.isAnonymized ? (
+              <ReplyNotAvailable type={reply.field!.type} />
+            ) : isFileTypeField(reply.field!.type) ? (
+              <Box>
+                <VisuallyHidden>
+                  {intl.formatMessage({
+                    id: "generic.file-name",
+                    defaultMessage: "File name",
+                  })}
+                </VisuallyHidden>
+                <Text as="span">{content.filename}</Text>
+                <Text as="span" marginX={2}>
+                  -
+                </Text>
+                <Text
+                  as="span"
+                  aria-label={intl.formatMessage({
+                    id: "generic.file-size",
+                    defaultMessage: "File size",
+                  })}
+                  fontSize="sm"
+                  color="gray.500"
+                >
+                  <FileSize value={content.size} />
+                </Text>
+              </Box>
+            ) : reply.field!.type === "NUMBER" ? (
+              <Text wordBreak="break-all" whiteSpace="pre">
+                {formatNumberWithPrefix(
+                  content as number,
+                  reply.field!.options as FieldOptions["NUMBER"]
+                )}
+              </Text>
+            ) : reply.field!.type === "DATE" ? (
+              <Text>
+                {intl.formatDate(content, {
+                  ...FORMATS.L,
+                  timeZone: "UTC",
+                })}
+              </Text>
+            ) : (
+              <BreakLines>{content}</BreakLines>
             )}
-          </Text>
-        ) : reply.field!.type === "DATE" ? (
-          <Text>
-            {intl.formatDate(reply.content.value, {
-              ...FORMATS.L,
-              timeZone: "UTC",
-            })}
-          </Text>
-        ) : reply.field!.type === "PHONE" ? (
-          reply.isAnonymized ? (
-            <ReplyNotAvailable />
-          ) : (
-            <BreakLines>{reply.content.value}</BreakLines>
-          )
-        ) : isFileTypeField(reply.field!.type) ? (
-          reply.isAnonymized ? (
-            <ReplyNotAvailable type={reply.field!.type} />
-          ) : (
-            <Box>
-              <VisuallyHidden>
-                {intl.formatMessage({
-                  id: "generic.file-name",
-                  defaultMessage: "File name",
-                })}
-              </VisuallyHidden>
-              <Text as="span">{reply.content.filename}</Text>
-              <Text as="span" marginX={2}>
-                -
-              </Text>
-              <Text
-                as="span"
-                aria-label={intl.formatMessage({
-                  id: "generic.file-size",
-                  defaultMessage: "File size",
-                })}
-                fontSize="sm"
-                color="gray.500"
+          </GridItem>
+          <GridItem>
+            {i === 0 ? (
+              <Stack
+                direction="row"
+                spacing={1}
+                alignSelf="flex-start"
+                data-section="approve-reject-reply"
               >
-                <FileSize value={reply.content.size} />
-              </Text>
-            </Box>
-          )
-        ) : reply.field!.type === "DYNAMIC_SELECT" ? (
-          <List spacing={1}>
-            {(reply.content.value as [string, string][]).map(([, value], index) => (
-              <ListItem key={index}>{value}</ListItem>
-            ))}
-          </List>
-        ) : reply.field!.type === "CHECKBOX" ? (
-          <List spacing={1}>
-            {(reply.content.value as string[]).map((value, index) => (
-              <ListItem key={index}>{value}</ListItem>
-            ))}
-          </List>
-        ) : null}
-        <Box fontSize="sm">
-          {reply.field?.type === "FILE_UPLOAD" && reply.content.uploadComplete === false ? (
-            <Text color="red.500">
-              <FormattedMessage
-                id="petition-replies.petition-field-reply.file-upload.file-incomplete"
-                defaultMessage="File upload is incomplete"
-              />
-            </Text>
-          ) : (
-            <Text color="gray.500">
-              {reply.updatedBy?.__typename === "User" && reply.updatedBy.isMe ? (
-                <FormattedMessage id="generic.you" defaultMessage="You" />
-              ) : (
-                <UserOrContactReference userOrAccess={reply.updatedBy} isLink={false} />
-              )}
-              {", "}
-              <DateTime as="span" value={reply.createdAt} format={FORMATS.LLL} />
-            </Text>
-          )}
-        </Box>
-      </Flex>
-      <Stack direction="row" spacing={1} alignSelf="flex-start" data-section="approve-reject-reply">
-        <IconButtonWithTooltip
-          data-action="approve-reply"
-          icon={<CheckIcon />}
-          label={intl.formatMessage({
-            id: "petition-replies.petition-field-reply.approve",
-            defaultMessage: "Approve",
-          })}
-          size="xs"
-          placement="bottom"
-          colorScheme={reply.status === "APPROVED" ? "green" : "gray"}
-          role="switch"
-          aria-checked={reply.status === "APPROVED"}
-          onClick={() => onUpdateStatus(reply.status === "APPROVED" ? "PENDING" : "APPROVED")}
-          isDisabled={isDisabled || reply.isAnonymized}
-        />
-        <IconButtonWithTooltip
-          data-action="reject-reply"
-          icon={<CloseIcon />}
-          label={intl.formatMessage({
-            id: "petition-replies.petition-field-reply.reject",
-            defaultMessage: "Reject",
-          })}
-          size="xs"
-          placement="bottom"
-          role="switch"
-          colorScheme={reply.status === "REJECTED" ? "red" : "gray"}
-          aria-checked={reply.status === "REJECTED"}
-          onClick={() => onUpdateStatus(reply.status === "REJECTED" ? "PENDING" : "REJECTED")}
-          isDisabled={isDisabled || reply.isAnonymized}
-        />
-      </Stack>
-    </Flex>
+                <IconButtonWithTooltip
+                  data-action="approve-reply"
+                  icon={<CheckIcon />}
+                  label={intl.formatMessage({
+                    id: "petition-replies.petition-field-reply.approve",
+                    defaultMessage: "Approve",
+                  })}
+                  size="xs"
+                  placement="bottom"
+                  colorScheme={reply.status === "APPROVED" ? "green" : "gray"}
+                  role="switch"
+                  aria-checked={reply.status === "APPROVED"}
+                  onClick={() =>
+                    onUpdateStatus(reply.status === "APPROVED" ? "PENDING" : "APPROVED")
+                  }
+                  isDisabled={isDisabled || reply.isAnonymized}
+                />
+                <IconButtonWithTooltip
+                  data-action="reject-reply"
+                  icon={<CloseIcon />}
+                  label={intl.formatMessage({
+                    id: "petition-replies.petition-field-reply.reject",
+                    defaultMessage: "Reject",
+                  })}
+                  size="xs"
+                  placement="bottom"
+                  role="switch"
+                  colorScheme={reply.status === "REJECTED" ? "red" : "gray"}
+                  aria-checked={reply.status === "REJECTED"}
+                  onClick={() =>
+                    onUpdateStatus(reply.status === "REJECTED" ? "PENDING" : "REJECTED")
+                  }
+                  isDisabled={isDisabled || reply.isAnonymized}
+                />
+              </Stack>
+            ) : null}
+          </GridItem>
+        </Fragment>
+      ))}
+      <GridItem borderRight="2px solid" borderColor="gray.200" />
+      <GridItem fontSize="sm" colSpan={2} marginLeft={2}>
+        {isFileTypeField(reply.field!.type) && reply.content.uploadComplete === false ? (
+          <Text color="red.500">
+            <FormattedMessage
+              id="petition-replies.petition-field-reply.file-upload.file-incomplete"
+              defaultMessage="File upload is incomplete"
+            />
+          </Text>
+        ) : (
+          <Text color="gray.500">
+            {reply.updatedBy?.__typename === "User" && reply.updatedBy.isMe ? (
+              <FormattedMessage id="generic.you" defaultMessage="You" />
+            ) : (
+              <UserOrContactReference userOrAccess={reply.updatedBy} isLink={false} />
+            )}
+            {", "}
+            <DateTime as="span" value={reply.createdAt} format={FORMATS.LLL} />
+          </Text>
+        )}
+      </GridItem>
+    </Grid>
   );
 }
 
