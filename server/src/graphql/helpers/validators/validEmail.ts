@@ -19,7 +19,10 @@ export function validEmail<TypeName extends string, FieldName extends string>(
         unMaybeArray(emails),
         async (email) => {
           if (!(await ctx.emails.validateEmail(email))) {
-            throw new ArgValidationError(info, argName, `${email} is not a valid email.`);
+            throw new ArgValidationError(info, argName, `${email} is not a valid email.`, {
+              email,
+              error_code: "INVALID_EMAIL_ERROR",
+            });
           }
         },
         { concurrency: 20 }

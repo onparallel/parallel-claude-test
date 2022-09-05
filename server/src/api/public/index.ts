@@ -984,71 +984,71 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
     tags: ["Parallels"],
   },
   async ({ client, params, body, query }) => {
-    const contactIds = await pMap(
-      body.contacts,
-      async (item) => {
-        if (typeof item === "string") {
-          return item;
-        } else {
-          const { email, ...data } = item;
-          const _query = gql`
-            query CreatePetitionRecipients_contact($email: String!) {
-              contacts: contactsByEmail(emails: [$email]) {
-                id
-                firstName
-                lastName
+    try {
+      const contactIds = await pMap(
+        body.contacts,
+        async (item) => {
+          if (typeof item === "string") {
+            return item;
+          } else {
+            const { email, ...data } = item;
+            const _query = gql`
+              query CreatePetitionRecipients_contact($email: String!) {
+                contacts: contactsByEmail(emails: [$email]) {
+                  id
+                  firstName
+                  lastName
+                }
               }
-            }
-          `;
-          const result = await client.request(CreatePetitionRecipients_contactDocument, {
-            email,
-          });
-          const contact = result.contacts[0];
-          if (contact) {
-            if (
-              (contact.firstName !== data.firstName && isDefined(data.firstName)) ||
-              (contact.lastName !== data.lastName && isDefined(data.lastName))
-            ) {
+            `;
+            const result = await client.request(CreatePetitionRecipients_contactDocument, {
+              email,
+            });
+            const contact = result.contacts[0];
+            if (contact) {
+              if (
+                (contact.firstName !== data.firstName && isDefined(data.firstName)) ||
+                (contact.lastName !== data.lastName && isDefined(data.lastName))
+              ) {
+                const _mutation = gql`
+                  mutation CreatePetitionRecipients_updateContact(
+                    $contactId: GID!
+                    $data: UpdateContactInput!
+                  ) {
+                    updateContact(id: $contactId, data: $data) {
+                      id
+                    }
+                  }
+                `;
+                await client.request(CreatePetitionRecipients_updateContactDocument, {
+                  contactId: contact.id,
+                  data,
+                });
+              }
+              return contact.id;
+            } else {
               const _mutation = gql`
-                mutation CreatePetitionRecipients_updateContact(
-                  $contactId: GID!
-                  $data: UpdateContactInput!
-                ) {
-                  updateContact(id: $contactId, data: $data) {
+                mutation CreatePetitionRecipients_createContact($data: CreateContactInput!) {
+                  createContact(data: $data) {
                     id
                   }
                 }
               `;
-              await client.request(CreatePetitionRecipients_updateContactDocument, {
-                contactId: contact.id,
-                data,
+              const result = await client.request(CreatePetitionRecipients_createContactDocument, {
+                data: item,
               });
+              return result.createContact.id;
             }
-            return contact.id;
-          } else {
-            const _mutation = gql`
-              mutation CreatePetitionRecipients_createContact($data: CreateContactInput!) {
-                createContact(data: $data) {
-                  id
-                }
-              }
-            `;
-            const result = await client.request(CreatePetitionRecipients_createContactDocument, {
-              data: item,
-            });
-            return result.createContact.id;
           }
-        }
-      },
-      { concurrency: 3 }
-    );
-    let message = isDefined(body.message)
-      ? body.message.format === "PLAIN_TEXT"
-        ? body.message.content.split("\n").map((line) => ({ children: [{ text: line }] }))
-        : [{ children: [{ text: "" }] }]
-      : null;
-    let subject = body.subject;
-    try {
+        },
+        { concurrency: 3 }
+      );
+      let message = isDefined(body.message)
+        ? body.message.format === "PLAIN_TEXT"
+          ? body.message.content.split("\n").map((line) => ({ children: [{ text: line }] }))
+          : [{ children: [{ text: "" }] }]
+        : null;
+      let subject = body.subject;
       const _query = gql`
         query CreatePetitionRecipients_petition($id: GID!) {
           petition(id: $id) {
@@ -1126,11 +1126,15 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
 
       return Ok(mapPetition(result.sendPetition[0].petition));
     } catch (error: any) {
-      if (
-        error instanceof ClientError &&
-        containsGraphQLError(error, "PETITION_ALREADY_SENT_ERROR")
-      ) {
-        throw new ConflictError("The parallel was already sent to some of the provided contacts");
+      if (error instanceof ClientError) {
+        if (containsGraphQLError(error, "PETITION_ALREADY_SENT_ERROR")) {
+          throw new ConflictError("The parallel was already sent to some of the provided contacts");
+        } else if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+          const { email, error_code: errorCode } = error.response.errors![0].extensions.extra;
+          if (errorCode === "INVALID_EMAIL_ERROR") {
+            throw new BadRequestError(`${email} is not a valid email`);
+          }
+        }
       }
       throw error;
     }
