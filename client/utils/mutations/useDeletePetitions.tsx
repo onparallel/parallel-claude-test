@@ -1,14 +1,16 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { Button, Center, ListItem, Spinner, Stack, Text, UnorderedList } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { PetitionName } from "@parallel/components/common/PetitionName";
+import { PathName } from "@parallel/components/common/PathName";
+import { PetitionNameWithPath } from "@parallel/components/common/PetitionNameWithPath";
 import {
   PetitionBaseType,
   useDeletePetitions_deletePetitionsDocument,
   useDeletePetitions_PetitionBaseFragment,
+  useDeletePetitions_PetitionBaseOrFolderFragment,
   useDeletePetitions_PetitionFolderFragment,
   useDeletePetitions_petitionsDocument,
 } from "@parallel/graphql/__types";
@@ -18,35 +20,21 @@ import { isDefined, partition } from "remeda";
 import { isApolloError } from "../apollo/isApolloError";
 import { withError } from "../promises/withError";
 
-type useDeletePetitions_PetitionBaseOrFolder =
-  | useDeletePetitions_PetitionBaseFragment
-  | useDeletePetitions_PetitionFolderFragment;
-
-function partitionIds(ids: useDeletePetitions_PetitionBaseOrFolder[]) {
-  return partition(ids, (t) => t.__typename === "PetitionFolder") as [
-    useDeletePetitions_PetitionFolderFragment[],
-    useDeletePetitions_PetitionBaseFragment[]
-  ];
-}
-
 export function useDeletePetitions() {
   const intl = useIntl();
   const showErrorDialog = useErrorDialog();
   const confirmDelete = useDialog(ConfirmDeletePetitionsDialog);
   const confirmDeleteSharedPetitions = useDialog(ConfirmDeleteSharedPetitionsDialog);
-
-  const { refetch: fetchPetitions } = useQuery(useDeletePetitions_petitionsDocument, {
-    fetchPolicy: "cache-and-network",
-    skip: true,
-  });
+  const apollo = useApolloClient();
 
   const [deletePetitions] = useMutation(useDeletePetitions_deletePetitionsDocument);
+
   const handleDeletePetitions = async (
-    ids: useDeletePetitions_PetitionBaseOrFolder[],
+    petitionsOrFolders: useDeletePetitions_PetitionBaseOrFolderFragment[],
     type: PetitionBaseType,
     { force, dryrun }: { force?: boolean; dryrun?: boolean }
   ) => {
-    const [folders, petitions] = partitionIds(ids);
+    const [folders, petitions] = partitionFoldersAndPetitions(petitionsOrFolders);
     const petitionIds = petitions.map((p) => p.id);
     const folderIds = folders.map((f) => f.folderId);
 
@@ -62,6 +50,9 @@ export function useDeletePetitions() {
           for (const petitionId of petitionIds) {
             client.evict({ id: petitionId });
           }
+          for (const folderId of folderIds) {
+            client.evict({ id: folderId });
+          }
           client.gc();
         }
       },
@@ -70,13 +61,15 @@ export function useDeletePetitions() {
 
   return useCallback(
     async (
-      ids: useDeletePetitions_PetitionBaseOrFolder[],
+      petitionsOrFolders: useDeletePetitions_PetitionBaseOrFolderFragment[],
       type: PetitionBaseType,
       currentPath?: string
     ) => {
       try {
         // first do a dry-run to check if errors will happen when deleting the petition
-        const [error] = await withError(handleDeletePetitions(ids, type, { dryrun: true }));
+        const [error] = await withError(
+          handleDeletePetitions(petitionsOrFolders, type, { dryrun: true })
+        );
         if (error && isApolloError(error, "DELETE_SHARED_PETITION_ERROR")) {
           // some of the petitions are shared by me to other users, show a confirmation dialog before deleting
           await confirmDeleteSharedPetitions({
@@ -85,15 +78,16 @@ export function useDeletePetitions() {
             currentPath,
           });
         } else if (!error) {
-          await confirmDelete({ ids, type });
+          await confirmDelete({ petitionsOrFolders: petitionsOrFolders, type });
         } else {
           throw error;
         }
-        await handleDeletePetitions(ids, type, { force: true });
+        await handleDeletePetitions(petitionsOrFolders, type, { force: true });
       } catch (error: any) {
         if (isApolloError(error)) {
-          const { data } = await fetchPetitions({
-            ids: error.graphQLErrors[0]?.extensions?.petitionIds as string[],
+          const { data } = await apollo.query({
+            query: useDeletePetitions_petitionsDocument,
+            variables: { ids: error.graphQLErrors[0]?.extensions?.petitionIds as string[] },
           });
 
           const errorHeader = (
@@ -122,7 +116,7 @@ export function useDeletePetitions() {
                     defaultMessage="The <b>{name}</b> {type, select, PETITION {parallel} other{template}} cannot be deleted because it has been shared with you through a team."
                     values={{
                       name: (
-                        <PetitionName
+                        <PetitionNameWithPath
                           petition={conflictingPetitions[0]!}
                           relativePath={currentPath}
                         />
@@ -140,7 +134,7 @@ export function useDeletePetitions() {
                     <UnorderedList paddingLeft={4} pt={2}>
                       {conflictingPetitions.map((petition) => (
                         <ListItem key={petition!.id}>
-                          <PetitionName petition={petition!} relativePath={currentPath} />
+                          <PetitionNameWithPath petition={petition!} relativePath={currentPath} />
                         </ListItem>
                       ))}
                     </UnorderedList>
@@ -158,7 +152,7 @@ export function useDeletePetitions() {
                     defaultMessage="The <b>{name}</b> template cannot be deleted because it is public."
                     values={{
                       name: (
-                        <PetitionName
+                        <PetitionNameWithPath
                           petition={conflictingPetitions[0]!}
                           relativePath={currentPath}
                         />
@@ -174,7 +168,7 @@ export function useDeletePetitions() {
                     <UnorderedList paddingLeft={2} pt={2}>
                       {conflictingPetitions.map((petition) => (
                         <ListItem key={petition!.id}>
-                          <PetitionName petition={petition!} relativePath={currentPath} />
+                          <PetitionNameWithPath petition={petition!} relativePath={currentPath} />
                         </ListItem>
                       ))}
                     </UnorderedList>
@@ -191,96 +185,71 @@ export function useDeletePetitions() {
 }
 
 function ConfirmDeletePetitionsDialog({
-  ids,
+  petitionsOrFolders,
   type,
   ...props
 }: DialogProps<{
-  ids: useDeletePetitions_PetitionBaseOrFolder[];
+  petitionsOrFolders: useDeletePetitions_PetitionBaseOrFolderFragment[];
   type: PetitionBaseType;
 }>) {
   const intl = useIntl();
-  const [folders, petitions] = partitionIds(ids);
+  const [folders, petitions] = partitionFoldersAndPetitions(petitionsOrFolders);
 
-  const isTemplate = type === "TEMPLATE";
+  const folderPetitionCount = folders.reduce((acc, curr) => acc + curr.petitionCount, 0);
+  const count = folderPetitionCount + petitions.length;
 
   return (
     <ConfirmDialog
       header={
-        <FormattedMessage
-          id="component.delete-petitions.confirm-delete-petitions.header"
-          defaultMessage="Delete {petitionsAndFolders}"
-          values={{
-            petitionsAndFolders: intl.formatList(
-              [
-                petitions.length > 0
-                  ? isTemplate
-                    ? intl.formatMessage(
-                        {
-                          id: "component.delete-petitions.confirm-delete-templates.header-part",
-                          defaultMessage: "{count, plural, =1{# template} other {# templates}}",
-                        },
-                        { count: petitions.length }
-                      )
-                    : intl.formatMessage(
-                        {
-                          id: "component.delete-petitions.confirm-delete-petitions.header-part",
-                          defaultMessage: "{count, plural, =1{# parallel} other {# parallels}}",
-                        },
-                        { count: petitions.length }
-                      )
-                  : null,
-                ,
-                folders.length > 0
-                  ? intl.formatMessage(
-                      {
-                        id: "component.delete-petitions.confirm-delete-folders.header-part",
-                        defaultMessage: "{count, plural, =1{# folder} other {# folders}}",
-                      },
-                      { count: folders.length }
-                    )
-                  : null,
-              ].filter(isDefined)
-            ),
-          }}
-        />
+        type === "TEMPLATE" ? (
+          <FormattedMessage
+            id="component.confirm-delete-petitions-dialog.template-header"
+            defaultMessage="Delete {count, plural, =1 {template} other {templates}}"
+            values={{ count }}
+          />
+        ) : (
+          <FormattedMessage
+            id="component.confirm-delete-petitions-dialog.petition-header"
+            defaultMessage="Delete {count, plural, =1 {parallel} other {parallels}}"
+            values={{ count }}
+          />
+        )
       }
       body={
         <FormattedMessage
-          id="component.delete-petitions.confirm-delete-petitions.body"
-          defaultMessage="Are you sure you want to delete {petitionsAndFolders}?"
+          id="component.confirm-delete-petitions-dialog.body"
+          defaultMessage="Are you sure you want to delete {list}?"
           values={{
-            petitionsAndFolders: intl.formatList(
+            list: intl.formatList(
               [
                 folders.length > 0
                   ? intl.formatMessage(
                       {
-                        id: "component.delete-petitions.confirm-delete-folders.body-part",
+                        id: "component.delete-petitions.confirm-delete-folders.part-folders",
                         defaultMessage:
-                          "{count, plural, =1{<b>#</b> folder} other {<b>#</b> folders}}",
+                          "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected folders}} ({petitionCount, plural, =1{# {type, select, TEMPLATE {template} other {parallel}}} other {# {type, select, TEMPLATE {templates} other {parallels}}}})",
                       },
                       {
                         count: folders.length,
+                        name: <PathName path={folders[0].path} type={type} />,
+                        petitionCount: folderPetitionCount,
+                        type,
                       }
                     )
                   : null,
                 petitions.length > 0
-                  ? isTemplate
-                    ? intl.formatMessage(
-                        {
-                          id: "component.delete-petitions.confirm-delete-templates.body-part",
-                          defaultMessage:
-                            "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected templates}}",
-                        },
-                        { count: petitions.length, name: <PetitionName petition={petitions[0]} /> }
-                      )
-                    : intl.formatMessage(
-                        {
-                          id: "component.delete-petitions.confirm-delete-petitions.body-part",
-                          defaultMessage:
-                            "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected parallels}}",
-                        },
-                        { count: petitions.length, name: <PetitionName petition={petitions[0]} /> }
-                      )
+                  ? intl.formatMessage(
+                      {
+                        id: "component.confirm-delete-petitions-dialog.part-petitions",
+                        defaultMessage:
+                          "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected {type, select, TEMPLATE {templates} other {parallels}}}}",
+                      },
+                      {
+                        count: petitions.length,
+                        name: <PetitionNameWithPath petition={petitions[0]} />,
+                        type,
+                      }
+                    )
                   : null,
               ].filter(isDefined)
             ),
@@ -313,14 +282,13 @@ function ConfirmDeleteSharedPetitionsDialog({
   });
 
   const petitions = data?.petitionsById ?? [];
-  const isTemplate = type === "TEMPLATE";
 
   const count = petitionIds.length;
 
   return (
     <ConfirmDialog
       header={
-        isTemplate ? (
+        type === "TEMPLATE" ? (
           <FormattedMessage
             id="component.delete-shared-petitions-dialog.template-header"
             defaultMessage="Delete shared {count, plural, =1 {template} other {templates}}"
@@ -336,7 +304,7 @@ function ConfirmDeleteSharedPetitionsDialog({
       }
       body={
         <Stack>
-          {isTemplate ? (
+          {type === "TEMPLATE" ? (
             <Text>
               <FormattedMessage
                 id="component.delete-shared-petitions-dialog.template-body-1"
@@ -357,8 +325,8 @@ function ConfirmDeleteSharedPetitionsDialog({
           <Text>
             <FormattedMessage
               id="component.delete-shared-petitions-dialog.body-2"
-              defaultMessage="Are you sure you want to delete the following {isTemplate, select, true{templates} other{parallels}}?"
-              values={{ isTemplate }}
+              defaultMessage="Are you sure you want to delete the following {type, select, TEMPLATE{templates} other{parallels}}?"
+              values={{ type }}
             />
           </Text>
           {loading ? (
@@ -372,10 +340,10 @@ function ConfirmDeleteSharedPetitionsDialog({
               />
             </Center>
           ) : (
-            <UnorderedList paddingLeft={4} pt={2}>
-              {petitions?.map((petition) => (
+            <UnorderedList paddingLeft={4}>
+              {petitions.map((petition) => (
                 <ListItem key={petition!.id}>
-                  <PetitionName petition={petition!} relativePath={currentPath} />
+                  <PetitionNameWithPath petition={petition!} relativePath={currentPath} />
                 </ListItem>
               ))}
             </UnorderedList>
@@ -393,20 +361,39 @@ function ConfirmDeleteSharedPetitionsDialog({
 }
 
 useDeletePetitions.fragments = {
-  PetitionBase: gql`
-    fragment useDeletePetitions_PetitionBase on PetitionBase {
-      id
-      path
-      ...PetitionName_PetitionBase
-    }
-    ${PetitionName.fragments.PetitionBase}
-  `,
-  PetitionFolder: gql`
-    fragment useDeletePetitions_PetitionFolder on PetitionFolder {
-      folderId: id
-      path
-    }
-  `,
+  get PetitionBaseOrFolder() {
+    return gql`
+      fragment useDeletePetitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
+        ... on PetitionBase {
+          ...useDeletePetitions_PetitionBase
+        }
+        ... on PetitionFolder {
+          ...useDeletePetitions_PetitionFolder
+        }
+      }
+      ${this.PetitionBase}
+      ${this.PetitionFolder}
+    `;
+  },
+  get PetitionBase() {
+    return gql`
+      fragment useDeletePetitions_PetitionBase on PetitionBase {
+        id
+        path
+        ...PetitionName_PetitionBase
+      }
+      ${PetitionNameWithPath.fragments.PetitionBase}
+    `;
+  },
+  get PetitionFolder() {
+    return gql`
+      fragment useDeletePetitions_PetitionFolder on PetitionFolder {
+        folderId: id
+        path
+        petitionCount
+      }
+    `;
+  },
 };
 
 const _queries = [
@@ -433,3 +420,10 @@ const _mutations = [
     }
   `,
 ];
+
+function partitionFoldersAndPetitions(ids: useDeletePetitions_PetitionBaseOrFolderFragment[]) {
+  return partition(ids, (t) => t.__typename === "PetitionFolder") as [
+    useDeletePetitions_PetitionFolderFragment[],
+    useDeletePetitions_PetitionBaseFragment[]
+  ];
+}

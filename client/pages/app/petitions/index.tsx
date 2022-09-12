@@ -487,8 +487,8 @@ Petitions.fragments = {
   `,
   PetitionBaseOrFolder: gql`
     fragment Petitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
+      ...useDeletePetitions_PetitionBaseOrFolder
       ... on PetitionBase {
-        ...useDeletePetitions_PetitionBase
         ...usePetitionsTableColumns_PetitionBase
         myEffectivePermission {
           permissionType
@@ -498,15 +498,13 @@ Petitions.fragments = {
         isPublic
       }
       ... on PetitionFolder {
-        ...useDeletePetitions_PetitionFolder
         ...usePetitionsTableColumns_PetitionFolder
         path
         minimumPermissionType
       }
     }
-    ${useDeletePetitions.fragments.PetitionBase}
+    ${useDeletePetitions.fragments.PetitionBaseOrFolder}
     ${usePetitionsTableColumns.fragments.PetitionBase}
-    ${useDeletePetitions.fragments.PetitionFolder}
     ${usePetitionsTableColumns.fragments.PetitionFolder}
   `,
 };

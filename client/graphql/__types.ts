@@ -20077,13 +20077,13 @@ export type Petitions_UserFragment = { __typename?: "User"; role: OrganizationRo
 
 export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
   __typename?: "Petition";
-  id: string;
-  path: string;
   sentAt?: string | null;
+  id: string;
   name?: string | null;
   createdAt: string;
   status: PetitionStatus;
   isRestricted: boolean;
+  path: string;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -20150,6 +20150,7 @@ export type Petitions_PetitionBaseOrFolder_PetitionFolder_Fragment = {
   __typename?: "PetitionFolder";
   path: string;
   minimumPermissionType: PetitionPermissionType;
+  petitionCount: number;
   folderId: string;
   folderName: string;
 };
@@ -20157,14 +20158,14 @@ export type Petitions_PetitionBaseOrFolder_PetitionFolder_Fragment = {
 export type Petitions_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   isPublic: boolean;
-  id: string;
-  path: string;
   descriptionExcerpt?: string | null;
+  id: string;
   name?: string | null;
   createdAt: string;
   locale: PetitionLocale;
   isRestricted: boolean;
   anonymizeAfterMonths?: number | null;
+  path: string;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -20284,13 +20285,13 @@ export type Petitions_petitionsQuery = {
     items: Array<
       | {
           __typename?: "Petition";
-          id: string;
-          path: string;
           sentAt?: string | null;
+          id: string;
           name?: string | null;
           createdAt: string;
           status: PetitionStatus;
           isRestricted: boolean;
+          path: string;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
             permissionType: PetitionPermissionType;
@@ -20361,20 +20362,21 @@ export type Petitions_petitionsQuery = {
           __typename?: "PetitionFolder";
           path: string;
           minimumPermissionType: PetitionPermissionType;
+          petitionCount: number;
           folderId: string;
           folderName: string;
         }
       | {
           __typename?: "PetitionTemplate";
           isPublic: boolean;
-          id: string;
-          path: string;
           descriptionExcerpt?: string | null;
+          id: string;
           name?: string | null;
           createdAt: string;
           locale: PetitionLocale;
           isRestricted: boolean;
           anonymizeAfterMonths?: number | null;
+          path: string;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
             permissionType: PetitionPermissionType;
@@ -22363,6 +22365,32 @@ export type useDeleteContacts_ContactFragment = {
   email: string;
 };
 
+export type useDeletePetitions_PetitionBaseOrFolder_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  path: string;
+  name?: string | null;
+};
+
+export type useDeletePetitions_PetitionBaseOrFolder_PetitionFolder_Fragment = {
+  __typename?: "PetitionFolder";
+  path: string;
+  petitionCount: number;
+  folderId: string;
+};
+
+export type useDeletePetitions_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  path: string;
+  name?: string | null;
+};
+
+export type useDeletePetitions_PetitionBaseOrFolderFragment =
+  | useDeletePetitions_PetitionBaseOrFolder_Petition_Fragment
+  | useDeletePetitions_PetitionBaseOrFolder_PetitionFolder_Fragment
+  | useDeletePetitions_PetitionBaseOrFolder_PetitionTemplate_Fragment;
+
 export type useDeletePetitions_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
@@ -22384,6 +22412,7 @@ export type useDeletePetitions_PetitionBaseFragment =
 export type useDeletePetitions_PetitionFolderFragment = {
   __typename?: "PetitionFolder";
   path: string;
+  petitionCount: number;
   folderId: string;
 };
 
@@ -26704,6 +26733,25 @@ export const Petitions_UserFragmentDoc = gql`
     role
   }
 ` as unknown as DocumentNode<Petitions_UserFragment, unknown>;
+export const useDeletePetitions_PetitionFolderFragmentDoc = gql`
+  fragment useDeletePetitions_PetitionFolder on PetitionFolder {
+    folderId: id
+    path
+    petitionCount
+  }
+` as unknown as DocumentNode<useDeletePetitions_PetitionFolderFragment, unknown>;
+export const useDeletePetitions_PetitionBaseOrFolderFragmentDoc = gql`
+  fragment useDeletePetitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
+    ... on PetitionBase {
+      ...useDeletePetitions_PetitionBase
+    }
+    ... on PetitionFolder {
+      ...useDeletePetitions_PetitionFolder
+    }
+  }
+  ${useDeletePetitions_PetitionBaseFragmentDoc}
+  ${useDeletePetitions_PetitionFolderFragmentDoc}
+` as unknown as DocumentNode<useDeletePetitions_PetitionBaseOrFolderFragment, unknown>;
 export const PetitionTagListCellContent_TagFragmentDoc = gql`
   fragment PetitionTagListCellContent_Tag on Tag {
     id
@@ -26768,12 +26816,6 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
   ${PetitionSignatureCellContent_PetitionFragmentDoc}
   ${TemplateActiveSettingsIcons_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<usePetitionsTableColumns_PetitionBaseFragment, unknown>;
-export const useDeletePetitions_PetitionFolderFragmentDoc = gql`
-  fragment useDeletePetitions_PetitionFolder on PetitionFolder {
-    folderId: id
-    path
-  }
-` as unknown as DocumentNode<useDeletePetitions_PetitionFolderFragment, unknown>;
 export const usePetitionsTableColumns_PetitionFolderFragmentDoc = gql`
   fragment usePetitionsTableColumns_PetitionFolder on PetitionFolder {
     folderId: id
@@ -26782,8 +26824,8 @@ export const usePetitionsTableColumns_PetitionFolderFragmentDoc = gql`
 ` as unknown as DocumentNode<usePetitionsTableColumns_PetitionFolderFragment, unknown>;
 export const Petitions_PetitionBaseOrFolderFragmentDoc = gql`
   fragment Petitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
+    ...useDeletePetitions_PetitionBaseOrFolder
     ... on PetitionBase {
-      ...useDeletePetitions_PetitionBase
       ...usePetitionsTableColumns_PetitionBase
       myEffectivePermission {
         permissionType
@@ -26793,15 +26835,13 @@ export const Petitions_PetitionBaseOrFolderFragmentDoc = gql`
       isPublic
     }
     ... on PetitionFolder {
-      ...useDeletePetitions_PetitionFolder
       ...usePetitionsTableColumns_PetitionFolder
       path
       minimumPermissionType
     }
   }
-  ${useDeletePetitions_PetitionBaseFragmentDoc}
+  ${useDeletePetitions_PetitionBaseOrFolderFragmentDoc}
   ${usePetitionsTableColumns_PetitionBaseFragmentDoc}
-  ${useDeletePetitions_PetitionFolderFragmentDoc}
   ${usePetitionsTableColumns_PetitionFolderFragmentDoc}
 ` as unknown as DocumentNode<Petitions_PetitionBaseOrFolderFragment, unknown>;
 export const TemplateCard_PetitionTemplateFragmentDoc = gql`

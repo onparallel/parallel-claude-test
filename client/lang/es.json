@@ -490,6 +490,26 @@
     "context": "Delete {count, plural, =1{{email}} other {# contacts}}"
   },
   {
+    "term": "component.confirm-delete-petitions-dialog.body",
+    "definition": "¿Estás seguro de que quieres eliminar {list}?",
+    "context": "Are you sure you want to delete {list}?"
+  },
+  {
+    "term": "component.confirm-delete-petitions-dialog.part-petitions",
+    "definition": "{count, plural, =1{<b>{name}</b>} other {{type, select, TEMPLATE {las <b>#</b> plantillas seleccionadas} other {los <b>#</b> parallels seleccionados}}}}",
+    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected {type, select, TEMPLATE {templates} other {parallels}}}}"
+  },
+  {
+    "term": "component.confirm-delete-petitions-dialog.petition-header",
+    "definition": "Eliminar {count, plural, =1 {parallel} other {parallels}}",
+    "context": "Delete {count, plural, =1 {parallel} other {parallels}}"
+  },
+  {
+    "term": "component.confirm-delete-petitions-dialog.template-header",
+    "definition": "Eliminar {count, plural, =1 {plantilla} other {plantillas}}",
+    "context": "Delete {count, plural, =1 {template} other {templates}}"
+  },
+  {
     "term": "component.confirm-disable-ongoing-signature-petition-close.body",
     "definition": "Hay un proceso de firma digital pendiente. Si cierras este parallel, el proceso será cancelado.",
     "context": "There is an ongoing eSignature process. If you close this parallel now, the process will be cancelled."
@@ -1000,44 +1020,9 @@
     "context": "Any applications or scripts using this event {count, plural, =1 {subscription} other {subscriptions}} will no longer receive event notifications from Parallel."
   },
   {
-    "term": "component.delete-petitions.confirm-delete-folders.body-part",
-    "definition": "{count, plural, =1{<b>#</b> carpeta} other {<b>#</b> carpetas}}",
-    "context": "{count, plural, =1{<b>#</b> folder} other {<b>#</b> folders}}"
-  },
-  {
-    "term": "component.delete-petitions.confirm-delete-folders.header-part",
-    "definition": "{count, plural, =1{# carpeta} other {# carpetas}}",
-    "context": "{count, plural, =1{# folder} other {# folders}}"
-  },
-  {
-    "term": "component.delete-petitions.confirm-delete-petitions.body",
-    "definition": "¿Está seguro de que quiere eliminar {petitionsAndFolders}?",
-    "context": "Are you sure you want to delete {petitionsAndFolders}?"
-  },
-  {
-    "term": "component.delete-petitions.confirm-delete-petitions.body-part",
-    "definition": "{count, plural, =1{<b>{name}</b>} other {los <b>#</b> parallels seleccionados}}",
-    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected parallels}}"
-  },
-  {
-    "term": "component.delete-petitions.confirm-delete-petitions.header",
-    "definition": "Eliminar {petitionsAndFolders}",
-    "context": "Delete {petitionsAndFolders}"
-  },
-  {
-    "term": "component.delete-petitions.confirm-delete-petitions.header-part",
-    "definition": "{count, plural, =1{# parallel} other {# parallels}}",
-    "context": "{count, plural, =1{# parallel} other {# parallels}}"
-  },
-  {
-    "term": "component.delete-petitions.confirm-delete-templates.body-part",
-    "definition": "{count, plural, =1{<b>{name}</b>} other {las <b>#</b> plantillas seleccionadas}}",
-    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected templates}}"
-  },
-  {
-    "term": "component.delete-petitions.confirm-delete-templates.header-part",
-    "definition": "{count, plural, =1{# plantilla} other {# plantillas}}",
-    "context": "{count, plural, =1{# template} other {# templates}}"
+    "term": "component.delete-petitions.confirm-delete-folders.part-folders",
+    "definition": "{count, plural, =1{<b>{name}</b>} other {las <b>#</b> carpetas seleccionadas}} ({petitionCount, plural, =1{# {type, select, TEMPLATE {plantilla} other {parallel}}} other {# {type, select, TEMPLATE {plantillas} other {parallels}}}})",
+    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected folders}} ({petitionCount, plural, =1{# {type, select, TEMPLATE {template} other {parallel}}} other {# {type, select, TEMPLATE {templates} other {parallels}}}})"
   },
   {
     "term": "component.delete-petitions.error-header",
@@ -1066,8 +1051,8 @@
   },
   {
     "term": "component.delete-shared-petitions-dialog.body-2",
-    "definition": "¿Estás seguro de querer eliminar {isTemplate, select, true{las siguientes plantillas} other{los siguientes parallels}}?",
-    "context": "Are you sure you want to delete the following {isTemplate, select, true{templates} other{parallels}}?"
+    "definition": "¿Estás seguro de querer eliminar {type, select, TEMPLATE{las siguientes plantillas} other{los siguientes parallels}}?",
+    "context": "Are you sure you want to delete the following {type, select, TEMPLATE{templates} other{parallels}}?"
   },
   {
     "term": "component.delete-shared-petitions-dialog.petition-body-1",

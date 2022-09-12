@@ -27,7 +27,7 @@ import {
 import { ChevronDownIcon, DeleteIcon, UserArrowIcon, UsersIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { PetitionName } from "@parallel/components/common/PetitionName";
+import { PetitionNameWithPath } from "@parallel/components/common/PetitionNameWithPath";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import {
   NewPetition_templatesDocument,
@@ -631,7 +631,10 @@ export function PetitionSharingDialog({
                         <UnorderedList paddingLeft={4} pt={2}>
                           {petitionsRead.map((petition) => (
                             <ListItem key={petition.id}>
-                              <PetitionName petition={petition} relativePath={currentPath} />
+                              <PetitionNameWithPath
+                                petition={petition}
+                                relativePath={currentPath}
+                              />
                             </ListItem>
                           ))}
                         </UnorderedList>
