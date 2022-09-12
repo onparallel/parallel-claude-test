@@ -117,7 +117,7 @@ export function PetitionListHeader({
   const handleCreateNewParallelOrTemplate = async () => {
     try {
       if (state.type === "PETITION") {
-        navigate(`/app/petitions/new?${new URLSearchParams({ from: "new-parallel-button" })}`);
+        navigate(`/app/petitions/new`);
       } else {
         const templateId = await showNewTemplateDialog({});
         if (!templateId) {

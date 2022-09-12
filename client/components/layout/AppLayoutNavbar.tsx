@@ -171,7 +171,7 @@ export const AppLayoutNavbar = Object.assign(
             </NakedLink>
           </Center>
           <Flex justifyContent="center" alignItems="center">
-            <NakedLink href={`/app/petitions/new?${new URLSearchParams({ from: "plus-button" })}`}>
+            <NakedLink href={`/app/petitions/new`}>
               <IconButtonWithTooltip
                 data-link="create-petition"
                 as="a"
