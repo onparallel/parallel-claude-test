@@ -10,7 +10,8 @@ export const EMAIL_REGEX =
 
 export function validEmail<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<string> | null | undefined,
-  argName: string
+  argName: string,
+  onlyRegex = false
 ) {
   return (async (_, args, ctx, info) => {
     const emails = prop(args);
@@ -18,7 +19,7 @@ export function validEmail<TypeName extends string, FieldName extends string>(
       await pMap(
         unMaybeArray(emails),
         async (email) => {
-          if (!(await ctx.emails.validateEmail(email))) {
+          if (!(await ctx.emails.validateEmail(email, onlyRegex))) {
             throw new ArgValidationError(info, argName, `${email} is not a valid email.`, {
               email,
               error_code: "INVALID_EMAIL_ERROR",
