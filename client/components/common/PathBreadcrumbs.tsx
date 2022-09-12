@@ -21,7 +21,7 @@ export const PathBreadcrumbs = chakraForwardRef<"nav", PathBreadcrumbsProps>(
             type === "PETITION"
               ? intl.formatMessage({ id: "generic.root-petitions", defaultMessage: "Parallels" })
               : intl.formatMessage({ id: "generic.root-templates", defaultMessage: "Templates" }),
-          url: pathUrl("/"),
+          getUrl: () => pathUrl("/"),
           isCurrent: path === "/",
         },
       ];
@@ -34,7 +34,7 @@ export const PathBreadcrumbs = chakraForwardRef<"nav", PathBreadcrumbsProps>(
               const p = "/" + parts.slice(0, i + 1).join("/") + "/";
               return {
                 text: part,
-                url: pathUrl(p),
+                getUrl: () => pathUrl(p),
                 isCurrent: path === p,
               };
             })
@@ -44,9 +44,9 @@ export const PathBreadcrumbs = chakraForwardRef<"nav", PathBreadcrumbsProps>(
     }, [path, type, intl.locale]);
     return (
       <Breadcrumb ref={ref} height={8} display="flex" alignItems="center" {...props}>
-        {breadcrumbs.map(({ text, url, isCurrent }, i) => (
+        {breadcrumbs.map(({ text, getUrl, isCurrent }, i) => (
           <BreadcrumbItem key={i}>
-            <NakedLink href={url}>
+            <NakedLink href={getUrl()}>
               <BreadcrumbLink
                 isCurrentPage={isCurrent}
                 color="primary.600"
