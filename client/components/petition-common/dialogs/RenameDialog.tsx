@@ -6,7 +6,6 @@ import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterW
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
 
 interface RenameDialogProps {
   name: string | null | undefined;
@@ -79,27 +78,25 @@ function RenameDialog({
               )}
             </FormLabel>
             <Input {...nameProps} />
-            {isDefined(errors.name) ? (
-              <FormErrorMessage>
-                {errors.name.type === "maxLength" ? (
-                  <FormattedMessage
-                    id="component.rename-dialog.max-length-error"
-                    defaultMessage="Name cannot exceed {max} characters"
-                    values={{ max: 255 }}
-                  />
-                ) : errors.name.type === "noSlash" ? (
-                  <FormattedMessage
-                    id="component.rename-dialog.no-slash-error"
-                    defaultMessage="Name can't contain the slash character /"
-                  />
-                ) : errors.name.type === "required" ? (
-                  <FormattedMessage
-                    id="component.rename-dialog.required-error"
-                    defaultMessage="Please enter a name"
-                  />
-                ) : null}
-              </FormErrorMessage>
-            ) : null}
+            <FormErrorMessage>
+              {errors.name?.type === "maxLength" ? (
+                <FormattedMessage
+                  id="generic.folder-name.max-length-error"
+                  defaultMessage="Name cannot exceed {max} characters"
+                  values={{ max: 255 }}
+                />
+              ) : errors.name?.type === "noSlash" ? (
+                <FormattedMessage
+                  id="generic.folder-name.no-slash-error"
+                  defaultMessage="Name can't contain the slash character /"
+                />
+              ) : errors.name?.type === "required" ? (
+                <FormattedMessage
+                  id="generic.folder-name.required-error"
+                  defaultMessage="Please enter a name"
+                />
+              ) : null}
+            </FormErrorMessage>
           </FormControl>
         </Stack>
       }

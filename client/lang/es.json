@@ -890,6 +890,16 @@
     "context": "Please, select at least one {isTemplate, select, true{template} other{parallel}} in the current folder"
   },
   {
+    "term": "component.create-folder-dialog.placeholder-parallels",
+    "definition": "Selecciona parallels para añadir a la carpeta",
+    "context": "Select parallels to add to the folder"
+  },
+  {
+    "term": "component.create-folder-dialog.placeholder-templates",
+    "definition": "Selecciona plantillas para añadir a la carpeta",
+    "context": "Select templates to add to the folder"
+  },
+  {
     "term": "component.create-group-dialog.confirm-button",
     "definition": "Crear equipo",
     "context": "Create team"
@@ -4175,21 +4185,6 @@
     "context": "Rename template"
   },
   {
-    "term": "component.rename-dialog.max-length-error",
-    "definition": "El nombre no puede superar los {max} carácteres",
-    "context": "Name cannot exceed {max} characters"
-  },
-  {
-    "term": "component.rename-dialog.no-slash-error",
-    "definition": "El nombre no puede contener el carácter \"/\"",
-    "context": "Name can't contain the slash character /"
-  },
-  {
-    "term": "component.rename-dialog.required-error",
-    "definition": "Por favor, ingrese un nombre",
-    "context": "Please enter a name"
-  },
-  {
     "term": "component.replies-field-comment.mark-as-unread",
     "definition": "Marcar como no leído",
     "context": "Mark as unread"
@@ -5610,6 +5605,21 @@
     "context": "Folder name"
   },
   {
+    "term": "generic.folder-name.max-length-error",
+    "definition": "El nombre no puede superar los {max} carácteres",
+    "context": "Name cannot exceed {max} characters"
+  },
+  {
+    "term": "generic.folder-name.no-slash-error",
+    "definition": "El nombre no puede contener el carácter \"/\"",
+    "context": "Name can't contain the slash character /"
+  },
+  {
+    "term": "generic.folder-name.required-error",
+    "definition": "Por favor, ingrese un nombre",
+    "context": "Please enter a name"
+  },
+  {
     "term": "generic.for-example",
     "definition": "Por ejemplo, {example}",
     "context": "E.g. {example}"
@@ -5663,11 +5673,6 @@
     "term": "generic.forms.invalid-first-name-error",
     "definition": "Por favor, introduzca el nombre",
     "context": "Please, enter the first name"
-  },
-  {
-    "term": "generic.forms.invalid-folder-name-error",
-    "definition": "Por favor, introduzca el nombre de la carpeta",
-    "context": "Please, enter the folder name"
   },
   {
     "term": "generic.forms.invalid-group-name-error",

@@ -16,7 +16,7 @@ import {
   CreateFolderDialog_petitionsDocument,
 } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { rsComponent, useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { genericRsComponent, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { isNotEmptyText } from "@parallel/utils/strings";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -56,61 +56,14 @@ function CreateFolderDialog({
   const nameRef = useRef<HTMLInputElement>(null);
   const nameRegisterProps = useRegisterWithRef(nameRef, register, "name", {
     required: true,
-    validate: { isNotEmptyText },
+    validate: { isNotEmptyText, noSlash: (value) => !value.includes("/") },
   });
 
-  const PetitionName = useCallback(function PetitionName({ name }: { name: string | null }) {
-    return name ? (
-      <Text as="span">{name}</Text>
-    ) : (
-      <Text as="span" textStyle="hint">
-        {isTemplate ? (
-          <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
-        ) : (
-          <FormattedMessage id="generic.unnamed-parallel" defaultMessage="Unnamed parallel" />
-        )}
-      </Text>
-    );
-  }, []);
-
-  const reactSelectProps = useReactSelectProps<CreateFolderDialog_PetitionBaseFragment, true>({
-    components: {
-      Option: rsComponent("Option", function (props) {
-        return (
-          <components.Option {...props}>
-            <PetitionName name={props.data.name} />
-          </components.Option>
-        );
-      }),
-      MultiValueLabel: rsComponent("MultiValueLabel", function ({ children, ...props }) {
-        return (
-          <components.MultiValueLabel {...props}>
-            <PetitionName name={props.data.name} />
-          </components.MultiValueLabel>
-        );
-      }),
-      NoOptionsMessage: rsComponent("NoOptionsMessage", function () {
-        return (
-          <Box textAlign="center" color="gray.400" padding={4}>
-            <Text as="div" marginTop={2}>
-              <FormattedMessage
-                id="component.create-folder-dialog.no-options"
-                defaultMessage="We could not find any {isTemplate, select, true{template} other{parallel}} with <i>Editor</i> permission in the current folder"
-                values={{
-                  isTemplate,
-                  i: (chunks: any[]) => (
-                    <Text as="span" fontStyle="italic">
-                      {chunks}
-                    </Text>
-                  ),
-                }}
-              />
-            </Text>
-          </Box>
-        );
-      }),
-    },
-  });
+  const reactSelectProps = useReactSelectProps<
+    CreateFolderDialog_PetitionBaseFragment,
+    true,
+    never
+  >({ components: { Option, MultiValueLabel, NoOptionsMessage } });
 
   const apollo = useApolloClient();
   const loadPetitions = useCallback(
@@ -125,7 +78,7 @@ function CreateFolderDialog({
             path: currentPath,
           },
           search,
-          sortBy: "lastUsedAt_DESC",
+          sortBy: isTemplate ? "lastUsedAt_DESC" : "createdAt_DESC",
         },
       });
 
@@ -165,10 +118,23 @@ function CreateFolderDialog({
             </FormLabel>
             <Input {...nameRegisterProps} />
             <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.invalid-folder-name-error"
-                defaultMessage="Please, enter the folder name"
-              />
+              {errors.name?.type === "maxLength" ? (
+                <FormattedMessage
+                  id="generic.folder-name.max-length-error"
+                  defaultMessage="Name cannot exceed {max} characters"
+                  values={{ max: 255 }}
+                />
+              ) : errors.name?.type === "noSlash" ? (
+                <FormattedMessage
+                  id="generic.folder-name.no-slash-error"
+                  defaultMessage="Name can't contain the slash character /"
+                />
+              ) : errors.name?.type === "required" ? (
+                <FormattedMessage
+                  id="generic.folder-name.required-error"
+                  defaultMessage="Please enter a name"
+                />
+              ) : null}
             </FormErrorMessage>
           </FormControl>
           <FormControl id="petitions" isInvalid={!!errors.petitions}>
@@ -183,10 +149,10 @@ function CreateFolderDialog({
               name="petitions"
               control={control}
               rules={{
-                required: true,
+                validate: { isNotEmptyList: (petitions) => petitions.length > 0 },
               }}
               render={({ field: { onChange, value } }) => (
-                <AsyncSelect<CreateFolderDialog_PetitionBaseFragment, true>
+                <AsyncSelect<CreateFolderDialog_PetitionBaseFragment, true, never>
                   {...reactSelectProps}
                   value={value}
                   isMulti
@@ -198,10 +164,17 @@ function CreateFolderDialog({
                   isClearable
                   getOptionValue={(o) => o.id}
                   getOptionLabel={(o) => o.name ?? ""}
-                  placeholder={intl.formatMessage({
-                    id: "generic.select",
-                    defaultMessage: "Select",
-                  })}
+                  placeholder={
+                    isTemplate
+                      ? intl.formatMessage({
+                          id: "component.create-folder-dialog.placeholder-templates",
+                          defaultMessage: "Select templates to add to the folder",
+                        })
+                      : intl.formatMessage({
+                          id: "component.create-folder-dialog.placeholder-parallels",
+                          defaultMessage: "Select parallels to add to the folder",
+                        })
+                  }
                 />
               )}
             />
@@ -216,7 +189,7 @@ function CreateFolderDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" isDisabled={false} type="submit">
+        <Button colorScheme="primary" type="submit">
           <FormattedMessage
             id="component.create-folder-dialog.create-folder"
             defaultMessage="Create folder"
@@ -239,7 +212,7 @@ const _fragments = {
   `,
 };
 
-CreateFolderDialog.queries = [
+const _queries = [
   gql`
     query CreateFolderDialog_petitions(
       $offset: Int!
@@ -267,3 +240,71 @@ CreateFolderDialog.queries = [
 export function useCreateFolderDialog() {
   return useDialog(CreateFolderDialog);
 }
+
+function PetitionName({
+  name,
+  isTemplate,
+}: {
+  name: string | null | undefined;
+  isTemplate: boolean;
+}) {
+  return name ? (
+    <Text as="span">{name}</Text>
+  ) : (
+    <Text as="span" textStyle="hint">
+      {isTemplate ? (
+        <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
+      ) : (
+        <FormattedMessage id="generic.unnamed-parallel" defaultMessage="Unnamed parallel" />
+      )}
+    </Text>
+  );
+}
+
+const rsComponent = genericRsComponent<
+  CreateFolderDialog_PetitionBaseFragment,
+  true,
+  never,
+  {
+    selectProps: {
+      isTemplate: boolean;
+    };
+  }
+>();
+
+const Option = rsComponent("Option", function (props) {
+  return (
+    <components.Option {...props}>
+      <PetitionName name={props.data.name} isTemplate={props.selectProps.isTemplate} />
+    </components.Option>
+  );
+});
+
+const MultiValueLabel = rsComponent("MultiValueLabel", function ({ children, ...props }) {
+  return (
+    <components.MultiValueLabel {...props}>
+      <PetitionName name={props.data.name} isTemplate={props.selectProps.isTemplate} />
+    </components.MultiValueLabel>
+  );
+});
+
+const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
+  return (
+    <Box textAlign="center" color="gray.400" padding={4}>
+      <Text as="div" marginTop={2}>
+        <FormattedMessage
+          id="component.create-folder-dialog.no-options"
+          defaultMessage="We could not find any {isTemplate, select, true{template} other{parallel}} with <i>Editor</i> permission in the current folder"
+          values={{
+            isTemplate: props.selectProps.isTemplate,
+            i: (chunks: any[]) => (
+              <Text as="span" fontStyle="italic">
+                {chunks}
+              </Text>
+            ),
+          }}
+        />
+      </Text>
+    </Box>
+  );
+});
