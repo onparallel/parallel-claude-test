@@ -1118,6 +1118,7 @@ export interface NexusGenFieldTypes {
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     removePetitionPermission: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
     removeUsersFromGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
+    renameFolder: NexusGenEnums["Success"]; // Success!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
     resendVerificationCode: NexusGenEnums["Result"]; // Result!
     resetTemporaryPassword: NexusGenEnums["Result"]; // Result!
@@ -2696,6 +2697,7 @@ export interface NexusGenFieldTypeNames {
     reactivateAccesses: "PetitionAccess";
     removePetitionPermission: "PetitionBase";
     removeUsersFromGroup: "UserGroup";
+    renameFolder: "Success";
     reopenPetition: "Petition";
     resendVerificationCode: "Result";
     resetTemporaryPassword: "Result";
@@ -4475,6 +4477,12 @@ export interface NexusGenArgTypes {
       // args
       userGroupId: NexusGenScalars["GID"]; // GID!
       userIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    renameFolder: {
+      // args
+      folderId: string; // ID!
+      name?: string | null; // String
+      type: NexusGenEnums["PetitionBaseType"]; // PetitionBaseType!
     };
     reopenPetition: {
       // args

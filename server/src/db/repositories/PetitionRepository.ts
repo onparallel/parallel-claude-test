@@ -5044,7 +5044,7 @@ export class PetitionRepository extends BaseRepository {
           where pp.user_id = ? and pp.deleted_at is null
             and p.is_template = ? and p.deleted_at is null and p.org_id = ?
             and exists(
-              select * from unnest(?) as t(prefix) where starts_with(p.path, prefix)
+              select * from unnest(?::text[]) as t(prefix) where starts_with(p.path, prefix)
             )
           group by p.id
           having min(pp.type) > ?
@@ -5057,24 +5057,28 @@ export class PetitionRepository extends BaseRepository {
 
   async updatePetitionPaths(
     petitionIds: number[],
-    folderPaths: string[],
+    paths: string[],
     source: string,
     destination: string,
     isTemplate: boolean,
     user: User
   ) {
     await this.raw(
-      /* SQL */ `
+      /* sql */ `
         with user_petition_ids as (
-          select p.id from petition p join petition_permission pp on pp.petition_id = p.id
+          select p.id from petition p
+            join petition_permission pp on pp.petition_id = p.id
           where pp.user_id = ? and pp.deleted_at is null
-          and p.is_template = ? and p.deleted_at is null and p.org_id = ?
-          and (p.id in ? or p.path like any (?::text[]))
+            and p.is_template = ? and p.deleted_at is null and p.org_id = ?
+            and (p.id in ? or exists(
+              select * from unnest(?::text[]) as t(prefix) where starts_with(p.path, prefix)
+            ))
         )
         update petition p
-        set "path" = concat(?::text, substring("path", length(?) + 1)),
-        updated_at = NOW(),
-        updated_by = ?
+        set
+          "path" = concat(?::text, substring("path", length(?) + 1)),
+          updated_at = NOW(),
+          updated_by = ?
         from user_petition_ids ids where ids.id = p.id;
       `,
       [
@@ -5082,7 +5086,7 @@ export class PetitionRepository extends BaseRepository {
         isTemplate,
         user.org_id,
         this.sqlIn(petitionIds.length > 0 ? petitionIds : [-1]),
-        this.sqlArray(folderPaths.map((path) => `${path}%`)),
+        this.sqlArray(paths),
         destination,
         source,
         `User:${user.id}`,
@@ -5093,18 +5097,17 @@ export class PetitionRepository extends BaseRepository {
   async getUserPetitionsInsideFolders(paths: string[], isTemplate: boolean, user: User) {
     return await this.raw<Petition>(
       /* sql */ `
-      select p.* from petition p join petition_permission pp on p.id = pp.petition_id
-      where 
-            pp.user_id = ?
-        and pp.deleted_at is null
-        and p.org_id = ?
-        and p.is_template = ?
-        and p.deleted_at is null
-        and p.path like any (?::text[])
+      select p.* from petition p
+        join petition_permission pp on p.id = pp.petition_id
+      where pp.user_id = ? and pp.deleted_at is null
+        and p.is_template = ? and p.deleted_at is null and p.org_id = ?
+        and exists(
+          select * from unnest(?::text[]) as t(prefix) where starts_with(p.path, prefix)
+        )
         group by p.id
         order by p.path asc, p.id asc;
     `,
-      [user.id, user.org_id, isTemplate, this.sqlArray(paths.map((path) => `${path}%`))]
+      [user.id, isTemplate, user.org_id, this.sqlArray(paths)]
     );
   }
 }

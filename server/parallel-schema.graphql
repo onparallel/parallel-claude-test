@@ -986,12 +986,12 @@ type Mutation {
     destination: String!
 
     """
-    PetitionFolder GIDs to be moved
+    PetitionFolder GIDs to be moved.
     """
     folderIds: [ID!]
 
     """
-    Petition to be moved
+    Petition to be moved.
     """
     ids: [GID!]
 
@@ -1231,6 +1231,18 @@ type Mutation {
   Removes users from a user group
   """
   removeUsersFromGroup(userGroupId: GID!, userIds: [GID!]!): UserGroup!
+
+  """
+  Renames a folder.
+  """
+  renameFolder(
+    """
+    PetitionFolder GIDs to be renamed
+    """
+    folderId: ID!
+    name: String
+    type: PetitionBaseType!
+  ): Success!
 
   """
   Reopens the petition

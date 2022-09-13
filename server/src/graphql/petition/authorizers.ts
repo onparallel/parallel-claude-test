@@ -539,7 +539,7 @@ export const petitionHasStatus = createPetitionAuthorizer(
 export function userHasPermissionInFolders<
   TypeName extends string,
   FieldName extends string,
-  TArgIds extends Arg<TypeName, FieldName, string[]>,
+  TArgIds extends Arg<TypeName, FieldName, MaybeArray<string>>,
   TArgType extends Arg<TypeName, FieldName, core.GetGen2<"allTypes", "PetitionBaseType">>
 >(
   folderIdsArg: TArgIds,
@@ -549,7 +549,7 @@ export function userHasPermissionInFolders<
   return async (_, args, ctx) => {
     try {
       const paths = fromGlobalIds(
-        args[folderIdsArg] as unknown as string[],
+        unMaybeArray(args[folderIdsArg] as unknown as MaybeArray<string>),
         "PetitionFolder",
         true
       ).ids;

@@ -57,6 +57,7 @@ import { validateFile } from "../../helpers/validators/validateFile";
 import { validateRegex } from "../../helpers/validators/validateRegex";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 import { validFieldVisibilityJson } from "../../helpers/validators/validFieldVisibility";
+import { validFolderId } from "../../helpers/validators/validFolderId";
 import { validIsDefined } from "../../helpers/validators/validIsDefined";
 import { validPath } from "../../helpers/validators/validPath";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
@@ -2105,13 +2106,14 @@ export const movePetitions = mutationField("movePetitions", {
     )
   ),
   args: {
-    ids: list(nonNull(globalIdArg("Petition", { description: "Petition to be moved" }))),
-    folderIds: list(nonNull(idArg({ description: "PetitionFolder GIDs to be moved" }))),
+    ids: list(nonNull(globalIdArg("Petition", { description: "Petition to be moved." }))),
+    folderIds: list(nonNull(idArg({ description: "PetitionFolder GIDs to be moved." }))),
     source: nonNull(stringArg({ description: "Base path of the entries to move." })),
     destination: nonNull(stringArg({ description: "Destination path." })),
     type: nonNull("PetitionBaseType"),
   },
   validateArgs: validateAnd(
+    validFolderId((args) => args.folderIds, "folderIds"),
     validPath((args) => args.source, "source"),
     validPath((args) => args.destination, "destination"),
     (_, args, ctx, info) => {
@@ -2134,6 +2136,35 @@ export const movePetitions = mutationField("movePetitions", {
       paths,
       args.source,
       args.destination,
+      args.type === "TEMPLATE",
+      ctx.user!
+    );
+
+    return SUCCESS;
+  },
+});
+
+export const renameFolder = mutationField("renameFolder", {
+  description: "Renames a folder.",
+  type: "Success",
+  authorize: authenticateAnd(userHasPermissionInFolders("folderId" as never, "type", "WRITE")),
+  args: {
+    folderId: nonNull(idArg({ description: "PetitionFolder GIDs to be renamed" })),
+    name: stringArg(),
+    type: nonNull("PetitionBaseType"),
+  },
+  validateArgs: validateAnd(
+    validFolderId((args) => args.folderId, "folderId"),
+    validateRegex((args) => args.name, "name", /^[^/]+$/)
+  ),
+  resolve: async (_, args, ctx, info) => {
+    const path = fromGlobalId(args.folderId, "PetitionFolder", true).id;
+    const destination = path.replace(/\/[^/]+\/$/, "/" + args.name + "/");
+    await ctx.petitions.updatePetitionPaths(
+      [],
+      [path],
+      path,
+      destination,
       args.type === "TEMPLATE",
       ctx.user!
     );

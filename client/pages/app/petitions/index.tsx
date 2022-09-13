@@ -31,6 +31,7 @@ import {
   Petitions_movePetitionsDocument,
   Petitions_PetitionBaseOrFolderFragment,
   Petitions_petitionsDocument,
+  Petitions_renameFolderDocument,
   Petitions_updatePetitionDocument,
   Petitions_userDocument,
 } from "@parallel/graphql/__types";
@@ -241,6 +242,7 @@ function Petitions() {
 
   const [updatePetition] = useMutation(Petitions_updatePetitionDocument);
   const [movePetitions] = useMutation(Petitions_movePetitionsDocument);
+  const [renameFolder] = useMutation(Petitions_renameFolderDocument);
   const showRenameDialog = useRenameDialog();
 
   const handleRenameClick = useCallback(async () => {
@@ -253,13 +255,8 @@ function Petitions() {
           isDisabled: false,
         });
 
-        await movePetitions({
-          variables: {
-            folderIds: [row.folderId],
-            source: stateRef.current.path,
-            destination: stateRef.current.path.concat(newName, "/"),
-            type: stateRef.current.type,
-          },
+        await renameFolder({
+          variables: { folderId: row.folderId, name: newName, type: stateRef.current.type },
           onCompleted: () => {
             refetch();
           },
@@ -564,6 +561,11 @@ const _mutations = [
         destination: $destination
         type: $type
       )
+    }
+  `,
+  gql`
+    mutation Petitions_renameFolder($folderId: ID!, $name: String!, $type: PetitionBaseType!) {
+      renameFolder(folderId: $folderId, name: $name, type: $type)
     }
   `,
 ];

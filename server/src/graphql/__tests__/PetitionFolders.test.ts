@@ -1003,6 +1003,145 @@ describe("Petition Folders", () => {
     });
   });
 
+  describe("renameFolder", () => {
+    afterEach(async () => {
+      await mocks.knex.from("petition").update({ deleted_at: new Date() });
+    });
+
+    it("renames a folder", async () => {
+      /*
+        /
+        ├─ spanish/
+        │   └─ clients/
+        │       ├─ [petition1]
+        │       ├─ [petition2]
+        │       └─ closed/
+        │           └─ [petition5]
+        └─ english/
+            └─ clients/
+                ├─ [petition3]
+                └─ [petition4]
+
+        renameFolder(
+          folderId: ["/spanish/clients/"],
+          name: "customers",
+        )
+
+        /
+        ├─ spanish/
+        │   └─ customers/
+        │       ├─ [petition1]
+        │       ├─ [petition2]
+        │       └─ closed/
+        │           └─ [petition5]
+        └─ english/
+            └─ clients/
+                ├─ [petition3]
+                └─ [petition4]
+         */
+
+      const petitions = await Promise.all([
+        mocks.createRandomPetitions(user.org_id, user.id, 2, (i) => ({
+          path: "/spanish/clients/",
+          name: `petition${i + 1}`,
+        })),
+        mocks.createRandomPetitions(user.org_id, user.id, 1, () => ({
+          path: "/spanish/clients/closed/",
+          name: "petition5",
+        })),
+        mocks.createRandomPetitions(user.org_id, user.id, 2, (i) => ({
+          path: "/english/clients/",
+          name: `petition${i + 3}`,
+        })),
+      ]).then((p) => p.flat());
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($folderId: ID!, $name: String!, $type: PetitionBaseType!) {
+            renameFolder(folderId: $folderId, name: $name, type: $type)
+          }
+        `,
+        {
+          folderId: toGlobalId("PetitionFolder", "/spanish/clients/"),
+          name: "customers",
+          type: "PETITION",
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data!.renameFolder).toEqual("SUCCESS");
+
+      const after = await mocks.knex
+        .from("petition")
+        .whereIn(
+          "id",
+          petitions.map((p) => p.id)
+        )
+        .select("name", "path")
+        .orderBy("name", "asc");
+
+      expect(after).toEqual([
+        { name: "petition1", path: "/spanish/customers/" },
+        { name: "petition2", path: "/spanish/customers/" },
+        { name: "petition3", path: "/english/clients/" },
+        { name: "petition4", path: "/english/clients/" },
+        { name: "petition5", path: "/spanish/customers/closed/" },
+      ]);
+    });
+
+    it("fails when name is not valid", async () => {
+      /*
+        /
+        ├─ spanish/
+        │   └─ clients/
+        │       ├─ [petition1]
+        │       ├─ [petition2]
+        │       └─ closed/
+        │           └─ [petition5]
+        └─ english/
+            └─ clients/
+                ├─ [petition3]
+                └─ [petition4]
+
+        renameFolder(
+          folderId: ["/spanish/clients/"],
+          name: "hola/que/tal",
+        )
+         */
+
+      const petitions = await Promise.all([
+        mocks.createRandomPetitions(user.org_id, user.id, 2, (i) => ({
+          path: "/spanish/clients/",
+          name: `petition${i + 1}`,
+        })),
+        mocks.createRandomPetitions(user.org_id, user.id, 1, () => ({
+          path: "/spanish/clients/closed/",
+          name: "petition5",
+        })),
+        mocks.createRandomPetitions(user.org_id, user.id, 2, (i) => ({
+          path: "/english/clients/",
+          name: `petition${i + 3}`,
+        })),
+      ]).then((p) => p.flat());
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($folderId: ID!, $name: String!, $type: PetitionBaseType!) {
+            renameFolder(folderId: $folderId, name: $name, type: $type)
+          }
+        `,
+        {
+          folderId: toGlobalId("PetitionFolder", "/spanish/clients/"),
+          name: "hola/que/tal",
+          type: "PETITION",
+        }
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+  });
+
   describe("deletePetitions", () => {
     let orgUser: User;
     let otherOrgUser: User;

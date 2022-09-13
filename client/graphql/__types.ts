@@ -641,6 +641,8 @@ export interface Mutation {
   removePetitionPermission: Array<Maybe<PetitionBase>>;
   /** Removes users from a user group */
   removeUsersFromGroup: UserGroup;
+  /** Renames a folder. */
+  renameFolder: Success;
   /** Reopens the petition */
   reopenPetition: Petition;
   /** Sends the AccountVerification email with confirmation code to unconfirmed user emails */
@@ -1319,6 +1321,12 @@ export interface MutationremovePetitionPermissionArgs {
 export interface MutationremoveUsersFromGroupArgs {
   userGroupId: Scalars["GID"];
   userIds: Array<Scalars["GID"]>;
+}
+
+export interface MutationrenameFolderArgs {
+  folderId: Scalars["ID"];
+  name?: InputMaybe<Scalars["String"]>;
+  type: PetitionBaseType;
 }
 
 export interface MutationreopenPetitionArgs {
@@ -20468,6 +20476,14 @@ export type Petitions_movePetitionsMutationVariables = Exact<{
 
 export type Petitions_movePetitionsMutation = { movePetitions: Success };
 
+export type Petitions_renameFolderMutationVariables = Exact<{
+  folderId: Scalars["ID"];
+  name: Scalars["String"];
+  type: PetitionBaseType;
+}>;
+
+export type Petitions_renameFolderMutation = { renameFolder: Success };
+
 export type NewPetition_PetitionBaseOrFolder_Petition_Fragment = { __typename?: "Petition" };
 
 export type NewPetition_PetitionBaseOrFolder_PetitionFolder_Fragment = {
@@ -30237,6 +30253,14 @@ export const Petitions_movePetitionsDocument = gql`
 ` as unknown as DocumentNode<
   Petitions_movePetitionsMutation,
   Petitions_movePetitionsMutationVariables
+>;
+export const Petitions_renameFolderDocument = gql`
+  mutation Petitions_renameFolder($folderId: ID!, $name: String!, $type: PetitionBaseType!) {
+    renameFolder(folderId: $folderId, name: $name, type: $type)
+  }
+` as unknown as DocumentNode<
+  Petitions_renameFolderMutation,
+  Petitions_renameFolderMutationVariables
 >;
 export const NewPetition_templatesDocument = gql`
   query NewPetition_templates(
