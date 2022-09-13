@@ -15,6 +15,10 @@ import {
 import { AddIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { PathBreadcrumbs } from "@parallel/components/common/PathBreadcrumbs";
+import {
+  SearchAllOrCurrentFolder,
+  SearchInOptions,
+} from "@parallel/components/common/SearchAllOrCurrentFolder";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
@@ -51,6 +55,7 @@ import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import {
   boolean,
   parseQuery,
+  QueryStateFrom,
   string,
   useBuildStateUrl,
   useQueryState,
@@ -67,12 +72,15 @@ const QUERY_STATE = {
     .withValidation((value) => typeof value === "string" && /^\/([^\/]+\/)*$/.test(value))
     .orDefault("/"),
   search: string(),
+  searchIn: values<SearchInOptions>(["EVERYWHERE", "CURRENT_FOLDER"]).orDefault("EVERYWHERE"),
   lang: values<PetitionLocale | "ALL">(["en", "es", "ALL"]),
   public: boolean().orDefault(false),
   owner: boolean(),
   category: string(),
   template: string(),
 };
+
+export type TemplatesQueryState = QueryStateFrom<typeof QUERY_STATE>;
 
 const PAGE_SIZE = 18;
 
@@ -115,7 +123,7 @@ function NewPetition() {
       locale: locale,
       isOwner: state.owner,
       category: state.category,
-      path: state.path,
+      path: state.search && state.searchIn === "EVERYWHERE" ? null : state.path,
     },
   });
   const hasMore = templates.length < totalCount;
@@ -136,6 +144,13 @@ function NewPetition() {
     mainRef.current!.scrollTo(0, 0);
     setSearch(search);
     debouncedSearch(search);
+  };
+
+  const handleSearchInChange = (value: string) => {
+    setQueryState((state) => ({
+      ...state,
+      searchIn: value as TemplatesQueryState["searchIn"],
+    }));
   };
 
   const handleLocaleChange = (lang: Maybe<PetitionLocale>) => {
@@ -343,7 +358,15 @@ function NewPetition() {
                   />
                 </Stack>
               </Stack>
-              {state.path !== "/" ? (
+              {state.search ? (
+                <SearchAllOrCurrentFolder
+                  onChange={handleSearchInChange}
+                  value={state.searchIn}
+                  path={state.path}
+                  type={"TEMPLATE"}
+                  paddingX={6}
+                />
+              ) : state.path !== "/" ? (
                 <PathBreadcrumbs
                   path={state.path}
                   type="TEMPLATE"

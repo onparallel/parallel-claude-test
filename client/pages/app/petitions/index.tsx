@@ -9,6 +9,7 @@ import {
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { SearchInOptions } from "@parallel/components/common/SearchAllOrCurrentFolder";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
@@ -70,7 +71,7 @@ const QUERY_STATE = {
   status: values<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED", "CLOSED"]).list(),
   type: values<PetitionBaseType>(["PETITION", "TEMPLATE"]).orDefault("PETITION"),
   search: string(),
-  searchIn: values(["EVERYWHERE", "CURRENT_FOLDER"] as const).orDefault("EVERYWHERE"),
+  searchIn: values<SearchInOptions>(["EVERYWHERE", "CURRENT_FOLDER"]).orDefault("EVERYWHERE"),
   tags: new QueryItem<string[] | null>(
     (value) => (typeof value === "string" ? (value === "NO_TAGS" ? [] : value.split(",")) : null),
     (value) => (value.length === 0 ? "NO_TAGS" : value.join(","))

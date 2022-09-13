@@ -1,16 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  HStack,
-  MenuItem,
-  MenuList,
-  RadioProps,
-  Stack,
-  useRadio,
-  useRadioGroup,
-} from "@chakra-ui/react";
+import { Box, Button, HStack, MenuItem, MenuList, Stack } from "@chakra-ui/react";
 import { AddIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { PetitionListHeader_movePetitionsDocument } from "@parallel/graphql/__types";
 import type { PetitionsQueryState } from "@parallel/pages/app/petitions";
@@ -25,7 +14,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
 import { PathBreadcrumbs } from "../common/PathBreadcrumbs";
-import { PathName } from "../common/PathName";
+import { SearchAllOrCurrentFolder } from "../common/SearchAllOrCurrentFolder";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 import { useCreateFolderDialog } from "../petition-common/dialogs/CreateFolderDialog";
@@ -68,16 +57,13 @@ export function PetitionListHeader({
 
   const buildUrl = useBuildStateUrl(shape);
 
-  const { getRootProps, getRadioProps } = useRadioGroup({
-    name: "categories",
-    value: state.searchIn,
-    onChange: (value: string) =>
-      onStateChange((current) => ({
-        ...current,
-        searchIn: value as PetitionsQueryState["searchIn"],
-        page: 1,
-      })),
-  });
+  const handleSearchInChange = (value: string) => {
+    onStateChange((current) => ({
+      ...current,
+      searchIn: value as PetitionsQueryState["searchIn"],
+      page: 1,
+    }));
+  };
 
   const showCreateFolderDialog = useCreateFolderDialog();
   const [movePetitions] = useMutation(PetitionListHeader_movePetitionsDocument);
@@ -195,30 +181,12 @@ export function PetitionListHeader({
         />
       </HStack>
       {state.search ? (
-        <HStack>
-          <Box id="search-in-label">
-            <FormattedMessage
-              id="component.petition-list-header.search-in"
-              defaultMessage="Search in:"
-            />
-          </Box>
-          <ButtonGroup
-            size="sm"
-            isAttached
-            variant="outline"
-            aria-labelledby="#search-in-label"
-            {...getRootProps()}
-          >
-            <SearchInButton {...getRadioProps({ value: "EVERYWHERE" })}>
-              <FormattedMessage id="generic.everywhere" defaultMessage="Everywhere" />
-            </SearchInButton>
-            <SearchInButton {...getRadioProps({ value: "CURRENT_FOLDER" })}>
-              {'"'}
-              <PathName path={state.path} type={state.type} disableTooltip />
-              {'"'}
-            </SearchInButton>
-          </ButtonGroup>
-        </HStack>
+        <SearchAllOrCurrentFolder
+          onChange={handleSearchInChange}
+          value={state.searchIn}
+          path={state.path}
+          type={state.type}
+        />
       ) : state.path !== "/" ? (
         <PathBreadcrumbs
           path={state.path}
@@ -227,34 +195,6 @@ export function PetitionListHeader({
         />
       ) : null}
     </Stack>
-  );
-}
-
-function SearchInButton(props: RadioProps) {
-  const { getInputProps, getCheckboxProps } = useRadio(props);
-
-  const input = getInputProps();
-
-  return (
-    <Button
-      fontWeight="normal"
-      as="label"
-      htmlFor={input.id}
-      cursor="pointer"
-      _checked={{
-        backgroundColor: "blue.500",
-        borderColor: "blue.500",
-        color: "white",
-        _hover: {
-          backgroundColor: "blue.600",
-          borderColor: "blue.600",
-        },
-      }}
-      {...getCheckboxProps()}
-    >
-      <input {...getInputProps()} />
-      {props.children}
-    </Button>
   );
 }
 
