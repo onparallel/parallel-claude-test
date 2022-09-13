@@ -4299,8 +4299,9 @@ export interface NexusGenArgTypes {
     movePetitions: {
       // args
       destination: string; // String!
+      folderIds?: string[] | null; // [ID!]
+      ids?: NexusGenScalars["GID"][] | null; // [GID!]
       source: string; // String!
-      targets: string[]; // [ID!]!
       type: NexusGenEnums["PetitionBaseType"]; // PetitionBaseType!
     };
     petitionAttachmentDownloadLink: {

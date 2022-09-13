@@ -25,7 +25,6 @@ import {
   fieldsBelongsToPetition,
   petitionsArePublicTemplates,
   userHasAccessToPetitions,
-  userHasAccessToPetitionsAndFolders,
 } from "./authorizers";
 import { validatePublicPetitionLinkSlug } from "./validations";
 
@@ -138,13 +137,6 @@ export const petitionsByIdQuery = queryField("petitionsById", {
     ifArgDefined(
       (args) => args.ids,
       or(userHasAccessToPetitions("ids" as never), petitionsArePublicTemplates("ids" as never))
-    ),
-    ifArgDefined(
-      (args) => args.folders,
-      userHasAccessToPetitionsAndFolders(
-        (args) => args.folders!.folderIds,
-        (args) => args.folders!.type
-      )
     )
   ),
   validateArgs: validateAnd(

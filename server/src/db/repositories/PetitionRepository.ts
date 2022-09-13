@@ -5026,39 +5026,33 @@ export class PetitionRepository extends BaseRepository {
     return paths.map((p) => p.path);
   }
 
-  async userHasAccessToPetitionsAndFolders(
+  /**
+   * Check that there's no petition with permission lower than required in the specified folders
+   */
+  async userHasPermissionInFolders(
     userId: number,
     orgId: number,
     isTemplate: boolean,
-    petitionIds: number[],
-    folderPaths: string[],
-    permissionTypes: PetitionPermissionType[] = []
+    paths: string[],
+    permissionType: PetitionPermissionType
   ) {
-    const permissions = await this.raw<{ petition_id: number; type: PetitionPermissionType }>(
-      /* SQL */ `
-        select p.id as petition_id, pp.type from petition p left join petition_permission pp on pp.petition_id = p.id
-        where pp.user_id = ? and pp.deleted_at is null
-        and p.is_template = ? and p.deleted_at is null and p.org_id = ?
-        and (p.id in ? or p.path like any (?::text[]));
+    const result = await this.raw<{ exists: boolean }>(
+      /* sql */ `
+        select exists(
+          select min(pp.type) from petition p
+            join petition_permission pp on pp.petition_id = p.id
+          where pp.user_id = ? and pp.deleted_at is null
+            and p.is_template = ? and p.deleted_at is null and p.org_id = ?
+            and exists(
+              select * from unnest(?) as t(prefix) where starts_with(p.path, prefix)
+            )
+          group by p.id
+          having min(pp.type) > ?
+        )
       `,
-      [
-        userId,
-        isTemplate,
-        orgId,
-        this.sqlIn(petitionIds.length > 0 ? petitionIds : [-1]),
-        this.sqlArray(folderPaths.map((path) => `${path}%`)),
-      ]
+      [userId, isTemplate, orgId, this.sqlArray(paths), permissionType]
     );
-
-    const ids = permissions.map((p) => p.petition_id);
-
-    return (
-      // every matched petition must have one of the permissions defined in permissionTypes
-      (permissionTypes.length === 0 ||
-        permissions.every((p) => permissionTypes.includes(p.type))) &&
-      // every passed petitionId must be included in the result
-      petitionIds.every((id) => ids.includes(id))
-    );
+    return !result[0].exists;
   }
 
   async updatePetitionPaths(

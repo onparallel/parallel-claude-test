@@ -255,8 +255,8 @@ function Petitions() {
 
         await movePetitions({
           variables: {
-            targets: [row.folderId],
-            source: row.path,
+            folderIds: [row.folderId],
+            source: stateRef.current.path,
             destination: stateRef.current.path.concat(newName, "/"),
             type: stateRef.current.type,
           },
@@ -296,7 +296,12 @@ function Petitions() {
       });
       await movePetitions({
         variables: {
-          targets: selectedRowsRef.current.map(rowKeyProp),
+          ids: selectedRowsRef.current
+            .filter((r) => r.__typename !== "PetitionFolder")
+            .map(rowKeyProp),
+          folderIds: selectedRowsRef.current
+            .filter((r) => r.__typename === "PetitionFolder")
+            .map(rowKeyProp),
           source: stateRef.current.path,
           destination: destinationPath,
           type: stateRef.current.type,
@@ -546,12 +551,19 @@ const _mutations = [
   `,
   gql`
     mutation Petitions_movePetitions(
-      $targets: [ID!]!
+      $ids: [GID!]
+      $folderIds: [ID!]
       $source: String!
       $destination: String!
       $type: PetitionBaseType!
     ) {
-      movePetitions(targets: $targets, source: $source, destination: $destination, type: $type)
+      movePetitions(
+        ids: $ids
+        folderIds: $folderIds
+        source: $source
+        destination: $destination
+        type: $type
+      )
     }
   `,
 ];

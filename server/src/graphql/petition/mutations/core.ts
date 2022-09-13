@@ -14,7 +14,7 @@ import {
 } from "nexus";
 import { outdent } from "outdent";
 import pMap from "p-map";
-import { isDefined, omit, partition, uniq, zip } from "remeda";
+import { isDefined, omit, uniq, zip } from "remeda";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
 import { isValueCompatible } from "../../../db/helpers/utils";
 import {
@@ -25,12 +25,7 @@ import {
   PetitionPermission,
 } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
-import {
-  fromGlobalId,
-  fromGlobalIds,
-  fromMultipleGlobalIds,
-  toGlobalId,
-} from "../../../util/globalId";
+import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { getRequiredPetitionSendCredits } from "../../../util/organizationUsageLimits";
 import { withError } from "../../../util/promises/withError";
@@ -81,12 +76,13 @@ import {
   fieldHasType,
   fieldIsNotFixed,
   fieldsBelongsToPetition,
+  foldersAreInPath,
   messageBelongToPetition,
   petitionHasRepliableFields,
   petitionHasStatus,
   petitionIsNotAnonymized,
-  petitionsAndFoldersMatchesPath,
   petitionsAreEditable,
+  petitionsAreInPath,
   petitionsAreNotPublicTemplates,
   petitionsAreOfTypePetition,
   petitionsAreOfTypeTemplate,
@@ -95,8 +91,8 @@ import {
   repliesBelongsToPetition,
   templateDoesNotHavePublicPetitionLink,
   userHasAccessToPetitions,
-  userHasAccessToPetitionsAndFolders,
   userHasFeatureFlag,
+  userHasPermissionInFolders,
 } from "../authorizers";
 import { validatePublicPetitionLinkSlug } from "../validations";
 import { ArgValidationError } from "./../../helpers/errors";
@@ -289,16 +285,7 @@ export const clonePetitions = mutationField("clonePetitions", {
 export const deletePetitions = mutationField("deletePetitions", {
   description: "Delete petitions and folders.",
   type: "Success",
-  authorize: authenticateAnd(
-    ifArgDefined("ids", userHasAccessToPetitions("ids" as never)),
-    ifArgDefined(
-      "folders",
-      userHasAccessToPetitionsAndFolders(
-        (args) => args.folders!.folderIds,
-        (args) => args.folders!.type
-      )
-    )
-  ),
+  authorize: authenticateAnd(ifArgDefined("ids", userHasAccessToPetitions("ids" as never))),
   args: {
     ids: list(nonNull(globalIdArg("Petition"))),
     folders: "FoldersInput",
@@ -2102,34 +2089,49 @@ export const movePetitions = mutationField("movePetitions", {
   description: "Moves a group of petitions or folders to another folder.",
   type: "Success",
   authorize: authenticateAnd(
-    userHasAccessToPetitionsAndFolders(
-      (args) => args.targets,
-      (args) => args.type,
-      ["OWNER", "WRITE"]
+    ifArgDefined(
+      "ids",
+      and(
+        userHasAccessToPetitions("ids" as never, ["WRITE", "OWNER"]),
+        petitionsAreInPath("ids" as never, "source")
+      )
     ),
-    petitionsAndFoldersMatchesPath("targets", "source")
+    ifArgDefined(
+      "folderIds",
+      and(
+        userHasPermissionInFolders("folderIds" as never, "type", "WRITE"),
+        foldersAreInPath("folderIds" as never, "source")
+      )
+    )
   ),
   args: {
-    targets: nonNull(
-      list(nonNull(idArg({ description: "Petition and PetitionFolder GIDs targeted to be moved" })))
-    ),
+    ids: list(nonNull(globalIdArg("Petition", { description: "Petition to be moved" }))),
+    folderIds: list(nonNull(idArg({ description: "PetitionFolder GIDs to be moved" }))),
     source: nonNull(stringArg({ description: "Base path of the entries to move." })),
     destination: nonNull(stringArg({ description: "Destination path." })),
     type: nonNull("PetitionBaseType"),
   },
   validateArgs: validateAnd(
     validPath((args) => args.source, "source"),
-    validPath((args) => args.destination, "destination")
+    validPath((args) => args.destination, "destination"),
+    (_, args, ctx, info) => {
+      const folderIds = unMaybeArray(args.folderIds ?? []);
+      const paths = fromGlobalIds(folderIds, "PetitionFolder", true).ids;
+      if (paths.some((p) => args.destination.startsWith(p))) {
+        throw new ArgValidationError(
+          info,
+          "destination",
+          `Destination can't be within one of the target folders.`
+        );
+      }
+    }
   ),
   resolve: async (_, args, ctx) => {
-    const [folders, petitions] = partition(
-      fromMultipleGlobalIds(args.targets, ["Petition", { type: "PetitionFolder", isString: true }]),
-      (decoded) => decoded.type === "PetitionFolder"
-    );
+    const paths = fromGlobalIds(args.folderIds ?? [], "PetitionFolder", true).ids;
 
     await ctx.petitions.updatePetitionPaths(
-      petitions.map((p) => p.id as number),
-      folders.map((f) => f.id as string),
+      args.ids ?? [],
+      paths,
       args.source,
       args.destination,
       args.type === "TEMPLATE",

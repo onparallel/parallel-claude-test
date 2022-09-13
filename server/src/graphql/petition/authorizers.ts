@@ -1,7 +1,7 @@
 import { ApolloError } from "apollo-server-express";
-import { ArgsValue } from "nexus/dist/core";
+import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { countBy, isDefined, partition, uniq } from "remeda";
+import { countBy, isDefined, uniq } from "remeda";
 import {
   FeatureFlagName,
   IntegrationType,
@@ -13,7 +13,7 @@ import {
   PetitionStatus,
 } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
-import { fromMultipleGlobalIds, toGlobalId } from "../../util/globalId";
+import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
 import { Arg, ArgAuthorizer } from "../helpers/authorize";
 
@@ -536,37 +536,32 @@ export const petitionHasStatus = createPetitionAuthorizer(
   (petition, status: PetitionStatus) => petition.status === status
 );
 
-export function userHasAccessToPetitionsAndFolders<
+export function userHasPermissionInFolders<
   TypeName extends string,
-  FieldName extends string
+  FieldName extends string,
+  TArgIds extends Arg<TypeName, FieldName, string[]>,
+  TArgType extends Arg<TypeName, FieldName, core.GetGen2<"allTypes", "PetitionBaseType">>
 >(
-  targetIdsProp: (args: ArgsValue<TypeName, FieldName>) => string[],
-  petitionBaseTypeProps: (args: ArgsValue<TypeName, FieldName>) => "PETITION" | "TEMPLATE",
-  permissionTypes?: PetitionPermissionType[]
+  folderIdsArg: TArgIds,
+  typeArg: TArgType,
+  permissionTypes: PetitionPermissionType
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const ids = targetIdsProp(args);
-      if (ids.length === 0) {
+      const paths = fromGlobalIds(
+        args[folderIdsArg] as unknown as string[],
+        "PetitionFolder",
+        true
+      ).ids;
+      if (paths.length === 0) {
         return true;
       }
 
-      const [folderPaths, petitionIds] = partition(
-        fromMultipleGlobalIds(ids, ["Petition", { type: "PetitionFolder", isString: true }]),
-        (decoded) => decoded.type === "PetitionFolder"
-      );
-
-      // can't target root folder
-      if (folderPaths.some((f) => (f.id as string) === "/")) {
-        return false;
-      }
-
-      return await ctx.petitions.userHasAccessToPetitionsAndFolders(
+      return await ctx.petitions.userHasPermissionInFolders(
         ctx.user!.id,
         ctx.user!.org_id,
-        petitionBaseTypeProps(args) === "TEMPLATE",
-        petitionIds.map((p) => p.id as number),
-        folderPaths.map((f) => f.id as string),
+        (args[typeArg] as unknown) === "TEMPLATE",
+        paths,
         permissionTypes
       );
     } catch {}
@@ -574,37 +569,41 @@ export function userHasAccessToPetitionsAndFolders<
   };
 }
 
-export function petitionsAndFoldersMatchesPath<
+export function petitionsAreInPath<
   TypeName extends string,
   FieldName extends string,
-  TArgIds extends Arg<TypeName, FieldName, string[]>,
+  TArgIds extends Arg<TypeName, FieldName, MaybeArray<number>>,
   TArgPath extends Arg<TypeName, FieldName, string>
->(argNameIds: TArgIds, argNamePath: TArgPath): FieldAuthorizeResolver<TypeName, FieldName> {
+>(argIds: TArgIds, argPath: TArgPath): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const ids = unMaybeArray(args[argNameIds] as unknown as string[]);
-      if (ids.length === 0) {
+      const petitionIds = unMaybeArray(args[argIds] as unknown as number | number[]);
+      if (petitionIds.length === 0) {
         return true;
       }
+      const path = args[argPath] as unknown as string;
+      const petitions = await ctx.petitions.loadPetition(petitionIds);
+      return petitions.every((p) => isDefined(p) && p.path === path);
+    } catch {}
+    return false;
+  };
+}
 
-      const source = args[argNamePath] as unknown as string;
-      const [folderPaths, petitionIds] = partition(
-        fromMultipleGlobalIds(ids, ["Petition", { type: "PetitionFolder", isString: true }]),
-        (decoded) => decoded.type === "PetitionFolder"
-      );
-
-      if (petitionIds.length > 0) {
-        const petitions = await ctx.petitions.loadPetition(petitionIds.map((p) => p.id as number));
-        if (!petitions.every((p) => p && p.path === source)) {
-          return false;
-        }
+export function foldersAreInPath<
+  TypeName extends string,
+  FieldName extends string,
+  TArgFolderIds extends Arg<TypeName, FieldName, MaybeArray<string>>,
+  TArgPath extends Arg<TypeName, FieldName, string>
+>(argFolderIds: TArgFolderIds, argPath: TArgPath): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const folderIds = unMaybeArray(args[argFolderIds] as unknown as string | string[]);
+      if (folderIds.length === 0) {
+        return true;
       }
-
-      if (!folderPaths.every((fp) => (fp.id as string).startsWith(source))) {
-        return false;
-      }
-
-      return true;
+      const paths = fromGlobalIds(folderIds, "PetitionFolder", true).ids;
+      const path = args[argPath] as unknown as string;
+      return paths.every((p) => p.startsWith(path) && /^\/[^/]+\/$/.test(p.replace(path, "/")));
     } catch {}
     return false;
   };

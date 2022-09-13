@@ -1143,8 +1143,9 @@ export interface MutationmodifyPetitionCustomPropertyArgs {
 
 export interface MutationmovePetitionsArgs {
   destination: Scalars["String"];
+  folderIds?: InputMaybe<Array<Scalars["ID"]>>;
+  ids?: InputMaybe<Array<Scalars["GID"]>>;
   source: Scalars["String"];
-  targets: Array<Scalars["ID"]>;
   type: PetitionBaseType;
 }
 
@@ -9738,7 +9739,8 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
 };
 
 export type PetitionListHeader_movePetitionsMutationVariables = Exact<{
-  targets: Array<Scalars["ID"]> | Scalars["ID"];
+  ids?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  folderIds?: InputMaybe<Array<Scalars["ID"]> | Scalars["ID"]>;
   source: Scalars["String"];
   destination: Scalars["String"];
   type: PetitionBaseType;
@@ -20457,7 +20459,8 @@ export type Petitions_updatePetitionMutation = {
 };
 
 export type Petitions_movePetitionsMutationVariables = Exact<{
-  targets: Array<Scalars["ID"]> | Scalars["ID"];
+  ids?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  folderIds?: InputMaybe<Array<Scalars["ID"]> | Scalars["ID"]>;
   source: Scalars["String"];
   destination: Scalars["String"];
   type: PetitionBaseType;
@@ -28333,12 +28336,19 @@ export const DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument = 
 >;
 export const PetitionListHeader_movePetitionsDocument = gql`
   mutation PetitionListHeader_movePetitions(
-    $targets: [ID!]!
+    $ids: [GID!]
+    $folderIds: [ID!]
     $source: String!
     $destination: String!
     $type: PetitionBaseType!
   ) {
-    movePetitions(targets: $targets, source: $source, destination: $destination, type: $type)
+    movePetitions(
+      ids: $ids
+      folderIds: $folderIds
+      source: $source
+      destination: $destination
+      type: $type
+    )
   }
 ` as unknown as DocumentNode<
   PetitionListHeader_movePetitionsMutation,
@@ -30210,12 +30220,19 @@ export const Petitions_updatePetitionDocument = gql`
 >;
 export const Petitions_movePetitionsDocument = gql`
   mutation Petitions_movePetitions(
-    $targets: [ID!]!
+    $ids: [GID!]
+    $folderIds: [ID!]
     $source: String!
     $destination: String!
     $type: PetitionBaseType!
   ) {
-    movePetitions(targets: $targets, source: $source, destination: $destination, type: $type)
+    movePetitions(
+      ids: $ids
+      folderIds: $folderIds
+      source: $source
+      destination: $destination
+      type: $type
+    )
   }
 ` as unknown as DocumentNode<
   Petitions_movePetitionsMutation,

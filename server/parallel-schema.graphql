@@ -986,14 +986,19 @@ type Mutation {
     destination: String!
 
     """
+    PetitionFolder GIDs to be moved
+    """
+    folderIds: [ID!]
+
+    """
+    Petition to be moved
+    """
+    ids: [GID!]
+
+    """
     Base path of the entries to move.
     """
     source: String!
-
-    """
-    Petition and PetitionFolder GIDs targeted to be moved
-    """
-    targets: [ID!]!
     type: PetitionBaseType!
   ): Success!
 

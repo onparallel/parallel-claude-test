@@ -75,7 +75,7 @@ export function PetitionListHeader({
       });
       await movePetitions({
         variables: {
-          targets: data.petitions.map((p) => p.id),
+          ids: data.petitions.map((p) => p.id),
           source: state.path,
           destination: `${state.path}${data.name}/`,
           type: state.type,
@@ -201,12 +201,19 @@ export function PetitionListHeader({
 const _mutations = [
   gql`
     mutation PetitionListHeader_movePetitions(
-      $targets: [ID!]!
+      $ids: [GID!]
+      $folderIds: [ID!]
       $source: String!
       $destination: String!
       $type: PetitionBaseType!
     ) {
-      movePetitions(targets: $targets, source: $source, destination: $destination, type: $type)
+      movePetitions(
+        ids: $ids
+        folderIds: $folderIds
+        source: $source
+        destination: $destination
+        type: $type
+      )
     }
   `,
 ];
