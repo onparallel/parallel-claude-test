@@ -19,8 +19,8 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { validateAnd } from "../helpers/validateArgs";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
-import { PETITION_FOLDER_REGEX, validateRegex } from "../helpers/validators/validateRegex";
 import { validIsDefined } from "../helpers/validators/validIsDefined";
+import { validPath } from "../helpers/validators/validPath";
 import {
   fieldsBelongsToPetition,
   petitionsArePublicTemplates,
@@ -304,7 +304,7 @@ export const petitionFolders = queryField("petitionFolders", {
     type: nonNull("PetitionBaseType"),
     currentPath: stringArg(),
   },
-  validateArgs: validateRegex((args) => args.currentPath, "currentPath", PETITION_FOLDER_REGEX),
+  validateArgs: validPath((args) => args.currentPath, "currentPath"),
   resolve: async (_, args, ctx) => {
     function pathAndParents(path: string): string[] {
       if (path.split("/").length > 2) {

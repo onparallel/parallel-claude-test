@@ -59,14 +59,11 @@ import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
 import { notEmptyString } from "../../helpers/validators/notEmptyString";
 import { validateFile } from "../../helpers/validators/validateFile";
-import {
-  PETITION_FOLDER_REGEX,
-  REFERENCE_REGEX,
-  validateRegex,
-} from "../../helpers/validators/validateRegex";
+import { validateRegex } from "../../helpers/validators/validateRegex";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 import { validFieldVisibilityJson } from "../../helpers/validators/validFieldVisibility";
 import { validIsDefined } from "../../helpers/validators/validIsDefined";
+import { validPath } from "../../helpers/validators/validPath";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
 import { validSignatureConfig } from "../../helpers/validators/validSignatureConfig";
@@ -135,6 +132,7 @@ export const createPetition = mutationField("createPetition", {
     }),
     path: stringArg(),
   },
+  validateArgs: validPath((args) => args.path, "path"),
   resolve: async (_, { name, locale, petitionId, type, path }, ctx) => {
     const isTemplate = type === "TEMPLATE";
     let petition: Petition;
@@ -246,7 +244,10 @@ export const clonePetitions = mutationField("clonePetitions", {
     keepTitle: booleanArg({ default: false }),
     path: stringArg(),
   },
-  validateArgs: notEmptyArray((args) => args.petitionIds, "petitionIds"),
+  validateArgs: validateAnd(
+    notEmptyArray((args) => args.petitionIds, "petitionIds"),
+    validPath((args) => args.path, "path")
+  ),
   resolve: async (_, args, ctx) => {
     return await pMap(
       unMaybeArray(args.petitionIds),
@@ -731,7 +732,7 @@ export const updatePetition = mutationField("updatePetition", {
     validRemindersConfig((args) => args.data.remindersConfig, "data.remindersConfig"),
     validSignatureConfig((args) => args.data.signatureConfig, "data.signatureConfig"),
     inRange((args) => args.data.anonymizeAfterMonths, "data.anonymizeAfterMonths", 1),
-    validateRegex((args) => args.data.defaultPath, "data.defaultPath", PETITION_FOLDER_REGEX)
+    validPath((args) => args.data.defaultPath, "data.defaultPath")
   ),
   resolve: async (_, args, ctx) => {
     const {
@@ -968,7 +969,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     maxLength((args) => args.data.alias, "data.alias", 100),
     validateIf(
       (args) => isDefined(args.data.alias),
-      validateRegex((args) => args.data.alias, "data.alias", REFERENCE_REGEX)
+      validateRegex((args) => args.data.alias, "data.alias", /^[A-Za-z0-9_]+$/)
     ),
     validateIf(
       (args) => isDefined(args.data.visibility),
@@ -2117,8 +2118,8 @@ export const movePetitions = mutationField("movePetitions", {
     type: nonNull("PetitionBaseType"),
   },
   validateArgs: validateAnd(
-    validateRegex((args) => args.source, "source", PETITION_FOLDER_REGEX),
-    validateRegex((args) => args.destination, "destination", PETITION_FOLDER_REGEX)
+    validPath((args) => args.source, "source"),
+    validPath((args) => args.destination, "destination")
   ),
   resolve: async (_, args, ctx) => {
     const [folders, petitions] = partition(

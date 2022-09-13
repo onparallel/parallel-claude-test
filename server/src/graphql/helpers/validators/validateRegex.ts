@@ -14,7 +14,3 @@ export function validateRegex<TypeName extends string, FieldName extends string>
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
-
-export const REFERENCE_REGEX = /^[A-Za-z0-9_]+$/;
-
-export const PETITION_FOLDER_REGEX = /^\/([^/]+\/)*$/;
