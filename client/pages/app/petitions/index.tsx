@@ -56,7 +56,7 @@ import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { MouseEvent, PropsWithChildren, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, pick, sort as sortFn } from "remeda";
+import { map, maxBy, pick, pipe } from "remeda";
 
 const SORTING = ["name", "createdAt", "sentAt"] as const;
 
@@ -123,7 +123,7 @@ function Petitions() {
 
   const petitions = data?.petitions;
 
-  const { selectedIdsRef, selectedRowsRef, selectedIds, onChangeSelectedIds } = useSelection(
+  const { selectedIdsRef, selectedRows, selectedRowsRef, onChangeSelectedIds } = useSelection(
     petitions?.items,
     rowKeyProp
   );
@@ -311,34 +311,24 @@ function Petitions() {
   const context = useMemo(() => ({ user: me! }), [me]);
 
   const minimumPermission = useMemo(() => {
-    return sortFn(
-      selectedRowsRef.current
-        .map((r) =>
-          r.__typename === "PetitionFolder"
-            ? r.minimumPermissionType
-            : r.__typename === "Petition" || r.__typename === "PetitionTemplate"
-            ? r.myEffectivePermission!.permissionType
-            : null
-        )
-        .filter(isDefined),
-      (permission) => {
-        switch (permission) {
-          case "READ":
-            return -1;
-          case "WRITE":
-            return 0;
-          case "OWNER":
-            return 1;
-        }
-      }
-    )[0];
-  }, [selectedRowsRef.current.length]);
+    return pipe(
+      selectedRows,
+      map((r) =>
+        r.__typename === "PetitionFolder"
+          ? r.minimumPermissionType
+          : r.__typename === "Petition" || r.__typename === "PetitionTemplate"
+          ? r.myEffectivePermission!.permissionType
+          : (null as never)
+      ),
+      maxBy((p) => ["OWNER", "WRITE", "READ"].indexOf(p))
+    )!;
+  }, [selectedRows]);
 
   const actions = usePetitionListActions({
     user: me,
     type: state.type,
-    selectedCount: selectedIds.length,
-    hasSelectedFolders: selectedRowsRef.current.some((c) => c.__typename === "PetitionFolder"),
+    selectedCount: selectedRows.length,
+    hasSelectedFolders: selectedRows.some((c) => c.__typename === "PetitionFolder"),
     minimumPermission,
     onRenameClick: handleRenameClick,
     onDeleteClick: handleDeleteClick,
