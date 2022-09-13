@@ -380,18 +380,10 @@ export class PetitionRepository extends BaseRepository {
     const builders: Knex.QueryCallbackWithArgs[] = [
       (q) =>
         q
-          .with(
-            "effective_permissions",
-            this.knex.raw(
-              /* sql */ `
-              select p.id as petition_id, min(pp.type) as effective_type, min(pp.created_at) as last_used_at
-              from petition p join petition_permission pp on p.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null
-              group by p.id
-            `,
-              [userId]
-            )
+          .joinRaw(
+            /* sql */ `join petition_permission pp on p.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null`,
+            [userId]
           )
-          .joinRaw(/* sql */ `join effective_permissions ep on p.id = ep.petition_id`)
           .joinRaw(/* sql */ `left join petition_message pm on p.id = pm.petition_id`)
           .where("p.org_id", orgId)
           .whereNull("p.deleted_at")
@@ -565,7 +557,7 @@ export class PetitionRepository extends BaseRepository {
           if (filters?.path) {
             q.where("p.path", filters.path);
           }
-          if (opts.sortBy?.some((s) => s.field === "lastUsedAt")) {
+          if (opts.sortBy?.some((s) => s.field === "lastUsedAt") && type === "TEMPLATE") {
             q.joinRaw(
               /* sql */ `
               left join (
@@ -584,9 +576,9 @@ export class PetitionRepository extends BaseRepository {
           this.knex.raw(/* sql */ `null::petition_permission_type as min_permission`),
           this.knex.raw(/* sql */ `p.name as _name`),
           this.knex.raw(/* sql */ `min(coalesce(pm.scheduled_at, pm.created_at)) as sent_at`),
-          opts.sortBy?.some((s) => s.field === "lastUsedAt")
+          opts.sortBy?.some((s) => s.field === "lastUsedAt") && type === "TEMPLATE"
             ? this.knex.raw(
-                /* sql */ `greatest(max(t.t_last_used_at), min(ep.last_used_at)) as last_used_at`
+                /* sql */ `greatest(max(t.t_last_used_at), min(pp.created_at)) as last_used_at`
               )
             : this.knex.raw(/* sql */ `null as last_used_at`)
         );
@@ -607,7 +599,7 @@ export class PetitionRepository extends BaseRepository {
               .limit(opts.limit ?? 0)
           : await this.knex
               .with(
-                "fs",
+                "ps",
                 this.knex
                   .fromRaw("petition as p")
                   .whereRaw(/* sql */ `starts_with(p.path, ?) and p.path != ?`, [
@@ -617,12 +609,23 @@ export class PetitionRepository extends BaseRepository {
                   .modify(function (q) {
                     builders.forEach((b) => b.call(this, q));
                   })
-                  .select<{ count: number }[]>(
-                    this.knex.raw(/* sql */ `get_folder_after_prefix(p.path, ?) as _name`, [
+                  .select(
+                    "p.id",
+                    "p.path",
+                    this.knex.raw(/* sql */ `min(pp.type) as effective_permission`)
+                  )
+                  .groupBy("p.id")
+              )
+              .with(
+                "fs",
+                this.knex
+                  .from("ps")
+                  .select(
+                    this.knex.raw(/* sql */ `get_folder_after_prefix(ps.path, ?) as _name`, [
                       filters!.path!,
                     ]),
-                    this.knex.raw(/* sql */ `count(distinct p.id)::int as petition_count`),
-                    this.knex.raw(/* sql */ `max(ep.effective_type) as min_permission`)
+                    this.count("petition_count"),
+                    this.knex.raw(/* sql */ `max(ps.effective_permission) as min_permission`)
                   )
                   .groupBy("_name")
               )
