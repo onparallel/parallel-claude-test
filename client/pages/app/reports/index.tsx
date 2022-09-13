@@ -36,6 +36,7 @@ import { ReportsErrorMessage } from "@parallel/components/reports/ReportsErrorMe
 import { ReportsLoadingMessage } from "@parallel/components/reports/ReportsLoadingMessage";
 import { ReportsReadyMessage } from "@parallel/components/reports/ReportsReadyMessage";
 import { Reports_templatesDocument, Reports_userDocument } from "@parallel/graphql/__types";
+import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import {
   useAssertQuery,
   useAssertQueryOrPreviousData,
@@ -92,6 +93,7 @@ export function Reports() {
       isPublic: false,
     },
   });
+  assertTypenameArray(templates, "PetitionTemplate");
 
   const templateStatsTask = useBackgroundTask("TEMPLATE_STATS_REPORT");
 
