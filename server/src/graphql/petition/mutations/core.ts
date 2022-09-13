@@ -133,8 +133,9 @@ export const createPetition = mutationField("createPetition", {
       description: "Type of petition to create",
       default: "PETITION",
     }),
+    path: stringArg(),
   },
-  resolve: async (_, { name, locale, petitionId, type }, ctx) => {
+  resolve: async (_, { name, locale, petitionId, type, path }, ctx) => {
     const isTemplate = type === "TEMPLATE";
     let petition: Petition;
     if (petitionId) {
@@ -216,6 +217,7 @@ export const createPetition = mutationField("createPetition", {
           locale: locale!,
           email_subject: name,
           is_template: isTemplate,
+          path: path ?? undefined,
         },
         ctx.user!
       );
@@ -242,13 +244,14 @@ export const clonePetitions = mutationField("clonePetitions", {
   args: {
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
     keepTitle: booleanArg({ default: false }),
+    path: stringArg(),
   },
   validateArgs: notEmptyArray((args) => args.petitionIds, "petitionIds"),
   resolve: async (_, args, ctx) => {
     return await pMap(
       unMaybeArray(args.petitionIds),
       async (petitionId) => {
-        const { name, locale } = (await ctx.petitions.loadPetition(petitionId))!;
+        const { name, locale, path } = (await ctx.petitions.loadPetition(petitionId))!;
         const intl = await ctx.i18n.getIntl(locale);
         const mark = `(${intl.formatMessage({
           id: "generic.copy",
@@ -261,6 +264,7 @@ export const clonePetitions = mutationField("clonePetitions", {
               ? name.slice(0, 255)
               : ""
             : `${name ? `${name} ` : ""}${mark}`.slice(0, 255),
+          path: args.path ?? path,
         });
 
         await ctx.petitions.createEvent({

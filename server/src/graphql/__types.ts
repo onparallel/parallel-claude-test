@@ -4002,6 +4002,7 @@ export interface NexusGenArgTypes {
     clonePetitions: {
       // args
       keepTitle?: boolean | null; // Boolean
+      path?: string | null; // String
       petitionIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     cloneUserGroup: {
@@ -4079,6 +4080,7 @@ export interface NexusGenArgTypes {
       // args
       locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
       name?: string | null; // String
+      path?: string | null; // String
       petitionId?: NexusGenScalars["GID"] | null; // GID
       type: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
     };

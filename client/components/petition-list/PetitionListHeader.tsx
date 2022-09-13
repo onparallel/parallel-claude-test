@@ -108,10 +108,10 @@ export function PetitionListHeader({
 
   const handleCreateTemplate = useCallback(async () => {
     try {
-      const id = await createPetition({ type: "TEMPLATE" });
+      const id = await createPetition({ type: "TEMPLATE", path: state.path });
       goToPetition(id, "compose", { query: { new: "true" } });
     } catch {}
-  }, [goToPetition, createPetition]);
+  }, [goToPetition, createPetition, state.path]);
 
   const navigate = useHandleNavigation();
   const handleCreateNewParallelOrTemplate = async () => {
@@ -126,6 +126,7 @@ export function PetitionListHeader({
           const petitionIds = await clonePetitions({
             petitionIds: [templateId],
             keepTitle: true,
+            path: state.path,
           });
           goToPetition(petitionIds[0], "compose", { query: { new: "true" } });
         }

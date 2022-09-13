@@ -846,6 +846,7 @@ export interface MutationclonePetitionFieldArgs {
 
 export interface MutationclonePetitionsArgs {
   keepTitle?: InputMaybe<Scalars["Boolean"]>;
+  path?: InputMaybe<Scalars["String"]>;
   petitionIds: Array<Scalars["GID"]>;
 }
 
@@ -923,6 +924,7 @@ export interface MutationcreateOrganizationUserArgs {
 export interface MutationcreatePetitionArgs {
   locale?: InputMaybe<PetitionLocale>;
   name?: InputMaybe<Scalars["String"]>;
+  path?: InputMaybe<Scalars["String"]>;
   petitionId?: InputMaybe<Scalars["GID"]>;
   type?: InputMaybe<PetitionBaseType>;
 }
@@ -22314,6 +22316,7 @@ export type usePetitionCommentsMutations_deletePetitionFieldCommentMutation = {
 export type useClonePetitions_clonePetitionsMutationVariables = Exact<{
   petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
   keepTitle?: InputMaybe<Scalars["Boolean"]>;
+  path?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type useClonePetitions_clonePetitionsMutation = {
@@ -22343,6 +22346,7 @@ export type useCreatePetition_createPetitionMutationVariables = Exact<{
   locale: PetitionLocale;
   petitionId?: InputMaybe<Scalars["GID"]>;
   type?: InputMaybe<PetitionBaseType>;
+  path?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type useCreatePetition_createPetitionMutation = {
@@ -30798,8 +30802,12 @@ export const usePetitionCommentsMutations_deletePetitionFieldCommentDocument = g
   usePetitionCommentsMutations_deletePetitionFieldCommentMutationVariables
 >;
 export const useClonePetitions_clonePetitionsDocument = gql`
-  mutation useClonePetitions_clonePetitions($petitionIds: [GID!]!, $keepTitle: Boolean) {
-    clonePetitions(petitionIds: $petitionIds, keepTitle: $keepTitle) {
+  mutation useClonePetitions_clonePetitions(
+    $petitionIds: [GID!]!
+    $keepTitle: Boolean
+    $path: String
+  ) {
+    clonePetitions(petitionIds: $petitionIds, keepTitle: $keepTitle, path: $path) {
       id
     }
   }
@@ -30828,8 +30836,15 @@ export const useCreatePetition_createPetitionDocument = gql`
     $locale: PetitionLocale!
     $petitionId: GID
     $type: PetitionBaseType
+    $path: String
   ) {
-    createPetition(name: $name, locale: $locale, petitionId: $petitionId, type: $type) {
+    createPetition(
+      name: $name
+      locale: $locale
+      petitionId: $petitionId
+      type: $type
+      path: $path
+    ) {
       id
     }
   }

@@ -15,6 +15,7 @@ import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useMoveToFolderDialog } from "@parallel/components/petition-common/dialogs/MoveToFolderDialog";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { useRenameDialog } from "@parallel/components/petition-common/dialogs/RenameDialog";
+import { EmptyFolderIllustration } from "@parallel/components/petition-common/EmptyFolderIllustration";
 import {
   flatShared,
   removeInvalidLines,
@@ -401,6 +402,8 @@ function Petitions() {
                     />
                   </Text>
                 </Flex>
+              ) : state.path !== "/" ? (
+                <EmptyFolderIllustration flex="1" isTemplate={state.type === "TEMPLATE"} />
               ) : (
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text fontSize="lg">

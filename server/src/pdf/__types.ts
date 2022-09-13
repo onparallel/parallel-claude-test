@@ -812,6 +812,7 @@ export type MutationclonePetitionFieldArgs = {
 
 export type MutationclonePetitionsArgs = {
   keepTitle?: InputMaybe<Scalars["Boolean"]>;
+  path?: InputMaybe<Scalars["String"]>;
   petitionIds: Array<Scalars["GID"]>;
 };
 
@@ -889,6 +890,7 @@ export type MutationcreateOrganizationUserArgs = {
 export type MutationcreatePetitionArgs = {
   locale?: InputMaybe<PetitionLocale>;
   name?: InputMaybe<Scalars["String"]>;
+  path?: InputMaybe<Scalars["String"]>;
   petitionId?: InputMaybe<Scalars["GID"]>;
   type?: InputMaybe<PetitionBaseType>;
 };

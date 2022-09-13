@@ -227,7 +227,7 @@ function ConfirmDeletePetitionsDialog({
                       {
                         id: "component.delete-petitions.confirm-delete-folders.part-folders",
                         defaultMessage:
-                          "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected folders}} ({petitionCount, plural, =1{# {type, select, TEMPLATE {template} other {parallel}}} other {# {type, select, TEMPLATE {templates} other {parallels}}}})",
+                          "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected folders}} ({petitionCount, plural, =1{# {type, select, TEMPLATE {template} other {parallel}}} other {# {type, select, TEMPLATE {templates} other {parallels}}}})",
                       },
                       {
                         count: folders.length,
@@ -242,7 +242,7 @@ function ConfirmDeletePetitionsDialog({
                       {
                         id: "component.confirm-delete-petitions-dialog.part-petitions",
                         defaultMessage:
-                          "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected {type, select, TEMPLATE {templates} other {parallels}}}}",
+                          "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected {type, select, TEMPLATE {templates} other {parallels}}}}",
                       },
                       {
                         count: petitions.length,

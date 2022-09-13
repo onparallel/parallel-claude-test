@@ -589,7 +589,7 @@ type Mutation {
   """
   Clone petition.
   """
-  clonePetitions(keepTitle: Boolean = false, petitionIds: [GID!]!): [PetitionBase!]!
+  clonePetitions(keepTitle: Boolean = false, path: String, petitionIds: [GID!]!): [PetitionBase!]!
 
   """
   Clones the user group with all its members
@@ -706,6 +706,7 @@ type Mutation {
   createPetition(
     locale: PetitionLocale
     name: String
+    path: String
 
     """
     GID of petition to base from

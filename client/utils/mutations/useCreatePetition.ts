@@ -31,9 +31,10 @@ export function useCreatePetition() {
     locale = router.locale as PetitionLocale,
     petitionId = null,
     type = null,
+    path = null,
   }: Partial<VariablesOf<typeof useCreatePetition_createPetitionDocument>> = {}) {
     const { data } = await createPetition({
-      variables: { name, locale: localeRef.current, petitionId, type },
+      variables: { name, locale: localeRef.current, petitionId, type, path },
     });
     return data!.createPetition.id;
   },
@@ -47,8 +48,15 @@ useCreatePetition.mutations = [
       $locale: PetitionLocale!
       $petitionId: GID
       $type: PetitionBaseType
+      $path: String
     ) {
-      createPetition(name: $name, locale: $locale, petitionId: $petitionId, type: $type) {
+      createPetition(
+        name: $name
+        locale: $locale
+        petitionId: $petitionId
+        type: $type
+        path: $path
+      ) {
         id
       }
     }

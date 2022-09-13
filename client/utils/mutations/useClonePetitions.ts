@@ -16,10 +16,16 @@ export function useClonePetitions() {
   });
 
   return useCallback(
-    async ({ petitionIds }: VariablesOf<typeof useClonePetitions_clonePetitionsDocument>) => {
+    async ({
+      petitionIds,
+      keepTitle = null,
+      path = null,
+    }: VariablesOf<typeof useClonePetitions_clonePetitionsDocument>) => {
       const { data } = await clonePetitions({
         variables: {
           petitionIds,
+          keepTitle,
+          path,
         },
       });
       return data!.clonePetitions!.map((p) => p.id);
@@ -30,8 +36,12 @@ export function useClonePetitions() {
 
 useClonePetitions.mutations = [
   gql`
-    mutation useClonePetitions_clonePetitions($petitionIds: [GID!]!, $keepTitle: Boolean) {
-      clonePetitions(petitionIds: $petitionIds, keepTitle: $keepTitle) {
+    mutation useClonePetitions_clonePetitions(
+      $petitionIds: [GID!]!
+      $keepTitle: Boolean
+      $path: String
+    ) {
+      clonePetitions(petitionIds: $petitionIds, keepTitle: $keepTitle, path: $path) {
         id
       }
     }

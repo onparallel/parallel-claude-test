@@ -19,6 +19,7 @@ import { SearchInput } from "@parallel/components/common/SearchInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { TemplateDetailsModal } from "@parallel/components/petition-common/dialogs/TemplateDetailsModal";
+import { EmptyFolderIllustration } from "@parallel/components/petition-common/EmptyFolderIllustration";
 import { useNewTemplateDialog } from "@parallel/components/petition-new/dialogs/NewTemplateDialog";
 import { FolderCard } from "@parallel/components/petition-new/FolderCard";
 import { GridInfiniteScrollList } from "@parallel/components/petition-new/GridInfiniteScrollList";
@@ -176,10 +177,10 @@ function NewPetition() {
 
   const handleCreateTemplate = useCallback(async () => {
     try {
-      const id = await createPetition({ type: "TEMPLATE" });
+      const id = await createPetition({ type: "TEMPLATE", path: state.path });
       goToPetition(id, "compose", { query: { new: "true" } });
     } catch {}
-  }, [goToPetition, createPetition]);
+  }, [goToPetition, createPetition, state.path]);
 
   useEffect(() => {
     if (!hasTemplates && !state.public) {
@@ -198,6 +199,7 @@ function NewPetition() {
         const petitionIds = await clonePetitions({
           petitionIds: [templateId],
           keepTitle: true,
+          path: state.path,
         });
         goToPetition(petitionIds[0], "compose", { query: { new: "true" } });
       }
@@ -377,13 +379,15 @@ function NewPetition() {
                     }
                   }}
                 </GridInfiniteScrollList>
-              ) : hasTemplates ? (
+              ) : hasTemplates && state.search?.length ? (
                 <NewPetitionEmptySearch
                   flex="1"
                   marginBottom={16}
                   onClickNewTemplate={() => handleCreateTemplate()}
                   onClickPublicTemplates={() => handleTabChange(1)}
                 />
+              ) : state.path !== "/" ? (
+                <EmptyFolderIllustration flex="1" marginBottom={16} isTemplate />
               ) : (
                 <NewPetitionEmptyTemplates
                   flex="1"

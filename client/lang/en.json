@@ -496,8 +496,8 @@
   },
   {
     "term": "component.confirm-delete-petitions-dialog.part-petitions",
-    "definition": "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected {type, select, TEMPLATE {templates} other {parallels}}}}",
-    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected {type, select, TEMPLATE {templates} other {parallels}}}}"
+    "definition": "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected {type, select, TEMPLATE {templates} other {parallels}}}}",
+    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected {type, select, TEMPLATE {templates} other {parallels}}}}"
   },
   {
     "term": "component.confirm-delete-petitions-dialog.petition-header",
@@ -1031,8 +1031,8 @@
   },
   {
     "term": "component.delete-petitions.confirm-delete-folders.part-folders",
-    "definition": "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected folders}} ({petitionCount, plural, =1{# {type, select, TEMPLATE {template} other {parallel}}} other {# {type, select, TEMPLATE {templates} other {parallels}}}})",
-    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>#</b> selected folders}} ({petitionCount, plural, =1{# {type, select, TEMPLATE {template} other {parallel}}} other {# {type, select, TEMPLATE {templates} other {parallels}}}})"
+    "definition": "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected folders}} ({petitionCount, plural, =1{# {type, select, TEMPLATE {template} other {parallel}}} other {# {type, select, TEMPLATE {templates} other {parallels}}}})",
+    "context": "{count, plural, =1{<b>{name}</b>} other {the <b>{count}</b> selected folders}} ({petitionCount, plural, =1{# {type, select, TEMPLATE {template} other {parallel}}} other {# {type, select, TEMPLATE {templates} other {parallels}}}})"
   },
   {
     "term": "component.delete-petitions.error-header",
@@ -1208,6 +1208,16 @@
     "term": "component.email-verification-required-alert.title",
     "definition": "Activation pending",
     "context": "Activation pending"
+  },
+  {
+    "term": "component.empty-folder-illustration.create-new-template",
+    "definition": "Create a new template to be saved in this folder.",
+    "context": "Create a new template to be saved in this folder."
+  },
+  {
+    "term": "component.empty-folder-illustration.title",
+    "definition": "The folder is empty",
+    "context": "The folder is empty"
   },
   {
     "term": "component.error-dialog.header",
