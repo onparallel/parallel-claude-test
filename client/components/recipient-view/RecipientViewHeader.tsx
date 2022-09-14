@@ -438,8 +438,8 @@ function useHelpModal({ tone }: { tone: Tone }) {
   async function showHelp() {
     try {
       await showRecipientViewHelpDialog({ tone });
-      setFirstTime("check");
     } catch {}
+    setFirstTime("check");
   }
   return async function () {
     try {
