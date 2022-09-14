@@ -2176,7 +2176,7 @@
   },
   {
     "term": "component.petition-comments-and-notes-editor.note-placeholder",
-    "definition": "Presiona @ para mencionar a otros usuarios",
+    "definition": "Escribe @ para mencionar a otros usuarios",
     "context": "Type @ to mention other users"
   },
   {
