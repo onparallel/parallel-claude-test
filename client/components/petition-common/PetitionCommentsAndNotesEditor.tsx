@@ -102,6 +102,7 @@ export function PetitionCommentsAndNotesEditor({
             as={HStack}
             alignItems="flex-start"
             padding={2}
+            minHeight="60px"
           >
             <CommentEditor
               id={`comment-editor-${id}`}
@@ -120,6 +121,7 @@ export function PetitionCommentsAndNotesEditor({
               colorScheme="primary"
               isDisabled={isDisabled || isCommentEmpty || isTemplate}
               onClick={handleSubmitClick}
+              minWidth="fit-content"
             >
               <FormattedMessage id="generic.submit" defaultMessage="Submit" />
             </Button>
@@ -131,6 +133,8 @@ export function PetitionCommentsAndNotesEditor({
             as={HStack}
             alignItems="flex-start"
             padding={2}
+            justifyContent="flex-end"
+            minHeight="60px"
           >
             {isNote ? (
               <>
@@ -151,6 +155,7 @@ export function PetitionCommentsAndNotesEditor({
                   colorScheme="primary"
                   isDisabled={isDisabled || isNoteEmpty || isTemplate}
                   onClick={handleSubmitClick}
+                  minWidth="fit-content"
                 >
                   <FormattedMessage id="generic.add" defaultMessage="Add" />
                 </Button>

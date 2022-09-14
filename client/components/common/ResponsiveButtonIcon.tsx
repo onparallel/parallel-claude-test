@@ -32,7 +32,7 @@ export const ResponsiveButtonIcon = chakraForwardRef<"button", ResponsiveButtonI
     <Tooltip placement={placement} label={label} isDisabled={props.isDisabled || !isOnlyIcon}>
       <Button
         aria-label={isOnlyIcon ? label : undefined}
-        paddingX={{ base: 0, [breakpoint]: 4 }}
+        paddingX={{ base: 0, [breakpoint]: props.size === "sm" ? 3 : 4 }}
         {...props}
         ref={ref}
       >

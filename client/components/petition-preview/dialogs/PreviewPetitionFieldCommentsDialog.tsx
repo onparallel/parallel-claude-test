@@ -147,7 +147,6 @@ export function PreviewPetitionFieldCommentsDialog({
       <ModalContent
         className="with-organization-brand-theme"
         maxHeight="calc(100vh - 7.5rem)"
-        minHeight="calc(60vh - 7.5rem)"
         overflow="hidden"
       >
         <ModalCloseButton
@@ -225,28 +224,25 @@ export function PreviewPetitionFieldCommentsDialog({
               )}
             </Flex>
           ) : (
-            <>
-              <Stack
-                spacing={0}
-                divider={<Divider />}
-                overflow="auto"
-                maxHeight="calc(100vh - 20rem)"
-              >
-                {comments.map((comment) => (
-                  <PetitionFieldComment
-                    key={comment.id}
-                    comment={comment}
-                    onEdit={(content) =>
-                      handleEditCommentContent(comment.id, content, comment.isInternal)
-                    }
-                    onDelete={() => handleDeleteClick(comment.id)}
-                    onMarkAsUnread={() => handleMarkAsUnread(comment.id)}
-                    onSearchMentionables={handleSearchMentionables}
-                  />
-                ))}
-              </Stack>
-              <Divider />
-            </>
+            <Stack
+              spacing={0}
+              divider={<Divider />}
+              overflow="auto"
+              maxHeight="calc(100vh - 20rem)"
+            >
+              {comments.map((comment) => (
+                <PetitionFieldComment
+                  key={comment.id}
+                  comment={comment}
+                  onEdit={(content) =>
+                    handleEditCommentContent(comment.id, content, comment.isInternal)
+                  }
+                  onDelete={() => handleDeleteClick(comment.id)}
+                  onMarkAsUnread={() => handleMarkAsUnread(comment.id)}
+                  onSearchMentionables={handleSearchMentionables}
+                />
+              ))}
+            </Stack>
           )}
           {isTemplate ? (
             <Box padding={2}>
