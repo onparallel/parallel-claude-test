@@ -117,14 +117,15 @@ export function PetitionCommentsAndNotesEditor({
               onChange={setCommentDraft}
               onSearchMentionables={onSearchMentionables}
             />
-            <Button
-              colorScheme="primary"
-              isDisabled={isDisabled || isCommentEmpty || isTemplate}
-              onClick={handleSubmitClick}
-              minWidth="fit-content"
-            >
-              <FormattedMessage id="generic.submit" defaultMessage="Submit" />
-            </Button>
+            <Box>
+              <Button
+                colorScheme="primary"
+                isDisabled={isDisabled || isCommentEmpty || isTemplate}
+                onClick={handleSubmitClick}
+              >
+                <FormattedMessage id="generic.submit" defaultMessage="Submit" />
+              </Button>
+            </Box>
           </TabPanel>
           <TabPanel
             backgroundColor="yellow.100"
@@ -151,14 +152,15 @@ export function PetitionCommentsAndNotesEditor({
                   onChange={setNoteDraft}
                   onSearchMentionables={onSearchMentionables}
                 />
-                <Button
-                  colorScheme="primary"
-                  isDisabled={isDisabled || isNoteEmpty || isTemplate}
-                  onClick={handleSubmitClick}
-                  minWidth="fit-content"
-                >
-                  <FormattedMessage id="generic.add" defaultMessage="Add" />
-                </Button>
+                <Box>
+                  <Button
+                    colorScheme="primary"
+                    isDisabled={isDisabled || isNoteEmpty || isTemplate}
+                    onClick={handleSubmitClick}
+                  >
+                    <FormattedMessage id="generic.add" defaultMessage="Add" />
+                  </Button>
+                </Box>
               </>
             ) : null}
           </TabPanel>
