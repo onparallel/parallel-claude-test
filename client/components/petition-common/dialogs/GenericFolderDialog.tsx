@@ -1,5 +1,14 @@
 import { gql, useQuery } from "@apollo/client";
-import { Box, Button, Center, FormControl, FormLabel, Input, Spinner } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Center,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Spinner,
+} from "@chakra-ui/react";
 import { FolderIcon, FolderOpenIcon } from "@parallel/chakra/icons";
 import {
   ConfirmDialog,
@@ -15,6 +24,7 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, pick } from "remeda";
 import { PathName } from "../../common/PathName";
+import { isNotEmptyText } from "@parallel/utils/strings";
 
 interface PathNode extends INode {
   path: string;
@@ -178,6 +188,7 @@ export function GenericFolderDialog({
       closeOnOverlayClick={false}
       hasCloseButton={true}
       initialFocusRef={initialFocusRef}
+      size="lg"
       {...props}
       header={createElement(header, componentProps)}
       body={
@@ -291,9 +302,17 @@ const _queries = [
 
 function NewFolderNameDialog(props: DialogProps<{}, string>) {
   const intl = useIntl();
-  const { register, handleSubmit, formState } = useForm({ defaultValues: { name: "" } });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ defaultValues: { name: "" } });
   const inputRef = useRef<HTMLInputElement>(null);
-  const inputProps = useRegisterWithRef(inputRef, register, "name", { required: true });
+  const inputProps = useRegisterWithRef(inputRef, register, "name", {
+    required: true,
+    maxLength: 255,
+    validate: { isNotEmptyText, noSlash: (value) => !value.includes("/") },
+  });
   return (
     <ConfirmDialog
       {...props}
@@ -313,7 +332,7 @@ function NewFolderNameDialog(props: DialogProps<{}, string>) {
         <FormattedMessage id="component.new-folder-dialog.header" defaultMessage="New folder" />
       }
       body={
-        <FormControl>
+        <FormControl isInvalid={!!errors.name}>
           <FormLabel>
             <FormattedMessage
               id="component.new-folder-dialog.folder-name-label"
@@ -327,10 +346,29 @@ function NewFolderNameDialog(props: DialogProps<{}, string>) {
             })}
             {...inputProps}
           />
+          <FormErrorMessage>
+            {errors.name?.type === "maxLength" ? (
+              <FormattedMessage
+                id="generic.folder-name.max-length-error"
+                defaultMessage="Name cannot exceed {max} characters"
+                values={{ max: 255 }}
+              />
+            ) : errors.name?.type === "noSlash" ? (
+              <FormattedMessage
+                id="generic.folder-name.no-slash-error"
+                defaultMessage="Name can't contain the slash character /"
+              />
+            ) : (
+              <FormattedMessage
+                id="generic.folder-name.required-error"
+                defaultMessage="Please enter a name"
+              />
+            )}
+          </FormErrorMessage>
         </FormControl>
       }
       confirm={
-        <Button colorScheme="primary" type="submit" isDisabled={!!formState.errors.name}>
+        <Button colorScheme="primary" type="submit" isDisabled={!!errors.name}>
           <FormattedMessage id="generic.create-folder" defaultMessage="Create folder" />
         </Button>
       }

@@ -10,6 +10,7 @@ import {
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionBaseType } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
+import { OverflownText } from "./OverflownText";
 import { PathName } from "./PathName";
 
 export type SearchInOptions = "EVERYWHERE" | "CURRENT_FOLDER";
@@ -31,7 +32,7 @@ export const SearchAllOrCurrentFolder = chakraForwardRef<"div", SearchAllOrCurre
 
     return (
       <HStack {...props}>
-        <Box id="search-in-label">
+        <Box id="search-in-label" whiteSpace="nowrap" minWidth="75px">
           <FormattedMessage
             id="component.petition-list-header.search-in"
             defaultMessage="Search in:"
@@ -43,14 +44,19 @@ export const SearchAllOrCurrentFolder = chakraForwardRef<"div", SearchAllOrCurre
           variant="outline"
           aria-labelledby="#search-in-label"
           {...getRootProps()}
+          maxWidth="calc(100% - 84px)"
         >
-          <SearchInButton {...getRadioProps({ value: "EVERYWHERE" })}>
+          <SearchInButton {...getRadioProps({ value: "EVERYWHERE" })} minWidth="fit-content">
             <FormattedMessage id="generic.everywhere" defaultMessage="Everywhere" />
           </SearchInButton>
           <SearchInButton {...getRadioProps({ value: "CURRENT_FOLDER" })}>
-            {'"'}
-            <PathName path={path} type={type} disableTooltip />
-            {'"'}
+            <OverflownText flex={1} minWidth={0}>
+              <>
+                {'"'}
+                <PathName type={type} path={path} disableTooltip />
+                {'"'}
+              </>
+            </OverflownText>
           </SearchInButton>
         </ButtonGroup>
       </HStack>
@@ -59,7 +65,8 @@ export const SearchAllOrCurrentFolder = chakraForwardRef<"div", SearchAllOrCurre
 );
 
 function SearchInButton(props: RadioProps) {
-  const { getInputProps, getCheckboxProps } = useRadio(props);
+  const { minWidth, ...radioProps } = props;
+  const { getInputProps, getCheckboxProps } = useRadio(radioProps);
 
   const input = getInputProps();
 
@@ -79,9 +86,10 @@ function SearchInButton(props: RadioProps) {
         },
       }}
       {...getCheckboxProps()}
+      minWidth={minWidth}
     >
       <input {...getInputProps()} />
-      {props.children}
+      {radioProps.children}
     </Button>
   );
 }

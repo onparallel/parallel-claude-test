@@ -51,7 +51,7 @@ export const PathBreadcrumbs = chakraForwardRef<"nav", PathBreadcrumbsProps>(
       return breadcrumbs;
     }, [path, type, intl.locale]);
     return (
-      <Breadcrumb ref={ref} height={8} display="flex" alignItems="center" {...props}>
+      <Breadcrumb ref={ref} paddingY={1} display="flex" alignItems="center" {...props}>
         {breadcrumbs.map((part, i) =>
           part.type === "path" ? (
             <BreadcrumbItem key={i}>

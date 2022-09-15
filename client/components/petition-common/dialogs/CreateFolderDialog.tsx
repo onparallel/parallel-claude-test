@@ -56,6 +56,7 @@ function CreateFolderDialog({
   const nameRef = useRef<HTMLInputElement>(null);
   const nameRegisterProps = useRegisterWithRef(nameRef, register, "name", {
     required: true,
+    maxLength: 255,
     validate: { isNotEmptyText, noSlash: (value) => !value.includes("/") },
   });
 
@@ -129,12 +130,12 @@ function CreateFolderDialog({
                   id="generic.folder-name.no-slash-error"
                   defaultMessage="Name can't contain the slash character /"
                 />
-              ) : errors.name?.type === "required" ? (
+              ) : (
                 <FormattedMessage
                   id="generic.folder-name.required-error"
                   defaultMessage="Please enter a name"
                 />
-              ) : null}
+              )}
             </FormErrorMessage>
           </FormControl>
           <FormControl id="petitions" isInvalid={!!errors.petitions}>

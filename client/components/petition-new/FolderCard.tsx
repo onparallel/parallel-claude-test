@@ -29,12 +29,12 @@ export const FolderCard = Object.assign(
         {...buttonProps}
         {...props}
       >
-        <HStack as="header" alignItems="center">
+        <HStack as="header" alignItems="flex-start">
           <Flex>
             <VisuallyHidden>
               <FormattedMessage id="generic.folder" defaultMessage="Folder" />
             </VisuallyHidden>
-            <FolderIcon fontSize="lg" role="presentation" />
+            <FolderIcon fontSize="lg" role="presentation" marginTop={1} />
           </Flex>
           <Text as="h2" fontSize="lg" noOfLines={2} fontWeight="bold">
             {folder.folderName}
