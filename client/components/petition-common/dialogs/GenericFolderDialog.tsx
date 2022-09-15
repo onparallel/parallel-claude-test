@@ -6,6 +6,7 @@ import {
   ConfirmDialogProps,
 } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { OverflownText } from "@parallel/components/common/OverflownText";
 import { GenericFolderDialog_foldersDocument, PetitionBaseType } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { ComponentType, createElement, useEffect, useMemo, useRef, useState } from "react";
@@ -249,7 +250,9 @@ export function GenericFolderDialog({
                       tabIndex={0}
                       {...nodeProps}
                     >
-                      <PathName type={type} path={path} disableTooltip />
+                      <OverflownText flex={1} minWidth={0}>
+                        <PathName type={type} path={path} disableTooltip />
+                      </OverflownText>
                     </Button>
                   );
                 }}
