@@ -34,7 +34,7 @@ export const SearchAllOrCurrentFolder = chakraForwardRef<"div", SearchAllOrCurre
 
     return (
       <HStack {...props}>
-        <Box id="search-in-label" whiteSpace="nowrap" minWidth="75px">
+        <Box id="search-in-label" whiteSpace="nowrap">
           <FormattedMessage
             id="component.petition-list-header.search-in"
             defaultMessage="Search in:"
