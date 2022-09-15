@@ -16724,6 +16724,12 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   anonymizePurpose?: string | null;
   updatedAt: string;
   path: string;
+  organization: {
+    __typename?: "Organization";
+    id: string;
+    customHost?: string | null;
+    brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
+  };
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -17697,6 +17703,12 @@ export type PetitionCompose_petitionQuery = {
         anonymizePurpose?: string | null;
         updatedAt: string;
         path: string;
+        organization: {
+          __typename?: "Organization";
+          id: string;
+          customHost?: string | null;
+          brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
+        };
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -18227,6 +18239,11 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
   isRestricted: boolean;
   updatedAt: string;
   path: string;
+  organization: {
+    __typename?: "Organization";
+    id: string;
+    brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
+  };
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -18602,6 +18619,11 @@ export type PetitionPreview_updatePetitionMutation = {
         isRestricted: boolean;
         updatedAt: string;
         path: string;
+        organization: {
+          __typename?: "Organization";
+          id: string;
+          brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
+        };
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -19130,6 +19152,11 @@ export type PetitionPreview_petitionQuery = {
         isRestricted: boolean;
         updatedAt: string;
         path: string;
+        organization: {
+          __typename?: "Organization";
+          id: string;
+          brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
+        };
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
