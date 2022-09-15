@@ -3,6 +3,7 @@ import {
   Button,
   ButtonGroup,
   HStack,
+  layoutPropNames,
   RadioProps,
   useRadio,
   useRadioGroup,
@@ -10,6 +11,7 @@ import {
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionBaseType } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
+import { pick } from "remeda";
 import { OverflownText } from "./OverflownText";
 import { PathName } from "./PathName";
 
@@ -43,20 +45,18 @@ export const SearchAllOrCurrentFolder = chakraForwardRef<"div", SearchAllOrCurre
           isAttached
           variant="outline"
           aria-labelledby="#search-in-label"
+          minWidth={0}
           {...getRootProps()}
-          maxWidth="calc(100% - 84px)"
         >
           <SearchInButton {...getRadioProps({ value: "EVERYWHERE" })} minWidth="fit-content">
             <FormattedMessage id="generic.everywhere" defaultMessage="Everywhere" />
           </SearchInButton>
           <SearchInButton {...getRadioProps({ value: "CURRENT_FOLDER" })}>
+            {'"'}
             <OverflownText flex={1} minWidth={0}>
-              <>
-                {'"'}
-                <PathName type={type} path={path} disableTooltip />
-                {'"'}
-              </>
+              <PathName type={type} path={path} disableTooltip />
             </OverflownText>
+            {'"'}
           </SearchInButton>
         </ButtonGroup>
       </HStack>
@@ -65,8 +65,8 @@ export const SearchAllOrCurrentFolder = chakraForwardRef<"div", SearchAllOrCurre
 );
 
 function SearchInButton(props: RadioProps) {
-  const { minWidth, ...radioProps } = props;
-  const { getInputProps, getCheckboxProps } = useRadio(radioProps);
+  const rootProps = pick(props, layoutPropNames as any);
+  const { getInputProps, getCheckboxProps } = useRadio(props);
 
   const input = getInputProps();
 
@@ -86,10 +86,10 @@ function SearchInButton(props: RadioProps) {
         },
       }}
       {...getCheckboxProps()}
-      minWidth={minWidth}
+      {...(rootProps as any)}
     >
       <input {...getInputProps()} />
-      {radioProps.children}
+      {props.children}
     </Button>
   );
 }
