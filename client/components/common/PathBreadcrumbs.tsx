@@ -15,8 +15,12 @@ export const PathBreadcrumbs = chakraForwardRef<"nav", PathBreadcrumbsProps>(
   function PathBreadcrumbs({ path, type, pathUrl, ...props }, ref) {
     const intl = useIntl();
     const breadcrumbs = useMemo(() => {
-      const breadcrumbs = [
+      const breadcrumbs: (
+        | { type: "ellipsis" }
+        | { type: "path"; text: string; getUrl: () => string; isCurrent: boolean }
+      )[] = [
         {
+          type: "path",
           text:
             type === "PETITION"
               ? intl.formatMessage({ id: "generic.root-petitions", defaultMessage: "Parallels" })
@@ -33,6 +37,7 @@ export const PathBreadcrumbs = chakraForwardRef<"nav", PathBreadcrumbsProps>(
             .map((part, i, parts) => {
               const p = "/" + parts.slice(0, i + 1).join("/") + "/";
               return {
+                type: "path" as const,
                 text: part,
                 getUrl: () => pathUrl(p),
                 isCurrent: path === p,
@@ -40,29 +45,48 @@ export const PathBreadcrumbs = chakraForwardRef<"nav", PathBreadcrumbsProps>(
             })
         );
       }
+      if (breadcrumbs.length > 4) {
+        breadcrumbs.splice(1, breadcrumbs.length - 4, { type: "ellipsis" });
+      }
       return breadcrumbs;
     }, [path, type, intl.locale]);
     return (
       <Breadcrumb ref={ref} height={8} display="flex" alignItems="center" {...props}>
-        {breadcrumbs.map(({ text, getUrl, isCurrent }, i) => (
-          <BreadcrumbItem key={i}>
-            <NakedLink href={getUrl()}>
+        {breadcrumbs.map((part, i) =>
+          part.type === "path" ? (
+            <BreadcrumbItem key={i}>
+              <NakedLink href={part.getUrl()}>
+                <BreadcrumbLink
+                  isCurrentPage={part.isCurrent}
+                  color="primary.600"
+                  fontWeight="medium"
+                  _activeLink={{
+                    color: "inherit",
+                    fontWeight: "inherit",
+                    cursor: "default",
+                    _hover: { textDecoration: "none" },
+                  }}
+                >
+                  {part.text}
+                </BreadcrumbLink>
+              </NakedLink>
+            </BreadcrumbItem>
+          ) : (
+            <BreadcrumbItem key={i}>
               <BreadcrumbLink
-                isCurrentPage={isCurrent}
-                color="primary.600"
-                fontWeight="medium"
-                _activeLink={{
+                as="span"
+                sx={{
                   color: "inherit",
                   fontWeight: "inherit",
                   cursor: "default",
                   _hover: { textDecoration: "none" },
                 }}
               >
-                {text}
+                ...
               </BreadcrumbLink>
-            </NakedLink>
-          </BreadcrumbItem>
-        ))}
+            </BreadcrumbItem>
+          )
+        )}
       </Breadcrumb>
     );
   }
