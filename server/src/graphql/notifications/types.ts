@@ -76,7 +76,7 @@ export const CommentCreatedUserNotification = createPetitionUserNotification(
       resolve: async (o, _, ctx) => (await ctx.petitions.loadField(o.data.petition_field_id))!,
     });
     t.boolean("isMention", {
-      resolve: (o) => o.data.is_mentioned,
+      resolve: (o) => o.data.is_mentioned ?? false,
     });
   }
 );
