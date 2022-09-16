@@ -217,7 +217,9 @@ export const User = objectType({
       description: "Organizations this user belongs to",
       authorize: rootIsContextRealUser(),
       resolve: async (root, _, ctx) => {
-        const users = await ctx.users.loadUsersByUserDataId(root.user_data_id);
+        const users = (await ctx.users.loadUsersByUserDataId(root.user_data_id)).filter(
+          (user) => user.status === "ACTIVE"
+        );
         const usersByOrgId = indexBy(users, (u) => u.org_id);
         const orgs = await ctx.organizations.loadOrg(uniq(users.map((u) => u.org_id)));
         return sortBy(orgs.filter(isDefined), (o) => usersByOrgId[o.id].created_at);
