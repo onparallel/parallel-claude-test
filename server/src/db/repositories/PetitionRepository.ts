@@ -5153,18 +5153,26 @@ export class PetitionRepository extends BaseRepository {
       return;
     }
     const [userMentions, userGroupMentions] = partition(mentions, (m) => m.type === "User");
-    const permissions = await this.loadUserAndUserGroupPermissionsByPetitionId(petitionId);
-    const [userPermissions, groupPermissions] = partition(permissions, (p) => isDefined(p.user_id));
+    const permissions = await this.from("petition_permission")
+      .where("petition_id", petitionId)
+      .whereNull("deleted_at")
+      .andWhere((q) => {
+        q.whereIn(
+          "user_id",
+          userMentions.map((u) => u.id)
+        ).orWhereIn(
+          "user_group_id",
+          userGroupMentions.map((ug) => ug.id)
+        );
+      })
+      .select("user_id", "user_group_id");
 
-    const userIdsWithNoPermissions = difference(
-      userMentions.map((m) => m.id),
-      userPermissions.map((p) => p.user_id!)
-    );
-
-    const userGroupIdsWithNoPermissions = difference(
-      userGroupMentions.map((m) => m.id),
-      groupPermissions.map((p) => p.user_group_id!)
-    );
+    const userIdsWithNoPermissions = userMentions
+      .map((m) => m.id)
+      .filter((id) => !permissions.some((p) => p.user_id === id));
+    const userGroupIdsWithNoPermissions = userGroupMentions
+      .map((m) => m.id)
+      .filter((id) => !permissions.some((p) => p.user_group_id === id));
 
     if (userIdsWithNoPermissions.length > 0 || userGroupIdsWithNoPermissions.length > 0) {
       if (throwOnNoPermission) {
