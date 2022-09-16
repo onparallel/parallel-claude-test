@@ -6,7 +6,6 @@ import pMap from "p-map";
 import {
   chunk,
   countBy,
-  difference,
   groupBy,
   indexBy,
   isDefined,
