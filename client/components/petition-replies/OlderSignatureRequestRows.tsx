@@ -56,11 +56,10 @@ export function OlderSignatureRequestRows({
                       signerStatus={{
                         ...sStatus,
                         // show X icon on pending signers for older signature requests
-                        status: sStatus.status === "PENDING" ? "DECLINED" : sStatus.status,
+                        status: sStatus.status === "PENDING" ? "SIGNED" : sStatus.status,
                       }}
                       position="relative"
-                      top={-0.5}
-                      marginX={0.5}
+                      marginX={1}
                     />
                   </Fragment>
                 ))}

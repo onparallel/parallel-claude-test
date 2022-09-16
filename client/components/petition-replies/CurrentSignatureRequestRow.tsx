@@ -84,8 +84,7 @@ export function CurrentSignatureRequestRow({
                     <PetitionSignatureRequestSignerStatusIcon
                       signerStatus={sStatus}
                       position="relative"
-                      top={-0.5}
-                      marginX={0.5}
+                      marginX={1}
                     />
                   ) : null}
                 </Fragment>
