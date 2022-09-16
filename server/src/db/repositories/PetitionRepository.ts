@@ -4315,16 +4315,15 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async isUserSubscribedToPetition(userId: number, petitionId: number) {
-    const [permission] = await this.raw<PetitionPermission>(
+    return await this.exists(
       /* sql */ `
-      select pp.*
-        from petition_permission pp
-        join "user" u on u.id = pp.user_id
-      where pp.user_id = ? and pp.petition_id = ? and pp.deleted_at is null and u.deleted_at is null
+        select pp.*
+          from petition_permission pp
+          join "user" u on u.id = pp.user_id
+        where pp.user_id = ? and pp.petition_id = ? and pp.is_subscribed and pp.deleted_at is null and u.deleted_at is null
     `,
       [userId, petitionId]
     );
-    return permission.is_subscribed;
   }
 
   async updatePetitionPermissionSubscription(
@@ -5066,23 +5065,21 @@ export class PetitionRepository extends BaseRepository {
     paths: string[],
     permissionType: PetitionPermissionType
   ) {
-    const result = await this.raw<{ exists: boolean }>(
+    const hasPetitionWithLowerPermission = await this.exists(
       /* sql */ `
-        select exists(
-          select min(pp.type) from petition p
-            join petition_permission pp on pp.petition_id = p.id
-          where pp.user_id = ? and pp.deleted_at is null
-            and p.is_template = ? and p.deleted_at is null and p.org_id = ?
-            and exists(
-              select * from unnest(?::text[]) as t(prefix) where starts_with(p.path, prefix)
-            )
-          group by p.id
-          having min(pp.type) > ?
-        )
+        select min(pp.type) from petition p
+          join petition_permission pp on pp.petition_id = p.id
+        where pp.user_id = ? and pp.deleted_at is null
+          and p.is_template = ? and p.deleted_at is null and p.org_id = ?
+          and exists(
+            select * from unnest(?::text[]) as t(prefix) where starts_with(p.path, prefix)
+          )
+        group by p.id
+        having min(pp.type) > ?
       `,
       [userId, isTemplate, orgId, this.sqlArray(paths), permissionType]
     );
-    return !result[0].exists;
+    return !hasPetitionWithLowerPermission;
   }
 
   async updatePetitionPaths(

@@ -117,6 +117,19 @@ export class BaseRepository {
     return rows;
   }
 
+  protected async exists(
+    sql: string,
+    bindings?: readonly Knex.RawBinding[],
+    transaction?: Knex.Transaction
+  ): Promise<boolean> {
+    const [{ exists }] = await this.raw<{ exists: boolean }>(
+      /* sql */ `select exists(?)`,
+      [this.knex.raw(sql, bindings ?? [])],
+      transaction
+    );
+    return exists;
+  }
+
   protected insert<TName extends TableNames>(
     tableName: TName,
     data: MaybeArray<TableCreateTypes[TName]>,
