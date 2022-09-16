@@ -651,7 +651,7 @@
   },
   {
     "term": "petition-shared-email.access-button",
-    "definition": "Acceder a la {isTemplate, select, true{plantilla} other{parallel}}",
+    "definition": "Acceder {isTemplate, select, true{a la plantilla} other{al parallel}}",
     "context": "Access the {isTemplate, select, true{template} other{parallel}}"
   },
   {
