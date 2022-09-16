@@ -1,4 +1,4 @@
-import { Box, Portal } from "@chakra-ui/react";
+import { Box, Center, Portal, Spinner } from "@chakra-ui/react";
 import { MaybePromise } from "@parallel/utils/types";
 import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
 import {
@@ -21,7 +21,7 @@ import {
   useEventEditorSelectors,
 } from "@udecode/plate-core";
 import { flip, offset, shift, useVirtualFloating } from "@udecode/plate-floating";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card } from "../Card";
 
 export interface ComboboxItemProps<TData> {
@@ -71,19 +71,24 @@ const ComboboxContent = <TData extends Data = NoData>(
   const isOpen = useComboboxSelectors.isOpen();
   const text = useComboboxSelectors.text() ?? "";
 
+  const [isLoading, setIsLoading] = useState(false);
+
   // Update items
   useAsyncEffect(
     async (isMounted) => {
       try {
         if (text !== "" && isOpen) {
+          setIsLoading(true);
           const items = await onSearchItems(text);
           if (isMounted()) {
             comboboxActions.items(items);
             comboboxActions.filteredItems(items);
+            setIsLoading(false);
           }
         } else {
           comboboxActions.items([]);
           comboboxActions.filteredItems([]);
+          setIsLoading(false);
         }
       } catch {}
     },
@@ -134,6 +139,7 @@ const ComboboxContent = <TData extends Data = NoData>(
         transition="none"
         maxHeight="220px"
         overflow="auto"
+        minWidth="320px"
         maxWidth="320px"
       >
         {filteredItems.length > 0 ? (
@@ -166,6 +172,16 @@ const ComboboxContent = <TData extends Data = NoData>(
               </Box>
             );
           })
+        ) : isLoading ? (
+          <Center minHeight={40}>
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="primary.500"
+              size="xl"
+            />
+          </Center>
         ) : (
           <NoItems search={text} />
         )}
