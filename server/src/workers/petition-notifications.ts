@@ -34,14 +34,14 @@ async function processCommentCreatedUserNotifications(
         const petitionId = group[0].petition_id;
         const userId = group[0].user_id;
         const isSubscribed = await context.petitions.isUserSubscribedToPetition(userId, petitionId);
-        await context.emails.sendPetitionCommentsUserNotificationEmail(
-          petitionId,
-          userId,
-          group
-            .filter((n) => isSubscribed || !!n.data.is_mentioned)
-            .map((n) => n.data.petition_field_comment_id)
-        );
-
+        const notifications = isSubscribed ? group : group.filter((n) => n.data.is_mentioned);
+        if (notifications.length > 0) {
+          await context.emails.sendPetitionCommentsUserNotificationEmail(
+            petitionId,
+            userId,
+            notifications.map((n) => n.data.petition_field_comment_id)
+          );
+        }
         await context.petitions.updatePetitionUserNotificationsProcessedAt(group.map((n) => n.id));
       }
     }
