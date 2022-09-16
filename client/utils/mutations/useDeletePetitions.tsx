@@ -9,15 +9,14 @@ import { PetitionNameWithPath } from "@parallel/components/common/PetitionNameWi
 import {
   PetitionBaseType,
   useDeletePetitions_deletePetitionsDocument,
-  useDeletePetitions_PetitionBaseFragment,
   useDeletePetitions_PetitionBaseOrFolderFragment,
-  useDeletePetitions_PetitionFolderFragment,
   useDeletePetitions_petitionsDocument,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, partition } from "remeda";
+import { isDefined } from "remeda";
 import { isApolloError } from "../apollo/isApolloError";
+import { partitionOnTypename } from "../apollo/typename";
 import { withError } from "../promises/withError";
 
 export function useDeletePetitions() {
@@ -34,7 +33,7 @@ export function useDeletePetitions() {
     type: PetitionBaseType,
     { force, dryrun }: { force?: boolean; dryrun?: boolean }
   ) => {
-    const [folders, petitions] = partitionFoldersAndPetitions(petitionsOrFolders);
+    const [folders, petitions] = partitionOnTypename(petitionsOrFolders, "PetitionFolder");
     const petitionIds = petitions.map((p) => p.id);
     const folderIds = folders.map((f) => f.folderId);
 
@@ -193,7 +192,7 @@ function ConfirmDeletePetitionsDialog({
   type: PetitionBaseType;
 }>) {
   const intl = useIntl();
-  const [folders, petitions] = partitionFoldersAndPetitions(petitionsOrFolders);
+  const [folders, petitions] = partitionOnTypename(petitionsOrFolders, "PetitionFolder");
 
   const folderPetitionCount = folders.reduce((acc, curr) => acc + curr.petitionCount, 0);
   const count = folderPetitionCount + petitions.length;
@@ -420,10 +419,3 @@ const _mutations = [
     }
   `,
 ];
-
-function partitionFoldersAndPetitions(ids: useDeletePetitions_PetitionBaseOrFolderFragment[]) {
-  return partition(ids, (t) => t.__typename === "PetitionFolder") as [
-    useDeletePetitions_PetitionFolderFragment[],
-    useDeletePetitions_PetitionBaseFragment[]
-  ];
-}

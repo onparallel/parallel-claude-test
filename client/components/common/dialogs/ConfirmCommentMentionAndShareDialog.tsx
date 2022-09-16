@@ -2,9 +2,10 @@ import { Button, ListItem, Stack, Text, UnorderedList } from "@chakra-ui/react";
 import { UserGroupReference } from "@parallel/components/petition-activity/UserGroupReference";
 import { UserReference } from "@parallel/components/petition-activity/UserReference";
 import { usePetitionCommentsMutations_getUsersOrGroupsQuery } from "@parallel/graphql/__types";
+import { partitionOnTypename } from "@parallel/utils/apollo/typename";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, partition } from "remeda";
+import { isDefined } from "remeda";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
 
@@ -19,7 +20,7 @@ function ConfirmCommentMentionAndShareDialog({
   ...props
 }: DialogProps<ConfirmCommentMentionAndShareDialogProps, boolean>) {
   const intl = useIntl();
-  const [users, groups] = partition(usersAndGroups, (t) => t.__typename === "User");
+  const [users, groups] = partitionOnTypename(usersAndGroups, "User");
   return (
     <ConfirmDialog
       {...props}
