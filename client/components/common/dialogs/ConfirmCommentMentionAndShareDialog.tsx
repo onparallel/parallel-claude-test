@@ -71,8 +71,7 @@ function ConfirmCommentMentionAndShareDialog({
           <Text>
             <FormattedMessage
               id="component.confirm-comment-mention-and-share-dialog.body-confirm"
-              defaultMessage="Do you want to share the parallel so they can see your message?"
-              values={{ count: usersAndGroups.length }}
+              defaultMessage="Do you want to share the parallel with them so the message can be read?"
             />
           </Text>
         </Stack>

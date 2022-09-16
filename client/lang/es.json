@@ -391,7 +391,7 @@
   },
   {
     "term": "component.confirm-comment-mention-and-share-dialog.body-confirm",
-    "definition": "¿Quieres {count, plural, =1{compartirle} other{compartirles}} el parallel para que {count, plural, =1{pueda} other{puedan}} ver tu mensaje?",
+    "definition": "¿Quieres compartir el parallel para que se pueda leer tu mensaje?",
     "context": "Do you want to share the parallel so they can see your message?"
   },
   {
