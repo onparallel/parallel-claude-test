@@ -31,6 +31,7 @@ export const initServer = async () => {
   });
 
   const knex = container.get<Knex>(KNEX);
+  await server.start();
 
   return {
     async execute(query: string | DocumentNode, variables?: VariableValues) {
