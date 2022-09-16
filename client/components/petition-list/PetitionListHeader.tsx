@@ -1,7 +1,10 @@
 import { gql, useMutation } from "@apollo/client";
 import { Box, Button, HStack, MenuItem, MenuList, Stack } from "@chakra-ui/react";
 import { AddIcon, RepeatIcon } from "@parallel/chakra/icons";
-import { PetitionListHeader_movePetitionsDocument } from "@parallel/graphql/__types";
+import {
+  OrganizationRole,
+  PetitionListHeader_movePetitionsDocument,
+} from "@parallel/graphql/__types";
 import type { PetitionsQueryState } from "@parallel/pages/app/petitions";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
@@ -25,6 +28,7 @@ export interface PetitionListHeaderProps {
   state: PetitionsQueryState;
   onStateChange: SetQueryState<Partial<PetitionsQueryState>>;
   onReload: () => void;
+  organizationRole: OrganizationRole;
 }
 
 export function PetitionListHeader({
@@ -32,6 +36,7 @@ export function PetitionListHeader({
   state,
   onStateChange,
   onReload,
+  organizationRole,
 }: PetitionListHeaderProps) {
   const intl = useIntl();
   const [search, setSearch] = useState(state.search ?? "");
@@ -147,7 +152,11 @@ export function PetitionListHeader({
           })}
         />
         <Spacer />
-        <Button display={{ base: "none", lg: "block" }} onClick={handleCreateFolder}>
+        <Button
+          display={{ base: "none", lg: "block" }}
+          onClick={handleCreateFolder}
+          isDisabled={organizationRole === "COLLABORATOR"}
+        >
           <FormattedMessage
             id="component.petition-list-header.create-folder"
             defaultMessage="Create folder"
@@ -157,6 +166,7 @@ export function PetitionListHeader({
           display={{ base: "none", lg: "block" }}
           colorScheme="primary"
           onClick={handleCreateNewParallelOrTemplate}
+          isDisabled={organizationRole === "COLLABORATOR" && state.type === "TEMPLATE"}
         >
           {newParallelOrTemplateLiteral}
         </Button>
@@ -167,13 +177,19 @@ export function PetitionListHeader({
           icon={<AddIcon />}
           options={
             <MenuList minWidth="fit-content">
-              <MenuItem onClick={handleCreateFolder}>
+              <MenuItem
+                onClick={handleCreateFolder}
+                isDisabled={organizationRole === "COLLABORATOR"}
+              >
                 <FormattedMessage
                   id="component.petition-list-header.create-folder"
                   defaultMessage="Create folder"
                 />
               </MenuItem>
-              <MenuItem onClick={handleCreateNewParallelOrTemplate}>
+              <MenuItem
+                onClick={handleCreateNewParallelOrTemplate}
+                isDisabled={organizationRole === "COLLABORATOR" && state.type === "TEMPLATE"}
+              >
                 {newParallelOrTemplateLiteral}
               </MenuItem>
             </MenuList>

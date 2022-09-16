@@ -392,6 +392,7 @@ function Petitions() {
               state={state}
               onStateChange={setQueryState}
               onReload={() => refetch()}
+              organizationRole={me.role}
             />
           }
           body={
