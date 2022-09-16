@@ -10,11 +10,12 @@ export interface PaneWithFlyoutProps {
   isFlyoutActive: boolean;
   flyout: ReactNode;
   alignWith: Maybe<HTMLElement>;
+  flyoutTopPadding: number;
   children: ReactNode;
 }
 
 export const PaneWithFlyout = chakraForwardRef<"div", PaneWithFlyoutProps>(function PaneWithFlyout(
-  { isFlyoutActive, flyout, alignWith, children, ...props },
+  { isFlyoutActive, flyout, alignWith, flyoutTopPadding, children, ...props },
   ref
 ) {
   const [flyoutOffset, setFlyoutOffset] = useState(0);
@@ -31,9 +32,11 @@ export const PaneWithFlyout = chakraForwardRef<"div", PaneWithFlyoutProps>(funct
       return;
     }
     const { top: paneTop, height: paneHeight } = paneRef.current!.getBoundingClientRect();
-    const { height: alignWithHeight, top: alignWithTop } = alignWith.getBoundingClientRect();
+    const { top: alignWithTop } = alignWith.getBoundingClientRect();
     const { height: flyoutHeight } = flyoutRef.current.getBoundingClientRect();
-    const offset = alignWithTop - paneTop + alignWithHeight / 2 - flyoutHeight / 2;
+
+    // flyoutTopPadding is in rem's, so its multiplied by 4 to match pixels
+    const offset = alignWithTop - paneTop - flyoutTopPadding * 4;
     const maxOffset = paneHeight - flyoutHeight;
     setFlyoutOffset(Math.min(maxOffset, Math.max(0, offset)));
   }

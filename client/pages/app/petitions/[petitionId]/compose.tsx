@@ -480,6 +480,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           backgroundColor={petition?.__typename === "PetitionTemplate" ? "primary.50" : undefined}
           isFlyoutActive={Boolean(activeField)}
           alignWith={activeField ? activeFieldElement : null}
+          flyoutTopPadding={4}
           flyout={
             <Box padding={{ base: 4 }} paddingLeft={{ md: 0 }}>
               {activeField ? (

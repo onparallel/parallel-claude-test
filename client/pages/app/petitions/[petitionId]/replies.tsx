@@ -568,6 +568,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       <PaneWithFlyout
         isFlyoutActive={Boolean(activeFieldId)}
         alignWith={activeFieldId ? fieldRefs[activeFieldId].current : null}
+        flyoutTopPadding={4}
         flyout={
           <Box padding={4} paddingLeft={{ md: 0 }}>
             {activeFieldId && !!activeField ? (
