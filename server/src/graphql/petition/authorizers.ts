@@ -590,6 +590,7 @@ export function foldersAreInPath<
     } catch {}
     return false;
   };
+}
 
 export function userHasAccessToPetitionFieldComment<
   TypeName extends string,
