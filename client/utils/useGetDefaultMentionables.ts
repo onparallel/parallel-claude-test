@@ -2,12 +2,10 @@ import { gql, useQuery } from "@apollo/client";
 import { useGetDefaultMentionables_permissionsQueryDocument } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { uniqBy } from "remeda";
-import { useGetMyId } from "./apollo/getMyId";
 import { isTypename } from "./apollo/typename";
 import { createMentionPlugin } from "./slate/MentionPlugin";
 
 export function useGetDefaultMentionables(petitionId: string) {
-  const myId = useGetMyId();
   const { data } = useQuery(useGetDefaultMentionables_permissionsQueryDocument, {
     variables: { petitionId },
     fetchPolicy: "cache-and-network",
@@ -29,7 +27,7 @@ export function useGetDefaultMentionables(petitionId: string) {
         ...(data?.petition?.permissions
           .filter(isTypename("PetitionUserGroupPermission"))
           .flatMap((p) => p.group.members.map((m) => m.user)) ?? []),
-      ].filter((m) => m.id !== myId),
+      ].filter((m) => (m.__typename === "User" && m.isMe ? false : true)),
       (m) => m.id
     );
   }, [data]);
@@ -46,6 +44,7 @@ const _queries = [
             user {
               id
               ...createMentionPlugin_UserOrUserGroup
+              isMe
             }
           }
           ... on PetitionUserGroupPermission {
@@ -57,6 +56,7 @@ const _queries = [
                 user {
                   id
                   ...createMentionPlugin_UserOrUserGroup
+                  isMe
                 }
               }
             }

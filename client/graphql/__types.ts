@@ -23026,6 +23026,7 @@ export type useGetDefaultMentionables_permissionsQueryQuery = {
                   user: {
                     __typename?: "User";
                     id: string;
+                    isMe: boolean;
                     fullName?: string | null;
                     email: string;
                   };
@@ -23035,7 +23036,13 @@ export type useGetDefaultMentionables_permissionsQueryQuery = {
           | {
               __typename?: "PetitionUserPermission";
               permissionType: PetitionPermissionType;
-              user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+              user: {
+                __typename?: "User";
+                id: string;
+                isMe: boolean;
+                fullName?: string | null;
+                email: string;
+              };
             }
         >;
       }
@@ -23056,6 +23063,7 @@ export type useGetDefaultMentionables_permissionsQueryQuery = {
                   user: {
                     __typename?: "User";
                     id: string;
+                    isMe: boolean;
                     fullName?: string | null;
                     email: string;
                   };
@@ -23065,7 +23073,13 @@ export type useGetDefaultMentionables_permissionsQueryQuery = {
           | {
               __typename?: "PetitionUserPermission";
               permissionType: PetitionPermissionType;
-              user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+              user: {
+                __typename?: "User";
+                id: string;
+                isMe: boolean;
+                fullName?: string | null;
+                email: string;
+              };
             }
         >;
       }
@@ -31529,6 +31543,7 @@ export const useGetDefaultMentionables_permissionsQueryDocument = gql`
           user {
             id
             ...createMentionPlugin_UserOrUserGroup
+            isMe
           }
         }
         ... on PetitionUserGroupPermission {
@@ -31540,6 +31555,7 @@ export const useGetDefaultMentionables_permissionsQueryDocument = gql`
               user {
                 id
                 ...createMentionPlugin_UserOrUserGroup
+                isMe
               }
             }
           }
