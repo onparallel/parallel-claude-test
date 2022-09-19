@@ -457,7 +457,7 @@ export type Mutation = {
   /** Notifies the backend that the upload is complete. */
   createFileUploadReplyComplete: PetitionFieldReply;
   /** Creates a new organization. Sends email to owner ONLY if it's not registered in any other organization. */
-  createOrganization: SupportMethodResponse;
+  createOrganization: Organization;
   /** Creates a new PDF_DOCUMENT theme on the user's organization */
   createOrganizationPdfDocumentTheme: Organization;
   /** Creates a new user in the same organization as the context user if `orgId` is not provided */
@@ -871,7 +871,6 @@ export type MutationcreateOrganizationArgs = {
   lastName: Scalars["String"];
   locale: PetitionLocale;
   name: Scalars["String"];
-  password: Scalars["String"];
   status: OrganizationStatus;
 };
 

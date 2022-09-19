@@ -1,6 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import { Badge, Flex, Text, Tooltip, useToast } from "@chakra-ui/react";
 import { ForbiddenIcon, LogInIcon } from "@parallel/chakra/icons";
+import { AdminOrganizationMembersListTableHeader } from "@parallel/components/admin-organizations/AdminOrganizationMembersListTableHeader";
 import { AdminOrganizationsLayout } from "@parallel/components/admin-organizations/AdminOrganizationsLayout";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -8,8 +9,7 @@ import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
-import { useInviteUserDialog } from "@parallel/components/organization/dialogs/InviteUserDialog";
-import { OrganizationMembersListTableHeader } from "@parallel/components/organization/OrganizationMembersListTableHeader";
+import { useInviteUserDialog } from "@parallel/components/admin-organizations/dialogs/InviteUserDialog";
 import {
   AdminOrganizationsMembers_createOrganizationUserDocument,
   AdminOrganizationsMembers_organizationDocument,
@@ -203,7 +203,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
             },
           ]}
           header={
-            <OrganizationMembersListTableHeader
+            <AdminOrganizationMembersListTableHeader
               search={search}
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}

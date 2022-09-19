@@ -115,7 +115,7 @@ export function InviteUserDialog({ ...props }: DialogProps<{}, InviteUserDialogD
               />
             </FormErrorMessage>
           </FormControl>
-          <FormControl id="locale" isInvalid={!!errors.lastName}>
+          <FormControl id="locale" isInvalid={!!errors.locale}>
             <FormLabel>
               <FormattedMessage id="generic.language" defaultMessage="Language" />
             </FormLabel>

@@ -1,10 +1,9 @@
-import { gql } from "@apollo/client";
-import { Badge, Box, Flex, Heading, Stack } from "@chakra-ui/react";
-import { RepeatIcon } from "@parallel/chakra/icons";
+import { gql, useMutation } from "@apollo/client";
+import { Badge, Flex, Heading, useToast } from "@chakra-ui/react";
+import { AdminOrganizationsListTableHeader } from "@parallel/components/admin-organizations/AdminOrganizationsListTableHeader";
+import { useCreateOrganizationDialog } from "@parallel/components/admin-organizations/dialogs/CreateOrganizationDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { SearchInput } from "@parallel/components/common/SearchInput";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -23,11 +22,14 @@ import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviou
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useHandleNavigation } from "@parallel/utils/navigation";
+import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { useAdminSections } from "@parallel/utils/useAdminSections";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { ChangeEvent, MouseEvent, useCallback, useMemo, useState } from "react";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
+import { AdminOrganizations_createOrganizationDocument } from "../../../../graphql/__types";
 
 const SORTING = ["name", "createdAt"] as const;
 
@@ -63,9 +65,8 @@ function AdminOrganizations() {
     }
   );
   const organizations = data?.organizations;
-
+  const toast = useToast();
   const sections = useAdminSections();
-
   const columns = useOrganizationColumns();
   const [search, setSearch] = useState(state.search);
 
@@ -80,14 +81,57 @@ function AdminOrganizations() {
     300,
     [setQueryState]
   );
+
   const handleSearchChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const value = event.target.value;
+    (value: string | null) => {
       setSearch(value);
       debouncedOnSearchChange(value || null);
     },
     [debouncedOnSearchChange]
   );
+
+  const [createOrganization] = useMutation(AdminOrganizations_createOrganizationDocument);
+  const genericError = useGenericErrorToast();
+  const showCreateOrganizationDialog = useCreateOrganizationDialog();
+  async function handleCreateOrganization() {
+    try {
+      const [error, organization] = await withError(showCreateOrganizationDialog({}));
+      if (error || !organization) {
+        return;
+      }
+
+      await createOrganization({
+        variables: {
+          ...organization,
+        },
+        update: () => {
+          refetch();
+        },
+      });
+
+      toast({
+        isClosable: true,
+        duration: 5000,
+        status: "success",
+        title: intl.formatMessage({
+          id: "organization.organization-created-success.toast-title",
+          defaultMessage: "Organization created successfully.",
+        }),
+        description: intl.formatMessage(
+          {
+            id: "organization.organization-created-success.toast-description",
+            defaultMessage:
+              "We have sent an email to {email} with instructions and the temporal password.",
+          },
+          {
+            email: organization.email,
+          }
+        ),
+      });
+    } catch {
+      genericError();
+    }
+  }
 
   const navigate = useHandleNavigation();
   const handleRowClick = useCallback(function (row: OrganizationSelection, event: MouseEvent) {
@@ -131,21 +175,12 @@ function AdminOrganizations() {
           }
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
           header={
-            <Stack direction="row" padding={2}>
-              <Box flex="0 1 400px">
-                <SearchInput value={search ?? ""} onChange={handleSearchChange} />
-              </Box>
-              <IconButtonWithTooltip
-                onClick={() => refetch()}
-                icon={<RepeatIcon />}
-                placement="bottom"
-                variant="outline"
-                label={intl.formatMessage({
-                  id: "generic.reload-data",
-                  defaultMessage: "Reload",
-                })}
-              />
-            </Stack>
+            <AdminOrganizationsListTableHeader
+              search={search}
+              onReload={() => refetch()}
+              onSearchChange={handleSearchChange}
+              onCreateClick={handleCreateOrganization}
+            />
           }
         />
       </Flex>
@@ -304,6 +339,31 @@ AdminOrganizations.queries = [
       ...AppLayout_Query
     }
     ${AppLayout.fragments.Query}
+  `,
+];
+
+AdminOrganizations.mutations = [
+  gql`
+    mutation AdminOrganizations_createOrganization(
+      $name: String!
+      $status: OrganizationStatus!
+      $firstName: String!
+      $lastName: String!
+      $email: String!
+      $locale: PetitionLocale!
+    ) {
+      createOrganization(
+        name: $name
+        status: $status
+        firstName: $firstName
+        lastName: $lastName
+        email: $email
+        locale: $locale
+      ) {
+        ...AdminOrganizations_Organization
+      }
+    }
+    ${AdminOrganizations.fragments.Organization}
   `,
 ];
 

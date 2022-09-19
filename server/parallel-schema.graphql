@@ -675,13 +675,8 @@ type Mutation {
     Name of the organization
     """
     name: String!
-
-    """
-    Temporary password of the organization owner
-    """
-    password: String!
     status: OrganizationStatus!
-  ): SupportMethodResponse!
+  ): Organization!
 
   """
   Creates a new PDF_DOCUMENT theme on the user's organization

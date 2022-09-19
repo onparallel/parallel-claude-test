@@ -11,7 +11,6 @@ import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validateRegex } from "../helpers/validators/validateRegex";
 import { validEmail } from "../helpers/validators/validEmail";
-import { validLocale } from "../helpers/validators/validLocale";
 import { validateHexColor } from "../tag/validators";
 import { supportMethodAccess } from "./authorizers";
 import { validatePublicTemplateCategories } from "./validators";
@@ -73,79 +72,6 @@ export const deletePetition = mutationField("deletePetition", {
       return {
         result: RESULT.SUCCESS,
         message: `Petition ${args.petitionId} deleted.`,
-      };
-    } catch (e: any) {
-      return { result: RESULT.FAILURE, message: e.message };
-    }
-  },
-});
-
-export const createOrganization = mutationField("createOrganization", {
-  description:
-    "Creates a new organization. Sends email to owner ONLY if it's not registered in any other organization.",
-  type: "SupportMethodResponse",
-  args: {
-    name: nonNull(stringArg({ description: "Name of the organization" })),
-    status: nonNull("OrganizationStatus"),
-    firstName: nonNull(stringArg({ description: "First name of the organization owner" })),
-    lastName: nonNull(stringArg({ description: "Last name of the organization owner" })),
-    email: nonNull(stringArg({ description: "Email of the organization owner" })),
-    password: nonNull(stringArg({ description: "Temporary password of the organization owner" })),
-    locale: nonNull("PetitionLocale"),
-  },
-  authorize: supportMethodAccess(),
-  validateArgs: validateAnd(
-    validLocale((args) => args.locale, "locale"),
-    validEmail((args) => args.email, "email"),
-    (_, { status }, ctx, info) => {
-      if (status === "ROOT") {
-        throw new ArgValidationError(info, "status", "Can't create an org with ROOT status");
-      }
-    }
-  ),
-  resolve: async (_, args, ctx) => {
-    try {
-      const org = await ctx.organizations.createOrganization(
-        {
-          name: args.name.trim(),
-          status: args.status,
-        },
-        `User:${ctx.user!.id}`
-      );
-
-      const email = args.email.trim().toLowerCase();
-      const userData = (await ctx.users.loadUserData(ctx.user!.user_data_id))!;
-      const cognitoId = await ctx.aws.getOrCreateCognitoUser(
-        email,
-        args.password,
-        args.firstName,
-        args.lastName,
-        {
-          locale: args.locale ?? "en",
-          organizationName: org.name,
-          organizationUser: fullName(userData.first_name, userData.last_name),
-        }
-      );
-
-      await ctx.users.createUser(
-        {
-          org_id: org.id,
-          organization_role: "OWNER",
-        },
-        {
-          cognito_id: cognitoId,
-          email,
-          first_name: args.firstName,
-          last_name: args.lastName,
-          details: { source: "parallel", preferredLocale: args.locale ?? "en" },
-        },
-        `User:${ctx.user!.id}`
-      );
-
-      await ctx.tiers.updateOrganizationTier(org, "FREE", `User:${ctx.user!.id}`);
-      return {
-        result: RESULT.SUCCESS,
-        message: `Organization:${org.id} created successfully with owner ${args.email}.`,
       };
     } catch (e: any) {
       return { result: RESULT.FAILURE, message: e.message };

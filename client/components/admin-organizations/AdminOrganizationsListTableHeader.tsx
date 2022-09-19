@@ -4,24 +4,24 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
-import { WhenOrgRole } from "../common/WhenOrgRole";
 
-export type OrganizationGroupsListTableHeaderProps = {
+export interface AdminOrganizationsListTableHeaderProps {
   search: string | null;
-  onSearchChange: (value: string | null) => void;
-  onReload: () => void;
-  onCreateGroup: () => void;
-};
+  onSearchChange(value: string | null): void;
+  onReload(): void;
+  onCreateClick(): void;
+}
 
-export function OrganizationGroupsListTableHeader({
+export function AdminOrganizationsListTableHeader({
   search,
   onSearchChange,
   onReload,
-  onCreateGroup,
-}: OrganizationGroupsListTableHeaderProps) {
+  onCreateClick,
+}: AdminOrganizationsListTableHeaderProps) {
   const intl = useIntl();
+
   return (
-    <Stack direction="row" padding={2}>
+    <Stack direction="row" alignItems="center" padding={2}>
       <Box flex="0 1 400px">
         <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
       </Box>
@@ -35,14 +35,15 @@ export function OrganizationGroupsListTableHeader({
           defaultMessage: "Reload",
         })}
       />
-      <WhenOrgRole role="ADMIN">
-        <Spacer />
-        <Box>
-          <Button colorScheme="primary" onClick={onCreateGroup}>
-            <FormattedMessage id="organization-groups.create-group" defaultMessage="Create team" />
-          </Button>
-        </Box>
-      </WhenOrgRole>
+      <Spacer />
+      <Box>
+        <Button colorScheme="primary" onClick={onCreateClick}>
+          <FormattedMessage
+            id="component.admin-organizations-list-table-header.create-organization"
+            defaultMessage="Create organization"
+          />
+        </Button>
+      </Box>
     </Stack>
   );
 }

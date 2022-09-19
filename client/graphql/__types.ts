@@ -491,7 +491,7 @@ export interface Mutation {
   /** Notifies the backend that the upload is complete. */
   createFileUploadReplyComplete: PetitionFieldReply;
   /** Creates a new organization. Sends email to owner ONLY if it's not registered in any other organization. */
-  createOrganization: SupportMethodResponse;
+  createOrganization: Organization;
   /** Creates a new PDF_DOCUMENT theme on the user's organization */
   createOrganizationPdfDocumentTheme: Organization;
   /** Creates a new user in the same organization as the context user if `orgId` is not provided */
@@ -905,7 +905,6 @@ export interface MutationcreateOrganizationArgs {
   lastName: Scalars["String"];
   locale: PetitionLocale;
   name: Scalars["String"];
-  password: Scalars["String"];
   status: OrganizationStatus;
 }
 
@@ -12534,6 +12533,32 @@ export type AdminOrganizations_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
+export type AdminOrganizations_createOrganizationMutationVariables = Exact<{
+  name: Scalars["String"];
+  status: OrganizationStatus;
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  email: Scalars["String"];
+  locale: PetitionLocale;
+}>;
+
+export type AdminOrganizations_createOrganizationMutation = {
+  createOrganization: {
+    __typename?: "Organization";
+    id: string;
+    _id: number;
+    name: string;
+    status: OrganizationStatus;
+    activeUserCount: number;
+    createdAt: string;
+    usageLimits: {
+      __typename?: "OrganizationUsageLimit";
+      users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
+      petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+    };
   };
 };
 
@@ -29703,6 +29728,31 @@ export const AdminOrganizations_userDocument = gql`
   }
   ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<AdminOrganizations_userQuery, AdminOrganizations_userQueryVariables>;
+export const AdminOrganizations_createOrganizationDocument = gql`
+  mutation AdminOrganizations_createOrganization(
+    $name: String!
+    $status: OrganizationStatus!
+    $firstName: String!
+    $lastName: String!
+    $email: String!
+    $locale: PetitionLocale!
+  ) {
+    createOrganization(
+      name: $name
+      status: $status
+      firstName: $firstName
+      lastName: $lastName
+      email: $email
+      locale: $locale
+    ) {
+      ...AdminOrganizations_Organization
+    }
+  }
+  ${AdminOrganizations_OrganizationFragmentDoc}
+` as unknown as DocumentNode<
+  AdminOrganizations_createOrganizationMutation,
+  AdminOrganizations_createOrganizationMutationVariables
+>;
 export const AdminSupportMethods_userDocument = gql`
   query AdminSupportMethods_user {
     ...AppLayout_Query

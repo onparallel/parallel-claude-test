@@ -1045,7 +1045,7 @@ export interface NexusGenFieldTypes {
     createExportRepliesTask: NexusGenRootTypes["Task"]; // Task!
     createFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
     createFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
-    createOrganization: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    createOrganization: NexusGenRootTypes["Organization"]; // Organization!
     createOrganizationPdfDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
     createOrganizationUser: NexusGenRootTypes["User"]; // User!
     createPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -2625,7 +2625,7 @@ export interface NexusGenFieldTypeNames {
     createExportRepliesTask: "Task";
     createFileUploadReply: "FileUploadReplyResponse";
     createFileUploadReplyComplete: "PetitionFieldReply";
-    createOrganization: "SupportMethodResponse";
+    createOrganization: "Organization";
     createOrganizationPdfDocumentTheme: "Organization";
     createOrganizationUser: "User";
     createPetition: "PetitionBase";
@@ -4062,7 +4062,6 @@ export interface NexusGenArgTypes {
       lastName: string; // String!
       locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
       name: string; // String!
-      password: string; // String!
       status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
     };
     createOrganizationPdfDocumentTheme: {

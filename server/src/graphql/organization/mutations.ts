@@ -13,9 +13,11 @@ import {
 } from "nexus";
 import { isDefined, pick } from "remeda";
 import { OrganizationTheme } from "../../db/__types";
+import { fullName } from "../../util/fullName";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { random } from "../../util/token";
 import { authenticateAnd, userIsSuperAdmin } from "../helpers/authorize";
+import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { uploadArg } from "../helpers/scalars";
 import { validateAnd } from "../helpers/validateArgs";
@@ -23,7 +25,9 @@ import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 import { inRange } from "../helpers/validators/inRange";
 import { maxLength } from "../helpers/validators/maxLength";
 import { validateFile } from "../helpers/validators/validateFile";
+import { validEmail } from "../helpers/validators/validEmail";
 import { validFontFamily } from "../helpers/validators/validFontFamily";
+import { validLocale } from "../helpers/validators/validLocale";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 import { validWebSafeFontFamily } from "../helpers/validators/validWebSafeFontFamily";
 import { userHasFeatureFlag } from "../petition/authorizers";
@@ -364,5 +368,72 @@ export const updateFeatureFlags = mutationField("updateFeatureFlags", {
     }
 
     return (await ctx.organizations.loadOrg(orgId))!;
+  },
+});
+
+export const createOrganization = mutationField("createOrganization", {
+  description:
+    "Creates a new organization. Sends email to owner ONLY if it's not registered in any other organization.",
+  type: "Organization",
+  args: {
+    name: nonNull(stringArg({ description: "Name of the organization" })),
+    status: nonNull("OrganizationStatus"),
+    firstName: nonNull(stringArg({ description: "First name of the organization owner" })),
+    lastName: nonNull(stringArg({ description: "Last name of the organization owner" })),
+    email: nonNull(stringArg({ description: "Email of the organization owner" })),
+    locale: nonNull("PetitionLocale"),
+  },
+  authorize: authenticateAnd(userIsSuperAdmin()),
+  validateArgs: validateAnd(
+    validLocale((args) => args.locale, "locale"),
+    validEmail((args) => args.email, "email"),
+    (_, { status }, ctx, info) => {
+      if (status === "ROOT") {
+        throw new ArgValidationError(info, "status", "Can't create an org with ROOT status");
+      }
+    }
+  ),
+  resolve: async (_, args, ctx) => {
+    const org = await ctx.organizations.createOrganization(
+      {
+        name: args.name.trim(),
+        status: args.status,
+      },
+      `User:${ctx.user!.id}`
+    );
+
+    const email = args.email.trim().toLowerCase();
+    const userData = (await ctx.users.loadUserData(ctx.user!.user_data_id))!;
+    const cognitoId = await ctx.aws.getOrCreateCognitoUser(
+      email,
+      null,
+      args.firstName,
+      args.lastName,
+      {
+        locale: args.locale ?? "en",
+        organizationName: org.name,
+        organizationUser: fullName(userData.first_name, userData.last_name),
+      },
+      true
+    );
+
+    await ctx.users.createUser(
+      {
+        org_id: org.id,
+        organization_role: "OWNER",
+      },
+      {
+        cognito_id: cognitoId,
+        email,
+        first_name: args.firstName,
+        last_name: args.lastName,
+        details: { source: "parallel", preferredLocale: args.locale ?? "en" },
+      },
+      `User:${ctx.user!.id}`
+    );
+
+    await ctx.tiers.updateOrganizationTier(org, "FREE", `User:${ctx.user!.id}`);
+
+    return org;
   },
 });

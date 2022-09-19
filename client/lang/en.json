@@ -165,6 +165,11 @@
     "context": "Enter your API Key"
   },
   {
+    "term": "component.admin-organizations-list-table-header.create-organization",
+    "definition": "Create organization",
+    "context": "Create organization"
+  },
+  {
     "term": "component.admin-organizations-tabs.features",
     "definition": "Features",
     "context": "Features"
@@ -983,6 +988,21 @@
     "term": "component.create-or-update-user-dialog.update-user",
     "definition": "Update user",
     "context": "Update user"
+  },
+  {
+    "term": "component.create-organization-dialog.create-organization",
+    "definition": "Create organization",
+    "context": "Create organization"
+  },
+  {
+    "term": "component.create-organization-dialog.organization-name",
+    "definition": "Organization name",
+    "context": "Organization name"
+  },
+  {
+    "term": "component.create-organization-dialog.organization-status",
+    "definition": "Organization status",
+    "context": "Organization status"
   },
   {
     "term": "component.create-reference-dialog.body",
@@ -6683,6 +6703,16 @@
     "term": "organization.integrations.zapier-description",
     "definition": "Automate your workflows using its +400 services.",
     "context": "Automate your workflows using its +400 services."
+  },
+  {
+    "term": "organization.organization-created-success.toast-description",
+    "definition": "We have sent an email to {email} with instructions and the temporal password.",
+    "context": "We have sent an email to {email} with instructions and the temporal password."
+  },
+  {
+    "term": "organization.organization-created-success.toast-title",
+    "definition": "Organization created successfully.",
+    "context": "Organization created successfully."
   },
   {
     "term": "organization.signature-integrations.title",
