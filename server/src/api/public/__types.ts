@@ -608,6 +608,8 @@ export type Mutation = {
   removePetitionPermission: Array<Maybe<PetitionBase>>;
   /** Removes users from a user group */
   removeUsersFromGroup: UserGroup;
+  /** Renames a folder. */
+  renameFolder: Success;
   /** Reopens the petition */
   reopenPetition: Petition;
   /** Sends the AccountVerification email with confirmation code to unconfirmed user emails */
@@ -1111,8 +1113,9 @@ export type MutationmodifyPetitionCustomPropertyArgs = {
 
 export type MutationmovePetitionsArgs = {
   destination: Scalars["String"];
+  folderIds?: InputMaybe<Array<Scalars["ID"]>>;
+  ids?: InputMaybe<Array<Scalars["GID"]>>;
   source: Scalars["String"];
-  targets: Array<Scalars["ID"]>;
   type: PetitionBaseType;
 };
 
@@ -1286,6 +1289,12 @@ export type MutationremovePetitionPermissionArgs = {
 export type MutationremoveUsersFromGroupArgs = {
   userGroupId: Scalars["GID"];
   userIds: Array<Scalars["GID"]>;
+};
+
+export type MutationrenameFolderArgs = {
+  folderId: Scalars["ID"];
+  name?: InputMaybe<Scalars["String"]>;
+  type: PetitionBaseType;
 };
 
 export type MutationreopenPetitionArgs = {
