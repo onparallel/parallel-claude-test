@@ -87,7 +87,9 @@ export function removeMentionInputElements(content: CommentEditorValue) {
 
 export interface CommentEditorProps
   extends ValueProps<CommentEditorValue, false>,
-    Omit<EditableProps, "value" | "onChange"> {
+    Omit<EditableProps, "value" | "onChange">,
+    Pick<MentionComboboxProps, "defaultMentionables">,
+    Partial<Pick<MentionComboboxProps, "onSearchMentionables">> {
   // we need an id to pass it to the Plate element
   id: string;
   placeholder?: string;
@@ -95,7 +97,6 @@ export interface CommentEditorProps
   isInvalid?: boolean;
   isRequired?: boolean;
   isReadOnly?: boolean;
-  onSearchMentionables?: MentionComboboxProps["onSearchMentionables"];
 }
 
 export interface CommentEditorInstance {
@@ -113,6 +114,7 @@ const _CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProps>(fun
     isInvalid,
     isRequired,
     isReadOnly,
+    defaultMentionables,
     onSearchMentionables,
     ...props
   },
@@ -223,7 +225,10 @@ const _CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProps>(fun
         renderEditable={renderEditable}
       >
         {onSearchMentionables ? (
-          <MentionCombobox onSearchMentionables={onSearchMentionables} />
+          <MentionCombobox
+            defaultMentionables={defaultMentionables}
+            onSearchMentionables={onSearchMentionables}
+          />
         ) : null}
       </Plate>
     </Box>

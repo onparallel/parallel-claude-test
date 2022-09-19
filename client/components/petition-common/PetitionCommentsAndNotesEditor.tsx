@@ -13,7 +13,7 @@ import {
 } from "../common/slate/CommentEditor";
 
 interface PetitionCommentsAndNotesEditorProps
-  extends Pick<CommentEditorProps, "onSearchMentionables"> {
+  extends Pick<CommentEditorProps, "defaultMentionables" | "onSearchMentionables"> {
   id: string;
   onSubmit: (content: CommentEditorValue, isNote: boolean) => Promise<void>;
   hasCommentsEnabled: boolean;
@@ -24,6 +24,7 @@ interface PetitionCommentsAndNotesEditorProps
 export function PetitionCommentsAndNotesEditor({
   id,
   onSubmit,
+  defaultMentionables,
   onSearchMentionables,
   hasCommentsEnabled,
   isDisabled,
@@ -115,6 +116,7 @@ export function PetitionCommentsAndNotesEditor({
               isDisabled={isDisabled}
               onKeyDown={handleKeyDown}
               onChange={setCommentDraft}
+              defaultMentionables={defaultMentionables}
               onSearchMentionables={onSearchMentionables}
             />
             <Box>
@@ -150,6 +152,7 @@ export function PetitionCommentsAndNotesEditor({
                   isDisabled={isDisabled}
                   onKeyDown={handleKeyDown}
                   onChange={setNoteDraft}
+                  defaultMentionables={defaultMentionables}
                   onSearchMentionables={onSearchMentionables}
                 />
                 <Box>

@@ -33,11 +33,12 @@ export interface ComboboxProps<TData = NoData>
   extends Partial<Pick<ComboboxState<TData>, "items">>,
     ComboboxStateById<TData> {
   inputType: string;
+  defaultItems?: TComboboxItem<TData>[];
+  onSearchItems: (search: string) => MaybePromise<TComboboxItem<TData>[]>;
   /**
    * Render combobox item.
    * @default item.text
    */
-  onSearchItems: (search: string) => MaybePromise<TComboboxItem<TData>[]>;
   onRenderItem?: RenderFunction<ComboboxItemProps<TData>>;
   onRenderNoItems?: RenderFunction<{ search: string }>;
 }
@@ -57,6 +58,7 @@ const ComboboxContent = <TData extends Data = NoData>(
 ) => {
   const {
     inputType,
+    defaultItems,
     onSearchItems,
     onRenderItem: Item = ({ item }) => item.text,
     onRenderNoItems: NoItems = () => null,
@@ -77,9 +79,14 @@ const ComboboxContent = <TData extends Data = NoData>(
   useAsyncEffect(
     async (isMounted) => {
       try {
-        if (text !== "" && isOpen) {
-          setIsLoading(true);
-          const items = await onSearchItems(text);
+        if (isOpen) {
+          let items = [] as TComboboxItem<TData>[];
+          if (text === "") {
+            items = defaultItems ?? [];
+          } else {
+            setIsLoading(true);
+            items = await onSearchItems(text);
+          }
           if (isMounted()) {
             comboboxActions.items(items);
             comboboxActions.filteredItems(items);
@@ -92,7 +99,7 @@ const ComboboxContent = <TData extends Data = NoData>(
         }
       } catch {}
     },
-    [text, isOpen, onSearchItems]
+    [defaultItems, text, isOpen, onSearchItems]
   );
 
   // Get target range rect

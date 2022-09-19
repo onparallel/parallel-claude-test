@@ -28,21 +28,24 @@ import {
 } from "./slate/CommentEditor";
 import { SmallPopover } from "./SmallPopover";
 
+interface PetitionFieldCommentProps
+  extends Pick<CommentEditorProps, "defaultMentionables" | "onSearchMentionables"> {
+  comment: PetitionFieldComment_PetitionFieldCommentFragment;
+  onDelete: () => void;
+  onEdit: (content: CommentEditorValue) => void;
+  onMarkAsUnread?: () => void;
+  isDisabled?: boolean;
+}
+
 export function PetitionFieldComment({
   comment,
   onDelete,
   onEdit,
   onMarkAsUnread,
+  defaultMentionables,
   onSearchMentionables,
   isDisabled,
-}: {
-  comment: PetitionFieldComment_PetitionFieldCommentFragment;
-  onDelete: () => void;
-  onEdit: (content: CommentEditorValue) => void;
-  onMarkAsUnread?: () => void;
-  onSearchMentionables: CommentEditorProps["onSearchMentionables"];
-  isDisabled?: boolean;
-}) {
+}: PetitionFieldCommentProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState<CommentEditorValue>(comment.content);
   const editorRef = useRef<CommentEditorInstance>(null);
@@ -170,6 +173,7 @@ export function PetitionFieldComment({
             id={`petition-field-comment-${comment.id}`}
             ref={editorRef}
             value={content}
+            defaultMentionables={defaultMentionables}
             onSearchMentionables={onSearchMentionables}
             onKeyDown={handleKeyDown}
             onChange={setContent}

@@ -27,6 +27,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useGetMyId } from "@parallel/utils/apollo/getMyId";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
+import { useGetDefaultMentionables } from "@parallel/utils/useGetDefaultMentionables";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useTimeoutEffect } from "@parallel/utils/useTimeoutEffect";
 import { useCallback, useRef } from "react";
@@ -65,6 +66,8 @@ export function PreviewPetitionFieldCommentsDialog({
       fetchPolicy: "cache-and-network",
     }
   );
+
+  const defaultMentionables = useGetDefaultMentionables(petitionId);
 
   const comments = data?.petitionField.comments ?? [];
   const hasCommentsEnabled = field.isInternal ? false : field.hasCommentsEnabled;
@@ -239,6 +242,7 @@ export function PreviewPetitionFieldCommentsDialog({
                   }
                   onDelete={() => handleDeleteClick(comment.id)}
                   onMarkAsUnread={() => handleMarkAsUnread(comment.id)}
+                  defaultMentionables={defaultMentionables}
                   onSearchMentionables={handleSearchMentionables}
                 />
               ))}
@@ -264,6 +268,7 @@ export function PreviewPetitionFieldCommentsDialog({
             id={field.id}
             isDisabled={isDisabled}
             isTemplate={isTemplate ?? false}
+            defaultMentionables={defaultMentionables}
             onSearchMentionables={handleSearchMentionables}
             hasCommentsEnabled={hasCommentsEnabled && !onlyReadPermission}
             onSubmit={handleSubmitClick}

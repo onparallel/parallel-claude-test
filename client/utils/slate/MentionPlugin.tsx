@@ -22,7 +22,7 @@ import {
   getMentionOnSelectItem,
   MentionPlugin,
 } from "@udecode/plate-mention";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useFocused, useSelected } from "slate-react";
 import { MaybePromise } from "../types";
 import { SlateElement, SlateText } from "./types";
@@ -71,11 +71,27 @@ export interface MentionComboboxProps extends Pick<Partial<ComboboxProps<Mention
   onSearchMentionables: (
     search: string
   ) => MaybePromise<createMentionPlugin_UserOrUserGroupFragment[]>;
+  defaultMentionables?: createMentionPlugin_UserOrUserGroupFragment[];
   pluginKey?: string;
+}
+
+function mapMentionable(mentionable: createMentionPlugin_UserOrUserGroupFragment) {
+  const text =
+    mentionable.__typename === "User"
+      ? mentionable.fullName!
+      : mentionable.__typename === "UserGroup"
+      ? mentionable.name
+      : "";
+  return {
+    key: mentionable.id,
+    text,
+    data: mentionable,
+  };
 }
 
 export function MentionCombobox({
   onSearchMentionables,
+  defaultMentionables,
   pluginKey = MENTION_TYPE,
   id = pluginKey,
 }: MentionComboboxProps) {
@@ -86,18 +102,14 @@ export function MentionCombobox({
   const handleSearchItems = useCallback(
     async (search: string) => {
       const mentionables = await onSearchMentionables(search);
-      return mentionables.map((m) => {
-        const text =
-          m.__typename === "User" ? m.fullName! : m.__typename === "UserGroup" ? m.name : "";
-        return {
-          key: m.id,
-          text,
-          data: m,
-        };
-      });
+      return mentionables.map(mapMentionable);
     },
     [onSearchMentionables]
   );
+
+  const defaultItems = useMemo(() => {
+    return defaultMentionables?.map(mapMentionable) ?? [];
+  }, [defaultMentionables]);
 
   return (
     <PlateCombobox<Mentionable>
@@ -105,6 +117,7 @@ export function MentionCombobox({
       inputType={ELEMENT_MENTION_INPUT}
       trigger={trigger!}
       controlled
+      defaultItems={defaultItems as any}
       onSearchItems={handleSearchItems as any}
       onRenderItem={RenderMentionable}
       onRenderNoItems={RenderNoItems}

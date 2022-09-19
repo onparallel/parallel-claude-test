@@ -4,9 +4,10 @@ import { CommentIcon, NoteIcon } from "@parallel/chakra/icons";
 import { Card, CloseableCardHeader } from "@parallel/components/common/Card";
 import {
   PetitionRepliesFieldComments_PetitionFieldFragment,
-  PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
+  PetitionRepliesFieldComments_petitionFieldQueryDocument,
 } from "@parallel/graphql/__types";
 import { useGetMyId } from "@parallel/utils/apollo/getMyId";
+import { useGetDefaultMentionables } from "@parallel/utils/useGetDefaultMentionables";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import usePreviousValue from "beautiful-react-hooks/usePreviousValue";
 import { useCallback, useEffect, useRef } from "react";
@@ -45,13 +46,12 @@ export function PetitionRepliesFieldComments({
 
   const commentsRef = useRef<HTMLDivElement>(null);
 
-  const { data, loading } = useQuery(
-    PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
-    {
-      variables: { petitionId, petitionFieldId: field.id },
-      fetchPolicy: "cache-and-network",
-    }
-  );
+  const { data, loading } = useQuery(PetitionRepliesFieldComments_petitionFieldQueryDocument, {
+    variables: { petitionId, petitionFieldId: field.id },
+    fetchPolicy: "cache-and-network",
+  });
+
+  const defaultMentionables = useGetDefaultMentionables(petitionId);
   const comments = data?.petitionField.comments ?? [];
 
   // Scroll to bottom when a comment is added
@@ -150,6 +150,7 @@ export function PetitionRepliesFieldComments({
               <PetitionFieldComment
                 key={comment.id}
                 comment={comment}
+                defaultMentionables={defaultMentionables}
                 onSearchMentionables={handleSearchMentionables}
                 onEdit={(content) => onUpdateComment(comment.id, content, comment.isInternal)}
                 onDelete={() => onDeleteComment(comment.id)}
@@ -165,6 +166,7 @@ export function PetitionRepliesFieldComments({
           id={field.id}
           isDisabled={isDisabled}
           isTemplate={false}
+          defaultMentionables={defaultMentionables}
           onSearchMentionables={handleSearchMentionables}
           hasCommentsEnabled={hasCommentsEnabled && !onlyReadPermission}
           onSubmit={async (content, isNote) => {
@@ -192,12 +194,30 @@ PetitionRepliesFieldComments.fragments = {
         replies {
           ...PetitionRepliesFieldComments_PetitionFieldReply
         }
+        comments {
+          ...PetitionFieldComment_PetitionFieldComment
+        }
         hasCommentsEnabled
       }
       fragment PetitionRepliesFieldComments_PetitionFieldReply on PetitionFieldReply {
         id
         content
       }
+      ${PetitionFieldComment.fragments.PetitionFieldComment}
     `;
   },
 };
+
+const _queries = [
+  gql`
+    query PetitionRepliesFieldComments_petitionFieldQuery(
+      $petitionId: GID!
+      $petitionFieldId: GID!
+    ) {
+      petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
+        ...PreviewPetitionFieldCommentsDialog_PetitionField
+      }
+    }
+    ${PetitionRepliesFieldComments.fragments.PetitionField}
+  `,
+];
