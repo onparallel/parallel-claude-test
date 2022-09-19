@@ -224,40 +224,41 @@ function useFormulasByTypeField({
     });
     const defaultFilter = type === "DATE" ? " | date" : type === "NUMBER" ? " | number" : "";
     const interpolation = `{{ ${loopVariable}${defaultFilter} }}`;
-    const multipleFieldFormulas = multiple
-      ? [
-          {
-            title: intl.formatMessage({
-              id: "component.reference-options-menu.list-of-replies",
-              defaultMessage: "List of replies",
-            }),
-            description: intl.formatMessage({
-              id: "component.reference-options-menu.list-of-replies-description",
-              defaultMessage: "Creates a list with each reply added.",
-            }),
-            formula: [
-              `{% for ${loopVariable} in ${alias} -%}`,
-              `- ${interpolation}`,
-              `{% endfor %}`,
-            ].join("\n"),
-          },
-          {
-            title: intl.formatMessage({
-              id: "component.reference-options-menu.one-line-replies",
-              defaultMessage: "One-line replies",
-            }),
-            description: intl.formatMessage({
-              id: "component.reference-options-menu.one-line-replies-description",
-              defaultMessage: "Displays all replies in one line.",
-            }),
-            formula: [
-              `{% for ${loopVariable} in ${alias} -%}`,
-              `{% if forloop.first == true %}{% elsif forloop.last == true %} ${and} {% else %}, {% endif %}${interpolation}`,
-              `{%- endfor %}`,
-            ].join("\n"),
-          },
-        ]
-      : [];
+    const multipleFieldFormulas =
+      multiple || (type === "CHECKBOX" && options.limit.type === "UNLIMITED")
+        ? [
+            {
+              title: intl.formatMessage({
+                id: "component.reference-options-menu.list-of-replies",
+                defaultMessage: "List of replies",
+              }),
+              description: intl.formatMessage({
+                id: "component.reference-options-menu.list-of-replies-description",
+                defaultMessage: "Creates a list with each reply added.",
+              }),
+              formula: [
+                `{% for ${loopVariable} in ${alias} -%}`,
+                `- ${interpolation}`,
+                `{% endfor %}`,
+              ].join("\n"),
+            },
+            {
+              title: intl.formatMessage({
+                id: "component.reference-options-menu.one-line-replies",
+                defaultMessage: "One-line replies",
+              }),
+              description: intl.formatMessage({
+                id: "component.reference-options-menu.one-line-replies-description",
+                defaultMessage: "Displays all replies in one line.",
+              }),
+              formula: [
+                `{% for ${loopVariable} in ${alias} -%}`,
+                `{% if forloop.first == true %}{% elsif forloop.last == true %} ${and} {% else %}, {% endif %}${interpolation}`,
+                `{%- endfor %}`,
+              ].join("\n"),
+            },
+          ]
+        : [];
 
     const commonFormulas = [
       {

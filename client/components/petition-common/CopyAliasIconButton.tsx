@@ -7,7 +7,7 @@ import { CopyToClipboardButton, CopyToClipboardButtonProps } from "../common/Cop
 
 export interface CopyAliasIconButtonProps
   extends Omit<CopyToClipboardButtonProps, "aria-label" | "placement" | "text" | "icon"> {
-  field: Pick<PetitionField, "alias" | "type" | "multiple">;
+  field: Pick<PetitionField, "alias" | "type" | "multiple" | "options">;
 }
 
 export const CopyAliasIconButton = chakraForwardRef<"button", CopyAliasIconButtonProps>(
@@ -26,7 +26,7 @@ export const CopyAliasIconButton = chakraForwardRef<"button", CopyAliasIconButto
       defaultMessage: "reply",
     });
     const interpolation =
-      field.type === "CHECKBOX" || field.multiple
+      (field.type === "CHECKBOX" && field.options.limit.type === "UNLIMITED") || field.multiple
         ? [
             `{% for ${loopVariable} in ${field.alias} -%}`,
             `- {{ ${loopVariable}${defaultFilter} }}`,
