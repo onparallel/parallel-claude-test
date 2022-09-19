@@ -81,6 +81,7 @@ function CreateFolderDialog({
           search,
           sortBy: isTemplate ? "lastUsedAt_DESC" : "createdAt_DESC",
         },
+        fetchPolicy: "network-only",
       });
 
       return result.data.petitions.items.filter(
