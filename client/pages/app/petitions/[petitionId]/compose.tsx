@@ -112,6 +112,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     return activeFieldId ? document.querySelector<HTMLElement>(`#field-${activeFieldId}`)! : null;
   }, [activeFieldId]);
 
+  // 0 - Content
+  // 1 - Petition/Template Settings
+  const [tabIndex, setTabIndex] = useState(1);
+
+  const handleTabsChange = (index: number) => {
+    setTabIndex(index);
+  };
+
   const showPublicTemplateDialog = usePublicTemplateDialog();
   useEffect(() => {
     if (isPublicTemplate) {
@@ -487,7 +495,13 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 />
               ) : (
                 <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 11rem)`}>
-                  <Tabs variant="enclosed" {...extendFlexColumn} defaultIndex={1}>
+                  <Tabs
+                    variant="enclosed"
+                    {...extendFlexColumn}
+                    defaultIndex={1}
+                    index={tabIndex}
+                    onChange={handleTabsChange}
+                  >
                     <TabList marginX="-1px" marginTop="-1px" flex="none">
                       <Tab padding={4} lineHeight={5} fontWeight="bold">
                         <ListIcon fontSize="18px" marginRight={2} aria-hidden="true" />
