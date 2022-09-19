@@ -56,7 +56,7 @@ export const appsumo = Router()
         await verify(match[1], req.context.config.security.jwtSecret);
 
         const orgs = await req.context.organizations.getOrganizationsByUserEmail(
-          req.body.activation_email
+          (req.body.activation_email as string).toLowerCase()
         );
 
         if (orgs.length > 1) {
