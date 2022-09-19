@@ -25,8 +25,12 @@ export const CopyAliasIconButton = chakraForwardRef<"button", CopyAliasIconButto
       id: "component.reference-options-menu.loop-variable",
       defaultMessage: "reply",
     });
+
+    // If checkbox max is 1 we trate it like a radio button, if is unlimited we ignore the max
     const interpolation =
-      (field.type === "CHECKBOX" && field.options.limit.type === "UNLIMITED") || field.multiple
+      (field.type === "CHECKBOX" &&
+        (field.options.limit.type === "UNLIMITED" || field.options.limit.max > 1)) ||
+      field.multiple
         ? [
             `{% for ${loopVariable} in ${field.alias} -%}`,
             `- {{ ${loopVariable}${defaultFilter} }}`,

@@ -224,8 +224,11 @@ function useFormulasByTypeField({
     });
     const defaultFilter = type === "DATE" ? " | date" : type === "NUMBER" ? " | number" : "";
     const interpolation = `{{ ${loopVariable}${defaultFilter} }}`;
+
+    // If checkbox max is 1 we trate it like a radio button, if is unlimited we ignore the max
     const multipleFieldFormulas =
-      multiple || (type === "CHECKBOX" && options.limit.type === "UNLIMITED")
+      multiple ||
+      (type === "CHECKBOX" && (options.limit.type === "UNLIMITED" || options.limit.max > 1))
         ? [
             {
               title: intl.formatMessage({
