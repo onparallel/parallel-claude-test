@@ -5884,7 +5884,7 @@ export type BrandingGeneral_updateOrganizationBrandThemeMutation = {
   };
 };
 
-export type BrandingGeneralPreview_OrganizatioNBrandThemeDataFragment = {
+export type BrandingGeneralPreview_OrganizationBrandThemeDataFragment = {
   __typename?: "OrganizationBrandThemeData";
   preferredTone: Tone;
   color: string;
@@ -24120,13 +24120,13 @@ export const OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragmentDoc
   OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragment,
   unknown
 >;
-export const BrandingGeneralPreview_OrganizatioNBrandThemeDataFragmentDoc = gql`
-  fragment BrandingGeneralPreview_OrganizatioNBrandThemeData on OrganizationBrandThemeData {
+export const BrandingGeneralPreview_OrganizationBrandThemeDataFragmentDoc = gql`
+  fragment BrandingGeneralPreview_OrganizationBrandThemeData on OrganizationBrandThemeData {
     preferredTone
     ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
   }
   ${OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragmentDoc}
-` as unknown as DocumentNode<BrandingGeneralPreview_OrganizatioNBrandThemeDataFragment, unknown>;
+` as unknown as DocumentNode<BrandingGeneralPreview_OrganizationBrandThemeDataFragment, unknown>;
 export const BrandingGeneralPreview_UserFragmentDoc = gql`
   fragment BrandingGeneralPreview_User on User {
     fullName
@@ -24135,11 +24135,11 @@ export const BrandingGeneralPreview_UserFragmentDoc = gql`
       name
       logoUrl(options: { resize: { width: 600 } })
       brandTheme {
-        ...BrandingGeneralPreview_OrganizatioNBrandThemeData
+        ...BrandingGeneralPreview_OrganizationBrandThemeData
       }
     }
   }
-  ${BrandingGeneralPreview_OrganizatioNBrandThemeDataFragmentDoc}
+  ${BrandingGeneralPreview_OrganizationBrandThemeDataFragmentDoc}
 ` as unknown as DocumentNode<BrandingGeneralPreview_UserFragment, unknown>;
 export const BrandingGeneral_UserFragmentDoc = gql`
   fragment BrandingGeneral_User on User {

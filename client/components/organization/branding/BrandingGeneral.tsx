@@ -53,7 +53,7 @@ interface BrandingGeneralProps {
 }
 
 interface BrandingGeneralData {
-  tone: Tone;
+  preferredTone: Tone;
   color: string;
   fontFamily: string | null;
   logo: Maybe<File> | string;
@@ -75,7 +75,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
   } = useForm<BrandingGeneralData>({
     mode: "onChange",
     defaultValues: {
-      tone: user.organization.brandTheme.preferredTone,
+      preferredTone: user.organization.brandTheme.preferredTone,
       color: user.organization.brandTheme.color,
       fontFamily: user.organization.brandTheme.fontFamily ?? "DEFAULT",
       logo: user.organization.logoUrl,
@@ -83,14 +83,10 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
   });
   useAutoConfirmDiscardChangesDialog(isDirty);
 
-  const preferredTone = watch("tone");
-  const color = watch("color");
+  const { preferredTone, color, logo, fontFamily } = watch();
 
   const isLight =
     /^#[a-f\d]{6}$/i.test(color) && new Color(color).contrast(new Color("#ffffff")) < 3;
-
-  const fontFamily = watch("fontFamily");
-  const logo = watch("logo");
 
   const hasAdminRole = isAtLeast("ADMIN", user.role);
   const sortedFonts = useMemo(
@@ -124,16 +120,16 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
       paddingBottom={16}
       as="form"
       onSubmit={handleSubmit(async (data) => {
-        const { color, fontFamily, tone, logo } = dirtyFields;
+        const { color, fontFamily, preferredTone, logo } = dirtyFields;
 
         try {
-          if (color || fontFamily || tone) {
+          if (color || fontFamily || preferredTone) {
             await updateOrganizationBrandTheme({
               variables: {
                 data: {
                   color: data.color,
                   fontFamily: data.fontFamily !== "DEFAULT" ? data.fontFamily : null,
-                  preferredTone: data.tone,
+                  preferredTone: data.preferredTone,
                 },
               },
             });
@@ -328,7 +324,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
               />
             </FormLabel>
             <Controller
-              name="tone"
+              name="preferredTone"
               control={control}
               render={({ field: { onChange, value } }) => (
                 <RadioGroup

@@ -18,13 +18,13 @@ export function OverrideWithOrganizationTheme({
     ...theme,
     fonts: {
       ...theme.fonts,
-      body: brand.fontFamily || theme.fonts.body,
-      heading: brand.fontFamily || theme.fonts.heading,
+      body: brand.fontFamily ?? theme.fonts.body,
+      heading: brand.fontFamily ?? theme.fonts.heading,
     },
     colors: {
       ...theme.colors,
       primary: /^#[a-f\d]{6}$/i.test(brand.color)
-        ? generateOrganizationPallete(brand.color)
+        ? generateOrganizationPalette(brand.color)
         : theme.colors.primary,
     },
   });
@@ -45,7 +45,7 @@ OverrideWithOrganizationTheme.fragments = {
   `,
 };
 
-export function generateOrganizationPallete(color: string) {
+export function generateOrganizationPalette(color: string) {
   const _color = new Color(color);
   const lightness = _color.hsl().round().lightness();
 

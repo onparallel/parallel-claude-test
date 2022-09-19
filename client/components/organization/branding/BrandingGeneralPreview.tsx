@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import {
-  BrandingGeneralPreview_OrganizatioNBrandThemeDataFragment,
+  BrandingGeneralPreview_OrganizationBrandThemeDataFragment,
   BrandingGeneralPreview_UserFragment,
   Maybe,
 } from "@parallel/graphql/__types";
@@ -21,7 +21,7 @@ import { FormattedMessage } from "react-intl";
 
 interface BrandingGeneralPreviewProps {
   user: BrandingGeneralPreview_UserFragment;
-  brand: BrandingGeneralPreview_OrganizatioNBrandThemeDataFragment;
+  brand: BrandingGeneralPreview_OrganizationBrandThemeDataFragment;
   logo: Maybe<File> | string;
 }
 
@@ -146,9 +146,9 @@ export function BrandingGeneralPreview({ user, brand, logo }: BrandingGeneralPre
 }
 
 BrandingGeneralPreview.fragments = {
-  get OrganizatioNBrandThemeData() {
+  get OrganizationBrandThemeData() {
     return gql`
-      fragment BrandingGeneralPreview_OrganizatioNBrandThemeData on OrganizationBrandThemeData {
+      fragment BrandingGeneralPreview_OrganizationBrandThemeData on OrganizationBrandThemeData {
         preferredTone
         ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
       }
@@ -164,11 +164,11 @@ BrandingGeneralPreview.fragments = {
           name
           logoUrl(options: { resize: { width: 600 } })
           brandTheme {
-            ...BrandingGeneralPreview_OrganizatioNBrandThemeData
+            ...BrandingGeneralPreview_OrganizationBrandThemeData
           }
         }
       }
-      ${this.OrganizatioNBrandThemeData}
+      ${this.OrganizationBrandThemeData}
     `;
   },
 };
