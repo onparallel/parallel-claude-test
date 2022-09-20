@@ -78,6 +78,12 @@ export const AppLayout = Object.assign(
       });
     }, []);
 
+    useEffect(() => {
+      if (window.innerWidth < 480) {
+        window.Intercom?.("update", { hide_default_launcher: true });
+      }
+    }, []);
+
     // Load Segment analytics and identify user
     useEffect(() => {
       if (window.analytics && !(window.analytics as any).initialized) {
