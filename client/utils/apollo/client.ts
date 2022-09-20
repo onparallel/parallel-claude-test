@@ -106,8 +106,8 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
           fields: {
             templates: {
               keyArgs: ["isOwner", "isPublic", "locale", "search", "category", "path"],
-              merge(existing, incoming, { readField }) {
-                if (existing === undefined) {
+              merge(existing, incoming, { readField, variables }) {
+                if (existing === undefined || variables?.offset === 0) {
                   return incoming;
                 } else {
                   return {
