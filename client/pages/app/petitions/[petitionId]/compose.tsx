@@ -498,7 +498,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   <Tabs
                     variant="enclosed"
                     {...extendFlexColumn}
-                    defaultIndex={1}
                     index={tabIndex}
                     onChange={handleTabsChange}
                   >
