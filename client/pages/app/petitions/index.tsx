@@ -614,36 +614,31 @@ function usePetitionListActions({
       leftIcon: <UserArrowIcon />,
       children: <FormattedMessage id="page.petitions-list.actions-share" defaultMessage="Share" />,
     },
-    ...(user.role === "COLLABORATOR"
-      ? []
-      : [
-          {
-            key: "clone",
-            isDisabled: hasSelectedFolders,
-            onClick: onCloneClick,
-            leftIcon: <CopyIcon />,
-            children: (
-              <FormattedMessage id="page.petitions-list.actions-clone" defaultMessage="Duplicate" />
-            ),
-          },
-          {
-            key: "move-to",
-            onClick: onMoveToClick,
-            isDisabled: minimumPermission === "READ",
-            leftIcon: <FolderIcon />,
-            children: (
-              <FormattedMessage
-                id="page.petitions-list.actions-move-to"
-                defaultMessage="Move to..."
-              />
-            ),
-          },
-        ]),
+
+    {
+      key: "clone",
+      isDisabled: hasSelectedFolders || user.role === "COLLABORATOR",
+      onClick: onCloneClick,
+      leftIcon: <CopyIcon />,
+      children: (
+        <FormattedMessage id="page.petitions-list.actions-clone" defaultMessage="Duplicate" />
+      ),
+    },
+    {
+      key: "move-to",
+      onClick: onMoveToClick,
+      isDisabled: minimumPermission === "READ" || user.role === "COLLABORATOR",
+      leftIcon: <FolderIcon />,
+      children: (
+        <FormattedMessage id="page.petitions-list.actions-move-to" defaultMessage="Move to..." />
+      ),
+    },
+
     type === "PETITION"
       ? {
           key: "saveAsTemplate",
           onClick: onCloneAsTemplateClick,
-          isDisabled: selectedCount !== 1 || hasSelectedFolders,
+          isDisabled: selectedCount !== 1 || hasSelectedFolders || user.role === "COLLABORATOR",
           leftIcon: <CopyIcon />,
           children: (
             <FormattedMessage
