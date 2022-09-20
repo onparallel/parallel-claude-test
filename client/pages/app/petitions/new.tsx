@@ -1,20 +1,10 @@
 import { gql, useQuery } from "@apollo/client";
-import {
-  Button,
-  Container,
-  Flex,
-  Grid,
-  Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-} from "@chakra-ui/react";
+import { Container, Grid, Stack, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { PathBreadcrumbs } from "@parallel/components/common/PathBreadcrumbs";
+import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
+import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import {
   SearchAllOrCurrentFolder,
   SearchInOptions,
@@ -139,6 +129,12 @@ function NewPetition() {
     300,
     [refetch]
   );
+
+  useEffect(() => {
+    if (me.role === "COLLABORATOR" && state.public) {
+      setQueryState((current) => ({ ...current, public: false }));
+    }
+  }, [me, state.public]);
 
   const handleSearchChange = (search: string) => {
     mainRef.current!.scrollTo(0, 0);
@@ -281,40 +277,50 @@ function NewPetition() {
               >
                 <FormattedMessage id="new-petition.my-templates" defaultMessage="My templates" />
               </Tab>
-              <Tab
-                data-link="public-templates"
-                borderTopRadius="md"
-                _selected={selectTabStyles}
-                whiteSpace="nowrap"
-                paddingX={3}
+              <RestrictedFeaturePopover
+                isVisible={me.role === "COLLABORATOR"}
+                display="flex"
+                opacity={0.4}
+                borderBottomRadius={0}
               >
-                <FormattedMessage
-                  id="new-petition.public-templates"
-                  defaultMessage="Public templates"
-                />
-              </Tab>
+                <Tab
+                  data-link="public-templates"
+                  borderTopRadius="md"
+                  _selected={selectTabStyles}
+                  whiteSpace="nowrap"
+                  paddingX={3}
+                  isDisabled={me.role === "COLLABORATOR"}
+                >
+                  <FormattedMessage
+                    id="new-petition.public-templates"
+                    defaultMessage="Public templates"
+                  />
+                </Tab>
+              </RestrictedFeaturePopover>
             </TabList>
-            <Button
-              data-action="create-template"
-              aria-label={intl.formatMessage({
-                id: "new-petition.create",
-                defaultMessage: "Create",
-              })}
-              padding={{ base: 0, md: 4 }}
+            <RestrictedFeaturePopover
+              isVisible={me.role === "COLLABORATOR"}
+              display="flex"
               alignSelf="flex-end"
-              colorScheme="primary"
-              isDisabled={me.role === "COLLABORATOR"}
-              onClick={handleCreateTemplateClick}
             >
-              <Flex alignItems="center" justifyContent="center">
-                <AddIcon fontSize={{ base: "16px", md: "12px" }} />
-                <Flex alignItems="center" marginLeft={2} display={{ base: "none", md: "flex" }}>
-                  <Text as="span">
-                    <FormattedMessage id="new-petition.create" defaultMessage="Create" />
-                  </Text>
-                </Flex>
-              </Flex>
-            </Button>
+              <ResponsiveButtonIcon
+                data-action="create-template"
+                aria-label={intl.formatMessage({
+                  id: "new-petition.create",
+                  defaultMessage: "Create",
+                })}
+                padding={{ base: 0, md: 4 }}
+                colorScheme="primary"
+                alignSelf="flex-end"
+                icon={<AddIcon fontSize={{ base: "16px", md: "12px" }} />}
+                isDisabled={me.role === "COLLABORATOR"}
+                label={intl.formatMessage({
+                  id: "new-petition.create",
+                  defaultMessage: "Create",
+                })}
+                onClick={handleCreateTemplateClick}
+              />
+            </RestrictedFeaturePopover>
           </Stack>
           <TabPanels flex="1" display="flex" flexDirection="column">
             <TabPanel padding={0} flex="1" display="flex" flexDirection="column">

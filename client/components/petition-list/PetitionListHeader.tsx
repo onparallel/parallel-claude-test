@@ -14,6 +14,7 @@ import { QueryStateOf, SetQueryState, useBuildStateUrl } from "@parallel/utils/q
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { RestrictedFeaturePopover } from "../common/RestrictedFeaturePopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
 import { PathBreadcrumbs } from "../common/PathBreadcrumbs";
@@ -152,25 +153,30 @@ export function PetitionListHeader({
           })}
         />
         <Spacer />
-        <Button
-          display={{ base: "none", lg: "block" }}
-          onClick={handleCreateFolder}
-          isDisabled={organizationRole === "COLLABORATOR"}
+        <RestrictedFeaturePopover isVisible={organizationRole === "COLLABORATOR"}>
+          <Button
+            display={{ base: "none", lg: "block" }}
+            onClick={handleCreateFolder}
+            isDisabled={organizationRole === "COLLABORATOR"}
+          >
+            <FormattedMessage
+              id="component.petition-list-header.create-folder"
+              defaultMessage="Create folder"
+            />
+          </Button>
+        </RestrictedFeaturePopover>
+        <RestrictedFeaturePopover
+          isVisible={organizationRole === "COLLABORATOR" && state.type === "TEMPLATE"}
         >
-          <FormattedMessage
-            id="component.petition-list-header.create-folder"
-            defaultMessage="Create folder"
-          />
-        </Button>
-        <Button
-          display={{ base: "none", lg: "block" }}
-          colorScheme="primary"
-          onClick={handleCreateNewParallelOrTemplate}
-          isDisabled={organizationRole === "COLLABORATOR" && state.type === "TEMPLATE"}
-        >
-          {newParallelOrTemplateLiteral}
-        </Button>
-
+          <Button
+            display={{ base: "none", lg: "block" }}
+            colorScheme="primary"
+            onClick={handleCreateNewParallelOrTemplate}
+            isDisabled={organizationRole === "COLLABORATOR" && state.type === "TEMPLATE"}
+          >
+            {newParallelOrTemplateLiteral}
+          </Button>
+        </RestrictedFeaturePopover>
         <MoreOptionsMenuButton
           display={{ base: "block", lg: "none" }}
           colorScheme="primary"

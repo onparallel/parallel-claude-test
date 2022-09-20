@@ -4325,6 +4325,16 @@
     "context": "Restrict editing"
   },
   {
+    "term": "component.restricted-feature-popover.contact-and-admin",
+    "definition": "<a>Contacta con tu administrador</a> si necesitas cambiar tus permisos.",
+    "context": "<a>Contact an admin</a> if you need to change these permissions."
+  },
+  {
+    "term": "component.restricted-feature-popover.restricted",
+    "definition": "Está funcionalidad está limitada.",
+    "context": "This feature is restricted."
+  },
+  {
     "term": "component.rich-text-editor.add-link-header",
     "definition": "Añadir enlace",
     "context": "Add link"
