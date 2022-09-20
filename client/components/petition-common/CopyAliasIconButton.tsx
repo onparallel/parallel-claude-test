@@ -36,6 +36,8 @@ export const CopyAliasIconButton = chakraForwardRef<"button", CopyAliasIconButto
             `- {{ ${loopVariable}${defaultFilter} }}`,
             `{% endfor %}`,
           ].join("\n")
+        : field.type === "CHECKBOX"
+        ? `{{ ${field.alias}[0] }}`
         : `{{ ${field.alias}${defaultFilter} }}`;
 
     return (
