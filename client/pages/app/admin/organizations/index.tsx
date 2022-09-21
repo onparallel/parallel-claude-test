@@ -3,7 +3,7 @@ import { Badge, Flex, Heading, useToast } from "@chakra-ui/react";
 import { AdminOrganizationsListTableHeader } from "@parallel/components/admin-organizations/AdminOrganizationsListTableHeader";
 import { useCreateOrganizationDialog } from "@parallel/components/admin-organizations/dialogs/CreateOrganizationDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -22,7 +22,6 @@ import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviou
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useHandleNavigation } from "@parallel/utils/navigation";
-import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { useAdminSections } from "@parallel/utils/useAdminSections";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
@@ -91,22 +90,17 @@ function AdminOrganizations() {
   );
 
   const [createOrganization] = useMutation(AdminOrganizations_createOrganizationDocument);
-  const genericError = useGenericErrorToast();
+  const showGenericErrorToast = useGenericErrorToast();
   const showCreateOrganizationDialog = useCreateOrganizationDialog();
   async function handleCreateOrganization() {
     try {
-      const [error, organization] = await withError(showCreateOrganizationDialog({}));
-      if (error || !organization) {
-        return;
-      }
+      const organization = await showCreateOrganizationDialog({});
 
       await createOrganization({
         variables: {
           ...organization,
         },
-        update: () => {
-          refetch();
-        },
+        update: () => refetch(),
       });
 
       toast({
@@ -128,8 +122,12 @@ function AdminOrganizations() {
           }
         ),
       });
-    } catch {
-      genericError();
+    } catch (error) {
+      if (isDialogError(error)) {
+        return;
+      } else {
+        showGenericErrorToast(error);
+      }
     }
   }
 
