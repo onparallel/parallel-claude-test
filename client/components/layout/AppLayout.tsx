@@ -146,12 +146,12 @@ export const AppLayout = Object.assign(
             content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
           />
         </Head>
-        {/* {process.env.NODE_ENV !== "development" ? (
-          <> */}
-        <Segment />
-        <Canny />
-        {/* </>
-        ) : null} */}
+        {process.env.NODE_ENV !== "development" ? (
+          <>
+            <Segment />
+            <Canny />
+          </>
+        ) : null}
         <DndProvider backend={HTML5Backend}>
           <Flex
             alignItems="stretch"
