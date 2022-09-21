@@ -11,11 +11,12 @@ import {
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { AppLayout_QueryFragment } from "@parallel/graphql/__types";
 import { useCheckForNewVersion } from "@parallel/utils/useCheckForNewVersion";
+import { useOnMediaQueryChange } from "@parallel/utils/useOnMediaQueryChange";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
 import * as Sentry from "@sentry/node";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { FormattedMessage } from "react-intl";
@@ -42,6 +43,18 @@ export const AppLayout = Object.assign(
     const hasNewVersion = useCheckForNewVersion();
 
     const timeoutRef = useRef<number>();
+
+    useOnMediaQueryChange(
+      "sm",
+      useCallback((matches) => {
+        if (!matches) {
+          window.Intercom?.("update", { hide_default_launcher: true });
+        } else {
+          window.Intercom?.("update", { hide_default_launcher: false });
+        }
+      }, [])
+    );
+
     // Show spinner if a page takes more than 1s to load
     useEffect(() => {
       router.events.on("routeChangeStart", handleRouteChangeStart);
@@ -76,12 +89,6 @@ export const AppLayout = Object.assign(
         position: "right",
         align: "bottom",
       });
-    }, []);
-
-    useEffect(() => {
-      if (window.innerWidth < 480) {
-        window.Intercom?.("update", { hide_default_launcher: true });
-      }
     }, []);
 
     // Load Segment analytics and identify user
