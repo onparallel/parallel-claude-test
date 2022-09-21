@@ -29,7 +29,7 @@ export function CopyOrDownloadReplyButton({
   const intl = useIntl();
 
   return (
-    <Stack spacing={1} paddingRight={2}>
+    <Stack spacing={1}>
       {reply.field!.type === "NUMBER" ? (
         <CopyToClipboardButton
           size="xs"
