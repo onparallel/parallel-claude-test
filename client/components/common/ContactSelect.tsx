@@ -9,7 +9,7 @@ import {
   UseReactSelectProps,
 } from "@parallel/utils/react-select/hooks";
 import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/types";
-import { unMaybeArray } from "@parallel/utils/types";
+import { Maybe, unMaybeArray } from "@parallel/utils/types";
 import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
@@ -36,7 +36,7 @@ export type ContactSelectSelection = ContactSelect_ContactFragment & {
 
 export interface ContactSelectProps<IsMulti extends boolean = false>
   extends CustomAsyncCreatableSelectProps<ContactSelectSelection, IsMulti, never> {
-  onCreateContact: (data: { defaultEmail?: string }) => Promise<ContactSelectSelection>;
+  onCreateContact: (data: { defaultEmail?: string }) => Promise<Maybe<ContactSelectSelection>>;
   onSearchContacts: (search: string, exclude: string[]) => Promise<ContactSelectSelection[]>;
   onPasteEmails?: (emails: string[]) => void;
   onFocus?: () => void;
@@ -62,7 +62,7 @@ export const ContactSelect = Object.assign(
     }: ContactSelectProps<IsMulti>,
     ref: ForwardedRef<ContactSelectInstance<IsMulti>>
   ) {
-    const errorToast = useExistingContactToast();
+    const showExistingContactErrorToast = useExistingContactToast();
 
     const [isCreating, setIsCreating] = useState(false);
 
@@ -100,6 +100,9 @@ export const ContactSelect = Object.assign(
       setIsCreating(true);
       try {
         const contact = await onCreateContact({ defaultEmail: email });
+        if (!isDefined(contact)) {
+          return;
+        }
         if (isMulti) {
           onChange([
             ...((value ?? []) as ContactSelectSelection[]).filter((v) => v.id !== email),
@@ -119,9 +122,9 @@ export const ContactSelect = Object.assign(
         }
         setIsCreating(false);
         return true;
-      } catch (e) {
-        if (isApolloError(e) && e.graphQLErrors[0]?.extensions?.code === "EXISTING_CONTACT") {
-          errorToast();
+      } catch (error) {
+        if (isApolloError(error, "EXISTING_CONTACT")) {
+          showExistingContactErrorToast();
         }
       }
       setIsCreating(false);

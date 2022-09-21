@@ -20,10 +20,10 @@ export function useCreateContact() {
       return data!.createContact;
     } catch (error) {
       if (isDialogError(error)) {
-        return;
       } else {
         showGenericErrorToast(error);
       }
+      return null;
     }
   }, []);
 }

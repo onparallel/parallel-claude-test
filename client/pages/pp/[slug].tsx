@@ -123,7 +123,7 @@ function PublicPetitionLink({
       if (data?.publicSendReminder === "SUCCESS") {
         setStep("REMINDER_SENT");
       } else if (data?.publicSendReminder === "FAILURE") {
-        showErrorToast();
+        showGenericErrorToast();
       }
     } catch (error) {
       if (
@@ -144,7 +144,7 @@ function PublicPetitionLink({
           isClosable: true,
         });
       } else {
-        showErrorToast(error);
+        showGenericErrorToast(error);
       }
     }
   };
