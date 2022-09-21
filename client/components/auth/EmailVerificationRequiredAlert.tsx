@@ -26,7 +26,7 @@ export function EmailVerificationRequiredAlert({
   const toast = useToast();
   const intl = useIntl();
   const [isEmailSent, setIsEmailSent] = useState(false);
-  const genericErrorToast = useGenericErrorToast();
+  const showGenericErrorToast = useGenericErrorToast();
   const resendSuccessToast = () => {
     toast({
       title: intl.formatMessage({
@@ -49,7 +49,7 @@ export function EmailVerificationRequiredAlert({
       resendSuccessToast();
     } else {
       setIsEmailSent(false);
-      genericErrorToast();
+      showGenericErrorToast();
     }
   };
   return (

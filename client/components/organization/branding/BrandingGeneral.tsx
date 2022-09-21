@@ -110,7 +110,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
       : logo ?? `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`;
   }, [logo]);
 
-  const genericErrorToast = useGenericErrorToast();
+  const showGenericErrorToast = useGenericErrorToast();
   const showErrorDialog = useErrorDialog();
   const [updateLogo, { loading: updateLogoLoading }] = useMutation(
     BrandingGeneral_updateOrgLogoDocument
@@ -162,7 +162,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
               setError("color", { type: "validate" });
             }
           } else {
-            genericErrorToast();
+            showGenericErrorToast(error);
           }
         }
       })}

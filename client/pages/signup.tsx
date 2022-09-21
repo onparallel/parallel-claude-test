@@ -44,7 +44,7 @@ interface SignupProps {
 function Signup({ code, source, activationEmail }: SignupProps) {
   const intl = useIntl();
 
-  const genericErrorToast = useGenericErrorToast();
+  const showGenericErrorToast = useGenericErrorToast();
 
   const formData = useRef<Partial<SignupFormData>>({});
 
@@ -70,7 +70,7 @@ function Signup({ code, source, activationEmail }: SignupProps) {
           },
         });
       } catch (error) {
-        genericErrorToast();
+        showGenericErrorToast(error);
       }
     }
     nextStep();

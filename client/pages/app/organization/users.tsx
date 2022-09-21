@@ -8,7 +8,7 @@ import {
   UserXIcon,
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
@@ -136,15 +136,12 @@ function OrganizationUsers() {
     [debouncedOnSearchChange]
   );
 
-  const genericError = useGenericErrorToast();
+  const showGenericErrorToast = useGenericErrorToast();
   const [createOrganizationUser] = useMutation(OrganizationUsers_createOrganizationUserDocument);
   const showCreateOrUpdateUserDialog = useCreateOrUpdateUserDialog();
   const handleCreateUser = async () => {
     try {
-      const [error, data] = await withError(showCreateOrUpdateUserDialog({}));
-      if (error || !data) {
-        return;
-      }
+      const data = await showCreateOrUpdateUserDialog({});
       const { userGroups, ...user } = data;
       await createOrganizationUser({
         variables: {
@@ -173,8 +170,10 @@ function OrganizationUsers() {
         duration: 5000,
         isClosable: true,
       });
-    } catch (e: any) {
-      if (isApolloError(e, "USER_ALREADY_IN_ORG_ERROR")) {
+    } catch (error) {
+      if (isDialogError(error)) {
+        return;
+      } else if (isApolloError(error, "USER_ALREADY_IN_ORG_ERROR")) {
         toast({
           status: "info",
           title: intl.formatMessage({
@@ -188,7 +187,7 @@ function OrganizationUsers() {
           isClosable: true,
         });
       } else {
-        genericError();
+        showGenericErrorToast(error);
       }
     }
   };
@@ -268,7 +267,6 @@ function OrganizationUsers() {
 
   const showConfirmResendInvitationDialog = useConfirmResendInvitationDialog();
   const [resetTemporaryPassword] = useMutation(OrganizationUsers_resetTemporaryPasswordDocument);
-  const genericErrorToast = useGenericErrorToast();
   async function handleResendInvitation() {
     try {
       await showConfirmResendInvitationDialog({ fullName: selectedRows[0].fullName ?? "" });
@@ -293,8 +291,10 @@ function OrganizationUsers() {
         duration: 5000,
         isClosable: true,
       });
-    } catch (e: any) {
-      if (isApolloError(e, "RESET_USER_PASSWORD_TIME_RESTRICTION")) {
+    } catch (error) {
+      if (isDialogError(error)) {
+        return;
+      } else if (isApolloError(error, "RESET_USER_PASSWORD_TIME_RESTRICTION")) {
         toast({
           title: intl.formatMessage({
             id: "organization.user-invitation-sent-error.toast-title",
@@ -311,7 +311,7 @@ function OrganizationUsers() {
           duration: 5000,
           isClosable: true,
         });
-      } else if (isApolloError(e, "RESET_USER_PASSWORD_STATUS_ERROR")) {
+      } else if (isApolloError(error, "RESET_USER_PASSWORD_STATUS_ERROR")) {
         toast({
           title: intl.formatMessage({
             id: "organization.user-invitation-not-sent-error.toast-title",
@@ -329,7 +329,7 @@ function OrganizationUsers() {
           duration: 5000,
           isClosable: true,
         });
-      } else if (isApolloError(e, "RESET_USER_PASSWORD_INACTIVE_ERROR")) {
+      } else if (isApolloError(error, "RESET_USER_PASSWORD_INACTIVE_ERROR")) {
         toast({
           title: intl.formatMessage({
             id: "organization.user-invitation-not-sent-error.toast-title",
@@ -346,7 +346,7 @@ function OrganizationUsers() {
           duration: 5000,
           isClosable: true,
         });
-      } else if (isApolloError(e, "RESET_USER_PASSWORD_SSO_ERROR")) {
+      } else if (isApolloError(error, "RESET_USER_PASSWORD_SSO_ERROR")) {
         toast({
           title: intl.formatMessage({
             id: "organization.user-invitation-not-sent-error.toast-title",
@@ -363,8 +363,8 @@ function OrganizationUsers() {
           duration: 5000,
           isClosable: true,
         });
-      } else if (e.message !== "CANCEL" && e.message !== "CLOSE") {
-        genericErrorToast();
+      } else {
+        showGenericErrorToast(error);
       }
     }
   }

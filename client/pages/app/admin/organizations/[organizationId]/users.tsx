@@ -3,7 +3,7 @@ import { Badge, Flex, Text, Tooltip, useToast } from "@chakra-ui/react";
 import { ForbiddenIcon, LogInIcon } from "@parallel/chakra/icons";
 import { AdminOrganizationsLayout } from "@parallel/components/admin-organizations/AdminOrganizationsLayout";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -23,7 +23,6 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
-import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
@@ -81,17 +80,14 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
 
   const intl = useIntl();
   const toast = useToast();
-  const genericError = useGenericErrorToast();
+  const showGenericErrorToast = useGenericErrorToast();
   const [createOrganizationUser] = useMutation(
     AdminOrganizationsMembers_createOrganizationUserDocument
   );
   const showInviteUserDialog = useInviteUserDialog();
   async function handleInviteUser() {
     try {
-      const [error, user] = await withError(showInviteUserDialog({}));
-      if (error || !user) {
-        return;
-      }
+      const user = await showInviteUserDialog({});
 
       await createOrganizationUser({
         variables: {
@@ -122,8 +118,10 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
           }
         ),
       });
-    } catch (e: any) {
-      if (isApolloError(e, "USER_ALREADY_IN_ORG_ERROR")) {
+    } catch (error) {
+      if (isDialogError(error)) {
+        return;
+      } else if (isApolloError(error, "USER_ALREADY_IN_ORG_ERROR")) {
         toast({
           status: "info",
           title: intl.formatMessage({
@@ -137,7 +135,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
           isClosable: true,
         });
       } else {
-        genericError();
+        showGenericErrorToast(error);
       }
     }
   }

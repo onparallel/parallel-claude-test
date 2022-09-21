@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { DeleteIcon, RepeatIcon, StarIcon } from "@parallel/chakra/icons";
 import { ContactSupportAlert } from "@parallel/components/common/ContactSupportAlert";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -75,7 +75,7 @@ function IntegrationsSignature() {
   const sections = useOrganizationSections(me);
   const columns = useSignatureTokensTableColumns();
 
-  const genericErrorToast = useGenericErrorToast();
+  const showGenericErrorToast = useGenericErrorToast();
   const showAddSignatureCredentialsDialog = useAddSignatureCredentialsDialog();
   const [createSignaturitIntegration] = useMutation(
     IntegrationsSignature_createSignaturitIntegrationDocument
@@ -104,23 +104,23 @@ function IntegrationsSignature() {
         refetch();
       }
     } catch (error) {
-      if (isApolloError(error)) {
-        if (error.graphQLErrors[0]?.extensions?.code === "INVALID_APIKEY_ERROR") {
-          toast({
-            title: intl.formatMessage({
-              id: "page.signature.invalid-apikey-toast-title",
-              defaultMessage: "Error",
-            }),
-            description: intl.formatMessage({
-              id: "page.signature.invalid-apikey-toast-description",
-              defaultMessage: "Invalid API Key",
-            }),
-            status: "error",
-            isClosable: true,
-          });
-        } else {
-          genericErrorToast();
-        }
+      if (isDialogError(error)) {
+        return;
+      } else if (isApolloError(error, "INVALID_APIKEY_ERROR")) {
+        toast({
+          title: intl.formatMessage({
+            id: "page.signature.invalid-apikey-toast-title",
+            defaultMessage: "Error",
+          }),
+          description: intl.formatMessage({
+            id: "page.signature.invalid-apikey-toast-description",
+            defaultMessage: "Invalid API Key",
+          }),
+          status: "error",
+          isClosable: true,
+        });
+      } else {
+        showGenericErrorToast(error);
       }
     }
   };

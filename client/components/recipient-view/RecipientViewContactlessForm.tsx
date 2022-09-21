@@ -145,17 +145,12 @@ export function RecipientViewContactlessForm({
 
   const handleSendReminder = async () => {
     try {
-      const { data, errors } = await publicSendReminder({
+      const { data } = await publicSendReminder({
         variables: {
           keycode,
           contactEmail: email,
         },
       });
-
-      if (errors) {
-        throw errors;
-      }
-
       if (data?.publicSendReminder === "SUCCESS") {
         accessSentToast();
       } else {
@@ -165,7 +160,7 @@ export function RecipientViewContactlessForm({
       if (isApolloError(error, "REMINDER_ALREADY_SENT_ERROR")) {
         accessSentToast();
       } else {
-        showGenericErrorToast();
+        showGenericErrorToast(error);
       }
     }
   };

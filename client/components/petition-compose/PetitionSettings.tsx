@@ -341,7 +341,7 @@ function _PetitionSettings({
 
   const configRestrictPetitionDialog = useRestrictPetitionDialog();
   const passwordRestrictPetitionDialog = usePasswordRestrictPetitionDialog();
-  const genericErrorToast = useGenericErrorToast();
+  const showGenericErrorToast = useGenericErrorToast();
 
   const handleUnrestrictPetition = async (password: string | null) => {
     try {
@@ -360,7 +360,7 @@ function _PetitionSettings({
       ) {
         return false;
       } else {
-        genericErrorToast();
+        showGenericErrorToast(error);
       }
       return false;
     }

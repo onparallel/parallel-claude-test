@@ -26,7 +26,7 @@ function Account() {
   const intl = useIntl();
   const router = useRouter();
   const toast = useToast();
-  const genericErrorToast = useGenericErrorToast();
+  const showGenericErrorToast = useGenericErrorToast();
 
   const updateSuccessToast = () => {
     toast({
@@ -57,17 +57,17 @@ function Account() {
       window.analytics?.identify(me.id, { firstName, lastName, name: me.fullName! });
       await updateAccount({ variables: { firstName, lastName } });
       updateSuccessToast();
-    } catch {
-      genericErrorToast();
+    } catch (error) {
+      showGenericErrorToast(error);
     }
   }
 
   async function onSaveDelegates(ids: string[]) {
-    const { errors } = await setUserDelegates({ variables: { delegateIds: ids } });
-    if (errors?.length) {
-      genericErrorToast();
-    } else {
+    try {
+      await setUserDelegates({ variables: { delegateIds: ids } });
       updateSuccessToast();
+    } catch (error) {
+      showGenericErrorToast(error);
     }
   }
 
@@ -77,8 +77,8 @@ function Account() {
       window.analytics?.identify(me.id, { locale, name: me.fullName! });
       window.Intercom?.("boot", { language_override: locale });
       router.push(router.asPath, undefined, { locale });
-    } catch {
-      genericErrorToast();
+    } catch (error) {
+      showGenericErrorToast(error);
     }
   }
 
