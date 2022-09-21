@@ -9,6 +9,7 @@ import {
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import { SearchInOptions } from "@parallel/components/common/SearchAllOrCurrentFolder";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -57,7 +58,7 @@ import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColum
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import { MouseEvent, PropsWithChildren, useCallback, useMemo } from "react";
+import { MouseEvent, PropsWithChildren, ReactNode, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { map, maxBy, pick, pipe } from "remeda";
 
@@ -623,6 +624,13 @@ function usePetitionListActions({
       children: (
         <FormattedMessage id="page.petitions-list.actions-clone" defaultMessage="Duplicate" />
       ),
+      wrap: (button: ReactNode) => {
+        return (
+          <RestrictedFeaturePopover isVisible={user.role === "COLLABORATOR"}>
+            {button}
+          </RestrictedFeaturePopover>
+        );
+      },
     },
     {
       key: "move-to",
@@ -632,6 +640,13 @@ function usePetitionListActions({
       children: (
         <FormattedMessage id="page.petitions-list.actions-move-to" defaultMessage="Move to..." />
       ),
+      wrap: (button: ReactNode) => {
+        return (
+          <RestrictedFeaturePopover isVisible={user.role === "COLLABORATOR"}>
+            {button}
+          </RestrictedFeaturePopover>
+        );
+      },
     },
 
     type === "PETITION"
@@ -646,6 +661,13 @@ function usePetitionListActions({
               defaultMessage="Save as template"
             />
           ),
+          wrap: (button: ReactNode) => {
+            return (
+              <RestrictedFeaturePopover isVisible={user.role === "COLLABORATOR"}>
+                {button}
+              </RestrictedFeaturePopover>
+            );
+          },
         }
       : {
           key: "useTemplate",

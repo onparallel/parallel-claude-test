@@ -17,12 +17,12 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableProps, useTableColors } from "@parallel/components/common/Table";
 import { ComponentType, Key, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, pick } from "remeda";
+import { identity, isDefined, pick } from "remeda";
 
 export interface TablePageProps<TRow, TContext = unknown, TImpl extends TRow = TRow>
   extends TableProps<TRow, TContext, TImpl> {
   loading: boolean;
-  actions?: (ButtonProps & { key: Key })[];
+  actions?: (ButtonProps & { key: Key; wrap?: (node: ReactNode) => ReactNode })[];
   header?: ReactNode;
   body?: ReactNode;
   totalCount?: number;
@@ -200,9 +200,17 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
                         values={{ count: (context as any).selectedCount }}
                       />
                     </Box>
-                    {actions?.map(({ key, ...props }) => (
-                      <Button key={key} variant="ghost" size="sm" fontWeight="normal" {...props} />
-                    ))}
+                    {actions?.map(({ key, wrap = identity, ...props }) =>
+                      wrap(
+                        <Button
+                          key={key}
+                          variant="ghost"
+                          size="sm"
+                          fontWeight="normal"
+                          {...props}
+                        />
+                      )
+                    )}
                   </HStack>
                 </Box>
               ),
