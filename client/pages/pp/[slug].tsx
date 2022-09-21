@@ -29,6 +29,7 @@ import {
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import jwtDecode from "jwt-decode";
 import {
   GetServerSidePropsContext,
@@ -79,27 +80,13 @@ function PublicPetitionLink({
     handleNewPublicPetition({ formData, force: false });
   };
 
-  const showErrorToast = () => {
-    toast({
-      title: intl.formatMessage({
-        id: "public.public-petition.error-title",
-        defaultMessage: "An error happened",
-      }),
-      description: intl.formatMessage({
-        id: "public.public-petition.error-description",
-        defaultMessage: "Please try again later",
-      }),
-      status: "error",
-      duration: 9000,
-      isClosable: true,
-    });
-  };
+  const showGenericErrorToast = useGenericErrorToast();
 
   const handleNewPublicPetition = async ({ formData, force }: HandleNewPublicPetitionProps) => {
     try {
       const _data = formData ?? submittedData;
 
-      const { data, errors } = await createPublicPetition({
+      const { data } = await createPublicPetition({
         variables: {
           slug,
           contactFirstName: _data?.firstName ?? "",
@@ -110,36 +97,28 @@ function PublicPetitionLink({
         },
       });
 
-      if (errors) {
-        throw errors;
-      }
-
       if (data?.publicCreateAndSendPetitionFromPublicLink === "SUCCESS") {
         setStep("EMAIL_SENT");
       } else if (data?.publicCreateAndSendPetitionFromPublicLink === "FAILURE") {
-        showErrorToast();
+        showGenericErrorToast();
       }
     } catch (error) {
       if (isApolloError(error, "PUBLIC_LINK_ACCESS_ALREADY_CREATED_ERROR")) {
         setStep("EMAIL_EXISTS");
       } else {
-        showErrorToast();
+        showGenericErrorToast(error);
       }
     }
   };
 
   const handleContinueExisting = async () => {
     try {
-      const { data, errors } = await sendReminder({
+      const { data } = await sendReminder({
         variables: {
           slug,
           contactEmail: submittedData?.email ?? "",
         },
       });
-
-      if (errors) {
-        throw errors;
-      }
 
       if (data?.publicSendReminder === "SUCCESS") {
         setStep("REMINDER_SENT");
@@ -165,7 +144,7 @@ function PublicPetitionLink({
           isClosable: true,
         });
       } else {
-        showErrorToast();
+        showErrorToast(error);
       }
     }
   };

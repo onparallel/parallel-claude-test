@@ -392,7 +392,7 @@
   {
     "term": "component.confirm-comment-mention-and-share-dialog.body-confirm",
     "definition": "¿Quieres compartir el parallel para que se pueda leer tu mensaje?",
-    "context": "Do you want to share the parallel so they can see your message?"
+    "context": "Do you want to share the parallel with them so the message can be read?"
   },
   {
     "term": "component.confirm-comment-mention-and-share-dialog.cancel",
@@ -8455,19 +8455,9 @@
     "context": "You can only send one reminder each 24 hours"
   },
   {
-    "term": "public.public-petition.error-description",
-    "definition": "Por favor, inténtelo de nuevo más tarde",
-    "context": "Please try again later"
-  },
-  {
     "term": "public.public-petition.error-reminder-title",
     "definition": "Recordatorio ya enviado",
     "context": "Reminder already sent"
-  },
-  {
-    "term": "public.public-petition.error-title",
-    "definition": "Ocurrió un error",
-    "context": "An error happened"
   },
   {
     "term": "public.resend-verification-email.success-description",

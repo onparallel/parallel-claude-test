@@ -391,8 +391,8 @@
   },
   {
     "term": "component.confirm-comment-mention-and-share-dialog.body-confirm",
-    "definition": "Do you want to share the parallel so they can see your message?",
-    "context": "Do you want to share the parallel so they can see your message?"
+    "definition": "Do you want to share the parallel with them so the message can be read?",
+    "context": "Do you want to share the parallel with them so the message can be read?"
   },
   {
     "term": "component.confirm-comment-mention-and-share-dialog.cancel",
@@ -8455,19 +8455,9 @@
     "context": "You can only send one reminder each 24 hours"
   },
   {
-    "term": "public.public-petition.error-description",
-    "definition": "Please try again later",
-    "context": "Please try again later"
-  },
-  {
     "term": "public.public-petition.error-reminder-title",
     "definition": "Reminder already sent",
     "context": "Reminder already sent"
-  },
-  {
-    "term": "public.public-petition.error-title",
-    "definition": "An error happened",
-    "context": "An error happened"
   },
   {
     "term": "public.resend-verification-email.success-description",
