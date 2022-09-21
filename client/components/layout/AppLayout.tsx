@@ -48,9 +48,11 @@ export const AppLayout = Object.assign(
       "sm",
       useCallback((matches) => {
         if (!matches) {
-          window.Intercom?.("update", { hide_default_launcher: true });
+          window.intercomSettings = { hide_default_launcher: true };
+          window.Intercom?.("update");
         } else {
-          window.Intercom?.("update", { hide_default_launcher: false });
+          window.intercomSettings = { hide_default_launcher: false };
+          window.Intercom?.("update");
         }
       }, [])
     );
@@ -144,12 +146,12 @@ export const AppLayout = Object.assign(
             content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
           />
         </Head>
-        {process.env.NODE_ENV !== "development" ? (
-          <>
-            <Segment />
-            <Canny />
-          </>
-        ) : null}
+        {/* {process.env.NODE_ENV !== "development" ? (
+          <> */}
+        <Segment />
+        <Canny />
+        {/* </>
+        ) : null} */}
         <DndProvider backend={HTML5Backend}>
           <Flex
             alignItems="stretch"
