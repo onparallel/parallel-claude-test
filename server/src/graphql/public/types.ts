@@ -145,14 +145,11 @@ export const PublicPetition = objectType({
         return signature ? (signature.status === "COMPLETED" ? "COMPLETED" : "STARTED") : null;
       },
     });
-    /** @deprecated */
     t.nonNull.field("tone", {
       type: "Tone",
-      deprecation: "use organization.brandTheme.preferredTone",
       description: "The preferred tone of organization.",
       resolve: async (root, _, ctx) => {
         const org = (await ctx.organizations.loadOrg(root.org_id))!;
-
         return org.preferred_tone;
       },
     });

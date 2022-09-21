@@ -77,11 +77,11 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   const recipients = petition!.recipients;
   const message = access!.message;
 
-  const tone = petition.organization.brandTheme.preferredTone;
-
   const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage, {
     hideInternalFields: true,
   });
+
+  const tone = petition.tone;
 
   const showFullScreenDialog =
     petition.isCompletingMessageEnabled &&
@@ -530,12 +530,7 @@ RecipientView.fragments = {
         status
         deadline
         isRecipientViewContentsHidden
-        organization {
-          id
-          brandTheme {
-            preferredTone
-          }
-        }
+        tone
         fields {
           ...RecipientView_PublicPetitionField
           ...useGetPageFields_PublicPetitionField

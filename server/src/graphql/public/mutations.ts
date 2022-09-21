@@ -67,7 +67,6 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
       t.nullable.string("email");
       t.nullable.string("ownerName");
       t.nullable.field("organization", { type: "PublicOrganization" });
-      t.nullable.jsonObject("brandTheme");
     },
   }),
   authorize: chain(checkClientServerToken("token"), fetchPetitionAccess("keycode")),
@@ -98,6 +97,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
       const owner = (await ctx.petitions.loadPetitionOwner(petition.id))!;
       const data = (await ctx.users.loadUserData(owner.user_data_id))!;
 
+      // TODO: Add petition tone indepdendetly to organization
       return {
         isAllowed: false,
         isContactlessAccess: true,

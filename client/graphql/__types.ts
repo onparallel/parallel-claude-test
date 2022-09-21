@@ -18043,6 +18043,7 @@ export type PetitionMessages_updatePetitionMutation = {
 export type PetitionPreview_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
+  tone: Tone;
   isAnonymized: boolean;
   status: PetitionStatus;
   name?: string | null;
@@ -18232,6 +18233,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
 export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
+  tone: Tone;
   isAnonymized: boolean;
   name?: string | null;
   locale: PetitionLocale;
@@ -18420,6 +18422,7 @@ export type PetitionPreview_updatePetitionMutation = {
     | {
         __typename?: "Petition";
         id: string;
+        tone: Tone;
         isAnonymized: boolean;
         status: PetitionStatus;
         name?: string | null;
@@ -18612,6 +18615,7 @@ export type PetitionPreview_updatePetitionMutation = {
     | {
         __typename?: "PetitionTemplate";
         id: string;
+        tone: Tone;
         isAnonymized: boolean;
         name?: string | null;
         locale: PetitionLocale;
@@ -18757,6 +18761,7 @@ export type PetitionPreview_completePetitionMutation = {
   completePetition: {
     __typename?: "Petition";
     id: string;
+    tone: Tone;
     isAnonymized: boolean;
     status: PetitionStatus;
     name?: string | null;
@@ -18953,6 +18958,7 @@ export type PetitionPreview_petitionQuery = {
     | {
         __typename?: "Petition";
         id: string;
+        tone: Tone;
         isAnonymized: boolean;
         status: PetitionStatus;
         name?: string | null;
@@ -19145,6 +19151,7 @@ export type PetitionPreview_petitionQuery = {
     | {
         __typename?: "PetitionTemplate";
         id: string;
+        tone: Tone;
         isAnonymized: boolean;
         name?: string | null;
         locale: PetitionLocale;
@@ -21715,6 +21722,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
     status: PetitionStatus;
     deadline?: string | null;
     isRecipientViewContentsHidden: boolean;
+    tone: Tone;
     signatureStatus?: PublicSignatureStatus | null;
     isCompletingMessageEnabled: boolean;
     completingMessageBody?: string | null;
@@ -21727,12 +21735,6 @@ export type RecipientView_PublicPetitionAccessFragment = {
       id: string;
       fullName: string;
     }>;
-    organization: {
-      __typename?: "PublicOrganization";
-      id: string;
-      hasRemoveParallelBranding: boolean;
-      brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
-    };
     fields: Array<{
       __typename?: "PublicPetitionField";
       type: PetitionFieldType;
@@ -21789,6 +21791,11 @@ export type RecipientView_PublicPetitionAccessFragment = {
         email: string;
       }>;
     } | null;
+    organization: {
+      __typename?: "PublicOrganization";
+      id: string;
+      hasRemoveParallelBranding: boolean;
+    };
   } | null;
   granter?: {
     __typename?: "PublicUser";
@@ -21832,16 +21839,11 @@ export type RecipientView_PublicPetitionFragment = {
   status: PetitionStatus;
   deadline?: string | null;
   isRecipientViewContentsHidden: boolean;
+  tone: Tone;
   signatureStatus?: PublicSignatureStatus | null;
   isCompletingMessageEnabled: boolean;
   completingMessageBody?: string | null;
   completingMessageSubject?: string | null;
-  organization: {
-    __typename?: "PublicOrganization";
-    id: string;
-    hasRemoveParallelBranding: boolean;
-    brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
-  };
   fields: Array<{
     __typename?: "PublicPetitionField";
     type: PetitionFieldType;
@@ -21905,6 +21907,11 @@ export type RecipientView_PublicPetitionFragment = {
     firstName: string;
     email: string;
   }>;
+  organization: {
+    __typename?: "PublicOrganization";
+    id: string;
+    hasRemoveParallelBranding: boolean;
+  };
 };
 
 export type RecipientView_PublicPetitionFieldFragment = {
@@ -21968,16 +21975,11 @@ export type RecipientView_publicCompletePetitionMutation = {
     status: PetitionStatus;
     deadline?: string | null;
     isRecipientViewContentsHidden: boolean;
+    tone: Tone;
     signatureStatus?: PublicSignatureStatus | null;
     isCompletingMessageEnabled: boolean;
     completingMessageBody?: string | null;
     completingMessageSubject?: string | null;
-    organization: {
-      __typename?: "PublicOrganization";
-      id: string;
-      hasRemoveParallelBranding: boolean;
-      brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
-    };
     fields: Array<{
       __typename?: "PublicPetitionField";
       type: PetitionFieldType;
@@ -22041,6 +22043,11 @@ export type RecipientView_publicCompletePetitionMutation = {
       firstName: string;
       email: string;
     }>;
+    organization: {
+      __typename?: "PublicOrganization";
+      id: string;
+      hasRemoveParallelBranding: boolean;
+    };
   };
 };
 
@@ -22057,6 +22064,7 @@ export type RecipientView_accessQuery = {
       status: PetitionStatus;
       deadline?: string | null;
       isRecipientViewContentsHidden: boolean;
+      tone: Tone;
       signatureStatus?: PublicSignatureStatus | null;
       isCompletingMessageEnabled: boolean;
       completingMessageBody?: string | null;
@@ -22069,12 +22077,6 @@ export type RecipientView_accessQuery = {
         id: string;
         fullName: string;
       }>;
-      organization: {
-        __typename?: "PublicOrganization";
-        id: string;
-        hasRemoveParallelBranding: boolean;
-        brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
-      };
       fields: Array<{
         __typename?: "PublicPetitionField";
         type: PetitionFieldType;
@@ -22131,6 +22133,11 @@ export type RecipientView_accessQuery = {
           email: string;
         }>;
       } | null;
+      organization: {
+        __typename?: "PublicOrganization";
+        id: string;
+        hasRemoveParallelBranding: boolean;
+      };
     } | null;
     granter?: {
       __typename?: "PublicUser";
@@ -26983,6 +26990,7 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
         preferredTone
       }
     }
+    tone
     isAnonymized
     myEffectivePermission {
       permissionType
@@ -27870,12 +27878,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     status
     deadline
     isRecipientViewContentsHidden
-    organization {
-      id
-      brandTheme {
-        preferredTone
-      }
-    }
+    tone
     fields {
       ...RecipientView_PublicPetitionField
       ...useGetPageFields_PublicPetitionField

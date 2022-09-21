@@ -586,7 +586,6 @@ export interface NexusGenObjects {
   PetitionUserPermission: db.PetitionPermission;
   PublicAccessVerification: {
     // root type
-    brandTheme?: NexusGenScalars["JSONObject"] | null; // JSONObject
     cookieName?: string | null; // String
     cookieValue?: string | null; // String
     email?: string | null; // String
@@ -1705,7 +1704,6 @@ export interface NexusGenFieldTypes {
   };
   PublicAccessVerification: {
     // field return type
-    brandTheme: NexusGenScalars["JSONObject"] | null; // JSONObject
     cookieName: string | null; // String
     cookieValue: string | null; // String
     email: string | null; // String
@@ -3291,7 +3289,6 @@ export interface NexusGenFieldTypeNames {
   };
   PublicAccessVerification: {
     // field return type name
-    brandTheme: "JSONObject";
     cookieName: "String";
     cookieValue: "String";
     email: "String";

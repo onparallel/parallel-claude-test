@@ -423,6 +423,7 @@ PetitionPreview.fragments = {
           preferredTone
         }
       }
+      tone
       isAnonymized
       myEffectivePermission {
         permissionType

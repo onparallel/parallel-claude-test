@@ -3773,7 +3773,6 @@ type PetitionUserPermission implements PetitionPermission & Timestamps {
 }
 
 type PublicAccessVerification {
-  brandTheme: JSONObject
   cookieName: String
   cookieValue: String
   email: String
@@ -3936,7 +3935,7 @@ type PublicPetition implements Timestamps {
   """
   The preferred tone of organization.
   """
-  tone: Tone! @deprecated(reason: "use organization.brandTheme.preferredTone")
+  tone: Tone!
 
   """
   Time when the resource was last updated.
