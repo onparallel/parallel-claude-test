@@ -14,7 +14,6 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import { fromEvent } from "file-selector";
 import { getColor } from "@chakra-ui/theme-tools";
 import {
   ConditionIcon,
@@ -43,7 +42,8 @@ import { withError } from "@parallel/utils/promises/withError";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { uploadFile } from "@parallel/utils/uploadFile";
 import useMergedRef from "@react-hook/merged-ref";
-import { memo, useCallback, useImperativeHandle, useRef, useState } from "react";
+import { fromEvent } from "file-selector";
+import { memo, RefObject, useCallback, useImperativeHandle, useRef, useState } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -85,10 +85,11 @@ export interface PetitionComposeFieldProps {
   isAttachDisabled?: boolean;
 }
 
-export type PetitionComposeFieldRef = {
+export interface PetitionComposeFieldRef {
+  elementRef: RefObject<HTMLDivElement>;
   focusFromPrevious: () => void;
   focusFromNext: () => void;
-};
+}
 
 const _PetitionComposeField = chakraForwardRef<
   "div",
@@ -491,10 +492,12 @@ const _PetitionComposeFieldInner = chakraForwardRef<
     fieldOptionsRef.current?.focus(atStart ? "START" : undefined);
   }, []);
 
+  const elementRef = useRef<HTMLDivElement>(null);
   useImperativeHandle(
     ref,
     () =>
       ({
+        elementRef,
         focusFromPrevious: () => focusTitle(true),
         focusFromNext: () => {
           if (field.type === "SELECT" || field.type === "CHECKBOX") {
@@ -512,7 +515,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
   const letter = letters();
 
   return (
-    <Stack spacing={1} {...props}>
+    <Stack ref={elementRef} spacing={1} {...props}>
       <Stack direction="row" spacing={2} alignItems="center">
         {field.isInternal ? <InternalFieldBadge /> : null}
         <Box flex={1}>

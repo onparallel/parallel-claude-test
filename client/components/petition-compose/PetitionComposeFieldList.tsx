@@ -34,7 +34,7 @@ import { FieldOptions } from "@parallel/utils/petitionFields";
 import { Maybe } from "@parallel/utils/types";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { Fragment, memo, useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -62,6 +62,7 @@ export interface PetitionComposeFieldListProps extends BoxProps {
   active: Maybe<string>;
   fields: FieldSelection[];
   showErrors: boolean;
+  fieldRefs: MultipleRefObject<PetitionComposeFieldRef>;
   onUpdateFieldPositions: (fieldIds: string[]) => void;
   onCloneField: (fieldId: string) => void;
   onFieldSettingsClick: (fieldId: string) => void;
@@ -81,6 +82,7 @@ export const PetitionComposeFieldList = Object.assign(
     active,
     fields,
     showErrors,
+    fieldRefs,
     onUpdateFieldPositions,
     onCloneField,
     onFieldSettingsClick,
@@ -140,8 +142,6 @@ export const PetitionComposeFieldList = Object.assign(
       },
       [onUpdateFieldPositions]
     );
-
-    const fieldRefs = useMultipleRefs<PetitionComposeFieldRef>();
 
     const showReferencedFieldDialog = useReferencedFieldDialog();
 

@@ -1,21 +1,37 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, PositionProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Maybe } from "@parallel/utils/types";
 import useMergedRef from "@react-hook/merged-ref";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, RefObject, useEffect, useRef, useState } from "react";
 import ResizeObserver from "react-resize-observer";
+import { isDefined } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+
+interface BoundingClientRect {
+  readonly bottom: number;
+  readonly height: number;
+  readonly left: number;
+  readonly right: number;
+  readonly top: number;
+  readonly width: number;
+  readonly x: number;
+  readonly y: number;
+}
+
+interface WithGetBoundingClientRect {
+  getBoundingClientRect(): BoundingClientRect;
+}
 
 export interface PaneWithFlyoutProps {
   isFlyoutActive: boolean;
   flyout: ReactNode;
-  alignWith: Maybe<HTMLElement>;
-  flyoutTopPadding: number;
+  alignWithRef: Maybe<RefObject<WithGetBoundingClientRect>>;
+  top?: PositionProps["top"];
   children: ReactNode;
 }
 
 export const PaneWithFlyout = chakraForwardRef<"div", PaneWithFlyoutProps>(function PaneWithFlyout(
-  { isFlyoutActive, flyout, alignWith, flyoutTopPadding, children, ...props },
+  { isFlyoutActive, flyout, alignWithRef, top = 0, children, ...props },
   ref
 ) {
   const [flyoutOffset, setFlyoutOffset] = useState(0);
@@ -23,20 +39,23 @@ export const PaneWithFlyout = chakraForwardRef<"div", PaneWithFlyoutProps>(funct
   const paneRef = useRef<HTMLDivElement>(null);
   const _paneRef = useMergedRef(ref, paneRef);
 
-  useEffect(positionFlyout, [isFlyoutActive, alignWith]);
-  useEffect(scrollFlyoutIntoView, [isFlyoutActive, alignWith]);
+  useEffect(positionFlyout, [isFlyoutActive, alignWithRef]);
+  useEffect(scrollFlyoutIntoView, [isFlyoutActive, alignWithRef]);
 
   function positionFlyout() {
-    if (!isFlyoutActive || !alignWith || !flyoutRef.current) {
+    const alignWith = alignWithRef?.current;
+    const flyout = flyoutRef.current;
+    if (!isFlyoutActive || !isDefined(alignWith) || !isDefined(flyout)) {
       setFlyoutOffset(0);
       return;
     }
     const { top: paneTop, height: paneHeight } = paneRef.current!.getBoundingClientRect();
-    const { top: alignWithTop } = alignWith.getBoundingClientRect();
-    const { height: flyoutHeight } = flyoutRef.current.getBoundingClientRect();
-
-    // flyoutTopPadding is in rem's, so its multiplied by 4 to match pixels
-    const offset = alignWithTop - paneTop - flyoutTopPadding * 4;
+    const { height: alignWithHeight, top: alignWithTop } = alignWith.getBoundingClientRect();
+    const { height: flyoutHeight } = flyout.getBoundingClientRect();
+    const offset =
+      flyoutHeight > alignWithHeight
+        ? alignWithTop - paneTop + alignWithHeight / 2 - flyoutHeight / 2
+        : alignWithTop - paneTop;
     const maxOffset = paneHeight - flyoutHeight;
     setFlyoutOffset(Math.min(maxOffset, Math.max(0, offset)));
   }
@@ -71,7 +90,7 @@ export const PaneWithFlyout = chakraForwardRef<"div", PaneWithFlyoutProps>(funct
             marginTop={{ base: 0, md: `${flyoutOffset}px` }}
             transition="margin-top 200ms ease"
             position={{ base: "relative", md: "sticky" }}
-            top={0}
+            top={top}
           >
             <ResizeObserver onResize={positionFlyout} />
             {flyout}

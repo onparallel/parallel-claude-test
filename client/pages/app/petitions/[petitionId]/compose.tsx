@@ -24,7 +24,10 @@ import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compo
 import { useHandledPetitionFromTemplateDialog } from "@parallel/components/petition-compose/dialogs/PetitionFromTemplateDialog";
 import { usePublicTemplateDialog } from "@parallel/components/petition-compose/dialogs/PublicTemplateDialog";
 import { useReferencedFieldDialog } from "@parallel/components/petition-compose/dialogs/ReferencedFieldDialog";
-import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
+import {
+  PetitionComposeField,
+  PetitionComposeFieldRef,
+} from "@parallel/components/petition-compose/PetitionComposeField";
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionSettings } from "@parallel/components/petition-compose/PetitionSettings";
@@ -58,6 +61,7 @@ import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
+import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
@@ -105,12 +109,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
 
   const [showErrors, setShowErrors] = useState(false);
+  const fieldRefs = useMultipleRefs<PetitionComposeFieldRef>();
   const activeField: Maybe<FieldSelection> = useMemo(() => {
     return activeFieldId ? petition.fields?.find((f) => f.id === activeFieldId) ?? null : null;
   }, [activeFieldId, petition.fields]);
-  const activeFieldElement = useMemo(() => {
-    return activeFieldId ? document.querySelector<HTMLElement>(`#field-${activeFieldId}`)! : null;
-  }, [activeFieldId]);
 
   // 0 - Content
   // 1 - Petition/Template Settings
@@ -478,11 +480,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       >
         <PaneWithFlyout
           backgroundColor={petition?.__typename === "PetitionTemplate" ? "primary.50" : undefined}
-          isFlyoutActive={Boolean(activeField)}
-          alignWith={activeField ? activeFieldElement : null}
-          flyoutTopPadding={4}
+          isFlyoutActive={Boolean(activeFieldId)}
+          alignWithRef={activeFieldId ? fieldRefs[activeFieldId].current?.elementRef ?? null : null}
+          top={4}
           flyout={
-            <Box padding={{ base: 4 }} paddingLeft={{ md: 0 }}>
+            <Box paddingX={{ base: 4 }} paddingLeft={{ md: 0 }}>
               {activeField ? (
                 <PetitionComposeFieldSettings
                   petitionId={petition.id}
@@ -555,6 +557,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               showErrors={showErrors}
               fields={petition.fields}
               active={activeFieldId}
+              fieldRefs={fieldRefs}
               onAddField={handleAddField}
               onCloneField={handleCloneField}
               onDeleteField={handleDeleteField}
