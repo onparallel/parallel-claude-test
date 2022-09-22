@@ -17,6 +17,7 @@ import {
   UserGroup,
   UserGroupMember,
 } from "../src/db/__types";
+import { defaultBrandTheme } from "../src/util/BrandTheme";
 import { deleteAllData } from "../src/util/knexUtils";
 import { defaultPdfDocumentTheme } from "../src/util/PdfDocumentTheme";
 
@@ -262,6 +263,15 @@ export async function seed(knex: Knex): Promise<any> {
         type: "PDF_DOCUMENT",
         is_default: true,
         data: defaultPdfDocumentTheme,
+        created_by: `User:${userIds[0]}`,
+        updated_by: `User:${userIds[0]}`,
+      },
+      {
+        org_id: orgIds[0],
+        type: "BRAND",
+        name: "Default",
+        is_default: true,
+        data: defaultBrandTheme,
         created_by: `User:${userIds[0]}`,
         updated_by: `User:${userIds[0]}`,
       },

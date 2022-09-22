@@ -2805,7 +2805,6 @@ export type PetitionUserPermission = PetitionPermission &
   };
 
 export type PublicAccessVerification = {
-  brandTheme: Maybe<Scalars["JSONObject"]>;
   cookieName: Maybe<Scalars["String"]>;
   cookieValue: Maybe<Scalars["String"]>;
   email: Maybe<Scalars["String"]>;
@@ -2901,10 +2900,7 @@ export type PublicPetition = Timestamps & {
   signatureStatus: Maybe<PublicSignatureStatus>;
   /** The status of the petition. */
   status: PetitionStatus;
-  /**
-   * The preferred tone of organization.
-   * @deprecated use organization.brandTheme.preferredTone
-   */
+  /** The preferred tone of organization. */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];

@@ -149,8 +149,10 @@ export const PublicPetition = objectType({
       type: "Tone",
       description: "The preferred tone of organization.",
       resolve: async (root, _, ctx) => {
-        const org = (await ctx.organizations.loadOrg(root.org_id))!;
-        return org.preferred_tone;
+        const res = await ctx.organizations.loadOrgBrandTheme(root.org_id);
+        const theme = res?.data ?? defaultBrandTheme;
+
+        return theme.preferredTone;
       },
     });
     t.boolean("hasRemoveParallelBranding", {
