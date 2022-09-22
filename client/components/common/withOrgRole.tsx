@@ -25,6 +25,7 @@ export function withOrgRole<P = {}>(role: OrganizationRole) {
           query: gql`
             query WithOrgRole {
               me {
+                id
                 role
               }
             }

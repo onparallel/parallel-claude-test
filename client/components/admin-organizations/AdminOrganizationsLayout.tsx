@@ -127,6 +127,7 @@ AdminOrganizationsLayout.fragments = {
       fragment AdminOrganizationsLayout_Query on Query {
         ...SettingsLayout_Query
         me {
+          id
           organization {
             name
             ...AdminOrganizationsLayout_Organization

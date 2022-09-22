@@ -4672,11 +4672,13 @@ export type HasFeatureFlagQuery = {
 
 export type WithOrgRoleQueryVariables = Exact<{ [key: string]: never }>;
 
-export type WithOrgRoleQuery = { me: { __typename?: "User"; role: OrganizationRole } };
+export type WithOrgRoleQuery = { me: { __typename?: "User"; id: string; role: OrganizationRole } };
 
 export type WithSuperAdminAccessQueryVariables = Exact<{ [key: string]: never }>;
 
-export type WithSuperAdminAccessQuery = { me: { __typename?: "User"; isSuperAdmin: boolean } };
+export type WithSuperAdminAccessQuery = {
+  me: { __typename?: "User"; id: string; isSuperAdmin: boolean };
+};
 
 export type useConfirmDeleteContactsDialog_ContactFragment = {
   __typename?: "Contact";
@@ -23633,6 +23635,7 @@ export const AdminOrganizationsLayout_QueryFragmentDoc = gql`
   fragment AdminOrganizationsLayout_Query on Query {
     ...SettingsLayout_Query
     me {
+      id
       organization {
         name
         ...AdminOrganizationsLayout_Organization
@@ -28116,6 +28119,7 @@ export const HasFeatureFlagDocument = gql`
 export const WithOrgRoleDocument = gql`
   query WithOrgRole {
     me {
+      id
       role
     }
   }
@@ -28123,6 +28127,7 @@ export const WithOrgRoleDocument = gql`
 export const WithSuperAdminAccessDocument = gql`
   query WithSuperAdminAccess {
     me {
+      id
       isSuperAdmin
     }
   }

@@ -23,6 +23,7 @@ export function withSuperAdminAccess<P = {}>(
         query: gql`
           query WithSuperAdminAccess {
             me {
+              id
               isSuperAdmin
             }
           }
