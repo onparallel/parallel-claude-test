@@ -93,6 +93,19 @@ export const AppLayout = Object.assign(
       });
     }, []);
 
+    //Identify user in canny to autologin
+    useEffect(() => {
+      window.Canny?.("identify", {
+        appID: process.env.NEXT_PUBLIC_CANNY_APPID,
+        user: {
+          email: me.email,
+          name: me.fullName,
+          id: me.id,
+          created: new Date(me.createdAt).toISOString(),
+        },
+      });
+    }, [me.id]);
+
     // Load Segment analytics and identify user
     useEffect(() => {
       if (window.analytics && !(window.analytics as any).initialized) {
