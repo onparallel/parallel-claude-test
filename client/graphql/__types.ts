@@ -7888,6 +7888,15 @@ export type AliasOptionsMenu_PetitionFieldFragment = {
   options: { [key: string]: any };
 };
 
+export type CopyAliasIconButton_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  alias?: string | null;
+  type: PetitionFieldType;
+  multiple: boolean;
+  options: { [key: string]: any };
+};
+
 export type PetitionContents_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -9752,6 +9761,15 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   visibility?: { [key: string]: any } | null;
   alias?: string | null;
   hasCommentsEnabled: boolean;
+};
+
+export type SettingsRowAlias_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  alias?: string | null;
+  multiple: boolean;
+  options: { [key: string]: any };
 };
 
 export type PetitionListHeader_movePetitionsMutationVariables = Exact<{
@@ -26335,6 +26353,35 @@ export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
   ${PetitionFieldOptionsListEditor_PetitionFieldFragmentDoc}
   ${PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeField_PetitionFieldFragment, unknown>;
+export const CopyAliasIconButton_PetitionFieldFragmentDoc = gql`
+  fragment CopyAliasIconButton_PetitionField on PetitionField {
+    id
+    alias
+    type
+    multiple
+    options
+  }
+` as unknown as DocumentNode<CopyAliasIconButton_PetitionFieldFragment, unknown>;
+export const AliasOptionsMenu_PetitionFieldFragmentDoc = gql`
+  fragment AliasOptionsMenu_PetitionField on PetitionField {
+    id
+    alias
+    type
+    multiple
+    options
+  }
+` as unknown as DocumentNode<AliasOptionsMenu_PetitionFieldFragment, unknown>;
+export const SettingsRowAlias_PetitionFieldFragmentDoc = gql`
+  fragment SettingsRowAlias_PetitionField on PetitionField {
+    id
+    type
+    alias
+    ...CopyAliasIconButton_PetitionField
+    ...AliasOptionsMenu_PetitionField
+  }
+  ${CopyAliasIconButton_PetitionFieldFragmentDoc}
+  ${AliasOptionsMenu_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<SettingsRowAlias_PetitionFieldFragment, unknown>;
 export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
   fragment PetitionComposeFieldSettings_PetitionField on PetitionField {
     id
@@ -26350,7 +26397,9 @@ export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
     visibility
     alias
     hasCommentsEnabled
+    ...SettingsRowAlias_PetitionField
   }
+  ${SettingsRowAlias_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeFieldSettings_PetitionFieldFragment, unknown>;
 export const filterPetitionFields_PetitionFieldFragmentDoc = gql`
   fragment filterPetitionFields_PetitionField on PetitionField {
@@ -26365,15 +26414,6 @@ export const filterPetitionFields_PetitionFieldFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<filterPetitionFields_PetitionFieldFragment, unknown>;
-export const AliasOptionsMenu_PetitionFieldFragmentDoc = gql`
-  fragment AliasOptionsMenu_PetitionField on PetitionField {
-    id
-    alias
-    type
-    multiple
-    options
-  }
-` as unknown as DocumentNode<AliasOptionsMenu_PetitionFieldFragment, unknown>;
 export const PetitionContents_PetitionFieldFragmentDoc = gql`
   fragment PetitionContents_PetitionField on PetitionField {
     id
@@ -26384,9 +26424,11 @@ export const PetitionContents_PetitionFieldFragmentDoc = gql`
     alias
     ...filterPetitionFields_PetitionField
     ...AliasOptionsMenu_PetitionField
+    ...CopyAliasIconButton_PetitionField
   }
   ${filterPetitionFields_PetitionFieldFragmentDoc}
   ${AliasOptionsMenu_PetitionFieldFragmentDoc}
+  ${CopyAliasIconButton_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionContents_PetitionFieldFragment, unknown>;
 export const PetitionCompose_PetitionFieldFragmentDoc = gql`
   fragment PetitionCompose_PetitionField on PetitionField {

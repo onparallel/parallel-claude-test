@@ -24,11 +24,12 @@ import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
 export interface AliasOptionsMenuProps extends Omit<ButtonProps, "children"> {
   field: AliasOptionsMenu_PetitionFieldFragment;
+  alwaysVisible?: boolean;
 }
 
 export const AliasOptionsMenu = Object.assign(
   chakraForwardRef<"button", AliasOptionsMenuProps>(function AliasOptionsMenu(
-    { field, ...props },
+    { field, alwaysVisible = false, ...props },
     ref
   ) {
     const intl = useIntl();
@@ -49,19 +50,14 @@ export const AliasOptionsMenu = Object.assign(
             event.stopPropagation();
           }}
           ref={ref}
-          display={isOpen ? undefined : "none"}
+          display={isOpen || alwaysVisible ? undefined : "none"}
           as={IconButtonWithTooltip}
           label={intl.formatMessage({
-            id: "component.reference-options-menu.other-options",
-            defaultMessage: "Other options",
+            id: "component.reference-options-menu.formulas",
+            defaultMessage: "Formulas",
           })}
           icon={<MoreVerticalIcon />}
           size="xs"
-          background="white"
-          boxShadow="md"
-          _hover={{
-            boxShadow: "lg",
-          }}
           {...props}
         />
         <Portal>

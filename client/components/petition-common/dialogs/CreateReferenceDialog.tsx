@@ -13,6 +13,7 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
   CreateReferenceDialog_PetitionFieldFragment,
+  Maybe,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -39,7 +40,7 @@ export function CreateReferenceDialog({
   fieldIndex,
   onFieldEdit,
   ...props
-}: DialogProps<CreateReferenceDialogProps>) {
+}: DialogProps<CreateReferenceDialogProps, Maybe<string>>) {
   const {
     handleSubmit,
     register,
@@ -90,7 +91,7 @@ export function CreateReferenceDialog({
               },
               alias: data.alias || null,
             });
-            props.onResolve();
+            props.onResolve(data.alias || null);
           } catch {}
         }),
       }}

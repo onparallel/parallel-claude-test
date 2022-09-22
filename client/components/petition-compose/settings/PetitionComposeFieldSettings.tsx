@@ -1,30 +1,14 @@
 import { gql } from "@apollo/client";
-import {
-  AlertDescription,
-  AlertIcon,
-  Box,
-  Heading,
-  Image,
-  Stack,
-  Switch,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Heading, Image, Stack, Switch } from "@chakra-ui/react";
 import { Card, CloseableCardHeader } from "@parallel/components/common/Card";
-import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
-import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   PetitionComposeFieldSettings_PetitionFieldFragment,
   PetitionComposeFieldSettings_UserFragment,
   PetitionFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { isFileTypeField } from "@parallel/utils/isFileTypeField";
-import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { REFERENCE_REGEX } from "@parallel/utils/validation";
-import { ChangeEvent, ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
 import { PetitionFieldTypeSelect } from "../PetitionFieldTypeSelect";
 import { CheckboxSettings } from "./PetitionComposeCheckboxSettings";
 import { DynamicSelectSettings } from "./PetitionComposeDynamicSelectFieldSettings";
@@ -37,7 +21,7 @@ import { ShortTextSettings } from "./PetitionComposeShortTextSettings";
 import { SpanishTaxDocumentsSettings } from "./PetitionComposeTaxDocumentsSettings";
 import { TextSettings } from "./PetitionComposeTextSettings";
 import { SettingsRow } from "./SettingsRow";
-import { AliasErrorType, SettingsRowAlias } from "./SettingsRowAlias";
+import { SettingsRowAlias } from "./SettingsRowAlias";
 
 export type PetitionComposeFieldSettingsProps = {
   petitionId: string;
@@ -60,42 +44,6 @@ export function PetitionComposeFieldSettings({
   isReadOnly,
 }: PetitionComposeFieldSettingsProps) {
   const intl = useIntl();
-  const [alias, setAlias] = useState(field.alias ?? "");
-  const [aliasError, setAliasError] = useState<AliasErrorType | null>(null);
-  const [showDocumentReferenceAlert, setShowDocumentReferenceAlert] = useState(false);
-
-  const debouncedOnUpdate = useDebouncedCallback(
-    async (fieldId, data) => {
-      try {
-        await onFieldEdit(fieldId, data);
-        if (isDefined(aliasError)) setAliasError(null);
-      } catch (error) {
-        if (isApolloError(error, "ALIAS_ALREADY_EXISTS")) {
-          setAliasError("UNIQUE");
-        }
-      }
-    },
-    300,
-    [field.id, aliasError]
-  );
-  const handleAliasChange = function (event: ChangeEvent<HTMLInputElement>) {
-    const value = event.target.value;
-    if (value && isFileTypeField(field.type)) {
-      setShowDocumentReferenceAlert(true);
-    }
-    setAlias(value);
-
-    if (!value || REFERENCE_REGEX.test(value)) {
-      debouncedOnUpdate(field.id, {
-        options: {
-          ...field.options,
-        },
-        alias: value || null,
-      });
-    } else {
-      setAliasError("INVALID");
-    }
-  };
 
   const commonSettings = (
     <>
@@ -299,25 +247,7 @@ export function PetitionComposeFieldSettings({
           >
             <FormattedMessage id="petition.advanced-options" defaultMessage="Advanced options" />
           </Heading>
-          <SettingsRowAlias
-            alias={alias}
-            onChange={handleAliasChange}
-            isReadOnly={isReadOnly}
-            errorType={aliasError}
-          />
-          <PaddedCollapse in={isFileTypeField(field.type) && showDocumentReferenceAlert}>
-            <CloseableAlert status="warning" rounded="md">
-              <AlertIcon color="yellow.500" />
-              <AlertDescription>
-                <Text>
-                  <FormattedMessage
-                    id="component.petition-compose-field-settings.alias-warning"
-                    defaultMessage="<b>Note:</b> Document fields cannot be used to replace content in descriptions."
-                  />
-                </Text>
-              </AlertDescription>
-            </CloseableAlert>
-          </PaddedCollapse>
+          <SettingsRowAlias field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         </Stack>
       ) : null}
     </Card>
@@ -346,6 +276,8 @@ PetitionComposeFieldSettings.fragments = {
       visibility
       alias
       hasCommentsEnabled
+      ...SettingsRowAlias_PetitionField
     }
+    ${SettingsRowAlias.fragments.PetitionField}
   `,
 };

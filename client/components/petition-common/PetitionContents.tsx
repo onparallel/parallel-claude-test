@@ -10,7 +10,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { EyeOffIcon, NewPropertyIcon } from "@parallel/chakra/icons";
+import { EyeOffIcon } from "@parallel/chakra/icons";
 import {
   PetitionContents_PetitionFieldFragment,
   SignatureOrgIntegrationEnvironment,
@@ -21,15 +21,15 @@ import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { filterPetitionFields, PetitionFieldFilter } from "@parallel/utils/filterPetitionFields";
 import { PetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
+import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { ComponentType, createElement, memo, MouseEvent, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { PetitionSignatureStatusIcon } from "../common/PetitionSignatureStatusIcon";
 import { AliasOptionsMenu } from "./AliasOptionsMenu";
-import { CopyAliasIconButton } from "./CopyAliasIconButton";
+import { CopyAliasIconButton, useBuildAliasInterpolation } from "./CopyAliasIconButton";
 import { useCreateReferenceDialog } from "./dialogs/CreateReferenceDialog";
 
 interface PetitionContentsFieldIndicatorsProps<T extends PetitionContents_PetitionFieldFragment> {
@@ -157,9 +157,11 @@ PetitionContents.fragments = {
       alias
       ...filterPetitionFields_PetitionField
       ...AliasOptionsMenu_PetitionField
+      ...CopyAliasIconButton_PetitionField
     }
     ${filterPetitionFields.fragments.PetitionField}
     ${AliasOptionsMenu.fragments.PetitionField}
+    ${CopyAliasIconButton.fragments.PetitionField}
   `,
 };
 
@@ -186,11 +188,20 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
 }: PetitionContentsItemProps<T>) {
   const intl = useIntl();
 
+  const copyReference = useClipboardWithToast({
+    text: intl.formatMessage({
+      id: "component.petition-contents.reference-copied-alert",
+      defaultMessage: "Reference copied to clipboard",
+    }),
+  });
+
   const showCreateReferenceDialog = useCreateReferenceDialog();
+  const buildAliasInterpolation = useBuildAliasInterpolation(field);
   const handleAddReferenceClick = async (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     try {
-      await showCreateReferenceDialog({ field, fieldIndex, onFieldEdit });
+      const alias = await showCreateReferenceDialog({ field, fieldIndex, onFieldEdit });
+      copyReference({ value: buildAliasInterpolation(alias) });
     } catch {}
   };
 
@@ -253,32 +264,28 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
           {fieldIndicators ? createElement(fieldIndicators, { field }) : null}
           {field.isInternal ? <InternalFieldBadge className="internal-badge" /> : null}
           {showAliasButtons ? (
-            field.alias ? (
-              <>
-                <CopyAliasIconButton display="none" className="alias-button" field={field} />
-                <AliasOptionsMenu className="alias-button" field={field} />
-              </>
-            ) : (
-              <IconButtonWithTooltip
-                isDisabled={isReadOnly}
-                tabIndex={0}
+            <>
+              <CopyAliasIconButton
                 display="none"
                 className="alias-button"
-                label={intl.formatMessage({
-                  id: "component.petition-contents-item.create-reference",
-                  defaultMessage: "Create reference",
-                })}
-                icon={<NewPropertyIcon />}
-                fontSize="16px"
-                onClick={handleAddReferenceClick}
-                size="xs"
+                field={field}
+                onClick={field.alias || isReadOnly ? undefined : handleAddReferenceClick}
                 background="white"
                 boxShadow="md"
                 _hover={{
                   boxShadow: "lg",
                 }}
               />
-            )
+              <AliasOptionsMenu
+                className="alias-button"
+                field={field}
+                background="white"
+                boxShadow="md"
+                _hover={{
+                  boxShadow: "lg",
+                }}
+              />
+            </>
           ) : null}
         </LinkBox>
       </Box>

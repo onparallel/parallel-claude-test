@@ -2380,14 +2380,14 @@
     "context": "No format"
   },
   {
-    "term": "component.petition-contents-item.create-reference",
-    "definition": "Crear referencia",
-    "context": "Create reference"
-  },
-  {
     "term": "component.petition-contents.hidden-fields-divider",
     "definition": "{count, plural, =1 {1 campo no aplica} other {# campos no aplican}}",
     "context": "{count, plural, =1 {1 field is} other {# fields are}} not applicable"
+  },
+  {
+    "term": "component.petition-contents.reference-copied-alert",
+    "definition": "Referencia copiada al portapapeles",
+    "context": "Reference copied to clipboard"
   },
   {
     "term": "component.petition-field-checkbox-settings.exact-number",
@@ -4128,11 +4128,6 @@
     "term": "component.reference-options-menu.one-line-replies-description",
     "definition": "Muestra todas las respuestas en una línea.",
     "context": "Displays all replies in one line."
-  },
-  {
-    "term": "component.reference-options-menu.other-options",
-    "definition": "Otras opciones",
-    "context": "Other options"
   },
   {
     "term": "component.reference-options-menu.percentage",
@@ -7403,11 +7398,6 @@
     "term": "petition-replies.petition-field-reply.approve",
     "definition": "Aprobar",
     "context": "Approve"
-  },
-  {
-    "term": "petition-replies.petition-field-reply.copy-dynamic-select-reply",
-    "definition": "Copiar {label} al portapapeles",
-    "context": "Copy {label} to clipboard"
   },
   {
     "term": "petition-replies.petition-field-reply.file-download",
