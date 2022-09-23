@@ -10,7 +10,6 @@ import {
   Portal,
   Stack,
   Text,
-  useDisclosure,
 } from "@chakra-ui/react";
 import { HelpOutlineIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -24,12 +23,11 @@ import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
 export interface AliasOptionsMenuProps extends Omit<ButtonProps, "children"> {
   field: AliasOptionsMenu_PetitionFieldFragment;
-  alwaysVisible?: boolean;
 }
 
 export const AliasOptionsMenu = Object.assign(
   chakraForwardRef<"button", AliasOptionsMenuProps>(function AliasOptionsMenu(
-    { field, alwaysVisible = false, ...props },
+    { field, ...props },
     ref
   ) {
     const intl = useIntl();
@@ -39,18 +37,15 @@ export const AliasOptionsMenu = Object.assign(
         defaultMessage: "Formula copied to clipboard",
       }),
     });
-    const { isOpen, onClose, onOpen } = useDisclosure();
-
     const formulas = useFormulasByTypeField(field);
 
     return (
-      <Menu onOpen={onOpen} onClose={onClose}>
+      <Menu>
         <MenuButton
           onClick={(event) => {
             event.stopPropagation();
           }}
           ref={ref}
-          display={isOpen || alwaysVisible ? undefined : "none"}
           as={IconButtonWithTooltip}
           label={intl.formatMessage({
             id: "component.reference-options-menu.formulas",

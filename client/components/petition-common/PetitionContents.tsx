@@ -205,13 +205,6 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
     } catch {}
   };
 
-  const defaultStyles = { background: "gray.100" };
-  const withAliasButtonsStyles = {
-    ".alias-button": { display: "flex" },
-    ".internal-badge": { display: "none" },
-    background: "gray.100",
-  };
-
   return (
     <>
       {field.type === "HEADING" && field.options.hasPageBreak ? (
@@ -235,10 +228,21 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
           onClick={onFieldClick}
           borderRadius="md"
           cursor="pointer"
-          _hover={!showAliasButtons ? defaultStyles : withAliasButtonsStyles}
-          _focus={!showAliasButtons ? defaultStyles : withAliasButtonsStyles}
-          _focusWithin={!showAliasButtons ? defaultStyles : withAliasButtonsStyles}
           overflow="hidden"
+          sx={{
+            "&:hover, &:focus, &:focus-within": {
+              background: "gray.100",
+              ".alias-button": {
+                display: "flex",
+              },
+            },
+            ".alias-button": {
+              display: "none",
+              "&[data-active]": {
+                display: "flex",
+              },
+            },
+          }}
         >
           <LinkOverlay
             as="div"
@@ -266,7 +270,6 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
           {showAliasButtons ? (
             <>
               <CopyAliasIconButton
-                display="none"
                 className="alias-button"
                 field={field}
                 onClick={field.alias || isReadOnly ? undefined : handleAddReferenceClick}

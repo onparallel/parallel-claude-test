@@ -107,16 +107,9 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
                   field={field}
                   isDisabled={!alias || Boolean(aliasError)}
                   size="sm"
-                  boxShadow="none"
                   variant="outline"
                 />
-                <AliasOptionsMenu
-                  field={field}
-                  alwaysVisible={true}
-                  size="sm"
-                  boxShadow="none"
-                  variant="outline"
-                />
+                <AliasOptionsMenu field={field} size="sm" boxShadow="none" variant="outline" />
               </>
             ) : null}
           </HStack>
