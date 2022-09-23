@@ -279,8 +279,6 @@ function NewPetition() {
               </Tab>
               <RestrictedFeaturePopover
                 isRestricted={me.role === "COLLABORATOR"}
-                display="flex"
-                opacity={0.4}
                 borderBottomRadius={0}
               >
                 <Tab
