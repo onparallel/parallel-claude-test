@@ -43,7 +43,7 @@ export const HeaderNameEditable = Object.assign(
     useEffect(() => {
       if (router.query.new === "true") {
         setTimeout(() => editablePreviewRef.current?.focus());
-
+        localStorage.setItem(`confirm-parallel-draft`, "true");
         router.replace(
           {
             pathname: router.pathname,

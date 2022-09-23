@@ -10,6 +10,7 @@ import {
 } from "@parallel/graphql/__types";
 import { ReactNode, useMemo } from "react";
 import { useIntl } from "react-intl";
+import { useAutoConfirmDiscardDraftDialog } from "../petition-compose/dialogs/ConfirmDiscardDraftDialog";
 import { PetitionTemplateHeader } from "./PetitionTemplateHeader";
 
 export type PetitionSection = "compose" | "preview" | "replies" | "activity" | "messages";
@@ -73,6 +74,11 @@ export const PetitionLayout = Object.assign(
       [section, intl.locale]
     );
 
+    useAutoConfirmDiscardDraftDialog(
+      petition.__typename === "Petition" && petition.status === "DRAFT" ? true : false,
+      petition
+    );
+
     return (
       <AppLayout
         ref={ref}
@@ -120,6 +126,7 @@ export const PetitionLayout = Object.assign(
         fragment PetitionLayout_PetitionBase on PetitionBase {
           id
           name
+          ...useAutoConfirmDiscardDraftDialog_PetitionBase
           ... on Petition {
             ...PetitionHeader_Petition
           }
@@ -127,6 +134,7 @@ export const PetitionLayout = Object.assign(
             ...PetitionTemplateHeader_PetitionTemplate
           }
         }
+        ${useAutoConfirmDiscardDraftDialog.fragments.PetitionBase}
         ${PetitionHeader.fragments.Petition}
         ${PetitionTemplateHeader.fragments.PetitionTemplate}
       `,

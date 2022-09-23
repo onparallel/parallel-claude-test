@@ -37,6 +37,10 @@ export function useDeletePetitions() {
     const petitionIds = petitions.map((p) => p.id);
     const folderIds = folders.map((f) => f.folderId);
 
+    if (force && petitionIds.length === 1) {
+      localStorage.removeItem(`confirm-parallel-draft`);
+    }
+
     return await deletePetitions({
       variables: {
         ids: petitionIds,
@@ -62,7 +66,8 @@ export function useDeletePetitions() {
     async (
       petitionsOrFolders: useDeletePetitions_PetitionBaseOrFolderFragment[],
       type: PetitionBaseType,
-      currentPath?: string
+      currentPath?: string,
+      skipConfirmDialogs?: boolean
     ) => {
       try {
         // first do a dry-run to check if errors will happen when deleting the petition
@@ -70,14 +75,18 @@ export function useDeletePetitions() {
           handleDeletePetitions(petitionsOrFolders, type, { dryrun: true })
         );
         if (error && isApolloError(error, "DELETE_SHARED_PETITION_ERROR")) {
-          // some of the petitions are shared by me to other users, show a confirmation dialog before deleting
-          await confirmDeleteSharedPetitions({
-            petitionIds: error.graphQLErrors[0].extensions.petitionIds as string[],
-            type,
-            currentPath,
-          });
+          if (!skipConfirmDialogs) {
+            // some of the petitions are shared by me to other users, show a confirmation dialog before deleting
+            await confirmDeleteSharedPetitions({
+              petitionIds: error.graphQLErrors[0].extensions.petitionIds as string[],
+              type,
+              currentPath,
+            });
+          }
         } else if (!error) {
-          await confirmDelete({ petitionsOrFolders: petitionsOrFolders, type });
+          if (!skipConfirmDialogs) {
+            await confirmDelete({ petitionsOrFolders: petitionsOrFolders, type });
+          }
         } else {
           throw error;
         }

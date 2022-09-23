@@ -585,6 +585,26 @@
     "context": "Unsaved changes"
   },
   {
+    "term": "component.confirm-discard-draft-dialog.back",
+    "definition": "Volver",
+    "context": "Go back"
+  },
+  {
+    "term": "component.confirm-discard-draft-dialog.body",
+    "definition": "Este parallel no tiene ninguna respuesta ni ha sido enviado. ¿Quieres guardarlo?",
+    "context": "This parallel has no replies and has not been sent. Do you want to save it?"
+  },
+  {
+    "term": "component.confirm-discard-draft-dialog.header",
+    "definition": "¿Quieres guardar este borrador?",
+    "context": "Do you want to save this draft?"
+  },
+  {
+    "term": "component.confirm-discard-draft-dialog.save-draft",
+    "definition": "Guardar borrador",
+    "context": "Save draft"
+  },
+  {
     "term": "component.confirm-petition-signers-dialog.confirmation-text",
     "definition": "Al iniciar firma enviaremos el documento a firmar a los siguientes contactos:",
     "context": "When you start the signature, we will send the document to be signed to the following contacts:"
@@ -1111,7 +1131,7 @@
   },
   {
     "term": "component.delete-shared-petitions-dialog.petition-body-1",
-    "definition": "Has compartido {count, plural, =1{este parallel} other{estos parallels}} con otros usuarios. Al {count, plural, =1{eliminarlo} other{eliminarlos}}, les quitarás el acceso a {count, plural, =1{el parallel} other{los parallels}}.",
+    "definition": "Has compartido {count, plural, =1{este parallel} other{estos parallels}} con otros usuarios. Al {count, plural, =1{eliminarlo} other{eliminarlos}}, les quitarás el acceso {count, plural, =1{al parallel} other{a los parallels}}.",
     "context": "You shared {count, plural, =1{this parallel} other{these parallels}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{parallel} other{parallels}}."
   },
   {
