@@ -599,6 +599,11 @@ function usePetitionListActions({
   onDeleteClick: () => void;
   onMoveToClick: () => void;
 }) {
+  const restrictToCollaborators = (button: ReactNode) => (
+    <RestrictedFeaturePopover isRestricted={user.role === "COLLABORATOR"}>
+      {button}
+    </RestrictedFeaturePopover>
+  );
   return [
     {
       key: "rename",
@@ -624,13 +629,7 @@ function usePetitionListActions({
       children: (
         <FormattedMessage id="page.petitions-list.actions-clone" defaultMessage="Duplicate" />
       ),
-      wrap: (button: ReactNode) => {
-        return (
-          <RestrictedFeaturePopover isVisible={user.role === "COLLABORATOR"}>
-            {button}
-          </RestrictedFeaturePopover>
-        );
-      },
+      wrap: restrictToCollaborators,
     },
     {
       key: "move-to",
@@ -640,13 +639,7 @@ function usePetitionListActions({
       children: (
         <FormattedMessage id="page.petitions-list.actions-move-to" defaultMessage="Move to..." />
       ),
-      wrap: (button: ReactNode) => {
-        return (
-          <RestrictedFeaturePopover isVisible={user.role === "COLLABORATOR"}>
-            {button}
-          </RestrictedFeaturePopover>
-        );
-      },
+      wrap: restrictToCollaborators,
     },
 
     type === "PETITION"
@@ -661,13 +654,7 @@ function usePetitionListActions({
               defaultMessage="Save as template"
             />
           ),
-          wrap: (button: ReactNode) => {
-            return (
-              <RestrictedFeaturePopover isVisible={user.role === "COLLABORATOR"}>
-                {button}
-              </RestrictedFeaturePopover>
-            );
-          },
+          wrap: restrictToCollaborators,
         }
       : {
           key: "useTemplate",

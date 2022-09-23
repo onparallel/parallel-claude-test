@@ -278,7 +278,7 @@ function NewPetition() {
                 <FormattedMessage id="new-petition.my-templates" defaultMessage="My templates" />
               </Tab>
               <RestrictedFeaturePopover
-                isVisible={me.role === "COLLABORATOR"}
+                isRestricted={me.role === "COLLABORATOR"}
                 display="flex"
                 opacity={0.4}
                 borderBottomRadius={0}
@@ -299,7 +299,7 @@ function NewPetition() {
               </RestrictedFeaturePopover>
             </TabList>
             <RestrictedFeaturePopover
-              isVisible={me.role === "COLLABORATOR"}
+              isRestricted={me.role === "COLLABORATOR"}
               display="flex"
               alignSelf="flex-end"
             >

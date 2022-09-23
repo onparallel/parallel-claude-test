@@ -7,7 +7,7 @@ import { Link } from "./Link";
 
 export type RestrictedFeaturePopoverProps = {
   children: ReactNode;
-  isVisible: boolean;
+  isRestricted: boolean;
   placement?: Placement;
   popoverWidth?: BoxProps["width"];
   fontSize?: TextProps["fontSize"];
@@ -15,7 +15,7 @@ export type RestrictedFeaturePopoverProps = {
 
 export const RestrictedFeaturePopover = chakraForwardRef<"div", RestrictedFeaturePopoverProps>(
   function (
-    { children, isVisible, placement = "bottom", popoverWidth, fontSize = "sm", ...props },
+    { children, isRestricted, placement = "bottom", popoverWidth, fontSize = "sm", ...props },
     ref
   ) {
     return (
@@ -41,29 +41,21 @@ export const RestrictedFeaturePopover = chakraForwardRef<"div", RestrictedFeatur
         }
         placement={placement}
         width={popoverWidth}
-        isDisabled={!isVisible}
+        isDisabled={!isRestricted}
       >
-        {isVisible ? (
+        {isRestricted ? (
           <Box
-            position="relative"
-            tabIndex={0}
             ref={ref}
+            tabIndex={0}
+            position="relative"
             _focus={{ outline: "none" }}
-            _focusVisible={{
-              shadow: "outline",
-            }}
+            _focusVisible={{ shadow: "outline" }}
             borderRadius="md"
             {...props}
           >
             <>{children}</>
-            <Box
-              position="absolute"
-              top="0"
-              left="0"
-              width="100%"
-              height="100%"
-              cursor="not-allowed"
-            ></Box>
+            {/* This box ensures that the popover works correctly on Chrome */}
+            <Box position="absolute" top="0" left="0" width="100%" height="100%" />
           </Box>
         ) : (
           children

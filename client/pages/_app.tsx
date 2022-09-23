@@ -1,4 +1,4 @@
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, StylesProvider } from "@chakra-ui/react";
 import { Fonts } from "@parallel/chakra/fonts";
 import { theme } from "@parallel/chakra/theme";
 import { I18nProps, I18nProvider } from "@parallel/components/common/I18nProvider";
@@ -31,10 +31,13 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
     <LiquidProvider>
       <I18nProvider {...props}>
         <ChakraProvider theme={theme} resetCSS portalZIndex={40} cssVarsRoot="body">
-          <Fonts />
-          <AnimateSharedLayout>
-            <Component {...pageProps} />
-          </AnimateSharedLayout>
+          {/* default StylesProvider so useStyles doesn't break */}
+          <StylesProvider value={{}}>
+            <Fonts />
+            <AnimateSharedLayout>
+              <Component {...pageProps} />
+            </AnimateSharedLayout>
+          </StylesProvider>
         </ChakraProvider>
       </I18nProvider>
     </LiquidProvider>

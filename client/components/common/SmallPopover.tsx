@@ -7,7 +7,9 @@ import {
   PopoverProps,
   PopoverTrigger,
   Portal,
+  StylesProvider,
   useId,
+  useStyles,
 } from "@chakra-ui/react";
 import { cloneElement, ReactNode, useState } from "react";
 
@@ -23,6 +25,7 @@ export function SmallPopover({
   content: ReactNode;
   width?: BoxProps["width"];
 } & PopoverProps) {
+  const styles = useStyles();
   const [isOpen, setIsOpen] = useState(false);
   const popoverId = useId(id, "small-popover");
   return isDisabled ? (
@@ -41,11 +44,13 @@ export function SmallPopover({
       }}
       {...props}
     >
-      <PopoverTrigger>
-        {cloneElement(children as any, {
-          ...(isOpen ? { "aria-describedby": popoverId } : {}),
-        })}
-      </PopoverTrigger>
+      <StylesProvider value={styles}>
+        <PopoverTrigger>
+          {cloneElement(children as any, {
+            ...(isOpen ? { "aria-describedby": popoverId } : {}),
+          })}
+        </PopoverTrigger>
+      </StylesProvider>
       <Portal>
         <PopoverContent width={width}>
           <PopoverBody id={popoverId}>{content}</PopoverBody>

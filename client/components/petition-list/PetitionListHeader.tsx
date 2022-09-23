@@ -153,7 +153,7 @@ export function PetitionListHeader({
           })}
         />
         <Spacer />
-        <RestrictedFeaturePopover isVisible={organizationRole === "COLLABORATOR"}>
+        <RestrictedFeaturePopover isRestricted={organizationRole === "COLLABORATOR"}>
           <Button
             display={{ base: "none", lg: "block" }}
             onClick={handleCreateFolder}
@@ -166,7 +166,7 @@ export function PetitionListHeader({
           </Button>
         </RestrictedFeaturePopover>
         <RestrictedFeaturePopover
-          isVisible={organizationRole === "COLLABORATOR" && state.type === "TEMPLATE"}
+          isRestricted={organizationRole === "COLLABORATOR" && state.type === "TEMPLATE"}
         >
           <Button
             display={{ base: "none", lg: "block" }}
