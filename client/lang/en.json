@@ -1006,8 +1006,8 @@
   },
   {
     "term": "component.create-reference-dialog.body",
-    "definition": "References can be inserted in a description to replace the content.",
-    "context": "References can be inserted in a description to replace the content."
+    "definition": "Add the reference to a field description where you want it to be replaced by the reply.",
+    "context": "Add the reference to a field description where you want it to be replaced by the reply."
   },
   {
     "term": "component.create-reference-dialog.field-reference",

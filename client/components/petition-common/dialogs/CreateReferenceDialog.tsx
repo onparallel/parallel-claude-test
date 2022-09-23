@@ -13,7 +13,6 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
   CreateReferenceDialog_PetitionFieldFragment,
-  Maybe,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -40,7 +39,7 @@ export function CreateReferenceDialog({
   fieldIndex,
   onFieldEdit,
   ...props
-}: DialogProps<CreateReferenceDialogProps, Maybe<string>>) {
+}: DialogProps<CreateReferenceDialogProps, string>) {
   const {
     handleSubmit,
     register,
@@ -89,9 +88,9 @@ export function CreateReferenceDialog({
               options: {
                 ...field.options,
               },
-              alias: data.alias || null,
+              alias: data.alias,
             });
-            props.onResolve(data.alias || null);
+            props.onResolve(data.alias);
           } catch {}
         }),
       }}
@@ -107,7 +106,7 @@ export function CreateReferenceDialog({
           <Text>
             <FormattedMessage
               id="component.create-reference-dialog.body"
-              defaultMessage="References can be inserted in a description to replace the content."
+              defaultMessage="Add the reference to a field description where you want it to be replaced by the reply."
             />
           </Text>
           <HStack>
