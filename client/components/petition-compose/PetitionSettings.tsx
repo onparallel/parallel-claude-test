@@ -129,7 +129,6 @@ function _PetitionSettings({
   const isPublicTemplate = petition?.__typename === "PetitionTemplate" && petition.isPublic;
 
   const showSignatureConfigDialog = useSignatureConfigDialog();
-  const showConfirmConfigureOngoingSignature = useDialog(ConfirmConfigureOngoingSignature);
   const showConfirmSignatureConfigChanged = useDialog(ConfirmSignatureConfigChanged);
 
   const [cancelSignatureRequest] = useMutation(
@@ -146,9 +145,6 @@ function _PetitionSettings({
   const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
   async function handleConfigureSignatureClick() {
     try {
-      if (ongoingSignatureRequest) {
-        await showConfirmConfigureOngoingSignature({});
-      }
       assertTypenameArray(signatureIntegrations, "SignatureOrgIntegration");
       const signatureConfig = await showSignatureConfigDialog({
         user,
@@ -1194,31 +1190,6 @@ function ConfirmSkipForwardSecurity(props: DialogProps<{}, void>) {
   );
 }
 
-function ConfirmConfigureOngoingSignature(props: DialogProps<{}, void>) {
-  return (
-    <ConfirmDialog
-      header={
-        <FormattedMessage
-          id="component.confirm-configure-ongoing-signature.header"
-          defaultMessage="Ongoing eSignature"
-        />
-      }
-      body={
-        <FormattedMessage
-          id="component.confirm-configure-ongoing-signature.body"
-          defaultMessage="There is an ongoing eSignature process. If you make any changes the ongoing process will be cancelled."
-        />
-      }
-      confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
-          <FormattedMessage id="generic.i-understand" defaultMessage="I understand" />
-        </Button>
-      }
-      {...props}
-    />
-  );
-}
-
 function ConfirmSignatureConfigChanged(props: DialogProps<{}, void>) {
   return (
     <ConfirmDialog
@@ -1234,9 +1205,14 @@ function ConfirmSignatureConfigChanged(props: DialogProps<{}, void>) {
           defaultMessage="You made changes to the eSignature configuration. If you continue, the ongoing eSignature process will be cancelled."
         />
       }
+      cancel={
+        <Button onClick={() => props.onReject()}>
+          <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
+        </Button>
+      }
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
-          <FormattedMessage id="generic.i-understand" defaultMessage="I understand" />
+          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }
       {...props}

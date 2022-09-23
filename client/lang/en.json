@@ -425,16 +425,6 @@
     "context": "Confirm data retention period"
   },
   {
-    "term": "component.confirm-configure-ongoing-signature.body",
-    "definition": "There is an ongoing eSignature process. If you make any changes the ongoing process will be cancelled.",
-    "context": "There is an ongoing eSignature process. If you make any changes the ongoing process will be cancelled."
-  },
-  {
-    "term": "component.confirm-configure-ongoing-signature.header",
-    "definition": "Ongoing eSignature",
-    "context": "Ongoing eSignature"
-  },
-  {
     "term": "component.confirm-deactivate-access-dialog.body",
     "definition": "Are you sure you want to <b>remove access</b> to {contact}?",
     "context": "Are you sure you want to <b>remove access</b> to {contact}?"

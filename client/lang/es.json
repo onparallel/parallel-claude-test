@@ -425,16 +425,6 @@
     "context": "Confirm data retention period"
   },
   {
-    "term": "component.confirm-configure-ongoing-signature.body",
-    "definition": "Hay un proceso de firma digital pendiente. Si realiza cualquier cambio, el proceso será cancelado.",
-    "context": "There is an ongoing eSignature process. If you make any changes the ongoing process will be cancelled."
-  },
-  {
-    "term": "component.confirm-configure-ongoing-signature.header",
-    "definition": "Firma digital pendiente",
-    "context": "Ongoing eSignature"
-  },
-  {
     "term": "component.confirm-deactivate-access-dialog.body",
     "definition": "¿Estás seguro de que quieres <b>quitar el acceso</b> a {contact}?",
     "context": "Are you sure you want to <b>remove access</b> to {contact}?"
