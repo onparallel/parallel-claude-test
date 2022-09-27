@@ -24,15 +24,14 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
-import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+import {
+  PetitionLayout,
+  usePetitionStateWrapper,
+  withPetitionLayoutContext,
+} from "@parallel/components/layout/PetitionLayout";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
-import {
-  useCreatePetitionFieldComment,
-  useDeletePetitionFieldComment,
-  useUpdatePetitionFieldComment,
-} from "@parallel/utils/mutations/comments";
 import { useClosePetitionDialog } from "@parallel/components/petition-replies/dialogs/ClosePetitionDialog";
 import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/dialogs/ConfirmResendCompletedNotificationDialog";
 import {
@@ -82,6 +81,11 @@ import {
 import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
 import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
 import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
+import {
+  useCreatePetitionFieldComment,
+  useDeletePetitionFieldComment,
+  useUpdatePetitionFieldComment,
+} from "@parallel/utils/mutations/comments";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
@@ -93,7 +97,6 @@ import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
 import { useLiquidScope } from "@parallel/utils/useLiquidScope";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
-import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -974,4 +977,4 @@ PetitionReplies.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
   return { petitionId };
 };
 
-export default compose(withPetitionState, withDialogs, withApolloData)(PetitionReplies);
+export default compose(withPetitionLayoutContext, withDialogs, withApolloData)(PetitionReplies);

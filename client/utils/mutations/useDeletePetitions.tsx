@@ -36,11 +36,6 @@ export function useDeletePetitions() {
     const [folders, petitions] = partitionOnTypename(petitionsOrFolders, "PetitionFolder");
     const petitionIds = petitions.map((p) => p.id);
     const folderIds = folders.map((f) => f.folderId);
-
-    if (force && petitionIds.length === 1) {
-      localStorage.removeItem(`confirm-parallel-draft`);
-    }
-
     return await deletePetitions({
       variables: {
         ids: petitionIds,

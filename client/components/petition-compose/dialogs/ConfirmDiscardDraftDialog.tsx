@@ -2,13 +2,15 @@ import { gql } from "@apollo/client";
 import { Button, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { useAutoConfirmDiscardDraftDialog_PetitionBaseFragment } from "@parallel/graphql/__types";
+import { usePetitionShouldConfirmNavigation } from "@parallel/components/layout/PetitionLayout";
+import { useConfirmDiscardDraftDialog_PetitionBaseFragment } from "@parallel/graphql/__types";
+import { assignRef } from "@parallel/utils/assignRef";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { usePreventNavigation } from "@parallel/utils/usePreventNavigation";
 import { useCallback, useEffect, useRef } from "react";
 import { FormattedMessage } from "react-intl";
 
-export function ConfirmDiscardDraftDialog({ ...props }: DialogProps<{}, boolean>) {
+export function ConfirmDiscardDraftDialog({ ...props }: DialogProps<{}, "KEEP" | "DISCARD">) {
   const keepRef = useRef<HTMLButtonElement>(null);
   return (
     <ConfirmDialog
@@ -17,7 +19,7 @@ export function ConfirmDiscardDraftDialog({ ...props }: DialogProps<{}, boolean>
       header={
         <FormattedMessage
           id="component.confirm-discard-draft-dialog.header"
-          defaultMessage="Do you want to save this draft?"
+          defaultMessage="Keep draft?"
         />
       }
       body={
@@ -25,7 +27,7 @@ export function ConfirmDiscardDraftDialog({ ...props }: DialogProps<{}, boolean>
           <Text>
             <FormattedMessage
               id="component.confirm-discard-draft-dialog.body"
-              defaultMessage="This parallel has no replies and has not been sent. Do you want to save it?"
+              defaultMessage="This parallel has no replies and has not been sent. Do you want to keep this draft?"
             />
           </Text>
         </Stack>
@@ -33,22 +35,22 @@ export function ConfirmDiscardDraftDialog({ ...props }: DialogProps<{}, boolean>
       initialFocusRef={keepRef}
       alternative={
         <Button onClick={() => props.onReject()}>
-          <FormattedMessage
-            id="component.confirm-discard-draft-dialog.back"
-            defaultMessage="Go back"
-          />
+          <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
         </Button>
       }
       cancel={
-        <Button onClick={() => props.onResolve(true)}>
-          <FormattedMessage id="generic.delete" defaultMessage="Delete" />
+        <Button onClick={() => props.onResolve("DISCARD")} colorScheme="red" variant="ghost">
+          <FormattedMessage
+            id="component.confirm-discard-draft-dialog.discard-draft"
+            defaultMessage="Discard"
+          />
         </Button>
       }
       confirm={
-        <Button ref={keepRef} colorScheme="primary" onClick={() => props.onResolve(false)}>
+        <Button ref={keepRef} colorScheme="primary" onClick={() => props.onResolve("KEEP")}>
           <FormattedMessage
-            id="component.confirm-discard-draft-dialog.save-draft"
-            defaultMessage="Save draft"
+            id="component.confirm-discard-draft-dialog.keep-draft"
+            defaultMessage="Keep draft"
           />
         </Button>
       }
@@ -57,21 +59,19 @@ export function ConfirmDiscardDraftDialog({ ...props }: DialogProps<{}, boolean>
   );
 }
 
-export function useConfirmDiscardDraftDialog() {
-  return useDialog(ConfirmDiscardDraftDialog);
-}
-
-export function useAutoConfirmDiscardDraftDialog(
-  isDraft: boolean,
-  petition: useAutoConfirmDiscardDraftDialog_PetitionBaseFragment
+export function useConfirmDiscardDraftDialog(
+  petition: useConfirmDiscardDraftDialog_PetitionBaseFragment
 ) {
-  const showConfirmDiscardDraftDialog = useConfirmDiscardDraftDialog();
+  const isDraft = petition.__typename === "Petition" && petition.status === "DRAFT";
+  const showConfirmDiscardDraftDialog = useDialog(ConfirmDiscardDraftDialog);
+  const [shouldConfirmNavigation, setShouldConfirmNavigation] =
+    usePetitionShouldConfirmNavigation();
 
   const prevIsDraft = useRef(isDraft);
   useEffect(() => {
     if (!isDraft && prevIsDraft.current) {
-      localStorage.removeItem(`confirm-parallel-draft`);
-      prevIsDraft.current = false;
+      setShouldConfirmNavigation(false);
+      assignRef(prevIsDraft, false);
     }
   }, [isDraft]);
 
@@ -79,15 +79,14 @@ export function useAutoConfirmDiscardDraftDialog(
   return usePreventNavigation({
     shouldConfirmNavigation: (path: string) => {
       const exitingPetition = !path.includes(`/app/petitions/${petition.id}`);
-      return isDraft && exitingPetition && Boolean(localStorage.getItem(`confirm-parallel-draft`));
+      return isDraft && exitingPetition && shouldConfirmNavigation;
     },
     confirmNavigation: useCallback(async () => {
       try {
-        const deleteDraft = await showConfirmDiscardDraftDialog({});
-        if (deleteDraft) {
+        if ((await showConfirmDiscardDraftDialog({})) === "DISCARD") {
           await deletePetitions([petition], "PETITION", undefined, true);
         }
-        localStorage.removeItem(`confirm-parallel-draft`);
+        setShouldConfirmNavigation(false);
         return true;
       } catch {
         return false;
@@ -96,13 +95,16 @@ export function useAutoConfirmDiscardDraftDialog(
   });
 }
 
-useAutoConfirmDiscardDraftDialog.fragments = {
+useConfirmDiscardDraftDialog.fragments = {
   get PetitionBase() {
     return gql`
-      fragment useAutoConfirmDiscardDraftDialog_PetitionBase on PetitionBase {
-        id
-        path
+      fragment useConfirmDiscardDraftDialog_PetitionBase on PetitionBase {
+        ...useDeletePetitions_PetitionBase
+        ... on Petition {
+          status
+        }
       }
+      ${useDeletePetitions.fragments.PetitionBase}
     `;
   },
 };

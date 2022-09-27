@@ -21,8 +21,7 @@ export type DialogOpener = <TProps = {}, TResult = void>(
   opener: (callbacks: DialogCallbacks<TResult>) => ReactElement<DialogProps<TProps, TResult>>
 ) => Promise<TResult>;
 
-export const DialogOpenerContext = createContext<DialogOpener | null>(null);
-// export const DialogCallbacksContext = createContext<DialogCallbacks<any>>();
+const DialogOpenerContext = createContext<DialogOpener | null>(null);
 
 export function useDialog<TProps = {}, TResult = void>(
   // eslint-disable-next-line @typescript-eslint/naming-convention

@@ -2,7 +2,10 @@ import { gql, useMutation } from "@apollo/client";
 import { Stack } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+import {
+  PetitionLayout,
+  withPetitionLayoutContext,
+} from "@parallel/components/layout/PetitionLayout";
 import { PetitionTemplateClosingMessageCard } from "@parallel/components/petition-messages/PetitionTemplateClosingMessageCard";
 import { PetitionTemplateCompletingMessageCard } from "@parallel/components/petition-messages/PetitionTemplateCompletingMessageCard";
 import { PetitionTemplateRequestMessageCard } from "@parallel/components/petition-messages/PetitionTemplateRequestMessageCard";
@@ -16,7 +19,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
+import { usePetitionStateWrapper } from "@parallel/components/layout/PetitionLayout";
 
 type PetitionMessagesProps = UnwrapPromise<ReturnType<typeof PetitionMessages.getInitialProps>>;
 
@@ -137,4 +140,4 @@ PetitionMessages.getInitialProps = async ({ query, fetchQuery }: WithApolloDataC
   return { petitionId };
 };
 
-export default compose(withPetitionState, withDialogs, withApolloData)(PetitionMessages);
+export default compose(withPetitionLayoutContext, withDialogs, withApolloData)(PetitionMessages);

@@ -167,7 +167,7 @@ function Petitions() {
         petitionId: selectedIdsRef.current[0],
         type: "TEMPLATE",
       });
-      goToPetition(templateId, "compose", { query: { new: "true" } });
+      goToPetition(templateId, "compose", { query: { new: "" } });
     } catch {}
   }, []);
 
@@ -177,7 +177,7 @@ function Petitions() {
         petitionId: selectedIdsRef.current[0],
       });
       goToPetition(petitionId, "preview", {
-        query: { new: "true", fromTemplate: "true" },
+        query: { new: "", fromTemplate: "" },
       });
     } catch {}
   }, []);
@@ -189,7 +189,7 @@ function Petitions() {
         petitionIds: selectedIdsRef.current,
       });
       if (petitionIds.length === 1) {
-        goToPetition(petitionIds[0], "compose", { query: { new: "true" } });
+        goToPetition(petitionIds[0], "compose", { query: { new: "" } });
       } else {
         refetch();
       }

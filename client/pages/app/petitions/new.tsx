@@ -189,7 +189,7 @@ function NewPetition() {
   const handleCreateTemplate = useCallback(async () => {
     try {
       const id = await createPetition({ type: "TEMPLATE", path: state.path });
-      goToPetition(id, "compose", { query: { new: "true" } });
+      goToPetition(id, "compose", { query: { new: "" } });
     } catch {}
   }, [goToPetition, createPetition, state.path]);
 
@@ -212,7 +212,7 @@ function NewPetition() {
           keepTitle: true,
           path: state.path,
         });
-        goToPetition(petitionIds[0], "compose", { query: { new: "true" } });
+        goToPetition(petitionIds[0], "compose", { query: { new: "" } });
       }
     } catch {}
   };

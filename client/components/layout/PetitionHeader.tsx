@@ -22,6 +22,10 @@ import {
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
+  usePetitionShouldConfirmNavigation,
+  usePetitionState,
+} from "@parallel/components/layout/PetitionLayout";
+import {
   PetitionActivity_petitionDocument,
   PetitionHeader_PetitionFragment,
   PetitionHeader_QueryFragment,
@@ -33,11 +37,11 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
-import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
 import { useRouter } from "next/router";
-import { ReactNode, useCallback, useMemo } from "react";
+import { ReactNode, useCallback, useImperativeHandle, useMemo, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 import { NakedLink } from "../common/Link";
 import { LocaleBadge } from "../common/LocaleBadge";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
@@ -46,7 +50,7 @@ import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 import { usePetitionSharingDialog } from "../petition-common/dialogs/PetitionSharingDialog";
 import { useConfirmReopenPetitionDialog } from "../petition-replies/dialogs/ConfirmReopenPetitionDialog";
-import { HeaderNameEditable } from "./HeaderNameEditable";
+import { HeaderNameEditable, HeaderNameEditableInstance } from "./HeaderNameEditable";
 import { PetitionHeaderTab } from "./PetitionHeaderTab";
 import { PetitionHeaderTabs } from "./PetitionHeaderTabs";
 import { PetitionSection } from "./PetitionLayout";
@@ -58,18 +62,24 @@ export interface PetitionHeaderProps extends PetitionHeader_QueryFragment {
   actions?: ReactNode;
 }
 
+export interface PetitionHeaderInstance {
+  focusName(): void;
+}
+
 export const PetitionHeader = Object.assign(
-  chakraForwardRef<"div", PetitionHeaderProps>(function PetitionHeader(
+  chakraForwardRef<"div", PetitionHeaderProps, PetitionHeaderInstance>(function PetitionHeader(
     { petition, me, onUpdatePetition, section: current, actions, ...props },
     ref
   ) {
     const intl = useIntl();
     const router = useRouter();
-    const state = usePetitionState();
+    const [state] = usePetitionState();
+    const [, setShouldConfirmNavigation] = usePetitionShouldConfirmNavigation();
 
     const deletePetitions = useDeletePetitions();
     const handleDeleteClick = async function () {
       try {
+        setShouldConfirmNavigation(false);
         await deletePetitions([petition], "PETITION");
         router.push("/app/petitions/");
       } catch {}
@@ -82,7 +92,7 @@ export const PetitionHeader = Object.assign(
         const [petitionId] = await clonePetitions({
           petitionIds: [petition.id],
         });
-        goToPetition(petitionId, "compose", { query: { new: "true" } });
+        goToPetition(petitionId, "compose", { query: { new: "" } });
       } catch {}
     };
 
@@ -93,7 +103,7 @@ export const PetitionHeader = Object.assign(
           petitionId: petition.id,
           type: "TEMPLATE",
         });
-        goToPetition(templateId, "compose", { query: { new: "true" } });
+        goToPetition(templateId, "compose", { query: { new: "" } });
       } catch {}
     };
 
@@ -203,9 +213,11 @@ export const PetitionHeader = Object.assign(
 
     const handlePrintPdfTask = usePrintPdfTask();
 
+    const editableRef = useRef<HeaderNameEditableInstance>(null);
+    useImperativeHandle(ref, () => ({ focusName: () => editableRef.current?.focus() }));
+
     return (
       <Box
-        ref={ref}
         backgroundColor="white"
         borderBottom="2px solid"
         borderBottomColor="gray.200"
@@ -219,6 +231,7 @@ export const PetitionHeader = Object.assign(
             </Center>
             <LocaleBadge locale={petition.locale} marginLeft={2} />
             <HeaderNameEditable
+              ref={editableRef}
               petition={petition}
               state={state}
               onNameChange={(name) => onUpdatePetition({ name: name || null })}
@@ -401,7 +414,7 @@ export const PetitionHeader = Object.assign(
               <NakedLink
                 key={section}
                 href={`/app/petitions/${petition.id}/${section}${
-                  router.query.fromTemplate ? `?fromTemplate=true` : ""
+                  isDefined(router.query.fromTemplate) ? "?fromTemplate" : ""
                 }`}
               >
                 <PetitionHeaderTab

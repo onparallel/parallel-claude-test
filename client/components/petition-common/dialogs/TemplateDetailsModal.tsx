@@ -87,14 +87,14 @@ export function TemplateDetailsModal({
     const petitionId = await createPetition({
       petitionId: template.id,
     });
-    goToPetition(petitionId, "preview", { query: { new: "true", fromTemplate: "true" } });
+    goToPetition(petitionId, "preview", { query: { new: "", fromTemplate: "" } });
   };
 
   const handleCloneTemplate = async () => {
     const [petitionId] = await clonePetitions({
       petitionIds: [template.id],
     });
-    goToPetition(petitionId, "compose", { query: { new: "true" } });
+    goToPetition(petitionId, "compose", { query: { new: "" } });
   };
 
   const handleEditTemplate = async () => {

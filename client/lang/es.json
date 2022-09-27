@@ -585,24 +585,24 @@
     "context": "Unsaved changes"
   },
   {
-    "term": "component.confirm-discard-draft-dialog.back",
-    "definition": "Volver",
-    "context": "Go back"
-  },
-  {
     "term": "component.confirm-discard-draft-dialog.body",
     "definition": "Este parallel no tiene ninguna respuesta ni ha sido enviado. ¿Quieres guardarlo?",
-    "context": "This parallel has no replies and has not been sent. Do you want to save it?"
+    "context": "This parallel has no replies and has not been sent. Do you want to keep this draft?"
+  },
+  {
+    "term": "component.confirm-discard-draft-dialog.discard-draft",
+    "definition": "Descartar",
+    "context": "Discard"
   },
   {
     "term": "component.confirm-discard-draft-dialog.header",
     "definition": "¿Quieres guardar este borrador?",
-    "context": "Do you want to save this draft?"
+    "context": "Keep draft?"
   },
   {
-    "term": "component.confirm-discard-draft-dialog.save-draft",
+    "term": "component.confirm-discard-draft-dialog.keep-draft",
     "definition": "Guardar borrador",
-    "context": "Save draft"
+    "context": "Keep draft"
   },
   {
     "term": "component.confirm-petition-signers-dialog.confirmation-text",

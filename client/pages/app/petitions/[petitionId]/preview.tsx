@@ -7,12 +7,21 @@ import {
   FieldErrorDialog,
   useFieldErrorDialog,
 } from "@parallel/components/common/dialogs/FieldErrorDialog";
-import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
+import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+import {
+  PetitionLayout,
+  usePetitionStateWrapper,
+  withPetitionLayoutContext,
+} from "@parallel/components/layout/PetitionLayout";
+import {
+  ConfirmPetitionSignersDialog,
+  ConfirmPetitionSignersDialogResult,
+  useConfirmPetitionSignersDialog,
+} from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
 import { PetitionCompletedAlert } from "@parallel/components/petition-common/PetitionCompletedAlert";
 import { PetitionPreviewOnlyAlert } from "@parallel/components/petition-common/PetitionPreviewOnlyAlert";
 import { PetitionPreviewSignatureReviewAlert } from "@parallel/components/petition-common/PetitionPreviewSignatureReviewAlert";
@@ -20,11 +29,6 @@ import { useSendPetitionHandler } from "@parallel/components/petition-common/use
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PreviewPetitionField } from "@parallel/components/petition-preview/PreviewPetitionField";
-import {
-  ConfirmPetitionSignersDialog,
-  ConfirmPetitionSignersDialogResult,
-  useConfirmPetitionSignersDialog,
-} from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
@@ -43,16 +47,15 @@ import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
+import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
 import { useLiquidScope } from "@parallel/utils/useLiquidScope";
-import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
+import { withMetadata } from "@parallel/utils/withMetadata";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { isDefined, omit } from "remeda";
-import { withMetadata } from "@parallel/utils/withMetadata";
-import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 
 type PetitionPreviewProps = UnwrapPromise<ReturnType<typeof PetitionPreview.getInitialProps>>;
 
@@ -558,7 +561,7 @@ PetitionPreview.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
 
 export default compose(
   withMetadata,
-  withPetitionState,
+  withPetitionLayoutContext,
   withDialogs,
   withApolloData
 )(PetitionPreview);

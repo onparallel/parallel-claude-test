@@ -2,16 +2,36 @@ import { gql } from "@apollo/client";
 import { Box } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { PetitionHeader, PetitionHeaderProps } from "@parallel/components/layout/PetitionHeader";
+import {
+  PetitionHeader,
+  PetitionHeaderInstance,
+  PetitionHeaderProps,
+} from "@parallel/components/layout/PetitionHeader";
 import {
   PetitionLayout_PetitionBaseFragment,
   PetitionLayout_QueryFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
-import { ReactNode, useMemo } from "react";
+import { useStateSlice } from "@parallel/utils/useStateSlice";
+import { useRouter } from "next/router";
+import {
+  ComponentType,
+  createContext,
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useIntl } from "react-intl";
-import { useAutoConfirmDiscardDraftDialog } from "../petition-compose/dialogs/ConfirmDiscardDraftDialog";
-import { PetitionTemplateHeader } from "./PetitionTemplateHeader";
+import { isDefined, omit } from "remeda";
+import { useErrorDialog } from "../common/dialogs/ErrorDialog";
+import { useConfirmDiscardDraftDialog } from "../petition-compose/dialogs/ConfirmDiscardDraftDialog";
+import { PetitionTemplateHeader, PetitionTemplateHeaderInstance } from "./PetitionTemplateHeader";
 
 export type PetitionSection = "compose" | "preview" | "replies" | "activity" | "messages";
 
@@ -74,10 +94,26 @@ export const PetitionLayout = Object.assign(
       [section, intl.locale]
     );
 
-    useAutoConfirmDiscardDraftDialog(
-      petition.__typename === "Petition" && petition.status === "DRAFT" ? true : false,
-      petition
-    );
+    const headerRef = useRef<PetitionHeaderInstance | PetitionTemplateHeaderInstance>(null);
+
+    const router = useRouter();
+    const [, setShouldConfirmNavigation] = usePetitionShouldConfirmNavigation();
+    useEffect(() => {
+      if (isDefined(router.query.new)) {
+        setTimeout(() => headerRef.current?.focusName());
+        setShouldConfirmNavigation(true);
+        router.replace(
+          {
+            pathname: router.pathname,
+            query: omit(router.query, ["new"]),
+          },
+          undefined,
+          { shallow: true }
+        );
+      }
+    }, []);
+
+    useConfirmDiscardDraftDialog(petition);
 
     return (
       <AppLayout
@@ -99,6 +135,7 @@ export const PetitionLayout = Object.assign(
       >
         {petition.__typename === "Petition" ? (
           <PetitionHeader
+            ref={headerRef}
             petition={petition}
             me={me}
             onUpdatePetition={onUpdatePetition}
@@ -107,6 +144,7 @@ export const PetitionLayout = Object.assign(
           />
         ) : petition.__typename === "PetitionTemplate" ? (
           <PetitionTemplateHeader
+            ref={headerRef}
             petition={petition}
             me={me}
             section={section!}
@@ -126,7 +164,7 @@ export const PetitionLayout = Object.assign(
         fragment PetitionLayout_PetitionBase on PetitionBase {
           id
           name
-          ...useAutoConfirmDiscardDraftDialog_PetitionBase
+          ...useConfirmDiscardDraftDialog_PetitionBase
           ... on Petition {
             ...PetitionHeader_Petition
           }
@@ -134,7 +172,7 @@ export const PetitionLayout = Object.assign(
             ...PetitionTemplateHeader_PetitionTemplate
           }
         }
-        ${useAutoConfirmDiscardDraftDialog.fragments.PetitionBase}
+        ${useConfirmDiscardDraftDialog.fragments.PetitionBase}
         ${PetitionHeader.fragments.Petition}
         ${PetitionTemplateHeader.fragments.PetitionTemplate}
       `,
@@ -149,3 +187,90 @@ export const PetitionLayout = Object.assign(
     },
   }
 );
+
+type PetitionState = "SAVED" | "SAVING" | "ERROR";
+
+interface PetitionLayoutContext {
+  state: PetitionState;
+  shouldConfirmNavigation: boolean;
+}
+
+const PetitionLayoutContext = createContext<
+  [
+    value: PetitionLayoutContext | null,
+    setValue: Dispatch<SetStateAction<PetitionLayoutContext>> | null
+  ]
+>([null, null]);
+
+export function withPetitionLayoutContext<P>(
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  Component: ComponentType<P>
+): ComponentType<P> {
+  const WithPetitionLayoutContext: ComponentType<P> = function (props) {
+    const [value, setValue] = useState<PetitionLayoutContext>({
+      state: "SAVED",
+      shouldConfirmNavigation: false,
+    });
+    return (
+      <PetitionLayoutContext.Provider value={[value, setValue]}>
+        <Component {...(props as any)} />
+      </PetitionLayoutContext.Provider>
+    );
+  };
+  const { displayName, ...rest } = Component;
+  return Object.assign(WithPetitionLayoutContext, rest, {
+    displayName: `WithPetitionLayoutContext(${displayName ?? Component.name})`,
+  });
+}
+
+export function usePetitionLayoutContext() {
+  return useContext(PetitionLayoutContext);
+}
+
+export function createUseContextSlice<K extends keyof PetitionLayoutContext>(key: K, name: string) {
+  return function () {
+    const [state, setState] = usePetitionLayoutContext();
+    if (!isDefined(state)) {
+      throw new Error(`${name} is being used without using withPetitionLayoutContext`);
+    }
+    return useStateSlice(state!, setState!, key);
+  };
+}
+
+export const usePetitionState = createUseContextSlice("state", "usePetitionState");
+export const usePetitionShouldConfirmNavigation = createUseContextSlice(
+  "shouldConfirmNavigation",
+  "usePetitionShouldConfirmNavigation"
+);
+
+export function usePetitionStateWrapper() {
+  const showError = useErrorDialog();
+  const intl = useIntl();
+  const [, setState] = usePetitionState();
+  if (!isDefined(setState)) {
+    throw new Error(
+      "usePetitionStateWrapper is being used without using withPetitionLayoutContext"
+    );
+  }
+  return useCallback(function <T extends (...args: any[]) => Promise<any>>(updater: T) {
+    return async function (...args: any[]) {
+      setState("SAVING");
+      try {
+        const result = await updater(...args);
+        setState("SAVED");
+        return result;
+      } catch (error) {
+        setState("ERROR");
+        try {
+          await showError({
+            message: intl.formatMessage({
+              id: "generic.unexpected-error-happened",
+              defaultMessage:
+                "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
+            }),
+          });
+        } catch {}
+      }
+    } as T;
+  }, []);
+}

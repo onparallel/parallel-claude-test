@@ -8,7 +8,11 @@ import {
 } from "@parallel/components/common/dialogs/FieldErrorDialog";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+import {
+  PetitionLayout,
+  usePetitionStateWrapper,
+  withPetitionLayoutContext,
+} from "@parallel/components/layout/PetitionLayout";
 import { AddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { useConfigureRemindersDialog } from "@parallel/components/petition-activity/dialogs/ConfigureRemindersDialog";
 import { useConfirmCancelScheduledMessageDialog } from "@parallel/components/petition-activity/dialogs/ConfirmCancelScheduledMessageDialog";
@@ -46,7 +50,6 @@ import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
@@ -497,4 +500,4 @@ PetitionActivity.getInitialProps = async ({ query, fetchQuery }: WithApolloDataC
   return { petitionId };
 };
 
-export default compose(withPetitionState, withDialogs, withApolloData)(PetitionActivity);
+export default compose(withPetitionLayoutContext, withDialogs, withApolloData)(PetitionActivity);

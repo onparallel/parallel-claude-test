@@ -13,7 +13,11 @@ import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButt
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
-import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+import {
+  PetitionLayout,
+  usePetitionStateWrapper,
+  withPetitionLayoutContext,
+} from "@parallel/components/layout/PetitionLayout";
 import { AddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { PetitionCompletedAlert } from "@parallel/components/petition-common/PetitionCompletedAlert";
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
@@ -62,13 +66,12 @@ import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdate
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
-import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { omit, zip } from "remeda";
+import { isDefined, omit, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type PetitionComposeProps = UnwrapPromise<ReturnType<typeof PetitionCompose.getInitialProps>>;
@@ -132,7 +135,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const showPetitionFromTemplateDialog = useHandledPetitionFromTemplateDialog();
 
   useEffect(() => {
-    if (query.fromTemplate) {
+    if (isDefined(query.fromTemplate)) {
       withError(showPetitionFromTemplateDialog());
       router.replace(
         {
@@ -844,4 +847,4 @@ PetitionCompose.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
   return { petitionId };
 };
 
-export default compose(withPetitionState, withDialogs, withApolloData)(PetitionCompose);
+export default compose(withPetitionLayoutContext, withDialogs, withApolloData)(PetitionCompose);
