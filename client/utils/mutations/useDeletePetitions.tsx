@@ -43,17 +43,6 @@ export function useDeletePetitions() {
         force,
         dryrun,
       },
-      update(client) {
-        if (!dryrun) {
-          for (const petitionId of petitionIds) {
-            client.evict({ id: petitionId });
-          }
-          for (const folderId of folderIds) {
-            client.evict({ id: folderId });
-          }
-          client.gc();
-        }
-      },
     });
   };
 
