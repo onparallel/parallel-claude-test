@@ -54,16 +54,6 @@ export async function petitionAccessDelegated(
 
   const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
 
-  const organization = await context.organizations.loadOrg(petition.org_id);
-  const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
-    organization!.id,
-    "REMOVE_WHY_WE_USE_PARALLEL"
-  );
-  const hasRemoveParallelBranding = await context.featureFlags.orgHasFeatureFlag(
-    organization!.id,
-    "REMOVE_PARALLEL_BRANDING"
-  );
-
   const { html, text, subject, from } = await buildEmail(
     AccessDelegatedEmail,
     {
@@ -76,10 +66,6 @@ export async function petitionAccessDelegated(
       bodyPlainText: toPlainText(payload.message_body),
       emailSubject: originalMessage?.email_subject ?? null,
       keycode: newAccess.keycode,
-      tone: organization!.preferred_tone,
-      theme: organization!.brand_theme,
-      removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
-      removeParallelBranding: hasRemoveParallelBranding,
       ...layoutProps,
     },
     { locale: petition.locale }

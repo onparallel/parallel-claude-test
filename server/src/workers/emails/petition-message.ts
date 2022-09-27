@@ -45,16 +45,6 @@ export async function petitionMessage(
   const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
   const renderContext = { contact, user: senderData, petition };
 
-  const organization = await context.organizations.loadOrg(petition.org_id);
-  const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
-    organization!.id,
-    "REMOVE_WHY_WE_USE_PARALLEL"
-  );
-  const hasRemoveParallelBranding = await context.featureFlags.orgHasFeatureFlag(
-    organization!.id,
-    "REMOVE_PARALLEL_BRANDING"
-  );
-
   const showNextButton = isDefined(petition.from_template_id)
     ? [
         "zas25KHxAByKWUeXTpW",
@@ -84,10 +74,6 @@ export async function petitionMessage(
       bodyPlainText: toPlainText(bodyJson, renderContext),
       deadline: petition.deadline,
       keycode: access.keycode,
-      tone: organization!.preferred_tone,
-      theme: organization!.brand_theme,
-      removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
-      removeParallelBranding: hasRemoveParallelBranding,
       showNextButton,
       ...layoutProps,
     },

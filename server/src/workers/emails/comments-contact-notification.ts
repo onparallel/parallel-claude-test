@@ -42,12 +42,6 @@ export async function commentsContactNotification(
     sortBy(_fields, (f) => f.position!),
     (f) => buildFieldWithComments(f, commentsByField, context)
   );
-  const organization = await context.organizations.loadOrg(petition.org_id);
-
-  const hasRemoveParallelBranding = await context.featureFlags.orgHasFeatureFlag(
-    organization!.id,
-    "REMOVE_PARALLEL_BRANDING"
-  );
 
   const { html, text, subject, from } = await buildEmail(
     PetitionCommentsContactNotification,
@@ -56,10 +50,7 @@ export async function commentsContactNotification(
       contactName: contact.first_name,
       contactFullName: fullName(contact.first_name, contact.last_name),
       keycode: access.keycode,
-      tone: organization!.preferred_tone,
-      theme: organization!.brand_theme,
       fields,
-      removeParallelBranding: hasRemoveParallelBranding,
       ...layoutProps,
     },
     { locale: petition.locale }

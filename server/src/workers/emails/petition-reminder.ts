@@ -76,16 +76,6 @@ export async function petitionReminder(
     const bodyJson = reminder.email_body ? JSON.parse(reminder.email_body) : null;
     const renderContext = { contact, user: granterData, petition };
 
-    const organization = await context.organizations.loadOrg(petition.org_id);
-    const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
-      organization!.id,
-      "REMOVE_WHY_WE_USE_PARALLEL"
-    );
-    const hasRemoveParallelBranding = await context.featureFlags.orgHasFeatureFlag(
-      organization!.id,
-      "REMOVE_PARALLEL_BRANDING"
-    );
-
     const { html, text, subject, from } = await buildEmail(
       PetitionReminder,
       {
@@ -100,10 +90,6 @@ export async function petitionReminder(
         bodyPlainText: bodyJson ? toPlainText(bodyJson, renderContext) : null,
         deadline: petition.deadline,
         keycode: access.keycode,
-        tone: organization!.preferred_tone,
-        theme: organization!.brand_theme,
-        removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
-        removeParallelBranding: hasRemoveParallelBranding,
         ...layoutProps,
       },
       { locale: petition.locale }

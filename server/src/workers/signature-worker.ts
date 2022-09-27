@@ -71,11 +71,6 @@ async function startSignatureProcess(
 
     const signatureClient = ctx.signature.getClient(signatureIntegration);
 
-    const hasRemoveParallelBranding = await ctx.featureFlags.orgHasFeatureFlag(
-      org!.id,
-      "REMOVE_PARALLEL_BRANDING"
-    );
-
     const petitionTheme = await ctx.organizations.loadOrganizationTheme(
       petition.document_organization_theme_id
     );
@@ -94,9 +89,6 @@ async function startSignatureProcess(
         locale: petition.locale,
         templateData: {
           ...(await getLayoutProps(petition.org_id, ctx)),
-          tone: org.preferred_tone,
-          theme: org.brand_theme,
-          removeParallelBranding: hasRemoveParallelBranding,
         },
         signingMode: "parallel",
         initialMessage: message,
@@ -305,13 +297,11 @@ async function storeAuditTrail(
 }
 
 async function updateOrganizationBranding(payload: { orgId: number }, ctx: WorkerContext) {
-  const [organization, signatureIntegrations, hasRemoveParallelBranding, layoutProps] =
-    await Promise.all([
-      ctx.organizations.loadOrg(payload.orgId),
-      ctx.integrations.loadIntegrationsByOrgId(payload.orgId, "SIGNATURE"),
-      ctx.featureFlags.orgHasFeatureFlag(payload.orgId, "REMOVE_PARALLEL_BRANDING"),
-      getLayoutProps(payload.orgId, ctx),
-    ]);
+  const [organization, signatureIntegrations, layoutProps] = await Promise.all([
+    ctx.organizations.loadOrg(payload.orgId),
+    ctx.integrations.loadIntegrationsByOrgId(payload.orgId, "SIGNATURE"),
+    getLayoutProps(payload.orgId, ctx),
+  ]);
 
   if (!organization) {
     return;
@@ -338,8 +328,6 @@ async function updateOrganizationBranding(payload: { orgId: number }, ctx: Worke
             templateData: {
               ...layoutProps,
               tone: tone as Tone,
-              theme: organization.brand_theme,
-              removeParallelBranding: hasRemoveParallelBranding,
             },
           });
         } catch (error) {

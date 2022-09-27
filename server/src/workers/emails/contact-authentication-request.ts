@@ -37,13 +37,6 @@ export async function contactAuthenticationRequest(
 
   const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
 
-  const organization = await context.organizations.loadOrg(petition.org_id);
-
-  const hasRemoveParallelBranding = await context.featureFlags.orgHasFeatureFlag(
-    organization!.id,
-    "REMOVE_PARALLEL_BRANDING"
-  );
-
   const { html, text, subject, from } = await buildEmail(
     ContactAuthenticationRequest,
     {
@@ -54,9 +47,6 @@ export async function contactAuthenticationRequest(
       code: request.code,
       browserName: ua?.getBrowser()?.name ?? "Unknown",
       osName: ua?.getOS()?.name ?? "Unknown",
-      tone: organization!.preferred_tone,
-      theme: organization!.brand_theme,
-      removeParallelBranding: hasRemoveParallelBranding,
       isContactVerification: payload.is_contact_verification,
       ...layoutProps,
     },
