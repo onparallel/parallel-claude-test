@@ -416,7 +416,7 @@ export const PetitionHeader = Object.assign(
                 key={section}
                 href={`/app/petitions/${petition.id}/${section}?${new URLSearchParams({
                   ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
-                  ...(isDefined(shouldConfirmNavigation) ? { new: "" } : {}),
+                  ...(shouldConfirmNavigation ? { new: "" } : {}),
                 })}`}
               >
                 <PetitionHeaderTab
