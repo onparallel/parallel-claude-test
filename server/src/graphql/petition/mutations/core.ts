@@ -1120,7 +1120,11 @@ export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFi
     const { labels, values } = parseResult!;
 
     const key = random(16);
-    const res = await ctx.aws.fileUploads.uploadFile(key, file.mimetype, file.createReadStream());
+    const res = await ctx.storage.fileUploads.uploadFile(
+      key,
+      file.mimetype,
+      file.createReadStream()
+    );
 
     const fileUpload = await ctx.files.createFileUpload(
       {
@@ -1178,7 +1182,7 @@ export const dynamicSelectFieldFileDownloadLink = mutationField(
         return {
           result: RESULT.SUCCESS,
           file,
-          url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
+          url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,
             "attachment"
@@ -1264,7 +1268,7 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
         throw new Error(`FileUpload not found with id ${reply!.content["file_upload_id"]}`);
       }
       if (!file.upload_complete) {
-        await ctx.aws.fileUploads.getFileMetadata(file!.path);
+        await ctx.storage.fileUploads.getFileMetadata(file!.path);
         await ctx.files.markFileUploadComplete(file.id, `User:${ctx.user!.id}`);
       }
       return {
@@ -1272,7 +1276,7 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
         file: file.upload_complete
           ? file
           : await ctx.files.loadFileUpload(file.id, { refresh: true }),
-        url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
+        url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
           file!.path,
           file!.filename,
           args.preview ? "inline" : "attachment"

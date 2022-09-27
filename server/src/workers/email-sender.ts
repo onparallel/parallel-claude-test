@@ -87,7 +87,7 @@ createQueueWorker("email-sender", async (payload: EmailSenderWorkerPayload, cont
           async (attachment) => ({
             filename: attachment.filename,
             contentType: attachment.content_type,
-            content: await context.aws.temporaryFiles.downloadFile(attachment.path),
+            content: await context.storage.temporaryFiles.downloadFile(attachment.path),
           }),
           { concurrency: 1 }
         ),

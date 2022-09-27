@@ -96,7 +96,7 @@ async function uploadEsTaxDocumentsFile(
 
   const buffer = await pdfData.buffer();
   const path = random(16);
-  const res = await context.aws.fileUploads.uploadFile(path, "application/pdf", buffer);
+  const res = await context.storage.fileUploads.uploadFile(path, "application/pdf", buffer);
   return await context.files.createFileUpload(
     {
       path,

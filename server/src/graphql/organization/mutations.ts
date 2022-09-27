@@ -54,7 +54,7 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
     const filename = random(16);
     const path = `uploads/${filename}`;
 
-    const res = await ctx.aws.publicFiles.uploadFile(path, mimetype, createReadStream());
+    const res = await ctx.storage.publicFiles.uploadFile(path, mimetype, createReadStream());
 
     const logoFile = await ctx.files.createPublicFile(
       {

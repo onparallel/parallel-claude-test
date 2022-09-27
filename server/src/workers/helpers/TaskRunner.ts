@@ -56,7 +56,7 @@ export abstract class TaskRunner<T extends TaskName> {
     contentType: string;
   }) {
     const path = random(16);
-    const res = await this.ctx.aws.temporaryFiles.uploadFile(path, contentType, stream);
+    const res = await this.ctx.storage.temporaryFiles.uploadFile(path, contentType, stream);
 
     return await this.ctx.files.createTemporaryFile(
       {

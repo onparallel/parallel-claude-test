@@ -12,7 +12,7 @@ import { IPrinter, Printer, PRINTER } from "./printer";
 import { IRedis, REDIS, Redis } from "./redis";
 import { ISignatureService, SIGNATURE, SignatureService } from "./signature";
 import { ISmtp, Smtp, SMTP } from "./smtp";
-import { IStorage, Storage, StorageFactory, STORAGE_FACTORY } from "./storage";
+import { IStorage, StorageService, STORAGE_SERVICE } from "./storage";
 import { ITiersService, TiersService, TIERS_SERVICE } from "./tiers";
 
 export const servicesModule = new ContainerModule((bind) => {
@@ -25,9 +25,7 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<ISmtp>(SMTP).to(Smtp).inSingletonScope();
   bind<IPrinter>(PRINTER).to(Printer);
   bind<ISignatureService>(SIGNATURE).to(SignatureService);
-  bind<IStorage>(STORAGE_FACTORY).toFactory(() => {
-    return ((...args) => new Storage(...args)) as StorageFactory;
-  });
+  bind<IStorage>(STORAGE_SERVICE).to(StorageService);
   bind<IFetchService>(FETCH_SERVICE).to(FetchService).inSingletonScope();
   bind<IImageService>(IMAGE_SERVICE).to(ImageService).inSingletonScope();
   bind<IPetitionBinder>(PETITION_BINDER).to(PetitionBinder);

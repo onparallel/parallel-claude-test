@@ -199,7 +199,7 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
     }
 
     return {
-      url: await ctx.aws.temporaryFiles.getSignedDownloadEndpoint(
+      url: await ctx.storage.temporaryFiles.getSignedDownloadEndpoint(
         file.path,
         file.filename,
         args.preview ? "inline" : "attachment"
@@ -248,7 +248,7 @@ export const getTaskResultFileUrl = mutationField("getTaskResultFileUrl", {
         "FILE_NOT_FOUND_ERROR"
       );
     }
-    return await ctx.aws.temporaryFiles.getSignedDownloadEndpoint(
+    return await ctx.storage.temporaryFiles.getSignedDownloadEndpoint(
       file.path,
       file.filename,
       args.preview ? "inline" : "attachment"

@@ -203,7 +203,7 @@ export const signedPetitionDownloadLink = mutationField("signedPetitionDownloadL
       return {
         result: RESULT.SUCCESS,
         file,
-        url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
+        url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
           file.path,
           file.filename,
           args.preview ? "inline" : "attachment"

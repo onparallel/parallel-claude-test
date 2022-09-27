@@ -662,7 +662,7 @@ export const publicPetitionFieldAttachmentDownloadLink = mutationField(
           throw new Error(`FileUpload not found with id ${attachment.file_upload_id}`);
         }
         if (!file.upload_complete) {
-          await ctx.aws.fileUploads.getFileMetadata(file!.path);
+          await ctx.storage.fileUploads.getFileMetadata(file!.path);
           await ctx.files.markFileUploadComplete(file.id, `Contact:${ctx.access!.contact_id}`);
         }
         return {
@@ -670,7 +670,7 @@ export const publicPetitionFieldAttachmentDownloadLink = mutationField(
           file: file.upload_complete
             ? file
             : await ctx.files.loadFileUpload(file.id, { refresh: true }),
-          url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
+          url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,
             args.preview ? "inline" : "attachment"
@@ -988,7 +988,7 @@ export const publicGetTaskResultFileUrl = mutationField("publicGetTaskResultFile
         "FILE_NOT_FOUND_ERROR"
       );
     }
-    return await ctx.aws.temporaryFiles.getSignedDownloadEndpoint(
+    return await ctx.storage.temporaryFiles.getSignedDownloadEndpoint(
       file.path,
       file.filename,
       "inline"

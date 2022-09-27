@@ -50,7 +50,7 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
       );
       ctx.petitions.loadFieldAttachmentsByFieldId.dataloader.clear(args.fieldId);
       const [presignedPostData, attachment] = await Promise.all([
-        ctx.aws.fileUploads.getSignedUploadEndpoint(key, contentType, size),
+        ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
         ctx.petitions.createPetitionFieldAttachment(
           {
             file_upload_id: file.id,
@@ -84,7 +84,7 @@ export const petitionFieldAttachmentUploadComplete = mutationField(
       const attachment = (await ctx.petitions.loadFieldAttachment(args.attachmentId))!;
       const file = await ctx.files.loadFileUpload(attachment.file_upload_id);
 
-      await ctx.aws.fileUploads.getFileMetadata(file!.path);
+      await ctx.storage.fileUploads.getFileMetadata(file!.path);
       await ctx.files.markFileUploadComplete(file!.id, `User:${ctx.user!.id}`);
       ctx.files.loadFileUpload.dataloader.clear(file!.id);
 
@@ -137,7 +137,7 @@ export const petitionFieldAttachmentDownloadLink = mutationField(
           throw new Error(`FileUpload not found with id ${fieldAttachment.file_upload_id}`);
         }
         if (!file.upload_complete) {
-          await ctx.aws.fileUploads.getFileMetadata(file!.path);
+          await ctx.storage.fileUploads.getFileMetadata(file!.path);
           await ctx.files.markFileUploadComplete(file.id, `User:${ctx.user!.id}`);
         }
         return {
@@ -145,7 +145,7 @@ export const petitionFieldAttachmentDownloadLink = mutationField(
           file: file.upload_complete
             ? file
             : await ctx.files.loadFileUpload(file.id, { refresh: true }),
-          url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
+          url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,
             "attachment"
@@ -195,7 +195,7 @@ export const createPetitionAttachmentUploadLink = mutationField(
         `User:${ctx.user!.id}`
       );
       const [presignedPostData, attachment] = await Promise.all([
-        ctx.aws.fileUploads.getSignedUploadEndpoint(key, contentType, size),
+        ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
         ctx.petitions.createPetitionAttachment(
           {
             file_upload_id: file.id,
@@ -225,7 +225,7 @@ export const petitionAttachmentUploadComplete = mutationField("petitionAttachmen
     const attachment = (await ctx.petitions.loadPetitionAttachment(args.attachmentId))!;
     const file = await ctx.files.loadFileUpload(attachment.file_upload_id);
 
-    await ctx.aws.fileUploads.getFileMetadata(file!.path);
+    await ctx.storage.fileUploads.getFileMetadata(file!.path);
     await ctx.files.markFileUploadComplete(file!.id, `User:${ctx.user!.id}`);
     ctx.files.loadFileUpload.dataloader.clear(file!.id);
 
@@ -271,7 +271,7 @@ export const petitionAttachmentDownloadLink = mutationField("petitionAttachmentD
         throw new Error(`FileUpload:${attachment.file_upload_id} not found`);
       }
       if (!file.upload_complete) {
-        await ctx.aws.fileUploads.getFileMetadata(file!.path);
+        await ctx.storage.fileUploads.getFileMetadata(file!.path);
         await ctx.files.markFileUploadComplete(file.id, `User:${ctx.user!.id}`);
       }
       return {
@@ -279,7 +279,7 @@ export const petitionAttachmentDownloadLink = mutationField("petitionAttachmentD
         file: file.upload_complete
           ? file
           : await ctx.files.loadFileUpload(file.id, { refresh: true }),
-        url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
+        url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
           file!.path,
           file!.filename,
           "attachment"

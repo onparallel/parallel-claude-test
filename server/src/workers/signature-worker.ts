@@ -453,7 +453,7 @@ async function storeDocument(
   ctx: WorkerContext
 ) {
   const path = random(16);
-  const res = await ctx.aws.fileUploads.uploadFile(path, "application/pdf", buffer);
+  const res = await ctx.storage.fileUploads.uploadFile(path, "application/pdf", buffer);
 
   return await ctx.files.createFileUpload(
     {

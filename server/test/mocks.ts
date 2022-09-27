@@ -12,7 +12,7 @@ import { IEmailsService } from "../src/services/emails";
 import { IFetchService } from "../src/services/fetch";
 import { IRedis } from "../src/services/redis";
 import { ISignatureService, SignatureService } from "../src/services/signature";
-import { IStorage } from "../src/services/storage";
+import { IS3Service, IStorage } from "../src/services/storage";
 import { random } from "../src/util/token";
 
 export const USER_COGNITO_ID = "test-cognito-id";
@@ -109,23 +109,12 @@ export class MockEmailsService implements IEmailsService {
 
 @injectable()
 export class MockAwsService implements IAws {
-  constructor(private readonly storage = new MockStorage()) {}
+  constructor() {}
   enqueueMessages() {}
   async enqueueEvents() {}
-
-  public get fileUploads() {
-    return this.storage;
-  }
-  public get publicFiles() {
-    return this.storage;
-  }
-  public get temporaryFiles() {
-    return this.storage;
-  }
 }
 
-@injectable()
-export class MockStorage implements IStorage {
+class MockS3Service implements IS3Service {
   async uploadFile() {
     return {} as any;
   }
@@ -141,6 +130,19 @@ export class MockStorage implements IStorage {
   }
   async getSignedDownloadEndpoint() {
     return "";
+  }
+}
+
+@injectable()
+export class MockStorage implements IStorage {
+  public get fileUploads() {
+    return new MockS3Service();
+  }
+  public get publicFiles() {
+    return new MockS3Service();
+  }
+  public get temporaryFiles() {
+    return new MockS3Service();
   }
 }
 

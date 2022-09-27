@@ -6,6 +6,7 @@ import { tmpdir } from "os";
 import pMap from "p-map";
 import { resolve } from "path";
 import { isDefined, zip } from "remeda";
+import sanitizeFilename from "sanitize-filename";
 import { FileRepository } from "../db/repositories/FileRepository";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
@@ -14,9 +15,8 @@ import { isFileTypeField } from "../util/isFileTypeField";
 import { pFlatMap } from "../util/promises/pFlatMap";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
-import { AWS_SERVICE, IAws } from "./aws";
 import { IPrinter, PRINTER } from "./printer";
-import sanitizeFilename from "sanitize-filename";
+import { IStorage, STORAGE_SERVICE } from "./storage";
 
 function isPrintableContentType(contentType: string) {
   return [
@@ -52,7 +52,7 @@ export class PetitionBinder implements IPetitionBinder {
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(FileRepository) private files: FileRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
-    @inject(AWS_SERVICE) private aws: IAws,
+    @inject(STORAGE_SERVICE) private storage: IStorage,
     @inject(PRINTER) private printer: IPrinter
   ) {}
 
@@ -122,7 +122,7 @@ export class PetitionBinder implements IPetitionBinder {
                     // jpeg can be used directly, other types need processing
                     const imageUrl =
                       file.content_type === "image/jpeg"
-                        ? await this.aws.fileUploads.getSignedDownloadEndpoint(
+                        ? await this.storage.fileUploads.getSignedDownloadEndpoint(
                             file.path,
                             file.filename,
                             "inline"
@@ -134,7 +134,7 @@ export class PetitionBinder implements IPetitionBinder {
                     );
                   } else if (file.content_type === "application/pdf") {
                     return await this.writeTemporaryFile(
-                      await this.aws.fileUploads.downloadFile(file.path)
+                      await this.storage.fileUploads.downloadFile(file.path)
                     );
                   } else {
                     throw new Error(`Cannot annex ${file.content_type} to pdf binder`);
@@ -229,7 +229,7 @@ export class PetitionBinder implements IPetitionBinder {
 
   private async convertImage(fileS3Path: string, contentType: string) {
     const tmpPath = await this.writeTemporaryFile(
-      await this.aws.fileUploads.downloadFile(fileS3Path)
+      await this.storage.fileUploads.downloadFile(fileS3Path)
     );
 
     const outputFormat = ["image/png", "image/gif"].includes(contentType) ? "png" : "jpeg";

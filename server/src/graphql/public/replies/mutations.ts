@@ -145,7 +145,7 @@ export const publicFileUploadReplyComplete = mutationField("publicFileUploadRepl
     }
     const file = await ctx.files.loadFileUpload(reply.content["file_upload_id"]);
     // Try to get metadata
-    await ctx.aws.fileUploads.getFileMetadata(file!.path);
+    await ctx.storage.fileUploads.getFileMetadata(file!.path);
     await ctx.files.markFileUploadComplete(file!.id, `Contact:${ctx.access!.contact_id}`);
     ctx.files.loadFileUpload.dataloader.clear(file!.id);
     return reply;
@@ -191,7 +191,7 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
       `Contact:${ctx.contact!.id}`
     );
     const [presignedPostData, reply] = await Promise.all([
-      ctx.aws.fileUploads.getSignedUploadEndpoint(key, contentType, size),
+      ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
       ctx.petitions.createPetitionFieldReply(
         {
           petition_field_id: args.fieldId,
@@ -233,7 +233,7 @@ export const publicFileUploadReplyDownloadLink = mutationField(
           throw new Error(`FileUpload not found with id ${reply!.content["file_upload_id"]}`);
         }
         if (!file.upload_complete) {
-          await ctx.aws.fileUploads.getFileMetadata(file!.path);
+          await ctx.storage.fileUploads.getFileMetadata(file!.path);
           await ctx.files.markFileUploadComplete(file.id, `Contact:${ctx.access!.contact_id}`);
         }
         return {
@@ -241,7 +241,7 @@ export const publicFileUploadReplyDownloadLink = mutationField(
           file: file.upload_complete
             ? file
             : await ctx.files.loadFileUpload(file.id, { refresh: true }),
-          url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
+          url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,
             args.preview ? "inline" : "attachment"

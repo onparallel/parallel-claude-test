@@ -9,18 +9,18 @@ import { Upload } from "@aws-sdk/lib-storage";
 import { createPresignedPost, PresignedPost } from "@aws-sdk/s3-presigned-post";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import contentDisposition from "content-disposition";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { chunk } from "remeda";
 import { Readable } from "stream";
 import { buffer } from "stream/consumers";
+import { Memoize } from "typescript-memoize";
+import { Config, CONFIG } from "../config";
 import { unMaybeArray } from "../util/arrays";
+import { awsLogger } from "../util/awsLogger";
 import { MaybeArray } from "../util/types";
+import { ILogger, LOGGER } from "./logger";
 
-export const STORAGE_FACTORY = Symbol.for("FACTORY<STORAGE>");
-
-export type StorageFactory = (...args: ConstructorParameters<typeof Storage>) => IStorage;
-
-export interface IStorage {
+export interface IS3Service {
   getSignedUploadEndpoint(
     key: string,
     contentType: string,
@@ -36,9 +36,10 @@ export interface IStorage {
   deleteFile(key: MaybeArray<string>): Promise<void>;
   uploadFile(key: string, contentType: string, body: Buffer | Readable): Promise<HeadObjectOutput>;
 }
+
 const _4GB = 1024 * 1024 * 1024 * 4;
-@injectable()
-export class Storage implements IStorage {
+
+class S3Service implements IS3Service {
   constructor(private s3: S3Client, private bucketName: string) {}
 
   async getSignedUploadEndpoint(key: string, contentType: string, maxAllowedSize?: number) {
@@ -108,5 +109,38 @@ export class Storage implements IStorage {
     }).done();
 
     return await this.getFileMetadata(key);
+  }
+}
+
+export const STORAGE_SERVICE = Symbol.for("STORAGE_SERVICE");
+
+export interface IStorage {
+  publicFiles: IS3Service;
+  fileUploads: IS3Service;
+  temporaryFiles: IS3Service;
+}
+
+@injectable()
+export class StorageService implements IStorage {
+  constructor(@inject(CONFIG) private config: Config, @inject(LOGGER) private logger: ILogger) {}
+
+  @Memoize() private get s3() {
+    return new S3Client({
+      ...this.config.aws,
+      useAccelerateEndpoint: true,
+      logger: awsLogger(this.logger),
+    });
+  }
+
+  @Memoize() public get fileUploads() {
+    return new S3Service(this.s3, this.config.s3.fileUploadsBucketName);
+  }
+
+  @Memoize() public get temporaryFiles() {
+    return new S3Service(this.s3, this.config.s3.temporaryFilesBucketName);
+  }
+
+  @Memoize() public get publicFiles() {
+    return new S3Service(this.s3, this.config.s3.publicFilesBucketName);
   }
 }

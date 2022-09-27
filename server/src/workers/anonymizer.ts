@@ -35,7 +35,7 @@ createCronWorker("anonymizer", async (ctx, config) => {
   const filesToDelete = await ctx.files.getFileUploadsToDelete();
   ctx.logger.debug(`Anonymizing ${filesToDelete.length} deleted files`);
   const filePaths = uniq(filesToDelete.map((f) => f.path));
-  await ctx.aws.fileUploads.deleteFile(filePaths);
+  await ctx.storage.fileUploads.deleteFile(filePaths);
   await ctx.files.updateFileUpload(
     filesToDelete.map((f) => f.id),
     { file_deleted_at: new Date() },

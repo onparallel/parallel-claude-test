@@ -20,7 +20,6 @@ import { UserRepository } from "./db/repositories/UserRepository";
 import { Contact, Organization, PetitionAccess, User } from "./db/__types";
 import { ANALYTICS, IAnalyticsService } from "./services/analytics";
 import { AUTH, IAuth } from "./services/auth";
-import { AWS_SERVICE, IAws } from "./services/aws";
 import { EMAILS, IEmailsService } from "./services/emails";
 import { FETCH_SERVICE, IFetchService } from "./services/fetch";
 import { I18N_SERVICE, II18nService } from "./services/i18n";
@@ -30,6 +29,7 @@ import { IPetitionBinder, PETITION_BINDER } from "./services/petition-binder";
 import { IPrinter, PRINTER } from "./services/printer";
 import { ISignatureService, SIGNATURE } from "./services/signature";
 import { ISmtp, SMTP } from "./services/smtp";
+import { IStorage, STORAGE_SERVICE } from "./services/storage";
 import { ITiersService, TIERS_SERVICE } from "./services/tiers";
 
 @injectable()
@@ -48,11 +48,11 @@ export class ApiContext {
     @inject(EMAILS) public readonly emails: IEmailsService,
     @inject(SIGNATURE) public readonly signature: ISignatureService,
     @inject(PRINTER) public readonly printer: IPrinter,
-    @inject(AWS_SERVICE) public readonly aws: IAws,
     @inject(FETCH_SERVICE) public readonly fetch: IFetchService,
     @inject(IMAGE_SERVICE) public readonly images: IImageService,
     @inject(TIERS_SERVICE) public readonly tiers: ITiersService,
     @inject(I18N_SERVICE) public readonly i18n: II18nService,
+    @inject(STORAGE_SERVICE) public readonly storage: IStorage,
 
     // Repositories
     public readonly contacts: ContactRepository,
@@ -79,7 +79,6 @@ export class WorkerContext {
     @inject(CONFIG) public config: Config,
     @inject(LOGGER) public logger: ILogger,
     // Services
-    @inject(AWS_SERVICE) public readonly aws: IAws,
     @inject(SMTP) public readonly smtp: ISmtp,
     @inject(EMAILS) public readonly emails: IEmailsService,
     @inject(ANALYTICS) public readonly analytics: IAnalyticsService,
@@ -88,6 +87,7 @@ export class WorkerContext {
     @inject(PETITION_BINDER) public readonly petitionBinder: IPetitionBinder,
     @inject(IMAGE_SERVICE) public readonly images: IImageService,
     @inject(I18N_SERVICE) public readonly i18n: II18nService,
+    @inject(STORAGE_SERVICE) public readonly storage: IStorage,
 
     // Repositories
     public readonly contacts: ContactRepository,

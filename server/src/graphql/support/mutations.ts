@@ -301,7 +301,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
         const { createReadStream, mimetype } = await args.image;
         const filename = random(16);
         const path = `uploads/${filename}`;
-        const res = await ctx.aws.publicFiles.uploadFile(path, mimetype, createReadStream());
+        const res = await ctx.storage.publicFiles.uploadFile(path, mimetype, createReadStream());
         const file = await ctx.files.createPublicFile(
           {
             path,
@@ -362,7 +362,7 @@ export const uploadUserAvatar = mutationField("uploadUserAvatar", {
 
       const filename = random(16);
       const path = `uploads/${filename}`;
-      const res = await ctx.aws.publicFiles.uploadFile(path, mimetype, createReadStream());
+      const res = await ctx.storage.publicFiles.uploadFile(path, mimetype, createReadStream());
       const file = await ctx.files.createPublicFile(
         {
           path,

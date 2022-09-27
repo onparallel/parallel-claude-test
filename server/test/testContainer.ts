@@ -7,6 +7,7 @@ import { FETCH_SERVICE, IFetchService } from "../src/services/fetch";
 import { ILogger, LOGGER } from "../src/services/logger";
 import { IRedis, REDIS } from "../src/services/redis";
 import { ISignatureService, SIGNATURE } from "../src/services/signature";
+import { IStorage, STORAGE_SERVICE } from "../src/services/storage";
 import {
   MockAnalyticsService,
   MockAuth,
@@ -15,6 +16,7 @@ import {
   MockFetchService,
   MockRedis,
   MockSignatureService,
+  MockStorage,
 } from "./mocks";
 
 export function createTestContainer() {
@@ -27,5 +29,6 @@ export function createTestContainer() {
   container.rebind<IAws>(AWS_SERVICE).to(MockAwsService).inSingletonScope();
   container.rebind<IFetchService>(FETCH_SERVICE).to(MockFetchService).inSingletonScope();
   container.rebind<ISignatureService>(SIGNATURE).to(MockSignatureService).inSingletonScope();
+  container.rebind<IStorage>(STORAGE_SERVICE).to(MockStorage);
   return container;
 }

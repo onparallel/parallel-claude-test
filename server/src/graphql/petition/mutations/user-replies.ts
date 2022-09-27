@@ -142,7 +142,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     );
 
     const [presignedPostData, reply] = await Promise.all([
-      ctx.aws.fileUploads.getSignedUploadEndpoint(key, contentType, size),
+      ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
       ctx.petitions.createPetitionFieldReply(
         {
           petition_field_id: args.fieldId,
@@ -175,7 +175,7 @@ export const createFileUploadReplyComplete = mutationField("createFileUploadRepl
     const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
     const file = await ctx.files.loadFileUpload(reply.content["file_upload_id"]);
     // Try to get metadata
-    await ctx.aws.fileUploads.getFileMetadata(file!.path);
+    await ctx.storage.fileUploads.getFileMetadata(file!.path);
     await ctx.files.markFileUploadComplete(file!.id, `User:${ctx.user!.id}`);
     ctx.files.loadFileUpload.dataloader.clear(file!.id);
     return reply;
@@ -217,7 +217,7 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
     );
 
     const [presignedPostData, reply] = await Promise.all([
-      ctx.aws.fileUploads.getSignedUploadEndpoint(key, contentType, size),
+      ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
       ctx.petitions.updatePetitionFieldReply(
         args.replyId,
         {
@@ -256,7 +256,7 @@ export const updateFileUploadReplyComplete = mutationField("updateFileUploadRepl
     const file = await ctx.files.loadFileUpload(reply.content["file_upload_id"]);
     // Try to get metadata
     await Promise.all([
-      ctx.aws.fileUploads.getFileMetadata(file!.path),
+      ctx.storage.fileUploads.getFileMetadata(file!.path),
       ctx.files.markFileUploadComplete(file!.id, `User:${ctx.user!.id}`),
       reply.content["old_file_upload_id"]
         ? ctx.files.deleteFileUpload(
