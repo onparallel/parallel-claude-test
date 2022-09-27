@@ -131,7 +131,7 @@ export const resetUserPassword = mutationField("resetUserPassword", {
           ctx.organizations.loadOrg(user.org_id),
         ]);
 
-        await ctx.aws.resetUserPassword(email, {
+        await ctx.auth.resetUserPassword(email, {
           locale,
           organizationName: organization!.name,
           organizationUser: fullName(userData!.first_name, userData!.last_name),

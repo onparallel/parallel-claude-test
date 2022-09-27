@@ -1,7 +1,5 @@
 import { S3Client } from "@aws-sdk/client-s3";
 import { SendMessageBatchCommand, SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
-import AWS, { AWSError, CognitoIdentityServiceProvider } from "aws-sdk";
-import { PromiseResult } from "aws-sdk/lib/request";
 import { createHash } from "crypto";
 import { inject, injectable, interfaces } from "inversify";
 import { Knex } from "knex";
@@ -12,7 +10,6 @@ import { PetitionEvent, SystemEvent } from "../db/events";
 import { unMaybeArray } from "../util/arrays";
 import { awsLogger } from "../util/awsLogger";
 import { MaybeArray } from "../util/types";
-import { EmailPayload } from "../workers/email-sender";
 import { ILogger, LOGGER } from "./logger";
 import { IStorage, Storage, STORAGE_FACTORY } from "./storage";
 
@@ -26,39 +23,6 @@ export interface IAws {
     t?: Knex.Transaction
   ): void;
   enqueueEvents(events: MaybeArray<PetitionEvent | SystemEvent>, t?: Knex.Transaction): void;
-  getOrCreateCognitoUser(
-    email: string,
-    password: string | null,
-    firstName: string,
-    lastName: string,
-    clientMetadata: {
-      organizationName: string;
-      organizationUser: string;
-      locale: string;
-    },
-    sendInviteEmail?: boolean
-  ): Promise<string>;
-  resetUserPassword(
-    email: string,
-    clientMetadata: {
-      organizationName: string;
-      organizationUser: string;
-      locale: string;
-    }
-  ): Promise<void>;
-  signUpUser(
-    email: string,
-    password: string,
-    firstName: string,
-    lastName: string,
-    clientMetadata: { locale: string }
-  ): Promise<string>;
-  deleteUser(email: string): Promise<void>;
-  getUser(
-    email: string
-  ): Promise<PromiseResult<CognitoIdentityServiceProvider.AdminGetUserResponse, AWSError>>;
-  forgotPassword(email: string, clientMetadata: { locale: string }): Promise<void>;
-  resendVerificationCode(email: string, clientMetadata: { locale: string }): Promise<void>;
 }
 
 export const AWS_SERVICE = Symbol.for("AWS_SERVICE");
@@ -81,10 +45,6 @@ export class Aws implements IAws {
     });
   }
 
-  @Memoize() private get cognitoIdP() {
-    return new AWS.CognitoIdentityServiceProvider();
-  }
-
   @Memoize() public get fileUploads() {
     return this.storageFactory(this.s3, this.config.s3.fileUploadsBucketName) as Storage;
   }
@@ -102,13 +62,7 @@ export class Aws implements IAws {
     @inject(LOGGER) private logger: ILogger,
     @inject(STORAGE_FACTORY)
     private storageFactory: interfaces.Factory<IStorage>
-  ) {
-    AWS.config.update({
-      ...config.aws,
-      signatureVersion: "v4",
-      logger: { log: logger.debug.bind(logger) },
-    });
-  }
+  ) {}
 
   private hash(value: string) {
     return createHash("md5").update(value).digest("hex");
@@ -178,145 +132,5 @@ export class Aws implements IAws {
         t
       );
     }
-  }
-
-  /**
-   * Creates a user in Cognito (or gets it if already exists) and returns the cognito Id
-   */
-  async getOrCreateCognitoUser(
-    email: string,
-    password: string | null,
-    firstName: string,
-    lastName: string,
-    clientMetadata: {
-      organizationName: string;
-      organizationUser: string;
-      locale: string;
-    },
-    sendInviteEmail?: boolean
-  ) {
-    try {
-      const user = await this.getUser(email);
-      if (sendInviteEmail) {
-        await this.sendInvitationEmail({
-          user_cognito_id: user.Username!,
-          is_new_user: false,
-          locale: clientMetadata.locale,
-          org_name: clientMetadata.organizationName,
-          org_user: clientMetadata.organizationUser,
-        });
-      }
-      return user.Username!;
-    } catch (error: any) {
-      if (error.code === "UserNotFoundException") {
-        const res = await this.cognitoIdP
-          .adminCreateUser({
-            UserPoolId: this.config.cognito.defaultPoolId,
-            Username: email,
-            TemporaryPassword: password ?? undefined,
-            MessageAction: sendInviteEmail ? undefined : "SUPPRESS",
-            UserAttributes: [
-              { Name: "email", Value: email },
-              { Name: "given_name", Value: firstName },
-              { Name: "family_name", Value: lastName },
-            ],
-            ClientMetadata: clientMetadata,
-          })
-          .promise();
-        return res.User!.Username!;
-      } else {
-        throw error;
-      }
-    }
-  }
-
-  /** resends the email with temporary password to an already existing user */
-  async resetUserPassword(
-    email: string,
-    clientMetadata: { organizationName: string; organizationUser: string; locale: string }
-  ) {
-    await this.cognitoIdP
-      .adminCreateUser({
-        UserPoolId: this.config.cognito.defaultPoolId,
-        Username: email,
-        MessageAction: "RESEND",
-        ClientMetadata: clientMetadata,
-      })
-      .promise();
-  }
-
-  /**
-    signs up a user in AWS Cognito, and returns the new user's cognito_id
-  */
-  async signUpUser(
-    email: string,
-    password: string,
-    firstName: string,
-    lastName: string,
-    clientMetadata: { locale: string }
-  ) {
-    const res = await this.cognitoIdP
-      .signUp({
-        Username: email,
-        Password: password,
-        ClientId: this.config.cognito.clientId,
-        ClientMetadata: clientMetadata,
-        UserAttributes: [
-          { Name: "email", Value: email },
-          { Name: "given_name", Value: firstName },
-          { Name: "family_name", Value: lastName },
-        ],
-      })
-      .promise();
-
-    return res.UserSub;
-  }
-
-  async deleteUser(email: string) {
-    await this.cognitoIdP
-      .adminDeleteUser({
-        Username: email,
-        UserPoolId: this.config.cognito.defaultPoolId,
-      })
-      .promise();
-  }
-
-  async getUser(email: string) {
-    return await this.cognitoIdP
-      .adminGetUser({
-        Username: email,
-        UserPoolId: this.config.cognito.defaultPoolId,
-      })
-      .promise();
-  }
-
-  async forgotPassword(email: string, clientMetadata: { locale: string }) {
-    await this.cognitoIdP
-      .forgotPassword({
-        ClientId: this.config.cognito.clientId,
-        Username: email,
-        ClientMetadata: clientMetadata,
-      })
-      .promise();
-  }
-
-  async resendVerificationCode(email: string, clientMetadata: { locale: string }) {
-    await this.cognitoIdP
-      .resendConfirmationCode({
-        ClientId: this.config.cognito.clientId,
-        Username: email,
-        ClientMetadata: clientMetadata,
-      })
-      .promise();
-  }
-
-  private async sendInvitationEmail(payload: EmailPayload["invitation"]) {
-    await this.enqueueMessages("email-sender", {
-      groupId: `user-invite-${payload.user_cognito_id}`,
-      body: {
-        type: "invitation",
-        payload,
-      },
-    });
   }
 }

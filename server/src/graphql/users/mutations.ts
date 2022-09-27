@@ -90,7 +90,7 @@ export const changePassword = mutationField("changePassword", {
       await ctx.auth.changePassword(ctx.req, password, newPassword);
       return "SUCCESS";
     } catch (error: any) {
-      switch (error.code) {
+      switch (error.__type) {
         case "NotAuthorizedException":
           return "INCORRECT_PASSWORD";
         case "InvalidPasswordException":
@@ -142,7 +142,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     const firstName = args.firstName.trim();
     const lastName = args.lastName.trim();
 
-    const cognitoId = await ctx.aws.getOrCreateCognitoUser(
+    const cognitoId = await ctx.auth.getOrCreateCognitoUser(
       email,
       null,
       firstName,
@@ -450,12 +450,12 @@ export const userSignUp = mutationField("userSignUp", {
 
     const email = args.email.trim().toLowerCase();
     const [error, cognitoId] = await withError(
-      ctx.aws.signUpUser(email, args.password, args.firstName, args.lastName, {
+      ctx.auth.signUpUser(email, args.password, args.firstName, args.lastName, {
         locale: args.locale ?? "en",
       })
     );
     if (error) {
-      await withError(ctx.aws.deleteUser(email));
+      await withError(ctx.auth.deleteUser(email));
       throw error;
     }
 
@@ -610,7 +610,7 @@ export const resendVerificationCode = mutationField("resendVerificationCode", {
           },
           `User:${user.id}`
         );
-        await ctx.aws.resendVerificationCode(email, { locale: locale ?? "en" });
+        await ctx.auth.resendVerificationCode(email, { locale: locale ?? "en" });
       }
     } catch {}
     return RESULT.SUCCESS;

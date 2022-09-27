@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-cloudwatch-logs": "^3.109.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.145.0",
     "@aws-sdk/client-s3": "^3.142.0",
     "@aws-sdk/client-sqs": "^3.145.0",
     "@aws-sdk/lib-storage": "^3.145.0",
@@ -61,7 +62,6 @@
     "apollo-server-express": "^3.10.1",
     "apollo-server-plugin-base": "^3.6.2",
     "archiver": "^5.3.1",
-    "aws-sdk": "^2.1153.0",
     "byte-length": "^1.0.2",
     "content-disposition": "^0.5.4",
     "cookie": "^0.5.0",

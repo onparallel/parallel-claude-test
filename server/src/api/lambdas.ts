@@ -1,4 +1,3 @@
-import { ClientMetadataType } from "aws-sdk/clients/cognitoidentityserviceprovider";
 import { Handler, json, Router } from "express";
 import { Config } from "../config";
 import { buildEmail } from "../emails/buildEmail";
@@ -15,7 +14,7 @@ interface CustomMessageRequest {
   };
   codeParameter: string;
   usernameParameter: string | null;
-  clientMetadata: ClientMetadataType;
+  clientMetadata: { [key: string]: string };
 }
 
 function layoutProps(config: Config["misc"]) {

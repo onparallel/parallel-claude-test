@@ -404,7 +404,7 @@ export const createOrganization = mutationField("createOrganization", {
 
     const email = args.email.trim().toLowerCase();
     const userData = (await ctx.users.loadUserData(ctx.user!.user_data_id))!;
-    const cognitoId = await ctx.aws.getOrCreateCognitoUser(
+    const cognitoId = await ctx.auth.getOrCreateCognitoUser(
       email,
       null,
       args.firstName,

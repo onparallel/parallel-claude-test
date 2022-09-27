@@ -1,9 +1,22 @@
-import { ApolloError, ForbiddenError } from "apollo-server-core";
-import AWS from "aws-sdk";
 import {
+  AdminCreateUserCommand,
+  AdminDeleteUserCommand,
+  AdminGetUserCommand,
+  AdminInitiateAuthCommand,
+  AdminRespondToAuthChallengeCommand,
+  AdminRespondToAuthChallengeCommandOutput,
+  AdminUpdateUserAttributesCommand,
   AuthenticationResultType,
+  ChangePasswordCommand,
+  CognitoIdentityProviderClient,
+  ConfirmForgotPasswordCommand,
+  ConfirmSignUpCommand,
   ContextDataType,
-} from "aws-sdk/clients/cognitoidentityserviceprovider";
+  ForgotPasswordCommand,
+  ResendConfirmationCodeCommand,
+  SignUpCommand,
+} from "@aws-sdk/client-cognito-identity-provider";
+import { ApolloError, ForbiddenError } from "apollo-server-core";
 import { parse as parseCookie } from "cookie";
 import DataLoader from "dataloader";
 import { differenceInMinutes } from "date-fns";
@@ -26,14 +39,16 @@ import { SystemRepository } from "../db/repositories/SystemRepository";
 import { UserAuthenticationRepository } from "../db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { User } from "../db/__types";
+import { awsLogger } from "../util/awsLogger";
 import { fromDataLoader } from "../util/fromDataLoader";
-import { fullName } from "../util/fullName";
 import { sign, verify } from "../util/jwt";
 import { withError } from "../util/promises/withError";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
 import { userHasRole } from "../util/userHasRole";
+import { EmailPayload } from "../workers/email-sender";
 import { AWS_SERVICE, IAws } from "./aws";
+import { ILogger, LOGGER } from "./logger";
 import { IRedis, REDIS } from "./redis";
 
 export interface IAuth {
@@ -53,6 +68,35 @@ export interface IAuth {
   restoreSessionLogin(req: Request, userId: number): Promise<void>;
   resetTempPassword(email: string, locale: string | null | undefined): Promise<void>;
   verifyCaptcha(captcha: string, ip: string): Promise<boolean>;
+  getOrCreateCognitoUser(
+    email: string,
+    password: string | null,
+    firstName: string,
+    lastName: string,
+    clientMetadata: {
+      organizationName: string;
+      organizationUser: string;
+      locale: string;
+    },
+    sendInviteEmail?: boolean
+  ): Promise<string>;
+  signUpUser(
+    email: string,
+    password: string,
+    firstName: string,
+    lastName: string,
+    clientMetadata: { locale: string }
+  ): Promise<string>;
+  deleteUser(email: string): Promise<void>;
+  resendVerificationCode(email: string, clientMetadata: { locale: string }): Promise<void>;
+  resetUserPassword(
+    email: string,
+    clientMetadata: {
+      organizationName: string;
+      organizationUser: string;
+      locale: string;
+    }
+  ): Promise<void>;
 }
 
 export const AUTH = Symbol.for("AUTH");
@@ -66,21 +110,120 @@ interface CognitoSession {
 export class Auth implements IAuth {
   private readonly EXPIRY = 30 * 24 * 60 * 60;
 
-  @Memoize()
-  get cognito() {
-    return new AWS.CognitoIdentityServiceProvider();
-  }
-
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(REDIS) private redis: IRedis,
-    @inject(AWS_SERVICE) public readonly aws: IAws,
+    @inject(AWS_SERVICE) private aws: IAws,
+    @inject(LOGGER) private logger: ILogger,
     private orgs: OrganizationRepository,
     private integrations: IntegrationRepository,
     private users: UserRepository,
     private userAuthentication: UserAuthenticationRepository,
     private system: SystemRepository
   ) {}
+
+  @Memoize() private get cognitoIdP() {
+    return new CognitoIdentityProviderClient({
+      ...this.config.aws,
+      logger: awsLogger(this.logger),
+    });
+  }
+
+  /**
+   * Creates a user in Cognito (or gets it if already exists) and returns the cognito Id
+   */
+  async getOrCreateCognitoUser(
+    email: string,
+    password: string | null,
+    firstName: string,
+    lastName: string,
+    clientMetadata: {
+      organizationName: string;
+      organizationUser: string;
+      locale: string;
+    },
+    sendInviteEmail?: boolean
+  ) {
+    try {
+      const user = await this.getUser(email);
+      if (sendInviteEmail) {
+        await this.sendInvitationEmail({
+          user_cognito_id: user.Username!,
+          is_new_user: false,
+          locale: clientMetadata.locale,
+          org_name: clientMetadata.organizationName,
+          org_user: clientMetadata.organizationUser,
+        });
+      }
+      return user.Username!;
+    } catch (error: any) {
+      if (error.code === "UserNotFoundException") {
+        const res = await this.cognitoIdP.send(
+          new AdminCreateUserCommand({
+            UserPoolId: this.config.cognito.defaultPoolId,
+            Username: email,
+            TemporaryPassword: password ?? undefined,
+            MessageAction: sendInviteEmail ? undefined : "SUPPRESS",
+            UserAttributes: [
+              { Name: "email", Value: email },
+              { Name: "given_name", Value: firstName },
+              { Name: "family_name", Value: lastName },
+            ],
+            ClientMetadata: clientMetadata,
+          })
+        );
+        return res.User!.Username!;
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
+    signs up a user in AWS Cognito, and returns the new user's cognito_id
+  */
+  async signUpUser(
+    email: string,
+    password: string,
+    firstName: string,
+    lastName: string,
+    clientMetadata: { locale: string }
+  ) {
+    const res = await this.cognitoIdP.send(
+      new SignUpCommand({
+        Username: email,
+        Password: password,
+        ClientId: this.config.cognito.clientId,
+        ClientMetadata: clientMetadata,
+        UserAttributes: [
+          { Name: "email", Value: email },
+          { Name: "given_name", Value: firstName },
+          { Name: "family_name", Value: lastName },
+        ],
+      })
+    );
+
+    return res.UserSub!;
+  }
+
+  async deleteUser(email: string) {
+    await this.cognitoIdP.send(
+      new AdminDeleteUserCommand({
+        Username: email,
+        UserPoolId: this.config.cognito.defaultPoolId,
+      })
+    );
+  }
+
+  async resendVerificationCode(email: string, clientMetadata: { locale: string }) {
+    await this.cognitoIdP.send(
+      new ResendConfirmationCodeCommand({
+        ClientId: this.config.cognito.clientId,
+        Username: email,
+        ClientMetadata: clientMetadata,
+      })
+    );
+  }
 
   async verifyCaptcha(captcha: string, ip: string) {
     const url = `https://google.com/recaptcha/api/siteverify?${new URLSearchParams({
@@ -238,7 +381,7 @@ export class Auth implements IAuth {
   async login(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password } = req.body;
-      const auth = await this.initiateAuth(email, password, req);
+      const auth = await this.initiateAuth(email, password, this.getContextData(req));
       if (auth.AuthenticationResult) {
         const token = await this.storeSessionInRedis(auth.AuthenticationResult as any);
         const user = await this.getUserFromAuthenticationResult(auth.AuthenticationResult);
@@ -256,7 +399,7 @@ export class Auth implements IAuth {
         res.status(401).send({ error: "UnknownError" });
       }
     } catch (error: any) {
-      switch (error.code) {
+      switch (error.__type) {
         case "PasswordResetRequiredException":
           res.status(401).send({ error: "PasswordResetRequired" });
           return;
@@ -279,7 +422,7 @@ export class Auth implements IAuth {
   async newPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password, newPassword } = req.body;
-      const auth = await this.initiateAuth(email, password, req);
+      const auth = await this.initiateAuth(email, password, this.getContextData(req));
       if (auth.ChallengeName !== "NEW_PASSWORD_REQUIRED") {
         return res.status(401).send({ error: "UnknownError" });
       }
@@ -287,7 +430,7 @@ export class Auth implements IAuth {
         auth.Session!,
         email,
         newPassword,
-        req
+        this.getContextData(req)
       );
       if (challenge.AuthenticationResult) {
         const user = await this.getUserFromAuthenticationResult(challenge.AuthenticationResult);
@@ -295,13 +438,13 @@ export class Auth implements IAuth {
           res.status(401).send({ error: "UnknownError" });
           return;
         }
-        await this.cognito
-          .adminUpdateUserAttributes({
+        await this.cognitoIdP.send(
+          new AdminUpdateUserAttributesCommand({
             Username: email,
             UserPoolId: this.config.cognito.defaultPoolId,
             UserAttributes: [{ Name: "email_verified", Value: "true" }],
           })
-          .promise();
+        );
         await this.trackSessionLogin(user);
         const token = await this.storeSessionInRedis(challenge.AuthenticationResult as any);
         this.setSession(res, token);
@@ -323,13 +466,19 @@ export class Auth implements IAuth {
         res.status(401).send({ error: "ExternalUser" });
         return;
       } else {
-        await this.aws.forgotPassword(email, { locale });
+        await this.cognitoIdP.send(
+          new ForgotPasswordCommand({
+            ClientId: this.config.cognito.clientId,
+            Username: email,
+            ClientMetadata: { locale },
+          })
+        );
         res.status(204).send();
       }
     } catch (error: any) {
-      switch (error.code) {
+      switch (error.__type) {
         case "NotAuthorizedException":
-          const [, data] = await withError(this.aws.getUser(email));
+          const [, data] = await withError(this.getUser(email));
           if (data?.UserStatus === "FORCE_CHANGE_PASSWORD") {
             // cognito user is in status FORCE_CHANGE_PASSWORD, can't reset the password
             res.status(401).send({ error: "ForceChangePasswordException" });
@@ -354,17 +503,17 @@ export class Auth implements IAuth {
   async confirmForgotPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, verificationCode, newPassword } = req.body;
-      await this.cognito
-        .confirmForgotPassword({
+      await this.cognitoIdP.send(
+        new ConfirmForgotPasswordCommand({
           ClientId: this.config.cognito.clientId,
           Username: email,
           Password: newPassword,
           ConfirmationCode: verificationCode,
         })
-        .promise();
+      );
       res.status(204).send();
     } catch (error: any) {
-      switch (error.code) {
+      switch (error.__type) {
         case "InvalidPasswordException":
           res.status(400).send({ error: "InvalidPassword" });
           return;
@@ -496,56 +645,6 @@ export class Auth implements IAuth {
     };
   }
 
-  private async initiateAuth(email: string, password: string, req: IncomingMessage) {
-    return await this.cognito
-      .adminInitiateAuth({
-        AuthFlow: "ADMIN_USER_PASSWORD_AUTH",
-        ClientId: this.config.cognito.clientId,
-        UserPoolId: this.config.cognito.defaultPoolId,
-        AuthParameters: {
-          USERNAME: email,
-          PASSWORD: password,
-        },
-        ContextData: this.getContextData(req),
-      })
-      .promise();
-  }
-
-  private async respondToNewPasswordRequiredChallenge(
-    session: string,
-    email: string,
-    newPassword: string,
-    req: Request
-  ) {
-    return await this.cognito
-      .adminRespondToAuthChallenge({
-        ClientId: this.config.cognito.clientId,
-        UserPoolId: this.config.cognito.defaultPoolId,
-        ChallengeName: "NEW_PASSWORD_REQUIRED",
-        Session: session,
-        ChallengeResponses: {
-          USERNAME: email,
-          NEW_PASSWORD: newPassword,
-        },
-        ContextData: this.getContextData(req),
-      })
-      .promise();
-  }
-
-  private async refreshToken(refreshToken: string, req: IncomingMessage) {
-    return this.cognito
-      .adminInitiateAuth({
-        AuthFlow: "REFRESH_TOKEN_AUTH",
-        ClientId: this.config.cognito.clientId,
-        UserPoolId: this.config.cognito.defaultPoolId,
-        AuthParameters: {
-          REFRESH_TOKEN: refreshToken,
-        },
-        ContextData: this.getContextData(req),
-      })
-      .promise();
-  }
-
   async validateRequestAuthentication(req: IncomingMessage): Promise<[User] | [User, User] | null> {
     return (
       (await this.validateSession(req)) ??
@@ -600,7 +699,7 @@ export class Auth implements IAuth {
               if (refreshToken === null) {
                 return null;
               }
-              const auth = await this.refreshToken(refreshToken, req);
+              const auth = await this.refreshToken(refreshToken, this.getContextData(req));
               if (auth.AuthenticationResult) {
                 await this.updateSession(token, auth.AuthenticationResult as any);
               } else {
@@ -681,13 +780,13 @@ export class Auth implements IAuth {
   async changePassword(req: IncomingMessage, password: string, newPassword: string) {
     const token = this.getSessionToken(req);
     const accessToken = await this.redis.get(`session:${token}:accessToken`);
-    await this.cognito
-      .changePassword({
+    await this.cognitoIdP.send(
+      new ChangePasswordCommand({
         AccessToken: accessToken!,
         PreviousPassword: password,
         ProposedPassword: newPassword,
       })
-      .promise();
+    );
   }
 
   async verifyEmail(req: Request, res: Response, next: NextFunction) {
@@ -695,13 +794,13 @@ export class Auth implements IAuth {
     try {
       const [user] = await req.context.users.loadUsersByEmail(email);
       if (user) {
-        await this.cognito
-          .confirmSignUp({
+        await this.cognitoIdP.send(
+          new ConfirmSignUpCommand({
             ClientId: this.config.cognito.clientId,
             ConfirmationCode: code,
             Username: email,
           })
-          .promise();
+        );
         await req.context.system.createEvent({
           type: "EMAIL_VERIFIED",
           data: {
@@ -736,7 +835,7 @@ export class Auth implements IAuth {
   async resetTempPassword(email: string, locale: string | null | undefined) {
     const [users, cognitoUser] = await Promise.all([
       this.users.loadUsersByEmail(email),
-      this.aws.getUser(email),
+      this.getUser(email),
     ]);
     const definedUsers = users.filter(isDefined);
     if (definedUsers.length === 0) {
@@ -776,13 +875,91 @@ export class Auth implements IAuth {
       if (!orgOwnerData) {
         throw new ApolloError(`UserData not found`, "USER_DATA_NOT_FOUND");
       }
-      await this.aws.resetUserPassword(email, {
-        locale: locale ?? "en",
-        organizationName: organization.name,
-        organizationUser: fullName(orgOwnerData.first_name, orgOwnerData.last_name),
-      });
     } else {
       throw new ApolloError(`User has SSO configured`, "RESET_USER_PASSWORD_SSO_ERROR");
     }
+  }
+
+  async resetUserPassword(
+    email: string,
+    clientMetadata: { organizationName: string; organizationUser: string; locale: string }
+  ): Promise<void> {
+    await this.cognitoIdP.send(
+      new AdminCreateUserCommand({
+        UserPoolId: this.config.cognito.defaultPoolId,
+        Username: email,
+        MessageAction: "RESEND",
+        ClientMetadata: clientMetadata,
+      })
+    );
+  }
+
+  private async initiateAuth(email: string, password: string, contextData: ContextDataType) {
+    return await this.cognitoIdP.send(
+      new AdminInitiateAuthCommand({
+        AuthFlow: "ADMIN_USER_PASSWORD_AUTH",
+        ClientId: this.config.cognito.clientId,
+        UserPoolId: this.config.cognito.defaultPoolId,
+        AuthParameters: {
+          USERNAME: email,
+          PASSWORD: password,
+        },
+        ContextData: contextData,
+      })
+    );
+  }
+
+  private async respondToNewPasswordRequiredChallenge(
+    session: string,
+    email: string,
+    password: string,
+    contextData: ContextDataType
+  ): Promise<AdminRespondToAuthChallengeCommandOutput> {
+    return await this.cognitoIdP.send(
+      new AdminRespondToAuthChallengeCommand({
+        ClientId: this.config.cognito.clientId,
+        UserPoolId: this.config.cognito.defaultPoolId,
+        ChallengeName: "NEW_PASSWORD_REQUIRED",
+        Session: session,
+        ChallengeResponses: {
+          USERNAME: email,
+          NEW_PASSWORD: password,
+        },
+        ContextData: contextData,
+      })
+    );
+  }
+
+  private async getUser(email: string) {
+    return await this.cognitoIdP.send(
+      new AdminGetUserCommand({
+        Username: email,
+        UserPoolId: this.config.cognito.defaultPoolId,
+      })
+    );
+  }
+
+  private async refreshToken(refreshToken: string, contextData: ContextDataType) {
+    return await this.cognitoIdP.send(
+      new AdminInitiateAuthCommand({
+        AuthFlow: "REFRESH_TOKEN_AUTH",
+        ClientId: this.config.cognito.clientId,
+        UserPoolId: this.config.cognito.defaultPoolId,
+        AuthParameters: {
+          REFRESH_TOKEN: refreshToken,
+        },
+        ContextData: contextData,
+      })
+    );
+  }
+
+  private async sendInvitationEmail(payload: EmailPayload["invitation"]) {
+    await this.aws.enqueueMessages("email-sender", {
+      groupId: `user-invite-${payload.user_cognito_id}`,
+      body: {
+        type: "invitation",
+        payload,
+      },
+    });
   }
 }

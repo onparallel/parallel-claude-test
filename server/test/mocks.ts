@@ -23,6 +23,15 @@ export class MockAuth implements IAuth {
     private users: UserRepository,
     private userAuthentication: UserAuthenticationRepository
   ) {}
+  async getOrCreateCognitoUser(): Promise<string> {
+    return "";
+  }
+  async signUpUser(): Promise<string> {
+    return random(10);
+  }
+  async deleteUser() {}
+  async resendVerificationCode() {}
+  async resetUserPassword() {}
   async validateRequestAuthentication(req: IncomingMessage) {
     if (req.headers.authorization?.startsWith("Bearer ")) {
       const token = req.headers.authorization.replace(/^Bearer /, "");
@@ -101,21 +110,9 @@ export class MockEmailsService implements IEmailsService {
 @injectable()
 export class MockAwsService implements IAws {
   constructor(private readonly storage = new MockStorage()) {}
-  async getUser() {
-    return {} as any;
-  }
-  async forgotPassword() {}
-  async resetUserPassword() {}
-  async signUpUser() {
-    return random(10);
-  }
-  async deleteUser() {}
-  async resendVerificationCode() {}
   enqueueMessages() {}
   async enqueueEvents() {}
-  async getOrCreateCognitoUser() {
-    return "";
-  }
+
   public get fileUploads() {
     return this.storage;
   }
