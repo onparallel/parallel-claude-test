@@ -13,7 +13,7 @@ import {
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { useStateSlice } from "@parallel/utils/useStateSlice";
-import { useRouter } from "next/router";
+import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import {
   ComponentType,
   createContext,
@@ -22,13 +22,12 @@ import {
   SetStateAction,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
 import { useIntl } from "react-intl";
-import { isDefined, omit } from "remeda";
+import { isDefined } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { useConfirmDiscardDraftDialog } from "../petition-compose/dialogs/ConfirmDiscardDraftDialog";
 import { PetitionTemplateHeader, PetitionTemplateHeaderInstance } from "./PetitionTemplateHeader";
@@ -96,22 +95,12 @@ export const PetitionLayout = Object.assign(
 
     const headerRef = useRef<PetitionHeaderInstance | PetitionTemplateHeaderInstance>(null);
 
-    const router = useRouter();
     const [, setShouldConfirmNavigation] = usePetitionShouldConfirmNavigation();
-    useEffect(() => {
-      if (isDefined(router.query.new)) {
-        setTimeout(() => headerRef.current?.focusName());
-        setShouldConfirmNavigation(true);
-        router.replace(
-          {
-            pathname: router.pathname,
-            query: omit(router.query, ["new"]),
-          },
-          undefined,
-          { shallow: true }
-        );
-      }
-    }, []);
+
+    useTempQueryParam("new", () => {
+      setTimeout(() => headerRef.current?.focusName());
+      setShouldConfirmNavigation(true);
+    });
 
     useConfirmDiscardDraftDialog(petition);
 

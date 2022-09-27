@@ -66,12 +66,12 @@ import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdate
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
-import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, omit, zip } from "remeda";
+import { zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type PetitionComposeProps = UnwrapPromise<ReturnType<typeof PetitionCompose.getInitialProps>>;
@@ -80,8 +80,6 @@ type FieldSelection = PetitionCompose_PetitionFieldFragment;
 
 function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const intl = useIntl();
-  const router = useRouter();
-  const { query } = router;
 
   const {
     data: { me, realMe },
@@ -134,19 +132,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const showPetitionFromTemplateDialog = useHandledPetitionFromTemplateDialog();
 
-  useEffect(() => {
-    if (isDefined(query.fromTemplate)) {
-      withError(showPetitionFromTemplateDialog());
-      router.replace(
-        {
-          pathname: router.pathname,
-          query: omit(router.query, ["fromTemplate"]),
-        },
-        undefined,
-        { shallow: true }
-      );
-    }
-  }, []);
+  useTempQueryParam("fromTemplate", () => {
+    withError(showPetitionFromTemplateDialog());
+  });
 
   useEffect(() => {
     setShowErrors(isSharedByLink);

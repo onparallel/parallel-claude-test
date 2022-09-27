@@ -74,7 +74,8 @@ export const PetitionHeader = Object.assign(
     const intl = useIntl();
     const router = useRouter();
     const [state] = usePetitionState();
-    const [, setShouldConfirmNavigation] = usePetitionShouldConfirmNavigation();
+    const [shouldConfirmNavigation, setShouldConfirmNavigation] =
+      usePetitionShouldConfirmNavigation();
 
     const deletePetitions = useDeletePetitions();
     const handleDeleteClick = async function () {
@@ -413,9 +414,10 @@ export const PetitionHeader = Object.assign(
             return (
               <NakedLink
                 key={section}
-                href={`/app/petitions/${petition.id}/${section}${
-                  isDefined(router.query.fromTemplate) ? "?fromTemplate" : ""
-                }`}
+                href={`/app/petitions/${petition.id}/${section}?${new URLSearchParams({
+                  ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
+                  ...(isDefined(shouldConfirmNavigation) ? { new: "" } : {}),
+                })}`}
               >
                 <PetitionHeaderTab
                   isActive={current === section}
