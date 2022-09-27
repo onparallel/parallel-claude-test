@@ -98,7 +98,11 @@ export const PetitionLayout = Object.assign(
     const [, setShouldConfirmNavigation] = usePetitionShouldConfirmNavigation();
 
     useTempQueryParam("new", () => {
-      setTimeout(() => headerRef.current?.focusName());
+      setTimeout(() => {
+        if (!isDefined(petition.name)) {
+          headerRef.current?.focusName();
+        }
+      });
       setShouldConfirmNavigation(true);
     });
 
