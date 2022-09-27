@@ -615,6 +615,16 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         }
       >
         <Box padding={4}>
+          <PetitionSignaturesCard
+            ref={signaturesRef as any}
+            id="signatures"
+            petition={petition}
+            user={me}
+            layerStyle="highlightable"
+            marginBottom={8}
+            onRefetchPetition={refetch}
+            isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+          />
           <Stack flex="2" spacing={4} data-section="replies-fields">
             <LiquidScopeProvider scope={scope}>
               {filterPetitionFields(petition.fields, indices, fieldVisibility ?? [], filter).map(
@@ -646,7 +656,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               )}
             </LiquidScopeProvider>
           </Stack>
-
           {petition.attachments.length > 0 ? (
             <PetitionAttachmentsCard
               id="attachments"
@@ -655,17 +664,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               marginTop={8}
             />
           ) : null}
-
-          <PetitionSignaturesCard
-            ref={signaturesRef as any}
-            id="signatures"
-            petition={petition}
-            user={me}
-            layerStyle="highlightable"
-            marginTop={8}
-            onRefetchPetition={refetch}
-            isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
-          />
         </Box>
       </PaneWithFlyout>
     </PetitionLayout>

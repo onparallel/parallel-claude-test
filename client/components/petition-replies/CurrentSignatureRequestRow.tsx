@@ -59,7 +59,7 @@ export function CurrentSignatureRequestRow({
   return (
     <>
       <GridItem padding={2} paddingLeft={4}>
-        <Heading size="xs" as="h4">
+        <Heading size="xs" as="h4" paddingBottom={1}>
           <FormattedMessage
             id="component.petition-signatures-card.status"
             defaultMessage="Status"
@@ -68,7 +68,7 @@ export function CurrentSignatureRequestRow({
         <PetitionSignatureRequestStatusText signature={signatureRequest} />
       </GridItem>
       <GridItem padding={2}>
-        <Heading size="xs" as="h4">
+        <Heading size="xs" as="h4" paddingBottom={1}>
           <FormattedMessage
             id="component.petition-signatures-card.signers"
             defaultMessage="Signers"

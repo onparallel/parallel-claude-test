@@ -1,6 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import { Box, Center, Grid, Text, useToast } from "@chakra-ui/react";
-import { SignatureIcon, SignaturePlusIcon } from "@parallel/chakra/icons";
+import { AddIcon, SignatureIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionSignaturesCard_cancelSignatureRequestDocument,
@@ -335,11 +335,8 @@ export const PetitionSignaturesCard = Object.assign(
                   defaultMessage: "Add signature",
                 })}
                 size="sm"
-                icon={<SignaturePlusIcon fontSize="20px" />}
+                icon={<AddIcon />}
                 onClick={handleAddNewSignature}
-                borderColor="gray.300"
-                borderWidth="1px"
-                backgroundColor="white"
               />
             ) : null
           }
@@ -381,7 +378,7 @@ export const PetitionSignaturesCard = Object.assign(
             ) : null}
           </Grid>
         ) : (
-          <Center flexDirection="column" minHeight={24} textStyle="hint" textAlign="center">
+          <Center flexDirection="column" padding={4} textStyle="hint" textAlign="center">
             <Text>
               <FormattedMessage
                 id="component.petition-signatures-card.no-signature-configured"

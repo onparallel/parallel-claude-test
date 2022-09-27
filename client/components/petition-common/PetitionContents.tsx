@@ -71,6 +71,13 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
   );
   return (
     <Stack as="ol" spacing={1} padding={4}>
+      {signatureStatus ? (
+        <SignatureStatusInfo
+          status={signatureStatus}
+          environment={signatureEnvironment}
+          onClick={onSignatureStatusClick}
+        />
+      ) : null}
       {filterPetitionFields(fields, fieldIndices, fieldVisibility ?? [], filter).map((x, index) =>
         x.type === "FIELD" ? (
           <PetitionContentsItem
@@ -103,13 +110,6 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
           </PetitionContentsDivider>
         )
       )}
-      {signatureStatus ? (
-        <SignatureStatusInfo
-          status={signatureStatus}
-          environment={signatureEnvironment}
-          onClick={onSignatureStatusClick}
-        />
-      ) : null}
     </Stack>
   );
 }
