@@ -8,7 +8,6 @@ import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { validateAnd, validateIf } from "../../helpers/validateArgs";
 import { maxLength } from "../../helpers/validators/maxLength";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
-import { userIdNotIncludedInArray } from "../../helpers/validators/notIncludedInArray";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 import { userHasAccessToUserGroups } from "../../user-group/authorizers";
 import { userHasAccessToPetitions } from "../authorizers";
@@ -58,7 +57,6 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
   validateArgs: validateAnd(
     notEmptyArray((args) => args.petitionIds, "petitionIds"),
     notEmptyArray((args) => args.userIds, "userIds"),
-    userIdNotIncludedInArray((args) => args.userIds, "userIds"),
     maxLength((args) => args.message, "message", 1000),
     notEmptyArray((args) => args.userGroupIds, "userGroupId"),
     (_, args, ctx, info) => {

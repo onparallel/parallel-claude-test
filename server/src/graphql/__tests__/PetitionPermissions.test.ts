@@ -842,39 +842,6 @@ describe("GraphQL/Petition Permissions", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error when trying to add permissions for logged user", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
-            addPetitionPermission(
-              petitionIds: $petitionIds
-              userIds: $userIds
-              permissionType: $type
-            ) {
-              id
-
-              permissions {
-                ... on PetitionUserPermission {
-                  permissionType
-                  user {
-                    id
-                  }
-                }
-              }
-            }
-          }
-        `,
-        variables: {
-          petitionIds: [toGlobalId("Petition", userPetition.id)],
-          userIds: [toGlobalId("User", loggedUser.id)],
-          type: "READ",
-        },
-      });
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
-    });
-
     it("should send notification email only to users that didn't have previous permissions", async () => {
       const sendPetitionSharedEmailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),

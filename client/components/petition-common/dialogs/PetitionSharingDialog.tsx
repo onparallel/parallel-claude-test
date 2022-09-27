@@ -154,12 +154,7 @@ export function PetitionSharingDialog({
   const messageRef = useRef<HTMLInputElement>(null);
   const messageRegisterProps = useRegisterWithRef(messageRef, register, "message");
 
-  const usersToExclude =
-    petitions.length === 1
-      ? [groupPermissions.some((g) => g.group.imMember) ? userId : null]
-          .filter(isDefined)
-          .concat(userPermissions.map((p) => p.user.id) ?? [])
-      : [userId];
+  const usersToExclude = petitions.length === 1 ? userPermissions.map((p) => p.user.id) ?? [] : [];
 
   const groupsToExclude =
     petitions.length === 1 ? groupPermissions.map((p) => p.group.id) ?? [] : [];
