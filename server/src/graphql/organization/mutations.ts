@@ -142,14 +142,14 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
       {
         brand_theme: {
           color: args.data.color ?? theme?.color,
-          fontFamily: args.data.fontFamily ?? theme?.fontFamily,
+          fontFamily: args.data.fontFamily !== undefined ? args.data.fontFamily : theme?.fontFamily,
         },
       },
       `User:${ctx.user!.id}`
     );
     if (
       (isDefined(args.data.color) && theme?.color !== args.data.color) ||
-      (isDefined(args.data.fontFamily) && theme?.fontFamily !== args.data.fontFamily)
+      (args.data.fontFamily !== undefined && theme?.fontFamily !== args.data.fontFamily)
     ) {
       await ctx.signature.updateBranding(ctx.user!.org_id);
     }
