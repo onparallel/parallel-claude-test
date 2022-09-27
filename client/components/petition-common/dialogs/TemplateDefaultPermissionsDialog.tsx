@@ -1,14 +1,14 @@
 import { gql } from "@apollo/client";
-import { Button, Checkbox, Collapse, Flex, FormControl, Stack, Text } from "@chakra-ui/react";
+import { Button, Checkbox, Flex, FormControl, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   UserSelect,
   UserSelectInstance,
   UserSelectSelection,
 } from "@parallel/components/common/UserSelect";
-import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import {
   Maybe,
   PetitionPermissionType,
@@ -17,6 +17,7 @@ import {
   UserOrUserGroupPermissionInput,
 } from "@parallel/graphql/__types";
 import { isTypename } from "@parallel/utils/apollo/typename";
+import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
@@ -215,7 +216,7 @@ export function TemplateDefaultPermissionsDialog({
               />
             </FormControl>
           </Flex>
-          <Collapse in={editors.length > 0}>
+          <PaddedCollapse in={editors.length > 0}>
             <FormControl id="is-subscribed">
               <Checkbox {...register("isSubscribed")}>
                 <Flex alignItems="center">
@@ -234,7 +235,7 @@ export function TemplateDefaultPermissionsDialog({
                 </Flex>
               </Checkbox>
             </FormControl>
-          </Collapse>
+          </PaddedCollapse>
           <Stack>
             <TemplateDefaultUserPermissionRow
               permission={ownerPermission}
