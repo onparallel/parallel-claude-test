@@ -103,7 +103,7 @@ export function CreateOrUpdateDocumentThemeDialog({
       }
       alternative={
         isDefined(theme) && !theme.isDefault ? (
-          <Button colorScheme="red" onClick={() => props.onReject("DELETE_THEME")}>
+          <Button colorScheme="red" variant="ghost" onClick={() => props.onReject("DELETE_THEME")}>
             <FormattedMessage
               id="component.create-or-update-document-theme-dialog.delete-theme-button"
               defaultMessage="Delete theme"
