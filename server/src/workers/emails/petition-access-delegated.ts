@@ -52,8 +52,12 @@ export async function petitionAccessDelegated(
     throw new Error(`UserData for User:${originalAccess.granter_id} not found`);
   }
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
-
+  const orgId = petition.org_id;
+  const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
+    orgId,
+    "REMOVE_WHY_WE_USE_PARALLEL"
+  );
+  const { emailFrom, ...layoutProps } = await getLayoutProps(orgId, context);
   const { html, text, subject, from } = await buildEmail(
     AccessDelegatedEmail,
     {
@@ -66,6 +70,7 @@ export async function petitionAccessDelegated(
       bodyPlainText: toPlainText(payload.message_body),
       emailSubject: originalMessage?.email_subject ?? null,
       keycode: newAccess.keycode,
+      removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       ...layoutProps,
     },
     { locale: petition.locale }

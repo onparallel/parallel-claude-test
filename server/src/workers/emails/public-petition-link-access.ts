@@ -47,7 +47,12 @@ export async function publicPetitionLinkAccess(
     throw new Error(`PublicPetitionLink:${petition.from_public_petition_link_id} not found`);
   }
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(sender.org_id, context);
+  const orgId = sender.org_id;
+  const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
+    orgId,
+    "REMOVE_WHY_WE_USE_PARALLEL"
+  );
+  const { emailFrom, ...layoutProps } = await getLayoutProps(orgId, context);
   const { html, text, subject, from } = await buildEmail(
     PublicPetitionLinkAccess,
     {
@@ -57,6 +62,7 @@ export async function publicPetitionLinkAccess(
       emailSubject: petition.email_subject,
       petitionTitle: publicPetitionLink.title,
       keycode: access.keycode,
+      removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       ...layoutProps,
     },
     { locale: petition.locale }

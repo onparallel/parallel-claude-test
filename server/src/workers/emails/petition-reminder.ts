@@ -70,12 +70,15 @@ export async function petitionReminder(
       ([field, isVisible]) => isVisible && field.type !== "HEADING" && field.is_internal === false
     );
 
+    const orgId = granter.org_id;
+    const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
+      orgId,
+      "REMOVE_WHY_WE_USE_PARALLEL"
+    );
     const missingFieldCount = countBy(repliableFields, ([field]) => field.replies.length === 0);
-    const { emailFrom, ...layoutProps } = await getLayoutProps(granter.org_id, context);
-
     const bodyJson = reminder.email_body ? JSON.parse(reminder.email_body) : null;
     const renderContext = { contact, user: granterData, petition };
-
+    const { emailFrom, ...layoutProps } = await getLayoutProps(orgId, context);
     const { html, text, subject, from } = await buildEmail(
       PetitionReminder,
       {
@@ -90,6 +93,7 @@ export async function petitionReminder(
         bodyPlainText: bodyJson ? toPlainText(bodyJson, renderContext) : null,
         deadline: petition.deadline,
         keycode: access.keycode,
+        removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
         ...layoutProps,
       },
       { locale: petition.locale }

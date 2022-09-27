@@ -18,11 +18,6 @@ export async function getLayoutProps(orgId: number, ctx: WorkerContext) {
     "REMOVE_PARALLEL_BRANDING"
   );
 
-  const hasRemoveWhyWeUseParallel = await ctx.featureFlags.orgHasFeatureFlag(
-    org.id,
-    "REMOVE_WHY_WE_USE_PARALLEL"
-  );
-
   const { assetsUrl, parallelUrl, emailFrom } = ctx.config.misc;
   return {
     assetsUrl,
@@ -33,6 +28,5 @@ export async function getLayoutProps(orgId: number, ctx: WorkerContext) {
     tone: org.preferred_tone,
     theme: org.brand_theme,
     removeParallelBranding: hasRemoveParallelBranding,
-    removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
   };
 }

@@ -41,10 +41,16 @@ export async function petitionMessage(
     throw new Error(`Contact not found for petition_access.contact_id ${access.contact_id}`);
   }
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(sender.org_id, context);
+  const orgId = sender.org_id;
+
+  const { emailFrom, ...layoutProps } = await getLayoutProps(orgId, context);
   const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
   const renderContext = { contact, user: senderData, petition };
 
+  const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
+    orgId,
+    "REMOVE_WHY_WE_USE_PARALLEL"
+  );
   const showNextButton = isDefined(petition.from_template_id)
     ? [
         "zas25KHxAByKWUeXTpW",
@@ -75,6 +81,7 @@ export async function petitionMessage(
       deadline: petition.deadline,
       keycode: access.keycode,
       showNextButton,
+      removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       ...layoutProps,
     },
     { locale: petition.locale }
