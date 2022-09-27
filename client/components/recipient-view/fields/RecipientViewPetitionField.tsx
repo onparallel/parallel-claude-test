@@ -1,4 +1,5 @@
 import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
+import { useTone } from "@parallel/components/common/ToneProvider";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
 import {
   RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
@@ -11,7 +12,6 @@ import {
   RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc,
   RecipientViewPetitionField_publicStartAsyncFieldCompletionDocument,
   RecipientViewPetitionField_publicUpdatePetitionFieldReplyDocument,
-  Tone,
 } from "@parallel/graphql/__types";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
@@ -48,14 +48,14 @@ export interface RecipientViewPetitionFieldProps
   access: RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment;
   petitionId: string;
   isDisabled: boolean;
-  tone: Tone;
 }
 
 export type UploadCache = Record<string, XMLHttpRequest>;
 
-export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPetitionFieldProps) {
+export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProps) {
   const uploads = useRef<UploadCache>({});
   const { updateLastSaved } = useLastSaved();
+  const tone = useTone();
 
   const [publicPetitionFieldAttachmentDownloadLink] = useMutation(
     RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument
@@ -257,7 +257,6 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
     <RecipientViewPetitionFieldTaxDocuments
       {...props}
       {...commonProps}
-      tone={tone}
       onDownloadReply={handleDownloadFileUploadReply}
       onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
       onRefreshField={handleRefreshAsyncField}

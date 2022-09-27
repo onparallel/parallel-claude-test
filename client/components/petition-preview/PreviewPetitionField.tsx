@@ -6,11 +6,11 @@ import {
   PreviewPetitionField_PetitionFieldFragment,
   PreviewPetitionField_PetitionFieldReplyFragmentDoc,
   RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkDocument,
-  Tone,
 } from "@parallel/graphql/__types";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { useCallback, useRef } from "react";
+import { useTone } from "../common/ToneProvider";
 import { useFailureGeneratingLinkDialog } from "../petition-replies/dialogs/FailureGeneratingLinkDialog";
 import { UploadCache } from "../recipient-view/fields/RecipientViewPetitionField";
 import {
@@ -49,7 +49,6 @@ export interface PreviewPetitionFieldProps
   petitionId: string;
   isDisabled: boolean;
   isCacheOnly: boolean;
-  tone: Tone;
   myEffectivePermission: PetitionPermissionType;
 }
 
@@ -58,13 +57,12 @@ export function PreviewPetitionField({
   petitionId,
   isCacheOnly,
   isDisabled,
-  tone,
   myEffectivePermission,
   ...props
 }: PreviewPetitionFieldProps) {
   const uploads = useRef<UploadCache>({});
   const fieldId = field.id;
-
+  const tone = useTone();
   const [petitionFieldAttachmentDownloadLink] = useMutation(
     PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument
   );
@@ -259,7 +257,6 @@ export function PreviewPetitionField({
     <RecipientViewPetitionFieldTaxDocuments
       {...props}
       {...commonProps}
-      tone={tone}
       onDownloadReply={handleDownloadFileUploadReply}
       onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
       onRefreshField={handleRefreshAsyncField}

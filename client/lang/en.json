@@ -3956,8 +3956,8 @@
   },
   {
     "term": "component.recipient-view-petition-field-reply.file-incomplete",
-    "definition": "This file was not uploaded correctly. Please, delete it and try again.",
-    "context": "This file was not uploaded correctly. Please, delete it and try again."
+    "definition": "There was an error uploading the file. {tone, select, INFORMAL {Please try again} other {Please upload it again}}.",
+    "context": "There was an error uploading the file. {tone, select, INFORMAL {Please try again} other {Please upload it again}}."
   },
   {
     "term": "component.recipient-view-petition-field-reply.rejected-file",
@@ -7421,8 +7421,8 @@
   },
   {
     "term": "petition-replies.petition-field-reply.file-upload.file-incomplete",
-    "definition": "File upload is incomplete",
-    "context": "File upload is incomplete"
+    "definition": "There was an error uploading the file. Please request a new upload.",
+    "context": "There was an error uploading the file. Please request a new upload."
   },
   {
     "term": "petition-replies.petition-field-reply.reject",

@@ -1,6 +1,6 @@
 import { Box, Button, HStack, List, Progress, Stack, Text } from "@chakra-ui/react";
 import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
-import { Tone } from "@parallel/graphql/__types";
+import { useTone } from "@parallel/components/common/ToneProvider";
 import { centeredPopup, openNewWindow } from "@parallel/utils/openNewWindow";
 import { useInterval } from "@parallel/utils/useInterval";
 import { isDefined } from "@udecode/plate-core";
@@ -20,7 +20,6 @@ export interface RecipientViewPetitionFieldTaxDocumentsProps
     "children" | "showAddNewReply" | "onAddNewReply"
   > {
   isDisabled: boolean;
-  tone: Tone;
   onDeleteReply: (replyId: string) => void;
   onDownloadReply: (replyId: string) => void;
   isCacheOnly?: boolean;
@@ -32,7 +31,6 @@ export function RecipientViewPetitionFieldTaxDocuments({
   field,
   isDisabled,
   isInvalid,
-  tone,
   onDeleteReply,
   onDownloadAttachment,
   onDownloadReply,
@@ -51,7 +49,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
     },
     [onDeleteReply]
   );
-
+  const tone = useTone();
   const [state, setState] = useState<"IDLE" | "ERROR" | "FETCHING">("IDLE");
 
   const showOverwriteDocumentationDialog = useOverwriteDocumentationDialog();

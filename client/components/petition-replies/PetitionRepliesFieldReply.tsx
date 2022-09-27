@@ -114,7 +114,7 @@ export function PetitionRepliesFieldReply({
             <Text color="red.500">
               <FormattedMessage
                 id="petition-replies.petition-field-reply.file-upload.file-incomplete"
-                defaultMessage="File upload is incomplete"
+                defaultMessage="There was an error uploading the file. Please request a new upload."
               />
             </Text>
           ) : (

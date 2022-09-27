@@ -3956,8 +3956,8 @@
   },
   {
     "term": "component.recipient-view-petition-field-reply.file-incomplete",
-    "definition": "Este archivo no se subió correctamente. Por favor, elimínelo y vuelva a intentar.",
-    "context": "This file was not uploaded correctly. Please, delete it and try again."
+    "definition": "{tone, select, INFORMAL {Hubo un error al subir el archivo. Por favor, inténtalo de nuevo} other {Se produjo un error en la subida del archivo. Por favor, súbalo de nuevo}}.",
+    "context": "There was an error uploading the file. {tone, select, INFORMAL {Please try again} other {Please upload it again}}."
   },
   {
     "term": "component.recipient-view-petition-field-reply.rejected-file",
@@ -7421,8 +7421,8 @@
   },
   {
     "term": "petition-replies.petition-field-reply.file-upload.file-incomplete",
-    "definition": "La subida de archivo está incompleta",
-    "context": "File upload is incomplete"
+    "definition": "Hubo un error al subir el archivo. Por favor, solicita que se suba de nuevo.",
+    "context": "There was an error uploading the file. Please request a new upload."
   },
   {
     "term": "petition-replies.petition-field-reply.reject",

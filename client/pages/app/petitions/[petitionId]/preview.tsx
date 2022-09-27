@@ -366,7 +366,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                     {fields.map((field) => (
                       <motion.div key={field.id} layout="position">
                         <PreviewPetitionField
-                          tone={petition.tone}
                           key={field.id}
                           petitionId={petition.id}
                           field={field}

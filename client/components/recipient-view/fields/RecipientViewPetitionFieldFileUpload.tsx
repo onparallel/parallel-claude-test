@@ -17,6 +17,7 @@ import { FileIcon } from "@parallel/components/common/FileIcon";
 import { FileName } from "@parallel/components/common/FileName";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { useTone } from "@parallel/components/common/ToneProvider";
 import { FORMATS } from "@parallel/utils/dates";
 import { MaybePromise } from "@parallel/utils/types";
 import { AnimatePresence, motion } from "framer-motion";
@@ -121,7 +122,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
   isDownloadDisabled,
 }: RecipientViewPetitionFieldReplyFileUploadProps) {
   const intl = useIntl();
-
+  const tone = useTone();
   const uploadHasFailed =
     reply.content.uploadComplete === false && reply.content.progress === undefined;
 
@@ -168,7 +169,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
             </Text>
           )}
         </Flex>
-        {reply.isAnonymized || reply.content!.uploadComplete === false ? (
+        {reply.isAnonymized || (reply.content!.uploadComplete === false && !uploadHasFailed) ? (
           <Center height="18px">
             <Progress
               borderRadius="sm"
@@ -185,7 +186,10 @@ export function RecipientViewPetitionFieldReplyFileUpload({
               <Text color="red.600">
                 <FormattedMessage
                   id="component.recipient-view-petition-field-reply.file-incomplete"
-                  defaultMessage="This file was not uploaded correctly. Please, delete it and try again."
+                  defaultMessage="There was an error uploading the file. {tone, select, INFORMAL {Please try again} other {Please upload it again}}."
+                  values={{
+                    tone,
+                  }}
                 />
               </Text>
             ) : (
