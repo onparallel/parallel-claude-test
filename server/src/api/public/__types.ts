@@ -2312,9 +2312,9 @@ export type PetitionFieldComment = {
   /** The author of the comment. */
   author: Maybe<UserOrPetitionAccess>;
   /** The JSON content of the comment. */
-  content: Scalars["JSON"];
+  content: Maybe<Scalars["JSON"]>;
   /** The HTML content of the comment. */
-  contentHtml: Scalars["String"];
+  contentHtml: Maybe<Scalars["String"]>;
   /** Time when the comment was created. */
   createdAt: Scalars["DateTime"];
   field: PetitionField;
@@ -2931,9 +2931,9 @@ export type PublicPetitionFieldComment = {
   /** The author of the comment. */
   author: Maybe<PublicUserOrContact>;
   /** The JSON content of the comment. */
-  content: Scalars["JSON"];
+  content: Maybe<Scalars["JSON"]>;
   /** The HTML content of the comment. */
-  contentHtml: Scalars["String"];
+  contentHtml: Maybe<Scalars["String"]>;
   /** Time when the comment was created. */
   createdAt: Scalars["DateTime"];
   field: PublicPetitionField;

@@ -4826,12 +4826,7 @@ export class PetitionRepository extends BaseRepository {
       .update({
         anonymized_at: this.now(),
         content: "",
-        content_json: JSON.stringify([
-          {
-            type: "paragraph",
-            children: [{ text: "" }],
-          },
-        ]),
+        content_json: null,
       });
   }
 

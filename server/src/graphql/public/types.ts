@@ -560,16 +560,16 @@ export const PublicPetitionFieldComment = objectType({
         throw new Error(`Both "user_id" and "petition_access_id" are null`);
       },
     });
-    t.json("content", {
+    t.nullable.json("content", {
       description: "The JSON content of the comment.",
-      resolve: async (root, _, ctx) => {
+      resolve: async (root) => {
         return root.content_json;
       },
     });
-    t.string("contentHtml", {
+    t.nullable.string("contentHtml", {
       description: "The HTML content of the comment.",
-      resolve: async (root, _, ctx) => {
-        return toHtml(root.content_json);
+      resolve: async (root) => {
+        return isDefined(root.content_json) ? toHtml(root.content_json) : null;
       },
     });
     t.datetime("createdAt", {

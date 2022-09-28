@@ -2894,12 +2894,12 @@ type PetitionFieldComment {
   """
   The JSON content of the comment.
   """
-  content: JSON!
+  content: JSON
 
   """
   The HTML content of the comment.
   """
-  contentHtml: String!
+  contentHtml: String
 
   """
   Time when the comment was created.
@@ -4037,12 +4037,12 @@ type PublicPetitionFieldComment {
   """
   The JSON content of the comment.
   """
-  content: JSON!
+  content: JSON
 
   """
   The HTML content of the comment.
   """
-  contentHtml: String!
+  contentHtml: String
 
   """
   Time when the comment was created.

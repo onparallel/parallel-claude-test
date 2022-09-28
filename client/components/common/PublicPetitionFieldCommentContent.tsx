@@ -16,7 +16,7 @@ export const PublicPetitionFieldCommentContent = Object.assign(
     ref
   ) {
     const memoizedHtml = useMemo(() => {
-      return parse(sanitizeHtml(comment.contentHtml));
+      return comment.contentHtml ? parse(sanitizeHtml(comment.contentHtml)) : null;
     }, [comment.contentHtml]);
 
     return (

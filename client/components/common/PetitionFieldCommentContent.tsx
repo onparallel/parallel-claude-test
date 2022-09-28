@@ -27,13 +27,15 @@ export const PetitionFieldCommentContent = Object.assign(
       },
     };
     const memoizedHtml = useMemo(() => {
-      return parse(
-        sanitizeHtml(comment.contentHtml, {
-          ADD_TAGS: ["mention"],
-          ADD_ATTR: ["data-mention-id"],
-        }),
-        options
-      );
+      return comment.contentHtml
+        ? parse(
+            sanitizeHtml(comment.contentHtml, {
+              ADD_TAGS: ["mention"],
+              ADD_ATTR: ["data-mention-id"],
+            }),
+            options
+          )
+        : null;
     }, [comment.contentHtml]);
 
     return (

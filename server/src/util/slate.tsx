@@ -1,9 +1,11 @@
 import { createElement, Fragment, ReactNode } from "react";
 import { renderToString } from "react-dom/server";
+import { isDefined } from "remeda";
 import { Contact, Petition, UserData } from "../db/__types";
 
 import { fullName } from "./fullName";
 import { fromGlobalId } from "./globalId";
+import { Maybe } from "./types";
 
 interface SlateContext {
   petition?: Partial<Petition> | null;
@@ -229,7 +231,10 @@ export function fromPlainText(value: string): SlateNode[] {
   return value.split("\n").map((line) => ({ type: "paragraph", children: [{ text: line }] }));
 }
 
-export function getMentions(value: SlateNode[]) {
+export function getMentions(value: Maybe<SlateNode[]>) {
+  if (!isDefined(value)) {
+    return [];
+  }
   const seen: Record<string, boolean> = {};
   const mentions: { id: number; type: "User" | "UserGroup" }[] = [];
   function walk(value: SlateNode[]) {

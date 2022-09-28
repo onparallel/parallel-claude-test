@@ -2377,9 +2377,9 @@ export interface PetitionFieldComment {
   /** The author of the comment. */
   author?: Maybe<UserOrPetitionAccess>;
   /** The JSON content of the comment. */
-  content: Scalars["JSON"];
+  content?: Maybe<Scalars["JSON"]>;
   /** The HTML content of the comment. */
-  contentHtml: Scalars["String"];
+  contentHtml?: Maybe<Scalars["String"]>;
   /** Time when the comment was created. */
   createdAt: Scalars["DateTime"];
   field: PetitionField;
@@ -3021,9 +3021,9 @@ export interface PublicPetitionFieldComment {
   /** The author of the comment. */
   author?: Maybe<PublicUserOrContact>;
   /** The JSON content of the comment. */
-  content: Scalars["JSON"];
+  content?: Maybe<Scalars["JSON"]>;
   /** The HTML content of the comment. */
-  contentHtml: Scalars["String"];
+  contentHtml?: Maybe<Scalars["String"]>;
   /** Time when the comment was created. */
   createdAt: Scalars["DateTime"];
   field: PublicPetitionField;
@@ -4149,12 +4149,12 @@ export type PetitionFieldComment_PetitionFieldCommentFragment = {
   __typename?: "PetitionFieldComment";
   id: string;
   createdAt: string;
-  content: any;
+  content?: any | null;
   isUnread: boolean;
   isInternal: boolean;
   isEdited: boolean;
   isAnonymized: boolean;
-  contentHtml: string;
+  contentHtml?: string | null;
   author?:
     | {
         __typename?: "PetitionAccess";
@@ -4196,7 +4196,7 @@ export type PetitionFieldComment_PetitionFieldCommentFragment = {
 
 export type PetitionFieldCommentContent_PetitionFieldCommentFragment = {
   __typename?: "PetitionFieldComment";
-  contentHtml: string;
+  contentHtml?: string | null;
   mentions: Array<
     | {
         __typename?: "PetitionFieldCommentUserGroupMention";
@@ -4402,11 +4402,11 @@ export type PetitionTagListCellContent_createTagMutation = {
 export type PublicPetitionFieldComment_PublicPetitionFieldCommentFragment = {
   __typename?: "PublicPetitionFieldComment";
   id: string;
-  content: any;
+  content?: any | null;
   createdAt: string;
   isUnread: boolean;
   isAnonymized: boolean;
-  contentHtml: string;
+  contentHtml?: string | null;
   author?:
     | { __typename?: "PublicContact"; id: string; fullName: string; isMe: boolean }
     | { __typename?: "PublicUser"; id: string; fullName: string }
@@ -4415,7 +4415,7 @@ export type PublicPetitionFieldComment_PublicPetitionFieldCommentFragment = {
 
 export type PublicPetitionFieldCommentContent_PetitionFieldCommentFragment = {
   __typename?: "PublicPetitionFieldComment";
-  contentHtml: string;
+  contentHtml?: string | null;
 };
 
 export type ShareButton_PetitionBase_Petition_Fragment = {
@@ -6127,7 +6127,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             __typename?: "PetitionFieldComment";
             isEdited: boolean;
             isAnonymized: boolean;
-            contentHtml: string;
+            contentHtml?: string | null;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -6741,7 +6741,7 @@ export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragmen
     __typename?: "PetitionFieldComment";
     isEdited: boolean;
     isAnonymized: boolean;
-    contentHtml: string;
+    contentHtml?: string | null;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -7509,7 +7509,7 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
     __typename?: "PetitionFieldComment";
     isEdited: boolean;
     isAnonymized: boolean;
-    contentHtml: string;
+    contentHtml?: string | null;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -10105,12 +10105,12 @@ export type PreviewPetitionField_PetitionFieldFragment = {
     __typename?: "PetitionFieldComment";
     id: string;
     createdAt: string;
-    content: any;
+    content?: any | null;
     isUnread: boolean;
     isInternal: boolean;
     isEdited: boolean;
     isAnonymized: boolean;
-    contentHtml: string;
+    contentHtml?: string | null;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -10208,12 +10208,12 @@ export type PreviewPetitionField_PetitionFieldQuery = {
       __typename?: "PetitionFieldComment";
       id: string;
       createdAt: string;
-      content: any;
+      content?: any | null;
       isUnread: boolean;
       isInternal: boolean;
       isEdited: boolean;
       isAnonymized: boolean;
-      contentHtml: string;
+      contentHtml?: string | null;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -10447,12 +10447,12 @@ export type PreviewPetitionFieldCommentsDialog_PetitionFieldFragment = {
     __typename?: "PetitionFieldComment";
     id: string;
     createdAt: string;
-    content: any;
+    content?: any | null;
     isUnread: boolean;
     isInternal: boolean;
     isEdited: boolean;
     isAnonymized: boolean;
-    contentHtml: string;
+    contentHtml?: string | null;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -10511,12 +10511,12 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery = {
       __typename?: "PetitionFieldComment";
       id: string;
       createdAt: string;
-      content: any;
+      content?: any | null;
       isUnread: boolean;
       isInternal: boolean;
       isEdited: boolean;
       isAnonymized: boolean;
-      contentHtml: string;
+      contentHtml?: string | null;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -10812,12 +10812,12 @@ export type PetitionRepliesFieldComments_PetitionFieldFragment = {
     __typename?: "PetitionFieldComment";
     id: string;
     createdAt: string;
-    content: any;
+    content?: any | null;
     isUnread: boolean;
     isInternal: boolean;
     isEdited: boolean;
     isAnonymized: boolean;
-    contentHtml: string;
+    contentHtml?: string | null;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -10882,12 +10882,12 @@ export type PetitionRepliesFieldComments_petitionFieldQueryQuery = {
       __typename?: "PetitionFieldComment";
       id: string;
       createdAt: string;
-      content: any;
+      content?: any | null;
       isUnread: boolean;
       isInternal: boolean;
       isEdited: boolean;
       isAnonymized: boolean;
-      contentHtml: string;
+      contentHtml?: string | null;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -11720,11 +11720,11 @@ export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment
   comments: Array<{
     __typename?: "PublicPetitionFieldComment";
     id: string;
-    content: any;
+    content?: any | null;
     createdAt: string;
     isUnread: boolean;
     isAnonymized: boolean;
-    contentHtml: string;
+    contentHtml?: string | null;
     author?:
       | { __typename?: "PublicContact"; id: string; fullName: string; isMe: boolean }
       | { __typename?: "PublicUser"; id: string; fullName: string }
@@ -11747,11 +11747,11 @@ export type RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldQuery = 
     comments: Array<{
       __typename?: "PublicPetitionFieldComment";
       id: string;
-      content: any;
+      content?: any | null;
       createdAt: string;
       isUnread: boolean;
       isAnonymized: boolean;
-      contentHtml: string;
+      contentHtml?: string | null;
       author?:
         | { __typename?: "PublicContact"; id: string; fullName: string; isMe: boolean }
         | { __typename?: "PublicUser"; id: string; fullName: string }
@@ -11786,11 +11786,11 @@ export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentM
   publicCreatePetitionFieldComment: {
     __typename?: "PublicPetitionFieldComment";
     id: string;
-    content: any;
+    content?: any | null;
     createdAt: string;
     isUnread: boolean;
     isAnonymized: boolean;
-    contentHtml: string;
+    contentHtml?: string | null;
     field: {
       __typename?: "PublicPetitionField";
       id: string;
@@ -11817,11 +11817,11 @@ export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentM
   publicUpdatePetitionFieldComment: {
     __typename?: "PublicPetitionFieldComment";
     id: string;
-    content: any;
+    content?: any | null;
     createdAt: string;
     isUnread: boolean;
     isAnonymized: boolean;
-    contentHtml: string;
+    contentHtml?: string | null;
     author?:
       | { __typename?: "PublicContact"; id: string; fullName: string; isMe: boolean }
       | { __typename?: "PublicUser"; id: string; fullName: string }
@@ -14133,7 +14133,7 @@ export type PetitionActivity_PetitionFragment = {
             __typename?: "PetitionFieldComment";
             isEdited: boolean;
             isAnonymized: boolean;
-            contentHtml: string;
+            contentHtml?: string | null;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -14957,7 +14957,7 @@ export type PetitionActivity_updatePetitionMutation = {
                   __typename?: "PetitionFieldComment";
                   isEdited: boolean;
                   isAnonymized: boolean;
-                  contentHtml: string;
+                  contentHtml?: string | null;
                   author?:
                     | {
                         __typename?: "PetitionAccess";
@@ -15840,7 +15840,7 @@ export type PetitionActivity_petitionQuery = {
                   __typename?: "PetitionFieldComment";
                   isEdited: boolean;
                   isAnonymized: boolean;
-                  contentHtml: string;
+                  contentHtml?: string | null;
                   author?:
                     | {
                         __typename?: "PetitionAccess";
@@ -18076,12 +18076,12 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
       __typename?: "PetitionFieldComment";
       id: string;
       createdAt: string;
-      content: any;
+      content?: any | null;
       isUnread: boolean;
       isInternal: boolean;
       isEdited: boolean;
       isAnonymized: boolean;
-      contentHtml: string;
+      contentHtml?: string | null;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -18234,12 +18234,12 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
       __typename?: "PetitionFieldComment";
       id: string;
       createdAt: string;
-      content: any;
+      content?: any | null;
       isUnread: boolean;
       isInternal: boolean;
       isEdited: boolean;
       isAnonymized: boolean;
-      contentHtml: string;
+      contentHtml?: string | null;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -18445,12 +18445,12 @@ export type PetitionPreview_updatePetitionMutation = {
             __typename?: "PetitionFieldComment";
             id: string;
             createdAt: string;
-            content: any;
+            content?: any | null;
             isUnread: boolean;
             isInternal: boolean;
             isEdited: boolean;
             isAnonymized: boolean;
-            contentHtml: string;
+            contentHtml?: string | null;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -18606,12 +18606,12 @@ export type PetitionPreview_updatePetitionMutation = {
             __typename?: "PetitionFieldComment";
             id: string;
             createdAt: string;
-            content: any;
+            content?: any | null;
             isUnread: boolean;
             isInternal: boolean;
             isEdited: boolean;
             isAnonymized: boolean;
-            contentHtml: string;
+            contentHtml?: string | null;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -18778,12 +18778,12 @@ export type PetitionPreview_completePetitionMutation = {
         __typename?: "PetitionFieldComment";
         id: string;
         createdAt: string;
-        content: any;
+        content?: any | null;
         isUnread: boolean;
         isInternal: boolean;
         isEdited: boolean;
         isAnonymized: boolean;
-        contentHtml: string;
+        contentHtml?: string | null;
         author?:
           | {
               __typename?: "PetitionAccess";
@@ -18974,12 +18974,12 @@ export type PetitionPreview_petitionQuery = {
             __typename?: "PetitionFieldComment";
             id: string;
             createdAt: string;
-            content: any;
+            content?: any | null;
             isUnread: boolean;
             isInternal: boolean;
             isEdited: boolean;
             isAnonymized: boolean;
-            contentHtml: string;
+            contentHtml?: string | null;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -19135,12 +19135,12 @@ export type PetitionPreview_petitionQuery = {
             __typename?: "PetitionFieldComment";
             id: string;
             createdAt: string;
-            content: any;
+            content?: any | null;
             isUnread: boolean;
             isInternal: boolean;
             isEdited: boolean;
             isAnonymized: boolean;
-            contentHtml: string;
+            contentHtml?: string | null;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -19328,11 +19328,11 @@ export type PetitionReplies_PetitionFragment = {
       id: string;
       isUnread: boolean;
       createdAt: string;
-      content: any;
+      content?: any | null;
       isInternal: boolean;
       isEdited: boolean;
       isAnonymized: boolean;
-      contentHtml: string;
+      contentHtml?: string | null;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -19522,11 +19522,11 @@ export type PetitionReplies_PetitionFieldFragment = {
     id: string;
     isUnread: boolean;
     createdAt: string;
-    content: any;
+    content?: any | null;
     isInternal: boolean;
     isEdited: boolean;
     isAnonymized: boolean;
-    contentHtml: string;
+    contentHtml?: string | null;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -19760,11 +19760,11 @@ export type PetitionReplies_closePetitionMutation = {
         id: string;
         isUnread: boolean;
         createdAt: string;
-        content: any;
+        content?: any | null;
         isInternal: boolean;
         isEdited: boolean;
         isAnonymized: boolean;
-        contentHtml: string;
+        contentHtml?: string | null;
         author?:
           | {
               __typename?: "PetitionAccess";
@@ -19995,11 +19995,11 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         id: string;
         isUnread: boolean;
         createdAt: string;
-        content: any;
+        content?: any | null;
         isInternal: boolean;
         isEdited: boolean;
         isAnonymized: boolean;
-        contentHtml: string;
+        contentHtml?: string | null;
         author?:
           | {
               __typename?: "PetitionAccess";
@@ -20332,11 +20332,11 @@ export type PetitionReplies_petitionQuery = {
             id: string;
             isUnread: boolean;
             createdAt: string;
-            content: any;
+            content?: any | null;
             isInternal: boolean;
             isEdited: boolean;
             isAnonymized: boolean;
-            contentHtml: string;
+            contentHtml?: string | null;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -22550,12 +22550,12 @@ export type usePetitionCommentsMutations_PetitionFieldCommentFragment = {
   __typename?: "PetitionFieldComment";
   id: string;
   createdAt: string;
-  content: any;
+  content?: any | null;
   isUnread: boolean;
   isInternal: boolean;
   isEdited: boolean;
   isAnonymized: boolean;
-  contentHtml: string;
+  contentHtml?: string | null;
   author?:
     | {
         __typename?: "PetitionAccess";
@@ -22609,12 +22609,12 @@ export type usePetitionCommentsMutations_createPetitionFieldCommentMutation = {
     __typename?: "PetitionFieldComment";
     id: string;
     createdAt: string;
-    content: any;
+    content?: any | null;
     isUnread: boolean;
     isInternal: boolean;
     isEdited: boolean;
     isAnonymized: boolean;
-    contentHtml: string;
+    contentHtml?: string | null;
     field: {
       __typename?: "PetitionField";
       id: string;
@@ -22676,12 +22676,12 @@ export type usePetitionCommentsMutations_updatePetitionFieldCommentMutation = {
     __typename?: "PetitionFieldComment";
     id: string;
     createdAt: string;
-    content: any;
+    content?: any | null;
     isUnread: boolean;
     isInternal: boolean;
     isEdited: boolean;
     isAnonymized: boolean;
-    contentHtml: string;
+    contentHtml?: string | null;
     field: {
       __typename?: "PetitionField";
       id: string;
