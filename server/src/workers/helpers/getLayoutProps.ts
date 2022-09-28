@@ -27,7 +27,6 @@ export async function getLayoutProps(orgId: number, ctx: WorkerContext) {
     logoUrl: logoUrl ?? `${assetsUrl}/static/emails/logo.png`,
     logoAlt: logoUrl ? org.name : "Parallel",
     emailFrom: org.custom_email_from ?? emailFrom,
-    tone: org.preferred_tone,
     removeParallelBranding: hasRemoveParallelBranding,
     theme: (brandTheme!.data ?? {}) as BrandTheme,
   };

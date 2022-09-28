@@ -321,7 +321,7 @@ async function updateOrganizationBranding(payload: { orgId: number }, ctx: Worke
       const client = ctx.signature.getClient(integration);
 
       for (const [key, brandingId] of Object.entries(definedBrandingIds)) {
-        const [locale, tone]: [string, Tone] = key.split("_");
+        const [locale, tone]: string[] = key.split("_");
         try {
           await client.updateBranding(brandingId, {
             locale: locale.toLowerCase(),
@@ -329,7 +329,7 @@ async function updateOrganizationBranding(payload: { orgId: number }, ctx: Worke
               ...layoutProps,
               theme: {
                 ...layoutProps.theme,
-                preferredTone: tone,
+                preferredTone: tone as Tone,
               },
             },
           });
