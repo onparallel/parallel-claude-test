@@ -64,9 +64,9 @@ export const OrganizationStatusValues = [
   "ROOT",
 ] as OrganizationStatus[];
 
-export type OrganizationThemeType = "PDF_DOCUMENT" | "BRAND";
+export type OrganizationThemeType = "PDF_DOCUMENT";
 
-export const OrganizationThemeTypeValues = ["PDF_DOCUMENT", "BRAND"] as OrganizationThemeType[];
+export const OrganizationThemeTypeValues = ["PDF_DOCUMENT"] as OrganizationThemeType[];
 
 export type OrganizationUsageLimitName = "PETITION_SEND" | "SIGNATURIT_SHARED_APIKEY";
 

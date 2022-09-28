@@ -191,6 +191,7 @@ function renderElement({ attributes, children, element }: RenderElementProps) {
       as="div"
       _before={{ content: "'-'", marginRight: 1 }}
       color={isEmpty ? "gray.400" : undefined}
+      wordBreak="break-word"
       {...attributes}
     >
       {children}

@@ -317,6 +317,7 @@ export const PetitionHeader = Object.assign(
                     <MenuItem
                       onClick={handleSaveAsTemplate}
                       icon={<CopyIcon display="block" boxSize={4} />}
+                      isDisabled={me.role === "COLLABORATOR"}
                     >
                       <FormattedMessage
                         id="component.petition-header.save-as-template-button"
