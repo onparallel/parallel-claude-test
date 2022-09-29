@@ -22,11 +22,7 @@ export interface IAws {
   ): Promise<void>;
   enqueueEvents(
     events: MaybeArray<PetitionEvent | SystemEvent>,
-    t?: Knex.Transaction
-  ): Promise<void>;
-  enqueueDelayedEvents(
-    events: MaybeArray<PetitionEvent | SystemEvent>,
-    delaySeconds: number,
+    delaySeconds?: number,
     t?: Knex.Transaction
   ): Promise<void>;
 }
@@ -106,43 +102,40 @@ export class Aws implements IAws {
     }
   }
 
-  async enqueueEvents(events: MaybeArray<PetitionEvent | SystemEvent>, t?: Knex.Transaction) {
-    const _events = unMaybeArray(events).filter(isDefined);
-    if (_events.length > 0) {
-      await this.enqueueMessages(
-        "event-processor",
-        _events.map((event) => ({
-          id: `event-processor-${event.id}`,
-          groupId: `event-processor-${event.id}`,
-          body: event,
-        })),
-        t
-      );
-    }
-  }
-
-  async enqueueDelayedEvents(
+  async enqueueEvents(
     events: MaybeArray<PetitionEvent | SystemEvent>,
-    delaySeconds: number,
+    delaySeconds?: number,
     t?: Knex.Transaction
   ) {
     const _events = unMaybeArray(events).filter(isDefined);
     if (_events.length > 0) {
-      await this.enqueueMessages(
-        "delay-queue",
-        _events.map((event) => {
-          return {
+      if (delaySeconds && delaySeconds > 0) {
+        await this.enqueueMessages(
+          "delay-queue",
+          _events.map((event) => {
+            return {
+              id: `event-processor-${event.id}`,
+              body: {
+                queue: "event-processor" as const,
+                body: { ...event, process_after: delaySeconds },
+                groupId: `event-processor-${event.id}`,
+              },
+              delaySeconds,
+            };
+          }),
+          t
+        );
+      } else {
+        await this.enqueueMessages(
+          "event-processor",
+          _events.map((event) => ({
             id: `event-processor-${event.id}`,
-            body: {
-              queue: "event-processor" as const,
-              body: { ...event, process_after: delaySeconds },
-              groupId: `event-processor-${event.id}`,
-            },
-            delaySeconds,
-          };
-        }),
-        t
-      );
+            groupId: `event-processor-${event.id}`,
+            body: event,
+          })),
+          t
+        );
+      }
     }
   }
 }

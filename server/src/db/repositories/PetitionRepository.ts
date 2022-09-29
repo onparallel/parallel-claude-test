@@ -2529,12 +2529,8 @@ export class PetitionRepository extends BaseRepository {
     }
 
     const petitionEvents = await this.insert("petition_event", eventsArray, t);
+    await this.aws.enqueueEvents(petitionEvents, notifyAfter, t);
 
-    if (isDefined(notifyAfter)) {
-      await this.aws.enqueueDelayedEvents(petitionEvents, notifyAfter, t);
-    } else {
-      await this.aws.enqueueEvents(petitionEvents, t);
-    }
     return petitionEvents;
   }
 
@@ -2590,9 +2586,8 @@ export class PetitionRepository extends BaseRepository {
 
   async updateEvent(eventId: number, data: Partial<PetitionEvent>, notifyAfter?: number) {
     const [event] = await this.from("petition_event").where("id", eventId).update(data, "*");
-    if (isDefined(notifyAfter)) {
-      await this.aws.enqueueDelayedEvents(event, notifyAfter);
-    }
+    await this.aws.enqueueEvents(event, notifyAfter);
+
     return event;
   }
 

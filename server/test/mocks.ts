@@ -111,7 +111,6 @@ export class MockEmailsService implements IEmailsService {
 export class MockAwsService implements IAws {
   constructor() {}
   async enqueueMessages() {}
-  async enqueueDelayedEvents() {}
   async enqueueEvents() {}
 }
 
