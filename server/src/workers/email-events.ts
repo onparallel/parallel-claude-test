@@ -1,13 +1,13 @@
 import { createQueueWorker } from "./helpers/createQueueWorker";
 
-type EmailEventsWorkerPayload = {
+export type EmailEventsWorkerPayload = {
   eventType: string;
   mail: any;
 };
 
 createQueueWorker(
   "email-events",
-  async (payload: EmailEventsWorkerPayload, context) => {
+  async (payload, context) => {
     if (!payload?.mail?.messageId) {
       return;
     }

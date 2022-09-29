@@ -1,6 +1,6 @@
-import { WorkerContext } from "../../context";
-import { PetitionEventTypeValues } from "../../db/__types";
-import { Event, EventListener, EventType } from "../event-processor";
+import { isDefined } from "remeda";
+import { PetitionEventTypeValues, SystemEventTypeValues } from "../../db/__types";
+import { EventListener, EventType } from "../event-processor";
 
 export class EventProcessor {
   private listeners = new Map<EventType, EventListener[]>();
@@ -16,15 +16,27 @@ export class EventProcessor {
     return this;
   }
 
-  listen() {
-    return async (event: Event, ctx: WorkerContext) => {
-      if (this.listeners.has(event.type)) {
-        for (const listener of this.listeners.get(event.type)!) {
-          try {
-            await listener(event, ctx);
-          } catch (error: any) {
-            // log error and continue to other listeners
-            ctx.logger.error(error.message, { stack: error.stack });
+  listen(): EventListener {
+    return async (payload, ctx) => {
+      if (this.listeners.has(payload.type)) {
+        // this is for retrocompatibility on release with older payload, where tableName is not defined.
+        // in the next iteration, tableName will be obtained from payload
+        const tableName = payload.type in SystemEventTypeValues ? "system_event" : "petition_event";
+
+        const event = await ctx.petitions.pickEventToProcess(
+          payload.id,
+          tableName,
+          payload.process_after
+        );
+
+        if (isDefined(event)) {
+          for (const listener of this.listeners.get(event.type)!) {
+            try {
+              await listener(event, ctx);
+            } catch (error: any) {
+              // log error and continue to other listeners
+              ctx.logger.error(error.message, { stack: error.stack });
+            }
           }
         }
       }

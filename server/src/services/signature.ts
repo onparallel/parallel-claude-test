@@ -194,6 +194,7 @@ export class SignatureService implements ISignatureService {
             petition_signature_request_id: signatureRequest.id,
           },
         },
+        undefined,
         t
       ),
     ]);
@@ -244,7 +245,7 @@ export class SignatureService implements ISignatureService {
           id: `signature-${toGlobalId("Petition", s.petition_id)}`,
           groupId: `signature-${toGlobalId("Petition", s.petition_id)}`,
           body: {
-            type: "cancel-signature-process",
+            type: "cancel-signature-process" as const,
             payload: { petitionSignatureRequestId: s.id },
           },
         })),
@@ -262,7 +263,7 @@ export class SignatureService implements ISignatureService {
           id: `signature-${toGlobalId("Petition", s.petition_id)}`,
           groupId: `signature-${toGlobalId("Petition", s.petition_id)}`,
           body: {
-            type: "send-signature-reminder",
+            type: "send-signature-reminder" as const,
             payload: { petitionSignatureRequestId: s.id },
           },
         }))

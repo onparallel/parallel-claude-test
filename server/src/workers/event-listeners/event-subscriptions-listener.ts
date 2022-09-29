@@ -1,13 +1,9 @@
 import fetch from "node-fetch";
-import { WorkerContext } from "../../context";
 import { PetitionEvent } from "../../db/events";
 import { mapEvent } from "../../util/eventMapper";
 import { EventListener } from "../event-processor";
 
-export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (
-  event: PetitionEvent,
-  ctx: WorkerContext
-) => {
+export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (event, ctx) => {
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) {
     return;
@@ -16,8 +12,15 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (
   const userIds = (await ctx.petitions.loadEffectivePermissions(petition.id)).map(
     (p) => p.user_id!
   );
-
-  await ctx.petitions.attachPetitionEventsToUsers(event.id, userIds);
+  try {
+    await ctx.petitions.attachPetitionEventsToUsers(event.id, userIds);
+  } catch (error: any) {
+    if (error.constraint === "user_petition_event_log__user_id__petition_event_id") {
+      // this event is already attached, continue normally
+    } else {
+      throw error;
+    }
+  }
 
   const userSubscriptions = (await ctx.subscriptions.loadSubscriptionsByUserId(userIds))
     .flat()

@@ -49,14 +49,14 @@ export type EmailPayload = {
   [K in EmailType]: Parameters<typeof builders[K]>[0];
 };
 
-type EmailSenderWorkerPayload = {
+export type EmailSenderWorkerPayload = {
   [K in EmailType]: {
     type: K;
     payload: EmailPayload[K];
   };
 }[EmailType];
 
-createQueueWorker("email-sender", async (payload: EmailSenderWorkerPayload, context) => {
+createQueueWorker("email-sender", async (payload, context) => {
   const builder = builders[payload.type];
   const emails = await builder(payload.payload as any, context);
   for (const email of unMaybeArray(emails)) {

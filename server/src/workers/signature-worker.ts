@@ -301,7 +301,10 @@ async function storeAuditTrail(
   });
 }
 
-async function updateOrganizationBranding(payload: { orgId: number }, ctx: WorkerContext) {
+async function updateOrganizationBranding(
+  payload: { orgId: number; _: string },
+  ctx: WorkerContext
+) {
   const [organization, signatureIntegrations, layoutProps] = await Promise.all([
     ctx.organizations.loadOrg(payload.orgId),
     ctx.integrations.loadIntegrationsByOrgId(payload.orgId, "SIGNATURE"),
@@ -365,14 +368,14 @@ export type SignaturePayload = {
   [K in HandlerType]: Parameters<typeof handlers[K]>[0];
 };
 
-type SignatureWorkerPayload = {
+export type SignatureWorkerPayload = {
   [K in HandlerType]: {
     type: K;
     payload: SignaturePayload[K];
   };
 }[HandlerType];
 
-createQueueWorker("signature-worker", async (data: SignatureWorkerPayload, ctx) => {
+createQueueWorker("signature-worker", async (data, ctx) => {
   await handlers[data.type](data.payload as any, ctx);
 });
 

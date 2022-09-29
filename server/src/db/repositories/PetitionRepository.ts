@@ -149,6 +149,7 @@ export type PetitionSignatureRequestCancelData<CancelReason extends PetitionSign
 
 @injectable()
 export class PetitionRepository extends BaseRepository {
+  private readonly REPLY_EVENTS_DELAY_SECONDS = 5;
   constructor(
     @inject(KNEX) knex: Knex,
     @inject(AWS_SERVICE) private aws: Aws,
@@ -881,6 +882,7 @@ export class PetitionRepository extends BaseRepository {
               petition_access_id: access.id,
             },
           })),
+          undefined,
           t
         )
       : await this.createEvent(
@@ -892,6 +894,7 @@ export class PetitionRepository extends BaseRepository {
               user_id: user.id,
             },
           })),
+          undefined,
           t
         );
 
@@ -994,6 +997,7 @@ export class PetitionRepository extends BaseRepository {
             petition_message_id: message.id,
           },
         })),
+        undefined,
         t
       );
     }
@@ -1047,6 +1051,7 @@ export class PetitionRepository extends BaseRepository {
           reason: (isDefined(userId) ? "CANCELLED_BY_USER" : "EMAIL_BOUNCED") as any,
         },
       })),
+      undefined,
       t
     );
 
@@ -1089,6 +1094,7 @@ export class PetitionRepository extends BaseRepository {
           },
         })),
       ],
+      undefined,
       t
     );
 
@@ -1291,6 +1297,7 @@ export class PetitionRepository extends BaseRepository {
               reason: "DEACTIVATED_BY_USER",
             },
           })),
+          undefined,
           t
         );
       }
@@ -1305,6 +1312,7 @@ export class PetitionRepository extends BaseRepository {
               reason: "CANCELLED_BY_USER",
             },
           })),
+          undefined,
           t
         );
       }
@@ -1753,17 +1761,20 @@ export class PetitionRepository extends BaseRepository {
     // clear cache to make sure petition status is updated in next graphql calls
     this.loadPetition.dataloader.clear(field.petition_id);
 
-    await this.createEvent({
-      type: "REPLY_CREATED",
-      petition_id: field.petition_id,
-      data: {
-        ...(createdBy === "User"
-          ? { user_id: reply.user_id! }
-          : { petition_access_id: reply.petition_access_id! }),
-        petition_field_id: reply.petition_field_id,
-        petition_field_reply_id: reply.id,
+    await this.createEvent(
+      {
+        type: "REPLY_CREATED",
+        petition_id: field.petition_id,
+        data: {
+          ...(createdBy === "User"
+            ? { user_id: reply.user_id! }
+            : { petition_access_id: reply.petition_access_id! }),
+          petition_field_id: reply.petition_field_id,
+          petition_field_reply_id: reply.id,
+        },
       },
-    });
+      this.REPLY_EVENTS_DELAY_SECONDS
+    );
     return reply;
   }
 
@@ -1868,15 +1879,18 @@ export class PetitionRepository extends BaseRepository {
           deleted_by: deletedBy,
         })
         .where("id", replyId),
-      this.createEvent({
-        type: "REPLY_DELETED",
-        petition_id: field!.petition_id,
-        data: {
-          ...(isContact ? { petition_access_id: deleter.id } : { user_id: deleter.id }),
-          petition_field_id: reply.petition_field_id,
-          petition_field_reply_id: reply.id,
+      this.createEvent(
+        {
+          type: "REPLY_DELETED",
+          petition_id: field!.petition_id,
+          data: {
+            ...(isContact ? { petition_access_id: deleter.id } : { user_id: deleter.id }),
+            petition_field_id: reply.petition_field_id,
+            petition_field_reply_id: reply.id,
+          },
         },
-      }),
+        this.REPLY_EVENTS_DELAY_SECONDS // delay webhook notification to allow other REPLY_CREATED and REPLY_UPDATED events to arrive before
+      ),
     ]);
 
     return field;
@@ -2113,6 +2127,7 @@ export class PetitionRepository extends BaseRepository {
           data: { user_id: owner.id },
           petition_id: cloned.id,
         },
+        undefined,
         t
       );
 
@@ -2403,6 +2418,11 @@ export class PetitionRepository extends BaseRepository {
       );
   }
 
+  async loadPetitionEvent(eventId: number) {
+    const [event] = await this.from("petition_event").where("id", eventId).select("*");
+    return event;
+  }
+
   async loadEventsForPetition(petitionId: number, opts: PageOpts) {
     return await this.loadPageAndCount(
       this.from("petition_event")
@@ -2498,7 +2518,11 @@ export class PetitionRepository extends BaseRepository {
     return true;
   }
 
-  async createEvent(events: MaybeArray<CreatePetitionEvent>, t?: Knex.Transaction) {
+  async createEvent(
+    events: MaybeArray<CreatePetitionEvent>,
+    notifyAfter?: number,
+    t?: Knex.Transaction
+  ) {
     const eventsArray = unMaybeArray(events);
     if (eventsArray.length === 0) {
       return [];
@@ -2506,11 +2530,15 @@ export class PetitionRepository extends BaseRepository {
 
     const petitionEvents = await this.insert("petition_event", eventsArray, t);
 
-    await this.aws.enqueueEvents(petitionEvents, t);
+    if (isDefined(notifyAfter)) {
+      await this.aws.enqueueDelayedEvents(petitionEvents, notifyAfter, t);
+    } else {
+      await this.aws.enqueueEvents(petitionEvents, t);
+    }
     return petitionEvents;
   }
 
-  async getLastEventForPetitionId(petitionId: number) {
+  async getLatestEventForPetitionId(petitionId: number) {
     const [event] = await this.raw<PetitionEvent | null>(
       /* sql */ `
       select * from petition_event where id in (
@@ -2526,33 +2554,45 @@ export class PetitionRepository extends BaseRepository {
     reply: PetitionFieldReply,
     updater: Pick<ReplyUpdatedEvent["data"], "petition_access_id" | "user_id">
   ) {
-    const event = await this.getLastEventForPetitionId(petitionId);
+    const latestEvent = await this.getLatestEventForPetitionId(petitionId);
 
+    // accumulate REPLY_CREATED and REPLY_UPDATED events coming in a 60 seconds time span
+    // to avoid spamming webhooks, only notify the last one
     if (
-      event &&
-      (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
-      event.data.petition_field_reply_id === reply.id &&
-      ((isDefined(updater.user_id) && event.data.user_id === updater.user_id) ||
+      latestEvent &&
+      (latestEvent.type === "REPLY_UPDATED" || latestEvent.type === "REPLY_CREATED") &&
+      latestEvent.data.petition_field_reply_id === reply.id &&
+      ((isDefined(updater.user_id) && latestEvent.data.user_id === updater.user_id) ||
         (isDefined(updater.petition_access_id) &&
-          event.data.petition_access_id === updater.petition_access_id)) &&
-      differenceInSeconds(new Date(), event.created_at) < 60
+          latestEvent.data.petition_access_id === updater.petition_access_id)) &&
+      differenceInSeconds(new Date(), latestEvent.created_at) < this.REPLY_EVENTS_DELAY_SECONDS
     ) {
-      await this.updateEvent(event.id, { created_at: new Date() });
+      await this.updateEvent(
+        latestEvent.id,
+        { created_at: new Date() },
+        this.REPLY_EVENTS_DELAY_SECONDS
+      );
     } else {
-      await this.createEvent({
-        type: "REPLY_UPDATED",
-        petition_id: petitionId,
-        data: {
-          petition_field_id: reply.petition_field_id,
-          petition_field_reply_id: reply.id,
-          ...updater,
+      await this.createEvent(
+        {
+          type: "REPLY_UPDATED",
+          petition_id: petitionId,
+          data: {
+            petition_field_id: reply.petition_field_id,
+            petition_field_reply_id: reply.id,
+            ...updater,
+          },
         },
-      });
+        this.REPLY_EVENTS_DELAY_SECONDS
+      );
     }
   }
 
-  async updateEvent(eventId: number, data: Partial<PetitionEvent>) {
+  async updateEvent(eventId: number, data: Partial<PetitionEvent>, notifyAfter?: number) {
     const [event] = await this.from("petition_event").where("id", eventId).update(data, "*");
+    if (isDefined(notifyAfter)) {
+      await this.aws.enqueueDelayedEvents(event, notifyAfter);
+    }
     return event;
   }
 
@@ -3054,6 +3094,7 @@ export class PetitionRepository extends BaseRepository {
             is_internal: comment.is_internal,
           },
         },
+        undefined,
         t
       );
 
@@ -3091,6 +3132,7 @@ export class PetitionRepository extends BaseRepository {
             petition_field_comment_id: comment.id,
           },
         },
+        undefined,
         t
       );
 
@@ -3564,6 +3606,7 @@ export class PetitionRepository extends BaseRepository {
               },
             })),
           ],
+          undefined,
           t
         );
       }
@@ -3647,6 +3690,7 @@ export class PetitionRepository extends BaseRepository {
             },
           })),
         ],
+        undefined,
         t
       );
 
@@ -3725,6 +3769,7 @@ export class PetitionRepository extends BaseRepository {
             },
           })),
         ],
+        undefined,
         t
       );
       return removedPermissions;
@@ -3771,6 +3816,7 @@ export class PetitionRepository extends BaseRepository {
             },
           })),
         ],
+        undefined,
         t
       );
 
@@ -3883,6 +3929,7 @@ export class PetitionRepository extends BaseRepository {
             owner_id: toUserId,
           },
         })),
+        undefined,
         t
       );
 
@@ -4291,6 +4338,7 @@ export class PetitionRepository extends BaseRepository {
           cancel_data: cancelData,
         },
       })),
+      undefined,
       t
     );
 
@@ -4772,6 +4820,7 @@ export class PetitionRepository extends BaseRepository {
           petition_id: petitionId,
           data: {},
         },
+        undefined,
         t
       );
     });
@@ -5206,5 +5255,18 @@ export class PetitionRepository extends BaseRepository {
         );
       }
     }
+  }
+
+  async pickEventToProcess<TName extends "petition_event" | "system_event">(
+    id: number,
+    tableName: TName,
+    processAfter?: number
+  ): Promise<TableTypes[TName] | undefined> {
+    const [event] = await this.from(tableName)
+      .where("id", id)
+      .andWhereRaw(/* sql */ `created_at + make_interval(secs => ?) <= NOW()`, [processAfter ?? 0])
+      .returning("*");
+
+    return event as unknown as TableTypes[TName] | undefined;
   }
 }

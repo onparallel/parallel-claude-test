@@ -425,6 +425,7 @@ export const deletePetitions = mutationField("deletePetitions", {
             status: petition.status!,
           },
         })),
+        undefined,
         t
       );
 
@@ -621,6 +622,7 @@ export const closePetition = mutationField("closePetition", {
             user_id: ctx.user!.id,
           },
         },
+        undefined,
         t
       );
 
@@ -1328,6 +1330,7 @@ export const createPetitionAccess = mutationField("createPetitionAccess", {
             user_id: ctx.user!.id,
           },
         },
+        undefined,
         t
       );
 
@@ -1759,6 +1762,7 @@ export const reopenPetition = mutationField("reopenPetition", {
             petition_id: args.petitionId,
             data: { user_id: ctx.user!.id },
           },
+          undefined,
           t
         ),
       ]);
@@ -2012,6 +2016,7 @@ export const completePetition = mutationField("completePetition", {
             petition_id: args.petitionId,
             data: { user_id: ctx.user!.id },
           },
+          undefined,
           t
         );
         return petition;
@@ -2046,6 +2051,7 @@ export const completePetition = mutationField("completePetition", {
               petition_id: petition.id,
               data: { user_id: ctx.user!.id },
             },
+            undefined,
             t
           );
           // insert a CANCELLED signature request so user can see it on the signatures card
@@ -2081,6 +2087,7 @@ export const completePetition = mutationField("completePetition", {
               },
               petition_id: args.petitionId,
             },
+            undefined,
             t
           );
           return petition;

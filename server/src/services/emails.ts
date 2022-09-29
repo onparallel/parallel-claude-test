@@ -99,7 +99,7 @@ export class EmailsService implements IEmailsService {
       "email-sender",
       payloads.map((p) => ({
         id: p.id,
-        body: { type, payload: p },
+        body: { type, payload: p } as any,
         groupId: p.id,
       })),
       t

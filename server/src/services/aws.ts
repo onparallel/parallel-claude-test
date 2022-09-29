@@ -9,15 +9,26 @@ import { PetitionEvent, SystemEvent } from "../db/events";
 import { unMaybeArray } from "../util/arrays";
 import { awsLogger } from "../util/awsLogger";
 import { MaybeArray } from "../util/types";
+import { QueueWorkerPayload } from "../workers/helpers/createQueueWorker";
 import { ILogger, LOGGER } from "./logger";
 
 export interface IAws {
-  enqueueMessages(
-    queue: keyof Config["queueWorkers"],
-    messages: { id: string; body: any; groupId: string }[] | { body: any; groupId: string },
+  enqueueMessages<Q extends keyof Config["queueWorkers"]>(
+    queue: Q,
+    messages:
+      | { id: string; body: QueueWorkerPayload<Q>; groupId: string; delaySeconds?: number }[]
+      | { body: QueueWorkerPayload<Q>; groupId: string; delaySeconds?: number },
     t?: Knex.Transaction
-  ): void;
-  enqueueEvents(events: MaybeArray<PetitionEvent | SystemEvent>, t?: Knex.Transaction): void;
+  ): Promise<void>;
+  enqueueEvents(
+    events: MaybeArray<PetitionEvent | SystemEvent>,
+    t?: Knex.Transaction
+  ): Promise<void>;
+  enqueueDelayedEvents(
+    events: MaybeArray<PetitionEvent | SystemEvent>,
+    delaySeconds: number,
+    t?: Knex.Transaction
+  ): Promise<void>;
 }
 
 export const AWS_SERVICE = Symbol.for("AWS_SERVICE");
@@ -38,9 +49,11 @@ export class Aws implements IAws {
     return createHash("md5").update(value).digest("hex");
   }
 
-  async enqueueMessages(
-    queue: keyof Config["queueWorkers"],
-    messages: { id: string; body: any; groupId: string }[] | { body: any; groupId: string },
+  async enqueueMessages<Q extends keyof Config["queueWorkers"]>(
+    queue: Q,
+    messages:
+      | { id: string; body: QueueWorkerPayload<Q>; groupId?: string; delaySeconds?: number }[]
+      | { body: QueueWorkerPayload<Q>; groupId?: string; delaySeconds?: number },
     t?: Knex.Transaction
   ) {
     if (isDefined(t)) {
@@ -60,9 +73,11 @@ export class Aws implements IAws {
     }
   }
 
-  private async sendSQSMessage(
-    queue: keyof Config["queueWorkers"],
-    messages: { id: string; body: any; groupId: string }[] | { body: any; groupId: string }
+  private async sendSQSMessage<Q extends keyof Config["queueWorkers"]>(
+    queue: Q,
+    messages:
+      | { id: string; body: QueueWorkerPayload<Q>; groupId?: string; delaySeconds?: number }[]
+      | { body: QueueWorkerPayload<Q>; groupId?: string; delaySeconds?: number }
   ) {
     const queueUrl = this.config.queueWorkers[queue].queueUrl;
     if (Array.isArray(messages)) {
@@ -70,10 +85,11 @@ export class Aws implements IAws {
         await this.sqs.send(
           new SendMessageBatchCommand({
             QueueUrl: queueUrl,
-            Entries: batch.map(({ id, body, groupId }) => ({
+            Entries: batch.map(({ id, body, groupId, delaySeconds }) => ({
               Id: this.hash(id),
               MessageBody: JSON.stringify(body),
-              MessageGroupId: this.hash(groupId),
+              MessageGroupId: groupId ? this.hash(groupId) : undefined,
+              DelaySeconds: delaySeconds,
             })),
           })
         );
@@ -84,6 +100,7 @@ export class Aws implements IAws {
           QueueUrl: queueUrl,
           MessageBody: JSON.stringify(messages.body),
           MessageGroupId: messages.groupId,
+          DelaySeconds: messages.delaySeconds,
         })
       );
     }
@@ -99,6 +116,31 @@ export class Aws implements IAws {
           groupId: `event-processor-${event.id}`,
           body: event,
         })),
+        t
+      );
+    }
+  }
+
+  async enqueueDelayedEvents(
+    events: MaybeArray<PetitionEvent | SystemEvent>,
+    delaySeconds: number,
+    t?: Knex.Transaction
+  ) {
+    const _events = unMaybeArray(events).filter(isDefined);
+    if (_events.length > 0) {
+      await this.enqueueMessages(
+        "delay-queue",
+        _events.map((event) => {
+          return {
+            id: `event-processor-${event.id}`,
+            body: {
+              queue: "event-processor" as const,
+              body: { ...event, process_after: delaySeconds },
+              groupId: `event-processor-${event.id}`,
+            },
+            delaySeconds,
+          };
+        }),
         t
       );
     }

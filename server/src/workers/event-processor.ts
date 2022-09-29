@@ -7,11 +7,11 @@ import { userNotificationsListener } from "./event-listeners/user-notifications-
 import { EventProcessor } from "./helpers/EventProcessor";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 
-export type Event = PetitionEvent | SystemEvent;
+export type EventProcessorPayload = (PetitionEvent | SystemEvent) & { process_after?: number };
 export type EventType = PetitionEventType | SystemEventType;
 
-export type EventListener<TEvent extends Event = Event> = (
-  event: TEvent,
+export type EventListener<TPayload extends EventProcessorPayload = EventProcessorPayload> = (
+  payload: TPayload,
   ctx: WorkerContext
 ) => Promise<void>;
 

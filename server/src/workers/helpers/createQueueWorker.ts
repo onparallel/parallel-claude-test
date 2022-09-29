@@ -9,12 +9,30 @@ import { ILogger, LOGGER } from "../../services/logger";
 import { awsLogger } from "../../util/awsLogger";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
+import { EmailEventsWorkerPayload } from "../email-events";
+import { EmailSenderWorkerPayload } from "../email-sender";
+import { EventProcessorPayload } from "../event-processor";
+import { SignatureWorkerPayload } from "../signature-worker";
+import { TaskWorkerPayload } from "../task-worker";
+import { DelayQueuePayload } from "../delay-queue";
+
+export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
+  "email-events": EmailEventsWorkerPayload;
+  "email-sender": EmailSenderWorkerPayload;
+  "event-processor": EventProcessorPayload;
+  "signature-worker": SignatureWorkerPayload;
+  "task-worker": TaskWorkerPayload;
+  "delay-queue": DelayQueuePayload;
+}[Q];
 
 export type QueueWorkerOptions<T> = {
   parser?: (message: string) => T;
 };
 
-export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
+export function createQueueWorker<
+  P extends QueueWorkerPayload<Q>,
+  Q extends keyof Config["queueWorkers"]
+>(
   name: Q,
   handler: (payload: P, context: WorkerContext, config: Config["queueWorkers"][Q]) => Promise<void>,
   options?: QueueWorkerOptions<P>

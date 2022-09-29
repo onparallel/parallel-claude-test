@@ -18,11 +18,15 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   TEMPLATE_STATS_REPORT: TemplateStatsReportRunner,
 };
 
-createQueueWorker("task-worker", async ({ taskId }: { taskId: number }, ctx) => {
+export type TaskWorkerPayload = {
+  taskId: number;
+};
+
+createQueueWorker("task-worker", async ({ taskId }, ctx) => {
   const task = await ctx.tasks.pickupTask(taskId, `TaskWorker:${taskId}`);
   if (!isDefined(task)) {
     return;
   }
-  const Runner = RUNNERS[task.name as TaskName];
+  const Runner = RUNNERS[task.name];
   await new Runner(ctx, task).runTask();
 });

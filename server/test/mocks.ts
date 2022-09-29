@@ -110,7 +110,8 @@ export class MockEmailsService implements IEmailsService {
 @injectable()
 export class MockAwsService implements IAws {
   constructor() {}
-  enqueueMessages() {}
+  async enqueueMessages() {}
+  async enqueueDelayedEvents() {}
   async enqueueEvents() {}
 }
 
