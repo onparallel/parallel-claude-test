@@ -2,6 +2,7 @@ import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import Invitation from "../../emails/emails/Invitation";
 import { buildFrom } from "../../emails/utils/buildFrom";
+import { defaultBrandTheme } from "../../util/BrandTheme";
 
 export async function invitation(
   payload: {
@@ -30,6 +31,7 @@ export async function invitation(
       assetsUrl: context.config.misc.assetsUrl,
       logoUrl: `${context.config.misc.assetsUrl}/static/emails/logo.png`,
       parallelUrl: context.config.misc.parallelUrl,
+      theme: defaultBrandTheme,
     },
     { locale: payload.locale }
   );
