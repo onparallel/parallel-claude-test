@@ -5,7 +5,7 @@ import { Knex } from "knex";
 import { chunk, isDefined } from "remeda";
 import { Memoize } from "typescript-memoize";
 import { Config, CONFIG } from "../config";
-import { PetitionEvent, SystemEvent } from "../db/events";
+import { TableTypes } from "../db/helpers/BaseRepository";
 import { unMaybeArray } from "../util/arrays";
 import { awsLogger } from "../util/awsLogger";
 import { MaybeArray } from "../util/types";
@@ -20,8 +20,9 @@ export interface IAws {
       | { body: QueueWorkerPayload<Q>; groupId: string; delaySeconds?: number },
     t?: Knex.Transaction
   ): Promise<void>;
-  enqueueEvents(
-    events: MaybeArray<PetitionEvent | SystemEvent>,
+  enqueueEvents<TName extends "petition_event" | "system_event">(
+    events: MaybeArray<TableTypes[TName]>,
+    tableName: TName,
     delaySeconds?: number,
     t?: Knex.Transaction
   ): Promise<void>;
@@ -102,8 +103,9 @@ export class Aws implements IAws {
     }
   }
 
-  async enqueueEvents(
-    events: MaybeArray<PetitionEvent | SystemEvent>,
+  async enqueueEvents<TName extends "petition_event" | "system_event">(
+    events: MaybeArray<TableTypes[TName]>,
+    tableName: TName,
     delaySeconds?: number,
     t?: Knex.Transaction
   ) {
@@ -117,7 +119,12 @@ export class Aws implements IAws {
               id: `event-processor-${event.id}`,
               body: {
                 queue: "event-processor" as const,
-                body: { ...event, process_after: delaySeconds },
+                body: {
+                  id: event.id,
+                  type: event.type,
+                  created_at: event.created_at,
+                  table_name: tableName,
+                },
                 groupId: `event-processor-${event.id}`,
               },
               delaySeconds,
@@ -131,7 +138,12 @@ export class Aws implements IAws {
           _events.map((event) => ({
             id: `event-processor-${event.id}`,
             groupId: `event-processor-${event.id}`,
-            body: event,
+            body: {
+              id: event.id,
+              type: event.type,
+              created_at: event.created_at,
+              table_name: tableName,
+            },
           })),
           t
         );

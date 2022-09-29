@@ -1,6 +1,7 @@
 import { isDefined } from "remeda";
+import { WorkerContext } from "../../context";
 import { PetitionEventTypeValues, SystemEventTypeValues } from "../../db/__types";
-import { EventListener, EventType } from "../event-processor";
+import { EventListener, EventProcessorPayload, EventType } from "../event-processor";
 
 export class EventProcessor {
   private listeners = new Map<EventType, EventListener[]>();
@@ -16,7 +17,7 @@ export class EventProcessor {
     return this;
   }
 
-  listen(): EventListener {
+  listen(): (payload: EventProcessorPayload, ctx: WorkerContext) => Promise<void> {
     return async (payload, ctx) => {
       if (this.listeners.has(payload.type)) {
         // this is for retrocompatibility on release with older payload, where tableName is not defined.
@@ -26,7 +27,7 @@ export class EventProcessor {
         const event = await ctx.petitions.pickEventToProcess(
           payload.id,
           tableName,
-          payload.process_after
+          payload.created_at
         );
 
         if (isDefined(event)) {

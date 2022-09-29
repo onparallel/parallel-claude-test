@@ -422,7 +422,7 @@ export type SystemEventPayload<TType extends SystemEventType> = {
 
 type GenericSystemEvent<TType extends SystemEventType, IsCreate extends boolean = false> = Omit<
   DbSystemEvent,
-  "type" | "data" | If<IsCreate, "id" | "created_at">
+  "type" | "data" | If<IsCreate, "id" | "created_at" | "processed_at">
 > & {
   type: TType;
   data: SystemEventPayload<TType>;

@@ -7,13 +7,18 @@ import { userNotificationsListener } from "./event-listeners/user-notifications-
 import { EventProcessor } from "./helpers/EventProcessor";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 
-export type EventProcessorPayload = (PetitionEvent | SystemEvent) & { process_after?: number };
 export type EventType = PetitionEventType | SystemEventType;
 
-export type EventListener<TPayload extends EventProcessorPayload = EventProcessorPayload> = (
-  payload: TPayload,
-  ctx: WorkerContext
-) => Promise<void>;
+export type EventProcessorPayload = {
+  id: number;
+  type: EventType;
+  created_at: Date; // this helps with content-based deduplication and is used to check if the event should be processed or not
+  table_name: "petition_event" | "system_event";
+};
+
+export type EventListener<
+  TPayload extends PetitionEvent | SystemEvent = PetitionEvent | SystemEvent
+> = (payload: TPayload, ctx: WorkerContext) => Promise<void>;
 
 createQueueWorker(
   "event-processor",

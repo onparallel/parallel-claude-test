@@ -2529,7 +2529,7 @@ export class PetitionRepository extends BaseRepository {
     }
 
     const petitionEvents = await this.insert("petition_event", eventsArray, t);
-    await this.aws.enqueueEvents(petitionEvents, notifyAfter, t);
+    await this.aws.enqueueEvents(petitionEvents, "petition_event", notifyAfter, t);
 
     return petitionEvents;
   }
@@ -2586,7 +2586,7 @@ export class PetitionRepository extends BaseRepository {
 
   async updateEvent(eventId: number, data: Partial<PetitionEvent>, notifyAfter?: number) {
     const [event] = await this.from("petition_event").where("id", eventId).update(data, "*");
-    await this.aws.enqueueEvents(event, notifyAfter);
+    await this.aws.enqueueEvents(event, "petition_event", notifyAfter);
 
     return event;
   }
@@ -5255,13 +5255,13 @@ export class PetitionRepository extends BaseRepository {
   async pickEventToProcess<TName extends "petition_event" | "system_event">(
     id: number,
     tableName: TName,
-    processAfter?: number
+    createdAt: Date
   ): Promise<TableTypes[TName] | undefined> {
     const [event] = await this.from(tableName)
       .update("processed_at", this.now())
       .whereRaw(
-        /* sql */ `id = ? and processed_at is null and created_at + make_interval(secs => ?) <= NOW()`,
-        [id, processAfter ?? 0]
+        /* sql */ `id = ? and processed_at is null and date_trunc('milliseconds', created_at) = ?::timestamptz`,
+        [id, createdAt]
       )
       .returning("*");
 
