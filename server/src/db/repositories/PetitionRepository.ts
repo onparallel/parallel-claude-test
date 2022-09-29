@@ -149,7 +149,7 @@ export type PetitionSignatureRequestCancelData<CancelReason extends PetitionSign
 
 @injectable()
 export class PetitionRepository extends BaseRepository {
-  private readonly REPLY_EVENTS_DELAY_SECONDS = 5;
+  private readonly REPLY_EVENTS_DELAY_SECONDS = 60;
   constructor(
     @inject(KNEX) knex: Knex,
     @inject(AWS_SERVICE) private aws: Aws,
@@ -5263,8 +5263,11 @@ export class PetitionRepository extends BaseRepository {
     processAfter?: number
   ): Promise<TableTypes[TName] | undefined> {
     const [event] = await this.from(tableName)
-      .where("id", id)
-      .andWhereRaw(/* sql */ `created_at + make_interval(secs => ?) <= NOW()`, [processAfter ?? 0])
+      .update("processed_at", this.now())
+      .whereRaw(
+        /* sql */ `id = ? and processed_at is null and created_at + make_interval(secs => ?) <= NOW()`,
+        [id, processAfter ?? 0]
+      )
       .returning("*");
 
     return event as unknown as TableTypes[TName] | undefined;

@@ -919,9 +919,13 @@ export interface PetitionEvent {
   type: PetitionEventType; // petition_event_type
   data: Maybe<any>; // jsonb
   created_at: Date; // timestamptz
+  processed_at: Maybe<Date>; // timestamptz
 }
 
-export type CreatePetitionEvent = PartialProps<Omit<PetitionEvent, "id">, "data" | "created_at">;
+export type CreatePetitionEvent = PartialProps<
+  Omit<PetitionEvent, "id">,
+  "data" | "created_at" | "processed_at"
+>;
 
 export interface PetitionEventSubscription {
   id: number; // int4
@@ -1261,9 +1265,13 @@ export interface SystemEvent {
   type: SystemEventType; // system_event_type
   data: Maybe<any>; // jsonb
   created_at: Date; // timestamptz
+  processed_at: Maybe<Date>; // timestamptz
 }
 
-export type CreateSystemEvent = PartialProps<Omit<SystemEvent, "id">, "data" | "created_at">;
+export type CreateSystemEvent = PartialProps<
+  Omit<SystemEvent, "id">,
+  "data" | "created_at" | "processed_at"
+>;
 
 export interface Tag {
   id: number; // int4
