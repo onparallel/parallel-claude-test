@@ -60,7 +60,9 @@ export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
         const config = container.get<Config>(CONFIG);
 
         const consumer = Consumer.create({
-          queueUrl: config.queueWorkers[name].endpoint,
+          queueUrl: config.queueWorkers[name].queueUrl,
+          visibilityTimeout: config.queueWorkers[name].visibilityTimeout,
+          heartbeatInterval: config.queueWorkers[name].heartbeatInterval,
           batchSize: 10,
           handleMessage: async (message) => {
             const payload = parser(message.Body!);

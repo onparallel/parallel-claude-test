@@ -94,7 +94,7 @@ export class Aws implements IAws {
     queue: keyof Config["queueWorkers"],
     messages: { id: string; body: any; groupId: string }[] | { body: any; groupId: string }
   ) {
-    const queueUrl = this.config.queueWorkers[queue].endpoint;
+    const queueUrl = this.config.queueWorkers[queue].queueUrl;
     if (Array.isArray(messages)) {
       for (const batch of chunk(messages, 10)) {
         await this.sqs.send(
