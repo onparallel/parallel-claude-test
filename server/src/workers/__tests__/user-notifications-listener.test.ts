@@ -69,6 +69,7 @@ describe("Worker - User Notifications Listener", () => {
         data: {
           petition_access_id: access.id,
         },
+        processed_at: null,
       },
       ctx
     );
@@ -103,6 +104,7 @@ describe("Worker - User Notifications Listener", () => {
           petition_field_comment_id: comment.id,
           petition_field_id: field.id,
         },
+        processed_at: null,
       },
       ctx
     );
@@ -139,6 +141,7 @@ describe("Worker - User Notifications Listener", () => {
           petition_field_comment_id: comment.id,
           petition_field_id: field.id,
         },
+        processed_at: null,
       },
       ctx
     );
@@ -176,6 +179,7 @@ describe("Worker - User Notifications Listener", () => {
           petition_field_comment_id: comment.id,
           petition_field_id: field.id,
         },
+        processed_at: null,
       },
       ctx
     );
@@ -217,6 +221,7 @@ describe("Worker - User Notifications Listener", () => {
           petition_field_comment_id: comment.id,
           petition_field_id: field.id,
         },
+        processed_at: null,
       },
       ctx
     );
@@ -254,6 +259,7 @@ describe("Worker - User Notifications Listener", () => {
           permission_user_id: newUser.id,
           user_id: users[0].id,
         },
+        processed_at: null,
       },
       ctx
     );
@@ -297,6 +303,7 @@ describe("Worker - User Notifications Listener", () => {
           user_group_id: userGroup.id,
           user_id: users[0].id,
         },
+        processed_at: null,
       },
       ctx
     );
@@ -332,6 +339,7 @@ describe("Worker - User Notifications Listener", () => {
           file_upload_id: 1,
           petition_signature_request_id: 1,
         },
+        processed_at: null,
       },
       ctx
     );
@@ -368,6 +376,7 @@ describe("Worker - User Notifications Listener", () => {
             user_id: users[1].id,
           },
         },
+        processed_at: null,
       },
       ctx
     );
@@ -413,6 +422,7 @@ describe("Worker - User Notifications Listener", () => {
         data: {
           petition_message_id: message.id,
         },
+        processed_at: null,
       },
       ctx
     );
@@ -450,6 +460,7 @@ describe("Worker - User Notifications Listener", () => {
         data: {
           petition_access_id: access.id,
         },
+        processed_at: null,
       },
       ctx
     );
