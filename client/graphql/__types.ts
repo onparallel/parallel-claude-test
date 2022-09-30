@@ -2383,6 +2383,7 @@ export interface PetitionFieldAttachment extends CreatedAt {
   field: PetitionField;
   file: FileUpload;
   id: Scalars["GID"];
+  isUploading: Scalars["Boolean"];
 }
 
 export interface PetitionFieldAttachmentUploadData {
@@ -9210,6 +9211,7 @@ export type PetitionComposeField_PetitionFieldFragment = {
   attachments: Array<{
     __typename?: "PetitionFieldAttachment";
     id: string;
+    isUploading: boolean;
     file: {
       __typename?: "FileUpload";
       filename: string;
@@ -9223,6 +9225,7 @@ export type PetitionComposeField_PetitionFieldFragment = {
 export type PetitionComposeField_PetitionFieldAttachmentFragment = {
   __typename?: "PetitionFieldAttachment";
   id: string;
+  isUploading: boolean;
   file: {
     __typename?: "FileUpload";
     filename: string;
@@ -9249,6 +9252,7 @@ export type PetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation
     attachment: {
       __typename?: "PetitionFieldAttachment";
       id: string;
+      isUploading: boolean;
       field: {
         __typename?: "PetitionField";
         id: string;
@@ -9275,6 +9279,7 @@ export type PetitionComposeField_petitionFieldAttachmentUploadCompleteMutation =
   petitionFieldAttachmentUploadComplete: {
     __typename?: "PetitionFieldAttachment";
     id: string;
+    isUploading: boolean;
     file: {
       __typename?: "FileUpload";
       filename: string;
@@ -9315,6 +9320,7 @@ export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutation = {
 export type PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment = {
   __typename?: "PetitionFieldAttachment";
   id: string;
+  isUploading: boolean;
   file: {
     __typename?: "FileUpload";
     filename: string;
@@ -16649,6 +16655,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
+      isUploading: boolean;
       file: {
         __typename?: "FileUpload";
         filename: string;
@@ -16746,6 +16753,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
+      isUploading: boolean;
       file: {
         __typename?: "FileUpload";
         filename: string;
@@ -16858,6 +16866,7 @@ export type PetitionCompose_PetitionFieldFragment = {
   attachments: Array<{
     __typename?: "PetitionFieldAttachment";
     id: string;
+    isUploading: boolean;
     file: {
       __typename?: "FileUpload";
       filename: string;
@@ -17240,6 +17249,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
+      isUploading: boolean;
       file: {
         __typename?: "FileUpload";
         filename: string;
@@ -17317,6 +17327,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
+      isUploading: boolean;
       file: {
         __typename?: "FileUpload";
         filename: string;
@@ -17408,6 +17419,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
+      isUploading: boolean;
       file: {
         __typename?: "FileUpload";
         filename: string;
@@ -17456,6 +17468,7 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
+      isUploading: boolean;
       file: {
         __typename?: "FileUpload";
         filename: string;
@@ -17629,6 +17642,7 @@ export type PetitionCompose_petitionQuery = {
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
             id: string;
+            isUploading: boolean;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -17725,6 +17739,7 @@ export type PetitionCompose_petitionQuery = {
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
             id: string;
+            isUploading: boolean;
             file: {
               __typename?: "FileUpload";
               filename: string;
@@ -26415,6 +26430,7 @@ export const PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc =
       size
       isComplete
     }
+    isUploading @client
   }
 ` as unknown as DocumentNode<
   PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment,

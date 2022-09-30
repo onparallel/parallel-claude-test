@@ -191,6 +191,15 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
             },
           },
         },
+        PetitionFieldAttachment: {
+          fields: {
+            isUploading: {
+              read(value) {
+                return value ?? false;
+              },
+            },
+          },
+        },
         PublicPetitionField: {
           fields: {
             replies: {

@@ -22,6 +22,7 @@ export const PetitionComposeFieldAttachment = Object.assign(
       { progress, attachment, onDownload, onRemove, isDisabled, ...props },
       ref
     ) {
+      const uploadHasFailed = !attachment.isUploading && !attachment.file.isComplete;
       const intl = useIntl();
       return (
         <Flex
@@ -29,7 +30,7 @@ export const PetitionComposeFieldAttachment = Object.assign(
           tabIndex={0}
           borderRadius="sm"
           border="1px solid"
-          borderColor="gray.200"
+          borderColor={uploadHasFailed ? "red.500" : "gray.200"}
           paddingX={2}
           height={8}
           alignItems="center"
@@ -37,7 +38,7 @@ export const PetitionComposeFieldAttachment = Object.assign(
           transition="200ms ease"
           outline="none"
           _hover={{
-            borderColor: "gray.300",
+            borderColor: uploadHasFailed ? "red.500" : "gray.300",
             backgroundColor: "white",
             color: "gray.700",
           }}
@@ -80,6 +81,7 @@ export const PetitionComposeFieldAttachment = Object.assign(
             boxSize="18px"
             filename={attachment.file.filename}
             contentType={attachment.file.contentType}
+            hasFailed={uploadHasFailed}
           />
           <Flex marginX={2}>
             <FileName
@@ -89,7 +91,7 @@ export const PetitionComposeFieldAttachment = Object.assign(
               role="button"
               cursor="pointer"
               maxWidth="200px"
-              onClick={() => onDownload()}
+              onClick={() => !uploadHasFailed && onDownload()}
             />
             <Text as="span" fontSize="sm" color="gray.500" marginLeft={1} whiteSpace="nowrap">
               (<FileSize value={attachment.file.size} />)
@@ -99,11 +101,11 @@ export const PetitionComposeFieldAttachment = Object.assign(
             className="progress-indicator"
             value={(progress ?? 0) * 100}
             size="20px"
-            display={attachment.file.isComplete ? "none" : "block"}
+            display={attachment.file.isComplete || uploadHasFailed ? "none" : "block"}
           />
           {!isDisabled ? (
             <IconButton
-              display={attachment.file.isComplete ? "block" : "none"}
+              display={attachment.file.isComplete || uploadHasFailed ? "block" : "none"}
               tabIndex={-1}
               variant="ghost"
               aria-label={intl.formatMessage({
@@ -140,6 +142,7 @@ export const PetitionComposeFieldAttachment = Object.assign(
             size
             isComplete
           }
+          isUploading @client
         }
       `,
     },

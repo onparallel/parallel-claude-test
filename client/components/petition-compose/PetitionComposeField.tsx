@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { DataProxy, gql, useMutation } from "@apollo/client";
 import {
   Box,
   Center,
@@ -25,6 +25,7 @@ import {
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
+  PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc,
   PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument,
   PetitionComposeField_deletePetitionFieldAttachmentDocument,
   PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument,
@@ -33,6 +34,7 @@ import {
   PetitionFieldVisibilityEditor_PetitionFieldFragment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
+import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
 import { letters, PetitionFieldIndex } from "@parallel/utils/fieldIndices";
@@ -173,6 +175,15 @@ const _PetitionComposeField = chakraForwardRef<
     );
   };
 
+  function updateAttachmentUploadingStatus(cache: DataProxy, id: string, isUploading: boolean) {
+    updateFragment(cache, {
+      fragment: PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc,
+      fragmentName: "PetitionComposeFieldAttachment_PetitionFieldAttachment",
+      id,
+      data: (data) => ({ ...data!, isUploading }),
+    });
+  }
+
   const showErrorDialog = useErrorDialog();
   const maxAttachmentSize = 100 * 1024 * 1024;
   const [draggedFiles, setDraggedFiles] = useState<(File | DataTransferItem)[]>([]);
@@ -234,6 +245,13 @@ const _PetitionComposeField = chakraForwardRef<
                 contentType: file.type,
               },
             },
+            update: async (cache, { data }) => {
+              updateAttachmentUploadingStatus(
+                cache,
+                data!.createPetitionFieldAttachmentUploadLink.attachment.id,
+                true
+              );
+            },
           });
           const { attachment, presignedPostData } = data!.createPetitionFieldAttachmentUploadLink;
           uploads.current[attachment.id] = uploadFile(file, presignedPostData, {
@@ -244,12 +262,15 @@ const _PetitionComposeField = chakraForwardRef<
               }));
             },
             async onComplete() {
-              delete uploads.current[field.id];
+              delete uploads.current[attachment.id];
               await petitionFieldAttachmentUploadComplete({
                 variables: {
                   petitionId: petitionId,
                   fieldId: field.id,
                   attachmentId: attachment.id,
+                },
+                update: async (cache) => {
+                  updateAttachmentUploadingStatus(cache, attachment.id, false);
                 },
               });
             },
