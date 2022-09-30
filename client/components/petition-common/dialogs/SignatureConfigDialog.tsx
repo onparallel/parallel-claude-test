@@ -111,7 +111,7 @@ export function SignatureConfigDialog({
       return;
     }
 
-    if (!isLastStep && !review) {
+    if (!isLastStep && (!review || petitionIsCompleted)) {
       nextStep();
     } else {
       const data = { ...step1Values(), ...step2Values() };
@@ -119,14 +119,15 @@ export function SignatureConfigDialog({
         title: data.title || null,
         orgIntegrationId: data.provider.id,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        signersInfo: review
-          ? []
-          : data.signers.map((s) => ({
-              contactId: s.contactId,
-              email: s.email,
-              firstName: s.firstName,
-              lastName: s.lastName ?? "",
-            })),
+        signersInfo:
+          review && !petitionIsCompleted
+            ? []
+            : data.signers.map((s) => ({
+                contactId: s.contactId,
+                email: s.email,
+                firstName: s.firstName,
+                lastName: s.lastName ?? "",
+              })),
         review,
         allowAdditionalSigners: review || data.allowAdditionalSigners || data.signers.length === 0,
       });
@@ -157,7 +158,7 @@ export function SignatureConfigDialog({
       header={
         <Flex alignItems="center">
           {stepHeaders[currentStep]}
-          {!review && (
+          {(!review || petitionIsCompleted) && (
             <Text marginLeft={2} color="gray.600" fontSize="md" fontWeight="400">
               {currentStep + 1}/2
             </Text>
@@ -172,17 +173,15 @@ export function SignatureConfigDialog({
       }
       confirm={
         <Button colorScheme="primary" onClick={handleClickNextStep}>
-          {isLastStep || review ? (
-            petitionIsCompleted ? (
-              <FormattedMessage
-                id="component.signature-config-dialog.confirm-start"
-                defaultMessage="Start signature"
-              />
-            ) : (
-              <FormattedMessage id="generic.save" defaultMessage="Save" />
-            )
-          ) : (
+          {!isLastStep && (!review || petitionIsCompleted) ? (
             <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+          ) : petitionIsCompleted ? (
+            <FormattedMessage
+              id="component.signature-config-dialog.confirm-start"
+              defaultMessage="Start signature"
+            />
+          ) : (
+            <FormattedMessage id="generic.save" defaultMessage="Save" />
           )}
         </Button>
         // )
