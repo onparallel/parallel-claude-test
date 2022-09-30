@@ -134,6 +134,7 @@ async function startSignatureProcess(
   } catch (error: any) {
     const cancelData = {
       error: error.stack ?? JSON.stringify(error),
+      error_code: error.message ?? "UNKNOWN",
     } as PetitionSignatureRequestCancelData<"REQUEST_ERROR">;
 
     await ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData);

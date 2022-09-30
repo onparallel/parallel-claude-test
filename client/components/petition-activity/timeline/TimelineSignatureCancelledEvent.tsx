@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { SignerReference } from "@parallel/components/common/SignerReference";
@@ -103,6 +103,30 @@ export function TimelineSignatureCancelledEvent({
                   signerEmail: event.extraErrorData?.email,
                 }}
               />
+            ) : event.errorCode === "MAX_SIZE_EXCEEDED" ? (
+              <>
+                <Text>
+                  <FormattedMessage
+                    id="timeline.signature-cancelled-request-error.max-size-exceeded.description"
+                    defaultMessage="The eSignature process has been cancelled because the document exceeds the maximum size allowed {timeAgo}"
+                    values={{
+                      timeAgo: (
+                        <DateTime
+                          value={event.createdAt}
+                          format={FORMATS.LLL}
+                          useRelativeTime="always"
+                        />
+                      ),
+                    }}
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="timeline.signature-cancelled-request-error.max-size-exceeded.help"
+                    defaultMessage="Please, compress the files annexed to the document and try it again."
+                  />
+                </Text>
+              </>
             ) : (
               <FormattedMessage
                 id="timeline.signature-cancelled-request-error.unknown.description"

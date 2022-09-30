@@ -2016,7 +2016,7 @@
   },
   {
     "term": "component.notification-signature-cancelled.no-credits-left.body",
-    "definition": "No se ha podido iniciar el proceso de firma digital por haber alcanzado el límite de firmas.",
+    "definition": "No se ha podido iniciar el proceso de firma por haber alcanzado el límite de firmas.",
     "context": "The eSignature could not be started because you reached your plan's limit."
   },
   {
@@ -3186,7 +3186,7 @@
   },
   {
     "term": "component.petition-signatures-card.no-credits-left.error",
-    "definition": "No se ha podido iniciar el proceso de firma digital por falta de créditos de firma. Por favor, <a>contacta con soporte</a> para obtener más créditos.",
+    "definition": "No se ha podido iniciar el proceso de firma por falta de créditos de firma. Por favor, <a>contacta con soporte</a> para obtener más créditos.",
     "context": "The eSignature could not be started due to lack of signature credits. Please <a>contact with support</a> to get more credits."
   },
   {
@@ -9436,32 +9436,42 @@
   },
   {
     "term": "timeline.signature-cancelled-by-user.description",
-    "definition": "{userIsYou, select, true {Cancelaste} other {{name} canceló}} el proceso de firma digital {timeAgo}",
+    "definition": "{userIsYou, select, true {Cancelaste} other {{name} canceló}} el proceso de firma {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}"
   },
   {
     "term": "timeline.signature-cancelled-request-error.email-bounced.description",
-    "definition": "El proceso de firma digital se ha cancelado debido a un error con {hasEmail, select, true{el correo <b><{signerEmail}></b>} other{un correo}} {timeAgo}",
+    "definition": "El proceso de firma se ha cancelado debido a un error con {hasEmail, select, true{el correo <b><{signerEmail}></b>} other{un correo}} {timeAgo}",
     "context": "The eSignature process has been cancelled due to an error with {hasEmail, select, true{<b><{signerEmail}></b>} other{an email}} {timeAgo}"
   },
   {
     "term": "timeline.signature-cancelled-request-error.insufficient-credits.description",
-    "definition": "No se ha podido iniciar el proceso de firma digital por falta de créditos de firma {timeAgo}",
+    "definition": "No se ha podido iniciar el proceso de firma por falta de créditos de firma {timeAgo}",
     "context": "The eSignature could not be started due to lack of signature credits {timeAgo}"
   },
   {
+    "term": "timeline.signature-cancelled-request-error.max-size-exceeded.description",
+    "definition": "El proceso de firma se ha cancelado porque el documento excede el tamaño máximo permitido {timeAgo}",
+    "context": "The eSignature process has been cancelled because the document exceeds the maximum size allowed {timeAgo}"
+  },
+  {
+    "term": "timeline.signature-cancelled-request-error.max-size-exceeded.help",
+    "definition": "Por favor, comprime los archivos anexos al documento e inténtalo de nuevo.",
+    "context": "Please, compress the files annexed to the document and try it again."
+  },
+  {
     "term": "timeline.signature-cancelled-request-error.unknown.description",
-    "definition": "El proceso de firma digital ha sido cancelado debido a un error desconocido {timeAgo}",
+    "definition": "El proceso de firma ha sido cancelado debido a un error desconocido {timeAgo}",
     "context": "The eSignature process has been cancelled due to an unknown error {timeAgo}"
   },
   {
     "term": "timeline.signature-completed-description",
-    "definition": "El proceso de firma digital en el parallel ha sido completado {timeAgo}",
+    "definition": "El proceso de firma en el parallel ha sido completado {timeAgo}",
     "context": "The eSignature process on the parallel has been completed {timeAgo}"
   },
   {
     "term": "timeline.signature-declined-by-signer.description",
-    "definition": "{signer} ha rechazado el proceso de firma digital {timeAgo}",
+    "definition": "{signer} ha rechazado el proceso de firma {timeAgo}",
     "context": "{signer} has declined the eSignature process {timeAgo}"
   },
   {
@@ -9481,7 +9491,7 @@
   },
   {
     "term": "timeline.signature-restarted.description",
-    "definition": "El proceso de firma digital ha sido reiniciado {timeAgo}",
+    "definition": "El proceso de firma ha sido reiniciado {timeAgo}",
     "context": "The eSignature process has been restarted {timeAgo}"
   },
   {

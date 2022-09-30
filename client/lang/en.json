@@ -9450,6 +9450,16 @@
     "context": "The eSignature could not be started due to lack of signature credits {timeAgo}"
   },
   {
+    "term": "timeline.signature-cancelled-request-error.max-size-exceeded.description",
+    "definition": "The eSignature process has been cancelled because the document exceeds the maximum size allowed {timeAgo}",
+    "context": "The eSignature process has been cancelled because the document exceeds the maximum size allowed {timeAgo}"
+  },
+  {
+    "term": "timeline.signature-cancelled-request-error.max-size-exceeded.help",
+    "definition": "Please, compress the files annexed to the document and try it again.",
+    "context": "Please, compress the files annexed to the document and try it again."
+  },
+  {
     "term": "timeline.signature-cancelled-request-error.unknown.description",
     "definition": "The eSignature process has been cancelled due to an unknown error {timeAgo}",
     "context": "The eSignature process has been cancelled due to an unknown error {timeAgo}"
