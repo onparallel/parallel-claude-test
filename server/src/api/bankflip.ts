@@ -1,4 +1,5 @@
 import { json, Router } from "express";
+import { isDefined } from "remeda";
 import { ApiContext } from "../context";
 import { Contact, User } from "../db/__types";
 import { fromGlobalId } from "../util/globalId";
@@ -60,6 +61,17 @@ export const bankflip = Router()
         );
         if (!pdfDocument) {
           throw new Error(`Document not found`);
+        }
+
+        // only consume credits if a user requested the upload
+        if (isDefined(user)) {
+          const field = (await req.context.petitions.loadField(fieldId))!;
+          await req.context.orgCredits.consumePetitionSendCredits(
+            field.petition_id,
+            user.org_id,
+            1,
+            `User:${user.id}`
+          );
         }
 
         const createdBy = user ? `User:${user.id}` : `Contact:${contact!.id}`;

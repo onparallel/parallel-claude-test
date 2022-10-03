@@ -189,7 +189,7 @@ export function useSendPetitionHandler(
       }
       onRefetch?.();
     } catch (e) {
-      if (isApolloError(e, "PETITION_SEND_CREDITS_ERROR")) {
+      if (isApolloError(e, "PETITION_SEND_LIMIT_REACHED")) {
         await withError(showPetitionLimitReachedErrorDialog());
       }
     }

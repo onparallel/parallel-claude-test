@@ -7,6 +7,11 @@ import { FetchService, FETCH_SERVICE, IFetchService } from "./fetch";
 import { I18nService, I18N_SERVICE, II18nService } from "./i18n";
 import { IImageService, ImageService, IMAGE_SERVICE } from "./image";
 import { createLogger, ILogger, LOGGER } from "./logger";
+import {
+  IOrganizationCreditsService,
+  OrganizationCreditsService,
+  ORGANIZATION_CREDITS_SERVICE,
+} from "./organization-credits";
 import { IPetitionBinder, PetitionBinder, PETITION_BINDER } from "./petition-binder";
 import { IPrinter, Printer, PRINTER } from "./printer";
 import { IRedis, REDIS, Redis } from "./redis";
@@ -31,4 +36,5 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IPetitionBinder>(PETITION_BINDER).to(PetitionBinder);
   bind<ITiersService>(TIERS_SERVICE).to(TiersService);
   bind<II18nService>(I18N_SERVICE).to(I18nService).inSingletonScope();
+  bind<IOrganizationCreditsService>(ORGANIZATION_CREDITS_SERVICE).to(OrganizationCreditsService);
 });

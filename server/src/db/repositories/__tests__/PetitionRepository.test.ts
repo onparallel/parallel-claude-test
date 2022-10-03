@@ -1,9 +1,12 @@
 import { faker } from "@faker-js/faker";
+import { addMinutes } from "date-fns";
+import { toDate } from "date-fns-tz";
 import { Container } from "inversify";
 import { Knex } from "knex";
 import { isDefined, pick, range, sortBy } from "remeda";
 import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
+import { calculateNextReminder } from "../../../util/reminderUtils";
 import { KNEX } from "../../knex";
 import {
   Contact,
@@ -12,6 +15,7 @@ import {
   PetitionAccess,
   PetitionContactNotification,
   PetitionField,
+  PetitionFieldTypeValues,
   PetitionUserNotification,
   User,
 } from "../../__types";
@@ -44,6 +48,8 @@ describe("repositories/PetitionRepository", () => {
       first_name: "Jesse",
       last_name: "Pinkman",
     }));
+
+    await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 1000);
 
     petitions = container.get(PetitionRepository);
     filesRepo = container.get(FileRepository);
@@ -881,6 +887,11 @@ describe("repositories/PetitionRepository", () => {
       let fields: PetitionField[] = [];
       let accesses: PetitionAccess[] = [];
 
+      afterAll(async () => {
+        await mocks.knex.from("petition_field_comment").delete();
+        await mocks.knex.from("petition_reminder").delete();
+      });
+
       beforeEach(async () => {
         [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
           is_template: false,
@@ -1171,6 +1182,448 @@ describe("repositories/PetitionRepository", () => {
       expect(result.map((r) => pick(r, ["id", "path"]))).toEqual([
         { id: petition.id, path: "/shared-with-group/" },
       ]);
+    });
+  });
+
+  describe("createAccessesAndMessages", () => {
+    let userPetitions: Petition[];
+    let contacts: Contact[];
+    let contactIds: number[];
+
+    beforeAll(async () => {
+      contacts = await mocks.createRandomContacts(organization.id, 21);
+      contactIds = contacts.map((c) => c.id);
+
+      userPetitions = await mocks.createRandomPetitions(organization.id, user.id, 21, () => ({
+        name: "Test petition",
+      }));
+    });
+
+    beforeEach(async () => {
+      // truncate tables to reuse petitions and avoid insert conflicts
+      await knex.from("petition_message").delete();
+      await knex.from("petition_access").delete();
+    });
+
+    it("creates accesses and messages for a simple petition send with a few contacts", async () => {
+      const petition = userPetitions[0];
+      const { error, result, messages, accesses } = await petitions.createAccessesAndMessages(
+        petition,
+        [contactIds[0], contactIds[1]],
+        { body: [], subject: "test" },
+        user,
+        null,
+        false
+      );
+
+      expect(error).toBeUndefined();
+      expect(result).toEqual("SUCCESS");
+      expect(messages).toHaveLength(2);
+      expect(accesses).toHaveLength(2);
+      expect(accesses).toMatchObject([
+        {
+          contact_id: contactIds[0],
+          granter_id: user.id,
+          next_reminder_at: null,
+          petition_id: petition.id,
+          reminders_active: false,
+          reminders_config: null,
+        },
+        {
+          contact_id: contactIds[1],
+          granter_id: user.id,
+          next_reminder_at: null,
+          petition_id: petition.id,
+          reminders_active: false,
+          reminders_config: null,
+        },
+      ]);
+
+      expect(messages).toMatchObject([
+        {
+          petition_access_id: accesses?.[0].id,
+          scheduled_at: null,
+          sender_id: user.id,
+          status: "PROCESSING",
+          petition_id: petition.id,
+          email_subject: "test",
+          email_body: "[]",
+        },
+        {
+          petition_access_id: accesses?.[1].id,
+          scheduled_at: null,
+          sender_id: user.id,
+          status: "PROCESSING",
+          petition_id: petition.id,
+          email_subject: "test",
+          email_body: "[]",
+        },
+      ]);
+    });
+
+    it("schedule a simple petition send with configured reminders", async () => {
+      const petition = userPetitions[0];
+      const { error, result, messages, accesses } = await petitions.createAccessesAndMessages(
+        petition,
+        [contactIds[0]],
+        {
+          scheduledAt: new Date(Date.UTC(2021, 8, 3)), // 03/09/2021 (month starts at 0)
+          remindersConfig: {
+            offset: 2,
+            time: "11:45",
+            weekdaysOnly: false,
+            timezone: "Europe/Madrid",
+          },
+          body: [],
+          subject: "test",
+        },
+        user,
+        null,
+        true
+      );
+
+      expect(error).toBeUndefined();
+      expect(result).toEqual("SUCCESS");
+      expect(accesses).toHaveLength(1);
+      expect(messages).toHaveLength(1);
+      expect(accesses).toMatchObject([
+        {
+          petition_id: petition.id,
+          contact_id: contactIds[0],
+          next_reminder_at: toDate("2021-09-05T11:45:00", {
+            timeZone: "Europe/Madrid",
+          }),
+
+          reminders_active: true,
+          reminders_left: 10,
+          reminders_config: {
+            offset: 2,
+            time: "11:45",
+            weekdaysOnly: false,
+            timezone: "Europe/Madrid",
+          },
+        },
+      ]);
+
+      expect(messages).toMatchObject([
+        {
+          petition_access_id: accesses?.[0].id,
+          sender_id: user.id,
+          status: "SCHEDULED",
+          scheduled_at: new Date(Date.UTC(2021, 8, 3)),
+        },
+      ]);
+    });
+  });
+
+  describe("prefillPetition", () => {
+    let petition: Petition;
+    let fields: PetitionField[];
+
+    function fieldId(fields: PetitionField[], alias: string) {
+      return fields.find((f) => f.alias === alias)!.id;
+    }
+
+    beforeAll(async () => {
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id);
+    });
+
+    beforeEach(async () => {
+      await mocks.knex
+        .from("petition_field")
+        .where("petition_id", petition.id)
+        .update({ deleted_at: new Date(), position: null });
+      fields = await mocks.createRandomPetitionFields(
+        petition.id,
+        PetitionFieldTypeValues.length,
+        (i) => ({
+          type: PetitionFieldTypeValues[i],
+          alias: PetitionFieldTypeValues[i],
+        })
+      );
+
+      const selectField = fields.find((f) => f.type === "SELECT")!;
+      const checkboxField = fields.find((f) => f.type === "CHECKBOX")!;
+      const numberField = fields.find((f) => f.type === "NUMBER")!;
+      const shortTextField = fields.find((f) => f.type === "SHORT_TEXT")!;
+      const dynamicSelectField = fields.find((f) => f.type === "DYNAMIC_SELECT")!;
+      await knex
+        .from("petition_field")
+        .where("id", selectField.id)
+        .update({ options: { values: ["A", "B", "C"] } });
+      await knex
+        .from("petition_field")
+        .where("id", checkboxField.id)
+        .update({ options: { values: ["A", "B", "C"], limit: { type: "RADIO", min: 1, max: 1 } } });
+      await knex
+        .from("petition_field")
+        .where("id", numberField.id)
+        .update({ options: { range: { min: 10 } } });
+      await knex
+        .from("petition_field")
+        .where("id", shortTextField.id)
+        .update({ options: { maxLength: 10 } });
+      await knex
+        .from("petition_field")
+        .where("id", dynamicSelectField.id)
+        .update({
+          options: {
+            file: null,
+            labels: ["Comunidad autónoma", "Provincia"],
+            values: [
+              ["Andalucía", ["Almeria", "Cadiz", "Cordoba", "Sevilla"]],
+              ["Aragón", ["Huesca", "Teruel", "Zaragoza"]],
+              ["Canarias", ["Fuerteventura", "Gran Canaria", "Lanzarote", "Tenerife"]],
+              ["Cataluña", ["Barcelona", "Gerona", "Lérida", "Tarragona"]],
+              ["Galicia", ["La Coruña", "Lugo", "Orense", "Pontevedra"]],
+            ],
+          },
+        });
+    });
+
+    it("ignores unknown alias", async () => {
+      await petitions.prefillPetition(petition.id, { unknown: 123 }, user);
+      const replies = (
+        await petitions.loadRepliesForField(
+          fields.map((f) => f.id),
+          { cache: false }
+        )
+      ).flat();
+
+      expect(replies).toHaveLength(0);
+    });
+
+    it("creates single replies for each type of alias-able field", async () => {
+      // please, add the new field type to this test if this check fails
+      expect(PetitionFieldTypeValues).toHaveLength(11);
+
+      await petitions.prefillPetition(
+        petition.id,
+        {
+          TEXT: "first text reply",
+          FILE_UPLOAD: "this should be ignored",
+          HEADING: "this should be ignored",
+          SELECT: "B",
+          DYNAMIC_SELECT: ["Cataluña", "Barcelona"],
+          SHORT_TEXT: "12345",
+          CHECKBOX: ["A"],
+          NUMBER: 200,
+          PHONE: "+34000000000",
+          DATE: ["2024-05-21"],
+          ES_TAX_DOCUMENTS: "this should be ignored",
+        },
+        user
+      );
+
+      const replies = (
+        await petitions.loadRepliesForField(
+          fields.map((f) => f.id),
+          { cache: false }
+        )
+      ).flat();
+
+      expect(replies).toHaveLength(8);
+      expect(replies.map((r) => pick(r, ["type", "content", "petition_field_id"]))).toEqual([
+        {
+          type: "TEXT",
+          content: { value: "first text reply" },
+          petition_field_id: fieldId(fields, "TEXT"),
+        },
+        { type: "SELECT", content: { value: "B" }, petition_field_id: fieldId(fields, "SELECT") },
+        {
+          type: "DYNAMIC_SELECT",
+          content: {
+            value: [
+              ["Comunidad autónoma", "Cataluña"],
+              ["Provincia", "Barcelona"],
+            ],
+          },
+          petition_field_id: fieldId(fields, "DYNAMIC_SELECT"),
+        },
+        {
+          type: "SHORT_TEXT",
+          content: { value: "12345" },
+          petition_field_id: fieldId(fields, "SHORT_TEXT"),
+        },
+        {
+          type: "CHECKBOX",
+          content: { value: ["A"] },
+          petition_field_id: fieldId(fields, "CHECKBOX"),
+        },
+        { type: "NUMBER", content: { value: 200 }, petition_field_id: fieldId(fields, "NUMBER") },
+        {
+          type: "PHONE",
+          content: { value: "+34000000000" },
+          petition_field_id: fieldId(fields, "PHONE"),
+        },
+        {
+          type: "DATE",
+          content: { value: "2024-05-21" },
+          petition_field_id: fieldId(fields, "DATE"),
+        },
+      ]);
+    });
+
+    it("creates multiple replies for each type of alias-able field", async () => {
+      // please, add the new field type to this test if this check fails
+      expect(PetitionFieldTypeValues).toHaveLength(11);
+
+      await petitions.prefillPetition(
+        petition.id,
+        {
+          TEXT: ["first text reply", "second text reply"],
+          FILE_UPLOAD: "this should be ignored",
+          HEADING: "this should be ignored",
+          SELECT: ["A", "C"],
+          DYNAMIC_SELECT: [
+            ["Cataluña", "Barcelona"],
+            ["Canarias", "Lanzarote"],
+          ],
+          SHORT_TEXT: ["abcd", "efgh"],
+          CHECKBOX: [["A"], ["B"]],
+          NUMBER: [100, 200, 300],
+          PHONE: ["+34000000000", "+34111111111"],
+          DATE: ["2024-05-21", "2011-08-29"],
+          ES_TAX_DOCUMENTS: "this should be ignored",
+        },
+        user
+      );
+
+      const replies = (
+        await petitions.loadRepliesForField(
+          fields.map((f) => f.id),
+          { cache: false }
+        )
+      ).flat();
+
+      // expect(replies).toHaveLength(17);
+      expect(replies.map((r) => pick(r, ["type", "content", "petition_field_id"]))).toEqual([
+        {
+          type: "TEXT",
+          content: { value: "first text reply" },
+          petition_field_id: fieldId(fields, "TEXT"),
+        },
+        {
+          type: "TEXT",
+          content: { value: "second text reply" },
+          petition_field_id: fieldId(fields, "TEXT"),
+        },
+        { type: "SELECT", content: { value: "A" }, petition_field_id: fieldId(fields, "SELECT") },
+        { type: "SELECT", content: { value: "C" }, petition_field_id: fieldId(fields, "SELECT") },
+        {
+          type: "DYNAMIC_SELECT",
+          content: {
+            value: [
+              ["Comunidad autónoma", "Cataluña"],
+              ["Provincia", "Barcelona"],
+            ],
+          },
+          petition_field_id: fieldId(fields, "DYNAMIC_SELECT"),
+        },
+        {
+          type: "DYNAMIC_SELECT",
+          content: {
+            value: [
+              ["Comunidad autónoma", "Canarias"],
+              ["Provincia", "Lanzarote"],
+            ],
+          },
+          petition_field_id: fieldId(fields, "DYNAMIC_SELECT"),
+        },
+        {
+          type: "SHORT_TEXT",
+          content: { value: "abcd" },
+          petition_field_id: fieldId(fields, "SHORT_TEXT"),
+        },
+        {
+          type: "SHORT_TEXT",
+          content: { value: "efgh" },
+          petition_field_id: fieldId(fields, "SHORT_TEXT"),
+        },
+        {
+          type: "CHECKBOX",
+          content: { value: ["A"] },
+          petition_field_id: fieldId(fields, "CHECKBOX"),
+        },
+        {
+          type: "CHECKBOX",
+          content: { value: ["B"] },
+          petition_field_id: fieldId(fields, "CHECKBOX"),
+        },
+        { type: "NUMBER", content: { value: 100 }, petition_field_id: fieldId(fields, "NUMBER") },
+        { type: "NUMBER", content: { value: 200 }, petition_field_id: fieldId(fields, "NUMBER") },
+        { type: "NUMBER", content: { value: 300 }, petition_field_id: fieldId(fields, "NUMBER") },
+        {
+          type: "PHONE",
+          content: { value: "+34000000000" },
+          petition_field_id: fieldId(fields, "PHONE"),
+        },
+        {
+          type: "PHONE",
+          content: { value: "+34111111111" },
+          petition_field_id: fieldId(fields, "PHONE"),
+        },
+        {
+          type: "DATE",
+          content: { value: "2024-05-21" },
+          petition_field_id: fieldId(fields, "DATE"),
+        },
+        {
+          type: "DATE",
+          content: { value: "2011-08-29" },
+          petition_field_id: fieldId(fields, "DATE"),
+        },
+      ]);
+    });
+
+    it("ignores a reply if it does not match with field options", async () => {
+      // please, add the new field type to this test if this check fails
+      expect(PetitionFieldTypeValues).toHaveLength(11);
+
+      await petitions.prefillPetition(
+        petition.id,
+        {
+          SELECT: ["unknown option", "C"],
+          DYNAMIC_SELECT: ["Buenos Aires", "AMBA"],
+          SHORT_TEXT: "this reply exceeds the max length of 10 chars",
+          CHECKBOX: ["A", "B", "C"], // options are right, but field has subtype RADIO
+          NUMBER: [1, 10],
+        },
+        user
+      );
+
+      const replies = (
+        await petitions.loadRepliesForField(
+          fields.map((f) => f.id),
+          { cache: false }
+        )
+      ).flat();
+
+      expect(replies).toHaveLength(2);
+      expect(replies.map((r) => pick(r, ["type", "content", "petition_field_id"]))).toEqual([
+        { type: "SELECT", content: { value: "C" }, petition_field_id: fieldId(fields, "SELECT") },
+        { type: "NUMBER", content: { value: 10 }, petition_field_id: fieldId(fields, "NUMBER") },
+      ]);
+    });
+
+    it("fails if org doesnt have petition_send credits", async () => {
+      await mocks.knex
+        .from("organization_usage_limit")
+        .where({ org_id: organization.id, limit_name: "PETITION_SEND" })
+        .update({ used: 0, limit: 0 });
+
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        status: "PENDING",
+        is_template: false,
+      }));
+      await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "TEXT",
+        alias: "TEXT",
+      }));
+
+      await expect(
+        petitions.prefillPetition(petition.id, { TEXT: "first text reply" }, user)
+      ).rejects.toThrow("ORGANIZATION_LIMITS_EXCEEDED_ERROR");
     });
   });
 });

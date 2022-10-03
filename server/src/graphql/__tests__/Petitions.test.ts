@@ -1,7 +1,7 @@
 import { gql } from "graphql-request";
 import { faker } from "@faker-js/faker";
 import { Knex } from "knex";
-import { sortBy } from "remeda";
+import { range, sortBy } from "remeda";
 import { PetitionEvent } from "../../db/events";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
@@ -3186,7 +3186,7 @@ describe("GraphQL/Petitions", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("PETITION_SEND_CREDITS_ERROR", {
+      expect(errors).toContainGraphQLError("PETITION_SEND_LIMIT_REACHED", {
         needed: 1,
         used: 5,
         limit: 5,
@@ -3305,7 +3305,7 @@ describe("GraphQL/Petitions", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("PETITION_SEND_CREDITS_ERROR", {
+      expect(errors).toContainGraphQLError("PETITION_SEND_LIMIT_REACHED", {
         needed: 3,
         limit: 2,
         used: 0,
@@ -3970,7 +3970,7 @@ describe("GraphQL/Petitions", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("PETITION_SEND_CREDITS_ERROR");
+      expect(errors).toContainGraphQLError("PETITION_SEND_LIMIT_REACHED");
       expect(data).toBeNull();
     });
 

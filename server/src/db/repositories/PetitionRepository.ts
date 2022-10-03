@@ -15,7 +15,9 @@ import {
   uniq,
   zip,
 } from "remeda";
+import { RESULT } from "../../graphql";
 import { Aws, AWS_SERVICE } from "../../services/aws";
+import { ILogger, LOGGER } from "../../services/logger";
 import { average, findLast, partition, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fieldVisibility";
@@ -29,6 +31,7 @@ import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/
 import { getMentions } from "../../util/slate";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
+import { validateReplyValue } from "../../util/validateReplyValue";
 import {
   CreatePetitionEvent,
   GenericPetitionEvent,
@@ -153,6 +156,7 @@ export class PetitionRepository extends BaseRepository {
   constructor(
     @inject(KNEX) knex: Knex,
     @inject(AWS_SERVICE) private aws: Aws,
+    @inject(LOGGER) private logger: ILogger,
     @inject(FileRepository) private files: FileRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository
   ) {
@@ -1719,15 +1723,6 @@ export class PetitionRepository extends BaseRepository {
       throw new Error(`PetitionField:${data.petition_field_id} not found`);
     }
     const petition = (await this.loadPetition(field.petition_id))!;
-    if (petition.credits_used === 0 && createdBy === "User") {
-      const limit = await this.organizations.getOrganizationCurrentUsageLimit(
-        petition.org_id,
-        "PETITION_SEND"
-      );
-      if (!limit || limit.used + 1 > limit.limit) {
-        throw new Error("PETITION_SEND_CREDITS_ERROR");
-      }
-    }
 
     this.loadRepliesForField.dataloader.clear(data.petition_field_id);
     const [reply] = await this.insert("petition_field_reply", {
@@ -1745,13 +1740,6 @@ export class PetitionRepository extends BaseRepository {
       },
       `${createdBy}:${creator.id}`
     );
-    if (petition.credits_used === 0 && createdBy === "User") {
-      await this.organizations.updateOrganizationCurrentUsageLimitCredits(
-        petition.org_id,
-        "PETITION_SEND",
-        1
-      );
-    }
     // clear cache to make sure petition status is updated in next graphql calls
     this.loadPetition.dataloader.clear(field.petition_id);
 
@@ -1944,7 +1932,7 @@ export class PetitionRepository extends BaseRepository {
   async completePetition(
     petitionId: number,
     userOrAccess: User | PetitionAccess,
-    extraData: Partial<Petition>,
+    extraData: Partial<Petition> = {},
     t?: Knex.Transaction
   ) {
     const isAccess = "keycode" in userOrAccess;
@@ -2069,6 +2057,7 @@ export class PetitionRepository extends BaseRepository {
             "template_public",
             "from_template_id",
             "anonymized_at",
+            "credits_used",
             // avoid copying deadline data if creating a template or cloning from a template
             ...(data?.is_template || sourcePetition?.is_template
               ? (["deadline"] as const)
@@ -5264,5 +5253,147 @@ export class PetitionRepository extends BaseRepository {
       .returning("*");
 
     return event as unknown as TableTypes[TName] | undefined;
+  }
+
+  /**
+   * creates the required accesses and messages to send a petition to a single contact group
+   */
+  async createAccessesAndMessages(
+    petition: Pick<Petition, "id" | "name">,
+    contactIds: number[],
+    args: {
+      remindersConfig?: PetitionAccessReminderConfig | null;
+      scheduledAt?: Date | null;
+      subject: string;
+      body: any;
+    },
+    user: User,
+    userDelegate: User | null,
+    fromPublicPetitionLink: boolean
+  ) {
+    try {
+      const accesses = await this.createAccesses(
+        petition.id,
+        contactIds.map((contactId) => ({
+          petition_id: petition.id,
+          contact_id: contactId,
+          delegate_granter_id: userDelegate ? user.id : null,
+          reminders_left: 10,
+          reminders_active: Boolean(args.remindersConfig),
+          reminders_config: args.remindersConfig,
+          next_reminder_at: args.remindersConfig
+            ? calculateNextReminder(args.scheduledAt ?? new Date(), args.remindersConfig)
+            : null,
+        })),
+        userDelegate ? userDelegate : user,
+        fromPublicPetitionLink
+      );
+      const messages = await this.createMessages(
+        petition.id,
+        args.scheduledAt ?? null,
+        accesses.map((access) => ({
+          petition_access_id: access.id,
+          status: args.scheduledAt ? "SCHEDULED" : "PROCESSING",
+          email_subject: args.subject,
+          email_body: JSON.stringify(args.body ?? []),
+        })),
+        userDelegate ? userDelegate : user
+      );
+
+      const [updatedPetition] = await this.updatePetition(
+        petition.id,
+        { name: petition.name ?? args.subject, status: "PENDING", closed_at: null },
+        `User:${user.id}`
+      );
+
+      return {
+        petition: updatedPetition,
+        accesses,
+        messages,
+        result: RESULT.SUCCESS,
+      };
+    } catch (error: any) {
+      this.logger.error(error.message, { stack: error.stack });
+      return { result: RESULT.FAILURE, error };
+    }
+  }
+
+  /** prefills a given petition with replies defined in prefill argument,
+   * where each key inside the object is a field alias and the value is the reply content.
+   * based on the field type the value could be an array for creating multiple replies.
+   * If no field is found for a given key/alias, that entry is ignored.
+   * If the reply is invalid given the field options, it will be ignored.
+   */
+  async prefillPetition(petitionId: number, prefill: Record<string, any>, owner: User) {
+    const fields = await this.loadFieldsForPetition(petitionId, { refresh: true });
+    const replies = await this.parsePrefillReplies(prefill, fields);
+    await pMap(
+      replies,
+      async ({ fieldId, fieldType, reply }) => {
+        await this.createPetitionFieldReply(
+          {
+            user_id: owner.id,
+            petition_field_id: fieldId,
+            content: { value: reply },
+            type: fieldType,
+          },
+          owner
+        );
+      },
+      { concurrency: 1 }
+    );
+    return (await this.loadPetition(petitionId))!;
+  }
+
+  private async parsePrefillReplies(prefill: Record<string, any>, fields: PetitionField[]) {
+    const entries = Object.entries(prefill);
+    const result: {
+      fieldId: number;
+      fieldType: PetitionFieldType;
+      reply: any;
+    }[] = [];
+
+    for (let i = 0; i < entries.length; i++) {
+      const [alias, value] = entries[i];
+      const field = fields.find((f) => f.alias === alias);
+      if (!field || isFileTypeField(field.type) || field.type === "HEADING") {
+        continue;
+      }
+
+      const fieldReplies = unMaybeArray(value);
+      const singleReplies = [];
+
+      if (field.type === "CHECKBOX") {
+        // for CHECKBOX fields, a single reply can contain more than 1 option, so each reply is a string[]
+        if (fieldReplies.every((r) => typeof r === "string")) {
+          singleReplies.push(uniq(fieldReplies));
+        } else if (fieldReplies.every((r) => Array.isArray(r))) {
+          singleReplies.push(...fieldReplies.map((r) => uniq(r)));
+        }
+      } else if (field.type === "DYNAMIC_SELECT") {
+        // for DYNAMIC_SELECT field, a single reply is like ["Cataluña", "Barcelona"]. each element on the array is a selection of that level.
+        // here we need to add the label for sending it to the backend with correct format. e.g.: [["Comunidad Autónoma", "Cataluña"], ["Provincia", "Barcelona"]]
+        if (fieldReplies.every((r) => typeof r === "string")) {
+          singleReplies.push(fieldReplies.map((value, i) => [field.options.labels[i], value]));
+        } else if (fieldReplies.every((r) => Array.isArray(r))) {
+          singleReplies.push(
+            ...fieldReplies.map((reply: string[]) =>
+              reply.map((value, i) => [field.options.labels[i], value])
+            )
+          );
+        }
+      } else {
+        singleReplies.push(...fieldReplies);
+      }
+
+      for (const reply of singleReplies) {
+        try {
+          validateReplyValue(field, reply);
+          result.push({ fieldId: field.id, fieldType: field.type, reply });
+        } catch {}
+      }
+    }
+
+    return result;
   }
 }

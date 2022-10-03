@@ -25,70 +25,38 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
   ),
   resolve: async (_, { petitionId, message }, ctx) => {
     try {
-      return await ctx.petitions.withTransaction(async (t) => {
-        const [petition] = await ctx.petitions.updatePetition(
-          petitionId,
-          { status: "COMPLETED" },
-          `User:${ctx.user!.id}`,
-          t
-        );
-        if (!petition) {
-          throw new Error(`Petition with id ${petitionId} not found`);
-        }
+      const petition = (await ctx.petitions.loadPetition(petitionId))!;
+      await ctx.orgCredits.consumePetitionSendCredits(
+        petition.id,
+        petition.org_id,
+        1,
+        `User:${ctx.user!.id}`
+      );
 
-        if (!petition.signature_config) {
-          throw new Error(`Petition:${petition.id} was expected to have signature_config set`);
-        }
+      await ctx.petitions.updatePetition(
+        petitionId,
+        { status: "COMPLETED" },
+        `User:${ctx.user!.id}`
+      );
 
-        if (petition.credits_used === 0) {
-          const petitionSendUsageLimit = await ctx.organizations.getOrganizationCurrentUsageLimit(
-            ctx.user!.org_id,
-            "PETITION_SEND"
-          );
+      if (!petition.signature_config) {
+        throw new Error(`Petition:${petition.id} was expected to have signature_config set`);
+      }
 
-          if (
-            !petitionSendUsageLimit ||
-            petitionSendUsageLimit.used + 1 > petitionSendUsageLimit.limit
-          ) {
-            throw new ApolloError(
-              `Not enough credits to send the petition`,
-              "PETITION_SEND_CREDITS_ERROR",
-              {
-                needed: 1,
-                used: petitionSendUsageLimit?.used || 0,
-                limit: petitionSendUsageLimit?.limit || 0,
-              }
-            );
-          }
-        }
+      const { signatureRequest } = await ctx.signature.createSignatureRequest(
+        petition.id,
+        { ...petition.signature_config, message: message ?? undefined },
+        ctx.user!
+      );
 
-        const { signatureRequest } = await ctx.signature.createSignatureRequest(
-          petition.id,
-          { ...petition.signature_config, message: message ?? undefined },
-          ctx.user!,
-          t
-        );
-
-        // consume PETITION_SEND credits if up to this point the petition hasn't consumed any
-        if (petition.credits_used === 0) {
-          await ctx.petitions.updatePetition(
-            petitionId,
-            { credits_used: 1 },
-            `User:${ctx.user!.id}`,
-            t
-          );
-          await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
-            ctx.user!.org_id,
-            "PETITION_SEND",
-            1,
-            t
-          );
-        }
-
-        return signatureRequest;
-      });
+      return signatureRequest;
     } catch (error: any) {
-      if (error.message === "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED") {
+      if (error.message === "PETITION_SEND_LIMIT_REACHED") {
+        throw new ApolloError(
+          "Can't complete the parallel due to lack of credits",
+          "PETITION_SEND_LIMIT_REACHED"
+        );
+      } else if (error.message === "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED") {
         // in this case, just throw the error without creating a SIGNATURE_CANCELLED event. We will inform in the front-end with an error dialog
         throw new ApolloError(
           "You reached the limit of uses for our signature API_KEY",

@@ -4074,7 +4074,6 @@ export interface NexusGenArgTypes {
     };
     createPetitionAccess: {
       // args
-      contactId?: NexusGenScalars["GID"] | null; // GID
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     createPetitionAttachmentUploadLink: {

@@ -342,10 +342,12 @@ export class OrganizationRepository extends BaseRepository {
   async updateOrganizationCurrentUsageLimitCredits(
     orgId: number,
     limitName: OrganizationUsageLimitName,
-    credits: number,
-    t?: Knex.Transaction
+    credits: number
   ) {
-    const [usage] = await this.from("organization_usage_limit", t)
+    if (credits <= 0) {
+      return 0;
+    }
+    const [usage] = await this.from("organization_usage_limit")
       .where({
         period_end_date: null,
         limit_name: limitName,
@@ -361,7 +363,7 @@ export class OrganizationRepository extends BaseRepository {
           `select (?::timestamptz + ?::interval) as period_end_date;`,
           [usage.period_start_date, usage.period]
         );
-        await this.emails.sendOrganizationLimitsReachedEmail(orgId, limitName, usage.used, t);
+        await this.emails.sendOrganizationLimitsReachedEmail(orgId, limitName, usage.used);
         await this.system.createEvent({
           type: "ORGANIZATION_LIMIT_REACHED",
           data: {
@@ -376,7 +378,8 @@ export class OrganizationRepository extends BaseRepository {
         break;
       }
     }
-    return usage;
+
+    return credits;
   }
 
   async createSandboxSignatureIntegration(orgId: number, createdBy?: string, t?: Knex.Transaction) {

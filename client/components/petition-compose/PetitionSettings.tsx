@@ -177,7 +177,7 @@ function _PetitionSettings({
         try {
           await startSignatureRequest({ variables: { petitionId: petition.id } });
         } catch (error) {
-          if (isApolloError(error, "PETITION_SEND_CREDITS_ERROR")) {
+          if (isApolloError(error, "PETITION_SEND_LIMIT_REACHED")) {
             await withError(showPetitionLimitReachedErrorDialog());
           }
         }

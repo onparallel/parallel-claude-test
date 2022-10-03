@@ -1,11 +1,11 @@
-import { MenuItem, MenuList } from "@chakra-ui/react";
+import { ButtonProps, MenuItem, MenuList } from "@chakra-ui/react";
 import { PaperPlaneIcon, TimeIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { MouseEvent } from "react";
 import { FormattedMessage } from "react-intl";
 import { ButtonWithMoreOptions } from "../common/ButtonWithMoreOptions";
 
-export interface SendButtonProps {
+export interface SendButtonProps extends ButtonProps {
   onSendClick: (event: MouseEvent) => void;
   onScheduleClick: (event: MouseEvent) => void;
 }

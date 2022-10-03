@@ -26,6 +26,10 @@ import { FETCH_SERVICE, IFetchService } from "./services/fetch";
 import { I18N_SERVICE, II18nService } from "./services/i18n";
 import { IImageService, IMAGE_SERVICE } from "./services/image";
 import { ILogger, LOGGER } from "./services/logger";
+import {
+  IOrganizationCreditsService,
+  ORGANIZATION_CREDITS_SERVICE,
+} from "./services/organization-credits";
 import { IPetitionBinder, PETITION_BINDER } from "./services/petition-binder";
 import { IPrinter, PRINTER } from "./services/printer";
 import { ISignatureService, SIGNATURE } from "./services/signature";
@@ -54,6 +58,7 @@ export class ApiContext {
     @inject(TIERS_SERVICE) public readonly tiers: ITiersService,
     @inject(I18N_SERVICE) public readonly i18n: II18nService,
     @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
+    @inject(ORGANIZATION_CREDITS_SERVICE) public readonly orgCredits: IOrganizationCreditsService,
 
     // Repositories
     public readonly contacts: ContactRepository,

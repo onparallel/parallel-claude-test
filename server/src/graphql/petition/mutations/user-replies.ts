@@ -7,7 +7,6 @@ import { sign } from "../../../util/jwt";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { prefillPetition } from "../../helpers/prefillPetition";
 import { jsonObjectArg } from "../../helpers/scalars";
 import { fileUploadInputMaxSize } from "../../helpers/validators/maxFileSize";
 import {
@@ -49,16 +48,34 @@ export const createPetitionFieldReply = mutationField("createPetitionFieldReply"
   validateArgs: validateFieldReply("fieldId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
     const { type } = (await ctx.petitions.loadField(args.fieldId))!;
-    return await ctx.petitions.createPetitionFieldReply(
-      {
-        petition_field_id: args.fieldId,
-        user_id: ctx.user!.id,
-        type,
-        status: "PENDING",
-        content: { value: args.reply },
-      },
-      ctx.user!
-    );
+
+    try {
+      await ctx.orgCredits.consumePetitionSendCredits(
+        args.petitionId,
+        ctx.user!.org_id,
+        1,
+        `User:${ctx.user!.id}`
+      );
+
+      return await ctx.petitions.createPetitionFieldReply(
+        {
+          petition_field_id: args.fieldId,
+          user_id: ctx.user!.id,
+          type,
+          status: "PENDING",
+          content: { value: args.reply },
+        },
+        ctx.user!
+      );
+    } catch (error: any) {
+      if (error.constraint === "PETITION_SEND_LIMIT_REACHED") {
+        throw new ApolloError(
+          "Can't submit a reply due to lack of credits",
+          "PETITION_SEND_LIMIT_REACHED"
+        );
+      }
+      throw error;
+    }
   },
 });
 
@@ -129,32 +146,49 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
   validateArgs: fileUploadInputMaxSize((args) => args.file, 50 * 1024 * 1024, "file"),
   resolve: async (_, args, ctx) => {
     const key = random(16);
-    const { filename, size, contentType } = args.file;
-    const file = await ctx.files.createFileUpload(
-      {
-        path: key,
-        filename,
-        size: size.toString(),
-        content_type: contentType,
-        upload_complete: false,
-      },
-      `User:${ctx.user!.id}`
-    );
+    try {
+      await ctx.orgCredits.consumePetitionSendCredits(
+        args.petitionId,
+        ctx.user!.org_id,
+        1,
+        `User:${ctx.user!.id}`
+      );
 
-    const [presignedPostData, reply] = await Promise.all([
-      ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
-      ctx.petitions.createPetitionFieldReply(
+      const { filename, size, contentType } = args.file;
+      const file = await ctx.files.createFileUpload(
         {
-          petition_field_id: args.fieldId,
-          user_id: ctx.user!.id,
-          type: "FILE_UPLOAD",
-          content: { file_upload_id: file.id },
-          status: "PENDING",
+          path: key,
+          filename,
+          size: size.toString(),
+          content_type: contentType,
+          upload_complete: false,
         },
-        ctx.user!
-      ),
-    ]);
-    return { presignedPostData, reply };
+        `User:${ctx.user!.id}`
+      );
+
+      const [presignedPostData, reply] = await Promise.all([
+        ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
+        ctx.petitions.createPetitionFieldReply(
+          {
+            petition_field_id: args.fieldId,
+            user_id: ctx.user!.id,
+            type: "FILE_UPLOAD",
+            content: { file_upload_id: file.id },
+            status: "PENDING",
+          },
+          ctx.user!
+        ),
+      ]);
+      return { presignedPostData, reply };
+    } catch (error: any) {
+      if (error.constraint === "PETITION_SEND_LIMIT_REACHED") {
+        throw new ApolloError(
+          "Can't submit a reply due to lack of credits",
+          "PETITION_SEND_LIMIT_REACHED"
+        );
+      }
+      throw error;
+    }
   },
 });
 
@@ -358,31 +392,27 @@ export const bulkCreatePetitionReplies = mutationField("bulkCreatePetitionReplie
     petitionId: nonNull(globalIdArg("Petition")),
     replies: nonNull(jsonObjectArg()),
   },
-  authorize: authenticateAnd(userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])),
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionIsNotAnonymized("petitionId")
+  ),
   resolve: async (_, args, ctx) => {
-    const petition = (await ctx.petitions.loadPetition(args.petitionId))!;
-    if (petition.credits_used === 0) {
-      const petitionSendUsageLimit = await ctx.organizations.getOrganizationCurrentUsageLimit(
+    try {
+      await ctx.orgCredits.consumePetitionSendCredits(
+        args.petitionId,
         ctx.user!.org_id,
-        "PETITION_SEND"
+        1,
+        `User:${ctx.user!.id}`
       );
-
-      if (
-        !petitionSendUsageLimit ||
-        petitionSendUsageLimit.used + 1 > petitionSendUsageLimit.limit
-      ) {
+      return await ctx.petitions.prefillPetition(args.petitionId, args.replies, ctx.user!);
+    } catch (error: any) {
+      if (error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(
-          `Not enough credits to submit a reply`,
-          "PETITION_SEND_CREDITS_ERROR",
-          {
-            needed: 1,
-            used: petitionSendUsageLimit?.used || 0,
-            limit: petitionSendUsageLimit?.limit || 0,
-          }
+          "Can't submit a reply due to lack of credits",
+          "PETITION_SEND_LIMIT_REACHED"
         );
       }
+      throw error;
     }
-    await prefillPetition(args.petitionId, args.replies, ctx.user!, ctx);
-    return petition;
   },
 });

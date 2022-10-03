@@ -36,6 +36,12 @@ export class BadRequestError extends HttpError {
   }
 }
 
+export class ForbiddenError extends HttpError {
+  static readonly code = "ForbiddenError";
+  constructor(public message: string, extra = {}) {
+    super(403, ForbiddenError.code, message, extra);
+  }
+}
 export class ConflictError extends HttpError {
   static readonly code = "Conflict";
   constructor(public message: string) {

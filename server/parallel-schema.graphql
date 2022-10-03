@@ -715,9 +715,9 @@ type Mutation {
   ): PetitionBase!
 
   """
-  Creates a petition access
+  Creates a contactless petition access
   """
-  createPetitionAccess(contactId: GID, petitionId: GID!): PetitionAccess!
+  createPetitionAccess(petitionId: GID!): PetitionAccess!
 
   """
   Generates and returns a signed url to upload a petition attachment to AWS S3

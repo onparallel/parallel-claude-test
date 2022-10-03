@@ -734,7 +734,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(errors).toContainGraphQLError("PETITION_SEND_LIMIT_REACHED");
       expect(data).toBeNull();
 
       await mocks

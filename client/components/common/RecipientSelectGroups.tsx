@@ -43,11 +43,13 @@ interface RecipientSelectGroupsProps {
   onSearchContacts: ContactSelectProps["onSearchContacts"];
   onCreateContact: ContactSelectProps["onCreateContact"];
   canAddRecipientGroups?: boolean;
+  maxGroups: number;
 }
 export function RecipientSelectGroups({
   showErrors,
   recipientGroups,
   canAddRecipientGroups,
+  maxGroups,
   onChangeRecipientGroups,
   onSearchContacts,
   onSearchContactsByEmail,
@@ -235,6 +237,7 @@ export function RecipientSelectGroups({
                     id: "component.recipient-select-groups.recipients-placeholder",
                     defaultMessage: "Enter recipients...",
                   })}
+                  isDisabled={maxGroups < 1}
                   value={recipients}
                   onChange={handleRecipientsChange(index)}
                   onCreateContact={async (data: any) => await handleCreateContact(index, data)}
@@ -293,6 +296,7 @@ export function RecipientSelectGroups({
             variant="link"
             color="gray.900"
             fontWeight="normal"
+            isDisabled={maxGroups <= recipientGroups.length}
             leftIcon={
               <Circle backgroundColor="primary.500" size={5}>
                 <AddIcon color="white" fontSize="xs" aria-hidden="true" />

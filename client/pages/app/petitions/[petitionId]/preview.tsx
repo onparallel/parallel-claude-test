@@ -371,7 +371,9 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                           petitionId={petition.id}
                           field={field}
                           isDisabled={
-                            (isPetition && petition.status === "CLOSED") || petition.isAnonymized
+                            (isPetition && petition.status === "CLOSED") ||
+                            petition.isAnonymized ||
+                            displayPetitionLimitReachedAlert
                           }
                           isInvalid={
                             finalized &&

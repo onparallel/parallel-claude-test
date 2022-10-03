@@ -333,7 +333,7 @@ export function AddPetitionAccessDialog({
             <Alert status="warning" borderRadius="md" mb={2}>
               <AlertIcon color="yellow.500" />
               <Text>
-                {limit === used ? (
+                {used >= limit ? (
                   <FormattedMessage
                     id="component.add-petition-access-dialog.petition-limit-reached.text"
                     defaultMessage="You reached the limit of parallels sent."
@@ -432,6 +432,7 @@ export function AddPetitionAccessDialog({
             onSearchContactsByEmail={handleSearchContactsByEmail}
             showErrors={showErrors}
             canAddRecipientGroups={canAddRecipientGroups}
+            maxGroups={limit - used}
           />
           <Box marginTop={4}>
             <MessageEmailEditor
@@ -456,13 +457,14 @@ export function AddPetitionAccessDialog({
           variant="outline"
           leftIcon={<LinkIcon />}
           onClick={handleShareByLinkClick}
-          isDisabled={recipientGroups.some((g) => g.length > 0)}
+          isDisabled={recipientGroups.some((g) => g.length > 0) || used >= limit}
         >
           <FormattedMessage id="generic.share-by-link" defaultMessage="Share by link" />
         </Button>
       }
       confirm={
         <SendButton
+          isDisabled={used >= limit}
           data-action="send-petition"
           onSendClick={() => handleSendClick(false)}
           onScheduleClick={() => handleSendClick(true)}

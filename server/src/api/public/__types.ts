@@ -463,7 +463,7 @@ export type Mutation = {
   createOrganizationUser: User;
   /** Create parallel. */
   createPetition: PetitionBase;
-  /** Creates a petition access */
+  /** Creates a contactless petition access */
   createPetitionAccess: PetitionAccess;
   /** Generates and returns a signed url to upload a petition attachment to AWS S3 */
   createPetitionAttachmentUploadLink: PetitionAttachmentUploadData;
@@ -873,7 +873,6 @@ export type MutationcreatePetitionArgs = {
 };
 
 export type MutationcreatePetitionAccessArgs = {
-  contactId?: InputMaybe<Scalars["GID"]>;
   petitionId: Scalars["GID"];
 };
 

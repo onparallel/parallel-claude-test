@@ -1,9 +1,7 @@
 import { ApolloError } from "apollo-server-core";
-import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isDefined } from "remeda";
 import { OrganizationThemeType } from "../../db/__types";
-import { getRequiredPetitionSendCredits } from "../../util/organizationUsageLimits";
 import { Arg, or, userIsSuperAdmin } from "../helpers/authorize";
 
 export function isOwnOrg<FieldName extends string>(): FieldAuthorizeResolver<
@@ -65,43 +63,6 @@ export function orgCanCreateNewUser<
       throw new ApolloError(`User limit reached for this organization`, "USER_LIMIT_ERROR", {
         userLimit: org!.usage_details.USER_LIMIT,
       });
-    }
-    return true;
-  };
-}
-
-export function orgHasAvailablePetitionSendCredits<
-  TypeName extends string,
-  FieldName extends string
->(
-  petitionIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
-  numberOfGroups: (args: core.ArgsValue<TypeName, FieldName>) => number
-): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    const needed = await getRequiredPetitionSendCredits(
-      petitionIdProp(args),
-      numberOfGroups(args),
-      ctx
-    );
-
-    const petitionSendUsageLimit = await ctx.organizations.getOrganizationCurrentUsageLimit(
-      ctx.user!.org_id,
-      "PETITION_SEND"
-    );
-
-    if (
-      !petitionSendUsageLimit ||
-      petitionSendUsageLimit.used + needed > petitionSendUsageLimit.limit
-    ) {
-      throw new ApolloError(
-        `Not enough credits to send the petition`,
-        "PETITION_SEND_CREDITS_ERROR",
-        {
-          needed,
-          used: petitionSendUsageLimit?.used || 0,
-          limit: petitionSendUsageLimit?.limit || 0,
-        }
-      );
     }
     return true;
   };

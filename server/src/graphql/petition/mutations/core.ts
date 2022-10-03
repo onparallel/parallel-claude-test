@@ -1,4 +1,5 @@
 import { ApolloError } from "apollo-server-core";
+import { addMinutes } from "date-fns";
 import {
   arg,
   booleanArg,
@@ -24,10 +25,9 @@ import {
   Petition,
   PetitionPermission,
 } from "../../../db/__types";
-import { unMaybeArray } from "../../../util/arrays";
+import { chunkWhile, sumBy, unMaybeArray } from "../../../util/arrays";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
-import { getRequiredPetitionSendCredits } from "../../../util/organizationUsageLimits";
 import { withError } from "../../../util/promises/withError";
 import { hash, random } from "../../../util/token";
 import { userHasAccessToContactGroups } from "../../contact/authorizers";
@@ -43,7 +43,6 @@ import {
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { importFromExcel } from "../../helpers/importDataFromExcel";
 import { parseDynamicSelectValues } from "../../helpers/parseDynamicSelectValues";
-import { presendPetition, sendPetitionMessageEmails } from "../../helpers/presendPetition";
 import { RESULT } from "../../helpers/result";
 import { datetimeArg, jsonArg, jsonObjectArg, SUCCESS, uploadArg } from "../../helpers/scalars";
 import { validateAnd, validateIf, validateIfDefined, validateOr } from "../../helpers/validateArgs";
@@ -63,10 +62,7 @@ import { validPath } from "../../helpers/validators/validPath";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
 import { validSignatureConfig } from "../../helpers/validators/validSignatureConfig";
-import {
-  orgHasAvailablePetitionSendCredits,
-  userHasAccessToOrganizationTheme,
-} from "../../organization/authorizers";
+import { userHasAccessToOrganizationTheme } from "../../organization/authorizers";
 import { contextUserHasRole } from "../../users/authorizers";
 import {
   accessesBelongToPetition,
@@ -1294,48 +1290,30 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
 });
 
 export const createPetitionAccess = mutationField("createPetitionAccess", {
-  description: "Creates a petition access",
+  description: "Creates a contactless petition access",
   type: "PetitionAccess",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionHasRepliableFields("petitionId"),
-    orgHasAvailablePetitionSendCredits(
-      (args) => args.petitionId,
-      () => 1
-    ),
     petitionIsNotAnonymized("petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
-    contactId: globalIdArg("Contact"),
   },
   resolve: async (_, args, ctx) => {
-    const accesses = await ctx.petitions.withTransaction(async (t) => {
-      const petitionAccess = await ctx.petitions.createAccess(
-        args.petitionId,
-        ctx.user!.id,
-        args.contactId ?? null,
-        ctx.user!,
-        t
-      );
+    const access = await ctx.petitions.createAccess(args.petitionId, ctx.user!.id, null, ctx.user!);
 
-      await ctx.petitions.createEvent(
-        {
-          type: "ACCESS_ACTIVATED",
-          petition_id: args.petitionId,
-          data: {
-            petition_access_id: petitionAccess.id,
-            user_id: ctx.user!.id,
-          },
-        },
-        t
-      );
-
-      return petitionAccess;
+    await ctx.petitions.createEvent({
+      type: "ACCESS_ACTIVATED",
+      petition_id: args.petitionId,
+      data: {
+        petition_access_id: access.id,
+        user_id: ctx.user!.id,
+      },
     });
 
     ctx.petitions.loadAccessesForPetition.dataloader.clear(args.petitionId);
-    return accesses;
+    return access;
   },
 });
 
@@ -1347,10 +1325,6 @@ export const sendPetition = mutationField("sendPetition", {
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionHasRepliableFields("petitionId"),
     userHasAccessToContactGroups("contactIdGroups"),
-    orgHasAvailablePetitionSendCredits(
-      (args) => args.petitionId,
-      (args) => args.contactIdGroups.length
-    ),
     userCanSendAs("senderId" as never),
     petitionIsNotAnonymized("petitionId")
   ),
@@ -1403,10 +1377,9 @@ export const sendPetition = mutationField("sendPetition", {
     }
   ),
   resolve: async (_, args, ctx) => {
-    const [petition, owner, requiredCredits, currentAccesses] = await Promise.all([
+    const [petition, owner, currentAccesses] = await Promise.all([
       ctx.petitions.loadPetition(args.petitionId),
       ctx.petitions.loadPetitionOwner(args.petitionId),
-      getRequiredPetitionSendCredits(args.petitionId, args.contactIdGroups.length, ctx),
       ctx.petitions.loadAccessesForPetition(args.petitionId),
     ]);
 
@@ -1427,78 +1400,129 @@ export const sendPetition = mutationField("sendPetition", {
         "PETITION_ALREADY_SENT_ERROR"
       );
     }
+    if (currentAccesses.length > 0 && args.contactIdGroups.length !== 1) {
+      // bulk sends only if the petition has not been sent to anyone
+      // we don't support this case for now, throw error to avoid possible future bugs
+      throw new Error("UNSUPPORTED_USE_CASE");
+    }
 
-    const clonedPetitions = await pMap(
-      args.contactIdGroups.slice(1),
-      async () =>
-        await ctx.petitions.clonePetition(
-          args.petitionId,
-          owner, // set the owner of the original petition as owner of the cloned ones
-          {},
-          { cloneReplies: true }, // also clone the petition replies
+    try {
+      await ctx.orgCredits.consumePetitionSendCredits(
+        petition.id,
+        petition.org_id,
+        args.contactIdGroups.length, // 1 credit for each cloned petition + 1 more credit on the original petition if it didn't consume yet
+        `User:${ctx.user!.id}`
+      );
+
+      const clonedPetitions = await pMap(
+        args.contactIdGroups.slice(1),
+        async (_, index) =>
+          await ctx.petitions.clonePetition(
+            args.petitionId,
+            owner, // set the owner of the original petition as owner of the cloned ones
+            {
+              credits_used: 1,
+              name: `${petition.name ?? args.subject} (${index + 1})`,
+            },
+            { cloneReplies: true }, // also clone the petition replies
+            `User:${ctx.user!.id}`
+          ),
+        { concurrency: 5 }
+      );
+
+      if (
+        isDefined(args.bulkSendSigningMode) &&
+        args.bulkSendSigningMode !== "COPY_SIGNATURE_SETTINGS"
+      ) {
+        await ctx.petitions.updatePetition(
+          [petition.id, ...clonedPetitions.map((p) => p.id)],
+          {
+            signature_config:
+              args.bulkSendSigningMode === "LET_RECIPIENT_CHOOSE"
+                ? {
+                    ...petition.signature_config!,
+                    signersInfo: [],
+                    review: false,
+                    allowAdditionalSigners: true,
+                  }
+                : null,
+          },
           `User:${ctx.user!.id}`
-        ),
-      { concurrency: 5 }
-    );
+        );
+      }
 
-    if (
-      isDefined(args.bulkSendSigningMode) &&
-      args.bulkSendSigningMode !== "COPY_SIGNATURE_SETTINGS"
-    ) {
-      await ctx.petitions.updatePetition(
-        [petition.id, ...clonedPetitions.map((p) => p.id)],
-        {
-          signature_config:
-            args.bulkSendSigningMode === "LET_RECIPIENT_CHOOSE"
-              ? {
-                  ...petition.signature_config!,
-                  signersInfo: [],
-                  review: false,
-                  allowAdditionalSigners: true,
-                }
-              : null,
-        },
-        `User:${ctx.user!.id}`
+      if (clonedPetitions.length > 0) {
+        // clone the permissions of the original petition to the cloned ones
+        await ctx.petitions.clonePetitionPermissions(
+          args.petitionId,
+          clonedPetitions.map((p) => p.id),
+          `User:${ctx.user!.id}`
+        );
+      }
+
+      const sender = isDefined(args.senderId) ? await ctx.users.loadUser(args.senderId) : null;
+
+      const petitionChunks = chunkWhile(
+        zip([petition, ...clonedPetitions], args.contactIdGroups),
+        (chunk, [_, current]) =>
+          // current chunk is empty, or
+          chunk.length === 0 ||
+          // (number of contactIds in the accumulated chunk) + (number of contactIds in the current sendGroup) <= 20
+          sumBy(chunk, ([_, curr]) => curr.length) + current.length <= 20
       );
-    }
 
-    if (clonedPetitions.length > 0) {
-      // clone the permissions of the original petition to the cloned ones
-      await ctx.petitions.clonePetitionPermissions(
-        args.petitionId,
-        clonedPetitions.map((p) => p.id),
-        `User:${ctx.user!.id}`
+      const baseDate = new Date();
+      const results = (
+        await pMap(petitionChunks, async (currentChunk, index) => {
+          return await pMap(currentChunk, async ([petition, contactIds]) => {
+            return await ctx.petitions.createAccessesAndMessages(
+              petition,
+              contactIds,
+              {
+                ...args,
+                scheduledAt:
+                  index === 0
+                    ? args.scheduledAt
+                    : addMinutes(args.scheduledAt ?? baseDate, index * 5),
+              },
+              ctx.user!,
+              sender,
+              false
+            );
+          });
+        })
+      ).flat();
+
+      const successfulSends = results.filter((r) => r.result === "SUCCESS");
+
+      const messages = successfulSends.flatMap(
+        (s) => s.messages?.filter((m) => !isDefined(m.scheduled_at)) ?? []
       );
+
+      if (messages.length > 0) {
+        await Promise.all([
+          ctx.emails.sendPetitionMessageEmail(messages.map((m) => m.id)),
+          ctx.petitions.createEvent(
+            messages.map((message) => ({
+              type: "MESSAGE_SENT",
+              data: { petition_message_id: message.id },
+              petition_id: message.petition_id,
+            }))
+          ),
+        ]);
+      }
+
+      ctx.petitions.loadAccessesForPetition.dataloader.clear(args.petitionId);
+      return results.map((r) => omit(r, ["messages"]));
+    } catch (error: any) {
+      if (error.message === "PETITION_SEND_LIMIT_REACHED") {
+        throw new ApolloError(
+          `Can't send the parallel due to lack of credits`,
+          "PETITION_SEND_LIMIT_REACHED"
+        );
+      }
+      throw error;
     }
-
-    const sender = isDefined(args.senderId) ? await ctx.users.loadUser(args.senderId) : null;
-
-    const results = await presendPetition(
-      zip([petition, ...clonedPetitions], args.contactIdGroups),
-      args,
-      ctx.user!,
-      sender,
-      false,
-      ctx
-    );
-
-    const successfulSends = results.filter((r) => r.result === "SUCCESS");
-
-    await sendPetitionMessageEmails(
-      successfulSends.flatMap((s) => s.messages?.filter((m) => !isDefined(m.scheduled_at)) ?? []),
-      ctx
-    );
-
-    if (requiredCredits > 0) {
-      await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
-        ctx.user!.org_id,
-        "PETITION_SEND",
-        requiredCredits
-      );
-    }
-
-    ctx.petitions.loadAccessesForPetition.dataloader.clear(args.petitionId);
-    return results.map((r) => omit(r, ["messages"]));
   },
 });
 
@@ -1971,124 +1995,80 @@ export const completePetition = mutationField("completePetition", {
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
-    orgHasAvailablePetitionSendCredits(
-      (args) => args.petitionId,
-      () => 1
-    ),
     petitionIsNotAnonymized("petitionId")
   ),
   resolve: async (_, args, ctx) => {
+    let petition = (await ctx.petitions.loadPetition(args.petitionId))!;
     try {
-      return await ctx.petitions.withTransaction(async (t) => {
-        const requiredCredits = await getRequiredPetitionSendCredits(args.petitionId, 1, ctx);
-        let petition = await ctx.petitions.completePetition(
-          args.petitionId,
-          ctx.user!,
-          { credits_used: 1 },
-          t
-        );
-        if (petition.signature_config?.review === false) {
-          const { petition: updatedPetition } = await ctx.signature.createSignatureRequest(
-            petition.id,
-            {
-              ...petition.signature_config,
-              additionalSignersInfo: args.additionalSigners ?? [],
-              message: args.message ?? undefined,
-            },
-            ctx.user!,
-            t
-          );
-          petition = updatedPetition ?? petition;
-        }
-        await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
-          ctx.user!.org_id,
-          "PETITION_SEND",
-          requiredCredits,
-          t
-        );
-        await ctx.petitions.createEvent(
-          {
-            type: "PETITION_COMPLETED",
-            petition_id: args.petitionId,
-            data: { user_id: ctx.user!.id },
-          },
-          t
-        );
-        return petition;
+      await ctx.orgCredits.consumePetitionSendCredits(
+        petition.id,
+        petition.org_id,
+        1,
+        `User:${ctx.user!.id}`
+      );
+      petition = await ctx.petitions.completePetition(args.petitionId, ctx.user!);
+      await ctx.petitions.createEvent({
+        type: "PETITION_COMPLETED",
+        petition_id: args.petitionId,
+        data: { user_id: ctx.user!.id },
       });
+
+      if (petition.signature_config?.review === false) {
+        const { petition: updatedPetition } = await ctx.signature.createSignatureRequest(
+          petition.id,
+          {
+            ...petition.signature_config,
+            additionalSignersInfo: args.additionalSigners ?? [],
+            message: args.message ?? undefined,
+          },
+          ctx.user!
+        );
+        petition = updatedPetition ?? petition;
+      }
     } catch (error: any) {
-      if (error.message === "REQUIRED_SIGNER_INFO_ERROR") {
+      if (error.message === "PETITION_SEND_LIMIT_REACHED") {
+        throw new ApolloError(
+          "Can't complete the parallel due to lack of credits",
+          "PETITION_SEND_LIMIT_REACHED"
+        );
+      } else if (error.message === "REQUIRED_SIGNER_INFO_ERROR") {
         throw new ApolloError(
           "Can't complete the petition without signers information",
           "REQUIRED_SIGNER_INFO_ERROR"
         );
       } else if (error.message === "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED") {
-        // complete the petition anyways and send signature_cancelled event for later notification to the user
-        return await ctx.petitions.withTransaction(async (t) => {
-          const requiredCredits = await getRequiredPetitionSendCredits(args.petitionId, 1, ctx);
-          const [petition] = await Promise.all([
-            ctx.petitions.completePetition(
-              args.petitionId,
-              ctx.user!,
-              { credits_used: requiredCredits },
-              t
-            ),
-            ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
-              ctx.user!.org_id,
-              "PETITION_SEND",
-              requiredCredits,
-              t
-            ),
-          ]);
-          await ctx.petitions.createEvent(
-            {
-              type: "PETITION_COMPLETED",
-              petition_id: petition.id,
-              data: { user_id: ctx.user!.id },
+        // insert a CANCELLED signature request so user can see it on the signatures card
+        const cancelledSignature = await ctx.petitions.createPetitionSignature(petition.id, {
+          signature_config: {
+            ...petition.signature_config,
+            additionalSignersInfo: args.additionalSigners ?? [],
+            message: args.message ?? undefined,
+          },
+          status: "CANCELLED",
+          cancel_reason: "REQUEST_ERROR",
+          cancel_data: {
+            error: "The signature request could not be started due to lack of signature credits",
+            error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
+          },
+        });
+        await ctx.petitions.createEvent({
+          type: "SIGNATURE_CANCELLED",
+          data: {
+            petition_signature_request_id: cancelledSignature.id,
+            cancel_reason: "REQUEST_ERROR",
+            cancel_data: {
+              error: "The signature request could not be started due to lack of signature credits",
+              error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
             },
-            t
-          );
-          // insert a CANCELLED signature request so user can see it on the signatures card
-          const cancelledSignature = await ctx.petitions.createPetitionSignature(
-            petition.id,
-            {
-              signature_config: {
-                ...petition.signature_config,
-                additionalSignersInfo: args.additionalSigners ?? [],
-                message: args.message ?? undefined,
-              },
-              status: "CANCELLED",
-              cancel_reason: "REQUEST_ERROR",
-              cancel_data: {
-                error:
-                  "The signature request could not be started due to lack of signature credits",
-                error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
-              },
-            },
-            t
-          );
-          await ctx.petitions.createEvent(
-            {
-              type: "SIGNATURE_CANCELLED",
-              data: {
-                petition_signature_request_id: cancelledSignature.id,
-                cancel_reason: "REQUEST_ERROR",
-                cancel_data: {
-                  error:
-                    "The signature request could not be started due to lack of signature credits",
-                  error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
-                },
-              },
-              petition_id: args.petitionId,
-            },
-            t
-          );
-          return petition;
+          },
+          petition_id: args.petitionId,
         });
       } else {
         throw error;
       }
     }
+
+    return petition;
   },
 });
 

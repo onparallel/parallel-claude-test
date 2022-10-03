@@ -7,7 +7,7 @@ import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
 import { toGlobalId } from "../../util/globalId";
 import { Body, FormDataBody, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
 import { RestApi } from "../rest/core";
-import { BadRequestError, ConflictError, UnauthorizedError } from "../rest/errors";
+import { BadRequestError, ConflictError, ForbiddenError, UnauthorizedError } from "../rest/errors";
 import { booleanParam, enumParam, stringParam } from "../rest/params";
 import {
   Created,
@@ -977,6 +977,9 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
       400: ErrorResponse({
         description: "Invalid parameter",
       }),
+      403: ErrorResponse({
+        description: "You don't have enough credits for this action",
+      }),
       409: ErrorResponse({
         description: "The parallel was already sent to some of the provided contacts",
       }),
@@ -1137,6 +1140,8 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
           if (errorCode === "INVALID_EMAIL_ERROR") {
             throw new BadRequestError(`${email} is not a valid email`);
           }
+        } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
+          throw new ForbiddenError("You don't have enough credits to send this parallel");
         }
       }
       throw error;
@@ -1280,6 +1285,9 @@ api
       responses: {
         201: SuccessResponse(PetitionFieldReply),
         400: ErrorResponse({ description: "Invalid parameters" }),
+        403: ErrorResponse({
+          description: "You don't have enough credits for this action",
+        }),
         409: ErrorResponse({ description: "The field does not accept more replies." }),
       },
       tags: ["Parallel replies"],
@@ -1378,6 +1386,8 @@ api
             throw new BadRequestError(
               "The field is already replied and does not accept any more replies."
             );
+          } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
+            throw new ForbiddenError("You don't have enough credits to submit a reply");
           }
         }
         throw error;
@@ -1649,23 +1659,36 @@ api
     `,
       responses: {
         200: SuccessResponse(SubmitPetitionRepliesResponse),
+        403: ErrorResponse({
+          description: "You don't have enough credits for this action",
+        }),
       },
       body: JsonBody(SubmitPetitionReplies),
       tags: ["Parallel replies"],
     },
     async ({ client, params, body }) => {
-      const res = await client.request(SubmitReplies_bulkCreatePetitionRepliesDocument, {
-        petitionId: params.petitionId,
-        replies: body,
-        includeFields: true,
-        includeRecipients: false,
-        includeTags: false,
-        includeRecipientUrl: false,
-        includeReplies: false,
-        includeProgress: false,
-      });
+      try {
+        const res = await client.request(SubmitReplies_bulkCreatePetitionRepliesDocument, {
+          petitionId: params.petitionId,
+          replies: body,
+          includeFields: true,
+          includeRecipients: false,
+          includeTags: false,
+          includeRecipientUrl: false,
+          includeReplies: false,
+          includeProgress: false,
+        });
 
-      return Ok(mapPetition(res.bulkCreatePetitionReplies));
+        return Ok(mapPetition(res.bulkCreatePetitionReplies));
+      } catch (error) {
+        if (
+          error instanceof ClientError &&
+          containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")
+        ) {
+          throw new ForbiddenError("You don't have enough credits to submit a reply");
+        }
+        throw error;
+      }
     }
   );
 

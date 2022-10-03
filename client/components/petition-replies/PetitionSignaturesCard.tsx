@@ -243,7 +243,7 @@ export const PetitionSignaturesCard = Object.assign(
                 ),
               })
             );
-          } else if (isApolloError(error, "PETITION_SEND_CREDITS_ERROR")) {
+          } else if (isApolloError(error, "PETITION_SEND_LIMIT_REACHED")) {
             await withError(showPetitionLimitReachedErrorDialog());
           }
         }

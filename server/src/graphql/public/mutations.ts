@@ -21,8 +21,6 @@ import { toGlobalId } from "../../util/globalId";
 import { stallFor } from "../../util/promises/stallFor";
 import { and, chain, checkClientServerToken, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { prefillPetition } from "../helpers/prefillPetition";
-import { presendPetition } from "../helpers/presendPetition";
 import { RESULT } from "../helpers/result";
 import { jsonArg } from "../helpers/scalars";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
@@ -248,6 +246,13 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
           if (petition) {
             const email = result.data.contact_email!.toLowerCase();
 
+            await ctx.orgCredits.consumePetitionSendCredits(
+              petition.id,
+              petition.org_id,
+              1,
+              `PetitionAccess:${access!.id}`
+            );
+
             await ctx.petitions.withTransaction(async (t) => {
               ctx.contact = (
                 await ctx.contacts.loadOrCreate(
@@ -270,26 +275,10 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
 
               await ctx.petitions.updatePetition(
                 petition.id,
-                { status: "PENDING", credits_used: 1, closed_at: null },
+                { status: "PENDING", closed_at: null },
                 `PetitionAccess:${access!.id}`,
                 t
               );
-
-              if (petition.credits_used === 0) {
-                const limit = await ctx.organizations.getOrganizationCurrentUsageLimit(
-                  petition.org_id,
-                  "PETITION_SEND"
-                );
-                if (!limit || limit.used + 1 > limit.limit) {
-                  throw new Error("PETITION_SEND_CREDITS_ERROR");
-                }
-                await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
-                  petition.org_id,
-                  "PETITION_SEND",
-                  1,
-                  t
-                );
-              }
             });
           }
         }
@@ -317,8 +306,17 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
           result: result.success ? RESULT.SUCCESS : RESULT.FAILURE,
           remainingAttempts: result.remainingAttempts,
         };
-      } catch {
-        throw new ApolloError("The token is no longer valid", "INVALID_TOKEN");
+      } catch (error: any) {
+        if (error.message === "PETITION_SEND_LIMIT_REACHED") {
+          throw new ApolloError(
+            `Can't send the parallel due to lack of credits`,
+            "PETITION_SEND_LIMIT_REACHED"
+          );
+        } else if (error.message === "INVALID_TOKEN") {
+          throw new ApolloError("The token is no longer valid", "INVALID_TOKEN");
+        } else {
+          throw error;
+        }
       }
     }, 2000);
   },
@@ -734,24 +732,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
     },
     authorize: chain(
       validPublicPetitionLinkSlug("slug"),
-      ifArgDefined("prefill", validPublicPetitionLinkPrefill("prefill" as never, "slug")),
-      // check if the organization has PETITION_SEND credits for this
-      async (_, { slug }, ctx) => {
-        const publicLink = (await ctx.petitions.loadPublicPetitionLinkBySlug(slug))!;
-        const template = await ctx.petitions.loadPetition(publicLink.template_id);
-        if (!template) {
-          return false;
-        }
-        const petitionSendLimit = await ctx.organizations.getOrganizationCurrentUsageLimit(
-          template.org_id,
-          "PETITION_SEND"
-        );
-        if (!petitionSendLimit || petitionSendLimit.used >= petitionSendLimit.limit) {
-          return false;
-        }
-
-        return true;
-      }
+      ifArgDefined("prefill", validPublicPetitionLinkPrefill("prefill" as never, "slug"))
     ),
     validateArgs: validEmail((args) => args.contactEmail, "contactEmail"),
     resolve: async (_, args, ctx) => {
@@ -771,34 +752,40 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         throw new Error(`Can't find owner of PublicPetitionLink:${link.id}`);
       }
 
-      const { messages, result, petition } = await ctx.petitions.withTransaction(async (t) => {
-        const [petition, [contact]] = await Promise.all([
-          ctx.petitions.clonePetition(
-            link!.template_id,
-            owner.user,
-            {
-              is_template: false,
-              status: "DRAFT",
-              from_public_petition_link_id: link.id,
-            },
-            { insertPermissions: !owner.isDefault },
-            `PublicPetitionLink:${link.id}`,
-            t
-          ),
-          ctx.contacts.loadOrCreate(
-            {
-              email: args.contactEmail,
-              first_name: args.contactFirstName,
-              last_name: args.contactLastName,
-              org_id: owner.user.org_id,
-            },
-            `PublicPetitionLink:${link.id}`,
-            t
-          ),
-        ]);
+      try {
+        await ctx.orgCredits.consumePetitionSendCredits(
+          null,
+          owner.user.org_id,
+          1,
+          `PublicPetitionLink:${link.id}`
+        );
 
-        const [{ result, messages, error }] = await presendPetition(
-          [[petition, [contact.id]]],
+        const petition = await ctx.petitions.clonePetition(
+          link!.template_id,
+          owner.user,
+          {
+            is_template: false,
+            status: "DRAFT",
+            from_public_petition_link_id: link.id,
+            credits_used: 1,
+          },
+          { insertPermissions: !owner.isDefault },
+          `PublicPetitionLink:${link.id}`
+        );
+
+        const [contact] = await ctx.contacts.loadOrCreate(
+          {
+            email: args.contactEmail,
+            first_name: args.contactFirstName,
+            last_name: args.contactLastName,
+            org_id: owner.user.org_id,
+          },
+          `PublicPetitionLink:${link.id}`
+        );
+
+        const { messages } = await ctx.petitions.createAccessesAndMessages(
+          petition,
+          [contact.id],
           {
             subject: petition.email_subject ?? link!.title,
             body: JSON.parse(petition.email_body!),
@@ -806,54 +793,48 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
           },
           owner.user,
           null,
-          true,
-          ctx,
-          new Date(),
-          t
+          true
         );
 
-        // don't do in parallel with presend so the owner gets created before any possible default permission
         await ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
           petition.id,
           link.template_id,
           "PublicPetitionLink",
-          link.id,
-          t
+          link.id
         );
 
-        if (error) throw error; // transaction rollback
-
-        return { messages: messages ?? [], result, petition };
-      });
-
-      if (isDefined(args.prefill)) {
-        const payload = decode(args.prefill) as JwtPayload;
-        if ("replies" in payload && typeof payload.replies === "object") {
-          await prefillPetition(petition.id, payload.replies, owner.user, ctx);
+        if (isDefined(args.prefill)) {
+          const payload = decode(args.prefill) as JwtPayload;
+          if ("replies" in payload && typeof payload.replies === "object") {
+            await ctx.petitions.prefillPetition(petition.id, payload.replies, owner.user);
+          }
         }
-      }
 
-      // trigger emails and events
-      // in this case the messages array should always have one unscheduled message, so there is no need to check what to send
-      if (result === "SUCCESS" && messages.length > 0) {
-        await Promise.all([
-          ctx.emails.sendPublicPetitionLinkAccessEmail(messages.map((s) => s.id)),
-          ctx.petitions.createEvent(
-            messages.map((message) => ({
-              type: "MESSAGE_SENT",
-              data: { petition_message_id: message.id },
-              petition_id: message.petition_id,
-            }))
-          ),
-          ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
-            petition.org_id,
-            "PETITION_SEND",
-            1
-          ),
-        ]);
-      }
+        // trigger emails and events
+        // in this case the messages array should always have one unscheduled message, so there is no need to check what to send
+        if (messages && messages.length > 0) {
+          await Promise.all([
+            ctx.emails.sendPublicPetitionLinkAccessEmail(messages.map((s) => s.id)),
+            ctx.petitions.createEvent(
+              messages.map((message) => ({
+                type: "MESSAGE_SENT",
+                data: { petition_message_id: message.id },
+                petition_id: message.petition_id,
+              }))
+            ),
+          ]);
+        }
 
-      return result;
+        return RESULT.SUCCESS;
+      } catch (error: any) {
+        if (error.message === "PETITION_SEND_LIMIT_REACHED") {
+          throw new ApolloError(
+            `Can't send the parallel due to lack of credits`,
+            "PETITION_SEND_LIMIT_REACHED"
+          );
+        }
+        return RESULT.FAILURE;
+      }
     },
   }
 );
