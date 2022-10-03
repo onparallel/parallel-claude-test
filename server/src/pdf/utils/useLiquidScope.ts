@@ -1,9 +1,9 @@
-import { gql } from "@apollo/client";
+import { gql } from "graphql-request";
 import { useMemo } from "react";
 import { isDefined, zip } from "remeda";
+import { getFieldIndices } from "../../util/fieldIndices";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { useLiquidScope_PetitionBaseFragment } from "../__types";
-import { getFieldIndices } from "../../util/fieldIndices";
 
 export function useLiquidScope(petition: useLiquidScope_PetitionBaseFragment) {
   return useMemo(() => {

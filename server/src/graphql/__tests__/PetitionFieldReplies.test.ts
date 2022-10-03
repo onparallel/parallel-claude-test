@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { omit } from "remeda";
 import { KNEX } from "../../db/knex";

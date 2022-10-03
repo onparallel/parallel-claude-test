@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from "graphql-request";
 import { faker } from "@faker-js/faker";
 import { Knex } from "knex";
 import { sortBy } from "remeda";

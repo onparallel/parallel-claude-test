@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
 import { addDays } from "date-fns";
+import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { omit } from "remeda";
 import { KNEX } from "../../db/knex";

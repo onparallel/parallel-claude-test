@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
 import { serialize as serializeCookie } from "cookie";
+import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
 import { ContactRepository } from "../../db/repositories/ContactRepository";

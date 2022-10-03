@@ -1,6 +1,5 @@
-import { gql } from "@apollo/client";
+import { gql } from "graphql-request";
 import { Knex } from "knex";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Petition } from "../../db/__types";

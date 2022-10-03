@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
 import { faker } from "@faker-js/faker";
+import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
