@@ -969,11 +969,15 @@ export interface MutationcreateTagArgs {
 }
 
 export interface MutationcreateTemplateRepliesReportTaskArgs {
+  endDate?: InputMaybe<Scalars["DateTime"]>;
   petitionId: Scalars["GID"];
+  startDate?: InputMaybe<Scalars["DateTime"]>;
   timezone: Scalars["String"];
 }
 
 export interface MutationcreateTemplateStatsReportTaskArgs {
+  endDate?: InputMaybe<Scalars["DateTime"]>;
+  startDate?: InputMaybe<Scalars["DateTime"]>;
   templateId: Scalars["GID"];
 }
 
@@ -23014,6 +23018,8 @@ export type useBackgroundTask_createPrintPdfTaskMutation = {
 
 export type useBackgroundTask_createTemplateStatsReportTaskMutationVariables = Exact<{
   templateId: Scalars["GID"];
+  startDate?: InputMaybe<Scalars["DateTime"]>;
+  endDate?: InputMaybe<Scalars["DateTime"]>;
 }>;
 
 export type useBackgroundTask_createTemplateStatsReportTaskMutation = {
@@ -23580,6 +23586,8 @@ export type useSettingsSections_UserFragment = { __typename?: "User"; hasDevelop
 export type useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   timezone: Scalars["String"];
+  startDate?: InputMaybe<Scalars["DateTime"]>;
+  endDate?: InputMaybe<Scalars["DateTime"]>;
 }>;
 
 export type useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutation = {
@@ -31655,8 +31663,16 @@ export const useBackgroundTask_createPrintPdfTaskDocument = gql`
   useBackgroundTask_createPrintPdfTaskMutationVariables
 >;
 export const useBackgroundTask_createTemplateStatsReportTaskDocument = gql`
-  mutation useBackgroundTask_createTemplateStatsReportTask($templateId: GID!) {
-    createTask: createTemplateStatsReportTask(templateId: $templateId) {
+  mutation useBackgroundTask_createTemplateStatsReportTask(
+    $templateId: GID!
+    $startDate: DateTime
+    $endDate: DateTime
+  ) {
+    createTask: createTemplateStatsReportTask(
+      templateId: $templateId
+      startDate: $startDate
+      endDate: $endDate
+    ) {
       ...useBackgroundTask_Task
     }
   }
@@ -31861,8 +31877,15 @@ export const useTemplateRepliesReportTask_createTemplateRepliesReportTaskDocumen
   mutation useTemplateRepliesReportTask_createTemplateRepliesReportTask(
     $petitionId: GID!
     $timezone: String!
+    $startDate: DateTime
+    $endDate: DateTime
   ) {
-    createTemplateRepliesReportTask(petitionId: $petitionId, timezone: $timezone) {
+    createTemplateRepliesReportTask(
+      petitionId: $petitionId
+      timezone: $timezone
+      startDate: $startDate
+      endDate: $endDate
+    ) {
       ...TaskProgressDialog_Task
     }
   }

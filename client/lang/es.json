@@ -1060,6 +1060,11 @@
     "context": "Previous month"
   },
   {
+    "term": "component.date-range-picker-popover.clear-filter",
+    "definition": "Quitar filtro",
+    "context": "Clear filter"
+  },
+  {
     "term": "component.date-range-picker-popover.title",
     "definition": "Selecciona un rango de fechas",
     "context": "Select a range of dates"
@@ -1068,6 +1073,11 @@
     "term": "component.date-range-picker.date-placeholder",
     "definition": "dd-mm-aaaa",
     "context": "mm-dd-aaaa"
+  },
+  {
+    "term": "component.date-range-picker.select-range",
+    "definition": "Selecciona un rango predefinido",
+    "context": "Select a predefined range"
   },
   {
     "term": "component.date-time.a-moment-ago",
@@ -7230,9 +7240,9 @@
     "context": "eSignatures processes in which a signer hasn't yet signed aren't included."
   },
   {
-    "term": "page.reports.generate-report",
-    "definition": "Generar informe",
-    "context": "Generate report"
+    "term": "page.reports.generate",
+    "definition": "Generar",
+    "context": "Generate"
   },
   {
     "term": "page.reports.no-esignatures-sent",

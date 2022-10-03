@@ -27,11 +27,12 @@ import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { OverflownText } from "@parallel/components/common/OverflownText";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { DateRangePickerPopover } from "@parallel/components/reports/DateRangePickerPopover";
+import { DateRangePickerButton } from "@parallel/components/reports/DateRangePickerButton";
 import { ReportsDoughnutChart } from "@parallel/components/reports/ReportsDoughnutChart";
 import { ReportsErrorMessage } from "@parallel/components/reports/ReportsErrorMessage";
 import { ReportsLoadingMessage } from "@parallel/components/reports/ReportsLoadingMessage";
@@ -43,7 +44,6 @@ import {
   useAssertQueryOrPreviousData,
 } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { FORMATS } from "@parallel/utils/dates";
 import { stallFor } from "@parallel/utils/promises/stallFor";
 import { string, useQueryState } from "@parallel/utils/queryState";
 import { useBackgroundTask } from "@parallel/utils/useBackgroundTask";
@@ -170,76 +170,79 @@ export function Reports() {
             <FormattedMessage id="generic.help-question" defaultMessage="Help?" />
           </Button>
         </HStack>
-        <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2}>
-          <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2} flex="1">
-            <HStack
-              data-section="reports-select-template"
-              flex="1"
-              maxWidth={{ base: "100%", md: "500px" }}
-            >
-              <Text>
-                <FormattedMessage id="generic.template" defaultMessage="Template" />:
-              </Text>
-              <Box flex="1">
-                <SimpleSelect
-                  options={templates.map((t) => ({
-                    label:
-                      t.name ??
-                      intl.formatMessage({
-                        id: "generic.unnamed-template",
-                        defaultMessage: "Unnamed template",
-                      }),
-                    value: t.id,
-                  }))}
-                  placeholder={intl.formatMessage({
-                    id: "page.reports.select-a-template",
-                    defaultMessage: "Select a template...",
-                  })}
-                  isSearchable={true}
-                  value={templateId}
-                  onChange={(templateId) => setState((state) => ({ ...state, templateId }))}
-                />
-              </Box>
-            </HStack>
-            <DateRangePickerPopover
-              startDate={state.startDate ? new Date(state.startDate) : null}
-              endDate={state.endDate ? new Date(state.endDate) : null}
-              onChange={(range) => {
-                setQueryState((s) => ({
-                  ...s,
-                  startDate: range[0].toISOString(),
-                  endDate: range[1].toISOString(),
-                }));
-              }}
-              onRemoveFilter={() => {
-                setQueryState({});
-              }}
-            />
-
-            <Button
-              colorScheme="primary"
-              isDisabled={canGenerateReport}
-              onClick={handleGenerateReportClick}
-              fontWeight="500"
-            >
-              <FormattedMessage
-                id="page.reports.generate-report"
-                defaultMessage="Generate report"
+        <Stack spacing={2}>
+          <Text>
+            <FormattedMessage id="generic.template" defaultMessage="Template" />:
+          </Text>
+          <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2}>
+            <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2} flex="1">
+              <HStack
+                data-section="reports-select-template"
+                flex="1"
+                maxWidth={{ base: "100%", md: "500px" }}
+              >
+                <Box flex="1">
+                  <SimpleSelect
+                    options={templates.map((t) => ({
+                      label:
+                        t.name ??
+                        intl.formatMessage({
+                          id: "generic.unnamed-template",
+                          defaultMessage: "Unnamed template",
+                        }),
+                      value: t.id,
+                    }))}
+                    placeholder={intl.formatMessage({
+                      id: "page.reports.select-a-template",
+                      defaultMessage: "Select a template...",
+                    })}
+                    isSearchable={true}
+                    value={templateId}
+                    onChange={(templateId) => setState((state) => ({ ...state, templateId }))}
+                  />
+                </Box>
+              </HStack>
+              <DateRangePickerButton
+                startDate={state.startDate ? new Date(state.startDate) : null}
+                endDate={state.endDate ? new Date(state.endDate) : null}
+                onChange={(range) => {
+                  setQueryState((s) => ({
+                    ...s,
+                    startDate: range[0].toISOString(),
+                    endDate: range[1].toISOString(),
+                  }));
+                }}
+                onRemoveFilter={() => {
+                  setQueryState({});
+                }}
               />
-            </Button>
+              <Button
+                minWidth="fit-content"
+                colorScheme="primary"
+                isDisabled={canGenerateReport}
+                onClick={handleGenerateReportClick}
+                fontWeight="500"
+              >
+                <FormattedMessage id="page.reports.generate" defaultMessage="Generate" />
+              </Button>
+            </Stack>
+            {isDefined(report) && status === "IDLE" ? (
+              <Button
+                leftIcon={<TableIcon />}
+                colorScheme="primary"
+                onClick={() =>
+                  handleTemplateRepliesReportTask(prevTemplateId!, state.startDate, state.endDate)
+                }
+              >
+                <OverflownText>
+                  <FormattedMessage
+                    id="page.reports.download-replies"
+                    defaultMessage="Download replies"
+                  />
+                </OverflownText>
+              </Button>
+            ) : null}
           </Stack>
-          {isDefined(report) && status === "IDLE" ? (
-            <Button
-              leftIcon={<TableIcon />}
-              colorScheme="primary"
-              onClick={() => handleTemplateRepliesReportTask(prevTemplateId!)}
-            >
-              <FormattedMessage
-                id="page.reports.download-replies"
-                defaultMessage="Download replies"
-              />
-            </Button>
-          ) : null}
         </Stack>
         {isDefined(report) && status === "IDLE" ? (
           <TemplateStatsReport report={report} />

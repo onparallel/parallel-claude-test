@@ -119,8 +119,16 @@ const _mutations = [
     ${fragments.Task}
   `,
   gql`
-    mutation useBackgroundTask_createTemplateStatsReportTask($templateId: GID!) {
-      createTask: createTemplateStatsReportTask(templateId: $templateId) {
+    mutation useBackgroundTask_createTemplateStatsReportTask(
+      $templateId: GID!
+      $startDate: DateTime
+      $endDate: DateTime
+    ) {
+      createTask: createTemplateStatsReportTask(
+        templateId: $templateId
+        startDate: $startDate
+        endDate: $endDate
+      ) {
         ...useBackgroundTask_Task
       }
     }

@@ -7,6 +7,7 @@ import { isValidTimezone } from "../../util/validators";
 import { authenticateAnd } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { datetimeArg } from "../helpers/scalars";
 import {
   petitionIsNotAnonymized,
   petitionsAreOfTypeTemplate,
@@ -103,6 +104,8 @@ export const createTemplateRepliesReportTask = mutationField("createTemplateRepl
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     timezone: nonNull(stringArg()),
+    startDate: datetimeArg(),
+    endDate: datetimeArg(),
   },
   validateArgs: (_, { timezone }, ctx, info) => {
     if (!isValidTimezone(timezone)) {
@@ -122,6 +125,8 @@ export const createTemplateRepliesReportTask = mutationField("createTemplateRepl
         input: {
           petition_id: args.petitionId,
           timezone: args.timezone,
+          startDate: args.startDate,
+          endDate: args.endDate,
         },
       },
       `User:${ctx.user!.id}`
@@ -139,8 +144,8 @@ export const createTemplateStatsReportTask = mutationField("createTemplateStatsR
   ),
   args: {
     templateId: nonNull(globalIdArg("Petition")),
-    startDate: stringArg(),
-    endDate: stringArg(),
+    startDate: datetimeArg(),
+    endDate: datetimeArg(),
   },
   resolve: async (_, args, ctx) => {
     return await ctx.tasks.createTask(
@@ -149,6 +154,8 @@ export const createTemplateStatsReportTask = mutationField("createTemplateStatsR
         user_id: ctx.user!.id,
         input: {
           template_id: args.templateId,
+          startDate: args.startDate,
+          endDate: args.endDate,
         },
       },
       `User:${ctx.user!.id}`

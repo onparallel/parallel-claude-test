@@ -11,7 +11,7 @@ import { TaskRunner } from "../helpers/TaskRunner";
 
 export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_REPORT"> {
   async run() {
-    const { petition_id: templateId, timezone } = this.task.input;
+    const { petition_id: templateId, timezone, startDate, endDate } = this.task.input;
 
     if (!this.task.user_id) {
       throw new Error(`Task ${this.task.id} is missing user_id`);
@@ -24,7 +24,13 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
     }
     const [template, petitions] = await Promise.all([
       this.ctx.readonlyPetitions.loadPetition(templateId),
-      this.ctx.readonlyPetitions.loadPetitionsByFromTemplateId(templateId),
+      startDate && endDate
+        ? this.ctx.readonlyPetitions.loadPetitionsByFromTemplateIdBetweenCreatedAt(
+            templateId,
+            startDate,
+            endDate
+          )
+        : this.ctx.readonlyPetitions.loadPetitionsByFromTemplateId(templateId),
     ]);
 
     const intl = await this.ctx.i18n.getIntl(template!.locale);

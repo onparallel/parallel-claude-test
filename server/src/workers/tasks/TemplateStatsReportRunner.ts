@@ -2,7 +2,7 @@ import { TaskRunner } from "../helpers/TaskRunner";
 
 export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT"> {
   async run() {
-    const { template_id: templateId } = this.task.input;
+    const { template_id: templateId, startDate, endDate } = this.task.input;
 
     const [user, hasAccess] = await Promise.all([
       this.ctx.readonlyUsers.loadUser(this.task.user_id!),
@@ -15,7 +15,9 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
 
     return await this.ctx.readonlyPetitions.getPetitionStatsByFromTemplateId(
       templateId,
-      user!.org_id
+      user!.org_id,
+      startDate,
+      endDate
     );
   }
 }

@@ -12,6 +12,7 @@ import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { openNewWindow } from "./openNewWindow";
 import { withError } from "./promises/withError";
+import { Maybe } from "./types";
 
 export function useTemplateRepliesReportTask() {
   const apollo = useApolloClient();
@@ -21,13 +22,18 @@ export function useTemplateRepliesReportTask() {
   const showTaskProgressDialog = useTaskProgressDialog();
   const intl = useIntl();
 
-  return async (petitionId: string) => {
+  return async (petitionId: string, startDate?: Maybe<string>, endDate?: Maybe<string>) => {
     const [taskError, finishedTask] = await withError(async () => {
       return await showTaskProgressDialog({
         initTask: async () => {
           const { data } = await apollo.mutate({
             mutation: useTemplateRepliesReportTask_createTemplateRepliesReportTaskDocument,
-            variables: { petitionId, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+            variables: {
+              petitionId,
+              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+              startDate,
+              endDate,
+            },
           });
           if (!isDefined(data)) {
             throw new Error();
@@ -85,8 +91,15 @@ useTemplateRepliesReportTask.mutations = [
     mutation useTemplateRepliesReportTask_createTemplateRepliesReportTask(
       $petitionId: GID!
       $timezone: String!
+      $startDate: DateTime
+      $endDate: DateTime
     ) {
-      createTemplateRepliesReportTask(petitionId: $petitionId, timezone: $timezone) {
+      createTemplateRepliesReportTask(
+        petitionId: $petitionId
+        timezone: $timezone
+        startDate: $startDate
+        endDate: $endDate
+      ) {
         ...TaskProgressDialog_Task
       }
     }

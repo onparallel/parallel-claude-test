@@ -4125,13 +4125,15 @@ export interface NexusGenArgTypes {
     };
     createTemplateRepliesReportTask: {
       // args
+      endDate?: NexusGenScalars["DateTime"] | null; // DateTime
       petitionId: NexusGenScalars["GID"]; // GID!
+      startDate?: NexusGenScalars["DateTime"] | null; // DateTime
       timezone: string; // String!
     };
     createTemplateStatsReportTask: {
       // args
-      endDate?: string | null; // String
-      startDate?: string | null; // String
+      endDate?: NexusGenScalars["DateTime"] | null; // DateTime
+      startDate?: NexusGenScalars["DateTime"] | null; // DateTime
       templateId: NexusGenScalars["GID"]; // GID!
     };
     createUserGroup: {

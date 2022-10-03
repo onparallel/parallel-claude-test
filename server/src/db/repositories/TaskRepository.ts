@@ -15,8 +15,17 @@ export type TaskInput<TName extends TaskName> = {
     include_netdocuments_links?: boolean;
   };
   EXPORT_EXCEL: { petition_id: number };
-  TEMPLATE_REPLIES_REPORT: { petition_id: number; timezone: string };
-  TEMPLATE_STATS_REPORT: { template_id: number };
+  TEMPLATE_REPLIES_REPORT: {
+    petition_id: number;
+    timezone: string;
+    startDate: Date | null | undefined;
+    endDate: Date | null | undefined;
+  };
+  TEMPLATE_STATS_REPORT: {
+    template_id: number;
+    startDate: Date | null | undefined;
+    endDate: Date | null | undefined;
+  };
 }[TName];
 
 export type TaskOutput<TName extends TaskName> = {

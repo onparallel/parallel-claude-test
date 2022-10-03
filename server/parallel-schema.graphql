@@ -799,12 +799,17 @@ type Mutation {
   """
   Creates a task for exporting a report grouping the replies of every petition coming from the same template
   """
-  createTemplateRepliesReportTask(petitionId: GID!, timezone: String!): Task!
+  createTemplateRepliesReportTask(
+    endDate: DateTime
+    petitionId: GID!
+    startDate: DateTime
+    timezone: String!
+  ): Task!
 
   """
   Creates a task for generating a JSON report of the template usage
   """
-  createTemplateStatsReportTask(endDate: String, startDate: String, templateId: GID!): Task!
+  createTemplateStatsReportTask(endDate: DateTime, startDate: DateTime, templateId: GID!): Task!
 
   """
   Creates a group in the user's organization

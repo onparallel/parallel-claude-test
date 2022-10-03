@@ -935,11 +935,15 @@ export type MutationcreateTagArgs = {
 };
 
 export type MutationcreateTemplateRepliesReportTaskArgs = {
+  endDate?: InputMaybe<Scalars["DateTime"]>;
   petitionId: Scalars["GID"];
+  startDate?: InputMaybe<Scalars["DateTime"]>;
   timezone: Scalars["String"];
 };
 
 export type MutationcreateTemplateStatsReportTaskArgs = {
+  endDate?: InputMaybe<Scalars["DateTime"]>;
+  startDate?: InputMaybe<Scalars["DateTime"]>;
   templateId: Scalars["GID"];
 };
 

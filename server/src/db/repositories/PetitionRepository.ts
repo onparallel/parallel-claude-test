@@ -189,6 +189,20 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
+  async loadPetitionsByFromTemplateIdBetweenCreatedAt(
+    templateId: number,
+    startDate: Date,
+    endDate: Date
+  ) {
+    return await this.from("petition")
+      .where({
+        from_template_id: templateId,
+      })
+      .whereNull("deleted_at")
+      .andWhereBetween("created_at", [startDate, endDate])
+      .select("*");
+  }
+
   async userHasAccessToPetitions(
     userId: number,
     petitionIds: number[],
@@ -4912,9 +4926,36 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
-  async getPetitionStatsByFromTemplateId(fromTemplateId: number, orgId: number) {
-    const petitionStatus = await this.raw<{ id: number; status: PetitionStatus }>(
-      /* sql */ `
+  async getPetitionStatsByFromTemplateId(
+    fromTemplateId: number,
+    orgId: number,
+    startDate: Date | null | undefined,
+    endDate: Date | null | undefined
+  ) {
+    const petitionStatus =
+      startDate && endDate
+        ? await this.raw<{ id: number; status: PetitionStatus }>(
+            /* sql */ `
+        with ps as (
+          select id, status from petition p  where p.from_template_id = ? and p.org_id = ? and p.deleted_at is null and created_at between ? and ?
+        ),
+        pas as (
+          select distinct(pa.petition_id), true as has_been_sent from petition_access pa where pa.petition_id in (select id from ps)
+        ),
+        pfrs as (
+          select distinct(pf.petition_id), true as has_reply from petition_field pf
+            join petition_field_reply pfr on pfr.petition_field_id = pf.id
+          where pf.petition_id in (select id from ps) and pf.deleted_at is null and pfr.deleted_at is null
+        )
+        select distinct ps.id, ps.status from ps
+          left join pas on pas.petition_id = ps.id
+          left join pfrs on pfrs.petition_id = ps.id
+        where pas.has_been_sent or pfrs.has_reply;
+    `,
+            [fromTemplateId, orgId, startDate, endDate]
+          )
+        : await this.raw<{ id: number; status: PetitionStatus }>(
+            /* sql */ `
         with ps as (
           select id, status from petition p  where p.from_template_id = ? and p.org_id = ? and p.deleted_at is null
         ),
@@ -4931,8 +4972,8 @@ export class PetitionRepository extends BaseRepository {
           left join pfrs on pfrs.petition_id = ps.id
         where pas.has_been_sent or pfrs.has_reply;
     `,
-      [fromTemplateId, orgId]
-    );
+            [fromTemplateId, orgId]
+          );
 
     const petitionIds = petitionStatus.map((s) => s.id);
 
