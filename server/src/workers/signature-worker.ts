@@ -134,8 +134,11 @@ async function startSignatureProcess(
   } catch (error: any) {
     const cancelData = {
       error: error.stack ?? JSON.stringify(error),
-      error_code: error.message ?? "UNKNOWN",
     } as PetitionSignatureRequestCancelData<"REQUEST_ERROR">;
+
+    if (error.message === "MAX_SIZE_EXCEEDED") {
+      cancelData.error_code = "MAX_SIZE_EXCEEDED";
+    }
 
     await ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData);
 
