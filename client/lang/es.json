@@ -1060,6 +1060,16 @@
     "context": "Previous month"
   },
   {
+    "term": "component.date-range-picker-popover.title",
+    "definition": "Selecciona un rango de fechas",
+    "context": "Select a range of dates"
+  },
+  {
+    "term": "component.date-range-picker.date-placeholder",
+    "definition": "dd-mm-aaaa",
+    "context": "mm-dd-aaaa"
+  },
+  {
     "term": "component.date-time.a-moment-ago",
     "definition": "hace un momento",
     "context": "a moment ago"
@@ -5390,6 +5400,11 @@
     "context": "All events"
   },
   {
+    "term": "generic.apply",
+    "definition": "Aplicar",
+    "context": "Apply"
+  },
+  {
     "term": "generic.apply-changes",
     "definition": "Aplicar cambios",
     "context": "Apply changes"
@@ -5953,6 +5968,16 @@
     "term": "generic.last-used-at",
     "definition": "Usado por última vez",
     "context": "Last used at"
+  },
+  {
+    "term": "generic.last-x-days",
+    "definition": "Últimos {days} días",
+    "context": "Last {days} days"
+  },
+  {
+    "term": "generic.last-x-months",
+    "definition": "Últimos {months} meses",
+    "context": "Last {months} months"
   },
   {
     "term": "generic.learn-more",
@@ -7133,6 +7158,11 @@
     "term": "page.pricing.zapier-integration",
     "definition": "Integración con Zapier",
     "context": "Zapier integration"
+  },
+  {
+    "term": "page.reports.any-date",
+    "definition": "Cualquier fecha",
+    "context": "Any date"
   },
   {
     "term": "page.reports.average-duration",

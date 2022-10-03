@@ -4130,6 +4130,8 @@ export interface NexusGenArgTypes {
     };
     createTemplateStatsReportTask: {
       // args
+      endDate?: string | null; // String
+      startDate?: string | null; // String
       templateId: NexusGenScalars["GID"]; // GID!
     };
     createUserGroup: {

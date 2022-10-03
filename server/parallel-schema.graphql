@@ -804,7 +804,7 @@ type Mutation {
   """
   Creates a task for generating a JSON report of the template usage
   """
-  createTemplateStatsReportTask(templateId: GID!): Task!
+  createTemplateStatsReportTask(endDate: String, startDate: String, templateId: GID!): Task!
 
   """
   Creates a group in the user's organization

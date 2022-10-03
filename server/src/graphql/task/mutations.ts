@@ -139,6 +139,8 @@ export const createTemplateStatsReportTask = mutationField("createTemplateStatsR
   ),
   args: {
     templateId: nonNull(globalIdArg("Petition")),
+    startDate: stringArg(),
+    endDate: stringArg(),
   },
   resolve: async (_, args, ctx) => {
     return await ctx.tasks.createTask(

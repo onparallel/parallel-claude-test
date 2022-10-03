@@ -5,7 +5,6 @@ import {
   eachDayOfInterval,
   endOfMonth,
   getDay,
-  isSameDay,
   isToday,
   isWeekend,
   startOfMonth,
@@ -40,6 +39,7 @@ export function CalendarMonth({
   month,
   year,
   firstDayOfWeek,
+  onDateClick,
   dateProps,
   wrapperProps,
 }: CalendarMonthProps) {
@@ -81,6 +81,7 @@ export function CalendarMonth({
                       aria-label={intl.formatDate(date, FORMATS.LL)}
                       {...(isToday(date) ? { "aria-current": "date" } : {})}
                       {...dateProps?.({ date, isNextMonth, isPrevMonth })}
+                      onClick={() => onDateClick?.(date)}
                     >
                       <FormattedDate value={date} day="numeric" />
                     </Button>
@@ -125,7 +126,7 @@ function getDays({
           end: subDays(monthStart, 1),
         })
       : []
-    ).map((date) => ({ isPrevMonth: true, date })),
+    ).map((date) => ({ isPrevMonth: true, isNextMonth: false, date })),
     ...eachDayOfInterval({ start: monthStart, end: monthEnd }).map((date) => ({
       date,
       isPrevMonth: false,
@@ -137,6 +138,6 @@ function getDays({
           end: addDays(monthEnd, nextMonthDays),
         })
       : []
-    ).map((date) => ({ isNextMonth: true, date })),
+    ).map((date) => ({ isPrevMonth: false, isNextMonth: true, date })),
   ];
 }

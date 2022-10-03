@@ -31,6 +31,7 @@ import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { DateRangePickerPopover } from "@parallel/components/reports/DateRangePickerPopover";
 import { ReportsDoughnutChart } from "@parallel/components/reports/ReportsDoughnutChart";
 import { ReportsErrorMessage } from "@parallel/components/reports/ReportsErrorMessage";
 import { ReportsLoadingMessage } from "@parallel/components/reports/ReportsLoadingMessage";
@@ -42,7 +43,9 @@ import {
   useAssertQueryOrPreviousData,
 } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { FORMATS } from "@parallel/utils/dates";
 import { stallFor } from "@parallel/utils/promises/stallFor";
+import { string, useQueryState } from "@parallel/utils/queryState";
 import { useBackgroundTask } from "@parallel/utils/useBackgroundTask";
 import { useTemplateRepliesReportTask } from "@parallel/utils/useTemplateRepliesReportTask";
 import { useRef, useState } from "react";
@@ -62,9 +65,14 @@ type ReportType = {
   };
 };
 
+const QUERY_STATE = {
+  startDate: string(),
+  endDate: string(),
+};
+
 export function Reports() {
   const intl = useIntl();
-
+  const [state, setQueryState] = useQueryState(QUERY_STATE);
   const {
     data: { me, realMe },
   } = useAssertQuery(Reports_userDocument);
@@ -107,7 +115,7 @@ export function Reports() {
         const { task } = await stallFor(
           () =>
             templateStatsTask(
-              { templateId: templateId },
+              { templateId: templateId, startDate: state.startDate, endDate: state.endDate },
               { signal: taskAbortController.current!.signal }
             ),
           2_000 + 1_000 * Math.random()
@@ -193,10 +201,26 @@ export function Reports() {
                 />
               </Box>
             </HStack>
+            <DateRangePickerPopover
+              startDate={state.startDate ? new Date(state.startDate) : null}
+              endDate={state.endDate ? new Date(state.endDate) : null}
+              onChange={(range) => {
+                setQueryState((s) => ({
+                  ...s,
+                  startDate: range[0].toISOString(),
+                  endDate: range[1].toISOString(),
+                }));
+              }}
+              onRemoveFilter={() => {
+                setQueryState({});
+              }}
+            />
+
             <Button
               colorScheme="primary"
               isDisabled={canGenerateReport}
               onClick={handleGenerateReportClick}
+              fontWeight="500"
             >
               <FormattedMessage
                 id="page.reports.generate-report"
