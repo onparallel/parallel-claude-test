@@ -29,7 +29,7 @@ import { IPetitionBinder, PETITION_BINDER } from "./services/petition-binder";
 import { IPrinter, PRINTER } from "./services/printer";
 import { ISignatureService, SIGNATURE } from "./services/signature";
 import { ISmtp, SMTP } from "./services/smtp";
-import { IStorage, STORAGE_SERVICE } from "./services/storage";
+import { IStorageService, STORAGE_SERVICE } from "./services/storage";
 import { ITiersService, TIERS_SERVICE } from "./services/tiers";
 
 @injectable()
@@ -52,7 +52,7 @@ export class ApiContext {
     @inject(IMAGE_SERVICE) public readonly images: IImageService,
     @inject(TIERS_SERVICE) public readonly tiers: ITiersService,
     @inject(I18N_SERVICE) public readonly i18n: II18nService,
-    @inject(STORAGE_SERVICE) public readonly storage: IStorage,
+    @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
 
     // Repositories
     public readonly contacts: ContactRepository,
@@ -87,7 +87,7 @@ export class WorkerContext {
     @inject(PETITION_BINDER) public readonly petitionBinder: IPetitionBinder,
     @inject(IMAGE_SERVICE) public readonly images: IImageService,
     @inject(I18N_SERVICE) public readonly i18n: II18nService,
-    @inject(STORAGE_SERVICE) public readonly storage: IStorage,
+    @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
 
     // Repositories
     public readonly contacts: ContactRepository,

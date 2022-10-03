@@ -16,7 +16,7 @@ import { pFlatMap } from "../util/promises/pFlatMap";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
 import { IPrinter, PRINTER } from "./printer";
-import { IStorage, STORAGE_SERVICE } from "./storage";
+import { IStorageService, STORAGE_SERVICE } from "./storage";
 
 function isPrintableContentType(contentType: string) {
   return [
@@ -52,7 +52,7 @@ export class PetitionBinder implements IPetitionBinder {
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(FileRepository) private files: FileRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
-    @inject(STORAGE_SERVICE) private storage: IStorage,
+    @inject(STORAGE_SERVICE) private storage: IStorageService,
     @inject(PRINTER) private printer: IPrinter
   ) {}
 

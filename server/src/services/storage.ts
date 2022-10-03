@@ -20,7 +20,7 @@ import { awsLogger } from "../util/awsLogger";
 import { MaybeArray } from "../util/types";
 import { ILogger, LOGGER } from "./logger";
 
-export interface IS3Service {
+export interface IStorageImpl {
   getSignedUploadEndpoint(
     key: string,
     contentType: string,
@@ -39,7 +39,7 @@ export interface IS3Service {
 
 const _4GB = 1024 * 1024 * 1024 * 4;
 
-class S3Service implements IS3Service {
+class StorageImpl implements IStorageImpl {
   constructor(private s3: S3Client, private bucketName: string) {}
 
   async getSignedUploadEndpoint(key: string, contentType: string, maxAllowedSize?: number) {
@@ -114,14 +114,14 @@ class S3Service implements IS3Service {
 
 export const STORAGE_SERVICE = Symbol.for("STORAGE_SERVICE");
 
-export interface IStorage {
-  publicFiles: IS3Service;
-  fileUploads: IS3Service;
-  temporaryFiles: IS3Service;
+export interface IStorageService {
+  publicFiles: IStorageImpl;
+  fileUploads: IStorageImpl;
+  temporaryFiles: IStorageImpl;
 }
 
 @injectable()
-export class StorageService implements IStorage {
+export class StorageService implements IStorageService {
   constructor(@inject(CONFIG) private config: Config, @inject(LOGGER) private logger: ILogger) {}
 
   @Memoize() private get s3() {
@@ -133,14 +133,14 @@ export class StorageService implements IStorage {
   }
 
   @Memoize() public get fileUploads() {
-    return new S3Service(this.s3, this.config.s3.fileUploadsBucketName);
+    return new StorageImpl(this.s3, this.config.s3.fileUploadsBucketName);
   }
 
   @Memoize() public get temporaryFiles() {
-    return new S3Service(this.s3, this.config.s3.temporaryFilesBucketName);
+    return new StorageImpl(this.s3, this.config.s3.temporaryFilesBucketName);
   }
 
   @Memoize() public get publicFiles() {
-    return new S3Service(this.s3, this.config.s3.publicFilesBucketName);
+    return new StorageImpl(this.s3, this.config.s3.publicFilesBucketName);
   }
 }
