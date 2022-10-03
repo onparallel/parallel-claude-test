@@ -121,7 +121,7 @@ export class TaskRepository extends BaseRepository {
     const [{ count }] = await this.from("task")
       .whereIn("id", taskIds)
       .where("user_id", userId)
-      .select(this.count());
+      .select<{ count: number }[]>(this.count());
 
     return count === new Set(taskIds).size;
   }

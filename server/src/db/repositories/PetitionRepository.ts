@@ -251,7 +251,7 @@ export class PetitionRepository extends BaseRepository {
         deleted_at: null,
       })
       .whereIn("id", fieldIds)
-      .select(this.count());
+      .select<{ count: number }[]>(this.count());
     return count === new Set(fieldIds).size;
   }
 
@@ -262,7 +262,7 @@ export class PetitionRepository extends BaseRepository {
     const [{ count }] = await this.from("petition_field")
       .whereIn("id", fieldIds)
       .where("has_comments_enabled", true)
-      .select(this.count());
+      .select<{ count: number }[]>(this.count());
 
     return count === new Set(fieldIds).size;
   }
@@ -274,7 +274,7 @@ export class PetitionRepository extends BaseRepository {
     const [{ count }] = await this.from("petition_field")
       .whereIn("id", fieldIds)
       .where("is_internal", false)
-      .select(this.count());
+      .select<{ count: number }[]>(this.count());
 
     return count === new Set(fieldIds).size;
   }
@@ -286,7 +286,7 @@ export class PetitionRepository extends BaseRepository {
         deleted_at: null,
       })
       .whereIn("id", attachmentIds)
-      .select(this.count());
+      .select<{ count: number }[]>(this.count());
     return count === new Set(attachmentIds).size;
   }
 
@@ -297,7 +297,7 @@ export class PetitionRepository extends BaseRepository {
         deleted_at: null,
       })
       .whereIn("id", attachmentIds)
-      .select(this.count());
+      .select<{ count: number }[]>(this.count());
     return count === new Set(attachmentIds).size;
   }
 
@@ -307,7 +307,7 @@ export class PetitionRepository extends BaseRepository {
         petition_id: petitionId,
       })
       .whereIn("id", accessIds)
-      .select(this.count());
+      .select<{ count: number }[]>(this.count());
     return count === new Set(accessIds).size;
   }
 
@@ -317,7 +317,7 @@ export class PetitionRepository extends BaseRepository {
         petition_id: petitionId,
       })
       .whereIn("id", messagesIds)
-      .select(this.count());
+      .select<{ count: number }[]>(this.count());
     return count === new Set(messagesIds).size;
   }
 
@@ -328,7 +328,7 @@ export class PetitionRepository extends BaseRepository {
       })
       .whereIn("id", commentIds)
       .whereNull("deleted_at")
-      .select(this.count());
+      .select<{ count: number }[]>(this.count());
     return count === new Set(commentIds).size;
   }
 

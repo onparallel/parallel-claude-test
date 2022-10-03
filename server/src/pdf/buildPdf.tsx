@@ -42,7 +42,7 @@ function init() {
   });
 }
 
-export async function buildPdf<ID, P>(
+export async function buildPdf<ID, P extends {}>(
   document: PdfDocument<ID, P>,
   initial: ID,
   context: PdfDocumentGetPropsContext
@@ -60,6 +60,6 @@ export async function buildPdf<ID, P>(
     onWarn: () => {},
   };
   return await renderToStream(
-    <IntlProvider {...intlProps}>{createElement(document, props as any)}</IntlProvider>
+    <IntlProvider {...intlProps}>{createElement<P>(document, props as any)}</IntlProvider>
   );
 }

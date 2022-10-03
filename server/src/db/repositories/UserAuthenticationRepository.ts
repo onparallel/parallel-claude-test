@@ -51,7 +51,7 @@ export class UserAuthenticationRepository extends BaseRepository {
         user_id: userId,
         deleted_at: null,
       })
-      .select(this.count());
+      .select<{ count: number }[]>(this.count());
 
     return count === new Set(ids).size;
   }

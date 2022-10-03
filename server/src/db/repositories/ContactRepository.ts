@@ -136,7 +136,7 @@ export class ContactRepository extends BaseRepository {
         deleted_at: null,
       })
       .whereIn("id", contactIds)
-      .select(this.count());
+      .select<{ count: number }[]>(this.count());
     return count === new Set(contactIds).size;
   }
 

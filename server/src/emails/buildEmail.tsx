@@ -7,14 +7,18 @@ export interface EmailOptions {
   locale: string;
 }
 
-export interface Email<T> {
+export interface Email<T extends {}> {
   from: (props: T, intl: IntlShape) => string;
   subject: (props: T, intl: IntlShape) => string;
   text: (props: T, intl: IntlShape) => string;
   html: ComponentType<T>;
 }
 
-export async function buildEmail<T>(email: Email<T>, props: T, { locale }: EmailOptions) {
+export async function buildEmail<T extends {}>(
+  email: Email<T>,
+  props: T,
+  { locale }: EmailOptions
+) {
   const messages = await loadMessages(locale);
   const intlProps: IntlConfig = {
     messages,
@@ -25,7 +29,7 @@ export async function buildEmail<T>(email: Email<T>, props: T, { locale }: Email
     onWarn: () => {},
   };
   const { html } = render(
-    <IntlProvider {...intlProps}>{createElement(email.html, props)}</IntlProvider>,
+    <IntlProvider {...intlProps}>{createElement<T>(email.html, props)}</IntlProvider>,
     {
       keepComments: false,
       minify: true,

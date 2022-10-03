@@ -351,7 +351,7 @@ export class OrganizationRepository extends BaseRepository {
     for (const threshold of [100, 80]) {
       const value = Math.round((usage.limit * threshold) / 100);
       if (usage.used - credits < value && usage.used >= value) {
-        const [{ period_end_date: periodEndDate }] = await this.raw(
+        const [{ period_end_date: periodEndDate }] = await this.raw<{ period_end_date: Date }>(
           `select (?::timestamptz + ?::interval) as period_end_date;`,
           [usage.period_start_date, usage.period]
         );

@@ -64,7 +64,7 @@ export interface PageOpts {
 
 type TableNames = keyof TableTypes;
 
-type QueryBuilderFunction<TRecord, TResult = TRecord> = (
+type QueryBuilderFunction<TRecord extends {}, TResult = TRecord[]> = (
   q: Knex.QueryBuilder<TRecord, TResult>
 ) => void;
 
@@ -217,14 +217,18 @@ export class BaseRepository {
     });
   }
 
-  protected async loadPageAndCount<TRecord, TResult>(
+  protected async loadPageAndCount<TRecord extends {}, TResult>(
     query: Knex.QueryBuilder<TRecord, TResult>,
     { offset, limit }: PageOpts
   ): Promise<{
     totalCount: number;
     items: UnwrapPromise<Knex.QueryBuilder<TRecord, TResult>>;
   }> {
-    const [{ count }] = await query.clone().clearOrder().clearSelect().select(this.count());
+    const [{ count }] = await query
+      .clone()
+      .clearOrder()
+      .clearSelect()
+      .select<{ count: number }[]>(this.count());
     if (count === 0) {
       return {
         totalCount: 0,

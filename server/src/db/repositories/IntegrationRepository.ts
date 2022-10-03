@@ -150,7 +150,7 @@ export class IntegrationRepository extends BaseRepository {
           q.whereIn("type", integrationTypes!);
         }
       })
-      .select(this.knex.raw(`count(distinct(id))::int as "count"`));
+      .select<{ count: number }[]>(this.knex.raw(`count(distinct(id))::int as "count"`));
     return count === new Set(ids).size;
   }
 

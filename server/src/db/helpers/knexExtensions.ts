@@ -5,7 +5,7 @@ import { Knex, knex } from "knex";
 (knex as any).QueryBuilder.extend("whereEscapedNotLike", likeClause("not like"));
 (knex as any).QueryBuilder.extend("whereNotIlike", likeClause("not ilike"));
 
-function likeClause<TRecord = any, TResult = unknown>(operator: string) {
+function likeClause<TRecord extends {} = any, TResult = unknown>(operator: string) {
   return function (
     this: Knex.QueryBuilder<TRecord, TResult>,
     columnName: string,
@@ -21,8 +21,8 @@ function likeClause<TRecord = any, TResult = unknown>(operator: string) {
 }
 
 (knex as any).QueryBuilder.extend("mmodify", function mmodify<
-  TRecord,
-  TResult
+  TRecord extends {},
+  TResult extends {}
 >(this: Knex.QueryBuilder<TRecord, TResult>, ...args: Parameters<Knex.QueryBuilder["modify"]>) {
   return this.modify<TRecord, TResult>(...args);
 });

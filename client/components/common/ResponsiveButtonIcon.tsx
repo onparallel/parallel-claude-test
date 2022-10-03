@@ -2,6 +2,7 @@ import {
   Button,
   chakra,
   IconButtonProps,
+  IconProps,
   Placement,
   Tooltip,
   useBreakpointValue,
@@ -40,7 +41,7 @@ export const ResponsiveButtonIcon = chakraForwardRef<"button", ResponsiveButtonI
           display={hideIconOnDesktop ? { base: "inherit", [breakpoint]: "none" } : "inherit"}
         >
           {isValidElement(icon)
-            ? cloneElement(icon, {
+            ? cloneElement<IconProps>(icon as any, {
                 "aria-hidden": true,
                 focusable: false,
               })

@@ -27,7 +27,7 @@ export class SystemRepository extends BaseRepository {
     const [{ count }] = await this.from("system_event")
       .where({ type: "USER_LOGGED_IN" })
       .whereRaw(/* sql */ `(("data" ->> 'user_id')::int) = ?`, [userId])
-      .select(this.count());
+      .select<{ count: number }[]>(this.count());
 
     return count;
   }
