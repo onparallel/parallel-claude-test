@@ -198,6 +198,10 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   const breakpoint = "md";
   const scope = useLiquidScope(petition);
 
+  const titleOrgName = granter.organization.hasRemoveParallelBranding
+    ? granter.organization.name
+    : "Parallel";
+
   return (
     <LastSavedProvider>
       <ToneProvider value={tone}>
@@ -207,12 +211,9 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
         >
           <Head>
             {fields[0]?.type === "HEADING" && fields[0].title ? (
-              <title>
-                {fields[0].title}
-                {granter.organization.hasRemoveParallelBranding ? "" : " | Parallel"}
-              </title>
+              <title>{`${fields[0].title} | ${titleOrgName}`}</title>
             ) : (
-              <title>Parallel</title>
+              <title>{titleOrgName}</title>
             )}
           </Head>
           <Flex
@@ -491,6 +492,7 @@ RecipientView.fragments = {
           ...RecipientView_PublicUser
           organization {
             id
+            name
             hasRemoveParallelBranding
             brandTheme {
               ...OverrideWithOrganizationTheme_OrganizationBrandThemeData

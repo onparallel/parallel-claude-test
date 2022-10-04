@@ -21817,8 +21817,8 @@ export type RecipientView_PublicPetitionAccessFragment = {
     organization: {
       __typename?: "PublicOrganization";
       id: string;
-      hasRemoveParallelBranding: boolean;
       name: string;
+      hasRemoveParallelBranding: boolean;
       logoUrl?: string | null;
       brandTheme: {
         __typename?: "OrganizationBrandThemeData";
@@ -22159,8 +22159,8 @@ export type RecipientView_accessQuery = {
       organization: {
         __typename?: "PublicOrganization";
         id: string;
-        hasRemoveParallelBranding: boolean;
         name: string;
+        hasRemoveParallelBranding: boolean;
         logoUrl?: string | null;
         brandTheme: {
           __typename?: "OrganizationBrandThemeData";
@@ -28029,6 +28029,7 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
       ...RecipientView_PublicUser
       organization {
         id
+        name
         hasRemoveParallelBranding
         brandTheme {
           ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
