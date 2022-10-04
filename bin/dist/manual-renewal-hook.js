@@ -1,4 +1,18 @@
 "use strict";
+/**
+ * This script is run by certbot when trying to renew the certificate for *.onparallel.com
+ * and onparallel.com.
+ * Certbot calls the script with a given challenge that needs to go as a TXT record on
+ * _acme-challenge.onparallel.com
+ *
+ * The following lines have been added to the renewal conf for the domain at
+ * /nfs/parallel/certs/renewal/onparallel.com.conf
+ *
+ * ```
+ * manual_auth_hook = node /home/ec2-user/parallel/bin/dist/manual-renewal-hook.js
+ * manual_cleanup_hook = node /home/ec2-user/parallel/bin/dist/manual-renewal-hook.js
+ * ```
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_route_53_1 = require("@aws-sdk/client-route-53");
 const credential_providers_1 = require("@aws-sdk/credential-providers"); // ES6 import
@@ -115,6 +129,6 @@ async function waitForChange(changeId) {
         var _a;
         const response = await route53.send(new client_route_53_1.GetChangeCommand({ Id: changeId }));
         return ((_a = response.ChangeInfo) === null || _a === void 0 ? void 0 : _a.Status) === "INSYNC";
-    }, "Waiting for record change", 3000);
+    }, 3000);
 }
 (0, run_1.run)(main);

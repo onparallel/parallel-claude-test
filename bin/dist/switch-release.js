@@ -76,10 +76,27 @@ async function main() {
         .send(new client_cloudfront_1.ListDistributionsCommand({}))
         .then((result) => result.DistributionList.Items.find((d) => d.Origins.Items.some((o) => o.Id === `S3-parallel-static-${env}`)).Id);
     // find distribution for
-    await cloudfront.send(new client_cloudfront_1.CreateInvalidationCommand({
-        DistributionId: distributionId,
-        InvalidationBatch: { CallerReference: buildId, Paths: { Quantity: 1, Items: ["/static/*"] } },
-    }));
+    await (0, wait_1.waitFor)(async (iteration) => {
+        if (iteration >= 10) {
+            throw new Error("Cloudfront is not responding.");
+        }
+        try {
+            await cloudfront.send(new client_cloudfront_1.CreateInvalidationCommand({
+                DistributionId: distributionId,
+                InvalidationBatch: {
+                    CallerReference: buildId,
+                    Paths: { Quantity: 1, Items: ["/static/*"] },
+                },
+            }));
+            return true;
+        }
+        catch (error) {
+            if (error instanceof client_cloudfront_1.CloudFrontServiceException) {
+                return false;
+            }
+            throw error;
+        }
+    }, 30000);
     console.log(chalk_1.default.green.bold `Invalidation created`);
     await (0, wait_1.waitFor)(async () => {
         return await elb

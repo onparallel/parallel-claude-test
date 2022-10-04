@@ -2,6 +2,7 @@ import {
   CloudFrontClient,
   CreateInvalidationCommand,
   ListDistributionsCommand,
+  CloudFrontServiceException,
 } from "@aws-sdk/client-cloudfront";
 import { DescribeInstancesCommand, EC2Client } from "@aws-sdk/client-ec2";
 import {
@@ -105,12 +106,28 @@ async function main() {
         )!.Id
     );
   // find distribution for
-  await cloudfront.send(
-    new CreateInvalidationCommand({
-      DistributionId: distributionId,
-      InvalidationBatch: { CallerReference: buildId, Paths: { Quantity: 1, Items: ["/static/*"] } },
-    })
-  );
+  await waitFor(async (iteration) => {
+    if (iteration >= 10) {
+      throw new Error("Cloudfront is not responding.");
+    }
+    try {
+      await cloudfront.send(
+        new CreateInvalidationCommand({
+          DistributionId: distributionId,
+          InvalidationBatch: {
+            CallerReference: buildId,
+            Paths: { Quantity: 1, Items: ["/static/*"] },
+          },
+        })
+      );
+      return true;
+    } catch (error) {
+      if (error instanceof CloudFrontServiceException) {
+        return false;
+      }
+      throw error;
+    }
+  }, 30_000);
 
   console.log(chalk.green.bold`Invalidation created`);
 

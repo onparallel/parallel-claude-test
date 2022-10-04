@@ -6,9 +6,15 @@ async function wait(ms) {
 }
 exports.wait = wait;
 async function waitFor(fn, message, ms) {
-    while (!(await fn())) {
-        console.log(message);
-        await wait(ms);
+    const _ms = typeof message === "number" ? message : ms;
+    const _message = typeof message === "number" ? undefined : message;
+    let iteration = 0;
+    while (!(await fn(iteration))) {
+        if (_message !== undefined) {
+            console.log(_message);
+        }
+        await wait(_ms);
+        iteration++;
     }
 }
 exports.waitFor = waitFor;
