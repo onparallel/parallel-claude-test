@@ -2036,33 +2036,6 @@ export const completePetition = mutationField("completePetition", {
           "Can't complete the petition without signers information",
           "REQUIRED_SIGNER_INFO_ERROR"
         );
-      } else if (error.message === "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED") {
-        // insert a CANCELLED signature request so user can see it on the signatures card
-        const cancelledSignature = await ctx.petitions.createPetitionSignature(petition.id, {
-          signature_config: {
-            ...petition.signature_config,
-            additionalSignersInfo: args.additionalSigners ?? [],
-            message: args.message ?? undefined,
-          },
-          status: "CANCELLED",
-          cancel_reason: "REQUEST_ERROR",
-          cancel_data: {
-            error: "The signature request could not be started due to lack of signature credits",
-            error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
-          },
-        });
-        await ctx.petitions.createEvent({
-          type: "SIGNATURE_CANCELLED",
-          data: {
-            petition_signature_request_id: cancelledSignature.id,
-            cancel_reason: "REQUEST_ERROR",
-            cancel_data: {
-              error: "The signature request could not be started due to lack of signature credits",
-              error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
-            },
-          },
-          petition_id: args.petitionId,
-        });
       } else {
         throw error;
       }

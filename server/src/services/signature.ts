@@ -294,19 +294,5 @@ export class SignatureService implements ISignatureService {
     if (petition.org_id !== integration.org_id) {
       throw new Error(`Invalid OrgIntegration:${integration.id} on Petition:${petitionId}`);
     }
-
-    /* check this here to avoid calling the signature-worker with a request that will be cancelled due to lack of credits */
-    if (integration.provider.toUpperCase() === "SIGNATURIT") {
-      const settings = integration.settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
-      if (settings.CREDENTIALS.API_KEY === this.config.signature.signaturitSharedProductionApiKey) {
-        const sharedKeyUsage = await this.organizationsRepository.getOrganizationCurrentUsageLimit(
-          integration.org_id,
-          "SIGNATURIT_SHARED_APIKEY"
-        );
-        if (!sharedKeyUsage || sharedKeyUsage.used >= sharedKeyUsage.limit) {
-          throw new Error("SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED");
-        }
-      }
-    }
   }
 }

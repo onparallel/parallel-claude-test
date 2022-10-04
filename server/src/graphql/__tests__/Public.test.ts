@@ -2307,7 +2307,6 @@ describe("GraphQL/Public", () => {
           .knex("petition_signature_request")
           .where("petition_id", access.petition_id)
           .select("*");
-        expect(signatureRequest?.status).toEqual("CANCELLED");
 
         const [event] = await mocks
           .knex("petition_event")

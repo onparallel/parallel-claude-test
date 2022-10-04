@@ -125,11 +125,22 @@ async function startSignatureProcess(
     }
     if (error.message === "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED") {
       cancelData.error_code = "INSUFFICIENT_SIGNATURE_CREDITS";
+      cancelData.error =
+        "The signature request could not be started due to lack of signature credits";
     }
 
     await ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData);
-
-    throw error;
+    // update signature_config with additional signers specified by recipient so user can restart the signature request knowing who are the signers
+    await ctx.petitions.updatePetition(
+      petition.id,
+      {
+        signature_config: {
+          ...petition.signature_config!,
+          signersInfo: signature.signature_config.signersInfo,
+        },
+      },
+      `SignatureWorker:${payload.petitionSignatureRequestId}`
+    );
   } finally {
     try {
       if (isDefined(documentTmpPath)) {

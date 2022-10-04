@@ -4170,7 +4170,6 @@ describe("GraphQL/Petitions", () => {
         .knex("petition_signature_request")
         .where("petition_id", petition.id)
         .select("*");
-      expect(signatureRequest?.status).toEqual("CANCELLED");
 
       const [event] = await mocks
         .knex("petition_event")
