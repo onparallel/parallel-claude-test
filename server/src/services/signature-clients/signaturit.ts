@@ -20,6 +20,7 @@ import { removeNotDefined } from "../../util/remedaExtensions";
 import { EMAILS, IEmailsService } from "../emails";
 import { FETCH_SERVICE, IFetchService } from "../fetch";
 import { I18N_SERVICE, II18nService } from "../i18n";
+import { IOrganizationCreditsService, ORGANIZATION_CREDITS_SERVICE } from "../organization-credits";
 import { BrandingIdKey, ISignatureClient, Recipient, SignatureOptions } from "./client";
 
 @injectable()
@@ -33,6 +34,7 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
     @inject(I18N_SERVICE) private i18n: II18nService,
     @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(EMAILS) private emails: IEmailsService,
+    @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: IOrganizationCreditsService,
     @inject(IntegrationRepository) private integrationRepository: IntegrationRepository,
     @inject(OrganizationRepository) private organizationRepository: OrganizationRepository
   ) {}
@@ -102,10 +104,8 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
       if (
         this.settings.CREDENTIALS.API_KEY === this.config.signature.signaturitSharedProductionApiKey
       ) {
-        // sets used signature credits += 1
-        await this.organizationRepository.updateOrganizationCurrentUsageLimitCredits(
+        await this.orgCredits.consumeSignaturitApiKeyCredits(
           fromGlobalId(orgId, "Organization").id,
-          "SIGNATURIT_SHARED_APIKEY",
           1
         );
       }
@@ -159,9 +159,7 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
         reminders: 0,
       });
     } catch (error: any) {
-      if (error.constraint === "organization_usage_limit__used__limit__check") {
-        throw new Error("SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED");
-      } else if (error.message === "Account depleted all it's advanced signature requests") {
+      if (error.message === "Account depleted all it's advanced signature requests") {
         await this.emails.sendInternalSignaturitAccountDepletedCreditsEmail(
           fromGlobalId(orgId, "Organization").id,
           fromGlobalId(petitionId, "Petition").id,

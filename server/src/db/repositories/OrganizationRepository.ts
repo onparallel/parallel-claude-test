@@ -355,6 +355,10 @@ export class OrganizationRepository extends BaseRepository {
       })
       .update({ used: this.knex.raw(`used + ?`, [credits]) }, "*");
 
+    if (!usage) {
+      throw new Error("ORGANIZATION_USAGE_LIMIT_EXPIRED");
+    }
+
     // if usage reached 80% or 100% of total credits in the period, send warning email to owner and admins
     for (const threshold of [100, 80]) {
       const value = Math.round((usage.limit * threshold) / 100);

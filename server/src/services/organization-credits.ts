@@ -14,6 +14,7 @@ export interface IOrganizationCreditsService {
     amount: number,
     updatedBy: string
   ): Promise<void>;
+  consumeSignaturitApiKeyCredits(orgId: number, amount: number): Promise<void>;
 }
 
 @injectable()
@@ -47,8 +48,29 @@ export class OrganizationCreditsService implements IOrganizationCreditsService {
         await this.petitions.updatePetition(petition.id, { credits_used: 1 }, updatedBy);
       }
     } catch (error: any) {
-      if (error.constraint === "organization_usage_limit__used__limit__check") {
+      if (
+        error.message === "ORGANIZATION_USAGE_LIMIT_EXPIRED" ||
+        error.constraint === "organization_usage_limit__used__limit__check"
+      ) {
         throw new Error("PETITION_SEND_LIMIT_REACHED");
+      }
+      throw error;
+    }
+  }
+
+  async consumeSignaturitApiKeyCredits(orgId: number, amount: number) {
+    try {
+      await this.organizations.updateOrganizationCurrentUsageLimitCredits(
+        orgId,
+        "SIGNATURIT_SHARED_APIKEY",
+        amount
+      );
+    } catch (error: any) {
+      if (
+        error.message === "ORGANIZATION_USAGE_LIMIT_EXPIRED" ||
+        error.constraint === "organization_usage_limit__used__limit__check"
+      ) {
+        throw new Error("SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED");
       }
       throw error;
     }
