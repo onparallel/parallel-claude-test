@@ -240,24 +240,28 @@ function PublicPetitionLink({
           </SimpleGrid>
           <Spacer />
           <Flex justifyContent="flex-end">
-            <NakedLink href={`https://www.onparallel.com/${intl.locale}?ref=parallel_public_link`}>
-              <Box
-                as="a"
-                target="_blank"
-                backgroundColor="gray.200"
-                borderTopLeftRadius="xl"
-                paddingX={4}
-                paddingY={1.5}
-                fontSize="sm"
-                whiteSpace="nowrap"
+            {publicPetitionLink.owner.organization.hasRemoveParallelBranding ? null : (
+              <NakedLink
+                href={`https://www.onparallel.com/${intl.locale}?ref=parallel_public_link`}
               >
-                <FormattedMessage
-                  id="recipient-view.created-with"
-                  defaultMessage="Created with {parallel}"
-                  values={{ parallel: <Text as="b">Parallel</Text> }}
-                />
-              </Box>
-            </NakedLink>
+                <Box
+                  as="a"
+                  target="_blank"
+                  backgroundColor="gray.200"
+                  borderTopLeftRadius="xl"
+                  paddingX={4}
+                  paddingY={1.5}
+                  fontSize="sm"
+                  whiteSpace="nowrap"
+                >
+                  <FormattedMessage
+                    id="recipient-view.created-with"
+                    defaultMessage="Created with {parallel}"
+                    values={{ parallel: <Text as="b">Parallel</Text> }}
+                  />
+                </Box>
+              </NakedLink>
+            )}
           </Flex>
         </Flex>
       </Center>
@@ -277,6 +281,7 @@ PublicPetitionLink.fragments = {
         organization {
           name
           logoUrl
+          hasRemoveParallelBranding
         }
       }
     }

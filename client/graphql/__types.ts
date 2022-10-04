@@ -22271,7 +22271,12 @@ export type PublicPetitionLink_PublicPublicPetitionLinkFragment = {
     __typename?: "PublicUser";
     fullName: string;
     email: string;
-    organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
+    organization: {
+      __typename?: "PublicOrganization";
+      name: string;
+      logoUrl?: string | null;
+      hasRemoveParallelBranding: boolean;
+    };
   };
 };
 
@@ -22310,7 +22315,12 @@ export type PublicPetitionLink_publicPetitionLinkBySlugQuery = {
       __typename?: "PublicUser";
       fullName: string;
       email: string;
-      organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
+      organization: {
+        __typename?: "PublicOrganization";
+        name: string;
+        logoUrl?: string | null;
+        hasRemoveParallelBranding: boolean;
+      };
     };
   } | null;
 };
@@ -28060,6 +28070,7 @@ export const PublicPetitionLink_PublicPublicPetitionLinkFragmentDoc = gql`
       organization {
         name
         logoUrl
+        hasRemoveParallelBranding
       }
     }
   }
