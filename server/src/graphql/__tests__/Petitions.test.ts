@@ -4165,30 +4165,6 @@ describe("GraphQL/Petitions", () => {
         id: toGlobalId("Petition", petition.id),
         status: "COMPLETED",
       });
-      // make sure signature didn't start
-      const [signatureRequest] = await mocks
-        .knex("petition_signature_request")
-        .where("petition_id", petition.id)
-        .select("*");
-
-      const [event] = await mocks
-        .knex("petition_event")
-        .where("petition_id", petition.id)
-        .where("type", "SIGNATURE_CANCELLED")
-        .select("*");
-
-      expect(event).toMatchObject({
-        type: "SIGNATURE_CANCELLED",
-        data: {
-          petition_signature_request_id: signatureRequest!.id,
-          cancel_reason: "REQUEST_ERROR",
-          cancel_data: {
-            error: "The signature request could not be started due to lack of signature credits",
-            error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
-          },
-        },
-        petition_id: petition.id,
-      });
     });
 
     it("don't use credits when sending a signature with a personal apiKey", async () => {
