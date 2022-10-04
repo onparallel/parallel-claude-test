@@ -73,28 +73,28 @@ export function buildConfig() {
     queueWorkers: {
       "email-sender": {
         queueUrl: process.env.WORKERS_EMAIL_SENDER_ENDPOINT!,
-        visibilityTimeout: parseInt(process.env.WORKER_EMAIL_SENDER_VISIBILITY_TIMEOUT!),
-        heartbeatInterval: parseInt(process.env.WORKER_EMAIL_SENDER_HEARTBEAT_INTERVAL!),
+        visibilityTimeout: parseInt(process.env.WORKERS_EMAIL_SENDER_VISIBILITY_TIMEOUT!),
+        heartbeatInterval: parseInt(process.env.WORKERS_EMAIL_SENDER_HEARTBEAT_INTERVAL!),
       },
       "email-events": {
         queueUrl: process.env.WORKERS_EMAIL_EVENTS_ENDPOINT!,
-        visibilityTimeout: parseInt(process.env.WORKER_EMAIL_EVENTS_VISIBILITY_TIMEOUT!),
-        heartbeatInterval: parseInt(process.env.WORKER_EMAIL_EVENTS_HEARTBEAT_INTERVAL!),
+        visibilityTimeout: parseInt(process.env.WORKERS_EMAIL_EVENTS_VISIBILITY_TIMEOUT!),
+        heartbeatInterval: parseInt(process.env.WORKERS_EMAIL_EVENTS_HEARTBEAT_INTERVAL!),
       },
       "signature-worker": {
         queueUrl: process.env.WORKERS_SIGNATURE_ENDPOINT!,
-        visibilityTimeout: parseInt(process.env.WORKER_SIGNATURE_VISIBILITY_TIMEOUT!),
-        heartbeatInterval: parseInt(process.env.WORKER_SIGNATURE_HEARTBEAT_INTERVAL!),
+        visibilityTimeout: parseInt(process.env.WORKERS_SIGNATURE_VISIBILITY_TIMEOUT!),
+        heartbeatInterval: parseInt(process.env.WORKERS_SIGNATURE_HEARTBEAT_INTERVAL!),
       },
       "event-processor": {
         queueUrl: process.env.WORKERS_EVENT_PROCESSOR_ENDPOINT!,
-        visibilityTimeout: parseInt(process.env.WORKER_EVENT_PROCESSOR_VISIBILITY_TIMEOUT!),
-        heartbeatInterval: parseInt(process.env.WORKER_EVENT_PROCESSOR_HEARTBEAT_INTERVAL!),
+        visibilityTimeout: parseInt(process.env.WORKERS_EVENT_PROCESSOR_VISIBILITY_TIMEOUT!),
+        heartbeatInterval: parseInt(process.env.WORKERS_EVENT_PROCESSOR_HEARTBEAT_INTERVAL!),
       },
       "task-worker": {
         queueUrl: process.env.WORKERS_TASK_WORKER_ENDPOINT!,
-        visibilityTimeout: parseInt(process.env.WORKER_TASK_WORKER_VISIBILITY_TIMEOUT!),
-        heartbeatInterval: parseInt(process.env.WORKER_TASK_WORKER_HEARTBEAT_INTERVAL!),
+        visibilityTimeout: parseInt(process.env.WORKERS_TASK_WORKER_VISIBILITY_TIMEOUT!),
+        heartbeatInterval: parseInt(process.env.WORKERS_TASK_WORKER_HEARTBEAT_INTERVAL!),
       },
     },
     cronWorkers: {
