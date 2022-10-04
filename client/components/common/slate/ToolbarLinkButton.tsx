@@ -63,7 +63,7 @@ export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonPro
           upsertLink(editorRef.current, {
             url: link.url,
             text: linkNode?.[0].children.length === 1 ? linkNode[0].children[0].text : undefined,
-            update: true,
+            insertTextInLink: true,
           });
         } else {
           const text = link.text || link.url;
