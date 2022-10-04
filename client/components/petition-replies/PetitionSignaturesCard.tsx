@@ -23,10 +23,8 @@ import { usePetitionSignaturesCardPolling } from "@parallel/utils/usePetitionSig
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Card, CardHeader } from "../common/Card";
-import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { HelpPopover } from "../common/HelpPopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { SupportLink } from "../common/SupportLink";
 import {
   SignatureConfigDialog,
   useSignatureConfigDialog,
@@ -194,7 +192,6 @@ export const PetitionSignaturesCard = Object.assign(
       [updateSignatureConfig, cancelSignatureRequest]
     );
 
-    const showErrorDialog = useErrorDialog();
     const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
 
     const handleStartSignatureProcess = useCallback(
@@ -218,32 +215,7 @@ export const PetitionSignaturesCard = Object.assign(
           });
           await onRefetchPetition();
         } catch (error: any) {
-          if (isApolloError(error, "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED")) {
-            await withError(
-              showErrorDialog({
-                message: intl.formatMessage(
-                  {
-                    id: "component.petition-signatures-card.no-credits-left.error",
-                    defaultMessage:
-                      "The eSignature could not be started due to lack of signature credits. Please <a>contact with support</a> to get more credits.",
-                  },
-                  {
-                    a: (chunks: any) => (
-                      <SupportLink
-                        message={intl.formatMessage({
-                          id: "component.petition-signatures-card.add-signature-credits-message",
-                          defaultMessage:
-                            "Hi, I would like to get more information about how to get more signature credits.",
-                        })}
-                      >
-                        {chunks}
-                      </SupportLink>
-                    ),
-                  }
-                ),
-              })
-            );
-          } else if (isApolloError(error, "PETITION_SEND_LIMIT_REACHED")) {
+          if (isApolloError(error, "PETITION_SEND_LIMIT_REACHED")) {
             await withError(showPetitionLimitReachedErrorDialog());
           }
         }

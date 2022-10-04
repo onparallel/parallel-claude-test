@@ -56,12 +56,6 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
           "Can't complete the parallel due to lack of credits",
           "PETITION_SEND_LIMIT_REACHED"
         );
-      } else if (error.message === "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED") {
-        // in this case, just throw the error without creating a SIGNATURE_CANCELLED event. We will inform in the front-end with an error dialog
-        throw new ApolloError(
-          "You reached the limit of uses for our signature API_KEY",
-          "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED"
-        );
       }
       throw error;
     }
