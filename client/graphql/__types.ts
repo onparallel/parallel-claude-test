@@ -22276,6 +22276,11 @@ export type PublicPetitionLink_PublicPublicPetitionLinkFragment = {
       name: string;
       logoUrl?: string | null;
       hasRemoveParallelBranding: boolean;
+      brandTheme: {
+        __typename?: "OrganizationBrandThemeData";
+        fontFamily?: string | null;
+        color: string;
+      };
     };
   };
 };
@@ -22320,6 +22325,11 @@ export type PublicPetitionLink_publicPetitionLinkBySlugQuery = {
         name: string;
         logoUrl?: string | null;
         hasRemoveParallelBranding: boolean;
+        brandTheme: {
+          __typename?: "OrganizationBrandThemeData";
+          fontFamily?: string | null;
+          color: string;
+        };
       };
     };
   } | null;
@@ -28071,6 +28081,10 @@ export const PublicPetitionLink_PublicPublicPetitionLinkFragmentDoc = gql`
         name
         logoUrl
         hasRemoveParallelBranding
+        brandTheme {
+          fontFamily
+          color
+        }
       }
     }
   }

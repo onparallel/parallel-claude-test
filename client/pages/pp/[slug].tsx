@@ -13,6 +13,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
+import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import { PublicPetitionEmailExists } from "@parallel/components/public/public-petitions/PublicPetitionEmailExists";
 import { PublicPetitionEmailSent } from "@parallel/components/public/public-petitions/PublicPetitionEmailSent";
@@ -156,115 +157,122 @@ function PublicPetitionLink({
           organization.name === "Parallel" ? title : organization.name
         }`}</title>
       </Head>
-      <Center
-        padding={{ base: 0, md: 6 }}
-        minHeight="100vh"
-        height={{ base: "100vh", md: "auto" }}
-        width="full"
-        backgroundColor="gray.50"
-        overflow="auto"
+      <OverrideWithOrganizationTheme
+        cssVarsRoot="body"
+        brandTheme={publicPetitionLink.owner.organization.brandTheme}
       >
-        <Flex
-          flexDirection="column"
-          width={{ base: "full", md: "auto" }}
-          height={{ base: "full", md: "auto" }}
-          rounded={{ base: undefined, md: "xl" }}
-          shadow={{ base: undefined, md: "lg" }}
-          border={{ base: undefined, md: "1px solid" }}
-          borderColor={{ base: undefined, md: "gray.200" }}
-          backgroundColor="white"
+        <Center
+          padding={{ base: 0, md: 6 }}
+          minHeight="100vh"
+          height={{ base: "100vh", md: "auto" }}
+          width="full"
+          backgroundColor="gray.50"
           overflow="auto"
         >
-          {!publicPetitionLink.isAvailable ? (
-            <Alert status="warning">
-              <AlertIcon color="yellow.500" />
-              <AlertTitle>
-                <FormattedMessage
-                  id="public.public-petition-link-unavailable.title"
-                  defaultMessage="This process is closed"
-                />
-              </AlertTitle>
-              <AlertDescription>
-                -{" "}
-                <FormattedMessage
-                  id="public.public-petition-link-unavailable.description"
-                  defaultMessage="Contact with {fullName} <{email}> to continue."
-                  values={{
-                    fullName: publicPetitionLink.owner.fullName!,
-                    email: publicPetitionLink.owner.email,
-                  }}
-                />
-              </AlertDescription>
-            </Alert>
-          ) : null}
-          <SimpleGrid
-            paddingX={{ base: 6, md: 8 }}
-            paddingY={{ base: 6, md: 10 }}
-            paddingBottom={{ base: 10, md: undefined }}
-            gap={8}
-            columns={{ base: 1, md: step !== "INITIAL" ? 1 : 2 }}
+          <Flex
+            flexDirection="column"
+            width={{ base: "full", md: "auto" }}
+            height={{ base: "full", md: "auto" }}
+            rounded={{ base: undefined, md: "xl" }}
+            shadow={{ base: undefined, md: "lg" }}
+            border={{ base: undefined, md: "1px solid" }}
+            borderColor={{ base: undefined, md: "gray.200" }}
+            backgroundColor="white"
+            overflow="auto"
           >
-            {step === "REMINDER_SENT" ? (
-              <PublicPetitionReminder
-                organizationName={organization.name}
-                logoUrl={organization.logoUrl}
-                email={submittedData?.email ?? ""}
-              />
-            ) : step === "EMAIL_SENT" ? (
-              <PublicPetitionEmailSent
-                organizationName={organization.name}
-                logoUrl={organization.logoUrl}
-                email={submittedData?.email ?? ""}
-              />
-            ) : step === "EMAIL_EXISTS" ? (
-              <PublicPetitionEmailExists
-                organizationName={organization.name}
-                logoUrl={organization.logoUrl}
-                onContinue={handleContinueExisting}
-                onNewPetition={handleNewPublicPetition}
-                isNewRequestLoading={loading}
-                isReminderLoading={reminderLoading}
-              />
-            ) : (
-              <PublicPetitionInitialForm
-                organizationName={organization.name}
-                logoUrl={organization.logoUrl}
-                title={title}
-                description={description}
-                onSubmit={onSubmit}
-                isLoading={loading}
-                isDisabled={!publicPetitionLink.isAvailable}
-                defaultValues={defaultValues}
-              />
-            )}
-          </SimpleGrid>
-          <Spacer />
-          <Flex justifyContent="flex-end">
-            {publicPetitionLink.owner.organization.hasRemoveParallelBranding ? null : (
-              <NakedLink
-                href={`https://www.onparallel.com/${intl.locale}?ref=parallel_public_link`}
-              >
-                <Box
-                  as="a"
-                  target="_blank"
-                  backgroundColor="gray.200"
-                  borderTopLeftRadius="xl"
-                  paddingX={4}
-                  paddingY={1.5}
-                  fontSize="sm"
-                  whiteSpace="nowrap"
-                >
+            {!publicPetitionLink.isAvailable ? (
+              <Alert status="warning">
+                <AlertIcon color="yellow.500" />
+                <AlertTitle>
                   <FormattedMessage
-                    id="recipient-view.created-with"
-                    defaultMessage="Created with {parallel}"
-                    values={{ parallel: <Text as="b">Parallel</Text> }}
+                    id="public.public-petition-link-unavailable.title"
+                    defaultMessage="This process is closed"
                   />
-                </Box>
-              </NakedLink>
+                </AlertTitle>
+                <AlertDescription>
+                  -{" "}
+                  <FormattedMessage
+                    id="public.public-petition-link-unavailable.description"
+                    defaultMessage="Contact with {fullName} <{email}> to continue."
+                    values={{
+                      fullName: publicPetitionLink.owner.fullName!,
+                      email: publicPetitionLink.owner.email,
+                    }}
+                  />
+                </AlertDescription>
+              </Alert>
+            ) : null}
+            <SimpleGrid
+              paddingX={{ base: 6, md: 8 }}
+              paddingY={{ base: 6, md: 10 }}
+              paddingBottom={{ base: 10, md: undefined }}
+              gap={8}
+              columns={{ base: 1, md: step !== "INITIAL" ? 1 : 2 }}
+            >
+              {step === "REMINDER_SENT" ? (
+                <PublicPetitionReminder
+                  organizationName={organization.name}
+                  logoUrl={organization.logoUrl}
+                  email={submittedData?.email ?? ""}
+                />
+              ) : step === "EMAIL_SENT" ? (
+                <PublicPetitionEmailSent
+                  organizationName={organization.name}
+                  logoUrl={organization.logoUrl}
+                  email={submittedData?.email ?? ""}
+                />
+              ) : step === "EMAIL_EXISTS" ? (
+                <PublicPetitionEmailExists
+                  organizationName={organization.name}
+                  logoUrl={organization.logoUrl}
+                  onContinue={handleContinueExisting}
+                  onNewPetition={handleNewPublicPetition}
+                  isNewRequestLoading={loading}
+                  isReminderLoading={reminderLoading}
+                />
+              ) : (
+                <PublicPetitionInitialForm
+                  organizationName={organization.name}
+                  logoUrl={organization.logoUrl}
+                  title={title}
+                  description={description}
+                  onSubmit={onSubmit}
+                  isLoading={loading}
+                  isDisabled={!publicPetitionLink.isAvailable}
+                  defaultValues={defaultValues}
+                />
+              )}
+            </SimpleGrid>
+            {publicPetitionLink.owner.organization.hasRemoveParallelBranding ? null : (
+              <>
+                <Spacer />
+                <Flex justifyContent="flex-end">
+                  <NakedLink
+                    href={`https://www.onparallel.com/${intl.locale}?ref=parallel_public_link`}
+                  >
+                    <Box
+                      as="a"
+                      target="_blank"
+                      backgroundColor="gray.200"
+                      borderTopLeftRadius="xl"
+                      paddingX={4}
+                      paddingY={1.5}
+                      fontSize="sm"
+                      whiteSpace="nowrap"
+                    >
+                      <FormattedMessage
+                        id="recipient-view.created-with"
+                        defaultMessage="Created with {parallel}"
+                        values={{ parallel: <Text as="b">Parallel</Text> }}
+                      />
+                    </Box>
+                  </NakedLink>
+                </Flex>
+              </>
             )}
           </Flex>
-        </Flex>
-      </Center>
+        </Center>
+      </OverrideWithOrganizationTheme>
     </>
   );
 }
@@ -282,6 +290,10 @@ PublicPetitionLink.fragments = {
           name
           logoUrl
           hasRemoveParallelBranding
+          brandTheme {
+            fontFamily
+            color
+          }
         }
       }
     }
