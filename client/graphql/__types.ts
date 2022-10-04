@@ -22205,8 +22205,8 @@ export type RecipientViewVerify_verifyPublicAccessMutation = {
     organization?: {
       __typename?: "PublicOrganization";
       id: string;
-      name: string;
       hasRemoveParallelBranding: boolean;
+      name: string;
       logoUrl340?: string | null;
       brandTheme: {
         __typename?: "OrganizationBrandThemeData";
@@ -31291,6 +31291,7 @@ export const RecipientViewVerify_verifyPublicAccessDocument = gql`
       email
       organization {
         id
+        hasRemoveParallelBranding
         ...RecipientViewContactlessForm_PublicOrganization
         ...RecipientViewNewDevice_PublicOrganization
         brandTheme {

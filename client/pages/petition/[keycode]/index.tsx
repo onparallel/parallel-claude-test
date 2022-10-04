@@ -27,10 +27,10 @@ function RecipientViewVerify({
     <ToneProvider value={organization!.brandTheme.preferredTone}>
       <OverrideWithOrganizationTheme cssVarsRoot="body" brandTheme={organization!.brandTheme}>
         <Head>
-          <title>{organization!.name}</title>
+          <title>{organization!.hasRemoveParallelBranding ? organization!.name : "Parallel"}</title>
         </Head>
         <Flex backgroundColor="primary.50" minHeight="100vh" alignItems="center">
-          <Container paddingY={4} maxWidth="32rem">
+          <Container paddingY={4} maxWidth="34rem">
             {isContactlessAccess ? (
               <RecipientViewContactlessForm ownerName={ownerName!} organization={organization!} />
             ) : (
@@ -107,6 +107,7 @@ RecipientViewVerify.mutations = [
         email
         organization {
           id
+          hasRemoveParallelBranding
           ...RecipientViewContactlessForm_PublicOrganization
           ...RecipientViewNewDevice_PublicOrganization
           brandTheme {

@@ -68,6 +68,8 @@ function PublicPetitionLink({
     owner: { organization },
   } = publicPetitionLink;
 
+  const hasRemoveParallelBranding = organization.hasRemoveParallelBranding;
+
   const [createPublicPetition, { loading }] = useMutation(
     PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocument
   );
@@ -150,23 +152,20 @@ function PublicPetitionLink({
     }
   };
 
+  const titleOrgName = hasRemoveParallelBranding ? organization.name : "Parallel";
+
   return (
     <>
       <Head>
-        <title>{`Parallel | ${
-          organization.name === "Parallel" ? title : organization.name
-        }`}</title>
+        <title>{`${title} | ${titleOrgName}`}</title>
       </Head>
-      <OverrideWithOrganizationTheme
-        cssVarsRoot="body"
-        brandTheme={publicPetitionLink.owner.organization.brandTheme}
-      >
+      <OverrideWithOrganizationTheme cssVarsRoot="body" brandTheme={organization.brandTheme}>
         <Center
           padding={{ base: 0, md: 6 }}
           minHeight="100vh"
           height={{ base: "100vh", md: "auto" }}
           width="full"
-          backgroundColor="gray.50"
+          backgroundColor="primary.50"
           overflow="auto"
         >
           <Flex
@@ -243,7 +242,7 @@ function PublicPetitionLink({
                 />
               )}
             </SimpleGrid>
-            {publicPetitionLink.owner.organization.hasRemoveParallelBranding ? null : (
+            {hasRemoveParallelBranding ? null : (
               <>
                 <Spacer />
                 <Flex justifyContent="flex-end">
