@@ -45,13 +45,11 @@ async function startSignatureProcess(
     throw new Error(`Signature is not enabled on petition with id ${signature.petition_id}`);
   }
 
-  const org = await fetchOrganization(petition.org_id, ctx);
-
   const { title, orgIntegrationId, signersInfo, message } = signature.signature_config;
 
   let documentTmpPath: string | null = null;
   const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
-  const settings = signatureIntegration.settings as IntegrationSettings<"SIGNATURE">;
+
   try {
     const owner = await ctx.petitions.loadPetitionOwner(petition.id);
     const recipients = signersInfo.map((signer) => ({
@@ -108,21 +106,6 @@ async function startSignatureProcess(
       })
     );
 
-    // when reaching this part, we can be sure the org has at least 1 signature credit available
-    if (signatureIntegration.provider.toUpperCase() === "SIGNATURIT") {
-      const signaturitSettings = settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
-      if (
-        signaturitSettings.CREDENTIALS.API_KEY ===
-        ctx.config.signature.signaturitSharedProductionApiKey
-      )
-        // sets used signature credits += 1
-        await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
-          signatureIntegration.org_id,
-          "SIGNATURIT_SHARED_APIKEY",
-          1
-        );
-    }
-
     await ctx.petitions.updatePetitionSignature(signature.id, {
       external_id: `${signatureIntegration.provider.toUpperCase()}/${data.id}`,
       data,
@@ -140,20 +123,11 @@ async function startSignatureProcess(
     if (error.message === "MAX_SIZE_EXCEEDED") {
       cancelData.error_code = "MAX_SIZE_EXCEEDED";
     }
+    if (error.message === "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED") {
+      cancelData.error_code = "INSUFFICIENT_SIGNATURE_CREDITS";
+    }
 
     await ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData);
-
-    if (
-      signatureIntegration.provider.toUpperCase() === "SIGNATURIT" &&
-      error.message === "Account depleted all it's advanced signature requests"
-    ) {
-      const signaturitSettings = settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
-      await ctx.emails.sendInternalSignaturitAccountDepletedCreditsEmail(
-        org.id,
-        petition.id,
-        signaturitSettings.CREDENTIALS.API_KEY.slice(0, 10)
-      );
-    }
 
     throw error;
   } finally {
@@ -400,14 +374,6 @@ async function fetchPetition(id: number, ctx: WorkerContext) {
     throw new Error(`Couldn't find petition with id ${id}`);
   }
   return petition;
-}
-
-async function fetchOrganization(id: number, ctx: WorkerContext) {
-  const org = await ctx.organizations.loadOrg(id);
-  if (!org) {
-    throw new Error(`Organization:${id} not found`);
-  }
-  return org;
 }
 
 async function fetchPetitionSignature(petitionSignatureRequestId: number, ctx: WorkerContext) {

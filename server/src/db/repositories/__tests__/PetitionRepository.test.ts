@@ -1605,25 +1605,5 @@ describe("repositories/PetitionRepository", () => {
         { type: "NUMBER", content: { value: 10 }, petition_field_id: fieldId(fields, "NUMBER") },
       ]);
     });
-
-    it("fails if org doesnt have petition_send credits", async () => {
-      await mocks.knex
-        .from("organization_usage_limit")
-        .where({ org_id: organization.id, limit_name: "PETITION_SEND" })
-        .update({ used: 0, limit: 0 });
-
-      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
-        status: "PENDING",
-        is_template: false,
-      }));
-      await mocks.createRandomPetitionFields(petition.id, 1, () => ({
-        type: "TEXT",
-        alias: "TEXT",
-      }));
-
-      await expect(
-        petitions.prefillPetition(petition.id, { TEXT: "first text reply" }, user)
-      ).rejects.toThrow("ORGANIZATION_LIMITS_EXCEEDED_ERROR");
-    });
   });
 });

@@ -335,41 +335,31 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
   authorize: authenticatePublicAccess("keycode"),
   resolve: async (_, args, ctx) => {
     try {
-      return await ctx.petitions.withTransaction(async (t) => {
-        let petition = await ctx.petitions.completePetition(
-          ctx.access!.petition_id,
-          ctx.access!,
-          {},
-          t
-        );
-
-        if (petition.signature_config?.review === false) {
-          const { petition: updatedPetition } = await ctx.signature.createSignatureRequest(
-            petition.id,
-            {
-              ...petition.signature_config,
-              additionalSignersInfo: args.additionalSigners ?? [],
-              message: args.message ?? undefined,
-            },
-            ctx.access!,
-            t
-          );
-          petition = updatedPetition ?? petition;
-        } else {
-          await ctx.emails.sendPetitionCompletedEmail(petition.id, {
-            accessId: ctx.access!.id,
-          });
-        }
-        await ctx.petitions.createEvent(
-          {
-            type: "PETITION_COMPLETED",
-            petition_id: ctx.access!.petition_id,
-            data: { petition_access_id: ctx.access!.id },
-          },
-          t
-        );
-        return petition;
+      let petition = await ctx.petitions.completePetition(ctx.access!.petition_id, ctx.access!, {});
+      await ctx.petitions.createEvent({
+        type: "PETITION_COMPLETED",
+        petition_id: ctx.access!.petition_id,
+        data: { petition_access_id: ctx.access!.id },
       });
+
+      if (petition.signature_config?.review === false) {
+        const { petition: updatedPetition } = await ctx.signature.createSignatureRequest(
+          petition.id,
+          {
+            ...petition.signature_config,
+            additionalSignersInfo: args.additionalSigners ?? [],
+            message: args.message ?? undefined,
+          },
+          ctx.access!
+        );
+        petition = updatedPetition ?? petition;
+      } else {
+        await ctx.emails.sendPetitionCompletedEmail(petition.id, {
+          accessId: ctx.access!.id,
+        });
+      }
+
+      return petition;
     } catch (error: any) {
       if (error.message === "REQUIRED_SIGNER_INFO_ERROR") {
         throw new ApolloError(
@@ -384,69 +374,52 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
       } else if (error.message === "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED") {
         // update signature_config with additional signers specified by recipient so user can restart the signature request knowing who are the signers
         const petition = (await ctx.petitions.loadPetition(ctx.access!.petition_id))!;
-        return await ctx.petitions.withTransaction(async (t) => {
-          const completedPetition = await ctx.petitions.completePetition(
-            ctx.access!.petition_id,
-            ctx.access!,
-            {
-              signature_config: {
-                ...petition.signature_config,
-                signersInfo: (petition.signature_config!.signersInfo ?? []).concat(
-                  args.additionalSigners ?? []
-                ),
-              },
+        const [completedPetition] = await ctx.petitions.updatePetition(
+          ctx.access!.petition_id,
+          {
+            signature_config: {
+              ...petition.signature_config!,
+              signersInfo: (petition.signature_config!.signersInfo ?? []).concat(
+                args.additionalSigners ?? []
+              ),
             },
-            t
-          );
-          await ctx.petitions.createEvent(
-            {
-              type: "PETITION_COMPLETED",
-              petition_id: ctx.access!.petition_id,
-              data: { petition_access_id: ctx.access!.id },
+          },
+          `PetitionAccess:${ctx.access!.id}`
+        );
+
+        // insert a CANCELLED signature request so user can see it on the signatures card
+        const cancelledSignature = await ctx.petitions.createPetitionSignature(
+          ctx.access!.petition_id,
+          {
+            signature_config: {
+              ...petition.signature_config,
+              signersInfo: (petition.signature_config!.signersInfo ?? []).concat(
+                args.additionalSigners ?? []
+              ),
             },
-            t
-          );
-          // insert a CANCELLED signature request so user can see it on the signatures card
-          const cancelledSignature = await ctx.petitions.createPetitionSignature(
-            ctx.access!.petition_id,
-            {
-              signature_config: {
-                ...petition.signature_config,
-                signersInfo: (petition.signature_config!.signersInfo ?? []).concat(
-                  args.additionalSigners ?? []
-                ),
-              },
-              status: "CANCELLED",
-              cancel_reason: "REQUEST_ERROR",
-              cancel_data: {
-                error:
-                  "The signature request could not be started due to lack of signature credits",
-                error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
-              },
+            status: "CANCELLED",
+            cancel_reason: "REQUEST_ERROR",
+            cancel_data: {
+              error: "The signature request could not be started due to lack of signature credits",
+              error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
             },
-            t
-          );
-          await ctx.petitions.createEvent(
-            {
-              type: "SIGNATURE_CANCELLED",
-              data: {
-                petition_signature_request_id: cancelledSignature.id,
-                cancel_reason: "REQUEST_ERROR",
-                cancel_data: {
-                  error:
-                    "The signature request could not be started due to lack of signature credits",
-                  error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
-                },
-              },
-              petition_id: ctx.access!.petition_id,
+          }
+        );
+        await ctx.petitions.createEvent({
+          type: "SIGNATURE_CANCELLED",
+          data: {
+            petition_signature_request_id: cancelledSignature.id,
+            cancel_reason: "REQUEST_ERROR",
+            cancel_data: {
+              error: "The signature request could not be started due to lack of signature credits",
+              error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
             },
-            t
-          );
-          return completedPetition;
+          },
+          petition_id: ctx.access!.petition_id,
         });
-      } else {
-        throw error;
+        return completedPetition;
       }
+      throw error;
     }
   },
 });

@@ -7,14 +7,17 @@ import {
   IntegrationRepository,
   IntegrationSettings,
 } from "../../db/repositories/IntegrationRepository";
+import { OrganizationRepository } from "../../db/repositories/OrganizationRepository";
 import { buildEmail } from "../../emails/buildEmail";
 import SignatureCancelledEmail from "../../emails/emails/SignatureCancelledEmail";
 import SignatureCompletedEmail from "../../emails/emails/SignatureCompletedEmail";
 import SignatureReminderEmail from "../../emails/emails/SignatureReminderEmail";
 import SignatureRequestedEmail from "../../emails/emails/SignatureRequestedEmail";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
+import { fromGlobalId } from "../../util/globalId";
 import { downloadImageBase64 } from "../../util/images";
 import { removeNotDefined } from "../../util/remedaExtensions";
+import { EMAILS, IEmailsService } from "../emails";
 import { FETCH_SERVICE, IFetchService } from "../fetch";
 import { I18N_SERVICE, II18nService } from "../i18n";
 import { BrandingIdKey, ISignatureClient, Recipient, SignatureOptions } from "./client";
@@ -29,7 +32,9 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
     @inject(CONFIG) private config: Config,
     @inject(I18N_SERVICE) private i18n: II18nService,
     @inject(FETCH_SERVICE) private fetch: IFetchService,
-    @inject(IntegrationRepository) private integrationRepository: IntegrationRepository
+    @inject(EMAILS) private emails: IEmailsService,
+    @inject(IntegrationRepository) private integrationRepository: IntegrationRepository,
+    @inject(OrganizationRepository) private organizationRepository: OrganizationRepository
   ) {}
 
   configure(integration: {
@@ -93,54 +98,78 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
     const locale = opts.locale;
     const tone = opts.templateData?.theme.preferredTone ?? "INFORMAL";
 
-    const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as BrandingIdKey;
-    let brandingId = this.settings[key];
-    if (!brandingId) {
-      brandingId = await this.createBranding(opts);
-      this.settings[key] = brandingId;
-
-      if (isDefined(this.integrationId)) {
-        this.integrationRepository.updateOrgIntegration<"SIGNATURE">(
-          this.integrationId,
-          { settings: this.settings },
-          `OrgIntegration:${this.integrationId}`
+    try {
+      if (
+        this.settings.CREDENTIALS.API_KEY === this.config.signature.signaturitSharedProductionApiKey
+      ) {
+        // sets used signature credits += 1
+        await this.organizationRepository.updateOrganizationCurrentUsageLimitCredits(
+          fromGlobalId(orgId, "Organization").id,
+          "SIGNATURIT_SHARED_APIKEY",
+          1
         );
       }
+
+      const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as BrandingIdKey;
+      let brandingId = this.settings[key];
+      if (!brandingId) {
+        brandingId = await this.createBranding(opts);
+        this.settings[key] = brandingId;
+
+        if (isDefined(this.integrationId)) {
+          this.integrationRepository.updateOrgIntegration<"SIGNATURE">(
+            this.integrationId,
+            { settings: this.settings },
+            `OrgIntegration:${this.integrationId}`
+          );
+        }
+      }
+
+      const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
+
+      return await this.sdk.createSignature(files, recipients, {
+        body: opts.initialMessage,
+        delivery_type: "email",
+        signing_mode: opts.signingMode ?? "parallel",
+        branding_id: brandingId,
+        events_url: `${baseEventsUrl}/api/webhooks/signaturit/${petitionId}/events`,
+        callback_url: `${this.config.misc.parallelUrl}/${locale}/thanks?${new URLSearchParams({
+          o: orgId,
+        })}`,
+        recipients: recipients.map((r, recipientIndex) => ({
+          email: r.email,
+          name: r.name,
+          widgets: [
+            {
+              type: "signature",
+              word_anchor: `3cb39pzCQA9wJ${recipientIndex}`,
+              height: 7.5, // 7.5% of page height
+              width:
+                ((210 -
+                  opts.pdfDocumentTheme.marginLeft -
+                  opts.pdfDocumentTheme.marginRight -
+                  5 /* grid gap */ * 2) /
+                  3 /
+                  210) *
+                100,
+            },
+          ],
+        })),
+        expire_time: 0, // disable signaturit automatic reminder emails
+        reminders: 0,
+      });
+    } catch (error: any) {
+      if (error.constraint === "organization_usage_limit__used__limit__check") {
+        throw new Error("SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED");
+      } else if (error.message === "Account depleted all it's advanced signature requests") {
+        await this.emails.sendInternalSignaturitAccountDepletedCreditsEmail(
+          fromGlobalId(orgId, "Organization").id,
+          fromGlobalId(petitionId, "Petition").id,
+          this.settings.CREDENTIALS.API_KEY.slice(0, 10)
+        );
+      }
+      throw error;
     }
-
-    const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
-
-    return await this.sdk.createSignature(files, recipients, {
-      body: opts.initialMessage,
-      delivery_type: "email",
-      signing_mode: opts.signingMode ?? "parallel",
-      branding_id: brandingId,
-      events_url: `${baseEventsUrl}/api/webhooks/signaturit/${petitionId}/events`,
-      callback_url: `${this.config.misc.parallelUrl}/${locale}/thanks?${new URLSearchParams({
-        o: orgId,
-      })}`,
-      recipients: recipients.map((r, recipientIndex) => ({
-        email: r.email,
-        name: r.name,
-        widgets: [
-          {
-            type: "signature",
-            word_anchor: `3cb39pzCQA9wJ${recipientIndex}`,
-            height: 7.5, // 7.5% of page height
-            width:
-              ((210 -
-                opts.pdfDocumentTheme.marginLeft -
-                opts.pdfDocumentTheme.marginRight -
-                5 /* grid gap */ * 2) /
-                3 /
-                210) *
-              100,
-          },
-        ],
-      })),
-      expire_time: 0, // disable signaturit automatic reminder emails
-      reminders: 0,
-    });
   }
 
   async cancelSignatureRequest(externalId: string) {

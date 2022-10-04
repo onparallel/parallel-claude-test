@@ -31,8 +31,7 @@ export interface ISignatureService {
   createSignatureRequest(
     petitionId: number,
     signatureConfig: PetitionSignatureConfig,
-    starter: User | PetitionAccess,
-    t?: Knex.Transaction
+    starter: User | PetitionAccess
   ): Promise<any>;
   cancelSignatureRequest(
     signatures: MaybeArray<PetitionSignatureRequest>,
@@ -80,8 +79,7 @@ export class SignatureService implements ISignatureService {
   async createSignatureRequest(
     petitionId: number,
     signatureConfig: PetitionSignatureConfig,
-    starter: User | PetitionAccess,
-    t?: Knex.Transaction
+    starter: User | PetitionAccess
   ) {
     await this.verifySignatureIntegration(petitionId, signatureConfig.orgIntegrationId);
 
@@ -112,8 +110,7 @@ export class SignatureService implements ISignatureService {
       [updatedPetition] = await this.petitionsRepository.updatePetition(
         petitionId,
         { signature_config: signatureConfig },
-        updatedBy,
-        t
+        updatedBy
       );
     }
 
@@ -139,63 +136,46 @@ export class SignatureService implements ISignatureService {
         this.petitionsRepository.cancelPetitionSignatureRequest(
           [enqueuedSignatureRequest, pendingSignatureRequest].filter(isDefined),
           "REQUEST_RESTARTED",
-          isAccess ? { petition_access_id: starter.id } : { user_id: starter.id },
-          undefined,
-          t
+          isAccess ? { petition_access_id: starter.id } : { user_id: starter.id }
         ),
         this.petitionsRepository.loadPetitionSignaturesByPetitionId.dataloader.clear(petitionId),
         pendingSignatureRequest
           ? // only send a cancel request if the signature request has been already processed
-            this.aws.enqueueMessages(
-              "signature-worker",
-              {
-                groupId: `signature-${toGlobalId("Petition", pendingSignatureRequest.petition_id)}`,
-                body: {
-                  type: "cancel-signature-process",
-                  payload: { petitionSignatureRequestId: pendingSignatureRequest.id },
-                },
+            this.aws.enqueueMessages("signature-worker", {
+              groupId: `signature-${toGlobalId("Petition", pendingSignatureRequest.petition_id)}`,
+              body: {
+                type: "cancel-signature-process",
+                payload: { petitionSignatureRequestId: pendingSignatureRequest.id },
               },
-              t
-            )
+            })
           : null,
       ]);
     }
 
-    const signatureRequest = await this.petitionsRepository.createPetitionSignature(
-      petitionId,
-      {
-        signature_config: {
-          ...(omit(signatureConfig, ["additionalSignersInfo"]) as any),
-          signersInfo: signatureConfig.signersInfo.concat(
-            signatureConfig.additionalSignersInfo ?? []
-          ),
-        },
+    const signatureRequest = await this.petitionsRepository.createPetitionSignature(petitionId, {
+      signature_config: {
+        ...(omit(signatureConfig, ["additionalSignersInfo"]) as any),
+        signersInfo: signatureConfig.signersInfo.concat(
+          signatureConfig.additionalSignersInfo ?? []
+        ),
       },
-      t
-    );
+    });
 
     await Promise.all([
-      this.aws.enqueueMessages(
-        "signature-worker",
-        {
-          groupId: `signature-${toGlobalId("Petition", petitionId)}`,
-          body: {
-            type: "start-signature-process",
-            payload: { petitionSignatureRequestId: signatureRequest.id },
-          },
+      this.aws.enqueueMessages("signature-worker", {
+        groupId: `signature-${toGlobalId("Petition", petitionId)}`,
+        body: {
+          type: "start-signature-process",
+          payload: { petitionSignatureRequestId: signatureRequest.id },
         },
-        t
-      ),
-      this.petitionsRepository.createEvent(
-        {
-          type: "SIGNATURE_STARTED",
-          petition_id: petitionId,
-          data: {
-            petition_signature_request_id: signatureRequest.id,
-          },
+      }),
+      this.petitionsRepository.createEvent({
+        type: "SIGNATURE_STARTED",
+        petition_id: petitionId,
+        data: {
+          petition_signature_request_id: signatureRequest.id,
         },
-        t
-      ),
+      }),
     ]);
 
     return { petition: updatedPetition, signatureRequest };
@@ -315,6 +295,7 @@ export class SignatureService implements ISignatureService {
       throw new Error(`Invalid OrgIntegration:${integration.id} on Petition:${petitionId}`);
     }
 
+    /* check this here to avoid calling the signature-worker with a request that will be cancelled due to lack of credits */
     if (integration.provider.toUpperCase() === "SIGNATURIT") {
       const settings = integration.settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
       if (settings.CREDENTIALS.API_KEY === this.config.signature.signaturitSharedProductionApiKey) {
