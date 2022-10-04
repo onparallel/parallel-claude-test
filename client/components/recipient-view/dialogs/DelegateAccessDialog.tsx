@@ -98,7 +98,7 @@ function DelegateAccessDialog({
       {...props}
       content={{
         as: "form",
-        onSubmit: handleSubmit<DelegateAccessDialogData>(props.onResolve),
+        onSubmit: handleSubmit(props.onResolve),
       }}
       header={
         <Stack direction="row">

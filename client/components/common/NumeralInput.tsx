@@ -2,7 +2,7 @@ import { assignRef, FormControlOptions, Input, ThemingProps } from "@chakra-ui/r
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
-import NumberFormat, { NumberFormatValues, SourceInfo } from "react-number-format";
+import { NumericFormat, NumberFormatValues, SourceInfo } from "react-number-format";
 import { isDefined } from "remeda";
 
 interface NumeralInputProps extends ThemingProps<"Input">, FormControlOptions {
@@ -56,7 +56,7 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
     // Event is a Synthetic Event wrapper which holds target and other information.
     // Source tells whether the reason for this function being triggered was an 'event' or due to a 'prop' change
     const { event, source } = sourceInfo;
-    if (source === "event" && (event.type === "change" || event.type === "keydown")) {
+    if (source === "event" && (event!.type === "change" || event!.type === "keydown")) {
       onChange(floatValue);
       assignRef(valueRef, value);
     }
@@ -64,7 +64,7 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
 
   return (
     <Input
-      as={NumberFormat}
+      as={NumericFormat}
       getInputRef={ref}
       prefix={prefix ?? ""}
       suffix={suffix ?? ""}

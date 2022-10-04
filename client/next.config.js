@@ -101,4 +101,12 @@ const config = {
 module.exports = [
   require("@next/bundle-analyzer")({ enabled: Boolean(process.env.ANALYZE) }),
   require("next-plugin-graphql"),
+  require("next-transpile-modules")([
+    "react-dnd",
+    "react-dnd-html5-backend",
+    "dnd-core",
+    "@react-dnd/invariant",
+    "@react-dnd/asap",
+    "@react-dnd/shallowequal",
+  ]),
 ].reduce((acc, curr) => curr(acc), config);

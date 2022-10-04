@@ -36,7 +36,7 @@ function AddNewSignerDialog({ tone, ...props }: DialogProps<{ tone: Tone }, NewS
       initialFocusRef={emailRef}
       content={{
         as: "form",
-        onSubmit: handleSubmit<NewSignerInfo>((data) =>
+        onSubmit: handleSubmit((data) =>
           props.onResolve({
             firstName: data.firstName.trim(),
             lastName: data.lastName.trim(),
