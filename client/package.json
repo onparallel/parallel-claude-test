@@ -79,7 +79,7 @@
     "node-fetch": "^2.6.7",
     "outdent": "^0.8.0",
     "react": "^17.0.2",
-    "react-accessible-treeview": "^2.1.4",
+    "react-accessible-treeview": "^2.2.0",
     "react-chartjs-2": "^4.2.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
