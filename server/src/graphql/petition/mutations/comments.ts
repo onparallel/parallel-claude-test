@@ -1,6 +1,6 @@
 import { ApolloError } from "apollo-server-core";
 import { booleanArg, mutationField, nonNull } from "nexus";
-import { getMentions, toPlainText } from "../../../util/slate";
+import { getMentions } from "../../../util/slate";
 import { and, authenticateAnd, ifArgEquals } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonArg } from "../../helpers/scalars";
@@ -11,8 +11,8 @@ import {
   fieldsBelongsToPetition,
   fieldsHaveCommentsEnabled,
   petitionIsNotAnonymized,
-  userIsOwnerOfPetitionFieldComment,
   userHasAccessToPetitions,
+  userIsOwnerOfPetitionFieldComment,
 } from "../authorizers";
 
 export const createPetitionFieldComment = mutationField("createPetitionFieldComment", {
@@ -65,7 +65,6 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
           petitionId: args.petitionId,
           petitionFieldId: args.petitionFieldId,
           contentJson: args.content,
-          content: toPlainText(args.content),
           isInternal: args.isInternal ?? false,
         },
         ctx.user!
@@ -146,7 +145,6 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
       return await ctx.petitions.updatePetitionFieldCommentFromUser(
         args.petitionFieldCommentId,
         {
-          content: toPlainText(args.content),
           contentJson: args.content,
         },
         ctx.user!

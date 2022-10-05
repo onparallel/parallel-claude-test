@@ -1,7 +1,7 @@
 import { createContext, PropsWithChildren, useContext } from "react";
 import Color from "color";
-import { Tone } from "../../db/__types";
 import { BrandTheme } from "../../util/BrandTheme";
+import { Tone } from "./types";
 
 type EmailThemeColor = Record<50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900, "string">;
 

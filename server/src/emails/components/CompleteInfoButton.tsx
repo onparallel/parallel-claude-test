@@ -1,5 +1,5 @@
 import { FormattedMessage } from "react-intl";
-import { Tone } from "../../db/__types";
+import { Tone } from "../utils/types";
 
 import { Button } from "./Button";
 

@@ -3013,7 +3013,6 @@ export class PetitionRepository extends BaseRepository {
     data: {
       petitionId: number;
       petitionFieldId: number;
-      content: string;
       contentJson: any;
       isInternal: boolean;
     },
@@ -3025,7 +3024,6 @@ export class PetitionRepository extends BaseRepository {
         {
           petition_id: data.petitionId,
           petition_field_id: data.petitionFieldId,
-          content: data.content,
           content_json: this.json(data.contentJson),
           user_id: user.id,
           is_internal: data.isInternal,
@@ -3055,7 +3053,6 @@ export class PetitionRepository extends BaseRepository {
     data: {
       petitionId: number;
       petitionFieldId: number;
-      content: string;
       contentJson: string;
     },
     access: PetitionAccess
@@ -3066,7 +3063,6 @@ export class PetitionRepository extends BaseRepository {
         {
           petition_id: data.petitionId,
           petition_field_id: data.petitionFieldId,
-          content: data.content,
           content_json: this.json(data.contentJson),
           petition_access_id: access.id,
           created_by: `PetitionAccess:${access.id}`,
@@ -3163,7 +3159,6 @@ export class PetitionRepository extends BaseRepository {
   async updatePetitionFieldCommentFromUser(
     petitionFieldCommentId: number,
     data: {
-      content: string;
       contentJson: any;
     },
     updatedBy: User
@@ -3172,7 +3167,6 @@ export class PetitionRepository extends BaseRepository {
       .where("id", petitionFieldCommentId)
       .update(
         {
-          content: data.content,
           content_json: this.json(data.contentJson),
           updated_at: this.now(),
           updated_by: `User:${updatedBy.id}`,
@@ -3185,7 +3179,6 @@ export class PetitionRepository extends BaseRepository {
   async updatePetitionFieldCommentFromContact(
     petitionFieldCommentId: number,
     data: {
-      content: string;
       contentJson: any;
     },
     updatedBy: Contact
@@ -3195,7 +3188,6 @@ export class PetitionRepository extends BaseRepository {
       .whereNull("deleted_at")
       .update(
         {
-          content: data.content,
           content_json: this.json(data.contentJson),
           updated_at: this.now(),
           updated_by: `Contact:${updatedBy.id}`,
@@ -4825,7 +4817,6 @@ export class PetitionRepository extends BaseRepository {
       .whereNull("anonymized_at")
       .update({
         anonymized_at: this.now(),
-        content: "",
         content_json: null,
       });
   }

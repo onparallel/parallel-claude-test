@@ -972,9 +972,9 @@ describe("repositories/PetitionRepository", () => {
           )
         ).flat();
 
-        expect(commentsAfter.every((c) => c.anonymized_at !== null && c.content === "")).toEqual(
-          true
-        );
+        expect(
+          commentsAfter.every((c) => c.anonymized_at !== null && c.content_json === null)
+        ).toEqual(true);
       });
 
       it("deactivates every access on the petition", async () => {

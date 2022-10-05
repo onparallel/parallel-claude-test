@@ -2,7 +2,7 @@ import {
   IntegrationSettings,
   SignatureProvider,
 } from "../../db/repositories/IntegrationRepository";
-import { Tone } from "../../db/__types";
+import { Tone } from "../../emails/utils/types";
 import { BrandTheme } from "../../util/BrandTheme";
 import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
 

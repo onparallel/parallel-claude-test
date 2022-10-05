@@ -8,7 +8,6 @@ import { toGlobalId } from "../../../util/globalId";
 import { defaultPdfDocumentTheme } from "../../../util/PdfDocumentTheme";
 import { removeNotDefined } from "../../../util/remedaExtensions";
 import { safeJsonParse } from "../../../util/safeJsonParse";
-import { toPlainText } from "../../../util/slate";
 import { titleize } from "../../../util/strings";
 import { hash, random } from "../../../util/token";
 import { MaybeArray, Replace } from "../../../util/types";
@@ -36,7 +35,6 @@ import {
   FileUpload,
   Organization,
   OrganizationTheme,
-  OrganizationThemeType,
   OrganizationUsageLimit,
   OrganizationUsageLimitName,
   OrgIntegration,
@@ -714,7 +712,6 @@ export class Mocks {
     return await this.knex<PetitionFieldComment>("petition_field_comment")
       .insert(
         range(0, amount || 1).map((i) => ({
-          content: toPlainText(content),
           content_json: this.knex.raw("?::jsonb", JSON.stringify(content)),
           user_id: userId,
           petition_field_id: petitionFieldId,
@@ -736,7 +733,6 @@ export class Mocks {
       .where("id", commentId)
       .select("*");
 
-    const newContent = (comment.content ?? "").concat("@" + userName);
     const newContentJson = (safeJsonParse(comment.content_json) ?? []).concat({
       type: "paragraph",
       children: [
@@ -750,7 +746,6 @@ export class Mocks {
 
     await this.knex<PetitionFieldComment>("petition_field_comment")
       .update({
-        content: newContent,
         content_json: this.knex.raw("?::jsonb", JSON.stringify(newContentJson)),
       })
       .where("id", commentId)
@@ -766,7 +761,6 @@ export class Mocks {
       .where("id", commentId)
       .select("*");
 
-    const newContent = (comment.content ?? "").concat("@" + userGroup.name);
     const newContentJson = (safeJsonParse(comment.content_json) ?? []).concat({
       type: "paragraph",
       children: [
@@ -780,7 +774,6 @@ export class Mocks {
 
     await this.knex<PetitionFieldComment>("petition_field_comment")
       .update({
-        content: newContent,
         content_json: this.knex.raw("?::jsonb", JSON.stringify(newContentJson)),
       })
       .where("id", commentId)
@@ -798,7 +791,6 @@ export class Mocks {
     return await this.knex<PetitionFieldComment>("petition_field_comment")
       .insert(
         range(0, amount || 1).map((i) => ({
-          content: toPlainText(content),
           content_json: this.knex.raw("?::jsonb", JSON.stringify(content)),
           petition_access_id: petitionAccessId,
           petition_field_id: petitionFieldId,

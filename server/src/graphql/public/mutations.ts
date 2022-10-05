@@ -19,7 +19,6 @@ import { PetitionAccess, User } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { stallFor } from "../../util/promises/stallFor";
-import { toPlainText } from "../../util/slate";
 import { and, chain, checkClientServerToken, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { prefillPetition } from "../helpers/prefillPetition";
@@ -478,7 +477,6 @@ export const publicCreatePetitionFieldComment = mutationField("publicCreatePetit
         petitionId: petitionId,
         petitionFieldId: args.petitionFieldId,
         contentJson: args.content,
-        content: toPlainText(args.content),
       },
       ctx.access!
     );
@@ -530,7 +528,6 @@ export const publicUpdatePetitionFieldComment = mutationField("publicUpdatePetit
     return await ctx.petitions.updatePetitionFieldCommentFromContact(
       args.petitionFieldCommentId,
       {
-        content: toPlainText(args.content),
         contentJson: args.content,
       },
       ctx.contact!

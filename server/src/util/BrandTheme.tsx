@@ -1,4 +1,4 @@
-import { Tone } from "../db/__types";
+import { Tone } from "../emails/utils/types";
 
 export interface BrandTheme {
   fontFamily: string | null;
