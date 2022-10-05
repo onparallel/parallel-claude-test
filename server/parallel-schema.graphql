@@ -260,7 +260,6 @@ enum FeatureFlag {
   REMOVE_WHY_WE_USE_PARALLEL
   SKIP_FORWARD_SECURITY
   TEMPLATE_REPLIES_PREVIEW_URL
-  TEMPLATE_REPLIES_RECIPIENT_URL
 }
 
 """
@@ -784,16 +783,6 @@ type Mutation {
   ): PublicPetitionLink!
 
   """
-  Creates a new signature integration on the user's organization
-  """
-  createSignatureIntegration(
-    apiKey: String!
-    isDefault: Boolean
-    name: String!
-    provider: SignatureOrgIntegrationProvider!
-  ): SignatureOrgIntegration! @deprecated(reason: "use createSignaturitIntegration")
-
-  """
   Creates a new Signaturit integration on the user's organization
   """
   createSignaturitIntegration(
@@ -963,12 +952,6 @@ type Mutation {
   Returns an object with signed download url and filename for tasks with file output
   """
   getTaskResultFile(preview: Boolean, taskId: GID!): TaskResultFile!
-
-  """
-  Returns a signed download url for tasks with file output
-  """
-  getTaskResultFileUrl(preview: Boolean, taskId: GID!): String!
-    @deprecated(reason: "use getTaskResultFile instead")
   loginAs(userId: GID!): Result!
 
   """
@@ -1268,12 +1251,6 @@ type Mutation {
   Resets the given user password on AWS Cognito and sends an email with new temporary.
   """
   resetUserPassword(email: String!, locale: PetitionLocale!): SupportMethodResponse!
-
-  """
-  Restores the 'fonts' section of the organization document theme to its default values
-  """
-  restoreDefaultOrganizationDocumentThemeFonts: Organization!
-    @deprecated(reason: "use restoreDefaultOrganizationPdfDocumentThemeFonts")
   restoreLogin: Result!
 
   """
@@ -1419,23 +1396,6 @@ type Mutation {
   updateEventSubscription(id: GID!, isEnabled: Boolean!): PetitionEventSubscription!
 
   """
-  Activate or deactivate an organization feature flag
-  """
-  updateFeatureFlag(
-    featureFlag: FeatureFlag!
-
-    """
-    Numeric ID of the organization
-    """
-    orgId: Int!
-
-    """
-    Feature flag value
-    """
-    value: Boolean!
-  ): SupportMethodResponse!
-
-  """
   Activate or deactivate a list of organization feature flag
   """
   updateFeatureFlags(featureFlags: [InputFeatureFlagNameValue!]!, orgId: GID!): Organization!
@@ -1501,12 +1461,6 @@ type Mutation {
   updateOrganizationBrandTheme(data: OrganizationBrandThemeInput!): Organization!
 
   """
-  updates the theme of the PDF documents of the organization
-  """
-  updateOrganizationDocumentTheme(data: OrganizationDocumentThemeInput!): Organization!
-    @deprecated(reason: "use updateOrganizationPdfDocumentTheme")
-
-  """
   Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period.
   """
   updateOrganizationLimits(
@@ -1547,12 +1501,6 @@ type Mutation {
     name: String
     orgThemeId: GID!
   ): Organization!
-
-  """
-  Changes the organization preferred tone
-  """
-  updateOrganizationPreferredTone(tone: Tone!): Organization!
-    @deprecated(reason: "use updateOrganizationBrandTheme instead")
 
   """
   Applies a given tier to the organization
@@ -1899,12 +1847,6 @@ type Organization implements Timestamps {
   ): OrgIntegrationPagination!
 
   """
-  Wether the 'fonts' section of the document theme has been changed from its default values or not
-  """
-  isPdfDocumentThemeFontsDirty: Boolean!
-    @deprecated(reason: "Not used anymore. Use themes.pdfDocument[0].isDirty")
-
-  """
   Current license for the organization
   """
   license: OrgLicense
@@ -1918,14 +1860,7 @@ type Organization implements Timestamps {
   The name of the organization.
   """
   name: String!
-  pdfDocumentTheme: JSONObject!
-    @deprecated(reason: "Not used anymore. Use themes.pdfDocument[0].data")
   pdfDocumentThemes: [OrganizationTheme!]!
-
-  """
-  The preferred tone of organization.
-  """
-  preferredTone: Tone! @deprecated(reason: "use brandTheme.preferredTone")
 
   """
   The status of the organization.
@@ -1977,29 +1912,6 @@ input OrganizationBrandThemeInput {
   color: String
   fontFamily: String
   preferredTone: Tone
-}
-
-input OrganizationDocumentThemeInput {
-  legalText: OrganizationDocumentThemeInputLegalText
-  marginBottom: Float
-  marginLeft: Float
-  marginRight: Float
-  marginTop: Float
-  showLogo: Boolean
-  textColor: String
-  textFontFamily: String
-  textFontSize: Float
-  title1Color: String
-  title1FontFamily: String
-  title1FontSize: Float
-  title2Color: String
-  title2FontFamily: String
-  title2FontSize: Float
-}
-
-input OrganizationDocumentThemeInputLegalText {
-  en: JSON
-  es: JSON
 }
 
 type OrganizationPagination {
@@ -2342,7 +2254,7 @@ type Petition implements PetitionBase {
   """
   The preferred tone of organization.
   """
-  tone: Tone! @deprecated(reason: "use organization.brandTheme.preferredTone")
+  tone: Tone!
 
   """
   Time when the resource was last updated.
@@ -2617,7 +2529,7 @@ interface PetitionBase {
   """
   The preferred tone of organization.
   """
-  tone: Tone! @deprecated(reason: "use organization.brandTheme.preferredTone")
+  tone: Tone!
 
   """
   Time when the resource was last updated.
@@ -2985,11 +2897,6 @@ type PetitionFieldProgress {
   Total number of fields in the petition
   """
   total: Int!
-
-  """
-  Number of fields validated
-  """
-  validated: Int! @deprecated(reason: "Don't use this")
 }
 
 """
@@ -3676,7 +3583,7 @@ type PetitionTemplate implements PetitionBase {
   """
   The preferred tone of organization.
   """
-  tone: Tone! @deprecated(reason: "use organization.brandTheme.preferredTone")
+  tone: Tone!
 
   """
   Time when the resource was last updated.
@@ -3850,11 +3757,6 @@ type PublicOrganization {
   The name of the organization.
   """
   name: String!
-
-  """
-  The preferred tone of organization.
-  """
-  tone: Tone! @deprecated(reason: "use brandTheme.preferredTone")
 }
 
 """

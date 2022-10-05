@@ -216,8 +216,7 @@ export type FeatureFlag =
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SKIP_FORWARD_SECURITY"
-  | "TEMPLATE_REPLIES_PREVIEW_URL"
-  | "TEMPLATE_REPLIES_RECIPIENT_URL";
+  | "TEMPLATE_REPLIES_PREVIEW_URL";
 
 /** A feature flag name with his value */
 export type FeatureFlagNameValue = {
@@ -480,11 +479,6 @@ export type Mutation = {
   createPrintPdfTask: Task;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
-  /**
-   * Creates a new signature integration on the user's organization
-   * @deprecated use createSignaturitIntegration
-   */
-  createSignatureIntegration: SignatureOrgIntegration;
   /** Creates a new Signaturit integration on the user's organization */
   createSignaturitIntegration: SignatureOrgIntegration;
   /** Creates a tag in the user's organization */
@@ -538,11 +532,6 @@ export type Mutation = {
   getApiTokenOwner: SupportMethodResponse;
   /** Returns an object with signed download url and filename for tasks with file output */
   getTaskResultFile: TaskResultFile;
-  /**
-   * Returns a signed download url for tasks with file output
-   * @deprecated use getTaskResultFile instead
-   */
-  getTaskResultFileUrl: Scalars["String"];
   loginAs: Result;
   /** marks a Signature integration as default */
   markSignatureIntegrationAsDefault: OrgIntegration;
@@ -618,11 +607,6 @@ export type Mutation = {
   resetTemporaryPassword: Result;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
   resetUserPassword: SupportMethodResponse;
-  /**
-   * Restores the 'fonts' section of the organization document theme to its default values
-   * @deprecated use restoreDefaultOrganizationPdfDocumentThemeFonts
-   */
-  restoreDefaultOrganizationDocumentThemeFonts: Organization;
   restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
@@ -659,8 +643,6 @@ export type Mutation = {
   updateContact: Contact;
   /** Updates an existing event subscription for the user's petitions */
   updateEventSubscription: PetitionEventSubscription;
-  /** Activate or deactivate an organization feature flag */
-  updateFeatureFlag: SupportMethodResponse;
   /** Activate or deactivate a list of organization feature flag */
   updateFeatureFlags: Organization;
   /** Updates the positions of the petition fields */
@@ -675,22 +657,12 @@ export type Mutation = {
   updateOrganizationAutoAnonymizePeriod: Organization;
   /** updates the theme of the organization brand */
   updateOrganizationBrandTheme: Organization;
-  /**
-   * updates the theme of the PDF documents of the organization
-   * @deprecated use updateOrganizationPdfDocumentTheme
-   */
-  updateOrganizationDocumentTheme: Organization;
   /** Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period. */
   updateOrganizationLimits: SupportMethodResponse;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
   /** updates the PDF_DOCUMENT theme of the organization */
   updateOrganizationPdfDocumentTheme: Organization;
-  /**
-   * Changes the organization preferred tone
-   * @deprecated use updateOrganizationBrandTheme instead
-   */
-  updateOrganizationPreferredTone: Organization;
   /** Applies a given tier to the organization */
   updateOrganizationTier: SupportMethodResponse;
   /** Updates the role of another user in the organization. */
@@ -951,13 +923,6 @@ export type MutationcreatePublicPetitionLinkArgs = {
   title: Scalars["String"];
 };
 
-export type MutationcreateSignatureIntegrationArgs = {
-  apiKey: Scalars["String"];
-  isDefault?: InputMaybe<Scalars["Boolean"]>;
-  name: Scalars["String"];
-  provider: SignatureOrgIntegrationProvider;
-};
-
 export type MutationcreateSignaturitIntegrationArgs = {
   apiKey: Scalars["String"];
   isDefault?: InputMaybe<Scalars["Boolean"]>;
@@ -1090,11 +1055,6 @@ export type MutationgetApiTokenOwnerArgs = {
 };
 
 export type MutationgetTaskResultFileArgs = {
-  preview?: InputMaybe<Scalars["Boolean"]>;
-  taskId: Scalars["GID"];
-};
-
-export type MutationgetTaskResultFileUrlArgs = {
   preview?: InputMaybe<Scalars["Boolean"]>;
   taskId: Scalars["GID"];
 };
@@ -1418,12 +1378,6 @@ export type MutationupdateEventSubscriptionArgs = {
   isEnabled: Scalars["Boolean"];
 };
 
-export type MutationupdateFeatureFlagArgs = {
-  featureFlag: FeatureFlag;
-  orgId: Scalars["Int"];
-  value: Scalars["Boolean"];
-};
-
 export type MutationupdateFeatureFlagsArgs = {
   featureFlags: Array<InputFeatureFlagNameValue>;
   orgId: Scalars["GID"];
@@ -1462,10 +1416,6 @@ export type MutationupdateOrganizationBrandThemeArgs = {
   data: OrganizationBrandThemeInput;
 };
 
-export type MutationupdateOrganizationDocumentThemeArgs = {
-  data: OrganizationDocumentThemeInput;
-};
-
 export type MutationupdateOrganizationLimitsArgs = {
   amount: Scalars["Int"];
   orgId: Scalars["Int"];
@@ -1485,10 +1435,6 @@ export type MutationupdateOrganizationPdfDocumentThemeArgs = {
   isDefault?: InputMaybe<Scalars["Boolean"]>;
   name?: InputMaybe<Scalars["String"]>;
   orgThemeId: Scalars["GID"];
-};
-
-export type MutationupdateOrganizationPreferredToneArgs = {
-  tone: Tone;
 };
 
 export type MutationupdateOrganizationTierArgs = {
@@ -1701,25 +1647,13 @@ export type Organization = Timestamps & {
   id: Scalars["GID"];
   /** A paginated list with enabled integrations for the organization */
   integrations: OrgIntegrationPagination;
-  /**
-   * Wether the 'fonts' section of the document theme has been changed from its default values or not
-   * @deprecated Not used anymore. Use themes.pdfDocument[0].isDirty
-   */
-  isPdfDocumentThemeFontsDirty: Scalars["Boolean"];
   /** Current license for the organization */
   license: Maybe<OrgLicense>;
   /** URL of the organization logo */
   logoUrl: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
-  /** @deprecated Not used anymore. Use themes.pdfDocument[0].data */
-  pdfDocumentTheme: Scalars["JSONObject"];
   pdfDocumentThemes: Array<OrganizationTheme>;
-  /**
-   * The preferred tone of organization.
-   * @deprecated use brandTheme.preferredTone
-   */
-  preferredTone: Tone;
   /** The status of the organization. */
   status: OrganizationStatus;
   /** Time when the resource was last updated. */
@@ -1766,29 +1700,6 @@ export type OrganizationBrandThemeInput = {
   color?: InputMaybe<Scalars["String"]>;
   fontFamily?: InputMaybe<Scalars["String"]>;
   preferredTone?: InputMaybe<Tone>;
-};
-
-export type OrganizationDocumentThemeInput = {
-  legalText?: InputMaybe<OrganizationDocumentThemeInputLegalText>;
-  marginBottom?: InputMaybe<Scalars["Float"]>;
-  marginLeft?: InputMaybe<Scalars["Float"]>;
-  marginRight?: InputMaybe<Scalars["Float"]>;
-  marginTop?: InputMaybe<Scalars["Float"]>;
-  showLogo?: InputMaybe<Scalars["Boolean"]>;
-  textColor?: InputMaybe<Scalars["String"]>;
-  textFontFamily?: InputMaybe<Scalars["String"]>;
-  textFontSize?: InputMaybe<Scalars["Float"]>;
-  title1Color?: InputMaybe<Scalars["String"]>;
-  title1FontFamily?: InputMaybe<Scalars["String"]>;
-  title1FontSize?: InputMaybe<Scalars["Float"]>;
-  title2Color?: InputMaybe<Scalars["String"]>;
-  title2FontFamily?: InputMaybe<Scalars["String"]>;
-  title2FontSize?: InputMaybe<Scalars["Float"]>;
-};
-
-export type OrganizationDocumentThemeInputLegalText = {
-  en?: InputMaybe<Scalars["JSON"]>;
-  es?: InputMaybe<Scalars["JSON"]>;
 };
 
 export type OrganizationPagination = {
@@ -1976,10 +1887,7 @@ export type Petition = PetitionBase & {
   status: PetitionStatus;
   /** The tags linked to the petition */
   tags: Array<Tag>;
-  /**
-   * The preferred tone of organization.
-   * @deprecated use organization.brandTheme.preferredTone
-   */
+  /** The preferred tone of organization. */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -2122,10 +2030,7 @@ export type PetitionBase = {
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
   tags: Array<Tag>;
-  /**
-   * The preferred tone of organization.
-   * @deprecated use organization.brandTheme.preferredTone
-   */
+  /** The preferred tone of organization. */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -2376,11 +2281,6 @@ export type PetitionFieldProgress = {
   replied: Scalars["Int"];
   /** Total number of fields in the petition */
   total: Scalars["Int"];
-  /**
-   * Number of fields validated
-   * @deprecated Don't use this
-   */
-  validated: Scalars["Int"];
 };
 
 /** A reply to a petition field */
@@ -2741,10 +2641,7 @@ export type PetitionTemplate = PetitionBase & {
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
   tags: Array<Tag>;
-  /**
-   * The preferred tone of organization.
-   * @deprecated use organization.brandTheme.preferredTone
-   */
+  /** The preferred tone of organization. */
   tone: Tone;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -2852,11 +2749,6 @@ export type PublicOrganization = {
   logoUrl: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
-  /**
-   * The preferred tone of organization.
-   * @deprecated use brandTheme.preferredTone
-   */
-  tone: Tone;
 };
 
 /** A public view of an organization */

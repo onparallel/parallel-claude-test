@@ -13,6 +13,10 @@ export async function up(knex: Knex): Promise<void> {
   });
 
   await removeFeatureFlag(knex, "TEMPLATE_REPLIES_RECIPIENT_URL");
+
+  knex.schema.raw(/* sql */ `
+    update petition_signature_request set signature_config = (signature_config::jsonb - 'API_KEY')::json
+  `);
 }
 
 export async function down(knex: Knex): Promise<void> {
