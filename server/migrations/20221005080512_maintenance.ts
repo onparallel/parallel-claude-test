@@ -14,8 +14,8 @@ export async function up(knex: Knex): Promise<void> {
 
   await removeFeatureFlag(knex, "TEMPLATE_REPLIES_RECIPIENT_URL");
 
-  knex.schema.raw(/* sql */ `
-    update petition_signature_request set signature_config = (signature_config::jsonb - 'API_KEY')::jsonb
+  await knex.schema.raw(/* sql */ `
+    update petition_signature_request set signature_config = signature_config::jsonb - 'API_KEY'
   `);
 }
 
@@ -32,7 +32,7 @@ export async function down(knex: Knex): Promise<void> {
   });
 
   await knex.schema.alterTable("petition_field_comment", (t) => {
-    t.text("content").notNullable();
+    t.text("content").notNullable().defaultTo("");
   });
 
   await addFeatureFlag(knex, "TEMPLATE_REPLIES_RECIPIENT_URL", false);
