@@ -7,7 +7,8 @@ import {
   PetitionSignatureConfigSigner,
   PetitionSignatureRequestCancelData,
 } from "../db/repositories/PetitionRepository";
-import { OrgIntegration, Tone } from "../db/__types";
+import { OrgIntegration } from "../db/__types";
+import { Tone } from "../emails/utils/types";
 import { BrandingIdKey, SignatureResponse } from "../services/signature-clients/client";
 import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";
@@ -327,7 +328,7 @@ async function updateOrganizationBranding(payload: { orgId: number }, ctx: Worke
       for (const [key, brandingId] of Object.entries(definedBrandingIds)) {
         const [locale, tone]: string[] = key.split("_");
         try {
-          await client.updateBranding(brandingId, {
+          await client.updateBranding(brandingId!, {
             locale: locale.toLowerCase(),
             templateData: {
               ...layoutProps,

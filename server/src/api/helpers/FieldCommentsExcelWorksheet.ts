@@ -2,6 +2,7 @@ import Excel from "exceljs";
 import { ApiContext, WorkerContext } from "../../context";
 import { Contact, PetitionField, PetitionFieldComment, UserData } from "../../db/__types";
 import { fullName } from "../../util/fullName";
+import { toPlainText } from "../../util/slate";
 import { Maybe } from "../../util/types";
 import { ExcelWorksheet } from "./ExcelWorksheet";
 
@@ -92,7 +93,7 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
     this.addRows({
       authorEmail: author.email,
       authorFullName: fullName(author.first_name, author.last_name),
-      content: comment.content,
+      content: toPlainText(comment.content_json),
       createdAt: comment.created_at.toISOString(),
       fieldName: fieldTitle,
       isInternal: comment.is_internal
