@@ -1,20 +1,9 @@
-import { Flex, HStack, Stack } from "@chakra-ui/react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@parallel/chakra/icons";
-import {
-  addMonths,
-  getMonth,
-  getYear,
-  isPast,
-  isSameDay,
-  isToday,
-  startOfDay,
-  startOfMonth,
-  subMonths,
-} from "date-fns";
+import { Stack } from "@chakra-ui/react";
+import { getMonth, getYear, isPast, isSameDay, isToday, startOfDay, startOfMonth } from "date-fns";
 import { useCallback, useState } from "react";
-import { FormattedDate, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
 import { CalendarMonth, CalendarMonthDateProps } from "./CalendarMonth";
-import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
+import { CalendarMonthHeader } from "./CalendarMonthHeader";
 
 export function DatePicker({
   value,
@@ -27,7 +16,6 @@ export function DatePicker({
   isPastAllowed?: boolean;
   isDisabledDate?: (date: Date) => boolean;
 }) {
-  const intl = useIntl();
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(value || new Date()));
   const selectedDate = value ? startOfDay(value) : undefined;
   const month = getMonth(currentMonth);
@@ -62,29 +50,7 @@ export function DatePicker({
 
   return (
     <Stack>
-      <HStack>
-        <IconButtonWithTooltip
-          icon={<ChevronLeftIcon />}
-          size="sm"
-          label={intl.formatMessage({
-            id: "component.date-picker.prev-month",
-            defaultMessage: "Previous month",
-          })}
-          onClick={() => setCurrentMonth((m) => subMonths(m, 1))}
-        />
-        <Flex flex="1" alignItems="center" justifyContent="center" fontWeight="bold">
-          <FormattedDate value={currentMonth} month="long" year="numeric" />
-        </Flex>
-        <IconButtonWithTooltip
-          icon={<ChevronRightIcon />}
-          size="sm"
-          label={intl.formatMessage({
-            id: "component.date-picker.next-month",
-            defaultMessage: "Next month",
-          })}
-          onClick={() => setCurrentMonth((m) => addMonths(m, 1))}
-        />
-      </HStack>
+      <CalendarMonthHeader value={currentMonth} onChange={(value) => setCurrentMonth(value)} />
       <CalendarMonth
         key={`${year}-${month}`}
         year={year}

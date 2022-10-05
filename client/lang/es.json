@@ -1050,12 +1050,12 @@
     "context": "Use only letters, numbers or _"
   },
   {
-    "term": "component.date-picker.next-month",
+    "term": "component.calendar-month-header.next-month",
     "definition": "Mes siguiente",
     "context": "Next month"
   },
   {
-    "term": "component.date-picker.prev-month",
+    "term": "component.calendar-month-header.prev-month",
     "definition": "Mes anterior",
     "context": "Previous month"
   },
