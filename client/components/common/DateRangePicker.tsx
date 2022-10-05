@@ -247,6 +247,11 @@ export function DateRangePicker({
                 setEnd(null);
               }
             }}
+            sx={{
+              "&": { color: rangeActive === null ? "gray.400" : "inherit" },
+              "& option": { color: "gray.800" },
+              "& option[value='']": { color: "gray.400" },
+            }}
           >
             {ranges.map((range, index) => {
               const { amount, type } = range;
