@@ -20,6 +20,7 @@ import { UserRepository } from "./db/repositories/UserRepository";
 import { Contact, Organization, PetitionAccess, User } from "./db/__types";
 import { ANALYTICS, IAnalyticsService } from "./services/analytics";
 import { AUTH, IAuth } from "./services/auth";
+import { AWS_SERVICE, IAws } from "./services/aws";
 import { EMAILS, IEmailsService } from "./services/emails";
 import { FETCH_SERVICE, IFetchService } from "./services/fetch";
 import { I18N_SERVICE, II18nService } from "./services/i18n";
@@ -88,6 +89,7 @@ export class WorkerContext {
     @inject(IMAGE_SERVICE) public readonly images: IImageService,
     @inject(I18N_SERVICE) public readonly i18n: II18nService,
     @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
+    @inject(AWS_SERVICE) public readonly aws: IAws,
 
     // Repositories
     public readonly contacts: ContactRepository,
