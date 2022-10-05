@@ -1,5 +1,5 @@
 import { ApolloError } from "apollo-server-core";
-import { arg, booleanArg, mutationField, nonNull, nullable, objectType, stringArg } from "nexus";
+import { booleanArg, mutationField, nonNull, nullable, objectType, stringArg } from "nexus";
 import { withError } from "../../util/promises/withError";
 import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -26,59 +26,6 @@ export const markSignatureIntegrationAsDefault = mutationField(
     },
   }
 );
-
-export const createSignatureIntegration = mutationField("createSignatureIntegration", {
-  deprecation: "use createSignaturitIntegration",
-  description: "Creates a new signature integration on the user's organization",
-  type: nonNull("SignatureOrgIntegration"),
-  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("PETITION_SIGNATURE")),
-  args: {
-    name: nonNull(stringArg()),
-    provider: nonNull(arg({ type: "SignatureOrgIntegrationProvider" })),
-    apiKey: nonNull(stringArg()),
-    isDefault: nullable(booleanArg()),
-  },
-  resolve: async (_, args, ctx) => {
-    const [error, data] = await withError(
-      ctx.signature
-        .getClient({ provider: "SIGNATURIT", settings: { CREDENTIALS: { API_KEY: args.apiKey } } })
-        .authenticate()
-    );
-    if (error || !data.environment) {
-      throw new ApolloError(
-        `Unable to check Signaturit APIKEY environment`,
-        "INVALID_APIKEY_ERROR"
-      );
-    }
-
-    const newIntegration = await ctx.integrations.createOrgIntegration<"SIGNATURE", "SIGNATURIT">(
-      {
-        type: "SIGNATURE",
-        provider: "SIGNATURIT",
-        org_id: ctx.user!.org_id,
-        name: args.name,
-        settings: {
-          CREDENTIALS: {
-            API_KEY: args.apiKey,
-          },
-          ENVIRONMENT: data.environment,
-        },
-        is_enabled: true,
-      },
-      `User:${ctx.user!.id}`
-    );
-
-    if (args.isDefault) {
-      return await ctx.integrations.setDefaultOrgIntegration(
-        newIntegration.id,
-        "SIGNATURE",
-        ctx.user!
-      );
-    } else {
-      return newIntegration;
-    }
-  },
-});
 
 export const validateSignatureCredentials = mutationField("validateSignatureCredentials", {
   description: "Runs backend checks to validate signature credentials.",

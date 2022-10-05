@@ -16,8 +16,6 @@ export type IntegrationSettings<
   TProvider extends SignatureProvider = any
 > = {
   SIGNATURE: {
-    /** @deprecated previously used for Signaturit API_KEY. Use CREDENTIALS.API_KEY instead (when TProvider is SIGNATURIT)  */
-    API_KEY?: string;
     CREDENTIALS: SignatureIntegrationCredentials<TProvider>;
     ENVIRONMENT?: "production" | "sandbox";
     EN_FORMAL_BRANDING_ID?: string;

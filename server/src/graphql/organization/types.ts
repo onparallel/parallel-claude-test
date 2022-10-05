@@ -8,9 +8,8 @@ import {
   nullable,
   objectType,
 } from "nexus";
-import { equals, isDefined, omit, pick } from "remeda";
+import { isDefined, omit, pick } from "remeda";
 import { defaultBrandTheme } from "../../util/BrandTheme";
-import { defaultPdfDocumentTheme, PdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { or, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
@@ -64,36 +63,6 @@ export const OrganizationTheme = objectType({
   },
   sourceType: "db.OrganizationTheme",
 });
-
-/** @deprecated not used anymore */
-export const OrganizationDocumentThemeInput = inputObjectType({
-  name: "OrganizationDocumentThemeInput",
-  definition(t) {
-    t.nullable.float("marginTop");
-    t.nullable.float("marginRight");
-    t.nullable.float("marginBottom");
-    t.nullable.float("marginLeft");
-    t.nullable.boolean("showLogo");
-    t.nullable.string("title1FontFamily");
-    t.nullable.string("title1Color");
-    t.nullable.float("title1FontSize");
-    t.nullable.string("title2FontFamily");
-    t.nullable.string("title2Color");
-    t.nullable.float("title2FontSize");
-    t.nullable.string("textFontFamily");
-    t.nullable.string("textColor");
-    t.nullable.float("textFontSize");
-    t.nullable.field("legalText", {
-      type: inputObjectType({
-        name: "OrganizationDocumentThemeInputLegalText",
-        definition(t) {
-          t.nullable.json("es");
-          t.nullable.json("en");
-        },
-      }),
-    });
-  },
-}).asArg();
 
 export const OrganizationPdfDocumentThemeInput = inputObjectType({
   name: "OrganizationPdfDocumentThemeInput",
@@ -317,15 +286,6 @@ export const Organization = objectType({
         };
       },
     });
-    /** @deprecated */
-    t.nonNull.field("preferredTone", {
-      type: "Tone",
-      deprecation: "use brandTheme.preferredTone",
-      description: "The preferred tone of organization.",
-      resolve: (o) => {
-        return o.preferred_tone;
-      },
-    });
     t.nonNull.list.nonNull.field("pdfDocumentThemes", {
       type: "OrganizationTheme",
       resolve: async (o, _, ctx) => {
@@ -334,12 +294,6 @@ export const Organization = objectType({
           ...theme,
           data: omit(theme.data, ["paginationPosition", "logoPosition"]),
         }));
-      },
-    });
-    t.nonNull.jsonObject("pdfDocumentTheme", {
-      deprecation: "Not used anymore. Use themes.pdfDocument[0].data",
-      resolve: (o) => {
-        return o.pdf_document_theme ?? defaultPdfDocumentTheme;
       },
     });
     t.nonNull.field("brandTheme", {
@@ -354,27 +308,6 @@ export const Organization = objectType({
       resolve: async (o, _, ctx) => {
         const theme = await ctx.organizations.loadOrgBrandTheme(o.id);
         return theme?.data ?? defaultBrandTheme;
-      },
-    });
-    t.nonNull.boolean("isPdfDocumentThemeFontsDirty", {
-      deprecation: "Not used anymore. Use themes.pdfDocument[0].isDirty",
-      description:
-        "Wether the 'fonts' section of the document theme has been changed from its default values or not",
-      resolve: (o) => {
-        const fontKeys = [
-          "title1FontFamily",
-          "title1Color",
-          "title1FontSize",
-          "title2FontFamily",
-          "title2Color",
-          "title2FontSize",
-          "textFontFamily",
-          "textColor",
-          "textFontSize",
-        ] as (keyof PdfDocumentTheme)[];
-        const currentThemeFonts = pick(o.pdf_document_theme ?? defaultPdfDocumentTheme, fontKeys);
-        const defaultThemeFonts = pick(defaultPdfDocumentTheme, fontKeys);
-        return !equals(currentThemeFonts, defaultThemeFonts);
       },
     });
     t.nullable.field("license", {

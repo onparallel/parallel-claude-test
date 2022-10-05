@@ -1,4 +1,3 @@
-import deepmerge from "deepmerge";
 import {
   arg,
   booleanArg,
@@ -77,24 +76,6 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
     }
 
     return org;
-  },
-});
-
-/** @deprecated */
-export const updateOrganizationPreferredTone = mutationField("updateOrganizationPreferredTone", {
-  description: "Changes the organization preferred tone",
-  deprecation: "use updateOrganizationBrandTheme instead",
-  type: "Organization",
-  args: {
-    tone: nonNull(arg({ type: "Tone" })),
-  },
-  authorize: authenticateAnd(contextUserHasRole("ADMIN")),
-  resolve: async (root, args, ctx) => {
-    return await ctx.organizations.updateOrganization(
-      ctx.user!.org_id,
-      { preferred_tone: args.tone },
-      `User:${ctx.user!.id}`
-    );
   },
 });
 
@@ -269,73 +250,6 @@ export const deleteOrganizationPdfDocumentTheme = mutationField(
     resolve: async (_, { orgThemeId }, ctx) => {
       await ctx.organizations.deleteOrganizationTheme(orgThemeId, ctx.user!);
       return (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
-    },
-  }
-);
-
-/** @deprecated */
-export const updateOrganizationDocumentTheme = mutationField("updateOrganizationDocumentTheme", {
-  deprecation: "use updateOrganizationPdfDocumentTheme",
-  description: "updates the theme of the PDF documents of the organization",
-  type: "Organization",
-  authorize: authenticateAnd(contextUserHasRole("ADMIN")),
-  args: {
-    data: nonNull("OrganizationDocumentThemeInput"),
-  },
-  validateArgs: validateTheme((args) => args.data, "data"),
-  resolve: async (_, args, ctx) => {
-    const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
-    const theme = deepmerge(
-      organization?.pdf_document_theme ?? defaultPdfDocumentTheme,
-      args.data,
-      {
-        // avoid deepmerge on legalText
-        customMerge: (key) => (from: any, to: any) => {
-          if (key === "legalText") {
-            return Object.assign(from, to);
-          }
-        },
-      }
-    );
-    return await ctx.organizations.updateOrganization(
-      ctx.user!.org_id,
-      { pdf_document_theme: theme },
-      `User:${ctx.user!.id}`
-    );
-  },
-});
-
-/** @deprecated */
-export const restoreDefaultOrganizationDocumentThemeFonts = mutationField(
-  "restoreDefaultOrganizationDocumentThemeFonts",
-  {
-    deprecation: "use restoreDefaultOrganizationPdfDocumentThemeFonts",
-    description:
-      "Restores the 'fonts' section of the organization document theme to its default values",
-    type: "Organization",
-    authorize: authenticateAnd(contextUserHasRole("ADMIN")),
-    resolve: async (_, args, ctx) => {
-      const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
-
-      const theme = Object.assign(
-        organization?.pdf_document_theme ?? defaultPdfDocumentTheme,
-        pick(defaultPdfDocumentTheme, [
-          "title1FontFamily",
-          "title1Color",
-          "title1FontSize",
-          "title2FontFamily",
-          "title2Color",
-          "title2FontSize",
-          "textFontFamily",
-          "textColor",
-          "textFontSize",
-        ])
-      );
-      return await ctx.organizations.updateOrganization(
-        ctx.user!.org_id,
-        { pdf_document_theme: theme },
-        `User:${ctx.user!.id}`
-      );
     },
   }
 );

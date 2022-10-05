@@ -23,7 +23,6 @@ export type FeatureFlagName =
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "AUTO_ANONYMIZE"
-  | "TEMPLATE_REPLIES_RECIPIENT_URL"
   | "TEMPLATE_REPLIES_PREVIEW_URL";
 
 export const FeatureFlagNameValues = [
@@ -42,7 +41,6 @@ export const FeatureFlagNameValues = [
   "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI",
   "PETITION_ACCESS_RECIPIENT_URL_FIELD",
   "AUTO_ANONYMIZE",
-  "TEMPLATE_REPLIES_RECIPIENT_URL",
   "TEMPLATE_REPLIES_PREVIEW_URL",
 ] as FeatureFlagName[];
 
@@ -318,10 +316,6 @@ export const TaskNameValues = [
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";
 
 export const TaskStatusValues = ["ENQUEUED", "PROCESSING", "COMPLETED", "FAILED"] as TaskStatus[];
-
-export type Tone = "FORMAL" | "INFORMAL";
-
-export const ToneValues = ["FORMAL", "INFORMAL"] as Tone[];
 
 export type UserOrganizationRole = "COLLABORATOR" | "NORMAL" | "ADMIN" | "OWNER";
 
@@ -669,12 +663,9 @@ export interface Organization {
   custom_email_from: Maybe<string>; // varchar
   logo_public_file_id: Maybe<number>; // int4
   usage_details: Maybe<any>; // jsonb
-  preferred_tone: Tone; // tone
   icon_public_file_id: Maybe<number>; // int4
   appsumo_license: Maybe<any>; // jsonb
-  pdf_document_theme: Maybe<any>; // jsonb
   anonymize_petitions_after_months: Maybe<number>; // int4
-  brand_theme: Maybe<any>; // jsonb
 }
 
 export type CreateOrganization = PartialProps<
@@ -689,12 +680,9 @@ export type CreateOrganization = PartialProps<
   | "custom_email_from"
   | "logo_public_file_id"
   | "usage_details"
-  | "preferred_tone"
   | "icon_public_file_id"
   | "appsumo_license"
-  | "pdf_document_theme"
   | "anonymize_petitions_after_months"
-  | "brand_theme"
 >;
 
 export interface OrganizationTheme {
@@ -1032,7 +1020,6 @@ export interface PetitionFieldComment {
   id: number; // int4
   petition_id: number; // int4
   petition_field_id: number; // int4
-  content: string; // text
   user_id: Maybe<number>; // int4
   petition_access_id: Maybe<number>; // int4
   created_at: Date; // timestamptz

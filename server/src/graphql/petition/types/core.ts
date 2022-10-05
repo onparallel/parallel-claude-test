@@ -1,6 +1,7 @@
 import { extension } from "mime-types";
 import { arg, enumType, inputObjectType, interfaceType, objectType, unionType } from "nexus";
 import { isDefined, minBy } from "remeda";
+import { defaultBrandTheme } from "../../../util/BrandTheme";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
@@ -39,11 +40,6 @@ export const PetitionFieldProgress = objectType({
   name: "PetitionFieldProgress",
   description: "The progress of the petition",
   definition(t) {
-    t.int("validated", {
-      description: "Number of fields validated",
-      deprecation: "Don't use this",
-      resolve: (o) => o.approved,
-    });
     t.int("approved", {
       description: "Number of fields approved",
     });
@@ -258,15 +254,14 @@ export const PetitionBase = interfaceType({
         return root.signature_config;
       },
     });
-    /** @deprecated */
     t.nonNull.field("tone", {
       type: "Tone",
-      deprecation: "use organization.brandTheme.preferredTone",
       description: "The preferred tone of organization.",
       resolve: async (root, _, ctx) => {
-        const org = (await ctx.organizations.loadOrg(root.org_id))!;
+        const res = await ctx.organizations.loadOrgBrandTheme(root.org_id);
+        const theme = res?.data ?? defaultBrandTheme;
 
-        return org.preferred_tone;
+        return theme.preferredTone;
       },
     });
     t.nonNull.field("customProperties", {

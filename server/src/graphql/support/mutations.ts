@@ -488,36 +488,6 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
   },
 });
 
-export const updateFeatureFlag = mutationField("updateFeatureFlag", {
-  description: "Activate or deactivate an organization feature flag",
-  type: "SupportMethodResponse",
-  args: {
-    featureFlag: nonNull("FeatureFlag"),
-    orgId: nonNull(intArg({ description: "Numeric ID of the organization" })),
-    value: nonNull(booleanArg({ description: "Feature flag value" })),
-  },
-  authorize: supportMethodAccess(),
-  resolve: async (_, { featureFlag, value, orgId }, ctx) => {
-    try {
-      await ctx.featureFlags.addOrUpdateFeatureFlagOverride(orgId, { name: featureFlag, value });
-      if (["REMOVE_PARALLEL_BRANDING"].includes(featureFlag)) {
-        await ctx.signature.updateBranding(orgId);
-      }
-      return {
-        result: RESULT.SUCCESS,
-        message: `Organization with ID: ${orgId} now has ${featureFlag} set to ${String(
-          value
-        ).toUpperCase()}`,
-      };
-    } catch (error: any) {
-      if ((error.message as string).includes("feature_flag_override_org_id_foreign")) {
-        return { result: RESULT.FAILURE, message: `Wrong organization ID: ${orgId}` };
-      }
-      return { result: RESULT.FAILURE, message: error.message };
-    }
-  },
-});
-
 export const updateOrganizationUserLimit = mutationField("updateOrganizationUserLimit", {
   description: "Updates the user limit for a organization",
   type: "SupportMethodResponse",
