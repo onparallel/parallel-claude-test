@@ -75,15 +75,20 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
     ];
   }
 
-  public async addFieldComments(field: PetitionField) {
-    const fieldComments = await this.context.petitions.loadPetitionFieldCommentsForField({
-      petitionFieldId: field.id,
-      petitionId: field.petition_id,
-      loadInternalComments: true,
-    });
+  public async addFieldComments(fields: PetitionField[]) {
+    const fieldComments = (
+      await this.context.petitions.loadPetitionFieldCommentsForField(
+        fields.map((field) => ({
+          petitionFieldId: field.id,
+          petitionId: field.petition_id,
+          loadInternalComments: true,
+        }))
+      )
+    ).flat();
 
     for (const comment of fieldComments) {
-      await this.addCommentRow(comment, field.title);
+      const fieldTitle = fields.find((f) => f.id === comment.petition_field_id)!.title;
+      await this.addCommentRow(comment, fieldTitle);
     }
   }
 

@@ -102,13 +102,12 @@ export async function* getPetitionFiles(
     } else if (!isFileTypeField(field.type)) {
       excelWorkbook.addPetitionFieldReply(field, field.replies);
     }
-
-    await excelWorkbook.addPetitionFieldComments(field);
   }
+
+  await excelWorkbook.addPetitionFieldComments(visibleFields);
 
   if (excelWorkbook.hasRows()) {
     yield await excelWorkbook.export();
-    await options.onProgress?.(++processedFiles / totalFiles);
   }
 
   if (latestPetitionSignature?.status === "COMPLETED" && !options.xlsxOnly) {

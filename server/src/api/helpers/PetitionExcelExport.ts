@@ -59,8 +59,8 @@ export class PetitionExcelExport {
     }
   }
 
-  public async addPetitionFieldComments(field: PetitionField) {
-    await this.fieldCommentsTab.addFieldComments(field);
+  public async addPetitionFieldComments(fields: PetitionField[]) {
+    await this.fieldCommentsTab.addFieldComments(fields);
   }
 
   public async export(): Promise<ZipFileInput> {
