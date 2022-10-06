@@ -572,6 +572,7 @@ export interface NexusGenObjects {
           opened_at?: Date;
           signed_at?: Date;
           declined_at?: Date;
+          bounced_at?: Date;
         }
       | undefined;
   };
@@ -1622,6 +1623,7 @@ export interface NexusGenFieldTypes {
   };
   PetitionSignatureRequestSignerStatus: {
     // field return type
+    bouncedAt: NexusGenScalars["DateTime"] | null; // DateTime
     declinedAt: NexusGenScalars["DateTime"] | null; // DateTime
     openedAt: NexusGenScalars["DateTime"] | null; // DateTime
     sentAt: NexusGenScalars["DateTime"] | null; // DateTime
@@ -3207,6 +3209,7 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionSignatureRequestSignerStatus: {
     // field return type name
+    bouncedAt: "DateTime";
     declinedAt: "DateTime";
     openedAt: "DateTime";
     sentAt: "DateTime";

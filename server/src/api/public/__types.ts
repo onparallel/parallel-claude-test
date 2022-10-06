@@ -2627,6 +2627,7 @@ export type PetitionSignatureRequest = Timestamps & {
 };
 
 export type PetitionSignatureRequestSignerStatus = {
+  bouncedAt: Maybe<Scalars["DateTime"]>;
   declinedAt: Maybe<Scalars["DateTime"]>;
   openedAt: Maybe<Scalars["DateTime"]>;
   sentAt: Maybe<Scalars["DateTime"]>;

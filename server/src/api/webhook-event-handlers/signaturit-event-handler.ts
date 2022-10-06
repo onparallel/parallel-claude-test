@@ -225,8 +225,17 @@ async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petition
     extra: pick(data.document, ["email", "name"]),
   };
 
+  const [, signerIndex] = findSigner(signature.signature_config.signersInfo, data.document);
   await Promise.all([
-    ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData),
+    ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData, {
+      signer_status: {
+        ...signature.signer_status,
+        [signerIndex]: {
+          ...signature.signer_status[signerIndex],
+          bounced_at: new Date(data.created_at),
+        },
+      },
+    }),
     updateSignatureStartedEvent(petitionId, { email_bounced_at: new Date(data.created_at) }, ctx),
     appendEventLogs(ctx, data),
   ]);

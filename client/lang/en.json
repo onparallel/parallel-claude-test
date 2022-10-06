@@ -3150,6 +3150,11 @@
     "context": "Starting"
   },
   {
+    "term": "component.petition-signature-request.signer-status.dates.bounced-at",
+    "definition": "Email bounced: {bouncedAt}",
+    "context": "Email bounced: {bouncedAt}"
+  },
+  {
     "term": "component.petition-signature-request.signer-status.dates.declined-at",
     "definition": "Document declined: {declinedAt}",
     "context": "Document declined: {declinedAt}"

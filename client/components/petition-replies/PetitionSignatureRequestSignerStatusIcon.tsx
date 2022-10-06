@@ -11,7 +11,13 @@ import { FormattedMessage } from "react-intl";
 import { DateTime } from "../common/DateTime";
 import { SmallPopover } from "../common/SmallPopover";
 
-function DatesList({ sentAt, openedAt, signedAt, declinedAt }: DatesList_SignerStatusFragment) {
+function DatesList({
+  sentAt,
+  openedAt,
+  signedAt,
+  declinedAt,
+  bouncedAt,
+}: DatesList_SignerStatusFragment) {
   return (
     <Stack as="ul" paddingLeft={4} spacing={1}>
       {sentAt ? (
@@ -50,6 +56,15 @@ function DatesList({ sentAt, openedAt, signedAt, declinedAt }: DatesList_SignerS
           />
         </Text>
       ) : null}
+      {bouncedAt ? (
+        <Text as="li" fontSize="sm">
+          <FormattedMessage
+            id="component.petition-signature-request.signer-status.dates.bounced-at"
+            defaultMessage="Email bounced: {bouncedAt}"
+            values={{ bouncedAt: <DateTime value={bouncedAt} format={FORMATS["L+LT"]} /> }}
+          />
+        </Text>
+      ) : null}
     </Stack>
   );
 }
@@ -61,6 +76,7 @@ DatesList.fragments = {
       openedAt
       signedAt
       declinedAt
+      bouncedAt
     }
   `,
 };
@@ -70,7 +86,7 @@ export const PetitionSignatureRequestSignerStatusIcon = Object.assign(
     "svg",
     { signerStatus: PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment }
   >(function PetitionSignatureRequestSignerStatusIcon(
-    { signerStatus: { status, sentAt, openedAt, signedAt, declinedAt }, ...props },
+    { signerStatus: { status, sentAt, openedAt, signedAt, declinedAt, bouncedAt }, ...props },
     ref
   ) {
     switch (status) {
@@ -84,11 +100,19 @@ export const PetitionSignatureRequestSignerStatusIcon = Object.assign(
             <CheckIcon ref={ref} color="green.500" {...props} />
           </SmallPopover>
         );
+      case "BOUNCED":
       case "DECLINED":
         return (
           <SmallPopover
-            isDisabled={!sentAt && !openedAt && !declinedAt}
-            content={<DatesList sentAt={sentAt} openedAt={openedAt} declinedAt={declinedAt} />}
+            isDisabled={!sentAt && !openedAt && !declinedAt && !bouncedAt}
+            content={
+              <DatesList
+                sentAt={sentAt}
+                openedAt={openedAt}
+                declinedAt={declinedAt}
+                bouncedAt={bouncedAt}
+              />
+            }
             width="auto"
           >
             <CloseIcon ref={ref} color="red.500" fontSize="12px" {...props} />

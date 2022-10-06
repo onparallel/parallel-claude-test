@@ -2708,6 +2708,7 @@ export interface PetitionSignatureRequest extends Timestamps {
 
 export interface PetitionSignatureRequestSignerStatus {
   __typename?: "PetitionSignatureRequestSignerStatus";
+  bouncedAt?: Maybe<Scalars["DateTime"]>;
   declinedAt?: Maybe<Scalars["DateTime"]>;
   openedAt?: Maybe<Scalars["DateTime"]>;
   sentAt?: Maybe<Scalars["DateTime"]>;
@@ -10641,6 +10642,7 @@ export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
     openedAt?: string | null;
     signedAt?: string | null;
     declinedAt?: string | null;
+    bouncedAt?: string | null;
     signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
   }>;
   petition: { __typename?: "Petition"; id: string };
@@ -10720,6 +10722,7 @@ export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
     openedAt?: string | null;
     signedAt?: string | null;
     declinedAt?: string | null;
+    bouncedAt?: string | null;
     signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
   }>;
   petition: { __typename?: "Petition"; id: string };
@@ -11024,6 +11027,7 @@ export type DatesList_SignerStatusFragment = {
   openedAt?: string | null;
   signedAt?: string | null;
   declinedAt?: string | null;
+  bouncedAt?: string | null;
 };
 
 export type PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment = {
@@ -11033,6 +11037,7 @@ export type PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment = {
   openedAt?: string | null;
   signedAt?: string | null;
   declinedAt?: string | null;
+  bouncedAt?: string | null;
 };
 
 export type PetitionSignatureRequestStatusText_PetitionSignatureRequestFragment = {
@@ -11097,6 +11102,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
       openedAt?: string | null;
       signedAt?: string | null;
       declinedAt?: string | null;
+      bouncedAt?: string | null;
       signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
     }>;
     petition: { __typename?: "Petition"; id: string };
@@ -11179,6 +11185,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
             openedAt?: string | null;
             signedAt?: string | null;
             declinedAt?: string | null;
+            bouncedAt?: string | null;
             signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
           }>;
           petition: { __typename?: "Petition"; id: string };
@@ -19534,6 +19541,7 @@ export type PetitionReplies_PetitionFragment = {
       openedAt?: string | null;
       signedAt?: string | null;
       declinedAt?: string | null;
+      bouncedAt?: string | null;
       signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
     }>;
     petition: { __typename?: "Petition"; id: string };
@@ -19966,6 +19974,7 @@ export type PetitionReplies_closePetitionMutation = {
         openedAt?: string | null;
         signedAt?: string | null;
         declinedAt?: string | null;
+        bouncedAt?: string | null;
         signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
       }>;
       petition: { __typename?: "Petition"; id: string };
@@ -20201,6 +20210,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         openedAt?: string | null;
         signedAt?: string | null;
         declinedAt?: string | null;
+        bouncedAt?: string | null;
         signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
       }>;
       petition: { __typename?: "Petition"; id: string };
@@ -20538,6 +20548,7 @@ export type PetitionReplies_petitionQuery = {
             openedAt?: string | null;
             signedAt?: string | null;
             declinedAt?: string | null;
+            bouncedAt?: string | null;
             signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
           }>;
           petition: { __typename?: "Petition"; id: string };
@@ -23384,6 +23395,7 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
             openedAt?: string | null;
             signedAt?: string | null;
             declinedAt?: string | null;
+            bouncedAt?: string | null;
             signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
           }>;
           petition: { __typename?: "Petition"; id: string };
@@ -27261,6 +27273,7 @@ export const DatesList_SignerStatusFragmentDoc = gql`
     openedAt
     signedAt
     declinedAt
+    bouncedAt
   }
 ` as unknown as DocumentNode<DatesList_SignerStatusFragment, unknown>;
 export const PetitionSignatureRequestSignerStatusIcon_SignerStatusFragmentDoc = gql`

@@ -22,6 +22,7 @@ export const PetitionSignatureRequestSignerStatus = objectType({
           opened_at?: Date;
           signed_at?: Date;
           declined_at?: Date;
+          bounced_at?: Date;
         }
       | undefined;
   }`,
@@ -37,7 +38,13 @@ export const PetitionSignatureRequestSignerStatus = objectType({
     t.string("status", {
       description: "The signing status of the individual contact.",
       resolve: (o) =>
-        o.status?.signed_at ? "SIGNED" : o.status?.declined_at ? "DECLINED" : "PENDING",
+        o.status?.signed_at
+          ? "SIGNED"
+          : o.status?.declined_at
+          ? "DECLINED"
+          : o.status?.bounced_at
+          ? "BOUNCED"
+          : "PENDING",
     });
     t.nullable.datetime("sentAt", {
       resolve: (o) => o.status?.sent_at ?? null,
@@ -50,6 +57,9 @@ export const PetitionSignatureRequestSignerStatus = objectType({
     });
     t.nullable.datetime("declinedAt", {
       resolve: (o) => o.status?.declined_at ?? null,
+    });
+    t.nullable.datetime("bouncedAt", {
+      resolve: (o) => o.status?.bounced_at ?? null,
     });
   },
 });
