@@ -2,6 +2,7 @@ import Analytics from "analytics-node";
 import { inject, injectable } from "inversify";
 import { isDefined } from "remeda";
 import { Config, CONFIG } from "../config";
+import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import {
   OrganizationUsageLimitName,
   PetitionSignatureCancelReason,
@@ -227,7 +228,7 @@ export type AnalyticsEvent =
 export const ANALYTICS = Symbol.for("ANALYTICS");
 
 export interface IAnalyticsService {
-  identifyUser(user: User, userData: UserData, extraTraits?: any): void;
+  identifyUser(user: User, userData: UserData, extraTraits?: any): Promise<void>;
   trackEvent(events: MaybeArray<AnalyticsEvent>): void;
 }
 
@@ -235,7 +236,10 @@ export interface IAnalyticsService {
 export class AnalyticsService implements IAnalyticsService {
   readonly analytics?: Analytics;
 
-  constructor(@inject(CONFIG) config: Config) {
+  constructor(
+    @inject(CONFIG) config: Config,
+    @inject(OrganizationRepository) private organizations: OrganizationRepository
+  ) {
     if (config.analytics.writeKey) {
       this.analytics = new Analytics(config.analytics.writeKey, {
         enable: process.env.NODE_ENV === "production",
@@ -243,7 +247,8 @@ export class AnalyticsService implements IAnalyticsService {
     }
   }
 
-  identifyUser(user: User, userData: UserData, extraTraits?: any) {
+  async identifyUser(user: User, userData: UserData, extraTraits?: any) {
+    const org = (await this.organizations.loadOrg(user.org_id))!;
     this.analytics?.identify({
       userId: toGlobalId("User", user.id),
       traits: {
@@ -258,7 +263,10 @@ export class AnalyticsService implements IAnalyticsService {
         position: userData.details?.position,
         source: userData.details?.source,
         locale: userData.details?.preferredLocale,
-        orgId: user.org_id,
+        company: {
+          id: toGlobalId("Organization", org.id),
+          name: org.name,
+        },
         orgRole: user.organization_role,
         ...extraTraits,
       },

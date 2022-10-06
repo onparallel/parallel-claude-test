@@ -119,6 +119,10 @@ export const AppLayout = Object.assign(
         createdAt: me.createdAt,
         orgRole: me.role,
         name: me.fullName!,
+        company: {
+          id: me.organization.id,
+          name: me.organization.name,
+        },
       });
     }, [me.id]);
 
