@@ -23,11 +23,12 @@ import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
 export interface AliasOptionsMenuProps extends Omit<ButtonProps, "children"> {
   field: AliasOptionsMenu_PetitionFieldFragment;
+  onCreateAlias?: () => Promise<string>;
 }
 
 export const AliasOptionsMenu = Object.assign(
   chakraForwardRef<"button", AliasOptionsMenuProps>(function AliasOptionsMenu(
-    { field, ...props },
+    { field, onCreateAlias, ...props },
     ref
   ) {
     const intl = useIntl();
@@ -67,9 +68,10 @@ export const AliasOptionsMenu = Object.assign(
             </HStack>
             {formulas.map(({ title, description, formula }, index) => (
               <MenuItem
-                onClick={(event) => {
+                onClick={async (event) => {
                   event.stopPropagation();
-                  copyFormula({ value: formula || `{{ ${field.alias} }}` });
+                  const alias = field.alias ?? (await onCreateAlias?.());
+                  copyFormula({ value: formula(alias ?? "") });
                 }}
                 key={index}
               >
@@ -112,7 +114,7 @@ export const AliasOptionsMenu = Object.assign(
 type FormulasType = {
   title: string;
   description: string;
-  formula: string;
+  formula: (alias: string) => string;
 }[];
 
 function useFormulasByTypeField({
@@ -123,55 +125,59 @@ function useFormulasByTypeField({
 }: AliasOptionsMenu_PetitionFieldFragment): FormulasType {
   const intl = useIntl();
   return useMemo(() => {
-    const _alias = multiple ? alias + "[0]" : alias;
+    const buildAlias = (alias: string) => (multiple ? alias + "[0]" : alias);
 
     const conditionalFormula = (() => {
       switch (type) {
         case "CHECKBOX": {
           const fieldOptions = options as FieldOptions["CHECKBOX"];
           const values = fieldOptions.values.length > 0 ? fieldOptions.values : ["A"];
-          return [
-            ...values.slice(0, 3).flatMap((value, index) => [
-              `{% ${index === 0 ? "if" : "elsif"} ${alias} contains ${JSON.stringify(value)} %}`,
-              intl.formatMessage(
-                {
-                  id: "component.reference-options-menu.sentence-for-option",
-                  defaultMessage: `This sentence will be displayed when "{option}" is selected.`,
-                },
-                { option: value }
-              ),
-            ]),
-            "{% else %}",
-            intl.formatMessage({
-              id: "component.reference-options-menu.sentence-for-other",
-              defaultMessage:
-                "This sentence will be displayed if none of the previous options is selected.",
-            }),
-            "{% endif %}",
-          ].join("\n");
+          return (alias: string) =>
+            [
+              ...values.slice(0, 3).flatMap((value, index) => [
+                `{% ${index === 0 ? "if" : "elsif"} ${alias} contains ${JSON.stringify(value)} %}`,
+                intl.formatMessage(
+                  {
+                    id: "component.reference-options-menu.sentence-for-option",
+                    defaultMessage: `This sentence will be displayed when "{option}" is selected.`,
+                  },
+                  { option: value }
+                ),
+              ]),
+              "{% else %}",
+              intl.formatMessage({
+                id: "component.reference-options-menu.sentence-for-other",
+                defaultMessage:
+                  "This sentence will be displayed if none of the previous options is selected.",
+              }),
+              "{% endif %}",
+            ].join("\n");
         }
         case "SELECT": {
           const fieldOptions = options as FieldOptions["SELECT"];
           const values = fieldOptions.values.length > 0 ? fieldOptions.values : ["A"];
-          return [
-            ...values.slice(0, 3).flatMap((value, index) => [
-              `{% ${index === 0 ? "if" : "elsif"} ${_alias} == ${JSON.stringify(value)} %}`,
-              intl.formatMessage(
-                {
-                  id: "component.reference-options-menu.if-option-with-sentence",
-                  defaultMessage: `This sentence will be displayed when "{option}" is selected.`,
-                },
-                { option: value }
-              ),
-            ]),
-            "{% else %}",
-            intl.formatMessage({
-              id: "component.reference-options-menu.sentence-for-other",
-              defaultMessage:
-                "This sentence will be displayed if none of the previous options is selected.",
-            }),
-            "{% endif %}",
-          ].join("\n");
+          return (alias: string) =>
+            [
+              ...values.slice(0, 3).flatMap((value, index) => [
+                `{% ${index === 0 ? "if" : "elsif"} ${buildAlias(alias)} == ${JSON.stringify(
+                  value
+                )} %}`,
+                intl.formatMessage(
+                  {
+                    id: "component.reference-options-menu.if-option-with-sentence",
+                    defaultMessage: `This sentence will be displayed when "{option}" is selected.`,
+                  },
+                  { option: value }
+                ),
+              ]),
+              "{% else %}",
+              intl.formatMessage({
+                id: "component.reference-options-menu.sentence-for-other",
+                defaultMessage:
+                  "This sentence will be displayed if none of the previous options is selected.",
+              }),
+              "{% endif %}",
+            ].join("\n");
         }
         default: {
           const value =
@@ -185,22 +191,23 @@ function useFormulasByTypeField({
                   id: "component.reference-options-menu.example-reply",
                   defaultMessage: "Example reply",
                 });
-          return [
-            `{% if ${_alias} == ${JSON.stringify(value)} %}`,
-            intl.formatMessage(
-              {
-                id: "component.reference-options-menu.sentence-with-reply",
-                defaultMessage: `This sentence will be displayed when the reply is "{value}".`,
-              },
-              { value }
-            ),
-            "{% else %}",
-            intl.formatMessage({
-              id: "component.reference-options-menu.sentence-no-reply",
-              defaultMessage: "This sentence will be displayed if there are no added replies.",
-            }),
-            "{% endif %}",
-          ].join("\n");
+          return (alias: string) =>
+            [
+              `{% if ${buildAlias(alias)} == ${JSON.stringify(value)} %}`,
+              intl.formatMessage(
+                {
+                  id: "component.reference-options-menu.sentence-with-reply",
+                  defaultMessage: `This sentence will be displayed when the reply is "{value}".`,
+                },
+                { value }
+              ),
+              "{% else %}",
+              intl.formatMessage({
+                id: "component.reference-options-menu.sentence-no-reply",
+                defaultMessage: "This sentence will be displayed if there are no added replies.",
+              }),
+              "{% endif %}",
+            ].join("\n");
         }
       }
     })();
@@ -230,11 +237,12 @@ function useFormulasByTypeField({
                 id: "component.reference-options-menu.list-of-replies-description",
                 defaultMessage: "Creates a list with each reply added.",
               }),
-              formula: [
-                `{% for ${loopVariable} in ${alias} -%}`,
-                `- ${interpolation}`,
-                `{% endfor %}`,
-              ].join("\n"),
+              formula: (alias: string) =>
+                [
+                  `{% for ${loopVariable} in ${alias} -%}`,
+                  `- ${interpolation}`,
+                  `{% endfor %}`,
+                ].join("\n"),
             },
             {
               title: intl.formatMessage({
@@ -245,11 +253,12 @@ function useFormulasByTypeField({
                 id: "component.reference-options-menu.one-line-replies-description",
                 defaultMessage: "Displays all replies in one line.",
               }),
-              formula: [
-                `{% for ${loopVariable} in ${alias} -%}`,
-                `{% if forloop.first == true %}{% elsif forloop.last == true %} ${and} {% else %}, {% endif %}${interpolation}`,
-                `{%- endfor %}`,
-              ].join("\n"),
+              formula: (alias: string) =>
+                [
+                  `{% for ${loopVariable} in ${alias} -%}`,
+                  `{% if forloop.first == true %}{% elsif forloop.last == true %} ${and} {% else %}, {% endif %}${interpolation}`,
+                  `{%- endfor %}`,
+                ].join("\n"),
             },
           ]
         : [];
@@ -287,7 +296,7 @@ function useFormulasByTypeField({
                 id: "component.reference-options-menu.quantities-description",
                 defaultMessage: "Displays the reply as quantity.",
               }),
-              formula: `{{ ${_alias} | number }}`,
+              formula: (alias) => `{{ ${buildAlias(alias)} | number }}`,
             },
             {
               title: intl.formatMessage({
@@ -298,7 +307,7 @@ function useFormulasByTypeField({
                 id: "component.reference-options-menu.percentage-description",
                 defaultMessage: "Displays the reply as a percentage.",
               }),
-              formula: `{{ ${_alias} | percent: 2 }}`,
+              formula: (alias) => `{{ ${buildAlias(alias)} | percent: 2 }}`,
             },
             {
               title: intl.formatMessage({
@@ -309,7 +318,7 @@ function useFormulasByTypeField({
                 id: "component.reference-options-menu.round-up-description",
                 defaultMessage: "Rounds the amount of a field.",
               }),
-              formula: `{{ ${_alias} | round }}`,
+              formula: (alias) => `{{ ${buildAlias(alias)} | round }}`,
             },
             ...commonFormulas,
           ];
@@ -325,7 +334,7 @@ function useFormulasByTypeField({
                 id: "component.reference-options-menu.uppercase-description",
                 defaultMessage: "Displays the reply in capital letters.",
               }),
-              formula: `{{ ${_alias} | upcase }}`,
+              formula: (alias) => `{{ ${buildAlias(alias)} | upcase }}`,
             },
             {
               title: intl.formatMessage({
@@ -336,7 +345,7 @@ function useFormulasByTypeField({
                 id: "component.reference-options-menu.lowercase-description",
                 defaultMessage: "Displays a lowercase reply.",
               }),
-              formula: `{{ ${_alias} | downcase }}`,
+              formula: (alias) => `{{ ${buildAlias(alias)} | downcase }}`,
             },
             {
               title: intl.formatMessage({
@@ -347,7 +356,7 @@ function useFormulasByTypeField({
                 id: "component.reference-options-menu.capitalize-first-letter-description",
                 defaultMessage: "Displays the reply with the first letter capitalized.",
               }),
-              formula: `{{ ${_alias} | capitalize }}`,
+              formula: (alias) => `{{ ${buildAlias(alias)} | capitalize }}`,
             },
             ...commonFormulas,
           ];

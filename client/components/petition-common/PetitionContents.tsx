@@ -195,13 +195,17 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
     }),
   });
 
+  const handleCreateAlias = async () => {
+    return await showCreateReferenceDialog({ field, fieldIndex, onFieldEdit });
+  };
+
   const showCreateReferenceDialog = useCreateReferenceDialog();
   const buildAliasInterpolation = useBuildAliasInterpolation(field);
   const handleAddReferenceClick = async (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     event.preventDefault();
     try {
-      const alias = await showCreateReferenceDialog({ field, fieldIndex, onFieldEdit });
+      const alias = await handleCreateAlias();
       copyReference({ value: buildAliasInterpolation(alias) });
     } catch {}
   };
@@ -290,7 +294,7 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
                   boxShadow: "lg",
                 }}
                 isDisabled={!field.alias && isReadOnly}
-                onClick={field.alias || isReadOnly ? undefined : handleAddReferenceClick}
+                onCreateAlias={handleCreateAlias}
               />
             </>
           ) : null}
