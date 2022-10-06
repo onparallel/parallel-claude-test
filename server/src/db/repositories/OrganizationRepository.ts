@@ -7,6 +7,7 @@ import { EMAILS, IEmailsService } from "../../services/emails";
 import { unMaybeArray } from "../../util/arrays";
 import { BrandTheme, defaultBrandTheme } from "../../util/BrandTheme";
 import { fromDataLoader } from "../../util/fromDataLoader";
+import { fromGlobalId, isGlobalId } from "../../util/globalId";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
@@ -210,6 +211,11 @@ export class OrganizationRepository extends BaseRepository {
           const { search, status, sortBy } = opts;
           if (search) {
             q.whereEscapedILike("name", `%${escapeLike(search, "\\")}%`, "\\");
+            if (search.match(/^\d+$/)) {
+              q.or.where("id", parseInt(search, 10));
+            } else if (isGlobalId(search, "Organization")) {
+              q.or.where("id", fromGlobalId(search, "Organization").id);
+            }
           }
           if (status) {
             q.where("status", status);

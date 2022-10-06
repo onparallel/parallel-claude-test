@@ -1,6 +1,15 @@
 import { decode, encode } from "./token";
 import { Maybe } from "./types";
 
+export function isGlobalId(value: string, type?: string) {
+  try {
+    fromGlobalId(value, type);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function toGlobalId<TId extends number | string = number>(type: string, id: TId) {
   return encode(Buffer.from(`${type}:${id}`, "utf8"));
 }
