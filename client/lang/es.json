@@ -315,6 +315,16 @@
     "context": "Open menu"
   },
   {
+    "term": "component.calendar-month-header.next-month",
+    "definition": "Mes siguiente",
+    "context": "Next month"
+  },
+  {
+    "term": "component.calendar-month-header.prev-month",
+    "definition": "Mes anterior",
+    "context": "Previous month"
+  },
+  {
     "term": "component.checkbox-type-label.exact",
     "definition": "{tone, select, INFORMAL{Elige} other{Escoja}} {max, plural, =1{# opción} other{# opciones}}",
     "context": "Choose {max, plural, =1{# option} other{# options}}"
@@ -1050,19 +1060,19 @@
     "context": "Use only letters, numbers or _"
   },
   {
-    "term": "component.calendar-month-header.next-month",
-    "definition": "Mes siguiente",
-    "context": "Next month"
+    "term": "component.date-range-picker-button.clear-range",
+    "definition": "Vaciar rango de fechas",
+    "context": "Clear date range"
   },
   {
-    "term": "component.calendar-month-header.prev-month",
-    "definition": "Mes anterior",
-    "context": "Previous month"
+    "term": "component.date-range-picker-button.default-text",
+    "definition": "Cualquier fecha",
+    "context": "All time"
   },
   {
-    "term": "component.date-range-picker-popover.clear-filter",
-    "definition": "Quitar filtro",
-    "context": "Clear filter"
+    "term": "component.date-range-picker-button.title",
+    "definition": "Selecciona un rango de fechas",
+    "context": "Select a range of dates"
   },
   {
     "term": "component.date-range-picker-popover.title",
@@ -5565,6 +5575,21 @@
     "context": "Created at"
   },
   {
+    "term": "generic.current-month",
+    "definition": "Mes en curso",
+    "context": "Current month"
+  },
+  {
+    "term": "generic.current-quarter",
+    "definition": "Trimestre en curso",
+    "context": "Current quarter"
+  },
+  {
+    "term": "generic.current-year",
+    "definition": "Año en curso",
+    "context": "Current year"
+  },
+  {
     "term": "generic.default",
     "definition": "Predet.",
     "context": "Default"
@@ -5975,19 +6000,24 @@
     "context": "Last active at"
   },
   {
+    "term": "generic.last-month",
+    "definition": "Mes anterior",
+    "context": "Last month"
+  },
+  {
+    "term": "generic.last-quarter",
+    "definition": "Trimestre anterior",
+    "context": "Last quarter"
+  },
+  {
     "term": "generic.last-used-at",
     "definition": "Usado por última vez",
     "context": "Last used at"
   },
   {
-    "term": "generic.last-x-days",
-    "definition": "Últimos {days} días",
-    "context": "Last {days} days"
-  },
-  {
-    "term": "generic.last-x-months",
-    "definition": "Últimos {months} meses",
-    "context": "Last {months} months"
+    "term": "generic.last-year",
+    "definition": "Año anterior",
+    "context": "Last year"
   },
   {
     "term": "generic.learn-more",
@@ -7168,11 +7198,6 @@
     "term": "page.pricing.zapier-integration",
     "definition": "Integración con Zapier",
     "context": "Zapier integration"
-  },
-  {
-    "term": "page.reports.any-date",
-    "definition": "Cualquier fecha",
-    "context": "Any date"
   },
   {
     "term": "page.reports.average-duration",

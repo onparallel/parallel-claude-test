@@ -54,11 +54,14 @@ export class QueryItem<T> {
     }
   }
 
-  list() {
+  list(maxItems?: number) {
     return new QueryItem<NonNullable<T>[] | null>(
       (value) => {
         if (value) {
-          const parsed = (value as string).split(",").map((v) => this.parseValue(v));
+          const parsed = (value as string)
+            .split(",")
+            .slice(0, maxItems)
+            .map((v) => this.parseValue(v));
           return parsed.includes(null) ? null : (parsed as NonNullable<T>[]);
         } else {
           return null;
@@ -90,10 +93,23 @@ export function string() {
     return typeof value === "string" ? value : null;
   });
 }
+
 export function boolean() {
   return new QueryItem<boolean | null>((value) => {
     return value === "true" ? true : value === "false" ? false : null;
   });
+}
+
+export function date() {
+  return new QueryItem<Date | null>(
+    (value) => {
+      const parsed = typeof value === "string" ? new Date(parseInt(value)) : null;
+      return isDefined(parsed) && !isNaN(parsed.valueOf()) ? parsed : null;
+    },
+    (value: Date) => {
+      return value.valueOf().toString();
+    }
+  );
 }
 
 export function values<T extends string | number>(values: readonly T[]): QueryItem<T | null> {

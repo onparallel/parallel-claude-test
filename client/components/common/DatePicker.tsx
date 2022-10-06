@@ -1,7 +1,6 @@
 import { Stack } from "@chakra-ui/react";
 import { getMonth, getYear, isPast, isSameDay, isToday, startOfDay, startOfMonth } from "date-fns";
 import { useCallback, useState } from "react";
-import { useIntl } from "react-intl";
 import { CalendarMonth, CalendarMonthDateProps } from "./CalendarMonth";
 import { CalendarMonthHeader } from "./CalendarMonthHeader";
 

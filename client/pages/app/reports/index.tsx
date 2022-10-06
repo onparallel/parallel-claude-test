@@ -45,7 +45,7 @@ import {
 } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { stallFor } from "@parallel/utils/promises/stallFor";
-import { string, useQueryState } from "@parallel/utils/queryState";
+import { date, useQueryState } from "@parallel/utils/queryState";
 import { useBackgroundTask } from "@parallel/utils/useBackgroundTask";
 import { useTemplateRepliesReportTask } from "@parallel/utils/useTemplateRepliesReportTask";
 import { useRef, useState } from "react";
@@ -66,8 +66,7 @@ type ReportType = {
 };
 
 const QUERY_STATE = {
-  startDate: string(),
-  endDate: string(),
+  range: date().list(2),
 };
 
 export function Reports() {
@@ -115,7 +114,11 @@ export function Reports() {
         const { task } = await stallFor(
           () =>
             templateStatsTask(
-              { templateId: templateId, startDate: state.startDate, endDate: state.endDate },
+              {
+                templateId: templateId,
+                startDate: state.range?.[0].toISOString() ?? null,
+                endDate: state.range?.[1].toISOString() ?? null,
+              },
               { signal: taskAbortController.current!.signal }
             ),
           2_000 + 1_000 * Math.random()
@@ -203,18 +206,8 @@ export function Reports() {
                 </Box>
               </HStack>
               <DateRangePickerButton
-                startDate={state.startDate ? new Date(state.startDate) : null}
-                endDate={state.endDate ? new Date(state.endDate) : null}
-                onChange={(range) => {
-                  setQueryState((s) => ({
-                    ...s,
-                    startDate: range[0].toISOString(),
-                    endDate: range[1].toISOString(),
-                  }));
-                }}
-                onRemoveFilter={() => {
-                  setQueryState({});
-                }}
+                value={state.range as [Date, Date] | null}
+                onChange={(range) => setQueryState((s) => ({ ...s, range }))}
               />
               <Button
                 minWidth="fit-content"
@@ -231,7 +224,11 @@ export function Reports() {
                 leftIcon={<TableIcon />}
                 colorScheme="primary"
                 onClick={() =>
-                  handleTemplateRepliesReportTask(prevTemplateId!, state.startDate, state.endDate)
+                  handleTemplateRepliesReportTask(
+                    prevTemplateId!,
+                    state.range?.[0].toISOString() ?? null,
+                    state.range?.[1].toISOString() ?? null
+                  )
                 }
               >
                 <OverflownText>

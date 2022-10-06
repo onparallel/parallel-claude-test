@@ -1,20 +1,8 @@
-import {
-  BoxProps,
-  Button,
-  ButtonGroup,
-  ButtonProps,
-  Flex,
-  HStack,
-  Select,
-  Stack,
-} from "@chakra-ui/react";
-import { ChevronLeftIcon, ChevronRightIcon, FieldDateIcon } from "@parallel/chakra/icons";
+import { Box, Button, HStack, Select, Stack } from "@chakra-ui/react";
+import { FieldDateIcon } from "@parallel/chakra/icons";
 import { FORMATS } from "@parallel/utils/dates";
+import { ValueProps } from "@parallel/utils/ValueProps";
 import {
-  addDays,
-  addMonths,
-  differenceInDays,
-  differenceInMonths,
   endOfDay,
   getMonth,
   getYear,
@@ -26,275 +14,269 @@ import {
   isToday,
   startOfDay,
   startOfMonth,
-  subMonths,
 } from "date-fns";
-import { useCallback, useEffect, useState } from "react";
-import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
-import { CalendarMonth, CalendarMonthDateProps } from "./CalendarMonth";
-import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
+import { useCallback, useMemo, useState } from "react";
+import { useIntl } from "react-intl";
+import { isDefined } from "remeda";
+import {
+  CalendarMonth,
+  CalendarMonthDateProps,
+  CalendarMonthDateWrapperProps,
+} from "./CalendarMonth";
+import { CalendarMonthHeader } from "./CalendarMonthHeader";
+import { DateRange, isEqualDateRange, useQuickDateRanges } from "./useQuickDateRanges";
 
-export type QuickRangeType = { type: "DAYS" | "MONTHS"; amount: number };
+function isBeforeOrEqual(date: Date, dateToCompare: Date) {
+  return isBefore(date, dateToCompare) || isEqual(date, dateToCompare);
+}
 
-const ranges = [
-  {
-    amount: 7,
-    type: "DAYS",
-  },
-  {
-    amount: 30,
-    type: "DAYS",
-  },
-  {
-    amount: 3,
-    type: "MONTHS",
-  },
-  {
-    amount: 6,
-    type: "MONTHS",
-  },
-  {
-    amount: 12,
-    type: "MONTHS",
-  },
-] as QuickRangeType[];
+function isAfterOrEqual(date: Date, dateToCompare: Date) {
+  return isAfter(date, dateToCompare) || isEqual(date, dateToCompare);
+}
 
-export function DateRangePicker({
-  startDate = null,
-  endDate = null,
-  isPastAllowed,
-  isFutureAllowed,
-  onChange,
-  onCancel,
-}: {
-  startDate: Date | null;
-  endDate: Date | null;
+export interface DateRangePickerProps extends ValueProps<DateRange<true>, false> {
   isPastAllowed?: boolean;
   isFutureAllowed?: boolean;
-  onChange: (range: [Date, Date], quickRange: QuickRangeType | null) => void;
-  onCancel?: () => void;
-}) {
+}
+
+export function DateRangePicker({
+  value,
+  onChange,
+  isPastAllowed = true,
+  isFutureAllowed = true,
+}: DateRangePickerProps) {
   const intl = useIntl();
 
-  const [start, setStart] = useState(startDate || null);
-  const [end, setEnd] = useState(endDate || null);
-  const [rangeActive, setRangeActive] = useState<QuickRangeType | null>(null);
-
-  const [currentMonth, setCurrentMonth] = useState(startOfMonth(startDate || new Date()));
+  const [startDate, endDate] = value;
+  const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
+  const [currentMonth, setCurrentMonth] = useState(startOfMonth(value[0] ?? new Date()));
+  const [edgeSelection, setEdgeSelection] = useState<"START" | "END">("START");
   const month = getMonth(currentMonth);
   const year = getYear(currentMonth);
   const firstDayOfWeek = 1;
-  const [isStartSelected, setIsStartSelected] = useState(startDate && !endDate ? false : true);
+  const quickRanges = useQuickDateRanges();
+  const activeRange = useMemo(() => {
+    return isDefined(startDate) && isDefined(endDate)
+      ? quickRanges.find(({ range }) => isEqualDateRange([startDate, endDate], range)) ?? null
+      : null;
+  }, [startDate?.valueOf(), endDate?.valueOf(), quickRanges]);
 
-  useEffect(() => {
-    setStart(startDate ? startOfDay(startDate) : startDate);
-    setEnd(endDate ? endOfDay(endDate) : endDate);
-  }, [startDate, endDate]);
+  function setQuickRange(range: DateRange) {
+    onChange(range);
+    setCurrentMonth(startOfMonth(range[0]));
+  }
 
-  useEffect(() => {
-    if (start && end && isToday(end)) {
-      const months = differenceInMonths(start, end) * -1;
-      const days = differenceInDays(start, end) * -1;
-
-      if ([3, 6, 12].includes(months)) {
-        setRangeActive({ type: "MONTHS", amount: months });
-      } else if ([7, 30].includes(days)) {
-        setRangeActive({ type: "DAYS", amount: days });
-      }
-    } else {
-      setRangeActive(null);
-    }
-
-    if (start) {
-      setCurrentMonth(startOfMonth(start));
-    }
-  }, [start, end]);
-
-  const handleQuickRangeClick = (range: QuickRangeType) => {
-    setRangeActive(range);
-
-    const startRangeDate =
-      range.type === "DAYS"
-        ? startOfDay(addDays(new Date(), -range.amount))
-        : startOfDay(addMonths(new Date(), -range.amount));
-
-    setStart(startRangeDate);
-    setEnd(endOfDay(new Date()));
-  };
-
-  const handleApplyClick = () => {
-    if (start && end) {
-      onChange([start, end], rangeActive);
-    }
-  };
-
-  const handleDateSelected = useCallback(
+  const handleDateClick = useCallback(
     function (date: Date) {
-      if (start && end && isStartSelected) {
-        // Reset the range, and set start date
-        setEnd?.(null);
-        setStart?.(startOfDay(date));
+      if (edgeSelection === "START") {
+        onChange([
+          startOfDay(date),
+          isDefined(endDate) && isBefore(endDate, startOfDay(date)) ? null : endDate,
+        ]);
+        setEdgeSelection("END");
       } else {
-        if (isStartSelected) {
-          // If dont have range set the start date
-          setStart?.(startOfDay(date));
-        } else if (start && isBefore(date, start)) {
-          // If the end date is before the start we flip it to make sense
-          setEnd?.(endOfDay(start));
-          setStart?.(startOfDay(date));
-        } else {
-          // if start is not selected sets the end, It doesn't matter if it has value or not
-          setEnd?.(endOfDay(date));
-        }
+        onChange([
+          isDefined(startDate) && isAfter(startDate, endOfDay(date)) ? null : startDate,
+          endOfDay(date),
+        ]);
+        setEdgeSelection("START");
       }
-
-      setCurrentMonth(startOfMonth(date));
-      setIsStartSelected((current) => !current);
     },
-    [isStartSelected, start, end, setStart, setEnd]
+    [edgeSelection, startDate?.valueOf(), endDate?.valueOf()]
   );
-
-  const wrapperProps = { paddingX: "4px", paddingY: "3px" } as BoxProps;
 
   const dateProps = useCallback<CalendarMonthDateProps>(
     ({ date, isNextMonth, isPrevMonth }) => {
-      const defaultProps = {
-        variant: "ghost",
+      return {
+        zIndex: 3,
+        _focus: { zIndex: 3 },
+        position: "initial",
         opacity: isNextMonth || isPrevMonth ? 0.4 : 1,
         textDecoration: isToday(date) ? "underline" : "none",
         isDisabled:
           ((!isPastAllowed && isPast(date) && !isToday(date)) ||
             (!isFutureAllowed && isFuture(date) && !isToday(date))) ??
           false,
-      } as ButtonProps;
-
-      if (start && !end) {
-        return {
-          ...defaultProps,
-          ...(isEqual(date, start) ? { variant: "solid", colorScheme: "primary" } : {}),
-        };
-      } else if (start && end) {
-        return {
-          ...defaultProps,
-          ...(isAfter(date, start) && isBefore(endOfDay(date), end)
-            ? { variant: "solid", colorScheme: "primary", backgroundColor: "primary.300" }
-            : isEqual(date, start) || isEqual(endOfDay(date), end)
-            ? { variant: "solid", colorScheme: "primary" }
-            : {}),
-        };
-      } else {
-        return defaultProps;
-      }
+        ...((isDefined(startDate) && isEqual(date, startDate)) ||
+        (isDefined(endDate) && isEqual(endOfDay(date), endDate))
+          ? { variant: "solid", colorScheme: "primary" }
+          : isDefined(startDate) &&
+            isDefined(endDate) &&
+            isAfter(date, startDate) &&
+            isBefore(endOfDay(date), endDate)
+          ? {
+              variant: "ghost",
+              backgroundColor: "primary.100",
+              _hover: { backgroundColor: "primary.300" },
+            }
+          : { variant: "ghost" }),
+        // Make button fill entire cell so it's easier to select
+        _after: {
+          content: "''",
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+        },
+      };
     },
-    [start, end]
+    [startDate?.valueOf(), endDate?.valueOf()]
+  );
+
+  const wrapperProps = useCallback<CalendarMonthDateWrapperProps>(
+    ({ date }) => {
+      return {
+        position: "relative",
+        sx: {
+          ...(isDefined(startDate) &&
+          isDefined(endDate) &&
+          isAfterOrEqual(date, startDate) &&
+          isBeforeOrEqual(endOfDay(date), endDate)
+            ? {
+                _after: {
+                  zIndex: 2,
+                  content: "''",
+                  position: "absolute",
+                  height: "100%",
+                  background: "primary.100",
+                  ...(isEqual(date, startDate) && isEqual(endOfDay(date), endDate)
+                    ? {}
+                    : isEqual(date, startDate)
+                    ? { right: 0, width: "calc(50% + 16px)", borderLeftRadius: "full" }
+                    : isEqual(endOfDay(date), endDate)
+                    ? { left: 0, width: "calc(50% + 16px)", borderRightRadius: "full" }
+                    : isAfter(date, startDate) && isBefore(date, endDate)
+                    ? { width: "100%" }
+                    : {}),
+                },
+              }
+            : {}),
+          ...(isDefined(hoveredDate) &&
+          // selecting END and date is range [endDate ?? startDate, hoveredDate]
+          ((isDefined(startDate) &&
+            isBeforeOrEqual(date, hoveredDate) &&
+            edgeSelection === "END" &&
+            (isDefined(endDate)
+              ? isAfterOrEqual(endOfDay(date), endDate)
+              : isAfterOrEqual(date, startDate))) ||
+            // selecting START and date is range [hoveredDate, startDate ?? endDate]
+            (isDefined(endDate) &&
+              edgeSelection === "START" &&
+              isAfterOrEqual(date, hoveredDate) &&
+              (isDefined(startDate)
+                ? isBeforeOrEqual(date, startDate)
+                : isBeforeOrEqual(endOfDay(date), endDate))))
+            ? {
+                _before: {
+                  zIndex: 1,
+                  content: "''",
+                  position: "absolute",
+                  height: "100%",
+                  borderColor: "gray.100",
+                  borderStyle: "dashed",
+                  ...// if hovering opposite edge, don't show
+                  (isEqual(date, hoveredDate) &&
+                  ((edgeSelection === "START" &&
+                    (isDefined(startDate)
+                      ? isEqual(date, startDate)
+                      : isEqual(endOfDay(date), endDate!))) ||
+                    (edgeSelection === "END" &&
+                      (isDefined(endDate)
+                        ? isEqual(endOfDay(date), endDate)
+                        : isEqual(date, startDate!))))
+                    ? {}
+                    : isEqual(date, hoveredDate)
+                    ? // date is the hoveredDate
+                      {
+                        width: "calc(50% + 16px)",
+                        borderBlockWidth: "2px",
+                        ...(edgeSelection === "START"
+                          ? { right: 0, borderLeftRadius: "full", borderLeftWidth: "2px" }
+                          : { left: 0, borderRightRadius: "full", borderRightWidth: "2px" }),
+                      }
+                    : edgeSelection === "START" && isEqual(endOfDay(date), endDate!)
+                    ? // date is endDate and hovering after it
+                      { width: "50%", left: 0, borderBlockWidth: "2px" }
+                    : edgeSelection === "END" && isEqual(date, startDate!)
+                    ? // date is startDate and hovering before it it
+                      { width: "50%", right: 0, borderBlockWidth: "2px" }
+                    : { width: "100%", borderBlockWidth: "2px" }),
+                },
+              }
+            : {}),
+        },
+      };
+    },
+    [startDate?.valueOf(), endDate?.valueOf(), hoveredDate?.valueOf(), edgeSelection]
   );
 
   return (
     <Stack spacing={6} width="100%">
-      <Flex direction="row" gridGap={4}>
-        <Stack paddingTop={1} display={{ base: "none", md: "flex" }}>
-          {ranges.map((range, index) => {
-            const { amount, type } = range;
-            const isActive = rangeActive && rangeActive.amount === amount;
-            return (
-              <Button
-                key={index}
-                display="box"
-                textAlign="left"
-                fontWeight="400"
-                variant={isActive ? undefined : "ghost"}
-                colorScheme={isActive ? "blue" : undefined}
-                onClick={() => handleQuickRangeClick(range)}
-              >
-                {type === "DAYS" ? (
-                  <FormattedMessage
-                    id="generic.last-x-days"
-                    defaultMessage="Last {days} days"
-                    values={{
-                      days: amount,
-                    }}
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="generic.last-x-months"
-                    defaultMessage="Last {months} months"
-                    values={{
-                      months: amount,
-                    }}
-                  />
-                )}
-              </Button>
-            );
-          })}
-        </Stack>
-        <Stack spacing={0} gridGap={2} width="100%">
+      <Stack direction={{ base: "column", md: "row" }} spacing={{ base: 2, md: 4 }}>
+        <Box>
+          <Stack display={{ base: "none", md: "flex" }}>
+            {quickRanges.map(({ key, range, text }) => {
+              const isActive = isDefined(activeRange) && activeRange.key === key;
+              return (
+                <Button
+                  key={key}
+                  display="box"
+                  textAlign="left"
+                  fontWeight="400"
+                  variant={isActive ? undefined : "ghost"}
+                  colorScheme={isActive ? "blue" : undefined}
+                  onClick={() => setQuickRange(range)}
+                >
+                  {text}
+                </Button>
+              );
+            })}
+          </Stack>
           <Select
             display={{ base: "block", md: "none" }}
             placeholder={intl.formatMessage({
               id: "component.date-range-picker.select-range",
               defaultMessage: "Select a predefined range",
             })}
-            value={rangeActive ? `${rangeActive.amount}-${rangeActive.type}` : ""}
+            value={activeRange?.key ?? ""}
             onChange={(e) => {
               if (e.target.value) {
-                const value = e.target.value.split("-");
-                handleQuickRangeClick({
-                  amount: Number(value[0]),
-                  type: value[1] as "DAYS" | "MONTHS",
-                });
-              } else {
-                setRangeActive(null);
-                setStart(null);
-                setEnd(null);
+                setQuickRange(quickRanges.find(({ key }) => key === e.target.value)!.range);
               }
             }}
             sx={{
-              "&": { color: rangeActive === null ? "gray.400" : "inherit" },
+              "&": { color: !isDefined(activeRange) ? "gray.400" : "inherit" },
               "& option": { color: "gray.800" },
               "& option[value='']": { color: "gray.400" },
             }}
           >
-            {ranges.map((range, index) => {
-              const { amount, type } = range;
-              return (
-                <option key={index} value={`${amount}-${type}`}>
-                  {type === "DAYS"
-                    ? intl.formatMessage(
-                        {
-                          id: "generic.last-x-days",
-                          defaultMessage: "Last {days} days",
-                        },
-                        {
-                          days: amount,
-                        }
-                      )
-                    : intl.formatMessage(
-                        {
-                          id: "generic.last-x-months",
-                          defaultMessage: "Last {months} months",
-                        },
-                        {
-                          months: amount,
-                        }
-                      )}
-                </option>
-              );
-            })}
+            {quickRanges.map(({ key, text }) => (
+              <option key={key} value={key}>
+                {text}
+              </option>
+            ))}
           </Select>
-          <HStack paddingY={1}>
+        </Box>
+        <Stack spacing={3} flex={1}>
+          <HStack>
             <Button
               size="sm"
               fontWeight="400"
-              color={start ? undefined : "gray.400"}
+              color={startDate ? undefined : "gray.400"}
               rightIcon={<FieldDateIcon />}
               variant="outline"
-              onClick={() => setIsStartSelected(true)}
-              outlineColor={isStartSelected ? "blue.500" : undefined}
-              outline={isStartSelected ? "1px solid" : undefined}
+              onClick={() => {
+                setEdgeSelection("START");
+                if (isDefined(startDate)) {
+                  setCurrentMonth(startOfMonth(startDate));
+                }
+              }}
+              outlineColor={edgeSelection === "START" ? "blue.500" : undefined}
+              outline={edgeSelection === "START" ? "1px solid" : undefined}
               flex="1"
               justifyContent="space-between"
             >
-              {start
-                ? intl.formatDate(start, FORMATS.L)
+              {isDefined(startDate)
+                ? intl.formatDate(startDate, FORMATS.L)
                 : intl.formatMessage({
                     id: "component.date-range-picker.date-placeholder",
                     defaultMessage: "mm-dd-aaaa",
@@ -303,71 +285,40 @@ export function DateRangePicker({
             <Button
               size="sm"
               fontWeight="400"
-              color={end ? undefined : "gray.400"}
+              color={endDate ? undefined : "gray.400"}
               rightIcon={<FieldDateIcon />}
               variant="outline"
-              onClick={() => setIsStartSelected(false)}
-              outlineColor={!isStartSelected ? "blue.500" : undefined}
-              outline={!isStartSelected ? "1px solid" : undefined}
+              onClick={() => {
+                setEdgeSelection("END");
+                if (isDefined(endDate)) {
+                  setCurrentMonth(startOfMonth(endDate));
+                }
+              }}
+              outlineColor={edgeSelection === "END" ? "blue.500" : undefined}
+              outline={edgeSelection === "END" ? "1px solid" : undefined}
               flex="1"
               justifyContent="space-between"
             >
-              {end
-                ? intl.formatDate(end, FORMATS.L)
+              {isDefined(endDate)
+                ? intl.formatDate(endDate, FORMATS.L)
                 : intl.formatMessage({
                     id: "component.date-range-picker.date-placeholder",
                     defaultMessage: "mm-dd-aaaa",
                   })}
             </Button>
           </HStack>
-          <Flex marginBottom={2}>
-            <IconButtonWithTooltip
-              icon={<ChevronLeftIcon />}
-              size="sm"
-              label={intl.formatMessage({
-                id: "component.date-picker.prev-month",
-                defaultMessage: "Previous month",
-              })}
-              onClick={() => setCurrentMonth((m) => subMonths(m, 1))}
-            />
-            <Flex flex="1" alignItems="center" justifyContent="center" fontWeight="bold">
-              <FormattedDate value={currentMonth} month="long" year="numeric" />
-            </Flex>
-            <IconButtonWithTooltip
-              icon={<ChevronRightIcon />}
-              size="sm"
-              label={intl.formatMessage({
-                id: "component.date-picker.next-month",
-                defaultMessage: "Next month",
-              })}
-              onClick={() => setCurrentMonth((m) => addMonths(m, 1))}
-            />
-          </Flex>
+          <CalendarMonthHeader value={currentMonth} onChange={(value) => setCurrentMonth(value)} />
           <CalendarMonth
-            key={`${year}-${month}`}
             year={year}
             month={month}
             firstDayOfWeek={firstDayOfWeek}
-            onDateClick={handleDateSelected}
+            onDateClick={handleDateClick}
+            onDateHover={(date) => setHoveredDate(date)}
             dateProps={dateProps}
-            wrapperProps={() => wrapperProps}
+            wrapperProps={wrapperProps}
           />
         </Stack>
-      </Flex>
-      <Flex justifyContent="flex-end">
-        <ButtonGroup>
-          <Button onClick={onCancel}>
-            <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-          </Button>
-          <Button
-            isDisabled={!start || !end || (isEqual(start, startDate!) && isEqual(end, endDate!))}
-            colorScheme="primary"
-            onClick={handleApplyClick}
-          >
-            <FormattedMessage id="generic.apply" defaultMessage="Apply" />
-          </Button>
-        </ButtonGroup>
-      </Flex>
+      </Stack>
     </Stack>
   );
 }

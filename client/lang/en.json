@@ -315,6 +315,16 @@
     "context": "Open menu"
   },
   {
+    "term": "component.calendar-month-header.next-month",
+    "definition": "Next month",
+    "context": "Next month"
+  },
+  {
+    "term": "component.calendar-month-header.prev-month",
+    "definition": "Previous month",
+    "context": "Previous month"
+  },
+  {
     "term": "component.checkbox-type-label.exact",
     "definition": "Choose {max, plural, =1{# option} other{# options}}",
     "context": "Choose {max, plural, =1{# option} other{# options}}"
@@ -1050,19 +1060,19 @@
     "context": "Use only letters, numbers or _"
   },
   {
-    "term": "component.calendar-month-header.next-month",
-    "definition": "Next month",
-    "context": "Next month"
+    "term": "component.date-range-picker-button.clear-range",
+    "definition": "Clear date range",
+    "context": "Clear date range"
   },
   {
-    "term": "component.calendar-month-header.prev-month",
-    "definition": "Previous month",
-    "context": "Previous month"
+    "term": "component.date-range-picker-button.default-text",
+    "definition": "All time",
+    "context": "All time"
   },
   {
-    "term": "component.date-range-picker-popover.clear-filter",
-    "definition": "Clear filter",
-    "context": "Clear filter"
+    "term": "component.date-range-picker-button.title",
+    "definition": "Select a range of dates",
+    "context": "Select a range of dates"
   },
   {
     "term": "component.date-range-picker-popover.title",
@@ -5565,6 +5575,21 @@
     "context": "Created at"
   },
   {
+    "term": "generic.current-month",
+    "definition": "Current month",
+    "context": "Current month"
+  },
+  {
+    "term": "generic.current-quarter",
+    "definition": "Current quarter",
+    "context": "Current quarter"
+  },
+  {
+    "term": "generic.current-year",
+    "definition": "Current year",
+    "context": "Current year"
+  },
+  {
     "term": "generic.default",
     "definition": "Default",
     "context": "Default"
@@ -5975,19 +6000,24 @@
     "context": "Last active at"
   },
   {
+    "term": "generic.last-month",
+    "definition": "Last month",
+    "context": "Last month"
+  },
+  {
+    "term": "generic.last-quarter",
+    "definition": "Last quarter",
+    "context": "Last quarter"
+  },
+  {
     "term": "generic.last-used-at",
     "definition": "Last used at",
     "context": "Last used at"
   },
   {
-    "term": "generic.last-x-days",
-    "definition": "Last {days} days",
-    "context": "Last {days} days"
-  },
-  {
-    "term": "generic.last-x-months",
-    "definition": "Last {months} months",
-    "context": "Last {months} months"
+    "term": "generic.last-year",
+    "definition": "Last year",
+    "context": "Last year"
   },
   {
     "term": "generic.learn-more",
@@ -7168,11 +7198,6 @@
     "term": "page.pricing.zapier-integration",
     "definition": "Zapier integration",
     "context": "Zapier integration"
-  },
-  {
-    "term": "page.reports.any-date",
-    "definition": "Any date",
-    "context": "Any date"
   },
   {
     "term": "page.reports.average-duration",

@@ -31,6 +31,7 @@ export interface CalendarMonthProps {
   year: number;
   firstDayOfWeek: 0 | 1;
   onDateClick?: (value: Date) => void;
+  onDateHover?: (value: Date | null) => void;
   dateProps?: CalendarMonthDateProps;
   wrapperProps?: CalendarMonthDateWrapperProps;
 }
@@ -40,6 +41,7 @@ export function CalendarMonth({
   year,
   firstDayOfWeek,
   onDateClick,
+  onDateHover,
   dateProps,
   wrapperProps,
 }: CalendarMonthProps) {
@@ -48,7 +50,7 @@ export function CalendarMonth({
   const weekDays = getWeekDays({ firstDayOfWeek });
 
   return (
-    <Box as="table" width="100%">
+    <Box as="table" width="100%" onMouseLeave={() => onDateHover?.(null)}>
       <chakra.colgroup sx={{ "[data-is-weekend]": { backgroundColor: "gray.50" } }}>
         {weekDays.map((day, index) => (
           <col data-is-weekend={isWeekend(day) ? "" : undefined} key={index} />
@@ -68,10 +70,12 @@ export function CalendarMonth({
           <tr key={index}>
             {week.map(({ date, isNextMonth, isPrevMonth }, index) => {
               return (
-                <Box as="td" key={index} paddingY="2px" paddingX={0}>
+                <Box as="td" key={index} paddingY="2px" paddingX={0} position="relative">
                   <Box
                     as="span"
-                    display="inline-block"
+                    display="inline-flex"
+                    justifyContent="center"
+                    width="100%"
                     {...wrapperProps?.({ date, isNextMonth, isPrevMonth })}
                   >
                     <Button
@@ -82,6 +86,7 @@ export function CalendarMonth({
                       {...(isToday(date) ? { "aria-current": "date" } : {})}
                       {...dateProps?.({ date, isNextMonth, isPrevMonth })}
                       onClick={() => onDateClick?.(date)}
+                      onMouseEnter={() => onDateHover?.(date)}
                     >
                       <FormattedDate value={date} day="numeric" />
                     </Button>
