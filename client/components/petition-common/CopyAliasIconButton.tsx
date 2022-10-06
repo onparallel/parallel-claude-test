@@ -8,6 +8,7 @@ import {
 import { MouseEvent, useCallback } from "react";
 import { useIntl } from "react-intl";
 import { CopyToClipboardButton, CopyToClipboardButtonProps } from "../common/CopyToClipboardButton";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
 export interface CopyAliasIconButtonProps
   extends Omit<CopyToClipboardButtonProps, "aria-label" | "placement" | "text" | "icon"> {
@@ -19,11 +20,29 @@ export const CopyAliasIconButton = Object.assign(
     { field, onClick, ...props },
     ref
   ) {
+    const intl = useIntl();
     function handleClick(event: MouseEvent<HTMLButtonElement>) {
       event.stopPropagation();
       onClick?.(event);
     }
     const buildAliasInterpolation = useBuildAliasInterpolation(field);
+
+    if (!field.alias) {
+      return (
+        <IconButtonWithTooltip
+          ref={ref}
+          icon={<CopyPropertyIcon />}
+          fontSize="16px"
+          onClick={handleClick}
+          size="xs"
+          label={intl.formatMessage({
+            id: "component.copy-alias-button.copy-reference",
+            defaultMessage: "Copy reference",
+          })}
+          {...props}
+        />
+      );
+    }
 
     return (
       <CopyToClipboardButton
@@ -33,6 +52,14 @@ export const CopyAliasIconButton = Object.assign(
         fontSize="16px"
         onClick={handleClick}
         size="xs"
+        copyLabel={intl.formatMessage({
+          id: "component.copy-alias-button.copy-reference",
+          defaultMessage: "Copy reference",
+        })}
+        copiedLabel={intl.formatMessage({
+          id: "component.copy-alias-button.copied-reference",
+          defaultMessage: "Copied to clipboard!",
+        })}
         {...props}
       />
     );

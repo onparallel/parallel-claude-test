@@ -199,6 +199,7 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
   const buildAliasInterpolation = useBuildAliasInterpolation(field);
   const handleAddReferenceClick = async (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
+    event.preventDefault();
     try {
       const alias = await showCreateReferenceDialog({ field, fieldIndex, onFieldEdit });
       copyReference({ value: buildAliasInterpolation(alias) });
@@ -272,12 +273,13 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
               <CopyAliasIconButton
                 className="alias-button"
                 field={field}
-                onClick={field.alias || isReadOnly ? undefined : handleAddReferenceClick}
                 background="white"
                 boxShadow="md"
                 _hover={{
                   boxShadow: "lg",
                 }}
+                isDisabled={!field.alias && isReadOnly}
+                onClick={field.alias || isReadOnly ? undefined : handleAddReferenceClick}
               />
               <AliasOptionsMenu
                 className="alias-button"
@@ -287,6 +289,8 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
                 _hover={{
                   boxShadow: "lg",
                 }}
+                isDisabled={!field.alias && isReadOnly}
+                onClick={field.alias || isReadOnly ? undefined : handleAddReferenceClick}
               />
             </>
           ) : null}

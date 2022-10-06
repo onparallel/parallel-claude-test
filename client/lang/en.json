@@ -820,6 +820,16 @@
     "context": "Search for existing contacts or enter a valid email."
   },
   {
+    "term": "component.copy-alias-button.copied-reference",
+    "definition": "Copied to clipboard!",
+    "context": "Copied to clipboard!"
+  },
+  {
+    "term": "component.copy-alias-button.copy-reference",
+    "definition": "Copy reference",
+    "context": "Copy reference"
+  },
+  {
     "term": "component.copy-signature-config-dialog.body",
     "definition": "You have assigned {contacts} to sign the first parallel.",
     "context": "You have assigned {contacts} to sign the first parallel."
