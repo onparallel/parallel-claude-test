@@ -116,7 +116,7 @@ export class Aws implements IAws {
           "delay-queue",
           _events.map((event) => {
             return {
-              id: `event-processor-${event.id}`,
+              id: `${tableName}-${event.id}`,
               body: {
                 queue: "event-processor" as const,
                 body: {
@@ -125,7 +125,7 @@ export class Aws implements IAws {
                   created_at: event.created_at,
                   table_name: tableName,
                 },
-                groupId: `event-processor-${event.id}`,
+                groupId: `${tableName}-${event.id}`,
               },
               delaySeconds,
             };

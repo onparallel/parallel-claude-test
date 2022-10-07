@@ -882,7 +882,6 @@ export class PetitionRepository extends BaseRepository {
               petition_access_id: access.id,
             },
           })),
-          undefined,
           t
         )
       : await this.createEvent(
@@ -894,7 +893,7 @@ export class PetitionRepository extends BaseRepository {
               user_id: user.id,
             },
           })),
-          undefined,
+
           t
         );
 
@@ -997,7 +996,6 @@ export class PetitionRepository extends BaseRepository {
             petition_message_id: message.id,
           },
         })),
-        undefined,
         t
       );
     }
@@ -1051,7 +1049,6 @@ export class PetitionRepository extends BaseRepository {
           reason: (isDefined(userId) ? "CANCELLED_BY_USER" : "EMAIL_BOUNCED") as any,
         },
       })),
-      undefined,
       t
     );
 
@@ -1094,7 +1091,6 @@ export class PetitionRepository extends BaseRepository {
           },
         })),
       ],
-      undefined,
       t
     );
 
@@ -1297,7 +1293,6 @@ export class PetitionRepository extends BaseRepository {
               reason: "DEACTIVATED_BY_USER",
             },
           })),
-          undefined,
           t
         );
       }
@@ -1312,7 +1307,6 @@ export class PetitionRepository extends BaseRepository {
               reason: "CANCELLED_BY_USER",
             },
           })),
-          undefined,
           t
         );
       }
@@ -1761,7 +1755,7 @@ export class PetitionRepository extends BaseRepository {
     // clear cache to make sure petition status is updated in next graphql calls
     this.loadPetition.dataloader.clear(field.petition_id);
 
-    await this.createEvent(
+    await this.createEventWithDelay(
       {
         type: "REPLY_CREATED",
         petition_id: field.petition_id,
@@ -1879,7 +1873,7 @@ export class PetitionRepository extends BaseRepository {
           deleted_by: deletedBy,
         })
         .where("id", replyId),
-      this.createEvent(
+      this.createEventWithDelay(
         {
           type: "REPLY_DELETED",
           petition_id: field!.petition_id,
@@ -2127,7 +2121,6 @@ export class PetitionRepository extends BaseRepository {
           data: { user_id: owner.id },
           petition_id: cloned.id,
         },
-        undefined,
         t
       );
 
@@ -2518,18 +2511,26 @@ export class PetitionRepository extends BaseRepository {
     return true;
   }
 
-  async createEvent(
-    events: MaybeArray<CreatePetitionEvent>,
-    notifyAfter?: number,
-    t?: Knex.Transaction
-  ) {
+  async createEvent(events: MaybeArray<CreatePetitionEvent>, t?: Knex.Transaction) {
     const eventsArray = unMaybeArray(events);
     if (eventsArray.length === 0) {
       return [];
     }
 
     const petitionEvents = await this.insert("petition_event", eventsArray, t);
-    await this.aws.enqueueEvents(petitionEvents, "petition_event", notifyAfter, t);
+    await this.aws.enqueueEvents(petitionEvents, "petition_event", undefined, t);
+
+    return petitionEvents;
+  }
+
+  async createEventWithDelay(events: MaybeArray<CreatePetitionEvent>, notifyAfter: number) {
+    const eventsArray = unMaybeArray(events);
+    if (eventsArray.length === 0) {
+      return [];
+    }
+
+    const petitionEvents = await this.insert("petition_event", eventsArray);
+    await this.aws.enqueueEvents(petitionEvents, "petition_event", notifyAfter);
 
     return petitionEvents;
   }
@@ -2569,7 +2570,7 @@ export class PetitionRepository extends BaseRepository {
         this.REPLY_EVENTS_DELAY_SECONDS
       );
     } else {
-      await this.createEvent(
+      await this.createEventWithDelay(
         {
           type: "REPLY_UPDATED",
           petition_id: petitionId,
@@ -3089,7 +3090,6 @@ export class PetitionRepository extends BaseRepository {
             is_internal: comment.is_internal,
           },
         },
-        undefined,
         t
       );
 
@@ -3127,7 +3127,6 @@ export class PetitionRepository extends BaseRepository {
             petition_field_comment_id: comment.id,
           },
         },
-        undefined,
         t
       );
 
@@ -3601,7 +3600,6 @@ export class PetitionRepository extends BaseRepository {
               },
             })),
           ],
-          undefined,
           t
         );
       }
@@ -3685,7 +3683,6 @@ export class PetitionRepository extends BaseRepository {
             },
           })),
         ],
-        undefined,
         t
       );
 
@@ -3764,7 +3761,6 @@ export class PetitionRepository extends BaseRepository {
             },
           })),
         ],
-        undefined,
         t
       );
       return removedPermissions;
@@ -3811,7 +3807,6 @@ export class PetitionRepository extends BaseRepository {
             },
           })),
         ],
-        undefined,
         t
       );
 
@@ -3924,7 +3919,6 @@ export class PetitionRepository extends BaseRepository {
             owner_id: toUserId,
           },
         })),
-        undefined,
         t
       );
 
@@ -4333,7 +4327,6 @@ export class PetitionRepository extends BaseRepository {
           cancel_data: cancelData,
         },
       })),
-      undefined,
       t
     );
 
@@ -4815,7 +4808,6 @@ export class PetitionRepository extends BaseRepository {
           petition_id: petitionId,
           data: {},
         },
-        undefined,
         t
       );
     });

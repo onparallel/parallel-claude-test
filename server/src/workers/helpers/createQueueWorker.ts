@@ -29,18 +29,19 @@ export type QueueWorkerOptions<T> = {
   parser?: (message: string) => T;
 };
 
-export function createQueueWorker<
-  P extends QueueWorkerPayload<Q>,
-  Q extends keyof Config["queueWorkers"]
->(
+export function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
   name: Q,
-  handler: (payload: P, context: WorkerContext, config: Config["queueWorkers"][Q]) => Promise<void>,
-  options?: QueueWorkerOptions<P>
+  handler: (
+    payload: QueueWorkerPayload<Q>,
+    context: WorkerContext,
+    config: Config["queueWorkers"][Q]
+  ) => Promise<void>,
+  options?: QueueWorkerOptions<QueueWorkerPayload<Q>>
 ) {
   loadEnv(`.${name}.env`);
 
   const { parser } = {
-    parser: (message: string) => JSON.parse(message) as P,
+    parser: (message: string) => JSON.parse(message) as QueueWorkerPayload<Q>,
     ...options,
   };
   const container = createContainer();

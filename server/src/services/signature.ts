@@ -194,7 +194,6 @@ export class SignatureService implements ISignatureService {
             petition_signature_request_id: signatureRequest.id,
           },
         },
-        undefined,
         t
       ),
     ]);

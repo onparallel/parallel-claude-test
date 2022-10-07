@@ -368,7 +368,6 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
             petition_id: ctx.access!.petition_id,
             data: { petition_access_id: ctx.access!.id },
           },
-          undefined,
           t
         );
         return petition;
@@ -407,7 +406,6 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
               petition_id: ctx.access!.petition_id,
               data: { petition_access_id: ctx.access!.id },
             },
-            undefined,
             t
           );
           // insert a CANCELLED signature request so user can see it on the signatures card
@@ -444,7 +442,6 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
               },
               petition_id: ctx.access!.petition_id,
             },
-            undefined,
             t
           );
           return completedPetition;
