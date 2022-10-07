@@ -182,9 +182,12 @@ export function useReactSelectProps<
           cursor: "pointer",
           padding: `6px ${padding}px`,
           fontSize: fontSize,
-          overflow: "hidden",
           textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
+          overflow: "hidden",
+          display: "-webkit-box",
+          "-webkit-line-clamp": "2",
+          "-webkit-box-orient": "vertical",
+          whiteSpace: "normal",
         };
       },
       menu: (styles) => {
