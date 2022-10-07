@@ -167,18 +167,31 @@ export function DateRangePickerButton({
     <ButtonGroup isAttached>
       <Popover closeOnBlur={false} placement="bottom-start" onOpen={onOpen} isOpen={isOpen}>
         <PopoverTrigger>{mainButton}</PopoverTrigger>
-        <PopoverContent padding={4} width="container.xs" ref={contentRef}>
+        <PopoverContent width="520px" ref={contentRef}>
           <FocusLock restoreFocus>
-            <PopoverHeader border="none" as="h2" fontSize="xl" fontWeight="600" padding={0}>
+            <PopoverHeader
+              border="none"
+              as="h2"
+              fontSize="xl"
+              fontWeight="600"
+              paddingTop={4}
+              paddingX={6}
+            >
               <FormattedMessage
                 id="component.date-range-picker-popover.title"
                 defaultMessage="Select a range of dates"
               />
             </PopoverHeader>
-            <PopoverBody padding={0} marginTop={6}>
+            <PopoverBody paddingX={6} paddingY={4}>
               {picker}
             </PopoverBody>
-            <PopoverFooter as={HStack} justifyContent="flex-end" borderTopWidth={0}>
+            <PopoverFooter
+              as={HStack}
+              justifyContent="flex-end"
+              borderTopWidth={0}
+              paddingBottom={4}
+              paddingX={6}
+            >
               <Button onClick={onClose}>
                 <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
               </Button>
