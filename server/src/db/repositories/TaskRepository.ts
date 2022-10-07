@@ -18,13 +18,13 @@ export type TaskInput<TName extends TaskName> = {
   TEMPLATE_REPLIES_REPORT: {
     petition_id: number;
     timezone: string;
-    startDate: Date | null | undefined;
-    endDate: Date | null | undefined;
+    startDate?: Date | null;
+    endDate?: Date | null;
   };
   TEMPLATE_STATS_REPORT: {
     template_id: number;
-    startDate: Date | null | undefined;
-    endDate: Date | null | undefined;
+    startDate?: Date | null;
+    endDate?: Date | null;
   };
 }[TName];
 
