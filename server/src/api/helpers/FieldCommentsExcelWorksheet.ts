@@ -1,8 +1,9 @@
 import Excel from "exceljs";
+import pMap from "p-map";
 import { ApiContext, WorkerContext } from "../../context";
 import { Contact, PetitionField, PetitionFieldComment, UserData } from "../../db/__types";
 import { fullName } from "../../util/fullName";
-import { toPlainText } from "../../util/slate";
+import { pFlatMap } from "../../util/promises/pFlatMap";
 import { Maybe } from "../../util/types";
 import { ExcelWorksheet } from "./ExcelWorksheet";
 
@@ -76,41 +77,30 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
   }
 
   public async addFieldComments(fields: PetitionField[]) {
-    const fieldComments = (
-      await this.context.petitions.loadPetitionFieldCommentsForField(
-        fields.map((field) => ({
-          petitionFieldId: field.id,
-          petitionId: field.petition_id,
-          loadInternalComments: true,
-        }))
-      )
-    ).flat();
-
-    for (const comment of fieldComments) {
-      const fieldTitle = fields.find((f) => f.id === comment.petition_field_id)!.title;
-      await this.addCommentRow(comment, fieldTitle);
-    }
-  }
-
-  private async addCommentRow(comment: PetitionFieldComment, fieldTitle: Maybe<string>) {
-    const author = await this.loadCommentAuthor(comment);
     const intl = await this.context.i18n.getIntl(this.locale);
-    this.addRows({
-      authorEmail: author.email,
-      authorFullName: fullName(author.first_name, author.last_name),
-      content: toPlainText(comment.content_json),
-      createdAt: comment.created_at.toISOString(),
-      fieldName: fieldTitle,
-      isInternal: comment.is_internal
-        ? intl.formatMessage({
-            id: "generic.yes",
-            defaultMessage: "Yes",
-          })
-        : intl.formatMessage({
-            id: "generic.no",
-            defaultMessage: "No",
-          }),
+    const comments = await pFlatMap(fields, async (field) => {
+      const comments = await this.context.petitions.loadPetitionFieldCommentsForField({
+        petitionFieldId: field.id,
+        petitionId: field.petition_id,
+        loadInternalComments: true,
+      });
+      return await pMap(comments, async (comment) => {
+        const author = await this.loadCommentAuthor(comment);
+        return { comment, author, field };
+      });
     });
+    for (const { comment, field, author } of comments) {
+      this.addRows({
+        authorEmail: author.email,
+        authorFullName: fullName(author.first_name, author.last_name),
+        content: comment.content,
+        createdAt: comment.created_at.toISOString(),
+        fieldName: field.title,
+        isInternal: comment.is_internal
+          ? intl.formatMessage({ id: "generic.yes", defaultMessage: "Yes" })
+          : intl.formatMessage({ id: "generic.no", defaultMessage: "No" }),
+      });
+    }
   }
 
   private async loadCommentAuthor(comment: PetitionFieldComment): Promise<Contact | UserData> {
