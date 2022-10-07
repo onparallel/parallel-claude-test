@@ -70,8 +70,10 @@ export const AliasOptionsMenu = Object.assign(
               <MenuItem
                 onClick={async (event) => {
                   event.stopPropagation();
-                  const alias = field.alias ?? (await onCreateAlias?.());
-                  copyFormula({ value: formula(alias ?? "") });
+                  try {
+                    const alias = field.alias ?? (await onCreateAlias?.());
+                    copyFormula({ value: formula(alias ?? "") });
+                  } catch {}
                 }}
                 key={index}
               >
