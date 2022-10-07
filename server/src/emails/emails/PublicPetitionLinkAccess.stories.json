@@ -18,9 +18,13 @@
         "assetsUrl": "https://static-staging.onparallel.com",
         "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel",
-        "tone": "FORMAL",
         "removeWhyWeUseParallel": false,
-        "removeParallelBranding": false
+        "removeParallelBranding": false,
+        "theme": {
+          "color": "#f75959",
+          "fontFamily": "Trebuchet MS, Helvetica, sans-serif",
+          "preferredTone": "FORMAL"
+        }
       },
       "argTypes": {
         "emailSubject": { "control": { "type": "text" } },
@@ -32,9 +36,9 @@
         "assetsUrl": { "control": { "type": "text" } },
         "logoUrl": { "control": { "type": "text" } },
         "logoAlt": { "control": { "type": "text" } },
-        "tone": { "control": { "type": "text" } },
         "removeWhyWeUseParallel": { "control": { "type": "boolean" } },
-        "removeParallelBranding": { "control": { "type": "boolean" } }
+        "removeParallelBranding": { "control": { "type": "boolean" } },
+        "theme": { "control": { "type": "object" } }
       }
     }
   ]

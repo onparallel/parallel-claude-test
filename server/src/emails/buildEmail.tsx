@@ -1,4 +1,4 @@
-import { render } from "mjml-react";
+import { render } from "@faire/mjml-react";
 import { ComponentType, createElement } from "react";
 import { createIntl, IntlConfig, IntlProvider, IntlShape } from "react-intl";
 import { loadMessages } from "../util/loadMessages";

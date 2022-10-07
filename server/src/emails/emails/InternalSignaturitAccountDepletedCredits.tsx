@@ -1,4 +1,4 @@
-import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
+import { MjmlColumn, MjmlSection, MjmlText } from "@faire/mjml-react";
 import outdent from "outdent";
 import { Email } from "../buildEmail";
 import { Layout, LayoutProps } from "../components/Layout";

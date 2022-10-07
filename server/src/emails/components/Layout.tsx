@@ -16,7 +16,7 @@ import {
   MjmlText,
   MjmlTitle,
   MjmlWrapper,
-} from "mjml-react";
+} from "@faire/mjml-react";
 import { FC, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { URLSearchParams } from "url";

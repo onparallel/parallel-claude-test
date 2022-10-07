@@ -1,4 +1,10 @@
-import { MjmlColumn, MjmlSection, MjmlSectionProps, MjmlText, MjmlTextProps } from "mjml-react";
+import {
+  MjmlColumn,
+  MjmlSection,
+  MjmlSectionProps,
+  MjmlText,
+  MjmlTextProps,
+} from "@faire/mjml-react";
 import { ReactNode } from "react";
 
 interface AlertProps extends MjmlSectionProps {

@@ -17,7 +17,12 @@
         "parallelUrl": "https://staging.onparallel.com",
         "assetsUrl": "https://static-staging.onparallel.com",
         "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
-        "logoAlt": "Parallel"
+        "logoAlt": "Parallel",
+        "theme": {
+          "color": "#f75959",
+          "fontFamily": "Trebuchet MS, Helvetica, sans-serif",
+          "preferredTone": "FORMAL"
+        }
       },
       "argTypes": {
         "signatureProvider": { "control": { "type": "text" } },
@@ -28,7 +33,8 @@
         "parallelUrl": { "control": { "type": "text" } },
         "assetsUrl": { "control": { "type": "text" } },
         "logoUrl": { "control": { "type": "text" } },
-        "logoAlt": { "control": { "type": "text" } }
+        "logoAlt": { "control": { "type": "text" } },
+        "theme": { "control": { "type": "object" } }
       }
     }
   ]

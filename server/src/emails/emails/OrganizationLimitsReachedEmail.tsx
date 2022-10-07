@@ -1,4 +1,4 @@
-import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
+import { MjmlColumn, MjmlSection, MjmlText } from "@faire/mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape } from "react-intl";
 import { OrganizationUsageLimitName } from "../../db/__types";

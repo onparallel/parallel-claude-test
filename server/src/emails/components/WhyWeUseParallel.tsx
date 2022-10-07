@@ -1,4 +1,11 @@
-import { MjmlColumn, MjmlGroup, MjmlImage, MjmlSection, MjmlText, MjmlWrapper } from "mjml-react";
+import {
+  MjmlColumn,
+  MjmlGroup,
+  MjmlImage,
+  MjmlSection,
+  MjmlText,
+  MjmlWrapper,
+} from "@faire/mjml-react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Tone } from "../utils/types";
 

@@ -1,4 +1,4 @@
-import { MjmlColumn, MjmlProps, MjmlSection, MjmlText, MjmlWrapper } from "mjml-react";
+import { MjmlColumn, MjmlProps, MjmlSection, MjmlText, MjmlWrapper } from "@faire/mjml-react";
 import { FormattedMessage } from "react-intl";
 import { SlateNode, toHtml } from "../../util/slate";
 import { Maybe } from "../../util/types";

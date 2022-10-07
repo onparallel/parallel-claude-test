@@ -1,4 +1,4 @@
-import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
+import { MjmlColumn, MjmlSection, MjmlText } from "@faire/mjml-react";
 import outdent from "outdent";
 import { Fragment } from "react";
 import { FormattedList, FormattedMessage, IntlShape, useIntl } from "react-intl";

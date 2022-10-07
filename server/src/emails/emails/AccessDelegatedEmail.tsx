@@ -1,4 +1,4 @@
-import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
+import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "@faire/mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, useIntl } from "react-intl";
 import { FORMATS } from "../../util/dates";
