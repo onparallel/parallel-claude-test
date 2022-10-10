@@ -8,13 +8,22 @@ import {
   AdminUpdateUserAttributesCommand,
   AuthenticationResultType,
   ChangePasswordCommand,
+  CodeMismatchException,
   CognitoIdentityProviderClient,
   ConfirmForgotPasswordCommand,
   ConfirmSignUpCommand,
   ContextDataType,
+  ExpiredCodeException,
   ForgotPasswordCommand,
+  InvalidParameterException,
+  InvalidPasswordException,
+  LimitExceededException,
+  NotAuthorizedException,
+  PasswordResetRequiredException,
   ResendConfirmationCodeCommand,
   SignUpCommand,
+  UserNotConfirmedException,
+  UserNotFoundException,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { ApolloError, ForbiddenError } from "apollo-server-core";
 import { parse as parseCookie } from "cookie";
@@ -158,7 +167,7 @@ export class Auth implements IAuth {
       }
       return user.Username!;
     } catch (error: any) {
-      if (error.__type === "UserNotFoundException") {
+      if (error instanceof UserNotFoundException) {
         const res = await this.cognitoIdP.send(
           new AdminCreateUserCommand({
             UserPoolId: this.config.cognito.defaultPoolId,
@@ -174,9 +183,9 @@ export class Auth implements IAuth {
           })
         );
         return res.User!.Username!;
-      } else {
-        throw error;
       }
+
+      throw error;
     }
   }
 
@@ -400,18 +409,20 @@ export class Auth implements IAuth {
         res.status(401).send({ error: "UnknownError" });
       }
     } catch (error: any) {
-      switch (error.__type) {
-        case "PasswordResetRequiredException":
-          res.status(401).send({ error: "PasswordResetRequired" });
-          return;
-        case "UserNotConfirmedException":
-          res.status(401).send({ error: "UserNotConfirmedException" });
-          return;
-        case "UserNotFoundException":
-        case "NotAuthorizedException":
-          res.status(401).send({ error: "InvalidUsernameOrPassword" });
-          return;
+      if (error instanceof PasswordResetRequiredException) {
+        res.status(401).send({ error: "PasswordResetRequired" });
+        return;
+      } else if (error instanceof UserNotConfirmedException) {
+        res.status(401).send({ error: "UserNotConfirmedException" });
+        return;
+      } else if (
+        error instanceof UserNotFoundException ||
+        error instanceof NotAuthorizedException
+      ) {
+        res.status(401).send({ error: "InvalidUsernameOrPassword" });
+        return;
       }
+
       req.context.logger.error(error?.message, {
         stack: error?.stack,
         body: { email: req.body.email }, // be careful not to expose the password!
@@ -454,7 +465,7 @@ export class Auth implements IAuth {
         res.status(401).send({ error: "UnknownError" });
       }
     } catch (error: any) {
-      if (error.__type === "InvalidPasswordException") {
+      if (error instanceof InvalidPasswordException) {
         res.status(403).send({ error: "InvalidPasswordException" });
       } else {
         next(error);
@@ -481,29 +492,29 @@ export class Auth implements IAuth {
         res.status(204).send();
       }
     } catch (error: any) {
-      switch (error.__type) {
-        case "LimitExceededException":
-          res.status(429).send({ error: "LimitExceededException" });
-          return;
-        case "NotAuthorizedException":
-          const [, data] = await withError(this.getUser(email));
-          if (data?.UserStatus === "FORCE_CHANGE_PASSWORD") {
-            // cognito user is in status FORCE_CHANGE_PASSWORD, can't reset the password
-            res.status(401).send({ error: "ForceChangePasswordException" });
-          } else if (!data) {
-            // if the user is SSO, adminGetUser will throw an UserNotFoundException
-            res.status(401).send({ error: "ExternalUser" });
-          }
-          return;
-        case "UserNotFoundException":
-          // don't leak whether users exist or not
-          res.status(204).send();
-          return;
-        case "InvalidParameterException":
-          // email is not yet verified, cognito can't reset the password
-          res.status(401).send({ error: "EmailNotVerifiedException" });
-          return;
+      if (error instanceof LimitExceededException) {
+        res.status(429).send({ error: "LimitExceededException" });
+        return;
+      } else if (error instanceof NotAuthorizedException) {
+        const [, data] = await withError(this.getUser(email));
+        if (data?.UserStatus === "FORCE_CHANGE_PASSWORD") {
+          // cognito user is in status FORCE_CHANGE_PASSWORD, can't reset the password
+          res.status(401).send({ error: "ForceChangePasswordException" });
+        } else if (!data) {
+          // if the user is SSO, adminGetUser will throw an UserNotFoundException
+          res.status(401).send({ error: "ExternalUser" });
+        }
+        return;
+      } else if (error instanceof UserNotFoundException) {
+        // don't leak whether users exist or not
+        res.status(204).send();
+        return;
+      } else if (error instanceof InvalidParameterException) {
+        // email is not yet verified, cognito can't reset the password
+        res.status(401).send({ error: "EmailNotVerifiedException" });
+        return;
       }
+
       next(error);
     }
   }
@@ -521,16 +532,18 @@ export class Auth implements IAuth {
       );
       res.status(204).send();
     } catch (error: any) {
-      switch (error.__type) {
-        case "InvalidPasswordException":
-          res.status(400).send({ error: "InvalidPassword" });
-          return;
-        case "ExpiredCodeException":
-        case "CodeMismatchException":
-        case "UserNotFoundException":
-          res.status(400).send({ error: "InvalidVerificationCode" });
-          return;
+      if (error instanceof InvalidPasswordException) {
+        res.status(400).send({ error: "InvalidPassword" });
+        return;
+      } else if (
+        error instanceof ExpiredCodeException ||
+        error instanceof CodeMismatchException ||
+        error instanceof UserNotFoundException
+      ) {
+        res.status(400).send({ error: "InvalidVerificationCode" });
+        return;
       }
+
       next(error);
     }
   }

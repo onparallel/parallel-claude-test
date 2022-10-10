@@ -214,6 +214,7 @@ function Login() {
               <InvalidPasswordAlert
                 isOpen={isWeakPassword}
                 onClose={() => setIsWeakPassword(false)}
+                marginBottom={10}
               />
               <EmailVerificationRequiredAlert
                 isOpen={isVerificationRequired}

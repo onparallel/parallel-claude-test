@@ -162,18 +162,19 @@ function Forgot() {
           >
             <PublicUserFormContainer>
               <LimitExceededAlert
-                isOpen={verification.isLimitExceededError || false}
+                isOpen={verification.isLimitExceededError ?? false}
                 onClose={() =>
                   setVerification({
                     sent: false,
                     isLimitExceededError: false,
                   })
                 }
+                marginBottom={10}
               />
               <EmailVerificationRequiredAlert
                 isOpen={
-                  verification.isEmailNotVerifiedError ||
-                  verification.isForceChangePasswordError ||
+                  verification.isEmailNotVerifiedError ??
+                  verification.isForceChangePasswordError ??
                   false
                 }
                 onClose={() =>

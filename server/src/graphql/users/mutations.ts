@@ -1,3 +1,7 @@
+import {
+  InvalidPasswordException,
+  NotAuthorizedException,
+} from "@aws-sdk/client-cognito-identity-provider";
 import { ApolloError, ForbiddenError } from "apollo-server-core";
 import { differenceInMinutes } from "date-fns";
 import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } from "nexus";
@@ -90,13 +94,13 @@ export const changePassword = mutationField("changePassword", {
       await ctx.auth.changePassword(ctx.req, password, newPassword);
       return "SUCCESS";
     } catch (error: any) {
-      switch (error.__type) {
-        case "NotAuthorizedException":
-          return "INCORRECT_PASSWORD";
-        case "InvalidPasswordException":
-          return "INVALID_NEW_PASSWORD";
+      if (error instanceof NotAuthorizedException) {
+        return "INCORRECT_PASSWORD";
+      } else if (error instanceof InvalidPasswordException) {
+        return "INVALID_NEW_PASSWORD";
+      } else {
+        throw error;
       }
-      throw error;
     }
   },
 });
