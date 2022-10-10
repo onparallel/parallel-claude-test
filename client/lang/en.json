@@ -2850,26 +2850,6 @@
     "context": "Clear filter"
   },
   {
-    "term": "component.petition-list-status-filter.closed",
-    "definition": "Closed",
-    "context": "Closed"
-  },
-  {
-    "term": "component.petition-list-status-filter.completed",
-    "definition": "Completed",
-    "context": "Completed"
-  },
-  {
-    "term": "component.petition-list-status-filter.draft",
-    "definition": "Draft",
-    "context": "Draft"
-  },
-  {
-    "term": "component.petition-list-status-filter.pending",
-    "definition": "Pending",
-    "context": "Pending"
-  },
-  {
     "term": "component.petition-list-tag-filter.clear-filter",
     "definition": "Clear filter",
     "context": "Clear filter"
@@ -8083,6 +8063,11 @@
     "term": "petitions.header.shared",
     "definition": "Shared",
     "context": "Shared"
+  },
+  {
+    "term": "petitions.header.signature",
+    "definition": "eSignature",
+    "context": "eSignature"
   },
   {
     "term": "petitions.header.status",

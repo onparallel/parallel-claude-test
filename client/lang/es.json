@@ -2850,26 +2850,6 @@
     "context": "Clear filter"
   },
   {
-    "term": "component.petition-list-status-filter.closed",
-    "definition": "Cerradas",
-    "context": "Closed"
-  },
-  {
-    "term": "component.petition-list-status-filter.completed",
-    "definition": "Completadas",
-    "context": "Completed"
-  },
-  {
-    "term": "component.petition-list-status-filter.draft",
-    "definition": "Borradores",
-    "context": "Draft"
-  },
-  {
-    "term": "component.petition-list-status-filter.pending",
-    "definition": "Pendientes",
-    "context": "Pending"
-  },
-  {
     "term": "component.petition-list-tag-filter.clear-filter",
     "definition": "Quitar filtro",
     "context": "Clear filter"
@@ -8083,6 +8063,11 @@
     "term": "petitions.header.shared",
     "definition": "Compartido",
     "context": "Shared"
+  },
+  {
+    "term": "petitions.header.signature",
+    "definition": "Firma",
+    "context": "eSignature"
   },
   {
     "term": "petitions.header.status",

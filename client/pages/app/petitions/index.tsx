@@ -40,6 +40,7 @@ import { isTypename } from "@parallel/utils/apollo/typename";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
+import { PetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
@@ -83,6 +84,14 @@ const QUERY_STATE = {
     flatten: flatShared,
     unflatten: unflatShared,
   }),
+  signature: values<PetitionSignatureStatus>([
+    "NO_SIGNATURE",
+    "NOT_STARTED",
+    "PENDING_START",
+    "PROCESSING",
+    "COMPLETED",
+    "CANCELLED",
+  ]).list(),
 };
 
 export type PetitionsQueryState = QueryStateFrom<typeof QUERY_STATE>;
@@ -376,7 +385,7 @@ function Petitions() {
           pageSize={state.items}
           totalCount={petitions?.totalCount}
           sort={sort}
-          filter={pick(state, ["sharedWith", "status", "tags"])}
+          filter={pick(state, ["sharedWith", "status", "tags", "signature"])}
           onFilterChange={(key, value) => {
             setQueryState((current) => ({ ...current, [key]: value, page: 1 }));
           }}

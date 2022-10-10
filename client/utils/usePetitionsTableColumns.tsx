@@ -12,9 +12,9 @@ import { PetitionTagListCellContent } from "@parallel/components/common/Petition
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
+import { PetitionListGenericSimpleFilter } from "@parallel/components/petition-list/filters/PetitionListGenericSimpleFilter";
 import { PetitionListSharedWithFilter } from "@parallel/components/petition-list/filters/shared-with/PetitionListSharedWithFilter";
-import { PetitionListStatusFilter } from "@parallel/components/petition-list/filters/status/PetitionListStatusFilter";
-import { PetitionListTagFilter } from "@parallel/components/petition-list/tags/PetitionListTagFilter";
+import { PetitionListTagFilter } from "@parallel/components/petition-list/filters/tags/PetitionListTagFilter";
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
 import {
   PetitionBaseType,
@@ -30,6 +30,8 @@ import { isDefined, maxBy, minBy } from "remeda";
 import { EnumerateList } from "./EnumerateList";
 import { useGoToContact } from "./goToContact";
 import { useGoToPetition } from "./goToPetition";
+import { usePetitionSignatureStatusLabels } from "./usePetitionSignatureStatusLabels";
+import { usePetitionStatusLabels } from "./usePetitionStatusLabels";
 
 type PetitionBase = usePetitionsTableColumns_PetitionBaseFragment;
 type Petition = usePetitionsTableColumns_PetitionBase_Petition_Fragment;
@@ -42,6 +44,19 @@ type PetitionsTableColumns_PetitionTemplateOrFolder = TableColumn<Template | Pet
 
 export function usePetitionsTableColumns(type: PetitionBaseType) {
   const intl = useIntl();
+
+  const petitionStatusLabels = usePetitionStatusLabels();
+  const statusFilterOptions = useMemo(
+    () => Object.entries(petitionStatusLabels).map(([value, text]) => ({ value, text })),
+    []
+  );
+
+  const signatureStatusLabels = usePetitionSignatureStatusLabels();
+  const signatureStatusFilterOptions = useMemo(
+    () => Object.entries(signatureStatusLabels).map(([value, text]) => ({ value, text })),
+    []
+  );
+
   return useMemo(
     () =>
       [
@@ -147,7 +162,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   defaultMessage: "Status",
                 }),
                 isFilterable: true,
-                Filter: PetitionListStatusFilter,
+                Filter: PetitionListGenericSimpleFilter(statusFilterOptions),
                 align: "center",
                 cellProps: (row) =>
                   row.__typename === "Petition"
@@ -166,9 +181,15 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
               },
               {
                 key: "signature",
+                header: intl.formatMessage({
+                  id: "petitions.header.signature",
+                  defaultMessage: "eSignature",
+                }),
+                isFilterable: true,
                 align: "center",
+                Filter: PetitionListGenericSimpleFilter(signatureStatusFilterOptions),
                 headerProps: { padding: 0 },
-                cellProps: { padding: 0, width: 8 },
+                cellProps: { padding: 0 },
                 CellContent: ({ row }) =>
                   row.__typename === "Petition" ? (
                     <Flex alignItems="center" paddingRight="2">
