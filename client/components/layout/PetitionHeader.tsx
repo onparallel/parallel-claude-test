@@ -411,14 +411,17 @@ export const PetitionHeader = Object.assign(
         </Flex>
         <PetitionHeaderTabs>
           {sections.map(({ section, label, rightIcon, attributes }) => {
+            let href = `/app/petitions/${petition.id}/${section}`;
+
+            if (isDefined(router.query.fromTemplate) || shouldConfirmNavigation) {
+              href += `?${new URLSearchParams({
+                ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
+                ...(shouldConfirmNavigation ? { new: "" } : {}),
+              })}`;
+            }
+
             return (
-              <NakedLink
-                key={section}
-                href={`/app/petitions/${petition.id}/${section}?${new URLSearchParams({
-                  ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
-                  ...(shouldConfirmNavigation ? { new: "" } : {}),
-                })}`}
-              >
+              <NakedLink key={section} href={href}>
                 <PetitionHeaderTab
                   isActive={current === section}
                   rightIcon={rightIcon}
