@@ -623,7 +623,7 @@ export const publicResetTemporaryPassword = mutationField("publicResetTemporaryP
   type: "Result",
   args: {
     email: nonNull(stringArg()),
-    locale: stringArg(),
+    locale: nonNull(stringArg()),
   },
   validateArgs: validateAnd(
     validEmail((args) => args.email, "email"),
@@ -645,7 +645,7 @@ export const resetTemporaryPassword = mutationField("resetTemporaryPassword", {
   type: "Result",
   args: {
     email: nonNull(stringArg()),
-    locale: stringArg(),
+    locale: nonNull(stringArg()),
   },
   authorize: authenticateAnd(contextUserHasRole("ADMIN")),
   validateArgs: validateAnd(

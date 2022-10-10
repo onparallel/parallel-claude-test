@@ -5,6 +5,7 @@ import {
   ForgotPasswordData,
   ForgotPasswordForm,
 } from "@parallel/components/auth/ForgotPasswordForm";
+import { LimitExceededAlert } from "@parallel/components/auth/LimitExceededAlert";
 import { PasswordResetData, PasswordResetForm } from "@parallel/components/auth/PasswordResetForm";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
@@ -31,6 +32,7 @@ function Forgot() {
     isExternalUserError?: boolean;
     isEmailNotVerifiedError?: boolean;
     isForceChangePasswordError?: boolean;
+    isLimitExceededError?: boolean;
   }>({ sent: false });
   const router = useRouter();
   const intl = useIntl();
@@ -63,6 +65,7 @@ function Forgot() {
         isExternalUserError: error.error === "ExternalUser",
         isEmailNotVerifiedError: error.error === "EmailNotVerifiedException",
         isForceChangePasswordError: error.error === "ForceChangePasswordException",
+        isLimitExceededError: error.error === "LimitExceededException",
       });
     }
     setIsSubmitting(false);
@@ -107,7 +110,7 @@ function Forgot() {
   }
 
   const [resendVerificationCode] = useMutation(Forgot_resendVerificationCodeDocument);
-  const [resetTemporaryPassword] = useMutation(Forgot_publicResetTemporaryPasswordDocument);
+  const [publicResetTemporaryPassword] = useMutation(Forgot_publicResetTemporaryPasswordDocument);
   async function handleResendEmail() {
     try {
       if (verification.email) {
@@ -116,7 +119,7 @@ function Forgot() {
             variables: { email: verification.email, locale: intl.locale },
           });
         } else if (verification.isForceChangePasswordError) {
-          await resetTemporaryPassword({
+          await publicResetTemporaryPassword({
             variables: { email: verification.email, locale: intl.locale },
           });
         }
@@ -158,6 +161,15 @@ function Forgot() {
             }}
           >
             <PublicUserFormContainer>
+              <LimitExceededAlert
+                isOpen={verification.isLimitExceededError || false}
+                onClose={() =>
+                  setVerification({
+                    sent: false,
+                    isLimitExceededError: false,
+                  })
+                }
+              />
               <EmailVerificationRequiredAlert
                 isOpen={
                   verification.isEmailNotVerifiedError ||
@@ -233,7 +245,7 @@ Forgot.mutations = [
     }
   `,
   gql`
-    mutation Forgot_publicResetTemporaryPassword($email: String!, $locale: String) {
+    mutation Forgot_publicResetTemporaryPassword($email: String!, $locale: String!) {
       publicResetTemporaryPassword(email: $email, locale: $locale)
     }
   `,

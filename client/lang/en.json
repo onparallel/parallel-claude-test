@@ -1760,6 +1760,26 @@
     "context": "Int"
   },
   {
+    "term": "component.invalid-password-alert.body",
+    "definition": "The provided password cannot be used for security reasons. Please try again with a stronger password.",
+    "context": "The provided password cannot be used for security reasons. Please try again with a stronger password."
+  },
+  {
+    "term": "component.invalid-password-alert.title",
+    "definition": "Invalid password",
+    "context": "Invalid password"
+  },
+  {
+    "term": "component.limit-exceeded-alert.body",
+    "definition": "Attempt limit exceeded, please try after some time.",
+    "context": "Attempt limit exceeded, please try after some time."
+  },
+  {
+    "term": "component.limit-exceeded-alert.title",
+    "definition": "Limit exceeded",
+    "context": "Limit exceeded"
+  },
+  {
     "term": "component.loading-dynamic-text.calculating-average-times",
     "definition": "Calculating average times with a calculator...",
     "context": "Calculating average times with a calculator..."

@@ -756,7 +756,7 @@ const _mutations = [
     }
   `,
   gql`
-    mutation OrganizationUsers_resetTemporaryPassword($email: String!, $locale: String) {
+    mutation OrganizationUsers_resetTemporaryPassword($email: String!, $locale: String!) {
       resetTemporaryPassword(email: $email, locale: $locale)
     }
   `,

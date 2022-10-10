@@ -4396,7 +4396,7 @@ export interface NexusGenArgTypes {
     publicResetTemporaryPassword: {
       // args
       email: string; // String!
-      locale?: string | null; // String
+      locale: string; // String!
     };
     publicSendReminder: {
       // args
@@ -4464,7 +4464,7 @@ export interface NexusGenArgTypes {
     resetTemporaryPassword: {
       // args
       email: string; // String!
-      locale?: string | null; // String
+      locale: string; // String!
     };
     resetUserPassword: {
       // args

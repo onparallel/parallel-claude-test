@@ -2,6 +2,7 @@ import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { Box, Center, Flex, Image, useToast } from "@chakra-ui/react";
 import { AlreadyLoggedIn } from "@parallel/components/auth/AlreadyLoggedIn";
 import { EmailVerificationRequiredAlert } from "@parallel/components/auth/EmailVerificationRequiredAlert";
+import { InvalidPasswordAlert } from "@parallel/components/auth/InvalidPasswordAlert";
 import { LoginData, LoginForm } from "@parallel/components/auth/LoginForm";
 import {
   PasswordChangeData,
@@ -30,6 +31,7 @@ function Login() {
   const [showContinueAs, setShowContinueAs] = useState(Boolean(data?.me));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isVerificationRequired, setIsVerificationRequired] = useState(false);
+  const [isWeakPassword, setIsWeakPassword] = useState(false);
   const nonVerifiedEmail = useRef("");
   const [passwordChange, setPasswordChange] = useState<{
     type: "CHANGE" | "RESET";
@@ -116,7 +118,11 @@ function Login() {
         newPassword,
       });
       router.push("/app");
-    } catch (error: any) {}
+    } catch (error: any) {
+      if (error.error === "InvalidPasswordException") {
+        setIsWeakPassword(true);
+      }
+    }
     setIsSubmitting(false);
   }
 
@@ -205,6 +211,10 @@ function Login() {
             }}
           >
             <PublicUserFormContainer>
+              <InvalidPasswordAlert
+                isOpen={isWeakPassword}
+                onClose={() => setIsWeakPassword(false)}
+              />
               <EmailVerificationRequiredAlert
                 isOpen={isVerificationRequired}
                 onClose={() => setIsVerificationRequired(false)}

@@ -41,6 +41,7 @@ import { UserRepository } from "../db/repositories/UserRepository";
 import { User } from "../db/__types";
 import { awsLogger } from "../util/awsLogger";
 import { fromDataLoader } from "../util/fromDataLoader";
+import { fullName } from "../util/fullName";
 import { sign, verify } from "../util/jwt";
 import { withError } from "../util/promises/withError";
 import { random } from "../util/token";
@@ -66,7 +67,7 @@ export interface IAuth {
   changePassword(req: IncomingMessage, password: string, newPassword: string): Promise<void>;
   updateSessionLogin(req: Request, userId: number, asUserId: number): Promise<void>;
   restoreSessionLogin(req: Request, userId: number): Promise<void>;
-  resetTempPassword(email: string, locale: string | null | undefined): Promise<void>;
+  resetTempPassword(email: string, locale: string): Promise<void>;
   verifyCaptcha(captcha: string, ip: string): Promise<boolean>;
   getOrCreateCognitoUser(
     email: string,
@@ -157,7 +158,7 @@ export class Auth implements IAuth {
       }
       return user.Username!;
     } catch (error: any) {
-      if (error.code === "UserNotFoundException") {
+      if (error.__type === "UserNotFoundException") {
         const res = await this.cognitoIdP.send(
           new AdminCreateUserCommand({
             UserPoolId: this.config.cognito.defaultPoolId,
@@ -453,7 +454,11 @@ export class Auth implements IAuth {
         res.status(401).send({ error: "UnknownError" });
       }
     } catch (error: any) {
-      next(error);
+      if (error.__type === "InvalidPasswordException") {
+        res.status(403).send({ error: "InvalidPasswordException" });
+      } else {
+        next(error);
+      }
     }
   }
 
@@ -477,6 +482,9 @@ export class Auth implements IAuth {
       }
     } catch (error: any) {
       switch (error.__type) {
+        case "LimitExceededException":
+          res.status(429).send({ error: "LimitExceededException" });
+          return;
         case "NotAuthorizedException":
           const [, data] = await withError(this.getUser(email));
           if (data?.UserStatus === "FORCE_CHANGE_PASSWORD") {
@@ -832,7 +840,7 @@ export class Auth implements IAuth {
     await this.redis.set(`session:${token}:meta`, JSON.stringify({ userId }), this.EXPIRY);
   }
 
-  async resetTempPassword(email: string, locale: string | null | undefined) {
+  async resetTempPassword(email: string, locale: string) {
     const [users, cognitoUser] = await Promise.all([
       this.users.loadUsersByEmail(email),
       this.getUser(email),
@@ -875,6 +883,12 @@ export class Auth implements IAuth {
       if (!orgOwnerData) {
         throw new ApolloError(`UserData not found`, "USER_DATA_NOT_FOUND");
       }
+
+      await this.resetUserPassword(email, {
+        locale,
+        organizationName: organization.name,
+        organizationUser: fullName(orgOwnerData.first_name, orgOwnerData.last_name),
+      });
     } else {
       throw new ApolloError(`User has SSO configured`, "RESET_USER_PASSWORD_SSO_ERROR");
     }

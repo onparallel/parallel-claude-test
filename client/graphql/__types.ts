@@ -1240,7 +1240,7 @@ export interface MutationpublicPetitionFieldAttachmentDownloadLinkArgs {
 
 export interface MutationpublicResetTemporaryPasswordArgs {
   email: Scalars["String"];
-  locale?: InputMaybe<Scalars["String"]>;
+  locale: Scalars["String"];
 }
 
 export interface MutationpublicSendReminderArgs {
@@ -1308,7 +1308,7 @@ export interface MutationresendVerificationCodeArgs {
 
 export interface MutationresetTemporaryPasswordArgs {
   email: Scalars["String"];
-  locale?: InputMaybe<Scalars["String"]>;
+  locale: Scalars["String"];
 }
 
 export interface MutationresetUserPasswordArgs {
@@ -13822,7 +13822,7 @@ export type OrganizationUsers_deactivateUserMutation = {
 
 export type OrganizationUsers_resetTemporaryPasswordMutationVariables = Exact<{
   email: Scalars["String"];
-  locale?: InputMaybe<Scalars["String"]>;
+  locale: Scalars["String"];
 }>;
 
 export type OrganizationUsers_resetTemporaryPasswordMutation = { resetTemporaryPassword: Result };
@@ -21606,7 +21606,7 @@ export type Forgot_resendVerificationCodeMutation = { resendVerificationCode: Re
 
 export type Forgot_publicResetTemporaryPasswordMutationVariables = Exact<{
   email: Scalars["String"];
-  locale?: InputMaybe<Scalars["String"]>;
+  locale: Scalars["String"];
 }>;
 
 export type Forgot_publicResetTemporaryPasswordMutation = { publicResetTemporaryPassword: Result };
@@ -30345,7 +30345,7 @@ export const OrganizationUsers_deactivateUserDocument = gql`
   OrganizationUsers_deactivateUserMutationVariables
 >;
 export const OrganizationUsers_resetTemporaryPasswordDocument = gql`
-  mutation OrganizationUsers_resetTemporaryPassword($email: String!, $locale: String) {
+  mutation OrganizationUsers_resetTemporaryPassword($email: String!, $locale: String!) {
     resetTemporaryPassword(email: $email, locale: $locale)
   }
 ` as unknown as DocumentNode<
@@ -31132,7 +31132,7 @@ export const Forgot_resendVerificationCodeDocument = gql`
   Forgot_resendVerificationCodeMutationVariables
 >;
 export const Forgot_publicResetTemporaryPasswordDocument = gql`
-  mutation Forgot_publicResetTemporaryPassword($email: String!, $locale: String) {
+  mutation Forgot_publicResetTemporaryPassword($email: String!, $locale: String!) {
     publicResetTemporaryPassword(email: $email, locale: $locale)
   }
 ` as unknown as DocumentNode<

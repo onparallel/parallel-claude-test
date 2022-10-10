@@ -1206,7 +1206,7 @@ export type MutationpublicPetitionFieldAttachmentDownloadLinkArgs = {
 
 export type MutationpublicResetTemporaryPasswordArgs = {
   email: Scalars["String"];
-  locale?: InputMaybe<Scalars["String"]>;
+  locale: Scalars["String"];
 };
 
 export type MutationpublicSendReminderArgs = {
@@ -1274,7 +1274,7 @@ export type MutationresendVerificationCodeArgs = {
 
 export type MutationresetTemporaryPasswordArgs = {
   email: Scalars["String"];
-  locale?: InputMaybe<Scalars["String"]>;
+  locale: Scalars["String"];
 };
 
 export type MutationresetUserPasswordArgs = {

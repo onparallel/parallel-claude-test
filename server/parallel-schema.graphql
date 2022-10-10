@@ -1168,7 +1168,7 @@ type Mutation {
   """
   Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
   """
-  publicResetTemporaryPassword(email: String!, locale: String): Result!
+  publicResetTemporaryPassword(email: String!, locale: String!): Result!
   publicSendReminder(contactEmail: String!, keycode: ID, slug: ID): Result!
   publicSendVerificationCode(
     email: String
@@ -1250,7 +1250,7 @@ type Mutation {
   """
   Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
   """
-  resetTemporaryPassword(email: String!, locale: String): Result!
+  resetTemporaryPassword(email: String!, locale: String!): Result!
 
   """
   Resets the given user password on AWS Cognito and sends an email with new temporary.
