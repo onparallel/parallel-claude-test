@@ -1,4 +1,4 @@
-import { AlertDescription, AlertIcon, AlertTitle, Flex, Stack, Text } from "@chakra-ui/react";
+import { AlertDescription, AlertIcon, AlertTitle, Stack, Text } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
 import { CloseableAlert, CloseableAlertProps } from "../common/CloseableAlert";
 
