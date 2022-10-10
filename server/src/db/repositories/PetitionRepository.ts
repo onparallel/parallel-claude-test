@@ -5244,6 +5244,12 @@ export class PetitionRepository extends BaseRepository {
     }
   }
 
+  /**
+   * retrieves an unprocessed petition or system event for the event-processor.
+   *
+   * created_at Date of the event must match with param createdAt.
+   * This will ensure to only pick the most up-to-date event for processing, as some events can be updated in DB before the event-processor processes them
+   */
   async pickEventToProcess<TName extends "petition_event" | "system_event">(
     id: number,
     tableName: TName,

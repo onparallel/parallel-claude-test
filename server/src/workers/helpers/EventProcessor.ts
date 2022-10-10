@@ -22,6 +22,7 @@ export class EventProcessor {
       if (this.listeners.has(payload.type)) {
         // this is for retrocompatibility on release with older payload, where tableName is not defined.
         // in the next iteration, tableName will be obtained from payload
+        // TODO read tableName from payload
         const tableName = payload.type in SystemEventTypeValues ? "system_event" : "petition_event";
 
         const event = await ctx.petitions.pickEventToProcess(
