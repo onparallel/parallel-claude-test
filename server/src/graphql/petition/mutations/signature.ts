@@ -26,12 +26,7 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
   resolve: async (_, { petitionId, message }, ctx) => {
     try {
       const petition = (await ctx.petitions.loadPetition(petitionId))!;
-      await ctx.orgCredits.consumePetitionSendCredits(
-        petition.id,
-        petition.org_id,
-        1,
-        `User:${ctx.user!.id}`
-      );
+      await ctx.orgCredits.ensurePetitionHasConsumedCredit(petition.id, `User:${ctx.user!.id}`);
 
       await ctx.petitions.updatePetition(
         petitionId,

@@ -246,10 +246,8 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
           if (petition) {
             const email = result.data.contact_email!.toLowerCase();
 
-            await ctx.orgCredits.consumePetitionSendCredits(
+            await ctx.orgCredits.ensurePetitionHasConsumedCredit(
               petition.id,
-              petition.org_id,
-              1,
               `PetitionAccess:${access!.id}`
             );
 
@@ -679,13 +677,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
       }
 
       try {
-        await ctx.orgCredits.consumePetitionSendCredits(
-          null,
-          owner.user.org_id,
-          1,
-          `PublicPetitionLink:${link.id}`
-        );
-
+        await ctx.orgCredits.consumePetitionSendCredits(owner.user.org_id, 1);
         const petition = await ctx.petitions.clonePetition(
           link!.template_id,
           owner.user,

@@ -66,10 +66,8 @@ export const bankflip = Router()
         // only consume credits if a user requested the upload
         if (isDefined(user)) {
           const field = (await req.context.petitions.loadField(fieldId))!;
-          await req.context.orgCredits.consumePetitionSendCredits(
+          await req.context.orgCredits.ensurePetitionHasConsumedCredit(
             field.petition_id,
-            user.org_id,
-            1,
             `User:${user.id}`
           );
         }

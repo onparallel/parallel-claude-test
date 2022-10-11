@@ -50,13 +50,7 @@ export const createPetitionFieldReply = mutationField("createPetitionFieldReply"
     const { type } = (await ctx.petitions.loadField(args.fieldId))!;
 
     try {
-      await ctx.orgCredits.consumePetitionSendCredits(
-        args.petitionId,
-        ctx.user!.org_id,
-        1,
-        `User:${ctx.user!.id}`
-      );
-
+      await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
       return await ctx.petitions.createPetitionFieldReply(
         {
           petition_field_id: args.fieldId,
@@ -147,12 +141,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
   resolve: async (_, args, ctx) => {
     const key = random(16);
     try {
-      await ctx.orgCredits.consumePetitionSendCredits(
-        args.petitionId,
-        ctx.user!.org_id,
-        1,
-        `User:${ctx.user!.id}`
-      );
+      await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
 
       const { filename, size, contentType } = args.file;
       const file = await ctx.files.createFileUpload(
@@ -398,12 +387,7 @@ export const bulkCreatePetitionReplies = mutationField("bulkCreatePetitionReplie
   ),
   resolve: async (_, args, ctx) => {
     try {
-      await ctx.orgCredits.consumePetitionSendCredits(
-        args.petitionId,
-        ctx.user!.org_id,
-        1,
-        `User:${ctx.user!.id}`
-      );
+      await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
       return await ctx.petitions.prefillPetition(args.petitionId, args.replies, ctx.user!);
     } catch (error: any) {
       if (error.message === "PETITION_SEND_LIMIT_REACHED") {

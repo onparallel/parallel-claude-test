@@ -1407,11 +1407,10 @@ export const sendPetition = mutationField("sendPetition", {
     }
 
     try {
+      await ctx.orgCredits.ensurePetitionHasConsumedCredit(petition.id, `User:${ctx.user!.id}`);
       await ctx.orgCredits.consumePetitionSendCredits(
-        petition.id,
         petition.org_id,
-        args.contactIdGroups.length, // 1 credit for each cloned petition + 1 more credit on the original petition if it didn't consume yet
-        `User:${ctx.user!.id}`
+        args.contactIdGroups.length - 1 // 1 more credit consumed for each contact group
       );
 
       const clonedPetitions = await pMap(
@@ -1998,15 +1997,10 @@ export const completePetition = mutationField("completePetition", {
     petitionIsNotAnonymized("petitionId")
   ),
   resolve: async (_, args, ctx) => {
-    let petition = (await ctx.petitions.loadPetition(args.petitionId))!;
     try {
-      await ctx.orgCredits.consumePetitionSendCredits(
-        petition.id,
-        petition.org_id,
-        1,
-        `User:${ctx.user!.id}`
-      );
-      petition = await ctx.petitions.completePetition(args.petitionId, ctx.user!);
+      await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
+
+      let petition = await ctx.petitions.completePetition(args.petitionId, ctx.user!);
       await ctx.petitions.createEvent({
         type: "PETITION_COMPLETED",
         petition_id: args.petitionId,
@@ -2025,6 +2019,7 @@ export const completePetition = mutationField("completePetition", {
         );
         petition = updatedPetition ?? petition;
       }
+      return petition;
     } catch (error: any) {
       if (error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(
@@ -2040,8 +2035,6 @@ export const completePetition = mutationField("completePetition", {
         throw error;
       }
     }
-
-    return petition;
   },
 });
 
