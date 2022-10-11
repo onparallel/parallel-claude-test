@@ -72,7 +72,7 @@ async function main() {
     });
     (0, child_process_1.execSync)(`echo "SECURITY_SERVICE_JWT_SECRET=${SECURITY_SERVICE_JWT_SECRET}" >> ${buildDir}/server/.env`, { cwd: WORK_DIR, encoding: "utf-8" });
     console.log("Building the client");
-    (0, child_process_1.execSync)(`ENV=${env} yarn build`, {
+    (0, child_process_1.execSync)(`ENV=${env} yarn build-ops`, {
         cwd: `${buildDir}/client`,
         encoding: "utf-8",
     });

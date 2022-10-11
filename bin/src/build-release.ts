@@ -80,7 +80,7 @@ async function main() {
   );
 
   console.log("Building the client");
-  execSync(`ENV=${env} yarn build`, {
+  execSync(`ENV=${env} yarn build-ops`, {
     cwd: `${buildDir}/client`,
     encoding: "utf-8",
   });
