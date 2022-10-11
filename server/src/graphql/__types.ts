@@ -149,6 +149,7 @@ export interface NexusGenInputs {
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     path?: string | null; // String
     sharedWith?: NexusGenInputs["PetitionSharedWithFilter"] | null; // PetitionSharedWithFilter
+    signature?: NexusGenEnums["PetitionSignatureStatusFilter"][] | null; // [PetitionSignatureStatusFilter!]
     status?: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
     tagIds?: NexusGenScalars["GID"][] | null; // [GID!]
     type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
@@ -289,6 +290,13 @@ export interface NexusGenEnums {
     | "COMPLETED"
     | "ENQUEUED"
     | "PROCESSED"
+    | "PROCESSING";
+  PetitionSignatureStatusFilter:
+    | "CANCELLED"
+    | "COMPLETED"
+    | "NOT_STARTED"
+    | "NO_SIGNATURE"
+    | "PENDING_START"
     | "PROCESSING";
   PetitionStatus: db.PetitionStatus;
   PetitionUserNotificationFilter: "ALL" | "COMMENTS" | "COMPLETED" | "OTHER" | "SHARED" | "UNREAD";

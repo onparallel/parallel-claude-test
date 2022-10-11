@@ -1,8 +1,8 @@
+import { PetitionSignatureStatusFilter } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
-import { PetitionSignatureStatus } from "./getPetitionSignatureStatus";
 
-export function usePetitionSignatureStatusLabels(): Record<PetitionSignatureStatus, string> {
+export function usePetitionSignatureStatusLabels(): Record<PetitionSignatureStatusFilter, string> {
   const intl = useIntl();
   return useMemo(
     () => ({

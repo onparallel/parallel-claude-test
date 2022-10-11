@@ -75,6 +75,44 @@ export const petitionsQuery = queryField((t) => {
               },
             }),
           });
+          t.nullable.list.nonNull.field("signature", {
+            type: enumType({
+              name: "PetitionSignatureStatusFilter",
+              description: "Filters petitions by the status of its latest eSignature request.",
+              members: [
+                {
+                  name: "NO_SIGNATURE",
+                  description:
+                    "Petitions with no eSignature configured and no past eSignature requests.",
+                },
+                {
+                  name: "NOT_STARTED",
+                  description:
+                    "Petitions with configured eSignature that have not yet been started (petition is PENDING).",
+                },
+                {
+                  name: "PENDING_START",
+                  description:
+                    "Completed petitions with configured signatures to be started after user reviews the replies. Need to manually start the eSignature.",
+                },
+                {
+                  name: "PROCESSING",
+                  description:
+                    "Petitions with ongoing eSignature process. Awaiting for the signers to sign the document.",
+                },
+                {
+                  name: "COMPLETED",
+                  description:
+                    "Petition with eSignature completed. Every signer signed the document.",
+                },
+                {
+                  name: "CANCELLED",
+                  description:
+                    "Petitions with cancelled eSignatures. Request errors, user cancels, signer declines, etc...",
+                },
+              ],
+            }),
+          });
         },
       }).asArg(),
     },

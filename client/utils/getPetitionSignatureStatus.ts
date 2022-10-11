@@ -1,21 +1,24 @@
 import { gql } from "@apollo/client";
-import { getPetitionSignatureStatus_PetitionFragment } from "@parallel/graphql/__types";
+import {
+  getPetitionSignatureStatus_PetitionFragment,
+  PetitionSignatureStatusFilter,
+} from "@parallel/graphql/__types";
 import { isDefined } from "remeda";
 
-export type PetitionSignatureStatus = ReturnType<typeof getPetitionSignatureStatus>;
 export function getPetitionSignatureStatus({
   status,
   currentSignatureRequest,
   signatureConfig,
-}: getPetitionSignatureStatus_PetitionFragment) {
+}: getPetitionSignatureStatus_PetitionFragment): PetitionSignatureStatusFilter {
   if (isDefined(signatureConfig) && status === "PENDING") {
     // petition has signature configured but it's not yet completed
     return "NOT_STARTED";
   } else if (
-    signatureConfig?.review &&
+    isDefined(signatureConfig) &&
     ["COMPLETED", "CLOSED"].includes(status) &&
     (!currentSignatureRequest ||
-      ["COMPLETED", "CANCELLED"].includes(currentSignatureRequest.status))
+      currentSignatureRequest.status === "COMPLETED" ||
+      currentSignatureRequest.cancelReason === "CANCELLED_BY_USER")
   ) {
     // petition is completed and configured to be reviewed before starting signature
     // and signature was never started or the last one is already completed (now we're starting a new request)
@@ -40,6 +43,7 @@ getPetitionSignatureStatus.fragments = {
       status
       currentSignatureRequest {
         status
+        cancelReason
       }
       signatureConfig {
         review

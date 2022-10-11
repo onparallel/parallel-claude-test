@@ -2427,6 +2427,7 @@ export interface PetitionFilter {
   locale?: InputMaybe<PetitionLocale>;
   path?: InputMaybe<Scalars["String"]>;
   sharedWith?: InputMaybe<PetitionSharedWithFilter>;
+  signature?: InputMaybe<Array<PetitionSignatureStatusFilter>>;
   status?: InputMaybe<Array<PetitionStatus>>;
   tagIds?: InputMaybe<Array<Scalars["GID"]>>;
   type?: InputMaybe<PetitionBaseType>;
@@ -2637,6 +2638,21 @@ export type PetitionSignatureRequestStatus =
   | "COMPLETED"
   | "ENQUEUED"
   | "PROCESSED"
+  | "PROCESSING";
+
+/** Filters petitions by the status of its latest eSignature request. */
+export type PetitionSignatureStatusFilter =
+  /** Petitions with cancelled eSignatures. Request errors, user cancels, signer declines, etc... */
+  | "CANCELLED"
+  /** Petition with eSignature completed. Every signer signed the document. */
+  | "COMPLETED"
+  /** Petitions with configured eSignature that have not yet been started (petition is PENDING). */
+  | "NOT_STARTED"
+  /** Petitions with no eSignature configured and no past eSignature requests. */
+  | "NO_SIGNATURE"
+  /** Completed petitions with configured signatures to be started after user reviews the replies. Need to manually start the eSignature. */
+  | "PENDING_START"
+  /** Petitions with ongoing eSignature process. Awaiting for the signers to sign the document. */
   | "PROCESSING";
 
 /** Information about a signer of the petition */
@@ -4209,6 +4225,7 @@ export type PetitionSignatureCellContent_PetitionFragment = {
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
     status: PetitionSignatureRequestStatus;
+    cancelReason?: string | null;
     environment: SignatureOrgIntegrationEnvironment;
   } | null;
   signatureConfig?: {
@@ -12658,6 +12675,7 @@ export type Contact_ContactFragment = {
         currentSignatureRequest?: {
           __typename?: "PetitionSignatureRequest";
           status: PetitionSignatureRequestStatus;
+          cancelReason?: string | null;
           environment: SignatureOrgIntegrationEnvironment;
         } | null;
         signatureConfig?: {
@@ -12729,6 +12747,7 @@ export type Contact_PetitionAccessFragment = {
     currentSignatureRequest?: {
       __typename?: "PetitionSignatureRequest";
       status: PetitionSignatureRequestStatus;
+      cancelReason?: string | null;
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
     signatureConfig?: {
@@ -12786,6 +12805,7 @@ export type Contact_PetitionFragment = {
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
     status: PetitionSignatureRequestStatus;
+    cancelReason?: string | null;
     environment: SignatureOrgIntegrationEnvironment;
   } | null;
   signatureConfig?: {
@@ -12911,6 +12931,7 @@ export type Contact_contactQuery = {
           currentSignatureRequest?: {
             __typename?: "PetitionSignatureRequest";
             status: PetitionSignatureRequestStatus;
+            cancelReason?: string | null;
             environment: SignatureOrgIntegrationEnvironment;
           } | null;
           signatureConfig?: {
@@ -19418,6 +19439,7 @@ export type PetitionReplies_PetitionFragment = {
     __typename?: "PetitionSignatureRequest";
     id: string;
     status: PetitionSignatureRequestStatus;
+    cancelReason?: string | null;
     environment: SignatureOrgIntegrationEnvironment;
   } | null;
   myEffectivePermission?: {
@@ -19853,6 +19875,7 @@ export type PetitionReplies_closePetitionMutation = {
       __typename?: "PetitionSignatureRequest";
       id: string;
       status: PetitionSignatureRequestStatus;
+      cancelReason?: string | null;
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
     myEffectivePermission?: {
@@ -20090,6 +20113,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       __typename?: "PetitionSignatureRequest";
       id: string;
       status: PetitionSignatureRequestStatus;
+      cancelReason?: string | null;
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
     myEffectivePermission?: {
@@ -20429,6 +20453,7 @@ export type PetitionReplies_petitionQuery = {
           __typename?: "PetitionSignatureRequest";
           id: string;
           status: PetitionSignatureRequestStatus;
+          cancelReason?: string | null;
           environment: SignatureOrgIntegrationEnvironment;
         } | null;
         myEffectivePermission?: {
@@ -20578,6 +20603,7 @@ export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
     status: PetitionSignatureRequestStatus;
+    cancelReason?: string | null;
     environment: SignatureOrgIntegrationEnvironment;
   } | null;
   signatureConfig?: {
@@ -20791,6 +20817,7 @@ export type Petitions_petitionsQuery = {
           currentSignatureRequest?: {
             __typename?: "PetitionSignatureRequest";
             status: PetitionSignatureRequestStatus;
+            cancelReason?: string | null;
             environment: SignatureOrgIntegrationEnvironment;
           } | null;
           signatureConfig?: {
@@ -22592,6 +22619,7 @@ export type getPetitionSignatureStatus_PetitionFragment = {
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
     status: PetitionSignatureRequestStatus;
+    cancelReason?: string | null;
   } | null;
   signatureConfig?: { __typename?: "SignatureConfig"; review: boolean } | null;
 };
@@ -23460,6 +23488,7 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
     status: PetitionSignatureRequestStatus;
+    cancelReason?: string | null;
     environment: SignatureOrgIntegrationEnvironment;
   } | null;
   signatureConfig?: {
@@ -24757,6 +24786,7 @@ export const getPetitionSignatureStatus_PetitionFragmentDoc = gql`
     status
     currentSignatureRequest {
       status
+      cancelReason
     }
     signatureConfig {
       review

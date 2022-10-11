@@ -13,13 +13,13 @@ import {
 import { EyeOffIcon } from "@parallel/chakra/icons";
 import {
   PetitionContents_PetitionFieldFragment,
+  PetitionSignatureStatusFilter,
   SignatureOrgIntegrationEnvironment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { filterPetitionFields, PetitionFieldFilter } from "@parallel/utils/filterPetitionFields";
-import { PetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
@@ -45,7 +45,7 @@ export interface PetitionContentsProps<T extends PetitionContents_PetitionFieldF
   onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => void;
   filter?: PetitionFieldFilter;
   fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
-  signatureStatus?: PetitionSignatureStatus;
+  signatureStatus?: PetitionSignatureStatusFilter;
   signatureEnvironment?: SignatureOrgIntegrationEnvironment | null;
   onSignatureStatusClick?: () => void;
   isReadOnly?: boolean;
@@ -119,7 +119,7 @@ function SignatureStatusInfo({
   environment,
   ...props
 }: BoxProps & {
-  status: PetitionSignatureStatus;
+  status: PetitionSignatureStatusFilter;
   environment?: SignatureOrgIntegrationEnvironment | null;
 }) {
   return (

@@ -2355,6 +2355,7 @@ export type PetitionFilter = {
   locale?: InputMaybe<PetitionLocale>;
   path?: InputMaybe<Scalars["String"]>;
   sharedWith?: InputMaybe<PetitionSharedWithFilter>;
+  signature?: InputMaybe<Array<PetitionSignatureStatusFilter>>;
   status?: InputMaybe<Array<PetitionStatus>>;
   tagIds?: InputMaybe<Array<Scalars["GID"]>>;
   type?: InputMaybe<PetitionBaseType>;
@@ -2555,6 +2556,21 @@ export type PetitionSignatureRequestStatus =
   | "COMPLETED"
   | "ENQUEUED"
   | "PROCESSED"
+  | "PROCESSING";
+
+/** Filters petitions by the status of its latest eSignature. */
+export type PetitionSignatureStatusFilter =
+  /** Petitions with cancelled eSignatures. Request errors, user cancels, signer declines, etc... */
+  | "CANCELLED"
+  /** Petition with eSignature completed. Every signer signed the document. */
+  | "COMPLETED"
+  /** Petitions with configured eSignature that have not yet been started (petition is PENDING). */
+  | "NOT_STARTED"
+  /** Petitions with no eSignature configured. */
+  | "NO_SIGNATURE"
+  /** Completed petitions with configured signatures to be started after user reviews the replies. Need to manually start the eSignature. */
+  | "PENDING_START"
+  /** Petitions with ongoing eSignature process. Awaiting for the signers to sign the document. */
   | "PROCESSING";
 
 /** Information about a signer of the petition */

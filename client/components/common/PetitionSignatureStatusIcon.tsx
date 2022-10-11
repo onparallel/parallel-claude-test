@@ -6,14 +6,16 @@ import {
   SignaturePendingIcon,
   SignatureProcessingIcon,
 } from "@parallel/chakra/icons";
-import { SignatureOrgIntegrationEnvironment } from "@parallel/graphql/__types";
-import { PetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
+import {
+  PetitionSignatureStatusFilter,
+  SignatureOrgIntegrationEnvironment,
+} from "@parallel/graphql/__types";
 import { usePetitionSignatureStatusLabels } from "@parallel/utils/usePetitionSignatureStatusLabels";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
 interface PetitionSignatureStatusIconProps {
-  status: PetitionSignatureStatus;
+  status: PetitionSignatureStatusFilter;
   environment?: SignatureOrgIntegrationEnvironment | null;
   tooltipPlacement?: PlacementWithLogical;
 }

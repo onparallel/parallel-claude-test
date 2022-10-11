@@ -28,6 +28,7 @@ import {
   PetitionBaseType,
   PetitionPermissionType,
   PetitionSharedWithFilter,
+  PetitionSignatureStatusFilter,
   PetitionStatus,
   Petitions_movePetitionsDocument,
   Petitions_PetitionBaseOrFolderFragment,
@@ -40,7 +41,6 @@ import { isTypename } from "@parallel/utils/apollo/typename";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
-import { PetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
@@ -84,7 +84,7 @@ const QUERY_STATE = {
     flatten: flatShared,
     unflatten: unflatShared,
   }),
-  signature: values<PetitionSignatureStatus>([
+  signature: values<PetitionSignatureStatusFilter>([
     "NO_SIGNATURE",
     "NOT_STARTED",
     "PENDING_START",
@@ -123,6 +123,7 @@ function Petitions() {
         filters: {
           path: state.search && state.searchIn === "EVERYWHERE" ? null : state.path,
           status: state.status,
+          signature: state.signature,
           type: state.type,
           tagIds: state.tags,
           sharedWith: removeInvalidLines(state.sharedWith),
@@ -407,7 +408,7 @@ function Petitions() {
           }
           body={
             data?.petitions.totalCount === 0 && !loading ? (
-              state.search || state.sharedWith || state.tags || state.status ? (
+              state.search || state.sharedWith || state.tags || state.status || state.signature ? (
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text color="gray.300" fontSize="lg">
                     <FormattedMessage
