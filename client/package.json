@@ -10,6 +10,7 @@
     "build-ops": "NODE_OPTIONS=--max-old-space-size=6144 next build",
     "start": "next start",
     "prebuild": "yarn generate-i18n-files",
+    "prebuild-ops": "yarn generate-i18n-files",
     "postbuild": "yarn _strip-js --input ../client/.next/server/pages/es/update.html && yarn _strip-js --input ../client/.next/server/pages/en/update.html",
     "generate-graphql-types": "graphql-codegen",
     "extract-i18n-terms": "yarn workspace @parallel/bin extract-i18n-terms --locales en es --input '../client/{components,pages,utils}/**/*.{ts,tsx}' --output '../client/lang'",
