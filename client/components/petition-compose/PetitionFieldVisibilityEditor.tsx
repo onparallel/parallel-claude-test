@@ -180,7 +180,7 @@ export function PetitionFieldVisibilityEditor({
                       isDisabled={isReadOnly}
                     />
                     {index === 1 ? (
-                      <Box flex="1">
+                      <Box flex="1" minWidth="0">
                         <VisibilityOperatorSelect
                           value={visibility.operator}
                           onChange={(operator) => setVisibilityOperator(operator!)}
@@ -626,7 +626,7 @@ function ConditionPredicate({
   );
 
   return !field.multiple && condition.modifier === "NUMBER_OF_REPLIES" ? (
-    <Box flex="1">
+    <Box flex="1" minWidth="0">
       <SimpleSelect
         size="sm"
         isDisabled={isReadOnly}

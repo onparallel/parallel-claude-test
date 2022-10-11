@@ -267,7 +267,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
     <FormControl id={id} isDisabled={isDisabled}>
       <FormLabel>{label}</FormLabel>
       <Flex alignItems="center">
-        <Box flex="1" position="relative">
+        <Box flex="1" position="relative" minWidth="0">
           <SimpleSelect
             ref={ref as any}
             id={id}

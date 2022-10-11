@@ -117,7 +117,7 @@ export function RecipientViewPetitionFieldSelect({
         </List>
       ) : null}
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
-        <Box flex="1" position="relative" marginTop={2}>
+        <Box flex="1" position="relative" marginTop={2} minWidth="0">
           <SimpleSelect
             ref={newReplyRef as any}
             id={`reply-${field.id}-new`}
@@ -188,7 +188,7 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
 
   return (
     <Stack direction="row">
-      <Box flex="1" position="relative">
+      <Box flex="1" position="relative" minWidth="0">
         <Box position="relative">
           <SimpleSelect
             ref={ref}

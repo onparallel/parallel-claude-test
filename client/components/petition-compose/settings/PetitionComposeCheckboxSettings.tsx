@@ -168,7 +168,7 @@ export function CheckboxSettings({
       </SettingsRow>
       {limitType !== "RADIO" ? (
         <Stack direction="row">
-          <Box flex={1}>
+          <Box flex="1" minWidth="0">
             <SimpleSelect
               isDisabled={isReadOnly}
               options={options}

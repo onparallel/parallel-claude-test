@@ -49,7 +49,7 @@ export function ShortTextSettings({
               defaultMessage="Format:"
             />
           </Text>
-          <Box flex="1">
+          <Box flex="1" minWidth="0">
             <SimpleSelect
               size="sm"
               options={grouped}

@@ -169,12 +169,12 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
       gridTemplateColumns={{ base: "1fr", xl: "fit-content(420px) 1fr" }}
       gridTemplateAreas={{ base: `"a" "c" "d"`, xl: `"a b" "c d"` }}
     >
-      <Stack>
+      <Stack minWidth="0">
         <Heading as="h4" size="md" fontWeight="semibold">
           <FormattedMessage id="branding.themes-header" defaultMessage="Themes" />
         </Heading>
         <HStack width="100%">
-          <Box flex="1">
+          <Box flex="1" minWidth="0">
             <DocumentThemeSelect
               onCreateNewTheme={handleCreateNewDocumentTheme}
               onChange={(t) => handleThemeChange(t!)}

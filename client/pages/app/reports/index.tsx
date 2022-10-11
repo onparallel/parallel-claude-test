@@ -184,7 +184,7 @@ export function Reports() {
                 flex="1"
                 maxWidth={{ base: "100%", md: "500px" }}
               >
-                <Box flex="1">
+                <Box flex="1" minWidth="0">
                   <SimpleSelect
                     options={templates.map((t) => ({
                       label:

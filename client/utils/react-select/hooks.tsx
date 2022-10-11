@@ -150,8 +150,6 @@ export function useReactSelectProps<
           "&:hover": {
             borderColor: isInvalid ? error : isFocused ? borderColor : borderColorHover,
           },
-          display: "grid",
-          gridTemplateColumns: "1fr auto",
         };
       },
       placeholder: (styles, { theme }) => {

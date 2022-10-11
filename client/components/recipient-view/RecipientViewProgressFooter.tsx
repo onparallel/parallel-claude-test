@@ -88,7 +88,7 @@ export function RecipientViewProgressFooter({
       bottom={0}
       borderRadius={0}
       borderX="none"
-      zIndex={1}
+      zIndex={2}
       {...props}
     >
       <Heading display="flex" as="h3" fontSize="md" fontWeight="normal" alignItems="center">
