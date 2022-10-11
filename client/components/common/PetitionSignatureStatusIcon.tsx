@@ -1,4 +1,4 @@
-import { Flex, PlacementWithLogical, Tooltip } from "@chakra-ui/react";
+import { Flex, PlacementWithLogical, Text, Tooltip } from "@chakra-ui/react";
 import {
   SignatureCancelledIcon,
   SignatureCompletedIcon,
@@ -36,7 +36,7 @@ export function PetitionSignatureStatusIcon({
         })}`.toUpperCase()
       : "";
 
-  const label = status !== "NO_SIGNATURE" ? labels[status] + envLabel : "";
+  const label = labels[status] + envLabel;
 
   const iconProps = useMemo(
     () => ({
@@ -66,7 +66,9 @@ export function PetitionSignatureStatusIcon({
           <SignatureCancelledIcon {...iconProps} />
         ) : status === "COMPLETED" ? (
           <SignatureCompletedIcon {...iconProps} />
-        ) : null}
+        ) : (
+          <Text color="gray.400">-</Text>
+        )}
       </Flex>
     </Tooltip>
   );
