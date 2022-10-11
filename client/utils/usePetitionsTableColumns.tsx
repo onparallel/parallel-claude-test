@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { Flex, HStack, IconButton, Text, VisuallyHidden } from "@chakra-ui/react";
 import { BellSettingsIcon, FolderIcon } from "@parallel/chakra/icons";
+import { CheckboxTableFilter } from "@parallel/components/common/CheckboxTableFilter";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -12,12 +13,14 @@ import { PetitionTagListCellContent } from "@parallel/components/common/Petition
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
-import { PetitionListGenericSimpleFilter } from "@parallel/components/petition-list/filters/PetitionListGenericSimpleFilter";
+import { withProps } from "@parallel/components/common/withProps";
 import { PetitionListSharedWithFilter } from "@parallel/components/petition-list/filters/shared-with/PetitionListSharedWithFilter";
 import { PetitionListTagFilter } from "@parallel/components/petition-list/filters/tags/PetitionListTagFilter";
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
 import {
   PetitionBaseType,
+  PetitionSignatureStatusFilter,
+  PetitionStatus,
   usePetitionsTableColumns_PetitionBaseFragment,
   usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment,
   usePetitionsTableColumns_PetitionBase_Petition_Fragment,
@@ -44,18 +47,6 @@ type PetitionsTableColumns_PetitionTemplateOrFolder = TableColumn<Template | Pet
 
 export function usePetitionsTableColumns(type: PetitionBaseType) {
   const intl = useIntl();
-
-  const petitionStatusLabels = usePetitionStatusLabels();
-  const statusFilterOptions = useMemo(
-    () => Object.entries(petitionStatusLabels).map(([value, text]) => ({ value, text })),
-    []
-  );
-
-  const signatureStatusLabels = usePetitionSignatureStatusLabels();
-  const signatureStatusFilterOptions = useMemo(
-    () => Object.entries(signatureStatusLabels).map(([value, text]) => ({ value, text })),
-    []
-  );
 
   return useMemo(
     () =>
@@ -162,7 +153,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   defaultMessage: "Status",
                 }),
                 isFilterable: true,
-                Filter: PetitionListGenericSimpleFilter(statusFilterOptions),
+                Filter: PetitionListStatusFilter,
                 align: "center",
                 cellProps: (row) =>
                   row.__typename === "Petition"
@@ -187,7 +178,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 }),
                 isFilterable: true,
                 align: "center",
-                Filter: PetitionListGenericSimpleFilter(signatureStatusFilterOptions),
+                Filter: PetitionListSignatureStatusFilter,
                 headerProps: { padding: 0 },
                 cellProps: { padding: 0 },
                 CellContent: ({ row }) =>
@@ -468,3 +459,31 @@ usePetitionsTableColumns.fragments = {
     ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}
   `,
 };
+
+const PetitionListStatusFilter = withProps(CheckboxTableFilter<PetitionStatus>, () => {
+  const statuses = usePetitionStatusLabels();
+  return {
+    options: useMemo(
+      () =>
+        Object.entries(statuses).map(([value, text]) => ({ value: value as PetitionStatus, text })),
+      []
+    ),
+  };
+});
+
+const PetitionListSignatureStatusFilter = withProps(
+  CheckboxTableFilter<PetitionSignatureStatusFilter>,
+  () => {
+    const statuses = usePetitionSignatureStatusLabels();
+    return {
+      options: useMemo(
+        () =>
+          Object.entries(statuses).map(([value, text]) => ({
+            value: value as PetitionSignatureStatusFilter,
+            text,
+          })),
+        []
+      ),
+    };
+  }
+);
