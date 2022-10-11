@@ -364,6 +364,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
               width="100%"
               maxWidth="container.lg"
               paddingX={4}
+              zIndex={1}
             >
               <Box
                 flex={{ base: 0, [breakpoint]: 1 }}
@@ -425,7 +426,11 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
             </Flex>
 
             {petition.status !== "CLOSED" && (
-              <RecipientViewProgressFooter petition={petition} onFinalize={handleFinalize} />
+              <RecipientViewProgressFooter
+                petition={petition}
+                onFinalize={handleFinalize}
+                zIndex={2}
+              />
             )}
           </Flex>
         </OverrideWithOrganizationTheme>

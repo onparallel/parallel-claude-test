@@ -339,6 +339,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               paddingY={6}
               paddingX={4}
               fontFamily="body"
+              zIndex={1}
             >
               <Box
                 flex={{ base: 0, [breakpoint]: 1 }}
@@ -405,6 +406,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 myEffectivePermission === "READ"
               }
               fontFamily="body"
+              zIndex={2}
             />
           )}
         </Flex>
