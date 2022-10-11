@@ -105,6 +105,7 @@ export const RecipientViewProgressFooter = Object.assign(
               value={replied}
               backgroundColor={isCompleted ? "green.400" : "yellow.400"}
             />
+
             <ProgressIndicator
               min={0}
               max={total}
