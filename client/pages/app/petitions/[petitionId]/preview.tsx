@@ -26,6 +26,7 @@ import { PetitionCompletedAlert } from "@parallel/components/petition-common/Pet
 import { PetitionPreviewOnlyAlert } from "@parallel/components/petition-common/PetitionPreviewOnlyAlert";
 import { PetitionPreviewSignatureReviewAlert } from "@parallel/components/petition-common/PetitionPreviewSignatureReviewAlert";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
+import { useHiddenFieldDialog } from "@parallel/components/petition-compose/dialogs/HiddenFieldDialog";
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PreviewPetitionField } from "@parallel/components/petition-preview/PreviewPetitionField";
@@ -115,6 +116,42 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage, {
     usePreviewReplies: !isPetition,
   });
+
+  useEffect(() => {
+    checkVisibilityFocusedField();
+  }, []);
+
+  const showHiddenFieldDialog = useHiddenFieldDialog();
+  const checkVisibilityFocusedField = async () => {
+    try {
+      const hash = window.location.hash;
+      if (hash && hash.includes("#field-")) {
+        const fieldId = hash.replace("#field-", "");
+        const field = petition.fields.find((f) => f.id === fieldId);
+        if (field && !visibility[field.position]) {
+          await showHiddenFieldDialog(field);
+        }
+      }
+    } catch (e: any) {
+      if (e.message === "CANCEL") {
+        const hash = window.location.hash;
+        const fieldId = hash.replace("#field-", "");
+
+        let href = `/app/petitions/${petitionId}/compose`;
+
+        if (isDefined(router.query.fromTemplate) || isDefined(router.query.new)) {
+          href += `/app/petitions/${petitionId}/compose?${new URLSearchParams({
+            ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
+            ...(isDefined(router.query.new) ? { new: "" } : {}),
+          })}`;
+        }
+
+        href += `#field-${fieldId}`;
+
+        router.push(href);
+      }
+    }
+  };
 
   const breakpoint = "md";
 
@@ -450,6 +487,8 @@ PetitionPreview.fragments = {
         }
       }
       fields {
+        id
+        position
         ...PreviewPetitionField_PetitionField
         ...useGetPageFields_PetitionField
         ...validatePetitionFields_PetitionField

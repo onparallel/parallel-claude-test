@@ -10,15 +10,20 @@ import {
   Button,
   ButtonProps,
   Center,
-  Flex,
   Grid,
   Heading,
+  HStack,
   IconButton,
   Stack,
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import { ArrowForwardIcon, CommentIcon, PaperclipIcon } from "@parallel/chakra/icons";
+import {
+  ArrowForwardIcon,
+  CommentIcon,
+  EditSimpleIcon,
+  PaperclipIcon,
+} from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
@@ -35,7 +40,9 @@ import { forwardRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { FieldDescription } from "../common/FieldDescription";
 import { FileAttachmentButton } from "../common/FileAttachmentButton";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
+import { NakedLink } from "../common/Link";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
 
@@ -51,6 +58,7 @@ export interface PetitionRepliesFieldProps extends BoxProps {
   ) => void;
   onToggleComments: () => void;
   onUpdateReplyStatus: (replyId: string, status: PetitionFieldReplyStatus) => void;
+  onEditReply: (replyId: string) => void;
   isDisabled?: boolean;
 }
 
@@ -65,12 +73,14 @@ export const PetitionRepliesField = Object.assign(
       onAction,
       onToggleComments,
       onUpdateReplyStatus,
+      onEditReply,
       isDisabled,
       ...props
     },
     ref
   ) {
     const intl = useIntl();
+
     const [petitionFieldAttachmentDownloadLink] = useMutation(
       PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument
     );
@@ -86,6 +96,23 @@ export const PetitionRepliesField = Object.assign(
       );
     };
 
+    const button = (
+      <NakedLink href={`/app/petitions/${petitionId}/compose#field-${field.id}`}>
+        <IconButtonWithTooltip
+          as="a"
+          display="none"
+          className="edit-field-button"
+          size="xs"
+          variant="ghost"
+          icon={<EditSimpleIcon />}
+          label={intl.formatMessage({
+            id: "component.petition-replies-field.edit-field",
+            defaultMessage: "Edit field",
+          })}
+        />
+      </NakedLink>
+    );
+
     return field.type === "HEADING" ? (
       <Grid
         ref={ref as any}
@@ -96,25 +123,17 @@ export const PetitionRepliesField = Object.assign(
         templateColumns="32px 10px 1fr 8px auto"
         gridTemplateAreas={`"index . heading . comments" ". . desc desc desc"`}
         {...props}
+        _focusWithin={{
+          ".edit-field-button": {
+            display: "inline-flex",
+          },
+        }}
+        _hover={{
+          ".edit-field-button": {
+            display: "inline-flex",
+          },
+        }}
       >
-        <Center gridArea="index">
-          <PetitionFieldTypeIndicator
-            as="span"
-            type={field.type}
-            fieldIndex={fieldIndex}
-            hideIcon
-          />
-        </Center>
-        <Flex gridArea="heading" alignItems="center" minWidth={0}>
-          <Heading size="md" flex="1" isTruncated {...(field.title ? {} : { textStyle: "hint" })}>
-            {field.isInternal ? (
-              <InternalFieldBadge marginRight={1.5} position="relative" top="-2px" />
-            ) : null}
-            {field.title || (
-              <FormattedMessage id="generic.empty-heading" defaultMessage="Untitled heading" />
-            )}
-          </Heading>
-        </Flex>
         <Box gridArea="comments">
           <CommentsButton
             data-action="see-field-comments"
@@ -124,6 +143,26 @@ export const PetitionRepliesField = Object.assign(
             onClick={onToggleComments}
           />
         </Box>
+        <Center gridArea="index">
+          <PetitionFieldTypeIndicator
+            as="span"
+            type={field.type}
+            fieldIndex={fieldIndex}
+            hideIcon
+          />
+        </Center>
+        <HStack gridArea="heading" alignItems="center" minWidth={0}>
+          <Heading size="md" isTruncated {...(field.title ? {} : { textStyle: "hint" })}>
+            {field.isInternal ? (
+              <InternalFieldBadge marginRight={1.5} position="relative" top="-2px" />
+            ) : null}
+            {field.title || (
+              <FormattedMessage id="generic.empty-heading" defaultMessage="Untitled heading" />
+            )}
+          </Heading>
+          {button}
+        </HStack>
+
         <Box gridArea="desc">
           {field.description ? (
             <FieldDescription
@@ -160,7 +199,26 @@ export const PetitionRepliesField = Object.assign(
         <Grid
           templateColumns="32px 10px 1fr 8px auto"
           gridTemplateAreas={`"index . heading . comments" ". . desc desc desc"`}
+          _focusWithin={{
+            ".edit-field-button": {
+              display: "inline-flex",
+            },
+          }}
+          _hover={{
+            ".edit-field-button": {
+              display: "inline-flex",
+            },
+          }}
         >
+          <Box gridArea="comments">
+            <CommentsButton
+              data-action="see-field-comments"
+              isActive={isShowingComments}
+              commentCount={field.comments.length}
+              hasUnreadComments={field.comments.some((c) => c.isUnread)}
+              onClick={onToggleComments}
+            />
+          </Box>
           <Box position="relative" gridArea="index">
             {!field.optional ? (
               <Tooltip
@@ -197,7 +255,7 @@ export const PetitionRepliesField = Object.assign(
               hideIcon
             />
           </Box>
-          <Flex gridArea="heading" alignItems="center">
+          <HStack gridArea="heading" alignItems="center">
             <Heading
               fontSize="md"
               as="h4"
@@ -212,16 +270,9 @@ export const PetitionRepliesField = Object.assign(
                 <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
               )}
             </Heading>
-          </Flex>
-          <Box gridArea="comments">
-            <CommentsButton
-              data-action="see-field-comments"
-              isActive={isShowingComments}
-              commentCount={field.comments.length}
-              hasUnreadComments={field.comments.some((c) => c.isUnread)}
-              onClick={onToggleComments}
-            />
-          </Box>
+            {button}
+          </HStack>
+
           <Box gridArea="desc">
             {field.description ? (
               <FieldDescription
@@ -269,6 +320,7 @@ export const PetitionRepliesField = Object.assign(
                   reply={reply}
                   onAction={(action) => onAction(action, reply)}
                   onUpdateStatus={(status) => onUpdateReplyStatus(reply.id, status)}
+                  onEditReply={onEditReply}
                   isDisabled={isDisabled}
                 />
               ))}

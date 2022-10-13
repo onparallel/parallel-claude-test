@@ -1740,6 +1740,16 @@
     "context": "Change name"
   },
   {
+    "term": "component.hidden-field-dialog.body",
+    "definition": "El campo que intentas previsualizar no es visible ahora mismo.",
+    "context": "The field you are trying to preview is not visible right now."
+  },
+  {
+    "term": "component.hidden-field-dialog.header",
+    "definition": "Campo no visible",
+    "context": "Field not visible"
+  },
+  {
     "term": "component.internal-field-badge.popover",
     "definition": "Los campos internos no serán visibles para el destinatario.",
     "context": "The internal fields will not be visible to the recipient."
@@ -2375,6 +2385,11 @@
     "context": "Add a description..."
   },
   {
+    "term": "component.petition-compose-field.field-preview",
+    "definition": "Previsualizar",
+    "context": "Preview"
+  },
+  {
     "term": "component.petition-compose-field.field-settings",
     "definition": "Ajustes de campo",
     "context": "Field settings"
@@ -2948,6 +2963,16 @@
     "term": "component.petition-replies-field.conditions-not-met",
     "definition": "No se cumplen las condiciones de visibilidad de este campo",
     "context": "Visibility conditions for this field are not met"
+  },
+  {
+    "term": "component.petition-replies-field.edit-field",
+    "definition": "Editar campo",
+    "context": "Edit field"
+  },
+  {
+    "term": "component.petition-replies-field.edit-field-reply",
+    "definition": "Editar respuesta",
+    "context": "Edit reply"
   },
   {
     "term": "component.petition-replies-field.no-replies",

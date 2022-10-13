@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, Grid, GridItem, HStack, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
-import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
+import { CheckIcon, CloseIcon, EditSimpleIcon } from "@parallel/chakra/icons";
 import {
   PetitionFieldReplyStatus,
   PetitionFieldType,
@@ -23,6 +23,7 @@ export interface PetitionRepliesFieldReplyProps {
   reply: PetitionRepliesFieldReply_PetitionFieldReplyFragment;
   onUpdateStatus: (status: PetitionFieldReplyStatus) => void;
   onAction: (action: PetitionRepliesFieldAction) => void;
+  onEditReply: (replyId: string) => void;
   isDisabled?: boolean;
 }
 
@@ -32,9 +33,11 @@ export function PetitionRepliesFieldReply({
   reply,
   onUpdateStatus,
   onAction,
+  onEditReply,
   isDisabled,
 }: PetitionRepliesFieldReplyProps) {
   const intl = useIntl();
+
   const singleContents = isFileTypeField(reply.field!.type)
     ? [reply.content]
     : Array.isArray(reply.content.value)
@@ -43,12 +46,41 @@ export function PetitionRepliesFieldReply({
       : reply.content.value
     : [reply.content.value];
 
+  const editReplyIconButton = (
+    <IconButtonWithTooltip
+      marginLeft={2}
+      position="absolute"
+      display="none"
+      className="edit-field-reply-button"
+      variant="ghost"
+      size="xs"
+      icon={<EditSimpleIcon />}
+      label={intl.formatMessage({
+        id: "component.petition-replies-field.edit-field-reply",
+        defaultMessage: "Edit reply",
+      })}
+      onClick={() => onEditReply(reply.id)}
+    />
+  );
+
   return (
     <HStack>
       <Grid flex="1" templateColumns="auto 1fr" columnGap={2}>
         {singleContents.map((content, i) => (
           <Fragment key={i}>
-            <GridItem paddingBottom={1}>
+            <GridItem
+              paddingBottom={1}
+              _focusWithin={{
+                "+ div .edit-field-reply-button": {
+                  display: "inline-flex",
+                },
+              }}
+              _hover={{
+                "+ div .edit-field-reply-button": {
+                  display: "inline-flex",
+                },
+              }}
+            >
               <CopyOrDownloadReplyButton reply={reply} content={content} onAction={onAction} />
             </GridItem>
             <GridItem
@@ -56,50 +88,70 @@ export function PetitionRepliesFieldReply({
               borderColor="gray.200"
               paddingBottom={1}
               paddingLeft={2}
+              _focusWithin={{
+                ".edit-field-reply-button": {
+                  display: "inline-flex",
+                },
+              }}
+              _hover={{
+                ".edit-field-reply-button": {
+                  display: "inline-flex",
+                },
+              }}
             >
-              {reply.isAnonymized ? (
-                <ReplyNotAvailable type={reply.field!.type} />
-              ) : isFileTypeField(reply.field!.type) ? (
-                <Box>
-                  <VisuallyHidden>
-                    {intl.formatMessage({
-                      id: "generic.file-name",
-                      defaultMessage: "File name",
-                    })}
-                  </VisuallyHidden>
-                  <Text as="span">{content.filename}</Text>
-                  <Text as="span" marginX={2}>
-                    -
+              <HStack alignItems={"center"} gridGap={2} spacing={0}>
+                {reply.isAnonymized ? (
+                  <ReplyNotAvailable type={reply.field!.type} />
+                ) : isFileTypeField(reply.field!.type) ? (
+                  <Box>
+                    <VisuallyHidden>
+                      {intl.formatMessage({
+                        id: "generic.file-name",
+                        defaultMessage: "File name",
+                      })}
+                    </VisuallyHidden>
+                    <Text as="span">{content.filename}</Text>
+                    <Text as="span" marginX={2}>
+                      -
+                    </Text>
+                    <Text
+                      as="span"
+                      aria-label={intl.formatMessage({
+                        id: "generic.file-size",
+                        defaultMessage: "File size",
+                      })}
+                      fontSize="sm"
+                      color="gray.500"
+                    >
+                      <FileSize value={content.size} />
+                    </Text>
+                    {editReplyIconButton}
+                  </Box>
+                ) : reply.field!.type === "NUMBER" ? (
+                  <Text wordBreak="break-all" whiteSpace="pre">
+                    {formatNumberWithPrefix(
+                      content as number,
+                      reply.field!.options as FieldOptions["NUMBER"]
+                    )}
+                    {editReplyIconButton}
                   </Text>
-                  <Text
-                    as="span"
-                    aria-label={intl.formatMessage({
-                      id: "generic.file-size",
-                      defaultMessage: "File size",
+                ) : reply.field!.type === "DATE" ? (
+                  <Text>
+                    {intl.formatDate(content, {
+                      ...FORMATS.L,
+                      timeZone: "UTC",
                     })}
-                    fontSize="sm"
-                    color="gray.500"
-                  >
-                    <FileSize value={content.size} />
+                    {editReplyIconButton}
                   </Text>
-                </Box>
-              ) : reply.field!.type === "NUMBER" ? (
-                <Text wordBreak="break-all" whiteSpace="pre">
-                  {formatNumberWithPrefix(
-                    content as number,
-                    reply.field!.options as FieldOptions["NUMBER"]
-                  )}
-                </Text>
-              ) : reply.field!.type === "DATE" ? (
-                <Text>
-                  {intl.formatDate(content, {
-                    ...FORMATS.L,
-                    timeZone: "UTC",
-                  })}
-                </Text>
-              ) : (
-                <BreakLines>{content}</BreakLines>
-              )}
+                ) : (
+                  <BreakLines>
+                    <Text as="span">
+                      {content}
+                      {editReplyIconButton}
+                    </Text>
+                  </BreakLines>
+                )}
+              </HStack>
             </GridItem>
           </Fragment>
         ))}

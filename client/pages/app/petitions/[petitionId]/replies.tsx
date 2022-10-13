@@ -463,6 +463,23 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const scope = useLiquidScope(petition);
 
+  const handleEditFieldReply = (replyId: string, fieldId: string) => {
+    let page = 1;
+    petition.fields.find((f) => {
+      if (f.type === "HEADING" && f.options.hasPageBreak) {
+        page += 1;
+      }
+      return f.id === fieldId;
+    });
+
+    const href = `/app/petitions/${petitionId}/preview?${new URLSearchParams({
+      ...router.query,
+      ...{ page: page.toString() },
+    })}#reply-${fieldId}-${replyId}`;
+
+    router.push(href);
+  };
+
   return (
     <PetitionLayout
       key={petition.id}
@@ -648,6 +665,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                       onUpdateReplyStatus={(replyId, status) =>
                         handleUpdateRepliesStatus(x.field.id, [replyId], status)
                       }
+                      onEditReply={(replyId) => {
+                        handleEditFieldReply(replyId, x.field.id);
+                      }}
                       isDisabled={myEffectivePermission === "READ"}
                     />
                   ) : (

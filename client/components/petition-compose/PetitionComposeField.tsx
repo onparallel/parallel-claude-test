@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { getColor } from "@chakra-ui/theme-tools";
 import {
+  ChevronRightIcon,
   ConditionIcon,
   CopyIcon,
   DeleteIcon,
@@ -31,13 +32,13 @@ import {
   PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument,
   PetitionComposeField_petitionFieldAttachmentUploadCompleteDocument,
   PetitionComposeField_PetitionFieldFragment,
-  PetitionFieldVisibilityEditor_PetitionFieldFragment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
 import { letters, PetitionFieldIndex } from "@parallel/utils/fieldIndices";
+import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { getMinMaxCheckboxLimit, usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
 import { withError } from "@parallel/utils/promises/withError";
@@ -45,6 +46,7 @@ import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { uploadFile } from "@parallel/utils/uploadFile";
 import useMergedRef from "@react-hook/merged-ref";
 import { fromEvent } from "file-selector";
+import { useRouter } from "next/router";
 import { memo, RefObject, useCallback, useImperativeHandle, useRef, useState } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { useDropzone } from "react-dropzone";
@@ -68,7 +70,7 @@ import { PetitionFieldVisibilityEditor } from "./PetitionFieldVisibilityEditor";
 export interface PetitionComposeFieldProps {
   petitionId: string;
   field: PetitionComposeField_PetitionFieldFragment;
-  fields: PetitionFieldVisibilityEditor_PetitionFieldFragment[];
+  fields: PetitionComposeField_PetitionFieldFragment[];
   fieldIndex: PetitionFieldIndex;
   index: number;
   isActive: boolean;
@@ -124,6 +126,7 @@ const _PetitionComposeField = chakraForwardRef<
   ref
 ) {
   const intl = useIntl();
+  const router = useRouter();
   const { elementRef, dragRef, previewRef, isDragging } = useDragAndDrop(
     field.id,
     index,
@@ -173,6 +176,25 @@ const _PetitionComposeField = chakraForwardRef<
         return url!;
       })
     );
+  };
+
+  const handlePreviewField = async () => {
+    try {
+      let page = 1;
+      fields.find((f) => {
+        if (f.type === "HEADING" && f.options.hasPageBreak) {
+          page += 1;
+        }
+        return f.id === field.id;
+      });
+
+      const href = `/app/petitions/${petitionId}/preview?${new URLSearchParams({
+        ...router.query,
+        ...{ page: page.toString() },
+      })}#field-${field.id}`;
+
+      router.push(href);
+    } catch {}
   };
 
   function updateAttachmentUploadingStatus(cache: DataProxy, id: string, isUploading: boolean) {
@@ -430,6 +452,7 @@ const _PetitionComposeField = chakraForwardRef<
           onDeleteClick={onDeleteClick}
           onVisibilityClick={onFieldVisibilityClick}
           onAttachmentClick={open}
+          onPreviewClick={handlePreviewField}
           className="field-actions"
           position="absolute"
           bottom={0}
@@ -825,6 +848,7 @@ interface PetitionComposeFieldActionsProps
   canChangeVisibility: boolean;
   onVisibilityClick: () => void;
   onAttachmentClick: () => void;
+  onPreviewClick: () => void;
   isReadOnly?: boolean;
   isAttachDisabled?: boolean;
 }
@@ -839,6 +863,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
       onCloneField,
       onSettingsClick,
       onDeleteClick,
+      onPreviewClick,
       isReadOnly,
       isAttachDisabled,
       ...props
@@ -957,6 +982,18 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
           })}
           onClick={onDeleteClick}
         />
+        <IconButtonWithTooltip
+          icon={<ChevronRightIcon boxSize={6} />}
+          size="sm"
+          variant="ghost"
+          placement="bottom"
+          color="gray.600"
+          label={intl.formatMessage({
+            id: "component.petition-compose-field.field-preview",
+            defaultMessage: "Preview",
+          })}
+          onClick={onPreviewClick}
+        />
       </Stack>
     );
   }
@@ -976,15 +1013,18 @@ const fragments = {
         isInternal
         isReadOnly
         visibility
+        position
         attachments {
           ...PetitionComposeField_PetitionFieldAttachment
         }
         ...PetitionFieldOptionsListEditor_PetitionField
         ...PetitionFieldVisibilityEditor_PetitionField
+        ...useFieldVisibility_PetitionField
       }
       ${this.PetitionFieldAttachment}
       ${PetitionFieldOptionsListEditor.fragments.PetitionField}
       ${PetitionFieldVisibilityEditor.fragments.PetitionField}
+      ${useFieldVisibility.fragments.PetitionField}
     `;
   },
   get PetitionFieldAttachment() {

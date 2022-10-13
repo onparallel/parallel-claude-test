@@ -22,6 +22,7 @@ import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { Maybe, UnionToArrayUnion } from "@parallel/utils/types";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
 import { Card, CardHeader } from "../common/Card";
@@ -51,8 +52,26 @@ export const RecipientViewContentsCard = Object.assign(
     const { query } = useRouter();
     const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage, usePreviewReplies);
 
+    useEffect(() => {
+      const hash = window.location.hash;
+      if (hash && hash.includes("#field-")) {
+        const fieldId = hash.replace("#field-", "");
+        const field = (fields as PetitionFieldSelection[]).find((f) => f.id === fieldId);
+
+        if (field) {
+          handleFocusField(field);
+        }
+      }
+    }, []);
+
     const handleFocusField = (field: PetitionFieldSelection) => {
-      if (field.type === "SHORT_TEXT" || field.type === "TEXT") {
+      if (
+        field.type === "SHORT_TEXT" ||
+        field.type === "TEXT" ||
+        field.type === "DATE" ||
+        field.type === "NUMBER" ||
+        field.type === "PHONE"
+      ) {
         const id = `reply-${field.id}-${field.replies[0]?.id ?? "new"}`;
         const element = document.getElementById(id) as HTMLInputElement;
         element?.focus();

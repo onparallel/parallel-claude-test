@@ -146,6 +146,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     if (hash) {
       if (hash.includes("#field-settings-")) {
         handleFieldSettingsClick(hash.replace("#field-settings-", ""));
+      } else if (hash.includes("#field-")) {
+        handleIndexFieldClick(hash.replace("#field-", ""));
       } else {
         const { error, fieldsWithIndices } = validatePetitionFields(petition.fields);
         if (error && fieldsWithIndices && fieldsWithIndices.length > 0) {
