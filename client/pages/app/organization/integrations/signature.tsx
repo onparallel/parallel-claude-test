@@ -133,7 +133,7 @@ function IntegrationsSignature() {
   const handleDeleteIntegration = async (id: string) => {
     if (numberOfIntegrations < 2) return;
     try {
-      await removeSignatureToken({});
+      await removeSignatureToken();
       await deleteSignatureIntegration({ variables: { id } });
     } catch (error) {
       if (isApolloError(error, "SIGNATURE_INTEGRATION_IN_USE_ERROR")) {

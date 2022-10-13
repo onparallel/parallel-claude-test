@@ -87,7 +87,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
   const showInviteUserDialog = useInviteUserDialog();
   async function handleInviteUser() {
     try {
-      const user = await showInviteUserDialog({});
+      const user = await showInviteUserDialog();
 
       await createOrganizationUser({
         variables: {

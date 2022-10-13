@@ -111,7 +111,7 @@ export function PetitionListHeader({
       if (state.type === "PETITION") {
         navigate(`/app/petitions/new`);
       } else {
-        const templateId = await showNewTemplateDialog({});
+        const templateId = await showNewTemplateDialog();
         if (!templateId) {
           handleCreateTemplate();
         } else {

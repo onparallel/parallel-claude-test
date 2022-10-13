@@ -83,7 +83,7 @@ export function useConfirmDiscardDraftDialog(
     },
     confirmNavigation: useCallback(async () => {
       try {
-        if ((await showConfirmDiscardDraftDialog({})) === "DISCARD") {
+        if ((await showConfirmDiscardDraftDialog()) === "DISCARD") {
           await deletePetitions([petition], "PETITION", undefined, true);
         }
         setShouldConfirmNavigation(false);

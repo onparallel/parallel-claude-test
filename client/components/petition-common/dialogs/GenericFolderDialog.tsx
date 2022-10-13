@@ -142,7 +142,7 @@ export function GenericFolderDialog({
   const showNewFolderNameDialog = useNewFolderNameDialog();
   async function handleCreateNewFolder() {
     try {
-      const name = await showNewFolderNameDialog({});
+      const name = await showNewFolderNameDialog();
       const path = selectedPath + name + "/";
       const id = treeViewData!.length;
       const parent = treeViewData!.find((n) => n.path === selectedPath)!;

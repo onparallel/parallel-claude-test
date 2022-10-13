@@ -166,7 +166,7 @@ export function AddPetitionAccessDialog({
         setShowErrors(true);
         return;
       }
-      const scheduledAt = schedule ? await showScheduleMessageDialog({}) : null;
+      const scheduledAt = schedule ? await showScheduleMessageDialog() : null;
 
       // if the petition has signer contacts configured,
       // ask user if they want that contact(s) to sign all the petitions

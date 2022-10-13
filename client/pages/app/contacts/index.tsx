@@ -118,7 +118,7 @@ function Contacts() {
   const showImportContactsDialog = useImportContactsDialog();
 
   async function handleImportClick() {
-    const [error, data] = await withError(showImportContactsDialog({}));
+    const [error, data] = await withError(showImportContactsDialog());
     if (!error) {
       await refetch();
       showToast({

@@ -124,7 +124,7 @@ export function RecipientSelectGroups({
       );
       return;
     }
-    const [, result] = await withError(showMultipleEmailsDialog({}));
+    const [, result] = await withError(showMultipleEmailsDialog());
     if (result === "SEPARATE_GROUPS") {
       onChangeRecipientGroups([
         ...recipientGroups.slice(0, groupNumber),

@@ -117,7 +117,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
     } catch (e) {
       if (isDialogError(e) && e.reason === "DELETE_THEME") {
         try {
-          await showConfirmDeleteThemeDialog({});
+          await showConfirmDeleteThemeDialog();
           const { data } = await deleteOrganizationPdfDocumentTheme({
             variables: { orgThemeId: selectedTheme.id },
           });
@@ -135,7 +135,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
   async function handleThemeChange(theme: BrandingDocumentTheme_OrganizationThemeFragment) {
     if (isDirty) {
       try {
-        await showConfirmDiscardChangesDialog({});
+        await showConfirmDiscardChangesDialog();
         setSelectedTheme(theme);
       } catch {}
     } else {

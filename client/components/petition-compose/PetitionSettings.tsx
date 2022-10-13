@@ -169,7 +169,7 @@ function _PetitionSettings({
       ].some(([after, before]) => after !== before);
 
       if (ongoingSignatureRequest && signatureConfigHasChanged) {
-        await showConfirmSignatureConfigChanged({});
+        await showConfirmSignatureConfigChanged();
       }
       await onUpdatePetition({ signatureConfig });
 
@@ -192,7 +192,7 @@ function _PetitionSettings({
     } else {
       try {
         if (ongoingSignatureRequest) {
-          await showConfirmDisableOngoingSignature({});
+          await showConfirmDisableOngoingSignature();
           await cancelSignatureRequest({
             variables: {
               petitionSignatureRequestId: ongoingSignatureRequest.id,
@@ -208,7 +208,7 @@ function _PetitionSettings({
   async function handleSkipForwardSecurityChange(value: boolean) {
     try {
       if (value) {
-        await showConfirmSkipForwardSecurity({});
+        await showConfirmSkipForwardSecurity();
       }
       await onUpdatePetition({ skipForwardSecurity: value });
     } catch {}
@@ -364,7 +364,7 @@ function _PetitionSettings({
   const handleRestrictPetition = async (value: boolean) => {
     try {
       if (value) {
-        const { password } = await configRestrictPetitionDialog({});
+        const { password } = await configRestrictPetitionDialog();
         await updatePetitionRestriction({
           variables: {
             petitionId: petition.id,
@@ -1070,7 +1070,7 @@ function DeadlineInput({
 
   async function handleOpenDeadlineDialog() {
     try {
-      const date = await showPetitionDeadlineDialog({});
+      const date = await showPetitionDeadlineDialog();
       onChange(date);
     } catch {}
   }

@@ -57,7 +57,7 @@ export function useAutoConfirmDiscardChangesDialog(hasChanges: boolean) {
     shouldConfirmNavigation: hasChanges,
     confirmNavigation: useCallback(async () => {
       try {
-        await showConfirmDiscardChangesDialog({});
+        await showConfirmDiscardChangesDialog();
         return true;
       } catch {
         return false;

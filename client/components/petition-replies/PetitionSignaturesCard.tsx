@@ -275,7 +275,7 @@ export const PetitionSignaturesCard = Object.assign(
       assertTypenameArray(signatureIntegrations, "SignatureOrgIntegration");
       try {
         if (current?.status === "COMPLETED") {
-          await showConfirmRestartSignature({});
+          await showConfirmRestartSignature();
         }
         const signatureConfig = await showSignatureConfigDialog({
           user,

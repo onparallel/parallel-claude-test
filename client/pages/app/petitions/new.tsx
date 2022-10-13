@@ -203,7 +203,7 @@ function NewPetition() {
   const showNewTemplateDialog = useNewTemplateDialog();
   const handleCreateTemplateClick = async () => {
     try {
-      const templateId = await showNewTemplateDialog({});
+      const templateId = await showNewTemplateDialog();
       if (!templateId) {
         handleCreateTemplate();
       } else {

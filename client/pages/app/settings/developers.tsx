@@ -73,7 +73,7 @@ function Developers() {
   const showGenerateNewTokenDialog = useGenerateNewTokenDialog();
   const handleGenerateNewToken = async () => {
     try {
-      await showGenerateNewTokenDialog({});
+      await showGenerateNewTokenDialog();
       await refetchTokens();
     } catch {}
   };
@@ -503,7 +503,7 @@ function useSubscriptionsColumns(): TableColumn<
           async function handleToggleChange(e: any) {
             try {
               if (!e.target.checked) {
-                await showConfirmDeactivateEventSubscriptionDialog({});
+                await showConfirmDeactivateEventSubscriptionDialog();
                 onToggleEnabled(row.id, false);
               } else {
                 onToggleEnabled(row.id, true);

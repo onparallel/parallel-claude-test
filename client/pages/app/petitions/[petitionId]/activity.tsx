@@ -185,7 +185,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const handleCancelScheduledMessage = useCallback(
     async (messageId: string) => {
       try {
-        await confirmCancelScheduledMessage({});
+        await confirmCancelScheduledMessage();
       } catch {
         return;
       }

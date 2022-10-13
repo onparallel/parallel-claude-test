@@ -94,7 +94,7 @@ export function PetitionTagListCellContent({
 
   const showTagEditDialog = useTagEditDialog();
   const handleEditTags = async () => {
-    await withError(showTagEditDialog({}));
+    await withError(showTagEditDialog());
   };
 
   const [createTag] = useMutation(PetitionTagListCellContent_createTagDocument);

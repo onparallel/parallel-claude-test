@@ -84,7 +84,7 @@ export function useHandledPetitionFromTemplateDialog() {
 
   return useCallback(async () => {
     if (showPetitionFromTemplateDialogUserPreference) {
-      const { dontShow } = await showPetitionFromTemplateDialog({});
+      const { dontShow } = await showPetitionFromTemplateDialog();
       if (dontShow) {
         setShowPetitionFromTemplateDialogUserPreference(false);
       }

@@ -126,7 +126,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const showPublicTemplateDialog = usePublicTemplateDialog();
   useEffect(() => {
     if (isPublicTemplate) {
-      withError(showPublicTemplateDialog({}));
+      withError(showPublicTemplateDialog());
     }
   }, []);
 
@@ -202,7 +202,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         return;
       } catch {}
       try {
-        await confirmDelete({});
+        await confirmDelete();
         await deletePetitionField({
           variables: { petitionId, fieldId, force: true },
         });
@@ -287,7 +287,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         }
         try {
           if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
-            await confirmChangeFormat({});
+            await confirmChangeFormat();
             await updatePetitionField({
               variables: { petitionId, fieldId, data, force: true },
             });
@@ -342,7 +342,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         return;
       } catch {}
       try {
-        await confirmChangeFieldType({});
+        await confirmChangeFieldType();
         await changePetitionFieldType({
           variables: { petitionId, fieldId, type, force: true },
         });

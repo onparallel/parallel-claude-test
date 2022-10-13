@@ -23,15 +23,23 @@ export type DialogOpener = <TProps = {}, TResult = void>(
 
 const DialogOpenerContext = createContext<DialogOpener | null>(null);
 
+type UseDialogReturn<TProps = {}, TResult = void> = {
+  (
+    ...args: [keyof Omit<TProps, keyof DialogCallbacks>] extends [never]
+      ? []
+      : [props: Omit<TProps, keyof DialogCallbacks>]
+  ): Promise<TResult>;
+};
+
 export function useDialog<TProps = {}, TResult = void>(
   // eslint-disable-next-line @typescript-eslint/naming-convention
   Dialog: ComponentType<DialogProps<TProps, TResult>>
-): (props: Omit<TProps, keyof DialogCallbacks>) => Promise<TResult> {
+): UseDialogReturn<TProps, TResult> {
   const opener = useContext(DialogOpenerContext)!;
   return useCallback(
-    (props: Omit<TProps, keyof DialogCallbacks>) =>
+    (props?: Omit<TProps, keyof DialogCallbacks>) =>
       opener((callbacks: DialogCallbacks<TResult>) => (
-        <Dialog {...callbacks} {...(props as any)} />
+        <Dialog {...callbacks} {...((props as any) ?? {})} />
       )),
     [Dialog]
   );

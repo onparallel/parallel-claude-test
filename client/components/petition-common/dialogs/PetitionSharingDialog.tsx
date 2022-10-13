@@ -226,7 +226,7 @@ export function PetitionSharingDialog({
         const id = user ? user.id : userGroup?.id;
 
         if (id === userId && permissionType === "READ") {
-          await confirmEditPetitionPermission({});
+          await confirmEditPetitionPermission();
         }
         await editPetitionPermission({
           variables: { petitionId, [prop]: [id], permissionType },

@@ -352,7 +352,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           throw error;
         }
         if (isApolloError(error, "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR")) {
-          await petitionAlreadyNotifiedDialog({});
+          await petitionAlreadyNotifiedDialog();
           await sendPetitionClosedNotification({
             variables: {
               petitionId: petition.id,
@@ -390,7 +390,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           )) ??
         false;
       if (hasPendingSignature || petition.signatureConfig) {
-        await showConfirmCancelOngoingSignature({});
+        await showConfirmCancelOngoingSignature();
         if (hasPendingSignature) {
           await cancelSignatureRequest({
             variables: {
@@ -411,7 +411,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         f.replies.some((r) => r.status === "PENDING")
       );
 
-      const option = hasUnreviewedReplies ? await showSolveUnreviewedRepliesDialog({}) : "APPROVE";
+      const option = hasUnreviewedReplies ? await showSolveUnreviewedRepliesDialog() : "APPROVE";
 
       await handleFinishPetition({ requiredMessage: false });
 

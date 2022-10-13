@@ -202,7 +202,7 @@ export const PetitionHeader = Object.assign(
 
     const handleReopenPetition = useCallback(async () => {
       try {
-        await confirmReopenPetitionDialog({});
+        await confirmReopenPetitionDialog();
         await reopenPetition({
           variables: {
             petitionId: petition.id,

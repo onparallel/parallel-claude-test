@@ -94,7 +94,7 @@ function AdminOrganizations() {
   const showCreateOrganizationDialog = useCreateOrganizationDialog();
   async function handleCreateOrganization() {
     try {
-      const organization = await showCreateOrganizationDialog({});
+      const organization = await showCreateOrganizationDialog();
 
       await createOrganization({
         variables: {

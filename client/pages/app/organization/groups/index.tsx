@@ -192,7 +192,7 @@ function OrganizationGroups() {
   const showCreateGroupDialog = useCreateGroupDialog();
   const handleCreateGroup = async () => {
     try {
-      const newGroup = await showCreateGroupDialog({});
+      const newGroup = await showCreateGroupDialog();
       await createUserGroup({
         variables: {
           name: newGroup.name,
