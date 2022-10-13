@@ -13,7 +13,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { CommentIcon } from "@parallel/chakra/icons";
+import { CommentIcon, ExclamationOutlineIcon } from "@parallel/chakra/icons";
 import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PublicPetitionFieldComment } from "@parallel/components/common/PublicPetitionFieldComment";
@@ -156,7 +156,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
         />
         {loading ? null : (
           <ModalHeader paddingRight={12}>
-            {field!.title || (
+            {field?.title || (
               <Text fontWeight="normal" textStyle="hint">
                 <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
               </Text>
@@ -184,22 +184,36 @@ export function RecipientViewPetitionFieldCommentsDialog({
               alignItems="center"
               textAlign="center"
             >
-              <CommentIcon color="gray.300" boxSize="64px" />
-              <Text color="gray.500">
-                {access.granter!.fullName ? (
-                  <FormattedMessage
-                    id="recipient-view.field-comments.cta-with-name"
-                    defaultMessage="{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask {name} here"
-                    values={{ name: access.granter!.fullName, tone }}
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="recipient-view.field-comments.cta"
-                    defaultMessage="{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask here"
-                    values={{ tone }}
-                  />
-                )}
-              </Text>
+              {field ? (
+                <>
+                  <CommentIcon color="gray.300" boxSize="64px" />
+                  <Text color="gray.500">
+                    {access.granter!.fullName ? (
+                      <FormattedMessage
+                        id="recipient-view.field-comments.cta-with-name"
+                        defaultMessage="{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask {name} here"
+                        values={{ name: access.granter!.fullName, tone }}
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="recipient-view.field-comments.cta"
+                        defaultMessage="{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask here"
+                        values={{ tone }}
+                      />
+                    )}
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <ExclamationOutlineIcon color="red.300" boxSize="64px" marginBottom={4} />
+                  <Text color="red.500">
+                    <FormattedMessage
+                      id="recipient-view.field-comments.undefined-field"
+                      defaultMessage="Something unexpected happened. Please, refresh the page and try again."
+                    />
+                  </Text>
+                </>
+              )}
             </Flex>
           ) : (
             <Stack spacing={0} divider={<Divider />} overflow="auto">
@@ -232,8 +246,13 @@ export function RecipientViewPetitionFieldCommentsDialog({
                     },
                     { tone }
                   )}
+                  isDisabled={!field}
                 />
-                <Button colorScheme="primary" isDisabled={isDraftEmpty} onClick={handleSubmitClick}>
+                <Button
+                  colorScheme="primary"
+                  isDisabled={isDraftEmpty || !field}
+                  onClick={handleSubmitClick}
+                >
                   <FormattedMessage id="generic.submit" defaultMessage="Submit" />
                 </Button>
               </HStack>

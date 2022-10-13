@@ -8810,6 +8810,11 @@
     "context": "Ask here your questions and doubts"
   },
   {
+    "term": "recipient-view.field-comments.undefined-field",
+    "definition": "Something unexpected happened. Please, refresh the page and try again.",
+    "context": "Something unexpected happened. Please, refresh the page and try again."
+  },
+  {
     "term": "recipient-view.first-time.finalize-whenever-body",
     "definition": "Either from the link in your email or by copying the url of this page, you can return at any point and finalize the parallel.",
     "context": "Either from the link in your email or by copying the url of this page, you can return at any point and finalize the parallel."

@@ -8810,6 +8810,11 @@
     "context": "Ask here your questions and doubts"
   },
   {
+    "term": "recipient-view.field-comments.undefined-field",
+    "definition": "Ha ocurrido algo inesperado. Por favor, actualice la página e inténtelo de nuevo.",
+    "context": "Something unexpected happened. Please, refresh the page and try again."
+  },
+  {
     "term": "recipient-view.first-time.finalize-whenever-body",
     "definition": "Desde el correo o copiando el enlace de esta página, {tone, select, INFORMAL{podrás cerrar y volver para terminar de completarlo cuando quieras.} other{ podrá volver para terminar de completar la información en otro momento.}}",
     "context": "Either from the link in your email or by copying the url of this page, you can return at any point and finalize the parallel."
