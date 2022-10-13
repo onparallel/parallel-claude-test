@@ -3,7 +3,11 @@ import yargs from "yargs";
 import { run } from "./utils/run";
 
 async function main() {
-  const { commit: _commit, env } = await yargs
+  const {
+    commit: _commit,
+    env,
+    skipBuild,
+  } = await yargs
     .usage("Usage: $0 --commit [commit] --env [env]")
     .option("commit", {
       required: true,
@@ -14,12 +18,17 @@ async function main() {
       required: true,
       choices: ["staging", "production"],
       description: "The environment for the build",
+    })
+    .option("skip-build", {
+      default: false,
+      type: "boolean",
+      description: "Wether to skip the build step",
     }).argv;
 
   const commit = _commit.slice(0, 7);
 
   for (const command of [
-    `yarn build-release --commit ${commit} --env ${env}`,
+    ...(skipBuild ? [] : [`yarn build-release --commit ${commit} --env ${env}`]),
     `yarn launch-instance --commit ${commit} --env ${env}`,
     `yarn switch-release --commit ${commit} --env ${env}`,
     `yarn prune-instances --env ${env}`,
