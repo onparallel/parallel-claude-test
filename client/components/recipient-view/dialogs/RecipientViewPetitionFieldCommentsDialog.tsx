@@ -109,7 +109,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
         editorRef.current?.clear();
       } catch {}
     }
-    closeRef.current!.focus();
+    closeRef.current?.focus();
   }
 
   const [updatePetitionFieldComment] = useMutation(
@@ -146,7 +146,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
 
   return (
     <BaseDialog closeOnOverlayClick={false} {...props}>
-      <ModalContent maxHeight="calc(100vh - 7.5rem)" minHeight="18rem">
+      <ModalContent maxHeight="calc(100vh - 7.5rem)">
         <ModalCloseButton
           ref={closeRef}
           aria-label={intl.formatMessage({
