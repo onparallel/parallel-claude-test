@@ -1847,7 +1847,10 @@ export type Petition = PetitionBase & {
   fields: Array<PetitionField>;
   /** The template used for this petition */
   fromTemplate: Maybe<PetitionBaseMini>;
-  /** The template GID used for this petition */
+  /**
+   * The template GID used for this petition
+   * @deprecated use fromTemplate.id
+   */
   fromTemplateId: Maybe<Scalars["GID"]>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
@@ -3907,8 +3910,8 @@ export type PetitionFragment = {
   deadline: string | null;
   locale: PetitionLocale;
   createdAt: string;
-  fromTemplateId: string | null;
   customProperties: { [key: string]: any };
+  fromTemplate: { id: string } | null;
   recipients: Array<{
     recipientUrl: string | null;
     id: string;
@@ -4093,8 +4096,8 @@ export type GetPetitions_petitionsQuery = {
           deadline: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          fromTemplateId: string | null;
           customProperties: { [key: string]: any };
+          fromTemplate: { id: string } | null;
           recipients: Array<{
             recipientUrl: string | null;
             id: string;
@@ -4179,8 +4182,8 @@ export type CreatePetition_petitionMutation = {
         deadline: string | null;
         locale: PetitionLocale;
         createdAt: string;
-        fromTemplateId: string | null;
         customProperties: { [key: string]: any };
+        fromTemplate: { id: string } | null;
         recipients: Array<{
           recipientUrl: string | null;
           id: string;
@@ -4262,8 +4265,8 @@ export type GetPetition_petitionQuery = {
         deadline: string | null;
         locale: PetitionLocale;
         createdAt: string;
-        fromTemplateId: string | null;
         customProperties: { [key: string]: any };
+        fromTemplate: { id: string } | null;
         recipients: Array<{
           recipientUrl: string | null;
           id: string;
@@ -4347,8 +4350,8 @@ export type UpdatePetition_updatePetitionMutation = {
         deadline: string | null;
         locale: PetitionLocale;
         createdAt: string;
-        fromTemplateId: string | null;
         customProperties: { [key: string]: any };
+        fromTemplate: { id: string } | null;
         recipients: Array<{
           recipientUrl: string | null;
           id: string;
@@ -4508,8 +4511,8 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
       deadline: string | null;
       locale: PetitionLocale;
       createdAt: string;
-      fromTemplateId: string | null;
       customProperties: { [key: string]: any };
+      fromTemplate: { id: string } | null;
       recipients: Array<{
         recipientUrl: string | null;
         id: string;
@@ -5603,8 +5606,8 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
     deadline: string | null;
     locale: PetitionLocale;
     createdAt: string;
-    fromTemplateId: string | null;
     customProperties: { [key: string]: any };
+    fromTemplate: { id: string } | null;
     recipients: Array<{
       recipientUrl: string | null;
       id: string;
@@ -5834,7 +5837,9 @@ export const PetitionFragmentDoc = gql`
     deadline
     locale
     createdAt
-    fromTemplateId
+    fromTemplate {
+      id
+    }
     customProperties
     recipients: accesses @include(if: $includeRecipients) {
       ...PetitionAccess

@@ -212,10 +212,23 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
   };
 }
 
-export function mapPetition<T extends Pick<PetitionFragment, "tags" | "fields" | "replies">>(
-  petition: T
-) {
-  return pipe(petition, mapPetitionFieldRepliesContent, mapPetitionTags, mapPetitionReplies);
+function mapPetitionBase<T extends Pick<PetitionFragment, "fromTemplate">>(petition: T) {
+  return {
+    ...omit(petition, ["fromTemplate"]),
+    fromTemplateId: petition.fromTemplate?.id ?? null,
+  };
+}
+
+export function mapPetition<
+  T extends Pick<PetitionFragment, "fromTemplate" | "tags" | "fields" | "replies">
+>(petition: T) {
+  return pipe(
+    petition,
+    mapPetitionBase,
+    mapPetitionFieldRepliesContent,
+    mapPetitionTags,
+    mapPetitionReplies
+  );
 }
 
 export function mapTemplate<T extends Pick<TemplateFragment, "tags" | "fields">>(petition: T) {

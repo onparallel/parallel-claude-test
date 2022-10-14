@@ -2167,7 +2167,7 @@ type Petition implements PetitionBase {
   """
   The template GID used for this petition
   """
-  fromTemplateId: GID
+  fromTemplateId: GID @deprecated(reason: "use fromTemplate.id")
 
   """
   The ID of the petition or template.

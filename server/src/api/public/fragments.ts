@@ -126,7 +126,9 @@ export const PetitionFragment = gql`
     deadline
     locale
     createdAt
-    fromTemplateId
+    fromTemplate {
+      id
+    }
     customProperties
     recipients: accesses @include(if: $includeRecipients) {
       ...PetitionAccess

@@ -377,7 +377,9 @@ export const Petition = objectType({
         });
       },
     });
+    /** @deprecated */
     t.nullable.globalId("fromTemplateId", {
+      deprecation: "use fromTemplate.id",
       description: "The template GID used for this petition",
       resolve: (root) => root.from_template_id,
     });

@@ -785,7 +785,7 @@ function _PetitionSettings({
           controlId="hide-recipient-view-contents"
         />
       ) : null}
-      {petition.__typename === "Petition" && petition.fromTemplateId ? (
+      {petition.__typename === "Petition" && petition.fromTemplate ? (
         <Alert status="info" background="transparent" padding={0}>
           <AlertIcon />
           <AlertDescription fontStyle="italic">
@@ -793,23 +793,15 @@ function _PetitionSettings({
               id="component.petition-settings.from-template-information"
               defaultMessage="Parallel created from the {name}."
               values={{
-                name:
-                  petition.fromTemplateId && !petition.fromTemplate ? (
-                    <Text textStyle="hint" as="span">
-                      <FormattedMessage
-                        id="component.petition-settings.template-not-available"
-                        defaultMessage="Template not available"
-                      />
-                    </Text>
-                  ) : (
-                    <Text textStyle={petition.fromTemplate?.name ? undefined : "hint"} as="span">
-                      {petition.fromTemplate?.name ??
-                        intl.formatMessage({
-                          id: "generic.unnamed-template",
-                          defaultMessage: "Unnamed template",
-                        })}
-                    </Text>
-                  ),
+                name: (
+                  <Text textStyle={petition.fromTemplate.name ? undefined : "hint"} as="span">
+                    {petition.fromTemplate.name ??
+                      intl.formatMessage({
+                        id: "generic.unnamed-template",
+                        defaultMessage: "Unnamed template",
+                      })}
+                  </Text>
+                ),
               }}
             />
           </AlertDescription>
@@ -893,7 +885,6 @@ const fragments = {
           id
           status
         }
-        fromTemplateId
         fromTemplate {
           id
           name

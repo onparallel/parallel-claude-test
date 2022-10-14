@@ -1893,7 +1893,10 @@ export interface Petition extends PetitionBase {
   fields: Array<PetitionField>;
   /** The template used for this petition */
   fromTemplate?: Maybe<PetitionBaseMini>;
-  /** The template GID used for this petition */
+  /**
+   * The template GID used for this petition
+   * @deprecated use fromTemplate.id
+   */
   fromTemplateId?: Maybe<Scalars["GID"]>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
@@ -9304,7 +9307,6 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
   status: PetitionStatus;
   deadline?: string | null;
-  fromTemplateId?: string | null;
   id: string;
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
@@ -16489,7 +16491,6 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   isAnonymized: boolean;
   name?: string | null;
   deadline?: string | null;
-  fromTemplateId?: string | null;
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
@@ -16866,7 +16867,6 @@ export type PetitionCompose_updatePetitionMutation = {
         name?: string | null;
         status: PetitionStatus;
         deadline?: string | null;
-        fromTemplateId?: string | null;
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
         isRecipientViewContentsHidden: boolean;
@@ -17472,7 +17472,6 @@ export type PetitionCompose_petitionQuery = {
         isAnonymized: boolean;
         name?: string | null;
         deadline?: string | null;
-        fromTemplateId?: string | null;
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
         isRecipientViewContentsHidden: boolean;
@@ -26325,7 +26324,6 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
         id
         status
       }
-      fromTemplateId
       fromTemplate {
         id
         name

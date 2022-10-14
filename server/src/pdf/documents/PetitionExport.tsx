@@ -337,7 +337,7 @@ export default function PetitionExport({
                 isDefined(petition.currentSignatureRequest) ? (
                   <SignaturesBlock
                     signatureConfig={petition.currentSignatureRequest.signatureConfig}
-                    templateId={petition.fromTemplateId}
+                    templateId={petition.fromTemplate?.id ?? null}
                     style={styles.signaturesBlock}
                   />
                 ) : null}
@@ -398,7 +398,9 @@ PetitionExport.fragments = {
           data
         }
         ... on Petition {
-          fromTemplateId
+          fromTemplate {
+            id
+          }
           currentSignatureRequest {
             signatureConfig {
               ...SignaturesBlock_SignatureConfig

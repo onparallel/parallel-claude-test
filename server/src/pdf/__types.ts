@@ -1847,7 +1847,10 @@ export type Petition = PetitionBase & {
   fields: Array<PetitionField>;
   /** The template used for this petition */
   fromTemplate: Maybe<PetitionBaseMini>;
-  /** The template GID used for this petition */
+  /**
+   * The template GID used for this petition
+   * @deprecated use fromTemplate.id
+   */
   fromTemplateId: Maybe<Scalars["GID"]>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
@@ -3810,9 +3813,9 @@ export type SignaturesBlock_SignatureConfigFragment = {
 
 export type PetitionExport_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
-  fromTemplateId: string | null;
   id: string;
   name: string | null;
+  fromTemplate: { id: string } | null;
   currentSignatureRequest: {
     signatureConfig: {
       timezone: string;
@@ -3893,9 +3896,9 @@ export type PetitionExport_petitionQuery = {
   petition:
     | {
         __typename: "Petition";
-        fromTemplateId: string | null;
         id: string;
         name: string | null;
+        fromTemplate: { id: string } | null;
         currentSignatureRequest: {
           signatureConfig: {
             timezone: string;
@@ -4028,7 +4031,9 @@ export const PetitionExport_PetitionBaseFragmentDoc = gql`
       data
     }
     ... on Petition {
-      fromTemplateId
+      fromTemplate {
+        id
+      }
       currentSignatureRequest {
         signatureConfig {
           ...SignaturesBlock_SignatureConfig

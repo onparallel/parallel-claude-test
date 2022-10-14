@@ -3145,11 +3145,6 @@
     "context": "If you disable Forward Security recipients will be able to share their links and other people might be able to access the data submitted so far."
   },
   {
-    "term": "component.petition-settings.template-not-available",
-    "definition": "Plantilla no disponible",
-    "context": "Template not available"
-  },
-  {
     "term": "component.petition-sharing-dialog.subscribe",
     "definition": "Subscribir a las notificaciones",
     "context": "Subscribe to notifications"
