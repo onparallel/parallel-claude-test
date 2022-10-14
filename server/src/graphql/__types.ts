@@ -484,6 +484,7 @@ export interface NexusGenObjects {
     attachment: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
     presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
   };
+  PetitionBaseMini: db.Petition;
   PetitionBaseOrFolderPagination: {
     // root type
     items: NexusGenRootTypes["PetitionBaseOrFolder"][]; // [PetitionBaseOrFolder!]!
@@ -1264,7 +1265,7 @@ export interface NexusGenFieldTypes {
     events: NexusGenRootTypes["PetitionEventPagination"]; // PetitionEventPagination!
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
-    fromTemplate: NexusGenRootTypes["PetitionTemplate"] | null; // PetitionTemplate
+    fromTemplate: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     fromTemplateId: NexusGenScalars["GID"] | null; // GID
     id: NexusGenScalars["GID"]; // GID!
     isAnonymized: boolean; // Boolean!
@@ -1335,6 +1336,11 @@ export interface NexusGenFieldTypes {
     // field return type
     attachment: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
     presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
+  };
+  PetitionBaseMini: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    name: string | null; // String
   };
   PetitionBaseOrFolderPagination: {
     // field return type
@@ -1412,7 +1418,7 @@ export interface NexusGenFieldTypes {
     // field return type
     eventTypes: NexusGenEnums["PetitionEventType"][] | null; // [PetitionEventType!]
     eventsUrl: string; // String!
-    fromTemplate: NexusGenRootTypes["PetitionTemplate"] | null; // PetitionTemplate
+    fromTemplate: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     id: NexusGenScalars["GID"]; // GID!
     isEnabled: boolean; // Boolean!
     name: string | null; // String
@@ -2839,7 +2845,7 @@ export interface NexusGenFieldTypeNames {
     events: "PetitionEventPagination";
     fieldCount: "Int";
     fields: "PetitionField";
-    fromTemplate: "PetitionTemplate";
+    fromTemplate: "PetitionBaseMini";
     fromTemplateId: "GID";
     id: "GID";
     isAnonymized: "Boolean";
@@ -2910,6 +2916,11 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     attachment: "PetitionAttachment";
     presignedPostData: "AWSPresignedPostData";
+  };
+  PetitionBaseMini: {
+    // field return type name
+    id: "GID";
+    name: "String";
   };
   PetitionBaseOrFolderPagination: {
     // field return type name
@@ -2987,7 +2998,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     eventTypes: "PetitionEventType";
     eventsUrl: "String";
-    fromTemplate: "PetitionTemplate";
+    fromTemplate: "PetitionBaseMini";
     id: "GID";
     isEnabled: "Boolean";
     name: "String";

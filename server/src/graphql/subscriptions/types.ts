@@ -11,7 +11,7 @@ export const PetitionEventSubscription = objectType({
       resolve: (o) => o.event_types,
     });
     t.nullable.field("fromTemplate", {
-      type: "PetitionTemplate",
+      type: "PetitionBaseMini",
       resolve: async (o, _, ctx) => {
         return o.from_template_id ? await ctx.petitions.loadPetition(o.from_template_id) : null;
       },

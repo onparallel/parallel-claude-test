@@ -299,6 +299,20 @@ export const PetitionBase = interfaceType({
   sourceType: "db.Petition",
 });
 
+export const PetitionBaseMini = objectType({
+  name: "PetitionBaseMini",
+  sourceType: "db.Petition",
+  definition(t) {
+    t.globalId("id", {
+      prefixName: "Petition",
+      description: "The ID of the petition or template.",
+    });
+    t.nullable.string("name", {
+      description: "The name of the petition.",
+    });
+  },
+});
+
 export const Petition = objectType({
   name: "Petition",
   description: "A petition",
@@ -368,7 +382,12 @@ export const Petition = objectType({
       resolve: (root) => root.from_template_id,
     });
     t.nullable.field("fromTemplate", {
-      type: "PetitionTemplate",
+      /**
+       * minified version of PetitionBase.
+       * as user may not have access to this template,
+       * only expose id and name
+       */
+      type: "PetitionBaseMini",
       description: "The template used for this petition",
       resolve: async (root, _, ctx) => {
         const templateId = root.from_template_id;

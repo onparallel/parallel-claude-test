@@ -2162,7 +2162,7 @@ type Petition implements PetitionBase {
   """
   The template used for this petition
   """
-  fromTemplate: PetitionTemplate
+  fromTemplate: PetitionBaseMini
 
   """
   The template GID used for this petition
@@ -2542,6 +2542,18 @@ interface PetitionBase {
   updatedAt: DateTime!
 }
 
+type PetitionBaseMini {
+  """
+  The ID of the petition or template.
+  """
+  id: GID!
+
+  """
+  The name of the petition.
+  """
+  name: String
+}
+
 union PetitionBaseOrFolder = Petition | PetitionFolder | PetitionTemplate
 
 type PetitionBaseOrFolderPagination {
@@ -2646,7 +2658,7 @@ type PetitionEventPagination {
 type PetitionEventSubscription {
   eventTypes: [PetitionEventType!]
   eventsUrl: String!
-  fromTemplate: PetitionTemplate
+  fromTemplate: PetitionBaseMini
   id: GID!
   isEnabled: Boolean!
   name: String

@@ -1892,7 +1892,7 @@ export interface Petition extends PetitionBase {
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
   /** The template used for this petition */
-  fromTemplate?: Maybe<PetitionTemplate>;
+  fromTemplate?: Maybe<PetitionBaseMini>;
   /** The template GID used for this petition */
   fromTemplateId?: Maybe<Scalars["GID"]>;
   /** The ID of the petition or template. */
@@ -2091,6 +2091,14 @@ export interface PetitionBase {
   updatedAt: Scalars["DateTime"];
 }
 
+export interface PetitionBaseMini {
+  __typename?: "PetitionBaseMini";
+  /** The ID of the petition or template. */
+  id: Scalars["GID"];
+  /** The name of the petition. */
+  name?: Maybe<Scalars["String"]>;
+}
+
 export type PetitionBaseOrFolder = Petition | PetitionFolder | PetitionTemplate;
 
 export interface PetitionBaseOrFolderPagination {
@@ -2192,7 +2200,7 @@ export interface PetitionEventSubscription {
   __typename?: "PetitionEventSubscription";
   eventTypes?: Maybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
-  fromTemplate?: Maybe<PetitionTemplate>;
+  fromTemplate?: Maybe<PetitionBaseMini>;
   id: Scalars["GID"];
   isEnabled: Scalars["Boolean"];
   name?: Maybe<Scalars["String"]>;
@@ -9313,7 +9321,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     id: string;
     status: PetitionSignatureRequestStatus;
   } | null;
-  fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
+  fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -16584,7 +16592,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     id: string;
     status: PetitionSignatureRequestStatus;
   } | null;
-  fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
+  fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   effectivePermissions: Array<{
     __typename?: "EffectivePetitionUserPermission";
@@ -16877,7 +16885,7 @@ export type PetitionCompose_updatePetitionMutation = {
           id: string;
           status: PetitionSignatureRequestStatus;
         } | null;
-        fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
+        fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -17571,7 +17579,7 @@ export type PetitionCompose_petitionQuery = {
           id: string;
           status: PetitionSignatureRequestStatus;
         } | null;
-        fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
+        fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         effectivePermissions: Array<{
           __typename?: "EffectivePetitionUserPermission";
@@ -21396,7 +21404,7 @@ export type Developers_PetitionEventSubscriptionFragment = {
   eventTypes?: Array<PetitionEventType> | null;
   isEnabled: boolean;
   name?: string | null;
-  fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
+  fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
 };
 
 export type Developers_revokeUserAuthTokenMutationVariables = Exact<{
@@ -21420,7 +21428,7 @@ export type Developers_createEventSubscriptionMutation = {
     eventTypes?: Array<PetitionEventType> | null;
     isEnabled: boolean;
     name?: string | null;
-    fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
+    fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
   };
 };
 
@@ -21437,7 +21445,7 @@ export type Developers_updateEventSubscriptionMutation = {
     eventTypes?: Array<PetitionEventType> | null;
     isEnabled: boolean;
     name?: string | null;
-    fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
+    fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
   };
 };
 
@@ -21474,7 +21482,7 @@ export type Developers_subscriptionsQuery = {
     eventTypes?: Array<PetitionEventType> | null;
     isEnabled: boolean;
     name?: string | null;
-    fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
+    fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
   }>;
 };
 

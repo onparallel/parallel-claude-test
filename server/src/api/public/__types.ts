@@ -1846,7 +1846,7 @@ export type Petition = PetitionBase & {
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
   /** The template used for this petition */
-  fromTemplate: Maybe<PetitionTemplate>;
+  fromTemplate: Maybe<PetitionBaseMini>;
   /** The template GID used for this petition */
   fromTemplateId: Maybe<Scalars["GID"]>;
   /** The ID of the petition or template. */
@@ -2040,6 +2040,13 @@ export type PetitionBase = {
   updatedAt: Scalars["DateTime"];
 };
 
+export type PetitionBaseMini = {
+  /** The ID of the petition or template. */
+  id: Scalars["GID"];
+  /** The name of the petition. */
+  name: Maybe<Scalars["String"]>;
+};
+
 export type PetitionBaseOrFolder = Petition | PetitionFolder | PetitionTemplate;
 
 export type PetitionBaseOrFolderPagination = {
@@ -2131,7 +2138,7 @@ export type PetitionEventPagination = {
 export type PetitionEventSubscription = {
   eventTypes: Maybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
-  fromTemplate: Maybe<PetitionTemplate>;
+  fromTemplate: Maybe<PetitionBaseMini>;
   id: Scalars["GID"];
   isEnabled: Scalars["Boolean"];
   name: Maybe<Scalars["String"]>;
