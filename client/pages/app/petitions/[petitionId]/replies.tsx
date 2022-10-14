@@ -26,6 +26,7 @@ import { withApolloData, WithApolloDataContext } from "@parallel/components/comm
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import {
   PetitionLayout,
+  usePetitionShouldConfirmNavigation,
   usePetitionStateWrapper,
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
@@ -101,6 +102,7 @@ import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getInitialProps>>;
@@ -132,6 +134,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const fieldVisibility = useFieldVisibility(petition.fields);
   const toast = useToast();
+
+  const [shouldConfirmNavigation, _] = usePetitionShouldConfirmNavigation();
 
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
   const [activeFieldId, setActiveFieldId] = useQueryStateSlice(
@@ -472,10 +476,15 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       return f.id === fieldId;
     });
 
-    const href = `/app/petitions/${petitionId}/preview?${new URLSearchParams({
-      ...router.query,
+    const field = petition.fields.find((f) => f.id === fieldId)!;
+
+    let href = `/app/petitions/${petitionId}/preview?${new URLSearchParams({
+      ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
+      ...(shouldConfirmNavigation ? { new: "" } : {}),
       ...{ page: page.toString() },
-    })}#reply-${fieldId}-${replyId}`;
+    })}`;
+
+    href += field.type === "CHECKBOX" ? `#field-${fieldId}` : `#reply-${fieldId}-${replyId}`;
 
     router.push(href);
   };

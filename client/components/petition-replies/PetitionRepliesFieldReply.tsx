@@ -46,22 +46,26 @@ export function PetitionRepliesFieldReply({
       : reply.content.value
     : [reply.content.value];
 
-  const editReplyIconButton = (
-    <IconButtonWithTooltip
-      marginLeft={2}
-      position="absolute"
-      display="none"
-      className="edit-field-reply-button"
-      variant="ghost"
-      size="xs"
-      icon={<EditSimpleIcon />}
-      label={intl.formatMessage({
-        id: "component.petition-replies-field.edit-field-reply",
-        defaultMessage: "Edit reply",
-      })}
-      onClick={() => onEditReply(reply.id)}
-    />
-  );
+  const editReplyIconButton = (index: number) => {
+    const id = reply.field!.type === "DYNAMIC_SELECT" ? `-${index}` : "";
+
+    return (
+      <IconButtonWithTooltip
+        marginLeft={2}
+        position="absolute"
+        display="none"
+        className="edit-field-reply-button"
+        variant="ghost"
+        size="xs"
+        icon={<EditSimpleIcon />}
+        label={intl.formatMessage({
+          id: "component.petition-replies-field.edit-field-reply",
+          defaultMessage: "Edit reply",
+        })}
+        onClick={() => onEditReply(reply.id + id)}
+      />
+    );
+  };
 
   return (
     <HStack>
@@ -125,7 +129,7 @@ export function PetitionRepliesFieldReply({
                     >
                       <FileSize value={content.size} />
                     </Text>
-                    {editReplyIconButton}
+                    {editReplyIconButton(i)}
                   </Box>
                 ) : reply.field!.type === "NUMBER" ? (
                   <Text wordBreak="break-all" whiteSpace="pre">
@@ -133,7 +137,7 @@ export function PetitionRepliesFieldReply({
                       content as number,
                       reply.field!.options as FieldOptions["NUMBER"]
                     )}
-                    {editReplyIconButton}
+                    {editReplyIconButton(i)}
                   </Text>
                 ) : reply.field!.type === "DATE" ? (
                   <Text>
@@ -141,13 +145,13 @@ export function PetitionRepliesFieldReply({
                       ...FORMATS.L,
                       timeZone: "UTC",
                     })}
-                    {editReplyIconButton}
+                    {editReplyIconButton(i)}
                   </Text>
                 ) : (
                   <BreakLines>
                     <Text as="span">
                       {content}
-                      {editReplyIconButton}
+                      {editReplyIconButton(i)}
                     </Text>
                   </BreakLines>
                 )}

@@ -1,12 +1,13 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Flex, Stack, useToast } from "@chakra-ui/react";
-import { PaperPlaneIcon } from "@parallel/chakra/icons";
+import { Box, Center, Flex, Stack, useBreakpointValue, useToast } from "@chakra-ui/react";
+import { ChevronRightIcon, EditSimpleIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   FieldErrorDialog,
   useFieldErrorDialog,
 } from "@parallel/components/common/dialogs/FieldErrorDialog";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -14,6 +15,7 @@ import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import {
   PetitionLayout,
+  usePetitionShouldConfirmNavigation,
   usePetitionStateWrapper,
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
@@ -75,6 +77,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 
   const [finalized, setFinalized] = useState(false);
 
+  const [shouldConfirmNavigation, _] = usePetitionShouldConfirmNavigation();
+
   const wrapper = usePetitionStateWrapper();
   const [updatePetition] = useMutation(PetitionPreview_updatePetitionDocument);
   const handleUpdatePetition = useCallback(
@@ -121,6 +125,21 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     checkVisibilityFocusedField();
   }, []);
 
+  const handlePushTo = (tab: string, fieldId: string) => {
+    let href = `/app/petitions/${petitionId}/${tab}`;
+
+    if (isDefined(router.query.fromTemplate) || shouldConfirmNavigation) {
+      href += `?${new URLSearchParams({
+        ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
+        ...(shouldConfirmNavigation ? { new: "" } : {}),
+      })}`;
+    }
+
+    href += `#field-${fieldId}`;
+
+    router.push(href);
+  };
+
   const showHiddenFieldDialog = useHiddenFieldDialog();
   const checkVisibilityFocusedField = async () => {
     try {
@@ -137,18 +156,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         const hash = window.location.hash;
         const fieldId = hash.replace("#field-", "");
 
-        let href = `/app/petitions/${petitionId}/compose`;
-
-        if (isDefined(router.query.fromTemplate) || isDefined(router.query.new)) {
-          href += `/app/petitions/${petitionId}/compose?${new URLSearchParams({
-            ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
-            ...(isDefined(router.query.new) ? { new: "" } : {}),
-          })}`;
-        }
-
-        href += `#field-${fieldId}`;
-
-        router.push(href);
+        handlePushTo("compose", fieldId);
       }
     }
   };
@@ -313,6 +321,9 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     isUsageLimitsReached(me.organization) && isPetition && petition.status === "DRAFT";
 
   const scope = useLiquidScope(petition, petition.__typename === "PetitionTemplate");
+
+  const showQuickAccessButtons = useBreakpointValue({ base: false, xl: true });
+
   return (
     <ToneProvider value={petition.organization.brandTheme.preferredTone}>
       <PetitionLayout
@@ -403,7 +414,20 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                   <LiquidScopeProvider scope={scope}>
                     {fields.map((field) => (
                       <motion.div key={field.id} layout="position">
-                        <PreviewPetitionField
+                        <Box
+                          position="relative"
+                          _focusWithin={{
+                            ".edit-preview-field-buttons": {
+                              display: "flex",
+                            },
+                          }}
+                          _hover={{
+                            ".edit-preview-field-buttons": {
+                              display: "inline-flex",
+                            },
+                          }}
+                        >
+                           <PreviewPetitionField
                           key={field.id}
                           petitionId={petition.id}
                           field={field}
@@ -418,8 +442,54 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                             !field.optional
                           }
                           isCacheOnly={!isPetition}
-                          myEffectivePermission={myEffectivePermission}
-                        />
+                            myEffectivePermission={myEffectivePermission}
+                            />
+                          <Center
+                            className={
+                              showQuickAccessButtons ? "edit-preview-field-buttons" : undefined
+                            }
+                            position="absolute"
+                            top="0px"
+                            right="-48px"
+                            height="100%"
+                            width="auto"
+                            display="none"
+                            padding={2}
+                          >
+                            <Stack>
+                              <IconButtonWithTooltip
+                                size="sm"
+                                variant="outline"
+                                backgroundColor="white"
+                                placement="bottom"
+                                color="gray.600"
+                                icon={<EditSimpleIcon boxSize={4} />}
+                                label={intl.formatMessage({
+                                  id: "page.preview.edit-field",
+                                  defaultMessage: "Edit field",
+                                })}
+                                onClick={() => handlePushTo("compose", field.id)}
+                              />
+                              {field.type === "HEADING" ? null : (
+                                <IconButtonWithTooltip
+                                  icon={<ChevronRightIcon boxSize={5} />}
+                                  size="sm"
+                                  variant="outline"
+                                  backgroundColor="white"
+                                  placement="bottom"
+                                  color="gray.600"
+                                  isDisabled={field.replies.length === 0}
+                                  label={intl.formatMessage({
+                                    id: "page.preview.review-reply",
+                                    defaultMessage: "Review reply",
+                                  })}
+                                  onClick={() => handlePushTo("replies", field.id)}
+                                />
+                              )}
+                            </Stack>
+                          </Center>
+                        </Box>
+                       
                       </motion.div>
                     ))}
                   </LiquidScopeProvider>

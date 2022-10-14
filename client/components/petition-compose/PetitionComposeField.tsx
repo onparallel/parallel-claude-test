@@ -51,13 +51,14 @@ import { memo, RefObject, useCallback, useImperativeHandle, useRef, useState } f
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-import { omit } from "remeda";
+import { isDefined, omit } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { FileSize } from "../common/FileSize";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { SmallPopover } from "../common/SmallPopover";
+import { usePetitionShouldConfirmNavigation } from "../layout/PetitionLayout";
 import { CheckboxTypeLabel } from "../petition-common/CheckboxTypeLabel";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
 import { PetitionComposeFieldAttachment } from "./PetitionComposeFieldAttachment";
@@ -133,6 +134,9 @@ const _PetitionComposeField = chakraForwardRef<
     onMove,
     field.isFixed ? "FIXED_FIELD" : "FIELD"
   );
+
+  const [shouldConfirmNavigation, _] = usePetitionShouldConfirmNavigation();
+
   const canChangeVisibility =
     fields
       .slice(
@@ -189,7 +193,8 @@ const _PetitionComposeField = chakraForwardRef<
       });
 
       const href = `/app/petitions/${petitionId}/preview?${new URLSearchParams({
-        ...router.query,
+        ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
+        ...(shouldConfirmNavigation ? { new: "" } : {}),
         ...{ page: page.toString() },
       })}#field-${field.id}`;
 

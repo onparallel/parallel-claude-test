@@ -64,6 +64,18 @@ export const RecipientViewContentsCard = Object.assign(
       }
     }, []);
 
+    useEffect(() => {
+      const hash = window.location.hash;
+      if (hash.includes("#reply-")) {
+        const element = document.getElementById(hash.replace("#", "")) as HTMLInputElement;
+        element?.focus();
+        if (element?.type === "text") {
+          // setSelectionRange does not work on inputs that are not type="text" (e.g. email)
+          element?.setSelectionRange?.(element.value.length, element.value.length);
+        }
+      }
+    }, []);
+
     const handleFocusField = (field: PetitionFieldSelection) => {
       if (
         field.type === "SHORT_TEXT" ||

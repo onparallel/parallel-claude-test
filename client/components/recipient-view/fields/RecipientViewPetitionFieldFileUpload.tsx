@@ -84,6 +84,7 @@ export function RecipientViewPetitionFieldFileUpload({
                 exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
               >
                 <RecipientViewPetitionFieldReplyFileUpload
+                  id={`reply-${field.id}-${reply.id}`}
                   reply={reply}
                   isDisabled={isDisabled || isDeletingReply[reply.id] || reply.isAnonymized}
                   onRemove={() => handleDeletePetitionReply({ replyId: reply.id })}
@@ -107,6 +108,7 @@ export function RecipientViewPetitionFieldFileUpload({
 }
 
 interface RecipientViewPetitionFieldReplyFileUploadProps {
+  id: string;
   reply: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
   isDisabled: boolean;
   onRemove?: () => void;
@@ -115,6 +117,7 @@ interface RecipientViewPetitionFieldReplyFileUploadProps {
 }
 
 export function RecipientViewPetitionFieldReplyFileUpload({
+  id,
   reply,
   isDisabled,
   onRemove,
@@ -127,7 +130,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
     reply.content.uploadComplete === false && reply.content.progress === undefined;
 
   return (
-    <Stack direction="row" alignItems="center" backgroundColor="white">
+    <Stack direction="row" alignItems="center" backgroundColor="white" id={id}>
       <Center
         boxSize={10}
         borderRadius="md"

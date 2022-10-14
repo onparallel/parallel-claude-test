@@ -36,13 +36,15 @@ import {
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
+import { useRouter } from "next/router";
 import { forwardRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 import { FieldDescription } from "../common/FieldDescription";
 import { FileAttachmentButton } from "../common/FileAttachmentButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
-import { NakedLink } from "../common/Link";
+import { usePetitionShouldConfirmNavigation } from "../layout/PetitionLayout";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
 
@@ -80,7 +82,8 @@ export const PetitionRepliesField = Object.assign(
     ref
   ) {
     const intl = useIntl();
-
+    const router = useRouter();
+    const [shouldConfirmNavigation, _] = usePetitionShouldConfirmNavigation();
     const [petitionFieldAttachmentDownloadLink] = useMutation(
       PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument
     );
@@ -96,21 +99,34 @@ export const PetitionRepliesField = Object.assign(
       );
     };
 
+    const handleEditField = () => {
+      let href = `/app/petitions/${petitionId}/compose`;
+
+      if (isDefined(router.query.fromTemplate) || shouldConfirmNavigation) {
+        href += `?${new URLSearchParams({
+          ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
+          ...(shouldConfirmNavigation ? { new: "" } : {}),
+        })}`;
+      }
+
+      href += `#field-${field.id}`;
+
+      router.push(href);
+    };
+
     const button = (
-      <NakedLink href={`/app/petitions/${petitionId}/compose#field-${field.id}`}>
-        <IconButtonWithTooltip
-          as="a"
-          display="none"
-          className="edit-field-button"
-          size="xs"
-          variant="ghost"
-          icon={<EditSimpleIcon />}
-          label={intl.formatMessage({
-            id: "component.petition-replies-field.edit-field",
-            defaultMessage: "Edit field",
-          })}
-        />
-      </NakedLink>
+      <IconButtonWithTooltip
+        display="none"
+        className="edit-field-button"
+        size="xs"
+        variant="ghost"
+        icon={<EditSimpleIcon />}
+        label={intl.formatMessage({
+          id: "component.petition-replies-field.edit-field",
+          defaultMessage: "Edit field",
+        })}
+        onClick={handleEditField}
+      />
     );
 
     return field.type === "HEADING" ? (
