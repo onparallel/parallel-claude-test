@@ -342,12 +342,13 @@ export class OrganizationRepository extends BaseRepository {
   async updateOrganizationCurrentUsageLimitCredits(
     orgId: number,
     limitName: OrganizationUsageLimitName,
-    credits: number
+    credits: number,
+    t?: Knex.Transaction
   ) {
     if (credits <= 0) {
       return 0;
     }
-    const [usage] = await this.from("organization_usage_limit")
+    const [usage] = await this.from("organization_usage_limit", t)
       .where({
         period_end_date: null,
         limit_name: limitName,
@@ -365,20 +366,24 @@ export class OrganizationRepository extends BaseRepository {
       if (usage.used - credits < value && usage.used >= value) {
         const [{ period_end_date: periodEndDate }] = await this.raw<{ period_end_date: Date }>(
           `select (?::timestamptz + ?::interval) as period_end_date;`,
-          [usage.period_start_date, usage.period]
+          [usage.period_start_date, usage.period],
+          t
         );
-        await this.emails.sendOrganizationLimitsReachedEmail(orgId, limitName, usage.used);
-        await this.system.createEvent({
-          type: "ORGANIZATION_LIMIT_REACHED",
-          data: {
-            org_id: usage.org_id,
-            limit_name: limitName,
-            total: usage.limit,
-            used: usage.used,
-            period_start_date: usage.period_start_date,
-            period_end_date: periodEndDate,
+        await this.emails.sendOrganizationLimitsReachedEmail(orgId, limitName, usage.used, t);
+        await this.system.createEvent(
+          {
+            type: "ORGANIZATION_LIMIT_REACHED",
+            data: {
+              org_id: usage.org_id,
+              limit_name: limitName,
+              total: usage.limit,
+              used: usage.used,
+              period_start_date: usage.period_start_date,
+              period_end_date: periodEndDate,
+            },
           },
-        });
+          t
+        );
         break;
       }
     }
