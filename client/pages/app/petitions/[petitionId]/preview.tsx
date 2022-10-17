@@ -28,7 +28,10 @@ import { PetitionCompletedAlert } from "@parallel/components/petition-common/Pet
 import { PetitionPreviewOnlyAlert } from "@parallel/components/petition-common/PetitionPreviewOnlyAlert";
 import { PetitionPreviewSignatureReviewAlert } from "@parallel/components/petition-common/PetitionPreviewSignatureReviewAlert";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
-import { useHiddenFieldDialog } from "@parallel/components/petition-compose/dialogs/HiddenFieldDialog";
+import {
+  useHiddenFieldDialog,
+  HiddenFieldDialog,
+} from "@parallel/components/petition-compose/dialogs/HiddenFieldDialog";
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PreviewPetitionField } from "@parallel/components/petition-preview/PreviewPetitionField";
@@ -110,32 +113,45 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const pageCount =
     petition.fields.filter((f) => f.type === "HEADING" && f.options!.hasPageBreak).length + 1;
 
-  const currentPage = Number(query.page) || 1;
+  const { pages, visibility } = useGetPageFields(petition.fields, {
+    usePreviewReplies: !isPetition,
+  });
+
+  const getCurrentPage = () => {
+    let page = 0;
+    const fieldId = router.query.field;
+    const replyId = router.query.reply;
+    if (fieldId) {
+      page = pages.findIndex((fields) => fields.some((f) => f.id === fieldId));
+    }
+
+    if (replyId && typeof replyId === "string") {
+      const id = replyId.split("-")[0];
+      page = pages.findIndex((fields) => fields.some((f) => f.id === id));
+    }
+
+    return Math.max(page + 1, 1);
+  };
+
+  const currentPage = Number(query.page) || getCurrentPage();
+
+  const fields = pages[currentPage - 1];
 
   useEffect(() => {
     const layoutBody = document.getElementById("petition-layout-body");
     if (layoutBody) layoutBody.scrollTop = 0;
   }, [currentPage]);
 
-  const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage, {
-    usePreviewReplies: !isPetition,
-  });
-
   useEffect(() => {
     checkVisibilityFocusedField();
   }, []);
 
   const handlePushTo = (tab: string, fieldId: string) => {
-    let href = `/app/petitions/${petitionId}/${tab}`;
-
-    if (isDefined(router.query.fromTemplate) || shouldConfirmNavigation) {
-      href += `?${new URLSearchParams({
-        ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
-        ...(shouldConfirmNavigation ? { new: "" } : {}),
-      })}`;
-    }
-
-    href += `#field-${fieldId}`;
+    const href = `/app/petitions/${petitionId}/${tab}?${new URLSearchParams({
+      ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
+      ...(shouldConfirmNavigation ? { new: "" } : {}),
+      ...{ field: fieldId },
+    })}`;
 
     router.push(href);
   };
@@ -143,20 +159,19 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const showHiddenFieldDialog = useHiddenFieldDialog();
   const checkVisibilityFocusedField = async () => {
     try {
-      const hash = window.location.hash;
-      if (hash && hash.includes("#field-")) {
-        const fieldId = hash.replace("#field-", "");
+      const fieldId = router.query.field;
+      if (fieldId) {
         const field = petition.fields.find((f) => f.id === fieldId);
         if (field && !visibility[field.position]) {
-          await showHiddenFieldDialog(field);
+          await showHiddenFieldDialog({ field, fields: petition.fields });
         }
       }
     } catch (e: any) {
       if (e.message === "CANCEL") {
-        const hash = window.location.hash;
-        const fieldId = hash.replace("#field-", "");
-
-        handlePushTo("compose", fieldId);
+        const fieldId = router.query.field;
+        if (fieldId && typeof fieldId === "string") {
+          handlePushTo("compose", fieldId);
+        }
       }
     }
   };
@@ -171,7 +186,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
       if (fieldsWithIndices && fieldsWithIndices.length > 0) {
         await withError(showFieldErrorDialog({ message, fieldsWithIndices }));
         const firstId = fieldsWithIndices[0].field.id;
-        router.push(`/app/petitions/${query.petitionId}/compose#field-${firstId}`);
+        router.push(
+          `/app/petitions/${query.petitionId}/compose?${new URLSearchParams({
+            field: firstId,
+          })}`
+        );
       } else {
         await withError(showErrorDialog({ message }));
         router.push(`/app/petitions/${query.petitionId}/compose`);
@@ -310,7 +329,12 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             );
           })!;
 
-          router.push(`/app/petitions/${query.petitionId}/preview?page=${page}#field-${field.id}`);
+          router.push(
+            `/app/petitions/${query.petitionId}/preview?${new URLSearchParams({
+              page: page.toString(),
+              field: field.id,
+            })}`
+          );
         }
       } catch {}
     },
@@ -495,7 +519,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                   </LiquidScopeProvider>
                 </Stack>
                 <Spacer />
-                {pages > 1 ? (
+                {pages.length > 1 ? (
                   <RecipientViewPagination
                     marginTop={8}
                     currentPage={currentPage}
@@ -564,6 +588,7 @@ PetitionPreview.fragments = {
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
         ...completedFieldReplies_PetitionField
+        ...HiddenFieldDialog_PetitionField
       }
       signatureConfig {
         allowAdditionalSigners
@@ -590,6 +615,7 @@ PetitionPreview.fragments = {
     ${FieldErrorDialog.fragments.PetitionField}
     ${useLiquidScope.fragments.PetitionBase}
     ${completedFieldReplies.fragments.PetitionField}
+    ${HiddenFieldDialog.fragments.PetitionField}
   `,
   Query: gql`
     fragment PetitionPreview_Query on Query {

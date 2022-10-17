@@ -9681,6 +9681,17 @@ export type CopySignatureConfigDialog_PetitionSignerFragment = {
   fullName: string;
 };
 
+export type HiddenFieldDialog_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  visibility?: { [key: string]: any } | null;
+  type: PetitionFieldType;
+  multiple: boolean;
+  options: { [key: string]: any };
+  isReadOnly: boolean;
+  title?: string | null;
+};
+
 export type ReferencedFieldDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -24492,6 +24503,33 @@ export const PetitionComposeFieldList_UserFragmentDoc = gql`
   }
   ${AddFieldPopover_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeFieldList_UserFragment, unknown>;
+export const PetitionFieldSelect_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldSelect_PetitionField on PetitionField {
+    id
+    type
+    title
+    options
+  }
+` as unknown as DocumentNode<PetitionFieldSelect_PetitionFieldFragment, unknown>;
+export const PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldVisibilityEditor_PetitionField on PetitionField {
+    id
+    type
+    multiple
+    options
+    isReadOnly
+    ...PetitionFieldSelect_PetitionField
+  }
+  ${PetitionFieldSelect_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<PetitionFieldVisibilityEditor_PetitionFieldFragment, unknown>;
+export const HiddenFieldDialog_PetitionFieldFragmentDoc = gql`
+  fragment HiddenFieldDialog_PetitionField on PetitionField {
+    id
+    visibility
+    ...PetitionFieldVisibilityEditor_PetitionField
+  }
+  ${PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<HiddenFieldDialog_PetitionFieldFragment, unknown>;
 export const FieldErrorDialog_PetitionFieldFragmentDoc = gql`
   fragment FieldErrorDialog_PetitionField on PetitionField {
     id
@@ -26481,25 +26519,6 @@ export const PetitionFieldOptionsListEditor_PetitionFieldFragmentDoc = gql`
     options
   }
 ` as unknown as DocumentNode<PetitionFieldOptionsListEditor_PetitionFieldFragment, unknown>;
-export const PetitionFieldSelect_PetitionFieldFragmentDoc = gql`
-  fragment PetitionFieldSelect_PetitionField on PetitionField {
-    id
-    type
-    title
-    options
-  }
-` as unknown as DocumentNode<PetitionFieldSelect_PetitionFieldFragment, unknown>;
-export const PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc = gql`
-  fragment PetitionFieldVisibilityEditor_PetitionField on PetitionField {
-    id
-    type
-    multiple
-    options
-    isReadOnly
-    ...PetitionFieldSelect_PetitionField
-  }
-  ${PetitionFieldSelect_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<PetitionFieldVisibilityEditor_PetitionFieldFragment, unknown>;
 export const completedFieldReplies_PetitionFieldFragmentDoc = gql`
   fragment completedFieldReplies_PetitionField on PetitionField {
     type

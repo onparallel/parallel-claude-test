@@ -20,11 +20,13 @@ import {
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
+import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { Maybe, UnionToArrayUnion } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { zip } from "remeda";
+import { isDefined, zip } from "remeda";
+import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { Card, CardHeader } from "../common/Card";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { NakedLink } from "../common/Link";
@@ -49,47 +51,61 @@ export const RecipientViewContentsCard = Object.assign(
     { currentPage, petition, usePreviewReplies, ...props },
     ref
   ) {
-    const { query } = useRouter();
+    const router = useRouter();
+    const { query } = router;
     const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage, usePreviewReplies);
 
     useEffect(() => {
-      const hash = window.location.hash;
-      if (hash && hash.includes("#field-")) {
-        const fieldId = hash.replace("#field-", "");
+      if (isDefined(router.query.field)) {
+        const fieldId = router.query.field;
         const field = (fields as PetitionFieldSelection[]).find((f) => f.id === fieldId);
 
         if (field) {
           handleFocusField(field);
         }
       }
-    }, []);
+    }, [router.query]);
 
     useEffect(() => {
-      const hash = window.location.hash;
-      if (hash.includes("#reply-")) {
-        const element = document.getElementById(hash.replace("#", "")) as HTMLInputElement;
-        element?.focus();
-        if (element?.type === "text") {
-          // setSelectionRange does not work on inputs that are not type="text" (e.g. email)
-          element?.setSelectionRange?.(element.value.length, element.value.length);
+      if (isDefined(router.query.reply)) {
+        const replyId = router.query.reply;
+        const element = document.getElementById(`reply-${replyId}`) as HTMLInputElement;
+
+        if (element) {
+          scrollIntoView(element, { block: "center", behavior: "smooth" });
+          element.focus();
+          if (element.type === "text") {
+            // setSelectionRange does not work on inputs that are not type="text" (e.g. email)
+            element.setSelectionRange?.(element.value.length, element.value.length);
+          }
         }
       }
-    }, []);
+    }, [router.query]);
 
     const handleFocusField = (field: PetitionFieldSelection) => {
-      if (
-        field.type === "SHORT_TEXT" ||
-        field.type === "TEXT" ||
-        field.type === "DATE" ||
-        field.type === "NUMBER" ||
-        field.type === "PHONE"
-      ) {
-        const id = `reply-${field.id}-${field.replies[0]?.id ?? "new"}`;
-        const element = document.getElementById(id) as HTMLInputElement;
-        element?.focus();
-        if (element.type === "text") {
-          // setSelectionRange does not work on inputs that are not type="text" (e.g. email)
-          element?.setSelectionRange?.(element.value.length, element.value.length);
+      const focusFieldContainer = field.type === "HEADING" || isFileTypeField(field.type);
+      let id =
+        focusFieldContainer || field.type === "CHECKBOX"
+          ? `field-${field.id}`
+          : `reply-${field.id}-${field.replies[0]?.id ?? "new"}`;
+
+      if (field.type === "DYNAMIC_SELECT" && field.replies.length) {
+        id += "-0";
+      }
+
+      const element =
+        field.type === "CHECKBOX"
+          ? (document.querySelector(`#${id} input`) as HTMLInputElement)
+          : (document.getElementById(id) as HTMLInputElement);
+
+      if (element) {
+        scrollIntoView(element, { block: "center", behavior: "smooth" });
+        if (!focusFieldContainer) {
+          element.focus();
+          if (element.type === "text") {
+            // setSelectionRange does not work on inputs that are not type="text" (e.g. email)
+            element.setSelectionRange?.(element.value.length, element.value.length);
+          }
         }
       }
     };
@@ -201,54 +217,52 @@ export const RecipientViewContentsCard = Object.assign(
                               display="flex"
                               position="relative"
                             >
-                              <NakedLink href={`${url}#field-${field.id}`}>
-                                <Button
-                                  variant="ghost"
-                                  as="a"
-                                  size="sm"
-                                  fontSize="md"
-                                  display="flex"
-                                  width="100%"
-                                  paddingStart={7}
-                                  fontWeight={field.type === "HEADING" ? "bold" : "normal"}
-                                  _focus={{ outline: "none" }}
-                                  onClick={() => handleFocusField(field)}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                fontSize="md"
+                                display="flex"
+                                width="100%"
+                                textAlign="left"
+                                paddingStart={7}
+                                fontWeight={field.type === "HEADING" ? "bold" : "normal"}
+                                _focus={{ outline: "none" }}
+                                onClick={() => handleFocusField(field)}
+                              >
+                                <Box
+                                  flex="1"
+                                  isTruncated
+                                  {...(field.title
+                                    ? {
+                                        color: field.replies.some((r) => r.status === "REJECTED")
+                                          ? "red.600"
+                                          : completedFieldReplies(field).length !== 0
+                                          ? "gray.400"
+                                          : "inherit",
+                                      }
+                                    : {
+                                        color: field.replies.some((r) => r.status === "REJECTED")
+                                          ? "red.600"
+                                          : "gray.500",
+                                        fontWeight: "normal",
+                                        fontStyle: "italic",
+                                      })}
                                 >
-                                  <Box
-                                    flex="1"
-                                    isTruncated
-                                    {...(field.title
-                                      ? {
-                                          color: field.replies.some((r) => r.status === "REJECTED")
-                                            ? "red.600"
-                                            : completedFieldReplies(field).length !== 0
-                                            ? "gray.400"
-                                            : "inherit",
-                                        }
-                                      : {
-                                          color: field.replies.some((r) => r.status === "REJECTED")
-                                            ? "red.600"
-                                            : "gray.500",
-                                          fontWeight: "normal",
-                                          fontStyle: "italic",
-                                        })}
-                                  >
-                                    {field.title || (
-                                      <FormattedMessage
-                                        id="generic.untitled-field"
-                                        defaultMessage="Untitled field"
-                                      />
-                                    )}
-                                  </Box>
-                                  {showCommentsCount(field) ? (
-                                    <RecipientViewContentsIndicators
-                                      hasUnreadComments={field.unreadCommentCount > 0}
-                                      commentCount={field.commentCount}
+                                  {field.title || (
+                                    <FormattedMessage
+                                      id="generic.untitled-field"
+                                      defaultMessage="Untitled field"
                                     />
-                                  ) : null}
-                                  {field.isInternal ? <InternalFieldBadge marginLeft={2} /> : null}
-                                </Button>
-                              </NakedLink>
+                                  )}
+                                </Box>
+                                {showCommentsCount(field) ? (
+                                  <RecipientViewContentsIndicators
+                                    hasUnreadComments={field.unreadCommentCount > 0}
+                                    commentCount={field.commentCount}
+                                  />
+                                ) : null}
+                                {field.isInternal ? <InternalFieldBadge marginLeft={2} /> : null}
+                              </Button>
                             </Text>
                           </ListItem>
                         );

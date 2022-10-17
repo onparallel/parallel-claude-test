@@ -69,22 +69,24 @@ export function PetitionRepliesFieldReply({
 
   return (
     <HStack>
-      <Grid flex="1" templateColumns="auto 1fr" columnGap={2}>
+      <Grid
+        flex="1"
+        templateColumns="auto 1fr"
+        columnGap={2}
+        _focusWithin={{
+          ".edit-field-reply-button": {
+            display: "inline-flex",
+          },
+        }}
+        _hover={{
+          ".edit-field-reply-button": {
+            display: "inline-flex",
+          },
+        }}
+      >
         {singleContents.map((content, i) => (
           <Fragment key={i}>
-            <GridItem
-              paddingBottom={1}
-              _focusWithin={{
-                "+ div .edit-field-reply-button": {
-                  display: "inline-flex",
-                },
-              }}
-              _hover={{
-                "+ div .edit-field-reply-button": {
-                  display: "inline-flex",
-                },
-              }}
-            >
+            <GridItem paddingBottom={1}>
               <CopyOrDownloadReplyButton reply={reply} content={content} onAction={onAction} />
             </GridItem>
             <GridItem
@@ -92,16 +94,6 @@ export function PetitionRepliesFieldReply({
               borderColor="gray.200"
               paddingBottom={1}
               paddingLeft={2}
-              _focusWithin={{
-                ".edit-field-reply-button": {
-                  display: "inline-flex",
-                },
-              }}
-              _hover={{
-                ".edit-field-reply-button": {
-                  display: "inline-flex",
-                },
-              }}
             >
               <HStack alignItems={"center"} gridGap={2} spacing={0}>
                 {reply.isAnonymized ? (

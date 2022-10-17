@@ -1741,8 +1741,8 @@
   },
   {
     "term": "component.hidden-field-dialog.body",
-    "definition": "El campo que intentas previsualizar no es visible ahora mismo.",
-    "context": "The field you are trying to preview is not visible right now."
+    "definition": "El campo que intentas previsualizar no es visible ahora mismo. Para que se muestre tienen que cumplirse las siguientes condiciones:",
+    "context": "The field you are trying to preview is not visible right now. The following conditions must be met for it to be displayed:"
   },
   {
     "term": "component.hidden-field-dialog.header",

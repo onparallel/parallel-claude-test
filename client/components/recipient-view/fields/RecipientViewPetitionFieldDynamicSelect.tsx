@@ -270,7 +270,6 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
         <Box flex="1" position="relative" minWidth="0">
           <SimpleSelect
             ref={ref as any}
-            id={id}
             isDisabled={
               (isDisabled ||
                 reply?.status === "APPROVED" ||

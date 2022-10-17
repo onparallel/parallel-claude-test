@@ -182,24 +182,14 @@ const _PetitionComposeField = chakraForwardRef<
     );
   };
 
-  const handlePreviewField = async () => {
-    try {
-      let page = 1;
-      fields.find((f) => {
-        if (f.type === "HEADING" && f.options.hasPageBreak) {
-          page += 1;
-        }
-        return f.id === field.id;
-      });
+  const handlePreviewField = () => {
+    const href = `/app/petitions/${petitionId}/preview?${new URLSearchParams({
+      ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
+      ...(shouldConfirmNavigation ? { new: "" } : {}),
+      ...{ field: field.id },
+    })}`;
 
-      const href = `/app/petitions/${petitionId}/preview?${new URLSearchParams({
-        ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
-        ...(shouldConfirmNavigation ? { new: "" } : {}),
-        ...{ page: page.toString() },
-      })}#field-${field.id}`;
-
-      router.push(href);
-    } catch {}
+    router.push(href);
   };
 
   function updateAttachmentUploadingStatus(cache: DataProxy, id: string, isUploading: boolean) {

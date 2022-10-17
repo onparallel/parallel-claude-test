@@ -1741,8 +1741,8 @@
   },
   {
     "term": "component.hidden-field-dialog.body",
-    "definition": "The field you are trying to preview is not visible right now.",
-    "context": "The field you are trying to preview is not visible right now."
+    "definition": "The field you are trying to preview is not visible right now. The following conditions must be met for it to be displayed:",
+    "context": "The field you are trying to preview is not visible right now. The following conditions must be met for it to be displayed:"
   },
   {
     "term": "component.hidden-field-dialog.header",

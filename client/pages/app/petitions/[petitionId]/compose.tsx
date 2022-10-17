@@ -140,14 +140,16 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     setShowErrors(isSharedByLink);
   }, [setShowErrors, isSharedByLink]);
 
+  useTempQueryParam("field", (fieldId) => {
+    handleIndexFieldClick(fieldId);
+  });
+
   useEffect(() => {
     // Validate and focus fields when have "tags" in url, because it probably comes from other page when validates petition fields
     const hash = window.location.hash;
     if (hash) {
       if (hash.includes("#field-settings-")) {
         handleFieldSettingsClick(hash.replace("#field-settings-", ""));
-      } else if (hash.includes("#field-")) {
-        handleIndexFieldClick(hash.replace("#field-", ""));
       } else {
         const { error, fieldsWithIndices } = validatePetitionFields(petition.fields);
         if (error && fieldsWithIndices && fieldsWithIndices.length > 0) {
@@ -376,7 +378,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         await withError(showFieldErrorDialog({ message, fieldsWithIndices }));
         const firstId = fieldsWithIndices[0].field.id;
         const node = document.querySelector(`#field-${firstId}`);
-        await scrollIntoView(node!, { block: "start", behavior: "smooth" });
+        await scrollIntoView(node!, { block: "center", behavior: "smooth" });
       } else {
         await withError(showErrorDialog({ message }));
         if (error === "NO_REPLIABLE_FIELDS") {
@@ -400,7 +402,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     if (fieldElement) {
       focusFieldTitle(fieldId);
       await scrollIntoView(fieldElement, {
-        block: "start",
+        block: "center",
         behavior: "smooth",
         scrollMode: "if-needed",
       });

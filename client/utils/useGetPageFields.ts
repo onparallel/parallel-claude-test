@@ -18,14 +18,13 @@ interface UseGetPageFieldsOptions extends GroupFieldsByPagesOptions {
 
 export function useGetPageFields<T extends UnionToArrayUnion<PetitionFieldSelection>>(
   fields: T,
-  page: number,
   { usePreviewReplies, ...options }: UseGetPageFieldsOptions
 ) {
   const visibility = useFieldVisibility(fields, usePreviewReplies);
   return useMemo(() => {
     const pages = groupFieldsByPages<PetitionFieldSelection>(fields, visibility, options);
-    return { fields: pages[page - 1] as T, pages: pages.length, visibility };
-  }, [fields, page, visibility, usePreviewReplies, options.hideInternalFields, options.isPdf]);
+    return { pages, visibility };
+  }, [fields, visibility, usePreviewReplies, options.hideInternalFields, options.isPdf]);
 }
 
 useGetPageFields.fragments = {

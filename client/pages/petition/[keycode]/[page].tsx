@@ -77,10 +77,10 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   const recipients = petition!.recipients;
   const message = access!.message;
 
-  const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage, {
+  const { pages, visibility } = useGetPageFields(petition.fields, {
     hideInternalFields: true,
   });
-
+  const fields = pages[currentPage - 1];
   const tone = petition.tone;
 
   const showFullScreenDialog =
@@ -170,7 +170,11 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
             );
           })!;
           const { keycode } = router.query;
-          router.push(`/petition/${keycode}/${page}#field-${field.id}`);
+          router.push(
+            `/petition/${keycode}/${page}?${new URLSearchParams({
+              field: field.id,
+            })}`
+          );
         }
       } catch (e) {
         if (isApolloError(e, "CANT_COMPLETE_PETITION_ERROR")) {
@@ -412,7 +416,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                   </LiquidScopeProvider>
                 </Stack>
                 <Spacer />
-                {pages > 1 ? (
+                {pages.length > 1 ? (
                   <RecipientViewPagination
                     marginTop={8}
                     currentPage={currentPage}

@@ -99,6 +99,7 @@ import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
 import { useLiquidScope } from "@parallel/utils/useLiquidScope";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
+import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -152,6 +153,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       setActiveFieldId(activeFieldId);
     }
   }, []);
+
+  useTempQueryParam("field", (fieldId) => {
+    handlePetitionContentsFieldClick(fieldId);
+  });
 
   useEffect(() => {
     if (activeFieldId && activeField) {
@@ -468,23 +473,13 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const scope = useLiquidScope(petition);
 
   const handleEditFieldReply = (replyId: string, fieldId: string) => {
-    let page = 1;
-    petition.fields.find((f) => {
-      if (f.type === "HEADING" && f.options.hasPageBreak) {
-        page += 1;
-      }
-      return f.id === fieldId;
-    });
-
     const field = petition.fields.find((f) => f.id === fieldId)!;
 
-    let href = `/app/petitions/${petitionId}/preview?${new URLSearchParams({
+    const href = `/app/petitions/${petitionId}/preview?${new URLSearchParams({
       ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
       ...(shouldConfirmNavigation ? { new: "" } : {}),
-      ...{ page: page.toString() },
+      ...(field.type === "CHECKBOX" ? { field: field.id } : { reply: `${fieldId}-${replyId}` }),
     })}`;
-
-    href += field.type === "CHECKBOX" ? `#field-${fieldId}` : `#reply-${fieldId}-${replyId}`;
 
     router.push(href);
   };

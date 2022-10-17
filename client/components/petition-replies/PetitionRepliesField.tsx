@@ -100,16 +100,11 @@ export const PetitionRepliesField = Object.assign(
     };
 
     const handleEditField = () => {
-      let href = `/app/petitions/${petitionId}/compose`;
-
-      if (isDefined(router.query.fromTemplate) || shouldConfirmNavigation) {
-        href += `?${new URLSearchParams({
-          ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
-          ...(shouldConfirmNavigation ? { new: "" } : {}),
-        })}`;
-      }
-
-      href += `#field-${field.id}`;
+      const href = `/app/petitions/${petitionId}/compose?${new URLSearchParams({
+        ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
+        ...(shouldConfirmNavigation ? { new: "" } : {}),
+        ...{ field: field.id },
+      })}`;
 
       router.push(href);
     };

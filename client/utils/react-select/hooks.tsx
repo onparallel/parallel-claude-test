@@ -61,6 +61,7 @@ export interface UseReactSelectProps<
   isInvalid?: boolean;
   usePortal?: boolean;
   singleLineOptions?: boolean;
+  isReadOnly?: boolean;
 }
 
 /**
@@ -83,7 +84,12 @@ export function useReactSelectProps<
 > {
   const { colors, radii, fontSizes } = useTheme();
 
-  const { id: inputId, "aria-invalid": isInvalid, disabled: isDisabled } = useFormControl(props);
+  const {
+    id: inputId,
+    "aria-invalid": isInvalid,
+    disabled: isDisabled,
+    readOnly: isReadOnly,
+  } = useFormControl(props);
 
   const theme = useCallback(
     (theme: Theme) => {
@@ -140,14 +146,15 @@ export function useReactSelectProps<
         return {
           ...styles,
           alignItems: "stretch",
-          opacity: isDisabled ? 0.4 : 1,
+          backgroundColor: "white",
+          opacity: isDisabled && !isReadOnly ? 0.4 : 1,
           borderColor: isInvalid ? error : isFocused ? borderColor : "inherit",
           boxShadow: isInvalid
             ? `0 0 0 1px ${error}`
             : isFocused
             ? `0 0 0 1px ${borderColor}`
             : undefined,
-          pointerEvents: isDisabled ? "none" : undefined,
+          pointerEvents: isDisabled || isReadOnly ? "none" : undefined,
           fontSize: fontSize,
           "&:hover": {
             borderColor: isInvalid ? error : isFocused ? borderColor : borderColorHover,
@@ -271,7 +278,7 @@ export function useReactSelectProps<
   const rehydrated = useRehydrated();
   return {
     inputId,
-    isDisabled,
+    isDisabled: isReadOnly || isDisabled,
     menuPortalTarget: usePortal && rehydrated ? document.body : undefined,
     menuPlacement: "auto",
     theme,

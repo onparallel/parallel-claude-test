@@ -1,4 +1,4 @@
-import { Box, Center, List, Stack } from "@chakra-ui/react";
+import { Box, Center, FormControl, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import {
@@ -84,6 +84,8 @@ export function RecipientViewPetitionFieldSelect({
     setTimeout(() => newReplyRef.current?.focus());
   }
 
+  const id = `reply-${field.id}-new`;
+
   return (
     <RecipientViewPetitionFieldCard
       field={field}
@@ -117,44 +119,46 @@ export function RecipientViewPetitionFieldSelect({
         </List>
       ) : null}
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
-        <Box flex="1" position="relative" marginTop={2} minWidth="0">
-          <SimpleSelect
-            ref={newReplyRef as any}
-            id={`reply-${field.id}-new`}
-            isDisabled={isDisabled}
-            value={value}
-            options={values}
-            onChange={async (value) => {
-              setValue(value);
-              setIsSaving(true);
-              try {
-                const replyId = await onCreateReply(value!);
-                if (replyId) {
-                  setShowNewReply(false);
-                  setValue(null);
-                  setTimeout(() => {
-                    replyRefs[replyId].current?.focus();
-                  });
-                }
-              } catch {}
-              setIsSaving(false);
-            }}
-            placeholder={
-              options.placeholder ??
-              intl.formatMessage({
-                id: "component.recipient-view-petition-field-reply.select-placeholder",
-                defaultMessage: "Select an option",
-              })
-            }
-            styles={{
-              menu: (styles) => ({ ...styles, zIndex: 100 }),
-              valueContainer: (styles) => ({ ...styles, paddingRight: 32 }),
-            }}
-          />
-          <Center height="100%" position="absolute" right="42px" top={0}>
-            <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
-          </Center>
-        </Box>
+        <FormControl id={id} isDisabled={isDisabled}>
+       <Box flex="1" position="relative" marginTop={2} minWidth="0">
+            <SimpleSelect
+              ref={newReplyRef as any}
+              isDisabled={isDisabled}
+              value={value}
+              options={values}
+              onChange={async (value) => {
+                setValue(value);
+                setIsSaving(true);
+                try {
+                  const replyId = await onCreateReply(value!);
+                  if (replyId) {
+                    setShowNewReply(false);
+                    setValue(null);
+                    setTimeout(() => {
+                      replyRefs[replyId].current?.focus();
+                    });
+                  }
+                } catch {}
+                setIsSaving(false);
+              }}
+              placeholder={
+                options.placeholder ??
+                intl.formatMessage({
+                  id: "component.recipient-view-petition-field-reply.select-placeholder",
+                  defaultMessage: "Select an option",
+                })
+              }
+              styles={{
+                menu: (styles) => ({ ...styles, zIndex: 100 }),
+                valueContainer: (styles) => ({ ...styles, paddingRight: 32 }),
+              }}
+            />
+            <Center height="100%" position="absolute" right="42px" top={0}>
+              <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
+            </Center>
+          </Box>
+        </FormControl>
+        
       ) : null}
     </RecipientViewPetitionFieldCard>
   );
@@ -186,51 +190,54 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
     [options.values]
   );
 
+  const id = `reply-${field.id}-${reply.id}`;
   return (
     <Stack direction="row">
-      <Box flex="1" position="relative" minWidth="0">
-        <Box position="relative">
-          <SimpleSelect
-            ref={ref}
-            id={`reply-${field.id}-${reply.id}`}
-            isDisabled={isDisabled || reply.status === "APPROVED"}
-            isInvalid={reply.status === "REJECTED"}
-            value={value}
-            options={values}
-            onChange={async (value) => {
-              setValue(value);
-              setIsSaving(true);
-              try {
-                await onUpdate(value);
-              } catch {}
-              setIsSaving(false);
-            }}
-            placeholder={
-              reply.isAnonymized
-                ? intl.formatMessage({
-                    id: "generic.reply-not-available",
-                    defaultMessage: "Reply not available",
-                  })
-                : options.placeholder ??
-                  intl.formatMessage({
-                    id: "generic.select-an-option",
-                    defaultMessage: "Select an option",
-                  })
-            }
-            styles={{
-              menu: (styles) => ({ ...styles, zIndex: 100 }),
-              valueContainer: (styles) => ({ ...styles, paddingRight: 32 }),
-              placeholder: (base) => ({
-                ...base,
-                fontStyle: reply.isAnonymized ? "italic" : "normal",
-              }),
-            }}
-          />
-          <Center height="100%" position="absolute" right="42px" top={0}>
-            <RecipientViewPetitionFieldReplyStatusIndicator reply={reply} isSaving={isSaving} />
-          </Center>
+      <FormControl id={id} isDisabled={isDisabled}>
+        <Box flex="1" position="relative" minWidth="0">
+          <Box position="relative">
+            <SimpleSelect
+              ref={ref}
+              isDisabled={isDisabled || reply.status === "APPROVED"}
+              isInvalid={reply.status === "REJECTED"}
+              value={value}
+              options={values}
+              onChange={async (value) => {
+                setValue(value);
+                setIsSaving(true);
+                try {
+                  await onUpdate(value);
+                } catch {}
+                setIsSaving(false);
+              }}
+              placeholder={
+                reply.isAnonymized
+                  ? intl.formatMessage({
+                      id: "generic.reply-not-available",
+                      defaultMessage: "Reply not available",
+                    })
+                  : options.placeholder ??
+                    intl.formatMessage({
+                      id: "generic.select-an-option",
+                      defaultMessage: "Select an option",
+                    })
+              }
+              styles={{
+                menu: (styles) => ({ ...styles, zIndex: 100 }),
+                valueContainer: (styles) => ({ ...styles, paddingRight: 32 }),
+                placeholder: (base) => ({
+                  ...base,
+                  fontStyle: reply.isAnonymized ? "italic" : "normal",
+                }),
+              }}
+            />
+            <Center height="100%" position="absolute" right="42px" top={0}>
+              <RecipientViewPetitionFieldReplyStatusIndicator reply={reply} isSaving={isSaving} />
+            </Center>
+          </Box>
+      
         </Box>
-      </Box>
+      </FormControl>
       <IconButtonWithTooltip
         isDisabled={isDisabled || reply.status === "APPROVED"}
         onClick={() => onDelete()}

@@ -164,7 +164,7 @@ export function PetitionFieldVisibilityEditor({
                   <VisibilityTypeSelect
                     value={visibility.type}
                     onChange={(type) => setVisibilityType(type!)}
-                    isDisabled={isReadOnly}
+                    isReadOnly={isReadOnly}
                   />
                 ) : (
                   <Stack direction="row">
@@ -184,7 +184,7 @@ export function PetitionFieldVisibilityEditor({
                         <VisibilityOperatorSelect
                           value={visibility.operator}
                           onChange={(operator) => setVisibilityOperator(operator!)}
-                          isDisabled={isReadOnly}
+                          isReadOnly={isReadOnly}
                         />
                       </Box>
                     ) : (
@@ -223,7 +223,7 @@ export function PetitionFieldVisibilityEditor({
                     fields={_fields}
                     indices={_indices}
                     onChange={(value) => updateCondition(index, defaultCondition(value!))}
-                    isDisabled={isReadOnly}
+                    isReadOnly={isReadOnly}
                   />
                   <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }} alignItems="start">
                     {conditionField.multiple ? (
@@ -364,7 +364,7 @@ function ConditionMultipleFieldModifier({
   return (
     <SimpleSelect
       size="sm"
-      isDisabled={isReadOnly}
+      isReadOnly={isReadOnly}
       options={options}
       value={condition.modifier}
       onChange={handleChange}
@@ -629,7 +629,7 @@ function ConditionPredicate({
     <Box flex="1" minWidth="0">
       <SimpleSelect
         size="sm"
-        isDisabled={isReadOnly}
+        isReadOnly={isReadOnly}
         options={options}
         value={operator}
         onChange={handleChange}
@@ -639,7 +639,7 @@ function ConditionPredicate({
     <>
       <SimpleSelect
         size="sm"
-        isDisabled={isReadOnly}
+        isReadOnly={isReadOnly}
         options={options}
         value={operator}
         onChange={handleChange}
@@ -726,6 +726,7 @@ function ConditionPredicateValueDate({
         defaultMessage: "Enter a value",
       })}
       isDisabled={isReadOnly}
+      opacity={isReadOnly ? "1 !important" : undefined}
     />
   );
 }
@@ -744,6 +745,7 @@ function ConditionPredicateValueFloat({
       backgroundColor="white"
       value={value}
       isDisabled={isReadOnly}
+      opacity={isReadOnly ? "1 !important" : undefined}
       onChange={(value) => setValue(value ?? 0)}
       onBlur={() => onChange({ ...condition, value })}
       placeholder={intl.formatMessage({
@@ -789,6 +791,7 @@ function ConditionPredicateValueNumber({
           id: "generic.enter-a-value",
           defaultMessage: "Enter a value",
         })}
+        opacity={isReadOnly ? 1 : undefined}
       />
       <NumberInputStepper>
         <NumberIncrementStepper />
@@ -826,7 +829,7 @@ function ConditionPredicateValueSelect({
     <SimpleSelect
       size="sm"
       options={options}
-      isDisabled={isReadOnly}
+      isReadOnly={isReadOnly}
       isInvalid={showError && condition.value === null}
       isMulti={isMultiCondition}
       value={condition.value as string | string[] | null}
@@ -867,6 +870,7 @@ function ConditionPredicateValueString({
         defaultMessage: "Enter a value",
       })}
       isDisabled={isReadOnly}
+      opacity={isReadOnly ? "1 !important" : undefined}
     />
   );
 }
