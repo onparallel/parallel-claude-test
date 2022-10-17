@@ -791,7 +791,7 @@ function ConditionPredicateValueNumber({
           id: "generic.enter-a-value",
           defaultMessage: "Enter a value",
         })}
-        opacity={isReadOnly ? 1 : undefined}
+        opacity={isReadOnly ? "1 !important" : undefined}
       />
       <NumberInputStepper>
         <NumberIncrementStepper />

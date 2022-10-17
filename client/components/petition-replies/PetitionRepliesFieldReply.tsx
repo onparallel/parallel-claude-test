@@ -23,7 +23,7 @@ export interface PetitionRepliesFieldReplyProps {
   reply: PetitionRepliesFieldReply_PetitionFieldReplyFragment;
   onUpdateStatus: (status: PetitionFieldReplyStatus) => void;
   onAction: (action: PetitionRepliesFieldAction) => void;
-  onEditReply: (replyId: string) => void;
+  onClickEditReply: (replyId: string) => void;
   isDisabled?: boolean;
 }
 
@@ -33,7 +33,7 @@ export function PetitionRepliesFieldReply({
   reply,
   onUpdateStatus,
   onAction,
-  onEditReply,
+  onClickEditReply,
   isDisabled,
 }: PetitionRepliesFieldReplyProps) {
   const intl = useIntl();
@@ -62,7 +62,7 @@ export function PetitionRepliesFieldReply({
           id: "component.petition-replies-field.edit-field-reply",
           defaultMessage: "Edit reply",
         })}
-        onClick={() => onEditReply(reply.id + id)}
+        onClick={() => onClickEditReply(reply.id + id)}
       />
     );
   };

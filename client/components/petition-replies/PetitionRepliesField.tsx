@@ -60,7 +60,6 @@ export interface PetitionRepliesFieldProps extends BoxProps {
   ) => void;
   onToggleComments: () => void;
   onUpdateReplyStatus: (replyId: string, status: PetitionFieldReplyStatus) => void;
-  onEditReply: (replyId: string) => void;
   isDisabled?: boolean;
 }
 
@@ -75,7 +74,6 @@ export const PetitionRepliesField = Object.assign(
       onAction,
       onToggleComments,
       onUpdateReplyStatus,
-      onEditReply,
       isDisabled,
       ...props
     },
@@ -104,6 +102,16 @@ export const PetitionRepliesField = Object.assign(
         ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
         ...(shouldConfirmNavigation ? { new: "" } : {}),
         ...{ field: field.id },
+      })}`;
+
+      router.push(href);
+    };
+
+    const handleEditFieldReply = (replyId: string) => {
+      const href = `/app/petitions/${petitionId}/preview?${new URLSearchParams({
+        ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
+        ...(shouldConfirmNavigation ? { new: "" } : {}),
+        ...(field.type === "CHECKBOX" ? { field: field.id } : { reply: `${field.id}-${replyId}` }),
       })}`;
 
       router.push(href);
@@ -331,7 +339,7 @@ export const PetitionRepliesField = Object.assign(
                   reply={reply}
                   onAction={(action) => onAction(action, reply)}
                   onUpdateStatus={(status) => onUpdateReplyStatus(reply.id, status)}
-                  onEditReply={onEditReply}
+                  onClickEditReply={handleEditFieldReply}
                   isDisabled={isDisabled}
                 />
               ))}

@@ -26,7 +26,6 @@ import { withApolloData, WithApolloDataContext } from "@parallel/components/comm
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import {
   PetitionLayout,
-  usePetitionShouldConfirmNavigation,
   usePetitionStateWrapper,
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
@@ -103,9 +102,7 @@ import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-
 type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getInitialProps>>;
 
 const QUERY_STATE = {
@@ -135,8 +132,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const fieldVisibility = useFieldVisibility(petition.fields);
   const toast = useToast();
-
-  const [shouldConfirmNavigation, _] = usePetitionShouldConfirmNavigation();
 
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
   const [activeFieldId, setActiveFieldId] = useQueryStateSlice(
@@ -472,18 +467,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const scope = useLiquidScope(petition);
 
-  const handleEditFieldReply = (replyId: string, fieldId: string) => {
-    const field = petition.fields.find((f) => f.id === fieldId)!;
-
-    const href = `/app/petitions/${petitionId}/preview?${new URLSearchParams({
-      ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
-      ...(shouldConfirmNavigation ? { new: "" } : {}),
-      ...(field.type === "CHECKBOX" ? { field: field.id } : { reply: `${fieldId}-${replyId}` }),
-    })}`;
-
-    router.push(href);
-  };
-
   return (
     <PetitionLayout
       key={petition.id}
@@ -669,9 +652,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                       onUpdateReplyStatus={(replyId, status) =>
                         handleUpdateRepliesStatus(x.field.id, [replyId], status)
                       }
-                      onEditReply={(replyId) => {
-                        handleEditFieldReply(replyId, x.field.id);
-                      }}
                       isDisabled={myEffectivePermission === "READ"}
                     />
                   ) : (
