@@ -29,6 +29,11 @@ app.use("/api", json(), cors(), cookieParser(), api(container));
 
 app.use("/graphql", graphqlUploadExpress());
 const server = new ApolloServer({
+  // this allows us to send the error stacktrace to the context logger (cloudwatch)
+  // as we don't expose the stacktrace anywhere else, it's safe to leave it as true for all environments
+  // starting from @apollo/server v4 the debug param will be replaced by includeStacktraceInErrorResponses
+  // https://www.apollographql.com/docs/apollo-server/api/apollo-server/#includestacktraceinerrorresponses
+  // includeStacktraceInErrorResponses: true,
   debug: true,
   cache: "bounded",
   schema: schema,
