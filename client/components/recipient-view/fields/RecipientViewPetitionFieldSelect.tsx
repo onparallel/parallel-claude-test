@@ -120,7 +120,7 @@ export function RecipientViewPetitionFieldSelect({
       ) : null}
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <FormControl id={id} isDisabled={isDisabled}>
-       <Box flex="1" position="relative" marginTop={2} minWidth="0">
+          <Box flex="1" position="relative" marginTop={2} minWidth="0">
             <SimpleSelect
               ref={newReplyRef as any}
               isDisabled={isDisabled}
@@ -158,7 +158,6 @@ export function RecipientViewPetitionFieldSelect({
             </Center>
           </Box>
         </FormControl>
-        
       ) : null}
     </RecipientViewPetitionFieldCard>
   );
@@ -235,7 +234,6 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
               <RecipientViewPetitionFieldReplyStatusIndicator reply={reply} isSaving={isSaving} />
             </Center>
           </Box>
-      
         </Box>
       </FormControl>
       <IconButtonWithTooltip

@@ -143,6 +143,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
                 exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
               >
                 <RecipientViewPetitionFieldReplyFileUpload
+                  id={`reply-${field.id}-${reply.id}`}
                   reply={reply}
                   isDisabled={isDisabled || isDeletingReply[reply.id]}
                   onRemove={() => handleDeletePetitionReply({ replyId: reply.id })}

@@ -22,7 +22,7 @@ export function useGetPageFields<T extends UnionToArrayUnion<PetitionFieldSelect
 ) {
   const visibility = useFieldVisibility(fields, usePreviewReplies);
   return useMemo(() => {
-    const pages = groupFieldsByPages<PetitionFieldSelection>(fields, visibility, options);
+    const pages = groupFieldsByPages<T>(fields, visibility, options);
     return { pages, visibility };
   }, [fields, visibility, usePreviewReplies, options.hideInternalFields, options.isPdf]);
 }

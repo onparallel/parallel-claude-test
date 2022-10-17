@@ -29,8 +29,8 @@ import { PetitionPreviewOnlyAlert } from "@parallel/components/petition-common/P
 import { PetitionPreviewSignatureReviewAlert } from "@parallel/components/petition-common/PetitionPreviewSignatureReviewAlert";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import {
-  useHiddenFieldDialog,
   HiddenFieldDialog,
+  useHiddenFieldDialog,
 } from "@parallel/components/petition-compose/dialogs/HiddenFieldDialog";
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
