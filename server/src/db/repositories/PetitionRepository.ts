@@ -511,72 +511,66 @@ export class PetitionRepository extends BaseRepository {
     }
 
     if (filters?.signature && filters.signature.length > 0) {
-      builders.push(
-        (q) => q.whereRaw(/* sql */ `p.status != 'DRAFT'`),
-        (q) => {
-          q.joinRaw(
-            /* sql */ `
-          left join petition_signature_request psr on p.id = psr.petition_id
-          and psr.created_at = (select max(created_at) from petition_signature_request where petition_id = p.id)
-        `
-          ).where((q) => {
-            if (filters.signature!.includes("NO_SIGNATURE")) {
-              // no signature configured nor any previous signature request
-              q.or.whereRaw(/* sql */ `
+      builders.push((q) =>
+        q.whereRaw(/* sql */ `p.status != 'DRAFT'`).andWhere((q) => {
+          if (filters.signature!.includes("NO_SIGNATURE")) {
+            // no signature configured nor any previous signature request
+            q.or.whereRaw(/* sql */ `
               p.signature_config is null
-              and psr.id is null
+              and p.latest_signature_status is null
             `);
-            }
-            if (filters.signature!.includes("NOT_STARTED")) {
-              // signature is configured, awaiting to complete the petition
-              q.or.whereRaw(/* sql */ `
+          }
+          if (filters.signature!.includes("NOT_STARTED")) {
+            // signature is configured, awaiting to complete the petition
+            q.or.whereRaw(/* sql */ `
               p.signature_config is not null
               and p.status = 'PENDING'
             `);
-            }
-            if (filters.signature!.includes("PENDING_START")) {
-              // petition is completed, need to manually start the signature
-              // also show as pending start when user manually cancels the previous request
-              // and signature is still configured
-              q.or.whereRaw(/* sql */ `
+          }
+          if (filters.signature!.includes("PENDING_START")) {
+            // petition is completed, need to manually start the signature
+            // also show as pending start when user manually cancels the previous request
+            // and signature is still configured
+            q.or.whereRaw(/* sql */ `
               p.signature_config is not null 
               and p.status in ('COMPLETED', 'CLOSED')
               and (
-                psr.id is null
-                or psr.status = 'COMPLETED'
-                or psr.cancel_reason = 'CANCELLED_BY_USER'
+                p.latest_signature_status is null
+                or p.latest_signature_status = 'COMPLETED'
+                or p.latest_signature_status = 'CANCELLED_BY_USER'
               )
             `);
-            }
-            if (filters.signature!.includes("PROCESSING")) {
-              // signature is ongoing
-              q.or.whereRaw(/* sql */ `
-              psr.id is not null
-              and psr.status not in ('COMPLETED', 'CANCELLED')
+          }
+          if (filters.signature!.includes("PROCESSING")) {
+            // signature is ongoing
+            q.or.whereRaw(/* sql */ `
+              p.latest_signature_status is not null
+              and p.latest_signature_status not in ('COMPLETED', 'CANCELLED_BY_USER', 'CANCELLED')
             `);
-            }
-            if (filters.signature!.includes("COMPLETED")) {
-              // signature completed, every signer signed
-              q.or.whereRaw(/* sql */ `
+          }
+          if (filters.signature!.includes("COMPLETED")) {
+            // signature completed, everyone signed
+            q.or.whereRaw(/* sql */ `
               p.signature_config is null
-              and psr.id is not null
-              and psr.status = 'COMPLETED'
+              and p.latest_signature_status is not null
+              and p.latest_signature_status = 'COMPLETED'
             `);
-            }
-            if (filters.signature!.includes("CANCELLED")) {
-              // cancelled by a reason external to user (request error, signer declined, etc)
-              // or cancelled by user and no signature configured
-              q.or.whereRaw(/* sql */ `
-              psr.id is not null
-              and psr.status = 'CANCELLED'
+          }
+          if (filters.signature!.includes("CANCELLED")) {
+            // cancelled by a reason external to user (request error, signer declined, etc)
+            // or cancelled by user and no signature configured
+            q.or.whereRaw(/* sql */ `
+              p.latest_signature_status is not null
               and (
-                psr.cancel_reason != 'CANCELLED_BY_USER'
-                or p.signature_config is null
+                p.latest_signature_status = 'CANCELLED'
+                or ( 
+                  p.latest_signature_status = 'CANCELLED_BY_USER'
+                  and p.signature_config is null
+                )
               )
             `);
-            }
-          });
-        }
+          }
+        })
       );
     }
 
@@ -4330,6 +4324,10 @@ export class PetitionRepository extends BaseRepository {
       t
     ).returning("*");
 
+    await this.from("petition", t)
+      .where("id", petitionId)
+      .update({ latest_signature_status: data.status ?? "ENQUEUED" });
+
     return row;
   }
 
@@ -4346,6 +4344,15 @@ export class PetitionRepository extends BaseRepository {
       })
       .returning("*");
 
+    if (isDefined(data.status)) {
+      await this.from("petition")
+        .where("id", row.petition_id)
+        .update({
+          latest_signature_status:
+            data.cancel_reason === "CANCELLED_BY_USER" ? "CANCELLED_BY_USER" : data.status,
+        });
+    }
+
     return row;
   }
 
@@ -4360,6 +4367,15 @@ export class PetitionRepository extends BaseRepository {
         updated_at: this.now(),
       })
       .returning("*");
+
+    if (isDefined(data.status)) {
+      await this.from("petition")
+        .where("id", row.petition_id)
+        .update({
+          latest_signature_status:
+            data.cancel_reason === "CANCELLED_BY_USER" ? "CANCELLED_BY_USER" : data.status,
+        });
+    }
 
     return row;
   }
@@ -4389,6 +4405,15 @@ export class PetitionRepository extends BaseRepository {
         updated_at: this.now(),
       })
       .returning("*");
+
+    await this.from("petition")
+      .whereIn(
+        "id",
+        signatures.map((s) => s.petition_id)
+      )
+      .update({
+        latest_signature_status: reason === "CANCELLED_BY_USER" ? "CANCELLED_BY_USER" : "CANCELLED",
+      });
 
     await this.createEvent(
       rows.map((signature) => ({

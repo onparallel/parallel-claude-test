@@ -801,6 +801,7 @@ export interface Petition {
   document_organization_theme_id: number; // int4
   path: string; // text
   default_path: string; // text
+  latest_signature_status: Maybe<string>; // varchar
 }
 
 export type CreatePetition = PartialProps<
@@ -844,6 +845,7 @@ export type CreatePetition = PartialProps<
   | "anonymize_purpose"
   | "path"
   | "default_path"
+  | "latest_signature_status"
 >;
 
 export interface PetitionAccess {
