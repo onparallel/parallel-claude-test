@@ -60,6 +60,7 @@ export interface UseReactSelectProps<
   size?: keyof typeof SIZES;
   isInvalid?: boolean;
   usePortal?: boolean;
+  singleLineOptions?: boolean;
 }
 
 /**
@@ -73,6 +74,7 @@ export function useReactSelectProps<
   size = "md",
   usePortal = true,
   styles: _styles,
+  singleLineOptions,
   ...props
 }: UseReactSelectProps<OptionType, IsMulti, GroupType> = {}): SelectProps<
   OptionType,
@@ -172,11 +174,12 @@ export function useReactSelectProps<
           paddingRight: 0,
         };
       },
-      option: (styles, { theme }) => {
+      option: (styles, { theme, selectProps }) => {
         const {
           fontSize,
           spacing: { padding },
         } = theme;
+        const { singleLineOptions } = selectProps;
         return {
           ...styles,
           cursor: "pointer",
@@ -184,10 +187,14 @@ export function useReactSelectProps<
           fontSize: fontSize,
           textOverflow: "ellipsis",
           overflow: "hidden",
-          display: "-webkit-box",
-          WebkitLineClamp: "2",
-          WebkitBoxOrient: "vertical",
-          whiteSpace: "normal",
+          ...(singleLineOptions
+            ? { whiteSpace: "nowrap" }
+            : {
+                display: "-webkit-box",
+                WebkitLineClamp: "2",
+                WebkitBoxOrient: "vertical",
+                whiteSpace: "normal",
+              }),
         };
       },
       menu: (styles) => {
@@ -271,7 +278,7 @@ export function useReactSelectProps<
     components,
     styles,
     // Extension props
-    ...({ size, isInvalid } as any),
+    ...({ size, isInvalid, singleLineOptions } as any),
   };
 }
 
@@ -284,6 +291,7 @@ export type ExtendComponentProps = {
     colors: Record<`error${"" | 10 | 20 | 30}`, string>;
   };
   selectProps: {
+    singleLineOptions?: boolean;
     isInvalid?: boolean;
     size: "sm" | "md" | "lg";
   };

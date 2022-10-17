@@ -839,7 +839,8 @@ function ConditionPredicateValueSelect({
         id: "generic.select-an-option",
         defaultMessage: "Select an option",
       })}
-      components={{ MenuList: OptimizedMenuList as any }}
+      components={options.length > 100 ? { MenuList: OptimizedMenuList as any } : {}}
+      singleLineOptions={options.length > 100}
       styles={{ valueContainer: (styles) => ({ ...styles, gridTemplateColumns: "1fr" }) }}
     />
   );
