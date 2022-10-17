@@ -149,7 +149,7 @@ function _PetitionSettings({
       const signatureConfig = await showSignatureConfigDialog({
         user,
         petition,
-        providers: signatureIntegrations,
+        integrations: signatureIntegrations,
       });
 
       const previous = petition.signatureConfig;

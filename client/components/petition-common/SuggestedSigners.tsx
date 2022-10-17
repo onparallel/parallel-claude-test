@@ -6,8 +6,9 @@ import { FormattedMessage } from "react-intl";
 interface SuggestedSignersProps {
   suggestions: SuggestedSigners_PetitionSignerFragment[];
   onAddSigner: (s: SuggestedSigners_PetitionSignerFragment) => void;
+  isDisabled?: boolean;
 }
-export function SuggestedSigners({ suggestions, onAddSigner }: SuggestedSignersProps) {
+export function SuggestedSigners({ suggestions, onAddSigner, isDisabled }: SuggestedSignersProps) {
   return suggestions.length > 0 ? (
     <>
       <Text fontWeight="bold" marginTop={4}>
@@ -21,7 +22,7 @@ export function SuggestedSigners({ suggestions, onAddSigner }: SuggestedSignersP
               {signer.email}
               {">"}
             </Box>
-            <Button onClick={() => onAddSigner(signer)} size="sm">
+            <Button onClick={() => onAddSigner(signer)} size="sm" isDisabled={isDisabled}>
               <FormattedMessage id="generic.add" defaultMessage="Add" />
             </Button>
           </Flex>

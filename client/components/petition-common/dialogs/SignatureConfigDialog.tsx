@@ -47,16 +47,17 @@ import {
   SignerSelectSelection,
 } from "./ConfirmPetitionSignersDialog";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
-
 export type SignatureConfigDialogProps = {
   petition: SignatureConfigDialog_PetitionBaseFragment;
-  providers: SignatureConfigDialog_SignatureOrgIntegrationFragment[];
+  integrations: SignatureConfigDialog_SignatureOrgIntegrationFragment[];
   user: SignatureConfigDialog_UserFragment;
 };
 
+export const MAX_SIGNERS_ALLOWED = 40;
+
 export function SignatureConfigDialog({
   petition,
-  providers,
+  integrations,
   user,
   ...props
 }: DialogProps<SignatureConfigDialogProps, SignatureConfigInput>) {
@@ -73,7 +74,7 @@ export function SignatureConfigDialog({
   const titleRef = useRef<HTMLInputElement>(null);
 
   const step1Props = useSignatureConfigDialogBodyStep1Props({
-    providers,
+    integrations,
     petition,
     titleRef,
   });
@@ -117,7 +118,7 @@ export function SignatureConfigDialog({
       const data = { ...step1Values(), ...step2Values() };
       props.onResolve({
         title: data.title || null,
-        orgIntegrationId: data.provider.id,
+        orgIntegrationId: data.integration.id,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         signersInfo:
           review && !petitionIsCompleted
@@ -270,32 +271,32 @@ export function useSignatureConfigDialog() {
 
 function useSignatureConfigDialogBodyStep1Props({
   petition,
-  providers,
+  integrations,
   titleRef,
 }: {
   petition: SignatureConfigDialog_PetitionBaseFragment;
-  providers: SignatureConfigDialog_SignatureOrgIntegrationFragment[];
+  integrations: SignatureConfigDialog_SignatureOrgIntegrationFragment[];
   titleRef: RefObject<HTMLInputElement>;
 }) {
   return {
     form: useForm<{
-      provider: SignatureConfigDialog_SignatureOrgIntegrationFragment;
+      integration: SignatureConfigDialog_SignatureOrgIntegrationFragment;
       review: boolean;
       title: Maybe<string>;
     }>({
       mode: "onSubmit",
       defaultValues: {
-        provider:
+        integration:
           petition.signatureConfig?.integration ??
-          providers.find((p) => p.isDefault) ??
-          providers[0],
+          integrations.find((i) => i.isDefault) ??
+          integrations[0],
         review: petition.signatureConfig?.review ?? false,
         title: petition.signatureConfig?.title ?? null,
       },
     }),
     petitionIsCompleted:
       petition.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status),
-    providers,
+    integrations,
     titleRef,
   };
 }
@@ -303,7 +304,7 @@ function useSignatureConfigDialogBodyStep1Props({
 function SignatureConfigDialogBodyStep1({
   form: { control, register },
   petitionIsCompleted,
-  providers,
+  integrations,
   titleRef,
 }: ReturnType<typeof useSignatureConfigDialogBodyStep1Props>) {
   const intl = useIntl();
@@ -355,7 +356,7 @@ function SignatureConfigDialogBodyStep1({
           </HelpCenterLink>
         </Text>
       </Stack>
-      <FormControl hidden={providers.length < 2}>
+      <FormControl hidden={integrations.length < 2}>
         <FormLabel>
           <FormattedMessage
             id="component.signature-config-dialog.provider-label"
@@ -363,23 +364,23 @@ function SignatureConfigDialogBodyStep1({
           />
         </FormLabel>
         <Controller
-          name="provider"
+          name="integration"
           control={control}
           render={({ field: { onChange, value } }) => (
             <Select
               {...signatureIntegrationReactProps}
-              getOptionLabel={(p) =>
-                p.environment === "DEMO"
-                  ? `${p.name} (${intl.formatMessage({
+              getOptionLabel={(i) =>
+                i.environment === "DEMO"
+                  ? `${i.name} (${intl.formatMessage({
                       id: "generic.signature-demo-environment-long",
                       defaultMessage: "Test environment",
                     })})`
-                  : p.name
+                  : i.name
               }
               getOptionValue={(p) => p.id}
-              value={providers.find((p) => p.id === value.id)}
+              value={integrations.find((i) => i.id === value.id)}
               onChange={onChange}
-              options={providers}
+              options={integrations}
               isSearchable={false}
             />
           )}
@@ -496,6 +497,8 @@ export function SignatureConfigDialogBodyStep2({
   accesses,
 }: ReturnType<typeof useSignatureConfigDialogBodyStep2Props>) {
   const signers = watch("signers");
+
+  const isMaxSignersReached = signers.length >= MAX_SIGNERS_ALLOWED;
 
   const intl = useIntl();
   const handleSearchContacts = useSearchContacts();
@@ -646,6 +649,7 @@ export function SignatureConfigDialogBodyStep2({
 
               <Box marginTop={2}>
                 <ContactSelect
+                  isDisabled={isMaxSignersReached}
                   value={selectedContact}
                   onFocus={() => setRadioSelection("choose-now")}
                   onChange={handleContactSelectOnChange(onChange)}
@@ -657,6 +661,7 @@ export function SignatureConfigDialogBodyStep2({
                   })}
                 />
                 <SuggestedSigners
+                  isDisabled={isMaxSignersReached}
                   suggestions={suggestions}
                   onAddSigner={(s) => {
                     setRadioSelection("choose-now");
@@ -668,7 +673,7 @@ export function SignatureConfigDialogBodyStep2({
           )}
         />
       </FormControl>
-      <FormControl hidden={signers.length === 0 || petitionIsCompleted}>
+      <FormControl hidden={isMaxSignersReached || signers.length === 0 || petitionIsCompleted}>
         <FormLabel>
           <Checkbox marginTop={4} colorScheme="primary" {...register("allowAdditionalSigners")}>
             <HStack alignContent="center">

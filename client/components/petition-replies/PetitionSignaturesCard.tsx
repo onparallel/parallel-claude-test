@@ -280,7 +280,7 @@ export const PetitionSignaturesCard = Object.assign(
         const signatureConfig = await showSignatureConfigDialog({
           user,
           petition,
-          providers: signatureIntegrations,
+          integrations: signatureIntegrations,
         });
         await updateSignatureConfig({
           variables: { petitionId: petition.id, signatureConfig },

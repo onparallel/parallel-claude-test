@@ -86,6 +86,10 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
     recipients: Recipient[],
     opts: SignatureOptions
   ) {
+    // signaturit has a 40 signers limit
+    if (recipients.length > 40) {
+      throw new Error("MAX_RECIPIENTS_EXCEEDED_ERROR");
+    }
     const locale = opts.locale;
     const tone = opts.templateData?.theme.preferredTone ?? "INFORMAL";
 

@@ -27,6 +27,7 @@ import { isDefined, omit, uniqBy } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SuggestedSigners } from "../SuggestedSigners";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
+import { MAX_SIGNERS_ALLOWED } from "./SignatureConfigDialog";
 
 interface ConfirmPetitionSignersDialogProps {
   user: ConfirmPetitionSignersDialog_UserFragment;
@@ -153,6 +154,8 @@ export function ConfirmPetitionSignersDialog({
       } catch {}
     };
 
+  const isMaxSignersReached = signers.length >= MAX_SIGNERS_ALLOWED;
+
   return (
     <ConfirmDialog
       size="xl"
@@ -171,7 +174,11 @@ export function ConfirmPetitionSignersDialog({
               firstName: s.firstName,
               lastName: s.lastName ?? "",
             })),
-            allowAdditionalSigners: hasSigners ? allowAdditionalSigners : true,
+            allowAdditionalSigners: hasSigners
+              ? isMaxSignersReached
+                ? false
+                : allowAdditionalSigners
+              : true,
           });
         }),
       }}
@@ -217,6 +224,7 @@ export function ConfirmPetitionSignersDialog({
                   <Box marginTop={2}>
                     <ContactSelect
                       ref={contactSelectRef as any}
+                      isDisabled={isMaxSignersReached}
                       value={selectedContact}
                       onChange={handleContactSelectOnChange(onChange)}
                       onSearchContacts={handleSearchContacts}
@@ -227,6 +235,7 @@ export function ConfirmPetitionSignersDialog({
                       })}
                     />
                     <SuggestedSigners
+                      isDisabled={isMaxSignersReached}
                       suggestions={suggestions}
                       onAddSigner={(s) => onChange([...signers, s])}
                     />
@@ -236,7 +245,7 @@ export function ConfirmPetitionSignersDialog({
             />
           </FormControl>
           {signers.length > 0 ? (
-            isUpdate ? (
+            isUpdate && !isMaxSignersReached ? (
               <Checkbox marginTop={4} colorScheme="primary" {...register("allowAdditionalSigners")}>
                 <HStack alignContent="center">
                   <FormattedMessage

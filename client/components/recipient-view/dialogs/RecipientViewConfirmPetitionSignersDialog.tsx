@@ -7,6 +7,7 @@ import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { SignerSelectSelection } from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
 import { useConfirmSignerInfoDialog } from "@parallel/components/petition-common/dialogs/ConfirmSignerInfoDialog";
+import { MAX_SIGNERS_ALLOWED } from "@parallel/components/petition-common/dialogs/SignatureConfigDialog";
 import { SelectedSignerRow } from "@parallel/components/petition-common/SelectedSignerRow";
 import { SuggestedSigners } from "@parallel/components/petition-common/SuggestedSigners";
 import {
@@ -106,6 +107,7 @@ function RecipientViewConfirmPetitionSignersDialog({
     } catch {}
   };
 
+  const isMaxSignersReached = signers.length >= MAX_SIGNERS_ALLOWED;
   return (
     <ConfirmDialog
       {...props}
@@ -166,7 +168,7 @@ function RecipientViewConfirmPetitionSignersDialog({
                       />
                     ))}
                   </Stack>
-                  {signers.length === 0 || allowAdditionalSigners ? (
+                  {!isMaxSignersReached && (signers.length === 0 || allowAdditionalSigners) ? (
                     <Box marginTop={2}>
                       <Button variant="outline" paddingX={3} onClick={handleAddNewSigner(onChange)}>
                         <PlusCircleFilledIcon color="primary.500" fontSize="xl" marginRight={2} />
