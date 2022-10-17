@@ -467,51 +467,50 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                           }
                           isCacheOnly={!isPetition}
                             myEffectivePermission={myEffectivePermission}
-                            />
-                          <Center
-                            className={
-                              showQuickAccessButtons ? "edit-preview-field-buttons" : undefined
-                            }
-                            position="absolute"
-                            top="0px"
-                            right="-48px"
-                            height="100%"
-                            width="auto"
-                            display="none"
-                            padding={2}
-                          >
-                            <Stack>
-                              <IconButtonWithTooltip
-                                size="sm"
-                                variant="outline"
-                                backgroundColor="white"
-                                placement="bottom"
-                                color="gray.600"
-                                icon={<EditSimpleIcon boxSize={4} />}
-                                label={intl.formatMessage({
-                                  id: "page.preview.edit-field",
-                                  defaultMessage: "Edit field",
-                                })}
-                                onClick={() => handlePushTo("compose", field.id)}
-                              />
-                              {field.type === "HEADING" ? null : (
+                          />
+                          {showQuickAccessButtons ? (
+                            <Center
+                              position="absolute"
+                              top="0px"
+                              right="-48px"
+                              height="100%"
+                              width="auto"
+                              minWidth="48px"
+                              padding={2}
+                            >
+                              <Stack className={"edit-preview-field-buttons"} display="none">
                                 <IconButtonWithTooltip
-                                  icon={<ChevronRightIcon boxSize={5} />}
                                   size="sm"
                                   variant="outline"
                                   backgroundColor="white"
                                   placement="bottom"
                                   color="gray.600"
-                                  isDisabled={field.replies.length === 0}
+                                  icon={<EditSimpleIcon boxSize={4} />}
                                   label={intl.formatMessage({
-                                    id: "page.preview.review-reply",
-                                    defaultMessage: "Review reply",
+                                    id: "page.preview.edit-field",
+                                    defaultMessage: "Edit field",
                                   })}
-                                  onClick={() => handlePushTo("replies", field.id)}
+                                  onClick={() => handlePushTo("compose", field.id)}
                                 />
-                              )}
-                            </Stack>
-                          </Center>
+                                {field.type === "HEADING" ? null : (
+                                  <IconButtonWithTooltip
+                                    icon={<ChevronRightIcon boxSize={5} />}
+                                    size="sm"
+                                    variant="outline"
+                                    backgroundColor="white"
+                                    placement="bottom"
+                                    color="gray.600"
+                                    isDisabled={field.replies.length === 0}
+                                    label={intl.formatMessage({
+                                      id: "page.preview.review-reply",
+                                      defaultMessage: "Review reply",
+                                    })}
+                                    onClick={() => handlePushTo("replies", field.id)}
+                                  />
+                                )}
+                              </Stack>
+                            </Center>
+                          ) : null}
                         </Box>
                        
                       </motion.div>
