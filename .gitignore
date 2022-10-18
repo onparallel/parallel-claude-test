@@ -10,3 +10,4 @@ server/lang/compiled
 server/.development.env
 
 .DS_Store
+client/tsconfig.tsbuildinfo

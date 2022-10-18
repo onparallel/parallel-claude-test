@@ -492,7 +492,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                                   })}
                                   onClick={() => handlePushTo("compose", field.id)}
                                 />
-                                {field.type === "HEADING" ? null : (
+                                {field.type === "HEADING" || !isPetition ? null : (
                                   <IconButtonWithTooltip
                                     icon={<ChevronRightIcon boxSize={5} />}
                                     size="sm"

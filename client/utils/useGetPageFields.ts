@@ -6,7 +6,6 @@ import {
 import { useMemo } from "react";
 import { useFieldVisibility } from "./fieldVisibility/useFieldVisibility";
 import { groupFieldsByPages, GroupFieldsByPagesOptions } from "./groupFieldsByPage";
-import { UnionToArrayUnion } from "./types";
 
 type PetitionFieldSelection =
   | useGetPageFields_PublicPetitionFieldFragment
@@ -16,11 +15,11 @@ interface UseGetPageFieldsOptions extends GroupFieldsByPagesOptions {
   usePreviewReplies?: boolean;
 }
 
-export function useGetPageFields<T extends UnionToArrayUnion<PetitionFieldSelection>>(
-  fields: T,
+export function useGetPageFields<T extends PetitionFieldSelection>(
+  fields: T[],
   { usePreviewReplies, ...options }: UseGetPageFieldsOptions
 ) {
-  const visibility = useFieldVisibility(fields, usePreviewReplies);
+  const visibility = useFieldVisibility(fields as any, usePreviewReplies);
   return useMemo(() => {
     const pages = groupFieldsByPages<T>(fields, visibility, options);
     return { pages, visibility };
