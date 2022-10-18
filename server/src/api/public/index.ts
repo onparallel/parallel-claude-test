@@ -2433,9 +2433,6 @@ api
       body: JsonBody(CreateContact),
       responses: {
         201: SuccessResponse(Contact),
-        409: ErrorResponse({
-          description: "A contact with this email already exists",
-        }),
       },
       tags: ["Contacts"],
     },
