@@ -9,13 +9,13 @@ export async function up(knex: Knex): Promise<void> {
   });
 
   await knex.raw(/* sql */ `
-    create index petition_event__processed_at on petition_event (id) where processed_at is null;
-    create index system_event__processed_at on system_event (id) where processed_at is null;
+    update petition_event set processed_at = created_at;
+    update system_event set processed_at = created_at;  
   `);
 
   await knex.raw(/* sql */ `
-    update petition_event set processed_at = created_at;
-    update system_event set processed_at = created_at;  
+    create index petition_event__processed_at on petition_event (id) where processed_at is null;
+    create index system_event__processed_at on system_event (id) where processed_at is null;
   `);
 }
 
