@@ -15,7 +15,6 @@ import {
   Contacts_userDocument,
   QueryContacts_OrderBy,
 } from "@parallel/graphql/__types";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
@@ -29,7 +28,6 @@ import { UnwrapArray } from "@parallel/utils/types";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-
 const SORTING = ["firstName", "lastName", "fullName", "email", "createdAt"] as const;
 
 const QUERY_STATE = {
@@ -82,23 +80,7 @@ function Contacts() {
     try {
       await createContact({});
       refetch();
-    } catch (error) {
-      if (isApolloError(error, "ARG_VALIDATION_ERROR")) {
-        showToast({
-          title: intl.formatMessage({
-            id: "contacts.email-error.validation-failed",
-            defaultMessage: "The email validation has failed",
-          }),
-          description: intl.formatMessage({
-            id: "contacts.email-error.check-correct-email",
-            defaultMessage: "Please make sure that the email is correct.",
-          }),
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    }
+    } catch {}
   }
   const deleteContacts = useDeleteContacts();
   async function handleDeleteClick() {
