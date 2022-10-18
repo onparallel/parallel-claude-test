@@ -47,7 +47,7 @@ export const createContact = mutationField("createContact", {
   resolve: async (_, args, ctx) => {
     const { email, firstName, lastName } = args.data;
     try {
-      return await ctx.contacts.createContact(
+      const [contact] = await ctx.contacts.loadOrCreate(
         {
           org_id: ctx.user!.org_id,
           email: email.trim().toLowerCase(),
@@ -56,18 +56,10 @@ export const createContact = mutationField("createContact", {
         },
         `User:${ctx.user!.id}`
       );
-    } catch (error: any) {
-      if (error?.constraint === "contact__org_id__email") {
-        const contact = await ctx.contacts.loadContactByEmail({
-          orgId: ctx.user!.org_id,
-          email: email.trim().toLowerCase(),
-        });
 
-        return contact!;
-        // throw new ApolloError("Contact already exists.", "EXISTING_CONTACT");
-      } else {
-        throw new Error("INTERNAL_ERROR");
-      }
+      return contact;
+    } catch (error: any) {
+      throw new Error("INTERNAL_ERROR");
     }
   },
 });
