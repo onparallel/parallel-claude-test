@@ -7,7 +7,7 @@ import { User } from "../src/db/__types";
 import { EMAIL_REGEX } from "../src/graphql/helpers/validators/validEmail";
 import { IAnalyticsService } from "../src/services/analytics";
 import { IAuth } from "../src/services/auth";
-import { IAws } from "../src/services/aws";
+import { IQueuesService } from "../src/services/queues";
 import { IEmailsService } from "../src/services/emails";
 import { IFetchService } from "../src/services/fetch";
 import { IRedis } from "../src/services/redis";
@@ -108,7 +108,7 @@ export class MockEmailsService implements IEmailsService {
 }
 
 @injectable()
-export class MockAwsService implements IAws {
+export class MockQueuesService implements IQueuesService {
   constructor() {}
   async enqueueMessages() {}
   async enqueueEvents() {}

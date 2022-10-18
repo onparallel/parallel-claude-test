@@ -16,7 +16,7 @@ import {
   zip,
 } from "remeda";
 import { RESULT } from "../../graphql";
-import { Aws, AWS_SERVICE } from "../../services/aws";
+import { QueuesService, QUEUES_SERVICE } from "../../services/queues";
 import { ILogger, LOGGER } from "../../services/logger";
 import { average, findLast, partition, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
@@ -155,7 +155,7 @@ export class PetitionRepository extends BaseRepository {
   private readonly REPLY_EVENTS_DELAY_SECONDS = 60;
   constructor(
     @inject(KNEX) knex: Knex,
-    @inject(AWS_SERVICE) private aws: Aws,
+    @inject(QUEUES_SERVICE) private queues: QueuesService,
     @inject(LOGGER) private logger: ILogger,
     @inject(FileRepository) private files: FileRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository
@@ -2507,7 +2507,7 @@ export class PetitionRepository extends BaseRepository {
     }
 
     const petitionEvents = await this.insert("petition_event", eventsArray, t);
-    await this.aws.enqueueEvents(petitionEvents, "petition_event", undefined, t);
+    await this.queues.enqueueEvents(petitionEvents, "petition_event", undefined, t);
 
     return petitionEvents;
   }
@@ -2519,7 +2519,7 @@ export class PetitionRepository extends BaseRepository {
     }
 
     const petitionEvents = await this.insert("petition_event", eventsArray);
-    await this.aws.enqueueEvents(petitionEvents, "petition_event", notifyAfter);
+    await this.queues.enqueueEvents(petitionEvents, "petition_event", notifyAfter);
 
     return petitionEvents;
   }
@@ -2576,7 +2576,7 @@ export class PetitionRepository extends BaseRepository {
 
   async updateEvent(eventId: number, data: Partial<PetitionEvent>, notifyAfter?: number) {
     const [event] = await this.from("petition_event").where("id", eventId).update(data, "*");
-    await this.aws.enqueueEvents(event, "petition_event", notifyAfter);
+    await this.queues.enqueueEvents(event, "petition_event", notifyAfter);
 
     return event;
   }

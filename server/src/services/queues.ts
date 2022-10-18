@@ -12,7 +12,7 @@ import { MaybeArray } from "../util/types";
 import { QueueWorkerPayload } from "../workers/helpers/createQueueWorker";
 import { ILogger, LOGGER } from "./logger";
 
-export interface IAws {
+export interface IQueuesService {
   enqueueMessages<Q extends keyof Config["queueWorkers"]>(
     queue: Q,
     messages:
@@ -28,10 +28,10 @@ export interface IAws {
   ): Promise<void>;
 }
 
-export const AWS_SERVICE = Symbol.for("AWS_SERVICE");
+export const QUEUES_SERVICE = Symbol.for("QUEUES_SERVICE");
 
 @injectable()
-export class Aws implements IAws {
+export class QueuesService implements IQueuesService {
   @Memoize() private get sqs() {
     return new SQSClient({
       ...this.config.aws,

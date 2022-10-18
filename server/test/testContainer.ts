@@ -1,7 +1,7 @@
 import { createContainer } from "../src/container";
 import { ANALYTICS, IAnalyticsService } from "../src/services/analytics";
 import { AUTH, IAuth } from "../src/services/auth";
-import { AWS_SERVICE, IAws } from "../src/services/aws";
+import { QUEUES_SERVICE, IQueuesService } from "../src/services/queues";
 import { EMAILS, IEmailsService } from "../src/services/emails";
 import { FETCH_SERVICE, IFetchService } from "../src/services/fetch";
 import { ILogger, LOGGER } from "../src/services/logger";
@@ -11,7 +11,7 @@ import { IStorageService, STORAGE_SERVICE } from "../src/services/storage";
 import {
   MockAnalyticsService,
   MockAuth,
-  MockAwsService,
+  MockQueuesService,
   MockEmailsService,
   MockFetchService,
   MockRedis,
@@ -26,7 +26,7 @@ export function createTestContainer() {
   container.rebind<IRedis>(REDIS).to(MockRedis);
   container.rebind<IAnalyticsService>(ANALYTICS).to(MockAnalyticsService);
   container.rebind<IEmailsService>(EMAILS).to(MockEmailsService).inSingletonScope();
-  container.rebind<IAws>(AWS_SERVICE).to(MockAwsService).inSingletonScope();
+  container.rebind<IQueuesService>(QUEUES_SERVICE).to(MockQueuesService).inSingletonScope();
   container.rebind<IFetchService>(FETCH_SERVICE).to(MockFetchService).inSingletonScope();
   container.rebind<ISignatureService>(SIGNATURE).to(MockSignatureService).inSingletonScope();
   container.rebind<IStorageService>(STORAGE_SERVICE).to(MockStorage);

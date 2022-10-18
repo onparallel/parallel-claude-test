@@ -132,7 +132,7 @@ export class Mocks {
       .insert(
         range(0, amount).map<CreateOrganization>((index) => {
           return {
-            name: faker.company.companyName(),
+            name: faker.company.name(),
             status: "DEV",
             ...builder?.(index),
           };

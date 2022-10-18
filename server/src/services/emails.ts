@@ -10,7 +10,7 @@ import { EMAIL_REGEX } from "../graphql/helpers/validators/validEmail";
 import { unMaybeArray } from "../util/arrays";
 import { Maybe, MaybeArray } from "../util/types";
 import { EmailPayload } from "../workers/email-sender";
-import { Aws, AWS_SERVICE } from "./aws";
+import { QueuesService, QUEUES_SERVICE } from "./queues";
 
 export interface IEmailsService {
   sendPetitionMessageEmail(messageIds: MaybeArray<number>): Promise<void>;
@@ -87,7 +87,7 @@ export const EMAILS = Symbol.for("EMAILS");
 
 @injectable()
 export class EmailsService implements IEmailsService {
-  constructor(@inject(AWS_SERVICE) private aws: Aws) {}
+  constructor(@inject(QUEUES_SERVICE) private queues: QueuesService) {}
 
   private async enqueueEmail<T extends keyof EmailPayload>(
     type: T,
@@ -95,7 +95,7 @@ export class EmailsService implements IEmailsService {
     t?: Knex.Transaction
   ) {
     const payloads = unMaybeArray(data);
-    await this.aws.enqueueMessages(
+    await this.queues.enqueueMessages(
       "email-sender",
       payloads.map((p) => ({
         id: p.id,

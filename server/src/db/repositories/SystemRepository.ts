@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { AWS_SERVICE, IAws } from "../../services/aws";
+import { QUEUES_SERVICE, IQueuesService } from "../../services/queues";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { CreateSystemEvent } from "../events";
@@ -9,7 +9,7 @@ import { KNEX } from "../knex";
 
 @injectable()
 export class SystemRepository extends BaseRepository {
-  constructor(@inject(KNEX) knex: Knex, @inject(AWS_SERVICE) private aws: IAws) {
+  constructor(@inject(KNEX) knex: Knex, @inject(QUEUES_SERVICE) private queues: IQueuesService) {
     super(knex);
   }
 
@@ -19,7 +19,7 @@ export class SystemRepository extends BaseRepository {
       return [];
     }
     const systemEvents = await this.insert("system_event", eventsArray, t);
-    await this.aws.enqueueEvents(systemEvents, "system_event", undefined, t);
+    await this.queues.enqueueEvents(systemEvents, "system_event", undefined, t);
     return systemEvents;
   }
 

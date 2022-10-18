@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { AWS_SERVICE, IAws } from "../../services/aws";
+import { QUEUES_SERVICE, IQueuesService } from "../../services/queues";
 import { Loader } from "../../util/fromDataLoader";
 import { Maybe, Replace } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
@@ -54,7 +54,7 @@ export type Task<TName extends TaskName> = Replace<
 
 @injectable()
 export class TaskRepository extends BaseRepository {
-  constructor(@inject(KNEX) knex: Knex, @inject(AWS_SERVICE) private aws: IAws) {
+  constructor(@inject(KNEX) knex: Knex, @inject(QUEUES_SERVICE) private queues: IQueuesService) {
     super(knex);
   }
 
@@ -101,7 +101,7 @@ export class TaskRepository extends BaseRepository {
       },
       "*"
     );
-    await this.aws.enqueueMessages("task-worker", {
+    await this.queues.enqueueMessages("task-worker", {
       groupId: `Task:${task.id}`,
       body: { taskId: task.id },
     });

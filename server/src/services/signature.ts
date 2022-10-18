@@ -8,7 +8,6 @@ import {
   IntegrationSettings,
   SignatureProvider,
 } from "../db/repositories/IntegrationRepository";
-import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import {
   PetitionRepository,
   PetitionSignatureConfig,
@@ -19,7 +18,7 @@ import { unMaybeArray } from "../util/arrays";
 import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";
 import { MaybeArray } from "../util/types";
-import { AWS_SERVICE, IAws } from "./aws";
+import { IQueuesService, QUEUES_SERVICE } from "./queues";
 import { ISignatureClient, SIGNATURE_CLIENT } from "./signature-clients/client";
 
 export interface ISignatureService {
@@ -58,8 +57,7 @@ export class SignatureService implements ISignatureService {
     @inject(IntegrationRepository)
     private integrationRepository: IntegrationRepository,
     @inject(PetitionRepository) private petitionsRepository: PetitionRepository,
-    @inject(OrganizationRepository) private organizationsRepository: OrganizationRepository,
-    @inject(AWS_SERVICE) private aws: IAws,
+    @inject(QUEUES_SERVICE) private queues: IQueuesService,
     @inject(Container) private container: Container
   ) {}
 
@@ -141,7 +139,7 @@ export class SignatureService implements ISignatureService {
         this.petitionsRepository.loadPetitionSignaturesByPetitionId.dataloader.clear(petitionId),
         pendingSignatureRequest
           ? // only send a cancel request if the signature request has been already processed
-            this.aws.enqueueMessages("signature-worker", {
+            this.queues.enqueueMessages("signature-worker", {
               groupId: `signature-${toGlobalId("Petition", pendingSignatureRequest.petition_id)}`,
               body: {
                 type: "cancel-signature-process",
@@ -162,7 +160,7 @@ export class SignatureService implements ISignatureService {
     });
 
     await Promise.all([
-      this.aws.enqueueMessages("signature-worker", {
+      this.queues.enqueueMessages("signature-worker", {
         groupId: `signature-${toGlobalId("Petition", petitionId)}`,
         body: {
           type: "start-signature-process",
@@ -186,7 +184,7 @@ export class SignatureService implements ISignatureService {
     signedDocumentExternalId: string,
     signer: PetitionSignatureConfigSigner
   ) {
-    await this.aws.enqueueMessages("signature-worker", {
+    await this.queues.enqueueMessages("signature-worker", {
       groupId: `signature-${toGlobalId("Petition", signature.petition_id)}`,
       body: {
         type: "store-signed-document",
@@ -200,7 +198,7 @@ export class SignatureService implements ISignatureService {
   }
 
   async storeAuditTrail(signature: PetitionSignatureRequest, signedDocumentExternalId: string) {
-    await this.aws.enqueueMessages("signature-worker", {
+    await this.queues.enqueueMessages("signature-worker", {
       groupId: `signature-${toGlobalId("Petition", signature.petition_id)}`,
       body: {
         type: "store-audit-trail",
@@ -218,7 +216,7 @@ export class SignatureService implements ISignatureService {
   ): Promise<void> {
     const signatures = unMaybeArray(signature).filter((s) => s.status === "PROCESSED");
     if (signatures.length > 0) {
-      await this.aws.enqueueMessages(
+      await this.queues.enqueueMessages(
         "signature-worker",
         signatures.map((s) => ({
           id: `signature-${toGlobalId("Petition", s.petition_id)}`,
@@ -236,7 +234,7 @@ export class SignatureService implements ISignatureService {
   async sendSignatureReminders(signature: MaybeArray<PetitionSignatureRequest>): Promise<void> {
     const signatures = unMaybeArray(signature).filter((s) => s.status === "PROCESSED");
     if (signatures.length > 0) {
-      await this.aws.enqueueMessages(
+      await this.queues.enqueueMessages(
         "signature-worker",
         signatures.map((s) => ({
           id: `signature-${toGlobalId("Petition", s.petition_id)}`,
@@ -251,7 +249,7 @@ export class SignatureService implements ISignatureService {
   }
 
   async updateBranding(orgId: number, t?: Knex.Transaction): Promise<void> {
-    await this.aws.enqueueMessages(
+    await this.queues.enqueueMessages(
       "signature-worker",
       {
         groupId: `signature-branding-${toGlobalId("Organization", orgId)}`,

@@ -12,7 +12,7 @@ export type DelayQueuePayload = {
 }[OtherQueues];
 
 createQueueWorker("delay-queue", async ({ queue, body, groupId }, ctx) => {
-  await ctx.aws.enqueueMessages(queue, {
+  await ctx.queues.enqueueMessages(queue, {
     body,
     groupId,
   });

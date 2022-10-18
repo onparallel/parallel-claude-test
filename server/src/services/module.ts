@@ -1,7 +1,7 @@
 import { ContainerModule } from "inversify";
 import { ANALYTICS, AnalyticsService, IAnalyticsService } from "./analytics";
 import { AUTH, Auth, IAuth } from "./auth";
-import { Aws, AWS_SERVICE, IAws } from "./aws";
+import { QueuesService, QUEUES_SERVICE, IQueuesService } from "./queues";
 import { EMAILS, EmailsService, IEmailsService } from "./emails";
 import { FetchService, FETCH_SERVICE, IFetchService } from "./fetch";
 import { I18nService, I18N_SERVICE, II18nService } from "./i18n";
@@ -23,7 +23,7 @@ import { ITiersService, TiersService, TIERS_SERVICE } from "./tiers";
 export const servicesModule = new ContainerModule((bind) => {
   bind<ILogger>(LOGGER).toDynamicValue(createLogger).inSingletonScope();
   bind<IAuth>(AUTH).to(Auth);
-  bind<IAws>(AWS_SERVICE).to(Aws).inSingletonScope();
+  bind<IQueuesService>(QUEUES_SERVICE).to(QueuesService).inSingletonScope();
   bind<IEmailsService>(EMAILS).to(EmailsService);
   bind<IAnalyticsService>(ANALYTICS).to(AnalyticsService).inSingletonScope();
   bind<IRedis>(REDIS).to(Redis).inSingletonScope();

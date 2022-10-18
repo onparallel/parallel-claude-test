@@ -57,7 +57,7 @@ import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
 import { userHasRole } from "../util/userHasRole";
 import { EmailPayload } from "../workers/email-sender";
-import { AWS_SERVICE, IAws } from "./aws";
+import { QUEUES_SERVICE, IQueuesService } from "./queues";
 import { ILogger, LOGGER } from "./logger";
 import { IRedis, REDIS } from "./redis";
 
@@ -123,7 +123,7 @@ export class Auth implements IAuth {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(REDIS) private redis: IRedis,
-    @inject(AWS_SERVICE) private aws: IAws,
+    @inject(QUEUES_SERVICE) private queues: IQueuesService,
     @inject(LOGGER) private logger: ILogger,
     private orgs: OrganizationRepository,
     private integrations: IntegrationRepository,
@@ -981,7 +981,7 @@ export class Auth implements IAuth {
   }
 
   private async sendInvitationEmail(payload: EmailPayload["invitation"]) {
-    await this.aws.enqueueMessages("email-sender", {
+    await this.queues.enqueueMessages("email-sender", {
       groupId: `user-invite-${payload.user_cognito_id}`,
       body: {
         type: "invitation",
