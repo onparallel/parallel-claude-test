@@ -222,7 +222,7 @@ describe("GraphQL/Contacts", () => {
     });
   });
 
-  it("sends error when trying to create a contact with an existing email", async () => {
+  it("return contact when trying to create a contact with an existing email", async () => {
     const { data, errors } = await testClient.execute(
       gql`
         mutation ($email: String!, $firstName: String!) {
@@ -238,8 +238,11 @@ describe("GraphQL/Contacts", () => {
       }
     );
 
-    expect(errors).toContainGraphQLError("EXISTING_CONTACT");
-    expect(data).toBeNull();
+    expect(errors).toBeUndefined();
+    expect(data!.createContact).toEqual({
+      email: userContacts[3].email,
+      id: toGlobalId("Contact", userContacts[3].id),
+    });
   });
 
   it("updates first name from contact", async () => {

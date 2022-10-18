@@ -2452,9 +2452,6 @@ api
         const result = await client.request(CreateContact_contactDocument, { data: body });
         return Created(result.createContact!);
       } catch (error: any) {
-        if (error instanceof ClientError && containsGraphQLError(error, "EXISTING_CONTACT")) {
-          throw new ConflictError("A contact with this email already exists");
-        }
         throw error;
       }
     }

@@ -1320,16 +1320,6 @@
     "context": "Error"
   },
   {
-    "term": "component.existing-contact-toast.description",
-    "definition": "This contact already exists.",
-    "context": "This contact already exists."
-  },
-  {
-    "term": "component.existing-contact-toast.title",
-    "definition": "Existing contact",
-    "context": "Existing contact"
-  },
-  {
     "term": "component.export-replies-dialog.download-files",
     "definition": "Download files as a ZIP",
     "context": "Download files as a ZIP"

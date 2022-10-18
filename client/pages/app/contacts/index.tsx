@@ -26,7 +26,6 @@ import { useDeleteContacts } from "@parallel/utils/mutations/useDeleteContacts";
 import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
-import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -46,7 +45,6 @@ const QUERY_STATE = {
 function Contacts() {
   const intl = useIntl();
   const showToast = useToast();
-  const errorToast = useExistingContactToast();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const {
     data: { me, realMe },
@@ -85,9 +83,6 @@ function Contacts() {
       await createContact({});
       refetch();
     } catch (error) {
-      if (isApolloError(error, "EXISTING_CONTACT")) {
-        errorToast();
-      }
       if (isApolloError(error, "ARG_VALIDATION_ERROR")) {
         showToast({
           title: intl.formatMessage({

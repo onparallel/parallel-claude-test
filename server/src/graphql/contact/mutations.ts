@@ -58,7 +58,13 @@ export const createContact = mutationField("createContact", {
       );
     } catch (error: any) {
       if (error?.constraint === "contact__org_id__email") {
-        throw new ApolloError("Contact already exists.", "EXISTING_CONTACT");
+        const contact = await ctx.contacts.loadContactByEmail({
+          orgId: ctx.user!.org_id,
+          email: email.trim().toLowerCase(),
+        });
+
+        return contact!;
+        // throw new ApolloError("Contact already exists.", "EXISTING_CONTACT");
       } else {
         throw new Error("INTERNAL_ERROR");
       }

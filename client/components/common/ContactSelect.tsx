@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { Box, Text, Tooltip } from "@chakra-ui/react";
 import { AlertCircleFilledIcon, UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import {
   genericRsComponent,
   useReactSelectProps,
@@ -10,7 +9,6 @@ import {
 } from "@parallel/utils/react-select/hooks";
 import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/types";
 import { Maybe, unMaybeArray } from "@parallel/utils/types";
-import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
 import {
@@ -62,8 +60,6 @@ export const ContactSelect = Object.assign(
     }: ContactSelectProps<IsMulti>,
     ref: ForwardedRef<ContactSelectInstance<IsMulti>>
   ) {
-    const showExistingContactErrorToast = useExistingContactToast();
-
     const [isCreating, setIsCreating] = useState(false);
 
     const [options, setOptions] = useState<ContactSelectSelection[]>();
@@ -122,11 +118,7 @@ export const ContactSelect = Object.assign(
         }
         setIsCreating(false);
         return true;
-      } catch (error) {
-        if (isApolloError(error, "EXISTING_CONTACT")) {
-          showExistingContactErrorToast();
-        }
-      }
+      } catch {}
       setIsCreating(false);
       return false;
     }
