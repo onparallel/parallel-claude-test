@@ -41,15 +41,7 @@ import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviou
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { withError } from "@parallel/utils/promises/withError";
-import {
-  boolean,
-  integer,
-  sorting,
-  string,
-  useQueryState,
-  useQueryStateSlice,
-  values,
-} from "@parallel/utils/queryState";
+import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { isAdmin } from "@parallel/utils/roles";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
@@ -58,7 +50,8 @@ import { useLoginAs } from "@parallel/utils/useLoginAs";
 import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useSelection } from "@parallel/utils/useSelectionState";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
+import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
@@ -71,7 +64,6 @@ const QUERY_STATE = {
     field: "createdAt",
     direction: "ASC",
   }),
-  dialog: boolean(),
 };
 
 function OrganizationUsers() {
@@ -94,22 +86,23 @@ function OrganizationUsers() {
 
   const userIsAdmin = isAdmin(me.role);
 
-  const [showDialog, setShowDialog] = useQueryStateSlice(state, setQueryState, "dialog");
-
-  const hasSsoProvider = data?.me.organization.hasSsoProvider ?? false;
+  const hasSsoProvider = me.organization.hasSsoProvider;
   const users = data?.me.organization.users;
 
   const { selectedRows, selectedIds, onChangeSelectedIds } = useSelection(users?.items, "id");
 
-  const isUserLimitReached = loading
-    ? false
-    : data!.me.organization.activeUserCount >= data!.me.organization.usageLimits.users.limit;
+  const isUserLimitReached =
+    me.organization.activeUserCount >= me.organization.usageLimits.users.limit;
 
-  const isActivateUserButtonDisabled = loading
-    ? false
-    : data!.me.organization.activeUserCount +
-        selectedRows.filter((u) => u.status === "INACTIVE").length >
-      data!.me.organization.usageLimits.users.limit;
+  useTempQueryParam("dialog", () => {
+    if (!isUserLimitReached) {
+      handleCreateUser();
+    }
+  });
+
+  const isActivateUserButtonDisabled =
+    me.organization.activeUserCount + selectedRows.filter((u) => u.status === "INACTIVE").length >
+    me.organization.usageLimits.users.limit;
 
   const [search, setSearch] = useState(state.search);
 
@@ -205,13 +198,6 @@ function OrganizationUsers() {
       }
     }
   };
-
-  useEffect(() => {
-    if (showDialog) {
-      handleCreateUser();
-      setShowDialog(null);
-    }
-  }, [showDialog]);
 
   const [updateOrganizationUser] = useMutation(OrganizationUsers_updateOrganizationUserDocument);
   const handleUpdateUser = async (user: OrganizationUsers_UserFragment) => {
@@ -782,6 +768,16 @@ OrganizationUsers.queries = [
       ...SettingsLayout_Query
       me {
         hasGhostLogin: hasFeatureFlag(featureFlag: GHOST_LOGIN)
+        organization {
+          id
+          hasSsoProvider
+          activeUserCount
+          usageLimits {
+            users {
+              limit
+            }
+          }
+        }
       }
     }
     ${SettingsLayout.fragments.Query}
@@ -796,8 +792,6 @@ OrganizationUsers.queries = [
       me {
         organization {
           id
-          hasSsoProvider
-          activeUserCount
           users(
             offset: $offset
             limit: $limit
@@ -808,11 +802,6 @@ OrganizationUsers.queries = [
             totalCount
             items {
               ...OrganizationUsers_User
-            }
-          }
-          usageLimits {
-            users {
-              limit
             }
           }
         }

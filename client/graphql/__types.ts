@@ -13855,10 +13855,13 @@ export type OrganizationUsers_userQuery = {
     organization: {
       __typename?: "Organization";
       id: string;
+      hasSsoProvider: boolean;
+      activeUserCount: number;
       name: string;
       iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
+        users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
       };
     };
@@ -13886,8 +13889,6 @@ export type OrganizationUsers_orgUsersQuery = {
     organization: {
       __typename?: "Organization";
       id: string;
-      hasSsoProvider: boolean;
-      activeUserCount: number;
       users: {
         __typename?: "UserPagination";
         totalCount: number;
@@ -13911,10 +13912,6 @@ export type OrganizationUsers_orgUsersQuery = {
             memberCount: number;
           }>;
         }>;
-      };
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
       };
     };
   };
@@ -30420,6 +30417,16 @@ export const OrganizationUsers_userDocument = gql`
     ...SettingsLayout_Query
     me {
       hasGhostLogin: hasFeatureFlag(featureFlag: GHOST_LOGIN)
+      organization {
+        id
+        hasSsoProvider
+        activeUserCount
+        usageLimits {
+          users {
+            limit
+          }
+        }
+      }
     }
   }
   ${SettingsLayout_QueryFragmentDoc}
@@ -30434,8 +30441,6 @@ export const OrganizationUsers_orgUsersDocument = gql`
     me {
       organization {
         id
-        hasSsoProvider
-        activeUserCount
         users(
           offset: $offset
           limit: $limit
@@ -30446,11 +30451,6 @@ export const OrganizationUsers_orgUsersDocument = gql`
           totalCount
           items {
             ...OrganizationUsers_User
-          }
-        }
-        usageLimits {
-          users {
-            limit
           }
         }
       }
