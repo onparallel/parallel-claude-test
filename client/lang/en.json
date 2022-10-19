@@ -3210,11 +3210,6 @@
     "context": "Signature completed: {signedAt}"
   },
   {
-    "term": "component.petition-signatures-card.add-signature-credits-message",
-    "definition": "Hi, I would like to get more information about how to get more signature credits.",
-    "context": "Hi, I would like to get more information about how to get more signature credits."
-  },
-  {
     "term": "component.petition-signatures-card.add-signature.label",
     "definition": "Add signature",
     "context": "Add signature"
@@ -3233,11 +3228,6 @@
     "term": "component.petition-signatures-card.more-info-button",
     "definition": "More information",
     "context": "More information"
-  },
-  {
-    "term": "component.petition-signatures-card.no-credits-left.error",
-    "definition": "The eSignature could not be started due to lack of signature credits. Please <a>contact with support</a> to get more credits.",
-    "context": "The eSignature could not be started due to lack of signature credits. Please <a>contact with support</a> to get more credits."
   },
   {
     "term": "component.petition-signatures-card.no-signature-configured",
@@ -5233,16 +5223,6 @@
     "term": "error.maintenance.header",
     "definition": "Parallel is under maintenance",
     "context": "Parallel is under maintenance"
-  },
-  {
-    "term": "error.petition-not-available.header",
-    "definition": "It seems that this parallel is no longer available.",
-    "context": "It seems that this parallel is no longer available."
-  },
-  {
-    "term": "error.petition-not-available.text",
-    "definition": "If you need to access it, please reach out to the person that sent it to you.",
-    "context": "If you need to access it, please reach out to the person that sent it to you."
   },
   {
     "term": "error.unknown-error.header",
@@ -8913,6 +8893,16 @@
     "term": "recipient-view.petition-delegated.toast-header",
     "definition": "Access delegated",
     "context": "Access delegated"
+  },
+  {
+    "term": "recipient-view.petition-not-available-error.header",
+    "definition": "It seems that this page is no longer available.",
+    "context": "It seems that this page is no longer available."
+  },
+  {
+    "term": "recipient-view.petition-not-available-error.text",
+    "definition": "If you need to access it, please reach out to the person that sent it to you.",
+    "context": "If you need to access it, please reach out to the person that sent it to you."
   },
   {
     "term": "recipient-view.petition-requires-signature-alert-1",

@@ -14,10 +14,10 @@ export const PublicPetitionAccess = objectType({
   sourceType: "db.PetitionAccess",
   description: "A public view of a petition access",
   definition(t) {
-    t.nullable.field("petition", {
+    t.field("petition", {
       type: "PublicPetition",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadPetition(root.petition_id);
+        return (await ctx.petitions.loadPetition(root.petition_id))!;
       },
     });
     t.nullable.field("granter", {

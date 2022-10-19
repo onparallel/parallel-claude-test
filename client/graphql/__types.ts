@@ -2908,7 +2908,7 @@ export interface PublicPetitionAccess {
   contact?: Maybe<PublicContact>;
   granter?: Maybe<PublicUser>;
   message?: Maybe<PublicPetitionMessage>;
-  petition?: Maybe<PublicPetition>;
+  petition: PublicPetition;
 }
 
 /** A field within a petition. */
@@ -3059,7 +3059,7 @@ export type PublicUserOrContact = PublicContact | PublicUser;
 
 export interface Query {
   __typename?: "Query";
-  access?: Maybe<PublicPetitionAccess>;
+  access: PublicPetitionAccess;
   contact?: Maybe<Contact>;
   /** The contacts of the user */
   contacts: ContactPagination;
@@ -11512,7 +11512,7 @@ export type RecipientViewHeader_publicDelegateAccessToContactMutationVariables =
 export type RecipientViewHeader_publicDelegateAccessToContactMutation = {
   publicDelegateAccessToContact: {
     __typename?: "PublicPetitionAccess";
-    petition?: {
+    petition: {
       __typename?: "PublicPetition";
       id: string;
       recipients: Array<{
@@ -11521,7 +11521,7 @@ export type RecipientViewHeader_publicDelegateAccessToContactMutation = {
         fullName: string;
         email: string;
       }>;
-    } | null;
+    };
   };
 };
 
@@ -21640,7 +21640,7 @@ export type Login_currentUserQuery = {
 
 export type RecipientView_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
-  petition?: {
+  petition: {
     __typename?: "PublicPetition";
     id: string;
     status: PetitionStatus;
@@ -21720,7 +21720,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
       id: string;
       hasRemoveParallelBranding: boolean;
     };
-  } | null;
+  };
   granter?: {
     __typename?: "PublicUser";
     fullName: string;
@@ -21884,6 +21884,12 @@ export type RecipientView_PublicUserFragment = {
   organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
 };
 
+export type RecipientView_ConnectionMetadataFragment = {
+  __typename?: "ConnectionMetadata";
+  country?: string | null;
+  browserName?: string | null;
+};
+
 export type RecipientView_publicCompletePetitionMutationVariables = Exact<{
   keycode: Scalars["ID"];
   additionalSigners?: InputMaybe<
@@ -21980,9 +21986,9 @@ export type RecipientView_accessQueryVariables = Exact<{
 }>;
 
 export type RecipientView_accessQuery = {
-  access?: {
+  access: {
     __typename?: "PublicPetitionAccess";
-    petition?: {
+    petition: {
       __typename?: "PublicPetition";
       id: string;
       status: PetitionStatus;
@@ -22062,7 +22068,7 @@ export type RecipientView_accessQuery = {
         id: string;
         hasRemoveParallelBranding: boolean;
       };
-    } | null;
+    };
     granter?: {
       __typename?: "PublicUser";
       fullName: string;
@@ -22091,12 +22097,35 @@ export type RecipientView_accessQuery = {
       lastName?: string | null;
     } | null;
     message?: { __typename?: "PublicPetitionMessage"; id: string; subject?: string | null } | null;
-  } | null;
+  };
   metadata: {
     __typename?: "ConnectionMetadata";
     country?: string | null;
     browserName?: string | null;
   };
+};
+
+export type RecipientViewVerify_PublicAccessVerificationFragment = {
+  __typename?: "PublicAccessVerification";
+  isAllowed: boolean;
+  isContactlessAccess?: boolean | null;
+  ownerName?: string | null;
+  cookieName?: string | null;
+  cookieValue?: string | null;
+  email?: string | null;
+  organization?: {
+    __typename?: "PublicOrganization";
+    id: string;
+    hasRemoveParallelBranding: boolean;
+    name: string;
+    logoUrl340?: string | null;
+    brandTheme: {
+      __typename?: "OrganizationBrandThemeData";
+      preferredTone: Tone;
+      color: string;
+      fontFamily?: string | null;
+    };
+  } | null;
 };
 
 export type RecipientViewVerify_verifyPublicAccessMutationVariables = Exact<{
@@ -22141,7 +22170,7 @@ export type OptOut_publicOptOutRemindersMutationVariables = Exact<{
 export type OptOut_publicOptOutRemindersMutation = {
   publicOptOutReminders: {
     __typename?: "PublicPetitionAccess";
-    petition?: { __typename?: "PublicPetition"; id: string } | null;
+    petition: { __typename?: "PublicPetition"; id: string };
   };
 };
 
@@ -22165,14 +22194,14 @@ export type OptOut_accessQueryVariables = Exact<{
 }>;
 
 export type OptOut_accessQuery = {
-  access?: {
+  access: {
     __typename?: "PublicPetitionAccess";
     granter?: {
       __typename?: "PublicUser";
       id: string;
       organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
     } | null;
-  } | null;
+  };
 };
 
 export type PublicPetitionLink_PublicPublicPetitionLinkFragment = {
@@ -24530,20 +24559,6 @@ export const LandingTemplateCard_LandingTemplateFragmentDoc = gql`
     organizationName
   }
 ` as unknown as DocumentNode<LandingTemplateCard_LandingTemplateFragment, unknown>;
-export const RecipientViewContactlessForm_PublicOrganizationFragmentDoc = gql`
-  fragment RecipientViewContactlessForm_PublicOrganization on PublicOrganization {
-    name
-    logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
-    hasRemoveParallelBranding
-  }
-` as unknown as DocumentNode<RecipientViewContactlessForm_PublicOrganizationFragment, unknown>;
-export const RecipientViewNewDevice_PublicOrganizationFragmentDoc = gql`
-  fragment RecipientViewNewDevice_PublicOrganization on PublicOrganization {
-    name
-    logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
-    hasRemoveParallelBranding
-  }
-` as unknown as DocumentNode<RecipientViewNewDevice_PublicOrganizationFragment, unknown>;
 export const PublicPetitionFieldCommentContent_PetitionFieldCommentFragmentDoc = gql`
   fragment PublicPetitionFieldCommentContent_PetitionFieldComment on PublicPetitionFieldComment {
     contentHtml
@@ -27971,6 +27986,49 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
   ${RecipientView_PublicPetitionMessageFragmentDoc}
   ${RecipientViewPetitionField_PublicPetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_PublicPetitionAccessFragment, unknown>;
+export const RecipientView_ConnectionMetadataFragmentDoc = gql`
+  fragment RecipientView_ConnectionMetadata on ConnectionMetadata {
+    country
+    browserName
+  }
+` as unknown as DocumentNode<RecipientView_ConnectionMetadataFragment, unknown>;
+export const RecipientViewContactlessForm_PublicOrganizationFragmentDoc = gql`
+  fragment RecipientViewContactlessForm_PublicOrganization on PublicOrganization {
+    name
+    logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
+    hasRemoveParallelBranding
+  }
+` as unknown as DocumentNode<RecipientViewContactlessForm_PublicOrganizationFragment, unknown>;
+export const RecipientViewNewDevice_PublicOrganizationFragmentDoc = gql`
+  fragment RecipientViewNewDevice_PublicOrganization on PublicOrganization {
+    name
+    logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
+    hasRemoveParallelBranding
+  }
+` as unknown as DocumentNode<RecipientViewNewDevice_PublicOrganizationFragment, unknown>;
+export const RecipientViewVerify_PublicAccessVerificationFragmentDoc = gql`
+  fragment RecipientViewVerify_PublicAccessVerification on PublicAccessVerification {
+    isAllowed
+    isContactlessAccess
+    ownerName
+    cookieName
+    cookieValue
+    email
+    organization {
+      id
+      hasRemoveParallelBranding
+      ...RecipientViewContactlessForm_PublicOrganization
+      ...RecipientViewNewDevice_PublicOrganization
+      brandTheme {
+        preferredTone
+        ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
+      }
+    }
+  }
+  ${RecipientViewContactlessForm_PublicOrganizationFragmentDoc}
+  ${RecipientViewNewDevice_PublicOrganizationFragmentDoc}
+  ${OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragmentDoc}
+` as unknown as DocumentNode<RecipientViewVerify_PublicAccessVerificationFragment, unknown>;
 export const OptOut_PublicUserFragmentDoc = gql`
   fragment OptOut_PublicUser on PublicUser {
     id
@@ -31188,11 +31246,11 @@ export const RecipientView_accessDocument = gql`
       ...RecipientView_PublicPetitionAccess
     }
     metadata(keycode: $keycode) {
-      country
-      browserName
+      ...RecipientView_ConnectionMetadata
     }
   }
   ${RecipientView_PublicPetitionAccessFragmentDoc}
+  ${RecipientView_ConnectionMetadataFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_accessQuery, RecipientView_accessQueryVariables>;
 export const RecipientViewVerify_verifyPublicAccessDocument = gql`
   mutation RecipientViewVerify_verifyPublicAccess(
@@ -31202,27 +31260,10 @@ export const RecipientViewVerify_verifyPublicAccessDocument = gql`
     $userAgent: String
   ) {
     verifyPublicAccess(token: $token, keycode: $keycode, ip: $ip, userAgent: $userAgent) {
-      isAllowed
-      isContactlessAccess
-      ownerName
-      cookieName
-      cookieValue
-      email
-      organization {
-        id
-        hasRemoveParallelBranding
-        ...RecipientViewContactlessForm_PublicOrganization
-        ...RecipientViewNewDevice_PublicOrganization
-        brandTheme {
-          preferredTone
-          ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
-        }
-      }
+      ...RecipientViewVerify_PublicAccessVerification
     }
   }
-  ${RecipientViewContactlessForm_PublicOrganizationFragmentDoc}
-  ${RecipientViewNewDevice_PublicOrganizationFragmentDoc}
-  ${OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragmentDoc}
+  ${RecipientViewVerify_PublicAccessVerificationFragmentDoc}
 ` as unknown as DocumentNode<
   RecipientViewVerify_verifyPublicAccessMutation,
   RecipientViewVerify_verifyPublicAccessMutationVariables

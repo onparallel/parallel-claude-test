@@ -6,39 +6,17 @@ import * as Sentry from "@sentry/node";
 import { NextPageContext } from "next";
 import { FormattedMessage, useIntl } from "react-intl";
 
-const SENTRY_WHITELISTED_ERRORS = [
-  "PUBLIC_PETITION_NOT_AVAILABLE",
-  "CONTACT_NOT_VERIFIED",
-  "FORBIDDEN",
-];
+const SENTRY_WHITELISTED_ERRORS = ["FORBIDDEN"];
 
-export default function CustomError({
-  err,
-  errorCode,
-  hasGetInitialPropsRun,
-}: UnwrapPromise<ReturnType<typeof CustomError.getInitialProps>>) {
+export default function CustomError(
+  props: UnwrapPromise<ReturnType<typeof CustomError.getInitialProps>>
+) {
+  const { err, errorCode } = props;
   const intl = useIntl();
-  if (!hasGetInitialPropsRun && err && !SENTRY_WHITELISTED_ERRORS.includes(errorCode)) {
+  if (err && !SENTRY_WHITELISTED_ERRORS.includes(errorCode)) {
     Sentry.captureException(err);
   }
-  return errorCode === "PUBLIC_PETITION_NOT_AVAILABLE" ? (
-    <ErrorPage
-      header={
-        <FormattedMessage
-          id="error.petition-not-available.header"
-          defaultMessage="It seems that this parallel is no longer available."
-        />
-      }
-      imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_road_sign.svg`}
-    >
-      <Text>
-        <FormattedMessage
-          id="error.petition-not-available.text"
-          defaultMessage="If you need to access it, please reach out to the person that sent it to you."
-        />
-      </Text>
-    </ErrorPage>
-  ) : errorCode === "FORBIDDEN" ? (
+  return errorCode === "FORBIDDEN" ? (
     <ErrorPage
       header={
         <FormattedMessage id="error.forbidden-access.header" defaultMessage="Access forbidden" />
@@ -86,11 +64,5 @@ export default function CustomError({
 
 CustomError.getInitialProps = async ({ res, err, asPath }: NextPageContext) => {
   const errorCode = (err as any)?.graphQLErrors?.[0]?.extensions.code ?? (err as any)?.message;
-
-  if (!err || (err && !SENTRY_WHITELISTED_ERRORS.includes(errorCode))) {
-    Sentry.captureException(err ?? `_error.js getInitialProps missing data at path: ${asPath}`);
-    await Sentry.flush(2000);
-  }
-
-  return { errorCode, err, hasGetInitialPropsRun: true };
+  return { errorCode, err };
 };

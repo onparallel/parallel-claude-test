@@ -3870,7 +3870,7 @@ type PublicPetitionAccess {
   contact: PublicContact
   granter: PublicUser
   message: PublicPetitionMessage
-  petition: PublicPetition
+  petition: PublicPetition!
 }
 
 """
@@ -4135,7 +4135,7 @@ type PublicUser {
 union PublicUserOrContact = PublicContact | PublicUser
 
 type Query {
-  access(keycode: ID!): PublicPetitionAccess
+  access(keycode: ID!): PublicPetitionAccess!
   contact(id: GID!): Contact
 
   """

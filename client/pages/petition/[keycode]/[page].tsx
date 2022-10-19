@@ -48,7 +48,6 @@ import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
-import { resolveUrl } from "@parallel/utils/next";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
@@ -63,6 +62,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
 
 type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getInitialProps>>;
+
 function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) {
   const intl = useIntl();
   const router = useRouter();
@@ -603,6 +603,12 @@ RecipientView.fragments = {
       ${useCompletingMessageDialog.fragments.PublicUser}
     `;
   },
+  ConnectionMetadata: gql`
+    fragment RecipientView_ConnectionMetadata on ConnectionMetadata {
+      country
+      browserName
+    }
+  `,
 };
 
 RecipientView.mutations = [
@@ -632,34 +638,49 @@ RecipientView.queries = [
         ...RecipientView_PublicPetitionAccess
       }
       metadata(keycode: $keycode) {
-        country
-        browserName
+        ...RecipientView_ConnectionMetadata
       }
     }
     ${RecipientView.fragments.PublicPetitionAccess}
+    ${RecipientView.fragments.ConnectionMetadata}
   `,
 ];
 
-RecipientView.getInitialProps = async ({ query, pathname, fetchQuery }: WithApolloDataContext) => {
+RecipientView.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const keycode = query.keycode as string;
   const page = parseInt(query.page as string);
   if (!Number.isInteger(page) || page <= 0) {
-    throw new RedirectError(resolveUrl(pathname, { ...query, page: "1" }));
+    throw new RedirectError(`/petition/${keycode}/1`);
   }
-
-  const { data } = await fetchQuery(RecipientView_accessDocument, {
-    variables: { keycode },
-  });
-  if (!data?.access?.petition) {
-    throw new Error();
+  try {
+    const { data } = await fetchQuery(RecipientView_accessDocument, {
+      variables: { keycode },
+    });
+    const pageCount =
+      data!.access.petition.fields.filter((f) => f.type === "HEADING" && f.options!.hasPageBreak)
+        .length + 1;
+    if (page > pageCount) {
+      throw new RedirectError(`/petition/${keycode}/1`);
+    }
+    return {
+      keycode,
+      currentPage: page,
+      pageCount,
+      metadata: data.metadata,
+    };
+  } catch (error) {
+    if (error instanceof RedirectError) {
+      throw error;
+    }
+    if (
+      isApolloError(error, "PUBLIC_PETITION_NOT_AVAILABLE") ||
+      isApolloError(error, "CONTACT_NOT_FOUND") ||
+      isApolloError(error, "CONTACT_NOT_VERIFIED")
+    ) {
+      throw new RedirectError(`/petition/${keycode}`);
+    }
+    throw error;
   }
-  const pageCount =
-    data.access.petition.fields.filter((f) => f.type === "HEADING" && f.options!.hasPageBreak)
-      .length + 1;
-  if (page > pageCount) {
-    throw new RedirectError(resolveUrl(pathname, { ...query, page: "1" }));
-  }
-  return { keycode, currentPage: page, pageCount, metadata: data.metadata };
 };
 
 export default compose(withMetadata, withDialogs, withApolloData)(RecipientView);

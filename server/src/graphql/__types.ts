@@ -1740,7 +1740,7 @@ export interface NexusGenFieldTypes {
     contact: NexusGenRootTypes["PublicContact"] | null; // PublicContact
     granter: NexusGenRootTypes["PublicUser"] | null; // PublicUser
     message: NexusGenRootTypes["PublicPetitionMessage"] | null; // PublicPetitionMessage
-    petition: NexusGenRootTypes["PublicPetition"] | null; // PublicPetition
+    petition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
   };
   PublicPetitionField: {
     // field return type
@@ -1828,7 +1828,7 @@ export interface NexusGenFieldTypes {
   };
   Query: {
     // field return type
-    access: NexusGenRootTypes["PublicPetitionAccess"] | null; // PublicPetitionAccess
+    access: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
     contactsByEmail: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!

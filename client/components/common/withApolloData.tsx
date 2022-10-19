@@ -22,9 +22,9 @@ export type WithApolloDataContext = NextPageContext & {
   ): Promise<ApolloQueryResult<TData>>;
 };
 
-export const SERVER_STATE = "__SERVER_STATE__";
+const SERVER_STATE = "__SERVER_STATE__";
 
-export type WithServerState<P> = P & {
+type WithServerState<P> = P & {
   [SERVER_STATE]: any;
 };
 

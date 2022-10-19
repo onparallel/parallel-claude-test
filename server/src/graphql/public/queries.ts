@@ -14,7 +14,7 @@ import {
 } from "./authorizers";
 
 export const accessQuery = queryField("access", {
-  type: nullable("PublicPetitionAccess"),
+  type: "PublicPetitionAccess",
   args: {
     keycode: nonNull(idArg()),
   },

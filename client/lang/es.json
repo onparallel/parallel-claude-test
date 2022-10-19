@@ -3210,11 +3210,6 @@
     "context": "Signature completed: {signedAt}"
   },
   {
-    "term": "component.petition-signatures-card.add-signature-credits-message",
-    "definition": "Hola, me gustaría obtener más información sobre cómo conseguir más créditos de firma.",
-    "context": "Hi, I would like to get more information about how to get more signature credits."
-  },
-  {
     "term": "component.petition-signatures-card.add-signature.label",
     "definition": "Añadir firma",
     "context": "Add signature"
@@ -3233,11 +3228,6 @@
     "term": "component.petition-signatures-card.more-info-button",
     "definition": "Más información",
     "context": "More information"
-  },
-  {
-    "term": "component.petition-signatures-card.no-credits-left.error",
-    "definition": "No se ha podido iniciar el proceso de firma por falta de créditos de firma. Por favor, <a>contacta con soporte</a> para obtener más créditos.",
-    "context": "The eSignature could not be started due to lack of signature credits. Please <a>contact with support</a> to get more credits."
   },
   {
     "term": "component.petition-signatures-card.no-signature-configured",
@@ -5233,16 +5223,6 @@
     "term": "error.maintenance.header",
     "definition": "Parallel se encuentra en mantenimiento",
     "context": "Parallel is under maintenance"
-  },
-  {
-    "term": "error.petition-not-available.header",
-    "definition": "Parece que este parallel ya no está disponible.",
-    "context": "It seems that this parallel is no longer available."
-  },
-  {
-    "term": "error.petition-not-available.text",
-    "definition": "Si necesitas acceder, por favor, ponte en contacto con la persona que te la envió.",
-    "context": "If you need to access it, please reach out to the person that sent it to you."
   },
   {
     "term": "error.unknown-error.header",
@@ -8913,6 +8893,16 @@
     "term": "recipient-view.petition-delegated.toast-header",
     "definition": "Acceso delegado",
     "context": "Access delegated"
+  },
+  {
+    "term": "recipient-view.petition-not-available-error.header",
+    "definition": "Parece que esta página ya no está disponible.",
+    "context": "It seems that this page is no longer available."
+  },
+  {
+    "term": "recipient-view.petition-not-available-error.text",
+    "definition": "Si necesitas acceder, por favor, ponte en contacto con la persona que te la envió.",
+    "context": "If you need to access it, please reach out to the person that sent it to you."
   },
   {
     "term": "recipient-view.petition-requires-signature-alert-1",
