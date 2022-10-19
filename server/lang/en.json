@@ -606,8 +606,8 @@
   },
   {
     "term": "petition-completed.text",
-    "definition": "{recipient} completed {signed, select, true{and signed } other{}}the parallel you sent to him.",
-    "context": "{recipient} completed {signed, select, true{and signed } other{}}the parallel you sent to him."
+    "definition": "{recipient} completed {signed, select, true{and signed } other{}}the parallel you sent.",
+    "context": "{recipient} completed {signed, select, true{and signed } other{}}the parallel you sent."
   },
   {
     "term": "petition-excel-export.comments",
