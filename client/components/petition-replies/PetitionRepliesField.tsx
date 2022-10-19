@@ -34,6 +34,7 @@ import {
   PetitionRepliesField_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
+import { useGoToPetitionSection } from "@parallel/utils/goToPetition";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { useRouter } from "next/router";
@@ -44,7 +45,6 @@ import { FieldDescription } from "../common/FieldDescription";
 import { FileAttachmentButton } from "../common/FileAttachmentButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
-import { usePetitionShouldConfirmNavigation } from "../layout/PetitionLayout";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
 
@@ -81,7 +81,6 @@ export const PetitionRepliesField = Object.assign(
   ) {
     const intl = useIntl();
     const router = useRouter();
-    const [shouldConfirmNavigation, _] = usePetitionShouldConfirmNavigation();
     const [petitionFieldAttachmentDownloadLink] = useMutation(
       PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument
     );
@@ -97,24 +96,25 @@ export const PetitionRepliesField = Object.assign(
       );
     };
 
+    const goToSection = useGoToPetitionSection();
     const handleEditField = () => {
-      const href = `/app/petitions/${petitionId}/compose?${new URLSearchParams({
-        ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
-        ...(shouldConfirmNavigation ? { new: "" } : {}),
-        ...{ field: field.id },
-      })}`;
-
-      router.push(href);
+      goToSection("compose", {
+        query: {
+          ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
+          field: field.id,
+        },
+      });
     };
 
     const handleEditFieldReply = (replyId: string) => {
-      const href = `/app/petitions/${petitionId}/preview?${new URLSearchParams({
-        ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
-        ...(shouldConfirmNavigation ? { new: "" } : {}),
-        ...(field.type === "CHECKBOX" ? { field: field.id } : { reply: `${field.id}-${replyId}` }),
-      })}`;
-
-      router.push(href);
+      goToSection("preview", {
+        query: {
+          ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
+          ...(field.type === "CHECKBOX"
+            ? { field: field.id }
+            : { reply: `${field.id}-${replyId}` }),
+        },
+      });
     };
 
     const button = (

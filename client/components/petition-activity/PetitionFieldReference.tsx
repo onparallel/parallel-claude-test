@@ -12,7 +12,13 @@ export function PetitionFieldReference({
 }) {
   return field ? (
     field.title ? (
-      <OverflownText as="strong" display="inline-block" maxWidth="30rem" verticalAlign="bottom">
+      <OverflownText
+        as="strong"
+        display="inline-block"
+        maxWidth="30rem"
+        verticalAlign="bottom"
+        whiteSpace="normal"
+      >
         {field.title}
       </OverflownText>
     ) : (

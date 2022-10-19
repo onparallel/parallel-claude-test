@@ -6061,7 +6061,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
           id: string;
           isInternal: boolean;
           createdAt: string;
-          field?: { __typename?: "PetitionField"; title?: string | null } | null;
+          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
           comment?: {
             __typename?: "PetitionFieldComment";
             isEdited: boolean;
@@ -6675,7 +6675,7 @@ export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragmen
   id: string;
   isInternal: boolean;
   createdAt: string;
-  field?: { __typename?: "PetitionField"; title?: string | null } | null;
+  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
   comment?: {
     __typename?: "PetitionFieldComment";
     isEdited: boolean;
@@ -7443,7 +7443,7 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
   __typename?: "CommentPublishedEvent";
   isInternal: boolean;
   createdAt: string;
-  field?: { __typename?: "PetitionField"; title?: string | null } | null;
+  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
   comment?: {
     __typename?: "PetitionFieldComment";
     isEdited: boolean;
@@ -14120,7 +14120,7 @@ export type PetitionActivity_PetitionFragment = {
           id: string;
           isInternal: boolean;
           createdAt: string;
-          field?: { __typename?: "PetitionField"; title?: string | null } | null;
+          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
           comment?: {
             __typename?: "PetitionFieldComment";
             isEdited: boolean;
@@ -14944,7 +14944,7 @@ export type PetitionActivity_updatePetitionMutation = {
                 id: string;
                 isInternal: boolean;
                 createdAt: string;
-                field?: { __typename?: "PetitionField"; title?: string | null } | null;
+                field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
                 comment?: {
                   __typename?: "PetitionFieldComment";
                   isEdited: boolean;
@@ -15827,7 +15827,7 @@ export type PetitionActivity_petitionQuery = {
                 id: string;
                 isInternal: boolean;
                 createdAt: string;
-                field?: { __typename?: "PetitionField"; title?: string | null } | null;
+                field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
                 comment?: {
                   __typename?: "PetitionFieldComment";
                   isEdited: boolean;
@@ -25479,6 +25479,7 @@ export const PetitionFieldCommentContent_PetitionFieldCommentFragmentDoc = gql`
 export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gql`
   fragment TimelineCommentPublishedEvent_CommentPublishedEvent on CommentPublishedEvent {
     field {
+      id
       ...PetitionFieldReference_PetitionField
     }
     comment {

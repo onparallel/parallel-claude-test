@@ -39,6 +39,7 @@ import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
 import { letters, PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
+import { useGoToPetitionSection } from "@parallel/utils/goToPetition";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { getMinMaxCheckboxLimit, usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
 import { withError } from "@parallel/utils/promises/withError";
@@ -46,19 +47,17 @@ import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { uploadFile } from "@parallel/utils/uploadFile";
 import useMergedRef from "@react-hook/merged-ref";
 import { fromEvent } from "file-selector";
-import { useRouter } from "next/router";
 import { memo, RefObject, useCallback, useImperativeHandle, useRef, useState } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, omit } from "remeda";
+import { omit } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { FileSize } from "../common/FileSize";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { SmallPopover } from "../common/SmallPopover";
-import { usePetitionShouldConfirmNavigation } from "../layout/PetitionLayout";
 import { CheckboxTypeLabel } from "../petition-common/CheckboxTypeLabel";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
 import { PetitionComposeFieldAttachment } from "./PetitionComposeFieldAttachment";
@@ -127,15 +126,12 @@ const _PetitionComposeField = chakraForwardRef<
   ref
 ) {
   const intl = useIntl();
-  const router = useRouter();
   const { elementRef, dragRef, previewRef, isDragging } = useDragAndDrop(
     field.id,
     index,
     onMove,
     field.isFixed ? "FIXED_FIELD" : "FIELD"
   );
-
-  const [shouldConfirmNavigation, _] = usePetitionShouldConfirmNavigation();
 
   const canChangeVisibility =
     fields
@@ -182,14 +178,13 @@ const _PetitionComposeField = chakraForwardRef<
     );
   };
 
+  const goToSection = useGoToPetitionSection();
   const handlePreviewField = () => {
-    const href = `/app/petitions/${petitionId}/preview?${new URLSearchParams({
-      ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
-      ...(shouldConfirmNavigation ? { new: "" } : {}),
-      ...{ field: field.id },
-    })}`;
-
-    router.push(href);
+    goToSection("preview", {
+      query: {
+        field: field.id,
+      },
+    });
   };
 
   function updateAttachmentUploadingStatus(cache: DataProxy, id: string, isUploading: boolean) {

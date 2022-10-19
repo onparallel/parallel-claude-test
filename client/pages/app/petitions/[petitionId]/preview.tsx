@@ -15,7 +15,6 @@ import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import {
   PetitionLayout,
-  usePetitionShouldConfirmNavigation,
   usePetitionStateWrapper,
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
@@ -49,6 +48,7 @@ import {
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
+import { PetitionSection, useGoToPetitionSection } from "@parallel/utils/goToPetition";
 import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
@@ -79,8 +79,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   });
 
   const [finalized, setFinalized] = useState(false);
-
-  const [shouldConfirmNavigation, _] = usePetitionShouldConfirmNavigation();
 
   const wrapper = usePetitionStateWrapper();
   const [updatePetition] = useMutation(PetitionPreview_updatePetitionDocument);
@@ -146,14 +144,14 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     checkVisibilityFocusedField();
   }, []);
 
-  const handlePushTo = (tab: string, fieldId: string) => {
-    const href = `/app/petitions/${petitionId}/${tab}?${new URLSearchParams({
-      ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
-      ...(shouldConfirmNavigation ? { new: "" } : {}),
-      ...{ field: fieldId },
-    })}`;
-
-    router.push(href);
+  const goToSection = useGoToPetitionSection();
+  const handlePushTo = (section: PetitionSection, fieldId: string) => {
+    goToSection(section, {
+      query: {
+        ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
+        field: fieldId,
+      },
+    });
   };
 
   const showHiddenFieldDialog = useHiddenFieldDialog();
@@ -451,21 +449,21 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                             },
                           }}
                         >
-                           <PreviewPetitionField
-                          key={field.id}
-                          petitionId={petition.id}
-                          field={field}
-                          isDisabled={
-                            (isPetition && petition.status === "CLOSED") ||
-                            petition.isAnonymized ||
-                            displayPetitionLimitReachedAlert
-                          }
-                          isInvalid={
-                            finalized &&
-                            completedFieldReplies(field).length === 0 &&
-                            !field.optional
-                          }
-                          isCacheOnly={!isPetition}
+                          <PreviewPetitionField
+                            key={field.id}
+                            petitionId={petition.id}
+                            field={field}
+                            isDisabled={
+                              (isPetition && petition.status === "CLOSED") ||
+                              petition.isAnonymized ||
+                              displayPetitionLimitReachedAlert
+                            }
+                            isInvalid={
+                              finalized &&
+                              completedFieldReplies(field).length === 0 &&
+                              !field.optional
+                            }
+                            isCacheOnly={!isPetition}
                             myEffectivePermission={myEffectivePermission}
                           />
                           {showQuickAccessButtons ? (
@@ -512,7 +510,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                             </Center>
                           ) : null}
                         </Box>
-                       
                       </motion.div>
                     ))}
                   </LiquidScopeProvider>

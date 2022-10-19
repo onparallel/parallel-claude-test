@@ -9360,6 +9360,11 @@
     "context": "Message not available"
   },
   {
+    "term": "timeline.comment-published.reply",
+    "definition": "Reply",
+    "context": "Reply"
+  },
+  {
     "term": "timeline.contactless-access-activated-description",
     "definition": "{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}"
