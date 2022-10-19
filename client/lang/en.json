@@ -6865,6 +6865,16 @@
     "context": "It seems the user has already logged in. There is no need to resend the invitation."
   },
   {
+    "term": "organization.user-limit-reached.toast-description",
+    "definition": "You reached the maximum amount of users you can create.",
+    "context": "You reached the maximum amount of users you can create."
+  },
+  {
+    "term": "organization.user-limit-reached.toast-title",
+    "definition": "User limit reached",
+    "context": "User limit reached"
+  },
+  {
     "term": "organization.user-updated-success.toast-title",
     "definition": "User updated successfully.",
     "context": "User updated successfully."

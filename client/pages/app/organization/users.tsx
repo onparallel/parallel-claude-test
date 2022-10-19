@@ -186,6 +186,20 @@ function OrganizationUsers() {
           }),
           isClosable: true,
         });
+      } else if (isApolloError(error, "USER_LIMIT_ERROR")) {
+        toast({
+          status: "error",
+          title: intl.formatMessage({
+            id: "organization.user-limit-reached.toast-title",
+            defaultMessage: "User limit reached",
+          }),
+          description: intl.formatMessage({
+            id: "organization.user-limit-reached.toast-description",
+            defaultMessage: "You reached the maximum amount of users you can create.",
+          }),
+          isClosable: true,
+          duration: 5000,
+        });
       } else {
         showGenericErrorToast(error);
       }
