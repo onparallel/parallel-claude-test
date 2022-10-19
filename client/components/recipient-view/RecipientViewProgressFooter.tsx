@@ -158,7 +158,7 @@ export const RecipientViewProgressFooter = Object.assign(
           <PopoverContent backgroundColor="blue.500" color="white" marginRight={4}>
             <PopoverArrow backgroundColor="blue.500" />
             <PopoverCloseButton />
-            <PopoverBody>
+            <PopoverBody paddingRight={10}>
               <FormattedMessage
                 id="component.recipient-view.reminder-submit"
                 defaultMessage="Remember to click Finalize when you finish entering all the information."
