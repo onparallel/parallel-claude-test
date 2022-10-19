@@ -2405,7 +2405,12 @@ export class PetitionRepository extends BaseRepository {
     return event;
   }
 
-  async loadEventsForPetition(petitionId: number, opts: PageOpts) {
+  readonly loadPetitionEventsByPetitionId = this.buildLoadMultipleBy(
+    "petition_event",
+    "petition_id"
+  );
+
+  async loadPaginatedEventsForPetition(petitionId: number, opts: PageOpts) {
     return await this.loadPageAndCount(
       this.from("petition_event")
         .where("petition_id", petitionId)

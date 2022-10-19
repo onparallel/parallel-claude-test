@@ -175,9 +175,34 @@
     "context": "See answers in ND"
   },
   {
-    "term": "export-template-report-column-header.preview-url",
-    "definition": "URL del parallel",
-    "context": "Preview URL"
+    "term": "export-template-report.column-header.parallel-closed-at",
+    "definition": "Fecha de cerrado",
+    "context": "Closed at"
+  },
+  {
+    "term": "export-template-report.column-header.parallel-completed-at",
+    "definition": "Fecha de completado",
+    "context": "Completed at"
+  },
+  {
+    "term": "export-template-report.column-header.parallel-owner",
+    "definition": "Propietario",
+    "context": "Owner"
+  },
+  {
+    "term": "export-template-report.column-header.parallel-signed-at",
+    "definition": "Fecha de firmado",
+    "context": "Signed at"
+  },
+  {
+    "term": "export-template-report.column-header.parallel-status",
+    "definition": "Estado",
+    "context": "Status"
+  },
+  {
+    "term": "export-template-report.column-header.parallel-tags",
+    "definition": "Etiquetas",
+    "context": "Tags"
   },
   {
     "term": "export-template-report.column-header.petition-id",
@@ -190,6 +215,11 @@
     "context": "Parallel name"
   },
   {
+    "term": "export-template-report.column-header.preview-url",
+    "definition": "URL del parallel",
+    "context": "Preview URL"
+  },
+  {
     "term": "export-template-report.column-header.recipient-emails",
     "definition": "Email de los destinatarios",
     "context": "Recipient emails"
@@ -200,9 +230,14 @@
     "context": "Recipient names"
   },
   {
-    "term": "export-template-report.column-header.send-date",
+    "term": "export-template-report.column-header.sent-at",
     "definition": "Fecha de envío",
-    "context": "Send date"
+    "context": "Sent at"
+  },
+  {
+    "term": "export-template-report.column-header.sent-by",
+    "definition": "Enviado por",
+    "context": "Sent by"
   },
   {
     "term": "export-template-report.file-cell-content",
@@ -213,6 +248,26 @@
     "term": "export-template-report.file-name",
     "definition": "informe-plantilla-{id}.xlsx",
     "context": "template-report-{id}.xlsx"
+  },
+  {
+    "term": "export-template-report.petition-status.closed",
+    "definition": "CERRADO",
+    "context": "CLOSED"
+  },
+  {
+    "term": "export-template-report.petition-status.completed",
+    "definition": "COMPLETADO",
+    "context": "COMPLETED"
+  },
+  {
+    "term": "export-template-report.petition-status.draft",
+    "definition": "BORRADOR",
+    "context": "DRAFT"
+  },
+  {
+    "term": "export-template-report.petition-status.pending",
+    "definition": "PENDIENTE",
+    "context": "PENDING"
   },
   {
     "term": "field-comments-excel-worksheet.email",

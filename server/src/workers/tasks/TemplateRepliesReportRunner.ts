@@ -1,8 +1,8 @@
 import Excel from "exceljs";
 import { isDefined, minBy, zip } from "remeda";
 import { Readable } from "stream";
-import { PetitionFieldReply } from "../../db/__types";
-import { getFieldIndices as getFieldIndexes } from "../../util/fieldIndices";
+import { PetitionFieldReply, PetitionMessage } from "../../db/__types";
+import { getFieldIndices } from "../../util/fieldIndices";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
@@ -29,13 +29,23 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
 
     const intl = await this.ctx.i18n.getIntl(template!.locale);
 
-    const [includePreviewUrl, petitionsAccesses, petitionsMessages, petitionsFields] =
-      await Promise.all([
-        this.ctx.featureFlags.orgHasFeatureFlag(template!.org_id, "TEMPLATE_REPLIES_PREVIEW_URL"),
-        this.ctx.readonlyPetitions.loadAccessesForPetition(petitions.map((p) => p.id)),
-        this.ctx.readonlyPetitions.loadMessagesByPetitionId(petitions.map((p) => p.id)),
-        this.ctx.readonlyPetitions.loadFieldsForPetition(petitions.map((p) => p.id)),
-      ]);
+    const [
+      includePreviewUrl,
+      petitionsAccesses,
+      petitionsMessages,
+      petitionsFields,
+      petitionsOwner,
+      petitionsTags,
+      petitionsEvents,
+    ] = await Promise.all([
+      this.ctx.featureFlags.orgHasFeatureFlag(template!.org_id, "TEMPLATE_REPLIES_PREVIEW_URL"),
+      this.ctx.readonlyPetitions.loadAccessesForPetition(petitions.map((p) => p.id)),
+      this.ctx.readonlyPetitions.loadMessagesByPetitionId(petitions.map((p) => p.id)),
+      this.ctx.readonlyPetitions.loadFieldsForPetition(petitions.map((p) => p.id)),
+      this.ctx.readonlyPetitions.loadPetitionOwner(petitions.map((p) => p.id)),
+      this.ctx.readonlyTags.loadTagsByPetitionId(petitions.map((p) => p.id)),
+      this.ctx.readonlyPetitions.loadPetitionEventsByPetitionId(petitions.map((p) => p.id)),
+    ]);
 
     const petitionsAccessesContacts = await Promise.all(
       petitionsAccesses.map((accesses) =>
@@ -48,16 +58,33 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       )
     );
 
+    const petitionsOwnerUserData = await Promise.all(
+      petitionsOwner.map((user) => this.ctx.users.loadUserDataByUserId(user!.id))
+    );
+
+    const petitionsFirstMessage = petitionsMessages.reduce(
+      (result: Maybe<PetitionMessage>[], messages) => {
+        const firstMessage =
+          minBy(messages, (m) => m.scheduled_at?.valueOf() ?? m.created_at.valueOf()) ?? null;
+        return result.concat(firstMessage);
+      },
+      []
+    );
+
+    const petitionsFirstMessageUserData = await Promise.all(
+      petitionsFirstMessage.map((m) =>
+        m ? this.ctx.users.loadUserDataByUserId(m.sender_id) : null
+      )
+    );
+
     const rows = petitions.map((petition, petitionIndex) => {
       const petitionFields = petitionsFields[petitionIndex];
       const petitionFieldsReplies = petitionsFieldsReplies[petitionIndex];
       const contacts = petitionsAccessesContacts[petitionIndex].filter(isDefined);
-      const messages = petitionsMessages[petitionIndex];
-      const firstMessage = minBy(
-        messages,
-        (m) => m.scheduled_at?.valueOf() ?? m.created_at.valueOf()
-      );
-      const firstSendDate = firstMessage?.scheduled_at ?? firstMessage?.created_at ?? null;
+      const petitionFirstMessage = petitionsFirstMessage[petitionIndex];
+      const petitionFirstMessageUserData = petitionsFirstMessageUserData[petitionIndex];
+      const firstSendDate =
+        petitionFirstMessage?.scheduled_at ?? petitionFirstMessage?.created_at ?? null;
 
       const contactNames = contacts.map((c) => fullName(c.first_name, c.last_name));
       const contactEmails = contacts.map((c) => c.email);
@@ -73,6 +100,19 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
             hour12: false,
           })
         : [];
+
+      const petitionOwner = petitionsOwnerUserData[petitionIndex];
+      const petitionTags = petitionsTags[petitionIndex];
+      const petitionEvents = petitionsEvents[petitionIndex];
+      const latestPetitionCompletedEvent = petitionEvents
+        .filter((e) => e.type === "PETITION_COMPLETED")
+        .at(-1);
+      const latestPetitionClosedEvent = petitionEvents
+        .filter((e) => e.type === "PETITION_CLOSED")
+        .at(-1);
+      const latestSignatureCompletedEvent = petitionEvents
+        .filter((e) => e.type === "SIGNATURE_COMPLETED")
+        .at(-1);
 
       const row: Record<
         string,
@@ -113,8 +153,8 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         "send-date": {
           position: 4,
           title: intl.formatMessage({
-            id: "export-template-report.column-header.send-date",
-            defaultMessage: "Send date",
+            id: "export-template-report.column-header.sent-at",
+            defaultMessage: "Sent at",
           }),
           content: firstSendDate
             ? new Date(
@@ -128,13 +168,91 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
               )
             : null,
         },
+        "sent-by": {
+          position: 5,
+          title: intl.formatMessage({
+            id: "export-template-report.column-header.sent-by",
+            defaultMessage: "Sent by",
+          }),
+          content: fullName(
+            petitionFirstMessageUserData?.first_name,
+            petitionFirstMessageUserData?.last_name
+          ),
+        },
+        "parallel-owner": {
+          position: 6,
+          title: intl.formatMessage({
+            id: "export-template-report.column-header.parallel-owner",
+            defaultMessage: "Owner",
+          }),
+          content: fullName(petitionOwner?.first_name, petitionOwner?.last_name),
+        },
+        tags: {
+          position: 7,
+          title: intl.formatMessage({
+            id: "export-template-report.column-header.parallel-tags",
+            defaultMessage: "Tags",
+          }),
+          content: petitionTags.map((t) => t.name).join(", "),
+        },
+        status: {
+          position: 8,
+          title: intl.formatMessage({
+            id: "export-template-report.column-header.parallel-status",
+            defaultMessage: "Status",
+          }),
+          content: petition.status
+            ? {
+                DRAFT: intl.formatMessage({
+                  id: "export-template-report.petition-status.draft",
+                  defaultMessage: "DRAFT",
+                }),
+                PENDING: intl.formatMessage({
+                  id: "export-template-report.petition-status.pending",
+                  defaultMessage: "PENDING",
+                }),
+                COMPLETED: intl.formatMessage({
+                  id: "export-template-report.petition-status.completed",
+                  defaultMessage: "COMPLETED",
+                }),
+                CLOSED: intl.formatMessage({
+                  id: "export-template-report.petition-status.closed",
+                  defaultMessage: "CLOSED",
+                }),
+              }[petition.status]
+            : null,
+        },
+        "completed-at": {
+          position: 9,
+          title: intl.formatMessage({
+            id: "export-template-report.column-header.parallel-completed-at",
+            defaultMessage: "Completed at",
+          }),
+          content: latestPetitionCompletedEvent?.created_at ?? null,
+        },
+        "closed-at": {
+          position: 10,
+          title: intl.formatMessage({
+            id: "export-template-report.column-header.parallel-closed-at",
+            defaultMessage: "Closed at",
+          }),
+          content: latestPetitionClosedEvent?.created_at ?? null,
+        },
+        "signed-at": {
+          position: 11,
+          title: intl.formatMessage({
+            id: "export-template-report.column-header.parallel-signed-at",
+            defaultMessage: "Signed at",
+          }),
+          content: latestSignatureCompletedEvent?.created_at ?? null,
+        },
       };
 
       if (includePreviewUrl) {
         row["preview-url"] = {
-          position: 5,
+          position: Object.keys(row).length,
           title: intl.formatMessage({
-            id: "export-template-report-column-header.preview-url",
+            id: "export-template-report.column-header.preview-url",
             defaultMessage: "Preview URL",
           }),
           content: `${this.ctx.config.misc.parallelUrl}/${intl.locale}/app/petitions/${toGlobalId(
@@ -145,7 +263,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       }
       const fixedColsLength = Object.keys(row).length;
 
-      const fieldIndexes = getFieldIndexes(petitionFields);
+      const fieldIndexes = getFieldIndices(petitionFields);
       zip(petitionFields, fieldIndexes).forEach(([field, fieldIndex], i) => {
         if (field.type !== "HEADING") {
           const replies = petitionFieldsReplies[i];
