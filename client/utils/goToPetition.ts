@@ -1,6 +1,7 @@
 import { usePetitionShouldConfirmNavigation } from "@parallel/components/layout/PetitionLayout";
 import { useRouter } from "next/router";
 import { MouseEvent, useCallback } from "react";
+import { isDefined } from "remeda";
 import { useHandleNavigation } from "./navigation";
 
 export type PetitionSection = "compose" | "replies" | "activity" | "preview";
@@ -30,19 +31,22 @@ export function useGoToPetitionSection() {
   const goToPetition = useGoToPetition();
   const router = useRouter();
   const [shouldConfirmNavigation, _] = usePetitionShouldConfirmNavigation();
+  const petitionId = router.query.petitionId as string;
+  const fromTemplate = isDefined(router.query.fromTemplate);
   return useCallback(
     function (section: PetitionSection, options?: GoToPetitionOptions) {
-      goToPetition(router.query.petitionId as string, section, {
+      goToPetition(petitionId, section, {
         ...options,
         query:
-          shouldConfirmNavigation || options?.query
+          fromTemplate || shouldConfirmNavigation || options?.query
             ? {
+                ...(fromTemplate ? { fromTemplate: "" } : {}),
                 ...(shouldConfirmNavigation ? { new: "" } : {}),
                 ...(options?.query ?? {}),
               }
             : undefined,
       });
     },
-    [router.query.petitionId, shouldConfirmNavigation]
+    [petitionId, fromTemplate, shouldConfirmNavigation]
   );
 }

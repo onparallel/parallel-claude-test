@@ -150,12 +150,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 
   const goToSection = useGoToPetitionSection();
   const handlePushTo = (section: PetitionSection, fieldId: string) => {
-    goToSection(section, {
-      query: {
-        ...(isDefined(query.fromTemplate) ? { fromTemplate: "" } : {}),
-        field: fieldId,
-      },
-    });
+    goToSection(section, { query: { field: fieldId } });
   };
 
   const showHiddenFieldDialog = useHiddenFieldDialog();

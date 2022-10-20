@@ -179,11 +179,7 @@ const _PetitionComposeField = chakraForwardRef<
 
   const goToSection = useGoToPetitionSection();
   const handlePreviewField = () => {
-    goToSection("preview", {
-      query: {
-        field: field.id,
-      },
-    });
+    goToSection("preview", { query: { field: field.id } });
   };
 
   function updateAttachmentUploadingStatus(cache: DataProxy, id: string, isUploading: boolean) {

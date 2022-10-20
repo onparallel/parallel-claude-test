@@ -35,11 +35,7 @@ export function TimelineCommentPublishedEvent({
     const goToSection = useGoToPetitionSection();
     const handlePreviewComment = () => {
       if (field) {
-        goToSection("replies", {
-          query: {
-            comments: field.id,
-          },
-        });
+        goToSection("replies", { query: { comments: field.id } });
       }
     };
 

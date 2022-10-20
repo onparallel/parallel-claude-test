@@ -98,12 +98,7 @@ export const PetitionRepliesField = Object.assign(
 
     const goToSection = useGoToPetitionSection();
     const handleEditField = () => {
-      goToSection("compose", {
-        query: {
-          ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
-          field: field.id,
-        },
-      });
+      goToSection("compose", { query: { field: field.id } });
     };
 
     const handleEditFieldReply = (replyId: string) => {
