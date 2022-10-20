@@ -48,7 +48,7 @@ function PetitionFromTemplateDialog({
             <Text>
               <FormattedMessage
                 id="component.petition-from-template-dialog.body-2"
-                defaultMessage="If you want your changes to be maintained in all parallels, make them from the template."
+                defaultMessage="If you want your changes to be implemented for all future parallels, make them on the template."
               />
             </Text>
           </Box>

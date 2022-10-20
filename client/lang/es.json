@@ -2696,8 +2696,8 @@
   },
   {
     "term": "component.petition-from-template-dialog.body-2",
-    "definition": "Si quieres que tus cambios se mantengan en todos los parallel, hazlos desde la plantilla.",
-    "context": "If you want your changes to be maintained in all parallels, make them from the template."
+    "definition": "Si quieres que tus cambios se mantengan en todos los parallel futuros, hazlos desde la plantilla.",
+    "context": "If you want your changes to be implemented for all future parallels, make them on the template."
   },
   {
     "term": "component.petition-from-template-dialog.title",
