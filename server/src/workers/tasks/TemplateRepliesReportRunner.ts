@@ -89,7 +89,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       const contactNames = contacts.map((c) => fullName(c.first_name, c.last_name));
       const contactEmails = contacts.map((c) => c.email);
 
-      const [day, , month, , year, , hour, , minute] = firstSendDate
+      const dateParts = firstSendDate
         ? intl.formatDateToParts(firstSendDate, {
             timeZone: timezone,
             day: "numeric",
@@ -100,6 +100,12 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
             hour12: false,
           })
         : [];
+
+      const year = dateParts.find((p) => p.type === "year")!;
+      const month = dateParts.find((p) => p.type === "month")!;
+      const day = dateParts.find((p) => p.type === "day")!;
+      const hour = dateParts.find((p) => p.type === "hour")!;
+      const minute = dateParts.find((p) => p.type === "minute")!;
 
       const petitionOwner = petitionsOwnerUserData[petitionIndex];
       const petitionTags = petitionsTags[petitionIndex];
