@@ -253,7 +253,7 @@ export function CreateEventSubscriptionDialog(
                   values={{
                     a: (chunks: any) => (
                       <Link
-                        href="https://www.onparallel.com/developers/api#tag/Petition-Event"
+                        href="https://www.onparallel.com/developers/api#tag/Parallel-Event"
                         isExternal
                       >
                         {chunks}
