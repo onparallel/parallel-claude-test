@@ -38,7 +38,6 @@ import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
 import { letters, PetitionFieldIndex } from "@parallel/utils/fieldIndices";
-import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { useGoToPetitionSection } from "@parallel/utils/goToPetition";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { getMinMaxCheckboxLimit, usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
@@ -1003,18 +1002,15 @@ const fragments = {
         isInternal
         isReadOnly
         visibility
-        position
         attachments {
           ...PetitionComposeField_PetitionFieldAttachment
         }
         ...PetitionFieldOptionsListEditor_PetitionField
         ...PetitionFieldVisibilityEditor_PetitionField
-        ...useFieldVisibility_PetitionField
       }
       ${this.PetitionFieldAttachment}
       ${PetitionFieldOptionsListEditor.fragments.PetitionField}
       ${PetitionFieldVisibilityEditor.fragments.PetitionField}
-      ${useFieldVisibility.fragments.PetitionField}
     `;
   },
   get PetitionFieldAttachment() {

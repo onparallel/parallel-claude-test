@@ -48,7 +48,11 @@ import {
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
-import { PetitionSection, useGoToPetitionSection } from "@parallel/utils/goToPetition";
+import {
+  PetitionSection,
+  useGoToPetition,
+  useGoToPetitionSection,
+} from "@parallel/utils/goToPetition";
 import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
@@ -117,8 +121,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 
   const getCurrentPage = () => {
     let page = 0;
-    const fieldId = router.query.field;
-    const replyId = router.query.reply;
+    const fieldId = query.field;
+    const replyId = query.reply;
     if (fieldId) {
       page = pages.findIndex((fields) => fields.some((f) => f.id === fieldId));
     }
@@ -148,7 +152,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const handlePushTo = (section: PetitionSection, fieldId: string) => {
     goToSection(section, {
       query: {
-        ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
+        ...(isDefined(query.fromTemplate) ? { fromTemplate: "" } : {}),
         field: fieldId,
       },
     });
@@ -157,7 +161,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const showHiddenFieldDialog = useHiddenFieldDialog();
   const checkVisibilityFocusedField = async () => {
     try {
-      const fieldId = router.query.field;
+      const fieldId = query.field;
       if (fieldId) {
         const field = petition.fields.find((f) => f.id === fieldId);
         if (field && !visibility[field.position]) {
@@ -166,7 +170,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
       }
     } catch (e: any) {
       if (e.message === "CANCEL") {
-        const fieldId = router.query.field;
+        const fieldId = query.field;
         if (fieldId && typeof fieldId === "string") {
           handlePushTo("compose", fieldId);
         }
@@ -176,22 +180,24 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 
   const breakpoint = "md";
 
+  const goToPetition = useGoToPetition();
   const showErrorDialog = useErrorDialog();
   const showFieldErrorDialog = useFieldErrorDialog();
   const _validatePetitionFields = async () => {
     const { error, message, fieldsWithIndices } = validatePetitionFields(petition.fields);
     if (error) {
+      const petitionId = query.petitionId;
       if (fieldsWithIndices && fieldsWithIndices.length > 0) {
         await withError(showFieldErrorDialog({ message, fieldsWithIndices }));
         const firstId = fieldsWithIndices[0].field.id;
-        router.push(
-          `/app/petitions/${query.petitionId}/compose?${new URLSearchParams({
-            field: firstId,
-          })}`
-        );
+        if (isDefined(petitionId) && typeof petitionId === "string") {
+          goToPetition(petitionId, "compose", { query: { field: firstId } });
+        }
       } else {
         await withError(showErrorDialog({ message }));
-        router.push(`/app/petitions/${query.petitionId}/compose`);
+        if (isDefined(petitionId) && typeof petitionId === "string") {
+          goToPetition(petitionId, "compose");
+        }
       }
       return false;
     }
