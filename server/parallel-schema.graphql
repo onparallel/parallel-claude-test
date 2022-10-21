@@ -350,6 +350,8 @@ type GroupPermissionRemovedEvent implements PetitionEvent {
   user: User
 }
 
+scalar ISO8601Duration
+
 input ImageOptions {
   resize: ImageOptionsResize
 }
@@ -965,6 +967,15 @@ type Mutation {
   markSignatureIntegrationAsDefault(id: GID!): OrgIntegration!
 
   """
+  Updates the limit of the current usage limit of a given organization
+  """
+  modifyCurrentUsagePeriod(
+    limitName: OrganizationUsageLimitName!
+    newLimit: Int!
+    orgId: GID!
+  ): Organization!
+
+  """
   Adds, edits or deletes a custom property on the petition
   """
   modifyPetitionCustomProperty(key: String!, petitionId: GID!, value: String): PetitionBase!
@@ -1312,21 +1323,14 @@ type Mutation {
   Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag.
   """
   shareSignaturitApiKey(
+    duration: ISO8601Duration!
+
     """
     How many credits allow the org to use in the given period
     """
     limit: Int!
-
-    """
-    Numeric ID of the Organization
-    """
-    orgId: Int!
-
-    """
-    Period of the usage limit. e.g.: 1 month, 1 year, 20 days, etc...
-    """
-    period: String!
-  ): SupportMethodResponse!
+    orgId: GID!
+  ): Organization!
 
   """
   Generates a download link for the signed PDF petition.
@@ -1466,33 +1470,6 @@ type Mutation {
   updateOrganizationBrandTheme(data: OrganizationBrandThemeInput!): Organization!
 
   """
-  Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period.
-  """
-  updateOrganizationLimits(
-    """
-    How many credits allow the org to use in the given period
-    """
-    amount: Int!
-
-    """
-    Numeric ID of the Organization
-    """
-    orgId: Int!
-
-    """
-    e.g.: 1 month, 1 year, 20 days, etc...
-    """
-    period: String
-
-    """
-    End current period and start new with this arguments
-    """
-    startNewPeriod: Boolean!
-    type: OrganizationUsageLimitName!
-    updateOnlyCurrentPeriod: Boolean!
-  ): SupportMethodResponse!
-
-  """
   Updates the logo of an organization
   """
   updateOrganizationLogo(file: Upload!, isIcon: Boolean): Organization!
@@ -1523,6 +1500,30 @@ type Mutation {
   ): SupportMethodResponse!
 
   """
+  Updates the usage_details of a given organization. Will impact the limits of coming usage periods.
+  """
+  updateOrganizationUsageDetails(
+    duration: ISO8601Duration!
+
+    """
+    How many credits allow the org to use in the given period
+    """
+    limit: Int!
+    limitName: OrganizationUsageLimitName!
+    orgId: GID!
+
+    """
+    How many cycles this subscription will renew until it finishes. Zero means infinite
+    """
+    renewalCycles: Int!
+
+    """
+    End current period and start new with this arguments.
+    """
+    startNewPeriod: Boolean!
+  ): Organization!
+
+  """
   Updates the role of another user in the organization.
   """
   updateOrganizationUser(role: OrganizationRole!, userGroupIds: [GID!], userId: GID!): User!
@@ -1535,12 +1536,8 @@ type Mutation {
     How many users allow the org to create
     """
     limit: Int!
-
-    """
-    Numeric ID of the organization
-    """
-    orgId: Int!
-  ): SupportMethodResponse!
+    orgId: GID!
+  ): Organization!
 
   """
   Updates a petition.
@@ -1805,6 +1802,7 @@ type Organization implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
+  currentUsagePeriod(limitName: OrganizationUsageLimitName!): OrganizationUsageLimit
 
   """
   Custom host used in petition links and public links.
@@ -1876,7 +1874,20 @@ type Organization implements Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
-  usageLimits: OrganizationUsageLimit!
+  usageDetails: JSONObject!
+  usageLimits: OrganizationUsageLimits! @deprecated(reason: "use usagePeriods pagination")
+  usagePeriods(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+    limitName: OrganizationUsageLimitName!
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+  ): OrganizationUsageLimitPagination!
 
   """
   The users in the organization.
@@ -2002,9 +2013,13 @@ type OrganizationTheme {
 }
 
 type OrganizationUsageLimit {
-  petitions: OrganizationUsagePetitionLimit!
-  signatures: OrganizationUsageSignaturesLimit
-  users: OrganizationUsageUserLimit!
+  cycleNumber: Int!
+  id: GID!
+  limit: Int!
+  period: ISO8601Duration!
+  periodEndDate: DateTime
+  periodStartDate: DateTime!
+  used: Int!
 }
 
 enum OrganizationUsageLimitName {
@@ -2012,14 +2027,22 @@ enum OrganizationUsageLimitName {
   SIGNATURIT_SHARED_APIKEY
 }
 
-type OrganizationUsagePetitionLimit {
-  limit: Int!
-  used: Int!
+type OrganizationUsageLimitPagination {
+  """
+  The requested slice of items.
+  """
+  items: [OrganizationUsageLimit!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
 }
 
-type OrganizationUsageSignaturesLimit {
-  limit: Int!
-  used: Int!
+type OrganizationUsageLimits {
+  petitions: OrganizationUsageLimit!
+  signatures: OrganizationUsageLimit
+  users: OrganizationUsageUserLimit!
 }
 
 type OrganizationUsageUserLimit {

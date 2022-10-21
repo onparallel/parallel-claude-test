@@ -33,7 +33,11 @@ import { validWebSafeFontFamily } from "../helpers/validators/validWebSafeFontFa
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { validateHexColor } from "../tag/validators";
 import { contextUserHasRole } from "../users/authorizers";
-import { organizationThemeIsNotDefault, userHasAccessToOrganizationTheme } from "./authorizers";
+import {
+  organizationHasOngoingUsagePeriod,
+  organizationThemeIsNotDefault,
+  userHasAccessToOrganizationTheme,
+} from "./authorizers";
 
 export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
   description: "Updates the logo of an organization",
@@ -278,7 +282,7 @@ export const updateFeatureFlags = mutationField("updateFeatureFlags", {
   resolve: async (_, { featureFlags, orgId }, ctx) => {
     const needRemoveBranding = featureFlags.some((f) => f.name === "REMOVE_PARALLEL_BRANDING");
 
-    await ctx.featureFlags.addOrUpdateFeatureFlagOverride(orgId, featureFlags);
+    await ctx.featureFlags.upsertFeatureFlagOverride(orgId, featureFlags);
     if (needRemoveBranding) {
       await ctx.signature.updateBranding(orgId);
     }
@@ -351,5 +355,173 @@ export const createOrganization = mutationField("createOrganization", {
     await ctx.tiers.updateOrganizationTier(org, "FREE", `User:${ctx.user!.id}`);
 
     return org;
+  },
+});
+
+export const updateOrganizationUserLimit = mutationField("updateOrganizationUserLimit", {
+  description: "Updates the user limit for a organization",
+  type: "Organization",
+  args: {
+    orgId: nonNull(globalIdArg("Organization")),
+    limit: nonNull(intArg({ description: "How many users allow the org to create" })),
+  },
+  authorize: authenticateAnd(userIsSuperAdmin()),
+  resolve: async (_, { orgId, limit }, ctx) => {
+    return await ctx.organizations.updateOrganizationUsageDetails(
+      orgId,
+      { USER_LIMIT: limit },
+      `User:${ctx.user!.id}`
+    );
+  },
+});
+
+export const updateOrganizationUsageDetails = mutationField("updateOrganizationUsageDetails", {
+  type: "Organization",
+  description:
+    "Updates the usage_details of a given organization. Will impact the limits of coming usage periods.",
+  authorize: authenticateAnd(userIsSuperAdmin()),
+  args: {
+    orgId: nonNull(globalIdArg("Organization")),
+    limitName: nonNull("OrganizationUsageLimitName"),
+    limit: nonNull(
+      intArg({ description: "How many credits allow the org to use in the given period" })
+    ),
+    duration: nonNull("ISO8601Duration"),
+    renewalCycles: nonNull(
+      intArg({
+        description:
+          "How many cycles this subscription will renew until it finishes. Zero means infinite",
+      })
+    ),
+    startNewPeriod: nonNull(
+      booleanArg({
+        description: "End current period and start new with this arguments.",
+      })
+    ),
+  },
+  resolve: async (_, args, ctx) => {
+    const org = await ctx.organizations.updateOrganizationUsageDetails(
+      args.orgId,
+      {
+        [args.limitName]: {
+          duration: args.duration,
+          limit: args.limit,
+          renewal_cycles: args.renewalCycles > 0 ? args.renewalCycles : null,
+        },
+      },
+      `User:${ctx.user!.id}`
+    );
+    if (args.startNewPeriod) {
+      await ctx.organizations.startNewOrganizationUsageLimitPeriod(
+        args.orgId,
+        args.limitName,
+        args.limit,
+        args.duration
+      );
+    }
+
+    return org;
+  },
+});
+
+export const modifyCurrentUsagePeriod = mutationField("modifyCurrentUsagePeriod", {
+  description: "Updates the limit of the current usage limit of a given organization",
+  type: "Organization",
+  authorize: authenticateAnd(
+    userIsSuperAdmin(),
+    organizationHasOngoingUsagePeriod("orgId", "limitName")
+  ),
+  args: {
+    orgId: nonNull(globalIdArg("Organization")),
+    limitName: nonNull("OrganizationUsageLimitName"),
+    newLimit: nonNull(intArg()),
+  },
+  validateArgs: inRange((args) => args.newLimit, "newLimit", 0),
+  resolve: async (_, args, ctx) => {
+    await ctx.organizations.updateOrganizationCurrentUsageLimit(
+      args.orgId,
+      args.limitName,
+      args.newLimit
+    );
+    return (await ctx.organizations.loadOrg(args.orgId))!;
+  },
+});
+
+export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
+  description: `Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag.`,
+  type: "Organization",
+  args: {
+    orgId: nonNull(globalIdArg("Organization")),
+    limit: nonNull(
+      intArg({ description: "How many credits allow the org to use in the given period" })
+    ),
+    duration: nonNull("ISO8601Duration"),
+  },
+  authorize: authenticateAnd(userIsSuperAdmin()),
+  resolve: async (_, { orgId, duration, limit }, ctx) => {
+    const signatureIntegrations = await ctx.integrations.loadIntegrationsByOrgId(
+      orgId,
+      "SIGNATURE"
+    );
+
+    const hasSharedSignaturitApiKey =
+      signatureIntegrations.length > 0 &&
+      signatureIntegrations.some(
+        (i) =>
+          i.provider.toUpperCase() === "SIGNATURIT" &&
+          i.settings.CREDENTIALS.API_KEY ===
+            ctx.config.signature.signaturitSharedProductionApiKey &&
+          i.settings.ENVIRONMENT === "production" &&
+          i.is_enabled
+      );
+
+    return await ctx.organizations.withTransaction(async (t) => {
+      const [organization] = await Promise.all([
+        ctx.organizations.updateOrganizationUsageDetails(
+          orgId,
+          {
+            SIGNATURIT_SHARED_APIKEY: {
+              limit,
+              duration,
+              renewal_cycles: null, // TODO check this
+            },
+          },
+          `User:${ctx.user!.id}`,
+          t
+        ),
+        !hasSharedSignaturitApiKey
+          ? ctx.integrations.createOrgIntegration<"SIGNATURE", "SIGNATURIT">(
+              {
+                type: "SIGNATURE",
+                provider: "SIGNATURIT",
+                name: "Signaturit",
+                org_id: orgId,
+                settings: {
+                  CREDENTIALS: {
+                    API_KEY: ctx.config.signature.signaturitSharedProductionApiKey,
+                  },
+                  ENVIRONMENT: "production",
+                },
+                is_enabled: true,
+              },
+              `User:${ctx.user!.id}`,
+              t
+            )
+          : null,
+        ctx.organizations.startNewOrganizationUsageLimitPeriod(
+          orgId,
+          "SIGNATURIT_SHARED_APIKEY",
+          limit,
+          duration,
+          t
+        ),
+        ctx.featureFlags.upsertFeatureFlagOverride(
+          orgId,
+          { name: "PETITION_SIGNATURE", value: true },
+          t
+        ),
+      ]);
+      return organization;
+    });
   },
 });

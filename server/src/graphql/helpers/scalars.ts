@@ -28,6 +28,25 @@ export function datetimeArg(opts?: Omit<core.NexusArgConfig<"DateTime">, "type">
   return arg({ ...opts, type: "DateTime" });
 }
 
+const ISO_DURATION_REGEX =
+  /P(?:([\d]+\.?[\d]*|\.[\d]+)Y)?(?:([\d]+\.?[\d]*|\.[\d]+)M)?(?:([\d]+\.?[\d]*|\.[\d]+)W)?(?:([\d]+\.?[\d]*|\.[\d]+)D)?(?:T(?:([\d]+\.?[\d]*|\.[\d]+)H)?(?:([\d]+\.?[\d]*|\.[\d]+)M)?(?:([\d]+\.?[\d]*|\.[\d]+)S)?)?$/;
+export const ISO8601Duration = scalarType({
+  name: "ISO8601Duration",
+  asNexusMethod: "duration",
+  sourceType: "string",
+  parseLiteral: (v) => {
+    if (v.kind !== "StringValue" || !v.value.match(ISO_DURATION_REGEX)) {
+      throw new Error();
+    }
+    return v.value;
+  },
+  parseValue: (v) => v,
+});
+
+export function iso8601DurationArg(opts?: Omit<core.NexusArgConfig<"ISO8601Duration">, "type">) {
+  return arg({ ...opts, type: "ISO8601Duration" });
+}
+
 export const Success = enumType({
   name: "Success",
   description: "Represents a successful execution.",

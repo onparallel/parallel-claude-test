@@ -14,6 +14,7 @@ import { or, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { isOwnOrgOrSuperAdmin } from "./authorizers";
+import { parseOrganizationUsageDetails } from "./helpers";
 
 export const OrganizationStatus = enumType({
   name: "OrganizationStatus",
@@ -92,6 +93,20 @@ export const OrganizationPdfDocumentThemeInput = inputObjectType({
     });
   },
 }).asArg();
+
+export const OrganizationUsageLimit = objectType({
+  name: "OrganizationUsageLimit",
+  sourceType: "db.OrganizationUsageLimit",
+  definition(t) {
+    t.nonNull.globalId("id", { prefixName: "OrganizationUsageLimit" });
+    t.nonNull.int("limit");
+    t.nonNull.int("used");
+    t.nonNull.duration("period");
+    t.nonNull.datetime("periodStartDate", { resolve: (o) => o.period_start_date });
+    t.nullable.datetime("periodEndDate", { resolve: (o) => o.period_end_date });
+    t.nonNull.int("cycleNumber", { resolve: (o) => o.cycle_number });
+  },
+});
 
 export const Organization = objectType({
   name: "Organization",
@@ -205,10 +220,43 @@ export const Organization = objectType({
           limit,
         }),
     });
+    t.nonNull.jsonObject("usageDetails", {
+      authorize: isOwnOrgOrSuperAdmin(),
+      resolve: (o) => parseOrganizationUsageDetails(o.usage_details),
+    });
+    t.paginationField("usagePeriods", {
+      type: "OrganizationUsageLimit",
+      authorize: isOwnOrgOrSuperAdmin(),
+      extendArgs: {
+        limitName: nonNull("OrganizationUsageLimitName"),
+      },
+      resolve: async (root, { limitName, limit, offset }, ctx) => {
+        return await ctx.organizations.loadPaginatedUsageLimits(root.id, {
+          limitName,
+          limit,
+          offset,
+        });
+      },
+    });
+    t.nullable.field("currentUsagePeriod", {
+      type: "OrganizationUsageLimit",
+      authorize: isOwnOrgOrSuperAdmin(),
+      args: {
+        limitName: nonNull("OrganizationUsageLimitName"),
+      },
+      resolve: async (_, args, ctx) => {
+        return await ctx.organizations.getOrganizationCurrentUsageLimit(
+          ctx.user!.org_id,
+          args.limitName
+        );
+      },
+    });
+    /** @deprecated */
     t.nonNull.field("usageLimits", {
+      deprecation: "use usagePeriods pagination",
       authorize: isOwnOrgOrSuperAdmin(),
       type: objectType({
-        name: "OrganizationUsageLimit",
+        name: "OrganizationUsageLimits",
         sourceType: /* ts*/ `{
           petitions: {
             limit: number,
@@ -224,13 +272,7 @@ export const Organization = objectType({
         }`,
         definition(t) {
           t.nonNull.field("petitions", {
-            type: objectType({
-              name: "OrganizationUsagePetitionLimit",
-              definition(d) {
-                d.nonNull.int("limit");
-                d.nonNull.int("used");
-              },
-            }),
+            type: "OrganizationUsageLimit",
           });
           t.nonNull.field("users", {
             type: objectType({
@@ -241,13 +283,7 @@ export const Organization = objectType({
             }),
           });
           t.nullable.field("signatures", {
-            type: objectType({
-              name: "OrganizationUsageSignaturesLimit",
-              definition(d) {
-                d.nonNull.int("limit");
-                d.nonNull.int("used");
-              },
-            }),
+            type: "OrganizationUsageLimit",
           });
         },
       }),
@@ -276,12 +312,13 @@ export const Organization = objectType({
           petitions: {
             limit: petitionSendLimits?.limit || 0,
             used: petitionSendLimits?.used || 0,
+            period: petitionSendLimits!.period as any,
           },
           users: {
             limit: organization!.usage_details.USER_LIMIT,
           },
           signatures: hasSharedSignatureIntegration
-            ? pick(signatureSendLimits, ["limit", "used"])
+            ? pick(signatureSendLimits, ["limit", "used", "period"])
             : null,
         };
       },

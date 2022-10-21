@@ -1,7 +1,7 @@
 import { ApolloError } from "apollo-server-core";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isDefined } from "remeda";
-import { OrganizationThemeType } from "../../db/__types";
+import { OrganizationThemeType, OrganizationUsageLimitName } from "../../db/__types";
 import { Arg, or, userIsSuperAdmin } from "../helpers/authorize";
 
 export function isOwnOrg<FieldName extends string>(): FieldAuthorizeResolver<
@@ -98,6 +98,24 @@ export function organizationThemeIsNotDefault<
         args[argName] as unknown as number
       );
       return theme?.is_default === false;
+    } catch {}
+    return false;
+  };
+}
+
+export function organizationHasOngoingUsagePeriod<
+  TypeName extends string,
+  FieldName extends string,
+  TOrgIdArg extends Arg<TypeName, FieldName, number>,
+  TLimitNameArg extends Arg<TypeName, FieldName, OrganizationUsageLimitName>
+>(orgIdArg: TOrgIdArg, limitNameArg: TLimitNameArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const orgId = args[orgIdArg] as unknown as number;
+      const limitName = args[limitNameArg] as unknown as OrganizationUsageLimitName;
+
+      const limit = await ctx.organizations.getOrganizationCurrentUsageLimit(orgId, limitName);
+      return isDefined(limit);
     } catch {}
     return false;
   };

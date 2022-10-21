@@ -15,6 +15,7 @@ export type Scalars = {
   /** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
   DateTime: string;
   GID: string;
+  ISO8601Duration: string;
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSON: any;
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
@@ -535,6 +536,8 @@ export type Mutation = {
   loginAs: Result;
   /** marks a Signature integration as default */
   markSignatureIntegrationAsDefault: OrgIntegration;
+  /** Updates the limit of the current usage limit of a given organization */
+  modifyCurrentUsagePeriod: Organization;
   /** Adds, edits or deletes a custom property on the petition */
   modifyPetitionCustomProperty: PetitionBase;
   /** Moves a group of petitions or folders to another folder. */
@@ -623,7 +626,7 @@ export type Mutation = {
   /** Sets the locale passed as arg as the preferred language of the user to see the page */
   setUserPreferredLocale: User;
   /** Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag. */
-  shareSignaturitApiKey: SupportMethodResponse;
+  shareSignaturitApiKey: Organization;
   /** Generates a download link for the signed PDF petition. */
   signedPetitionDownloadLink: FileUploadDownloadLinkResult;
   /** Starts the completion of an async field */
@@ -657,18 +660,18 @@ export type Mutation = {
   updateOrganizationAutoAnonymizePeriod: Organization;
   /** updates the theme of the organization brand */
   updateOrganizationBrandTheme: Organization;
-  /** Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period. */
-  updateOrganizationLimits: SupportMethodResponse;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
   /** updates the PDF_DOCUMENT theme of the organization */
   updateOrganizationPdfDocumentTheme: Organization;
   /** Applies a given tier to the organization */
   updateOrganizationTier: SupportMethodResponse;
+  /** Updates the usage_details of a given organization. Will impact the limits of coming usage periods. */
+  updateOrganizationUsageDetails: Organization;
   /** Updates the role of another user in the organization. */
   updateOrganizationUser: User;
   /** Updates the user limit for a organization */
-  updateOrganizationUserLimit: SupportMethodResponse;
+  updateOrganizationUserLimit: Organization;
   /** Updates a petition. */
   updatePetition: PetitionBase;
   /** Updates a petition field. */
@@ -1070,6 +1073,12 @@ export type MutationmarkSignatureIntegrationAsDefaultArgs = {
   id: Scalars["GID"];
 };
 
+export type MutationmodifyCurrentUsagePeriodArgs = {
+  limitName: OrganizationUsageLimitName;
+  newLimit: Scalars["Int"];
+  orgId: Scalars["GID"];
+};
+
 export type MutationmodifyPetitionCustomPropertyArgs = {
   key: Scalars["String"];
   petitionId: Scalars["GID"];
@@ -1323,9 +1332,9 @@ export type MutationsetUserPreferredLocaleArgs = {
 };
 
 export type MutationshareSignaturitApiKeyArgs = {
+  duration: Scalars["ISO8601Duration"];
   limit: Scalars["Int"];
-  orgId: Scalars["Int"];
-  period: Scalars["String"];
+  orgId: Scalars["GID"];
 };
 
 export type MutationsignedPetitionDownloadLinkArgs = {
@@ -1419,15 +1428,6 @@ export type MutationupdateOrganizationBrandThemeArgs = {
   data: OrganizationBrandThemeInput;
 };
 
-export type MutationupdateOrganizationLimitsArgs = {
-  amount: Scalars["Int"];
-  orgId: Scalars["Int"];
-  period?: InputMaybe<Scalars["String"]>;
-  startNewPeriod: Scalars["Boolean"];
-  type: OrganizationUsageLimitName;
-  updateOnlyCurrentPeriod: Scalars["Boolean"];
-};
-
 export type MutationupdateOrganizationLogoArgs = {
   file: Scalars["Upload"];
   isIcon?: InputMaybe<Scalars["Boolean"]>;
@@ -1445,6 +1445,15 @@ export type MutationupdateOrganizationTierArgs = {
   tier: Scalars["String"];
 };
 
+export type MutationupdateOrganizationUsageDetailsArgs = {
+  duration: Scalars["ISO8601Duration"];
+  limit: Scalars["Int"];
+  limitName: OrganizationUsageLimitName;
+  orgId: Scalars["GID"];
+  renewalCycles: Scalars["Int"];
+  startNewPeriod: Scalars["Boolean"];
+};
+
 export type MutationupdateOrganizationUserArgs = {
   role: OrganizationRole;
   userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
@@ -1453,7 +1462,7 @@ export type MutationupdateOrganizationUserArgs = {
 
 export type MutationupdateOrganizationUserLimitArgs = {
   limit: Scalars["Int"];
-  orgId: Scalars["Int"];
+  orgId: Scalars["GID"];
 };
 
 export type MutationupdatePetitionArgs = {
@@ -1638,6 +1647,7 @@ export type Organization = Timestamps & {
   brandTheme: OrganizationBrandThemeData;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  currentUsagePeriod: Maybe<OrganizationUsageLimit>;
   /** Custom host used in petition links and public links. */
   customHost: Maybe<Scalars["String"]>;
   /** A list of all feature flag and the value asigned to this org */
@@ -1661,9 +1671,17 @@ export type Organization = Timestamps & {
   status: OrganizationStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-  usageLimits: OrganizationUsageLimit;
+  usageDetails: Scalars["JSONObject"];
+  /** @deprecated use usagePeriods pagination */
+  usageLimits: OrganizationUsageLimits;
+  usagePeriods: OrganizationUsageLimitPagination;
   /** The users in the organization. */
   users: UserPagination;
+};
+
+/** An organization in the system. */
+export type OrganizationcurrentUsagePeriodArgs = {
+  limitName: OrganizationUsageLimitName;
 };
 
 /** An organization in the system. */
@@ -1681,6 +1699,13 @@ export type OrganizationintegrationsArgs = {
 /** An organization in the system. */
 export type OrganizationlogoUrlArgs = {
   options?: InputMaybe<ImageOptions>;
+};
+
+/** An organization in the system. */
+export type OrganizationusagePeriodsArgs = {
+  limit?: InputMaybe<Scalars["Int"]>;
+  limitName: OrganizationUsageLimitName;
+  offset?: InputMaybe<Scalars["Int"]>;
 };
 
 /** An organization in the system. */
@@ -1759,21 +1784,28 @@ export type OrganizationTheme = {
 };
 
 export type OrganizationUsageLimit = {
-  petitions: OrganizationUsagePetitionLimit;
-  signatures: Maybe<OrganizationUsageSignaturesLimit>;
-  users: OrganizationUsageUserLimit;
+  cycleNumber: Scalars["Int"];
+  id: Scalars["GID"];
+  limit: Scalars["Int"];
+  period: Scalars["ISO8601Duration"];
+  periodEndDate: Maybe<Scalars["DateTime"]>;
+  periodStartDate: Scalars["DateTime"];
+  used: Scalars["Int"];
 };
 
 export type OrganizationUsageLimitName = "PETITION_SEND" | "SIGNATURIT_SHARED_APIKEY";
 
-export type OrganizationUsagePetitionLimit = {
-  limit: Scalars["Int"];
-  used: Scalars["Int"];
+export type OrganizationUsageLimitPagination = {
+  /** The requested slice of items. */
+  items: Array<OrganizationUsageLimit>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
 };
 
-export type OrganizationUsageSignaturesLimit = {
-  limit: Scalars["Int"];
-  used: Scalars["Int"];
+export type OrganizationUsageLimits = {
+  petitions: OrganizationUsageLimit;
+  signatures: Maybe<OrganizationUsageLimit>;
+  users: OrganizationUsageUserLimit;
 };
 
 export type OrganizationUsageUserLimit = {
@@ -2833,7 +2865,7 @@ export type PublicPetitionAccess = {
   contact: Maybe<PublicContact>;
   granter: Maybe<PublicUser>;
   message: Maybe<PublicPetitionMessage>;
-  petition: Maybe<PublicPetition>;
+  petition: PublicPetition;
 };
 
 /** A field within a petition. */
@@ -2975,7 +3007,7 @@ export type PublicUser = {
 export type PublicUserOrContact = PublicContact | PublicUser;
 
 export type Query = {
-  access: Maybe<PublicPetitionAccess>;
+  access: PublicPetitionAccess;
   contact: Maybe<Contact>;
   /** The contacts of the user */
   contacts: ContactPagination;

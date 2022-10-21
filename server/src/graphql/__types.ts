@@ -34,6 +34,10 @@ declare global {
       fieldName: FieldName,
       opts?: core.CommonInputFieldConfig<TypeName, FieldName>
     ): void; // "DateTime";
+    duration<FieldName extends string>(
+      fieldName: FieldName,
+      opts?: core.CommonInputFieldConfig<TypeName, FieldName>
+    ): void; // "ISO8601Duration";
     globalId<FieldName extends string>(
       fieldName: FieldName,
       opts: GlobalIdInputFieldConfig<TypeName, FieldName>
@@ -63,6 +67,10 @@ declare global {
       fieldName: FieldName,
       ...opts: core.ScalarOutSpread<TypeName, FieldName>
     ): void; // "DateTime";
+    duration<FieldName extends string>(
+      fieldName: FieldName,
+      ...opts: core.ScalarOutSpread<TypeName, FieldName>
+    ): void; // "ISO8601Duration";
     globalId<FieldName extends string>(
       fieldName: FieldName,
       ...opts: GlobalIdOutputFieldConfigSpread<TypeName, FieldName>
@@ -341,6 +349,7 @@ export interface NexusGenScalars {
   ID: string;
   DateTime: Date;
   GID: number;
+  ISO8601Duration: string;
   JSON: any;
   JSONObject: { [key: string]: any };
   Upload: Promise<FileUpload>;
@@ -450,7 +459,13 @@ export interface NexusGenObjects {
     totalCount: number; // Int!
   };
   OrganizationTheme: db.OrganizationTheme;
-  OrganizationUsageLimit: {
+  OrganizationUsageLimit: db.OrganizationUsageLimit;
+  OrganizationUsageLimitPagination: {
+    // root type
+    items: NexusGenRootTypes["OrganizationUsageLimit"][]; // [OrganizationUsageLimit!]!
+    totalCount: number; // Int!
+  };
+  OrganizationUsageLimits: {
     petitions: {
       limit: number;
       used: number;
@@ -462,16 +477,6 @@ export interface NexusGenObjects {
       limit: number;
       used: number;
     } | null;
-  };
-  OrganizationUsagePetitionLimit: {
-    // root type
-    limit: number; // Int!
-    used: number; // Int!
-  };
-  OrganizationUsageSignaturesLimit: {
-    // root type
-    limit: number; // Int!
-    used: number; // Int!
   };
   OrganizationUsageUserLimit: {
     // root type
@@ -1079,6 +1084,7 @@ export interface NexusGenFieldTypes {
     getTaskResultFile: NexusGenRootTypes["TaskResultFile"]; // TaskResultFile!
     loginAs: NexusGenEnums["Result"]; // Result!
     markSignatureIntegrationAsDefault: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
+    modifyCurrentUsagePeriod: NexusGenRootTypes["Organization"]; // Organization!
     modifyPetitionCustomProperty: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     movePetitions: NexusGenEnums["Success"]; // Success!
     petitionAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
@@ -1123,7 +1129,7 @@ export interface NexusGenFieldTypes {
     sendSignatureRequestReminders: NexusGenEnums["Result"]; // Result!
     setUserDelegates: NexusGenRootTypes["User"]; // User!
     setUserPreferredLocale: NexusGenRootTypes["User"]; // User!
-    shareSignaturitApiKey: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    shareSignaturitApiKey: NexusGenRootTypes["Organization"]; // Organization!
     signedPetitionDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     startAsyncFieldCompletion: NexusGenRootTypes["AsyncFieldCompletionResponse"]; // AsyncFieldCompletionResponse!
     startSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
@@ -1141,12 +1147,12 @@ export interface NexusGenFieldTypes {
     updateLandingTemplateMetadata: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOrganizationAutoAnonymizePeriod: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationBrandTheme: NexusGenRootTypes["Organization"]; // Organization!
-    updateOrganizationLimits: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationPdfDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationTier: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    updateOrganizationUsageDetails: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationUser: NexusGenRootTypes["User"]; // User!
-    updateOrganizationUserLimit: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    updateOrganizationUserLimit: NexusGenRootTypes["Organization"]; // Organization!
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
@@ -1189,6 +1195,7 @@ export interface NexusGenFieldTypes {
     anonymizePetitionsAfterMonths: number | null; // Int
     brandTheme: NexusGenRootTypes["OrganizationBrandThemeData"]; // OrganizationBrandThemeData!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    currentUsagePeriod: NexusGenRootTypes["OrganizationUsageLimit"] | null; // OrganizationUsageLimit
     customHost: string | null; // String
     features: NexusGenRootTypes["FeatureFlagNameValue"][]; // [FeatureFlagNameValue!]!
     hasSsoProvider: boolean; // Boolean!
@@ -1201,7 +1208,9 @@ export interface NexusGenFieldTypes {
     pdfDocumentThemes: NexusGenRootTypes["OrganizationTheme"][]; // [OrganizationTheme!]!
     status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
-    usageLimits: NexusGenRootTypes["OrganizationUsageLimit"]; // OrganizationUsageLimit!
+    usageDetails: NexusGenScalars["JSONObject"]; // JSONObject!
+    usageLimits: NexusGenRootTypes["OrganizationUsageLimits"]; // OrganizationUsageLimits!
+    usagePeriods: NexusGenRootTypes["OrganizationUsageLimitPagination"]; // OrganizationUsageLimitPagination!
     users: NexusGenRootTypes["UserPagination"]; // UserPagination!
   };
   OrganizationBrandThemeData: {
@@ -1224,19 +1233,24 @@ export interface NexusGenFieldTypes {
   };
   OrganizationUsageLimit: {
     // field return type
-    petitions: NexusGenRootTypes["OrganizationUsagePetitionLimit"]; // OrganizationUsagePetitionLimit!
-    signatures: NexusGenRootTypes["OrganizationUsageSignaturesLimit"] | null; // OrganizationUsageSignaturesLimit
+    cycleNumber: number; // Int!
+    id: NexusGenScalars["GID"]; // GID!
+    limit: number; // Int!
+    period: NexusGenScalars["ISO8601Duration"]; // ISO8601Duration!
+    periodEndDate: NexusGenScalars["DateTime"] | null; // DateTime
+    periodStartDate: NexusGenScalars["DateTime"]; // DateTime!
+    used: number; // Int!
+  };
+  OrganizationUsageLimitPagination: {
+    // field return type
+    items: NexusGenRootTypes["OrganizationUsageLimit"][]; // [OrganizationUsageLimit!]!
+    totalCount: number; // Int!
+  };
+  OrganizationUsageLimits: {
+    // field return type
+    petitions: NexusGenRootTypes["OrganizationUsageLimit"]; // OrganizationUsageLimit!
+    signatures: NexusGenRootTypes["OrganizationUsageLimit"] | null; // OrganizationUsageLimit
     users: NexusGenRootTypes["OrganizationUsageUserLimit"]; // OrganizationUsageUserLimit!
-  };
-  OrganizationUsagePetitionLimit: {
-    // field return type
-    limit: number; // Int!
-    used: number; // Int!
-  };
-  OrganizationUsageSignaturesLimit: {
-    // field return type
-    limit: number; // Int!
-    used: number; // Int!
   };
   OrganizationUsageUserLimit: {
     // field return type
@@ -2659,6 +2673,7 @@ export interface NexusGenFieldTypeNames {
     getTaskResultFile: "TaskResultFile";
     loginAs: "Result";
     markSignatureIntegrationAsDefault: "OrgIntegration";
+    modifyCurrentUsagePeriod: "Organization";
     modifyPetitionCustomProperty: "PetitionBase";
     movePetitions: "Success";
     petitionAttachmentDownloadLink: "FileUploadDownloadLinkResult";
@@ -2703,7 +2718,7 @@ export interface NexusGenFieldTypeNames {
     sendSignatureRequestReminders: "Result";
     setUserDelegates: "User";
     setUserPreferredLocale: "User";
-    shareSignaturitApiKey: "SupportMethodResponse";
+    shareSignaturitApiKey: "Organization";
     signedPetitionDownloadLink: "FileUploadDownloadLinkResult";
     startAsyncFieldCompletion: "AsyncFieldCompletionResponse";
     startSignatureRequest: "PetitionSignatureRequest";
@@ -2721,12 +2736,12 @@ export interface NexusGenFieldTypeNames {
     updateLandingTemplateMetadata: "SupportMethodResponse";
     updateOrganizationAutoAnonymizePeriod: "Organization";
     updateOrganizationBrandTheme: "Organization";
-    updateOrganizationLimits: "SupportMethodResponse";
     updateOrganizationLogo: "Organization";
     updateOrganizationPdfDocumentTheme: "Organization";
     updateOrganizationTier: "SupportMethodResponse";
+    updateOrganizationUsageDetails: "Organization";
     updateOrganizationUser: "User";
-    updateOrganizationUserLimit: "SupportMethodResponse";
+    updateOrganizationUserLimit: "Organization";
     updatePetition: "PetitionBase";
     updatePetitionField: "PetitionField";
     updatePetitionFieldComment: "PetitionFieldComment";
@@ -2769,6 +2784,7 @@ export interface NexusGenFieldTypeNames {
     anonymizePetitionsAfterMonths: "Int";
     brandTheme: "OrganizationBrandThemeData";
     createdAt: "DateTime";
+    currentUsagePeriod: "OrganizationUsageLimit";
     customHost: "String";
     features: "FeatureFlagNameValue";
     hasSsoProvider: "Boolean";
@@ -2781,7 +2797,9 @@ export interface NexusGenFieldTypeNames {
     pdfDocumentThemes: "OrganizationTheme";
     status: "OrganizationStatus";
     updatedAt: "DateTime";
-    usageLimits: "OrganizationUsageLimit";
+    usageDetails: "JSONObject";
+    usageLimits: "OrganizationUsageLimits";
+    usagePeriods: "OrganizationUsageLimitPagination";
     users: "UserPagination";
   };
   OrganizationBrandThemeData: {
@@ -2804,19 +2822,24 @@ export interface NexusGenFieldTypeNames {
   };
   OrganizationUsageLimit: {
     // field return type name
-    petitions: "OrganizationUsagePetitionLimit";
-    signatures: "OrganizationUsageSignaturesLimit";
+    cycleNumber: "Int";
+    id: "GID";
+    limit: "Int";
+    period: "ISO8601Duration";
+    periodEndDate: "DateTime";
+    periodStartDate: "DateTime";
+    used: "Int";
+  };
+  OrganizationUsageLimitPagination: {
+    // field return type name
+    items: "OrganizationUsageLimit";
+    totalCount: "Int";
+  };
+  OrganizationUsageLimits: {
+    // field return type name
+    petitions: "OrganizationUsageLimit";
+    signatures: "OrganizationUsageLimit";
     users: "OrganizationUsageUserLimit";
-  };
-  OrganizationUsagePetitionLimit: {
-    // field return type name
-    limit: "Int";
-    used: "Int";
-  };
-  OrganizationUsageSignaturesLimit: {
-    // field return type name
-    limit: "Int";
-    used: "Int";
   };
   OrganizationUsageUserLimit: {
     // field return type name
@@ -4278,6 +4301,12 @@ export interface NexusGenArgTypes {
       // args
       id: NexusGenScalars["GID"]; // GID!
     };
+    modifyCurrentUsagePeriod: {
+      // args
+      limitName: NexusGenEnums["OrganizationUsageLimitName"]; // OrganizationUsageLimitName!
+      newLimit: number; // Int!
+      orgId: NexusGenScalars["GID"]; // GID!
+    };
     modifyPetitionCustomProperty: {
       // args
       key: string; // String!
@@ -4532,9 +4561,9 @@ export interface NexusGenArgTypes {
     };
     shareSignaturitApiKey: {
       // args
+      duration: NexusGenScalars["ISO8601Duration"]; // ISO8601Duration!
       limit: number; // Int!
-      orgId: number; // Int!
-      period: string; // String!
+      orgId: NexusGenScalars["GID"]; // GID!
     };
     signedPetitionDownloadLink: {
       // args
@@ -4627,15 +4656,6 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["OrganizationBrandThemeInput"]; // OrganizationBrandThemeInput!
     };
-    updateOrganizationLimits: {
-      // args
-      amount: number; // Int!
-      orgId: number; // Int!
-      period?: string | null; // String
-      startNewPeriod: boolean; // Boolean!
-      type: NexusGenEnums["OrganizationUsageLimitName"]; // OrganizationUsageLimitName!
-      updateOnlyCurrentPeriod: boolean; // Boolean!
-    };
     updateOrganizationLogo: {
       // args
       file: NexusGenScalars["Upload"]; // Upload!
@@ -4653,6 +4673,15 @@ export interface NexusGenArgTypes {
       orgId: number; // Int!
       tier: string; // String!
     };
+    updateOrganizationUsageDetails: {
+      // args
+      duration: NexusGenScalars["ISO8601Duration"]; // ISO8601Duration!
+      limit: number; // Int!
+      limitName: NexusGenEnums["OrganizationUsageLimitName"]; // OrganizationUsageLimitName!
+      orgId: NexusGenScalars["GID"]; // GID!
+      renewalCycles: number; // Int!
+      startNewPeriod: boolean; // Boolean!
+    };
     updateOrganizationUser: {
       // args
       role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
@@ -4662,7 +4691,7 @@ export interface NexusGenArgTypes {
     updateOrganizationUserLimit: {
       // args
       limit: number; // Int!
-      orgId: number; // Int!
+      orgId: NexusGenScalars["GID"]; // GID!
     };
     updatePetition: {
       // args
@@ -4812,6 +4841,10 @@ export interface NexusGenArgTypes {
     };
   };
   Organization: {
+    currentUsagePeriod: {
+      // args
+      limitName: NexusGenEnums["OrganizationUsageLimitName"]; // OrganizationUsageLimitName!
+    };
     iconUrl: {
       // args
       options?: NexusGenInputs["ImageOptions"] | null; // ImageOptions
@@ -4825,6 +4858,12 @@ export interface NexusGenArgTypes {
     logoUrl: {
       // args
       options?: NexusGenInputs["ImageOptions"] | null; // ImageOptions
+    };
+    usagePeriods: {
+      // args
+      limit?: number | null; // Int
+      limitName: NexusGenEnums["OrganizationUsageLimitName"]; // OrganizationUsageLimitName!
+      offset?: number | null; // Int
     };
     users: {
       // args

@@ -2,7 +2,6 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { pick } from "remeda";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
-import { IntegrationRepository } from "../db/repositories/IntegrationRepository";
 import {
   OrganizationRepository,
   OrganizationUsageDetails,
@@ -28,7 +27,6 @@ export interface ITiersService {
 @injectable()
 export class TiersService implements ITiersService {
   constructor(
-    @inject(IntegrationRepository) private integrations: IntegrationRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(FeatureFlagRepository)
     private featureFlags: FeatureFlagRepository,
@@ -45,27 +43,27 @@ export class TiersService implements ITiersService {
   private readonly TIERS: Record<string, Tier> = {
     FREE: {
       USER_LIMIT: 2,
-      PETITION_SEND: { limit: 20, period: "1 month" },
+      PETITION_SEND: { limit: 20, duration: "P1M" },
       FEATURE_FLAGS: [],
     },
     APPSUMO1: {
       USER_LIMIT: 5,
-      PETITION_SEND: { limit: 40, period: "1 month" },
+      PETITION_SEND: { limit: 40, duration: "P1M" },
       FEATURE_FLAGS: this.defaultAppSumoFFs.map((name) => ({ name, value: true })),
     },
     APPSUMO2: {
       USER_LIMIT: 20,
-      PETITION_SEND: { limit: 80, period: "1 month" },
+      PETITION_SEND: { limit: 80, duration: "P1M" },
       FEATURE_FLAGS: this.defaultAppSumoFFs.map((name) => ({ name, value: true })),
     },
     APPSUMO3: {
       USER_LIMIT: 50,
-      PETITION_SEND: { limit: 150, period: "1 month" },
+      PETITION_SEND: { limit: 150, duration: "P1M" },
       FEATURE_FLAGS: this.defaultAppSumoFFs.map((name) => ({ name, value: true })),
     },
     APPSUMO4: {
       USER_LIMIT: 1000,
-      PETITION_SEND: { limit: 300, period: "1 month" },
+      PETITION_SEND: { limit: 300, duration: "P1M" },
       FEATURE_FLAGS: this.defaultAppSumoFFs.map((name) => ({ name, value: true })),
     },
   };
@@ -97,12 +95,12 @@ export class TiersService implements ITiersService {
           updatedBy,
           t
         ),
-        this.featureFlags.addOrUpdateFeatureFlagOverride(org.id, tier.FEATURE_FLAGS, t),
+        this.featureFlags.upsertFeatureFlagOverride(org.id, tier.FEATURE_FLAGS, t),
         this.organizations.upsertOrganizationUsageLimit(
           org.id,
           "PETITION_SEND",
           tier.PETITION_SEND.limit,
-          tier.PETITION_SEND.period,
+          tier.PETITION_SEND.duration,
           t
         ),
         this.signatures.updateBranding(org.id, t),

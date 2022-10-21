@@ -148,7 +148,7 @@ export class FeatureFlagRepository extends BaseRepository {
     return rows;
   }
 
-  async addOrUpdateFeatureFlagOverride(
+  async upsertFeatureFlagOverride(
     orgId: number,
     featureFlag: MaybeArray<{ name: FeatureFlagName; value: boolean }>,
     t?: Knex.Transaction

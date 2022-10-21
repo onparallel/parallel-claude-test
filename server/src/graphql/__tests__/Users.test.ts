@@ -1195,17 +1195,23 @@ describe("GraphQL/Users", () => {
                 isDefault
                 data
               }
-              usageLimits {
-                petitions {
+              usageDetails
+              petitionsPeriod: usagePeriods(limit: 100, offset: 0, limitName: PETITION_SEND) {
+                items {
                   limit
                   used
+                  period
                 }
-                signatures {
+              }
+              signaturesPeriod: usagePeriods(
+                limit: 100
+                offset: 0
+                limitName: SIGNATURIT_SHARED_APIKEY
+              ) {
+                items {
                   limit
                   used
-                }
-                users {
-                  limit
+                  period
                 }
               }
             }
@@ -1231,15 +1237,18 @@ describe("GraphQL/Users", () => {
                 data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
               },
             ],
-            usageLimits: {
-              petitions: {
+            usageDetails: {
+              USER_LIMIT: 2,
+              PETITION_SEND: {
                 limit: 20,
-                used: 0,
+                duration: { months: 1 },
               },
-              signatures: null,
-              users: {
-                limit: 2,
-              },
+            },
+            petitionsPeriod: {
+              items: [{ limit: 20, used: 0, period: { months: 1 } }],
+            },
+            signaturesPeriod: {
+              items: [],
             },
           },
         },

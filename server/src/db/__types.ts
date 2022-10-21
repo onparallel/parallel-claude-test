@@ -720,11 +720,12 @@ export interface OrganizationUsageLimit {
   period: string; // interval
   period_start_date: Date; // timestamptz
   period_end_date: Maybe<Date>; // timestamptz
+  cycle_number: number; // int4
 }
 
 export type CreateOrganizationUsageLimit = PartialProps<
   Omit<OrganizationUsageLimit, "id">,
-  "used" | "period_start_date" | "period_end_date"
+  "used" | "period_start_date" | "period_end_date" | "cycle_number"
 >;
 
 export interface OrgIntegration {

@@ -25,19 +25,20 @@ import {
   OrganizationUsageLimitName,
   User,
 } from "../__types";
+import { IntegrationRepository } from "./IntegrationRepository";
 import { SystemRepository } from "./SystemRepository";
+
+type TUsageDetail = {
+  limit: number;
+  duration: string; // ISO 8601 Duration https://en.wikipedia.org/wiki/ISO_8601#Durations
+  renewal_cycles?: Maybe<number>; // null will renew indefinitely
+};
 
 export type OrganizationUsageDetails = {
   USER_LIMIT: number;
-  PETITION_SEND: {
-    limit: number;
-    period: string; //pg interval
-  };
+  PETITION_SEND: TUsageDetail;
   // limits the number of uses of the signature production service with our shared API_KEY
-  SIGNATURIT_SHARED_APIKEY: {
-    limit: number;
-    period: string;
-  };
+  SIGNATURIT_SHARED_APIKEY?: TUsageDetail;
 };
 
 @injectable()
@@ -46,7 +47,8 @@ export class OrganizationRepository extends BaseRepository {
     @inject(CONFIG) private config: Config,
     @inject(KNEX) knex: Knex,
     @inject(EMAILS) private readonly emails: IEmailsService,
-    @inject(SystemRepository) private system: SystemRepository
+    @inject(SystemRepository) private system: SystemRepository,
+    @inject(IntegrationRepository) private integrations: IntegrationRepository
   ) {
     super(knex);
   }
@@ -165,6 +167,28 @@ export class OrganizationRepository extends BaseRepository {
     return org;
   }
 
+  async updateOrganizationUsageDetails(
+    orgId: number,
+    details: Partial<OrganizationUsageDetails>,
+    updatedBy: string,
+    t?: Knex.Transaction
+  ) {
+    const [org] = await this.from("organization", t)
+      .where("id", orgId)
+      .update(
+        {
+          usage_details: this.knex.raw(/* sql */ `"usage_details" ||  ?::jsonb`, [
+            JSON.stringify(details),
+          ]),
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*"
+      );
+
+    return org;
+  }
+
   async updateAppSumoLicense(orgId: number, payload: any, updatedBy: string, t?: Knex.Transaction) {
     const [org] = await this.from("organization", t)
       .where("id", orgId)
@@ -274,9 +298,10 @@ export class OrganizationRepository extends BaseRepository {
 
   async getOrganizationCurrentUsageLimit(
     orgId: number,
-    limitName: OrganizationUsageLimitName
+    limitName: OrganizationUsageLimitName,
+    t?: Knex.Transaction
   ): Promise<OrganizationUsageLimit | null> {
-    const [row] = await this.from("organization_usage_limit").where({
+    const [row] = await this.from("organization_usage_limit", t).where({
       org_id: orgId,
       period_end_date: null,
       limit_name: limitName,
@@ -332,11 +357,39 @@ export class OrganizationRepository extends BaseRepository {
     );
   }
 
-  async updateUsageLimitAsExpired(orgUsageLimitId: number) {
-    return await this.raw<OrganizationUsageLimit>(
-      /* sql */ `UPDATE organization_usage_limit SET "period_end_date" = "period_start_date" + "period" WHERE "id" = ? RETURNING *`,
-      [orgUsageLimitId]
-    );
+  async updateOrganizationCurrentUsageLimit(
+    orgId: number,
+    limitName: OrganizationUsageLimitName,
+    newLimit: number
+  ) {
+    await this.from("organization_usage_limit")
+      .where({
+        org_id: orgId,
+        limit_name: limitName,
+        period_end_date: null,
+      })
+      .update({
+        limit: newLimit,
+      });
+  }
+
+  async updateUsageLimitAsExpired(
+    orgUsageLimitId: number,
+    opts?: { expireNow: boolean },
+    t?: Knex.Transaction
+  ) {
+    const [usageLimit] = await this.from("organization_usage_limit", t)
+      .where("id", orgUsageLimitId)
+      .update(
+        {
+          period_end_date: opts?.expireNow
+            ? this.now()
+            : this.knex.raw(/* sql */ `"period_start_date" + "period"`),
+        },
+        "*"
+      );
+
+    return usageLimit;
   }
 
   async updateOrganizationCurrentUsageLimitCredits(
@@ -590,5 +643,49 @@ export class OrganizationRepository extends BaseRepository {
       updated_at: this.now(),
       updated_by: updatedBy,
     });
+  }
+
+  async startNewOrganizationUsageLimitPeriod(
+    orgId: number,
+    limitName: OrganizationUsageLimitName,
+    limit: number,
+    duration: string,
+    t?: Knex.Transaction
+  ) {
+    const currentPeriod = await this.getOrganizationCurrentUsageLimit(orgId, limitName, t);
+    let newPeriodStartDate = new Date();
+    if (currentPeriod) {
+      const oldLimit = await this.updateUsageLimitAsExpired(
+        currentPeriod.id,
+        { expireNow: true },
+        t
+      );
+      newPeriodStartDate = oldLimit.period_end_date!;
+    }
+    await this.createOrganizationUsageLimit(
+      orgId,
+      {
+        limit_name: limitName,
+        limit,
+        period: duration,
+        period_start_date: newPeriodStartDate,
+      },
+      t
+    );
+  }
+
+  async loadPaginatedUsageLimits(
+    orgId: number,
+    opts: {
+      limitName: OrganizationUsageLimitName;
+    } & PageOpts
+  ) {
+    return await this.loadPageAndCount(
+      this.from("organization_usage_limit")
+        .where({ org_id: orgId, limit_name: opts.limitName })
+        .orderBy("period_end_date", "desc")
+        .select("*"),
+      opts
+    );
   }
 }

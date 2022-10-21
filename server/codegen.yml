@@ -17,6 +17,7 @@ generates:
         Upload: any
         GID: string
         Void: void
+        ISO8601Duration: string
       skipTypename: true
       avoidOptionals:
         field: true
@@ -46,6 +47,7 @@ generates:
         Upload: any
         GID: string
         Void: void
+        ISO8601Duration: string
       skipTypename: true
       avoidOptionals:
         field: true
