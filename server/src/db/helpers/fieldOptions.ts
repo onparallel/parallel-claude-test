@@ -199,6 +199,11 @@ const SCHEMAS = {
       },
     },
   },
+  DOW_JONES_KYC_RESEARCH: {
+    type: "object",
+    additionalProperties: false,
+    properties: {},
+  },
 };
 
 export function validateFieldOptions(type: PetitionFieldType, options: any) {
@@ -231,6 +236,8 @@ export function defaultFieldOptions(
       : type === "CHECKBOX" // CHECKBOX always false
       ? false
       : type === "HEADING" // HEADING always false
+      ? false
+      : type === "DOW_JONES_KYC_RESEARCH" // DOW_JONES_KYC_RESEARCH always false
       ? false
       : field?.type === "FILE_UPLOAD" // Inherit if not coming from a FILE_UPLOAD
       ? false
@@ -270,6 +277,7 @@ export function defaultFieldOptions(
           format: null,
         };
       }
+      case "DOW_JONES_KYC_RESEARCH":
       case "DATE": {
         return {};
       }
@@ -338,7 +346,7 @@ export function defaultFieldOptions(
   return {
     optional,
     multiple,
-    is_internal: field?.is_internal ?? false,
+    is_internal: type === "DOW_JONES_KYC_RESEARCH" ? true : field?.is_internal ?? false,
     show_in_pdf: field?.show_in_pdf ?? true,
     alias,
     has_comments_enabled: type === "HEADING" ? false : true,

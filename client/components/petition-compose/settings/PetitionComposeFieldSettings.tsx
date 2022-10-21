@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, Heading, Image, Stack, Switch } from "@chakra-ui/react";
+import { Box, Heading, Image, Stack, Switch, Text } from "@chakra-ui/react";
 import { Card, CloseableCardHeader } from "@parallel/components/common/Card";
+import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import {
   PetitionComposeFieldSettings_PetitionFieldFragment,
   PetitionComposeFieldSettings_UserFragment,
@@ -45,6 +46,8 @@ export function PetitionComposeFieldSettings({
 }: PetitionComposeFieldSettingsProps) {
   const intl = useIntl();
 
+  const isOnlyInternal = field.type === "DOW_JONES_KYC_RESEARCH";
+
   const commonSettings = (
     <>
       <SettingsRow
@@ -71,9 +74,8 @@ export function PetitionComposeFieldSettings({
           isDisabled={isReadOnly || field.isInternal}
         />
       </SettingsRow>
-
       <SettingsRow
-        isDisabled={isReadOnly || field.isFixed}
+        isDisabled={isReadOnly || field.isFixed || isOnlyInternal}
         label={
           <FormattedMessage
             id="component.petition-settings.petition-internal-field"
@@ -88,99 +90,116 @@ export function PetitionComposeFieldSettings({
         }
         controlId="internal-field"
       >
-        <Switch
-          height="20px"
-          display="block"
-          id="internal-field"
-          color="green"
-          isChecked={field.isInternal}
-          onChange={(event) =>
-            onFieldEdit(field.id, {
-              isInternal: event.target.checked,
-              showInPdf: !event.target.checked,
-            })
-          }
-          isDisabled={isReadOnly || field.isFixed}
-        />
-      </SettingsRow>
-      <SettingsRow
-        isDisabled={isReadOnly}
-        label={
-          <FormattedMessage
-            id="component.petition-settings.petition-shown-in-pdf"
-            defaultMessage="Show in PDF"
-          />
-        }
-        description={
-          <>
-            <FormattedMessage
-              id="field-settings.show-in-pdf-description"
-              defaultMessage="Enabling this option will make the content appear in the exported PDF and the document to be signed."
-            />
-            <Image
-              marginTop={2}
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/FILE_UPLOAD_show_in_pdf_setting_${intl.locale}.png`}
-            />
-          </>
-        }
-        controlId="show-in-pdf"
-      >
-        <Switch
-          height="20px"
-          display="block"
-          id="show-in-pdf"
-          color="green"
-          isChecked={field.showInPdf}
-          onChange={(event) =>
-            onFieldEdit(field.id, {
-              showInPdf: event.target.checked,
-            })
-          }
-          isDisabled={isReadOnly}
-        />
-      </SettingsRow>
-      {!field.isReadOnly && !["CHECKBOX", "ES_TAX_DOCUMENTS"].includes(field.type) && (
-        <SettingsRow
-          isDisabled={isReadOnly}
-          label={
-            field.type === "FILE_UPLOAD" ? (
+        <RestrictedFeaturePopover
+          isRestricted={isOnlyInternal}
+          borderRadius="xl"
+          content={
+            <Text>
               <FormattedMessage
-                id="field-settings.file-multiple-label"
-                defaultMessage="Allow uploading more than one file"
+                id="component.petition-settings.only-internal-field"
+                defaultMessage="This field can only be used internally."
               />
-            ) : (
-              <FormattedMessage
-                id="field-settings.multiple-label"
-                defaultMessage="Allow more than one reply"
-              />
-            )
+            </Text>
           }
-          description={
-            field.type === "FILE_UPLOAD" ? (
-              <FormattedMessage
-                id="field-settings.file-multiple-description"
-                defaultMessage="Enabling this allows the recipient to upload multiple files to this field."
-              />
-            ) : (
-              <FormattedMessage
-                id="field-settings.multiple-description"
-                defaultMessage="Enabling this allows the recipient to submit multiple answers to this field."
-              />
-            )
-          }
-          controlId="field-multiple"
         >
           <Switch
             height="20px"
             display="block"
-            id="field-multiple"
+            id="internal-field"
             color="green"
-            isChecked={field.multiple}
-            onChange={(event) => onFieldEdit(field.id, { multiple: event.target.checked })}
+            isChecked={field.isInternal}
+            onChange={(event) =>
+              onFieldEdit(field.id, {
+                isInternal: event.target.checked,
+                showInPdf: !event.target.checked,
+              })
+            }
+            isDisabled={isReadOnly || field.isFixed || isOnlyInternal}
+          />
+        </RestrictedFeaturePopover>
+      </SettingsRow>
+      {field.type === "DOW_JONES_KYC_RESEARCH" ? null : (
+        <SettingsRow
+          isDisabled={isReadOnly}
+          label={
+            <FormattedMessage
+              id="component.petition-settings.petition-shown-in-pdf"
+              defaultMessage="Show in PDF"
+            />
+          }
+          description={
+            <>
+              <FormattedMessage
+                id="field-settings.show-in-pdf-description"
+                defaultMessage="Enabling this option will make the content appear in the exported PDF and the document to be signed."
+              />
+              <Image
+                marginTop={2}
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/FILE_UPLOAD_show_in_pdf_setting_${intl.locale}.png`}
+              />
+            </>
+          }
+          controlId="show-in-pdf"
+        >
+          <Switch
+            height="20px"
+            display="block"
+            id="show-in-pdf"
+            color="green"
+            isChecked={field.showInPdf}
+            onChange={(event) =>
+              onFieldEdit(field.id, {
+                showInPdf: event.target.checked,
+              })
+            }
             isDisabled={isReadOnly}
           />
         </SettingsRow>
       )}
+
+      {!field.isReadOnly &&
+        !["CHECKBOX", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC_RESEARCH"].includes(field.type) && (
+          <SettingsRow
+            isDisabled={isReadOnly}
+            label={
+              field.type === "FILE_UPLOAD" ? (
+                <FormattedMessage
+                  id="field-settings.file-multiple-label"
+                  defaultMessage="Allow uploading more than one file"
+                />
+              ) : (
+                <FormattedMessage
+                  id="field-settings.multiple-label"
+                  defaultMessage="Allow more than one reply"
+                />
+              )
+            }
+            description={
+              field.type === "FILE_UPLOAD" ? (
+                <FormattedMessage
+                  id="field-settings.file-multiple-description"
+                  defaultMessage="Enabling this allows the recipient to upload multiple files to this field."
+                />
+              ) : (
+                <FormattedMessage
+                  id="field-settings.multiple-description"
+                  defaultMessage="Enabling this allows the recipient to submit multiple answers to this field."
+                />
+              )
+            }
+            controlId="field-multiple"
+          >
+            <Switch
+              height="20px"
+              display="block"
+              id="field-multiple"
+              color="green"
+              isChecked={field.multiple}
+              onChange={(event) => onFieldEdit(field.id, { multiple: event.target.checked })}
+              isDisabled={isReadOnly}
+            />
+          </SettingsRow>
+        )}
     </>
   );
 

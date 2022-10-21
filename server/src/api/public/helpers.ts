@@ -104,6 +104,7 @@ function mapFieldReplyContent(fieldType: PetitionFieldType, content: any) {
   switch (fieldType) {
     case "ES_TAX_DOCUMENTS":
     case "FILE_UPLOAD":
+    case "DOW_JONES_KYC_RESEARCH":
       return content as {
         filename: string;
         contentType: string;

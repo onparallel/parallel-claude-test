@@ -19,6 +19,7 @@ import {
 } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldCheckbox } from "../recipient-view/fields/RecipientViewPetitionFieldCheckbox";
 import { RecipientViewPetitionFieldDate } from "../recipient-view/fields/RecipientViewPetitionFieldDate";
+import { RecipientViewPetitionFieldKYCResearch } from "../recipient-view/fields/RecipientViewPetitionFieldKYCResearch";
 import { RecipientViewPetitionFieldDynamicSelect } from "../recipient-view/fields/RecipientViewPetitionFieldDynamicSelect";
 import { RecipientViewPetitionFieldFileUpload } from "../recipient-view/fields/RecipientViewPetitionFieldFileUpload";
 import { RecipientViewPetitionFieldHeading } from "../recipient-view/fields/RecipientViewPetitionFieldHeading";
@@ -262,6 +263,8 @@ export function PreviewPetitionField({
       onRefreshField={handleRefreshAsyncField}
       isCacheOnly={isCacheOnly}
     />
+  ) : field.type === "DOW_JONES_KYC_RESEARCH" ? (
+    <RecipientViewPetitionFieldKYCResearch {...props} {...commonProps} isCacheOnly={isCacheOnly} />
   ) : null;
 }
 

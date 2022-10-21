@@ -2449,6 +2449,8 @@ export type PetitionFieldType =
   | "CHECKBOX"
   /** A datepicker field. */
   | "DATE"
+  /** A spy documents/info field. */
+  | "DOW_JONES_KYC_RESEARCH"
   /** A dynamic select field. */
   | "DYNAMIC_SELECT"
   /** A tax documents/info field. */

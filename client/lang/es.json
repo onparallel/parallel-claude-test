@@ -2565,6 +2565,11 @@
     "context": "Allows the recipient to respond with dates."
   },
   {
+    "term": "component.petition-field-type-select-dropdown.dow-jones-kyc-research-description",
+    "definition": "Permite espiar a la vecina de al lado de manera fácil y rápida.",
+    "context": "Allows you to spy on your next-door neighbor quickly and easily."
+  },
+  {
     "term": "component.petition-field-type-select-dropdown.dynamic-select-description",
     "definition": "Menús desplegables que adaptan sus opciones dinámicamente según la respuesta del destinatario al desplegable anterior.",
     "context": "Drop-down menu that dynamically adapts its options based on the reply to the previous drop-down."
@@ -3160,6 +3165,11 @@
     "context": "Communications language"
   },
   {
+    "term": "component.petition-settings.only-internal-field",
+    "definition": "Este campo solo puede utilizarse de forma interna.",
+    "context": "This field can only be used internally."
+  },
+  {
     "term": "component.petition-settings.petition-comments-enable",
     "definition": "Permitir comentarios",
     "context": "Allow comments"
@@ -3488,6 +3498,46 @@
     "term": "component.preview-comments-dialog.template-no-comments-added",
     "definition": "<b>Solo previsualización</b> - los comentarios están desactivados.",
     "context": "<b>Preview only</b> - comments are disabled."
+  },
+  {
+    "term": "component.preview-factiva-table.country-territory",
+    "definition": "País/Territorio",
+    "context": "Country/Territory"
+  },
+  {
+    "term": "component.preview-factiva-table.date-of-birth",
+    "definition": "Fecha de nacimiento",
+    "context": "Date of birth"
+  },
+  {
+    "term": "component.preview-factiva-table.details",
+    "definition": "Detalles",
+    "context": "Details"
+  },
+  {
+    "term": "component.preview-factiva-table.gender",
+    "definition": "Género",
+    "context": "Gender"
+  },
+  {
+    "term": "component.preview-factiva-table.name",
+    "definition": "Nombre",
+    "context": "Name"
+  },
+  {
+    "term": "component.preview-factiva-table.profile-id",
+    "definition": "ID del perfil",
+    "context": "Profile id"
+  },
+  {
+    "term": "component.preview-factiva-table.searching-for",
+    "definition": "Búsqueda de",
+    "context": "Searching for"
+  },
+  {
+    "term": "component.preview-factiva-table.subsidiary",
+    "definition": "Filial",
+    "context": "Subsidiary"
   },
   {
     "term": "component.print-pdf-task.confirm",
@@ -4033,6 +4083,31 @@
     "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox-exact",
     "definition": "{count}/{total} enviadas",
     "context": "{count}/{total} submitted"
+  },
+  {
+    "term": "component.recipient-view-petition-field-kyc-research-dialog.results",
+    "definition": "Resultados",
+    "context": "Results"
+  },
+  {
+    "term": "component.recipient-view-petition-field-kyc-research.date-of-birth",
+    "definition": "Fecha de nacimiento:",
+    "context": "Date of birth:"
+  },
+  {
+    "term": "component.recipient-view-petition-field-kyc-research.full-name",
+    "definition": "Nombre Completo:",
+    "context": "Full name:"
+  },
+  {
+    "term": "component.recipient-view-petition-field-kyc-research.search",
+    "definition": "Buscar",
+    "context": "Search"
+  },
+  {
+    "term": "component.recipient-view-petition-field-kyc-research.searching-data",
+    "definition": "Por favor, espere mientras realizamos la búsqueda...",
+    "context": "Please wait while we perform the search..."
   },
   {
     "term": "component.recipient-view-petition-field-number.only-numbers",
@@ -7963,6 +8038,11 @@
     "term": "petition.field-type.date",
     "definition": "Fecha",
     "context": "Date"
+  },
+  {
+    "term": "petition.field-type.dow-jones-kyc-research",
+    "definition": "Dow Jones",
+    "context": "Dow Jones"
   },
   {
     "term": "petition.field-type.file-upload",

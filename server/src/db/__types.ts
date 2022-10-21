@@ -187,7 +187,8 @@ export type PetitionFieldType =
   | "NUMBER"
   | "PHONE"
   | "DATE"
-  | "ES_TAX_DOCUMENTS";
+  | "ES_TAX_DOCUMENTS"
+  | "DOW_JONES_KYC_RESEARCH";
 
 export const PetitionFieldTypeValues = [
   "TEXT",
@@ -201,6 +202,7 @@ export const PetitionFieldTypeValues = [
   "PHONE",
   "DATE",
   "ES_TAX_DOCUMENTS",
+  "DOW_JONES_KYC_RESEARCH",
 ] as PetitionFieldType[];
 
 export type PetitionMessageStatus = "SCHEDULED" | "CANCELLED" | "PROCESSING" | "PROCESSED";
