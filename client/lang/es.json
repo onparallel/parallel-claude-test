@@ -1546,8 +1546,8 @@
   },
   {
     "term": "component.feature-flag-descriptions.remove-parallel-branding-description",
-    "definition": "Elmina todo el branding de Parallel de vista de destinatario y correos (incluido el \"Porqué usamos Parallel\")",
-    "context": "Eliminates all Parallel branding from recipient and mailing view (including \"Why we use Parallel\")"
+    "definition": "Elmina todo el branding de Parallel de vista de destinatario y correos (incluido el \"¿Por qué usamos Parallel?\")",
+    "context": "Eliminates all Parallel branding from recipient and mailing view (including \"Why we use Parallel?\")"
   },
   {
     "term": "component.feature-flag-descriptions.remove-parallel-branding-name",
@@ -1556,8 +1556,8 @@
   },
   {
     "term": "component.feature-flag-descriptions.remove-why-we-use-parallel-description",
-    "definition": "Elimina el bloque de \"Porqué usamos Parallel\" en los mails a destinatarios",
-    "context": "Removes the \"Why we use Parallel\" block in mails to recipients"
+    "definition": "Elimina el bloque de \"¿Por qué usamos Paralle?l\" en los mails a destinatarios",
+    "context": "Removes the \"Why we use Parallel?\" block in mails to recipients"
   },
   {
     "term": "component.feature-flag-descriptions.remove-why-we-use-parallel-name",
@@ -8886,13 +8886,13 @@
   },
   {
     "term": "recipient-view.petition-completed-alert-1",
-    "definition": "{tone, select, INFORMAL{¡Perfecto! Has completado el parallel y hemos avisado a {name} para que lo revise y valide.} other{Este parallel ha sido completado y hemos notificado a {name} para su revisión y validación.}}",
-    "context": "{tone, select, INFORMAL{Great! You have completed the parallel and we have notified {name} for review and validation.} other{This parallel has been completed and {name} has been notified for its revision and validation.}}"
+    "definition": "{tone, select, INFORMAL{<b>¡Información completada!</b> Hemos avisado a {name} para que la revise y valide.} other{<b>Información completada,</b> hemos notificado a {name} para su revisión y validación.}}",
+    "context": "<b>Information completed!</b> We have notified {name} for review and validation."
   },
   {
     "term": "recipient-view.petition-completed-alert-2",
-    "definition": "{tone, select, INFORMAL{Puedes hacer cambios si quieres} other{Puede realizar cambios si así lo desea}}, pero no {tone, select, INFORMAL{olvides} other{olvide}} hacer click de nuevo en el botón de <b>Finalizar</b>.",
-    "context": "If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
+    "definition": "{tone, select, INFORMAL{Si realizas cualquier cambio} other{Si realiza cualquier cambio}}, no {tone, select, INFORMAL{olvides} other{olvide}} hacer click de nuevo en el botón de <b>Finalizar</b>.",
+    "context": "If you make any changes, don't forget to hit the <b>Finalize</b> button again."
   },
   {
     "term": "recipient-view.petition-delegated.toast-body",
@@ -8916,13 +8916,8 @@
   },
   {
     "term": "recipient-view.petition-requires-signature-alert-1",
-    "definition": "Este parallel requiere de <b>firma digital</b> para ser completado.",
-    "context": "This parallel requires an <b>eSignature</b> to be completed."
-  },
-  {
-    "term": "recipient-view.petition-requires-signature-alert-2",
-    "definition": "Le enviaremos el <b>documento a firmar</b> una vez hayan sido revisadas y validadas las respuestas.",
-    "context": "We will send the <b>document to sign</b> once the replies have been reviewed and validated."
+    "definition": "<b>Firma digital pendiente,</b> {tone, select, INFORMAL{enviaremos el documento a firmar cuando se revise la información.} other{le enviaremos el documento a firmar una vez haya sido revisada la información.}}",
+    "context": "<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."
   },
   {
     "term": "recipient-view.petition-signature-request-sent-alert",

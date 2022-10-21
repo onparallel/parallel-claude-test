@@ -252,7 +252,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                             <Text>
                               <FormattedMessage
                                 id="recipient-view.petition-completed-alert-1"
-                                defaultMessage="{tone, select, INFORMAL{Great! You have completed the parallel and we have notified {name} for review and validation.} other{This parallel has been completed and {name} has been notified for its revision and validation.}}"
+                                defaultMessage="<b>Information completed!</b> We have notified {name} for review and validation."
                                 values={{
                                   name: <b>{granter.fullName}</b>,
                                   tone,
@@ -262,7 +262,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                             <Text>
                               <FormattedMessage
                                 id="recipient-view.petition-completed-alert-2"
-                                defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
+                                defaultMessage="If you make any changes, don't forget to hit the <b>Finalize</b> button again."
                                 values={{ tone }}
                               />
                             </Text>
@@ -280,7 +280,10 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                     </Flex>
                   </CloseableAlert>
                 ) : (
-                  <CloseableAlert status="warning" zIndex={2}>
+                  <CloseableAlert
+                    status={petition.signatureConfig.review ? "warning" : "success"}
+                    zIndex={2}
+                  >
                     <Flex
                       maxWidth="container.lg"
                       alignItems="center"
@@ -290,23 +293,18 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                       paddingLeft={4}
                       paddingRight={12}
                     >
-                      <AlertIcon color="yellow.400" />
+                      <AlertIcon
+                        color={petition.signatureConfig.review ? "yellow.400" : undefined}
+                      />
                       <AlertDescription>
                         {petition.signatureConfig.review ? (
-                          <>
-                            <Text>
-                              <FormattedMessage
-                                id="recipient-view.petition-requires-signature-alert-1"
-                                defaultMessage="This parallel requires an <b>eSignature</b> to be completed."
-                              />
-                            </Text>
-                            <Text>
-                              <FormattedMessage
-                                id="recipient-view.petition-requires-signature-alert-2"
-                                defaultMessage="We will send the <b>document to sign</b> once the replies have been reviewed and validated."
-                              />
-                            </Text>
-                          </>
+                          <Text>
+                            <FormattedMessage
+                              id="recipient-view.petition-requires-signature-alert-1"
+                              defaultMessage="<b>eSignature pending</b>, we will send the document to sign after the information is reviewed."
+                              values={{ tone }}
+                            />
+                          </Text>
                         ) : (
                           <Text>
                             {petition.signatureConfig.signers.length > 0 ? (
@@ -348,7 +346,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                         )}
                         <FormattedMessage
                           id="recipient-view.petition-completed-alert-2"
-                          defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
+                          defaultMessage="If you make any changes, don't forget to hit the <b>Finalize</b> button again."
                           values={{ tone }}
                         />
                       </AlertDescription>

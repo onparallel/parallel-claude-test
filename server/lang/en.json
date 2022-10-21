@@ -126,8 +126,8 @@
   },
   {
     "term": "component.why-we-use-parallel.title",
-    "definition": "Why we use Parallel",
-    "context": "Why we use Parallel"
+    "definition": "Why we use Parallel?",
+    "context": "Why we use Parallel?"
   },
   {
     "term": "developer.webhook-error-email.subject",
@@ -331,8 +331,8 @@
   },
   {
     "term": "from.via-parallel",
-    "definition": "{senderName} (via Parallel)",
-    "context": "{senderName} (via Parallel)"
+    "definition": "{senderName} via Parallel",
+    "context": "{senderName} via Parallel"
   },
   {
     "term": "gdpr.processor-disclaimer",
@@ -496,8 +496,8 @@
   },
   {
     "term": "new-petition.text",
-    "definition": "{senderName} ({senderEmail}) has shared an access to Parallel:",
-    "context": "{senderName} ({senderEmail}) has shared an access to Parallel:"
+    "definition": "{senderName} ({senderEmail}) has shared with you this link.",
+    "context": "{senderName} ({senderEmail}) has shared with you this link."
   },
   {
     "term": "organization-limits-reached.parallel-send.few-credits-remaining-text",
@@ -756,8 +756,8 @@
   },
   {
     "term": "reminder.text",
-    "definition": "We remind you that {senderName} ({senderEmail}) shared with you an access to Parallel in which there is still some information to be completed.",
-    "context": "We remind you that {senderName} ({senderEmail}) shared with you an access to Parallel in which there is still some information to be completed."
+    "definition": "We remind you that {senderName} ({senderEmail}) shared with you a link and some of the requested information has not yet been submitted.",
+    "context": "We remind you that {senderName} ({senderEmail}) shared with you a link and some of the requested information has not yet been submitted."
   },
   {
     "term": "signature-cancelled-no-credits-left.alert",

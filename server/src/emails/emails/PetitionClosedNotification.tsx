@@ -20,7 +20,7 @@ const email: Email<PetitionClosedNotificationProps> = {
     return intl.formatMessage(
       {
         id: "from.via-parallel",
-        defaultMessage: "{senderName} (via Parallel)",
+        defaultMessage: "{senderName} via Parallel",
       },
       { senderName }
     );

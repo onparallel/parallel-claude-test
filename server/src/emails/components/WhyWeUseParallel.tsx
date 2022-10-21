@@ -80,7 +80,7 @@ export function WhyWeUseParallel({ tone, assetsUrl }: WhyWeUseParallelProps) {
         <MjmlText fontSize="20px" fontWeight={600} paddingRight={0}>
           <FormattedMessage
             id="component.why-we-use-parallel.title"
-            defaultMessage="Why we use Parallel"
+            defaultMessage="Why we use Parallel?"
           />
         </MjmlText>
       </MjmlSection>

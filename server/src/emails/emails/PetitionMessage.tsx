@@ -30,7 +30,7 @@ const email: Email<PetitionMessageProps> = {
     return intl.formatMessage(
       {
         id: "from.via-parallel",
-        defaultMessage: "{senderName} (via Parallel)",
+        defaultMessage: "{senderName} via Parallel",
       },
       { senderName }
     );
@@ -43,7 +43,7 @@ const email: Email<PetitionMessageProps> = {
       ${intl.formatMessage(
         {
           id: "new-petition.text",
-          defaultMessage: "{senderName} ({senderEmail}) has shared an access to Parallel:",
+          defaultMessage: "{senderName} ({senderEmail}) has shared with you this link.",
         },
         { senderName, senderEmail, tone: theme.preferredTone }
       )}
@@ -120,7 +120,7 @@ const email: Email<PetitionMessageProps> = {
             <MjmlText align="center">
               <FormattedMessage
                 id="new-petition.text"
-                defaultMessage="{senderName} ({senderEmail}) has shared an access to Parallel:"
+                defaultMessage="{senderName} ({senderEmail}) has shared with you this link."
                 values={{
                   senderName: <b>{senderName}</b>,
                   senderEmail: <b>{senderEmail}</b>,

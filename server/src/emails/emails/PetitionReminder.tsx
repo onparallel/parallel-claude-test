@@ -34,7 +34,7 @@ const email: Email<PetitionReminderProps> = {
     return intl.formatMessage(
       {
         id: "from.via-parallel",
-        defaultMessage: "{senderName} (via Parallel)",
+        defaultMessage: "{senderName} via Parallel",
       },
       { senderName }
     );
@@ -80,7 +80,7 @@ const email: Email<PetitionReminderProps> = {
         {
           id: "reminder.text",
           defaultMessage:
-            "We remind you that {senderName} ({senderEmail}) shared with you an access to Parallel in which there is still some information to be completed.",
+            "We remind you that {senderName} ({senderEmail}) shared with you a link and some of the requested information has not yet been submitted.",
         },
         { senderName, senderEmail, tone: theme.preferredTone }
       )}
@@ -181,7 +181,7 @@ const email: Email<PetitionReminderProps> = {
             <MjmlText lineHeight="24px">
               <FormattedMessage
                 id="reminder.text"
-                defaultMessage="We remind you that {senderName} ({senderEmail}) shared with you an access to Parallel in which there is still some information to be completed."
+                defaultMessage="We remind you that {senderName} ({senderEmail}) shared with you a link and some of the requested information has not yet been submitted."
                 values={{
                   senderName: <b>{senderName}</b>,
                   senderEmail: <b>{senderEmail}</b>,

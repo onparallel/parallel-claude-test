@@ -30,7 +30,7 @@ const email: Email<AccessDelegatedEmailProps> = {
     return intl.formatMessage(
       {
         id: "from.via-parallel",
-        defaultMessage: "{senderName} (via Parallel)",
+        defaultMessage: "{senderName} via Parallel",
       },
       { senderName }
     );

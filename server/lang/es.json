@@ -126,8 +126,8 @@
   },
   {
     "term": "component.why-we-use-parallel.title",
-    "definition": "Por qué usamos Parallel",
-    "context": "Why we use Parallel"
+    "definition": "¿Por qué usamos Parallel?",
+    "context": "Why we use Parallel?"
   },
   {
     "term": "developer.webhook-error-email.subject",
@@ -331,8 +331,8 @@
   },
   {
     "term": "from.via-parallel",
-    "definition": "{senderName} (vía Parallel)",
-    "context": "{senderName} (via Parallel)"
+    "definition": "{senderName} vía Parallel",
+    "context": "{senderName} via Parallel"
   },
   {
     "term": "gdpr.processor-disclaimer",
@@ -496,8 +496,8 @@
   },
   {
     "term": "new-petition.text",
-    "definition": "{tone, select, INFORMAL{{senderName} ({senderEmail}) te ha compartido un acceso a Parallel:} other{{senderName} ({senderEmail}) le ha compartido un acceso a Parallel:}}",
-    "context": "{senderName} ({senderEmail}) has shared an access to Parallel:"
+    "definition": "{tone, select, INFORMAL{{senderName} ({senderEmail}) te ha compartido este enlace:} other{{senderName} ({senderEmail}) le ha compartido este enlace:}}",
+    "context": "{senderName} ({senderEmail}) has shared with you this link."
   },
   {
     "term": "organization-limits-reached.parallel-send.few-credits-remaining-text",
@@ -756,8 +756,8 @@
   },
   {
     "term": "reminder.text",
-    "definition": "{tone, select, INFORMAL{Te recordamos que {senderName} ({senderEmail}) te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que {senderName} ({senderEmail}) le compartió un acceso a Parallel en el que queda información pendiente de completar.}}",
-    "context": "We remind you that {senderName} ({senderEmail}) shared with you an access to Parallel in which there is still some information to be completed."
+    "definition": "{tone, select, INFORMAL{Te recordamos que {senderName} ({senderEmail}) te compartió un enlace en el que queda información pendiente de completar.} other{Le recordamos que {senderName} ({senderEmail}) le compartio un enlace del que queda información pendiente de completar.}}",
+    "context": "We remind you that {senderName} ({senderEmail}) shared with you a link and some of the requested information has not yet been submitted."
   },
   {
     "term": "signature-cancelled-no-credits-left.alert",

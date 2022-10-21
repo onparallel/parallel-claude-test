@@ -161,7 +161,7 @@ export function useFeatureFlags() {
         description: intl.formatMessage({
           id: "component.feature-flag-descriptions.remove-parallel-branding-description",
           defaultMessage:
-            'Eliminates all Parallel branding from recipient and mailing view (including "Why we use Parallel")',
+            'Eliminates all Parallel branding from recipient and mailing view (including "Why we use Parallel?")',
         }),
       },
       {
@@ -172,7 +172,7 @@ export function useFeatureFlags() {
         }),
         description: intl.formatMessage({
           id: "component.feature-flag-descriptions.remove-why-we-use-parallel-description",
-          defaultMessage: 'Removes the "Why we use Parallel" block in mails to recipients',
+          defaultMessage: 'Removes the "Why we use Parallel?" block in mails to recipients',
         }),
       },
       {
