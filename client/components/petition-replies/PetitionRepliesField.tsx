@@ -34,17 +34,16 @@ import {
   PetitionRepliesField_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
-import { useGoToPetitionSection } from "@parallel/utils/goToPetition";
+import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
-import { useRouter } from "next/router";
 import { forwardRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
 import { FieldDescription } from "../common/FieldDescription";
 import { FileAttachmentButton } from "../common/FileAttachmentButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
+import { NakedLink } from "../common/Link";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
 
@@ -80,7 +79,6 @@ export const PetitionRepliesField = Object.assign(
     ref
   ) {
     const intl = useIntl();
-    const router = useRouter();
     const [petitionFieldAttachmentDownloadLink] = useMutation(
       PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument
     );
@@ -96,35 +94,23 @@ export const PetitionRepliesField = Object.assign(
       );
     };
 
-    const goToSection = useGoToPetitionSection();
-    const handleEditField = () => {
-      goToSection("compose", { query: { field: field.id } });
-    };
+    const buildUrlToSection = useBuildUrlToPetitionSection();
 
-    const handleEditFieldReply = (replyId: string) => {
-      goToSection("preview", {
-        query: {
-          ...(isDefined(router.query.fromTemplate) ? { fromTemplate: "" } : {}),
-          ...(field.type === "CHECKBOX"
-            ? { field: field.id }
-            : { reply: `${field.id}-${replyId}` }),
-        },
-      });
-    };
-
-    const button = (
-      <IconButtonWithTooltip
-        display="none"
-        className="edit-field-button"
-        size="xs"
-        variant="ghost"
-        icon={<EditSimpleIcon />}
-        label={intl.formatMessage({
-          id: "component.petition-replies-field.edit-field",
-          defaultMessage: "Edit field",
-        })}
-        onClick={handleEditField}
-      />
+    const goToComposeButton = (
+      <NakedLink href={buildUrlToSection("compose", { field: field.id })}>
+        <IconButtonWithTooltip
+          as="a"
+          display="none"
+          className="edit-field-button"
+          size="xs"
+          variant="ghost"
+          icon={<EditSimpleIcon />}
+          label={intl.formatMessage({
+            id: "component.petition-replies-field.edit-field",
+            defaultMessage: "Edit field",
+          })}
+        />
+      </NakedLink>
     );
 
     return field.type === "HEADING" ? (
@@ -174,7 +160,7 @@ export const PetitionRepliesField = Object.assign(
               <FormattedMessage id="generic.empty-heading" defaultMessage="Untitled heading" />
             )}
           </Heading>
-          {button}
+          {goToComposeButton}
         </HStack>
 
         <Box gridArea="desc">
@@ -284,7 +270,7 @@ export const PetitionRepliesField = Object.assign(
                 <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
               )}
             </Heading>
-            {button}
+            {goToComposeButton}
           </HStack>
 
           <Box gridArea="desc">
@@ -334,7 +320,6 @@ export const PetitionRepliesField = Object.assign(
                   reply={reply}
                   onAction={(action) => onAction(action, reply)}
                   onUpdateStatus={(status) => onUpdateReplyStatus(reply.id, status)}
-                  onClickEditReply={handleEditFieldReply}
                   isDisabled={isDisabled}
                 />
               ))}

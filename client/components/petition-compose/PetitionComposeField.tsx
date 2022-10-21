@@ -38,7 +38,7 @@ import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
 import { letters, PetitionFieldIndex } from "@parallel/utils/fieldIndices";
-import { useGoToPetitionSection } from "@parallel/utils/goToPetition";
+import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { getMinMaxCheckboxLimit, usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
 import { withError } from "@parallel/utils/promises/withError";
@@ -56,6 +56,7 @@ import { FileSize } from "../common/FileSize";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
+import { NakedLink } from "../common/Link";
 import { SmallPopover } from "../common/SmallPopover";
 import { CheckboxTypeLabel } from "../petition-common/CheckboxTypeLabel";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
@@ -175,11 +176,6 @@ const _PetitionComposeField = chakraForwardRef<
         return url!;
       })
     );
-  };
-
-  const goToSection = useGoToPetitionSection();
-  const handlePreviewField = () => {
-    goToSection("preview", { query: { field: field.id } });
   };
 
   function updateAttachmentUploadingStatus(cache: DataProxy, id: string, isUploading: boolean) {
@@ -437,7 +433,6 @@ const _PetitionComposeField = chakraForwardRef<
           onDeleteClick={onDeleteClick}
           onVisibilityClick={onFieldVisibilityClick}
           onAttachmentClick={open}
-          onPreviewClick={handlePreviewField}
           className="field-actions"
           position="absolute"
           bottom={0}
@@ -833,7 +828,6 @@ interface PetitionComposeFieldActionsProps
   canChangeVisibility: boolean;
   onVisibilityClick: () => void;
   onAttachmentClick: () => void;
-  onPreviewClick: () => void;
   isReadOnly?: boolean;
   isAttachDisabled?: boolean;
 }
@@ -848,7 +842,6 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
       onCloneField,
       onSettingsClick,
       onDeleteClick,
-      onPreviewClick,
       isReadOnly,
       isAttachDisabled,
       ...props
@@ -857,6 +850,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
   ) {
     const intl = useIntl();
     const hasCondition = field.visibility;
+    const buildUrlToSection = useBuildUrlToPetitionSection();
     return (
       <Stack ref={ref} direction="row" padding={1} {...props}>
         {canChangeVisibility || field.isFixed ? (
@@ -967,18 +961,20 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
           })}
           onClick={onDeleteClick}
         />
-        <IconButtonWithTooltip
-          icon={<ChevronRightIcon boxSize={6} />}
-          size="sm"
-          variant="ghost"
-          placement="bottom"
-          color="gray.600"
-          label={intl.formatMessage({
-            id: "component.petition-compose-field.field-preview",
-            defaultMessage: "Preview",
-          })}
-          onClick={onPreviewClick}
-        />
+        <NakedLink href={buildUrlToSection("preview", { field: field.id })}>
+          <IconButtonWithTooltip
+            as="a"
+            icon={<ChevronRightIcon boxSize={6} />}
+            size="sm"
+            variant="ghost"
+            placement="bottom"
+            color="gray.600"
+            label={intl.formatMessage({
+              id: "component.petition-compose-field.field-preview",
+              defaultMessage: "Preview",
+            })}
+          />
+        </NakedLink>
       </Stack>
     );
   }

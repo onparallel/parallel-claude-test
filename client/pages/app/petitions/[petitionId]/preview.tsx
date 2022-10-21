@@ -1,13 +1,14 @@
 import { gql, useMutation } from "@apollo/client";
 import { Box, Center, Flex, Stack, useBreakpointValue, useToast } from "@chakra-ui/react";
 import { ChevronRightIcon, EditSimpleIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   FieldErrorDialog,
   useFieldErrorDialog,
 } from "@parallel/components/common/dialogs/FieldErrorDialog";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { NakedLink } from "@parallel/components/common/Link";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -49,7 +50,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
 import {
-  PetitionSection,
+  useBuildUrlToPetitionSection,
   useGoToPetition,
   useGoToPetitionSection,
 } from "@parallel/utils/goToPetition";
@@ -59,11 +60,12 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
 import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
 import { useLiquidScope } from "@parallel/utils/useLiquidScope";
+import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { withMetadata } from "@parallel/utils/withMetadata";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import { isDefined, omit } from "remeda";
 
@@ -119,7 +121,10 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     usePreviewReplies: !isPetition,
   });
 
-  const getCurrentPage = () => {
+  const currentPage = useMemo(() => {
+    if (query.page && !isNaN(Number(query.page))) {
+      return Number(query.page);
+    }
     let page = 0;
     const fieldId = query.field;
     const replyId = query.reply;
@@ -133,9 +138,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     }
 
     return Math.max(page + 1, 1);
-  };
-
-  const currentPage = Number(query.page) || getCurrentPage();
+  }, [query.page]);
 
   const fields = pages[currentPage - 1];
 
@@ -144,34 +147,22 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     if (layoutBody) layoutBody.scrollTop = 0;
   }, [currentPage]);
 
-  useEffect(() => {
-    checkVisibilityFocusedField();
-  }, []);
-
   const goToSection = useGoToPetitionSection();
-  const handlePushTo = (section: PetitionSection, fieldId: string) => {
-    goToSection(section, { query: { field: fieldId } });
-  };
+  const buildUrlToSection = useBuildUrlToPetitionSection();
 
   const showHiddenFieldDialog = useHiddenFieldDialog();
-  const checkVisibilityFocusedField = async () => {
+  useTempQueryParam("field", async (fieldId) => {
     try {
-      const fieldId = query.field;
-      if (fieldId) {
-        const field = petition.fields.find((f) => f.id === fieldId);
-        if (field && !visibility[field.position]) {
-          await showHiddenFieldDialog({ field, fields: petition.fields });
-        }
+      const field = petition.fields.find((f) => f.id === fieldId);
+      if (field && !visibility[field.position]) {
+        await showHiddenFieldDialog({ field, fields: petition.fields });
       }
-    } catch (e: any) {
-      if (e.message === "CANCEL") {
-        const fieldId = query.field;
-        if (fieldId && typeof fieldId === "string") {
-          handlePushTo("compose", fieldId);
-        }
+    } catch (error) {
+      if (isDialogError(error) && error.message === "CANCEL") {
+        goToSection("compose", { query: { field: fieldId } });
       }
     }
-  };
+  });
 
   const breakpoint = "md";
 
@@ -478,34 +469,40 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                               padding={2}
                             >
                               <Stack className={"edit-preview-field-buttons"} display="none">
-                                <IconButtonWithTooltip
-                                  size="sm"
-                                  variant="outline"
-                                  backgroundColor="white"
-                                  placement="bottom"
-                                  color="gray.600"
-                                  icon={<EditSimpleIcon boxSize={4} />}
-                                  label={intl.formatMessage({
-                                    id: "page.preview.edit-field",
-                                    defaultMessage: "Edit field",
-                                  })}
-                                  onClick={() => handlePushTo("compose", field.id)}
-                                />
-                                {field.type === "HEADING" || !isPetition ? null : (
+                                <NakedLink href={buildUrlToSection("compose", { field: field.id })}>
                                   <IconButtonWithTooltip
-                                    icon={<ChevronRightIcon boxSize={5} />}
+                                    as="a"
                                     size="sm"
                                     variant="outline"
                                     backgroundColor="white"
                                     placement="bottom"
                                     color="gray.600"
-                                    isDisabled={field.replies.length === 0}
+                                    icon={<EditSimpleIcon boxSize={4} />}
                                     label={intl.formatMessage({
-                                      id: "page.preview.review-reply",
-                                      defaultMessage: "Review reply",
+                                      id: "page.preview.edit-field",
+                                      defaultMessage: "Edit field",
                                     })}
-                                    onClick={() => handlePushTo("replies", field.id)}
                                   />
+                                </NakedLink>
+                                {field.type === "HEADING" || !isPetition ? null : (
+                                  <NakedLink
+                                    href={buildUrlToSection("replies", { field: field.id })}
+                                  >
+                                    <IconButtonWithTooltip
+                                      as="a"
+                                      icon={<ChevronRightIcon boxSize={5} />}
+                                      size="sm"
+                                      variant="outline"
+                                      backgroundColor="white"
+                                      placement="bottom"
+                                      color="gray.600"
+                                      isDisabled={field.replies.length === 0}
+                                      label={intl.formatMessage({
+                                        id: "page.preview.review-reply",
+                                        defaultMessage: "Review reply",
+                                      })}
+                                    />
+                                  </NakedLink>
                                 )}
                               </Stack>
                             </Center>

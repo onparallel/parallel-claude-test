@@ -10692,6 +10692,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
     isAnonymized: boolean;
     field?: {
       __typename?: "PetitionField";
+      id: string;
       type: PetitionFieldType;
       options: { [key: string]: any };
     } | null;
@@ -10738,6 +10739,7 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
   isAnonymized: boolean;
   field?: {
     __typename?: "PetitionField";
+    id: string;
     type: PetitionFieldType;
     options: { [key: string]: any };
   } | null;
@@ -10919,6 +10921,7 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
   isAnonymized: boolean;
   field?: {
     __typename?: "PetitionField";
+    id: string;
     type: PetitionFieldType;
     options: { [key: string]: any };
   } | null;
@@ -19323,6 +19326,7 @@ export type PetitionReplies_PetitionFragment = {
       metadata: { [key: string]: any };
       field?: {
         __typename?: "PetitionField";
+        id: string;
         type: PetitionFieldType;
         options: { [key: string]: any };
       } | null;
@@ -19523,6 +19527,7 @@ export type PetitionReplies_PetitionFieldFragment = {
     metadata: { [key: string]: any };
     field?: {
       __typename?: "PetitionField";
+      id: string;
       type: PetitionFieldType;
       options: { [key: string]: any };
     } | null;
@@ -19756,6 +19761,7 @@ export type PetitionReplies_closePetitionMutation = {
         metadata: { [key: string]: any };
         field?: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
         } | null;
@@ -19992,6 +19998,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         metadata: { [key: string]: any };
         field?: {
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
         } | null;
@@ -20330,6 +20337,7 @@ export type PetitionReplies_petitionQuery = {
             metadata: { [key: string]: any };
             field?: {
               __typename?: "PetitionField";
+              id: string;
               type: PetitionFieldType;
               options: { [key: string]: any };
             } | null;
@@ -27077,6 +27085,7 @@ export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
     createdAt
     metadata
     field {
+      id
       type
       options
     }

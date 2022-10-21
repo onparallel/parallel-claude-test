@@ -132,6 +132,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const showPetitionFromTemplateDialog = useHandledPetitionFromTemplateDialog();
 
+  useTempQueryParam("field", (fieldId) => {
+    handleIndexFieldClick(fieldId);
+  });
+
   useTempQueryParam("fromTemplate", () => {
     withError(showPetitionFromTemplateDialog());
   });
@@ -139,10 +143,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   useEffect(() => {
     setShowErrors(isSharedByLink);
   }, [setShowErrors, isSharedByLink]);
-
-  useTempQueryParam("field", (fieldId) => {
-    handleIndexFieldClick(fieldId);
-  });
 
   useEffect(() => {
     // Validate and focus fields when have "tags" in url, because it probably comes from other page when validates petition fields

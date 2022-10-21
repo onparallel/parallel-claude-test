@@ -1,20 +1,28 @@
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useRef } from "react";
 import { isDefined, omit } from "remeda";
+import { MaybePromise } from "./types";
+import { useAsyncEffect } from "./useAsyncEffect";
 
-export function useTempQueryParam(paramName: string, effect: (value: string) => void) {
-  const router = useRouter();
-  useEffect(() => {
-    if (isDefined(router.query[paramName])) {
-      effect(router.query[paramName] as string);
-      router.replace(
-        {
-          pathname: router.pathname,
-          query: omit(router.query, [paramName]),
-        },
-        undefined,
-        { shallow: true }
-      );
+export function useTempQueryParam(
+  paramName: string,
+  effect: (value: string) => MaybePromise<boolean | undefined | void>
+) {
+  const routerRef = useRef(useRouter());
+  useAsyncEffect(async (isMounted) => {
+    const { query, pathname } = routerRef.current;
+    if (isDefined(query[paramName])) {
+      const result = await effect(query[paramName] as string);
+      if (isMounted() && result !== false) {
+        routerRef.current.replace(
+          {
+            pathname: pathname,
+            query: omit(routerRef.current.query, [paramName]),
+          },
+          undefined,
+          { shallow: true }
+        );
+      }
     }
   }, []);
 }

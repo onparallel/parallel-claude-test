@@ -8,6 +8,7 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { formatNumberWithPrefix } from "@parallel/utils/formatNumberWithPrefix";
+import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { Fragment } from "react";
@@ -16,6 +17,7 @@ import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { NakedLink } from "../common/Link";
 import { UserOrContactReference } from "../petition-activity/UserOrContactReference";
 import { CopyOrDownloadReplyButton } from "./CopyOrDownloadReplyButton";
 
@@ -23,7 +25,6 @@ export interface PetitionRepliesFieldReplyProps {
   reply: PetitionRepliesFieldReply_PetitionFieldReplyFragment;
   onUpdateStatus: (status: PetitionFieldReplyStatus) => void;
   onAction: (action: PetitionRepliesFieldAction) => void;
-  onClickEditReply: (replyId: string) => void;
   isDisabled?: boolean;
 }
 
@@ -33,7 +34,6 @@ export function PetitionRepliesFieldReply({
   reply,
   onUpdateStatus,
   onAction,
-  onClickEditReply,
   isDisabled,
 }: PetitionRepliesFieldReplyProps) {
   const intl = useIntl();
@@ -46,24 +46,30 @@ export function PetitionRepliesFieldReply({
       : reply.content.value
     : [reply.content.value];
 
-  const editReplyIconButton = (index: number) => {
-    const id = reply.field!.type === "DYNAMIC_SELECT" ? `-${index}` : "";
-
+  const buildUrlToSection = useBuildUrlToPetitionSection();
+  const editReplyIconButton = (idSuffix = "") => {
     return (
-      <IconButtonWithTooltip
-        marginLeft={2}
-        position="absolute"
-        display="none"
-        className="edit-field-reply-button"
-        variant="ghost"
-        size="xs"
-        icon={<EditSimpleIcon />}
-        label={intl.formatMessage({
-          id: "component.petition-replies-field.edit-field-reply",
-          defaultMessage: "Edit reply",
+      <NakedLink
+        href={buildUrlToSection("preview", {
+          field: reply.field!.id,
+          reply: `${reply.field!.id}-${reply.id}${idSuffix}`,
         })}
-        onClick={() => onClickEditReply(reply.id + id)}
-      />
+      >
+        <IconButtonWithTooltip
+          as="a"
+          marginLeft={2}
+          position="absolute"
+          display="none"
+          className="edit-field-reply-button"
+          variant="ghost"
+          size="xs"
+          icon={<EditSimpleIcon />}
+          label={intl.formatMessage({
+            id: "component.petition-replies-field.edit-field-reply",
+            defaultMessage: "Edit reply",
+          })}
+        />
+      </NakedLink>
     );
   };
 
@@ -121,7 +127,7 @@ export function PetitionRepliesFieldReply({
                     >
                       <FileSize value={content.size} />
                     </Text>
-                    {editReplyIconButton(i)}
+                    {editReplyIconButton()}
                   </Box>
                 ) : reply.field!.type === "NUMBER" ? (
                   <Text wordBreak="break-all" whiteSpace="pre">
@@ -129,7 +135,7 @@ export function PetitionRepliesFieldReply({
                       content as number,
                       reply.field!.options as FieldOptions["NUMBER"]
                     )}
-                    {editReplyIconButton(i)}
+                    {editReplyIconButton()}
                   </Text>
                 ) : reply.field!.type === "DATE" ? (
                   <Text>
@@ -137,13 +143,13 @@ export function PetitionRepliesFieldReply({
                       ...FORMATS.L,
                       timeZone: "UTC",
                     })}
-                    {editReplyIconButton(i)}
+                    {editReplyIconButton()}
                   </Text>
                 ) : (
                   <BreakLines>
                     <Text as="span">
                       {content}
-                      {editReplyIconButton(i)}
+                      {editReplyIconButton(reply.field?.type === "DYNAMIC_SELECT" ? `-${i}` : "")}
                     </Text>
                   </BreakLines>
                 )}
@@ -223,6 +229,7 @@ PetitionRepliesFieldReply.fragments = {
       createdAt
       metadata
       field {
+        id
         type
         options
       }

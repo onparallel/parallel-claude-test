@@ -5,10 +5,11 @@ import { Card } from "@parallel/components/common/Card";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Divider } from "@parallel/components/common/Divider";
+import { NakedLink } from "@parallel/components/common/Link";
 import { PetitionFieldCommentContent } from "@parallel/components/common/PetitionFieldCommentContent";
 import { TimelineCommentPublishedEvent_CommentPublishedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { useGoToPetitionSection } from "@parallel/utils/goToPetition";
+import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { FormattedMessage } from "react-intl";
 import { PetitionFieldReference } from "../PetitionFieldReference";
 import { UserOrContactReference } from "../UserOrContactReference";
@@ -32,12 +33,7 @@ export function TimelineCommentPublishedEvent({
   if (comment) {
     const { author, isEdited } = comment;
 
-    const goToSection = useGoToPetitionSection();
-    const handlePreviewComment = () => {
-      if (field) {
-        goToSection("replies", { query: { comments: field.id } });
-      }
-    };
+    const buildUrlToSection = useBuildUrlToPetitionSection();
 
     return (
       <Box
@@ -55,7 +51,7 @@ export function TimelineCommentPublishedEvent({
             alignItems={{ base: "start", md: "center" }}
             spacing={3}
           >
-            <Box>
+            <Box flex={1}>
               {isInternal ? (
                 <FormattedMessage
                   id="timeline.note-published-description"
@@ -84,11 +80,18 @@ export function TimelineCommentPublishedEvent({
                 </Text>
               ) : null}
             </Box>
-            <Box>
-              <Button variant="outline" backgroundColor="white" onClick={handlePreviewComment}>
-                <FormattedMessage id="timeline.comment-published.reply" defaultMessage="Reply" />
-              </Button>
-            </Box>
+            {field ? (
+              <Box>
+                <NakedLink href={buildUrlToSection("replies", { comments: field.id })}>
+                  <Button as="a" variant="outline" backgroundColor="white">
+                    <FormattedMessage
+                      id="timeline.comment-published.reply"
+                      defaultMessage="Reply"
+                    />
+                  </Button>
+                </NakedLink>
+              </Box>
+            ) : null}
           </Stack>
           <Divider />
           <Box padding={4}>
