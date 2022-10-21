@@ -32,7 +32,7 @@ export function PublicPetitionFieldComment({
     setContent(comment.content);
     setIsEditing(true);
     setTimeout(() => {
-      editorRef.current!.focus();
+      editorRef.current?.focus();
     }, 100);
   }
 
