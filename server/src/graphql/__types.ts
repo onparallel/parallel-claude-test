@@ -1202,6 +1202,7 @@ export interface NexusGenFieldTypes {
     iconUrl: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
     integrations: NexusGenRootTypes["OrgIntegrationPagination"]; // OrgIntegrationPagination!
+    isUsageLimitReached: boolean; // Boolean!
     license: NexusGenRootTypes["OrgLicense"] | null; // OrgLicense
     logoUrl: string | null; // String
     name: string; // String!
@@ -2791,6 +2792,7 @@ export interface NexusGenFieldTypeNames {
     iconUrl: "String";
     id: "GID";
     integrations: "OrgIntegrationPagination";
+    isUsageLimitReached: "Boolean";
     license: "OrgLicense";
     logoUrl: "String";
     name: "String";
@@ -4854,6 +4856,10 @@ export interface NexusGenArgTypes {
       limit?: number | null; // Int
       offset?: number | null; // Int
       type?: NexusGenEnums["IntegrationType"] | null; // IntegrationType
+    };
+    isUsageLimitReached: {
+      // args
+      limitName: NexusGenEnums["OrganizationUsageLimitName"]; // OrganizationUsageLimitName!
     };
     logoUrl: {
       // args

@@ -54,7 +54,6 @@ import {
   useGoToPetition,
   useGoToPetitionSection,
 } from "@parallel/utils/goToPetition";
-import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
@@ -332,7 +331,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   );
 
   const displayPetitionLimitReachedAlert =
-    isUsageLimitsReached(me.organization) && isPetition && petition.status === "DRAFT";
+    me.organization.isPetitionUsageLimitReached && isPetition && petition.status === "DRAFT";
 
   const scope = useLiquidScope(petition, petition.__typename === "PetitionTemplate");
 
@@ -371,7 +370,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               <PetitionPreviewSignatureReviewAlert />
             ) : null}
             {displayPetitionLimitReachedAlert ? (
-              <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
+              <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
             ) : null}
             {isPetition &&
             !petition.signatureConfig?.review &&
@@ -619,7 +618,7 @@ PetitionPreview.fragments = {
         organization {
           id
           name
-          ...isUsageLimitsReached_Organization
+          isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
           brandTheme {
             ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
           }
@@ -629,10 +628,9 @@ PetitionPreview.fragments = {
       }
     }
     ${PetitionLayout.fragments.Query}
-    ${useSendPetitionHandler.fragments.User}
-    ${isUsageLimitsReached.fragments.Organization}
-    ${ConfirmPetitionSignersDialog.fragments.User}
     ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
+    ${useSendPetitionHandler.fragments.User}
+    ${ConfirmPetitionSignersDialog.fragments.User}
   `,
 };
 

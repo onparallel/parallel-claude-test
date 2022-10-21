@@ -1848,6 +1848,7 @@ type Organization implements Timestamps {
     """
     type: IntegrationType
   ): OrgIntegrationPagination!
+  isUsageLimitReached(limitName: OrganizationUsageLimitName!): Boolean!
 
   """
   Current license for the organization

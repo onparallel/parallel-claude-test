@@ -61,7 +61,6 @@ import {
   PetitionFieldVisibility,
   PetitionFieldVisibilityCondition,
 } from "@parallel/utils/fieldVisibility/types";
-import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
@@ -424,7 +423,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   } as const;
 
   const displayPetitionLimitReachedAlert =
-    isUsageLimitsReached(me.organization) &&
+    me.organization.isPetitionUsageLimitReached &&
     petition?.__typename === "Petition" &&
     petition.status === "DRAFT";
 
@@ -463,7 +462,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         subHeader={
           <>
             {displayPetitionLimitReachedAlert ? (
-              <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
+              <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
             ) : null}
             {petition?.__typename === "Petition" &&
             ["COMPLETED", "CLOSED"].includes(petition.status) &&
@@ -674,7 +673,7 @@ PetitionCompose.fragments = {
           ...useUpdateIsReadNotification_User
           ...useSendPetitionHandler_User
           organization {
-            ...isUsageLimitsReached_Organization
+            isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
           }
           ...PetitionComposeFieldSettings_User
         }
@@ -683,7 +682,6 @@ PetitionCompose.fragments = {
       ${PetitionSettings.fragments.User}
       ${useSendPetitionHandler.fragments.User}
       ${useUpdateIsReadNotification.fragments.User}
-      ${isUsageLimitsReached.fragments.Organization}
       ${PetitionComposeFieldSettings.fragments.User}
     `;
   },

@@ -46,7 +46,6 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
@@ -318,7 +317,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   };
 
   const displayPetitionLimitReachedAlert =
-    isUsageLimitsReached(me.organization) &&
+    me.organization.isPetitionUsageLimitReached &&
     petition.__typename === "Petition" &&
     petition.status === "DRAFT";
 
@@ -337,7 +336,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       }
       subHeader={
         displayPetitionLimitReachedAlert ? (
-          <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
+          <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
         ) : null
       }
     >
@@ -402,7 +401,7 @@ PetitionActivity.fragments = {
       me {
         organization {
           name
-          ...isUsageLimitsReached_Organization
+          isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
         }
         ...useUpdateIsReadNotification_User
         ...useSendPetitionHandler_User
@@ -411,7 +410,6 @@ PetitionActivity.fragments = {
     ${PetitionLayout.fragments.Query}
     ${useUpdateIsReadNotification.fragments.User}
     ${useSendPetitionHandler.fragments.User}
-    ${isUsageLimitsReached.fragments.Organization}
   `,
 };
 

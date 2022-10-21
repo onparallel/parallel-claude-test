@@ -240,59 +240,6 @@ export const supportMethods: {
   },
   {
     field: {
-      name: "shareSignaturitApiKey",
-      description:
-        "Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag.",
-      args: [
-        {
-          name: "limit",
-          description: "How many credits allow the org to use in the given period",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "Int", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-        {
-          name: "orgId",
-          description: "Numeric ID of the Organization",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "Int", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-        {
-          name: "period",
-          description: "Period of the usage limit. e.g.: 1 month, 1 year, 20 days, etc...",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "String", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-      ],
-      type: {
-        kind: "NON_NULL",
-        name: null,
-        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
-      },
-      isDeprecated: false,
-      deprecationReason: null,
-    },
-    queryType: "mutation",
-  },
-  {
-    field: {
       name: "transferOrganizationOwnership",
       description:
         "Transfers the ownership of an organization to a given user. Old owner will get ADMIN role",
@@ -402,91 +349,6 @@ export const supportMethods: {
   },
   {
     field: {
-      name: "updateOrganizationLimits",
-      description:
-        "Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period.",
-      args: [
-        {
-          name: "amount",
-          description: "How many credits allow the org to use in the given period",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "Int", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-        {
-          name: "orgId",
-          description: "Numeric ID of the Organization",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "Int", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-        {
-          name: "period",
-          description: "e.g.: 1 month, 1 year, 20 days, etc...",
-          type: { kind: "SCALAR", name: "String", ofType: null },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-        {
-          name: "startNewPeriod",
-          description: "End current period and start new with this arguments",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "Boolean", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-        {
-          name: "type",
-          description: null,
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "ENUM", name: "OrganizationUsageLimitName", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-        {
-          name: "updateOnlyCurrentPeriod",
-          description: null,
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "Boolean", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-      ],
-      type: {
-        kind: "NON_NULL",
-        name: null,
-        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
-      },
-      isDeprecated: false,
-      deprecationReason: null,
-    },
-    queryType: "mutation",
-  },
-  {
-    field: {
       name: "updateOrganizationTier",
       description: "Applies a given tier to the organization",
       args: [
@@ -509,46 +371,6 @@ export const supportMethods: {
             kind: "NON_NULL",
             name: null,
             ofType: { kind: "SCALAR", name: "String", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-      ],
-      type: {
-        kind: "NON_NULL",
-        name: null,
-        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
-      },
-      isDeprecated: false,
-      deprecationReason: null,
-    },
-    queryType: "mutation",
-  },
-  {
-    field: {
-      name: "updateOrganizationUserLimit",
-      description: "Updates the user limit for a organization",
-      args: [
-        {
-          name: "limit",
-          description: "How many users allow the org to create",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "Int", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-        {
-          name: "orgId",
-          description: "Numeric ID of the organization",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "Int", ofType: null },
           },
           defaultValue: null,
           isDeprecated: false,
@@ -705,25 +527,6 @@ export const schemaTypes: IntrospectionType[] = [
     enumValues: [
       { name: "en", description: null, isDeprecated: false, deprecationReason: null },
       { name: "es", description: null, isDeprecated: false, deprecationReason: null },
-    ],
-    possibleTypes: null,
-  },
-  {
-    kind: "ENUM",
-    name: "OrganizationUsageLimitName",
-    description: null,
-    specifiedByURL: null,
-    fields: null,
-    inputFields: null,
-    interfaces: null,
-    enumValues: [
-      { name: "PETITION_SEND", description: null, isDeprecated: false, deprecationReason: null },
-      {
-        name: "SIGNATURIT_SHARED_APIKEY",
-        description: null,
-        isDeprecated: false,
-        deprecationReason: null,
-      },
     ],
     possibleTypes: null,
   },

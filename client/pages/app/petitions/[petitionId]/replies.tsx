@@ -80,7 +80,6 @@ import {
 } from "@parallel/utils/filterPetitionFields";
 import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
 import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
-import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import {
   useCreatePetitionFieldComment,
   useDeletePetitionFieldComment,
@@ -461,7 +460,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const petitionSignatureEnvironment = getPetitionSignatureEnvironment(petition);
 
   const displayPetitionLimitReachedAlert =
-    isUsageLimitsReached(me.organization) &&
+    me.organization.isPetitionUsageLimitReached &&
     petition.__typename === "Petition" &&
     petition.status === "DRAFT";
 
@@ -483,7 +482,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       subHeader={
         <>
           {displayPetitionLimitReachedAlert ? (
-            <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
+            <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
           ) : null}
           <Stack direction="row" paddingX={4} paddingY={2}>
             <IconButtonWithTooltip
@@ -740,7 +739,7 @@ PetitionReplies.fragments = {
         me {
           organization {
             name
-            ...isUsageLimitsReached_Organization
+            isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
           }
           hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
           ...PetitionRepliesFieldComments_User
@@ -754,7 +753,6 @@ PetitionReplies.fragments = {
       ${ExportRepliesDialog.fragments.User}
       ${PetitionSignaturesCard.fragments.User}
       ${useUpdateIsReadNotification.fragments.User}
-      ${isUsageLimitsReached.fragments.Organization}
     `;
   },
 };

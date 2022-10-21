@@ -46,8 +46,6 @@ export const AppLayoutNavbar = Object.assign(
       const intl = useIntl();
       const router = useRouter();
       const { pathname, query } = router;
-      const petitionLimitReached =
-        me.organization.usageLimits.petitions.used >= me.organization.usageLimits.petitions.limit;
 
       const hasAdminRole = isAtLeast("ADMIN", me.role);
       const items = useMemo(
@@ -62,7 +60,7 @@ export const AppLayoutNavbar = Object.assign(
               id: "component.app-layout-navbar.parallels-link",
               defaultMessage: "Parallels",
             }),
-            warning: petitionLimitReached
+            warning: me.organization.isPetitionUsageLimitReached
               ? intl.formatMessage(
                   {
                     id: "component.app-layout-navbar.parallels-link.limit-reached-warning",
@@ -70,7 +68,7 @@ export const AppLayoutNavbar = Object.assign(
                       "It seems that you have reached your limit of {limit} parallels, <a>reach out to us to upgrade your plan.</a>",
                   },
                   {
-                    limit: me.organization.usageLimits.petitions.limit,
+                    limit: me.organization.currentUsagePeriod?.limit ?? 0,
                     a: (chunks: any[]) => (
                       <SupportLink
                         message={intl.formatMessage({
@@ -285,11 +283,9 @@ export const AppLayoutNavbar = Object.assign(
                 id
                 name
                 iconUrl92: iconUrl(options: { resize: { width: 92 } })
-                usageLimits {
-                  petitions {
-                    limit
-                    used
-                  }
+                isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+                currentUsagePeriod(limitName: PETITION_SEND) {
+                  limit
                 }
               }
             }

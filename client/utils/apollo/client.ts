@@ -214,10 +214,10 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
           fields: {
             brandTheme: { merge: true },
             users: { merge: false },
-            usageLimits: { merge: true },
             integrations: { merge: false },
             pdfDocumentThemes: { merge: false },
             features: { merge: mergeArraysBy(["name"]) },
+            currentUsagePeriod: { merge: true },
           },
         },
         User: {

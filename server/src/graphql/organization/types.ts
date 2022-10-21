@@ -251,6 +251,14 @@ export const Organization = objectType({
         );
       },
     });
+    t.boolean("isUsageLimitReached", {
+      authorize: isOwnOrgOrSuperAdmin(),
+      args: { limitName: nonNull("OrganizationUsageLimitName") },
+      resolve: async (root, { limitName }, ctx) => {
+        const limit = await ctx.organizations.getOrganizationCurrentUsageLimit(root.id, limitName);
+        return !limit || limit.limit <= limit.used;
+      },
+    });
     /** @deprecated */
     t.nonNull.field("usageLimits", {
       deprecation: "use usagePeriods pagination",
