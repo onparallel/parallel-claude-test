@@ -16,8 +16,8 @@ import {
   zip,
 } from "remeda";
 import { RESULT } from "../../graphql";
-import { QueuesService, QUEUES_SERVICE } from "../../services/queues";
 import { ILogger, LOGGER } from "../../services/logger";
+import { QueuesService, QUEUES_SERVICE } from "../../services/queues";
 import { average, findLast, partition, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fieldVisibility";
@@ -5368,7 +5368,7 @@ export class PetitionRepository extends BaseRepository {
    * creates the required accesses and messages to send a petition to a single contact group
    */
   async createAccessesAndMessages(
-    petition: Pick<Petition, "id" | "name">,
+    petition: Pick<Petition, "id" | "name" | "reminders_config">,
     contactIds: number[],
     args: {
       remindersConfig?: PetitionAccessReminderConfig | null;
@@ -5381,6 +5381,10 @@ export class PetitionRepository extends BaseRepository {
     fromPublicPetitionLink: boolean
   ) {
     try {
+      const remindersConfig =
+        args.remindersConfig === undefined
+          ? (petition.reminders_config as PetitionAccessReminderConfig | null)
+          : args.remindersConfig;
       const accesses = await this.createAccesses(
         petition.id,
         contactIds.map((contactId) => ({
@@ -5388,10 +5392,10 @@ export class PetitionRepository extends BaseRepository {
           contact_id: contactId,
           delegate_granter_id: userDelegate ? user.id : null,
           reminders_left: 10,
-          reminders_active: Boolean(args.remindersConfig),
-          reminders_config: args.remindersConfig,
-          next_reminder_at: args.remindersConfig
-            ? calculateNextReminder(args.scheduledAt ?? new Date(), args.remindersConfig)
+          reminders_active: Boolean(remindersConfig),
+          reminders_config: remindersConfig,
+          next_reminder_at: remindersConfig
+            ? calculateNextReminder(args.scheduledAt ?? new Date(), remindersConfig)
             : null,
         })),
         userDelegate ? userDelegate : user,

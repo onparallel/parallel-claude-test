@@ -28,6 +28,7 @@ import {
 import { chunkWhile, sumBy, unMaybeArray } from "../../../util/arrays";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
+import { pFlatMap } from "../../../util/promises/pFlatMap";
 import { withError } from "../../../util/promises/withError";
 import { hash, random } from "../../../util/token";
 import { userHasAccessToContactGroups } from "../../contact/authorizers";
@@ -1471,26 +1472,24 @@ export const sendPetition = mutationField("sendPetition", {
       );
 
       const baseDate = new Date();
-      const results = (
-        await pMap(petitionChunks, async (currentChunk, index) => {
-          return await pMap(currentChunk, async ([petition, contactIds]) => {
-            return await ctx.petitions.createAccessesAndMessages(
-              petition,
-              contactIds,
-              {
-                ...args,
-                scheduledAt:
-                  index === 0
-                    ? args.scheduledAt
-                    : addMinutes(args.scheduledAt ?? baseDate, index * 5),
-              },
-              ctx.user!,
-              sender,
-              false
-            );
-          });
-        })
-      ).flat();
+      const results = await pFlatMap(petitionChunks, async (currentChunk, index) => {
+        return await pMap(currentChunk, async ([petition, contactIds]) => {
+          return await ctx.petitions.createAccessesAndMessages(
+            petition,
+            contactIds,
+            {
+              ...args,
+              scheduledAt:
+                index === 0
+                  ? args.scheduledAt
+                  : addMinutes(args.scheduledAt ?? baseDate, index * 5),
+            },
+            ctx.user!,
+            sender,
+            false
+          );
+        });
+      });
 
       const successfulSends = results.filter((r) => r.result === "SUCCESS");
 
