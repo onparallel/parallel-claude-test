@@ -180,7 +180,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 align: "center",
                 Filter: PetitionListSignatureStatusFilter,
                 headerProps: { padding: 0 },
-                cellProps: { padding: 0 },
+                cellProps: { padding: 0, minWidth: "72px" },
                 CellContent: ({ row }) =>
                   row.__typename === "Petition" ? (
                     <Flex alignItems="center" paddingRight="2">

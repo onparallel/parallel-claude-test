@@ -80,6 +80,7 @@ export function CheckboxTableFilter<T extends string>({
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      const optionsLength = options.length + 1;
       switch (e.key) {
         case "Tab": {
           e.preventDefault();
@@ -89,14 +90,14 @@ export function CheckboxTableFilter<T extends string>({
           e.preventDefault();
           const button = e.target as HTMLElement;
           const index = parseInt(button.getAttribute("data-index")!);
-          focus((index + 1) % options.length);
+          focus((index + 1) % optionsLength);
           return;
         }
         case "ArrowUp": {
           e.preventDefault();
           const button = e.target as HTMLElement;
           const index = parseInt(button.getAttribute("data-index")!);
-          focus((index - 1 + options.length) % options.length);
+          focus((index - 1 + optionsLength) % optionsLength);
           return;
         }
       }
