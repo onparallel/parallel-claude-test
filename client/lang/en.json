@@ -170,9 +170,19 @@
     "context": "Create organization"
   },
   {
+    "term": "component.admin-organizations-subscription-card.button-label",
+    "definition": "Change subscription",
+    "context": "Change subscription"
+  },
+  {
     "term": "component.admin-organizations-tabs.features",
     "definition": "Features",
     "context": "Features"
+  },
+  {
+    "term": "component.admin-organizations-tabs.subscriptions",
+    "definition": "Subscriptions",
+    "context": "Subscriptions"
   },
   {
     "term": "component.admin-organizations-tabs.users",
@@ -2153,6 +2163,66 @@
     "term": "component.organization-memebers-list-table-headr.sso-provider",
     "definition": "SSO provider",
     "context": "SSO provider"
+  },
+  {
+    "term": "component.organization-usage-periods-table.limit.header",
+    "definition": "Limit",
+    "context": "Limit"
+  },
+  {
+    "term": "component.organization-usage-periods-table.modify-ongoing-period-button",
+    "definition": "Modify ongoing period",
+    "context": "Modify ongoing period"
+  },
+  {
+    "term": "component.organization-usage-periods-table.period-badge.header",
+    "definition": "Period",
+    "context": "Period"
+  },
+  {
+    "term": "component.organization-usage-periods-table.period-badge.ongoing",
+    "definition": "Ongoing",
+    "context": "Ongoing"
+  },
+  {
+    "term": "component.organization-usage-periods-table.period-badge.past",
+    "definition": "Past",
+    "context": "Past"
+  },
+  {
+    "term": "component.organization-usage-periods-table.period-end-date.header",
+    "definition": "Period end date",
+    "context": "Period end date"
+  },
+  {
+    "term": "component.organization-usage-periods-table.period-start-date.header",
+    "definition": "Start date",
+    "context": "Start date"
+  },
+  {
+    "term": "component.organization-usage-periods-table.period.header",
+    "definition": "Period",
+    "context": "Period"
+  },
+  {
+    "term": "component.organization-usage-periods-table.selector-label",
+    "definition": "Periods of {selector}",
+    "context": "Periods of {selector}"
+  },
+  {
+    "term": "component.organization-usage-periods-table.selector-parallels-label",
+    "definition": "parallels",
+    "context": "parallels"
+  },
+  {
+    "term": "component.organization-usage-periods-table.selector-signatures-label",
+    "definition": "signatures",
+    "context": "signatures"
+  },
+  {
+    "term": "component.organization-usage-periods-table.used.header",
+    "definition": "Used",
+    "context": "Used"
   },
   {
     "term": "component.overwrite-documentation-dialog.body",
@@ -4990,9 +5060,99 @@
     "context": "Test signature"
   },
   {
-    "term": "component.timespan.value",
-    "definition": "{days, plural, =0 {} =1 {# day } other {# days }} {hours}h {minutes}'",
-    "context": "{days, plural, =0 {} =1 {# day } other {# days }} {hours}h {minutes}'"
+    "term": "component.timespan.days-part",
+    "definition": "{n, plural, =1{# day} other{# days}}",
+    "context": "{n, plural, =1{# day} other{# days}}"
+  },
+  {
+    "term": "component.timespan.hours-part",
+    "definition": "{n}h",
+    "context": "{n}h"
+  },
+  {
+    "term": "component.timespan.minutes-part",
+    "definition": "{n}'",
+    "context": "{n}'"
+  },
+  {
+    "term": "component.timespan.months-part",
+    "definition": "{n, plural, =1{# month} other{# months}}",
+    "context": "{n, plural, =1{# month} other{# months}}"
+  },
+  {
+    "term": "component.timespan.seconds-part",
+    "definition": "{n}''",
+    "context": "{n}''"
+  },
+  {
+    "term": "component.timespan.weeks-part",
+    "definition": "{n, plural, =1{# week} other{# weeks}}",
+    "context": "{n, plural, =1{# week} other{# weeks}}"
+  },
+  {
+    "term": "component.timespan.years-part",
+    "definition": "{n, plural, =1{# year} other{# years}}",
+    "context": "{n, plural, =1{# year} other{# years}}"
+  },
+  {
+    "term": "component.update-organization-current-usage-period-dialog.limit-label",
+    "definition": "Limit",
+    "context": "Limit"
+  },
+  {
+    "term": "component.update-organization-current-usage-period-dialog.ongoing-period-end-label",
+    "definition": "Ongoing period end:",
+    "context": "Ongoing period end:"
+  },
+  {
+    "term": "component.update-organization-usage-details-dialog.limit-label",
+    "definition": "Limit",
+    "context": "Limit"
+  },
+  {
+    "term": "component.update-organization-usage-details-dialog.months-label",
+    "definition": "Months",
+    "context": "Months"
+  },
+  {
+    "term": "component.update-organization-usage-details-dialog.next-period-label",
+    "definition": "Next period:",
+    "context": "Next period:"
+  },
+  {
+    "term": "component.update-organization-usage-details-dialog.no-periods",
+    "definition": "No periods",
+    "context": "No periods"
+  },
+  {
+    "term": "component.update-organization-usage-details-dialog.period-label",
+    "definition": "Period",
+    "context": "Period"
+  },
+  {
+    "term": "component.update-organization-usage-details-dialog.renewal-cycles-label",
+    "definition": "Renewal cycles",
+    "context": "Renewal cycles"
+  },
+  {
+    "term": "component.update-organization-usage-details-dialog.start-new-period-label",
+    "definition": "Start new period",
+    "context": "Start new period"
+  },
+  {
+    "term": "component.update-organization-usage-details-dialog.start-new-period-popover",
+    "definition": "Activating this option will finalize the current period and start a new one with the new subscription.",
+    "context": "Activating this option will finalize the current period and start a new one with the new subscription."
+  },
+  {
+    "term": "component.update-organization-usage-details-dialog.subscription-end-label",
+    "definition": "Subscription end:",
+    "context": "Subscription end:"
+  },
+  {
+    "term": "component.update-organization-usage-details-dialog.years-label",
+    "definition": "Years",
+    "context": "Years"
   },
   {
     "term": "component.user-dropdown-empty.invite-button",
@@ -6366,8 +6526,8 @@
   },
   {
     "term": "generic.unlimited",
-    "definition": "unlimited",
-    "context": "unlimited"
+    "definition": "Unlimited",
+    "context": "Unlimited"
   },
   {
     "term": "generic.unnamed-parallel",
@@ -6388,6 +6548,11 @@
     "term": "generic.untitled-field",
     "definition": "Untitled field",
     "context": "Untitled field"
+  },
+  {
+    "term": "generic.update",
+    "definition": "Update",
+    "context": "Update"
   },
   {
     "term": "generic.upgrade",
@@ -7005,7 +7170,7 @@
     "context": "{amount} years"
   },
   {
-    "term": "page.oganizations.features-active",
+    "term": "page.organizations.features-active",
     "definition": "Enabled features",
     "context": "Enabled features"
   },
@@ -9633,6 +9798,66 @@
     "term": "validate-petition-fields.select-fields-without-options-error",
     "definition": "Please add two or more options to the following <em>dropdown</em> {count, plural, one{field} other{fields}}.",
     "context": "Please add two or more options to the following <em>dropdown</em> {count, plural, one{field} other{fields}}."
+  },
+  {
+    "term": "view.admin-organizations-subscriptions.activate-signature-button",
+    "definition": "Activate signature",
+    "context": "Activate signature"
+  },
+  {
+    "term": "view.admin-organizations-subscriptions.card-end-date",
+    "definition": "End date",
+    "context": "End date"
+  },
+  {
+    "term": "view.admin-organizations-subscriptions.card-limit",
+    "definition": "Limit",
+    "context": "Limit"
+  },
+  {
+    "term": "view.admin-organizations-subscriptions.card-period",
+    "definition": "Period",
+    "context": "Period"
+  },
+  {
+    "term": "view.admin-organizations-subscriptions.card-remaining-cycles",
+    "definition": "Remaining cycles",
+    "context": "Remaining cycles"
+  },
+  {
+    "term": "view.admin-organizations-subscriptions.card-users",
+    "definition": "Users",
+    "context": "Users"
+  },
+  {
+    "term": "view.admin-organizations-subscriptions.petitions-header",
+    "definition": "Parallels",
+    "context": "Parallels"
+  },
+  {
+    "term": "view.admin-organizations-subscriptions.signatures-card.not-active",
+    "definition": "The eSignature has not been activated in this organization",
+    "context": "The eSignature has not been activated in this organization"
+  },
+  {
+    "term": "view.admin-organizations-subscriptions.signatures-header",
+    "definition": "Signatures",
+    "context": "Signatures"
+  },
+  {
+    "term": "view.admin-organizations-subscriptions.update-.current-petitions-header",
+    "definition": "Ongoing parallels period",
+    "context": "Ongoing parallels period"
+  },
+  {
+    "term": "view.admin-organizations-subscriptions.update-.current-signatures-header",
+    "definition": "Ongoing signatures period",
+    "context": "Ongoing signatures period"
+  },
+  {
+    "term": "view.admin-organizations-subscriptions.users-header",
+    "definition": "Users",
+    "context": "Users"
   },
   {
     "term": "view.group.edit-name",

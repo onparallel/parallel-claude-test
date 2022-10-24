@@ -244,11 +244,8 @@ export const Organization = objectType({
       args: {
         limitName: nonNull("OrganizationUsageLimitName"),
       },
-      resolve: async (_, args, ctx) => {
-        return await ctx.organizations.getOrganizationCurrentUsageLimit(
-          ctx.user!.org_id,
-          args.limitName
-        );
+      resolve: async (root, args, ctx) => {
+        return await ctx.organizations.getOrganizationCurrentUsageLimit(root.id, args.limitName);
       },
     });
     t.boolean("isUsageLimitReached", {

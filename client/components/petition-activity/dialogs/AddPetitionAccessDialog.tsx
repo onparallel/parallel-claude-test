@@ -260,7 +260,7 @@ export function AddPetitionAccessDialog({
     } catch {}
   }, [accesses]);
 
-  const { used, limit } = petition.organization.usageLimits.petitions;
+  const { petitionsPeriod } = petition.organization;
 
   return (
     <ConfirmDialog
@@ -329,11 +329,11 @@ export function AddPetitionAccessDialog({
       }
       body={
         <>
-          {limit - used <= 10 ? (
+          {!petitionsPeriod || petitionsPeriod.limit - petitionsPeriod.used <= 10 ? (
             <Alert status="warning" borderRadius="md" mb={2}>
               <AlertIcon color="yellow.500" />
               <Text>
-                {used >= limit ? (
+                {!petitionsPeriod || petitionsPeriod.used >= petitionsPeriod.limit ? (
                   <FormattedMessage
                     id="component.add-petition-access-dialog.petition-limit-reached.text"
                     defaultMessage="You reached the limit of parallels sent."
@@ -342,7 +342,7 @@ export function AddPetitionAccessDialog({
                   <FormattedMessage
                     id="component.add-petition-access-dialog.petition-limit-near.text"
                     defaultMessage="You can send {left, plural, =1{# more parallel} other{# more parallels}}."
-                    values={{ left: limit - used }}
+                    values={{ left: petitionsPeriod.limit - petitionsPeriod.used }}
                   />
                 )}
               </Text>
@@ -432,7 +432,7 @@ export function AddPetitionAccessDialog({
             onSearchContactsByEmail={handleSearchContactsByEmail}
             showErrors={showErrors}
             canAddRecipientGroups={canAddRecipientGroups}
-            maxGroups={limit - used}
+            maxGroups={petitionsPeriod ? petitionsPeriod.limit - petitionsPeriod.used : 0}
           />
           <Box marginTop={4}>
             <MessageEmailEditor
@@ -457,14 +457,18 @@ export function AddPetitionAccessDialog({
           variant="outline"
           leftIcon={<LinkIcon />}
           onClick={handleShareByLinkClick}
-          isDisabled={recipientGroups.some((g) => g.length > 0) || used >= limit}
+          isDisabled={
+            recipientGroups.some((g) => g.length > 0) ||
+            !petitionsPeriod ||
+            petitionsPeriod.used >= petitionsPeriod.limit
+          }
         >
           <FormattedMessage id="generic.share-by-link" defaultMessage="Share by link" />
         </Button>
       }
       confirm={
         <SendButton
-          isDisabled={used >= limit}
+          isDisabled={!petitionsPeriod || petitionsPeriod.used >= petitionsPeriod.limit}
           data-action="send-petition"
           onSendClick={() => handleSendClick(false)}
           onScheduleClick={() => handleSendClick(true)}
@@ -534,11 +538,9 @@ AddPetitionAccessDialog.fragments = {
       }
       organization {
         id
-        usageLimits {
-          petitions {
-            limit
-            used
-          }
+        petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+          limit
+          used
         }
       }
       accesses {

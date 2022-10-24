@@ -244,7 +244,7 @@ function useOrganizationColumns() {
         CellContent: ({ row }) => (
           <>
             <FormattedNumber value={row.activeUserCount} />/
-            <FormattedNumber value={row.usageLimits.users.limit} />
+            <FormattedNumber value={row.usageDetails.USER_LIMIT} />
           </>
         ),
       },
@@ -260,8 +260,8 @@ function useOrganizationColumns() {
         align: "right",
         CellContent: ({ row }) => (
           <>
-            <FormattedNumber value={row.usageLimits.petitions.used} />/
-            <FormattedNumber value={row.usageLimits.petitions.limit} />
+            <FormattedNumber value={row.petitionsPeriod?.used ?? 0} />/
+            <FormattedNumber value={row.petitionsPeriod?.limit ?? 0} />
           </>
         ),
       },
@@ -294,15 +294,11 @@ AdminOrganizations.fragments = {
         status
         activeUserCount
         createdAt
-        usageLimits {
-          users {
-            limit
-          }
-          petitions {
-            used
-            limit
-          }
+        petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+          limit
+          used
         }
+        usageDetails
       }
     `;
   },

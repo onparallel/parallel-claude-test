@@ -32,9 +32,9 @@ export function UsageCard({
                 defaultMessage="out of"
               />
             </VisuallyHidden>
-            <Text as="span">
+            <Text as="span" textTransform="lowercase">
               {isUnlimited ? (
-                <FormattedMessage id="generic.unlimited" defaultMessage="unlimited" />
+                <FormattedMessage id="generic.unlimited" defaultMessage="Unlimited" />
               ) : (
                 <FormattedNumber value={limit} />
               )}

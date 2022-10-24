@@ -37,7 +37,7 @@ import { ReportsDoughnutChart } from "@parallel/components/reports/ReportsDoughn
 import { ReportsErrorMessage } from "@parallel/components/reports/ReportsErrorMessage";
 import { ReportsLoadingMessage } from "@parallel/components/reports/ReportsLoadingMessage";
 import { ReportsReadyMessage } from "@parallel/components/reports/ReportsReadyMessage";
-import { Reports_templatesDocument, Reports_userDocument } from "@parallel/graphql/__types";
+import { Maybe, Reports_templatesDocument, Reports_userDocument } from "@parallel/graphql/__types";
 import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import {
   useAssertQuery,
@@ -57,11 +57,11 @@ type ReportType = {
   pending: number;
   completed: number;
   closed: number;
-  pending_to_complete: number;
-  complete_to_close: number;
+  pending_to_complete: Maybe<number>;
+  complete_to_close: Maybe<number>;
   signatures: {
     completed: number;
-    time_to_complete: number;
+    time_to_complete: Maybe<number>;
   };
 };
 
@@ -303,9 +303,9 @@ Reports.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
 
 export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(Reports);
 function TemplateStatsReport({ report }: { report: ReportType }) {
-  const pendingToComplete = report.pending_to_complete;
-  const completeToClose = report.complete_to_close;
-  const timeToComplete = report.signatures.time_to_complete;
+  const pendingToComplete = report.pending_to_complete ?? 0;
+  const completeToClose = report.complete_to_close ?? 0;
+  const timeToComplete = report.signatures.time_to_complete ?? 0;
 
   const pendingToCompletePercent =
     (pendingToComplete / (pendingToComplete + completeToClose)) * 100;
@@ -471,7 +471,7 @@ function TemplateStatsReport({ report }: { report: ReportType }) {
           >
             <GridItem colSpan={{ base: 4, md: 1 }} textAlign={{ base: "left", md: "right" }}>
               <Text whiteSpace="nowrap">
-                <TimeSpan seconds={pendingToComplete} />
+                <TimeSpan duration={pendingToComplete} />
               </Text>
             </GridItem>
             <GridItem colSpan={4}>
@@ -489,7 +489,7 @@ function TemplateStatsReport({ report }: { report: ReportType }) {
             </GridItem>
             <GridItem colSpan={{ base: 4, md: 1 }} textAlign={{ base: "left", md: "right" }}>
               <Text whiteSpace="nowrap">
-                <TimeSpan seconds={completeToClose} />
+                <TimeSpan duration={completeToClose} />
               </Text>
             </GridItem>
             <GridItem colSpan={4}>
@@ -551,7 +551,7 @@ function TemplateStatsReport({ report }: { report: ReportType }) {
               <>
                 <GridItem colSpan={{ base: 4, md: 1 }} textAlign={{ base: "left", md: "right" }}>
                   <Text whiteSpace="nowrap">
-                    <TimeSpan seconds={timeToComplete} />
+                    <TimeSpan duration={timeToComplete} />
                   </Text>
                 </GridItem>
                 <GridItem colSpan={4}>

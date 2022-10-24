@@ -11,7 +11,7 @@ import { ReactNode, useEffect, useMemo, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 
-type AdminOrganizationsSection = "users" | "features";
+type AdminOrganizationsSection = "users" | "features" | "subscriptions";
 
 interface AdminOrganizationsLayoutProps extends AdminOrganizationsLayout_QueryFragment {
   tabKey: AdminOrganizationsSection;
@@ -99,6 +99,13 @@ function useAdminOrganizationsTabs() {
         title: intl.formatMessage({
           id: "component.admin-organizations-tabs.users",
           defaultMessage: "Users",
+        }),
+      },
+      {
+        key: "subscriptions" as const,
+        title: intl.formatMessage({
+          id: "component.admin-organizations-tabs.subscriptions",
+          defaultMessage: "Subscriptions",
         }),
       },
       {

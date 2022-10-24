@@ -92,7 +92,7 @@ function OrganizationUsers() {
   const { selectedRows, selectedIds, onChangeSelectedIds } = useSelection(users?.items, "id");
 
   const isUserLimitReached =
-    me.organization.activeUserCount >= me.organization.usageLimits.users.limit;
+    me.organization.activeUserCount >= me.organization.usageDetails.USER_LIMIT;
 
   useTempQueryParam("dialog", () => {
     if (!isUserLimitReached) {
@@ -102,7 +102,7 @@ function OrganizationUsers() {
 
   const isActivateUserButtonDisabled =
     me.organization.activeUserCount + selectedRows.filter((u) => u.status === "INACTIVE").length >
-    me.organization.usageLimits.users.limit;
+    me.organization.usageDetails.USER_LIMIT;
 
   const [search, setSearch] = useState(state.search);
 
@@ -772,11 +772,7 @@ OrganizationUsers.queries = [
           id
           hasSsoProvider
           activeUserCount
-          usageLimits {
-            users {
-              limit
-            }
-          }
+          usageDetails
         }
       }
     }

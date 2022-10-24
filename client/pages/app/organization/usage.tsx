@@ -23,11 +23,8 @@ function OrganizationUsage() {
 
   const { organization } = me;
 
-  const {
-    activeUserCount,
-    license,
-    usageLimits: { petitions, users, signatures },
-  } = organization;
+  const { activeUserCount, license, usageDetails, petitionsPeriod, signaturesPeriod } =
+    organization;
 
   return (
     <SettingsLayout
@@ -67,7 +64,7 @@ function OrganizationUsage() {
               defaultMessage: "Users",
             })}
             usage={activeUserCount}
-            limit={users.limit}
+            limit={usageDetails.USER_LIMIT}
             isUnlimited={license?.name === "APPSUMO4"}
           />
           <UsageCard
@@ -75,17 +72,17 @@ function OrganizationUsage() {
               id: "page.usage.parallels",
               defaultMessage: "Parallels",
             })}
-            usage={petitions.used}
-            limit={petitions.limit}
+            usage={petitionsPeriod?.used ?? 0}
+            limit={petitionsPeriod?.limit ?? 0}
           />
-          {signatures && signatures.limit > 0 ? (
+          {signaturesPeriod ? (
             <UsageCard
               title={intl.formatMessage({
                 id: "page.usage.signatures",
                 defaultMessage: "eSignatures",
               })}
-              usage={signatures.used}
-              limit={signatures.limit}
+              usage={signaturesPeriod.used}
+              limit={signaturesPeriod.limit}
             />
           ) : null}
         </Grid>
@@ -106,18 +103,14 @@ OrganizationUsage.queries = [
             source
             ...AppSumoLicenseAlert_OrgLicense
           }
-          usageLimits {
-            users {
-              limit
-            }
-            petitions {
-              used
-              limit
-            }
-            signatures {
-              used
-              limit
-            }
+          usageDetails
+          petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+            limit
+            used
+          }
+          signaturesPeriod: currentUsagePeriod(limitName: SIGNATURIT_SHARED_APIKEY) {
+            limit
+            used
           }
         }
       }

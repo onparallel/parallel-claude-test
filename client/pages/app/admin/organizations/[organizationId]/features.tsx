@@ -83,7 +83,7 @@ function AdminOrganizationsFeatures({ organizationId }: AdminOrganizationsFeatur
         <Card maxWidth="container.sm" as="form" onSubmit={handleSubmit(handleSubmitFeatureFlags)}>
           <CardHeader>
             <FormattedMessage
-              id="page.oganizations.features-active"
+              id="page.organizations.features-active"
               defaultMessage="Enabled features"
             />
           </CardHeader>

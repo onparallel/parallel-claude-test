@@ -36,6 +36,7 @@ export interface TablePageProps<TRow, TContext = unknown, TImpl extends TRow = T
   footerProps?: any;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
+  pageSizeOptions?: number[];
 }
 
 export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
@@ -64,6 +65,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   footerProps,
   onPageSizeChange,
   onPageChange,
+  pageSizeOptions = [10, 25, 50],
   color,
   ...props
 }: WithChakraProps<"section", TablePageProps<TRow, TContext, TImpl>>) {
@@ -91,7 +93,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
           display="flex"
           alignItems="center"
         >
-          {[10, 25, 50].map((items) => (
+          {pageSizeOptions.map((items) => (
             <option key={items} value={items}>
               {intl.formatMessage(
                 {

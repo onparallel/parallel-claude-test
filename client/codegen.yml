@@ -23,6 +23,7 @@ generates:
         JSONObject: "{ [key: string]: any }"
         Upload: File
         GID: string
+        ISO8601Duration: string
       namingConvention: keep
       preResolveTypes: true
       maybeValue: T | null
