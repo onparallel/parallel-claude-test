@@ -30,39 +30,42 @@ interface GoToPetitionOptions {
 export function useGoToPetition() {
   const navigate = useHandleNavigation();
   const buildUrlToPetition = useBuildUrlToPetition();
-  return useCallback(function (
-    id: string,
-    section: PetitionSection,
-    options?: GoToPetitionOptions
-  ) {
-    const url = buildUrlToPetition(id, section, options?.query);
-    navigate(url, options?.event);
-  },
-  []);
+  return useCallback(
+    function (id: string, section: PetitionSection, options?: GoToPetitionOptions) {
+      const url = buildUrlToPetition(id, section, options?.query);
+      navigate(url, options?.event);
+    },
+    [buildUrlToPetition]
+  );
 }
 
 export function useBuildUrlToPetitionSection() {
-  const routerRef = useRef(useRouter());
+  const router = useRouter();
   const [shouldConfirmNavigation, _] = usePetitionShouldConfirmNavigation();
   const shouldConfirmNavigationRef = useRef(shouldConfirmNavigation);
   const buildUrlToPetition = useBuildUrlToPetition();
-  return useCallback(function (section: PetitionSection, query?: Record<string, string>) {
-    const router = routerRef.current;
-    const petitionId = router.query.petitionId as string;
-    const fromTemplate = isDefined(router.query.fromTemplate);
-    return buildUrlToPetition(petitionId, section, {
-      ...(fromTemplate ? { fromTemplate: "" } : {}),
-      ...(shouldConfirmNavigationRef.current ? { new: "" } : {}),
-      ...(query ?? {}),
-    });
-  }, []);
+  return useCallback(
+    function (section: PetitionSection, query?: Record<string, string>) {
+      const petitionId = router.query.petitionId as string;
+      const fromTemplate = isDefined(router.query.fromTemplate);
+      return buildUrlToPetition(petitionId, section, {
+        ...(fromTemplate ? { fromTemplate: "" } : {}),
+        ...(shouldConfirmNavigationRef.current ? { new: "" } : {}),
+        ...(query ?? {}),
+      });
+    },
+    [router.query]
+  );
 }
 
 export function useGoToPetitionSection() {
   const navigate = useHandleNavigation();
   const buildUrlToPetitionSection = useBuildUrlToPetitionSection();
-  return useCallback(function (section: PetitionSection, options?: GoToPetitionOptions) {
-    const url = buildUrlToPetitionSection(section, options?.query);
-    navigate(url, options?.event);
-  }, []);
+  return useCallback(
+    function (section: PetitionSection, options?: GoToPetitionOptions) {
+      const url = buildUrlToPetitionSection(section, options?.query);
+      navigate(url, options?.event);
+    },
+    [buildUrlToPetitionSection]
+  );
 }
