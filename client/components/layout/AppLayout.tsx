@@ -119,6 +119,7 @@ export const AppLayout = Object.assign(
         createdAt: me.createdAt,
         orgRole: me.role,
         name: me.fullName!,
+        lastActiveAt: me.lastActiveAt,
         company: {
           id: me.organization.id,
           name: me.organization.name,
@@ -281,6 +282,7 @@ export const AppLayout = Object.assign(
             email
             createdAt
             role
+            lastActiveAt
           }
           ...AppLayoutNavbar_Query
         }

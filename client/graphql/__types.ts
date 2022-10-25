@@ -3977,6 +3977,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -4652,6 +4653,7 @@ export type AppLayout_QueryFragment = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -4830,6 +4832,7 @@ export type PetitionLayout_QueryFragment = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -4884,6 +4887,7 @@ export type SettingsLayout_QueryFragment = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -12275,6 +12279,7 @@ export type Admin_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -12326,6 +12331,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -12402,6 +12408,7 @@ export type AdminOrganizationsMembers_queryQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -12533,6 +12540,7 @@ export type AdminOrganizations_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -12595,6 +12603,7 @@ export type AdminSupportMethods_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -12846,6 +12855,7 @@ export type Contact_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -12997,6 +13007,7 @@ export type Contacts_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -13068,6 +13079,7 @@ export type OrganizationBranding_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -13137,6 +13149,7 @@ export type OrganizationCompliance_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -13189,6 +13202,7 @@ export type OrganizationGeneral_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -13353,6 +13367,7 @@ export type OrganizationGroup_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -13511,6 +13526,7 @@ export type OrganizationGroups_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -13547,6 +13563,7 @@ export type OrganizationSettings_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -13583,6 +13600,7 @@ export type OrganizationIntegrations_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -13689,6 +13707,7 @@ export type IntegrationsSignature_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -13742,6 +13761,7 @@ export type OrganizationUsage_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -13883,6 +13903,7 @@ export type OrganizationUsers_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -14736,6 +14757,7 @@ export type PetitionActivity_QueryFragment = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
@@ -16486,6 +16508,7 @@ export type PetitionActivity_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
@@ -16836,6 +16859,7 @@ export type PetitionCompose_QueryFragment = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
@@ -17440,6 +17464,7 @@ export type PetitionCompose_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
@@ -17836,6 +17861,7 @@ export type PetitionMessages_QueryFragment = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -17873,6 +17899,7 @@ export type PetitionMessages_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -18334,6 +18361,7 @@ export type PetitionPreview_QueryFragment = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -19262,6 +19290,7 @@ export type PetitionPreview_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -19643,6 +19672,7 @@ export type PetitionReplies_QueryFragment = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
@@ -20260,6 +20290,7 @@ export type PetitionReplies_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
@@ -20716,6 +20747,7 @@ export type Petitions_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -21136,6 +21168,7 @@ export type NewPetition_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -21295,6 +21328,7 @@ export type Reports_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -21329,6 +21363,7 @@ export type Account_QueryFragment = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     isSsoUser: boolean;
     preferredLocale?: string | null;
@@ -21407,6 +21442,7 @@ export type Account_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     isSsoUser: boolean;
     preferredLocale?: string | null;
@@ -21546,6 +21582,7 @@ export type Developers_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -21583,6 +21620,7 @@ export type Settings_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -21628,6 +21666,7 @@ export type Security_userQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -23762,6 +23801,7 @@ export const AppLayout_QueryFragmentDoc = gql`
       email
       createdAt
       role
+      lastActiveAt
     }
     ...AppLayoutNavbar_Query
   }
