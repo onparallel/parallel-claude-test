@@ -61,6 +61,7 @@ describe("GraphQL/Public", () => {
     });
 
     limit = await mocks.createOrganizationUsageLimit(org.id, "SIGNATURIT_SHARED_APIKEY", 10);
+    await mocks.createOrganizationUsageLimit(org.id, "PETITION_SEND", 10);
 
     const [user] = await mocks.createRandomUsers(org.id, 1);
     const [contact] = await mocks.createRandomContacts(org.id, 1);
@@ -236,6 +237,167 @@ describe("GraphQL/Public", () => {
 
       expect(res3.errors).toBeUndefined();
       expect(res3.data!.verifyPublicAccess.isAllowed).toBe(true);
+    });
+
+    it("verify contactless petition access", async () => {
+      const [user] = await mocks.createRandomUsers(org.id, 1);
+      const [petition] = await mocks.createRandomPetitions(org.id, user.id, 1, () => ({
+        status: "DRAFT",
+      }));
+      const [access] = await mocks.createPetitionAccess(petition.id, user.id, [null], user.id);
+
+      const mutation = gql`
+        mutation ($token: ID!, $keycode: ID!, $ip: String, $userAgent: String) {
+          verifyPublicAccess(token: $token, keycode: $keycode, ip: $ip, userAgent: $userAgent) {
+            isAllowed
+            isContactlessAccess
+            cookieValue
+          }
+        }
+      `;
+
+      const res = await testClient.execute(mutation, {
+        token: "test",
+        keycode: access.keycode,
+        ip: "127.0.0.42",
+        userAgent: "WAT",
+      });
+
+      expect(res.errors).toBeUndefined();
+      expect(res.data!.verifyPublicAccess.isAllowed).toBe(false);
+      expect(res.data!.verifyPublicAccess.isContactlessAccess).toBe(true);
+      expect(res.data!.verifyPublicAccess.cookieValue).toBeNull();
+    });
+
+    it("allow only the first contact to access a contactless petition access", async () => {
+      const [user] = await mocks.createRandomUsers(org.id, 1);
+      const [petition] = await mocks.createRandomPetitions(org.id, user.id, 1, () => ({
+        status: "DRAFT",
+      }));
+      const [access] = await mocks.createPetitionAccess(petition.id, user.id, [null], user.id);
+
+      const mutation = gql`
+        mutation ($token: ID!, $keycode: ID!, $ip: String, $userAgent: String) {
+          verifyPublicAccess(token: $token, keycode: $keycode, ip: $ip, userAgent: $userAgent) {
+            isAllowed
+            isContactlessAccess
+            cookieValue
+          }
+        }
+      `;
+
+      const res0 = await testClient.execute(mutation, {
+        token: "test",
+        keycode: access.keycode,
+        ip: "127.0.0.42",
+        userAgent: "WAT",
+      });
+
+      expect(res0.errors).toBeUndefined();
+      expect(res0.data!.verifyPublicAccess.isAllowed).toBe(false);
+      expect(res0.data!.verifyPublicAccess.isContactlessAccess).toBe(true);
+      expect(res0.data!.verifyPublicAccess.cookieValue).toBeNull();
+
+      const emailSpy = jest.spyOn(
+        testClient.container.get<IEmailsService>(EMAILS),
+        "sendContactAuthenticationRequestEmail"
+      );
+
+      const res1 = await testClient.execute(
+        gql`
+          mutation ($keycode: ID!, $firstName: String, $lastName: String, $email: String) {
+            publicSendVerificationCode(
+              keycode: $keycode
+              firstName: $firstName
+              lastName: $lastName
+              email: $email
+            ) {
+              token
+              remainingAttempts
+              expiresAt
+            }
+          }
+        `,
+        {
+          keycode: access.keycode,
+          firstName: "first name",
+          lastName: "last name",
+          email: "first@gmail.com",
+        }
+      );
+
+      const res2 = await testClient.execute(
+        gql`
+          mutation ($keycode: ID!, $firstName: String, $lastName: String, $email: String) {
+            publicSendVerificationCode(
+              keycode: $keycode
+              firstName: $firstName
+              lastName: $lastName
+              email: $email
+            ) {
+              token
+              remainingAttempts
+              expiresAt
+            }
+          }
+        `,
+        {
+          keycode: access.keycode,
+          firstName: "first name",
+          lastName: "last name",
+          email: "second@gmail.com",
+        }
+      );
+
+      expect(emailSpy).toHaveBeenCalledTimes(3);
+
+      // get generated code
+      const requestId1 = emailSpy.mock.calls[emailSpy.mock.calls.length - 2][0];
+      const requestId2 = emailSpy.mock.calls[emailSpy.mock.calls.length - 1][0];
+
+      const [request1] = await knex.from("contact_authentication_request").where("id", requestId1);
+      const [request2] = await knex.from("contact_authentication_request").where("id", requestId2);
+
+      expect(request1.contact_email).toBe("first@gmail.com");
+      expect(request2.contact_email).toBe("second@gmail.com");
+
+      const res3 = await testClient.execute(
+        gql`
+          mutation ($keycode: ID!, $token: ID!, $code: String!) {
+            publicCheckVerificationCode(keycode: $keycode, token: $token, code: $code) {
+              result
+              remainingAttempts
+            }
+          }
+        `,
+        {
+          keycode: access.keycode,
+          token: res1.data?.publicSendVerificationCode.token,
+          code: request1.code,
+        }
+      );
+
+      expect(res3.errors).toBeUndefined();
+      expect(res3.data!.publicCheckVerificationCode.result).toBe("SUCCESS");
+
+      const res4 = await testClient.execute(
+        gql`
+          mutation ($keycode: ID!, $token: ID!, $code: String!) {
+            publicCheckVerificationCode(keycode: $keycode, token: $token, code: $code) {
+              result
+              remainingAttempts
+            }
+          }
+        `,
+        {
+          keycode: access.keycode,
+          token: res2.data?.publicSendVerificationCode.token,
+          code: request2.code,
+        }
+      );
+
+      expect(res4.errors).toContainGraphQLError("ACCESS_ALREADY_WITH_CONTACT");
+      expect(res4.data).toBeNull();
     });
   });
 

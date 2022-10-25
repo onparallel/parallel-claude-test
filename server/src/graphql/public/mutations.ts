@@ -239,12 +239,12 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
         );
 
         // if is a contactless petition access
-        if (result.success && isDefined(result.data) && !isDefined(ctx.access!.contact_id)) {
+        if (result.success && !isDefined(ctx.access!.contact_id)) {
           const access = await ctx.petitions.loadAccessByKeycode(args.keycode);
           const petition = await ctx.petitions.loadPetition(access!.petition_id);
 
           if (petition) {
-            const email = result.data.contact_email!.toLowerCase();
+            const email = result.data!.contact_email!.toLowerCase();
 
             await ctx.orgCredits.ensurePetitionHasConsumedCredit(
               petition.id,
@@ -282,6 +282,19 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
         }
 
         if (result.success) {
+          // if there is an email in the authentication request it is coming from a non-contact link,
+          // if it is not the same contact it throws an error to force 2FA.
+          if (
+            isDefined(ctx.contact) &&
+            isDefined(result.data?.contact_email) &&
+            ctx.contact.email.toLowerCase() !== result.data!.contact_email!.toLowerCase()
+          ) {
+            throw new ApolloError(
+              "Access already has a contact assigned to it",
+              "ACCESS_ALREADY_WITH_CONTACT"
+            );
+          }
+
           const { contactAuthentication, cookieValue } =
             await ctx.contacts.createContactAuthentication(ctx.contact!.id);
           await ctx.contacts.addContactAuthenticationLogAccessEntry(contactAuthentication.id, {

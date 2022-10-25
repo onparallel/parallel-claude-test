@@ -223,7 +223,7 @@ export function RecipientViewContactlessForm({
           }
         }
       } catch {
-        codeExpired();
+        window.location.reload();
       }
     }
   }

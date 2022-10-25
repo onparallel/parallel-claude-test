@@ -549,7 +549,7 @@ export class Mocks {
   async createPetitionAccess(
     petitionId: number,
     ownerId: number,
-    contactIds: number[],
+    contactIds: number[] | null[],
     createdByUserId: number
   ) {
     return await this.knex<PetitionAccess>("petition_access")
