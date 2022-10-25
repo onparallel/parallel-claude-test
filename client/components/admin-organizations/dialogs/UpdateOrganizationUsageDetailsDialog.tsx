@@ -22,7 +22,7 @@ import { addMonths, Duration } from "date-fns";
 import { ReactNode, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { omit } from "remeda";
 
 interface UpdateOrganizationUsageDetailsDialogProps {
   header: ReactNode;
@@ -45,7 +45,7 @@ interface UpdateOrganizationUsageDetailsDialogInput {
 
 interface UpdateOrganizationUsageDetailsDialogResult {
   limit: number;
-  duration: string;
+  duration: Duration;
   renewalCycles: number;
   startNewPeriod: boolean;
 }
@@ -119,13 +119,6 @@ export function UpdateOrganizationUsageDetailsDialog({
     nextPeriod = null;
   }
 
-  function durationToISO8610(d: Duration) {
-    // assuming duration only has years or months
-    return ["P", d.years ? d.years + "Y" : null, d.months ? d.months + "M" : null]
-      .filter(isDefined)
-      .join("");
-  }
-
   return (
     <ConfirmDialog
       {...props}
@@ -134,8 +127,8 @@ export function UpdateOrganizationUsageDetailsDialog({
         as: "form",
         onSubmit: handleSubmit((data) => {
           props.onResolve({
-            ...data,
-            duration: durationToISO8610({ [data.periodUnits as keyof Duration]: data.periodValue }),
+            ...omit(data, ["periodUnits", "periodValue"]),
+            duration: { [data.periodUnits as keyof Duration]: data.periodValue },
           });
         }),
       }}

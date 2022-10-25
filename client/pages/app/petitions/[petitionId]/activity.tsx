@@ -402,6 +402,9 @@ PetitionActivity.fragments = {
         organization {
           name
           isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+          petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+            limit
+          }
         }
         ...useUpdateIsReadNotification_User
         ...useSendPetitionHandler_User

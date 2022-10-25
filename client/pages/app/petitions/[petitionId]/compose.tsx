@@ -674,6 +674,9 @@ PetitionCompose.fragments = {
           ...useSendPetitionHandler_User
           organization {
             isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+            petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+              limit
+            }
           }
           ...PetitionComposeFieldSettings_User
         }

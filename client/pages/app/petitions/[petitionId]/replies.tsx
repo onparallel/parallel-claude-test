@@ -740,6 +740,9 @@ PetitionReplies.fragments = {
           organization {
             name
             isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+            petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+              limit
+            }
           }
           hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
           ...PetitionRepliesFieldComments_User

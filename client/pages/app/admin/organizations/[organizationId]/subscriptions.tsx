@@ -697,7 +697,7 @@ const _mutations = [
       $orgId: GID!
       $limit: Int!
       $limitName: OrganizationUsageLimitName!
-      $duration: ISO8601Duration!
+      $duration: Duration!
       $startNewPeriod: Boolean!
       $renewalCycles: Int!
     ) {
@@ -718,7 +718,7 @@ const _mutations = [
     mutation AdminOrganizationsSubscriptions_shareSignaturitApiKey(
       $orgId: GID!
       $limit: Int!
-      $duration: ISO8601Duration!
+      $duration: Duration!
     ) {
       shareSignaturitApiKey(orgId: $orgId, limit: $limit, duration: $duration) {
         ...AdminOrganizationsSubscriptions_Organization

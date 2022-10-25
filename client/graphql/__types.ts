@@ -14,8 +14,8 @@ export interface Scalars {
   Float: number;
   /** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
   DateTime: string;
+  Duration: Duration;
   GID: string;
-  ISO8601Duration: string;
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSON: any;
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
@@ -1366,7 +1366,7 @@ export interface MutationsetUserPreferredLocaleArgs {
 }
 
 export interface MutationshareSignaturitApiKeyArgs {
-  duration: Scalars["ISO8601Duration"];
+  duration: Scalars["Duration"];
   limit: Scalars["Int"];
   orgId: Scalars["GID"];
 }
@@ -1480,7 +1480,7 @@ export interface MutationupdateOrganizationTierArgs {
 }
 
 export interface MutationupdateOrganizationUsageDetailsArgs {
-  duration: Scalars["ISO8601Duration"];
+  duration: Scalars["Duration"];
   limit: Scalars["Int"];
   limitName: OrganizationUsageLimitName;
   orgId: Scalars["GID"];
@@ -1834,7 +1834,7 @@ export interface OrganizationUsageLimit {
   cycleNumber: Scalars["Int"];
   id: Scalars["GID"];
   limit: Scalars["Int"];
-  period: Scalars["ISO8601Duration"];
+  period: Scalars["Duration"];
   periodEndDate?: Maybe<Scalars["DateTime"]>;
   periodStartDate: Scalars["DateTime"];
   used: Scalars["Int"];
@@ -4041,7 +4041,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
 export type UpdateOrganizationCurrentUsagePeriodDialog_OrganizationUsageLimitFragment = {
   __typename?: "OrganizationUsageLimit";
   limit: number;
-  period: string;
+  period: Duration;
   periodStartDate: string;
 };
 
@@ -7282,7 +7282,6 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   organization: {
     __typename?: "Organization";
     id: string;
-    isPetitionUsageLimitReached: boolean;
     petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number; used: number } | null;
   };
   accesses: Array<{
@@ -7363,7 +7362,6 @@ export type AddPetitionAccessDialog_createPetitionAccessMutation = {
       organization: {
         __typename?: "Organization";
         id: string;
-        isPetitionUsageLimitReached: boolean;
         petitionsPeriod?: {
           __typename?: "OrganizationUsageLimit";
           limit: number;
@@ -9029,7 +9027,6 @@ export type useSendPetitionHandler_PetitionFragment = {
   organization: {
     __typename?: "Organization";
     id: string;
-    isPetitionUsageLimitReached: boolean;
     petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number; used: number } | null;
   };
 };
@@ -9140,7 +9137,6 @@ export type useSendPetitionHandler_addPetitionPermissionMutation = {
         organization: {
           __typename?: "Organization";
           id: string;
-          isPetitionUsageLimitReached: boolean;
           petitionsPeriod?: {
             __typename?: "OrganizationUsageLimit";
             limit: number;
@@ -12402,7 +12398,7 @@ export type OrganizationUsagePeriodsTable_OrganizationUsageLimitFragment = {
   id: string;
   used: number;
   limit: number;
-  period: string;
+  period: Duration;
   periodStartDate: string;
   periodEndDate?: string | null;
 };
@@ -12415,7 +12411,7 @@ export type OrganizationUsagePeriodsTable_OrganizationUsageLimitPaginationFragme
     id: string;
     used: number;
     limit: number;
-    period: string;
+    period: Duration;
     periodStartDate: string;
     periodEndDate?: string | null;
   }>;
@@ -12489,7 +12485,7 @@ export type AdminOrganizationsSubscriptions_organizationUsagePeriodsQueryQuery =
       items: Array<{
         __typename?: "OrganizationUsageLimit";
         limit: number;
-        period: string;
+        period: Duration;
         periodStartDate: string;
         id: string;
         used: number;
@@ -12500,14 +12496,14 @@ export type AdminOrganizationsSubscriptions_organizationUsagePeriodsQueryQuery =
       __typename?: "OrganizationUsageLimit";
       cycleNumber: number;
       limit: number;
-      period: string;
+      period: Duration;
       periodStartDate: string;
     } | null;
     signaturesPeriod?: {
       __typename?: "OrganizationUsageLimit";
       cycleNumber: number;
       limit: number;
-      period: string;
+      period: Duration;
       periodStartDate: string;
     } | null;
   } | null;
@@ -12533,7 +12529,7 @@ export type AdminOrganizationsSubscriptions_updateOrganizationUsageDetailsMutati
     orgId: Scalars["GID"];
     limit: Scalars["Int"];
     limitName: OrganizationUsageLimitName;
-    duration: Scalars["ISO8601Duration"];
+    duration: Scalars["Duration"];
     startNewPeriod: Scalars["Boolean"];
     renewalCycles: Scalars["Int"];
   }>;
@@ -12551,7 +12547,7 @@ export type AdminOrganizationsSubscriptions_updateOrganizationUsageDetailsMutati
 export type AdminOrganizationsSubscriptions_shareSignaturitApiKeyMutationVariables = Exact<{
   orgId: Scalars["GID"];
   limit: Scalars["Int"];
-  duration: Scalars["ISO8601Duration"];
+  duration: Scalars["Duration"];
 }>;
 
 export type AdminOrganizationsSubscriptions_shareSignaturitApiKeyMutation = {
@@ -14920,7 +14916,6 @@ export type PetitionActivity_PetitionFragment = {
   organization: {
     __typename?: "Organization";
     id: string;
-    isPetitionUsageLimitReached: boolean;
     petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number; used: number } | null;
   };
 };
@@ -14948,6 +14943,7 @@ export type PetitionActivity_QueryFragment = {
       id: string;
       isPetitionUsageLimitReached: boolean;
       iconUrl92?: string | null;
+      petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
@@ -15775,7 +15771,6 @@ export type PetitionActivity_updatePetitionMutation = {
         organization: {
           __typename?: "Organization";
           id: string;
-          isPetitionUsageLimitReached: boolean;
           petitionsPeriod?: {
             __typename?: "OrganizationUsageLimit";
             limit: number;
@@ -16656,7 +16651,6 @@ export type PetitionActivity_petitionQuery = {
         organization: {
           __typename?: "Organization";
           id: string;
-          isPetitionUsageLimitReached: boolean;
           petitionsPeriod?: {
             __typename?: "OrganizationUsageLimit";
             limit: number;
@@ -16693,6 +16687,7 @@ export type PetitionActivity_userQuery = {
       id: string;
       isPetitionUsageLimitReached: boolean;
       iconUrl92?: string | null;
+      petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
@@ -16765,7 +16760,6 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   organization: {
     __typename?: "Organization";
     id: string;
-    isPetitionUsageLimitReached: boolean;
     brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
     petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number; used: number } | null;
   };
@@ -17046,6 +17040,7 @@ export type PetitionCompose_QueryFragment = {
       name: string;
       isPetitionUsageLimitReached: boolean;
       iconUrl92?: string | null;
+      petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       signatureIntegrations: {
         __typename?: "OrgIntegrationPagination";
@@ -17163,7 +17158,6 @@ export type PetitionCompose_updatePetitionMutation = {
         organization: {
           __typename?: "Organization";
           id: string;
-          isPetitionUsageLimitReached: boolean;
           petitionsPeriod?: {
             __typename?: "OrganizationUsageLimit";
             limit: number;
@@ -17647,6 +17641,7 @@ export type PetitionCompose_userQuery = {
       name: string;
       isPetitionUsageLimitReached: boolean;
       iconUrl92?: string | null;
+      petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       signatureIntegrations: {
         __typename?: "OrgIntegrationPagination";
@@ -17740,7 +17735,6 @@ export type PetitionCompose_petitionQuery = {
         organization: {
           __typename?: "Organization";
           id: string;
-          isPetitionUsageLimitReached: boolean;
           brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
           petitionsPeriod?: {
             __typename?: "OrganizationUsageLimit";
@@ -18219,7 +18213,6 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   organization: {
     __typename?: "Organization";
     id: string;
-    isPetitionUsageLimitReached: boolean;
     brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
     petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number; used: number } | null;
   };
@@ -18527,6 +18520,7 @@ export type PetitionPreview_QueryFragment = {
       name: string;
       isPetitionUsageLimitReached: boolean;
       iconUrl92?: string | null;
+      petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       brandTheme: {
         __typename?: "OrganizationBrandThemeData";
         color: string;
@@ -18597,7 +18591,6 @@ export type PetitionPreview_updatePetitionMutation = {
         organization: {
           __typename?: "Organization";
           id: string;
-          isPetitionUsageLimitReached: boolean;
           brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
           petitionsPeriod?: {
             __typename?: "OrganizationUsageLimit";
@@ -18936,7 +18929,6 @@ export type PetitionPreview_completePetitionMutation = {
     organization: {
       __typename?: "Organization";
       id: string;
-      isPetitionUsageLimitReached: boolean;
       brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
       petitionsPeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -19136,7 +19128,6 @@ export type PetitionPreview_petitionQuery = {
         organization: {
           __typename?: "Organization";
           id: string;
-          isPetitionUsageLimitReached: boolean;
           brandTheme: { __typename?: "OrganizationBrandThemeData"; preferredTone: Tone };
           petitionsPeriod?: {
             __typename?: "OrganizationUsageLimit";
@@ -19452,6 +19443,7 @@ export type PetitionPreview_userQuery = {
       name: string;
       isPetitionUsageLimitReached: boolean;
       iconUrl92?: string | null;
+      petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       brandTheme: {
         __typename?: "OrganizationBrandThemeData";
         color: string;
@@ -19834,6 +19826,7 @@ export type PetitionReplies_QueryFragment = {
       id: string;
       isPetitionUsageLimitReached: boolean;
       iconUrl92?: string | null;
+      petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       signatureIntegrations: {
         __typename?: "OrgIntegrationPagination";
@@ -20450,6 +20443,7 @@ export type PetitionReplies_userQuery = {
       id: string;
       isPetitionUsageLimitReached: boolean;
       iconUrl92?: string | null;
+      petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       signatureIntegrations: {
         __typename?: "OrgIntegrationPagination";
@@ -26276,7 +26270,6 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
     }
     organization {
       id
-      isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
       petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
         limit
         used
@@ -26410,6 +26403,9 @@ export const PetitionActivity_QueryFragmentDoc = gql`
       organization {
         name
         isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+        petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+          limit
+        }
       }
       ...useUpdateIsReadNotification_User
       ...useSendPetitionHandler_User
@@ -26883,6 +26879,9 @@ export const PetitionCompose_QueryFragmentDoc = gql`
       ...useSendPetitionHandler_User
       organization {
         isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+        petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+          limit
+        }
       }
       ...PetitionComposeFieldSettings_User
     }
@@ -27266,6 +27265,9 @@ export const PetitionPreview_QueryFragmentDoc = gql`
         id
         name
         isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+        petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+          limit
+        }
         brandTheme {
           ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
         }
@@ -27614,6 +27616,9 @@ export const PetitionReplies_QueryFragmentDoc = gql`
       organization {
         name
         isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+        petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+          limit
+        }
       }
       hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
       ...PetitionRepliesFieldComments_User
@@ -30124,7 +30129,7 @@ export const AdminOrganizationsSubscriptions_updateOrganizationUsageDetailsDocum
     $orgId: GID!
     $limit: Int!
     $limitName: OrganizationUsageLimitName!
-    $duration: ISO8601Duration!
+    $duration: Duration!
     $startNewPeriod: Boolean!
     $renewalCycles: Int!
   ) {
@@ -30148,7 +30153,7 @@ export const AdminOrganizationsSubscriptions_shareSignaturitApiKeyDocument = gql
   mutation AdminOrganizationsSubscriptions_shareSignaturitApiKey(
     $orgId: GID!
     $limit: Int!
-    $duration: ISO8601Duration!
+    $duration: Duration!
   ) {
     shareSignaturitApiKey(orgId: $orgId, limit: $limit, duration: $duration) {
       ...AdminOrganizationsSubscriptions_Organization

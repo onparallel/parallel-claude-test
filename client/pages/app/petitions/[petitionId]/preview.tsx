@@ -619,6 +619,9 @@ PetitionPreview.fragments = {
           id
           name
           isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+          petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+            limit
+          }
           brandTheme {
             ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
           }
