@@ -33,8 +33,8 @@ export const Duration = scalarType({
   name: "Duration",
   asNexusMethod: "duration",
   sourceType: "Duration",
-  serialize: ensureDuration,
-  parseValue: ensureDuration,
+  serialize: (value) => ensureDuration(value, false),
+  parseValue: (value) => ensureDuration(value, true),
   parseLiteral: parseDuration,
   extensions: {
     jsonSchema: DURATION_SCHEMA,

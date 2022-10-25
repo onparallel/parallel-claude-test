@@ -26,6 +26,15 @@ export class ContactRepository extends BaseRepository {
     super(knex);
   }
 
+  async test(duration: Duration) {
+    const [{ x }] = await this.raw<{ x: any }>(
+      `select ? + '1.1 days 3.0004 seconds'::interval as x`,
+      [this.interval(duration)]
+    );
+    console.log(x);
+    return x;
+  }
+
   readonly loadContact = this.buildLoadBy("contact", "id", (q) => q.whereNull("deleted_at"));
 
   readonly loadContactByEmail = fromDataLoader(

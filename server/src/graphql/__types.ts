@@ -1888,6 +1888,7 @@ export interface NexusGenFieldTypes {
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
     task: NexusGenRootTypes["Task"]; // Task!
     templates: NexusGenRootTypes["PetitionBaseOrFolderPagination"]; // PetitionBaseOrFolderPagination!
+    test: NexusGenScalars["Duration"]; // Duration!
     userGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
     userGroups: NexusGenRootTypes["UserGroupPagination"]; // UserGroupPagination!
   };
@@ -3478,6 +3479,7 @@ export interface NexusGenFieldTypeNames {
     tags: "TagPagination";
     task: "Task";
     templates: "PetitionBaseOrFolderPagination";
+    test: "Duration";
     userGroup: "UserGroup";
     userGroups: "UserGroupPagination";
   };
@@ -5063,6 +5065,10 @@ export interface NexusGenArgTypes {
       offset?: number | null; // Int
       path?: string | null; // String
       search?: string | null; // String
+    };
+    test: {
+      // args
+      duration?: NexusGenScalars["Duration"] | null; // Duration
     };
     userGroup: {
       // args

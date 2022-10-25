@@ -21,6 +21,7 @@ import {
   TableCreateTypes as _TableCreateTypes,
   TableTypes as _TableTypes,
 } from "../__types";
+import PostgresInterval from "postgres-interval";
 
 export interface TableTypes
   extends Replace<
@@ -100,24 +101,9 @@ export class BaseRepository {
   }
 
   protected interval(value: Duration) {
-    const isoDurationDate = [
-      value.years ? `${value.years}Y` : null,
-      value.months ? `${value.months}M` : null,
-      value.weeks ? `${value.weeks}W` : null,
-      value.days ? `${value.days}D` : null,
-    ].filter(isDefined);
-
-    const isoDurationTime = [
-      value.hours ? `${value.hours}H` : null,
-      value.minutes ? `${value.minutes}M` : null,
-      value.seconds ? `${value.seconds}S` : null,
-    ].filter(isDefined);
-
     return this.knex.raw(
       "?::interval",
-      `P${isoDurationDate.join("")}${
-        isoDurationTime.length > 0 ? `T${isoDurationTime.join("")}` : ""
-      }`
+      Object.assign(PostgresInterval(), value).toPostgres()
     ) as any;
   }
 

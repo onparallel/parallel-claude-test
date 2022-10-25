@@ -4,6 +4,21 @@ import { CONFIG, Config } from "../config";
 import { ILogger, LOGGER } from "../services/logger";
 import "./helpers/knexExtensions";
 import { TableTypes } from "./__types";
+import pg from "pg";
+import { parse } from "postgres-interval";
+import { isDefined } from "remeda";
+
+pg.types.setTypeParser(pg.types.builtins.INTERVAL, (value: string) => {
+  console.log(">>>>>", value, parse(value));
+  const { milliseconds, seconds, ...rest } = parse(value);
+  if (isDefined(seconds) || isDefined(milliseconds)) {
+    return {
+      ...rest,
+      seconds: (seconds ?? 0) + (milliseconds ?? 0) / 1000,
+    };
+  }
+  return rest;
+});
 
 export const KNEX = Symbol.for("KNEX");
 

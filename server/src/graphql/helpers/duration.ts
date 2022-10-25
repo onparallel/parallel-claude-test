@@ -1,77 +1,72 @@
 import Ajv from "ajv";
-import { Kind, ValueNode } from "graphql";
+import { GraphQLScalarLiteralParser, Kind, ValueNode } from "graphql";
+import { ObjMap } from "graphql/jsutils/ObjMap";
+import { Maybe } from "graphql/jsutils/Maybe";
+import { isDefined } from "remeda";
+
+const KEYS = ["years", "months", "weeks", "days", "hours", "minutes", "seconds"];
 
 export const DURATION_SCHEMA = {
   type: "object",
-  properties: {
-    years: { type: ["number", "null"] },
-    months: { type: ["number", "null"] },
-    weeks: { type: ["number", "null"] },
-    days: { type: ["number", "null"] },
-    hours: { type: ["number", "null"] },
-    minutes: { type: ["number", "null"] },
-    seconds: { type: ["number", "null"] },
-  },
+  properties: Object.fromEntries(KEYS.map((key) => [key, { type: "number" }])),
   additionalProperties: false,
+  anyOf: KEYS.map((key) => ({ required: [key] })),
 };
 
-export function ensureDuration(value: any): object {
+export function ensureDuration(value: any, strict: boolean): Duration {
+  console.log(value);
+  console.log(JSON.stringify(value, null, "  "));
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
-    throw new TypeError(`JSONObject cannot represent non-object value: ${value}`);
+    throw new Error(`Value is not a valid Duration: ${value}`);
   }
-
-  if (Object.keys(value).length === 0) {
-    throw new Error("Expected non empty input.");
-  }
-  // this is to strip all 'PostgresInterval' metadata.
-  // without this the ajv validation will fail on the additionalProperties: false check
-  const duration = Object.assign({}, value);
   const ajv = new Ajv();
-  if (!ajv.validate(DURATION_SCHEMA, duration)) {
-    throw new Error(ajv.errorsText());
+  if (
+    !ajv.validate(
+      { ...DURATION_SCHEMA, additionalProperties: strict === true ? false : true },
+      value
+    )
+  ) {
+    throw new Error(`Value is not a valid Duration: ${value} ${ajv.errorsText()}`);
   }
-
-  return duration;
+  return Object.fromEntries(
+    KEYS.map((key) => [key, value[key]]).filter(([, value]) => isDefined(value))
+  );
 }
 
-export function parseDuration(ast: ValueNode, variables: any) {
+export const parseDuration: GraphQLScalarLiteralParser<Duration> = function parseDuration(
+  ast,
+  variables
+) {
+  console.log(JSON.stringify(ast, null, "  "), variables);
   const value = Object.create(null);
   if (ast.kind !== Kind.OBJECT) {
     throw new Error();
   }
-  ast.fields.forEach((field) => {
-    value[field.name.value] = parseLiteral(field.value, variables);
-  });
-
-  if (Object.keys(value).length === 0) {
-    throw new Error("Expected non empty input.");
+  if (Object.keys(ast.fields).length === 0) {
+    throw new Error(`Invalid Duration object`);
   }
 
-  const ajv = new Ajv();
-  if (!ajv.validate(DURATION_SCHEMA, value)) {
-    throw new Error(ajv.errorsText());
+  for (const field of ast.fields) {
+    const prop = field.name.value;
+    if (!KEYS.includes(prop)) {
+      throw new Error(`Invalid Duration object`);
+    }
+    value[prop] = parseDurationAmount(field.value, variables);
   }
-
   return value;
-}
+};
 
-function parseLiteral(ast: ValueNode, variables: any): any {
+function parseDurationAmount(ast: ValueNode, variables: Maybe<ObjMap<unknown>>): any {
   switch (ast.kind) {
-    case Kind.STRING:
-    case Kind.BOOLEAN:
-      return ast.value;
     case Kind.INT:
     case Kind.FLOAT:
       return parseFloat(ast.value);
-    case Kind.OBJECT:
-      return parseDuration(ast, variables);
-    case Kind.LIST:
-      return ast.values.map((n) => parseLiteral(n, variables));
-    case Kind.NULL:
-      return null;
     case Kind.VARIABLE: {
       const name = ast.name.value;
       return variables ? variables[name] : undefined;
+    }
+    default: {
+      throw new Error(`Invalid Duration object`);
     }
   }
 }
