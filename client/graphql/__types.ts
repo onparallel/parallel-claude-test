@@ -1,3 +1,4 @@
+import { Duration } from "date-fns";
 import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
 import gql from "graphql-tag";
 export type Maybe<T> = T | null;
