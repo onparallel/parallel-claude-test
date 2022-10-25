@@ -17,11 +17,15 @@ type Tier = Omit<OrganizationUsageDetails, "SIGNATURIT_SHARED_APIKEY"> & {
 
 export interface ITiersService {
   updateOrganizationTier(
-    organization: Organization,
+    org: Pick<Organization, "id" | "usage_details">,
     tierKey: string,
     updatedBy: string,
     t?: Knex.Transaction
   ): Promise<Tier>;
+  downgradeOrganizationPetitionSendLimit(
+    org: Pick<Organization, "id" | "usage_details">,
+    updatedBy: string
+  ): Promise<void>;
 }
 
 @injectable()
@@ -69,7 +73,7 @@ export class TiersService implements ITiersService {
   };
 
   async updateOrganizationTier(
-    org: Organization,
+    org: Pick<Organization, "id" | "usage_details">,
     tierKey: string,
     updatedBy: string,
     t?: Knex.Transaction
@@ -108,5 +112,29 @@ export class TiersService implements ITiersService {
     }, t);
 
     return tier;
+  }
+
+  async downgradeOrganizationPetitionSendLimit(
+    org: Pick<Organization, "id" | "usage_details">,
+    updatedBy: string
+  ) {
+    await Promise.all([
+      this.organizations.updateOrganization(
+        org.id,
+        {
+          usage_details: {
+            ...org.usage_details,
+            PETITION_SEND: this.TIERS.FREE.PETITION_SEND,
+          },
+        },
+        updatedBy
+      ),
+      this.organizations.upsertOrganizationUsageLimit(
+        org.id,
+        "PETITION_SEND",
+        this.TIERS.FREE.PETITION_SEND.limit,
+        this.TIERS.FREE.PETITION_SEND.duration
+      ),
+    ]);
   }
 }

@@ -24,7 +24,14 @@ createCronWorker("organization-limits", async (context) => {
         cycle_number: cycleNumber + 1,
       });
     } else if (limit.limit_name === "PETITION_SEND") {
-      // TODO downgrade organization to FREE tier??
+      // downgrade PETITION_SEND limits to FREE tier
+      await context.tiers.downgradeOrganizationPetitionSendLimit(
+        {
+          id: limit.org_id,
+          usage_details: limit.usage_details,
+        },
+        "Worker:OrganizationLimits"
+      );
     }
   }
 });

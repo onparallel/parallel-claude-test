@@ -95,6 +95,7 @@ export class WorkerContext {
     @inject(I18N_SERVICE) public readonly i18n: II18nService,
     @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
     @inject(QUEUES_SERVICE) public readonly queues: IQueuesService,
+    @inject(TIERS_SERVICE) public readonly tiers: ITiersService,
 
     // Repositories
     public readonly contacts: ContactRepository,
