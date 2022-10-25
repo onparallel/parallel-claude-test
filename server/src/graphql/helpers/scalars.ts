@@ -1,8 +1,7 @@
-import { Duration as DateFnsDuration } from "date-fns";
-import { Kind } from "graphql";
 import { GraphQLDateTime, GraphQLJSON, GraphQLJSONObject } from "graphql-scalars";
 import { GraphQLUpload as _GraphQLUpload } from "graphql-upload";
 import { arg, asNexusMethod, core, enumType, scalarType } from "nexus";
+import { DURATION_SCHEMA, ensureDuration, parseDuration } from "./duration";
 
 export const GraphQLUpload = scalarType({
   ..._GraphQLUpload,
@@ -34,26 +33,11 @@ export const Duration = scalarType({
   name: "Duration",
   asNexusMethod: "duration",
   sourceType: "Duration",
-  serialize: (v) => v,
-  parseValue: (v) => v,
-  parseLiteral: (v) => {
-    if (v.kind !== Kind.OBJECT) {
-      throw new Error();
-    }
-    const duration: DateFnsDuration = {};
-    for (const field of v.fields) {
-      if (
-        field.kind !== Kind.OBJECT_FIELD ||
-        field.value.kind !== Kind.INT ||
-        !["years", "months", "weeks", "days", "hours", "minutes", "seconds"].includes(
-          field.name.value
-        )
-      ) {
-        throw new Error();
-      }
-      duration[field.name.value as keyof Duration] = parseInt(field.value.value);
-    }
-    return duration;
+  serialize: ensureDuration,
+  parseValue: ensureDuration,
+  parseLiteral: parseDuration,
+  extensions: {
+    jsonSchema: DURATION_SCHEMA,
   },
 });
 
