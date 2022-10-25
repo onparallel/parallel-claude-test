@@ -74,6 +74,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   const granter = access!.granter!;
   const contact = access!.contact!;
   const signers = petition!.signatureConfig?.signers ?? [];
+  const totalSigners = signers.concat(petition.signatureConfig?.additionalSigners ?? []);
   const recipients = petition!.recipients;
   const message = access!.message;
 
@@ -311,41 +312,27 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                           </Text>
                         ) : (
                           <Text>
-                            {petition.signatureConfig.signers.length > 0 ? (
-                              <FormattedMessage
-                                id="recipient-view.petition-signature-request-sent-alert"
-                                defaultMessage="<b>We have sent the document to sign</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}} in order to finalize the parallel."
-                                values={{
-                                  a: (chunks: any) => (
-                                    <ContactListPopover
-                                      contacts={petition
-                                        .signatureConfig!.signers.slice(1)
-                                        .concat(petition.signatureConfig!.additionalSigners)}
+                            <FormattedMessage
+                              id="recipient-view.petition-signature-request-sent-alert"
+                              defaultMessage="<b>Document sent for signature</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}}."
+                              values={{
+                                a: (chunks: any) => (
+                                  <ContactListPopover contacts={totalSigners.slice(1)}>
+                                    <Text
+                                      display="initial"
+                                      textDecoration="underline"
+                                      color="primary.600"
+                                      cursor="pointer"
                                     >
-                                      <Text
-                                        display="initial"
-                                        textDecoration="underline"
-                                        color="primary.600"
-                                        cursor="pointer"
-                                      >
-                                        {chunks}
-                                      </Text>
-                                    </ContactListPopover>
-                                  ),
-                                  name: petition.signatureConfig.signers[0]!.fullName,
-                                  email: petition.signatureConfig.signers[0]!.email,
-                                  count:
-                                    petition.signatureConfig.signers.length +
-                                    petition.signatureConfig.additionalSigners.length -
-                                    1,
-                                }}
-                              />
-                            ) : (
-                              <FormattedMessage
-                                id="recipient-view.petition-signature-request-sent-alert.unknown-signer"
-                                defaultMessage="<b>We have sent the document to sign</b> to the specified person in order to finalize the parallel."
-                              />
-                            )}
+                                      {chunks}
+                                    </Text>
+                                  </ContactListPopover>
+                                ),
+                                name: totalSigners[0]!.fullName,
+                                email: totalSigners[0]!.email,
+                                count: totalSigners.length - 1,
+                              }}
+                            />
                           </Text>
                         )}
                         <FormattedMessage
