@@ -1,0 +1,37 @@
+diff --git a/node_modules/postgres-interval/index.d.ts b/node_modules/postgres-interval/index.d.ts
+index c7a33be..80eac30 100644
+--- a/node_modules/postgres-interval/index.d.ts
++++ b/node_modules/postgres-interval/index.d.ts
+@@ -1,5 +1,5 @@
+ declare namespace PostgresInterval {
+-  export interface IPostgresInterval {
++  export class PostgresInterval {
+     years: number;
+     months: number;
+     days: number;
+@@ -62,6 +62,16 @@ declare namespace PostgresInterval {
+      */
+     toISOStringShort(): string;
+   }
++
++  export function parse(value: string): {
++    years?: number;
++    months?: number;
++    days?: number;
++    hours?: number;
++    minutes?: number;
++    seconds?: number;
++    milliseconds?: number;
++  }
+ }
+ 
+ /**
+@@ -81,6 +91,7 @@ declare namespace PostgresInterval {
+  *
+  * @param raw A Postgres interval string.
+  */
+-declare function PostgresInterval(raw: string): PostgresInterval.IPostgresInterval;
++
++declare function PostgresInterval(raw?: string): PostgresInterval.PostgresInterval;
+ 
+ export = PostgresInterval;
