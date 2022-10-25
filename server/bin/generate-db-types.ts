@@ -49,6 +49,8 @@ async function generateTypes(dist: string) {
  * Do not make changes to this file directly
  */
 
+import { Duration } from 'date-fns';
+
 type Maybe<T> = T | null;
 
 type PartialProps<T, K extends keyof T = never> = Omit<T, K> & Partial<Pick<T, K>>;
@@ -237,7 +239,6 @@ function getColumnType(type: string, enums: Map<string, DbEnum>): string {
     case "inet":
     case "time":
     case "timetz":
-    case "interval":
     case "name":
       return "string";
     case "int2":
@@ -259,6 +260,8 @@ function getColumnType(type: string, enums: Map<string, DbEnum>): string {
     case "timestamp":
     case "timestamptz":
       return "Date";
+    case "interval":
+      return "Duration";
     default:
       if (enums.has(type)) {
         return enums.get(type)!.name;

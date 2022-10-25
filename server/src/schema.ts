@@ -33,7 +33,10 @@ export const schema = makeSchema({
     paginationPlugin(),
   ],
   sourceTypes: {
-    headers: [`import { FileUpload } from "graphql-upload";`],
+    headers: [
+      `import { FileUpload } from "graphql-upload";`,
+      `import { Duration } from "date-fns";`,
+    ],
     modules: [
       { module: resolve("./db/__types.ts"), alias: "db" },
       { module: resolve("./db/events.ts"), alias: "events" },

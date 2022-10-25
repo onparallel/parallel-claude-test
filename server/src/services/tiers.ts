@@ -43,27 +43,27 @@ export class TiersService implements ITiersService {
   private readonly TIERS: Record<string, Tier> = {
     FREE: {
       USER_LIMIT: 2,
-      PETITION_SEND: { limit: 20, duration: "P1M" },
+      PETITION_SEND: { limit: 20, duration: { months: 1 } },
       FEATURE_FLAGS: [],
     },
     APPSUMO1: {
       USER_LIMIT: 5,
-      PETITION_SEND: { limit: 40, duration: "P1M" },
+      PETITION_SEND: { limit: 40, duration: { months: 1 } },
       FEATURE_FLAGS: this.defaultAppSumoFFs.map((name) => ({ name, value: true })),
     },
     APPSUMO2: {
       USER_LIMIT: 20,
-      PETITION_SEND: { limit: 80, duration: "P1M" },
+      PETITION_SEND: { limit: 80, duration: { months: 1 } },
       FEATURE_FLAGS: this.defaultAppSumoFFs.map((name) => ({ name, value: true })),
     },
     APPSUMO3: {
       USER_LIMIT: 50,
-      PETITION_SEND: { limit: 150, duration: "P1M" },
+      PETITION_SEND: { limit: 150, duration: { months: 1 } },
       FEATURE_FLAGS: this.defaultAppSumoFFs.map((name) => ({ name, value: true })),
     },
     APPSUMO4: {
       USER_LIMIT: 1000,
-      PETITION_SEND: { limit: 300, duration: "P1M" },
+      PETITION_SEND: { limit: 300, duration: { months: 1 } },
       FEATURE_FLAGS: this.defaultAppSumoFFs.map((name) => ({ name, value: true })),
     },
   };

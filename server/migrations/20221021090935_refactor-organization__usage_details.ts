@@ -4,7 +4,7 @@ import { isDefined } from "remeda";
 
 import { OrganizationUsageDetails } from "../src/db/repositories/OrganizationRepository";
 
-function stringToISODuration(value: string) {
+function stringToDuration(value: string) {
   const REGEXP = new RegExp(/(\d*) (years|year|months|month|days|day)/g);
   let i = 0;
   const duration: Duration = {};
@@ -17,32 +17,18 @@ function stringToISODuration(value: string) {
     i++;
   }
 
-  return (
-    "P" +
-    [
-      duration.years ? `${duration.years}Y` : null,
-      duration.months ? `${duration.months}M` : null,
-      duration.days ? `${duration.days}D` : null,
-    ]
-      .filter(isDefined)
-      .join("")
-  );
+  return duration;
 }
 
-function isoDurationToString(duration: string) {
-  // only the part of year, month, day
-  const REGEXP = new RegExp(
-    /P(?:([\d]+\.?[\d]*|\.[\d]+)Y)?(?:([\d]+\.?[\d]*|\.[\d]+)M)?(?:([\d]+\.?[\d]*|\.[\d]+)D)?/g
-  );
-
-  const match = REGEXP.exec(duration);
-  if (match === null) throw new Error("expected match: " + duration);
-  const [, years, months, days] = match;
-
+function durationToString(duration: Duration) {
   return [
-    years ? `${years} years` : null,
-    months ? `${months} months` : null,
-    days ? `${days} days` : null,
+    duration.years ? `${duration.years} years` : null,
+    duration.months ? `${duration.months} months` : null,
+    duration.weeks ? `${duration.weeks} weeks` : null,
+    duration.days ? `${duration.days} days` : null,
+    duration.hours ? `${duration.hours} hours` : null,
+    duration.minutes ? `${duration.minutes} minutes` : null,
+    duration.seconds ? `${duration.seconds} seconds` : null,
   ]
     .filter(isDefined)
     .join(" ");
@@ -61,14 +47,14 @@ export async function up(knex: Knex): Promise<void> {
           ...d.usage_details,
           PETITION_SEND: {
             ...d.usage_details.PETITION_SEND,
-            duration: stringToISODuration((d.usage_details.PETITION_SEND as any).period),
+            duration: stringToDuration((d.usage_details.PETITION_SEND as any).period),
           },
         },
       };
       if (d.usage_details.SIGNATURIT_SHARED_APIKEY) {
         updated.usage_details.SIGNATURIT_SHARED_APIKEY = {
           ...d.usage_details.SIGNATURIT_SHARED_APIKEY,
-          duration: stringToISODuration((d.usage_details.SIGNATURIT_SHARED_APIKEY as any).period),
+          duration: stringToDuration((d.usage_details.SIGNATURIT_SHARED_APIKEY as any).period),
         };
       }
 
@@ -100,14 +86,14 @@ export async function down(knex: Knex): Promise<void> {
           ...d.usage_details,
           PETITION_SEND: {
             ...d.usage_details.PETITION_SEND,
-            period: isoDurationToString(d.usage_details.PETITION_SEND.duration),
+            period: durationToString(d.usage_details.PETITION_SEND.duration),
           },
         },
       };
       if (d.usage_details.SIGNATURIT_SHARED_APIKEY) {
         updated.usage_details.SIGNATURIT_SHARED_APIKEY = {
           ...d.usage_details.SIGNATURIT_SHARED_APIKEY,
-          period: isoDurationToString(d.usage_details.SIGNATURIT_SHARED_APIKEY.duration),
+          period: durationToString(d.usage_details.SIGNATURIT_SHARED_APIKEY.duration),
         } as any;
       }
 

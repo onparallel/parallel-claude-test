@@ -227,6 +227,8 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 """
 scalar DateTime
 
+scalar Duration
+
 """
 The effective permission for a petition and user
 """
@@ -349,8 +351,6 @@ type GroupPermissionRemovedEvent implements PetitionEvent {
   type: PetitionEventType!
   user: User
 }
-
-scalar ISO8601Duration
 
 input ImageOptions {
   resize: ImageOptionsResize
@@ -1323,7 +1323,7 @@ type Mutation {
   Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag.
   """
   shareSignaturitApiKey(
-    duration: ISO8601Duration!
+    duration: Duration!
 
     """
     How many credits allow the org to use in the given period
@@ -1503,7 +1503,7 @@ type Mutation {
   Updates the usage_details of a given organization. Will impact the limits of coming usage periods.
   """
   updateOrganizationUsageDetails(
-    duration: ISO8601Duration!
+    duration: Duration!
 
     """
     How many credits allow the org to use in the given period
@@ -2017,7 +2017,7 @@ type OrganizationUsageLimit {
   cycleNumber: Int!
   id: GID!
   limit: Int!
-  period: ISO8601Duration!
+  period: Duration!
   periodEndDate: DateTime
   periodStartDate: DateTime!
   used: Int!

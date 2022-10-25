@@ -14,7 +14,6 @@ import { or, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { isOwnOrgOrSuperAdmin } from "./authorizers";
-import { parseOrganizationUsageDetails } from "./helpers";
 
 export const OrganizationStatus = enumType({
   name: "OrganizationStatus",
@@ -222,7 +221,7 @@ export const Organization = objectType({
     });
     t.nonNull.jsonObject("usageDetails", {
       authorize: isOwnOrgOrSuperAdmin(),
-      resolve: (o) => parseOrganizationUsageDetails(o.usage_details),
+      resolve: (o) => o.usage_details,
     });
     t.paginationField("usagePeriods", {
       type: "OrganizationUsageLimit",

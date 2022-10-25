@@ -1,4 +1,5 @@
 import DataLoader from "dataloader";
+import { Duration } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { indexBy } from "remeda";
@@ -30,7 +31,7 @@ import { SystemRepository } from "./SystemRepository";
 
 type TUsageDetail = {
   limit: number;
-  duration: string; // ISO 8601 Duration https://en.wikipedia.org/wiki/ISO_8601#Durations
+  duration: Duration;
   renewal_cycles?: Maybe<number>; // null will renew indefinitely
 };
 
@@ -327,14 +328,18 @@ export class OrganizationRepository extends BaseRepository {
     t?: Knex.Transaction
   ) {
     const dataArr = unMaybeArray(data).map((d) => ({ org_id: orgId, ...d }));
-    return await this.insert("organization_usage_limit", dataArr, t);
+    return await this.insert(
+      "organization_usage_limit",
+      dataArr.map((d) => ({ ...d, period: this.interval(d.period) })),
+      t
+    );
   }
 
   async upsertOrganizationUsageLimit(
     orgId: number,
     limitName: OrganizationUsageLimitName,
     limit: number,
-    period: string,
+    duration: Duration,
     t?: Knex.Transaction
   ) {
     return await this.raw(
@@ -349,7 +354,7 @@ export class OrganizationRepository extends BaseRepository {
         this.from("organization_usage_limit").insert({
           org_id: orgId,
           limit_name: limitName,
-          period,
+          period: this.interval(duration),
           limit,
         }),
       ],
@@ -649,7 +654,7 @@ export class OrganizationRepository extends BaseRepository {
     orgId: number,
     limitName: OrganizationUsageLimitName,
     limit: number,
-    duration: string,
+    duration: Duration,
     t?: Knex.Transaction
   ) {
     const currentPeriod = await this.getOrganizationCurrentUsageLimit(orgId, limitName, t);

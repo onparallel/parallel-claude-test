@@ -3,6 +3,8 @@
  * Do not make changes to this file directly
  */
 
+import { Duration } from "date-fns";
+
 type Maybe<T> = T | null;
 
 type PartialProps<T, K extends keyof T = never> = Omit<T, K> & Partial<Pick<T, K>>;
@@ -717,7 +719,7 @@ export interface OrganizationUsageLimit {
   limit_name: OrganizationUsageLimitName; // organization_usage_limit_name
   limit: number; // int4
   used: number; // int4
-  period: string; // interval
+  period: Duration; // interval
   period_start_date: Date; // timestamptz
   period_end_date: Maybe<Date>; // timestamptz
   cycle_number: number; // int4

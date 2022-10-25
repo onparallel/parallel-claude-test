@@ -888,7 +888,7 @@ export class Mocks {
     limit: number
   ) {
     const [row] = await this.knex<OrganizationUsageLimit>("organization_usage_limit")
-      .insert({ limit, limit_name: limitName, org_id: orgId, period: "1 month" })
+      .insert({ limit, limit_name: limitName, org_id: orgId, period: "P1M" as any })
       .returning("*");
     return row;
   }

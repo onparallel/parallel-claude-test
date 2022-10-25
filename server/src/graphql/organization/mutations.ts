@@ -386,7 +386,7 @@ export const updateOrganizationUsageDetails = mutationField("updateOrganizationU
     limit: nonNull(
       intArg({ description: "How many credits allow the org to use in the given period" })
     ),
-    duration: nonNull("ISO8601Duration"),
+    duration: nonNull("Duration"),
     renewalCycles: nonNull(
       intArg({
         description:
@@ -455,7 +455,7 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
     limit: nonNull(
       intArg({ description: "How many credits allow the org to use in the given period" })
     ),
-    duration: nonNull("ISO8601Duration"),
+    duration: nonNull("Duration"),
   },
   authorize: authenticateAnd(userIsSuperAdmin()),
   resolve: async (_, { orgId, duration, limit }, ctx) => {

@@ -14,8 +14,8 @@ export type Scalars = {
   Float: number;
   /** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
   DateTime: string;
+  Duration: Duration;
   GID: string;
-  ISO8601Duration: string;
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSON: any;
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
@@ -1332,7 +1332,7 @@ export type MutationsetUserPreferredLocaleArgs = {
 };
 
 export type MutationshareSignaturitApiKeyArgs = {
-  duration: Scalars["ISO8601Duration"];
+  duration: Scalars["Duration"];
   limit: Scalars["Int"];
   orgId: Scalars["GID"];
 };
@@ -1446,7 +1446,7 @@ export type MutationupdateOrganizationTierArgs = {
 };
 
 export type MutationupdateOrganizationUsageDetailsArgs = {
-  duration: Scalars["ISO8601Duration"];
+  duration: Scalars["Duration"];
   limit: Scalars["Int"];
   limitName: OrganizationUsageLimitName;
   orgId: Scalars["GID"];
@@ -1660,6 +1660,7 @@ export type Organization = Timestamps & {
   id: Scalars["GID"];
   /** A paginated list with enabled integrations for the organization */
   integrations: OrgIntegrationPagination;
+  isUsageLimitReached: Scalars["Boolean"];
   /** Current license for the organization */
   license: Maybe<OrgLicense>;
   /** URL of the organization logo */
@@ -1694,6 +1695,11 @@ export type OrganizationintegrationsArgs = {
   limit?: InputMaybe<Scalars["Int"]>;
   offset?: InputMaybe<Scalars["Int"]>;
   type?: InputMaybe<IntegrationType>;
+};
+
+/** An organization in the system. */
+export type OrganizationisUsageLimitReachedArgs = {
+  limitName: OrganizationUsageLimitName;
 };
 
 /** An organization in the system. */
@@ -1787,7 +1793,7 @@ export type OrganizationUsageLimit = {
   cycleNumber: Scalars["Int"];
   id: Scalars["GID"];
   limit: Scalars["Int"];
-  period: Scalars["ISO8601Duration"];
+  period: Scalars["Duration"];
   periodEndDate: Maybe<Scalars["DateTime"]>;
   periodStartDate: Scalars["DateTime"];
   used: Scalars["Int"];
@@ -2590,7 +2596,7 @@ export type PetitionSignatureRequestStatus =
   | "PROCESSED"
   | "PROCESSING";
 
-/** Filters petitions by the status of its latest eSignature. */
+/** Filters petitions by the status of its latest eSignature request. */
 export type PetitionSignatureStatusFilter =
   /** Petitions with cancelled eSignatures. Request errors, user cancels, signer declines, etc... */
   | "CANCELLED"
@@ -2598,7 +2604,7 @@ export type PetitionSignatureStatusFilter =
   | "COMPLETED"
   /** Petitions with configured eSignature that have not yet been started (petition is PENDING). */
   | "NOT_STARTED"
-  /** Petitions with no eSignature configured. */
+  /** Petitions with no eSignature configured and no past eSignature requests. */
   | "NO_SIGNATURE"
   /** Completed petitions with configured signatures to be started after user reviews the replies. Need to manually start the eSignature. */
   | "PENDING_START"

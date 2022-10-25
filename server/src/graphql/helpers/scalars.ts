@@ -1,3 +1,5 @@
+import { Duration as DateFnsDuration } from "date-fns";
+import { Kind } from "graphql";
 import { GraphQLDateTime, GraphQLJSON, GraphQLJSONObject } from "graphql-scalars";
 import { GraphQLUpload as _GraphQLUpload } from "graphql-upload";
 import { arg, asNexusMethod, core, enumType, scalarType } from "nexus";
@@ -28,23 +30,35 @@ export function datetimeArg(opts?: Omit<core.NexusArgConfig<"DateTime">, "type">
   return arg({ ...opts, type: "DateTime" });
 }
 
-const ISO_DURATION_REGEX =
-  /P(?:([\d]+\.?[\d]*|\.[\d]+)Y)?(?:([\d]+\.?[\d]*|\.[\d]+)M)?(?:([\d]+\.?[\d]*|\.[\d]+)W)?(?:([\d]+\.?[\d]*|\.[\d]+)D)?(?:T(?:([\d]+\.?[\d]*|\.[\d]+)H)?(?:([\d]+\.?[\d]*|\.[\d]+)M)?(?:([\d]+\.?[\d]*|\.[\d]+)S)?)?$/;
-export const ISO8601Duration = scalarType({
-  name: "ISO8601Duration",
+export const Duration = scalarType({
+  name: "Duration",
   asNexusMethod: "duration",
-  sourceType: "string",
+  sourceType: "Duration",
+  serialize: (v) => v,
+  parseValue: (v) => v,
   parseLiteral: (v) => {
-    if (v.kind !== "StringValue" || !v.value.match(ISO_DURATION_REGEX)) {
+    if (v.kind !== Kind.OBJECT) {
       throw new Error();
     }
-    return v.value;
+    const duration: DateFnsDuration = {};
+    for (const field of v.fields) {
+      if (
+        field.kind !== Kind.OBJECT_FIELD ||
+        field.value.kind !== Kind.INT ||
+        !["years", "months", "weeks", "days", "hours", "minutes", "seconds"].includes(
+          field.name.value
+        )
+      ) {
+        throw new Error();
+      }
+      duration[field.name.value as keyof Duration] = parseInt(field.value.value);
+    }
+    return duration;
   },
-  parseValue: (v) => v,
 });
 
-export function iso8601DurationArg(opts?: Omit<core.NexusArgConfig<"ISO8601Duration">, "type">) {
-  return arg({ ...opts, type: "ISO8601Duration" });
+export function durationArg(opts?: Omit<core.NexusArgConfig<"Duration">, "type">) {
+  return arg({ ...opts, type: "Duration" });
 }
 
 export const Success = enumType({

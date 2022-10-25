@@ -1,4 +1,5 @@
 import { FileUpload } from "graphql-upload";
+import { Duration } from "date-fns";
 import type * as db from "./../db/__types";
 import type * as events from "./../db/events";
 import type * as notifications from "./../db/notifications";
@@ -37,7 +38,7 @@ declare global {
     duration<FieldName extends string>(
       fieldName: FieldName,
       opts?: core.CommonInputFieldConfig<TypeName, FieldName>
-    ): void; // "ISO8601Duration";
+    ): void; // "Duration";
     globalId<FieldName extends string>(
       fieldName: FieldName,
       opts: GlobalIdInputFieldConfig<TypeName, FieldName>
@@ -70,7 +71,7 @@ declare global {
     duration<FieldName extends string>(
       fieldName: FieldName,
       ...opts: core.ScalarOutSpread<TypeName, FieldName>
-    ): void; // "ISO8601Duration";
+    ): void; // "Duration";
     globalId<FieldName extends string>(
       fieldName: FieldName,
       ...opts: GlobalIdOutputFieldConfigSpread<TypeName, FieldName>
@@ -348,8 +349,8 @@ export interface NexusGenScalars {
   Boolean: boolean;
   ID: string;
   DateTime: Date;
+  Duration: Duration;
   GID: number;
-  ISO8601Duration: string;
   JSON: any;
   JSONObject: { [key: string]: any };
   Upload: Promise<FileUpload>;
@@ -1237,7 +1238,7 @@ export interface NexusGenFieldTypes {
     cycleNumber: number; // Int!
     id: NexusGenScalars["GID"]; // GID!
     limit: number; // Int!
-    period: NexusGenScalars["ISO8601Duration"]; // ISO8601Duration!
+    period: NexusGenScalars["Duration"]; // Duration!
     periodEndDate: NexusGenScalars["DateTime"] | null; // DateTime
     periodStartDate: NexusGenScalars["DateTime"]; // DateTime!
     used: number; // Int!
@@ -2827,7 +2828,7 @@ export interface NexusGenFieldTypeNames {
     cycleNumber: "Int";
     id: "GID";
     limit: "Int";
-    period: "ISO8601Duration";
+    period: "Duration";
     periodEndDate: "DateTime";
     periodStartDate: "DateTime";
     used: "Int";
@@ -4563,7 +4564,7 @@ export interface NexusGenArgTypes {
     };
     shareSignaturitApiKey: {
       // args
-      duration: NexusGenScalars["ISO8601Duration"]; // ISO8601Duration!
+      duration: NexusGenScalars["Duration"]; // Duration!
       limit: number; // Int!
       orgId: NexusGenScalars["GID"]; // GID!
     };
@@ -4677,7 +4678,7 @@ export interface NexusGenArgTypes {
     };
     updateOrganizationUsageDetails: {
       // args
-      duration: NexusGenScalars["ISO8601Duration"]; // ISO8601Duration!
+      duration: NexusGenScalars["Duration"]; // Duration!
       limit: number; // Int!
       limitName: NexusGenEnums["OrganizationUsageLimitName"]; // OrganizationUsageLimitName!
       orgId: NexusGenScalars["GID"]; // GID!

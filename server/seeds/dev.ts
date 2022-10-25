@@ -38,11 +38,11 @@ export async function seed(knex: Knex): Promise<any> {
           USER_LIMIT: 100,
           PETITION_SEND: {
             limit: 5000,
-            duration: "P1M",
+            duration: { months: 1 },
           },
           SIGNATURIT_SHARED_APIKEY: {
             limit: 5000,
-            duration: "P1M",
+            duration: { months: 1 },
           },
         },
       },
@@ -129,14 +129,14 @@ export async function seed(knex: Knex): Promise<any> {
       org_id: orgIds[0],
       limit_name: "PETITION_SEND",
       limit: 5000,
-      period: "1 month",
+      period: "P1M" as any,
       used: 0,
     },
     {
       org_id: orgIds[0],
       limit_name: "SIGNATURIT_SHARED_APIKEY",
       limit: 5000,
-      period: "1 month",
+      period: "P1M" as any,
       used: 0,
     },
   ]);

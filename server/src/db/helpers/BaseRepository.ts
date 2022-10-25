@@ -1,4 +1,5 @@
 import DataLoader from "dataloader";
+import { Duration } from "date-fns";
 import { injectable } from "inversify";
 import { Knex } from "knex";
 import { groupBy, indexBy, isDefined, times } from "remeda";
@@ -96,6 +97,28 @@ export class BaseRepository {
 
   protected json(value: any) {
     return this.knex.raw("?::jsonb", JSON.stringify(value)) as any;
+  }
+
+  protected interval(value: Duration) {
+    const isoDurationDate = [
+      value.years ? `${value.years}Y` : null,
+      value.months ? `${value.months}M` : null,
+      value.weeks ? `${value.weeks}W` : null,
+      value.days ? `${value.days}D` : null,
+    ].filter(isDefined);
+
+    const isoDurationTime = [
+      value.hours ? `${value.hours}H` : null,
+      value.minutes ? `${value.minutes}M` : null,
+      value.seconds ? `${value.seconds}S` : null,
+    ].filter(isDefined);
+
+    return this.knex.raw(
+      "?::interval",
+      `P${isoDurationDate.join("")}${
+        isoDurationTime.length > 0 ? `T${isoDurationTime.join("")}` : ""
+      }`
+    ) as any;
   }
 
   protected from<TName extends TableNames>(tableName: TName, transaction?: Knex.Transaction) {
