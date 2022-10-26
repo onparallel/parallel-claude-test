@@ -101,7 +101,7 @@ export const PetitionUserNotification = Object.assign(
                 as="div"
                 position="relative"
                 paddingX={4}
-                isTruncated
+                noOfLines={1}
                 fontSize="sm"
                 minWidth="0"
                 fontWeight={petition.name ? "bold" : "normal"}

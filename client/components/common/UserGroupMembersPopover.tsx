@@ -62,7 +62,7 @@ export function UserGroupMembersPopover({ userGroupId, children }: UserGroupMemb
                   {group.members.map(({ user }) => (
                     <Flex key={user.id} as={ListItem} alignItems="center" paddingX={3}>
                       <UserAvatar size="xs" user={user} />
-                      <Text flex="1" marginLeft={2} isTruncated>
+                      <Text flex="1" marginLeft={2} noOfLines={1} wordBreak="break-all">
                         {user.fullName}
                       </Text>
                     </Flex>

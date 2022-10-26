@@ -63,7 +63,7 @@ export function FieldErrorDialog({
                   isTooltipDisabled
                   flexShrink={0}
                 />
-                <Box marginLeft={2} flex="1" minWidth="0" isTruncated>
+                <Box marginLeft={2} flex="1" minWidth="0" noOfLines={1} wordBreak="break-all">
                   {field.title ? (
                     field.title
                   ) : (

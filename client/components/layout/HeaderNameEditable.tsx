@@ -61,7 +61,12 @@ export const HeaderNameEditable = Object.assign(
             <>
               <Flex flex="1 1 auto" minWidth={0} padding={1}>
                 {isReadOnly ? (
-                  <Text color={name ? "default" : "gray.400"} paddingX={2} isTruncated>
+                  <Text
+                    color={name ? "default" : "gray.400"}
+                    paddingX={2}
+                    noOfLines={1}
+                    wordBreak="break-all"
+                  >
                     {name || props.placeholder}
                   </Text>
                 ) : (
@@ -81,7 +86,8 @@ export const HeaderNameEditable = Object.assign(
                           paddingY={1}
                           paddingX={2}
                           display="block"
-                          isTruncated
+                          noOfLines={1}
+                          wordBreak="break-all"
                         />
                         <EditableInput
                           paddingY={1}

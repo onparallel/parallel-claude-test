@@ -253,7 +253,8 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
             as="div"
             flex="1"
             minWidth={0}
-            isTruncated
+            noOfLines={1}
+            wordBreak="break-all"
             opacity={isVisible ? 1 : 0.6}
             paddingY={1}
           >

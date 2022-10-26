@@ -33,7 +33,9 @@ export function TemplateDefaultUserGroupPermissionRow({
       <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
         <Stack direction={"row"} spacing={2} align="center">
           <UsersIcon />
-          <Text isTruncated>{group.name}</Text>
+          <Text noOfLines={1} wordBreak="break-all">
+            {group.name}
+          </Text>
         </Stack>
         <Flex
           role="group"
@@ -42,7 +44,7 @@ export function TemplateDefaultUserGroupPermissionRow({
           alignItems="center"
         >
           <UserGroupMembersPopover userGroupId={group.id}>
-            <Text color="gray.500" cursor="default" isTruncated>
+            <Text color="gray.500" cursor="default" noOfLines={1}>
               <FormattedMessage
                 id="generic.n-group-members"
                 defaultMessage="{count, plural, =1 {1 member} other {# members}}"

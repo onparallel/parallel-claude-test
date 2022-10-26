@@ -112,7 +112,7 @@ const SingleValue = rsComponent("SingleValue", function (props) {
   return (
     <components.SingleValue {...props}>
       <HStack>
-        <Box flex="1" minWidth={0} isTruncated>
+        <Box flex="1" minWidth={0} whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
           {props.data.name}
         </Box>
         {props.data.isDefault ? (
@@ -129,7 +129,7 @@ const Option = rsComponent("Option", function ({ children, ...props }) {
   return (
     <components.Option {...props}>
       <HStack>
-        <Box flex="1" minWidth={0} isTruncated>
+        <Box flex="1" minWidth={0} noOfLines={1} wordBreak="break-all">
           {props.data.name}
         </Box>
         {props.data.isDefault ? (

@@ -379,7 +379,7 @@ export function PetitionSharingDialog({
               </FormControl>
             </Flex>
             <Stack display={hasUsers ? "flex" : "none"}>
-              <Checkbox {...register("notify")} colorScheme="primary" defaultIsChecked>
+              <Checkbox {...register("notify")} colorScheme="primary" defaultChecked>
                 <FormattedMessage
                   id="petition-sharing.notify-checkbox"
                   defaultMessage="Notify users"
@@ -400,7 +400,7 @@ export function PetitionSharingDialog({
                 />
               </PaddedCollapse>
               {!isTemplate ? (
-                <Checkbox {...register("subscribe")} colorScheme="primary" defaultIsChecked>
+                <Checkbox {...register("subscribe")} colorScheme="primary" defaultChecked>
                   <FormattedMessage
                     id="component.petition-sharing-dialog.subscribe"
                     defaultMessage="Subscribe to notifications"
@@ -419,7 +419,7 @@ export function PetitionSharingDialog({
                 <Flex key={user.id} alignItems="center">
                   <UserAvatar role="presentation" user={user} size="sm" />
                   <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
-                    <Text isTruncated>
+                    <Text noOfLines={1} wordBreak="break-all">
                       {user.fullName}{" "}
                       {userId === user.id ? (
                         <Text as="span">
@@ -429,7 +429,7 @@ export function PetitionSharingDialog({
                         </Text>
                       ) : null}
                     </Text>
-                    <Text color="gray.500" isTruncated>
+                    <Text color="gray.500" noOfLines={1}>
                       {user.email}
                     </Text>
                   </Box>
@@ -518,7 +518,9 @@ export function PetitionSharingDialog({
                     <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
                       <Stack direction={"row"} spacing={2} align="center">
                         <UsersIcon />
-                        <Text isTruncated>{group.name} </Text>
+                        <Text noOfLines={1} wordBreak="break-all">
+                          {group.name}
+                        </Text>
                       </Stack>
                       <Flex
                         role="group"
@@ -527,7 +529,7 @@ export function PetitionSharingDialog({
                         alignItems="center"
                       >
                         <UserGroupMembersPopover userGroupId={group.id}>
-                          <Text color="gray.500" cursor="default" isTruncated>
+                          <Text color="gray.500" cursor="default" noOfLines={1}>
                             <FormattedMessage
                               id="generic.n-group-members"
                               defaultMessage="{count, plural, =1 {1 member} other {# members}}"

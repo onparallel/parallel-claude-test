@@ -505,10 +505,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 leftIcon={<CheckIcon />}
                 onClick={handleClosePetition}
               >
-                <FormattedMessage
-                  id="petition-replies.finalize-petition.button"
-                  defaultMessage="Close parallel"
-                />
+                <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
+                  <FormattedMessage
+                    id="petition-replies.finalize-petition.button"
+                    defaultMessage="Close parallel"
+                  />
+                </Text>
               </Button>
             )}
             {petition.status !== "CLOSED" ||

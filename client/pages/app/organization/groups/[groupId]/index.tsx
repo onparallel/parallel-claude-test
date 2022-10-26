@@ -450,7 +450,8 @@ function EditableHeading({ isDisabled, value, onChange }: EditableHeadingProps) 
             _hover={{
               borderColor: "gray.300",
             }}
-            isTruncated
+            noOfLines={1}
+            wordBreak="break-all"
             maxWidth={655}
           />
 

@@ -45,7 +45,7 @@ export function UserListPopover({
                   {u.__typename === "User" ? (
                     <>
                       <UserAvatar size="xs" user={u} />
-                      <Text flex="1" marginLeft={2} isTruncated>
+                      <Text flex="1" marginLeft={2} noOfLines={1} wordBreak="break-all">
                         {u.fullName}
                       </Text>
                     </>
@@ -56,7 +56,7 @@ export function UserListPopover({
                         backgroundColor="gray.200"
                         icon={<UsersIcon boxSize={3.5} />}
                       />
-                      <Text flex="1" marginLeft={2} isTruncated>
+                      <Text flex="1" marginLeft={2} noOfLines={1} wordBreak="break-all">
                         {u.name}
                       </Text>
                     </>

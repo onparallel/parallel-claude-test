@@ -152,7 +152,12 @@ export const PetitionRepliesField = Object.assign(
           />
         </Center>
         <HStack gridArea="heading" alignItems="center" minWidth={0}>
-          <Heading size="md" isTruncated {...(field.title ? {} : { textStyle: "hint" })}>
+          <Heading
+            size="md"
+            noOfLines={1}
+            wordBreak="break-all"
+            {...(field.title ? {} : { textStyle: "hint" })}
+          >
             {field.isInternal ? (
               <InternalFieldBadge marginRight={1.5} position="relative" top="-2px" />
             ) : null}

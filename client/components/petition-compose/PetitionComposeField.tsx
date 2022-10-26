@@ -550,7 +550,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
               id: "component.petition-compose-field.field-title-label",
               defaultMessage: "Field title",
             })}
-            isTruncated
+            noOfLines={1}
             placeholder={
               field.type === "HEADING"
                 ? intl.formatMessage({

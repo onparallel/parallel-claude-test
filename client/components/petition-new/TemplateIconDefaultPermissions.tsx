@@ -38,7 +38,7 @@ export function TemplateIconDefaultPermissions({
                   {p.__typename === "TemplateDefaultUserPermission" ? (
                     <>
                       <UserAvatar size="xs" user={p.user} />
-                      <Text flex="1" marginLeft={2} isTruncated>
+                      <Text flex="1" marginLeft={2} noOfLines={1} wordBreak="break-all">
                         {p.user.fullName}{" "}
                         <Text as="span" fontSize="xs" color="gray.600">
                           ({permissionType})
@@ -52,7 +52,7 @@ export function TemplateIconDefaultPermissions({
                         backgroundColor="gray.200"
                         icon={<UsersIcon boxSize={3.5} />}
                       />
-                      <Text flex="1" marginLeft={2} isTruncated>
+                      <Text flex="1" marginLeft={2} noOfLines={1} wordBreak="break-all">
                         {p.group.name}{" "}
                         <Text as="span" fontSize="xs" color="gray.600">
                           ({permissionType})

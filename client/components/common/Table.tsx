@@ -588,7 +588,7 @@ export function DefaultHeader({
         alignItems="center"
         justifyContent={toFlexAlignment(column.align) ?? "flex-start"}
       >
-        <Text as="div" isTruncated>
+        <Text as="div" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
           {column.header}
         </Text>
         {column.isFilterable ? (

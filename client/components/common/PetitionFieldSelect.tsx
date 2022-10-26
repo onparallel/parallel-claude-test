@@ -150,7 +150,16 @@ const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
           isTooltipDisabled
           flexShrink={0}
         />
-        <Box fontSize="sm" marginLeft={2} paddingRight={1} flex="1" minWidth="0" isTruncated>
+        <Box
+          fontSize="sm"
+          marginLeft={2}
+          paddingRight={1}
+          flex="1"
+          minWidth="0"
+          whiteSpace="nowrap"
+          overflow="hidden"
+          textOverflow="ellipsis"
+        >
           {field.title ? (
             <HighlightText as="span" search={highlight}>
               {field.title}
@@ -189,7 +198,9 @@ const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
           paddingRight={1}
           flex="1"
           minWidth="0"
-          isTruncated
+          whiteSpace="nowrap"
+          overflow="hidden"
+          textOverflow="ellipsis"
         >
           {label}
         </HighlightText>

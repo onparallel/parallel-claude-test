@@ -183,7 +183,9 @@ export const RecipientViewContentsCard = Object.assign(
                         />
                         <Box
                           flex="1"
-                          isTruncated
+                          overflow="hidden"
+                          textOverflow="ellipsis"
+                          whiteSpace="nowrap"
                           {...(title ? {} : { textStyle: "hint", fontWeight: "normal" })}
                         >
                           {title || (
@@ -231,7 +233,9 @@ export const RecipientViewContentsCard = Object.assign(
                               >
                                 <Box
                                   flex="1"
-                                  isTruncated
+                                  overflow="hidden"
+                                  textOverflow="ellipsis"
+                                  whiteSpace="nowrap"
                                   {...(field.title
                                     ? {
                                         color: field.replies.some((r) => r.status === "REJECTED")

@@ -1,4 +1,4 @@
-import { Box, Button, Stack } from "@chakra-ui/react";
+import { Box, Button, Stack, Text } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -37,11 +37,11 @@ export function OrganizationGroupsListTableHeader({
       />
       <WhenOrgRole role="ADMIN">
         <Spacer />
-        <Box>
-          <Button colorScheme="primary" onClick={onCreateGroup}>
+        <Button colorScheme="primary" onClick={onCreateGroup}>
+          <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
             <FormattedMessage id="organization-groups.create-group" defaultMessage="Create team" />
-          </Button>
-        </Box>
+          </Text>
+        </Button>
       </WhenOrgRole>
     </Stack>
   );

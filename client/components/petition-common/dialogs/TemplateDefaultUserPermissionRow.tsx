@@ -46,7 +46,7 @@ export function TemplateDefaultUserPermissionRow({
       <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
         {isDefined(permission) ? (
           <>
-            <Text isTruncated>
+            <Text noOfLines={1} wordBreak="break-all">
               {permission.user.fullName}{" "}
               {userId === permission.user.id ? (
                 <Text as="span">
@@ -56,7 +56,7 @@ export function TemplateDefaultUserPermissionRow({
                 </Text>
               ) : null}
             </Text>
-            <Text color="gray.500" isTruncated>
+            <Text color="gray.500" noOfLines={1}>
               {permission.user.email}
             </Text>
           </>

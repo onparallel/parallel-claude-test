@@ -17,7 +17,7 @@ interface UserSelectOptionProps {
 export function UserSelectOption({ data, highlight, isDisabled }: UserSelectOptionProps) {
   const intl = useIntl();
   return data.__typename === "User" ? (
-    <Box verticalAlign="baseline" isTruncated>
+    <Box verticalAlign="baseline" noOfLines={1} wordBreak="break-all">
       {data.fullName ? (
         <>
           <HighlightText search={highlight} as="span">

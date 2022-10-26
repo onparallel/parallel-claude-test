@@ -37,7 +37,14 @@ export const OverflownText = chakraForwardRef<"div", OverflownTextProps>(functio
 
   return (
     <Tooltip label={children} isDisabled={!children || !isOverflown}>
-      <Box position="relative" isTruncated ref={_ref} {...props}>
+      <Box
+        position="relative"
+        whiteSpace="nowrap"
+        overflow="hidden"
+        textOverflow="ellipsis"
+        ref={_ref}
+        {...props}
+      >
         <ResizeObserver onResize={handleResize} />
         {children}
       </Box>

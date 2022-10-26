@@ -58,7 +58,7 @@ export function ContactListHeader({
         variant="outline"
         onClick={onImportClick}
       >
-        <Text as="span" isTruncated>
+        <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
           <FormattedMessage
             id="component.contact-list-header.import-contacts-button"
             defaultMessage="Import contacts"

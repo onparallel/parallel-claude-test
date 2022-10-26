@@ -42,7 +42,7 @@ export function OrganizationGroupListTableHeader({
           leftIcon={<UserPlusIcon fontSize="18px" />}
           onClick={onAddMember}
         >
-          <Text as="span" isTruncated>
+          <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
             <FormattedMessage id="organization-groups.add-user" defaultMessage="Add user" />
           </Text>
         </Button>
