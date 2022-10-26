@@ -14,8 +14,6 @@ export const DURATION_SCHEMA = {
 };
 
 export function ensureDuration(value: any, strict: boolean): Duration {
-  console.log(value);
-  console.log(JSON.stringify(value, null, "  "));
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     throw new Error(`Value is not a valid Duration: ${value}`);
   }
@@ -37,7 +35,6 @@ export const parseDuration: GraphQLScalarLiteralParser<Duration> = function pars
   ast,
   variables
 ) {
-  console.log(JSON.stringify(ast, null, "  "), variables);
   const value = Object.create(null);
   if (ast.kind !== Kind.OBJECT) {
     throw new Error();

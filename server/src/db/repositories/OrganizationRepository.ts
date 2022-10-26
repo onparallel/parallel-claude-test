@@ -424,7 +424,7 @@ export class OrganizationRepository extends BaseRepository {
       if (usage.used - credits < value && usage.used >= value) {
         const [{ period_end_date: periodEndDate }] = await this.raw<{ period_end_date: Date }>(
           `select (?::timestamptz + ?::interval) as period_end_date;`,
-          [usage.period_start_date, usage.period],
+          [usage.period_start_date, this.interval(usage.period)],
           t
         );
         await this.emails.sendOrganizationLimitsReachedEmail(orgId, limitName, usage.used, t);
