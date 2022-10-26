@@ -5,7 +5,6 @@ import { getClientIp } from "request-ip";
 import { UAParser } from "ua-parser-js";
 import { authenticate, chain, checkClientServerToken, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { durationArg } from "../helpers/scalars";
 import { NexusGenObjects } from "../__types";
 import {
   authenticatePublicAccess,
@@ -22,17 +21,6 @@ export const accessQuery = queryField("access", {
   authorize: authenticatePublicAccess("keycode"),
   resolve: async (root, args, ctx) => {
     return ctx.access!;
-  },
-});
-
-export const test = queryField("test", {
-  type: "Duration",
-  args: {
-    duration: durationArg(),
-  },
-  resolve: async (_, args, ctx) => {
-    console.log(args.duration);
-    return await ctx.contacts.test(args.duration!);
   },
 });
 

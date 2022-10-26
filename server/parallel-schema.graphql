@@ -4437,7 +4437,6 @@ type Query {
     """
     search: String
   ): PetitionBaseOrFolderPagination!
-  test(duration: Duration): Duration!
   userGroup(id: GID!): UserGroup
 
   """

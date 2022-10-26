@@ -9,7 +9,6 @@ import { parse } from "postgres-interval";
 import { isDefined } from "remeda";
 
 pg.types.setTypeParser(pg.types.builtins.INTERVAL, (value: string) => {
-  console.log(">>>>>", value, parse(value));
   const { milliseconds, seconds, ...rest } = parse(value);
   if (isDefined(seconds) || isDefined(milliseconds)) {
     return {
