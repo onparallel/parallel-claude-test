@@ -123,6 +123,7 @@ export const AppLayout = Object.assign(
         company: {
           id: me.organization.id,
           name: me.organization.name,
+          petitionsSubscriptionEndDate: me.organization.petitionsSubscriptionEndDate,
         },
       });
     }, [me.id]);
@@ -283,6 +284,11 @@ export const AppLayout = Object.assign(
             createdAt
             role
             lastActiveAt
+            organization {
+              id
+              name
+              petitionsSubscriptionEndDate: subscriptionEndDate(limitName: PETITION_SEND)
+            }
           }
           ...AppLayoutNavbar_Query
         }

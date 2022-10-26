@@ -4035,6 +4035,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
       __typename?: "Organization";
       name: string;
       id: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -4728,6 +4729,7 @@ export type AppLayout_QueryFragment = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -4912,6 +4914,7 @@ export type PetitionLayout_QueryFragment = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -4968,6 +4971,7 @@ export type SettingsLayout_QueryFragment = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -12354,6 +12358,7 @@ export type Admin_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -12408,6 +12413,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
       __typename?: "Organization";
       name: string;
       id: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -12526,6 +12532,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     email: string;
     createdAt: string;
     role: OrganizationRole;
+    lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -12533,6 +12540,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
       __typename?: "Organization";
       name: string;
       id: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -12770,6 +12778,7 @@ export type AdminOrganizationsMembers_queryQuery = {
       __typename?: "Organization";
       name: string;
       id: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -12902,6 +12911,7 @@ export type AdminOrganizations_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -12964,6 +12974,7 @@ export type AdminSupportMethods_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -13218,6 +13229,7 @@ export type Contact_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -13372,6 +13384,7 @@ export type Contacts_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -13448,6 +13461,7 @@ export type OrganizationBranding_userQuery = {
       id: string;
       name: string;
       logoUrl?: string | null;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -13520,6 +13534,7 @@ export type OrganizationCompliance_userQuery = {
       id: string;
       name: string;
       anonymizePetitionsAfterMonths?: number | null;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -13576,6 +13591,7 @@ export type OrganizationGeneral_userQuery = {
       name: string;
       customHost?: string | null;
       iconUrl240?: string | null;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -13740,6 +13756,7 @@ export type OrganizationGroup_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -13901,6 +13918,7 @@ export type OrganizationGroups_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -13940,6 +13958,7 @@ export type OrganizationSettings_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -13981,6 +14000,7 @@ export type OrganizationIntegrations_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -14089,6 +14109,7 @@ export type IntegrationsSignature_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       signatureIntegrations: {
@@ -14146,6 +14167,7 @@ export type OrganizationUsage_userQuery = {
       activeUserCount: number;
       usageDetails: { [key: string]: any };
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       license?: {
@@ -14297,6 +14319,7 @@ export type OrganizationUsers_userQuery = {
       activeUserCount: number;
       usageDetails: { [key: string]: any };
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -15150,6 +15173,7 @@ export type PetitionActivity_QueryFragment = {
       name: string;
       id: string;
       isPetitionUsageLimitReached: boolean;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
@@ -16898,6 +16922,7 @@ export type PetitionActivity_userQuery = {
       name: string;
       id: string;
       isPetitionUsageLimitReached: boolean;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
@@ -17255,6 +17280,7 @@ export type PetitionCompose_QueryFragment = {
       id: string;
       name: string;
       isPetitionUsageLimitReached: boolean;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
@@ -17860,6 +17886,7 @@ export type PetitionCompose_userQuery = {
       id: string;
       name: string;
       isPetitionUsageLimitReached: boolean;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
@@ -18248,6 +18275,7 @@ export type PetitionMessages_QueryFragment = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -18288,6 +18316,7 @@ export type PetitionMessages_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -18751,6 +18780,7 @@ export type PetitionPreview_QueryFragment = {
       id: string;
       name: string;
       isPetitionUsageLimitReached: boolean;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       brandTheme: {
@@ -19678,6 +19708,7 @@ export type PetitionPreview_userQuery = {
       id: string;
       name: string;
       isPetitionUsageLimitReached: boolean;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       brandTheme: {
@@ -20065,6 +20096,7 @@ export type PetitionReplies_QueryFragment = {
       name: string;
       id: string;
       isPetitionUsageLimitReached: boolean;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
@@ -20686,6 +20718,7 @@ export type PetitionReplies_userQuery = {
       name: string;
       id: string;
       isPetitionUsageLimitReached: boolean;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
@@ -21141,6 +21174,7 @@ export type Petitions_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -21564,6 +21598,7 @@ export type NewPetition_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -21726,6 +21761,7 @@ export type Reports_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -21767,6 +21803,7 @@ export type Account_QueryFragment = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -21848,6 +21885,7 @@ export type Account_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -21987,6 +22025,7 @@ export type Developers_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -22027,6 +22066,7 @@ export type Settings_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -22075,6 +22115,7 @@ export type Security_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       currentUsagePeriod?: {
@@ -24195,6 +24236,11 @@ export const AppLayout_QueryFragmentDoc = gql`
       createdAt
       role
       lastActiveAt
+      organization {
+        id
+        name
+        petitionsSubscriptionEndDate: subscriptionEndDate(limitName: PETITION_SEND)
+      }
     }
     ...AppLayoutNavbar_Query
   }
