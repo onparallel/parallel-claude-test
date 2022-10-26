@@ -1209,6 +1209,7 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     pdfDocumentThemes: NexusGenRootTypes["OrganizationTheme"][]; // [OrganizationTheme!]!
     status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
+    subscriptionEndDate: NexusGenScalars["DateTime"] | null; // DateTime
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     usageDetails: NexusGenScalars["JSONObject"]; // JSONObject!
     usageLimits: NexusGenRootTypes["OrganizationUsageLimits"]; // OrganizationUsageLimits!
@@ -2800,6 +2801,7 @@ export interface NexusGenFieldTypeNames {
     name: "String";
     pdfDocumentThemes: "OrganizationTheme";
     status: "OrganizationStatus";
+    subscriptionEndDate: "DateTime";
     updatedAt: "DateTime";
     usageDetails: "JSONObject";
     usageLimits: "OrganizationUsageLimits";
@@ -4867,6 +4869,10 @@ export interface NexusGenArgTypes {
     logoUrl: {
       // args
       options?: NexusGenInputs["ImageOptions"] | null; // ImageOptions
+    };
+    subscriptionEndDate: {
+      // args
+      limitName: NexusGenEnums["OrganizationUsageLimitName"]; // OrganizationUsageLimitName!
     };
     usagePeriods: {
       // args

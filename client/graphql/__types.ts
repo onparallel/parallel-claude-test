@@ -1708,6 +1708,7 @@ export interface Organization extends Timestamps {
   pdfDocumentThemes: Array<OrganizationTheme>;
   /** The status of the organization. */
   status: OrganizationStatus;
+  subscriptionEndDate?: Maybe<Scalars["DateTime"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   usageDetails: Scalars["JSONObject"];
@@ -1743,6 +1744,11 @@ export interface OrganizationisUsageLimitReachedArgs {
 /** An organization in the system. */
 export interface OrganizationlogoUrlArgs {
   options?: InputMaybe<ImageOptions>;
+}
+
+/** An organization in the system. */
+export interface OrganizationsubscriptionEndDateArgs {
+  limitName: OrganizationUsageLimitName;
 }
 
 /** An organization in the system. */
@@ -3165,6 +3171,7 @@ export interface Query {
   task: Task;
   /** The available templates */
   templates: PetitionBaseOrFolderPagination;
+  test: Scalars["Duration"];
   userGroup?: Maybe<UserGroup>;
   /** Paginated list of user groups in the organization */
   userGroups: UserGroupPagination;
@@ -3330,6 +3337,10 @@ export interface QuerytemplatesArgs {
   offset?: InputMaybe<Scalars["Int"]>;
   path?: InputMaybe<Scalars["String"]>;
   search?: InputMaybe<Scalars["String"]>;
+}
+
+export interface QuerytestArgs {
+  duration?: InputMaybe<Scalars["Duration"]>;
 }
 
 export interface QueryuserGroupArgs {
@@ -4026,7 +4037,11 @@ export type AdminOrganizationsLayout_QueryFragment = {
       id: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -4043,6 +4058,14 @@ export type UpdateOrganizationCurrentUsagePeriodDialog_OrganizationUsageLimitFra
   __typename?: "OrganizationUsageLimit";
   limit: number;
   period: Duration;
+  periodStartDate: string;
+};
+
+export type UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimitFragment = {
+  __typename?: "OrganizationUsageLimit";
+  id: string;
+  period: Duration;
+  cycleNumber: number;
   periodStartDate: string;
 };
 
@@ -4707,7 +4730,11 @@ export type AppLayout_QueryFragment = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -4744,7 +4771,11 @@ export type AppLayoutNavbar_QueryFragment = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
 };
@@ -4883,7 +4914,11 @@ export type PetitionLayout_QueryFragment = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -4935,7 +4970,11 @@ export type SettingsLayout_QueryFragment = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -12317,7 +12356,11 @@ export type Admin_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -12367,7 +12410,11 @@ export type AdminOrganizationsFeatures_queryQuery = {
       id: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -12424,6 +12471,22 @@ export type AdminOrganizationsSubscriptions_OrganizationFragment = {
   activeUserCount: number;
   usageDetails: { [key: string]: any };
   name: string;
+  petitionsSubscriptionEndDate?: string | null;
+  signaturitSubscriptionEndDate?: string | null;
+  petitionsPeriod?: {
+    __typename?: "OrganizationUsageLimit";
+    id: string;
+    period: Duration;
+    cycleNumber: number;
+    periodStartDate: string;
+  } | null;
+  signaturesPeriod?: {
+    __typename?: "OrganizationUsageLimit";
+    id: string;
+    period: Duration;
+    cycleNumber: number;
+    periodStartDate: string;
+  } | null;
 };
 
 export type AdminOrganizationsSubscriptions_queryQueryVariables = Exact<{
@@ -12437,6 +12500,22 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     activeUserCount: number;
     usageDetails: { [key: string]: any };
     name: string;
+    petitionsSubscriptionEndDate?: string | null;
+    signaturitSubscriptionEndDate?: string | null;
+    petitionsPeriod?: {
+      __typename?: "OrganizationUsageLimit";
+      id: string;
+      period: Duration;
+      cycleNumber: number;
+      periodStartDate: string;
+    } | null;
+    signaturesPeriod?: {
+      __typename?: "OrganizationUsageLimit";
+      id: string;
+      period: Duration;
+      cycleNumber: number;
+      periodStartDate: string;
+    } | null;
   } | null;
   me: {
     __typename?: "User";
@@ -12456,7 +12535,11 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
       id: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -12522,6 +12605,22 @@ export type AdminOrganizationsSubscriptions_updateOrganizationUserLimitMutation 
     activeUserCount: number;
     usageDetails: { [key: string]: any };
     name: string;
+    petitionsSubscriptionEndDate?: string | null;
+    signaturitSubscriptionEndDate?: string | null;
+    petitionsPeriod?: {
+      __typename?: "OrganizationUsageLimit";
+      id: string;
+      period: Duration;
+      cycleNumber: number;
+      periodStartDate: string;
+    } | null;
+    signaturesPeriod?: {
+      __typename?: "OrganizationUsageLimit";
+      id: string;
+      period: Duration;
+      cycleNumber: number;
+      periodStartDate: string;
+    } | null;
   };
 };
 
@@ -12542,6 +12641,22 @@ export type AdminOrganizationsSubscriptions_updateOrganizationUsageDetailsMutati
     activeUserCount: number;
     usageDetails: { [key: string]: any };
     name: string;
+    petitionsSubscriptionEndDate?: string | null;
+    signaturitSubscriptionEndDate?: string | null;
+    petitionsPeriod?: {
+      __typename?: "OrganizationUsageLimit";
+      id: string;
+      period: Duration;
+      cycleNumber: number;
+      periodStartDate: string;
+    } | null;
+    signaturesPeriod?: {
+      __typename?: "OrganizationUsageLimit";
+      id: string;
+      period: Duration;
+      cycleNumber: number;
+      periodStartDate: string;
+    } | null;
   };
 };
 
@@ -12558,6 +12673,22 @@ export type AdminOrganizationsSubscriptions_shareSignaturitApiKeyMutation = {
     activeUserCount: number;
     usageDetails: { [key: string]: any };
     name: string;
+    petitionsSubscriptionEndDate?: string | null;
+    signaturitSubscriptionEndDate?: string | null;
+    petitionsPeriod?: {
+      __typename?: "OrganizationUsageLimit";
+      id: string;
+      period: Duration;
+      cycleNumber: number;
+      periodStartDate: string;
+    } | null;
+    signaturesPeriod?: {
+      __typename?: "OrganizationUsageLimit";
+      id: string;
+      period: Duration;
+      cycleNumber: number;
+      periodStartDate: string;
+    } | null;
   };
 };
 
@@ -12574,6 +12705,22 @@ export type AdminOrganizationsSubscriptions_modifyCurrentUsagePeriodMutation = {
     activeUserCount: number;
     usageDetails: { [key: string]: any };
     name: string;
+    petitionsSubscriptionEndDate?: string | null;
+    signaturitSubscriptionEndDate?: string | null;
+    petitionsPeriod?: {
+      __typename?: "OrganizationUsageLimit";
+      id: string;
+      period: Duration;
+      cycleNumber: number;
+      periodStartDate: string;
+    } | null;
+    signaturesPeriod?: {
+      __typename?: "OrganizationUsageLimit";
+      id: string;
+      period: Duration;
+      cycleNumber: number;
+      periodStartDate: string;
+    } | null;
   };
 };
 
@@ -12625,7 +12772,11 @@ export type AdminOrganizationsMembers_queryQuery = {
       id: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -12753,7 +12904,11 @@ export type AdminOrganizations_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -12811,7 +12966,11 @@ export type AdminSupportMethods_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -13061,7 +13220,11 @@ export type Contact_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -13211,7 +13374,11 @@ export type Contacts_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -13283,7 +13450,11 @@ export type OrganizationBranding_userQuery = {
       logoUrl?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
       brandTheme: {
         __typename?: "OrganizationBrandThemeData";
         color: string;
@@ -13351,7 +13522,11 @@ export type OrganizationCompliance_userQuery = {
       anonymizePetitionsAfterMonths?: number | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -13403,7 +13578,11 @@ export type OrganizationGeneral_userQuery = {
       iconUrl240?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -13563,7 +13742,11 @@ export type OrganizationGroup_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -13720,7 +13903,11 @@ export type OrganizationGroups_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -13755,7 +13942,11 @@ export type OrganizationSettings_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -13792,7 +13983,11 @@ export type OrganizationIntegrations_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -13912,7 +14107,11 @@ export type IntegrationsSignature_userQuery = {
           | { __typename?: "UserProvisioningOrgIntegration" }
         >;
       };
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -13965,7 +14164,11 @@ export type OrganizationUsage_userQuery = {
         limit: number;
         used: number;
       } | null;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -14096,7 +14299,11 @@ export type OrganizationUsers_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -14945,7 +15152,11 @@ export type PetitionActivity_QueryFragment = {
       isPetitionUsageLimitReached: boolean;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
@@ -16689,7 +16900,11 @@ export type PetitionActivity_userQuery = {
       isPetitionUsageLimitReached: boolean;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
@@ -17042,7 +17257,11 @@ export type PetitionCompose_QueryFragment = {
       isPetitionUsageLimitReached: boolean;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
       signatureIntegrations: {
         __typename?: "OrgIntegrationPagination";
         items: Array<
@@ -17643,7 +17862,11 @@ export type PetitionCompose_userQuery = {
       isPetitionUsageLimitReached: boolean;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
       signatureIntegrations: {
         __typename?: "OrgIntegrationPagination";
         items: Array<
@@ -18027,7 +18250,11 @@ export type PetitionMessages_QueryFragment = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -18063,7 +18290,11 @@ export type PetitionMessages_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -18527,7 +18758,11 @@ export type PetitionPreview_QueryFragment = {
         color: string;
         fontFamily?: string | null;
       };
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
@@ -19450,7 +19685,11 @@ export type PetitionPreview_userQuery = {
         color: string;
         fontFamily?: string | null;
       };
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
@@ -19828,7 +20067,11 @@ export type PetitionReplies_QueryFragment = {
       isPetitionUsageLimitReached: boolean;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
       signatureIntegrations: {
         __typename?: "OrgIntegrationPagination";
         items: Array<
@@ -20445,7 +20688,11 @@ export type PetitionReplies_userQuery = {
       isPetitionUsageLimitReached: boolean;
       iconUrl92?: string | null;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
       signatureIntegrations: {
         __typename?: "OrgIntegrationPagination";
         items: Array<
@@ -20896,7 +21143,11 @@ export type Petitions_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -21315,7 +21566,11 @@ export type NewPetition_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   hasTemplates: { __typename?: "PetitionBaseOrFolderPagination"; totalCount: number };
@@ -21473,7 +21728,11 @@ export type Reports_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -21510,7 +21769,11 @@ export type Account_QueryFragment = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
     delegates: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
@@ -21587,7 +21850,11 @@ export type Account_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
     delegates: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
@@ -21722,7 +21989,11 @@ export type Developers_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -21758,7 +22029,11 @@ export type Settings_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -21802,7 +22077,11 @@ export type Security_userQuery = {
       name: string;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
     };
   };
   realMe: {
@@ -23897,6 +24176,7 @@ export const AppLayoutNavbar_QueryFragmentDoc = gql`
         iconUrl92: iconUrl(options: { resize: { width: 92 } })
         isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
         currentUsagePeriod(limitName: PETITION_SEND) {
+          id
           limit
         }
       }
@@ -24876,14 +25156,34 @@ export const OrganizationUsagePeriodsTable_OrganizationUsageLimitPaginationFragm
   OrganizationUsagePeriodsTable_OrganizationUsageLimitPaginationFragment,
   unknown
 >;
+export const UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimitFragmentDoc = gql`
+  fragment UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimit on OrganizationUsageLimit {
+    id
+    period
+    cycleNumber
+    periodStartDate
+  }
+` as unknown as DocumentNode<
+  UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimitFragment,
+  unknown
+>;
 export const AdminOrganizationsSubscriptions_OrganizationFragmentDoc = gql`
   fragment AdminOrganizationsSubscriptions_Organization on Organization {
     id
     ...AdminOrganizationsLayout_Organization
     activeUserCount
     usageDetails
+    petitionsSubscriptionEndDate: subscriptionEndDate(limitName: PETITION_SEND)
+    signaturitSubscriptionEndDate: subscriptionEndDate(limitName: SIGNATURIT_SHARED_APIKEY)
+    petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+      ...UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimit
+    }
+    signaturesPeriod: currentUsagePeriod(limitName: SIGNATURIT_SHARED_APIKEY) {
+      ...UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimit
+    }
   }
   ${AdminOrganizationsLayout_OrganizationFragmentDoc}
+  ${UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimitFragmentDoc}
 ` as unknown as DocumentNode<AdminOrganizationsSubscriptions_OrganizationFragment, unknown>;
 export const AdminOrganizationsMembers_OrganizationUserFragmentDoc = gql`
   fragment AdminOrganizationsMembers_OrganizationUser on User {

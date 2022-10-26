@@ -6,9 +6,14 @@ import {
   UpdateOrganizationCurrentUsagePeriodDialog,
   useUpdateOrganizationCurrentUsagePeriodDialog,
 } from "@parallel/components/admin-organizations/dialogs/UpdateOrganizationCurrentUsagePeriodDialog";
-import { useUpdateOrganizationUsageDetailsDialog } from "@parallel/components/admin-organizations/dialogs/UpdateOrganizationUsageDetailsDialog";
+import {
+  UpdateOrganizationUsageDetailsDialog,
+  useUpdateOrganizationUsageDetailsDialog,
+} from "@parallel/components/admin-organizations/dialogs/UpdateOrganizationUsageDetailsDialog";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { TableColumn } from "@parallel/components/common/Table";
+import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
 import { TimeSpan } from "@parallel/components/reports/TimeSpan";
@@ -26,17 +31,13 @@ import {
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
+import { FORMATS } from "@parallel/utils/dates";
 import { integer, sorting, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { add, Duration } from "date-fns";
+import { useMemo } from "react";
 import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-
-import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
-import { TablePage } from "@parallel/components/common/TablePage";
-import { useMemo } from "react";
-import { FORMATS } from "@parallel/utils/dates";
-
 type AdminOrganizationsSubscriptionsProps = UnwrapPromise<
   ReturnType<typeof AdminOrganizationsSubscriptions.getInitialProps>
 >;
@@ -118,6 +119,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
           duration: details.duration,
           renewalCycles: details.renewal_cycles,
         },
+        currentUsageLimit: organization.petitionsPeriod,
       });
       await updateOrganizationUsageDetails({
         variables: {
@@ -150,6 +152,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
           defaultMessage: "Signatures",
         }),
         usageDetails: organization.usageDetails.SIGNATURIT_SHARED_APIKEY,
+        currentUsageLimit: organization.signaturesPeriod,
       });
       if (!organization.usageDetails.SIGNATURIT_SHARED_APIKEY) {
         await shareSignaturitApiKey({
@@ -235,36 +238,6 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
     };
   })();
 
-  function multiplyDuration(duration: Duration, multiplier: number) {
-    const newDuration: Duration = {};
-    Object.entries(duration).forEach(([unit, value]) => {
-      newDuration[unit as keyof Duration] = value * multiplier;
-    });
-    return newDuration;
-  }
-
-  const subscriptionEndDates = (() => {
-    return {
-      PETITION_SEND:
-        petitionSendDetails.renewal_cycles > 0
-          ? add(
-              petitionSendDetails.periodStartDate ?? new Date(),
-              multiplyDuration(petitionSendDetails.duration, petitionSendDetails.renewal_cycles)
-            )
-          : null,
-      SIGNATURIT_SHARED_APIKEY:
-        signaturitApiKeyDetails?.renewal_cycles > 0
-          ? add(
-              signaturitApiKeyDetails.periodStartDate ?? new Date(),
-              multiplyDuration(
-                signaturitApiKeyDetails.duration,
-                signaturitApiKeyDetails.renewal_cycles
-              )
-            )
-          : null,
-    };
-  })();
-
   return (
     <AdminOrganizationsLayout
       tabKey="subscriptions"
@@ -335,9 +308,12 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
                   defaultMessage="End date"
                 />
               </Text>
-              {subscriptionEndDates.PETITION_SEND ? (
+              {organization.petitionsSubscriptionEndDate ? (
                 <Text as="dd">
-                  <FormattedDate value={subscriptionEndDates.PETITION_SEND} {...FORMATS["LL"]} />
+                  <FormattedDate
+                    value={organization.petitionsSubscriptionEndDate}
+                    {...FORMATS["LL"]}
+                  />
                 </Text>
               ) : (
                 <Text as="dd" textStyle="hint">
@@ -394,10 +370,10 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
                     defaultMessage="End date"
                   />
                 </Text>
-                {subscriptionEndDates.SIGNATURIT_SHARED_APIKEY ? (
+                {organization.signaturitSubscriptionEndDate ? (
                   <Text as="dd">
                     <FormattedDate
-                      value={subscriptionEndDates.SIGNATURIT_SHARED_APIKEY}
+                      value={organization.signaturitSubscriptionEndDate}
                       {...FORMATS["LL"]}
                     />
                   </Text>
@@ -633,8 +609,17 @@ AdminOrganizationsSubscriptions.fragments = {
         ...AdminOrganizationsLayout_Organization
         activeUserCount
         usageDetails
+        petitionsSubscriptionEndDate: subscriptionEndDate(limitName: PETITION_SEND)
+        signaturitSubscriptionEndDate: subscriptionEndDate(limitName: SIGNATURIT_SHARED_APIKEY)
+        petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+          ...UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimit
+        }
+        signaturesPeriod: currentUsagePeriod(limitName: SIGNATURIT_SHARED_APIKEY) {
+          ...UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimit
+        }
       }
       ${AdminOrganizationsLayout.fragments.Organization}
+      ${UpdateOrganizationUsageDetailsDialog.fragments.OrganizationUsageLimit}
     `;
   },
 };

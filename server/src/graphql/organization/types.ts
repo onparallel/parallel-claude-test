@@ -1,3 +1,4 @@
+import { add } from "date-fns";
 import {
   arg,
   booleanArg,
@@ -11,6 +12,7 @@ import {
 import { isDefined, omit, pick } from "remeda";
 import { defaultBrandTheme } from "../../util/BrandTheme";
 import { or, userIsSuperAdmin } from "../helpers/authorize";
+import { addDuration, multiplyDuration } from "../helpers/duration";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { isOwnOrgOrSuperAdmin } from "./authorizers";
@@ -245,6 +247,35 @@ export const Organization = objectType({
       },
       resolve: async (root, args, ctx) => {
         return await ctx.organizations.getOrganizationCurrentUsageLimit(root.id, args.limitName);
+      },
+    });
+    t.nullable.datetime("subscriptionEndDate", {
+      authorize: isOwnOrgOrSuperAdmin(),
+      args: {
+        limitName: nonNull("OrganizationUsageLimitName"),
+      },
+      resolve: async (root, args, ctx) => {
+        const currentUsageLimit = await ctx.organizations.getOrganizationCurrentUsageLimit(
+          root.id,
+          args.limitName
+        );
+        if (!currentUsageLimit) {
+          return null;
+        }
+        const usageDetails = root.usage_details[args.limitName];
+        if (!usageDetails || !usageDetails.renewal_cycles) {
+          return null;
+        }
+        return add(
+          currentUsageLimit.period_start_date,
+          addDuration(
+            currentUsageLimit.period,
+            multiplyDuration(
+              usageDetails.duration,
+              usageDetails.renewal_cycles - currentUsageLimit.cycle_number
+            )
+          )
+        );
       },
     });
     t.boolean("isUsageLimitReached", {

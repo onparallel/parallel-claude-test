@@ -15,7 +15,8 @@ import {
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { UpdateOrganizationCurrentUsagePeriodDialog_OrganizationUsageLimitFragment } from "@parallel/graphql/__types";
-import { addMonths } from "date-fns";
+import { FORMATS } from "@parallel/utils/dates";
+import { add } from "date-fns";
 import { ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedDate, FormattedMessage } from "react-intl";
@@ -37,8 +38,6 @@ export function UpdateOrganizationCurrentUsagePeriodDialog({
   UpdateOrganizationCurrentUsagePeriodDialogData,
   UpdateOrganizationCurrentUsagePeriodDialogResult
 >) {
-  const [[periodUnits, periodValue]] = Object.entries(usagePeriod?.period ?? { months: 1 });
-
   const {
     control,
     formState: { isDirty },
@@ -49,9 +48,9 @@ export function UpdateOrganizationCurrentUsagePeriodDialog({
     },
   });
 
-  const periodEndDate = addMonths(
+  const periodEndDate = add(
     usagePeriod?.periodStartDate ? new Date(usagePeriod.periodStartDate) : new Date(),
-    (periodValue as number) * (periodUnits === "years" ? 12 : 1)
+    usagePeriod?.period ?? { months: 1 }
   );
 
   return (
@@ -99,7 +98,7 @@ export function UpdateOrganizationCurrentUsagePeriodDialog({
                 />
               </Text>
               <Text>
-                <FormattedDate value={periodEndDate} dateStyle="long" />
+                <FormattedDate value={periodEndDate} {...FORMATS["LL"]} />
               </Text>
             </HStack>
           </GridItem>

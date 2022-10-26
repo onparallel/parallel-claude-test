@@ -1870,6 +1870,7 @@ type Organization implements Timestamps {
   The status of the organization.
   """
   status: OrganizationStatus!
+  subscriptionEndDate(limitName: OrganizationUsageLimitName!): DateTime
 
   """
   Time when the resource was last updated.

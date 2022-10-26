@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Button,
   Checkbox,
@@ -17,8 +18,11 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
-import { Maybe } from "@parallel/graphql/__types";
-import { addMonths, Duration } from "date-fns";
+import {
+  Maybe,
+  UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimitFragment,
+} from "@parallel/graphql/__types";
+import { add, Duration } from "date-fns";
 import { ReactNode, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
@@ -27,12 +31,12 @@ import { omit } from "remeda";
 interface UpdateOrganizationUsageDetailsDialogProps {
   header: ReactNode;
   hidePeriodSection?: boolean;
-  usageDetails?: {
+  usageDetails: {
     limit: number;
     duration?: Duration;
     renewalCycles?: number;
-    periodStartDate?: Date;
   } | null;
+  currentUsageLimit?: Maybe<UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimitFragment>;
 }
 
 interface UpdateOrganizationUsageDetailsDialogInput {
@@ -52,8 +56,9 @@ interface UpdateOrganizationUsageDetailsDialogResult {
 
 export function UpdateOrganizationUsageDetailsDialog({
   header,
-  usageDetails,
   hidePeriodSection,
+  usageDetails,
+  currentUsageLimit,
   ...props
 }: DialogProps<
   UpdateOrganizationUsageDetailsDialogProps,
@@ -98,22 +103,30 @@ export function UpdateOrganizationUsageDetailsDialog({
   const { startNewPeriod, periodUnits, periodValue, renewalCycles } = watch();
 
   const now = new Date();
+
+  let nextPeriod: Maybe<Date> = startNewPeriod
+    ? now
+    : currentUsageLimit
+    ? add(new Date(currentUsageLimit.periodStartDate), currentUsageLimit.period)
+    : now;
+
   const subscriptionEndDate =
     renewalCycles > 0
-      ? addMonths(
-          usageDetails?.periodStartDate ?? now,
-          periodValue * (periodUnits === "years" ? 12 : 1) * renewalCycles
+      ? add(
+          currentUsageLimit && !startNewPeriod
+            ? add(new Date(currentUsageLimit.periodStartDate), currentUsageLimit.period) // end date of the current period
+            : now,
+          {
+            // + duration of the remaining periods, if any
+            [periodUnits as keyof Duration]:
+              periodValue *
+              (renewalCycles -
+                (startNewPeriod
+                  ? 0 // cycle count is restarted when starting a new period
+                  : currentUsageLimit?.cycleNumber ?? 0)), // if not starting a new period, we have to consider the cycle number of the current period
+          }
         )
       : null;
-
-  let nextPeriod: Maybe<Date> = usageDetails
-    ? startNewPeriod
-      ? new Date()
-      : addMonths(
-          usageDetails.periodStartDate ?? now,
-          periodValue * (periodUnits === "years" ? 12 : 1)
-        )
-    : now;
 
   if (nextPeriod.getTime() - (subscriptionEndDate?.getTime() ?? 0) === 0) {
     nextPeriod = null;
@@ -315,6 +328,17 @@ export function UpdateOrganizationUsageDetailsDialog({
     />
   );
 }
+
+UpdateOrganizationUsageDetailsDialog.fragments = {
+  OrganizationUsageLimit: gql`
+    fragment UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimit on OrganizationUsageLimit {
+      id
+      period
+      cycleNumber
+      periodStartDate
+    }
+  `,
+};
 
 export function useUpdateOrganizationUsageDetailsDialog() {
   return useDialog(UpdateOrganizationUsageDetailsDialog);

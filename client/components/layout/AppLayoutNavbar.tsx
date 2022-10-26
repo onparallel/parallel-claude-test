@@ -285,6 +285,7 @@ export const AppLayoutNavbar = Object.assign(
                 iconUrl92: iconUrl(options: { resize: { width: 92 } })
                 isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
                 currentUsagePeriod(limitName: PETITION_SEND) {
+                  id
                   limit
                 }
               }
