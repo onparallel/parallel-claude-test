@@ -1,7 +1,7 @@
 import { Grid, HStack, Icon, Stack, Text } from "@chakra-ui/react";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
-import copy from "clipboard-copy";
+import copy from "copy-to-clipboard";
 import React, { useState } from "react";
 import * as allIcons from "../chakra/icons";
 import { StoryDecorator } from "./decorators";
