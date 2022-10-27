@@ -2,21 +2,21 @@ import { ApolloError } from "apollo-server-express";
 import { GraphQLResolveInfo } from "graphql";
 
 export class PublicPetitionNotAvailableError extends ApolloError {
-  readonly name = "PublicPetitionNotAvailableError";
+  override readonly name = "PublicPetitionNotAvailableError";
   constructor(message: string) {
     super(message, "PUBLIC_PETITION_NOT_AVAILABLE");
   }
 }
 
 export class UnknownError extends ApolloError {
-  readonly name = "UnknownError";
+  override readonly name = "UnknownError";
   constructor(message: string) {
     super(message, "UNKNOWN_ERROR");
   }
 }
 
 export class ArgValidationError extends ApolloError {
-  readonly name = "ArgValidationError";
+  override readonly name = "ArgValidationError";
   constructor(
     { parentType, fieldName }: GraphQLResolveInfo,
     argName: string,
@@ -38,7 +38,7 @@ export class ArgValidationError extends ApolloError {
 }
 
 export class ValidatorOrConditionError extends ApolloError {
-  readonly name = "ValidatorOrConditionError";
+  override readonly name = "ValidatorOrConditionError";
   constructor({ parentType, fieldName }: GraphQLResolveInfo, message: string, extra?: any) {
     super(
       `Validator error on OR condition for ${parentType}.${fieldName}: ${message}`,
@@ -51,7 +51,7 @@ export class ValidatorOrConditionError extends ApolloError {
 }
 
 export class InvalidReplyError extends ApolloError {
-  readonly name = "InvalidReplyError";
+  override readonly name = "InvalidReplyError";
   constructor(
     { parentType, fieldName }: GraphQLResolveInfo,
     argName: string,
@@ -69,7 +69,7 @@ export class InvalidReplyError extends ApolloError {
 }
 
 export class MaxFileSizeExceededError extends ApolloError {
-  readonly name = "MaxFileSizeExceededError";
+  override readonly name = "MaxFileSizeExceededError";
   constructor(
     { parentType, fieldName }: GraphQLResolveInfo,
     argName: string,

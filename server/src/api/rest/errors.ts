@@ -15,7 +15,7 @@ export abstract class HttpError extends Error implements ResponseWrapper<ErrorBo
   constructor(
     public status: number,
     public code: string,
-    public message: string,
+    public override message: string,
     public extra = {}
   ) {
     super(message);
@@ -31,34 +31,34 @@ export abstract class HttpError extends Error implements ResponseWrapper<ErrorBo
 
 export class BadRequestError extends HttpError {
   static readonly code = "BadRequestError";
-  constructor(public message: string, extra = {}) {
+  constructor(public override message: string, extra = {}) {
     super(400, BadRequestError.code, message, extra);
   }
 }
 
 export class ForbiddenError extends HttpError {
   static readonly code = "ForbiddenError";
-  constructor(public message: string, extra = {}) {
+  constructor(public override message: string, extra = {}) {
     super(403, ForbiddenError.code, message, extra);
   }
 }
 export class ConflictError extends HttpError {
   static readonly code = "Conflict";
-  constructor(public message: string) {
+  constructor(public override message: string) {
     super(409, ConflictError.code, message);
   }
 }
 
 export class UnauthorizedError extends HttpError {
   static readonly code = "Unauthorized";
-  constructor(public message: string) {
+  constructor(public override message: string) {
     super(401, UnauthorizedError.code, message);
   }
 }
 
 export class InternalError extends HttpError {
   static readonly code = "InternalError";
-  constructor(public message: string) {
+  constructor(public override message: string) {
     super(500, InternalError.code, message);
   }
 }
@@ -72,7 +72,7 @@ export class UnknownError extends HttpError {
       process.env.NODE_ENV === "development" ? originalError.message : "An unknown error happened"
     );
   }
-  apply(res: Response<ErrorBody>) {
+  override apply(res: Response<ErrorBody>) {
     res.status(this.status).json({
       code: this.code,
       message: this.message,
@@ -91,7 +91,7 @@ export class InvalidParameterError extends HttpError {
   static readonly status = 422;
   static readonly code = "InvalidParameter";
   constructor(
-    public name: string,
+    public override name: string,
     public value: any,
     public location: "query" | "path",
     message: string

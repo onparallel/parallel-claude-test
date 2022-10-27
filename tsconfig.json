@@ -13,6 +13,7 @@
 
     /* Additional checks */
     "noImplicitAny": true,
+    "noImplicitOverride": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true
