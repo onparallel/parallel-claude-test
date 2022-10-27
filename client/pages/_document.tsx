@@ -46,7 +46,7 @@ const POLYFILLS_INTL = [
 type MyDocumentProps = I18nProps;
 
 class MyDocument extends Document<MyDocumentProps> {
-  static async getInitialProps(ctx: DocumentContext) {
+  static override async getInitialProps(ctx: DocumentContext) {
     const { renderPage, locale } = ctx;
     if (!isDefined(locale)) {
       ctx.res!.writeHead(302, { Location: "/" }).end();
@@ -62,7 +62,7 @@ class MyDocument extends Document<MyDocumentProps> {
     return { ...initialProps, locale, messages };
   }
 
-  render() {
+  override render() {
     const { locale, messages } = this.props;
     const polyfillsUrl = `https://polyfill.io/v3/polyfill.min.js?features=${encodeURIComponent(
       [
