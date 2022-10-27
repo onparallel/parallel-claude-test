@@ -1,7 +1,7 @@
 import { IconButtonProps, PlacementWithLogical } from "@chakra-ui/react";
 import { ClipboardIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import copy from "clipboard-copy";
+import copy from "copy-to-clipboard";
 import { MouseEvent, ReactElement, useState } from "react";
 import { useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
