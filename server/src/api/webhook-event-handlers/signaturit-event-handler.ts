@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { RequestHandler, Router, urlencoded } from "express";
 import { isDefined, pick } from "remeda";
 import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
@@ -7,26 +7,9 @@ import {
   PetitionSignatureConfigSigner,
   PetitionSignatureRequestCancelData,
 } from "../../db/repositories/PetitionRepository";
+import { fromGlobalId } from "../../util/globalId";
 
-export async function validateSignaturitRequest(
-  req: Request & { context: ApiContext },
-  res: Response,
-  next: NextFunction
-) {
-  const body = req.body as SignaturItEventBody;
-  const signature = await req.context.petitions.loadPetitionSignatureByExternalId(
-    `SIGNATURIT/${body.document.signature.id}`
-  );
-
-  if (signature && signature.status !== "CANCELLED") {
-    next();
-  } else {
-    // status 200 to kill request but avoid sending an error to signaturit
-    res.sendStatus(200).end();
-  }
-}
-
-export type SignaturItEventBody = {
+interface SignaturItEventBody {
   document: {
     created_at: string;
     decline_reason?: string; // only for document_declined event type
@@ -45,30 +28,49 @@ export type SignaturItEventBody = {
   created_at: string;
   type: SignatureEvents;
   reason?: string;
+}
+
+const HANDLERS: Partial<
+  Record<SignatureEvents, (ctx: ApiContext, data: SignaturItEventBody, petitionId: number) => void>
+> = {
+  document_opened: documentOpened,
+  document_signed: documentSigned,
+  document_declined: documentDeclined,
+  document_completed: documentCompleted,
+  audit_trail_completed: auditTrailCompleted,
+  email_delivered: emailDelivered,
+  email_opened: emailOpened,
+  email_bounced: emailBounced,
 };
 
-export function signaturItEventHandler(type: SignatureEvents) {
-  switch (type) {
-    case "document_opened":
-      return documentOpened;
-    case "document_signed":
-      return documentSigned;
-    case "document_declined":
-      return documentDeclined;
-    case "document_completed":
-      return documentCompleted;
-    case "audit_trail_completed":
-      return auditTrailCompleted;
-    case "email_delivered":
-      return emailDelivered;
-    case "email_opened":
-      return emailOpened;
-    case "email_bounced":
-      return emailBounced;
-    default:
-      return appendEventLogs;
-  }
-}
+export const signaturitEventHandlers: RequestHandler = Router()
+  .use(urlencoded({ extended: true }))
+  .post("/:petitionId/events", async (req, res, next) => {
+    try {
+      const body = req.body as SignaturItEventBody;
+      const signature = await req.context.petitions.loadPetitionSignatureByExternalId(
+        `SIGNATURIT/${body.document.signature.id}`
+      );
+
+      if (!isDefined(signature) || signature.status === "CANCELLED") {
+        // status 200 to kill request but avoid sending an error to signaturit
+        return res.sendStatus(200).end();
+      }
+      const handler = HANDLERS[body.type] ?? appendEventLogs;
+      const petitionId = fromGlobalId(req.params.petitionId, "Petition").id;
+      (async function () {
+        try {
+          await handler?.(req.context, body, petitionId);
+        } catch (error: any) {
+          req.context.logger.error(error.message, { stack: error.stack });
+        }
+      })();
+      res.sendStatus(200).end();
+    } catch (error: any) {
+      req.context.logger.error(error.message, { stack: error.stack });
+      next(error);
+    }
+  });
 
 /** a signer opened the signing page on the signature provider */
 async function documentOpened(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
