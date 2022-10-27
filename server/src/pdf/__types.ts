@@ -3071,7 +3071,6 @@ export type Query = {
   task: Task;
   /** The available templates */
   templates: PetitionBaseOrFolderPagination;
-  test: Scalars["Duration"];
   userGroup: Maybe<UserGroup>;
   /** Paginated list of user groups in the organization */
   userGroups: UserGroupPagination;
@@ -3237,10 +3236,6 @@ export type QuerytemplatesArgs = {
   offset?: InputMaybe<Scalars["Int"]>;
   path?: InputMaybe<Scalars["String"]>;
   search?: InputMaybe<Scalars["String"]>;
-};
-
-export type QuerytestArgs = {
-  duration?: InputMaybe<Scalars["Duration"]>;
 };
 
 export type QueryuserGroupArgs = {
