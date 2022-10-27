@@ -105,10 +105,12 @@ OrganizationUsage.queries = [
           }
           usageDetails
           petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+            id
             limit
             used
           }
           signaturesPeriod: currentUsagePeriod(limitName: SIGNATURIT_SHARED_APIKEY) {
+            id
             limit
             used
           }

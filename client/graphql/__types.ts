@@ -14173,11 +14173,13 @@ export type OrganizationUsage_userQuery = {
       } | null;
       petitionsPeriod?: {
         __typename?: "OrganizationUsageLimit";
+        id: string;
         limit: number;
         used: number;
       } | null;
       signaturesPeriod?: {
         __typename?: "OrganizationUsageLimit";
+        id: string;
         limit: number;
         used: number;
       } | null;
@@ -31024,10 +31026,12 @@ export const OrganizationUsage_userDocument = gql`
         }
         usageDetails
         petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+          id
           limit
           used
         }
         signaturesPeriod: currentUsagePeriod(limitName: SIGNATURIT_SHARED_APIKEY) {
+          id
           limit
           used
         }
