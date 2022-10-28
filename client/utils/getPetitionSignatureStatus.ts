@@ -10,10 +10,7 @@ export function getPetitionSignatureStatus({
   currentSignatureRequest,
   signatureConfig,
 }: getPetitionSignatureStatus_PetitionFragment): PetitionSignatureStatusFilter {
-  if (isDefined(signatureConfig) && status === "PENDING") {
-    // petition has signature configured but it's not yet completed
-    return "NOT_STARTED";
-  } else if (
+  if (
     isDefined(signatureConfig) &&
     ["COMPLETED", "CLOSED"].includes(status) &&
     (!currentSignatureRequest ||
@@ -24,13 +21,18 @@ export function getPetitionSignatureStatus({
     // and signature was never started or the last one is already completed (now we're starting a new request)
     // this means the user has to manually trigger the start of the signature request
     return "PENDING_START";
-  } else if (isDefined(currentSignatureRequest)) {
+  }
+
+  if (isDefined(currentSignatureRequest)) {
     // signature request is already started, return the current status
     if (["ENQUEUED", "PROCESSING", "PROCESSED"].includes(currentSignatureRequest.status)) {
       return "PROCESSING";
     } else {
       return currentSignatureRequest.status as "COMPLETED" | "CANCELLED";
     }
+  } else if (isDefined(signatureConfig) && status === "PENDING") {
+    // petition has signature configured but it's not yet completed
+    return "NOT_STARTED";
   }
 
   // petition doesn't have signature configured and never started a signature request

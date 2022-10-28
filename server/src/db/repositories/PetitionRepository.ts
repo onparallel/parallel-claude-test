@@ -524,6 +524,7 @@ export class PetitionRepository extends BaseRepository {
             // signature is configured, awaiting to complete the petition
             q.or.whereRaw(/* sql */ `
               p.signature_config is not null
+              and p.latest_signature_status is null
               and p.status = 'PENDING'
             `);
           }
