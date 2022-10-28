@@ -145,6 +145,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     // force a rerender when active field is coming from url so the flyout repositions
     if (activeFieldId) {
       setActiveFieldId(activeFieldId);
+      const field = document.getElementById(`field-${activeFieldId}`);
+      if (field) {
+        scrollIntoView(field, { block: "center", behavior: "smooth" });
+      }
     }
   }, []);
 
