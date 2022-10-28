@@ -6,10 +6,11 @@ import { Divider } from "./Divider";
 
 export interface CardProps {
   isInteractive?: boolean;
+  isDisabled?: boolean;
 }
 
 export const Card = chakraForwardRef<"section", CardProps>(function Card(
-  { children, isInteractive, ...props },
+  { children, isInteractive, isDisabled, ...props },
   ref
 ) {
   return (
@@ -22,8 +23,10 @@ export const Card = chakraForwardRef<"section", CardProps>(function Card(
       boxShadow="short"
       borderRadius="md"
       transition="all 150ms ease"
+      opacity={isDisabled ? 0.4 : undefined}
+      cursor={isDisabled ? "not-allowed" : undefined}
       sx={{
-        ...(isInteractive
+        ...(isInteractive && !isDisabled
           ? {
               _hover: {
                 transform: "scale(1.025)",

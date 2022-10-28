@@ -34,7 +34,7 @@ function OrganizationIntegrations() {
 
   const integrations = [
     {
-      isDisabled: !hasAdminRole || false,
+      isDisabled: !hasAdminRole,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/signaturit.png`}
@@ -56,30 +56,27 @@ function OrganizationIntegrations() {
         id: "organization.integrations.signaturit-description",
         defaultMessage: "Add digital signature to your parallels.",
       }),
-      showButton: true,
-      route: "/app/organization/integrations/signature",
+      href: "/app/organization/integrations/signature",
     },
     {
-      isDisabled: !hasAdminRole || false,
+      isDisabled: !hasAdminRole,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/zapier.png`}
           alt="Zapier"
-          maxWidth="124px"
+          maxWidth="100px"
         />
       ),
-      badge: null,
       title: "Zapier",
       body: intl.formatMessage({
         id: "organization.integrations.zapier-description",
         defaultMessage: "Automate your workflows using its +400 services.",
       }),
-      showButton: true,
-      route: "https://zapier.com/apps/parallel/integrations",
+      href: "https://zapier.com/apps/parallel/integrations",
       isExternal: true,
     },
     {
-      isDisabled: !me.hasDeveloperAccess,
+      isDisabled: !me.hasDeveloperAccess || !hasAdminRole,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/parallel-api.png`}
@@ -87,7 +84,6 @@ function OrganizationIntegrations() {
           maxWidth="124px"
         />
       ),
-      badge: null,
       title: intl.formatMessage({
         id: "organization.integrations.parallel-api-title",
         defaultMessage: "Parallel API",
@@ -96,8 +92,7 @@ function OrganizationIntegrations() {
         id: "organization.integrations.parallel-api-description",
         defaultMessage: "Access our API to automate all your flows.",
       }),
-      showButton: me.hasDeveloperAccess,
-      route: "/app/settings/developers",
+      href: "/app/settings/developers",
     },
   ];
 

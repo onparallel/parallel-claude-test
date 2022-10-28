@@ -1,86 +1,63 @@
-import { Center, HStack, LinkBox, LinkOverlay, Stack, StackProps, Text } from "@chakra-ui/react";
+import { Center, HStack, LinkBox, LinkOverlay, Stack, Text } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { NakedLink } from "@parallel/components/common/Link";
 import { ReactNode } from "react";
+import { Card } from "../common/Card";
 
-interface IntegrationCardProps extends StackProps {
+interface IntegrationCardProps {
   logo: ReactNode | null;
   title: string;
   body: string;
-  badge: ReactNode | null;
-  isDisabled: boolean;
-  showButton: boolean;
-  route: string;
+  badge?: ReactNode | null;
+  isDisabled?: boolean;
+  href: string;
   isExternal?: boolean;
 }
 
-export function IntegrationCard({
-  logo,
-  title,
-  body,
-  badge,
-  isDisabled,
-  showButton,
-  route,
-  isExternal,
-  ...props
-}: IntegrationCardProps) {
-  const titleElement = isDisabled ? (
-    <Text fontSize="xl" as="h3" fontWeight="bold">
-      {title}
-    </Text>
-  ) : (
-    <NakedLink passHref href={route}>
-      <LinkOverlay isExternal={isExternal}>
-        <Text fontSize="xl" as="h3" fontWeight="bold">
-          {title}
-        </Text>
-      </LinkOverlay>
-    </NakedLink>
-  );
-
-  return (
-    <LinkBox
-      as={HStack}
-      position="relative"
-      width="100%"
-      backgroundColor="white"
-      rounded="lg"
-      shadow="short"
-      paddingX={6}
-      paddingY={4}
-      border="1px solid"
-      borderColor={isDisabled ? "gray.100" : "gray.200"}
-      cursor={isDisabled ? "not-allowed" : "pointer"}
-      transition="all 0.3s ease"
-      sx={{
-        " > * ": {
-          opacity: isDisabled ? 0.4 : 1,
-        },
-        _hover: isDisabled
-          ? {}
-          : {
-              boxShadow: "long",
-              backgroundColor: "gray.50",
-            },
-      }}
-      {...props}
-    >
-      <Stack direction={{ base: "column", md: "row" }} flex="1" spacing={6}>
-        <Center>{logo}</Center>
-        <Stack flex="1" paddingRight={10}>
-          <HStack>
-            {titleElement}
-            {badge}
-          </HStack>
-          <Text color="gray.600">{body}</Text>
-        </Stack>
-      </Stack>
-      {showButton ? (
-        <Center position="absolute" right="0" paddingRight={5} pointerEvents="none">
-          <ChevronRightIcon boxSize={8} />
-        </Center>
-      ) : null}
-    </LinkBox>
-  );
-}
+export const IntegrationCard = chakraForwardRef<"div", IntegrationCardProps>(
+  function IntegrationCard(
+    { logo, title, body, badge, isDisabled, href, isExternal, ...props },
+    ref
+  ) {
+    return (
+      <LinkBox
+        ref={ref}
+        as={Card}
+        isInteractive
+        paddingX={6}
+        paddingY={4}
+        isDisabled={isDisabled}
+        {...props}
+      >
+        <HStack spacing={6}>
+          <Stack direction={{ base: "column", md: "row" }} flex="1" spacing={6}>
+            <Center width={{ base: "auto", md: "120px" }}>{logo}</Center>
+            <Stack flex="1">
+              <HStack>
+                {isDisabled ? (
+                  <Text fontSize="xl" as="h3" fontWeight="bold">
+                    {title}
+                  </Text>
+                ) : (
+                  <NakedLink passHref href={href}>
+                    <LinkOverlay isExternal={isExternal}>
+                      <Text fontSize="xl" as="h3" fontWeight="bold">
+                        {title}
+                      </Text>
+                    </LinkOverlay>
+                  </NakedLink>
+                )}
+                {badge}
+              </HStack>
+              <Text color="gray.600">{body}</Text>
+            </Stack>
+          </Stack>
+          <Center>
+            <ChevronRightIcon boxSize={8} />
+          </Center>
+        </HStack>
+      </LinkBox>
+    );
+  }
+);
