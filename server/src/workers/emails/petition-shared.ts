@@ -1,4 +1,4 @@
-import { indexBy, isDefined, uniq } from "remeda";
+import { groupBy, indexBy, isDefined, uniq } from "remeda";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
@@ -29,47 +29,52 @@ export async function petitionShared(
     throw new Error(`UserData not found for User:${payload.user_id}`);
   }
   const userIds = uniq(permissions.filter(isDefined).map((p) => p.user_id!));
-  const [permissionUsers, permissionUsersData, petitions] = await Promise.all([
+  const [users, usersData, petitions] = await Promise.all([
     context.users.loadUser(userIds),
     context.users.loadUserDataByUserId(userIds),
     context.petitions.loadPetition(uniq(permissions.filter(isDefined).map((p) => p.petition_id))),
   ]);
-  const permissionUsersById = indexBy(permissionUsers.filter(isDefined), (p) => p.id);
-  const petitionsById = indexBy(petitions.filter(isDefined), (p) => p.id);
+  const usersById = indexBy(users.filter(isDefined), (p) => p.id);
   const emails: EmailLog[] = [];
   const { emailFrom, ...layoutProps } = await getLayoutProps(user.org_id, context);
 
-  for (const permission of permissions) {
-    if (permission) {
-      const permissionUser = permissionUsersById[permission.user_id!];
-      const permissionUserData = permissionUsersData.find(
-        (ud) => ud!.id === permissionUser.user_data_id
-      )!;
-      const petition = petitionsById[permission.petition_id];
-      const { html, text, subject, from } = await buildEmail(
-        PetitionSharedEmail,
-        {
-          petitionId: toGlobalId("Petition", petition.id),
-          petitionName: petition.name,
-          name: permissionUserData.first_name,
-          ownerName: fullName(userData.first_name, userData.last_name)!,
-          ownerEmail: userData.email,
-          message: payload.message,
-          isTemplate: petition.is_template,
-          ...layoutProps,
-        },
-        { locale: petition.locale }
-      );
-      const email = await context.emailLogs.createEmail({
-        from: buildFrom(from, emailFrom),
-        to: permissionUserData.email,
-        subject,
-        text,
-        html,
-        created_from: `PetitionPermission:${permission.id}`,
-      });
-      emails.push(email);
-    }
+  const permissionsByUserId = groupBy(
+    permissions.filter((p) => isDefined(p?.user_id)),
+    (p) => p!.user_id!
+  );
+
+  for (const [userId, permissions] of Object.entries(permissionsByUserId)) {
+    const _petitions = petitions.filter(
+      (p) => isDefined(p) && permissions.some((permission) => permission!.petition_id === p.id)
+    );
+    const permissionUser = usersById[userId!];
+    const permissionUserData = usersData.find((ud) => ud!.id === permissionUser.user_data_id)!;
+
+    const { html, text, subject, from } = await buildEmail(
+      PetitionSharedEmail,
+      {
+        petitions: _petitions.map((p) => ({
+          globalId: toGlobalId("Petition", p!.id),
+          name: p!.name,
+        })),
+        name: permissionUserData.first_name,
+        ownerName: fullName(userData.first_name, userData.last_name)!,
+        ownerEmail: userData.email,
+        message: payload.message,
+        isTemplate: _petitions[0]!.is_template,
+        ...layoutProps,
+      },
+      { locale: permissionUserData.details?.preferredLocale ?? "en" }
+    );
+    const email = await context.emailLogs.createEmail({
+      from: buildFrom(from, emailFrom),
+      to: permissionUserData.email,
+      subject,
+      text,
+      html,
+      created_from: `User:${user.id}`,
+    });
+    emails.push(email);
   }
 
   return emails;

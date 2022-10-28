@@ -705,14 +705,29 @@
     "context": "Access the {isTemplate, select, true{template} other{parallel}}"
   },
   {
+    "term": "petition-shared-email.go-to-parallel",
+    "definition": "Go to Parallel",
+    "context": "Go to Parallel"
+  },
+  {
     "term": "petition-shared-email.subject",
     "definition": "{userName} has shared {petitionName} with you",
     "context": "{userName} has shared {petitionName} with you"
   },
   {
+    "term": "petition-shared-email.subject-multiple",
+    "definition": "{userName} has shared {amount} {isTemplate, select, true{templates} other{parallels}} with you",
+    "context": "{userName} has shared {amount} {isTemplate, select, true{templates} other{parallels}} with you"
+  },
+  {
     "term": "petition-shared-email.text",
     "definition": "{owner} has shared the following {isTemplate, select, true{template} other{parallel}} with you.",
     "context": "{owner} has shared the following {isTemplate, select, true{template} other{parallel}} with you."
+  },
+  {
+    "term": "petition-shared-email.text-multiple",
+    "definition": "{owner} has shared the following {isTemplate, select, true{templates} other{parallels}} with you:",
+    "context": "{owner} has shared the following {isTemplate, select, true{templates} other{parallels}} with you:"
   },
   {
     "term": "petition-sharing-notification.access-button",
@@ -721,8 +736,8 @@
   },
   {
     "term": "petition-sharing-notification.access-click-link",
-    "definition": "Follow the link below link to access it.",
-    "context": "Follow the link below link to access it."
+    "definition": "Follow the link below link to access.",
+    "context": "Follow the link below link to access."
   },
   {
     "term": "public-petition-link.text-1",

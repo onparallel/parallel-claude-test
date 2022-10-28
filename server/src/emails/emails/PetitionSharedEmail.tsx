@@ -1,10 +1,9 @@
 import { MjmlColumn, MjmlSection, MjmlText } from "@faire/mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
-import { Email } from "../buildEmail";
 import { BreakLines } from "../../util/BreakLines";
+import { Email } from "../buildEmail";
 import { Button } from "../components/Button";
-import { ClosingParallelTeam } from "../components/ClosingParallelTeam";
 import { GreetingUser } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
 import { closing, greetingUser } from "../components/texts";
@@ -12,8 +11,7 @@ import { UserMessageBox } from "../components/UserMessageBox";
 
 export type PetitionSharedEmailProps = {
   name: string | null;
-  petitionId: string;
-  petitionName: string | null;
+  petitions: { globalId: string; name: string | null }[];
   ownerEmail: string;
   ownerName: string;
   message: string | null;
@@ -30,20 +28,30 @@ const email: Email<PetitionSharedEmailProps> = {
       { senderName: ownerName }
     );
   },
-  subject({ petitionName, ownerName }: PetitionSharedEmailProps, intl: IntlShape) {
-    return intl.formatMessage(
-      {
-        id: "petition-shared-email.subject",
-        defaultMessage: "{userName} has shared {petitionName} with you",
-      },
-      { petitionName, userName: ownerName }
-    );
+  subject({ petitions, ownerName, isTemplate }: PetitionSharedEmailProps, intl: IntlShape) {
+    if (petitions.length > 1) {
+      return intl.formatMessage(
+        {
+          id: "petition-shared-email.subject-multiple",
+          defaultMessage:
+            "{userName} has shared {amount} {isTemplate, select, true{templates} other{parallels}} with you",
+        },
+        { amount: petitions.length, userName: ownerName, isTemplate }
+      );
+    } else {
+      return intl.formatMessage(
+        {
+          id: "petition-shared-email.subject",
+          defaultMessage: "{userName} has shared {petitionName} with you",
+        },
+        { petitionName: petitions[0].name, userName: ownerName }
+      );
+    }
   },
   text(
     {
       name,
-      petitionId,
-      petitionName,
+      petitions,
       ownerName,
       ownerEmail,
       message,
@@ -52,44 +60,83 @@ const email: Email<PetitionSharedEmailProps> = {
     }: PetitionSharedEmailProps,
     intl: IntlShape
   ) {
+    let body = "";
+    if (petitions.length > 1) {
+      body = outdent`
+        ${intl.formatMessage(
+          {
+            id: "petition-shared-email.text-multiple",
+            defaultMessage:
+              "{owner} has shared the following {isTemplate, select, true{templates} other{parallels}} with you:",
+          },
+          { owner: `${ownerName} (${ownerEmail})`, ownerEmail, isTemplate }
+        )}
+
+        ${petitions
+          .map(
+            ({ name }) =>
+              name ||
+              intl.formatMessage({
+                id: "generic.unnamed-parallel",
+                defaultMessage: "Unnamed parallel",
+              })
+          )
+          .join("\n")}
+
+        ${message
+          ?.split(/\n/)
+          .map((line) => `> ${line}`)
+          .join("\n")}
+
+        ${intl.formatMessage({
+          id: "petition-sharing-notification.access-click-link",
+          defaultMessage: "Follow the link below link to access.",
+        })}
+        ${parallelUrl}/${intl.locale}/app/petitions
+      `;
+    } else {
+      body = outdent`
+        ${intl.formatMessage(
+          {
+            id: "petition-shared-email.text",
+            defaultMessage:
+              "{owner} has shared the following {isTemplate, select, true{template} other{parallel}} with you.",
+          },
+          { owner: `${ownerName} (${ownerEmail})`, ownerEmail, isTemplate }
+        )}
+
+        ${
+          petitions[0].name ||
+          intl.formatMessage({
+            id: "generic.unnamed-parallel",
+            defaultMessage: "Unnamed parallel",
+          })
+        }
+
+        ${message
+          ?.split(/\n/)
+          .map((line) => `> ${line}`)
+          .join("\n")}
+
+        ${intl.formatMessage({
+          id: "petition-sharing-notification.access-click-link",
+          defaultMessage: "Follow the link below link to access.",
+        })}
+        ${parallelUrl}/${intl.locale}/app/petitions/${petitions[0].globalId}
+      `;
+    }
+
     return outdent`
       ${greetingUser({ name }, intl)}
 
-      ${intl.formatMessage(
-        {
-          id: "petition-shared-email.text",
-          defaultMessage:
-            "{owner} has shared the following {isTemplate, select, true{template} other{parallel}} with you.",
-        },
-        { owner: `${ownerName} (${ownerEmail})`, ownerEmail, isTemplate }
-      )}
-
-      ${
-        petitionName ||
-        intl.formatMessage({
-          id: "generic.unnamed-parallel",
-          defaultMessage: "Unnamed parallel",
-        })
-      }
-
-      ${message
-        ?.split(/\n/)
-        .map((line) => `> ${line}`)
-        .join("\n")}
-
-      ${intl.formatMessage({
-        id: "petition-sharing-notification.access-click-link",
-        defaultMessage: "Follow the link below link to access it.",
-      })}
-      ${parallelUrl}/${intl.locale}/app/petitions/${petitionId}
+      ${body}
 
       ${closing({}, intl)}
     `;
   },
   html({
     name,
-    petitionId,
-    petitionName,
+    petitions,
     ownerName,
     ownerEmail,
     message,
@@ -112,33 +159,67 @@ const email: Email<PetitionSharedEmailProps> = {
         <MjmlSection padding="0">
           <MjmlColumn>
             <GreetingUser name={name} />
-            <MjmlText>
-              <FormattedMessage
-                id="petition-shared-email.text"
-                defaultMessage="{owner} has shared the following {isTemplate, select, true{template} other{parallel}} with you."
-                values={{
-                  owner: (
-                    <b>
-                      {ownerName} ({ownerEmail})
-                    </b>
-                  ),
-
-                  isTemplate,
-                }}
-              />
-            </MjmlText>
-            <MjmlText fontSize="16px">
-              {petitionName ? (
-                <li>{petitionName}</li>
-              ) : (
-                <li style={{ color: "#A0AEC0", fontStyle: "italic" }}>
+            {petitions.length > 1 ? (
+              <>
+                <MjmlText>
                   <FormattedMessage
-                    id="generic.unnamed-parallel"
-                    defaultMessage="Unnamed parallel"
+                    id="petition-shared-email.text-multiple"
+                    defaultMessage="{owner} has shared the following {isTemplate, select, true{templates} other{parallels}} with you:"
+                    values={{
+                      owner: (
+                        <b>
+                          {ownerName} ({ownerEmail})
+                        </b>
+                      ),
+                      isTemplate,
+                    }}
                   />
-                </li>
-              )}
-            </MjmlText>
+                </MjmlText>
+                <MjmlText fontSize="16px">
+                  {petitions.map(({ name }) =>
+                    name ? (
+                      <li>{name}</li>
+                    ) : (
+                      <li style={{ color: "#A0AEC0", fontStyle: "italic" }}>
+                        <FormattedMessage
+                          id="generic.unnamed-parallel"
+                          defaultMessage="Unnamed parallel"
+                        />
+                      </li>
+                    )
+                  )}
+                </MjmlText>
+              </>
+            ) : (
+              <>
+                <MjmlText>
+                  <FormattedMessage
+                    id="petition-shared-email.text"
+                    defaultMessage="{owner} has shared the following {isTemplate, select, true{template} other{parallel}} with you."
+                    values={{
+                      owner: (
+                        <b>
+                          {ownerName} ({ownerEmail})
+                        </b>
+                      ),
+                      isTemplate,
+                    }}
+                  />
+                </MjmlText>
+                <MjmlText fontSize="16px">
+                  {petitions[0].name ? (
+                    <li>{petitions[0].name}</li>
+                  ) : (
+                    <li style={{ color: "#A0AEC0", fontStyle: "italic" }}>
+                      <FormattedMessage
+                        id="generic.unnamed-parallel"
+                        defaultMessage="Unnamed parallel"
+                      />
+                    </li>
+                  )}
+                </MjmlText>
+              </>
+            )}
           </MjmlColumn>
         </MjmlSection>
 
@@ -150,14 +231,22 @@ const email: Email<PetitionSharedEmailProps> = {
 
         <MjmlSection>
           <MjmlColumn>
-            <Button href={`${parallelUrl}/${locale}/app/petitions/${petitionId}`}>
-              <FormattedMessage
-                id="petition-shared-email.access-button"
-                defaultMessage="Access the {isTemplate, select, true{template} other{parallel}}"
-                values={{ isTemplate }}
-              />
-            </Button>
-            <ClosingParallelTeam />
+            {petitions.length > 1 ? (
+              <Button href={`${parallelUrl}/${locale}/app/petitions`}>
+                <FormattedMessage
+                  id="petition-shared-email.go-to-parallel"
+                  defaultMessage="Go to Parallel"
+                />
+              </Button>
+            ) : (
+              <Button href={`${parallelUrl}/${locale}/app/petitions/${petitions[0].globalId}`}>
+                <FormattedMessage
+                  id="petition-shared-email.access-button"
+                  defaultMessage="Access the {isTemplate, select, true{template} other{parallel}}"
+                  values={{ isTemplate }}
+                />
+              </Button>
+            )}
           </MjmlColumn>
         </MjmlSection>
       </Layout>

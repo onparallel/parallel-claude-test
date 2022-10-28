@@ -49,7 +49,7 @@ export async function signatureCancelledRequestError(
         })),
         ...layoutProps,
       },
-      { locale: petition.locale }
+      { locale: userData.details?.preferredLocale ?? "en" }
     );
 
     emails.push(

@@ -57,7 +57,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
           defaultMessage:
             "You have {count, plural, =1{# new comment} other{# new comments}} on {subject, select, null{your parallel} other{{subject}}}:",
         },
-        { count: commentCount, subject: emailSubject }
+        { count: commentCount, subject: emailSubject, tone: theme.preferredTone }
       )}
 
       ${intl.formatMessage({

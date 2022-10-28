@@ -57,7 +57,7 @@ export async function signatureCancelledDeclinedBySigner(
         signerName,
         ...layoutProps,
       },
-      { locale: petition.locale }
+      { locale: userData.details?.preferredLocale ?? "en" }
     );
 
     emails.push(
