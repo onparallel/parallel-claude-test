@@ -53,8 +53,8 @@ export function SettingsLayout({
           backgroundColor="white"
           borderRight="1px solid"
           borderRightColor="gray.100"
-          width={{ base: "auto", md: 64 }}
-          flexShrink={0}
+          flex="1"
+          maxWidth={{ base: "auto", md: 64 }}
           display={{ base: isBase ? "block" : "none", md: "block" }}
         >
           <Flex
@@ -74,56 +74,54 @@ export function SettingsLayout({
             </SettingsLayoutMenuItem>
           ))}
         </Box>
-        <Flex
-          display={{
-            base: isBase ? "none" : "flex",
-            md: "flex",
-          }}
-          direction="column"
-          flex="1"
-          minWidth={0}
-          backgroundColor="white"
-        >
-          {isBase ? null : (
-            <>
-              <Flex
-                flexDirection="row"
-                alignItems="center"
-                height={16}
-                paddingX={4}
-                borderBottom="1px solid"
-                borderBottomColor="gray.100"
-              >
-                <NakedLink href={basePath}>
-                  <IconButton
-                    as="a"
-                    icon={<ArrowBackIcon />}
-                    variant="ghost"
-                    aria-label={intl.formatMessage({
-                      id: "generic.go-back",
-                      defaultMessage: "Go back",
-                    })}
-                    marginRight={2}
-                    display={{
-                      base: "flex",
-                      md: showBackButton ? "flex" : "none",
-                    }}
-                  />
-                </NakedLink>
-                {header}
-              </Flex>
-              <Box
-                flex="1"
-                minHeight={0}
-                overflow="auto"
-                backgroundColor="gray.50"
-                position="relative"
-              >
-                {children}
-              </Box>
-            </>
-          )}
-        </Flex>
+        {isBase ? null : (
+          <Flex
+            display={{
+              base: isBase ? "none" : "flex",
+              md: "flex",
+            }}
+            direction="column"
+            flex="1"
+            minWidth={0}
+            backgroundColor="white"
+          >
+            <Flex
+              flexDirection="row"
+              alignItems="center"
+              height={16}
+              paddingX={4}
+              borderBottom="1px solid"
+              borderBottomColor="gray.100"
+            >
+              <NakedLink href={basePath}>
+                <IconButton
+                  as="a"
+                  icon={<ArrowBackIcon />}
+                  variant="ghost"
+                  aria-label={intl.formatMessage({
+                    id: "generic.go-back",
+                    defaultMessage: "Go back",
+                  })}
+                  marginRight={2}
+                  display={{
+                    base: "flex",
+                    md: showBackButton ? "flex" : "none",
+                  }}
+                />
+              </NakedLink>
+              {header}
+            </Flex>
+            <Box
+              flex="1"
+              minHeight={0}
+              overflow="auto"
+              backgroundColor="gray.50"
+              position="relative"
+            >
+              {children}
+            </Box>
+          </Flex>
+        )}
       </Flex>
     </AppLayout>
   );

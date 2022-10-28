@@ -31,7 +31,7 @@ export const IntegrationCard = chakraForwardRef<"div", IntegrationCardProps>(
         {...props}
       >
         <HStack spacing={6}>
-          <Stack direction={{ base: "column", md: "row" }} flex="1" spacing={6}>
+          <Stack direction={{ base: "column", md: "row" }} flex="1" spacing={{ base: 4, md: 6 }}>
             <Center width={{ base: "auto", md: "120px" }}>{logo}</Center>
             <Stack flex="1">
               <HStack>

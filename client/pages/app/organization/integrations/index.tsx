@@ -7,6 +7,7 @@ import {
   Badge,
   Box,
   Button,
+  Center,
   Heading,
   Image,
   Stack,
@@ -117,13 +118,7 @@ function OrganizationIntegrations() {
     >
       <Alert status="info" paddingX={6}>
         <AlertIcon />
-        <Stack
-          direction={{ base: "column", md: "row" }}
-          justifyContent="space-between"
-          alignItems={{ base: "flex-start", md: "center" }}
-          flex="1"
-          spacing={4}
-        >
+        <Stack direction={{ base: "column", md: "row" }} flex="1" spacing={4}>
           <Box>
             <AlertTitle>
               <FormattedMessage
@@ -138,7 +133,7 @@ function OrganizationIntegrations() {
               />
             </AlertDescription>
           </Box>
-          <Box>
+          <Center>
             <Button
               variant="outline"
               colorScheme="blue"
@@ -157,7 +152,7 @@ function OrganizationIntegrations() {
                 defaultMessage="Suggest integration"
               />
             </Button>
-          </Box>
+          </Center>
         </Stack>
       </Alert>
       <Stack padding={4} spacing={5} maxWidth="container.sm" paddingBottom={16}>
