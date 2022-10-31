@@ -21,19 +21,18 @@ import { CustomEditor, SlateElement, SlateText } from "@parallel/utils/slate/typ
 import { useConstant } from "@parallel/utils/useConstant";
 import {
   createHistoryPlugin,
-  createPlateEditor,
   createPlugins,
   createReactPlugin,
   focusEditor,
   getEndPoint,
   insertText,
-  Plate,
+  PlateProvider,
   select,
 } from "@udecode/plate-core";
 import { createParagraphPlugin } from "@udecode/plate-paragraph";
-import { CSSProperties, MouseEvent, useImperativeHandle, useMemo } from "react";
+import { CSSProperties, MouseEvent, useImperativeHandle, useMemo, useRef } from "react";
 import { useIntl } from "react-intl";
-import { ReactEditor } from "slate-react";
+import { PlateWithEditorRef } from "./PlateWithEditorRef";
 
 type PlaceholderInputValue = [PlaceholderInputBlock];
 
@@ -72,21 +71,18 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
         plugin as any,
       ])
     );
-    const editor = useMemo<PlaceholderInputEditor>(
-      () => createPlateEditor<PlaceholderInputValue, PlaceholderInputEditor>({ id, plugins }),
-      []
-    );
+    const editorRef = useRef<PlaceholderInputEditor>(null);
 
     useImperativeHandle(
       ref,
       () => ({
         focus: () => {
+          const editor = editorRef.current!;
           focusEditor(editor);
-          ReactEditor.focus(editor as any);
           select(editor, getEndPoint(editor, []));
         },
       }),
-      [editor]
+      []
     );
 
     const placeholderMenuId = useId(undefined, "placeholder-menu");
@@ -106,7 +102,8 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
     const selected = isOpen ? values[index] : undefined;
 
     function onPlaceholderButtonClick(event: MouseEvent) {
-      event.stopPropagation();
+      const editor = editorRef.current!;
+      event.preventDefault();
       insertText(editor, "#", { at: editor.selection?.anchor });
       focusEditor(editor);
     }
@@ -129,7 +126,13 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
     );
 
     return (
-      <>
+      <PlateProvider<PlaceholderInputValue, PlaceholderInputEditor>
+        plugins={plugins}
+        value={slateValue}
+        onChange={(value) =>
+          onChange(slateNodesToTextWithPlaceholders(value as PlaceholderInputValue))
+        }
+      >
         <Box
           id={id}
           ref={referenceRef}
@@ -143,14 +146,8 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
           {...inputStyles}
           {...props}
         >
-          <Plate<PlaceholderInputValue, PlaceholderInputEditor>
-            id={id}
-            editor={editor}
-            plugins={plugins}
-            value={slateValue}
-            onChange={(value) =>
-              onChange(slateNodesToTextWithPlaceholders(value as PlaceholderInputValue))
-            }
+          <PlateWithEditorRef<PlaceholderInputValue, PlaceholderInputEditor>
+            editorRef={editorRef}
             editableProps={{
               readOnly: isDisabled,
               placeholder,
@@ -184,11 +181,7 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
                 borderColor: "gray.400",
                 color: "gray.900",
               }}
-              _active={{
-                borderBottomWidth: "1px",
-              }}
-              animation="border-bottom-width 150ms ease"
-              onClick={onPlaceholderButtonClick}
+              onMouseDown={onPlaceholderButtonClick}
             >
               <Box as="span" aria-hidden="true">
                 #
@@ -205,11 +198,13 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
             search={search}
             values={values}
             highlightedIndex={index}
-            onAddPlaceholder={(placeholder) => onAddPlaceholder(editor as any, placeholder)}
+            onAddPlaceholder={(placeholder) =>
+              onAddPlaceholder(editorRef.current! as any, placeholder)
+            }
             onHighlightOption={onHighlightOption}
           />
         </Portal>
-      </>
+      </PlateProvider>
     );
   }
 );

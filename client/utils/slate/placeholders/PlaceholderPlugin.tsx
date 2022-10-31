@@ -7,9 +7,11 @@ import {
   createPluginFactory,
   insertNodes,
   moveSelection,
+  PlateEditor,
   PlatePlugin,
   select,
   TRenderElementProps,
+  Value,
 } from "@udecode/plate-core";
 import { ReactNode, useCallback, useState } from "react";
 import { clamp, isDefined } from "remeda";
@@ -44,14 +46,17 @@ export function usePlaceholderPlugin(options: PlaceholderOption[]) {
       ? options.filter((c) => c.label.toLowerCase().includes(state.search!.toLowerCase()))
       : options
   );
-  const onAddPlaceholder = useCallback((editor: CustomEditor, placeholder: PlaceholderOption) => {
-    const { target } = stateRef.current;
-    if (target !== null) {
-      select(editor, target);
-      insertPlaceholder(editor, placeholder);
-      setState((state) => ({ ...state, index: 0, target: null }));
-    }
-  }, []);
+  const onAddPlaceholder = useCallback(
+    (editor: CustomEditor<any>, placeholder: PlaceholderOption) => {
+      const { target } = stateRef.current;
+      if (target !== null) {
+        select(editor, target);
+        insertPlaceholder(editor as any, placeholder);
+        setState((state) => ({ ...state, index: 0, target: null }));
+      }
+    },
+    []
+  );
 
   const onHighlightOption = useCallback((index: number) => {
     setState((s) => ({ ...s, index }));
@@ -207,12 +212,15 @@ const PlaceholderToken = function ({
   );
 };
 
-function insertPlaceholder(editor: CustomEditor, placeholder: PlaceholderOption) {
+function insertPlaceholder<E extends PlateEditor<any> = PlateEditor<Value>>(
+  editor: E,
+  placeholder: PlaceholderOption
+) {
   insertNodes(editor, {
     type: PLACEHOLDER_TYPE,
     placeholder: placeholder.value,
     children: [{ text: "" }],
-  });
+  } as any);
 
   moveSelection(editor);
 }

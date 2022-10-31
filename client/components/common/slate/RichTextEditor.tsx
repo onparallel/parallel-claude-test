@@ -10,7 +10,6 @@ import { CustomEditor } from "@parallel/utils/slate/types";
 import { useEditorPopper } from "@parallel/utils/slate/useEditorPopper";
 import { useConstant } from "@parallel/utils/useConstant";
 import { useFocus } from "@parallel/utils/useFocus";
-import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { createAutoformatPlugin } from "@udecode/plate-autoformat";
 import {
@@ -28,9 +27,7 @@ import {
   createPlugins,
   createReactPlugin,
   focusEditor,
-  Plate,
   PlateProvider,
-  usePlateEditorState,
 } from "@udecode/plate-core";
 import { createHeadingPlugin, ELEMENT_H1, ELEMENT_H2 } from "@udecode/plate-heading";
 import { createLinkPlugin, ELEMENT_LINK } from "@udecode/plate-link";
@@ -43,9 +40,10 @@ import {
   unwrapList,
 } from "@udecode/plate-list";
 import { createParagraphPlugin, ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
-import { CSSProperties, forwardRef, ReactNode, useImperativeHandle, useMemo } from "react";
+import { CSSProperties, forwardRef, ReactNode, useImperativeHandle, useMemo, useRef } from "react";
 import { omit, pick } from "remeda";
 import { EditableProps } from "slate-react/dist/components/editable";
+import { PlateWithEditorRef } from "./PlateWithEditorRef";
 import { RichTextEditorToolbar } from "./RichTextEditorToolbar";
 
 const components = {
@@ -93,7 +91,7 @@ export interface RichTextEditorInstance {
   focus(): void;
 }
 
-const _RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
+export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
   function RichTextEditor(
     {
       id,
@@ -187,7 +185,7 @@ const _RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
       isRequired,
       isReadOnly,
     });
-    const editorRef = useUpdatingRef(usePlateEditorState(id));
+    const editorRef = useRef<RichTextPEditor>(null);
 
     useImperativeHandle(ref, () => ({
       focus: () => {
@@ -239,7 +237,7 @@ const _RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
       [isDisabled, placeholder, placeholderMenuId, itemIdPrefix, selected?.value, focusProps]
     );
 
-    const { popperRef } = useEditorPopper(editorRef.current!, target, {
+    const { popperRef } = useEditorPopper(editorRef.current! as any, target, {
       strategy: "fixed",
       placement: "bottom-start",
       enabled: isMenuOpen,
@@ -257,55 +255,51 @@ const _RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
     ]);
 
     return (
-      <Box
-        role="application"
-        overflow="hidden"
-        aria-disabled={formControl.disabled}
-        {...formControlProps}
-        {...inputStyles}
+      <PlateProvider<RichTextEditorValue, RichTextPEditor>
+        plugins={plugins}
+        initialValue={initialValue}
+        onChange={!isDisabled ? onChange : undefined}
       >
-        <RichTextEditorToolbar
-          editorId={id}
-          height="40px"
-          isDisabled={formControl.disabled || formControl.readOnly}
-          hasPlaceholders={placeholderOptions.length > 0}
-          hasHeadingButton={toolbarOpts?.headingButton}
-          hasListButtons={toolbarOpts?.listButtons}
-        />
-        <Plate<RichTextEditorValue, RichTextPEditor>
-          id={id}
-          plugins={plugins}
-          initialValue={initialValue}
-          onChange={!isDisabled ? onChange : undefined}
-          editableProps={editableProps}
-          renderEditable={renderEditable}
-        ></Plate>
-        <Portal>
-          <PlaceholderMenu
-            ref={popperRef}
-            isOpen={isMenuOpen}
-            menuId={placeholderMenuId}
-            itemIdPrefix={itemIdPrefix}
-            search={search}
-            values={values}
-            highlightedIndex={index}
-            onAddPlaceholder={(placeholder) => onAddPlaceholder(editorRef.current!, placeholder)}
-            onHighlightOption={onHighlightOption}
-            width="fit-content"
-            position="relative"
+        <Box
+          role="application"
+          overflow="hidden"
+          aria-disabled={formControl.disabled}
+          {...formControlProps}
+          {...inputStyles}
+        >
+          <RichTextEditorToolbar
+            height="40px"
+            isDisabled={formControl.disabled || formControl.readOnly}
+            hasPlaceholders={placeholderOptions.length > 0}
+            hasHeadingButton={toolbarOpts?.headingButton}
+            hasListButtons={toolbarOpts?.listButtons}
           />
-        </Portal>
-      </Box>
+          <PlateWithEditorRef<RichTextEditorValue, RichTextPEditor>
+            editorRef={editorRef}
+            editableProps={editableProps}
+            renderEditable={renderEditable}
+          />
+          <Portal>
+            <PlaceholderMenu
+              ref={popperRef}
+              isOpen={isMenuOpen}
+              menuId={placeholderMenuId}
+              itemIdPrefix={itemIdPrefix}
+              search={search}
+              values={values}
+              highlightedIndex={index}
+              onAddPlaceholder={(placeholder) =>
+                onAddPlaceholder(editorRef.current! as any, placeholder)
+              }
+              onHighlightOption={onHighlightOption}
+              width="fit-content"
+              position="relative"
+            />
+          </Portal>
+        </Box>
+      </PlateProvider>
     );
   }
-);
-
-export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
-  (props, ref) => (
-    <PlateProvider id={props.id}>
-      <_RichTextEditor ref={ref} {...props} />
-    </PlateProvider>
-  )
 );
 
 function RenderElement({ attributes, nodeProps, styles, element, editor, ...props }: any) {
