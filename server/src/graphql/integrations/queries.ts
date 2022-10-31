@@ -1,24 +1,11 @@
-import { nonNull, objectType, queryField, stringArg } from "nexus";
+import { nonNull, queryField, stringArg } from "nexus";
 import { authenticateAnd } from "../helpers/authorize";
 import { datetimeArg } from "../helpers/scalars";
 import { userHasEnabledIntegration, userHasFeatureFlag } from "../petition/authorizers";
 
 export const queries = queryField((t) => {
   t.paginationField("dowJonesRiskEntitySearch", {
-    type: objectType({
-      name: "DowJonesRiskEntitySearchResult",
-      definition(t) {
-        t.id("id");
-        t.string("type");
-        t.string("primaryName");
-        t.string("title");
-        t.string("countryTerritoryName");
-        t.string("gender");
-        t.boolean("isSubsidiary");
-        t.list.string("iconHints");
-        t.nullable.jsonObject("dateOfBirth");
-      },
-    }),
+    type: "DowJonesRiskEntitySearchResult",
     authorize: authenticateAnd(
       userHasEnabledIntegration("DOW_JONES_KYC"),
       userHasFeatureFlag("DOW_JONES_KYC")
@@ -34,6 +21,25 @@ export const queries = queryField((t) => {
       );
 
       return await ctx.dowJonesKyc.riskEntitySearch(args, integration);
+    },
+  });
+
+  t.field("dowJonesRiskEntityProfile", {
+    type: "DowJonesRiskEntityProfileResult",
+    authorize: authenticateAnd(
+      userHasEnabledIntegration("DOW_JONES_KYC"),
+      userHasFeatureFlag("DOW_JONES_KYC")
+    ),
+    args: {
+      profileId: nonNull(stringArg()),
+    },
+    resolve: async (_, args, ctx) => {
+      const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
+        ctx.user!.org_id,
+        "DOW_JONES_KYC"
+      );
+
+      return await ctx.dowJonesKyc.riskEntityProfile(args.profileId, integration);
     },
   });
 });

@@ -269,7 +269,7 @@ const _PetitionField = {
         "DATE",
         "PHONE",
         "ES_TAX_DOCUMENTS",
-        "DOW_JONES_KYC_RESEARCH",
+        "DOW_JONES_KYC_RESEARCH", // TODO update docs with this new field
       ],
       description: "The type of the field",
       example: "TEXT",

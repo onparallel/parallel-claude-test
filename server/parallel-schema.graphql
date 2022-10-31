@@ -227,16 +227,60 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 """
 scalar DateTime
 
+type DowJonesRiskEntityDate {
+  day: Int
+  month: Int
+  year: Int
+}
+
+type DowJonesRiskEntityPlace {
+  countryCode: String!
+  descriptor: String!
+}
+
+type DowJonesRiskEntityProfileResult {
+  citizenship: DowJonesRiskEntityPlace!
+  dateOfBirth: DowJonesRiskEntityDate!
+  firstName: String!
+  iconHints: [String!]!
+  id: ID!
+  isDeceased: Boolean!
+  jurisdiction: DowJonesRiskEntityPlace!
+  lastName: String!
+  middleName: String!
+  placeOfBirth: DowJonesRiskEntityPlace!
+  relationships: [DowJonesRiskEntityRelationship!]!
+  residence: DowJonesRiskEntityPlace!
+  sanctions: [DowJonesRiskEntitySanction!]!
+  type: DowJonesRiskEntityType!
+}
+
+type DowJonesRiskEntityRelationship {
+  connectionType: String!
+  firstName: String
+  iconHints: [String!]!
+  lastName: String
+  middleName: String
+  profileId: Int!
+  type: DowJonesRiskEntityType!
+}
+
+type DowJonesRiskEntitySanction {
+  fromDate: DowJonesRiskEntityDate!
+  name: String!
+  sources: [String!]!
+}
+
 type DowJonesRiskEntitySearchResult {
   countryTerritoryName: String!
-  dateOfBirth: JSONObject
+  dateOfBirth: DowJonesRiskEntityDate
   gender: String!
   iconHints: [String!]!
   id: ID!
   isSubsidiary: Boolean!
   primaryName: String!
   title: String!
-  type: String!
+  type: DowJonesRiskEntityType!
 }
 
 type DowJonesRiskEntitySearchResultPagination {
@@ -249,6 +293,11 @@ type DowJonesRiskEntitySearchResultPagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+enum DowJonesRiskEntityType {
+  Entity
+  Person
 }
 
 scalar Duration
@@ -4298,6 +4347,7 @@ type Query {
   Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts
   """
   contactsByEmail(emails: [String!]!): [Contact]!
+  dowJonesRiskEntityProfile(profileId: String!): DowJonesRiskEntityProfileResult!
   dowJonesRiskEntitySearch(
     dateOfBirth: DateTime
 

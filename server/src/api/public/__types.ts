@@ -193,16 +193,60 @@ export type CreatedAt = {
   createdAt: Scalars["DateTime"];
 };
 
+export type DowJonesRiskEntityDate = {
+  day: Maybe<Scalars["Int"]>;
+  month: Maybe<Scalars["Int"]>;
+  year: Maybe<Scalars["Int"]>;
+};
+
+export type DowJonesRiskEntityPlace = {
+  countryCode: Scalars["String"];
+  descriptor: Scalars["String"];
+};
+
+export type DowJonesRiskEntityProfileResult = {
+  citizenship: DowJonesRiskEntityPlace;
+  dateOfBirth: DowJonesRiskEntityDate;
+  firstName: Scalars["String"];
+  iconHints: Array<Scalars["String"]>;
+  id: Scalars["ID"];
+  isDeceased: Scalars["Boolean"];
+  jurisdiction: DowJonesRiskEntityPlace;
+  lastName: Scalars["String"];
+  middleName: Scalars["String"];
+  placeOfBirth: DowJonesRiskEntityPlace;
+  relationships: Array<DowJonesRiskEntityRelationship>;
+  residence: DowJonesRiskEntityPlace;
+  sanctions: Array<DowJonesRiskEntitySanction>;
+  type: DowJonesRiskEntityType;
+};
+
+export type DowJonesRiskEntityRelationship = {
+  connectionType: Scalars["String"];
+  firstName: Scalars["String"];
+  iconHints: Array<Scalars["String"]>;
+  lastName: Scalars["String"];
+  middleName: Scalars["String"];
+  profileId: Scalars["Int"];
+  type: DowJonesRiskEntityType;
+};
+
+export type DowJonesRiskEntitySanction = {
+  fromDate: DowJonesRiskEntityDate;
+  name: Scalars["String"];
+  sources: Array<Scalars["String"]>;
+};
+
 export type DowJonesRiskEntitySearchResult = {
   countryTerritoryName: Scalars["String"];
-  dateOfBirth: Maybe<Scalars["JSONObject"]>;
+  dateOfBirth: Maybe<DowJonesRiskEntityDate>;
   gender: Scalars["String"];
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   isSubsidiary: Scalars["Boolean"];
   primaryName: Scalars["String"];
   title: Scalars["String"];
-  type: Scalars["String"];
+  type: DowJonesRiskEntityType;
 };
 
 export type DowJonesRiskEntitySearchResultPagination = {
@@ -211,6 +255,8 @@ export type DowJonesRiskEntitySearchResultPagination = {
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
 };
+
+export type DowJonesRiskEntityType = "Entity" | "Person";
 
 /** The effective permission for a petition and user */
 export type EffectivePetitionUserPermission = {
@@ -3074,6 +3120,7 @@ export type Query = {
   contacts: ContactPagination;
   /** Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts */
   contactsByEmail: Array<Maybe<Contact>>;
+  dowJonesRiskEntityProfile: DowJonesRiskEntityProfileResult;
   dowJonesRiskEntitySearch: DowJonesRiskEntitySearchResultPagination;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
@@ -3143,6 +3190,10 @@ export type QuerycontactsArgs = {
 
 export type QuerycontactsByEmailArgs = {
   emails: Array<Scalars["String"]>;
+};
+
+export type QuerydowJonesRiskEntityProfileArgs = {
+  profileId: Scalars["String"];
 };
 
 export type QuerydowJonesRiskEntitySearchArgs = {
