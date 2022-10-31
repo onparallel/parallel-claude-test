@@ -539,6 +539,7 @@ AddPetitionAccessDialog.fragments = {
       organization {
         id
         petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+          id
           limit
           used
         }

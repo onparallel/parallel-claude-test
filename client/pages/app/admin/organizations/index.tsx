@@ -295,6 +295,7 @@ AdminOrganizations.fragments = {
         activeUserCount
         createdAt
         petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+          id
           limit
           used
         }
