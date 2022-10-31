@@ -396,6 +396,18 @@ interface IOrgIntegration {
   type: IntegrationType!
 }
 
+type IOrgIntegrationPagination {
+  """
+  The requested slice of items.
+  """
+  items: [IOrgIntegration!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
+}
+
 input ImageOptions {
   resize: ImageOptionsResize
 }
@@ -1018,7 +1030,7 @@ type Mutation {
   """
   marks a Signature integration as default
   """
-  markSignatureIntegrationAsDefault(id: GID!): OrgIntegration!
+  markSignatureIntegrationAsDefault(id: GID!): IOrgIntegration!
 
   """
   Updates the limit of the current usage limit of a given organization
@@ -1823,18 +1835,6 @@ type OrgIntegration implements IOrgIntegration {
   type: IntegrationType!
 }
 
-type OrgIntegrationPagination {
-  """
-  The requested slice of items.
-  """
-  items: [OrgIntegration!]!
-
-  """
-  The total count of items in the list.
-  """
-  totalCount: Int!
-}
-
 """
 An object describing the license of an organization
 """
@@ -1910,7 +1910,7 @@ type Organization implements Timestamps {
     Filter by integration type.
     """
     type: IntegrationType
-  ): OrgIntegrationPagination!
+  ): IOrgIntegrationPagination!
   isUsageLimitReached(limitName: OrganizationUsageLimitName!): Boolean!
 
   """

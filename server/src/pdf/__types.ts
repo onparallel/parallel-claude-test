@@ -193,6 +193,25 @@ export type CreatedAt = {
   createdAt: Scalars["DateTime"];
 };
 
+export type DowJonesRiskEntitySearchResult = {
+  countryTerritoryName: Scalars["String"];
+  dateOfBirth: Maybe<Scalars["JSONObject"]>;
+  gender: Scalars["String"];
+  iconHints: Array<Scalars["String"]>;
+  id: Scalars["ID"];
+  isSubsidiary: Scalars["Boolean"];
+  primaryName: Scalars["String"];
+  title: Scalars["String"];
+  type: Scalars["String"];
+};
+
+export type DowJonesRiskEntitySearchResultPagination = {
+  /** The requested slice of items. */
+  items: Array<DowJonesRiskEntitySearchResult>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+};
+
 /** The effective permission for a petition and user */
 export type EffectivePetitionUserPermission = {
   /** wether user is subscribed or not to emails and alerts of the petition */
@@ -206,6 +225,7 @@ export type FeatureFlag =
   | "AUTO_ANONYMIZE"
   | "CUSTOM_HOST_UI"
   | "DEVELOPER_ACCESS"
+  | "DOW_JONES_KYC"
   | "ES_TAX_DOCUMENTS_FIELD"
   | "EXPORT_CUATRECASAS"
   | "GHOST_LOGIN"
@@ -300,6 +320,23 @@ export type GroupPermissionRemovedEvent = PetitionEvent & {
   user: Maybe<User>;
 };
 
+export type IOrgIntegration = {
+  id: Scalars["GID"];
+  /** Wether this integration is the default to be used if the user has more than one of the same type */
+  isDefault: Scalars["Boolean"];
+  /** Custom name of this integration, provided by the user */
+  name: Scalars["String"];
+  /** The type of the integration. */
+  type: IntegrationType;
+};
+
+export type IOrgIntegrationPagination = {
+  /** The requested slice of items. */
+  items: Array<IOrgIntegration>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+};
+
 export type ImageOptions = {
   resize?: InputMaybe<ImageOptionsResize>;
 };
@@ -319,7 +356,7 @@ export type InputFeatureFlagNameValue = {
 };
 
 /** The types of integrations available. */
-export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
+export type IntegrationType = "DOW_JONES_KYC" | "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
 /** A public template on landing page */
 export type LandingTemplate = {
@@ -447,6 +484,8 @@ export type Mutation = {
   completePetition: Petition;
   /** Create a contact. */
   createContact: Contact;
+  /** Creates a new DOW JONES Factiva integration on the user's organization */
+  createDowJonesFactivaIntegration: OrgIntegration;
   /** Creates an event subscription for the user's petitions */
   createEventSubscription: PetitionEventSubscription;
   /** Creates a task for exporting an xlsx file with petition text replies and sends it to the queue */
@@ -536,7 +575,7 @@ export type Mutation = {
   getTaskResultFile: TaskResultFile;
   loginAs: Result;
   /** marks a Signature integration as default */
-  markSignatureIntegrationAsDefault: OrgIntegration;
+  markSignatureIntegrationAsDefault: IOrgIntegration;
   /** Updates the limit of the current usage limit of a given organization */
   modifyCurrentUsagePeriod: Organization;
   /** Adds, edits or deletes a custom property on the petition */
@@ -719,6 +758,8 @@ export type Mutation = {
   uploadUserAvatar: SupportMethodResponse;
   /** Triggered by new users that want to sign up into Parallel */
   userSignUp: User;
+  /** Tries to get an access_token with provided credentials */
+  validateDowJonesFactivaCredentials: Scalars["Boolean"];
   /** Runs backend checks to validate signature credentials. */
   validateSignatureCredentials: ValidateSignatureCredentialsResult;
   verifyPublicAccess: PublicAccessVerification;
@@ -815,6 +856,12 @@ export type MutationcompletePetitionArgs = {
 
 export type MutationcreateContactArgs = {
   data: CreateContactInput;
+};
+
+export type MutationcreateDowJonesFactivaIntegrationArgs = {
+  clientId: Scalars["String"];
+  password: Scalars["String"];
+  username: Scalars["String"];
 };
 
 export type MutationcreateEventSubscriptionArgs = {
@@ -1600,6 +1647,12 @@ export type MutationuserSignUpArgs = {
   role?: InputMaybe<Scalars["String"]>;
 };
 
+export type MutationvalidateDowJonesFactivaCredentialsArgs = {
+  clientId: Scalars["String"];
+  password: Scalars["String"];
+  username: Scalars["String"];
+};
+
 export type MutationvalidateSignatureCredentialsArgs = {
   credentials: Scalars["JSONObject"];
   provider: SignatureOrgIntegrationProvider;
@@ -1612,7 +1665,7 @@ export type MutationverifyPublicAccessArgs = {
   userAgent?: InputMaybe<Scalars["String"]>;
 };
 
-export type OrgIntegration = {
+export type OrgIntegration = IOrgIntegration & {
   id: Scalars["GID"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
   isDefault: Scalars["Boolean"];
@@ -1620,13 +1673,6 @@ export type OrgIntegration = {
   name: Scalars["String"];
   /** The type of the integration. */
   type: IntegrationType;
-};
-
-export type OrgIntegrationPagination = {
-  /** The requested slice of items. */
-  items: Array<OrgIntegration>;
-  /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
 };
 
 /** An object describing the license of an organization */
@@ -1660,7 +1706,7 @@ export type Organization = Timestamps & {
   /** The ID of the organization. */
   id: Scalars["GID"];
   /** A paginated list with enabled integrations for the organization */
-  integrations: OrgIntegrationPagination;
+  integrations: IOrgIntegrationPagination;
   isUsageLimitReached: Scalars["Boolean"];
   /** Current license for the organization */
   license: Maybe<OrgLicense>;
@@ -3028,6 +3074,7 @@ export type Query = {
   contacts: ContactPagination;
   /** Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts */
   contactsByEmail: Array<Maybe<Contact>>;
+  dowJonesRiskEntitySearch: DowJonesRiskEntitySearchResultPagination;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
   getSlugForPublicPetitionLink: Scalars["String"];
@@ -3096,6 +3143,13 @@ export type QuerycontactsArgs = {
 
 export type QuerycontactsByEmailArgs = {
   emails: Array<Scalars["String"]>;
+};
+
+export type QuerydowJonesRiskEntitySearchArgs = {
+  dateOfBirth?: InputMaybe<Scalars["DateTime"]>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  name: Scalars["String"];
+  offset?: InputMaybe<Scalars["Int"]>;
 };
 
 export type QueryemailIsAvailableArgs = {
@@ -3483,7 +3537,7 @@ export type SignatureOpenedEvent = PetitionEvent & {
   type: PetitionEventType;
 };
 
-export type SignatureOrgIntegration = OrgIntegration & {
+export type SignatureOrgIntegration = IOrgIntegration & {
   /** Environment of this integration, to differentiate between sandbox and production-ready integrations */
   environment: SignatureOrgIntegrationEnvironment;
   id: Scalars["GID"];
@@ -3518,16 +3572,6 @@ export type SignatureStartedEvent = PetitionEvent & {
   openedAt: Maybe<Scalars["DateTime"]>;
   petition: Maybe<Petition>;
   type: PetitionEventType;
-};
-
-export type SsoOrgIntegration = OrgIntegration & {
-  id: Scalars["GID"];
-  /** Wether this integration is the default to be used if the user has more than one of the same type */
-  isDefault: Scalars["Boolean"];
-  /** Custom name of this integration, provided by the user */
-  name: Scalars["String"];
-  /** The type of the integration. */
-  type: IntegrationType;
 };
 
 /** Represents a successful execution. */
@@ -3838,16 +3882,6 @@ export type UserPermissionRemovedEvent = PetitionEvent & {
   petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
-};
-
-export type UserProvisioningOrgIntegration = OrgIntegration & {
-  id: Scalars["GID"];
-  /** Wether this integration is the default to be used if the user has more than one of the same type */
-  isDefault: Scalars["Boolean"];
-  /** Custom name of this integration, provided by the user */
-  name: Scalars["String"];
-  /** The type of the integration. */
-  type: IntegrationType;
 };
 
 export type UserStatus = "ACTIVE" | "INACTIVE";

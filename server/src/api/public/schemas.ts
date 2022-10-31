@@ -269,6 +269,7 @@ const _PetitionField = {
         "DATE",
         "PHONE",
         "ES_TAX_DOCUMENTS",
+        "DOW_JONES_KYC_RESEARCH",
       ],
       description: "The type of the field",
       example: "TEXT",
@@ -287,6 +288,7 @@ const _PetitionField = {
       type: ["array", "null"],
       description:
         "For fields of type `SELECT`, `DYNAMIC_SELECT` and `CHECKBOX`. An array with valid options for the reply.",
+      items: { type: "string" },
     },
     multiple: {
       type: "boolean",

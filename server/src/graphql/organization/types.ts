@@ -203,7 +203,7 @@ export const Organization = objectType({
       },
     });
     t.paginationField("integrations", {
-      type: "OrgIntegration",
+      type: "IOrgIntegration",
       description: "A paginated list with enabled integrations for the organization",
       extendArgs: {
         type: nullable(

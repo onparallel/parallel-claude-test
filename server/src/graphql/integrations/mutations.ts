@@ -12,7 +12,7 @@ import { userHasAccessToIntegrations } from "./authorizers";
 export const markSignatureIntegrationAsDefault = mutationField(
   "markSignatureIntegrationAsDefault",
   {
-    type: "OrgIntegration",
+    type: "IOrgIntegration",
     description: "marks a Signature integration as default",
     authorize: authenticateAnd(
       contextUserHasRole("ADMIN"),

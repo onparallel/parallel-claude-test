@@ -209,6 +209,27 @@ export interface CreatedAt {
   createdAt: Scalars["DateTime"];
 }
 
+export interface DowJonesRiskEntitySearchResult {
+  __typename?: "DowJonesRiskEntitySearchResult";
+  countryTerritoryName: Scalars["String"];
+  dateOfBirth?: Maybe<Scalars["JSONObject"]>;
+  gender: Scalars["String"];
+  iconHints: Array<Scalars["String"]>;
+  id: Scalars["ID"];
+  isSubsidiary: Scalars["Boolean"];
+  primaryName: Scalars["String"];
+  title: Scalars["String"];
+  type: Scalars["String"];
+}
+
+export interface DowJonesRiskEntitySearchResultPagination {
+  __typename?: "DowJonesRiskEntitySearchResultPagination";
+  /** The requested slice of items. */
+  items: Array<DowJonesRiskEntitySearchResult>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+}
+
 /** The effective permission for a petition and user */
 export interface EffectivePetitionUserPermission {
   __typename?: "EffectivePetitionUserPermission";
@@ -223,6 +244,7 @@ export type FeatureFlag =
   | "AUTO_ANONYMIZE"
   | "CUSTOM_HOST_UI"
   | "DEVELOPER_ACCESS"
+  | "DOW_JONES_KYC"
   | "ES_TAX_DOCUMENTS_FIELD"
   | "EXPORT_CUATRECASAS"
   | "GHOST_LOGIN"
@@ -325,6 +347,24 @@ export interface GroupPermissionRemovedEvent extends PetitionEvent {
   user?: Maybe<User>;
 }
 
+export interface IOrgIntegration {
+  id: Scalars["GID"];
+  /** Wether this integration is the default to be used if the user has more than one of the same type */
+  isDefault: Scalars["Boolean"];
+  /** Custom name of this integration, provided by the user */
+  name: Scalars["String"];
+  /** The type of the integration. */
+  type: IntegrationType;
+}
+
+export interface IOrgIntegrationPagination {
+  __typename?: "IOrgIntegrationPagination";
+  /** The requested slice of items. */
+  items: Array<IOrgIntegration>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+}
+
 export interface ImageOptions {
   resize?: InputMaybe<ImageOptionsResize>;
 }
@@ -344,7 +384,7 @@ export interface InputFeatureFlagNameValue {
 }
 
 /** The types of integrations available. */
-export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
+export type IntegrationType = "DOW_JONES_KYC" | "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
 /** A public template on landing page */
 export interface LandingTemplate {
@@ -481,6 +521,8 @@ export interface Mutation {
   completePetition: Petition;
   /** Create a contact. */
   createContact: Contact;
+  /** Creates a new DOW JONES Factiva integration on the user's organization */
+  createDowJonesFactivaIntegration: OrgIntegration;
   /** Creates an event subscription for the user's petitions */
   createEventSubscription: PetitionEventSubscription;
   /** Creates a task for exporting an xlsx file with petition text replies and sends it to the queue */
@@ -570,7 +612,7 @@ export interface Mutation {
   getTaskResultFile: TaskResultFile;
   loginAs: Result;
   /** marks a Signature integration as default */
-  markSignatureIntegrationAsDefault: OrgIntegration;
+  markSignatureIntegrationAsDefault: IOrgIntegration;
   /** Updates the limit of the current usage limit of a given organization */
   modifyCurrentUsagePeriod: Organization;
   /** Adds, edits or deletes a custom property on the petition */
@@ -753,6 +795,8 @@ export interface Mutation {
   uploadUserAvatar: SupportMethodResponse;
   /** Triggered by new users that want to sign up into Parallel */
   userSignUp: User;
+  /** Tries to get an access_token with provided credentials */
+  validateDowJonesFactivaCredentials: Scalars["Boolean"];
   /** Runs backend checks to validate signature credentials. */
   validateSignatureCredentials: ValidateSignatureCredentialsResult;
   verifyPublicAccess: PublicAccessVerification;
@@ -849,6 +893,12 @@ export interface MutationcompletePetitionArgs {
 
 export interface MutationcreateContactArgs {
   data: CreateContactInput;
+}
+
+export interface MutationcreateDowJonesFactivaIntegrationArgs {
+  clientId: Scalars["String"];
+  password: Scalars["String"];
+  username: Scalars["String"];
 }
 
 export interface MutationcreateEventSubscriptionArgs {
@@ -1634,6 +1684,12 @@ export interface MutationuserSignUpArgs {
   role?: InputMaybe<Scalars["String"]>;
 }
 
+export interface MutationvalidateDowJonesFactivaCredentialsArgs {
+  clientId: Scalars["String"];
+  password: Scalars["String"];
+  username: Scalars["String"];
+}
+
 export interface MutationvalidateSignatureCredentialsArgs {
   credentials: Scalars["JSONObject"];
   provider: SignatureOrgIntegrationProvider;
@@ -1646,7 +1702,8 @@ export interface MutationverifyPublicAccessArgs {
   userAgent?: InputMaybe<Scalars["String"]>;
 }
 
-export interface OrgIntegration {
+export interface OrgIntegration extends IOrgIntegration {
+  __typename?: "OrgIntegration";
   id: Scalars["GID"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
   isDefault: Scalars["Boolean"];
@@ -1654,14 +1711,6 @@ export interface OrgIntegration {
   name: Scalars["String"];
   /** The type of the integration. */
   type: IntegrationType;
-}
-
-export interface OrgIntegrationPagination {
-  __typename?: "OrgIntegrationPagination";
-  /** The requested slice of items. */
-  items: Array<OrgIntegration>;
-  /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
 }
 
 /** An object describing the license of an organization */
@@ -1697,7 +1746,7 @@ export interface Organization extends Timestamps {
   /** The ID of the organization. */
   id: Scalars["GID"];
   /** A paginated list with enabled integrations for the organization */
-  integrations: OrgIntegrationPagination;
+  integrations: IOrgIntegrationPagination;
   isUsageLimitReached: Scalars["Boolean"];
   /** Current license for the organization */
   license?: Maybe<OrgLicense>;
@@ -3128,6 +3177,7 @@ export interface Query {
   contacts: ContactPagination;
   /** Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts */
   contactsByEmail: Array<Maybe<Contact>>;
+  dowJonesRiskEntitySearch: DowJonesRiskEntitySearchResultPagination;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
   getSlugForPublicPetitionLink: Scalars["String"];
@@ -3196,6 +3246,13 @@ export interface QuerycontactsArgs {
 
 export interface QuerycontactsByEmailArgs {
   emails: Array<Scalars["String"]>;
+}
+
+export interface QuerydowJonesRiskEntitySearchArgs {
+  dateOfBirth?: InputMaybe<Scalars["DateTime"]>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  name: Scalars["String"];
+  offset?: InputMaybe<Scalars["Int"]>;
 }
 
 export interface QueryemailIsAvailableArgs {
@@ -3599,7 +3656,7 @@ export interface SignatureOpenedEvent extends PetitionEvent {
   type: PetitionEventType;
 }
 
-export interface SignatureOrgIntegration extends OrgIntegration {
+export interface SignatureOrgIntegration extends IOrgIntegration {
   __typename?: "SignatureOrgIntegration";
   /** Environment of this integration, to differentiate between sandbox and production-ready integrations */
   environment: SignatureOrgIntegrationEnvironment;
@@ -3637,17 +3694,6 @@ export interface SignatureStartedEvent extends PetitionEvent {
   openedAt?: Maybe<Scalars["DateTime"]>;
   petition?: Maybe<Petition>;
   type: PetitionEventType;
-}
-
-export interface SsoOrgIntegration extends OrgIntegration {
-  __typename?: "SsoOrgIntegration";
-  id: Scalars["GID"];
-  /** Wether this integration is the default to be used if the user has more than one of the same type */
-  isDefault: Scalars["Boolean"];
-  /** Custom name of this integration, provided by the user */
-  name: Scalars["String"];
-  /** The type of the integration. */
-  type: IntegrationType;
 }
 
 /** Represents a successful execution. */
@@ -3974,17 +4020,6 @@ export interface UserPermissionRemovedEvent extends PetitionEvent {
   petition?: Maybe<Petition>;
   type: PetitionEventType;
   user?: Maybe<User>;
-}
-
-export interface UserProvisioningOrgIntegration extends OrgIntegration {
-  __typename?: "UserProvisioningOrgIntegration";
-  id: Scalars["GID"];
-  /** Wether this integration is the default to be used if the user has more than one of the same type */
-  isDefault: Scalars["Boolean"];
-  /** Custom name of this integration, provided by the user */
-  name: Scalars["String"];
-  /** The type of the integration. */
-  type: IntegrationType;
 }
 
 export type UserStatus = "ACTIVE" | "INACTIVE";
@@ -9384,8 +9419,9 @@ export type PetitionSettings_UserFragment = {
     __typename?: "Organization";
     id: string;
     signatureIntegrations: {
-      __typename?: "OrgIntegrationPagination";
+      __typename?: "IOrgIntegrationPagination";
       items: Array<
+        | { __typename?: "OrgIntegration" }
         | {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -9393,8 +9429,6 @@ export type PetitionSettings_UserFragment = {
             isDefault: boolean;
             environment: SignatureOrgIntegrationEnvironment;
           }
-        | { __typename?: "SsoOrgIntegration" }
-        | { __typename?: "UserProvisioningOrgIntegration" }
       >;
     };
     pdfDocumentThemes: Array<{ __typename?: "OrganizationTheme"; id: string; name: string }>;
@@ -11074,8 +11108,9 @@ export type PetitionSignaturesCard_UserFragment = {
   organization: {
     __typename?: "Organization";
     signatureIntegrations: {
-      __typename?: "OrgIntegrationPagination";
+      __typename?: "IOrgIntegrationPagination";
       items: Array<
+        | { __typename?: "OrgIntegration" }
         | {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -11083,8 +11118,6 @@ export type PetitionSignaturesCard_UserFragment = {
             isDefault: boolean;
             environment: SignatureOrgIntegrationEnvironment;
           }
-        | { __typename?: "SsoOrgIntegration" }
-        | { __typename?: "UserProvisioningOrgIntegration" }
       >;
     };
   };
@@ -14082,6 +14115,7 @@ export type IntegrationsSignature_markSignatureIntegrationAsDefaultMutationVaria
 
 export type IntegrationsSignature_markSignatureIntegrationAsDefaultMutation = {
   markSignatureIntegrationAsDefault:
+    | { __typename?: "OrgIntegration" }
     | {
         __typename?: "SignatureOrgIntegration";
         id: string;
@@ -14089,9 +14123,7 @@ export type IntegrationsSignature_markSignatureIntegrationAsDefaultMutation = {
         provider: SignatureOrgIntegrationProvider;
         isDefault: boolean;
         environment: SignatureOrgIntegrationEnvironment;
-      }
-    | { __typename?: "SsoOrgIntegration" }
-    | { __typename?: "UserProvisioningOrgIntegration" };
+      };
 };
 
 export type IntegrationsSignature_deleteSignatureIntegrationMutationVariables = Exact<{
@@ -14131,9 +14163,10 @@ export type IntegrationsSignature_userQuery = {
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
       signatureIntegrations: {
-        __typename?: "OrgIntegrationPagination";
+        __typename?: "IOrgIntegrationPagination";
         totalCount: number;
         items: Array<
+          | { __typename?: "OrgIntegration" }
           | {
               __typename?: "SignatureOrgIntegration";
               id: string;
@@ -14142,8 +14175,6 @@ export type IntegrationsSignature_userQuery = {
               isDefault: boolean;
               environment: SignatureOrgIntegrationEnvironment;
             }
-          | { __typename?: "SsoOrgIntegration" }
-          | { __typename?: "UserProvisioningOrgIntegration" }
         >;
       };
       currentUsagePeriod?: {
@@ -17321,8 +17352,9 @@ export type PetitionCompose_QueryFragment = {
         limit: number;
       } | null;
       signatureIntegrations: {
-        __typename?: "OrgIntegrationPagination";
+        __typename?: "IOrgIntegrationPagination";
         items: Array<
+          | { __typename?: "OrgIntegration" }
           | {
               __typename?: "SignatureOrgIntegration";
               id: string;
@@ -17330,8 +17362,6 @@ export type PetitionCompose_QueryFragment = {
               isDefault: boolean;
               environment: SignatureOrgIntegrationEnvironment;
             }
-          | { __typename?: "SsoOrgIntegration" }
-          | { __typename?: "UserProvisioningOrgIntegration" }
         >;
       };
       pdfDocumentThemes: Array<{ __typename?: "OrganizationTheme"; id: string; name: string }>;
@@ -17928,8 +17958,9 @@ export type PetitionCompose_userQuery = {
         limit: number;
       } | null;
       signatureIntegrations: {
-        __typename?: "OrgIntegrationPagination";
+        __typename?: "IOrgIntegrationPagination";
         items: Array<
+          | { __typename?: "OrgIntegration" }
           | {
               __typename?: "SignatureOrgIntegration";
               id: string;
@@ -17937,8 +17968,6 @@ export type PetitionCompose_userQuery = {
               isDefault: boolean;
               environment: SignatureOrgIntegrationEnvironment;
             }
-          | { __typename?: "SsoOrgIntegration" }
-          | { __typename?: "UserProvisioningOrgIntegration" }
         >;
       };
       pdfDocumentThemes: Array<{ __typename?: "OrganizationTheme"; id: string; name: string }>;
@@ -20147,8 +20176,9 @@ export type PetitionReplies_QueryFragment = {
         limit: number;
       } | null;
       signatureIntegrations: {
-        __typename?: "OrgIntegrationPagination";
+        __typename?: "IOrgIntegrationPagination";
         items: Array<
+          | { __typename?: "OrgIntegration" }
           | {
               __typename?: "SignatureOrgIntegration";
               id: string;
@@ -20156,8 +20186,6 @@ export type PetitionReplies_QueryFragment = {
               isDefault: boolean;
               environment: SignatureOrgIntegrationEnvironment;
             }
-          | { __typename?: "SsoOrgIntegration" }
-          | { __typename?: "UserProvisioningOrgIntegration" }
         >;
       };
     };
@@ -20769,8 +20797,9 @@ export type PetitionReplies_userQuery = {
         limit: number;
       } | null;
       signatureIntegrations: {
-        __typename?: "OrgIntegrationPagination";
+        __typename?: "IOrgIntegrationPagination";
         items: Array<
+          | { __typename?: "OrgIntegration" }
           | {
               __typename?: "SignatureOrgIntegration";
               id: string;
@@ -20778,8 +20807,6 @@ export type PetitionReplies_userQuery = {
               isDefault: boolean;
               environment: SignatureOrgIntegrationEnvironment;
             }
-          | { __typename?: "SsoOrgIntegration" }
-          | { __typename?: "UserProvisioningOrgIntegration" }
         >;
       };
     };

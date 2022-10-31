@@ -440,6 +440,11 @@ export interface NexusGenObjects {
   GroupPermissionAddedEvent: events.GroupPermissionAddedEvent;
   GroupPermissionEditedEvent: events.GroupPermissionEditedEvent;
   GroupPermissionRemovedEvent: events.GroupPermissionRemovedEvent;
+  IOrgIntegrationPagination: {
+    // root type
+    items: NexusGenRootTypes["IOrgIntegration"][]; // [IOrgIntegration!]!
+    totalCount: number; // Int!
+  };
   LandingTemplate: db.Petition;
   LandingTemplateCategorySample: string;
   LandingTemplateField: db.PetitionField;
@@ -454,11 +459,6 @@ export interface NexusGenObjects {
   MessageSentEvent: events.MessageSentEvent;
   Mutation: {};
   OrgIntegration: db.OrgIntegration;
-  OrgIntegrationPagination: {
-    // root type
-    items: NexusGenRootTypes["OrgIntegration"][]; // [OrgIntegration!]!
-    totalCount: number; // Int!
-  };
   OrgLicense: {
     // root type
     externalId: string; // String!
@@ -981,6 +981,11 @@ export interface NexusGenFieldTypes {
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
+  IOrgIntegrationPagination: {
+    // field return type
+    items: NexusGenRootTypes["IOrgIntegration"][]; // [IOrgIntegration!]!
+    totalCount: number; // Int!
+  };
   LandingTemplate: {
     // field return type
     backgroundColor: string | null; // String
@@ -1120,7 +1125,7 @@ export interface NexusGenFieldTypes {
     getApiTokenOwner: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     getTaskResultFile: NexusGenRootTypes["TaskResultFile"]; // TaskResultFile!
     loginAs: NexusGenEnums["Result"]; // Result!
-    markSignatureIntegrationAsDefault: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
+    markSignatureIntegrationAsDefault: NexusGenRootTypes["IOrgIntegration"]; // IOrgIntegration!
     modifyCurrentUsagePeriod: NexusGenRootTypes["Organization"]; // Organization!
     modifyPetitionCustomProperty: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     movePetitions: NexusGenEnums["Success"]; // Success!
@@ -1222,11 +1227,6 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     type: NexusGenEnums["IntegrationType"]; // IntegrationType!
   };
-  OrgIntegrationPagination: {
-    // field return type
-    items: NexusGenRootTypes["OrgIntegration"][]; // [OrgIntegration!]!
-    totalCount: number; // Int!
-  };
   OrgLicense: {
     // field return type
     externalId: string; // String!
@@ -1246,7 +1246,7 @@ export interface NexusGenFieldTypes {
     hasSsoProvider: boolean; // Boolean!
     iconUrl: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
-    integrations: NexusGenRootTypes["OrgIntegrationPagination"]; // OrgIntegrationPagination!
+    integrations: NexusGenRootTypes["IOrgIntegrationPagination"]; // IOrgIntegrationPagination!
     isUsageLimitReached: boolean; // Boolean!
     license: NexusGenRootTypes["OrgLicense"] | null; // OrgLicense
     logoUrl: string | null; // String
@@ -2585,6 +2585,11 @@ export interface NexusGenFieldTypeNames {
     type: "PetitionEventType";
     user: "User";
   };
+  IOrgIntegrationPagination: {
+    // field return type name
+    items: "IOrgIntegration";
+    totalCount: "Int";
+  };
   LandingTemplate: {
     // field return type name
     backgroundColor: "String";
@@ -2724,7 +2729,7 @@ export interface NexusGenFieldTypeNames {
     getApiTokenOwner: "SupportMethodResponse";
     getTaskResultFile: "TaskResultFile";
     loginAs: "Result";
-    markSignatureIntegrationAsDefault: "OrgIntegration";
+    markSignatureIntegrationAsDefault: "IOrgIntegration";
     modifyCurrentUsagePeriod: "Organization";
     modifyPetitionCustomProperty: "PetitionBase";
     movePetitions: "Success";
@@ -2826,11 +2831,6 @@ export interface NexusGenFieldTypeNames {
     name: "String";
     type: "IntegrationType";
   };
-  OrgIntegrationPagination: {
-    // field return type name
-    items: "OrgIntegration";
-    totalCount: "Int";
-  };
   OrgLicense: {
     // field return type name
     externalId: "String";
@@ -2850,7 +2850,7 @@ export interface NexusGenFieldTypeNames {
     hasSsoProvider: "Boolean";
     iconUrl: "String";
     id: "GID";
-    integrations: "OrgIntegrationPagination";
+    integrations: "IOrgIntegrationPagination";
     isUsageLimitReached: "Boolean";
     license: "OrgLicense";
     logoUrl: "String";
