@@ -5125,14 +5125,39 @@
     "context": "No periods"
   },
   {
+    "term": "component.update-organization-usage-details-dialog.period-changes-disclaimer",
+    "definition": "*By default, changes will take effect after the current period, unless {checkbox} is checked.",
+    "context": "*By default, changes will take effect after the current period, unless {checkbox} is checked."
+  },
+  {
     "term": "component.update-organization-usage-details-dialog.period-label",
     "definition": "Period",
     "context": "Period"
   },
   {
+    "term": "component.update-organization-usage-details-dialog.period-popover-1",
+    "definition": "The period is how often the limit will be reset.",
+    "context": "The period is how often the limit will be reset."
+  },
+  {
+    "term": "component.update-organization-usage-details-dialog.period-popover-2",
+    "definition": "Example: If the contract specifies 100 signatures per month, the period will be 1 month.",
+    "context": "Example: If the contract specifies 100 signatures per month, the period will be 1 month."
+  },
+  {
     "term": "component.update-organization-usage-details-dialog.renewal-cycles-label",
     "definition": "Renewal cycles",
     "context": "Renewal cycles"
+  },
+  {
+    "term": "component.update-organization-usage-details-dialog.renewal-cycles-popover-1",
+    "definition": "The renewal cycles is how many periods there will be.",
+    "context": "The renewal cycles is how many periods there will be."
+  },
+  {
+    "term": "component.update-organization-usage-details-dialog.renewal-cycles-popover-2",
+    "definition": "Example: A 1 year contract with monthly periods will have 12 renewal cycles.",
+    "context": "Example: A 1 year contract with monthly periods will have 12 renewal cycles."
   },
   {
     "term": "component.update-organization-usage-details-dialog.start-new-period-label",

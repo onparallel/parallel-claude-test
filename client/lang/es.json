@@ -5125,14 +5125,39 @@
     "context": "No periods"
   },
   {
+    "term": "component.update-organization-usage-details-dialog.period-changes-disclaimer",
+    "definition": "*Por defecto, los cambios se efectuarán sobre el siguiente periodo, a no ser que se marque {checkbox}.",
+    "context": "*By default, changes will take effect after the current period, unless {checkbox} is checked."
+  },
+  {
     "term": "component.update-organization-usage-details-dialog.period-label",
     "definition": "Periodo",
     "context": "Period"
   },
   {
+    "term": "component.update-organization-usage-details-dialog.period-popover-1",
+    "definition": "El periodo es cada cuanto se recargará el límite seleccionado para la suscripción.",
+    "context": "The period is how often the limit will be reset."
+  },
+  {
+    "term": "component.update-organization-usage-details-dialog.period-popover-2",
+    "definition": "Ejemplo: Si se han contratado 100 firmas al mes. El periodo será de 1 mes.",
+    "context": "Example: If the contract specifies 100 signatures per month, the period will be 1 month."
+  },
+  {
     "term": "component.update-organization-usage-details-dialog.renewal-cycles-label",
     "definition": "Ciclos de renovación",
     "context": "Renewal cycles"
+  },
+  {
+    "term": "component.update-organization-usage-details-dialog.renewal-cycles-popover-1",
+    "definition": "Los ciclos de renovación, son el número de periodos que existirán.",
+    "context": "The renewal cycles is how many periods there will be."
+  },
+  {
+    "term": "component.update-organization-usage-details-dialog.renewal-cycles-popover-2",
+    "definition": "Ejemplo: Un contrato de 1 año, con periodos mensuales tendrá 12 ciclos de renovación.",
+    "context": "Example: A 1 year contract with monthly periods will have 12 renewal cycles."
   },
   {
     "term": "component.update-organization-usage-details-dialog.start-new-period-label",

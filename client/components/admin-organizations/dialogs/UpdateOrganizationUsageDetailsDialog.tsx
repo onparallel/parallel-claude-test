@@ -149,7 +149,7 @@ export function UpdateOrganizationUsageDetailsDialog({
       body={
         <Grid templateColumns="auto 1fr 1fr" gap={3} alignItems="flex-end">
           <GridItem>
-            <FormLabel fontWeight="600">
+            <FormLabel fontWeight="600" margin={0} display="inline">
               <FormattedMessage
                 id="component.update-organization-usage-details-dialog.limit-label"
                 defaultMessage="Limit"
@@ -178,13 +178,27 @@ export function UpdateOrganizationUsageDetailsDialog({
           </GridItem>
           {hidePeriodSection ? null : (
             <>
-              <GridItem>
-                <FormLabel fontWeight="600">
+              <GridItem display="flex" alignItems="center">
+                <FormLabel fontWeight="600" margin={0} display="inline">
                   <FormattedMessage
                     id="component.update-organization-usage-details-dialog.period-label"
                     defaultMessage="Period"
                   />
                 </FormLabel>
+                <HelpPopover>
+                  <Text fontSize="sm">
+                    <FormattedMessage
+                      id="component.update-organization-usage-details-dialog.period-popover-1"
+                      defaultMessage="The period is how often the limit will be reset."
+                    />
+                  </Text>
+                  <Text fontSize="sm" fontStyle="italic">
+                    <FormattedMessage
+                      id="component.update-organization-usage-details-dialog.period-popover-2"
+                      defaultMessage="Example: If the contract specifies 100 signatures per month, the period will be 1 month."
+                    />
+                  </Text>
+                </HelpPopover>
               </GridItem>
               <GridItem>
                 <Controller
@@ -221,13 +235,27 @@ export function UpdateOrganizationUsageDetailsDialog({
                   )}
                 />
               </GridItem>
-              <GridItem>
-                <FormLabel fontWeight="600">
+              <GridItem display="flex" alignItems="center">
+                <FormLabel fontWeight="600" margin={0} display="inline">
                   <FormattedMessage
                     id="component.update-organization-usage-details-dialog.renewal-cycles-label"
                     defaultMessage="Renewal cycles"
                   />
                 </FormLabel>
+                <HelpPopover>
+                  <Text fontSize="sm">
+                    <FormattedMessage
+                      id="component.update-organization-usage-details-dialog.renewal-cycles-popover-1"
+                      defaultMessage="The renewal cycles is how many periods there will be."
+                    />
+                  </Text>
+                  <Text fontSize="sm" fontStyle="italic">
+                    <FormattedMessage
+                      id="component.update-organization-usage-details-dialog.renewal-cycles-popover-2"
+                      defaultMessage="Example: A 1 year contract with monthly periods will have 12 renewal cycles."
+                    />
+                  </Text>
+                </HelpPopover>
               </GridItem>
               <GridItem colSpan={2}>
                 <Controller
@@ -272,48 +300,66 @@ export function UpdateOrganizationUsageDetailsDialog({
                 colSpan={3}
                 borderColor="gray.200"
                 borderWidth="1px"
-                borderRadius="5px"
+                borderRadius="md"
                 paddingX={4}
                 paddingY={2}
               >
                 <Stack>
-                  <HStack>
-                    <Text fontWeight="bold">
+                  <Text>
+                    <Text as="strong" marginRight={2}>
                       <FormattedMessage
                         id="component.update-organization-usage-details-dialog.next-period-label"
                         defaultMessage="Next period:"
                       />
                     </Text>
                     {nextPeriod ? (
-                      <Text>
+                      <Text as="span">
                         <FormattedDate value={nextPeriod} dateStyle="long" />
                       </Text>
                     ) : (
-                      <Text textStyle="hint">
+                      <Text as="span" textStyle="hint">
                         <FormattedMessage
                           id="component.update-organization-usage-details-dialog.no-periods"
                           defaultMessage="No periods"
                         />
                       </Text>
                     )}
-                  </HStack>
-                  <HStack>
-                    <Text fontWeight="bold">
+                  </Text>
+                  <Text>
+                    <Text as="strong" marginRight={2}>
                       <FormattedMessage
                         id="component.update-organization-usage-details-dialog.subscription-end-label"
                         defaultMessage="Subscription end:"
                       />
                     </Text>
                     {subscriptionEndDate ? (
-                      <Text>
+                      <Text as="span">
                         <FormattedDate value={subscriptionEndDate} dateStyle="long" />
                       </Text>
                     ) : (
-                      <Text textStyle="hint">
+                      <Text as="span" textStyle="hint">
                         <FormattedMessage id="generic.unlimited" defaultMessage="Unlimited" />
                       </Text>
                     )}
-                  </HStack>
+                  </Text>
+                  <Text fontSize="sm" fontStyle="italic">
+                    <FormattedMessage
+                      id="component.update-organization-usage-details-dialog.period-changes-disclaimer"
+                      defaultMessage="*By default, changes will take effect after the current period, unless {checkbox} is checked."
+                      values={{
+                        checkbox: (
+                          <Text as="span">
+                            {'"'}
+                            <FormattedMessage
+                              id="component.update-organization-usage-details-dialog.start-new-period-label"
+                              defaultMessage="Start new period"
+                            />
+                            {'"'}
+                          </Text>
+                        ),
+                      }}
+                    />
+                  </Text>
                 </Stack>
               </GridItem>
             </>
