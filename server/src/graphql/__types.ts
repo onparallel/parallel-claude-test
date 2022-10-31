@@ -394,6 +394,23 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["Contact"][]; // [Contact!]!
     totalCount: number; // Int!
   };
+  DowJonesRiskEntitySearchResult: {
+    // root type
+    countryTerritoryName: string; // String!
+    dateOfBirth?: NexusGenScalars["JSONObject"] | null; // JSONObject
+    gender: string; // String!
+    iconHints: string[]; // [String!]!
+    id: string; // ID!
+    isSubsidiary: boolean; // Boolean!
+    primaryName: string; // String!
+    title: string; // String!
+    type: string; // String!
+  };
+  DowJonesRiskEntitySearchResultPagination: {
+    // root type
+    items: NexusGenRootTypes["DowJonesRiskEntitySearchResult"][]; // [DowJonesRiskEntitySearchResult!]!
+    totalCount: number; // Int!
+  };
   EffectivePetitionUserPermission: Pick<
     db.PetitionPermission,
     "petition_id" | "user_id" | "type" | "is_subscribed"
@@ -436,6 +453,7 @@ export interface NexusGenObjects {
   MessageScheduledEvent: events.MessageScheduledEvent;
   MessageSentEvent: events.MessageSentEvent;
   Mutation: {};
+  OrgIntegration: db.OrgIntegration;
   OrgIntegrationPagination: {
     // root type
     items: NexusGenRootTypes["OrgIntegration"][]; // [OrgIntegration!]!
@@ -651,7 +669,6 @@ export interface NexusGenObjects {
   SignatureOrgIntegration: db.OrgIntegration;
   SignatureReminderEvent: events.SignatureReminderEvent;
   SignatureStartedEvent: events.SignatureStartedEvent;
-  SsoOrgIntegration: db.OrgIntegration;
   SupportMethodResponse: {
     // root type
     message?: string | null; // String
@@ -694,7 +711,6 @@ export interface NexusGenObjects {
   UserPermissionAddedEvent: events.UserPermissionAddedEvent;
   UserPermissionEditedEvent: events.UserPermissionEditedEvent;
   UserPermissionRemovedEvent: events.UserPermissionRemovedEvent;
-  UserProvisioningOrgIntegration: db.OrgIntegration;
   ValidateSignatureCredentialsResult: {
     // root type
     data?: NexusGenScalars["JSONObject"] | null; // JSONObject
@@ -717,7 +733,9 @@ export interface NexusGenInterfaces {
   CreatedAt: {
     created_at: Date;
   };
-  OrgIntegration: db.OrgIntegration;
+  IOrgIntegration:
+    | NexusGenRootTypes["OrgIntegration"]
+    | NexusGenRootTypes["SignatureOrgIntegration"];
   PetitionBase: db.Petition;
   PetitionEvent: events.PetitionEvent;
   PetitionPermission: db.PetitionPermission;
@@ -880,6 +898,23 @@ export interface NexusGenFieldTypes {
     items: NexusGenRootTypes["Contact"][]; // [Contact!]!
     totalCount: number; // Int!
   };
+  DowJonesRiskEntitySearchResult: {
+    // field return type
+    countryTerritoryName: string; // String!
+    dateOfBirth: NexusGenScalars["JSONObject"] | null; // JSONObject
+    gender: string; // String!
+    iconHints: string[]; // [String!]!
+    id: string; // ID!
+    isSubsidiary: boolean; // Boolean!
+    primaryName: string; // String!
+    title: string; // String!
+    type: string; // String!
+  };
+  DowJonesRiskEntitySearchResultPagination: {
+    // field return type
+    items: NexusGenRootTypes["DowJonesRiskEntitySearchResult"][]; // [DowJonesRiskEntitySearchResult!]!
+    totalCount: number; // Int!
+  };
   EffectivePetitionUserPermission: {
     // field return type
     isSubscribed: boolean; // Boolean!
@@ -1039,6 +1074,7 @@ export interface NexusGenFieldTypes {
     closePetition: NexusGenRootTypes["Petition"]; // Petition!
     completePetition: NexusGenRootTypes["Petition"]; // Petition!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
+    createDowJonesFactivaIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     createEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     createExportExcelTask: NexusGenRootTypes["Task"]; // Task!
     createExportRepliesTask: NexusGenRootTypes["Task"]; // Task!
@@ -1175,8 +1211,16 @@ export interface NexusGenFieldTypes {
     uploadDynamicSelectFieldFile: NexusGenRootTypes["PetitionField"]; // PetitionField!
     uploadUserAvatar: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     userSignUp: NexusGenRootTypes["User"]; // User!
+    validateDowJonesFactivaCredentials: boolean; // Boolean!
     validateSignatureCredentials: NexusGenRootTypes["ValidateSignatureCredentialsResult"]; // ValidateSignatureCredentialsResult!
     verifyPublicAccess: NexusGenRootTypes["PublicAccessVerification"]; // PublicAccessVerification!
+  };
+  OrgIntegration: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    isDefault: boolean; // Boolean!
+    name: string; // String!
+    type: NexusGenEnums["IntegrationType"]; // IntegrationType!
   };
   OrgIntegrationPagination: {
     // field return type
@@ -1857,6 +1901,7 @@ export interface NexusGenFieldTypes {
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
     contactsByEmail: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
+    dowJonesRiskEntitySearch: NexusGenRootTypes["DowJonesRiskEntitySearchResultPagination"]; // DowJonesRiskEntitySearchResultPagination!
     emailIsAvailable: boolean; // Boolean!
     getSlugForPublicPetitionLink: string; // String!
     getUsersOrGroups: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
@@ -2069,13 +2114,6 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
-  SsoOrgIntegration: {
-    // field return type
-    id: NexusGenScalars["GID"]; // GID!
-    isDefault: boolean; // Boolean!
-    name: string; // String!
-    type: NexusGenEnums["IntegrationType"]; // IntegrationType!
-  };
   SupportMethodResponse: {
     // field return type
     message: string | null; // String
@@ -2233,13 +2271,6 @@ export interface NexusGenFieldTypes {
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
-  UserProvisioningOrgIntegration: {
-    // field return type
-    id: NexusGenScalars["GID"]; // GID!
-    isDefault: boolean; // Boolean!
-    name: string; // String!
-    type: NexusGenEnums["IntegrationType"]; // IntegrationType!
-  };
   ValidateSignatureCredentialsResult: {
     // field return type
     data: NexusGenScalars["JSONObject"] | null; // JSONObject
@@ -2260,7 +2291,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
   };
-  OrgIntegration: {
+  IOrgIntegration: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
     isDefault: boolean; // Boolean!
@@ -2471,6 +2502,23 @@ export interface NexusGenFieldTypeNames {
     items: "Contact";
     totalCount: "Int";
   };
+  DowJonesRiskEntitySearchResult: {
+    // field return type name
+    countryTerritoryName: "String";
+    dateOfBirth: "JSONObject";
+    gender: "String";
+    iconHints: "String";
+    id: "ID";
+    isSubsidiary: "Boolean";
+    primaryName: "String";
+    title: "String";
+    type: "String";
+  };
+  DowJonesRiskEntitySearchResultPagination: {
+    // field return type name
+    items: "DowJonesRiskEntitySearchResult";
+    totalCount: "Int";
+  };
   EffectivePetitionUserPermission: {
     // field return type name
     isSubscribed: "Boolean";
@@ -2630,6 +2678,7 @@ export interface NexusGenFieldTypeNames {
     closePetition: "Petition";
     completePetition: "Petition";
     createContact: "Contact";
+    createDowJonesFactivaIntegration: "OrgIntegration";
     createEventSubscription: "PetitionEventSubscription";
     createExportExcelTask: "Task";
     createExportRepliesTask: "Task";
@@ -2766,8 +2815,16 @@ export interface NexusGenFieldTypeNames {
     uploadDynamicSelectFieldFile: "PetitionField";
     uploadUserAvatar: "SupportMethodResponse";
     userSignUp: "User";
+    validateDowJonesFactivaCredentials: "Boolean";
     validateSignatureCredentials: "ValidateSignatureCredentialsResult";
     verifyPublicAccess: "PublicAccessVerification";
+  };
+  OrgIntegration: {
+    // field return type name
+    id: "GID";
+    isDefault: "Boolean";
+    name: "String";
+    type: "IntegrationType";
   };
   OrgIntegrationPagination: {
     // field return type name
@@ -3448,6 +3505,7 @@ export interface NexusGenFieldTypeNames {
     contact: "Contact";
     contacts: "ContactPagination";
     contactsByEmail: "Contact";
+    dowJonesRiskEntitySearch: "DowJonesRiskEntitySearchResultPagination";
     emailIsAvailable: "Boolean";
     getSlugForPublicPetitionLink: "String";
     getUsersOrGroups: "UserOrUserGroup";
@@ -3660,13 +3718,6 @@ export interface NexusGenFieldTypeNames {
     petition: "Petition";
     type: "PetitionEventType";
   };
-  SsoOrgIntegration: {
-    // field return type name
-    id: "GID";
-    isDefault: "Boolean";
-    name: "String";
-    type: "IntegrationType";
-  };
   SupportMethodResponse: {
     // field return type name
     message: "String";
@@ -3824,13 +3875,6 @@ export interface NexusGenFieldTypeNames {
     type: "PetitionEventType";
     user: "User";
   };
-  UserProvisioningOrgIntegration: {
-    // field return type name
-    id: "GID";
-    isDefault: "Boolean";
-    name: "String";
-    type: "IntegrationType";
-  };
   ValidateSignatureCredentialsResult: {
     // field return type name
     data: "JSONObject";
@@ -3851,7 +3895,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
   };
-  OrgIntegration: {
+  IOrgIntegration: {
     // field return type name
     id: "GID";
     isDefault: "Boolean";
@@ -4048,6 +4092,12 @@ export interface NexusGenArgTypes {
     createContact: {
       // args
       data: NexusGenInputs["CreateContactInput"]; // CreateContactInput!
+    };
+    createDowJonesFactivaIntegration: {
+      // args
+      clientId: string; // String!
+      password: string; // String!
+      username: string; // String!
     };
     createEventSubscription: {
       // args
@@ -4832,6 +4882,12 @@ export interface NexusGenArgTypes {
       position?: string | null; // String
       role?: string | null; // String
     };
+    validateDowJonesFactivaCredentials: {
+      // args
+      clientId: string; // String!
+      password: string; // String!
+      username: string; // String!
+    };
     validateSignatureCredentials: {
       // args
       credentials: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -4927,6 +4983,13 @@ export interface NexusGenArgTypes {
     contactsByEmail: {
       // args
       emails: string[]; // [String!]!
+    };
+    dowJonesRiskEntitySearch: {
+      // args
+      dateOfBirth?: NexusGenScalars["DateTime"] | null; // DateTime
+      limit?: number | null; // Int
+      name: string; // String!
+      offset?: number | null; // Int
     };
     emailIsAvailable: {
       // args
@@ -5114,10 +5177,7 @@ export interface NexusGenAbstractTypeMembers {
     | "PetitionMessage"
     | "PetitionReminder"
     | "UserAuthenticationToken";
-  OrgIntegration:
-    | "SignatureOrgIntegration"
-    | "SsoOrgIntegration"
-    | "UserProvisioningOrgIntegration";
+  IOrgIntegration: "OrgIntegration" | "SignatureOrgIntegration";
   PetitionBase: "Petition" | "PetitionTemplate";
   PetitionEvent:
     | "AccessActivatedEvent"
@@ -5205,6 +5265,7 @@ export interface NexusGenTypeInterfaces {
   MessageEmailBouncedUserNotification: "PetitionUserNotification";
   MessageScheduledEvent: "PetitionEvent";
   MessageSentEvent: "PetitionEvent";
+  OrgIntegration: "IOrgIntegration";
   Organization: "Timestamps";
   OwnershipTransferredEvent: "PetitionEvent";
   Petition: "PetitionBase";
@@ -5245,10 +5306,9 @@ export interface NexusGenTypeInterfaces {
   SignatureCompletedEvent: "PetitionEvent";
   SignatureCompletedUserNotification: "PetitionUserNotification";
   SignatureOpenedEvent: "PetitionEvent";
-  SignatureOrgIntegration: "OrgIntegration";
+  SignatureOrgIntegration: "IOrgIntegration";
   SignatureReminderEvent: "PetitionEvent";
   SignatureStartedEvent: "PetitionEvent";
-  SsoOrgIntegration: "OrgIntegration";
   TemplateDefaultUserGroupPermission: "TemplateDefaultPermission" | "Timestamps";
   TemplateDefaultUserPermission: "TemplateDefaultPermission" | "Timestamps";
   TemplateUsedEvent: "PetitionEvent";
@@ -5258,7 +5318,6 @@ export interface NexusGenTypeInterfaces {
   UserPermissionAddedEvent: "PetitionEvent";
   UserPermissionEditedEvent: "PetitionEvent";
   UserPermissionRemovedEvent: "PetitionEvent";
-  UserProvisioningOrgIntegration: "OrgIntegration";
   PetitionPermission: "Timestamps";
   TemplateDefaultPermission: "Timestamps";
 }
@@ -5279,7 +5338,7 @@ export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never;
 
 export type NexusGenAbstractsUsingStrategyResolveType =
   | "CreatedAt"
-  | "OrgIntegration"
+  | "IOrgIntegration"
   | "PetitionBase"
   | "PetitionBaseOrFolder"
   | "PetitionEvent"

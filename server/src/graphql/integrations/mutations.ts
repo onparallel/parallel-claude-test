@@ -4,6 +4,7 @@ import { withError } from "../../util/promises/withError";
 import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
+import { validEmail } from "../helpers/validators/validEmail";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { contextUserHasRole } from "../users/authorizers";
 import { userHasAccessToIntegrations } from "./authorizers";
@@ -172,5 +173,71 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
       return RESULT.SUCCESS;
     } catch {}
     return RESULT.FAILURE;
+  },
+});
+
+export const validateDowJonesFactivaCredentials = mutationField(
+  "validateDowJonesFactivaCredentials",
+  {
+    description: "Tries to get an access_token with provided credentials",
+    type: "Boolean",
+    authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("DOW_JONES_KYC")),
+    args: {
+      clientId: nonNull(stringArg()),
+      username: nonNull(stringArg()),
+      password: nonNull(stringArg()),
+    },
+    validateArgs: validEmail((args) => args.username, "username", true),
+    resolve: async (_, args, ctx) => {
+      try {
+        await ctx.dowJonesKyc.fetchCredentials(args.clientId, args.username, args.password);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+  }
+);
+
+export const createDowJonesFactivaIntegration = mutationField("createDowJonesFactivaIntegration", {
+  description: "Creates a new DOW JONES Factiva integration on the user's organization",
+  type: nonNull("OrgIntegration"),
+  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("DOW_JONES_KYC")),
+  args: {
+    clientId: nonNull(stringArg()),
+    username: nonNull(stringArg()),
+    password: nonNull(stringArg()),
+  },
+  validateArgs: validEmail((args) => args.username, "username", true),
+  resolve: async (_, args, ctx) => {
+    if (
+      (await ctx.integrations.loadIntegrationsByOrgId(ctx.user!.org_id, "DOW_JONES_KYC")).length > 0
+    ) {
+      throw new ApolloError(
+        `You already have an active Dow Jones integration`,
+        "INTEGRATION_ALREADY_EXISTS_ERROR"
+      );
+    }
+
+    const [error, credentials] = await withError(
+      ctx.dowJonesKyc.fetchCredentials(args.clientId, args.username, args.password)
+    );
+    if (error || !credentials) {
+      throw new ApolloError(`Unable to validate credentials`, "INVALID_CREDENTIALS_ERROR");
+    }
+
+    return await ctx.integrations.createOrgIntegration<"DOW_JONES_KYC">(
+      {
+        type: "DOW_JONES_KYC",
+        provider: "FACTIVA",
+        org_id: ctx.user!.org_id,
+        name: "Dow Jones - Factiva KYC",
+        settings: {
+          CREDENTIALS: credentials,
+        },
+        is_enabled: true,
+      },
+      `User:${ctx.user!.id}`
+    );
   },
 });

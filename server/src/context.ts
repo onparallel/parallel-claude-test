@@ -20,7 +20,7 @@ import { UserRepository } from "./db/repositories/UserRepository";
 import { Contact, Organization, PetitionAccess, User } from "./db/__types";
 import { ANALYTICS, IAnalyticsService } from "./services/analytics";
 import { AUTH, IAuth } from "./services/auth";
-import { QUEUES_SERVICE, IQueuesService } from "./services/queues";
+import { DOW_JONES_KYC_SERVICE, IDowJonesKycService } from "./services/dowjones";
 import { EMAILS, IEmailsService } from "./services/emails";
 import { FETCH_SERVICE, IFetchService } from "./services/fetch";
 import { I18N_SERVICE, II18nService } from "./services/i18n";
@@ -32,6 +32,7 @@ import {
 } from "./services/organization-credits";
 import { IPetitionBinder, PETITION_BINDER } from "./services/petition-binder";
 import { IPrinter, PRINTER } from "./services/printer";
+import { IQueuesService, QUEUES_SERVICE } from "./services/queues";
 import { ISignatureService, SIGNATURE } from "./services/signature";
 import { ISmtp, SMTP } from "./services/smtp";
 import { IStorageService, STORAGE_SERVICE } from "./services/storage";
@@ -59,6 +60,7 @@ export class ApiContext {
     @inject(I18N_SERVICE) public readonly i18n: II18nService,
     @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
     @inject(ORGANIZATION_CREDITS_SERVICE) public readonly orgCredits: IOrganizationCreditsService,
+    @inject(DOW_JONES_KYC_SERVICE) public readonly dowJonesKyc: IDowJonesKycService,
 
     // Repositories
     public readonly contacts: ContactRepository,

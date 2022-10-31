@@ -2,12 +2,12 @@ import { enumType, interfaceType, objectType } from "nexus";
 
 export const IntegrationType = enumType({
   name: "IntegrationType",
-  members: ["SIGNATURE", "SSO", "USER_PROVISIONING"],
+  members: ["SIGNATURE", "SSO", "USER_PROVISIONING", "DOW_JONES_KYC"],
   description: "The types of integrations available.",
 });
 
-export const OrgIntegration = interfaceType({
-  name: "OrgIntegration",
+export const IOrgIntegration = interfaceType({
+  name: "IOrgIntegration",
   definition(t) {
     t.globalId("id");
     t.string("name", {
@@ -23,20 +23,13 @@ export const OrgIntegration = interfaceType({
       resolve: (o) => o.is_default,
     });
   },
-  resolveType: (o) =>
-    ((
-      {
-        SIGNATURE: "SignatureOrgIntegration",
-        SSO: "SsoOrgIntegration",
-        USER_PROVISIONING: "UserProvisioningOrgIntegration",
-      } as const
-    )[o.type]),
+  resolveType: (o) => (o.type === "SIGNATURE" ? "SignatureOrgIntegration" : "OrgIntegration"),
 });
 
 export const SignatureOrgIntegration = objectType({
   name: "SignatureOrgIntegration",
   definition(t) {
-    t.implements("OrgIntegration");
+    t.implements("IOrgIntegration");
     t.field("provider", {
       type: enumType({ name: "SignatureOrgIntegrationProvider", members: ["SIGNATURIT"] }),
     });
@@ -55,18 +48,10 @@ export const SignatureOrgIntegration = objectType({
   sourceType: "db.OrgIntegration",
 });
 
-export const UserProvisioningOrgIntegration = objectType({
-  name: "UserProvisioningOrgIntegration",
+export const OrgIntegration = objectType({
+  name: "OrgIntegration",
   definition(t) {
-    t.implements("OrgIntegration");
-  },
-  sourceType: "db.OrgIntegration",
-});
-
-export const SsoOrgIntegration = objectType({
-  name: "SsoOrgIntegration",
-  definition(t) {
-    t.implements("OrgIntegration");
+    t.implements("IOrgIntegration");
   },
   sourceType: "db.OrgIntegration",
 });

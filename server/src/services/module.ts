@@ -1,7 +1,7 @@
 import { ContainerModule } from "inversify";
 import { ANALYTICS, AnalyticsService, IAnalyticsService } from "./analytics";
 import { AUTH, Auth, IAuth } from "./auth";
-import { QueuesService, QUEUES_SERVICE, IQueuesService } from "./queues";
+import { DowJonesKycService, DOW_JONES_KYC_SERVICE, IDowJonesKycService } from "./dowjones";
 import { EMAILS, EmailsService, IEmailsService } from "./emails";
 import { FetchService, FETCH_SERVICE, IFetchService } from "./fetch";
 import { I18nService, I18N_SERVICE, II18nService } from "./i18n";
@@ -14,6 +14,7 @@ import {
 } from "./organization-credits";
 import { IPetitionBinder, PetitionBinder, PETITION_BINDER } from "./petition-binder";
 import { IPrinter, Printer, PRINTER } from "./printer";
+import { IQueuesService, QueuesService, QUEUES_SERVICE } from "./queues";
 import { IRedis, REDIS, Redis } from "./redis";
 import { ISignatureService, SIGNATURE, SignatureService } from "./signature";
 import { ISmtp, Smtp, SMTP } from "./smtp";
@@ -37,4 +38,5 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<ITiersService>(TIERS_SERVICE).to(TiersService);
   bind<II18nService>(I18N_SERVICE).to(I18nService).inSingletonScope();
   bind<IOrganizationCreditsService>(ORGANIZATION_CREDITS_SERVICE).to(OrganizationCreditsService);
+  bind<IDowJonesKycService>(DOW_JONES_KYC_SERVICE).to(DowJonesKycService);
 });

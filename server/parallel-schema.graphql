@@ -227,6 +227,30 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 """
 scalar DateTime
 
+type DowJonesRiskEntitySearchResult {
+  countryTerritoryName: String!
+  dateOfBirth: JSONObject
+  gender: String!
+  iconHints: [String!]!
+  id: ID!
+  isSubsidiary: Boolean!
+  primaryName: String!
+  title: String!
+  type: String!
+}
+
+type DowJonesRiskEntitySearchResultPagination {
+  """
+  The requested slice of items.
+  """
+  items: [DowJonesRiskEntitySearchResult!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
+}
+
 scalar Duration
 
 """
@@ -249,6 +273,7 @@ enum FeatureFlag {
   AUTO_ANONYMIZE
   CUSTOM_HOST_UI
   DEVELOPER_ACCESS
+  DOW_JONES_KYC
   ES_TAX_DOCUMENTS_FIELD
   EXPORT_CUATRECASAS
   GHOST_LOGIN
@@ -352,6 +377,25 @@ type GroupPermissionRemovedEvent implements PetitionEvent {
   user: User
 }
 
+interface IOrgIntegration {
+  id: GID!
+
+  """
+  Wether this integration is the default to be used if the user has more than one of the same type
+  """
+  isDefault: Boolean!
+
+  """
+  Custom name of this integration, provided by the user
+  """
+  name: String!
+
+  """
+  The type of the integration.
+  """
+  type: IntegrationType!
+}
+
 input ImageOptions {
   resize: ImageOptionsResize
 }
@@ -382,6 +426,7 @@ input InputFeatureFlagNameValue {
 The types of integrations available.
 """
 enum IntegrationType {
+  DOW_JONES_KYC
   SIGNATURE
   SSO
   USER_PROVISIONING
@@ -617,6 +662,15 @@ type Mutation {
   Create a contact.
   """
   createContact(data: CreateContactInput!): Contact!
+
+  """
+  Creates a new DOW JONES Factiva integration on the user's organization
+  """
+  createDowJonesFactivaIntegration(
+    clientId: String!
+    password: String!
+    username: String!
+  ): OrgIntegration!
 
   """
   Creates an event subscription for the user's petitions
@@ -1727,6 +1781,15 @@ type Mutation {
   ): User!
 
   """
+  Tries to get an access_token with provided credentials
+  """
+  validateDowJonesFactivaCredentials(
+    clientId: String!
+    password: String!
+    username: String!
+  ): Boolean!
+
+  """
   Runs backend checks to validate signature credentials.
   """
   validateSignatureCredentials(
@@ -1741,7 +1804,7 @@ type Mutation {
   ): PublicAccessVerification!
 }
 
-interface OrgIntegration {
+type OrgIntegration implements IOrgIntegration {
   id: GID!
 
   """
@@ -4235,6 +4298,20 @@ type Query {
   Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts
   """
   contactsByEmail(emails: [String!]!): [Contact]!
+  dowJonesRiskEntitySearch(
+    dateOfBirth: DateTime
+
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+    name: String!
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+  ): DowJonesRiskEntitySearchResultPagination!
 
   """
   Checks if the provided email is available to be registered as a user on Parallel
@@ -4786,7 +4863,7 @@ type SignatureOpenedEvent implements PetitionEvent {
   type: PetitionEventType!
 }
 
-type SignatureOrgIntegration implements OrgIntegration {
+type SignatureOrgIntegration implements IOrgIntegration {
   """
   Environment of this integration, to differentiate between sandbox and production-ready integrations
   """
@@ -4837,25 +4914,6 @@ type SignatureStartedEvent implements PetitionEvent {
   openedAt: DateTime
   petition: Petition
   type: PetitionEventType!
-}
-
-type SsoOrgIntegration implements OrgIntegration {
-  id: GID!
-
-  """
-  Wether this integration is the default to be used if the user has more than one of the same type
-  """
-  isDefault: Boolean!
-
-  """
-  Custom name of this integration, provided by the user
-  """
-  name: String!
-
-  """
-  The type of the integration.
-  """
-  type: IntegrationType!
 }
 
 """
@@ -5305,25 +5363,6 @@ type UserPermissionRemovedEvent implements PetitionEvent {
   petition: Petition
   type: PetitionEventType!
   user: User
-}
-
-type UserProvisioningOrgIntegration implements OrgIntegration {
-  id: GID!
-
-  """
-  Wether this integration is the default to be used if the user has more than one of the same type
-  """
-  isDefault: Boolean!
-
-  """
-  Custom name of this integration, provided by the user
-  """
-  name: String!
-
-  """
-  The type of the integration.
-  """
-  type: IntegrationType!
 }
 
 enum UserStatus {

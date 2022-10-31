@@ -25,7 +25,8 @@ export type FeatureFlagName =
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "AUTO_ANONYMIZE"
-  | "TEMPLATE_REPLIES_PREVIEW_URL";
+  | "TEMPLATE_REPLIES_PREVIEW_URL"
+  | "DOW_JONES_KYC";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -44,11 +45,17 @@ export const FeatureFlagNameValues = [
   "PETITION_ACCESS_RECIPIENT_URL_FIELD",
   "AUTO_ANONYMIZE",
   "TEMPLATE_REPLIES_PREVIEW_URL",
+  "DOW_JONES_KYC",
 ] as FeatureFlagName[];
 
-export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
+export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING" | "DOW_JONES_KYC";
 
-export const IntegrationTypeValues = ["SIGNATURE", "SSO", "USER_PROVISIONING"] as IntegrationType[];
+export const IntegrationTypeValues = [
+  "SIGNATURE",
+  "SSO",
+  "USER_PROVISIONING",
+  "DOW_JONES_KYC",
+] as IntegrationType[];
 
 export type LicenseCodeStatus = "PENDING" | "REDEEMED" | "EXPIRED";
 

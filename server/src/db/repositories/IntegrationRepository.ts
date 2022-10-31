@@ -30,6 +30,13 @@ export type IntegrationSettings<
   USER_PROVISIONING: {
     AUTH_KEY: string;
   };
+  DOW_JONES_KYC: {
+    CREDENTIALS: {
+      ACCESS_TOKEN: string;
+      REFRESH_TOKEN: string;
+      CLIENT_ID: string;
+    };
+  };
 }[TType];
 
 @injectable()
