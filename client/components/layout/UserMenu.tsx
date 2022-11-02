@@ -182,17 +182,15 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
           <MenuItem data-action="start-tour" icon={<MapIcon display="block" boxSize={4} />}>
             <FormattedMessage id="navbar.start-tour" defaultMessage="Guide me around" />
           </MenuItem>
-          <NormalLink
+          <MenuItem
+            as="a"
             href="https://roadmap.onparallel.com/"
-            aria-label="Feature requests"
-            isExternal
-            color="inherit"
-            _hover={{ color: "inherit" }}
+            target="_blank"
+            rel="noopener"
+            icon={<CommentIcon display="block" boxSize={4} />}
           >
-            <MenuItem icon={<CommentIcon display="block" boxSize={4} />}>
-              <FormattedMessage id="navbar.feature-requests" defaultMessage="Feature requests" />
-            </MenuItem>
-          </NormalLink>
+            <FormattedMessage id="navbar.feature-requests" defaultMessage="Feature requests" />
+          </MenuItem>
           <MenuDivider />
 
           <MenuItem onClick={handleLogoutClick} icon={<LogOutIcon display="block" boxSize={4} />}>

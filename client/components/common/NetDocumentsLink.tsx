@@ -37,7 +37,7 @@ export const NetDocumentsIconButton = chakraForwardRef<
       as="a"
       href={`https://eu.netdocuments.com/neWeb2/goid.aspx?id=${externalId}`}
       target="_href"
-      rel="noopener noreferer"
+      rel="noopener"
       icon={<NetDocumentsIcon />}
       label={intl.formatMessage({
         id: "component.netdocuments-iconbutton.open-file",
