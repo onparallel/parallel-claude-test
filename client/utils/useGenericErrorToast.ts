@@ -1,7 +1,7 @@
 import { useToast } from "@chakra-ui/react";
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
-import * as Sentry from "@sentry/node";
+import * as Sentry from "@sentry/nextjs";
 import { isDefined } from "remeda";
 
 export function useGenericErrorToast() {

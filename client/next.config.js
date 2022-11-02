@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const SentryWebpackPlugin = require("@sentry/webpack-plugin");
+const { withSentryConfig } = require("@sentry/nextjs");
 const { createSecureHeaders } = require("next-secure-headers");
 
 /** @type {import('next').NextConfig} */
@@ -14,6 +14,7 @@ const config = {
     locales: ["en", "es"],
     defaultLocale: "en",
   },
+  generateBuildId: process.env.BUILD_ID ? () => process.env.BUILD_ID : undefined,
   crossOrigin: "anonymous",
   assetPrefix: process.env.NEXT_PUBLIC_ASSETS_URL,
   poweredByHeader: false,
@@ -21,29 +22,8 @@ const config = {
     config.resolve.alias["@parallel"] = __dirname;
     config.resolve.alias["react/jsx-runtime"] = "react/jsx-runtime.js";
     config.plugins.push(
-      new options.webpack.DefinePlugin({
-        "process.env.BUILD_ID": JSON.stringify(options.buildId),
-      })
+      new options.webpack.DefinePlugin({ "process.env.BUILD_ID": JSON.stringify(options.buildId) })
     );
-
-    // Configure sentry
-    if (!options.isServer) {
-      config.resolve.alias["@sentry/node"] = "@sentry/browser";
-    }
-    if (process.env.NODE_ENV === "production" && process.env.SENTRY_AUTH_TOKEN) {
-      config.plugins.push(
-        new SentryWebpackPlugin({
-          authToken: process.env.SENTRY_AUTH_TOKEN,
-          org: "parallel-org",
-          project: "parallel",
-          include: ".next",
-          ignore: ["node_modules"],
-          stripPrefix: ["webpack://_N_E/"],
-          urlPrefix: `~/_next`,
-          release: options.buildId,
-        })
-      );
-    }
 
     // Add the why did you render script on development
     const originalEntry = config.entry;
@@ -95,7 +75,9 @@ const config = {
       },
     ];
   },
-  productionBrowserSourceMaps: true,
+  sentry: {
+    hideSourceMaps: true,
+  },
 };
 
 module.exports = [
@@ -109,4 +91,7 @@ module.exports = [
     "@react-dnd/asap",
     "@react-dnd/shallowequal",
   ]),
+  ...(process.env.SENTRY_AUTH_TOKEN
+    ? [(config) => withSentryConfig(config, { silent: true })]
+    : []),
 ].reduce((acc, curr) => curr(acc), config);

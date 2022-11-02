@@ -2,7 +2,7 @@ import { Text } from "@chakra-ui/react";
 import { SupportLink } from "@parallel/components/common/SupportLink";
 import { ErrorPage } from "@parallel/components/public/ErrorPage";
 import { UnwrapPromise } from "@parallel/utils/types";
-import * as Sentry from "@sentry/node";
+import * as Sentry from "@sentry/nextjs";
 import { NextPageContext } from "next";
 import { FormattedMessage, useIntl } from "react-intl";
 

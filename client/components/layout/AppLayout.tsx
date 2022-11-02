@@ -13,7 +13,7 @@ import { AppLayout_QueryFragment } from "@parallel/graphql/__types";
 import { useCheckForNewVersion } from "@parallel/utils/useCheckForNewVersion";
 import { useOnMediaQueryChange } from "@parallel/utils/useOnMediaQueryChange";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
-import * as Sentry from "@sentry/node";
+import * as Sentry from "@sentry/nextjs";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";

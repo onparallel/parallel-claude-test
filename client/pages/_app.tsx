@@ -2,14 +2,11 @@ import { ChakraProvider, StylesProvider } from "@chakra-ui/react";
 import { Fonts } from "@parallel/chakra/fonts";
 import { theme } from "@parallel/chakra/theme";
 import { I18nProps, I18nProvider } from "@parallel/components/common/I18nProvider";
-import { initSentry } from "@parallel/utils/sentry";
 import { LiquidProvider } from "@parallel/utils/useLiquid";
 import { AnimateSharedLayout } from "framer-motion";
 import { AppProps } from "next/app";
 import Router from "next/router";
 import { useEffect } from "react";
-
-initSentry();
 
 type MyAppProps = AppProps & I18nProps;
 
