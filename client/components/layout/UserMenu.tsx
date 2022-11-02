@@ -31,7 +31,7 @@ import { useLoginAs } from "@parallel/utils/useLoginAs";
 import { useNotificationsState } from "@parallel/utils/useNotificationsState";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
-import { NakedLink, NormalLink } from "../common/Link";
+import { NakedLink } from "../common/Link";
 import { UserAvatar } from "../common/UserAvatar";
 
 export interface UserMenuProps extends UserMenu_QueryFragment {

@@ -110,23 +110,42 @@ export function UpdateOrganizationUsageDetailsDialog({
     ? add(new Date(currentUsageLimit.periodStartDate), currentUsageLimit.period)
     : now;
 
+  function addDuration(d1: Duration, d2: Duration) {
+    const newDuration: Duration = {};
+    ["years", "months", "weeks", "days", "hours", "minutes", "seconds"].forEach((key) => {
+      const dKey = key as keyof Duration;
+      newDuration[dKey] = (d1[dKey] ?? 0) + (d2[dKey] ?? 0);
+    });
+    return newDuration;
+  }
+
+  function multiplyDuration(duration: Duration, multiplier: number) {
+    const newDuration: Duration = {};
+    Object.entries(duration).forEach(([unit, value]) => {
+      newDuration[unit as keyof Duration] = value * multiplier;
+    });
+    return newDuration;
+  }
+
   const subscriptionEndDate =
-    renewalCycles > 0
+    startNewPeriod || !currentUsageLimit
       ? add(
-          currentUsageLimit && !startNewPeriod
-            ? add(new Date(currentUsageLimit.periodStartDate), currentUsageLimit.period) // end date of the current period
-            : now,
-          {
-            // + duration of the remaining periods, if any
-            [periodUnits as keyof Duration]:
-              periodValue *
-              (renewalCycles -
-                (startNewPeriod
-                  ? 0 // cycle count is restarted when starting a new period
-                  : currentUsageLimit?.cycleNumber ?? 0)), // if not starting a new period, we have to consider the cycle number of the current period
-          }
+          now,
+          multiplyDuration(
+            { [periodUnits as keyof Duration]: periodValue },
+            renewalCycles - (startNewPeriod ? 0 : currentUsageLimit?.cycleNumber ?? 0)
+          )
         )
-      : null;
+      : add(
+          new Date(currentUsageLimit.periodStartDate),
+          addDuration(
+            currentUsageLimit.period,
+            multiplyDuration(
+              { [periodUnits as keyof Duration]: periodValue },
+              renewalCycles - currentUsageLimit.cycleNumber
+            )
+          )
+        );
 
   if (nextPeriod.getTime() - (subscriptionEndDate?.getTime() ?? 0) === 0) {
     nextPeriod = null;
@@ -147,7 +166,7 @@ export function UpdateOrganizationUsageDetailsDialog({
       }}
       header={header}
       body={
-        <Grid templateColumns="auto 1fr 1fr" gap={3} alignItems="flex-end">
+        <Grid templateColumns="auto 1fr 1fr" gap={3} alignItems="center">
           <GridItem>
             <FormLabel fontWeight="600" margin={0} display="inline">
               <FormattedMessage
