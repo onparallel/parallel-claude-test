@@ -305,7 +305,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
               <Text as="dt" fontWeight="600">
                 <FormattedMessage
                   id="view.admin-organizations-subscriptions.card-end-date"
-                  defaultMessage="End date"
+                  defaultMessage="Subscription end"
                 />
               </Text>
               {organization.petitionsSubscriptionEndDate ? (
@@ -367,7 +367,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
                 <Text as="dt" fontWeight="600">
                   <FormattedMessage
                     id="view.admin-organizations-subscriptions.card-end-date"
-                    defaultMessage="End date"
+                    defaultMessage="Subscription end"
                   />
                 </Text>
                 {organization.signaturitSubscriptionEndDate ? (

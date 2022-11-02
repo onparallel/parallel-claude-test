@@ -9831,8 +9831,8 @@
   },
   {
     "term": "view.admin-organizations-subscriptions.card-end-date",
-    "definition": "Fecha fin",
-    "context": "End date"
+    "definition": "Fin de suscripción",
+    "context": "Subscription end"
   },
   {
     "term": "view.admin-organizations-subscriptions.card-limit",
