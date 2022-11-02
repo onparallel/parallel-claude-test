@@ -1,5 +1,4 @@
-import { identity, reverse } from "remeda";
-import { PredIndexed } from "remeda/dist/commonjs/_types";
+import { identity, reverse, sumBy } from "remeda";
 import { MaybeArray } from "./types";
 
 export function unMaybeArray<T>(items: MaybeArray<T>) {
@@ -39,10 +38,6 @@ export function chunkWhile<T>(array: T[], predicate: (current: T[], value: T) =>
     }
   }
   return chunks;
-}
-
-export function sumBy<T>(array: T[], fn: PredIndexed<T, number>) {
-  return array.reduce((acc, curr, index) => acc + fn(curr, index, array), 0);
 }
 
 /**

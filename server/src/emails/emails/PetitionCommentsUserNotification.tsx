@@ -1,8 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlText } from "@faire/mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
-import { uniqBy } from "remeda";
-import { sumBy } from "../../util/arrays";
+import { sumBy, uniqBy } from "remeda";
 import { Email } from "../buildEmail";
 import { Button } from "../components/Button";
 import { GreetingUser } from "../components/Greeting";

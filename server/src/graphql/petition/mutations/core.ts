@@ -15,7 +15,7 @@ import {
 } from "nexus";
 import { outdent } from "outdent";
 import pMap from "p-map";
-import { isDefined, omit, uniq, zip } from "remeda";
+import { isDefined, omit, sumBy, uniq, zip } from "remeda";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
 import { isValueCompatible } from "../../../db/helpers/utils";
 import {
@@ -25,7 +25,7 @@ import {
   Petition,
   PetitionPermission,
 } from "../../../db/__types";
-import { chunkWhile, sumBy, unMaybeArray } from "../../../util/arrays";
+import { chunkWhile, unMaybeArray } from "../../../util/arrays";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { pFlatMap } from "../../../util/promises/pFlatMap";

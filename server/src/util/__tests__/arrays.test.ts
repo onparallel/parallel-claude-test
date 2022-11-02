@@ -1,4 +1,5 @@
-import { chunkWhile, partition, sumBy } from "../arrays";
+import { sumBy } from "remeda";
+import { chunkWhile, partition } from "../arrays";
 
 describe("Array Helper Functions", () => {
   it("chunkWhile 1", () => {
