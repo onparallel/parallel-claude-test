@@ -93,48 +93,81 @@ export const DowJonesRiskEntityRelationship = objectType({
     t.int("profileId");
     t.string("connectionType");
     t.list.string("iconHints");
-    t.nullable.string("firstName");
-    t.nullable.string("middleName");
-    t.nullable.string("lastName");
+    t.nullable.string("name");
     t.field("type", { type: "DowJonesRiskEntityType" });
   },
 });
 
-export const DowJonesRiskEntitySearchResult = objectType({
+export const DowJonesRiskEntitySearchResult = interfaceType({
   name: "DowJonesRiskEntitySearchResult",
   definition(t) {
     t.id("id");
     t.field("type", { type: "DowJonesRiskEntityType" });
-    t.string("primaryName");
+    t.string("name");
     t.string("title");
     t.string("countryTerritoryName");
-    t.string("gender");
     t.boolean("isSubsidiary");
     t.list.string("iconHints");
+  },
+  resolveType: (o) =>
+    o.type === "Person"
+      ? "DowJonesRiskEntitySearchResultPerson"
+      : "DowJonesRiskEntitySearchResultEntity",
+});
+
+export const DowJonesRiskEntitySearchResultPerson = objectType({
+  name: "DowJonesRiskEntitySearchResultPerson",
+  definition(t) {
+    t.implements("DowJonesRiskEntitySearchResult");
+    t.string("gender");
     t.nullable.field("dateOfBirth", { type: "DowJonesRiskEntityDate" });
   },
 });
 
-export const DowJonesRiskEntityProfileResult = objectType({
+export const DowJonesRiskEntitySearchResultEntity = objectType({
+  name: "DowJonesRiskEntitySearchResultEntity",
+  definition(t) {
+    t.implements("DowJonesRiskEntitySearchResult");
+  },
+});
+
+export const DowJonesRiskEntityProfileResult = interfaceType({
   name: "DowJonesRiskEntityProfileResult",
   definition(t) {
     t.id("id");
     t.field("type", { type: "DowJonesRiskEntityType" });
-    t.string("firstName");
-    t.string("middleName");
-    t.string("lastName");
+    t.string("name");
     t.list.string("iconHints");
-    t.field("placeOfBirth", { type: "DowJonesRiskEntityPlace" });
-    t.field("dateOfBirth", { type: "DowJonesRiskEntityDate" });
-    t.field("citizenship", { type: "DowJonesRiskEntityPlace" });
-    t.field("residence", { type: "DowJonesRiskEntityPlace" });
-    t.field("jurisdiction", { type: "DowJonesRiskEntityPlace" });
-    t.boolean("isDeceased");
     t.list.field("sanctions", {
       type: "DowJonesRiskEntitySanction",
     });
     t.list.field("relationships", {
       type: "DowJonesRiskEntityRelationship",
     });
+  },
+  resolveType: (o) =>
+    o.type === "Person"
+      ? "DowJonesRiskEntityProfileResultPerson"
+      : "DowJonesRiskEntityProfileResultEntity",
+});
+
+export const DowJonesRiskEntityProfileResultPerson = objectType({
+  name: "DowJonesRiskEntityProfileResultPerson",
+  definition(t) {
+    t.implements("DowJonesRiskEntityProfileResult");
+    t.nullable.field("placeOfBirth", { type: "DowJonesRiskEntityPlace" });
+    t.nullable.field("dateOfBirth", { type: "DowJonesRiskEntityDate" });
+    t.nullable.field("citizenship", { type: "DowJonesRiskEntityPlace" });
+    t.nullable.field("residence", { type: "DowJonesRiskEntityPlace" });
+    t.nullable.field("jurisdiction", { type: "DowJonesRiskEntityPlace" });
+    t.boolean("isDeceased");
+  },
+});
+
+export const DowJonesRiskEntityProfileResultEntity = objectType({
+  name: "DowJonesRiskEntityProfileResultEntity",
+  definition(t) {
+    t.implements("DowJonesRiskEntityProfileResult");
+    t.nullable.field("dateOfRegistration", { type: "DowJonesRiskEntityDate" });
   },
 });

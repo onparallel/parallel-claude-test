@@ -1,4 +1,5 @@
 import { inject, injectable } from "inversify";
+import { isDefined } from "remeda";
 import {
   IntegrationRepository,
   IntegrationSettings,
@@ -16,63 +17,89 @@ type DowJonesIntegration = Replace<
 
 type RiskEntityType = "Person" | "Entity";
 
-type RiskEntityResultPlace = {
-  descriptor: string;
-  countryCode: string;
-};
-
-type RiskEntityResultDate = {
-  year?: number;
-  month?: number;
-  day?: number;
-};
-
 type RiskEntitySearchResult = {
-  totalCount: number;
-  items: {
+  meta: { total_count: number };
+  data?: {
     id: string;
-    type: RiskEntityType;
-    primaryName: string;
-    title: string;
-    countryTerritoryName: string;
-    gender: string;
-    isSubsidiary: boolean;
-    iconHints: string[];
-    dateOfBirth?: RiskEntityResultDate;
+    attributes: {
+      type: RiskEntityType;
+      primary_name: string;
+      title: string;
+      country_territory_name: string;
+      gender: string;
+      is_subsidiary: boolean;
+      icon_hints: string[];
+      date_of_birth?: {
+        day: string;
+        month: string;
+        year: string;
+      }[];
+    };
   }[];
 };
 
-type RiskEntityProfileResultSanction = {
-  name: string;
-  sources: string[];
-  fromDate: RiskEntityResultDate;
-};
-
-type RiskEntityProfileResultRelationship = {
-  profileId: number;
-  connectionType: string;
-  iconHints: string[];
-  firstName?: string;
-  middleName?: string;
-  lastName?: string;
-  type: RiskEntityType;
+type RiskEntityPersonName = { first_name?: string; surname?: string; middle_name?: string };
+type RiskEntityEntityName = { name: string };
+type RiskEntityDate = { day?: number; month?: number; year?: number };
+type RiskEntityPlace = {
+  descriptor: string;
+  iso_alpha2: string;
 };
 
 type RiskEntityProfileResult = {
-  id: string;
-  type: RiskEntityType;
-  firstName: string;
-  middleName: string;
-  lastName: string;
-  iconHints: string[];
-  placeOfBirth: RiskEntityResultPlace;
-  dateOfBirth: RiskEntityResultDate;
-  citizenship: RiskEntityResultPlace;
-  residence: RiskEntityResultPlace;
-  jurisdiction: RiskEntityResultPlace;
-  isDeceased: boolean;
-  sanctions: RiskEntityProfileResultSanction[];
-  relationships: RiskEntityProfileResultRelationship[];
+  data: {
+    id: string;
+    attributes: {
+      basic: {
+        type: RiskEntityType;
+        name_details: {
+          primary_name: RiskEntityPersonName | RiskEntityEntityName;
+        };
+      };
+      person?: {
+        icon_hints: string[];
+        date_details: {
+          birth?: { date: RiskEntityDate }[];
+        };
+        places_of_birth?: { country: RiskEntityPlace }[];
+        country_territory_details: {
+          citizenship?: RiskEntityPlace[];
+          residence?: RiskEntityPlace[];
+          jurisdiction?: RiskEntityPlace[];
+        };
+        gender: string;
+        is_deceased: boolean;
+      };
+      entity?: {
+        icon_hints: string[];
+        date_details?: {
+          registration: { date: RiskEntityDate }[];
+        };
+      };
+      list_reference?: {
+        sanctions_lists: {
+          name: string;
+          sources: string[];
+          from_date: RiskEntityDate;
+        }[];
+      };
+      relationship?: {
+        connection_details: {
+          profile_id: number;
+          connection_type: string;
+          icon_hints: string[];
+          type: RiskEntityType;
+          name_detail: RiskEntityPersonName | RiskEntityEntityName;
+        }[];
+      };
+    };
+  };
+};
+
+type RiskEntityProfilePdfResult = {
+  mime_type: string;
+  binary_encoding: string;
+  binary_stream: string;
 };
 
 export interface IDowJonesKycService {
@@ -94,6 +121,11 @@ export interface IDowJonesKycService {
     profileId: string,
     integration: DowJonesIntegration
   ): Promise<RiskEntityProfileResult>;
+  riskEntityProfilePdf(
+    profileId: string,
+    integration: DowJonesIntegration
+  ): Promise<RiskEntityProfilePdfResult>;
+  entityFullName(name: RiskEntityPersonName | RiskEntityEntityName): string;
 }
 
 @injectable()
@@ -102,6 +134,15 @@ export class DowJonesKycService implements IDowJonesKycService {
     @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(IntegrationRepository) private integrations: IntegrationRepository
   ) {}
+  entityFullName(name: RiskEntityPersonName | RiskEntityEntityName) {
+    if ("name" in name) {
+      return name.name;
+    } else {
+      return [name.surname ? name.surname + "," : null, name.middle_name, name.first_name]
+        .filter(isDefined)
+        .join(" ");
+    }
+  }
 
   private async getAuthenticationIdToken(
     clientId: string,
@@ -253,26 +294,7 @@ export class DowJonesKycService implements IDowJonesKycService {
     },
     integration: DowJonesIntegration
   ): Promise<RiskEntitySearchResult> {
-    const response = await this.makeApiCall<{
-      meta: { total_count: number };
-      data?: {
-        id: string;
-        attributes: {
-          type: RiskEntityType;
-          primary_name: string;
-          title: string;
-          country_territory_name: string;
-          gender: string;
-          is_subsidiary: boolean;
-          icon_hints: string[];
-          date_of_birth?: {
-            day: string;
-            month: string;
-            year: string;
-          }[];
-        };
-      }[];
-    }>(
+    return await this.makeApiCall<RiskEntitySearchResult>(
       "https://api.dowjones.com/riskentities/search",
       {
         method: "POST",
@@ -292,7 +314,12 @@ export class DowJonesKycService implements IDowJonesKycService {
                   search_keyword: {
                     scope: ["Name"],
                     text: args.name,
-                    type: "BROAD",
+                    /**
+                     * Precise Considers matches of at least 88% (runs a stricter fuzzy search)
+                     * Near	Considers matches of at least 70% (runs on an intermediate fuzzy search)
+                     * Broad Considers matches of at least 50% (runs on an high level of fuzzy search)
+                     */
+                    type: "Near", // Precise | Near | Broad
                   },
                   ...(args.dateOfBirth
                     ? {
@@ -315,148 +342,37 @@ export class DowJonesKycService implements IDowJonesKycService {
       },
       integration
     );
-
-    return {
-      totalCount: response.meta.total_count,
-      items: (response.data ?? []).map((d) => ({
-        id: d.id,
-        type: d.attributes.type,
-        title: d.attributes.title,
-        countryTerritoryName: d.attributes.country_territory_name,
-        gender: d.attributes.gender,
-        iconHints: d.attributes.icon_hints,
-        isSubsidiary: d.attributes.is_subsidiary,
-        primaryName: d.attributes.primary_name,
-        ...(d.attributes.date_of_birth
-          ? {
-              dateOfBirth: {
-                year: parseInt(d.attributes.date_of_birth[0].year),
-                month: parseInt(d.attributes.date_of_birth[0].month),
-                day: parseInt(d.attributes.date_of_birth[0].day),
-              },
-            }
-          : {}),
-      })),
-    };
   }
 
   async riskEntityProfile(
     profileId: string,
     integration: DowJonesIntegration
   ): Promise<RiskEntityProfileResult> {
-    const response = await this.makeApiCall<{
-      data: {
-        attributes: {
-          basic: {
-            type: RiskEntityType;
-            name_details: {
-              primary_name: {
-                first_name: string;
-                middle_name: string;
-                surname: string;
-              };
-            };
-          };
-          person: {
-            icon_hints: string[];
-            date_details: {
-              birth: { date: { day?: number; month?: number; year?: number } }[];
-            };
-            places_of_birth: {
-              country: {
-                descriptor: string;
-                iso_alpha2: string;
-              };
-            }[];
-            country_territory_details: {
-              citizenship: { descriptor: string; iso_alpha2: string }[];
-              residence: { descriptor: string; iso_alpha2: string }[];
-              jurisdiction: { descriptor: string; iso_alpha2: string }[];
-            };
-            is_deceased: boolean;
-          };
-          list_reference?: {
-            sanctions_lists: {
-              name: string;
-              sources: string[];
-              from_date: {
-                day: number;
-                month: number;
-                year: number;
-              };
-            }[];
-          };
-          relationship: {
-            connection_details: {
-              profile_id: number;
-              type: RiskEntityType;
-              connection_type: string;
-              name_detail: {
-                first_name: string;
-                middle_name: string;
-                surname: string;
-              };
-              icon_hints: string[];
-            }[];
-          };
-        };
-        id: string;
-      };
-    }>(
+    return await this.makeApiCall<RiskEntityProfileResult>(
       "https://api.dowjones.com/riskentities/profiles/" + profileId,
       { method: "GET" },
       integration
     );
+  }
 
-    return {
-      id: response.data.id,
-      firstName: response.data.attributes.basic.name_details.primary_name.first_name,
-      middleName: response.data.attributes.basic.name_details.primary_name.middle_name,
-      lastName: response.data.attributes.basic.name_details.primary_name.surname,
-      iconHints: response.data.attributes.person.icon_hints,
-      type: response.data.attributes.basic.type,
-      placeOfBirth: {
-        descriptor: response.data.attributes.person.places_of_birth[0].country.descriptor,
-        countryCode: response.data.attributes.person.places_of_birth[0].country.iso_alpha2,
+  async riskEntityProfilePdf(
+    profileId: string,
+    integration: DowJonesIntegration
+  ): Promise<RiskEntityProfilePdfResult> {
+    return await this.makeApiCall<RiskEntityProfilePdfResult>(
+      "https://api.riskcenter.dowjones.com/profile-pdf",
+      {
+        method: "POST",
+        body: {
+          meta: { action: "download" },
+          data: {
+            attributes: {
+              profile_id: profileId,
+            },
+          },
+        },
       },
-      dateOfBirth: {
-        year: response.data.attributes.person.date_details.birth[0].date.year,
-        month: response.data.attributes.person.date_details.birth[0].date.month,
-        day: response.data.attributes.person.date_details.birth[0].date.day,
-      },
-      citizenship: {
-        descriptor:
-          response.data.attributes.person.country_territory_details.citizenship[0].descriptor,
-        countryCode:
-          response.data.attributes.person.country_territory_details.citizenship[0].iso_alpha2,
-      },
-      residence: {
-        descriptor:
-          response.data.attributes.person.country_territory_details.residence[0].descriptor,
-        countryCode:
-          response.data.attributes.person.country_territory_details.residence[0].iso_alpha2,
-      },
-      jurisdiction: {
-        descriptor:
-          response.data.attributes.person.country_territory_details.jurisdiction[0].descriptor,
-        countryCode:
-          response.data.attributes.person.country_territory_details.jurisdiction[0].iso_alpha2,
-      },
-      isDeceased: response.data.attributes.person.is_deceased,
-      sanctions: (response.data.attributes.list_reference?.sanctions_lists ?? []).map((s) => ({
-        name: s.name,
-        sources: s.sources,
-        fromDate: s.from_date,
-      })),
-      relationships: response.data.attributes.relationship.connection_details.map((r) => ({
-        profileId: r.profile_id,
-        connectionType: r.connection_type,
-        iconHints: r.icon_hints,
-        firstName: r.name_detail.first_name,
-        middleName: r.name_detail.middle_name,
-        lastName: r.name_detail.surname,
-        type: r.type,
-      })),
-    };
+      integration
+    );
   }
 }

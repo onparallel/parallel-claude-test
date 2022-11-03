@@ -20,7 +20,31 @@ export const queries = queryField((t) => {
         "DOW_JONES_KYC"
       );
 
-      return await ctx.dowJonesKyc.riskEntitySearch(args, integration);
+      const result = await ctx.dowJonesKyc.riskEntitySearch(args, integration);
+      return {
+        totalCount: result.meta.total_count,
+        items: (result.data ?? []).map((i) => ({
+          id: i.id,
+          type: i.attributes.type,
+          name: i.attributes.primary_name,
+          title: i.attributes.title,
+          countryTerritoryName: i.attributes.country_territory_name,
+          isSubsidiary: i.attributes.is_subsidiary,
+          iconHints: i.attributes.icon_hints,
+          ...(i.attributes.type === "Person"
+            ? {
+                gender: i.attributes.gender,
+                dateOfBirth: i.attributes.date_of_birth
+                  ? {
+                      year: parseInt(i.attributes.date_of_birth[0].year) || null,
+                      month: parseInt(i.attributes.date_of_birth[0].month) || null,
+                      day: parseInt(i.attributes.date_of_birth[0].day) || null,
+                    }
+                  : null,
+              }
+            : {}),
+        })),
+      };
     },
   });
 
@@ -39,7 +63,77 @@ export const queries = queryField((t) => {
         "DOW_JONES_KYC"
       );
 
-      return await ctx.dowJonesKyc.riskEntityProfile(args.profileId, integration);
+      const result = await ctx.dowJonesKyc.riskEntityProfile(args.profileId, integration);
+      return {
+        id: result.data.id,
+        type: result.data.attributes.basic.type,
+        name: ctx.dowJonesKyc.entityFullName(
+          result.data.attributes.basic.name_details.primary_name
+        ),
+        iconHints:
+          result.data.attributes.person?.icon_hints ??
+          result.data.attributes.entity?.icon_hints ??
+          [],
+        sanctions: (result.data.attributes.list_reference?.sanctions_lists ?? []).map((s) => ({
+          name: s.name,
+          sources: s.sources,
+          fromDate: s.from_date,
+        })),
+        relationships: (result.data.attributes.relationship?.connection_details ?? []).map((r) => ({
+          profileId: r.profile_id,
+          type: r.type,
+          connectionType: r.connection_type,
+          iconHints: r.icon_hints,
+          name: ctx.dowJonesKyc.entityFullName(r.name_detail),
+        })),
+        ...(result.data.attributes.basic.type === "Person"
+          ? {
+              placeOfBirth: result.data.attributes.person!.places_of_birth
+                ? {
+                    descriptor:
+                      result.data.attributes.person!.places_of_birth[0].country.descriptor,
+                    countryCode:
+                      result.data.attributes.person!.places_of_birth[0].country.iso_alpha2,
+                  }
+                : null,
+              dateOfBirth: result.data.attributes.person!.date_details.birth?.[0].date,
+              citizenship: result.data.attributes.person!.country_territory_details.citizenship
+                ? {
+                    descriptor:
+                      result.data.attributes.person!.country_territory_details.citizenship[0]
+                        .descriptor,
+                    countryCode:
+                      result.data.attributes.person!.country_territory_details.citizenship[0]
+                        .iso_alpha2,
+                  }
+                : null,
+              residence: result.data.attributes.person!.country_territory_details.residence
+                ? {
+                    descriptor:
+                      result.data.attributes.person!.country_territory_details.residence[0]
+                        .descriptor,
+                    countryCode:
+                      result.data.attributes.person!.country_territory_details.residence[0]
+                        .iso_alpha2,
+                  }
+                : null,
+              jurisdiction: result.data.attributes.person!.country_territory_details.jurisdiction
+                ? {
+                    descriptor:
+                      result.data.attributes.person!.country_territory_details.jurisdiction[0]
+                        .descriptor,
+                    countryCode:
+                      result.data.attributes.person!.country_territory_details.jurisdiction[0]
+                        .iso_alpha2,
+                  }
+                : null,
+              isDeceased: result.data.attributes.person!.is_deceased,
+            }
+          : {
+              dateOfRegistration:
+                result.data.attributes.entity!.date_details?.registration[0].date ?? null,
+            }),
+      };
     },
   });
 });

@@ -238,29 +238,44 @@ type DowJonesRiskEntityPlace {
   descriptor: String!
 }
 
-type DowJonesRiskEntityProfileResult {
-  citizenship: DowJonesRiskEntityPlace!
-  dateOfBirth: DowJonesRiskEntityDate!
-  firstName: String!
+interface DowJonesRiskEntityProfileResult {
+  iconHints: [String!]!
+  id: ID!
+  name: String!
+  relationships: [DowJonesRiskEntityRelationship!]!
+  sanctions: [DowJonesRiskEntitySanction!]!
+  type: DowJonesRiskEntityType!
+}
+
+type DowJonesRiskEntityProfileResultEntity implements DowJonesRiskEntityProfileResult {
+  dateOfRegistration: DowJonesRiskEntityDate
+  iconHints: [String!]!
+  id: ID!
+  name: String!
+  relationships: [DowJonesRiskEntityRelationship!]!
+  sanctions: [DowJonesRiskEntitySanction!]!
+  type: DowJonesRiskEntityType!
+}
+
+type DowJonesRiskEntityProfileResultPerson implements DowJonesRiskEntityProfileResult {
+  citizenship: DowJonesRiskEntityPlace
+  dateOfBirth: DowJonesRiskEntityDate
   iconHints: [String!]!
   id: ID!
   isDeceased: Boolean!
-  jurisdiction: DowJonesRiskEntityPlace!
-  lastName: String!
-  middleName: String!
-  placeOfBirth: DowJonesRiskEntityPlace!
+  jurisdiction: DowJonesRiskEntityPlace
+  name: String!
+  placeOfBirth: DowJonesRiskEntityPlace
   relationships: [DowJonesRiskEntityRelationship!]!
-  residence: DowJonesRiskEntityPlace!
+  residence: DowJonesRiskEntityPlace
   sanctions: [DowJonesRiskEntitySanction!]!
   type: DowJonesRiskEntityType!
 }
 
 type DowJonesRiskEntityRelationship {
   connectionType: String!
-  firstName: String
   iconHints: [String!]!
-  lastName: String
-  middleName: String
+  name: String
   profileId: Int!
   type: DowJonesRiskEntityType!
 }
@@ -271,14 +286,22 @@ type DowJonesRiskEntitySanction {
   sources: [String!]!
 }
 
-type DowJonesRiskEntitySearchResult {
+interface DowJonesRiskEntitySearchResult {
   countryTerritoryName: String!
-  dateOfBirth: DowJonesRiskEntityDate
-  gender: String!
   iconHints: [String!]!
   id: ID!
   isSubsidiary: Boolean!
-  primaryName: String!
+  name: String!
+  title: String!
+  type: DowJonesRiskEntityType!
+}
+
+type DowJonesRiskEntitySearchResultEntity implements DowJonesRiskEntitySearchResult {
+  countryTerritoryName: String!
+  iconHints: [String!]!
+  id: ID!
+  isSubsidiary: Boolean!
+  name: String!
   title: String!
   type: DowJonesRiskEntityType!
 }
@@ -293,6 +316,18 @@ type DowJonesRiskEntitySearchResultPagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+type DowJonesRiskEntitySearchResultPerson implements DowJonesRiskEntitySearchResult {
+  countryTerritoryName: String!
+  dateOfBirth: DowJonesRiskEntityDate
+  gender: String!
+  iconHints: [String!]!
+  id: ID!
+  isSubsidiary: Boolean!
+  name: String!
+  title: String!
+  type: DowJonesRiskEntityType!
 }
 
 enum DowJonesRiskEntityType {
