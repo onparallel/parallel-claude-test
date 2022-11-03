@@ -60,7 +60,7 @@ type RiskEntityProfileResult = {
       };
       person?: {
         icon_hints: string[];
-        date_details: {
+        date_details?: {
           birth?: { date: RiskEntityDate }[];
         };
         places_of_birth?: { country: RiskEntityPlace }[];
@@ -75,7 +75,7 @@ type RiskEntityProfileResult = {
       entity?: {
         icon_hints: string[];
         date_details?: {
-          registration: { date: RiskEntityDate }[];
+          registration?: { date: RiskEntityDate }[];
         };
       };
       list_reference?: {

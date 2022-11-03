@@ -100,7 +100,7 @@ export const queries = queryField((t) => {
                         result.data.attributes.person!.places_of_birth[0].country.iso_alpha2,
                     }
                   : null,
-                dateOfBirth: result.data.attributes.person!.date_details.birth?.[0].date,
+                dateOfBirth: result.data.attributes.person!.date_details?.birth?.[0].date ?? null,
                 citizenship: result.data.attributes.person!.country_territory_details.citizenship
                   ? {
                       descriptor:
@@ -135,7 +135,7 @@ export const queries = queryField((t) => {
               }
             : {
                 dateOfRegistration:
-                  result.data.attributes.entity!.date_details?.registration[0].date ?? null,
+                  result.data.attributes.entity!.date_details?.registration?.[0].date ?? null,
               }),
         };
       } catch (error: any) {
