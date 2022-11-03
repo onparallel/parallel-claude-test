@@ -4957,10 +4957,20 @@ export class PetitionRepository extends BaseRepository {
           case "type"
             when 'FILE_UPLOAD' then
               content || jsonb_build_object('file_upload_id', null)
+            when 'DOW_JONES_KYC_RESEARCH' then
+              content || jsonb_build_object('file_upload_id', null)
             when 'ES_TAX_DOCUMENTS' then
               content || jsonb_build_object('file_upload_id', null)
             else 
               content || jsonb_build_object('value', null)
+            end
+        `),
+        metadata: this.knex.raw(/* sql */ `
+          case "type"
+            when 'DOW_JONES_KYC_RESEARCH' then 
+              jsonb_build_object('type', null, 'name', null, 'iconHints', null)
+            else 
+              metadata
             end
         `),
       });
