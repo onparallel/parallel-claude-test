@@ -237,8 +237,8 @@ export function defaultFieldOptions(
       ? false
       : type === "HEADING" // HEADING always false
       ? false
-      : type === "DOW_JONES_KYC_RESEARCH" // DOW_JONES_KYC_RESEARCH always false
-      ? false
+      : type === "DOW_JONES_KYC_RESEARCH" // DOW_JONES_KYC_RESEARCH always true
+      ? true
       : field?.type === "FILE_UPLOAD" // Inherit if not coming from a FILE_UPLOAD
       ? false
       : field?.multiple ?? false;

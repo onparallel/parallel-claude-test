@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Alert,
   AlertDescription,
@@ -11,27 +11,72 @@ import {
   Heading,
   Image,
   Stack,
+  Text,
 } from "@chakra-ui/react";
+import { AlertCircleFilledIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
+import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { IntegrationCard } from "@parallel/components/organization/IntegrationCard";
-import { OrganizationIntegrations_userDocument } from "@parallel/graphql/__types";
+import {
+  IntegrationLinkCard,
+  IntegrationLinkCardProps,
+} from "@parallel/components/organization/IntegrationLinkCard";
+import {
+  IntegrationSwitchCard,
+  IntegrationSwitchCardProps,
+} from "@parallel/components/organization/IntegrationSwitchCard";
+import {
+  OrganizationIntegrations_createDowJonesFactivaIntegrationDocument,
+  OrganizationIntegrations_userDocument,
+} from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { isAtLeast } from "@parallel/utils/roles";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
+import { useDeactivateDowJonesIntegrationDialog } from "./dialogs/DeactivateDowJonesIntegrationDialog";
+import { useDowJonesIntegrationDialog } from "./dialogs/DowJonesIntegrationDialog";
 
 function OrganizationIntegrations() {
   const intl = useIntl();
   const {
     data: { me, realMe },
+    refetch,
   } = useAssertQuery(OrganizationIntegrations_userDocument);
   const sections = useOrganizationSections(me);
 
   const hasAdminRole = isAtLeast("ADMIN", me.role);
+
+  const hasDownJones = me.organization.hasDowJones;
+  const hasErrorDownJones = false;
+
+  const [createDowJonesIntegration] = useMutation(
+    OrganizationIntegrations_createDowJonesFactivaIntegrationDocument
+  );
+
+  const showDeactivateDowJonesIntegrationDialog = useDeactivateDowJonesIntegrationDialog();
+  const showDowJonesIntegrationDialog = useDowJonesIntegrationDialog();
+  const handleSwitchDownJones = async (isChecked: boolean) => {
+    if (isChecked) {
+      try {
+        const data = await showDowJonesIntegrationDialog();
+        await createDowJonesIntegration({
+          variables: {
+            ...data,
+          },
+        });
+        refetch();
+      } catch {}
+    } else {
+      try {
+        await showDeactivateDowJonesIntegrationDialog();
+        // TODO: Remove integration
+      } catch {}
+    }
+  };
 
   const integrations = [
     {
@@ -77,6 +122,48 @@ function OrganizationIntegrations() {
       isExternal: true,
     },
     {
+      isDisabled: false,
+      logo: (
+        <Image
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/dow-jones.png`}
+          alt="Dow Jones Factiva"
+          maxWidth="124px"
+        />
+      ),
+      badge: hasDownJones ? (
+        hasErrorDownJones ? (
+          <SmallPopover
+            content={
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="organization.integrations.dow-jones-error"
+                  defaultMessage="The integration is not working properly. Please reconnect to your account."
+                />
+              </Text>
+            }
+            placement="bottom"
+          >
+            <AlertCircleFilledIcon color="yellow.500" />
+          </SmallPopover>
+        ) : (
+          <Badge colorScheme="green">
+            <FormattedMessage id="generic.activated" defaultMessage="Activated" />
+          </Badge>
+        )
+      ) : null,
+      title: intl.formatMessage({
+        id: "organization.integrations.dow-jones-title",
+        defaultMessage: "Dow Jones RiskCenter",
+      }),
+      body: intl.formatMessage({
+        id: "organization.integrations.dow-jones-description",
+        defaultMessage:
+          "Run a background check of individuals and legal entities using its database.",
+      }),
+      onChange: handleSwitchDownJones,
+      isChecked: hasDownJones,
+    },
+    {
       isDisabled: !me.hasDeveloperAccess || !hasAdminRole,
       logo: (
         <Image
@@ -95,7 +182,7 @@ function OrganizationIntegrations() {
       }),
       href: "/app/settings/developers",
     },
-  ];
+  ] as (IntegrationLinkCardProps | IntegrationSwitchCardProps)[];
 
   return (
     <SettingsLayout
@@ -156,9 +243,17 @@ function OrganizationIntegrations() {
         </Stack>
       </Alert>
       <Stack padding={4} spacing={5} maxWidth="container.sm" paddingBottom={16}>
-        {integrations.map((integration, index) => (
-          <IntegrationCard key={index} {...integration} />
-        ))}
+        {integrations.map((integration, index) => {
+          if (isDefined((integration as IntegrationSwitchCardProps).onChange)) {
+            return <IntegrationSwitchCard key={index} {...integration} />;
+          }
+
+          if (isDefined((integration as IntegrationLinkCardProps).href)) {
+            return (
+              <IntegrationLinkCard key={index} {...(integration as IntegrationLinkCardProps)} />
+            );
+          }
+        })}
         {!hasAdminRole ? <OnlyAdminsAlert /> : null}
       </Stack>
     </SettingsLayout>
@@ -174,9 +269,31 @@ OrganizationIntegrations.queries = [
         role
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
         hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
+        organization {
+          id
+          hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
+        }
       }
     }
     ${SettingsLayout.fragments.Query}
+  `,
+];
+
+OrganizationIntegrations.mutations = [
+  gql`
+    mutation OrganizationIntegrations_createDowJonesFactivaIntegration(
+      $clientId: String!
+      $username: String!
+      $password: String!
+    ) {
+      createDowJonesFactivaIntegration(
+        clientId: $clientId
+        username: $username
+        password: $password
+      ) {
+        id
+      }
+    }
   `,
 ];
 

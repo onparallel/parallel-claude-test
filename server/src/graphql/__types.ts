@@ -1332,6 +1332,7 @@ export interface NexusGenFieldTypes {
     currentUsagePeriod: NexusGenRootTypes["OrganizationUsageLimit"] | null; // OrganizationUsageLimit
     customHost: string | null; // String
     features: NexusGenRootTypes["FeatureFlagNameValue"][]; // [FeatureFlagNameValue!]!
+    hasIntegration: boolean; // Boolean!
     hasSsoProvider: boolean; // Boolean!
     iconUrl: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
@@ -2981,6 +2982,7 @@ export interface NexusGenFieldTypeNames {
     currentUsagePeriod: "OrganizationUsageLimit";
     customHost: "String";
     features: "FeatureFlagNameValue";
+    hasIntegration: "Boolean";
     hasSsoProvider: "Boolean";
     iconUrl: "String";
     id: "GID";
@@ -5040,6 +5042,10 @@ export interface NexusGenArgTypes {
     currentUsagePeriod: {
       // args
       limitName: NexusGenEnums["OrganizationUsageLimitName"]; // OrganizationUsageLimitName!
+    };
+    hasIntegration: {
+      // args
+      integration: NexusGenEnums["IntegrationType"]; // IntegrationType!
     };
     iconUrl: {
       // args

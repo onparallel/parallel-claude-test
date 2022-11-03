@@ -245,7 +245,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
                 ) : activeType === "DOW_JONES_KYC_RESEARCH" ? (
                   <FormattedMessage
                     id="component.petition-field-type-select-dropdown.dow-jones-kyc-research-description"
-                    defaultMessage="Allows you to spy on your next-door neighbor quickly and easily."
+                    defaultMessage="Easily search in Dow Jones to run a background check of an individual or legal entity."
                   />
                 ) : null}
               </Box>
@@ -260,6 +260,9 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
       User: gql`
         fragment PetitionFieldTypeSelectDropdown_User on User {
           hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
+          organization {
+            hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
+          }
         }
       `,
     },

@@ -221,6 +221,16 @@ export const Organization = objectType({
           limit,
         }),
     });
+    t.boolean("hasIntegration", {
+      authorize: isOwnOrgOrSuperAdmin(),
+      args: {
+        integration: nonNull(arg({ type: "IntegrationType" })),
+      },
+      resolve: async (root, { integration }, ctx) => {
+        const integrations = await ctx.integrations.loadIntegrationsByOrgId(root.id, integration);
+        return integrations.some((int) => int.is_enabled);
+      },
+    });
     t.nonNull.jsonObject("usageDetails", {
       authorize: isOwnOrgOrSuperAdmin(),
       resolve: (o) => o.usage_details,

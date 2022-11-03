@@ -1,11 +1,8 @@
-import { Box, Heading, HStack, Stack, Text } from "@chakra-ui/react";
-import { ArrowBackIcon } from "@parallel/chakra/icons";
+import { Box, Button, Flex, HStack, Text } from "@chakra-ui/react";
 import { TableColumn } from "@parallel/components/common/Table";
 import { nanoid } from "nanoid";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Card } from "../common/Card";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { TablePage } from "../common/TablePage";
 
 const fakeData = [
@@ -23,39 +20,20 @@ const fakeData = [
   },
 ];
 
-export function PreviewFactivaTable({ name, date }: { name: string; date: string }) {
-  const intl = useIntl();
+export function PreviewFactivaTable({
+  name,
+  date,
+  onRowClick,
+  onResetClick,
+}: {
+  name: string;
+  date: string;
+  onRowClick: (id: string) => void;
+  onResetClick: () => void;
+}) {
   const columns = useDowJonesFactivaDataColumns();
 
-  const [details, setDetails] = useState<any>(null);
-
-  const handleRowClick = (data: any) => {
-    setDetails(data);
-  };
-
   const context = useMemo(() => ({}), []);
-
-  if (details) {
-    return (
-      <Card>
-        <HStack padding={4} borderBottom="1px solid" borderColor="gray.200">
-          <IconButtonWithTooltip
-            icon={<ArrowBackIcon />}
-            variant="ghost"
-            label={intl.formatMessage({
-              id: "generic.go-back",
-              defaultMessage: "Go back",
-            })}
-            onClick={() => setDetails(null)}
-          />{" "}
-          <Heading size="md">{details.id}</Heading>
-        </HStack>
-        <Stack padding={4}>
-          <Text>{details.data}</Text>
-        </Stack>
-      </Card>
-    );
-  }
 
   return (
     <TablePage
@@ -72,27 +50,48 @@ export function PreviewFactivaTable({ name, date }: { name: string; date: string
       onPageChange={() => {}}
       onPageSizeChange={() => {}}
       onSortChange={() => {}}
-      onRowClick={handleRowClick}
+      onRowClick={onRowClick}
       header={
-        <Box padding={4}>
-          <Text as="span" fontWeight={600}>
-            <FormattedMessage
-              id="component.preview-factiva-table.searching-for"
-              defaultMessage="Searching for"
-            />
-            {": "}
-          </Text>
-          <Text as="span">{name}</Text>
+        <Flex
+          direction={{ base: "column", sm: "row" }}
+          gridGap={3}
+          paddingX={4}
+          paddingY={2}
+          justifyContent={"space-between"}
+        >
+          <HStack spacing={0} gridGap={3} wrap="wrap">
+            <Text>
+              <Text as="span" fontWeight={600}>
+                <FormattedMessage
+                  id="component.preview-factiva-table.searching-for"
+                  defaultMessage="Searching for"
+                />
+                {": "}
+              </Text>
+              <Text as="span" whiteSpace="nowrap">
+                {name}
+              </Text>
+            </Text>
+            <Text>
+              <Text as="span" fontWeight={600}>
+                <FormattedMessage
+                  id="component.preview-factiva-table.date-of-birth"
+                  defaultMessage="Date of birth"
+                />
+                {": "}
+              </Text>
+              <Text as="span" whiteSpace="nowrap">
+                {date}
+              </Text>
+            </Text>
+          </HStack>
 
-          <Text as="span" marginLeft={4} fontWeight={600}>
-            <FormattedMessage
-              id="component.preview-factiva-table.date-of-birth"
-              defaultMessage="Date of birth"
-            />
-            {": "}
-          </Text>
-          <Text as="span">{date}</Text>
-        </Box>
+          <Box>
+            <Button variant="outline" onClick={onResetClick}>
+              Modificar búsqueda
+            </Button>
+          </Box>
+        </Flex>
       }
     />
   );

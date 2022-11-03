@@ -50,30 +50,32 @@ export function PetitionComposeFieldSettings({
 
   const commonSettings = (
     <>
-      <SettingsRow
-        isDisabled={isReadOnly || field.isInternal}
-        label={
-          <FormattedMessage
-            id="component.petition-settings.petition-comments-enable"
-            defaultMessage="Allow comments"
-          />
-        }
-        controlId="enable-comments"
-      >
-        <Switch
-          height="20px"
-          display="block"
-          id="enable-comments"
-          color="green"
-          isChecked={field.isInternal ? false : field.hasCommentsEnabled}
-          onChange={(event) =>
-            onFieldEdit(field.id, {
-              hasCommentsEnabled: event.target.checked,
-            })
-          }
+      {isOnlyInternal ? null : (
+        <SettingsRow
           isDisabled={isReadOnly || field.isInternal}
-        />
-      </SettingsRow>
+          label={
+            <FormattedMessage
+              id="component.petition-settings.petition-comments-enable"
+              defaultMessage="Allow comments"
+            />
+          }
+          controlId="enable-comments"
+        >
+          <Switch
+            height="20px"
+            display="block"
+            id="enable-comments"
+            color="green"
+            isChecked={field.isInternal ? false : field.hasCommentsEnabled}
+            onChange={(event) =>
+              onFieldEdit(field.id, {
+                hasCommentsEnabled: event.target.checked,
+              })
+            }
+            isDisabled={isReadOnly || field.isInternal}
+          />
+        </SettingsRow>
+      )}
       <SettingsRow
         isDisabled={isReadOnly || field.isFixed || isOnlyInternal}
         label={
@@ -118,7 +120,7 @@ export function PetitionComposeFieldSettings({
           />
         </RestrictedFeaturePopover>
       </SettingsRow>
-      {field.type === "DOW_JONES_KYC_RESEARCH" ? null : (
+      {isOnlyInternal ? null : (
         <SettingsRow
           isDisabled={isReadOnly}
           label={

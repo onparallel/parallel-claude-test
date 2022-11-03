@@ -489,7 +489,7 @@ export const PetitionFieldType = enumType({
     { name: "DATE", description: "A datepicker field." },
     { name: "PHONE", description: "A phone formatted field." },
     { name: "ES_TAX_DOCUMENTS", description: "A tax documents/info field." },
-    { name: "DOW_JONES_KYC_RESEARCH", description: "A spy documents/info field." },
+    { name: "DOW_JONES_KYC_RESEARCH", description: "A saerch in Dow Jones field." },
   ],
 });
 

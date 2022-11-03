@@ -19,7 +19,7 @@ import {
 } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldCheckbox } from "../recipient-view/fields/RecipientViewPetitionFieldCheckbox";
 import { RecipientViewPetitionFieldDate } from "../recipient-view/fields/RecipientViewPetitionFieldDate";
-import { RecipientViewPetitionFieldKYCResearch } from "../recipient-view/fields/RecipientViewPetitionFieldKYCResearch";
+import { PreviewPetitionFieldKYCResearch } from "./fields/PreviewPetitionFieldKYCResearch";
 import { RecipientViewPetitionFieldDynamicSelect } from "../recipient-view/fields/RecipientViewPetitionFieldDynamicSelect";
 import { RecipientViewPetitionFieldFileUpload } from "../recipient-view/fields/RecipientViewPetitionFieldFileUpload";
 import { RecipientViewPetitionFieldHeading } from "../recipient-view/fields/RecipientViewPetitionFieldHeading";
@@ -264,7 +264,7 @@ export function PreviewPetitionField({
       isCacheOnly={isCacheOnly}
     />
   ) : field.type === "DOW_JONES_KYC_RESEARCH" ? (
-    <RecipientViewPetitionFieldKYCResearch {...props} {...commonProps} isCacheOnly={isCacheOnly} />
+    <PreviewPetitionFieldKYCResearch {...props} {...commonProps} isCacheOnly={isCacheOnly} />
   ) : null;
 }
 
@@ -273,6 +273,7 @@ PreviewPetitionField.fragments = {
     fragment PreviewPetitionField_PetitionField on PetitionField {
       ...RecipientViewPetitionFieldCard_PetitionField
       ...PreviewPetitionFieldCommentsDialog_PetitionField
+      ...PreviewPetitionFieldKYCResearch_PetitionField
       previewReplies @client {
         ...RecipientViewPetitionFieldCard_PetitionFieldReply
       }
@@ -280,6 +281,7 @@ PreviewPetitionField.fragments = {
     ${RecipientViewPetitionFieldCard.fragments.PetitionField}
     ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
     ${PreviewPetitionFieldCommentsDialog.fragments.PetitionField}
+    ${PreviewPetitionFieldKYCResearch.fragments.PetitionField}
   `,
   PetitionFieldReply: gql`
     fragment PreviewPetitionField_PetitionFieldReply on PetitionFieldReply {

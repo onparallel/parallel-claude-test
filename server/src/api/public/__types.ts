@@ -223,10 +223,10 @@ export type DowJonesRiskEntityProfileResult = {
 
 export type DowJonesRiskEntityRelationship = {
   connectionType: Scalars["String"];
-  firstName: Scalars["String"];
+  firstName: Maybe<Scalars["String"]>;
   iconHints: Array<Scalars["String"]>;
-  lastName: Scalars["String"];
-  middleName: Scalars["String"];
+  lastName: Maybe<Scalars["String"]>;
+  middleName: Maybe<Scalars["String"]>;
   profileId: Scalars["Int"];
   type: DowJonesRiskEntityType;
 };
@@ -1745,6 +1745,7 @@ export type Organization = Timestamps & {
   customHost: Maybe<Scalars["String"]>;
   /** A list of all feature flag and the value asigned to this org */
   features: Array<FeatureFlagNameValue>;
+  hasIntegration: Scalars["Boolean"];
   /** Whether the organization has an SSO provider configured. */
   hasSsoProvider: Scalars["Boolean"];
   /** URL of the organization logo */
@@ -1777,6 +1778,11 @@ export type Organization = Timestamps & {
 /** An organization in the system. */
 export type OrganizationcurrentUsagePeriodArgs = {
   limitName: OrganizationUsageLimitName;
+};
+
+/** An organization in the system. */
+export type OrganizationhasIntegrationArgs = {
+  integration: IntegrationType;
 };
 
 /** An organization in the system. */
@@ -2469,7 +2475,7 @@ export type PetitionFieldType =
   | "CHECKBOX"
   /** A datepicker field. */
   | "DATE"
-  /** A spy documents/info field. */
+  /** A saerch in Dow Jones field. */
   | "DOW_JONES_KYC_RESEARCH"
   /** A dynamic select field. */
   | "DYNAMIC_SELECT"

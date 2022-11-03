@@ -1925,6 +1925,7 @@ type Organization implements Timestamps {
   A list of all feature flag and the value asigned to this org
   """
   features: [FeatureFlagNameValue!]!
+  hasIntegration(integration: IntegrationType!): Boolean!
 
   """
   Whether the organization has an SSO provider configured.
@@ -3134,7 +3135,7 @@ enum PetitionFieldType {
   DATE
 
   """
-  A spy documents/info field.
+  A saerch in Dow Jones field.
   """
   DOW_JONES_KYC_RESEARCH
 

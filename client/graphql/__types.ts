@@ -209,17 +209,66 @@ export interface CreatedAt {
   createdAt: Scalars["DateTime"];
 }
 
+export interface DowJonesRiskEntityDate {
+  __typename?: "DowJonesRiskEntityDate";
+  day?: Maybe<Scalars["Int"]>;
+  month?: Maybe<Scalars["Int"]>;
+  year?: Maybe<Scalars["Int"]>;
+}
+
+export interface DowJonesRiskEntityPlace {
+  __typename?: "DowJonesRiskEntityPlace";
+  countryCode: Scalars["String"];
+  descriptor: Scalars["String"];
+}
+
+export interface DowJonesRiskEntityProfileResult {
+  __typename?: "DowJonesRiskEntityProfileResult";
+  citizenship: DowJonesRiskEntityPlace;
+  dateOfBirth: DowJonesRiskEntityDate;
+  firstName: Scalars["String"];
+  iconHints: Array<Scalars["String"]>;
+  id: Scalars["ID"];
+  isDeceased: Scalars["Boolean"];
+  jurisdiction: DowJonesRiskEntityPlace;
+  lastName: Scalars["String"];
+  middleName: Scalars["String"];
+  placeOfBirth: DowJonesRiskEntityPlace;
+  relationships: Array<DowJonesRiskEntityRelationship>;
+  residence: DowJonesRiskEntityPlace;
+  sanctions: Array<DowJonesRiskEntitySanction>;
+  type: DowJonesRiskEntityType;
+}
+
+export interface DowJonesRiskEntityRelationship {
+  __typename?: "DowJonesRiskEntityRelationship";
+  connectionType: Scalars["String"];
+  firstName?: Maybe<Scalars["String"]>;
+  iconHints: Array<Scalars["String"]>;
+  lastName?: Maybe<Scalars["String"]>;
+  middleName?: Maybe<Scalars["String"]>;
+  profileId: Scalars["Int"];
+  type: DowJonesRiskEntityType;
+}
+
+export interface DowJonesRiskEntitySanction {
+  __typename?: "DowJonesRiskEntitySanction";
+  fromDate: DowJonesRiskEntityDate;
+  name: Scalars["String"];
+  sources: Array<Scalars["String"]>;
+}
+
 export interface DowJonesRiskEntitySearchResult {
   __typename?: "DowJonesRiskEntitySearchResult";
   countryTerritoryName: Scalars["String"];
-  dateOfBirth?: Maybe<Scalars["JSONObject"]>;
+  dateOfBirth?: Maybe<DowJonesRiskEntityDate>;
   gender: Scalars["String"];
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   isSubsidiary: Scalars["Boolean"];
   primaryName: Scalars["String"];
   title: Scalars["String"];
-  type: Scalars["String"];
+  type: DowJonesRiskEntityType;
 }
 
 export interface DowJonesRiskEntitySearchResultPagination {
@@ -229,6 +278,8 @@ export interface DowJonesRiskEntitySearchResultPagination {
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
 }
+
+export type DowJonesRiskEntityType = "Entity" | "Person";
 
 /** The effective permission for a petition and user */
 export interface EffectivePetitionUserPermission {
@@ -1739,6 +1790,7 @@ export interface Organization extends Timestamps {
   customHost?: Maybe<Scalars["String"]>;
   /** A list of all feature flag and the value asigned to this org */
   features: Array<FeatureFlagNameValue>;
+  hasIntegration: Scalars["Boolean"];
   /** Whether the organization has an SSO provider configured. */
   hasSsoProvider: Scalars["Boolean"];
   /** URL of the organization logo */
@@ -1771,6 +1823,11 @@ export interface Organization extends Timestamps {
 /** An organization in the system. */
 export interface OrganizationcurrentUsagePeriodArgs {
   limitName: OrganizationUsageLimitName;
+}
+
+/** An organization in the system. */
+export interface OrganizationhasIntegrationArgs {
+  integration: IntegrationType;
 }
 
 /** An organization in the system. */
@@ -2498,7 +2555,7 @@ export type PetitionFieldType =
   | "CHECKBOX"
   /** A datepicker field. */
   | "DATE"
-  /** A spy documents/info field. */
+  /** A saerch in Dow Jones field. */
   | "DOW_JONES_KYC_RESEARCH"
   /** A dynamic select field. */
   | "DYNAMIC_SELECT"
@@ -3177,6 +3234,7 @@ export interface Query {
   contacts: ContactPagination;
   /** Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts */
   contactsByEmail: Array<Maybe<Contact>>;
+  dowJonesRiskEntityProfile: DowJonesRiskEntityProfileResult;
   dowJonesRiskEntitySearch: DowJonesRiskEntitySearchResultPagination;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
@@ -3246,6 +3304,10 @@ export interface QuerycontactsArgs {
 
 export interface QuerycontactsByEmailArgs {
   emails: Array<Scalars["String"]>;
+}
+
+export interface QuerydowJonesRiskEntityProfileArgs {
+  profileId: Scalars["String"];
 }
 
 export interface QuerydowJonesRiskEntitySearchArgs {
@@ -9234,7 +9296,11 @@ export type useSendPetitionHandler_addPetitionPermissionMutation = {
   >;
 };
 
-export type AddFieldPopover_UserFragment = { __typename?: "User"; hasEsTaxDocumentsField: boolean };
+export type AddFieldPopover_UserFragment = {
+  __typename?: "User";
+  hasEsTaxDocumentsField: boolean;
+  organization: { __typename?: "Organization"; hasDowJones: boolean };
+};
 
 export type PetitionComposeField_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -9374,6 +9440,7 @@ export type PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment = {
 export type PetitionComposeFieldList_UserFragment = {
   __typename?: "User";
   hasEsTaxDocumentsField: boolean;
+  organization: { __typename?: "Organization"; hasDowJones: boolean };
 };
 
 export type PetitionFieldOptionsListEditor_PetitionFieldFragment = {
@@ -9387,11 +9454,13 @@ export type PetitionFieldOptionsListEditor_PetitionFieldFragment = {
 export type PetitionFieldTypeSelect_UserFragment = {
   __typename?: "User";
   hasEsTaxDocumentsField: boolean;
+  organization: { __typename?: "Organization"; hasDowJones: boolean };
 };
 
 export type PetitionFieldTypeSelectDropdown_UserFragment = {
   __typename?: "User";
   hasEsTaxDocumentsField: boolean;
+  organization: { __typename?: "Organization"; hasDowJones: boolean };
 };
 
 export type PetitionFieldVisibilityEditor_PetitionFieldFragment = {
@@ -9850,6 +9919,7 @@ export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
 export type PetitionComposeFieldSettings_UserFragment = {
   __typename?: "User";
   hasEsTaxDocumentsField: boolean;
+  organization: { __typename?: "Organization"; hasDowJones: boolean };
 };
 
 export type PetitionComposeFieldSettings_PetitionFieldFragment = {
@@ -10255,6 +10325,17 @@ export type PreviewPetitionField_PetitionFieldFragment = {
         }
     >;
   }>;
+  petition:
+    | {
+        __typename?: "Petition";
+        id: string;
+        organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+      };
 };
 
 export type PreviewPetitionField_PetitionFieldReplyFragment = {
@@ -10363,6 +10444,17 @@ export type PreviewPetitionField_PetitionFieldQuery = {
           }
       >;
     }>;
+    petition:
+      | {
+          __typename?: "Petition";
+          id: string;
+          organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+        }
+      | {
+          __typename?: "PetitionTemplate";
+          id: string;
+          organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+        };
   };
 };
 
@@ -10667,6 +10759,22 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery = {
       >;
     }>;
   };
+};
+
+export type PreviewPetitionFieldKYCResearch_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  petition:
+    | {
+        __typename?: "Petition";
+        id: string;
+        organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+      };
 };
 
 export type CopyOrDownloadReplyButton_PetitionFieldReplyFragment = {
@@ -14029,6 +14137,16 @@ export type OrganizationSettings_userQuery = {
   };
 };
 
+export type DowJonesIntegrationDialog_validateDowJonesFactivaCredentialsMutationVariables = Exact<{
+  clientId: Scalars["String"];
+  username: Scalars["String"];
+  password: Scalars["String"];
+}>;
+
+export type DowJonesIntegrationDialog_validateDowJonesFactivaCredentialsMutation = {
+  validateDowJonesFactivaCredentials: boolean;
+};
+
 export type OrganizationIntegrations_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationIntegrations_userQuery = {
@@ -14051,6 +14169,7 @@ export type OrganizationIntegrations_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
+      hasDowJones: boolean;
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
@@ -14069,6 +14188,16 @@ export type OrganizationIntegrations_userQuery = {
     initials?: string | null;
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
+};
+
+export type OrganizationIntegrations_createDowJonesFactivaIntegrationMutationVariables = Exact<{
+  clientId: Scalars["String"];
+  username: Scalars["String"];
+  password: Scalars["String"];
+}>;
+
+export type OrganizationIntegrations_createDowJonesFactivaIntegrationMutation = {
+  createDowJonesFactivaIntegration: { __typename?: "OrgIntegration"; id: string };
 };
 
 export type IntegrationsSignature_SignatureOrgIntegrationFragment = {
@@ -17345,6 +17474,7 @@ export type PetitionCompose_QueryFragment = {
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
+      hasDowJones: boolean;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -17951,6 +18081,7 @@ export type PetitionCompose_userQuery = {
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
+      hasDowJones: boolean;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -18493,6 +18624,84 @@ export type PetitionMessages_updatePetitionMutation = {
       };
 };
 
+export type ExternalFieldPreview_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  isAnonymized: boolean;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+  }>;
+};
+
+export type ExternalFieldPreview_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  isAnonymized: boolean;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+  }>;
+};
+
+export type ExternalFieldPreview_PetitionBaseFragment =
+  | ExternalFieldPreview_PetitionBase_Petition_Fragment
+  | ExternalFieldPreview_PetitionBase_PetitionTemplate_Fragment;
+
+export type ExternalFieldPreview_QueryFragment = {
+  me: {
+    __typename?: "User";
+    id: string;
+    organization: { __typename?: "Organization"; hasDowJones: boolean };
+  };
+};
+
+export type ExternalFieldPreview_petitionQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type ExternalFieldPreview_petitionQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        isAnonymized: boolean;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          title?: string | null;
+        }>;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        isAnonymized: boolean;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          title?: string | null;
+        }>;
+      }
+    | null;
+};
+
+export type ExternalFieldPreview_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type ExternalFieldPreview_userQuery = {
+  metadata: { __typename?: "ConnectionMetadata"; browserName?: string | null };
+  me: {
+    __typename?: "User";
+    id: string;
+    organization: { __typename?: "Organization"; hasDowJones: boolean };
+  };
+};
+
 export type PetitionPreview_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
@@ -18650,6 +18859,17 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
           }
       >;
     }>;
+    petition:
+      | {
+          __typename?: "Petition";
+          id: string;
+          organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+        }
+      | {
+          __typename?: "PetitionTemplate";
+          id: string;
+          organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+        };
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
@@ -18806,6 +19026,17 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
           }
       >;
     }>;
+    petition:
+      | {
+          __typename?: "Petition";
+          id: string;
+          organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+        }
+      | {
+          __typename?: "PetitionTemplate";
+          id: string;
+          organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+        };
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
@@ -19038,6 +19269,17 @@ export type PetitionPreview_updatePetitionMutation = {
                 }
             >;
           }>;
+          petition:
+            | {
+                __typename?: "Petition";
+                id: string;
+                organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+              }
+            | {
+                __typename?: "PetitionTemplate";
+                id: string;
+                organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+              };
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
@@ -19193,6 +19435,17 @@ export type PetitionPreview_updatePetitionMutation = {
                 }
             >;
           }>;
+          petition:
+            | {
+                __typename?: "Petition";
+                id: string;
+                organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+              }
+            | {
+                __typename?: "PetitionTemplate";
+                id: string;
+                organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+              };
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
@@ -19377,6 +19630,17 @@ export type PetitionPreview_completePetitionMutation = {
             }
         >;
       }>;
+      petition:
+        | {
+            __typename?: "Petition";
+            id: string;
+            organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+          }
+        | {
+            __typename?: "PetitionTemplate";
+            id: string;
+            organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+          };
     }>;
     signatureConfig?: {
       __typename?: "SignatureConfig";
@@ -19577,6 +19841,17 @@ export type PetitionPreview_petitionQuery = {
                 }
             >;
           }>;
+          petition:
+            | {
+                __typename?: "Petition";
+                id: string;
+                organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+              }
+            | {
+                __typename?: "PetitionTemplate";
+                id: string;
+                organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+              };
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
@@ -19732,6 +20007,17 @@ export type PetitionPreview_petitionQuery = {
                 }
             >;
           }>;
+          petition:
+            | {
+                __typename?: "Petition";
+                id: string;
+                organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+              }
+            | {
+                __typename?: "PetitionTemplate";
+                id: string;
+                organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
+              };
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
@@ -25006,6 +25292,9 @@ export const TemplateDetailsModal_PetitionTemplateFragmentDoc = gql`
 export const PetitionFieldTypeSelectDropdown_UserFragmentDoc = gql`
   fragment PetitionFieldTypeSelectDropdown_User on User {
     hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
+    organization {
+      hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
+    }
   }
 ` as unknown as DocumentNode<PetitionFieldTypeSelectDropdown_UserFragment, unknown>;
 export const AddFieldPopover_UserFragmentDoc = gql`
@@ -27372,6 +27661,27 @@ export const PetitionMessages_QueryFragmentDoc = gql`
   }
   ${PetitionLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<PetitionMessages_QueryFragment, unknown>;
+export const ExternalFieldPreview_PetitionBaseFragmentDoc = gql`
+  fragment ExternalFieldPreview_PetitionBase on PetitionBase {
+    id
+    isAnonymized
+    fields {
+      id
+      type
+      title
+    }
+  }
+` as unknown as DocumentNode<ExternalFieldPreview_PetitionBaseFragment, unknown>;
+export const ExternalFieldPreview_QueryFragmentDoc = gql`
+  fragment ExternalFieldPreview_Query on Query {
+    me {
+      id
+      organization {
+        hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
+      }
+    }
+  }
+` as unknown as DocumentNode<ExternalFieldPreview_QueryFragment, unknown>;
 export const completedFieldReplies_PetitionFieldFragmentDoc = gql`
   fragment completedFieldReplies_PetitionField on PetitionField {
     type
@@ -27518,16 +27828,30 @@ export const PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc = gql`
   }
   ${PetitionFieldComment_PetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<PreviewPetitionFieldCommentsDialog_PetitionFieldFragment, unknown>;
+export const PreviewPetitionFieldKYCResearch_PetitionFieldFragmentDoc = gql`
+  fragment PreviewPetitionFieldKYCResearch_PetitionField on PetitionField {
+    id
+    petition {
+      id
+      organization {
+        id
+        hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
+      }
+    }
+  }
+` as unknown as DocumentNode<PreviewPetitionFieldKYCResearch_PetitionFieldFragment, unknown>;
 export const PreviewPetitionField_PetitionFieldFragmentDoc = gql`
   fragment PreviewPetitionField_PetitionField on PetitionField {
     ...RecipientViewPetitionFieldCard_PetitionField
     ...PreviewPetitionFieldCommentsDialog_PetitionField
+    ...PreviewPetitionFieldKYCResearch_PetitionField
     previewReplies @client {
       ...RecipientViewPetitionFieldCard_PetitionFieldReply
     }
   }
   ${RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc}
   ${PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc}
+  ${PreviewPetitionFieldKYCResearch_PetitionFieldFragmentDoc}
   ${RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<PreviewPetitionField_PetitionFieldFragment, unknown>;
 export const groupFieldsByPages_PetitionFieldFragmentDoc = gql`
@@ -30993,6 +31317,22 @@ export const OrganizationSettings_userDocument = gql`
   OrganizationSettings_userQuery,
   OrganizationSettings_userQueryVariables
 >;
+export const DowJonesIntegrationDialog_validateDowJonesFactivaCredentialsDocument = gql`
+  mutation DowJonesIntegrationDialog_validateDowJonesFactivaCredentials(
+    $clientId: String!
+    $username: String!
+    $password: String!
+  ) {
+    validateDowJonesFactivaCredentials(
+      clientId: $clientId
+      username: $username
+      password: $password
+    )
+  }
+` as unknown as DocumentNode<
+  DowJonesIntegrationDialog_validateDowJonesFactivaCredentialsMutation,
+  DowJonesIntegrationDialog_validateDowJonesFactivaCredentialsMutationVariables
+>;
 export const OrganizationIntegrations_userDocument = gql`
   query OrganizationIntegrations_user {
     ...SettingsLayout_Query
@@ -31001,12 +31341,34 @@ export const OrganizationIntegrations_userDocument = gql`
       role
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
       hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
+      organization {
+        id
+        hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
+      }
     }
   }
   ${SettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<
   OrganizationIntegrations_userQuery,
   OrganizationIntegrations_userQueryVariables
+>;
+export const OrganizationIntegrations_createDowJonesFactivaIntegrationDocument = gql`
+  mutation OrganizationIntegrations_createDowJonesFactivaIntegration(
+    $clientId: String!
+    $username: String!
+    $password: String!
+  ) {
+    createDowJonesFactivaIntegration(
+      clientId: $clientId
+      username: $username
+      password: $password
+    ) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  OrganizationIntegrations_createDowJonesFactivaIntegrationMutation,
+  OrganizationIntegrations_createDowJonesFactivaIntegrationMutationVariables
 >;
 export const IntegrationsSignature_validateSignatureCredentialsDocument = gql`
   mutation IntegrationsSignature_validateSignatureCredentials(
@@ -31514,6 +31876,30 @@ export const PetitionMessages_updatePetitionDocument = gql`
 ` as unknown as DocumentNode<
   PetitionMessages_updatePetitionMutation,
   PetitionMessages_updatePetitionMutationVariables
+>;
+export const ExternalFieldPreview_petitionDocument = gql`
+  query ExternalFieldPreview_petition($id: GID!) {
+    petition(id: $id) {
+      id
+      ...ExternalFieldPreview_PetitionBase
+    }
+  }
+  ${ExternalFieldPreview_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  ExternalFieldPreview_petitionQuery,
+  ExternalFieldPreview_petitionQueryVariables
+>;
+export const ExternalFieldPreview_userDocument = gql`
+  query ExternalFieldPreview_user {
+    ...ExternalFieldPreview_Query
+    metadata {
+      browserName
+    }
+  }
+  ${ExternalFieldPreview_QueryFragmentDoc}
+` as unknown as DocumentNode<
+  ExternalFieldPreview_userQuery,
+  ExternalFieldPreview_userQueryVariables
 >;
 export const PetitionPreview_updatePetitionDocument = gql`
   mutation PetitionPreview_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {

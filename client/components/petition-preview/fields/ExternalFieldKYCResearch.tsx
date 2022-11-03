@@ -1,12 +1,7 @@
-import { ArrowBackIcon, ExclamationOutlineIcon } from "@parallel/chakra/icons";
-import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { PreviewFactivaTable } from "@parallel/components/petition-preview/PreviewFactivaTable";
-import { Tone } from "@parallel/graphql/__types";
+import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
 import { useMetadata } from "@parallel/utils/withMetadata";
-import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 
 import {
   Button,
@@ -23,113 +18,30 @@ import {
 } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
-import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import Head from "next/head";
 
-function RecipientViewPetitionFieldKYCResearchDialog({
-  tone,
-  ...props
-}: DialogProps<{ tone: Tone }>) {
-  const intl = useIntl();
-  const focusRef = useRef<HTMLButtonElement>(null);
-  const [step, setStep] = useState<"FORM" | "TABLE" | "DETAILS">("FORM");
-  const [formState, setFormState] = useState<"IDLE" | "LOADING" | "ERROR">("IDLE");
+type ExternalFieldKYCResearch = {
+  htmlTitle: string;
+  petitionId: string;
+  fieldId: string;
+};
 
-  const handleGoBack = () => {
-    setStep("TABLE");
-  };
-
-  const handleResetSearch = () => {
-    setStep("FORM");
-  };
-
-  const handleRowClick = async (id: string) => {
-    setStep("DETAILS");
-  };
-
-  const handleSave = () => {};
-
-  const handleDownloadPDF = () => {};
-
-  function randomRange(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  const handleFormSubmit = async ({ name, date }: formData) => {
-    try {
-      if (randomRange(1, 10) < 4) {
-        setFormState("ERROR");
-      } else {
-        setFormState("LOADING");
-        setTimeout(() => {
-          setFormState("IDLE");
-          setStep("TABLE");
-        }, 800);
-      }
-    } catch (err) {}
-  };
+export function ExternalFieldKYCResearch({
+  htmlTitle,
+  petitionId,
+  fieldId,
+}: ExternalFieldKYCResearch) {
+  const handleFormSubmit = async () => {};
 
   return (
-    <ConfirmDialog
-      {...props}
-      closeOnOverlayClick={false}
-      initialFocusRef={focusRef}
-      hasCloseButton={true}
-      size="full"
-      header={
-        step === "TABLE" ? (
-          <Heading size="md">
-            <FormattedMessage
-              id="component.recipient-view-petition-field-kyc-research.results-found"
-              defaultMessage="Results found: {amount}"
-              values={{ amount: 3 }}
-            />
-          </Heading>
-        ) : step === "DETAILS" ? (
-          <HStack padding={4} borderBottom="1px solid" borderColor="gray.200">
-            <IconButtonWithTooltip
-              icon={<ArrowBackIcon />}
-              variant="ghost"
-              label={intl.formatMessage({
-                id: "generic.go-back",
-                defaultMessage: "Go back",
-              })}
-              onClick={handleGoBack}
-            />
-            <Heading size="md">
-              <FormattedMessage
-                id="component.recipient-view-petition-field-kyc-research.profile-details"
-                defaultMessage="Profile details"
-              />
-            </Heading>
-          </HStack>
-        ) : null
-      }
-      body={
-        step === "FORM" ? (
-          <Form
-            onSubmit={handleFormSubmit}
-            isLoading={formState === "LOADING"}
-            hasError={formState === "ERROR"}
-          />
-        ) : step === "TABLE" ? (
-          <PreviewFactivaTable
-            name={"Some name"}
-            date={"11-11-2011"}
-            onRowClick={handleRowClick}
-            onResetClick={handleResetSearch}
-          />
-        ) : (
-          <Details onClickSave={handleSave} onClickDownload={handleDownloadPDF} />
-        )
-      }
-      confirm={<></>}
-      cancel={<></>}
-    />
+    <>
+      <Head>
+        <title>{htmlTitle}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </Head>
+      <Form onSubmit={handleFormSubmit} isDisabled={false} hasError={false} isLoading={false} />
+    </>
   );
-}
-
-export function useRecipientViewPetitionFieldKYCResearchDialog() {
-  return useDialog(RecipientViewPetitionFieldKYCResearchDialog);
 }
 
 type FormProps = {
@@ -162,7 +74,7 @@ function Form({ onSubmit, isDisabled, hasError, isLoading }: FormProps) {
   const date = watch("date");
 
   return (
-    <Center height="calc(100vh - 80px)">
+    <Center height="100vh" padding={4}>
       <Card paddingX={8} paddingY={10} width="100%" maxWidth={"500px"}>
         <Stack spacing={6} as="form" onSubmit={handleSubmit(onSubmit)}>
           <Heading size="lg">
@@ -241,17 +153,17 @@ function Form({ onSubmit, isDisabled, hasError, isLoading }: FormProps) {
   );
 }
 
-type DetailsProps = {
-  onClickSave: () => void;
-  onClickDownload: () => void;
-};
+// type DetailsProps = {
+//   onClickSave: () => void;
+//   onClickDownload: () => void;
+// };
 
-function Details({ onClickSave, onClickDownload }: DetailsProps) {
-  return (
-    <Card>
-      <Stack padding={4}>
-        <Text>SOME SHIT</Text>
-      </Stack>
-    </Card>
-  );
-}
+// function Details({ onClickSave, onClickDownload }: DetailsProps) {
+//   return (
+//     <Card>
+//       <Stack padding={4}>
+//         <Text>SOME SHIT</Text>
+//       </Stack>
+//     </Card>
+//   );
+// }

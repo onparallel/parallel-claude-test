@@ -5,7 +5,7 @@ import { NakedLink } from "@parallel/components/common/Link";
 import { ReactNode } from "react";
 import { Card } from "../common/Card";
 
-interface IntegrationCardProps {
+export interface IntegrationLinkCardProps {
   logo: ReactNode | null;
   title: string;
   body: string;
@@ -15,8 +15,8 @@ interface IntegrationCardProps {
   isExternal?: boolean;
 }
 
-export const IntegrationCard = chakraForwardRef<"div", IntegrationCardProps>(
-  function IntegrationCard(
+export const IntegrationLinkCard = chakraForwardRef<"div", IntegrationLinkCardProps>(
+  function IntegrationLinkCard(
     { logo, title, body, badge, isDisabled, href, isExternal, ...props },
     ref
   ) {

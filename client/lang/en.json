@@ -1105,6 +1105,26 @@
     "context": "a moment ago"
   },
   {
+    "term": "component.deactivate-dow-jones-integration-dialog.deactivate",
+    "definition": "Deactivate",
+    "context": "Deactivate"
+  },
+  {
+    "term": "component.deactivate-dow-jones-integration-dialog.description-1",
+    "definition": "If you continue, the integration with Dow Jones will be disabled and Parallel will not be able to access your Dow Jones account to perform searches.",
+    "context": "If you continue, the integration with Dow Jones will be disabled and Parallel will not be able to access your Dow Jones account to perform searches."
+  },
+  {
+    "term": "component.deactivate-dow-jones-integration-dialog.description-2",
+    "definition": "Are you sure you want to deactivate the integration?",
+    "context": "Are you sure you want to deactivate the integration?"
+  },
+  {
+    "term": "component.deactivate-dow-jones-integration-dialog.title",
+    "definition": "Deactivate integration",
+    "context": "Deactivate integration"
+  },
+  {
     "term": "component.delete-access-token-dialog.body",
     "definition": "Are you sure you want to delete the {count, plural, =1 {selected access token} other {# selected access tokens}}?",
     "context": "Are you sure you want to delete the {count, plural, =1 {selected access token} other {# selected access tokens}}?"
@@ -1283,6 +1303,31 @@
     "term": "component.document-theme-select.no-options-text",
     "definition": "No more themes created",
     "context": "No more themes created"
+  },
+  {
+    "term": "component.dow-jones-integration-dialog.client-id",
+    "definition": "Client ID",
+    "context": "Client ID"
+  },
+  {
+    "term": "component.dow-jones-integration-dialog.connect",
+    "definition": "Connect",
+    "context": "Connect"
+  },
+  {
+    "term": "component.dow-jones-integration-dialog.description",
+    "definition": "Complete the information to connect your Parallel account with Dow Jones.",
+    "context": "Complete the information to connect your Parallel account with Dow Jones."
+  },
+  {
+    "term": "component.dow-jones-integration-dialog.password",
+    "definition": "Password",
+    "context": "Password"
+  },
+  {
+    "term": "component.dow-jones-integration-dialog.username",
+    "definition": "Username",
+    "context": "Username"
   },
   {
     "term": "component.download-dialog.placeholder-field-number",
@@ -2566,8 +2611,8 @@
   },
   {
     "term": "component.petition-field-type-select-dropdown.dow-jones-kyc-research-description",
-    "definition": "Allows you to spy on your next-door neighbor quickly and easily.",
-    "context": "Allows you to spy on your next-door neighbor quickly and easily."
+    "definition": "Easily search in Dow Jones to run a background check of an individual or legal entity.",
+    "context": "Easily search in Dow Jones to run a background check of an individual or legal entity."
   },
   {
     "term": "component.petition-field-type-select-dropdown.dynamic-select-description",
@@ -3500,6 +3545,16 @@
     "context": "<b>Preview only</b> - comments are disabled."
   },
   {
+    "term": "component.preview-dow-jones-permission-denied-dialog.description-1",
+    "definition": "Authorization is required to search in Dow Jones. Please connect an account to be able to use this field from {integrations}.",
+    "context": "Authorization is required to search in Dow Jones. Please connect an account to be able to use this field from {integrations}."
+  },
+  {
+    "term": "component.preview-dow-jones-permission-denied-dialog.title",
+    "definition": "Permissions needed",
+    "context": "Permissions needed"
+  },
+  {
     "term": "component.preview-factiva-table.country-territory",
     "definition": "Country/Territory",
     "context": "Country/Territory"
@@ -4085,19 +4140,29 @@
     "context": "{count}/{total} submitted"
   },
   {
-    "term": "component.recipient-view-petition-field-kyc-research-dialog.results",
-    "definition": "Results",
-    "context": "Results"
-  },
-  {
     "term": "component.recipient-view-petition-field-kyc-research.date-of-birth",
-    "definition": "Date of birth:",
-    "context": "Date of birth:"
+    "definition": "Date of birth",
+    "context": "Date of birth"
   },
   {
-    "term": "component.recipient-view-petition-field-kyc-research.full-name",
-    "definition": "Full name:",
-    "context": "Full name:"
+    "term": "component.recipient-view-petition-field-kyc-research.fill-in-data",
+    "definition": "Fill in the data to start the search",
+    "context": "Fill in the data to start the search"
+  },
+  {
+    "term": "component.recipient-view-petition-field-kyc-research.name-person-entity",
+    "definition": "Name of the person/entity *",
+    "context": "Name of the person/entity *"
+  },
+  {
+    "term": "component.recipient-view-petition-field-kyc-research.profile-details",
+    "definition": "Profile details",
+    "context": "Profile details"
+  },
+  {
+    "term": "component.recipient-view-petition-field-kyc-research.results-found",
+    "definition": "Results found: {amount}",
+    "context": "Results found: {amount}"
   },
   {
     "term": "component.recipient-view-petition-field-kyc-research.search",
@@ -4105,9 +4170,9 @@
     "context": "Search"
   },
   {
-    "term": "component.recipient-view-petition-field-kyc-research.searching-data",
-    "definition": "Please wait while we perform the search...",
-    "context": "Please wait while we perform the search..."
+    "term": "component.recipient-view-petition-field-kyc-research.search-in-down-jones",
+    "definition": "Search in Dow Jones",
+    "context": "Search in Dow Jones"
   },
   {
     "term": "component.recipient-view-petition-field-number.only-numbers",
@@ -6045,6 +6110,11 @@
     "context": "This domain has SSO enabled. Please, contact your administrator to register."
   },
   {
+    "term": "generic.forms.field-required-error",
+    "definition": "This field is required",
+    "context": "This field is required"
+  },
+  {
     "term": "generic.forms.first-name-label",
     "definition": "First name",
     "context": "First name"
@@ -6750,6 +6820,11 @@
     "context": "What are you looking for?"
   },
   {
+    "term": "omponent.dow-jones-integration-dialog.invalid-credentials-message",
+    "definition": "The credentials validation has failed, please check that everything is correct.",
+    "context": "The credentials validation has failed, please check that everything is correct."
+  },
+  {
     "term": "organization-groups.add-user",
     "definition": "Add user",
     "context": "Add user"
@@ -7028,6 +7103,21 @@
     "term": "organization.integrations.alert-title",
     "definition": "Can't find the integration you need?",
     "context": "Can't find the integration you need?"
+  },
+  {
+    "term": "organization.integrations.dow-jones-description",
+    "definition": "Run a background check of individuals and legal entities using its database.",
+    "context": "Run a background check of individuals and legal entities using its database."
+  },
+  {
+    "term": "organization.integrations.dow-jones-error",
+    "definition": "The integration is not working properly. Please reconnect to your account.",
+    "context": "The integration is not working properly. Please reconnect to your account."
+  },
+  {
+    "term": "organization.integrations.dow-jones-title",
+    "definition": "Dow Jones RiskCenter",
+    "context": "Dow Jones RiskCenter"
   },
   {
     "term": "organization.integrations.parallel-api-description",
@@ -8041,8 +8131,8 @@
   },
   {
     "term": "petition.field-type.dow-jones-kyc-research",
-    "definition": "Dow Jones",
-    "context": "Dow Jones"
+    "definition": "Search in Dow Jones",
+    "context": "Search in Dow Jones"
   },
   {
     "term": "petition.field-type.file-upload",
