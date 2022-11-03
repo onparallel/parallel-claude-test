@@ -150,6 +150,18 @@ const email: Email<MessageBouncedEmailProps> = {
 
         <MjmlSection>
           <MjmlColumn>
+            <MjmlText>
+              <FormattedMessage
+                id="petition-message-bounced.intro-text-2"
+                defaultMessage="Please, verify that the email {contactEmail} is correct and try again."
+                values={{ contactEmail }}
+              />
+            </MjmlText>
+          </MjmlColumn>
+        </MjmlSection>
+
+        <MjmlSection>
+          <MjmlColumn>
             <Button href={`${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/activity`}>
               <FormattedMessage
                 id="petition-sharing-notification.access-button"
