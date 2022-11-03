@@ -62,7 +62,7 @@ export const createPetitionFieldReply = mutationField("createPetitionFieldReply"
         ctx.user!
       );
     } catch (error: any) {
-      if (error.constraint === "PETITION_SEND_LIMIT_REACHED") {
+      if (error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(
           "Can't submit a reply due to lack of credits",
           "PETITION_SEND_LIMIT_REACHED"
@@ -170,7 +170,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
       ]);
       return { presignedPostData, reply };
     } catch (error: any) {
-      if (error.constraint === "PETITION_SEND_LIMIT_REACHED") {
+      if (error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(
           "Can't submit a reply due to lack of credits",
           "PETITION_SEND_LIMIT_REACHED"
