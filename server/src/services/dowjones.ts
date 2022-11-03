@@ -278,6 +278,8 @@ export class DowJonesKycService implements IDowJonesKycService {
       // access_token expired, refresh it and try again
       const updatedIntegration = await this.refreshAccessToken(integration);
       return await this.makeApiCall<TResult>(url, opts, updatedIntegration, false);
+    } else if (response.status === 404) {
+      throw new Error("PROFILE_NOT_FOUND");
     } else {
       // TODO manage case when refresh_token expires (it expires after a number of uses on the same IP)
       // we need to mark the integration as "reauthorization required"
