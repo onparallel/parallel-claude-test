@@ -769,6 +769,15 @@ type Mutation {
   ): OrgIntegration!
 
   """
+  Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document
+  """
+  createDowJonesKycResearchReply(
+    fieldId: GID!
+    petitionId: GID!
+    profileId: ID!
+  ): PetitionFieldReply!
+
+  """
   Creates an event subscription for the user's petitions
   """
   createEventSubscription(

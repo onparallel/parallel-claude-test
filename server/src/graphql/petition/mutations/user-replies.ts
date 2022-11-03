@@ -1,5 +1,5 @@
 import { ApolloError } from "apollo-server-core";
-import { mutationField, nonNull, objectType } from "nexus";
+import { idArg, mutationField, nonNull, objectType } from "nexus";
 import { isDefined } from "remeda";
 import { getBaseWebhookUrl } from "../../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../../util/globalId";
@@ -18,6 +18,8 @@ import {
   replyCanBeUpdated,
   replyIsForFieldOfType,
   userHasAccessToPetitions,
+  userHasEnabledIntegration,
+  userHasFeatureFlag,
 } from "../authorizers";
 import { validateFieldReply, validateReplyUpdate } from "../validations";
 
@@ -389,6 +391,86 @@ export const bulkCreatePetitionReplies = mutationField("bulkCreatePetitionReplie
     try {
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
       return await ctx.petitions.prefillPetition(args.petitionId, args.replies, ctx.user!);
+    } catch (error: any) {
+      if (error.message === "PETITION_SEND_LIMIT_REACHED") {
+        throw new ApolloError(
+          "Can't submit a reply due to lack of credits",
+          "PETITION_SEND_LIMIT_REACHED"
+        );
+      }
+      throw error;
+    }
+  },
+});
+
+export const createDowJonesKycResearchReply = mutationField("createDowJonesKycResearchReply", {
+  description: "Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document",
+  type: "PetitionFieldReply",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    profileId: nonNull(idArg()),
+  },
+  authorize: authenticateAnd(
+    userHasEnabledIntegration("DOW_JONES_KYC"),
+    userHasFeatureFlag("DOW_JONES_KYC"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    fieldsBelongsToPetition("petitionId", "fieldId"),
+    fieldHasType("fieldId", ["DOW_JONES_KYC_RESEARCH"]),
+    fieldCanBeReplied("fieldId"),
+    petitionIsNotAnonymized("petitionId")
+  ),
+  resolve: async (_, args, ctx) => {
+    try {
+      await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
+
+      const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
+        ctx.user!.org_id,
+        "DOW_JONES_KYC"
+      );
+      const [dowJonesFile, dowJonesProfile] = await Promise.all([
+        ctx.dowJonesKyc.riskEntityProfilePdf(args.profileId, integration),
+        ctx.dowJonesKyc.riskEntityProfile(args.profileId, integration),
+      ]);
+
+      const path = random(16);
+      const response = await ctx.storage.fileUploads.uploadFile(
+        path,
+        dowJonesFile.mime_type,
+        Buffer.from(dowJonesFile.binary_stream, "base64")
+      );
+
+      const fileUpload = await ctx.files.createFileUpload(
+        {
+          path,
+          filename: `${args.profileId}.pdf`,
+          size: response["ContentLength"]!.toString(),
+          content_type: dowJonesFile.mime_type,
+          upload_complete: true,
+        },
+        `User:${ctx.user!.id}`
+      );
+
+      return await ctx.petitions.createPetitionFieldReply(
+        {
+          petition_field_id: args.fieldId,
+          user_id: ctx.user!.id,
+          type: "DOW_JONES_KYC_RESEARCH",
+          content: { file_upload_id: fileUpload.id },
+          metadata: {
+            type: dowJonesProfile.data.attributes.basic.type,
+            name: ctx.dowJonesKyc.entityFullName(
+              dowJonesProfile.data.attributes.basic.name_details.primary_name
+            ),
+            iconHints:
+              dowJonesProfile.data.attributes.person?.icon_hints ??
+              dowJonesProfile.data.attributes.entity?.icon_hints ??
+              [],
+          },
+          status: "PENDING",
+        },
+        ctx.user!
+      );
     } catch (error: any) {
       if (error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(
