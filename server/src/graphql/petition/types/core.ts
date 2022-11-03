@@ -862,6 +862,7 @@ export const PetitionFieldReply = objectType({
                 contentType: file.content_type,
                 extension: extension(file.content_type) || null,
                 uploadComplete: file.upload_complete,
+                ...(root.type === "DOW_JONES_KYC_RESEARCH" ? { entity: root.content.entity } : {}),
               }
             : {};
         } else {

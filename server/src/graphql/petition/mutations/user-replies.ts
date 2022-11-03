@@ -456,16 +456,18 @@ export const createDowJonesKycResearchReply = mutationField("createDowJonesKycRe
           petition_field_id: args.fieldId,
           user_id: ctx.user!.id,
           type: "DOW_JONES_KYC_RESEARCH",
-          content: { file_upload_id: fileUpload.id },
-          metadata: {
-            type: dowJonesProfile.data.attributes.basic.type,
-            name: ctx.dowJonesKyc.entityFullName(
-              dowJonesProfile.data.attributes.basic.name_details.primary_name
-            ),
-            iconHints:
-              dowJonesProfile.data.attributes.person?.icon_hints ??
-              dowJonesProfile.data.attributes.entity?.icon_hints ??
-              [],
+          content: {
+            file_upload_id: fileUpload.id,
+            entity: {
+              type: dowJonesProfile.data.attributes.basic.type,
+              name: ctx.dowJonesKyc.entityFullName(
+                dowJonesProfile.data.attributes.basic.name_details.primary_name
+              ),
+              iconHints:
+                dowJonesProfile.data.attributes.person?.icon_hints ??
+                dowJonesProfile.data.attributes.entity?.icon_hints ??
+                [],
+            },
           },
           status: "PENDING",
         },
