@@ -778,6 +778,11 @@ type Mutation {
   ): PetitionFieldReply!
 
   """
+  Creates a task for downloading a PDF file with the profile of an entity in DowJones
+  """
+  createDowJonesProfileDownloadTask(profileId: ID!): Task!
+
+  """
   Creates an event subscription for the user's petitions
   """
   createEventSubscription(
@@ -5061,6 +5066,7 @@ type Task {
 }
 
 enum TaskName {
+  DOW_JONES_PROFILE_DOWNLOAD
   EXPORT_EXCEL
   EXPORT_REPLIES
   PRINT_PDF

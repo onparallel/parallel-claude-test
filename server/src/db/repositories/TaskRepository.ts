@@ -26,6 +26,9 @@ export type TaskInput<TName extends TaskName> = {
     startDate?: Date | null;
     endDate?: Date | null;
   };
+  DOW_JONES_PROFILE_DOWNLOAD: {
+    profile_id: string;
+  };
 }[TName];
 
 export type TaskOutput<TName extends TaskName> = {
@@ -41,6 +44,7 @@ export type TaskOutput<TName extends TaskName> = {
     complete_to_close: number | null;
     signatures: { completed: number; time_to_complete: number | null };
   };
+  DOW_JONES_PROFILE_DOWNLOAD: { temporary_file_id: number };
 }[TName];
 
 export type Task<TName extends TaskName> = Replace<

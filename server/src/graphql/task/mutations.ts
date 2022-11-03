@@ -1,6 +1,6 @@
 import { ApolloError } from "apollo-server-core";
 import { differenceInDays } from "date-fns";
-import { booleanArg, mutationField, nonNull, nullable, objectType, stringArg } from "nexus";
+import { booleanArg, idArg, mutationField, nonNull, nullable, objectType, stringArg } from "nexus";
 import { isDefined } from "remeda";
 import { Task } from "../../db/repositories/TaskRepository";
 import { isValidTimezone } from "../../util/validators";
@@ -12,6 +12,8 @@ import {
   petitionIsNotAnonymized,
   petitionsAreOfTypeTemplate,
   userHasAccessToPetitions,
+  userHasEnabledIntegration,
+  userHasFeatureFlag,
 } from "../petition/authorizers";
 import { contextUserHasRole } from "../users/authorizers";
 import { tasksAreOfType, userHasAccessToTasks } from "./authorizers";
@@ -163,6 +165,34 @@ export const createTemplateStatsReportTask = mutationField("createTemplateStatsR
   },
 });
 
+export const createDowJonesProfileDownloadTask = mutationField(
+  "createDowJonesProfileDownloadTask",
+  {
+    description:
+      "Creates a task for downloading a PDF file with the profile of an entity in DowJones",
+    type: "Task",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("DOW_JONES_KYC"),
+      userHasEnabledIntegration("DOW_JONES_KYC")
+    ),
+    args: {
+      profileId: nonNull(idArg()),
+    },
+    resolve: async (_, args, ctx) => {
+      return await ctx.tasks.createTask(
+        {
+          name: "DOW_JONES_PROFILE_DOWNLOAD",
+          user_id: ctx.user!.id,
+          input: {
+            profile_id: args.profileId,
+          },
+        },
+        `User:${ctx.user!.id}`
+      );
+    },
+  }
+);
+
 export const getTaskResultFile = mutationField("getTaskResultFile", {
   description: "Returns an object with signed download url and filename for tasks with file output",
   type: objectType({
@@ -179,6 +209,7 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
       "PRINT_PDF",
       "EXPORT_EXCEL",
       "TEMPLATE_REPLIES_REPORT",
+      "DOW_JONES_PROFILE_DOWNLOAD",
     ])
   ),
   args: {
@@ -190,7 +221,8 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
       | Task<"EXPORT_REPLIES">
       | Task<"PRINT_PDF">
       | Task<"EXPORT_EXCEL">
-      | Task<"TEMPLATE_REPLIES_REPORT">;
+      | Task<"TEMPLATE_REPLIES_REPORT">
+      | Task<"DOW_JONES_PROFILE_DOWNLOAD">;
 
     const file = isDefined(task.output)
       ? await ctx.files.loadTemporaryFile(task.output.temporary_file_id)

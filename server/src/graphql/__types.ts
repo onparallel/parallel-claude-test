@@ -1208,6 +1208,7 @@ export interface NexusGenFieldTypes {
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createDowJonesFactivaIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     createDowJonesKycResearchReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
+    createDowJonesProfileDownloadTask: NexusGenRootTypes["Task"]; // Task!
     createEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     createExportExcelTask: NexusGenRootTypes["Task"]; // Task!
     createExportRepliesTask: NexusGenRootTypes["Task"]; // Task!
@@ -2894,6 +2895,7 @@ export interface NexusGenFieldTypeNames {
     createContact: "Contact";
     createDowJonesFactivaIntegration: "OrgIntegration";
     createDowJonesKycResearchReply: "PetitionFieldReply";
+    createDowJonesProfileDownloadTask: "Task";
     createEventSubscription: "PetitionEventSubscription";
     createExportExcelTask: "Task";
     createExportRepliesTask: "Task";
@@ -4334,6 +4336,10 @@ export interface NexusGenArgTypes {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
+      profileId: string; // ID!
+    };
+    createDowJonesProfileDownloadTask: {
+      // args
       profileId: string; // ID!
     };
     createEventSubscription: {

@@ -314,7 +314,8 @@ export type TaskName =
   | "EXPORT_REPLIES"
   | "EXPORT_EXCEL"
   | "TEMPLATE_REPLIES_REPORT"
-  | "TEMPLATE_STATS_REPORT";
+  | "TEMPLATE_STATS_REPORT"
+  | "DOW_JONES_PROFILE_DOWNLOAD";
 
 export const TaskNameValues = [
   "PRINT_PDF",
@@ -322,6 +323,7 @@ export const TaskNameValues = [
   "EXPORT_EXCEL",
   "TEMPLATE_REPLIES_REPORT",
   "TEMPLATE_STATS_REPORT",
+  "DOW_JONES_PROFILE_DOWNLOAD",
 ] as TaskName[];
 
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";

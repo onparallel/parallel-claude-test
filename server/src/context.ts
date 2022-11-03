@@ -98,6 +98,7 @@ export class WorkerContext {
     @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
     @inject(QUEUES_SERVICE) public readonly queues: IQueuesService,
     @inject(TIERS_SERVICE) public readonly tiers: ITiersService,
+    @inject(DOW_JONES_KYC_SERVICE) public readonly dowJonesKyc: IDowJonesKycService,
 
     // Repositories
     public readonly contacts: ContactRepository,
