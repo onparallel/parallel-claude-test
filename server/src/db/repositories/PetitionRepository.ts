@@ -2348,6 +2348,7 @@ export class PetitionRepository extends BaseRepository {
           data: e.data,
           petition_id: toPetitionId,
           type: e.type,
+          processed_at: e.created_at,
         })) as any[]
       );
     }
