@@ -1,6 +1,7 @@
 import { ApolloError } from "apollo-server-core";
 import { booleanArg, mutationField, nonNull, nullable, objectType, stringArg } from "nexus";
 import { withError } from "../../util/promises/withError";
+import { encrypt } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
@@ -226,6 +227,7 @@ export const createDowJonesFactivaIntegration = mutationField("createDowJonesFac
       throw new ApolloError(`Unable to validate credentials`, "INVALID_CREDENTIALS_ERROR");
     }
 
+    const encryptionKey = Buffer.from(ctx.config.security.encryptKeyBase64, "base64");
     return await ctx.integrations.createOrgIntegration<"DOW_JONES_KYC">(
       {
         type: "DOW_JONES_KYC",
@@ -233,7 +235,13 @@ export const createDowJonesFactivaIntegration = mutationField("createDowJonesFac
         org_id: ctx.user!.org_id,
         name: "Dow Jones - Factiva KYC",
         settings: {
-          CREDENTIALS: credentials,
+          CREDENTIALS: {
+            ACCESS_TOKEN: encrypt(credentials.ACCESS_TOKEN, encryptionKey).toString("hex"),
+            REFRESH_TOKEN: encrypt(credentials.REFRESH_TOKEN, encryptionKey).toString("hex"),
+            CLIENT_ID: encrypt(credentials.CLIENT_ID, encryptionKey).toString("hex"),
+            USERNAME: credentials.USERNAME,
+            PASSWORD: encrypt(credentials.PASSWORD, encryptionKey).toString("hex"),
+          },
         },
         is_enabled: true,
       },

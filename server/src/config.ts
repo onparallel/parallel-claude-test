@@ -62,6 +62,7 @@ export function buildConfig() {
     },
     security: {
       jwtSecret: process.env.SECURITY_SERVICE_JWT_SECRET!,
+      encryptKeyBase64: process.env.SECURITY_ENCRYPTION_KEY_BASE64!,
     },
     signature: {
       signaturitSandboxApiKey: process.env.SIGNATURIT_SANDBOX_API_KEY!,

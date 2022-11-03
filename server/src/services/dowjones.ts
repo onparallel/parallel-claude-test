@@ -1,10 +1,12 @@
 import { inject, injectable } from "inversify";
 import { isDefined } from "remeda";
+import { Config, CONFIG } from "../config";
 import {
   IntegrationRepository,
   IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
 import { OrgIntegration } from "../db/__types";
+import { decrypt, encrypt } from "../util/token";
 import { Maybe, Replace } from "../util/types";
 import { FETCH_SERVICE, IFetchService } from "./fetch";
 
@@ -131,6 +133,7 @@ export interface IDowJonesKycService {
 @injectable()
 export class DowJonesKycService implements IDowJonesKycService {
   constructor(
+    @inject(CONFIG) private config: Config,
     @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(IntegrationRepository) private integrations: IntegrationRepository
   ) {}
@@ -198,14 +201,24 @@ export class DowJonesKycService implements IDowJonesKycService {
   }
 
   private async refreshAccessToken(integration: DowJonesIntegration) {
+    const key = Buffer.from(this.config.security.encryptKeyBase64, "base64");
+    const clientId = decrypt(
+      Buffer.from(integration.settings.CREDENTIALS.CLIENT_ID, "hex"),
+      key
+    ).toString("utf8");
+    const refreshToken = decrypt(
+      Buffer.from(integration.settings.CREDENTIALS.REFRESH_TOKEN, "hex"),
+      key
+    ).toString("utf8");
+
     const response = await this.fetch.fetchWithTimeout(
       "https://accounts.dowjones.com/oauth2/v1/token",
       {
         method: "POST",
         body: new URLSearchParams({
-          client_id: integration.settings.CREDENTIALS.CLIENT_ID,
+          client_id: clientId,
           grant_type: "refresh_token",
-          refresh_token: integration.settings.CREDENTIALS.REFRESH_TOKEN,
+          refresh_token: refreshToken,
           scope: "openid service_account_id",
         }),
       },
@@ -214,10 +227,7 @@ export class DowJonesKycService implements IDowJonesKycService {
 
     const jsonData = await response.json();
     if (response.ok && !jsonData.error) {
-      const accessToken = await this.getAccessToken(
-        jsonData.access_token,
-        integration.settings.CREDENTIALS.CLIENT_ID
-      );
+      const accessToken = await this.getAccessToken(jsonData.access_token, clientId);
       const [updatedIntegration] = await this.integrations.updateOrgIntegration(
         integration.id,
         {
@@ -225,7 +235,7 @@ export class DowJonesKycService implements IDowJonesKycService {
             ...integration.settings,
             CREDENTIALS: {
               ...integration.settings.CREDENTIALS,
-              ACCESS_TOKEN: accessToken,
+              ACCESS_TOKEN: encrypt(accessToken, key).toString("hex"),
             },
           },
         },
@@ -243,13 +253,18 @@ export class DowJonesKycService implements IDowJonesKycService {
     integration: DowJonesIntegration,
     retry = true
   ): Promise<TResult> {
+    const accessToken = decrypt(
+      Buffer.from(integration.settings.CREDENTIALS.ACCESS_TOKEN, "hex"),
+      Buffer.from(this.config.security.encryptKeyBase64, "base64")
+    ).toString("utf8");
+
     const response = await this.fetch.fetchWithTimeout(
       url,
       {
         method: opts.method,
         body: opts.body ? JSON.stringify(opts.body) : undefined,
         headers: {
-          Authorization: `Bearer ${integration.settings.CREDENTIALS.ACCESS_TOKEN}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
       },
@@ -282,6 +297,8 @@ export class DowJonesKycService implements IDowJonesKycService {
       CLIENT_ID: clientId,
       ACCESS_TOKEN: accessToken,
       REFRESH_TOKEN: refreshToken,
+      USERNAME: username,
+      PASSWORD: password,
     };
   }
 

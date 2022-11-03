@@ -223,19 +223,37 @@ export interface DowJonesRiskEntityPlace {
 }
 
 export interface DowJonesRiskEntityProfileResult {
-  __typename?: "DowJonesRiskEntityProfileResult";
-  citizenship: DowJonesRiskEntityPlace;
-  dateOfBirth: DowJonesRiskEntityDate;
-  firstName: Scalars["String"];
+  iconHints: Array<Scalars["String"]>;
+  id: Scalars["ID"];
+  name: Scalars["String"];
+  relationships: Array<DowJonesRiskEntityRelationship>;
+  sanctions: Array<DowJonesRiskEntitySanction>;
+  type: DowJonesRiskEntityType;
+}
+
+export interface DowJonesRiskEntityProfileResultEntity extends DowJonesRiskEntityProfileResult {
+  __typename?: "DowJonesRiskEntityProfileResultEntity";
+  dateOfRegistration?: Maybe<DowJonesRiskEntityDate>;
+  iconHints: Array<Scalars["String"]>;
+  id: Scalars["ID"];
+  name: Scalars["String"];
+  relationships: Array<DowJonesRiskEntityRelationship>;
+  sanctions: Array<DowJonesRiskEntitySanction>;
+  type: DowJonesRiskEntityType;
+}
+
+export interface DowJonesRiskEntityProfileResultPerson extends DowJonesRiskEntityProfileResult {
+  __typename?: "DowJonesRiskEntityProfileResultPerson";
+  citizenship?: Maybe<DowJonesRiskEntityPlace>;
+  dateOfBirth?: Maybe<DowJonesRiskEntityDate>;
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   isDeceased: Scalars["Boolean"];
-  jurisdiction: DowJonesRiskEntityPlace;
-  lastName: Scalars["String"];
-  middleName: Scalars["String"];
-  placeOfBirth: DowJonesRiskEntityPlace;
+  jurisdiction?: Maybe<DowJonesRiskEntityPlace>;
+  name: Scalars["String"];
+  placeOfBirth?: Maybe<DowJonesRiskEntityPlace>;
   relationships: Array<DowJonesRiskEntityRelationship>;
-  residence: DowJonesRiskEntityPlace;
+  residence?: Maybe<DowJonesRiskEntityPlace>;
   sanctions: Array<DowJonesRiskEntitySanction>;
   type: DowJonesRiskEntityType;
 }
@@ -243,10 +261,8 @@ export interface DowJonesRiskEntityProfileResult {
 export interface DowJonesRiskEntityRelationship {
   __typename?: "DowJonesRiskEntityRelationship";
   connectionType: Scalars["String"];
-  firstName?: Maybe<Scalars["String"]>;
   iconHints: Array<Scalars["String"]>;
-  lastName?: Maybe<Scalars["String"]>;
-  middleName?: Maybe<Scalars["String"]>;
+  name?: Maybe<Scalars["String"]>;
   profileId: Scalars["Int"];
   type: DowJonesRiskEntityType;
 }
@@ -259,14 +275,22 @@ export interface DowJonesRiskEntitySanction {
 }
 
 export interface DowJonesRiskEntitySearchResult {
-  __typename?: "DowJonesRiskEntitySearchResult";
   countryTerritoryName: Scalars["String"];
-  dateOfBirth?: Maybe<DowJonesRiskEntityDate>;
-  gender: Scalars["String"];
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   isSubsidiary: Scalars["Boolean"];
-  primaryName: Scalars["String"];
+  name: Scalars["String"];
+  title: Scalars["String"];
+  type: DowJonesRiskEntityType;
+}
+
+export interface DowJonesRiskEntitySearchResultEntity extends DowJonesRiskEntitySearchResult {
+  __typename?: "DowJonesRiskEntitySearchResultEntity";
+  countryTerritoryName: Scalars["String"];
+  iconHints: Array<Scalars["String"]>;
+  id: Scalars["ID"];
+  isSubsidiary: Scalars["Boolean"];
+  name: Scalars["String"];
   title: Scalars["String"];
   type: DowJonesRiskEntityType;
 }
@@ -277,6 +301,19 @@ export interface DowJonesRiskEntitySearchResultPagination {
   items: Array<DowJonesRiskEntitySearchResult>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
+}
+
+export interface DowJonesRiskEntitySearchResultPerson extends DowJonesRiskEntitySearchResult {
+  __typename?: "DowJonesRiskEntitySearchResultPerson";
+  countryTerritoryName: Scalars["String"];
+  dateOfBirth?: Maybe<DowJonesRiskEntityDate>;
+  gender: Scalars["String"];
+  iconHints: Array<Scalars["String"]>;
+  id: Scalars["ID"];
+  isSubsidiary: Scalars["Boolean"];
+  name: Scalars["String"];
+  title: Scalars["String"];
+  type: DowJonesRiskEntityType;
 }
 
 export type DowJonesRiskEntityType = "Entity" | "Person";
@@ -574,6 +611,8 @@ export interface Mutation {
   createContact: Contact;
   /** Creates a new DOW JONES Factiva integration on the user's organization */
   createDowJonesFactivaIntegration: OrgIntegration;
+  /** Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document */
+  createDowJonesKycResearchReply: PetitionFieldReply;
   /** Creates an event subscription for the user's petitions */
   createEventSubscription: PetitionEventSubscription;
   /** Creates a task for exporting an xlsx file with petition text replies and sends it to the queue */
@@ -950,6 +989,12 @@ export interface MutationcreateDowJonesFactivaIntegrationArgs {
   clientId: Scalars["String"];
   password: Scalars["String"];
   username: Scalars["String"];
+}
+
+export interface MutationcreateDowJonesKycResearchReplyArgs {
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+  profileId: Scalars["ID"];
 }
 
 export interface MutationcreateEventSubscriptionArgs {

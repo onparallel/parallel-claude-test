@@ -1,4 +1,4 @@
-import { randomBytes, scrypt } from "crypto";
+import { createCipheriv, createDecipheriv, randomBytes, scrypt } from "crypto";
 
 const ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
   .split("")
@@ -99,4 +99,25 @@ export async function hash(password: string, salt: string): Promise<string> {
       }
     });
   });
+}
+
+export function encrypt(value: string, key: Buffer) {
+  const iv = randomBytes(12);
+  const cipher = createCipheriv("aes-256-gcm", key, iv);
+  const encrypted = Buffer.concat([cipher.update(value), cipher.final()]);
+  const authTag = cipher.getAuthTag();
+  const bufferLength = Buffer.alloc(1);
+  bufferLength.writeUInt8(iv.length, 0);
+
+  return Buffer.concat([bufferLength, iv, authTag, encrypted]);
+}
+
+export function decrypt(value: Buffer, key: Buffer) {
+  const ivSize = value.readUInt8(0);
+  const iv = value.subarray(1, ivSize + 1);
+  // The authTag is by default 16 bytes in AES-GCM
+  const authTag = value.subarray(ivSize + 1, ivSize + 17);
+  const decipher = createDecipheriv("aes-256-gcm", key, iv);
+  decipher.setAuthTag(authTag);
+  return Buffer.concat([decipher.update(value.subarray(ivSize + 17)), decipher.final()]);
 }

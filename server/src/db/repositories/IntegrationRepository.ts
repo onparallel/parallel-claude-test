@@ -35,6 +35,8 @@ export type IntegrationSettings<
       ACCESS_TOKEN: string;
       REFRESH_TOKEN: string;
       CLIENT_ID: string;
+      USERNAME: string;
+      PASSWORD: string;
     };
   };
 }[TType];

@@ -12,6 +12,14 @@ const result: PossibleTypesResultData = {
       "PetitionReminder",
       "UserAuthenticationToken",
     ],
+    DowJonesRiskEntityProfileResult: [
+      "DowJonesRiskEntityProfileResultEntity",
+      "DowJonesRiskEntityProfileResultPerson",
+    ],
+    DowJonesRiskEntitySearchResult: [
+      "DowJonesRiskEntitySearchResultEntity",
+      "DowJonesRiskEntitySearchResultPerson",
+    ],
     IOrgIntegration: ["OrgIntegration", "SignatureOrgIntegration"],
     PetitionBase: ["Petition", "PetitionTemplate"],
     PetitionBaseOrFolder: ["Petition", "PetitionFolder", "PetitionTemplate"],
