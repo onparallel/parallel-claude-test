@@ -1,6 +1,6 @@
 import { isDefined } from "remeda";
 import { WorkerContext } from "../../context";
-import { PetitionEventTypeValues, SystemEventTypeValues } from "../../db/__types";
+import { PetitionEventTypeValues } from "../../db/__types";
 import { EventListener, EventProcessorPayload, EventType } from "../event-processor";
 
 export class EventProcessor {
@@ -20,14 +20,9 @@ export class EventProcessor {
   listen(): (payload: EventProcessorPayload, ctx: WorkerContext) => Promise<void> {
     return async (payload, ctx) => {
       if (this.listeners.has(payload.type)) {
-        // this is for retrocompatibility on release with older payload, where tableName is not defined.
-        // in the next iteration, tableName will be obtained from payload
-        // TODO read tableName from payload
-        const tableName = payload.type in SystemEventTypeValues ? "system_event" : "petition_event";
-
         const event = await ctx.petitions.pickEventToProcess(
           payload.id,
-          tableName,
+          payload.table_name,
           payload.created_at
         );
 
