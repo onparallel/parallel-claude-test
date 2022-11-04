@@ -353,8 +353,8 @@ export const createOrganization = mutationField("createOrganization", {
     );
 
     await ctx.tiers.updateOrganizationTier(org, "FREE", `User:${ctx.user!.id}`);
-
-    return org;
+    // load org to get updated usage_details
+    return (await ctx.organizations.loadOrg(org.id))!;
   },
 });
 
