@@ -15,10 +15,12 @@ import {
 } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { compose } from "@parallel/utils/compose";
 import Head from "next/head";
 import { useState } from "react";
-import { PreviewFactivaTable } from "../PreviewFactivaTable";
 import { isDefined } from "remeda";
+import { PreviewFactivaTable } from "../PreviewFactivaTable";
 
 type ExternalFieldKYCResearchProps = {
   htmlTitle: string;
@@ -26,7 +28,7 @@ type ExternalFieldKYCResearchProps = {
   fieldId: string;
 };
 
-export function ExternalFieldKYCResearch({
+function ExternalFieldKYCResearch({
   htmlTitle,
   petitionId,
   fieldId,
@@ -58,6 +60,8 @@ export function ExternalFieldKYCResearch({
     </>
   );
 }
+
+export default compose(withDialogs)(ExternalFieldKYCResearch);
 
 type FormProps = {
   onSubmit: (data: formData) => void;

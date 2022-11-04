@@ -1,5 +1,5 @@
 import { ApolloError } from "apollo-server-core";
-import { nonNull, queryField, stringArg } from "nexus";
+import { idArg, nonNull, queryField, stringArg } from "nexus";
 import { authenticateAnd } from "../helpers/authorize";
 import { datetimeArg } from "../helpers/scalars";
 import { userHasEnabledIntegration, userHasFeatureFlag } from "../petition/authorizers";
@@ -56,7 +56,7 @@ export const queries = queryField((t) => {
       userHasFeatureFlag("DOW_JONES_KYC")
     ),
     args: {
-      profileId: nonNull(stringArg()),
+      profileId: nonNull(idArg()),
     },
     resolve: async (_, args, ctx) => {
       try {
@@ -66,6 +66,15 @@ export const queries = queryField((t) => {
         );
 
         const result = await ctx.dowJonesKyc.riskEntityProfile(args.profileId, integration);
+        const citizenship = (
+          result.data.attributes.person?.country_territory_details.citizenship ?? []
+        ).find((c) => c.code !== "NOTK"); // NOTK is "Not Known", this info is irrelevant so we will filter it
+        const jurisdiction = (
+          result.data.attributes.person?.country_territory_details.jurisdiction ?? []
+        ).find((c) => c.code !== "NOTK");
+        const residence = (
+          result.data.attributes.person?.country_territory_details.residence ?? []
+        ).find((c) => c.code !== "NOTK");
         return {
           id: result.data.id,
           type: result.data.attributes.basic.type,
@@ -101,34 +110,22 @@ export const queries = queryField((t) => {
                     }
                   : null,
                 dateOfBirth: result.data.attributes.person!.date_details?.birth?.[0].date ?? null,
-                citizenship: result.data.attributes.person!.country_territory_details.citizenship
+                citizenship: citizenship
                   ? {
-                      descriptor:
-                        result.data.attributes.person!.country_territory_details.citizenship[0]
-                          .descriptor,
-                      countryCode:
-                        result.data.attributes.person!.country_territory_details.citizenship[0]
-                          .iso_alpha2,
+                      descriptor: citizenship.descriptor,
+                      countryCode: citizenship.iso_alpha2,
                     }
                   : null,
-                residence: result.data.attributes.person!.country_territory_details.residence
+                residence: residence
                   ? {
-                      descriptor:
-                        result.data.attributes.person!.country_territory_details.residence[0]
-                          .descriptor,
-                      countryCode:
-                        result.data.attributes.person!.country_territory_details.residence[0]
-                          .iso_alpha2,
+                      descriptor: residence.descriptor,
+                      countryCode: residence.iso_alpha2,
                     }
                   : null,
-                jurisdiction: result.data.attributes.person!.country_territory_details.jurisdiction
+                jurisdiction: jurisdiction
                   ? {
-                      descriptor:
-                        result.data.attributes.person!.country_territory_details.jurisdiction[0]
-                          .descriptor,
-                      countryCode:
-                        result.data.attributes.person!.country_territory_details.jurisdiction[0]
-                          .iso_alpha2,
+                      descriptor: jurisdiction.descriptor,
+                      countryCode: jurisdiction.iso_alpha2,
                     }
                   : null,
                 isDeceased: result.data.attributes.person!.is_deceased,

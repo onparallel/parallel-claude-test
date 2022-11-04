@@ -35,6 +35,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { integer, useQueryState, values } from "@parallel/utils/queryState";
 import { useLoadCountryNames } from "@parallel/utils/useCountryName";
+import { useDowJonesProfileDownloadTask } from "@parallel/utils/useDowJonesProfileDownloadTask";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -298,7 +299,7 @@ function DowJonesProfileDetails({ id, onGoBack }: DowJonesProfileDetailsProps) {
 
   const sanctionsColumns = useDowJonesFactivaSanctionsColumns();
   const relationshipsColumns = useDowJonesFactivaRelationshipsColumns();
-
+  const downloadDowJonesProfilePdf = useDowJonesProfileDownloadTask();
   return (
     <Stack paddingX={6} paddingY={5} spacing={6}>
       <HStack>
@@ -419,7 +420,12 @@ function DowJonesProfileDetails({ id, onGoBack }: DowJonesProfileDetailsProps) {
             }}
           />
         </Text>
-        <Button variant="ghost" colorScheme="purple" leftIcon={<DownloadIcon />}>
+        <Button
+          variant="ghost"
+          colorScheme="purple"
+          leftIcon={<DownloadIcon />}
+          onClick={() => downloadDowJonesProfilePdf(id)}
+        >
           <FormattedMessage
             id="component.preview-factiva-table.get-full-pdf"
             defaultMessage="Get full PDF"
@@ -814,7 +820,7 @@ DowJonesProfileDetails.fragments = {
 
 DowJonesProfileDetails.queries = [
   gql`
-    query DowJonesProfileDetails_dowJonesRiskEntityProfile($profileId: String!) {
+    query DowJonesProfileDetails_dowJonesRiskEntityProfile($profileId: ID!) {
       dowJonesRiskEntityProfile(profileId: $profileId) {
         ...DowJonesProfileDetails_DowJonesRiskEntityProfileResult
       }

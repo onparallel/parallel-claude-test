@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { ExternalFieldKYCResearch } from "@parallel/components/petition-preview/fields/ExternalFieldKYCResearch";
+import ExternalFieldKYCResearch from "@parallel/components/petition-preview/fields/ExternalFieldKYCResearch";
 import {
   ExternalFieldPreview_petitionDocument,
   ExternalFieldPreview_userDocument,

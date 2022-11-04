@@ -44,6 +44,7 @@ type RiskEntityPersonName = { first_name?: string; surname?: string; middle_name
 type RiskEntityEntityName = { name: string };
 type RiskEntityDate = { day?: number; month?: number; year?: number };
 type RiskEntityPlace = {
+  code: string;
   descriptor: string;
   iso_alpha2: string;
 };

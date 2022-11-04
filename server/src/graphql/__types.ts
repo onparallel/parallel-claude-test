@@ -5233,7 +5233,7 @@ export interface NexusGenArgTypes {
     };
     dowJonesRiskEntityProfile: {
       // args
-      profileId: string; // String!
+      profileId: string; // ID!
     };
     dowJonesRiskEntitySearch: {
       // args

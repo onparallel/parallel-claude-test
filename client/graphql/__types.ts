@@ -332,6 +332,7 @@ export type FeatureFlag =
   | "AUTO_ANONYMIZE"
   | "CUSTOM_HOST_UI"
   | "DEVELOPER_ACCESS"
+  | "DOW_JONES_KYC"
   | "ES_TAX_DOCUMENTS_FIELD"
   | "EXPORT_CUATRECASAS"
   | "GHOST_LOGIN"
@@ -3357,7 +3358,7 @@ export interface QuerycontactsByEmailArgs {
 }
 
 export interface QuerydowJonesRiskEntityProfileArgs {
-  profileId: Scalars["String"];
+  profileId: Scalars["ID"];
 }
 
 export interface QuerydowJonesRiskEntitySearchArgs {
@@ -10401,7 +10402,7 @@ export type DowJonesProfileDetails_DowJonesRiskEntityProfileResultFragment =
   | DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultPerson_Fragment;
 
 export type DowJonesProfileDetails_dowJonesRiskEntityProfileQueryVariables = Exact<{
-  profileId: Scalars["String"];
+  profileId: Scalars["ID"];
 }>;
 
 export type DowJonesProfileDetails_dowJonesRiskEntityProfileQuery = {
@@ -24301,6 +24302,28 @@ export type useBackgroundTask_taskQuery = {
   };
 };
 
+export type useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTaskMutationVariables =
+  Exact<{
+    profileId: Scalars["ID"];
+  }>;
+
+export type useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTaskMutation = {
+  createDowJonesProfileDownloadTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    progress?: number | null;
+  };
+};
+
+export type useDowJonesProfileDownloadTask_getTaskResultFileMutationVariables = Exact<{
+  taskId: Scalars["GID"];
+}>;
+
+export type useDowJonesProfileDownloadTask_getTaskResultFileMutation = {
+  getTaskResultFile: { __typename?: "TaskResultFile"; url: string };
+};
+
 export type useExportRepliesTask_createExportRepliesTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   pattern?: InputMaybe<Scalars["String"]>;
@@ -30473,7 +30496,7 @@ export const PetitionListTagFilter_tagsDocument = gql`
   PetitionListTagFilter_tagsQueryVariables
 >;
 export const DowJonesProfileDetails_dowJonesRiskEntityProfileDocument = gql`
-  query DowJonesProfileDetails_dowJonesRiskEntityProfile($profileId: String!) {
+  query DowJonesProfileDetails_dowJonesRiskEntityProfile($profileId: ID!) {
     dowJonesRiskEntityProfile(profileId: $profileId) {
       ...DowJonesProfileDetails_DowJonesRiskEntityProfileResult
     }
@@ -33368,6 +33391,27 @@ export const useBackgroundTask_taskDocument = gql`
   }
   ${useBackgroundTask_TaskFragmentDoc}
 ` as unknown as DocumentNode<useBackgroundTask_taskQuery, useBackgroundTask_taskQueryVariables>;
+export const useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTaskDocument = gql`
+  mutation useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTask($profileId: ID!) {
+    createDowJonesProfileDownloadTask(profileId: $profileId) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTaskMutation,
+  useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTaskMutationVariables
+>;
+export const useDowJonesProfileDownloadTask_getTaskResultFileDocument = gql`
+  mutation useDowJonesProfileDownloadTask_getTaskResultFile($taskId: GID!) {
+    getTaskResultFile(taskId: $taskId, preview: true) {
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  useDowJonesProfileDownloadTask_getTaskResultFileMutation,
+  useDowJonesProfileDownloadTask_getTaskResultFileMutationVariables
+>;
 export const useExportRepliesTask_createExportRepliesTaskDocument = gql`
   mutation useExportRepliesTask_createExportRepliesTask($petitionId: GID!, $pattern: String) {
     createExportRepliesTask(petitionId: $petitionId, pattern: $pattern) {
