@@ -3555,6 +3555,16 @@
     "context": "Permissions needed"
   },
   {
+    "term": "component.preview-factiva-table.birth",
+    "definition": "Nacimiento",
+    "context": "Birth"
+  },
+  {
+    "term": "component.preview-factiva-table.citizenship",
+    "definition": "Ciudadanía",
+    "context": "Citizenship"
+  },
+  {
     "term": "component.preview-factiva-table.country-territory",
     "definition": "País/Territorio",
     "context": "Country/Territory"
@@ -3565,9 +3575,24 @@
     "context": "Date of birth"
   },
   {
-    "term": "component.preview-factiva-table.details",
-    "definition": "Detalles",
-    "context": "Details"
+    "term": "component.preview-factiva-table.date-of-registration",
+    "definition": "Fecha de registro",
+    "context": "Date of registration"
+  },
+  {
+    "term": "component.preview-factiva-table.deceased",
+    "definition": "Fallecido",
+    "context": "Deceased"
+  },
+  {
+    "term": "component.preview-factiva-table.entity",
+    "definition": "Entidad",
+    "context": "Entity"
+  },
+  {
+    "term": "component.preview-factiva-table.from",
+    "definition": "Desde",
+    "context": "From"
   },
   {
     "term": "component.preview-factiva-table.gender",
@@ -3575,14 +3600,54 @@
     "context": "Gender"
   },
   {
+    "term": "component.preview-factiva-table.get-full-pdf",
+    "definition": "Obtener PDF completo",
+    "context": "Get full PDF"
+  },
+  {
+    "term": "component.preview-factiva-table.jurisdiction",
+    "definition": "Jurisdicción",
+    "context": "Jurisdiction"
+  },
+  {
+    "term": "component.preview-factiva-table.modify-search",
+    "definition": "Modificar búsqueda",
+    "context": "Modify search"
+  },
+  {
     "term": "component.preview-factiva-table.name",
     "definition": "Nombre",
     "context": "Name"
   },
   {
-    "term": "component.preview-factiva-table.profile-id",
-    "definition": "ID del perfil",
-    "context": "Profile id"
+    "term": "component.preview-factiva-table.person",
+    "definition": "Persona",
+    "context": "Person"
+  },
+  {
+    "term": "component.preview-factiva-table.relation",
+    "definition": "Relación",
+    "context": "Relation"
+  },
+  {
+    "term": "component.preview-factiva-table.relationships",
+    "definition": "Relaciones",
+    "context": "Relationships"
+  },
+  {
+    "term": "component.preview-factiva-table.resident-of",
+    "definition": "Residente de",
+    "context": "Resident of"
+  },
+  {
+    "term": "component.preview-factiva-table.results-obtained-on",
+    "definition": "Resultados obtenidos el {date}",
+    "context": "Results obtained on {date}"
+  },
+  {
+    "term": "component.preview-factiva-table.sanction-lists",
+    "definition": "Listas de sanciones",
+    "context": "Sanction lists"
   },
   {
     "term": "component.preview-factiva-table.searching-for",
@@ -3593,6 +3658,11 @@
     "term": "component.preview-factiva-table.subsidiary",
     "definition": "Filial",
     "context": "Subsidiary"
+  },
+  {
+    "term": "component.preview-factiva-table.type",
+    "definition": "Tipo",
+    "context": "Type"
   },
   {
     "term": "component.print-pdf-task.confirm",
@@ -6385,6 +6455,11 @@
     "context": "Next page"
   },
   {
+    "term": "generic.no",
+    "definition": "No",
+    "context": "No"
+  },
+  {
     "term": "generic.no-deadline",
     "definition": "Sin vencimiento",
     "context": "No deadline"
@@ -6743,6 +6818,11 @@
     "term": "generic.users",
     "definition": "Usuarios",
     "context": "Users"
+  },
+  {
+    "term": "generic.yes",
+    "definition": "Sí",
+    "context": "Yes"
   },
   {
     "term": "generic.yes-continue",

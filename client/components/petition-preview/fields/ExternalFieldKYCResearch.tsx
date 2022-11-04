@@ -1,4 +1,3 @@
-import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
 import { useMetadata } from "@parallel/utils/withMetadata";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
@@ -11,16 +10,17 @@ import {
   FormErrorMessage,
   FormLabel,
   Heading,
-  HStack,
   Input,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import Head from "next/head";
+import { useState } from "react";
+import { PreviewFactivaTable } from "../PreviewFactivaTable";
+import { isDefined } from "remeda";
 
-type ExternalFieldKYCResearch = {
+type ExternalFieldKYCResearchProps = {
   htmlTitle: string;
   petitionId: string;
   fieldId: string;
@@ -30,8 +30,15 @@ export function ExternalFieldKYCResearch({
   htmlTitle,
   petitionId,
   fieldId,
-}: ExternalFieldKYCResearch) {
-  const handleFormSubmit = async () => {};
+}: ExternalFieldKYCResearchProps) {
+  const [formData, setFormData] = useState<formData | null>(null);
+  const handleFormSubmit = async (data: formData) => {
+    setFormData(data);
+  };
+
+  const handleResetSearch = async () => {
+    setFormData(null);
+  };
 
   return (
     <>
@@ -39,7 +46,15 @@ export function ExternalFieldKYCResearch({
         <title>{htmlTitle}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <Form onSubmit={handleFormSubmit} isDisabled={false} hasError={false} isLoading={false} />
+      {isDefined(formData) ? (
+        <PreviewFactivaTable
+          name={formData.name}
+          date={formData.dateOfBirth}
+          onResetClick={handleResetSearch}
+        />
+      ) : (
+        <Form onSubmit={handleFormSubmit} isDisabled={false} />
+      )}
     </>
   );
 }
@@ -47,16 +62,14 @@ export function ExternalFieldKYCResearch({
 type FormProps = {
   onSubmit: (data: formData) => void;
   isDisabled?: boolean;
-  isLoading: boolean;
-  hasError: boolean;
 };
 
 type formData = {
   name: string;
-  date: string;
+  dateOfBirth: string;
 };
 
-function Form({ onSubmit, isDisabled, hasError, isLoading }: FormProps) {
+function Form({ onSubmit, isDisabled }: FormProps) {
   const { browserName } = useMetadata();
   const {
     handleSubmit,
@@ -67,11 +80,11 @@ function Form({ onSubmit, isDisabled, hasError, isLoading }: FormProps) {
     mode: "onSubmit",
     defaultValues: {
       name: "",
-      date: "",
+      dateOfBirth: "",
     },
   });
 
-  const date = watch("date");
+  const date = watch("dateOfBirth");
 
   return (
     <Center height="100vh" padding={4}>
@@ -109,7 +122,7 @@ function Form({ onSubmit, isDisabled, hasError, isLoading }: FormProps) {
               <Flex flex="1" position="relative" marginTop={2}>
                 <Input
                   type="date"
-                  {...register("date")}
+                  {...register("dateOfBirth")}
                   sx={{
                     paddingRight: 1.5,
                     "&::-webkit-calendar-picker-indicator": {
@@ -130,13 +143,13 @@ function Form({ onSubmit, isDisabled, hasError, isLoading }: FormProps) {
               </Flex>
             </FormControl>
           </Stack>
-          <Button colorScheme="primary" type="submit" isLoading={isLoading} isDisabled={isDisabled}>
+          <Button colorScheme="primary" type="submit" isDisabled={isDisabled}>
             <FormattedMessage
               id="component.recipient-view-petition-field-kyc-research.search"
               defaultMessage="Search"
             />
           </Button>
-          {hasError ? (
+          {/* {hasError ? (
             <HStack alignItems="center" marginTop={2} color="red.600">
               <ExclamationOutlineIcon boxSize={4} />
               <Text fontSize="sm">
@@ -146,7 +159,7 @@ function Form({ onSubmit, isDisabled, hasError, isLoading }: FormProps) {
                 />
               </Text>
             </HStack>
-          ) : null}
+          ) : null} */}
         </Stack>
       </Card>
     </Center>

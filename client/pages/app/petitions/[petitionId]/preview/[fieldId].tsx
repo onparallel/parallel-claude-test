@@ -6,6 +6,7 @@ import {
   ExternalFieldPreview_userDocument,
 } from "@parallel/graphql/__types";
 import { compose } from "@parallel/utils/compose";
+import { withMetadata } from "@parallel/utils/withMetadata";
 
 function ExternalFieldPreview({ petitionId, fieldId }: { petitionId: string; fieldId: string }) {
   return (
@@ -81,4 +82,4 @@ ExternalFieldPreview.getInitialProps = async ({ query, fetchQuery }: WithApolloD
   return { petitionId, fieldId, metadata };
 };
 
-export default compose(withApolloData)(ExternalFieldPreview);
+export default compose(withMetadata, withApolloData)(ExternalFieldPreview);
