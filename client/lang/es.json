@@ -3207,7 +3207,7 @@
   {
     "term": "component.petition-settings.signature-description",
     "definition": "Genera un documento e inicia un proceso de firma digital al completar el parallel, a través de uno de nuestros proveedores integrados.",
-    "context": "Generates a document and iniciates an eSignature process upon completion of the parallel, through one of our integrated providers."
+    "context": "Generates a document and initiates an eSignature process upon completion of the parallel, through one of our integrated providers."
   },
   {
     "term": "component.petition-settings.skip-forward-security",
@@ -3332,7 +3332,7 @@
   {
     "term": "component.petition-signatures-card.signature-description",
     "definition": "Genera un documento e inicia un proceso de firma digital a través de uno de nuestros proveedores integrados.",
-    "context": "Generates a document and iniciates an eSignature process, through one of our integrated providers."
+    "context": "Generates a document and initiates an eSignature process, through one of our integrated providers."
   },
   {
     "term": "component.petition-signatures-card.signature-sent-toast-description",

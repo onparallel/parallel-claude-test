@@ -680,7 +680,7 @@ function _PetitionSettings({
               <HelpPopover popoverWidth="2xs">
                 <FormattedMessage
                   id="component.petition-settings.signature-description"
-                  defaultMessage="Generates a document and iniciates an eSignature process upon completion of the parallel, through one of our integrated providers."
+                  defaultMessage="Generates a document and initiates an eSignature process upon completion of the parallel, through one of our integrated providers."
                 />
               </HelpPopover>
               {petition.signatureConfig?.integration?.environment === "DEMO" || hasDemoSignature ? (

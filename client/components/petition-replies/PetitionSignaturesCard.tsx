@@ -317,7 +317,7 @@ export const PetitionSignaturesCard = Object.assign(
           <HelpPopover popoverWidth="2xs">
             <FormattedMessage
               id="component.petition-signatures-card.signature-description"
-              defaultMessage="Generates a document and iniciates an eSignature process, through one of our integrated providers."
+              defaultMessage="Generates a document and initiates an eSignature process, through one of our integrated providers."
             />
           </HelpPopover>
           {signatureEnvironment === "DEMO" ? (
