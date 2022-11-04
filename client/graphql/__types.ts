@@ -4334,14 +4334,12 @@ export type PetitionTagListCellContent_TagFragment = {
 export type PetitionTagListCellContent_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
-  isRestricted: boolean;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
 };
 
 export type PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  isRestricted: boolean;
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
 };
 
@@ -21043,7 +21041,6 @@ export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
   name?: string | null;
   createdAt: string;
   status: PetitionStatus;
-  isRestricted: boolean;
   path: string;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -21256,7 +21253,6 @@ export type Petitions_petitionsQuery = {
           name?: string | null;
           createdAt: string;
           status: PetitionStatus;
-          isRestricted: boolean;
           path: string;
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
@@ -23957,7 +23953,6 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   name?: string | null;
   createdAt: string;
   status: PetitionStatus;
-  isRestricted: boolean;
   accesses: Array<{
     __typename?: "PetitionAccess";
     status: PetitionAccessStatus;
@@ -28058,7 +28053,6 @@ export const PetitionTagListCellContent_TagFragmentDoc = gql`
 export const PetitionTagListCellContent_PetitionBaseFragmentDoc = gql`
   fragment PetitionTagListCellContent_PetitionBase on PetitionBase {
     id
-    isRestricted
     tags {
       ...PetitionTagListCellContent_Tag
     }

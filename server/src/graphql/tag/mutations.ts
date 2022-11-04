@@ -7,11 +7,7 @@ import { RESULT } from "../helpers/result";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyString } from "../helpers/validators/notEmptyString";
-import {
-  petitionsAreEditable,
-  petitionsAreNotPublicTemplates,
-  userHasAccessToPetitions,
-} from "../petition/authorizers";
+import { petitionsAreNotPublicTemplates, userHasAccessToPetitions } from "../petition/authorizers";
 import { userHasAccessToTags } from "./authorizers";
 import { validateHexColor } from "./validators";
 
@@ -125,7 +121,6 @@ export const tagPetition = mutationField("tagPetition", {
   authorize: authenticateAnd(
     userHasAccessToTags("tagId"),
     userHasAccessToPetitions("petitionId"),
-    petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId")
   ),
   resolve: async (_, args, ctx) => {
@@ -155,7 +150,6 @@ export const untagPetition = mutationField("untagPetition", {
   authorize: authenticateAnd(
     userHasAccessToTags("tagId"),
     userHasAccessToPetitions("petitionId"),
-    petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId")
   ),
   resolve: async (_, args, ctx) => {
