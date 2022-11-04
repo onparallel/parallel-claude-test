@@ -5,7 +5,7 @@ import { scim } from "./scim";
 import { signaturitEventHandlers } from "./webhook-event-handlers/signaturit-event-handler";
 
 export const webhooks = Router()
-  .post("/signaturit", signaturitEventHandlers)
+  .use("/signaturit", signaturitEventHandlers)
   // bankflip webhook for ES_TAX_DOCUMENTS field completion
   .use("/bankflip", bankflip)
   // SCIM endpoints for User Provisioning
