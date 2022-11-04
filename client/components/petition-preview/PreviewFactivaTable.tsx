@@ -76,7 +76,6 @@ export function PreviewFactivaTable({
   const columns = useDowJonesFactivaDataColumns();
 
   const handleRowClick = useCallback(function (row: FactivaSelection, event: MouseEvent) {
-    console.log("Row clicked: ", row);
     setProfileId(row.id);
   }, []);
 
@@ -155,8 +154,8 @@ export function PreviewFactivaTable({
             <Flex flex="1" alignItems="center" justifyContent="center">
               <Text fontSize="lg">
                 <FormattedMessage
-                  id="view.group.no-users"
-                  defaultMessage="No users added to this team yet"
+                  id="component.preview-factiva-table.no-results"
+                  defaultMessage="No results found for this search"
                 />
               </Text>
             </Flex>
@@ -179,14 +178,7 @@ function useDowJonesFactivaDataColumns() {
           if (!iconHints || iconHints.length === 0) {
             return <></>;
           }
-
-          return (
-            <Stack direction="row">
-              {iconHints.map((item, i) => (
-                <Badge key={i}>{item}</Badge>
-              ))}
-            </Stack>
-          );
+          return <IconHints hints={iconHints} />;
         },
       },
       {
@@ -221,7 +213,15 @@ function useDowJonesFactivaDataColumns() {
         }),
         CellContent: ({ row }) => {
           if (row.__typename === "DowJonesRiskEntitySearchResultPerson") {
-            return <>{`${row.dateOfBirth?.year} `}</>;
+            const { year, month, day } = row.dateOfBirth ?? {};
+
+            return (
+              <>
+                {year && month && day
+                  ? intl.formatDate(new Date(year, month - 1, day), FORMATS.ll)
+                  : "-"}
+              </>
+            );
           } else {
             return <>{"-"}</>;
           }
@@ -244,7 +244,9 @@ function useDowJonesFactivaDataColumns() {
           defaultMessage: "Subsidiary",
         }),
         CellContent: ({ row: { isSubsidiary } }) => {
-          return <>{isSubsidiary ? "YEST" : "N/A"}</>;
+          return (
+            <>{isSubsidiary ? <FormattedMessage id="generic.yes" defaultMessage="Yes" /> : "N/A"}</>
+          );
         },
       },
       {
@@ -286,16 +288,27 @@ function DowJonesProfileDetails({ id, onGoBack }: DowJonesProfileDetailsProps) {
 
   const details = data?.dowJonesRiskEntityProfile;
 
-  const handleSanctionsRowClick = ({ sources }) => {
-    if (isDefined(sources[0])) {
-      openNewWindow(sources[0]);
+  const handleSanctionsRowClick = useCallback(function (
+    row: DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment,
+    event: MouseEvent
+  ) {
+    if (isDefined(row.sources[0])) {
+      openNewWindow(row.sources[0]);
     }
-  };
-  const handleRelationshipsRowClick = ({ profileId }) => {
-    refetch({
-      profileId: profileId,
-    });
-  };
+  },
+  []);
+
+  const handleRelationshipsRowClick = useCallback(function (
+    row: DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment,
+    event: MouseEvent
+  ) {
+    if (isDefined(row.profileId)) {
+      refetch({
+        profileId: row.profileId.toString(),
+      });
+    }
+  },
+  []);
 
   const sanctionsColumns = useDowJonesFactivaSanctionsColumns();
   const relationshipsColumns = useDowJonesFactivaRelationshipsColumns();
@@ -324,24 +337,25 @@ function DowJonesProfileDetails({ id, onGoBack }: DowJonesProfileDetailsProps) {
         <CardHeader>
           <HStack>
             {loading ? (
-              <Skeleton height="20px" />
+              <>
+                <Skeleton height="20px" width="100%" maxWidth="320px" endColor="gray.300" />
+                <Skeleton height="20px" width="50px" endColor="gray.300" />
+              </>
             ) : (
               <>
                 <Text fontSize="xl">{details?.name}</Text>
-                <Stack direction="row" lineHeight="1.5">
-                  {details?.iconHints?.map((item, i) => (
-                    <Badge key={i}>{item}</Badge>
-                  ))}
-                </Stack>
+                <IconHints hints={details?.iconHints ?? []} />
               </>
             )}
           </HStack>
         </CardHeader>
-        {details?.__typename === "DowJonesRiskEntityProfileResultEntity" ? (
+        {loading ? (
+          <Box height={"80px"}></Box>
+        ) : details?.__typename === "DowJonesRiskEntityProfileResultEntity" ? (
           <ProfileResultEntity data={details} />
-        ) : (
+        ) : details?.__typename === "DowJonesRiskEntityProfileResultPerson" ? (
           <ProfileResultPerson data={details} />
-        )}
+        ) : null}
       </Card>
 
       <Card>
@@ -410,28 +424,30 @@ function DowJonesProfileDetails({ id, onGoBack }: DowJonesProfileDetailsProps) {
         )}
       </Card>
 
-      <HStack justifyContent="space-between">
-        <Text>
-          <FormattedMessage
-            id="component.preview-factiva-table.results-obtained-on"
-            defaultMessage="Results obtained on {date}"
-            values={{
-              date: intl.formatDate(new Date(), FORMATS.FULL),
-            }}
-          />
-        </Text>
-        <Button
-          variant="ghost"
-          colorScheme="purple"
-          leftIcon={<DownloadIcon />}
-          onClick={() => downloadDowJonesProfilePdf(id)}
-        >
-          <FormattedMessage
-            id="component.preview-factiva-table.get-full-pdf"
-            defaultMessage="Get full PDF"
-          />
-        </Button>
-      </HStack>
+      {loading ? null : (
+        <HStack justifyContent="space-between">
+          <Text>
+            <FormattedMessage
+              id="component.preview-factiva-table.results-obtained-on"
+              defaultMessage="Results obtained on {date}"
+              values={{
+                date: intl.formatDate(new Date(), FORMATS.FULL),
+              }}
+            />
+          </Text>
+          <Button
+            variant="ghost"
+            colorScheme="purple"
+            leftIcon={<DownloadIcon />}
+            onClick={() => downloadDowJonesProfilePdf(id)}
+          >
+            <FormattedMessage
+              id="component.preview-factiva-table.get-full-pdf"
+              defaultMessage="Get full PDF"
+            />
+          </Button>
+        </HStack>
+      )}
     </Stack>
   );
 }
@@ -441,12 +457,15 @@ function ProfileResultPerson({ data }: { data: DowJonesRiskEntityProfileResultPe
 
   const { countries } = useLoadCountryNames(intl.locale);
 
-  const { placeOfBirth, citizenship, residence, jurisdiction, isDeceased } = data ?? {};
+  const { placeOfBirth, citizenship, residence, jurisdiction, isDeceased, dateOfBirth } =
+    data ?? {};
 
   const placeOfBirthCountryCode = placeOfBirth?.countryCode;
   const citizenshipCountryCode = citizenship?.countryCode;
   const residentCountryCode = residence?.countryCode;
   const jurisdictionCountryCode = jurisdiction?.countryCode;
+
+  const { year, month, day } = dateOfBirth ?? {};
 
   const birthFlag = placeOfBirthCountryCode ? (
     <Image
@@ -513,7 +532,7 @@ function ProfileResultPerson({ data }: { data: DowJonesRiskEntityProfileResultPe
         </Text>
         <HStack>
           {birthFlag}
-          <Text>{placeOfBirthCountryCode ? countries?.[placeOfBirthCountryCode] : ""}</Text>
+          <Text>{placeOfBirthCountryCode ? countries?.[placeOfBirthCountryCode] : "-"}</Text>
         </HStack>
       </Stack>
 
@@ -527,7 +546,7 @@ function ProfileResultPerson({ data }: { data: DowJonesRiskEntityProfileResultPe
         </Text>
         <HStack>
           {citizenshipFlag}
-          <Text>{citizenshipCountryCode ? countries?.[citizenshipCountryCode] : ""}</Text>
+          <Text>{citizenshipCountryCode ? countries?.[citizenshipCountryCode] : "-"}</Text>
         </HStack>
       </Stack>
 
@@ -541,7 +560,7 @@ function ProfileResultPerson({ data }: { data: DowJonesRiskEntityProfileResultPe
         </Text>
         <HStack>
           {residentFlag}
-          <Text>{residentCountryCode ? countries?.[residentCountryCode] : ""}</Text>
+          <Text>{residentCountryCode ? countries?.[residentCountryCode] : "-"}</Text>
         </HStack>
       </Stack>
 
@@ -555,7 +574,7 @@ function ProfileResultPerson({ data }: { data: DowJonesRiskEntityProfileResultPe
         </Text>
         <HStack>
           {jurisdictionFlag}
-          <Text>{jurisdictionCountryCode ? countries?.[jurisdictionCountryCode] : ""}</Text>
+          <Text>{jurisdictionCountryCode ? countries?.[jurisdictionCountryCode] : "-"}</Text>
         </HStack>
       </Stack>
 
@@ -569,7 +588,11 @@ function ProfileResultPerson({ data }: { data: DowJonesRiskEntityProfileResultPe
         </Text>
         <HStack>
           <FieldDateIcon />
-          <Text>7 de Octubre de 1952</Text>
+          <Text>
+            {year && month && day
+              ? intl.formatDate(new Date(year, month - 1, day), FORMATS.ll)
+              : "-"}
+          </Text>
         </HStack>
       </Stack>
 
@@ -594,6 +617,10 @@ function ProfileResultPerson({ data }: { data: DowJonesRiskEntityProfileResultPe
 }
 
 function ProfileResultEntity({ data }: { data: DowJonesRiskEntityProfileResultEntity }) {
+  const intl = useIntl();
+
+  const { year, month, day } = data.dateOfRegistration ?? {};
+
   const detailsSpanProps = {
     color: "gray.600",
     fontSize: "sm",
@@ -622,7 +649,11 @@ function ProfileResultEntity({ data }: { data: DowJonesRiskEntityProfileResultEn
         </Text>
         <HStack>
           <FieldDateIcon />
-          <Text>7 de Octubre de 1952</Text>
+          <Text>
+            {year && month && day
+              ? intl.formatDate(new Date(year, month - 1, day), FORMATS.ll)
+              : "-"}
+          </Text>
         </HStack>
       </Stack>
     </HStack>
@@ -651,9 +682,15 @@ function useDowJonesFactivaSanctionsColumns() {
           defaultMessage: "From",
         }),
         CellContent: ({ row: { fromDate } }) => {
-          const { year, month, day } = fromDate;
+          const { year, month, day } = fromDate ?? {};
 
-          return <>{`${year} ${month} ${day}`}</>;
+          return (
+            <>
+              {year && month && day
+                ? intl.formatDate(new Date(year, month - 1, day), FORMATS.ll)
+                : "-"}
+            </>
+          );
         },
       },
     ],
@@ -674,13 +711,7 @@ function useDowJonesFactivaRelationshipsColumns() {
             return <></>;
           }
 
-          return (
-            <Stack direction="row">
-              {iconHints.map((item, i) => (
-                <Badge key={i}>{item}</Badge>
-              ))}
-            </Stack>
-          );
+          return <IconHints hints={iconHints} />;
         },
       },
       {
@@ -739,6 +770,32 @@ function useDowJonesFactivaRelationshipsColumns() {
       },
     ],
     [intl.locale]
+  );
+}
+
+function IconHints({ hints }: { hints: string[] }) {
+  return (
+    <Stack direction="row">
+      {hints.map((item, i) => {
+        if (item.includes("PEP")) {
+          return (
+            <Badge colorScheme="green" key={i}>
+              {item}
+            </Badge>
+          );
+        }
+
+        if (item.includes("SAN")) {
+          return (
+            <Badge colorScheme="red" key={i}>
+              {item}
+            </Badge>
+          );
+        }
+
+        return <Badge key={i}>{item}</Badge>;
+      })}
+    </Stack>
   );
 }
 
