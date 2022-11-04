@@ -2759,46 +2759,6 @@ describe("GraphQL/Petitions", () => {
       expect(data).toBeNull();
     });
 
-    it("should not allow to add tags to the petition", async () => {
-      const [tag] = await mocks.createRandomTags(organization.id, 1);
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionId: GID!, $tagId: GID!) {
-            tagPetition(petitionId: $petitionId, tagId: $tagId) {
-              id
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", readonlyPetition.id),
-          tagId: toGlobalId("Tag", tag.id),
-        },
-      });
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
-
-    it("should not allow to remove tags from the petition", async () => {
-      const [tag] = await mocks.createRandomTags(organization.id, 1);
-      await mocks.tagPetitions([readonlyPetition.id], tag.id);
-
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionId: GID!, $tagId: GID!) {
-            untagPetition(petitionId: $petitionId, tagId: $tagId) {
-              id
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", readonlyPetition.id),
-          tagId: toGlobalId("Tag", tag.id),
-        },
-      });
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
-
     it("should not allow to edit field options", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
