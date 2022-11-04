@@ -182,6 +182,7 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
         }
       case "FILE_UPLOAD":
       case "ES_TAX_DOCUMENTS":
+      case "DOW_JONES_KYC_RESEARCH":
         if (replies.length > 1) {
           return replies.map((r) => ({ ...r.content, replyId: r.id, metadata: r.metadata }));
         } else {

@@ -9,7 +9,7 @@ export const IntegrationType = enumType({
 export const IOrgIntegration = interfaceType({
   name: "IOrgIntegration",
   definition(t) {
-    t.globalId("id");
+    t.globalId("id", { prefixName: "OrgIntegration" });
     t.string("name", {
       description: "Custom name of this integration, provided by the user",
     });

@@ -306,7 +306,6 @@ export type FeatureFlag =
   | "AUTO_ANONYMIZE"
   | "CUSTOM_HOST_UI"
   | "DEVELOPER_ACCESS"
-  | "DOW_JONES_KYC"
   | "ES_TAX_DOCUMENTS_FIELD"
   | "EXPORT_CUATRECASAS"
   | "GHOST_LOGIN"
@@ -569,6 +568,8 @@ export type Mutation = {
   createDowJonesFactivaIntegration: OrgIntegration;
   /** Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document */
   createDowJonesKycResearchReply: PetitionFieldReply;
+  /** Creates a task for downloading a PDF file with the profile of an entity in DowJones */
+  createDowJonesProfileDownloadTask: Task;
   /** Creates an event subscription for the user's petitions */
   createEventSubscription: PetitionEventSubscription;
   /** Creates a task for exporting an xlsx file with petition text replies and sends it to the queue */
@@ -950,6 +951,10 @@ export type MutationcreateDowJonesFactivaIntegrationArgs = {
 export type MutationcreateDowJonesKycResearchReplyArgs = {
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+  profileId: Scalars["ID"];
+};
+
+export type MutationcreateDowJonesProfileDownloadTaskArgs = {
   profileId: Scalars["ID"];
 };
 
