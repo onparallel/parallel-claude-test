@@ -8256,8 +8256,8 @@
   },
   {
     "term": "petitions.header.signature",
-    "definition": "Firma",
-    "context": "eSignature"
+    "definition": "Estado de la firma",
+    "context": "eSignature status"
   },
   {
     "term": "petitions.header.status",

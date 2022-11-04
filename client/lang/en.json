@@ -8256,8 +8256,8 @@
   },
   {
     "term": "petitions.header.signature",
-    "definition": "eSignature",
-    "context": "eSignature"
+    "definition": "eSignature status",
+    "context": "eSignature status"
   },
   {
     "term": "petitions.header.status",

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { Flex, HStack, IconButton, Text, VisuallyHidden } from "@chakra-ui/react";
-import { BellSettingsIcon, FolderIcon } from "@parallel/chakra/icons";
+import { Flex, HStack, IconButton, Text, Tooltip, VisuallyHidden } from "@chakra-ui/react";
+import { BellSettingsIcon, FolderIcon, SignatureIcon } from "@parallel/chakra/icons";
 import { CheckboxTableFilter } from "@parallel/components/common/CheckboxTableFilter";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { ContactReference } from "@parallel/components/common/ContactReference";
@@ -172,10 +172,16 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
               },
               {
                 key: "signature",
-                header: intl.formatMessage({
-                  id: "petitions.header.signature",
-                  defaultMessage: "eSignature",
-                }),
+                header: (
+                  <Tooltip
+                    label={intl.formatMessage({
+                      id: "petitions.header.signature",
+                      defaultMessage: "eSignature status",
+                    })}
+                  >
+                    <SignatureIcon />
+                  </Tooltip>
+                ),
                 isFilterable: true,
                 align: "center",
                 Filter: PetitionListSignatureStatusFilter,
