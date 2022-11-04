@@ -442,6 +442,7 @@ export interface NexusGenObjects {
   DowJonesRiskEntitySanction: {
     // root type
     fromDate: NexusGenRootTypes["DowJonesRiskEntityDate"]; // DowJonesRiskEntityDate!
+    id: number; // Int!
     name: string; // String!
     sources: string[]; // [String!]!
   };
@@ -1012,6 +1013,7 @@ export interface NexusGenFieldTypes {
   DowJonesRiskEntitySanction: {
     // field return type
     fromDate: NexusGenRootTypes["DowJonesRiskEntityDate"]; // DowJonesRiskEntityDate!
+    id: number; // Int!
     name: string; // String!
     sources: string[]; // [String!]!
   };
@@ -2699,6 +2701,7 @@ export interface NexusGenFieldTypeNames {
   DowJonesRiskEntitySanction: {
     // field return type name
     fromDate: "DowJonesRiskEntityDate";
+    id: "Int";
     name: "String";
     sources: "String";
   };

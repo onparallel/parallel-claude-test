@@ -282,6 +282,7 @@ type DowJonesRiskEntityRelationship {
 
 type DowJonesRiskEntitySanction {
   fromDate: DowJonesRiskEntityDate!
+  id: Int!
   name: String!
   sources: [String!]!
 }

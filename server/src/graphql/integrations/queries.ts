@@ -85,11 +85,14 @@ export const queries = queryField((t) => {
             result.data.attributes.person?.icon_hints ??
             result.data.attributes.entity?.icon_hints ??
             [],
-          sanctions: (result.data.attributes.list_reference?.sanctions_lists ?? []).map((s) => ({
-            name: s.name,
-            sources: s.sources,
-            fromDate: s.from_date,
-          })),
+          sanctions: (result.data.attributes.list_reference?.sanctions_lists ?? []).map(
+            (s, id) => ({
+              id,
+              name: s.name,
+              sources: s.sources,
+              fromDate: s.from_date,
+            })
+          ),
           relationships: (result.data.attributes.relationship?.connection_details ?? []).map(
             (r) => ({
               profileId: r.profile_id,

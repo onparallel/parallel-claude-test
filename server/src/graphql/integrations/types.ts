@@ -81,6 +81,7 @@ export const DowJonesRiskEntityDate = objectType({
 export const DowJonesRiskEntitySanction = objectType({
   name: "DowJonesRiskEntitySanction",
   definition(t) {
+    t.int("id");
     t.string("name");
     t.list.string("sources");
     t.field("fromDate", { type: "DowJonesRiskEntityDate" });
