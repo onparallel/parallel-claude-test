@@ -2253,7 +2253,7 @@ export class PetitionRepository extends BaseRepository {
       }
 
       // map[old field id] = cloned field id
-      const newIds = Object.fromEntries(
+      const newFieldIds = Object.fromEntries(
         zip(
           fields.map((f) => f.id),
           sortBy(clonedFields, (f) => f.position!).map((f) => f.id)
@@ -2262,14 +2262,9 @@ export class PetitionRepository extends BaseRepository {
 
       if (options?.cloneReplies) {
         // insert petition replies into cloned fields
-        await this.clonePetitionReplies(newIds, t);
+        const newReplyIds = await this.clonePetitionReplies(newFieldIds, t);
         // clone some petition events into new petition
-        await this.clonePetitionEvents(
-          petitionId,
-          cloned.id,
-          ["REPLY_CREATED", "REPLY_UPDATED", "REPLY_DELETED"],
-          t
-        );
+        await this.clonePetitionReplyEvents(petitionId, cloned.id, newFieldIds, newReplyIds, t);
       }
 
       const toUpdate = clonedFields.filter((f) => f.visibility);
@@ -2293,7 +2288,7 @@ export class PetitionRepository extends BaseRepository {
                     ...visibility,
                     conditions: visibility.conditions.map((condition) => ({
                       ...condition,
-                      fieldId: newIds[condition.fieldId],
+                      fieldId: newFieldIds[condition.fieldId],
                     })),
                   }),
                 ];
@@ -2307,7 +2302,7 @@ export class PetitionRepository extends BaseRepository {
 
       if (fields.length > 0) {
         // copy field attachments to new fields, making a copy of the file_upload
-        await this.cloneFieldAttachments(fields, newIds, t);
+        await this.cloneFieldAttachments(fields, newFieldIds, t);
       }
 
       return cloned;
@@ -2328,26 +2323,47 @@ export class PetitionRepository extends BaseRepository {
         },
       }));
 
-      await this.from("petition_field_reply", t).insert(
-        [...newFileReplies, ...otherReplies].map((r) => ({
+      const originalReplies = [...newFileReplies, ...otherReplies];
+      const newReplies = await this.from("petition_field_reply", t).insert(
+        originalReplies.map((r) => ({
           ...omit(r, ["id", "anonymized_at"]),
           petition_field_id: newFieldsMap[r.petition_field_id],
-        }))
+        })),
+        "*"
       );
+
+      return Object.fromEntries(
+        zip(
+          originalReplies.map((r) => r.id),
+          newReplies.map((r) => r.id)
+        )
+      );
+    } else {
+      return {};
     }
   }
 
-  private async clonePetitionEvents(
+  private async clonePetitionReplyEvents(
     fromPetitionId: number,
     toPetitionId: number,
-    types: PetitionEventType[],
+    fieldsMap: Record<string, number>,
+    repliesMap: Record<string, number>,
     t?: Knex.Transaction
   ) {
-    const events = await this.getPetitionEventsByType(fromPetitionId, types);
+    const events = await this.getPetitionEventsByType(fromPetitionId, [
+      "REPLY_CREATED",
+      "REPLY_UPDATED",
+      "REPLY_DELETED",
+    ]);
+
     if (events.length > 0) {
       await this.from("petition_event", t).insert(
         events.map((e) => ({
-          data: e.data,
+          data: {
+            ...e.data,
+            petition_field_id: fieldsMap[e.data.petition_field_id],
+            petition_field_reply_id: repliesMap[e.data.petition_field_reply_id],
+          },
           petition_id: toPetitionId,
           type: e.type,
           processed_at: e.created_at,
