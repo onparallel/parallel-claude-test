@@ -90,7 +90,7 @@ export const queries = queryField((t) => {
               id,
               name: s.name,
               sources: s.sources,
-              fromDate: s.from_date,
+              fromDate: s.from_date ?? null,
             })
           ),
           relationships: (result.data.attributes.relationship?.connection_details ?? []).map(

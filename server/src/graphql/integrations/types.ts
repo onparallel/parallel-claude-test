@@ -84,7 +84,7 @@ export const DowJonesRiskEntitySanction = objectType({
     t.int("id");
     t.string("name");
     t.list.string("sources");
-    t.field("fromDate", { type: "DowJonesRiskEntityDate" });
+    t.nullable.field("fromDate", { type: "DowJonesRiskEntityDate" });
   },
 });
 

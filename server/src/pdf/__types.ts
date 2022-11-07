@@ -247,7 +247,8 @@ export type DowJonesRiskEntityRelationship = {
 };
 
 export type DowJonesRiskEntitySanction = {
-  fromDate: DowJonesRiskEntityDate;
+  fromDate: Maybe<DowJonesRiskEntityDate>;
+  id: Scalars["Int"];
   name: Scalars["String"];
   sources: Array<Scalars["String"]>;
 };
@@ -306,6 +307,7 @@ export type FeatureFlag =
   | "AUTO_ANONYMIZE"
   | "CUSTOM_HOST_UI"
   | "DEVELOPER_ACCESS"
+  | "DOW_JONES_KYC"
   | "ES_TAX_DOCUMENTS_FIELD"
   | "EXPORT_CUATRECASAS"
   | "GHOST_LOGIN"
@@ -3247,7 +3249,7 @@ export type QuerycontactsByEmailArgs = {
 };
 
 export type QuerydowJonesRiskEntityProfileArgs = {
-  profileId: Scalars["String"];
+  profileId: Scalars["ID"];
 };
 
 export type QuerydowJonesRiskEntitySearchArgs = {
@@ -3713,6 +3715,7 @@ export type Task = {
 };
 
 export type TaskName =
+  | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
   | "PRINT_PDF"

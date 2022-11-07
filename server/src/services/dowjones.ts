@@ -83,7 +83,7 @@ type RiskEntityProfileResult = {
         sanctions_lists: {
           name: string;
           sources: string[];
-          from_date: RiskEntityDate;
+          from_date?: RiskEntityDate;
         }[];
       };
       relationship?: {

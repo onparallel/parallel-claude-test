@@ -269,7 +269,7 @@ export interface DowJonesRiskEntityRelationship {
 
 export interface DowJonesRiskEntitySanction {
   __typename?: "DowJonesRiskEntitySanction";
-  fromDate: DowJonesRiskEntityDate;
+  fromDate?: Maybe<DowJonesRiskEntityDate>;
   id: Scalars["Int"];
   name: Scalars["String"];
   sources: Array<Scalars["String"]>;
@@ -10293,12 +10293,12 @@ export type DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment = {
   id: number;
   name: string;
   sources: Array<string>;
-  fromDate: {
+  fromDate?: {
     __typename?: "DowJonesRiskEntityDate";
     year?: number | null;
     month?: number | null;
     day?: number | null;
-  };
+  } | null;
 };
 
 export type DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment = {
@@ -10328,12 +10328,12 @@ export type DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskE
       id: number;
       name: string;
       sources: Array<string>;
-      fromDate: {
+      fromDate?: {
         __typename?: "DowJonesRiskEntityDate";
         year?: number | null;
         month?: number | null;
         day?: number | null;
-      };
+      } | null;
     }>;
     relationships: Array<{
       __typename?: "DowJonesRiskEntityRelationship";
@@ -10384,12 +10384,12 @@ export type DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskE
       id: number;
       name: string;
       sources: Array<string>;
-      fromDate: {
+      fromDate?: {
         __typename?: "DowJonesRiskEntityDate";
         year?: number | null;
         month?: number | null;
         day?: number | null;
-      };
+      } | null;
     }>;
     relationships: Array<{
       __typename?: "DowJonesRiskEntityRelationship";
@@ -10428,12 +10428,12 @@ export type DowJonesProfileDetails_dowJonesRiskEntityProfileQuery = {
           id: number;
           name: string;
           sources: Array<string>;
-          fromDate: {
+          fromDate?: {
             __typename?: "DowJonesRiskEntityDate";
             year?: number | null;
             month?: number | null;
             day?: number | null;
-          };
+          } | null;
         }>;
         relationships: Array<{
           __typename?: "DowJonesRiskEntityRelationship";
@@ -10482,12 +10482,12 @@ export type DowJonesProfileDetails_dowJonesRiskEntityProfileQuery = {
           id: number;
           name: string;
           sources: Array<string>;
-          fromDate: {
+          fromDate?: {
             __typename?: "DowJonesRiskEntityDate";
             year?: number | null;
             month?: number | null;
             day?: number | null;
-          };
+          } | null;
         }>;
         relationships: Array<{
           __typename?: "DowJonesRiskEntityRelationship";
