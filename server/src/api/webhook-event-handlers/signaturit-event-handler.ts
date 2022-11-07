@@ -77,26 +77,24 @@ async function documentOpened(ctx: ApiContext, data: SignaturItEventBody, petiti
   const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
   const [signer, signerIndex] = findSigner(signature!.signature_config.signersInfo, data.document);
 
-  await Promise.all([
-    ctx.petitions.updatePetitionSignatureByExternalId(signature.external_id!, {
-      signer_status: {
-        ...signature.signer_status,
-        [signerIndex]: {
-          ...signature.signer_status[signerIndex],
-          opened_at: new Date(data.created_at),
-        },
+  await ctx.petitions.updatePetitionSignatureByExternalId(signature.external_id!, {
+    signer_status: {
+      ...signature.signer_status,
+      [signerIndex]: {
+        ...signature.signer_status[signerIndex],
+        opened_at: new Date(data.created_at),
       },
-    }),
-    ctx.petitions.createEvent({
-      type: "SIGNATURE_OPENED",
-      petition_id: petitionId,
-      data: {
-        signer,
-        petition_signature_request_id: signature!.id,
-      },
-    }),
-    appendEventLogs(ctx, data),
-  ]);
+    },
+  });
+  await ctx.petitions.createEvent({
+    type: "SIGNATURE_OPENED",
+    petition_id: petitionId,
+    data: {
+      signer,
+      petition_signature_request_id: signature!.id,
+    },
+  });
+  await appendEventLogs(ctx, data);
 }
 
 /** the document was signed by any of the assigned signers */
@@ -107,8 +105,9 @@ async function documentSigned(ctx: ApiContext, data: SignaturItEventBody, petiti
 
   const [signer, signerIndex] = findSigner(signature!.signature_config.signersInfo, data.document);
 
-  await Promise.all([
-    ctx.petitions.updatePetitionSignatureByExternalId(`SIGNATURIT/${data.document.signature.id}`, {
+  await ctx.petitions.updatePetitionSignatureByExternalId(
+    `SIGNATURIT/${data.document.signature.id}`,
+    {
       signer_status: {
         ...signature!.signer_status,
         [signerIndex]: {
@@ -116,17 +115,17 @@ async function documentSigned(ctx: ApiContext, data: SignaturItEventBody, petiti
           signed_at: new Date(data.created_at),
         },
       },
-    }),
-    ctx.petitions.createEvent({
-      type: "RECIPIENT_SIGNED",
-      petition_id: petitionId,
-      data: {
-        signer,
-        petition_signature_request_id: signature!.id,
-      },
-    }),
-    appendEventLogs(ctx, data),
-  ]);
+    }
+  );
+  await ctx.petitions.createEvent({
+    type: "RECIPIENT_SIGNED",
+    petition_id: petitionId,
+    data: {
+      signer,
+      petition_signature_request_id: signature!.id,
+    },
+  });
+  await appendEventLogs(ctx, data);
 }
 
 /** signer declined the document. Whole signature process will be cancelled */
@@ -137,26 +136,24 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
     data.document
   );
 
-  await Promise.all([
-    ctx.petitions.cancelPetitionSignatureRequest(
-      signature,
-      "DECLINED_BY_SIGNER",
-      {
-        canceller,
-        decline_reason: data.document.decline_reason,
-      },
-      {
-        signer_status: {
-          ...signature.signer_status,
-          [cancellerIndex]: {
-            ...signature.signer_status[cancellerIndex],
-            declined_at: new Date(data.created_at),
-          },
+  await ctx.petitions.cancelPetitionSignatureRequest(
+    signature,
+    "DECLINED_BY_SIGNER",
+    {
+      canceller,
+      decline_reason: data.document.decline_reason,
+    },
+    {
+      signer_status: {
+        ...signature.signer_status,
+        [cancellerIndex]: {
+          ...signature.signer_status[cancellerIndex],
+          declined_at: new Date(data.created_at),
         },
-      }
-    ),
-    appendEventLogs(ctx, data),
-  ]);
+      },
+    }
+  );
+  await appendEventLogs(ctx, data);
 }
 /** signed document has been completed and is ready to be downloaded */
 async function documentCompleted(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
@@ -188,26 +185,30 @@ async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, p
 async function emailDelivered(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
   const signature = await fetchPetitionSignature(data.document.signature.id, ctx);
   const [, signerIndex] = findSigner(signature.signature_config.signersInfo, data.document);
-  await Promise.all([
-    ctx.petitions.updatePetitionSignatureByExternalId(signature.external_id!, {
-      signer_status: {
-        ...signature.signer_status,
-        [signerIndex]: {
-          ...signature.signer_status[signerIndex],
-          sent_at: new Date(data.created_at),
-        },
+  await ctx.petitions.updatePetitionSignatureByExternalId(signature.external_id!, {
+    signer_status: {
+      ...signature.signer_status,
+      [signerIndex]: {
+        ...signature.signer_status[signerIndex],
+        sent_at: new Date(data.created_at),
       },
-    }),
-    updateSignatureStartedEvent(petitionId, { email_delivered_at: new Date(data.created_at) }, ctx),
-    appendEventLogs(ctx, data),
-  ]);
+    },
+  });
+  await updateSignatureStartedEvent(
+    petitionId,
+    { email_delivered_at: new Date(data.created_at) },
+    ctx
+  );
+  await appendEventLogs(ctx, data);
 }
 
 async function emailOpened(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
-  await Promise.all([
-    updateSignatureStartedEvent(petitionId, { email_opened_at: new Date(data.created_at) }, ctx),
-    appendEventLogs(ctx, data),
-  ]);
+  await updateSignatureStartedEvent(
+    petitionId,
+    { email_opened_at: new Date(data.created_at) },
+    ctx
+  );
+  await appendEventLogs(ctx, data);
 }
 
 async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
@@ -228,19 +229,21 @@ async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petition
   };
 
   const [, signerIndex] = findSigner(signature.signature_config.signersInfo, data.document);
-  await Promise.all([
-    ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData, {
-      signer_status: {
-        ...signature.signer_status,
-        [signerIndex]: {
-          ...signature.signer_status[signerIndex],
-          bounced_at: new Date(data.created_at),
-        },
+  await ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData, {
+    signer_status: {
+      ...signature.signer_status,
+      [signerIndex]: {
+        ...signature.signer_status[signerIndex],
+        bounced_at: new Date(data.created_at),
       },
-    }),
-    updateSignatureStartedEvent(petitionId, { email_bounced_at: new Date(data.created_at) }, ctx),
-    appendEventLogs(ctx, data),
-  ]);
+    },
+  });
+  await updateSignatureStartedEvent(
+    petitionId,
+    { email_bounced_at: new Date(data.created_at) },
+    ctx
+  );
+  await appendEventLogs(ctx, data);
 }
 
 async function fetchPetitionSignature(signatureId: string, ctx: ApiContext) {

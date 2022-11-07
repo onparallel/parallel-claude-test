@@ -237,28 +237,26 @@ async function storeSignedDocument(
     ctx
   );
 
-  await Promise.all([
-    ctx.emails.sendPetitionCompletedEmail(petition.id, {
-      signer: payload.signer,
-    }),
-    ctx.petitions.createEvent({
-      type: "SIGNATURE_COMPLETED",
-      petition_id: petition.id,
-      data: {
-        petition_signature_request_id: payload.petitionSignatureRequestId,
-        file_upload_id: signedDocument.id,
-      },
-    }),
-    ctx.petitions.updatePetitionSignature(payload.petitionSignatureRequestId, {
-      status: "COMPLETED",
+  await ctx.emails.sendPetitionCompletedEmail(petition.id, {
+    signer: payload.signer,
+  });
+  await ctx.petitions.createEvent({
+    type: "SIGNATURE_COMPLETED",
+    petition_id: petition.id,
+    data: {
+      petition_signature_request_id: payload.petitionSignatureRequestId,
       file_upload_id: signedDocument.id,
-    }),
-    ctx.petitions.updatePetition(
-      petition.id,
-      { signature_config: null }, // when completed, set signature_config to null so the signatures card on replies page don't show a "pending start" row
-      `OrgIntegration:${signaturitIntegration.id}`
-    ),
-  ]);
+    },
+  });
+  await ctx.petitions.updatePetitionSignature(payload.petitionSignatureRequestId, {
+    status: "COMPLETED",
+    file_upload_id: signedDocument.id,
+  });
+  await ctx.petitions.updatePetition(
+    petition.id,
+    { signature_config: null }, // when completed, set signature_config to null so the signatures card on replies page don't show a "pending start" row
+    `OrgIntegration:${signaturitIntegration.id}`
+  );
 }
 
 async function storeAuditTrail(
