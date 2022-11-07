@@ -1268,31 +1268,30 @@ export class PetitionRepository extends BaseRepository {
         t
       );
 
-      await Promise.all([
-        this.insert(
-          "petition_permission",
-          {
-            petition_id: petition.id,
-            user_id: user.id,
-            created_by: `User:${user.id}`,
-            updated_by: `User:${user.id}`,
-          },
-          t
-        ),
-        this.insert(
-          "petition_field",
-          (["HEADING", "SHORT_TEXT"] as PetitionFieldType[]).map((type, index) => ({
-            ...defaultFieldOptions(type),
-            petition_id: petition.id,
-            type,
-            is_fixed: type === "HEADING",
-            position: index,
-            created_by: `User:${user.id}`,
-            updated_by: `User:${user.id}`,
-          })),
-          t
-        ),
-      ]);
+      await this.insert(
+        "petition_permission",
+        {
+          petition_id: petition.id,
+          user_id: user.id,
+          created_by: `User:${user.id}`,
+          updated_by: `User:${user.id}`,
+        },
+        t
+      );
+
+      await this.insert(
+        "petition_field",
+        (["HEADING", "SHORT_TEXT"] as PetitionFieldType[]).map((type, index) => ({
+          ...defaultFieldOptions(type),
+          petition_id: petition.id,
+          type,
+          is_fixed: type === "HEADING",
+          position: index,
+          created_by: `User:${user.id}`,
+          updated_by: `User:${user.id}`,
+        })),
+        t
+      );
 
       return petition;
     });
@@ -2188,10 +2187,10 @@ export class PetitionRepository extends BaseRepository {
       );
 
       const fields = await this.loadFieldsForPetition(petitionId);
-      const [clonedFields] = await Promise.all([
+      const clonedFields =
         fields.length === 0
           ? []
-          : this.insert(
+          : await this.insert(
               "petition_field",
               fields.map((field) => ({
                 ...omit(field, ["id", "petition_id", "created_at", "updated_at"]),
@@ -2201,53 +2200,57 @@ export class PetitionRepository extends BaseRepository {
                 updated_by: createdBy,
               })),
               t
-            ).returning("*"),
+            ).returning("*");
+
+      if (options?.insertPermissions ?? true) {
         // copy permissions
-        options?.insertPermissions ?? true
-          ? this.insert(
-              "petition_permission",
-              {
-                petition_id: cloned.id,
-                user_id: owner.id,
-                type: "OWNER",
-                // if cloning a petition clone, the is_subscribed from the original
-                is_subscribed: sourcePetition!.is_template
-                  ? true
-                  : userPermissions.find((p) => p.user_id === owner.id)?.is_subscribed ?? true,
-                created_by: createdBy,
-                updated_by: createdBy,
-              },
-              t
-            )
-          : null,
+        await this.insert(
+          "petition_permission",
+          {
+            petition_id: cloned.id,
+            user_id: owner.id,
+            type: "OWNER",
+            // if cloning a petition clone, the is_subscribed from the original
+            is_subscribed: sourcePetition!.is_template
+              ? true
+              : userPermissions.find((p) => p.user_id === owner.id)?.is_subscribed ?? true,
+            created_by: createdBy,
+            updated_by: createdBy,
+          },
+          t
+        );
+      }
+
+      if (sourcePetition?.org_id === owner.org_id) {
         // clone tags if source petition is from same org
-        sourcePetition?.org_id === owner.org_id
-          ? this.raw(
-              /* sql */ `
-              insert into petition_tag (petition_id, tag_id, created_by)
-              select ?, tag_id, ? from petition_tag where petition_id = ?
-            `,
-              [cloned.id, createdBy, petitionId],
-              t
-            )
-          : [],
-        // clone default permissions if source petition is from same org
-        // and we are creating a template from another template
+        await this.raw(
+          /* sql */ `
+            insert into petition_tag (petition_id, tag_id, created_by)
+            select ?, tag_id, ? from petition_tag where petition_id = ?
+          `,
+          [cloned.id, createdBy, petitionId],
+          t
+        );
+      }
+
+      if (
         sourcePetition?.org_id === owner.org_id &&
         sourcePetition.is_template &&
         (data.is_template === undefined || data.is_template === true)
-          ? this.raw(
-              /* sql */ `
-              insert into template_default_permission (
-                template_id, "type", user_id, user_group_id, is_subscribed, created_by, updated_by)
-              select ?, "type", user_id, user_group_id, is_subscribed, ?, ?
-                from template_default_permission where template_id = ? and deleted_at is null
-            `,
-              [cloned.id, createdBy, createdBy, petitionId],
-              t
-            )
-          : [],
-      ]);
+      ) {
+        // clone default permissions if source petition is from same org
+        // and we are creating a template from another template
+        await this.raw(
+          /* sql */ `
+            insert into template_default_permission (
+              template_id, "type", user_id, user_group_id, is_subscribed, created_by, updated_by)
+            select ?, "type", user_id, user_group_id, is_subscribed, ?, ?
+              from template_default_permission where template_id = ? and deleted_at is null
+          `,
+          [cloned.id, createdBy, createdBy, petitionId],
+          t
+        );
+      }
 
       // map[old field id] = cloned field id
       const newIds = Object.fromEntries(
@@ -2258,55 +2261,54 @@ export class PetitionRepository extends BaseRepository {
       );
 
       if (options?.cloneReplies) {
-        await Promise.all([
-          // insert petition replies into cloned fields
-          this.clonePetitionReplies(newIds, t),
-          // clone some petition events into new petition
-          this.clonePetitionEvents(
-            petitionId,
-            cloned.id,
-            ["REPLY_CREATED", "REPLY_UPDATED", "REPLY_DELETED"],
-            t
-          ),
-        ]);
+        // insert petition replies into cloned fields
+        await this.clonePetitionReplies(newIds, t);
+        // clone some petition events into new petition
+        await this.clonePetitionEvents(
+          petitionId,
+          cloned.id,
+          ["REPLY_CREATED", "REPLY_UPDATED", "REPLY_DELETED"],
+          t
+        );
       }
 
       const toUpdate = clonedFields.filter((f) => f.visibility);
-      await Promise.all([
+      if (toUpdate.length > 0) {
         // update visibility conditions on cloned fields
-        toUpdate.length > 0
-          ? this.raw<PetitionField>(
-              /* sql */ `
-            update petition_field as pf set
-              visibility = t.visibility
-            from (?) as t (id, visibility)
-            where t.id = pf.id
-            returning *;
-          `,
-              [
-                this.sqlValues(
-                  toUpdate.map((field) => {
-                    const visibility = field.visibility as PetitionFieldVisibility;
-                    return [
-                      field.id,
-                      JSON.stringify({
-                        ...visibility,
-                        conditions: visibility.conditions.map((condition) => ({
-                          ...condition,
-                          fieldId: newIds[condition.fieldId],
-                        })),
-                      }),
-                    ];
+        await this.raw<PetitionField>(
+          /* sql */ `
+          update petition_field as pf set
+            visibility = t.visibility
+          from (?) as t (id, visibility)
+          where t.id = pf.id
+          returning *;
+        `,
+          [
+            this.sqlValues(
+              toUpdate.map((field) => {
+                const visibility = field.visibility as PetitionFieldVisibility;
+                return [
+                  field.id,
+                  JSON.stringify({
+                    ...visibility,
+                    conditions: visibility.conditions.map((condition) => ({
+                      ...condition,
+                      fieldId: newIds[condition.fieldId],
+                    })),
                   }),
-                  ["int", "jsonb"]
-                ),
-              ],
-              t
-            )
-          : [],
+                ];
+              }),
+              ["int", "jsonb"]
+            ),
+          ],
+          t
+        );
+      }
+
+      if (fields.length > 0) {
         // copy field attachments to new fields, making a copy of the file_upload
-        fields.length > 0 ? this.cloneFieldAttachments(fields, newIds, t) : [],
-      ]);
+        await this.cloneFieldAttachments(fields, newIds, t);
+      }
 
       return cloned;
     }, t);
@@ -3530,82 +3532,86 @@ export class PetitionRepository extends BaseRepository {
     return await this.withTransaction(async (t) => {
       const permissionType =
         newUsers.length > 0 ? newUsers[0].permissionType : newUserGroups[0].permissionType;
-      const [newUserPermissions, newGroupPermissions, groupAssignedNewUserPermissions] =
-        await Promise.all([
-          newUsers.length > 0
-            ? this.raw<PetitionPermission>(
-                /* sql */ `
-               ? on conflict (petition_id, user_id)
-               where deleted_at is null and from_user_group_id is null and user_group_id is null 
-                  do update set
-                  type = ?,
-                  updated_by = ?,
-                  updated_at = ?,
-                  deleted_by = null,
-                  deleted_at = null where petition_permission.type > ?
-                returning *;
-              `,
-                [
-                  // directly-assigned user permissions
-                  this.from("petition_permission").insert(
-                    petitionIds.flatMap((petitionId) =>
-                      newUsers.map((user) => ({
-                        petition_id: petitionId,
-                        user_id: user.id,
-                        is_subscribed: user.isSubscribed,
-                        type: user.permissionType,
-                        created_by: createdBy,
-                        updated_by: createdBy,
-                      }))
-                    )
-                  ),
-                  permissionType,
-                  createdBy,
-                  this.now(),
-                  permissionType,
-                ],
-                t
-              )
-            : [],
-          newUserGroups.length > 0
-            ? this.raw<PetitionPermission>(
-                /* sql */ `
-                ? on conflict (petition_id, user_group_id)
-                where deleted_at is null and user_group_id is not null
-                  do update set
-                  type = ?,
-                  updated_by = ?,
-                  updated_at = ?,
-                  deleted_by = null,
-                  deleted_at = null  where petition_permission.type > ?
-                returning *;
-              `,
-                [
-                  // group permissions
-                  this.from("petition_permission").insert(
-                    petitionIds.flatMap((petitionId) =>
-                      newUserGroups.map((userGroup) => ({
-                        petition_id: petitionId,
-                        user_group_id: userGroup.id,
-                        is_subscribed: userGroup.isSubscribed,
-                        type: userGroup.permissionType,
-                        created_by: createdBy,
-                        updated_by: createdBy,
-                      }))
-                    )
-                  ),
-                  permissionType,
-                  createdBy,
-                  this.now(),
-                  permissionType,
-                ],
-                t
-              )
-            : [],
-          // user permissions through a user group
-          newUserGroups.length > 0
-            ? this.raw<PetitionPermission>(
-                /* sql */ `
+
+      const newUserPermissions =
+        newUsers.length > 0
+          ? await this.raw<PetitionPermission>(
+              /* sql */ `
+         ? on conflict (petition_id, user_id)
+         where deleted_at is null and from_user_group_id is null and user_group_id is null 
+            do update set
+            type = ?,
+            updated_by = ?,
+            updated_at = ?,
+            deleted_by = null,
+            deleted_at = null where petition_permission.type > ?
+          returning *;
+        `,
+              [
+                // directly-assigned user permissions
+                this.from("petition_permission").insert(
+                  petitionIds.flatMap((petitionId) =>
+                    newUsers.map((user) => ({
+                      petition_id: petitionId,
+                      user_id: user.id,
+                      is_subscribed: user.isSubscribed,
+                      type: user.permissionType,
+                      created_by: createdBy,
+                      updated_by: createdBy,
+                    }))
+                  )
+                ),
+                permissionType,
+                createdBy,
+                this.now(),
+                permissionType,
+              ],
+              t
+            )
+          : [];
+
+      const newGroupPermissions =
+        newUserGroups.length > 0
+          ? await this.raw<PetitionPermission>(
+              /* sql */ `
+              ? on conflict (petition_id, user_group_id)
+              where deleted_at is null and user_group_id is not null
+                do update set
+                type = ?,
+                updated_by = ?,
+                updated_at = ?,
+                deleted_by = null,
+                deleted_at = null  where petition_permission.type > ?
+              returning *;
+            `,
+              [
+                // group permissions
+                this.from("petition_permission").insert(
+                  petitionIds.flatMap((petitionId) =>
+                    newUserGroups.map((userGroup) => ({
+                      petition_id: petitionId,
+                      user_group_id: userGroup.id,
+                      is_subscribed: userGroup.isSubscribed,
+                      type: userGroup.permissionType,
+                      created_by: createdBy,
+                      updated_by: createdBy,
+                    }))
+                  )
+                ),
+                permissionType,
+                createdBy,
+                this.now(),
+                permissionType,
+              ],
+              t
+            )
+          : [];
+
+      // user permissions through a user group
+      const groupAssignedNewUserPermissions =
+        newUserGroups.length > 0
+          ? await this.raw<PetitionPermission>(
+              /* sql */ `
               with gm as (
                 select ugm.user_id, ugm.user_group_id, ugm_info.is_subscribed, ugm_info.permission_type
                 from user_group_member ugm
@@ -3622,26 +3628,25 @@ export class PetitionRepository extends BaseRepository {
               from gm cross join p
               on conflict do nothing returning *;
             `,
-                [
-                  this.sqlValues(
-                    newUserGroups.map((ug) => [ug.id, ug.isSubscribed, ug.permissionType]),
-                    ["int", "bool", "petition_permission_type"]
-                  ),
-                  this.sqlIn(
-                    newUserGroups.map((ug) => ug.id),
-                    "int"
-                  ),
-                  this.sqlValues(
-                    petitionIds.map((id) => [id]),
-                    ["int"]
-                  ),
-                  createdBy,
-                  createdBy,
-                ],
-                t
-              )
-            : [],
-        ]);
+              [
+                this.sqlValues(
+                  newUserGroups.map((ug) => [ug.id, ug.isSubscribed, ug.permissionType]),
+                  ["int", "bool", "petition_permission_type"]
+                ),
+                this.sqlIn(
+                  newUserGroups.map((ug) => ug.id),
+                  "int"
+                ),
+                this.sqlValues(
+                  petitionIds.map((id) => [id]),
+                  ["int"]
+                ),
+                createdBy,
+                createdBy,
+              ],
+              t
+            )
+          : [];
 
       for (const petitionId of petitionIds) {
         this.loadUserPermissionsByPetitionId.dataloader.clear(petitionId);
