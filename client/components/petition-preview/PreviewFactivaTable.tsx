@@ -1,4 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Badge,
   Box,
@@ -16,6 +16,8 @@ import {
 import {
   ArrowBackIcon,
   BusinessIcon,
+  CheckIcon,
+  DeleteIcon,
   DownloadIcon,
   FieldDateIcon,
   SaveIcon,
@@ -28,8 +30,11 @@ import {
   DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment,
   DowJonesRiskEntityProfileResultEntity,
   DowJonesRiskEntityProfileResultPerson,
+  PreviewFactivaTable_createDowJonesKycResearchReplyDocument,
+  PreviewFactivaTable_deletePetitionFieldReplyDocument,
   PreviewFactivaTable_dowJonesRiskEntitySearchDocument,
   PreviewFactivaTable_DowJonesRiskEntitySearchResultFragment,
+  PreviewFactivaTable_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { FORMATS } from "@parallel/utils/dates";
@@ -51,14 +56,26 @@ const QUERY_STATE = {
 
 type FactivaSelection = PreviewFactivaTable_DowJonesRiskEntitySearchResultFragment;
 
+type DowJonesFactivaDataColumnsContext = {
+  petitionId: string;
+  fieldId: string;
+  replies: PreviewFactivaTable_PetitionFieldReplyFragment[];
+};
+
 export function PreviewFactivaTable({
   name,
   date,
+  petitionId,
+  fieldId,
   onResetClick,
+  replies,
 }: {
   name: string;
   date: string;
   onResetClick: () => void;
+  petitionId: string;
+  fieldId: string;
+  replies: PreviewFactivaTable_PetitionFieldReplyFragment[];
 }) {
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const [profileId, setProfileId] = useState<string | null>(null);
@@ -107,6 +124,7 @@ export function PreviewFactivaTable({
       <TablePage
         isHighlightable
         columns={columns}
+        context={{ petitionId, fieldId, replies }}
         rows={result?.items}
         rowKeyProp="id"
         page={state.page}
@@ -181,7 +199,7 @@ export function PreviewFactivaTable({
 function useDowJonesFactivaDataColumns() {
   const intl = useIntl();
 
-  return useMemo<TableColumn<FactivaSelection>[]>(
+  return useMemo<TableColumn<FactivaSelection, DowJonesFactivaDataColumnsContext>[]>(
     () => [
       {
         key: "tags",
@@ -277,18 +295,65 @@ function useDowJonesFactivaDataColumns() {
       {
         key: "actions",
         header: "",
-        CellContent: ({ row }) => {
+        CellContent: ({ row, context }) => {
+          const [createDowJonesKycResearchReply, { loading: isSavingProfile }] = useMutation(
+            PreviewFactivaTable_createDowJonesKycResearchReplyDocument
+          );
+          const [deletePetitionFieldReply] = useMutation(
+            PreviewFactivaTable_deletePetitionFieldReplyDocument
+          );
+          const profileReply = context.replies.find((r) => r.content.entity.profileId === row.id);
+          const handleSaveClick = async () => {
+            await createDowJonesKycResearchReply({
+              variables: {
+                profileId: row.id,
+                petitionId: context.petitionId,
+                fieldId: context.fieldId,
+              },
+            });
+          };
+          const handleDeleteClick = async () => {
+            await deletePetitionFieldReply({
+              variables: {
+                petitionId: context.petitionId,
+                replyId: profileReply!.id,
+              },
+            });
+          };
           return (
             <Flex justifyContent="end">
-              <Button
-                variant="solid"
-                colorScheme="purple"
-                leftIcon={<SaveIcon />}
-                size="sm"
-                fontSize="md"
-              >
-                <FormattedMessage id="generic.save" defaultMessage="Save" />
-              </Button>
+              {!!profileReply ? (
+                <HStack>
+                  <CheckIcon color="green.500" />
+                  <Text fontWeight={500}>
+                    <FormattedMessage id="generic.saved" defaultMessage="Guardado" />
+                  </Text>
+                  <IconButtonWithTooltip
+                    size="sm"
+                    label="Eliminar"
+                    icon={<DeleteIcon />}
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick();
+                    }}
+                  />
+                </HStack>
+              ) : (
+                <Button
+                  size="sm"
+                  isLoading={isSavingProfile}
+                  variant="solid"
+                  colorScheme="purple"
+                  leftIcon={<SaveIcon />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSaveClick();
+                  }}
+                >
+                  <FormattedMessage id="generic.save" defaultMessage="Save" />
+                </Button>
+              )}
             </Flex>
           );
         },
@@ -975,6 +1040,14 @@ PreviewFactivaTable.fragments = {
       }
     `;
   },
+  get PetitionFieldReply() {
+    return gql`
+      fragment PreviewFactivaTable_PetitionFieldReply on PetitionFieldReply {
+        id
+        content
+      }
+    `;
+  },
 };
 
 PreviewFactivaTable.queries = [
@@ -998,5 +1071,41 @@ PreviewFactivaTable.queries = [
       }
     }
     ${PreviewFactivaTable.fragments.DowJonesRiskEntitySearchResult}
+  `,
+];
+
+const _mutations = [
+  gql`
+    mutation PreviewFactivaTable_createDowJonesKycResearchReply(
+      $petitionId: GID!
+      $fieldId: GID!
+      $profileId: ID!
+    ) {
+      createDowJonesKycResearchReply(
+        petitionId: $petitionId
+        fieldId: $fieldId
+        profileId: $profileId
+      ) {
+        id
+        field {
+          id
+          replies {
+            id
+            content
+          }
+        }
+      }
+    }
+  `,
+  gql`
+    mutation PreviewFactivaTable_deletePetitionFieldReply($petitionId: GID!, $replyId: GID!) {
+      deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+        id
+        replies {
+          id
+          content
+        }
+      }
+    }
   `,
 ];

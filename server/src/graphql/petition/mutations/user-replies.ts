@@ -459,6 +459,7 @@ export const createDowJonesKycResearchReply = mutationField("createDowJonesKycRe
           content: {
             file_upload_id: fileUpload.id,
             entity: {
+              profileId: args.profileId,
               type: dowJonesProfile.data.attributes.basic.type,
               name: ctx.dowJonesKyc.entityFullName(
                 dowJonesProfile.data.attributes.basic.name_details.primary_name

@@ -10535,6 +10535,12 @@ export type PreviewFactivaTable_DowJonesRiskEntitySearchResultFragment =
   | PreviewFactivaTable_DowJonesRiskEntitySearchResult_DowJonesRiskEntitySearchResultEntity_Fragment
   | PreviewFactivaTable_DowJonesRiskEntitySearchResult_DowJonesRiskEntitySearchResultPerson_Fragment;
 
+export type PreviewFactivaTable_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  id: string;
+  content: { [key: string]: any };
+};
+
 export type PreviewFactivaTable_dowJonesRiskEntitySearchQueryVariables = Exact<{
   offset?: InputMaybe<Scalars["Int"]>;
   limit?: InputMaybe<Scalars["Int"]>;
@@ -10575,6 +10581,45 @@ export type PreviewFactivaTable_dowJonesRiskEntitySearchQuery = {
           } | null;
         }
     >;
+  };
+};
+
+export type PreviewFactivaTable_createDowJonesKycResearchReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  profileId: Scalars["ID"];
+}>;
+
+export type PreviewFactivaTable_createDowJonesKycResearchReplyMutation = {
+  createDowJonesKycResearchReply: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    field?: {
+      __typename?: "PetitionField";
+      id: string;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    } | null;
+  };
+};
+
+export type PreviewFactivaTable_deletePetitionFieldReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+}>;
+
+export type PreviewFactivaTable_deletePetitionFieldReplyMutation = {
+  deletePetitionReply: {
+    __typename?: "PetitionField";
+    id: string;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+    }>;
   };
 };
 
@@ -11102,6 +11147,12 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery = {
       >;
     }>;
   };
+};
+
+export type ExternalFieldKYCResearch_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  id: string;
+  content: { [key: string]: any };
 };
 
 export type PreviewPetitionFieldKYCResearch_PetitionFieldFragment = {
@@ -18967,81 +19018,52 @@ export type PetitionMessages_updatePetitionMutation = {
       };
 };
 
-export type ExternalFieldPreview_PetitionBase_Petition_Fragment = {
-  __typename?: "Petition";
+export type ExternalFieldPreview_PetitionFieldFragment = {
+  __typename?: "PetitionField";
   id: string;
-  isAnonymized: boolean;
-  fields: Array<{
-    __typename?: "PetitionField";
+  type: PetitionFieldType;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
     id: string;
-    type: PetitionFieldType;
-    title?: string | null;
+    content: { [key: string]: any };
   }>;
 };
-
-export type ExternalFieldPreview_PetitionBase_PetitionTemplate_Fragment = {
-  __typename?: "PetitionTemplate";
-  id: string;
-  isAnonymized: boolean;
-  fields: Array<{
-    __typename?: "PetitionField";
-    id: string;
-    type: PetitionFieldType;
-    title?: string | null;
-  }>;
-};
-
-export type ExternalFieldPreview_PetitionBaseFragment =
-  | ExternalFieldPreview_PetitionBase_Petition_Fragment
-  | ExternalFieldPreview_PetitionBase_PetitionTemplate_Fragment;
 
 export type ExternalFieldPreview_QueryFragment = {
   me: {
     __typename?: "User";
     id: string;
-    organization: { __typename?: "Organization"; hasDowJones: boolean };
+    hasDowJonesFeatureFlag: boolean;
+    organization: { __typename?: "Organization"; hasDowJonesIntegration: boolean };
   };
 };
 
-export type ExternalFieldPreview_petitionQueryVariables = Exact<{
-  id: Scalars["GID"];
+export type ExternalFieldPreview_petitionFieldQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
 }>;
 
-export type ExternalFieldPreview_petitionQuery = {
-  petition?:
-    | {
-        __typename?: "Petition";
-        id: string;
-        isAnonymized: boolean;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: string | null;
-        }>;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        isAnonymized: boolean;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: string | null;
-        }>;
-      }
-    | null;
+export type ExternalFieldPreview_petitionFieldQuery = {
+  petitionField: {
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+    }>;
+  };
 };
 
 export type ExternalFieldPreview_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ExternalFieldPreview_userQuery = {
-  metadata: { __typename?: "ConnectionMetadata"; browserName?: string | null };
   me: {
     __typename?: "User";
     id: string;
-    organization: { __typename?: "Organization"; hasDowJones: boolean };
+    hasDowJonesFeatureFlag: boolean;
+    organization: { __typename?: "Organization"; hasDowJonesIntegration: boolean };
   };
 };
 
@@ -28119,23 +28141,35 @@ export const PetitionMessages_QueryFragmentDoc = gql`
   }
   ${PetitionLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<PetitionMessages_QueryFragment, unknown>;
-export const ExternalFieldPreview_PetitionBaseFragmentDoc = gql`
-  fragment ExternalFieldPreview_PetitionBase on PetitionBase {
+export const PreviewFactivaTable_PetitionFieldReplyFragmentDoc = gql`
+  fragment PreviewFactivaTable_PetitionFieldReply on PetitionFieldReply {
     id
-    isAnonymized
-    fields {
-      id
-      type
-      title
+    content
+  }
+` as unknown as DocumentNode<PreviewFactivaTable_PetitionFieldReplyFragment, unknown>;
+export const ExternalFieldKYCResearch_PetitionFieldReplyFragmentDoc = gql`
+  fragment ExternalFieldKYCResearch_PetitionFieldReply on PetitionFieldReply {
+    ...PreviewFactivaTable_PetitionFieldReply
+  }
+  ${PreviewFactivaTable_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<ExternalFieldKYCResearch_PetitionFieldReplyFragment, unknown>;
+export const ExternalFieldPreview_PetitionFieldFragmentDoc = gql`
+  fragment ExternalFieldPreview_PetitionField on PetitionField {
+    id
+    type
+    replies {
+      ...ExternalFieldKYCResearch_PetitionFieldReply
     }
   }
-` as unknown as DocumentNode<ExternalFieldPreview_PetitionBaseFragment, unknown>;
+  ${ExternalFieldKYCResearch_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<ExternalFieldPreview_PetitionFieldFragment, unknown>;
 export const ExternalFieldPreview_QueryFragmentDoc = gql`
   fragment ExternalFieldPreview_Query on Query {
     me {
       id
+      hasDowJonesFeatureFlag: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
       organization {
-        hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
+        hasDowJonesIntegration: hasIntegration(integration: DOW_JONES_KYC)
       }
     }
   }
@@ -30537,6 +30571,45 @@ export const PreviewFactivaTable_dowJonesRiskEntitySearchDocument = gql`
   PreviewFactivaTable_dowJonesRiskEntitySearchQuery,
   PreviewFactivaTable_dowJonesRiskEntitySearchQueryVariables
 >;
+export const PreviewFactivaTable_createDowJonesKycResearchReplyDocument = gql`
+  mutation PreviewFactivaTable_createDowJonesKycResearchReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $profileId: ID!
+  ) {
+    createDowJonesKycResearchReply(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      profileId: $profileId
+    ) {
+      id
+      field {
+        id
+        replies {
+          id
+          content
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  PreviewFactivaTable_createDowJonesKycResearchReplyMutation,
+  PreviewFactivaTable_createDowJonesKycResearchReplyMutationVariables
+>;
+export const PreviewFactivaTable_deletePetitionFieldReplyDocument = gql`
+  mutation PreviewFactivaTable_deletePetitionFieldReply($petitionId: GID!, $replyId: GID!) {
+    deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+      id
+      replies {
+        id
+        content
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  PreviewFactivaTable_deletePetitionFieldReplyMutation,
+  PreviewFactivaTable_deletePetitionFieldReplyMutationVariables
+>;
 export const PreviewPetitionField_PetitionFieldDocument = gql`
   query PreviewPetitionField_PetitionField($petitionId: GID!, $fieldId: GID!) {
     petitionField(petitionId: $petitionId, petitionFieldId: $fieldId) {
@@ -32370,24 +32443,20 @@ export const PetitionMessages_updatePetitionDocument = gql`
   PetitionMessages_updatePetitionMutation,
   PetitionMessages_updatePetitionMutationVariables
 >;
-export const ExternalFieldPreview_petitionDocument = gql`
-  query ExternalFieldPreview_petition($id: GID!) {
-    petition(id: $id) {
-      id
-      ...ExternalFieldPreview_PetitionBase
+export const ExternalFieldPreview_petitionFieldDocument = gql`
+  query ExternalFieldPreview_petitionField($petitionId: GID!, $petitionFieldId: GID!) {
+    petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
+      ...ExternalFieldPreview_PetitionField
     }
   }
-  ${ExternalFieldPreview_PetitionBaseFragmentDoc}
+  ${ExternalFieldPreview_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<
-  ExternalFieldPreview_petitionQuery,
-  ExternalFieldPreview_petitionQueryVariables
+  ExternalFieldPreview_petitionFieldQuery,
+  ExternalFieldPreview_petitionFieldQueryVariables
 >;
 export const ExternalFieldPreview_userDocument = gql`
   query ExternalFieldPreview_user {
     ...ExternalFieldPreview_Query
-    metadata {
-      browserName
-    }
   }
   ${ExternalFieldPreview_QueryFragmentDoc}
 ` as unknown as DocumentNode<

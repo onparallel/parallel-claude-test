@@ -21,17 +21,21 @@ import Head from "next/head";
 import { useState } from "react";
 import { isDefined } from "remeda";
 import { PreviewFactivaTable } from "../PreviewFactivaTable";
+import { gql } from "@apollo/client";
+import { ExternalFieldKYCResearch_PetitionFieldReplyFragment } from "@parallel/graphql/__types";
 
 type ExternalFieldKYCResearchProps = {
   htmlTitle: string;
   petitionId: string;
   fieldId: string;
+  replies: ExternalFieldKYCResearch_PetitionFieldReplyFragment[];
 };
 
-function ExternalFieldKYCResearch({
+export function ExternalFieldKYCResearch({
   htmlTitle,
   petitionId,
   fieldId,
+  replies,
 }: ExternalFieldKYCResearchProps) {
   const [formData, setFormData] = useState<formData | null>(null);
   const handleFormSubmit = async (data: formData) => {
@@ -52,6 +56,9 @@ function ExternalFieldKYCResearch({
         <PreviewFactivaTable
           name={formData.name}
           date={formData.dateOfBirth}
+          petitionId={petitionId}
+          fieldId={fieldId}
+          replies={replies}
           onResetClick={handleResetSearch}
         />
       ) : (
@@ -60,6 +67,15 @@ function ExternalFieldKYCResearch({
     </>
   );
 }
+
+ExternalFieldKYCResearch.fragments = {
+  PetitionFieldReply: gql`
+    fragment ExternalFieldKYCResearch_PetitionFieldReply on PetitionFieldReply {
+      ...PreviewFactivaTable_PetitionFieldReply
+    }
+    ${PreviewFactivaTable.fragments.PetitionFieldReply}
+  `,
+};
 
 export default compose(withDialogs)(ExternalFieldKYCResearch);
 
