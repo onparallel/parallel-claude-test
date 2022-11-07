@@ -8,7 +8,6 @@ import {
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { withMetadata } from "@parallel/utils/withMetadata";
 
 function ExternalFieldPreview({
   petitionId,
@@ -100,4 +99,4 @@ ExternalFieldPreview.getInitialProps = async ({ query, fetchQuery }: WithApolloD
   return { petitionId, petitionFieldId };
 };
 
-export default compose(withMetadata, withApolloData)(ExternalFieldPreview);
+export default compose(withApolloData)(ExternalFieldPreview);

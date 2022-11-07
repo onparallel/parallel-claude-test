@@ -30,6 +30,7 @@ import {
   DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment,
   DowJonesRiskEntityProfileResultEntity,
   DowJonesRiskEntityProfileResultPerson,
+  Maybe,
   PreviewFactivaTable_createDowJonesKycResearchReplyDocument,
   PreviewFactivaTable_deletePetitionFieldReplyDocument,
   PreviewFactivaTable_dowJonesRiskEntitySearchDocument,
@@ -109,7 +110,15 @@ export function PreviewFactivaTable({
   // console.log("loading: ", loading);
 
   if (profileId) {
-    return <DowJonesProfileDetails id={profileId} onGoBack={handleGoBack} />;
+    return (
+      <DowJonesProfileDetails
+        id={profileId}
+        petitionId={petitionId}
+        fieldId={fieldId}
+        replyId={replies.find((r) => r.content.entity.profileId === profileId)?.id ?? null}
+        onGoBack={handleGoBack}
+      />
+    );
   }
 
   return (
@@ -369,9 +378,18 @@ function useDowJonesFactivaDataColumns() {
 type DowJonesProfileDetailsProps = {
   id: string;
   onGoBack: () => void;
+  petitionId: string;
+  fieldId: string;
+  replyId: Maybe<string>;
 };
 
-function DowJonesProfileDetails({ id, onGoBack }: DowJonesProfileDetailsProps) {
+function DowJonesProfileDetails({
+  id,
+  replyId,
+  petitionId,
+  fieldId,
+  onGoBack,
+}: DowJonesProfileDetailsProps) {
   const intl = useIntl();
 
   const { data, loading, refetch } = useQuery(
@@ -382,6 +400,20 @@ function DowJonesProfileDetails({ id, onGoBack }: DowJonesProfileDetailsProps) {
       },
     }
   );
+
+  const [createDowJonesKycResearchReply, { loading: isSavingProfile }] = useMutation(
+    PreviewFactivaTable_createDowJonesKycResearchReplyDocument
+  );
+
+  const handleSaveClick = async () => {
+    await createDowJonesKycResearchReply({
+      variables: {
+        profileId: id,
+        petitionId,
+        fieldId,
+      },
+    });
+  };
 
   console.log("DATA DETAILS: ", data);
 
@@ -458,9 +490,24 @@ function DowJonesProfileDetails({ id, onGoBack }: DowJonesProfileDetailsProps) {
               )}
             </HStack>
             <Box>
-              <Button variant="solid" colorScheme="purple" leftIcon={<SaveIcon />}>
-                <FormattedMessage id="generic.save" defaultMessage="Save" />
-              </Button>
+              {replyId ? (
+                <Button leftIcon={<CheckIcon color="green.500" />} pointerEvents="none">
+                  <FormattedMessage
+                    id="component.preview-factiva-table.profile-saved"
+                    defaultMessage="Saved"
+                  />
+                </Button>
+              ) : (
+                <Button
+                  variant="solid"
+                  colorScheme="purple"
+                  leftIcon={<SaveIcon />}
+                  onClick={handleSaveClick}
+                  isLoading={isSavingProfile}
+                >
+                  <FormattedMessage id="generic.save" defaultMessage="Save" />
+                </Button>
+              )}
             </Box>
           </HStack>
         </CardHeader>
