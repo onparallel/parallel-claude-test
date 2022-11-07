@@ -4408,11 +4408,8 @@ export class PetitionRepository extends BaseRepository {
       })
       .returning("*");
 
-    await this.from("petition")
-      .whereIn(
-        "id",
-        signatures.map((s) => s.petition_id)
-      )
+    await this.from("petition", t)
+      .whereIn("id", uniq(signatures.map((s) => s.petition_id)))
       .update({
         latest_signature_status: reason === "CANCELLED_BY_USER" ? "CANCELLED_BY_USER" : "CANCELLED",
       });
