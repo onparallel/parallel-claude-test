@@ -326,11 +326,14 @@ function useDowJonesFactivaDataColumns() {
                 <HStack>
                   <CheckIcon color="green.500" />
                   <Text fontWeight={500}>
-                    <FormattedMessage id="generic.saved" defaultMessage="Guardado" />
+                    <FormattedMessage
+                      id="component.preview-factiva-table.profile-saved"
+                      defaultMessage="Saved"
+                    />
                   </Text>
                   <IconButtonWithTooltip
                     size="sm"
-                    label="Eliminar"
+                    label={intl.formatMessage({ id: "generic.delete", defaultMessage: "Delete" })}
                     icon={<DeleteIcon />}
                     variant="outline"
                     onClick={(e) => {
