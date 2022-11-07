@@ -20,7 +20,7 @@ import { compose } from "@parallel/utils/compose";
 import Head from "next/head";
 import { useState } from "react";
 import { isDefined } from "remeda";
-import { PreviewFactivaTable } from "../PreviewFactivaTable";
+import { DowJonesSearchResult } from "./DowJonesSearchResult";
 import { gql } from "@apollo/client";
 import { ExternalFieldKYCResearch_PetitionFieldReplyFragment } from "@parallel/graphql/__types";
 
@@ -53,7 +53,7 @@ export function ExternalFieldKYCResearch({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       {isDefined(formData) ? (
-        <PreviewFactivaTable
+        <DowJonesSearchResult
           name={formData.name}
           date={formData.dateOfBirth}
           petitionId={petitionId}
@@ -71,9 +71,9 @@ export function ExternalFieldKYCResearch({
 ExternalFieldKYCResearch.fragments = {
   PetitionFieldReply: gql`
     fragment ExternalFieldKYCResearch_PetitionFieldReply on PetitionFieldReply {
-      ...PreviewFactivaTable_PetitionFieldReply
+      ...DowJonesSearchResult_PetitionFieldReply
     }
-    ${PreviewFactivaTable.fragments.PetitionFieldReply}
+    ${DowJonesSearchResult.fragments.PetitionFieldReply}
   `,
 };
 
@@ -112,7 +112,7 @@ function Form({ onSubmit, isDisabled }: FormProps) {
         <Stack spacing={6} as="form" onSubmit={handleSubmit(onSubmit)}>
           <Heading size="lg">
             <FormattedMessage
-              id="component.recipient-view-petition-field-kyc-research.fill-in-data"
+              id="component.external-field-kyc-research.fill-in-data"
               defaultMessage="Fill in the data to start the search"
             />
           </Heading>
@@ -120,7 +120,7 @@ function Form({ onSubmit, isDisabled }: FormProps) {
             <FormControl id="name" isInvalid={!!errors.name} isDisabled={isDisabled}>
               <FormLabel fontWeight="400">
                 <FormattedMessage
-                  id="component.recipient-view-petition-field-kyc-research.name-person-entity"
+                  id="component.external-field-kyc-research.name-person-entity"
                   defaultMessage="Name of the person/entity *"
                 />
               </FormLabel>
@@ -135,7 +135,7 @@ function Form({ onSubmit, isDisabled }: FormProps) {
             <FormControl isDisabled={isDisabled}>
               <FormLabel fontWeight="400">
                 <FormattedMessage
-                  id="component.recipient-view-petition-field-kyc-research.date-of-birth"
+                  id="component.external-field-kyc-research.date-of-birth"
                   defaultMessage="Date of birth"
                 />
               </FormLabel>
@@ -165,7 +165,7 @@ function Form({ onSubmit, isDisabled }: FormProps) {
           </Stack>
           <Button colorScheme="primary" type="submit" isDisabled={isDisabled}>
             <FormattedMessage
-              id="component.recipient-view-petition-field-kyc-research.search"
+              id="component.external-field-kyc-research.search"
               defaultMessage="Search"
             />
           </Button>

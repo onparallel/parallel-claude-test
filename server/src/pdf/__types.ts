@@ -3715,7 +3715,6 @@ export type Task = {
 };
 
 export type TaskName =
-  | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
   | "PRINT_PDF"

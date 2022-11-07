@@ -51,7 +51,7 @@ export function PreviewPetitionFieldKYCResearch({
         <NakedLink href={`/app/petitions/${field.petition.id}/preview/${field.id}`} passHref>
           <Button as="a" variant="outline" target="_blank" isDisabled={isDisabled}>
             <FormattedMessage
-              id="component.recipient-view-petition-field-kyc-research.search-in-down-jones"
+              id="component.preview-petition-field-kyc-research.search-in-down-jones"
               defaultMessage="Search in Dow Jones"
             />
           </Button>
@@ -59,7 +59,7 @@ export function PreviewPetitionFieldKYCResearch({
       ) : (
         <Button variant="outline" onClick={handleRestrictSearchInDowJones} isDisabled={isDisabled}>
           <FormattedMessage
-            id="component.recipient-view-petition-field-kyc-research.search-in-down-jones"
+            id="component.preview-petition-field-kyc-research.search-in-down-jones"
             defaultMessage="Search in Dow Jones"
           />
         </Button>

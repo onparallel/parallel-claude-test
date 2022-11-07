@@ -1330,6 +1330,131 @@
     "context": "Username"
   },
   {
+    "term": "component.dow-jones-profile-details.birth",
+    "definition": "Nacimiento",
+    "context": "Birth"
+  },
+  {
+    "term": "component.dow-jones-profile-details.citizenship",
+    "definition": "Ciudadanía",
+    "context": "Citizenship"
+  },
+  {
+    "term": "component.dow-jones-profile-details.date-of-registration",
+    "definition": "Fecha de registro",
+    "context": "Date of registration"
+  },
+  {
+    "term": "component.dow-jones-profile-details.deceased",
+    "definition": "Fallecido",
+    "context": "Deceased"
+  },
+  {
+    "term": "component.dow-jones-profile-details.entity",
+    "definition": "Entidad",
+    "context": "Entity"
+  },
+  {
+    "term": "component.dow-jones-profile-details.from",
+    "definition": "Desde",
+    "context": "From"
+  },
+  {
+    "term": "component.dow-jones-profile-details.get-full-pdf",
+    "definition": "Obtener PDF completo",
+    "context": "Get full PDF"
+  },
+  {
+    "term": "component.dow-jones-profile-details.jurisdiction",
+    "definition": "Jurisdicción",
+    "context": "Jurisdiction"
+  },
+  {
+    "term": "component.dow-jones-profile-details.person",
+    "definition": "Persona",
+    "context": "Person"
+  },
+  {
+    "term": "component.dow-jones-profile-details.profile-details",
+    "definition": "Detalles del perfil",
+    "context": "Profile details"
+  },
+  {
+    "term": "component.dow-jones-profile-details.relation",
+    "definition": "Relación",
+    "context": "Relation"
+  },
+  {
+    "term": "component.dow-jones-profile-details.relationships",
+    "definition": "Relaciones",
+    "context": "Relationships"
+  },
+  {
+    "term": "component.dow-jones-profile-details.resident-of",
+    "definition": "Residente de",
+    "context": "Resident of"
+  },
+  {
+    "term": "component.dow-jones-profile-details.results-obtained-on",
+    "definition": "Resultados obtenidos el {date}",
+    "context": "Results obtained on {date}"
+  },
+  {
+    "term": "component.dow-jones-profile-details.sanction-lists",
+    "definition": "Listas de sanciones",
+    "context": "Sanction lists"
+  },
+  {
+    "term": "component.dow-jones-profile-details.type",
+    "definition": "Tipo",
+    "context": "Type"
+  },
+  {
+    "term": "component.dow-jones-search-result.country-territory",
+    "definition": "País/Territorio",
+    "context": "Country/Territory"
+  },
+  {
+    "term": "component.dow-jones-search-result.date-of-birth",
+    "definition": "Fecha de nacimiento",
+    "context": "Date of birth"
+  },
+  {
+    "term": "component.dow-jones-search-result.gender",
+    "definition": "Género",
+    "context": "Gender"
+  },
+  {
+    "term": "component.dow-jones-search-result.modify-search",
+    "definition": "Modificar búsqueda",
+    "context": "Modify search"
+  },
+  {
+    "term": "component.dow-jones-search-result.name",
+    "definition": "Nombre",
+    "context": "Name"
+  },
+  {
+    "term": "component.dow-jones-search-result.no-results",
+    "definition": "No se han encontrado resultados para esta búsqueda",
+    "context": "No results found for this search"
+  },
+  {
+    "term": "component.dow-jones-search-result.results-found",
+    "definition": "Resultados encontrados: {amount}",
+    "context": "Results found: {amount}"
+  },
+  {
+    "term": "component.dow-jones-search-result.searching-for",
+    "definition": "Búsqueda de",
+    "context": "Searching for"
+  },
+  {
+    "term": "component.dow-jones-search-result.subsidiary",
+    "definition": "Filial",
+    "context": "Subsidiary"
+  },
+  {
     "term": "component.dowjones-profile-download-task.header",
     "definition": "Generando archivo PDF...",
     "context": "Generating PDF file..."
@@ -1483,6 +1608,26 @@
     "term": "component.export-report-task.header",
     "definition": "Generando informe...",
     "context": "Generating report..."
+  },
+  {
+    "term": "component.external-field-kyc-research.date-of-birth",
+    "definition": "Fecha de nacimiento:",
+    "context": "Date of birth"
+  },
+  {
+    "term": "component.external-field-kyc-research.fill-in-data",
+    "definition": "Completa los datos para comenzar la búsqueda",
+    "context": "Fill in the data to start the search"
+  },
+  {
+    "term": "component.external-field-kyc-research.name-person-entity",
+    "definition": "Nombre de la persona/entidad *",
+    "context": "Name of the person/entity *"
+  },
+  {
+    "term": "component.external-field-kyc-research.search",
+    "definition": "Buscar",
+    "context": "Search"
   },
   {
     "term": "component.feature-flag-descriptions.auto-anonymize-description",
@@ -3560,124 +3705,9 @@
     "context": "Permissions needed"
   },
   {
-    "term": "component.preview-factiva-table.birth",
-    "definition": "Nacimiento",
-    "context": "Birth"
-  },
-  {
-    "term": "component.preview-factiva-table.citizenship",
-    "definition": "Ciudadanía",
-    "context": "Citizenship"
-  },
-  {
-    "term": "component.preview-factiva-table.country-territory",
-    "definition": "País/Territorio",
-    "context": "Country/Territory"
-  },
-  {
-    "term": "component.preview-factiva-table.date-of-birth",
-    "definition": "Fecha de nacimiento",
-    "context": "Date of birth"
-  },
-  {
-    "term": "component.preview-factiva-table.date-of-registration",
-    "definition": "Fecha de registro",
-    "context": "Date of registration"
-  },
-  {
-    "term": "component.preview-factiva-table.deceased",
-    "definition": "Fallecido",
-    "context": "Deceased"
-  },
-  {
-    "term": "component.preview-factiva-table.entity",
-    "definition": "Entidad",
-    "context": "Entity"
-  },
-  {
-    "term": "component.preview-factiva-table.from",
-    "definition": "Desde",
-    "context": "From"
-  },
-  {
-    "term": "component.preview-factiva-table.gender",
-    "definition": "Género",
-    "context": "Gender"
-  },
-  {
-    "term": "component.preview-factiva-table.get-full-pdf",
-    "definition": "Obtener PDF completo",
-    "context": "Get full PDF"
-  },
-  {
-    "term": "component.preview-factiva-table.jurisdiction",
-    "definition": "Jurisdicción",
-    "context": "Jurisdiction"
-  },
-  {
-    "term": "component.preview-factiva-table.modify-search",
-    "definition": "Modificar búsqueda",
-    "context": "Modify search"
-  },
-  {
-    "term": "component.preview-factiva-table.name",
-    "definition": "Nombre",
-    "context": "Name"
-  },
-  {
-    "term": "component.preview-factiva-table.no-results",
-    "definition": "No se han encontrado resultados para esta búsqueda",
-    "context": "No results found for this search"
-  },
-  {
-    "term": "component.preview-factiva-table.person",
-    "definition": "Persona",
-    "context": "Person"
-  },
-  {
-    "term": "component.preview-factiva-table.profile-saved",
-    "definition": "Guardado",
-    "context": "Saved"
-  },
-  {
-    "term": "component.preview-factiva-table.relation",
-    "definition": "Relación",
-    "context": "Relation"
-  },
-  {
-    "term": "component.preview-factiva-table.relationships",
-    "definition": "Relaciones",
-    "context": "Relationships"
-  },
-  {
-    "term": "component.preview-factiva-table.resident-of",
-    "definition": "Residente de",
-    "context": "Resident of"
-  },
-  {
-    "term": "component.preview-factiva-table.results-obtained-on",
-    "definition": "Resultados obtenidos el {date}",
-    "context": "Results obtained on {date}"
-  },
-  {
-    "term": "component.preview-factiva-table.sanction-lists",
-    "definition": "Listas de sanciones",
-    "context": "Sanction lists"
-  },
-  {
-    "term": "component.preview-factiva-table.searching-for",
-    "definition": "Búsqueda de",
-    "context": "Searching for"
-  },
-  {
-    "term": "component.preview-factiva-table.subsidiary",
-    "definition": "Filial",
-    "context": "Subsidiary"
-  },
-  {
-    "term": "component.preview-factiva-table.type",
-    "definition": "Tipo",
-    "context": "Type"
+    "term": "component.preview-petition-field-kyc-research.search-in-down-jones",
+    "definition": "Buscar en Dow Jones",
+    "context": "Search in Dow Jones"
   },
   {
     "term": "component.print-pdf-task.confirm",
@@ -4223,41 +4253,6 @@
     "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox-exact",
     "definition": "{count}/{total} enviadas",
     "context": "{count}/{total} submitted"
-  },
-  {
-    "term": "component.recipient-view-petition-field-kyc-research.date-of-birth",
-    "definition": "Fecha de nacimiento:",
-    "context": "Date of birth"
-  },
-  {
-    "term": "component.recipient-view-petition-field-kyc-research.fill-in-data",
-    "definition": "Completa los datos para comenzar la búsqueda",
-    "context": "Fill in the data to start the search"
-  },
-  {
-    "term": "component.recipient-view-petition-field-kyc-research.name-person-entity",
-    "definition": "Nombre de la persona/entidad *",
-    "context": "Name of the person/entity *"
-  },
-  {
-    "term": "component.recipient-view-petition-field-kyc-research.profile-details",
-    "definition": "Detalles del perfil",
-    "context": "Profile details"
-  },
-  {
-    "term": "component.recipient-view-petition-field-kyc-research.results-found",
-    "definition": "Resultados encontrados: {amount}",
-    "context": "Results found: {amount}"
-  },
-  {
-    "term": "component.recipient-view-petition-field-kyc-research.search",
-    "definition": "Buscar",
-    "context": "Search"
-  },
-  {
-    "term": "component.recipient-view-petition-field-kyc-research.search-in-down-jones",
-    "definition": "Buscar en Dow Jones",
-    "context": "Search in Dow Jones"
   },
   {
     "term": "component.recipient-view-petition-field-number.only-numbers",
@@ -6623,6 +6618,11 @@
     "term": "generic.save-changes",
     "definition": "Guardar cambios",
     "context": "Save changes"
+  },
+  {
+    "term": "generic.saved",
+    "definition": "Guardado",
+    "context": "Saved"
   },
   {
     "term": "generic.saving-changes",

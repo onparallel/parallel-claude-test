@@ -10288,341 +10288,6 @@ export type TemplateIconSignature_SignatureConfigFragment = {
   } | null>;
 };
 
-export type DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment = {
-  __typename?: "DowJonesRiskEntitySanction";
-  id: number;
-  name: string;
-  sources: Array<string>;
-  fromDate?: {
-    __typename?: "DowJonesRiskEntityDate";
-    year?: number | null;
-    month?: number | null;
-    day?: number | null;
-  } | null;
-};
-
-export type DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment = {
-  __typename?: "DowJonesRiskEntityRelationship";
-  profileId: number;
-  connectionType: string;
-  iconHints: Array<string>;
-  name?: string | null;
-  type: DowJonesRiskEntityType;
-};
-
-export type DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultEntity_Fragment =
-  {
-    __typename?: "DowJonesRiskEntityProfileResultEntity";
-    id: string;
-    type: DowJonesRiskEntityType;
-    name: string;
-    iconHints: Array<string>;
-    dateOfRegistration?: {
-      __typename?: "DowJonesRiskEntityDate";
-      year?: number | null;
-      month?: number | null;
-      day?: number | null;
-    } | null;
-    sanctions: Array<{
-      __typename?: "DowJonesRiskEntitySanction";
-      id: number;
-      name: string;
-      sources: Array<string>;
-      fromDate?: {
-        __typename?: "DowJonesRiskEntityDate";
-        year?: number | null;
-        month?: number | null;
-        day?: number | null;
-      } | null;
-    }>;
-    relationships: Array<{
-      __typename?: "DowJonesRiskEntityRelationship";
-      profileId: number;
-      connectionType: string;
-      iconHints: Array<string>;
-      name?: string | null;
-      type: DowJonesRiskEntityType;
-    }>;
-  };
-
-export type DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultPerson_Fragment =
-  {
-    __typename?: "DowJonesRiskEntityProfileResultPerson";
-    isDeceased: boolean;
-    id: string;
-    type: DowJonesRiskEntityType;
-    name: string;
-    iconHints: Array<string>;
-    placeOfBirth?: {
-      __typename?: "DowJonesRiskEntityPlace";
-      descriptor: string;
-      countryCode: string;
-    } | null;
-    dateOfBirth?: {
-      __typename?: "DowJonesRiskEntityDate";
-      year?: number | null;
-      month?: number | null;
-      day?: number | null;
-    } | null;
-    citizenship?: {
-      __typename?: "DowJonesRiskEntityPlace";
-      descriptor: string;
-      countryCode: string;
-    } | null;
-    residence?: {
-      __typename?: "DowJonesRiskEntityPlace";
-      descriptor: string;
-      countryCode: string;
-    } | null;
-    jurisdiction?: {
-      __typename?: "DowJonesRiskEntityPlace";
-      descriptor: string;
-      countryCode: string;
-    } | null;
-    sanctions: Array<{
-      __typename?: "DowJonesRiskEntitySanction";
-      id: number;
-      name: string;
-      sources: Array<string>;
-      fromDate?: {
-        __typename?: "DowJonesRiskEntityDate";
-        year?: number | null;
-        month?: number | null;
-        day?: number | null;
-      } | null;
-    }>;
-    relationships: Array<{
-      __typename?: "DowJonesRiskEntityRelationship";
-      profileId: number;
-      connectionType: string;
-      iconHints: Array<string>;
-      name?: string | null;
-      type: DowJonesRiskEntityType;
-    }>;
-  };
-
-export type DowJonesProfileDetails_DowJonesRiskEntityProfileResultFragment =
-  | DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultEntity_Fragment
-  | DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultPerson_Fragment;
-
-export type DowJonesProfileDetails_dowJonesRiskEntityProfileQueryVariables = Exact<{
-  profileId: Scalars["ID"];
-}>;
-
-export type DowJonesProfileDetails_dowJonesRiskEntityProfileQuery = {
-  dowJonesRiskEntityProfile:
-    | {
-        __typename?: "DowJonesRiskEntityProfileResultEntity";
-        id: string;
-        type: DowJonesRiskEntityType;
-        name: string;
-        iconHints: Array<string>;
-        dateOfRegistration?: {
-          __typename?: "DowJonesRiskEntityDate";
-          year?: number | null;
-          month?: number | null;
-          day?: number | null;
-        } | null;
-        sanctions: Array<{
-          __typename?: "DowJonesRiskEntitySanction";
-          id: number;
-          name: string;
-          sources: Array<string>;
-          fromDate?: {
-            __typename?: "DowJonesRiskEntityDate";
-            year?: number | null;
-            month?: number | null;
-            day?: number | null;
-          } | null;
-        }>;
-        relationships: Array<{
-          __typename?: "DowJonesRiskEntityRelationship";
-          profileId: number;
-          connectionType: string;
-          iconHints: Array<string>;
-          name?: string | null;
-          type: DowJonesRiskEntityType;
-        }>;
-      }
-    | {
-        __typename?: "DowJonesRiskEntityProfileResultPerson";
-        isDeceased: boolean;
-        id: string;
-        type: DowJonesRiskEntityType;
-        name: string;
-        iconHints: Array<string>;
-        placeOfBirth?: {
-          __typename?: "DowJonesRiskEntityPlace";
-          descriptor: string;
-          countryCode: string;
-        } | null;
-        dateOfBirth?: {
-          __typename?: "DowJonesRiskEntityDate";
-          year?: number | null;
-          month?: number | null;
-          day?: number | null;
-        } | null;
-        citizenship?: {
-          __typename?: "DowJonesRiskEntityPlace";
-          descriptor: string;
-          countryCode: string;
-        } | null;
-        residence?: {
-          __typename?: "DowJonesRiskEntityPlace";
-          descriptor: string;
-          countryCode: string;
-        } | null;
-        jurisdiction?: {
-          __typename?: "DowJonesRiskEntityPlace";
-          descriptor: string;
-          countryCode: string;
-        } | null;
-        sanctions: Array<{
-          __typename?: "DowJonesRiskEntitySanction";
-          id: number;
-          name: string;
-          sources: Array<string>;
-          fromDate?: {
-            __typename?: "DowJonesRiskEntityDate";
-            year?: number | null;
-            month?: number | null;
-            day?: number | null;
-          } | null;
-        }>;
-        relationships: Array<{
-          __typename?: "DowJonesRiskEntityRelationship";
-          profileId: number;
-          connectionType: string;
-          iconHints: Array<string>;
-          name?: string | null;
-          type: DowJonesRiskEntityType;
-        }>;
-      };
-};
-
-export type PreviewFactivaTable_DowJonesRiskEntitySearchResult_DowJonesRiskEntitySearchResultEntity_Fragment =
-  {
-    __typename?: "DowJonesRiskEntitySearchResultEntity";
-    id: string;
-    type: DowJonesRiskEntityType;
-    name: string;
-    title: string;
-    countryTerritoryName: string;
-    isSubsidiary: boolean;
-    iconHints: Array<string>;
-  };
-
-export type PreviewFactivaTable_DowJonesRiskEntitySearchResult_DowJonesRiskEntitySearchResultPerson_Fragment =
-  {
-    __typename?: "DowJonesRiskEntitySearchResultPerson";
-    gender: string;
-    id: string;
-    type: DowJonesRiskEntityType;
-    name: string;
-    title: string;
-    countryTerritoryName: string;
-    isSubsidiary: boolean;
-    iconHints: Array<string>;
-    dateOfBirth?: {
-      __typename?: "DowJonesRiskEntityDate";
-      year?: number | null;
-      month?: number | null;
-      day?: number | null;
-    } | null;
-  };
-
-export type PreviewFactivaTable_DowJonesRiskEntitySearchResultFragment =
-  | PreviewFactivaTable_DowJonesRiskEntitySearchResult_DowJonesRiskEntitySearchResultEntity_Fragment
-  | PreviewFactivaTable_DowJonesRiskEntitySearchResult_DowJonesRiskEntitySearchResultPerson_Fragment;
-
-export type PreviewFactivaTable_PetitionFieldReplyFragment = {
-  __typename?: "PetitionFieldReply";
-  id: string;
-  content: { [key: string]: any };
-};
-
-export type PreviewFactivaTable_dowJonesRiskEntitySearchQueryVariables = Exact<{
-  offset?: InputMaybe<Scalars["Int"]>;
-  limit?: InputMaybe<Scalars["Int"]>;
-  name: Scalars["String"];
-  dateOfBirth?: InputMaybe<Scalars["DateTime"]>;
-}>;
-
-export type PreviewFactivaTable_dowJonesRiskEntitySearchQuery = {
-  dowJonesRiskEntitySearch: {
-    __typename?: "DowJonesRiskEntitySearchResultPagination";
-    totalCount: number;
-    items: Array<
-      | {
-          __typename?: "DowJonesRiskEntitySearchResultEntity";
-          id: string;
-          type: DowJonesRiskEntityType;
-          name: string;
-          title: string;
-          countryTerritoryName: string;
-          isSubsidiary: boolean;
-          iconHints: Array<string>;
-        }
-      | {
-          __typename?: "DowJonesRiskEntitySearchResultPerson";
-          gender: string;
-          id: string;
-          type: DowJonesRiskEntityType;
-          name: string;
-          title: string;
-          countryTerritoryName: string;
-          isSubsidiary: boolean;
-          iconHints: Array<string>;
-          dateOfBirth?: {
-            __typename?: "DowJonesRiskEntityDate";
-            year?: number | null;
-            month?: number | null;
-            day?: number | null;
-          } | null;
-        }
-    >;
-  };
-};
-
-export type PreviewFactivaTable_createDowJonesKycResearchReplyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  fieldId: Scalars["GID"];
-  profileId: Scalars["ID"];
-}>;
-
-export type PreviewFactivaTable_createDowJonesKycResearchReplyMutation = {
-  createDowJonesKycResearchReply: {
-    __typename?: "PetitionFieldReply";
-    id: string;
-    field?: {
-      __typename?: "PetitionField";
-      id: string;
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        content: { [key: string]: any };
-      }>;
-    } | null;
-  };
-};
-
-export type PreviewFactivaTable_deletePetitionFieldReplyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
-}>;
-
-export type PreviewFactivaTable_deletePetitionFieldReplyMutation = {
-  deletePetitionReply: {
-    __typename?: "PetitionField";
-    id: string;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-    }>;
-  };
-};
-
 export type PreviewPetitionField_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -11145,6 +10810,341 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery = {
             } | null;
           }
       >;
+    }>;
+  };
+};
+
+export type DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment = {
+  __typename?: "DowJonesRiskEntitySanction";
+  id: number;
+  name: string;
+  sources: Array<string>;
+  fromDate?: {
+    __typename?: "DowJonesRiskEntityDate";
+    year?: number | null;
+    month?: number | null;
+    day?: number | null;
+  } | null;
+};
+
+export type DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment = {
+  __typename?: "DowJonesRiskEntityRelationship";
+  profileId: number;
+  connectionType: string;
+  iconHints: Array<string>;
+  name?: string | null;
+  type: DowJonesRiskEntityType;
+};
+
+export type DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultEntity_Fragment =
+  {
+    __typename?: "DowJonesRiskEntityProfileResultEntity";
+    id: string;
+    type: DowJonesRiskEntityType;
+    name: string;
+    iconHints: Array<string>;
+    dateOfRegistration?: {
+      __typename?: "DowJonesRiskEntityDate";
+      year?: number | null;
+      month?: number | null;
+      day?: number | null;
+    } | null;
+    sanctions: Array<{
+      __typename?: "DowJonesRiskEntitySanction";
+      id: number;
+      name: string;
+      sources: Array<string>;
+      fromDate?: {
+        __typename?: "DowJonesRiskEntityDate";
+        year?: number | null;
+        month?: number | null;
+        day?: number | null;
+      } | null;
+    }>;
+    relationships: Array<{
+      __typename?: "DowJonesRiskEntityRelationship";
+      profileId: number;
+      connectionType: string;
+      iconHints: Array<string>;
+      name?: string | null;
+      type: DowJonesRiskEntityType;
+    }>;
+  };
+
+export type DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultPerson_Fragment =
+  {
+    __typename?: "DowJonesRiskEntityProfileResultPerson";
+    isDeceased: boolean;
+    id: string;
+    type: DowJonesRiskEntityType;
+    name: string;
+    iconHints: Array<string>;
+    placeOfBirth?: {
+      __typename?: "DowJonesRiskEntityPlace";
+      descriptor: string;
+      countryCode: string;
+    } | null;
+    dateOfBirth?: {
+      __typename?: "DowJonesRiskEntityDate";
+      year?: number | null;
+      month?: number | null;
+      day?: number | null;
+    } | null;
+    citizenship?: {
+      __typename?: "DowJonesRiskEntityPlace";
+      descriptor: string;
+      countryCode: string;
+    } | null;
+    residence?: {
+      __typename?: "DowJonesRiskEntityPlace";
+      descriptor: string;
+      countryCode: string;
+    } | null;
+    jurisdiction?: {
+      __typename?: "DowJonesRiskEntityPlace";
+      descriptor: string;
+      countryCode: string;
+    } | null;
+    sanctions: Array<{
+      __typename?: "DowJonesRiskEntitySanction";
+      id: number;
+      name: string;
+      sources: Array<string>;
+      fromDate?: {
+        __typename?: "DowJonesRiskEntityDate";
+        year?: number | null;
+        month?: number | null;
+        day?: number | null;
+      } | null;
+    }>;
+    relationships: Array<{
+      __typename?: "DowJonesRiskEntityRelationship";
+      profileId: number;
+      connectionType: string;
+      iconHints: Array<string>;
+      name?: string | null;
+      type: DowJonesRiskEntityType;
+    }>;
+  };
+
+export type DowJonesProfileDetails_DowJonesRiskEntityProfileResultFragment =
+  | DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultEntity_Fragment
+  | DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultPerson_Fragment;
+
+export type DowJonesProfileDetails_dowJonesRiskEntityProfileQueryVariables = Exact<{
+  profileId: Scalars["ID"];
+}>;
+
+export type DowJonesProfileDetails_dowJonesRiskEntityProfileQuery = {
+  dowJonesRiskEntityProfile:
+    | {
+        __typename?: "DowJonesRiskEntityProfileResultEntity";
+        id: string;
+        type: DowJonesRiskEntityType;
+        name: string;
+        iconHints: Array<string>;
+        dateOfRegistration?: {
+          __typename?: "DowJonesRiskEntityDate";
+          year?: number | null;
+          month?: number | null;
+          day?: number | null;
+        } | null;
+        sanctions: Array<{
+          __typename?: "DowJonesRiskEntitySanction";
+          id: number;
+          name: string;
+          sources: Array<string>;
+          fromDate?: {
+            __typename?: "DowJonesRiskEntityDate";
+            year?: number | null;
+            month?: number | null;
+            day?: number | null;
+          } | null;
+        }>;
+        relationships: Array<{
+          __typename?: "DowJonesRiskEntityRelationship";
+          profileId: number;
+          connectionType: string;
+          iconHints: Array<string>;
+          name?: string | null;
+          type: DowJonesRiskEntityType;
+        }>;
+      }
+    | {
+        __typename?: "DowJonesRiskEntityProfileResultPerson";
+        isDeceased: boolean;
+        id: string;
+        type: DowJonesRiskEntityType;
+        name: string;
+        iconHints: Array<string>;
+        placeOfBirth?: {
+          __typename?: "DowJonesRiskEntityPlace";
+          descriptor: string;
+          countryCode: string;
+        } | null;
+        dateOfBirth?: {
+          __typename?: "DowJonesRiskEntityDate";
+          year?: number | null;
+          month?: number | null;
+          day?: number | null;
+        } | null;
+        citizenship?: {
+          __typename?: "DowJonesRiskEntityPlace";
+          descriptor: string;
+          countryCode: string;
+        } | null;
+        residence?: {
+          __typename?: "DowJonesRiskEntityPlace";
+          descriptor: string;
+          countryCode: string;
+        } | null;
+        jurisdiction?: {
+          __typename?: "DowJonesRiskEntityPlace";
+          descriptor: string;
+          countryCode: string;
+        } | null;
+        sanctions: Array<{
+          __typename?: "DowJonesRiskEntitySanction";
+          id: number;
+          name: string;
+          sources: Array<string>;
+          fromDate?: {
+            __typename?: "DowJonesRiskEntityDate";
+            year?: number | null;
+            month?: number | null;
+            day?: number | null;
+          } | null;
+        }>;
+        relationships: Array<{
+          __typename?: "DowJonesRiskEntityRelationship";
+          profileId: number;
+          connectionType: string;
+          iconHints: Array<string>;
+          name?: string | null;
+          type: DowJonesRiskEntityType;
+        }>;
+      };
+};
+
+export type DowJonesSearchResult_DowJonesRiskEntitySearchResult_DowJonesRiskEntitySearchResultEntity_Fragment =
+  {
+    __typename?: "DowJonesRiskEntitySearchResultEntity";
+    id: string;
+    type: DowJonesRiskEntityType;
+    name: string;
+    title: string;
+    countryTerritoryName: string;
+    isSubsidiary: boolean;
+    iconHints: Array<string>;
+  };
+
+export type DowJonesSearchResult_DowJonesRiskEntitySearchResult_DowJonesRiskEntitySearchResultPerson_Fragment =
+  {
+    __typename?: "DowJonesRiskEntitySearchResultPerson";
+    gender: string;
+    id: string;
+    type: DowJonesRiskEntityType;
+    name: string;
+    title: string;
+    countryTerritoryName: string;
+    isSubsidiary: boolean;
+    iconHints: Array<string>;
+    dateOfBirth?: {
+      __typename?: "DowJonesRiskEntityDate";
+      year?: number | null;
+      month?: number | null;
+      day?: number | null;
+    } | null;
+  };
+
+export type DowJonesSearchResult_DowJonesRiskEntitySearchResultFragment =
+  | DowJonesSearchResult_DowJonesRiskEntitySearchResult_DowJonesRiskEntitySearchResultEntity_Fragment
+  | DowJonesSearchResult_DowJonesRiskEntitySearchResult_DowJonesRiskEntitySearchResultPerson_Fragment;
+
+export type DowJonesSearchResult_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  id: string;
+  content: { [key: string]: any };
+};
+
+export type DowJonesSearchResult_dowJonesRiskEntitySearchQueryVariables = Exact<{
+  offset?: InputMaybe<Scalars["Int"]>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  name: Scalars["String"];
+  dateOfBirth?: InputMaybe<Scalars["DateTime"]>;
+}>;
+
+export type DowJonesSearchResult_dowJonesRiskEntitySearchQuery = {
+  dowJonesRiskEntitySearch: {
+    __typename?: "DowJonesRiskEntitySearchResultPagination";
+    totalCount: number;
+    items: Array<
+      | {
+          __typename?: "DowJonesRiskEntitySearchResultEntity";
+          id: string;
+          type: DowJonesRiskEntityType;
+          name: string;
+          title: string;
+          countryTerritoryName: string;
+          isSubsidiary: boolean;
+          iconHints: Array<string>;
+        }
+      | {
+          __typename?: "DowJonesRiskEntitySearchResultPerson";
+          gender: string;
+          id: string;
+          type: DowJonesRiskEntityType;
+          name: string;
+          title: string;
+          countryTerritoryName: string;
+          isSubsidiary: boolean;
+          iconHints: Array<string>;
+          dateOfBirth?: {
+            __typename?: "DowJonesRiskEntityDate";
+            year?: number | null;
+            month?: number | null;
+            day?: number | null;
+          } | null;
+        }
+    >;
+  };
+};
+
+export type DowJonesSearchResult_createDowJonesKycResearchReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  profileId: Scalars["ID"];
+}>;
+
+export type DowJonesSearchResult_createDowJonesKycResearchReplyMutation = {
+  createDowJonesKycResearchReply: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    field?: {
+      __typename?: "PetitionField";
+      id: string;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    } | null;
+  };
+};
+
+export type DowJonesSearchResult_deletePetitionFieldReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+}>;
+
+export type DowJonesSearchResult_deletePetitionFieldReplyMutation = {
+  deletePetitionReply: {
+    __typename?: "PetitionField";
+    id: string;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
     }>;
   };
 };
@@ -25716,6 +25716,47 @@ export const PetitionListTagFilter_TagFragmentDoc = gql`
   }
   ${Tag_TagFragmentDoc}
 ` as unknown as DocumentNode<PetitionListTagFilter_TagFragment, unknown>;
+export const PreviewPetitionField_PetitionFieldReplyFragmentDoc = gql`
+  fragment PreviewPetitionField_PetitionFieldReply on PetitionFieldReply {
+    content
+  }
+` as unknown as DocumentNode<PreviewPetitionField_PetitionFieldReplyFragment, unknown>;
+export const PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragmentDoc =
+  gql`
+    fragment PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply on PetitionFieldReply {
+      id
+      content
+      status
+      isAnonymized
+      createdAt
+      updatedAt
+    }
+  ` as unknown as DocumentNode<
+    PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragment,
+    unknown
+  >;
+export const PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragmentDoc = gql`
+  fragment PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionField on PetitionField {
+    previewReplies @client {
+      ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply
+    }
+    replies {
+      ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply
+    }
+  }
+  ${PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment,
+  unknown
+>;
+export const PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc = gql`
+  fragment PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReply on PetitionFieldReply {
+    content
+  }
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragment,
+  unknown
+>;
 export const DowJonesProfileDetails_DowJonesRiskEntitySanctionFragmentDoc = gql`
   fragment DowJonesProfileDetails_DowJonesRiskEntitySanction on DowJonesRiskEntitySanction {
     id
@@ -25790,8 +25831,8 @@ export const DowJonesProfileDetails_DowJonesRiskEntityProfileResultFragmentDoc =
   DowJonesProfileDetails_DowJonesRiskEntityProfileResultFragment,
   unknown
 >;
-export const PreviewFactivaTable_DowJonesRiskEntitySearchResultFragmentDoc = gql`
-  fragment PreviewFactivaTable_DowJonesRiskEntitySearchResult on DowJonesRiskEntitySearchResult {
+export const DowJonesSearchResult_DowJonesRiskEntitySearchResultFragmentDoc = gql`
+  fragment DowJonesSearchResult_DowJonesRiskEntitySearchResult on DowJonesRiskEntitySearchResult {
     id
     type
     name
@@ -25808,48 +25849,7 @@ export const PreviewFactivaTable_DowJonesRiskEntitySearchResultFragmentDoc = gql
       }
     }
   }
-` as unknown as DocumentNode<PreviewFactivaTable_DowJonesRiskEntitySearchResultFragment, unknown>;
-export const PreviewPetitionField_PetitionFieldReplyFragmentDoc = gql`
-  fragment PreviewPetitionField_PetitionFieldReply on PetitionFieldReply {
-    content
-  }
-` as unknown as DocumentNode<PreviewPetitionField_PetitionFieldReplyFragment, unknown>;
-export const PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragmentDoc =
-  gql`
-    fragment PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply on PetitionFieldReply {
-      id
-      content
-      status
-      isAnonymized
-      createdAt
-      updatedAt
-    }
-  ` as unknown as DocumentNode<
-    PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragment,
-    unknown
-  >;
-export const PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragmentDoc = gql`
-  fragment PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionField on PetitionField {
-    previewReplies @client {
-      ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply
-    }
-    replies {
-      ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply
-    }
-  }
-  ${PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment,
-  unknown
->;
-export const PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc = gql`
-  fragment PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReply on PetitionFieldReply {
-    content
-  }
-` as unknown as DocumentNode<
-  PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragment,
-  unknown
->;
+` as unknown as DocumentNode<DowJonesSearchResult_DowJonesRiskEntitySearchResultFragment, unknown>;
 export const useCuatrecasasExport_PetitionFieldFragmentDoc = gql`
   fragment useCuatrecasasExport_PetitionField on PetitionField {
     type
@@ -28141,17 +28141,17 @@ export const PetitionMessages_QueryFragmentDoc = gql`
   }
   ${PetitionLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<PetitionMessages_QueryFragment, unknown>;
-export const PreviewFactivaTable_PetitionFieldReplyFragmentDoc = gql`
-  fragment PreviewFactivaTable_PetitionFieldReply on PetitionFieldReply {
+export const DowJonesSearchResult_PetitionFieldReplyFragmentDoc = gql`
+  fragment DowJonesSearchResult_PetitionFieldReply on PetitionFieldReply {
     id
     content
   }
-` as unknown as DocumentNode<PreviewFactivaTable_PetitionFieldReplyFragment, unknown>;
+` as unknown as DocumentNode<DowJonesSearchResult_PetitionFieldReplyFragment, unknown>;
 export const ExternalFieldKYCResearch_PetitionFieldReplyFragmentDoc = gql`
   fragment ExternalFieldKYCResearch_PetitionFieldReply on PetitionFieldReply {
-    ...PreviewFactivaTable_PetitionFieldReply
+    ...DowJonesSearchResult_PetitionFieldReply
   }
-  ${PreviewFactivaTable_PetitionFieldReplyFragmentDoc}
+  ${DowJonesSearchResult_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<ExternalFieldKYCResearch_PetitionFieldReplyFragment, unknown>;
 export const ExternalFieldPreview_PetitionFieldFragmentDoc = gql`
   fragment ExternalFieldPreview_PetitionField on PetitionField {
@@ -30536,80 +30536,6 @@ export const PetitionListTagFilter_tagsDocument = gql`
   PetitionListTagFilter_tagsQuery,
   PetitionListTagFilter_tagsQueryVariables
 >;
-export const DowJonesProfileDetails_dowJonesRiskEntityProfileDocument = gql`
-  query DowJonesProfileDetails_dowJonesRiskEntityProfile($profileId: ID!) {
-    dowJonesRiskEntityProfile(profileId: $profileId) {
-      ...DowJonesProfileDetails_DowJonesRiskEntityProfileResult
-    }
-  }
-  ${DowJonesProfileDetails_DowJonesRiskEntityProfileResultFragmentDoc}
-` as unknown as DocumentNode<
-  DowJonesProfileDetails_dowJonesRiskEntityProfileQuery,
-  DowJonesProfileDetails_dowJonesRiskEntityProfileQueryVariables
->;
-export const PreviewFactivaTable_dowJonesRiskEntitySearchDocument = gql`
-  query PreviewFactivaTable_dowJonesRiskEntitySearch(
-    $offset: Int
-    $limit: Int
-    $name: String!
-    $dateOfBirth: DateTime
-  ) {
-    dowJonesRiskEntitySearch(
-      offset: $offset
-      limit: $limit
-      name: $name
-      dateOfBirth: $dateOfBirth
-    ) {
-      items {
-        ...PreviewFactivaTable_DowJonesRiskEntitySearchResult
-      }
-      totalCount
-    }
-  }
-  ${PreviewFactivaTable_DowJonesRiskEntitySearchResultFragmentDoc}
-` as unknown as DocumentNode<
-  PreviewFactivaTable_dowJonesRiskEntitySearchQuery,
-  PreviewFactivaTable_dowJonesRiskEntitySearchQueryVariables
->;
-export const PreviewFactivaTable_createDowJonesKycResearchReplyDocument = gql`
-  mutation PreviewFactivaTable_createDowJonesKycResearchReply(
-    $petitionId: GID!
-    $fieldId: GID!
-    $profileId: ID!
-  ) {
-    createDowJonesKycResearchReply(
-      petitionId: $petitionId
-      fieldId: $fieldId
-      profileId: $profileId
-    ) {
-      id
-      field {
-        id
-        replies {
-          id
-          content
-        }
-      }
-    }
-  }
-` as unknown as DocumentNode<
-  PreviewFactivaTable_createDowJonesKycResearchReplyMutation,
-  PreviewFactivaTable_createDowJonesKycResearchReplyMutationVariables
->;
-export const PreviewFactivaTable_deletePetitionFieldReplyDocument = gql`
-  mutation PreviewFactivaTable_deletePetitionFieldReply($petitionId: GID!, $replyId: GID!) {
-    deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
-      id
-      replies {
-        id
-        content
-      }
-    }
-  }
-` as unknown as DocumentNode<
-  PreviewFactivaTable_deletePetitionFieldReplyMutation,
-  PreviewFactivaTable_deletePetitionFieldReplyMutationVariables
->;
 export const PreviewPetitionField_PetitionFieldDocument = gql`
   query PreviewPetitionField_PetitionField($petitionId: GID!, $fieldId: GID!) {
     petitionField(petitionId: $petitionId, petitionFieldId: $fieldId) {
@@ -30785,6 +30711,80 @@ export const PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument = gql
 ` as unknown as DocumentNode<
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery,
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryQueryVariables
+>;
+export const DowJonesProfileDetails_dowJonesRiskEntityProfileDocument = gql`
+  query DowJonesProfileDetails_dowJonesRiskEntityProfile($profileId: ID!) {
+    dowJonesRiskEntityProfile(profileId: $profileId) {
+      ...DowJonesProfileDetails_DowJonesRiskEntityProfileResult
+    }
+  }
+  ${DowJonesProfileDetails_DowJonesRiskEntityProfileResultFragmentDoc}
+` as unknown as DocumentNode<
+  DowJonesProfileDetails_dowJonesRiskEntityProfileQuery,
+  DowJonesProfileDetails_dowJonesRiskEntityProfileQueryVariables
+>;
+export const DowJonesSearchResult_dowJonesRiskEntitySearchDocument = gql`
+  query DowJonesSearchResult_dowJonesRiskEntitySearch(
+    $offset: Int
+    $limit: Int
+    $name: String!
+    $dateOfBirth: DateTime
+  ) {
+    dowJonesRiskEntitySearch(
+      offset: $offset
+      limit: $limit
+      name: $name
+      dateOfBirth: $dateOfBirth
+    ) {
+      items {
+        ...DowJonesSearchResult_DowJonesRiskEntitySearchResult
+      }
+      totalCount
+    }
+  }
+  ${DowJonesSearchResult_DowJonesRiskEntitySearchResultFragmentDoc}
+` as unknown as DocumentNode<
+  DowJonesSearchResult_dowJonesRiskEntitySearchQuery,
+  DowJonesSearchResult_dowJonesRiskEntitySearchQueryVariables
+>;
+export const DowJonesSearchResult_createDowJonesKycResearchReplyDocument = gql`
+  mutation DowJonesSearchResult_createDowJonesKycResearchReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $profileId: ID!
+  ) {
+    createDowJonesKycResearchReply(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      profileId: $profileId
+    ) {
+      id
+      field {
+        id
+        replies {
+          id
+          content
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DowJonesSearchResult_createDowJonesKycResearchReplyMutation,
+  DowJonesSearchResult_createDowJonesKycResearchReplyMutationVariables
+>;
+export const DowJonesSearchResult_deletePetitionFieldReplyDocument = gql`
+  mutation DowJonesSearchResult_deletePetitionFieldReply($petitionId: GID!, $replyId: GID!) {
+    deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+      id
+      replies {
+        id
+        content
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DowJonesSearchResult_deletePetitionFieldReplyMutation,
+  DowJonesSearchResult_deletePetitionFieldReplyMutationVariables
 >;
 export const PetitionAttachmentsCard_petitionAttachmentDownloadLinkDocument = gql`
   mutation PetitionAttachmentsCard_petitionAttachmentDownloadLink(

@@ -1,10 +1,8 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
 import {
-  Badge,
   Box,
   Button,
   Center,
-  Flex,
   Heading,
   HStack,
   Image,
@@ -30,347 +28,21 @@ import {
   DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment,
   DowJonesRiskEntityProfileResultEntity,
   DowJonesRiskEntityProfileResultPerson,
+  DowJonesSearchResult_createDowJonesKycResearchReplyDocument,
+  DowJonesSearchResult_deletePetitionFieldReplyDocument,
   Maybe,
-  PreviewFactivaTable_createDowJonesKycResearchReplyDocument,
-  PreviewFactivaTable_deletePetitionFieldReplyDocument,
-  PreviewFactivaTable_dowJonesRiskEntitySearchDocument,
-  PreviewFactivaTable_DowJonesRiskEntitySearchResultFragment,
-  PreviewFactivaTable_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
-import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
-import { integer, useQueryState, values } from "@parallel/utils/queryState";
 import { useLoadCountryNames } from "@parallel/utils/useCountryName";
 import { useDowJonesProfileDownloadTask } from "@parallel/utils/useDowJonesProfileDownloadTask";
-import { useCallback, useMemo, useState } from "react";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { Card, CardHeader } from "../common/Card";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { TablePage } from "../common/TablePage";
-
-const QUERY_STATE = {
-  page: integer({ min: 1 }).orDefault(1),
-  items: values([10, 25, 50]).orDefault(10),
-};
-
-type FactivaSelection = PreviewFactivaTable_DowJonesRiskEntitySearchResultFragment;
-
-type DowJonesFactivaDataColumnsContext = {
-  petitionId: string;
-  fieldId: string;
-  replies: PreviewFactivaTable_PetitionFieldReplyFragment[];
-};
-
-export function PreviewFactivaTable({
-  name,
-  date,
-  petitionId,
-  fieldId,
-  onResetClick,
-  replies,
-}: {
-  name: string;
-  date: string;
-  onResetClick: () => void;
-  petitionId: string;
-  fieldId: string;
-  replies: PreviewFactivaTable_PetitionFieldReplyFragment[];
-}) {
-  const [state, setQueryState] = useQueryState(QUERY_STATE);
-  const [profileId, setProfileId] = useState<string | null>(null);
-
-  const { data, loading } = useQueryOrPreviousData(
-    PreviewFactivaTable_dowJonesRiskEntitySearchDocument,
-    {
-      variables: {
-        offset: state.items * (state.page - 1),
-        limit: state.items,
-        name: name,
-        dateOfBirth: date ? new Date(date).toISOString() : null,
-      },
-      fetchPolicy: "cache-and-network",
-    }
-  );
-
-  const result = data?.dowJonesRiskEntitySearch;
-
-  const columns = useDowJonesFactivaDataColumns();
-
-  const handleRowClick = useCallback(function (row: FactivaSelection, event: MouseEvent) {
-    setProfileId(row.id);
-  }, []);
-
-  const handleGoBack = () => {
-    setProfileId(null);
-  };
-
-  if (profileId) {
-    return (
-      <DowJonesProfileDetails
-        id={profileId}
-        petitionId={petitionId}
-        fieldId={fieldId}
-        replyId={replies.find((r) => r.content.entity.profileId === profileId)?.id ?? null}
-        onGoBack={handleGoBack}
-      />
-    );
-  }
-
-  return (
-    <Stack paddingX={6} paddingY={5} spacing={6}>
-      <Heading size="md">
-        <FormattedMessage
-          id="component.recipient-view-petition-field-kyc-research.results-found"
-          defaultMessage="Results found: {amount}"
-          values={{ amount: result?.totalCount ?? "..." }}
-        />
-      </Heading>
-      <TablePage
-        isHighlightable
-        columns={columns}
-        context={{ petitionId, fieldId, replies }}
-        rows={result?.items}
-        rowKeyProp="id"
-        page={state.page}
-        pageSize={state.items}
-        loading={loading}
-        totalCount={result?.totalCount}
-        onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-        onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items: items as any, page: 1 }))}
-        onRowClick={handleRowClick}
-        header={
-          <Flex
-            direction={{ base: "column", sm: "row" }}
-            gridGap={3}
-            paddingX={4}
-            paddingY={2}
-            justifyContent={"space-between"}
-          >
-            <HStack spacing={0} gridGap={3} wrap="wrap">
-              <Text>
-                <Text as="span" fontWeight={600}>
-                  <FormattedMessage
-                    id="component.preview-factiva-table.searching-for"
-                    defaultMessage="Searching for"
-                  />
-                  {": "}
-                </Text>
-                <Text as="span" whiteSpace="nowrap">
-                  {name}
-                </Text>
-              </Text>
-              <Text>
-                <Text as="span" fontWeight={600}>
-                  <FormattedMessage
-                    id="component.preview-factiva-table.date-of-birth"
-                    defaultMessage="Date of birth"
-                  />
-                  {": "}
-                </Text>
-                <Text as="span" whiteSpace="nowrap">
-                  {date}
-                </Text>
-              </Text>
-            </HStack>
-
-            <Box>
-              <Button variant="outline" onClick={onResetClick}>
-                <FormattedMessage
-                  id="component.preview-factiva-table.modify-search"
-                  defaultMessage="Modify search"
-                />
-              </Button>
-            </Box>
-          </Flex>
-        }
-        body={
-          result?.items.length === 0 && !loading ? (
-            <Flex flex="1" alignItems="center" justifyContent="center">
-              <Text fontSize="lg">
-                <FormattedMessage
-                  id="component.preview-factiva-table.no-results"
-                  defaultMessage="No results found for this search"
-                />
-              </Text>
-            </Flex>
-          ) : null
-        }
-      />
-    </Stack>
-  );
-}
-
-function useDowJonesFactivaDataColumns() {
-  const intl = useIntl();
-
-  return useMemo<TableColumn<FactivaSelection, DowJonesFactivaDataColumnsContext>[]>(
-    () => [
-      {
-        key: "tags",
-        header: "",
-        CellContent: ({ row: { iconHints } }) => {
-          if (!iconHints || iconHints.length === 0) {
-            return <></>;
-          }
-          return (
-            <HStack>
-              <IconHints hints={iconHints} />
-            </HStack>
-          );
-        },
-      },
-      {
-        key: "name",
-        header: intl.formatMessage({
-          id: "component.preview-factiva-table.name",
-          defaultMessage: "Name",
-        }),
-        CellContent: ({ row: { name } }) => {
-          return <>{name}</>;
-        },
-      },
-      {
-        key: "gender",
-        header: intl.formatMessage({
-          id: "component.preview-factiva-table.gender",
-          defaultMessage: "Gender",
-        }),
-        CellContent: ({ row }) => {
-          if (row.__typename === "DowJonesRiskEntitySearchResultPerson") {
-            return <>{row.gender}</>;
-          } else {
-            return <>{"-"}</>;
-          }
-        },
-      },
-      {
-        key: "dateOfBirth",
-        header: intl.formatMessage({
-          id: "component.preview-factiva-table.date-of-birth",
-          defaultMessage: "Date of birth",
-        }),
-        CellContent: ({ row }) => {
-          if (row.__typename === "DowJonesRiskEntitySearchResultPerson") {
-            const { year, month, day } = row.dateOfBirth ?? {};
-
-            return (
-              <>
-                {year && month && day
-                  ? intl.formatDate(new Date(year, month - 1, day), FORMATS.ll)
-                  : "-"}
-              </>
-            );
-          } else {
-            return <>{"-"} </>;
-          }
-        },
-      },
-      {
-        key: "country",
-        header: intl.formatMessage({
-          id: "component.preview-factiva-table.country-territory",
-          defaultMessage: "Country/Territory",
-        }),
-        CellContent: ({ row: { countryTerritoryName } }) => {
-          return <>{countryTerritoryName} </>;
-        },
-      },
-      {
-        key: "subsidiary",
-        header: intl.formatMessage({
-          id: "component.preview-factiva-table.subsidiary",
-          defaultMessage: "Subsidiary",
-        }),
-        CellContent: ({ row }) => {
-          if (row.__typename === "DowJonesRiskEntitySearchResultPerson") {
-            return <>{"-"}</>;
-          }
-          return (
-            <>
-              {row.isSubsidiary ? (
-                <FormattedMessage id="generic.yes" defaultMessage="Yes" />
-              ) : (
-                <FormattedMessage id="generic.no" defaultMessage="No" />
-              )}
-            </>
-          );
-        },
-      },
-      {
-        key: "actions",
-        header: "",
-        CellContent: ({ row, context }) => {
-          const [createDowJonesKycResearchReply, { loading: isSavingProfile }] = useMutation(
-            PreviewFactivaTable_createDowJonesKycResearchReplyDocument
-          );
-          const [deletePetitionFieldReply] = useMutation(
-            PreviewFactivaTable_deletePetitionFieldReplyDocument
-          );
-          const profileReply = context.replies.find((r) => r.content.entity.profileId === row.id);
-          const handleSaveClick = async () => {
-            await createDowJonesKycResearchReply({
-              variables: {
-                profileId: row.id,
-                petitionId: context.petitionId,
-                fieldId: context.fieldId,
-              },
-            });
-          };
-          const handleDeleteClick = async () => {
-            await deletePetitionFieldReply({
-              variables: {
-                petitionId: context.petitionId,
-                replyId: profileReply!.id,
-              },
-            });
-          };
-          return (
-            <Flex justifyContent="end">
-              {!!profileReply ? (
-                <HStack>
-                  <CheckIcon color="green.500" />
-                  <Text fontWeight={500}>
-                    <FormattedMessage
-                      id="component.preview-factiva-table.profile-saved"
-                      defaultMessage="Saved"
-                    />
-                  </Text>
-                  <IconButtonWithTooltip
-                    size="sm"
-                    label={intl.formatMessage({ id: "generic.delete", defaultMessage: "Delete" })}
-                    icon={<DeleteIcon />}
-                    variant="outline"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteClick();
-                    }}
-                  />
-                </HStack>
-              ) : (
-                <Button
-                  size="sm"
-                  isLoading={isSavingProfile}
-                  variant="solid"
-                  colorScheme="purple"
-                  leftIcon={<SaveIcon />}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSaveClick();
-                  }}
-                >
-                  <FormattedMessage id="generic.save" defaultMessage="Save" />
-                </Button>
-              )}
-            </Flex>
-          );
-        },
-      },
-    ],
-    [intl.locale]
-  );
-}
+import { Card, CardHeader } from "../../common/Card";
+import { IconButtonWithTooltip } from "../../common/IconButtonWithTooltip";
+import { DowJonesHints } from "../../petition-common/DowJonesHints";
 
 type DowJonesProfileDetailsProps = {
   id: string;
@@ -380,7 +52,7 @@ type DowJonesProfileDetailsProps = {
   replyId: Maybe<string>;
 };
 
-function DowJonesProfileDetails({
+export function DowJonesProfileDetails({
   id,
   replyId,
   petitionId,
@@ -388,7 +60,7 @@ function DowJonesProfileDetails({
   onGoBack,
 }: DowJonesProfileDetailsProps) {
   const intl = useIntl();
-
+  const showGenericErrorToast = useGenericErrorToast();
   const { data, loading, refetch } = useQuery(
     DowJonesProfileDetails_dowJonesRiskEntityProfileDocument,
     {
@@ -399,20 +71,41 @@ function DowJonesProfileDetails({
   );
 
   const [createDowJonesKycResearchReply, { loading: isSavingProfile }] = useMutation(
-    PreviewFactivaTable_createDowJonesKycResearchReplyDocument
+    DowJonesSearchResult_createDowJonesKycResearchReplyDocument
   );
 
   const handleSaveClick = async () => {
-    await createDowJonesKycResearchReply({
-      variables: {
-        profileId: id,
-        petitionId,
-        fieldId,
-      },
-    });
+    try {
+      await createDowJonesKycResearchReply({
+        variables: {
+          profileId: id,
+          petitionId,
+          fieldId,
+        },
+      });
+    } catch (e) {
+      showGenericErrorToast(e);
+    }
   };
 
-  console.log("DATA DETAILS: ", data);
+  const [deletePetitionFieldReply] = useMutation(
+    DowJonesSearchResult_deletePetitionFieldReplyDocument
+  );
+
+  const handleDeleteClick = async () => {
+    try {
+      if (isDefined(replyId)) {
+        await deletePetitionFieldReply({
+          variables: {
+            petitionId,
+            replyId,
+          },
+        });
+      }
+    } catch (e) {
+      showGenericErrorToast(e);
+    }
+  };
 
   const details = data?.dowJonesRiskEntityProfile;
 
@@ -455,14 +148,14 @@ function DowJonesProfileDetails({
         />
         <Heading size="md">
           <FormattedMessage
-            id="component.recipient-view-petition-field-kyc-research.profile-details"
+            id="component.dow-jones-profile-details.profile-details"
             defaultMessage="Profile details"
           />
         </Heading>
       </HStack>
 
       <Card>
-        <CardHeader>
+        <CardHeader minHeight="65px">
           <HStack justifyContent="space-between" spacing={0} gridGap={3} wrap="wrap">
             <HStack flex="1">
               {loading ? (
@@ -481,19 +174,30 @@ function DowJonesProfileDetails({
                     whiteSpace="break-spaces"
                   >
                     {details?.name}
-                    <IconHints hints={details?.iconHints ?? []} />
+                    <DowJonesHints hints={details?.iconHints ?? []} />
                   </Text>
                 </>
               )}
             </HStack>
             <Box>
               {replyId ? (
-                <Button leftIcon={<CheckIcon color="green.500" />} pointerEvents="none">
-                  <FormattedMessage
-                    id="component.preview-factiva-table.profile-saved"
-                    defaultMessage="Saved"
+                <HStack>
+                  <CheckIcon color="green.500" />
+                  <Text fontWeight={500}>
+                    <FormattedMessage id="generic.saved" defaultMessage="Saved" />
+                  </Text>
+                  <IconButtonWithTooltip
+                    size="sm"
+                    fontSize="md"
+                    label={intl.formatMessage({ id: "generic.delete", defaultMessage: "Delete" })}
+                    icon={<DeleteIcon />}
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick();
+                    }}
                   />
-                </Button>
+                </HStack>
               ) : (
                 <Button
                   variant="solid"
@@ -509,7 +213,7 @@ function DowJonesProfileDetails({
           </HStack>
         </CardHeader>
         {loading ? (
-          <Box height={"80px"}></Box>
+          <Box height={"85px"}></Box>
         ) : details?.__typename === "DowJonesRiskEntityProfileResultEntity" ? (
           <ProfileResultEntity data={details} />
         ) : details?.__typename === "DowJonesRiskEntityProfileResultPerson" ? (
@@ -521,7 +225,7 @@ function DowJonesProfileDetails({
         <CardHeader omitDivider={loading || !details?.sanctions?.length ? false : true}>
           <Text as="span" fontWeight={600} fontSize="xl">
             <FormattedMessage
-              id="component.preview-factiva-table.sanction-lists"
+              id="component.dow-jones-profile-details.sanction-lists"
               defaultMessage="Sanction lists"
             />{" "}
             {`(${details?.sanctions?.length ?? 0})`}
@@ -558,7 +262,7 @@ function DowJonesProfileDetails({
         <CardHeader omitDivider={loading || !details?.relationships?.length ? false : true}>
           <Text as="span" fontWeight={600} fontSize="xl">
             <FormattedMessage
-              id="component.preview-factiva-table.relationships"
+              id="component.dow-jones-profile-details.relationships"
               defaultMessage="Relationships"
             />{" "}
             {`(${details?.relationships?.length ?? 0})`}
@@ -595,7 +299,7 @@ function DowJonesProfileDetails({
         <HStack justifyContent="space-between" flexWrap="wrap" spacing={0} gridGap={2}>
           <Text>
             <FormattedMessage
-              id="component.preview-factiva-table.results-obtained-on"
+              id="component.dow-jones-profile-details.results-obtained-on"
               defaultMessage="Results obtained on {date}"
               values={{
                 date: intl.formatDate(new Date(), FORMATS.FULL),
@@ -609,7 +313,7 @@ function DowJonesProfileDetails({
             onClick={() => downloadDowJonesProfilePdf(id)}
           >
             <FormattedMessage
-              id="component.preview-factiva-table.get-full-pdf"
+              id="component.dow-jones-profile-details.get-full-pdf"
               defaultMessage="Get full PDF"
             />
           </Button>
@@ -690,19 +394,23 @@ function ProfileResultPerson({ data }: { data: DowJonesRiskEntityProfileResultPe
     >
       <Stack>
         <Text {...detailsSpanProps}>
-          <FormattedMessage id="component.preview-factiva-table.type" defaultMessage="Type" />:
+          <FormattedMessage id="component.dow-jones-profile-details.type" defaultMessage="Type" />:
         </Text>
         <HStack>
           <UserIcon />
           <Text>
-            <FormattedMessage id="component.preview-factiva-table.person" defaultMessage="Person" />
+            <FormattedMessage
+              id="component.dow-jones-profile-details.person"
+              defaultMessage="Person"
+            />
           </Text>
         </HStack>
       </Stack>
 
       <Stack>
         <Text {...detailsSpanProps}>
-          <FormattedMessage id="component.preview-factiva-table.birth" defaultMessage="Birth" />:
+          <FormattedMessage id="component.dow-jones-profile-details.birth" defaultMessage="Birth" />
+          :
         </Text>
         <HStack>
           {birthFlag}
@@ -713,7 +421,7 @@ function ProfileResultPerson({ data }: { data: DowJonesRiskEntityProfileResultPe
       <Stack>
         <Text {...detailsSpanProps}>
           <FormattedMessage
-            id="component.preview-factiva-table.citizenship"
+            id="component.dow-jones-profile-details.citizenship"
             defaultMessage="Citizenship"
           />
           :
@@ -727,7 +435,7 @@ function ProfileResultPerson({ data }: { data: DowJonesRiskEntityProfileResultPe
       <Stack>
         <Text {...detailsSpanProps}>
           <FormattedMessage
-            id="component.preview-factiva-table.resident-of"
+            id="component.dow-jones-profile-details.resident-of"
             defaultMessage="Resident of"
           />
           :
@@ -741,7 +449,7 @@ function ProfileResultPerson({ data }: { data: DowJonesRiskEntityProfileResultPe
       <Stack>
         <Text {...detailsSpanProps}>
           <FormattedMessage
-            id="component.preview-factiva-table.jurisdiction"
+            id="component.dow-jones-profile-details.jurisdiction"
             defaultMessage="Jurisdiction"
           />
           :
@@ -755,7 +463,7 @@ function ProfileResultPerson({ data }: { data: DowJonesRiskEntityProfileResultPe
       <Stack>
         <Text {...detailsSpanProps}>
           <FormattedMessage
-            id="component.preview-factiva-table.date-of-birth"
+            id="component.dow-jones-search-result.date-of-birth"
             defaultMessage="Date of birth"
           />
           :
@@ -773,7 +481,7 @@ function ProfileResultPerson({ data }: { data: DowJonesRiskEntityProfileResultPe
       <Stack>
         <Text {...detailsSpanProps}>
           <FormattedMessage
-            id="component.preview-factiva-table.deceased"
+            id="component.dow-jones-profile-details.deceased"
             defaultMessage="Deceased"
           />
           :
@@ -804,19 +512,22 @@ function ProfileResultEntity({ data }: { data: DowJonesRiskEntityProfileResultEn
     <HStack paddingX={6} paddingY={4} gridGap={{ base: 4, md: 8 }} spacing={0} wrap="wrap">
       <Stack>
         <Text {...detailsSpanProps}>
-          <FormattedMessage id="component.preview-factiva-table.type" defaultMessage="Type" />:
+          <FormattedMessage id="component.dow-jones-profile-details.type" defaultMessage="Type" />:
         </Text>
         <HStack>
           <BusinessIcon />
           <Text>
-            <FormattedMessage id="component.preview-factiva-table.entity" defaultMessage="Entity" />
+            <FormattedMessage
+              id="component.dow-jones-profile-details.entity"
+              defaultMessage="Entity"
+            />
           </Text>
         </HStack>
       </Stack>
       <Stack>
         <Text {...detailsSpanProps}>
           <FormattedMessage
-            id="component.preview-factiva-table.date-of-registration"
+            id="component.dow-jones-profile-details.date-of-registration"
             defaultMessage="Date of registration"
           />
           :
@@ -842,7 +553,7 @@ function useDowJonesFactivaSanctionsColumns() {
       {
         key: "name",
         header: intl.formatMessage({
-          id: "component.preview-factiva-table.name",
+          id: "component.dow-jones-search-result.name",
           defaultMessage: "Name",
         }),
         CellContent: ({ row: { name } }) => {
@@ -852,7 +563,7 @@ function useDowJonesFactivaSanctionsColumns() {
       {
         key: "from",
         header: intl.formatMessage({
-          id: "component.preview-factiva-table.from",
+          id: "component.dow-jones-profile-details.from",
           defaultMessage: "From",
         }),
         CellContent: ({ row: { fromDate } }) => {
@@ -887,7 +598,7 @@ function useDowJonesFactivaRelationshipsColumns() {
 
           return (
             <HStack>
-              <IconHints hints={iconHints} />
+              <DowJonesHints hints={iconHints} />
             </HStack>
           );
         },
@@ -895,7 +606,7 @@ function useDowJonesFactivaRelationshipsColumns() {
       {
         key: "name",
         header: intl.formatMessage({
-          id: "component.preview-factiva-table.name",
+          id: "component.dow-jones-search-result.name",
           defaultMessage: "Name",
         }),
         CellContent: ({ row: { name } }) => {
@@ -905,7 +616,7 @@ function useDowJonesFactivaRelationshipsColumns() {
       {
         key: "type",
         header: intl.formatMessage({
-          id: "component.preview-factiva-table.type",
+          id: "component.dow-jones-profile-details.type",
           defaultMessage: "Type",
         }),
         CellContent: ({ row: { type } }) => {
@@ -915,7 +626,7 @@ function useDowJonesFactivaRelationshipsColumns() {
                 <BusinessIcon />
                 <Text>
                   <FormattedMessage
-                    id="component.preview-factiva-table.entity"
+                    id="component.dow-jones-profile-details.entity"
                     defaultMessage="Entity"
                   />
                 </Text>
@@ -927,7 +638,7 @@ function useDowJonesFactivaRelationshipsColumns() {
                 <UserIcon />
                 <Text>
                   <FormattedMessage
-                    id="component.preview-factiva-table.person"
+                    id="component.dow-jones-profile-details.person"
                     defaultMessage="Person"
                   />
                 </Text>
@@ -939,7 +650,7 @@ function useDowJonesFactivaRelationshipsColumns() {
       {
         key: "connectionType",
         header: intl.formatMessage({
-          id: "component.preview-factiva-table.relation",
+          id: "component.dow-jones-profile-details.relation",
           defaultMessage: "Relation",
         }),
         CellContent: ({ row: { connectionType } }) => {
@@ -948,32 +659,6 @@ function useDowJonesFactivaRelationshipsColumns() {
       },
     ],
     [intl.locale]
-  );
-}
-
-export function IconHints({ hints }: { hints: string[] }) {
-  return (
-    <>
-      {hints.map((item, i) => {
-        if (item.includes("PEP")) {
-          return (
-            <Badge colorScheme="green" key={i}>
-              {item}
-            </Badge>
-          );
-        }
-
-        if (item.includes("SAN")) {
-          return (
-            <Badge colorScheme="red" key={i}>
-              {item}
-            </Badge>
-          );
-        }
-
-        return <Badge key={i}>{item}</Badge>;
-      })}
-    </>
   );
 }
 
@@ -1062,97 +747,5 @@ DowJonesProfileDetails.queries = [
       }
     }
     ${DowJonesProfileDetails.fragments.DowJonesRiskEntityProfileResult}
-  `,
-];
-
-PreviewFactivaTable.fragments = {
-  get DowJonesRiskEntitySearchResult() {
-    return gql`
-      fragment PreviewFactivaTable_DowJonesRiskEntitySearchResult on DowJonesRiskEntitySearchResult {
-        id
-        type
-        name
-        title
-        countryTerritoryName
-        isSubsidiary
-        iconHints
-        ... on DowJonesRiskEntitySearchResultPerson {
-          gender
-          dateOfBirth {
-            year
-            month
-            day
-          }
-        }
-      }
-    `;
-  },
-  get PetitionFieldReply() {
-    return gql`
-      fragment PreviewFactivaTable_PetitionFieldReply on PetitionFieldReply {
-        id
-        content
-      }
-    `;
-  },
-};
-
-PreviewFactivaTable.queries = [
-  gql`
-    query PreviewFactivaTable_dowJonesRiskEntitySearch(
-      $offset: Int
-      $limit: Int
-      $name: String!
-      $dateOfBirth: DateTime
-    ) {
-      dowJonesRiskEntitySearch(
-        offset: $offset
-        limit: $limit
-        name: $name
-        dateOfBirth: $dateOfBirth
-      ) {
-        items {
-          ...PreviewFactivaTable_DowJonesRiskEntitySearchResult
-        }
-        totalCount
-      }
-    }
-    ${PreviewFactivaTable.fragments.DowJonesRiskEntitySearchResult}
-  `,
-];
-
-const _mutations = [
-  gql`
-    mutation PreviewFactivaTable_createDowJonesKycResearchReply(
-      $petitionId: GID!
-      $fieldId: GID!
-      $profileId: ID!
-    ) {
-      createDowJonesKycResearchReply(
-        petitionId: $petitionId
-        fieldId: $fieldId
-        profileId: $profileId
-      ) {
-        id
-        field {
-          id
-          replies {
-            id
-            content
-          }
-        }
-      }
-    }
-  `,
-  gql`
-    mutation PreviewFactivaTable_deletePetitionFieldReply($petitionId: GID!, $replyId: GID!) {
-      deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
-        id
-        replies {
-          id
-          content
-        }
-      }
-    }
   `,
 ];

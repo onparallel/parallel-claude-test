@@ -1330,6 +1330,131 @@
     "context": "Username"
   },
   {
+    "term": "component.dow-jones-profile-details.birth",
+    "definition": "Birth",
+    "context": "Birth"
+  },
+  {
+    "term": "component.dow-jones-profile-details.citizenship",
+    "definition": "Citizenship",
+    "context": "Citizenship"
+  },
+  {
+    "term": "component.dow-jones-profile-details.date-of-registration",
+    "definition": "Date of registration",
+    "context": "Date of registration"
+  },
+  {
+    "term": "component.dow-jones-profile-details.deceased",
+    "definition": "Deceased",
+    "context": "Deceased"
+  },
+  {
+    "term": "component.dow-jones-profile-details.entity",
+    "definition": "Entity",
+    "context": "Entity"
+  },
+  {
+    "term": "component.dow-jones-profile-details.from",
+    "definition": "From",
+    "context": "From"
+  },
+  {
+    "term": "component.dow-jones-profile-details.get-full-pdf",
+    "definition": "Get full PDF",
+    "context": "Get full PDF"
+  },
+  {
+    "term": "component.dow-jones-profile-details.jurisdiction",
+    "definition": "Jurisdiction",
+    "context": "Jurisdiction"
+  },
+  {
+    "term": "component.dow-jones-profile-details.person",
+    "definition": "Person",
+    "context": "Person"
+  },
+  {
+    "term": "component.dow-jones-profile-details.profile-details",
+    "definition": "Profile details",
+    "context": "Profile details"
+  },
+  {
+    "term": "component.dow-jones-profile-details.relation",
+    "definition": "Relation",
+    "context": "Relation"
+  },
+  {
+    "term": "component.dow-jones-profile-details.relationships",
+    "definition": "Relationships",
+    "context": "Relationships"
+  },
+  {
+    "term": "component.dow-jones-profile-details.resident-of",
+    "definition": "Resident of",
+    "context": "Resident of"
+  },
+  {
+    "term": "component.dow-jones-profile-details.results-obtained-on",
+    "definition": "Results obtained on {date}",
+    "context": "Results obtained on {date}"
+  },
+  {
+    "term": "component.dow-jones-profile-details.sanction-lists",
+    "definition": "Sanction lists",
+    "context": "Sanction lists"
+  },
+  {
+    "term": "component.dow-jones-profile-details.type",
+    "definition": "Type",
+    "context": "Type"
+  },
+  {
+    "term": "component.dow-jones-search-result.country-territory",
+    "definition": "Country/Territory",
+    "context": "Country/Territory"
+  },
+  {
+    "term": "component.dow-jones-search-result.date-of-birth",
+    "definition": "Date of birth",
+    "context": "Date of birth"
+  },
+  {
+    "term": "component.dow-jones-search-result.gender",
+    "definition": "Gender",
+    "context": "Gender"
+  },
+  {
+    "term": "component.dow-jones-search-result.modify-search",
+    "definition": "Modify search",
+    "context": "Modify search"
+  },
+  {
+    "term": "component.dow-jones-search-result.name",
+    "definition": "Name",
+    "context": "Name"
+  },
+  {
+    "term": "component.dow-jones-search-result.no-results",
+    "definition": "No results found for this search",
+    "context": "No results found for this search"
+  },
+  {
+    "term": "component.dow-jones-search-result.results-found",
+    "definition": "Results found: {amount}",
+    "context": "Results found: {amount}"
+  },
+  {
+    "term": "component.dow-jones-search-result.searching-for",
+    "definition": "Searching for",
+    "context": "Searching for"
+  },
+  {
+    "term": "component.dow-jones-search-result.subsidiary",
+    "definition": "Subsidiary",
+    "context": "Subsidiary"
+  },
+  {
     "term": "component.dowjones-profile-download-task.header",
     "definition": "Generating PDF file...",
     "context": "Generating PDF file..."
@@ -1483,6 +1608,26 @@
     "term": "component.export-report-task.header",
     "definition": "Generating report...",
     "context": "Generating report..."
+  },
+  {
+    "term": "component.external-field-kyc-research.date-of-birth",
+    "definition": "Date of birth",
+    "context": "Date of birth"
+  },
+  {
+    "term": "component.external-field-kyc-research.fill-in-data",
+    "definition": "Fill in the data to start the search",
+    "context": "Fill in the data to start the search"
+  },
+  {
+    "term": "component.external-field-kyc-research.name-person-entity",
+    "definition": "Name of the person/entity *",
+    "context": "Name of the person/entity *"
+  },
+  {
+    "term": "component.external-field-kyc-research.search",
+    "definition": "Search",
+    "context": "Search"
   },
   {
     "term": "component.feature-flag-descriptions.auto-anonymize-description",
@@ -3560,124 +3705,9 @@
     "context": "Permissions needed"
   },
   {
-    "term": "component.preview-factiva-table.birth",
-    "definition": "Birth",
-    "context": "Birth"
-  },
-  {
-    "term": "component.preview-factiva-table.citizenship",
-    "definition": "Citizenship",
-    "context": "Citizenship"
-  },
-  {
-    "term": "component.preview-factiva-table.country-territory",
-    "definition": "Country/Territory",
-    "context": "Country/Territory"
-  },
-  {
-    "term": "component.preview-factiva-table.date-of-birth",
-    "definition": "Date of birth",
-    "context": "Date of birth"
-  },
-  {
-    "term": "component.preview-factiva-table.date-of-registration",
-    "definition": "Date of registration",
-    "context": "Date of registration"
-  },
-  {
-    "term": "component.preview-factiva-table.deceased",
-    "definition": "Deceased",
-    "context": "Deceased"
-  },
-  {
-    "term": "component.preview-factiva-table.entity",
-    "definition": "Entity",
-    "context": "Entity"
-  },
-  {
-    "term": "component.preview-factiva-table.from",
-    "definition": "From",
-    "context": "From"
-  },
-  {
-    "term": "component.preview-factiva-table.gender",
-    "definition": "Gender",
-    "context": "Gender"
-  },
-  {
-    "term": "component.preview-factiva-table.get-full-pdf",
-    "definition": "Get full PDF",
-    "context": "Get full PDF"
-  },
-  {
-    "term": "component.preview-factiva-table.jurisdiction",
-    "definition": "Jurisdiction",
-    "context": "Jurisdiction"
-  },
-  {
-    "term": "component.preview-factiva-table.modify-search",
-    "definition": "Modify search",
-    "context": "Modify search"
-  },
-  {
-    "term": "component.preview-factiva-table.name",
-    "definition": "Name",
-    "context": "Name"
-  },
-  {
-    "term": "component.preview-factiva-table.no-results",
-    "definition": "No results found for this search",
-    "context": "No results found for this search"
-  },
-  {
-    "term": "component.preview-factiva-table.person",
-    "definition": "Person",
-    "context": "Person"
-  },
-  {
-    "term": "component.preview-factiva-table.profile-saved",
-    "definition": "Saved",
-    "context": "Saved"
-  },
-  {
-    "term": "component.preview-factiva-table.relation",
-    "definition": "Relation",
-    "context": "Relation"
-  },
-  {
-    "term": "component.preview-factiva-table.relationships",
-    "definition": "Relationships",
-    "context": "Relationships"
-  },
-  {
-    "term": "component.preview-factiva-table.resident-of",
-    "definition": "Resident of",
-    "context": "Resident of"
-  },
-  {
-    "term": "component.preview-factiva-table.results-obtained-on",
-    "definition": "Results obtained on {date}",
-    "context": "Results obtained on {date}"
-  },
-  {
-    "term": "component.preview-factiva-table.sanction-lists",
-    "definition": "Sanction lists",
-    "context": "Sanction lists"
-  },
-  {
-    "term": "component.preview-factiva-table.searching-for",
-    "definition": "Searching for",
-    "context": "Searching for"
-  },
-  {
-    "term": "component.preview-factiva-table.subsidiary",
-    "definition": "Subsidiary",
-    "context": "Subsidiary"
-  },
-  {
-    "term": "component.preview-factiva-table.type",
-    "definition": "Type",
-    "context": "Type"
+    "term": "component.preview-petition-field-kyc-research.search-in-down-jones",
+    "definition": "Search in Dow Jones",
+    "context": "Search in Dow Jones"
   },
   {
     "term": "component.print-pdf-task.confirm",
@@ -4223,41 +4253,6 @@
     "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox-exact",
     "definition": "{count}/{total} submitted",
     "context": "{count}/{total} submitted"
-  },
-  {
-    "term": "component.recipient-view-petition-field-kyc-research.date-of-birth",
-    "definition": "Date of birth",
-    "context": "Date of birth"
-  },
-  {
-    "term": "component.recipient-view-petition-field-kyc-research.fill-in-data",
-    "definition": "Fill in the data to start the search",
-    "context": "Fill in the data to start the search"
-  },
-  {
-    "term": "component.recipient-view-petition-field-kyc-research.name-person-entity",
-    "definition": "Name of the person/entity *",
-    "context": "Name of the person/entity *"
-  },
-  {
-    "term": "component.recipient-view-petition-field-kyc-research.profile-details",
-    "definition": "Profile details",
-    "context": "Profile details"
-  },
-  {
-    "term": "component.recipient-view-petition-field-kyc-research.results-found",
-    "definition": "Results found: {amount}",
-    "context": "Results found: {amount}"
-  },
-  {
-    "term": "component.recipient-view-petition-field-kyc-research.search",
-    "definition": "Search",
-    "context": "Search"
-  },
-  {
-    "term": "component.recipient-view-petition-field-kyc-research.search-in-down-jones",
-    "definition": "Search in Dow Jones",
-    "context": "Search in Dow Jones"
   },
   {
     "term": "component.recipient-view-petition-field-number.only-numbers",
@@ -6623,6 +6618,11 @@
     "term": "generic.save-changes",
     "definition": "Save changes",
     "context": "Save changes"
+  },
+  {
+    "term": "generic.saved",
+    "definition": "Saved",
+    "context": "Saved"
   },
   {
     "term": "generic.saving-changes",

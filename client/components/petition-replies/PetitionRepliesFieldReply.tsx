@@ -25,7 +25,7 @@ import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
 import { UserOrContactReference } from "../petition-activity/UserOrContactReference";
-import { IconHints } from "../petition-preview/PreviewFactivaTable";
+import { DowJonesHints } from "../petition-common/DowJonesHints";
 import { CopyOrDownloadReplyButton } from "./CopyOrDownloadReplyButton";
 
 export interface PetitionRepliesFieldReplyProps {
@@ -122,7 +122,7 @@ export function PetitionRepliesFieldReply({
                     {content.entity.type === "Entity" ? <BusinessIcon /> : <UserIcon />}
                     <Text as="span">{content.entity.name}</Text>
                     <HStack>
-                      <IconHints hints={content.entity.iconHints ?? []} />
+                      <DowJonesHints hints={content.entity.iconHints ?? []} />
                     </HStack>
                     <Text as="span" marginX={2}>
                       -
