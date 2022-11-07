@@ -270,6 +270,7 @@ export interface DowJonesRiskEntityRelationship {
 export interface DowJonesRiskEntitySanction {
   __typename?: "DowJonesRiskEntitySanction";
   fromDate: DowJonesRiskEntityDate;
+  id: Scalars["Int"];
   name: Scalars["String"];
   sources: Array<Scalars["String"]>;
 }
@@ -10289,6 +10290,7 @@ export type TemplateIconSignature_SignatureConfigFragment = {
 
 export type DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment = {
   __typename?: "DowJonesRiskEntitySanction";
+  id: number;
   name: string;
   sources: Array<string>;
   fromDate: {
@@ -10323,6 +10325,7 @@ export type DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskE
     } | null;
     sanctions: Array<{
       __typename?: "DowJonesRiskEntitySanction";
+      id: number;
       name: string;
       sources: Array<string>;
       fromDate: {
@@ -10378,6 +10381,7 @@ export type DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskE
     } | null;
     sanctions: Array<{
       __typename?: "DowJonesRiskEntitySanction";
+      id: number;
       name: string;
       sources: Array<string>;
       fromDate: {
@@ -10421,6 +10425,7 @@ export type DowJonesProfileDetails_dowJonesRiskEntityProfileQuery = {
         } | null;
         sanctions: Array<{
           __typename?: "DowJonesRiskEntitySanction";
+          id: number;
           name: string;
           sources: Array<string>;
           fromDate: {
@@ -10474,6 +10479,7 @@ export type DowJonesProfileDetails_dowJonesRiskEntityProfileQuery = {
         } | null;
         sanctions: Array<{
           __typename?: "DowJonesRiskEntitySanction";
+          id: number;
           name: string;
           sources: Array<string>;
           fromDate: {
@@ -25690,6 +25696,7 @@ export const PetitionListTagFilter_TagFragmentDoc = gql`
 ` as unknown as DocumentNode<PetitionListTagFilter_TagFragment, unknown>;
 export const DowJonesProfileDetails_DowJonesRiskEntitySanctionFragmentDoc = gql`
   fragment DowJonesProfileDetails_DowJonesRiskEntitySanction on DowJonesRiskEntitySanction {
+    id
     name
     sources
     fromDate {

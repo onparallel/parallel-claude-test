@@ -31,6 +31,7 @@ import {
   PreviewFactivaTable_dowJonesRiskEntitySearchDocument,
   PreviewFactivaTable_DowJonesRiskEntitySearchResultFragment,
 } from "@parallel/graphql/__types";
+import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { integer, useQueryState, values } from "@parallel/utils/queryState";
@@ -62,14 +63,18 @@ export function PreviewFactivaTable({
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const [profileId, setProfileId] = useState<string | null>(null);
 
-  const { data, loading } = useQuery(PreviewFactivaTable_dowJonesRiskEntitySearchDocument, {
-    variables: {
-      offset: state.items * (state.page - 1),
-      limit: state.items,
-      name: name,
-    },
-    fetchPolicy: "cache-and-network",
-  });
+  const { data, loading } = useQueryOrPreviousData(
+    PreviewFactivaTable_dowJonesRiskEntitySearchDocument,
+    {
+      variables: {
+        offset: state.items * (state.page - 1),
+        limit: state.items,
+        name: name,
+        dateOfBirth: date ? new Date(date).toISOString() : null,
+      },
+      fetchPolicy: "cache-and-network",
+    }
+  );
 
   const result = data?.dowJonesRiskEntitySearch;
 
@@ -79,8 +84,15 @@ export function PreviewFactivaTable({
     setProfileId(row.id);
   }, []);
 
+  const handleGoBack = () => {
+    setProfileId(null);
+  };
+
+  console.log("loading: ", loading);
+  // console.log("loading: ", loading);
+
   if (profileId) {
-    return <DowJonesProfileDetails id={profileId} onGoBack={() => setProfileId(null)} />;
+    return <DowJonesProfileDetails id={profileId} onGoBack={handleGoBack} />;
   }
 
   return (
@@ -89,7 +101,7 @@ export function PreviewFactivaTable({
         <FormattedMessage
           id="component.recipient-view-petition-field-kyc-research.results-found"
           defaultMessage="Results found: {amount}"
-          values={{ amount: loading ? "..." : result?.totalCount }}
+          values={{ amount: result?.totalCount ?? "..." }}
         />
       </Heading>
       <TablePage
@@ -178,7 +190,11 @@ function useDowJonesFactivaDataColumns() {
           if (!iconHints || iconHints.length === 0) {
             return <></>;
           }
-          return <IconHints hints={iconHints} />;
+          return (
+            <HStack>
+              <IconHints hints={iconHints} />
+            </HStack>
+          );
         },
       },
       {
@@ -223,7 +239,7 @@ function useDowJonesFactivaDataColumns() {
               </>
             );
           } else {
-            return <>{"-"}</>;
+            return <>{"-"} </>;
           }
         },
       },
@@ -234,7 +250,7 @@ function useDowJonesFactivaDataColumns() {
           defaultMessage: "Country/Territory",
         }),
         CellContent: ({ row: { countryTerritoryName } }) => {
-          return <>{countryTerritoryName}</>;
+          return <>{countryTerritoryName} </>;
         },
       },
       {
@@ -243,9 +259,18 @@ function useDowJonesFactivaDataColumns() {
           id: "component.preview-factiva-table.subsidiary",
           defaultMessage: "Subsidiary",
         }),
-        CellContent: ({ row: { isSubsidiary } }) => {
+        CellContent: ({ row }) => {
+          if (row.__typename === "DowJonesRiskEntitySearchResultPerson") {
+            return <>{"-"}</>;
+          }
           return (
-            <>{isSubsidiary ? <FormattedMessage id="generic.yes" defaultMessage="Yes" /> : "N/A"}</>
+            <>
+              {row.isSubsidiary ? (
+                <FormattedMessage id="generic.yes" defaultMessage="Yes" />
+              ) : (
+                <FormattedMessage id="generic.no" defaultMessage="No" />
+              )}
+            </>
           );
         },
       },
@@ -255,7 +280,13 @@ function useDowJonesFactivaDataColumns() {
         CellContent: ({ row }) => {
           return (
             <Flex justifyContent="end">
-              <Button variant="solid" colorScheme="purple" leftIcon={<SaveIcon />}>
+              <Button
+                variant="solid"
+                colorScheme="purple"
+                leftIcon={<SaveIcon />}
+                size="sm"
+                fontSize="md"
+              >
                 <FormattedMessage id="generic.save" defaultMessage="Save" />
               </Button>
             </Flex>
@@ -335,18 +366,34 @@ function DowJonesProfileDetails({ id, onGoBack }: DowJonesProfileDetailsProps) {
 
       <Card>
         <CardHeader>
-          <HStack>
-            {loading ? (
-              <>
-                <Skeleton height="20px" width="100%" maxWidth="320px" endColor="gray.300" />
-                <Skeleton height="20px" width="50px" endColor="gray.300" />
-              </>
-            ) : (
-              <>
-                <Text fontSize="xl">{details?.name}</Text>
-                <IconHints hints={details?.iconHints ?? []} />
-              </>
-            )}
+          <HStack justifyContent="space-between" spacing={0} gridGap={3} wrap="wrap">
+            <HStack flex="1">
+              {loading ? (
+                <>
+                  <Skeleton height="20px" width="100%" maxWidth="320px" endColor="gray.300" />
+                  <Skeleton height="20px" width="50px" endColor="gray.300" />
+                </>
+              ) : (
+                <>
+                  <Text
+                    fontSize="xl"
+                    display="flex"
+                    alignItems="center"
+                    gridGap={2}
+                    flexWrap="wrap"
+                    whiteSpace="break-spaces"
+                  >
+                    {details?.name}
+                    <IconHints hints={details?.iconHints ?? []} />
+                  </Text>
+                </>
+              )}
+            </HStack>
+            <Box>
+              <Button variant="solid" colorScheme="purple" leftIcon={<SaveIcon />}>
+                <FormattedMessage id="generic.save" defaultMessage="Save" />
+              </Button>
+            </Box>
           </HStack>
         </CardHeader>
         {loading ? (
@@ -379,13 +426,17 @@ function DowJonesProfileDetails({ id, onGoBack }: DowJonesProfileDetailsProps) {
             />
           </Center>
         ) : details?.sanctions?.length ? (
-          <Table
-            isHighlightable
-            columns={sanctionsColumns}
-            rows={details?.sanctions}
-            rowKeyProp="name"
-            onRowClick={handleSanctionsRowClick}
-          />
+          <Box overflowX="auto">
+            <Table
+              isHighlightable
+              columns={sanctionsColumns}
+              rows={
+                details.sanctions as DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment[]
+              }
+              rowKeyProp="id"
+              onRowClick={handleSanctionsRowClick}
+            />
+          </Box>
         ) : (
           <Box height="120px"></Box>
         )}
@@ -412,20 +463,24 @@ function DowJonesProfileDetails({ id, onGoBack }: DowJonesProfileDetailsProps) {
             />
           </Center>
         ) : details?.relationships?.length ? (
-          <Table
-            isHighlightable
-            columns={relationshipsColumns}
-            rows={details?.relationships}
-            rowKeyProp="profileId"
-            onRowClick={handleRelationshipsRowClick}
-          />
+          <Box overflowX="auto">
+            <Table
+              isHighlightable
+              columns={relationshipsColumns}
+              rows={
+                details.relationships as DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment[]
+              }
+              rowKeyProp="profileId"
+              onRowClick={handleRelationshipsRowClick}
+            />
+          </Box>
         ) : (
           <Box height="120px"></Box>
         )}
       </Card>
 
       {loading ? null : (
-        <HStack justifyContent="space-between">
+        <HStack justifyContent="space-between" flexWrap="wrap" spacing={0} gridGap={2}>
           <Text>
             <FormattedMessage
               id="component.preview-factiva-table.results-obtained-on"
@@ -513,7 +568,14 @@ function ProfileResultPerson({ data }: { data: DowJonesRiskEntityProfileResultPe
   };
 
   return (
-    <HStack paddingX={6} paddingY={4} gridGap={8} spacing={0} wrap="wrap" alignItems="start">
+    <HStack
+      paddingX={6}
+      paddingY={4}
+      gridGap={{ base: 4, md: 8 }}
+      spacing={0}
+      wrap="wrap"
+      alignItems="start"
+    >
       <Stack>
         <Text {...detailsSpanProps}>
           <FormattedMessage id="component.preview-factiva-table.type" defaultMessage="Type" />:
@@ -627,7 +689,7 @@ function ProfileResultEntity({ data }: { data: DowJonesRiskEntityProfileResultEn
   };
 
   return (
-    <HStack paddingX={6} paddingY={4} gridGap={8} spacing={0} wrap="wrap">
+    <HStack paddingX={6} paddingY={4} gridGap={{ base: 4, md: 8 }} spacing={0} wrap="wrap">
       <Stack>
         <Text {...detailsSpanProps}>
           <FormattedMessage id="component.preview-factiva-table.type" defaultMessage="Type" />:
@@ -711,7 +773,11 @@ function useDowJonesFactivaRelationshipsColumns() {
             return <></>;
           }
 
-          return <IconHints hints={iconHints} />;
+          return (
+            <HStack>
+              <IconHints hints={iconHints} />
+            </HStack>
+          );
         },
       },
       {
@@ -775,7 +841,7 @@ function useDowJonesFactivaRelationshipsColumns() {
 
 function IconHints({ hints }: { hints: string[] }) {
   return (
-    <Stack direction="row">
+    <>
       {hints.map((item, i) => {
         if (item.includes("PEP")) {
           return (
@@ -795,7 +861,7 @@ function IconHints({ hints }: { hints: string[] }) {
 
         return <Badge key={i}>{item}</Badge>;
       })}
-    </Stack>
+    </>
   );
 }
 
@@ -803,6 +869,7 @@ DowJonesProfileDetails.fragments = {
   get DowJonesRiskEntitySanction() {
     return gql`
       fragment DowJonesProfileDetails_DowJonesRiskEntitySanction on DowJonesRiskEntitySanction {
+        id
         name
         sources
         fromDate {

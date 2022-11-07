@@ -153,34 +153,8 @@ function Form({ onSubmit, isDisabled }: FormProps) {
               defaultMessage="Search"
             />
           </Button>
-          {/* {hasError ? (
-            <HStack alignItems="center" marginTop={2} color="red.600">
-              <ExclamationOutlineIcon boxSize={4} />
-              <Text fontSize="sm">
-                <FormattedMessage
-                  id="component.recipient-view-petition-field-tax-documents.error-uploading"
-                  defaultMessage="We have not found any files. Please try again."
-                />
-              </Text>
-            </HStack>
-          ) : null} */}
         </Stack>
       </Card>
     </Center>
   );
 }
-
-// type DetailsProps = {
-//   onClickSave: () => void;
-//   onClickDownload: () => void;
-// };
-
-// function Details({ onClickSave, onClickDownload }: DetailsProps) {
-//   return (
-//     <Card>
-//       <Stack padding={4}>
-//         <Text>SOME SHIT</Text>
-//       </Stack>
-//     </Card>
-//   );
-// }

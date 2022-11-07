@@ -1330,6 +1330,11 @@
     "context": "Username"
   },
   {
+    "term": "component.dowjones-profile-download-task.header",
+    "definition": "Generating PDF file...",
+    "context": "Generating PDF file..."
+  },
+  {
     "term": "component.download-dialog.placeholder-field-number",
     "definition": "Field number",
     "context": "Field number"
@@ -3618,6 +3623,11 @@
     "term": "component.preview-factiva-table.name",
     "definition": "Name",
     "context": "Name"
+  },
+  {
+    "term": "component.preview-factiva-table.no-results",
+    "definition": "No results found for this search",
+    "context": "No results found for this search"
   },
   {
     "term": "component.preview-factiva-table.person",
