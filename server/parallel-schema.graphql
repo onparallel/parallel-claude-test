@@ -1005,6 +1005,11 @@ type Mutation {
   ): Result!
 
   """
+  Removes the DOW JONES integration of the user's organization
+  """
+  deleteDowJonesFactivaIntegration: Organization!
+
+  """
   Deletes event subscriptions
   """
   deleteEventSubscriptions(ids: [GID!]!): Result!

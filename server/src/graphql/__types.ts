@@ -1236,6 +1236,7 @@ export interface NexusGenFieldTypes {
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     deactivateUser: NexusGenRootTypes["User"][]; // [User!]!
     deleteContacts: NexusGenEnums["Result"]; // Result!
+    deleteDowJonesFactivaIntegration: NexusGenRootTypes["Organization"]; // Organization!
     deleteEventSubscriptions: NexusGenEnums["Result"]; // Result!
     deleteOrganizationPdfDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
     deletePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -2924,6 +2925,7 @@ export interface NexusGenFieldTypeNames {
     deactivateAccesses: "PetitionAccess";
     deactivateUser: "User";
     deleteContacts: "Result";
+    deleteDowJonesFactivaIntegration: "Organization";
     deleteEventSubscriptions: "Result";
     deleteOrganizationPdfDocumentTheme: "Organization";
     deletePetition: "SupportMethodResponse";

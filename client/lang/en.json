@@ -1660,6 +1660,16 @@
     "context": "Developer access"
   },
   {
+    "term": "component.feature-flag-descriptions.dow-jones-kyc-description",
+    "definition": "Enables the Dow Jones petition field on the organization.",
+    "context": "Enables the Dow Jones petition field on the organization."
+  },
+  {
+    "term": "component.feature-flag-descriptions.dow-jones-kyc-name",
+    "definition": "Dow Jones Field",
+    "context": "Dow Jones Field"
+  },
+  {
     "term": "component.feature-flag-descriptions.es-tax-documents-field-description",
     "definition": "Gives access to the Bankflip field.",
     "context": "Gives access to the Bankflip field."

@@ -622,6 +622,8 @@ export type Mutation = {
   deactivateUser: Array<User>;
   /** Delete contacts. */
   deleteContacts: Result;
+  /** Removes the DOW JONES integration of the user's organization */
+  deleteDowJonesFactivaIntegration: Organization;
   /** Deletes event subscriptions */
   deleteEventSubscriptions: Result;
   deleteOrganizationPdfDocumentTheme: Organization;
@@ -3715,6 +3717,7 @@ export type Task = {
 };
 
 export type TaskName =
+  | "DOW_JONES_PROFILE_DOWNLOAD"
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
   | "PRINT_PDF"

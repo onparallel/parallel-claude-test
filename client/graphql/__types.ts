@@ -666,6 +666,8 @@ export interface Mutation {
   deactivateUser: Array<User>;
   /** Delete contacts. */
   deleteContacts: Result;
+  /** Removes the DOW JONES integration of the user's organization */
+  deleteDowJonesFactivaIntegration: Organization;
   /** Deletes event subscriptions */
   deleteEventSubscriptions: Result;
   deleteOrganizationPdfDocumentTheme: Organization;
@@ -14592,6 +14594,18 @@ export type OrganizationIntegrations_createDowJonesFactivaIntegrationMutationVar
 
 export type OrganizationIntegrations_createDowJonesFactivaIntegrationMutation = {
   createDowJonesFactivaIntegration: { __typename?: "OrgIntegration"; id: string };
+};
+
+export type OrganizationIntegrations_deleteDowJonesFactivaIntegrationMutationVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type OrganizationIntegrations_deleteDowJonesFactivaIntegrationMutation = {
+  deleteDowJonesFactivaIntegration: {
+    __typename?: "Organization";
+    id: string;
+    hasDowJones: boolean;
+  };
 };
 
 export type IntegrationsSignature_SignatureOrgIntegrationFragment = {
@@ -31935,6 +31949,17 @@ export const OrganizationIntegrations_createDowJonesFactivaIntegrationDocument =
 ` as unknown as DocumentNode<
   OrganizationIntegrations_createDowJonesFactivaIntegrationMutation,
   OrganizationIntegrations_createDowJonesFactivaIntegrationMutationVariables
+>;
+export const OrganizationIntegrations_deleteDowJonesFactivaIntegrationDocument = gql`
+  mutation OrganizationIntegrations_deleteDowJonesFactivaIntegration {
+    deleteDowJonesFactivaIntegration {
+      id
+      hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
+    }
+  }
+` as unknown as DocumentNode<
+  OrganizationIntegrations_deleteDowJonesFactivaIntegrationMutation,
+  OrganizationIntegrations_deleteDowJonesFactivaIntegrationMutationVariables
 >;
 export const IntegrationsSignature_validateSignatureCredentialsDocument = gql`
   mutation IntegrationsSignature_validateSignatureCredentials(

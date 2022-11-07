@@ -249,3 +249,19 @@ export const createDowJonesFactivaIntegration = mutationField("createDowJonesFac
     );
   },
 });
+
+export const deleteDowJonesFactivaIntegration = mutationField("deleteDowJonesFactivaIntegration", {
+  description: "Removes the DOW JONES integration of the user's organization",
+  type: nonNull("Organization"),
+  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("DOW_JONES_KYC")),
+  resolve: async (_, args, ctx) => {
+    const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
+      ctx.user!.org_id,
+      "DOW_JONES_KYC"
+    );
+    if (integration) {
+      await ctx.integrations.deleteOrgIntegration(integration.id, `User:${ctx.user!.id}`);
+    }
+    return (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
+  },
+});

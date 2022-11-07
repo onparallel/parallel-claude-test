@@ -199,6 +199,17 @@ export function useFeatureFlags() {
             "Adds a column on the template replies Excel report with petition preview URL",
         }),
       },
+      {
+        name: "DOW_JONES_KYC",
+        title: intl.formatMessage({
+          id: "component.feature-flag-descriptions.dow-jones-kyc-name",
+          defaultMessage: "Dow Jones Field",
+        }),
+        description: intl.formatMessage({
+          id: "component.feature-flag-descriptions.dow-jones-kyc-description",
+          defaultMessage: "Enables the Dow Jones petition field on the organization.",
+        }),
+      },
     ],
     [intl.locale]
   );

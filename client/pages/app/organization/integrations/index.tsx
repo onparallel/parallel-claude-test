@@ -29,6 +29,7 @@ import {
 } from "@parallel/components/organization/IntegrationSwitchCard";
 import {
   OrganizationIntegrations_createDowJonesFactivaIntegrationDocument,
+  OrganizationIntegrations_deleteDowJonesFactivaIntegrationDocument,
   OrganizationIntegrations_userDocument,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
@@ -53,8 +54,11 @@ function OrganizationIntegrations() {
   const hasDownJones = me.organization.hasDowJones;
   const hasErrorDownJones = false;
 
-  const [createDowJonesIntegration] = useMutation(
+  const [createDowJonesFactivaIntegration] = useMutation(
     OrganizationIntegrations_createDowJonesFactivaIntegrationDocument
+  );
+  const [deleteDowJonesFactivaIntegration] = useMutation(
+    OrganizationIntegrations_deleteDowJonesFactivaIntegrationDocument
   );
 
   const showDeactivateDowJonesIntegrationDialog = useDeactivateDowJonesIntegrationDialog();
@@ -63,7 +67,7 @@ function OrganizationIntegrations() {
     if (isChecked) {
       try {
         const data = await showDowJonesIntegrationDialog();
-        await createDowJonesIntegration({
+        await createDowJonesFactivaIntegration({
           variables: {
             ...data,
           },
@@ -73,7 +77,7 @@ function OrganizationIntegrations() {
     } else {
       try {
         await showDeactivateDowJonesIntegrationDialog();
-        // TODO: Remove integration
+        await deleteDowJonesFactivaIntegration();
       } catch {}
     }
   };
@@ -292,6 +296,14 @@ OrganizationIntegrations.mutations = [
         password: $password
       ) {
         id
+      }
+    }
+  `,
+  gql`
+    mutation OrganizationIntegrations_deleteDowJonesFactivaIntegration {
+      deleteDowJonesFactivaIntegration {
+        id
+        hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
       }
     }
   `,
