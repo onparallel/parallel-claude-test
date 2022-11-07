@@ -106,9 +106,6 @@ export function PreviewFactivaTable({
     setProfileId(null);
   };
 
-  console.log("loading: ", loading);
-  // console.log("loading: ", loading);
-
   if (profileId) {
     return (
       <DowJonesProfileDetails
@@ -954,7 +951,7 @@ function useDowJonesFactivaRelationshipsColumns() {
   );
 }
 
-function IconHints({ hints }: { hints: string[] }) {
+export function IconHints({ hints }: { hints: string[] }) {
   return (
     <>
       {hints.map((item, i) => {

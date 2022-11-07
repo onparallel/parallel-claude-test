@@ -1,6 +1,12 @@
 import { gql } from "@apollo/client";
 import { Box, Grid, GridItem, HStack, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
-import { CheckIcon, CloseIcon, EditSimpleIcon } from "@parallel/chakra/icons";
+import {
+  BusinessIcon,
+  CheckIcon,
+  CloseIcon,
+  EditSimpleIcon,
+  UserIcon,
+} from "@parallel/chakra/icons";
 import {
   PetitionFieldReplyStatus,
   PetitionFieldType,
@@ -19,6 +25,7 @@ import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
 import { UserOrContactReference } from "../petition-activity/UserOrContactReference";
+import { IconHints } from "../petition-preview/PreviewFactivaTable";
 import { CopyOrDownloadReplyButton } from "./CopyOrDownloadReplyButton";
 
 export interface PetitionRepliesFieldReplyProps {
@@ -104,6 +111,35 @@ export function PetitionRepliesFieldReply({
               <HStack alignItems={"center"} gridGap={2} spacing={0}>
                 {reply.isAnonymized ? (
                   <ReplyNotAvailable type={reply.field!.type} />
+                ) : reply.field!.type === "DOW_JONES_KYC_RESEARCH" ? (
+                  <HStack flexWrap="wrap" whiteSpace="break-spaces" spacing={0} gridGap={2}>
+                    <VisuallyHidden>
+                      {intl.formatMessage({
+                        id: "generic.name",
+                        defaultMessage: "Name",
+                      })}
+                    </VisuallyHidden>
+                    {content.entity.type === "Entity" ? <BusinessIcon /> : <UserIcon />}
+                    <Text as="span">{content.entity.name}</Text>
+                    <HStack>
+                      <IconHints hints={content.entity.iconHints ?? []} />
+                    </HStack>
+                    <Text as="span" marginX={2}>
+                      -
+                    </Text>
+                    <Text
+                      as="span"
+                      aria-label={intl.formatMessage({
+                        id: "generic.file-size",
+                        defaultMessage: "File size",
+                      })}
+                      fontSize="sm"
+                      color="gray.500"
+                    >
+                      <FileSize value={content.size} />
+                    </Text>
+                    <Box alignSelf="start">{editReplyIconButton()}</Box>
+                  </HStack>
                 ) : isFileTypeField(reply.field!.type) ? (
                   <Box>
                     <VisuallyHidden>
