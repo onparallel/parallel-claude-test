@@ -90,7 +90,7 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
               id="field-settings.alias-description"
               defaultMessage="Allows to easily identify the field in API replies. In addition, it can be inserted into the field description to automatically replace the content."
             />
-            <HelpCenterLink marginLeft={1} articleId={5998723}>
+            <HelpCenterLink marginLeft={1} articleId={6323096}>
               <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
             </HelpCenterLink>
           </Text>
