@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Button, Flex, Heading, HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, HStack, Skeleton, Stack, Text } from "@chakra-ui/react";
 import { CheckIcon, DeleteIcon, SaveIcon } from "@parallel/chakra/icons";
 import { TableColumn } from "@parallel/components/common/Table";
 import { DowJonesHints } from "@parallel/components/petition-common/DowJonesHints";
@@ -87,13 +87,20 @@ export function DowJonesSearchResult({
 
   return (
     <Stack paddingX={6} paddingY={5} spacing={6}>
-      <Heading size="md">
-        <FormattedMessage
-          id="component.dow-jones-search-result.results-found"
-          defaultMessage="Results found: {amount}"
-          values={{ amount: result?.totalCount ?? "..." }}
-        />
-      </Heading>
+      {result?.totalCount ? (
+        <Heading size="md">
+          <FormattedMessage
+            id="component.dow-jones-search-result.results-found"
+            defaultMessage="Results found: {amount}"
+            values={{ amount: result?.totalCount }}
+          />
+        </Heading>
+      ) : (
+        <HStack>
+          <Skeleton height="24px" width="100%" maxWidth="300px" endColor="gray.300" />
+          <Skeleton height="24px" width="50px" endColor="gray.300" />
+        </HStack>
+      )}
       <TablePage
         isHighlightable
         columns={columns}
