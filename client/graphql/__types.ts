@@ -447,6 +447,7 @@ export interface GroupPermissionRemovedEvent extends PetitionEvent {
 
 export interface IOrgIntegration {
   id: Scalars["GID"];
+  invalidCredentials: Scalars["Boolean"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
   isDefault: Scalars["Boolean"];
   /** Custom name of this integration, provided by the user */
@@ -1819,6 +1820,7 @@ export interface MutationverifyPublicAccessArgs {
 export interface OrgIntegration extends IOrgIntegration {
   __typename?: "OrgIntegration";
   id: Scalars["GID"];
+  invalidCredentials: Scalars["Boolean"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
   isDefault: Scalars["Boolean"];
   /** Custom name of this integration, provided by the user */
@@ -3786,6 +3788,7 @@ export interface SignatureOrgIntegration extends IOrgIntegration {
   /** Environment of this integration, to differentiate between sandbox and production-ready integrations */
   environment: SignatureOrgIntegrationEnvironment;
   id: Scalars["GID"];
+  invalidCredentials: Scalars["Boolean"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
   isDefault: Scalars["Boolean"];
   /** Custom name of this integration, provided by the user */
@@ -14610,6 +14613,13 @@ export type OrganizationIntegrations_userQuery = {
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
+      integrations: {
+        __typename?: "IOrgIntegrationPagination";
+        items: Array<
+          | { __typename?: "OrgIntegration"; id: string; invalidCredentials: boolean }
+          | { __typename?: "SignatureOrgIntegration"; id: string; invalidCredentials: boolean }
+        >;
+      };
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
         id: string;
@@ -31953,6 +31963,12 @@ export const OrganizationIntegrations_userDocument = gql`
       organization {
         id
         hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
+        integrations(type: DOW_JONES_KYC, limit: 1, offset: 0) {
+          items {
+            id
+            invalidCredentials
+          }
+        }
       }
     }
   }

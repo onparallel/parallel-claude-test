@@ -249,11 +249,41 @@ export class DowJonesKycService implements IDowJonesKycService {
     }
   }
 
+  private async updateIntegrationCredentials(integration: DowJonesIntegration) {
+    const encryptionKey = Buffer.from(this.config.security.encryptKeyBase64, "base64");
+    const clientId = decrypt(
+      Buffer.from(integration.settings.CREDENTIALS.CLIENT_ID, "hex"),
+      encryptionKey
+    ).toString("utf8");
+    const username = integration.settings.CREDENTIALS.USERNAME;
+    const password = decrypt(
+      Buffer.from(integration.settings.CREDENTIALS.PASSWORD, "hex"),
+      encryptionKey
+    ).toString("utf8");
+    const newCredentials = await this.fetchCredentials(clientId, username, password);
+    const [updatedIntegration] = await this.integrations.updateOrgIntegration(
+      integration.id,
+      {
+        settings: {
+          ...integration.settings,
+          CREDENTIALS: {
+            ...integration.settings.CREDENTIALS,
+            REFRESH_TOKEN: encrypt(newCredentials.REFRESH_TOKEN, encryptionKey).toString("hex"),
+            ACCESS_TOKEN: encrypt(newCredentials.ACCESS_TOKEN, encryptionKey).toString("hex"),
+          },
+        },
+      },
+      `OrgIntegration:${integration.id}`
+    );
+
+    return updatedIntegration;
+  }
+
   private async makeApiCall<TResult = any>(
     url: string,
     opts: { method: "GET" | "POST"; body?: any },
     integration: DowJonesIntegration,
-    retry = true
+    retryCount = 0
   ): Promise<TResult> {
     const accessToken = decrypt(
       Buffer.from(integration.settings.CREDENTIALS.ACCESS_TOKEN, "hex"),
@@ -276,18 +306,30 @@ export class DowJonesKycService implements IDowJonesKycService {
     const jsonData = await response.json();
     if (response.ok) {
       return jsonData as TResult;
-    } else if (response.status === 401 && retry) {
-      // access_token expired, refresh it and try again
-      const updatedIntegration = await this.refreshAccessToken(integration);
-      return await this.makeApiCall<TResult>(url, opts, updatedIntegration, false);
+    } else if (response.status === 401) {
+      if (retryCount === 0) {
+        // first retry, we assume access_token is expired, refresh it and try again
+        const updatedIntegration = await this.refreshAccessToken(integration);
+        return await this.makeApiCall<TResult>(url, opts, updatedIntegration, retryCount + 1);
+      } else if (retryCount === 1) {
+        // second retry, refreshing with refresh_token did not work, get new access_token using username and password credentials
+        const updatedIntegration = await this.updateIntegrationCredentials(integration);
+        return await this.makeApiCall<TResult>(url, opts, updatedIntegration, retryCount + 1);
+      } else {
+        // third retry, refreshing with username and password failed. Mark integration credentials as invalid :/
+        await this.integrations.updateOrgIntegration(
+          integration.id,
+          { invalid_credentials: true },
+          `OrgIntegration:${integration.id}`
+        );
+
+        throw new Error(JSON.stringify(jsonData));
+      }
     } else if (response.status === 404) {
       throw new Error("PROFILE_NOT_FOUND");
-    } else {
-      // TODO manage case when refresh_token expires (it expires after a number of uses on the same IP)
-      // we need to mark the integration as "reauthorization required"
-      console.log(JSON.stringify(jsonData, null, 2));
-      throw new Error(jsonData);
     }
+
+    throw new Error(JSON.stringify(jsonData));
   }
 
   async fetchCredentials(clientId: string, username: string, password: string) {

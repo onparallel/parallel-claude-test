@@ -52,7 +52,7 @@ function OrganizationIntegrations() {
   const hasAdminRole = isAtLeast("ADMIN", me.role);
 
   const hasDownJones = me.organization.hasDowJones;
-  const hasErrorDownJones = false;
+  const hasErrorDownJones = me.organization.integrations.items[0]?.invalidCredentials;
 
   const [createDowJonesFactivaIntegration] = useMutation(
     OrganizationIntegrations_createDowJonesFactivaIntegrationDocument
@@ -276,6 +276,12 @@ OrganizationIntegrations.queries = [
         organization {
           id
           hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
+          integrations(type: DOW_JONES_KYC, limit: 1, offset: 0) {
+            items {
+              id
+              invalidCredentials
+            }
+          }
         }
       }
     }

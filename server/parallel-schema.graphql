@@ -473,6 +473,7 @@ type GroupPermissionRemovedEvent implements PetitionEvent {
 
 interface IOrgIntegration {
   id: GID!
+  invalidCredentials: Boolean!
 
   """
   Wether this integration is the default to be used if the user has more than one of the same type
@@ -1931,6 +1932,7 @@ type Mutation {
 
 type OrgIntegration implements IOrgIntegration {
   id: GID!
+  invalidCredentials: Boolean!
 
   """
   Wether this integration is the default to be used if the user has more than one of the same type
@@ -4984,6 +4986,7 @@ type SignatureOrgIntegration implements IOrgIntegration {
   """
   environment: SignatureOrgIntegrationEnvironment!
   id: GID!
+  invalidCredentials: Boolean!
 
   """
   Wether this integration is the default to be used if the user has more than one of the same type

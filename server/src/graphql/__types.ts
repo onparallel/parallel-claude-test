@@ -1367,6 +1367,7 @@ export interface NexusGenFieldTypes {
   OrgIntegration: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
+    invalidCredentials: boolean; // Boolean!
     isDefault: boolean; // Boolean!
     name: string; // String!
     type: NexusGenEnums["IntegrationType"]; // IntegrationType!
@@ -2235,6 +2236,7 @@ export interface NexusGenFieldTypes {
     // field return type
     environment: NexusGenEnums["SignatureOrgIntegrationEnvironment"]; // SignatureOrgIntegrationEnvironment!
     id: NexusGenScalars["GID"]; // GID!
+    invalidCredentials: boolean; // Boolean!
     isDefault: boolean; // Boolean!
     name: string; // String!
     provider: NexusGenEnums["SignatureOrgIntegrationProvider"]; // SignatureOrgIntegrationProvider!
@@ -2462,6 +2464,7 @@ export interface NexusGenFieldTypes {
   IOrgIntegration: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
+    invalidCredentials: boolean; // Boolean!
     isDefault: boolean; // Boolean!
     name: string; // String!
     type: NexusGenEnums["IntegrationType"]; // IntegrationType!
@@ -3065,6 +3068,7 @@ export interface NexusGenFieldTypeNames {
   OrgIntegration: {
     // field return type name
     id: "GID";
+    invalidCredentials: "Boolean";
     isDefault: "Boolean";
     name: "String";
     type: "IntegrationType";
@@ -3933,6 +3937,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     environment: "SignatureOrgIntegrationEnvironment";
     id: "GID";
+    invalidCredentials: "Boolean";
     isDefault: "Boolean";
     name: "String";
     provider: "SignatureOrgIntegrationProvider";
@@ -4160,6 +4165,7 @@ export interface NexusGenFieldTypeNames {
   IOrgIntegration: {
     // field return type name
     id: "GID";
+    invalidCredentials: "Boolean";
     isDefault: "Boolean";
     name: "String";
     type: "IntegrationType";

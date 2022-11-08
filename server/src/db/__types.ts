@@ -756,6 +756,7 @@ export interface OrgIntegration {
   deleted_by: Maybe<string>; // varchar
   is_default: boolean; // bool
   name: string; // varchar
+  invalid_credentials: boolean; // bool
 }
 
 export type CreateOrgIntegration = PartialProps<
@@ -769,6 +770,7 @@ export type CreateOrgIntegration = PartialProps<
   | "deleted_at"
   | "deleted_by"
   | "is_default"
+  | "invalid_credentials"
 >;
 
 export interface Petition {

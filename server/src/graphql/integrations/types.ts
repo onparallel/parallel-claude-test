@@ -22,6 +22,9 @@ export const IOrgIntegration = interfaceType({
         "Wether this integration is the default to be used if the user has more than one of the same type",
       resolve: (o) => o.is_default,
     });
+    t.boolean("invalidCredentials", {
+      resolve: (o) => o.invalid_credentials,
+    });
   },
   resolveType: (o) => (o.type === "SIGNATURE" ? "SignatureOrgIntegration" : "OrgIntegration"),
 });
