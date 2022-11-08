@@ -1,4 +1,3 @@
-import { gql } from "@apollo/client";
 import {
   Alert,
   AlertDescription,
@@ -18,90 +17,21 @@ import {
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { SupportLink } from "@parallel/components/common/SupportLink";
-import {
-  InternalFieldKYCResearch_PetitionFieldReplyFragment,
-  InternalFieldKYCResearch_UserFragment,
-} from "@parallel/graphql/__types";
 import { useMetadata } from "@parallel/utils/withMetadata";
-import Head from "next/head";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
-import { DowJonesSearchResult } from "./DowJonesSearchResult";
 
-type InternalFieldKYCResearchProps = {
-  htmlTitle: string;
-  petitionId: string;
-  fieldId: string;
-  replies: InternalFieldKYCResearch_PetitionFieldReplyFragment[];
-  me: InternalFieldKYCResearch_UserFragment;
-};
-
-export function InternalFieldKYCResearch({
-  htmlTitle,
-  petitionId,
-  fieldId,
-  replies,
-  me,
-}: InternalFieldKYCResearchProps) {
-  const [formData, setFormData] = useState<DowJonesSearchFormData | null>(null);
-  const handleFormSubmit = async (data: DowJonesSearchFormData) => {
-    setFormData(data);
-  };
-
-  const handleResetSearch = async () => {
-    setFormData(null);
-  };
-
-  return (
-    <>
-      <Head>
-        <title>{htmlTitle}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </Head>
-      {isDefined(formData) ? (
-        <DowJonesSearchResult
-          name={formData.name}
-          date={formData.dateOfBirth}
-          petitionId={petitionId}
-          fieldId={fieldId}
-          replies={replies}
-          onResetClick={handleResetSearch}
-        />
-      ) : (
-        <DowJonesSearchForm onSubmit={handleFormSubmit} isDisabled={!me.hasDowJonesFeatureFlag} />
-      )}
-    </>
-  );
-}
-
-InternalFieldKYCResearch.fragments = {
-  PetitionFieldReply: gql`
-    fragment InternalFieldKYCResearch_PetitionFieldReply on PetitionFieldReply {
-      ...DowJonesSearchResult_PetitionFieldReply
-    }
-    ${DowJonesSearchResult.fragments.PetitionFieldReply}
-  `,
-  User: gql`
-    fragment InternalFieldKYCResearch_User on User {
-      id
-      hasDowJonesFeatureFlag: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
-    }
-  `,
-};
-
-type DowJonesSearchFormProps = {
+export type DowJonesSearchFormProps = {
   onSubmit: (data: DowJonesSearchFormData) => void;
   isDisabled?: boolean;
 };
 
-type DowJonesSearchFormData = {
+export type DowJonesSearchFormData = {
   name: string;
   dateOfBirth: string;
 };
 
-function DowJonesSearchForm({ onSubmit, isDisabled }: DowJonesSearchFormProps) {
+export function DowJonesSearchForm({ onSubmit, isDisabled }: DowJonesSearchFormProps) {
   const { browserName } = useMetadata();
   const {
     handleSubmit,

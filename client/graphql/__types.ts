@@ -11168,18 +11168,6 @@ export type DowJonesSearchResult_deletePetitionFieldReplyMutation = {
   };
 };
 
-export type InternalFieldKYCResearch_PetitionFieldReplyFragment = {
-  __typename?: "PetitionFieldReply";
-  id: string;
-  content: { [key: string]: any };
-};
-
-export type InternalFieldKYCResearch_UserFragment = {
-  __typename?: "User";
-  id: string;
-  hasDowJonesFeatureFlag: boolean;
-};
-
 export type PreviewPetitionFieldKYCResearch_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -28206,38 +28194,26 @@ export const DowJonesSearchResult_PetitionFieldReplyFragmentDoc = gql`
     content
   }
 ` as unknown as DocumentNode<DowJonesSearchResult_PetitionFieldReplyFragment, unknown>;
-export const InternalFieldKYCResearch_PetitionFieldReplyFragmentDoc = gql`
-  fragment InternalFieldKYCResearch_PetitionFieldReply on PetitionFieldReply {
-    ...DowJonesSearchResult_PetitionFieldReply
-  }
-  ${DowJonesSearchResult_PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<InternalFieldKYCResearch_PetitionFieldReplyFragment, unknown>;
 export const DowJonesFieldPreview_PetitionFieldFragmentDoc = gql`
   fragment DowJonesFieldPreview_PetitionField on PetitionField {
     id
     type
     replies {
-      ...InternalFieldKYCResearch_PetitionFieldReply
+      ...DowJonesSearchResult_PetitionFieldReply
     }
   }
-  ${InternalFieldKYCResearch_PetitionFieldReplyFragmentDoc}
+  ${DowJonesSearchResult_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<DowJonesFieldPreview_PetitionFieldFragment, unknown>;
-export const InternalFieldKYCResearch_UserFragmentDoc = gql`
-  fragment InternalFieldKYCResearch_User on User {
-    id
-    hasDowJonesFeatureFlag: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
-  }
-` as unknown as DocumentNode<InternalFieldKYCResearch_UserFragment, unknown>;
 export const DowJonesFieldPreview_QueryFragmentDoc = gql`
   fragment DowJonesFieldPreview_Query on Query {
     metadata {
       browserName
     }
     me {
-      ...InternalFieldKYCResearch_User
+      id
+      hasDowJonesFeatureFlag: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
     }
   }
-  ${InternalFieldKYCResearch_UserFragmentDoc}
 ` as unknown as DocumentNode<DowJonesFieldPreview_QueryFragment, unknown>;
 export const completedFieldReplies_PetitionFieldFragmentDoc = gql`
   fragment completedFieldReplies_PetitionField on PetitionField {

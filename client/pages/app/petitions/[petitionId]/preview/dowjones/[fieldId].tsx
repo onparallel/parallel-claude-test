@@ -1,7 +1,11 @@
 import { gql } from "@apollo/client";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { InternalFieldKYCResearch } from "@parallel/components/petition-preview/fields/InternalFieldKYCResearch";
+import {
+  DowJonesSearchForm,
+  DowJonesSearchFormData,
+} from "@parallel/components/petition-preview/fields/DowJonesSearchForm";
+import { DowJonesSearchResult } from "@parallel/components/petition-preview/fields/DowJonesSearchResult";
 import {
   DowJonesFieldPreview_petitionFieldDocument,
   DowJonesFieldPreview_userDocument,
@@ -10,6 +14,9 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { withMetadata } from "@parallel/utils/withMetadata";
+import Head from "next/head";
+import { useState } from "react";
+import { isDefined } from "remeda";
 
 function DowJonesFieldPreview({
   petitionId,
@@ -28,14 +35,34 @@ function DowJonesFieldPreview({
     data: { me },
   } = useAssertQuery(DowJonesFieldPreview_userDocument);
 
+  const [formData, setFormData] = useState<DowJonesSearchFormData | null>(null);
+  const handleFormSubmit = async (data: DowJonesSearchFormData) => {
+    setFormData(data);
+  };
+
+  const handleResetSearch = async () => {
+    setFormData(null);
+  };
+
   return (
-    <InternalFieldKYCResearch
-      htmlTitle={"Dow Jones | Parallel"}
-      petitionId={petitionId}
-      fieldId={petitionFieldId}
-      replies={petitionField.replies}
-      me={me}
-    />
+    <>
+      <Head>
+        <title>{"Dow Jones | Parallel"}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </Head>
+      {isDefined(formData) ? (
+        <DowJonesSearchResult
+          name={formData.name}
+          date={formData.dateOfBirth}
+          petitionId={petitionId}
+          fieldId={petitionFieldId}
+          replies={petitionField.replies}
+          onResetClick={handleResetSearch}
+        />
+      ) : (
+        <DowJonesSearchForm onSubmit={handleFormSubmit} isDisabled={!me.hasDowJonesFeatureFlag} />
+      )}
+    </>
   );
 }
 
@@ -45,10 +72,10 @@ DowJonesFieldPreview.fragments = {
       id
       type
       replies {
-        ...InternalFieldKYCResearch_PetitionFieldReply
+        ...DowJonesSearchResult_PetitionFieldReply
       }
     }
-    ${InternalFieldKYCResearch.fragments.PetitionFieldReply}
+    ${DowJonesSearchResult.fragments.PetitionFieldReply}
   `,
   Query: gql`
     fragment DowJonesFieldPreview_Query on Query {
@@ -56,10 +83,10 @@ DowJonesFieldPreview.fragments = {
         browserName
       }
       me {
-        ...InternalFieldKYCResearch_User
+        id
+        hasDowJonesFeatureFlag: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
       }
     }
-    ${InternalFieldKYCResearch.fragments.User}
   `,
 };
 

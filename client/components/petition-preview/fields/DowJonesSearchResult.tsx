@@ -87,7 +87,7 @@ export function DowJonesSearchResult({
 
   return (
     <Stack paddingX={6} paddingY={5} spacing={6}>
-      {result?.totalCount ? (
+      {result?.totalCount || !loading ? (
         <Heading size="md">
           <FormattedMessage
             id="component.dow-jones-search-result.results-found"

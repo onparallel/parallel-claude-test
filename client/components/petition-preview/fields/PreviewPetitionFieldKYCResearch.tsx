@@ -38,12 +38,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
+import { PreviewPetitionFieldKYCResearch_PetitionFieldFragment } from "@parallel/graphql/__types";
 
 export interface PreviewPetitionFieldKYCResearchProps
   extends Omit<
     RecipientViewPetitionFieldCardProps,
     "children" | "showAddNewReply" | "onAddNewReply"
   > {
+  field: PreviewPetitionFieldKYCResearch_PetitionFieldFragment;
   isDisabled: boolean;
   onDeleteReply: (replyId: string) => void;
   onDownloadReply: (replyId: string) => void;

@@ -213,9 +213,9 @@ export function DowJonesProfileDetails({
         {loading ? (
           <Box height={"85px"}></Box>
         ) : details?.__typename === "DowJonesRiskEntityProfileResultEntity" ? (
-          <ProfileResultEntity data={details} />
+          <ProfileResultEntity data={details as any} />
         ) : details?.__typename === "DowJonesRiskEntityProfileResultPerson" ? (
-          <ProfileResultPerson data={details} />
+          <ProfileResultPerson data={details as any} />
         ) : null}
       </Card>
 
@@ -279,10 +279,8 @@ export function DowJonesProfileDetails({
             <Table
               isHighlightable
               columns={relationshipsColumns}
-              rows={
-                details.relationships as DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment[]
-              }
-              rowKeyProp="id"
+              rows={details.relationships}
+              rowKeyProp="profileId"
               onRowClick={handleRelationshipsRowClick}
             />
           </Box>
