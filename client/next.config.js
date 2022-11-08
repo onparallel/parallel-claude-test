@@ -93,5 +93,5 @@ module.exports = [
   ]),
   ...(process.env.SENTRY_AUTH_TOKEN
     ? [(config) => withSentryConfig(config, { silent: true })]
-    : []),
+    : [({ sentry, ...config }) => config]),
 ].reduce((acc, curr) => curr(acc), config);
