@@ -1395,7 +1395,7 @@ describe("repositories/PetitionRepository", () => {
 
     it("creates single replies for each type of alias-able field", async () => {
       // please, add the new field type to this test if this check fails
-      expect(PetitionFieldTypeValues).toHaveLength(11);
+      expect(PetitionFieldTypeValues).toHaveLength(12);
 
       await petitions.prefillPetition(
         petition.id,
@@ -1411,6 +1411,7 @@ describe("repositories/PetitionRepository", () => {
           PHONE: "+34000000000",
           DATE: ["2024-05-21"],
           ES_TAX_DOCUMENTS: "this should be ignored",
+          DOW_JONES_KYC_RESEARCH: "this should be ignored",
         },
         user
       );
@@ -1466,7 +1467,7 @@ describe("repositories/PetitionRepository", () => {
 
     it("creates multiple replies for each type of alias-able field", async () => {
       // please, add the new field type to this test if this check fails
-      expect(PetitionFieldTypeValues).toHaveLength(11);
+      expect(PetitionFieldTypeValues).toHaveLength(12);
 
       await petitions.prefillPetition(
         petition.id,
@@ -1485,6 +1486,7 @@ describe("repositories/PetitionRepository", () => {
           PHONE: ["+34000000000", "+34111111111"],
           DATE: ["2024-05-21", "2011-08-29"],
           ES_TAX_DOCUMENTS: "this should be ignored",
+          DOW_JONES_KYC_RESEARCH: "this should be ignored",
         },
         user
       );
@@ -1578,7 +1580,7 @@ describe("repositories/PetitionRepository", () => {
 
     it("ignores a reply if it does not match with field options", async () => {
       // please, add the new field type to this test if this check fails
-      expect(PetitionFieldTypeValues).toHaveLength(11);
+      expect(PetitionFieldTypeValues).toHaveLength(12);
 
       await petitions.prefillPetition(
         petition.id,
@@ -1588,6 +1590,7 @@ describe("repositories/PetitionRepository", () => {
           SHORT_TEXT: "this reply exceeds the max length of 10 chars",
           CHECKBOX: ["A", "B", "C"], // options are right, but field has subtype RADIO
           NUMBER: [1, 10],
+          DOW_JONES_KYC_RESEARCH: "this should be ignored",
         },
         user
       );
