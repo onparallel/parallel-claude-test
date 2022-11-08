@@ -38,8 +38,8 @@ import { isAtLeast } from "@parallel/utils/roles";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { useDeactivateDowJonesIntegrationDialog } from "./dialogs/DeactivateDowJonesIntegrationDialog";
-import { useDowJonesIntegrationDialog } from "./dialogs/DowJonesIntegrationDialog";
+import { useDeactivateDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DeactivateDowJonesIntegrationDialog";
+import { useDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DowJonesIntegrationDialog";
 
 function OrganizationIntegrations() {
   const intl = useIntl();
