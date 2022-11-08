@@ -2,6 +2,7 @@ import DataLoader from "dataloader";
 import { Duration } from "date-fns";
 import { injectable } from "inversify";
 import { Knex } from "knex";
+import PostgresInterval from "postgres-interval";
 import { groupBy, indexBy, isDefined, times } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { KeysOfType, MaybeArray, Replace, UnwrapPromise } from "../../util/types";
@@ -21,7 +22,6 @@ import {
   TableCreateTypes as _TableCreateTypes,
   TableTypes as _TableTypes,
 } from "../__types";
-import PostgresInterval from "postgres-interval";
 
 export interface TableTypes
   extends Replace<
@@ -74,7 +74,7 @@ interface LoaderOptions {
   refresh?: boolean;
 }
 
-interface Loader<K, V, C = K> {
+export interface Loader<K, V, C = K> {
   (key: K, options?: LoaderOptions): Promise<V>;
   (keys: ReadonlyArray<K>, options?: LoaderOptions): Promise<V[]>;
   dataloader: DataLoader<K, V, C>;
@@ -107,10 +107,11 @@ export class BaseRepository {
     ) as any;
   }
 
-  protected from<TName extends TableNames>(tableName: TName, transaction?: Knex.Transaction) {
-    return transaction
-      ? transaction<TableTypes[TName]>(tableName)
-      : this.knex<TableTypes[TName]>(tableName);
+  protected from<TName extends TableNames, TResult extends {} = TableTypes[TName]>(
+    tableName: TName,
+    transaction?: Knex.Transaction
+  ) {
+    return transaction ? transaction<TResult>(tableName) : this.knex<TResult>(tableName);
   }
 
   protected async raw<TResult>(
@@ -180,30 +181,30 @@ export class BaseRepository {
 
   protected buildLoadBy<
     TName extends TableNames,
-    TColumn extends KeysOfType<TableTypes[TName], number | string | null>
+    TColumn extends KeysOfType<TableTypes[TName], number | string | null>,
+    TResult extends {} = TableTypes[TName]
   >(tableName: TName, column: TColumn, builder?: QueryBuilderFunction<TableTypes[TName]>) {
-    return this.buildLoader<TableTypes[TName][TColumn], TableTypes[TName] | null>(
-      async (values, t) => {
-        const rows: TableTypes[TName][] = await this.from(tableName, t)
-          .whereIn(column as any, values)
-          .modify((q) => builder?.(q))
-          .select("*");
-        const byValue = indexBy(rows, (r) => r[column]);
-        return values.map((value) => byValue[value as any] ?? null);
-      }
-    );
+    return this.buildLoader<TableTypes[TName][TColumn], TResult | null>(async (values, t) => {
+      const rows: TResult[] = await this.from(tableName, t)
+        .whereIn(column as any, values as any)
+        .modify((q) => builder?.(q as any))
+        .select("*");
+      const byValue = indexBy(rows, (r) => (r as any)[column]);
+      return values.map((value) => byValue[value as any] ?? null);
+    });
   }
 
   protected buildLoadMultipleBy<
     TName extends TableNames,
-    TColumn extends KeysOfType<TableTypes[TName], number | string | null>
+    TColumn extends KeysOfType<TableTypes[TName], number | string | null>,
+    TResult extends {} = TableTypes[TName]
   >(tableName: TName, column: TColumn, builder?: QueryBuilderFunction<TableTypes[TName]>) {
-    return this.buildLoader<TableTypes[TName][TColumn], TableTypes[TName][]>(async (values, t) => {
-      const rows: TableTypes[TName][] = await this.from(tableName, t)
-        .whereIn(column as any, values)
-        .modify((q) => builder?.(q))
+    return this.buildLoader<TableTypes[TName][TColumn], TResult[]>(async (values, t) => {
+      const rows: TResult[] = await this.from(tableName, t)
+        .whereIn(column as any, values as any)
+        .modify((q) => builder?.(q as any))
         .select("*");
-      const byValue = groupBy(rows, (r) => r[column] as any);
+      const byValue = groupBy(rows, (r) => (r as any)[column] as any);
       return values.map((value) => byValue[value as any] ?? []);
     });
   }
@@ -217,8 +218,8 @@ export class BaseRepository {
         aggr: any;
         count: number;
       }[] = await this.from(tableName, t)
-        .whereIn(column as any, values)
-        .modify((q) => builder?.(q))
+        .whereIn(column as any, values as any)
+        .modify((q) => builder?.(q as any))
         .groupBy(column)
         .select(this.knex.raw(`?? as aggr`, [column as string]), this.count());
       const byValue = indexBy(rows, (r) => r.aggr);

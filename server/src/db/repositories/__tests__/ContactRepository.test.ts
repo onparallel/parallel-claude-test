@@ -43,10 +43,10 @@ describe("repositories/ContactRepository", () => {
 
   describe("loadContactByEmail", () => {
     test("gets the contact from the right org", async () => {
-      const result = await c.loadContactByEmail(
-        { orgId: orgs[0].id, email: "contact.0@onparallel.com" },
-        { cache: false }
-      );
+      const result = await c.loadContactByEmail.raw({
+        orgId: orgs[0].id,
+        email: "contact.0@onparallel.com",
+      });
       expect(result).toMatchObject({
         org_id: orgs[0].id,
         email: "contact.0@onparallel.com",
@@ -54,15 +54,12 @@ describe("repositories/ContactRepository", () => {
     });
 
     test("gets multiple contacts", async () => {
-      const result = await c.loadContactByEmail(
-        [
-          { orgId: orgs[0].id, email: "contact.0@onparallel.com" },
-          { orgId: orgs[1].id, email: "contact.0@onparallel.com" },
-          { orgId: orgs[1].id, email: "contact.1@onparallel.com" },
-          { orgId: orgs[1].id, email: "contact.2@onparallel.com" },
-        ],
-        { cache: false }
-      );
+      const result = await c.loadContactByEmail.raw([
+        { orgId: orgs[0].id, email: "contact.0@onparallel.com" },
+        { orgId: orgs[1].id, email: "contact.0@onparallel.com" },
+        { orgId: orgs[1].id, email: "contact.1@onparallel.com" },
+        { orgId: orgs[1].id, email: "contact.2@onparallel.com" },
+      ]);
       expect(result).toMatchObject([
         {
           org_id: orgs[0].id,

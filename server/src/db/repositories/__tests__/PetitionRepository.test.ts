@@ -943,10 +943,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.anonymizePetition(petition.id);
 
         const repliesAfter = (
-          await petitions.loadRepliesForField(
-            fields.map((f) => f.id),
-            { cache: false }
-          )
+          await petitions.loadRepliesForField.raw(fields.map((f) => f.id))
         ).flat();
         expect(repliesAfter.length).toBeGreaterThan(0);
 
@@ -973,13 +970,12 @@ describe("repositories/PetitionRepository", () => {
         await petitions.anonymizePetition(petition.id);
 
         const commentsAfter = (
-          await petitions.loadPetitionFieldCommentsForField(
+          await petitions.loadPetitionFieldCommentsForField.raw(
             fields.map((f) => ({
               petitionFieldId: f.id,
               petitionId: petition.id,
               loadInternalComments: true,
-            })),
-            { cache: false }
+            }))
           )
         ).flat();
 
@@ -1383,12 +1379,7 @@ describe("repositories/PetitionRepository", () => {
 
     it("ignores unknown alias", async () => {
       await petitions.prefillPetition(petition.id, { unknown: 123 }, user);
-      const replies = (
-        await petitions.loadRepliesForField(
-          fields.map((f) => f.id),
-          { cache: false }
-        )
-      ).flat();
+      const replies = (await petitions.loadRepliesForField.raw(fields.map((f) => f.id))).flat();
 
       expect(replies).toHaveLength(0);
     });
@@ -1416,12 +1407,7 @@ describe("repositories/PetitionRepository", () => {
         user
       );
 
-      const replies = (
-        await petitions.loadRepliesForField(
-          fields.map((f) => f.id),
-          { cache: false }
-        )
-      ).flat();
+      const replies = (await petitions.loadRepliesForField.raw(fields.map((f) => f.id))).flat();
 
       expect(replies).toHaveLength(8);
       expect(replies.map((r) => pick(r, ["type", "content", "petition_field_id"]))).toEqual([
@@ -1491,12 +1477,7 @@ describe("repositories/PetitionRepository", () => {
         user
       );
 
-      const replies = (
-        await petitions.loadRepliesForField(
-          fields.map((f) => f.id),
-          { cache: false }
-        )
-      ).flat();
+      const replies = (await petitions.loadRepliesForField.raw(fields.map((f) => f.id))).flat();
 
       // expect(replies).toHaveLength(17);
       expect(replies.map((r) => pick(r, ["type", "content", "petition_field_id"]))).toEqual([
@@ -1595,12 +1576,7 @@ describe("repositories/PetitionRepository", () => {
         user
       );
 
-      const replies = (
-        await petitions.loadRepliesForField(
-          fields.map((f) => f.id),
-          { cache: false }
-        )
-      ).flat();
+      const replies = (await petitions.loadRepliesForField.raw(fields.map((f) => f.id))).flat();
 
       expect(replies).toHaveLength(2);
       expect(replies.map((r) => pick(r, ["type", "content", "petition_field_id"]))).toEqual([

@@ -1,4 +1,3 @@
-import DataLoader from "dataloader";
 import { Duration } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
@@ -7,7 +6,6 @@ import { Config, CONFIG } from "../../config";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { unMaybeArray } from "../../util/arrays";
 import { BrandTheme, defaultBrandTheme } from "../../util/BrandTheme";
-import { fromDataLoader } from "../../util/fromDataLoader";
 import { fromGlobalId, isGlobalId } from "../../util/globalId";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { Maybe, MaybeArray } from "../../util/types";
@@ -255,35 +253,33 @@ export class OrganizationRepository extends BaseRepository {
     );
   }
 
-  readonly loadOrgLogoPath = fromDataLoader(
-    new DataLoader<number, Maybe<string>>(async (orgIds) => {
-      const results = await this.raw<{ id: number; path: string }>(
-        /* sql */ `
+  readonly loadOrgLogoPath = this.buildLoader<number, Maybe<string>>(async (orgIds, t) => {
+    const results = await this.raw<{ id: number; path: string }>(
+      /* sql */ `
         select o.id, pfu.path from organization o
-          join public_file_upload pfu on o.logo_public_file_id = pfu.id
-          where o.id in ?
+        join public_file_upload pfu on o.logo_public_file_id = pfu.id
+        where o.id in ?
       `,
-        [this.sqlIn(orgIds)]
-      );
-      const resultsById = indexBy(results, (x) => x.id);
-      return orgIds.map((id) => resultsById[id]?.path ?? null);
-    })
-  );
+      [this.sqlIn(orgIds)],
+      t
+    );
+    const resultsById = indexBy(results, (x) => x.id);
+    return orgIds.map((id) => resultsById[id]?.path ?? null);
+  });
 
-  readonly loadOrgIconPath = fromDataLoader(
-    new DataLoader<number, Maybe<string>>(async (orgIds) => {
-      const results = await this.raw<{ id: number; path: string }>(
-        /* sql */ `
+  readonly loadOrgIconPath = this.buildLoader<number, Maybe<string>>(async (orgIds, t) => {
+    const results = await this.raw<{ id: number; path: string }>(
+      /* sql */ `
         select o.id, pfu.path from organization o
-          join public_file_upload pfu on o.icon_public_file_id = pfu.id
-          where o.id in ?
+        join public_file_upload pfu on o.icon_public_file_id = pfu.id
+        where o.id in ?
       `,
-        [this.sqlIn(orgIds)]
-      );
-      const resultsById = indexBy(results, (x) => x.id);
-      return orgIds.map((id) => resultsById[id]?.path ?? null);
-    })
-  );
+      [this.sqlIn(orgIds)],
+      t
+    );
+    const resultsById = indexBy(results, (x) => x.id);
+    return orgIds.map((id) => resultsById[id]?.path ?? null);
+  });
 
   async getOrganizationOwner(orgId: number) {
     const [owner] = await this.from("user")

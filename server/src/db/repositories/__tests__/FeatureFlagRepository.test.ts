@@ -37,9 +37,7 @@ describe("repositories/FeatureFlagRepository", () => {
   });
 
   test("returns the default value when there's no overrides", async () => {
-    const result = await ff.userHasFeatureFlag(user1.id, "PETITION_SIGNATURE", {
-      refresh: true,
-    });
+    const result = await ff.userHasFeatureFlag(user1.id, "PETITION_SIGNATURE", true);
     expect(result).toBe(false);
   });
 
@@ -51,9 +49,7 @@ describe("repositories/FeatureFlagRepository", () => {
         value: true,
       },
     ]);
-    const result = await ff.userHasFeatureFlag(user1.id, "PETITION_SIGNATURE", {
-      refresh: true,
-    });
+    const result = await ff.userHasFeatureFlag(user1.id, "PETITION_SIGNATURE", true);
     expect(result).toBe(true);
   });
 
@@ -71,12 +67,8 @@ describe("repositories/FeatureFlagRepository", () => {
       },
     ]);
     const [result1, result2] = await Promise.all([
-      ff.userHasFeatureFlag(user1.id, "PETITION_SIGNATURE", {
-        refresh: true,
-      }),
-      ff.userHasFeatureFlag(user2.id, "PETITION_SIGNATURE", {
-        refresh: true,
-      }),
+      ff.userHasFeatureFlag(user1.id, "PETITION_SIGNATURE", true),
+      ff.userHasFeatureFlag(user2.id, "PETITION_SIGNATURE", true),
     ]);
 
     expect(result1).toBe(false);
@@ -84,9 +76,7 @@ describe("repositories/FeatureFlagRepository", () => {
   });
 
   test("returns false for unknown userId", async () => {
-    const result = await ff.userHasFeatureFlag(654321, "PETITION_SIGNATURE", {
-      refresh: true,
-    });
+    const result = await ff.userHasFeatureFlag(654321, "PETITION_SIGNATURE", true);
     expect(result).toBe(false);
   });
 });

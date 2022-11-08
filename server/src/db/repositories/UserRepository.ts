@@ -1,10 +1,8 @@
-import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { groupBy, indexBy, omit, uniq } from "remeda";
 import { CONFIG, Config } from "../../config";
 import { unMaybeArray } from "../../util/arrays";
-import { fromDataLoader } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
 import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
@@ -23,55 +21,54 @@ export class UserRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadUsersByCognitoId = fromDataLoader(
-    new DataLoader<string, User[]>(async (cognitoIds) => {
-      const users = await this.raw<User & { ud_cognito_id: string }>(
-        /* sql */ `
+  readonly loadUsersByCognitoId = this.buildLoader<string, User[]>(async (cognitoIds, t) => {
+    const users = await this.raw<User & { ud_cognito_id: string }>(
+      /* sql */ `
         update "user" u set last_active_at = NOW()
         from user_data ud 
         where ud.id = u.user_data_id
         and u.deleted_at is null and ud.deleted_at is null and ud.cognito_id in ?
         returning u.*, ud.cognito_id as ud_cognito_id
       `,
-        [this.sqlIn(cognitoIds)]
-      );
-      const byCognitoId = groupBy(users, (u) => u.ud_cognito_id);
-      return cognitoIds.map((id) => byCognitoId[id]?.map((u) => omit(u, ["ud_cognito_id"])) ?? []);
-    })
-  );
+      [this.sqlIn(cognitoIds)],
+      t
+    );
+    const byCognitoId = groupBy(users, (u) => u.ud_cognito_id);
+    return cognitoIds.map((id) => byCognitoId[id]?.map((u) => omit(u, ["ud_cognito_id"])) ?? []);
+  });
 
   readonly loadUser = this.buildLoadBy("user", "id", (q) => q.whereNull("deleted_at"));
 
   readonly loadUserData = this.buildLoadBy("user_data", "id", (q) => q.whereNull("deleted_at"));
 
-  readonly loadUserDelegatesByUserId = fromDataLoader(
-    new DataLoader<number, User[]>(async (userIds) => {
-      const users = await this.raw<User & { user_id: number }>(
-        /* sql */ `
+  readonly loadUserDelegatesByUserId = this.buildLoader<number, User[]>(async (userIds, t) => {
+    const users = await this.raw<User & { user_id: number }>(
+      /* sql */ `
         select ud.user_id as user_id, u.* from "user" u
-          join user_delegate ud on ud.delegate_user_id = u.id
-          where ud.user_id in ? and u.deleted_at is null and ud.deleted_at is null
+        join user_delegate ud on ud.delegate_user_id = u.id
+        where ud.user_id in ? and u.deleted_at is null and ud.deleted_at is null
       `,
-        [this.sqlIn(userIds)]
-      );
-      const byUserId = groupBy(users, (u) => u.user_id);
-      return userIds.map((id) => byUserId[id]?.map((u) => omit(u, ["user_id"])) ?? []);
-    })
-  );
+      [this.sqlIn(userIds)],
+      t
+    );
+    const byUserId = groupBy(users, (u) => u.user_id);
+    return userIds.map((id) => byUserId[id]?.map((u) => omit(u, ["user_id"])) ?? []);
+  });
 
-  readonly loadReverseUserDelegatesByUserId = fromDataLoader(
-    new DataLoader<number, User[]>(async (userIds) => {
+  readonly loadReverseUserDelegatesByUserId = this.buildLoader<number, User[]>(
+    async (userIds, t) => {
       const users = await this.raw<User & { delegate_user_id: number }>(
         /* sql */ `
-        select ud.delegate_user_id as delegate_user_id, u.* from "user" u
+          select ud.delegate_user_id as delegate_user_id, u.* from "user" u
           join user_delegate ud on ud.user_id = u.id
           where ud.delegate_user_id in ? and u.deleted_at is null and ud.deleted_at is null
-      `,
-        [this.sqlIn(userIds)]
+        `,
+        [this.sqlIn(userIds)],
+        t
       );
       const byUserId = groupBy(users, (u) => u.delegate_user_id);
       return userIds.map((id) => byUserId[id]?.map((u) => omit(u, ["delegate_user_id"])) ?? []);
-    })
+    }
   );
 
   async syncDelegates(userId: number, delegateUserIds: MaybeArray<number>, user: User) {
@@ -105,51 +102,53 @@ export class UserRepository extends BaseRepository {
     }
   }
 
-  readonly loadUserDataByUserId = fromDataLoader(
-    new DataLoader<number, Maybe<UserData>>(async (ids) => {
-      const users = await this.raw<UserData & { user_id: number }>(
-        /* sql */ `
-        select u.id as user_id, ud.* from "user" u join "user_data" ud on u.user_data_id = ud.id
+  readonly loadUserDataByUserId = this.buildLoader<number, Maybe<UserData>>(async (userIds, t) => {
+    const users = await this.raw<UserData & { user_id: number }>(
+      /* sql */ `
+        select u.id as user_id, ud.* from "user" u
+        join "user_data" ud on u.user_data_id = ud.id
         where u.id in ?
         and u.deleted_at is null and ud.deleted_at is null
       `,
-        [this.sqlIn(ids)]
-      );
+      [this.sqlIn(userIds)],
+      t
+    );
 
-      const byUserId = indexBy(users, (u) => u.user_id);
-      return ids.map((id) => (byUserId[id] ? omit(byUserId[id], ["user_id"]) : null));
-    })
+    const byUserId = indexBy(users, (u) => u.user_id);
+    return userIds.map((id) => (byUserId[id] ? omit(byUserId[id], ["user_id"]) : null));
+  });
+
+  readonly loadUserByExternalId = this.buildLoader<
+    { orgId: number; externalId: string },
+    Maybe<User>,
+    string
+  >(
+    async (externalIds, t) => {
+      const users = await this.from("user", t)
+        .whereIn("org_id", uniq(externalIds.map((x) => x.orgId)))
+        .whereIn("external_id", uniq(externalIds.map((x) => x.externalId)))
+        .whereNull("deleted_at");
+
+      const byId = indexBy(users, keyBuilder(["org_id", "external_id"]));
+
+      return externalIds.map(keyBuilder(["orgId", "externalId"])).map((key) => byId[key] ?? null);
+    },
+    { cacheKeyFn: keyBuilder(["orgId", "externalId"]) }
   );
 
-  readonly loadUserByExternalId = fromDataLoader(
-    new DataLoader<{ orgId: number; externalId: string }, Maybe<User>, string>(
-      async (ids) => {
-        const users = await this.from("user")
-          .whereIn("org_id", uniq(ids.map((x) => x.orgId)))
-          .whereIn("external_id", uniq(ids.map((x) => x.externalId)))
-          .whereNull("deleted_at");
-
-        const byId = indexBy(users, keyBuilder(["org_id", "external_id"]));
-
-        return ids.map(keyBuilder(["orgId", "externalId"])).map((key) => byId[key] ?? null);
-      },
-      { cacheKeyFn: keyBuilder(["orgId", "externalId"]) }
-    )
-  );
-
-  readonly loadUsersByEmail = fromDataLoader(
-    new DataLoader<string, User[]>(async (emails) => {
-      const users = await this.raw<User & { ud_email: string }>(
-        /* sql */ `
-        select u.*, ud.email as ud_email from "user" u join "user_data" ud on u.user_data_id = ud.id
+  readonly loadUsersByEmail = this.buildLoader<string, User[]>(async (emails, t) => {
+    const users = await this.raw<User & { ud_email: string }>(
+      /* sql */ `
+        select u.*, ud.email as ud_email from "user" u
+        join "user_data" ud on u.user_data_id = ud.id
         where u.deleted_at is null and ud.deleted_at is null and ud.email in ?
       `,
-        [this.sqlIn(emails)]
-      );
-      const byEmail = groupBy(users, (u) => u.ud_email);
-      return emails.map((email) => byEmail[email]?.map((u) => omit(u, ["ud_email"])) ?? []);
-    })
-  );
+      [this.sqlIn(emails)],
+      t
+    );
+    const byEmail = groupBy(users, (u) => u.ud_email);
+    return emails.map((email) => byEmail[email]?.map((u) => omit(u, ["ud_email"])) ?? []);
+  });
 
   readonly loadUsersByUserDataId = this.buildLoadMultipleBy("user", "user_data_id");
 
@@ -356,18 +355,19 @@ export class UserRepository extends BaseRepository {
     return [...(userGroups ?? []), ...users];
   }
 
-  readonly loadAvatarPathByUserDataId = fromDataLoader(
-    new DataLoader<number, Maybe<string>>(async (userDataIds) => {
+  readonly loadAvatarPathByUserDataId = this.buildLoader<number, Maybe<string>>(
+    async (userDataIds, t) => {
       const results = await this.raw<{ id: number; path: string }>(
         /* sql */ `
-        select ud.id, pfu.path from "user_data" ud
+          select ud.id, pfu.path from "user_data" ud
           join public_file_upload pfu on ud.avatar_public_file_id = pfu.id
           where ud.id in ?
-      `,
-        [this.sqlIn(userDataIds)]
+        `,
+        [this.sqlIn(userDataIds)],
+        t
       );
       const resultsById = indexBy(results, (x) => x.id);
       return userDataIds.map((id) => resultsById[id]?.path ?? null);
-    })
+    }
   );
 }

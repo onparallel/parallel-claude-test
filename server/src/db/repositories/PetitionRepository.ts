@@ -1,4 +1,3 @@
-import DataLoader from "dataloader";
 import { differenceInSeconds, isSameMonth, isThisMonth, subMonths } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
@@ -21,7 +20,6 @@ import { QueuesService, QUEUES_SERVICE } from "../../services/queues";
 import { average, findLast, partition, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fieldVisibility";
-import { fromDataLoader } from "../../util/fromDataLoader";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { keyBuilder } from "../../util/keyBuilder";
@@ -60,7 +58,6 @@ import {
   CreatePetitionReminder,
   CreatePetitionSignatureRequest,
   CreatePublicPetitionLink,
-  FileUpload,
   OrgIntegration,
   Petition,
   PetitionAccess,
@@ -180,21 +177,20 @@ export class PetitionRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  readonly loadFieldForReply = fromDataLoader(
-    new DataLoader<number, PetitionField | null>(async (ids) => {
+  readonly loadFieldForReply = this.buildLoader<number, PetitionField | null>(
+    async (replyIds, t) => {
       const fields = await this.raw<PetitionField & { _pfr_id: number }>(
         /* sql */ `
-      select pf.*, pfr.id as _pfr_id from petition_field_reply pfr
-      join petition_field pf on pfr.petition_field_id = pf.id
-      where pfr.id in ?
-        and pf.deleted_at is null
-        and pfr.deleted_at is null
-    `,
-        [this.sqlIn(ids)]
+        select pf.*, pfr.id as _pfr_id from petition_field_reply pfr
+        join petition_field pf on pfr.petition_field_id = pf.id
+        where pfr.id in ? and pf.deleted_at is null and pfr.deleted_at is null
+      `,
+        [this.sqlIn(replyIds)],
+        t
       );
       const byPfrId = indexBy(fields, (f) => f._pfr_id);
-      return ids.map((id) => (byPfrId[id] ? omit(byPfrId[id], ["_pfr_id"]) : null));
-    })
+      return replyIds.map((id) => (byPfrId[id] ? omit(byPfrId[id], ["_pfr_id"]) : null));
+    }
   );
 
   async getPetitionsByFromTemplateId(
@@ -774,135 +770,134 @@ export class PetitionRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  readonly loadPetitionProgress = fromDataLoader(
-    new DataLoader<
-      number,
-      {
-        external: {
-          approved: number;
-          replied: number;
-          optional: number;
-          total: number;
-        };
-        internal: {
-          approved: number;
-          replied: number;
-          optional: number;
-          total: number;
-        };
-      }
-    >(async (ids) => {
-      const [fields, fieldReplies] = await Promise.all([
-        this.knex<PetitionField>("petition_field")
-          .whereIn("petition_id", ids)
-          .whereNull("deleted_at")
-          .whereNot("type", "HEADING"),
-        this.knex("petition_field_reply as pfr")
-          .leftJoin("petition_field as pf", function () {
-            this.on("pf.id", "pfr.petition_field_id").andOnNull("pfr.deleted_at");
-          })
-          .whereIn("pf.petition_id", ids)
-          .whereNull("pf.deleted_at")
-          .select<PetitionFieldReply[]>("pfr.*"),
-      ]);
+  readonly loadPetitionProgress = this.buildLoader<
+    number,
+    {
+      external: {
+        approved: number;
+        replied: number;
+        optional: number;
+        total: number;
+      };
+      internal: {
+        approved: number;
+        replied: number;
+        optional: number;
+        total: number;
+      };
+    }
+  >(async (petitionIds, t) => {
+    const [fields, fieldReplies] = await Promise.all([
+      this.from("petition_field", t)
+        .whereIn("petition_id", petitionIds)
+        .whereNull("deleted_at")
+        .whereNot("type", "HEADING"),
+      this.raw<PetitionFieldReply>(
+        /* sql */ `
+          select pfr.* from petition_field_reply as pfr
+          left join petition_field as pf on pf.id = pfr.petition_field_id and pfr.deleted_at is null
+          where pf.petition in ? and pf.deleted_at is null
+        `,
+        [this.sqlIn(petitionIds)],
+        t
+      ),
+    ]);
 
-      const fieldsByPetition = groupBy(fields, (f) => f.petition_id);
+    const fieldsByPetition = groupBy(fields, (f) => f.petition_id);
 
-      const fileUploadIds = uniq(
-        fieldReplies
-          .filter((r) => isFileTypeField(r.type) && r.content?.file_upload_id)
-          .map((r) => r.content.file_upload_id as number)
+    const fileUploadIds = uniq(
+      fieldReplies
+        .filter((r) => isFileTypeField(r.type) && r.content?.file_upload_id)
+        .map((r) => r.content.file_upload_id as number)
+    );
+
+    const uploadedFiles = await this.from("file_upload", t)
+      .whereIn("id", fileUploadIds)
+      .whereNull("deleted_at")
+      .select("*");
+
+    return petitionIds.map((id) => {
+      const fieldsWithReplies = (fieldsByPetition[id] ?? [])
+        .map((field) => ({
+          ...field,
+          replies: fieldReplies
+            .filter((r) => r.petition_field_id === field.id)
+            .map((reply) => {
+              // for FILE_UPLOADs, we need to make sure the file was correctly uploaded before counting it as a submitted reply
+              const file =
+                isFileTypeField(reply.type) && isDefined(reply.content?.file_upload_id)
+                  ? uploadedFiles.find((f) => f.id === reply.content!.file_upload_id)
+                  : undefined;
+
+              return {
+                content: reply.content
+                  ? {
+                      ...reply.content,
+                      uploadComplete: file?.upload_complete,
+                    }
+                  : null,
+                status: reply.status,
+                anonymized_at: reply.anonymized_at,
+              };
+            })
+            .filter((r) => r.content !== null),
+        }))
+        .sort((a, b) => a.position! - b.position!);
+
+      const visibleFields = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
+        .filter(([field, isVisible]) => isVisible && !field.is_internal)
+        .map(([field]) => field);
+
+      const visibleInternalFields = zip(
+        fieldsWithReplies,
+        evaluateFieldVisibility(fieldsWithReplies)
+      )
+        .filter(([field, isVisible]) => isVisible && field.is_internal)
+        .map(([field]) => field);
+
+      const validatedExternal = countBy(
+        visibleFields,
+        (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED")
       );
 
-      const uploadedFiles = await this.knex
-        .from<FileUpload>("file_upload")
-        .whereIn("id", fileUploadIds)
-        .whereNull("deleted_at")
-        .select("*");
+      const validatedInternal = countBy(
+        visibleInternalFields,
+        (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED")
+      );
 
-      return ids.map((id) => {
-        const fieldsWithReplies = (fieldsByPetition[id] ?? [])
-          .map((field) => ({
-            ...field,
-            replies: fieldReplies
-              .filter((r) => r.petition_field_id === field.id)
-              .map((reply) => {
-                // for FILE_UPLOADs, we need to make sure the file was correctly uploaded before counting it as a submitted reply
-                const file =
-                  isFileTypeField(reply.type) && isDefined(reply.content?.file_upload_id)
-                    ? uploadedFiles.find((f) => f.id === reply.content!.file_upload_id)
-                    : undefined;
-
-                return {
-                  content: reply.content
-                    ? {
-                        ...reply.content,
-                        uploadComplete: file?.upload_complete,
-                      }
-                    : null,
-                  status: reply.status,
-                  anonymized_at: reply.anonymized_at,
-                };
-              })
-              .filter((r) => r.content !== null),
-          }))
-          .sort((a, b) => a.position! - b.position!);
-
-        const visibleFields = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
-          .filter(([field, isVisible]) => isVisible && !field.is_internal)
-          .map(([field]) => field);
-
-        const visibleInternalFields = zip(
-          fieldsWithReplies,
-          evaluateFieldVisibility(fieldsWithReplies)
-        )
-          .filter(([field, isVisible]) => isVisible && field.is_internal)
-          .map(([field]) => field);
-
-        const validatedExternal = countBy(
-          visibleFields,
-          (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED")
-        );
-
-        const validatedInternal = countBy(
-          visibleInternalFields,
-          (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED")
-        );
-
-        return {
-          external: {
-            approved: validatedExternal,
-            replied: countBy(
-              visibleFields,
-              (f) =>
-                completedFieldReplies(f).length > 0 &&
-                f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED")
-            ),
-            optional: countBy(
-              visibleFields,
-              (f) => f.optional && completedFieldReplies(f).length === 0
-            ),
-            total: visibleFields.length,
-          },
-          internal: {
-            validated: validatedInternal,
-            approved: validatedInternal,
-            replied: countBy(
-              visibleInternalFields,
-              (f) =>
-                completedFieldReplies(f).length > 0 &&
-                f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED")
-            ),
-            optional: countBy(
-              visibleInternalFields,
-              (f) => f.optional && completedFieldReplies(f).length === 0
-            ),
-            total: visibleInternalFields.length,
-          },
-        };
-      });
-    })
-  );
+      return {
+        external: {
+          approved: validatedExternal,
+          replied: countBy(
+            visibleFields,
+            (f) =>
+              completedFieldReplies(f).length > 0 &&
+              f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED")
+          ),
+          optional: countBy(
+            visibleFields,
+            (f) => f.optional && completedFieldReplies(f).length === 0
+          ),
+          total: visibleFields.length,
+        },
+        internal: {
+          validated: validatedInternal,
+          approved: validatedInternal,
+          replied: countBy(
+            visibleInternalFields,
+            (f) =>
+              completedFieldReplies(f).length > 0 &&
+              f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED")
+          ),
+          optional: countBy(
+            visibleInternalFields,
+            (f) => f.optional && completedFieldReplies(f).length === 0
+          ),
+          total: visibleInternalFields.length,
+        },
+      };
+    });
+  });
 
   readonly loadAccess = this.buildLoadBy("petition_access", "id");
 
@@ -1748,21 +1743,10 @@ export class PetitionRepository extends BaseRepository {
     return field;
   }
 
-  readonly loadRepliesForField = fromDataLoader(
-    new DataLoader<number, PetitionFieldReply[]>(async (ids) => {
-      const rows = await this.from("petition_field_reply")
-        .whereIn("petition_field_id", ids)
-        .whereNull("deleted_at")
-        .select("*");
-      const byPetitionFieldId = groupBy(rows, (r) => r.petition_field_id);
-      return ids.map((id) => {
-        return sortBy(
-          byPetitionFieldId[id] ?? [],
-          (r) => r.created_at,
-          (r) => r.id
-        );
-      });
-    })
+  readonly loadRepliesForField = this.buildLoadMultipleBy(
+    "petition_field_reply",
+    "petition_field_id",
+    (q) => q.whereNull("deleted_at").orderBy("created_at").orderBy("id")
   );
 
   async updateRemindersForPetition(
@@ -2679,120 +2663,110 @@ export class PetitionRepository extends BaseRepository {
     return event;
   }
 
-  readonly loadPetitionFieldCommentsForField = fromDataLoader(
-    new DataLoader<
-      {
-        loadInternalComments?: boolean;
-        petitionId: number;
-        petitionFieldId: number;
-      },
-      PetitionFieldComment[],
-      string
-    >(
-      async (ids) => {
-        const rows = await this.from("petition_field_comment")
-          .whereIn("petition_id", uniq(ids.map((x) => x.petitionId)))
-          .whereIn("petition_field_id", uniq(ids.map((x) => x.petitionFieldId)))
-          .whereNull("deleted_at")
-          .select<PetitionFieldComment[]>("petition_field_comment.*");
+  readonly loadPetitionFieldCommentsForField = this.buildLoader<
+    {
+      loadInternalComments?: boolean;
+      petitionId: number;
+      petitionFieldId: number;
+    },
+    PetitionFieldComment[],
+    string
+  >(
+    async (keys, t) => {
+      const rows = await this.from("petition_field_comment", t)
+        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
+        .whereIn("petition_field_id", uniq(keys.map((x) => x.petitionFieldId)))
+        .whereNull("deleted_at")
+        .select<PetitionFieldComment[]>("petition_field_comment.*");
 
-        const byId = groupBy(rows, (r) => r.petition_field_id);
-        return ids.map((id) => {
-          const comments = this.sortComments(byId[id.petitionFieldId] ?? []);
-          return id.loadInternalComments
-            ? comments
-            : comments.filter((c) => c.is_internal === false);
-        });
-      },
-      {
-        cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "loadInternalComments"]),
-      }
-    )
+      const byId = groupBy(rows, (r) => r.petition_field_id);
+      return keys.map((id) => {
+        const comments = this.sortComments(byId[id.petitionFieldId] ?? []);
+        return id.loadInternalComments ? comments : comments.filter((c) => c.is_internal === false);
+      });
+    },
+    { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "loadInternalComments"]) }
   );
 
-  readonly loadPetitionFieldUnreadCommentCountForFieldAndAccess = fromDataLoader(
-    new DataLoader<
-      { accessId: number; petitionId: number; petitionFieldId: number },
-      number,
-      string
-    >(
-      async (ids) => {
-        const rows = await this.from("petition_contact_notification")
-          .whereIn("petition_id", uniq(ids.map((x) => x.petitionId)))
-          .whereIn("petition_access_id", uniq(ids.map((x) => x.accessId)))
-          .whereIn(
-            this.knex.raw("(data ->> 'petition_field_id')::int") as any,
-            uniq(ids.map((x) => x.petitionFieldId))
-          )
-          .where("type", "COMMENT_CREATED")
-          .where("is_read", false)
-          .groupBy(
-            "petition_id",
-            "petition_access_id",
-            this.knex.raw("(data ->> 'petition_field_id')::int")
-          )
-          .select<
-            (Pick<PetitionContactNotification, "petition_id" | "petition_access_id"> & {
-              petition_field_id: number;
-              unread_count: number;
-            })[]
-          >(
-            "petition_id",
-            "petition_access_id",
-            this.knex.raw("(data ->> 'petition_field_id')::int as petition_field_id"),
-            this.count("unread_count")
-          );
-
-        const rowsById = indexBy(
-          rows,
-          keyBuilder(["petition_id", "petition_field_id", "petition_access_id"])
+  readonly loadPetitionFieldUnreadCommentCountForFieldAndAccess = this.buildLoader<
+    { accessId: number; petitionId: number; petitionFieldId: number },
+    number,
+    string
+  >(
+    async (keys, t) => {
+      const rows = await this.from("petition_contact_notification", t)
+        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
+        .whereIn("petition_access_id", uniq(keys.map((x) => x.accessId)))
+        .whereIn(
+          this.knex.raw("(data ->> 'petition_field_id')::int") as any,
+          uniq(keys.map((x) => x.petitionFieldId))
+        )
+        .where("type", "COMMENT_CREATED")
+        .where("is_read", false)
+        .groupBy(
+          "petition_id",
+          "petition_access_id",
+          this.knex.raw("(data ->> 'petition_field_id')::int")
+        )
+        .select<
+          (Pick<PetitionContactNotification, "petition_id" | "petition_access_id"> & {
+            petition_field_id: number;
+            unread_count: number;
+          })[]
+        >(
+          "petition_id",
+          "petition_access_id",
+          this.knex.raw("(data ->> 'petition_field_id')::int as petition_field_id"),
+          this.count("unread_count")
         );
 
-        return ids.map(keyBuilder(["petitionId", "petitionFieldId", "accessId"])).map((key) => {
-          return rowsById[key]?.unread_count ?? 0;
-        });
-      },
-      {
-        cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]),
-      }
-    )
+      const rowsById = indexBy(
+        rows,
+        keyBuilder(["petition_id", "petition_field_id", "petition_access_id"])
+      );
+
+      return keys.map(keyBuilder(["petitionId", "petitionFieldId", "accessId"])).map((key) => {
+        return rowsById[key]?.unread_count ?? 0;
+      });
+    },
+    { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]) }
   );
 
-  readonly loadPetitionFieldUnreadCommentCountForFieldAndUser = fromDataLoader(
-    new DataLoader<{ userId: number; petitionId: number; petitionFieldId: number }, number, string>(
-      async (ids) => {
-        const rows = await this.from("petition_user_notification")
-          .whereIn("petition_id", uniq(ids.map((x) => x.petitionId)))
-          .whereIn("user_id", uniq(ids.map((x) => x.userId)))
-          .whereIn(
-            this.knex.raw("(data ->> 'petition_field_id')::int") as any,
-            uniq(ids.map((x) => x.petitionFieldId))
-          )
-          .where("type", "COMMENT_CREATED")
-          .where("is_read", false)
-          .groupBy("petition_id", "user_id", this.knex.raw("(data ->> 'petition_field_id')::int"))
-          .select<
-            (Pick<PetitionUserNotification, "petition_id" | "user_id"> & {
-              petition_field_id: number;
-              unread_count: number;
-            })[]
-          >(
-            "petition_id",
-            "user_id",
-            this.knex.raw("(data ->> 'petition_field_id')::int as petition_field_id"),
-            this.count("unread_count")
-          );
+  readonly loadPetitionFieldUnreadCommentCountForFieldAndUser = this.buildLoader<
+    { userId: number; petitionId: number; petitionFieldId: number },
+    number,
+    string
+  >(
+    async (keys, t) => {
+      const rows = await this.from("petition_user_notification", t)
+        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
+        .whereIn("user_id", uniq(keys.map((x) => x.userId)))
+        .whereIn(
+          this.knex.raw("(data ->> 'petition_field_id')::int") as any,
+          uniq(keys.map((x) => x.petitionFieldId))
+        )
+        .where("type", "COMMENT_CREATED")
+        .where("is_read", false)
+        .groupBy("petition_id", "user_id", this.knex.raw("(data ->> 'petition_field_id')::int"))
+        .select<
+          (Pick<PetitionUserNotification, "petition_id" | "user_id"> & {
+            petition_field_id: number;
+            unread_count: number;
+          })[]
+        >(
+          "petition_id",
+          "user_id",
+          this.knex.raw("(data ->> 'petition_field_id')::int as petition_field_id"),
+          this.count("unread_count")
+        );
 
-        const rowsById = indexBy(rows, keyBuilder(["petition_id", "petition_field_id", "user_id"]));
+      const rowsById = indexBy(rows, keyBuilder(["petition_id", "petition_field_id", "user_id"]));
 
-        return ids.map(keyBuilder(["petitionId", "petitionFieldId", "userId"])).map((key) => {
-          return rowsById[key]?.unread_count ?? 0;
-        });
-      },
-      {
-        cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "userId"]),
-      }
-    )
+      return keys.map(keyBuilder(["petitionId", "petitionFieldId", "userId"])).map((key) => {
+        return rowsById[key]?.unread_count ?? 0;
+      });
+    },
+    { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "userId"]) }
   );
 
   async canBeMentionedInPetitionFieldComment(
@@ -3037,111 +3011,105 @@ export class PetitionRepository extends BaseRepository {
       .update(data, "*");
   }
 
-  readonly loadPetitionFieldCommentIsUnreadForUser = fromDataLoader(
-    new DataLoader<
-      {
-        userId: number;
-        petitionId: number;
-        petitionFieldId: number;
-        petitionFieldCommentId: number;
-      },
-      boolean,
-      string
-    >(
-      async (ids) => {
-        const rows = await this.knex<CommentCreatedUserNotification>("petition_user_notification")
-          .where("type", "COMMENT_CREATED")
-          .whereIn("user_id", uniq(ids.map((x) => x.userId)))
-          .whereIn("petition_id", uniq(ids.map((x) => x.petitionId)))
-          .whereIn(
-            this.knex.raw("data ->> 'petition_field_id'") as any,
-            uniq(ids.map((x) => x.petitionFieldId))
-          )
-          .whereIn(
-            this.knex.raw("data ->> 'petition_field_comment_id'") as any,
-            uniq(ids.map((x) => x.petitionFieldCommentId))
-          )
-          .select("*");
+  readonly loadPetitionFieldCommentIsUnreadForUser = this.buildLoader<
+    {
+      userId: number;
+      petitionId: number;
+      petitionFieldId: number;
+      petitionFieldCommentId: number;
+    },
+    boolean,
+    string
+  >(
+    async (keys, t) => {
+      const rows = await this.from<"petition_user_notification", CommentCreatedUserNotification>(
+        "petition_user_notification",
+        t
+      )
+        .where("type", "COMMENT_CREATED")
+        .whereIn("user_id", uniq(keys.map((x) => x.userId)))
+        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
+        .whereIn(
+          this.knex.raw("data ->> 'petition_field_id'") as any,
+          uniq(keys.map((x) => x.petitionFieldId))
+        )
+        .whereIn(
+          this.knex.raw("data ->> 'petition_field_comment_id'") as any,
+          uniq(keys.map((x) => x.petitionFieldCommentId))
+        )
+        .select("*");
 
-        const byId = indexBy(
-          rows,
-          keyBuilder([
-            "user_id",
-            "petition_id",
-            (r) => r.data.petition_field_id,
-            (r) => r.data.petition_field_comment_id,
-          ])
-        );
-        return ids
-          .map(keyBuilder(["userId", "petitionId", "petitionFieldId", "petitionFieldCommentId"]))
-          .map((key) => !(byId[key]?.is_read ?? true));
-      },
-      {
-        cacheKeyFn: keyBuilder([
-          "userId",
-          "petitionId",
-          "petitionFieldId",
-          "petitionFieldCommentId",
-        ]),
-      }
-    )
+      const byId = indexBy(
+        rows,
+        keyBuilder([
+          "user_id",
+          "petition_id",
+          (r) => r.data.petition_field_id,
+          (r) => r.data.petition_field_comment_id,
+        ])
+      );
+      return keys
+        .map(keyBuilder(["userId", "petitionId", "petitionFieldId", "petitionFieldCommentId"]))
+        .map((key) => !(byId[key]?.is_read ?? true));
+    },
+    {
+      cacheKeyFn: keyBuilder(["userId", "petitionId", "petitionFieldId", "petitionFieldCommentId"]),
+    }
   );
 
-  readonly loadPetitionFieldCommentIsUnreadForContact = fromDataLoader(
-    new DataLoader<
-      {
-        petitionAccessId: number;
-        petitionId: number;
-        petitionFieldId: number;
-        petitionFieldCommentId: number;
-      },
-      boolean,
-      string
-    >(
-      async (ids) => {
-        const rows = await this.from("petition_contact_notification")
-          .where("type", "COMMENT_CREATED")
-          .whereIn("petition_access_id", uniq(ids.map((x) => x.petitionAccessId)))
-          .whereIn("petition_id", uniq(ids.map((x) => x.petitionId)))
-          .whereIn(
-            this.knex.raw("data ->> 'petition_field_id'") as any,
-            uniq(ids.map((x) => x.petitionFieldId))
-          )
-          .whereIn(
-            this.knex.raw("data ->> 'petition_field_comment_id'") as any,
-            uniq(ids.map((x) => x.petitionFieldCommentId))
-          )
-          .select("*");
+  readonly loadPetitionFieldCommentIsUnreadForContact = this.buildLoader<
+    {
+      petitionAccessId: number;
+      petitionId: number;
+      petitionFieldId: number;
+      petitionFieldCommentId: number;
+    },
+    boolean,
+    string
+  >(
+    async (keys, t) => {
+      const rows = await this.from("petition_contact_notification", t)
+        .where("type", "COMMENT_CREATED")
+        .whereIn("petition_access_id", uniq(keys.map((x) => x.petitionAccessId)))
+        .whereIn("petition_id", uniq(keys.map((x) => x.petitionId)))
+        .whereIn(
+          this.knex.raw("data ->> 'petition_field_id'") as any,
+          uniq(keys.map((x) => x.petitionFieldId))
+        )
+        .whereIn(
+          this.knex.raw("data ->> 'petition_field_comment_id'") as any,
+          uniq(keys.map((x) => x.petitionFieldCommentId))
+        )
+        .select("*");
 
-        const byId = indexBy(
-          rows,
+      const byId = indexBy(
+        rows,
+        keyBuilder([
+          "petition_access_id",
+          "petition_id",
+          (r) => r.data.petition_field_id,
+          (r) => r.data.petition_field_comment_id,
+        ])
+      );
+      return keys
+        .map(
           keyBuilder([
-            "petition_access_id",
-            "petition_id",
-            (r) => r.data.petition_field_id,
-            (r) => r.data.petition_field_comment_id,
+            "petitionAccessId",
+            "petitionId",
+            "petitionFieldId",
+            "petitionFieldCommentId",
           ])
-        );
-        return ids
-          .map(
-            keyBuilder([
-              "petitionAccessId",
-              "petitionId",
-              "petitionFieldId",
-              "petitionFieldCommentId",
-            ])
-          )
-          .map((key) => !(byId[key]?.is_read ?? true));
-      },
-      {
-        cacheKeyFn: keyBuilder([
-          "petitionAccessId",
-          "petitionId",
-          "petitionFieldId",
-          "petitionFieldCommentId",
-        ]),
-      }
-    )
+        )
+        .map((key) => !(byId[key]?.is_read ?? true));
+    },
+    {
+      cacheKeyFn: keyBuilder([
+        "petitionAccessId",
+        "petitionId",
+        "petitionFieldId",
+        "petitionFieldCommentId",
+      ]),
+    }
   );
 
   async createPetitionFieldCommentFromUser(
@@ -3424,8 +3392,8 @@ export class PetitionRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  readonly loadEffectivePermissions = fromDataLoader(
-    new DataLoader<number, EffectivePetitionPermission[]>(async (petitionIds) => {
+  readonly loadEffectivePermissions = this.buildLoader<number, EffectivePetitionPermission[]>(
+    async (petitionIds, t) => {
       const rows = await this.raw<EffectivePetitionPermission>(
         /* sql */ `
         select petition_id, user_id, min("type") as type, bool_or(is_subscribed) is_subscribed 
@@ -3435,12 +3403,13 @@ export class PetitionRepository extends BaseRepository {
           and petition_id in ? 
           group by user_id, petition_id
       `,
-        [this.sqlIn(petitionIds)]
+        [this.sqlIn(petitionIds)],
+        t
       );
 
       const byPetitionId = groupBy(rows, (r) => r.petition_id);
-      return petitionIds.map((id) => byPetitionId[id]);
-    })
+      return petitionIds.map((id) => byPetitionId[id] ?? []);
+    }
   );
 
   readonly loadUserPermissionsByPetitionId = this.buildLoadMultipleBy(
@@ -3480,24 +3449,22 @@ export class PetitionRepository extends BaseRepository {
         .orderByRaw("type asc, created_at")
   );
 
-  readonly loadPetitionOwner = fromDataLoader(
-    new DataLoader<number, User | null>(async (ids) => {
-      const rows = await this.from("petition_permission")
-        .leftJoin("user", "petition_permission.user_id", "user.id")
-        .whereIn("petition_id", ids)
-        .where("type", "OWNER")
-        .whereNull("petition_permission.deleted_at")
-        // required whereNull for using index on query
-        .whereNull("petition_permission.from_user_group_id")
-        .whereNull("petition_permission.user_group_id")
-        .whereNull("user.deleted_at")
-        .select("petition_permission.petition_id", "user.*");
-      const rowsByPetitionId = indexBy(rows, (r) => r.petition_id);
-      return ids.map((id) =>
-        rowsByPetitionId[id] ? (omit(rowsByPetitionId[id], ["petition_id"]) as User) : null
-      );
-    })
-  );
+  readonly loadPetitionOwner = this.buildLoader<number, User | null>(async (ids, t) => {
+    const rows = await this.from("petition_permission", t)
+      .leftJoin("user", "petition_permission.user_id", "user.id")
+      .whereIn("petition_id", ids)
+      .where("type", "OWNER")
+      .whereNull("petition_permission.deleted_at")
+      // required whereNull for using index on query
+      .whereNull("petition_permission.from_user_group_id")
+      .whereNull("petition_permission.user_group_id")
+      .whereNull("user.deleted_at")
+      .select("petition_permission.petition_id", "user.*");
+    const rowsByPetitionId = indexBy(rows, (r) => r.petition_id);
+    return ids.map((id) =>
+      rowsByPetitionId[id] ? (omit(rowsByPetitionId[id], ["petition_id"]) as User) : null
+    );
+  });
 
   /**
    * clones every permission on `fromPetitionId` into `toPetitionIds`
@@ -4303,10 +4270,12 @@ export class PetitionRepository extends BaseRepository {
       ])
   );
 
-  readonly loadLatestPetitionSignatureByPetitionId = fromDataLoader(
-    new DataLoader<number, PetitionSignatureRequest | null>(async (keys) => {
-      const signatures = await this.raw<PetitionSignatureRequest & { _rank: number }>(
-        /* sql */ `
+  readonly loadLatestPetitionSignatureByPetitionId = this.buildLoader<
+    number,
+    PetitionSignatureRequest | null
+  >(async (petitionIds, t) => {
+    const signatures = await this.raw<PetitionSignatureRequest & { _rank: number }>(
+      /* sql */ `
         with cte as (
           select *, rank() over (partition by petition_id order by created_at desc) _rank
           from petition_signature_request
@@ -4314,12 +4283,14 @@ export class PetitionRepository extends BaseRepository {
         ) 
         select * from cte where _rank = 1
       `,
-        [this.sqlIn(keys)]
-      );
-      const byPetitionId = indexBy(signatures, (r) => r.petition_id);
-      return keys.map((key) => (byPetitionId[key] ? omit(byPetitionId[key], ["_rank"]) : null));
-    })
-  );
+      [this.sqlIn(petitionIds)],
+      t
+    );
+    const byPetitionId = indexBy(signatures, (r) => r.petition_id);
+    return petitionIds.map((key) =>
+      byPetitionId[key] ? omit(byPetitionId[key], ["_rank"]) : null
+    );
+  });
 
   async loadPendingSignatureRequestsByIntegrationId(orgIntegrationId: number) {
     return await this.from("petition_signature_request")
@@ -4627,50 +4598,48 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.orderBy("created_at", "asc")
   );
 
-  readonly loadTemplateDefaultOwner = fromDataLoader(
-    new DataLoader<number, { isDefault: boolean; user: User } | null>(async (templateIds) => {
-      const [templateDefaultOwners, templateOwners] = await Promise.all([
-        this.from("template_default_permission")
-          .whereNull("deleted_at")
-          .where({ type: "OWNER" })
-          .whereIn("template_id", templateIds)
-          .select("*"),
-        this.from("petition_permission")
-          .whereNull("deleted_at")
-          .where({ type: "OWNER" })
-          .whereIn("petition_id", templateIds)
-          .select("*"),
-      ]);
+  readonly loadTemplateDefaultOwner = this.buildLoader<
+    number,
+    { isDefault: boolean; user: User } | null
+  >(async (templateIds, t) => {
+    const [templateDefaultOwners, templateOwners] = await Promise.all([
+      this.from("template_default_permission", t)
+        .whereNull("deleted_at")
+        .where({ type: "OWNER" })
+        .whereIn("template_id", templateIds)
+        .select("*"),
+      this.from("petition_permission", t)
+        .whereNull("deleted_at")
+        .where({ type: "OWNER" })
+        .whereIn("petition_id", templateIds)
+        .select("*"),
+    ]);
 
-      const defaultOwnerByTemplateId = indexBy(templateDefaultOwners, (tdp) => tdp.template_id);
-      const templateOwnerByTemplateId = indexBy(templateOwners, (t) => t.petition_id);
+    const defaultOwnerByTemplateId = indexBy(templateDefaultOwners, (tdp) => tdp.template_id);
+    const templateOwnerByTemplateId = indexBy(templateOwners, (t) => t.petition_id);
 
-      const userIds = uniq([
+    const userIds = uniq(
+      [
         ...templateDefaultOwners.map((tdp) => tdp.user_id),
         ...templateOwners.map((t) => t.user_id),
-      ]).filter(isDefined);
+      ].filter(isDefined)
+    );
 
-      const users = await this.from("user")
-        .whereIn("id", userIds)
-        .whereNull("deleted_at")
-        .select("*");
+    const users = await this.from("user", t)
+      .whereIn("id", userIds)
+      .whereNull("deleted_at")
+      .select("*");
 
-      return templateIds.map((templateId) => {
-        const isDefault = isDefined(defaultOwnerByTemplateId[templateId]?.user_id);
-        const ownerId =
-          defaultOwnerByTemplateId[templateId]?.user_id ??
-          templateOwnerByTemplateId[templateId]?.user_id;
-        const user = users.find((u) => u.id === ownerId) ?? null;
+    return templateIds.map((templateId) => {
+      const isDefault = isDefined(defaultOwnerByTemplateId[templateId]?.user_id);
+      const ownerId =
+        defaultOwnerByTemplateId[templateId]?.user_id ??
+        templateOwnerByTemplateId[templateId]?.user_id;
+      const user = users.find((u) => u.id === ownerId) ?? null;
 
-        return user
-          ? {
-              isDefault,
-              user,
-            }
-          : null;
-      });
-    })
-  );
+      return user ? { isDefault, user } : null;
+    });
+  });
 
   async createPublicPetitionLink(
     data: CreatePublicPetitionLink,

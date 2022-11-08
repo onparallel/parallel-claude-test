@@ -1,10 +1,8 @@
-import DataLoader from "dataloader";
 import { addMinutes } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { groupBy, indexBy, mapValues, omit, pipe, toPairs } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
-import { fromDataLoader } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
 import { hash, random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
@@ -28,45 +26,46 @@ export class ContactRepository extends BaseRepository {
 
   readonly loadContact = this.buildLoadBy("contact", "id", (q) => q.whereNull("deleted_at"));
 
-  readonly loadContactByEmail = fromDataLoader(
-    new DataLoader<{ orgId: number; email: string }, Contact | null, string>(
-      async (keys) => {
-        const byOrgId = pipe(
-          keys,
-          groupBy((k) => k.orgId),
-          mapValues((keys) => keys.map((k) => k.email)),
-          toPairs
-        );
-        const rows = await this.from("contact")
-          .whereNull("deleted_at")
-          .where((qb) => {
-            for (const [orgId, emails] of byOrgId) {
-              qb.orWhere((qb) => qb.where("org_id", parseInt(orgId)).whereIn("email", emails));
-            }
-          });
-        const results = indexBy(rows, keyBuilder(["org_id", "email"]));
-        return keys.map(keyBuilder(["orgId", "email"])).map((key) => results[key] ?? null);
-      },
-      {
-        cacheKeyFn: keyBuilder(["orgId", "email"]),
-      }
-    )
+  readonly loadContactByEmail = this.buildLoader<
+    { orgId: number; email: string },
+    Contact | null,
+    string
+  >(
+    async (keys, t) => {
+      const byOrgId = pipe(
+        keys,
+        groupBy((k) => k.orgId),
+        mapValues((keys) => keys.map((k) => k.email)),
+        toPairs
+      );
+      const rows = await this.from("contact", t)
+        .whereNull("deleted_at")
+        .where((qb) => {
+          for (const [orgId, emails] of byOrgId) {
+            qb.orWhere((qb) => qb.where("org_id", parseInt(orgId)).whereIn("email", emails));
+          }
+        });
+      const results = indexBy(rows, keyBuilder(["org_id", "email"]));
+      return keys.map(keyBuilder(["orgId", "email"])).map((key) => results[key] ?? null);
+    },
+    { cacheKeyFn: keyBuilder(["orgId", "email"]) }
   );
 
-  readonly loadContactByAccessId = fromDataLoader(
-    new DataLoader<number, Contact | null>(async (ids) => {
+  readonly loadContactByAccessId = this.buildLoader<number, Contact | null>(
+    async (accessIds, t) => {
       const contacts = await this.raw<Contact & { access_id: number }>(
         /* sql */ `
-        select c.*, pa.id as access_id from contact c
-        left join petition_access pa on pa.contact_id = c.id
-        where pa.id in ? 
-      `,
-        [this.sqlIn(ids)]
+          select c.*, pa.id as access_id from contact c
+          left join petition_access pa on pa.contact_id = c.id
+          where pa.id in ? 
+        `,
+        [this.sqlIn(accessIds)],
+        t
       );
 
       const byAccessId = indexBy(contacts, (r) => r.access_id);
-      return ids.map((id) => (byAccessId[id] ? omit(byAccessId[id], ["access_id"]) : null));
-    })
+      return accessIds.map((id) => (byAccessId[id] ? omit(byAccessId[id], ["access_id"]) : null));
+    }
   );
 
   async loadOrCreate(

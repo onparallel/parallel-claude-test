@@ -1,9 +1,7 @@
-import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { indexBy, uniq } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
-import { fromDataLoader, FromDataLoaderOptions } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
@@ -19,35 +17,37 @@ export class FeatureFlagRepository extends BaseRepository {
   async userHasFeatureFlag(
     userId: number,
     featureFlag: FeatureFlagName,
-    opts?: FromDataLoaderOptions
+    raw?: boolean
   ): Promise<boolean>;
   async userHasFeatureFlag(
     userId: number,
     featureFlags: FeatureFlagName[],
-    opts?: FromDataLoaderOptions
+    raw?: boolean
   ): Promise<boolean[]>;
   async userHasFeatureFlag(
     userId: number,
     featureFlag: MaybeArray<FeatureFlagName>,
-    opts?: FromDataLoaderOptions
+    raw?: boolean
   ): Promise<boolean | boolean[]> {
-    return Array.isArray(featureFlag)
-      ? ((await this._userHasFeatureFlag(
-          featureFlag.map((featureFlag) => ({ userId, featureFlag })),
-          opts
-        )) as boolean[])
-      : await this._userHasFeatureFlag({ userId, featureFlag }, opts);
+    const keys = Array.isArray(featureFlag)
+      ? featureFlag.map((featureFlag) => ({ userId, featureFlag }))
+      : [{ userId, featureFlag }];
+    const result = raw
+      ? await this._userHasFeatureFlag.raw(keys)
+      : await this._userHasFeatureFlag(keys);
+    return Array.isArray(featureFlag) ? result : result[0];
   }
 
-  private readonly _userHasFeatureFlag = fromDataLoader(
-    new DataLoader<{ userId: number; featureFlag: FeatureFlagName }, boolean, string>(
-      async (keys) => {
-        const userIds = uniq(keys.map((k) => k.userId));
-        const featureFlags = uniq(keys.map((k) => k.featureFlag));
-        const { rows } = await this.knex.raw<{
-          rows: { user_id: number; feature_flag: number; value: boolean }[];
-        }>(
-          /* sql */ `
+  private readonly _userHasFeatureFlag = this.buildLoader<
+    { userId: number; featureFlag: FeatureFlagName },
+    boolean,
+    string
+  >(
+    async (keys, t) => {
+      const userIds = uniq(keys.map((k) => k.userId));
+      const featureFlags = uniq(keys.map((k) => k.featureFlag));
+      const rows = await this.raw<{ user_id: number; feature_flag: number; value: boolean }>(
+        /* sql */ `
           with selected_user as (
             select id as user_id, org_id from "user"
               where id in ?
@@ -64,49 +64,51 @@ export class FeatureFlagRepository extends BaseRepository {
             left join feature_flag_override ffou
               on ffou.feature_flag_name = ff.name and ffou.user_id = su.user_id and ffou.org_id is null
         `,
-          [this.sqlIn(userIds), this.sqlIn(featureFlags)]
-        );
-        const results = indexBy(rows, keyBuilder(["user_id", "feature_flag"]));
-        return keys
-          .map(keyBuilder(["userId", "featureFlag"]))
-          .map((key) => results[key]?.value ?? false);
-      },
-      {
-        cacheKeyFn: keyBuilder(["userId", "featureFlag"]),
-      }
-    )
+        [this.sqlIn(userIds), this.sqlIn(featureFlags)],
+        t
+      );
+      const results = indexBy(rows, keyBuilder(["user_id", "feature_flag"]));
+      return keys
+        .map(keyBuilder(["userId", "featureFlag"]))
+        .map((key) => results[key]?.value ?? false);
+    },
+    { cacheKeyFn: keyBuilder(["userId", "featureFlag"]) }
   );
 
   async orgHasFeatureFlag(
     orgId: number,
     featureFlag: FeatureFlagName,
-    opts?: FromDataLoaderOptions
+    raw?: boolean
   ): Promise<boolean>;
   async orgHasFeatureFlag(
     orgId: number,
     featureFlags: FeatureFlagName[],
-    opts?: FromDataLoaderOptions
+    raw?: boolean
   ): Promise<boolean[]>;
   async orgHasFeatureFlag(
     orgId: number,
     featureFlag: MaybeArray<FeatureFlagName>,
-    opts?: FromDataLoaderOptions
+    raw?: boolean
   ): Promise<boolean | boolean[]> {
-    return Array.isArray(featureFlag)
-      ? ((await this._orgHasFeatureFlag(
-          featureFlag.map((featureFlag) => ({ orgId, featureFlag })),
-          opts
-        )) as boolean[])
-      : await this._orgHasFeatureFlag({ orgId, featureFlag }, opts);
+    const keys = Array.isArray(featureFlag)
+      ? featureFlag.map((featureFlag) => ({ orgId, featureFlag }))
+      : [{ orgId, featureFlag }];
+    const result = raw
+      ? await this._orgHasFeatureFlag.raw(keys)
+      : await this._orgHasFeatureFlag(keys);
+    return Array.isArray(featureFlag) ? result : result[0];
   }
 
-  private readonly _orgHasFeatureFlag = fromDataLoader(
-    new DataLoader<{ orgId: number; featureFlag: FeatureFlagName }, boolean, string>(
-      async (keys) => {
-        const orgIds = uniq(keys.map((k) => k.orgId));
-        const featureFlags = uniq(keys.map((k) => k.featureFlag));
-        const rows = await this.raw<{ org_id: number; feature_flag: number; value: boolean }>(
-          /* sql */ `
+  private readonly _orgHasFeatureFlag = this.buildLoader<
+    { orgId: number; featureFlag: FeatureFlagName },
+    boolean,
+    string
+  >(
+    async (keys, t) => {
+      const orgIds = uniq(keys.map((k) => k.orgId));
+      const featureFlags = uniq(keys.map((k) => k.featureFlag));
+      const rows = await this.raw<{ org_id: number; feature_flag: number; value: boolean }>(
+        /* sql */ `
           with selected_org as (
             select id as org_id from "organization" where id in ? 
           )
@@ -119,17 +121,15 @@ export class FeatureFlagRepository extends BaseRepository {
             left join feature_flag_override ffoo
               on ffoo.feature_flag_name = ff.name and ffoo.org_id = so.org_id and ffoo.user_id is null
         `,
-          [this.sqlIn(orgIds), this.sqlIn(featureFlags)]
-        );
-        const results = indexBy(rows, keyBuilder(["org_id", "feature_flag"]));
-        return keys
-          .map(keyBuilder(["orgId", "featureFlag"]))
-          .map((key) => results[key]?.value ?? false);
-      },
-      {
-        cacheKeyFn: keyBuilder(["orgId", "featureFlag"]),
-      }
-    )
+        [this.sqlIn(orgIds), this.sqlIn(featureFlags)],
+        t
+      );
+      const results = indexBy(rows, keyBuilder(["org_id", "feature_flag"]));
+      return keys
+        .map(keyBuilder(["orgId", "featureFlag"]))
+        .map((key) => results[key]?.value ?? false);
+    },
+    { cacheKeyFn: keyBuilder(["orgId", "featureFlag"]) }
   );
 
   async getOrganizationFeatureFlags(orgId: number, t?: Knex.Transaction) {

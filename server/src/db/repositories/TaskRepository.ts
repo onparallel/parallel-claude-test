@@ -1,7 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { QUEUES_SERVICE, IQueuesService } from "../../services/queues";
-import { Loader } from "../../util/fromDataLoader";
+import { IQueuesService, QUEUES_SERVICE } from "../../services/queues";
 import { Maybe, Replace } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
@@ -62,7 +61,7 @@ export class TaskRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadTask: Loader<number, Task<any> | null> = this.buildLoadBy("task", "id");
+  readonly loadTask = this.buildLoadBy<"task", "id", Task<any>>("task", "id");
 
   async pickupTask(taskId: number, updatedBy: string) {
     return await this.updateTask(

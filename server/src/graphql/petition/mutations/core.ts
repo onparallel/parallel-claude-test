@@ -1019,9 +1019,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           isDefined(data.options.format) &&
           field.options.format !== data.options.format
         ) {
-          const replies = await ctx.petitions.loadRepliesForField(args.fieldId, {
-            cache: false,
-          });
+          const replies = await ctx.petitions.loadRepliesForField.raw(args.fieldId);
 
           if (!args.force && replies.length > 0) {
             throw new ApolloError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
@@ -1684,9 +1682,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
     force: booleanArg({ default: false }),
   },
   resolve: async (_, args, ctx) => {
-    const replies = await ctx.petitions.loadRepliesForField(args.fieldId, {
-      cache: false,
-    });
+    const replies = await ctx.petitions.loadRepliesForField.raw(args.fieldId);
 
     const field = await ctx.petitions.loadField(args.fieldId);
 

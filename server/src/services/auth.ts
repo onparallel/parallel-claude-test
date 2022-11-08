@@ -49,7 +49,6 @@ import { UserAuthenticationRepository } from "../db/repositories/UserAuthenticat
 import { UserRepository } from "../db/repositories/UserRepository";
 import { User } from "../db/__types";
 import { awsLogger } from "../util/awsLogger";
-import { fromDataLoader } from "../util/fromDataLoader";
 import { fullName } from "../util/fullName";
 import { sign, verify } from "../util/jwt";
 import { withError } from "../util/promises/withError";
@@ -57,8 +56,8 @@ import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
 import { userHasRole } from "../util/userHasRole";
 import { EmailPayload } from "../workers/email-sender";
-import { QUEUES_SERVICE, IQueuesService } from "./queues";
 import { ILogger, LOGGER } from "./logger";
+import { IQueuesService, QUEUES_SERVICE } from "./queues";
 import { IRedis, REDIS } from "./redis";
 
 export interface IAuth {
@@ -692,8 +691,8 @@ export class Auth implements IAuth {
     if (!token) {
       return null;
     }
-    const result = await this.getUserFromToken({ token, req });
-    this.getUserFromToken.dataloader.clearAll();
+    const result = await this.getUserFromToken.load({ token, req });
+    this.getUserFromToken.clearAll();
     return result;
   }
 
@@ -701,74 +700,76 @@ export class Auth implements IAuth {
   // called for each one of them. This will in turn call validateSession many times. To avoid executing
   // the logic more than once we use a DataLoader to process all requests happening within the same
   // Node tick. The DataLoader is cleared right after.
-  private getUserFromToken = fromDataLoader(
-    new DataLoader<{ token: string; req: IncomingMessage }, [User] | [User, User] | null, string>(
-      async (payloads) => {
-        // It will always be called with the same token so we just use the first element
-        const { token, req } = payloads[0];
-        const result = await (async () => {
-          try {
-            const idToken = await this.redis.get(`session:${token}:idToken`);
-            if (idToken === null) {
+  private getUserFromToken = new DataLoader<
+    { token: string; req: IncomingMessage },
+    [User] | [User, User] | null,
+    string
+  >(
+    async (payloads) => {
+      // It will always be called with the same token so we just use the first element
+      const { token, req } = payloads[0];
+      const result = await (async () => {
+        try {
+          const idToken = await this.redis.get(`session:${token}:idToken`);
+          if (idToken === null) {
+            return null;
+          }
+          const payload = decode(idToken) as any;
+          const expiresAt = payload["exp"] as number;
+          const cognitoId = payload["cognito:username"] as string;
+          if (Date.now() > expiresAt * 1000) {
+            const refreshToken = await this.redis.get(`session:${token}:refreshToken`);
+            if (refreshToken === null) {
               return null;
             }
-            const payload = decode(idToken) as any;
-            const expiresAt = payload["exp"] as number;
-            const cognitoId = payload["cognito:username"] as string;
-            if (Date.now() > expiresAt * 1000) {
-              const refreshToken = await this.redis.get(`session:${token}:refreshToken`);
-              if (refreshToken === null) {
-                return null;
-              }
-              const auth = await this.refreshToken(refreshToken, this.getContextData(req));
-              if (auth.AuthenticationResult) {
-                await this.updateSession(token, auth.AuthenticationResult as any);
-              } else {
-                return null;
-              }
+            const auth = await this.refreshToken(refreshToken, this.getContextData(req));
+            if (auth.AuthenticationResult) {
+              await this.updateSession(token, auth.AuthenticationResult as any);
+            } else {
+              return null;
             }
-            const meta = await this.redis.get(`session:${token}:meta`);
-            const users = await this.users.loadUsersByCognitoId(cognitoId);
-            if (isDefined(meta)) {
-              const { userId, asUserId } = JSON.parse(meta) as {
-                userId: number;
-                asUserId?: number;
-              };
-              const user = users.find((u) => u.id === userId);
-              if (!isDefined(user)) {
+          }
+          const meta = await this.redis.get(`session:${token}:meta`);
+          const users = await this.users.loadUsersByCognitoId(cognitoId);
+          if (isDefined(meta)) {
+            const { userId, asUserId } = JSON.parse(meta) as {
+              userId: number;
+              asUserId?: number;
+            };
+            const user = users.find((u) => u.id === userId);
+            if (!isDefined(user)) {
+              // who dis
+              return null;
+            }
+            if (isDefined(asUserId) && asUserId !== user.id) {
+              // make sure user can ghost login
+              if (!userHasRole(user, "ADMIN")) {
+                // can't ghost login if not admin
+                return null;
+              }
+              const org = (await this.orgs.loadOrg(user.org_id))!;
+              const asUser = await this.users.loadUser(asUserId);
+              if (!isDefined(asUser)) {
                 // who dis
                 return null;
               }
-              if (isDefined(asUserId) && asUserId !== user.id) {
-                // make sure user can ghost login
-                if (!userHasRole(user, "ADMIN")) {
-                  // can't ghost login if not admin
-                  return null;
-                }
-                const org = (await this.orgs.loadOrg(user.org_id))!;
-                const asUser = await this.users.loadUser(asUserId);
-                if (!isDefined(asUser)) {
-                  // who dis
-                  return null;
-                }
-                if (org.status === "ROOT" || user.org_id === asUser.org_id) {
-                  return [asUser, user] as [User, User];
-                } else {
-                  return null;
-                }
+              if (org.status === "ROOT" || user.org_id === asUser.org_id) {
+                return [asUser, user] as [User, User];
               } else {
-                return [user] as [User];
+                return null;
               }
+            } else {
+              return [user] as [User];
             }
-            return users.length > 0 ? ([users[0]] as [User]) : null;
-          } catch (error: any) {
-            return null;
           }
-        })();
-        return payloads.map(() => result);
-      },
-      { cacheKeyFn: (payload) => payload.token }
-    )
+          return users.length > 0 ? ([users[0]] as [User]) : null;
+        } catch (error: any) {
+          return null;
+        }
+      })();
+      return payloads.map(() => result);
+    },
+    { cacheKeyFn: (payload) => payload.token }
   );
 
   private async validateUserAuthToken(req: IncomingMessage): Promise<[User] | null> {
