@@ -127,6 +127,16 @@ export function RecipientViewPetitionFieldCard({
               defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
               values={{ count: fieldReplies.length }}
             />
+          ) : field.type === "DOW_JONES_KYC_RESEARCH" ? (
+            <>
+              {fieldReplies.length ? (
+                <FormattedMessage
+                  id="component.recipient-view-petition-field-card.profiles-uploaded"
+                  defaultMessage="{count, plural, =1 {1 profile uploaded} other {# profiles uploaded}}"
+                  values={{ count: fieldReplies.length }}
+                />
+              ) : null}
+            </>
           ) : field.type === "ES_TAX_DOCUMENTS" ? (
             <>
               <FormattedMessage

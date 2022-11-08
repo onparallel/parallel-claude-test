@@ -110,8 +110,7 @@ export function DowJonesProfileDetails({
   const details = data?.dowJonesRiskEntityProfile;
 
   const handleSanctionsRowClick = useCallback(function (
-    row: DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment,
-    event: MouseEvent
+    row: DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment
   ) {
     if (isDefined(row.sources[0])) {
       openNewWindow(row.sources[0]);
@@ -120,8 +119,7 @@ export function DowJonesProfileDetails({
   []);
 
   const handleRelationshipsRowClick = useCallback(function (
-    row: DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment,
-    event: MouseEvent
+    row: DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment
   ) {
     if (isDefined(row.profileId)) {
       refetch({
@@ -246,9 +244,7 @@ export function DowJonesProfileDetails({
             <Table
               isHighlightable
               columns={sanctionsColumns}
-              rows={
-                details.sanctions as DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment[]
-              }
+              rows={details.sanctions}
               rowKeyProp="id"
               onRowClick={handleSanctionsRowClick}
             />

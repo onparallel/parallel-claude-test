@@ -2000,6 +2000,31 @@
     "context": "Invalid password"
   },
   {
+    "term": "component.kyc-research-field-reply.approved-profile",
+    "definition": "Este perfil ha sido aprobado",
+    "context": "This profile has been approved"
+  },
+  {
+    "term": "component.kyc-research-field-reply.download-label",
+    "definition": "Descargar perfil",
+    "context": "Download profile"
+  },
+  {
+    "term": "component.kyc-research-field-reply.profile-incomplete",
+    "definition": "Se ha producido un error al guardar el perfil. Por favor, inténtelo de nuevo.",
+    "context": "There was an error saving the profile. Please try again."
+  },
+  {
+    "term": "component.kyc-research-field-reply.rejected-profile",
+    "definition": "Este perfil ha sido rechazado",
+    "context": "This profile has been rejected"
+  },
+  {
+    "term": "component.kyc-research-field-reply.remove-reply-label",
+    "definition": "Eliminar respuesta",
+    "context": "Remove reply"
+  },
+  {
     "term": "component.limit-exceeded-alert.body",
     "definition": "Límite de intentos superado, por favor inténtelo después de un tiempo.",
     "context": "Attempt limit exceeded, please try after some time."
@@ -3730,9 +3755,19 @@
     "context": "Permissions needed"
   },
   {
+    "term": "component.preview-petition-field-kyc-research.do-another-search",
+    "definition": "Hacer otra búsqueda",
+    "context": "Do another search"
+  },
+  {
     "term": "component.preview-petition-field-kyc-research.search-in-down-jones",
     "definition": "Buscar en Dow Jones",
     "context": "Search in Dow Jones"
+  },
+  {
+    "term": "component.preview-petition-field-kyc-research.wait-perform-search",
+    "definition": "Por favor, espera mientras realizamos la búqueda...",
+    "context": "Please wait while we perform the search..."
   },
   {
     "term": "component.print-pdf-task.confirm",
@@ -4258,6 +4293,11 @@
     "term": "component.recipient-view-petition-field-card.files-uploaded",
     "definition": "{count, plural, =0 {No se han subido archivos todavía} =1 {1 archivo subido} other {# archivos subidos}}",
     "context": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.profiles-uploaded",
+    "definition": "{count, plural, =1 {1 perfil subido} other {# perfiles subidos}}",
+    "context": "{count, plural, =1 {1 profile uploaded} other {# profiles uploaded}}"
   },
   {
     "term": "component.recipient-view-petition-field-card.replies-submitted",

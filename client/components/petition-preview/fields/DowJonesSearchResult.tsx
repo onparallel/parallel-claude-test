@@ -64,9 +64,7 @@ export function DowJonesSearchResult({
   );
 
   const result = data?.dowJonesRiskEntitySearch;
-
   const columns = useDowJonesFactivaDataColumns();
-
   const handleRowClick = useCallback(function (row: FactivaSelection) {
     setProfileId(row.profileId);
   }, []);
@@ -278,12 +276,15 @@ function useDowJonesFactivaDataColumns() {
           const [deletePetitionFieldReply] = useMutation(
             DowJonesSearchResult_deletePetitionFieldReplyDocument
           );
-          const profileReply = context.replies.find((r) => r.content.entity.profileId === row.id);
+
+          const profileReply = context.replies.find(
+            (r) => r.content.entity.profileId === row.profileId
+          );
           const handleSaveClick = async () => {
             try {
               await createDowJonesKycResearchReply({
                 variables: {
-                  profileId: row.id,
+                  profileId: row.profileId,
                   petitionId: context.petitionId,
                   fieldId: context.fieldId,
                 },

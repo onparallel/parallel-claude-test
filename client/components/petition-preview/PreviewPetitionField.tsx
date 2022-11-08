@@ -264,7 +264,13 @@ export function PreviewPetitionField({
       isCacheOnly={isCacheOnly}
     />
   ) : field.type === "DOW_JONES_KYC_RESEARCH" ? (
-    <PreviewPetitionFieldKYCResearch {...props} {...commonProps} isCacheOnly={isCacheOnly} />
+    <PreviewPetitionFieldKYCResearch
+      {...props}
+      {...commonProps}
+      onDownloadReply={handleDownloadFileUploadReply}
+      onRefreshField={handleRefreshAsyncField}
+      isCacheOnly={isCacheOnly}
+    />
   ) : null;
 }
 

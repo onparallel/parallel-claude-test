@@ -11183,6 +11183,16 @@ export type InternalFieldKYCResearch_UserFragment = {
 export type PreviewPetitionFieldKYCResearch_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
+  type: PetitionFieldType;
+  title?: string | null;
+  description?: string | null;
+  options: { [key: string]: any };
+  optional: boolean;
+  multiple: boolean;
+  isInternal: boolean;
+  commentCount: number;
+  unreadCommentCount: number;
+  hasCommentsEnabled: boolean;
   petition:
     | {
         __typename?: "Petition";
@@ -11194,6 +11204,26 @@ export type PreviewPetitionFieldKYCResearch_PetitionFieldFragment = {
         id: string;
         organization: { __typename?: "Organization"; id: string; hasDowJones: boolean };
       };
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    content: { [key: string]: any };
+    isAnonymized: boolean;
+    id: string;
+    status: PetitionFieldReplyStatus;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  attachments: Array<{
+    __typename?: "PetitionFieldAttachment";
+    id: string;
+    file: {
+      __typename?: "FileUpload";
+      filename: string;
+      contentType: string;
+      size: number;
+      isComplete: boolean;
+    };
+  }>;
 };
 
 export type CopyOrDownloadReplyButton_PetitionFieldReplyFragment = {
@@ -28358,6 +28388,7 @@ export const PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc = gql`
 export const PreviewPetitionFieldKYCResearch_PetitionFieldFragmentDoc = gql`
   fragment PreviewPetitionFieldKYCResearch_PetitionField on PetitionField {
     id
+    ...RecipientViewPetitionFieldCard_PetitionField
     petition {
       id
       organization {
@@ -28366,6 +28397,7 @@ export const PreviewPetitionFieldKYCResearch_PetitionFieldFragmentDoc = gql`
       }
     }
   }
+  ${RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PreviewPetitionFieldKYCResearch_PetitionFieldFragment, unknown>;
 export const PreviewPetitionField_PetitionFieldFragmentDoc = gql`
   fragment PreviewPetitionField_PetitionField on PetitionField {
