@@ -1610,26 +1610,6 @@
     "context": "Generating report..."
   },
   {
-    "term": "component.internal-field-kyc-research.date-of-birth",
-    "definition": "Date of birth",
-    "context": "Date of birth"
-  },
-  {
-    "term": "component.internal-field-kyc-research.fill-in-data",
-    "definition": "Fill in the data to start the search",
-    "context": "Fill in the data to start the search"
-  },
-  {
-    "term": "component.internal-field-kyc-research.name-person-entity",
-    "definition": "Name of the person/entity *",
-    "context": "Name of the person/entity *"
-  },
-  {
-    "term": "component.internal-field-kyc-research.search",
-    "definition": "Search",
-    "context": "Search"
-  },
-  {
     "term": "component.feature-flag-descriptions.auto-anonymize-description",
     "definition": "Allows setting up a period of time for the parallels to be automatically anonymized after x days of their closing.",
     "context": "Allows setting up a period of time for the parallels to be automatically anonymized after x days of their closing."
@@ -1973,6 +1953,41 @@
     "term": "component.internal-field-badge.text",
     "definition": "Int",
     "context": "Int"
+  },
+  {
+    "term": "component.internal-field-kyc-research.date-of-birth",
+    "definition": "Date of birth",
+    "context": "Date of birth"
+  },
+  {
+    "term": "component.internal-field-kyc-research.disabled-feature-alert-body",
+    "definition": "Your organization does not have access to this feature. <Link>Contact with our support team</Link> for more information.",
+    "context": "Your organization does not have access to this feature. <Link>Contact with our support team</Link> for more information."
+  },
+  {
+    "term": "component.internal-field-kyc-research.disabled-feature-alert-message",
+    "definition": "Hi, I am having issues with the Dow Jones field.",
+    "context": "Hi, I am having issues with the Dow Jones field."
+  },
+  {
+    "term": "component.internal-field-kyc-research.disabled-feature-alert-title",
+    "definition": "Disabled feature",
+    "context": "Disabled feature"
+  },
+  {
+    "term": "component.internal-field-kyc-research.fill-in-data",
+    "definition": "Fill in the data to start the search",
+    "context": "Fill in the data to start the search"
+  },
+  {
+    "term": "component.internal-field-kyc-research.name-person-entity",
+    "definition": "Name of the person/entity *",
+    "context": "Name of the person/entity *"
+  },
+  {
+    "term": "component.internal-field-kyc-research.search",
+    "definition": "Search",
+    "context": "Search"
   },
   {
     "term": "component.invalid-password-alert.body",

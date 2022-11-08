@@ -80,7 +80,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
             "DATE",
             "PHONE",
             "NUMBER",
-            "DOW_JONES_KYC_RESEARCH",
+            ...(user.hasDowJonesField ? ["DOW_JONES_KYC_RESEARCH"] : []),
             ...(user.hasEsTaxDocumentsField ? ["ES_TAX_DOCUMENTS"] : []),
             "DYNAMIC_SELECT",
           ] as PetitionFieldType[],
@@ -260,9 +260,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
       User: gql`
         fragment PetitionFieldTypeSelectDropdown_User on User {
           hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
-          organization {
-            hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
-          }
+          hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
         }
       `,
     },

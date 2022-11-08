@@ -24,12 +24,17 @@ function DowJonesFieldPreview({
     },
   });
 
+  const {
+    data: { me },
+  } = useAssertQuery(DowJonesFieldPreview_userDocument);
+
   return (
     <InternalFieldKYCResearch
       htmlTitle={"Dow Jones | Parallel"}
       petitionId={petitionId}
       fieldId={petitionFieldId}
       replies={petitionField.replies}
+      me={me}
     />
   );
 }
@@ -51,13 +56,10 @@ DowJonesFieldPreview.fragments = {
         browserName
       }
       me {
-        id
-        hasDowJonesFeatureFlag: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
-        organization {
-          hasDowJonesIntegration: hasIntegration(integration: DOW_JONES_KYC)
-        }
+        ...InternalFieldKYCResearch_User
       }
     }
+    ${InternalFieldKYCResearch.fragments.User}
   `,
 };
 
@@ -83,7 +85,7 @@ DowJonesFieldPreview.getInitialProps = async ({ query, fetchQuery }: WithApolloD
   const petitionFieldId = query.fieldId as string;
   const [
     {
-      data: { metadata, me },
+      data: { metadata },
     },
     {
       data: { petitionField },
@@ -96,11 +98,7 @@ DowJonesFieldPreview.getInitialProps = async ({ query, fetchQuery }: WithApolloD
     }),
   ]);
 
-  if (
-    !me.hasDowJonesFeatureFlag ||
-    !me.organization.hasDowJonesIntegration ||
-    petitionField.type !== "DOW_JONES_KYC_RESEARCH"
-  ) {
+  if (petitionField.type !== "DOW_JONES_KYC_RESEARCH") {
     throw new Error("FORBIDDEN");
   }
 

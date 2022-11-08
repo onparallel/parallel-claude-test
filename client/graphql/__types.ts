@@ -11174,6 +11174,12 @@ export type InternalFieldKYCResearch_PetitionFieldReplyFragment = {
   content: { [key: string]: any };
 };
 
+export type InternalFieldKYCResearch_UserFragment = {
+  __typename?: "User";
+  id: string;
+  hasDowJonesFeatureFlag: boolean;
+};
+
 export type PreviewPetitionFieldKYCResearch_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -19062,12 +19068,7 @@ export type DowJonesFieldPreview_PetitionFieldFragment = {
 
 export type DowJonesFieldPreview_QueryFragment = {
   metadata: { __typename?: "ConnectionMetadata"; browserName?: string | null };
-  me: {
-    __typename?: "User";
-    id: string;
-    hasDowJonesFeatureFlag: boolean;
-    organization: { __typename?: "Organization"; hasDowJonesIntegration: boolean };
-  };
+  me: { __typename?: "User"; id: string; hasDowJonesFeatureFlag: boolean };
 };
 
 export type DowJonesFieldPreview_petitionFieldQueryVariables = Exact<{
@@ -19092,12 +19093,7 @@ export type DowJonesFieldPreview_userQueryVariables = Exact<{ [key: string]: nev
 
 export type DowJonesFieldPreview_userQuery = {
   metadata: { __typename?: "ConnectionMetadata"; browserName?: string | null };
-  me: {
-    __typename?: "User";
-    id: string;
-    hasDowJonesFeatureFlag: boolean;
-    organization: { __typename?: "Organization"; hasDowJonesIntegration: boolean };
-  };
+  me: { __typename?: "User"; id: string; hasDowJonesFeatureFlag: boolean };
 };
 
 export type PetitionPreview_PetitionBase_Petition_Fragment = {
@@ -28196,19 +28192,22 @@ export const DowJonesFieldPreview_PetitionFieldFragmentDoc = gql`
   }
   ${InternalFieldKYCResearch_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<DowJonesFieldPreview_PetitionFieldFragment, unknown>;
+export const InternalFieldKYCResearch_UserFragmentDoc = gql`
+  fragment InternalFieldKYCResearch_User on User {
+    id
+    hasDowJonesFeatureFlag: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
+  }
+` as unknown as DocumentNode<InternalFieldKYCResearch_UserFragment, unknown>;
 export const DowJonesFieldPreview_QueryFragmentDoc = gql`
   fragment DowJonesFieldPreview_Query on Query {
     metadata {
       browserName
     }
     me {
-      id
-      hasDowJonesFeatureFlag: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
-      organization {
-        hasDowJonesIntegration: hasIntegration(integration: DOW_JONES_KYC)
-      }
+      ...InternalFieldKYCResearch_User
     }
   }
+  ${InternalFieldKYCResearch_UserFragmentDoc}
 ` as unknown as DocumentNode<DowJonesFieldPreview_QueryFragment, unknown>;
 export const completedFieldReplies_PetitionFieldFragmentDoc = gql`
   fragment completedFieldReplies_PetitionField on PetitionField {

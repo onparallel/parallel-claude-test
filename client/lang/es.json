@@ -1610,26 +1610,6 @@
     "context": "Generating report..."
   },
   {
-    "term": "component.internal-field-kyc-research.date-of-birth",
-    "definition": "Fecha de nacimiento:",
-    "context": "Date of birth"
-  },
-  {
-    "term": "component.internal-field-kyc-research.fill-in-data",
-    "definition": "Completa los datos para comenzar la búsqueda",
-    "context": "Fill in the data to start the search"
-  },
-  {
-    "term": "component.internal-field-kyc-research.name-person-entity",
-    "definition": "Nombre de la persona/entidad *",
-    "context": "Name of the person/entity *"
-  },
-  {
-    "term": "component.internal-field-kyc-research.search",
-    "definition": "Buscar",
-    "context": "Search"
-  },
-  {
     "term": "component.feature-flag-descriptions.auto-anonymize-description",
     "definition": "Permite incluir un periodo para que las peticiones se anonimicen automaticamente pasados x dias de su cierre.",
     "context": "Allows setting up a period of time for the parallels to be automatically anonymized after x days of their closing."
@@ -1973,6 +1953,41 @@
     "term": "component.internal-field-badge.text",
     "definition": "Int",
     "context": "Int"
+  },
+  {
+    "term": "component.internal-field-kyc-research.date-of-birth",
+    "definition": "Fecha de nacimiento:",
+    "context": "Date of birth"
+  },
+  {
+    "term": "component.internal-field-kyc-research.disabled-feature-alert-body",
+    "definition": "Tu organización no tiene acceso a esta funcionalidad. <Link>Contacta con nuestro equipo de soporte</Link> para más información.",
+    "context": "Your organization does not have access to this feature. <Link>Contact with our support team</Link> for more information."
+  },
+  {
+    "term": "component.internal-field-kyc-research.disabled-feature-alert-message",
+    "definition": "Hola, estoy teniendo problemas con el campo de Dow Jones.",
+    "context": "Hi, I am having issues with the Dow Jones field."
+  },
+  {
+    "term": "component.internal-field-kyc-research.disabled-feature-alert-title",
+    "definition": "Funcionalidad desactivada",
+    "context": "Disabled feature"
+  },
+  {
+    "term": "component.internal-field-kyc-research.fill-in-data",
+    "definition": "Completa los datos para comenzar la búsqueda",
+    "context": "Fill in the data to start the search"
+  },
+  {
+    "term": "component.internal-field-kyc-research.name-person-entity",
+    "definition": "Nombre de la persona/entidad *",
+    "context": "Name of the person/entity *"
+  },
+  {
+    "term": "component.internal-field-kyc-research.search",
+    "definition": "Buscar",
+    "context": "Search"
   },
   {
     "term": "component.invalid-password-alert.body",
