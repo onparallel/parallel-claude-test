@@ -19,7 +19,7 @@ import { PublicPetitionEmailExists } from "@parallel/components/public/public-pe
 import { PublicPetitionEmailSent } from "@parallel/components/public/public-petitions/PublicPetitionEmailSent";
 import {
   PublicPetitionInitialForm,
-  PublicPetitionInitialFormInputs,
+  PublicPetitionInitialFormData,
 } from "@parallel/components/public/public-petitions/PublicPetitionInitialForm";
 import { PublicPetitionReminder } from "@parallel/components/public/public-petitions/PublicPetitionReminder";
 import {
@@ -43,10 +43,10 @@ import { SubmitHandler } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 export type PublicPetitionLinkSteps = "INITIAL" | "EMAIL_SENT" | "EMAIL_EXISTS" | "REMINDER_SENT";
 
-export type HandleNewPublicPetitionProps = {
-  formData?: PublicPetitionInitialFormInputs;
+interface HandleNewPublicPetitionProps {
+  formData?: PublicPetitionInitialFormData;
   force: boolean;
-};
+}
 
 function PublicPetitionLink({
   slug,
@@ -60,7 +60,7 @@ function PublicPetitionLink({
 
   const [step, setStep] = useState<PublicPetitionLinkSteps>("INITIAL");
 
-  const [submittedData, setSubmittedData] = useState<PublicPetitionInitialFormInputs>();
+  const [submittedData, setSubmittedData] = useState<PublicPetitionInitialFormData>();
 
   const {
     description,
@@ -78,7 +78,7 @@ function PublicPetitionLink({
     PublicPetitionLink_publicSendReminderDocument
   );
 
-  const onSubmit: SubmitHandler<PublicPetitionInitialFormInputs> = async (formData) => {
+  const onSubmit: SubmitHandler<PublicPetitionInitialFormData> = async (formData) => {
     setSubmittedData(formData);
     handleNewPublicPetition({ formData, force: false });
   };
@@ -341,7 +341,7 @@ type PublicPetitionLinkServerSideProps = {
   prefill: string | null;
   slug: string;
   publicPetitionLink: PublicPetitionLink_PublicPublicPetitionLinkFragment;
-  defaultValues?: PublicPetitionInitialFormInputs;
+  defaultValues?: PublicPetitionInitialFormData;
 };
 
 export async function getServerSideProps({

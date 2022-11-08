@@ -23,12 +23,12 @@ import { QuestionOutlineIcon } from "@parallel/chakra/icons";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
-import { useEffect, useRef, useState } from "react";
+import useResizeObserver from "@react-hook/resize-observer";
+import { useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import ResizeObserver from "react-resize-observer";
 
-export interface PublicPetitionInitialFormInputs {
+export interface PublicPetitionInitialFormData {
   firstName: string;
   lastName: string;
   email: string;
@@ -39,10 +39,10 @@ interface PublicPetitionInitialFormProps {
   logoUrl?: string | null;
   title: string;
   description: string;
-  onSubmit: SubmitHandler<PublicPetitionInitialFormInputs>;
+  onSubmit: SubmitHandler<PublicPetitionInitialFormData>;
   isLoading: boolean;
   isDisabled: boolean;
-  defaultValues?: PublicPetitionInitialFormInputs;
+  defaultValues?: PublicPetitionInitialFormData;
 }
 
 export function PublicPetitionInitialForm({
@@ -61,21 +61,13 @@ export function PublicPetitionInitialForm({
   const onCloseDialog = () => setDialogIsOpen(false);
   const closeDialogRef = useRef<HTMLButtonElement>(null);
 
-  const [showMore, setShowMore] = useState(false);
-
-  const [canExpand, setCanExpand] = useState(false);
   const descriptionRef = useRef<HTMLDivElement>(null);
-
-  const handleResize = () => {
-    if (descriptionRef?.current) {
-      setCanExpand(descriptionRef.current!.scrollHeight > 300);
-      setShowMore(descriptionRef.current!.scrollHeight < 300);
-    }
-  };
-
-  useEffect(() => {
-    handleResize();
-  }, []);
+  const [canExpand, setCanExpand] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+  useResizeObserver(descriptionRef, (target) => {
+    setCanExpand(target.contentRect.height > 300);
+    setShowMore(showMore || target.contentRect.height < 300);
+  });
 
   const handleToggleShowMore = () => setShowMore(!showMore);
 
@@ -83,7 +75,7 @@ export function PublicPetitionInitialForm({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<PublicPetitionInitialFormInputs>({ defaultValues });
+  } = useForm<PublicPetitionInitialFormData>({ defaultValues });
 
   return (
     <>
@@ -112,36 +104,31 @@ export function PublicPetitionInitialForm({
           <Text fontSize="2xl" fontWeight="bold">
             {title}
           </Text>
-          <ResizeObserver onResize={handleResize} />
         </Stack>
         <Box maxWidth={{ base: "auto", md: "25rem" }} width="100%" position="relative">
           <Collapse startingHeight={200} in={showMore}>
-            <Box
-              ref={descriptionRef}
-              whiteSpace="pre-wrap"
-              overflowWrap="break-word"
-              dangerouslySetInnerHTML={{ __html: description }}
-            ></Box>
-            {canExpand ? (
+            <Box ref={descriptionRef} whiteSpace="pre-wrap">
+              {description}
+            </Box>
+          </Collapse>
+          {canExpand ? (
+            <>
               <Box
-                opacity={!showMore ? "1" : "0"}
+                opacity={!showMore ? 1 : 0}
                 position="absolute"
                 bottom="48px"
                 width="100%"
                 height="50px"
-                transition="opacity 0.3s ease"
                 background="linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,1) 100%)"
-              ></Box>
-            ) : null}
-          </Collapse>
-          {canExpand ? (
-            <Button variant="outline" size="sm" onClick={handleToggleShowMore} marginTop={4}>
-              <FormattedMessage
-                id="generic.show-more-less"
-                defaultMessage="Show {more, select, true {more} other {less}}"
-                values={{ more: !showMore }}
               />
-            </Button>
+              <Button variant="outline" size="sm" onClick={handleToggleShowMore} marginTop={4}>
+                <FormattedMessage
+                  id="generic.show-more-less"
+                  defaultMessage="Show {more, select, true {more} other {less}}"
+                  values={{ more: !showMore }}
+                />
+              </Button>
+            </>
           ) : null}
         </Box>
       </Stack>

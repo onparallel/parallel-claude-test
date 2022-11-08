@@ -1,8 +1,8 @@
 import { assignRef, Box, Tooltip } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import useMergedRef from "@react-hook/merged-ref";
-import { ReactNode, useEffect, useRef, useState } from "react";
-import ResizeObserver from "react-resize-observer";
+import useResizeObserver from "@react-hook/resize-observer";
+import { ReactNode, useRef, useState } from "react";
 
 export interface OverflownTextProps {
   children: ReactNode;
@@ -18,22 +18,13 @@ export const OverflownText = chakraForwardRef<"div", OverflownTextProps>(functio
   // avoid unnecessary rerenders or listener changes
   const isOverflownRef = useRef(isOverflown);
   assignRef(isOverflownRef, isOverflown);
-  useEffect(() => {
-    const element = innerRef.current!;
-    setIsOverflown(element.scrollWidth > element.clientWidth);
-  }, []);
-
-  function handleResize() {
-    const element = innerRef.current;
-    if (!element) {
-      return;
-    }
-    const _isOverflown = element.scrollWidth > element.clientWidth;
+  useResizeObserver(innerRef, ({ target }) => {
+    const _isOverflown = target.scrollWidth > target.clientWidth;
     // boolean xor
-    if ((_isOverflown as any) ^ (isOverflown as any)) {
+    if ((_isOverflown as any) ^ (isOverflownRef.current as any)) {
       setIsOverflown(_isOverflown);
     }
-  }
+  });
 
   return (
     <Tooltip label={children} isDisabled={!children || !isOverflown}>
@@ -45,7 +36,6 @@ export const OverflownText = chakraForwardRef<"div", OverflownTextProps>(functio
         ref={_ref}
         {...props}
       >
-        <ResizeObserver onResize={handleResize} />
         {children}
       </Box>
     </Tooltip>

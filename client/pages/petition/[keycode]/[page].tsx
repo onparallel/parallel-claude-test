@@ -54,12 +54,12 @@ import { useGetPageFields } from "@parallel/utils/useGetPageFields";
 import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
 import { useLiquidScope } from "@parallel/utils/useLiquidScope";
 import { withMetadata } from "@parallel/utils/withMetadata";
+import useResizeObserver from "@react-hook/resize-observer";
 import { AnimatePresence, motion } from "framer-motion";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import ResizeObserver, { DOMRect } from "react-resize-observer";
 
 type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getInitialProps>>;
 
@@ -196,9 +196,10 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   );
 
   const [sidebarTop, setSidebarTop] = useState(0);
-  const readjustHeight = useCallback(function (rect: DOMRect) {
-    setSidebarTop(rect.height + 16);
-  }, []);
+  const alertsBoxRef = useRef<HTMLDivElement>(null);
+  useResizeObserver(alertsBoxRef, (entry) => {
+    setSidebarTop(entry.contentRect.height + 16);
+  });
 
   const breakpoint = "md";
   const scope = useLiquidScope(petition);
@@ -236,7 +237,14 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
               keycode={keycode}
               isClosed={["COMPLETED", "CLOSED"].includes(petition.status)}
             />
-            <Box position="sticky" top={0} width="100%" zIndex={2} marginBottom={4}>
+            <Box
+              ref={alertsBoxRef}
+              position="sticky"
+              top={0}
+              width="100%"
+              zIndex={2}
+              marginBottom={4}
+            >
               {["COMPLETED", "CLOSED"].includes(petition.status) ? (
                 !petition.signatureConfig ||
                 (petition.signatureConfig && petition.signatureStatus === "COMPLETED") ? (
@@ -345,7 +353,6 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                   </CloseableAlert>
                 )
               ) : null}
-              <ResizeObserver onResize={readjustHeight} />
             </Box>
             <Flex
               flex="1"

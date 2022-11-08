@@ -2,8 +2,8 @@ import { Box, Flex, PositionProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Maybe } from "@parallel/utils/types";
 import useMergedRef from "@react-hook/merged-ref";
+import useResizeObserver from "@react-hook/resize-observer";
 import { ReactNode, RefObject, useEffect, useRef, useState } from "react";
-import ResizeObserver from "react-resize-observer";
 import { isDefined } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
@@ -39,10 +39,9 @@ export const PaneWithFlyout = chakraForwardRef<"div", PaneWithFlyoutProps>(funct
   const paneRef = useRef<HTMLDivElement>(null);
   const _paneRef = useMergedRef(ref, paneRef);
 
-  useEffect(positionFlyout, [isFlyoutActive, alignWithRef]);
   useEffect(scrollFlyoutIntoView, [isFlyoutActive, alignWithRef]);
 
-  function positionFlyout() {
+  useResizeObserver(flyoutRef, function () {
     const alignWith = alignWithRef?.current;
     const flyout = flyoutRef.current;
     if (!isFlyoutActive || !isDefined(alignWith) || !isDefined(flyout)) {
@@ -58,7 +57,7 @@ export const PaneWithFlyout = chakraForwardRef<"div", PaneWithFlyoutProps>(funct
         : alignWithTop - paneTop;
     const maxOffset = paneHeight - flyoutHeight;
     setFlyoutOffset(Math.min(maxOffset, Math.max(0, offset)));
-  }
+  });
 
   function scrollFlyoutIntoView() {
     if (isFlyoutActive) {
@@ -92,7 +91,6 @@ export const PaneWithFlyout = chakraForwardRef<"div", PaneWithFlyoutProps>(funct
             position={{ base: "relative", md: "sticky" }}
             top={top}
           >
-            <ResizeObserver onResize={positionFlyout} />
             {flyout}
           </Box>
         ) : null}
