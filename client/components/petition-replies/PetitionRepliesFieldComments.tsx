@@ -9,7 +9,7 @@ import {
 import { useGetMyId } from "@parallel/utils/apollo/getMyId";
 import { useGetDefaultMentionables } from "@parallel/utils/useGetDefaultMentionables";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
-import usePreviousValue from "beautiful-react-hooks/usePreviousValue";
+import usePrevious from "@react-hook/previous";
 import { useCallback, useEffect, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
@@ -55,7 +55,7 @@ export function PetitionRepliesFieldComments({
   const comments = data?.petitionField.comments ?? [];
 
   // Scroll to bottom when a comment is added
-  const previousCommentCount = usePreviousValue(comments.length);
+  const previousCommentCount = usePrevious(comments.length);
   useEffect(() => {
     if (previousCommentCount === undefined || comments.length > previousCommentCount) {
       commentsRef.current?.scrollTo({ top: 99999, behavior: "smooth" });

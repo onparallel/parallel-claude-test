@@ -1,6 +1,6 @@
 import { FormControl, FormControlProps, FormLabel, Input, Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import usePreviousValue from "beautiful-react-hooks/usePreviousValue";
+import usePrevious from "@react-hook/previous";
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -23,7 +23,7 @@ export const ConfirmInput = chakraForwardRef<"div", ConfirmInputProps>(function 
       })
       .toLocaleLowerCase(intl.locale);
   const [value, setValue] = useState("");
-  const prevValue = usePreviousValue(value);
+  const prevValue = usePrevious(value);
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
     const match = e.target.value === confirmation;
