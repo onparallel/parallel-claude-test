@@ -212,6 +212,7 @@ export type DowJonesRiskEntityProfileResult = {
   relationships: Array<DowJonesRiskEntityRelationship>;
   sanctions: Array<DowJonesRiskEntitySanction>;
   type: DowJonesRiskEntityType;
+  updatedAt: Scalars["DateTime"];
 };
 
 export type DowJonesRiskEntityProfileResultEntity = DowJonesRiskEntityProfileResult & {
@@ -223,6 +224,7 @@ export type DowJonesRiskEntityProfileResultEntity = DowJonesRiskEntityProfileRes
   relationships: Array<DowJonesRiskEntityRelationship>;
   sanctions: Array<DowJonesRiskEntitySanction>;
   type: DowJonesRiskEntityType;
+  updatedAt: Scalars["DateTime"];
 };
 
 export type DowJonesRiskEntityProfileResultPerson = DowJonesRiskEntityProfileResult & {
@@ -239,6 +241,7 @@ export type DowJonesRiskEntityProfileResultPerson = DowJonesRiskEntityProfileRes
   residence: Maybe<DowJonesRiskEntityPlace>;
   sanctions: Array<DowJonesRiskEntitySanction>;
   type: DowJonesRiskEntityType;
+  updatedAt: Scalars["DateTime"];
 };
 
 export type DowJonesRiskEntityRelationship = {

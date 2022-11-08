@@ -230,6 +230,7 @@ export interface DowJonesRiskEntityProfileResult {
   relationships: Array<DowJonesRiskEntityRelationship>;
   sanctions: Array<DowJonesRiskEntitySanction>;
   type: DowJonesRiskEntityType;
+  updatedAt: Scalars["DateTime"];
 }
 
 export interface DowJonesRiskEntityProfileResultEntity extends DowJonesRiskEntityProfileResult {
@@ -242,6 +243,7 @@ export interface DowJonesRiskEntityProfileResultEntity extends DowJonesRiskEntit
   relationships: Array<DowJonesRiskEntityRelationship>;
   sanctions: Array<DowJonesRiskEntitySanction>;
   type: DowJonesRiskEntityType;
+  updatedAt: Scalars["DateTime"];
 }
 
 export interface DowJonesRiskEntityProfileResultPerson extends DowJonesRiskEntityProfileResult {
@@ -259,6 +261,7 @@ export interface DowJonesRiskEntityProfileResultPerson extends DowJonesRiskEntit
   residence?: Maybe<DowJonesRiskEntityPlace>;
   sanctions: Array<DowJonesRiskEntitySanction>;
   type: DowJonesRiskEntityType;
+  updatedAt: Scalars["DateTime"];
 }
 
 export interface DowJonesRiskEntityRelationship {
@@ -10851,6 +10854,7 @@ export type DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskE
     type: DowJonesRiskEntityType;
     name: string;
     iconHints: Array<string>;
+    updatedAt: string;
     dateOfRegistration?: {
       __typename?: "DowJonesRiskEntityDate";
       year?: number | null;
@@ -10887,6 +10891,7 @@ export type DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskE
     type: DowJonesRiskEntityType;
     name: string;
     iconHints: Array<string>;
+    updatedAt: string;
     placeOfBirth?: {
       __typename?: "DowJonesRiskEntityPlace";
       descriptor: string;
@@ -10951,6 +10956,7 @@ export type DowJonesProfileDetails_dowJonesRiskEntityProfileQuery = {
         type: DowJonesRiskEntityType;
         name: string;
         iconHints: Array<string>;
+        updatedAt: string;
         dateOfRegistration?: {
           __typename?: "DowJonesRiskEntityDate";
           year?: number | null;
@@ -10985,6 +10991,7 @@ export type DowJonesProfileDetails_dowJonesRiskEntityProfileQuery = {
         type: DowJonesRiskEntityType;
         name: string;
         iconHints: Array<string>;
+        updatedAt: string;
         placeOfBirth?: {
           __typename?: "DowJonesRiskEntityPlace";
           descriptor: string;
@@ -25817,6 +25824,7 @@ export const DowJonesProfileDetails_DowJonesRiskEntityProfileResultFragmentDoc =
     relationships {
       ...DowJonesProfileDetails_DowJonesRiskEntityRelationship
     }
+    updatedAt
     ... on DowJonesRiskEntityProfileResultEntity {
       dateOfRegistration {
         year

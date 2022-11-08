@@ -286,7 +286,7 @@ export function DowJonesProfileDetails({
               rows={
                 details.relationships as DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment[]
               }
-              rowKeyProp="profileId"
+              rowKeyProp="id"
               onRowClick={handleRelationshipsRowClick}
             />
           </Box>
@@ -295,14 +295,14 @@ export function DowJonesProfileDetails({
         )}
       </Card>
 
-      {loading ? null : (
+      {loading || !details ? null : (
         <HStack justifyContent="space-between" flexWrap="wrap" spacing={0} gridGap={2}>
           <Text>
             <FormattedMessage
               id="component.dow-jones-profile-details.results-obtained-on"
               defaultMessage="Results obtained on {date}"
               values={{
-                date: intl.formatDate(new Date(), FORMATS.FULL),
+                date: intl.formatDate(details.updatedAt, FORMATS.FULL),
               }}
             />
           </Text>
@@ -701,6 +701,7 @@ DowJonesProfileDetails.fragments = {
         relationships {
           ...DowJonesProfileDetails_DowJonesRiskEntityRelationship
         }
+        updatedAt
         ... on DowJonesRiskEntityProfileResultEntity {
           dateOfRegistration {
             year

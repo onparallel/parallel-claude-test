@@ -147,6 +147,7 @@ export const DowJonesRiskEntityProfileResult = interfaceType({
     t.list.field("relationships", {
       type: "DowJonesRiskEntityRelationship",
     });
+    t.datetime("updatedAt");
   },
   resolveType: (o) =>
     o.type === "Person"

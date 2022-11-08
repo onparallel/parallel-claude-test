@@ -416,6 +416,7 @@ export interface NexusGenObjects {
     relationships: NexusGenRootTypes["DowJonesRiskEntityRelationship"][]; // [DowJonesRiskEntityRelationship!]!
     sanctions: NexusGenRootTypes["DowJonesRiskEntitySanction"][]; // [DowJonesRiskEntitySanction!]!
     type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   DowJonesRiskEntityProfileResultPerson: {
     // root type
@@ -432,6 +433,7 @@ export interface NexusGenObjects {
     residence?: NexusGenRootTypes["DowJonesRiskEntityPlace"] | null; // DowJonesRiskEntityPlace
     sanctions: NexusGenRootTypes["DowJonesRiskEntitySanction"][]; // [DowJonesRiskEntitySanction!]!
     type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   DowJonesRiskEntityRelationship: {
     // root type
@@ -991,6 +993,7 @@ export interface NexusGenFieldTypes {
     relationships: NexusGenRootTypes["DowJonesRiskEntityRelationship"][]; // [DowJonesRiskEntityRelationship!]!
     sanctions: NexusGenRootTypes["DowJonesRiskEntitySanction"][]; // [DowJonesRiskEntitySanction!]!
     type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   DowJonesRiskEntityProfileResultPerson: {
     // field return type
@@ -1007,6 +1010,7 @@ export interface NexusGenFieldTypes {
     residence: NexusGenRootTypes["DowJonesRiskEntityPlace"] | null; // DowJonesRiskEntityPlace
     sanctions: NexusGenRootTypes["DowJonesRiskEntitySanction"][]; // [DowJonesRiskEntitySanction!]!
     type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   DowJonesRiskEntityRelationship: {
     // field return type
@@ -2442,6 +2446,7 @@ export interface NexusGenFieldTypes {
     relationships: NexusGenRootTypes["DowJonesRiskEntityRelationship"][]; // [DowJonesRiskEntityRelationship!]!
     sanctions: NexusGenRootTypes["DowJonesRiskEntitySanction"][]; // [DowJonesRiskEntitySanction!]!
     type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   DowJonesRiskEntitySearchResult: {
     // field return type
@@ -2686,6 +2691,7 @@ export interface NexusGenFieldTypeNames {
     relationships: "DowJonesRiskEntityRelationship";
     sanctions: "DowJonesRiskEntitySanction";
     type: "DowJonesRiskEntityType";
+    updatedAt: "DateTime";
   };
   DowJonesRiskEntityProfileResultPerson: {
     // field return type name
@@ -2702,6 +2708,7 @@ export interface NexusGenFieldTypeNames {
     residence: "DowJonesRiskEntityPlace";
     sanctions: "DowJonesRiskEntitySanction";
     type: "DowJonesRiskEntityType";
+    updatedAt: "DateTime";
   };
   DowJonesRiskEntityRelationship: {
     // field return type name
@@ -4137,6 +4144,7 @@ export interface NexusGenFieldTypeNames {
     relationships: "DowJonesRiskEntityRelationship";
     sanctions: "DowJonesRiskEntitySanction";
     type: "DowJonesRiskEntityType";
+    updatedAt: "DateTime";
   };
   DowJonesRiskEntitySearchResult: {
     // field return type name

@@ -33,6 +33,7 @@ import {
 import { IPetitionBinder, PETITION_BINDER } from "./services/petition-binder";
 import { IPrinter, PRINTER } from "./services/printer";
 import { IQueuesService, QUEUES_SERVICE } from "./services/queues";
+import { IRedis, REDIS } from "./services/redis";
 import { ISignatureService, SIGNATURE } from "./services/signature";
 import { ISmtp, SMTP } from "./services/smtp";
 import { IStorageService, STORAGE_SERVICE } from "./services/storage";
@@ -61,6 +62,7 @@ export class ApiContext {
     @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
     @inject(ORGANIZATION_CREDITS_SERVICE) public readonly orgCredits: IOrganizationCreditsService,
     @inject(DOW_JONES_KYC_SERVICE) public readonly dowJonesKyc: IDowJonesKycService,
+    @inject(REDIS) public readonly redis: IRedis,
 
     // Repositories
     public readonly contacts: ContactRepository,

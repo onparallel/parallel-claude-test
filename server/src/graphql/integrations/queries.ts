@@ -61,33 +61,41 @@ export const queries = queryField((t) => {
     },
     resolve: async (_, args, ctx) => {
       try {
+        const redisKey = `DowJones:${args.profileId}`;
+        const cachedData = await ctx.redis.get(redisKey);
+        if (cachedData) {
+          return JSON.parse(cachedData);
+        }
+
         const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
           ctx.user!.org_id,
           "DOW_JONES_KYC"
         );
 
-        const result = await ctx.dowJonesKyc.riskEntityProfile(args.profileId, integration);
+        const profile = await ctx.dowJonesKyc.riskEntityProfile(args.profileId, integration);
+
         const citizenship = (
-          result.data.attributes.person?.country_territory_details.citizenship ?? []
+          profile.data.attributes.person?.country_territory_details.citizenship ?? []
         ).find((c) => c.code !== "NOTK"); // NOTK is "Not Known", this info is irrelevant so we will filter it
         const jurisdiction = (
-          result.data.attributes.person?.country_territory_details.jurisdiction ?? []
+          profile.data.attributes.person?.country_territory_details.jurisdiction ?? []
         ).find((c) => c.code !== "NOTK");
         const residence = (
-          result.data.attributes.person?.country_territory_details.residence ?? []
+          profile.data.attributes.person?.country_territory_details.residence ?? []
         ).find((c) => c.code !== "NOTK");
-        return {
-          id: toGlobalId("DowJonesRiskEntityProfileResult", result.data.id),
-          profileId: result.data.id,
-          type: result.data.attributes.basic.type,
+
+        const result = {
+          id: toGlobalId("DowJonesRiskEntityProfileResult", profile.data.id),
+          profileId: profile.data.id,
+          type: profile.data.attributes.basic.type,
           name: ctx.dowJonesKyc.entityFullName(
-            result.data.attributes.basic.name_details.primary_name
+            profile.data.attributes.basic.name_details.primary_name
           ),
           iconHints:
-            result.data.attributes.person?.icon_hints ??
-            result.data.attributes.entity?.icon_hints ??
+            profile.data.attributes.person?.icon_hints ??
+            profile.data.attributes.entity?.icon_hints ??
             [],
-          sanctions: (result.data.attributes.list_reference?.sanctions_lists ?? []).map(
+          sanctions: (profile.data.attributes.list_reference?.sanctions_lists ?? []).map(
             (s, id) => ({
               id,
               name: s.name,
@@ -95,7 +103,7 @@ export const queries = queryField((t) => {
               fromDate: s.from_date ?? null,
             })
           ),
-          relationships: (result.data.attributes.relationship?.connection_details ?? []).map(
+          relationships: (profile.data.attributes.relationship?.connection_details ?? []).map(
             (r) => ({
               profileId: r.profile_id,
               type: r.type,
@@ -104,13 +112,13 @@ export const queries = queryField((t) => {
               name: ctx.dowJonesKyc.entityFullName(r.name_detail),
             })
           ),
-          placeOfBirth: result.data.attributes.person?.places_of_birth
+          placeOfBirth: profile.data.attributes.person?.places_of_birth
             ? {
-                descriptor: result.data.attributes.person!.places_of_birth[0].country.descriptor,
-                countryCode: result.data.attributes.person!.places_of_birth[0].country.iso_alpha2,
+                descriptor: profile.data.attributes.person!.places_of_birth[0].country.descriptor,
+                countryCode: profile.data.attributes.person!.places_of_birth[0].country.iso_alpha2,
               }
             : null,
-          dateOfBirth: result.data.attributes.person?.date_details?.birth?.[0].date ?? null,
+          dateOfBirth: profile.data.attributes.person?.date_details?.birth?.[0].date ?? null,
           citizenship: citizenship
             ? {
                 descriptor: citizenship.descriptor,
@@ -129,10 +137,15 @@ export const queries = queryField((t) => {
                 countryCode: jurisdiction.iso_alpha2,
               }
             : null,
-          isDeceased: result.data.attributes.person?.is_deceased,
+          isDeceased: profile.data.attributes.person?.is_deceased,
           dateOfRegistration:
-            result.data.attributes.entity?.date_details?.registration?.[0].date ?? null,
+            profile.data.attributes.entity?.date_details?.registration?.[0].date ?? null,
+          updatedAt: new Date(),
         };
+
+        await ctx.redis.set(redisKey, JSON.stringify(result), 15 * 60); // 15 min cache
+
+        return result;
       } catch (error: any) {
         if (error.message === "PROFILE_NOT_FOUND") {
           throw new ApolloError(

@@ -246,6 +246,7 @@ interface DowJonesRiskEntityProfileResult {
   relationships: [DowJonesRiskEntityRelationship!]!
   sanctions: [DowJonesRiskEntitySanction!]!
   type: DowJonesRiskEntityType!
+  updatedAt: DateTime!
 }
 
 type DowJonesRiskEntityProfileResultEntity implements DowJonesRiskEntityProfileResult {
@@ -257,6 +258,7 @@ type DowJonesRiskEntityProfileResultEntity implements DowJonesRiskEntityProfileR
   relationships: [DowJonesRiskEntityRelationship!]!
   sanctions: [DowJonesRiskEntitySanction!]!
   type: DowJonesRiskEntityType!
+  updatedAt: DateTime!
 }
 
 type DowJonesRiskEntityProfileResultPerson implements DowJonesRiskEntityProfileResult {
@@ -273,6 +275,7 @@ type DowJonesRiskEntityProfileResultPerson implements DowJonesRiskEntityProfileR
   residence: DowJonesRiskEntityPlace
   sanctions: [DowJonesRiskEntitySanction!]!
   type: DowJonesRiskEntityType!
+  updatedAt: DateTime!
 }
 
 type DowJonesRiskEntityRelationship {
