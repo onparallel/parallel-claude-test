@@ -226,6 +226,7 @@ export interface DowJonesRiskEntityProfileResult {
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   name: Scalars["String"];
+  profileId: Scalars["ID"];
   relationships: Array<DowJonesRiskEntityRelationship>;
   sanctions: Array<DowJonesRiskEntitySanction>;
   type: DowJonesRiskEntityType;
@@ -237,6 +238,7 @@ export interface DowJonesRiskEntityProfileResultEntity extends DowJonesRiskEntit
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   name: Scalars["String"];
+  profileId: Scalars["ID"];
   relationships: Array<DowJonesRiskEntityRelationship>;
   sanctions: Array<DowJonesRiskEntitySanction>;
   type: DowJonesRiskEntityType;
@@ -252,6 +254,7 @@ export interface DowJonesRiskEntityProfileResultPerson extends DowJonesRiskEntit
   jurisdiction?: Maybe<DowJonesRiskEntityPlace>;
   name: Scalars["String"];
   placeOfBirth?: Maybe<DowJonesRiskEntityPlace>;
+  profileId: Scalars["ID"];
   relationships: Array<DowJonesRiskEntityRelationship>;
   residence?: Maybe<DowJonesRiskEntityPlace>;
   sanctions: Array<DowJonesRiskEntitySanction>;
@@ -281,6 +284,7 @@ export interface DowJonesRiskEntitySearchResult {
   id: Scalars["ID"];
   isSubsidiary: Scalars["Boolean"];
   name: Scalars["String"];
+  profileId: Scalars["ID"];
   title: Scalars["String"];
   type: DowJonesRiskEntityType;
 }
@@ -292,6 +296,7 @@ export interface DowJonesRiskEntitySearchResultEntity extends DowJonesRiskEntity
   id: Scalars["ID"];
   isSubsidiary: Scalars["Boolean"];
   name: Scalars["String"];
+  profileId: Scalars["ID"];
   title: Scalars["String"];
   type: DowJonesRiskEntityType;
 }
@@ -313,6 +318,7 @@ export interface DowJonesRiskEntitySearchResultPerson extends DowJonesRiskEntity
   id: Scalars["ID"];
   isSubsidiary: Scalars["Boolean"];
   name: Scalars["String"];
+  profileId: Scalars["ID"];
   title: Scalars["String"];
   type: DowJonesRiskEntityType;
 }
@@ -9354,7 +9360,7 @@ export type useSendPetitionHandler_addPetitionPermissionMutation = {
 export type AddFieldPopover_UserFragment = {
   __typename?: "User";
   hasEsTaxDocumentsField: boolean;
-  organization: { __typename?: "Organization"; hasDowJones: boolean };
+  hasDowJonesField: boolean;
 };
 
 export type PetitionComposeField_PetitionFieldFragment = {
@@ -9495,7 +9501,7 @@ export type PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment = {
 export type PetitionComposeFieldList_UserFragment = {
   __typename?: "User";
   hasEsTaxDocumentsField: boolean;
-  organization: { __typename?: "Organization"; hasDowJones: boolean };
+  hasDowJonesField: boolean;
 };
 
 export type PetitionFieldOptionsListEditor_PetitionFieldFragment = {
@@ -9509,13 +9515,13 @@ export type PetitionFieldOptionsListEditor_PetitionFieldFragment = {
 export type PetitionFieldTypeSelect_UserFragment = {
   __typename?: "User";
   hasEsTaxDocumentsField: boolean;
-  organization: { __typename?: "Organization"; hasDowJones: boolean };
+  hasDowJonesField: boolean;
 };
 
 export type PetitionFieldTypeSelectDropdown_UserFragment = {
   __typename?: "User";
   hasEsTaxDocumentsField: boolean;
-  organization: { __typename?: "Organization"; hasDowJones: boolean };
+  hasDowJonesField: boolean;
 };
 
 export type PetitionFieldVisibilityEditor_PetitionFieldFragment = {
@@ -9974,7 +9980,7 @@ export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
 export type PetitionComposeFieldSettings_UserFragment = {
   __typename?: "User";
   hasEsTaxDocumentsField: boolean;
-  organization: { __typename?: "Organization"; hasDowJones: boolean };
+  hasDowJonesField: boolean;
 };
 
 export type PetitionComposeFieldSettings_PetitionFieldFragment = {
@@ -11032,6 +11038,7 @@ export type DowJonesSearchResult_DowJonesRiskEntitySearchResult_DowJonesRiskEnti
   {
     __typename?: "DowJonesRiskEntitySearchResultEntity";
     id: string;
+    profileId: string;
     type: DowJonesRiskEntityType;
     name: string;
     title: string;
@@ -11045,6 +11052,7 @@ export type DowJonesSearchResult_DowJonesRiskEntitySearchResult_DowJonesRiskEnti
     __typename?: "DowJonesRiskEntitySearchResultPerson";
     gender: string;
     id: string;
+    profileId: string;
     type: DowJonesRiskEntityType;
     name: string;
     title: string;
@@ -11084,6 +11092,7 @@ export type DowJonesSearchResult_dowJonesRiskEntitySearchQuery = {
       | {
           __typename?: "DowJonesRiskEntitySearchResultEntity";
           id: string;
+          profileId: string;
           type: DowJonesRiskEntityType;
           name: string;
           title: string;
@@ -11095,6 +11104,7 @@ export type DowJonesSearchResult_dowJonesRiskEntitySearchQuery = {
           __typename?: "DowJonesRiskEntitySearchResultPerson";
           gender: string;
           id: string;
+          profileId: string;
           type: DowJonesRiskEntityType;
           name: string;
           title: string;
@@ -17875,6 +17885,7 @@ export type PetitionCompose_QueryFragment = {
     hasPrefillSecret: boolean;
     hasOnBehalfOf: boolean;
     hasEsTaxDocumentsField: boolean;
+    hasDowJonesField: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -17882,7 +17893,6 @@ export type PetitionCompose_QueryFragment = {
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
-      hasDowJones: boolean;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -18482,6 +18492,7 @@ export type PetitionCompose_userQuery = {
     hasPrefillSecret: boolean;
     hasOnBehalfOf: boolean;
     hasEsTaxDocumentsField: boolean;
+    hasDowJonesField: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -18489,7 +18500,6 @@ export type PetitionCompose_userQuery = {
       isPetitionUsageLimitReached: boolean;
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
-      hasDowJones: boolean;
       petitionsPeriod?: { __typename?: "OrganizationUsageLimit"; limit: number } | null;
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
@@ -25693,9 +25703,7 @@ export const TemplateDetailsModal_PetitionTemplateFragmentDoc = gql`
 export const PetitionFieldTypeSelectDropdown_UserFragmentDoc = gql`
   fragment PetitionFieldTypeSelectDropdown_User on User {
     hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
-    organization {
-      hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
-    }
+    hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
   }
 ` as unknown as DocumentNode<PetitionFieldTypeSelectDropdown_UserFragment, unknown>;
 export const AddFieldPopover_UserFragmentDoc = gql`
@@ -25848,6 +25856,7 @@ export const DowJonesProfileDetails_DowJonesRiskEntityProfileResultFragmentDoc =
 export const DowJonesSearchResult_DowJonesRiskEntitySearchResultFragmentDoc = gql`
   fragment DowJonesSearchResult_DowJonesRiskEntitySearchResult on DowJonesRiskEntitySearchResult {
     id
+    profileId
     type
     name
     title

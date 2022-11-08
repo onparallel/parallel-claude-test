@@ -1,5 +1,6 @@
 import { ApolloError } from "apollo-server-core";
 import { idArg, nonNull, queryField, stringArg } from "nexus";
+import { toGlobalId } from "../../util/globalId";
 import { authenticateAnd } from "../helpers/authorize";
 import { datetimeArg } from "../helpers/scalars";
 import { userHasEnabledIntegration, userHasFeatureFlag } from "../petition/authorizers";
@@ -25,25 +26,22 @@ export const queries = queryField((t) => {
       return {
         totalCount: result.meta.total_count,
         items: (result.data ?? []).map((i) => ({
-          id: i.id,
+          id: toGlobalId("DowJonesRiskEntitySearchResult", i.id),
+          profileId: i.id,
           type: i.attributes.type,
           name: i.attributes.primary_name,
           title: i.attributes.title,
           countryTerritoryName: i.attributes.country_territory_name,
           isSubsidiary: i.attributes.is_subsidiary,
           iconHints: i.attributes.icon_hints,
-          ...(i.attributes.type === "Person"
+          gender: i.attributes.gender,
+          dateOfBirth: i.attributes.date_of_birth
             ? {
-                gender: i.attributes.gender,
-                dateOfBirth: i.attributes.date_of_birth
-                  ? {
-                      year: parseInt(i.attributes.date_of_birth[0].year) || null,
-                      month: parseInt(i.attributes.date_of_birth[0].month) || null,
-                      day: parseInt(i.attributes.date_of_birth[0].day) || null,
-                    }
-                  : null,
+                year: parseInt(i.attributes.date_of_birth[0].year) || null,
+                month: parseInt(i.attributes.date_of_birth[0].month) || null,
+                day: parseInt(i.attributes.date_of_birth[0].day) || null,
               }
-            : {}),
+            : null,
         })),
       };
     },
@@ -76,7 +74,8 @@ export const queries = queryField((t) => {
           result.data.attributes.person?.country_territory_details.residence ?? []
         ).find((c) => c.code !== "NOTK");
         return {
-          id: result.data.id,
+          id: toGlobalId("DowJonesRiskEntityProfileResult", result.data.id),
+          profileId: result.data.id,
           type: result.data.attributes.basic.type,
           name: ctx.dowJonesKyc.entityFullName(
             result.data.attributes.basic.name_details.primary_name
@@ -102,41 +101,34 @@ export const queries = queryField((t) => {
               name: ctx.dowJonesKyc.entityFullName(r.name_detail),
             })
           ),
-          ...(result.data.attributes.basic.type === "Person"
+          placeOfBirth: result.data.attributes.person?.places_of_birth
             ? {
-                placeOfBirth: result.data.attributes.person!.places_of_birth
-                  ? {
-                      descriptor:
-                        result.data.attributes.person!.places_of_birth[0].country.descriptor,
-                      countryCode:
-                        result.data.attributes.person!.places_of_birth[0].country.iso_alpha2,
-                    }
-                  : null,
-                dateOfBirth: result.data.attributes.person!.date_details?.birth?.[0].date ?? null,
-                citizenship: citizenship
-                  ? {
-                      descriptor: citizenship.descriptor,
-                      countryCode: citizenship.iso_alpha2,
-                    }
-                  : null,
-                residence: residence
-                  ? {
-                      descriptor: residence.descriptor,
-                      countryCode: residence.iso_alpha2,
-                    }
-                  : null,
-                jurisdiction: jurisdiction
-                  ? {
-                      descriptor: jurisdiction.descriptor,
-                      countryCode: jurisdiction.iso_alpha2,
-                    }
-                  : null,
-                isDeceased: result.data.attributes.person!.is_deceased,
+                descriptor: result.data.attributes.person!.places_of_birth[0].country.descriptor,
+                countryCode: result.data.attributes.person!.places_of_birth[0].country.iso_alpha2,
               }
-            : {
-                dateOfRegistration:
-                  result.data.attributes.entity!.date_details?.registration?.[0].date ?? null,
-              }),
+            : null,
+          dateOfBirth: result.data.attributes.person?.date_details?.birth?.[0].date ?? null,
+          citizenship: citizenship
+            ? {
+                descriptor: citizenship.descriptor,
+                countryCode: citizenship.iso_alpha2,
+              }
+            : null,
+          residence: residence
+            ? {
+                descriptor: residence.descriptor,
+                countryCode: residence.iso_alpha2,
+              }
+            : null,
+          jurisdiction: jurisdiction
+            ? {
+                descriptor: jurisdiction.descriptor,
+                countryCode: jurisdiction.iso_alpha2,
+              }
+            : null,
+          isDeceased: result.data.attributes.person?.is_deceased,
+          dateOfRegistration:
+            result.data.attributes.entity?.date_details?.registration?.[0].date ?? null,
         };
       } catch (error: any) {
         if (error.message === "PROFILE_NOT_FOUND") {

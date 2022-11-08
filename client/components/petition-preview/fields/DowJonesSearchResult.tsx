@@ -67,8 +67,8 @@ export function DowJonesSearchResult({
 
   const columns = useDowJonesFactivaDataColumns();
 
-  const handleRowClick = useCallback(function (row: FactivaSelection, event: MouseEvent) {
-    setProfileId(row.id);
+  const handleRowClick = useCallback(function (row: FactivaSelection) {
+    setProfileId(row.profileId);
   }, []);
 
   const handleGoBack = () => {
@@ -354,6 +354,7 @@ DowJonesSearchResult.fragments = {
     return gql`
       fragment DowJonesSearchResult_DowJonesRiskEntitySearchResult on DowJonesRiskEntitySearchResult {
         id
+        profileId
         type
         name
         title

@@ -412,6 +412,7 @@ export interface NexusGenObjects {
     iconHints: string[]; // [String!]!
     id: string; // ID!
     name: string; // String!
+    profileId: string; // ID!
     relationships: NexusGenRootTypes["DowJonesRiskEntityRelationship"][]; // [DowJonesRiskEntityRelationship!]!
     sanctions: NexusGenRootTypes["DowJonesRiskEntitySanction"][]; // [DowJonesRiskEntitySanction!]!
     type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
@@ -426,6 +427,7 @@ export interface NexusGenObjects {
     jurisdiction?: NexusGenRootTypes["DowJonesRiskEntityPlace"] | null; // DowJonesRiskEntityPlace
     name: string; // String!
     placeOfBirth?: NexusGenRootTypes["DowJonesRiskEntityPlace"] | null; // DowJonesRiskEntityPlace
+    profileId: string; // ID!
     relationships: NexusGenRootTypes["DowJonesRiskEntityRelationship"][]; // [DowJonesRiskEntityRelationship!]!
     residence?: NexusGenRootTypes["DowJonesRiskEntityPlace"] | null; // DowJonesRiskEntityPlace
     sanctions: NexusGenRootTypes["DowJonesRiskEntitySanction"][]; // [DowJonesRiskEntitySanction!]!
@@ -453,6 +455,7 @@ export interface NexusGenObjects {
     id: string; // ID!
     isSubsidiary: boolean; // Boolean!
     name: string; // String!
+    profileId: string; // ID!
     title: string; // String!
     type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
   };
@@ -470,6 +473,7 @@ export interface NexusGenObjects {
     id: string; // ID!
     isSubsidiary: boolean; // Boolean!
     name: string; // String!
+    profileId: string; // ID!
     title: string; // String!
     type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
   };
@@ -983,6 +987,7 @@ export interface NexusGenFieldTypes {
     iconHints: string[]; // [String!]!
     id: string; // ID!
     name: string; // String!
+    profileId: string; // ID!
     relationships: NexusGenRootTypes["DowJonesRiskEntityRelationship"][]; // [DowJonesRiskEntityRelationship!]!
     sanctions: NexusGenRootTypes["DowJonesRiskEntitySanction"][]; // [DowJonesRiskEntitySanction!]!
     type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
@@ -997,6 +1002,7 @@ export interface NexusGenFieldTypes {
     jurisdiction: NexusGenRootTypes["DowJonesRiskEntityPlace"] | null; // DowJonesRiskEntityPlace
     name: string; // String!
     placeOfBirth: NexusGenRootTypes["DowJonesRiskEntityPlace"] | null; // DowJonesRiskEntityPlace
+    profileId: string; // ID!
     relationships: NexusGenRootTypes["DowJonesRiskEntityRelationship"][]; // [DowJonesRiskEntityRelationship!]!
     residence: NexusGenRootTypes["DowJonesRiskEntityPlace"] | null; // DowJonesRiskEntityPlace
     sanctions: NexusGenRootTypes["DowJonesRiskEntitySanction"][]; // [DowJonesRiskEntitySanction!]!
@@ -1024,6 +1030,7 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     isSubsidiary: boolean; // Boolean!
     name: string; // String!
+    profileId: string; // ID!
     title: string; // String!
     type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
   };
@@ -1041,6 +1048,7 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     isSubsidiary: boolean; // Boolean!
     name: string; // String!
+    profileId: string; // ID!
     title: string; // String!
     type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
   };
@@ -2430,6 +2438,7 @@ export interface NexusGenFieldTypes {
     iconHints: string[]; // [String!]!
     id: string; // ID!
     name: string; // String!
+    profileId: string; // ID!
     relationships: NexusGenRootTypes["DowJonesRiskEntityRelationship"][]; // [DowJonesRiskEntityRelationship!]!
     sanctions: NexusGenRootTypes["DowJonesRiskEntitySanction"][]; // [DowJonesRiskEntitySanction!]!
     type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
@@ -2441,6 +2450,7 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     isSubsidiary: boolean; // Boolean!
     name: string; // String!
+    profileId: string; // ID!
     title: string; // String!
     type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
   };
@@ -2672,6 +2682,7 @@ export interface NexusGenFieldTypeNames {
     iconHints: "String";
     id: "ID";
     name: "String";
+    profileId: "ID";
     relationships: "DowJonesRiskEntityRelationship";
     sanctions: "DowJonesRiskEntitySanction";
     type: "DowJonesRiskEntityType";
@@ -2686,6 +2697,7 @@ export interface NexusGenFieldTypeNames {
     jurisdiction: "DowJonesRiskEntityPlace";
     name: "String";
     placeOfBirth: "DowJonesRiskEntityPlace";
+    profileId: "ID";
     relationships: "DowJonesRiskEntityRelationship";
     residence: "DowJonesRiskEntityPlace";
     sanctions: "DowJonesRiskEntitySanction";
@@ -2713,6 +2725,7 @@ export interface NexusGenFieldTypeNames {
     id: "ID";
     isSubsidiary: "Boolean";
     name: "String";
+    profileId: "ID";
     title: "String";
     type: "DowJonesRiskEntityType";
   };
@@ -2730,6 +2743,7 @@ export interface NexusGenFieldTypeNames {
     id: "ID";
     isSubsidiary: "Boolean";
     name: "String";
+    profileId: "ID";
     title: "String";
     type: "DowJonesRiskEntityType";
   };
@@ -4119,6 +4133,7 @@ export interface NexusGenFieldTypeNames {
     iconHints: "String";
     id: "ID";
     name: "String";
+    profileId: "ID";
     relationships: "DowJonesRiskEntityRelationship";
     sanctions: "DowJonesRiskEntitySanction";
     type: "DowJonesRiskEntityType";
@@ -4130,6 +4145,7 @@ export interface NexusGenFieldTypeNames {
     id: "ID";
     isSubsidiary: "Boolean";
     name: "String";
+    profileId: "ID";
     title: "String";
     type: "DowJonesRiskEntityType";
   };

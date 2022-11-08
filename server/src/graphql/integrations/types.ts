@@ -103,6 +103,7 @@ export const DowJonesRiskEntitySearchResult = interfaceType({
   name: "DowJonesRiskEntitySearchResult",
   definition(t) {
     t.id("id");
+    t.id("profileId");
     t.field("type", { type: "DowJonesRiskEntityType" });
     t.string("name");
     t.string("title");
@@ -136,6 +137,7 @@ export const DowJonesRiskEntityProfileResult = interfaceType({
   name: "DowJonesRiskEntityProfileResult",
   definition(t) {
     t.id("id");
+    t.id("profileId");
     t.field("type", { type: "DowJonesRiskEntityType" });
     t.string("name");
     t.list.string("iconHints");

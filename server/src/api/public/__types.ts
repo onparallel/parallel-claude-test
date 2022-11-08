@@ -208,6 +208,7 @@ export type DowJonesRiskEntityProfileResult = {
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   name: Scalars["String"];
+  profileId: Scalars["ID"];
   relationships: Array<DowJonesRiskEntityRelationship>;
   sanctions: Array<DowJonesRiskEntitySanction>;
   type: DowJonesRiskEntityType;
@@ -218,6 +219,7 @@ export type DowJonesRiskEntityProfileResultEntity = DowJonesRiskEntityProfileRes
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   name: Scalars["String"];
+  profileId: Scalars["ID"];
   relationships: Array<DowJonesRiskEntityRelationship>;
   sanctions: Array<DowJonesRiskEntitySanction>;
   type: DowJonesRiskEntityType;
@@ -232,6 +234,7 @@ export type DowJonesRiskEntityProfileResultPerson = DowJonesRiskEntityProfileRes
   jurisdiction: Maybe<DowJonesRiskEntityPlace>;
   name: Scalars["String"];
   placeOfBirth: Maybe<DowJonesRiskEntityPlace>;
+  profileId: Scalars["ID"];
   relationships: Array<DowJonesRiskEntityRelationship>;
   residence: Maybe<DowJonesRiskEntityPlace>;
   sanctions: Array<DowJonesRiskEntitySanction>;
@@ -259,6 +262,7 @@ export type DowJonesRiskEntitySearchResult = {
   id: Scalars["ID"];
   isSubsidiary: Scalars["Boolean"];
   name: Scalars["String"];
+  profileId: Scalars["ID"];
   title: Scalars["String"];
   type: DowJonesRiskEntityType;
 };
@@ -269,6 +273,7 @@ export type DowJonesRiskEntitySearchResultEntity = DowJonesRiskEntitySearchResul
   id: Scalars["ID"];
   isSubsidiary: Scalars["Boolean"];
   name: Scalars["String"];
+  profileId: Scalars["ID"];
   title: Scalars["String"];
   type: DowJonesRiskEntityType;
 };
@@ -288,6 +293,7 @@ export type DowJonesRiskEntitySearchResultPerson = DowJonesRiskEntitySearchResul
   id: Scalars["ID"];
   isSubsidiary: Scalars["Boolean"];
   name: Scalars["String"];
+  profileId: Scalars["ID"];
   title: Scalars["String"];
   type: DowJonesRiskEntityType;
 };

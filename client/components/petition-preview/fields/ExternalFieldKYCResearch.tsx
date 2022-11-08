@@ -37,8 +37,8 @@ export function ExternalFieldKYCResearch({
   fieldId,
   replies,
 }: ExternalFieldKYCResearchProps) {
-  const [formData, setFormData] = useState<formData | null>(null);
-  const handleFormSubmit = async (data: formData) => {
+  const [formData, setFormData] = useState<DowJonesSearchFormData | null>(null);
+  const handleFormSubmit = async (data: DowJonesSearchFormData) => {
     setFormData(data);
   };
 
@@ -62,7 +62,7 @@ export function ExternalFieldKYCResearch({
           onResetClick={handleResetSearch}
         />
       ) : (
-        <Form onSubmit={handleFormSubmit} isDisabled={false} />
+        <DowJonesSearchForm onSubmit={handleFormSubmit} isDisabled={false} />
       )}
     </>
   );
@@ -79,24 +79,24 @@ ExternalFieldKYCResearch.fragments = {
 
 export default compose(withDialogs)(ExternalFieldKYCResearch);
 
-type FormProps = {
-  onSubmit: (data: formData) => void;
+type DowJonesSearchFormProps = {
+  onSubmit: (data: DowJonesSearchFormData) => void;
   isDisabled?: boolean;
 };
 
-type formData = {
+type DowJonesSearchFormData = {
   name: string;
   dateOfBirth: string;
 };
 
-function Form({ onSubmit, isDisabled }: FormProps) {
+function DowJonesSearchForm({ onSubmit, isDisabled }: DowJonesSearchFormProps) {
   const { browserName } = useMetadata();
   const {
     handleSubmit,
     register,
     watch,
     formState: { errors },
-  } = useForm<formData>({
+  } = useForm<DowJonesSearchFormData>({
     mode: "onSubmit",
     defaultValues: {
       name: "",

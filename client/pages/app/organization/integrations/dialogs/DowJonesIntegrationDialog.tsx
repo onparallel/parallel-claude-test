@@ -87,7 +87,7 @@ export function DowJonesIntegrationDialog({
       initialFocusRef={clientIdRef}
       header={
         <HStack spacing={2} align="center">
-          <Text>Prallel</Text>
+          <Text>Parallel</Text>
           <ArrowForwardIcon role="presentation" />
           <Text>Dow Jones</Text>
         </HStack>

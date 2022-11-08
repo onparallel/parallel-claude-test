@@ -242,6 +242,7 @@ interface DowJonesRiskEntityProfileResult {
   iconHints: [String!]!
   id: ID!
   name: String!
+  profileId: ID!
   relationships: [DowJonesRiskEntityRelationship!]!
   sanctions: [DowJonesRiskEntitySanction!]!
   type: DowJonesRiskEntityType!
@@ -252,6 +253,7 @@ type DowJonesRiskEntityProfileResultEntity implements DowJonesRiskEntityProfileR
   iconHints: [String!]!
   id: ID!
   name: String!
+  profileId: ID!
   relationships: [DowJonesRiskEntityRelationship!]!
   sanctions: [DowJonesRiskEntitySanction!]!
   type: DowJonesRiskEntityType!
@@ -266,6 +268,7 @@ type DowJonesRiskEntityProfileResultPerson implements DowJonesRiskEntityProfileR
   jurisdiction: DowJonesRiskEntityPlace
   name: String!
   placeOfBirth: DowJonesRiskEntityPlace
+  profileId: ID!
   relationships: [DowJonesRiskEntityRelationship!]!
   residence: DowJonesRiskEntityPlace
   sanctions: [DowJonesRiskEntitySanction!]!
@@ -293,6 +296,7 @@ interface DowJonesRiskEntitySearchResult {
   id: ID!
   isSubsidiary: Boolean!
   name: String!
+  profileId: ID!
   title: String!
   type: DowJonesRiskEntityType!
 }
@@ -303,6 +307,7 @@ type DowJonesRiskEntitySearchResultEntity implements DowJonesRiskEntitySearchRes
   id: ID!
   isSubsidiary: Boolean!
   name: String!
+  profileId: ID!
   title: String!
   type: DowJonesRiskEntityType!
 }
@@ -327,6 +332,7 @@ type DowJonesRiskEntitySearchResultPerson implements DowJonesRiskEntitySearchRes
   id: ID!
   isSubsidiary: Boolean!
   name: String!
+  profileId: ID!
   title: String!
   type: DowJonesRiskEntityType!
 }
