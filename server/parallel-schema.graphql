@@ -291,7 +291,7 @@ type DowJonesRiskEntitySanction {
 }
 
 interface DowJonesRiskEntitySearchResult {
-  countryTerritoryName: String!
+  countryTerritoryName: String
   iconHints: [String!]!
   id: ID!
   isSubsidiary: Boolean!
@@ -302,7 +302,7 @@ interface DowJonesRiskEntitySearchResult {
 }
 
 type DowJonesRiskEntitySearchResultEntity implements DowJonesRiskEntitySearchResult {
-  countryTerritoryName: String!
+  countryTerritoryName: String
   iconHints: [String!]!
   id: ID!
   isSubsidiary: Boolean!
@@ -325,7 +325,7 @@ type DowJonesRiskEntitySearchResultPagination {
 }
 
 type DowJonesRiskEntitySearchResultPerson implements DowJonesRiskEntitySearchResult {
-  countryTerritoryName: String!
+  countryTerritoryName: String
   dateOfBirth: DowJonesRiskEntityDate
   gender: String!
   iconHints: [String!]!

@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { ExternalFieldKYCResearch } from "@parallel/components/petition-preview/fields/ExternalFieldKYCResearch";
 import {
@@ -8,6 +9,7 @@ import {
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
+import { withMetadata } from "@parallel/utils/withMetadata";
 
 function ExternalFieldPreview({
   petitionId,
@@ -55,6 +57,9 @@ ExternalFieldPreview.fragments = {
   `,
   Query: gql`
     fragment ExternalFieldPreview_Query on Query {
+      metadata {
+        browserName
+      }
       me {
         id
         hasDowJonesFeatureFlag: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
@@ -86,7 +91,11 @@ ExternalFieldPreview.queries = [
 ExternalFieldPreview.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const petitionId = query.petitionId as string;
   const petitionFieldId = query.fieldId as string;
-  await Promise.all([
+  const [
+    {
+      data: { metadata },
+    },
+  ] = await Promise.all([
     fetchQuery(ExternalFieldPreview_userDocument),
     fetchQuery(ExternalFieldPreview_petitionFieldDocument, {
       variables: { petitionId, petitionFieldId },
@@ -96,7 +105,7 @@ ExternalFieldPreview.getInitialProps = async ({ query, fetchQuery }: WithApolloD
 
   // TODO: qué hacer cuando el user no tiene FF o integración de dow jones???
 
-  return { petitionId, petitionFieldId };
+  return { petitionId, petitionFieldId, metadata };
 };
 
-export default compose(withApolloData)(ExternalFieldPreview);
+export default compose(withMetadata, withDialogs, withApolloData)(ExternalFieldPreview);

@@ -31,7 +31,10 @@ export const queries = queryField((t) => {
           type: i.attributes.type,
           name: i.attributes.primary_name,
           title: i.attributes.title,
-          countryTerritoryName: i.attributes.country_territory_name,
+          countryTerritoryName:
+            i.attributes.country_territory_code !== "NOTK"
+              ? i.attributes.country_territory_name
+              : null,
           isSubsidiary: i.attributes.is_subsidiary,
           iconHints: i.attributes.icon_hints,
           gender: i.attributes.gender,

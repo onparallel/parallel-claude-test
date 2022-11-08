@@ -244,7 +244,7 @@ function useDowJonesFactivaDataColumns() {
           defaultMessage: "Country/Territory",
         }),
         CellContent: ({ row: { countryTerritoryName } }) => {
-          return <>{countryTerritoryName} </>;
+          return <>{countryTerritoryName || "-"} </>;
         },
       },
       {

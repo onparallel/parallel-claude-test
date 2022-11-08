@@ -257,7 +257,7 @@ export type DowJonesRiskEntitySanction = {
 };
 
 export type DowJonesRiskEntitySearchResult = {
-  countryTerritoryName: Scalars["String"];
+  countryTerritoryName: Maybe<Scalars["String"]>;
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   isSubsidiary: Scalars["Boolean"];
@@ -268,7 +268,7 @@ export type DowJonesRiskEntitySearchResult = {
 };
 
 export type DowJonesRiskEntitySearchResultEntity = DowJonesRiskEntitySearchResult & {
-  countryTerritoryName: Scalars["String"];
+  countryTerritoryName: Maybe<Scalars["String"]>;
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   isSubsidiary: Scalars["Boolean"];
@@ -286,7 +286,7 @@ export type DowJonesRiskEntitySearchResultPagination = {
 };
 
 export type DowJonesRiskEntitySearchResultPerson = DowJonesRiskEntitySearchResult & {
-  countryTerritoryName: Scalars["String"];
+  countryTerritoryName: Maybe<Scalars["String"]>;
   dateOfBirth: Maybe<DowJonesRiskEntityDate>;
   gender: Scalars["String"];
   iconHints: Array<Scalars["String"]>;

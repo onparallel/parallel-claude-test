@@ -27,6 +27,7 @@ type RiskEntitySearchResult = {
       type: RiskEntityType;
       primary_name: string;
       title: string;
+      country_territory_code: string;
       country_territory_name: string;
       gender: string;
       is_subsidiary: boolean;

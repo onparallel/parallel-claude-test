@@ -107,7 +107,7 @@ export const DowJonesRiskEntitySearchResult = interfaceType({
     t.field("type", { type: "DowJonesRiskEntityType" });
     t.string("name");
     t.string("title");
-    t.string("countryTerritoryName");
+    t.nullable.string("countryTerritoryName");
     t.boolean("isSubsidiary");
     t.list.string("iconHints");
   },

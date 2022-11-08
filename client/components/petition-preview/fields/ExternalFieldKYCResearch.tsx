@@ -2,6 +2,7 @@ import { useMetadata } from "@parallel/utils/withMetadata";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 
+import { gql } from "@apollo/client";
 import {
   Button,
   Center,
@@ -15,14 +16,11 @@ import {
 } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
-import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { compose } from "@parallel/utils/compose";
+import { ExternalFieldKYCResearch_PetitionFieldReplyFragment } from "@parallel/graphql/__types";
 import Head from "next/head";
 import { useState } from "react";
 import { isDefined } from "remeda";
 import { DowJonesSearchResult } from "./DowJonesSearchResult";
-import { gql } from "@apollo/client";
-import { ExternalFieldKYCResearch_PetitionFieldReplyFragment } from "@parallel/graphql/__types";
 
 type ExternalFieldKYCResearchProps = {
   htmlTitle: string;
@@ -76,8 +74,6 @@ ExternalFieldKYCResearch.fragments = {
     ${DowJonesSearchResult.fragments.PetitionFieldReply}
   `,
 };
-
-export default compose(withDialogs)(ExternalFieldKYCResearch);
 
 type DowJonesSearchFormProps = {
   onSubmit: (data: DowJonesSearchFormData) => void;

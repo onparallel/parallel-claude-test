@@ -450,7 +450,7 @@ export interface NexusGenObjects {
   };
   DowJonesRiskEntitySearchResultEntity: {
     // root type
-    countryTerritoryName: string; // String!
+    countryTerritoryName?: string | null; // String
     iconHints: string[]; // [String!]!
     id: string; // ID!
     isSubsidiary: boolean; // Boolean!
@@ -466,7 +466,7 @@ export interface NexusGenObjects {
   };
   DowJonesRiskEntitySearchResultPerson: {
     // root type
-    countryTerritoryName: string; // String!
+    countryTerritoryName?: string | null; // String
     dateOfBirth?: NexusGenRootTypes["DowJonesRiskEntityDate"] | null; // DowJonesRiskEntityDate
     gender: string; // String!
     iconHints: string[]; // [String!]!
@@ -1025,7 +1025,7 @@ export interface NexusGenFieldTypes {
   };
   DowJonesRiskEntitySearchResultEntity: {
     // field return type
-    countryTerritoryName: string; // String!
+    countryTerritoryName: string | null; // String
     iconHints: string[]; // [String!]!
     id: string; // ID!
     isSubsidiary: boolean; // Boolean!
@@ -1041,7 +1041,7 @@ export interface NexusGenFieldTypes {
   };
   DowJonesRiskEntitySearchResultPerson: {
     // field return type
-    countryTerritoryName: string; // String!
+    countryTerritoryName: string | null; // String
     dateOfBirth: NexusGenRootTypes["DowJonesRiskEntityDate"] | null; // DowJonesRiskEntityDate
     gender: string; // String!
     iconHints: string[]; // [String!]!
@@ -2445,7 +2445,7 @@ export interface NexusGenFieldTypes {
   };
   DowJonesRiskEntitySearchResult: {
     // field return type
-    countryTerritoryName: string; // String!
+    countryTerritoryName: string | null; // String
     iconHints: string[]; // [String!]!
     id: string; // ID!
     isSubsidiary: boolean; // Boolean!

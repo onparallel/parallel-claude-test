@@ -279,7 +279,7 @@ export interface DowJonesRiskEntitySanction {
 }
 
 export interface DowJonesRiskEntitySearchResult {
-  countryTerritoryName: Scalars["String"];
+  countryTerritoryName?: Maybe<Scalars["String"]>;
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   isSubsidiary: Scalars["Boolean"];
@@ -291,7 +291,7 @@ export interface DowJonesRiskEntitySearchResult {
 
 export interface DowJonesRiskEntitySearchResultEntity extends DowJonesRiskEntitySearchResult {
   __typename?: "DowJonesRiskEntitySearchResultEntity";
-  countryTerritoryName: Scalars["String"];
+  countryTerritoryName?: Maybe<Scalars["String"]>;
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   isSubsidiary: Scalars["Boolean"];
@@ -311,7 +311,7 @@ export interface DowJonesRiskEntitySearchResultPagination {
 
 export interface DowJonesRiskEntitySearchResultPerson extends DowJonesRiskEntitySearchResult {
   __typename?: "DowJonesRiskEntitySearchResultPerson";
-  countryTerritoryName: Scalars["String"];
+  countryTerritoryName?: Maybe<Scalars["String"]>;
   dateOfBirth?: Maybe<DowJonesRiskEntityDate>;
   gender: Scalars["String"];
   iconHints: Array<Scalars["String"]>;
@@ -11042,7 +11042,7 @@ export type DowJonesSearchResult_DowJonesRiskEntitySearchResult_DowJonesRiskEnti
     type: DowJonesRiskEntityType;
     name: string;
     title: string;
-    countryTerritoryName: string;
+    countryTerritoryName?: string | null;
     isSubsidiary: boolean;
     iconHints: Array<string>;
   };
@@ -11056,7 +11056,7 @@ export type DowJonesSearchResult_DowJonesRiskEntitySearchResult_DowJonesRiskEnti
     type: DowJonesRiskEntityType;
     name: string;
     title: string;
-    countryTerritoryName: string;
+    countryTerritoryName?: string | null;
     isSubsidiary: boolean;
     iconHints: Array<string>;
     dateOfBirth?: {
@@ -11096,7 +11096,7 @@ export type DowJonesSearchResult_dowJonesRiskEntitySearchQuery = {
           type: DowJonesRiskEntityType;
           name: string;
           title: string;
-          countryTerritoryName: string;
+          countryTerritoryName?: string | null;
           isSubsidiary: boolean;
           iconHints: Array<string>;
         }
@@ -11108,7 +11108,7 @@ export type DowJonesSearchResult_dowJonesRiskEntitySearchQuery = {
           type: DowJonesRiskEntityType;
           name: string;
           title: string;
-          countryTerritoryName: string;
+          countryTerritoryName?: string | null;
           isSubsidiary: boolean;
           iconHints: Array<string>;
           dateOfBirth?: {
@@ -19054,6 +19054,7 @@ export type ExternalFieldPreview_PetitionFieldFragment = {
 };
 
 export type ExternalFieldPreview_QueryFragment = {
+  metadata: { __typename?: "ConnectionMetadata"; browserName?: string | null };
   me: {
     __typename?: "User";
     id: string;
@@ -19083,6 +19084,7 @@ export type ExternalFieldPreview_petitionFieldQuery = {
 export type ExternalFieldPreview_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ExternalFieldPreview_userQuery = {
+  metadata: { __typename?: "ConnectionMetadata"; browserName?: string | null };
   me: {
     __typename?: "User";
     id: string;
@@ -28188,6 +28190,9 @@ export const ExternalFieldPreview_PetitionFieldFragmentDoc = gql`
 ` as unknown as DocumentNode<ExternalFieldPreview_PetitionFieldFragment, unknown>;
 export const ExternalFieldPreview_QueryFragmentDoc = gql`
   fragment ExternalFieldPreview_Query on Query {
+    metadata {
+      browserName
+    }
     me {
       id
       hasDowJonesFeatureFlag: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
