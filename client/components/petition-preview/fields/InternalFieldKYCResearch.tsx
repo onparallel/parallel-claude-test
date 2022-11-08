@@ -16,25 +16,25 @@ import {
 } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
-import { ExternalFieldKYCResearch_PetitionFieldReplyFragment } from "@parallel/graphql/__types";
+import { InternalFieldKYCResearch_PetitionFieldReplyFragment } from "@parallel/graphql/__types";
 import Head from "next/head";
 import { useState } from "react";
 import { isDefined } from "remeda";
 import { DowJonesSearchResult } from "./DowJonesSearchResult";
 
-type ExternalFieldKYCResearchProps = {
+type InternalFieldKYCResearchProps = {
   htmlTitle: string;
   petitionId: string;
   fieldId: string;
-  replies: ExternalFieldKYCResearch_PetitionFieldReplyFragment[];
+  replies: InternalFieldKYCResearch_PetitionFieldReplyFragment[];
 };
 
-export function ExternalFieldKYCResearch({
+export function InternalFieldKYCResearch({
   htmlTitle,
   petitionId,
   fieldId,
   replies,
-}: ExternalFieldKYCResearchProps) {
+}: InternalFieldKYCResearchProps) {
   const [formData, setFormData] = useState<DowJonesSearchFormData | null>(null);
   const handleFormSubmit = async (data: DowJonesSearchFormData) => {
     setFormData(data);
@@ -66,9 +66,9 @@ export function ExternalFieldKYCResearch({
   );
 }
 
-ExternalFieldKYCResearch.fragments = {
+InternalFieldKYCResearch.fragments = {
   PetitionFieldReply: gql`
-    fragment ExternalFieldKYCResearch_PetitionFieldReply on PetitionFieldReply {
+    fragment InternalFieldKYCResearch_PetitionFieldReply on PetitionFieldReply {
       ...DowJonesSearchResult_PetitionFieldReply
     }
     ${DowJonesSearchResult.fragments.PetitionFieldReply}
@@ -108,7 +108,7 @@ function DowJonesSearchForm({ onSubmit, isDisabled }: DowJonesSearchFormProps) {
         <Stack spacing={6} as="form" onSubmit={handleSubmit(onSubmit)}>
           <Heading size="lg">
             <FormattedMessage
-              id="component.external-field-kyc-research.fill-in-data"
+              id="component.internal-field-kyc-research.fill-in-data"
               defaultMessage="Fill in the data to start the search"
             />
           </Heading>
@@ -116,7 +116,7 @@ function DowJonesSearchForm({ onSubmit, isDisabled }: DowJonesSearchFormProps) {
             <FormControl id="name" isInvalid={!!errors.name} isDisabled={isDisabled}>
               <FormLabel fontWeight="400">
                 <FormattedMessage
-                  id="component.external-field-kyc-research.name-person-entity"
+                  id="component.internal-field-kyc-research.name-person-entity"
                   defaultMessage="Name of the person/entity *"
                 />
               </FormLabel>
@@ -131,7 +131,7 @@ function DowJonesSearchForm({ onSubmit, isDisabled }: DowJonesSearchFormProps) {
             <FormControl isDisabled={isDisabled}>
               <FormLabel fontWeight="400">
                 <FormattedMessage
-                  id="component.external-field-kyc-research.date-of-birth"
+                  id="component.internal-field-kyc-research.date-of-birth"
                   defaultMessage="Date of birth"
                 />
               </FormLabel>
@@ -161,7 +161,7 @@ function DowJonesSearchForm({ onSubmit, isDisabled }: DowJonesSearchFormProps) {
           </Stack>
           <Button colorScheme="primary" type="submit" isDisabled={isDisabled}>
             <FormattedMessage
-              id="component.external-field-kyc-research.search"
+              id="component.internal-field-kyc-research.search"
               defaultMessage="Search"
             />
           </Button>

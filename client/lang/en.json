@@ -1610,22 +1610,22 @@
     "context": "Generating report..."
   },
   {
-    "term": "component.external-field-kyc-research.date-of-birth",
+    "term": "component.internal-field-kyc-research.date-of-birth",
     "definition": "Date of birth",
     "context": "Date of birth"
   },
   {
-    "term": "component.external-field-kyc-research.fill-in-data",
+    "term": "component.internal-field-kyc-research.fill-in-data",
     "definition": "Fill in the data to start the search",
     "context": "Fill in the data to start the search"
   },
   {
-    "term": "component.external-field-kyc-research.name-person-entity",
+    "term": "component.internal-field-kyc-research.name-person-entity",
     "definition": "Name of the person/entity *",
     "context": "Name of the person/entity *"
   },
   {
-    "term": "component.external-field-kyc-research.search",
+    "term": "component.internal-field-kyc-research.search",
     "definition": "Search",
     "context": "Search"
   },

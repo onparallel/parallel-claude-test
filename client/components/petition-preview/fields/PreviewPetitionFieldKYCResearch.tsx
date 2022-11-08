@@ -48,7 +48,10 @@ export function PreviewPetitionFieldKYCResearch({
       tone={tone}
     >
       {field.petition.organization.hasDowJones ? (
-        <NakedLink href={`/app/petitions/${field.petition.id}/preview/${field.id}`} passHref>
+        <NakedLink
+          href={`/app/petitions/${field.petition.id}/preview/dowjones/${field.id}`}
+          passHref
+        >
           <Button as="a" variant="outline" target="_blank" isDisabled={isDisabled}>
             <FormattedMessage
               id="component.preview-petition-field-kyc-research.search-in-down-jones"

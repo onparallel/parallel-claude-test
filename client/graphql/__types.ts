@@ -11161,7 +11161,7 @@ export type DowJonesSearchResult_deletePetitionFieldReplyMutation = {
   };
 };
 
-export type ExternalFieldKYCResearch_PetitionFieldReplyFragment = {
+export type InternalFieldKYCResearch_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
   id: string;
   content: { [key: string]: any };
@@ -19042,7 +19042,7 @@ export type PetitionMessages_updatePetitionMutation = {
       };
 };
 
-export type ExternalFieldPreview_PetitionFieldFragment = {
+export type DowJonesFieldPreview_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
@@ -19053,7 +19053,7 @@ export type ExternalFieldPreview_PetitionFieldFragment = {
   }>;
 };
 
-export type ExternalFieldPreview_QueryFragment = {
+export type DowJonesFieldPreview_QueryFragment = {
   metadata: { __typename?: "ConnectionMetadata"; browserName?: string | null };
   me: {
     __typename?: "User";
@@ -19063,12 +19063,12 @@ export type ExternalFieldPreview_QueryFragment = {
   };
 };
 
-export type ExternalFieldPreview_petitionFieldQueryVariables = Exact<{
+export type DowJonesFieldPreview_petitionFieldQueryVariables = Exact<{
   petitionId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
 }>;
 
-export type ExternalFieldPreview_petitionFieldQuery = {
+export type DowJonesFieldPreview_petitionFieldQuery = {
   petitionField: {
     __typename?: "PetitionField";
     id: string;
@@ -19081,9 +19081,9 @@ export type ExternalFieldPreview_petitionFieldQuery = {
   };
 };
 
-export type ExternalFieldPreview_userQueryVariables = Exact<{ [key: string]: never }>;
+export type DowJonesFieldPreview_userQueryVariables = Exact<{ [key: string]: never }>;
 
-export type ExternalFieldPreview_userQuery = {
+export type DowJonesFieldPreview_userQuery = {
   metadata: { __typename?: "ConnectionMetadata"; browserName?: string | null };
   me: {
     __typename?: "User";
@@ -28172,24 +28172,24 @@ export const DowJonesSearchResult_PetitionFieldReplyFragmentDoc = gql`
     content
   }
 ` as unknown as DocumentNode<DowJonesSearchResult_PetitionFieldReplyFragment, unknown>;
-export const ExternalFieldKYCResearch_PetitionFieldReplyFragmentDoc = gql`
-  fragment ExternalFieldKYCResearch_PetitionFieldReply on PetitionFieldReply {
+export const InternalFieldKYCResearch_PetitionFieldReplyFragmentDoc = gql`
+  fragment InternalFieldKYCResearch_PetitionFieldReply on PetitionFieldReply {
     ...DowJonesSearchResult_PetitionFieldReply
   }
   ${DowJonesSearchResult_PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<ExternalFieldKYCResearch_PetitionFieldReplyFragment, unknown>;
-export const ExternalFieldPreview_PetitionFieldFragmentDoc = gql`
-  fragment ExternalFieldPreview_PetitionField on PetitionField {
+` as unknown as DocumentNode<InternalFieldKYCResearch_PetitionFieldReplyFragment, unknown>;
+export const DowJonesFieldPreview_PetitionFieldFragmentDoc = gql`
+  fragment DowJonesFieldPreview_PetitionField on PetitionField {
     id
     type
     replies {
-      ...ExternalFieldKYCResearch_PetitionFieldReply
+      ...InternalFieldKYCResearch_PetitionFieldReply
     }
   }
-  ${ExternalFieldKYCResearch_PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<ExternalFieldPreview_PetitionFieldFragment, unknown>;
-export const ExternalFieldPreview_QueryFragmentDoc = gql`
-  fragment ExternalFieldPreview_Query on Query {
+  ${InternalFieldKYCResearch_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<DowJonesFieldPreview_PetitionFieldFragment, unknown>;
+export const DowJonesFieldPreview_QueryFragmentDoc = gql`
+  fragment DowJonesFieldPreview_Query on Query {
     metadata {
       browserName
     }
@@ -28201,7 +28201,7 @@ export const ExternalFieldPreview_QueryFragmentDoc = gql`
       }
     }
   }
-` as unknown as DocumentNode<ExternalFieldPreview_QueryFragment, unknown>;
+` as unknown as DocumentNode<DowJonesFieldPreview_QueryFragment, unknown>;
 export const completedFieldReplies_PetitionFieldFragmentDoc = gql`
   fragment completedFieldReplies_PetitionField on PetitionField {
     type
@@ -32482,25 +32482,25 @@ export const PetitionMessages_updatePetitionDocument = gql`
   PetitionMessages_updatePetitionMutation,
   PetitionMessages_updatePetitionMutationVariables
 >;
-export const ExternalFieldPreview_petitionFieldDocument = gql`
-  query ExternalFieldPreview_petitionField($petitionId: GID!, $petitionFieldId: GID!) {
+export const DowJonesFieldPreview_petitionFieldDocument = gql`
+  query DowJonesFieldPreview_petitionField($petitionId: GID!, $petitionFieldId: GID!) {
     petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
-      ...ExternalFieldPreview_PetitionField
+      ...DowJonesFieldPreview_PetitionField
     }
   }
-  ${ExternalFieldPreview_PetitionFieldFragmentDoc}
+  ${DowJonesFieldPreview_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<
-  ExternalFieldPreview_petitionFieldQuery,
-  ExternalFieldPreview_petitionFieldQueryVariables
+  DowJonesFieldPreview_petitionFieldQuery,
+  DowJonesFieldPreview_petitionFieldQueryVariables
 >;
-export const ExternalFieldPreview_userDocument = gql`
-  query ExternalFieldPreview_user {
-    ...ExternalFieldPreview_Query
+export const DowJonesFieldPreview_userDocument = gql`
+  query DowJonesFieldPreview_user {
+    ...DowJonesFieldPreview_Query
   }
-  ${ExternalFieldPreview_QueryFragmentDoc}
+  ${DowJonesFieldPreview_QueryFragmentDoc}
 ` as unknown as DocumentNode<
-  ExternalFieldPreview_userQuery,
-  ExternalFieldPreview_userQueryVariables
+  DowJonesFieldPreview_userQuery,
+  DowJonesFieldPreview_userQueryVariables
 >;
 export const PetitionPreview_updatePetitionDocument = gql`
   mutation PetitionPreview_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
