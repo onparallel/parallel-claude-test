@@ -24,10 +24,10 @@ import {
 import { Table, TableColumn } from "@parallel/components/common/Table";
 import {
   DowJonesProfileDetails_dowJonesRiskEntityProfileDocument,
+  DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultEntity_Fragment,
+  DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultPerson_Fragment,
   DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment,
   DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment,
-  DowJonesRiskEntityProfileResultEntity,
-  DowJonesRiskEntityProfileResultPerson,
   DowJonesSearchResult_createDowJonesKycReplyDocument,
   DowJonesSearchResult_deletePetitionFieldReplyDocument,
   Maybe,
@@ -45,30 +45,28 @@ import { IconButtonWithTooltip } from "../../common/IconButtonWithTooltip";
 import { DowJonesHints } from "../../petition-common/DowJonesHints";
 
 type DowJonesProfileDetailsProps = {
-  id: string;
+  profileId: string;
   onGoBack: () => void;
+  onProfileIdChange: (profileId: string) => void;
   petitionId: string;
   fieldId: string;
   replyId: Maybe<string>;
 };
 
 export function DowJonesProfileDetails({
-  id,
+  profileId,
   replyId,
   petitionId,
   fieldId,
   onGoBack,
+  onProfileIdChange,
 }: DowJonesProfileDetailsProps) {
   const intl = useIntl();
   const showGenericErrorToast = useGenericErrorToast();
-  const { data, loading, refetch } = useQuery(
-    DowJonesProfileDetails_dowJonesRiskEntityProfileDocument,
-    {
-      variables: {
-        profileId: id,
-      },
-    }
-  );
+
+  const { data, loading } = useQuery(DowJonesProfileDetails_dowJonesRiskEntityProfileDocument, {
+    variables: { profileId },
+  });
 
   const [createDowJonesKycReply, { loading: isSavingProfile }] = useMutation(
     DowJonesSearchResult_createDowJonesKycReplyDocument
@@ -78,7 +76,7 @@ export function DowJonesProfileDetails({
     try {
       await createDowJonesKycReply({
         variables: {
-          profileId: id,
+          profileId,
           petitionId,
           fieldId,
         },
@@ -122,9 +120,7 @@ export function DowJonesProfileDetails({
     row: DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment
   ) {
     if (isDefined(row.profileId)) {
-      refetch({
-        profileId: row.profileId.toString(),
-      });
+      onProfileIdChange(row.profileId);
     }
   },
   []);
@@ -213,9 +209,9 @@ export function DowJonesProfileDetails({
         {loading ? (
           <Box height={"85px"}></Box>
         ) : details?.__typename === "DowJonesRiskEntityProfileResultEntity" ? (
-          <ProfileResultEntity data={details as any} />
+          <ProfileResultEntity data={details} />
         ) : details?.__typename === "DowJonesRiskEntityProfileResultPerson" ? (
-          <ProfileResultPerson data={details as any} />
+          <ProfileResultPerson data={details} />
         ) : null}
       </Card>
 
@@ -304,7 +300,7 @@ export function DowJonesProfileDetails({
             variant="ghost"
             colorScheme="purple"
             leftIcon={<DownloadIcon />}
-            onClick={() => downloadDowJonesProfilePdf(id)}
+            onClick={() => downloadDowJonesProfilePdf(profileId)}
           >
             <FormattedMessage
               id="component.dow-jones-profile-details.get-full-pdf"
@@ -317,7 +313,11 @@ export function DowJonesProfileDetails({
   );
 }
 
-function ProfileResultPerson({ data }: { data: DowJonesRiskEntityProfileResultPerson }) {
+function ProfileResultPerson({
+  data,
+}: {
+  data: DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultPerson_Fragment;
+}) {
   const intl = useIntl();
 
   const { countries } = useLoadCountryNames(intl.locale);
@@ -492,7 +492,11 @@ function ProfileResultPerson({ data }: { data: DowJonesRiskEntityProfileResultPe
   );
 }
 
-function ProfileResultEntity({ data }: { data: DowJonesRiskEntityProfileResultEntity }) {
+function ProfileResultEntity({
+  data,
+}: {
+  data: DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultEntity_Fragment;
+}) {
   const intl = useIntl();
 
   const { year, month, day } = data.dateOfRegistration ?? {};

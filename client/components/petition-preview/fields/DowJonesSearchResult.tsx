@@ -76,7 +76,8 @@ export function DowJonesSearchResult({
   if (profileId) {
     return (
       <DowJonesProfileDetails
-        id={profileId}
+        profileId={profileId}
+        onProfileIdChange={setProfileId}
         petitionId={petitionId}
         fieldId={fieldId}
         replyId={replies.find((r) => r.content.entity.profileId === profileId)?.id ?? null}
