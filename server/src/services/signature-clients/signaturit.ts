@@ -7,14 +7,13 @@ import {
   IntegrationRepository,
   IntegrationSettings,
 } from "../../db/repositories/IntegrationRepository";
-import { OrganizationRepository } from "../../db/repositories/OrganizationRepository";
 import { buildEmail } from "../../emails/buildEmail";
 import SignatureCancelledEmail from "../../emails/emails/SignatureCancelledEmail";
 import SignatureCompletedEmail from "../../emails/emails/SignatureCompletedEmail";
 import SignatureReminderEmail from "../../emails/emails/SignatureReminderEmail";
 import SignatureRequestedEmail from "../../emails/emails/SignatureRequestedEmail";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
-import { fromGlobalId } from "../../util/globalId";
+import { toGlobalId } from "../../util/globalId";
 import { downloadImageBase64 } from "../../util/images";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { EMAILS, IEmailsService } from "../emails";
@@ -27,7 +26,7 @@ import { BrandingIdKey, ISignatureClient, Recipient, SignatureOptions } from "./
 export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
   private sdk!: SignaturitSDK;
   private settings!: IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
-  private integrationId: number | undefined;
+  private integrationId?: number;
 
   constructor(
     @inject(CONFIG) private config: Config,
@@ -35,8 +34,7 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
     @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(EMAILS) private emails: IEmailsService,
     @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: IOrganizationCreditsService,
-    @inject(IntegrationRepository) private integrationRepository: IntegrationRepository,
-    @inject(OrganizationRepository) private organizationRepository: OrganizationRepository
+    @inject(IntegrationRepository) private integrationRepository: IntegrationRepository
   ) {}
 
   configure(integration: {
@@ -87,8 +85,8 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
   }
 
   async startSignatureRequest(
-    petitionId: string,
-    orgId: string,
+    petitionId: number,
+    orgId: number,
     files: string,
     recipients: Recipient[],
     opts: SignatureOptions
@@ -104,10 +102,7 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
       if (
         this.settings.CREDENTIALS.API_KEY === this.config.signature.signaturitSharedProductionApiKey
       ) {
-        await this.orgCredits.consumeSignaturitApiKeyCredits(
-          fromGlobalId(orgId, "Organization").id,
-          1
-        );
+        await this.orgCredits.consumeSignaturitApiKeyCredits(orgId, 1);
       }
 
       const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as BrandingIdKey;
@@ -132,9 +127,12 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
         delivery_type: "email",
         signing_mode: opts.signingMode ?? "parallel",
         branding_id: brandingId,
-        events_url: `${baseEventsUrl}/api/webhooks/signaturit/${petitionId}/events`,
+        events_url: `${baseEventsUrl}/api/webhooks/signaturit/${toGlobalId(
+          "Petition",
+          petitionId
+        )}/events`,
         callback_url: `${this.config.misc.parallelUrl}/${locale}/thanks?${new URLSearchParams({
-          o: orgId,
+          o: toGlobalId("Organization", orgId),
         })}`,
         recipients: recipients.map((r, recipientIndex) => ({
           email: r.email,
@@ -161,8 +159,8 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
     } catch (error: any) {
       if (error.message === "Account depleted all it's advanced signature requests") {
         await this.emails.sendInternalSignaturitAccountDepletedCreditsEmail(
-          fromGlobalId(orgId, "Organization").id,
-          fromGlobalId(petitionId, "Petition").id,
+          orgId,
+          petitionId,
           this.settings.CREDENTIALS.API_KEY.slice(0, 10)
         );
       }
@@ -171,7 +169,7 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
   }
 
   async cancelSignatureRequest(externalId: string) {
-    return await this.sdk.cancelSignature(externalId);
+    await this.sdk.cancelSignature(externalId);
   }
 
   // returns a binary encoded buffer of the signed document
@@ -186,7 +184,7 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
   }
 
   async sendPendingSignatureReminder(signatureId: string) {
-    return await this.sdk.sendSignatureReminder(signatureId);
+    await this.sdk.sendSignatureReminder(signatureId);
   }
 
   async updateBranding(
@@ -195,7 +193,7 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
   ) {
     const intl = await this.i18n.getIntl(opts.locale);
 
-    const branding = await this.sdk.updateBranding(
+    await this.sdk.updateBranding(
       brandingId,
       removeNotDefined({
         layout_color: opts.templateData?.theme?.color,
@@ -216,8 +214,6 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
           : undefined,
       })
     );
-
-    return branding.id;
   }
 
   private async createBranding(opts: SignatureOptions) {

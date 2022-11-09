@@ -866,6 +866,8 @@ export interface Mutation {
   updateOrganizationBrandTheme: Organization;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
+  /** Updates the name of an organization */
+  updateOrganizationName: SupportMethodResponse;
   /** updates the PDF_DOCUMENT theme of the organization */
   updateOrganizationPdfDocumentTheme: Organization;
   /** Applies a given tier to the organization */
@@ -1708,6 +1710,11 @@ export interface MutationupdateOrganizationBrandThemeArgs {
 export interface MutationupdateOrganizationLogoArgs {
   file: Scalars["Upload"];
   isIcon?: InputMaybe<Scalars["Boolean"]>;
+}
+
+export interface MutationupdateOrganizationNameArgs {
+  name: Scalars["String"];
+  orgId: Scalars["Int"];
 }
 
 export interface MutationupdateOrganizationPdfDocumentThemeArgs {
@@ -4037,6 +4044,7 @@ export interface SignatureOpenedEvent extends PetitionEvent {
 
 export interface SignatureOrgIntegration extends IOrgIntegration {
   __typename?: "SignatureOrgIntegration";
+  consentRequiredUrl?: Maybe<Scalars["String"]>;
   /** Environment of this integration, to differentiate between sandbox and production-ready integrations */
   environment: SignatureOrgIntegrationEnvironment;
   id: Scalars["GID"];
@@ -4052,7 +4060,7 @@ export interface SignatureOrgIntegration extends IOrgIntegration {
 
 export type SignatureOrgIntegrationEnvironment = "DEMO" | "PRODUCTION";
 
-export type SignatureOrgIntegrationProvider = "SIGNATURIT";
+export type SignatureOrgIntegrationProvider = "DOCUSIGN" | "SIGNATURIT";
 
 export interface SignatureReminderEvent extends PetitionEvent {
   __typename?: "SignatureReminderEvent";
@@ -15827,6 +15835,7 @@ export type IntegrationsSignature_SignatureOrgIntegrationFragment = {
   provider: SignatureOrgIntegrationProvider;
   isDefault: boolean;
   environment: SignatureOrgIntegrationEnvironment;
+  consentRequiredUrl?: string | null;
 };
 
 export type IntegrationsSignature_validateSignatureCredentialsMutationVariables = Exact<{
@@ -15855,6 +15864,7 @@ export type IntegrationsSignature_createSignaturitIntegrationMutation = {
     provider: SignatureOrgIntegrationProvider;
     isDefault: boolean;
     environment: SignatureOrgIntegrationEnvironment;
+    consentRequiredUrl?: string | null;
   };
 };
 
@@ -15872,6 +15882,7 @@ export type IntegrationsSignature_markSignatureIntegrationAsDefaultMutation = {
         provider: SignatureOrgIntegrationProvider;
         isDefault: boolean;
         environment: SignatureOrgIntegrationEnvironment;
+        consentRequiredUrl?: string | null;
       };
 };
 
@@ -15923,6 +15934,7 @@ export type IntegrationsSignature_userQuery = {
               provider: SignatureOrgIntegrationProvider;
               isDefault: boolean;
               environment: SignatureOrgIntegrationEnvironment;
+              consentRequiredUrl?: string | null;
             }
         >;
       };
@@ -28384,6 +28396,7 @@ export const IntegrationsSignature_SignatureOrgIntegrationFragmentDoc = gql`
     provider
     isDefault
     environment
+    consentRequiredUrl
   }
 ` as unknown as DocumentNode<IntegrationsSignature_SignatureOrgIntegrationFragment, unknown>;
 export const UserSelectOption_UserGroupFragmentDoc = gql`
@@ -34523,11 +34536,7 @@ export const IntegrationsSignature_userDocument = gql`
         signatureIntegrations: integrations(type: SIGNATURE, limit: $limit, offset: $offset) {
           items {
             ... on SignatureOrgIntegration {
-              id
-              name
-              provider
-              isDefault
-              environment
+              ...IntegrationsSignature_SignatureOrgIntegration
             }
           }
           totalCount
@@ -34536,6 +34545,7 @@ export const IntegrationsSignature_userDocument = gql`
     }
   }
   ${SettingsLayout_QueryFragmentDoc}
+  ${IntegrationsSignature_SignatureOrgIntegrationFragmentDoc}
 ` as unknown as DocumentNode<
   IntegrationsSignature_userQuery,
   IntegrationsSignature_userQueryVariables

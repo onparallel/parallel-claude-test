@@ -9,7 +9,7 @@ import {
 } from "../../db/repositories/PetitionRepository";
 import { fromGlobalId } from "../../util/globalId";
 
-interface SignaturItEventBody {
+export interface SignaturItEventBody {
   document: {
     created_at: string;
     decline_reason?: string; // only for document_declined event type

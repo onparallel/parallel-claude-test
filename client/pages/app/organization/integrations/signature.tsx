@@ -16,6 +16,7 @@ import { DeleteIcon, RepeatIcon, StarIcon } from "@parallel/chakra/icons";
 import { ContactSupportAlert } from "@parallel/components/common/ContactSupportAlert";
 import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { NormalLink } from "@parallel/components/common/Link";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
@@ -276,9 +277,37 @@ function useSignatureTokensTableColumns() {
           }),
           CellContent: ({ row }) => {
             return (
-              <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
-                {row.name}
-              </Text>
+              <>
+                <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
+                  {row.name}
+                </Text>
+                {row.consentRequiredUrl ? (
+                  <SmallPopover
+                    content={
+                      <Text fontSize="sm">
+                        <FormattedMessage
+                          id="page.signature.consent-required-popover"
+                          defaultMessage="<a>Click here</a> to give us your consent to send signatures on your behalf."
+                          values={{
+                            a: (chunks: any[]) => (
+                              <NormalLink href={row.consentRequiredUrl!} target="_blank">
+                                {chunks}
+                              </NormalLink>
+                            ),
+                          }}
+                        />
+                      </Text>
+                    }
+                  >
+                    <Badge marginLeft={2} colorScheme="red" cursor="pointer">
+                      <FormattedMessage
+                        id="page.signature.consent-required"
+                        defaultMessage="Consent required"
+                      />
+                    </Badge>
+                  </SmallPopover>
+                ) : null}
+              </>
             );
           },
         },
@@ -293,6 +322,12 @@ function useSignatureTokensTableColumns() {
               <Image
                 src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/signaturit.png`}
                 alt="Signaturit"
+                maxWidth="80px"
+              />
+            ) : row.provider === "DOCUSIGN" ? (
+              <Image
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/docusign.png`}
+                alt="Docusign"
                 maxWidth="80px"
               />
             ) : null,
@@ -412,6 +447,7 @@ IntegrationsSignature.fragments = {
       provider
       isDefault
       environment
+      consentRequiredUrl
     }
   `,
 };
@@ -466,11 +502,7 @@ IntegrationsSignature.queries = [
           signatureIntegrations: integrations(type: SIGNATURE, limit: $limit, offset: $offset) {
             items {
               ... on SignatureOrgIntegration {
-                id
-                name
-                provider
-                isDefault
-                environment
+                ...IntegrationsSignature_SignatureOrgIntegration
               }
             }
             totalCount
@@ -479,6 +511,7 @@ IntegrationsSignature.queries = [
       }
     }
     ${SettingsLayout.fragments.Query}
+    ${IntegrationsSignature.fragments.SignatureOrgIntegration}
   `,
 ];
 

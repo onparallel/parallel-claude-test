@@ -76,7 +76,7 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
     );
 
     if (!args.isIcon) {
-      await ctx.signature.updateBranding(ctx.user!.org_id);
+      await ctx.signature.updateBranding(ctx.user!.org_id, { exclude: ["DOCUSIGN"] });
     }
 
     return org;
@@ -138,7 +138,7 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
       `User:${ctx.user!.id}`
     );
 
-    await ctx.signature.updateBranding(ctx.user!.org_id);
+    await ctx.signature.updateBranding(ctx.user!.org_id, { exclude: ["DOCUSIGN"] });
     return (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
   },
 });

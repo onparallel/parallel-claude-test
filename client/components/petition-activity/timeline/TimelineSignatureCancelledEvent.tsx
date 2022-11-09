@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { NakedLink } from "@parallel/components/common/Link";
 import { SignerReference } from "@parallel/components/common/SignerReference";
 import { TimelineSignatureCancelledEvent_SignatureCancelledEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -127,6 +128,20 @@ export function TimelineSignatureCancelledEvent({
                   />
                 </Text>
               </>
+            ) : event.errorCode === "CONSENT_REQUIRED" ? (
+              <FormattedMessage
+                id="timeline.signature-cancelled-request-error.consent-required.description"
+                defaultMessage="The eSignature process has been cancelled because we don't have your consent to send signatures on your behalf {timeAgo}"
+                values={{
+                  timeAgo: (
+                    <DateTime
+                      value={event.createdAt}
+                      format={FORMATS.LLL}
+                      useRelativeTime="always"
+                    />
+                  ),
+                }}
+              />
             ) : (
               <FormattedMessage
                 id="timeline.signature-cancelled-request-error.unknown.description"
@@ -151,6 +166,18 @@ export function TimelineSignatureCancelledEvent({
             />
           </Button>
         )}
+        {event.cancelType === "REQUEST_ERROR" &&
+          event.errorCode === "CONSENT_REQUIRED" &&
+          event.extraErrorData?.consentUrl && (
+            <NakedLink href={event.extraErrorData.consentUrl}>
+              <Button as="a" target="_blank" size="sm" variant="outline" marginLeft={4}>
+                <FormattedMessage
+                  id="timeline.signature-declined.give-consent"
+                  defaultMessage="Give consent"
+                />
+              </Button>
+            </NakedLink>
+          )}
       </Flex>
     </TimelineItem>
   );

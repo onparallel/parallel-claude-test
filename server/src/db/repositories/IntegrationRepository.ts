@@ -7,10 +7,11 @@ import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 import { CreateOrgIntegration, IntegrationType, OrgIntegration, User } from "../__types";
 
-export type SignatureProvider = "SIGNATURIT";
+export type SignatureProvider = "SIGNATURIT" | "DOCUSIGN";
 
 type SignatureIntegrationCredentials<TProvider extends SignatureProvider> = {
   SIGNATURIT: { API_KEY: string };
+  DOCUSIGN: { USER_ID: string; INTEGRATION_KEY: string };
 }[TProvider];
 
 export type IntegrationSettings<
@@ -24,6 +25,8 @@ export type IntegrationSettings<
     ES_FORMAL_BRANDING_ID?: string;
     EN_INFORMAL_BRANDING_ID?: string;
     ES_INFORMAL_BRANDING_ID?: string;
+    CONSENT_REQUIRED?: boolean;
+    CONSENT_URL?: string;
   };
   SSO: {
     EMAIL_DOMAINS: string[];

@@ -106,7 +106,7 @@ export class TiersService implements ITiersService {
           tier.PETITION_SEND.duration,
           t
         ),
-        this.signatures.updateBranding(org.id, t),
+        this.signatures.updateBranding(org.id, { exclude: ["DOCUSIGN"] }, t),
       ]);
     }, t);
 

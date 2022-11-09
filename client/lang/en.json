@@ -8240,6 +8240,16 @@
     "context": "Reports"
   },
   {
+    "term": "page.signature.consent-required",
+    "definition": "Consent required",
+    "context": "Consent required"
+  },
+  {
+    "term": "page.signature.consent-required-popover",
+    "definition": "<a>Click here</a> to give us your consent to send signatures on your behalf.",
+    "context": "<a>Click here</a> to give us your consent to send signatures on your behalf."
+  },
+  {
     "term": "page.signature.invalid-apikey-toast-description",
     "definition": "Invalid API Key",
     "context": "Invalid API Key"
@@ -10525,6 +10535,11 @@
     "context": "{userIsYou, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}"
   },
   {
+    "term": "timeline.signature-cancelled-request-error.consent-required.description",
+    "definition": "The eSignature process has been cancelled because we don't have your consent to send signatures on your behalf {timeAgo}",
+    "context": "The eSignature process has been cancelled because we don't have your consent to send signatures on your behalf {timeAgo}"
+  },
+  {
     "term": "timeline.signature-cancelled-request-error.email-bounced.description",
     "definition": "The eSignature process has been cancelled due to an error with {hasEmail, select, true{<b><{signerEmail}></b>} other{an email}} {timeAgo}",
     "context": "The eSignature process has been cancelled due to an error with {hasEmail, select, true{<b><{signerEmail}></b>} other{an email}} {timeAgo}"
@@ -10558,6 +10573,11 @@
     "term": "timeline.signature-declined-by-signer.description",
     "definition": "{signer} has declined the eSignature process {timeAgo}",
     "context": "{signer} has declined the eSignature process {timeAgo}"
+  },
+  {
+    "term": "timeline.signature-declined.give-consent",
+    "definition": "Give consent",
+    "context": "Give consent"
   },
   {
     "term": "timeline.signature-declined.see-reason",

@@ -369,7 +369,7 @@ export interface NexusGenEnums {
   QueryUserGroups_OrderBy: "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
   Result: "FAILURE" | "SUCCESS";
   SignatureOrgIntegrationEnvironment: "DEMO" | "PRODUCTION";
-  SignatureOrgIntegrationProvider: "SIGNATURIT";
+  SignatureOrgIntegrationProvider: "DOCUSIGN" | "SIGNATURIT";
   Success: "SUCCESS";
   TaskName: db.TaskName;
   TaskStatus: db.TaskStatus;
@@ -1428,6 +1428,7 @@ export interface NexusGenFieldTypes {
     updateOrganizationAutoAnonymizePeriod: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationBrandTheme: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
+    updateOrganizationName: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOrganizationPdfDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationTier: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOrganizationUsageDetails: NexusGenRootTypes["Organization"]; // Organization!
@@ -2404,6 +2405,7 @@ export interface NexusGenFieldTypes {
   };
   SignatureOrgIntegration: {
     // field return type
+    consentRequiredUrl: string | null; // String
     environment: NexusGenEnums["SignatureOrgIntegrationEnvironment"]; // SignatureOrgIntegrationEnvironment!
     id: NexusGenScalars["GID"]; // GID!
     invalidCredentials: boolean; // Boolean!
@@ -3217,6 +3219,7 @@ export interface NexusGenFieldTypeNames {
     updateOrganizationAutoAnonymizePeriod: "Organization";
     updateOrganizationBrandTheme: "Organization";
     updateOrganizationLogo: "Organization";
+    updateOrganizationName: "SupportMethodResponse";
     updateOrganizationPdfDocumentTheme: "Organization";
     updateOrganizationTier: "SupportMethodResponse";
     updateOrganizationUsageDetails: "Organization";
@@ -4193,6 +4196,7 @@ export interface NexusGenFieldTypeNames {
   };
   SignatureOrgIntegration: {
     // field return type name
+    consentRequiredUrl: "String";
     environment: "SignatureOrgIntegrationEnvironment";
     id: "GID";
     invalidCredentials: "Boolean";
@@ -5305,6 +5309,11 @@ export interface NexusGenArgTypes {
       // args
       file: NexusGenScalars["Upload"]; // Upload!
       isIcon?: boolean | null; // Boolean
+    };
+    updateOrganizationName: {
+      // args
+      name: string; // String!
+      orgId: number; // Int!
     };
     updateOrganizationPdfDocumentTheme: {
       // args

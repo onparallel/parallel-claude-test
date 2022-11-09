@@ -26,6 +26,7 @@ export interface ISignatureService {
     provider: TProvider;
     settings: IntegrationSettings<"SIGNATURE", TProvider>;
   }): ISignatureClient<TProvider>;
+  consentGranted(integrationId: number, provider: string): Promise<string>;
   createSignatureRequest(
     petitionId: number,
     signatureConfig: PetitionSignatureConfig,
@@ -49,7 +50,11 @@ export interface ISignatureService {
     signature: PetitionSignatureRequest,
     signedDocumentExternalId: string
   ): Promise<void>;
-  updateBranding(orgId: number, t?: Knex.Transaction): Promise<void>;
+  updateBranding(
+    orgId: number,
+    opts?: { exclude?: SignatureProvider[] },
+    t?: Knex.Transaction
+  ): Promise<void>;
 }
 
 export const SIGNATURE = Symbol.for("SIGNATURE");
@@ -58,17 +63,34 @@ export class SignatureService implements ISignatureService {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(IntegrationRepository)
-    private integrationRepository: IntegrationRepository,
-    @inject(PetitionRepository) private petitionsRepository: PetitionRepository,
+    private integrations: IntegrationRepository,
+    @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(QUEUES_SERVICE) private queues: IQueuesService,
     @inject(Container) private container: Container
   ) {}
+
+  async consentGranted(integrationId: number, provider: string) {
+    try {
+      const integration = await this.integrations.loadAnySignatureIntegration(integrationId);
+      if (integration?.provider === provider) {
+        const settings = integration.settings as IntegrationSettings<"SIGNATURE", "DOCUSIGN">;
+        delete settings.CONSENT_REQUIRED;
+        delete settings.CONSENT_URL;
+        await this.integrations.updateOrgIntegration(
+          integrationId,
+          { settings },
+          `OrgIntegration:${integrationId}`
+        );
+      }
+    } catch {}
+    return this.config.misc.parallelUrl;
+  }
 
   public getClient<TProvider extends SignatureProvider>(integration: {
     id?: number;
     provider: TProvider;
     settings: IntegrationSettings<"SIGNATURE", TProvider>;
-  }): ISignatureClient<TProvider> {
+  }) {
     const client = this.container.getNamed<ISignatureClient<TProvider>>(
       SIGNATURE_CLIENT,
       integration.provider
@@ -116,7 +138,7 @@ export class SignatureService implements ISignatureService {
     }
 
     if ((signatureConfig.additionalSignersInfo ?? [])?.length > 0) {
-      [updatedPetition] = await this.petitionsRepository.updatePetition(
+      [updatedPetition] = await this.petitions.updatePetition(
         petitionId,
         { signature_config: signatureConfig },
         updatedBy
@@ -125,7 +147,7 @@ export class SignatureService implements ISignatureService {
 
     await this.cancelPendingSignatureRequests(petitionId, starter);
 
-    const signatureRequest = await this.petitionsRepository.createPetitionSignature(petitionId, {
+    const signatureRequest = await this.petitions.createPetitionSignature(petitionId, {
       signature_config: {
         ...(omit(signatureConfig, ["additionalSignersInfo"]) as any),
         signersInfo: signatureConfig.signersInfo.concat(
@@ -142,7 +164,7 @@ export class SignatureService implements ISignatureService {
           payload: { petitionSignatureRequestId: signatureRequest.id },
         },
       }),
-      this.petitionsRepository.createEvent({
+      this.petitions.createEvent({
         type: "SIGNATURE_STARTED",
         petition_id: petitionId,
         data: {
@@ -223,7 +245,11 @@ export class SignatureService implements ISignatureService {
     }
   }
 
-  async updateBranding(orgId: number, t?: Knex.Transaction): Promise<void> {
+  async updateBranding(
+    orgId: number,
+    opts?: { exclude?: SignatureProvider[] },
+    t?: Knex.Transaction
+  ): Promise<void> {
     await this.queues.enqueueMessages(
       "signature-worker",
       {
@@ -232,6 +258,7 @@ export class SignatureService implements ISignatureService {
           type: "update-branding",
           payload: {
             orgId,
+            exclude: opts?.exclude ?? null,
             _: random(10), // random value on message body to override sqs contentBasedDeduplication and allow processing repeated messages in short periods of time
           },
         },
@@ -242,10 +269,12 @@ export class SignatureService implements ISignatureService {
 
   async cancelPendingSignatureRequests(petitionId: number, canceller: PetitionAccess | User) {
     const isAccess = "keycode" in canceller;
-    const previousSignatureRequests =
-      await this.petitionsRepository.loadPetitionSignaturesByPetitionId(petitionId, {
+    const previousSignatureRequests = await this.petitions.loadPetitionSignaturesByPetitionId(
+      petitionId,
+      {
         refresh: true,
-      });
+      }
+    );
 
     // avoid recipients restarting the signature process too many times
     if (countBy(previousSignatureRequests, (r) => r.cancel_reason === "REQUEST_RESTARTED") >= 20) {
@@ -260,7 +289,7 @@ export class SignatureService implements ISignatureService {
 
     // cancel pending signature request before starting a new one
     if (enqueuedSignatureRequest || pendingSignatureRequest) {
-      await this.petitionsRepository.cancelPetitionSignatureRequest(
+      await this.petitions.cancelPetitionSignatureRequest(
         [enqueuedSignatureRequest, pendingSignatureRequest].filter(isDefined),
         "REQUEST_RESTARTED",
         isAccess ? { petition_access_id: canceller.id } : { user_id: canceller.id }
@@ -277,7 +306,7 @@ export class SignatureService implements ISignatureService {
         });
       }
 
-      this.petitionsRepository.loadPetitionSignaturesByPetitionId.dataloader.clear(petitionId);
+      this.petitions.loadPetitionSignaturesByPetitionId.dataloader.clear(petitionId);
     }
   }
 
@@ -293,12 +322,12 @@ export class SignatureService implements ISignatureService {
     if (orgIntegrationId === undefined) {
       throw new Error(`undefined orgIntegrationId on signature_config. Petition:${petitionId}`);
     }
-    const petition = await this.petitionsRepository.loadPetition(petitionId);
+    const petition = await this.petitions.loadPetition(petitionId);
     if (!petition) {
       throw new Error(`Petition:${petitionId} not found`);
     }
 
-    const integration = await this.integrationRepository.loadIntegration(orgIntegrationId);
+    const integration = await this.integrations.loadIntegration(orgIntegrationId);
     if (!integration || integration.type !== "SIGNATURE") {
       throw new Error(
         `Couldn't find an enabled signature integration for OrgIntegration:${orgIntegrationId}`

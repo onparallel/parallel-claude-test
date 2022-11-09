@@ -34,7 +34,10 @@ export const SignatureOrgIntegration = objectType({
   definition(t) {
     t.implements("IOrgIntegration");
     t.field("provider", {
-      type: enumType({ name: "SignatureOrgIntegrationProvider", members: ["SIGNATURIT"] }),
+      type: enumType({
+        name: "SignatureOrgIntegrationProvider",
+        members: ["SIGNATURIT", "DOCUSIGN"],
+      }),
     });
     t.field("environment", {
       type: enumType({
@@ -46,6 +49,9 @@ export const SignatureOrgIntegration = objectType({
       resolve: (o) => {
         return o.settings.ENVIRONMENT === "production" ? "PRODUCTION" : "DEMO";
       },
+    });
+    t.nullable.string("consentRequiredUrl", {
+      resolve: (o) => (o.settings.CONSENT_REQUIRED && o.settings.CONSENT_URL) ?? null,
     });
   },
   sourceType: "db.OrgIntegration",

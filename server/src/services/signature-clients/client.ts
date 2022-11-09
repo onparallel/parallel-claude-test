@@ -32,6 +32,7 @@ export type SignatureOptions = {
     assetsUrl: string;
     removeParallelBranding: boolean;
     theme: BrandTheme;
+    organizationName?: string;
   };
   events_url?: string;
   signingMode?: "parallel" | "sequential";
@@ -54,8 +55,13 @@ export type Recipient = { email: string; name: string };
 
 export type BrandingIdKey = `${"EN" | "ES"}_${Tone}_BRANDING_ID`;
 
-type AuthenticationResponse<TProvider extends SignatureProvider = any> = {
+type AuthenticationResponse<TProvider extends SignatureProvider> = {
   SIGNATURIT: { environment: "production" | "sandbox" };
+  DOCUSIGN: {
+    environment: "production" | "sandbox";
+    consent_required?: boolean;
+    consent_url?: string;
+  };
 }[TProvider];
 
 export const SIGNATURE_CLIENT = Symbol.for("SIGNATURE_CLIENT");
@@ -67,18 +73,18 @@ export interface ISignatureClient<TProvider extends SignatureProvider> {
   }): void;
   authenticate(): Promise<AuthenticationResponse<TProvider>>;
   startSignatureRequest: (
-    petitionId: string,
-    orgId: string,
+    petitionId: number,
+    orgId: number,
     filePath: string,
     recipients: Recipient[],
     options: SignatureOptions
   ) => Promise<SignatureResponse>;
-  cancelSignatureRequest: (externalId: string) => Promise<SignatureResponse>;
+  cancelSignatureRequest: (externalId: string) => Promise<void>;
   downloadSignedDocument: (externalId: string) => Promise<Buffer>;
   downloadAuditTrail: (externalId: string) => Promise<Buffer>;
-  sendPendingSignatureReminder: (signatureId: string) => Promise<SignatureResponse>;
+  sendPendingSignatureReminder: (signatureId: string) => Promise<void>;
   updateBranding(
     brandingId: string,
     opts: Pick<SignatureOptions, "locale" | "templateData">
-  ): Promise<string>;
+  ): Promise<void>;
 }

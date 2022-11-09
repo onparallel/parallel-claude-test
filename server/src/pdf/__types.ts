@@ -822,6 +822,8 @@ export type Mutation = {
   updateOrganizationBrandTheme: Organization;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
+  /** Updates the name of an organization */
+  updateOrganizationName: SupportMethodResponse;
   /** updates the PDF_DOCUMENT theme of the organization */
   updateOrganizationPdfDocumentTheme: Organization;
   /** Applies a given tier to the organization */
@@ -1664,6 +1666,11 @@ export type MutationupdateOrganizationBrandThemeArgs = {
 export type MutationupdateOrganizationLogoArgs = {
   file: Scalars["Upload"];
   isIcon?: InputMaybe<Scalars["Boolean"]>;
+};
+
+export type MutationupdateOrganizationNameArgs = {
+  name: Scalars["String"];
+  orgId: Scalars["Int"];
 };
 
 export type MutationupdateOrganizationPdfDocumentThemeArgs = {
@@ -3900,6 +3907,7 @@ export type SignatureOpenedEvent = PetitionEvent & {
 };
 
 export type SignatureOrgIntegration = IOrgIntegration & {
+  consentRequiredUrl: Maybe<Scalars["String"]>;
   /** Environment of this integration, to differentiate between sandbox and production-ready integrations */
   environment: SignatureOrgIntegrationEnvironment;
   id: Scalars["GID"];
@@ -3915,7 +3923,7 @@ export type SignatureOrgIntegration = IOrgIntegration & {
 
 export type SignatureOrgIntegrationEnvironment = "DEMO" | "PRODUCTION";
 
-export type SignatureOrgIntegrationProvider = "SIGNATURIT";
+export type SignatureOrgIntegrationProvider = "DOCUSIGN" | "SIGNATURIT";
 
 export type SignatureReminderEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];

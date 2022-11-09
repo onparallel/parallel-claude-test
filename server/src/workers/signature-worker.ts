@@ -11,7 +11,6 @@ import { OrgIntegration } from "../db/__types";
 import { Tone } from "../emails/utils/types";
 import { BrandingIdKey, SignatureResponse } from "../services/signature-clients/client";
 import { fullName } from "../util/fullName";
-import { toGlobalId } from "../util/globalId";
 import { removeKeys, removeNotDefined } from "../util/remedaExtensions";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { random } from "../util/token";
@@ -41,6 +40,10 @@ async function startSignatureProcess(
   }
 
   const petition = await fetchPetition(signature.petition_id, ctx);
+  const organization = await ctx.organizations.loadOrg(petition.org_id);
+  if (!organization) {
+    throw new Error(`Organization:${petition.org_id} not found`);
+  }
   if (!petition.signature_config) {
     throw new Error(`Signature is not enabled on petition with id ${signature.petition_id}`);
   }
@@ -49,7 +52,6 @@ async function startSignatureProcess(
 
   let documentTmpPath: string | null = null;
   const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
-
   try {
     const owner = await ctx.petitions.loadPetitionOwner(petition.id);
     const recipients = signersInfo.map((signer) => ({
@@ -80,14 +82,15 @@ async function startSignatureProcess(
 
     // send request to signature client
     const data = await signatureClient.startSignatureRequest(
-      toGlobalId("Petition", petition.id),
-      toGlobalId("Organization", petition.org_id),
+      petition.id,
+      petition.org_id,
       documentTmpPath,
       recipients,
       {
         locale: petition.locale,
         templateData: {
           ...(await getLayoutProps(petition.org_id, ctx)),
+          organizationName: organization.name,
         },
         signingMode: "parallel",
         initialMessage: message,
@@ -98,7 +101,7 @@ async function startSignatureProcess(
     // remove events array from data before saving to DB
     data.documents = data.documents.map((doc) => removeKeys(doc, ([key]) => key !== "events"));
 
-    // update signers on signature_config to include the externalId provided by signaturit so we can match it later
+    // update signers on signature_config to include the externalId provided by provider so we can match it later on events webhook
     const updatedSignersInfo = signature.signature_config.signersInfo.map(
       (signer, signerIndex) => ({
         ...signer,
@@ -141,6 +144,10 @@ async function startSignatureProcess(
       },
       `SignatureWorker:${payload.petitionSignatureRequestId}`
     );
+
+    if (!error.consent_required) {
+      throw error;
+    }
   } finally {
     try {
       if (isDefined(documentTmpPath)) {
@@ -178,7 +185,11 @@ async function cancelSignatureProcess(
     }
     const signatureClient = ctx.signature.getClient(signatureIntegration);
     await signatureClient.cancelSignatureRequest(signature.external_id.replace(/^.*?\//, ""));
-  } catch {}
+  } catch (error: any) {
+    if (!error.consent_required) {
+      throw error;
+    }
+  }
 }
 
 /** sends a reminder email to every pending signer of the signature request */
@@ -202,7 +213,11 @@ async function sendSignatureReminder(
 
     const signatureClient = ctx.signature.getClient(signatureIntegration);
     await signatureClient.sendPendingSignatureReminder(signature.external_id.replace(/^.*?\//, ""));
-  } catch {}
+  } catch (error: any) {
+    if (!error.consent_required) {
+      throw error;
+    }
+  }
 }
 
 async function storeSignedDocument(
@@ -213,79 +228,91 @@ async function storeSignedDocument(
   },
   ctx: WorkerContext
 ) {
-  const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
-  const petition = await fetchPetition(signature.petition_id, ctx);
+  try {
+    const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
+    const petition = await fetchPetition(signature.petition_id, ctx);
 
-  const { title, orgIntegrationId } = signature.signature_config;
+    const { title, orgIntegrationId } = signature.signature_config;
 
-  const signaturitIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
+    const integration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
 
-  const client = ctx.signature.getClient(signaturitIntegration);
+    const client = ctx.signature.getClient(integration);
 
-  const intl = await ctx.i18n.getIntl(petition.locale);
+    const intl = await ctx.i18n.getIntl(petition.locale);
 
-  const signedDocument = await storeDocument(
-    await client.downloadSignedDocument(payload.signedDocumentExternalId),
-    sanitizeFilenameWithSuffix(
-      title || (await getDefaultFileName(petition.id, petition.locale, ctx)),
-      `_${intl.formatMessage({
-        id: "signature-worker.signed",
-        defaultMessage: "signed",
-      })}.pdf`
-    ),
-    signaturitIntegration.id,
-    ctx
-  );
+    const signedDocument = await storeDocument(
+      await client.downloadSignedDocument(payload.signedDocumentExternalId),
+      sanitizeFilenameWithSuffix(
+        title || (await getDefaultFileName(petition.id, petition.locale, ctx)),
+        `_${intl.formatMessage({
+          id: "signature-worker.signed",
+          defaultMessage: "signed",
+        })}.pdf`
+      ),
+      integration.id,
+      ctx
+    );
 
-  await ctx.emails.sendPetitionCompletedEmail(petition.id, {
-    signer: payload.signer,
-  });
-  await ctx.petitions.createEvent({
-    type: "SIGNATURE_COMPLETED",
-    petition_id: petition.id,
-    data: {
-      petition_signature_request_id: payload.petitionSignatureRequestId,
+    await ctx.emails.sendPetitionCompletedEmail(petition.id, {
+      signer: payload.signer,
+    });
+    await ctx.petitions.createEvent({
+      type: "SIGNATURE_COMPLETED",
+      petition_id: petition.id,
+      data: {
+        petition_signature_request_id: payload.petitionSignatureRequestId,
+        file_upload_id: signedDocument.id,
+      },
+    });
+    await ctx.petitions.updatePetitionSignature(payload.petitionSignatureRequestId, {
+      status: "COMPLETED",
       file_upload_id: signedDocument.id,
-    },
-  });
-  await ctx.petitions.updatePetitionSignature(payload.petitionSignatureRequestId, {
-    status: "COMPLETED",
-    file_upload_id: signedDocument.id,
-  });
-  await ctx.petitions.updatePetition(
-    petition.id,
-    { signature_config: null }, // when completed, set signature_config to null so the signatures card on replies page don't show a "pending start" row
-    `OrgIntegration:${signaturitIntegration.id}`
-  );
+    });
+    await ctx.petitions.updatePetition(
+      petition.id,
+      { signature_config: null }, // when completed, set signature_config to null so the signatures card on replies page don't show a "pending start" row
+      `OrgIntegration:${integration.id}`
+    );
+  } catch (error: any) {
+    if (!error.consent_required) {
+      throw error;
+    }
+  }
 }
 
 async function storeAuditTrail(
   payload: { petitionSignatureRequestId: number; signedDocumentExternalId: string },
   ctx: WorkerContext
 ) {
-  const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
-  const petition = await fetchPetition(signature.petition_id, ctx);
-  const { orgIntegrationId, title } = signature.signature_config;
-  const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
-  const client = ctx.signature.getClient(signatureIntegration);
+  try {
+    const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
+    const petition = await fetchPetition(signature.petition_id, ctx);
+    const { orgIntegrationId, title } = signature.signature_config;
+    const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
+    const client = ctx.signature.getClient(signatureIntegration);
 
-  const auditTrail = await storeDocument(
-    await client.downloadAuditTrail(payload.signedDocumentExternalId),
-    sanitizeFilenameWithSuffix(
-      title || (await getDefaultFileName(petition.id, petition.locale, ctx)),
-      "_audit_trail.pdf"
-    ),
-    signatureIntegration.id,
-    ctx
-  );
+    const auditTrail = await storeDocument(
+      await client.downloadAuditTrail(payload.signedDocumentExternalId),
+      sanitizeFilenameWithSuffix(
+        title || (await getDefaultFileName(petition.id, petition.locale, ctx)),
+        "_audit_trail.pdf"
+      ),
+      signatureIntegration.id,
+      ctx
+    );
 
-  await ctx.petitions.updatePetitionSignature(signature.id, {
-    file_upload_audit_trail_id: auditTrail.id,
-  });
+    await ctx.petitions.updatePetitionSignature(signature.id, {
+      file_upload_audit_trail_id: auditTrail.id,
+    });
+  } catch (error: any) {
+    if (!error.consent_required) {
+      throw error;
+    }
+  }
 }
 
 async function updateOrganizationBranding(
-  payload: { orgId: number; _: string },
+  payload: { orgId: number; exclude: SignatureProvider[] | null; _: string },
   ctx: WorkerContext
 ) {
   const [organization, signatureIntegrations, layoutProps] = await Promise.all([
@@ -301,6 +328,10 @@ async function updateOrganizationBranding(
   await pMap(
     signatureIntegrations as SignatureOrgIntegration[],
     async (integration) => {
+      if (payload.exclude?.includes(integration.provider)) {
+        return;
+      }
+
       const settings = integration.settings;
       const definedBrandingIds = removeNotDefined<Record<BrandingIdKey, string | undefined>>({
         EN_FORMAL_BRANDING_ID: settings.EN_FORMAL_BRANDING_ID,
@@ -310,7 +341,6 @@ async function updateOrganizationBranding(
       });
 
       const client = ctx.signature.getClient(integration);
-
       for (const [key, brandingId] of Object.entries(definedBrandingIds)) {
         const [locale, tone]: string[] = key.split("_");
         try {
@@ -322,6 +352,7 @@ async function updateOrganizationBranding(
                 ...layoutProps.theme,
                 preferredTone: tone as Tone,
               },
+              organizationName: organization.name,
             },
           });
         } catch (error) {

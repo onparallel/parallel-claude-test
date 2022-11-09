@@ -1,5 +1,6 @@
 import { ContainerModule } from "inversify";
 import { ISignatureClient, SIGNATURE_CLIENT } from "./client";
+import { DocuSignClient } from "./docusign";
 import { SignaturitClient } from "./signaturit";
 
 export const signatureClientsModule = new ContainerModule((bind) => {
@@ -7,4 +8,9 @@ export const signatureClientsModule = new ContainerModule((bind) => {
     .to(SignaturitClient)
     .inSingletonScope()
     .whenTargetNamed("SIGNATURIT");
+
+  bind<ISignatureClient<"DOCUSIGN">>(SIGNATURE_CLIENT)
+    .to(DocuSignClient)
+    .inSingletonScope()
+    .whenTargetNamed("DOCUSIGN");
 });

@@ -8240,6 +8240,16 @@
     "context": "Reports"
   },
   {
+    "term": "page.signature.consent-required",
+    "definition": "Consentimiento requerido",
+    "context": "Consent required"
+  },
+  {
+    "term": "page.signature.consent-required-popover",
+    "definition": "<a>Haz click aquí</a> para darnos tu consentimiento para enviar firmas en tu nombre.",
+    "context": "<a>Click here</a> to give us your consent to send signatures on your behalf."
+  },
+  {
     "term": "page.signature.invalid-apikey-toast-description",
     "definition": "Clave API inválida",
     "context": "Invalid API Key"
@@ -10525,6 +10535,11 @@
     "context": "{userIsYou, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}"
   },
   {
+    "term": "timeline.signature-cancelled-request-error.consent-required.description",
+    "definition": "El proceso de firma digital se ha cancelado porque no tenemos tu consentimiento para enviar firmas en tu nombre {timeAgo}",
+    "context": "The eSignature process has been cancelled because we don't have your consent to send signatures on your behalf {timeAgo}"
+  },
+  {
     "term": "timeline.signature-cancelled-request-error.email-bounced.description",
     "definition": "El proceso de firma se ha cancelado debido a un error con {hasEmail, select, true{el correo <b><{signerEmail}></b>} other{un correo}} {timeAgo}",
     "context": "The eSignature process has been cancelled due to an error with {hasEmail, select, true{<b><{signerEmail}></b>} other{an email}} {timeAgo}"
@@ -10558,6 +10573,11 @@
     "term": "timeline.signature-declined-by-signer.description",
     "definition": "{signer} ha rechazado el proceso de firma {timeAgo}",
     "context": "{signer} has declined the eSignature process {timeAgo}"
+  },
+  {
+    "term": "timeline.signature-declined.give-consent",
+    "definition": "Otorgar consentimiento",
+    "context": "Give consent"
   },
   {
     "term": "timeline.signature-declined.see-reason",
