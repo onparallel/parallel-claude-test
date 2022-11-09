@@ -186,7 +186,6 @@ export const validateDowJonesKycCredentials = mutationField("validateDowJonesKyc
     username: nonNull(stringArg()),
     password: nonNull(stringArg()),
   },
-  validateArgs: validEmail((args) => args.username, "username", true),
   resolve: async (_, args, ctx) => {
     try {
       await ctx.dowJonesKyc.fetchCredentials(args.clientId, args.username, args.password);
