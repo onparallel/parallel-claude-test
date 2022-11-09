@@ -26,6 +26,7 @@ import {
   CloseIcon,
   DeleteIcon,
   DownloadIcon,
+  QuestionIcon,
   UserIcon,
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -231,7 +232,13 @@ export function KYCResearchFieldReplyProfile({
         boxShadow="sm"
         fontSize="xl"
       >
-        {reply.content.entity.type === "Entity" ? <BusinessIcon /> : <UserIcon />}
+        {reply.isAnonymized ? (
+          <QuestionIcon color="gray.300" />
+        ) : reply.content.entity.type === "Entity" ? (
+          <BusinessIcon />
+        ) : (
+          <UserIcon />
+        )}
       </Center>
       <Box flex="1" overflow="hidden" paddingBottom="2px">
         <Flex minWidth={0} whiteSpace="nowrap" alignItems="baseline">
