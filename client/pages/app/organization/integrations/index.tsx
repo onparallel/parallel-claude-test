@@ -67,11 +67,7 @@ function OrganizationIntegrations() {
     if (isChecked) {
       try {
         const data = await showDowJonesIntegrationDialog();
-        await createDowJonesKycIntegration({
-          variables: {
-            ...data,
-          },
-        });
+        await createDowJonesKycIntegration({ variables: data });
         refetch();
       } catch {}
     } else {
@@ -130,7 +126,7 @@ function OrganizationIntegrations() {
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/dow-jones.png`}
-          alt="Dow Jones Factiva"
+          alt="Dow Jones"
           maxWidth="124px"
         />
       ),
