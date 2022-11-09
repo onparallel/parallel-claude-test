@@ -47,7 +47,11 @@ export function DowJonesHints({ hints }: { hints: string[] }) {
           <BusinessIcon />
         ) : /-PERSON$/.test(item) ? (
           <UserIcon />
-        ) : /-(SHIP|AIRCRAFT|COUNTRY|BANK)$/.test(item) ? null : (
+        ) : /-(SHIP|AIRCRAFT|COUNTRY|BANK)$/.test(item) ? null : ["SOC", "AM", "SOR"].includes(
+            item
+          ) ? (
+          <BusinessIcon />
+        ) : (
           <UserIcon />
         );
         return (
