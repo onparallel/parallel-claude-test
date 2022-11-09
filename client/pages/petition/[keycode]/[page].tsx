@@ -414,7 +414,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                   <RecipientViewPagination
                     marginTop={8}
                     currentPage={currentPage}
-                    pageCount={pageCount}
+                    pageCount={pages.length}
                   />
                 ) : null}
                 <RecipientViewFooter marginTop={12} petition={petition} />
@@ -653,15 +653,15 @@ RecipientView.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCont
       variables: { keycode },
     });
     const pageCount =
-      data!.access.petition.fields.filter((f) => f.type === "HEADING" && f.options!.hasPageBreak)
-        .length + 1;
+      data!.access.petition.fields.filter(
+        (f) => f.type === "HEADING" && f.options!.hasPageBreak && !f.isInternal
+      ).length + 1;
     if (page > pageCount) {
       throw new RedirectError(`/petition/${keycode}/1`);
     }
     return {
       keycode,
       currentPage: page,
-      pageCount,
       metadata: data.metadata,
     };
   } catch (error) {
