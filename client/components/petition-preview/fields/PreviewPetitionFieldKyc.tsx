@@ -78,14 +78,15 @@ export function PreviewPetitionFieldKyc({
     [onDeleteReply]
   );
 
-  const popupRef = useRef<Window>();
+  const browserTabRef = useRef<Window>();
   useInterval(
     async (done) => {
-      if (isDefined(popupRef.current) && popupRef.current.closed) {
+      if (isDefined(browserTabRef.current) && browserTabRef.current.closed) {
         setState("IDLE");
         done();
       } else if (state === "FETCHING") {
         onRefreshField();
+        console.log("REFRESH");
       }
     },
     5000,
@@ -94,11 +95,10 @@ export function PreviewPetitionFieldKyc({
 
   useEffect(() => {
     const handler = function (e: MessageEvent) {
-      const popup = popupRef.current;
-      if (isDefined(popup) && e.source === popup && e.data.name === "success") {
+      const browserTab = browserTabRef.current;
+
+      if (isDefined(browserTab) && e.source === browserTab) {
         onRefreshField();
-        popup.close();
-        setState("IDLE");
       }
     };
     window.addEventListener("message", handler);
@@ -109,7 +109,7 @@ export function PreviewPetitionFieldKyc({
   const handleStart = async () => {
     if (field.petition.organization.hasDowJones) {
       setState("FETCHING");
-      popupRef.current = await openNewWindow(
+      browserTabRef.current = await openNewWindow(
         `/${intl.locale}/app/petitions/${field.petition.id}/preview/dowjones/${field.id}`
       );
       if (isCacheOnly) {
@@ -122,7 +122,7 @@ export function PreviewPetitionFieldKyc({
 
   const handleCancelClick = () => {
     setState("IDLE");
-    popupRef.current?.close();
+    browserTabRef.current?.close();
   };
 
   return (

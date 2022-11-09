@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import {
@@ -7,12 +7,15 @@ import {
 } from "@parallel/components/petition-preview/fields/DowJonesSearchForm";
 import { DowJonesSearchResult } from "@parallel/components/petition-preview/fields/DowJonesSearchResult";
 import {
+  DowJonesFieldPreview_createDowJonesKycReplyDocument,
+  DowJonesFieldPreview_deletePetitionFieldReplyDocument,
   DowJonesFieldPreview_petitionFieldDocument,
   DowJonesFieldPreview_userDocument,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { withMetadata } from "@parallel/utils/withMetadata";
 import Head from "next/head";
 import { useState } from "react";
@@ -34,14 +37,60 @@ function DowJonesFieldPreview({
   const {
     data: { me },
   } = useAssertQuery(DowJonesFieldPreview_userDocument);
-
+  const showGenericErrorToast = useGenericErrorToast();
   const [formData, setFormData] = useState<DowJonesSearchFormData | null>(null);
+
+  const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
+  const [isCreatingReply, setIsCreatingReply] = useState<Record<string, boolean>>({});
+
   const handleFormSubmit = async (data: DowJonesSearchFormData) => {
     setFormData(data);
   };
 
   const handleResetSearch = async () => {
     setFormData(null);
+  };
+
+  const [createDowJonesKycReply] = useMutation(DowJonesFieldPreview_createDowJonesKycReplyDocument);
+  const [deletePetitionFieldReply] = useMutation(
+    DowJonesFieldPreview_deletePetitionFieldReplyDocument
+  );
+
+  const handleDeleteReply = async (replyId: string) => {
+    try {
+      setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
+      await deletePetitionFieldReply({
+        variables: {
+          petitionId,
+          replyId,
+        },
+      });
+
+      // not working
+      window.parent.postMessage("refresh", "*");
+    } catch (e) {
+      showGenericErrorToast(e);
+    }
+    setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
+  };
+
+  const handleCreateReply = async (profileId: string) => {
+    try {
+      setIsCreatingReply((curr) => ({ ...curr, [profileId]: true }));
+      await createDowJonesKycReply({
+        variables: {
+          profileId,
+          petitionId,
+          fieldId: petitionFieldId,
+        },
+      });
+
+      // not working
+      window.parent.postMessage("refresh", "*");
+    } catch (e) {
+      showGenericErrorToast(e);
+    }
+    setIsCreatingReply(({ [profileId]: _, ...curr }) => curr);
   };
 
   return (
@@ -54,10 +103,12 @@ function DowJonesFieldPreview({
         <DowJonesSearchResult
           name={formData.name}
           date={formData.dateOfBirth}
-          petitionId={petitionId}
-          fieldId={petitionFieldId}
           replies={petitionField.replies}
           onResetClick={handleResetSearch}
+          onCreateReply={handleCreateReply}
+          onDeleteReply={handleDeleteReply}
+          isCreatingReply={isCreatingReply}
+          isDeletingReply={isDeletingReply}
         />
       ) : (
         <DowJonesSearchForm onSubmit={handleFormSubmit} isDisabled={!me.hasDowJonesFeatureFlag} />
@@ -89,6 +140,38 @@ DowJonesFieldPreview.fragments = {
     }
   `,
 };
+
+DowJonesFieldPreview.mutations = [
+  gql`
+    mutation DowJonesFieldPreview_createDowJonesKycReply(
+      $petitionId: GID!
+      $fieldId: GID!
+      $profileId: ID!
+    ) {
+      createDowJonesKycReply(petitionId: $petitionId, fieldId: $fieldId, profileId: $profileId) {
+        id
+        field {
+          id
+          replies {
+            id
+            content
+          }
+        }
+      }
+    }
+  `,
+  gql`
+    mutation DowJonesFieldPreview_deletePetitionFieldReply($petitionId: GID!, $replyId: GID!) {
+      deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+        id
+        replies {
+          id
+          content
+        }
+      }
+    }
+  `,
+];
 
 DowJonesFieldPreview.queries = [
   gql`

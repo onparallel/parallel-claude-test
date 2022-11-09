@@ -1,11 +1,9 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { Box, Button, Flex, Heading, HStack, Skeleton, Stack, Text } from "@chakra-ui/react";
 import { CheckIcon, DeleteIcon, SaveIcon } from "@parallel/chakra/icons";
 import { TableColumn } from "@parallel/components/common/Table";
 import { DowJonesHints } from "@parallel/components/petition-common/DowJonesHints";
 import {
-  DowJonesSearchResult_createDowJonesKycReplyDocument,
-  DowJonesSearchResult_deletePetitionFieldReplyDocument,
   DowJonesSearchResult_DowJonesKycEntitySearchDocument,
   DowJonesSearchResult_DowJonesKycEntitySearchResultFragment,
   DowJonesSearchResult_PetitionFieldReplyFragment,
@@ -13,7 +11,6 @@ import {
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { FORMATS } from "@parallel/utils/dates";
 import { integer, useQueryState, values } from "@parallel/utils/queryState";
-import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../../common/IconButtonWithTooltip";
@@ -27,26 +24,32 @@ const QUERY_STATE = {
 
 type DowJonesSearchResult = DowJonesSearchResult_DowJonesKycEntitySearchResultFragment;
 
-interface DowJonesKycDataColumnsContext {
-  petitionId: string;
-  fieldId: string;
+type DowJonesKycDataColumnsContext = {
   replies: DowJonesSearchResult_PetitionFieldReplyFragment[];
-}
+  onDeleteReply: (replyId: string) => void;
+  onCreateReply: (profileId: string) => void;
+  isDeletingReply: Record<string, boolean>;
+  isCreatingReply: Record<string, boolean>;
+};
 
 export function DowJonesSearchResult({
   name,
   date,
-  petitionId,
-  fieldId,
-  onResetClick,
   replies,
+  onResetClick,
+  onDeleteReply,
+  onCreateReply,
+  isDeletingReply,
+  isCreatingReply,
 }: {
   name: string;
   date: string;
-  onResetClick: () => void;
-  petitionId: string;
-  fieldId: string;
   replies: DowJonesSearchResult_PetitionFieldReplyFragment[];
+  onResetClick: () => void;
+  onDeleteReply: (id: string) => void;
+  onCreateReply: (profileId: string) => void;
+  isDeletingReply: Record<string, boolean>;
+  isCreatingReply: Record<string, boolean>;
 }) {
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const [profileId, setProfileId] = useState<string | null>(null);
@@ -78,10 +81,12 @@ export function DowJonesSearchResult({
       <DowJonesProfileDetails
         profileId={profileId}
         onProfileIdChange={setProfileId}
-        petitionId={petitionId}
-        fieldId={fieldId}
         replyId={replies.find((r) => r.content.entity.profileId === profileId)?.id ?? null}
         onGoBack={handleGoBack}
+        onCreateReply={onCreateReply}
+        onDeleteReply={onDeleteReply}
+        isDeletingReply={isDeletingReply}
+        isCreatingReply={isCreatingReply}
       />
     );
   }
@@ -105,7 +110,7 @@ export function DowJonesSearchResult({
       <TablePage
         isHighlightable
         columns={columns}
-        context={{ petitionId, fieldId, replies }}
+        context={{ replies, onDeleteReply, onCreateReply, isDeletingReply, isCreatingReply }}
         rows={result?.items}
         rowKeyProp="id"
         page={state.page}
@@ -179,8 +184,6 @@ export function DowJonesSearchResult({
 
 function useDowJonesKycDataColumns() {
   const intl = useIntl();
-  const showGenericErrorToast = useGenericErrorToast();
-
   return useMemo<TableColumn<DowJonesSearchResult, DowJonesKycDataColumnsContext>[]>(
     () => [
       {
@@ -278,40 +281,14 @@ function useDowJonesKycDataColumns() {
         key: "actions",
         header: "",
         CellContent: ({ row, context }) => {
-          const [createDowJonesKycReply, { loading: isSavingProfile }] = useMutation(
-            DowJonesSearchResult_createDowJonesKycReplyDocument
-          );
-          const [deletePetitionFieldReply] = useMutation(
-            DowJonesSearchResult_deletePetitionFieldReplyDocument
-          );
-
           const profileReply = context.replies.find(
             (r) => r.content.entity.profileId === row.profileId
           );
           const handleSaveClick = async () => {
-            try {
-              await createDowJonesKycReply({
-                variables: {
-                  profileId: row.profileId,
-                  petitionId: context.petitionId,
-                  fieldId: context.fieldId,
-                },
-              });
-            } catch (e) {
-              showGenericErrorToast(e);
-            }
+            context.onCreateReply(row.profileId);
           };
           const handleDeleteClick = async () => {
-            try {
-              await deletePetitionFieldReply({
-                variables: {
-                  petitionId: context.petitionId,
-                  replyId: profileReply!.id,
-                },
-              });
-            } catch (e) {
-              showGenericErrorToast(e);
-            }
+            context.onDeleteReply(profileReply!.id);
           };
           return (
             <Flex justifyContent="end">
@@ -326,6 +303,7 @@ function useDowJonesKycDataColumns() {
                     fontSize="md"
                     label={intl.formatMessage({ id: "generic.delete", defaultMessage: "Delete" })}
                     icon={<DeleteIcon />}
+                    isDisabled={context.isCreatingReply[profileReply!.id]}
                     variant="outline"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -337,7 +315,7 @@ function useDowJonesKycDataColumns() {
                 <Button
                   size="sm"
                   fontSize="md"
-                  isLoading={isSavingProfile}
+                  isLoading={context.isCreatingReply[row.profileId]}
                   variant="solid"
                   colorScheme="purple"
                   leftIcon={<SaveIcon />}
@@ -412,37 +390,5 @@ DowJonesSearchResult.queries = [
       }
     }
     ${DowJonesSearchResult.fragments.DowJonesKycEntitySearchResult}
-  `,
-];
-
-const _mutations = [
-  gql`
-    mutation DowJonesSearchResult_createDowJonesKycReply(
-      $petitionId: GID!
-      $fieldId: GID!
-      $profileId: ID!
-    ) {
-      createDowJonesKycReply(petitionId: $petitionId, fieldId: $fieldId, profileId: $profileId) {
-        id
-        field {
-          id
-          replies {
-            id
-            content
-          }
-        }
-      }
-    }
-  `,
-  gql`
-    mutation DowJonesSearchResult_deletePetitionFieldReply($petitionId: GID!, $replyId: GID!) {
-      deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
-        id
-        replies {
-          id
-          content
-        }
-      }
-    }
   `,
 ];

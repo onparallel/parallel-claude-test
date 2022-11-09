@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
@@ -28,15 +28,12 @@ import {
   DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment,
   DowJonesProfileDetails_DowJonesKycEntityRelationshipFragment,
   DowJonesProfileDetails_DowJonesKycEntitySanctionFragment,
-  DowJonesSearchResult_createDowJonesKycReplyDocument,
-  DowJonesSearchResult_deletePetitionFieldReplyDocument,
   Maybe,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { useLoadCountryNames } from "@parallel/utils/useCountryName";
 import { useDowJonesProfileDownloadTask } from "@parallel/utils/useDowJonesProfileDownloadTask";
-import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -48,59 +45,35 @@ type DowJonesProfileDetailsProps = {
   profileId: string;
   onGoBack: () => void;
   onProfileIdChange: (profileId: string) => void;
-  petitionId: string;
-  fieldId: string;
   replyId: Maybe<string>;
+  onDeleteReply: (id: string) => void;
+  onCreateReply: (profileId: string) => void;
+  isDeletingReply: Record<string, boolean>;
+  isCreatingReply: Record<string, boolean>;
 };
 
 export function DowJonesProfileDetails({
   profileId,
   replyId,
-  petitionId,
-  fieldId,
   onGoBack,
   onProfileIdChange,
+  onDeleteReply,
+  onCreateReply,
+  isDeletingReply,
+  isCreatingReply,
 }: DowJonesProfileDetailsProps) {
   const intl = useIntl();
-  const showGenericErrorToast = useGenericErrorToast();
   const { data, loading } = useQuery(DowJonesProfileDetails_DowJonesKycEntityProfileDocument, {
     variables: { profileId },
   });
 
-  const [createDowJonesKycReply, { loading: isSavingProfile }] = useMutation(
-    DowJonesSearchResult_createDowJonesKycReplyDocument
-  );
-
   const handleSaveClick = async () => {
-    try {
-      await createDowJonesKycReply({
-        variables: {
-          profileId,
-          petitionId,
-          fieldId,
-        },
-      });
-    } catch (e) {
-      showGenericErrorToast(e);
-    }
+    onCreateReply(profileId);
   };
 
-  const [deletePetitionFieldReply] = useMutation(
-    DowJonesSearchResult_deletePetitionFieldReplyDocument
-  );
-
   const handleDeleteClick = async () => {
-    try {
-      if (isDefined(replyId)) {
-        await deletePetitionFieldReply({
-          variables: {
-            petitionId,
-            replyId,
-          },
-        });
-      }
-    } catch (e) {
-      showGenericErrorToast(e);
+    if (isDefined(replyId)) {
+      onDeleteReply(replyId);
     }
   };
 
@@ -189,6 +162,7 @@ export function DowJonesProfileDetails({
                       e.stopPropagation();
                       handleDeleteClick();
                     }}
+                    isDisabled={isDeletingReply[replyId]}
                   />
                 </HStack>
               ) : (
@@ -197,7 +171,7 @@ export function DowJonesProfileDetails({
                   colorScheme="purple"
                   leftIcon={<SaveIcon />}
                   onClick={handleSaveClick}
-                  isLoading={isSavingProfile}
+                  isLoading={isCreatingReply[profileId]}
                 >
                   <FormattedMessage id="generic.save" defaultMessage="Save" />
                 </Button>

@@ -620,7 +620,7 @@ export interface Mutation {
   completePetition: Petition;
   /** Create a contact. */
   createContact: Contact;
-  /** Creates a new DOW JONES Factiva integration on the user's organization */
+  /** Creates a new Dow Jones KYC integration on the user's organization */
   createDowJonesKycIntegration: OrgIntegration;
   /** Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document */
   createDowJonesKycReply: PetitionFieldReply;
@@ -3293,14 +3293,14 @@ export type PublicUserOrContact = PublicContact | PublicUser;
 
 export interface Query {
   __typename?: "Query";
+  DowJonesKycEntityProfile: DowJonesKycEntityProfileResult;
+  DowJonesKycEntitySearch: DowJonesKycEntitySearchResultPagination;
   access: PublicPetitionAccess;
   contact?: Maybe<Contact>;
   /** The contacts of the user */
   contacts: ContactPagination;
   /** Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts */
   contactsByEmail: Array<Maybe<Contact>>;
-  DowJonesKycEntityProfile: DowJonesKycEntityProfileResult;
-  DowJonesKycEntitySearch: DowJonesKycEntitySearchResultPagination;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
   getSlugForPublicPetitionLink: Scalars["String"];
@@ -3351,6 +3351,17 @@ export interface Query {
   userGroups: UserGroupPagination;
 }
 
+export interface QueryDowJonesKycEntityProfileArgs {
+  profileId: Scalars["ID"];
+}
+
+export interface QueryDowJonesKycEntitySearchArgs {
+  dateOfBirth?: InputMaybe<Scalars["DateTime"]>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  name: Scalars["String"];
+  offset?: InputMaybe<Scalars["Int"]>;
+}
+
 export interface QueryaccessArgs {
   keycode: Scalars["ID"];
 }
@@ -3369,17 +3380,6 @@ export interface QuerycontactsArgs {
 
 export interface QuerycontactsByEmailArgs {
   emails: Array<Scalars["String"]>;
-}
-
-export interface QueryDowJonesKycEntityProfileArgs {
-  profileId: Scalars["ID"];
-}
-
-export interface QueryDowJonesKycEntitySearchArgs {
-  dateOfBirth?: InputMaybe<Scalars["DateTime"]>;
-  limit?: InputMaybe<Scalars["Int"]>;
-  name: Scalars["String"];
-  offset?: InputMaybe<Scalars["Int"]>;
 }
 
 export interface QueryemailIsAvailableArgs {
@@ -11139,45 +11139,6 @@ export type DowJonesSearchResult_DowJonesKycEntitySearchQuery = {
           } | null;
         }
     >;
-  };
-};
-
-export type DowJonesSearchResult_createDowJonesKycReplyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  fieldId: Scalars["GID"];
-  profileId: Scalars["ID"];
-}>;
-
-export type DowJonesSearchResult_createDowJonesKycReplyMutation = {
-  createDowJonesKycReply: {
-    __typename?: "PetitionFieldReply";
-    id: string;
-    field?: {
-      __typename?: "PetitionField";
-      id: string;
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        content: { [key: string]: any };
-      }>;
-    } | null;
-  };
-};
-
-export type DowJonesSearchResult_deletePetitionFieldReplyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
-}>;
-
-export type DowJonesSearchResult_deletePetitionFieldReplyMutation = {
-  deletePetitionReply: {
-    __typename?: "PetitionField";
-    id: string;
-    replies: Array<{
-      __typename?: "PetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-    }>;
   };
 };
 
@@ -19093,6 +19054,45 @@ export type DowJonesFieldPreview_PetitionFieldFragment = {
 export type DowJonesFieldPreview_QueryFragment = {
   metadata: { __typename?: "ConnectionMetadata"; browserName?: string | null };
   me: { __typename?: "User"; id: string; hasDowJonesFeatureFlag: boolean };
+};
+
+export type DowJonesFieldPreview_createDowJonesKycReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  profileId: Scalars["ID"];
+}>;
+
+export type DowJonesFieldPreview_createDowJonesKycReplyMutation = {
+  createDowJonesKycReply: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    field?: {
+      __typename?: "PetitionField";
+      id: string;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    } | null;
+  };
+};
+
+export type DowJonesFieldPreview_deletePetitionFieldReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+}>;
+
+export type DowJonesFieldPreview_deletePetitionFieldReplyMutation = {
+  deletePetitionReply: {
+    __typename?: "PetitionField";
+    id: string;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+    }>;
+  };
 };
 
 export type DowJonesFieldPreview_petitionFieldQueryVariables = Exact<{
@@ -30805,41 +30805,6 @@ export const DowJonesSearchResult_DowJonesKycEntitySearchDocument = gql`
   DowJonesSearchResult_DowJonesKycEntitySearchQuery,
   DowJonesSearchResult_DowJonesKycEntitySearchQueryVariables
 >;
-export const DowJonesSearchResult_createDowJonesKycReplyDocument = gql`
-  mutation DowJonesSearchResult_createDowJonesKycReply(
-    $petitionId: GID!
-    $fieldId: GID!
-    $profileId: ID!
-  ) {
-    createDowJonesKycReply(petitionId: $petitionId, fieldId: $fieldId, profileId: $profileId) {
-      id
-      field {
-        id
-        replies {
-          id
-          content
-        }
-      }
-    }
-  }
-` as unknown as DocumentNode<
-  DowJonesSearchResult_createDowJonesKycReplyMutation,
-  DowJonesSearchResult_createDowJonesKycReplyMutationVariables
->;
-export const DowJonesSearchResult_deletePetitionFieldReplyDocument = gql`
-  mutation DowJonesSearchResult_deletePetitionFieldReply($petitionId: GID!, $replyId: GID!) {
-    deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
-      id
-      replies {
-        id
-        content
-      }
-    }
-  }
-` as unknown as DocumentNode<
-  DowJonesSearchResult_deletePetitionFieldReplyMutation,
-  DowJonesSearchResult_deletePetitionFieldReplyMutationVariables
->;
 export const PetitionAttachmentsCard_petitionAttachmentDownloadLinkDocument = gql`
   mutation PetitionAttachmentsCard_petitionAttachmentDownloadLink(
     $petitionId: GID!
@@ -32493,6 +32458,41 @@ export const PetitionMessages_updatePetitionDocument = gql`
 ` as unknown as DocumentNode<
   PetitionMessages_updatePetitionMutation,
   PetitionMessages_updatePetitionMutationVariables
+>;
+export const DowJonesFieldPreview_createDowJonesKycReplyDocument = gql`
+  mutation DowJonesFieldPreview_createDowJonesKycReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $profileId: ID!
+  ) {
+    createDowJonesKycReply(petitionId: $petitionId, fieldId: $fieldId, profileId: $profileId) {
+      id
+      field {
+        id
+        replies {
+          id
+          content
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DowJonesFieldPreview_createDowJonesKycReplyMutation,
+  DowJonesFieldPreview_createDowJonesKycReplyMutationVariables
+>;
+export const DowJonesFieldPreview_deletePetitionFieldReplyDocument = gql`
+  mutation DowJonesFieldPreview_deletePetitionFieldReply($petitionId: GID!, $replyId: GID!) {
+    deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+      id
+      replies {
+        id
+        content
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DowJonesFieldPreview_deletePetitionFieldReplyMutation,
+  DowJonesFieldPreview_deletePetitionFieldReplyMutationVariables
 >;
 export const DowJonesFieldPreview_petitionFieldDocument = gql`
   query DowJonesFieldPreview_petitionField($petitionId: GID!, $petitionFieldId: GID!) {
