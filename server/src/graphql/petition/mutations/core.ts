@@ -839,7 +839,7 @@ export const createPetitionField = mutationField("createPetitionField", {
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     ifArgEquals("type", "ES_TAX_DOCUMENTS", userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD")),
-    ifArgEquals("type", "DOW_JONES_KYC_RESEARCH", userHasFeatureFlag("DOW_JONES_KYC")),
+    ifArgEquals("type", "DOW_JONES_KYC", userHasFeatureFlag("DOW_JONES_KYC")),
     petitionIsNotAnonymized("petitionId")
   ),
   args: {
@@ -1674,7 +1674,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     ifArgEquals("type", "ES_TAX_DOCUMENTS", userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD")),
-    ifArgEquals("type", "DOW_JONES_KYC_RESEARCH", userHasFeatureFlag("DOW_JONES_KYC")),
+    ifArgEquals("type", "DOW_JONES_KYC", userHasFeatureFlag("DOW_JONES_KYC")),
     petitionIsNotAnonymized("petitionId")
   ),
   args: {

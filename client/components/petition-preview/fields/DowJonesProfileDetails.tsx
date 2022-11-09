@@ -28,7 +28,7 @@ import {
   DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment,
   DowJonesRiskEntityProfileResultEntity,
   DowJonesRiskEntityProfileResultPerson,
-  DowJonesSearchResult_createDowJonesKycResearchReplyDocument,
+  DowJonesSearchResult_createDowJonesKycReplyDocument,
   DowJonesSearchResult_deletePetitionFieldReplyDocument,
   Maybe,
 } from "@parallel/graphql/__types";
@@ -70,13 +70,13 @@ export function DowJonesProfileDetails({
     }
   );
 
-  const [createDowJonesKycResearchReply, { loading: isSavingProfile }] = useMutation(
-    DowJonesSearchResult_createDowJonesKycResearchReplyDocument
+  const [createDowJonesKycReply, { loading: isSavingProfile }] = useMutation(
+    DowJonesSearchResult_createDowJonesKycReplyDocument
   );
 
   const handleSaveClick = async () => {
     try {
-      await createDowJonesKycResearchReply({
+      await createDowJonesKycReply({
         variables: {
           profileId: id,
           petitionId,
@@ -129,8 +129,8 @@ export function DowJonesProfileDetails({
   },
   []);
 
-  const sanctionsColumns = useDowJonesFactivaSanctionsColumns();
-  const relationshipsColumns = useDowJonesFactivaRelationshipsColumns();
+  const sanctionsColumns = useDowJonesKycSanctionsColumns();
+  const relationshipsColumns = useDowJonesKycRelationshipsColumns();
   const downloadDowJonesProfilePdf = useDowJonesProfileDownloadTask();
   return (
     <Stack paddingX={6} paddingY={5} spacing={6}>
@@ -539,7 +539,7 @@ function ProfileResultEntity({ data }: { data: DowJonesRiskEntityProfileResultEn
   );
 }
 
-function useDowJonesFactivaSanctionsColumns() {
+function useDowJonesKycSanctionsColumns() {
   const intl = useIntl();
 
   return useMemo<TableColumn<DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment>[]>(
@@ -577,7 +577,7 @@ function useDowJonesFactivaSanctionsColumns() {
   );
 }
 
-function useDowJonesFactivaRelationshipsColumns() {
+function useDowJonesKycRelationshipsColumns() {
   const intl = useIntl();
 
   return useMemo<TableColumn<DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment>[]>(

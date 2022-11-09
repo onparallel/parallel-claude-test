@@ -36,7 +36,7 @@ export const PetitionFieldTypeIcon = chakraForwardRef<"svg", PetitionFieldTypeIc
         DATE: FieldDateIcon,
         PHONE: FieldPhoneIcon,
         ES_TAX_DOCUMENTS: FieldTaxDocumentsIcon,
-        DOW_JONES_KYC_RESEARCH: DowJonesIcon,
+        DOW_JONES_KYC: DowJonesIcon,
       } as Record<PetitionFieldType, ElementType>
     )[type];
     return <Icon as={icon} {...props} ref={ref} />;

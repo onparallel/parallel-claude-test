@@ -60,7 +60,7 @@ export type FieldOptions = {
     };
   };
   DATE: {};
-  DOW_JONES_KYC_RESEARCH: {};
+  DOW_JONES_KYC: {};
 };
 
 export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
@@ -122,7 +122,7 @@ export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
           id: "petition.field-type.tax-documents",
           defaultMessage: "Tax documents",
         });
-      case "DOW_JONES_KYC_RESEARCH":
+      case "DOW_JONES_KYC":
         return intl.formatMessage({
           id: "petition.field-type.dow-jones-kyc-research",
           defaultMessage: "Search in Dow Jones",
@@ -148,7 +148,7 @@ export function usePetitionFieldTypeColor(type: PetitionFieldType) {
       PHONE: theme.colors.orange[400],
       DATE: theme.colors.orange[300],
       ES_TAX_DOCUMENTS: theme.colors.teal[500],
-      DOW_JONES_KYC_RESEARCH: "#48A3D3",
+      DOW_JONES_KYC: "#48A3D3",
     } as Record<PetitionFieldType, string>
   )[type];
 }

@@ -46,7 +46,7 @@ export function PetitionComposeFieldSettings({
 }: PetitionComposeFieldSettingsProps) {
   const intl = useIntl();
 
-  const isOnlyInternal = field.type === "DOW_JONES_KYC_RESEARCH";
+  const isOnlyInternal = field.type === "DOW_JONES_KYC";
 
   const commonSettings = (
     <>
@@ -160,7 +160,7 @@ export function PetitionComposeFieldSettings({
       )}
 
       {!field.isReadOnly &&
-        !["CHECKBOX", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC_RESEARCH"].includes(field.type) && (
+        !["CHECKBOX", "ES_TAX_DOCUMENTS", "DOW_JONES_KYC"].includes(field.type) && (
           <SettingsRow
             isDisabled={isReadOnly}
             label={

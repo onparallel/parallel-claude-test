@@ -199,7 +199,7 @@ const SCHEMAS = {
       },
     },
   },
-  DOW_JONES_KYC_RESEARCH: {
+  DOW_JONES_KYC: {
     type: "object",
     additionalProperties: false,
     properties: {},
@@ -237,7 +237,7 @@ export function defaultFieldOptions(
       ? false
       : type === "HEADING" // HEADING always false
       ? false
-      : type === "DOW_JONES_KYC_RESEARCH" // DOW_JONES_KYC_RESEARCH always true
+      : type === "DOW_JONES_KYC" // DOW_JONES_KYC always true
       ? true
       : field?.type === "FILE_UPLOAD" // Inherit if not coming from a FILE_UPLOAD
       ? false
@@ -277,7 +277,7 @@ export function defaultFieldOptions(
           format: null,
         };
       }
-      case "DOW_JONES_KYC_RESEARCH":
+      case "DOW_JONES_KYC":
       case "DATE": {
         return {};
       }
@@ -346,7 +346,7 @@ export function defaultFieldOptions(
   return {
     optional,
     multiple,
-    is_internal: type === "DOW_JONES_KYC_RESEARCH" ? true : field?.is_internal ?? false,
+    is_internal: type === "DOW_JONES_KYC" ? true : field?.is_internal ?? false,
     show_in_pdf: field?.show_in_pdf ?? true,
     alias,
     has_comments_enabled: type === "HEADING" ? false : true,

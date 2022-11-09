@@ -440,13 +440,13 @@ export interface NexusGenObjects {
     connectionType: string; // String!
     iconHints: string[]; // [String!]!
     name?: string | null; // String
-    profileId: number; // Int!
+    profileId: string; // ID!
     type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
   };
   DowJonesRiskEntitySanction: {
     // root type
     fromDate?: NexusGenRootTypes["DowJonesRiskEntityDate"] | null; // DowJonesRiskEntityDate
-    id: number; // Int!
+    id: string; // ID!
     name: string; // String!
     sources: string[]; // [String!]!
   };
@@ -1017,13 +1017,13 @@ export interface NexusGenFieldTypes {
     connectionType: string; // String!
     iconHints: string[]; // [String!]!
     name: string | null; // String
-    profileId: number; // Int!
+    profileId: string; // ID!
     type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
   };
   DowJonesRiskEntitySanction: {
     // field return type
     fromDate: NexusGenRootTypes["DowJonesRiskEntityDate"] | null; // DowJonesRiskEntityDate
-    id: number; // Int!
+    id: string; // ID!
     name: string; // String!
     sources: string[]; // [String!]!
   };
@@ -1220,8 +1220,8 @@ export interface NexusGenFieldTypes {
     closePetition: NexusGenRootTypes["Petition"]; // Petition!
     completePetition: NexusGenRootTypes["Petition"]; // Petition!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
-    createDowJonesFactivaIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
-    createDowJonesKycResearchReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
+    createDowJonesKycIntegration: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
+    createDowJonesKycReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createDowJonesProfileDownloadTask: NexusGenRootTypes["Task"]; // Task!
     createEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     createExportExcelTask: NexusGenRootTypes["Task"]; // Task!
@@ -1248,7 +1248,7 @@ export interface NexusGenFieldTypes {
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     deactivateUser: NexusGenRootTypes["User"][]; // [User!]!
     deleteContacts: NexusGenEnums["Result"]; // Result!
-    deleteDowJonesFactivaIntegration: NexusGenRootTypes["Organization"]; // Organization!
+    deleteDowJonesKycIntegration: NexusGenRootTypes["Organization"]; // Organization!
     deleteEventSubscriptions: NexusGenEnums["Result"]; // Result!
     deleteOrganizationPdfDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
     deletePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -1360,7 +1360,7 @@ export interface NexusGenFieldTypes {
     uploadDynamicSelectFieldFile: NexusGenRootTypes["PetitionField"]; // PetitionField!
     uploadUserAvatar: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     userSignUp: NexusGenRootTypes["User"]; // User!
-    validateDowJonesFactivaCredentials: boolean; // Boolean!
+    validateDowJonesKycCredentials: boolean; // Boolean!
     validateSignatureCredentials: NexusGenRootTypes["ValidateSignatureCredentialsResult"]; // ValidateSignatureCredentialsResult!
     verifyPublicAccess: NexusGenRootTypes["PublicAccessVerification"]; // PublicAccessVerification!
   };
@@ -2718,13 +2718,13 @@ export interface NexusGenFieldTypeNames {
     connectionType: "String";
     iconHints: "String";
     name: "String";
-    profileId: "Int";
+    profileId: "ID";
     type: "DowJonesRiskEntityType";
   };
   DowJonesRiskEntitySanction: {
     // field return type name
     fromDate: "DowJonesRiskEntityDate";
-    id: "Int";
+    id: "ID";
     name: "String";
     sources: "String";
   };
@@ -2921,8 +2921,8 @@ export interface NexusGenFieldTypeNames {
     closePetition: "Petition";
     completePetition: "Petition";
     createContact: "Contact";
-    createDowJonesFactivaIntegration: "OrgIntegration";
-    createDowJonesKycResearchReply: "PetitionFieldReply";
+    createDowJonesKycIntegration: "OrgIntegration";
+    createDowJonesKycReply: "PetitionFieldReply";
     createDowJonesProfileDownloadTask: "Task";
     createEventSubscription: "PetitionEventSubscription";
     createExportExcelTask: "Task";
@@ -2949,7 +2949,7 @@ export interface NexusGenFieldTypeNames {
     deactivateAccesses: "PetitionAccess";
     deactivateUser: "User";
     deleteContacts: "Result";
-    deleteDowJonesFactivaIntegration: "Organization";
+    deleteDowJonesKycIntegration: "Organization";
     deleteEventSubscriptions: "Result";
     deleteOrganizationPdfDocumentTheme: "Organization";
     deletePetition: "SupportMethodResponse";
@@ -3061,7 +3061,7 @@ export interface NexusGenFieldTypeNames {
     uploadDynamicSelectFieldFile: "PetitionField";
     uploadUserAvatar: "SupportMethodResponse";
     userSignUp: "User";
-    validateDowJonesFactivaCredentials: "Boolean";
+    validateDowJonesKycCredentials: "Boolean";
     validateSignatureCredentials: "ValidateSignatureCredentialsResult";
     verifyPublicAccess: "PublicAccessVerification";
   };
@@ -4361,13 +4361,13 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["CreateContactInput"]; // CreateContactInput!
     };
-    createDowJonesFactivaIntegration: {
+    createDowJonesKycIntegration: {
       // args
       clientId: string; // String!
       password: string; // String!
       username: string; // String!
     };
-    createDowJonesKycResearchReply: {
+    createDowJonesKycReply: {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
@@ -5160,7 +5160,7 @@ export interface NexusGenArgTypes {
       position?: string | null; // String
       role?: string | null; // String
     };
-    validateDowJonesFactivaCredentials: {
+    validateDowJonesKycCredentials: {
       // args
       clientId: string; // String!
       password: string; // String!

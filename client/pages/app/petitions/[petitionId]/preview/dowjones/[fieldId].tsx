@@ -125,7 +125,7 @@ DowJonesFieldPreview.getInitialProps = async ({ query, fetchQuery }: WithApolloD
     }),
   ]);
 
-  if (petitionField.type !== "DOW_JONES_KYC_RESEARCH") {
+  if (petitionField.type !== "DOW_JONES_KYC") {
     throw new Error("FORBIDDEN");
   }
 

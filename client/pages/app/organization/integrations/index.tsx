@@ -28,8 +28,8 @@ import {
   IntegrationSwitchCardProps,
 } from "@parallel/components/organization/IntegrationSwitchCard";
 import {
-  OrganizationIntegrations_createDowJonesFactivaIntegrationDocument,
-  OrganizationIntegrations_deleteDowJonesFactivaIntegrationDocument,
+  OrganizationIntegrations_createDowJonesKycIntegrationDocument,
+  OrganizationIntegrations_deleteDowJonesKycIntegrationDocument,
   OrganizationIntegrations_userDocument,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
@@ -54,11 +54,11 @@ function OrganizationIntegrations() {
   const hasDownJones = me.organization.hasDowJones;
   const hasErrorDownJones = me.organization.integrations.items[0]?.invalidCredentials;
 
-  const [createDowJonesFactivaIntegration] = useMutation(
-    OrganizationIntegrations_createDowJonesFactivaIntegrationDocument
+  const [createDowJonesKycIntegration] = useMutation(
+    OrganizationIntegrations_createDowJonesKycIntegrationDocument
   );
-  const [deleteDowJonesFactivaIntegration] = useMutation(
-    OrganizationIntegrations_deleteDowJonesFactivaIntegrationDocument
+  const [deleteDowJonesKycIntegration] = useMutation(
+    OrganizationIntegrations_deleteDowJonesKycIntegrationDocument
   );
 
   const showDeactivateDowJonesIntegrationDialog = useDeactivateDowJonesIntegrationDialog();
@@ -67,7 +67,7 @@ function OrganizationIntegrations() {
     if (isChecked) {
       try {
         const data = await showDowJonesIntegrationDialog();
-        await createDowJonesFactivaIntegration({
+        await createDowJonesKycIntegration({
           variables: {
             ...data,
           },
@@ -77,7 +77,7 @@ function OrganizationIntegrations() {
     } else {
       try {
         await showDeactivateDowJonesIntegrationDialog();
-        await deleteDowJonesFactivaIntegration();
+        await deleteDowJonesKycIntegration();
       } catch {}
     }
   };
@@ -291,23 +291,19 @@ OrganizationIntegrations.queries = [
 
 OrganizationIntegrations.mutations = [
   gql`
-    mutation OrganizationIntegrations_createDowJonesFactivaIntegration(
+    mutation OrganizationIntegrations_createDowJonesKycIntegration(
       $clientId: String!
       $username: String!
       $password: String!
     ) {
-      createDowJonesFactivaIntegration(
-        clientId: $clientId
-        username: $username
-        password: $password
-      ) {
+      createDowJonesKycIntegration(clientId: $clientId, username: $username, password: $password) {
         id
       }
     }
   `,
   gql`
-    mutation OrganizationIntegrations_deleteDowJonesFactivaIntegration {
-      deleteDowJonesFactivaIntegration {
+    mutation OrganizationIntegrations_deleteDowJonesKycIntegration {
+      deleteDowJonesKycIntegration {
         id
         hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
       }

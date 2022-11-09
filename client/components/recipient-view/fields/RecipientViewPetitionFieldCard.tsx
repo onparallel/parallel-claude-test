@@ -127,7 +127,7 @@ export function RecipientViewPetitionFieldCard({
               defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
               values={{ count: fieldReplies.length }}
             />
-          ) : field.type === "DOW_JONES_KYC_RESEARCH" ? (
+          ) : field.type === "DOW_JONES_KYC" ? (
             <>
               {fieldReplies.length ? (
                 <FormattedMessage

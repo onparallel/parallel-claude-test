@@ -403,7 +403,7 @@ export const bulkCreatePetitionReplies = mutationField("bulkCreatePetitionReplie
   },
 });
 
-export const createDowJonesKycResearchReply = mutationField("createDowJonesKycResearchReply", {
+export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
   description: "Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document",
   type: "PetitionFieldReply",
   args: {
@@ -416,7 +416,7 @@ export const createDowJonesKycResearchReply = mutationField("createDowJonesKycRe
     userHasFeatureFlag("DOW_JONES_KYC"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
-    fieldHasType("fieldId", ["DOW_JONES_KYC_RESEARCH"]),
+    fieldHasType("fieldId", ["DOW_JONES_KYC"]),
     fieldCanBeReplied("fieldId"),
     petitionIsNotAnonymized("petitionId")
   ),
@@ -455,7 +455,7 @@ export const createDowJonesKycResearchReply = mutationField("createDowJonesKycRe
         {
           petition_field_id: args.fieldId,
           user_id: ctx.user!.id,
-          type: "DOW_JONES_KYC_RESEARCH",
+          type: "DOW_JONES_KYC",
           content: {
             file_upload_id: fileUpload.id,
             entity: {

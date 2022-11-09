@@ -177,30 +177,27 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
   },
 });
 
-export const validateDowJonesFactivaCredentials = mutationField(
-  "validateDowJonesFactivaCredentials",
-  {
-    description: "Tries to get an access_token with provided credentials",
-    type: "Boolean",
-    authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("DOW_JONES_KYC")),
-    args: {
-      clientId: nonNull(stringArg()),
-      username: nonNull(stringArg()),
-      password: nonNull(stringArg()),
-    },
-    validateArgs: validEmail((args) => args.username, "username", true),
-    resolve: async (_, args, ctx) => {
-      try {
-        await ctx.dowJonesKyc.fetchCredentials(args.clientId, args.username, args.password);
-        return true;
-      } catch {
-        return false;
-      }
-    },
-  }
-);
+export const validateDowJonesKycCredentials = mutationField("validateDowJonesKycCredentials", {
+  description: "Tries to get an access_token with provided credentials",
+  type: "Boolean",
+  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("DOW_JONES_KYC")),
+  args: {
+    clientId: nonNull(stringArg()),
+    username: nonNull(stringArg()),
+    password: nonNull(stringArg()),
+  },
+  validateArgs: validEmail((args) => args.username, "username", true),
+  resolve: async (_, args, ctx) => {
+    try {
+      await ctx.dowJonesKyc.fetchCredentials(args.clientId, args.username, args.password);
+      return true;
+    } catch {
+      return false;
+    }
+  },
+});
 
-export const createDowJonesFactivaIntegration = mutationField("createDowJonesFactivaIntegration", {
+export const createDowJonesKycIntegration = mutationField("createDowJonesKycIntegration", {
   description: "Creates a new DOW JONES Factiva integration on the user's organization",
   type: nonNull("OrgIntegration"),
   authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("DOW_JONES_KYC")),
@@ -250,7 +247,7 @@ export const createDowJonesFactivaIntegration = mutationField("createDowJonesFac
   },
 });
 
-export const deleteDowJonesFactivaIntegration = mutationField("deleteDowJonesFactivaIntegration", {
+export const deleteDowJonesKycIntegration = mutationField("deleteDowJonesKycIntegration", {
   description: "Removes the DOW JONES integration of the user's organization",
   type: nonNull("Organization"),
   authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("DOW_JONES_KYC")),

@@ -12,7 +12,7 @@ import {
 import { ArrowForwardIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { DowJonesIntegrationDialog_validateDowJonesFactivaCredentialsDocument } from "@parallel/graphql/__types";
+import { DowJonesIntegrationDialog_validateDowJonesKycCredentialsDocument } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { isNotEmptyText } from "@parallel/utils/strings";
 import { useEffect, useRef, useState } from "react";
@@ -57,7 +57,7 @@ export function DowJonesIntegrationDialog({
   });
 
   const [validateIntegration] = useMutation(
-    DowJonesIntegrationDialog_validateDowJonesFactivaCredentialsDocument
+    DowJonesIntegrationDialog_validateDowJonesKycCredentialsDocument
   );
 
   return (
@@ -73,7 +73,7 @@ export function DowJonesIntegrationDialog({
               },
             });
 
-            if (res.data?.validateDowJonesFactivaCredentials) {
+            if (res.data?.validateDowJonesKycCredentials) {
               props.onResolve(data);
             } else {
               reset(undefined, {
@@ -184,16 +184,12 @@ export function useDowJonesIntegrationDialog() {
 
 DowJonesIntegrationDialog.mutations = [
   gql`
-    mutation DowJonesIntegrationDialog_validateDowJonesFactivaCredentials(
+    mutation DowJonesIntegrationDialog_validateDowJonesKycCredentials(
       $clientId: String!
       $username: String!
       $password: String!
     ) {
-      validateDowJonesFactivaCredentials(
-        clientId: $clientId
-        username: $username
-        password: $password
-      )
+      validateDowJonesKycCredentials(clientId: $clientId, username: $username, password: $password)
     }
   `,
 ];

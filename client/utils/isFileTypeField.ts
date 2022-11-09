@@ -1,5 +1,5 @@
 import { PetitionFieldType } from "@parallel/graphql/__types";
 
 export function isFileTypeField(type: PetitionFieldType) {
-  return type === "FILE_UPLOAD" || type === "ES_TAX_DOCUMENTS" || type === "DOW_JONES_KYC_RESEARCH";
+  return type === "FILE_UPLOAD" || type === "ES_TAX_DOCUMENTS" || type === "DOW_JONES_KYC";
 }

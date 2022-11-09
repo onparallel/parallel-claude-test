@@ -489,7 +489,7 @@ export const PetitionFieldType = enumType({
     { name: "DATE", description: "A datepicker field." },
     { name: "PHONE", description: "A phone formatted field." },
     { name: "ES_TAX_DOCUMENTS", description: "A tax documents/info field." },
-    { name: "DOW_JONES_KYC_RESEARCH", description: "A saerch in Dow Jones field." },
+    { name: "DOW_JONES_KYC", description: "A saerch in Dow Jones field." },
   ],
 });
 
@@ -862,7 +862,7 @@ export const PetitionFieldReply = objectType({
                 contentType: file.content_type,
                 extension: extension(file.content_type) || null,
                 uploadComplete: file.upload_complete,
-                ...(root.type === "DOW_JONES_KYC_RESEARCH" ? { entity: root.content.entity } : {}),
+                ...(root.type === "DOW_JONES_KYC" ? { entity: root.content.entity } : {}),
               }
             : {};
         } else {

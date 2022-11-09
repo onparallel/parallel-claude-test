@@ -576,9 +576,9 @@ export type Mutation = {
   /** Create a contact. */
   createContact: Contact;
   /** Creates a new DOW JONES Factiva integration on the user's organization */
-  createDowJonesFactivaIntegration: OrgIntegration;
+  createDowJonesKycIntegration: OrgIntegration;
   /** Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document */
-  createDowJonesKycResearchReply: PetitionFieldReply;
+  createDowJonesKycReply: PetitionFieldReply;
   /** Creates a task for downloading a PDF file with the profile of an entity in DowJones */
   createDowJonesProfileDownloadTask: Task;
   /** Creates an event subscription for the user's petitions */
@@ -632,7 +632,7 @@ export type Mutation = {
   /** Delete contacts. */
   deleteContacts: Result;
   /** Removes the DOW JONES integration of the user's organization */
-  deleteDowJonesFactivaIntegration: Organization;
+  deleteDowJonesKycIntegration: Organization;
   /** Deletes event subscriptions */
   deleteEventSubscriptions: Result;
   deleteOrganizationPdfDocumentTheme: Organization;
@@ -856,7 +856,7 @@ export type Mutation = {
   /** Triggered by new users that want to sign up into Parallel */
   userSignUp: User;
   /** Tries to get an access_token with provided credentials */
-  validateDowJonesFactivaCredentials: Scalars["Boolean"];
+  validateDowJonesKycCredentials: Scalars["Boolean"];
   /** Runs backend checks to validate signature credentials. */
   validateSignatureCredentials: ValidateSignatureCredentialsResult;
   verifyPublicAccess: PublicAccessVerification;
@@ -955,13 +955,13 @@ export type MutationcreateContactArgs = {
   data: CreateContactInput;
 };
 
-export type MutationcreateDowJonesFactivaIntegrationArgs = {
+export type MutationcreateDowJonesKycIntegrationArgs = {
   clientId: Scalars["String"];
   password: Scalars["String"];
   username: Scalars["String"];
 };
 
-export type MutationcreateDowJonesKycResearchReplyArgs = {
+export type MutationcreateDowJonesKycReplyArgs = {
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
   profileId: Scalars["ID"];
@@ -1754,7 +1754,7 @@ export type MutationuserSignUpArgs = {
   role?: InputMaybe<Scalars["String"]>;
 };
 
-export type MutationvalidateDowJonesFactivaCredentialsArgs = {
+export type MutationvalidateDowJonesKycCredentialsArgs = {
   clientId: Scalars["String"];
   password: Scalars["String"];
   username: Scalars["String"];
@@ -2537,7 +2537,7 @@ export type PetitionFieldType =
   /** A datepicker field. */
   | "DATE"
   /** A saerch in Dow Jones field. */
-  | "DOW_JONES_KYC_RESEARCH"
+  | "DOW_JONES_KYC"
   /** A dynamic select field. */
   | "DYNAMIC_SELECT"
   /** A tax documents/info field. */

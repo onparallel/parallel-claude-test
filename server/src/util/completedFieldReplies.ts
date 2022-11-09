@@ -27,7 +27,7 @@ export function completedFieldReplies(field: PartialField) {
       });
     case "FILE_UPLOAD":
     case "ES_TAX_DOCUMENTS":
-    case "DOW_JONES_KYC_RESEARCH":
+    case "DOW_JONES_KYC":
       return field.replies.filter((reply) => reply.content.uploadComplete);
 
     default:

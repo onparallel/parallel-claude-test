@@ -269,14 +269,14 @@ export interface DowJonesRiskEntityRelationship {
   connectionType: Scalars["String"];
   iconHints: Array<Scalars["String"]>;
   name?: Maybe<Scalars["String"]>;
-  profileId: Scalars["Int"];
+  profileId: Scalars["ID"];
   type: DowJonesRiskEntityType;
 }
 
 export interface DowJonesRiskEntitySanction {
   __typename?: "DowJonesRiskEntitySanction";
   fromDate?: Maybe<DowJonesRiskEntityDate>;
-  id: Scalars["Int"];
+  id: Scalars["ID"];
   name: Scalars["String"];
   sources: Array<Scalars["String"]>;
 }
@@ -621,9 +621,9 @@ export interface Mutation {
   /** Create a contact. */
   createContact: Contact;
   /** Creates a new DOW JONES Factiva integration on the user's organization */
-  createDowJonesFactivaIntegration: OrgIntegration;
+  createDowJonesKycIntegration: OrgIntegration;
   /** Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document */
-  createDowJonesKycResearchReply: PetitionFieldReply;
+  createDowJonesKycReply: PetitionFieldReply;
   /** Creates a task for downloading a PDF file with the profile of an entity in DowJones */
   createDowJonesProfileDownloadTask: Task;
   /** Creates an event subscription for the user's petitions */
@@ -677,7 +677,7 @@ export interface Mutation {
   /** Delete contacts. */
   deleteContacts: Result;
   /** Removes the DOW JONES integration of the user's organization */
-  deleteDowJonesFactivaIntegration: Organization;
+  deleteDowJonesKycIntegration: Organization;
   /** Deletes event subscriptions */
   deleteEventSubscriptions: Result;
   deleteOrganizationPdfDocumentTheme: Organization;
@@ -901,7 +901,7 @@ export interface Mutation {
   /** Triggered by new users that want to sign up into Parallel */
   userSignUp: User;
   /** Tries to get an access_token with provided credentials */
-  validateDowJonesFactivaCredentials: Scalars["Boolean"];
+  validateDowJonesKycCredentials: Scalars["Boolean"];
   /** Runs backend checks to validate signature credentials. */
   validateSignatureCredentials: ValidateSignatureCredentialsResult;
   verifyPublicAccess: PublicAccessVerification;
@@ -1000,13 +1000,13 @@ export interface MutationcreateContactArgs {
   data: CreateContactInput;
 }
 
-export interface MutationcreateDowJonesFactivaIntegrationArgs {
+export interface MutationcreateDowJonesKycIntegrationArgs {
   clientId: Scalars["String"];
   password: Scalars["String"];
   username: Scalars["String"];
 }
 
-export interface MutationcreateDowJonesKycResearchReplyArgs {
+export interface MutationcreateDowJonesKycReplyArgs {
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
   profileId: Scalars["ID"];
@@ -1799,7 +1799,7 @@ export interface MutationuserSignUpArgs {
   role?: InputMaybe<Scalars["String"]>;
 }
 
-export interface MutationvalidateDowJonesFactivaCredentialsArgs {
+export interface MutationvalidateDowJonesKycCredentialsArgs {
   clientId: Scalars["String"];
   password: Scalars["String"];
   username: Scalars["String"];
@@ -2621,7 +2621,7 @@ export type PetitionFieldType =
   /** A datepicker field. */
   | "DATE"
   /** A saerch in Dow Jones field. */
-  | "DOW_JONES_KYC_RESEARCH"
+  | "DOW_JONES_KYC"
   /** A dynamic select field. */
   | "DYNAMIC_SELECT"
   /** A tax documents/info field. */
@@ -6115,6 +6115,16 @@ export type CreateUserDialog_emailIsAvailableQueryVariables = Exact<{
 }>;
 
 export type CreateUserDialog_emailIsAvailableQuery = { emailIsAvailable: boolean };
+
+export type DowJonesIntegrationDialog_validateDowJonesKycCredentialsMutationVariables = Exact<{
+  clientId: Scalars["String"];
+  username: Scalars["String"];
+  password: Scalars["String"];
+}>;
+
+export type DowJonesIntegrationDialog_validateDowJonesKycCredentialsMutation = {
+  validateDowJonesKycCredentials: boolean;
+};
 
 export type EmailEventsIndicator_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
@@ -10830,7 +10840,7 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery = {
 
 export type DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment = {
   __typename?: "DowJonesRiskEntitySanction";
-  id: number;
+  id: string;
   name: string;
   sources: Array<string>;
   fromDate?: {
@@ -10843,7 +10853,7 @@ export type DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment = {
 
 export type DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment = {
   __typename?: "DowJonesRiskEntityRelationship";
-  profileId: number;
+  profileId: string;
   connectionType: string;
   iconHints: Array<string>;
   name?: string | null;
@@ -10866,7 +10876,7 @@ export type DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskE
     } | null;
     sanctions: Array<{
       __typename?: "DowJonesRiskEntitySanction";
-      id: number;
+      id: string;
       name: string;
       sources: Array<string>;
       fromDate?: {
@@ -10878,7 +10888,7 @@ export type DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskE
     }>;
     relationships: Array<{
       __typename?: "DowJonesRiskEntityRelationship";
-      profileId: number;
+      profileId: string;
       connectionType: string;
       iconHints: Array<string>;
       name?: string | null;
@@ -10923,7 +10933,7 @@ export type DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskE
     } | null;
     sanctions: Array<{
       __typename?: "DowJonesRiskEntitySanction";
-      id: number;
+      id: string;
       name: string;
       sources: Array<string>;
       fromDate?: {
@@ -10935,7 +10945,7 @@ export type DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskE
     }>;
     relationships: Array<{
       __typename?: "DowJonesRiskEntityRelationship";
-      profileId: number;
+      profileId: string;
       connectionType: string;
       iconHints: Array<string>;
       name?: string | null;
@@ -10968,7 +10978,7 @@ export type DowJonesProfileDetails_dowJonesRiskEntityProfileQuery = {
         } | null;
         sanctions: Array<{
           __typename?: "DowJonesRiskEntitySanction";
-          id: number;
+          id: string;
           name: string;
           sources: Array<string>;
           fromDate?: {
@@ -10980,7 +10990,7 @@ export type DowJonesProfileDetails_dowJonesRiskEntityProfileQuery = {
         }>;
         relationships: Array<{
           __typename?: "DowJonesRiskEntityRelationship";
-          profileId: number;
+          profileId: string;
           connectionType: string;
           iconHints: Array<string>;
           name?: string | null;
@@ -11023,7 +11033,7 @@ export type DowJonesProfileDetails_dowJonesRiskEntityProfileQuery = {
         } | null;
         sanctions: Array<{
           __typename?: "DowJonesRiskEntitySanction";
-          id: number;
+          id: string;
           name: string;
           sources: Array<string>;
           fromDate?: {
@@ -11035,7 +11045,7 @@ export type DowJonesProfileDetails_dowJonesRiskEntityProfileQuery = {
         }>;
         relationships: Array<{
           __typename?: "DowJonesRiskEntityRelationship";
-          profileId: number;
+          profileId: string;
           connectionType: string;
           iconHints: Array<string>;
           name?: string | null;
@@ -11132,14 +11142,14 @@ export type DowJonesSearchResult_dowJonesRiskEntitySearchQuery = {
   };
 };
 
-export type DowJonesSearchResult_createDowJonesKycResearchReplyMutationVariables = Exact<{
+export type DowJonesSearchResult_createDowJonesKycReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   fieldId: Scalars["GID"];
   profileId: Scalars["ID"];
 }>;
 
-export type DowJonesSearchResult_createDowJonesKycResearchReplyMutation = {
-  createDowJonesKycResearchReply: {
+export type DowJonesSearchResult_createDowJonesKycReplyMutation = {
+  createDowJonesKycReply: {
     __typename?: "PetitionFieldReply";
     id: string;
     field?: {
@@ -11171,7 +11181,7 @@ export type DowJonesSearchResult_deletePetitionFieldReplyMutation = {
   };
 };
 
-export type PreviewPetitionFieldKYCResearch_PetitionFieldFragment = {
+export type PreviewPetitionFieldKyc_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
@@ -14577,16 +14587,6 @@ export type OrganizationSettings_userQuery = {
   };
 };
 
-export type DowJonesIntegrationDialog_validateDowJonesFactivaCredentialsMutationVariables = Exact<{
-  clientId: Scalars["String"];
-  username: Scalars["String"];
-  password: Scalars["String"];
-}>;
-
-export type DowJonesIntegrationDialog_validateDowJonesFactivaCredentialsMutation = {
-  validateDowJonesFactivaCredentials: boolean;
-};
-
 export type OrganizationIntegrations_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationIntegrations_userQuery = {
@@ -14637,26 +14637,22 @@ export type OrganizationIntegrations_userQuery = {
   };
 };
 
-export type OrganizationIntegrations_createDowJonesFactivaIntegrationMutationVariables = Exact<{
+export type OrganizationIntegrations_createDowJonesKycIntegrationMutationVariables = Exact<{
   clientId: Scalars["String"];
   username: Scalars["String"];
   password: Scalars["String"];
 }>;
 
-export type OrganizationIntegrations_createDowJonesFactivaIntegrationMutation = {
-  createDowJonesFactivaIntegration: { __typename?: "OrgIntegration"; id: string };
+export type OrganizationIntegrations_createDowJonesKycIntegrationMutation = {
+  createDowJonesKycIntegration: { __typename?: "OrgIntegration"; id: string };
 };
 
-export type OrganizationIntegrations_deleteDowJonesFactivaIntegrationMutationVariables = Exact<{
+export type OrganizationIntegrations_deleteDowJonesKycIntegrationMutationVariables = Exact<{
   [key: string]: never;
 }>;
 
-export type OrganizationIntegrations_deleteDowJonesFactivaIntegrationMutation = {
-  deleteDowJonesFactivaIntegration: {
-    __typename?: "Organization";
-    id: string;
-    hasDowJones: boolean;
-  };
+export type OrganizationIntegrations_deleteDowJonesKycIntegrationMutation = {
+  deleteDowJonesKycIntegration: { __typename?: "Organization"; id: string; hasDowJones: boolean };
 };
 
 export type IntegrationsSignature_SignatureOrgIntegrationFragment = {
@@ -28371,8 +28367,8 @@ export const PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc = gql`
   }
   ${PetitionFieldComment_PetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<PreviewPetitionFieldCommentsDialog_PetitionFieldFragment, unknown>;
-export const PreviewPetitionFieldKYCResearch_PetitionFieldFragmentDoc = gql`
-  fragment PreviewPetitionFieldKYCResearch_PetitionField on PetitionField {
+export const PreviewPetitionFieldKyc_PetitionFieldFragmentDoc = gql`
+  fragment PreviewPetitionFieldKyc_PetitionField on PetitionField {
     id
     ...RecipientViewPetitionFieldCard_PetitionField
     petition {
@@ -28384,19 +28380,19 @@ export const PreviewPetitionFieldKYCResearch_PetitionFieldFragmentDoc = gql`
     }
   }
   ${RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<PreviewPetitionFieldKYCResearch_PetitionFieldFragment, unknown>;
+` as unknown as DocumentNode<PreviewPetitionFieldKyc_PetitionFieldFragment, unknown>;
 export const PreviewPetitionField_PetitionFieldFragmentDoc = gql`
   fragment PreviewPetitionField_PetitionField on PetitionField {
     ...RecipientViewPetitionFieldCard_PetitionField
     ...PreviewPetitionFieldCommentsDialog_PetitionField
-    ...PreviewPetitionFieldKYCResearch_PetitionField
+    ...PreviewPetitionFieldKyc_PetitionField
     previewReplies @client {
       ...RecipientViewPetitionFieldCard_PetitionFieldReply
     }
   }
   ${RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc}
   ${PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc}
-  ${PreviewPetitionFieldKYCResearch_PetitionFieldFragmentDoc}
+  ${PreviewPetitionFieldKyc_PetitionFieldFragmentDoc}
   ${RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<PreviewPetitionField_PetitionFieldFragment, unknown>;
 export const groupFieldsByPages_PetitionFieldFragmentDoc = gql`
@@ -30022,6 +30018,18 @@ export const CreateUserDialog_emailIsAvailableDocument = gql`
   CreateUserDialog_emailIsAvailableQuery,
   CreateUserDialog_emailIsAvailableQueryVariables
 >;
+export const DowJonesIntegrationDialog_validateDowJonesKycCredentialsDocument = gql`
+  mutation DowJonesIntegrationDialog_validateDowJonesKycCredentials(
+    $clientId: String!
+    $username: String!
+    $password: String!
+  ) {
+    validateDowJonesKycCredentials(clientId: $clientId, username: $username, password: $password)
+  }
+` as unknown as DocumentNode<
+  DowJonesIntegrationDialog_validateDowJonesKycCredentialsMutation,
+  DowJonesIntegrationDialog_validateDowJonesKycCredentialsMutationVariables
+>;
 export const AddPetitionAccessDialog_createPetitionAccessDocument = gql`
   mutation AddPetitionAccessDialog_createPetitionAccess($petitionId: GID!) {
     createPetitionAccess(petitionId: $petitionId) {
@@ -30800,17 +30808,13 @@ export const DowJonesSearchResult_dowJonesRiskEntitySearchDocument = gql`
   DowJonesSearchResult_dowJonesRiskEntitySearchQuery,
   DowJonesSearchResult_dowJonesRiskEntitySearchQueryVariables
 >;
-export const DowJonesSearchResult_createDowJonesKycResearchReplyDocument = gql`
-  mutation DowJonesSearchResult_createDowJonesKycResearchReply(
+export const DowJonesSearchResult_createDowJonesKycReplyDocument = gql`
+  mutation DowJonesSearchResult_createDowJonesKycReply(
     $petitionId: GID!
     $fieldId: GID!
     $profileId: ID!
   ) {
-    createDowJonesKycResearchReply(
-      petitionId: $petitionId
-      fieldId: $fieldId
-      profileId: $profileId
-    ) {
+    createDowJonesKycReply(petitionId: $petitionId, fieldId: $fieldId, profileId: $profileId) {
       id
       field {
         id
@@ -30822,8 +30826,8 @@ export const DowJonesSearchResult_createDowJonesKycResearchReplyDocument = gql`
     }
   }
 ` as unknown as DocumentNode<
-  DowJonesSearchResult_createDowJonesKycResearchReplyMutation,
-  DowJonesSearchResult_createDowJonesKycResearchReplyMutationVariables
+  DowJonesSearchResult_createDowJonesKycReplyMutation,
+  DowJonesSearchResult_createDowJonesKycReplyMutationVariables
 >;
 export const DowJonesSearchResult_deletePetitionFieldReplyDocument = gql`
   mutation DowJonesSearchResult_deletePetitionFieldReply($petitionId: GID!, $replyId: GID!) {
@@ -31936,22 +31940,6 @@ export const OrganizationSettings_userDocument = gql`
   OrganizationSettings_userQuery,
   OrganizationSettings_userQueryVariables
 >;
-export const DowJonesIntegrationDialog_validateDowJonesFactivaCredentialsDocument = gql`
-  mutation DowJonesIntegrationDialog_validateDowJonesFactivaCredentials(
-    $clientId: String!
-    $username: String!
-    $password: String!
-  ) {
-    validateDowJonesFactivaCredentials(
-      clientId: $clientId
-      username: $username
-      password: $password
-    )
-  }
-` as unknown as DocumentNode<
-  DowJonesIntegrationDialog_validateDowJonesFactivaCredentialsMutation,
-  DowJonesIntegrationDialog_validateDowJonesFactivaCredentialsMutationVariables
->;
 export const OrganizationIntegrations_userDocument = gql`
   query OrganizationIntegrations_user {
     ...SettingsLayout_Query
@@ -31977,34 +31965,30 @@ export const OrganizationIntegrations_userDocument = gql`
   OrganizationIntegrations_userQuery,
   OrganizationIntegrations_userQueryVariables
 >;
-export const OrganizationIntegrations_createDowJonesFactivaIntegrationDocument = gql`
-  mutation OrganizationIntegrations_createDowJonesFactivaIntegration(
+export const OrganizationIntegrations_createDowJonesKycIntegrationDocument = gql`
+  mutation OrganizationIntegrations_createDowJonesKycIntegration(
     $clientId: String!
     $username: String!
     $password: String!
   ) {
-    createDowJonesFactivaIntegration(
-      clientId: $clientId
-      username: $username
-      password: $password
-    ) {
+    createDowJonesKycIntegration(clientId: $clientId, username: $username, password: $password) {
       id
     }
   }
 ` as unknown as DocumentNode<
-  OrganizationIntegrations_createDowJonesFactivaIntegrationMutation,
-  OrganizationIntegrations_createDowJonesFactivaIntegrationMutationVariables
+  OrganizationIntegrations_createDowJonesKycIntegrationMutation,
+  OrganizationIntegrations_createDowJonesKycIntegrationMutationVariables
 >;
-export const OrganizationIntegrations_deleteDowJonesFactivaIntegrationDocument = gql`
-  mutation OrganizationIntegrations_deleteDowJonesFactivaIntegration {
-    deleteDowJonesFactivaIntegration {
+export const OrganizationIntegrations_deleteDowJonesKycIntegrationDocument = gql`
+  mutation OrganizationIntegrations_deleteDowJonesKycIntegration {
+    deleteDowJonesKycIntegration {
       id
       hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
     }
   }
 ` as unknown as DocumentNode<
-  OrganizationIntegrations_deleteDowJonesFactivaIntegrationMutation,
-  OrganizationIntegrations_deleteDowJonesFactivaIntegrationMutationVariables
+  OrganizationIntegrations_deleteDowJonesKycIntegrationMutation,
+  OrganizationIntegrations_deleteDowJonesKycIntegrationMutationVariables
 >;
 export const IntegrationsSignature_validateSignatureCredentialsDocument = gql`
   mutation IntegrationsSignature_validateSignatureCredentials(

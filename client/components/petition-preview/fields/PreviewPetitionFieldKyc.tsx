@@ -38,14 +38,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { PreviewPetitionFieldKYCResearch_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { PreviewPetitionFieldKyc_PetitionFieldFragment } from "@parallel/graphql/__types";
 
-export interface PreviewPetitionFieldKYCResearchProps
+export interface PreviewPetitionFieldKycProps
   extends Omit<
     RecipientViewPetitionFieldCardProps,
     "children" | "showAddNewReply" | "onAddNewReply"
   > {
-  field: PreviewPetitionFieldKYCResearch_PetitionFieldFragment;
+  field: PreviewPetitionFieldKyc_PetitionFieldFragment;
   isDisabled: boolean;
   onDeleteReply: (replyId: string) => void;
   onDownloadReply: (replyId: string) => void;
@@ -53,7 +53,7 @@ export interface PreviewPetitionFieldKYCResearchProps
   isCacheOnly?: boolean;
 }
 
-export function PreviewPetitionFieldKYCResearch({
+export function PreviewPetitionFieldKyc({
   field,
   isDisabled,
   isInvalid,
@@ -63,7 +63,7 @@ export function PreviewPetitionFieldKYCResearch({
   onCommentsButtonClick,
   onRefreshField,
   isCacheOnly,
-}: PreviewPetitionFieldKYCResearchProps) {
+}: PreviewPetitionFieldKycProps) {
   const tone = useTone();
   const intl = useIntl();
   const [state, setState] = useState<"IDLE" | "FETCHING">("IDLE");
@@ -319,9 +319,9 @@ export function KYCResearchFieldReplyProfile({
   );
 }
 
-PreviewPetitionFieldKYCResearch.fragments = {
+PreviewPetitionFieldKyc.fragments = {
   PetitionField: gql`
-    fragment PreviewPetitionFieldKYCResearch_PetitionField on PetitionField {
+    fragment PreviewPetitionFieldKyc_PetitionField on PetitionField {
       id
       ...RecipientViewPetitionFieldCard_PetitionField
       petition {

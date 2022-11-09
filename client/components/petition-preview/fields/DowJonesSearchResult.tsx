@@ -4,7 +4,7 @@ import { CheckIcon, DeleteIcon, SaveIcon } from "@parallel/chakra/icons";
 import { TableColumn } from "@parallel/components/common/Table";
 import { DowJonesHints } from "@parallel/components/petition-common/DowJonesHints";
 import {
-  DowJonesSearchResult_createDowJonesKycResearchReplyDocument,
+  DowJonesSearchResult_createDowJonesKycReplyDocument,
   DowJonesSearchResult_deletePetitionFieldReplyDocument,
   DowJonesSearchResult_dowJonesRiskEntitySearchDocument,
   DowJonesSearchResult_DowJonesRiskEntitySearchResultFragment,
@@ -27,7 +27,7 @@ const QUERY_STATE = {
 
 type FactivaSelection = DowJonesSearchResult_DowJonesRiskEntitySearchResultFragment;
 
-type DowJonesFactivaDataColumnsContext = {
+type DowJonesKycDataColumnsContext = {
   petitionId: string;
   fieldId: string;
   replies: DowJonesSearchResult_PetitionFieldReplyFragment[];
@@ -64,7 +64,7 @@ export function DowJonesSearchResult({
   );
 
   const result = data?.dowJonesRiskEntitySearch;
-  const columns = useDowJonesFactivaDataColumns();
+  const columns = useDowJonesKycDataColumns();
   const handleRowClick = useCallback(function (row: FactivaSelection) {
     setProfileId(row.profileId);
   }, []);
@@ -176,11 +176,11 @@ export function DowJonesSearchResult({
   );
 }
 
-function useDowJonesFactivaDataColumns() {
+function useDowJonesKycDataColumns() {
   const intl = useIntl();
   const showGenericErrorToast = useGenericErrorToast();
 
-  return useMemo<TableColumn<FactivaSelection, DowJonesFactivaDataColumnsContext>[]>(
+  return useMemo<TableColumn<FactivaSelection, DowJonesKycDataColumnsContext>[]>(
     () => [
       {
         key: "tags",
@@ -277,8 +277,8 @@ function useDowJonesFactivaDataColumns() {
         key: "actions",
         header: "",
         CellContent: ({ row, context }) => {
-          const [createDowJonesKycResearchReply, { loading: isSavingProfile }] = useMutation(
-            DowJonesSearchResult_createDowJonesKycResearchReplyDocument
+          const [createDowJonesKycReply, { loading: isSavingProfile }] = useMutation(
+            DowJonesSearchResult_createDowJonesKycReplyDocument
           );
           const [deletePetitionFieldReply] = useMutation(
             DowJonesSearchResult_deletePetitionFieldReplyDocument
@@ -289,7 +289,7 @@ function useDowJonesFactivaDataColumns() {
           );
           const handleSaveClick = async () => {
             try {
-              await createDowJonesKycResearchReply({
+              await createDowJonesKycReply({
                 variables: {
                   profileId: row.profileId,
                   petitionId: context.petitionId,
@@ -416,16 +416,12 @@ DowJonesSearchResult.queries = [
 
 const _mutations = [
   gql`
-    mutation DowJonesSearchResult_createDowJonesKycResearchReply(
+    mutation DowJonesSearchResult_createDowJonesKycReply(
       $petitionId: GID!
       $fieldId: GID!
       $profileId: ID!
     ) {
-      createDowJonesKycResearchReply(
-        petitionId: $petitionId
-        fieldId: $fieldId
-        profileId: $profileId
-      ) {
+      createDowJonesKycReply(petitionId: $petitionId, fieldId: $fieldId, profileId: $profileId) {
         id
         field {
           id

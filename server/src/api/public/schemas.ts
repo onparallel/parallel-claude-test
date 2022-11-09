@@ -269,7 +269,7 @@ const _PetitionField = {
         "DATE",
         "PHONE",
         "ES_TAX_DOCUMENTS",
-        "DOW_JONES_KYC_RESEARCH",
+        "DOW_JONES_KYC",
       ],
       description: "The type of the field",
       example: "TEXT",
@@ -480,7 +480,7 @@ const _Petition = {
       type: "object",
       description: outdent`
       If parameter \`include\` contains \`replies\`, this will be a key-value object where each key is a field alias and the value is the submitted replies on the field.
-      For FILE_UPLOAD, ES_TAX_DOCUMENTS and DOW_JONES_KYC_RESEARCH fields, the value will contain the \`replyId\`, with which you can use the [/download](#operation/DownloadFileReply) endpoint to download the file.
+      For FILE_UPLOAD, ES_TAX_DOCUMENTS and DOW_JONES_KYC fields, the value will contain the \`replyId\`, with which you can use the [/download](#operation/DownloadFileReply) endpoint to download the file.
       `,
       example: {
         firstName: "Robert Baratheon",
@@ -2023,7 +2023,7 @@ export const SubmitPetitionReplies = schema({
 
     If no field is found with the provided alias or the reply is invalid given the field type and options, that entry will be ignored.
 
-    \`HEADING\`, \`FILE_UPLOAD\`, \`ES_TAX_DOCUMENTS\`, and \`DOW_JONES_KYC_RESEARCH\` fields do not accept reply submission via this endpoint.
+    \`HEADING\`, \`FILE_UPLOAD\`, \`ES_TAX_DOCUMENTS\`, and \`DOW_JONES_KYC\` fields do not accept reply submission via this endpoint.
   `,
   example: {
     fullName: "Robert Baratheon",

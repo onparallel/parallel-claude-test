@@ -282,13 +282,13 @@ type DowJonesRiskEntityRelationship {
   connectionType: String!
   iconHints: [String!]!
   name: String
-  profileId: Int!
+  profileId: ID!
   type: DowJonesRiskEntityType!
 }
 
 type DowJonesRiskEntitySanction {
   fromDate: DowJonesRiskEntityDate
-  id: Int!
+  id: ID!
   name: String!
   sources: [String!]!
 }
@@ -773,7 +773,7 @@ type Mutation {
   """
   Creates a new DOW JONES Factiva integration on the user's organization
   """
-  createDowJonesFactivaIntegration(
+  createDowJonesKycIntegration(
     clientId: String!
     password: String!
     username: String!
@@ -782,11 +782,7 @@ type Mutation {
   """
   Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document
   """
-  createDowJonesKycResearchReply(
-    fieldId: GID!
-    petitionId: GID!
-    profileId: ID!
-  ): PetitionFieldReply!
+  createDowJonesKycReply(fieldId: GID!, petitionId: GID!, profileId: ID!): PetitionFieldReply!
 
   """
   Creates a task for downloading a PDF file with the profile of an entity in DowJones
@@ -1017,7 +1013,7 @@ type Mutation {
   """
   Removes the DOW JONES integration of the user's organization
   """
-  deleteDowJonesFactivaIntegration: Organization!
+  deleteDowJonesKycIntegration: Organization!
 
   """
   Deletes event subscriptions
@@ -1909,11 +1905,7 @@ type Mutation {
   """
   Tries to get an access_token with provided credentials
   """
-  validateDowJonesFactivaCredentials(
-    clientId: String!
-    password: String!
-    username: String!
-  ): Boolean!
+  validateDowJonesKycCredentials(clientId: String!, password: String!, username: String!): Boolean!
 
   """
   Runs backend checks to validate signature credentials.
@@ -3203,7 +3195,7 @@ enum PetitionFieldType {
   """
   A saerch in Dow Jones field.
   """
-  DOW_JONES_KYC_RESEARCH
+  DOW_JONES_KYC
 
   """
   A dynamic select field.

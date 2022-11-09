@@ -104,7 +104,7 @@ function mapFieldReplyContent(fieldType: PetitionFieldType, content: any) {
   switch (fieldType) {
     case "ES_TAX_DOCUMENTS":
     case "FILE_UPLOAD":
-    case "DOW_JONES_KYC_RESEARCH":
+    case "DOW_JONES_KYC":
       return content as {
         filename: string;
         contentType: string;
@@ -182,7 +182,7 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
         }
       case "FILE_UPLOAD":
       case "ES_TAX_DOCUMENTS":
-      case "DOW_JONES_KYC_RESEARCH":
+      case "DOW_JONES_KYC":
         if (replies.length > 1) {
           return replies.map((r) => ({ ...r.content, replyId: r.id, metadata: r.metadata }));
         } else {

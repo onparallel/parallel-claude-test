@@ -111,7 +111,7 @@ export function PetitionRepliesFieldReply({
               <HStack alignItems={"center"} gridGap={2} spacing={0}>
                 {reply.isAnonymized ? (
                   <ReplyNotAvailable type={reply.field!.type} />
-                ) : reply.field!.type === "DOW_JONES_KYC_RESEARCH" ? (
+                ) : reply.field!.type === "DOW_JONES_KYC" ? (
                   <HStack flexWrap="wrap" whiteSpace="break-spaces" spacing={0} gridGap={2}>
                     <VisuallyHidden>
                       {intl.formatMessage({

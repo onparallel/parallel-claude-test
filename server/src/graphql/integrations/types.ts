@@ -84,7 +84,7 @@ export const DowJonesRiskEntityDate = objectType({
 export const DowJonesRiskEntitySanction = objectType({
   name: "DowJonesRiskEntitySanction",
   definition(t) {
-    t.int("id");
+    t.id("id");
     t.string("name");
     t.list.string("sources");
     t.nullable.field("fromDate", { type: "DowJonesRiskEntityDate" });
@@ -94,7 +94,7 @@ export const DowJonesRiskEntitySanction = objectType({
 export const DowJonesRiskEntityRelationship = objectType({
   name: "DowJonesRiskEntityRelationship",
   definition(t) {
-    t.int("profileId");
+    t.id("profileId");
     t.string("connectionType");
     t.list.string("iconHints");
     t.nullable.string("name");

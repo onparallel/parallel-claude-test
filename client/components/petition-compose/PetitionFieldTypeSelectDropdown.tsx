@@ -80,7 +80,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
             "DATE",
             "PHONE",
             "NUMBER",
-            ...(user.hasDowJonesField ? ["DOW_JONES_KYC_RESEARCH"] : []),
+            ...(user.hasDowJonesField ? ["DOW_JONES_KYC"] : []),
             ...(user.hasEsTaxDocumentsField ? ["ES_TAX_DOCUMENTS"] : []),
             "DYNAMIC_SELECT",
           ] as PetitionFieldType[],
@@ -242,7 +242,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
                     id="component.petition-field-type-select-dropdown.tax-documents-description"
                     defaultMessage="Easily access and upload documents from the Spanish Tax Agency."
                   />
-                ) : activeType === "DOW_JONES_KYC_RESEARCH" ? (
+                ) : activeType === "DOW_JONES_KYC" ? (
                   <FormattedMessage
                     id="component.petition-field-type-select-dropdown.dow-jones-kyc-research-description"
                     defaultMessage="Easily search in Dow Jones to run a background check of an individual or legal entity."
