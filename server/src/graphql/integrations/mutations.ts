@@ -5,7 +5,6 @@ import { encrypt } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
-import { validEmail } from "../helpers/validators/validEmail";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { contextUserHasRole } from "../users/authorizers";
 import { userHasAccessToIntegrations } from "./authorizers";
@@ -205,7 +204,6 @@ export const createDowJonesKycIntegration = mutationField("createDowJonesKycInte
     username: nonNull(stringArg()),
     password: nonNull(stringArg()),
   },
-  validateArgs: validEmail((args) => args.username, "username", true),
   resolve: async (_, args, ctx) => {
     if (
       (await ctx.integrations.loadIntegrationsByOrgId(ctx.user!.org_id, "DOW_JONES_KYC")).length > 0
