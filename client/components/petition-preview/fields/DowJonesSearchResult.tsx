@@ -193,11 +193,7 @@ function useDowJonesKycDataColumns() {
           if (!iconHints || iconHints.length === 0) {
             return <></>;
           }
-          return (
-            <HStack>
-              <DowJonesHints hints={iconHints} />
-            </HStack>
-          );
+          return <DowJonesHints hints={iconHints} />;
         },
       },
       {

@@ -21,15 +21,15 @@ import { SupportLink } from "@parallel/components/common/SupportLink";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
-export type DowJonesSearchFormProps = {
+export interface DowJonesSearchFormProps {
   onSubmit: (data: DowJonesSearchFormData) => void;
   isDisabled?: boolean;
-};
+}
 
-export type DowJonesSearchFormData = {
+export interface DowJonesSearchFormData {
   name: string;
   dateOfBirth: string;
-};
+}
 
 export function DowJonesSearchForm({ onSubmit, isDisabled }: DowJonesSearchFormProps) {
   const {
