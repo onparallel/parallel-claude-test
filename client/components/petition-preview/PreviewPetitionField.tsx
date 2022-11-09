@@ -211,8 +211,6 @@ export function PreviewPetitionField({
     skip: true,
   });
   const handleRefreshAsyncField = useCallback(async () => {
-    console.log("handleRefreshAsyncField");
-
     await refetch({ fieldId: field.id, petitionId });
   }, [refetch, field.id, petitionId]);
 

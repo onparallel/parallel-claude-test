@@ -2811,7 +2811,7 @@
   },
   {
     "term": "component.petition-field-type-select-dropdown.dow-jones-kyc-research-description",
-    "definition": "Realiza una búsqueda en Dow Jones para comprobar los antecedente de un individuo o entidad.",
+    "definition": "Realiza una búsqueda en Dow Jones para comprobar los antecedentes de un individuo o entidad.",
     "context": "Easily search in Dow Jones to run a background check of an individual or legal entity."
   },
   {

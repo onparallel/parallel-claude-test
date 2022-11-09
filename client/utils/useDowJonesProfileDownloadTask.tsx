@@ -46,8 +46,6 @@ export function useDowJonesProfileDownloadTask() {
       });
     });
 
-    console.log(taskError);
-
     if (taskError?.message === "SERVER_ERROR") {
       await withError(
         showError({
