@@ -1,8 +1,8 @@
-import { Center, Flex, Input, List, Stack } from "@chakra-ui/react";
+import { Center, Flex, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon, FieldDateIcon } from "@parallel/chakra/icons";
+import { DateInput } from "@parallel/components/common/DateInput";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { isMetaReturn } from "@parallel/utils/keys";
-import { useDateInputProps } from "@parallel/utils/useDateInputProps";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
@@ -112,18 +112,14 @@ export function RecipientViewPetitionFieldDate({
     [onCreateReply]
   );
 
-  const dateInputProps = useDateInputProps();
-
   const inputProps = {
-    type: "date",
     id: `reply-${field.id}-new`,
     ref: newReplyRef as any,
     paddingRight: 3,
-    isDisabled: isDisabled,
+    isDisabled,
     value,
     // This removes the reset button on Firefox
     required: true,
-    sx: dateInputProps(value),
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
         await handleCreate.immediate(value, false);
@@ -187,7 +183,7 @@ export function RecipientViewPetitionFieldDate({
       ) : null}
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
-          <Input {...inputProps} />
+          <DateInput {...inputProps} />
           <Center boxSize={10} position="absolute" right={0} bottom={0} pointerEvents="none">
             <FieldDateIcon fontSize="18px" color={isDisabled ? "gray.400" : undefined} />
           </Center>
@@ -232,8 +228,6 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
     [onUpdate]
   );
 
-  const dateInputProps = useDateInputProps();
-
   const props = {
     type: reply.isAnonymized ? "text" : "date",
     id: `reply-${field.id}-${reply.id}`,
@@ -243,7 +237,6 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
     // This removes the reset button on Firefox
     required: true,
     sx: {
-      ...dateInputProps(value),
       _placeholderShown: { fontStyle: reply.isAnonymized ? "italic" : "normal" },
     },
     isDisabled: isDisabled || reply.status === "APPROVED",
@@ -279,7 +272,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
   return (
     <Stack direction="row">
       <Flex flex="1" position="relative">
-        <Input {...props} />
+        <DateInput {...props} />
         <Center boxSize={10} position="absolute" right={0} bottom={0} pointerEvents="none">
           <FieldDateIcon
             fontSize="18px"

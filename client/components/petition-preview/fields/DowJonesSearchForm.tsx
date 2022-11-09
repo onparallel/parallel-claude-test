@@ -16,8 +16,8 @@ import {
 } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
+import { DateInput } from "@parallel/components/common/DateInput";
 import { SupportLink } from "@parallel/components/common/SupportLink";
-import { useDateInputProps } from "@parallel/utils/useDateInputProps";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -35,7 +35,6 @@ export function DowJonesSearchForm({ onSubmit, isDisabled }: DowJonesSearchFormP
   const {
     handleSubmit,
     register,
-    watch,
     formState: { errors },
   } = useForm<DowJonesSearchFormData>({
     mode: "onSubmit",
@@ -45,10 +44,7 @@ export function DowJonesSearchForm({ onSubmit, isDisabled }: DowJonesSearchFormP
     },
   });
 
-  const date = watch("dateOfBirth");
   const intl = useIntl();
-
-  const dateInputProps = useDateInputProps();
   return (
     <Center height="100vh" padding={4}>
       <Stack>
@@ -117,7 +113,7 @@ export function DowJonesSearchForm({ onSubmit, isDisabled }: DowJonesSearchFormP
                   />
                 </FormLabel>
                 <Flex flex="1" position="relative" marginTop={2}>
-                  <Input type="date" {...register("dateOfBirth")} sx={dateInputProps(date)} />
+                  <DateInput {...register("dateOfBirth")} />
                   <Center
                     boxSize={10}
                     position="absolute"
