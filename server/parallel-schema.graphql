@@ -227,73 +227,73 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 """
 scalar DateTime
 
-type DowJonesRiskEntityDate {
+type DowJonesKycEntityDate {
   day: Int
   month: Int
   year: Int
 }
 
-type DowJonesRiskEntityPlace {
+type DowJonesKycEntityPlace {
   countryCode: String!
   descriptor: String!
 }
 
-interface DowJonesRiskEntityProfileResult {
+interface DowJonesKycEntityProfileResult {
   iconHints: [String!]!
   id: ID!
   name: String!
   profileId: ID!
-  relationships: [DowJonesRiskEntityRelationship!]!
-  sanctions: [DowJonesRiskEntitySanction!]!
-  type: DowJonesRiskEntityType!
+  relationships: [DowJonesKycEntityRelationship!]!
+  sanctions: [DowJonesKycEntitySanction!]!
+  type: DowJonesKycEntityType!
   updatedAt: DateTime!
 }
 
-type DowJonesRiskEntityProfileResultEntity implements DowJonesRiskEntityProfileResult {
-  dateOfRegistration: DowJonesRiskEntityDate
+type DowJonesKycEntityProfileResultEntity implements DowJonesKycEntityProfileResult {
+  dateOfRegistration: DowJonesKycEntityDate
   iconHints: [String!]!
   id: ID!
   name: String!
   profileId: ID!
-  relationships: [DowJonesRiskEntityRelationship!]!
-  sanctions: [DowJonesRiskEntitySanction!]!
-  type: DowJonesRiskEntityType!
+  relationships: [DowJonesKycEntityRelationship!]!
+  sanctions: [DowJonesKycEntitySanction!]!
+  type: DowJonesKycEntityType!
   updatedAt: DateTime!
 }
 
-type DowJonesRiskEntityProfileResultPerson implements DowJonesRiskEntityProfileResult {
-  citizenship: DowJonesRiskEntityPlace
-  dateOfBirth: DowJonesRiskEntityDate
+type DowJonesKycEntityProfileResultPerson implements DowJonesKycEntityProfileResult {
+  citizenship: DowJonesKycEntityPlace
+  dateOfBirth: DowJonesKycEntityDate
   iconHints: [String!]!
   id: ID!
   isDeceased: Boolean!
-  jurisdiction: DowJonesRiskEntityPlace
+  jurisdiction: DowJonesKycEntityPlace
   name: String!
-  placeOfBirth: DowJonesRiskEntityPlace
+  placeOfBirth: DowJonesKycEntityPlace
   profileId: ID!
-  relationships: [DowJonesRiskEntityRelationship!]!
-  residence: DowJonesRiskEntityPlace
-  sanctions: [DowJonesRiskEntitySanction!]!
-  type: DowJonesRiskEntityType!
+  relationships: [DowJonesKycEntityRelationship!]!
+  residence: DowJonesKycEntityPlace
+  sanctions: [DowJonesKycEntitySanction!]!
+  type: DowJonesKycEntityType!
   updatedAt: DateTime!
 }
 
-type DowJonesRiskEntityRelationship {
+type DowJonesKycEntityRelationship {
   connectionType: String!
   iconHints: [String!]!
   name: String
   profileId: ID!
-  type: DowJonesRiskEntityType!
+  type: DowJonesKycEntityType!
 }
 
-type DowJonesRiskEntitySanction {
-  fromDate: DowJonesRiskEntityDate
+type DowJonesKycEntitySanction {
+  fromDate: DowJonesKycEntityDate
   id: ID!
   name: String!
   sources: [String!]!
 }
 
-interface DowJonesRiskEntitySearchResult {
+interface DowJonesKycEntitySearchResult {
   countryTerritoryName: String
   iconHints: [String!]!
   id: ID!
@@ -301,10 +301,10 @@ interface DowJonesRiskEntitySearchResult {
   name: String!
   profileId: ID!
   title: String!
-  type: DowJonesRiskEntityType!
+  type: DowJonesKycEntityType!
 }
 
-type DowJonesRiskEntitySearchResultEntity implements DowJonesRiskEntitySearchResult {
+type DowJonesKycEntitySearchResultEntity implements DowJonesKycEntitySearchResult {
   countryTerritoryName: String
   iconHints: [String!]!
   id: ID!
@@ -312,14 +312,14 @@ type DowJonesRiskEntitySearchResultEntity implements DowJonesRiskEntitySearchRes
   name: String!
   profileId: ID!
   title: String!
-  type: DowJonesRiskEntityType!
+  type: DowJonesKycEntityType!
 }
 
-type DowJonesRiskEntitySearchResultPagination {
+type DowJonesKycEntitySearchResultPagination {
   """
   The requested slice of items.
   """
-  items: [DowJonesRiskEntitySearchResult!]!
+  items: [DowJonesKycEntitySearchResult!]!
 
   """
   The total count of items in the list.
@@ -327,9 +327,9 @@ type DowJonesRiskEntitySearchResultPagination {
   totalCount: Int!
 }
 
-type DowJonesRiskEntitySearchResultPerson implements DowJonesRiskEntitySearchResult {
+type DowJonesKycEntitySearchResultPerson implements DowJonesKycEntitySearchResult {
   countryTerritoryName: String
-  dateOfBirth: DowJonesRiskEntityDate
+  dateOfBirth: DowJonesKycEntityDate
   gender: String!
   iconHints: [String!]!
   id: ID!
@@ -337,10 +337,10 @@ type DowJonesRiskEntitySearchResultPerson implements DowJonesRiskEntitySearchRes
   name: String!
   profileId: ID!
   title: String!
-  type: DowJonesRiskEntityType!
+  type: DowJonesKycEntityType!
 }
 
-enum DowJonesRiskEntityType {
+enum DowJonesKycEntityType {
   Entity
   Person
 }
@@ -771,7 +771,7 @@ type Mutation {
   createContact(data: CreateContactInput!): Contact!
 
   """
-  Creates a new DOW JONES Factiva integration on the user's organization
+  Creates a new Dow Jones KYC integration on the user's organization
   """
   createDowJonesKycIntegration(
     clientId: String!
@@ -4372,6 +4372,21 @@ type PublicUser {
 union PublicUserOrContact = PublicContact | PublicUser
 
 type Query {
+  DowJonesKycEntityProfile(profileId: ID!): DowJonesKycEntityProfileResult!
+  DowJonesKycEntitySearch(
+    dateOfBirth: DateTime
+
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+    name: String!
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+  ): DowJonesKycEntitySearchResultPagination!
   access(keycode: ID!): PublicPetitionAccess!
   contact(id: GID!): Contact
 
@@ -4406,21 +4421,6 @@ type Query {
   Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts
   """
   contactsByEmail(emails: [String!]!): [Contact]!
-  dowJonesRiskEntityProfile(profileId: ID!): DowJonesRiskEntityProfileResult!
-  dowJonesRiskEntitySearch(
-    dateOfBirth: DateTime
-
-    """
-    Number of elements to take from the list.
-    """
-    limit: Int
-    name: String!
-
-    """
-    Number of elements to skip from the list.
-    """
-    offset: Int
-  ): DowJonesRiskEntitySearchResultPagination!
 
   """
   Checks if the provided email is available to be registered as a user on Parallel

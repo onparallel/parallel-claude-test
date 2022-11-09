@@ -209,79 +209,79 @@ export interface CreatedAt {
   createdAt: Scalars["DateTime"];
 }
 
-export interface DowJonesRiskEntityDate {
-  __typename?: "DowJonesRiskEntityDate";
+export interface DowJonesKycEntityDate {
+  __typename?: "DowJonesKycEntityDate";
   day?: Maybe<Scalars["Int"]>;
   month?: Maybe<Scalars["Int"]>;
   year?: Maybe<Scalars["Int"]>;
 }
 
-export interface DowJonesRiskEntityPlace {
-  __typename?: "DowJonesRiskEntityPlace";
+export interface DowJonesKycEntityPlace {
+  __typename?: "DowJonesKycEntityPlace";
   countryCode: Scalars["String"];
   descriptor: Scalars["String"];
 }
 
-export interface DowJonesRiskEntityProfileResult {
+export interface DowJonesKycEntityProfileResult {
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   name: Scalars["String"];
   profileId: Scalars["ID"];
-  relationships: Array<DowJonesRiskEntityRelationship>;
-  sanctions: Array<DowJonesRiskEntitySanction>;
-  type: DowJonesRiskEntityType;
+  relationships: Array<DowJonesKycEntityRelationship>;
+  sanctions: Array<DowJonesKycEntitySanction>;
+  type: DowJonesKycEntityType;
   updatedAt: Scalars["DateTime"];
 }
 
-export interface DowJonesRiskEntityProfileResultEntity extends DowJonesRiskEntityProfileResult {
-  __typename?: "DowJonesRiskEntityProfileResultEntity";
-  dateOfRegistration?: Maybe<DowJonesRiskEntityDate>;
+export interface DowJonesKycEntityProfileResultEntity extends DowJonesKycEntityProfileResult {
+  __typename?: "DowJonesKycEntityProfileResultEntity";
+  dateOfRegistration?: Maybe<DowJonesKycEntityDate>;
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   name: Scalars["String"];
   profileId: Scalars["ID"];
-  relationships: Array<DowJonesRiskEntityRelationship>;
-  sanctions: Array<DowJonesRiskEntitySanction>;
-  type: DowJonesRiskEntityType;
+  relationships: Array<DowJonesKycEntityRelationship>;
+  sanctions: Array<DowJonesKycEntitySanction>;
+  type: DowJonesKycEntityType;
   updatedAt: Scalars["DateTime"];
 }
 
-export interface DowJonesRiskEntityProfileResultPerson extends DowJonesRiskEntityProfileResult {
-  __typename?: "DowJonesRiskEntityProfileResultPerson";
-  citizenship?: Maybe<DowJonesRiskEntityPlace>;
-  dateOfBirth?: Maybe<DowJonesRiskEntityDate>;
+export interface DowJonesKycEntityProfileResultPerson extends DowJonesKycEntityProfileResult {
+  __typename?: "DowJonesKycEntityProfileResultPerson";
+  citizenship?: Maybe<DowJonesKycEntityPlace>;
+  dateOfBirth?: Maybe<DowJonesKycEntityDate>;
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   isDeceased: Scalars["Boolean"];
-  jurisdiction?: Maybe<DowJonesRiskEntityPlace>;
+  jurisdiction?: Maybe<DowJonesKycEntityPlace>;
   name: Scalars["String"];
-  placeOfBirth?: Maybe<DowJonesRiskEntityPlace>;
+  placeOfBirth?: Maybe<DowJonesKycEntityPlace>;
   profileId: Scalars["ID"];
-  relationships: Array<DowJonesRiskEntityRelationship>;
-  residence?: Maybe<DowJonesRiskEntityPlace>;
-  sanctions: Array<DowJonesRiskEntitySanction>;
-  type: DowJonesRiskEntityType;
+  relationships: Array<DowJonesKycEntityRelationship>;
+  residence?: Maybe<DowJonesKycEntityPlace>;
+  sanctions: Array<DowJonesKycEntitySanction>;
+  type: DowJonesKycEntityType;
   updatedAt: Scalars["DateTime"];
 }
 
-export interface DowJonesRiskEntityRelationship {
-  __typename?: "DowJonesRiskEntityRelationship";
+export interface DowJonesKycEntityRelationship {
+  __typename?: "DowJonesKycEntityRelationship";
   connectionType: Scalars["String"];
   iconHints: Array<Scalars["String"]>;
   name?: Maybe<Scalars["String"]>;
   profileId: Scalars["ID"];
-  type: DowJonesRiskEntityType;
+  type: DowJonesKycEntityType;
 }
 
-export interface DowJonesRiskEntitySanction {
-  __typename?: "DowJonesRiskEntitySanction";
-  fromDate?: Maybe<DowJonesRiskEntityDate>;
+export interface DowJonesKycEntitySanction {
+  __typename?: "DowJonesKycEntitySanction";
+  fromDate?: Maybe<DowJonesKycEntityDate>;
   id: Scalars["ID"];
   name: Scalars["String"];
   sources: Array<Scalars["String"]>;
 }
 
-export interface DowJonesRiskEntitySearchResult {
+export interface DowJonesKycEntitySearchResult {
   countryTerritoryName?: Maybe<Scalars["String"]>;
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
@@ -289,11 +289,11 @@ export interface DowJonesRiskEntitySearchResult {
   name: Scalars["String"];
   profileId: Scalars["ID"];
   title: Scalars["String"];
-  type: DowJonesRiskEntityType;
+  type: DowJonesKycEntityType;
 }
 
-export interface DowJonesRiskEntitySearchResultEntity extends DowJonesRiskEntitySearchResult {
-  __typename?: "DowJonesRiskEntitySearchResultEntity";
+export interface DowJonesKycEntitySearchResultEntity extends DowJonesKycEntitySearchResult {
+  __typename?: "DowJonesKycEntitySearchResultEntity";
   countryTerritoryName?: Maybe<Scalars["String"]>;
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
@@ -301,21 +301,21 @@ export interface DowJonesRiskEntitySearchResultEntity extends DowJonesRiskEntity
   name: Scalars["String"];
   profileId: Scalars["ID"];
   title: Scalars["String"];
-  type: DowJonesRiskEntityType;
+  type: DowJonesKycEntityType;
 }
 
-export interface DowJonesRiskEntitySearchResultPagination {
-  __typename?: "DowJonesRiskEntitySearchResultPagination";
+export interface DowJonesKycEntitySearchResultPagination {
+  __typename?: "DowJonesKycEntitySearchResultPagination";
   /** The requested slice of items. */
-  items: Array<DowJonesRiskEntitySearchResult>;
+  items: Array<DowJonesKycEntitySearchResult>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
 }
 
-export interface DowJonesRiskEntitySearchResultPerson extends DowJonesRiskEntitySearchResult {
-  __typename?: "DowJonesRiskEntitySearchResultPerson";
+export interface DowJonesKycEntitySearchResultPerson extends DowJonesKycEntitySearchResult {
+  __typename?: "DowJonesKycEntitySearchResultPerson";
   countryTerritoryName?: Maybe<Scalars["String"]>;
-  dateOfBirth?: Maybe<DowJonesRiskEntityDate>;
+  dateOfBirth?: Maybe<DowJonesKycEntityDate>;
   gender: Scalars["String"];
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
@@ -323,10 +323,10 @@ export interface DowJonesRiskEntitySearchResultPerson extends DowJonesRiskEntity
   name: Scalars["String"];
   profileId: Scalars["ID"];
   title: Scalars["String"];
-  type: DowJonesRiskEntityType;
+  type: DowJonesKycEntityType;
 }
 
-export type DowJonesRiskEntityType = "Entity" | "Person";
+export type DowJonesKycEntityType = "Entity" | "Person";
 
 /** The effective permission for a petition and user */
 export interface EffectivePetitionUserPermission {
@@ -3299,8 +3299,8 @@ export interface Query {
   contacts: ContactPagination;
   /** Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts */
   contactsByEmail: Array<Maybe<Contact>>;
-  dowJonesRiskEntityProfile: DowJonesRiskEntityProfileResult;
-  dowJonesRiskEntitySearch: DowJonesRiskEntitySearchResultPagination;
+  DowJonesKycEntityProfile: DowJonesKycEntityProfileResult;
+  DowJonesKycEntitySearch: DowJonesKycEntitySearchResultPagination;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
   getSlugForPublicPetitionLink: Scalars["String"];
@@ -3371,11 +3371,11 @@ export interface QuerycontactsByEmailArgs {
   emails: Array<Scalars["String"]>;
 }
 
-export interface QuerydowJonesRiskEntityProfileArgs {
+export interface QueryDowJonesKycEntityProfileArgs {
   profileId: Scalars["ID"];
 }
 
-export interface QuerydowJonesRiskEntitySearchArgs {
+export interface QueryDowJonesKycEntitySearchArgs {
   dateOfBirth?: InputMaybe<Scalars["DateTime"]>;
   limit?: InputMaybe<Scalars["Int"]>;
   name: Scalars["String"];
@@ -10838,228 +10838,228 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery = {
   };
 };
 
-export type DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment = {
-  __typename?: "DowJonesRiskEntitySanction";
+export type DowJonesProfileDetails_DowJonesKycEntitySanctionFragment = {
+  __typename?: "DowJonesKycEntitySanction";
   id: string;
   name: string;
   sources: Array<string>;
   fromDate?: {
-    __typename?: "DowJonesRiskEntityDate";
+    __typename?: "DowJonesKycEntityDate";
     year?: number | null;
     month?: number | null;
     day?: number | null;
   } | null;
 };
 
-export type DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment = {
-  __typename?: "DowJonesRiskEntityRelationship";
+export type DowJonesProfileDetails_DowJonesKycEntityRelationshipFragment = {
+  __typename?: "DowJonesKycEntityRelationship";
   profileId: string;
   connectionType: string;
   iconHints: Array<string>;
   name?: string | null;
-  type: DowJonesRiskEntityType;
+  type: DowJonesKycEntityType;
 };
 
-export type DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultEntity_Fragment =
+export type DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultEntity_Fragment =
   {
-    __typename?: "DowJonesRiskEntityProfileResultEntity";
+    __typename?: "DowJonesKycEntityProfileResultEntity";
     id: string;
-    type: DowJonesRiskEntityType;
+    type: DowJonesKycEntityType;
     name: string;
     iconHints: Array<string>;
     updatedAt: string;
     dateOfRegistration?: {
-      __typename?: "DowJonesRiskEntityDate";
+      __typename?: "DowJonesKycEntityDate";
       year?: number | null;
       month?: number | null;
       day?: number | null;
     } | null;
     sanctions: Array<{
-      __typename?: "DowJonesRiskEntitySanction";
+      __typename?: "DowJonesKycEntitySanction";
       id: string;
       name: string;
       sources: Array<string>;
       fromDate?: {
-        __typename?: "DowJonesRiskEntityDate";
+        __typename?: "DowJonesKycEntityDate";
         year?: number | null;
         month?: number | null;
         day?: number | null;
       } | null;
     }>;
     relationships: Array<{
-      __typename?: "DowJonesRiskEntityRelationship";
+      __typename?: "DowJonesKycEntityRelationship";
       profileId: string;
       connectionType: string;
       iconHints: Array<string>;
       name?: string | null;
-      type: DowJonesRiskEntityType;
+      type: DowJonesKycEntityType;
     }>;
   };
 
-export type DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultPerson_Fragment =
+export type DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment =
   {
-    __typename?: "DowJonesRiskEntityProfileResultPerson";
+    __typename?: "DowJonesKycEntityProfileResultPerson";
     isDeceased: boolean;
     id: string;
-    type: DowJonesRiskEntityType;
+    type: DowJonesKycEntityType;
     name: string;
     iconHints: Array<string>;
     updatedAt: string;
     placeOfBirth?: {
-      __typename?: "DowJonesRiskEntityPlace";
+      __typename?: "DowJonesKycEntityPlace";
       descriptor: string;
       countryCode: string;
     } | null;
     dateOfBirth?: {
-      __typename?: "DowJonesRiskEntityDate";
+      __typename?: "DowJonesKycEntityDate";
       year?: number | null;
       month?: number | null;
       day?: number | null;
     } | null;
     citizenship?: {
-      __typename?: "DowJonesRiskEntityPlace";
+      __typename?: "DowJonesKycEntityPlace";
       descriptor: string;
       countryCode: string;
     } | null;
     residence?: {
-      __typename?: "DowJonesRiskEntityPlace";
+      __typename?: "DowJonesKycEntityPlace";
       descriptor: string;
       countryCode: string;
     } | null;
     jurisdiction?: {
-      __typename?: "DowJonesRiskEntityPlace";
+      __typename?: "DowJonesKycEntityPlace";
       descriptor: string;
       countryCode: string;
     } | null;
     sanctions: Array<{
-      __typename?: "DowJonesRiskEntitySanction";
+      __typename?: "DowJonesKycEntitySanction";
       id: string;
       name: string;
       sources: Array<string>;
       fromDate?: {
-        __typename?: "DowJonesRiskEntityDate";
+        __typename?: "DowJonesKycEntityDate";
         year?: number | null;
         month?: number | null;
         day?: number | null;
       } | null;
     }>;
     relationships: Array<{
-      __typename?: "DowJonesRiskEntityRelationship";
+      __typename?: "DowJonesKycEntityRelationship";
       profileId: string;
       connectionType: string;
       iconHints: Array<string>;
       name?: string | null;
-      type: DowJonesRiskEntityType;
+      type: DowJonesKycEntityType;
     }>;
   };
 
-export type DowJonesProfileDetails_DowJonesRiskEntityProfileResultFragment =
-  | DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultEntity_Fragment
-  | DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultPerson_Fragment;
+export type DowJonesProfileDetails_DowJonesKycEntityProfileResultFragment =
+  | DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultEntity_Fragment
+  | DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment;
 
-export type DowJonesProfileDetails_dowJonesRiskEntityProfileQueryVariables = Exact<{
+export type DowJonesProfileDetails_DowJonesKycEntityProfileQueryVariables = Exact<{
   profileId: Scalars["ID"];
 }>;
 
-export type DowJonesProfileDetails_dowJonesRiskEntityProfileQuery = {
-  dowJonesRiskEntityProfile:
+export type DowJonesProfileDetails_DowJonesKycEntityProfileQuery = {
+  DowJonesKycEntityProfile:
     | {
-        __typename?: "DowJonesRiskEntityProfileResultEntity";
+        __typename?: "DowJonesKycEntityProfileResultEntity";
         id: string;
-        type: DowJonesRiskEntityType;
+        type: DowJonesKycEntityType;
         name: string;
         iconHints: Array<string>;
         updatedAt: string;
         dateOfRegistration?: {
-          __typename?: "DowJonesRiskEntityDate";
+          __typename?: "DowJonesKycEntityDate";
           year?: number | null;
           month?: number | null;
           day?: number | null;
         } | null;
         sanctions: Array<{
-          __typename?: "DowJonesRiskEntitySanction";
+          __typename?: "DowJonesKycEntitySanction";
           id: string;
           name: string;
           sources: Array<string>;
           fromDate?: {
-            __typename?: "DowJonesRiskEntityDate";
+            __typename?: "DowJonesKycEntityDate";
             year?: number | null;
             month?: number | null;
             day?: number | null;
           } | null;
         }>;
         relationships: Array<{
-          __typename?: "DowJonesRiskEntityRelationship";
+          __typename?: "DowJonesKycEntityRelationship";
           profileId: string;
           connectionType: string;
           iconHints: Array<string>;
           name?: string | null;
-          type: DowJonesRiskEntityType;
+          type: DowJonesKycEntityType;
         }>;
       }
     | {
-        __typename?: "DowJonesRiskEntityProfileResultPerson";
+        __typename?: "DowJonesKycEntityProfileResultPerson";
         isDeceased: boolean;
         id: string;
-        type: DowJonesRiskEntityType;
+        type: DowJonesKycEntityType;
         name: string;
         iconHints: Array<string>;
         updatedAt: string;
         placeOfBirth?: {
-          __typename?: "DowJonesRiskEntityPlace";
+          __typename?: "DowJonesKycEntityPlace";
           descriptor: string;
           countryCode: string;
         } | null;
         dateOfBirth?: {
-          __typename?: "DowJonesRiskEntityDate";
+          __typename?: "DowJonesKycEntityDate";
           year?: number | null;
           month?: number | null;
           day?: number | null;
         } | null;
         citizenship?: {
-          __typename?: "DowJonesRiskEntityPlace";
+          __typename?: "DowJonesKycEntityPlace";
           descriptor: string;
           countryCode: string;
         } | null;
         residence?: {
-          __typename?: "DowJonesRiskEntityPlace";
+          __typename?: "DowJonesKycEntityPlace";
           descriptor: string;
           countryCode: string;
         } | null;
         jurisdiction?: {
-          __typename?: "DowJonesRiskEntityPlace";
+          __typename?: "DowJonesKycEntityPlace";
           descriptor: string;
           countryCode: string;
         } | null;
         sanctions: Array<{
-          __typename?: "DowJonesRiskEntitySanction";
+          __typename?: "DowJonesKycEntitySanction";
           id: string;
           name: string;
           sources: Array<string>;
           fromDate?: {
-            __typename?: "DowJonesRiskEntityDate";
+            __typename?: "DowJonesKycEntityDate";
             year?: number | null;
             month?: number | null;
             day?: number | null;
           } | null;
         }>;
         relationships: Array<{
-          __typename?: "DowJonesRiskEntityRelationship";
+          __typename?: "DowJonesKycEntityRelationship";
           profileId: string;
           connectionType: string;
           iconHints: Array<string>;
           name?: string | null;
-          type: DowJonesRiskEntityType;
+          type: DowJonesKycEntityType;
         }>;
       };
 };
 
-export type DowJonesSearchResult_DowJonesRiskEntitySearchResult_DowJonesRiskEntitySearchResultEntity_Fragment =
+export type DowJonesSearchResult_DowJonesKycEntitySearchResult_DowJonesKycEntitySearchResultEntity_Fragment =
   {
-    __typename?: "DowJonesRiskEntitySearchResultEntity";
+    __typename?: "DowJonesKycEntitySearchResultEntity";
     id: string;
     profileId: string;
-    type: DowJonesRiskEntityType;
+    type: DowJonesKycEntityType;
     name: string;
     title: string;
     countryTerritoryName?: string | null;
@@ -11067,29 +11067,29 @@ export type DowJonesSearchResult_DowJonesRiskEntitySearchResult_DowJonesRiskEnti
     iconHints: Array<string>;
   };
 
-export type DowJonesSearchResult_DowJonesRiskEntitySearchResult_DowJonesRiskEntitySearchResultPerson_Fragment =
+export type DowJonesSearchResult_DowJonesKycEntitySearchResult_DowJonesKycEntitySearchResultPerson_Fragment =
   {
-    __typename?: "DowJonesRiskEntitySearchResultPerson";
+    __typename?: "DowJonesKycEntitySearchResultPerson";
     gender: string;
     id: string;
     profileId: string;
-    type: DowJonesRiskEntityType;
+    type: DowJonesKycEntityType;
     name: string;
     title: string;
     countryTerritoryName?: string | null;
     isSubsidiary: boolean;
     iconHints: Array<string>;
     dateOfBirth?: {
-      __typename?: "DowJonesRiskEntityDate";
+      __typename?: "DowJonesKycEntityDate";
       year?: number | null;
       month?: number | null;
       day?: number | null;
     } | null;
   };
 
-export type DowJonesSearchResult_DowJonesRiskEntitySearchResultFragment =
-  | DowJonesSearchResult_DowJonesRiskEntitySearchResult_DowJonesRiskEntitySearchResultEntity_Fragment
-  | DowJonesSearchResult_DowJonesRiskEntitySearchResult_DowJonesRiskEntitySearchResultPerson_Fragment;
+export type DowJonesSearchResult_DowJonesKycEntitySearchResultFragment =
+  | DowJonesSearchResult_DowJonesKycEntitySearchResult_DowJonesKycEntitySearchResultEntity_Fragment
+  | DowJonesSearchResult_DowJonesKycEntitySearchResult_DowJonesKycEntitySearchResultPerson_Fragment;
 
 export type DowJonesSearchResult_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
@@ -11097,23 +11097,23 @@ export type DowJonesSearchResult_PetitionFieldReplyFragment = {
   content: { [key: string]: any };
 };
 
-export type DowJonesSearchResult_dowJonesRiskEntitySearchQueryVariables = Exact<{
+export type DowJonesSearchResult_DowJonesKycEntitySearchQueryVariables = Exact<{
   offset?: InputMaybe<Scalars["Int"]>;
   limit?: InputMaybe<Scalars["Int"]>;
   name: Scalars["String"];
   dateOfBirth?: InputMaybe<Scalars["DateTime"]>;
 }>;
 
-export type DowJonesSearchResult_dowJonesRiskEntitySearchQuery = {
-  dowJonesRiskEntitySearch: {
-    __typename?: "DowJonesRiskEntitySearchResultPagination";
+export type DowJonesSearchResult_DowJonesKycEntitySearchQuery = {
+  DowJonesKycEntitySearch: {
+    __typename?: "DowJonesKycEntitySearchResultPagination";
     totalCount: number;
     items: Array<
       | {
-          __typename?: "DowJonesRiskEntitySearchResultEntity";
+          __typename?: "DowJonesKycEntitySearchResultEntity";
           id: string;
           profileId: string;
-          type: DowJonesRiskEntityType;
+          type: DowJonesKycEntityType;
           name: string;
           title: string;
           countryTerritoryName?: string | null;
@@ -11121,18 +11121,18 @@ export type DowJonesSearchResult_dowJonesRiskEntitySearchQuery = {
           iconHints: Array<string>;
         }
       | {
-          __typename?: "DowJonesRiskEntitySearchResultPerson";
+          __typename?: "DowJonesKycEntitySearchResultPerson";
           gender: string;
           id: string;
           profileId: string;
-          type: DowJonesRiskEntityType;
+          type: DowJonesKycEntityType;
           name: string;
           title: string;
           countryTerritoryName?: string | null;
           isSubsidiary: boolean;
           iconHints: Array<string>;
           dateOfBirth?: {
-            __typename?: "DowJonesRiskEntityDate";
+            __typename?: "DowJonesKycEntityDate";
             year?: number | null;
             month?: number | null;
             day?: number | null;
@@ -25808,8 +25808,8 @@ export const PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReply
   PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragment,
   unknown
 >;
-export const DowJonesProfileDetails_DowJonesRiskEntitySanctionFragmentDoc = gql`
-  fragment DowJonesProfileDetails_DowJonesRiskEntitySanction on DowJonesRiskEntitySanction {
+export const DowJonesProfileDetails_DowJonesKycEntitySanctionFragmentDoc = gql`
+  fragment DowJonesProfileDetails_DowJonesKycEntitySanction on DowJonesKycEntitySanction {
     id
     name
     sources
@@ -25819,40 +25819,37 @@ export const DowJonesProfileDetails_DowJonesRiskEntitySanctionFragmentDoc = gql`
       day
     }
   }
-` as unknown as DocumentNode<DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment, unknown>;
-export const DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragmentDoc = gql`
-  fragment DowJonesProfileDetails_DowJonesRiskEntityRelationship on DowJonesRiskEntityRelationship {
+` as unknown as DocumentNode<DowJonesProfileDetails_DowJonesKycEntitySanctionFragment, unknown>;
+export const DowJonesProfileDetails_DowJonesKycEntityRelationshipFragmentDoc = gql`
+  fragment DowJonesProfileDetails_DowJonesKycEntityRelationship on DowJonesKycEntityRelationship {
     profileId
     connectionType
     iconHints
     name
     type
   }
-` as unknown as DocumentNode<
-  DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment,
-  unknown
->;
-export const DowJonesProfileDetails_DowJonesRiskEntityProfileResultFragmentDoc = gql`
-  fragment DowJonesProfileDetails_DowJonesRiskEntityProfileResult on DowJonesRiskEntityProfileResult {
+` as unknown as DocumentNode<DowJonesProfileDetails_DowJonesKycEntityRelationshipFragment, unknown>;
+export const DowJonesProfileDetails_DowJonesKycEntityProfileResultFragmentDoc = gql`
+  fragment DowJonesProfileDetails_DowJonesKycEntityProfileResult on DowJonesKycEntityProfileResult {
     id
     type
     name
     iconHints
     sanctions {
-      ...DowJonesProfileDetails_DowJonesRiskEntitySanction
+      ...DowJonesProfileDetails_DowJonesKycEntitySanction
     }
     relationships {
-      ...DowJonesProfileDetails_DowJonesRiskEntityRelationship
+      ...DowJonesProfileDetails_DowJonesKycEntityRelationship
     }
     updatedAt
-    ... on DowJonesRiskEntityProfileResultEntity {
+    ... on DowJonesKycEntityProfileResultEntity {
       dateOfRegistration {
         year
         month
         day
       }
     }
-    ... on DowJonesRiskEntityProfileResultPerson {
+    ... on DowJonesKycEntityProfileResultPerson {
       placeOfBirth {
         descriptor
         countryCode
@@ -25877,14 +25874,14 @@ export const DowJonesProfileDetails_DowJonesRiskEntityProfileResultFragmentDoc =
       isDeceased
     }
   }
-  ${DowJonesProfileDetails_DowJonesRiskEntitySanctionFragmentDoc}
-  ${DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragmentDoc}
+  ${DowJonesProfileDetails_DowJonesKycEntitySanctionFragmentDoc}
+  ${DowJonesProfileDetails_DowJonesKycEntityRelationshipFragmentDoc}
 ` as unknown as DocumentNode<
-  DowJonesProfileDetails_DowJonesRiskEntityProfileResultFragment,
+  DowJonesProfileDetails_DowJonesKycEntityProfileResultFragment,
   unknown
 >;
-export const DowJonesSearchResult_DowJonesRiskEntitySearchResultFragmentDoc = gql`
-  fragment DowJonesSearchResult_DowJonesRiskEntitySearchResult on DowJonesRiskEntitySearchResult {
+export const DowJonesSearchResult_DowJonesKycEntitySearchResultFragmentDoc = gql`
+  fragment DowJonesSearchResult_DowJonesKycEntitySearchResult on DowJonesKycEntitySearchResult {
     id
     profileId
     type
@@ -25893,7 +25890,7 @@ export const DowJonesSearchResult_DowJonesRiskEntitySearchResultFragmentDoc = gq
     countryTerritoryName
     isSubsidiary
     iconHints
-    ... on DowJonesRiskEntitySearchResultPerson {
+    ... on DowJonesKycEntitySearchResultPerson {
       gender
       dateOfBirth {
         year
@@ -25902,7 +25899,7 @@ export const DowJonesSearchResult_DowJonesRiskEntitySearchResultFragmentDoc = gq
       }
     }
   }
-` as unknown as DocumentNode<DowJonesSearchResult_DowJonesRiskEntitySearchResultFragment, unknown>;
+` as unknown as DocumentNode<DowJonesSearchResult_DowJonesKycEntitySearchResultFragment, unknown>;
 export const useCuatrecasasExport_PetitionFieldFragmentDoc = gql`
   fragment useCuatrecasasExport_PetitionField on PetitionField {
     type
@@ -30773,40 +30770,40 @@ export const PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument = gql
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery,
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryQueryVariables
 >;
-export const DowJonesProfileDetails_dowJonesRiskEntityProfileDocument = gql`
-  query DowJonesProfileDetails_dowJonesRiskEntityProfile($profileId: ID!) {
-    dowJonesRiskEntityProfile(profileId: $profileId) {
-      ...DowJonesProfileDetails_DowJonesRiskEntityProfileResult
+export const DowJonesProfileDetails_DowJonesKycEntityProfileDocument = gql`
+  query DowJonesProfileDetails_DowJonesKycEntityProfile($profileId: ID!) {
+    DowJonesKycEntityProfile(profileId: $profileId) {
+      ...DowJonesProfileDetails_DowJonesKycEntityProfileResult
     }
   }
-  ${DowJonesProfileDetails_DowJonesRiskEntityProfileResultFragmentDoc}
+  ${DowJonesProfileDetails_DowJonesKycEntityProfileResultFragmentDoc}
 ` as unknown as DocumentNode<
-  DowJonesProfileDetails_dowJonesRiskEntityProfileQuery,
-  DowJonesProfileDetails_dowJonesRiskEntityProfileQueryVariables
+  DowJonesProfileDetails_DowJonesKycEntityProfileQuery,
+  DowJonesProfileDetails_DowJonesKycEntityProfileQueryVariables
 >;
-export const DowJonesSearchResult_dowJonesRiskEntitySearchDocument = gql`
-  query DowJonesSearchResult_dowJonesRiskEntitySearch(
+export const DowJonesSearchResult_DowJonesKycEntitySearchDocument = gql`
+  query DowJonesSearchResult_DowJonesKycEntitySearch(
     $offset: Int
     $limit: Int
     $name: String!
     $dateOfBirth: DateTime
   ) {
-    dowJonesRiskEntitySearch(
+    DowJonesKycEntitySearch(
       offset: $offset
       limit: $limit
       name: $name
       dateOfBirth: $dateOfBirth
     ) {
       items {
-        ...DowJonesSearchResult_DowJonesRiskEntitySearchResult
+        ...DowJonesSearchResult_DowJonesKycEntitySearchResult
       }
       totalCount
     }
   }
-  ${DowJonesSearchResult_DowJonesRiskEntitySearchResultFragmentDoc}
+  ${DowJonesSearchResult_DowJonesKycEntitySearchResultFragmentDoc}
 ` as unknown as DocumentNode<
-  DowJonesSearchResult_dowJonesRiskEntitySearchQuery,
-  DowJonesSearchResult_dowJonesRiskEntitySearchQueryVariables
+  DowJonesSearchResult_DowJonesKycEntitySearchQuery,
+  DowJonesSearchResult_DowJonesKycEntitySearchQueryVariables
 >;
 export const DowJonesSearchResult_createDowJonesKycReplyDocument = gql`
   mutation DowJonesSearchResult_createDowJonesKycReply(

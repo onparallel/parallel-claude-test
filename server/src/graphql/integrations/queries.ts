@@ -6,8 +6,8 @@ import { datetimeArg } from "../helpers/scalars";
 import { userHasEnabledIntegration, userHasFeatureFlag } from "../petition/authorizers";
 
 export const queries = queryField((t) => {
-  t.paginationField("dowJonesRiskEntitySearch", {
-    type: "DowJonesRiskEntitySearchResult",
+  t.paginationField("DowJonesKycEntitySearch", {
+    type: "DowJonesKycEntitySearchResult",
     authorize: authenticateAnd(
       userHasEnabledIntegration("DOW_JONES_KYC"),
       userHasFeatureFlag("DOW_JONES_KYC")
@@ -26,7 +26,7 @@ export const queries = queryField((t) => {
       return {
         totalCount: result.meta.total_count,
         items: (result.data ?? []).map((i) => ({
-          id: toGlobalId("DowJonesRiskEntitySearchResult", i.id),
+          id: toGlobalId("DowJonesKycEntitySearchResult", i.id),
           profileId: i.id,
           type: i.attributes.type,
           name: i.attributes.primary_name,
@@ -50,8 +50,8 @@ export const queries = queryField((t) => {
     },
   });
 
-  t.field("dowJonesRiskEntityProfile", {
-    type: "DowJonesRiskEntityProfileResult",
+  t.field("DowJonesKycEntityProfile", {
+    type: "DowJonesKycEntityProfileResult",
     authorize: authenticateAnd(
       userHasEnabledIntegration("DOW_JONES_KYC"),
       userHasFeatureFlag("DOW_JONES_KYC")
@@ -85,7 +85,7 @@ export const queries = queryField((t) => {
         ).find((c) => c.code !== "NOTK");
 
         const result = {
-          id: toGlobalId("DowJonesRiskEntityProfileResult", profile.data.id),
+          id: toGlobalId("DowJonesKycEntityProfileResult", profile.data.id),
           profileId: profile.data.id,
           type: profile.data.attributes.basic.type,
           name: ctx.dowJonesKyc.entityFullName(

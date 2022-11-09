@@ -59,21 +59,21 @@ export const OrgIntegration = objectType({
   sourceType: "db.OrgIntegration",
 });
 
-export const DowJonesRiskEntityType = enumType({
-  name: "DowJonesRiskEntityType",
+export const DowJonesKycEntityType = enumType({
+  name: "DowJonesKycEntityType",
   members: ["Person", "Entity"],
 });
 
-export const DowJonesRiskEntityPlace = objectType({
-  name: "DowJonesRiskEntityPlace",
+export const DowJonesKycEntityPlace = objectType({
+  name: "DowJonesKycEntityPlace",
   definition(t) {
     t.string("descriptor");
     t.string("countryCode");
   },
 });
 
-export const DowJonesRiskEntityDate = objectType({
-  name: "DowJonesRiskEntityDate",
+export const DowJonesKycEntityDate = objectType({
+  name: "DowJonesKycEntityDate",
   definition(t) {
     t.nullable.int("year");
     t.nullable.int("month");
@@ -81,33 +81,33 @@ export const DowJonesRiskEntityDate = objectType({
   },
 });
 
-export const DowJonesRiskEntitySanction = objectType({
-  name: "DowJonesRiskEntitySanction",
+export const DowJonesKycEntitySanction = objectType({
+  name: "DowJonesKycEntitySanction",
   definition(t) {
     t.id("id");
     t.string("name");
     t.list.string("sources");
-    t.nullable.field("fromDate", { type: "DowJonesRiskEntityDate" });
+    t.nullable.field("fromDate", { type: "DowJonesKycEntityDate" });
   },
 });
 
-export const DowJonesRiskEntityRelationship = objectType({
-  name: "DowJonesRiskEntityRelationship",
+export const DowJonesKycEntityRelationship = objectType({
+  name: "DowJonesKycEntityRelationship",
   definition(t) {
     t.id("profileId");
     t.string("connectionType");
     t.list.string("iconHints");
     t.nullable.string("name");
-    t.field("type", { type: "DowJonesRiskEntityType" });
+    t.field("type", { type: "DowJonesKycEntityType" });
   },
 });
 
-export const DowJonesRiskEntitySearchResult = interfaceType({
-  name: "DowJonesRiskEntitySearchResult",
+export const DowJonesKycEntitySearchResult = interfaceType({
+  name: "DowJonesKycEntitySearchResult",
   definition(t) {
     t.id("id");
     t.id("profileId");
-    t.field("type", { type: "DowJonesRiskEntityType" });
+    t.field("type", { type: "DowJonesKycEntityType" });
     t.string("name");
     t.string("title");
     t.nullable.string("countryTerritoryName");
@@ -116,65 +116,65 @@ export const DowJonesRiskEntitySearchResult = interfaceType({
   },
   resolveType: (o) =>
     o.type === "Person"
-      ? "DowJonesRiskEntitySearchResultPerson"
-      : "DowJonesRiskEntitySearchResultEntity",
+      ? "DowJonesKycEntitySearchResultPerson"
+      : "DowJonesKycEntitySearchResultEntity",
 });
 
-export const DowJonesRiskEntitySearchResultPerson = objectType({
-  name: "DowJonesRiskEntitySearchResultPerson",
+export const DowJonesKycEntitySearchResultPerson = objectType({
+  name: "DowJonesKycEntitySearchResultPerson",
   definition(t) {
-    t.implements("DowJonesRiskEntitySearchResult");
+    t.implements("DowJonesKycEntitySearchResult");
     t.string("gender");
-    t.nullable.field("dateOfBirth", { type: "DowJonesRiskEntityDate" });
+    t.nullable.field("dateOfBirth", { type: "DowJonesKycEntityDate" });
   },
 });
 
-export const DowJonesRiskEntitySearchResultEntity = objectType({
-  name: "DowJonesRiskEntitySearchResultEntity",
+export const DowJonesKycEntitySearchResultEntity = objectType({
+  name: "DowJonesKycEntitySearchResultEntity",
   definition(t) {
-    t.implements("DowJonesRiskEntitySearchResult");
+    t.implements("DowJonesKycEntitySearchResult");
   },
 });
 
-export const DowJonesRiskEntityProfileResult = interfaceType({
-  name: "DowJonesRiskEntityProfileResult",
+export const DowJonesKycEntityProfileResult = interfaceType({
+  name: "DowJonesKycEntityProfileResult",
   definition(t) {
     t.id("id");
     t.id("profileId");
-    t.field("type", { type: "DowJonesRiskEntityType" });
+    t.field("type", { type: "DowJonesKycEntityType" });
     t.string("name");
     t.list.string("iconHints");
     t.list.field("sanctions", {
-      type: "DowJonesRiskEntitySanction",
+      type: "DowJonesKycEntitySanction",
     });
     t.list.field("relationships", {
-      type: "DowJonesRiskEntityRelationship",
+      type: "DowJonesKycEntityRelationship",
     });
     t.datetime("updatedAt");
   },
   resolveType: (o) =>
     o.type === "Person"
-      ? "DowJonesRiskEntityProfileResultPerson"
-      : "DowJonesRiskEntityProfileResultEntity",
+      ? "DowJonesKycEntityProfileResultPerson"
+      : "DowJonesKycEntityProfileResultEntity",
 });
 
-export const DowJonesRiskEntityProfileResultPerson = objectType({
-  name: "DowJonesRiskEntityProfileResultPerson",
+export const DowJonesKycEntityProfileResultPerson = objectType({
+  name: "DowJonesKycEntityProfileResultPerson",
   definition(t) {
-    t.implements("DowJonesRiskEntityProfileResult");
-    t.nullable.field("placeOfBirth", { type: "DowJonesRiskEntityPlace" });
-    t.nullable.field("dateOfBirth", { type: "DowJonesRiskEntityDate" });
-    t.nullable.field("citizenship", { type: "DowJonesRiskEntityPlace" });
-    t.nullable.field("residence", { type: "DowJonesRiskEntityPlace" });
-    t.nullable.field("jurisdiction", { type: "DowJonesRiskEntityPlace" });
+    t.implements("DowJonesKycEntityProfileResult");
+    t.nullable.field("placeOfBirth", { type: "DowJonesKycEntityPlace" });
+    t.nullable.field("dateOfBirth", { type: "DowJonesKycEntityDate" });
+    t.nullable.field("citizenship", { type: "DowJonesKycEntityPlace" });
+    t.nullable.field("residence", { type: "DowJonesKycEntityPlace" });
+    t.nullable.field("jurisdiction", { type: "DowJonesKycEntityPlace" });
     t.boolean("isDeceased");
   },
 });
 
-export const DowJonesRiskEntityProfileResultEntity = objectType({
-  name: "DowJonesRiskEntityProfileResultEntity",
+export const DowJonesKycEntityProfileResultEntity = objectType({
+  name: "DowJonesKycEntityProfileResultEntity",
   definition(t) {
-    t.implements("DowJonesRiskEntityProfileResult");
-    t.nullable.field("dateOfRegistration", { type: "DowJonesRiskEntityDate" });
+    t.implements("DowJonesKycEntityProfileResult");
+    t.nullable.field("dateOfRegistration", { type: "DowJonesKycEntityDate" });
   },
 });

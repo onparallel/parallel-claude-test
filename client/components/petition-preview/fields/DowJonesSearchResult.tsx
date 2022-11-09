@@ -6,8 +6,8 @@ import { DowJonesHints } from "@parallel/components/petition-common/DowJonesHint
 import {
   DowJonesSearchResult_createDowJonesKycReplyDocument,
   DowJonesSearchResult_deletePetitionFieldReplyDocument,
-  DowJonesSearchResult_dowJonesRiskEntitySearchDocument,
-  DowJonesSearchResult_DowJonesRiskEntitySearchResultFragment,
+  DowJonesSearchResult_DowJonesKycEntitySearchDocument,
+  DowJonesSearchResult_DowJonesKycEntitySearchResultFragment,
   DowJonesSearchResult_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
@@ -25,13 +25,13 @@ const QUERY_STATE = {
   items: values([10, 25, 50]).orDefault(10),
 };
 
-type FactivaSelection = DowJonesSearchResult_DowJonesRiskEntitySearchResultFragment;
+type DowJonesSearchResult = DowJonesSearchResult_DowJonesKycEntitySearchResultFragment;
 
-type DowJonesKycDataColumnsContext = {
+interface DowJonesKycDataColumnsContext {
   petitionId: string;
   fieldId: string;
   replies: DowJonesSearchResult_PetitionFieldReplyFragment[];
-};
+}
 
 export function DowJonesSearchResult({
   name,
@@ -51,7 +51,7 @@ export function DowJonesSearchResult({
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const [profileId, setProfileId] = useState<string | null>(null);
   const { data, loading } = useQueryOrPreviousData(
-    DowJonesSearchResult_dowJonesRiskEntitySearchDocument,
+    DowJonesSearchResult_DowJonesKycEntitySearchDocument,
     {
       variables: {
         offset: state.items * (state.page - 1),
@@ -63,9 +63,9 @@ export function DowJonesSearchResult({
     }
   );
 
-  const result = data?.dowJonesRiskEntitySearch;
+  const result = data?.DowJonesKycEntitySearch;
   const columns = useDowJonesKycDataColumns();
-  const handleRowClick = useCallback(function (row: FactivaSelection) {
+  const handleRowClick = useCallback(function (row: DowJonesSearchResult) {
     setProfileId(row.profileId);
   }, []);
 
@@ -181,7 +181,7 @@ function useDowJonesKycDataColumns() {
   const intl = useIntl();
   const showGenericErrorToast = useGenericErrorToast();
 
-  return useMemo<TableColumn<FactivaSelection, DowJonesKycDataColumnsContext>[]>(
+  return useMemo<TableColumn<DowJonesSearchResult, DowJonesKycDataColumnsContext>[]>(
     () => [
       {
         key: "tags",
@@ -214,7 +214,7 @@ function useDowJonesKycDataColumns() {
           defaultMessage: "Gender",
         }),
         CellContent: ({ row }) => {
-          if (row.__typename === "DowJonesRiskEntitySearchResultPerson") {
+          if (row.__typename === "DowJonesKycEntitySearchResultPerson") {
             return <>{row.gender}</>;
           } else {
             return <>{"-"}</>;
@@ -228,7 +228,7 @@ function useDowJonesKycDataColumns() {
           defaultMessage: "Date of birth",
         }),
         CellContent: ({ row }) => {
-          if (row.__typename === "DowJonesRiskEntitySearchResultPerson") {
+          if (row.__typename === "DowJonesKycEntitySearchResultPerson") {
             const { year, month, day } = row.dateOfBirth ?? {};
 
             return (
@@ -260,7 +260,7 @@ function useDowJonesKycDataColumns() {
           defaultMessage: "Subsidiary",
         }),
         CellContent: ({ row }) => {
-          if (row.__typename === "DowJonesRiskEntitySearchResultPerson") {
+          if (row.__typename === "DowJonesKycEntitySearchResultPerson") {
             return <>{"-"}</>;
           }
           return (
@@ -359,9 +359,9 @@ function useDowJonesKycDataColumns() {
 }
 
 DowJonesSearchResult.fragments = {
-  get DowJonesRiskEntitySearchResult() {
+  get DowJonesKycEntitySearchResult() {
     return gql`
-      fragment DowJonesSearchResult_DowJonesRiskEntitySearchResult on DowJonesRiskEntitySearchResult {
+      fragment DowJonesSearchResult_DowJonesKycEntitySearchResult on DowJonesKycEntitySearchResult {
         id
         profileId
         type
@@ -370,7 +370,7 @@ DowJonesSearchResult.fragments = {
         countryTerritoryName
         isSubsidiary
         iconHints
-        ... on DowJonesRiskEntitySearchResultPerson {
+        ... on DowJonesKycEntitySearchResultPerson {
           gender
           dateOfBirth {
             year
@@ -393,25 +393,25 @@ DowJonesSearchResult.fragments = {
 
 DowJonesSearchResult.queries = [
   gql`
-    query DowJonesSearchResult_dowJonesRiskEntitySearch(
+    query DowJonesSearchResult_DowJonesKycEntitySearch(
       $offset: Int
       $limit: Int
       $name: String!
       $dateOfBirth: DateTime
     ) {
-      dowJonesRiskEntitySearch(
+      DowJonesKycEntitySearch(
         offset: $offset
         limit: $limit
         name: $name
         dateOfBirth: $dateOfBirth
       ) {
         items {
-          ...DowJonesSearchResult_DowJonesRiskEntitySearchResult
+          ...DowJonesSearchResult_DowJonesKycEntitySearchResult
         }
         totalCount
       }
     }
-    ${DowJonesSearchResult.fragments.DowJonesRiskEntitySearchResult}
+    ${DowJonesSearchResult.fragments.DowJonesKycEntitySearchResult}
   `,
 ];
 

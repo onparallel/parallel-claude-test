@@ -198,7 +198,7 @@ export const validateDowJonesKycCredentials = mutationField("validateDowJonesKyc
 });
 
 export const createDowJonesKycIntegration = mutationField("createDowJonesKycIntegration", {
-  description: "Creates a new DOW JONES Factiva integration on the user's organization",
+  description: "Creates a new Dow Jones KYC integration on the user's organization",
   type: nonNull("OrgIntegration"),
   authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("DOW_JONES_KYC")),
   args: {
@@ -228,9 +228,9 @@ export const createDowJonesKycIntegration = mutationField("createDowJonesKycInte
     return await ctx.integrations.createOrgIntegration<"DOW_JONES_KYC">(
       {
         type: "DOW_JONES_KYC",
-        provider: "FACTIVA",
+        provider: "DOW_JONES_KYC",
         org_id: ctx.user!.org_id,
-        name: "Dow Jones - Factiva KYC",
+        name: "Dow Jones KYC",
         settings: {
           CREDENTIALS: {
             ACCESS_TOKEN: encrypt(credentials.ACCESS_TOKEN, encryptionKey).toString("hex"),

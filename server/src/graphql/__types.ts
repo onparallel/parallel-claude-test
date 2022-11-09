@@ -261,7 +261,7 @@ export interface NexusGenInputs {
 export interface NexusGenEnums {
   BulkSendSigningMode: "COPY_SIGNATURE_SETTINGS" | "DISABLE_SIGNATURE" | "LET_RECIPIENT_CHOOSE";
   ChangePasswordResult: "INCORRECT_PASSWORD" | "INVALID_NEW_PASSWORD" | "SUCCESS";
-  DowJonesRiskEntityType: "Entity" | "Person";
+  DowJonesKycEntityType: "Entity" | "Person";
   FeatureFlag: db.FeatureFlagName;
   FilterSharedWithLogicalOperator: "AND" | "OR";
   FilterSharedWithOperator: "IS_OWNER" | "NOT_IS_OWNER" | "NOT_SHARED_WITH" | "SHARED_WITH";
@@ -395,62 +395,62 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["Contact"][]; // [Contact!]!
     totalCount: number; // Int!
   };
-  DowJonesRiskEntityDate: {
+  DowJonesKycEntityDate: {
     // root type
     day?: number | null; // Int
     month?: number | null; // Int
     year?: number | null; // Int
   };
-  DowJonesRiskEntityPlace: {
+  DowJonesKycEntityPlace: {
     // root type
     countryCode: string; // String!
     descriptor: string; // String!
   };
-  DowJonesRiskEntityProfileResultEntity: {
+  DowJonesKycEntityProfileResultEntity: {
     // root type
-    dateOfRegistration?: NexusGenRootTypes["DowJonesRiskEntityDate"] | null; // DowJonesRiskEntityDate
+    dateOfRegistration?: NexusGenRootTypes["DowJonesKycEntityDate"] | null; // DowJonesKycEntityDate
     iconHints: string[]; // [String!]!
     id: string; // ID!
     name: string; // String!
     profileId: string; // ID!
-    relationships: NexusGenRootTypes["DowJonesRiskEntityRelationship"][]; // [DowJonesRiskEntityRelationship!]!
-    sanctions: NexusGenRootTypes["DowJonesRiskEntitySanction"][]; // [DowJonesRiskEntitySanction!]!
-    type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    relationships: NexusGenRootTypes["DowJonesKycEntityRelationship"][]; // [DowJonesKycEntityRelationship!]!
+    sanctions: NexusGenRootTypes["DowJonesKycEntitySanction"][]; // [DowJonesKycEntitySanction!]!
+    type: NexusGenEnums["DowJonesKycEntityType"]; // DowJonesKycEntityType!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
-  DowJonesRiskEntityProfileResultPerson: {
+  DowJonesKycEntityProfileResultPerson: {
     // root type
-    citizenship?: NexusGenRootTypes["DowJonesRiskEntityPlace"] | null; // DowJonesRiskEntityPlace
-    dateOfBirth?: NexusGenRootTypes["DowJonesRiskEntityDate"] | null; // DowJonesRiskEntityDate
+    citizenship?: NexusGenRootTypes["DowJonesKycEntityPlace"] | null; // DowJonesKycEntityPlace
+    dateOfBirth?: NexusGenRootTypes["DowJonesKycEntityDate"] | null; // DowJonesKycEntityDate
     iconHints: string[]; // [String!]!
     id: string; // ID!
     isDeceased: boolean; // Boolean!
-    jurisdiction?: NexusGenRootTypes["DowJonesRiskEntityPlace"] | null; // DowJonesRiskEntityPlace
+    jurisdiction?: NexusGenRootTypes["DowJonesKycEntityPlace"] | null; // DowJonesKycEntityPlace
     name: string; // String!
-    placeOfBirth?: NexusGenRootTypes["DowJonesRiskEntityPlace"] | null; // DowJonesRiskEntityPlace
+    placeOfBirth?: NexusGenRootTypes["DowJonesKycEntityPlace"] | null; // DowJonesKycEntityPlace
     profileId: string; // ID!
-    relationships: NexusGenRootTypes["DowJonesRiskEntityRelationship"][]; // [DowJonesRiskEntityRelationship!]!
-    residence?: NexusGenRootTypes["DowJonesRiskEntityPlace"] | null; // DowJonesRiskEntityPlace
-    sanctions: NexusGenRootTypes["DowJonesRiskEntitySanction"][]; // [DowJonesRiskEntitySanction!]!
-    type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    relationships: NexusGenRootTypes["DowJonesKycEntityRelationship"][]; // [DowJonesKycEntityRelationship!]!
+    residence?: NexusGenRootTypes["DowJonesKycEntityPlace"] | null; // DowJonesKycEntityPlace
+    sanctions: NexusGenRootTypes["DowJonesKycEntitySanction"][]; // [DowJonesKycEntitySanction!]!
+    type: NexusGenEnums["DowJonesKycEntityType"]; // DowJonesKycEntityType!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
-  DowJonesRiskEntityRelationship: {
+  DowJonesKycEntityRelationship: {
     // root type
     connectionType: string; // String!
     iconHints: string[]; // [String!]!
     name?: string | null; // String
     profileId: string; // ID!
-    type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    type: NexusGenEnums["DowJonesKycEntityType"]; // DowJonesKycEntityType!
   };
-  DowJonesRiskEntitySanction: {
+  DowJonesKycEntitySanction: {
     // root type
-    fromDate?: NexusGenRootTypes["DowJonesRiskEntityDate"] | null; // DowJonesRiskEntityDate
+    fromDate?: NexusGenRootTypes["DowJonesKycEntityDate"] | null; // DowJonesKycEntityDate
     id: string; // ID!
     name: string; // String!
     sources: string[]; // [String!]!
   };
-  DowJonesRiskEntitySearchResultEntity: {
+  DowJonesKycEntitySearchResultEntity: {
     // root type
     countryTerritoryName?: string | null; // String
     iconHints: string[]; // [String!]!
@@ -459,17 +459,17 @@ export interface NexusGenObjects {
     name: string; // String!
     profileId: string; // ID!
     title: string; // String!
-    type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    type: NexusGenEnums["DowJonesKycEntityType"]; // DowJonesKycEntityType!
   };
-  DowJonesRiskEntitySearchResultPagination: {
+  DowJonesKycEntitySearchResultPagination: {
     // root type
-    items: NexusGenRootTypes["DowJonesRiskEntitySearchResult"][]; // [DowJonesRiskEntitySearchResult!]!
+    items: NexusGenRootTypes["DowJonesKycEntitySearchResult"][]; // [DowJonesKycEntitySearchResult!]!
     totalCount: number; // Int!
   };
-  DowJonesRiskEntitySearchResultPerson: {
+  DowJonesKycEntitySearchResultPerson: {
     // root type
     countryTerritoryName?: string | null; // String
-    dateOfBirth?: NexusGenRootTypes["DowJonesRiskEntityDate"] | null; // DowJonesRiskEntityDate
+    dateOfBirth?: NexusGenRootTypes["DowJonesKycEntityDate"] | null; // DowJonesKycEntityDate
     gender: string; // String!
     iconHints: string[]; // [String!]!
     id: string; // ID!
@@ -477,7 +477,7 @@ export interface NexusGenObjects {
     name: string; // String!
     profileId: string; // ID!
     title: string; // String!
-    type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    type: NexusGenEnums["DowJonesKycEntityType"]; // DowJonesKycEntityType!
   };
   EffectivePetitionUserPermission: Pick<
     db.PetitionPermission,
@@ -801,12 +801,12 @@ export interface NexusGenInterfaces {
   CreatedAt: {
     created_at: Date;
   };
-  DowJonesRiskEntityProfileResult:
-    | NexusGenRootTypes["DowJonesRiskEntityProfileResultEntity"]
-    | NexusGenRootTypes["DowJonesRiskEntityProfileResultPerson"];
-  DowJonesRiskEntitySearchResult:
-    | NexusGenRootTypes["DowJonesRiskEntitySearchResultEntity"]
-    | NexusGenRootTypes["DowJonesRiskEntitySearchResultPerson"];
+  DowJonesKycEntityProfileResult:
+    | NexusGenRootTypes["DowJonesKycEntityProfileResultEntity"]
+    | NexusGenRootTypes["DowJonesKycEntityProfileResultPerson"];
+  DowJonesKycEntitySearchResult:
+    | NexusGenRootTypes["DowJonesKycEntitySearchResultEntity"]
+    | NexusGenRootTypes["DowJonesKycEntitySearchResultPerson"];
   IOrgIntegration:
     | NexusGenRootTypes["OrgIntegration"]
     | NexusGenRootTypes["SignatureOrgIntegration"];
@@ -972,62 +972,62 @@ export interface NexusGenFieldTypes {
     items: NexusGenRootTypes["Contact"][]; // [Contact!]!
     totalCount: number; // Int!
   };
-  DowJonesRiskEntityDate: {
+  DowJonesKycEntityDate: {
     // field return type
     day: number | null; // Int
     month: number | null; // Int
     year: number | null; // Int
   };
-  DowJonesRiskEntityPlace: {
+  DowJonesKycEntityPlace: {
     // field return type
     countryCode: string; // String!
     descriptor: string; // String!
   };
-  DowJonesRiskEntityProfileResultEntity: {
+  DowJonesKycEntityProfileResultEntity: {
     // field return type
-    dateOfRegistration: NexusGenRootTypes["DowJonesRiskEntityDate"] | null; // DowJonesRiskEntityDate
+    dateOfRegistration: NexusGenRootTypes["DowJonesKycEntityDate"] | null; // DowJonesKycEntityDate
     iconHints: string[]; // [String!]!
     id: string; // ID!
     name: string; // String!
     profileId: string; // ID!
-    relationships: NexusGenRootTypes["DowJonesRiskEntityRelationship"][]; // [DowJonesRiskEntityRelationship!]!
-    sanctions: NexusGenRootTypes["DowJonesRiskEntitySanction"][]; // [DowJonesRiskEntitySanction!]!
-    type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    relationships: NexusGenRootTypes["DowJonesKycEntityRelationship"][]; // [DowJonesKycEntityRelationship!]!
+    sanctions: NexusGenRootTypes["DowJonesKycEntitySanction"][]; // [DowJonesKycEntitySanction!]!
+    type: NexusGenEnums["DowJonesKycEntityType"]; // DowJonesKycEntityType!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
-  DowJonesRiskEntityProfileResultPerson: {
+  DowJonesKycEntityProfileResultPerson: {
     // field return type
-    citizenship: NexusGenRootTypes["DowJonesRiskEntityPlace"] | null; // DowJonesRiskEntityPlace
-    dateOfBirth: NexusGenRootTypes["DowJonesRiskEntityDate"] | null; // DowJonesRiskEntityDate
+    citizenship: NexusGenRootTypes["DowJonesKycEntityPlace"] | null; // DowJonesKycEntityPlace
+    dateOfBirth: NexusGenRootTypes["DowJonesKycEntityDate"] | null; // DowJonesKycEntityDate
     iconHints: string[]; // [String!]!
     id: string; // ID!
     isDeceased: boolean; // Boolean!
-    jurisdiction: NexusGenRootTypes["DowJonesRiskEntityPlace"] | null; // DowJonesRiskEntityPlace
+    jurisdiction: NexusGenRootTypes["DowJonesKycEntityPlace"] | null; // DowJonesKycEntityPlace
     name: string; // String!
-    placeOfBirth: NexusGenRootTypes["DowJonesRiskEntityPlace"] | null; // DowJonesRiskEntityPlace
+    placeOfBirth: NexusGenRootTypes["DowJonesKycEntityPlace"] | null; // DowJonesKycEntityPlace
     profileId: string; // ID!
-    relationships: NexusGenRootTypes["DowJonesRiskEntityRelationship"][]; // [DowJonesRiskEntityRelationship!]!
-    residence: NexusGenRootTypes["DowJonesRiskEntityPlace"] | null; // DowJonesRiskEntityPlace
-    sanctions: NexusGenRootTypes["DowJonesRiskEntitySanction"][]; // [DowJonesRiskEntitySanction!]!
-    type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    relationships: NexusGenRootTypes["DowJonesKycEntityRelationship"][]; // [DowJonesKycEntityRelationship!]!
+    residence: NexusGenRootTypes["DowJonesKycEntityPlace"] | null; // DowJonesKycEntityPlace
+    sanctions: NexusGenRootTypes["DowJonesKycEntitySanction"][]; // [DowJonesKycEntitySanction!]!
+    type: NexusGenEnums["DowJonesKycEntityType"]; // DowJonesKycEntityType!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
-  DowJonesRiskEntityRelationship: {
+  DowJonesKycEntityRelationship: {
     // field return type
     connectionType: string; // String!
     iconHints: string[]; // [String!]!
     name: string | null; // String
     profileId: string; // ID!
-    type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    type: NexusGenEnums["DowJonesKycEntityType"]; // DowJonesKycEntityType!
   };
-  DowJonesRiskEntitySanction: {
+  DowJonesKycEntitySanction: {
     // field return type
-    fromDate: NexusGenRootTypes["DowJonesRiskEntityDate"] | null; // DowJonesRiskEntityDate
+    fromDate: NexusGenRootTypes["DowJonesKycEntityDate"] | null; // DowJonesKycEntityDate
     id: string; // ID!
     name: string; // String!
     sources: string[]; // [String!]!
   };
-  DowJonesRiskEntitySearchResultEntity: {
+  DowJonesKycEntitySearchResultEntity: {
     // field return type
     countryTerritoryName: string | null; // String
     iconHints: string[]; // [String!]!
@@ -1036,17 +1036,17 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     profileId: string; // ID!
     title: string; // String!
-    type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    type: NexusGenEnums["DowJonesKycEntityType"]; // DowJonesKycEntityType!
   };
-  DowJonesRiskEntitySearchResultPagination: {
+  DowJonesKycEntitySearchResultPagination: {
     // field return type
-    items: NexusGenRootTypes["DowJonesRiskEntitySearchResult"][]; // [DowJonesRiskEntitySearchResult!]!
+    items: NexusGenRootTypes["DowJonesKycEntitySearchResult"][]; // [DowJonesKycEntitySearchResult!]!
     totalCount: number; // Int!
   };
-  DowJonesRiskEntitySearchResultPerson: {
+  DowJonesKycEntitySearchResultPerson: {
     // field return type
     countryTerritoryName: string | null; // String
-    dateOfBirth: NexusGenRootTypes["DowJonesRiskEntityDate"] | null; // DowJonesRiskEntityDate
+    dateOfBirth: NexusGenRootTypes["DowJonesKycEntityDate"] | null; // DowJonesKycEntityDate
     gender: string; // String!
     iconHints: string[]; // [String!]!
     id: string; // ID!
@@ -1054,7 +1054,7 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     profileId: string; // ID!
     title: string; // String!
-    type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    type: NexusGenEnums["DowJonesKycEntityType"]; // DowJonesKycEntityType!
   };
   EffectivePetitionUserPermission: {
     // field return type
@@ -2043,12 +2043,12 @@ export interface NexusGenFieldTypes {
   };
   Query: {
     // field return type
+    DowJonesKycEntityProfile: NexusGenRootTypes["DowJonesKycEntityProfileResult"]; // DowJonesKycEntityProfileResult!
+    DowJonesKycEntitySearch: NexusGenRootTypes["DowJonesKycEntitySearchResultPagination"]; // DowJonesKycEntitySearchResultPagination!
     access: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
     contactsByEmail: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
-    dowJonesRiskEntityProfile: NexusGenRootTypes["DowJonesRiskEntityProfileResult"]; // DowJonesRiskEntityProfileResult!
-    dowJonesRiskEntitySearch: NexusGenRootTypes["DowJonesRiskEntitySearchResultPagination"]; // DowJonesRiskEntitySearchResultPagination!
     emailIsAvailable: boolean; // Boolean!
     getSlugForPublicPetitionLink: string; // String!
     getUsersOrGroups: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
@@ -2439,18 +2439,18 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
   };
-  DowJonesRiskEntityProfileResult: {
+  DowJonesKycEntityProfileResult: {
     // field return type
     iconHints: string[]; // [String!]!
     id: string; // ID!
     name: string; // String!
     profileId: string; // ID!
-    relationships: NexusGenRootTypes["DowJonesRiskEntityRelationship"][]; // [DowJonesRiskEntityRelationship!]!
-    sanctions: NexusGenRootTypes["DowJonesRiskEntitySanction"][]; // [DowJonesRiskEntitySanction!]!
-    type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    relationships: NexusGenRootTypes["DowJonesKycEntityRelationship"][]; // [DowJonesKycEntityRelationship!]!
+    sanctions: NexusGenRootTypes["DowJonesKycEntitySanction"][]; // [DowJonesKycEntitySanction!]!
+    type: NexusGenEnums["DowJonesKycEntityType"]; // DowJonesKycEntityType!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
-  DowJonesRiskEntitySearchResult: {
+  DowJonesKycEntitySearchResult: {
     // field return type
     countryTerritoryName: string | null; // String
     iconHints: string[]; // [String!]!
@@ -2459,7 +2459,7 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     profileId: string; // ID!
     title: string; // String!
-    type: NexusGenEnums["DowJonesRiskEntityType"]; // DowJonesRiskEntityType!
+    type: NexusGenEnums["DowJonesKycEntityType"]; // DowJonesKycEntityType!
   };
   IOrgIntegration: {
     // field return type
@@ -2673,62 +2673,62 @@ export interface NexusGenFieldTypeNames {
     items: "Contact";
     totalCount: "Int";
   };
-  DowJonesRiskEntityDate: {
+  DowJonesKycEntityDate: {
     // field return type name
     day: "Int";
     month: "Int";
     year: "Int";
   };
-  DowJonesRiskEntityPlace: {
+  DowJonesKycEntityPlace: {
     // field return type name
     countryCode: "String";
     descriptor: "String";
   };
-  DowJonesRiskEntityProfileResultEntity: {
+  DowJonesKycEntityProfileResultEntity: {
     // field return type name
-    dateOfRegistration: "DowJonesRiskEntityDate";
+    dateOfRegistration: "DowJonesKycEntityDate";
     iconHints: "String";
     id: "ID";
     name: "String";
     profileId: "ID";
-    relationships: "DowJonesRiskEntityRelationship";
-    sanctions: "DowJonesRiskEntitySanction";
-    type: "DowJonesRiskEntityType";
+    relationships: "DowJonesKycEntityRelationship";
+    sanctions: "DowJonesKycEntitySanction";
+    type: "DowJonesKycEntityType";
     updatedAt: "DateTime";
   };
-  DowJonesRiskEntityProfileResultPerson: {
+  DowJonesKycEntityProfileResultPerson: {
     // field return type name
-    citizenship: "DowJonesRiskEntityPlace";
-    dateOfBirth: "DowJonesRiskEntityDate";
+    citizenship: "DowJonesKycEntityPlace";
+    dateOfBirth: "DowJonesKycEntityDate";
     iconHints: "String";
     id: "ID";
     isDeceased: "Boolean";
-    jurisdiction: "DowJonesRiskEntityPlace";
+    jurisdiction: "DowJonesKycEntityPlace";
     name: "String";
-    placeOfBirth: "DowJonesRiskEntityPlace";
+    placeOfBirth: "DowJonesKycEntityPlace";
     profileId: "ID";
-    relationships: "DowJonesRiskEntityRelationship";
-    residence: "DowJonesRiskEntityPlace";
-    sanctions: "DowJonesRiskEntitySanction";
-    type: "DowJonesRiskEntityType";
+    relationships: "DowJonesKycEntityRelationship";
+    residence: "DowJonesKycEntityPlace";
+    sanctions: "DowJonesKycEntitySanction";
+    type: "DowJonesKycEntityType";
     updatedAt: "DateTime";
   };
-  DowJonesRiskEntityRelationship: {
+  DowJonesKycEntityRelationship: {
     // field return type name
     connectionType: "String";
     iconHints: "String";
     name: "String";
     profileId: "ID";
-    type: "DowJonesRiskEntityType";
+    type: "DowJonesKycEntityType";
   };
-  DowJonesRiskEntitySanction: {
+  DowJonesKycEntitySanction: {
     // field return type name
-    fromDate: "DowJonesRiskEntityDate";
+    fromDate: "DowJonesKycEntityDate";
     id: "ID";
     name: "String";
     sources: "String";
   };
-  DowJonesRiskEntitySearchResultEntity: {
+  DowJonesKycEntitySearchResultEntity: {
     // field return type name
     countryTerritoryName: "String";
     iconHints: "String";
@@ -2737,17 +2737,17 @@ export interface NexusGenFieldTypeNames {
     name: "String";
     profileId: "ID";
     title: "String";
-    type: "DowJonesRiskEntityType";
+    type: "DowJonesKycEntityType";
   };
-  DowJonesRiskEntitySearchResultPagination: {
+  DowJonesKycEntitySearchResultPagination: {
     // field return type name
-    items: "DowJonesRiskEntitySearchResult";
+    items: "DowJonesKycEntitySearchResult";
     totalCount: "Int";
   };
-  DowJonesRiskEntitySearchResultPerson: {
+  DowJonesKycEntitySearchResultPerson: {
     // field return type name
     countryTerritoryName: "String";
-    dateOfBirth: "DowJonesRiskEntityDate";
+    dateOfBirth: "DowJonesKycEntityDate";
     gender: "String";
     iconHints: "String";
     id: "ID";
@@ -2755,7 +2755,7 @@ export interface NexusGenFieldTypeNames {
     name: "String";
     profileId: "ID";
     title: "String";
-    type: "DowJonesRiskEntityType";
+    type: "DowJonesKycEntityType";
   };
   EffectivePetitionUserPermission: {
     // field return type name
@@ -3744,12 +3744,12 @@ export interface NexusGenFieldTypeNames {
   };
   Query: {
     // field return type name
+    DowJonesKycEntityProfile: "DowJonesKycEntityProfileResult";
+    DowJonesKycEntitySearch: "DowJonesKycEntitySearchResultPagination";
     access: "PublicPetitionAccess";
     contact: "Contact";
     contacts: "ContactPagination";
     contactsByEmail: "Contact";
-    dowJonesRiskEntityProfile: "DowJonesRiskEntityProfileResult";
-    dowJonesRiskEntitySearch: "DowJonesRiskEntitySearchResultPagination";
     emailIsAvailable: "Boolean";
     getSlugForPublicPetitionLink: "String";
     getUsersOrGroups: "UserOrUserGroup";
@@ -4140,18 +4140,18 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
   };
-  DowJonesRiskEntityProfileResult: {
+  DowJonesKycEntityProfileResult: {
     // field return type name
     iconHints: "String";
     id: "ID";
     name: "String";
     profileId: "ID";
-    relationships: "DowJonesRiskEntityRelationship";
-    sanctions: "DowJonesRiskEntitySanction";
-    type: "DowJonesRiskEntityType";
+    relationships: "DowJonesKycEntityRelationship";
+    sanctions: "DowJonesKycEntitySanction";
+    type: "DowJonesKycEntityType";
     updatedAt: "DateTime";
   };
-  DowJonesRiskEntitySearchResult: {
+  DowJonesKycEntitySearchResult: {
     // field return type name
     countryTerritoryName: "String";
     iconHints: "String";
@@ -4160,7 +4160,7 @@ export interface NexusGenFieldTypeNames {
     name: "String";
     profileId: "ID";
     title: "String";
-    type: "DowJonesRiskEntityType";
+    type: "DowJonesKycEntityType";
   };
   IOrgIntegration: {
     // field return type name
@@ -5246,6 +5246,17 @@ export interface NexusGenArgTypes {
     };
   };
   Query: {
+    DowJonesKycEntityProfile: {
+      // args
+      profileId: string; // ID!
+    };
+    DowJonesKycEntitySearch: {
+      // args
+      dateOfBirth?: NexusGenScalars["DateTime"] | null; // DateTime
+      limit?: number | null; // Int
+      name: string; // String!
+      offset?: number | null; // Int
+    };
     access: {
       // args
       keycode: string; // ID!
@@ -5265,17 +5276,6 @@ export interface NexusGenArgTypes {
     contactsByEmail: {
       // args
       emails: string[]; // [String!]!
-    };
-    dowJonesRiskEntityProfile: {
-      // args
-      profileId: string; // ID!
-    };
-    dowJonesRiskEntitySearch: {
-      // args
-      dateOfBirth?: NexusGenScalars["DateTime"] | null; // DateTime
-      limit?: number | null; // Int
-      name: string; // String!
-      offset?: number | null; // Int
     };
     emailIsAvailable: {
       // args
@@ -5463,12 +5463,12 @@ export interface NexusGenAbstractTypeMembers {
     | "PetitionMessage"
     | "PetitionReminder"
     | "UserAuthenticationToken";
-  DowJonesRiskEntityProfileResult:
-    | "DowJonesRiskEntityProfileResultEntity"
-    | "DowJonesRiskEntityProfileResultPerson";
-  DowJonesRiskEntitySearchResult:
-    | "DowJonesRiskEntitySearchResultEntity"
-    | "DowJonesRiskEntitySearchResultPerson";
+  DowJonesKycEntityProfileResult:
+    | "DowJonesKycEntityProfileResultEntity"
+    | "DowJonesKycEntityProfileResultPerson";
+  DowJonesKycEntitySearchResult:
+    | "DowJonesKycEntitySearchResultEntity"
+    | "DowJonesKycEntitySearchResultPerson";
   IOrgIntegration: "OrgIntegration" | "SignatureOrgIntegration";
   PetitionBase: "Petition" | "PetitionTemplate";
   PetitionEvent:
@@ -5550,10 +5550,10 @@ export interface NexusGenTypeInterfaces {
   CommentDeletedEvent: "PetitionEvent";
   CommentPublishedEvent: "PetitionEvent";
   Contact: "Timestamps";
-  DowJonesRiskEntityProfileResultEntity: "DowJonesRiskEntityProfileResult";
-  DowJonesRiskEntityProfileResultPerson: "DowJonesRiskEntityProfileResult";
-  DowJonesRiskEntitySearchResultEntity: "DowJonesRiskEntitySearchResult";
-  DowJonesRiskEntitySearchResultPerson: "DowJonesRiskEntitySearchResult";
+  DowJonesKycEntityProfileResultEntity: "DowJonesKycEntityProfileResult";
+  DowJonesKycEntityProfileResultPerson: "DowJonesKycEntityProfileResult";
+  DowJonesKycEntitySearchResultEntity: "DowJonesKycEntitySearchResult";
+  DowJonesKycEntitySearchResultPerson: "DowJonesKycEntitySearchResult";
   GroupPermissionAddedEvent: "PetitionEvent";
   GroupPermissionEditedEvent: "PetitionEvent";
   GroupPermissionRemovedEvent: "PetitionEvent";
@@ -5634,8 +5634,8 @@ export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never;
 
 export type NexusGenAbstractsUsingStrategyResolveType =
   | "CreatedAt"
-  | "DowJonesRiskEntityProfileResult"
-  | "DowJonesRiskEntitySearchResult"
+  | "DowJonesKycEntityProfileResult"
+  | "DowJonesKycEntitySearchResult"
   | "IOrgIntegration"
   | "PetitionBase"
   | "PetitionBaseOrFolder"

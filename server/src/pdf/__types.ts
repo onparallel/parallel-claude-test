@@ -193,73 +193,73 @@ export type CreatedAt = {
   createdAt: Scalars["DateTime"];
 };
 
-export type DowJonesRiskEntityDate = {
+export type DowJonesKycEntityDate = {
   day: Maybe<Scalars["Int"]>;
   month: Maybe<Scalars["Int"]>;
   year: Maybe<Scalars["Int"]>;
 };
 
-export type DowJonesRiskEntityPlace = {
+export type DowJonesKycEntityPlace = {
   countryCode: Scalars["String"];
   descriptor: Scalars["String"];
 };
 
-export type DowJonesRiskEntityProfileResult = {
+export type DowJonesKycEntityProfileResult = {
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   name: Scalars["String"];
   profileId: Scalars["ID"];
-  relationships: Array<DowJonesRiskEntityRelationship>;
-  sanctions: Array<DowJonesRiskEntitySanction>;
-  type: DowJonesRiskEntityType;
+  relationships: Array<DowJonesKycEntityRelationship>;
+  sanctions: Array<DowJonesKycEntitySanction>;
+  type: DowJonesKycEntityType;
   updatedAt: Scalars["DateTime"];
 };
 
-export type DowJonesRiskEntityProfileResultEntity = DowJonesRiskEntityProfileResult & {
-  dateOfRegistration: Maybe<DowJonesRiskEntityDate>;
+export type DowJonesKycEntityProfileResultEntity = DowJonesKycEntityProfileResult & {
+  dateOfRegistration: Maybe<DowJonesKycEntityDate>;
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   name: Scalars["String"];
   profileId: Scalars["ID"];
-  relationships: Array<DowJonesRiskEntityRelationship>;
-  sanctions: Array<DowJonesRiskEntitySanction>;
-  type: DowJonesRiskEntityType;
+  relationships: Array<DowJonesKycEntityRelationship>;
+  sanctions: Array<DowJonesKycEntitySanction>;
+  type: DowJonesKycEntityType;
   updatedAt: Scalars["DateTime"];
 };
 
-export type DowJonesRiskEntityProfileResultPerson = DowJonesRiskEntityProfileResult & {
-  citizenship: Maybe<DowJonesRiskEntityPlace>;
-  dateOfBirth: Maybe<DowJonesRiskEntityDate>;
+export type DowJonesKycEntityProfileResultPerson = DowJonesKycEntityProfileResult & {
+  citizenship: Maybe<DowJonesKycEntityPlace>;
+  dateOfBirth: Maybe<DowJonesKycEntityDate>;
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
   isDeceased: Scalars["Boolean"];
-  jurisdiction: Maybe<DowJonesRiskEntityPlace>;
+  jurisdiction: Maybe<DowJonesKycEntityPlace>;
   name: Scalars["String"];
-  placeOfBirth: Maybe<DowJonesRiskEntityPlace>;
+  placeOfBirth: Maybe<DowJonesKycEntityPlace>;
   profileId: Scalars["ID"];
-  relationships: Array<DowJonesRiskEntityRelationship>;
-  residence: Maybe<DowJonesRiskEntityPlace>;
-  sanctions: Array<DowJonesRiskEntitySanction>;
-  type: DowJonesRiskEntityType;
+  relationships: Array<DowJonesKycEntityRelationship>;
+  residence: Maybe<DowJonesKycEntityPlace>;
+  sanctions: Array<DowJonesKycEntitySanction>;
+  type: DowJonesKycEntityType;
   updatedAt: Scalars["DateTime"];
 };
 
-export type DowJonesRiskEntityRelationship = {
+export type DowJonesKycEntityRelationship = {
   connectionType: Scalars["String"];
   iconHints: Array<Scalars["String"]>;
   name: Maybe<Scalars["String"]>;
-  profileId: Scalars["Int"];
-  type: DowJonesRiskEntityType;
+  profileId: Scalars["ID"];
+  type: DowJonesKycEntityType;
 };
 
-export type DowJonesRiskEntitySanction = {
-  fromDate: Maybe<DowJonesRiskEntityDate>;
-  id: Scalars["Int"];
+export type DowJonesKycEntitySanction = {
+  fromDate: Maybe<DowJonesKycEntityDate>;
+  id: Scalars["ID"];
   name: Scalars["String"];
   sources: Array<Scalars["String"]>;
 };
 
-export type DowJonesRiskEntitySearchResult = {
+export type DowJonesKycEntitySearchResult = {
   countryTerritoryName: Maybe<Scalars["String"]>;
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
@@ -267,10 +267,10 @@ export type DowJonesRiskEntitySearchResult = {
   name: Scalars["String"];
   profileId: Scalars["ID"];
   title: Scalars["String"];
-  type: DowJonesRiskEntityType;
+  type: DowJonesKycEntityType;
 };
 
-export type DowJonesRiskEntitySearchResultEntity = DowJonesRiskEntitySearchResult & {
+export type DowJonesKycEntitySearchResultEntity = DowJonesKycEntitySearchResult & {
   countryTerritoryName: Maybe<Scalars["String"]>;
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
@@ -278,19 +278,19 @@ export type DowJonesRiskEntitySearchResultEntity = DowJonesRiskEntitySearchResul
   name: Scalars["String"];
   profileId: Scalars["ID"];
   title: Scalars["String"];
-  type: DowJonesRiskEntityType;
+  type: DowJonesKycEntityType;
 };
 
-export type DowJonesRiskEntitySearchResultPagination = {
+export type DowJonesKycEntitySearchResultPagination = {
   /** The requested slice of items. */
-  items: Array<DowJonesRiskEntitySearchResult>;
+  items: Array<DowJonesKycEntitySearchResult>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
 };
 
-export type DowJonesRiskEntitySearchResultPerson = DowJonesRiskEntitySearchResult & {
+export type DowJonesKycEntitySearchResultPerson = DowJonesKycEntitySearchResult & {
   countryTerritoryName: Maybe<Scalars["String"]>;
-  dateOfBirth: Maybe<DowJonesRiskEntityDate>;
+  dateOfBirth: Maybe<DowJonesKycEntityDate>;
   gender: Scalars["String"];
   iconHints: Array<Scalars["String"]>;
   id: Scalars["ID"];
@@ -298,10 +298,10 @@ export type DowJonesRiskEntitySearchResultPerson = DowJonesRiskEntitySearchResul
   name: Scalars["String"];
   profileId: Scalars["ID"];
   title: Scalars["String"];
-  type: DowJonesRiskEntityType;
+  type: DowJonesKycEntityType;
 };
 
-export type DowJonesRiskEntityType = "Entity" | "Person";
+export type DowJonesKycEntityType = "Entity" | "Person";
 
 /** The effective permission for a petition and user */
 export type EffectivePetitionUserPermission = {
@@ -413,6 +413,7 @@ export type GroupPermissionRemovedEvent = PetitionEvent & {
 
 export type IOrgIntegration = {
   id: Scalars["GID"];
+  invalidCredentials: Scalars["Boolean"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
   isDefault: Scalars["Boolean"];
   /** Custom name of this integration, provided by the user */
@@ -575,7 +576,7 @@ export type Mutation = {
   completePetition: Petition;
   /** Create a contact. */
   createContact: Contact;
-  /** Creates a new DOW JONES Factiva integration on the user's organization */
+  /** Creates a new Dow Jones KYC integration on the user's organization */
   createDowJonesKycIntegration: OrgIntegration;
   /** Creates a reply for a DOW_JONES_KYC_FIELD, obtaining profile info and PDF document */
   createDowJonesKycReply: PetitionFieldReply;
@@ -1774,6 +1775,7 @@ export type MutationverifyPublicAccessArgs = {
 
 export type OrgIntegration = IOrgIntegration & {
   id: Scalars["GID"];
+  invalidCredentials: Scalars["Boolean"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
   isDefault: Scalars["Boolean"];
   /** Custom name of this integration, provided by the user */
@@ -3181,14 +3183,14 @@ export type PublicUser = {
 export type PublicUserOrContact = PublicContact | PublicUser;
 
 export type Query = {
+  DowJonesKycEntityProfile: DowJonesKycEntityProfileResult;
+  DowJonesKycEntitySearch: DowJonesKycEntitySearchResultPagination;
   access: PublicPetitionAccess;
   contact: Maybe<Contact>;
   /** The contacts of the user */
   contacts: ContactPagination;
   /** Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts */
   contactsByEmail: Array<Maybe<Contact>>;
-  dowJonesRiskEntityProfile: DowJonesRiskEntityProfileResult;
-  dowJonesRiskEntitySearch: DowJonesRiskEntitySearchResultPagination;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
   getSlugForPublicPetitionLink: Scalars["String"];
@@ -3239,6 +3241,17 @@ export type Query = {
   userGroups: UserGroupPagination;
 };
 
+export type QueryDowJonesKycEntityProfileArgs = {
+  profileId: Scalars["ID"];
+};
+
+export type QueryDowJonesKycEntitySearchArgs = {
+  dateOfBirth?: InputMaybe<Scalars["DateTime"]>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  name: Scalars["String"];
+  offset?: InputMaybe<Scalars["Int"]>;
+};
+
 export type QueryaccessArgs = {
   keycode: Scalars["ID"];
 };
@@ -3257,17 +3270,6 @@ export type QuerycontactsArgs = {
 
 export type QuerycontactsByEmailArgs = {
   emails: Array<Scalars["String"]>;
-};
-
-export type QuerydowJonesRiskEntityProfileArgs = {
-  profileId: Scalars["ID"];
-};
-
-export type QuerydowJonesRiskEntitySearchArgs = {
-  dateOfBirth?: InputMaybe<Scalars["DateTime"]>;
-  limit?: InputMaybe<Scalars["Int"]>;
-  name: Scalars["String"];
-  offset?: InputMaybe<Scalars["Int"]>;
 };
 
 export type QueryemailIsAvailableArgs = {
@@ -3659,6 +3661,7 @@ export type SignatureOrgIntegration = IOrgIntegration & {
   /** Environment of this integration, to differentiate between sandbox and production-ready integrations */
   environment: SignatureOrgIntegrationEnvironment;
   id: Scalars["GID"];
+  invalidCredentials: Scalars["Boolean"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
   isDefault: Scalars["Boolean"];
   /** Custom name of this integration, provided by the user */

@@ -23,11 +23,11 @@ import {
 } from "@parallel/chakra/icons";
 import { Table, TableColumn } from "@parallel/components/common/Table";
 import {
-  DowJonesProfileDetails_dowJonesRiskEntityProfileDocument,
-  DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultEntity_Fragment,
-  DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultPerson_Fragment,
-  DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment,
-  DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment,
+  DowJonesProfileDetails_DowJonesKycEntityProfileDocument,
+  DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultEntity_Fragment,
+  DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment,
+  DowJonesProfileDetails_DowJonesKycEntityRelationshipFragment,
+  DowJonesProfileDetails_DowJonesKycEntitySanctionFragment,
   DowJonesSearchResult_createDowJonesKycReplyDocument,
   DowJonesSearchResult_deletePetitionFieldReplyDocument,
   Maybe,
@@ -63,8 +63,7 @@ export function DowJonesProfileDetails({
 }: DowJonesProfileDetailsProps) {
   const intl = useIntl();
   const showGenericErrorToast = useGenericErrorToast();
-
-  const { data, loading } = useQuery(DowJonesProfileDetails_dowJonesRiskEntityProfileDocument, {
+  const { data, loading } = useQuery(DowJonesProfileDetails_DowJonesKycEntityProfileDocument, {
     variables: { profileId },
   });
 
@@ -105,10 +104,10 @@ export function DowJonesProfileDetails({
     }
   };
 
-  const details = data?.dowJonesRiskEntityProfile;
+  const details = data?.DowJonesKycEntityProfile;
 
   const handleSanctionsRowClick = useCallback(function (
-    row: DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment
+    row: DowJonesProfileDetails_DowJonesKycEntitySanctionFragment
   ) {
     if (isDefined(row.sources[0])) {
       openNewWindow(row.sources[0]);
@@ -117,7 +116,7 @@ export function DowJonesProfileDetails({
   []);
 
   const handleRelationshipsRowClick = useCallback(function (
-    row: DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment
+    row: DowJonesProfileDetails_DowJonesKycEntityRelationshipFragment
   ) {
     if (isDefined(row.profileId)) {
       onProfileIdChange(row.profileId);
@@ -208,9 +207,9 @@ export function DowJonesProfileDetails({
         </CardHeader>
         {loading ? (
           <Box height={"85px"}></Box>
-        ) : details?.__typename === "DowJonesRiskEntityProfileResultEntity" ? (
+        ) : details?.__typename === "DowJonesKycEntityProfileResultEntity" ? (
           <ProfileResultEntity data={details} />
-        ) : details?.__typename === "DowJonesRiskEntityProfileResultPerson" ? (
+        ) : details?.__typename === "DowJonesKycEntityProfileResultPerson" ? (
           <ProfileResultPerson data={details} />
         ) : null}
       </Card>
@@ -316,7 +315,7 @@ export function DowJonesProfileDetails({
 function ProfileResultPerson({
   data,
 }: {
-  data: DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultPerson_Fragment;
+  data: DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment;
 }) {
   const intl = useIntl();
 
@@ -495,7 +494,7 @@ function ProfileResultPerson({
 function ProfileResultEntity({
   data,
 }: {
-  data: DowJonesProfileDetails_DowJonesRiskEntityProfileResult_DowJonesRiskEntityProfileResultEntity_Fragment;
+  data: DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultEntity_Fragment;
 }) {
   const intl = useIntl();
 
@@ -546,7 +545,7 @@ function ProfileResultEntity({
 function useDowJonesKycSanctionsColumns() {
   const intl = useIntl();
 
-  return useMemo<TableColumn<DowJonesProfileDetails_DowJonesRiskEntitySanctionFragment>[]>(
+  return useMemo<TableColumn<DowJonesProfileDetails_DowJonesKycEntitySanctionFragment>[]>(
     () => [
       {
         key: "name",
@@ -584,7 +583,7 @@ function useDowJonesKycSanctionsColumns() {
 function useDowJonesKycRelationshipsColumns() {
   const intl = useIntl();
 
-  return useMemo<TableColumn<DowJonesProfileDetails_DowJonesRiskEntityRelationshipFragment>[]>(
+  return useMemo<TableColumn<DowJonesProfileDetails_DowJonesKycEntityRelationshipFragment>[]>(
     () => [
       {
         key: "tags",
@@ -661,9 +660,9 @@ function useDowJonesKycRelationshipsColumns() {
 }
 
 DowJonesProfileDetails.fragments = {
-  get DowJonesRiskEntitySanction() {
+  get DowJonesKycEntitySanction() {
     return gql`
-      fragment DowJonesProfileDetails_DowJonesRiskEntitySanction on DowJonesRiskEntitySanction {
+      fragment DowJonesProfileDetails_DowJonesKycEntitySanction on DowJonesKycEntitySanction {
         id
         name
         sources
@@ -675,9 +674,9 @@ DowJonesProfileDetails.fragments = {
       }
     `;
   },
-  get DowJonesRiskEntityRelationship() {
+  get DowJonesKycEntityRelationship() {
     return gql`
-      fragment DowJonesProfileDetails_DowJonesRiskEntityRelationship on DowJonesRiskEntityRelationship {
+      fragment DowJonesProfileDetails_DowJonesKycEntityRelationship on DowJonesKycEntityRelationship {
         profileId
         connectionType
         iconHints
@@ -686,28 +685,28 @@ DowJonesProfileDetails.fragments = {
       }
     `;
   },
-  get DowJonesRiskEntityProfileResult() {
+  get DowJonesKycEntityProfileResult() {
     return gql`
-      fragment DowJonesProfileDetails_DowJonesRiskEntityProfileResult on DowJonesRiskEntityProfileResult {
+      fragment DowJonesProfileDetails_DowJonesKycEntityProfileResult on DowJonesKycEntityProfileResult {
         id
         type
         name
         iconHints
         sanctions {
-          ...DowJonesProfileDetails_DowJonesRiskEntitySanction
+          ...DowJonesProfileDetails_DowJonesKycEntitySanction
         }
         relationships {
-          ...DowJonesProfileDetails_DowJonesRiskEntityRelationship
+          ...DowJonesProfileDetails_DowJonesKycEntityRelationship
         }
         updatedAt
-        ... on DowJonesRiskEntityProfileResultEntity {
+        ... on DowJonesKycEntityProfileResultEntity {
           dateOfRegistration {
             year
             month
             day
           }
         }
-        ... on DowJonesRiskEntityProfileResultPerson {
+        ... on DowJonesKycEntityProfileResultPerson {
           placeOfBirth {
             descriptor
             countryCode
@@ -732,19 +731,19 @@ DowJonesProfileDetails.fragments = {
           isDeceased
         }
       }
-      ${DowJonesProfileDetails.fragments.DowJonesRiskEntitySanction}
-      ${DowJonesProfileDetails.fragments.DowJonesRiskEntityRelationship}
+      ${DowJonesProfileDetails.fragments.DowJonesKycEntitySanction}
+      ${DowJonesProfileDetails.fragments.DowJonesKycEntityRelationship}
     `;
   },
 };
 
 DowJonesProfileDetails.queries = [
   gql`
-    query DowJonesProfileDetails_dowJonesRiskEntityProfile($profileId: ID!) {
-      dowJonesRiskEntityProfile(profileId: $profileId) {
-        ...DowJonesProfileDetails_DowJonesRiskEntityProfileResult
+    query DowJonesProfileDetails_DowJonesKycEntityProfile($profileId: ID!) {
+      DowJonesKycEntityProfile(profileId: $profileId) {
+        ...DowJonesProfileDetails_DowJonesKycEntityProfileResult
       }
     }
-    ${DowJonesProfileDetails.fragments.DowJonesRiskEntityProfileResult}
+    ${DowJonesProfileDetails.fragments.DowJonesKycEntityProfileResult}
   `,
 ];
