@@ -17,7 +17,7 @@ import {
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { SupportLink } from "@parallel/components/common/SupportLink";
-import { useMetadata } from "@parallel/utils/withMetadata";
+import { useDateInputProps } from "@parallel/utils/useDateInputProps";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -32,7 +32,6 @@ export type DowJonesSearchFormData = {
 };
 
 export function DowJonesSearchForm({ onSubmit, isDisabled }: DowJonesSearchFormProps) {
-  const { browserName } = useMetadata();
   const {
     handleSubmit,
     register,
@@ -48,6 +47,8 @@ export function DowJonesSearchForm({ onSubmit, isDisabled }: DowJonesSearchFormP
 
   const date = watch("dateOfBirth");
   const intl = useIntl();
+
+  const dateInputProps = useDateInputProps();
   return (
     <Center height="100vh" padding={4}>
       <Stack>
@@ -116,23 +117,7 @@ export function DowJonesSearchForm({ onSubmit, isDisabled }: DowJonesSearchFormP
                   />
                 </FormLabel>
                 <Flex flex="1" position="relative" marginTop={2}>
-                  <Input
-                    type="date"
-                    {...register("dateOfBirth")}
-                    sx={{
-                      paddingRight: 1.5,
-                      "&::-webkit-calendar-picker-indicator": {
-                        color: "transparent",
-                        background: "transparent",
-                      },
-                      ...(browserName === "Safari" // Safari does stupid things
-                        ? {
-                            color: "gray.800",
-                            ...(date ? {} : { "&:not(:focus)": { color: "rgba(0,0,0,0.3)" } }),
-                          }
-                        : {}),
-                    }}
-                  />
+                  <Input type="date" {...register("dateOfBirth")} sx={dateInputProps(date)} />
                   <Center
                     boxSize={10}
                     position="absolute"

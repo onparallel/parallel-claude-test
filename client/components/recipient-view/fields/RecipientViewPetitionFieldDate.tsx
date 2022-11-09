@@ -2,10 +2,10 @@ import { Center, Flex, Input, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon, FieldDateIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { isMetaReturn } from "@parallel/utils/keys";
+import { useDateInputProps } from "@parallel/utils/useDateInputProps";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
-import { useMetadata } from "@parallel/utils/withMetadata";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChangeEvent, forwardRef, KeyboardEvent, useRef, useState } from "react";
 import { useIntl } from "react-intl";
@@ -112,7 +112,7 @@ export function RecipientViewPetitionFieldDate({
     [onCreateReply]
   );
 
-  const { browserName } = useMetadata();
+  const dateInputProps = useDateInputProps();
 
   const inputProps = {
     type: "date",
@@ -123,19 +123,7 @@ export function RecipientViewPetitionFieldDate({
     value,
     // This removes the reset button on Firefox
     required: true,
-    sx: {
-      paddingRight: 1.5,
-      "&::-webkit-calendar-picker-indicator": {
-        color: "transparent",
-        background: "transparent",
-      },
-      ...(browserName === "Safari" // Safari does stupid things
-        ? {
-            color: "gray.800",
-            ...(value ? {} : { "&:not(:focus)": { color: "rgba(0,0,0,0.3)" } }),
-          }
-        : {}),
-    },
+    sx: dateInputProps(value),
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
         await handleCreate.immediate(value, false);
@@ -244,7 +232,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
     [onUpdate]
   );
 
-  const { browserName } = useMetadata();
+  const dateInputProps = useDateInputProps();
 
   const props = {
     type: reply.isAnonymized ? "text" : "date",
@@ -255,17 +243,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
     // This removes the reset button on Firefox
     required: true,
     sx: {
-      paddingRight: 1.5,
-      "&::-webkit-calendar-picker-indicator": {
-        color: "transparent",
-        background: "transparent",
-      },
-      ...(browserName === "Safari" // Safari does stupid things
-        ? {
-            color: "gray.800",
-            ...(value ? {} : { "&:not(:focus)": { color: "rgba(0,0,0,0.3)" } }),
-          }
-        : {}),
+      ...dateInputProps(value),
       _placeholderShown: { fontStyle: reply.isAnonymized ? "italic" : "normal" },
     },
     isDisabled: isDisabled || reply.status === "APPROVED",
