@@ -56,7 +56,7 @@ export function DowJonesIntegrationDialog({
     validate: { isNotEmptyText },
   });
 
-  const [validateIntegration] = useMutation(
+  const [validateIntegration, { loading }] = useMutation(
     DowJonesIntegrationDialog_validateDowJonesKycCredentialsDocument
   );
 
@@ -67,12 +67,7 @@ export function DowJonesIntegrationDialog({
         as: "form",
         onSubmit: handleSubmit(async (data) => {
           try {
-            const res = await validateIntegration({
-              variables: {
-                ...data,
-              },
-            });
-
+            const res = await validateIntegration({ variables: data });
             if (res.data?.validateDowJonesKycCredentials) {
               props.onResolve(data);
             } else {
@@ -166,7 +161,7 @@ export function DowJonesIntegrationDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" variant="solid">
+        <Button type="submit" colorScheme="primary" variant="solid" isLoading={loading}>
           <FormattedMessage
             id="component.dow-jones-integration-dialog.connect"
             defaultMessage="Connect"
