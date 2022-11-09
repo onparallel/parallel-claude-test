@@ -1,4 +1,5 @@
 import { Knex } from "knex";
+import { FeatureFlagName } from "../../src/db/__types";
 
 export async function addFeatureFlag(knex: Knex, featureFlag: string, defaultValue: boolean) {
   // need to commit the transaction before safely using new enum value
@@ -9,7 +10,7 @@ export async function addFeatureFlag(knex: Knex, featureFlag: string, defaultVal
   `);
 
   await knex.from("feature_flag").insert({
-    name: featureFlag,
+    name: featureFlag as FeatureFlagName,
     default_value: defaultValue,
   });
 }
