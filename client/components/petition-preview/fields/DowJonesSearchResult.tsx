@@ -229,11 +229,13 @@ function useDowJonesKycDataColumns() {
         CellContent: ({ row }) => {
           if (row.__typename === "DowJonesKycEntitySearchResultPerson") {
             const { year, month, day } = row.dateOfBirth ?? {};
-
+            console.log("row.dateOfBirth: ", row.dateOfBirth);
             return (
               <>
                 {year && month && day
                   ? intl.formatDate(new Date(year, month - 1, day), FORMATS.ll)
+                  : year
+                  ? year
                   : "-"}
               </>
             );
