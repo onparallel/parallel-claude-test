@@ -75,18 +75,11 @@ function DowJonesFieldSearchResults({
   const columns = useDowJonesKycDataColumns();
   const handleRowClick = useCallback(
     function (row: DowJonesFieldSearchResults_Selection) {
-      const { petitionId, fieldId, ...rest } = router.query;
+      const { petitionId, fieldId } = router.query;
 
-      router.push(
-        `/app/petitions/${petitionId}/preview/dowjones/${fieldId}/${
-          row.profileId
-        }?${new URLSearchParams({
-          ...(rest as any),
-          ...state,
-        })}`
-      );
+      router.push(`/app/petitions/${petitionId}/preview/dowjones/${fieldId}/${row.profileId}`);
     },
-    [state, router.query]
+    [router.query]
   );
 
   const showGenericErrorToast = useGenericErrorToast();

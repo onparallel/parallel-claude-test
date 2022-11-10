@@ -135,23 +135,14 @@ function DowJonesFieldProfileDetails({
     row: DowJonesFieldProfileDetails_DowJonesKycEntityRelationshipFragment
   ) {
     if (isDefined(row.profileId)) {
-      const { petitionId, fieldId, profileId: _, ...rest } = query;
-      router.push(
-        `/app/petitions/${petitionId}/preview/dowjones/${fieldId}/${
-          row.profileId
-        }?${new URLSearchParams(rest as any)}`
-      );
+      const { petitionId, fieldId } = query;
+      router.push(`/app/petitions/${petitionId}/preview/dowjones/${fieldId}/${row.profileId}`);
     }
   },
   []);
 
   const handleGoBackClick = () => {
-    const { petitionId, fieldId, profileId: _, ...rest } = query;
-    router.push(
-      `/app/petitions/${petitionId}/preview/dowjones/${fieldId}/results?${new URLSearchParams(
-        rest as any
-      )}`
-    );
+    window.history.back();
   };
 
   const sanctionsColumns = useDowJonesKycSanctionsColumns();
