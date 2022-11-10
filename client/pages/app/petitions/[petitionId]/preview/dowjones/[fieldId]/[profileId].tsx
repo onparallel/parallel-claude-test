@@ -186,8 +186,12 @@ function DowJonesProfileDetails({
 
         <Card>
           <CardHeader headingLevel="h2" minHeight="65px">
-            <HStack>
-              <Stack direction={{ base: "column", md: "row" }} flex="1">
+            <Stack direction={{ base: "column", sm: "row" }} spacing={4}>
+              <Stack
+                direction={{ base: "column", md: "row" }}
+                alignItems={{ base: "start", md: "center" }}
+                flex="1"
+              >
                 {loading ? (
                   <>
                     <Skeleton height="24px" width="100%" maxWidth="320px" />
@@ -239,7 +243,7 @@ function DowJonesProfileDetails({
                   </Button>
                 )}
               </Box>
-            </HStack>
+            </Stack>
           </CardHeader>
           {loading ? (
             <Box height={"85px"}></Box>
