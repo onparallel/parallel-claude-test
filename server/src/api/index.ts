@@ -5,6 +5,7 @@ import { ApiContext } from "../context";
 import { ILogger, LOGGER } from "../services/logger";
 import { auth } from "./auth";
 import { lambdas } from "./lambdas";
+import { oauth } from "./oauth/oauth";
 import { api as publicApi } from "./public/index";
 import { webhooks } from "./webhooks";
 
@@ -32,6 +33,7 @@ export function api(container: Container) {
     .use("/lambda", lambdas)
     .use("/v1", publicApi.handler())
     .use("/docs", publicApi.spec())
+    .use("/oauth", oauth(container))
     .use(((err, req, res, next) => {
       logger.error(err?.message, { stack: err?.stack });
       next(err);

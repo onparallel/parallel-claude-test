@@ -2,6 +2,7 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { isDefined, uniq } from "remeda";
 import { keyBuilder } from "../../util/keyBuilder";
+import { OauthCredentials } from "../../api/oauth/OAuthIntegration";
 import { Replace } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
@@ -11,7 +12,7 @@ export type SignatureProvider = "SIGNATURIT" | "DOCUSIGN";
 
 type SignatureIntegrationCredentials<TProvider extends SignatureProvider> = {
   SIGNATURIT: { API_KEY: string };
-  DOCUSIGN: { USER_ID: string; INTEGRATION_KEY: string };
+  DOCUSIGN: OauthCredentials;
 }[TProvider];
 
 export type IntegrationSettings<

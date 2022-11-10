@@ -111,6 +111,22 @@ function OrganizationIntegrations() {
       isDisabled: !hasAdminRole,
       logo: (
         <Image
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/docusign.png`}
+          alt="Docusign"
+          maxWidth="124px"
+        />
+      ),
+      title: "DocuSign",
+      body: intl.formatMessage({
+        id: "organization.integrations.docusign-description",
+        defaultMessage: "Add digital signature to your parallels.",
+      }),
+      href: "/api/oauth/docusign/authorize",
+    },
+    {
+      isDisabled: !hasAdminRole,
+      logo: (
+        <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/zapier.png`}
           alt="Zapier"
           maxWidth="100px"

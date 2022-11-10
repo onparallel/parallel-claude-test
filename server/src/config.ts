@@ -152,6 +152,14 @@ export function buildConfig() {
       apiKey: process.env.BANKFLIP_API_KEY!,
       webhookSecret: process.env.BANKFLIP_WEBHOOK_SECRET!,
     },
+    oauth: {
+      docusign: {
+        baseUri: "https://account-d.docusign.com/oauth",
+        clientId: "16b67cfa-ee31-400f-9793-441d4978d96f",
+        secretKey: "caa0dd2d-26f8-48e6-8688-3f4a1e77cd8e",
+        redirectUri: `${process.env.PARALLEL_URL!}/api/oauth/docusign/redirect`,
+      },
+    },
   });
 }
 
