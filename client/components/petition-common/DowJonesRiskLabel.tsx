@@ -60,6 +60,8 @@ export const DowJonesRiskLabel = chakraForwardRef<"span", { risk: string }>(
           colorScheme={
             risk === "PEP"
               ? "green"
+              : risk === "RCA"
+              ? "blue"
               : /^SAN(-?|$)/.test(risk)
               ? "red"
               : /^OOL(-?|$)/.test(risk)
