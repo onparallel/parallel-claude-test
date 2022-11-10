@@ -63,7 +63,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getInitialProps>>;
 
-function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) {
+function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const intl = useIntl();
   const router = useRouter();
   const toast = useToast();
