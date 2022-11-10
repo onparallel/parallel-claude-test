@@ -6,7 +6,7 @@ import { datetimeArg } from "../helpers/scalars";
 import { userHasEnabledIntegration, userHasFeatureFlag } from "../petition/authorizers";
 
 export const queries = queryField((t) => {
-  t.paginationField("DowJonesKycEntitySearch", {
+  t.paginationField("dowJonesKycEntitySearch", {
     type: "DowJonesKycEntitySearchResult",
     authorize: authenticateAnd(
       userHasEnabledIntegration("DOW_JONES_KYC"),
@@ -50,7 +50,7 @@ export const queries = queryField((t) => {
     },
   });
 
-  t.field("DowJonesKycEntityProfile", {
+  t.field("dowJonesKycEntityProfile", {
     type: "DowJonesKycEntityProfileResult",
     authorize: authenticateAnd(
       userHasEnabledIntegration("DOW_JONES_KYC"),

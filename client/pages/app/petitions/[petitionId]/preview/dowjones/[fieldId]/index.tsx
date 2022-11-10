@@ -1,108 +1,63 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+  Button,
+  Center,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Heading,
+  Input,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { FieldDateIcon } from "@parallel/chakra/icons";
+import { Card } from "@parallel/components/common/Card";
+import { DateInput } from "@parallel/components/common/DateInput";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { SupportLink } from "@parallel/components/common/SupportLink";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import {
-  DowJonesSearchForm,
-  DowJonesSearchFormData,
-} from "@parallel/components/petition-preview/fields/DowJonesSearchForm";
-import { DowJonesSearchResult } from "@parallel/components/petition-preview/fields/DowJonesSearchResult";
-import {
-  DowJonesFieldPreview_createDowJonesKycReplyDocument,
-  DowJonesFieldPreview_deletePetitionFieldReplyDocument,
-  DowJonesFieldPreview_petitionFieldDocument,
-  DowJonesFieldPreview_userDocument,
+  DowJonesFieldSearch_petitionFieldDocument,
+  DowJonesFieldSearch_userDocument,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { integer, string, useQueryState, values } from "@parallel/utils/queryState";
-import { UnwrapPromise } from "@parallel/utils/types";
-import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
-import { isValidDateString } from "@parallel/utils/validation";
 import { withMetadata } from "@parallel/utils/withMetadata";
 import Head from "next/head";
-import { useState } from "react";
-import { isDefined } from "remeda";
+import { useRouter } from "next/router";
+import { useForm } from "react-hook-form";
+import { FormattedMessage, useIntl } from "react-intl";
 
-const QUERY_STATE = {
-  page: integer({ min: 1 }).orDefault(1),
-  items: values([10, 25, 50]).orDefault(10),
-  dateOfBirth: string().withValidation(isValidDateString),
-  name: string(),
-};
+export interface DowJonesSearchFormData {
+  name: string;
+  dateOfBirth: string;
+}
 
-function DowJonesFieldPreview({
-  petitionId,
-  petitionFieldId,
-}: UnwrapPromise<ReturnType<typeof DowJonesFieldPreview.getInitialProps>>) {
-  const {
-    data: { petitionField },
-  } = useAssertQuery(DowJonesFieldPreview_petitionFieldDocument, {
-    variables: {
-      petitionId,
-      petitionFieldId,
-    },
-  });
+function DowJonesFieldSearch() {
+  const router = useRouter();
+  const intl = useIntl();
 
   const {
     data: { me },
-  } = useAssertQuery(DowJonesFieldPreview_userDocument);
-  const showGenericErrorToast = useGenericErrorToast();
+  } = useAssertQuery(DowJonesFieldSearch_userDocument);
+  const isDisabled = !me.hasDowJonesFeatureFlag;
 
-  const [state, setQueryState] = useQueryState(QUERY_STATE);
-
-  const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
-  const [isCreatingReply, setIsCreatingReply] = useState<Record<string, boolean>>({});
-
-  const handleFormSubmit = async (data: DowJonesSearchFormData) => {
-    setQueryState(() => ({
-      name: data.name,
-      ...(data.dateOfBirth ? { dateOfBirth: data.dateOfBirth } : {}),
-    }));
-  };
-
-  const handleResetSearch = async () => {
-    setQueryState({});
-  };
-
-  const [createDowJonesKycReply] = useMutation(DowJonesFieldPreview_createDowJonesKycReplyDocument);
-  const [deletePetitionFieldReply] = useMutation(
-    DowJonesFieldPreview_deletePetitionFieldReplyDocument
-  );
-
-  const handleDeleteReply = async (replyId: string) => {
-    try {
-      setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
-      await deletePetitionFieldReply({
-        variables: {
-          petitionId,
-          replyId,
-        },
-      });
-
-      window.opener.postMessage("refresh", window.origin);
-    } catch (e) {
-      showGenericErrorToast(e);
-    }
-    setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
-  };
-
-  const handleCreateReply = async (profileId: string) => {
-    try {
-      setIsCreatingReply((curr) => ({ ...curr, [profileId]: true }));
-      await createDowJonesKycReply({
-        variables: {
-          profileId,
-          petitionId,
-          fieldId: petitionFieldId,
-        },
-      });
-
-      window.opener.postMessage("refresh", window.origin);
-    } catch (e) {
-      showGenericErrorToast(e);
-    }
-    setIsCreatingReply(({ [profileId]: _, ...curr }) => curr);
-  };
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<DowJonesSearchFormData>({
+    mode: "onSubmit",
+    defaultValues: {
+      name: "",
+      dateOfBirth: "",
+    },
+  });
 
   return (
     <>
@@ -110,37 +65,125 @@ function DowJonesFieldPreview({
         <title>{"Dow Jones | Parallel"}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      {isDefined(state.name) ? (
-        <DowJonesSearchResult
-          name={state.name}
-          date={state.dateOfBirth}
-          replies={petitionField.replies}
-          onResetClick={handleResetSearch}
-          onCreateReply={handleCreateReply}
-          onDeleteReply={handleDeleteReply}
-          isCreatingReply={isCreatingReply}
-          isDeletingReply={isDeletingReply}
-        />
-      ) : (
-        <DowJonesSearchForm onSubmit={handleFormSubmit} isDisabled={!me.hasDowJonesFeatureFlag} />
-      )}
+      <Center height="100vh" padding={4}>
+        <Stack>
+          {isDisabled ? (
+            <Alert status="warning" borderRadius="md" maxWidth="500px">
+              <AlertIcon />
+              <Stack>
+                <AlertTitle>
+                  <FormattedMessage
+                    id="component.internal-field-kyc-research.disabled-feature-alert-title"
+                    defaultMessage="Disabled feature"
+                  />
+                </AlertTitle>
+                <AlertDescription>
+                  <Text>
+                    <FormattedMessage
+                      id="component.internal-field-kyc-research.disabled-feature-alert-body"
+                      defaultMessage="Your organization does not have access to this feature. <Link>Contact with our support team</Link> for more information."
+                      values={{
+                        Link: (chunks: any[]) => (
+                          <SupportLink
+                            message={intl.formatMessage({
+                              id: "component.internal-field-kyc-research.disabled-feature-alert-message",
+                              defaultMessage: "Hi, I am having issues with the Dow Jones field.",
+                            })}
+                          >
+                            {chunks}
+                          </SupportLink>
+                        ),
+                      }}
+                    />
+                  </Text>
+                </AlertDescription>
+              </Stack>
+            </Alert>
+          ) : null}
+          <Card
+            as="form"
+            onSubmit={handleSubmit(({ name, dateOfBirth }) => {
+              const { petitionId, fieldId } = router.query;
+              router.push(
+                `/app/petitions/${petitionId}/preview/dowjones/${fieldId}/results?${new URLSearchParams(
+                  { name, dateOfBirth }
+                )}`
+              );
+            })}
+            paddingX={8}
+            paddingY={10}
+            width="100%"
+            maxWidth={"500px"}
+          >
+            <Stack spacing={6}>
+              <Heading size="lg">
+                <FormattedMessage
+                  id="component.internal-field-kyc-research.fill-in-data"
+                  defaultMessage="Fill in the data to start the search"
+                />
+              </Heading>
+              <Stack spacing={4}>
+                <FormControl id="name" isInvalid={!!errors.name} isDisabled={isDisabled}>
+                  <FormLabel fontWeight="400">
+                    <FormattedMessage
+                      id="component.internal-field-kyc-research.name-person-entity"
+                      defaultMessage="Name of the person/entity *"
+                    />
+                  </FormLabel>
+                  <Input {...register("name", { required: true })} />
+                  <FormErrorMessage>
+                    <FormattedMessage
+                      id="generic.forms.invalid-first-name-error"
+                      defaultMessage="Please, enter the first name"
+                    />
+                  </FormErrorMessage>
+                </FormControl>
+                <FormControl isDisabled={isDisabled}>
+                  <FormLabel fontWeight="400">
+                    <FormattedMessage
+                      id="component.internal-field-kyc-research.date-of-birth"
+                      defaultMessage="Date of birth"
+                    />
+                  </FormLabel>
+                  <Flex flex="1" position="relative" marginTop={2}>
+                    <DateInput {...register("dateOfBirth")} />
+                    <Center
+                      boxSize={10}
+                      position="absolute"
+                      right={0}
+                      bottom={0}
+                      pointerEvents="none"
+                    >
+                      <FieldDateIcon fontSize="18px" />
+                    </Center>
+                  </Flex>
+                </FormControl>
+              </Stack>
+              <Button colorScheme="primary" type="submit" isDisabled={isDisabled}>
+                <FormattedMessage
+                  id="component.internal-field-kyc-research.search"
+                  defaultMessage="Search"
+                />
+              </Button>
+            </Stack>
+          </Card>
+        </Stack>
+      </Center>
     </>
   );
 }
 
-DowJonesFieldPreview.fragments = {
-  PetitionField: gql`
-    fragment DowJonesFieldPreview_PetitionField on PetitionField {
-      id
-      type
-      replies {
-        ...DowJonesSearchResult_PetitionFieldReply
+const _queries = [
+  gql`
+    query DowJonesFieldSearch_petitionField($petitionId: GID!, $petitionFieldId: GID!) {
+      petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
+        id
+        type
       }
     }
-    ${DowJonesSearchResult.fragments.PetitionFieldReply}
   `,
-  Query: gql`
-    fragment DowJonesFieldPreview_Query on Query {
+  gql`
+    query DowJonesFieldSearch_user {
       metadata {
         browserName
       }
@@ -150,58 +193,9 @@ DowJonesFieldPreview.fragments = {
       }
     }
   `,
-};
-
-DowJonesFieldPreview.mutations = [
-  gql`
-    mutation DowJonesFieldPreview_createDowJonesKycReply(
-      $petitionId: GID!
-      $fieldId: GID!
-      $profileId: ID!
-    ) {
-      createDowJonesKycReply(petitionId: $petitionId, fieldId: $fieldId, profileId: $profileId) {
-        id
-        field {
-          id
-          replies {
-            id
-            content
-          }
-        }
-      }
-    }
-  `,
-  gql`
-    mutation DowJonesFieldPreview_deletePetitionFieldReply($petitionId: GID!, $replyId: GID!) {
-      deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
-        id
-        replies {
-          id
-          content
-        }
-      }
-    }
-  `,
 ];
 
-DowJonesFieldPreview.queries = [
-  gql`
-    query DowJonesFieldPreview_petitionField($petitionId: GID!, $petitionFieldId: GID!) {
-      petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
-        ...DowJonesFieldPreview_PetitionField
-      }
-    }
-    ${DowJonesFieldPreview.fragments.PetitionField}
-  `,
-  gql`
-    query DowJonesFieldPreview_user {
-      ...DowJonesFieldPreview_Query
-    }
-    ${DowJonesFieldPreview.fragments.Query}
-  `,
-];
-
-DowJonesFieldPreview.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
+DowJonesFieldSearch.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const petitionId = query.petitionId as string;
   const petitionFieldId = query.fieldId as string;
   const [
@@ -212,8 +206,8 @@ DowJonesFieldPreview.getInitialProps = async ({ query, fetchQuery }: WithApolloD
       data: { petitionField },
     },
   ] = await Promise.all([
-    fetchQuery(DowJonesFieldPreview_userDocument),
-    fetchQuery(DowJonesFieldPreview_petitionFieldDocument, {
+    fetchQuery(DowJonesFieldSearch_userDocument),
+    fetchQuery(DowJonesFieldSearch_petitionFieldDocument, {
       variables: { petitionId, petitionFieldId },
       ignoreCache: true,
     }),
@@ -223,7 +217,7 @@ DowJonesFieldPreview.getInitialProps = async ({ query, fetchQuery }: WithApolloD
     throw new Error("FORBIDDEN");
   }
 
-  return { petitionId, petitionFieldId, metadata };
+  return { metadata };
 };
 
-export default compose(withMetadata, withDialogs, withApolloData)(DowJonesFieldPreview);
+export default compose(withMetadata, withDialogs, withApolloData)(DowJonesFieldSearch);

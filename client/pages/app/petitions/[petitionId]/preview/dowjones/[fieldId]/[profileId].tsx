@@ -27,17 +27,17 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { Table, TableColumn } from "@parallel/components/common/Table";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { DowJonesRiskLabel } from "@parallel/components/petition-common/DowJonesRiskLabel";
 import {
-  DowJonesProfileDetails_createDowJonesKycReplyDocument,
-  DowJonesProfileDetails_deletePetitionFieldReplyDocument,
-  DowJonesProfileDetails_DowJonesKycEntityProfileDocument,
-  DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultEntity_Fragment,
-  DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment,
-  DowJonesProfileDetails_DowJonesKycEntityRelationshipFragment,
-  DowJonesProfileDetails_DowJonesKycEntitySanctionFragment,
-  DowJonesProfileDetails_petitionFieldDocument,
-  DowJonesProfileDetails_userDocument,
+  DowJonesFieldProfileDetails_createDowJonesKycReplyDocument,
+  DowJonesFieldProfileDetails_deletePetitionFieldReplyDocument,
+  DowJonesFieldProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultEntity_Fragment,
+  DowJonesFieldProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment,
+  DowJonesFieldProfileDetails_DowJonesKycEntityRelationshipFragment,
+  DowJonesFieldProfileDetails_DowJonesKycEntitySanctionFragment,
+  DowJonesFieldProfileDetails_petitionFieldDocument,
+  DowJonesFieldProfileDetails_profileDocument,
 } from "@parallel/graphql/__types";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
@@ -52,30 +52,30 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
-function DowJonesProfileDetails({
+function DowJonesFieldProfileDetails({
   petitionId,
   fieldId,
   profileId,
   fieldReplyId,
-}: UnwrapPromise<ReturnType<typeof DowJonesProfileDetails.getInitialProps>>) {
+}: UnwrapPromise<ReturnType<typeof DowJonesFieldProfileDetails.getInitialProps>>) {
   const intl = useIntl();
   const router = useRouter();
   const { query } = router;
   const showGenericErrorToast = useGenericErrorToast();
 
-  const { data, loading } = useQuery(DowJonesProfileDetails_DowJonesKycEntityProfileDocument, {
+  const { data, loading } = useQuery(DowJonesFieldProfileDetails_profileDocument, {
     variables: { profileId },
   });
 
-  const details = data?.DowJonesKycEntityProfile;
+  const details = data?.dowJonesKycEntityProfile;
 
   const [replyId, setReplyId] = useState<string | null>(fieldReplyId ?? null);
 
   const [createDowJonesKycReply, { loading: isSavingProfile }] = useMutation(
-    DowJonesProfileDetails_createDowJonesKycReplyDocument
+    DowJonesFieldProfileDetails_createDowJonesKycReplyDocument
   );
   const [deletePetitionFieldReply, { loading: isDeletingReply }] = useMutation(
-    DowJonesProfileDetails_deletePetitionFieldReplyDocument
+    DowJonesFieldProfileDetails_deletePetitionFieldReplyDocument
   );
 
   useEffect(() => {
@@ -123,7 +123,7 @@ function DowJonesProfileDetails({
   };
 
   const handleSanctionsRowClick = useCallback(function (
-    row: DowJonesProfileDetails_DowJonesKycEntitySanctionFragment
+    row: DowJonesFieldProfileDetails_DowJonesKycEntitySanctionFragment
   ) {
     if (isDefined(row.sources[0])) {
       openNewWindow(row.sources[0]);
@@ -132,16 +132,14 @@ function DowJonesProfileDetails({
   []);
 
   const handleRelationshipsRowClick = useCallback(function (
-    row: DowJonesProfileDetails_DowJonesKycEntityRelationshipFragment
+    row: DowJonesFieldProfileDetails_DowJonesKycEntityRelationshipFragment
   ) {
     if (isDefined(row.profileId)) {
       const { petitionId, fieldId, profileId: _, ...rest } = query;
       router.push(
         `/app/petitions/${petitionId}/preview/dowjones/${fieldId}/${
           row.profileId
-        }?${new URLSearchParams({
-          ...(rest as any),
-        })}`
+        }?${new URLSearchParams(rest as any)}`
       );
     }
   },
@@ -150,9 +148,9 @@ function DowJonesProfileDetails({
   const handleGoBackClick = () => {
     const { petitionId, fieldId, profileId: _, ...rest } = query;
     router.push(
-      `/app/petitions/${petitionId}/preview/dowjones/${fieldId}?${new URLSearchParams({
-        ...(rest as any),
-      })}`
+      `/app/petitions/${petitionId}/preview/dowjones/${fieldId}/results?${new URLSearchParams(
+        rest as any
+      )}`
     );
   };
 
@@ -233,7 +231,7 @@ function DowJonesProfileDetails({
                 ) : (
                   <Button
                     variant="solid"
-                    colorScheme="purple"
+                    colorScheme="primary"
                     leftIcon={<SaveIcon />}
                     onClick={handleSaveClick}
                     isLoading={isSavingProfile}
@@ -337,7 +335,7 @@ function DowJonesProfileDetails({
             </Text>
             <Button
               variant="ghost"
-              colorScheme="purple"
+              colorScheme="primary"
               leftIcon={<DownloadIcon />}
               onClick={() => downloadDowJonesProfilePdf(profileId)}
             >
@@ -356,7 +354,7 @@ function DowJonesProfileDetails({
 function ProfileResultPerson({
   data,
 }: {
-  data: DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment;
+  data: DowJonesFieldProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment;
 }) {
   const intl = useIntl();
 
@@ -537,7 +535,7 @@ function ProfileResultPerson({
 function ProfileResultEntity({
   data,
 }: {
-  data: DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultEntity_Fragment;
+  data: DowJonesFieldProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultEntity_Fragment;
 }) {
   const intl = useIntl();
 
@@ -590,7 +588,7 @@ function ProfileResultEntity({
 function useDowJonesKycSanctionsColumns() {
   const intl = useIntl();
 
-  return useMemo<TableColumn<DowJonesProfileDetails_DowJonesKycEntitySanctionFragment>[]>(
+  return useMemo<TableColumn<DowJonesFieldProfileDetails_DowJonesKycEntitySanctionFragment>[]>(
     () => [
       {
         key: "name",
@@ -630,7 +628,7 @@ function useDowJonesKycSanctionsColumns() {
 function useDowJonesKycRelationshipsColumns() {
   const intl = useIntl();
 
-  return useMemo<TableColumn<DowJonesProfileDetails_DowJonesKycEntityRelationshipFragment>[]>(
+  return useMemo<TableColumn<DowJonesFieldProfileDetails_DowJonesKycEntityRelationshipFragment>[]>(
     () => [
       {
         key: "tags",
@@ -704,31 +702,22 @@ function useDowJonesKycRelationshipsColumns() {
   );
 }
 
-DowJonesProfileDetails.fragments = {
+const _fragments = {
   get PetitionField() {
     return gql`
-      fragment DowJonesProfileDetails_PetitionField on PetitionField {
+      fragment DowJonesFieldProfileDetails_PetitionField on PetitionField {
         id
         type
         replies {
-          ...DowJonesSearchResult_PetitionFieldReply
-        }
-      }
-    `;
-  },
-  get Query() {
-    return gql`
-      fragment DowJonesProfileDetails_Query on Query {
-        me {
           id
-          hasDowJonesFeatureFlag: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
+          content
         }
       }
     `;
   },
   get DowJonesKycEntitySanction() {
     return gql`
-      fragment DowJonesProfileDetails_DowJonesKycEntitySanction on DowJonesKycEntitySanction {
+      fragment DowJonesFieldProfileDetails_DowJonesKycEntitySanction on DowJonesKycEntitySanction {
         id
         name
         sources
@@ -742,7 +731,7 @@ DowJonesProfileDetails.fragments = {
   },
   get DowJonesKycEntityRelationship() {
     return gql`
-      fragment DowJonesProfileDetails_DowJonesKycEntityRelationship on DowJonesKycEntityRelationship {
+      fragment DowJonesFieldProfileDetails_DowJonesKycEntityRelationship on DowJonesKycEntityRelationship {
         profileId
         connectionType
         iconHints
@@ -753,16 +742,16 @@ DowJonesProfileDetails.fragments = {
   },
   get DowJonesKycEntityProfileResult() {
     return gql`
-      fragment DowJonesProfileDetails_DowJonesKycEntityProfileResult on DowJonesKycEntityProfileResult {
+      fragment DowJonesFieldProfileDetails_DowJonesKycEntityProfileResult on DowJonesKycEntityProfileResult {
         id
         type
         name
         iconHints
         sanctions {
-          ...DowJonesProfileDetails_DowJonesKycEntitySanction
+          ...DowJonesFieldProfileDetails_DowJonesKycEntitySanction
         }
         relationships {
-          ...DowJonesProfileDetails_DowJonesKycEntityRelationship
+          ...DowJonesFieldProfileDetails_DowJonesKycEntityRelationship
         }
         updatedAt
         ... on DowJonesKycEntityProfileResultEntity {
@@ -797,15 +786,15 @@ DowJonesProfileDetails.fragments = {
           isDeceased
         }
       }
-      ${DowJonesProfileDetails.fragments.DowJonesKycEntitySanction}
-      ${DowJonesProfileDetails.fragments.DowJonesKycEntityRelationship}
+      ${_fragments.DowJonesKycEntitySanction}
+      ${_fragments.DowJonesKycEntityRelationship}
     `;
   },
 };
 
-DowJonesProfileDetails.mutations = [
+const _mutations = [
   gql`
-    mutation DowJonesProfileDetails_createDowJonesKycReply(
+    mutation DowJonesFieldProfileDetails_createDowJonesKycReply(
       $petitionId: GID!
       $fieldId: GID!
       $profileId: ID!
@@ -823,7 +812,10 @@ DowJonesProfileDetails.mutations = [
     }
   `,
   gql`
-    mutation DowJonesProfileDetails_deletePetitionFieldReply($petitionId: GID!, $replyId: GID!) {
+    mutation DowJonesFieldProfileDetails_deletePetitionFieldReply(
+      $petitionId: GID!
+      $replyId: GID!
+    ) {
       deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
         id
         replies {
@@ -835,54 +827,43 @@ DowJonesProfileDetails.mutations = [
   `,
 ];
 
-DowJonesProfileDetails.queries = [
+const _queries = [
   gql`
-    query DowJonesProfileDetails_DowJonesKycEntityProfile($profileId: ID!) {
-      DowJonesKycEntityProfile(profileId: $profileId) {
-        ...DowJonesProfileDetails_DowJonesKycEntityProfileResult
+    query DowJonesFieldProfileDetails_profile($profileId: ID!) {
+      dowJonesKycEntityProfile(profileId: $profileId) {
+        ...DowJonesFieldProfileDetails_DowJonesKycEntityProfileResult
       }
     }
-    ${DowJonesProfileDetails.fragments.DowJonesKycEntityProfileResult}
+    ${_fragments.DowJonesKycEntityProfileResult}
   `,
   gql`
-    query DowJonesProfileDetails_petitionField($petitionId: GID!, $petitionFieldId: GID!) {
+    query DowJonesFieldProfileDetails_petitionField($petitionId: GID!, $petitionFieldId: GID!) {
       petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
-        ...DowJonesProfileDetails_PetitionField
+        ...DowJonesFieldProfileDetails_PetitionField
       }
     }
-    ${DowJonesProfileDetails.fragments.PetitionField}
-  `,
-  gql`
-    query DowJonesProfileDetails_user {
-      ...DowJonesProfileDetails_Query
-    }
-    ${DowJonesProfileDetails.fragments.Query}
+    ${_fragments.PetitionField}
   `,
 ];
 
-DowJonesProfileDetails.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
+DowJonesFieldProfileDetails.getInitialProps = async ({
+  query,
+  fetchQuery,
+}: WithApolloDataContext) => {
   const petitionId = query.petitionId as string;
   const fieldId = query.fieldId as string;
   const profileId = query.profileId as string;
 
   const [
     {
-      data: { me },
-    },
-    {
       data: { petitionField },
     },
   ] = await Promise.all([
-    fetchQuery(DowJonesProfileDetails_userDocument),
-    fetchQuery(DowJonesProfileDetails_petitionFieldDocument, {
+    fetchQuery(DowJonesFieldProfileDetails_petitionFieldDocument, {
       variables: { petitionId, petitionFieldId: fieldId },
-      //   ignoreCache: true,
+      ignoreCache: true,
     }),
   ]);
-
-  if (!me.hasDowJonesFeatureFlag || petitionField.type !== "DOW_JONES_KYC") {
-    throw new Error("FORBIDDEN");
-  }
 
   const fieldReplyId =
     petitionField.replies.find((r) => r.content.entity.profileId === profileId)?.id ?? null;
@@ -890,4 +871,8 @@ DowJonesProfileDetails.getInitialProps = async ({ query, fetchQuery }: WithApoll
   return { petitionId, fieldId, profileId, fieldReplyId };
 };
 
-export default compose(withDialogs, withApolloData)(DowJonesProfileDetails);
+export default compose(
+  withDialogs,
+  withFeatureFlag("DOW_JONES_KYC"),
+  withApolloData
+)(DowJonesFieldProfileDetails);

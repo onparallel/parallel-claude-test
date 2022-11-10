@@ -2043,12 +2043,12 @@ export interface NexusGenFieldTypes {
   };
   Query: {
     // field return type
-    DowJonesKycEntityProfile: NexusGenRootTypes["DowJonesKycEntityProfileResult"]; // DowJonesKycEntityProfileResult!
-    DowJonesKycEntitySearch: NexusGenRootTypes["DowJonesKycEntitySearchResultPagination"]; // DowJonesKycEntitySearchResultPagination!
     access: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
     contactsByEmail: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
+    dowJonesKycEntityProfile: NexusGenRootTypes["DowJonesKycEntityProfileResult"]; // DowJonesKycEntityProfileResult!
+    dowJonesKycEntitySearch: NexusGenRootTypes["DowJonesKycEntitySearchResultPagination"]; // DowJonesKycEntitySearchResultPagination!
     emailIsAvailable: boolean; // Boolean!
     getSlugForPublicPetitionLink: string; // String!
     getUsersOrGroups: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
@@ -3744,12 +3744,12 @@ export interface NexusGenFieldTypeNames {
   };
   Query: {
     // field return type name
-    DowJonesKycEntityProfile: "DowJonesKycEntityProfileResult";
-    DowJonesKycEntitySearch: "DowJonesKycEntitySearchResultPagination";
     access: "PublicPetitionAccess";
     contact: "Contact";
     contacts: "ContactPagination";
     contactsByEmail: "Contact";
+    dowJonesKycEntityProfile: "DowJonesKycEntityProfileResult";
+    dowJonesKycEntitySearch: "DowJonesKycEntitySearchResultPagination";
     emailIsAvailable: "Boolean";
     getSlugForPublicPetitionLink: "String";
     getUsersOrGroups: "UserOrUserGroup";
@@ -5246,17 +5246,6 @@ export interface NexusGenArgTypes {
     };
   };
   Query: {
-    DowJonesKycEntityProfile: {
-      // args
-      profileId: string; // ID!
-    };
-    DowJonesKycEntitySearch: {
-      // args
-      dateOfBirth?: NexusGenScalars["DateTime"] | null; // DateTime
-      limit?: number | null; // Int
-      name: string; // String!
-      offset?: number | null; // Int
-    };
     access: {
       // args
       keycode: string; // ID!
@@ -5276,6 +5265,17 @@ export interface NexusGenArgTypes {
     contactsByEmail: {
       // args
       emails: string[]; // [String!]!
+    };
+    dowJonesKycEntityProfile: {
+      // args
+      profileId: string; // ID!
+    };
+    dowJonesKycEntitySearch: {
+      // args
+      dateOfBirth?: NexusGenScalars["DateTime"] | null; // DateTime
+      limit?: number | null; // Int
+      name: string; // String!
+      offset?: number | null; // Int
     };
     emailIsAvailable: {
       // args

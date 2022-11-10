@@ -4372,21 +4372,6 @@ type PublicUser {
 union PublicUserOrContact = PublicContact | PublicUser
 
 type Query {
-  DowJonesKycEntityProfile(profileId: ID!): DowJonesKycEntityProfileResult!
-  DowJonesKycEntitySearch(
-    dateOfBirth: DateTime
-
-    """
-    Number of elements to take from the list.
-    """
-    limit: Int
-    name: String!
-
-    """
-    Number of elements to skip from the list.
-    """
-    offset: Int
-  ): DowJonesKycEntitySearchResultPagination!
   access(keycode: ID!): PublicPetitionAccess!
   contact(id: GID!): Contact
 
@@ -4421,6 +4406,21 @@ type Query {
   Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts
   """
   contactsByEmail(emails: [String!]!): [Contact]!
+  dowJonesKycEntityProfile(profileId: ID!): DowJonesKycEntityProfileResult!
+  dowJonesKycEntitySearch(
+    dateOfBirth: DateTime
+
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+    name: String!
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+  ): DowJonesKycEntitySearchResultPagination!
 
   """
   Checks if the provided email is available to be registered as a user on Parallel
