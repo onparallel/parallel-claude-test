@@ -1,4 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
@@ -21,63 +21,105 @@ import {
   SaveIcon,
   UserIcon,
 } from "@parallel/chakra/icons";
+import { Card, CardHeader } from "@parallel/components/common/Card";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { Table, TableColumn } from "@parallel/components/common/Table";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { DowJonesHints } from "@parallel/components/petition-common/DowJonesHints";
 import {
+  DowJonesProfileDetails_createDowJonesKycReplyDocument,
+  DowJonesProfileDetails_deletePetitionFieldReplyDocument,
   DowJonesProfileDetails_DowJonesKycEntityProfileDocument,
   DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultEntity_Fragment,
   DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment,
   DowJonesProfileDetails_DowJonesKycEntityRelationshipFragment,
   DowJonesProfileDetails_DowJonesKycEntitySanctionFragment,
-  Maybe,
+  DowJonesProfileDetails_petitionFieldDocument,
+  DowJonesProfileDetails_userDocument,
 } from "@parallel/graphql/__types";
+import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
+import { UnwrapPromise } from "@parallel/utils/types";
 import { useLoadCountryNames } from "@parallel/utils/useCountryName";
 import { useDowJonesProfileDownloadTask } from "@parallel/utils/useDowJonesProfileDownloadTask";
-import { useCallback, useMemo } from "react";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { Card, CardHeader } from "../../common/Card";
-import { IconButtonWithTooltip } from "../../common/IconButtonWithTooltip";
-import { DowJonesHints } from "../../petition-common/DowJonesHints";
 
-type DowJonesProfileDetailsProps = {
-  profileId: string;
-  onGoBack: () => void;
-  onProfileIdChange: (profileId: string) => void;
-  replyId: Maybe<string>;
-  onDeleteReply: (id: string) => void;
-  onCreateReply: (profileId: string) => void;
-  isDeletingReply: Record<string, boolean>;
-  isCreatingReply: Record<string, boolean>;
-};
-
-export function DowJonesProfileDetails({
+function DowJonesProfileDetails({
+  petitionId,
+  fieldId,
   profileId,
-  replyId,
-  onGoBack,
-  onProfileIdChange,
-  onDeleteReply,
-  onCreateReply,
-  isDeletingReply,
-  isCreatingReply,
-}: DowJonesProfileDetailsProps) {
+  fieldReplyId,
+}: UnwrapPromise<ReturnType<typeof DowJonesProfileDetails.getInitialProps>>) {
   const intl = useIntl();
+  const router = useRouter();
+  const { query } = router;
+  const showGenericErrorToast = useGenericErrorToast();
+
   const { data, loading } = useQuery(DowJonesProfileDetails_DowJonesKycEntityProfileDocument, {
     variables: { profileId },
   });
 
-  const handleSaveClick = async () => {
-    onCreateReply(profileId);
-  };
+  const details = data?.DowJonesKycEntityProfile;
 
-  const handleDeleteClick = async () => {
-    if (isDefined(replyId)) {
-      onDeleteReply(replyId);
+  const [replyId, setReplyId] = useState<string | null>(fieldReplyId ?? null);
+
+  const [createDowJonesKycReply, { loading: isSavingProfile }] = useMutation(
+    DowJonesProfileDetails_createDowJonesKycReplyDocument
+  );
+  const [deletePetitionFieldReply, { loading: isDeletingReply }] = useMutation(
+    DowJonesProfileDetails_deletePetitionFieldReplyDocument
+  );
+
+  useEffect(() => {
+    setReplyId(fieldReplyId);
+  }, [fieldReplyId]);
+
+  const handleSaveClick = async () => {
+    try {
+      const { data } = await createDowJonesKycReply({
+        variables: {
+          profileId,
+          petitionId,
+          fieldId,
+        },
+      });
+
+      const replyId =
+        data?.createDowJonesKycReply.field?.replies.find(
+          (r) => r.content.entity.profileId === profileId
+        )?.id ?? null;
+
+      setReplyId(replyId);
+      window.opener.postMessage("refresh", window.origin);
+    } catch (e) {
+      showGenericErrorToast(e);
     }
   };
 
-  const details = data?.DowJonesKycEntityProfile;
+  const handleDeleteClick = async () => {
+    try {
+      if (replyId) {
+        await deletePetitionFieldReply({
+          variables: {
+            petitionId,
+            replyId,
+          },
+        });
+        setReplyId(null);
+      }
+
+      window.opener.postMessage("refresh", window.origin);
+    } catch (e) {
+      showGenericErrorToast(e);
+    }
+  };
 
   const handleSanctionsRowClick = useCallback(function (
     row: DowJonesProfileDetails_DowJonesKycEntitySanctionFragment
@@ -92,197 +134,220 @@ export function DowJonesProfileDetails({
     row: DowJonesProfileDetails_DowJonesKycEntityRelationshipFragment
   ) {
     if (isDefined(row.profileId)) {
-      onProfileIdChange(row.profileId);
+      const { petitionId, fieldId, profileId: _, ...rest } = query;
+      router.push(
+        `/app/petitions/${petitionId}/preview/dowjones/${fieldId}/${
+          row.profileId
+        }?${new URLSearchParams({
+          ...(rest as any),
+        })}`
+      );
     }
   },
   []);
+
+  const handleGoBackClick = () => {
+    const { petitionId, fieldId, profileId: _, ...rest } = query;
+    router.push(
+      `/app/petitions/${petitionId}/preview/dowjones/${fieldId}?${new URLSearchParams({
+        ...(rest as any),
+      })}`
+    );
+  };
 
   const sanctionsColumns = useDowJonesKycSanctionsColumns();
   const relationshipsColumns = useDowJonesKycRelationshipsColumns();
   const downloadDowJonesProfilePdf = useDowJonesProfileDownloadTask();
   return (
-    <Stack paddingX={6} paddingY={5} spacing={6}>
-      <HStack>
-        <IconButtonWithTooltip
-          icon={<ArrowBackIcon />}
-          variant="ghost"
-          label={intl.formatMessage({
-            id: "generic.go-back",
-            defaultMessage: "Go back",
-          })}
-          onClick={onGoBack}
-        />
-        <Heading size="md">
-          <FormattedMessage
-            id="component.dow-jones-profile-details.profile-details"
-            defaultMessage="Profile details"
-          />
-        </Heading>
-      </HStack>
-
-      <Card>
-        <CardHeader minHeight="65px">
-          <HStack justifyContent="space-between" spacing={0} gridGap={3} wrap="wrap">
-            <HStack flex="1">
-              {loading ? (
-                <>
-                  <Skeleton height="20px" width="100%" maxWidth="320px" endColor="gray.300" />
-                  <Skeleton height="20px" width="50px" endColor="gray.300" />
-                </>
-              ) : (
-                <>
-                  <Text
-                    fontSize="xl"
-                    display="flex"
-                    alignItems="center"
-                    gridGap={2}
-                    flexWrap="wrap"
-                    whiteSpace="break-spaces"
-                  >
-                    {details?.name}
-                    <DowJonesHints hints={details?.iconHints ?? []} />
-                  </Text>
-                </>
-              )}
-            </HStack>
-            <Box>
-              {replyId ? (
-                <HStack>
-                  <CheckIcon color="green.500" />
-                  <Text fontWeight={500}>
-                    <FormattedMessage id="generic.saved" defaultMessage="Saved" />
-                  </Text>
-                  <IconButtonWithTooltip
-                    size="sm"
-                    fontSize="md"
-                    label={intl.formatMessage({ id: "generic.delete", defaultMessage: "Delete" })}
-                    icon={<DeleteIcon />}
-                    variant="outline"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteClick();
-                    }}
-                    isDisabled={isDeletingReply[replyId]}
-                  />
-                </HStack>
-              ) : (
-                <Button
-                  variant="solid"
-                  colorScheme="purple"
-                  leftIcon={<SaveIcon />}
-                  onClick={handleSaveClick}
-                  isLoading={isCreatingReply[profileId]}
-                >
-                  <FormattedMessage id="generic.save" defaultMessage="Save" />
-                </Button>
-              )}
-            </Box>
-          </HStack>
-        </CardHeader>
-        {loading ? (
-          <Box height={"85px"}></Box>
-        ) : details?.__typename === "DowJonesKycEntityProfileResultEntity" ? (
-          <ProfileResultEntity data={details} />
-        ) : details?.__typename === "DowJonesKycEntityProfileResultPerson" ? (
-          <ProfileResultPerson data={details} />
-        ) : null}
-      </Card>
-
-      <Card>
-        <CardHeader omitDivider={loading || !details?.sanctions?.length ? false : true}>
-          <Text as="span" fontWeight={600} fontSize="xl">
-            <FormattedMessage
-              id="component.dow-jones-profile-details.sanction-lists"
-              defaultMessage="Sanction lists"
-            />{" "}
-            {`(${details?.sanctions?.length ?? 0})`}
-          </Text>
-        </CardHeader>
-        {loading ? (
-          <Center minHeight={"136px"}>
-            <Spinner
-              thickness="4px"
-              speed="0.65s"
-              emptyColor="gray.200"
-              color="purple.500"
-              size="xl"
-            />
-          </Center>
-        ) : details?.sanctions?.length ? (
-          <Box overflowX="auto">
-            <Table
-              isHighlightable
-              columns={sanctionsColumns}
-              rows={details.sanctions}
-              rowKeyProp="id"
-              onRowClick={handleSanctionsRowClick}
-            />
-          </Box>
-        ) : (
-          <Box height="120px"></Box>
-        )}
-      </Card>
-
-      <Card>
-        <CardHeader omitDivider={loading || !details?.relationships?.length ? false : true}>
-          <Text as="span" fontWeight={600} fontSize="xl">
-            <FormattedMessage
-              id="component.dow-jones-profile-details.relationships"
-              defaultMessage="Relationships"
-            />{" "}
-            {`(${details?.relationships?.length ?? 0})`}
-          </Text>
-        </CardHeader>
-        {loading ? (
-          <Center minHeight={"136px"}>
-            <Spinner
-              thickness="4px"
-              speed="0.65s"
-              emptyColor="gray.200"
-              color="purple.500"
-              size="xl"
-            />
-          </Center>
-        ) : details?.relationships?.length ? (
-          <Box overflowX="auto">
-            <Table
-              isHighlightable
-              columns={relationshipsColumns}
-              rows={details.relationships}
-              rowKeyProp="profileId"
-              onRowClick={handleRelationshipsRowClick}
-            />
-          </Box>
-        ) : (
-          <Box height="120px"></Box>
-        )}
-      </Card>
-
-      {loading || !details ? null : (
-        <HStack justifyContent="space-between" flexWrap="wrap" spacing={0} gridGap={2}>
-          <Text>
-            <FormattedMessage
-              id="component.dow-jones-profile-details.results-obtained-on"
-              defaultMessage="Results obtained on {date}"
-              values={{
-                date: intl.formatDate(details.updatedAt, FORMATS.FULL),
-              }}
-            />
-          </Text>
-          <Button
+    <>
+      <Head>
+        <title>{"Dow Jones | Parallel"}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </Head>
+      <Stack paddingX={6} paddingY={5} spacing={6}>
+        <HStack>
+          <IconButtonWithTooltip
+            icon={<ArrowBackIcon />}
             variant="ghost"
-            colorScheme="purple"
-            leftIcon={<DownloadIcon />}
-            onClick={() => downloadDowJonesProfilePdf(profileId)}
-          >
+            label={intl.formatMessage({
+              id: "generic.go-back",
+              defaultMessage: "Go back",
+            })}
+            onClick={handleGoBackClick}
+          />
+          <Heading size="md">
             <FormattedMessage
-              id="component.dow-jones-profile-details.get-full-pdf"
-              defaultMessage="Get full PDF"
+              id="component.dow-jones-profile-details.profile-details"
+              defaultMessage="Profile details"
             />
-          </Button>
+          </Heading>
         </HStack>
-      )}
-    </Stack>
+
+        <Card>
+          <CardHeader minHeight="65px">
+            <HStack justifyContent="space-between" spacing={0} gridGap={3} wrap="wrap">
+              <HStack flex="1">
+                {loading ? (
+                  <>
+                    <Skeleton height="20px" width="100%" maxWidth="320px" endColor="gray.300" />
+                    <Skeleton height="20px" width="50px" endColor="gray.300" />
+                  </>
+                ) : (
+                  <>
+                    <Text
+                      fontSize="xl"
+                      display="flex"
+                      alignItems="center"
+                      gridGap={2}
+                      flexWrap="wrap"
+                      whiteSpace="break-spaces"
+                    >
+                      {details?.name}
+                      <DowJonesHints hints={details?.iconHints ?? []} />
+                    </Text>
+                  </>
+                )}
+              </HStack>
+              <Box>
+                {replyId ? (
+                  <HStack>
+                    <CheckIcon color="green.500" />
+                    <Text fontWeight={500}>
+                      <FormattedMessage id="generic.saved" defaultMessage="Saved" />
+                    </Text>
+                    <IconButtonWithTooltip
+                      size="sm"
+                      fontSize="md"
+                      label={intl.formatMessage({ id: "generic.delete", defaultMessage: "Delete" })}
+                      icon={<DeleteIcon />}
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick();
+                      }}
+                      isDisabled={isDeletingReply}
+                    />
+                  </HStack>
+                ) : (
+                  <Button
+                    variant="solid"
+                    colorScheme="purple"
+                    leftIcon={<SaveIcon />}
+                    onClick={handleSaveClick}
+                    isLoading={isSavingProfile}
+                    isDisabled={loading}
+                  >
+                    <FormattedMessage id="generic.save" defaultMessage="Save" />
+                  </Button>
+                )}
+              </Box>
+            </HStack>
+          </CardHeader>
+          {loading ? (
+            <Box height={"85px"}></Box>
+          ) : details?.__typename === "DowJonesKycEntityProfileResultEntity" ? (
+            <ProfileResultEntity data={details} />
+          ) : details?.__typename === "DowJonesKycEntityProfileResultPerson" ? (
+            <ProfileResultPerson data={details} />
+          ) : null}
+        </Card>
+
+        <Card>
+          <CardHeader omitDivider={loading || !details?.sanctions?.length ? false : true}>
+            <Text as="span" fontWeight={600} fontSize="xl">
+              <FormattedMessage
+                id="component.dow-jones-profile-details.sanction-lists"
+                defaultMessage="Sanction lists"
+              />{" "}
+              {`(${details?.sanctions?.length ?? 0})`}
+            </Text>
+          </CardHeader>
+          {loading ? (
+            <Center minHeight={"136px"}>
+              <Spinner
+                thickness="4px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="purple.500"
+                size="xl"
+              />
+            </Center>
+          ) : details?.sanctions?.length ? (
+            <Box overflowX="auto">
+              <Table
+                isHighlightable
+                columns={sanctionsColumns}
+                rows={details.sanctions}
+                rowKeyProp="id"
+                onRowClick={handleSanctionsRowClick}
+              />
+            </Box>
+          ) : (
+            <Box height="120px"></Box>
+          )}
+        </Card>
+
+        <Card>
+          <CardHeader omitDivider={loading || !details?.relationships?.length ? false : true}>
+            <Text as="span" fontWeight={600} fontSize="xl">
+              <FormattedMessage
+                id="component.dow-jones-profile-details.relationships"
+                defaultMessage="Relationships"
+              />{" "}
+              {`(${details?.relationships?.length ?? 0})`}
+            </Text>
+          </CardHeader>
+          {loading ? (
+            <Center minHeight={"136px"}>
+              <Spinner
+                thickness="4px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="purple.500"
+                size="xl"
+              />
+            </Center>
+          ) : details?.relationships?.length ? (
+            <Box overflowX="auto">
+              <Table
+                isHighlightable
+                columns={relationshipsColumns}
+                rows={details.relationships}
+                rowKeyProp="profileId"
+                onRowClick={handleRelationshipsRowClick}
+              />
+            </Box>
+          ) : (
+            <Box height="120px"></Box>
+          )}
+        </Card>
+
+        {loading || !details ? null : (
+          <HStack justifyContent="space-between" flexWrap="wrap" spacing={0} gridGap={2}>
+            <Text>
+              <FormattedMessage
+                id="component.dow-jones-profile-details.results-obtained-on"
+                defaultMessage="Results obtained on {date}"
+                values={{
+                  date: intl.formatDate(details.updatedAt, FORMATS.FULL),
+                }}
+              />
+            </Text>
+            <Button
+              variant="ghost"
+              colorScheme="purple"
+              leftIcon={<DownloadIcon />}
+              onClick={() => downloadDowJonesProfilePdf(profileId)}
+            >
+              <FormattedMessage
+                id="component.dow-jones-profile-details.get-full-pdf"
+                defaultMessage="Get full PDF"
+              />
+            </Button>
+          </HStack>
+        )}
+      </Stack>
+    </>
   );
 }
 
@@ -640,6 +705,27 @@ function useDowJonesKycRelationshipsColumns() {
 }
 
 DowJonesProfileDetails.fragments = {
+  get PetitionField() {
+    return gql`
+      fragment DowJonesProfileDetails_PetitionField on PetitionField {
+        id
+        type
+        replies {
+          ...DowJonesSearchResult_PetitionFieldReply
+        }
+      }
+    `;
+  },
+  get Query() {
+    return gql`
+      fragment DowJonesProfileDetails_Query on Query {
+        me {
+          id
+          hasDowJonesFeatureFlag: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
+        }
+      }
+    `;
+  },
   get DowJonesKycEntitySanction() {
     return gql`
       fragment DowJonesProfileDetails_DowJonesKycEntitySanction on DowJonesKycEntitySanction {
@@ -717,6 +803,38 @@ DowJonesProfileDetails.fragments = {
   },
 };
 
+DowJonesProfileDetails.mutations = [
+  gql`
+    mutation DowJonesProfileDetails_createDowJonesKycReply(
+      $petitionId: GID!
+      $fieldId: GID!
+      $profileId: ID!
+    ) {
+      createDowJonesKycReply(petitionId: $petitionId, fieldId: $fieldId, profileId: $profileId) {
+        id
+        field {
+          id
+          replies {
+            id
+            content
+          }
+        }
+      }
+    }
+  `,
+  gql`
+    mutation DowJonesProfileDetails_deletePetitionFieldReply($petitionId: GID!, $replyId: GID!) {
+      deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+        id
+        replies {
+          id
+          content
+        }
+      }
+    }
+  `,
+];
+
 DowJonesProfileDetails.queries = [
   gql`
     query DowJonesProfileDetails_DowJonesKycEntityProfile($profileId: ID!) {
@@ -726,4 +844,50 @@ DowJonesProfileDetails.queries = [
     }
     ${DowJonesProfileDetails.fragments.DowJonesKycEntityProfileResult}
   `,
+  gql`
+    query DowJonesProfileDetails_petitionField($petitionId: GID!, $petitionFieldId: GID!) {
+      petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
+        ...DowJonesProfileDetails_PetitionField
+      }
+    }
+    ${DowJonesProfileDetails.fragments.PetitionField}
+  `,
+  gql`
+    query DowJonesProfileDetails_user {
+      ...DowJonesProfileDetails_Query
+    }
+    ${DowJonesProfileDetails.fragments.Query}
+  `,
 ];
+
+DowJonesProfileDetails.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
+  const petitionId = query.petitionId as string;
+  const fieldId = query.fieldId as string;
+  const profileId = query.profileId as string;
+
+  const [
+    {
+      data: { me },
+    },
+    {
+      data: { petitionField },
+    },
+  ] = await Promise.all([
+    fetchQuery(DowJonesProfileDetails_userDocument),
+    fetchQuery(DowJonesProfileDetails_petitionFieldDocument, {
+      variables: { petitionId, petitionFieldId: fieldId },
+      //   ignoreCache: true,
+    }),
+  ]);
+
+  if (!me.hasDowJonesFeatureFlag || petitionField.type !== "DOW_JONES_KYC") {
+    throw new Error("FORBIDDEN");
+  }
+
+  const fieldReplyId =
+    petitionField.replies.find((r) => r.content.entity.profileId === profileId)?.id ?? null;
+
+  return { petitionId, fieldId, profileId, fieldReplyId };
+};
+
+export default compose(withDialogs, withApolloData)(DowJonesProfileDetails);

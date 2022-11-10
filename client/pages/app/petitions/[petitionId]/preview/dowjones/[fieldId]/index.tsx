@@ -14,12 +14,21 @@ import {
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { integer, string, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { isValidDateString } from "@parallel/utils/validation";
 import { withMetadata } from "@parallel/utils/withMetadata";
 import Head from "next/head";
 import { useState } from "react";
 import { isDefined } from "remeda";
+
+const QUERY_STATE = {
+  page: integer({ min: 1 }).orDefault(1),
+  items: values([10, 25, 50]).orDefault(10),
+  dateOfBirth: string().withValidation(isValidDateString),
+  name: string(),
+};
 
 function DowJonesFieldPreview({
   petitionId,
@@ -38,17 +47,21 @@ function DowJonesFieldPreview({
     data: { me },
   } = useAssertQuery(DowJonesFieldPreview_userDocument);
   const showGenericErrorToast = useGenericErrorToast();
-  const [formData, setFormData] = useState<DowJonesSearchFormData | null>(null);
+
+  const [state, setQueryState] = useQueryState(QUERY_STATE);
 
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
   const [isCreatingReply, setIsCreatingReply] = useState<Record<string, boolean>>({});
 
   const handleFormSubmit = async (data: DowJonesSearchFormData) => {
-    setFormData(data);
+    setQueryState(() => ({
+      name: data.name,
+      ...(data.dateOfBirth ? { dateOfBirth: data.dateOfBirth } : {}),
+    }));
   };
 
   const handleResetSearch = async () => {
-    setFormData(null);
+    setQueryState({});
   };
 
   const [createDowJonesKycReply] = useMutation(DowJonesFieldPreview_createDowJonesKycReplyDocument);
@@ -66,8 +79,7 @@ function DowJonesFieldPreview({
         },
       });
 
-      // not working
-      window.parent.postMessage("refresh", "*");
+      window.opener.postMessage("refresh", window.origin);
     } catch (e) {
       showGenericErrorToast(e);
     }
@@ -85,8 +97,7 @@ function DowJonesFieldPreview({
         },
       });
 
-      // not working
-      window.parent.postMessage("refresh", "*");
+      window.opener.postMessage("refresh", window.origin);
     } catch (e) {
       showGenericErrorToast(e);
     }
@@ -99,10 +110,10 @@ function DowJonesFieldPreview({
         <title>{"Dow Jones | Parallel"}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      {isDefined(formData) ? (
+      {isDefined(state.name) ? (
         <DowJonesSearchResult
-          name={formData.name}
-          date={formData.dateOfBirth}
+          name={state.name}
+          date={state.dateOfBirth}
           replies={petitionField.replies}
           onResetClick={handleResetSearch}
           onCreateReply={handleCreateReply}

@@ -86,18 +86,16 @@ export function PreviewPetitionFieldKyc({
         done();
       } else if (state === "FETCHING") {
         onRefreshField();
-        console.log("REFRESH");
       }
     },
-    5000,
+    10000,
     [onRefreshField, state, field.replies.length]
   );
 
   useEffect(() => {
     const handler = function (e: MessageEvent) {
       const browserTab = browserTabRef.current;
-
-      if (isDefined(browserTab) && e.source === browserTab) {
+      if (isDefined(browserTab) && e.source === browserTab && e.data === "refresh") {
         onRefreshField();
       }
     };

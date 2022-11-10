@@ -11,11 +11,11 @@ import {
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { FORMATS } from "@parallel/utils/dates";
 import { integer, useQueryState, values } from "@parallel/utils/queryState";
-import { useCallback, useMemo, useState } from "react";
+import { useRouter } from "next/router";
+import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../../common/IconButtonWithTooltip";
 import { TablePage } from "../../common/TablePage";
-import { DowJonesProfileDetails } from "./DowJonesProfileDetails";
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -43,7 +43,7 @@ export function DowJonesSearchResult({
   isCreatingReply,
 }: {
   name: string;
-  date: string;
+  date: string | null;
   replies: DowJonesSearchResult_PetitionFieldReplyFragment[];
   onResetClick: () => void;
   onDeleteReply: (id: string) => void;
@@ -51,8 +51,9 @@ export function DowJonesSearchResult({
   isDeletingReply: Record<string, boolean>;
   isCreatingReply: Record<string, boolean>;
 }) {
+  const router = useRouter();
+  const { query } = router;
   const [state, setQueryState] = useQueryState(QUERY_STATE);
-  const [profileId, setProfileId] = useState<string | null>(null);
   const { data, loading } = useQueryOrPreviousData(
     DowJonesSearchResult_DowJonesKycEntitySearchDocument,
     {
@@ -68,28 +69,21 @@ export function DowJonesSearchResult({
 
   const result = data?.DowJonesKycEntitySearch;
   const columns = useDowJonesKycDataColumns();
-  const handleRowClick = useCallback(function (row: DowJonesSearchResult) {
-    setProfileId(row.profileId);
-  }, []);
+  const handleRowClick = useCallback(
+    function (row: DowJonesSearchResult) {
+      const { petitionId, fieldId, ...rest } = query;
 
-  const handleGoBack = () => {
-    setProfileId(null);
-  };
-
-  if (profileId) {
-    return (
-      <DowJonesProfileDetails
-        profileId={profileId}
-        onProfileIdChange={setProfileId}
-        replyId={replies.find((r) => r.content.entity.profileId === profileId)?.id ?? null}
-        onGoBack={handleGoBack}
-        onCreateReply={onCreateReply}
-        onDeleteReply={onDeleteReply}
-        isDeletingReply={isDeletingReply}
-        isCreatingReply={isCreatingReply}
-      />
-    );
-  }
+      router.push(
+        `/app/petitions/${petitionId}/preview/dowjones/${fieldId}/${
+          row.profileId
+        }?${new URLSearchParams({
+          ...(rest as any),
+          ...state,
+        })}`
+      );
+    },
+    [state]
+  );
 
   return (
     <Stack paddingX={6} paddingY={5} spacing={6}>

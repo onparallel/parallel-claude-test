@@ -10838,222 +10838,6 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery = {
   };
 };
 
-export type DowJonesProfileDetails_DowJonesKycEntitySanctionFragment = {
-  __typename?: "DowJonesKycEntitySanction";
-  id: string;
-  name: string;
-  sources: Array<string>;
-  fromDate?: {
-    __typename?: "DowJonesKycEntityDate";
-    year?: number | null;
-    month?: number | null;
-    day?: number | null;
-  } | null;
-};
-
-export type DowJonesProfileDetails_DowJonesKycEntityRelationshipFragment = {
-  __typename?: "DowJonesKycEntityRelationship";
-  profileId: string;
-  connectionType: string;
-  iconHints: Array<string>;
-  name?: string | null;
-  type: DowJonesKycEntityType;
-};
-
-export type DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultEntity_Fragment =
-  {
-    __typename?: "DowJonesKycEntityProfileResultEntity";
-    id: string;
-    type: DowJonesKycEntityType;
-    name: string;
-    iconHints: Array<string>;
-    updatedAt: string;
-    dateOfRegistration?: {
-      __typename?: "DowJonesKycEntityDate";
-      year?: number | null;
-      month?: number | null;
-      day?: number | null;
-    } | null;
-    sanctions: Array<{
-      __typename?: "DowJonesKycEntitySanction";
-      id: string;
-      name: string;
-      sources: Array<string>;
-      fromDate?: {
-        __typename?: "DowJonesKycEntityDate";
-        year?: number | null;
-        month?: number | null;
-        day?: number | null;
-      } | null;
-    }>;
-    relationships: Array<{
-      __typename?: "DowJonesKycEntityRelationship";
-      profileId: string;
-      connectionType: string;
-      iconHints: Array<string>;
-      name?: string | null;
-      type: DowJonesKycEntityType;
-    }>;
-  };
-
-export type DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment =
-  {
-    __typename?: "DowJonesKycEntityProfileResultPerson";
-    isDeceased: boolean;
-    id: string;
-    type: DowJonesKycEntityType;
-    name: string;
-    iconHints: Array<string>;
-    updatedAt: string;
-    placeOfBirth?: {
-      __typename?: "DowJonesKycEntityPlace";
-      descriptor: string;
-      countryCode: string;
-    } | null;
-    dateOfBirth?: {
-      __typename?: "DowJonesKycEntityDate";
-      year?: number | null;
-      month?: number | null;
-      day?: number | null;
-    } | null;
-    citizenship?: {
-      __typename?: "DowJonesKycEntityPlace";
-      descriptor: string;
-      countryCode: string;
-    } | null;
-    residence?: {
-      __typename?: "DowJonesKycEntityPlace";
-      descriptor: string;
-      countryCode: string;
-    } | null;
-    jurisdiction?: {
-      __typename?: "DowJonesKycEntityPlace";
-      descriptor: string;
-      countryCode: string;
-    } | null;
-    sanctions: Array<{
-      __typename?: "DowJonesKycEntitySanction";
-      id: string;
-      name: string;
-      sources: Array<string>;
-      fromDate?: {
-        __typename?: "DowJonesKycEntityDate";
-        year?: number | null;
-        month?: number | null;
-        day?: number | null;
-      } | null;
-    }>;
-    relationships: Array<{
-      __typename?: "DowJonesKycEntityRelationship";
-      profileId: string;
-      connectionType: string;
-      iconHints: Array<string>;
-      name?: string | null;
-      type: DowJonesKycEntityType;
-    }>;
-  };
-
-export type DowJonesProfileDetails_DowJonesKycEntityProfileResultFragment =
-  | DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultEntity_Fragment
-  | DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment;
-
-export type DowJonesProfileDetails_DowJonesKycEntityProfileQueryVariables = Exact<{
-  profileId: Scalars["ID"];
-}>;
-
-export type DowJonesProfileDetails_DowJonesKycEntityProfileQuery = {
-  DowJonesKycEntityProfile:
-    | {
-        __typename?: "DowJonesKycEntityProfileResultEntity";
-        id: string;
-        type: DowJonesKycEntityType;
-        name: string;
-        iconHints: Array<string>;
-        updatedAt: string;
-        dateOfRegistration?: {
-          __typename?: "DowJonesKycEntityDate";
-          year?: number | null;
-          month?: number | null;
-          day?: number | null;
-        } | null;
-        sanctions: Array<{
-          __typename?: "DowJonesKycEntitySanction";
-          id: string;
-          name: string;
-          sources: Array<string>;
-          fromDate?: {
-            __typename?: "DowJonesKycEntityDate";
-            year?: number | null;
-            month?: number | null;
-            day?: number | null;
-          } | null;
-        }>;
-        relationships: Array<{
-          __typename?: "DowJonesKycEntityRelationship";
-          profileId: string;
-          connectionType: string;
-          iconHints: Array<string>;
-          name?: string | null;
-          type: DowJonesKycEntityType;
-        }>;
-      }
-    | {
-        __typename?: "DowJonesKycEntityProfileResultPerson";
-        isDeceased: boolean;
-        id: string;
-        type: DowJonesKycEntityType;
-        name: string;
-        iconHints: Array<string>;
-        updatedAt: string;
-        placeOfBirth?: {
-          __typename?: "DowJonesKycEntityPlace";
-          descriptor: string;
-          countryCode: string;
-        } | null;
-        dateOfBirth?: {
-          __typename?: "DowJonesKycEntityDate";
-          year?: number | null;
-          month?: number | null;
-          day?: number | null;
-        } | null;
-        citizenship?: {
-          __typename?: "DowJonesKycEntityPlace";
-          descriptor: string;
-          countryCode: string;
-        } | null;
-        residence?: {
-          __typename?: "DowJonesKycEntityPlace";
-          descriptor: string;
-          countryCode: string;
-        } | null;
-        jurisdiction?: {
-          __typename?: "DowJonesKycEntityPlace";
-          descriptor: string;
-          countryCode: string;
-        } | null;
-        sanctions: Array<{
-          __typename?: "DowJonesKycEntitySanction";
-          id: string;
-          name: string;
-          sources: Array<string>;
-          fromDate?: {
-            __typename?: "DowJonesKycEntityDate";
-            year?: number | null;
-            month?: number | null;
-            day?: number | null;
-          } | null;
-        }>;
-        relationships: Array<{
-          __typename?: "DowJonesKycEntityRelationship";
-          profileId: string;
-          connectionType: string;
-          iconHints: Array<string>;
-          name?: string | null;
-          type: DowJonesKycEntityType;
-        }>;
-      };
-};
-
 export type DowJonesSearchResult_DowJonesKycEntitySearchResult_DowJonesKycEntitySearchResultEntity_Fragment =
   {
     __typename?: "DowJonesKycEntitySearchResultEntity";
@@ -19040,6 +18824,300 @@ export type PetitionMessages_updatePetitionMutation = {
       };
 };
 
+export type DowJonesProfileDetails_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+  }>;
+};
+
+export type DowJonesProfileDetails_QueryFragment = {
+  me: { __typename?: "User"; id: string; hasDowJonesFeatureFlag: boolean };
+};
+
+export type DowJonesProfileDetails_DowJonesKycEntitySanctionFragment = {
+  __typename?: "DowJonesKycEntitySanction";
+  id: string;
+  name: string;
+  sources: Array<string>;
+  fromDate?: {
+    __typename?: "DowJonesKycEntityDate";
+    year?: number | null;
+    month?: number | null;
+    day?: number | null;
+  } | null;
+};
+
+export type DowJonesProfileDetails_DowJonesKycEntityRelationshipFragment = {
+  __typename?: "DowJonesKycEntityRelationship";
+  profileId: string;
+  connectionType: string;
+  iconHints: Array<string>;
+  name?: string | null;
+  type: DowJonesKycEntityType;
+};
+
+export type DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultEntity_Fragment =
+  {
+    __typename?: "DowJonesKycEntityProfileResultEntity";
+    id: string;
+    type: DowJonesKycEntityType;
+    name: string;
+    iconHints: Array<string>;
+    updatedAt: string;
+    dateOfRegistration?: {
+      __typename?: "DowJonesKycEntityDate";
+      year?: number | null;
+      month?: number | null;
+      day?: number | null;
+    } | null;
+    sanctions: Array<{
+      __typename?: "DowJonesKycEntitySanction";
+      id: string;
+      name: string;
+      sources: Array<string>;
+      fromDate?: {
+        __typename?: "DowJonesKycEntityDate";
+        year?: number | null;
+        month?: number | null;
+        day?: number | null;
+      } | null;
+    }>;
+    relationships: Array<{
+      __typename?: "DowJonesKycEntityRelationship";
+      profileId: string;
+      connectionType: string;
+      iconHints: Array<string>;
+      name?: string | null;
+      type: DowJonesKycEntityType;
+    }>;
+  };
+
+export type DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment =
+  {
+    __typename?: "DowJonesKycEntityProfileResultPerson";
+    isDeceased: boolean;
+    id: string;
+    type: DowJonesKycEntityType;
+    name: string;
+    iconHints: Array<string>;
+    updatedAt: string;
+    placeOfBirth?: {
+      __typename?: "DowJonesKycEntityPlace";
+      descriptor: string;
+      countryCode: string;
+    } | null;
+    dateOfBirth?: {
+      __typename?: "DowJonesKycEntityDate";
+      year?: number | null;
+      month?: number | null;
+      day?: number | null;
+    } | null;
+    citizenship?: {
+      __typename?: "DowJonesKycEntityPlace";
+      descriptor: string;
+      countryCode: string;
+    } | null;
+    residence?: {
+      __typename?: "DowJonesKycEntityPlace";
+      descriptor: string;
+      countryCode: string;
+    } | null;
+    jurisdiction?: {
+      __typename?: "DowJonesKycEntityPlace";
+      descriptor: string;
+      countryCode: string;
+    } | null;
+    sanctions: Array<{
+      __typename?: "DowJonesKycEntitySanction";
+      id: string;
+      name: string;
+      sources: Array<string>;
+      fromDate?: {
+        __typename?: "DowJonesKycEntityDate";
+        year?: number | null;
+        month?: number | null;
+        day?: number | null;
+      } | null;
+    }>;
+    relationships: Array<{
+      __typename?: "DowJonesKycEntityRelationship";
+      profileId: string;
+      connectionType: string;
+      iconHints: Array<string>;
+      name?: string | null;
+      type: DowJonesKycEntityType;
+    }>;
+  };
+
+export type DowJonesProfileDetails_DowJonesKycEntityProfileResultFragment =
+  | DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultEntity_Fragment
+  | DowJonesProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment;
+
+export type DowJonesProfileDetails_createDowJonesKycReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  profileId: Scalars["ID"];
+}>;
+
+export type DowJonesProfileDetails_createDowJonesKycReplyMutation = {
+  createDowJonesKycReply: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    field?: {
+      __typename?: "PetitionField";
+      id: string;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    } | null;
+  };
+};
+
+export type DowJonesProfileDetails_deletePetitionFieldReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+}>;
+
+export type DowJonesProfileDetails_deletePetitionFieldReplyMutation = {
+  deletePetitionReply: {
+    __typename?: "PetitionField";
+    id: string;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+    }>;
+  };
+};
+
+export type DowJonesProfileDetails_DowJonesKycEntityProfileQueryVariables = Exact<{
+  profileId: Scalars["ID"];
+}>;
+
+export type DowJonesProfileDetails_DowJonesKycEntityProfileQuery = {
+  DowJonesKycEntityProfile:
+    | {
+        __typename?: "DowJonesKycEntityProfileResultEntity";
+        id: string;
+        type: DowJonesKycEntityType;
+        name: string;
+        iconHints: Array<string>;
+        updatedAt: string;
+        dateOfRegistration?: {
+          __typename?: "DowJonesKycEntityDate";
+          year?: number | null;
+          month?: number | null;
+          day?: number | null;
+        } | null;
+        sanctions: Array<{
+          __typename?: "DowJonesKycEntitySanction";
+          id: string;
+          name: string;
+          sources: Array<string>;
+          fromDate?: {
+            __typename?: "DowJonesKycEntityDate";
+            year?: number | null;
+            month?: number | null;
+            day?: number | null;
+          } | null;
+        }>;
+        relationships: Array<{
+          __typename?: "DowJonesKycEntityRelationship";
+          profileId: string;
+          connectionType: string;
+          iconHints: Array<string>;
+          name?: string | null;
+          type: DowJonesKycEntityType;
+        }>;
+      }
+    | {
+        __typename?: "DowJonesKycEntityProfileResultPerson";
+        isDeceased: boolean;
+        id: string;
+        type: DowJonesKycEntityType;
+        name: string;
+        iconHints: Array<string>;
+        updatedAt: string;
+        placeOfBirth?: {
+          __typename?: "DowJonesKycEntityPlace";
+          descriptor: string;
+          countryCode: string;
+        } | null;
+        dateOfBirth?: {
+          __typename?: "DowJonesKycEntityDate";
+          year?: number | null;
+          month?: number | null;
+          day?: number | null;
+        } | null;
+        citizenship?: {
+          __typename?: "DowJonesKycEntityPlace";
+          descriptor: string;
+          countryCode: string;
+        } | null;
+        residence?: {
+          __typename?: "DowJonesKycEntityPlace";
+          descriptor: string;
+          countryCode: string;
+        } | null;
+        jurisdiction?: {
+          __typename?: "DowJonesKycEntityPlace";
+          descriptor: string;
+          countryCode: string;
+        } | null;
+        sanctions: Array<{
+          __typename?: "DowJonesKycEntitySanction";
+          id: string;
+          name: string;
+          sources: Array<string>;
+          fromDate?: {
+            __typename?: "DowJonesKycEntityDate";
+            year?: number | null;
+            month?: number | null;
+            day?: number | null;
+          } | null;
+        }>;
+        relationships: Array<{
+          __typename?: "DowJonesKycEntityRelationship";
+          profileId: string;
+          connectionType: string;
+          iconHints: Array<string>;
+          name?: string | null;
+          type: DowJonesKycEntityType;
+        }>;
+      };
+};
+
+export type DowJonesProfileDetails_petitionFieldQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+}>;
+
+export type DowJonesProfileDetails_petitionFieldQuery = {
+  petitionField: {
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+    }>;
+  };
+};
+
+export type DowJonesProfileDetails_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type DowJonesProfileDetails_userQuery = {
+  me: { __typename?: "User"; id: string; hasDowJonesFeatureFlag: boolean };
+};
+
 export type DowJonesFieldPreview_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -25808,78 +25886,6 @@ export const PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReply
   PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragment,
   unknown
 >;
-export const DowJonesProfileDetails_DowJonesKycEntitySanctionFragmentDoc = gql`
-  fragment DowJonesProfileDetails_DowJonesKycEntitySanction on DowJonesKycEntitySanction {
-    id
-    name
-    sources
-    fromDate {
-      year
-      month
-      day
-    }
-  }
-` as unknown as DocumentNode<DowJonesProfileDetails_DowJonesKycEntitySanctionFragment, unknown>;
-export const DowJonesProfileDetails_DowJonesKycEntityRelationshipFragmentDoc = gql`
-  fragment DowJonesProfileDetails_DowJonesKycEntityRelationship on DowJonesKycEntityRelationship {
-    profileId
-    connectionType
-    iconHints
-    name
-    type
-  }
-` as unknown as DocumentNode<DowJonesProfileDetails_DowJonesKycEntityRelationshipFragment, unknown>;
-export const DowJonesProfileDetails_DowJonesKycEntityProfileResultFragmentDoc = gql`
-  fragment DowJonesProfileDetails_DowJonesKycEntityProfileResult on DowJonesKycEntityProfileResult {
-    id
-    type
-    name
-    iconHints
-    sanctions {
-      ...DowJonesProfileDetails_DowJonesKycEntitySanction
-    }
-    relationships {
-      ...DowJonesProfileDetails_DowJonesKycEntityRelationship
-    }
-    updatedAt
-    ... on DowJonesKycEntityProfileResultEntity {
-      dateOfRegistration {
-        year
-        month
-        day
-      }
-    }
-    ... on DowJonesKycEntityProfileResultPerson {
-      placeOfBirth {
-        descriptor
-        countryCode
-      }
-      dateOfBirth {
-        year
-        month
-        day
-      }
-      citizenship {
-        descriptor
-        countryCode
-      }
-      residence {
-        descriptor
-        countryCode
-      }
-      jurisdiction {
-        descriptor
-        countryCode
-      }
-      isDeceased
-    }
-  }
-  ${DowJonesProfileDetails_DowJonesKycEntitySanctionFragmentDoc}
-  ${DowJonesProfileDetails_DowJonesKycEntityRelationshipFragmentDoc}
-` as unknown as DocumentNode<
-  DowJonesProfileDetails_DowJonesKycEntityProfileResultFragment,
-  unknown
->;
 export const DowJonesSearchResult_DowJonesKycEntitySearchResultFragmentDoc = gql`
   fragment DowJonesSearchResult_DowJonesKycEntitySearchResult on DowJonesKycEntitySearchResult {
     id
@@ -28197,6 +28203,96 @@ export const DowJonesSearchResult_PetitionFieldReplyFragmentDoc = gql`
     content
   }
 ` as unknown as DocumentNode<DowJonesSearchResult_PetitionFieldReplyFragment, unknown>;
+export const DowJonesProfileDetails_PetitionFieldFragmentDoc = gql`
+  fragment DowJonesProfileDetails_PetitionField on PetitionField {
+    id
+    type
+    replies {
+      ...DowJonesSearchResult_PetitionFieldReply
+    }
+  }
+  ${DowJonesSearchResult_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<DowJonesProfileDetails_PetitionFieldFragment, unknown>;
+export const DowJonesProfileDetails_QueryFragmentDoc = gql`
+  fragment DowJonesProfileDetails_Query on Query {
+    me {
+      id
+      hasDowJonesFeatureFlag: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
+    }
+  }
+` as unknown as DocumentNode<DowJonesProfileDetails_QueryFragment, unknown>;
+export const DowJonesProfileDetails_DowJonesKycEntitySanctionFragmentDoc = gql`
+  fragment DowJonesProfileDetails_DowJonesKycEntitySanction on DowJonesKycEntitySanction {
+    id
+    name
+    sources
+    fromDate {
+      year
+      month
+      day
+    }
+  }
+` as unknown as DocumentNode<DowJonesProfileDetails_DowJonesKycEntitySanctionFragment, unknown>;
+export const DowJonesProfileDetails_DowJonesKycEntityRelationshipFragmentDoc = gql`
+  fragment DowJonesProfileDetails_DowJonesKycEntityRelationship on DowJonesKycEntityRelationship {
+    profileId
+    connectionType
+    iconHints
+    name
+    type
+  }
+` as unknown as DocumentNode<DowJonesProfileDetails_DowJonesKycEntityRelationshipFragment, unknown>;
+export const DowJonesProfileDetails_DowJonesKycEntityProfileResultFragmentDoc = gql`
+  fragment DowJonesProfileDetails_DowJonesKycEntityProfileResult on DowJonesKycEntityProfileResult {
+    id
+    type
+    name
+    iconHints
+    sanctions {
+      ...DowJonesProfileDetails_DowJonesKycEntitySanction
+    }
+    relationships {
+      ...DowJonesProfileDetails_DowJonesKycEntityRelationship
+    }
+    updatedAt
+    ... on DowJonesKycEntityProfileResultEntity {
+      dateOfRegistration {
+        year
+        month
+        day
+      }
+    }
+    ... on DowJonesKycEntityProfileResultPerson {
+      placeOfBirth {
+        descriptor
+        countryCode
+      }
+      dateOfBirth {
+        year
+        month
+        day
+      }
+      citizenship {
+        descriptor
+        countryCode
+      }
+      residence {
+        descriptor
+        countryCode
+      }
+      jurisdiction {
+        descriptor
+        countryCode
+      }
+      isDeceased
+    }
+  }
+  ${DowJonesProfileDetails_DowJonesKycEntitySanctionFragmentDoc}
+  ${DowJonesProfileDetails_DowJonesKycEntityRelationshipFragmentDoc}
+` as unknown as DocumentNode<
+  DowJonesProfileDetails_DowJonesKycEntityProfileResultFragment,
+  unknown
+>;
 export const DowJonesFieldPreview_PetitionFieldFragmentDoc = gql`
   fragment DowJonesFieldPreview_PetitionField on PetitionField {
     id
@@ -30770,17 +30866,6 @@ export const PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument = gql
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery,
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryQueryVariables
 >;
-export const DowJonesProfileDetails_DowJonesKycEntityProfileDocument = gql`
-  query DowJonesProfileDetails_DowJonesKycEntityProfile($profileId: ID!) {
-    DowJonesKycEntityProfile(profileId: $profileId) {
-      ...DowJonesProfileDetails_DowJonesKycEntityProfileResult
-    }
-  }
-  ${DowJonesProfileDetails_DowJonesKycEntityProfileResultFragmentDoc}
-` as unknown as DocumentNode<
-  DowJonesProfileDetails_DowJonesKycEntityProfileQuery,
-  DowJonesProfileDetails_DowJonesKycEntityProfileQueryVariables
->;
 export const DowJonesSearchResult_DowJonesKycEntitySearchDocument = gql`
   query DowJonesSearchResult_DowJonesKycEntitySearch(
     $offset: Int
@@ -32458,6 +32543,72 @@ export const PetitionMessages_updatePetitionDocument = gql`
 ` as unknown as DocumentNode<
   PetitionMessages_updatePetitionMutation,
   PetitionMessages_updatePetitionMutationVariables
+>;
+export const DowJonesProfileDetails_createDowJonesKycReplyDocument = gql`
+  mutation DowJonesProfileDetails_createDowJonesKycReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $profileId: ID!
+  ) {
+    createDowJonesKycReply(petitionId: $petitionId, fieldId: $fieldId, profileId: $profileId) {
+      id
+      field {
+        id
+        replies {
+          id
+          content
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DowJonesProfileDetails_createDowJonesKycReplyMutation,
+  DowJonesProfileDetails_createDowJonesKycReplyMutationVariables
+>;
+export const DowJonesProfileDetails_deletePetitionFieldReplyDocument = gql`
+  mutation DowJonesProfileDetails_deletePetitionFieldReply($petitionId: GID!, $replyId: GID!) {
+    deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+      id
+      replies {
+        id
+        content
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DowJonesProfileDetails_deletePetitionFieldReplyMutation,
+  DowJonesProfileDetails_deletePetitionFieldReplyMutationVariables
+>;
+export const DowJonesProfileDetails_DowJonesKycEntityProfileDocument = gql`
+  query DowJonesProfileDetails_DowJonesKycEntityProfile($profileId: ID!) {
+    DowJonesKycEntityProfile(profileId: $profileId) {
+      ...DowJonesProfileDetails_DowJonesKycEntityProfileResult
+    }
+  }
+  ${DowJonesProfileDetails_DowJonesKycEntityProfileResultFragmentDoc}
+` as unknown as DocumentNode<
+  DowJonesProfileDetails_DowJonesKycEntityProfileQuery,
+  DowJonesProfileDetails_DowJonesKycEntityProfileQueryVariables
+>;
+export const DowJonesProfileDetails_petitionFieldDocument = gql`
+  query DowJonesProfileDetails_petitionField($petitionId: GID!, $petitionFieldId: GID!) {
+    petitionField(petitionId: $petitionId, petitionFieldId: $petitionFieldId) {
+      ...DowJonesProfileDetails_PetitionField
+    }
+  }
+  ${DowJonesProfileDetails_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<
+  DowJonesProfileDetails_petitionFieldQuery,
+  DowJonesProfileDetails_petitionFieldQueryVariables
+>;
+export const DowJonesProfileDetails_userDocument = gql`
+  query DowJonesProfileDetails_user {
+    ...DowJonesProfileDetails_Query
+  }
+  ${DowJonesProfileDetails_QueryFragmentDoc}
+` as unknown as DocumentNode<
+  DowJonesProfileDetails_userQuery,
+  DowJonesProfileDetails_userQueryVariables
 >;
 export const DowJonesFieldPreview_createDowJonesKycReplyDocument = gql`
   mutation DowJonesFieldPreview_createDowJonesKycReply(
