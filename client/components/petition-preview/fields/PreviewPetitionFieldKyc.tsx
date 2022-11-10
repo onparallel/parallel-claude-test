@@ -31,7 +31,8 @@ import {
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { DowJonesHints } from "@parallel/components/petition-common/DowJonesHints";
+import { DowJonesRiskLabel } from "@parallel/components/petition-common/DowJonesRiskLabel";
+import { PreviewPetitionFieldKyc_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { useInterval } from "@parallel/utils/useInterval";
@@ -39,7 +40,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { PreviewPetitionFieldKyc_PetitionFieldFragment } from "@parallel/graphql/__types";
 
 export interface PreviewPetitionFieldKycProps
   extends Omit<
@@ -241,12 +241,16 @@ export function KYCResearchFieldReplyProfile({
       <Box flex="1" overflow="hidden" paddingBottom="2px">
         <Flex minWidth={0} whiteSpace="nowrap" alignItems="baseline">
           {!reply.isAnonymized ? (
-            <>
-              <HStack flexWrap="wrap" spacing={0} gridGap={2}>
-                <Text as="span">{reply.content?.entity.name}</Text>
-                <DowJonesHints hints={reply.content.entity.iconHints ?? []} />
-              </HStack>
-            </>
+            <Flex flexWrap="wrap" gap={2}>
+              <Text as="span" lineHeight={1.2}>
+                {reply.content?.entity.name}
+              </Text>
+              <Flex flexWrap="wrap" gap={2} alignItems="center">
+                {(reply.content.entity.iconHints as string[] | undefined)?.map((hint, i) => (
+                  <DowJonesRiskLabel key={i} risk={hint} />
+                ))}
+              </Flex>
+            </Flex>
           ) : (
             <Text textStyle="hint">
               <FormattedMessage

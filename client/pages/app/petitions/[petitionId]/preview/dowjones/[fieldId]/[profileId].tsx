@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Center,
+  Flex,
   Heading,
   HStack,
   Image,
@@ -26,7 +27,7 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { Table, TableColumn } from "@parallel/components/common/Table";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { DowJonesHints } from "@parallel/components/petition-common/DowJonesHints";
+import { DowJonesRiskLabel } from "@parallel/components/petition-common/DowJonesRiskLabel";
 import {
   DowJonesProfileDetails_createDowJonesKycReplyDocument,
   DowJonesProfileDetails_deletePetitionFieldReplyDocument,
@@ -175,7 +176,7 @@ function DowJonesProfileDetails({
             })}
             onClick={handleGoBackClick}
           />
-          <Heading size="md">
+          <Heading as="h1" size="md">
             <FormattedMessage
               id="component.dow-jones-profile-details.profile-details"
               defaultMessage="Profile details"
@@ -184,30 +185,27 @@ function DowJonesProfileDetails({
         </HStack>
 
         <Card>
-          <CardHeader minHeight="65px">
-            <HStack justifyContent="space-between" spacing={0} gridGap={3} wrap="wrap">
-              <HStack flex="1">
+          <CardHeader headingLevel="h2" minHeight="65px">
+            <HStack>
+              <Stack direction={{ base: "column", md: "row" }} flex="1">
                 {loading ? (
                   <>
-                    <Skeleton height="20px" width="100%" maxWidth="320px" endColor="gray.300" />
-                    <Skeleton height="20px" width="50px" endColor="gray.300" />
+                    <Skeleton height="24px" width="100%" maxWidth="320px" />
+                    <Skeleton height="18px" width="50px" />
                   </>
                 ) : (
                   <>
-                    <Text
-                      fontSize="xl"
-                      display="flex"
-                      alignItems="center"
-                      gridGap={2}
-                      flexWrap="wrap"
-                      whiteSpace="break-spaces"
-                    >
+                    <Text as="div" fontSize="xl">
                       {details?.name}
-                      <DowJonesHints hints={details?.iconHints ?? []} />
                     </Text>
+                    <Flex lineHeight="base" gap={2} flexWrap="wrap">
+                      {details?.iconHints?.map((hint, i) => (
+                        <DowJonesRiskLabel key={i} risk={hint} />
+                      ))}
+                    </Flex>
                   </>
                 )}
-              </HStack>
+              </Stack>
               <Box>
                 {replyId ? (
                   <HStack>
@@ -634,14 +632,12 @@ function useDowJonesKycRelationshipsColumns() {
         key: "tags",
         header: "",
         CellContent: ({ row: { iconHints } }) => {
-          if (!iconHints || iconHints.length === 0) {
-            return <></>;
-          }
-
           return (
-            <HStack>
-              <DowJonesHints hints={iconHints} />
-            </HStack>
+            <Flex gap={2} flexWrap="wrap">
+              {iconHints?.map((hint, i) => (
+                <DowJonesRiskLabel key={i} risk={hint} />
+              ))}
+            </Flex>
           );
         },
       },

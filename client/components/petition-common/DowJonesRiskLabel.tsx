@@ -1,5 +1,6 @@
 import { Badge, HStack, Tooltip, Text } from "@chakra-ui/react";
 import { BusinessIcon, UserIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { isDefined } from "remeda";
 
 const LABELS = {
@@ -37,48 +38,42 @@ const LABELS = {
   "LOCATIONS-COUNTRY": "Enhanced Country Risk - Entity (Country)",
 } as Record<string, string>;
 
-export function DowJonesHints({ hints }: { hints: string[] }) {
-  return (
-    <>
-      {hints.map((item, i) => {
-        const label = LABELS[item];
-        const text = /-(ENTITY|PERSON)$/.test(item) ? item.replace(/-(ENTITY|PERSON)$/, "") : item;
-        const icon = /-ENTITY$/.test(item) ? (
-          <BusinessIcon />
-        ) : /-PERSON$/.test(item) ? (
-          <UserIcon />
-        ) : /-(SHIP|AIRCRAFT|COUNTRY|BANK)$/.test(item) ? null : ["SOC", "AM", "SOR"].includes(
-            item
-          ) ? (
-          <BusinessIcon />
-        ) : (
-          <UserIcon />
-        );
-        return (
-          <Tooltip placement="right" key={i} label={label} isDisabled={!isDefined(label)}>
-            <Badge
-              as={HStack}
-              marginRight={2}
-              display="inline-flex"
-              spacing={1}
-              colorScheme={
-                item === "PEP"
-                  ? "green"
-                  : /^SAN(-?|$)/.test(item)
-                  ? "red"
-                  : /^OOL(-?|$)/.test(item)
-                  ? "orange"
-                  : /^SI(-?|$)/.test(item)
-                  ? "yellow"
-                  : undefined
-              }
-            >
-              {icon}
-              <Text as="span">{text}</Text>
-            </Badge>
-          </Tooltip>
-        );
-      })}
-    </>
-  );
-}
+export const DowJonesRiskLabel = chakraForwardRef<"span", { risk: string }>(
+  function DowJonesRiskLabel({ risk, ...props }, ref) {
+    const label = LABELS[risk];
+    const text = /-(ENTITY|PERSON)$/.test(risk) ? risk.replace(/-(ENTITY|PERSON)$/, "") : risk;
+    const icon = /-ENTITY$/.test(risk) ? (
+      <BusinessIcon />
+    ) : /-PERSON$/.test(risk) ? (
+      <UserIcon />
+    ) : /-(SHIP|AIRCRAFT|COUNTRY|BANK)$/.test(risk) ? null : ["SOC", "AM", "SOR"].includes(risk) ? (
+      <BusinessIcon />
+    ) : (
+      <UserIcon />
+    );
+    return (
+      <Tooltip placement="right" label={label} isDisabled={!isDefined(label)}>
+        <Badge
+          as={HStack}
+          display="inline-flex"
+          spacing={1}
+          colorScheme={
+            risk === "PEP"
+              ? "green"
+              : /^SAN(-?|$)/.test(risk)
+              ? "red"
+              : /^OOL(-?|$)/.test(risk)
+              ? "orange"
+              : /^SI(-?|$)/.test(risk)
+              ? "yellow"
+              : undefined
+          }
+          {...props}
+        >
+          {icon}
+          <Text as="span">{text}</Text>
+        </Badge>
+      </Tooltip>
+    );
+  }
+);

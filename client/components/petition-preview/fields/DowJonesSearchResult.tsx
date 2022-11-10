@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Button, Flex, Heading, HStack, Skeleton, Stack, Text } from "@chakra-ui/react";
 import { CheckIcon, DeleteIcon, SaveIcon } from "@parallel/chakra/icons";
 import { TableColumn } from "@parallel/components/common/Table";
-import { DowJonesHints } from "@parallel/components/petition-common/DowJonesHints";
+import { DowJonesRiskLabel } from "@parallel/components/petition-common/DowJonesRiskLabel";
 import {
   DowJonesSearchResult_DowJonesKycEntitySearchDocument,
   DowJonesSearchResult_DowJonesKycEntitySearchResultFragment,
@@ -184,10 +184,13 @@ function useDowJonesKycDataColumns() {
         key: "tags",
         header: "",
         CellContent: ({ row: { iconHints } }) => {
-          if (!iconHints || iconHints.length === 0) {
-            return <></>;
-          }
-          return <DowJonesHints hints={iconHints} />;
+          return (
+            <Flex gap={2} flexWrap="wrap">
+              {iconHints?.map((hint, i) => (
+                <DowJonesRiskLabel key={i} risk={hint} />
+              ))}
+            </Flex>
+          );
         },
       },
       {

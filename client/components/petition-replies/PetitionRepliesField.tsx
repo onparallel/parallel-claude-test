@@ -100,7 +100,7 @@ export const PetitionRepliesField = Object.assign(
       <NakedLink href={buildUrlToSection("compose", { field: field.id })}>
         <IconButtonWithTooltip
           as="a"
-          display="none"
+          opacity={0}
           className="edit-field-button"
           size="xs"
           variant="ghost"
@@ -123,14 +123,11 @@ export const PetitionRepliesField = Object.assign(
         templateColumns="32px 10px 1fr 8px auto"
         gridTemplateAreas={`"index . heading . comments" ". . desc desc desc"`}
         {...props}
-        _focusWithin={{
-          ".edit-field-button": {
-            display: "inline-flex",
-          },
-        }}
-        _hover={{
-          ".edit-field-button": {
-            display: "inline-flex",
+        sx={{
+          "&:focus-within, &:hover": {
+            ".edit-field-button": {
+              opacity: 1,
+            },
           },
         }}
       >
@@ -204,14 +201,11 @@ export const PetitionRepliesField = Object.assign(
         <Grid
           templateColumns="32px 10px 1fr 8px auto"
           gridTemplateAreas={`"index . heading . comments" ". . desc desc desc"`}
-          _focusWithin={{
-            ".edit-field-button": {
-              display: "inline-flex",
-            },
-          }}
-          _hover={{
-            ".edit-field-button": {
-              display: "inline-flex",
+          sx={{
+            "&:focus-within, &:hover": {
+              ".edit-field-button": {
+                opacity: 1,
+              },
             },
           }}
         >

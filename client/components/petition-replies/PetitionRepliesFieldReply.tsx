@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Grid, GridItem, HStack, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
+import { Box, Flex, Grid, GridItem, HStack, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
 import {
   BusinessIcon,
   CheckIcon,
@@ -25,7 +25,7 @@ import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
 import { UserOrContactReference } from "../petition-activity/UserOrContactReference";
-import { DowJonesHints } from "../petition-common/DowJonesHints";
+import { DowJonesRiskLabel } from "../petition-common/DowJonesRiskLabel";
 import { CopyOrDownloadReplyButton } from "./CopyOrDownloadReplyButton";
 
 export interface PetitionRepliesFieldReplyProps {
@@ -44,11 +44,28 @@ export function PetitionRepliesFieldReply({
   isDisabled,
 }: PetitionRepliesFieldReplyProps) {
   const intl = useIntl();
+  const type = reply.field!.type;
 
-  const singleContents = isFileTypeField(reply.field!.type)
+  const contents = isFileTypeField(type)
     ? [reply.content]
+    : type === "NUMBER"
+    ? [
+        formatNumberWithPrefix(
+          reply.content.value as number,
+          reply.field!.options as FieldOptions["NUMBER"]
+        ),
+      ]
+    : type === "DATE"
+    ? [
+        <time key={0} dateTime={reply.content.value}>
+          {intl.formatDate(reply.content.value as string, {
+            ...FORMATS.L,
+            timeZone: "UTC",
+          })}
+        </time>,
+      ]
     : Array.isArray(reply.content.value)
-    ? reply.field!.type === "DYNAMIC_SELECT"
+    ? type === "DYNAMIC_SELECT"
       ? reply.content.value.map((v) => v[1])
       : reply.content.value
     : [reply.content.value];
@@ -64,9 +81,7 @@ export function PetitionRepliesFieldReply({
       >
         <IconButtonWithTooltip
           as="a"
-          marginLeft={2}
-          position="absolute"
-          display="none"
+          opacity={0}
           className="edit-field-reply-button"
           variant="ghost"
           size="xs"
@@ -86,18 +101,15 @@ export function PetitionRepliesFieldReply({
         flex="1"
         templateColumns="auto 1fr"
         columnGap={2}
-        _focusWithin={{
-          ".edit-field-reply-button": {
-            display: "inline-flex",
-          },
-        }}
-        _hover={{
-          ".edit-field-reply-button": {
-            display: "inline-flex",
+        sx={{
+          "&:focus-within, &:hover": {
+            ".edit-field-reply-button": {
+              opacity: 1,
+            },
           },
         }}
       >
-        {singleContents.map((content, i) => (
+        {contents.map((content, i) => (
           <Fragment key={i}>
             <GridItem paddingBottom={1}>
               <CopyOrDownloadReplyButton reply={reply} content={content} onAction={onAction} />
@@ -110,84 +122,72 @@ export function PetitionRepliesFieldReply({
             >
               <HStack alignItems={"center"} gridGap={2} spacing={0}>
                 {reply.isAnonymized ? (
-                  <ReplyNotAvailable type={reply.field!.type} />
-                ) : reply.field!.type === "DOW_JONES_KYC" ? (
-                  <HStack flexWrap="wrap" whiteSpace="break-spaces" spacing={0} gridGap={2}>
-                    <VisuallyHidden>
-                      {intl.formatMessage({
-                        id: "generic.name",
-                        defaultMessage: "Name",
-                      })}
-                    </VisuallyHidden>
-                    {content.entity.type === "Entity" ? <BusinessIcon /> : <UserIcon />}
-                    <Text as="span">{content.entity.name}</Text>
-                    <HStack>
-                      <DowJonesHints hints={content.entity.iconHints ?? []} />
-                    </HStack>
-                    <Text as="span" marginX={2}>
-                      -
-                    </Text>
-                    <Text
-                      as="span"
-                      aria-label={intl.formatMessage({
-                        id: "generic.file-size",
-                        defaultMessage: "File size",
-                      })}
-                      fontSize="sm"
-                      color="gray.500"
-                    >
-                      <FileSize value={content.size} />
-                    </Text>
-                    <Box alignSelf="start">{editReplyIconButton()}</Box>
-                  </HStack>
-                ) : isFileTypeField(reply.field!.type) ? (
-                  <Box>
+                  <ReplyNotAvailable type={type} />
+                ) : isFileTypeField(type) && type !== "DOW_JONES_KYC" ? (
+                  <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
                     <VisuallyHidden>
                       {intl.formatMessage({
                         id: "generic.file-name",
                         defaultMessage: "File name",
                       })}
                     </VisuallyHidden>
-                    <Text as="span">{content.filename}</Text>
-                    <Text as="span" marginX={2}>
-                      -
-                    </Text>
-                    <Text
-                      as="span"
-                      aria-label={intl.formatMessage({
-                        id: "generic.file-size",
-                        defaultMessage: "File size",
-                      })}
-                      fontSize="sm"
-                      color="gray.500"
-                    >
-                      <FileSize value={content.size} />
-                    </Text>
-                    {editReplyIconButton()}
-                  </Box>
-                ) : reply.field!.type === "NUMBER" ? (
-                  <Text wordBreak="break-all" whiteSpace="pre">
-                    {formatNumberWithPrefix(
-                      content as number,
-                      reply.field!.options as FieldOptions["NUMBER"]
-                    )}
-                    {editReplyIconButton()}
-                  </Text>
-                ) : reply.field!.type === "DATE" ? (
-                  <Text>
-                    {intl.formatDate(content, {
-                      ...FORMATS.L,
-                      timeZone: "UTC",
-                    })}
-                    {editReplyIconButton()}
-                  </Text>
-                ) : (
-                  <BreakLines>
                     <Text as="span">
-                      {content}
-                      {editReplyIconButton(reply.field?.type === "DYNAMIC_SELECT" ? `-${i}` : "")}
+                      {content.filename}
+                      {" - "}
+                      <Text
+                        as="span"
+                        aria-label={intl.formatMessage({
+                          id: "generic.file-size",
+                          defaultMessage: "File size",
+                        })}
+                        fontSize="sm"
+                        color="gray.500"
+                      >
+                        <FileSize value={content.size} />
+                      </Text>
                     </Text>
-                  </BreakLines>
+                    {editReplyIconButton()}
+                  </Flex>
+                ) : type === "DOW_JONES_KYC" ? (
+                  <Stack spacing={1}>
+                    <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
+                      <VisuallyHidden>
+                        {intl.formatMessage({
+                          id: "generic.name",
+                          defaultMessage: "Name",
+                        })}
+                      </VisuallyHidden>
+                      {content.entity.type === "Entity" ? <BusinessIcon /> : <UserIcon />}
+                      <Text as="span">
+                        {content.entity.name}
+                        {" - "}
+                        <Text
+                          as="span"
+                          aria-label={intl.formatMessage({
+                            id: "generic.file-size",
+                            defaultMessage: "File size",
+                          })}
+                          fontSize="sm"
+                          color="gray.500"
+                        >
+                          <FileSize value={content.size} />
+                        </Text>
+                      </Text>
+                      {editReplyIconButton()}
+                    </Flex>
+                    <Flex flexWrap="wrap" gap={2} alignItems="center">
+                      {(content.entity.iconHints as string[] | undefined)?.map((hint, i) => (
+                        <DowJonesRiskLabel key={i} risk={hint} />
+                      ))}
+                    </Flex>
+                  </Stack>
+                ) : (
+                  <Box>
+                    <BreakLines>{content}</BreakLines>
+                    <Box display="inline-block" height={6} marginLeft={2} verticalAlign="baseline">
+                      {editReplyIconButton(reply.field?.type === "DYNAMIC_SELECT" ? `-${i}` : "")}
+                    </Box>
+                  </Box>
                 )}
               </HStack>
             </GridItem>
@@ -200,7 +200,7 @@ export function PetitionRepliesFieldReply({
           borderColor="gray.200"
           paddingLeft={2}
         >
-          {isFileTypeField(reply.field!.type) && reply.content.uploadComplete === false ? (
+          {isFileTypeField(type) && reply.content.uploadComplete === false ? (
             <Text color="red.500">
               <FormattedMessage
                 id="petition-replies.petition-field-reply.file-upload.file-incomplete"
