@@ -49,21 +49,9 @@ export function PetitionRepliesFieldReply({
   const contents = isFileTypeField(type)
     ? [reply.content]
     : type === "NUMBER"
-    ? [
-        formatNumberWithPrefix(
-          reply.content.value as number,
-          reply.field!.options as FieldOptions["NUMBER"]
-        ),
-      ]
+    ? [formatNumberWithPrefix(reply.content.value, reply.field!.options as FieldOptions["NUMBER"])]
     : type === "DATE"
-    ? [
-        <time key={0} dateTime={reply.content.value}>
-          {intl.formatDate(reply.content.value as string, {
-            ...FORMATS.L,
-            timeZone: "UTC",
-          })}
-        </time>,
-      ]
+    ? [intl.formatDate(reply.content.value as string, { ...FORMATS.L, timeZone: "UTC" })]
     : Array.isArray(reply.content.value)
     ? type === "DYNAMIC_SELECT"
       ? reply.content.value.map((v) => v[1])
@@ -145,8 +133,10 @@ export function PetitionRepliesFieldReply({
                       >
                         <FileSize value={content.size} />
                       </Text>
+                      <Box display="inline-block" marginLeft={2}>
+                        {editReplyIconButton()}
+                      </Box>
                     </Text>
-                    {editReplyIconButton()}
                   </Flex>
                 ) : type === "DOW_JONES_KYC" ? (
                   <Stack spacing={1}>
@@ -157,8 +147,10 @@ export function PetitionRepliesFieldReply({
                           defaultMessage: "Name",
                         })}
                       </VisuallyHidden>
-                      {content.entity.type === "Entity" ? <BusinessIcon /> : <UserIcon />}
                       <Text as="span">
+                        <Text as="span" display="inline-block" marginRight={2}>
+                          {content.entity.type === "Entity" ? <BusinessIcon /> : <UserIcon />}
+                        </Text>
                         {content.entity.name}
                         {" - "}
                         <Text
@@ -172,8 +164,10 @@ export function PetitionRepliesFieldReply({
                         >
                           <FileSize value={content.size} />
                         </Text>
+                        <Box display="inline-block" marginLeft={2}>
+                          {editReplyIconButton()}
+                        </Box>
                       </Text>
-                      {editReplyIconButton()}
                     </Flex>
                     <Flex flexWrap="wrap" gap={2} alignItems="center">
                       {(content.entity.iconHints as string[] | undefined)?.map((hint, i) => (

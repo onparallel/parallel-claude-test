@@ -239,7 +239,7 @@ export function KYCResearchFieldReplyProfile({
         )}
       </Center>
       <Box flex="1" overflow="hidden" paddingBottom="2px">
-        <Flex minWidth={0} whiteSpace="nowrap" alignItems="baseline">
+        <Flex minWidth={0} alignItems="baseline">
           {!reply.isAnonymized ? (
             <Flex flexWrap="wrap" gap={2}>
               <Text as="span" lineHeight={1.2}>
