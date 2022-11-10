@@ -796,7 +796,7 @@ export class PetitionRepository extends BaseRepository {
         /* sql */ `
           select pfr.* from petition_field_reply as pfr
           left join petition_field as pf on pf.id = pfr.petition_field_id and pfr.deleted_at is null
-          where pf.petition in ? and pf.deleted_at is null
+          where pf.petition_id in ? and pf.deleted_at is null
         `,
         [this.sqlIn(petitionIds)],
         t

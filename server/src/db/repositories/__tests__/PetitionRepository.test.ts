@@ -1585,4 +1585,33 @@ describe("repositories/PetitionRepository", () => {
       ]);
     });
   });
+
+  describe("loadPetitionProgress", () => {
+    it("loads the progress of the petition", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [textField] = await mocks.createRandomPetitionFields(petition.id, 4, (i) => ({
+        type: "TEXT",
+        is_internal: i === 0,
+        optional: i === 3,
+      }));
+
+      await mocks.createRandomTextReply(textField.id, undefined, 1, () => ({ user_id: user.id }));
+
+      const progress = await petitions.loadPetitionProgress(petition.id);
+      expect(progress).toMatchObject({
+        external: {
+          approved: 0,
+          replied: 0,
+          optional: 1,
+          total: 3,
+        },
+        internal: {
+          approved: 0,
+          replied: 1,
+          optional: 0,
+          total: 1,
+        },
+      });
+    });
+  });
 });
