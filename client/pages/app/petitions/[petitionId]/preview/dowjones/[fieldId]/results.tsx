@@ -137,7 +137,7 @@ function DowJonesFieldSearchResults({
         <title>{"Dow Jones | Parallel"}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <Stack paddingX={6} paddingY={5} spacing={6}>
+      <Stack paddingX={6} paddingY={5} spacing={6} minHeight="100vh" backgroundColor="gray.50">
         {result?.totalCount || !loading ? (
           <Heading size="md">
             <FormattedMessage

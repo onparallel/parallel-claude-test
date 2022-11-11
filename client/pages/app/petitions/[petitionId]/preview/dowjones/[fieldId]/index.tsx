@@ -65,7 +65,7 @@ function DowJonesFieldSearch() {
         <title>{"Dow Jones | Parallel"}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <Center height="100vh" padding={4}>
+      <Center minHeight="100vh" backgroundColor="gray.50" padding={4}>
         <Stack>
           {isDisabled ? (
             <Alert status="warning" borderRadius="md" maxWidth="500px">
