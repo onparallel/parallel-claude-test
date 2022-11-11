@@ -78,14 +78,6 @@ async function loadUserStats(userId: number, ctx: WorkerContext) {
   };
 }
 
-async function loadPetitionFieldComment(petitionFieldCommentId: number, ctx: WorkerContext) {
-  const comment = await ctx.petitions.loadPetitionFieldComment(petitionFieldCommentId);
-  if (!comment) {
-    throw new Error(`PetitionFieldComment:${petitionFieldCommentId} not found`);
-  }
-  return comment;
-}
-
 async function trackPetitionCreatedEvent(event: PetitionCreatedEvent, ctx: WorkerContext) {
   const petition = await ctx.petitions.loadPetition(event.petition_id);
   if (!petition) return;
@@ -403,8 +395,12 @@ async function trackCommentPublishedEvent(event: CommentPublishedEvent, ctx: Wor
 
   const [user, comment] = await Promise.all([
     loadPetitionOwner(event.petition_id, ctx),
-    loadPetitionFieldComment(event.data.petition_field_comment_id, ctx),
+    ctx.petitions.loadPetitionFieldComment(event.data.petition_field_comment_id),
   ]);
+
+  if (!comment) {
+    return;
+  }
 
   const from = isDefined(comment.petition_access_id) ? "recipient" : "user";
   await ctx.analytics.trackEvent({
