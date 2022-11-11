@@ -113,17 +113,6 @@ const HANDLERS: Partial<
 
 export const docusignEventHandlers: RequestHandler = Router()
   .use(json())
-  .get("/consent", async (req, res) => {
-    /**
-     * this is the endpoint where a docusign user is redirected after granting consent
-     * here we need to update the integration settings to remove the CONSENT_REQUIRED flag
-     */
-    const url = await req.context.signature.consentGranted(
-      fromGlobalId(req.query.state as string, "OrgIntegration").id,
-      "DOCUSIGN"
-    );
-    res.redirect(url);
-  })
   .post("/:petitionId/events", async (req, res, next) => {
     try {
       const body = req.body as DocuSignEventBody;

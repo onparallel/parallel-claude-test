@@ -3962,6 +3962,7 @@ export interface SignatureCancelledEvent extends PetitionEvent {
   extraErrorData?: Maybe<Scalars["JSON"]>;
   id: Scalars["GID"];
   petition?: Maybe<Petition>;
+  provider: SignatureOrgIntegrationProvider;
   type: PetitionEventType;
 }
 
@@ -4044,7 +4045,6 @@ export interface SignatureOpenedEvent extends PetitionEvent {
 
 export interface SignatureOrgIntegration extends IOrgIntegration {
   __typename?: "SignatureOrgIntegration";
-  consentRequiredUrl?: Maybe<Scalars["String"]>;
   /** Environment of this integration, to differentiate between sandbox and production-ready integrations */
   environment: SignatureOrgIntegrationEnvironment;
   id: Scalars["GID"];
@@ -7091,6 +7091,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
       | {
           __typename?: "SignatureCancelledEvent";
           id: string;
+          provider: SignatureOrgIntegrationProvider;
           cancelType: PetitionSignatureCancelReason;
           errorCode?: string | null;
           extraErrorData?: any | null;
@@ -7620,6 +7621,7 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment = 
 export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment = {
   __typename?: "SignatureCancelledEvent";
   id: string;
+  provider: SignatureOrgIntegrationProvider;
   cancelType: PetitionSignatureCancelReason;
   errorCode?: string | null;
   extraErrorData?: any | null;
@@ -8405,6 +8407,7 @@ export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
 
 export type TimelineSignatureCancelledEvent_SignatureCancelledEventFragment = {
   __typename?: "SignatureCancelledEvent";
+  provider: SignatureOrgIntegrationProvider;
   cancelType: PetitionSignatureCancelReason;
   errorCode?: string | null;
   extraErrorData?: any | null;
@@ -15835,7 +15838,7 @@ export type IntegrationsSignature_SignatureOrgIntegrationFragment = {
   provider: SignatureOrgIntegrationProvider;
   isDefault: boolean;
   environment: SignatureOrgIntegrationEnvironment;
-  consentRequiredUrl?: string | null;
+  invalidCredentials: boolean;
 };
 
 export type IntegrationsSignature_validateSignatureCredentialsMutationVariables = Exact<{
@@ -15864,7 +15867,7 @@ export type IntegrationsSignature_createSignaturitIntegrationMutation = {
     provider: SignatureOrgIntegrationProvider;
     isDefault: boolean;
     environment: SignatureOrgIntegrationEnvironment;
-    consentRequiredUrl?: string | null;
+    invalidCredentials: boolean;
   };
 };
 
@@ -15882,7 +15885,7 @@ export type IntegrationsSignature_markSignatureIntegrationAsDefaultMutation = {
         provider: SignatureOrgIntegrationProvider;
         isDefault: boolean;
         environment: SignatureOrgIntegrationEnvironment;
-        consentRequiredUrl?: string | null;
+        invalidCredentials: boolean;
       };
 };
 
@@ -15934,7 +15937,7 @@ export type IntegrationsSignature_userQuery = {
               provider: SignatureOrgIntegrationProvider;
               isDefault: boolean;
               environment: SignatureOrgIntegrationEnvironment;
-              consentRequiredUrl?: string | null;
+              invalidCredentials: boolean;
             }
         >;
       };
@@ -16812,6 +16815,7 @@ export type PetitionActivity_PetitionFragment = {
       | {
           __typename?: "SignatureCancelledEvent";
           id: string;
+          provider: SignatureOrgIntegrationProvider;
           cancelType: PetitionSignatureCancelReason;
           errorCode?: string | null;
           extraErrorData?: any | null;
@@ -17684,6 +17688,7 @@ export type PetitionActivity_updatePetitionMutation = {
             | {
                 __typename?: "SignatureCancelledEvent";
                 id: string;
+                provider: SignatureOrgIntegrationProvider;
                 cancelType: PetitionSignatureCancelReason;
                 errorCode?: string | null;
                 extraErrorData?: any | null;
@@ -18582,6 +18587,7 @@ export type PetitionActivity_petitionQuery = {
             | {
                 __typename?: "SignatureCancelledEvent";
                 id: string;
+                provider: SignatureOrgIntegrationProvider;
                 cancelType: PetitionSignatureCancelReason;
                 errorCode?: string | null;
                 extraErrorData?: any | null;
@@ -28396,7 +28402,7 @@ export const IntegrationsSignature_SignatureOrgIntegrationFragmentDoc = gql`
     provider
     isDefault
     environment
-    consentRequiredUrl
+    invalidCredentials
   }
 ` as unknown as DocumentNode<IntegrationsSignature_SignatureOrgIntegrationFragment, unknown>;
 export const UserSelectOption_UserGroupFragmentDoc = gql`
@@ -29093,6 +29099,7 @@ export const TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc 
     canceller {
       ...SignerReference_PetitionSigner
     }
+    provider
     cancelType
     errorCode
     extraErrorData

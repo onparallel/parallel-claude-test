@@ -26,8 +26,6 @@ export type IntegrationSettings<
     ES_FORMAL_BRANDING_ID?: string;
     EN_INFORMAL_BRANDING_ID?: string;
     ES_INFORMAL_BRANDING_ID?: string;
-    CONSENT_REQUIRED?: boolean;
-    CONSENT_URL?: string;
   };
   SSO: {
     EMAIL_DOMAINS: string[];

@@ -26,7 +26,6 @@ export interface ISignatureService {
     provider: TProvider;
     settings: IntegrationSettings<"SIGNATURE", TProvider>;
   }): ISignatureClient<TProvider>;
-  consentGranted(integrationId: number, provider: string): Promise<string>;
   createSignatureRequest(
     petitionId: number,
     signatureConfig: PetitionSignatureConfig,
@@ -68,23 +67,6 @@ export class SignatureService implements ISignatureService {
     @inject(QUEUES_SERVICE) private queues: IQueuesService,
     @inject(Container) private container: Container
   ) {}
-
-  async consentGranted(integrationId: number, provider: string) {
-    try {
-      const integration = await this.integrations.loadAnySignatureIntegration(integrationId);
-      if (integration?.provider === provider) {
-        const settings = integration.settings as IntegrationSettings<"SIGNATURE", "DOCUSIGN">;
-        delete settings.CONSENT_REQUIRED;
-        delete settings.CONSENT_URL;
-        await this.integrations.updateOrgIntegration(
-          integrationId,
-          { settings },
-          `OrgIntegration:${integrationId}`
-        );
-      }
-    } catch {}
-    return this.config.misc.parallelUrl;
-  }
 
   public getClient<TProvider extends SignatureProvider>(integration: {
     id?: number;

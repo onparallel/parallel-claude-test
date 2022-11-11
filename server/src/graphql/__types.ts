@@ -2359,6 +2359,7 @@ export interface NexusGenFieldTypes {
     extraErrorData: NexusGenScalars["JSON"] | null; // JSON
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["Petition"] | null; // Petition
+    provider: NexusGenEnums["SignatureOrgIntegrationProvider"]; // SignatureOrgIntegrationProvider!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   SignatureCancelledUserNotification: {
@@ -2405,7 +2406,6 @@ export interface NexusGenFieldTypes {
   };
   SignatureOrgIntegration: {
     // field return type
-    consentRequiredUrl: string | null; // String
     environment: NexusGenEnums["SignatureOrgIntegrationEnvironment"]; // SignatureOrgIntegrationEnvironment!
     id: NexusGenScalars["GID"]; // GID!
     invalidCredentials: boolean; // Boolean!
@@ -4150,6 +4150,7 @@ export interface NexusGenFieldTypeNames {
     extraErrorData: "JSON";
     id: "GID";
     petition: "Petition";
+    provider: "SignatureOrgIntegrationProvider";
     type: "PetitionEventType";
   };
   SignatureCancelledUserNotification: {
@@ -4196,7 +4197,6 @@ export interface NexusGenFieldTypeNames {
   };
   SignatureOrgIntegration: {
     // field return type name
-    consentRequiredUrl: "String";
     environment: "SignatureOrgIntegrationEnvironment";
     id: "GID";
     invalidCredentials: "Boolean";

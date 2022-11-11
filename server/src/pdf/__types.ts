@@ -3831,6 +3831,7 @@ export type SignatureCancelledEvent = PetitionEvent & {
   extraErrorData: Maybe<Scalars["JSON"]>;
   id: Scalars["GID"];
   petition: Maybe<Petition>;
+  provider: SignatureOrgIntegrationProvider;
   type: PetitionEventType;
 };
 
@@ -3907,7 +3908,6 @@ export type SignatureOpenedEvent = PetitionEvent & {
 };
 
 export type SignatureOrgIntegration = IOrgIntegration & {
-  consentRequiredUrl: Maybe<Scalars["String"]>;
   /** Environment of this integration, to differentiate between sandbox and production-ready integrations */
   environment: SignatureOrgIntegrationEnvironment;
   id: Scalars["GID"];

@@ -5202,6 +5202,7 @@ type SignatureCancelledEvent implements PetitionEvent {
   extraErrorData: JSON
   id: GID!
   petition: Petition
+  provider: SignatureOrgIntegrationProvider!
   type: PetitionEventType!
 }
 
@@ -5315,8 +5316,6 @@ type SignatureOpenedEvent implements PetitionEvent {
 }
 
 type SignatureOrgIntegration implements IOrgIntegration {
-  consentRequiredUrl: String
-
   """
   Environment of this integration, to differentiate between sandbox and production-ready integrations
   """

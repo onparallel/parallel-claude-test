@@ -60,7 +60,6 @@ type AuthenticationResponse<TProvider extends SignatureProvider> = {
   DOCUSIGN: {
     environment: "production" | "sandbox";
     consent_required?: boolean;
-    consent_url?: string;
   };
 }[TProvider];
 
@@ -71,7 +70,7 @@ export interface ISignatureClient<TProvider extends SignatureProvider> {
     id?: number;
     settings: IntegrationSettings<"SIGNATURE", TProvider>;
   }): void;
-  authenticate(): Promise<AuthenticationResponse<TProvider>>;
+  authenticate(throwOnError?: boolean): Promise<AuthenticationResponse<TProvider>>;
   startSignatureRequest: (
     petitionId: number,
     orgId: number,

@@ -168,8 +168,8 @@ export function TimelineSignatureCancelledEvent({
         )}
         {event.cancelType === "REQUEST_ERROR" &&
           event.errorCode === "CONSENT_REQUIRED" &&
-          event.extraErrorData?.consentUrl && (
-            <NakedLink href={event.extraErrorData.consentUrl}>
+          event.provider === "DOCUSIGN" && (
+            <NakedLink href="/api/oauth/docusign/authorize">
               <Button as="a" target="_blank" size="sm" variant="outline" marginLeft={4}>
                 <FormattedMessage
                   id="timeline.signature-declined.give-consent"
@@ -192,6 +192,7 @@ TimelineSignatureCancelledEvent.fragments = {
       canceller {
         ...SignerReference_PetitionSigner
       }
+      provider
       cancelType
       errorCode
       extraErrorData

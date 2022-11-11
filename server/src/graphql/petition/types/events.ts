@@ -584,6 +584,17 @@ export const SignatureCancelledEvent = createPetitionEvent("SignatureCancelledEv
       return data.cancel_reason === "REQUEST_ERROR" ? data.cancel_data?.extra ?? null : null;
     },
   });
+  t.field("provider", {
+    type: "SignatureOrgIntegrationProvider",
+    resolve: async (event, _, ctx) => {
+      const signature = await ctx.petitions.loadPetitionSignatureById(
+        event.data.petition_signature_request_id
+      );
+      const orgIntegrationId = signature!.signature_config.orgIntegrationId as number;
+      const integration = await ctx.integrations.loadIntegration(orgIntegrationId);
+      return integration!.provider;
+    },
+  });
 });
 
 export const SignatureReminderEvent = createPetitionEvent("SignatureReminderEvent", (t) => {

@@ -1,6 +1,5 @@
 import { RequestHandler, Router } from "express";
 import { injectable } from "inversify";
-import { Response } from "node-fetch";
 import { isDefined } from "remeda";
 import { Config } from "../../config";
 import { IntegrationRepository } from "../../db/repositories/IntegrationRepository";
@@ -20,16 +19,15 @@ export abstract class OAuthIntegration {
   constructor(
     protected config: Config,
     private redis: IRedis,
-    private integrations: IntegrationRepository
+    protected integrations: IntegrationRepository
   ) {}
   abstract readonly orgIntegrationType: IntegrationType;
   abstract readonly provider: string;
   abstract readonly redirectCallbackUrl: string;
 
-  abstract buildAuthorizationUrl(state: string): MaybePromise<string>;
+  abstract buildAuthorizationUrl(state: string): string;
   abstract getAccessAndRefreshToken(code: string): MaybePromise<OauthCredentials>;
-  abstract refreshAccessToken(refreshToken: string): MaybePromise<OauthCredentials>;
-  abstract checkIfAccessTokenExpired(response: Response): MaybePromise<boolean>;
+  abstract refreshAccessToken(refreshToken: string): Promise<OauthCredentials>;
 
   protected orgHasAccessToIntegration(orgId: number): MaybePromise<boolean> {
     return true;
@@ -86,6 +84,7 @@ export abstract class OAuthIntegration {
               ? "sandbox"
               : "production",
           },
+          invalid_credentials: false,
         },
         `Organization:${orgId}`
       );
@@ -103,7 +102,7 @@ export abstract class OAuthIntegration {
           }
           const state = random(16);
           await this.storeState(state, { orgId });
-          const url = await this.buildAuthorizationUrl(state);
+          const url = this.buildAuthorizationUrl(state);
           res.redirect(url);
         } catch (error) {
           console.error(error);
@@ -114,7 +113,6 @@ export abstract class OAuthIntegration {
         try {
           const { state, code } = req.query;
           if (typeof state !== "string" || typeof code !== "string") {
-            // TODO: user didn't grant authorization, show some message
             res.redirect(this.redirectCallbackUrl);
           } else {
             const { orgId } = await this.getState<{ orgId: number }>(state);
@@ -144,35 +142,4 @@ export abstract class OAuthIntegration {
       REFRESH_TOKEN: decrypt(Buffer.from(c.REFRESH_TOKEN, "hex"), encryptionKey).toString("utf8"),
     };
   }
-
-  // async makeApiCall<TResult = unknown>(
-  //   orgIntegrationId: number,
-  //   url: string,
-  //   options?: RequestInit
-  // ) {
-  //   const { accessToken, refreshToken } = await this.getCredentials(orgIntegrationId);
-  //   const response = await fetch(url, {
-  //     ...options,
-  //     headers: { ...options?.headers, Authorization: `Bearer ${accessToken}` },
-  //   });
-  //   if (response.ok) {
-  //     return (await response.json()) as TResult;
-  //   } else {
-  //     if (await this.checkIfAccessTokenExpired(response)) {
-  //       try {
-  //         const credentials = await this.refreshAccessToken(refreshToken);
-  //         await this.storeCredentials(orgIntegrationId, credentials);
-  //         const response = await fetch(url, {
-  //           ...options,
-  //           headers: { ...options?.headers, Authorization: `Bearer ${accessToken}` },
-  //         });
-  //         return (await response.json()) as TResult;
-  //       } catch (error) {
-  //         if (error instanceof DeauthorizedError) {
-  //           // TODO make integration as deauthorized
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
 }

@@ -50,9 +50,6 @@ export const SignatureOrgIntegration = objectType({
         return o.settings.ENVIRONMENT === "production" ? "PRODUCTION" : "DEMO";
       },
     });
-    t.nullable.string("consentRequiredUrl", {
-      resolve: (o) => (o.settings.CONSENT_REQUIRED && o.settings.CONSENT_URL) ?? null,
-    });
   },
   sourceType: "db.OrgIntegration",
 });
