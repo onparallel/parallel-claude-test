@@ -167,6 +167,7 @@ export class DocuSignClient implements ISignatureClient<"DOCUSIGN"> {
           defaultMessage: "Signature requested",
         }),
         eventNotification: {
+          includeHMAC: "true",
           url: `${baseEventsUrl}/api/webhooks/docusign/${toGlobalId(
             "Petition",
             petitionId

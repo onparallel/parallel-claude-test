@@ -1,3 +1,4 @@
+import { createHmac, timingSafeEqual } from "crypto";
 import { json, RequestHandler, Router } from "express";
 import { isDefined, maxBy } from "remeda";
 import { ApiContext } from "../../context";
@@ -111,9 +112,32 @@ const HANDLERS: Partial<
   "recipient-autoresponded": recipientAutoresponded,
 };
 
+const validateHMACSignature: RequestHandler = (req, res, next) => {
+  // check against multiple keys to allow for key rotation on Docusign panel
+  const headerKeys = ["x-docusign-signature-1", "x-docusign-signature-2"];
+  const isValid = headerKeys.some((key) => {
+    const signature = req.headers[key] as string | undefined;
+    if (signature) {
+      const hash = createHmac("sha256", req.context.config.oauth.docusign.webhookHmacSecret)
+        .update(JSON.stringify(req.body))
+        .digest("base64");
+      if (timingSafeEqual(Buffer.from(hash, "base64"), Buffer.from(signature, "base64"))) {
+        return true;
+      }
+    }
+    return false;
+  });
+
+  if (isValid) {
+    next();
+  } else {
+    res.sendStatus(401).end();
+  }
+};
+
 export const docusignEventHandlers: RequestHandler = Router()
   .use(json())
-  .post("/:petitionId/events", async (req, res, next) => {
+  .post("/:petitionId/events", validateHMACSignature, async (req, res, next) => {
     try {
       const body = req.body as DocuSignEventBody;
       const signature = await req.context.petitions.loadPetitionSignatureByExternalId(

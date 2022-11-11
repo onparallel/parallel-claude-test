@@ -158,6 +158,7 @@ export function buildConfig() {
         clientId: "16b67cfa-ee31-400f-9793-441d4978d96f",
         secretKey: "caa0dd2d-26f8-48e6-8688-3f4a1e77cd8e",
         redirectUri: `${process.env.PARALLEL_URL!}/api/oauth/docusign/redirect`,
+        webhookHmacSecret: "yINhv/np/ugb9mCZ/jtSX6PXN2wbvy2LpLLFC5j0xMc=",
       },
     },
   });
