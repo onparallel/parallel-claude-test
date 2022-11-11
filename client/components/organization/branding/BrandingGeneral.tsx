@@ -265,7 +265,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                   validate: (v) => /^#[a-f\d]{6}$/i.test(v),
                 }}
                 render={({ field: { onChange, value } }) => (
-                  <ColorInput value={value} onChange={onChange} />
+                  <ColorInput value={value} onChange={onChange} isDisabled={!hasAdminRole} />
                 )}
               />
             </HStack>
@@ -301,7 +301,10 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                   />
                 </HelpPopover>
               </FormLabel>
-              <Select backgroundColor="white" {...register("fontFamily")}>
+              <Select
+                backgroundColor="white"
+                {...register("fontFamily", { disabled: !hasAdminRole })}
+              >
                 <option key="Default" value="DEFAULT">
                   {intl.formatMessage({
                     id: "generic.default-font-name",
