@@ -11,6 +11,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, DeleteIcon, UserArrowIcon, UserIcon } from "@parallel/chakra/icons";
+import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
@@ -55,6 +56,7 @@ export function TemplateDefaultUserPermissionRow({
                   {")"}
                 </Text>
               ) : null}
+              {permission.isSubscribed ? <SubscribedNotificationsIcon /> : null}
             </Text>
             <Text color="gray.500" noOfLines={1}>
               {permission.user.email}
@@ -118,6 +120,7 @@ TemplateDefaultUserPermissionRow.fragments = {
         email
         ...UserAvatar_User
       }
+      isSubscribed
     }
     ${UserAvatar.fragments.User}
   `,

@@ -8941,6 +8941,7 @@ export type TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment =
 export type TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment = {
   __typename?: "TemplateDefaultUserGroupPermission";
   permissionType: PetitionPermissionType;
+  isSubscribed: boolean;
   group: {
     __typename?: "UserGroup";
     id: string;
@@ -8953,6 +8954,7 @@ export type TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermis
 export type TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment = {
   __typename?: "TemplateDefaultUserPermission";
   permissionType: PetitionPermissionType;
+  isSubscribed: boolean;
   user: {
     __typename?: "User";
     id: string;
@@ -9041,12 +9043,14 @@ export type TemplateDetailsModal_PetitionTemplateFragment = {
         __typename?: "TemplateDefaultUserGroupPermission";
         id: string;
         permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
         group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
         id: string;
         permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
         user: {
           __typename?: "User";
           id: string;
@@ -10140,12 +10144,14 @@ export type PublicTemplateCard_PetitionTemplateFragment = {
         __typename?: "TemplateDefaultUserGroupPermission";
         id: string;
         permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
         group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
         id: string;
         permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
         user: {
           __typename?: "User";
           id: string;
@@ -10187,12 +10193,14 @@ export type TemplateActiveSettingsIcons_PetitionTemplateFragment = {
         __typename?: "TemplateDefaultUserGroupPermission";
         id: string;
         permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
         group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
         id: string;
         permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
         user: {
           __typename?: "User";
           id: string;
@@ -10251,12 +10259,14 @@ export type TemplateCard_PetitionTemplateFragment = {
         __typename?: "TemplateDefaultUserGroupPermission";
         id: string;
         permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
         group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
         id: string;
         permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
         user: {
           __typename?: "User";
           id: string;
@@ -10273,6 +10283,7 @@ export type TemplateIconDefaultPermissions_TemplateDefaultPermission_TemplateDef
     __typename?: "TemplateDefaultUserGroupPermission";
     id: string;
     permissionType: PetitionPermissionType;
+    isSubscribed: boolean;
     group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
   };
 
@@ -10281,6 +10292,7 @@ export type TemplateIconDefaultPermissions_TemplateDefaultPermission_TemplateDef
     __typename?: "TemplateDefaultUserPermission";
     id: string;
     permissionType: PetitionPermissionType;
+    isSubscribed: boolean;
     user: {
       __typename?: "User";
       id: string;
@@ -21981,12 +21993,14 @@ export type Petitions_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
         __typename?: "TemplateDefaultUserGroupPermission";
         id: string;
         permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
         group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
         id: string;
         permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
         user: {
           __typename?: "User";
           id: string;
@@ -22196,12 +22210,14 @@ export type Petitions_petitionsQuery = {
                 __typename?: "TemplateDefaultUserGroupPermission";
                 id: string;
                 permissionType: PetitionPermissionType;
+                isSubscribed: boolean;
                 group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
               }
             | {
                 __typename?: "TemplateDefaultUserPermission";
                 id: string;
                 permissionType: PetitionPermissionType;
+                isSubscribed: boolean;
                 user: {
                   __typename?: "User";
                   id: string;
@@ -22308,12 +22324,14 @@ export type NewPetition_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
         __typename?: "TemplateDefaultUserGroupPermission";
         id: string;
         permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
         group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
         id: string;
         permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
         user: {
           __typename?: "User";
           id: string;
@@ -22406,12 +22424,14 @@ export type NewPetition_templatesQuery = {
                 __typename?: "TemplateDefaultUserGroupPermission";
                 id: string;
                 permissionType: PetitionPermissionType;
+                isSubscribed: boolean;
                 group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
               }
             | {
                 __typename?: "TemplateDefaultUserPermission";
                 id: string;
                 permissionType: PetitionPermissionType;
+                isSubscribed: boolean;
                 user: {
                   __typename?: "User";
                   id: string;
@@ -22547,12 +22567,14 @@ export type NewPetition_templateQuery = {
               __typename?: "TemplateDefaultUserGroupPermission";
               id: string;
               permissionType: PetitionPermissionType;
+              isSubscribed: boolean;
               group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
             }
           | {
               __typename?: "TemplateDefaultUserPermission";
               id: string;
               permissionType: PetitionPermissionType;
+              isSubscribed: boolean;
               user: {
                 __typename?: "User";
                 id: string;
@@ -24896,12 +24918,14 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
         __typename?: "TemplateDefaultUserGroupPermission";
         id: string;
         permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
         group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
         id: string;
         permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
         user: {
           __typename?: "User";
           id: string;
@@ -25728,6 +25752,7 @@ export const TemplateIconDefaultPermissions_TemplateDefaultPermissionFragmentDoc
         initials
       }
     }
+    isSubscribed
   }
   ${UserAvatar_UserFragmentDoc}
 ` as unknown as DocumentNode<
@@ -27728,6 +27753,7 @@ export const TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragm
       email
       ...UserAvatar_User
     }
+    isSubscribed
   }
   ${UserAvatar_UserFragmentDoc}
 ` as unknown as DocumentNode<
@@ -27744,6 +27770,7 @@ export const TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermi
         name
         memberCount
       }
+      isSubscribed
     }
   ` as unknown as DocumentNode<
     TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment,

@@ -4,6 +4,7 @@ import { ArrowShortRightIcon, UsersIcon } from "@parallel/chakra/icons";
 import { TemplateIconDefaultPermissions_TemplateDefaultPermissionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "../common/SmallPopover";
+import { SubscribedNotificationsIcon } from "../common/SubscribedNotificationsIcon";
 import { UserAvatar } from "../common/UserAvatar";
 
 export interface TemplateIconDefaultPermissionsProps extends PopoverProps {
@@ -43,6 +44,7 @@ export function TemplateIconDefaultPermissions({
                         <Text as="span" fontSize="xs" color="gray.600">
                           ({permissionType})
                         </Text>
+                        {p.isSubscribed ? <SubscribedNotificationsIcon marginLeft={1} /> : null}
                       </Text>
                     </>
                   ) : p.__typename === "TemplateDefaultUserGroupPermission" ? (
@@ -57,6 +59,7 @@ export function TemplateIconDefaultPermissions({
                         <Text as="span" fontSize="xs" color="gray.600">
                           ({permissionType})
                         </Text>
+                        {p.isSubscribed ? <SubscribedNotificationsIcon marginLeft={1} /> : null}
                       </Text>
                     </>
                   ) : null}
@@ -93,6 +96,7 @@ TemplateIconDefaultPermissions.fragments = {
           initials
         }
       }
+      isSubscribed
     }
     ${UserAvatar.fragments.User}
   `,

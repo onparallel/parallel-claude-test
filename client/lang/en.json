@@ -5105,6 +5105,11 @@
     "context": "What would you like to do with them?"
   },
   {
+    "term": "component.subscribed-notifications-icon.label",
+    "definition": "Subscribed to notifications",
+    "context": "Subscribed to notifications"
+  },
+  {
     "term": "component.suggested-signers.header",
     "definition": "Suggested:",
     "context": "Suggested:"

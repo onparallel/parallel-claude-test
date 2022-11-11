@@ -12,6 +12,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
+import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import { TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
@@ -31,11 +32,12 @@ export function TemplateDefaultUserGroupPermissionRow({
     <Flex key={group.id} alignItems="center">
       <Avatar role="presentation" getInitials={() => group.initials} name={group.name} size="sm" />
       <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
-        <Stack direction={"row"} spacing={2} align="center">
+        <Stack direction={"row"} spacing={1} align="center">
           <UsersIcon />
-          <Text noOfLines={1} wordBreak="break-all">
+          <Text paddingLeft={1} noOfLines={1} wordBreak="break-all">
             {group.name}
           </Text>
+          {permission.isSubscribed ? <SubscribedNotificationsIcon /> : null}
         </Stack>
         <Flex
           role="group"
@@ -82,6 +84,7 @@ TemplateDefaultUserGroupPermissionRow.fragments = {
         name
         memberCount
       }
+      isSubscribed
     }
   `,
 };

@@ -353,6 +353,29 @@ export const BellOffIcon = createIcon({
   ),
 });
 
+export const BellOnIcon = createIcon({
+  displayName: "BellOnIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g>
+      <g
+        stroke="currentColor"
+        strokeWidth={2}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="m17 8.5c0-1.5913-.6321-3.11742-1.7574-4.24264-1.1252-1.12522-2.6513-1.75736-4.2426-1.75736s-3.11742.63214-4.24264 1.75736-1.75736 2.65134-1.75736 4.24264c0 7-3 9-3 9h6.75" />
+        <path d="m12.73 20.5c-.1758.3031-.4281.5547-.7318.7295-.3036.1749-.6478.267-.9982.267s-.6946-.0921-.9982-.267c-.30362-.1748-.55597-.4264-.73178-.7295" />
+      </g>
+      <path
+        d="m14.0311 17.8057c.411.4359 1.1105.4151 1.4948-.0445l5.9007-7.0573c.3266-.3905.3076-.964-.044-1.33212l-.0481-.05036c-.4162-.43576-1.1204-.40718-1.4999.06088l-5.031 6.205-3.0926-3.3406c-.3873-.4184-1.0455-.4287-1.4459-.0227l-.0882.0894c-.37775.3832-.3846.9966-.0155 1.3881z"
+        fill="currentColor"
+      />
+    </g>
+  ),
+});
+
 export const BellSettingsIcon = createIcon({
   displayName: "BellSettingsIcon",
   viewBox: "0 0 24 24",
