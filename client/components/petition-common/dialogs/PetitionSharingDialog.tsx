@@ -328,7 +328,7 @@ export function PetitionSharingDialog({
         petitions.length > 0 ? (
           <Stack>
             <Flex>
-              <FormControl id="selection">
+              <FormControl id="selection" flex="1 1 auto" minWidth={0} width="auto">
                 <Controller
                   name="selection"
                   control={control}
@@ -363,7 +363,7 @@ export function PetitionSharingDialog({
                   )}
                 />
               </FormControl>
-              <FormControl id="permissionType" width="180px" marginLeft={2}>
+              <FormControl id="permissionType" minWidth="120px" width="120px" marginLeft={2}>
                 <Controller
                   name="permissionType"
                   control={control}

@@ -258,9 +258,7 @@ export function useReactSelectProps<
       },
       multiValueLabel: (styles) => {
         return {
-          ...styles,
-          display: "inline-flex",
-          alignItems: "center",
+          ...omit(styles, ["borderRadius"]),
         };
       },
     });

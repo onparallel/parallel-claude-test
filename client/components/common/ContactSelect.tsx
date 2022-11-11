@@ -308,22 +308,25 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
 const MultiValueLabel = rsComponent("MultiValueLabel", function ({ children, ...props }) {
   const { fullName, email, isDeleted, hasBouncedEmail } = props.data;
   const intl = useIntl();
+  const showHasBounced = !isDeleted && hasBouncedEmail;
   return (
-    <components.MultiValueLabel {...props}>
-      <Text as="span" marginLeft={1}>
-        {isDeleted ? <DeletedContact color="red.600" /> : `${fullName} <${email}>`}
-      </Text>
-      {hasBouncedEmail ? (
+    <>
+      <components.MultiValueLabel {...props}>
+        <Text as="span" marginLeft={1}>
+          {isDeleted ? <DeletedContact color="red.600" /> : `${fullName} <${email}>`}
+        </Text>
+      </components.MultiValueLabel>
+      {showHasBounced ? (
         <Tooltip
           label={intl.formatMessage({
             id: "component.contact-select.bounced-email-tooltip",
             defaultMessage: "Previously bounced email",
           })}
         >
-          <AlertCircleFilledIcon boxSize={4} color="yellow.500" marginLeft={2} />
+          <AlertCircleFilledIcon boxSize={4} color="yellow.500" marginX={0.5} alignSelf="center" />
         </Tooltip>
       ) : null}
-    </components.MultiValueLabel>
+    </>
   );
 });
 

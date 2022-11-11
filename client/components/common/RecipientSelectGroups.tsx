@@ -229,7 +229,7 @@ export function RecipientSelectGroups({
               ) : null}
             </FormLabel>
             <Flex>
-              <Box flex="1" data-section="recipient-select">
+              <Box flex="1" minWidth={0} data-section="recipient-select">
                 <ContactSelect
                   ref={recipientGroupSelectRef[index]}
                   isMulti

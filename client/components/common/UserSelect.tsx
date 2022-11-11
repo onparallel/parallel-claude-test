@@ -1,5 +1,5 @@
 import { gql, useApolloClient, useQuery } from "@apollo/client";
-import { Box, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { UsersIcon } from "@parallel/chakra/icons";
 import {
   UserSelect_canCreateUsersDocument,
@@ -18,6 +18,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import Select, { components, SelectComponentsConfig, SelectInstance } from "react-select";
 import AsyncSelect from "react-select/async";
 import { indexBy, zip } from "remeda";
+import { OverflownText } from "./OverflownText";
 import { UserDropdownEmpty } from "./UserDropdownEmpty";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
 import { UserSelectOption } from "./UserSelectOption";
@@ -336,7 +337,9 @@ const MultiValueLabel = rsComponent("MultiValueLabel", function ({ children, ...
   return (
     <components.MultiValueLabel {...(props as any)}>
       {data.__typename === "User" ? (
-        <Text as="span">{data.fullName ? `${data.fullName} <${data.email}>` : data.email}</Text>
+        <OverflownText as="span">
+          {data.fullName ? `${data.fullName} <${data.email}>` : data.email}
+        </OverflownText>
       ) : data.__typename === "UserGroup" ? (
         <UserGroupMembersPopover userGroupId={data.id}>
           <Box>
