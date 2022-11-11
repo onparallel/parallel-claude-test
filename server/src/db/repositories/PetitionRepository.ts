@@ -3397,13 +3397,13 @@ export class PetitionRepository extends BaseRepository {
     async (petitionIds, t) => {
       const rows = await this.raw<EffectivePetitionPermission>(
         /* sql */ `
-        select petition_id, user_id, min("type") as type, bool_or(is_subscribed) is_subscribed 
-        from petition_permission 
-          where deleted_at is null 
-          and user_group_id is null
-          and petition_id in ? 
-          group by user_id, petition_id
-      `,
+          select petition_id, user_id, min("type") as type, bool_or(is_subscribed) is_subscribed 
+          from petition_permission 
+            where deleted_at is null 
+            and user_group_id is null
+            and petition_id in ? 
+            group by user_id, petition_id
+        `,
         [this.sqlIn(petitionIds)],
         t
       );
@@ -3412,6 +3412,38 @@ export class PetitionRepository extends BaseRepository {
       return petitionIds.map((id) => byPetitionId[id] ?? []);
     }
   );
+
+  readonly loadEffectiveDefaultPermissions = this.buildLoader<
+    number,
+    EffectivePetitionPermission[]
+  >(async (templateIds, t) => {
+    const rows = await this.raw<EffectivePetitionPermission>(
+      /* sql */ `
+        with ps as (
+          select template_id, user_id, type, is_subscribed
+          from template_default_permission
+            where deleted_at is null
+            and user_id is not null
+            and template_id in ?
+          union
+          select template_id, ugm.user_id, type, is_subscribed
+          from template_default_permission tdf
+          join user_group_member ugm on tdf.user_group_id = ugm.user_group_id and ugm.deleted_at is null
+          where tdf.deleted_at is null
+            and tdf.user_group_id is not null
+            and template_id in ?
+        )
+        select template_id as petition_id, user_id, min("type") as type, bool_or(is_subscribed) is_subscribed
+        from ps
+        group by user_id, template_id
+      `,
+      [this.sqlIn(templateIds), this.sqlIn(templateIds)],
+      t
+    );
+
+    const byPetitionId = groupBy(rows, (r) => r.petition_id);
+    return templateIds.map((id) => byPetitionId[id] ?? []);
+  });
 
   readonly loadUserPermissionsByPetitionId = this.buildLoadMultipleBy(
     "petition_permission",
