@@ -453,19 +453,6 @@ export const PetitionTemplate = objectType({
       type: "EffectivePetitionUserPermission",
       description: "The default effective permissions on the template",
       resolve: async (root, _, ctx) => {
-        // const defaultPermissions = await ctx.petitions.loadTemplateDefaultPermissions(root.id);
-        // const groups = defaultPermissions.filter((d) => d.user_group_id !== null);
-        // const users = defaultPermissions.filter((d) => d.user_id !== null);
-
-        // const groupMembers = await ctx.userGroups.loadUserGroupMembers(groups.map((g) => g.id));
-
-        // const a = users.map((u) => ({
-        //   petition_id: root.id,
-        //   user_id: u.user_id,
-        //   type: u.type,
-        //   is_subscribed: u.is_subscribed,
-        // }));
-
         return await ctx.petitions.loadEffectiveTemplateDefaultPermissions(root.id);
       },
     });
