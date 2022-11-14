@@ -1,6 +1,5 @@
 import { Box, Stack, Text } from "@chakra-ui/react";
 import { genericRsComponent, rsStyles } from "@parallel/utils/react-select/hooks";
-import { ValueProps } from "@parallel/utils/ValueProps";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 import { components } from "react-select";
