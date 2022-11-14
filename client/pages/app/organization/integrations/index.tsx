@@ -81,7 +81,7 @@ function OrganizationIntegrations() {
 
   const integrations = [
     {
-      isDisabled: !hasAdminRole,
+      isDisabled: !hasAdminRole || !me.hasPetitionSignature,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/signaturit.png`}
@@ -89,7 +89,9 @@ function OrganizationIntegrations() {
           maxWidth="124px"
         />
       ),
-      badge: me.hasPetitionSignature ? (
+      badge: me.organization.signatureIntegrations.items.some(
+        (i) => i.__typename === "SignatureOrgIntegration" && i.environment === "PRODUCTION"
+      ) ? (
         <Badge colorScheme="green">
           <FormattedMessage id="generic.activated" defaultMessage="Activated" />
         </Badge>
@@ -307,6 +309,15 @@ OrganizationIntegrations.queries = [
               id
               invalidCredentials
             }
+          }
+          signatureIntegrations: integrations(type: SIGNATURE, limit: 20, offset: 0) {
+            items {
+              ... on SignatureOrgIntegration {
+                id
+                environment
+              }
+            }
+            totalCount
           }
         }
       }

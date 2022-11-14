@@ -14279,6 +14279,18 @@ export type OrganizationIntegrations_userQuery = {
           | { __typename?: "SignatureOrgIntegration"; id: string; invalidCredentials: boolean }
         >;
       };
+      signatureIntegrations: {
+        __typename?: "IOrgIntegrationPagination";
+        totalCount: number;
+        items: Array<
+          | { __typename?: "OrgIntegration" }
+          | {
+              __typename?: "SignatureOrgIntegration";
+              id: string;
+              environment: SignatureOrgIntegrationEnvironment;
+            }
+        >;
+      };
       currentUsagePeriod?: {
         __typename?: "OrganizationUsageLimit";
         id: string;
@@ -31951,6 +31963,15 @@ export const OrganizationIntegrations_userDocument = gql`
             id
             invalidCredentials
           }
+        }
+        signatureIntegrations: integrations(type: SIGNATURE, limit: 10, offset: 0) {
+          items {
+            ... on SignatureOrgIntegration {
+              id
+              environment
+            }
+          }
+          totalCount
         }
       }
     }
