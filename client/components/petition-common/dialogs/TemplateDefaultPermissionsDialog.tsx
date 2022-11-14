@@ -268,11 +268,9 @@ export function TemplateDefaultPermissionsDialog({
                 onRemove={() => handleRemovePermission(permission.id)}
                 onTransfer={() => handleTransferOwnership(permission.id)}
                 onChange={handleChangePermission}
-                isSubscribed={
-                  petitionTemplate.effectiveDefaultPermissions.some(
-                    (ep) => ep.user.id === permission.user.id && ep.isSubscribed
-                  ) || permission.isSubscribed
-                }
+                isSubscribed={petitionTemplate.effectiveDefaultPermissions.some(
+                  (ep) => ep.user.id === permission.user.id && ep.isSubscribed
+                )}
               />
             ))}
             {groupPermissions.map((permission, index) => (

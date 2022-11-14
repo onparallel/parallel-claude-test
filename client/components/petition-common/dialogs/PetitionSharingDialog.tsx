@@ -416,7 +416,7 @@ export function PetitionSharingDialog({
               ) : null}
             </Stack>
             <Stack display={hasUsers || petitions.length !== 1 ? "none" : "flex"} paddingTop={2}>
-              {userPermissions.map(({ user, permissionType, isSubscribed }) => (
+              {userPermissions.map(({ user, permissionType }) => (
                 <Flex key={user.id} alignItems="center">
                   <UserAvatar role="presentation" user={user} size="sm" />
                   <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
