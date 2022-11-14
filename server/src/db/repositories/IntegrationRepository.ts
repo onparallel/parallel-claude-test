@@ -79,6 +79,7 @@ export class IntegrationRepository extends BaseRepository {
   async loadIntegrationsByOrgId<IType extends IntegrationType>(
     orgId: number,
     type?: IType | null,
+    provider?: string | null,
     t?: Knex.Transaction
   ): Promise<Replace<OrgIntegration, { settings: IntegrationSettings<IType> }>[]> {
     return await this.from("org_integration", t)
@@ -90,6 +91,9 @@ export class IntegrationRepository extends BaseRepository {
       .mmodify((q) => {
         if (type) {
           q.where("type", type);
+        }
+        if (provider) {
+          q.where("provider", provider);
         }
       })
       .orderBy("created_at", "desc")

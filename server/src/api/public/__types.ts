@@ -1846,6 +1846,7 @@ export type OrganizationcurrentUsagePeriodArgs = {
 /** An organization in the system. */
 export type OrganizationhasIntegrationArgs = {
   integration: IntegrationType;
+  provider?: InputMaybe<Scalars["String"]>;
 };
 
 /** An organization in the system. */

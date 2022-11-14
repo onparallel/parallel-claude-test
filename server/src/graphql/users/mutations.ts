@@ -519,7 +519,7 @@ export const userSignUp = mutationField("userSignUp", {
       );
 
       const [[signatureSandboxIntegration], [pdfDocTheme]] = await Promise.all([
-        ctx.integrations.loadIntegrationsByOrgId(org.id, "SIGNATURE", t),
+        ctx.integrations.loadIntegrationsByOrgId(org.id, "SIGNATURE", "SIGNATURIT", t),
         ctx.organizations.loadPdfDocumentThemesByOrgId.raw(org.id, t),
       ]);
 

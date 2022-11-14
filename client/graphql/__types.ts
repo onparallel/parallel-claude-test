@@ -1893,6 +1893,7 @@ export interface OrganizationcurrentUsagePeriodArgs {
 /** An organization in the system. */
 export interface OrganizationhasIntegrationArgs {
   integration: IntegrationType;
+  provider?: InputMaybe<Scalars["String"]>;
 }
 
 /** An organization in the system. */

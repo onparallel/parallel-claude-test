@@ -5187,6 +5187,7 @@ export interface NexusGenArgTypes {
     hasIntegration: {
       // args
       integration: NexusGenEnums["IntegrationType"]; // IntegrationType!
+      provider?: string | null; // String
     };
     iconUrl: {
       // args

@@ -8,6 +8,7 @@ import {
   nonNull,
   nullable,
   objectType,
+  stringArg,
 } from "nexus";
 import { isDefined, omit, pick } from "remeda";
 import { defaultBrandTheme } from "../../util/BrandTheme";
@@ -225,9 +226,14 @@ export const Organization = objectType({
       authorize: isOwnOrgOrSuperAdmin(),
       args: {
         integration: nonNull(arg({ type: "IntegrationType" })),
+        provider: stringArg(),
       },
-      resolve: async (root, { integration }, ctx) => {
-        const integrations = await ctx.integrations.loadIntegrationsByOrgId(root.id, integration);
+      resolve: async (root, { integration, provider }, ctx) => {
+        const integrations = await ctx.integrations.loadIntegrationsByOrgId(
+          root.id,
+          integration,
+          provider
+        );
         return integrations.some((int) => int.is_enabled);
       },
     });
@@ -338,7 +344,7 @@ export const Organization = objectType({
             ctx.organizations.loadOrg(root.id),
             ctx.organizations.getOrganizationCurrentUsageLimit(root.id, "PETITION_SEND"),
             ctx.organizations.getOrganizationCurrentUsageLimit(root.id, "SIGNATURIT_SHARED_APIKEY"),
-            ctx.integrations.loadIntegrationsByOrgId(root.id, "SIGNATURE"),
+            ctx.integrations.loadIntegrationsByOrgId(root.id, "SIGNATURE", "SIGNATURIT"),
           ]);
 
         // only return signature limits if org has an enabled signature integration with our shared APIKEY
@@ -346,7 +352,6 @@ export const Organization = objectType({
           isDefined(signatureSendLimits) &&
           signatureIntegrations.some(
             (i) =>
-              i.provider.toUpperCase() === "SIGNATURIT" &&
               i.settings.CREDENTIALS.API_KEY ===
                 ctx.config.signature.signaturitSharedProductionApiKey &&
               i.settings.ENVIRONMENT === "production" &&

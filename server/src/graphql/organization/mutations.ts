@@ -461,14 +461,14 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
   resolve: async (_, { orgId, duration, limit }, ctx) => {
     const signatureIntegrations = await ctx.integrations.loadIntegrationsByOrgId(
       orgId,
-      "SIGNATURE"
+      "SIGNATURE",
+      "SIGNATURIT"
     );
 
     const hasSharedSignaturitApiKey =
       signatureIntegrations.length > 0 &&
       signatureIntegrations.some(
         (i) =>
-          i.provider.toUpperCase() === "SIGNATURIT" &&
           i.settings.CREDENTIALS.API_KEY ===
             ctx.config.signature.signaturitSharedProductionApiKey &&
           i.settings.ENVIRONMENT === "production" &&

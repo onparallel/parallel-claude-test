@@ -1983,7 +1983,7 @@ type Organization implements Timestamps {
   A list of all feature flag and the value asigned to this org
   """
   features: [FeatureFlagNameValue!]!
-  hasIntegration(integration: IntegrationType!): Boolean!
+  hasIntegration(integration: IntegrationType!, provider: String): Boolean!
 
   """
   Whether the organization has an SSO provider configured.
