@@ -19,7 +19,7 @@ export const IntegrationSwitchCard = chakraForwardRef<"div", IntegrationSwitchCa
     ref
   ) {
     return (
-      <Card ref={ref} paddingX={6} paddingY={4} {...props}>
+      <Card ref={ref} paddingX={6} paddingY={4} isDisabled={isDisabled} {...props}>
         <HStack spacing={6}>
           <Stack direction={{ base: "column", md: "row" }} flex="1" spacing={{ base: 4, md: 6 }}>
             <Center width={{ base: "auto", md: "120px" }}>{logo}</Center>

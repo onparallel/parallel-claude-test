@@ -122,7 +122,7 @@ function OrganizationIntegrations() {
       isExternal: true,
     },
     {
-      isDisabled: false,
+      isDisabled: !hasDownJones,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/dow-jones.png`}
