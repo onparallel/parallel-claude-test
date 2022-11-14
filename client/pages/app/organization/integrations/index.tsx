@@ -17,6 +17,7 @@ import { AlertCircleFilledIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
+import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
@@ -122,7 +123,30 @@ function OrganizationIntegrations() {
       isExternal: true,
     },
     {
-      isDisabled: !hasDownJones,
+      isDisabled: !hasAdminRole || !me.hasDowJonesFeature,
+      disabledMessage: (
+        <Text>
+          <FormattedMessage
+            id="organization.integrations.dow-jones-disabled-message"
+            defaultMessage="This is an Enterprise feature. <a>Contact</a> with our support team for more information."
+            values={{
+              a: (chunks: any) => (
+                <SupportButton
+                  variant="link"
+                  fontSize="sm"
+                  message={intl.formatMessage({
+                    id: "organization.integrations.dow-jones-contact-message",
+                    defaultMessage:
+                      "Hi, I would like more information about Dow Jones integration.",
+                  })}
+                >
+                  {chunks}
+                </SupportButton>
+              ),
+            }}
+          />
+        </Text>
+      ),
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/dow-jones.png`}
@@ -205,7 +229,12 @@ function OrganizationIntegrations() {
     >
       <Alert status="info" paddingX={6}>
         <AlertIcon />
-        <Stack direction={{ base: "column", md: "row" }} flex="1" spacing={4}>
+        <Stack
+          direction={{ base: "column", md: "row" }}
+          flex="1"
+          justifyContent="space-between"
+          spacing={4}
+        >
           <Box>
             <AlertTitle>
               <FormattedMessage
@@ -269,6 +298,7 @@ OrganizationIntegrations.queries = [
         role
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
         hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
+        hasDowJonesFeature: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
         organization {
           id
           hasDowJones: hasIntegration(integration: DOW_JONES_KYC)

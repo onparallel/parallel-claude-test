@@ -14263,6 +14263,7 @@ export type OrganizationIntegrations_userQuery = {
     initials?: string | null;
     hasPetitionSignature: boolean;
     hasDeveloperAccess: boolean;
+    hasDowJonesFeature: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -31941,6 +31942,7 @@ export const OrganizationIntegrations_userDocument = gql`
       role
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
       hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
+      hasDowJonesFeature: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
       organization {
         id
         hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
