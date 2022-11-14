@@ -3183,14 +3183,14 @@ export type PublicUser = {
 export type PublicUserOrContact = PublicContact | PublicUser;
 
 export type Query = {
-  DowJonesKycEntityProfile: DowJonesKycEntityProfileResult;
-  DowJonesKycEntitySearch: DowJonesKycEntitySearchResultPagination;
   access: PublicPetitionAccess;
   contact: Maybe<Contact>;
   /** The contacts of the user */
   contacts: ContactPagination;
   /** Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts */
   contactsByEmail: Array<Maybe<Contact>>;
+  dowJonesKycEntityProfile: DowJonesKycEntityProfileResult;
+  dowJonesKycEntitySearch: DowJonesKycEntitySearchResultPagination;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
   getSlugForPublicPetitionLink: Scalars["String"];
@@ -3241,17 +3241,6 @@ export type Query = {
   userGroups: UserGroupPagination;
 };
 
-export type QueryDowJonesKycEntityProfileArgs = {
-  profileId: Scalars["ID"];
-};
-
-export type QueryDowJonesKycEntitySearchArgs = {
-  dateOfBirth?: InputMaybe<Scalars["DateTime"]>;
-  limit?: InputMaybe<Scalars["Int"]>;
-  name: Scalars["String"];
-  offset?: InputMaybe<Scalars["Int"]>;
-};
-
 export type QueryaccessArgs = {
   keycode: Scalars["ID"];
 };
@@ -3270,6 +3259,17 @@ export type QuerycontactsArgs = {
 
 export type QuerycontactsByEmailArgs = {
   emails: Array<Scalars["String"]>;
+};
+
+export type QuerydowJonesKycEntityProfileArgs = {
+  profileId: Scalars["ID"];
+};
+
+export type QuerydowJonesKycEntitySearchArgs = {
+  dateOfBirth?: InputMaybe<Scalars["DateTime"]>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  name: Scalars["String"];
+  offset?: InputMaybe<Scalars["Int"]>;
 };
 
 export type QueryemailIsAvailableArgs = {
