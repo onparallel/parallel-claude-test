@@ -128,7 +128,9 @@ export function UpdateOrganizationUsageDetailsDialog({
   }
 
   const subscriptionEndDate =
-    startNewPeriod || !currentUsageLimit
+    renewalCycles === 0
+      ? null
+      : startNewPeriod || !currentUsageLimit
       ? add(
           now,
           multiplyDuration(
