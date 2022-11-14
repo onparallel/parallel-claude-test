@@ -48,7 +48,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { Maybe } from "@parallel/utils/types";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -96,7 +96,6 @@ export function PetitionSharingDialog({
 >) {
   const intl = useIntl();
   const toast = useToast();
-  const [hasUsers, setHasUsers] = useState(false);
 
   const isTemplate = type === "TEMPLATE";
 
@@ -134,6 +133,9 @@ export function PetitionSharingDialog({
       message: "",
     },
   });
+
+  const hasUsers = watch("selection").length;
+  const notify = watch("notify");
 
   const permissionType = watch("permissionType");
 
@@ -279,9 +281,7 @@ export function PetitionSharingDialog({
         id: "template-sharing.success-title",
         defaultMessage: "{count, plural, =1 {Template} other {Templates}} shared",
       },
-      {
-        count: petitionsOwnedWrite.length,
-      }
+      { count: petitionsOwnedWrite.length }
     );
 
     const petition = intl.formatMessage(
@@ -289,15 +289,11 @@ export function PetitionSharingDialog({
         id: "petition-sharing.success-title",
         defaultMessage: "{count, plural, =1 {Parallel} other {Parallels}} shared",
       },
-      {
-        count: petitionsOwnedWrite.length,
-      }
+      { count: petitionsOwnedWrite.length }
     );
 
     return isTemplate ? template : petition;
   };
-
-  const notify = watch("notify");
 
   useEffect(() => {
     if (notify) {
@@ -345,10 +341,7 @@ export function PetitionSharingDialog({
                           e.preventDefault();
                         }
                       }}
-                      onChange={(users) => {
-                        onChange(users);
-                        setHasUsers(Boolean(users?.length));
-                      }}
+                      onChange={onChange}
                       onBlur={onBlur}
                       onSearch={handleSearchUsers}
                       isDisabled={petitionsOwnedWrite.length === 0}
@@ -415,151 +408,35 @@ export function PetitionSharingDialog({
                 </Checkbox>
               ) : null}
             </Stack>
-            <Stack display={hasUsers || petitions.length !== 1 ? "none" : "flex"} paddingTop={2}>
-              {userPermissions.map(({ user, permissionType }) => (
-                <Flex key={user.id} alignItems="center">
-                  <UserAvatar role="presentation" user={user} size="sm" />
-                  <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
-                    <Flex direction="row" alignItems="center" gap={1}>
-                      <Text noOfLines={1} wordBreak="break-all">
-                        {user.fullName}
-                      </Text>
-                      {userId === user.id ? (
-                        <Text as="span">
-                          {"("}
-                          <FormattedMessage id="generic.you" defaultMessage="You" />
-                          {")"}
-                        </Text>
-                      ) : null}
-                      {petitions[0].effectivePermissions.some(
-                        (ep) => ep.user.id === user.id && ep.isSubscribed
-                      ) ? (
-                        <SubscribedNotificationsIcon />
-                      ) : null}
-                    </Flex>
-                    <Text color="gray.500" noOfLines={1}>
-                      {user.email}
-                    </Text>
-                  </Box>
-                  {permissionType === "OWNER" ||
-                  (petitionsOwnedWrite.length === 0 && userId !== user.id) ? (
-                    <Box
-                      paddingX={3}
-                      fontWeight="bold"
-                      fontStyle="italic"
-                      fontSize="sm"
-                      color="gray.500"
-                      cursor="default"
-                    >
-                      <PetitionPermissionTypeText type={permissionType} />
-                    </Box>
-                  ) : (
-                    <Menu placement="bottom-end">
-                      <MenuButton
-                        as={Button}
-                        variant="ghost"
-                        size="sm"
-                        rightIcon={<ChevronDownIcon />}
-                      >
-                        <PetitionPermissionTypeText type={permissionType} />
-                      </MenuButton>
-                      <MenuList minWidth={40}>
-                        <MenuItem
-                          onClick={() =>
-                            handleChangePetitionPermissions({
-                              petitionId: petitions[0]!.id,
-                              user,
-                              permissionType: "WRITE",
-                            })
-                          }
-                          isDisabled={petitionsOwnedWrite.length === 0}
-                        >
-                          <PetitionPermissionTypeText type="WRITE" />
-                        </MenuItem>
-                        <MenuItem
-                          onClick={() =>
-                            handleChangePetitionPermissions({
-                              petitionId: petitions[0]!.id,
-                              user,
-                              permissionType: "READ",
-                            })
-                          }
-                          isDisabled={petitionsOwnedWrite.length === 0}
-                        >
-                          <PetitionPermissionTypeText type="READ" />
-                        </MenuItem>
-                        <MenuDivider />
-                        <MenuItem
-                          onClick={() => handleTransferPetitionOwnership(petitions[0].id, user)}
-                          isDisabled={petitionsOwned.length === 0}
-                        >
-                          <FormattedMessage
-                            id="generic.transfer-ownership"
-                            defaultMessage="Transfer ownership"
-                          />
-                        </MenuItem>
-                        <MenuItem
-                          color="red.500"
-                          onClick={() =>
-                            handleRemovePetitionPermission({
-                              petitionId: petitions[0]!.id,
-                              user,
-                            })
-                          }
-                        >
-                          <FormattedMessage id="generic.remove" defaultMessage="Remove" />
-                        </MenuItem>
-                      </MenuList>
-                    </Menu>
-                  )}
-                </Flex>
-              ))}
-              {groupPermissions.map(({ group, permissionType }) => {
-                return (
-                  <Flex key={group.id} alignItems="center">
-                    <Avatar
-                      role="presentation"
-                      getInitials={() => group.initials}
-                      name={group.name!}
-                      size="sm"
-                    />
+            {petitions.length === 1 && petitions[0].permissions.length > 0 ? (
+              <Stack paddingTop={2}>
+                {userPermissions.map(({ user, permissionType }) => (
+                  <Flex key={user.id} alignItems="center">
+                    <UserAvatar role="presentation" user={user} size="sm" />
                     <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
-                      <Stack direction={"row"} spacing={2} align="center">
-                        <UsersIcon />
+                      <Flex direction="row" alignItems="center" gap={1}>
                         <Text noOfLines={1} wordBreak="break-all">
-                          {group.name}
+                          {user.fullName}
                         </Text>
-                      </Stack>
-                      <Flex
-                        role="group"
-                        flexDirection="row-reverse"
-                        justifyContent="flex-end"
-                        alignItems="center"
-                      >
-                        <UserGroupMembersPopover
-                          userGroupId={group.id}
-                          userDetails={(userId: string) => {
-                            if (
-                              petitions[0].effectivePermissions.some(
-                                (ep) => ep.user.id === userId && ep.isSubscribed
-                              )
-                            ) {
-                              return <SubscribedNotificationsIcon />;
-                            }
-                            return null;
-                          }}
-                        >
-                          <Text color="gray.500" cursor="default" noOfLines={1}>
-                            <FormattedMessage
-                              id="generic.n-group-members"
-                              defaultMessage="{count, plural, =1 {1 member} other {# members}}"
-                              values={{ count: group.memberCount }}
-                            />
+                        {userId === user.id ? (
+                          <Text as="span">
+                            {"("}
+                            <FormattedMessage id="generic.you" defaultMessage="You" />
+                            {")"}
                           </Text>
-                        </UserGroupMembersPopover>
+                        ) : null}
+                        {petitions[0].effectivePermissions.some(
+                          (ep) => ep.user.id === user.id && ep.isSubscribed
+                        ) ? (
+                          <SubscribedNotificationsIcon />
+                        ) : null}
                       </Flex>
+                      <Text color="gray.500" noOfLines={1}>
+                        {user.email}
+                      </Text>
                     </Box>
-                    {petitionsOwnedWrite.length === 0 ? (
+                    {permissionType === "OWNER" ||
+                    (petitionsOwnedWrite.length === 0 && userId !== user.id) ? (
                       <Box
                         paddingX={3}
                         fontWeight="bold"
@@ -584,35 +461,45 @@ export function PetitionSharingDialog({
                           <MenuItem
                             onClick={() =>
                               handleChangePetitionPermissions({
-                                petitionId: petitions[0].id,
-                                userGroup: group,
+                                petitionId: petitions[0]!.id,
+                                user,
                                 permissionType: "WRITE",
                               })
                             }
+                            isDisabled={petitionsOwnedWrite.length === 0}
                           >
                             <PetitionPermissionTypeText type="WRITE" />
                           </MenuItem>
                           <MenuItem
                             onClick={() =>
                               handleChangePetitionPermissions({
-                                petitionId: petitions[0].id,
-                                userGroup: group,
+                                petitionId: petitions[0]!.id,
+                                user,
                                 permissionType: "READ",
                               })
                             }
+                            isDisabled={petitionsOwnedWrite.length === 0}
                           >
                             <PetitionPermissionTypeText type="READ" />
                           </MenuItem>
                           <MenuDivider />
                           <MenuItem
+                            onClick={() => handleTransferPetitionOwnership(petitions[0].id, user)}
+                            isDisabled={petitionsOwned.length === 0}
+                          >
+                            <FormattedMessage
+                              id="generic.transfer-ownership"
+                              defaultMessage="Transfer ownership"
+                            />
+                          </MenuItem>
+                          <MenuItem
                             color="red.500"
                             onClick={() =>
                               handleRemovePetitionPermission({
-                                petitionId: petitions[0].id,
-                                userGroup: group,
+                                petitionId: petitions[0]!.id,
+                                user,
                               })
                             }
-                            icon={<DeleteIcon display="block" boxSize={4} />}
                           >
                             <FormattedMessage id="generic.remove" defaultMessage="Remove" />
                           </MenuItem>
@@ -620,9 +507,117 @@ export function PetitionSharingDialog({
                       </Menu>
                     )}
                   </Flex>
-                );
-              })}
-            </Stack>
+                ))}
+                {groupPermissions.map(({ group, permissionType }) => {
+                  return (
+                    <Flex key={group.id} alignItems="center">
+                      <Avatar
+                        role="presentation"
+                        getInitials={() => group.initials}
+                        name={group.name!}
+                        size="sm"
+                      />
+                      <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
+                        <Stack direction={"row"} spacing={2} align="center">
+                          <UsersIcon />
+                          <Text noOfLines={1} wordBreak="break-all">
+                            {group.name}
+                          </Text>
+                        </Stack>
+                        <Flex
+                          role="group"
+                          flexDirection="row-reverse"
+                          justifyContent="flex-end"
+                          alignItems="center"
+                        >
+                          <UserGroupMembersPopover
+                            userGroupId={group.id}
+                            userDetails={(userId: string) => {
+                              if (
+                                petitions[0].effectivePermissions.some(
+                                  (ep) => ep.user.id === userId && ep.isSubscribed
+                                )
+                              ) {
+                                return <SubscribedNotificationsIcon />;
+                              }
+                              return null;
+                            }}
+                          >
+                            <Text color="gray.500" cursor="default" noOfLines={1}>
+                              <FormattedMessage
+                                id="generic.n-group-members"
+                                defaultMessage="{count, plural, =1 {1 member} other {# members}}"
+                                values={{ count: group.memberCount }}
+                              />
+                            </Text>
+                          </UserGroupMembersPopover>
+                        </Flex>
+                      </Box>
+                      {petitionsOwnedWrite.length === 0 ? (
+                        <Box
+                          paddingX={3}
+                          fontWeight="bold"
+                          fontStyle="italic"
+                          fontSize="sm"
+                          color="gray.500"
+                          cursor="default"
+                        >
+                          <PetitionPermissionTypeText type={permissionType} />
+                        </Box>
+                      ) : (
+                        <Menu placement="bottom-end">
+                          <MenuButton
+                            as={Button}
+                            variant="ghost"
+                            size="sm"
+                            rightIcon={<ChevronDownIcon />}
+                          >
+                            <PetitionPermissionTypeText type={permissionType} />
+                          </MenuButton>
+                          <MenuList minWidth={40}>
+                            <MenuItem
+                              onClick={() =>
+                                handleChangePetitionPermissions({
+                                  petitionId: petitions[0].id,
+                                  userGroup: group,
+                                  permissionType: "WRITE",
+                                })
+                              }
+                            >
+                              <PetitionPermissionTypeText type="WRITE" />
+                            </MenuItem>
+                            <MenuItem
+                              onClick={() =>
+                                handleChangePetitionPermissions({
+                                  petitionId: petitions[0].id,
+                                  userGroup: group,
+                                  permissionType: "READ",
+                                })
+                              }
+                            >
+                              <PetitionPermissionTypeText type="READ" />
+                            </MenuItem>
+                            <MenuDivider />
+                            <MenuItem
+                              color="red.500"
+                              onClick={() =>
+                                handleRemovePetitionPermission({
+                                  petitionId: petitions[0].id,
+                                  userGroup: group,
+                                })
+                              }
+                              icon={<DeleteIcon display="block" boxSize={4} />}
+                            >
+                              <FormattedMessage id="generic.remove" defaultMessage="Remove" />
+                            </MenuItem>
+                          </MenuList>
+                        </Menu>
+                      )}
+                    </Flex>
+                  );
+                })}
+              </Stack>
+            ) : null}
             <Stack display={petitionsRead.length && petitions.length !== 1 ? "flex" : "none"}>
               <Alert status="warning" backgroundColor="orange.100" borderRadius="md">
                 <Flex alignItems="center" justifyContent="flex-start">

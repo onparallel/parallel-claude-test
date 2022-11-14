@@ -47,7 +47,7 @@ export function UserGroupMembersPopover({
     <Popover trigger="hover" onOpen={() => getMembers()}>
       <PopoverTrigger>{children}</PopoverTrigger>
       <Portal>
-        <PopoverContent width="fit-content">
+        <PopoverContent width="fit-content" maxWidth="320px">
           <PopoverArrow />
           {isDefined(group) ? (
             <PopoverHeader borderBottom="none" fontWeight="normal" paddingBottom={0} fontSize="sm">
