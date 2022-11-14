@@ -1,16 +1,14 @@
 import { inject, injectable } from "inversify";
-import { Response } from "node-fetch";
 import { Config, CONFIG } from "../../config";
+import { FeatureFlagRepository } from "../../db/repositories/FeatureFlagRepository";
 import { IntegrationRepository } from "../../db/repositories/IntegrationRepository";
 import { IntegrationType } from "../../db/__types";
 import { FetchService, FETCH_SERVICE } from "../../services/fetch";
 import { IRedis, REDIS } from "../../services/redis";
-import { MaybePromise } from "../../util/types";
 import { OauthCredentials, OAuthIntegration } from "./OAuthIntegration";
 
 @injectable()
 export class DocusignOauthIntegration extends OAuthIntegration {
-  redirectCallbackUrl = "/app/organization/integrations/signature";
   orgIntegrationType: IntegrationType = "SIGNATURE";
   provider = "DOCUSIGN";
 
@@ -18,12 +16,13 @@ export class DocusignOauthIntegration extends OAuthIntegration {
     @inject(CONFIG) config: Config,
     @inject(REDIS) redis: IRedis,
     @inject(IntegrationRepository) integrations: IntegrationRepository,
-    @inject(FETCH_SERVICE) private fetch: FetchService
+    @inject(FETCH_SERVICE) private fetch: FetchService,
+    @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository
   ) {
     super(config, redis, integrations);
   }
 
-  buildAuthorizationUrl(state: string): MaybePromise<string> {
+  buildAuthorizationUrl(state: string) {
     return `${this.config.oauth.docusign.baseUri}/auth?${new URLSearchParams({
       state,
       response_type: "code",
@@ -53,10 +52,30 @@ export class DocusignOauthIntegration extends OAuthIntegration {
       throw new Error(data);
     }
   }
-  refreshAccessToken(refreshToken: string): MaybePromise<OauthCredentials> {
-    throw new Error("Method not implemented.");
+  async refreshAccessToken(refreshToken: string): Promise<OauthCredentials> {
+    const response = await this.fetch.fetch(`${this.config.oauth.docusign.baseUri}/token`, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${Buffer.from(
+          this.config.oauth.docusign.clientId + ":" + this.config.oauth.docusign.secretKey
+        ).toString("base64")}`,
+      },
+      body: new URLSearchParams({
+        grant_type: "refresh_token",
+        refresh_token: refreshToken,
+      }),
+    });
+
+    const data = await response.json();
+    console.log(data, response.status);
+    if (response.ok) {
+      return { ACCESS_TOKEN: data.access_token, REFRESH_TOKEN: data.refresh_token };
+    } else {
+      throw new Error(JSON.stringify(data));
+    }
   }
-  checkIfAccessTokenExpired(response: Response): MaybePromise<boolean> {
-    throw new Error("Method not implemented.");
+
+  protected override async orgHasAccessToIntegration(orgId: number) {
+    return await this.featureFlags.orgHasFeatureFlag(orgId, "PETITION_SIGNATURE");
   }
 }

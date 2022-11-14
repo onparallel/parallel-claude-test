@@ -21,6 +21,7 @@ import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { I18N_SERVICE, II18nService } from "../i18n";
 import {
+  AuthenticationResponse,
   BrandingIdKey,
   ISignatureClient,
   Recipient,
@@ -65,8 +66,14 @@ export class DocuSignClient implements ISignatureClient<"DOCUSIGN"> {
     this.apiAccountId = "";
   }
 
-  async authenticate(throwOnError?: boolean) {
+  async authenticate(opts?: {
+    retryOnError?: boolean;
+    throwOnConsentRequired?: boolean;
+  }): Promise<AuthenticationResponse<"DOCUSIGN">> {
     const environment = (this.settings.ENVIRONMENT ?? "sandbox") as "production" | "sandbox";
+    const { ACCESS_TOKEN, REFRESH_TOKEN } = this.docusignOauth.decryptCredentials(
+      this.settings.CREDENTIALS
+    );
     try {
       const url = {
         sandbox: "account-d.docusign.com",
@@ -75,8 +82,6 @@ export class DocuSignClient implements ISignatureClient<"DOCUSIGN"> {
 
       const apiClient = new ApiClient();
       apiClient.setOAuthBasePath(url);
-
-      const { ACCESS_TOKEN } = this.docusignOauth.decryptCredentials(this.settings.CREDENTIALS);
 
       // get user info
       const userInfoResults = await apiClient.getUserInfo(ACCESS_TOKEN);
@@ -103,6 +108,7 @@ export class DocuSignClient implements ISignatureClient<"DOCUSIGN"> {
 
       return { environment: environment as "production" | "sandbox" };
     } catch (e: any) {
+      console.error(e.status, opts, this.integrationId);
       if (e.response?.body?.error === "consent_required") {
         if (isDefined(this.integrationId)) {
           await this.integrations.updateOrgIntegration(
@@ -112,7 +118,7 @@ export class DocuSignClient implements ISignatureClient<"DOCUSIGN"> {
           );
         }
 
-        if (throwOnError) {
+        if (opts?.throwOnConsentRequired) {
           throw {
             environment: environment as "production" | "sandbox",
             consent_required: true,
@@ -123,9 +129,30 @@ export class DocuSignClient implements ISignatureClient<"DOCUSIGN"> {
             consent_required: true,
           };
         }
-      } else {
-        throw e;
+      } else if (e.status === 401 && this.integrationId && opts?.retryOnError) {
+        // authentication error, refresh access_token and try again
+        console.debug("REFRESHING ACCESS_TOKEN...");
+        const newCredentials = await this.docusignOauth.refreshAccessToken(REFRESH_TOKEN);
+        this.settings.CREDENTIALS = this.docusignOauth.encryptCredentials(newCredentials);
+        await this.integrations.updateOrgIntegration(
+          this.integrationId,
+          {
+            settings: {
+              ...this.settings,
+              CREDENTIALS: this.settings.CREDENTIALS,
+            },
+          },
+          `OrgIntegration:${this.integrationId}`
+        );
+        return await this.authenticate({ ...opts, retryOnError: false });
+      } else if (this.integrationId) {
+        await this.integrations.updateOrgIntegration(
+          this.integrationId,
+          { invalid_credentials: true },
+          `OrgIntegration:${this.integrationId}`
+        );
       }
+      throw { consent_required: true };
     }
   }
 
@@ -136,7 +163,7 @@ export class DocuSignClient implements ISignatureClient<"DOCUSIGN"> {
     recipients: Recipient[],
     options: SignatureOptions
   ): Promise<SignatureResponse> {
-    await this.authenticate(true);
+    await this.authenticate({ throwOnConsentRequired: true });
 
     // const key = `${options.locale.toUpperCase()}_INFORMAL_BRANDING_ID` as BrandingIdKey;
     // let brandingId = this.settings[key];
@@ -253,7 +280,7 @@ export class DocuSignClient implements ISignatureClient<"DOCUSIGN"> {
   }
 
   async cancelSignatureRequest(externalId: string) {
-    await this.authenticate(true);
+    await this.authenticate({ throwOnConsentRequired: true });
     const intl = await this.i18n.getIntl("es");
     await this.envelopesApi.update(this.apiAccountId, externalId, {
       envelope: {
@@ -271,7 +298,7 @@ export class DocuSignClient implements ISignatureClient<"DOCUSIGN"> {
   }
 
   async downloadSignedDocument(externalId: string): Promise<Buffer> {
-    await this.authenticate(true);
+    await this.authenticate({ throwOnConsentRequired: true });
     return Buffer.from(
       await this.envelopesApi.getDocument(this.apiAccountId, externalId, "combined", {}),
       "binary"
@@ -279,7 +306,7 @@ export class DocuSignClient implements ISignatureClient<"DOCUSIGN"> {
   }
 
   async downloadAuditTrail(externalId: string): Promise<Buffer> {
-    await this.authenticate(true);
+    await this.authenticate({ throwOnConsentRequired: true });
     return Buffer.from(
       await this.envelopesApi.getDocument(this.apiAccountId, externalId, "certificate", {}),
       "binary"
@@ -287,7 +314,7 @@ export class DocuSignClient implements ISignatureClient<"DOCUSIGN"> {
   }
 
   async sendPendingSignatureReminder(externalId: string) {
-    await this.authenticate(true);
+    await this.authenticate({ throwOnConsentRequired: true });
     await this.envelopesApi.update(this.apiAccountId, externalId, {
       resendEnvelope: true,
     });
@@ -297,7 +324,7 @@ export class DocuSignClient implements ISignatureClient<"DOCUSIGN"> {
     brandingId: string,
     opts: Pick<SignatureOptions, "locale" | "templateData">
   ) {
-    await this.authenticate(true);
+    await this.authenticate({ throwOnConsentRequired: true });
     try {
       await this.accountsApi.updateBrand(this.apiAccountId, brandingId, {
         brand: {
@@ -324,7 +351,7 @@ export class DocuSignClient implements ISignatureClient<"DOCUSIGN"> {
   }
 
   // private async createBranding(opts: SignatureOptions) {
-  //    await this.authenticate(true);
+  //    await this.authenticate({throwOnConsentRequired:true});
   //   const response = await this.accountsApi.createBrand(this.apiAccountId, {
   //     brand: {
   //       isOverridingCompanyName: true,
