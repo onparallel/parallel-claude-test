@@ -4,7 +4,7 @@ import { ValueProps } from "@parallel/utils/ValueProps";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 import { components } from "react-select";
-import { SimpleOption, SimpleSelect } from "./SimpleSelect";
+import { SimpleOption, SimpleSelect, SimpleSelectProps } from "./SimpleSelect";
 
 export const DEFAULT_COLORS = [
   "#E2E8F0",
@@ -74,9 +74,12 @@ function useTagColors() {
   );
 }
 
-export type TagColorSelectProps = ValueProps<string>;
+export type TagColorSelectProps = Omit<
+  SimpleSelectProps<string>,
+  "options" | "components" | "styles"
+>;
 
-export function TagColorSelect({ value, onChange }: TagColorSelectProps) {
+export function TagColorSelect(props: TagColorSelectProps) {
   const options = useTagColors();
   const styles = rsStyles<SimpleOption, false>({
     valueContainer: (styles) => ({
@@ -95,8 +98,7 @@ export function TagColorSelect({ value, onChange }: TagColorSelectProps) {
       options={options}
       components={{ SingleValue, Option }}
       styles={styles}
-      value={value}
-      onChange={onChange}
+      {...props}
     />
   );
 }
