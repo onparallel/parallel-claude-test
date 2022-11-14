@@ -6,14 +6,19 @@ import {
   Flex,
   Menu,
   MenuButton,
+  MenuDivider,
   MenuItem,
   MenuList,
+  Stack,
   Text,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, DeleteIcon, UserArrowIcon, UserIcon } from "@parallel/chakra/icons";
 import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
-import { TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment } from "@parallel/graphql/__types";
+import {
+  PetitionPermissionTypeRW,
+  TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment,
+} from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { isDefined } from "remeda";
 import { PetitionPermissionTypeText } from "../PetitionPermissionType";
@@ -22,7 +27,9 @@ interface TemplateDefaultUserPermissionRowProps {
   permission?: TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment;
   onRemove?: () => void;
   onTransfer?: () => void;
+  onChange?: (permissionId: string, permissionType: PetitionPermissionTypeRW) => void;
   userId: string;
+  isSubscribed?: boolean;
 }
 
 export function TemplateDefaultUserPermissionRow({
@@ -30,6 +37,8 @@ export function TemplateDefaultUserPermissionRow({
   userId,
   onRemove,
   onTransfer,
+  onChange,
+  isSubscribed,
 }: TemplateDefaultUserPermissionRowProps) {
   return (
     <Flex alignItems="center">
@@ -47,17 +56,19 @@ export function TemplateDefaultUserPermissionRow({
       <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
         {isDefined(permission) ? (
           <>
-            <Text noOfLines={1} wordBreak="break-all">
-              {permission.user.fullName}{" "}
-              {userId === permission.user.id ? (
-                <Text as="span">
-                  {"("}
-                  <FormattedMessage id="generic.you" defaultMessage="You" />
-                  {")"}
-                </Text>
-              ) : null}
-              {permission.isSubscribed ? <SubscribedNotificationsIcon /> : null}
-            </Text>
+            <Stack direction={"row"} spacing={1} align="center">
+              <Text noOfLines={1} wordBreak="break-all">
+                {permission.user.fullName}{" "}
+                {userId === permission.user.id ? (
+                  <Text as="span">
+                    {"("}
+                    <FormattedMessage id="generic.you" defaultMessage="You" />
+                    {")"}
+                  </Text>
+                ) : null}
+              </Text>
+              {isSubscribed ? <SubscribedNotificationsIcon /> : null}
+            </Stack>
             <Text color="gray.500" noOfLines={1}>
               {permission.user.email}
             </Text>
@@ -75,6 +86,13 @@ export function TemplateDefaultUserPermissionRow({
             <PetitionPermissionTypeText type={permission.permissionType} />
           </MenuButton>
           <MenuList minWidth={40}>
+            <MenuItem onClick={() => onChange?.(permission.id, "WRITE")}>
+              <PetitionPermissionTypeText type="WRITE" />
+            </MenuItem>
+            <MenuItem onClick={() => onChange?.(permission.id, "READ")}>
+              <PetitionPermissionTypeText type="READ" />
+            </MenuItem>
+            <MenuDivider />
             <MenuItem
               isDisabled={permission.permissionType === "OWNER"}
               icon={<UserArrowIcon display="block" boxSize={4} />}
@@ -113,6 +131,7 @@ export function TemplateDefaultUserPermissionRow({
 TemplateDefaultUserPermissionRow.fragments = {
   TemplateDefaultUserPermission: gql`
     fragment TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission on TemplateDefaultUserPermission {
+      id
       permissionType
       user {
         id

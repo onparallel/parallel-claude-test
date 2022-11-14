@@ -294,12 +294,12 @@ function _PetitionSettings({
       try {
         await showTemplateDefaultPermissionsDialog({
           userId: user.id,
-          permissions: petition.defaultPermissions,
+          petition,
           onUpdatePermissions: async (permissions) => {
             const { data } = await updateTemplateDefaultPermissions({
               variables: { templateId: petition.id, permissions },
             });
-            return data!.updateTemplateDefaultPermissions.defaultPermissions;
+            return data!.updateTemplateDefaultPermissions;
           },
         });
       } catch {}
@@ -904,12 +904,9 @@ const fragments = {
           url
           isActive
           ...PublicLinkSettingsDialog_PublicPetitionLink
-          ...TemplateDefaultPermissionsDialog_PublicPetitionLink
-        }
-        defaultPermissions {
-          ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
         }
         defaultPath
+        ...TemplateDefaultPermissionsDialog_PetitionTemplate
       }
       isAnonymized
     }
@@ -917,8 +914,7 @@ const fragments = {
     ${CompliancePeriodDialog.fragments.PetitionBase}
     ${PublicLinkSettingsDialog.fragments.PetitionTemplate}
     ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
-    ${TemplateDefaultPermissionsDialog.fragments.PublicPetitionLink}
-    ${TemplateDefaultPermissionsDialog.fragments.TemplateDefaultPermission}
+    ${TemplateDefaultPermissionsDialog.fragments.PetitionTemplate}
   `,
 };
 const mutations = [
@@ -1025,16 +1021,10 @@ const mutations = [
     ) {
       updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
         id
-        defaultPermissions {
-          ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
-        }
-        publicLink {
-          id
-          isActive
-        }
+        ...TemplateDefaultPermissionsDialog_PetitionTemplate
       }
     }
-    ${TemplateDefaultPermissionsDialog.fragments.TemplateDefaultPermission}
+    ${TemplateDefaultPermissionsDialog.fragments.PetitionTemplate}
   `,
 ];
 

@@ -3413,7 +3413,7 @@ export class PetitionRepository extends BaseRepository {
     }
   );
 
-  readonly loadEffectiveDefaultPermissions = this.buildLoader<
+  readonly loadEffectiveTemplateDefaultPermissions = this.buildLoader<
     number,
     EffectivePetitionPermission[]
   >(async (templateIds, t) => {

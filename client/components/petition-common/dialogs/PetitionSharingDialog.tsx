@@ -28,6 +28,7 @@ import { ChevronDownIcon, DeleteIcon, UserArrowIcon, UsersIcon } from "@parallel
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PetitionNameWithPath } from "@parallel/components/common/PetitionNameWithPath";
+import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import {
   NewPetition_templatesDocument,
@@ -415,12 +416,14 @@ export function PetitionSharingDialog({
               ) : null}
             </Stack>
             <Stack display={hasUsers || petitions.length !== 1 ? "none" : "flex"} paddingTop={2}>
-              {userPermissions.map(({ user, permissionType }) => (
+              {userPermissions.map(({ user, permissionType, isSubscribed }) => (
                 <Flex key={user.id} alignItems="center">
                   <UserAvatar role="presentation" user={user} size="sm" />
                   <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
-                    <Text noOfLines={1} wordBreak="break-all">
-                      {user.fullName}{" "}
+                    <Flex direction="row" alignItems="center" gap={1}>
+                      <Text noOfLines={1} wordBreak="break-all">
+                        {user.fullName}
+                      </Text>
                       {userId === user.id ? (
                         <Text as="span">
                           {"("}
@@ -428,7 +431,12 @@ export function PetitionSharingDialog({
                           {")"}
                         </Text>
                       ) : null}
-                    </Text>
+                      {petitions[0].effectivePermissions.some(
+                        (ep) => ep.user.id === user.id && ep.isSubscribed
+                      ) ? (
+                        <SubscribedNotificationsIcon />
+                      ) : null}
+                    </Flex>
                     <Text color="gray.500" noOfLines={1}>
                       {user.email}
                     </Text>
@@ -528,7 +536,20 @@ export function PetitionSharingDialog({
                         justifyContent="flex-end"
                         alignItems="center"
                       >
-                        <UserGroupMembersPopover userGroupId={group.id}>
+                        <UserGroupMembersPopover
+                          userGroupId={group.id}
+                          userDetails={(userId: string) => {
+                            const petition = petitions[0];
+                            if (
+                              petition.effectivePermissions.some(
+                                (ep) => ep.user.id === userId && ep.isSubscribed
+                              )
+                            ) {
+                              return <SubscribedNotificationsIcon />;
+                            }
+                            return null;
+                          }}
+                        >
                           <Text color="gray.500" cursor="default" noOfLines={1}>
                             <FormattedMessage
                               id="generic.n-group-members"
@@ -701,6 +722,12 @@ const fragments = {
         myEffectivePermission {
           permissionType
         }
+        effectivePermissions {
+          user {
+            id
+          }
+          isSubscribed
+        }
       }
       ${this.PetitionUserPermission}
       ${this.PetitionUserGroupPermission}
@@ -713,6 +740,7 @@ const fragments = {
         user {
           ...PetitionSharingModal_User
         }
+        isSubscribed
       }
       ${this.User}
     `;

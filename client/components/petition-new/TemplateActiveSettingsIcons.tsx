@@ -52,7 +52,7 @@ export function TemplateActiveSettingsIcons({
         </SmallPopover>
       ) : null}
       {!template.isPublic && template.defaultPermissions && template.defaultPermissions.length ? (
-        <TemplateIconDefaultPermissions defaultPermissions={template.defaultPermissions} />
+        <TemplateIconDefaultPermissions template={template} />
       ) : null}
       {template.signatureConfig ? (
         <TemplateIconSignature signatureConfig={template.signatureConfig} />
@@ -84,13 +84,11 @@ TemplateActiveSettingsIcons.fragments = {
       remindersConfig {
         ...TemplateIconReminders_RemindersConfig
       }
-      defaultPermissions {
-        ...TemplateIconDefaultPermissions_TemplateDefaultPermission
-      }
+      ...TemplateIconDefaultPermissions_PetitionTemplate
       anonymizeAfterMonths
     }
     ${TemplateIconSignature.fragments.SignatureConfig}
     ${TemplateIconReminders.fragments.RemindersConfig}
-    ${TemplateIconDefaultPermissions.fragments.TemplateDefaultPermission}
+    ${TemplateIconDefaultPermissions.fragments.PetitionTemplate}
   `,
 };

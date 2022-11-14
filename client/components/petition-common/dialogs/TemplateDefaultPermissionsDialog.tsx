@@ -10,9 +10,9 @@ import {
   UserSelectSelection,
 } from "@parallel/components/common/UserSelect";
 import {
-  Maybe,
   PetitionPermissionType,
-  TemplateDefaultPermissionsDialog_PublicPetitionLinkFragment,
+  PetitionPermissionTypeRW,
+  TemplateDefaultPermissionsDialog_PetitionTemplateFragment,
   TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment,
   UserOrUserGroupPermissionInput,
 } from "@parallel/graphql/__types";
@@ -27,23 +27,22 @@ import { TemplateDefaultUserPermissionRow } from "./TemplateDefaultUserPermissio
 
 export interface TemplateDefaultPermissionsDialogProps {
   userId: string;
-  permissions: TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment[];
-  publicLink?: Maybe<TemplateDefaultPermissionsDialog_PublicPetitionLinkFragment>;
+  petition: TemplateDefaultPermissionsDialog_PetitionTemplateFragment;
   onUpdatePermissions: (
     v: UserOrUserGroupPermissionInput[]
-  ) => Promise<TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment[]>;
+  ) => Promise<TemplateDefaultPermissionsDialog_PetitionTemplateFragment>;
 }
 
 export function TemplateDefaultPermissionsDialog({
   userId,
-  permissions,
-  publicLink,
+  petition,
   onUpdatePermissions,
   ...props
 }: DialogProps<TemplateDefaultPermissionsDialogProps>) {
   const editorsRef = useRef<UserSelectInstance<true, true>>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [permissionsList, setPermissionsList] = useState(permissions);
+  const [petitionTemplate, setPetitionTemplate] = useState(petition);
+  const permissionsList = petitionTemplate.defaultPermissions;
   const { handleSubmit, register, watch, control, setValue } = useForm<{
     editors: UserSelectSelection<true>[];
     permissionType: PetitionPermissionType;
@@ -104,17 +103,17 @@ export function TemplateDefaultPermissionsDialog({
   }
 
   const handleRemovePermission = async (templateDefaultPermissionId: string) => {
-    const newPermissions = await onUpdatePermissions(
+    const petition = await onUpdatePermissions(
       permissionsList.filter((p) => p.id !== templateDefaultPermissionId).map(mapPermission)
     );
-    setPermissionsList(newPermissions);
+    setPetitionTemplate(petition);
   };
 
   const handleTransferOwnership = async (templateDefaultPermissionId: string) => {
     const oldOwner = permissionsList.find((p) => p.permissionType === "OWNER");
     const newOwner = permissionsList.find((p) => p.id === templateDefaultPermissionId)!;
 
-    const newPermissions = await onUpdatePermissions(
+    const petition = await onUpdatePermissions(
       permissionsList
         .map((p) => {
           if (p.id === oldOwner?.id) {
@@ -128,7 +127,26 @@ export function TemplateDefaultPermissionsDialog({
         .map(mapPermission)
     );
 
-    setPermissionsList(newPermissions);
+    setPetitionTemplate(petition);
+  };
+
+  const handleChangePermission = async (
+    templateDefaultPermissionId: string,
+    permissionType: PetitionPermissionTypeRW
+  ) => {
+    const petition = await onUpdatePermissions(
+      permissionsList
+        .map((p) => {
+          if (p.id === templateDefaultPermissionId) {
+            return { ...p, permissionType } as const;
+          } else {
+            return p;
+          }
+        })
+        .map(mapPermission)
+    );
+
+    setPetitionTemplate(petition);
   };
 
   return (
@@ -143,7 +161,7 @@ export function TemplateDefaultPermissionsDialog({
           } else {
             try {
               setIsSubmitting(true);
-              const newPermissions = await onUpdatePermissions(
+              const petition = await onUpdatePermissions(
                 editors
                   .map((x) => ({
                     isSubscribed,
@@ -156,7 +174,7 @@ export function TemplateDefaultPermissionsDialog({
                   }))
                   .concat(permissionsList.map(mapPermission))
               );
-              setPermissionsList(newPermissions);
+              setPetitionTemplate(petition);
               setValue("editors", []);
             } catch {}
             setIsSubmitting(false);
@@ -249,6 +267,12 @@ export function TemplateDefaultPermissionsDialog({
                 userId={userId}
                 onRemove={() => handleRemovePermission(permission.id)}
                 onTransfer={() => handleTransferOwnership(permission.id)}
+                onChange={handleChangePermission}
+                isSubscribed={
+                  petitionTemplate.effectiveDefaultPermissions.some(
+                    (ep) => ep.user.id === userId && ep.isSubscribed
+                  ) || permission.isSubscribed
+                }
               />
             ))}
             {groupPermissions.map((permission, index) => (
@@ -256,6 +280,7 @@ export function TemplateDefaultPermissionsDialog({
                 key={index}
                 permission={permission}
                 onRemove={() => handleRemovePermission(permission.id)}
+                onChange={handleChangePermission}
               />
             ))}
           </Stack>
@@ -276,26 +301,44 @@ export function TemplateDefaultPermissionsDialog({
 }
 
 TemplateDefaultPermissionsDialog.fragments = {
-  PublicPetitionLink: gql`
-    fragment TemplateDefaultPermissionsDialog_PublicPetitionLink on PublicPetitionLink {
-      isActive
-    }
-  `,
-  TemplateDefaultPermission: gql`
-    fragment TemplateDefaultPermissionsDialog_TemplateDefaultPermission on TemplateDefaultPermission {
-      id
-      isSubscribed
-      permissionType
-      ... on TemplateDefaultUserPermission {
-        ...TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission
+  get TemplateDefaultPermission() {
+    return gql`
+      fragment TemplateDefaultPermissionsDialog_TemplateDefaultPermission on TemplateDefaultPermission {
+        id
+        isSubscribed
+        permissionType
+        ... on TemplateDefaultUserPermission {
+          ...TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission
+        }
+        ... on TemplateDefaultUserGroupPermission {
+          ...TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission
+        }
       }
-      ... on TemplateDefaultUserGroupPermission {
-        ...TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission
+      ${TemplateDefaultUserPermissionRow.fragments.TemplateDefaultUserPermission}
+      ${TemplateDefaultUserGroupPermissionRow.fragments.TemplateDefaultUserGroupPermission}
+    `;
+  },
+  get PetitionTemplate() {
+    return gql`
+      fragment TemplateDefaultPermissionsDialog_PetitionTemplate on PetitionTemplate {
+        id
+        effectiveDefaultPermissions {
+          user {
+            id
+          }
+          isSubscribed
+        }
+        publicLink {
+          id
+          isActive
+        }
+        defaultPermissions {
+          ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
+        }
       }
-    }
-    ${TemplateDefaultUserPermissionRow.fragments.TemplateDefaultUserPermission}
-    ${TemplateDefaultUserGroupPermissionRow.fragments.TemplateDefaultUserGroupPermission}
-  `,
+      ${this.TemplateDefaultPermission}
+    `;
+  },
 };
 
 export function useTemplateDefaultPermissionsDialog() {

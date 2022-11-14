@@ -6,6 +6,7 @@ import {
   Flex,
   Menu,
   MenuButton,
+  MenuDivider,
   MenuItem,
   MenuList,
   Stack,
@@ -14,18 +15,23 @@ import {
 import { ChevronDownIcon, DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
 import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
-import { TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment } from "@parallel/graphql/__types";
+import {
+  PetitionPermissionTypeRW,
+  TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment,
+} from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { PetitionPermissionTypeText } from "../PetitionPermissionType";
 
 interface TemplateDefaultUserGroupPermissionRowProps {
   permission: TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment;
   onRemove?: () => void;
+  onChange: (permissionId: string, permissionType: PetitionPermissionTypeRW) => void;
 }
 
 export function TemplateDefaultUserGroupPermissionRow({
   permission,
   onRemove,
+  onChange,
 }: TemplateDefaultUserGroupPermissionRowProps) {
   const { group } = permission;
   return (
@@ -45,7 +51,10 @@ export function TemplateDefaultUserGroupPermissionRow({
           justifyContent="flex-end"
           alignItems="center"
         >
-          <UserGroupMembersPopover userGroupId={group.id}>
+          <UserGroupMembersPopover
+            userGroupId={group.id}
+            userDetails={() => (permission.isSubscribed ? <SubscribedNotificationsIcon /> : null)}
+          >
             <Text color="gray.500" cursor="default" noOfLines={1}>
               <FormattedMessage
                 id="generic.n-group-members"
@@ -61,6 +70,13 @@ export function TemplateDefaultUserGroupPermissionRow({
           <PetitionPermissionTypeText type={permission.permissionType} />
         </MenuButton>
         <MenuList minWidth={40}>
+          <MenuItem onClick={() => onChange(permission.id, "WRITE")}>
+            <PetitionPermissionTypeText type="WRITE" />
+          </MenuItem>
+          <MenuItem onClick={() => onChange(permission.id, "READ")}>
+            <PetitionPermissionTypeText type="READ" />
+          </MenuItem>
+          <MenuDivider />
           <MenuItem
             color="red.500"
             icon={<DeleteIcon display="block" boxSize={4} />}
@@ -77,6 +93,7 @@ export function TemplateDefaultUserGroupPermissionRow({
 TemplateDefaultUserGroupPermissionRow.fragments = {
   TemplateDefaultUserGroupPermission: gql`
     fragment TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission on TemplateDefaultUserGroupPermission {
+      id
       permissionType
       group {
         id

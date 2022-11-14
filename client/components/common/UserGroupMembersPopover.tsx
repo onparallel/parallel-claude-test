@@ -27,9 +27,14 @@ import { UserAvatar } from "./UserAvatar";
 export interface UserGroupMembersPopoverProps {
   userGroupId: string;
   children: ReactNode;
+  userDetails?: (userId: string) => ReactNode;
 }
 
-export function UserGroupMembersPopover({ userGroupId, children }: UserGroupMembersPopoverProps) {
+export function UserGroupMembersPopover({
+  userGroupId,
+  children,
+  userDetails,
+}: UserGroupMembersPopoverProps) {
   const [getMembers, { data }] = useLazyQuery(UserGroupMembersPopover_getMembersDocument, {
     variables: { userGroupId },
     fetchPolicy: "cache-and-network",
@@ -62,9 +67,12 @@ export function UserGroupMembersPopover({ userGroupId, children }: UserGroupMemb
                   {group.members.map(({ user }) => (
                     <Flex key={user.id} as={ListItem} alignItems="center" paddingX={3}>
                       <UserAvatar size="xs" user={user} />
-                      <Text flex="1" marginLeft={2} noOfLines={1} wordBreak="break-all">
-                        {user.fullName}
-                      </Text>
+                      <Flex direction="row" alignItems="center" gap={1}>
+                        <Text marginLeft={2} noOfLines={1} wordBreak="break-all">
+                          {user.fullName}
+                        </Text>
+                        {userDetails?.(user.id) ?? null}
+                      </Flex>
                     </Flex>
                   ))}
                 </Stack>

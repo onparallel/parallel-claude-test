@@ -3732,6 +3732,11 @@ type PetitionTemplate implements PetitionBase {
   descriptionHtml: String
 
   """
+  The default effective permissions on the template
+  """
+  effectiveDefaultPermissions: [EffectivePetitionUserPermission!]!
+
+  """
   The effective permissions on the petition
   """
   effectivePermissions: [EffectivePetitionUserPermission!]!

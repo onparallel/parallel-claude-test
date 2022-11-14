@@ -1,24 +1,24 @@
 import { gql } from "@apollo/client";
 import { Avatar, Flex, List, ListItem, PopoverProps, Stack, Text } from "@chakra-ui/react";
 import { ArrowShortRightIcon, UsersIcon } from "@parallel/chakra/icons";
-import { TemplateIconDefaultPermissions_TemplateDefaultPermissionFragment } from "@parallel/graphql/__types";
+import { TemplateIconDefaultPermissions_PetitionTemplateFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "../common/SmallPopover";
 import { SubscribedNotificationsIcon } from "../common/SubscribedNotificationsIcon";
 import { UserAvatar } from "../common/UserAvatar";
 
 export interface TemplateIconDefaultPermissionsProps extends PopoverProps {
-  defaultPermissions: TemplateIconDefaultPermissions_TemplateDefaultPermissionFragment[];
+  template: TemplateIconDefaultPermissions_PetitionTemplateFragment;
 }
 
 export function TemplateIconDefaultPermissions({
-  defaultPermissions,
+  template,
   ...props
 }: TemplateIconDefaultPermissionsProps) {
   return (
     <SmallPopover
       content={
-        <Stack fontSize="sm">
+        <Stack fontSize="sm" width="auto" maxWidth="320px">
           <Text>
             <FormattedMessage
               id="component.template-icon-default-permissions.text"
@@ -26,45 +26,72 @@ export function TemplateIconDefaultPermissions({
             />
           </Text>
           <Stack as={List}>
-            {defaultPermissions.map((p) => {
-              const permissionType =
-                p.permissionType === "OWNER" ? (
-                  <FormattedMessage id="petition-permission-type.owner" defaultMessage="Owner" />
-                ) : p.permissionType === "WRITE" ? (
-                  <FormattedMessage id="petition-permission-type.write" defaultMessage="Editor" />
-                ) : null;
+            {template.defaultPermissions.map((p) => {
+              if (p.__typename === "TemplateDefaultUserPermission") {
+                const effectiveDefaultPermissions = template.effectiveDefaultPermissions.find(
+                  (e) => e.user.id === p.user.id
+                );
 
-              return (
-                <Flex key={p.id} as={ListItem} alignItems="center">
-                  {p.__typename === "TemplateDefaultUserPermission" ? (
-                    <>
-                      <UserAvatar size="xs" user={p.user} />
-                      <Text flex="1" marginLeft={2} noOfLines={1} wordBreak="break-all">
-                        {p.user.fullName}{" "}
-                        <Text as="span" fontSize="xs" color="gray.600">
-                          ({permissionType})
-                        </Text>
-                        {p.isSubscribed ? <SubscribedNotificationsIcon marginLeft={1} /> : null}
+                const permissionType =
+                  effectiveDefaultPermissions?.permissionType === "OWNER" ? (
+                    <FormattedMessage id="petition-permission-type.owner" defaultMessage="Owner" />
+                  ) : effectiveDefaultPermissions?.permissionType === "WRITE" ? (
+                    <FormattedMessage id="petition-permission-type.write" defaultMessage="Editor" />
+                  ) : effectiveDefaultPermissions?.permissionType === "READ" ? (
+                    <FormattedMessage
+                      id="petition-permission-type.reader"
+                      defaultMessage="Reader"
+                    />
+                  ) : null;
+
+                return (
+                  <Flex key={p.id} as={ListItem} alignItems="center">
+                    <UserAvatar size="xs" user={p.user} />
+                    <Flex marginLeft={2} direction="row" alignItems="center" gap={1}>
+                      <Text noOfLines={1} wordBreak="break-all">
+                        {p.user.fullName}
                       </Text>
-                    </>
-                  ) : p.__typename === "TemplateDefaultUserGroupPermission" ? (
-                    <>
-                      <Avatar
-                        size="xs"
-                        backgroundColor="gray.200"
-                        icon={<UsersIcon boxSize={3.5} />}
-                      />
-                      <Text flex="1" marginLeft={2} noOfLines={1} wordBreak="break-all">
-                        {p.group.name}{" "}
-                        <Text as="span" fontSize="xs" color="gray.600">
-                          ({permissionType})
-                        </Text>
-                        {p.isSubscribed ? <SubscribedNotificationsIcon marginLeft={1} /> : null}
+                      <Text as="span" fontSize="xs" color="gray.600">
+                        ({permissionType})
                       </Text>
-                    </>
-                  ) : null}
-                </Flex>
-              );
+                      {effectiveDefaultPermissions?.isSubscribed ? (
+                        <SubscribedNotificationsIcon />
+                      ) : null}
+                    </Flex>
+                  </Flex>
+                );
+              }
+
+              if (p.__typename === "TemplateDefaultUserGroupPermission") {
+                const permissionType =
+                  p.permissionType === "WRITE" ? (
+                    <FormattedMessage id="petition-permission-type.write" defaultMessage="Editor" />
+                  ) : p.permissionType === "READ" ? (
+                    <FormattedMessage
+                      id="petition-permission-type.reader"
+                      defaultMessage="Reader"
+                    />
+                  ) : null;
+
+                return (
+                  <Flex key={p.id} as={ListItem} alignItems="center">
+                    <Avatar
+                      size="xs"
+                      backgroundColor="gray.200"
+                      icon={<UsersIcon boxSize={3.5} />}
+                    />
+                    <Flex marginLeft={2} direction="row" alignItems="center" gap={1}>
+                      <Text noOfLines={1} wordBreak="break-all">
+                        {p.group.name}
+                      </Text>
+                      <Text as="span" fontSize="xs" color="gray.600">
+                        ({permissionType})
+                      </Text>
+                      {p.isSubscribed ? <SubscribedNotificationsIcon /> : null}
+                    </Flex>
+                  </Flex>
+                );
+              }
             })}
           </Stack>
         </Stack>
@@ -78,25 +105,35 @@ export function TemplateIconDefaultPermissions({
 }
 
 TemplateIconDefaultPermissions.fragments = {
-  TemplateDefaultPermission: gql`
-    fragment TemplateIconDefaultPermissions_TemplateDefaultPermission on TemplateDefaultPermission {
+  PetitionTemplate: gql`
+    fragment TemplateIconDefaultPermissions_PetitionTemplate on PetitionTemplate {
       id
-      permissionType
-      ... on TemplateDefaultUserPermission {
+      defaultPermissions {
+        id
+        permissionType
+        ... on TemplateDefaultUserPermission {
+          user {
+            id
+            fullName
+            ...UserAvatar_User
+          }
+        }
+        ... on TemplateDefaultUserGroupPermission {
+          group {
+            id
+            name
+            initials
+          }
+          isSubscribed
+        }
+      }
+      effectiveDefaultPermissions {
         user {
           id
-          fullName
-          ...UserAvatar_User
         }
+        permissionType
+        isSubscribed
       }
-      ... on TemplateDefaultUserGroupPermission {
-        group {
-          id
-          name
-          initials
-        }
-      }
-      isSubscribed
     }
     ${UserAvatar.fragments.User}
   `,

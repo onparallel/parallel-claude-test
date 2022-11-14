@@ -1844,6 +1844,7 @@ export interface NexusGenFieldTypes {
     description: NexusGenScalars["JSON"] | null; // JSON
     descriptionExcerpt: string | null; // String
     descriptionHtml: string | null; // String
+    effectiveDefaultPermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
     effectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
@@ -3545,6 +3546,7 @@ export interface NexusGenFieldTypeNames {
     description: "JSON";
     descriptionExcerpt: "String";
     descriptionHtml: "String";
+    effectiveDefaultPermissions: "EffectivePetitionUserPermission";
     effectivePermissions: "EffectivePetitionUserPermission";
     emailBody: "JSON";
     emailSubject: "String";

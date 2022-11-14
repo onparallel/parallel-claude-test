@@ -2830,6 +2830,8 @@ export type PetitionTemplate = PetitionBase & {
   descriptionExcerpt: Maybe<Scalars["String"]>;
   /** HTML description of the template. */
   descriptionHtml: Maybe<Scalars["String"]>;
+  /** The default effective permissions on the template */
+  effectiveDefaultPermissions: Array<EffectivePetitionUserPermission>;
   /** The effective permissions on the petition */
   effectivePermissions: Array<EffectivePetitionUserPermission>;
   /** The body of the petition. */
