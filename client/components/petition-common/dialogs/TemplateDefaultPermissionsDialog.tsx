@@ -270,7 +270,7 @@ export function TemplateDefaultPermissionsDialog({
                 onChange={handleChangePermission}
                 isSubscribed={
                   petitionTemplate.effectiveDefaultPermissions.some(
-                    (ep) => ep.user.id === userId && ep.isSubscribed
+                    (ep) => ep.user.id === permission.user.id && ep.isSubscribed
                   ) || permission.isSubscribed
                 }
               />
