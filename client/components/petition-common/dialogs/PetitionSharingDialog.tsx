@@ -539,9 +539,8 @@ export function PetitionSharingDialog({
                         <UserGroupMembersPopover
                           userGroupId={group.id}
                           userDetails={(userId: string) => {
-                            const petition = petitions[0];
                             if (
-                              petition.effectivePermissions.some(
+                              petitions[0].effectivePermissions.some(
                                 (ep) => ep.user.id === userId && ep.isSubscribed
                               )
                             ) {
