@@ -259,6 +259,7 @@ export function TemplateDefaultPermissionsDialog({
               permission={ownerPermission}
               userId={userId}
               onRemove={() => ownerPermission && handleRemovePermission(ownerPermission.id)}
+              onChange={handleChangePermission}
             />
             {nonOwnerUserPermissions.map((permission, index) => (
               <TemplateDefaultUserPermissionRow
