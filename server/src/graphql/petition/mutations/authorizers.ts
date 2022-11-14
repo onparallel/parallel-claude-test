@@ -1,8 +1,8 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isDefined } from "remeda";
+import { isDefined, partition } from "remeda";
 import { ApiContext } from "../../../context";
 import { PetitionPermissionType } from "../../../db/__types";
-import { partition, unMaybeArray } from "../../../util/arrays";
+import { unMaybeArray } from "../../../util/arrays";
 import { Maybe, MaybeArray } from "../../../util/types";
 import { Arg } from "../../helpers/authorize";
 import { contextUserHasAccessToUserGroups } from "../../user-group/authorizers";

@@ -1,5 +1,5 @@
 import { sumBy } from "remeda";
-import { chunkWhile, partition } from "../arrays";
+import { chunkWhile } from "../arrays";
 
 describe("Array Helper Functions", () => {
   it("chunkWhile 1", () => {
@@ -46,45 +46,6 @@ describe("Array Helper Functions", () => {
       ],
       [[{ id: 7 }, [15, 16, 17, 18, 19, 20]]],
       [[{ id: 8 }, [21, 22]]],
-    ]);
-  });
-
-  it("partition 1", () => {
-    const result = partition([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], (v) => v > 5);
-    expect(result).toEqual([
-      [6, 7, 8, 9, 10],
-      [1, 2, 3, 4, 5],
-    ]);
-  });
-
-  it("partition 2", () => {
-    const result = partition(
-      [
-        { id: 1, type: "WRITE" },
-        { id: 2, type: "READ" },
-        { id: 3, type: "READ" },
-        { id: 4, type: "WRITE" },
-        { id: 5, type: "READ" },
-        { id: 6, type: "WRITE" },
-        { id: 7, type: "WRITE" },
-        { id: 8, type: "READ" },
-      ],
-      (p) => p.type === "READ"
-    );
-
-    expect(result).toEqual([
-      [
-        { id: 2, type: "READ" },
-        { id: 3, type: "READ" },
-        { id: 5, type: "READ" },
-        { id: 8, type: "READ" },
-      ],
-      [
-        { id: 1, type: "WRITE" },
-        { id: 4, type: "WRITE" },
-        { id: 6, type: "WRITE" },
-        { id: 7, type: "WRITE" },
-      ],
     ]);
   });
 });

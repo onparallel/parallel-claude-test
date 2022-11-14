@@ -10,6 +10,7 @@ import {
   isDefined,
   maxBy,
   omit,
+  partition,
   sortBy,
   uniq,
   zip,
@@ -17,7 +18,7 @@ import {
 import { RESULT } from "../../graphql";
 import { ILogger, LOGGER } from "../../services/logger";
 import { QueuesService, QUEUES_SERVICE } from "../../services/queues";
-import { average, findLast, partition, unMaybeArray } from "../../util/arrays";
+import { average, findLast, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fieldVisibility";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";

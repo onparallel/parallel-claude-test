@@ -6,9 +6,8 @@ import { ApolloError, ForbiddenError } from "apollo-server-core";
 import { differenceInMinutes } from "date-fns";
 import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
-import { difference, isDefined, zip } from "remeda";
+import { difference, isDefined, partition, zip } from "remeda";
 import { LicenseCode, PublicFileUpload } from "../../db/__types";
-import { partition } from "../../util/arrays";
 import { fullName } from "../../util/fullName";
 import { withError } from "../../util/promises/withError";
 import { removeNotDefined } from "../../util/remedaExtensions";
@@ -46,9 +45,9 @@ import { userHasAccessToUserGroups } from "../user-group/authorizers";
 import {
   contextUserHasRole,
   contextUserIsNotSso,
+  emailIsNotRegisteredInTargetOrg,
   userIsNotContextUser,
   userIsNotOrgOwner,
-  emailIsNotRegisteredInTargetOrg,
   userIsNotSSO,
 } from "./authorizers";
 
