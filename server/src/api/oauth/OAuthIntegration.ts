@@ -3,7 +3,7 @@ import { injectable } from "inversify";
 import { isDefined } from "remeda";
 import { Config } from "../../config";
 import { IntegrationRepository } from "../../db/repositories/IntegrationRepository";
-import { IntegrationType } from "../../db/__types";
+import { IntegrationType, OrgIntegration } from "../../db/__types";
 import { IRedis } from "../../services/redis";
 import { decrypt, encrypt, random } from "../../util/token";
 import { MaybePromise } from "../../util/types";
@@ -23,7 +23,6 @@ export abstract class OAuthIntegration {
   ) {}
   abstract readonly orgIntegrationType: IntegrationType;
   abstract readonly provider: string;
-  abstract readonly redirectCallbackUrl: string;
 
   abstract buildAuthorizationUrl(state: string): string;
   abstract getAccessAndRefreshToken(code: string): MaybePromise<OauthCredentials>;
@@ -45,18 +44,22 @@ export abstract class OAuthIntegration {
     return JSON.parse(result);
   }
 
-  protected async storeCredentials(orgId: number, credentials: OauthCredentials) {
-    const [integration] = await this.integrations.loadIntegrationsByOrgId(
-      orgId,
+  protected async storeCredentials(
+    credentials: OauthCredentials,
+    args: { orgId: number; name: string; isDefault: boolean }
+  ) {
+    let integration: OrgIntegration;
+    [integration] = await this.integrations.loadIntegrationsByOrgId(
+      args.orgId,
       this.orgIntegrationType,
       this.provider
     );
 
     if (!integration) {
-      await this.integrations.createOrgIntegration(
+      integration = await this.integrations.createOrgIntegration(
         {
-          name: this.provider,
-          org_id: orgId,
+          name: args.name,
+          org_id: args.orgId,
           provider: this.provider,
           type: this.orgIntegrationType,
           is_enabled: true,
@@ -69,7 +72,7 @@ export abstract class OAuthIntegration {
               : "production",
           },
         },
-        `Organization:${orgId}`
+        `Organization:${args.orgId}`
       );
     } else {
       await this.integrations.updateOrgIntegration(
@@ -86,7 +89,16 @@ export abstract class OAuthIntegration {
           },
           invalid_credentials: false,
         },
-        `Organization:${orgId}`
+        `Organization:${args.orgId}`
+      );
+    }
+
+    if (args.isDefault) {
+      await this.integrations.setDefaultOrgIntegration(
+        integration.id,
+        this.orgIntegrationType,
+        args.orgId,
+        `Organization:${args.orgId}`
       );
     }
   }
@@ -96,12 +108,13 @@ export abstract class OAuthIntegration {
       .get("/authorize", authenticate(), async (req, res, next) => {
         try {
           const orgId = req.context.user!.org_id;
+          const { isDefault, name } = req.query;
           if (!(await this.orgHasAccessToIntegration(orgId))) {
             res.status(403).send("Not authorized");
             return;
           }
           const state = random(16);
-          await this.storeState(state, { orgId });
+          await this.storeState(state, { orgId, isDefault: isDefault === "true", name });
           const url = this.buildAuthorizationUrl(state);
           res.redirect(url);
         } catch (error) {
@@ -111,14 +124,25 @@ export abstract class OAuthIntegration {
       })
       .get("/redirect", async (req, res, next) => {
         try {
+          const response = (success: boolean) => /* html */ `
+            <script>
+              window.opener.postMessage({ success: ${success} });
+              window.close();
+            </script>
+          `;
+
           const { state, code } = req.query;
           if (typeof state !== "string" || typeof code !== "string") {
-            res.redirect(this.redirectCallbackUrl);
+            res.send(response(false));
           } else {
-            const { orgId } = await this.getState<{ orgId: number }>(state);
+            const args = await this.getState<{
+              orgId: number;
+              isDefault: boolean;
+              name: string;
+            }>(state);
             const credentials = await this.getAccessAndRefreshToken(code);
-            await this.storeCredentials(orgId, credentials);
-            res.redirect(this.redirectCallbackUrl);
+            await this.storeCredentials(credentials, args);
+            res.send(response(true));
           }
         } catch (error) {
           console.log(error);

@@ -160,9 +160,14 @@
     "context": "You will not be able to change this value after it is created."
   },
   {
-    "term": "component.add-signature-api-key-dialog.title",
-    "definition": "Enter your API Key",
-    "context": "Enter your API Key"
+    "term": "component.add-signature-credentials-dialog.docusign-allow-access.button",
+    "definition": "Allow access",
+    "context": "Allow access"
+  },
+  {
+    "term": "component.add-signature-credentials-dialog.title",
+    "definition": "New signature provider",
+    "context": "New signature provider"
   },
   {
     "term": "component.admin-organizations-list-table-header.create-organization",
@@ -1771,13 +1776,13 @@
   },
   {
     "term": "component.feature-flag-descriptions.petition-signature-description",
-    "definition": "Activates the Signaturit integration section so that the TOKEN API can be entered.",
-    "context": "Activates the Signaturit integration section so that the TOKEN API can be entered."
+    "definition": "Activates the signature integrations section so that the signature providers can be created and used.",
+    "context": "Activates the signature integrations section so that the signature providers can be created and used."
   },
   {
     "term": "component.feature-flag-descriptions.petition-signature-name",
-    "definition": "Signaturit Integration",
-    "context": "Signaturit Integration"
+    "definition": "Signature Integration",
+    "context": "Signature Integration"
   },
   {
     "term": "component.feature-flag-descriptions.prefill-data-public-links-description",
@@ -7615,6 +7620,11 @@
     "context": "Can't find the integration you need?"
   },
   {
+    "term": "organization.integrations.docusign-description",
+    "definition": "Add digital signature to your parallels.",
+    "context": "Add digital signature to your parallels."
+  },
+  {
     "term": "organization.integrations.dow-jones-contact-message",
     "definition": "Hi, I would like more information about Dow Jones integration.",
     "context": "Hi, I would like more information about Dow Jones integration."
@@ -7680,9 +7690,9 @@
     "context": "Signature integrations"
   },
   {
-    "term": "organization.signature.add-new-token",
-    "definition": "Add token",
-    "context": "Add token"
+    "term": "organization.signature.add-new-provider",
+    "definition": "Add provider",
+    "context": "Add provider"
   },
   {
     "term": "organization.usage.title",
@@ -8238,11 +8248,6 @@
     "term": "page.reports.title",
     "definition": "Reports",
     "context": "Reports"
-  },
-  {
-    "term": "page.signature.consent-required",
-    "definition": "Consent required",
-    "context": "Consent required"
   },
   {
     "term": "page.signature.consent-required-popover",

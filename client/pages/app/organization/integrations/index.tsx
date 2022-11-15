@@ -108,7 +108,7 @@ function OrganizationIntegrations() {
       href: "/app/organization/integrations/signature",
     },
     {
-      isDisabled: !hasAdminRole,
+      isDisabled: !hasAdminRole || !me.hasPetitionSignature,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/docusign.png`}
@@ -116,12 +116,17 @@ function OrganizationIntegrations() {
           maxWidth="124px"
         />
       ),
+      badge: me.organization.hasDocuSign ? (
+        <Badge colorScheme="green">
+          <FormattedMessage id="generic.activated" defaultMessage="Activated" />
+        </Badge>
+      ) : null,
       title: "DocuSign",
       body: intl.formatMessage({
         id: "organization.integrations.docusign-description",
         defaultMessage: "Add digital signature to your parallels.",
       }),
-      href: "/api/oauth/docusign/authorize",
+      href: "/app/organization/integrations/signature",
     },
     {
       isDisabled: !hasAdminRole,
@@ -320,6 +325,7 @@ OrganizationIntegrations.queries = [
         organization {
           id
           hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
+          hasDocuSign: hasIntegration(integration: SIGNATURE, provider: "DOCUSIGN")
           integrations(type: DOW_JONES_KYC, limit: 1, offset: 0) {
             items {
               id

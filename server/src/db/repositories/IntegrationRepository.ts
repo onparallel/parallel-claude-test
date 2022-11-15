@@ -197,24 +197,29 @@ export class IntegrationRepository extends BaseRepository {
     return count === new Set(ids).size;
   }
 
-  async setDefaultOrgIntegration(id: number, type: IntegrationType, user: User) {
+  async setDefaultOrgIntegration(
+    id: number,
+    type: IntegrationType,
+    orgId: number,
+    updatedBy: string
+  ) {
     return this.withTransaction(async (t) => {
       const [integration] = await this.from("org_integration", t)
-        .where({ id, org_id: user.org_id, type, deleted_at: null })
+        .where({ id, org_id: orgId, type, deleted_at: null })
         .update(
           {
             is_default: true,
-            updated_by: `User:${user.id}`,
+            updated_by: updatedBy,
             updated_at: this.now(),
           },
           "*"
         );
       await this.from("org_integration", t)
-        .where({ org_id: user.org_id, is_default: true, type, deleted_at: null })
+        .where({ org_id: orgId, is_default: true, type, deleted_at: null })
         .whereNot("id", id)
         .update({
           is_default: false,
-          updated_by: `User:${user.id}`,
+          updated_by: updatedBy,
           updated_at: this.now(),
         });
       return integration;

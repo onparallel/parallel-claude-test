@@ -1,19 +1,37 @@
+import { gql, useMutation } from "@apollo/client";
 import { Button } from "@chakra-ui/button";
-import { Checkbox } from "@chakra-ui/checkbox";
 import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/form-control";
-import { Input } from "@chakra-ui/input";
-import { HStack, Stack, Text } from "@chakra-ui/layout";
-import { Select } from "@chakra-ui/select";
+import { Flex, HStack, Stack, Text } from "@chakra-ui/layout";
+import {
+  Checkbox,
+  Image,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Radio,
+  RadioGroup,
+  Spinner,
+  useCounter,
+} from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { NormalLink } from "@parallel/components/common/Link";
-import { SignatureOrgIntegrationProvider } from "@parallel/graphql/__types";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { Steps } from "@parallel/components/common/Steps";
+import {
+  AddSignatureCredentialsDialog_validateSignatureCredentialsDocument,
+  SignatureOrgIntegrationProvider,
+} from "@parallel/graphql/__types";
+import { withError } from "@parallel/utils/promises/withError";
+import { useDocusignConsentPopup } from "@parallel/utils/useDocusignConsentPopup";
+import { useState } from "react";
+import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
+const PROVIDERS: SignatureOrgIntegrationProvider[] = ["SIGNATURIT", "DOCUSIGN"];
 type SignatureCredentials<TProvider extends SignatureOrgIntegrationProvider> = {
   SIGNATURIT: { API_KEY: string };
+  DOCUSIGN: {};
 }[TProvider];
 
 interface AddSignatureCredentialsDialogData<
@@ -26,100 +44,124 @@ interface AddSignatureCredentialsDialogData<
 }
 
 function AddSignatureCredentialsDialog({
-  validateCredentials,
   ...props
-}: DialogProps<
-  {
-    validateCredentials<TProvider extends SignatureOrgIntegrationProvider>(
-      provider: TProvider,
-      c: SignatureCredentials<TProvider>
-    ): Promise<{ success: boolean; data?: any }>;
-  },
-  AddSignatureCredentialsDialogData
->) {
+}: DialogProps<{}, AddSignatureCredentialsDialogData>) {
+  const {
+    valueAsNumber: currentStep,
+    isAtMin: isFirstStep,
+    isAtMax: isLastStep,
+    increment: nextStep,
+    decrement: previousStep,
+  } = useCounter({ min: 0, max: 1, defaultValue: 0 });
+
   const form = useForm<AddSignatureCredentialsDialogData>({
     defaultValues: {
-      name: "Signaturit",
       provider: "SIGNATURIT",
-      credentials: {},
       isDefault: false,
     },
+    reValidateMode: "onSubmit",
   });
 
-  const {
-    handleSubmit,
-    register,
-    formState: { errors, isSubmitting },
-  } = form;
+  const selectedProvider = form.watch("provider");
 
-  async function handleValidateSignaturitApiKey(apiKey: string) {
-    const result = await validateCredentials("SIGNATURIT", {
-      API_KEY: apiKey,
-    });
-    return result.success;
+  async function submitForm() {
+    const [error] = await withError(
+      form.handleSubmit(props.onResolve, (d) => {
+        throw new Error();
+      })
+    );
+    if (!error) {
+      props.onResolve(form.getValues());
+    }
+  }
+
+  const [consentState, setConsentState] = useState<"IDLE" | "AWAITING">("IDLE");
+
+  const showDocusignConsentPopup = useDocusignConsentPopup();
+
+  async function handleConfirmClick() {
+    if (isLastStep) {
+      if (selectedProvider === "DOCUSIGN") {
+        setConsentState("AWAITING");
+        const [error] = await withError(
+          showDocusignConsentPopup({
+            isDefault: form.getValues("isDefault"),
+            name: form.getValues("name"),
+          })
+        );
+        setConsentState("IDLE");
+        if (!error) {
+          props.onResolve(form.getValues());
+        }
+      } else {
+        await submitForm();
+      }
+    } else {
+      nextStep();
+    }
+  }
+
+  function handleCancelClick() {
+    if (isFirstStep) {
+      props.onReject();
+    } else {
+      previousStep();
+    }
   }
 
   return (
     <ConfirmDialog
       hasCloseButton
       closeOnOverlayClick={false}
-      content={{
-        as: "form",
-        onSubmit: handleSubmit(async (data) => {
-          return props.onResolve(data);
-        }),
-      }}
       header={
-        <Text>
-          <FormattedMessage
-            id="component.add-signature-api-key-dialog.title"
-            defaultMessage="Enter your API Key"
-          />
-        </Text>
+        <Flex alignItems="baseline">
+          <Text>
+            <FormattedMessage
+              id="component.add-signature-credentials-dialog.title"
+              defaultMessage="New signature provider"
+            />
+          </Text>
+          <Text marginLeft={2} color="gray.600" fontSize="md" fontWeight="400">
+            {currentStep + 1}/2
+          </Text>
+        </Flex>
       }
       body={
-        <Stack spacing={4}>
-          <FormControl id="provider">
-            <FormLabel>
-              <FormattedMessage id="generic.integration-provider" defaultMessage="Provider" />
-            </FormLabel>
-            <Select variant="outline" placeholder="Signaturit" isDisabled={true} />
-          </FormControl>
-          <FormControl id="name" isInvalid={!!errors.name}>
-            <FormLabel>
-              <FormattedMessage id="generic.integration-name" defaultMessage="Name" />
-            </FormLabel>
-            <Stack>
-              <Input {...register("name", { required: true })} />
-              <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.required-field-error"
-                  defaultMessage="The field is required"
-                />
-              </FormErrorMessage>
-              <Text fontSize="sm">
-                <FormattedMessage
-                  id="component.add-signature-api-key-dialog.name-help"
-                  defaultMessage="You will not be able to change this value after it is created."
-                />
-              </Text>
-            </Stack>
-          </FormControl>
-          <FormProvider {...form}>
-            <SignaturitCredentialsInput validateApiKey={handleValidateSignaturitApiKey} />
-          </FormProvider>
-
-          <Checkbox {...register("isDefault")}>
-            <FormattedMessage
-              id="component.add-signature-api-key-dialog.checkbox-set-default"
-              defaultMessage="Set as default"
-            />
-          </Checkbox>
-        </Stack>
+        <FormProvider {...form}>
+          <Steps currentStep={currentStep}>
+            <AddSignatureCredentialsStep1 />
+            <AddSignatureCredentialsStep2 />
+          </Steps>
+        </FormProvider>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" variant="solid" isLoading={isSubmitting}>
-          <FormattedMessage id="generic.accept" defaultMessage="Accept" />
+        <Button
+          colorScheme="primary"
+          variant="solid"
+          onClick={handleConfirmClick}
+          isLoading={form.formState.isSubmitting || consentState === "AWAITING"}
+        >
+          {isLastStep ? (
+            selectedProvider === "DOCUSIGN" ? (
+              <FormattedMessage
+                id="component.add-signature-credentials-dialog.docusign-allow-access.button"
+                defaultMessage="Allow access"
+              />
+            ) : (
+              <FormattedMessage id="generic.accept" defaultMessage="Accept" />
+            )
+          ) : (
+            <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+          )}
+        </Button>
+      }
+      cancel={
+        <Button onClick={handleCancelClick}>
+          {isFirstStep ? (
+            <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+          ) : (
+            <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
+          )}
         </Button>
       }
       {...props}
@@ -131,16 +173,44 @@ export function useAddSignatureCredentialsDialog() {
   return useDialog(AddSignatureCredentialsDialog);
 }
 
-function SignaturitCredentialsInput({
-  validateApiKey,
-}: {
-  validateApiKey: (apiKey: string) => Promise<boolean>;
-}) {
+function AddSignatureCredentialsStep1() {
+  const { control } = useFormContext<AddSignatureCredentialsDialogData>();
+
+  return (
+    <FormControl id="provider">
+      <Controller
+        name="provider"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <RadioGroup as={Stack} value={value} onChange={onChange}>
+            {PROVIDERS.map((value, i) => (
+              <Radio value={value} key={i}>
+                <Image
+                  src={`${
+                    process.env.NEXT_PUBLIC_ASSETS_URL
+                  }/static/logos/${value.toLowerCase()}.png`}
+                  alt={value}
+                  maxWidth="124px"
+                />
+              </Radio>
+            ))}
+          </RadioGroup>
+        )}
+      />
+    </FormControl>
+  );
+}
+
+function SignaturitCredentialsInput() {
   const intl = useIntl();
   const {
     formState: { errors },
     register,
   } = useFormContext<AddSignatureCredentialsDialogData<"SIGNATURIT">>();
+
+  const [validateSignatureCredentials, { loading: isValidating }] = useMutation(
+    AddSignatureCredentialsDialog_validateSignatureCredentialsDocument
+  );
 
   return (
     <FormControl id="apikey" isInvalid={!!errors.credentials}>
@@ -159,12 +229,24 @@ function SignaturitCredentialsInput({
         </HStack>
       </FormLabel>
       <Stack>
-        <Input
-          {...register("credentials.API_KEY", {
-            required: true,
-            validate: validateApiKey,
-          })}
-        />
+        <InputGroup>
+          <Input
+            {...register("credentials.API_KEY", {
+              required: true,
+              validate: async (apiKey: string) => {
+                const data = await validateSignatureCredentials({
+                  variables: { provider: "SIGNATURIT", credentials: { API_KEY: apiKey } },
+                });
+                return data.data?.validateSignatureCredentials.success ?? false;
+              },
+            })}
+          />
+          <InputRightElement>
+            {isValidating ? (
+              <Spinner thickness="2px" speed="0.65s" emptyColor="gray.200" color="gray.500" />
+            ) : null}
+          </InputRightElement>
+        </InputGroup>
         <FormErrorMessage>
           <FormattedMessage
             id="component.add-signature-api-key-dialog.api-key-required-error"
@@ -195,3 +277,62 @@ function SignaturitCredentialsInput({
     </FormControl>
   );
 }
+
+function AddSignatureCredentialsStep2() {
+  const {
+    register,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useFormContext<AddSignatureCredentialsDialogData>();
+
+  const selectedProvider = watch("provider");
+  setValue("name", selectedProvider[0].toUpperCase() + selectedProvider.substring(1).toLowerCase());
+
+  return (
+    <Stack>
+      <FormControl id="name" isInvalid={!!errors.name}>
+        <FormLabel>
+          <FormattedMessage id="generic.integration-name" defaultMessage="Name" />
+        </FormLabel>
+        <Stack>
+          <Input {...register("name", { required: true })} />
+          <FormErrorMessage>
+            <FormattedMessage
+              id="generic.required-field-error"
+              defaultMessage="The field is required"
+            />
+          </FormErrorMessage>
+          <Text fontSize="sm">
+            <FormattedMessage
+              id="component.add-signature-api-key-dialog.name-help"
+              defaultMessage="You will not be able to change this value after it is created."
+            />
+          </Text>
+        </Stack>
+      </FormControl>
+      {selectedProvider === "SIGNATURIT" ? <SignaturitCredentialsInput /> : null}
+      <FormControl>
+        <Checkbox {...register("isDefault")}>
+          <FormattedMessage
+            id="component.add-signature-api-key-dialog.checkbox-set-default"
+            defaultMessage="Set as default"
+          />
+        </Checkbox>
+      </FormControl>
+    </Stack>
+  );
+}
+
+const _mutations = [
+  gql`
+    mutation AddSignatureCredentialsDialog_validateSignatureCredentials(
+      $provider: SignatureOrgIntegrationProvider!
+      $credentials: JSONObject!
+    ) {
+      validateSignatureCredentials(provider: $provider, credentials: $credentials) {
+        success
+      }
+    }
+  `,
+];

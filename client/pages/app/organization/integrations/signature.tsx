@@ -12,7 +12,7 @@ import {
   Tooltip,
   useToast,
 } from "@chakra-ui/react";
-import { DeleteIcon, RepeatIcon, StarIcon } from "@parallel/chakra/icons";
+import { AlertCircleFilledIcon, DeleteIcon, RepeatIcon, StarIcon } from "@parallel/chakra/icons";
 import { ContactSupportAlert } from "@parallel/components/common/ContactSupportAlert";
 import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -32,17 +32,19 @@ import {
   IntegrationsSignature_markSignatureIntegrationAsDefaultDocument,
   IntegrationsSignature_SignatureOrgIntegrationFragment,
   IntegrationsSignature_userDocument,
-  IntegrationsSignature_validateSignatureCredentialsDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { withError } from "@parallel/utils/promises/withError";
 import { integer, parseQuery, useQueryState, values } from "@parallel/utils/queryState";
+import { useDocusignConsentPopup } from "@parallel/utils/useDocusignConsentPopup";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { pick } from "remeda";
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -54,6 +56,7 @@ interface SignatureTokensTableContext {
   numberOfIntegrations: number;
   onDeleteIntegration: (id: string) => void;
   onMarkIntegrationAsDefault: (id: string) => void;
+  refetch: () => Promise<any>;
 }
 
 function IntegrationsSignature() {
@@ -81,19 +84,9 @@ function IntegrationsSignature() {
   const [createSignaturitIntegration] = useMutation(
     IntegrationsSignature_createSignaturitIntegrationDocument
   );
-  const [validateSignatureCredentials] = useMutation(
-    IntegrationsSignature_validateSignatureCredentialsDocument
-  );
   const handleAddSignatureProvider = async () => {
     try {
-      const data = await showAddSignatureCredentialsDialog({
-        validateCredentials: async (provider, credentials) => {
-          const response = await validateSignatureCredentials({
-            variables: { provider, credentials },
-          });
-          return { success: response.data?.validateSignatureCredentials.success ?? false };
-        },
-      });
+      const data = await showAddSignatureCredentialsDialog();
       if (data.provider === "SIGNATURIT") {
         await createSignaturitIntegration({
           variables: {
@@ -102,8 +95,8 @@ function IntegrationsSignature() {
             name: data.name,
           },
         });
-        refetch();
       }
+      refetch();
     } catch (error) {
       if (isDialogError(error)) {
         return;
@@ -165,6 +158,7 @@ function IntegrationsSignature() {
     numberOfIntegrations,
     onDeleteIntegration: handleDeleteIntegration,
     onMarkIntegrationAsDefault: handleMarkIntegrationAsDefault,
+    refetch,
   } as SignatureTokensTableContext;
 
   return (
@@ -227,8 +221,8 @@ function IntegrationsSignature() {
                 onClick={handleAddSignatureProvider}
               >
                 <FormattedMessage
-                  id="organization.signature.add-new-token"
-                  defaultMessage="Add token"
+                  id="organization.signature.add-new-provider"
+                  defaultMessage="Add provider"
                 />
               </Button>
             </Stack>
@@ -275,13 +269,19 @@ function useSignatureTokensTableColumns() {
             id: "generic.integration-name",
             defaultMessage: "Name",
           }),
-          CellContent: ({ row }) => {
+          CellContent: ({ row, context }) => {
+            const showDocusignConsentPopup = useDocusignConsentPopup();
+            async function handleConsentClick() {
+              const [error] = await withError(
+                showDocusignConsentPopup(pick(row, ["isDefault", "name"]))
+              );
+              if (!error) {
+                context.refetch();
+              }
+            }
             return (
               <>
-                <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
-                  {row.name}
-                </Text>
-                {row.consentRequiredUrl ? (
+                {row.provider === "DOCUSIGN" && row.invalidCredentials ? (
                   <SmallPopover
                     content={
                       <Text fontSize="sm">
@@ -290,23 +290,19 @@ function useSignatureTokensTableColumns() {
                           defaultMessage="<a>Click here</a> to give us your consent to send signatures on your behalf."
                           values={{
                             a: (chunks: any[]) => (
-                              <NormalLink href={row.consentRequiredUrl!} target="_blank">
-                                {chunks}
-                              </NormalLink>
+                              <NormalLink onClick={handleConsentClick}>{chunks}</NormalLink>
                             ),
                           }}
                         />
                       </Text>
                     }
                   >
-                    <Badge marginLeft={2} colorScheme="red" cursor="pointer">
-                      <FormattedMessage
-                        id="page.signature.consent-required"
-                        defaultMessage="Consent required"
-                      />
-                    </Badge>
+                    <AlertCircleFilledIcon color="yellow.500" marginRight={1} />
                   </SmallPopover>
                 ) : null}
+                <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
+                  {row.name}
+                </Text>
               </>
             );
           },
@@ -447,22 +443,12 @@ IntegrationsSignature.fragments = {
       provider
       isDefault
       environment
-      consentRequiredUrl
+      invalidCredentials
     }
   `,
 };
 
 IntegrationsSignature.mutations = [
-  gql`
-    mutation IntegrationsSignature_validateSignatureCredentials(
-      $provider: SignatureOrgIntegrationProvider!
-      $credentials: JSONObject!
-    ) {
-      validateSignatureCredentials(provider: $provider, credentials: $credentials) {
-        success
-      }
-    }
-  `,
   gql`
     mutation IntegrationsSignature_createSignaturitIntegration(
       $name: String!

@@ -6413,6 +6413,18 @@ export type DocumentThemeSelect_OrganizationThemeFragment = {
   isDefault: boolean;
 };
 
+export type AddSignatureCredentialsDialog_validateSignatureCredentialsMutationVariables = Exact<{
+  provider: SignatureOrgIntegrationProvider;
+  credentials: Scalars["JSONObject"];
+}>;
+
+export type AddSignatureCredentialsDialog_validateSignatureCredentialsMutation = {
+  validateSignatureCredentials: {
+    __typename?: "ValidateSignatureCredentialsResult";
+    success: boolean;
+  };
+};
+
 export type CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment = {
   __typename?: "OrganizationTheme";
   name: string;
@@ -15774,6 +15786,7 @@ export type OrganizationIntegrations_userQuery = {
       id: string;
       name: string;
       hasDowJones: boolean;
+      hasDocuSign: boolean;
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
@@ -15839,18 +15852,6 @@ export type IntegrationsSignature_SignatureOrgIntegrationFragment = {
   isDefault: boolean;
   environment: SignatureOrgIntegrationEnvironment;
   invalidCredentials: boolean;
-};
-
-export type IntegrationsSignature_validateSignatureCredentialsMutationVariables = Exact<{
-  provider: SignatureOrgIntegrationProvider;
-  credentials: Scalars["JSONObject"];
-}>;
-
-export type IntegrationsSignature_validateSignatureCredentialsMutation = {
-  validateSignatureCredentials: {
-    __typename?: "ValidateSignatureCredentialsResult";
-    success: boolean;
-  };
 };
 
 export type IntegrationsSignature_createSignaturitIntegrationMutationVariables = Exact<{
@@ -32342,6 +32343,19 @@ export const BrandingGeneral_updateOrganizationBrandThemeDocument = gql`
   BrandingGeneral_updateOrganizationBrandThemeMutation,
   BrandingGeneral_updateOrganizationBrandThemeMutationVariables
 >;
+export const AddSignatureCredentialsDialog_validateSignatureCredentialsDocument = gql`
+  mutation AddSignatureCredentialsDialog_validateSignatureCredentials(
+    $provider: SignatureOrgIntegrationProvider!
+    $credentials: JSONObject!
+  ) {
+    validateSignatureCredentials(provider: $provider, credentials: $credentials) {
+      success
+    }
+  }
+` as unknown as DocumentNode<
+  AddSignatureCredentialsDialog_validateSignatureCredentialsMutation,
+  AddSignatureCredentialsDialog_validateSignatureCredentialsMutationVariables
+>;
 export const CreateUserDialog_emailIsAvailableDocument = gql`
   query CreateUserDialog_emailIsAvailable($email: String!) {
     emailIsAvailable(email: $email)
@@ -34437,6 +34451,7 @@ export const OrganizationIntegrations_userDocument = gql`
       organization {
         id
         hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
+        hasDocuSign: hasIntegration(integration: SIGNATURE, provider: "DOCUSIGN")
         integrations(type: DOW_JONES_KYC, limit: 1, offset: 0) {
           items {
             id
@@ -34484,19 +34499,6 @@ export const OrganizationIntegrations_deleteDowJonesKycIntegrationDocument = gql
 ` as unknown as DocumentNode<
   OrganizationIntegrations_deleteDowJonesKycIntegrationMutation,
   OrganizationIntegrations_deleteDowJonesKycIntegrationMutationVariables
->;
-export const IntegrationsSignature_validateSignatureCredentialsDocument = gql`
-  mutation IntegrationsSignature_validateSignatureCredentials(
-    $provider: SignatureOrgIntegrationProvider!
-    $credentials: JSONObject!
-  ) {
-    validateSignatureCredentials(provider: $provider, credentials: $credentials) {
-      success
-    }
-  }
-` as unknown as DocumentNode<
-  IntegrationsSignature_validateSignatureCredentialsMutation,
-  IntegrationsSignature_validateSignatureCredentialsMutationVariables
 >;
 export const IntegrationsSignature_createSignaturitIntegrationDocument = gql`
   mutation IntegrationsSignature_createSignaturitIntegration(

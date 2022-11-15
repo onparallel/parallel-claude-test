@@ -121,12 +121,12 @@ export function useFeatureFlags() {
         name: "PETITION_SIGNATURE",
         title: intl.formatMessage({
           id: "component.feature-flag-descriptions.petition-signature-name",
-          defaultMessage: "Signaturit Integration",
+          defaultMessage: "Signature Integration",
         }),
         description: intl.formatMessage({
           id: "component.feature-flag-descriptions.petition-signature-description",
           defaultMessage:
-            "Activates the Signaturit integration section so that the TOKEN API can be entered.",
+            "Activates the signature integrations section so that the signature providers can be created and used.",
         }),
       },
       {

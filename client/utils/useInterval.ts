@@ -1,12 +1,24 @@
 import { DependencyList, useEffect } from "react";
 import { isDefined } from "remeda";
 
+interface UserIntervalOptions {
+  delay?: number;
+  isRunning?: boolean;
+}
+
 export function useInterval(
   effect: (clearTimeout: () => void) => void,
-  ms?: number,
+  delayOrOptions?: number | UserIntervalOptions,
   deps?: DependencyList
 ) {
+  const { delay, isRunning = true } =
+    typeof delayOrOptions === "number"
+      ? { delay: delayOrOptions, isRunning: true }
+      : delayOrOptions ?? {};
   useEffect(() => {
+    if (!isRunning) {
+      return;
+    }
     let interval: any = undefined;
     const clear = () => {
       if (isDefined(interval)) {
@@ -14,7 +26,7 @@ export function useInterval(
         interval = undefined;
       }
     };
-    interval = setInterval(() => effect(clear), ms);
+    interval = setInterval(() => effect(clear), delay);
     return clear;
-  }, deps);
+  }, [...(deps ?? []), isRunning, delay]);
 }

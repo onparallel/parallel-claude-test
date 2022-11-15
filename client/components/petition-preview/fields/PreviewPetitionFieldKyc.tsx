@@ -36,8 +36,9 @@ import { PreviewPetitionFieldKyc_PetitionBaseFragment } from "@parallel/graphql/
 import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { useInterval } from "@parallel/utils/useInterval";
+import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
@@ -93,16 +94,16 @@ export function PreviewPetitionFieldKyc({
     [onRefreshField, state, field.replies.length]
   );
 
-  useEffect(() => {
-    const handler = function (e: MessageEvent) {
+  useWindowEvent(
+    "message",
+    (e) => {
       const browserTab = browserTabRef.current;
       if (isDefined(browserTab) && e.source === browserTab && e.data === "refresh") {
         onRefreshField();
       }
-    };
-    window.addEventListener("message", handler);
-    return () => window.removeEventListener("message", handler);
-  }, [onRefreshField]);
+    },
+    [onRefreshField]
+  );
 
   const showDowJonesRestrictedDialog = usePreviewDowJonesPermissionDeniedDialog();
   const handleStart = async () => {

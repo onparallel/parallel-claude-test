@@ -3,9 +3,10 @@ import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
 import { useTone } from "@parallel/components/common/ToneProvider";
 import { centeredPopup, openNewWindow } from "@parallel/utils/openNewWindow";
 import { useInterval } from "@parallel/utils/useInterval";
+import { useWindowEvent } from "@parallel/utils/useWindowEvent";
 import { isDefined } from "@udecode/plate-core";
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { useOverwriteDocumentationDialog } from "../dialogs/OverwriteDocumentationDialog";
 import {
@@ -78,8 +79,9 @@ export function RecipientViewPetitionFieldTaxDocuments({
     [onRefreshField, state, field.replies.length, bankflipSessionReady]
   );
 
-  useEffect(() => {
-    const handler = function (e: MessageEvent) {
+  useWindowEvent(
+    "message",
+    (e) => {
       const popup = popupRef.current;
       if (isDefined(popup) && e.source === popup) {
         // TODO Bankflip Legacy: legacy event, will be removed by Bankflip on May 2023
@@ -101,10 +103,9 @@ export function RecipientViewPetitionFieldTaxDocuments({
           }
         }
       }
-    };
-    window.addEventListener("message", handler);
-    return () => window.removeEventListener("message", handler);
-  }, [onRefreshField]);
+    },
+    [onRefreshField]
+  );
 
   const handleStart = async () => {
     try {

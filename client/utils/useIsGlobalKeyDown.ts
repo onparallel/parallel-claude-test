@@ -1,29 +1,32 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useWindowEvent } from "./useWindowEvent";
 
 export function useIsGlobalKeyDown(key: string) {
   const [isKeyDown, setIsKeyDown] = useState(false);
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
+  useWindowEvent(
+    "keydown",
+    function handleKeyDown(e) {
       if (e.key === key) {
         setIsKeyDown(true);
       }
-    }
-    function handleKeyUp(e: KeyboardEvent) {
+    },
+    []
+  );
+  useWindowEvent(
+    "keyup",
+    function handleKeyUp(e) {
       if (e.key === key) {
         setIsKeyDown(false);
       }
-    }
+    },
+    []
+  );
+  useWindowEvent(
+    "blur",
     function handleBlur() {
       setIsKeyDown(false);
-    }
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-    window.addEventListener("blur", handleBlur);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
-      window.removeEventListener("blur", handleBlur);
-    };
-  }, []);
+    },
+    []
+  );
   return isKeyDown;
 }

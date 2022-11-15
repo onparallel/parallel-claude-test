@@ -23,7 +23,12 @@ export const markSignatureIntegrationAsDefault = mutationField(
       id: nonNull(globalIdArg("OrgIntegration")),
     },
     resolve: async (_, { id }, ctx) => {
-      return await ctx.integrations.setDefaultOrgIntegration(id, "SIGNATURE", ctx.user!);
+      return await ctx.integrations.setDefaultOrgIntegration(
+        id,
+        "SIGNATURE",
+        ctx.user!.org_id,
+        `User:${ctx.user!.id}`
+      );
     },
   }
 );
@@ -96,7 +101,8 @@ export const createSignaturitIntegration = mutationField("createSignaturitIntegr
       return await ctx.integrations.setDefaultOrgIntegration(
         newIntegration.id,
         "SIGNATURE",
-        ctx.user!
+        ctx.user!.org_id,
+        `User:${ctx.user!.id}`
       );
     } else {
       return newIntegration;
