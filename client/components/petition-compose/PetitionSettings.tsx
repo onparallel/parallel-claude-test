@@ -293,13 +293,12 @@ function _PetitionSettings({
     if (enable) {
       try {
         await showTemplateDefaultPermissionsDialog({
+          petitionId: petition.id,
           userId: user.id,
-          petition,
           onUpdatePermissions: async (permissions) => {
-            const { data } = await updateTemplateDefaultPermissions({
+            await updateTemplateDefaultPermissions({
               variables: { templateId: petition.id, permissions },
             });
-            return data!.updateTemplateDefaultPermissions;
           },
         });
       } catch {}
@@ -905,8 +904,10 @@ const fragments = {
           isActive
           ...PublicLinkSettingsDialog_PublicPetitionLink
         }
+        defaultPermissions {
+          id
+        }
         defaultPath
-        ...TemplateDefaultPermissionsDialog_PetitionTemplate
       }
       isAnonymized
     }
@@ -914,7 +915,6 @@ const fragments = {
     ${CompliancePeriodDialog.fragments.PetitionBase}
     ${PublicLinkSettingsDialog.fragments.PetitionTemplate}
     ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
-    ${TemplateDefaultPermissionsDialog.fragments.PetitionTemplate}
   `,
 };
 const mutations = [

@@ -9010,7 +9010,6 @@ export type TemplateDefaultPermissionsDialog_PetitionTemplateFragment = {
     isSubscribed: boolean;
     user: { __typename?: "User"; id: string };
   }>;
-  publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
   defaultPermissions: Array<
     | {
         __typename?: "TemplateDefaultUserGroupPermission";
@@ -9040,6 +9039,54 @@ export type TemplateDefaultPermissionsDialog_PetitionTemplateFragment = {
         };
       }
   >;
+};
+
+export type TemplateDefaultPermissionsDialog_petitionQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type TemplateDefaultPermissionsDialog_petitionQuery = {
+  petition?:
+    | { __typename?: "Petition"; id: string }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        effectiveDefaultPermissions: Array<{
+          __typename?: "EffectivePetitionUserPermission";
+          isSubscribed: boolean;
+          user: { __typename?: "User"; id: string };
+        }>;
+        defaultPermissions: Array<
+          | {
+              __typename?: "TemplateDefaultUserGroupPermission";
+              id: string;
+              isSubscribed: boolean;
+              permissionType: PetitionPermissionType;
+              group: {
+                __typename?: "UserGroup";
+                id: string;
+                initials: string;
+                name: string;
+                memberCount: number;
+              };
+            }
+          | {
+              __typename?: "TemplateDefaultUserPermission";
+              id: string;
+              isSubscribed: boolean;
+              permissionType: PetitionPermissionType;
+              user: {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null;
+                email: string;
+                avatarUrl?: string | null;
+                initials?: string | null;
+              };
+            }
+        >;
+      }
+    | null;
 };
 
 export type TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment = {
@@ -9800,46 +9847,16 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     slug: string;
     prefillSecret?: string | null;
   } | null;
+  defaultPermissions: Array<
+    | { __typename?: "TemplateDefaultUserGroupPermission"; id: string }
+    | { __typename?: "TemplateDefaultUserPermission"; id: string }
+  >;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
   } | null;
   organization: { __typename?: "Organization"; customHost?: string | null };
-  effectiveDefaultPermissions: Array<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-    user: { __typename?: "User"; id: string };
-  }>;
-  defaultPermissions: Array<
-    | {
-        __typename?: "TemplateDefaultUserGroupPermission";
-        id: string;
-        isSubscribed: boolean;
-        permissionType: PetitionPermissionType;
-        group: {
-          __typename?: "UserGroup";
-          id: string;
-          initials: string;
-          name: string;
-          memberCount: number;
-        };
-      }
-    | {
-        __typename?: "TemplateDefaultUserPermission";
-        id: string;
-        isSubscribed: boolean;
-        permissionType: PetitionPermissionType;
-        user: {
-          __typename?: "User";
-          id: string;
-          fullName?: string | null;
-          email: string;
-          avatarUrl?: string | null;
-          initials?: string | null;
-        };
-      }
-  >;
   signatureConfig?: {
     __typename?: "SignatureConfig";
     title?: string | null;
@@ -9997,7 +10014,6 @@ export type PetitionSettings_updateTemplateDefaultPermissionsMutation = {
       isSubscribed: boolean;
       user: { __typename?: "User"; id: string };
     }>;
-    publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
     defaultPermissions: Array<
       | {
           __typename?: "TemplateDefaultUserGroupPermission";
@@ -17629,41 +17645,11 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     slug: string;
     prefillSecret?: string | null;
   } | null;
-  selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
-  effectiveDefaultPermissions: Array<{
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-    user: { __typename?: "User"; id: string };
-  }>;
   defaultPermissions: Array<
-    | {
-        __typename?: "TemplateDefaultUserGroupPermission";
-        id: string;
-        isSubscribed: boolean;
-        permissionType: PetitionPermissionType;
-        group: {
-          __typename?: "UserGroup";
-          id: string;
-          initials: string;
-          name: string;
-          memberCount: number;
-        };
-      }
-    | {
-        __typename?: "TemplateDefaultUserPermission";
-        id: string;
-        isSubscribed: boolean;
-        permissionType: PetitionPermissionType;
-        user: {
-          __typename?: "User";
-          id: string;
-          fullName?: string | null;
-          email: string;
-          avatarUrl?: string | null;
-          initials?: string | null;
-        };
-      }
+    | { __typename?: "TemplateDefaultUserGroupPermission"; id: string }
+    | { __typename?: "TemplateDefaultUserPermission"; id: string }
   >;
+  selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   signatureConfig?: {
     __typename?: "SignatureConfig";
     title?: string | null;
@@ -17934,46 +17920,16 @@ export type PetitionCompose_updatePetitionMutation = {
           slug: string;
           prefillSecret?: string | null;
         } | null;
+        defaultPermissions: Array<
+          | { __typename?: "TemplateDefaultUserGroupPermission"; id: string }
+          | { __typename?: "TemplateDefaultUserPermission"; id: string }
+        >;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
         } | null;
         organization: { __typename?: "Organization"; customHost?: string | null };
-        effectiveDefaultPermissions: Array<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string };
-        }>;
-        defaultPermissions: Array<
-          | {
-              __typename?: "TemplateDefaultUserGroupPermission";
-              id: string;
-              isSubscribed: boolean;
-              permissionType: PetitionPermissionType;
-              group: {
-                __typename?: "UserGroup";
-                id: string;
-                initials: string;
-                name: string;
-                memberCount: number;
-              };
-            }
-          | {
-              __typename?: "TemplateDefaultUserPermission";
-              id: string;
-              isSubscribed: boolean;
-              permissionType: PetitionPermissionType;
-              user: {
-                __typename?: "User";
-                id: string;
-                fullName?: string | null;
-                email: string;
-                avatarUrl?: string | null;
-                initials?: string | null;
-              };
-            }
-        >;
         signatureConfig?: {
           __typename?: "SignatureConfig";
           title?: string | null;
@@ -18629,41 +18585,11 @@ export type PetitionCompose_petitionQuery = {
           slug: string;
           prefillSecret?: string | null;
         } | null;
-        selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
-        effectiveDefaultPermissions: Array<{
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string };
-        }>;
         defaultPermissions: Array<
-          | {
-              __typename?: "TemplateDefaultUserGroupPermission";
-              id: string;
-              isSubscribed: boolean;
-              permissionType: PetitionPermissionType;
-              group: {
-                __typename?: "UserGroup";
-                id: string;
-                initials: string;
-                name: string;
-                memberCount: number;
-              };
-            }
-          | {
-              __typename?: "TemplateDefaultUserPermission";
-              id: string;
-              isSubscribed: boolean;
-              permissionType: PetitionPermissionType;
-              user: {
-                __typename?: "User";
-                id: string;
-                fullName?: string | null;
-                email: string;
-                avatarUrl?: string | null;
-                initials?: string | null;
-              };
-            }
+          | { __typename?: "TemplateDefaultUserGroupPermission"; id: string }
+          | { __typename?: "TemplateDefaultUserPermission"; id: string }
         >;
+        selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         signatureConfig?: {
           __typename?: "SignatureConfig";
           title?: string | null;
@@ -25877,6 +25803,73 @@ export const PetitionSharingModal_PetitionBaseFragmentDoc = gql`
   ${PetitionSharingModal_PetitionUserPermissionFragmentDoc}
   ${PetitionSharingModal_PetitionUserGroupPermissionFragmentDoc}
 ` as unknown as DocumentNode<PetitionSharingModal_PetitionBaseFragment, unknown>;
+export const TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragmentDoc = gql`
+  fragment TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission on TemplateDefaultUserPermission {
+    id
+    permissionType
+    user {
+      id
+      fullName
+      email
+      ...UserAvatar_User
+    }
+    isSubscribed
+  }
+  ${UserAvatar_UserFragmentDoc}
+` as unknown as DocumentNode<
+  TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment,
+  unknown
+>;
+export const TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragmentDoc =
+  gql`
+    fragment TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission on TemplateDefaultUserGroupPermission {
+      id
+      permissionType
+      group {
+        id
+        initials
+        name
+        memberCount
+      }
+      isSubscribed
+    }
+  ` as unknown as DocumentNode<
+    TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment,
+    unknown
+  >;
+export const TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragmentDoc = gql`
+  fragment TemplateDefaultPermissionsDialog_TemplateDefaultPermission on TemplateDefaultPermission {
+    id
+    isSubscribed
+    permissionType
+    ... on TemplateDefaultUserPermission {
+      ...TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission
+    }
+    ... on TemplateDefaultUserGroupPermission {
+      ...TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission
+    }
+  }
+  ${TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragmentDoc}
+  ${TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragmentDoc}
+` as unknown as DocumentNode<
+  TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment,
+  unknown
+>;
+export const TemplateDefaultPermissionsDialog_PetitionTemplateFragmentDoc = gql`
+  fragment TemplateDefaultPermissionsDialog_PetitionTemplate on PetitionTemplate {
+    id
+    effectiveDefaultPermissions {
+      user {
+        id
+      }
+      isSubscribed
+    }
+    defaultPermissions {
+      ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
+    }
+  }
+  ${TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragmentDoc}
+` as unknown as DocumentNode<TemplateDefaultPermissionsDialog_PetitionTemplateFragment, unknown>;
 export const TemplateDetailsModal_UserFragmentDoc = gql`
   fragment TemplateDetailsModal_User on User {
     id
@@ -27936,77 +27929,6 @@ export const PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc = gql`
     prefillSecret
   }
 ` as unknown as DocumentNode<PublicLinkSettingsDialog_PublicPetitionLinkFragment, unknown>;
-export const TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragmentDoc = gql`
-  fragment TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission on TemplateDefaultUserPermission {
-    id
-    permissionType
-    user {
-      id
-      fullName
-      email
-      ...UserAvatar_User
-    }
-    isSubscribed
-  }
-  ${UserAvatar_UserFragmentDoc}
-` as unknown as DocumentNode<
-  TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment,
-  unknown
->;
-export const TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragmentDoc =
-  gql`
-    fragment TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission on TemplateDefaultUserGroupPermission {
-      id
-      permissionType
-      group {
-        id
-        initials
-        name
-        memberCount
-      }
-      isSubscribed
-    }
-  ` as unknown as DocumentNode<
-    TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment,
-    unknown
-  >;
-export const TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragmentDoc = gql`
-  fragment TemplateDefaultPermissionsDialog_TemplateDefaultPermission on TemplateDefaultPermission {
-    id
-    isSubscribed
-    permissionType
-    ... on TemplateDefaultUserPermission {
-      ...TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission
-    }
-    ... on TemplateDefaultUserGroupPermission {
-      ...TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission
-    }
-  }
-  ${TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragmentDoc}
-  ${TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragmentDoc}
-` as unknown as DocumentNode<
-  TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment,
-  unknown
->;
-export const TemplateDefaultPermissionsDialog_PetitionTemplateFragmentDoc = gql`
-  fragment TemplateDefaultPermissionsDialog_PetitionTemplate on PetitionTemplate {
-    id
-    effectiveDefaultPermissions {
-      user {
-        id
-      }
-      isSubscribed
-    }
-    publicLink {
-      id
-      isActive
-    }
-    defaultPermissions {
-      ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
-    }
-  }
-  ${TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragmentDoc}
-` as unknown as DocumentNode<TemplateDefaultPermissionsDialog_PetitionTemplateFragment, unknown>;
 export const PetitionSettings_PetitionBaseFragmentDoc = gql`
   fragment PetitionSettings_PetitionBase on PetitionBase {
     id
@@ -28051,8 +27973,10 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
         isActive
         ...PublicLinkSettingsDialog_PublicPetitionLink
       }
+      defaultPermissions {
+        id
+      }
       defaultPath
-      ...TemplateDefaultPermissionsDialog_PetitionTemplate
     }
     isAnonymized
   }
@@ -28060,7 +27984,6 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
   ${CompliancePeriodDialog_PetitionBaseFragmentDoc}
   ${PublicLinkSettingsDialog_PetitionTemplateFragmentDoc}
   ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
-  ${TemplateDefaultPermissionsDialog_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<PetitionSettings_PetitionBaseFragment, unknown>;
 export const PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc = gql`
   fragment PetitionComposeFieldAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
@@ -30489,6 +30412,20 @@ export const PublicLinkSettingsDialog_isValidSlugDocument = gql`
   PublicLinkSettingsDialog_isValidSlugQuery,
   PublicLinkSettingsDialog_isValidSlugQueryVariables
 >;
+export const TemplateDefaultPermissionsDialog_petitionDocument = gql`
+  query TemplateDefaultPermissionsDialog_petition($id: GID!) {
+    petition(id: $id) {
+      id
+      ... on PetitionTemplate {
+        ...TemplateDefaultPermissionsDialog_PetitionTemplate
+      }
+    }
+  }
+  ${TemplateDefaultPermissionsDialog_PetitionTemplateFragmentDoc}
+` as unknown as DocumentNode<
+  TemplateDefaultPermissionsDialog_petitionQuery,
+  TemplateDefaultPermissionsDialog_petitionQueryVariables
+>;
 export const useCuatrecasasExport_fileUploadReplyDownloadLinkDocument = gql`
   mutation useCuatrecasasExport_fileUploadReplyDownloadLink($petitionId: GID!, $replyId: GID!) {
     fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
@@ -32194,7 +32131,7 @@ export const OrganizationIntegrations_userDocument = gql`
             invalidCredentials
           }
         }
-        signatureIntegrations: integrations(type: SIGNATURE, limit: 10, offset: 0) {
+        signatureIntegrations: integrations(type: SIGNATURE, limit: 20, offset: 0) {
           items {
             ... on SignatureOrgIntegration {
               id
