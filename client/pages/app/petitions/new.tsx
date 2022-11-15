@@ -613,7 +613,7 @@ NewPetition.getInitialProps = async ({
         locale: locale,
         isOwner: state.owner,
         category: state.category,
-        path: state.path,
+        path: state.search && state.searchIn === "EVERYWHERE" ? null : state.path,
       },
     }),
     fetchQuery(NewPetition_userDocument),
