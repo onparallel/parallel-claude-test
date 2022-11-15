@@ -15,7 +15,10 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
 import { Link } from "../common/Link";
 import { PetitionFieldComment } from "../common/PetitionFieldComment";
-import { PetitionCommentsAndNotesEditor } from "../petition-common/PetitionCommentsAndNotesEditor";
+import {
+  PetitionCommentsAndNotesEditor,
+  PetitionCommentsAndNotesEditorInstance,
+} from "../petition-common/PetitionCommentsAndNotesEditor";
 
 export interface PetitionRepliesFieldCommentsProps {
   petitionId: string;
@@ -45,6 +48,7 @@ export function PetitionRepliesFieldComments({
   const hasCommentsEnabled = field.isInternal ? false : field.hasCommentsEnabled;
 
   const commentsRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<PetitionCommentsAndNotesEditorInstance>(null);
 
   const { data, loading } = useQuery(PetitionRepliesFieldComments_petitionFieldQueryDocument, {
     variables: { petitionId, petitionFieldId: field.id },
@@ -53,6 +57,10 @@ export function PetitionRepliesFieldComments({
 
   const defaultMentionables = useGetDefaultMentionables(petitionId);
   const comments = data?.petitionField.comments ?? [];
+
+  useEffect(() => {
+    if (!loading) inputRef.current?.focusCurrentInput();
+  }, [loading, inputRef.current]);
 
   // Scroll to bottom when a comment is added
   const previousCommentCount = usePrevious(comments.length);
@@ -172,6 +180,7 @@ export function PetitionRepliesFieldComments({
           onSubmit={async (content, isNote) => {
             await onAddComment(content, isNote);
           }}
+          lastCommentIsNote={comments[comments.length - 1]?.isInternal}
         />
       </Box>
     </Card>

@@ -19,7 +19,10 @@ import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { Link } from "@parallel/components/common/Link";
 import { PetitionFieldComment } from "@parallel/components/common/PetitionFieldComment";
-import { PetitionCommentsAndNotesEditor } from "@parallel/components/petition-common/PetitionCommentsAndNotesEditor";
+import {
+  PetitionCommentsAndNotesEditor,
+  PetitionCommentsAndNotesEditorInstance,
+} from "@parallel/components/petition-common/PetitionCommentsAndNotesEditor";
 import {
   PreviewPetitionFieldCommentsDialog_PetitionFieldFragment,
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
@@ -30,7 +33,7 @@ import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdate
 import { useGetDefaultMentionables } from "@parallel/utils/useGetDefaultMentionables";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useTimeoutEffect } from "@parallel/utils/useTimeoutEffect";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   useCreatePetitionFieldComment,
@@ -72,6 +75,7 @@ export function PreviewPetitionFieldCommentsDialog({
   const comments = data?.petitionField.comments ?? [];
   const hasCommentsEnabled = field.isInternal ? false : field.hasCommentsEnabled;
   const closeRef = useRef<HTMLButtonElement>(null);
+  const inputRef = useRef<PetitionCommentsAndNotesEditorInstance>(null);
 
   const updateIsReadNotification = useUpdateIsReadNotification();
   async function handleMarkAsUnread(commentId: string) {
@@ -80,6 +84,10 @@ export function PreviewPetitionFieldCommentsDialog({
       isRead: false,
     });
   }
+
+  useEffect(() => {
+    if (!loading) inputRef.current?.focusCurrentInput();
+  }, [loading, inputRef.current]);
 
   useTimeoutEffect(
     async () => {
@@ -265,6 +273,7 @@ export function PreviewPetitionFieldCommentsDialog({
         <Divider />
         <ModalFooter paddingX={0} paddingTop={2} paddingBottom={0}>
           <PetitionCommentsAndNotesEditor
+            ref={inputRef}
             id={field.id}
             isDisabled={isDisabled}
             isTemplate={isTemplate ?? false}
@@ -272,6 +281,7 @@ export function PreviewPetitionFieldCommentsDialog({
             onSearchMentionables={handleSearchMentionables}
             hasCommentsEnabled={hasCommentsEnabled && !onlyReadPermission}
             onSubmit={handleSubmitClick}
+            lastCommentIsNote={comments[comments.length - 1]?.isInternal}
           />
         </ModalFooter>
       </ModalContent>

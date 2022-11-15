@@ -1,6 +1,7 @@
 import { Box, Button, HStack, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { isMetaReturn } from "@parallel/utils/keys";
-import { KeyboardEvent, useRef, useState } from "react";
+import { KeyboardEvent, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { HelpPopover } from "../common/HelpPopover";
 import {
@@ -19,19 +20,32 @@ interface PetitionCommentsAndNotesEditorProps
   hasCommentsEnabled: boolean;
   isDisabled: boolean;
   isTemplate: boolean;
+  lastCommentIsNote: boolean;
 }
 
-export function PetitionCommentsAndNotesEditor({
-  id,
-  onSubmit,
-  defaultMentionables,
-  onSearchMentionables,
-  hasCommentsEnabled,
-  isDisabled,
-  isTemplate,
-}: PetitionCommentsAndNotesEditorProps) {
+export interface PetitionCommentsAndNotesEditorInstance {
+  focusCurrentInput: () => void;
+}
+
+export const PetitionCommentsAndNotesEditor = chakraForwardRef<
+  "div",
+  PetitionCommentsAndNotesEditorProps,
+  PetitionCommentsAndNotesEditorInstance
+>(function PetitionCommentsAndNotesEditor(
+  {
+    id,
+    onSubmit,
+    defaultMentionables,
+    onSearchMentionables,
+    hasCommentsEnabled,
+    isDisabled,
+    isTemplate,
+    lastCommentIsNote,
+  },
+  ref
+) {
   const intl = useIntl();
-  const [isNote, setIsNote] = useState(!hasCommentsEnabled);
+  const [isNote, setIsNote] = useState(!hasCommentsEnabled || lastCommentIsNote);
   const [commentDraft, setCommentDraft] = useState(emptyCommentEditorValue());
   const [noteDraft, setNoteDraft] = useState(emptyCommentEditorValue());
   const isCommentEmpty = isEmptyCommentEditorValue(commentDraft);
@@ -39,6 +53,20 @@ export function PetitionCommentsAndNotesEditor({
 
   const commentRef = useRef<CommentEditorInstance>(null);
   const noteRef = useRef<CommentEditorInstance>(null);
+
+  useEffect(() => {
+    setIsNote(!hasCommentsEnabled || lastCommentIsNote);
+  }, [hasCommentsEnabled, lastCommentIsNote]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      focusCurrentInput: () => {
+        isNote ? noteRef.current?.focus() : commentRef.current?.focus();
+      },
+    }),
+    [isNote]
+  );
 
   async function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (isMetaReturn(event) && !isTemplate) {
@@ -171,4 +199,4 @@ export function PetitionCommentsAndNotesEditor({
       </Tabs>
     </Box>
   );
-}
+});
