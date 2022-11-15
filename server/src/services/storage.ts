@@ -17,6 +17,7 @@ import { Memoize } from "typescript-memoize";
 import { Config, CONFIG } from "../config";
 import { unMaybeArray } from "../util/arrays";
 import { awsLogger } from "../util/awsLogger";
+import { retry } from "../util/retry";
 import { MaybeArray } from "../util/types";
 import { ILogger, LOGGER } from "./logger";
 
@@ -74,11 +75,16 @@ class StorageImpl implements IStorageImpl {
   }
 
   async getFileMetadata(key: string) {
-    return await this.s3.send(
-      new HeadObjectCommand({
-        Bucket: this.bucketName,
-        Key: key,
-      })
+    return retry(
+      async () => {
+        return await this.s3.send(
+          new HeadObjectCommand({
+            Bucket: this.bucketName,
+            Key: key,
+          })
+        );
+      },
+      { maxRetries: 3, delay: 1_000 }
     );
   }
 
