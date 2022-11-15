@@ -156,23 +156,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     handlePetitionContentsFieldClick(fieldId);
   });
 
-  useEffect(() => {
-    if (activeFieldId && activeField) {
-      const timeout = setTimeout(async () => {
-        const petitionFieldCommentIds = activeField.comments
-          .filter((c) => c.isUnread)
-          .map((c) => c.id);
-        if (petitionFieldCommentIds.length > 0) {
-          await updateIsReadNotification({
-            petitionFieldCommentIds,
-            isRead: true,
-          });
-        }
-      }, 1000);
-      return () => clearTimeout(timeout);
-    }
-  }, [activeFieldId]);
-
   const wrapper = usePetitionStateWrapper();
   const [updatePetition] = useMutation(PetitionReplies_updatePetitionDocument);
   const downloadReplyFile = useDownloadReplyFile();

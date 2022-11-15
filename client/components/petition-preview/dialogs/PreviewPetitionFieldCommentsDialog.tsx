@@ -33,7 +33,7 @@ import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdate
 import { useGetDefaultMentionables } from "@parallel/utils/useGetDefaultMentionables";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useTimeoutEffect } from "@parallel/utils/useTimeoutEffect";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   useCreatePetitionFieldComment,
@@ -66,6 +66,7 @@ export function PreviewPetitionFieldCommentsDialog({
     PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
     {
       variables: { petitionId, petitionFieldId: field.id },
+      pollInterval: 10_000,
       fetchPolicy: "cache-and-network",
     }
   );
@@ -75,7 +76,8 @@ export function PreviewPetitionFieldCommentsDialog({
   const comments = data?.petitionField.comments ?? [];
   const hasCommentsEnabled = field.isInternal ? false : field.hasCommentsEnabled;
   const closeRef = useRef<HTMLButtonElement>(null);
-  const inputRef = useRef<PetitionCommentsAndNotesEditorInstance>(null);
+  const editorRef = useRef<PetitionCommentsAndNotesEditorInstance>(null);
+  const [tabIsNotes, setTabIsNotes] = useState(!hasCommentsEnabled || onlyReadPermission);
 
   const updateIsReadNotification = useUpdateIsReadNotification();
   async function handleMarkAsUnread(commentId: string) {
@@ -86,21 +88,23 @@ export function PreviewPetitionFieldCommentsDialog({
   }
 
   useEffect(() => {
-    if (!loading) inputRef.current?.focusCurrentInput();
-  }, [loading, inputRef.current]);
+    if (!loading) {
+      if (comments.at(-1)?.isInternal) {
+        setTabIsNotes(true);
+      }
+      setTimeout(() => editorRef.current?.focusCurrentInput());
+    }
+  }, [loading]);
 
   useTimeoutEffect(
-    async () => {
-      const petitionFieldCommentIds = comments.filter((c) => c.isUnread).map((c) => c.id);
-      if (petitionFieldCommentIds.length > 0) {
-        await updateIsReadNotification({
-          petitionFieldCommentIds,
-          isRead: true,
-        });
+    async (isMounted) => {
+      const unreadCommentIds = comments.filter((c) => c.isUnread).map((c) => c.id);
+      if (unreadCommentIds.length > 0 && isMounted()) {
+        await updateIsReadNotification({ petitionFieldCommentIds: unreadCommentIds, isRead: true });
       }
     },
     1000,
-    [field.id, comments.length]
+    [comments]
   );
 
   const createPetitionFieldComment = useCreatePetitionFieldComment();
@@ -273,7 +277,7 @@ export function PreviewPetitionFieldCommentsDialog({
         <Divider />
         <ModalFooter paddingX={0} paddingTop={2} paddingBottom={0}>
           <PetitionCommentsAndNotesEditor
-            ref={inputRef}
+            ref={editorRef}
             id={field.id}
             isDisabled={isDisabled}
             isTemplate={isTemplate ?? false}
@@ -281,7 +285,8 @@ export function PreviewPetitionFieldCommentsDialog({
             onSearchMentionables={handleSearchMentionables}
             hasCommentsEnabled={hasCommentsEnabled && !onlyReadPermission}
             onSubmit={handleSubmitClick}
-            lastCommentIsNote={comments[comments.length - 1]?.isInternal}
+            tabIsNotes={tabIsNotes}
+            onTabChange={setTabIsNotes}
           />
         </ModalFooter>
       </ModalContent>

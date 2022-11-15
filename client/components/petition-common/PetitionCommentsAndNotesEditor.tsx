@@ -1,7 +1,7 @@
 import { Box, Button, HStack, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { isMetaReturn } from "@parallel/utils/keys";
-import { KeyboardEvent, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { KeyboardEvent, useImperativeHandle, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { HelpPopover } from "../common/HelpPopover";
 import {
@@ -17,10 +17,11 @@ interface PetitionCommentsAndNotesEditorProps
   extends Pick<CommentEditorProps, "defaultMentionables" | "onSearchMentionables"> {
   id: string;
   onSubmit: (content: CommentEditorValue, isNote: boolean) => Promise<void>;
+  tabIsNotes: boolean;
+  onTabChange: (tabIsNotes: boolean) => void;
   hasCommentsEnabled: boolean;
   isDisabled: boolean;
   isTemplate: boolean;
-  lastCommentIsNote: boolean;
 }
 
 export interface PetitionCommentsAndNotesEditorInstance {
@@ -40,12 +41,12 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
     hasCommentsEnabled,
     isDisabled,
     isTemplate,
-    lastCommentIsNote,
+    tabIsNotes,
+    onTabChange,
   },
   ref
 ) {
   const intl = useIntl();
-  const [isNote, setIsNote] = useState(!hasCommentsEnabled || lastCommentIsNote);
   const [commentDraft, setCommentDraft] = useState(emptyCommentEditorValue());
   const [noteDraft, setNoteDraft] = useState(emptyCommentEditorValue());
   const isCommentEmpty = isEmptyCommentEditorValue(commentDraft);
@@ -54,18 +55,14 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
   const commentRef = useRef<CommentEditorInstance>(null);
   const noteRef = useRef<CommentEditorInstance>(null);
 
-  useEffect(() => {
-    setIsNote(!hasCommentsEnabled || lastCommentIsNote);
-  }, [hasCommentsEnabled, lastCommentIsNote]);
-
   useImperativeHandle(
     ref,
     () => ({
       focusCurrentInput: () => {
-        isNote ? noteRef.current?.focus() : commentRef.current?.focus();
+        tabIsNotes ? noteRef.current?.focus() : commentRef.current?.focus();
       },
     }),
-    [isNote]
+    [tabIsNotes]
   );
 
   async function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
@@ -76,18 +73,22 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
   }
 
   async function handleSubmitClick() {
-    const content = isNote ? noteDraft : commentDraft;
+    const content = tabIsNotes ? noteDraft : commentDraft;
     if (!isEmptyCommentEditorValue(content)) {
       try {
-        await onSubmit(content, isNote);
-        (isNote ? noteRef : commentRef).current?.clear();
+        await onSubmit(content, tabIsNotes);
+        (tabIsNotes ? noteRef : commentRef).current?.clear();
       } catch {}
     }
   }
 
   return (
     <Box flex="1">
-      <Tabs index={isNote ? 1 : 0} onChange={(index) => setIsNote(index === 1)} variant="enclosed">
+      <Tabs
+        index={tabIsNotes ? 1 : 0}
+        onChange={(index) => onTabChange(index === 1)}
+        variant="enclosed"
+      >
         <TabList>
           <Tab
             borderTopLeftRadius={0}
@@ -167,7 +168,7 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
             justifyContent="flex-end"
             minHeight="60px"
           >
-            {isNote ? (
+            {tabIsNotes ? (
               <>
                 <CommentEditor
                   ref={noteRef}

@@ -7,10 +7,12 @@ import {
   PetitionRepliesFieldComments_petitionFieldQueryDocument,
 } from "@parallel/graphql/__types";
 import { useGetMyId } from "@parallel/utils/apollo/getMyId";
+import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { useGetDefaultMentionables } from "@parallel/utils/useGetDefaultMentionables";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
+import { useTimeoutEffect } from "@parallel/utils/useTimeoutEffect";
 import usePrevious from "@react-hook/previous";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
 import { Link } from "../common/Link";
@@ -48,19 +50,38 @@ export function PetitionRepliesFieldComments({
   const hasCommentsEnabled = field.isInternal ? false : field.hasCommentsEnabled;
 
   const commentsRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<PetitionCommentsAndNotesEditorInstance>(null);
+  const editorRef = useRef<PetitionCommentsAndNotesEditorInstance>(null);
+  const [tabIsNotes, setTabIsNotes] = useState(!hasCommentsEnabled || onlyReadPermission);
 
   const { data, loading } = useQuery(PetitionRepliesFieldComments_petitionFieldQueryDocument, {
     variables: { petitionId, petitionFieldId: field.id },
+    pollInterval: 10_000,
     fetchPolicy: "cache-and-network",
   });
 
   const defaultMentionables = useGetDefaultMentionables(petitionId);
   const comments = data?.petitionField.comments ?? [];
 
+  const updateIsReadNotification = useUpdateIsReadNotification();
+  useTimeoutEffect(
+    async (isMounted) => {
+      const unreadCommentIds = comments.filter((c) => c.isUnread).map((c) => c.id);
+      if (unreadCommentIds.length > 0 && isMounted()) {
+        await updateIsReadNotification({ petitionFieldCommentIds: unreadCommentIds, isRead: true });
+      }
+    },
+    1000,
+    [comments]
+  );
+
   useEffect(() => {
-    if (!loading) inputRef.current?.focusCurrentInput();
-  }, [loading, inputRef.current]);
+    if (!loading) {
+      if (comments.at(-1)?.isInternal) {
+        setTabIsNotes(true);
+      }
+      setTimeout(() => editorRef.current?.focusCurrentInput());
+    }
+  }, [field.id, loading]);
 
   // Scroll to bottom when a comment is added
   const previousCommentCount = usePrevious(comments.length);
@@ -171,6 +192,7 @@ export function PetitionRepliesFieldComments({
       <Divider />
       <Box paddingTop={2}>
         <PetitionCommentsAndNotesEditor
+          ref={editorRef}
           id={field.id}
           isDisabled={isDisabled}
           isTemplate={false}
@@ -180,7 +202,8 @@ export function PetitionRepliesFieldComments({
           onSubmit={async (content, isNote) => {
             await onAddComment(content, isNote);
           }}
-          lastCommentIsNote={comments[comments.length - 1]?.isInternal}
+          tabIsNotes={tabIsNotes}
+          onTabChange={setTabIsNotes}
         />
       </Box>
     </Card>
