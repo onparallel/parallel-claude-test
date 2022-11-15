@@ -81,6 +81,7 @@ export type DocuSignEventBody = {
     userId: string;
     envelopeId: string;
     recipientId?: string;
+    reassignedRecipientId?: string;
     envelopeSummary: {
       status: string;
       voidedReason?: string;
@@ -110,6 +111,7 @@ const HANDLERS: Partial<
   "recipient-completed": recipientCompleted,
   "envelope-completed": envelopeCompleted,
   "recipient-autoresponded": recipientAutoresponded,
+  "recipient-reassign": recipientReassigned,
 };
 
 const validateHMACSignature: RequestHandler = (req, res, next) => {
@@ -169,10 +171,17 @@ async function recipientSent(ctx: ApiContext, body: DocuSignEventBody, petitionI
   const signature = (await ctx.petitions.loadPetitionSignatureByExternalId(
     `DOCUSIGN/${body.data.envelopeId}`
   ))!;
-  const [, signerIndex] = findSigner(
-    signature.signature_config.signersInfo,
-    body.data.recipientId!
-  );
+
+  /* 
+    recipient externalId may not be found on the signature config if this recipient
+    was assigned by somebody else. In this case we will skip without throwing error
+  */
+  let signerIndex: number;
+  try {
+    [, signerIndex] = findSigner(signature.signature_config.signersInfo, body.data.recipientId!);
+  } catch {
+    return;
+  }
 
   await ctx.petitions.updatePetitionSignatureByExternalId(signature.external_id!, {
     signer_status: {
@@ -303,10 +312,16 @@ async function recipientCompleted(ctx: ApiContext, body: DocuSignEventBody, peti
     `DOCUSIGN/${body.data.envelopeId}`
   ))!;
 
-  const [signer, signerIndex] = findSigner(
-    signature!.signature_config.signersInfo,
-    body.data.recipientId!
-  );
+  let signerIndex: number;
+  let signer: PetitionSignatureConfigSigner;
+  try {
+    [signer, signerIndex] = findSigner(
+      signature.signature_config.signersInfo,
+      body.data.recipientId!
+    );
+  } catch {
+    return;
+  }
 
   await ctx.petitions.updatePetitionSignatureByExternalId(`DOCUSIGN/${body.data.envelopeId}`, {
     signer_status: {
@@ -382,6 +397,26 @@ async function recipientAutoresponded(
     { email_bounced_at: new Date(body.generatedDateTime) },
     ctx
   );
+
+  await appendEventLogs(ctx, body);
+}
+
+/** one of the recipients reassigned their signature to another person. We need to update the recipientIds to point to the new signer */
+async function recipientReassigned(ctx: ApiContext, body: DocuSignEventBody, petitionId: number) {
+  const signature = (await ctx.petitions.loadPetitionSignatureByExternalId(
+    `DOCUSIGN/${body.data.envelopeId}`
+  ))!;
+
+  await ctx.petitions.updatePetitionSignatureByExternalId(`DOCUSIGN/${body.data.envelopeId}`, {
+    signature_config: {
+      ...signature.signature_config,
+      signersInfo: signature.signature_config.signersInfo.map((s) => ({
+        ...s,
+        externalId:
+          s.externalId === body.data.recipientId ? body.data.reassignedRecipientId : s.externalId,
+      })),
+    },
+  });
 
   await appendEventLogs(ctx, body);
 }
