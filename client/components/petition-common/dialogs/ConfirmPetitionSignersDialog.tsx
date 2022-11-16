@@ -15,10 +15,10 @@ import {
   ConfirmPetitionSignersDialog_PetitionSignatureRequestFragment,
   ConfirmPetitionSignersDialog_PetitionSignerFragment,
   ConfirmPetitionSignersDialog_UserFragment,
-  Maybe,
   SignatureConfigInputSigner,
 } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
+import { Maybe } from "@parallel/utils/types";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";

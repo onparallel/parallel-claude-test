@@ -6,7 +6,6 @@ import { removeMentionInputElements } from "@parallel/components/common/slate/Co
 import { UserGroupReference } from "@parallel/components/petition-activity/UserGroupReference";
 import { UserReference } from "@parallel/components/petition-activity/UserReference";
 import {
-  Maybe,
   usePetitionCommentsMutations_createPetitionFieldCommentDocument,
   usePetitionCommentsMutations_deletePetitionFieldCommentDocument,
   usePetitionCommentsMutations_getUsersOrGroupsDocument,
@@ -15,6 +14,7 @@ import {
 import { useCallback } from "react";
 import { isApolloError } from "../apollo/isApolloError";
 import { withError } from "../promises/withError";
+import { Maybe } from "../types";
 
 export function useCreatePetitionFieldComment() {
   const [createPetitionFieldComment] = useMutation(

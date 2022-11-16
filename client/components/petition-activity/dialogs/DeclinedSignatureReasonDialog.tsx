@@ -2,13 +2,14 @@ import { Box, Button, Heading, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { SignerReference } from "@parallel/components/common/SignerReference";
-import { Maybe, SignerReference_PetitionSignerFragment } from "@parallel/graphql/__types";
+import { SignerReference_PetitionSignerFragment } from "@parallel/graphql/__types";
+import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage } from "react-intl";
 
-export type DeclinedSignatureReasonDialogProps = {
+export interface DeclinedSignatureReasonDialogProps {
   declineReason: string;
   signer: Maybe<SignerReference_PetitionSignerFragment>;
-};
+}
 
 export function DeclinedSignatureReasonDialog({
   declineReason,

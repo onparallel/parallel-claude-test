@@ -18,10 +18,8 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
-import {
-  Maybe,
-  UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimitFragment,
-} from "@parallel/graphql/__types";
+import { UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimitFragment } from "@parallel/graphql/__types";
+import { Maybe } from "@parallel/utils/types";
 import { add, Duration } from "date-fns";
 import { ReactNode, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";

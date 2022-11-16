@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { Text, TextProps, Tooltip } from "@chakra-ui/react";
-import { ContactReference_ContactFragment, Maybe } from "@parallel/graphql/__types";
+import { ContactReference_ContactFragment } from "@parallel/graphql/__types";
+import { Maybe } from "@parallel/utils/types";
 import { DeletedContact } from "./DeletedContact";
 import { Link } from "./Link";
 

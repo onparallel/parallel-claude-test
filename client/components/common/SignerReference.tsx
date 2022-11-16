@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { Text, TextProps, Tooltip } from "@chakra-ui/react";
-import { Maybe, SignerReference_PetitionSignerFragment } from "@parallel/graphql/__types";
+import { SignerReference_PetitionSignerFragment } from "@parallel/graphql/__types";
+import { Maybe } from "@parallel/utils/types";
 import { DeletedContact } from "./DeletedContact";
 
 export function SignerReference({

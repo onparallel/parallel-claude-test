@@ -33,11 +33,11 @@ import {
   BrandingGeneral_updateOrganizationBrandThemeDocument,
   BrandingGeneral_updateOrgLogoDocument,
   BrandingGeneral_UserFragment,
-  Maybe,
   Tone,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { isAtLeast } from "@parallel/utils/roles";
+import { Maybe } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import Color from "color";
 import { useMemo, useRef } from "react";

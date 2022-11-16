@@ -2,11 +2,11 @@ import { gql } from "@apollo/client";
 import { Box, Button, Flex, GridItem, Heading, Stack, Text } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import {
-  Maybe,
   NewSignatureRequestRow_PetitionFragment,
   NewSignatureRequestRow_UserFragment,
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
+import { Maybe } from "@parallel/utils/types";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { isDefined, omit } from "remeda";
 import { SignerReference } from "../common/SignerReference";

@@ -37,7 +37,7 @@ import { ReportsDoughnutChart } from "@parallel/components/reports/ReportsDoughn
 import { ReportsErrorMessage } from "@parallel/components/reports/ReportsErrorMessage";
 import { ReportsLoadingMessage } from "@parallel/components/reports/ReportsLoadingMessage";
 import { ReportsReadyMessage } from "@parallel/components/reports/ReportsReadyMessage";
-import { Maybe, Reports_templatesDocument, Reports_userDocument } from "@parallel/graphql/__types";
+import { Reports_templatesDocument, Reports_userDocument } from "@parallel/graphql/__types";
 import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import {
   useAssertQuery,
@@ -46,6 +46,7 @@ import {
 import { compose } from "@parallel/utils/compose";
 import { stallFor } from "@parallel/utils/promises/stallFor";
 import { date, useQueryState } from "@parallel/utils/queryState";
+import { Maybe } from "@parallel/utils/types";
 import { useBackgroundTask } from "@parallel/utils/useBackgroundTask";
 import { useTemplateRepliesReportTask } from "@parallel/utils/useTemplateRepliesReportTask";
 import { useRef, useState } from "react";
@@ -53,7 +54,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { TimeSpan } from "../../../components/reports/TimeSpan";
 
-type ReportType = {
+interface ReportType {
   pending: number;
   completed: number;
   closed: number;
@@ -63,7 +64,7 @@ type ReportType = {
     completed: number;
     time_to_complete: Maybe<number>;
   };
-};
+}
 
 const QUERY_STATE = {
   range: date().list(2),

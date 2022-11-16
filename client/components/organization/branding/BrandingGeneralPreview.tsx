@@ -14,8 +14,8 @@ import { OverrideWithOrganizationTheme } from "@parallel/components/common/Overr
 import {
   BrandingGeneralPreview_OrganizationBrandThemeDataFragment,
   BrandingGeneralPreview_UserFragment,
-  Maybe,
 } from "@parallel/graphql/__types";
+import { Maybe } from "@parallel/utils/types";
 import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 

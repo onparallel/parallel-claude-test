@@ -11,19 +11,19 @@ import { MAX_SIGNERS_ALLOWED } from "@parallel/components/petition-common/dialog
 import { SelectedSignerRow } from "@parallel/components/petition-common/SelectedSignerRow";
 import { SuggestedSigners } from "@parallel/components/petition-common/SuggestedSigners";
 import {
-  Maybe,
   PublicPetitionSignerDataInput,
   Tone,
   useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragment,
   useRecipientViewConfirmPetitionSignersDialog_PublicContactFragment,
 } from "@parallel/graphql/__types";
+import { Maybe } from "@parallel/utils/types";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import { useAddNewSignerDialog } from "./AddNewSignerDialog";
 
-type RecipientViewConfirmPetitionSignersDialogProps = {
+interface RecipientViewConfirmPetitionSignersDialogProps {
   keycode: string;
   presetSigners: useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragment[];
   recipients: useRecipientViewConfirmPetitionSignersDialog_PublicContactFragment[];
@@ -31,12 +31,12 @@ type RecipientViewConfirmPetitionSignersDialogProps = {
   organization: string;
   allowAdditionalSigners: boolean;
   tone: Tone;
-};
+}
 
-export type RecipientViewConfirmPetitionSignersDialogResult = {
+export interface RecipientViewConfirmPetitionSignersDialogResult {
   additionalSigners: PublicPetitionSignerDataInput[];
   message: Maybe<string>;
-};
+}
 
 function RecipientViewConfirmPetitionSignersDialog({
   keycode,
