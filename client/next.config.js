@@ -18,6 +18,7 @@ const config = {
   crossOrigin: "anonymous",
   assetPrefix: process.env.NEXT_PUBLIC_ASSETS_URL,
   poweredByHeader: false,
+  largePageDataBytes: 0.5 * 1024 * 1024,
   webpack(config, options) {
     config.resolve.alias["@parallel"] = __dirname;
     config.resolve.alias["react/jsx-runtime"] = "react/jsx-runtime.js";
