@@ -119,7 +119,7 @@ export function Reports() {
                 startDate: state.range?.[0].toISOString() ?? null,
                 endDate: state.range?.[1].toISOString() ?? null,
               },
-              { signal: taskAbortController.current!.signal, timeout: 12_000 }
+              { signal: taskAbortController.current!.signal, timeout: 60_000 }
             ),
           2_000 + 1_000 * Math.random()
         );

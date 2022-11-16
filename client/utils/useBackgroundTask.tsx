@@ -43,7 +43,7 @@ export function useBackgroundTask<Task extends keyof typeof TASK_DOCUMENTS>(
   return useCallback(
     (async (
       variables: any,
-      { signal, timeout = 6_000, pollingInterval = 3_000 }: BackgroundTaskOptions = {}
+      { signal, timeout = 60_000, pollingInterval = 3_000 }: BackgroundTaskOptions = {}
     ) => {
       const { data: initialData } = await createTask({ variables });
 
