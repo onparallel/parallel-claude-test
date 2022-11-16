@@ -3,8 +3,9 @@ import { Duration } from "date-fns";
 import { injectable } from "inversify";
 import { Knex } from "knex";
 import PostgresInterval from "postgres-interval";
-import { groupBy, indexBy, isDefined, times } from "remeda";
+import { chunk, groupBy, indexBy, isDefined, times } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
+import { pFlatMap } from "../../util/promises/pFlatMap";
 import { KeysOfType, MaybeArray, Replace, UnwrapPromise } from "../../util/types";
 import { CreatePetitionEvent, CreateSystemEvent, PetitionEvent, SystemEvent } from "../events";
 import { CreatePetitionUserNotification, PetitionUserNotification } from "../notifications";
@@ -156,7 +157,10 @@ export class BaseRepository {
     loadFn: (keys: ReadonlyArray<K>, t?: Knex.Transaction) => Promise<V[]>,
     options?: DataLoader.Options<K, V, C>
   ): Loader<K, V, C> {
-    const dataloader = new DataLoader(loadFn, options);
+    const dataloader = new DataLoader<K, V, C>(
+      async (keys) => pFlatMap(chunk(keys, 10_000), (keys) => loadFn(keys), { concurrency: 1 }),
+      options
+    );
     return Object.assign(
       async function (keys: MaybeArray<K>, options?: LoaderOptions) {
         const { refresh = false } = options ?? {};
