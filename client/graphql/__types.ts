@@ -8303,6 +8303,7 @@ export type PetitionSharingModal_PetitionBase_Petition_Fragment = {
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
+    isSubscribed: boolean;
   } | null;
   effectivePermissions: Array<{
     __typename?: "EffectivePetitionUserPermission";
@@ -8346,6 +8347,7 @@ export type PetitionSharingModal_PetitionBase_PetitionTemplate_Fragment = {
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
+    isSubscribed: boolean;
   } | null;
   effectivePermissions: Array<{
     __typename?: "EffectivePetitionUserPermission";
@@ -8450,6 +8452,7 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
         } | null;
         effectivePermissions: Array<{
           __typename?: "EffectivePetitionUserPermission";
@@ -8492,6 +8495,7 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
         } | null;
         effectivePermissions: Array<{
           __typename?: "EffectivePetitionUserPermission";
@@ -8545,6 +8549,7 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
         } | null;
         effectivePermissions: Array<{
           __typename?: "EffectivePetitionUserPermission";
@@ -8587,6 +8592,7 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
         } | null;
         effectivePermissions: Array<{
           __typename?: "EffectivePetitionUserPermission";
@@ -8642,6 +8648,7 @@ export type PetitionSharingModal_editPetitionPermissionMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
         } | null;
         effectivePermissions: Array<{
           __typename?: "EffectivePetitionUserPermission";
@@ -8684,6 +8691,7 @@ export type PetitionSharingModal_editPetitionPermissionMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
         } | null;
         effectivePermissions: Array<{
           __typename?: "EffectivePetitionUserPermission";
@@ -8736,6 +8744,7 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
         } | null;
         effectivePermissions: Array<{
           __typename?: "EffectivePetitionUserPermission";
@@ -8778,6 +8787,7 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
         } | null;
         effectivePermissions: Array<{
           __typename?: "EffectivePetitionUserPermission";
@@ -8830,6 +8840,7 @@ export type PetitionSharingModal_petitionsQuery = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
         } | null;
         effectivePermissions: Array<{
           __typename?: "EffectivePetitionUserPermission";
@@ -8872,6 +8883,7 @@ export type PetitionSharingModal_petitionsQuery = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
         } | null;
         effectivePermissions: Array<{
           __typename?: "EffectivePetitionUserPermission";
@@ -25847,6 +25859,7 @@ export const PetitionSharingModal_PetitionBaseFragmentDoc = gql`
     }
     myEffectivePermission {
       permissionType
+      isSubscribed
     }
     effectivePermissions {
       user {

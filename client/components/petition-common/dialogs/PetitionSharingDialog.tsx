@@ -716,6 +716,7 @@ const fragments = {
         }
         myEffectivePermission {
           permissionType
+          isSubscribed
         }
         effectivePermissions {
           user {
