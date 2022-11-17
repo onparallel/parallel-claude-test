@@ -74,6 +74,7 @@ CopyOrDownloadReplyButton.fragments = {
       metadata
       isAnonymized
       field {
+        id
         type
       }
     }

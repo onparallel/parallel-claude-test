@@ -294,6 +294,7 @@ export const RecipientViewContentsCard = Object.assign(
         return gql`
           fragment RecipientViewContentsCard_PublicPetition on PublicPetition {
             fields {
+              id
               ...RecipientViewContentsCard_PublicPetitionField
             }
           }
@@ -328,6 +329,7 @@ export const RecipientViewContentsCard = Object.assign(
         return gql`
           fragment RecipientViewContentsCard_PetitionBase on PetitionBase {
             fields {
+              id
               ...RecipientViewContentsCard_PetitionField
             }
           }

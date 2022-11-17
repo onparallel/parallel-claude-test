@@ -615,6 +615,7 @@ PetitionCompose.fragments = {
         }
         isRestricted
         fields {
+          id
           ...PetitionCompose_PetitionField
         }
         ... on Petition {

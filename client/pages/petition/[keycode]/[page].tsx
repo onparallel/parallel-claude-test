@@ -535,6 +535,7 @@ RecipientView.fragments = {
         isRecipientViewContentsHidden
         tone
         fields {
+          id
           ...RecipientView_PublicPetitionField
           ...useGetPageFields_PublicPetitionField
         }

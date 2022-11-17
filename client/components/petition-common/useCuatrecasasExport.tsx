@@ -315,6 +315,7 @@ useCuatrecasasExport.fragments = {
         name
         metadata
         fields {
+          id
           ...useCuatrecasasExport_PetitionField
           replies {
             ...useCuatrecasasExport_PetitionFieldReply

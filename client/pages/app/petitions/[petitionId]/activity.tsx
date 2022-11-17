@@ -380,6 +380,7 @@ PetitionActivity.fragments = {
       ...AddPetitionAccessDialog_Petition
       ...useSendPetitionHandler_Petition
       fields {
+        id
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
       }

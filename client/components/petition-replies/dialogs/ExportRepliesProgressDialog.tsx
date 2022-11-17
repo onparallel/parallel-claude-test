@@ -280,6 +280,7 @@ ExportRepliesProgressDialog.fragments = {
         status
       }
       fields {
+        id
         ...useFilenamePlaceholdersRename_PetitionField
         replies {
           ...useFilenamePlaceholdersRename_PetitionFieldReply

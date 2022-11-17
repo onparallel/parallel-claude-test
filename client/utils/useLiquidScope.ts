@@ -46,6 +46,7 @@ useLiquidScope.fragments = {
     fragment useLiquidScope_PetitionBase on PetitionBase {
       id
       fields {
+        id
         type
         multiple
         alias
@@ -62,6 +63,7 @@ useLiquidScope.fragments = {
     fragment useLiquidScope_PublicPetition on PublicPetition {
       id
       fields {
+        id
         type
         multiple
         alias

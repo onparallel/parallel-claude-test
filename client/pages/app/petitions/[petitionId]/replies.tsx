@@ -673,6 +673,7 @@ PetitionReplies.fragments = {
         }
         ...PetitionLayout_PetitionBase
         fields {
+          id
           ...PetitionReplies_PetitionField
         }
         ...ShareButton_PetitionBase

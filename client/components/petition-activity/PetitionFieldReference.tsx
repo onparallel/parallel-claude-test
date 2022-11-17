@@ -1,42 +1,43 @@
 import { gql } from "@apollo/client";
 import { Text } from "@chakra-ui/react";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldReference_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage } from "react-intl";
-import { OverflownText } from "../common/OverflownText";
 
-export function PetitionFieldReference({
-  field,
-}: {
-  field?: Maybe<PetitionFieldReference_PetitionFieldFragment>;
-}) {
-  return field ? (
-    field.title ? (
-      <OverflownText
-        as="strong"
-        display="inline-block"
-        maxWidth="30rem"
-        verticalAlign="bottom"
-        whiteSpace="normal"
-      >
-        {field.title}
-      </OverflownText>
-    ) : (
-      <Text as="span" textStyle="hint">
-        <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
-      </Text>
-    )
-  ) : (
-    <Text as="span" textStyle="hint">
-      <FormattedMessage id="generic.deleted-field" defaultMessage="Deleted field" />
-    </Text>
-  );
+interface PetitionFieldReferenceProps {
+  field: Maybe<PetitionFieldReference_PetitionFieldFragment> | undefined;
 }
 
-PetitionFieldReference.fragments = {
-  PetitionField: gql`
-    fragment PetitionFieldReference_PetitionField on PetitionField {
-      title
-    }
-  `,
-};
+export const PetitionFieldReference = Object.assign(
+  chakraForwardRef<"span", PetitionFieldReferenceProps>(function PetitionFieldReference(
+    { field },
+    ref
+  ) {
+    return field ? (
+      field.title ? (
+        <Text ref={ref as any} as="strong">
+          {field.title}
+        </Text>
+      ) : (
+        <Text ref={ref as any} as="span" textStyle="hint">
+          <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+        </Text>
+      )
+    ) : (
+      <Text ref={ref as any} as="span" textStyle="hint">
+        <FormattedMessage id="generic.deleted-field" defaultMessage="Deleted field" />
+      </Text>
+    );
+  }),
+  {
+    fragments: {
+      PetitionField: gql`
+        fragment PetitionFieldReference_PetitionField on PetitionField {
+          id
+          title
+        }
+      `,
+    },
+  }
+);

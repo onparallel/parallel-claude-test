@@ -6314,7 +6314,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
           id: string;
           isInternal: boolean;
           createdAt: string;
-          field?: { __typename?: "PetitionField"; title?: string | null } | null;
+          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
           deletedBy?:
             | {
                 __typename?: "PetitionAccess";
@@ -6705,7 +6705,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "ReplyCreatedEvent";
           id: string;
           createdAt: string;
-          field?: { __typename?: "PetitionField"; title?: string | null } | null;
+          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
           createdBy?:
             | {
                 __typename?: "PetitionAccess";
@@ -6723,7 +6723,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "ReplyDeletedEvent";
           id: string;
           createdAt: string;
-          field?: { __typename?: "PetitionField"; title?: string | null } | null;
+          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
           deletedBy?:
             | {
                 __typename?: "PetitionAccess";
@@ -6741,7 +6741,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "ReplyUpdatedEvent";
           id: string;
           createdAt: string;
-          field?: { __typename?: "PetitionField"; title?: string | null } | null;
+          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
           updatedBy?:
             | {
                 __typename?: "PetitionAccess";
@@ -6932,7 +6932,7 @@ export type PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment 
   id: string;
   isInternal: boolean;
   createdAt: string;
-  field?: { __typename?: "PetitionField"; title?: string | null } | null;
+  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
   deletedBy?:
     | {
         __typename?: "PetitionAccess";
@@ -7232,7 +7232,7 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment = 
   __typename?: "ReplyCreatedEvent";
   id: string;
   createdAt: string;
-  field?: { __typename?: "PetitionField"; title?: string | null } | null;
+  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
   createdBy?:
     | {
         __typename?: "PetitionAccess";
@@ -7246,7 +7246,7 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment = 
   __typename?: "ReplyDeletedEvent";
   id: string;
   createdAt: string;
-  field?: { __typename?: "PetitionField"; title?: string | null } | null;
+  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
   deletedBy?:
     | {
         __typename?: "PetitionAccess";
@@ -7260,7 +7260,7 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment = 
   __typename?: "ReplyUpdatedEvent";
   id: string;
   createdAt: string;
-  field?: { __typename?: "PetitionField"; title?: string | null } | null;
+  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
   updatedBy?:
     | {
         __typename?: "PetitionAccess";
@@ -7406,6 +7406,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
 
 export type PetitionFieldReference_PetitionFieldFragment = {
   __typename?: "PetitionField";
+  id: string;
   title?: string | null;
 };
 
@@ -7705,7 +7706,7 @@ export type TimelineCommentDeletedEvent_CommentDeletedEventFragment = {
   __typename?: "CommentDeletedEvent";
   isInternal: boolean;
   createdAt: string;
-  field?: { __typename?: "PetitionField"; title?: string | null } | null;
+  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
   deletedBy?:
     | {
         __typename?: "PetitionAccess";
@@ -7978,7 +7979,7 @@ export type TimelineRemindersOptOutEvent_RemindersOptOutEventFragment = {
 export type TimelineReplyCreatedEvent_ReplyCreatedEventFragment = {
   __typename?: "ReplyCreatedEvent";
   createdAt: string;
-  field?: { __typename?: "PetitionField"; title?: string | null } | null;
+  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
   createdBy?:
     | {
         __typename?: "PetitionAccess";
@@ -7991,7 +7992,7 @@ export type TimelineReplyCreatedEvent_ReplyCreatedEventFragment = {
 export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
   __typename?: "ReplyDeletedEvent";
   createdAt: string;
-  field?: { __typename?: "PetitionField"; title?: string | null } | null;
+  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
   deletedBy?:
     | {
         __typename?: "PetitionAccess";
@@ -8004,7 +8005,7 @@ export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
 export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
   __typename?: "ReplyUpdatedEvent";
   createdAt: string;
-  field?: { __typename?: "PetitionField"; title?: string | null } | null;
+  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
   updatedBy?:
     | {
         __typename?: "PetitionAccess";
@@ -9227,6 +9228,7 @@ export type useCuatrecasasExport_PetitionFragment = {
   metadata: { [key: string]: any };
   fields: Array<{
     __typename?: "PetitionField";
+    id: string;
     type: PetitionFieldType;
     replies: Array<{
       __typename?: "PetitionFieldReply";
@@ -11057,7 +11059,7 @@ export type CopyOrDownloadReplyButton_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
   metadata: { [key: string]: any };
   isAnonymized: boolean;
-  field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
+  field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
 };
 
 export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
@@ -15015,7 +15017,7 @@ export type PetitionActivity_PetitionFragment = {
           id: string;
           isInternal: boolean;
           createdAt: string;
-          field?: { __typename?: "PetitionField"; title?: string | null } | null;
+          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
           deletedBy?:
             | {
                 __typename?: "PetitionAccess";
@@ -15406,7 +15408,7 @@ export type PetitionActivity_PetitionFragment = {
           __typename?: "ReplyCreatedEvent";
           id: string;
           createdAt: string;
-          field?: { __typename?: "PetitionField"; title?: string | null } | null;
+          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
           createdBy?:
             | {
                 __typename?: "PetitionAccess";
@@ -15424,7 +15426,7 @@ export type PetitionActivity_PetitionFragment = {
           __typename?: "ReplyDeletedEvent";
           id: string;
           createdAt: string;
-          field?: { __typename?: "PetitionField"; title?: string | null } | null;
+          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
           deletedBy?:
             | {
                 __typename?: "PetitionAccess";
@@ -15442,7 +15444,7 @@ export type PetitionActivity_PetitionFragment = {
           __typename?: "ReplyUpdatedEvent";
           id: string;
           createdAt: string;
-          field?: { __typename?: "PetitionField"; title?: string | null } | null;
+          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
           updatedBy?:
             | {
                 __typename?: "PetitionAccess";
@@ -15841,7 +15843,7 @@ export type PetitionActivity_updatePetitionMutation = {
                 id: string;
                 isInternal: boolean;
                 createdAt: string;
-                field?: { __typename?: "PetitionField"; title?: string | null } | null;
+                field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
                 deletedBy?:
                   | {
                       __typename?: "PetitionAccess";
@@ -16247,7 +16249,7 @@ export type PetitionActivity_updatePetitionMutation = {
                 __typename?: "ReplyCreatedEvent";
                 id: string;
                 createdAt: string;
-                field?: { __typename?: "PetitionField"; title?: string | null } | null;
+                field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
                 createdBy?:
                   | {
                       __typename?: "PetitionAccess";
@@ -16270,7 +16272,7 @@ export type PetitionActivity_updatePetitionMutation = {
                 __typename?: "ReplyDeletedEvent";
                 id: string;
                 createdAt: string;
-                field?: { __typename?: "PetitionField"; title?: string | null } | null;
+                field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
                 deletedBy?:
                   | {
                       __typename?: "PetitionAccess";
@@ -16293,7 +16295,7 @@ export type PetitionActivity_updatePetitionMutation = {
                 __typename?: "ReplyUpdatedEvent";
                 id: string;
                 createdAt: string;
-                field?: { __typename?: "PetitionField"; title?: string | null } | null;
+                field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
                 updatedBy?:
                   | {
                       __typename?: "PetitionAccess";
@@ -16722,7 +16724,7 @@ export type PetitionActivity_petitionQuery = {
                 id: string;
                 isInternal: boolean;
                 createdAt: string;
-                field?: { __typename?: "PetitionField"; title?: string | null } | null;
+                field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
                 deletedBy?:
                   | {
                       __typename?: "PetitionAccess";
@@ -17128,7 +17130,7 @@ export type PetitionActivity_petitionQuery = {
                 __typename?: "ReplyCreatedEvent";
                 id: string;
                 createdAt: string;
-                field?: { __typename?: "PetitionField"; title?: string | null } | null;
+                field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
                 createdBy?:
                   | {
                       __typename?: "PetitionAccess";
@@ -17151,7 +17153,7 @@ export type PetitionActivity_petitionQuery = {
                 __typename?: "ReplyDeletedEvent";
                 id: string;
                 createdAt: string;
-                field?: { __typename?: "PetitionField"; title?: string | null } | null;
+                field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
                 deletedBy?:
                   | {
                       __typename?: "PetitionAccess";
@@ -17174,7 +17176,7 @@ export type PetitionActivity_petitionQuery = {
                 __typename?: "ReplyUpdatedEvent";
                 id: string;
                 createdAt: string;
-                field?: { __typename?: "PetitionField"; title?: string | null } | null;
+                field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
                 updatedBy?:
                   | {
                       __typename?: "PetitionAccess";
@@ -20706,11 +20708,11 @@ export type PetitionReplies_PetitionFragment = {
   }>;
   fields: Array<{
     __typename?: "PetitionField";
+    id: string;
     type: PetitionFieldType;
     multiple: boolean;
     alias?: string | null;
     isReadOnly: boolean;
-    id: string;
     title?: string | null;
     description?: string | null;
     optional: boolean;
@@ -21146,11 +21148,11 @@ export type PetitionReplies_closePetitionMutation = {
     }>;
     fields: Array<{
       __typename?: "PetitionField";
+      id: string;
       type: PetitionFieldType;
       multiple: boolean;
       alias?: string | null;
       isReadOnly: boolean;
-      id: string;
       title?: string | null;
       description?: string | null;
       optional: boolean;
@@ -21384,11 +21386,11 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
     }>;
     fields: Array<{
       __typename?: "PetitionField";
+      id: string;
       type: PetitionFieldType;
       multiple: boolean;
       alias?: string | null;
       isReadOnly: boolean;
-      id: string;
       title?: string | null;
       description?: string | null;
       optional: boolean;
@@ -21728,11 +21730,11 @@ export type PetitionReplies_petitionQuery = {
         }>;
         fields: Array<{
           __typename?: "PetitionField";
+          id: string;
           type: PetitionFieldType;
           multiple: boolean;
           alias?: string | null;
           isReadOnly: boolean;
-          id: string;
           title?: string | null;
           description?: string | null;
           optional: boolean;
@@ -23170,10 +23172,10 @@ export type RecipientView_PublicPetitionAccessFragment = {
     }>;
     fields: Array<{
       __typename?: "PublicPetitionField";
+      id: string;
       type: PetitionFieldType;
       multiple: boolean;
       alias?: string | null;
-      id: string;
       title?: string | null;
       options: { [key: string]: any };
       optional: boolean;
@@ -23279,10 +23281,10 @@ export type RecipientView_PublicPetitionFragment = {
   completingMessageSubject?: string | null;
   fields: Array<{
     __typename?: "PublicPetitionField";
+    id: string;
     type: PetitionFieldType;
     multiple: boolean;
     alias?: string | null;
-    id: string;
     title?: string | null;
     options: { [key: string]: any };
     optional: boolean;
@@ -23421,10 +23423,10 @@ export type RecipientView_publicCompletePetitionMutation = {
     completingMessageSubject?: string | null;
     fields: Array<{
       __typename?: "PublicPetitionField";
+      id: string;
       type: PetitionFieldType;
       multiple: boolean;
       alias?: string | null;
-      id: string;
       title?: string | null;
       options: { [key: string]: any };
       optional: boolean;
@@ -23518,10 +23520,10 @@ export type RecipientView_accessQuery = {
       }>;
       fields: Array<{
         __typename?: "PublicPetitionField";
+        id: string;
         type: PetitionFieldType;
         multiple: boolean;
         alias?: string | null;
-        id: string;
         title?: string | null;
         options: { [key: string]: any };
         optional: boolean;
@@ -24769,6 +24771,7 @@ export type useLiquidScope_PetitionBase_Petition_Fragment = {
   id: string;
   fields: Array<{
     __typename?: "PetitionField";
+    id: string;
     type: PetitionFieldType;
     multiple: boolean;
     alias?: string | null;
@@ -24782,6 +24785,7 @@ export type useLiquidScope_PetitionBase_PetitionTemplate_Fragment = {
   id: string;
   fields: Array<{
     __typename?: "PetitionField";
+    id: string;
     type: PetitionFieldType;
     multiple: boolean;
     alias?: string | null;
@@ -24799,6 +24803,7 @@ export type useLiquidScope_PublicPetitionFragment = {
   id: string;
   fields: Array<{
     __typename?: "PublicPetitionField";
+    id: string;
     type: PetitionFieldType;
     multiple: boolean;
     alias?: string | null;
@@ -25393,6 +25398,12 @@ export const PetitionUserNotification_PetitionUserNotificationFragmentDoc = gql`
     isRead
   }
 ` as unknown as DocumentNode<PetitionUserNotification_PetitionUserNotificationFragment, unknown>;
+export const PetitionFieldReference_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldReference_PetitionField on PetitionField {
+    id
+    title
+  }
+` as unknown as DocumentNode<PetitionFieldReference_PetitionFieldFragment, unknown>;
 export const UserReference_UserFragmentDoc = gql`
   fragment UserReference_User on User {
     id
@@ -25425,8 +25436,7 @@ export const CommentCreatedUserNotification_CommentCreatedUserNotificationFragme
   fragment CommentCreatedUserNotification_CommentCreatedUserNotification on CommentCreatedUserNotification {
     ...PetitionUserNotification_PetitionUserNotification
     field {
-      id
-      title
+      ...PetitionFieldReference_PetitionField
     }
     comment {
       id
@@ -25438,6 +25448,7 @@ export const CommentCreatedUserNotification_CommentCreatedUserNotificationFragme
     isMention
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
+  ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<
   CommentCreatedUserNotification_CommentCreatedUserNotificationFragment,
@@ -26127,6 +26138,7 @@ export const useCuatrecasasExport_PetitionFragmentDoc = gql`
     name
     metadata
     fields {
+      id
       ...useCuatrecasasExport_PetitionField
       replies {
         ...useCuatrecasasExport_PetitionFieldReply
@@ -26164,6 +26176,7 @@ export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
       status
     }
     fields {
+      id
       ...useFilenamePlaceholdersRename_PetitionField
       replies {
         ...useFilenamePlaceholdersRename_PetitionFieldReply
@@ -26958,11 +26971,6 @@ export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
   ${ContactReference_ContactFragmentDoc}
   ${SentReminderMessageDialog_PetitionReminderFragmentDoc}
 ` as unknown as DocumentNode<TimelineReminderSentEvent_ReminderSentEventFragment, unknown>;
-export const PetitionFieldReference_PetitionFieldFragmentDoc = gql`
-  fragment PetitionFieldReference_PetitionField on PetitionField {
-    title
-  }
-` as unknown as DocumentNode<PetitionFieldReference_PetitionFieldFragment, unknown>;
 export const TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc = gql`
   fragment TimelineReplyCreatedEvent_ReplyCreatedEvent on ReplyCreatedEvent {
     field {
@@ -27764,6 +27772,7 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
     ...AddPetitionAccessDialog_Petition
     ...useSendPetitionHandler_Petition
     fields {
+      id
       ...validatePetitionFields_PetitionField
       ...FieldErrorDialog_PetitionField
     }
@@ -28159,6 +28168,7 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
     }
     isRestricted
     fields {
+      id
       ...PetitionCompose_PetitionField
     }
     ... on Petition {
@@ -28505,6 +28515,7 @@ export const RecipientViewProgressFooter_PetitionFragmentDoc = gql`
   fragment RecipientViewProgressFooter_Petition on Petition {
     status
     fields {
+      id
       ...RecipientViewProgressFooter_PetitionField
     }
     signatureConfig {
@@ -28682,6 +28693,7 @@ export const RecipientViewContentsCard_PetitionFieldFragmentDoc = gql`
 export const RecipientViewContentsCard_PetitionBaseFragmentDoc = gql`
   fragment RecipientViewContentsCard_PetitionBase on PetitionBase {
     fields {
+      id
       ...RecipientViewContentsCard_PetitionField
     }
   }
@@ -28691,6 +28703,7 @@ export const useLiquidScope_PetitionBaseFragmentDoc = gql`
   fragment useLiquidScope_PetitionBase on PetitionBase {
     id
     fields {
+      id
       type
       multiple
       alias
@@ -28801,6 +28814,7 @@ export const CopyOrDownloadReplyButton_PetitionFieldReplyFragmentDoc = gql`
     metadata
     isAnonymized
     field {
+      id
       type
     }
   }
@@ -29060,6 +29074,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     }
     ...PetitionLayout_PetitionBase
     fields {
+      id
       ...PetitionReplies_PetitionField
     }
     ...ShareButton_PetitionBase
@@ -29558,6 +29573,7 @@ export const RecipientViewHeader_PublicContactFragmentDoc = gql`
 export const RecipientViewContentsCard_PublicPetitionFragmentDoc = gql`
   fragment RecipientViewContentsCard_PublicPetition on PublicPetition {
     fields {
+      id
       ...RecipientViewContentsCard_PublicPetitionField
     }
   }
@@ -29567,6 +29583,7 @@ export const RecipientViewProgressFooter_PublicPetitionFragmentDoc = gql`
   fragment RecipientViewProgressFooter_PublicPetition on PublicPetition {
     status
     fields {
+      id
       ...RecipientViewProgressFooter_PublicPetitionField
     }
     signatureConfig {
@@ -29579,6 +29596,7 @@ export const useLiquidScope_PublicPetitionFragmentDoc = gql`
   fragment useLiquidScope_PublicPetition on PublicPetition {
     id
     fields {
+      id
       type
       multiple
       alias
@@ -29611,6 +29629,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     isRecipientViewContentsHidden
     tone
     fields {
+      id
       ...RecipientView_PublicPetitionField
       ...useGetPageFields_PublicPetitionField
     }

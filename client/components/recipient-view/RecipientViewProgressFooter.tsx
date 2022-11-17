@@ -177,6 +177,7 @@ export const RecipientViewProgressFooter = Object.assign(
           fragment RecipientViewProgressFooter_Petition on Petition {
             status
             fields {
+              id
               ...RecipientViewProgressFooter_PetitionField
             }
             signatureConfig {
@@ -209,6 +210,7 @@ export const RecipientViewProgressFooter = Object.assign(
           fragment RecipientViewProgressFooter_PublicPetition on PublicPetition {
             status
             fields {
+              id
               ...RecipientViewProgressFooter_PublicPetitionField
             }
             signatureConfig {

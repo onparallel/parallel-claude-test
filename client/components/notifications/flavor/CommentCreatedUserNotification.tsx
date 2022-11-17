@@ -2,8 +2,8 @@ import { gql } from "@apollo/client";
 import { Circle, Text } from "@chakra-ui/react";
 import { CommentIcon, MentionIcon, NoteIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
+import { PetitionFieldReference } from "@parallel/components/petition-activity/PetitionFieldReference";
 import { UserOrContactReference } from "@parallel/components/petition-activity/UserOrContactReference";
-import { UserReference } from "@parallel/components/petition-activity/UserReference";
 import { CommentCreatedUserNotification_CommentCreatedUserNotificationFragment } from "@parallel/graphql/__types";
 import { forwardRef } from "react";
 import { FormattedMessage } from "react-intl";
@@ -20,19 +20,9 @@ export const CommentCreatedUserNotification = Object.assign(
       const {
         comment: { author, isInternal: isNote },
         isMention,
+        field,
       } = notification;
 
-      const field = notification.field.title ? (
-        <Text as="span">
-          {'"'}
-          {notification.field.title}
-          {'"'}
-        </Text>
-      ) : (
-        <Text as="span" textStyle="hint">
-          <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
-        </Text>
-      );
       return (
         <PetitionUserNotification
           ref={ref}
@@ -55,19 +45,28 @@ export const CommentCreatedUserNotification = Object.assign(
             <FormattedMessage
               id="component.notification-mention-comment.body"
               defaultMessage="{name} has mentioned you in the field {field}."
-              values={{ name: <UserOrContactReference userOrAccess={author} />, field }}
+              values={{
+                name: <UserOrContactReference userOrAccess={author} />,
+                field: <PetitionFieldReference field={field} />,
+              }}
             />
           ) : isNote ? (
             <FormattedMessage
               id="component.notification-internal-comment.body"
               defaultMessage="{name} has added a note in the field {field}."
-              values={{ name: <UserOrContactReference userOrAccess={author} />, field }}
+              values={{
+                name: <UserOrContactReference userOrAccess={author} />,
+                field: <PetitionFieldReference field={field} />,
+              }}
             />
           ) : (
             <FormattedMessage
               id="component.notification-comment.body"
               defaultMessage="{name} has written a comment in the field {field}."
-              values={{ name: <UserOrContactReference userOrAccess={author} />, field }}
+              values={{
+                name: <UserOrContactReference userOrAccess={author} />,
+                field: <PetitionFieldReference field={field} />,
+              }}
             />
           )}
         </PetitionUserNotification>
@@ -80,8 +79,7 @@ export const CommentCreatedUserNotification = Object.assign(
         fragment CommentCreatedUserNotification_CommentCreatedUserNotification on CommentCreatedUserNotification {
           ...PetitionUserNotification_PetitionUserNotification
           field {
-            id
-            title
+            ...PetitionFieldReference_PetitionField
           }
           comment {
             id
@@ -93,8 +91,8 @@ export const CommentCreatedUserNotification = Object.assign(
           isMention
         }
         ${PetitionUserNotification.fragments.PetitionUserNotification}
+        ${PetitionFieldReference.fragments.PetitionField}
         ${UserOrContactReference.fragments.UserOrPetitionAccess}
-        ${UserReference.fragments.User}
         ${ContactReference.fragments.Contact}
       `,
     },
