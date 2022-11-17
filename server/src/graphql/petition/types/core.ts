@@ -539,7 +539,7 @@ export const PetitionField = objectType({
     });
     t.boolean("showInPdf", {
       description: "Determines if the field is visible in PDF export.",
-      resolve: (o) => o.show_in_pdf,
+      resolve: (o) => o.type !== "DOW_JONES_KYC" && o.show_in_pdf,
     });
     t.boolean("isReadOnly", {
       description: "Determines if the field accepts replies",

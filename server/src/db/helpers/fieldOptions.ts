@@ -347,7 +347,7 @@ export function defaultFieldOptions(
     optional,
     multiple,
     is_internal: type === "DOW_JONES_KYC" ? true : field?.is_internal ?? false,
-    show_in_pdf: field?.show_in_pdf ?? true,
+    show_in_pdf: type === "DOW_JONES_KYC" ? false : field?.show_in_pdf ?? true,
     alias,
     has_comments_enabled: type === "HEADING" ? false : true,
     options,
