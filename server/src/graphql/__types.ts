@@ -1262,7 +1262,7 @@ export interface NexusGenFieldTypes {
     deleteTag: NexusGenEnums["Result"]; // Result!
     deleteUserGroup: NexusGenEnums["Result"]; // Result!
     dynamicSelectFieldFileDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
-    editPetitionPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
+    editPetitionPermission: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     forceUpdateSignatureOrganizationBrandings: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
@@ -2964,7 +2964,7 @@ export interface NexusGenFieldTypeNames {
     deleteTag: "Result";
     deleteUserGroup: "Result";
     dynamicSelectFieldFileDownloadLink: "FileUploadDownloadLinkResult";
-    editPetitionPermission: "Petition";
+    editPetitionPermission: "PetitionBase";
     fileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     forceUpdateSignatureOrganizationBrandings: "SupportMethodResponse";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";

@@ -704,7 +704,7 @@ export interface Mutation {
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
   /** Edits permissions on given parallel and users */
-  editPetitionPermission: Array<Petition>;
+  editPetitionPermission: Array<PetitionBase>;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Forces an update of the branding of every signature integration of the selected organization. */
@@ -8606,48 +8606,92 @@ export type PetitionSharingModal_editPetitionPermissionMutationVariables = Exact
 }>;
 
 export type PetitionSharingModal_editPetitionPermissionMutation = {
-  editPetitionPermission: Array<{
-    __typename?: "Petition";
-    id: string;
-    name?: string | null;
-    path: string;
-    permissions: Array<
-      | {
-          __typename?: "PetitionUserGroupPermission";
+  editPetitionPermission: Array<
+    | {
+        __typename?: "Petition";
+        id: string;
+        name?: string | null;
+        path: string;
+        permissions: Array<
+          | {
+              __typename?: "PetitionUserGroupPermission";
+              permissionType: PetitionPermissionType;
+              group: {
+                __typename?: "UserGroup";
+                id: string;
+                name: string;
+                initials: string;
+                memberCount: number;
+                imMember: boolean;
+              };
+            }
+          | {
+              __typename?: "PetitionUserPermission";
+              permissionType: PetitionPermissionType;
+              isSubscribed: boolean;
+              user: {
+                __typename?: "User";
+                id: string;
+                email: string;
+                fullName?: string | null;
+                avatarUrl?: string | null;
+                initials?: string | null;
+              };
+            }
+        >;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
-          group: {
-            __typename?: "UserGroup";
-            id: string;
-            name: string;
-            initials: string;
-            memberCount: number;
-            imMember: boolean;
-          };
-        }
-      | {
-          __typename?: "PetitionUserPermission";
-          permissionType: PetitionPermissionType;
+        } | null;
+        effectivePermissions: Array<{
+          __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
-          user: {
-            __typename?: "User";
-            id: string;
-            email: string;
-            fullName?: string | null;
-            avatarUrl?: string | null;
-            initials?: string | null;
-          };
-        }
-    >;
-    myEffectivePermission?: {
-      __typename?: "EffectivePetitionUserPermission";
-      permissionType: PetitionPermissionType;
-    } | null;
-    effectivePermissions: Array<{
-      __typename?: "EffectivePetitionUserPermission";
-      isSubscribed: boolean;
-      user: { __typename?: "User"; id: string };
-    }>;
-  }>;
+          user: { __typename?: "User"; id: string };
+        }>;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        name?: string | null;
+        path: string;
+        permissions: Array<
+          | {
+              __typename?: "PetitionUserGroupPermission";
+              permissionType: PetitionPermissionType;
+              group: {
+                __typename?: "UserGroup";
+                id: string;
+                name: string;
+                initials: string;
+                memberCount: number;
+                imMember: boolean;
+              };
+            }
+          | {
+              __typename?: "PetitionUserPermission";
+              permissionType: PetitionPermissionType;
+              isSubscribed: boolean;
+              user: {
+                __typename?: "User";
+                id: string;
+                email: string;
+                fullName?: string | null;
+                avatarUrl?: string | null;
+                initials?: string | null;
+              };
+            }
+        >;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
+        effectivePermissions: Array<{
+          __typename?: "EffectivePetitionUserPermission";
+          isSubscribed: boolean;
+          user: { __typename?: "User"; id: string };
+        }>;
+      }
+  >;
 };
 
 export type PetitionSharingModal_transferPetitionOwnershipMutationVariables = Exact<{

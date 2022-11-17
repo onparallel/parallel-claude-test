@@ -225,14 +225,15 @@ export function PetitionSharingDialog({
   }: PetitionPermissionProps) => {
     try {
       if (isDefined(permissionType)) {
-        const prop = user ? "userIds" : "userGroupIds";
-        const id = user ? user.id : userGroup?.id;
-
-        if (id === userId && permissionType === "READ") {
+        if (user?.id === userId && permissionType === "READ") {
           await confirmEditPetitionPermission();
         }
         await editPetitionPermission({
-          variables: { petitionId, [prop]: [id], permissionType },
+          variables: {
+            petitionId,
+            permissionType,
+            ...(user ? { userIds: [user.id] } : { userGroupIds: userGroup!.id }),
+          },
         });
       }
     } catch {}

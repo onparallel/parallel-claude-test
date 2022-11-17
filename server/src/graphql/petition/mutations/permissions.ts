@@ -126,7 +126,7 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
 
 export const editPetitionPermission = mutationField("editPetitionPermission", {
   description: "Edits permissions on given parallel and users",
-  type: list(nonNull("Petition")),
+  type: list(nonNull("PetitionBase")),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
     ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
