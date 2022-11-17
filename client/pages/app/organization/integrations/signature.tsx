@@ -44,7 +44,6 @@ import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { pick } from "remeda";
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -272,9 +271,7 @@ function useSignatureTokensTableColumns() {
           CellContent: ({ row, context }) => {
             const showDocusignConsentPopup = useDocusignConsentPopup();
             async function handleConsentClick() {
-              const [error] = await withError(
-                showDocusignConsentPopup(pick(row, ["isDefault", "name"]))
-              );
+              const [error] = await withError(showDocusignConsentPopup());
               if (!error) {
                 context.refetch();
               }

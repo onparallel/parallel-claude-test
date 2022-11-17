@@ -120,9 +120,10 @@ async function startSignatureProcess(
     });
   } catch (error: any) {
     const cancelData = {
-      error: error.stack ?? JSON.stringify(error),
+      error: error.stack ?? error,
     } as PetitionSignatureRequestCancelData<"REQUEST_ERROR">;
 
+    // TODO manejar mejor estos errores :/
     if (error.message === "MAX_SIZE_EXCEEDED") {
       cancelData.error_code = "MAX_SIZE_EXCEEDED";
     }
@@ -130,6 +131,9 @@ async function startSignatureProcess(
       cancelData.error_code = "INSUFFICIENT_SIGNATURE_CREDITS";
       cancelData.error =
         "The signature request could not be started due to lack of signature credits";
+    }
+    if (error.consent_required) {
+      cancelData.error_code = "CONSENT_REQUIRED";
     }
 
     await ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData);
