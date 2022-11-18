@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Circle, Text } from "@chakra-ui/react";
+import { Circle } from "@chakra-ui/react";
 import { CommentIcon, MentionIcon, NoteIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { PetitionFieldReference } from "@parallel/components/petition-activity/PetitionFieldReference";
