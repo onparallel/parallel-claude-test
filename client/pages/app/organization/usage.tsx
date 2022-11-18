@@ -126,4 +126,8 @@ OrganizationUsage.getInitialProps = async ({ fetchQuery }: WithApolloDataContext
   await fetchQuery(OrganizationUsage_userDocument);
 };
 
-export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(OrganizationUsage);
+export default compose(
+  withDialogs,
+  withOrgRole("ADMIN", "/app/organization"),
+  withApolloData
+)(OrganizationUsage);

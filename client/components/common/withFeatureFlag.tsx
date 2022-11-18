@@ -1,9 +1,24 @@
 import { gql } from "@apollo/client";
-import { FeatureFlag, HasFeatureFlagQuery } from "@parallel/graphql/__types";
+import {
+  FeatureFlag,
+  HasFeatureFlagDocument,
+  HasFeatureFlagQuery,
+} from "@parallel/graphql/__types";
 import { NextComponentType } from "next";
-import { WithApolloDataContext } from "./withApolloData";
+import { RedirectError, WithApolloDataContext } from "./withApolloData";
 
-export function withFeatureFlag(featureFlag: FeatureFlag) {
+const _queries = [
+  gql`
+    query HasFeatureFlag($featureFlag: FeatureFlag!) {
+      me {
+        id
+        hasFeatureFlag: hasFeatureFlag(featureFlag: $featureFlag)
+      }
+    }
+  `,
+];
+
+export function withFeatureFlag(featureFlag: FeatureFlag, orPath = "/path") {
   return function <P = {}>(
     // eslint-disable-next-line @typescript-eslint/naming-convention
     Component: NextComponentType<WithApolloDataContext, P, P>
@@ -20,21 +35,13 @@ export function withFeatureFlag(featureFlag: FeatureFlag) {
             `Please, place "withFeatureFlag" before "withApolloData" in the "compose" argument list.`
           );
         }
-        const { data } = await context.apollo.query<HasFeatureFlagQuery>({
-          query: gql`
-            query HasFeatureFlag($featureFlag: FeatureFlag!) {
-              me {
-                id
-                hasFeatureFlag: hasFeatureFlag(featureFlag: $featureFlag)
-              }
-            }
-          `,
+        const { data } = await context.fetchQuery(HasFeatureFlagDocument, {
           variables: { featureFlag },
         });
         if (data?.me?.hasFeatureFlag) {
           return await getInitialProps?.(context);
         } else {
-          throw new Error("FORBIDDEN");
+          throw new RedirectError(orPath);
         }
       },
     });

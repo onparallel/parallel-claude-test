@@ -1,10 +1,21 @@
 import { gql } from "@apollo/client";
-import { OrganizationRole, WithOrgRoleQuery } from "@parallel/graphql/__types";
+import { OrganizationRole, WithOrgRoleDocument } from "@parallel/graphql/__types";
 import { isAtLeast } from "@parallel/utils/roles";
 import { NextComponentType } from "next";
-import { WithApolloDataContext } from "./withApolloData";
+import { RedirectError, WithApolloDataContext } from "./withApolloData";
 
-export function withOrgRole<P = {}>(role: OrganizationRole) {
+const _queries = [
+  gql`
+    query WithOrgRole {
+      me {
+        id
+        role
+      }
+    }
+  `,
+];
+
+export function withOrgRole<P = {}>(role: OrganizationRole, orPath = "/app") {
   return function (
     // eslint-disable-next-line @typescript-eslint/naming-convention
     Component: NextComponentType<WithApolloDataContext, P, P>
@@ -21,20 +32,11 @@ export function withOrgRole<P = {}>(role: OrganizationRole) {
             `Please, place "withOrgRole" before "withApolloData" in the "compose" argument list.`
           );
         }
-        const { data } = await context.apollo.query<WithOrgRoleQuery>({
-          query: gql`
-            query WithOrgRole {
-              me {
-                id
-                role
-              }
-            }
-          `,
-        });
+        const { data } = await context.fetchQuery(WithOrgRoleDocument);
         if (isAtLeast(role, data.me.role)) {
           return await getInitialProps?.(context);
         } else {
-          throw new Error("FORBIDDEN");
+          throw new RedirectError(orPath);
         }
       },
     });

@@ -1,7 +1,18 @@
 import { gql } from "@apollo/client";
-import { WithSuperAdminAccessQuery } from "@parallel/graphql/__types";
+import { WithSuperAdminAccessDocument } from "@parallel/graphql/__types";
 import { NextComponentType } from "next";
-import { WithApolloDataContext } from "./withApolloData";
+import { RedirectError, WithApolloDataContext } from "./withApolloData";
+
+const _queries = [
+  gql`
+    query WithSuperAdminAccess {
+      me {
+        id
+        isSuperAdmin
+      }
+    }
+  `,
+];
 
 export function withSuperAdminAccess<P = {}>(
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -19,20 +30,11 @@ export function withSuperAdminAccess<P = {}>(
           `Please, place "withSuperAdminAccess" before "withApolloData" in the "compose" argument list.`
         );
       }
-      const { data } = await context.apollo.query<WithSuperAdminAccessQuery>({
-        query: gql`
-          query WithSuperAdminAccess {
-            me {
-              id
-              isSuperAdmin
-            }
-          }
-        `,
-      });
+      const { data } = await context.fetchQuery(WithSuperAdminAccessDocument);
       if (data?.me?.isSuperAdmin) {
         return await getInitialProps?.(context);
       } else {
-        throw new Error("FORBIDDEN");
+        throw new RedirectError("/app");
       }
     },
   });

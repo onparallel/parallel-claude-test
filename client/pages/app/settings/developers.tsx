@@ -625,6 +625,6 @@ Developers.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
 
 export default compose(
   withDialogs,
-  withFeatureFlag("DEVELOPER_ACCESS"),
+  withFeatureFlag("DEVELOPER_ACCESS", "/app/organization"),
   withApolloData
 )(Developers);

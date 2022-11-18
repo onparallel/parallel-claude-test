@@ -303,6 +303,7 @@ Reports.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
 };
 
 export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(Reports);
+
 function TemplateStatsReport({ report }: { report: ReportType }) {
   const pendingToComplete = report.pending_to_complete ?? 0;
   const completeToClose = report.complete_to_close ?? 0;

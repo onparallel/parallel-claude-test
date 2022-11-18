@@ -492,4 +492,8 @@ IntegrationsSignature.getInitialProps = async ({
   });
 };
 
-export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(IntegrationsSignature);
+export default compose(
+  withDialogs,
+  withOrgRole("ADMIN", "/app/organization"),
+  withApolloData
+)(IntegrationsSignature);

@@ -403,4 +403,8 @@ OrganizationCompliance.getInitialProps = async ({ fetchQuery }: WithApolloDataCo
   await fetchQuery(OrganizationCompliance_userDocument);
 };
 
-export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(OrganizationCompliance);
+export default compose(
+  withDialogs,
+  withOrgRole("ADMIN", "/app/organization"),
+  withApolloData
+)(OrganizationCompliance);
