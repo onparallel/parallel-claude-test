@@ -5476,13 +5476,13 @@
   },
   {
     "term": "component.use-create-contact.force-contact-body",
-    "definition": "El dominio del correo electrónico no ha podido ser validado, si se crea puede ser que no se pueda enviar a esta dirección.",
-    "context": "The email domain could not be validated, if it is created you may not be able to send it to this address."
+    "definition": "El dominio del correo electrónico no ha podido ser verificado. Si se crea, puede ser que no se pueda enviar correos a esta dirección.",
+    "context": "We could not verify this email address. You may not be able to send emails to this address."
   },
   {
     "term": "component.use-create-contact.force-contact-header",
-    "definition": "No se pudo validar el correo electrónico",
-    "context": "Failed to validate email"
+    "definition": "No se pudo verificar el correo electrónico",
+    "context": "Failed to verify email"
   },
   {
     "term": "component.use-create-contact.force-contact-question",
@@ -5646,8 +5646,8 @@
   },
   {
     "term": "contacts.import-from-excel.import-error.body-domain",
-    "definition": "Si se crean, es posible que no se pueda enviar a estas direcciones.",
-    "context": "If created, you may not be able to send it to this addresses."
+    "definition": "Si se crean, es posible que no se pueda enviar correos a estas direcciones.",
+    "context": "You may not be able to send emails to these addresses."
   },
   {
     "term": "contacts.import-from-excel.import-error.body-domain-question",
@@ -5666,13 +5666,13 @@
   },
   {
     "term": "contacts.import-from-excel.import-error.details-domain",
-    "definition": "Los siguientes correos electrónicos no han podido ser validados:",
+    "definition": "Los siguientes correos electrónicos no han podido ser verificados:",
     "context": "The following emails could not be validated:"
   },
   {
     "term": "contacts.import-from-excel.import-error.details-domain-short",
-    "definition": "Varios correos electrónicos no pudieron ser validados.",
-    "context": "Many emails could not be validated."
+    "definition": "Varios de los correos electrónicos no pudieron ser verificados.",
+    "context": "Some of the emails could not be verified."
   },
   {
     "term": "contacts.no-contacts",

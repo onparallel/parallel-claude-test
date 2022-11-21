@@ -5476,13 +5476,13 @@
   },
   {
     "term": "component.use-create-contact.force-contact-body",
-    "definition": "The email domain could not be validated, if it is created you may not be able to send it to this address.",
-    "context": "The email domain could not be validated, if it is created you may not be able to send it to this address."
+    "definition": "We could not verify this email address. You may not be able to send emails to this address.",
+    "context": "We could not verify this email address. You may not be able to send emails to this address."
   },
   {
     "term": "component.use-create-contact.force-contact-header",
-    "definition": "Failed to validate email",
-    "context": "Failed to validate email"
+    "definition": "Failed to verify email",
+    "context": "Failed to verify email"
   },
   {
     "term": "component.use-create-contact.force-contact-question",
@@ -5646,8 +5646,8 @@
   },
   {
     "term": "contacts.import-from-excel.import-error.body-domain",
-    "definition": "If created, you may not be able to send it to this addresses.",
-    "context": "If created, you may not be able to send it to this addresses."
+    "definition": "You may not be able to send emails to these addresses.",
+    "context": "You may not be able to send emails to these addresses."
   },
   {
     "term": "contacts.import-from-excel.import-error.body-domain-question",
@@ -5671,8 +5671,8 @@
   },
   {
     "term": "contacts.import-from-excel.import-error.details-domain-short",
-    "definition": "Many emails could not be validated.",
-    "context": "Many emails could not be validated."
+    "definition": "Some of the emails could not be verified.",
+    "context": "Some of the emails could not be verified."
   },
   {
     "term": "contacts.no-contacts",

@@ -221,14 +221,14 @@ function ImportErrorResolveDomainDialog({ emails, ...props }: DialogProps<{ emai
             <Text>
               <FormattedMessage
                 id="contacts.import-from-excel.import-error.details-domain-short"
-                defaultMessage="Many emails could not be validated."
+                defaultMessage="Some of the emails could not be verified."
               />
             </Text>
           )}
           <Text>
             <FormattedMessage
               id="contacts.import-from-excel.import-error.body-domain"
-              defaultMessage="If created, you may not be able to send it to this addresses."
+              defaultMessage="You may not be able to send emails to these addresses."
             />
           </Text>
           <Text>

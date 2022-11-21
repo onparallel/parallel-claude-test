@@ -62,7 +62,7 @@ function ForceCreateContactDialog({ ...props }: DialogProps<{}>) {
           <Text>
             <FormattedMessage
               id="component.use-create-contact.force-contact-header"
-              defaultMessage="Failed to validate email"
+              defaultMessage="Failed to verify email"
             />
           </Text>
         </Stack>
@@ -72,7 +72,7 @@ function ForceCreateContactDialog({ ...props }: DialogProps<{}>) {
           <Text>
             <FormattedMessage
               id="component.use-create-contact.force-contact-body"
-              defaultMessage="The email domain could not be validated, if it is created you may not be able to send it to this address."
+              defaultMessage="We could not verify this email address. You may not be able to send emails to this address."
             />
           </Text>
           <Text>
