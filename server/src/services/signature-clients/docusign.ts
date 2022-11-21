@@ -106,9 +106,8 @@ export class DocuSignClient implements ISignatureClient<"DOCUSIGN"> {
         );
       }
 
-      return { environment: environment as "production" | "sandbox" };
+      return { environment };
     } catch (e: any) {
-      console.error(e.status, opts, this.integrationId);
       if (e.response?.body?.error === "consent_required") {
         if (isDefined(this.integrationId)) {
           await this.integrations.updateOrgIntegration(
@@ -119,19 +118,12 @@ export class DocuSignClient implements ISignatureClient<"DOCUSIGN"> {
         }
 
         if (opts?.throwOnConsentRequired) {
-          throw {
-            environment: environment as "production" | "sandbox",
-            consent_required: true,
-          };
+          throw { environment, consent_required: true };
         } else {
-          return {
-            environment: environment as "production" | "sandbox",
-            consent_required: true,
-          };
+          return { environment, consent_required: true };
         }
       } else if (e.status === 401 && this.integrationId && opts?.retryOnError) {
         // authentication error, refresh access_token and try again
-        console.debug("REFRESHING ACCESS_TOKEN...");
         const newCredentials = await this.docusignOauth.refreshAccessToken(REFRESH_TOKEN);
         this.settings.CREDENTIALS = this.docusignOauth.encryptCredentials(newCredentials);
         await this.integrations.updateOrgIntegration(

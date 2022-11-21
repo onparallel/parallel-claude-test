@@ -2,10 +2,10 @@ import { gql } from "@apollo/client";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { NakedLink } from "@parallel/components/common/Link";
 import { SignerReference } from "@parallel/components/common/SignerReference";
 import { TimelineSignatureCancelledEvent_SignatureCancelledEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { useDocusignConsentPopup } from "@parallel/utils/useDocusignConsentPopup";
 import { FormattedMessage } from "react-intl";
 import { useDeclinedSignatureReasonDialog } from "../dialogs/DeclinedSignatureReasonDialog";
 import { UserOrContactReference } from "../UserOrContactReference";
@@ -29,8 +29,6 @@ export function TimelineSignatureCancelledEvent({
       });
     } catch {}
   }
-
-  const showDocusignConsentPopup = useDocusignConsentPopup();
 
   return (
     <TimelineItem
@@ -171,17 +169,11 @@ export function TimelineSignatureCancelledEvent({
         {event.cancelType === "REQUEST_ERROR" &&
           event.errorCode === "CONSENT_REQUIRED" &&
           event.provider === "DOCUSIGN" && (
-            <Button
-              size="sm"
-              variant="outline"
-              marginLeft={4}
-              onClick={() => showDocusignConsentPopup()}
-            >
-              <FormattedMessage
-                id="timeline.signature-declined.give-consent"
-                defaultMessage="Give consent"
-              />
-            </Button>
+            <NakedLink href="/app/organization/integrations/signature">
+              <Button as="a" variant="outline" size="sm" marginLeft={4}>
+                <FormattedMessage id="timeline.signature-declined.review" defaultMessage="Review" />
+              </Button>
+            </NakedLink>
           )}
       </Flex>
     </TimelineItem>

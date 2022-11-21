@@ -10580,9 +10580,9 @@
     "context": "{signer} has declined the eSignature process {timeAgo}"
   },
   {
-    "term": "timeline.signature-declined.give-consent",
-    "definition": "Otorgar consentimiento",
-    "context": "Give consent"
+    "term": "timeline.signature-declined.review",
+    "definition": "Revisar",
+    "context": "Review"
   },
   {
     "term": "timeline.signature-declined.see-reason",

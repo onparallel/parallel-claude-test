@@ -67,7 +67,6 @@ export class DocusignOauthIntegration extends OAuthIntegration {
     });
 
     const data = await response.json();
-    console.log(data, response.status);
     if (response.ok) {
       return { ACCESS_TOKEN: data.access_token, REFRESH_TOKEN: data.refresh_token };
     } else {
