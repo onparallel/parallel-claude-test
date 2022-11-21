@@ -706,7 +706,14 @@ type Mutation {
   """
   Load contacts from an excel file, creating the ones not found on database
   """
-  bulkCreateContacts(file: Upload!): BulkCreateContactsReturnType!
+  bulkCreateContacts(
+    file: Upload!
+
+    """
+    Pass true to force create contacts with failed resolveMx email.
+    """
+    force: Boolean
+  ): BulkCreateContactsReturnType!
 
   """
   Submits multiple replies on a petition at once given a JSON input where the keys are field aliases and values are the replie(s) for that field.
@@ -768,7 +775,14 @@ type Mutation {
   """
   Create a contact.
   """
-  createContact(data: CreateContactInput!): Contact!
+  createContact(
+    data: CreateContactInput!
+
+    """
+    Pass true to force create contacts with failed resolveMx email.
+    """
+    force: Boolean
+  ): Contact!
 
   """
   Creates a new Dow Jones KYC integration on the user's organization

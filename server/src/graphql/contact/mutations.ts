@@ -19,7 +19,7 @@ import { importFromExcel } from "../helpers/importDataFromExcel";
 import { parseContactList } from "../helpers/parseContactList";
 import { RESULT } from "../helpers/result";
 import { uploadArg } from "../helpers/scalars";
-import { validateAnd, validateIfDefined } from "../helpers/validateArgs";
+import { validateAnd, validateIf, validateIfDefined } from "../helpers/validateArgs";
 import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 import { notEmptyString } from "../helpers/validators/notEmptyString";
 import { validateFile } from "../helpers/validators/validateFile";
@@ -42,8 +42,16 @@ export const createContact = mutationField("createContact", {
         },
       }).asArg()
     ),
+    force: nullable(
+      booleanArg({
+        description: "Pass true to force create contacts with failed resolveMx email.",
+      })
+    ),
   },
-  validateArgs: validEmail((args) => args.data.email, "data.email"),
+  validateArgs: validateIf(
+    (args) => !isDefined(args.force),
+    validEmail((args) => args.data.email, "data.email")
+  ),
   resolve: async (_, args, ctx) => {
     const { email, firstName, lastName } = args.data;
     try {
@@ -115,6 +123,11 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
   authorize: authenticate(),
   args: {
     file: nonNull(uploadArg()),
+    force: nullable(
+      booleanArg({
+        description: "Pass true to force create contacts with failed resolveMx email.",
+      })
+    ),
   },
   validateArgs: validateFile(
     (args) => args.file,
@@ -134,6 +147,7 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
 
     const [parsedErrors, parsedContacts] = await parseContactList(importResult!, {
       validateEmail: (email: string) => ctx.emails.validateEmail(email),
+      force: isDefined(args.force) && args.force ? true : false,
     });
 
     if (parsedContacts.length === 0) {

@@ -938,6 +938,7 @@ export interface MutationassignPetitionToUserArgs {
 
 export interface MutationbulkCreateContactsArgs {
   file: Scalars["Upload"];
+  force?: InputMaybe<Scalars["Boolean"]>;
 }
 
 export interface MutationbulkCreatePetitionRepliesArgs {
@@ -998,6 +999,7 @@ export interface MutationcompletePetitionArgs {
 
 export interface MutationcreateContactArgs {
   data: CreateContactInput;
+  force?: InputMaybe<Scalars["Boolean"]>;
 }
 
 export interface MutationcreateDowJonesKycIntegrationArgs {
@@ -4863,6 +4865,7 @@ export type useConfirmDeleteContactsDialog_ContactFragment = {
 
 export type ImportContactsDialog_bulkCreateContactsMutationVariables = Exact<{
   file: Scalars["Upload"];
+  force?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
 export type ImportContactsDialog_bulkCreateContactsMutation = {
@@ -24392,6 +24395,7 @@ export type useClonePetitions_clonePetitionsMutation = {
 
 export type useCreateContact_createContactMutationVariables = Exact<{
   data: CreateContactInput;
+  force?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
 export type useCreateContact_createContactMutation = {
@@ -30167,8 +30171,8 @@ export const WithSuperAdminAccessDocument = gql`
   }
 ` as unknown as DocumentNode<WithSuperAdminAccessQuery, WithSuperAdminAccessQueryVariables>;
 export const ImportContactsDialog_bulkCreateContactsDocument = gql`
-  mutation ImportContactsDialog_bulkCreateContacts($file: Upload!) {
-    bulkCreateContacts(file: $file) {
+  mutation ImportContactsDialog_bulkCreateContacts($file: Upload!, $force: Boolean) {
+    bulkCreateContacts(file: $file, force: $force) {
       errors
       contacts {
         id
@@ -33741,8 +33745,8 @@ export const useClonePetitions_clonePetitionsDocument = gql`
   useClonePetitions_clonePetitionsMutationVariables
 >;
 export const useCreateContact_createContactDocument = gql`
-  mutation useCreateContact_createContact($data: CreateContactInput!) {
-    createContact(data: $data) {
+  mutation useCreateContact_createContact($data: CreateContactInput!, $force: Boolean) {
+    createContact(data: $data, force: $force) {
       id
       email
       firstName

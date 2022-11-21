@@ -5470,6 +5470,26 @@
     "context": "Years"
   },
   {
+    "term": "component.use-create-contact.create-contact",
+    "definition": "Create contact",
+    "context": "Create contact"
+  },
+  {
+    "term": "component.use-create-contact.force-contact-body",
+    "definition": "The email domain could not be validated, if it is created you may not be able to send it to this address.",
+    "context": "The email domain could not be validated, if it is created you may not be able to send it to this address."
+  },
+  {
+    "term": "component.use-create-contact.force-contact-header",
+    "definition": "Failed to validate email",
+    "context": "Failed to validate email"
+  },
+  {
+    "term": "component.use-create-contact.force-contact-question",
+    "definition": "Do you still want to create the contact?",
+    "context": "Do you still want to create the contact?"
+  },
+  {
     "term": "component.user-dropdown-empty.invite-button",
     "definition": "Invite people",
     "context": "Invite people"
@@ -5590,16 +5610,6 @@
     "context": "Enter the contact details"
   },
   {
-    "term": "contacts.email-error.check-correct-email",
-    "definition": "Please make sure that the email is correct.",
-    "context": "Please make sure that the email is correct."
-  },
-  {
-    "term": "contacts.email-error.validation-failed",
-    "definition": "The email validation has failed",
-    "context": "The email validation has failed"
-  },
-  {
     "term": "contacts.header.email",
     "definition": "Email",
     "context": "Email"
@@ -5635,9 +5645,34 @@
     "context": "Please, review your file and make sure it matches the format on the loading model."
   },
   {
+    "term": "contacts.import-from-excel.import-error.body-domain",
+    "definition": "If created, you may not be able to send it to this addresses.",
+    "context": "If created, you may not be able to send it to this addresses."
+  },
+  {
+    "term": "contacts.import-from-excel.import-error.body-domain-question",
+    "definition": "Do you still want to create the contacts?",
+    "context": "Do you still want to create the contacts?"
+  },
+  {
+    "term": "contacts.import-from-excel.import-error.create-contacts",
+    "definition": "Create contacts",
+    "context": "Create contacts"
+  },
+  {
     "term": "contacts.import-from-excel.import-error.details",
     "definition": "We have detected an error in the following file rows:",
     "context": "We have detected an error in the following file rows:"
+  },
+  {
+    "term": "contacts.import-from-excel.import-error.details-domain",
+    "definition": "The following emails could not be validated:",
+    "context": "The following emails could not be validated:"
+  },
+  {
+    "term": "contacts.import-from-excel.import-error.details-domain-short",
+    "definition": "Many emails could not be validated.",
+    "context": "Many emails could not be validated."
   },
   {
     "term": "contacts.no-contacts",

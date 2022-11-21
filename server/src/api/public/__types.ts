@@ -954,6 +954,7 @@ export type MutationcompletePetitionArgs = {
 
 export type MutationcreateContactArgs = {
   data: CreateContactInput;
+  force?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type MutationcreateDowJonesKycIntegrationArgs = {

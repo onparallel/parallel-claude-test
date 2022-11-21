@@ -1,4 +1,12 @@
+import { EMAIL_REGEX } from "./validators/validEmail";
+
+export type ExcelParsingCodeErrors =
+  | "FIRST_NAME_REQUIRED"
+  | "INVALID_EMAIL_FORMAT"
+  | "CANNOT_RESOLVE_DOMAIN";
+
 export type ExcelParsingError = {
+  code: ExcelParsingCodeErrors;
   message: string;
   row: number;
   column: number;
@@ -14,6 +22,7 @@ export async function parseContactList(
   data: string[][],
   options: {
     validateEmail: (email: string) => Promise<boolean>;
+    force: boolean;
   }
 ): Promise<[ExcelParsingError[] | undefined, ParsedContact[]]> {
   const errors = [] as ExcelParsingError[];
@@ -33,13 +42,32 @@ export async function parseContactList(
     const firstName = row[0]?.trim();
     if (!firstName) {
       rowHasError = true;
-      errors.push({ message: "First name is required", row: index + 2, column: 1 });
+      errors.push({
+        code: "FIRST_NAME_REQUIRED",
+        message: "First name is required",
+        row: index + 2,
+        column: 1,
+      });
     }
     const lastName = row[1]?.trim();
     const email = row[2]?.trim().toLowerCase();
-    if (!(await options.validateEmail(email))) {
+
+    if (!EMAIL_REGEX.test(email)) {
       rowHasError = true;
-      errors.push({ message: `${email} is not a valid email`, row: index + 2, column: 3 });
+      errors.push({
+        code: "INVALID_EMAIL_FORMAT",
+        message: email,
+        row: index + 2,
+        column: 3,
+      });
+    } else if (!options.force && !(await options.validateEmail(email))) {
+      rowHasError = true;
+      errors.push({
+        code: "CANNOT_RESOLVE_DOMAIN",
+        message: email,
+        row: index + 2,
+        column: 3,
+      });
     }
 
     // we add the new contact to the cumulative array

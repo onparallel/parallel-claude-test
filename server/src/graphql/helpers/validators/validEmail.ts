@@ -20,10 +20,16 @@ export function validEmail<TypeName extends string, FieldName extends string>(
       await pMap(
         emails,
         async (email) => {
-          if (!(await ctx.emails.validateEmail(email, onlyRegex))) {
+          if (!EMAIL_REGEX.test(email)) {
             throw new ArgValidationError(info, argName, `'${email}' is not a valid email.`, {
               email,
               error_code: "INVALID_EMAIL_ERROR",
+            });
+          }
+          if (!onlyRegex && !(await ctx.emails.validateEmail(email))) {
+            throw new ArgValidationError(info, argName, `'${email}' is not a valid email.`, {
+              email,
+              error_code: "INVALID_MX_EMAIL_ERROR",
             });
           }
         },

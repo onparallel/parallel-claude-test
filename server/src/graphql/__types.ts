@@ -4302,6 +4302,7 @@ export interface NexusGenArgTypes {
     bulkCreateContacts: {
       // args
       file: NexusGenScalars["Upload"]; // Upload!
+      force?: boolean | null; // Boolean
     };
     bulkCreatePetitionReplies: {
       // args
@@ -4362,6 +4363,7 @@ export interface NexusGenArgTypes {
     createContact: {
       // args
       data: NexusGenInputs["CreateContactInput"]; // CreateContactInput!
+      force?: boolean | null; // Boolean
     };
     createDowJonesKycIntegration: {
       // args

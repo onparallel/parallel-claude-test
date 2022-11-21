@@ -1,15 +1,18 @@
 import { gql, useMutation } from "@apollo/client";
 import {
   Box,
+  Button,
   Center,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
   Spinner,
+  Stack,
   Text,
 } from "@chakra-ui/react";
-import { DownloadIcon } from "@parallel/chakra/icons";
+import { AlertCircleIcon, DownloadIcon } from "@parallel/chakra/icons";
+import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { ImportContactsDialog_bulkCreateContactsDocument } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -61,6 +64,8 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
     );
   }
 
+  const showImportErrorResolveDomainDialog = useDialog(ImportErrorResolveDomainDialog);
+
   const [bulkCreateContacts, { loading: isUploading }] = useMutation(
     ImportContactsDialog_bulkCreateContactsDocument
   );
@@ -72,11 +77,25 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
         const { data } = await bulkCreateContacts({
           variables: { file },
         });
-        const contacts = data!.bulkCreateContacts.contacts;
+        let contacts = data!.bulkCreateContacts.contacts;
         const errors = data!.bulkCreateContacts.errors;
 
         if (errors && errors.length > 0) {
-          await showImportErrorDialog(errors.map((e: any) => e.row));
+          if (errors.some((e) => e.code !== "CANNOT_RESOLVE_DOMAIN")) {
+            await showImportErrorDialog(errors.map((e: any) => e.row));
+          } else {
+            try {
+              await showImportErrorResolveDomainDialog({
+                emails: errors.map((e: any) => e.message),
+              });
+
+              const { data } = await bulkCreateContacts({
+                variables: { file, force: true },
+              });
+
+              contacts = data!.bulkCreateContacts.contacts;
+            } catch {}
+          }
         }
         props.onResolve({ count: contacts.length });
       } catch (error: any) {
@@ -174,10 +193,68 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
   );
 }
 
+function ImportErrorResolveDomainDialog({ emails, ...props }: DialogProps<{ emails: string[] }>) {
+  return (
+    <ConfirmDialog
+      {...props}
+      header={
+        <Stack direction={"row"} spacing={2} align="center">
+          <AlertCircleIcon role="presentation" />
+          <Text>
+            <FormattedMessage id="generic.import-error" defaultMessage="Import error" />
+          </Text>
+        </Stack>
+      }
+      body={
+        <>
+          {emails.length && emails.length < 16 ? (
+            <Text marginBottom={2}>
+              <FormattedMessage
+                id="contacts.import-from-excel.import-error.details-domain"
+                defaultMessage="The following emails could not be validated:"
+              />
+              <Text as="b" marginLeft={1.5}>
+                <FormattedList value={emails} />
+              </Text>
+            </Text>
+          ) : (
+            <Text>
+              <FormattedMessage
+                id="contacts.import-from-excel.import-error.details-domain-short"
+                defaultMessage="Many emails could not be validated."
+              />
+            </Text>
+          )}
+          <Text>
+            <FormattedMessage
+              id="contacts.import-from-excel.import-error.body-domain"
+              defaultMessage="If created, you may not be able to send it to this addresses."
+            />
+          </Text>
+          <Text>
+            <FormattedMessage
+              id="contacts.import-from-excel.import-error.body-domain-question"
+              defaultMessage="Do you still want to create the contacts?"
+            />
+          </Text>
+        </>
+      }
+      confirm={
+        <Button colorScheme="primary" onClick={() => props.onResolve()}>
+          <FormattedMessage
+            id="contacts.import-from-excel.import-error.create-contacts"
+            defaultMessage="Create contacts"
+          />
+        </Button>
+      }
+    />
+  );
+}
+
 ImportContactsDialog.mutations = [
   gql`
-    mutation ImportContactsDialog_bulkCreateContacts($file: Upload!) {
-      bulkCreateContacts(file: $file) {
+    mutation ImportContactsDialog_bulkCreateContacts($file: Upload!, $force: Boolean) {
+      bulkCreateContacts(file: $file, force: $force) {
         errors
         contacts {
           id

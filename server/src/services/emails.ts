@@ -72,7 +72,7 @@ export interface IEmailsService {
     used: number,
     t?: Knex.Transaction
   ): Promise<void>;
-  validateEmail(email: string, onlyRegex?: boolean): Promise<boolean>;
+  validateEmail(email: string): Promise<boolean>;
   sendAppSumoActivateAccountEmail(redirectUrl: string, email: string): Promise<void>;
   sendInternalSignaturitAccountDepletedCreditsEmail(
     orgId: number,
@@ -350,11 +350,7 @@ export class EmailsService implements IEmailsService {
     });
   })();
 
-  async validateEmail(email: string, onlyRegex?: boolean) {
-    const passesRegex = EMAIL_REGEX.test(email);
-    if (onlyRegex) {
-      return passesRegex;
-    }
-    return passesRegex && (await this.resolveMx.load(email.split("@")[1]));
+  async validateEmail(email: string) {
+    return EMAIL_REGEX.test(email) && (await this.resolveMx.load(email.split("@")[1]));
   }
 }
