@@ -139,7 +139,7 @@ export function withApolloData<P = {}>(
                 const from = params ? `${path}?${_params}` : path;
                 return redirect(context, `/login?redirect=${encodeURIComponent(from)}`, true);
               } else if (code === "FORBIDDEN") {
-                return redirect(context, `/app`);
+                return redirect(context, `/app/petitions`);
               } else if (
                 code === "CONTACT_NOT_VERIFIED" &&
                 context.pathname.startsWith("/petition/[keycode]")

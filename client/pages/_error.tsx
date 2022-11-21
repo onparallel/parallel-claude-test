@@ -1,3 +1,4 @@
+import { isApolloError } from "@apollo/client";
 import { Text } from "@chakra-ui/react";
 import { SupportLink } from "@parallel/components/common/SupportLink";
 import { ErrorPage } from "@parallel/components/public/ErrorPage";
@@ -11,11 +12,8 @@ const SENTRY_WHITELISTED_ERRORS = ["FORBIDDEN"];
 export default function CustomError(
   props: UnwrapPromise<ReturnType<typeof CustomError.getInitialProps>>
 ) {
-  const { err, errorCode } = props;
+  const { errorCode } = props;
   const intl = useIntl();
-  if (err && !SENTRY_WHITELISTED_ERRORS.includes(errorCode)) {
-    Sentry.captureException(err);
-  }
   return errorCode === "FORBIDDEN" ? (
     <ErrorPage
       header={
@@ -62,7 +60,24 @@ export default function CustomError(
   );
 }
 
-CustomError.getInitialProps = async ({ res, err, asPath }: NextPageContext) => {
-  const errorCode = (err as any)?.graphQLErrors?.[0]?.extensions.code ?? (err as any)?.message;
-  return { errorCode, err };
+CustomError.getInitialProps = async ({ err, ...props }: NextPageContext) => {
+  let errorCode: string | undefined;
+  if (typeof window !== "undefined") {
+    if (window.__NEXT_DATA__.page === "/_error") {
+      errorCode = window.__NEXT_DATA__.props.pageProps.errorCode;
+    } else {
+      errorCode =
+        err && isApolloError(err) ? err.graphQLErrors?.[0]?.extensions.code : (err as any)?.message;
+      if (err && !SENTRY_WHITELISTED_ERRORS.includes(errorCode!)) {
+        Sentry.captureException(err);
+      }
+    }
+  } else {
+    if (err && !SENTRY_WHITELISTED_ERRORS.includes(errorCode!)) {
+      Sentry.captureException(err);
+    }
+    errorCode =
+      err && isApolloError(err) ? err.graphQLErrors?.[0]?.extensions.code : (err as any)?.message;
+  }
+  return { errorCode };
 };
