@@ -32,8 +32,8 @@ export class DocusignOauthIntegration extends OAuthIntegration {
     })}`;
   }
 
-  async getAccessAndRefreshToken(code: string): Promise<OauthCredentials> {
-    const response = await this.fetch.fetch(`${this.config.oauth.docusign.baseUri}/token`, {
+  async getCredentials(code: string): Promise<OauthCredentials> {
+    const tokenResponse = await this.fetch.fetch(`${this.config.oauth.docusign.baseUri}/token`, {
       method: "POST",
       headers: {
         Authorization: `Basic ${Buffer.from(
@@ -45,14 +45,33 @@ export class DocusignOauthIntegration extends OAuthIntegration {
         code,
       }),
     });
-    const data = await response.json();
-    if (response.ok) {
-      return { ACCESS_TOKEN: data.access_token, REFRESH_TOKEN: data.refresh_token };
+    const data = await tokenResponse.json();
+    if (tokenResponse.ok) {
+      const userInfoResponse = await this.fetch.fetch(
+        `${this.config.oauth.docusign.baseUri}/userinfo`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${data.access_token}`,
+            "Cache-Control": "no-store",
+            Pragma: "no-cache",
+          },
+        }
+      );
+
+      const userInfoData = await userInfoResponse.json();
+      const userInfo = userInfoData.accounts.find((account: any) => account.is_default);
+      return {
+        ACCESS_TOKEN: data.access_token,
+        REFRESH_TOKEN: data.refresh_token,
+        API_ACCOUNT_ID: userInfo.account_id,
+        API_BASE_PATH: userInfo.base_uri,
+      };
     } else {
       throw new Error(data);
     }
   }
-  async refreshAccessToken(refreshToken: string): Promise<OauthCredentials> {
+  async refreshCredentials(credentials: OauthCredentials): Promise<OauthCredentials> {
     const response = await this.fetch.fetch(`${this.config.oauth.docusign.baseUri}/token`, {
       method: "POST",
       headers: {
@@ -62,13 +81,17 @@ export class DocusignOauthIntegration extends OAuthIntegration {
       },
       body: new URLSearchParams({
         grant_type: "refresh_token",
-        refresh_token: refreshToken,
+        refresh_token: credentials.REFRESH_TOKEN,
       }),
     });
 
     const data = await response.json();
     if (response.ok) {
-      return { ACCESS_TOKEN: data.access_token, REFRESH_TOKEN: data.refresh_token };
+      return {
+        ...credentials,
+        ACCESS_TOKEN: data.access_token,
+        REFRESH_TOKEN: data.refresh_token,
+      };
     } else {
       throw new Error(JSON.stringify(data));
     }

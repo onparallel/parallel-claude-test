@@ -55,13 +55,9 @@ export type Recipient = { email: string; name: string };
 
 export type BrandingIdKey = `${"EN" | "ES"}_${Tone}_BRANDING_ID`;
 
-export type AuthenticationResponse<TProvider extends SignatureProvider> = {
-  SIGNATURIT: { environment: "production" | "sandbox" };
-  DOCUSIGN: {
-    environment: "production" | "sandbox";
-    consent_required?: boolean;
-  };
-}[TProvider];
+export type AuthenticationResponse = {
+  environment: "production" | "sandbox";
+};
 
 export const SIGNATURE_CLIENT = Symbol.for("SIGNATURE_CLIENT");
 
@@ -70,10 +66,7 @@ export interface ISignatureClient<TProvider extends SignatureProvider> {
     id?: number;
     settings: IntegrationSettings<"SIGNATURE", TProvider>;
   }): void;
-  authenticate(opts?: {
-    throwOnConsentRequired?: boolean;
-    retryOnError?: boolean;
-  }): Promise<AuthenticationResponse<TProvider>>;
+  authenticate(): Promise<AuthenticationResponse>;
   startSignatureRequest: (
     petitionId: number,
     orgId: number,

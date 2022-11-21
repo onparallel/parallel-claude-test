@@ -12,6 +12,8 @@ import { authenticate } from "../helpers/authenticate";
 export interface OauthCredentials {
   ACCESS_TOKEN: string;
   REFRESH_TOKEN: string;
+  API_ACCOUNT_ID: string;
+  API_BASE_PATH: string;
 }
 
 @injectable()
@@ -25,8 +27,8 @@ export abstract class OAuthIntegration {
   abstract readonly provider: string;
 
   abstract buildAuthorizationUrl(state: string): string;
-  abstract getAccessAndRefreshToken(code: string): MaybePromise<OauthCredentials>;
-  abstract refreshAccessToken(refreshToken: string): Promise<OauthCredentials>;
+  abstract getCredentials(code: string): MaybePromise<OauthCredentials>;
+  abstract refreshCredentials(credentials: OauthCredentials): Promise<OauthCredentials>;
 
   protected orgHasAccessToIntegration(orgId: number): MaybePromise<boolean> {
     return true;
@@ -140,12 +142,11 @@ export abstract class OAuthIntegration {
               isDefault: boolean;
               name: string;
             }>(state);
-            const credentials = await this.getAccessAndRefreshToken(code);
+            const credentials = await this.getCredentials(code);
             await this.storeCredentials(credentials, args);
             res.send(response(true));
           }
         } catch (error) {
-          console.log(error);
           next(error);
         }
       });
@@ -156,6 +157,8 @@ export abstract class OAuthIntegration {
     return {
       ACCESS_TOKEN: encrypt(c.ACCESS_TOKEN, encryptionKey).toString("hex"),
       REFRESH_TOKEN: encrypt(c.REFRESH_TOKEN, encryptionKey).toString("hex"),
+      API_ACCOUNT_ID: c.API_ACCOUNT_ID,
+      API_BASE_PATH: c.API_BASE_PATH,
     };
   }
 
@@ -164,6 +167,8 @@ export abstract class OAuthIntegration {
     return {
       ACCESS_TOKEN: decrypt(Buffer.from(c.ACCESS_TOKEN, "hex"), encryptionKey).toString("utf8"),
       REFRESH_TOKEN: decrypt(Buffer.from(c.REFRESH_TOKEN, "hex"), encryptionKey).toString("utf8"),
+      API_ACCOUNT_ID: c.API_ACCOUNT_ID,
+      API_BASE_PATH: c.API_BASE_PATH,
     };
   }
 }
