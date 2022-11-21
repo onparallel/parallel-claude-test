@@ -1,9 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  FeatureFlag,
-  HasFeatureFlagDocument,
-  HasFeatureFlagQuery,
-} from "@parallel/graphql/__types";
+import { FeatureFlag, HasFeatureFlagDocument } from "@parallel/graphql/__types";
 import { NextComponentType } from "next";
 import { RedirectError, WithApolloDataContext } from "./withApolloData";
 
