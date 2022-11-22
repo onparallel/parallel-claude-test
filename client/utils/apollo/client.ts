@@ -40,11 +40,15 @@ export function mergeArraysBy(path: string[]): FieldMergeFunction {
         return next;
       }, value);
     };
-    const existingByKey = indexBy(existing || [], getKey);
-    return incoming.map((value: any) => {
-      const key = getKey(value);
-      return existingByKey[key] ? mergeObjects(existingByKey[key], value) : value;
-    });
+    if (existing === undefined) {
+      return incoming;
+    } else {
+      const existingByKey = indexBy(existing, getKey);
+      return incoming.map((value: any) => {
+        const key = getKey(value);
+        return existingByKey[key] ? mergeObjects(existingByKey[key], value) : value;
+      });
+    }
   };
 }
 
