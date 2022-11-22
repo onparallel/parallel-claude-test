@@ -2154,7 +2154,7 @@ export const createPublicPetitionLinkPrefillData = mutationField(
 
       return `${ctx.config.misc.parallelUrl}/${template.locale ?? "en"}/pp/${
         publicLink.slug
-      }?${new URLSearchParams({ prefillDataKey: prefillData.keycode })}`;
+      }?${new URLSearchParams({ pk: prefillData.keycode })}`;
     },
   }
 );

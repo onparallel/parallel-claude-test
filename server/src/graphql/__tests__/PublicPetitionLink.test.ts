@@ -1489,11 +1489,17 @@ describe("GraphQL/PublicPetitionLink", () => {
     let publicLink: PublicPetitionLink;
 
     beforeAll(async () => {
+      await mocks.updateFeatureFlag("PUBLIC_PETITION_LINK_PREFILL_DATA", true);
+
       const [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
         is_template: true,
         locale: "es",
       }));
       publicLink = await mocks.createRandomPublicPetitionLink(template.id);
+    });
+
+    afterEach(async () => {
+      await mocks.updateFeatureFlag("PUBLIC_PETITION_LINK_PREFILL_DATA", true);
     });
 
     it("sends error if user does not have feature flag", async () => {
@@ -1515,8 +1521,6 @@ describe("GraphQL/PublicPetitionLink", () => {
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
-
-      await mocks.updateFeatureFlag("PUBLIC_PETITION_LINK_PREFILL_DATA", true);
     });
 
     it("sends error if user has READ access to the template", async () => {
@@ -1548,7 +1552,7 @@ describe("GraphQL/PublicPetitionLink", () => {
       expect(data).toBeNull();
     });
 
-    it("returns full URL of public petition link with prefillDataKey in queryparam", async () => {
+    it("returns full URL of public petition link with pk in queryparam", async () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($publicPetitionLinkId: GID!, $data: JSONObject!, $path: String) {
@@ -1575,7 +1579,7 @@ describe("GraphQL/PublicPetitionLink", () => {
 
       expect(data?.createPublicPetitionLinkPrefillData).toEqual(
         `http://www.test-onparallel.com/es/pp/${publicLink.slug}?${new URLSearchParams({
-          prefillDataKey: prefillData.keycode,
+          pk: prefillData.keycode,
         })}`
       );
     });
