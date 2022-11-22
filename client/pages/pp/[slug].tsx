@@ -52,6 +52,7 @@ function PublicPetitionLink({
   slug,
   publicPetitionLink,
   prefill,
+  prefillDataKey,
   defaultValues,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
@@ -97,6 +98,7 @@ function PublicPetitionLink({
           contactEmail: _data?.email ?? "",
           force,
           prefill,
+          prefillDataKey,
         },
       });
 
@@ -308,6 +310,7 @@ PublicPetitionLink.mutations = [
       $contactEmail: String!
       $force: Boolean
       $prefill: String
+      $prefillDataKey: ID
     ) {
       publicCreateAndSendPetitionFromPublicLink(
         slug: $slug
@@ -316,6 +319,7 @@ PublicPetitionLink.mutations = [
         contactEmail: $contactEmail
         force: $force
         prefill: $prefill
+        prefillDataKey: $prefillDataKey
       )
     }
   `,
@@ -337,16 +341,17 @@ PublicPetitionLink.queries = [
   `,
 ];
 
-type PublicPetitionLinkServerSideProps = {
+interface PublicPetitionLinkServerSideProps {
   prefill: string | null;
+  prefillDataKey: string | null;
   slug: string;
   publicPetitionLink: PublicPetitionLink_PublicPublicPetitionLinkFragment;
   defaultValues?: PublicPetitionInitialFormData;
-};
+}
 
 export async function getServerSideProps({
   req,
-  query: { slug, prefill },
+  query: { slug, prefill, pk: prefillDataKey },
   locale,
 }: GetServerSidePropsContext): Promise<
   GetServerSidePropsResult<PublicPetitionLinkServerSideProps>
@@ -366,6 +371,7 @@ export async function getServerSideProps({
         slug: slug as string,
         publicPetitionLink: data.publicPetitionLinkBySlug,
         prefill: (prefill ?? null) as string | null,
+        prefillDataKey: (prefillDataKey ?? null) as string | null,
       };
       if (prefill && typeof prefill === "string") {
         props.defaultValues = jwtDecode(prefill);

@@ -143,14 +143,25 @@ export function useFeatureFlags() {
       {
         name: "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI",
         title: intl.formatMessage({
-          id: "component.feature-flag-descriptions.prefill-public-links-name",
-          defaultMessage: "Pre-fill public links (UI)",
+          id: "component.feature-flag-descriptions.prefill-secret-public-links-name",
+          defaultMessage: "Pre-fill public links with JWT query",
         }),
         description: intl.formatMessage({
-          id: "component.feature-flag-descriptions.prefill-public-links-description",
-          defaultMessage: "Allows you to pre-fill public links.",
+          id: "component.feature-flag-descriptions.prefill-secret-public-links-description",
+          defaultMessage: "Allows you to pre-fill public links with a JWT payload in the query.",
         }),
         articleId: 6261913,
+      },
+      {
+        name: "PUBLIC_PETITION_LINK_PREFILL_DATA",
+        title: intl.formatMessage({
+          id: "component.feature-flag-descriptions.prefill-data-public-links-name",
+          defaultMessage: "Pre-fill data in public links",
+        }),
+        description: intl.formatMessage({
+          id: "component.feature-flag-descriptions.prefill-data-public-links-description",
+          defaultMessage: "Allows you to pre-fill public links with data from the preview page.",
+        }),
       },
       {
         name: "REMOVE_PARALLEL_BRANDING",

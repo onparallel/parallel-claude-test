@@ -675,7 +675,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         })
       ),
       prefillDataKey: nullable(
-        stringArg({ description: "key to fetch prefill information from the database." })
+        idArg({ description: "key to fetch prefill information from the database." })
       ),
     },
     authorize: chain(

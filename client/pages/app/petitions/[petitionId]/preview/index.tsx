@@ -1,5 +1,16 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Center, Flex, Stack, useBreakpointValue, useToast } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertIcon,
+  Box,
+  Button,
+  Center,
+  Flex,
+  Stack,
+  Text,
+  useBreakpointValue,
+  useToast,
+} from "@chakra-ui/react";
 import { ChevronRightIcon, EditSimpleIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
@@ -25,7 +36,6 @@ import {
   useConfirmPetitionSignersDialog,
 } from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
 import { PetitionCompletedAlert } from "@parallel/components/petition-common/PetitionCompletedAlert";
-import { PetitionPreviewOnlyAlert } from "@parallel/components/petition-common/PetitionPreviewOnlyAlert";
 import { PetitionPreviewSignatureReviewAlert } from "@parallel/components/petition-common/PetitionPreviewSignatureReviewAlert";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import {
@@ -34,6 +44,10 @@ import {
 } from "@parallel/components/petition-compose/dialogs/HiddenFieldDialog";
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
+import {
+  GeneratePrefilledPublicLinkDialog,
+  useGeneratePrefilledPublicLinkDialog,
+} from "@parallel/components/petition-preview/dialogs/GeneratePrefilledPublicLinkDialog";
 import { PreviewPetitionField } from "@parallel/components/petition-preview/PreviewPetitionField";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
@@ -54,6 +68,7 @@ import {
   useGoToPetition,
   useGoToPetitionSection,
 } from "@parallel/utils/goToPetition";
+import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
@@ -65,9 +80,8 @@ import { withMetadata } from "@parallel/utils/withMetadata";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, omit } from "remeda";
-
 type PetitionPreviewProps = UnwrapPromise<ReturnType<typeof PetitionPreview.getInitialProps>>;
 
 function PetitionPreview({ petitionId }: PetitionPreviewProps) {
@@ -337,6 +351,15 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 
   const showQuickAccessButtons = useBreakpointValue({ base: false, xl: true });
 
+  const showGeneratePrefilledPublicLinkButton =
+    me.hasPublicLinkPrefill &&
+    petition.__typename === "PetitionTemplate" &&
+    petition.publicLink?.isActive &&
+    petition.fields.some(
+      (f) => !isFileTypeField(f.type) && isDefined(f.alias) && f.previewReplies.length > 0
+    );
+  const showGeneratePrefilledPublicLinkDialog = useGeneratePrefilledPublicLinkDialog();
+
   return (
     <ToneProvider value={petition.organization.brandTheme.preferredTone}>
       <PetitionLayout
@@ -365,7 +388,38 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         }
         subHeader={
           <>
-            {!isPetition ? <PetitionPreviewOnlyAlert /> : null}
+            {!isPetition ? (
+              <Alert status="info" paddingY={0}>
+                <AlertIcon />
+                <Text flex={1} paddingY={3}>
+                  <FormattedMessage
+                    id="page.preview.template-only-cache-alert"
+                    defaultMessage="<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."
+                    values={{
+                      button: (
+                        <FormattedMessage
+                          id="generic.create-petition"
+                          defaultMessage="Create parallel"
+                        />
+                      ),
+                    }}
+                  />
+                </Text>
+                {showGeneratePrefilledPublicLinkButton ? (
+                  <Button
+                    size="sm"
+                    colorScheme="blue"
+                    marginLeft={2}
+                    onClick={() => showGeneratePrefilledPublicLinkDialog({ petitionId })}
+                  >
+                    <FormattedMessage
+                      id="page.preview.generate-prefilled-link"
+                      defaultMessage="Generate prefilled link"
+                    />
+                  </Button>
+                ) : null}
+              </Alert>
+            ) : null}
             {isPetition && petition.status === "COMPLETED" && petition.signatureConfig?.review ? (
               <PetitionPreviewSignatureReviewAlert />
             ) : null}
@@ -573,6 +627,13 @@ PetitionPreview.fragments = {
           }
         }
       }
+      ... on PetitionTemplate {
+        ...GeneratePrefilledPublicLinkDialog_PetitionTemplate
+        publicLink {
+          id
+          isActive
+        }
+      }
       fields {
         id
         position
@@ -609,6 +670,7 @@ PetitionPreview.fragments = {
     ${useLiquidScope.fragments.PetitionBase}
     ${completedFieldReplies.fragments.PetitionField}
     ${HiddenFieldDialog.fragments.PetitionField}
+    ${GeneratePrefilledPublicLinkDialog.fragments.PetitionTemplate}
   `,
   Query: gql`
     fragment PetitionPreview_Query on Query {
@@ -637,7 +699,7 @@ PetitionPreview.fragments = {
   `,
 };
 
-PetitionPreview.mutations = [
+const _mutations = [
   gql`
     mutation PetitionPreview_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
       updatePetition(petitionId: $petitionId, data: $data) {
@@ -664,7 +726,7 @@ PetitionPreview.mutations = [
   `,
 ];
 
-PetitionPreview.queries = [
+const _queries = [
   gql`
     query PetitionPreview_petition($id: GID!) {
       petition(id: $id) {
@@ -676,6 +738,9 @@ PetitionPreview.queries = [
   gql`
     query PetitionPreview_user {
       ...PetitionPreview_Query
+      me {
+        hasPublicLinkPrefill: hasFeatureFlag(featureFlag: PUBLIC_PETITION_LINK_PREFILL_DATA)
+      }
       metadata {
         country
         browserName

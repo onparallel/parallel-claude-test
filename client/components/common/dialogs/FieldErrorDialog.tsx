@@ -1,16 +1,18 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, List, ListItem, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, HStack, List, ListItem, Stack, Text } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { PetitionFieldReference } from "@parallel/components/petition-activity/PetitionFieldReference";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { FieldErrorDialog_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { ReactNode, useRef } from "react";
 import { FormattedMessage } from "react-intl";
+import { OverflownText } from "../OverflownText";
 
 export interface FieldErrorDialogProps
   extends Omit<ConfirmDialogProps<void>, "body" | "header" | "confirm">,
@@ -53,9 +55,9 @@ export function FieldErrorDialog({
       body={
         <Stack>
           <Box>{message}</Box>
-          <List paddingLeft={2}>
+          <List>
             {fieldsWithIndices.slice(0, 5).map(({ field, fieldIndex }) => (
-              <ListItem as={Flex} key={field.id} alignItems="center">
+              <ListItem as={HStack} key={field.id}>
                 <PetitionFieldTypeIndicator
                   as="div"
                   type={field.type}
@@ -63,18 +65,9 @@ export function FieldErrorDialog({
                   isTooltipDisabled
                   flexShrink={0}
                 />
-                <Box marginLeft={2} flex="1" minWidth="0" noOfLines={1} wordBreak="break-all">
-                  {field.title ? (
-                    field.title
-                  ) : (
-                    <Text as="span" textStyle="hint">
-                      <FormattedMessage
-                        id="generic.untitled-field"
-                        defaultMessage="Untitled field"
-                      />
-                    </Text>
-                  )}
-                </Box>
+                <OverflownText>
+                  <PetitionFieldReference field={field} as="span" />
+                </OverflownText>
               </ListItem>
             ))}
             {fieldsWithIndices.length > 5 ? (

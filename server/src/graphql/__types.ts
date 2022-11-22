@@ -4707,7 +4707,7 @@ export interface NexusGenArgTypes {
       contactLastName: string; // String!
       force?: boolean | null; // Boolean
       prefill?: string | null; // String
-      prefillDataKey?: string | null; // String
+      prefillDataKey?: string | null; // ID
       slug: string; // ID!
     };
     publicCreateFileUploadReply: {

@@ -1269,7 +1269,7 @@ type Mutation {
     """
     key to fetch prefill information from the database.
     """
-    prefillDataKey: String
+    prefillDataKey: ID
     slug: ID!
   ): Result!
 

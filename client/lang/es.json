@@ -1730,14 +1730,24 @@
     "context": "Signaturit Integration"
   },
   {
-    "term": "component.feature-flag-descriptions.prefill-public-links-description",
-    "definition": "Permite prerellenar los links publicos.",
-    "context": "Allows you to pre-fill public links."
+    "term": "component.feature-flag-descriptions.prefill-data-public-links-description",
+    "definition": "Permite pre-rellenar los enlaces públicos con respuestas desde la vista de previsualizar.",
+    "context": "Allows you to pre-fill public links with data from the preview page."
   },
   {
-    "term": "component.feature-flag-descriptions.prefill-public-links-name",
-    "definition": "Pre-rellenar enlaces públicos (UI)",
-    "context": "Pre-fill public links (UI)"
+    "term": "component.feature-flag-descriptions.prefill-data-public-links-name",
+    "definition": "Pre-rellenar respuestas en enlaces públicos",
+    "context": "Pre-fill data in public links"
+  },
+  {
+    "term": "component.feature-flag-descriptions.prefill-secret-public-links-description",
+    "definition": "Permite pre-rellenar los enlaces públicos con respuestas mediante un token JWT en la query.",
+    "context": "Allows you to pre-fill public links with a JWT payload in the query."
+  },
+  {
+    "term": "component.feature-flag-descriptions.prefill-secret-public-links-name",
+    "definition": "Pre-rellenar respuestas con JWT en la query",
+    "context": "Pre-fill public links with JWT query"
   },
   {
     "term": "component.feature-flag-descriptions.remove-parallel-branding-description",
@@ -1918,6 +1928,36 @@
     "term": "component.generate-new-token-dialog.token-name-used",
     "definition": "Ya tienes un token con este mismo nombre",
     "context": "You already have a token with this name"
+  },
+  {
+    "term": "component.generate-prefilled-public-link-dialog.confirm-button",
+    "definition": "Generar enlace",
+    "context": "Generate link"
+  },
+  {
+    "term": "component.generate-prefilled-public-link-dialog.folder",
+    "definition": "Carpeta para parallels creados:",
+    "context": "Folder for created parallels:"
+  },
+  {
+    "term": "component.generate-prefilled-public-link-dialog.header",
+    "definition": "Crear enlace pre-rellenado",
+    "context": "Create prefilled link"
+  },
+  {
+    "term": "component.generate-prefilled-public-link-dialog.text",
+    "definition": "Haz click en {button} para generar un enlace público <em>pre-rellenado</em>.",
+    "context": "Click on {button} to generate a <em>prefilled</em> public link."
+  },
+  {
+    "term": "component.generate-prefilled-public-link-dialog.text-2",
+    "definition": "Los parallels creados desde este enlace estarán pre-rellenados con las respuestas actuales.",
+    "context": "Parallels created from this link will be prefilled with the current replies."
+  },
+  {
+    "term": "component.generate-prefilled-public-link-dialog.text-3",
+    "definition": "Los campos de tipo archivo no se tendrán en cuenta.",
+    "context": "Only non-file fields with a defined reference are considered."
   },
   {
     "term": "component.group-header.clone-label",
@@ -6150,6 +6190,11 @@
     "context": "Download"
   },
   {
+    "term": "generic.download-qr",
+    "definition": "Descargar código QR",
+    "context": "Download QR code"
+  },
+  {
     "term": "generic.dropzone-default",
     "definition": "Arrastra archivos aquí o haz click para seleccionarlos",
     "context": "Drag files here, or click to select them"
@@ -7608,6 +7653,11 @@
     "term": "page.preview.edit-field",
     "definition": "Editar campo",
     "context": "Edit field"
+  },
+  {
+    "term": "page.preview.generate-prefilled-link",
+    "definition": "Generar enlace pre-rellenado",
+    "context": "Generate prefilled link"
   },
   {
     "term": "page.preview.petition-created-toast",
