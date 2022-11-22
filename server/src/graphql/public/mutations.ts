@@ -23,9 +23,11 @@ import { and, chain, checkClientServerToken, ifArgDefined } from "../helpers/aut
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { jsonArg } from "../helpers/scalars";
+import { validateAnd } from "../helpers/validateArgs";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
+import { validXor } from "../helpers/validators/validXor";
 import { fieldAttachmentBelongsToField, fieldsHaveCommentsEnabled } from "../petition/authorizers";
 import { tasksAreOfType } from "../task/authorizers";
 import {
@@ -37,6 +39,7 @@ import {
   taskBelongsToAccess,
   validPetitionFieldCommentContent,
   validPublicPetitionLinkPrefill,
+  validPublicPetitionLinkPrefillDataKeycode,
   validPublicPetitionLinkSlug,
 } from "./authorizers";
 
@@ -665,13 +668,31 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
             "Set to true to force the creation + send of a new petition if the contact already has an active access on this public link",
         })
       ),
-      prefill: nullable(stringArg()),
+      prefill: nullable(
+        stringArg({
+          description:
+            "JWT token containing information to prefill the petition after creating it.",
+        })
+      ),
+      prefillDataKey: nullable(
+        stringArg({ description: "key to fetch prefill information from the database." })
+      ),
     },
     authorize: chain(
       validPublicPetitionLinkSlug("slug"),
-      ifArgDefined("prefill", validPublicPetitionLinkPrefill("prefill" as never, "slug"))
+      ifArgDefined("prefill", validPublicPetitionLinkPrefill("prefill" as never, "slug")),
+      ifArgDefined(
+        "prefillDataKey",
+        validPublicPetitionLinkPrefillDataKeycode("prefillDataKey" as never)
+      )
     ),
-    validateArgs: validEmail((args) => args.contactEmail, "contactEmail"),
+    validateArgs: validateAnd(
+      validEmail((args) => args.contactEmail, "contactEmail"),
+      validXor(
+        (args) => [isDefined(args.prefill), isDefined(args.prefillDataKey)],
+        "prefill,prefillDataKey"
+      )
+    ),
     resolve: async (_, args, ctx) => {
       const link = (await ctx.petitions.loadPublicPetitionLinkBySlug(args.slug))!;
       if (
@@ -739,6 +760,16 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
           if ("replies" in payload && typeof payload.replies === "object") {
             await ctx.petitions.prefillPetition(petition.id, payload.replies, owner.user);
           }
+        } else if (isDefined(args.prefillDataKey)) {
+          const prefillData = (await ctx.petitions.loadPublicPetitionLinkPrefillDataByKeycode(
+            args.prefillDataKey
+          ))!;
+          await ctx.petitions.prefillPetition(petition.id, prefillData.data, owner.user);
+          await ctx.petitions.updatePetition(
+            petition.id,
+            { path: prefillData.path },
+            `PublicPetitionLink:${link.id}`
+          );
         }
 
         // trigger emails and events

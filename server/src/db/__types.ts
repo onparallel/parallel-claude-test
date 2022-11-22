@@ -26,7 +26,8 @@ export type FeatureFlagName =
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "AUTO_ANONYMIZE"
   | "TEMPLATE_REPLIES_PREVIEW_URL"
-  | "DOW_JONES_KYC";
+  | "DOW_JONES_KYC"
+  | "PUBLIC_PETITION_LINK_PREFILL_DATA";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -46,6 +47,7 @@ export const FeatureFlagNameValues = [
   "AUTO_ANONYMIZE",
   "TEMPLATE_REPLIES_PREVIEW_URL",
   "DOW_JONES_KYC",
+  "PUBLIC_PETITION_LINK_PREFILL_DATA",
 ] as FeatureFlagName[];
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING" | "DOW_JONES_KYC";
@@ -376,6 +378,7 @@ export interface TableTypes {
   petition_user_notification: PetitionUserNotification;
   public_file_upload: PublicFileUpload;
   public_petition_link: PublicPetitionLink;
+  public_petition_link_prefill_data: PublicPetitionLinkPrefillData;
   system_event: SystemEvent;
   tag: Tag;
   task: Task;
@@ -423,6 +426,7 @@ export interface TableCreateTypes {
   petition_user_notification: CreatePetitionUserNotification;
   public_file_upload: CreatePublicFileUpload;
   public_petition_link: CreatePublicPetitionLink;
+  public_petition_link_prefill_data: CreatePublicPetitionLinkPrefillData;
   system_event: CreateSystemEvent;
   tag: CreateTag;
   task: CreateTask;
@@ -470,6 +474,7 @@ export interface TablePrimaryKeys {
   petition_user_notification: "id";
   public_file_upload: "id";
   public_petition_link: "id";
+  public_petition_link_prefill_data: "id";
   system_event: "id";
   tag: "id";
   task: "id";
@@ -1276,6 +1281,23 @@ export interface PublicPetitionLink {
 export type CreatePublicPetitionLink = PartialProps<
   Omit<PublicPetitionLink, "id">,
   "is_active" | "created_at" | "created_by" | "updated_at" | "updated_by" | "prefill_secret"
+>;
+
+export interface PublicPetitionLinkPrefillData {
+  id: number; // int4
+  template_id: number; // int4
+  keycode: string; // varchar
+  data: any; // jsonb
+  path: string; // text
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreatePublicPetitionLinkPrefillData = PartialProps<
+  Omit<PublicPetitionLinkPrefillData, "id">,
+  "data" | "path" | "created_at" | "created_by" | "deleted_at" | "deleted_by"
 >;
 
 export interface SystemEvent {

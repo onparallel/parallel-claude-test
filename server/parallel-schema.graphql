@@ -376,6 +376,7 @@ enum FeatureFlag {
   PETITION_ACCESS_RECIPIENT_URL_FIELD
   PETITION_PDF_EXPORT
   PETITION_SIGNATURE
+  PUBLIC_PETITION_LINK_PREFILL_DATA
   PUBLIC_PETITION_LINK_PREFILL_SECRET_UI
   REMOVE_PARALLEL_BRANDING
   REMOVE_WHY_WE_USE_PARALLEL
@@ -970,6 +971,15 @@ type Mutation {
   ): PublicPetitionLink!
 
   """
+  Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition.
+  """
+  createPublicPetitionLinkPrefillData(
+    data: JSONObject!
+    path: String
+    publicPetitionLinkId: GID!
+  ): String!
+
+  """
   Creates a new Signaturit integration on the user's organization
   """
   createSignaturitIntegration(
@@ -1250,7 +1260,16 @@ type Mutation {
     Set to true to force the creation + send of a new petition if the contact already has an active access on this public link
     """
     force: Boolean
+
+    """
+    JWT token containing information to prefill the petition after creating it.
+    """
     prefill: String
+
+    """
+    key to fetch prefill information from the database.
+    """
+    prefillDataKey: String
     slug: ID!
   ): Result!
 

@@ -325,6 +325,7 @@ export type FeatureFlag =
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "PETITION_PDF_EXPORT"
   | "PETITION_SIGNATURE"
+  | "PUBLIC_PETITION_LINK_PREFILL_DATA"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
@@ -616,6 +617,8 @@ export type Mutation = {
   createPrintPdfTask: Task;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
+  /** Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition. */
+  createPublicPetitionLinkPrefillData: Scalars["String"];
   /** Creates a new Signaturit integration on the user's organization */
   createSignaturitIntegration: SignatureOrgIntegration;
   /** Creates a tag in the user's organization */
@@ -660,7 +663,7 @@ export type Mutation = {
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
   /** Edits permissions on given parallel and users */
-  editPetitionPermission: Array<Petition>;
+  editPetitionPermission: Array<PetitionBase>;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Forces an update of the branding of every signature integration of the selected organization. */
@@ -894,6 +897,7 @@ export type MutationassignPetitionToUserArgs = {
 
 export type MutationbulkCreateContactsArgs = {
   file: Scalars["Upload"];
+  force?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type MutationbulkCreatePetitionRepliesArgs = {
@@ -1080,6 +1084,12 @@ export type MutationcreatePublicPetitionLinkArgs = {
   slug?: InputMaybe<Scalars["String"]>;
   templateId: Scalars["GID"];
   title: Scalars["String"];
+};
+
+export type MutationcreatePublicPetitionLinkPrefillDataArgs = {
+  data: Scalars["JSONObject"];
+  path?: InputMaybe<Scalars["String"]>;
+  publicPetitionLinkId: Scalars["GID"];
 };
 
 export type MutationcreateSignaturitIntegrationArgs = {
@@ -1290,6 +1300,7 @@ export type MutationpublicCreateAndSendPetitionFromPublicLinkArgs = {
   contactLastName: Scalars["String"];
   force?: InputMaybe<Scalars["Boolean"]>;
   prefill?: InputMaybe<Scalars["String"]>;
+  prefillDataKey?: InputMaybe<Scalars["String"]>;
   slug: Scalars["ID"];
 };
 

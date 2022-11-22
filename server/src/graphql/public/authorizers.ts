@@ -193,6 +193,33 @@ export function validPublicPetitionLinkPrefill<
   };
 }
 
+export function validPublicPetitionLinkPrefillDataKeycode<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, string>
+>(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const keycode = args[argKeycode] as unknown as string;
+      const publicPrefillData = await ctx.petitions.loadPublicPetitionLinkPrefillDataByKeycode(
+        keycode
+      );
+      if (!publicPrefillData) {
+        return false;
+      }
+
+      const template = await ctx.petitions.loadPetition(publicPrefillData.template_id);
+
+      if (!template || !template.is_template) {
+        return false;
+      }
+
+      return true;
+    } catch {}
+    return false;
+  };
+}
+
 export function taskBelongsToAccess<
   TypeName extends string,
   FieldName extends string,

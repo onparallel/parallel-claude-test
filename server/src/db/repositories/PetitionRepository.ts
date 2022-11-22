@@ -59,6 +59,7 @@ import {
   CreatePetitionReminder,
   CreatePetitionSignatureRequest,
   CreatePublicPetitionLink,
+  CreatePublicPetitionLinkPrefillData,
   OrgIntegration,
   Petition,
   PetitionAccess,
@@ -5533,4 +5534,22 @@ export class PetitionRepository extends BaseRepository {
 
     return result;
   }
+
+  async createPublicPetitionLinkPrefillData(
+    data: CreatePublicPetitionLinkPrefillData,
+    createdBy: string
+  ) {
+    const [row] = await this.insert("public_petition_link_prefill_data", {
+      ...data,
+      created_by: createdBy,
+    }).select("*");
+
+    return row;
+  }
+
+  readonly loadPublicPetitionLinkPrefillDataByKeycode = this.buildLoadBy(
+    "public_petition_link_prefill_data",
+    "keycode",
+    (q) => q.whereNull("deleted_at")
+  );
 }

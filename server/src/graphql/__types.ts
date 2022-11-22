@@ -1240,6 +1240,7 @@ export interface NexusGenFieldTypes {
     createPetitionFieldReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createPrintPdfTask: NexusGenRootTypes["Task"]; // Task!
     createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
+    createPublicPetitionLinkPrefillData: string; // String!
     createSignaturitIntegration: NexusGenRootTypes["SignatureOrgIntegration"]; // SignatureOrgIntegration!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
     createTemplateRepliesReportTask: NexusGenRootTypes["Task"]; // Task!
@@ -2942,6 +2943,7 @@ export interface NexusGenFieldTypeNames {
     createPetitionFieldReply: "PetitionFieldReply";
     createPrintPdfTask: "Task";
     createPublicPetitionLink: "PublicPetitionLink";
+    createPublicPetitionLinkPrefillData: "String";
     createSignaturitIntegration: "SignatureOrgIntegration";
     createTag: "Tag";
     createTemplateRepliesReportTask: "Task";
@@ -4490,6 +4492,12 @@ export interface NexusGenArgTypes {
       templateId: NexusGenScalars["GID"]; // GID!
       title: string; // String!
     };
+    createPublicPetitionLinkPrefillData: {
+      // args
+      data: NexusGenScalars["JSONObject"]; // JSONObject!
+      path?: string | null; // String
+      publicPetitionLinkId: NexusGenScalars["GID"]; // GID!
+    };
     createSignaturitIntegration: {
       // args
       apiKey: string; // String!
@@ -4699,6 +4707,7 @@ export interface NexusGenArgTypes {
       contactLastName: string; // String!
       force?: boolean | null; // Boolean
       prefill?: string | null; // String
+      prefillDataKey?: string | null; // String
       slug: string; // ID!
     };
     publicCreateFileUploadReply: {

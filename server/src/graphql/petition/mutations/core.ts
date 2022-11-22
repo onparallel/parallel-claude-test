@@ -2121,3 +2121,40 @@ export const renameFolder = mutationField("renameFolder", {
     return SUCCESS;
   },
 });
+
+export const createPublicPetitionLinkPrefillData = mutationField(
+  "createPublicPetitionLinkPrefillData",
+  {
+    description:
+      "Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition.",
+    type: nonNull("String"),
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PUBLIC_PETITION_LINK_PREFILL_DATA"),
+      userHasAccessToPublicPetitionLink("publicPetitionLinkId", ["OWNER", "WRITE"])
+    ),
+    args: {
+      publicPetitionLinkId: nonNull(globalIdArg("PublicPetitionLink")),
+      data: nonNull("JSONObject"),
+      path: stringArg(),
+    },
+    validateArgs: validPath((args) => args.path, "path"),
+    resolve: async (_, args, ctx) => {
+      const publicLink = (await ctx.petitions.loadPublicPetitionLink(args.publicPetitionLinkId))!;
+      const template = (await ctx.petitions.loadPetition(publicLink.template_id))!;
+
+      const prefillData = await ctx.petitions.createPublicPetitionLinkPrefillData(
+        {
+          template_id: publicLink.template_id,
+          keycode: random(10),
+          data: args.data,
+          path: args.path ?? "/",
+        },
+        `User:${ctx.user!.id}`
+      );
+
+      return `${ctx.config.misc.parallelUrl}/${template.locale ?? "en"}/pp/${
+        publicLink.slug
+      }?${new URLSearchParams({ keycode: prefillData.keycode })}`;
+    },
+  }
+);
