@@ -34,6 +34,7 @@ import {
   PetitionAccessTable_PetitionAccessFragment,
   PetitionActivity_cancelScheduledMessageDocument,
   PetitionActivity_deactivateAccessesDocument,
+  PetitionActivity_movePetitionsDocument,
   PetitionActivity_petitionDocument,
   PetitionActivity_PetitionFragment,
   PetitionActivity_reactivateAccessesDocument,
@@ -85,6 +86,26 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       return await updatePetition({ variables: { petitionId, data } });
     }),
     [petitionId]
+  );
+
+  const [movePetitions] = useMutation(PetitionActivity_movePetitionsDocument);
+  const handleMovePetition = useCallback(
+    async (destination: string) => {
+      try {
+        await movePetitions({
+          variables: {
+            ids: petition.id,
+            source: petition.path,
+            type: "PETITION",
+            destination,
+          },
+          onCompleted: () => {
+            refetch();
+          },
+        });
+      } catch {}
+    },
+    [petition]
   );
 
   const showErrorDialog = useErrorDialog();
@@ -328,6 +349,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       realMe={realMe}
       petition={petition}
       onUpdatePetition={handleUpdatePetition}
+      onMovePetition={handleMovePetition}
       section="activity"
       headerActions={
         <Box display={{ base: "none", lg: "block" }}>
@@ -488,6 +510,26 @@ PetitionActivity.queries = [
       ...PetitionActivity_Query
     }
     ${PetitionActivity.fragments.Query}
+  `,
+];
+
+PetitionActivity.mutations = [
+  gql`
+    mutation PetitionActivity_movePetitions(
+      $ids: [GID!]
+      $folderIds: [ID!]
+      $source: String!
+      $destination: String!
+      $type: PetitionBaseType!
+    ) {
+      movePetitions(
+        ids: $ids
+        folderIds: $folderIds
+        source: $source
+        destination: $destination
+        type: $type
+      )
+    }
   `,
 ];
 

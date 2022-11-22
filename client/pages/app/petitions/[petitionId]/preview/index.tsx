@@ -54,6 +54,7 @@ import { RecipientViewPagination } from "@parallel/components/recipient-view/Rec
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
 import {
   PetitionPreview_completePetitionDocument,
+  PetitionPreview_movePetitionsDocument,
   PetitionPreview_PetitionBaseFragment,
   PetitionPreview_petitionDocument,
   PetitionPreview_updatePetitionDocument,
@@ -93,7 +94,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const {
     data: { me, realMe },
   } = useAssertQuery(PetitionPreview_userDocument);
-  const { data } = useAssertQuery(PetitionPreview_petitionDocument, {
+  const { data, refetch } = useAssertQuery(PetitionPreview_petitionDocument, {
     variables: { id: petitionId },
   });
 
@@ -126,6 +127,26 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const isPetition = petition.__typename === "Petition";
 
   const myEffectivePermission = petition.myEffectivePermission!.permissionType;
+
+  const [movePetitions] = useMutation(PetitionPreview_movePetitionsDocument);
+  const handleMovePetition = useCallback(
+    async (destination: string) => {
+      try {
+        await movePetitions({
+          variables: {
+            ids: petition.id,
+            source: petition.path,
+            type: isPetition ? "PETITION" : "TEMPLATE",
+            destination,
+          },
+          onCompleted: () => {
+            refetch();
+          },
+        });
+      } catch {}
+    },
+    [petition]
+  );
 
   const pageCount =
     petition.fields.filter((f) => f.type === "HEADING" && f.options!.hasPageBreak).length + 1;
@@ -373,6 +394,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         realMe={realMe}
         petition={petition}
         onUpdatePetition={handleUpdatePetition}
+        onMovePetition={handleMovePetition}
         section="preview"
         headerActions={
           isPetition &&
@@ -705,6 +727,23 @@ PetitionPreview.fragments = {
 };
 
 const _mutations = [
+  gql`
+    mutation PetitionPreview_movePetitions(
+      $ids: [GID!]
+      $folderIds: [ID!]
+      $source: String!
+      $destination: String!
+      $type: PetitionBaseType!
+    ) {
+      movePetitions(
+        ids: $ids
+        folderIds: $folderIds
+        source: $source
+        destination: $destination
+        type: $type
+      )
+    }
+  `,
   gql`
     mutation PetitionPreview_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
       updatePetition(petitionId: $petitionId, data: $data) {

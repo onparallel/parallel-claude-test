@@ -1,9 +1,12 @@
 import { gql, useMutation } from "@apollo/client";
 import { getOperationName } from "@apollo/client/utilities";
 import {
+  Badge,
   Box,
+  Button,
   Center,
   Flex,
+  HStack,
   MenuDivider,
   MenuItem,
   MenuItemOption,
@@ -11,13 +14,16 @@ import {
   MenuOptionGroup,
   Stack,
   Text,
+  Tooltip,
 } from "@chakra-ui/react";
 import {
   CopyIcon,
   DeleteIcon,
   DownloadIcon,
   EditIcon,
+  FolderIcon,
   LockClosedIcon,
+  TableIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -27,7 +33,7 @@ import {
 } from "@parallel/components/layout/PetitionLayout";
 import {
   PetitionActivity_petitionDocument,
-  PetitionHeader_PetitionFragment,
+  PetitionHeader_PetitionBaseFragment,
   PetitionHeader_QueryFragment,
   PetitionHeader_reopenPetitionDocument,
   PetitionHeader_updatePetitionPermissionSubscriptionDocument,
@@ -37,17 +43,19 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
+import { isAtLeast } from "@parallel/utils/roles";
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
+import { useTemplateRepliesReportTask } from "@parallel/utils/useTemplateRepliesReportTask";
 import { useRouter } from "next/router";
 import { ReactNode, useCallback, useImperativeHandle, useMemo, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { NakedLink } from "../common/Link";
-import { LocaleBadge } from "../common/LocaleBadge";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
 import { PetitionStatusIcon } from "../common/PetitionStatusIcon";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
+import { useMoveToFolderDialog } from "../petition-common/dialogs/MoveToFolderDialog";
 import { usePetitionSharingDialog } from "../petition-common/dialogs/PetitionSharingDialog";
 import { useConfirmReopenPetitionDialog } from "../petition-replies/dialogs/ConfirmReopenPetitionDialog";
 import { HeaderNameEditable, HeaderNameEditableInstance } from "./HeaderNameEditable";
@@ -56,8 +64,9 @@ import { PetitionHeaderTabs } from "./PetitionHeaderTabs";
 import { PetitionSection } from "./PetitionLayout";
 
 export interface PetitionHeaderProps extends PetitionHeader_QueryFragment {
-  petition: PetitionHeader_PetitionFragment;
+  petition: PetitionHeader_PetitionBaseFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
+  onMovePetition: (destination: string) => void;
   section: PetitionSection;
   actions?: ReactNode;
 }
@@ -68,7 +77,7 @@ export interface PetitionHeaderInstance {
 
 export const PetitionHeader = Object.assign(
   chakraForwardRef<"div", PetitionHeaderProps, PetitionHeaderInstance>(function PetitionHeader(
-    { petition, me, onUpdatePetition, section: current, actions, ...props },
+    { petition, me, onUpdatePetition, onMovePetition, section: current, actions, ...props },
     ref
   ) {
     const intl = useIntl();
@@ -76,6 +85,15 @@ export const PetitionHeader = Object.assign(
     const [state] = usePetitionState();
     const [shouldConfirmNavigation, setShouldConfirmNavigation] =
       usePetitionShouldConfirmNavigation();
+    const hasAdminRole = isAtLeast("ADMIN", me.role);
+
+    const isPetition = petition.__typename === "Petition";
+
+    const status = petition.__typename === "Petition" ? petition.status : "DRAFT";
+    const isAnonymized = petition.__typename === "Petition" ? petition.isAnonymized : false;
+    const isSubscribed =
+      petition.__typename === "Petition" ? petition.myEffectivePermission!.isSubscribed : false;
+    const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
     const deletePetitions = useDeletePetitions();
     const handleDeleteClick = async function () {
@@ -85,6 +103,51 @@ export const PetitionHeader = Object.assign(
         router.push("/app/petitions/");
       } catch {}
     };
+
+    const { rootFolder, unnamed, ariaLabel } = useMemo(() => {
+      const rootFolder =
+        petition.__typename === "Petition"
+          ? intl.formatMessage({
+              id: "generic.root-petitions",
+              defaultMessage: "Parallels",
+            })
+          : intl.formatMessage({
+              id: "generic.root-templates",
+              defaultMessage: "Templates",
+            });
+
+      const unnamed =
+        petition.__typename === "Petition"
+          ? intl.formatMessage({
+              id: "generic.unnamed-parallel",
+              defaultMessage: "Unnamed parallel",
+            })
+          : intl.formatMessage({
+              id: "generic.unnamed-template",
+              defaultMessage: "Unnamed template",
+            });
+
+      const ariaLabel =
+        petition.__typename === "Petition"
+          ? intl.formatMessage({
+              id: "generic.parallel-name",
+              defaultMessage: "Parallel name",
+            })
+          : intl.formatMessage({
+              id: "generic.template-name",
+              defaultMessage: "Template name",
+            });
+
+      return { rootFolder, unnamed, ariaLabel };
+    }, [intl.locale]);
+
+    const arrayPath = [rootFolder, ...petition.path.split("/").filter((folder) => folder)];
+
+    if (arrayPath.length > 4) {
+      arrayPath.splice(1, arrayPath.length - 4, " ... ");
+    }
+    const path = petition.path === "/" ? rootFolder : arrayPath.join(" / ");
+    const currentFolder = arrayPath.at(-1) || rootFolder;
 
     const clonePetitions = useClonePetitions();
     const goToPetition = useGoToPetition();
@@ -108,8 +171,16 @@ export const PetitionHeader = Object.assign(
       } catch {}
     };
 
-    const isSubscribed = petition.myEffectivePermission!.isSubscribed;
-    const myEffectivePermission = petition.myEffectivePermission!.permissionType;
+    const handleUseTemplate = async function () {
+      try {
+        const petitionId = await createPetition({
+          petitionId: petition.id,
+        });
+        goToPetition(petitionId, "preview", {
+          query: { new: "", fromTemplate: "" },
+        });
+      } catch {}
+    };
 
     const [updatePetitionPermissionSubscription] = useMutation(
       PetitionHeader_updatePetitionPermissionSubscriptionDocument
@@ -129,72 +200,108 @@ export const PetitionHeader = Object.assign(
         const res = await showPetitionSharingDialog({
           userId: me.id,
           petitionIds: [petition.id],
-          type: "PETITION",
+          type: isPetition ? "PETITION" : "TEMPLATE",
         });
         if (res?.close) {
-          router.push("/app/petitions");
+          router.push(isPetition ? "/app/petitions" : "/app/petitions/new");
         }
       } catch {}
     };
 
     const sections = useMemo(
-      () => [
-        {
-          rightIcon: petition.isRestricted ? (
-            <SmallPopover
-              content={
-                <Text fontSize="sm">
-                  <FormattedMessage
-                    id="component.petition-header.compose-tab.readonly"
-                    defaultMessage="Edition restricted. To make changes, you can disable the protection on the Settings tab."
-                  />
-                </Text>
-              }
-            >
-              <LockClosedIcon color="gray.600" _hover={{ color: "gray.700" }} />
-            </SmallPopover>
-          ) : undefined,
-          section: "compose",
-          label: intl.formatMessage({
-            id: "petition.header.compose-tab",
-            defaultMessage: "Compose",
-          }),
-          attributes: {
-            "data-action": "petition-compose",
-          },
-        },
-        {
-          section: "preview",
-          label: intl.formatMessage({
-            id: "petition.header.preview-tab",
-            defaultMessage: "Input",
-          }),
-          attributes: {
-            "data-action": "petition-preview",
-          },
-        },
-        {
-          section: "replies",
-          label: intl.formatMessage({
-            id: "petition.header.replies-tab",
-            defaultMessage: "Review",
-          }),
-          attributes: {
-            "data-action": "petition-replies",
-          },
-        },
-        {
-          section: "activity",
-          label: intl.formatMessage({
-            id: "petition.header.activity-tab",
-            defaultMessage: "Activity",
-          }),
-          attributes: {
-            "data-action": "petition-activity",
-          },
-        },
-      ],
-      [petition.status, petition.isRestricted, intl.locale]
+      () =>
+        petition.__typename === "Petition"
+          ? [
+              {
+                rightIcon: petition.isRestricted ? (
+                  <SmallPopover
+                    content={
+                      <Text fontSize="sm">
+                        <FormattedMessage
+                          id="component.petition-header.compose-tab.readonly"
+                          defaultMessage="Edition restricted. To make changes, you can disable the protection on the Settings tab."
+                        />
+                      </Text>
+                    }
+                  >
+                    <LockClosedIcon color="gray.600" _hover={{ color: "gray.700" }} />
+                  </SmallPopover>
+                ) : undefined,
+                section: "compose",
+                label: intl.formatMessage({
+                  id: "petition.header.compose-tab",
+                  defaultMessage: "Compose",
+                }),
+                attributes: {
+                  "data-action": "petition-compose",
+                },
+              },
+              {
+                section: "preview",
+                label: intl.formatMessage({
+                  id: "petition.header.preview-tab",
+                  defaultMessage: "Input",
+                }),
+                attributes: {
+                  "data-action": "petition-preview",
+                },
+              },
+              {
+                section: "replies",
+                label: intl.formatMessage({
+                  id: "petition.header.replies-tab",
+                  defaultMessage: "Review",
+                }),
+                attributes: {
+                  "data-action": "petition-replies",
+                },
+              },
+              {
+                section: "activity",
+                label: intl.formatMessage({
+                  id: "petition.header.activity-tab",
+                  defaultMessage: "Activity",
+                }),
+                attributes: {
+                  "data-action": "petition-activity",
+                },
+              },
+            ]
+          : [
+              {
+                rightIcon: petition.isRestricted ? <EditionRestrictedPopover /> : undefined,
+                section: "compose",
+                label: intl.formatMessage({
+                  id: "petition.header.compose-tab",
+                  defaultMessage: "Compose",
+                }),
+                attributes: {
+                  "data-action": "template-compose",
+                },
+              },
+              {
+                rightIcon: petition.isRestricted ? <EditionRestrictedPopover /> : undefined,
+                section: "messages",
+                label: intl.formatMessage({
+                  id: "petition.header.messages-tab",
+                  defaultMessage: "Messages",
+                }),
+                attributes: {
+                  "data-action": "template-messages",
+                },
+              },
+              {
+                section: "preview",
+                label: intl.formatMessage({
+                  id: "template.header.preview-tab",
+                  defaultMessage: "Preview",
+                }),
+                attributes: {
+                  "data-action": "template-preview",
+                },
+              },
+            ],
+      [status, petition.isRestricted, intl.locale]
     );
 
     const [reopenPetition] = useMutation(PetitionHeader_reopenPetitionDocument);
@@ -212,7 +319,20 @@ export const PetitionHeader = Object.assign(
       } catch {}
     }, [petition.id]);
 
+    const showMoveFolderDialog = useMoveToFolderDialog();
+    const handleMoveToFolder = async () => {
+      try {
+        const destinationPath = await showMoveFolderDialog({
+          type: isPetition ? "PETITION" : "TEMPLATE",
+          currentPath: petition.path,
+        });
+        onMovePetition(destinationPath);
+      } catch {}
+    };
+
     const handlePrintPdfTask = usePrintPdfTask();
+
+    const handleTemplateRepliesReportTask = useTemplateRepliesReportTask();
 
     const editableRef = useRef<HeaderNameEditableInstance>(null);
     useImperativeHandle(ref, () => ({ focusName: () => editableRef.current?.focus() }));
@@ -227,71 +347,100 @@ export const PetitionHeader = Object.assign(
       >
         <Flex height={16} alignItems="center" paddingX={4}>
           <Flex alignItems="center">
-            <Center boxSize={6} data-section="petition-status-icon" data-status={petition.status}>
-              <PetitionStatusIcon status={petition.status} />
-            </Center>
-            <LocaleBadge locale={petition.locale} marginLeft={2} />
-            <HeaderNameEditable
-              ref={editableRef}
-              petition={petition}
-              state={state}
-              onNameChange={(name) => onUpdatePetition({ name: name || null })}
-              maxWidth={{
-                base: `calc(100vw - ${
-                  32 /* heading padding l+r */ +
-                  24 /* petition status icon width */ +
-                  8 /* locale badge margin left */ +
-                  24 /* locale badge width */ +
-                  16 /* petition name padding l+r */ +
-                  (petition.status === "DRAFT" ? 40 + 8 : 0) +
-                  40 /* more options button width */
-                }px)`,
-                sm: `calc(100vw - ${
-                  96 /* left navbar width */ +
-                  32 /* heading padding l+r */ +
-                  24 /* petition status icon width */ +
-                  8 /* locale badge margin left */ +
-                  24 /* locale badge width */ +
-                  16 /* petition name padding l+r */ +
-                  (petition.status === "DRAFT" ? 40 + 8 : 0) +
-                  40 /* more options button width */
-                }px)`,
-                md: `calc(100vw - ${
-                  96 /* left navbar width */ +
-                  32 /* heading padding l+r */ +
-                  24 /* petition status icon width */ +
-                  8 /* locale badge margin left */ +
-                  24 /* locale badge width */ +
-                  16 /* petition name padding l+r */ +
-                  (petition.status === "DRAFT" ? 138 : 10) +
-                  40 /* more options button width */
-                }px)`,
-                lg: `calc((100vw - ${
-                  96 /* left navbar width */ + 460 /* petition navigation tabs width */
-                }px)/2 - ${
-                  32 /* heading padding l+r */ +
-                  24 /* petition status icon width */ +
-                  8 /* locale badge margin left */ +
-                  24 /* locale badge width */
-                }px)`,
-              }}
-              placeholder={
-                petition.name
-                  ? ""
-                  : intl.formatMessage({
-                      id: "generic.unnamed-parallel",
-                      defaultMessage: "Unnamed parallel",
-                    })
-              }
-              aria-label={intl.formatMessage({
-                id: "generic.parallel-name",
-                defaultMessage: "Parallel name",
-              })}
-            />
+            <Stack spacing={0} alignItems="start">
+              <HeaderNameEditable
+                ref={editableRef}
+                petition={petition}
+                state={state}
+                onNameChange={(name) => onUpdatePetition({ name: name || null })}
+                maxWidth={{
+                  base: `calc(100vw - ${
+                    32 /* heading padding l+r */ +
+                    24 /* petition status icon width */ +
+                    8 /* locale badge margin left */ +
+                    24 /* locale badge width */ +
+                    16 /* petition name padding l+r */ +
+                    (status === "DRAFT" ? 40 + 8 : 0) +
+                    40 /* more options button width */
+                  }px)`,
+                  sm: `calc(100vw - ${
+                    96 /* left navbar width */ +
+                    32 /* heading padding l+r */ +
+                    24 /* petition status icon width */ +
+                    8 /* locale badge margin left */ +
+                    24 /* locale badge width */ +
+                    16 /* petition name padding l+r */ +
+                    (status === "DRAFT" ? 40 + 8 : 0) +
+                    40 /* more options button width */
+                  }px)`,
+                  md: `calc(100vw - ${
+                    96 /* left navbar width */ +
+                    32 /* heading padding l+r */ +
+                    24 /* petition status icon width */ +
+                    8 /* locale badge margin left */ +
+                    24 /* locale badge width */ +
+                    16 /* petition name padding l+r */ +
+                    (status === "DRAFT" ? 138 : 10) +
+                    40 /* more options button width */
+                  }px)`,
+                  lg: `calc((100vw - ${
+                    96 /* left navbar width */ + 460 /* petition navigation tabs width */
+                  }px)/2 - ${
+                    32 /* heading padding l+r */ +
+                    24 /* petition status icon width */ +
+                    8 /* locale badge margin left */ +
+                    24 /* locale badge width */
+                  }px)`,
+                }}
+                placeholder={petition.name ? "" : unnamed}
+                aria-label={ariaLabel}
+              />
+
+              <HStack spacing={1}>
+                {petition.__typename === "Petition" ? (
+                  <>
+                    <Center data-section="petition-status-icon" data-status={status} paddingX={1}>
+                      <PetitionStatusIcon status={status} showStatus={true} />
+                    </Center>
+                    <Text>{"·"}</Text>
+                  </>
+                ) : (
+                  <>
+                    <Badge colorScheme="primary" marginRight={2}>
+                      <FormattedMessage id="generic.template" defaultMessage="Template" />
+                    </Badge>
+                    <Text>{"|"}</Text>
+                  </>
+                )}
+                <Tooltip label={path}>
+                  <Button
+                    leftIcon={<FolderIcon boxSize={4} />}
+                    size="xs"
+                    variant="ghost"
+                    paddingX={1.5}
+                    fontSize="sm"
+                    fontWeight={400}
+                    onClick={handleMoveToFolder}
+                    color="gray.600"
+                    _hover={{ span: { color: "gray.800" }, backgroundColor: "gray.100" }}
+                  >
+                    <Text as="span" lineHeight="24px">
+                      {currentFolder}
+                    </Text>
+                  </Button>
+                </Tooltip>
+              </HStack>
+            </Stack>
           </Flex>
           <Spacer minWidth={4} />
           <Stack direction="row">
-            {actions ?? null}
+            {!isPetition ? (
+              <Button flexShrink={0} onClick={handleUseTemplate} data-action="use-template">
+                <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
+              </Button>
+            ) : (
+              actions ?? null
+            )}
             <Box>
               <MoreOptionsMenuButton
                 variant="outline"
@@ -301,15 +450,23 @@ export const PetitionHeader = Object.assign(
                       onClick={handlePetitionSharingClick}
                       icon={<UserArrowIcon display="block" boxSize={4} />}
                     >
-                      <FormattedMessage
-                        id="component.petition-header.share-label"
-                        defaultMessage="Share parallel"
-                      />
+                      {isPetition ? (
+                        <FormattedMessage
+                          id="component.petition-header.share-label"
+                          defaultMessage="Share parallel"
+                        />
+                      ) : (
+                        <FormattedMessage
+                          id="component.template-header.share-label"
+                          defaultMessage="Share template"
+                        />
+                      )}
                     </MenuItem>
+
                     {me.hasPetitionPdfExport ? (
                       <MenuItem
                         onClick={() => handlePrintPdfTask(petition.id)}
-                        isDisabled={petition.isAnonymized}
+                        isDisabled={isAnonymized}
                         icon={<DownloadIcon display="block" boxSize={4} />}
                       >
                         <FormattedMessage
@@ -318,30 +475,64 @@ export const PetitionHeader = Object.assign(
                         />
                       </MenuItem>
                     ) : null}
+
+                    {hasAdminRole && !isPetition ? (
+                      <MenuItem
+                        onClick={() => handleTemplateRepliesReportTask(petition.id)}
+                        icon={<TableIcon display="block" boxSize={4} />}
+                      >
+                        <FormattedMessage
+                          id="component.petition-header.download-results"
+                          defaultMessage="Download results"
+                        />
+                      </MenuItem>
+                    ) : null}
+
                     <MenuItem
                       onClick={handleCloneClick}
                       icon={<CopyIcon display="block" boxSize={4} />}
                       isDisabled={me.role === "COLLABORATOR"}
                     >
-                      <FormattedMessage
-                        id="component.petition-header.duplicate-label"
-                        defaultMessage="Duplicate parallel"
-                      />
+                      {isPetition ? (
+                        <FormattedMessage
+                          id="component.petition-header.duplicate-label"
+                          defaultMessage="Duplicate parallel"
+                        />
+                      ) : (
+                        <FormattedMessage
+                          id="component.template-header.duplicate-label"
+                          defaultMessage="Duplicate template"
+                        />
+                      )}
                     </MenuItem>
+
+                    {isPetition ? (
+                      <MenuItem
+                        onClick={handleSaveAsTemplate}
+                        icon={<CopyIcon display="block" boxSize={4} />}
+                        isDisabled={me.role === "COLLABORATOR"}
+                      >
+                        <FormattedMessage
+                          id="component.petition-header.save-as-template-button"
+                          defaultMessage="Save as template"
+                        />
+                      </MenuItem>
+                    ) : null}
+
                     <MenuItem
-                      onClick={handleSaveAsTemplate}
-                      icon={<CopyIcon display="block" boxSize={4} />}
-                      isDisabled={me.role === "COLLABORATOR"}
+                      onClick={handleMoveToFolder}
+                      icon={<FolderIcon display="block" boxSize={4} />}
                     >
                       <FormattedMessage
-                        id="component.petition-header.save-as-template-button"
-                        defaultMessage="Save as template"
+                        id="component.petition-header.move-to"
+                        defaultMessage="Move to..."
                       />
                     </MenuItem>
-                    {myEffectivePermission !== "READ" && petition.status === "CLOSED" ? (
+
+                    {myEffectivePermission !== "READ" && status === "CLOSED" ? (
                       <MenuItem
                         onClick={handleReopenPetition}
-                        isDisabled={petition.isAnonymized}
+                        isDisabled={isAnonymized}
                         icon={<EditIcon display="block" boxSize={4} />}
                       >
                         <FormattedMessage
@@ -350,59 +541,82 @@ export const PetitionHeader = Object.assign(
                         />
                       </MenuItem>
                     ) : null}
-                    <MenuDivider />
-                    <MenuOptionGroup
-                      type="radio"
-                      title={intl.formatMessage({
-                        id: "generic.notifications",
-                        defaultMessage: "Notifications",
-                      })}
-                      onChange={(value) => {
-                        handleUpdatePetitionPermissionSubscription(value === "FOLLOW");
-                      }}
-                      value={isSubscribed ? "FOLLOW" : "IGNORE"}
-                    >
-                      <MenuItemOption value="FOLLOW">
-                        <Box flex="1">
-                          <Text fontWeight="bold">
-                            <FormattedMessage id="generic.subscribed" defaultMessage="Subscribed" />
-                          </Text>
-                          <Text fontSize="sm" color="gray.500">
-                            <FormattedMessage
-                              id="component.petition-header.subscribed-description"
-                              defaultMessage="Get email notifications about activity in this parallel."
-                            />
-                          </Text>
-                        </Box>
-                      </MenuItemOption>
-                      <MenuItemOption value="IGNORE">
-                        <Box flex="1">
-                          <Text fontWeight="bold">
-                            <FormattedMessage
-                              id="generic.unsubscribed"
-                              defaultMessage="Unsubscribed"
-                            />
-                          </Text>
-                          <Text fontSize="sm" color="gray.500">
-                            <FormattedMessage
-                              id="component.petition-header.not-subscribed-description"
-                              defaultMessage="Don't get notifications about this parallel."
-                            />
-                          </Text>
-                        </Box>
-                      </MenuItemOption>
-                    </MenuOptionGroup>
-                    <MenuDivider />
-                    <MenuItem
-                      color="red.500"
-                      onClick={handleDeleteClick}
-                      icon={<DeleteIcon display="block" boxSize={4} />}
-                    >
-                      <FormattedMessage
-                        id="component.petition-header.delete-label"
-                        defaultMessage="Delete parallel"
-                      />
-                    </MenuItem>
+                    {petition.__typename === "Petition" ||
+                    (petition.__typename === "PetitionTemplate" && petition.isPublic) ? null : (
+                      <>
+                        <MenuDivider />
+                        <MenuItem
+                          color="red.500"
+                          onClick={handleDeleteClick}
+                          icon={<DeleteIcon display="block" boxSize={4} />}
+                        >
+                          <FormattedMessage
+                            id="component.petition-template.delete-label"
+                            defaultMessage="Delete template"
+                          />
+                        </MenuItem>
+                      </>
+                    )}
+                    {isPetition ? (
+                      <>
+                        <MenuDivider />
+                        <MenuOptionGroup
+                          type="radio"
+                          title={intl.formatMessage({
+                            id: "generic.notifications",
+                            defaultMessage: "Notifications",
+                          })}
+                          onChange={(value) => {
+                            handleUpdatePetitionPermissionSubscription(value === "FOLLOW");
+                          }}
+                          value={isSubscribed ? "FOLLOW" : "IGNORE"}
+                        >
+                          <MenuItemOption value="FOLLOW">
+                            <Box flex="1">
+                              <Text fontWeight="bold">
+                                <FormattedMessage
+                                  id="generic.subscribed"
+                                  defaultMessage="Subscribed"
+                                />
+                              </Text>
+                              <Text fontSize="sm" color="gray.500">
+                                <FormattedMessage
+                                  id="component.petition-header.subscribed-description"
+                                  defaultMessage="Get email notifications about activity in this parallel."
+                                />
+                              </Text>
+                            </Box>
+                          </MenuItemOption>
+                          <MenuItemOption value="IGNORE">
+                            <Box flex="1">
+                              <Text fontWeight="bold">
+                                <FormattedMessage
+                                  id="generic.unsubscribed"
+                                  defaultMessage="Unsubscribed"
+                                />
+                              </Text>
+                              <Text fontSize="sm" color="gray.500">
+                                <FormattedMessage
+                                  id="component.petition-header.not-subscribed-description"
+                                  defaultMessage="Don't get notifications about this parallel."
+                                />
+                              </Text>
+                            </Box>
+                          </MenuItemOption>
+                        </MenuOptionGroup>
+                        <MenuDivider />
+                        <MenuItem
+                          color="red.500"
+                          onClick={handleDeleteClick}
+                          icon={<DeleteIcon display="block" boxSize={4} />}
+                        >
+                          <FormattedMessage
+                            id="component.petition-header.delete-label"
+                            defaultMessage="Delete parallel"
+                          />
+                        </MenuItem>
+                      </>
+                    ) : null}
                   </MenuList>
                 }
               />
@@ -438,33 +652,67 @@ export const PetitionHeader = Object.assign(
   }),
   {
     fragments: {
-      Petition: gql`
-        fragment PetitionHeader_Petition on Petition {
-          id
-          locale
-          deadline
-          status
-          isRestricted
-          isAnonymized
-          myEffectivePermission {
-            isSubscribed
-            permissionType
-          }
-          ...HeaderNameEditable_PetitionBase
-          ...useDeletePetitions_PetitionBase
-        }
-        ${HeaderNameEditable.fragments.PetitionBase}
-        ${useDeletePetitions.fragments.PetitionBase}
-      `,
-      Query: gql`
-        fragment PetitionHeader_Query on Query {
-          me {
+      get Petition() {
+        return gql`
+          fragment PetitionHeader_Petition on Petition {
             id
-            role
-            hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
+            locale
+            deadline
+            status
+            isRestricted
+            isAnonymized
+            myEffectivePermission {
+              isSubscribed
+              permissionType
+            }
+            ...HeaderNameEditable_PetitionBase
+            ...useDeletePetitions_PetitionBase
           }
-        }
-      `,
+          ${HeaderNameEditable.fragments.PetitionBase}
+          ${useDeletePetitions.fragments.PetitionBase}
+        `;
+      },
+      get PetitionTemplate() {
+        return gql`
+          fragment PetitionHeader_PetitionTemplate on PetitionTemplate {
+            id
+            locale
+            isPublic
+            isRestricted
+            ...HeaderNameEditable_PetitionBase
+            ...useDeletePetitions_PetitionBase
+          }
+          ${HeaderNameEditable.fragments.PetitionBase}
+          ${useDeletePetitions.fragments.PetitionBase}
+        `;
+      },
+      get PetitionBase() {
+        return gql`
+          fragment PetitionHeader_PetitionBase on PetitionBase {
+            id
+            path
+            ... on Petition {
+              ...PetitionHeader_Petition
+            }
+            ... on PetitionTemplate {
+              ...PetitionHeader_PetitionTemplate
+            }
+          }
+          ${this.Petition}
+          ${this.PetitionTemplate}
+        `;
+      },
+      get Query() {
+        return gql`
+          fragment PetitionHeader_Query on Query {
+            me {
+              id
+              role
+              hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
+            }
+          }
+        `;
+      },
     },
   }
 );
@@ -493,3 +741,20 @@ const _mutations = [
     }
   `,
 ];
+
+function EditionRestrictedPopover() {
+  return (
+    <SmallPopover
+      content={
+        <Text fontSize="sm">
+          <FormattedMessage
+            id="component.petition-header.compose-tab.readonly"
+            defaultMessage="Edition restricted. To make changes, you can disable the protection on the Settings tab."
+          />
+        </Text>
+      }
+    >
+      <LockClosedIcon color="gray.600" _hover={{ color: "gray.700" }} />
+    </SmallPopover>
+  );
+}

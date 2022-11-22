@@ -30,14 +30,13 @@ import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { useConfirmDiscardDraftDialog } from "../petition-compose/dialogs/ConfirmDiscardDraftDialog";
-import { PetitionTemplateHeader, PetitionTemplateHeaderInstance } from "./PetitionTemplateHeader";
-
 export type PetitionSection = "compose" | "preview" | "replies" | "activity" | "messages";
 
 export interface PetitionLayoutProps extends PetitionLayout_QueryFragment {
   petition: PetitionLayout_PetitionBaseFragment;
   onNextClick?: () => void;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
+  onMovePetition: (destionation: string) => void;
   section: PetitionSection;
   headerActions?: ReactNode;
   subHeader?: ReactNode;
@@ -51,6 +50,7 @@ export const PetitionLayout = Object.assign(
       petition,
       section,
       onUpdatePetition,
+      onMovePetition,
       headerActions,
       children,
       subHeader,
@@ -93,7 +93,7 @@ export const PetitionLayout = Object.assign(
       [section, intl.locale]
     );
 
-    const headerRef = useRef<PetitionHeaderInstance | PetitionTemplateHeaderInstance>(null);
+    const headerRef = useRef<PetitionHeaderInstance>(null);
 
     const [, setShouldConfirmNavigation] = usePetitionShouldConfirmNavigation();
 
@@ -126,24 +126,15 @@ export const PetitionLayout = Object.assign(
         me={me}
         realMe={realMe}
       >
-        {petition.__typename === "Petition" ? (
-          <PetitionHeader
-            ref={headerRef}
-            petition={petition}
-            me={me}
-            onUpdatePetition={onUpdatePetition}
-            section={section!}
-            actions={headerActions}
-          />
-        ) : petition.__typename === "PetitionTemplate" ? (
-          <PetitionTemplateHeader
-            ref={headerRef}
-            petition={petition}
-            me={me}
-            section={section!}
-            onUpdatePetition={onUpdatePetition}
-          />
-        ) : null}
+        <PetitionHeader
+          ref={headerRef}
+          petition={petition}
+          me={me}
+          onUpdatePetition={onUpdatePetition}
+          onMovePetition={onMovePetition}
+          section={section!}
+          actions={headerActions}
+        />
         {subHeader ? <Box>{subHeader}</Box> : null}
         <Box flex="1" overflow="auto" {...props} id="petition-layout-body">
           {children}
@@ -158,16 +149,10 @@ export const PetitionLayout = Object.assign(
           id
           name
           ...useConfirmDiscardDraftDialog_PetitionBase
-          ... on Petition {
-            ...PetitionHeader_Petition
-          }
-          ... on PetitionTemplate {
-            ...PetitionTemplateHeader_PetitionTemplate
-          }
+          ...PetitionHeader_PetitionBase
         }
         ${useConfirmDiscardDraftDialog.fragments.PetitionBase}
-        ${PetitionHeader.fragments.Petition}
-        ${PetitionTemplateHeader.fragments.PetitionTemplate}
+        ${PetitionHeader.fragments.PetitionBase}
       `,
       Query: gql`
         fragment PetitionLayout_Query on Query {

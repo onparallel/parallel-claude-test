@@ -14,7 +14,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { HeaderNameEditable_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useImperativeHandle, useRef, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
 
 export interface HeaderNameEditableProps extends EditableProps {
   petition: HeaderNameEditable_PetitionBaseFragment;
@@ -44,7 +44,7 @@ export const HeaderNameEditable = Object.assign(
       return (
         <Editable
           display="flex"
-          fontSize="xl"
+          fontSize="lg"
           value={name}
           onChange={setName}
           onSubmit={() => {
@@ -59,11 +59,11 @@ export const HeaderNameEditable = Object.assign(
         >
           {({ isEditing }: { isEditing: boolean }) => (
             <>
-              <Flex flex="1 1 auto" minWidth={0} padding={1}>
+              <Flex flex="1 1 auto" minWidth={0} padding={0} minHeight="27px">
                 {isReadOnly ? (
                   <Text
                     color={name ? "default" : "gray.400"}
-                    paddingX={2}
+                    paddingX={1}
                     noOfLines={1}
                     wordBreak="break-all"
                   >
@@ -83,15 +83,15 @@ export const HeaderNameEditable = Object.assign(
                         <EditablePreview
                           ref={previewRef}
                           color={name ? undefined : "gray.400"}
-                          paddingY={1}
-                          paddingX={2}
+                          paddingY={0}
+                          paddingX={1}
                           display="block"
                           noOfLines={1}
                           wordBreak="break-all"
                         />
                         <EditableInput
-                          paddingY={1}
-                          paddingX={2}
+                          paddingY={0}
+                          paddingX={1}
                           maxLength={255}
                           width={props.maxWidth}
                           transition="all 250ms, width 0s"
@@ -102,7 +102,7 @@ export const HeaderNameEditable = Object.assign(
                 )}
               </Flex>
               {!isEditing && (
-                <Flex alignItems="center" fontSize="sm" position="relative" top="3px">
+                <Flex alignItems="center" fontSize="sm" position="relative" top="1px" left="4px">
                   <Tooltip
                     label={intl.formatMessage(
                       {
@@ -139,27 +139,6 @@ export const HeaderNameEditable = Object.assign(
                       ) : state === "ERROR" ? (
                         <CloudErrorIcon fontSize="sm" role="presentation" />
                       ) : null}
-                      <Text
-                        as="span"
-                        marginLeft={1}
-                        display={{
-                          base: "none",
-                          sm: "inline",
-                          md: "none",
-                          lg: "inline",
-                        }}
-                      >
-                        {state === "SAVING" ? (
-                          <FormattedMessage
-                            id="generic.saving-changes"
-                            defaultMessage="Saving..."
-                          />
-                        ) : state === "SAVED" ? (
-                          <FormattedMessage id="generic.changes-saved" defaultMessage="Saved" />
-                        ) : state === "ERROR" ? (
-                          <FormattedMessage id="petition.status.error" defaultMessage="Error" />
-                        ) : null}
-                      </Text>
                     </Text>
                   </Tooltip>
                 </Flex>

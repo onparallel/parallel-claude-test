@@ -22,7 +22,7 @@ export async function parseContactList(
   data: string[][],
   options: {
     validateEmail: (email: string) => Promise<boolean>;
-    force: boolean;
+    force?: boolean;
   }
 ): Promise<[ExcelParsingError[] | undefined, ParsedContact[]]> {
   const errors = [] as ExcelParsingError[];

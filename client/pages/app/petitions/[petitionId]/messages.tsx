@@ -10,6 +10,7 @@ import { PetitionTemplateClosingMessageCard } from "@parallel/components/petitio
 import { PetitionTemplateCompletingMessageCard } from "@parallel/components/petition-messages/PetitionTemplateCompletingMessageCard";
 import { PetitionTemplateRequestMessageCard } from "@parallel/components/petition-messages/PetitionTemplateRequestMessageCard";
 import {
+  PetitionMessages_movePetitionsDocument,
   PetitionMessages_petitionDocument,
   PetitionMessages_updatePetitionDocument,
   PetitionMessages_userDocument,
@@ -20,6 +21,7 @@ import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { usePetitionStateWrapper } from "@parallel/components/layout/PetitionLayout";
+import { useCallback } from "react";
 
 type PetitionMessagesProps = UnwrapPromise<ReturnType<typeof PetitionMessages.getInitialProps>>;
 
@@ -27,7 +29,7 @@ function PetitionMessages({ petitionId }: PetitionMessagesProps) {
   const {
     data: { me, realMe },
   } = useAssertQuery(PetitionMessages_userDocument);
-  const { data } = useAssertQuery(PetitionMessages_petitionDocument, {
+  const { data, refetch } = useAssertQuery(PetitionMessages_petitionDocument, {
     variables: { id: petitionId },
   });
   const petition = data.petition!;
@@ -51,6 +53,26 @@ function PetitionMessages({ petitionId }: PetitionMessagesProps) {
     [petitionId, _updatePetition]
   );
 
+  const [movePetitions] = useMutation(PetitionMessages_movePetitionsDocument);
+  const handleMovePetition = useCallback(
+    async (destination: string) => {
+      try {
+        await movePetitions({
+          variables: {
+            ids: petition.id,
+            source: petition.path,
+            type: "TEMPLATE",
+            destination,
+          },
+          onCompleted: () => {
+            refetch();
+          },
+        });
+      } catch {}
+    },
+    [petition]
+  );
+
   const cardCommonProps = {
     petition,
     onUpdatePetition: updatePetition,
@@ -63,6 +85,7 @@ function PetitionMessages({ petitionId }: PetitionMessagesProps) {
       realMe={realMe}
       petition={petition}
       onUpdatePetition={updatePetition}
+      onMovePetition={handleMovePetition}
       section="messages"
       backgroundColor="primary.50"
     >
@@ -117,6 +140,23 @@ PetitionMessages.queries = [
 ];
 
 PetitionMessages.mutations = [
+  gql`
+    mutation PetitionMessages_movePetitions(
+      $ids: [GID!]
+      $folderIds: [ID!]
+      $source: String!
+      $destination: String!
+      $type: PetitionBaseType!
+    ) {
+      movePetitions(
+        ids: $ids
+        folderIds: $folderIds
+        source: $source
+        destination: $destination
+        type: $type
+      )
+    }
+  `,
   gql`
     mutation PetitionMessages_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
       updatePetition(petitionId: $petitionId, data: $data) {

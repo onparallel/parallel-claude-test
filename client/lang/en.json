@@ -3105,6 +3105,11 @@
     "context": "Export to PDF"
   },
   {
+    "term": "component.petition-header.move-to",
+    "definition": "Move to...",
+    "context": "Move to..."
+  },
+  {
     "term": "component.petition-header.not-subscribed-description",
     "definition": "Don't get notifications about this parallel.",
     "context": "Don't get notifications about this parallel."
@@ -6005,11 +6010,6 @@
     "context": "Change"
   },
   {
-    "term": "generic.changes-saved",
-    "definition": "Saved",
-    "context": "Saved"
-  },
-  {
     "term": "generic.choice",
     "definition": "Choice",
     "context": "Choice"
@@ -8638,11 +8638,6 @@
     "term": "petition.signature-successful.title",
     "definition": "Document signed successfully",
     "context": "Document signed successfully"
-  },
-  {
-    "term": "petition.status.error",
-    "definition": "Error",
-    "context": "Error"
   },
   {
     "term": "petitions.header.name",

@@ -57,6 +57,7 @@ import {
   PetitionReplies_approveOrRejectPetitionFieldRepliesDocument,
   PetitionReplies_closePetitionDocument,
   PetitionReplies_fileUploadReplyDownloadLinkDocument,
+  PetitionReplies_movePetitionsDocument,
   PetitionReplies_petitionDocument,
   PetitionReplies_PetitionFieldFragment,
   PetitionReplies_PetitionFragment,
@@ -441,6 +442,26 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     } catch {}
   };
 
+  const [movePetitions] = useMutation(PetitionReplies_movePetitionsDocument);
+  const handleMovePetition = useCallback(
+    async (destination: string) => {
+      try {
+        await movePetitions({
+          variables: {
+            ids: petition.id,
+            source: petition.path,
+            type: "PETITION",
+            destination,
+          },
+          onCompleted: () => {
+            refetch();
+          },
+        });
+      } catch {}
+    },
+    [petition]
+  );
+
   const [filter, setFilter] = useState<PetitionFieldFilter>(defaultFieldsFilter);
 
   const petitionSignatureStatus = getPetitionSignatureStatus(petition);
@@ -460,6 +481,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       realMe={realMe}
       petition={petition}
       onUpdatePetition={handleUpdatePetition}
+      onMovePetition={handleMovePetition}
       section="replies"
       headerActions={
         <Box display={{ base: "none", lg: "block" }}>
@@ -749,6 +771,23 @@ PetitionReplies.fragments = {
 };
 
 PetitionReplies.mutations = [
+  gql`
+    mutation PetitionReplies_movePetitions(
+      $ids: [GID!]
+      $folderIds: [ID!]
+      $source: String!
+      $destination: String!
+      $type: PetitionBaseType!
+    ) {
+      movePetitions(
+        ids: $ids
+        folderIds: $folderIds
+        source: $source
+        destination: $destination
+        type: $type
+      )
+    }
+  `,
   gql`
     mutation PetitionReplies_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
       updatePetition(petitionId: $petitionId, data: $data) {
