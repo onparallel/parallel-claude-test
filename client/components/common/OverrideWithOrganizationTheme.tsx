@@ -14,6 +14,9 @@ export function OverrideWithOrganizationTheme({
   brandTheme: OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragment;
 }) {
   const theme = useTheme();
+  const palette = /^#[a-f\d]{6}$/i.test(brand.color)
+    ? generateOrganizationPalette(brand.color)
+    : theme.colors.primary;
   const customTheme = extendTheme({
     ...theme,
     fonts: {
@@ -21,12 +24,7 @@ export function OverrideWithOrganizationTheme({
       body: brand.fontFamily ?? theme.fonts.body,
       heading: brand.fontFamily ?? theme.fonts.heading,
     },
-    colors: {
-      ...theme.colors,
-      primary: /^#[a-f\d]{6}$/i.test(brand.color)
-        ? generateOrganizationPalette(brand.color)
-        : theme.colors.primary,
-    },
+    colors: { ...theme.colors, primary: palette },
   });
 
   return (
@@ -48,41 +46,18 @@ OverrideWithOrganizationTheme.fragments = {
 export function generateOrganizationPalette(color: string) {
   const _color = new Color(color);
   const lightness = _color.hsl().round().lightness();
-
-  const lightenOffset = (97 - lightness) / 5;
-  const darkenOffset = lightness > 21 ? (lightness - 20) / 4 : 6;
-
-  return {
-    50: _color.lightness(99).hex().toString(),
-    100: _color
-      .lightness(lightness + lightenOffset * 4)
-      .hex()
-      .toString(),
-    200: _color
-      .lightness(lightness + lightenOffset * 3)
-      .hex()
-      .toString(),
-    300: _color
-      .lightness(lightness + lightenOffset * 2)
-      .hex()
-      .toString(),
-    400: _color
-      .lightness(lightness + lightenOffset)
-      .hex()
-      .toString(),
-    500: color,
-    600: _color
-      .lightness(lightness - darkenOffset)
-      .hex()
-      .toString(),
-    700: _color
-      .lightness(lightness - darkenOffset * 2)
-      .hex()
-      .toString(),
-    800: _color
-      .lightness(lightness - darkenOffset * 3)
-      .hex()
-      .toString(),
-    900: _color.lightness(20).hex().toString(),
-  };
+  return Object.fromEntries(
+    [
+      [50, 99],
+      [100, 95],
+      [200, lightness + ((95 - lightness) / 4) * 3],
+      [300, lightness + ((95 - lightness) / 4) * 2],
+      [400, lightness + ((95 - lightness) / 4) * 1],
+      [500, lightness],
+      [600, lightness - ((lightness - 15) / 4) * 1],
+      [700, lightness - ((lightness - 15) / 4) * 2],
+      [800, lightness - ((lightness - 15) / 4) * 3],
+      [900, 15],
+    ].map(([color, lightness]) => [color, _color.lightness(lightness).hex().toString()])
+  );
 }
