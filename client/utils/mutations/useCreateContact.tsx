@@ -46,9 +46,9 @@ export function useCreateContact() {
         } else {
           showGenericErrorToast(error);
         }
-        return null;
       }
     } catch {}
+    return null;
   }, []);
 }
 
