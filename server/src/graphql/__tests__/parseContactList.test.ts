@@ -14,6 +14,7 @@ describe("parseContactList", () => {
       [["first name", "last name", "email"], ...list],
       {
         validateEmail: async (email) => email.endsWith("test.com"),
+        force: false,
       }
     );
 
