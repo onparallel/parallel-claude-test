@@ -26,7 +26,6 @@ export function useHubspotForm(data: HubspotFormProps | null) {
       script.src = "https://js.hsforms.net/forms/v2.js";
       script.onload = () => {
         hbspt!.forms.create(data);
-        console.log("create");
       };
       document.head.appendChild(script);
     }
