@@ -39,7 +39,9 @@
     "postinstall": "cd .. && yarn patch-package",
     "generate-graphql-types": "graphql-codegen",
     "run-ts-script": "ts-node --project tsconfig.json --transpile-only",
-    "flush-sqs": "docker-compose -f ../ops/dev/docker-compose.yml restart queue"
+    "flush-sqs": "docker-compose -f ../ops/dev/docker-compose.yml restart queue",
+    "archive-migrations": "ts-node ./migrations/scripts/archive-migrations.ts",
+    "sync-migrations": "ts-node ./migrations/scripts/sync-migrations.ts"
   },
   "dependencies": {
     "@aws-sdk/client-cloudwatch-logs": "^3.209.0",
