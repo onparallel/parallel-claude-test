@@ -16,6 +16,7 @@ import { EMAILS, IEmailsService } from "../../services/emails";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 import { faker } from "@faker-js/faker";
+import { random } from "../../util/token";
 
 describe("GraphQL/PublicPetitionLink", () => {
   let testClient: TestClient;
@@ -809,6 +810,122 @@ describe("GraphQL/PublicPetitionLink", () => {
         { type: "READ", user_id: users[1].id, petition_id: lastPetition.id },
       ]);
     });
+
+    it("sends error if prefillDataKey is unknown", async () => {
+      const [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        is_template: true,
+      }));
+      const publicLink = await mocks.createRandomPublicPetitionLink(template.id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $slug: ID!
+            $contactFirstName: String!
+            $contactLastName: String!
+            $contactEmail: String!
+            $prefillDataKey: String
+            $force: Boolean
+          ) {
+            publicCreateAndSendPetitionFromPublicLink(
+              prefillDataKey: $prefillDataKey
+              slug: $slug
+              contactFirstName: $contactFirstName
+              contactLastName: $contactLastName
+              contactEmail: $contactEmail
+              force: $force
+            )
+          }
+        `,
+        {
+          slug: publicLink.slug,
+          contactFirstName: "Roger",
+          contactLastName: "Waters",
+          contactEmail: "rogerwaters@rogerwaters.com",
+          prefillDataKey: "unknown",
+          force: true,
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("creates a petition with prefill info from database", async () => {
+      const [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        is_template: true,
+      }));
+
+      const [templateField] = await mocks.createRandomPetitionFields(template.id, 1, () => ({
+        type: "TEXT",
+        alias: "text",
+      }));
+
+      const keycode = random(10);
+      await mocks.knex.from("public_petition_link_prefill_data").insert({
+        keycode,
+        data: { text: "hello!" },
+        template_id: template.id,
+        path: "/A/",
+      });
+
+      const publicLink = await mocks.createRandomPublicPetitionLink(template.id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $slug: ID!
+            $contactFirstName: String!
+            $contactLastName: String!
+            $contactEmail: String!
+            $prefillDataKey: String
+            $force: Boolean
+          ) {
+            publicCreateAndSendPetitionFromPublicLink(
+              prefillDataKey: $prefillDataKey
+              slug: $slug
+              contactFirstName: $contactFirstName
+              contactLastName: $contactLastName
+              contactEmail: $contactEmail
+              force: $force
+            )
+          }
+        `,
+        {
+          slug: publicLink.slug,
+          contactFirstName: "Roger",
+          contactLastName: "Waters",
+          contactEmail: "rogerwaters@rogerwaters.com",
+          prefillDataKey: keycode,
+          force: true,
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data!.publicCreateAndSendPetitionFromPublicLink).toEqual("SUCCESS");
+
+      const petitions = await mocks.knex
+        .from("petition")
+        .where("from_public_petition_link_id", publicLink.id)
+        .select("*");
+
+      expect(petitions).toHaveLength(1);
+
+      expect(petitions[0].path).toEqual("/A/");
+
+      const [petitionField] = await mocks.knex
+        .from("petition_field")
+        .where("from_petition_field_id", templateField.id)
+        .select("*");
+
+      const replies = await mocks.knex
+        .from("petition_field_reply")
+        .where({ petition_field_id: petitionField.id })
+        .select("*");
+
+      expect(replies).toHaveLength(1);
+      expect(replies[0].content).toEqual({ value: "hello!" });
+    });
   });
 
   describe("publicSendReminder", () => {
@@ -1366,5 +1483,101 @@ describe("GraphQL/PublicPetitionLink", () => {
     });
 
     it("overwrites permission if updating a link owner and the link owner already has read or write permissions on the template", async () => {});
+  });
+
+  describe("createPublicPetitionLinkPrefillData", () => {
+    let publicLink: PublicPetitionLink;
+
+    beforeAll(async () => {
+      const [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        is_template: true,
+        locale: "es",
+      }));
+      publicLink = await mocks.createRandomPublicPetitionLink(template.id);
+    });
+
+    it("sends error if user does not have feature flag", async () => {
+      await mocks.updateFeatureFlag("PUBLIC_PETITION_LINK_PREFILL_DATA", false);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($publicPetitionLinkId: GID!, $data: JSONObject!) {
+            createPublicPetitionLinkPrefillData(
+              publicPetitionLinkId: $publicPetitionLinkId
+              data: $data
+            )
+          }
+        `,
+        {
+          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicLink.id),
+          data: {},
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+
+      await mocks.updateFeatureFlag("PUBLIC_PETITION_LINK_PREFILL_DATA", true);
+    });
+
+    it("sends error if user has READ access to the template", async () => {
+      const [readTemplate] = await mocks.createRandomPetitions(
+        organization.id,
+        user.id,
+        1,
+        () => ({ is_template: true }),
+        () => ({ type: "READ" })
+      );
+      const publicReadLink = await mocks.createRandomPublicPetitionLink(readTemplate.id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($publicPetitionLinkId: GID!, $data: JSONObject!) {
+            createPublicPetitionLinkPrefillData(
+              publicPetitionLinkId: $publicPetitionLinkId
+              data: $data
+            )
+          }
+        `,
+        {
+          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicReadLink.id),
+          data: {},
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("returns full URL of public petition link with prefillDataKey in queryparam", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($publicPetitionLinkId: GID!, $data: JSONObject!, $path: String) {
+            createPublicPetitionLinkPrefillData(
+              publicPetitionLinkId: $publicPetitionLinkId
+              data: $data
+              path: $path
+            )
+          }
+        `,
+        {
+          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicLink.id),
+          data: { abc: 1 },
+          path: "/A/",
+        }
+      );
+
+      expect(errors).toBeUndefined();
+
+      const [prefillData] = await mocks.knex
+        .from("public_petition_link_prefill_data")
+        .where("template_id", publicLink.template_id)
+        .select("*");
+
+      expect(data?.createPublicPetitionLinkPrefillData).toEqual(
+        `http://www.test-onparallel.com/es/pp/${publicLink.slug}?${new URLSearchParams({
+          prefillDataKey: prefillData.keycode,
+        })}`
+      );
+    });
   });
 });
