@@ -418,12 +418,12 @@ export const PetitionHeader = Object.assign(
                   >
                     {isPetition ? (
                       <FormattedMessage
-                        id="component.petition-header.share-label"
+                        id="component.petition-header.share-label-petition"
                         defaultMessage="Share parallel"
                       />
                     ) : (
                       <FormattedMessage
-                        id="component.template-header.share-label"
+                        id="component.petition-header.share-label-template"
                         defaultMessage="Share template"
                       />
                     )}
@@ -461,12 +461,12 @@ export const PetitionHeader = Object.assign(
                   >
                     {isPetition ? (
                       <FormattedMessage
-                        id="component.petition-header.duplicate-label"
+                        id="component.petition-header.duplicate-label-petition"
                         defaultMessage="Duplicate parallel"
                       />
                     ) : (
                       <FormattedMessage
-                        id="component.template-header.duplicate-label"
+                        id="component.petition-header.duplicate-label-template"
                         defaultMessage="Duplicate template"
                       />
                     )}
@@ -496,7 +496,7 @@ export const PetitionHeader = Object.assign(
                     />
                   </MenuItem>
 
-                  {myEffectivePermission !== "READ" && status === "CLOSED" ? (
+                  {isPetition && myEffectivePermission !== "READ" && status === "CLOSED" ? (
                     <MenuItem
                       onClick={handleReopenPetition}
                       isDisabled={isAnonymized}
@@ -508,8 +508,7 @@ export const PetitionHeader = Object.assign(
                       />
                     </MenuItem>
                   ) : null}
-                  {petition.__typename === "Petition" ||
-                  (petition.__typename === "PetitionTemplate" && petition.isPublic) ? null : (
+                  {petition.__typename === "PetitionTemplate" && !petition.isPublic ? (
                     <>
                       <MenuDivider />
                       <MenuItem
@@ -523,7 +522,7 @@ export const PetitionHeader = Object.assign(
                         />
                       </MenuItem>
                     </>
-                  )}
+                  ) : null}
                   {isPetition ? (
                     <>
                       <MenuDivider />

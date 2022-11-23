@@ -3090,9 +3090,14 @@
     "context": "Download results"
   },
   {
-    "term": "component.petition-header.duplicate-label",
+    "term": "component.petition-header.duplicate-label-petition",
     "definition": "Duplicate parallel",
     "context": "Duplicate parallel"
+  },
+  {
+    "term": "component.petition-header.duplicate-label-template",
+    "definition": "Duplicate template",
+    "context": "Duplicate template"
   },
   {
     "term": "component.petition-header.export-pdf",
@@ -3120,9 +3125,14 @@
     "context": "Save as template"
   },
   {
-    "term": "component.petition-header.share-label",
+    "term": "component.petition-header.share-label-petition",
     "definition": "Share parallel",
     "context": "Share parallel"
+  },
+  {
+    "term": "component.petition-header.share-label-template",
+    "definition": "Share template",
+    "context": "Share template"
   },
   {
     "term": "component.petition-header.subscribed-description",
@@ -5328,16 +5338,6 @@
     "term": "component.template-details-modal.shared-with",
     "definition": "Shared with:",
     "context": "Shared with:"
-  },
-  {
-    "term": "component.template-header.duplicate-label",
-    "definition": "Duplicate template",
-    "context": "Duplicate template"
-  },
-  {
-    "term": "component.template-header.share-label",
-    "definition": "Share template",
-    "context": "Share template"
   },
   {
     "term": "component.template-icon-compliance.text",

@@ -130,7 +130,7 @@ export function TemplateDetailsModal({
   const sharePetitionButton = (
     <Button width="100%" onClick={handlePetitionSharingClick} leftIcon={<UserArrowIcon />}>
       <FormattedMessage
-        id="component.template-header.share-label"
+        id="component.petition-header.share-label-template"
         defaultMessage="Share template"
       />
     </Button>
@@ -245,7 +245,7 @@ export function TemplateDetailsModal({
                             icon={<UserArrowIcon display="block" boxSize={4} />}
                           >
                             <FormattedMessage
-                              id="component.template-header.share-label"
+                              id="component.petition-header.share-label-template"
                               defaultMessage="Share template"
                             />
                           </MenuItem>
