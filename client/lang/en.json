@@ -2155,11 +2155,6 @@
     "context": "Currently in {folder}"
   },
   {
-    "term": "component.move-to-folder-dialog.header",
-    "definition": "Move to...",
-    "context": "Move to..."
-  },
-  {
     "term": "component.move-to-folder-dialog.move",
     "definition": "Move",
     "context": "Move"
@@ -3106,8 +3101,8 @@
   },
   {
     "term": "component.petition-header.move-to",
-    "definition": "Move to...",
-    "context": "Move to..."
+    "definition": "generic.move-to",
+    "context": "generic.move-to"
   },
   {
     "term": "component.petition-header.not-subscribed-description",
@@ -6580,6 +6575,11 @@
     "context": "More options..."
   },
   {
+    "term": "generic.move-to",
+    "definition": "Move to...",
+    "context": "Move to..."
+  },
+  {
     "term": "generic.n-group-members",
     "definition": "{count, plural, =1 {1 member} other {# members}}",
     "context": "{count, plural, =1 {1 member} other {# members}}"
@@ -7628,11 +7628,6 @@
     "term": "page.petitions-list.actions-clone",
     "definition": "Duplicate",
     "context": "Duplicate"
-  },
-  {
-    "term": "page.petitions-list.actions-move-to",
-    "definition": "Move to...",
-    "context": "Move to..."
   },
   {
     "term": "page.petitions-list.actions-rename",

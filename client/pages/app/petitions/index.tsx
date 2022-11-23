@@ -646,9 +646,7 @@ function usePetitionListActions({
       onClick: onMoveToClick,
       isDisabled: minimumPermission === "READ" || user.role === "COLLABORATOR",
       leftIcon: <FolderIcon />,
-      children: (
-        <FormattedMessage id="page.petitions-list.actions-move-to" defaultMessage="Move to..." />
-      ),
+      children: <FormattedMessage id="generic.move-to" defaultMessage="Move to..." />,
       wrap: restrictToCollaborators,
     },
 

@@ -10,9 +10,7 @@ function MoveToFolderDialog(props: MoveToFolderDialogProps) {
   return (
     <GenericFolderDialog
       {...props}
-      header={() => (
-        <FormattedMessage id="component.move-to-folder-dialog.header" defaultMessage="Move to..." />
-      )}
+      header={() => <FormattedMessage id="generic.move-to" defaultMessage="Move to..." />}
       body={({ currentPath, type, selectedPath }) => (
         <Text marginBottom={2}>
           {currentPath !== selectedPath ? (

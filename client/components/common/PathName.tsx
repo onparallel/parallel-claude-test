@@ -2,15 +2,17 @@ import { Box, Tooltip } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionBaseType } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
+import { createElement, ReactElement, ReactNode } from "react";
 
 interface PathNameProps {
   path: string;
   type: PetitionBaseType;
   disableTooltip?: boolean;
+  render?: (props: { children?: ReactNode }) => ReactElement;
 }
 
 export const PathName = chakraForwardRef<"span", PathNameProps>(function PathName(
-  { path, type, disableTooltip, ...props },
+  { path, type, disableTooltip, render = ({ children }) => <>{children}</>, ...props },
   ref
 ) {
   const intl = useIntl();
@@ -27,8 +29,12 @@ export const PathName = chakraForwardRef<"span", PathNameProps>(function PathNam
   const label = (`/${root}` + path).slice(0, -1);
   return (
     <Tooltip label={label} isDisabled={path === "/" || disableTooltip}>
-      <Box ref={ref as any} as="span" {...props}>
-        {path === "/" ? root : path.replace(/^\//, "").replace(/\/$/, "").split("/").at(-1)!}
+      <Box ref={ref as any} as="span" display="inline-block" {...props}>
+        {createElement(
+          render,
+          {},
+          <>{path === "/" ? root : path.replace(/^\//, "").replace(/\/$/, "").split("/").at(-1)!}</>
+        )}
       </Box>
     </Tooltip>
   );

@@ -52,8 +52,10 @@ import { useRouter } from "next/router";
 import { ReactNode, useCallback, useImperativeHandle, useMemo, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
+import { Divider } from "../common/Divider";
 import { NakedLink } from "../common/Link";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
+import { PathName } from "../common/PathName";
 import { PetitionStatusIcon } from "../common/PetitionStatusIcon";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
@@ -104,51 +106,6 @@ export const PetitionHeader = Object.assign(
         router.push("/app/petitions/");
       } catch {}
     };
-
-    const { rootFolder, unnamed, ariaLabel } = useMemo(() => {
-      const rootFolder =
-        petition.__typename === "Petition"
-          ? intl.formatMessage({
-              id: "generic.root-petitions",
-              defaultMessage: "Parallels",
-            })
-          : intl.formatMessage({
-              id: "generic.root-templates",
-              defaultMessage: "Templates",
-            });
-
-      const unnamed =
-        petition.__typename === "Petition"
-          ? intl.formatMessage({
-              id: "generic.unnamed-parallel",
-              defaultMessage: "Unnamed parallel",
-            })
-          : intl.formatMessage({
-              id: "generic.unnamed-template",
-              defaultMessage: "Unnamed template",
-            });
-
-      const ariaLabel =
-        petition.__typename === "Petition"
-          ? intl.formatMessage({
-              id: "generic.parallel-name",
-              defaultMessage: "Parallel name",
-            })
-          : intl.formatMessage({
-              id: "generic.template-name",
-              defaultMessage: "Template name",
-            });
-
-      return { rootFolder, unnamed, ariaLabel };
-    }, [intl.locale]);
-
-    const arrayPath = [rootFolder, ...petition.path.split("/").filter((folder) => folder)];
-
-    if (arrayPath.length > 4) {
-      arrayPath.splice(1, arrayPath.length - 4, " ... ");
-    }
-    const path = petition.path === "/" ? rootFolder : arrayPath.join(" / ");
-    const currentFolder = arrayPath.at(-1) || rootFolder;
 
     const clonePetitions = useClonePetitions();
     const goToPetition = useGoToPetition();
@@ -410,52 +367,48 @@ export const PetitionHeader = Object.assign(
                     24 /* locale badge width */
                   }px)`,
                 }}
-                placeholder={petition.name ? "" : unnamed}
-                aria-label={ariaLabel}
               />
 
               <HStack spacing={1}>
                 {petition.__typename === "Petition" ? (
-                  <>
-                    <Center data-section="petition-status-icon" data-status={status} paddingX={1}>
-                      <PetitionStatusIcon status={status} showStatus={true} />
-                    </Center>
-                    <Text>{"·"}</Text>
-                  </>
+                  <Center data-section="petition-status-icon" data-status={status} paddingX={1}>
+                    <PetitionStatusIcon status={status} showStatus={true} />
+                  </Center>
                 ) : (
-                  <>
-                    <Badge colorScheme="primary" marginRight={2}>
-                      <FormattedMessage id="generic.template" defaultMessage="Template" />
-                    </Badge>
-                    <Text>{"|"}</Text>
-                  </>
+                  <Badge colorScheme="primary" marginRight={2}>
+                    <FormattedMessage id="generic.template" defaultMessage="Template" />
+                  </Badge>
                 )}
-                <Tooltip label={path}>
-                  {me.role === "COLLABORATOR" ? (
-                    <HStack paddingX={1.5} color="gray.600" fontSize="sm">
-                      <FolderIcon boxSize={4} />
-                      <Text as="span" lineHeight="24px">
-                        {currentFolder}
-                      </Text>
-                    </HStack>
-                  ) : (
-                    <Button
-                      leftIcon={<FolderIcon boxSize={4} />}
-                      size="xs"
-                      variant="ghost"
-                      paddingX={1.5}
-                      fontSize="sm"
-                      fontWeight={400}
-                      onClick={handleMovePetition}
-                      color="gray.600"
-                      _hover={{ span: { color: "gray.800" }, backgroundColor: "gray.100" }}
-                    >
-                      <Text as="span" lineHeight="24px">
-                        {currentFolder}
-                      </Text>
-                    </Button>
+                <Divider isVertical height={3.5} color="gray.500" />
+                <PathName
+                  type={isPetition ? "PETITION" : "TEMPLATE"}
+                  path={petition.path}
+                  render={({ children }) => (
+                    <>
+                      {me.role === "COLLABORATOR" ? (
+                        <HStack paddingX={1.5} color="gray.600" fontSize="sm">
+                          <FolderIcon boxSize={4} />
+                          <Text as="span" lineHeight="24px">
+                            {children}
+                          </Text>
+                        </HStack>
+                      ) : (
+                        <Button
+                          leftIcon={<FolderIcon boxSize={4} />}
+                          color="gray.600"
+                          size="xs"
+                          variant="ghost"
+                          paddingX={1.5}
+                          fontSize="sm"
+                          fontWeight="norm"
+                          onClick={handleMovePetition}
+                        >
+                          {children}
+                        </Button>
+                      )}
+                    </>
                   )}
-                </Tooltip>
+                />
               </HStack>
             </Stack>
           </Flex>
@@ -553,7 +506,7 @@ export const PetitionHeader = Object.assign(
                     >
                       <FormattedMessage
                         id="component.petition-header.move-to"
-                        defaultMessage="Move to..."
+                        defaultMessage="generic.move-to"
                       />
                     </MenuItem>
 

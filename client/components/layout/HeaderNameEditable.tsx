@@ -55,6 +55,28 @@ export const HeaderNameEditable = Object.assign(
           onBlur={() => {
             setName(name.trim());
           }}
+          placeholder={
+            petition.__typename === "Petition"
+              ? intl.formatMessage({
+                  id: "generic.unnamed-parallel",
+                  defaultMessage: "Unnamed parallel",
+                })
+              : intl.formatMessage({
+                  id: "generic.unnamed-template",
+                  defaultMessage: "Unnamed template",
+                })
+          }
+          aria-label={
+            petition.__typename === "Petition"
+              ? intl.formatMessage({
+                  id: "generic.parallel-name",
+                  defaultMessage: "Parallel name",
+                })
+              : intl.formatMessage({
+                  id: "generic.template-name",
+                  defaultMessage: "Template name",
+                })
+          }
           {...props}
         >
           {({ isEditing }: { isEditing: boolean }) => (
