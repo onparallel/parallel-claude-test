@@ -323,7 +323,7 @@ export const PetitionHeader = Object.assign(
         gridTemplateAreas={{ base: '"a b" "c c"', md: '"a c b"' }}
         {...props}
       >
-        <GridItem area="a" as={Flex} flexDirection="column" justifyContent="center">
+        <GridItem area="a" as={Flex} flexDirection="column" justifyContent="center" minWidth={0}>
           <Flex>
             <HeaderNameEditable
               ref={editableRef}
@@ -347,14 +347,16 @@ export const PetitionHeader = Object.assign(
             <PathName
               type={isPetition ? "PETITION" : "TEMPLATE"}
               path={petition.path}
-              render={({ children }) => (
+              minWidth={0}
+              display="flex"
+              render={({ children, ...props }) => (
                 <>
                   {me.role === "COLLABORATOR" ? (
-                    <HStack paddingX={1.5} color="gray.600" fontSize="sm">
+                    <HStack minWidth={0} paddingX={1.5} color="gray.600" fontSize="sm" {...props}>
                       <FolderIcon boxSize={4} />
-                      <Text as="span" lineHeight="24px">
+                      <Box whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
                         {children}
-                      </Text>
+                      </Box>
                     </HStack>
                   ) : (
                     <Button
@@ -364,10 +366,14 @@ export const PetitionHeader = Object.assign(
                       variant="ghost"
                       paddingX={1.5}
                       fontSize="sm"
-                      fontWeight="norm"
+                      fontWeight="normal"
+                      minWitdh={0}
                       onClick={handleMovePetition}
+                      {...props}
                     >
-                      {children}
+                      <Box whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
+                        {children}
+                      </Box>
                     </Button>
                   )}
                 </>
