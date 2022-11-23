@@ -2141,6 +2141,7 @@ export const createPublicPetitionLinkPrefillData = mutationField(
     resolve: async (_, args, ctx) => {
       const publicLink = (await ctx.petitions.loadPublicPetitionLink(args.publicPetitionLinkId))!;
       const template = (await ctx.petitions.loadPetition(publicLink.template_id))!;
+      const org = (await ctx.organizations.loadOrg(template.org_id))!;
 
       const prefillData = await ctx.petitions.createPublicPetitionLinkPrefillData(
         {
@@ -2152,9 +2153,14 @@ export const createPublicPetitionLinkPrefillData = mutationField(
         `User:${ctx.user!.id}`
       );
 
-      return `${ctx.config.misc.parallelUrl}/${template.locale ?? "en"}/pp/${
-        publicLink.slug
-      }?${new URLSearchParams({ pk: prefillData.keycode })}`;
+      const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+      const prefix = org.custom_host
+        ? `${protocol}://${org.custom_host}`
+        : ctx.config.misc.parallelUrl;
+
+      return `${prefix}/${template.locale}/pp/${publicLink.slug}?${new URLSearchParams({
+        pk: prefillData.keycode,
+      })}`;
     },
   }
 );
