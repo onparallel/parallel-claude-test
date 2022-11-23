@@ -43,7 +43,6 @@ import {
   PetitionCompose_clonePetitionFieldDocument,
   PetitionCompose_createPetitionFieldDocument,
   PetitionCompose_deletePetitionFieldDocument,
-  PetitionCompose_movePetitionsDocument,
   PetitionCompose_petitionDocument,
   PetitionCompose_PetitionFieldFragment,
   PetitionCompose_updateFieldPositionsDocument,
@@ -171,26 +170,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       });
     }),
     [petitionId]
-  );
-
-  const [movePetitions] = useMutation(PetitionCompose_movePetitionsDocument);
-  const handleMovePetition = useCallback(
-    async (destination: string) => {
-      try {
-        await movePetitions({
-          variables: {
-            ids: petition.id,
-            source: petition.path,
-            type: petition.__typename === "Petition" ? "PETITION" : "TEMPLATE",
-            destination,
-          },
-          onCompleted: () => {
-            refetch();
-          },
-        });
-      } catch {}
-    },
-    [petition]
   );
 
   const [updateFieldPositions] = useMutation(PetitionCompose_updateFieldPositionsDocument);
@@ -462,7 +441,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         realMe={realMe}
         petition={petition}
         onUpdatePetition={handleUpdatePetition}
-        onMovePetition={handleMovePetition}
         section="compose"
         headerActions={
           petition?.__typename === "Petition" &&
@@ -713,24 +691,7 @@ PetitionCompose.fragments = {
   },
 };
 
-PetitionCompose.mutations = [
-  gql`
-    mutation PetitionCompose_movePetitions(
-      $ids: [GID!]
-      $folderIds: [ID!]
-      $source: String!
-      $destination: String!
-      $type: PetitionBaseType!
-    ) {
-      movePetitions(
-        ids: $ids
-        folderIds: $folderIds
-        source: $source
-        destination: $destination
-        type: $type
-      )
-    }
-  `,
+const _mutations = [
   gql`
     mutation PetitionCompose_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
       updatePetition(petitionId: $petitionId, data: $data) {
@@ -856,7 +817,7 @@ PetitionCompose.mutations = [
   `,
 ];
 
-PetitionCompose.queries = [
+const _queries = [
   gql`
     query PetitionCompose_user {
       ...PetitionCompose_Query

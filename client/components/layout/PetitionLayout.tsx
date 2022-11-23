@@ -36,7 +36,6 @@ export interface PetitionLayoutProps extends PetitionLayout_QueryFragment {
   petition: PetitionLayout_PetitionBaseFragment;
   onNextClick?: () => void;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
-  onMovePetition: (destionation: string) => void;
   section: PetitionSection;
   headerActions?: ReactNode;
   subHeader?: ReactNode;
@@ -50,7 +49,6 @@ export const PetitionLayout = Object.assign(
       petition,
       section,
       onUpdatePetition,
-      onMovePetition,
       headerActions,
       children,
       subHeader,
@@ -131,7 +129,6 @@ export const PetitionLayout = Object.assign(
           petition={petition}
           me={me}
           onUpdatePetition={onUpdatePetition}
-          onMovePetition={onMovePetition}
           section={section!}
           actions={headerActions}
         />

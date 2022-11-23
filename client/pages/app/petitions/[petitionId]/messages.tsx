@@ -4,13 +4,13 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import {
   PetitionLayout,
+  usePetitionStateWrapper,
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
 import { PetitionTemplateClosingMessageCard } from "@parallel/components/petition-messages/PetitionTemplateClosingMessageCard";
 import { PetitionTemplateCompletingMessageCard } from "@parallel/components/petition-messages/PetitionTemplateCompletingMessageCard";
 import { PetitionTemplateRequestMessageCard } from "@parallel/components/petition-messages/PetitionTemplateRequestMessageCard";
 import {
-  PetitionMessages_movePetitionsDocument,
   PetitionMessages_petitionDocument,
   PetitionMessages_updatePetitionDocument,
   PetitionMessages_userDocument,
@@ -20,8 +20,6 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { usePetitionStateWrapper } from "@parallel/components/layout/PetitionLayout";
-import { useCallback } from "react";
 
 type PetitionMessagesProps = UnwrapPromise<ReturnType<typeof PetitionMessages.getInitialProps>>;
 
@@ -29,7 +27,7 @@ function PetitionMessages({ petitionId }: PetitionMessagesProps) {
   const {
     data: { me, realMe },
   } = useAssertQuery(PetitionMessages_userDocument);
-  const { data, refetch } = useAssertQuery(PetitionMessages_petitionDocument, {
+  const { data } = useAssertQuery(PetitionMessages_petitionDocument, {
     variables: { id: petitionId },
   });
   const petition = data.petition!;
@@ -53,26 +51,6 @@ function PetitionMessages({ petitionId }: PetitionMessagesProps) {
     [petitionId, _updatePetition]
   );
 
-  const [movePetitions] = useMutation(PetitionMessages_movePetitionsDocument);
-  const handleMovePetition = useCallback(
-    async (destination: string) => {
-      try {
-        await movePetitions({
-          variables: {
-            ids: petition.id,
-            source: petition.path,
-            type: "TEMPLATE",
-            destination,
-          },
-          onCompleted: () => {
-            refetch();
-          },
-        });
-      } catch {}
-    },
-    [petition]
-  );
-
   const cardCommonProps = {
     petition,
     onUpdatePetition: updatePetition,
@@ -85,7 +63,6 @@ function PetitionMessages({ petitionId }: PetitionMessagesProps) {
       realMe={realMe}
       petition={petition}
       onUpdatePetition={updatePetition}
-      onMovePetition={handleMovePetition}
       section="messages"
       backgroundColor="primary.50"
     >
@@ -98,7 +75,7 @@ function PetitionMessages({ petitionId }: PetitionMessagesProps) {
   );
 }
 
-PetitionMessages.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment PetitionMessages_PetitionBase on PetitionBase {
       id
@@ -122,12 +99,12 @@ PetitionMessages.fragments = {
   `,
 };
 
-PetitionMessages.queries = [
+const _queries = [
   gql`
     query PetitionMessages_user {
       ...PetitionMessages_Query
     }
-    ${PetitionMessages.fragments.Query}
+    ${_fragments.Query}
   `,
   gql`
     query PetitionMessages_petition($id: GID!) {
@@ -135,35 +112,18 @@ PetitionMessages.queries = [
         ...PetitionMessages_PetitionBase
       }
     }
-    ${PetitionMessages.fragments.PetitionBase}
+    ${_fragments.PetitionBase}
   `,
 ];
 
-PetitionMessages.mutations = [
-  gql`
-    mutation PetitionMessages_movePetitions(
-      $ids: [GID!]
-      $folderIds: [ID!]
-      $source: String!
-      $destination: String!
-      $type: PetitionBaseType!
-    ) {
-      movePetitions(
-        ids: $ids
-        folderIds: $folderIds
-        source: $source
-        destination: $destination
-        type: $type
-      )
-    }
-  `,
+const _mutations = [
   gql`
     mutation PetitionMessages_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
       updatePetition(petitionId: $petitionId, data: $data) {
         ...PetitionMessages_PetitionBase
       }
     }
-    ${PetitionMessages.fragments.PetitionBase}
+    ${_fragments.PetitionBase}
   `,
 ];
 

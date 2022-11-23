@@ -54,7 +54,6 @@ import { RecipientViewPagination } from "@parallel/components/recipient-view/Rec
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
 import {
   PetitionPreview_completePetitionDocument,
-  PetitionPreview_movePetitionsDocument,
   PetitionPreview_PetitionBaseFragment,
   PetitionPreview_petitionDocument,
   PetitionPreview_updatePetitionDocument,
@@ -83,6 +82,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, omit } from "remeda";
+
 type PetitionPreviewProps = UnwrapPromise<ReturnType<typeof PetitionPreview.getInitialProps>>;
 
 function PetitionPreview({ petitionId }: PetitionPreviewProps) {
@@ -94,7 +94,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const {
     data: { me, realMe },
   } = useAssertQuery(PetitionPreview_userDocument);
-  const { data, refetch } = useAssertQuery(PetitionPreview_petitionDocument, {
+  const { data } = useAssertQuery(PetitionPreview_petitionDocument, {
     variables: { id: petitionId },
   });
 
@@ -127,26 +127,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const isPetition = petition.__typename === "Petition";
 
   const myEffectivePermission = petition.myEffectivePermission!.permissionType;
-
-  const [movePetitions] = useMutation(PetitionPreview_movePetitionsDocument);
-  const handleMovePetition = useCallback(
-    async (destination: string) => {
-      try {
-        await movePetitions({
-          variables: {
-            ids: petition.id,
-            source: petition.path,
-            type: isPetition ? "PETITION" : "TEMPLATE",
-            destination,
-          },
-          onCompleted: () => {
-            refetch();
-          },
-        });
-      } catch {}
-    },
-    [petition]
-  );
 
   const pageCount =
     petition.fields.filter((f) => f.type === "HEADING" && f.options!.hasPageBreak).length + 1;
@@ -394,7 +374,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         realMe={realMe}
         petition={petition}
         onUpdatePetition={handleUpdatePetition}
-        onMovePetition={handleMovePetition}
         section="preview"
         headerActions={
           isPetition &&
@@ -622,7 +601,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   );
 }
 
-PetitionPreview.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment PetitionPreview_PetitionBase on PetitionBase {
       id
@@ -728,29 +707,12 @@ PetitionPreview.fragments = {
 
 const _mutations = [
   gql`
-    mutation PetitionPreview_movePetitions(
-      $ids: [GID!]
-      $folderIds: [ID!]
-      $source: String!
-      $destination: String!
-      $type: PetitionBaseType!
-    ) {
-      movePetitions(
-        ids: $ids
-        folderIds: $folderIds
-        source: $source
-        destination: $destination
-        type: $type
-      )
-    }
-  `,
-  gql`
     mutation PetitionPreview_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
       updatePetition(petitionId: $petitionId, data: $data) {
         ...PetitionPreview_PetitionBase
       }
     }
-    ${PetitionPreview.fragments.PetitionBase}
+    ${_fragments.PetitionBase}
   `,
   gql`
     mutation PetitionPreview_completePetition(
@@ -766,7 +728,7 @@ const _mutations = [
         ...PetitionPreview_PetitionBase
       }
     }
-    ${PetitionPreview.fragments.PetitionBase}
+    ${_fragments.PetitionBase}
   `,
 ];
 
@@ -777,7 +739,7 @@ const _queries = [
         ...PetitionPreview_PetitionBase
       }
     }
-    ${PetitionPreview.fragments.PetitionBase}
+    ${_fragments.PetitionBase}
   `,
   gql`
     query PetitionPreview_user {
@@ -790,7 +752,7 @@ const _queries = [
         browserName
       }
     }
-    ${PetitionPreview.fragments.Query}
+    ${_fragments.Query}
   `,
 ];
 

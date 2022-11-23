@@ -34,9 +34,11 @@ import {
 import {
   PetitionActivity_petitionDocument,
   PetitionHeader_PetitionBaseFragment,
+  PetitionHeader_PetitionBase_updatePathFragmentDoc,
   PetitionHeader_QueryFragment,
   PetitionHeader_reopenPetitionDocument,
   PetitionHeader_updatePetitionPermissionSubscriptionDocument,
+  PetitionsHeader_movePetitionDocument,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
@@ -66,7 +68,6 @@ import { PetitionSection } from "./PetitionLayout";
 export interface PetitionHeaderProps extends PetitionHeader_QueryFragment {
   petition: PetitionHeader_PetitionBaseFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
-  onMovePetition: (destination: string) => void;
   section: PetitionSection;
   actions?: ReactNode;
 }
@@ -77,7 +78,7 @@ export interface PetitionHeaderInstance {
 
 export const PetitionHeader = Object.assign(
   chakraForwardRef<"div", PetitionHeaderProps, PetitionHeaderInstance>(function PetitionHeader(
-    { petition, me, onUpdatePetition, onMovePetition, section: current, actions, ...props },
+    { petition, me, onUpdatePetition, section: current, actions, ...props },
     ref
   ) {
     const intl = useIntl();
@@ -208,6 +209,34 @@ export const PetitionHeader = Object.assign(
       } catch {}
     };
 
+    const [movePetition] = useMutation(PetitionsHeader_movePetitionDocument);
+    const showMoveFolderDialog = useMoveToFolderDialog();
+    const handleMovePetition = async () => {
+      try {
+        const destination = await showMoveFolderDialog({
+          type: isPetition ? "PETITION" : "TEMPLATE",
+          currentPath: petition.path,
+        });
+        await movePetition({
+          variables: {
+            id: petition.id,
+            source: petition.path,
+            type: isPetition ? "PETITION" : "TEMPLATE",
+            destination,
+          },
+          update: (cache, { data }) => {
+            if (data?.movePetitions === "SUCCESS") {
+              cache.writeFragment({
+                id: petition.id,
+                fragment: PetitionHeader_PetitionBase_updatePathFragmentDoc,
+                data: { path: destination },
+              });
+            }
+          },
+        });
+      } catch {}
+    };
+
     const sections = useMemo(
       () =>
         petition.__typename === "Petition"
@@ -319,17 +348,6 @@ export const PetitionHeader = Object.assign(
       } catch {}
     }, [petition.id]);
 
-    const showMoveFolderDialog = useMoveToFolderDialog();
-    const handleMoveToFolder = async () => {
-      try {
-        const destinationPath = await showMoveFolderDialog({
-          type: isPetition ? "PETITION" : "TEMPLATE",
-          currentPath: petition.path,
-        });
-        onMovePetition(destinationPath);
-      } catch {}
-    };
-
     const handlePrintPdfTask = usePrintPdfTask();
 
     const handleTemplateRepliesReportTask = useTemplateRepliesReportTask();
@@ -428,7 +446,7 @@ export const PetitionHeader = Object.assign(
                       paddingX={1.5}
                       fontSize="sm"
                       fontWeight={400}
-                      onClick={handleMoveToFolder}
+                      onClick={handleMovePetition}
                       color="gray.600"
                       _hover={{ span: { color: "gray.800" }, backgroundColor: "gray.100" }}
                     >
@@ -529,7 +547,7 @@ export const PetitionHeader = Object.assign(
                     ) : null}
 
                     <MenuItem
-                      onClick={handleMoveToFolder}
+                      onClick={handleMovePetition}
                       icon={<FolderIcon display="block" boxSize={4} />}
                       isDisabled={me.role === "COLLABORATOR"}
                     >
@@ -727,6 +745,14 @@ export const PetitionHeader = Object.assign(
   }
 );
 
+const _fragments = {
+  PetitionHeader_PetitionBase_updatePath: gql`
+    fragment PetitionHeader_PetitionBase_updatePath on PetitionBase {
+      path
+    }
+  `,
+};
+
 const _mutations = [
   gql`
     mutation PetitionHeader_reopenPetition($petitionId: GID!) {
@@ -748,6 +774,16 @@ const _mutations = [
           isSubscribed
         }
       }
+    }
+  `,
+  gql`
+    mutation PetitionsHeader_movePetition(
+      $id: GID!
+      $source: String!
+      $destination: String!
+      $type: PetitionBaseType!
+    ) {
+      movePetitions(ids: [$id], source: $source, destination: $destination, type: $type)
     }
   `,
 ];

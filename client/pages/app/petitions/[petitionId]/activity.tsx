@@ -34,7 +34,6 @@ import {
   PetitionAccessTable_PetitionAccessFragment,
   PetitionActivity_cancelScheduledMessageDocument,
   PetitionActivity_deactivateAccessesDocument,
-  PetitionActivity_movePetitionsDocument,
   PetitionActivity_petitionDocument,
   PetitionActivity_PetitionFragment,
   PetitionActivity_reactivateAccessesDocument,
@@ -86,26 +85,6 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       return await updatePetition({ variables: { petitionId, data } });
     }),
     [petitionId]
-  );
-
-  const [movePetitions] = useMutation(PetitionActivity_movePetitionsDocument);
-  const handleMovePetition = useCallback(
-    async (destination: string) => {
-      try {
-        await movePetitions({
-          variables: {
-            ids: petition.id,
-            source: petition.path,
-            type: "PETITION",
-            destination,
-          },
-          onCompleted: () => {
-            refetch();
-          },
-        });
-      } catch {}
-    },
-    [petition]
   );
 
   const showErrorDialog = useErrorDialog();
@@ -349,7 +328,6 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       realMe={realMe}
       petition={petition}
       onUpdatePetition={handleUpdatePetition}
-      onMovePetition={handleMovePetition}
       section="activity"
       headerActions={
         <Box display={{ base: "none", lg: "block" }}>
@@ -385,7 +363,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   );
 }
 
-PetitionActivity.fragments = {
+const _fragments = {
   Petition: gql`
     fragment PetitionActivity_Petition on Petition {
       id
@@ -446,7 +424,7 @@ PetitionActivity.mutations = [
         ...PetitionActivity_Petition
       }
     }
-    ${PetitionActivity.fragments.Petition}
+    ${_fragments.Petition}
   `,
   gql`
     mutation PetitionActivity_sendReminders($petitionId: GID!, $accessIds: [GID!]!, $body: JSON) {
@@ -496,40 +474,20 @@ PetitionActivity.mutations = [
   `,
 ];
 
-PetitionActivity.queries = [
+const _queries = [
   gql`
     query PetitionActivity_petition($id: GID!) {
       petition(id: $id) {
         ...PetitionActivity_Petition
       }
     }
-    ${PetitionActivity.fragments.Petition}
+    ${_fragments.Petition}
   `,
   gql`
     query PetitionActivity_user {
       ...PetitionActivity_Query
     }
-    ${PetitionActivity.fragments.Query}
-  `,
-];
-
-PetitionActivity.mutations = [
-  gql`
-    mutation PetitionActivity_movePetitions(
-      $ids: [GID!]
-      $folderIds: [ID!]
-      $source: String!
-      $destination: String!
-      $type: PetitionBaseType!
-    ) {
-      movePetitions(
-        ids: $ids
-        folderIds: $folderIds
-        source: $source
-        destination: $destination
-        type: $type
-      )
-    }
+    ${_fragments.Query}
   `,
 ];
 

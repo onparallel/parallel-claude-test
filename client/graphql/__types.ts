@@ -5056,6 +5056,20 @@ export type PetitionHeader_QueryFragment = {
   me: { __typename?: "User"; id: string; role: OrganizationRole; hasPetitionPdfExport: boolean };
 };
 
+export type PetitionHeader_PetitionBase_updatePath_Petition_Fragment = {
+  __typename?: "Petition";
+  path: string;
+};
+
+export type PetitionHeader_PetitionBase_updatePath_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  path: string;
+};
+
+export type PetitionHeader_PetitionBase_updatePathFragment =
+  | PetitionHeader_PetitionBase_updatePath_Petition_Fragment
+  | PetitionHeader_PetitionBase_updatePath_PetitionTemplate_Fragment;
+
 export type PetitionHeader_reopenPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
@@ -5084,6 +5098,15 @@ export type PetitionHeader_updatePetitionPermissionSubscriptionMutation = {
     } | null;
   };
 };
+
+export type PetitionsHeader_movePetitionMutationVariables = Exact<{
+  id: Scalars["GID"];
+  source: Scalars["String"];
+  destination: Scalars["String"];
+  type: PetitionBaseType;
+}>;
+
+export type PetitionsHeader_movePetitionMutation = { movePetitions: Success };
 
 export type PetitionLayout_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
@@ -25567,6 +25590,11 @@ export const TaskProgressDialog_TaskFragmentDoc = gql`
     progress
   }
 ` as unknown as DocumentNode<TaskProgressDialog_TaskFragment, unknown>;
+export const PetitionHeader_PetitionBase_updatePathFragmentDoc = gql`
+  fragment PetitionHeader_PetitionBase_updatePath on PetitionBase {
+    path
+  }
+` as unknown as DocumentNode<PetitionHeader_PetitionBase_updatePathFragment, unknown>;
 export const PetitionUserNotification_PetitionUserNotificationFragmentDoc = gql`
   fragment PetitionUserNotification_PetitionUserNotification on PetitionUserNotification {
     id
@@ -30367,6 +30395,19 @@ export const PetitionHeader_updatePetitionPermissionSubscriptionDocument = gql`
 ` as unknown as DocumentNode<
   PetitionHeader_updatePetitionPermissionSubscriptionMutation,
   PetitionHeader_updatePetitionPermissionSubscriptionMutationVariables
+>;
+export const PetitionsHeader_movePetitionDocument = gql`
+  mutation PetitionsHeader_movePetition(
+    $id: GID!
+    $source: String!
+    $destination: String!
+    $type: PetitionBaseType!
+  ) {
+    movePetitions(ids: [$id], source: $source, destination: $destination, type: $type)
+  }
+` as unknown as DocumentNode<
+  PetitionsHeader_movePetitionMutation,
+  PetitionsHeader_movePetitionMutationVariables
 >;
 export const Notifications_UnreadPetitionUserNotificationIdsDocument = gql`
   query Notifications_UnreadPetitionUserNotificationIds {
