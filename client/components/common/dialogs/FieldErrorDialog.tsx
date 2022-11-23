@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, HStack, List, ListItem, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, HStack, List, ListItem, Stack, Text } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import {
   ConfirmDialog,

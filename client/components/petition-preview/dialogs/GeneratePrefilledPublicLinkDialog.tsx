@@ -76,7 +76,9 @@ export function GeneratePrefilledPublicLinkDialog({
         data: Object.fromEntries(
           fieldsWithIndices.map(([field]) => [
             field.alias!,
-            field.previewReplies.map((r) => r.content.value),
+            field.type === "DYNAMIC_SELECT"
+              ? field.previewReplies.map((r) => (r.content.value as string[]).map((v) => v[1]))
+              : field.previewReplies.map((r) => r.content.value),
           ])
         ),
       },

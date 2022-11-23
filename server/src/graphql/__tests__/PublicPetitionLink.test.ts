@@ -824,7 +824,7 @@ describe("GraphQL/PublicPetitionLink", () => {
             $contactFirstName: String!
             $contactLastName: String!
             $contactEmail: String!
-            $prefillDataKey: String
+            $prefillDataKey: ID
             $force: Boolean
           ) {
             publicCreateAndSendPetitionFromPublicLink(
@@ -878,7 +878,7 @@ describe("GraphQL/PublicPetitionLink", () => {
             $contactFirstName: String!
             $contactLastName: String!
             $contactEmail: String!
-            $prefillDataKey: String
+            $prefillDataKey: ID
             $force: Boolean
           ) {
             publicCreateAndSendPetitionFromPublicLink(
@@ -1482,14 +1482,18 @@ describe("GraphQL/PublicPetitionLink", () => {
       expect(data).toBeNull();
     });
 
-    it("overwrites permission if updating a link owner and the link owner already has read or write permissions on the template", async () => {});
+    it.todo(
+      "overwrites permission if updating a link owner and the link owner already has read or write permissions on the template"
+    );
   });
 
   describe("createPublicPetitionLinkPrefillData", () => {
     let publicLink: PublicPetitionLink;
 
     beforeAll(async () => {
-      await mocks.updateFeatureFlag("PUBLIC_PETITION_LINK_PREFILL_DATA", true);
+      await mocks.createFeatureFlags([
+        { name: "PUBLIC_PETITION_LINK_PREFILL_DATA", default_value: true },
+      ]);
 
       const [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
         is_template: true,

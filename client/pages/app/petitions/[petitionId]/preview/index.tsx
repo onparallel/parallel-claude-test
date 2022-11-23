@@ -359,6 +359,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
       (f) => !isFileTypeField(f.type) && isDefined(f.alias) && f.previewReplies.length > 0
     );
   const showGeneratePrefilledPublicLinkDialog = useGeneratePrefilledPublicLinkDialog();
+  async function handleGeneratePrefilledPublicLinkClick() {
+    try {
+      await showGeneratePrefilledPublicLinkDialog({ petitionId });
+    } catch {}
+  }
 
   return (
     <ToneProvider value={petition.organization.brandTheme.preferredTone}>
@@ -410,7 +415,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                     size="sm"
                     colorScheme="blue"
                     marginLeft={2}
-                    onClick={() => showGeneratePrefilledPublicLinkDialog({ petitionId })}
+                    onClick={() => handleGeneratePrefilledPublicLinkClick()}
                   >
                     <FormattedMessage
                       id="page.preview.generate-prefilled-link"
