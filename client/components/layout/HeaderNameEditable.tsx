@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
   Editable,
   EditableInput,
   EditablePreview,
@@ -81,7 +80,7 @@ export const HeaderNameEditable = Object.assign(
         >
           {({ isEditing }: { isEditing: boolean }) => (
             <>
-              <Flex flex="1 1 auto" minWidth={0} padding={0} minHeight="27px">
+              <Flex flex="1 1 auto" minWidth={0}>
                 {isReadOnly ? (
                   <Text
                     color={name ? "default" : "gray.400"}
@@ -92,79 +91,66 @@ export const HeaderNameEditable = Object.assign(
                     {name || props.placeholder}
                   </Text>
                 ) : (
-                  <>
+                  <Flex minWidth="0" flex="1">
                     <Tooltip
                       placement="bottom"
                       label={intl.formatMessage({
                         id: "component.header-name-editable.change-name",
                         defaultMessage: "Change name",
                       })}
-                      offset={[0, -1]}
+                      offset={[0, 4]}
                     >
-                      <Box minWidth="0">
-                        <EditablePreview
-                          ref={previewRef}
-                          color={name ? undefined : "gray.400"}
-                          paddingY={0}
-                          paddingX={1}
-                          display="block"
-                          noOfLines={1}
-                          wordBreak="break-all"
-                        />
-                        <EditableInput
-                          paddingY={0}
-                          paddingX={1}
-                          maxLength={255}
-                          width={props.maxWidth}
-                          transition="all 250ms, width 0s"
-                        />
-                      </Box>
+                      <EditablePreview
+                        ref={previewRef}
+                        color={name ? undefined : "gray.400"}
+                        paddingY={0}
+                        paddingX={1}
+                        display="block"
+                        noOfLines={1}
+                        wordBreak="break-all"
+                      />
                     </Tooltip>
-                  </>
+                    {!isEditing && (
+                      <Tooltip
+                        label={intl.formatMessage(
+                          {
+                            id: "petition.header.last-saved-on",
+                            defaultMessage: "Last saved on: {date}",
+                          },
+                          { date: intl.formatDate(petition.updatedAt, FORMATS.FULL) }
+                        )}
+                        isDisabled={state !== "SAVED"}
+                        offset={[0, 4]}
+                      >
+                        <Flex
+                          alignItems="center"
+                          color={
+                            state === "SAVING"
+                              ? "gray.500"
+                              : state === "SAVED"
+                              ? "green.500"
+                              : state === "ERROR"
+                              ? "red.500"
+                              : undefined
+                          }
+                          fontSize="xs"
+                          cursor="default"
+                          marginLeft={2}
+                        >
+                          {state === "SAVING" ? (
+                            <CloudUploadIcon fontSize="sm" role="presentation" />
+                          ) : state === "SAVED" ? (
+                            <CloudOkIcon fontSize="sm" role="presentation" />
+                          ) : state === "ERROR" ? (
+                            <CloudErrorIcon fontSize="sm" role="presentation" />
+                          ) : null}
+                        </Flex>
+                      </Tooltip>
+                    )}
+                    <EditableInput paddingY={0} paddingX={1} maxLength={255} />
+                  </Flex>
                 )}
               </Flex>
-              {!isEditing && (
-                <Flex alignItems="center" fontSize="sm" position="relative" top="1px" left="4px">
-                  <Tooltip
-                    label={intl.formatMessage(
-                      {
-                        id: "petition.header.last-saved-on",
-                        defaultMessage: "Last saved on: {date}",
-                      },
-                      {
-                        date: intl.formatDate(petition.updatedAt, FORMATS.FULL),
-                      }
-                    )}
-                    isDisabled={state !== "SAVED"}
-                    offset={[0, 6]}
-                  >
-                    <Text
-                      color={
-                        state === "SAVING"
-                          ? "gray.500"
-                          : state === "SAVED"
-                          ? "green.500"
-                          : state === "ERROR"
-                          ? "red.500"
-                          : undefined
-                      }
-                      fontSize="xs"
-                      fontStyle="italic"
-                      display="flex"
-                      alignItems="center"
-                      cursor="default"
-                    >
-                      {state === "SAVING" ? (
-                        <CloudUploadIcon fontSize="sm" role="presentation" />
-                      ) : state === "SAVED" ? (
-                        <CloudOkIcon fontSize="sm" role="presentation" />
-                      ) : state === "ERROR" ? (
-                        <CloudErrorIcon fontSize="sm" role="presentation" />
-                      ) : null}
-                    </Text>
-                  </Tooltip>
-                </Flex>
-              )}
             </>
           )}
         </Editable>

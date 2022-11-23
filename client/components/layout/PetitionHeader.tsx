@@ -6,15 +6,16 @@ import {
   Button,
   Center,
   Flex,
+  Grid,
+  GridItem,
   HStack,
+  List,
   MenuDivider,
   MenuItem,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Stack,
   Text,
-  Tooltip,
 } from "@chakra-ui/react";
 import {
   CopyIcon,
@@ -58,13 +59,11 @@ import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
 import { PathName } from "../common/PathName";
 import { PetitionStatusIcon } from "../common/PetitionStatusIcon";
 import { SmallPopover } from "../common/SmallPopover";
-import { Spacer } from "../common/Spacer";
 import { useMoveToFolderDialog } from "../petition-common/dialogs/MoveToFolderDialog";
 import { usePetitionSharingDialog } from "../petition-common/dialogs/PetitionSharingDialog";
 import { useConfirmReopenPetitionDialog } from "../petition-replies/dialogs/ConfirmReopenPetitionDialog";
 import { HeaderNameEditable, HeaderNameEditableInstance } from "./HeaderNameEditable";
 import { PetitionHeaderTab } from "./PetitionHeaderTab";
-import { PetitionHeaderTabs } from "./PetitionHeaderTabs";
 import { PetitionSection } from "./PetitionLayout";
 
 export interface PetitionHeaderProps extends PetitionHeader_QueryFragment {
@@ -313,298 +312,70 @@ export const PetitionHeader = Object.assign(
     useImperativeHandle(ref, () => ({ focusName: () => editableRef.current?.focus() }));
 
     return (
-      <Box
+      <Grid
         backgroundColor="white"
         borderBottom="2px solid"
         borderBottomColor="gray.200"
         position="relative"
+        paddingX={4}
+        gridTemplateColumns={{ base: "1fr min-content", md: "1fr min-content 1fr" }}
+        gridTemplateRows={{ base: "4rem 2.5rem", md: "4rem" }}
+        gridTemplateAreas={{ base: '"a b" "c c"', md: '"a c b"' }}
         {...props}
       >
-        <Flex height={16} alignItems="center" paddingX={4}>
-          <Flex alignItems="center">
-            <Stack spacing={0} alignItems="start">
-              <HeaderNameEditable
-                ref={editableRef}
-                petition={petition}
-                state={state}
-                onNameChange={(name) => onUpdatePetition({ name: name || null })}
-                maxWidth={{
-                  base: `calc(100vw - ${
-                    32 /* heading padding l+r */ +
-                    24 /* petition status icon width */ +
-                    8 /* locale badge margin left */ +
-                    24 /* locale badge width */ +
-                    16 /* petition name padding l+r */ +
-                    (status === "DRAFT" ? 40 + 8 : 0) +
-                    40 /* more options button width */
-                  }px)`,
-                  sm: `calc(100vw - ${
-                    96 /* left navbar width */ +
-                    32 /* heading padding l+r */ +
-                    24 /* petition status icon width */ +
-                    8 /* locale badge margin left */ +
-                    24 /* locale badge width */ +
-                    16 /* petition name padding l+r */ +
-                    (status === "DRAFT" ? 40 + 8 : 0) +
-                    40 /* more options button width */
-                  }px)`,
-                  md: `calc(100vw - ${
-                    96 /* left navbar width */ +
-                    32 /* heading padding l+r */ +
-                    24 /* petition status icon width */ +
-                    8 /* locale badge margin left */ +
-                    24 /* locale badge width */ +
-                    16 /* petition name padding l+r */ +
-                    (status === "DRAFT" ? 138 : 10) +
-                    40 /* more options button width */
-                  }px)`,
-                  lg: `calc((100vw - ${
-                    96 /* left navbar width */ + 460 /* petition navigation tabs width */
-                  }px)/2 - ${
-                    32 /* heading padding l+r */ +
-                    24 /* petition status icon width */ +
-                    8 /* locale badge margin left */ +
-                    24 /* locale badge width */
-                  }px)`,
-                }}
-              />
-
-              <HStack spacing={1}>
-                {petition.__typename === "Petition" ? (
-                  <Center data-section="petition-status-icon" data-status={status} paddingX={1}>
-                    <PetitionStatusIcon status={status} showStatus={true} />
-                  </Center>
-                ) : (
-                  <Badge colorScheme="primary" marginRight={2}>
-                    <FormattedMessage id="generic.template" defaultMessage="Template" />
-                  </Badge>
-                )}
-                <Divider isVertical height={3.5} color="gray.500" />
-                <PathName
-                  type={isPetition ? "PETITION" : "TEMPLATE"}
-                  path={petition.path}
-                  render={({ children }) => (
-                    <>
-                      {me.role === "COLLABORATOR" ? (
-                        <HStack paddingX={1.5} color="gray.600" fontSize="sm">
-                          <FolderIcon boxSize={4} />
-                          <Text as="span" lineHeight="24px">
-                            {children}
-                          </Text>
-                        </HStack>
-                      ) : (
-                        <Button
-                          leftIcon={<FolderIcon boxSize={4} />}
-                          color="gray.600"
-                          size="xs"
-                          variant="ghost"
-                          paddingX={1.5}
-                          fontSize="sm"
-                          fontWeight="norm"
-                          onClick={handleMovePetition}
-                        >
-                          {children}
-                        </Button>
-                      )}
-                    </>
-                  )}
-                />
-              </HStack>
-            </Stack>
+        <GridItem area="a" as={Flex} flexDirection="column" justifyContent="center">
+          <Flex>
+            <HeaderNameEditable
+              ref={editableRef}
+              flex="1"
+              petition={petition}
+              state={state}
+              onNameChange={(name) => onUpdatePetition({ name: name || null })}
+            />
           </Flex>
-          <Spacer minWidth={4} />
-          <Stack direction="row">
-            {!isPetition ? (
-              <Button flexShrink={0} onClick={handleUseTemplate} data-action="use-template">
-                <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
-              </Button>
+          <HStack spacing={1}>
+            {petition.__typename === "Petition" ? (
+              <Center data-section="petition-status-icon" data-status={status} paddingX={1}>
+                <PetitionStatusIcon status={status} showStatus={true} />
+              </Center>
             ) : (
-              actions ?? null
+              <Badge colorScheme="primary" marginRight={2}>
+                <FormattedMessage id="generic.template" defaultMessage="Template" />
+              </Badge>
             )}
-            <Box>
-              <MoreOptionsMenuButton
-                variant="outline"
-                options={
-                  <MenuList width="min-content" minWidth="16rem">
-                    <MenuItem
-                      onClick={handlePetitionSharingClick}
-                      icon={<UserArrowIcon display="block" boxSize={4} />}
-                    >
-                      {isPetition ? (
-                        <FormattedMessage
-                          id="component.petition-header.share-label"
-                          defaultMessage="Share parallel"
-                        />
-                      ) : (
-                        <FormattedMessage
-                          id="component.template-header.share-label"
-                          defaultMessage="Share template"
-                        />
-                      )}
-                    </MenuItem>
-
-                    {me.hasPetitionPdfExport ? (
-                      <MenuItem
-                        onClick={() => handlePrintPdfTask(petition.id)}
-                        isDisabled={isAnonymized}
-                        icon={<DownloadIcon display="block" boxSize={4} />}
-                      >
-                        <FormattedMessage
-                          id="component.petition-header.export-pdf"
-                          defaultMessage="Export to PDF"
-                        />
-                      </MenuItem>
-                    ) : null}
-
-                    {hasAdminRole && !isPetition ? (
-                      <MenuItem
-                        onClick={() => handleTemplateRepliesReportTask(petition.id)}
-                        icon={<TableIcon display="block" boxSize={4} />}
-                      >
-                        <FormattedMessage
-                          id="component.petition-header.download-results"
-                          defaultMessage="Download results"
-                        />
-                      </MenuItem>
-                    ) : null}
-
-                    <MenuItem
-                      onClick={handleCloneClick}
-                      icon={<CopyIcon display="block" boxSize={4} />}
-                      isDisabled={me.role === "COLLABORATOR"}
-                    >
-                      {isPetition ? (
-                        <FormattedMessage
-                          id="component.petition-header.duplicate-label"
-                          defaultMessage="Duplicate parallel"
-                        />
-                      ) : (
-                        <FormattedMessage
-                          id="component.template-header.duplicate-label"
-                          defaultMessage="Duplicate template"
-                        />
-                      )}
-                    </MenuItem>
-
-                    {isPetition ? (
-                      <MenuItem
-                        onClick={handleSaveAsTemplate}
-                        icon={<CopyIcon display="block" boxSize={4} />}
-                        isDisabled={me.role === "COLLABORATOR"}
-                      >
-                        <FormattedMessage
-                          id="component.petition-header.save-as-template-button"
-                          defaultMessage="Save as template"
-                        />
-                      </MenuItem>
-                    ) : null}
-
-                    <MenuItem
+            <Divider isVertical height={3.5} color="gray.500" />
+            <PathName
+              type={isPetition ? "PETITION" : "TEMPLATE"}
+              path={petition.path}
+              render={({ children }) => (
+                <>
+                  {me.role === "COLLABORATOR" ? (
+                    <HStack paddingX={1.5} color="gray.600" fontSize="sm">
+                      <FolderIcon boxSize={4} />
+                      <Text as="span" lineHeight="24px">
+                        {children}
+                      </Text>
+                    </HStack>
+                  ) : (
+                    <Button
+                      leftIcon={<FolderIcon boxSize={4} />}
+                      color="gray.600"
+                      size="xs"
+                      variant="ghost"
+                      paddingX={1.5}
+                      fontSize="sm"
+                      fontWeight="norm"
                       onClick={handleMovePetition}
-                      icon={<FolderIcon display="block" boxSize={4} />}
-                      isDisabled={me.role === "COLLABORATOR"}
                     >
-                      <FormattedMessage
-                        id="component.petition-header.move-to"
-                        defaultMessage="generic.move-to"
-                      />
-                    </MenuItem>
-
-                    {myEffectivePermission !== "READ" && status === "CLOSED" ? (
-                      <MenuItem
-                        onClick={handleReopenPetition}
-                        isDisabled={isAnonymized}
-                        icon={<EditIcon display="block" boxSize={4} />}
-                      >
-                        <FormattedMessage
-                          id="component.petition-header.reopen-button"
-                          defaultMessage="Reopen parallel"
-                        />
-                      </MenuItem>
-                    ) : null}
-                    {petition.__typename === "Petition" ||
-                    (petition.__typename === "PetitionTemplate" && petition.isPublic) ? null : (
-                      <>
-                        <MenuDivider />
-                        <MenuItem
-                          color="red.500"
-                          onClick={handleDeleteClick}
-                          icon={<DeleteIcon display="block" boxSize={4} />}
-                        >
-                          <FormattedMessage
-                            id="component.petition-template.delete-label"
-                            defaultMessage="Delete template"
-                          />
-                        </MenuItem>
-                      </>
-                    )}
-                    {isPetition ? (
-                      <>
-                        <MenuDivider />
-                        <MenuOptionGroup
-                          type="radio"
-                          title={intl.formatMessage({
-                            id: "generic.notifications",
-                            defaultMessage: "Notifications",
-                          })}
-                          onChange={(value) => {
-                            handleUpdatePetitionPermissionSubscription(value === "FOLLOW");
-                          }}
-                          value={isSubscribed ? "FOLLOW" : "IGNORE"}
-                        >
-                          <MenuItemOption value="FOLLOW">
-                            <Box flex="1">
-                              <Text fontWeight="bold">
-                                <FormattedMessage
-                                  id="generic.subscribed"
-                                  defaultMessage="Subscribed"
-                                />
-                              </Text>
-                              <Text fontSize="sm" color="gray.500">
-                                <FormattedMessage
-                                  id="component.petition-header.subscribed-description"
-                                  defaultMessage="Get email notifications about activity in this parallel."
-                                />
-                              </Text>
-                            </Box>
-                          </MenuItemOption>
-                          <MenuItemOption value="IGNORE">
-                            <Box flex="1">
-                              <Text fontWeight="bold">
-                                <FormattedMessage
-                                  id="generic.unsubscribed"
-                                  defaultMessage="Unsubscribed"
-                                />
-                              </Text>
-                              <Text fontSize="sm" color="gray.500">
-                                <FormattedMessage
-                                  id="component.petition-header.not-subscribed-description"
-                                  defaultMessage="Don't get notifications about this parallel."
-                                />
-                              </Text>
-                            </Box>
-                          </MenuItemOption>
-                        </MenuOptionGroup>
-                        <MenuDivider />
-                        <MenuItem
-                          color="red.500"
-                          onClick={handleDeleteClick}
-                          icon={<DeleteIcon display="block" boxSize={4} />}
-                        >
-                          <FormattedMessage
-                            id="component.petition-header.delete-label"
-                            defaultMessage="Delete parallel"
-                          />
-                        </MenuItem>
-                      </>
-                    ) : null}
-                  </MenuList>
-                }
-              />
-            </Box>
-          </Stack>
-        </Flex>
-        <PetitionHeaderTabs>
+                      {children}
+                    </Button>
+                  )}
+                </>
+              )}
+            />
+          </HStack>
+        </GridItem>
+        <GridItem area="c" as={List} display="flex" alignItems="stretch" justifyContent="center">
           {sections.map(({ section, label, rightIcon, attributes }) => {
             let href = `/app/petitions/${petition.id}/${section}`;
 
@@ -627,8 +398,198 @@ export const PetitionHeader = Object.assign(
               </NakedLink>
             );
           })}
-        </PetitionHeaderTabs>
-      </Box>
+        </GridItem>
+        <GridItem area="b" as={HStack} justifyContent="flex-end">
+          {!isPetition ? (
+            <Button flexShrink={0} onClick={handleUseTemplate} data-action="use-template">
+              <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
+            </Button>
+          ) : (
+            actions ?? null
+          )}
+          <Box>
+            <MoreOptionsMenuButton
+              variant="outline"
+              options={
+                <MenuList width="min-content" minWidth="16rem">
+                  <MenuItem
+                    onClick={handlePetitionSharingClick}
+                    icon={<UserArrowIcon display="block" boxSize={4} />}
+                  >
+                    {isPetition ? (
+                      <FormattedMessage
+                        id="component.petition-header.share-label"
+                        defaultMessage="Share parallel"
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="component.template-header.share-label"
+                        defaultMessage="Share template"
+                      />
+                    )}
+                  </MenuItem>
+
+                  {me.hasPetitionPdfExport ? (
+                    <MenuItem
+                      onClick={() => handlePrintPdfTask(petition.id)}
+                      isDisabled={isAnonymized}
+                      icon={<DownloadIcon display="block" boxSize={4} />}
+                    >
+                      <FormattedMessage
+                        id="component.petition-header.export-pdf"
+                        defaultMessage="Export to PDF"
+                      />
+                    </MenuItem>
+                  ) : null}
+
+                  {hasAdminRole && !isPetition ? (
+                    <MenuItem
+                      onClick={() => handleTemplateRepliesReportTask(petition.id)}
+                      icon={<TableIcon display="block" boxSize={4} />}
+                    >
+                      <FormattedMessage
+                        id="component.petition-header.download-results"
+                        defaultMessage="Download results"
+                      />
+                    </MenuItem>
+                  ) : null}
+
+                  <MenuItem
+                    onClick={handleCloneClick}
+                    icon={<CopyIcon display="block" boxSize={4} />}
+                    isDisabled={me.role === "COLLABORATOR"}
+                  >
+                    {isPetition ? (
+                      <FormattedMessage
+                        id="component.petition-header.duplicate-label"
+                        defaultMessage="Duplicate parallel"
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="component.template-header.duplicate-label"
+                        defaultMessage="Duplicate template"
+                      />
+                    )}
+                  </MenuItem>
+
+                  {isPetition ? (
+                    <MenuItem
+                      onClick={handleSaveAsTemplate}
+                      icon={<CopyIcon display="block" boxSize={4} />}
+                      isDisabled={me.role === "COLLABORATOR"}
+                    >
+                      <FormattedMessage
+                        id="component.petition-header.save-as-template-button"
+                        defaultMessage="Save as template"
+                      />
+                    </MenuItem>
+                  ) : null}
+
+                  <MenuItem
+                    onClick={handleMovePetition}
+                    icon={<FolderIcon display="block" boxSize={4} />}
+                    isDisabled={me.role === "COLLABORATOR"}
+                  >
+                    <FormattedMessage
+                      id="component.petition-header.move-to"
+                      defaultMessage="generic.move-to"
+                    />
+                  </MenuItem>
+
+                  {myEffectivePermission !== "READ" && status === "CLOSED" ? (
+                    <MenuItem
+                      onClick={handleReopenPetition}
+                      isDisabled={isAnonymized}
+                      icon={<EditIcon display="block" boxSize={4} />}
+                    >
+                      <FormattedMessage
+                        id="component.petition-header.reopen-button"
+                        defaultMessage="Reopen parallel"
+                      />
+                    </MenuItem>
+                  ) : null}
+                  {petition.__typename === "Petition" ||
+                  (petition.__typename === "PetitionTemplate" && petition.isPublic) ? null : (
+                    <>
+                      <MenuDivider />
+                      <MenuItem
+                        color="red.500"
+                        onClick={handleDeleteClick}
+                        icon={<DeleteIcon display="block" boxSize={4} />}
+                      >
+                        <FormattedMessage
+                          id="component.petition-template.delete-label"
+                          defaultMessage="Delete template"
+                        />
+                      </MenuItem>
+                    </>
+                  )}
+                  {isPetition ? (
+                    <>
+                      <MenuDivider />
+                      <MenuOptionGroup
+                        type="radio"
+                        title={intl.formatMessage({
+                          id: "generic.notifications",
+                          defaultMessage: "Notifications",
+                        })}
+                        onChange={(value) => {
+                          handleUpdatePetitionPermissionSubscription(value === "FOLLOW");
+                        }}
+                        value={isSubscribed ? "FOLLOW" : "IGNORE"}
+                      >
+                        <MenuItemOption value="FOLLOW">
+                          <Box flex="1">
+                            <Text fontWeight="bold">
+                              <FormattedMessage
+                                id="generic.subscribed"
+                                defaultMessage="Subscribed"
+                              />
+                            </Text>
+                            <Text fontSize="sm" color="gray.500">
+                              <FormattedMessage
+                                id="component.petition-header.subscribed-description"
+                                defaultMessage="Get email notifications about activity in this parallel."
+                              />
+                            </Text>
+                          </Box>
+                        </MenuItemOption>
+                        <MenuItemOption value="IGNORE">
+                          <Box flex="1">
+                            <Text fontWeight="bold">
+                              <FormattedMessage
+                                id="generic.unsubscribed"
+                                defaultMessage="Unsubscribed"
+                              />
+                            </Text>
+                            <Text fontSize="sm" color="gray.500">
+                              <FormattedMessage
+                                id="component.petition-header.not-subscribed-description"
+                                defaultMessage="Don't get notifications about this parallel."
+                              />
+                            </Text>
+                          </Box>
+                        </MenuItemOption>
+                      </MenuOptionGroup>
+                      <MenuDivider />
+                      <MenuItem
+                        color="red.500"
+                        onClick={handleDeleteClick}
+                        icon={<DeleteIcon display="block" boxSize={4} />}
+                      >
+                        <FormattedMessage
+                          id="component.petition-header.delete-label"
+                          defaultMessage="Delete parallel"
+                        />
+                      </MenuItem>
+                    </>
+                  ) : null}
+                </MenuList>
+              }
+            />
+          </Box>
+        </GridItem>
+      </Grid>
     );
   }),
   {
