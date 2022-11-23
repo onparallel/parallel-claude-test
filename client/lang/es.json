@@ -3105,11 +3105,6 @@
     "context": "Export to PDF"
   },
   {
-    "term": "component.petition-header.move-to",
-    "definition": "Mover a...",
-    "context": "generic.move-to"
-  },
-  {
     "term": "component.petition-header.not-subscribed-description",
     "definition": "No recibir notificaciones sobre este parallel.",
     "context": "Don't get notifications about this parallel."

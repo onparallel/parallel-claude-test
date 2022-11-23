@@ -496,10 +496,7 @@ export const PetitionHeader = Object.assign(
                     icon={<FolderIcon display="block" boxSize={4} />}
                     isDisabled={me.role === "COLLABORATOR"}
                   >
-                    <FormattedMessage
-                      id="component.petition-header.move-to"
-                      defaultMessage="generic.move-to"
-                    />
+                    <FormattedMessage id="generic.move-to" defaultMessage="Move to..." />
                   </MenuItem>
 
                   {isPetition && myEffectivePermission !== "READ" && status === "CLOSED" ? (
