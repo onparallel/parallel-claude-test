@@ -413,21 +413,30 @@ export const PetitionHeader = Object.assign(
                   </>
                 )}
                 <Tooltip label={path}>
-                  <Button
-                    leftIcon={<FolderIcon boxSize={4} />}
-                    size="xs"
-                    variant="ghost"
-                    paddingX={1.5}
-                    fontSize="sm"
-                    fontWeight={400}
-                    onClick={handleMoveToFolder}
-                    color="gray.600"
-                    _hover={{ span: { color: "gray.800" }, backgroundColor: "gray.100" }}
-                  >
-                    <Text as="span" lineHeight="24px">
-                      {currentFolder}
-                    </Text>
-                  </Button>
+                  {me.role === "COLLABORATOR" ? (
+                    <HStack paddingX={1.5} color="gray.600" fontSize="sm">
+                      <FolderIcon boxSize={4} />
+                      <Text as="span" lineHeight="24px">
+                        {currentFolder}
+                      </Text>
+                    </HStack>
+                  ) : (
+                    <Button
+                      leftIcon={<FolderIcon boxSize={4} />}
+                      size="xs"
+                      variant="ghost"
+                      paddingX={1.5}
+                      fontSize="sm"
+                      fontWeight={400}
+                      onClick={handleMoveToFolder}
+                      color="gray.600"
+                      _hover={{ span: { color: "gray.800" }, backgroundColor: "gray.100" }}
+                    >
+                      <Text as="span" lineHeight="24px">
+                        {currentFolder}
+                      </Text>
+                    </Button>
+                  )}
                 </Tooltip>
               </HStack>
             </Stack>
@@ -522,6 +531,7 @@ export const PetitionHeader = Object.assign(
                     <MenuItem
                       onClick={handleMoveToFolder}
                       icon={<FolderIcon display="block" boxSize={4} />}
+                      isDisabled={me.role === "COLLABORATOR"}
                     >
                       <FormattedMessage
                         id="component.petition-header.move-to"
