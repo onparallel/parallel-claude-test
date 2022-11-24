@@ -615,7 +615,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             layerStyle="highlightable"
             marginBottom={8}
             onRefetchPetition={refetch}
-            isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+            isDisabled={
+              petition.isAnonymized || myEffectivePermission === "READ" || petition.isRestricted
+            }
           />
           <Stack flex="2" spacing={4} data-section="replies-fields">
             <LiquidScopeProvider scope={scope}>
@@ -685,6 +687,7 @@ PetitionReplies.fragments = {
           permissionType
         }
         isAnonymized
+        isRestricted
         ...PetitionSignaturesCard_Petition
         ...getPetitionSignatureStatus_Petition
         ...getPetitionSignatureEnvironment_Petition
