@@ -4,10 +4,12 @@ import { centeredPopup, openNewWindow } from "./openNewWindow";
 import { useInterval } from "./useInterval";
 import { useWindowEvent } from "./useWindowEvent";
 
+type PromiseArgs = Parameters<ConstructorParameters<typeof Promise<void>>[0]>;
+
 export function useDocusignConsentPopup() {
   const windowRef = useRef<Window>();
   const [isRunning, setIsRunning] = useState(false);
-  const promiseArgsRef = useRef<Parameters<ConstructorParameters<typeof Promise<void>>[0]>>();
+  const promiseArgsRef = useRef<PromiseArgs>();
   useInterval(
     () => {
       if (windowRef.current?.closed) {
