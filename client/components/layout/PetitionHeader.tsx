@@ -367,7 +367,6 @@ export const PetitionHeader = Object.assign(
                       paddingX={1.5}
                       fontSize="sm"
                       fontWeight="normal"
-                      minWitdh={0}
                       onClick={handleMovePetition}
                       {...props}
                     >
