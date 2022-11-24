@@ -1428,7 +1428,6 @@ export interface NexusGenFieldTypes {
     updateOrganizationAutoAnonymizePeriod: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationBrandTheme: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
-    updateOrganizationName: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOrganizationPdfDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationTier: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOrganizationUsageDetails: NexusGenRootTypes["Organization"]; // Organization!
@@ -2360,7 +2359,6 @@ export interface NexusGenFieldTypes {
     extraErrorData: NexusGenScalars["JSON"] | null; // JSON
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["Petition"] | null; // Petition
-    provider: NexusGenEnums["SignatureOrgIntegrationProvider"] | null; // SignatureOrgIntegrationProvider
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   SignatureCancelledUserNotification: {
@@ -3220,7 +3218,6 @@ export interface NexusGenFieldTypeNames {
     updateOrganizationAutoAnonymizePeriod: "Organization";
     updateOrganizationBrandTheme: "Organization";
     updateOrganizationLogo: "Organization";
-    updateOrganizationName: "SupportMethodResponse";
     updateOrganizationPdfDocumentTheme: "Organization";
     updateOrganizationTier: "SupportMethodResponse";
     updateOrganizationUsageDetails: "Organization";
@@ -4152,7 +4149,6 @@ export interface NexusGenFieldTypeNames {
     extraErrorData: "JSON";
     id: "GID";
     petition: "Petition";
-    provider: "SignatureOrgIntegrationProvider";
     type: "PetitionEventType";
   };
   SignatureCancelledUserNotification: {
@@ -5311,11 +5307,6 @@ export interface NexusGenArgTypes {
       // args
       file: NexusGenScalars["Upload"]; // Upload!
       isIcon?: boolean | null; // Boolean
-    };
-    updateOrganizationName: {
-      // args
-      name: string; // String!
-      orgId: number; // Int!
     };
     updateOrganizationPdfDocumentTheme: {
       // args

@@ -866,8 +866,6 @@ export interface Mutation {
   updateOrganizationBrandTheme: Organization;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
-  /** Updates the name of an organization */
-  updateOrganizationName: SupportMethodResponse;
   /** updates the PDF_DOCUMENT theme of the organization */
   updateOrganizationPdfDocumentTheme: Organization;
   /** Applies a given tier to the organization */
@@ -1715,11 +1713,6 @@ export interface MutationupdateOrganizationBrandThemeArgs {
 export interface MutationupdateOrganizationLogoArgs {
   file: Scalars["Upload"];
   isIcon?: InputMaybe<Scalars["Boolean"]>;
-}
-
-export interface MutationupdateOrganizationNameArgs {
-  name: Scalars["String"];
-  orgId: Scalars["Int"];
 }
 
 export interface MutationupdateOrganizationPdfDocumentThemeArgs {
@@ -3971,7 +3964,6 @@ export interface SignatureCancelledEvent extends PetitionEvent {
   extraErrorData?: Maybe<Scalars["JSON"]>;
   id: Scalars["GID"];
   petition?: Maybe<Petition>;
-  provider?: Maybe<SignatureOrgIntegrationProvider>;
   type: PetitionEventType;
 }
 
@@ -7108,7 +7100,6 @@ export type PetitionActivityTimeline_PetitionFragment = {
       | {
           __typename?: "SignatureCancelledEvent";
           id: string;
-          provider?: SignatureOrgIntegrationProvider | null;
           cancelType: PetitionSignatureCancelReason;
           errorCode?: string | null;
           extraErrorData?: any | null;
@@ -7638,7 +7629,6 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment = 
 export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment = {
   __typename?: "SignatureCancelledEvent";
   id: string;
-  provider?: SignatureOrgIntegrationProvider | null;
   cancelType: PetitionSignatureCancelReason;
   errorCode?: string | null;
   extraErrorData?: any | null;
@@ -8424,7 +8414,6 @@ export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
 
 export type TimelineSignatureCancelledEvent_SignatureCancelledEventFragment = {
   __typename?: "SignatureCancelledEvent";
-  provider?: SignatureOrgIntegrationProvider | null;
   cancelType: PetitionSignatureCancelReason;
   errorCode?: string | null;
   extraErrorData?: any | null;
@@ -16821,7 +16810,6 @@ export type PetitionActivity_PetitionFragment = {
       | {
           __typename?: "SignatureCancelledEvent";
           id: string;
-          provider?: SignatureOrgIntegrationProvider | null;
           cancelType: PetitionSignatureCancelReason;
           errorCode?: string | null;
           extraErrorData?: any | null;
@@ -17694,7 +17682,6 @@ export type PetitionActivity_updatePetitionMutation = {
             | {
                 __typename?: "SignatureCancelledEvent";
                 id: string;
-                provider?: SignatureOrgIntegrationProvider | null;
                 cancelType: PetitionSignatureCancelReason;
                 errorCode?: string | null;
                 extraErrorData?: any | null;
@@ -18593,7 +18580,6 @@ export type PetitionActivity_petitionQuery = {
             | {
                 __typename?: "SignatureCancelledEvent";
                 id: string;
-                provider?: SignatureOrgIntegrationProvider | null;
                 cancelType: PetitionSignatureCancelReason;
                 errorCode?: string | null;
                 extraErrorData?: any | null;
@@ -29105,7 +29091,6 @@ export const TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc 
     canceller {
       ...SignerReference_PetitionSigner
     }
-    provider
     cancelType
     errorCode
     extraErrorData

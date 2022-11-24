@@ -822,8 +822,6 @@ export type Mutation = {
   updateOrganizationBrandTheme: Organization;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
-  /** Updates the name of an organization */
-  updateOrganizationName: SupportMethodResponse;
   /** updates the PDF_DOCUMENT theme of the organization */
   updateOrganizationPdfDocumentTheme: Organization;
   /** Applies a given tier to the organization */
@@ -1671,11 +1669,6 @@ export type MutationupdateOrganizationBrandThemeArgs = {
 export type MutationupdateOrganizationLogoArgs = {
   file: Scalars["Upload"];
   isIcon?: InputMaybe<Scalars["Boolean"]>;
-};
-
-export type MutationupdateOrganizationNameArgs = {
-  name: Scalars["String"];
-  orgId: Scalars["Int"];
 };
 
 export type MutationupdateOrganizationPdfDocumentThemeArgs = {
@@ -3840,7 +3833,6 @@ export type SignatureCancelledEvent = PetitionEvent & {
   extraErrorData: Maybe<Scalars["JSON"]>;
   id: Scalars["GID"];
   petition: Maybe<Petition>;
-  provider: Maybe<SignatureOrgIntegrationProvider>;
   type: PetitionEventType;
 };
 

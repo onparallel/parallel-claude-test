@@ -1,11 +1,4 @@
-import {
-  AccountsApi,
-  ApiClient,
-  Brand,
-  Envelope,
-  EnvelopeDefinition,
-  EnvelopesApi,
-} from "docusign-esign";
+import { AccountsApi, ApiClient, Envelope, EnvelopeDefinition, EnvelopesApi } from "docusign-esign";
 import { readFile, stat } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { basename, extname } from "path";
@@ -15,20 +8,11 @@ import {
 } from "../../api/oauth/DocusignOauthIntegration";
 import { InvalidCredentialsError } from "../../api/oauth/GenericIntegration";
 import { Config, CONFIG } from "../../config";
-import {
-  IntegrationRepository,
-  IntegrationSettings,
-} from "../../db/repositories/IntegrationRepository";
+import { IntegrationRepository } from "../../db/repositories/IntegrationRepository";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { I18N_SERVICE, II18nService } from "../i18n";
-import {
-  BrandingIdKey,
-  ISignatureClient,
-  Recipient,
-  SignatureOptions,
-  SignatureResponse,
-} from "./client";
+import { ISignatureClient, Recipient, SignatureOptions, SignatureResponse } from "./client";
 
 @injectable()
 export class DocuSignClient implements ISignatureClient {
@@ -243,30 +227,29 @@ export class DocuSignClient implements ISignatureClient {
     brandingId: string,
     opts: Pick<SignatureOptions, "locale" | "templateData">
   ) {
-    await this.withDocusignSdk(async ({ accounts }, { USER_ACCOUNT_ID: userAccountId }) => {
-      try {
-        await accounts.updateBrand(userAccountId, brandingId, {
-          brand: {
-            brandCompany: opts.templateData?.organizationName,
-          } as Brand,
-        });
-      } catch (error: any) {
-        if (error.response?.body?.errorCode === "INVALID_BRAND_ID") {
-          // branding has probably been deleted on docusign admin dashboard, so we need to remove the id from our database
-          const integration = (await this.integrations.loadIntegration(this.integrationId))!;
-          const settings = integration.settings as IntegrationSettings<"SIGNATURE", "DOCUSIGN">;
-          delete settings[`${opts.locale.toUpperCase()}_INFORMAL_BRANDING_ID` as BrandingIdKey];
-
-          await this.integrations.updateOrgIntegration(
-            this.integrationId,
-            { settings },
-            `OrgIntegration:${this.integrationId}`
-          );
-        } else {
-          throw error;
-        }
-      }
-    });
+    // await this.withDocusignSdk(async ({ accounts }, { USER_ACCOUNT_ID: userAccountId }) => {
+    //   try {
+    //     await accounts.updateBrand(userAccountId, brandingId, {
+    //       brand: {
+    //         brandCompany: opts.templateData?.organizationName,
+    //       } as Brand,
+    //     });
+    //   } catch (error: any) {
+    //     if (error.response?.body?.errorCode === "INVALID_BRAND_ID") {
+    //       // branding has probably been deleted on docusign admin dashboard, so we need to remove the id from our database
+    //       const integration = (await this.integrations.loadIntegration(this.integrationId))!;
+    //       const settings = integration.settings as IntegrationSettings<"SIGNATURE", "DOCUSIGN">;
+    //       delete settings[`${opts.locale.toUpperCase()}_INFORMAL_BRANDING_ID` as BrandingIdKey];
+    //       await this.integrations.updateOrgIntegration(
+    //         this.integrationId,
+    //         { settings },
+    //         `OrgIntegration:${this.integrationId}`
+    //       );
+    //     } else {
+    //       throw error;
+    //     }
+    //   }
+    // });
   }
 
   // private async createBranding(opts: SignatureOptions) {

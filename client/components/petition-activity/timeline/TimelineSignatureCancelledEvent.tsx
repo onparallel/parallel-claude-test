@@ -166,15 +166,13 @@ export function TimelineSignatureCancelledEvent({
             />
           </Button>
         )}
-        {event.cancelType === "REQUEST_ERROR" &&
-          event.errorCode === "CONSENT_REQUIRED" &&
-          event.provider === "DOCUSIGN" && (
-            <NakedLink href="/app/organization/integrations/signature">
-              <Button as="a" variant="outline" size="sm" marginLeft={4}>
-                <FormattedMessage id="timeline.signature-declined.review" defaultMessage="Review" />
-              </Button>
-            </NakedLink>
-          )}
+        {event.cancelType === "REQUEST_ERROR" && event.errorCode === "CONSENT_REQUIRED" && (
+          <NakedLink href="/app/organization/integrations/signature">
+            <Button as="a" variant="outline" size="sm" marginLeft={4}>
+              <FormattedMessage id="timeline.signature-declined.review" defaultMessage="Review" />
+            </Button>
+          </NakedLink>
+        )}
       </Flex>
     </TimelineItem>
   );
@@ -189,7 +187,6 @@ TimelineSignatureCancelledEvent.fragments = {
       canceller {
         ...SignerReference_PetitionSigner
       }
-      provider
       cancelType
       errorCode
       extraErrorData

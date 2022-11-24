@@ -1744,21 +1744,6 @@ type Mutation {
   updateOrganizationLogo(file: Upload!, isIcon: Boolean): Organization!
 
   """
-  Updates the name of an organization
-  """
-  updateOrganizationName(
-    """
-    New name of the organization
-    """
-    name: String!
-
-    """
-    Numeric ID of the Organization
-    """
-    orgId: Int!
-  ): SupportMethodResponse!
-
-  """
   updates the PDF_DOCUMENT theme of the organization
   """
   updateOrganizationPdfDocumentTheme(
@@ -5207,7 +5192,6 @@ type SignatureCancelledEvent implements PetitionEvent {
   extraErrorData: JSON
   id: GID!
   petition: Petition
-  provider: SignatureOrgIntegrationProvider
   type: PetitionEventType!
 }
 

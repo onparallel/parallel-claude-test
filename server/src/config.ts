@@ -154,11 +154,11 @@ export function buildConfig() {
     },
     oauth: {
       docusign: {
-        baseUri: "https://account-d.docusign.com/oauth",
-        clientId: "16b67cfa-ee31-400f-9793-441d4978d96f",
-        secretKey: "caa0dd2d-26f8-48e6-8688-3f4a1e77cd8e",
-        redirectUri: `${process.env.PARALLEL_URL!}/api/oauth/docusign/redirect`,
-        webhookHmacSecret: "yINhv/np/ugb9mCZ/jtSX6PXN2wbvy2LpLLFC5j0xMc=",
+        baseUri: process.env.DOCUSIGN_BASE_URI!,
+        integrationKey: process.env.DOCUSIGN_INTEGRATION_KEY!,
+        secretKey: process.env.DOCUSIGN_SECRET_KEY!,
+        redirectUri: process.env.DOCUSIGN_REDIRECT_URI!,
+        webhookHmacSecret: process.env.DOCUSIGN_WEBHOOK_HMAC_SECRET!,
       },
     },
   });

@@ -36,7 +36,7 @@ export class DocusignOauthIntegration extends OAuthIntegration<DocusignOauthInte
       state,
       response_type: "code",
       scope: "signature,impersonation",
-      client_id: this.config.oauth.docusign.clientId,
+      client_id: this.config.oauth.docusign.integrationKey,
       redirect_uri: this.config.oauth.docusign.redirectUri,
     })}`;
   }
@@ -48,7 +48,7 @@ export class DocusignOauthIntegration extends OAuthIntegration<DocusignOauthInte
       method: "POST",
       headers: {
         Authorization: `Basic ${Buffer.from(
-          this.config.oauth.docusign.clientId + ":" + this.config.oauth.docusign.secretKey
+          this.config.oauth.docusign.integrationKey + ":" + this.config.oauth.docusign.secretKey
         ).toString("base64")}`,
       },
       body: new URLSearchParams({
@@ -90,7 +90,7 @@ export class DocusignOauthIntegration extends OAuthIntegration<DocusignOauthInte
       method: "POST",
       headers: {
         Authorization: `Basic ${Buffer.from(
-          this.config.oauth.docusign.clientId + ":" + this.config.oauth.docusign.secretKey
+          this.config.oauth.docusign.integrationKey + ":" + this.config.oauth.docusign.secretKey
         ).toString("base64")}`,
       },
       body: new URLSearchParams({
