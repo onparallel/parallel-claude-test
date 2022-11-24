@@ -1,7 +1,9 @@
 import { core, enumType, interfaceType, objectType } from "nexus";
 import { isDefined } from "remeda";
+import { SignatureProvider } from "../../../db/repositories/IntegrationRepository";
 import { PetitionEventTypeValues } from "../../../db/__types";
 import { mapEventPayload } from "../../../util/eventMapper";
+import { Maybe } from "../../../util/types";
 import { userOrPetitionAccessResolver } from "../../helpers/userOrPetitionAccessResolver";
 
 export const PetitionEvent = interfaceType({
@@ -584,15 +586,19 @@ export const SignatureCancelledEvent = createPetitionEvent("SignatureCancelledEv
       return data.cancel_reason === "REQUEST_ERROR" ? data.cancel_data?.extra ?? null : null;
     },
   });
-  t.field("provider", {
+  // make nullable in case the signature integration is deleted
+  t.nullable.field("provider", {
     type: "SignatureOrgIntegrationProvider",
     resolve: async (event, _, ctx) => {
       const signature = await ctx.petitions.loadPetitionSignatureById(
         event.data.petition_signature_request_id
       );
-      const orgIntegrationId = signature!.signature_config.orgIntegrationId as number;
+      const orgIntegrationId = signature?.signature_config.orgIntegrationId;
+      if (!orgIntegrationId) {
+        return null;
+      }
       const integration = await ctx.integrations.loadIntegration(orgIntegrationId);
-      return integration!.provider;
+      return (integration?.provider ?? null) as Maybe<SignatureProvider>;
     },
   });
 });

@@ -271,7 +271,7 @@ function useSignatureTokensTableColumns() {
           CellContent: ({ row, context }) => {
             const showDocusignConsentPopup = useDocusignConsentPopup();
             async function handleConsentClick() {
-              const [error] = await withError(showDocusignConsentPopup());
+              const [error] = await withError(showDocusignConsentPopup(row));
               if (!error) {
                 context.refetch();
               }

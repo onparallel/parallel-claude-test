@@ -23,11 +23,7 @@ import { IOrganizationCreditsService, ORGANIZATION_CREDITS_SERVICE } from "../or
 import { BrandingIdKey, ISignatureClient, Recipient, SignatureOptions } from "./client";
 
 @injectable()
-export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
-  private sdk!: SignaturitSDK;
-  private settings!: IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
-  private integrationId?: number;
-
+export class SignaturitClient implements ISignatureClient {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(I18N_SERVICE) private i18n: II18nService,
@@ -36,52 +32,51 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
     @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: IOrganizationCreditsService,
     @inject(IntegrationRepository) private integrationRepository: IntegrationRepository
   ) {}
+  private integrationId!: number;
 
-  configure(integration: {
-    id?: number;
-    settings: IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
-  }) {
-    if (!integration.settings.CREDENTIALS.API_KEY) {
-      throw new Error("Signaturit API KEY not found on org_integration settings");
-    }
-    this.settings = integration.settings;
-    this.integrationId = integration.id;
-    this.sdk = new SignaturitSDK(
-      integration.settings.CREDENTIALS.API_KEY,
-      integration.settings.ENVIRONMENT === "production"
-    );
+  configure(integrationId: number) {
+    this.integrationId = integrationId;
   }
 
-  async authenticate() {
+  async authenticate(apiKey: string) {
     return await Promise.any(
       Object.entries({
         sandbox: "https://api.sandbox.signaturit.com",
         production: "https://api.signaturit.com",
-      })
-        .filter(([env]) => {
-          // if environment is already defined on settings, check only against that env.
-          // if nothing is defined, check both and store result
-          return !isDefined(this.settings.ENVIRONMENT) || env === this.settings.ENVIRONMENT;
-        })
-        .map(([environment, url]) =>
-          this.fetch
-            .fetchWithTimeout(
-              `${url}/v3/team/users.json`,
-              {
-                headers: { authorization: `Bearer ${this.settings.CREDENTIALS.API_KEY}` },
-              },
-              5000
-            )
-            .then((res) => {
-              if (res.status === 200) {
-                this.settings.ENVIRONMENT = environment as "sandbox" | "production";
-                return { environment: this.settings.ENVIRONMENT! };
-              } else {
-                throw new Error();
-              }
-            })
-        )
+      }).map(([environment, url]) =>
+        this.fetch
+          .fetchWithTimeout(
+            `${url}/v3/team/users.json`,
+            {
+              headers: { authorization: `Bearer ${apiKey}` },
+            },
+            5000
+          )
+          .then(({ status }) => {
+            if (status === 200) {
+              return { environment: environment as "sandbox" | "production" };
+            } else {
+              throw new Error();
+            }
+          })
+      )
     );
+  }
+
+  private async withSignaturitSDK<TResult>(
+    handler: (
+      sdk: SignaturitSDK,
+      settings: IntegrationSettings<"SIGNATURE", "SIGNATURIT">
+    ) => Promise<TResult>
+  ): Promise<TResult> {
+    const integration = (await this.integrationRepository.loadIntegration(this.integrationId))!;
+    const settings = integration.settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
+    const sdk = new SignaturitSDK(
+      settings.CREDENTIALS.API_KEY,
+      settings.ENVIRONMENT === "production"
+    );
+
+    return await handler(sdk, integration.settings);
   }
 
   async startSignatureRequest(
@@ -91,112 +86,149 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
     recipients: Recipient[],
     opts: SignatureOptions
   ) {
-    // signaturit has a 40 signers limit
-    if (recipients.length > 40) {
-      throw new Error("MAX_RECIPIENTS_EXCEEDED_ERROR");
-    }
-    const locale = opts.locale;
-    const tone = opts.templateData?.theme.preferredTone ?? "INFORMAL";
-
-    try {
-      if (
-        this.settings.CREDENTIALS.API_KEY === this.config.signature.signaturitSharedProductionApiKey
-      ) {
-        await this.orgCredits.consumeSignaturitApiKeyCredits(orgId, 1);
+    return await this.withSignaturitSDK(async (sdk, settings) => {
+      // signaturit has a 40 signers limit
+      if (recipients.length > 40) {
+        throw new Error("MAX_RECIPIENTS_EXCEEDED_ERROR");
       }
+      const locale = opts.locale;
+      const tone = opts.templateData?.theme.preferredTone ?? "INFORMAL";
 
-      const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as BrandingIdKey;
-      let brandingId = this.settings[key];
-      if (!brandingId) {
-        brandingId = await this.createBranding(opts);
-        this.settings[key] = brandingId;
+      try {
+        if (
+          settings.CREDENTIALS.API_KEY === this.config.signature.signaturitSharedProductionApiKey
+        ) {
+          await this.orgCredits.consumeSignaturitApiKeyCredits(orgId, 1);
+        }
 
-        if (isDefined(this.integrationId)) {
+        const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as BrandingIdKey;
+        let brandingId = settings[key];
+        if (!brandingId) {
+          brandingId = await this.createBranding(opts);
+          settings[key] = brandingId;
+
           this.integrationRepository.updateOrgIntegration<"SIGNATURE">(
             this.integrationId,
-            { settings: this.settings },
+            { settings },
             `OrgIntegration:${this.integrationId}`
           );
         }
-      }
 
-      const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
+        const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
 
-      return await this.sdk.createSignature(files, recipients, {
-        body: opts.initialMessage,
-        delivery_type: "email",
-        signing_mode: opts.signingMode ?? "parallel",
-        branding_id: brandingId,
-        events_url: `${baseEventsUrl}/api/webhooks/signaturit/${toGlobalId(
-          "Petition",
-          petitionId
-        )}/events`,
-        callback_url: `${this.config.misc.parallelUrl}/${locale}/thanks?${new URLSearchParams({
-          o: toGlobalId("Organization", orgId),
-        })}`,
-        recipients: recipients.map((r, recipientIndex) => ({
-          email: r.email,
-          name: r.name,
-          widgets: [
-            {
-              type: "signature",
-              word_anchor: `3cb39pzCQA9wJ${recipientIndex}`,
-              height: 7.5, // 7.5% of page height
-              width:
-                ((210 -
-                  opts.pdfDocumentTheme.marginLeft -
-                  opts.pdfDocumentTheme.marginRight -
-                  5 /* grid gap */ * 2) /
-                  3 /
-                  210) *
-                100,
-            },
-          ],
-        })),
-        expire_time: 0, // disable signaturit automatic reminder emails
-        reminders: 0,
-      });
-    } catch (error: any) {
-      if (error.message === "Account depleted all it's advanced signature requests") {
-        await this.emails.sendInternalSignaturitAccountDepletedCreditsEmail(
-          orgId,
-          petitionId,
-          this.settings.CREDENTIALS.API_KEY.slice(0, 10)
-        );
+        return await sdk.createSignature(files, recipients, {
+          body: opts.initialMessage,
+          delivery_type: "email",
+          signing_mode: opts.signingMode ?? "parallel",
+          branding_id: brandingId,
+          events_url: `${baseEventsUrl}/api/webhooks/signaturit/${toGlobalId(
+            "Petition",
+            petitionId
+          )}/events`,
+          callback_url: `${this.config.misc.parallelUrl}/${locale}/thanks?${new URLSearchParams({
+            o: toGlobalId("Organization", orgId),
+          })}`,
+          recipients: recipients.map((r, recipientIndex) => ({
+            email: r.email,
+            name: r.name,
+            widgets: [
+              {
+                type: "signature",
+                word_anchor: `3cb39pzCQA9wJ${recipientIndex}`,
+                height: 7.5, // 7.5% of page height
+                width:
+                  ((210 -
+                    opts.pdfDocumentTheme.marginLeft -
+                    opts.pdfDocumentTheme.marginRight -
+                    5 /* grid gap */ * 2) /
+                    3 /
+                    210) *
+                  100,
+              },
+            ],
+          })),
+          expire_time: 0, // disable signaturit automatic reminder emails
+          reminders: 0,
+        });
+      } catch (error: any) {
+        if (error.message === "Account depleted all it's advanced signature requests") {
+          await this.emails.sendInternalSignaturitAccountDepletedCreditsEmail(
+            orgId,
+            petitionId,
+            settings.CREDENTIALS.API_KEY.slice(0, 10)
+          );
+        }
+        throw error;
       }
-      throw error;
-    }
+    });
   }
 
   async cancelSignatureRequest(externalId: string) {
-    await this.sdk.cancelSignature(externalId);
+    await this.withSignaturitSDK(async (sdk) => {
+      await sdk.cancelSignature(externalId);
+    });
   }
 
   // returns a binary encoded buffer of the signed document
   async downloadSignedDocument(externalId: string) {
-    const [signatureId, documentId] = externalId.split("/");
-    return Buffer.from(await this.sdk.downloadSignedDocument(signatureId, documentId));
+    return await this.withSignaturitSDK(async (sdk) => {
+      const [signatureId, documentId] = externalId.split("/");
+      return Buffer.from(await sdk.downloadSignedDocument(signatureId, documentId));
+    });
   }
 
   async downloadAuditTrail(externalId: string) {
-    const [signatureId, documentId] = externalId.split("/");
-    return Buffer.from(await this.sdk.downloadAuditTrail(signatureId, documentId));
+    return await this.withSignaturitSDK(async (sdk) => {
+      const [signatureId, documentId] = externalId.split("/");
+      return Buffer.from(await sdk.downloadAuditTrail(signatureId, documentId));
+    });
   }
 
   async sendPendingSignatureReminder(signatureId: string) {
-    await this.sdk.sendSignatureReminder(signatureId);
+    await this.withSignaturitSDK(async (sdk) => {
+      await sdk.sendSignatureReminder(signatureId);
+    });
   }
 
   async updateBranding(
     brandingId: string,
     opts: Pick<SignatureOptions, "locale" | "templateData">
   ) {
-    const intl = await this.i18n.getIntl(opts.locale);
+    await this.withSignaturitSDK(async (sdk) => {
+      const intl = await this.i18n.getIntl(opts.locale);
 
-    await this.sdk.updateBranding(
-      brandingId,
-      removeNotDefined({
-        layout_color: opts.templateData?.theme?.color,
+      await sdk.updateBranding(
+        brandingId,
+        removeNotDefined({
+          layout_color: opts.templateData?.theme?.color,
+          logo: opts.templateData?.logoUrl
+            ? await downloadImageBase64(opts.templateData.logoUrl)
+            : undefined,
+          application_texts: {
+            open_sign_button: intl.formatMessage({
+              id: "signature-client.open-document",
+              defaultMessage: "Open document",
+            }),
+          },
+          templates: isDefined(opts.templateData)
+            ? await this.buildSignaturItBrandingTemplates({
+                locale: opts.locale,
+                templateData: opts.templateData!,
+              })
+            : undefined,
+        })
+      );
+    });
+  }
+
+  private async createBranding(opts: SignatureOptions) {
+    return await this.withSignaturitSDK(async (sdk) => {
+      const intl = await this.i18n.getIntl(opts.locale);
+
+      const branding = await sdk.createBranding({
+        show_welcome_page: false,
+        layout_color: opts.templateData?.theme?.color ?? "#6059F7",
+        text_color: "#F6F6F6",
         logo: opts.templateData?.logoUrl
           ? await downloadImageBase64(opts.templateData.logoUrl)
           : undefined,
@@ -207,37 +239,12 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
           }),
         },
         templates: isDefined(opts.templateData)
-          ? await this.buildSignaturItBrandingTemplates({
-              locale: opts.locale,
-              templateData: opts.templateData!,
-            })
+          ? await this.buildSignaturItBrandingTemplates(opts)
           : undefined,
-      })
-    );
-  }
+      });
 
-  private async createBranding(opts: SignatureOptions) {
-    const intl = await this.i18n.getIntl(opts.locale);
-
-    const branding = await this.sdk.createBranding({
-      show_welcome_page: false,
-      layout_color: opts.templateData?.theme?.color ?? "#6059F7",
-      text_color: "#F6F6F6",
-      logo: opts.templateData?.logoUrl
-        ? await downloadImageBase64(opts.templateData.logoUrl)
-        : undefined,
-      application_texts: {
-        open_sign_button: intl.formatMessage({
-          id: "signature-client.open-document",
-          defaultMessage: "Open document",
-        }),
-      },
-      templates: isDefined(opts.templateData)
-        ? await this.buildSignaturItBrandingTemplates(opts)
-        : undefined,
+      return branding.id;
     });
-
-    return branding.id;
   }
 
   private async buildSignaturItBrandingTemplates(

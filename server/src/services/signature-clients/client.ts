@@ -1,7 +1,3 @@
-import {
-  IntegrationSettings,
-  SignatureProvider,
-} from "../../db/repositories/IntegrationRepository";
 import { Tone } from "../../emails/utils/types";
 import { BrandTheme } from "../../util/BrandTheme";
 import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
@@ -55,18 +51,10 @@ export type Recipient = { email: string; name: string };
 
 export type BrandingIdKey = `${"EN" | "ES"}_${Tone}_BRANDING_ID`;
 
-export type AuthenticationResponse = {
-  environment: "production" | "sandbox";
-};
-
 export const SIGNATURE_CLIENT = Symbol.for("SIGNATURE_CLIENT");
 
-export interface ISignatureClient<TProvider extends SignatureProvider> {
-  configure(integration: {
-    id?: number;
-    settings: IntegrationSettings<"SIGNATURE", TProvider>;
-  }): void;
-  authenticate(): Promise<AuthenticationResponse>;
+export interface ISignatureClient {
+  configure(integrationId: number): void;
   startSignatureRequest: (
     petitionId: number,
     orgId: number,

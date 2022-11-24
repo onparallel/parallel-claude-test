@@ -25,7 +25,6 @@ import {
   OrganizationUsageLimitName,
   User,
 } from "../__types";
-import { IntegrationRepository } from "./IntegrationRepository";
 import { SystemRepository } from "./SystemRepository";
 
 type TUsageDetail = {
@@ -47,8 +46,7 @@ export class OrganizationRepository extends BaseRepository {
     @inject(CONFIG) private config: Config,
     @inject(KNEX) knex: Knex,
     @inject(EMAILS) private readonly emails: IEmailsService,
-    @inject(SystemRepository) private system: SystemRepository,
-    @inject(IntegrationRepository) private integrations: IntegrationRepository
+    @inject(SystemRepository) private system: SystemRepository
   ) {
     super(knex);
   }

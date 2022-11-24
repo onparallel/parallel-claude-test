@@ -19,7 +19,7 @@ import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Steps } from "@parallel/components/common/Steps";
 import {
-  AddSignatureCredentialsDialog_validateSignatureCredentialsDocument,
+  AddSignatureCredentialsDialog_validateSignaturitApiKeyDocument,
   SignatureOrgIntegrationProvider,
 } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
@@ -208,8 +208,8 @@ function SignaturitCredentialsInput() {
     register,
   } = useFormContext<AddSignatureCredentialsDialogData<"SIGNATURIT">>();
 
-  const [validateSignatureCredentials, { loading: isValidating }] = useMutation(
-    AddSignatureCredentialsDialog_validateSignatureCredentialsDocument
+  const [validateSignaturitApiKey, { loading: isValidating }] = useMutation(
+    AddSignatureCredentialsDialog_validateSignaturitApiKeyDocument
   );
 
   return (
@@ -234,10 +234,10 @@ function SignaturitCredentialsInput() {
             {...register("credentials.API_KEY", {
               required: true,
               validate: async (apiKey: string) => {
-                const data = await validateSignatureCredentials({
-                  variables: { provider: "SIGNATURIT", credentials: { API_KEY: apiKey } },
+                const data = await validateSignaturitApiKey({
+                  variables: { apiKey },
                 });
-                return data.data?.validateSignatureCredentials.success ?? false;
+                return data.data?.validateSignaturitApiKey.success ?? false;
               },
             })}
           />
@@ -326,11 +326,8 @@ function AddSignatureCredentialsStep2() {
 
 const _mutations = [
   gql`
-    mutation AddSignatureCredentialsDialog_validateSignatureCredentials(
-      $provider: SignatureOrgIntegrationProvider!
-      $credentials: JSONObject!
-    ) {
-      validateSignatureCredentials(provider: $provider, credentials: $credentials) {
+    mutation AddSignatureCredentialsDialog_validateSignaturitApiKey($apiKey: String!) {
+      validateSignaturitApiKey(apiKey: $apiKey) {
         success
       }
     }

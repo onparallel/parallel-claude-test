@@ -95,7 +95,7 @@ export const PetitionSignatureRequest = objectType({
         const integration = (await ctx.integrations.loadIntegration(
           root.signature_config.orgIntegrationId
         ))!;
-        return integration.settings.ENVIRONMENT === "production" ? "PRODUCTION" : "DEMO";
+        return integration?.settings.ENVIRONMENT === "production" ? "PRODUCTION" : "DEMO";
       },
     });
     t.nonNull.list.nonNull.field("signerStatus", {

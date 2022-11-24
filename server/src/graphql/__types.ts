@@ -1459,6 +1459,7 @@ export interface NexusGenFieldTypes {
     userSignUp: NexusGenRootTypes["User"]; // User!
     validateDowJonesKycCredentials: boolean; // Boolean!
     validateSignatureCredentials: NexusGenRootTypes["ValidateSignatureCredentialsResult"]; // ValidateSignatureCredentialsResult!
+    validateSignaturitApiKey: NexusGenRootTypes["ValidateSignatureCredentialsResult"]; // ValidateSignatureCredentialsResult!
     verifyPublicAccess: NexusGenRootTypes["PublicAccessVerification"]; // PublicAccessVerification!
   };
   OrgIntegration: {
@@ -2359,7 +2360,7 @@ export interface NexusGenFieldTypes {
     extraErrorData: NexusGenScalars["JSON"] | null; // JSON
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["Petition"] | null; // Petition
-    provider: NexusGenEnums["SignatureOrgIntegrationProvider"]; // SignatureOrgIntegrationProvider!
+    provider: NexusGenEnums["SignatureOrgIntegrationProvider"] | null; // SignatureOrgIntegrationProvider
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   SignatureCancelledUserNotification: {
@@ -3250,6 +3251,7 @@ export interface NexusGenFieldTypeNames {
     userSignUp: "User";
     validateDowJonesKycCredentials: "Boolean";
     validateSignatureCredentials: "ValidateSignatureCredentialsResult";
+    validateSignaturitApiKey: "ValidateSignatureCredentialsResult";
     verifyPublicAccess: "PublicAccessVerification";
   };
   OrgIntegration: {
@@ -5505,6 +5507,10 @@ export interface NexusGenArgTypes {
       // args
       credentials: NexusGenScalars["JSONObject"]; // JSONObject!
       provider: NexusGenEnums["SignatureOrgIntegrationProvider"]; // SignatureOrgIntegrationProvider!
+    };
+    validateSignaturitApiKey: {
+      // args
+      apiKey: string; // String!
     };
     verifyPublicAccess: {
       // args

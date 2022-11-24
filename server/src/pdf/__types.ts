@@ -886,8 +886,13 @@ export type Mutation = {
   userSignUp: User;
   /** Tries to get an access_token with provided credentials */
   validateDowJonesKycCredentials: Scalars["Boolean"];
-  /** Runs backend checks to validate signature credentials. */
+  /**
+   * Runs backend checks to validate signature credentials.
+   * @deprecated Use validateSignaturitApiKey
+   */
   validateSignatureCredentials: ValidateSignatureCredentialsResult;
+  /** Runs backend checks to validate signaturit credentials. */
+  validateSignaturitApiKey: ValidateSignatureCredentialsResult;
   verifyPublicAccess: PublicAccessVerification;
 };
 
@@ -1862,6 +1867,10 @@ export type MutationvalidateDowJonesKycCredentialsArgs = {
 export type MutationvalidateSignatureCredentialsArgs = {
   credentials: Scalars["JSONObject"];
   provider: SignatureOrgIntegrationProvider;
+};
+
+export type MutationvalidateSignaturitApiKeyArgs = {
+  apiKey: Scalars["String"];
 };
 
 export type MutationverifyPublicAccessArgs = {
@@ -3831,7 +3840,7 @@ export type SignatureCancelledEvent = PetitionEvent & {
   extraErrorData: Maybe<Scalars["JSON"]>;
   id: Scalars["GID"];
   petition: Maybe<Petition>;
-  provider: SignatureOrgIntegrationProvider;
+  provider: Maybe<SignatureOrgIntegrationProvider>;
   type: PetitionEventType;
 };
 

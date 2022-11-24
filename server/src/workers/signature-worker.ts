@@ -51,7 +51,7 @@ async function startSignatureProcess(
   const { title, orgIntegrationId, signersInfo, message } = signature.signature_config;
 
   let documentTmpPath: string | null = null;
-  const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
+  const integration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
   try {
     const owner = await ctx.petitions.loadPetitionOwner(petition.id);
     const recipients = signersInfo.map((signer) => ({
@@ -70,7 +70,7 @@ async function startSignatureProcess(
       includeAnnexedDocuments: true,
     });
 
-    const signatureClient = ctx.signature.getClient(signatureIntegration);
+    const signatureClient = ctx.signature.getClient(integration);
 
     const petitionTheme = await ctx.organizations.loadOrganizationTheme(
       petition.document_organization_theme_id
@@ -110,7 +110,7 @@ async function startSignatureProcess(
     );
 
     await ctx.petitions.updatePetitionSignature(signature.id, {
-      external_id: `${signatureIntegration.provider.toUpperCase()}/${data.id}`,
+      external_id: `${integration.provider.toUpperCase()}/${data.id}`,
       data,
       signature_config: {
         ...signature.signature_config,
@@ -178,16 +178,16 @@ async function cancelSignatureProcess(
 
     // here we need to lookup all signature integrations, also disabled and deleted ones
     // this is because the user could have deleted their signature integration, triggering a cancel of all pending signature requests
-    const signatureIntegration = (await ctx.integrations.loadAnySignatureIntegration(
+    const integration = (await ctx.integrations.loadAnySignatureIntegration(
       orgIntegrationId
     )) as SignatureOrgIntegration | null;
 
-    if (!signatureIntegration) {
+    if (!integration) {
       throw new Error(
         `Couldn't find a signature integration for OrgIntegration:${orgIntegrationId}`
       );
     }
-    const signatureClient = ctx.signature.getClient(signatureIntegration);
+    const signatureClient = ctx.signature.getClient(integration);
     await signatureClient.cancelSignatureRequest(signature.external_id.replace(/^.*?\//, ""));
   } catch (error: any) {
     if (!error.consent_required) {
@@ -213,9 +213,9 @@ async function sendSignatureReminder(
       );
     }
     const { orgIntegrationId } = signature.signature_config;
-    const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
+    const integration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
 
-    const signatureClient = ctx.signature.getClient(signatureIntegration);
+    const signatureClient = ctx.signature.getClient(integration);
     await signatureClient.sendPendingSignatureReminder(signature.external_id.replace(/^.*?\//, ""));
   } catch (error: any) {
     if (!error.consent_required) {
@@ -292,8 +292,8 @@ async function storeAuditTrail(
     const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
     const petition = await fetchPetition(signature.petition_id, ctx);
     const { orgIntegrationId, title } = signature.signature_config;
-    const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
-    const client = ctx.signature.getClient(signatureIntegration);
+    const integration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
+    const client = ctx.signature.getClient(integration);
 
     const auditTrail = await storeDocument(
       await client.downloadAuditTrail(payload.signedDocumentExternalId),
@@ -301,7 +301,7 @@ async function storeAuditTrail(
         title || (await getDefaultFileName(petition.id, petition.locale, ctx)),
         "_audit_trail.pdf"
       ),
-      signatureIntegration.id,
+      integration.id,
       ctx
     );
 

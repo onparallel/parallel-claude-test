@@ -1481,10 +1481,6 @@ describe("GraphQL/PublicPetitionLink", () => {
       });
       expect(data).toBeNull();
     });
-
-    it.todo(
-      "overwrites permission if updating a link owner and the link owner already has read or write permissions on the template"
-    );
   });
 
   describe("createPublicPetitionLinkPrefillData", () => {

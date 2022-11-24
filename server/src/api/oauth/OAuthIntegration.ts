@@ -1,44 +1,50 @@
 import { RequestHandler, Router } from "express";
 import { injectable } from "inversify";
-import { isDefined } from "remeda";
+import { isDefined, omit } from "remeda";
 import { Config } from "../../config";
 import { IntegrationRepository } from "../../db/repositories/IntegrationRepository";
-import { IntegrationType, OrgIntegration } from "../../db/__types";
+import { CreateOrgIntegration, IntegrationType, OrgIntegration } from "../../db/__types";
 import { IRedis } from "../../services/redis";
-import { decrypt, encrypt, random } from "../../util/token";
-import { MaybePromise } from "../../util/types";
+import { fromGlobalId } from "../../util/globalId";
+import { random } from "../../util/token";
+import { Maybe, MaybePromise } from "../../util/types";
 import { authenticate } from "../helpers/authenticate";
+import { GenericIntegration, InvalidCredentialsError } from "./GenericIntegration";
 
 export interface OauthCredentials {
   ACCESS_TOKEN: string;
   REFRESH_TOKEN: string;
-  API_ACCOUNT_ID: string;
-  API_BASE_PATH: string;
 }
 
 @injectable()
-export abstract class OAuthIntegration {
+export abstract class OAuthIntegration<
+  WithAccessTokenContext extends {} = {}
+> extends GenericIntegration<OauthCredentials, WithAccessTokenContext> {
   constructor(
-    protected config: Config,
-    private redis: IRedis,
-    protected integrations: IntegrationRepository
-  ) {}
+    protected override config: Config,
+    protected override integrations: IntegrationRepository,
+    private redis: IRedis
+  ) {
+    super(config, integrations);
+  }
   abstract readonly orgIntegrationType: IntegrationType;
   abstract readonly provider: string;
 
   abstract buildAuthorizationUrl(state: string): string;
-  abstract getCredentials(code: string): MaybePromise<OauthCredentials>;
+  abstract fetchCredentialsAndContextData(
+    code: string
+  ): Promise<{ CREDENTIALS: OauthCredentials } & WithAccessTokenContext>;
   abstract refreshCredentials(credentials: OauthCredentials): Promise<OauthCredentials>;
 
   protected orgHasAccessToIntegration(orgId: number): MaybePromise<boolean> {
     return true;
   }
 
-  protected async storeState(key: string, value: any) {
+  private async storeState(key: string, value: any) {
     await this.redis.set(`oauth.${key}`, JSON.stringify(value), 10 * 60);
   }
 
-  protected async getState<T = any>(key: string): Promise<T> {
+  private async getState<T = any>(key: string): Promise<T> {
     const result = await this.redis.get(`oauth.${key}`);
     if (!isDefined(result)) {
       throw new Error("Missing state");
@@ -46,61 +52,41 @@ export abstract class OAuthIntegration {
     return JSON.parse(result);
   }
 
-  protected async storeCredentials(
-    credentials: OauthCredentials,
-    args: { orgId: number; name: string; isDefault: boolean }
-  ) {
-    let integration: OrgIntegration;
-    [integration] = await this.integrations.loadIntegrationsByOrgId(
-      args.orgId,
-      this.orgIntegrationType,
-      this.provider
+  private async createIntegration(data: CreateOrgIntegration) {
+    const integration = await this.integrations.createOrgIntegration(
+      data as any,
+      `Organization:${data.org_id}`
     );
-
-    if (!integration) {
-      integration = await this.integrations.createOrgIntegration(
-        {
-          name: args.name,
-          org_id: args.orgId,
-          provider: this.provider,
-          type: this.orgIntegrationType,
-          is_enabled: true,
-          settings: {
-            CREDENTIALS: this.encryptCredentials(credentials),
-            ENVIRONMENT: this.config.oauth.docusign.baseUri.startsWith(
-              "https://account-d.docusign.com"
-            )
-              ? "sandbox"
-              : "production",
-          },
-        },
-        `Organization:${args.orgId}`
-      );
-    } else {
-      await this.integrations.updateOrgIntegration(
-        integration.id,
-        {
-          settings: {
-            ...integration.settings,
-            CREDENTIALS: this.encryptCredentials(credentials),
-            ENVIRONMENT: this.config.oauth.docusign.baseUri.startsWith(
-              "https://account-d.docusign.com"
-            )
-              ? "sandbox"
-              : "production",
-          },
-          invalid_credentials: false,
-        },
-        `Organization:${args.orgId}`
-      );
-    }
-
-    if (args.isDefault) {
+    if (data.is_default) {
       await this.integrations.setDefaultOrgIntegration(
         integration.id,
-        this.orgIntegrationType,
-        args.orgId,
-        `Organization:${args.orgId}`
+        data.type,
+        data.org_id,
+        `Organization:${data.org_id}`
+      );
+    }
+  }
+
+  private async updateIntegration(orgIntegrationId: number, data: Partial<OrgIntegration>) {
+    const integration = (await this.integrations.loadIntegration(orgIntegrationId))!;
+    await this.integrations.updateOrgIntegration(
+      orgIntegrationId,
+      {
+        ...data,
+        settings: {
+          ...data!.settings,
+          CREDENTIALS: this.encryptCredentials(data.settings.CREDENTIALS),
+        },
+      },
+      `Organization:${data.org_id}`
+    );
+
+    if (data.is_default) {
+      await this.integrations.setDefaultOrgIntegration(
+        orgIntegrationId,
+        integration.type,
+        integration.org_id,
+        `Organization:${integration.org_id}`
       );
     }
   }
@@ -110,13 +96,23 @@ export abstract class OAuthIntegration {
       .get("/authorize", authenticate(), async (req, res, next) => {
         try {
           const orgId = req.context.user!.org_id;
-          const { isDefault, name } = req.query;
+          const { id, isDefault, name } = req.query as {
+            id?: string;
+            isDefault: string;
+            name: string;
+          };
+
           if (!(await this.orgHasAccessToIntegration(orgId))) {
             res.status(403).send("Not authorized");
             return;
           }
           const state = random(16);
-          await this.storeState(state, { orgId, isDefault: isDefault === "true", name });
+          await this.storeState(state, {
+            orgId,
+            isDefault: isDefault === "true",
+            name,
+            id: id ? fromGlobalId(id, "OrgIntegration").id : null,
+          });
           const url = this.buildAuthorizationUrl(state);
           res.redirect(url);
         } catch (error) {
@@ -128,9 +124,16 @@ export abstract class OAuthIntegration {
         try {
           const response = (success: boolean) => /* html */ `
             <script>
-              window.opener.postMessage({ success: ${success} });
-              window.close();
+              setTimeout(() => {
+                window.opener.postMessage({ success: ${success} });
+                window.close();
+              }, 5000);
             </script>
+            ${
+              success
+                ? /* html */ `<body>TODO: show a friendly UI telling user integration is ready to be used</body>`
+                : null
+            }
           `;
 
           const { state, code } = req.query;
@@ -138,12 +141,40 @@ export abstract class OAuthIntegration {
             res.send(response(false));
           } else {
             const args = await this.getState<{
+              id: Maybe<number>;
               orgId: number;
               isDefault: boolean;
               name: string;
             }>(state);
-            const credentials = await this.getCredentials(code);
-            await this.storeCredentials(credentials, args);
+
+            const credentials = await this.fetchCredentialsAndContextData(code);
+            if (isDefined(args.id)) {
+              const integration = (await this.integrations.loadIntegration(args.id))!;
+              await this.updateIntegration(args.id, {
+                name: args.name,
+                is_default: args.isDefault,
+                settings: {
+                  ...integration.settings,
+                  CREDENTIALS: this.encryptCredentials(credentials.CREDENTIALS),
+                  ...omit(credentials, ["CREDENTIALS"]),
+                },
+                invalid_credentials: false,
+              });
+            } else {
+              await this.createIntegration({
+                type: this.orgIntegrationType,
+                provider: this.provider,
+                name: args.name,
+                org_id: args.orgId,
+                is_default: args.isDefault,
+                is_enabled: true,
+                settings: {
+                  CREDENTIALS: this.encryptCredentials(credentials.CREDENTIALS),
+                  ...omit(credentials, ["CREDENTIALS"]),
+                },
+              });
+            }
+
             res.send(response(true));
           }
         } catch (error) {
@@ -152,23 +183,33 @@ export abstract class OAuthIntegration {
       });
   }
 
-  public encryptCredentials(c: OauthCredentials): OauthCredentials {
-    const encryptionKey = Buffer.from(this.config.security.encryptKeyBase64, "base64");
-    return {
-      ACCESS_TOKEN: encrypt(c.ACCESS_TOKEN, encryptionKey).toString("hex"),
-      REFRESH_TOKEN: encrypt(c.REFRESH_TOKEN, encryptionKey).toString("hex"),
-      API_ACCOUNT_ID: c.API_ACCOUNT_ID,
-      API_BASE_PATH: c.API_BASE_PATH,
-    };
-  }
-
-  public decryptCredentials(c: OauthCredentials): OauthCredentials {
-    const encryptionKey = Buffer.from(this.config.security.encryptKeyBase64, "base64");
-    return {
-      ACCESS_TOKEN: decrypt(Buffer.from(c.ACCESS_TOKEN, "hex"), encryptionKey).toString("utf8"),
-      REFRESH_TOKEN: decrypt(Buffer.from(c.REFRESH_TOKEN, "hex"), encryptionKey).toString("utf8"),
-      API_ACCOUNT_ID: c.API_ACCOUNT_ID,
-      API_BASE_PATH: c.API_BASE_PATH,
-    };
+  public async withAccessToken<TResult>(
+    orgIntegrationId: number,
+    handler: (accessToken: string, context: WithAccessTokenContext) => Promise<TResult>
+  ): Promise<TResult> {
+    return await this.withCredentials(
+      orgIntegrationId,
+      async (credentials, context, integration) => {
+        try {
+          return await handler(credentials.ACCESS_TOKEN, context);
+        } catch (error) {
+          if (error instanceof InvalidCredentialsError && !error.skipRefresh) {
+            const newCredentials = await this.refreshCredentials(credentials);
+            await this.integrations.updateOrgIntegration(
+              orgIntegrationId,
+              {
+                settings: {
+                  ...integration.settings,
+                  CREDENTIALS: await this.encryptCredentials(newCredentials),
+                },
+              },
+              `OrgIntegration:${orgIntegrationId}`
+            );
+            return await handler(newCredentials.ACCESS_TOKEN, context);
+          }
+          throw error;
+        }
+      }
+    );
   }
 }

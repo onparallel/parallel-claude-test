@@ -2049,7 +2049,12 @@ type Mutation {
   validateSignatureCredentials(
     credentials: JSONObject!
     provider: SignatureOrgIntegrationProvider!
-  ): ValidateSignatureCredentialsResult!
+  ): ValidateSignatureCredentialsResult! @deprecated(reason: "Use validateSignaturitApiKey")
+
+  """
+  Runs backend checks to validate signaturit credentials.
+  """
+  validateSignaturitApiKey(apiKey: String!): ValidateSignatureCredentialsResult!
   verifyPublicAccess(
     ip: String
     keycode: ID!
@@ -5202,7 +5207,7 @@ type SignatureCancelledEvent implements PetitionEvent {
   extraErrorData: JSON
   id: GID!
   petition: Petition
-  provider: SignatureOrgIntegrationProvider!
+  provider: SignatureOrgIntegrationProvider
   type: PetitionEventType!
 }
 

@@ -2,11 +2,7 @@ import { Container, inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { countBy, isDefined, omit } from "remeda";
 import { CONFIG, Config } from "../config";
-import {
-  IntegrationRepository,
-  IntegrationSettings,
-  SignatureProvider,
-} from "../db/repositories/IntegrationRepository";
+import { IntegrationRepository, SignatureProvider } from "../db/repositories/IntegrationRepository";
 import {
   PetitionRepository,
   PetitionSignatureConfig,
@@ -21,11 +17,10 @@ import { IQueuesService, QUEUES_SERVICE } from "./queues";
 import { ISignatureClient, SIGNATURE_CLIENT } from "./signature-clients/client";
 
 export interface ISignatureService {
-  getClient<TProvider extends SignatureProvider>(integration: {
+  getClient<TClient extends ISignatureClient>(integration: {
     id?: number;
-    provider: TProvider;
-    settings: IntegrationSettings<"SIGNATURE", TProvider>;
-  }): ISignatureClient<TProvider>;
+    provider: SignatureProvider;
+  }): TClient;
   createSignatureRequest(
     petitionId: number,
     signatureConfig: PetitionSignatureConfig,
@@ -68,16 +63,14 @@ export class SignatureService implements ISignatureService {
     @inject(Container) private container: Container
   ) {}
 
-  public getClient<TProvider extends SignatureProvider>(integration: {
+  public getClient<TClient extends ISignatureClient>(integration: {
     id?: number;
-    provider: TProvider;
-    settings: IntegrationSettings<"SIGNATURE", TProvider>;
+    provider: SignatureProvider;
   }) {
-    const client = this.container.getNamed<ISignatureClient<TProvider>>(
-      SIGNATURE_CLIENT,
-      integration.provider
-    );
-    client.configure(integration);
+    const client = this.container.getNamed<TClient>(SIGNATURE_CLIENT, integration.provider);
+    if (isDefined(integration.id)) {
+      client.configure(integration.id);
+    }
     return client;
   }
 

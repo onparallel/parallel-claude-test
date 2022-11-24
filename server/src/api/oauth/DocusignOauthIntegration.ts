@@ -1,14 +1,23 @@
 import { inject, injectable } from "inversify";
 import { Config, CONFIG } from "../../config";
 import { FeatureFlagRepository } from "../../db/repositories/FeatureFlagRepository";
-import { IntegrationRepository } from "../../db/repositories/IntegrationRepository";
-import { IntegrationType } from "../../db/__types";
+import {
+  IntegrationRepository,
+  IntegrationSettings,
+} from "../../db/repositories/IntegrationRepository";
+import { IntegrationType, OrgIntegration } from "../../db/__types";
 import { FetchService, FETCH_SERVICE } from "../../services/fetch";
 import { IRedis, REDIS } from "../../services/redis";
+import { Replace } from "../../util/types";
 import { OauthCredentials, OAuthIntegration } from "./OAuthIntegration";
 
+export interface DocusignOauthIntegrationContext {
+  USER_ACCOUNT_ID: string;
+  API_BASE_PATH: string;
+}
+
 @injectable()
-export class DocusignOauthIntegration extends OAuthIntegration {
+export class DocusignOauthIntegration extends OAuthIntegration<DocusignOauthIntegrationContext> {
   orgIntegrationType: IntegrationType = "SIGNATURE";
   provider = "DOCUSIGN";
 
@@ -19,7 +28,7 @@ export class DocusignOauthIntegration extends OAuthIntegration {
     @inject(FETCH_SERVICE) private fetch: FetchService,
     @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository
   ) {
-    super(config, redis, integrations);
+    super(config, integrations, redis);
   }
 
   buildAuthorizationUrl(state: string) {
@@ -32,7 +41,9 @@ export class DocusignOauthIntegration extends OAuthIntegration {
     })}`;
   }
 
-  async getCredentials(code: string): Promise<OauthCredentials> {
+  async fetchCredentialsAndContextData(
+    code: string
+  ): Promise<{ CREDENTIALS: OauthCredentials } & DocusignOauthIntegrationContext> {
     const tokenResponse = await this.fetch.fetch(`${this.config.oauth.docusign.baseUri}/token`, {
       method: "POST",
       headers: {
@@ -62,15 +73,18 @@ export class DocusignOauthIntegration extends OAuthIntegration {
       const userInfoData = await userInfoResponse.json();
       const userInfo = userInfoData.accounts.find((account: any) => account.is_default);
       return {
-        ACCESS_TOKEN: data.access_token,
-        REFRESH_TOKEN: data.refresh_token,
-        API_ACCOUNT_ID: userInfo.account_id,
+        CREDENTIALS: {
+          ACCESS_TOKEN: data.access_token,
+          REFRESH_TOKEN: data.refresh_token,
+        },
+        USER_ACCOUNT_ID: userInfo.account_id,
         API_BASE_PATH: userInfo.base_uri,
       };
     } else {
       throw new Error(data);
     }
   }
+
   async refreshCredentials(credentials: OauthCredentials): Promise<OauthCredentials> {
     const response = await this.fetch.fetch(`${this.config.oauth.docusign.baseUri}/token`, {
       method: "POST",
@@ -88,13 +102,21 @@ export class DocusignOauthIntegration extends OAuthIntegration {
     const data = await response.json();
     if (response.ok) {
       return {
-        ...credentials,
         ACCESS_TOKEN: data.access_token,
         REFRESH_TOKEN: data.refresh_token,
       };
     } else {
       throw new Error(JSON.stringify(data));
     }
+  }
+
+  protected override async getContext(
+    integration: Replace<OrgIntegration, { settings: IntegrationSettings<"SIGNATURE", "DOCUSIGN"> }>
+  ): Promise<DocusignOauthIntegrationContext> {
+    return {
+      USER_ACCOUNT_ID: integration.settings.USER_ACCOUNT_ID!,
+      API_BASE_PATH: integration.settings.API_BASE_PATH!,
+    };
   }
 
   protected override async orgHasAccessToIntegration(orgId: number) {

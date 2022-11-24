@@ -22,10 +22,14 @@ export type IntegrationSettings<
   SIGNATURE: {
     CREDENTIALS: SignatureIntegrationCredentials<TProvider>;
     ENVIRONMENT?: "production" | "sandbox";
+    // Signaturit
     EN_FORMAL_BRANDING_ID?: string;
     ES_FORMAL_BRANDING_ID?: string;
     EN_INFORMAL_BRANDING_ID?: string;
     ES_INFORMAL_BRANDING_ID?: string;
+    // Docusign
+    API_BASE_PATH?: string;
+    USER_ACCOUNT_ID?: string;
   };
   SSO: {
     EMAIL_DOMAINS: string[];

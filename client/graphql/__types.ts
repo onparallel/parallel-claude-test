@@ -930,8 +930,13 @@ export interface Mutation {
   userSignUp: User;
   /** Tries to get an access_token with provided credentials */
   validateDowJonesKycCredentials: Scalars["Boolean"];
-  /** Runs backend checks to validate signature credentials. */
+  /**
+   * Runs backend checks to validate signature credentials.
+   * @deprecated Use validateSignaturitApiKey
+   */
   validateSignatureCredentials: ValidateSignatureCredentialsResult;
+  /** Runs backend checks to validate signaturit credentials. */
+  validateSignaturitApiKey: ValidateSignatureCredentialsResult;
   verifyPublicAccess: PublicAccessVerification;
 }
 
@@ -1906,6 +1911,10 @@ export interface MutationvalidateDowJonesKycCredentialsArgs {
 export interface MutationvalidateSignatureCredentialsArgs {
   credentials: Scalars["JSONObject"];
   provider: SignatureOrgIntegrationProvider;
+}
+
+export interface MutationvalidateSignaturitApiKeyArgs {
+  apiKey: Scalars["String"];
 }
 
 export interface MutationverifyPublicAccessArgs {
@@ -3962,7 +3971,7 @@ export interface SignatureCancelledEvent extends PetitionEvent {
   extraErrorData?: Maybe<Scalars["JSON"]>;
   id: Scalars["GID"];
   petition?: Maybe<Petition>;
-  provider: SignatureOrgIntegrationProvider;
+  provider?: Maybe<SignatureOrgIntegrationProvider>;
   type: PetitionEventType;
 }
 
@@ -6413,16 +6422,12 @@ export type DocumentThemeSelect_OrganizationThemeFragment = {
   isDefault: boolean;
 };
 
-export type AddSignatureCredentialsDialog_validateSignatureCredentialsMutationVariables = Exact<{
-  provider: SignatureOrgIntegrationProvider;
-  credentials: Scalars["JSONObject"];
+export type AddSignatureCredentialsDialog_validateSignaturitApiKeyMutationVariables = Exact<{
+  apiKey: Scalars["String"];
 }>;
 
-export type AddSignatureCredentialsDialog_validateSignatureCredentialsMutation = {
-  validateSignatureCredentials: {
-    __typename?: "ValidateSignatureCredentialsResult";
-    success: boolean;
-  };
+export type AddSignatureCredentialsDialog_validateSignaturitApiKeyMutation = {
+  validateSignaturitApiKey: { __typename?: "ValidateSignatureCredentialsResult"; success: boolean };
 };
 
 export type CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment = {
@@ -7103,7 +7108,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
       | {
           __typename?: "SignatureCancelledEvent";
           id: string;
-          provider: SignatureOrgIntegrationProvider;
+          provider?: SignatureOrgIntegrationProvider | null;
           cancelType: PetitionSignatureCancelReason;
           errorCode?: string | null;
           extraErrorData?: any | null;
@@ -7633,7 +7638,7 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment = 
 export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment = {
   __typename?: "SignatureCancelledEvent";
   id: string;
-  provider: SignatureOrgIntegrationProvider;
+  provider?: SignatureOrgIntegrationProvider | null;
   cancelType: PetitionSignatureCancelReason;
   errorCode?: string | null;
   extraErrorData?: any | null;
@@ -8419,7 +8424,7 @@ export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
 
 export type TimelineSignatureCancelledEvent_SignatureCancelledEventFragment = {
   __typename?: "SignatureCancelledEvent";
-  provider: SignatureOrgIntegrationProvider;
+  provider?: SignatureOrgIntegrationProvider | null;
   cancelType: PetitionSignatureCancelReason;
   errorCode?: string | null;
   extraErrorData?: any | null;
@@ -16816,7 +16821,7 @@ export type PetitionActivity_PetitionFragment = {
       | {
           __typename?: "SignatureCancelledEvent";
           id: string;
-          provider: SignatureOrgIntegrationProvider;
+          provider?: SignatureOrgIntegrationProvider | null;
           cancelType: PetitionSignatureCancelReason;
           errorCode?: string | null;
           extraErrorData?: any | null;
@@ -17689,7 +17694,7 @@ export type PetitionActivity_updatePetitionMutation = {
             | {
                 __typename?: "SignatureCancelledEvent";
                 id: string;
-                provider: SignatureOrgIntegrationProvider;
+                provider?: SignatureOrgIntegrationProvider | null;
                 cancelType: PetitionSignatureCancelReason;
                 errorCode?: string | null;
                 extraErrorData?: any | null;
@@ -18588,7 +18593,7 @@ export type PetitionActivity_petitionQuery = {
             | {
                 __typename?: "SignatureCancelledEvent";
                 id: string;
-                provider: SignatureOrgIntegrationProvider;
+                provider?: SignatureOrgIntegrationProvider | null;
                 cancelType: PetitionSignatureCancelReason;
                 errorCode?: string | null;
                 extraErrorData?: any | null;
@@ -32343,18 +32348,15 @@ export const BrandingGeneral_updateOrganizationBrandThemeDocument = gql`
   BrandingGeneral_updateOrganizationBrandThemeMutation,
   BrandingGeneral_updateOrganizationBrandThemeMutationVariables
 >;
-export const AddSignatureCredentialsDialog_validateSignatureCredentialsDocument = gql`
-  mutation AddSignatureCredentialsDialog_validateSignatureCredentials(
-    $provider: SignatureOrgIntegrationProvider!
-    $credentials: JSONObject!
-  ) {
-    validateSignatureCredentials(provider: $provider, credentials: $credentials) {
+export const AddSignatureCredentialsDialog_validateSignaturitApiKeyDocument = gql`
+  mutation AddSignatureCredentialsDialog_validateSignaturitApiKey($apiKey: String!) {
+    validateSignaturitApiKey(apiKey: $apiKey) {
       success
     }
   }
 ` as unknown as DocumentNode<
-  AddSignatureCredentialsDialog_validateSignatureCredentialsMutation,
-  AddSignatureCredentialsDialog_validateSignatureCredentialsMutationVariables
+  AddSignatureCredentialsDialog_validateSignaturitApiKeyMutation,
+  AddSignatureCredentialsDialog_validateSignaturitApiKeyMutationVariables
 >;
 export const CreateUserDialog_emailIsAvailableDocument = gql`
   query CreateUserDialog_emailIsAvailable($email: String!) {

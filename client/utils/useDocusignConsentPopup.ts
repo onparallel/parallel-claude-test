@@ -33,12 +33,17 @@ export function useDocusignConsentPopup() {
     []
   );
 
-  return async (params?: { isDefault: boolean; name: string }) => {
+  return async (params?: { id?: string; isDefault: boolean; name: string }) => {
     setIsRunning(true);
     windowRef.current = await openNewWindow(
       () =>
         `${process.env.NEXT_PUBLIC_PARALLEL_URL}/api/oauth/docusign/authorize?${new URLSearchParams(
-          params ? { isDefault: params.isDefault.toString(), name: params.name } : {}
+          params
+            ? {
+                ...params,
+                isDefault: params.isDefault.toString(),
+              }
+            : {}
         )}`,
       centeredPopup({ width: 500, height: 600 })
     );
