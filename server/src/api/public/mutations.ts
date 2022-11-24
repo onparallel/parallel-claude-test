@@ -2,7 +2,6 @@ import { gql } from "graphql-request";
 import {
   AWSPresignedPostDataFragment,
   PetitionFieldReplyFragment,
-  PetitionAttachmentFragment,
   PetitionFragment,
 } from "./fragments";
 
@@ -102,53 +101,6 @@ gql`
     }
   }
   ${PetitionFieldReplyFragment}
-`;
-gql`
-  mutation CreatePetitionAttachment_createPetitionAttachmentUploadLink(
-    $petitionId: GID!
-    $data: FileUploadInput!
-  ) {
-    createPetitionAttachmentUploadLink(petitionId: $petitionId, data: $data) {
-      presignedPostData {
-        ...AWSPresignedPostData
-      }
-      attachment {
-        ...PetitionAttachment
-      }
-    }
-  }
-  ${AWSPresignedPostDataFragment}
-  ${PetitionAttachmentFragment}
-`;
-
-gql`
-  mutation CreatePetitionAttachment_petitionAttachmentUploadComplete(
-    $petitionId: GID!
-    $attachmentId: GID!
-  ) {
-    petitionAttachmentUploadComplete(petitionId: $petitionId, attachmentId: $attachmentId) {
-      ...PetitionAttachment
-    }
-  }
-  ${PetitionAttachmentFragment}
-`;
-gql`
-  mutation DeletePetitionAttachment_deletePetitionAttachment(
-    $petitionId: GID!
-    $attachmentId: GID!
-  ) {
-    deletePetitionAttachment(petitionId: $petitionId, attachmentId: $attachmentId)
-  }
-`;
-gql`
-  mutation DownloadPetitionAttachment_petitionAttachmentDownloadLink(
-    $petitionId: GID!
-    $attachmentId: GID!
-  ) {
-    petitionAttachmentDownloadLink(petitionId: $petitionId, attachmentId: $attachmentId) {
-      url
-    }
-  }
 `;
 
 gql`

@@ -7,19 +7,6 @@ export const AWSPresignedPostDataFragment = gql`
   }
 `;
 
-export const PetitionAttachmentFragment = gql`
-  fragment PetitionAttachment on PetitionAttachment {
-    id
-    file {
-      filename
-      contentType
-      size
-      isComplete
-    }
-    createdAt
-  }
-`;
-
 export const UserFragment = gql`
   fragment User on User {
     id

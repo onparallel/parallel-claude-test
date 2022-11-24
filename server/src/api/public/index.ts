@@ -5,7 +5,7 @@ import pMap from "p-map";
 import { isDefined, pick, uniq } from "remeda";
 import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
 import { toGlobalId } from "../../util/globalId";
-import { Body, FormDataBody, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
+import { Body, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
 import { RestApi } from "../rest/core";
 import { BadRequestError, ConflictError, ForbiddenError, UnauthorizedError } from "../rest/errors";
 import { booleanParam, enumParam, stringParam } from "../rest/params";
@@ -54,10 +54,8 @@ import {
   CreateOrUpdatePetitionCustomProperty,
   CreatePetition,
   CreateSubscription,
-  FileUpload,
   ListOfPermissions,
   ListOfPetitionAccesses,
-  ListOfPetitionAttachments,
   ListOfPetitionEvents,
   ListOfPetitionFieldsWithReplies,
   ListOfSignatureRequests,
@@ -68,7 +66,6 @@ import {
   PaginatedTemplates,
   PaginatedUsers,
   Petition,
-  PetitionAttachment,
   PetitionCustomProperties,
   petitionEventTypes,
   PetitionField,
@@ -89,21 +86,17 @@ import {
 import {
   CreateContact_contactDocument,
   CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
-  CreatePetitionAttachment_createPetitionAttachmentUploadLinkDocument,
-  CreatePetitionAttachment_petitionAttachmentUploadCompleteDocument,
   CreatePetitionRecipients_contactDocument,
   CreatePetitionRecipients_createContactDocument,
   CreatePetitionRecipients_petitionDocument,
   CreatePetitionRecipients_sendPetitionDocument,
   CreatePetitionRecipients_updateContactDocument,
   CreatePetition_petitionDocument,
-  DeletePetitionAttachment_deletePetitionAttachmentDocument,
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   DeletePetition_deletePetitionsDocument,
   DeleteReply_deletePetitionReplyDocument,
   DeleteTemplate_deletePetitionsDocument,
   DownloadFileReply_fileUploadReplyDownloadLinkDocument,
-  DownloadPetitionAttachment_petitionAttachmentDownloadLinkDocument,
   DownloadSignedDocument_downloadAuditTrailDocument,
   DownloadSignedDocument_downloadSignedDocDocument,
   EventSubscriptions_createSubscriptionDocument,
@@ -116,7 +109,6 @@ import {
   GetMe_userDocument,
   GetOrganizationUsers_usersDocument,
   GetPermissions_permissionsDocument,
-  GetPetitionAttachments_petitionDocument,
   GetPetitionEvents_PetitionEventsDocument,
   GetPetitionRecipients_petitionAccessesDocument,
   GetPetitions_petitionsDocument,
@@ -198,7 +190,6 @@ export const api = new RestApi({
       tags: [
         "Parallels",
         "Parallel replies",
-        "Attachments",
         "Signatures",
         "Parallel Sharing",
         "Templates",
@@ -220,7 +211,6 @@ export const api = new RestApi({
       name: "Parallel replies",
       description: "See what your clients replied in your parallels",
     },
-    { name: "Attachments", description: "Attach files to your parallels" },
     {
       name: "Signatures",
       description:
@@ -308,10 +298,6 @@ const templateIncludeParam = {
 const petitionId = idParam({
   type: "Petition",
   description: "The ID of the parallel",
-});
-const attachmentId = idParam({
-  type: "PetitionAttachment",
-  description: "The ID of the parallel attachment",
 });
 const replyId = idParam({
   type: "PetitionFieldReply",
@@ -679,131 +665,6 @@ api
         }
         throw error;
       }
-    }
-  );
-
-api
-  .path("/petitions/:petitionId/attachments", {
-    params: { petitionId },
-  })
-  .get(
-    {
-      operationId: "GetPetitionAttachments",
-      summary: "List the parallel attachments",
-      description: "Returns a list with information on files attached to the parallel.",
-      responses: {
-        200: SuccessResponse(ListOfPetitionAttachments),
-      },
-      tags: ["Attachments"],
-    },
-    async ({ client, params }) => {
-      const { petition } = await client.request(GetPetitionAttachments_petitionDocument, {
-        id: params.petitionId,
-      });
-
-      return Ok(petition!.attachments);
-    }
-  )
-  .post(
-    {
-      middleware: singleFileUploadMiddleware("file"),
-      operationId: "CreatePetitionAttachment",
-      summary: "Attach a file to the parallel",
-      description: "Attaches the provided file to the parallel.",
-      responses: {
-        200: SuccessResponse(PetitionAttachment),
-      },
-      body: FormDataBody(FileUpload),
-      tags: ["Attachments"],
-    },
-    async ({ client, params, files }) => {
-      const file = files["file"][0];
-
-      const {
-        createPetitionAttachmentUploadLink: { presignedPostData, attachment },
-      } = await client.request(
-        CreatePetitionAttachment_createPetitionAttachmentUploadLinkDocument,
-        {
-          petitionId: params.petitionId,
-          data: { size: file.size, contentType: file.mimetype, filename: file.originalname },
-        }
-      );
-
-      const uploadResponse = await uploadFile(file, presignedPostData);
-      if (uploadResponse.ok) {
-        await unlink(file.path);
-        const { petitionAttachmentUploadComplete } = await client.request(
-          CreatePetitionAttachment_petitionAttachmentUploadCompleteDocument,
-          {
-            petitionId: params.petitionId,
-            attachmentId: attachment.id,
-          }
-        );
-        return Ok(petitionAttachmentUploadComplete);
-      }
-
-      throw new BadRequestError(uploadResponse.statusText);
-    }
-  );
-
-api
-  .path("/petitions/:petitionId/attachments/:attachmentId", {
-    params: { petitionId, attachmentId },
-  })
-  .delete(
-    {
-      operationId: "DeletePetitionAttachment",
-      summary: "Delete an attachment",
-      description: "Removes an attachment from the parallel.",
-      responses: {
-        204: SuccessResponse(),
-      },
-      tags: ["Attachments"],
-    },
-    async ({ client, params }) => {
-      await client.request(DeletePetitionAttachment_deletePetitionAttachmentDocument, {
-        petitionId: params.petitionId,
-        attachmentId: params.attachmentId,
-      });
-
-      return NoContent();
-    }
-  );
-
-api
-  .path("/petitions/:petitionId/attachments/:attachmentId/download", {
-    params: { petitionId, attachmentId },
-  })
-  .get(
-    {
-      operationId: "DownloadPetitionAttachment",
-      summary: "Download an attachment",
-      description: outdent`
-        Download the attached file.
-
-        ### Important
-        Note that *there will be a redirect* to a temporary download endpoint on
-        AWS S3 so make sure to configure your HTTP client to follow redirects.
-
-        For example if you were to use curl you would need to provide the
-        \`-L\` flag, e.g.:
-
-        ~~~bash
-        curl -s -L -XGET \\
-          -H 'Authorization: Bearer <your API token>' \\
-          'http://www.onparallel.com/api/v1/petitions/{petitionId}/attachments/{attachmentId}/download' \\
-          > presentation.pdf
-        ~~~
-      `,
-      responses: { 302: RedirectResponse("Redirect to the resource on AWS S3") },
-      tags: ["Attachments"],
-    },
-    async ({ client, params }) => {
-      const { petitionAttachmentDownloadLink } = await client.request(
-        DownloadPetitionAttachment_petitionAttachmentDownloadLinkDocument,
-        { petitionId: params.petitionId, attachmentId: params.attachmentId }
-      );
-      return Redirect(petitionAttachmentDownloadLink.url!);
     }
   );
 
