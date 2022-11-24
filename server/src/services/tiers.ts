@@ -40,7 +40,6 @@ export class TiersService implements ITiersService {
   private readonly defaultAppSumoFFs: FeatureFlagName[] = [
     "CUSTOM_HOST_UI",
     "DEVELOPER_ACCESS",
-    "PETITION_PDF_EXPORT",
     "REMOVE_PARALLEL_BRANDING",
   ];
 

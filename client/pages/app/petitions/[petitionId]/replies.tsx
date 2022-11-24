@@ -316,7 +316,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           id: petition.id,
           locale: petition.locale,
           petitionName: petition.name ?? null,
-          hasPetitionPdfExport: me.hasPetitionPdfExport,
           requiredMessage,
           showNotify: petition.accesses.length > 0,
           emailMessage: petition.closingEmailBody,
@@ -527,7 +526,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                   <MenuList>
                     <MenuItem
                       icon={<FilePdfIcon boxSize={5} />}
-                      isDisabled={!me.hasPetitionPdfExport}
                       onClick={() => setTimeout(() => handlePrintPdfTask(petition.id), 100)}
                       maxWidth={"260px"}
                     >
@@ -537,14 +535,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                           defaultMessage="Export to PDF"
                         />
                       </Text>
-                      {me.hasPetitionPdfExport ? null : (
-                        <Text fontSize="sm">
-                          <FormattedMessage
-                            id="generic.upgrade-to-enable"
-                            defaultMessage="Upgrade to enable this feature."
-                          />
-                        </Text>
-                      )}
                     </MenuItem>
                   </MenuList>
                 }
@@ -735,7 +725,6 @@ PetitionReplies.fragments = {
               limit
             }
           }
-          hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
           ...PetitionRepliesFieldComments_User
           ...ExportRepliesDialog_User
           ...PetitionSignaturesCard_User

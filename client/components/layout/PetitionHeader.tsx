@@ -433,20 +433,16 @@ export const PetitionHeader = Object.assign(
                       />
                     )}
                   </MenuItem>
-
-                  {me.hasPetitionPdfExport ? (
-                    <MenuItem
-                      onClick={() => handlePrintPdfTask(petition.id)}
-                      isDisabled={isAnonymized}
-                      icon={<DownloadIcon display="block" boxSize={4} />}
-                    >
-                      <FormattedMessage
-                        id="component.petition-header.export-pdf"
-                        defaultMessage="Export to PDF"
-                      />
-                    </MenuItem>
-                  ) : null}
-
+                  <MenuItem
+                    onClick={() => handlePrintPdfTask(petition.id)}
+                    isDisabled={isAnonymized}
+                    icon={<DownloadIcon display="block" boxSize={4} />}
+                  >
+                    <FormattedMessage
+                      id="component.petition-header.export-pdf"
+                      defaultMessage="Export to PDF"
+                    />
+                  </MenuItem>
                   {hasAdminRole && !isPetition ? (
                     <MenuItem
                       onClick={() => handleTemplateRepliesReportTask(petition.id)}
@@ -651,7 +647,6 @@ export const PetitionHeader = Object.assign(
             me {
               id
               role
-              hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
             }
           }
         `;

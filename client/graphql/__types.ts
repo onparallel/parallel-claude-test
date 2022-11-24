@@ -349,7 +349,6 @@ export type FeatureFlag =
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "ON_BEHALF_OF"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
-  | "PETITION_PDF_EXPORT"
   | "PETITION_SIGNATURE"
   | "PUBLIC_PETITION_LINK_PREFILL_DATA"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
@@ -5060,7 +5059,7 @@ export type PetitionHeader_PetitionBaseFragment =
   | PetitionHeader_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionHeader_QueryFragment = {
-  me: { __typename?: "User"; id: string; role: OrganizationRole; hasPetitionPdfExport: boolean };
+  me: { __typename?: "User"; id: string; role: OrganizationRole };
 };
 
 export type PetitionHeader_PetitionBase_updatePath_Petition_Fragment = {
@@ -5166,7 +5165,6 @@ export type PetitionLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasPetitionPdfExport: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -15807,7 +15805,6 @@ export type PetitionActivity_QueryFragment = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasPetitionPdfExport: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -17558,7 +17555,6 @@ export type PetitionActivity_userQuery = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasPetitionPdfExport: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -17890,7 +17886,6 @@ export type PetitionCompose_QueryFragment = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasPetitionPdfExport: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasAutoAnonymize: boolean;
@@ -18472,7 +18467,6 @@ export type PetitionCompose_userQuery = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasPetitionPdfExport: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasAutoAnonymize: boolean;
@@ -18845,7 +18839,6 @@ export type PetitionMessages_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasPetitionPdfExport: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -18886,7 +18879,6 @@ export type PetitionMessages_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasPetitionPdfExport: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -19825,7 +19817,6 @@ export type PetitionPreview_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasPetitionPdfExport: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -20811,7 +20802,6 @@ export type PetitionPreview_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasPublicLinkPrefill: boolean;
-    hasPetitionPdfExport: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -21203,7 +21193,6 @@ export type PetitionReplies_QueryFragment = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasPetitionPdfExport: boolean;
     hasExportCuatrecasas: boolean;
     hasPetitionSignature: boolean;
     organization: {
@@ -21824,7 +21813,6 @@ export type PetitionReplies_userQuery = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasPetitionPdfExport: boolean;
     hasExportCuatrecasas: boolean;
     hasPetitionSignature: boolean;
     organization: {
@@ -27967,7 +27955,6 @@ export const PetitionHeader_QueryFragmentDoc = gql`
     me {
       id
       role
-      hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
     }
   }
 ` as unknown as DocumentNode<PetitionHeader_QueryFragment, unknown>;
@@ -29354,7 +29341,6 @@ export const PetitionReplies_QueryFragmentDoc = gql`
           limit
         }
       }
-      hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
       ...PetitionRepliesFieldComments_User
       ...ExportRepliesDialog_User
       ...PetitionSignaturesCard_User

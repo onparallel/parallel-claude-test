@@ -1710,16 +1710,6 @@
     "context": "API access to the recipient's URL"
   },
   {
-    "term": "component.feature-flag-descriptions.petition-pdf-export-description",
-    "definition": "Permite exportar a PDF la petición.",
-    "context": "Allows exporting the parallel to PDF."
-  },
-  {
-    "term": "component.feature-flag-descriptions.petition-pdf-export-name",
-    "definition": "Exportación del PDF",
-    "context": "PDF export"
-  },
-  {
     "term": "component.feature-flag-descriptions.petition-signature-description",
     "definition": "Activa la sección de integración de Signaturit para que se pueda introducir el API TOKEN.",
     "context": "Activates the Signaturit integration section so that the TOKEN API can be entered."

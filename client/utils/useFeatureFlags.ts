@@ -118,17 +118,6 @@ export function useFeatureFlags() {
         }),
       },
       {
-        name: "PETITION_PDF_EXPORT",
-        title: intl.formatMessage({
-          id: "component.feature-flag-descriptions.petition-pdf-export-name",
-          defaultMessage: "PDF export",
-        }),
-        description: intl.formatMessage({
-          id: "component.feature-flag-descriptions.petition-pdf-export-description",
-          defaultMessage: "Allows exporting the parallel to PDF.",
-        }),
-      },
-      {
         name: "PETITION_SIGNATURE",
         title: intl.formatMessage({
           id: "component.feature-flag-descriptions.petition-signature-name",
