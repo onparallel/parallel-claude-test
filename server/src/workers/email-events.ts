@@ -37,6 +37,10 @@ createQueueWorker(
     ]);
 
     if (event === "bounce") {
+      if (eventPayload.bounceType === "Transient" && eventPayload.bounceSubType === "General") {
+        return;
+      }
+
       // bounce can come from a PetitionMessage or a PetitionReminder
       if (message) {
         await Promise.all([
