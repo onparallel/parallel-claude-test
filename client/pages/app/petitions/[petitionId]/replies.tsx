@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Button, MenuItem, MenuList, Stack, Text, useToast } from "@chakra-ui/react";
+import { Box, Button, Flex, MenuItem, MenuList, Stack, Text, useToast } from "@chakra-ui/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import {
   CheckIcon,
@@ -451,6 +451,13 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const scope = useLiquidScope(petition);
 
+  const extendFlexColumn = {
+    display: "flex",
+    flexDirection: "column",
+    flex: 1,
+    minHeight: 0,
+  } as const;
+
   return (
     <PetitionLayout
       key={petition.id}
@@ -553,7 +560,13 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         top={4}
         isSidePaneActive={Boolean(activeFieldId)}
         sidePane={
-          <Box paddingX={4} paddingLeft={{ md: 0 }}>
+          <Flex
+            direction="column"
+            paddingX={4}
+            paddingLeft={{ md: 0 }}
+            maxHeight={{ base: "calc(100vh - 178px)", md: "calc(100vh - 138px)" }}
+            paddingBottom="80px"
+          >
             {activeFieldId && !!activeField ? (
               <PetitionRepliesFieldComments
                 key={activeFieldId}
@@ -566,14 +579,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 onDeleteComment={handleDeleteComment}
                 onMarkAsUnread={handleMarkAsUnread}
                 onlyReadPermission={myEffectivePermission === "READ"}
+                {...extendFlexColumn}
               />
             ) : (
-              <Card
-                display="flex"
-                flexDirection="column"
-                maxHeight={`calc(100vh - 232px)`}
-                minHeight="112px"
-              >
+              <Card {...extendFlexColumn}>
                 <CardHeader
                   leftIcon={<ListIcon fontSize="18px" role="presentation" />}
                   rightAction={<PetitionRepliesFilterButton value={filter} onChange={setFilter} />}
@@ -596,7 +605,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 </Box>
               </Card>
             )}
-          </Box>
+          </Flex>
         }
       >
         <Box padding={4}>

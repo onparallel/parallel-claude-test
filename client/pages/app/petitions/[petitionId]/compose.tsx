@@ -1,5 +1,5 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
-import { Box, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
+import { Box, Flex, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
 import { ListIcon, PaperPlaneIcon, SettingsIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -478,7 +478,13 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           top={4}
           isSidePaneActive={Boolean(activeFieldId)}
           sidePane={
-            <Box paddingX={{ base: 4 }} paddingLeft={{ md: 0 }}>
+            <Flex
+              direction="column"
+              paddingX={4}
+              paddingLeft={{ md: 0 }}
+              maxHeight={{ base: "calc(100vh - 122px)", md: "calc(100vh - 82px)" }}
+              paddingBottom="80px"
+            >
               {activeField ? (
                 <PetitionComposeFieldSettings
                   petitionId={petition.id}
@@ -489,14 +495,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   onClose={handleSettingsClose}
                   isReadOnly={isReadOnly}
                   user={me}
+                  {...extendFlexColumn}
                 />
               ) : (
-                <Card
-                  display="flex"
-                  flexDirection="column"
-                  maxHeight={`calc(100vh - 175px)`}
-                  minHeight="170px"
-                >
+                <Card {...extendFlexColumn}>
                   <Tabs
                     variant="enclosed"
                     {...extendFlexColumn}
@@ -546,7 +548,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   </Tabs>
                 </Card>
               )}
-            </Box>
+            </Flex>
           }
         >
           <Box padding={4}>
