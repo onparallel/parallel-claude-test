@@ -14,6 +14,7 @@ import {
 import { isDefined, sort, uniq } from "remeda";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
+import { validateObject } from "../../util/validateObject";
 import { authenticate, authenticateAnd, ifArgDefined, or } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
@@ -113,6 +114,9 @@ export const petitionsQuery = queryField((t) => {
               ],
             }),
           });
+          t.nullable.list.nonNull.globalId("fromTemplateId", {
+            prefixName: "Petition",
+          });
         },
       }).asArg(),
     },
@@ -120,24 +124,30 @@ export const petitionsQuery = queryField((t) => {
     sortableBy: ["createdAt", "sentAt", "name", "lastUsedAt"] as any,
     resolve: async (_, { offset, limit, search, sortBy, filters }, ctx) => {
       // move this to validator if it grows in complexity
-      if (filters?.tagIds) {
-        if (filters.tagIds.length > 10) {
+      if (isDefined(filters)) {
+        try {
+          await validateObject(filters, {
+            tagIds: async (tagIds) => {
+              return (
+                tagIds.length <= 10 &&
+                (await ctx.tags.loadTag(tagIds)).every(
+                  (t) => t?.organization_id === ctx.user!.org_id
+                )
+              );
+            },
+            sharedWith: async (sharedWith) => {
+              return sharedWith.filters.every((f) => {
+                const type = fromGlobalId(f.value).type;
+                return type === "User" || type === "UserGroup";
+              });
+            },
+            fromTemplateId: async (fromTemplateId) => {
+              return await ctx.petitions.userHasAccessToPetitions(ctx.user!.id, fromTemplateId);
+            },
+          });
+        } catch (e) {
           throw new ApolloError("Invalid filter", "INVALID_FILTER");
         }
-        const tags = await ctx.tags.loadTag(filters.tagIds);
-        if (!tags.every((tag) => tag?.organization_id === ctx.user!.org_id)) {
-          throw new ApolloError("Invalid filter", "INVALID_FILTER");
-        }
-      }
-
-      if (
-        filters?.sharedWith &&
-        filters.sharedWith.filters.some((f) => {
-          const type = fromGlobalId(f.value).type;
-          return type !== "User" && type !== "UserGroup";
-        })
-      ) {
-        throw new ApolloError("Invalid filter", "INVALID_FILTER");
       }
 
       return await ctx.petitions.loadPetitionsForUser(ctx.user!.org_id, ctx.user!.id, {

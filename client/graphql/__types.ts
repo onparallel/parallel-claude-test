@@ -2655,6 +2655,7 @@ export type PetitionFieldType =
   | "TEXT";
 
 export interface PetitionFilter {
+  fromTemplateId?: InputMaybe<Array<Scalars["GID"]>>;
   locale?: InputMaybe<PetitionLocale>;
   path?: InputMaybe<Scalars["String"]>;
   sharedWith?: InputMaybe<PetitionSharedWithFilter>;

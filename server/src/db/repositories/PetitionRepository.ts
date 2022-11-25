@@ -110,6 +110,7 @@ interface PetitionFilter {
   type?: PetitionType | null;
   tagIds?: number[] | null;
   sharedWith?: PetitionSharedWithFilter | null;
+  fromTemplateId?: number[] | null;
 }
 
 type PetitionUserNotificationFilter =
@@ -571,6 +572,10 @@ export class PetitionRepository extends BaseRepository {
           }
         })
       );
+    }
+
+    if (filters?.fromTemplateId && filters.fromTemplateId.length > 0) {
+      builders.push((q) => q.whereIn("p.from_template_id", filters.fromTemplateId!));
     }
 
     const [[{ count: petitionCount }], [{ count: folderCount }]] = await Promise.all([

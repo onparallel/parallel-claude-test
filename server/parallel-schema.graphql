@@ -3277,6 +3277,7 @@ enum PetitionFieldType {
 }
 
 input PetitionFilter {
+  fromTemplateId: [GID!]
   locale: PetitionLocale
   path: String
   sharedWith: PetitionSharedWithFilter

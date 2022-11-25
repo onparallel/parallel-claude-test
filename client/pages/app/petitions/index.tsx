@@ -84,6 +84,7 @@ const QUERY_STATE = {
     flatten: flatShared,
     unflatten: unflatShared,
   }),
+  fromTemplateId: string().list(),
   signature: values<PetitionSignatureStatusFilter>([
     "NO_SIGNATURE",
     "NOT_STARTED",
@@ -127,6 +128,7 @@ function Petitions() {
           type: state.type,
           tagIds: state.tags,
           sharedWith: removeInvalidLines(state.sharedWith),
+          fromTemplateId: state.fromTemplateId,
         },
         sortBy: [`${sort.field}_${sort.direction}`],
       },

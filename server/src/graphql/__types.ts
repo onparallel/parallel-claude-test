@@ -155,6 +155,7 @@ export interface NexusGenInputs {
   };
   PetitionFilter: {
     // input type
+    fromTemplateId?: NexusGenScalars["GID"][] | null; // [GID!]
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     path?: string | null; // String
     sharedWith?: NexusGenInputs["PetitionSharedWithFilter"] | null; // PetitionSharedWithFilter
