@@ -5557,4 +5557,35 @@ export class PetitionRepository extends BaseRepository {
     "keycode",
     (q) => q.whereNull("deleted_at")
   );
+
+  async restoreDeletedPetition(petitionId: number) {
+    const [petition] = await this.from("petition")
+      .where({ id: petitionId })
+      .whereNull("anonymized_at")
+      .whereNotNull("deleted_at")
+      .select("*");
+
+    if (!petition) {
+      throw new Error("PETITION_NOT_FOUND");
+    }
+
+    await this.withTransaction(async (t) => {
+      // restore last OWNER permission to be deleted
+      await this.from("petition_permission", t)
+        .where(
+          "id",
+          this.from("petition_permission")
+            .where({ petition_id: petitionId, type: "OWNER" })
+            .whereNotNull("deleted_at")
+            .orderBy("deleted_at", "desc")
+            .limit(1)
+            .select("id")
+        )
+        .update({ deleted_at: null, deleted_by: null });
+
+      await this.from("petition", t)
+        .where("id", petitionId)
+        .update({ deleted_at: null, deleted_by: null });
+    });
+  }
 }

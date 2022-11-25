@@ -1476,6 +1476,11 @@ type Mutation {
   Resets the given user password on AWS Cognito and sends an email with new temporary.
   """
   resetUserPassword(email: String!, locale: PetitionLocale!): SupportMethodResponse!
+
+  """
+  Restores a deleted petition if it's not already anonymized.
+  """
+  restoreDeletedPetition(petitionId: GID!): SupportMethodResponse!
   restoreLogin: Result!
 
   """

@@ -450,3 +450,19 @@ export const updateOrganizationTier = mutationField("updateOrganizationTier", {
     }
   },
 });
+
+export const restoreDeletedPetition = mutationField("restoreDeletedPetition", {
+  description: "Restores a deleted petition if it's not already anonymized.",
+  type: "SupportMethodResponse",
+  authorize: supportMethodAccess(),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+  },
+  resolve: async (_, { petitionId }, ctx) => {
+    try {
+      await ctx.petitions.restoreDeletedPetition(petitionId);
+      return { result: RESULT.SUCCESS, message: "Petition restored successfully" };
+    } catch {}
+    return { result: RESULT.FAILURE, message: "We can't restore this petition :(" };
+  },
+});

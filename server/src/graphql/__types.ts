@@ -1309,6 +1309,7 @@ export interface NexusGenFieldTypes {
     resendVerificationCode: NexusGenEnums["Result"]; // Result!
     resetTemporaryPassword: NexusGenEnums["Result"]; // Result!
     resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    restoreDeletedPetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     restoreLogin: NexusGenEnums["Result"]; // Result!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
@@ -3012,6 +3013,7 @@ export interface NexusGenFieldTypeNames {
     resendVerificationCode: "Result";
     resetTemporaryPassword: "Result";
     resetUserPassword: "SupportMethodResponse";
+    restoreDeletedPetition: "SupportMethodResponse";
     restoreLogin: "Result";
     revokeUserAuthToken: "Result";
     sendPetition: "SendPetitionResult";
@@ -4864,6 +4866,10 @@ export interface NexusGenArgTypes {
       // args
       email: string; // String!
       locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+    };
+    restoreDeletedPetition: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     revokeUserAuthToken: {
       // args

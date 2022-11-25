@@ -795,6 +795,8 @@ export interface Mutation {
   resetTemporaryPassword: Result;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
   resetUserPassword: SupportMethodResponse;
+  /** Restores a deleted petition if it's not already anonymized. */
+  restoreDeletedPetition: SupportMethodResponse;
   restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
@@ -1500,6 +1502,10 @@ export interface MutationresetTemporaryPasswordArgs {
 export interface MutationresetUserPasswordArgs {
   email: Scalars["String"];
   locale: PetitionLocale;
+}
+
+export interface MutationrestoreDeletedPetitionArgs {
+  petitionId: Scalars["GID"];
 }
 
 export interface MutationrevokeUserAuthTokenArgs {
@@ -17580,16 +17586,6 @@ export type PetitionActivity_userQuery = {
   };
 };
 
-export type PetitionActivity_movePetitionsMutationVariables = Exact<{
-  ids?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  folderIds?: InputMaybe<Array<Scalars["ID"]> | Scalars["ID"]>;
-  source: Scalars["String"];
-  destination: Scalars["String"];
-  type: PetitionBaseType;
-}>;
-
-export type PetitionActivity_movePetitionsMutation = { movePetitions: Success };
-
 export type PetitionCompose_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
   status: PetitionStatus;
@@ -17942,16 +17938,6 @@ export type PetitionCompose_QueryFragment = {
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
-
-export type PetitionCompose_movePetitionsMutationVariables = Exact<{
-  ids?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  folderIds?: InputMaybe<Array<Scalars["ID"]> | Scalars["ID"]>;
-  source: Scalars["String"];
-  destination: Scalars["String"];
-  type: PetitionBaseType;
-}>;
-
-export type PetitionCompose_movePetitionsMutation = { movePetitions: Success };
 
 export type PetitionCompose_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -18972,16 +18958,6 @@ export type PetitionMessages_petitionQuery = {
     | null;
 };
 
-export type PetitionMessages_movePetitionsMutationVariables = Exact<{
-  ids?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  folderIds?: InputMaybe<Array<Scalars["ID"]> | Scalars["ID"]>;
-  source: Scalars["String"];
-  destination: Scalars["String"];
-  type: PetitionBaseType;
-}>;
-
-export type PetitionMessages_movePetitionsMutation = { movePetitions: Success };
-
 export type PetitionMessages_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   data: UpdatePetitionInput;
@@ -19881,16 +19857,6 @@ export type PetitionPreview_QueryFragment = {
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
-
-export type PetitionPreview_movePetitionsMutationVariables = Exact<{
-  ids?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  folderIds?: InputMaybe<Array<Scalars["ID"]> | Scalars["ID"]>;
-  source: Scalars["String"];
-  destination: Scalars["String"];
-  type: PetitionBaseType;
-}>;
-
-export type PetitionPreview_movePetitionsMutation = { movePetitions: Success };
 
 export type PetitionPreview_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -21277,16 +21243,6 @@ export type PetitionReplies_QueryFragment = {
     organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
-
-export type PetitionReplies_movePetitionsMutationVariables = Exact<{
-  ids?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  folderIds?: InputMaybe<Array<Scalars["ID"]> | Scalars["ID"]>;
-  source: Scalars["String"];
-  destination: Scalars["String"];
-  type: PetitionBaseType;
-}>;
-
-export type PetitionReplies_movePetitionsMutation = { movePetitions: Success };
 
 export type PetitionReplies_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -32783,46 +32739,6 @@ export const PetitionActivity_userDocument = gql`
   }
   ${PetitionActivity_QueryFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivity_userQuery, PetitionActivity_userQueryVariables>;
-export const PetitionActivity_movePetitionsDocument = gql`
-  mutation PetitionActivity_movePetitions(
-    $ids: [GID!]
-    $folderIds: [ID!]
-    $source: String!
-    $destination: String!
-    $type: PetitionBaseType!
-  ) {
-    movePetitions(
-      ids: $ids
-      folderIds: $folderIds
-      source: $source
-      destination: $destination
-      type: $type
-    )
-  }
-` as unknown as DocumentNode<
-  PetitionActivity_movePetitionsMutation,
-  PetitionActivity_movePetitionsMutationVariables
->;
-export const PetitionCompose_movePetitionsDocument = gql`
-  mutation PetitionCompose_movePetitions(
-    $ids: [GID!]
-    $folderIds: [ID!]
-    $source: String!
-    $destination: String!
-    $type: PetitionBaseType!
-  ) {
-    movePetitions(
-      ids: $ids
-      folderIds: $folderIds
-      source: $source
-      destination: $destination
-      type: $type
-    )
-  }
-` as unknown as DocumentNode<
-  PetitionCompose_movePetitionsMutation,
-  PetitionCompose_movePetitionsMutationVariables
->;
 export const PetitionCompose_updatePetitionDocument = gql`
   mutation PetitionCompose_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
     updatePetition(petitionId: $petitionId, data: $data) {
@@ -33004,26 +32920,6 @@ export const PetitionMessages_petitionDocument = gql`
   PetitionMessages_petitionQuery,
   PetitionMessages_petitionQueryVariables
 >;
-export const PetitionMessages_movePetitionsDocument = gql`
-  mutation PetitionMessages_movePetitions(
-    $ids: [GID!]
-    $folderIds: [ID!]
-    $source: String!
-    $destination: String!
-    $type: PetitionBaseType!
-  ) {
-    movePetitions(
-      ids: $ids
-      folderIds: $folderIds
-      source: $source
-      destination: $destination
-      type: $type
-    )
-  }
-` as unknown as DocumentNode<
-  PetitionMessages_movePetitionsMutation,
-  PetitionMessages_movePetitionsMutationVariables
->;
 export const PetitionMessages_updatePetitionDocument = gql`
   mutation PetitionMessages_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
     updatePetition(petitionId: $petitionId, data: $data) {
@@ -33184,26 +33080,6 @@ export const DowJonesFieldSearchResults_searchDocument = gql`
   DowJonesFieldSearchResults_searchQuery,
   DowJonesFieldSearchResults_searchQueryVariables
 >;
-export const PetitionPreview_movePetitionsDocument = gql`
-  mutation PetitionPreview_movePetitions(
-    $ids: [GID!]
-    $folderIds: [ID!]
-    $source: String!
-    $destination: String!
-    $type: PetitionBaseType!
-  ) {
-    movePetitions(
-      ids: $ids
-      folderIds: $folderIds
-      source: $source
-      destination: $destination
-      type: $type
-    )
-  }
-` as unknown as DocumentNode<
-  PetitionPreview_movePetitionsMutation,
-  PetitionPreview_movePetitionsMutationVariables
->;
 export const PetitionPreview_updatePetitionDocument = gql`
   mutation PetitionPreview_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
     updatePetition(petitionId: $petitionId, data: $data) {
@@ -33255,26 +33131,6 @@ export const PetitionPreview_userDocument = gql`
   }
   ${PetitionPreview_QueryFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreview_userQuery, PetitionPreview_userQueryVariables>;
-export const PetitionReplies_movePetitionsDocument = gql`
-  mutation PetitionReplies_movePetitions(
-    $ids: [GID!]
-    $folderIds: [ID!]
-    $source: String!
-    $destination: String!
-    $type: PetitionBaseType!
-  ) {
-    movePetitions(
-      ids: $ids
-      folderIds: $folderIds
-      source: $source
-      destination: $destination
-      type: $type
-    )
-  }
-` as unknown as DocumentNode<
-  PetitionReplies_movePetitionsMutation,
-  PetitionReplies_movePetitionsMutationVariables
->;
 export const PetitionReplies_updatePetitionDocument = gql`
   mutation PetitionReplies_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
     updatePetition(petitionId: $petitionId, data: $data) {

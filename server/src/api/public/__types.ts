@@ -751,6 +751,8 @@ export type Mutation = {
   resetTemporaryPassword: Result;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
   resetUserPassword: SupportMethodResponse;
+  /** Restores a deleted petition if it's not already anonymized. */
+  restoreDeletedPetition: SupportMethodResponse;
   restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
@@ -1300,7 +1302,7 @@ export type MutationpublicCreateAndSendPetitionFromPublicLinkArgs = {
   contactLastName: Scalars["String"];
   force?: InputMaybe<Scalars["Boolean"]>;
   prefill?: InputMaybe<Scalars["String"]>;
-  prefillDataKey?: InputMaybe<Scalars["String"]>;
+  prefillDataKey?: InputMaybe<Scalars["ID"]>;
   slug: Scalars["ID"];
 };
 
@@ -1456,6 +1458,10 @@ export type MutationresetTemporaryPasswordArgs = {
 export type MutationresetUserPasswordArgs = {
   email: Scalars["String"];
   locale: PetitionLocale;
+};
+
+export type MutationrestoreDeletedPetitionArgs = {
+  petitionId: Scalars["GID"];
 };
 
 export type MutationrevokeUserAuthTokenArgs = {
@@ -2573,6 +2579,7 @@ export type PetitionFieldType =
   | "TEXT";
 
 export type PetitionFilter = {
+  fromTemplateId?: InputMaybe<Array<Scalars["GID"]>>;
   locale?: InputMaybe<PetitionLocale>;
   path?: InputMaybe<Scalars["String"]>;
   sharedWith?: InputMaybe<PetitionSharedWithFilter>;
