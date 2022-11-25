@@ -7,6 +7,7 @@ import { IntegrationRepository } from "../db/repositories/IntegrationRepository"
 import { CreateOrgIntegration, IntegrationType, OrgIntegration } from "../db/__types";
 import { IRedis } from "../services/redis";
 import { fromGlobalId } from "../util/globalId";
+import { withError } from "../util/promises/withError";
 import { random } from "../util/token";
 import { Maybe, MaybePromise } from "../util/types";
 
@@ -197,14 +198,20 @@ export abstract class OAuthIntegration<
           return await handler(credentials.ACCESS_TOKEN, context);
         } catch (error) {
           if (error instanceof InvalidCredentialsError && !error.skipRefresh) {
-            const newCredentials = await this.refreshCredentials(credentials);
-            await this.updateIntegration(orgIntegrationId, {
-              settings: {
-                ...integration.settings,
-                CREDENTIALS: newCredentials,
-              },
-            });
-            return await handler(newCredentials.ACCESS_TOKEN, context);
+            const [refreshError, newCredentials] = await withError(
+              this.refreshCredentials(credentials)
+            );
+            if (isDefined(refreshError)) {
+              throw new InvalidCredentialsError(true);
+            } else {
+              await this.updateIntegration(orgIntegrationId, {
+                settings: {
+                  ...integration.settings,
+                  CREDENTIALS: newCredentials,
+                },
+              });
+              return await handler(newCredentials!.ACCESS_TOKEN, context);
+            }
           }
           throw error;
         }

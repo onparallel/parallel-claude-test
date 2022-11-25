@@ -2,17 +2,17 @@ import { AccountsApi, ApiClient, Envelope, EnvelopeDefinition, EnvelopesApi } fr
 import { readFile, stat } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { basename, extname } from "path";
+import { Config, CONFIG } from "../../config";
+import { IntegrationRepository } from "../../db/repositories/IntegrationRepository";
 import {
   DocusignOauthIntegration,
   DocusignOauthIntegrationContext,
 } from "../../integrations/DocusignOauthIntegration";
-import { Config, CONFIG } from "../../config";
-import { IntegrationRepository } from "../../db/repositories/IntegrationRepository";
+import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { I18N_SERVICE, II18nService } from "../i18n";
 import { ISignatureClient, Recipient, SignatureOptions, SignatureResponse } from "./client";
-import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
 
 @injectable()
 export class DocuSignClient implements ISignatureClient {
@@ -29,9 +29,9 @@ export class DocuSignClient implements ISignatureClient {
   }
 
   private isConsentRequiredError(error: any) {
-    // TODO: check
     console.debug(error);
-    return false;
+    // TODO: check
+    return error?.error === "invalid_grant";
   }
 
   private isAccessTokenExpiredError(error: any) {
