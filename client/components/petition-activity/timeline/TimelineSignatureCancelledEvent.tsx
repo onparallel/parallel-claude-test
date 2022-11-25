@@ -131,7 +131,7 @@ export function TimelineSignatureCancelledEvent({
             ) : event.errorCode === "CONSENT_REQUIRED" ? (
               <FormattedMessage
                 id="timeline.signature-cancelled-request-error.consent-required.description"
-                defaultMessage="The eSignature process has been cancelled because we don't have your consent to send signatures on your behalf {timeAgo}"
+                defaultMessage="The eSignature integration has expired and needs to be reauthorized {timeAgo}"
                 values={{
                   timeAgo: (
                     <DateTime

@@ -144,8 +144,8 @@ function AddSignatureCredentialsDialog({
           {isLastStep ? (
             selectedProvider === "DOCUSIGN" ? (
               <FormattedMessage
-                id="component.add-signature-credentials-dialog.docusign-allow-access.button"
-                defaultMessage="Allow access"
+                id="component.add-signature-credentials-dialog.docusign-authorize.button"
+                defaultMessage="Authorize"
               />
             ) : (
               <FormattedMessage id="generic.accept" defaultMessage="Accept" />
@@ -217,12 +217,12 @@ function SignaturitCredentialsInput() {
       <FormLabel>
         <HStack alignContent="center">
           <FormattedMessage
-            id="component.add-signature-api-key-dialog.api-key-label"
+            id="component.add-signature-credentials-dialog.signaturit-api-key-label"
             defaultMessage="API Key"
           />
           <HelpPopover>
             <FormattedMessage
-              id="component.add-signature-api-key-dialog.api-key-help"
+              id="component.add-signature-credentials-dialog.signaturit-api-key-help"
               defaultMessage="This key is provided by Signaturit and is required to activate the integration"
             />
           </HelpPopover>
@@ -249,13 +249,13 @@ function SignaturitCredentialsInput() {
         </InputGroup>
         <FormErrorMessage>
           <FormattedMessage
-            id="component.add-signature-api-key-dialog.api-key-required-error"
+            id="component.add-signature-credentials-dialog.signaturit-api-key-required-error"
             defaultMessage="Please, enter a valid API Key"
           />
         </FormErrorMessage>
         <Text fontSize="sm">
           <FormattedMessage
-            id="component.add-signature-api-key-dialog.help"
+            id="component.add-signature-credentials-dialog.signaturit-help"
             defaultMessage="If you need help to get your key you can find more information <a>here</a>."
             values={{
               a: (chunks: any) => (
@@ -275,6 +275,17 @@ function SignaturitCredentialsInput() {
         </Text>
       </Stack>
     </FormControl>
+  );
+}
+
+function DocusignCredentialsInput() {
+  return (
+    <Text fontSize="sm">
+      <FormattedMessage
+        id="component.add-signature-credentials-dialog.docusign-explainer"
+        defaultMessage="When you click on Authorize a window will open in which Docusign will ask you for permission to send signatures on your behalf."
+      />
+    </Text>
   );
 }
 
@@ -305,17 +316,22 @@ function AddSignatureCredentialsStep2() {
           </FormErrorMessage>
           <Text fontSize="sm">
             <FormattedMessage
-              id="component.add-signature-api-key-dialog.name-help"
+              id="component.add-signature-credentials-dialog.name-help"
               defaultMessage="You will not be able to change this value after it is created."
             />
           </Text>
         </Stack>
       </FormControl>
-      {selectedProvider === "SIGNATURIT" ? <SignaturitCredentialsInput /> : null}
+
+      {selectedProvider === "SIGNATURIT" ? (
+        <SignaturitCredentialsInput />
+      ) : selectedProvider === "DOCUSIGN" ? (
+        <DocusignCredentialsInput />
+      ) : null}
       <FormControl>
         <Checkbox {...register("isDefault")}>
           <FormattedMessage
-            id="component.add-signature-api-key-dialog.checkbox-set-default"
+            id="component.add-signature-credentials-dialog.checkbox-set-default"
             defaultMessage="Set as default"
           />
         </Checkbox>

@@ -17,7 +17,7 @@ export function useDocusignConsentPopup() {
         promiseArgsRef.current?.[1]("CLOSED");
       }
     },
-    { delay: 2_000, isRunning }
+    { delay: 500, isRunning }
   );
 
   useWindowEvent(

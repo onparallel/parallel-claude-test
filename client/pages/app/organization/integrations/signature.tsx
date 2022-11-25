@@ -55,6 +55,9 @@ interface SignatureTokensTableContext {
   numberOfIntegrations: number;
   onDeleteIntegration: (id: string) => void;
   onMarkIntegrationAsDefault: (id: string) => void;
+  onDocusignReauthorize: (
+    i: IntegrationsSignature_SignatureOrgIntegrationFragment
+  ) => Promise<void>;
   refetch: () => Promise<any>;
 }
 
@@ -152,12 +155,23 @@ function IntegrationsSignature() {
     } catch (error) {}
   };
 
+  const showDocusignConsentPopup = useDocusignConsentPopup();
+  async function handleDocusignReauthorize(
+    i: IntegrationsSignature_SignatureOrgIntegrationFragment
+  ) {
+    const [error] = await withError(showDocusignConsentPopup(i));
+    if (!error) {
+      refetch();
+    }
+  }
+
   const context = {
     hasSignature: me.hasPetitionSignature,
     numberOfIntegrations,
     onDeleteIntegration: handleDeleteIntegration,
     onMarkIntegrationAsDefault: handleMarkIntegrationAsDefault,
     refetch,
+    onDocusignReauthorize: handleDocusignReauthorize,
   } as SignatureTokensTableContext;
 
   return (
@@ -268,14 +282,7 @@ function useSignatureTokensTableColumns() {
             id: "generic.integration-name",
             defaultMessage: "Name",
           }),
-          CellContent: ({ row, context }) => {
-            const showDocusignConsentPopup = useDocusignConsentPopup();
-            async function handleConsentClick() {
-              const [error] = await withError(showDocusignConsentPopup(row));
-              if (!error) {
-                context.refetch();
-              }
-            }
+          CellContent: ({ row, context: { onDocusignReauthorize } }) => {
             return (
               <>
                 {row.provider === "DOCUSIGN" && row.invalidCredentials ? (
@@ -284,10 +291,12 @@ function useSignatureTokensTableColumns() {
                       <Text fontSize="sm">
                         <FormattedMessage
                           id="page.signature.consent-required-popover"
-                          defaultMessage="<a>Click here</a> to give us your consent to send signatures on your behalf."
+                          defaultMessage="<a>Click here</a> to reauthorize your DocuSign integration."
                           values={{
                             a: (chunks: any[]) => (
-                              <NormalLink onClick={handleConsentClick}>{chunks}</NormalLink>
+                              <NormalLink onClick={() => onDocusignReauthorize(row)}>
+                                {chunks}
+                              </NormalLink>
                             ),
                           }}
                         />

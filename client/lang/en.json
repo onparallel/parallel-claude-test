@@ -130,39 +130,44 @@
     "context": "Users will receive notifications about the activity of this parallel."
   },
   {
-    "term": "component.add-signature-api-key-dialog.api-key-help",
-    "definition": "This key is provided by Signaturit and is required to activate the integration",
-    "context": "This key is provided by Signaturit and is required to activate the integration"
-  },
-  {
-    "term": "component.add-signature-api-key-dialog.api-key-label",
-    "definition": "API Key",
-    "context": "API Key"
-  },
-  {
-    "term": "component.add-signature-api-key-dialog.api-key-required-error",
-    "definition": "Please, enter a valid API Key",
-    "context": "Please, enter a valid API Key"
-  },
-  {
-    "term": "component.add-signature-api-key-dialog.checkbox-set-default",
+    "term": "component.add-signature-credentials-dialog.checkbox-set-default",
     "definition": "Set as default",
     "context": "Set as default"
   },
   {
-    "term": "component.add-signature-api-key-dialog.help",
-    "definition": "If you need help to get your key you can find more information <a>here</a>.",
-    "context": "If you need help to get your key you can find more information <a>here</a>."
+    "term": "component.add-signature-credentials-dialog.docusign-authorize.button",
+    "definition": "Authorize",
+    "context": "Authorize"
   },
   {
-    "term": "component.add-signature-api-key-dialog.name-help",
+    "term": "component.add-signature-credentials-dialog.docusign-explainer",
+    "definition": "When you click on Authorize a window will open in which Docusign will ask you for permission to send signatures on your behalf.",
+    "context": "When you click on Authorize a window will open in which Docusign will ask you for permission to send signatures on your behalf."
+  },
+  {
+    "term": "component.add-signature-credentials-dialog.name-help",
     "definition": "You will not be able to change this value after it is created.",
     "context": "You will not be able to change this value after it is created."
   },
   {
-    "term": "component.add-signature-credentials-dialog.docusign-allow-access.button",
-    "definition": "Allow access",
-    "context": "Allow access"
+    "term": "component.add-signature-credentials-dialog.signaturit-api-key-help",
+    "definition": "This key is provided by Signaturit and is required to activate the integration",
+    "context": "This key is provided by Signaturit and is required to activate the integration"
+  },
+  {
+    "term": "component.add-signature-credentials-dialog.signaturit-api-key-label",
+    "definition": "API Key",
+    "context": "API Key"
+  },
+  {
+    "term": "component.add-signature-credentials-dialog.signaturit-api-key-required-error",
+    "definition": "Please, enter a valid API Key",
+    "context": "Please, enter a valid API Key"
+  },
+  {
+    "term": "component.add-signature-credentials-dialog.signaturit-help",
+    "definition": "If you need help to get your key you can find more information <a>here</a>.",
+    "context": "If you need help to get your key you can find more information <a>here</a>."
   },
   {
     "term": "component.add-signature-credentials-dialog.title",
@@ -8251,8 +8256,8 @@
   },
   {
     "term": "page.signature.consent-required-popover",
-    "definition": "<a>Click here</a> to give us your consent to send signatures on your behalf.",
-    "context": "<a>Click here</a> to give us your consent to send signatures on your behalf."
+    "definition": "<a>Click here</a> to reauthorize your DocuSign integration.",
+    "context": "<a>Click here</a> to reauthorize your DocuSign integration."
   },
   {
     "term": "page.signature.invalid-apikey-toast-description",
@@ -10541,8 +10546,8 @@
   },
   {
     "term": "timeline.signature-cancelled-request-error.consent-required.description",
-    "definition": "The eSignature process has been cancelled because we don't have your consent to send signatures on your behalf {timeAgo}",
-    "context": "The eSignature process has been cancelled because we don't have your consent to send signatures on your behalf {timeAgo}"
+    "definition": "The eSignature integration has expired and needs to be reauthorized {timeAgo}",
+    "context": "The eSignature integration has expired and needs to be reauthorized {timeAgo}"
   },
   {
     "term": "timeline.signature-cancelled-request-error.email-bounced.description",
