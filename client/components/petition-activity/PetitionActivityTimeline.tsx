@@ -139,9 +139,7 @@ export function PetitionActivityTimeline({
               <TimelinePetitionReminderBouncedEvent event={event} />
             ) : event.__typename === "PetitionAnonymizedEvent" ? (
               <TimelinePetitionAnonymizedEvent event={event} />
-            ) : (
-              <pre>{JSON.stringify(event, null, "  ")}</pre>
-            )}
+            ) : null}
           </Box>
         ))}
       </Box>
