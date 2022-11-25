@@ -1,14 +1,15 @@
 import { RequestHandler, Router } from "express";
 import { injectable } from "inversify";
 import { isDefined, omit } from "remeda";
-import { Config } from "../../config";
-import { IntegrationRepository } from "../../db/repositories/IntegrationRepository";
-import { CreateOrgIntegration, IntegrationType, OrgIntegration } from "../../db/__types";
-import { IRedis } from "../../services/redis";
-import { fromGlobalId } from "../../util/globalId";
-import { random } from "../../util/token";
-import { Maybe, MaybePromise } from "../../util/types";
-import { authenticate } from "../helpers/authenticate";
+import { authenticate } from "../api/helpers/authenticate";
+import { Config } from "../config";
+import { IntegrationRepository } from "../db/repositories/IntegrationRepository";
+import { CreateOrgIntegration, IntegrationType, OrgIntegration } from "../db/__types";
+import { IRedis } from "../services/redis";
+import { fromGlobalId } from "../util/globalId";
+import { random } from "../util/token";
+import { Maybe, MaybePromise } from "../util/types";
+
 import { GenericIntegration, InvalidCredentialsError } from "./GenericIntegration";
 
 export interface OauthCredentials {

@@ -22,6 +22,11 @@ import { I18N_SERVICE, II18nService } from "../i18n";
 import { IOrganizationCreditsService, ORGANIZATION_CREDITS_SERVICE } from "../organization-credits";
 import { BrandingIdKey, ISignatureClient, Recipient, SignatureOptions } from "./client";
 
+type SignaturitClientContext = {
+  isSharedProductionApiKey: boolean;
+  apiKeyHint: string;
+};
+
 @injectable()
 export class SignaturitClient implements ISignatureClient {
   constructor(
@@ -64,10 +69,7 @@ export class SignaturitClient implements ISignatureClient {
   }
 
   private async withSignaturitSDK<TResult>(
-    handler: (
-      sdk: SignaturitSDK,
-      settings: IntegrationSettings<"SIGNATURE", "SIGNATURIT">
-    ) => Promise<TResult>
+    handler: (sdk: SignaturitSDK, context: SignaturitClientContext) => Promise<TResult>
   ): Promise<TResult> {
     const integration = (await this.integrationRepository.loadIntegration(this.integrationId))!;
     const settings = integration.settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
@@ -76,7 +78,13 @@ export class SignaturitClient implements ISignatureClient {
       settings.ENVIRONMENT === "production"
     );
 
-    return await handler(sdk, integration.settings);
+    const context = {
+      apiKeyHint: settings.CREDENTIALS.API_KEY.slice(0, 10),
+      isSharedProductionApiKey:
+        settings.CREDENTIALS.API_KEY === this.config.signature.signaturitSharedProductionApiKey,
+    };
+
+    return await handler(sdk, context);
   }
 
   async startSignatureRequest(
@@ -86,7 +94,7 @@ export class SignaturitClient implements ISignatureClient {
     recipients: Recipient[],
     opts: SignatureOptions
   ) {
-    return await this.withSignaturitSDK(async (sdk, settings) => {
+    return await this.withSignaturitSDK(async (sdk, context) => {
       // signaturit has a 40 signers limit
       if (recipients.length > 40) {
         throw new Error("MAX_RECIPIENTS_EXCEEDED_ERROR");
@@ -95,12 +103,12 @@ export class SignaturitClient implements ISignatureClient {
       const tone = opts.templateData?.theme.preferredTone ?? "INFORMAL";
 
       try {
-        if (
-          settings.CREDENTIALS.API_KEY === this.config.signature.signaturitSharedProductionApiKey
-        ) {
+        if (context.isSharedProductionApiKey) {
           await this.orgCredits.consumeSignaturitApiKeyCredits(orgId, 1);
         }
 
+        const integration = (await this.integrationRepository.loadIntegration(this.integrationId))!;
+        const settings = integration.settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
         const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as BrandingIdKey;
         let brandingId = settings[key];
         if (!brandingId) {
@@ -155,7 +163,7 @@ export class SignaturitClient implements ISignatureClient {
           await this.emails.sendInternalSignaturitAccountDepletedCreditsEmail(
             orgId,
             petitionId,
-            settings.CREDENTIALS.API_KEY.slice(0, 10)
+            context.apiKeyHint
           );
         }
         throw error;

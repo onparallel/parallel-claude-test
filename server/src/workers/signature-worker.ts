@@ -9,6 +9,7 @@ import {
 } from "../db/repositories/PetitionRepository";
 import { OrgIntegration } from "../db/__types";
 import { Tone } from "../emails/utils/types";
+import { InvalidCredentialsError } from "../integrations/GenericIntegration";
 import { BrandingIdKey, SignatureResponse } from "../services/signature-clients/client";
 import { fullName } from "../util/fullName";
 import { removeKeys, removeNotDefined } from "../util/remedaExtensions";
@@ -123,16 +124,12 @@ async function startSignatureProcess(
       error: error.stack ?? error,
     } as PetitionSignatureRequestCancelData<"REQUEST_ERROR">;
 
-    // TODO manejar mejor estos errores :/
-    if (error.message === "MAX_SIZE_EXCEEDED") {
-      cancelData.error_code = "MAX_SIZE_EXCEEDED";
+    const knownErrors = ["MAX_SIZE_EXCEEDED", "INSUFFICIENT_SIGNATURE_CREDITS"];
+    if (knownErrors.includes(error.message)) {
+      cancelData.error_code = error.message;
     }
-    if (error.message === "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED") {
-      cancelData.error_code = "INSUFFICIENT_SIGNATURE_CREDITS";
-      cancelData.error =
-        "The signature request could not be started due to lack of signature credits";
-    }
-    if (error.consent_required) {
+
+    if (error instanceof InvalidCredentialsError) {
       cancelData.error_code = "CONSENT_REQUIRED";
     }
 
@@ -149,7 +146,7 @@ async function startSignatureProcess(
       `SignatureWorker:${payload.petitionSignatureRequestId}`
     );
 
-    if (!error.consent_required) {
+    if (!(error instanceof InvalidCredentialsError)) {
       throw error;
     }
   } finally {
@@ -190,7 +187,7 @@ async function cancelSignatureProcess(
     const signatureClient = ctx.signature.getClient(integration);
     await signatureClient.cancelSignatureRequest(signature.external_id.replace(/^.*?\//, ""));
   } catch (error: any) {
-    if (!error.consent_required) {
+    if (!(error instanceof InvalidCredentialsError)) {
       throw error;
     }
   }
@@ -218,7 +215,7 @@ async function sendSignatureReminder(
     const signatureClient = ctx.signature.getClient(integration);
     await signatureClient.sendPendingSignatureReminder(signature.external_id.replace(/^.*?\//, ""));
   } catch (error: any) {
-    if (!error.consent_required) {
+    if (!(error instanceof InvalidCredentialsError)) {
       throw error;
     }
   }
@@ -278,7 +275,7 @@ async function storeSignedDocument(
       `OrgIntegration:${integration.id}`
     );
   } catch (error: any) {
-    if (!error.consent_required) {
+    if (!(error instanceof InvalidCredentialsError)) {
       throw error;
     }
   }
@@ -309,7 +306,7 @@ async function storeAuditTrail(
       file_upload_audit_trail_id: auditTrail.id,
     });
   } catch (error: any) {
-    if (!error.consent_required) {
+    if (!(error instanceof InvalidCredentialsError)) {
       throw error;
     }
   }

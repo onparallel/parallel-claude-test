@@ -3,7 +3,7 @@ import { buildConfig, Config, CONFIG } from "./config";
 import { ApiContext, WorkerContext } from "./context";
 import { dbModule } from "./db/module";
 import { servicesModule } from "./services/module";
-import { oauthClientsModule } from "./services/oauth-clients-module";
+import { integrationsModule } from "./integrations/module";
 import { signatureClientsModule } from "./services/signature-clients/module";
 
 export function createContainer() {
@@ -14,7 +14,7 @@ export function createContainer() {
   container.load(dbModule);
   container.load(servicesModule);
   container.load(signatureClientsModule);
-  container.load(oauthClientsModule);
+  container.load(integrationsModule);
   container.bind<Container>(Container).toConstantValue(container);
   return container;
 }

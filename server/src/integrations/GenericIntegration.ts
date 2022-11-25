@@ -1,7 +1,7 @@
-import { Config } from "../../config";
-import { IntegrationRepository } from "../../db/repositories/IntegrationRepository";
-import { OrgIntegration } from "../../db/__types";
-import { decrypt, encrypt } from "../../util/token";
+import { Config } from "../config";
+import { IntegrationRepository } from "../db/repositories/IntegrationRepository";
+import { OrgIntegration } from "../db/__types";
+import { decrypt, encrypt } from "../util/token";
 
 export class GenericIntegration<TCredentials extends {}, TContext extends {} = {}> {
   constructor(protected config: Config, protected integrations: IntegrationRepository) {}
@@ -35,7 +35,7 @@ export class GenericIntegration<TCredentials extends {}, TContext extends {} = {
     try {
       return await handler(credentials, context, integration!);
     } catch (error) {
-      if (error instanceof InvalidCredentialsError) {
+      if (error instanceof InvalidCredentialsError && error.skipRefresh) {
         await this.integrations.updateOrgIntegration(
           orgIntegrationId,
           { invalid_credentials: true },

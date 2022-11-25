@@ -1,14 +1,14 @@
 import { inject, injectable } from "inversify";
-import { Config, CONFIG } from "../../config";
-import { FeatureFlagRepository } from "../../db/repositories/FeatureFlagRepository";
+import { Config, CONFIG } from "../config";
+import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import {
   IntegrationRepository,
   IntegrationSettings,
-} from "../../db/repositories/IntegrationRepository";
-import { IntegrationType, OrgIntegration } from "../../db/__types";
-import { FetchService, FETCH_SERVICE } from "../../services/fetch";
-import { IRedis, REDIS } from "../../services/redis";
-import { Replace } from "../../util/types";
+} from "../db/repositories/IntegrationRepository";
+import { IntegrationType, OrgIntegration } from "../db/__types";
+import { FetchService, FETCH_SERVICE } from "../services/fetch";
+import { IRedis, REDIS } from "../services/redis";
+import { Replace } from "../util/types";
 import { OauthCredentials, OAuthIntegration } from "./OAuthIntegration";
 
 export interface DocusignOauthIntegrationContext {

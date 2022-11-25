@@ -52,7 +52,7 @@ export class OrganizationCreditsService implements IOrganizationCreditsService {
         error.message === "ORGANIZATION_USAGE_LIMIT_EXPIRED" ||
         error.constraint === "organization_usage_limit__used__limit__check"
       ) {
-        throw new Error("SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED");
+        throw new Error("INSUFFICIENT_SIGNATURE_CREDITS");
       }
       throw error;
     }

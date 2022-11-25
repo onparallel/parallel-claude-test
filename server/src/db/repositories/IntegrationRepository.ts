@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { isDefined, uniq } from "remeda";
 import { keyBuilder } from "../../util/keyBuilder";
-import { OauthCredentials } from "../../api/oauth/OAuthIntegration";
+import { OauthCredentials } from "../../integrations/OAuthIntegration";
 import { Replace } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";

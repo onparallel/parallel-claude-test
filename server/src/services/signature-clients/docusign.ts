@@ -5,14 +5,14 @@ import { basename, extname } from "path";
 import {
   DocusignOauthIntegration,
   DocusignOauthIntegrationContext,
-} from "../../api/oauth/DocusignOauthIntegration";
-import { InvalidCredentialsError } from "../../api/oauth/GenericIntegration";
+} from "../../integrations/DocusignOauthIntegration";
 import { Config, CONFIG } from "../../config";
 import { IntegrationRepository } from "../../db/repositories/IntegrationRepository";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { I18N_SERVICE, II18nService } from "../i18n";
 import { ISignatureClient, Recipient, SignatureOptions, SignatureResponse } from "./client";
+import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
 
 @injectable()
 export class DocuSignClient implements ISignatureClient {
@@ -26,6 +26,18 @@ export class DocuSignClient implements ISignatureClient {
   private integrationId!: number;
   configure(integrationId: number) {
     this.integrationId = integrationId;
+  }
+
+  private isConsentRequiredError(error: any) {
+    // TODO: check
+    console.debug(error);
+    return false;
+  }
+
+  private isAccessTokenExpiredError(error: any) {
+    console.debug(error);
+    // TODO: check
+    return (error as any)?.status === 401;
   }
 
   private async withDocusignSdk<TResult>(
@@ -48,10 +60,10 @@ export class DocuSignClient implements ISignatureClient {
           context
         );
       } catch (error) {
-        if ((error as any)?.response?.body?.error === "consent_required") {
+        if (this.isConsentRequiredError(error)) {
           throw new InvalidCredentialsError(true);
         }
-        if ((error as any)?.status === 401) {
+        if (this.isAccessTokenExpiredError(error)) {
           throw new InvalidCredentialsError();
         }
         throw error;
