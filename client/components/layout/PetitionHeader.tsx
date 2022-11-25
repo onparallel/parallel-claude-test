@@ -351,7 +351,7 @@ export const PetitionHeader = Object.assign(
               display="flex"
               render={({ children, ...props }) => (
                 <>
-                  {me.role === "COLLABORATOR" ? (
+                  {me.role === "COLLABORATOR" || myEffectivePermission === "READ" ? (
                     <HStack minWidth={0} paddingX={1.5} color="gray.600" fontSize="sm" {...props}>
                       <FolderIcon boxSize={4} />
                       <Box whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
