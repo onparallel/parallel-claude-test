@@ -97,6 +97,20 @@ function IntegrationsSignature() {
             name: data.name,
           },
         });
+        toast({
+          status: "success",
+          title: intl.formatMessage({
+            id: "page.signature.provider-added-successfully.toast-title",
+            defaultMessage: "Success",
+          }),
+          description: intl.formatMessage(
+            {
+              id: "page.signature.provider-added-successfully.toast-description",
+              defaultMessage: "{provider} integration created successfully.",
+            },
+            { provider: "Signaturit" }
+          ),
+        });
       }
       refetch();
     } catch (error) {

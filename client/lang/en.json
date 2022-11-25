@@ -175,6 +175,16 @@
     "context": "New signature provider"
   },
   {
+    "term": "component.add-signature-credentials-dialog.toast-description",
+    "definition": "{provider} integration created successfully.",
+    "context": "{provider} integration created successfully."
+  },
+  {
+    "term": "component.add-signature-credentials-dialog.toast-title",
+    "definition": "Success",
+    "context": "Success"
+  },
+  {
     "term": "component.admin-organizations-list-table-header.create-organization",
     "definition": "Create organization",
     "context": "Create organization"
@@ -8268,6 +8278,16 @@
     "term": "page.signature.invalid-apikey-toast-title",
     "definition": "Error",
     "context": "Error"
+  },
+  {
+    "term": "page.signature.provider-added-successfully.toast-description",
+    "definition": "{provider} integration created successfully.",
+    "context": "{provider} integration created successfully."
+  },
+  {
+    "term": "page.signature.provider-added-successfully.toast-title",
+    "definition": "Success",
+    "context": "Success"
   },
   {
     "term": "page.signature.upgrade-plan-alert-1",

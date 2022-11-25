@@ -12,6 +12,7 @@ import {
   RadioGroup,
   Spinner,
   useCounter,
+  useToast,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -53,7 +54,7 @@ function AddSignatureCredentialsDialog({
     increment: nextStep,
     decrement: previousStep,
   } = useCounter({ min: 0, max: 1, defaultValue: 0 });
-
+  const intl = useIntl();
   const form = useForm<AddSignatureCredentialsDialogData>({
     defaultValues: {
       provider: "SIGNATURIT",
@@ -78,7 +79,7 @@ function AddSignatureCredentialsDialog({
   const [consentState, setConsentState] = useState<"IDLE" | "AWAITING">("IDLE");
 
   const showDocusignConsentPopup = useDocusignConsentPopup();
-
+  const toast = useToast();
   async function handleConfirmClick() {
     if (isLastStep) {
       if (selectedProvider === "DOCUSIGN") {
@@ -91,6 +92,21 @@ function AddSignatureCredentialsDialog({
         );
         setConsentState("IDLE");
         if (!error) {
+          toast({
+            isClosable: true,
+            status: "success",
+            title: intl.formatMessage({
+              id: "component.add-signature-credentials-dialog.toast-title",
+              defaultMessage: "Success",
+            }),
+            description: intl.formatMessage(
+              {
+                id: "component.add-signature-credentials-dialog.toast-description",
+                defaultMessage: "{provider} integration created successfully.",
+              },
+              { provider: "Docusign" }
+            ),
+          });
           props.onResolve(form.getValues());
         }
       } else {

@@ -132,16 +132,9 @@ export abstract class OAuthIntegration<
         try {
           const response = (success: boolean) => /* html */ `
             <script>
-              setTimeout(() => {
-                window.opener.postMessage({ success: ${success} });
-                window.close();
-              }, 5000);
+              window.opener.postMessage({ success: ${success} });
+              window.close();
             </script>
-            ${
-              success
-                ? /* html */ `<body>TODO: show a friendly UI telling user integration is ready to be used</body>`
-                : null
-            }
           `;
 
           const { state, code } = req.query;
