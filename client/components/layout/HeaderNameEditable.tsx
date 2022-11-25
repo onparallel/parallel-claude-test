@@ -40,6 +40,17 @@ export const HeaderNameEditable = Object.assign(
 
       const isReadOnly = isPublic || myEffectivePermission === "READ";
 
+      const placeholder =
+        petition.__typename === "Petition"
+          ? intl.formatMessage({
+              id: "generic.unnamed-parallel",
+              defaultMessage: "Unnamed parallel",
+            })
+          : intl.formatMessage({
+              id: "generic.unnamed-template",
+              defaultMessage: "Unnamed template",
+            });
+
       return (
         <Editable
           display="flex"
@@ -54,17 +65,7 @@ export const HeaderNameEditable = Object.assign(
           onBlur={() => {
             setName(name.trim());
           }}
-          placeholder={
-            petition.__typename === "Petition"
-              ? intl.formatMessage({
-                  id: "generic.unnamed-parallel",
-                  defaultMessage: "Unnamed parallel",
-                })
-              : intl.formatMessage({
-                  id: "generic.unnamed-template",
-                  defaultMessage: "Unnamed template",
-                })
-          }
+          placeholder={placeholder}
           aria-label={
             petition.__typename === "Petition"
               ? intl.formatMessage({
@@ -88,7 +89,7 @@ export const HeaderNameEditable = Object.assign(
                     noOfLines={1}
                     wordBreak="break-all"
                   >
-                    {name || props.placeholder}
+                    {name || placeholder}
                   </Text>
                 ) : (
                   <Flex minWidth="0" flex="1">
