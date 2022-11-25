@@ -54,7 +54,13 @@ export abstract class OAuthIntegration<
 
   private async createIntegration(data: CreateOrgIntegration) {
     const integration = await this.integrations.createOrgIntegration(
-      data as any,
+      {
+        ...data,
+        settings: {
+          CREDENTIALS: this.encryptCredentials(data.settings.CREDENTIALS),
+          ...omit(data!.settings, ["CREDENTIALS"]),
+        },
+      },
       `Organization:${data.org_id}`
     );
     if (data.is_default) {
@@ -74,8 +80,8 @@ export abstract class OAuthIntegration<
       {
         ...data,
         settings: {
-          ...data!.settings,
           CREDENTIALS: this.encryptCredentials(data.settings.CREDENTIALS),
+          ...omit(data!.settings, ["CREDENTIALS"]),
         },
       },
       `Organization:${data.org_id}`
@@ -155,8 +161,7 @@ export abstract class OAuthIntegration<
                 is_default: args.isDefault,
                 settings: {
                   ...integration.settings,
-                  CREDENTIALS: this.encryptCredentials(credentials.CREDENTIALS),
-                  ...omit(credentials, ["CREDENTIALS"]),
+                  ...credentials,
                 },
                 invalid_credentials: false,
               });
@@ -168,10 +173,7 @@ export abstract class OAuthIntegration<
                 org_id: args.orgId,
                 is_default: args.isDefault,
                 is_enabled: true,
-                settings: {
-                  CREDENTIALS: this.encryptCredentials(credentials.CREDENTIALS),
-                  ...omit(credentials, ["CREDENTIALS"]),
-                },
+                settings: credentials,
               });
             }
 
@@ -195,16 +197,12 @@ export abstract class OAuthIntegration<
         } catch (error) {
           if (error instanceof InvalidCredentialsError && !error.skipRefresh) {
             const newCredentials = await this.refreshCredentials(credentials);
-            await this.integrations.updateOrgIntegration(
-              orgIntegrationId,
-              {
-                settings: {
-                  ...integration.settings,
-                  CREDENTIALS: await this.encryptCredentials(newCredentials),
-                },
+            await this.updateIntegration(orgIntegrationId, {
+              settings: {
+                ...integration.settings,
+                CREDENTIALS: newCredentials,
               },
-              `OrgIntegration:${orgIntegrationId}`
-            );
+            });
             return await handler(newCredentials.ACCESS_TOKEN, context);
           }
           throw error;
