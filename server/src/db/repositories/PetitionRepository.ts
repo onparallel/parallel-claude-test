@@ -24,6 +24,7 @@ import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fie
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { keyBuilder } from "../../util/keyBuilder";
+import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pFlatMap } from "../../util/promises/pFlatMap";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/reminderUtils";
@@ -578,177 +579,183 @@ export class PetitionRepository extends BaseRepository {
       builders.push((q) => q.whereIn("p.from_template_id", filters.fromTemplateId!));
     }
 
-    const [[{ count: petitionCount }], [{ count: folderCount }]] = await Promise.all([
-      this.knex
-        .with(
-          "ps",
-          this.knex
-            .fromRaw("petition as p")
-            .modify(function (q) {
-              builders.forEach((b) => b.call(this, q));
-              if (filters?.path) {
-                q.where("p.path", filters.path);
-              }
-            })
-            .groupBy("p.id")
-            .select(this.knex.raw(/* sql */ `distinct p.id`))
-        )
-        .from("ps")
-        .select(this.count()),
-      filters?.path
-        ? this.knex
-            .with(
-              "ps",
-              this.knex
-                .fromRaw("petition as p")
-                .modify(function (q) {
-                  builders.forEach((b) => b.call(this, q));
-                })
-                .whereRaw(/* sql */ `starts_with(p.path, ?) and p.path != ?`, [
-                  filters.path,
-                  filters.path,
-                ])
-                .groupBy("p.id")
-                .select(
-                  this.knex.raw(/* sql */ `distinct get_folder_after_prefix(p.path, ?)`, [
-                    filters.path,
-                  ])
-                )
-            )
-            .from("ps")
-            .select(this.count())
-        : [{ count: 0 }],
-    ]);
-
-    const totalCount = petitionCount + folderCount;
-
-    if (totalCount === 0) {
-      return { totalCount, items: [] };
-    } else {
-      const applyOrder: Knex.QueryCallback = (q) => {
-        for (const { field: column, order } of opts.sortBy ?? []) {
-          const reverse = order === "asc" ? "desc" : "asc";
-          if (column === "lastUsedAt") {
-            q.orderByRaw(`is_folder ${order}, last_used_at ${order}`);
-          } else if (column === "sentAt") {
-            q.orderByRaw(
-              `is_folder ${order}, sent_at ${order}, status asc, created_at ${order}, _name ${reverse}`
-            );
-          } else if (column === "createdAt") {
-            q.orderByRaw(`is_folder ${order}, created_at ${order}`);
-          } else if (column === "name") {
-            q.orderBy(`_name`, order);
-          }
-        }
-        // default ordering to avoid ambiguity
-        q.orderBy("id");
-      };
-
-      const petitionsQuery = this.knex
-        .fromRaw("petition as p")
-        .groupBy("p.id")
-        .modify(function (q) {
-          builders.forEach((b) => b.call(this, q));
-          if (filters?.path) {
-            q.where("p.path", filters.path);
-          }
-          if (opts.sortBy?.some((s) => s.field === "lastUsedAt") && type === "TEMPLATE") {
-            q.joinRaw(
-              /* sql */ `
-              left join (
-                select p.from_template_id as template_id, max(p.created_at) as t_last_used_at
-                from petition as p where p.created_by = ? group by p.from_template_id
-              ) as t on t.template_id = p.id
-            `,
-              [`User:${userId}`]
-            );
-          }
-        })
-        .select(
-          "p.*",
-          this.knex.raw(/* sql */ `false as is_folder`),
-          this.knex.raw(/* sql */ `null::int as petition_count`),
-          this.knex.raw(/* sql */ `null::petition_permission_type as min_permission`),
-          this.knex.raw(/* sql */ `p.name as _name`),
-          this.knex.raw(/* sql */ `min(coalesce(pm.scheduled_at, pm.created_at)) as sent_at`),
-          opts.sortBy?.some((s) => s.field === "lastUsedAt") && type === "TEMPLATE"
-            ? this.knex.raw(
-                /* sql */ `greatest(max(t.t_last_used_at), min(pp.created_at)) as last_used_at`
-              )
-            : this.knex.raw(/* sql */ `null as last_used_at`)
-        );
-
-      const items: (Petition & {
-        is_folder: boolean;
-        petition_count: number | null;
-        min_permission: PetitionPermissionType | null;
-        _name: string;
-        sent_at: string | null;
-        last_used_at: string | null;
-      })[] =
-        folderCount === 0
-          ? await petitionsQuery
-              .clone()
-              .modify(applyOrder)
-              .offset(opts.offset ?? 0)
-              .limit(opts.limit ?? 0)
-          : await this.knex
+    const countPromise = LazyPromise.from(async () => {
+      const [[{ count: petitionCount }], [{ count: folderCount }]] = await Promise.all([
+        this.knex
+          .with(
+            "ps",
+            this.knex
+              .fromRaw("petition as p")
+              .modify(function (q) {
+                builders.forEach((b) => b.call(this, q));
+                if (filters?.path) {
+                  q.where("p.path", filters.path);
+                }
+              })
+              .groupBy("p.id")
+              .select(this.knex.raw(/* sql */ `distinct p.id`))
+          )
+          .from("ps")
+          .select<[{ count: number }]>(this.count()),
+        filters?.path
+          ? this.knex
               .with(
                 "ps",
                 this.knex
                   .fromRaw("petition as p")
-                  .whereRaw(/* sql */ `starts_with(p.path, ?) and p.path != ?`, [
-                    filters!.path!,
-                    filters!.path!,
-                  ])
                   .modify(function (q) {
                     builders.forEach((b) => b.call(this, q));
                   })
-                  .select(
-                    "p.id",
-                    "p.path",
-                    this.knex.raw(/* sql */ `min(pp.type) as effective_permission`)
-                  )
+                  .whereRaw(/* sql */ `starts_with(p.path, ?) and p.path != ?`, [
+                    filters.path,
+                    filters.path,
+                  ])
                   .groupBy("p.id")
-              )
-              .with(
-                "fs",
-                this.knex
-                  .from("ps")
                   .select(
-                    this.knex.raw(/* sql */ `get_folder_after_prefix(ps.path, ?) as _name`, [
-                      filters!.path!,
-                    ]),
-                    this.count("petition_count"),
-                    this.knex.raw(/* sql */ `max(ps.effective_permission) as min_permission`)
+                    this.knex.raw(/* sql */ `distinct get_folder_after_prefix(p.path, ?)`, [
+                      filters.path,
+                    ])
                   )
-                  .groupBy("_name")
               )
-              .with("p", petitionsQuery)
-              .from("p")
-              .select("p.*")
-              .unionAll([
-                this.knex
-                  .from("fs")
-                  // join with any petition so both parts of the union have the same columns.
-                  // The value from those columns will be discarded afterwards
-                  .joinRaw(/* sql */ `join (select * from petition limit 1) paux on 1 = 1`)
-                  .select(
-                    "paux.*",
-                    this.knex.raw(/* sql */ `true as is_folder`),
-                    "fs.petition_count",
-                    "fs.min_permission",
-                    "fs._name",
-                    this.knex.raw(/* sql */ `null as sent_at`),
-                    this.knex.raw(/* sql */ `null as last_used_at`)
-                  ),
-              ])
-              .modify(applyOrder)
-              .offset(opts.offset ?? 0)
-              .limit(opts.limit ?? 0);
-      return {
-        totalCount: totalCount,
-        items: items.map((i) =>
+              .from("ps")
+              .select<[{ count: number }]>(this.count())
+          : [{ count: 0 }],
+      ]);
+      return { petitionCount, folderCount, totalCount: petitionCount + folderCount };
+    });
+
+    return {
+      totalCount: LazyPromise.from(async () => {
+        const { totalCount } = await countPromise;
+        return totalCount;
+      }),
+      items: LazyPromise.from(async () => {
+        const { folderCount, totalCount } = await countPromise;
+        if (totalCount === 0) {
+          return [];
+        }
+        const applyOrder: Knex.QueryCallback = (q) => {
+          for (const { field: column, order } of opts.sortBy ?? []) {
+            const reverse = order === "asc" ? "desc" : "asc";
+            if (column === "lastUsedAt") {
+              q.orderByRaw(`is_folder ${order}, last_used_at ${order}`);
+            } else if (column === "sentAt") {
+              q.orderByRaw(
+                `is_folder ${order}, sent_at ${order}, status asc, created_at ${order}, _name ${reverse}`
+              );
+            } else if (column === "createdAt") {
+              q.orderByRaw(`is_folder ${order}, created_at ${order}`);
+            } else if (column === "name") {
+              q.orderBy(`_name`, order);
+            }
+          }
+          // default ordering to avoid ambiguity
+          q.orderBy("id");
+        };
+
+        const petitionsQuery = this.knex
+          .fromRaw("petition as p")
+          .groupBy("p.id")
+          .modify(function (q) {
+            builders.forEach((b) => b.call(this, q));
+            if (filters?.path) {
+              q.where("p.path", filters.path);
+            }
+            if (opts.sortBy?.some((s) => s.field === "lastUsedAt") && type === "TEMPLATE") {
+              q.joinRaw(
+                /* sql */ `
+                left join (
+                  select p.from_template_id as template_id, max(p.created_at) as t_last_used_at
+                  from petition as p where p.created_by = ? group by p.from_template_id
+                ) as t on t.template_id = p.id
+              `,
+                [`User:${userId}`]
+              );
+            }
+          })
+          .select(
+            "p.*",
+            this.knex.raw(/* sql */ `false as is_folder`),
+            this.knex.raw(/* sql */ `null::int as petition_count`),
+            this.knex.raw(/* sql */ `null::petition_permission_type as min_permission`),
+            this.knex.raw(/* sql */ `p.name as _name`),
+            this.knex.raw(/* sql */ `min(coalesce(pm.scheduled_at, pm.created_at)) as sent_at`),
+            opts.sortBy?.some((s) => s.field === "lastUsedAt") && type === "TEMPLATE"
+              ? this.knex.raw(
+                  /* sql */ `greatest(max(t.t_last_used_at), min(pp.created_at)) as last_used_at`
+                )
+              : this.knex.raw(/* sql */ `null as last_used_at`)
+          );
+
+        const items: (Petition & {
+          is_folder: boolean;
+          petition_count: number | null;
+          min_permission: PetitionPermissionType | null;
+          _name: string;
+          sent_at: string | null;
+          last_used_at: string | null;
+        })[] =
+          folderCount === 0
+            ? await petitionsQuery
+                .clone()
+                .modify(applyOrder)
+                .offset(opts.offset ?? 0)
+                .limit(opts.limit ?? 0)
+            : await this.knex
+                .with(
+                  "ps",
+                  this.knex
+                    .fromRaw("petition as p")
+                    .whereRaw(/* sql */ `starts_with(p.path, ?) and p.path != ?`, [
+                      filters!.path!,
+                      filters!.path!,
+                    ])
+                    .modify(function (q) {
+                      builders.forEach((b) => b.call(this, q));
+                    })
+                    .select(
+                      "p.id",
+                      "p.path",
+                      this.knex.raw(/* sql */ `min(pp.type) as effective_permission`)
+                    )
+                    .groupBy("p.id")
+                )
+                .with(
+                  "fs",
+                  this.knex
+                    .from("ps")
+                    .select(
+                      this.knex.raw(/* sql */ `get_folder_after_prefix(ps.path, ?) as _name`, [
+                        filters!.path!,
+                      ]),
+                      this.count("petition_count"),
+                      this.knex.raw(/* sql */ `max(ps.effective_permission) as min_permission`)
+                    )
+                    .groupBy("_name")
+                )
+                .with("p", petitionsQuery)
+                .from("p")
+                .select("p.*")
+                .unionAll([
+                  this.knex
+                    .from("fs")
+                    // join with any petition so both parts of the union have the same columns.
+                    // The value from those columns will be discarded afterwards
+                    .joinRaw(/* sql */ `join (select * from petition limit 1) paux on 1 = 1`)
+                    .select(
+                      "paux.*",
+                      this.knex.raw(/* sql */ `true as is_folder`),
+                      "fs.petition_count",
+                      "fs.min_permission",
+                      "fs._name",
+                      this.knex.raw(/* sql */ `null as sent_at`),
+                      this.knex.raw(/* sql */ `null as last_used_at`)
+                    ),
+                ])
+                .modify(applyOrder)
+                .offset(opts.offset ?? 0)
+                .limit(opts.limit ?? 0);
+        return items.map((i) =>
           i.is_folder
             ? {
                 name: i._name,
@@ -758,9 +765,9 @@ export class PetitionRepository extends BaseRepository {
                 path: `${filters!.path}${i._name}/`,
               }
             : omit(i, ["_name", "petition_count", "is_folder", "min_permission"])
-        ),
-      };
-    }
+        );
+      }),
+    };
   }
 
   readonly loadFieldsForPetition = this.buildLoadMultipleBy("petition_field", "petition_id", (q) =>

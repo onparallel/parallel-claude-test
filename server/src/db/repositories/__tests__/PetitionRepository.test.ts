@@ -73,8 +73,8 @@ describe("repositories/PetitionRepository", () => {
 
     test("returns an empty page without options", async () => {
       const result = await petitions.loadPetitionsForUser(user.org_id, user.id, {});
-      expect(result.totalCount).toBe(15);
-      expect(result.items).toHaveLength(0);
+      expect(await result.totalCount).toBe(15);
+      expect(await result.items).toHaveLength(0);
     });
 
     test("returns a slice of petitions", async () => {
@@ -82,8 +82,8 @@ describe("repositories/PetitionRepository", () => {
         offset: 5,
         limit: 5,
       });
-      expect(result.totalCount).toBe(15);
-      expect(result.items).toMatchObject(_petitions.slice(5, 10).map(pick(["id"])));
+      expect(await result.totalCount).toBe(15);
+      expect(await result.items).toMatchObject(_petitions.slice(5, 10).map(pick(["id"])));
     });
 
     test("returns a slice of filtered petitions", async () => {
@@ -92,8 +92,8 @@ describe("repositories/PetitionRepository", () => {
         limit: 5,
         search: "good", // there's only 5 good petitions
       });
-      expect(result.totalCount).toBe(5);
-      expect(result.items).toMatchObject(
+      expect(await result.totalCount).toBe(5);
+      expect(await result.items).toMatchObject(
         _petitions.filter((p) => (p.name ?? "").toLowerCase().includes("good")).slice(2, 2 + 5)
       );
     });
@@ -104,8 +104,8 @@ describe("repositories/PetitionRepository", () => {
         limit: 10,
         search: "jesse pinkm",
       });
-      expect(result.totalCount).toBe(1);
-      expect(result.items).toMatchObject([_petitions[0]]);
+      expect(await result.totalCount).toBe(1);
+      expect(await result.items).toMatchObject([_petitions[0]]);
     });
 
     test("searches petition by recipient email", async () => {
@@ -114,8 +114,8 @@ describe("repositories/PetitionRepository", () => {
         limit: 10,
         search: "jesse.pinkman@test.com",
       });
-      expect(result.totalCount).toBe(1);
-      expect(result.items).toMatchObject([_petitions[0]]);
+      expect(await result.totalCount).toBe(1);
+      expect(await result.items).toMatchObject([_petitions[0]]);
     });
   });
 
