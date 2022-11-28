@@ -11,7 +11,6 @@ type PartialProps<T, K extends keyof T = never> = Omit<T, K> & Partial<Pick<T, K
 
 export type FeatureFlagName =
   | "PETITION_SIGNATURE"
-  | "PETITION_PDF_EXPORT"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "SKIP_FORWARD_SECURITY"
   | "EXPORT_CUATRECASAS"
@@ -31,7 +30,6 @@ export type FeatureFlagName =
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
-  "PETITION_PDF_EXPORT",
   "HIDE_RECIPIENT_VIEW_CONTENTS",
   "SKIP_FORWARD_SECURITY",
   "EXPORT_CUATRECASAS",
