@@ -119,7 +119,7 @@ export function useShortTextFormats() {
             return { mask: "#0000000a", definitions: { "#": /[PQRSNW]/ }, prepare };
           }
         },
-        validate: (value) => /^([KLMXYZ]\d{7}[A-Z]|[ABCDEFGHJUV]\d{8})$/.test(value),
+        validate: (value) => /^([PQRSNW]\d{7}[A-Z]|[ABCDEFGHJUV]\d{8})$/.test(value),
       },
       {
         value: "ES_SSN",
