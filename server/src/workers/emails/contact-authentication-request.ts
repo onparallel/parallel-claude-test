@@ -61,7 +61,7 @@ export async function contactAuthenticationRequest(
     created_from: `ContactAuthenticationRequest:${payload.contact_authentication_request_id}`,
   });
 
-  await context.petitions.processPetitionMessage(
+  await context.contacts.processContactAuthenticationRequest(
     payload.contact_authentication_request_id,
     email.id
   );
