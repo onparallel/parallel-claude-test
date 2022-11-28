@@ -14,10 +14,9 @@ export type ShortTextFormat = ShortTextFormatImplementation & {
   inputProps?: any;
   validate?: (value: string) => boolean;
 };
-
 type ShortTextFormatImplementation =
   | { type: "INPUT" }
-  | { type: "MASK"; maskProps: (value: string) => any };
+  | { type: "MASK"; maskProps: IMask.AnyMaskedOptions };
 
 const prepare = (str: string) => str.toUpperCase();
 
@@ -47,36 +46,36 @@ export function useShortTextFormats() {
         }),
         example: "ES21 1465 0100 7220 3087 6293",
         type: "MASK",
-        maskProps: (value) => {
-          const defaultMask = {
-            mask: "aa00 AAAA AAAA AAAA AAAA AAAA AAAA AAAA",
-            definitions: { A: /[0-9A-Z]/ },
-            prepare,
-          };
-
-          if (value.length > 1) {
-            const match = ibanDefinitions.find(([country]) =>
-              country.startsWith(value.slice(0, 2).toUpperCase())
-            );
-
-            if (match) {
-              const [country, format] = match;
-              let full = format.map(([pattern, repeats]) => pattern.repeat(repeats)).join("");
-              let mask = `{${country}}00`;
-              if (full) {
-                while (full.length) {
-                  mask += " " + full.slice(0, 4);
-                  full = full.slice(4);
-                }
+        maskProps: {
+          mask: ibanDefinitions.map(([country, format]) => {
+            let full = format
+              .map(([pattern, repeats]) => {
+                const x = pattern === "F" ? "0" : pattern === "U" ? "a" : "x";
+                return x.repeat(repeats);
+              })
+              .join("");
+            let mask = `{${country}}00`;
+            if (full) {
+              while (full.length) {
+                mask += " " + full.slice(0, 4);
+                full = full.slice(4);
               }
-
-              return { mask, definitions: { A: /[0-9A-Z]/, F: /[0-9]/, U: /[A-Z]/ }, prepare };
-            } else {
-              return defaultMask;
             }
-          } else {
-            return defaultMask;
-          }
+            return {
+              mask,
+              definitions: { x: /[0-9A-Z]/, a: /[A-Z]/ },
+              country,
+            };
+          }),
+          prepare,
+          dispatch: function (appended, { value, compiledMasks }) {
+            const prefix = (value + appended).slice(0, 2);
+            console.log(compiledMasks);
+            const mask = compiledMasks.find((m) => {
+              return ((m as any).country as string).startsWith(prefix);
+            });
+            return mask;
+          },
         },
         validate: (value) => ibanRegex.test(value.replace(/\s/g, "")),
       },
@@ -89,11 +88,11 @@ export function useShortTextFormats() {
         example: "12345678Z",
         country: "ES",
         type: "MASK",
-        maskProps: () => ({
+        maskProps: {
           mask: "#0000000a",
           definitions: { "#": /[KLMXYZ0-9]/ },
           prepare,
-        }),
+        },
         validate: (value) => /^[KLMXYZ0-9]\d{7}[A-Z]$/.test(value),
       },
       {
@@ -105,19 +104,12 @@ export function useShortTextFormats() {
         example: "J12345674",
         country: "ES",
         type: "MASK",
-        maskProps: (value: string) => {
-          if (value === "") {
-            return {
-              mask: "#0000000%",
-              definitions: { "#": /[ABCDEFGHJUVPQRSNW]/, "%": /[A-Z0-9]/ },
-              prepare,
-            };
-          }
-          if (/^[ABCDEFGHJUV]/.test(value)) {
-            return { mask: "#00000000", definitions: { "#": /[ABCDEFGHJUV]/ }, prepare };
-          } else {
-            return { mask: "#0000000a", definitions: { "#": /[PQRSNW]/ }, prepare };
-          }
+        maskProps: {
+          mask: [
+            { mask: "#0000000a", definitions: { "#": /[PQRSNW]/ } },
+            { mask: "#00000000", definitions: { "#": /[ABCDEFGHJUV]/ } },
+          ],
+          prepare,
         },
         validate: (value) => /^([PQRSNW]\d{7}[A-Z]|[ABCDEFGHJUV]\d{8})$/.test(value),
       },
@@ -130,7 +122,7 @@ export function useShortTextFormats() {
         example: "28 12345678 40",
         country: "ES",
         type: "MASK",
-        maskProps: () => ({ mask: "00 00000000 00" }),
+        maskProps: { mask: "00 00000000 00" },
         inputProps: { inputMode: "numeric" },
         validate: (value) => /^\d{2} \d{8} \d{2}$/.test(value),
       },
@@ -143,7 +135,7 @@ export function useShortTextFormats() {
         example: "078-05-1120",
         country: "US",
         type: "MASK",
-        maskProps: () => ({ mask: "000-00-0000" }),
+        maskProps: { mask: "000-00-0000" },
         inputProps: { inputMode: "numeric" },
         validate: (value) => /^\d{3}-\d{2}-\d{4}$/.test(value),
       },
@@ -156,7 +148,7 @@ export function useShortTextFormats() {
         example: "08018",
         country: "ES",
         type: "MASK",
-        maskProps: () => ({ mask: "00000" }),
+        maskProps: { mask: "00000" },
         inputProps: { inputMode: "numeric" },
         validate: (value) => /^\d{5}$/.test(value),
       },
@@ -169,7 +161,7 @@ export function useShortTextFormats() {
         example: "20500",
         country: "US",
         type: "MASK",
-        maskProps: () => ({ mask: "00000" }),
+        maskProps: { mask: "00000" },
         inputProps: { inputMode: "numeric" },
         validate: (value) => /^\d{5}$/.test(value),
       },

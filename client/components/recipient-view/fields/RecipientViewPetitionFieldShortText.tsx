@@ -415,20 +415,14 @@ const ShortTextInput = chakraForwardRef<
     },
     [format?.type]
   );
-  const [maskProps, setMaskProps] = useState(
-    format?.type === "MASK" ? format.maskProps((props.value as string) ?? "") : null
-  );
   return (
     <Input
       ref={inputRef}
       {...(format?.type === "MASK"
         ? {
             as: IMaskInput,
-            ...maskProps,
+            ...format.maskProps,
             onAccept: (value: string) => {
-              if (format?.type === "MASK") {
-                setMaskProps(format.maskProps(value));
-              }
               onValueChange(value);
             },
           }
