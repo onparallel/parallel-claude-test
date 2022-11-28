@@ -29,14 +29,10 @@ export class DocuSignClient implements ISignatureClient {
   }
 
   private isConsentRequiredError(error: any) {
-    console.debug(error);
-    // TODO: check
     return error?.error === "invalid_grant";
   }
 
   private isAccessTokenExpiredError(error: any) {
-    console.debug(error);
-    // TODO: check
     return (error as any)?.status === 401;
   }
 

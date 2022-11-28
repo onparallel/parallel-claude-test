@@ -86,7 +86,7 @@ export abstract class OAuthIntegration<
           ...omit(data!.settings, ["CREDENTIALS"]),
         },
       },
-      `Organization:${data.org_id}`
+      `OrgIntegration:${orgIntegrationId}`
     );
 
     if (data.is_default) {
@@ -94,7 +94,7 @@ export abstract class OAuthIntegration<
         orgIntegrationId,
         integration.type,
         integration.org_id,
-        `Organization:${integration.org_id}`
+        `OrgIntegration:${orgIntegrationId}`
       );
     }
   }
@@ -195,6 +195,7 @@ export abstract class OAuthIntegration<
               this.refreshCredentials(credentials)
             );
             if (isDefined(refreshError)) {
+              // we couldn't refresh the access token, permissions might be revoked
               throw new InvalidCredentialsError(true);
             } else {
               await this.updateIntegration(orgIntegrationId, {

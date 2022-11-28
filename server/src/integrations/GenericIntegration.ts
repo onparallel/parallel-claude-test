@@ -17,7 +17,7 @@ export class GenericIntegration<TCredentials extends {}, TContext extends {} = {
     return JSON.parse(decrypted);
   }
 
-  protected async getContext(integration: OrgIntegration): Promise<TContext> {
+  protected getContext(integration: OrgIntegration): TContext {
     return {} as TContext;
   }
 
@@ -30,8 +30,8 @@ export class GenericIntegration<TCredentials extends {}, TContext extends {} = {
     ) => Promise<TResult>
   ): Promise<TResult> {
     const integration = await this.integrations.loadIntegration(orgIntegrationId);
-    const credentials = await this.decryptCredentials(integration!.settings.CREDENTIALS);
-    const context = await this.getContext(integration!);
+    const credentials = this.decryptCredentials(integration!.settings.CREDENTIALS);
+    const context = this.getContext(integration!);
     try {
       return await handler(credentials, context, integration!);
     } catch (error) {

@@ -110,9 +110,9 @@ export class DocusignOauthIntegration extends OAuthIntegration<DocusignOauthInte
     }
   }
 
-  protected override async getContext(
+  protected override getContext(
     integration: Replace<OrgIntegration, { settings: IntegrationSettings<"SIGNATURE", "DOCUSIGN"> }>
-  ): Promise<DocusignOauthIntegrationContext> {
+  ): DocusignOauthIntegrationContext {
     return {
       USER_ACCOUNT_ID: integration.settings.USER_ACCOUNT_ID!,
       API_BASE_PATH: integration.settings.API_BASE_PATH!,
