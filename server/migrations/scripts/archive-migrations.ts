@@ -6,10 +6,13 @@ import { resolve } from "path";
 async function main() {
   console.log("generating dump of local database...");
   execSync(
-    `docker exec dev-db-1 pg_dump -h localhost -d parallel_dev -U parallel --schema-only > dump.sql`
+    `docker exec dev-db-1 pg_dump -h localhost -d parallel_dev -U parallel --schema-only --no-owner --exclude-table=migrations* > dump.sql`
   );
 
-  const dumpContents = await readFile("./dump.sql", "utf8");
+  let dumpContents = await readFile("./dump.sql", "utf8");
+
+  // remove every line starting with SET, SELECT and -- (comments)
+  dumpContents = dumpContents.replace(/^(SET|SELECT|--).*/gm, "");
   await rm("./dump.sql");
 
   const timestamp = new Date()
@@ -32,7 +35,7 @@ async function main() {
     ${dumpContents}
     \`);
   }
-  
+
   export async function down(knex: Knex): Promise<void> {}
 
   `;
