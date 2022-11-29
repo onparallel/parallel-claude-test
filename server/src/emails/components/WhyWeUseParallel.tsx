@@ -77,7 +77,7 @@ export function WhyWeUseParallel({ tone, assetsUrl }: WhyWeUseParallelProps) {
   return (
     <MjmlWrapper padding="10px 25px">
       <MjmlSection>
-        <MjmlText fontSize="20px" fontWeight={600} paddingRight={0}>
+        <MjmlText fontSize="20px" fontWeight="600" paddingRight={0}>
           <FormattedMessage
             id="component.why-we-use-parallel.title"
             defaultMessage="Why we use Parallel?"
@@ -93,7 +93,7 @@ export function WhyWeUseParallel({ tone, assetsUrl }: WhyWeUseParallelProps) {
             <MjmlColumn verticalAlign="middle" width="88%">
               <MjmlText
                 fontSize="16px"
-                fontWeight={600}
+                fontWeight="600"
                 paddingBottom={0}
                 paddingLeft="16px"
                 paddingRight={0}

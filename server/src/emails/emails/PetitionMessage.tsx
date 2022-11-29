@@ -152,7 +152,7 @@ const email: Email<PetitionMessageProps> = {
             ) : null}
             <MjmlSpacer height="10px" />
             {showNextButton ? (
-              <Button href={`${parallelUrl}/${intl.locale}/petition/${keycode}`} fontWeight={500}>
+              <Button href={`${parallelUrl}/${intl.locale}/petition/${keycode}`} fontWeight="500">
                 <FormattedMessage
                   id="new-petition.next-button"
                   defaultMessage="Complete the information"

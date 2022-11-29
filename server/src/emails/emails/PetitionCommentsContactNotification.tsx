@@ -120,7 +120,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
           <MjmlColumn>
             <Button
               href={`${parallelUrl}/${locale}/petition/${keycode}`}
-              fontWeight={500}
+              fontWeight="500"
               fontSize={"16px"}
             >
               <FormattedMessage

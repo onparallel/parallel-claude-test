@@ -1,4 +1,4 @@
-import { MjmlColumn, MjmlProps, MjmlSection, MjmlText, MjmlWrapper } from "@faire/mjml-react";
+import { MjmlColumn, IMjmlProps, MjmlSection, MjmlText, MjmlWrapper } from "@faire/mjml-react";
 import { FormattedMessage } from "react-intl";
 import { SlateNode, toHtml } from "../../util/slate";
 import { Maybe } from "../../util/types";
@@ -114,7 +114,7 @@ export function PetitionFieldAndComments({ fields }: PetitionFieldAndCommentsPro
   );
 }
 
-interface MentionProps extends MjmlProps {
+interface MentionProps extends IMjmlProps {
   mention?: { id: string; highlight: boolean };
 }
 function Mention({ mention, children }: MentionProps) {

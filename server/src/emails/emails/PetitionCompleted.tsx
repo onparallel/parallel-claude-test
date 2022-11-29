@@ -113,7 +113,7 @@ const email: Email<PetitionCompletedProps> = {
               />
             </MjmlText>
 
-            <MjmlText fontSize="16px" fontWeight={400}>
+            <MjmlText fontSize="16px" fontWeight="400">
               {petitionName ? (
                 <li>{petitionName}</li>
               ) : (
@@ -145,7 +145,7 @@ export default email;
 
 function AccessInfoButton({ href }: { href: string }) {
   return (
-    <Button href={href} fontWeight={500}>
+    <Button href={href} fontWeight="500">
       <FormattedMessage
         id="petition-completed.access-button"
         defaultMessage="Access the information"

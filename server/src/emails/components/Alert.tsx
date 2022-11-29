@@ -1,15 +1,15 @@
 import {
   MjmlColumn,
   MjmlSection,
-  MjmlSectionProps,
+  IMjmlSectionProps,
   MjmlText,
-  MjmlTextProps,
+  IMjmlTextProps,
 } from "@faire/mjml-react";
 import { ReactNode } from "react";
 
-interface AlertProps extends MjmlSectionProps {
+interface AlertProps extends IMjmlSectionProps {
   children: ReactNode;
-  textColor?: MjmlTextProps["color"];
+  textColor?: IMjmlTextProps["color"];
 }
 export function Alert({ children, textColor, ...props }: AlertProps) {
   return (
@@ -18,7 +18,7 @@ export function Alert({ children, textColor, ...props }: AlertProps) {
         <MjmlText
           align="center"
           color={textColor ?? "white"}
-          fontWeight={600}
+          fontWeight="600"
           textTransform="uppercase"
         >
           {children}

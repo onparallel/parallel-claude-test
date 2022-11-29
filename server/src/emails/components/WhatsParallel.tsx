@@ -5,7 +5,7 @@ export function WhatsParallel() {
   return (
     <MjmlSection>
       <MjmlColumn>
-        <MjmlText fontSize="16px" fontWeight={600} paddingTop="20px" paddingBottom={0}>
+        <MjmlText fontSize="16px" fontWeight="600" paddingTop="20px" paddingBottom={0}>
           <FormattedMessage id="component.whats-parallel.title" defaultMessage="What's Parallel?" />
         </MjmlText>
         <MjmlText fontSize="14px" paddingBottom="14px">

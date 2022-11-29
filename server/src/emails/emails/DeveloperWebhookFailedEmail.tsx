@@ -80,7 +80,7 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
 
         <MjmlSection padding="0 20px">
           <MjmlColumn backgroundColor="#F4F7F9" borderRadius="5px" padding="10px 0">
-            <MjmlText fontWeight={600}>{errorMessage}</MjmlText>
+            <MjmlText fontWeight="600">{errorMessage}</MjmlText>
             <MjmlText>
               <pre>{JSON.stringify(postBody, null, 2)}</pre>
             </MjmlText>

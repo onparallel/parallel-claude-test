@@ -230,7 +230,7 @@ export function useReactSelectProps<
         return {
           ...styles,
           backgroundColor:
-            typeof data === "object" && isDefined(data) && "isInvalid" in data
+            typeof data === "object" && isDefined(data) && "isInvalid" in (data as any)
               ? backgroundColorError
               : backgroundColor,
           borderRadius: radii["sm"],
@@ -249,7 +249,7 @@ export function useReactSelectProps<
           borderRadius: `0 ${radii["sm"]} ${radii["sm"]} 0`,
           ":hover": {
             backgroundColor:
-              typeof data === "object" && isDefined(data) && "isInvalid" in data
+              typeof data === "object" && isDefined(data) && "isInvalid" in (data as any)
                 ? backgroundColorHoverError
                 : backgroundColorHover,
             color: fontColor,

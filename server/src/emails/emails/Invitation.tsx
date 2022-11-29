@@ -199,7 +199,7 @@ const email: Email<InvitationProps> = {
         </MjmlSection>
         <MjmlSection>
           <MjmlColumn>
-            <Button href={`${parallelUrl}/${locale}/login`} fontWeight={500}>
+            <Button href={`${parallelUrl}/${locale}/login`} fontWeight="500">
               {isNewUser ? (
                 <FormattedMessage id="invitation.join-parallel" defaultMessage="Join Parallel" />
               ) : (

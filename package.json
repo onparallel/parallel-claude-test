@@ -15,18 +15,18 @@
     "postpull": "yarn && cd server && yarn migrate"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.42.1",
-    "@typescript-eslint/parser": "^5.42.1",
-    "eslint": "^8.27.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-formatjs": "^4.3.4",
     "eslint-plugin-graphql": "^4.0.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-react": "7.31.10",
+    "eslint-plugin-react": "7.31.11",
     "graphql": "^16.6.0",
-    "npm-check-updates": "^16.3.25",
+    "npm-check-updates": "^16.4.3",
     "postinstall-postinstall": "^2.1.0",
-    "prettier": "^2.7.1"
+    "prettier": "^2.8.0"
   },
   "dependencies": {
     "patch-package": "^6.5.0"
