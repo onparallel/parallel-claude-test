@@ -512,7 +512,7 @@ export class PetitionRepository extends BaseRepository {
 
     if (filters?.signature && filters.signature.length > 0) {
       builders.push((q) =>
-        q.whereRaw(/* sql */ `p.status != 'DRAFT'`).andWhere((q) => {
+        q.where((q) => {
           if (filters.signature!.includes("NO_SIGNATURE")) {
             // no signature configured nor any previous signature request
             q.or.whereRaw(/* sql */ `
@@ -525,7 +525,7 @@ export class PetitionRepository extends BaseRepository {
             q.or.whereRaw(/* sql */ `
               p.signature_config is not null
               and p.latest_signature_status is null
-              and p.status = 'PENDING'
+              and p.status in ('DRAFT', 'PENDING')
             `);
           }
           if (filters.signature!.includes("PENDING_START")) {

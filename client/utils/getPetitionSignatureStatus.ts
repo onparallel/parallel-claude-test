@@ -30,7 +30,7 @@ export function getPetitionSignatureStatus({
     } else {
       return currentSignatureRequest.status as "COMPLETED" | "CANCELLED";
     }
-  } else if (isDefined(signatureConfig) && status === "PENDING") {
+  } else if (isDefined(signatureConfig) && ["DRAFT", "PENDING"].includes(status)) {
     // petition has signature configured but it's not yet completed
     return "NOT_STARTED";
   }
