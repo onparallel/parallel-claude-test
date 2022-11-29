@@ -49,10 +49,10 @@ export function generateOrganizationPalette(color: string) {
   return Object.fromEntries(
     [
       [50, 99],
-      [100, 95],
-      [200, lightness + ((95 - lightness) / 4) * 3],
-      [300, lightness + ((95 - lightness) / 4) * 2],
-      [400, lightness + ((95 - lightness) / 4) * 1],
+      [100, 97],
+      [200, lightness + ((97 - lightness) / 4) * 3],
+      [300, lightness + ((97 - lightness) / 4) * 2],
+      [400, lightness + ((97 - lightness) / 4) * 1],
       [500, lightness],
       [600, lightness - ((lightness - 15) / 4) * 1],
       [700, lightness - ((lightness - 15) / 4) * 2],

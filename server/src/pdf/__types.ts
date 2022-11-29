@@ -3031,6 +3031,8 @@ export type PublicPetition = Timestamps & {
    * @deprecated Use PublicOrganization.hasRemoveParallelBranding
    */
   hasRemoveParallelBranding: Scalars["Boolean"];
+  /** Shows if the petition has unread comments */
+  hasUnreadComments: Scalars["Boolean"];
   /** The ID of the petition. */
   id: Scalars["GID"];
   /** Wether the completion message will be shown to the recipients or not. */
@@ -3060,9 +3062,17 @@ export type PublicPetition = Timestamps & {
 /** A public view of a petition access */
 export type PublicPetitionAccess = {
   contact: Maybe<PublicContact>;
+  createdAt: Scalars["DateTime"];
   granter: Maybe<PublicUser>;
   message: Maybe<PublicPetitionMessage>;
   petition: PublicPetition;
+};
+
+export type PublicPetitionAccessPagination = {
+  /** The requested slice of items. */
+  items: Array<PublicPetitionAccess>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
 };
 
 /** A field within a petition. */
@@ -3151,6 +3161,8 @@ export type PublicPetitionLink = {
 export type PublicPetitionMessage = {
   /** The ID of the message. */
   id: Scalars["GID"];
+  /** Date when the petition was first sent */
+  sentAt: Maybe<Scalars["DateTime"]>;
   /** Subject of a email. */
   subject: Maybe<Scalars["String"]>;
 };
@@ -3205,7 +3217,9 @@ export type PublicUserOrContact = PublicContact | PublicUser;
 
 export type Query = {
   access: PublicPetitionAccess;
+  accesses: PublicPetitionAccessPagination;
   contact: Maybe<Contact>;
+  contactStats: petitions;
   /** The contacts of the user */
   contacts: ContactPagination;
   /** Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts */
@@ -3266,8 +3280,20 @@ export type QueryaccessArgs = {
   keycode: Scalars["ID"];
 };
 
+export type QueryaccessesArgs = {
+  keycode: Scalars["ID"];
+  limit?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+  search?: InputMaybe<Scalars["String"]>;
+  status?: InputMaybe<Array<PetitionStatus>>;
+};
+
 export type QuerycontactArgs = {
   id: Scalars["GID"];
+};
+
+export type QuerycontactStatsArgs = {
+  keycode: Scalars["ID"];
 };
 
 export type QuerycontactsArgs = {
@@ -4043,6 +4069,13 @@ export type VerificationCodeRequest = {
   expiresAt: Scalars["DateTime"];
   remainingAttempts: Scalars["Int"];
   token: Scalars["ID"];
+};
+
+/** Stats about how many petitions has in each status */
+export type petitions = {
+  closed: Scalars["Int"];
+  completed: Scalars["Int"];
+  pending: Scalars["Int"];
 };
 
 export type SignaturesBlock_SignatureConfigFragment = {

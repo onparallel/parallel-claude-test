@@ -68,8 +68,13 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const router = useRouter();
   const toast = useToast();
   const {
-    data: { access },
+    data: {
+      access,
+      total: { totalCount: total },
+      pending: { totalCount: pending },
+    },
   } = useAssertQuery(RecipientView_accessDocument, { variables: { keycode } });
+
   const petition = access!.petition!;
   const granter = access!.granter!;
   const contact = access!.contact!;
@@ -234,6 +239,8 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
               contact={contact}
               message={message}
               recipients={recipients}
+              hasMultiplePetitions={total > 1}
+              pendingPetitions={pending}
               keycode={keycode}
               isClosed={["COMPLETED", "CLOSED"].includes(petition.status)}
             />
@@ -637,6 +644,12 @@ RecipientView.queries = [
       }
       metadata(keycode: $keycode) {
         ...RecipientView_ConnectionMetadata
+      }
+      total: accesses(keycode: $keycode) {
+        totalCount
+      }
+      pending: accesses(keycode: $keycode, status: [PENDING]) {
+        totalCount
       }
     }
     ${RecipientView.fragments.PublicPetitionAccess}

@@ -684,6 +684,11 @@ export interface NexusGenObjects {
   PublicOrganization: db.Organization;
   PublicPetition: db.Petition;
   PublicPetitionAccess: db.PetitionAccess;
+  PublicPetitionAccessPagination: {
+    // root type
+    items: NexusGenRootTypes["PublicPetitionAccess"][]; // [PublicPetitionAccess!]!
+    totalCount: number; // Int!
+  };
   PublicPetitionField: db.PetitionField;
   PublicPetitionFieldComment: db.PetitionFieldComment;
   PublicPetitionFieldReply: db.PetitionFieldReply;
@@ -1942,6 +1947,7 @@ export interface NexusGenFieldTypes {
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
     fields: NexusGenRootTypes["PublicPetitionField"][]; // [PublicPetitionField!]!
     hasRemoveParallelBranding: boolean; // Boolean!
+    hasUnreadComments: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isCompletingMessageEnabled: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
@@ -1957,9 +1963,16 @@ export interface NexusGenFieldTypes {
   PublicPetitionAccess: {
     // field return type
     contact: NexusGenRootTypes["PublicContact"] | null; // PublicContact
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
     granter: NexusGenRootTypes["PublicUser"] | null; // PublicUser
+    keycode: string; // ID!
     message: NexusGenRootTypes["PublicPetitionMessage"] | null; // PublicPetitionMessage
     petition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
+  };
+  PublicPetitionAccessPagination: {
+    // field return type
+    items: NexusGenRootTypes["PublicPetitionAccess"][]; // [PublicPetitionAccess!]!
+    totalCount: number; // Int!
   };
   PublicPetitionField: {
     // field return type
@@ -2018,6 +2031,7 @@ export interface NexusGenFieldTypes {
   PublicPetitionMessage: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
+    sentAt: NexusGenScalars["DateTime"] | null; // DateTime
     subject: string | null; // String
   };
   PublicPublicPetitionLink: {
@@ -2048,6 +2062,7 @@ export interface NexusGenFieldTypes {
   Query: {
     // field return type
     access: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
+    accesses: NexusGenRootTypes["PublicPetitionAccessPagination"]; // PublicPetitionAccessPagination!
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
     contactsByEmail: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
@@ -3646,6 +3661,7 @@ export interface NexusGenFieldTypeNames {
     deadline: "DateTime";
     fields: "PublicPetitionField";
     hasRemoveParallelBranding: "Boolean";
+    hasUnreadComments: "Boolean";
     id: "GID";
     isCompletingMessageEnabled: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
@@ -3661,9 +3677,16 @@ export interface NexusGenFieldTypeNames {
   PublicPetitionAccess: {
     // field return type name
     contact: "PublicContact";
+    createdAt: "DateTime";
     granter: "PublicUser";
+    keycode: "ID";
     message: "PublicPetitionMessage";
     petition: "PublicPetition";
+  };
+  PublicPetitionAccessPagination: {
+    // field return type name
+    items: "PublicPetitionAccess";
+    totalCount: "Int";
   };
   PublicPetitionField: {
     // field return type name
@@ -3722,6 +3745,7 @@ export interface NexusGenFieldTypeNames {
   PublicPetitionMessage: {
     // field return type name
     id: "GID";
+    sentAt: "DateTime";
     subject: "String";
   };
   PublicPublicPetitionLink: {
@@ -3752,6 +3776,7 @@ export interface NexusGenFieldTypeNames {
   Query: {
     // field return type name
     access: "PublicPetitionAccess";
+    accesses: "PublicPetitionAccessPagination";
     contact: "Contact";
     contacts: "ContactPagination";
     contactsByEmail: "Contact";
@@ -5274,6 +5299,14 @@ export interface NexusGenArgTypes {
     access: {
       // args
       keycode: string; // ID!
+    };
+    accesses: {
+      // args
+      keycode: string; // ID!
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+      search?: string | null; // String
+      status?: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
     };
     contact: {
       // args

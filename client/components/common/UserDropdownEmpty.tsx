@@ -1,6 +1,5 @@
-import { Button, Stack, Text } from "@chakra-ui/react";
+import { Button, Image, Stack, Text } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
-import { EmptySearchIcon } from "./icons/EmptySearchIcon";
 import { Link, NakedLink } from "./Link";
 
 interface UserDropdownEmptyProps {
@@ -18,7 +17,12 @@ export function UserDropdownEmpty({
     <Stack alignItems="center" textAlign="center" padding={4} spacing={4} fontSize="sm">
       {search ? (
         <>
-          <EmptySearchIcon flex={0} width="120px" />
+          <Image
+            flex={0}
+            maxWidth="120px"
+            width="100%"
+            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/search/empty-search.svg`}
+          />
           <Text as="strong">
             <FormattedMessage
               id="component.user-dropdown-empty.no-options"

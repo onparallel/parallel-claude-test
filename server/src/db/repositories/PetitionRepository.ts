@@ -2746,6 +2746,25 @@ export class PetitionRepository extends BaseRepository {
     { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]) }
   );
 
+  async contactHasUnreadCommmentsInPetition(contactId: number, petitionId: number) {
+    const [{ id: accessId }] = await this.knex
+      .from("petition_access")
+      .where("contact_id", contactId)
+      .where("petition_id", petitionId)
+      .where("status", "ACTIVE")
+      .select("id");
+
+    const [{ count }] = await this.knex
+      .from("petition_contact_notification")
+      .where("petition_id", petitionId)
+      .where("petition_access_id", accessId)
+      .where("type", "COMMENT_CREATED")
+      .where("is_read", false)
+      .select(this.count());
+
+    return count > 0;
+  }
+
   readonly loadPetitionFieldUnreadCommentCountForFieldAndUser = this.buildLoader<
     { userId: number; petitionId: number; petitionFieldId: number },
     number,

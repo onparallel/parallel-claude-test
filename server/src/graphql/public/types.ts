@@ -1,6 +1,6 @@
 import { extension } from "mime-types";
 import { arg, core, enumType, inputObjectType, objectType, unionType } from "nexus";
-import { isDefined } from "remeda";
+import { isDefined, minBy } from "remeda";
 import { PetitionAccess, PetitionMessage } from "../../db/__types";
 import { defaultBrandTheme } from "../../util/BrandTheme";
 import { fullName } from "../../util/fullName";
@@ -14,6 +14,9 @@ export const PublicPetitionAccess = objectType({
   sourceType: "db.PetitionAccess",
   description: "A public view of a petition access",
   definition(t) {
+    t.nonNull.id("keycode", {
+      resolve: (root) => root.keycode,
+    });
     t.field("petition", {
       type: "PublicPetition",
       resolve: async (root, _, ctx) => {
@@ -38,6 +41,9 @@ export const PublicPetitionAccess = objectType({
         const messages = await ctx.petitions.loadMessagesByPetitionAccessId(root.id);
         return messages?.[0] ?? null;
       },
+    });
+    t.nonNull.datetime("createdAt", {
+      resolve: (root) => root.created_at,
     });
   },
 });
@@ -218,6 +224,12 @@ export const PublicPetition = objectType({
         return null;
       },
     });
+    t.boolean("hasUnreadComments", {
+      description: "Shows if the petition has unread comments",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.contactHasUnreadCommmentsInPetition(ctx.contact!.id, root.id);
+      },
+    });
   },
 });
 
@@ -233,6 +245,18 @@ export const PublicPetitionMessage = objectType({
     t.nullable.string("subject", {
       description: "Subject of a email.",
       resolve: (m) => m.email_subject,
+    });
+    t.nullable.datetime("sentAt", {
+      description: "Date when the petition was first sent",
+      resolve: async (root, _, ctx) => {
+        const messages = await ctx.petitions.loadMessagesByPetitionId(root.id);
+        const firstMessage = minBy(
+          messages,
+          (m) => m.scheduled_at?.valueOf() ?? m.created_at.valueOf()
+        );
+
+        return firstMessage?.scheduled_at ?? firstMessage?.created_at ?? null;
+      },
     });
   },
 });
@@ -515,6 +539,12 @@ export const PublicContact = objectType({
       description: "The full name of the user.",
       resolve: (o) => fullName(o.first_name, o.last_name),
     });
+    // t.list.field("petitionsAccess", {
+    //   type: "PublicPetitionAccess",
+    //   resolve: async (root, _, ctx) => {
+    //     return await ctx.petitions.loadActiveAccessByContactId(root.id);
+    //   },
+    // });
   },
 });
 

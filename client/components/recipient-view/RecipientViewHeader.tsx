@@ -5,8 +5,10 @@ import {
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
+  Avatar,
   Box,
   Button,
+  Circle,
   Divider,
   DividerProps,
   Flex,
@@ -16,6 +18,7 @@ import {
   Img,
   Menu,
   MenuButton,
+  MenuDivider,
   MenuItem,
   MenuList,
   Portal,
@@ -25,7 +28,14 @@ import {
   useBreakpointValue,
   useToast,
 } from "@chakra-ui/react";
-import { CloudOkIcon, FilePdfIcon, MapIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
+import {
+  CloudOkIcon,
+  DownloadIcon,
+  HelpOutlineIcon,
+  HomeIcon,
+  MoreVerticalIcon,
+  TimeIcon,
+} from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Logo } from "@parallel/components/common/Logo";
 import {
@@ -33,21 +43,20 @@ import {
   RecipientViewHeader_publicDelegateAccessToContactDocument,
   RecipientViewHeader_PublicUserFragment,
   RecipientView_PublicPetitionMessageFragment,
-  Tone,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { usePublicPrintPdfTask } from "@parallel/utils/usePublicPrintPdfTask";
-import { useUserPreference } from "@parallel/utils/useUserPreference";
-import { useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ContactListPopover } from "../common/ContactListPopover";
 import { HelpPopover } from "../common/HelpPopover";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { NakedLink } from "../common/Link";
 import { SmallPopover } from "../common/SmallPopover";
 import { useTone } from "../common/ToneProvider";
 import { useDelegateAccessDialog } from "./dialogs/DelegateAccessDialog";
-import { useRecipientViewHelpDialog } from "./dialogs/RecipientViewHelpDialog";
 import { useLastSaved } from "./LastSavedProvider";
+import { useHelpModal } from "./useHelpModal";
 
 function Contact({
   contact,
@@ -79,13 +88,25 @@ interface RecipientViewHeaderProps {
   contact: RecipientViewHeader_PublicContactFragment;
   recipients: RecipientViewHeader_PublicContactFragment[];
   message: RecipientView_PublicPetitionMessageFragment | null | undefined;
+  hasMultiplePetitions: boolean;
+  pendingPetitions: number;
   keycode: string;
   isClosed: boolean;
 }
 
 export const RecipientViewHeader = Object.assign(
   chakraForwardRef<"section", RecipientViewHeaderProps>(function RecipientViewHeader(
-    { sender, contact, message, recipients, keycode, isClosed, ...props },
+    {
+      sender,
+      contact,
+      message,
+      recipients,
+      hasMultiplePetitions,
+      pendingPetitions,
+      keycode,
+      isClosed,
+      ...props
+    },
     ref
   ) {
     const intl = useIntl();
@@ -167,7 +188,7 @@ export const RecipientViewHeader = Object.assign(
             ) : (
               <Logo width="152px" height="40px" />
             )}
-            <HStack spacing={3}>
+            <HStack spacing={0} gap={3}>
               {lastSaved ? (
                 <SmallPopover
                   content={
@@ -217,43 +238,165 @@ export const RecipientViewHeader = Object.assign(
                   </HStack>
                 </SmallPopover>
               ) : null}
-
-              <Menu placement="bottom-end">
-                <Tooltip
-                  placement="bottom-end"
+              <HStack display={{ base: "none", md: "flex" }} spacing={0} gap={2}>
+                <IconButtonWithTooltip
+                  onClick={() => publicPrintPdfTask(keycode)}
+                  icon={<DownloadIcon boxSize={6} />}
                   label={intl.formatMessage({
-                    id: "generic.options",
-                    defaultMessage: "Options...",
+                    id: "recipient-view.export-to-pdf",
+                    defaultMessage: "Export to PDF",
                   })}
-                  whiteSpace="nowrap"
-                >
-                  <MenuButton
-                    as={IconButton}
-                    variant="outline"
-                    icon={<MoreVerticalIcon />}
-                    aria-label={intl.formatMessage({
+                  variant="ghost"
+                />
+                {hasMultiplePetitions ? null : (
+                  <IconButtonWithTooltip
+                    onClick={handleHelpClick}
+                    icon={<HelpOutlineIcon boxSize={6} />}
+                    label={intl.formatMessage({
+                      id: "recipient-view.guide-me",
+                      defaultMessage: "Guide me",
+                    })}
+                    variant="ghost"
+                  />
+                )}
+              </HStack>
+
+              {hasMultiplePetitions ? (
+                <Menu placement="bottom-end">
+                  <Tooltip
+                    placement="bottom"
+                    label={intl.formatMessage({
+                      id: "header.user-menu-button",
+                      defaultMessage: "User menu",
+                    })}
+                    whiteSpace="nowrap"
+                  >
+                    <MenuButton
+                      as={Button}
+                      aria-label={intl.formatMessage({
+                        id: "header.user-menu-button",
+                        defaultMessage: "User menu",
+                      })}
+                      _hover={{
+                        shadow: "long",
+                        transform: "scale(1.1)",
+                      }}
+                      _active={{
+                        shadow: "long",
+                        transform: "scale(1.1)",
+                      }}
+                      borderRadius="full"
+                      height={10}
+                      paddingLeft={0}
+                      paddingRight={0}
+                      transition="all 200ms"
+                    >
+                      <Avatar name={contact.fullName} boxSize={10} size="md" />
+                      {pendingPetitions ? (
+                        <Circle
+                          size="16px"
+                          background="yellow.500"
+                          position="absolute"
+                          top="-4px"
+                          right="-4px"
+                          border="1px solid"
+                          borderColor="white"
+                        />
+                      ) : null}
+                    </MenuButton>
+                  </Tooltip>
+                  <Portal>
+                    <MenuList minW="min-content">
+                      <HStack paddingX={3.5} paddingY={1} position="relative">
+                        <Avatar name={contact.fullName} size="sm" />
+                        <Stack spacing={0}>
+                          <Text as="div" fontWeight="semibold">
+                            {contact.fullName}
+                          </Text>
+                          <Text as="div" color="gray.600" fontSize="sm">
+                            {contact.email}
+                          </Text>
+                        </Stack>
+                      </HStack>
+
+                      <MenuDivider />
+                      <MenuItem
+                        display={{ base: "flex", md: "none" }}
+                        onClick={() => publicPrintPdfTask(keycode)}
+                        icon={<DownloadIcon display="block" boxSize={4} />}
+                      >
+                        <FormattedMessage
+                          id="recipient-view.export-to-pdf"
+                          defaultMessage="Export to PDF"
+                        />
+                      </MenuItem>
+                      <NakedLink href={`/petition/${keycode}/home`}>
+                        <MenuItem as="a" icon={<HomeIcon display="block" boxSize={4} />}>
+                          <HStack justifyContent="space-between">
+                            <Text as="span">
+                              <FormattedMessage
+                                id="recipient-view.go-to-my-processes"
+                                defaultMessage="Go to my processes"
+                              />
+                            </Text>
+
+                            {pendingPetitions ? (
+                              <HStack fontWeight={600} color="yellow.500" spacing={1}>
+                                <Text as="span">{pendingPetitions}</Text>
+                                <TimeIcon boxSize={4} color="yellow.600" />
+                              </HStack>
+                            ) : null}
+                          </HStack>
+                        </MenuItem>
+                      </NakedLink>
+                      <MenuItem
+                        onClick={handleHelpClick}
+                        icon={<HelpOutlineIcon display="block" boxSize={4} />}
+                      >
+                        <FormattedMessage id="recipient-view.guide-me" defaultMessage="Guide me" />
+                      </MenuItem>
+                    </MenuList>
+                  </Portal>
+                </Menu>
+              ) : (
+                <Menu placement="bottom-end">
+                  <Tooltip
+                    placement="bottom-end"
+                    label={intl.formatMessage({
                       id: "generic.options",
                       defaultMessage: "Options...",
                     })}
-                  />
-                </Tooltip>
-                <Portal>
-                  <MenuList minW="min-content">
-                    <MenuItem
-                      onClick={() => publicPrintPdfTask(keycode)}
-                      icon={<FilePdfIcon fontSize="md" />}
-                    >
-                      <FormattedMessage
-                        id="recipient-view.export-to-pdf"
-                        defaultMessage="Export to PDF"
-                      />
-                    </MenuItem>
-                    <MenuItem onClick={handleHelpClick} icon={<MapIcon fontSize="md" />}>
-                      <FormattedMessage id="recipient-view.guide-me" defaultMessage="Guide me" />
-                    </MenuItem>
-                  </MenuList>
-                </Portal>
-              </Menu>
+                    whiteSpace="nowrap"
+                  >
+                    <MenuButton
+                      as={IconButton}
+                      variant="outline"
+                      icon={<MoreVerticalIcon />}
+                      aria-label={intl.formatMessage({
+                        id: "generic.options",
+                        defaultMessage: "Options...",
+                      })}
+                      display={{ base: "inline-flex", md: "none" }}
+                    />
+                  </Tooltip>
+                  <Portal>
+                    <MenuList minW="min-content">
+                      <MenuItem
+                        onClick={() => publicPrintPdfTask(keycode)}
+                        icon={<DownloadIcon fontSize="md" />}
+                      >
+                        <FormattedMessage
+                          id="recipient-view.export-to-pdf"
+                          defaultMessage="Export to PDF"
+                        />
+                      </MenuItem>
+                      <MenuItem onClick={handleHelpClick} icon={<HelpOutlineIcon fontSize="md" />}>
+                        <FormattedMessage id="recipient-view.guide-me" defaultMessage="Guide me" />
+                      </MenuItem>
+                    </MenuList>
+                  </Portal>
+                </Menu>
+              )}
             </HStack>
           </Flex>
 
@@ -426,24 +569,3 @@ const _mutations = [
     }
   `,
 ];
-
-function useHelpModal({ tone }: { tone: Tone }) {
-  const [firstTime, setFirstTime] = useUserPreference("recipient-first-time-check", "");
-  const showRecipientViewHelpDialog = useRecipientViewHelpDialog();
-
-  useEffect(() => {
-    if (firstTime !== "check") showHelp();
-  }, []);
-
-  async function showHelp() {
-    try {
-      await showRecipientViewHelpDialog({ tone });
-    } catch {}
-    setFirstTime("check");
-  }
-  return async function () {
-    try {
-      await showRecipientViewHelpDialog({ tone });
-    } catch {}
-  };
-}

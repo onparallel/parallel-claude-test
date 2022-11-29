@@ -4112,6 +4112,11 @@ type PublicPetition implements Timestamps {
     @deprecated(reason: "Use PublicOrganization.hasRemoveParallelBranding")
 
   """
+  Shows if the petition has unread comments
+  """
+  hasUnreadComments: Boolean!
+
+  """
   The ID of the petition.
   """
   id: GID!
@@ -4168,9 +4173,23 @@ A public view of a petition access
 """
 type PublicPetitionAccess {
   contact: PublicContact
+  createdAt: DateTime!
   granter: PublicUser
+  keycode: ID!
   message: PublicPetitionMessage
   petition: PublicPetition!
+}
+
+type PublicPetitionAccessPagination {
+  """
+  The requested slice of items.
+  """
+  items: [PublicPetitionAccess!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
 }
 
 """
@@ -4343,6 +4362,11 @@ type PublicPetitionMessage {
   id: GID!
 
   """
+  Date when the petition was first sent
+  """
+  sentAt: DateTime
+
+  """
   Subject of a email.
   """
   subject: String
@@ -4436,6 +4460,25 @@ union PublicUserOrContact = PublicContact | PublicUser
 
 type Query {
   access(keycode: ID!): PublicPetitionAccess!
+  accesses(
+    keycode: ID!
+
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+
+    """
+    Optional text to search in the collection.
+    """
+    search: String
+    status: [PetitionStatus!]
+  ): PublicPetitionAccessPagination!
   contact(id: GID!): Contact
 
   """

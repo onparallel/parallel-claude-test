@@ -1,7 +1,7 @@
 import { addMinutes } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, indexBy, mapValues, omit, pipe, toPairs } from "remeda";
+import { groupBy, indexBy, isDefined, mapValues, omit, pipe, toPairs } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
 import { hash, random } from "../../util/token";
@@ -15,6 +15,7 @@ import {
   CreateContact,
   CreateContactAuthenticationRequest,
   PetitionAccess,
+  PetitionStatus,
   User,
 } from "../__types";
 
@@ -177,15 +178,35 @@ export class ContactRepository extends BaseRepository {
     );
   }
 
-  getPaginatedAccessesForContact(contactId: number, userId: number, opts: PageOpts) {
+  getPaginatedAccessesForContact(
+    contactId: number,
+    userId: number,
+    opts: PageOpts & {
+      search?: string | null;
+      status?: PetitionStatus[] | null;
+    }
+  ) {
     return this.getPagination<PetitionAccess>(
       this.knex
         .with("pas", (q) => {
           q.from({ pa: "petition_access" })
             .join({ pp: "petition_permission" }, "pp.petition_id", "pa.petition_id")
             .join({ p: "petition" }, "p.id", "pa.petition_id")
+            .join({ pm: "petition_message" }, "pm.petition_id", "pa.petition_id")
+            .mmodify((q) => {
+              if (isDefined(opts.status) && opts.status.length > 0) {
+                q.whereIn("p.status", opts.status);
+              }
+              if (opts.search) {
+                q.whereEscapedILike("pm.email_subject", `%${escapeLike(opts.search, "\\")}%`, "\\");
+              }
+            })
             .where("pa.contact_id", contactId)
-            .where("pp.user_id", userId)
+            .mmodify((q) => {
+              if (userId) {
+                q.where("pp.user_id", userId);
+              }
+            })
             .whereNull("pp.deleted_at")
             .whereNull("p.deleted_at")
             .distinctOn("pa.id")

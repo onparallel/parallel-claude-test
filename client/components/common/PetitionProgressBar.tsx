@@ -14,10 +14,10 @@ interface PetitionProgressBarProps {
 
 const STYLES = (() => {
   const styles = {
-    APPROVED: { backgroundColor: "green.400" },
-    REPLIED: { backgroundColor: "yellow.400" },
+    APPROVED: { backgroundColor: "green.600" },
+    REPLIED: { backgroundColor: "green.400" },
     OPTIONAL: {
-      backgroundColor: "yellow.400",
+      backgroundColor: "green.400",
       sx: generateCssStripe({ color: "gray.200", size: "1rem" }),
     },
     EMPTY: { backgroundColor: "gray.200" },

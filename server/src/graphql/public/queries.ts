@@ -1,5 +1,5 @@
 import { lookup } from "geoip-country";
-import { idArg, nonNull, nullable, objectType, queryField, stringArg } from "nexus";
+import { arg, idArg, list, nonNull, nullable, objectType, queryField, stringArg } from "nexus";
 import { isDefined } from "remeda";
 import { getClientIp } from "request-ip";
 import { UAParser } from "ua-parser-js";
@@ -22,6 +22,28 @@ export const accessQuery = queryField("access", {
   resolve: async (root, args, ctx) => {
     return ctx.access!;
   },
+});
+
+export const accessesQuery = queryField((t) => {
+  t.paginationField("accesses", {
+    type: "PublicPetitionAccess",
+    extendArgs: {
+      keycode: nonNull(idArg()),
+      status: list(nonNull(arg({ type: "PetitionStatus" }))),
+    },
+    searchable: true,
+    authorize: authenticatePublicAccess("keycode" as never),
+    resolve: async (root, { keycode, offset, limit, status, search }, ctx) => {
+      const access = await ctx.petitions.loadAccessByKeycode(keycode);
+
+      return await ctx.contacts.loadAccessesForContact(access!.contact_id!, null, {
+        search,
+        offset,
+        limit,
+        status,
+      });
+    },
+  });
 });
 
 export const metadata = queryField("metadata", {

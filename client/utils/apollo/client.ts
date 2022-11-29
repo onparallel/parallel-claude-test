@@ -123,6 +123,21 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                 }
               },
             },
+            accesses: {
+              keyArgs: ["search", "status"],
+              merge(existing, incoming, { readField, variables }) {
+                if (existing === undefined || variables?.offset === 0) {
+                  return incoming;
+                } else {
+                  return {
+                    items: uniqBy([...(existing.items ?? []), ...(incoming.items ?? [])], (obj) =>
+                      readField("id", obj)
+                    ),
+                    totalCount: incoming.totalCount,
+                  };
+                }
+              },
+            },
             petitions: {
               keyArgs: ["offset", "limit", "search", "filters", "sortBy"],
               merge: false,

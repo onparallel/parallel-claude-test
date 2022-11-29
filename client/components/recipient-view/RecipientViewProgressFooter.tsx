@@ -99,18 +99,13 @@ export const RecipientViewProgressFooter = Object.assign(
         </Heading>
         <Flex flex="1" marginX={4}>
           <ProgressTrack size="lg" min={0} max={total} value={replied} flex="1" borderRadius="1rem">
-            <ProgressIndicator
-              min={0}
-              max={total}
-              value={replied}
-              backgroundColor={isCompleted ? "green.400" : "yellow.400"}
-            />
+            <ProgressIndicator min={0} max={total} value={replied} backgroundColor="green.400" />
 
             <ProgressIndicator
               min={0}
               max={total}
               value={optional}
-              backgroundColor={isCompleted ? "green.400" : "yellow.400"}
+              backgroundColor="green.400"
               sx={generateCssStripe({
                 color: "gray.200",
                 size: "1rem",

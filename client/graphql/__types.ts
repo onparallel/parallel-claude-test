@@ -3135,6 +3135,8 @@ export interface PublicPetition extends Timestamps {
    * @deprecated Use PublicOrganization.hasRemoveParallelBranding
    */
   hasRemoveParallelBranding: Scalars["Boolean"];
+  /** Shows if the petition has unread comments */
+  hasUnreadComments: Scalars["Boolean"];
   /** The ID of the petition. */
   id: Scalars["GID"];
   /** Wether the completion message will be shown to the recipients or not. */
@@ -3165,9 +3167,19 @@ export interface PublicPetition extends Timestamps {
 export interface PublicPetitionAccess {
   __typename?: "PublicPetitionAccess";
   contact?: Maybe<PublicContact>;
+  createdAt: Scalars["DateTime"];
   granter?: Maybe<PublicUser>;
+  keycode: Scalars["ID"];
   message?: Maybe<PublicPetitionMessage>;
   petition: PublicPetition;
+}
+
+export interface PublicPetitionAccessPagination {
+  __typename?: "PublicPetitionAccessPagination";
+  /** The requested slice of items. */
+  items: Array<PublicPetitionAccess>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
 }
 
 /** A field within a petition. */
@@ -3261,6 +3273,8 @@ export interface PublicPetitionMessage {
   __typename?: "PublicPetitionMessage";
   /** The ID of the message. */
   id: Scalars["GID"];
+  /** Date when the petition was first sent */
+  sentAt?: Maybe<Scalars["DateTime"]>;
   /** Subject of a email. */
   subject?: Maybe<Scalars["String"]>;
 }
@@ -3319,6 +3333,7 @@ export type PublicUserOrContact = PublicContact | PublicUser;
 export interface Query {
   __typename?: "Query";
   access: PublicPetitionAccess;
+  accesses: PublicPetitionAccessPagination;
   contact?: Maybe<Contact>;
   /** The contacts of the user */
   contacts: ContactPagination;
@@ -3378,6 +3393,14 @@ export interface Query {
 
 export interface QueryaccessArgs {
   keycode: Scalars["ID"];
+}
+
+export interface QueryaccessesArgs {
+  keycode: Scalars["ID"];
+  limit?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+  search?: InputMaybe<Scalars["String"]>;
+  status?: InputMaybe<Array<PetitionStatus>>;
 }
 
 export interface QuerycontactArgs {
@@ -11950,6 +11973,20 @@ export type LandingTemplateCard_LandingTemplateFragment = {
   backgroundColor?: string | null;
   ownerFullName: string;
   organizationName: string;
+};
+
+export type RecipientPortalHeader_PublicContactFragment = {
+  __typename?: "PublicContact";
+  id: string;
+  fullName: string;
+  firstName: string;
+  email: string;
+};
+
+export type RecipientPortalHeader_PublicUserFragment = {
+  __typename?: "PublicUser";
+  id: string;
+  organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
 };
 
 export type RecipientViewContactlessForm_PublicOrganizationFragment = {
@@ -23676,6 +23713,274 @@ export type RecipientView_accessQuery = {
     country?: string | null;
     browserName?: string | null;
   };
+  total: { __typename?: "PublicPetitionAccessPagination"; totalCount: number };
+  pending: { __typename?: "PublicPetitionAccessPagination"; totalCount: number };
+};
+
+export type RecipientPortal_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+  id: string;
+  type: PetitionFieldType;
+  optional: boolean;
+  isInternal: boolean;
+  isReadOnly: boolean;
+  options: { [key: string]: any };
+  visibility?: { [key: string]: any } | null;
+  replies: Array<{
+    __typename?: "PublicPetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    isAnonymized: boolean;
+  }>;
+};
+
+export type RecipientPortal_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+  id: string;
+  status: PetitionStatus;
+  tone: Tone;
+  hasUnreadComments: boolean;
+  fields: Array<{
+    __typename?: "PublicPetitionField";
+    id: string;
+    type: PetitionFieldType;
+    optional: boolean;
+    isInternal: boolean;
+    isReadOnly: boolean;
+    options: { [key: string]: any };
+    visibility?: { [key: string]: any } | null;
+    replies: Array<{
+      __typename?: "PublicPetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+    }>;
+  }>;
+};
+
+export type RecipientPortal_PublicPetitionMessageFragment = {
+  __typename?: "PublicPetitionMessage";
+  id: string;
+  subject?: string | null;
+  sentAt?: string | null;
+};
+
+export type RecipientPortal_PublicUserFragment = {
+  __typename?: "PublicUser";
+  id: string;
+  fullName: string;
+  organization: {
+    __typename?: "PublicOrganization";
+    id: string;
+    name: string;
+    hasRemoveParallelBranding: boolean;
+    logoUrl?: string | null;
+    brandTheme: {
+      __typename?: "OrganizationBrandThemeData";
+      color: string;
+      fontFamily?: string | null;
+    };
+  };
+};
+
+export type RecipientPortal_PublicPetitionAccessFragment = {
+  __typename?: "PublicPetitionAccess";
+  keycode: string;
+  createdAt: string;
+  petition: {
+    __typename?: "PublicPetition";
+    id: string;
+    status: PetitionStatus;
+    tone: Tone;
+    hasUnreadComments: boolean;
+    fields: Array<{
+      __typename?: "PublicPetitionField";
+      id: string;
+      type: PetitionFieldType;
+      optional: boolean;
+      isInternal: boolean;
+      isReadOnly: boolean;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      replies: Array<{
+        __typename?: "PublicPetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        isAnonymized: boolean;
+      }>;
+    }>;
+  };
+  granter?: {
+    __typename?: "PublicUser";
+    id: string;
+    fullName: string;
+    organization: {
+      __typename?: "PublicOrganization";
+      id: string;
+      name: string;
+      hasRemoveParallelBranding: boolean;
+      logoUrl?: string | null;
+      brandTheme: {
+        __typename?: "OrganizationBrandThemeData";
+        color: string;
+        fontFamily?: string | null;
+      };
+    };
+  } | null;
+  contact?: {
+    __typename?: "PublicContact";
+    id: string;
+    fullName: string;
+    firstName: string;
+    email: string;
+  } | null;
+  message?: {
+    __typename?: "PublicPetitionMessage";
+    id: string;
+    subject?: string | null;
+    sentAt?: string | null;
+  } | null;
+};
+
+export type RecipientPortal_accessQueryVariables = Exact<{
+  keycode: Scalars["ID"];
+}>;
+
+export type RecipientPortal_accessQuery = {
+  access: {
+    __typename?: "PublicPetitionAccess";
+    keycode: string;
+    createdAt: string;
+    petition: {
+      __typename?: "PublicPetition";
+      id: string;
+      status: PetitionStatus;
+      tone: Tone;
+      hasUnreadComments: boolean;
+      fields: Array<{
+        __typename?: "PublicPetitionField";
+        id: string;
+        type: PetitionFieldType;
+        optional: boolean;
+        isInternal: boolean;
+        isReadOnly: boolean;
+        options: { [key: string]: any };
+        visibility?: { [key: string]: any } | null;
+        replies: Array<{
+          __typename?: "PublicPetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }>;
+    };
+    granter?: {
+      __typename?: "PublicUser";
+      id: string;
+      fullName: string;
+      organization: {
+        __typename?: "PublicOrganization";
+        id: string;
+        name: string;
+        hasRemoveParallelBranding: boolean;
+        logoUrl?: string | null;
+        brandTheme: {
+          __typename?: "OrganizationBrandThemeData";
+          color: string;
+          fontFamily?: string | null;
+        };
+      };
+    } | null;
+    contact?: {
+      __typename?: "PublicContact";
+      id: string;
+      fullName: string;
+      firstName: string;
+      email: string;
+    } | null;
+    message?: {
+      __typename?: "PublicPetitionMessage";
+      id: string;
+      subject?: string | null;
+      sentAt?: string | null;
+    } | null;
+  };
+};
+
+export type RecipientPortal_accessesQueryVariables = Exact<{
+  keycode: Scalars["ID"];
+  offset?: InputMaybe<Scalars["Int"]>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  search?: InputMaybe<Scalars["String"]>;
+  status?: InputMaybe<Array<PetitionStatus> | PetitionStatus>;
+}>;
+
+export type RecipientPortal_accessesQuery = {
+  accesses: {
+    __typename?: "PublicPetitionAccessPagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "PublicPetitionAccess";
+      keycode: string;
+      createdAt: string;
+      petition: {
+        __typename?: "PublicPetition";
+        id: string;
+        status: PetitionStatus;
+        tone: Tone;
+        hasUnreadComments: boolean;
+        fields: Array<{
+          __typename?: "PublicPetitionField";
+          id: string;
+          type: PetitionFieldType;
+          optional: boolean;
+          isInternal: boolean;
+          isReadOnly: boolean;
+          options: { [key: string]: any };
+          visibility?: { [key: string]: any } | null;
+          replies: Array<{
+            __typename?: "PublicPetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+          }>;
+        }>;
+      };
+      granter?: {
+        __typename?: "PublicUser";
+        id: string;
+        fullName: string;
+        organization: {
+          __typename?: "PublicOrganization";
+          id: string;
+          name: string;
+          hasRemoveParallelBranding: boolean;
+          logoUrl?: string | null;
+          brandTheme: {
+            __typename?: "OrganizationBrandThemeData";
+            color: string;
+            fontFamily?: string | null;
+          };
+        };
+      } | null;
+      contact?: {
+        __typename?: "PublicContact";
+        id: string;
+        fullName: string;
+        firstName: string;
+        email: string;
+      } | null;
+      message?: {
+        __typename?: "PublicPetitionMessage";
+        id: string;
+        subject?: string | null;
+        sentAt?: string | null;
+      } | null;
+    }>;
+  };
+  total: { __typename?: "PublicPetitionAccessPagination"; totalCount: number };
+  pending: { __typename?: "PublicPetitionAccessPagination"; totalCount: number };
+  completed: { __typename?: "PublicPetitionAccessPagination"; totalCount: number };
 };
 
 export type RecipientViewVerify_PublicAccessVerificationFragment = {
@@ -29886,6 +30191,97 @@ export const RecipientView_ConnectionMetadataFragmentDoc = gql`
     browserName
   }
 ` as unknown as DocumentNode<RecipientView_ConnectionMetadataFragment, unknown>;
+export const RecipientPortal_PublicPetitionFieldFragmentDoc = gql`
+  fragment RecipientPortal_PublicPetitionField on PublicPetitionField {
+    id
+    type
+    optional
+    isInternal
+    isReadOnly
+    replies {
+      id
+    }
+    ...useFieldVisibility_PublicPetitionField
+    ...completedFieldReplies_PublicPetitionField
+  }
+  ${useFieldVisibility_PublicPetitionFieldFragmentDoc}
+  ${completedFieldReplies_PublicPetitionFieldFragmentDoc}
+` as unknown as DocumentNode<RecipientPortal_PublicPetitionFieldFragment, unknown>;
+export const RecipientPortal_PublicPetitionFragmentDoc = gql`
+  fragment RecipientPortal_PublicPetition on PublicPetition {
+    id
+    status
+    tone
+    hasUnreadComments
+    fields {
+      ...RecipientPortal_PublicPetitionField
+    }
+  }
+  ${RecipientPortal_PublicPetitionFieldFragmentDoc}
+` as unknown as DocumentNode<RecipientPortal_PublicPetitionFragment, unknown>;
+export const RecipientPortalHeader_PublicUserFragmentDoc = gql`
+  fragment RecipientPortalHeader_PublicUser on PublicUser {
+    id
+    organization {
+      name
+      logoUrl(options: { resize: { height: 80 } })
+    }
+  }
+` as unknown as DocumentNode<RecipientPortalHeader_PublicUserFragment, unknown>;
+export const RecipientPortal_PublicUserFragmentDoc = gql`
+  fragment RecipientPortal_PublicUser on PublicUser {
+    id
+    fullName
+    ...RecipientPortalHeader_PublicUser
+    organization {
+      id
+      name
+      hasRemoveParallelBranding
+      brandTheme {
+        ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
+      }
+    }
+  }
+  ${RecipientPortalHeader_PublicUserFragmentDoc}
+  ${OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragmentDoc}
+` as unknown as DocumentNode<RecipientPortal_PublicUserFragment, unknown>;
+export const RecipientPortalHeader_PublicContactFragmentDoc = gql`
+  fragment RecipientPortalHeader_PublicContact on PublicContact {
+    id
+    fullName
+    firstName
+    email
+  }
+` as unknown as DocumentNode<RecipientPortalHeader_PublicContactFragment, unknown>;
+export const RecipientPortal_PublicPetitionMessageFragmentDoc = gql`
+  fragment RecipientPortal_PublicPetitionMessage on PublicPetitionMessage {
+    id
+    subject
+    sentAt
+  }
+` as unknown as DocumentNode<RecipientPortal_PublicPetitionMessageFragment, unknown>;
+export const RecipientPortal_PublicPetitionAccessFragmentDoc = gql`
+  fragment RecipientPortal_PublicPetitionAccess on PublicPetitionAccess {
+    keycode
+    petition {
+      ...RecipientPortal_PublicPetition
+    }
+    granter {
+      ...RecipientPortal_PublicUser
+    }
+    contact {
+      ...RecipientPortalHeader_PublicContact
+    }
+    message {
+      ...RecipientPortal_PublicPetitionMessage
+    }
+    createdAt
+  }
+  ${RecipientPortal_PublicPetitionFragmentDoc}
+  ${RecipientPortal_PublicUserFragmentDoc}
+  ${RecipientPortalHeader_PublicContactFragmentDoc}
+  ${RecipientPortal_PublicPetitionMessageFragmentDoc}
+` as unknown as DocumentNode<RecipientPortal_PublicPetitionAccessFragment, unknown>;
 export const RecipientViewContactlessForm_PublicOrganizationFragmentDoc = gql`
   fragment RecipientViewContactlessForm_PublicOrganization on PublicOrganization {
     name
@@ -33495,10 +33891,50 @@ export const RecipientView_accessDocument = gql`
     metadata(keycode: $keycode) {
       ...RecipientView_ConnectionMetadata
     }
+    total: accesses(keycode: $keycode) {
+      totalCount
+    }
+    pending: accesses(keycode: $keycode, status: [PENDING]) {
+      totalCount
+    }
   }
   ${RecipientView_PublicPetitionAccessFragmentDoc}
   ${RecipientView_ConnectionMetadataFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_accessQuery, RecipientView_accessQueryVariables>;
+export const RecipientPortal_accessDocument = gql`
+  query RecipientPortal_access($keycode: ID!) {
+    access(keycode: $keycode) {
+      ...RecipientPortal_PublicPetitionAccess
+    }
+  }
+  ${RecipientPortal_PublicPetitionAccessFragmentDoc}
+` as unknown as DocumentNode<RecipientPortal_accessQuery, RecipientPortal_accessQueryVariables>;
+export const RecipientPortal_accessesDocument = gql`
+  query RecipientPortal_accesses(
+    $keycode: ID!
+    $offset: Int
+    $limit: Int
+    $search: String
+    $status: [PetitionStatus!]
+  ) {
+    accesses(keycode: $keycode, offset: $offset, limit: $limit, search: $search, status: $status) {
+      totalCount
+      items {
+        ...RecipientPortal_PublicPetitionAccess
+      }
+    }
+    total: accesses(keycode: $keycode, search: $search) {
+      totalCount
+    }
+    pending: accesses(keycode: $keycode, search: $search, status: [PENDING]) {
+      totalCount
+    }
+    completed: accesses(keycode: $keycode, search: $search, status: [COMPLETED, CLOSED]) {
+      totalCount
+    }
+  }
+  ${RecipientPortal_PublicPetitionAccessFragmentDoc}
+` as unknown as DocumentNode<RecipientPortal_accessesQuery, RecipientPortal_accessesQueryVariables>;
 export const RecipientViewVerify_verifyPublicAccessDocument = gql`
   mutation RecipientViewVerify_verifyPublicAccess(
     $token: ID!

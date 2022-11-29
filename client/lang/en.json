@@ -4190,6 +4190,46 @@
     "context": "No options"
   },
   {
+    "term": "component.recipient-portal-header.hello-name",
+    "definition": "Hello, {name}!",
+    "context": "Hello, {name}!"
+  },
+  {
+    "term": "component.recipient-portal-petition-status-filter.all",
+    "definition": "All",
+    "context": "All"
+  },
+  {
+    "term": "component.recipient-portal-petition-status-filter.all-processes",
+    "definition": "All processes",
+    "context": "All processes"
+  },
+  {
+    "term": "component.recipient-portal-petition-status-filter.completed",
+    "definition": "Completed",
+    "context": "Completed"
+  },
+  {
+    "term": "component.recipient-portal-petition-status-filter.completed-processes",
+    "definition": "Completed processes",
+    "context": "Completed processes"
+  },
+  {
+    "term": "component.recipient-portal-petition-status-filter.pending",
+    "definition": "Pending",
+    "context": "Pending"
+  },
+  {
+    "term": "component.recipient-portal-petition-status-filter.pending-processes",
+    "definition": "Pending processes",
+    "context": "Pending processes"
+  },
+  {
+    "term": "component.recipient-portal-petitions.no-results",
+    "definition": "No results found for your search",
+    "context": "No results found for your search"
+  },
+  {
     "term": "component.recipient-select-groups.add-recipient-group",
     "definition": "Add recipient group",
     "context": "Add recipient group"
@@ -4463,6 +4503,11 @@
     "term": "component.recipient-view-petition-field-tax-documents.start-button",
     "definition": "Start",
     "context": "Start"
+  },
+  {
+    "term": "component.recipient-view-portal-petition.requested-by",
+    "definition": "Requested by {name}, on {date}",
+    "context": "Requested by {name}, on {date}"
   },
   {
     "term": "component.recipient-view.confirm-petition-signers-dialog.add-signer.button",
@@ -9345,6 +9390,11 @@
     "context": "Try for free"
   },
   {
+    "term": "recipient-view-portal.my-processes",
+    "definition": "My processes",
+    "context": "My processes"
+  },
+  {
     "term": "recipient-view.cant-find-email-help",
     "definition": "<b>Can't find our email?</b> Check your spam folder and if it's not there, contact the person who shared the link with you.",
     "context": "<b>Can't find our email?</b> Check your spam folder and if it's not there, contact the person who shared the link with you."
@@ -9453,6 +9503,11 @@
     "term": "recipient-view.first-time.send-doubts-title",
     "definition": "Send your questions",
     "context": "Send your questions"
+  },
+  {
+    "term": "recipient-view.go-to-my-processes",
+    "definition": "Go to my processes",
+    "context": "Go to my processes"
   },
   {
     "term": "recipient-view.guide-me",

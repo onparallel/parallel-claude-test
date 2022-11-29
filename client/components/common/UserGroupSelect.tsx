@@ -1,5 +1,5 @@
 import { gql, useApolloClient } from "@apollo/client";
-import { Stack, Text } from "@chakra-ui/react";
+import { Stack, Text, Image } from "@chakra-ui/react";
 import {
   UserSelect_UserGroupFragment,
   useSearchUserGroups_searchUserGroupsDocument,
@@ -7,7 +7,6 @@ import {
 import { genericRsComponent } from "@parallel/utils/react-select/hooks";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { EmptySearchIcon } from "./icons/EmptySearchIcon";
 import { UserSelect, UserSelectProps } from "./UserSelect";
 
 interface UserGroupSelectProps<IsMulti extends boolean>
@@ -43,7 +42,12 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
     <Stack alignItems="center" textAlign="center" padding={4} spacing={4}>
       {search ? (
         <>
-          <EmptySearchIcon width="166px" height="77px" />
+          <Image
+            maxWidth="166px"
+            height="77px"
+            width="100%"
+            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/search/empty-search.svg`}
+          />
           <Text as="strong">
             <FormattedMessage
               id="component.user-group-select.no-options"
