@@ -31,6 +31,8 @@ async function main() {
       }))
     );
   });
+  await db.destroy();
+  console.log("DONE!");
 }
 
 main().then();
