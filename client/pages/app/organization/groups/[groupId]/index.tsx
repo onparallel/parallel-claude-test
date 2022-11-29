@@ -37,7 +37,6 @@ import {
   OrganizationGroup_UserGroupMemberFragment,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
-import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { withError } from "@parallel/utils/promises/withError";
@@ -78,13 +77,15 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     data: { me, realMe },
   } = useAssertQuery(OrganizationGroup_userDocument);
 
-  const { data, loading, refetch } = useQueryOrPreviousData(OrganizationGroup_userGroupDocument, {
+  const {
+    data: { userGroup },
+    loading,
+    refetch,
+  } = useAssertQuery(OrganizationGroup_userGroupDocument, {
     variables: {
       id: groupId,
     },
-    fetchPolicy: "cache-and-network",
   });
-  const userGroup = data?.userGroup;
 
   const canEdit = isAdmin(me.role);
 
@@ -473,7 +474,7 @@ function EditableHeading({ isDisabled, value, onChange }: EditableHeadingProps) 
   );
 }
 
-OrganizationGroup.fragments = {
+const _fragments = {
   get UserGroup() {
     return gql`
       fragment OrganizationGroup_UserGroup on UserGroup {
@@ -502,14 +503,14 @@ OrganizationGroup.fragments = {
   },
 };
 
-OrganizationGroup.mutations = [
+const _mutations = [
   gql`
     mutation OrganizationGroup_updateUserGroup($id: GID!, $data: UpdateUserGroupInput!) {
       updateUserGroup(id: $id, data: $data) {
         ...OrganizationGroup_UserGroup
       }
     }
-    ${OrganizationGroup.fragments.UserGroup}
+    ${_fragments.UserGroup}
   `,
   gql`
     mutation OrganizationGroup_addUsersToUserGroup($userGroupId: GID!, $userIds: [GID!]!) {
@@ -517,7 +518,7 @@ OrganizationGroup.mutations = [
         ...OrganizationGroup_UserGroup
       }
     }
-    ${OrganizationGroup.fragments.UserGroup}
+    ${_fragments.UserGroup}
   `,
   gql`
     mutation OrganizationGroup_removeUsersFromGroup($userGroupId: GID!, $userIds: [GID!]!) {
@@ -525,7 +526,7 @@ OrganizationGroup.mutations = [
         ...OrganizationGroup_UserGroup
       }
     }
-    ${OrganizationGroup.fragments.UserGroup}
+    ${_fragments.UserGroup}
   `,
   gql`
     mutation OrganizationGroup_deleteUserGroup($ids: [GID!]!) {
@@ -538,18 +539,18 @@ OrganizationGroup.mutations = [
         ...OrganizationGroup_UserGroup
       }
     }
-    ${OrganizationGroup.fragments.UserGroup}
+    ${_fragments.UserGroup}
   `,
 ];
 
-OrganizationGroup.queries = [
+const _queries = [
   gql`
     query OrganizationGroup_userGroup($id: GID!) {
       userGroup(id: $id) {
         ...OrganizationGroup_UserGroup
       }
     }
-    ${OrganizationGroup.fragments.UserGroup}
+    ${_fragments.UserGroup}
   `,
   gql`
     query OrganizationGroup_user {
@@ -561,7 +562,10 @@ OrganizationGroup.queries = [
 
 OrganizationGroup.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const groupId = query.groupId as string;
-  fetchQuery(OrganizationGroup_userDocument);
+  await Promise.all([
+    fetchQuery(OrganizationGroup_userGroupDocument, { variables: { id: groupId } }),
+    fetchQuery(OrganizationGroup_userDocument),
+  ]);
   return { groupId };
 };
 
