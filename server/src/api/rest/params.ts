@@ -4,7 +4,7 @@ import { RestParameter } from "./core";
 import { JsonSchema } from "./schemas";
 
 export class ParseError extends Error {
-  constructor(public readonly value: string | undefined, message: string) {
+  constructor(public readonly value: string | string[] | undefined, message: string) {
     super(message);
   }
 }
@@ -68,7 +68,7 @@ export function buildParse<
   options: ParameterOptions<T, TRequired, TArray, TDefaultValue>,
   parser: (value: string) => MaybePromise<T>
 ): ParameterParser<T, TRequired, TArray, TDefaultValue> {
-  return async function (value?: string) {
+  return async function (value: string | string[] | undefined) {
     const { required = true, array = false, defaultValue } = options;
     if (value === undefined) {
       if (required) {
@@ -81,12 +81,15 @@ export function buildParse<
           return [];
         } else {
           return await Promise.all(
-            value.split(/(?<!\\),/).map(async (part) => {
+            (Array.isArray(value) ? value : value.split(/(?<!\\),/)).map(async (part) => {
               return await parser(part.replace(/\\,/g, ","));
             })
           );
         }
       } else {
+        if (Array.isArray(value)) {
+          throw new ParseError(value, "Parameter is an array but an array was not expected");
+        }
         return await parser(value);
       }
     }

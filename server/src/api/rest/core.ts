@@ -19,7 +19,7 @@ export type RestParameters<T> = {
 };
 
 export interface RestParameter<T> {
-  parse(value?: string): MaybePromise<T>;
+  parse(value?: string | string[]): MaybePromise<T>;
   spec: OpenAPIV3.ParameterBaseObject;
 }
 
@@ -196,10 +196,10 @@ const _PathResolver: any = (function () {
             context.params = await pProps(
               this.pathOptions?.params ?? ({} as RestParameters<any>),
               async (param, name) => {
-                const value = req.params[name as keyof typeof req.params] as string;
+                const value = req.params[name as string];
                 try {
                   return await param.parse(value);
-                } catch (e: any) {
+                } catch (e) {
                   if (e instanceof ParseError) {
                     throw new InvalidParameterError(name as string, value, "path", e.message);
                   }
@@ -211,21 +211,26 @@ const _PathResolver: any = (function () {
               operationOptions.query ?? ({} as RestParameters<any>),
               async (param, name) => {
                 const value = req.query[name as string];
-                if (value !== undefined && typeof value !== "string") {
+                if (
+                  value === undefined ||
+                  typeof value === "string" ||
+                  (Array.isArray(value) && typeof value[0] === "string")
+                ) {
+                  try {
+                    return await param.parse(value as string | string[] | undefined);
+                  } catch (e) {
+                    if (e instanceof ParseError) {
+                      throw new InvalidParameterError(name as string, value, "query", e.message);
+                    }
+                    throw e;
+                  }
+                } else {
                   throw new InvalidParameterError(
                     name as string,
                     value,
                     "query",
-                    "Array or Object params are not supported"
+                    "Object or nested array params are not supported"
                   );
-                }
-                try {
-                  return await param.parse(value);
-                } catch (e: any) {
-                  if (e instanceof ParseError) {
-                    throw new InvalidParameterError(name as string, value, "query", e.message);
-                  }
-                  throw e;
                 }
               }
             );
