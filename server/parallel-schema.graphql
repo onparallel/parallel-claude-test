@@ -943,6 +943,16 @@ type Mutation {
     sharePetition: Boolean
 
     """
+    Permission to assign to the mentioned users if sharePetition=true
+    """
+    sharePetitionPermission: PetitionPermissionTypeRW
+
+    """
+    Wether to subscribe or not to notifications the mentioned users if sharePetition=true
+    """
+    sharePetitionSubscribed: Boolean
+
+    """
     Throw error if set to true and a user with no permissions is mentioned
     """
     throwOnNoPermission: Boolean
@@ -1780,6 +1790,16 @@ type Mutation {
     Automatically share the petition with mentioned users that have no permissions
     """
     sharePetition: Boolean
+
+    """
+    Permission to assign to the mentioned users if sharePetition=true
+    """
+    sharePetitionPermission: PetitionPermissionTypeRW
+
+    """
+    Wether to subscribe or not to notifications the mentioned users if sharePetition=true
+    """
+    sharePetitionSubscribed: Boolean
 
     """
     Throw error if set to true and a user with no permissions is mentioned

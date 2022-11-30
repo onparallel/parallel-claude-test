@@ -4473,6 +4473,8 @@ export interface NexusGenArgTypes {
       petitionFieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
       sharePetition?: boolean | null; // Boolean
+      sharePetitionPermission?: NexusGenEnums["PetitionPermissionTypeRW"] | null; // PetitionPermissionTypeRW
+      sharePetitionSubscribed?: boolean | null; // Boolean
       throwOnNoPermission?: boolean | null; // Boolean
     };
     createPetitionFieldReply: {
@@ -5065,6 +5067,8 @@ export interface NexusGenArgTypes {
       petitionFieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
       sharePetition?: boolean | null; // Boolean
+      sharePetitionPermission?: NexusGenEnums["PetitionPermissionTypeRW"] | null; // PetitionPermissionTypeRW
+      sharePetitionSubscribed?: boolean | null; // Boolean
       throwOnNoPermission?: boolean | null; // Boolean
     };
     updatePetitionFieldRepliesStatus: {

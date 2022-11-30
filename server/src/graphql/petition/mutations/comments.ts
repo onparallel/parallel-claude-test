@@ -1,5 +1,5 @@
 import { ApolloError } from "apollo-server-core";
-import { booleanArg, mutationField, nonNull } from "nexus";
+import { arg, booleanArg, mutationField, nonNull } from "nexus";
 import { getMentions } from "../../../util/slate";
 import { and, authenticateAnd, ifArgEquals } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -29,6 +29,11 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
       ),
       userHasAccessToPetitions("petitionId")
     ),
+    ifArgEquals(
+      "sharePetitionPermission",
+      "WRITE",
+      userHasAccessToPetitions("petitionId", ["OWNER"])
+    ),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     petitionIsNotAnonymized("petitionId"),
     validPetitionFieldCommentContent("content", "petitionFieldId", true)
@@ -44,6 +49,14 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
     throwOnNoPermission: booleanArg({
       description: "Throw error if set to true and a user with no permissions is mentioned",
     }),
+    sharePetitionPermission: arg({
+      type: "PetitionPermissionTypeRW",
+      description: "Permission to assign to the mentioned users if sharePetition=true",
+    }),
+    sharePetitionSubscribed: booleanArg({
+      description:
+        "Wether to subscribe or not to notifications the mentioned users if sharePetition=true",
+    }),
   },
   resolve: async (_, args, ctx) => {
     try {
@@ -51,8 +64,13 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
         getMentions(args.content),
         args.petitionId,
         args.throwOnNoPermission ?? true,
-        args.sharePetition ?? false,
-        ctx.user!.id
+        ctx.user!.id,
+        args.sharePetition
+          ? {
+              isSubscribed: args.sharePetitionSubscribed ?? false,
+              permissionType: args.sharePetitionPermission ?? "READ",
+            }
+          : undefined
       );
 
       ctx.petitions.loadPetitionFieldCommentsForField.dataloader.clear({
@@ -113,7 +131,12 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
   description: "Update a petition field comment.",
   type: "PetitionFieldComment",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    ifArgEquals(
+      "sharePetitionPermission",
+      "WRITE",
+      userHasAccessToPetitions("petitionId", ["OWNER"]),
+      userHasAccessToPetitions("petitionId")
+    ),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
     userIsOwnerOfPetitionFieldComment("petitionFieldCommentId"),
@@ -131,6 +154,14 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
     throwOnNoPermission: booleanArg({
       description: "Throw error if set to true and a user with no permissions is mentioned",
     }),
+    sharePetitionPermission: arg({
+      type: "PetitionPermissionTypeRW",
+      description: "Permission to assign to the mentioned users if sharePetition=true",
+    }),
+    sharePetitionSubscribed: booleanArg({
+      description:
+        "Wether to subscribe or not to notifications the mentioned users if sharePetition=true",
+    }),
   },
   resolve: async (_, args, ctx) => {
     try {
@@ -138,8 +169,13 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
         getMentions(args.content),
         args.petitionId,
         args.throwOnNoPermission ?? true,
-        args.sharePetition ?? false,
-        ctx.user!.id
+        ctx.user!.id,
+        args.sharePetition
+          ? {
+              isSubscribed: args.sharePetitionSubscribed ?? false,
+              permissionType: args.sharePetitionPermission ?? "READ",
+            }
+          : undefined
       );
 
       return await ctx.petitions.updatePetitionFieldCommentFromUser(

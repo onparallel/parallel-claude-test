@@ -5317,8 +5317,8 @@ export class PetitionRepository extends BaseRepository {
     mentions: ReturnType<typeof getMentions>,
     petitionId: number,
     throwOnNoPermission: boolean,
-    sharePetition: boolean,
-    userId: number
+    userId: number,
+    sharePetition?: { permissionType: PetitionPermissionType; isSubscribed: boolean }
   ) {
     if (mentions.length === 0) {
       return;
@@ -5354,21 +5354,21 @@ export class PetitionRepository extends BaseRepository {
             ...userGroupIdsWithNoPermissions.map((id) => toGlobalId("UserGroup", id)),
           ],
         };
-      } else if (sharePetition) {
+      } else if (isDefined(sharePetition)) {
         await this.addPetitionPermissions(
           [petitionId],
           [
             ...userIdsWithNoPermissions.map((userId) => ({
               type: "User" as const,
               id: userId,
-              isSubscribed: false,
-              permissionType: "READ" as const,
+              isSubscribed: sharePetition.isSubscribed,
+              permissionType: sharePetition.permissionType,
             })),
             ...userGroupIdsWithNoPermissions.map((groupId) => ({
               type: "UserGroup" as const,
               id: groupId,
-              isSubscribed: false,
-              permissionType: "READ" as const,
+              isSubscribed: sharePetition.isSubscribed,
+              permissionType: sharePetition.permissionType,
             })),
           ],
           "User",
