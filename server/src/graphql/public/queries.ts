@@ -33,7 +33,7 @@ export const accessesQuery = queryField((t) => {
     },
     searchable: true,
     authorize: authenticatePublicAccess("keycode" as never),
-    resolve: async (root, { keycode, offset, limit, status, search }, ctx) => {
+    resolve: async (root, { offset, limit, status, search }, ctx) => {
       return await ctx.contacts.loadAccessesForContact(ctx.access!.contact_id!, null, {
         search,
         offset,
