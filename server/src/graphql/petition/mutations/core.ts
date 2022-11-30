@@ -645,7 +645,6 @@ export const updatePetition = mutationField("updatePetition", {
         args.data.anonymizeAfterMonths,
         args.data.anonymizePurpose,
         args.data.defaultPath,
-        args.data.signatureConfig,
       ],
       petitionsAreEditable("petitionId")
     ),

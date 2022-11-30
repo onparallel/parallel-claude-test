@@ -20843,13 +20843,13 @@ export type PetitionReplies_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   isAnonymized: boolean;
-  isRestricted: boolean;
   name?: string | null;
   status: PetitionStatus;
   closingEmailBody?: any | null;
   path: string;
   locale: PetitionLocale;
   deadline?: string | null;
+  isRestricted: boolean;
   updatedAt: string;
   accesses: Array<{
     __typename?: "PetitionAccess";
@@ -21282,13 +21282,13 @@ export type PetitionReplies_closePetitionMutation = {
     __typename?: "Petition";
     id: string;
     isAnonymized: boolean;
-    isRestricted: boolean;
     name?: string | null;
     status: PetitionStatus;
     closingEmailBody?: any | null;
     path: string;
     locale: PetitionLocale;
     deadline?: string | null;
+    isRestricted: boolean;
     updatedAt: string;
     accesses: Array<{
       __typename?: "PetitionAccess";
@@ -21520,13 +21520,13 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
     __typename?: "Petition";
     id: string;
     isAnonymized: boolean;
-    isRestricted: boolean;
     name?: string | null;
     status: PetitionStatus;
     closingEmailBody?: any | null;
     path: string;
     locale: PetitionLocale;
     deadline?: string | null;
+    isRestricted: boolean;
     updatedAt: string;
     accesses: Array<{
       __typename?: "PetitionAccess";
@@ -21863,13 +21863,13 @@ export type PetitionReplies_petitionQuery = {
         __typename?: "Petition";
         id: string;
         isAnonymized: boolean;
-        isRestricted: boolean;
         name?: string | null;
         status: PetitionStatus;
         closingEmailBody?: any | null;
         path: string;
         locale: PetitionLocale;
         deadline?: string | null;
+        isRestricted: boolean;
         updatedAt: string;
         accesses: Array<{
           __typename?: "PetitionAccess";
@@ -29276,7 +29276,6 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
       permissionType
     }
     isAnonymized
-    isRestricted
     ...PetitionSignaturesCard_Petition
     ...getPetitionSignatureStatus_Petition
     ...getPetitionSignatureEnvironment_Petition
