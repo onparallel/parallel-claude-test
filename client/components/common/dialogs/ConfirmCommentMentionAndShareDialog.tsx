@@ -1,29 +1,78 @@
-import { Button, ListItem, Stack, Text, UnorderedList } from "@chakra-ui/react";
+import { gql, useFragment_experimental } from "@apollo/client";
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormLabel,
+  HStack,
+  ListItem,
+  Stack,
+  Text,
+  UnorderedList,
+} from "@chakra-ui/react";
 import { UserGroupReference } from "@parallel/components/petition-activity/UserGroupReference";
 import { UserReference } from "@parallel/components/petition-activity/UserReference";
-import { usePetitionCommentsMutations_getUsersOrGroupsQuery } from "@parallel/graphql/__types";
+import { PetitionPermissionTypeSelect } from "@parallel/components/petition-common/PetitionPermissionTypeSelect";
+import {
+  ConfirmCommentMentionAndShareDialog_PetitionFragmentDoc,
+  PetitionPermissionTypeRW,
+  usePetitionCommentsMutations_getUsersOrGroupsQuery,
+} from "@parallel/graphql/__types";
 import { partitionOnTypename } from "@parallel/utils/apollo/typename";
 import { Maybe } from "@parallel/utils/types";
+import { useRef } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
 
 interface ConfirmCommentMentionAndShareDialogProps {
+  petitionId: string;
   usersAndGroups: usePetitionCommentsMutations_getUsersOrGroupsQuery["getUsersOrGroups"];
-  isNote?: Maybe<boolean>;
+  isInternal?: Maybe<boolean>;
 }
 
+type ConfirmCommentMentionAndShareDialogResult =
+  | {
+      sharePetition: false;
+    }
+  | {
+      sharePetition: true;
+      sharePetitionPermission: PetitionPermissionTypeRW;
+      sharePetitionSubscribed: boolean;
+    };
+
 function ConfirmCommentMentionAndShareDialog({
+  petitionId,
   usersAndGroups,
-  isNote,
+  isInternal,
   ...props
-}: DialogProps<ConfirmCommentMentionAndShareDialogProps, boolean>) {
+}: DialogProps<
+  ConfirmCommentMentionAndShareDialogProps,
+  ConfirmCommentMentionAndShareDialogResult
+>) {
+  const confirmRef = useRef<HTMLButtonElement>(null);
+  const { data } = useFragment_experimental({
+    fragment: ConfirmCommentMentionAndShareDialog_PetitionFragmentDoc,
+    from: {
+      __typename: "Petition",
+      id: petitionId,
+    },
+  });
+  const { permissionType, isSubscribed } = data!.myEffectivePermission!;
+  const { control, register, handleSubmit } = useForm({
+    defaultValues: {
+      sharePetitionPermission: permissionType === "OWNER" ? "WRITE" : permissionType,
+      sharePetitionSubscribed: isSubscribed,
+    },
+  });
   const intl = useIntl();
   const [users, groups] = partitionOnTypename(usersAndGroups, "User");
   return (
     <ConfirmDialog
       {...props}
+      initialFocusRef={confirmRef}
       closeOnOverlayClick={false}
       closeOnEsc={false}
       header={
@@ -38,7 +87,7 @@ function ConfirmCommentMentionAndShareDialog({
             id="component.confirm-comment-mention-and-share-dialog.body"
             defaultMessage="The following {entries} won't be able to see your {isNote, select, true{note} other{comment}} because the parallel is not shared with them:"
             values={{
-              isNote,
+              isNote: isInternal,
               entries: intl.formatList(
                 [
                   users.length > 0
@@ -74,27 +123,78 @@ function ConfirmCommentMentionAndShareDialog({
               defaultMessage="Do you want to share the parallel with them so the message can be read?"
             />
           </Text>
+
+          {["OWNER", "WRITE"].includes(permissionType) ? (
+            <FormControl as={HStack}>
+              <FormLabel margin={0} fontWeight="normal" flex={1}>
+                <FormattedMessage
+                  id="component.confirm-comment-mention-and-share-dialog.body-share-as"
+                  defaultMessage="Share parallel as:"
+                />
+              </FormLabel>
+              <Controller
+                name="sharePetitionPermission"
+                control={control}
+                render={({ field }) => (
+                  <PetitionPermissionTypeSelect {...field} hideOwner isSearchable={false} />
+                )}
+              />
+            </FormControl>
+          ) : null}
+
+          <FormControl>
+            <Checkbox {...register("sharePetitionSubscribed")} colorScheme="primary" defaultChecked>
+              <FormattedMessage
+                id="component.confirm-comment-mention-and-share-dialog.body-subscribe-to-notifications"
+                defaultMessage="Subscribe to notifications"
+              />
+            </Checkbox>
+          </FormControl>
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" onClick={() => props.onResolve(true)}>
+        <Button
+          ref={confirmRef}
+          colorScheme="primary"
+          onClick={handleSubmit((data) => {
+            props.onResolve({
+              sharePetition: true,
+              ...data,
+            });
+          })}
+        >
           <FormattedMessage
             id="component.confirm-comment-mention-and-share-dialog.confirm"
-            defaultMessage="Yes, share parallel"
+            defaultMessage="Share and continue"
           />
         </Button>
       }
       cancel={
-        <Button onClick={() => props.onResolve(false)}>
+        <Button
+          onClick={handleSubmit(() => {
+            props.onResolve({ sharePetition: false });
+          })}
+        >
           <FormattedMessage
             id="component.confirm-comment-mention-and-share-dialog.cancel"
-            defaultMessage="No, continue without sharing"
+            defaultMessage="Continue without sharing"
           />
         </Button>
       }
     />
   );
 }
+
+ConfirmCommentMentionAndShareDialog.fragments = {
+  Petition: gql`
+    fragment ConfirmCommentMentionAndShareDialog_Petition on Petition {
+      myEffectivePermission {
+        permissionType
+        isSubscribed
+      }
+    }
+  `,
+};
 
 export function useConfirmCommentMentionAndShareDialog() {
   return useDialog(ConfirmCommentMentionAndShareDialog);

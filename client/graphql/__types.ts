@@ -1108,6 +1108,8 @@ export interface MutationcreatePetitionFieldCommentArgs {
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
   sharePetition?: InputMaybe<Scalars["Boolean"]>;
+  sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
+  sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]>;
   throwOnNoPermission?: InputMaybe<Scalars["Boolean"]>;
 }
 
@@ -1700,6 +1702,8 @@ export interface MutationupdatePetitionFieldCommentArgs {
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
   sharePetition?: InputMaybe<Scalars["Boolean"]>;
+  sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
+  sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]>;
   throwOnNoPermission?: InputMaybe<Scalars["Boolean"]>;
 }
 
@@ -4790,6 +4794,15 @@ export type UserSelectOption_UserGroupFragment = {
   id: string;
   name: string;
   memberCount: number;
+};
+
+export type ConfirmCommentMentionAndShareDialog_PetitionFragment = {
+  __typename?: "Petition";
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+    isSubscribed: boolean;
+  } | null;
 };
 
 export type FieldErrorDialog_PetitionFieldFragment = {
@@ -24334,6 +24347,8 @@ export type usePetitionCommentsMutations_createPetitionFieldCommentMutationVaria
   content: Scalars["JSON"];
   isInternal?: InputMaybe<Scalars["Boolean"]>;
   sharePetition?: InputMaybe<Scalars["Boolean"]>;
+  sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
+  sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]>;
   throwOnNoPermission?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
@@ -24401,6 +24416,8 @@ export type usePetitionCommentsMutations_updatePetitionFieldCommentMutationVaria
   petitionFieldCommentId: Scalars["GID"];
   content: Scalars["JSON"];
   sharePetition?: InputMaybe<Scalars["Boolean"]>;
+  sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
+  sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]>;
   throwOnNoPermission?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
@@ -25514,6 +25531,14 @@ export const UserListPopover_UserGroupFragmentDoc = gql`
     initials
   }
 ` as unknown as DocumentNode<UserListPopover_UserGroupFragment, unknown>;
+export const ConfirmCommentMentionAndShareDialog_PetitionFragmentDoc = gql`
+  fragment ConfirmCommentMentionAndShareDialog_Petition on Petition {
+    myEffectivePermission {
+      permissionType
+      isSubscribed
+    }
+  }
+` as unknown as DocumentNode<ConfirmCommentMentionAndShareDialog_PetitionFragment, unknown>;
 export const Tag_TagFragmentDoc = gql`
   fragment Tag_Tag on Tag {
     name
@@ -33822,6 +33847,8 @@ export const usePetitionCommentsMutations_createPetitionFieldCommentDocument = g
     $content: JSON!
     $isInternal: Boolean
     $sharePetition: Boolean
+    $sharePetitionPermission: PetitionPermissionTypeRW
+    $sharePetitionSubscribed: Boolean
     $throwOnNoPermission: Boolean
   ) {
     createPetitionFieldComment(
@@ -33830,6 +33857,8 @@ export const usePetitionCommentsMutations_createPetitionFieldCommentDocument = g
       content: $content
       isInternal: $isInternal
       sharePetition: $sharePetition
+      sharePetitionPermission: $sharePetitionPermission
+      sharePetitionSubscribed: $sharePetitionSubscribed
       throwOnNoPermission: $throwOnNoPermission
     ) {
       ...usePetitionCommentsMutations_PetitionFieldComment
@@ -33851,6 +33880,8 @@ export const usePetitionCommentsMutations_updatePetitionFieldCommentDocument = g
     $petitionFieldCommentId: GID!
     $content: JSON!
     $sharePetition: Boolean
+    $sharePetitionPermission: PetitionPermissionTypeRW
+    $sharePetitionSubscribed: Boolean
     $throwOnNoPermission: Boolean
   ) {
     updatePetitionFieldComment(
@@ -33859,6 +33890,8 @@ export const usePetitionCommentsMutations_updatePetitionFieldCommentDocument = g
       petitionFieldCommentId: $petitionFieldCommentId
       content: $content
       sharePetition: $sharePetition
+      sharePetitionPermission: $sharePetitionPermission
+      sharePetitionSubscribed: $sharePetitionSubscribed
       throwOnNoPermission: $throwOnNoPermission
     ) {
       ...usePetitionCommentsMutations_PetitionFieldComment

@@ -420,14 +420,24 @@
     "context": "Do you want to share the parallel with them so the message can be read?"
   },
   {
+    "term": "component.confirm-comment-mention-and-share-dialog.body-share-as",
+    "definition": "Compartir parallel como:",
+    "context": "Share parallel as:"
+  },
+  {
+    "term": "component.confirm-comment-mention-and-share-dialog.body-subscribe-to-notifications",
+    "definition": "Subscribir a las notificaciones",
+    "context": "Subscribe to notifications"
+  },
+  {
     "term": "component.confirm-comment-mention-and-share-dialog.cancel",
-    "definition": "No, continuar sin compartir",
-    "context": "No, continue without sharing"
+    "definition": "Continuar sin compartir",
+    "context": "Continue without sharing"
   },
   {
     "term": "component.confirm-comment-mention-and-share-dialog.confirm",
-    "definition": "Si, compartir parallel",
-    "context": "Yes, share parallel"
+    "definition": "Compartir y continuar",
+    "context": "Share and continue"
   },
   {
     "term": "component.confirm-comment-mention-and-share-dialog.header",

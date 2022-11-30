@@ -131,7 +131,7 @@ export function PreviewPetitionFieldCommentsDialog({
         petitionFieldId: field.id,
         petitionFieldCommentId: commentId,
         content,
-        isNote,
+        isInternal: isNote,
       });
     } catch {}
   }

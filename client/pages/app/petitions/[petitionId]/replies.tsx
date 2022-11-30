@@ -257,7 +257,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       petitionFieldId: activeFieldId!,
       petitionFieldCommentId,
       content,
-      isNote,
+      isInternal: isNote,
     });
   }
 
