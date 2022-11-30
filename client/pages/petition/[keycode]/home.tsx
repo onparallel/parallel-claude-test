@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   Box,
-  Button,
   Center,
   Circle,
   Flex,
@@ -12,12 +11,6 @@ import {
   Image,
   LinkBox,
   LinkOverlay,
-  Menu,
-  MenuButton,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup,
-  Portal,
   RadioProps,
   Spinner,
   Stack,
@@ -28,13 +21,11 @@ import {
 import {
   ArrowBackIcon,
   CheckIcon,
-  ChevronDownIcon,
   ChevronRightIcon,
   PaperPlaneIcon,
   RepeatIcon,
   TimeIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { Divider } from "@parallel/components/common/Divider";
@@ -43,14 +34,17 @@ import { NakedLink } from "@parallel/components/common/Link";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { ProgressIndicator, ProgressTrack } from "@parallel/components/common/Progress";
 import { SearchInput } from "@parallel/components/common/SearchInput";
-import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
-import { ToneProvider } from "@parallel/components/common/ToneProvider";
+import { ToneProvider, useTone } from "@parallel/components/common/ToneProvider";
 import {
   RedirectError,
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { RecipientPortalHeader } from "@parallel/components/recipient-view/RecipientPortalHeader";
+import {
+  RecipientPortalStatusFilter,
+  RecipientPortalStatusFilterValues,
+} from "@parallel/components/recipient-view/RecipientPortalStatusFilter";
 import {
   RecipientPortal_accessDocument,
   RecipientPortal_accessesDocument,
@@ -70,7 +64,6 @@ import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisi
 import { parseQuery, string, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { ValueProps } from "@parallel/utils/ValueProps";
 import Head from "next/head";
 import { Fragment, useCallback, useMemo, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -83,22 +76,24 @@ const QUERY_STATE = {
     "ALL"
   ),
 };
-
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 15;
 
 type RecipientPortalProps = UnwrapPromise<ReturnType<typeof RecipientPortal.getInitialProps>>;
 
 function RecipientPortal({ keycode }: RecipientPortalProps) {
   const intl = useIntl();
 
-  const mainRef = useRef<HTMLDivElement>(null);
-
   const [state, setQueryState] = useQueryState(QUERY_STATE);
-  const { status } = state;
   const [search, setSearch] = useState(state.search ?? "");
+
   const {
     data: { access },
   } = useAssertQuery(RecipientPortal_accessDocument, { variables: { keycode } });
+
+  const petition = access!.petition!;
+  const granter = access!.granter!;
+  const contact = access!.contact!;
+  const { status } = state;
 
   const {
     data: {
@@ -116,33 +111,36 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
       limit: PAGE_SIZE,
       search: state.search,
       status:
-        state.status === "ALL"
+        status === "ALL" || !status
           ? null
-          : state.status === "PENDING"
-          ? [state.status]
+          : status === "PENDING"
+          ? ["PENDING"]
           : ["COMPLETED", "CLOSED"],
     },
   });
+
   const hasMore = accesses.length < totalCount;
 
-  const handleLoadMore = useCallback(() => {
-    fetchMore({ variables: { offset: accesses.length, limit: PAGE_SIZE } });
-  }, [fetchMore, accesses]);
-
-  const petition = access!.petition!;
-  const granter = access!.granter!;
-  const contact = access!.contact!;
+  const mainRef = useRef<HTMLDivElement>(null);
 
   const { getRootProps, getRadioProps } = useRadioGroup({
     name: "filter",
     value: status,
     defaultValue: status,
-    onChange: (value: string) =>
-      setQueryState((current) => ({
-        ...current,
-        status: value as RecipientPortalStatusFilterValues,
-      })),
+    onChange: (value: RecipientPortalStatusFilterValues) => handleStatusChange(value),
   });
+
+  const handleLoadMore = useCallback(() => {
+    fetchMore({ variables: { offset: accesses.length, limit: PAGE_SIZE } });
+  }, [fetchMore, accesses]);
+
+  const handleStatusChange = (status: RecipientPortalStatusFilterValues) => {
+    mainRef.current!.scrollTo(0, 0);
+    setQueryState((current) => ({
+      ...current,
+      status,
+    }));
+  };
 
   const debouncedSearch = useDebouncedCallback(
     (search: string) => {
@@ -171,7 +169,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
       >
         <Head>
           <title>{`${intl.formatMessage({
-            id: "recipient-view-portal.my-processes",
+            id: "recipient-view.client-portal.my-processes",
             defaultMessage: "My processes",
           })} | ${titleOrgName}`}</title>
         </Head>
@@ -202,7 +200,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
 
                 <Heading as="h1" size="md">
                   <FormattedMessage
-                    id="recipient-view-portal.my-processes"
+                    id="recipient-view.client-portal.my-processes"
                     defaultMessage="My processes"
                   />
                 </Heading>
@@ -229,10 +227,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                     <PaperPlaneIcon boxSize={6} color="gray.600" />
                   </HStack>
                   <Text noOfLines={1} wordBreak="break-all">
-                    <FormattedMessage
-                      id="component.recipient-portal-petition-status-filter.all"
-                      defaultMessage="All"
-                    />
+                    <FormattedMessage id="recipient-view.client-portal.all" defaultMessage="All" />
                   </Text>
                 </RadioCard>
                 <RadioCard {...getRadioProps({ value: "PENDING" })}>
@@ -244,7 +239,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                   </HStack>
                   <Text noOfLines={1} wordBreak="break-all">
                     <FormattedMessage
-                      id="component.recipient-portal-petition-status-filter.pending"
+                      id="recipient-view.client-portal.pending"
                       defaultMessage="Pending"
                     />
                   </Text>
@@ -258,7 +253,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                   </HStack>
                   <Text noOfLines={1} wordBreak="break-all">
                     <FormattedMessage
-                      id="component.recipient-portal-petition-status-filter.completed"
+                      id="recipient-view.client-portal.completed"
                       defaultMessage="Completed"
                     />
                   </Text>
@@ -282,23 +277,17 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                     onChange={(event) => handleSearchChange(event?.target.value)}
                     backgroundColor="white"
                     placeholder={intl.formatMessage({
-                      id: "component.search-input.placeholder",
+                      id: "recipient-view.client-portal.search-placeholder",
                       defaultMessage: "Search...",
                     })}
                   />
                 </HStack>
-
                 <Box>
                   <RecipientPortalStatusFilter
                     width={{ base: "100%", sm: "auto" }}
                     value={status}
-                    onChange={(value) =>
-                      value &&
-                      setQueryState((current) => ({
-                        ...current,
-                        status: value as RecipientPortalStatusFilterValues,
-                      }))
-                    }
+                    onChange={(value) => value && handleStatusChange(value)}
+                    textAlign="left"
                   />
                 </Box>
               </Stack>
@@ -320,20 +309,9 @@ function Petitions({
   onLoadMore: () => void;
   hasMore: boolean;
 }) {
-  const sortedItems = [...items].sort((a, b) => {
-    const aHasComments = a.petition.hasUnreadComments;
-    const bHasComments = b.petition.hasUnreadComments;
-    if ((aHasComments && bHasComments) || (!aHasComments && !bHasComments)) {
-      const dateA = a.message?.sentAt ?? a.createdAt;
-      const dateB = b.message?.sentAt ?? b.createdAt;
+  const tone = useTone();
 
-      return dateB.localeCompare(dateA);
-    } else {
-      return aHasComments ? -1 : 1;
-    }
-  });
-
-  if (!sortedItems.length) {
+  if (!items.length) {
     return (
       <Stack alignItems="center" textAlign="center" padding={4} spacing={4}>
         <Image
@@ -344,8 +322,11 @@ function Petitions({
         />
         <Text>
           <FormattedMessage
-            id="component.recipient-portal-petitions.no-results"
+            id="recipient-view.client-portal.no-results"
             defaultMessage="No results found for your search"
+            values={{
+              tone,
+            }}
           />
         </Text>
       </Stack>
@@ -354,7 +335,7 @@ function Petitions({
 
   return (
     <InfiniteScroll
-      dataLength={sortedItems.length}
+      dataLength={items.length}
       next={onLoadMore}
       hasMore={hasMore}
       loader={
@@ -372,7 +353,7 @@ function Petitions({
       style={{ overflow: "display" }}
     >
       <Card width="100%" overflow="hidden">
-        {sortedItems.map((pa) => {
+        {items.map((pa) => {
           return (
             <Fragment key={pa.keycode}>
               <PetitionCard access={pa} />
@@ -385,11 +366,7 @@ function Petitions({
   );
 }
 
-type PetitionCardType = {
-  access: RecipientPortal_PublicPetitionAccessFragment;
-};
-
-function PetitionCard({ access }: PetitionCardType) {
+function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccessFragment }) {
   const intl = useIntl();
 
   const { message, granter, petition, keycode, createdAt } = access;
@@ -460,7 +437,7 @@ function PetitionCard({ access }: PetitionCardType) {
                 </Text>
                 <Text fontSize="sm" color="gray.600" noOfLines={2} wordBreak="break-all">
                   <FormattedMessage
-                    id="component.recipient-view-portal-petition.requested-by"
+                    id="recipient-view.client-portal.requested-by"
                     defaultMessage="Requested by {name}, on {date}"
                     values={{
                       name: granter?.fullName ?? "",
@@ -686,10 +663,10 @@ RecipientPortal.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
         limit: PAGE_SIZE,
         search: state.search,
         status:
-          state.status === "ALL"
+          state.status === "ALL" || !state.status
             ? null
             : state.status === "PENDING"
-            ? [state.status]
+            ? ["PENDING"]
             : ["COMPLETED", "CLOSED"],
       },
     });
@@ -712,69 +689,3 @@ RecipientPortal.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
 };
 
 export default compose(withApolloData, withDialogs)(RecipientPortal);
-
-export type RecipientPortalStatusFilterValues = "ALL" | "PENDING" | "COMPLETED";
-
-interface RecipientPortalStatusFilterProps extends ValueProps<RecipientPortalStatusFilterValues> {}
-
-export const RecipientPortalStatusFilter = chakraForwardRef<
-  "button",
-  RecipientPortalStatusFilterProps
->(function RecipientPortalStatusFilter({ value, onChange, ...props }, ref) {
-  const options = useSimpleSelectOptions(
-    (intl) => [
-      {
-        value: "ALL",
-        label: intl.formatMessage({
-          id: "component.recipient-portal-petition-status-filter.all-processes",
-          defaultMessage: "All processes",
-        }),
-      },
-      {
-        value: "PENDING",
-        label: intl.formatMessage({
-          id: "component.recipient-portal-petition-status-filter.pending-processes",
-          defaultMessage: "Pending processes",
-        }),
-      },
-      {
-        value: "COMPLETED",
-        label: intl.formatMessage({
-          id: "component.recipient-portal-petition-status-filter.completed-processes",
-          defaultMessage: "Completed processes",
-        }),
-      },
-    ],
-    []
-  );
-
-  return (
-    <Menu matchWidth={true}>
-      <MenuButton
-        ref={ref}
-        as={Button}
-        variant="outline"
-        rightIcon={<ChevronDownIcon />}
-        backgroundColor="white"
-        fontWeight={400}
-        {...props}
-      >
-        {options.find((opt) => opt.value === value)?.label ?? options[0].label}
-      </MenuButton>
-      <Portal>
-        <MenuList>
-          <MenuOptionGroup
-            value={value ?? "ALL"}
-            onChange={(value) => onChange(value as RecipientPortalStatusFilterValues)}
-          >
-            {options.map((option) => (
-              <MenuItemOption key={option.value} value={option.value}>
-                {option.label}
-              </MenuItemOption>
-            ))}
-          </MenuOptionGroup>
-        </MenuList>
-      </Portal>
-    </Menu>
-  );
-});

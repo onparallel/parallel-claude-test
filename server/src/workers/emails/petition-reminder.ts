@@ -7,7 +7,7 @@ import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fullName } from "../../util/fullName";
 import { toHtml, toPlainText } from "../../util/slate";
 import { getLayoutProps } from "../helpers/getLayoutProps";
-import { loadOriginalMessageByPetitionAccess } from "../helpers/loadOriginalMessageByPetitionAccess";
+import { loadOriginalMessageByPetitionAccess } from "../../util/loadOriginalMessageByPetitionAccess";
 
 export async function petitionReminder(
   payload: { petition_reminder_id: number },
@@ -34,7 +34,7 @@ export async function petitionReminder(
       context.users.loadUserDataByUserId(access.granter_id),
       access.contact_id ? context.contacts.loadContact(access.contact_id) : null,
       context.petitions.loadFieldsForPetition(access.petition_id),
-      loadOriginalMessageByPetitionAccess(access.id, access.petition_id, context),
+      loadOriginalMessageByPetitionAccess(access.id, access.petition_id, context.petitions),
     ]);
     if (!petition) {
       return; // if the petition was deleted, return without throwing error

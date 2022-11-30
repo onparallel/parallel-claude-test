@@ -6,6 +6,7 @@ import { defaultBrandTheme } from "../../util/BrandTheme";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
+import { loadOriginalMessageByPetitionAccess } from "../../util/loadOriginalMessageByPetitionAccess";
 import { safeJsonParse } from "../../util/safeJsonParse";
 import { toHtml } from "../../util/slate";
 
@@ -39,9 +40,15 @@ export const PublicPetitionAccess = objectType({
       type: "PublicPetitionMessage",
       resolve: async (root, _, ctx) => {
         const messages = await ctx.petitions.loadMessagesByPetitionAccessId(root.id);
-        return messages?.[0] ?? null;
+
+        return (
+          messages?.[0] ??
+          (await loadOriginalMessageByPetitionAccess(root.id, root.petition_id, ctx.petitions)) ??
+          null
+        );
       },
     });
+
     t.nonNull.datetime("createdAt", {
       resolve: (root) => root.created_at,
     });

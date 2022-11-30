@@ -7,7 +7,7 @@ import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { buildFieldWithComments } from "../helpers/getFieldWithComments";
 import { getLayoutProps } from "../helpers/getLayoutProps";
-import { loadOriginalMessageByPetitionAccess } from "../helpers/loadOriginalMessageByPetitionAccess";
+import { loadOriginalMessageByPetitionAccess } from "../../util/loadOriginalMessageByPetitionAccess";
 
 export async function commentsContactNotification(
   payload: {
@@ -22,7 +22,11 @@ export async function commentsContactNotification(
     context.contacts.loadContactByAccessId(payload.petition_access_id),
     context.petitions.loadAccess(payload.petition_access_id),
     context.petitions.loadPetitionFieldComment(payload.petition_field_comment_ids),
-    loadOriginalMessageByPetitionAccess(payload.petition_access_id, payload.petition_id, context),
+    loadOriginalMessageByPetitionAccess(
+      payload.petition_access_id,
+      payload.petition_id,
+      context.petitions
+    ),
   ]);
   if (!petition) {
     return; // if the petition was deleted, return without throwing error

@@ -4195,19 +4195,9 @@
     "context": "Hello, {name}!"
   },
   {
-    "term": "component.recipient-portal-petition-status-filter.all",
-    "definition": "Todos",
-    "context": "All"
-  },
-  {
     "term": "component.recipient-portal-petition-status-filter.all-processes",
     "definition": "Todos los procesos",
     "context": "All processes"
-  },
-  {
-    "term": "component.recipient-portal-petition-status-filter.completed",
-    "definition": "Completados",
-    "context": "Completed"
   },
   {
     "term": "component.recipient-portal-petition-status-filter.completed-processes",
@@ -4215,19 +4205,9 @@
     "context": "Completed processes"
   },
   {
-    "term": "component.recipient-portal-petition-status-filter.pending",
-    "definition": "Pendientes",
-    "context": "Pending"
-  },
-  {
     "term": "component.recipient-portal-petition-status-filter.pending-processes",
     "definition": "Procesos pendientes",
     "context": "Pending processes"
-  },
-  {
-    "term": "component.recipient-portal-petitions.no-results",
-    "definition": "No hay resultados para tu búsqueda",
-    "context": "No results found for your search"
   },
   {
     "term": "component.recipient-select-groups.add-recipient-group",
@@ -4503,11 +4483,6 @@
     "term": "component.recipient-view-petition-field-tax-documents.start-button",
     "definition": "Empezar",
     "context": "Start"
-  },
-  {
-    "term": "component.recipient-view-portal-petition.requested-by",
-    "definition": "Solicitado por {name}, el {date}",
-    "context": "Requested by {name}, on {date}"
   },
   {
     "term": "component.recipient-view.confirm-petition-signers-dialog.add-signer.button",
@@ -9390,11 +9365,6 @@
     "context": "Try for free"
   },
   {
-    "term": "recipient-view-portal.my-processes",
-    "definition": "Mis procesos",
-    "context": "My processes"
-  },
-  {
     "term": "recipient-view.cant-find-email-help",
     "definition": "{tone, select, INFORMAL{<b>¿No encuentras nuestro correo?</b> Revisa la bandeja de spam y si no está ponte en contacto con la persona que te haya compartido el enlace.} other{<b>Si no encuentra el correo</b> revisa la bandeja de spam y si no está póngase en contacto con la persona que le compartiera el enlace.}}",
     "context": "<b>Can't find our email?</b> Check your spam folder and if it's not there, contact the person who shared the link with you."
@@ -9403,6 +9373,41 @@
     "term": "recipient-view.change-email",
     "definition": "Cambiar correo electrónico",
     "context": "Change email"
+  },
+  {
+    "term": "recipient-view.client-portal.all",
+    "definition": "Todos",
+    "context": "All"
+  },
+  {
+    "term": "recipient-view.client-portal.completed",
+    "definition": "Completados",
+    "context": "Completed"
+  },
+  {
+    "term": "recipient-view.client-portal.my-processes",
+    "definition": "Mis procesos",
+    "context": "My processes"
+  },
+  {
+    "term": "recipient-view.client-portal.no-results",
+    "definition": "No hay resultados para {tone, select, INFORMAL{tu} other{su}} búsqueda",
+    "context": "No results found for your search"
+  },
+  {
+    "term": "recipient-view.client-portal.pending",
+    "definition": "Pendientes",
+    "context": "Pending"
+  },
+  {
+    "term": "recipient-view.client-portal.requested-by",
+    "definition": "Solicitado por {name}, el {date}",
+    "context": "Requested by {name}, on {date}"
+  },
+  {
+    "term": "recipient-view.client-portal.search-placeholder",
+    "definition": "Buscar...",
+    "context": "Search..."
   },
   {
     "term": "recipient-view.complete-petition.error-message",

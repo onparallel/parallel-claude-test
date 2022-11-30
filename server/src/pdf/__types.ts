@@ -323,6 +323,7 @@ export type FeatureFlag =
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "ON_BEHALF_OF"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
+  | "PETITION_PDF_EXPORT"
   | "PETITION_SIGNATURE"
   | "PUBLIC_PETITION_LINK_PREFILL_DATA"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
@@ -3064,6 +3065,7 @@ export type PublicPetitionAccess = {
   contact: Maybe<PublicContact>;
   createdAt: Scalars["DateTime"];
   granter: Maybe<PublicUser>;
+  keycode: Scalars["ID"];
   message: Maybe<PublicPetitionMessage>;
   petition: PublicPetition;
 };
@@ -3219,7 +3221,6 @@ export type Query = {
   access: PublicPetitionAccess;
   accesses: PublicPetitionAccessPagination;
   contact: Maybe<Contact>;
-  contactStats: petitions;
   /** The contacts of the user */
   contacts: ContactPagination;
   /** Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts */
@@ -3290,10 +3291,6 @@ export type QueryaccessesArgs = {
 
 export type QuerycontactArgs = {
   id: Scalars["GID"];
-};
-
-export type QuerycontactStatsArgs = {
-  keycode: Scalars["ID"];
 };
 
 export type QuerycontactsArgs = {
@@ -4069,13 +4066,6 @@ export type VerificationCodeRequest = {
   expiresAt: Scalars["DateTime"];
   remainingAttempts: Scalars["Int"];
   token: Scalars["ID"];
-};
-
-/** Stats about how many petitions has in each status */
-export type petitions = {
-  closed: Scalars["Int"];
-  completed: Scalars["Int"];
-  pending: Scalars["Int"];
 };
 
 export type SignaturesBlock_SignatureConfigFragment = {

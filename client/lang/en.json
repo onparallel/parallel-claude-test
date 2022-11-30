@@ -4195,19 +4195,9 @@
     "context": "Hello, {name}!"
   },
   {
-    "term": "component.recipient-portal-petition-status-filter.all",
-    "definition": "All",
-    "context": "All"
-  },
-  {
     "term": "component.recipient-portal-petition-status-filter.all-processes",
     "definition": "All processes",
     "context": "All processes"
-  },
-  {
-    "term": "component.recipient-portal-petition-status-filter.completed",
-    "definition": "Completed",
-    "context": "Completed"
   },
   {
     "term": "component.recipient-portal-petition-status-filter.completed-processes",
@@ -4215,19 +4205,9 @@
     "context": "Completed processes"
   },
   {
-    "term": "component.recipient-portal-petition-status-filter.pending",
-    "definition": "Pending",
-    "context": "Pending"
-  },
-  {
     "term": "component.recipient-portal-petition-status-filter.pending-processes",
     "definition": "Pending processes",
     "context": "Pending processes"
-  },
-  {
-    "term": "component.recipient-portal-petitions.no-results",
-    "definition": "No results found for your search",
-    "context": "No results found for your search"
   },
   {
     "term": "component.recipient-select-groups.add-recipient-group",
@@ -4503,11 +4483,6 @@
     "term": "component.recipient-view-petition-field-tax-documents.start-button",
     "definition": "Start",
     "context": "Start"
-  },
-  {
-    "term": "component.recipient-view-portal-petition.requested-by",
-    "definition": "Requested by {name}, on {date}",
-    "context": "Requested by {name}, on {date}"
   },
   {
     "term": "component.recipient-view.confirm-petition-signers-dialog.add-signer.button",
@@ -9390,11 +9365,6 @@
     "context": "Try for free"
   },
   {
-    "term": "recipient-view-portal.my-processes",
-    "definition": "My processes",
-    "context": "My processes"
-  },
-  {
     "term": "recipient-view.cant-find-email-help",
     "definition": "<b>Can't find our email?</b> Check your spam folder and if it's not there, contact the person who shared the link with you.",
     "context": "<b>Can't find our email?</b> Check your spam folder and if it's not there, contact the person who shared the link with you."
@@ -9403,6 +9373,41 @@
     "term": "recipient-view.change-email",
     "definition": "Change email",
     "context": "Change email"
+  },
+  {
+    "term": "recipient-view.client-portal.all",
+    "definition": "All",
+    "context": "All"
+  },
+  {
+    "term": "recipient-view.client-portal.completed",
+    "definition": "Completed",
+    "context": "Completed"
+  },
+  {
+    "term": "recipient-view.client-portal.my-processes",
+    "definition": "My processes",
+    "context": "My processes"
+  },
+  {
+    "term": "recipient-view.client-portal.no-results",
+    "definition": "No results found for your search",
+    "context": "No results found for your search"
+  },
+  {
+    "term": "recipient-view.client-portal.pending",
+    "definition": "Pending",
+    "context": "Pending"
+  },
+  {
+    "term": "recipient-view.client-portal.requested-by",
+    "definition": "Requested by {name}, on {date}",
+    "context": "Requested by {name}, on {date}"
+  },
+  {
+    "term": "recipient-view.client-portal.search-placeholder",
+    "definition": "Search...",
+    "context": "Search..."
   },
   {
     "term": "recipient-view.complete-petition.error-message",

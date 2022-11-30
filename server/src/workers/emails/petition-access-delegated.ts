@@ -5,7 +5,7 @@ import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toHtml, toPlainText } from "../../util/slate";
 import { getLayoutProps } from "../helpers/getLayoutProps";
-import { loadOriginalMessageByPetitionAccess } from "../helpers/loadOriginalMessageByPetitionAccess";
+import { loadOriginalMessageByPetitionAccess } from "../../util/loadOriginalMessageByPetitionAccess";
 
 export async function petitionAccessDelegated(
   payload: {
@@ -35,7 +35,11 @@ export async function petitionAccessDelegated(
     newAccess.contact_id ? context.contacts.loadContact(newAccess.contact_id) : null,
     originalAccess.contact_id ? context.contacts.loadContact(originalAccess.contact_id) : null,
     context.users.loadUserDataByUserId(originalAccess.granter_id),
-    loadOriginalMessageByPetitionAccess(payload.original_access_id, payload.petition_id, context),
+    loadOriginalMessageByPetitionAccess(
+      payload.original_access_id,
+      payload.petition_id,
+      context.petitions
+    ),
   ]);
 
   if (!contact) {
