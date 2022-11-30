@@ -23722,6 +23722,7 @@ export type RecipientPortal_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
   id: string;
   type: PetitionFieldType;
+  title?: string | null;
   optional: boolean;
   isInternal: boolean;
   isReadOnly: boolean;
@@ -23745,6 +23746,7 @@ export type RecipientPortal_PublicPetitionFragment = {
     __typename?: "PublicPetitionField";
     id: string;
     type: PetitionFieldType;
+    title?: string | null;
     optional: boolean;
     isInternal: boolean;
     isReadOnly: boolean;
@@ -23798,6 +23800,7 @@ export type RecipientPortal_PublicPetitionAccessFragment = {
       __typename?: "PublicPetitionField";
       id: string;
       type: PetitionFieldType;
+      title?: string | null;
       optional: boolean;
       isInternal: boolean;
       isReadOnly: boolean;
@@ -23862,6 +23865,7 @@ export type RecipientPortal_accessQuery = {
         __typename?: "PublicPetitionField";
         id: string;
         type: PetitionFieldType;
+        title?: string | null;
         optional: boolean;
         isInternal: boolean;
         isReadOnly: boolean;
@@ -23934,6 +23938,7 @@ export type RecipientPortal_accessesQuery = {
           __typename?: "PublicPetitionField";
           id: string;
           type: PetitionFieldType;
+          title?: string | null;
           optional: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
@@ -30196,6 +30201,7 @@ export const RecipientPortal_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientPortal_PublicPetitionField on PublicPetitionField {
     id
     type
+    title
     optional
     isInternal
     isReadOnly

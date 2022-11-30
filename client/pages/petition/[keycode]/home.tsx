@@ -396,6 +396,8 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
     return { replied, optional, total };
   }, [petition.fields, visibility]);
 
+  const title = message?.subject ?? petition.fields[0].title;
+
   return (
     <LinkBox>
       <HStack
@@ -432,8 +434,18 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
           <NakedLink href={`/petition/${keycode}/1`} passHref>
             <LinkOverlay>
               <Stack spacing={0}>
-                <Text fontWeight={600} noOfLines={[2, 1]} wordBreak="break-all">
-                  {message?.subject}
+                <Text
+                  fontWeight={600}
+                  noOfLines={[2, 1]}
+                  wordBreak="break-all"
+                  color={title ? undefined : "gray.500"}
+                  fontStyle={title ? "normal" : "italic"}
+                >
+                  {title ??
+                    intl.formatMessage({
+                      id: "generic.untitled",
+                      defaultMessage: "Untitled",
+                    })}
                 </Text>
                 <Text fontSize="sm" color="gray.600" noOfLines={2} wordBreak="break-all">
                   <FormattedMessage
@@ -525,6 +537,7 @@ RecipientPortal.fragments = {
       fragment RecipientPortal_PublicPetitionField on PublicPetitionField {
         id
         type
+        title
         optional
         isInternal
         isReadOnly
