@@ -502,7 +502,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                         >
                           <PreviewPetitionField
                             key={field.id}
-                            petitionId={petition.id}
+                            petition={petition}
                             field={field}
                             isDisabled={
                               (isPetition && petition.status === "CLOSED") ||
@@ -662,6 +662,7 @@ const _fragments = {
       ...RecipientViewContentsCard_PetitionBase
       ...PetitionLayout_PetitionBase
       ...useLiquidScope_PetitionBase
+      ...PreviewPetitionField_PetitionBase
     }
     ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
     ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
@@ -669,6 +670,7 @@ const _fragments = {
     ${useSendPetitionHandler.fragments.Petition}
     ${RecipientViewContentsCard.fragments.PetitionBase}
     ${PetitionLayout.fragments.PetitionBase}
+    ${PreviewPetitionField.fragments.PetitionBase}
     ${PreviewPetitionField.fragments.PetitionField}
     ${useGetPageFields.fragments.PetitionField}
     ${validatePetitionFields.fragments.PetitionField}

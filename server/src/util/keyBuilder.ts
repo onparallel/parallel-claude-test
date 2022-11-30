@@ -1,12 +1,11 @@
-export function keyBuilder<T, K extends keyof T | ((item: T) => string | number)>(properties: K[]) {
+export function keyBuilder<
+  T,
+  K extends keyof T | ((item: T) => string | number | null | undefined)
+>(properties: K[]) {
   return (item: T) =>
     properties
       .map((prop: any) => {
-        if (typeof prop === "function") {
-          return prop(item);
-        } else {
-          return (item as any)[prop];
-        }
+        return JSON.stringify(typeof prop === "function" ? prop(item) : (item as any)[prop]);
       })
       .join(",");
 }

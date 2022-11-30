@@ -32,7 +32,7 @@ import {
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { DowJonesRiskLabel } from "@parallel/components/petition-common/DowJonesRiskLabel";
-import { PreviewPetitionFieldKyc_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { PreviewPetitionFieldKyc_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { useInterval } from "@parallel/utils/useInterval";
@@ -46,7 +46,7 @@ export interface PreviewPetitionFieldKycProps
     RecipientViewPetitionFieldCardProps,
     "children" | "showAddNewReply" | "onAddNewReply"
   > {
-  field: PreviewPetitionFieldKyc_PetitionFieldFragment;
+  petition: PreviewPetitionFieldKyc_PetitionBaseFragment;
   isDisabled: boolean;
   onDeleteReply: (replyId: string) => void;
   onDownloadReply: (replyId: string) => void;
@@ -56,6 +56,7 @@ export interface PreviewPetitionFieldKycProps
 
 export function PreviewPetitionFieldKyc({
   field,
+  petition,
   isDisabled,
   isInvalid,
   onDeleteReply,
@@ -105,10 +106,10 @@ export function PreviewPetitionFieldKyc({
 
   const showDowJonesRestrictedDialog = usePreviewDowJonesPermissionDeniedDialog();
   const handleStart = async () => {
-    if (field.petition.organization.hasDowJones) {
+    if (petition.organization.hasDowJones) {
       setState("FETCHING");
       browserTabRef.current = await openNewWindow(
-        `/${intl.locale}/app/petitions/${field.petition.id}/preview/dowjones/${field.id}`
+        `/${intl.locale}/app/petitions/${petition.id}/preview/dowjones/${field.id}`
       );
       if (isCacheOnly) {
         setState("IDLE");
@@ -329,18 +330,13 @@ export function KYCResearchFieldReplyProfile({
 }
 
 PreviewPetitionFieldKyc.fragments = {
-  PetitionField: gql`
-    fragment PreviewPetitionFieldKyc_PetitionField on PetitionField {
+  PetitionBase: gql`
+    fragment PreviewPetitionFieldKyc_PetitionBase on PetitionBase {
       id
-      ...RecipientViewPetitionFieldCard_PetitionField
-      petition {
+      organization {
         id
-        organization {
-          id
-          hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
-        }
+        hasDowJones: hasIntegration(integration: DOW_JONES_KYC)
       }
     }
-    ${RecipientViewPetitionFieldCard.fragments.PetitionField}
   `,
 };

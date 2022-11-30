@@ -1,5 +1,7 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { isDefined, uniq } from "remeda";
+import { keyBuilder } from "../../util/keyBuilder";
 import { Replace } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
@@ -76,28 +78,56 @@ export class IntegrationRepository extends BaseRepository {
     );
   }
 
+  private _loadIntegrationsByOrgId = this.buildLoader<
+    {
+      orgId: number;
+      type?: IntegrationType | null;
+      provider?: string | null;
+    },
+    OrgIntegration[],
+    string
+  >(
+    async (keys, t) => {
+      const integrations = await this.from("org_integration", t)
+        .whereIn("org_id", uniq(keys.map((k) => k.orgId)))
+        .where((q) => {
+          const types = uniq(keys.map((k) => k.type)).filter(isDefined);
+          if (types.length > 0) {
+            q.whereIn("type", types);
+          }
+          const providers = uniq(keys.map((k) => k.provider)).filter(isDefined);
+          if (providers.length > 0) {
+            q.whereIn("provider", providers);
+          }
+        })
+        .whereNull("deleted_at")
+        .where("is_enabled", true)
+        .orderBy("created_at", "desc");
+      return keys.map(({ orgId, type, provider }) =>
+        integrations.filter(
+          (i) =>
+            i.org_id === orgId &&
+            (!isDefined(type) || i.type === type) &&
+            (!isDefined(provider) || i.provider === provider)
+        )
+      );
+    },
+    {
+      cacheKeyFn: keyBuilder(["orgId", (i) => i.type ?? null, (i) => i.provider ?? null]),
+    }
+  );
+
   async loadIntegrationsByOrgId<IType extends IntegrationType>(
     orgId: number,
-    type?: IType | null,
+    type: IType,
     provider?: string | null,
     t?: Knex.Transaction
   ): Promise<Replace<OrgIntegration, { settings: IntegrationSettings<IType> }>[]> {
-    return await this.from("org_integration", t)
-      .where({
-        org_id: orgId,
-        deleted_at: null,
-        is_enabled: true,
-      })
-      .mmodify((q) => {
-        if (type) {
-          q.where("type", type);
-        }
-        if (provider) {
-          q.where("provider", provider);
-        }
-      })
-      .orderBy("created_at", "desc")
-      .select("*");
+    if (isDefined(t)) {
+      return await this._loadIntegrationsByOrgId.raw({ orgId, type, provider }, t);
+    } else {
+      return await this._loadIntegrationsByOrgId({ orgId, type, provider });
+    }
   }
 
   async loadProvisioningIntegrationByAuthKey(key: string) {

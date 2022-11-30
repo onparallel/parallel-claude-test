@@ -1,6 +1,7 @@
 import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import {
   PetitionPermissionType,
+  PreviewPetitionField_PetitionBaseFragment,
   PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument,
   PreviewPetitionField_PetitionFieldDocument,
   PreviewPetitionField_PetitionFieldFragment,
@@ -46,8 +47,8 @@ export interface PreviewPetitionFieldProps
     RecipientViewPetitionFieldCardProps,
     "children" | "showAddNewReply" | "onAddNewReply" | "onDownloadAttachment" | "field"
   > {
+  petition: PreviewPetitionField_PetitionBaseFragment;
   field: PreviewPetitionField_PetitionFieldFragment;
-  petitionId: string;
   isDisabled: boolean;
   isCacheOnly: boolean;
   myEffectivePermission: PetitionPermissionType;
@@ -55,12 +56,13 @@ export interface PreviewPetitionFieldProps
 
 export function PreviewPetitionField({
   field,
-  petitionId,
+  petition,
   isCacheOnly,
   isDisabled,
   myEffectivePermission,
   ...props
 }: PreviewPetitionFieldProps) {
+  const petitionId = petition.id;
   const uploads = useRef<UploadCache>({});
   const fieldId = field.id;
   const tone = useTone();
@@ -266,6 +268,7 @@ export function PreviewPetitionField({
     <PreviewPetitionFieldKyc
       {...props}
       {...commonProps}
+      petition={petition}
       onDownloadReply={handleDownloadFileUploadReply}
       onRefreshField={handleRefreshAsyncField}
       isCacheOnly={isCacheOnly}
@@ -274,11 +277,16 @@ export function PreviewPetitionField({
 }
 
 PreviewPetitionField.fragments = {
+  PetitionBase: gql`
+    fragment PreviewPetitionField_PetitionBase on PetitionBase {
+      ...PreviewPetitionFieldKyc_PetitionBase
+    }
+    ${PreviewPetitionFieldKyc.fragments.PetitionBase}
+  `,
   PetitionField: gql`
     fragment PreviewPetitionField_PetitionField on PetitionField {
       ...RecipientViewPetitionFieldCard_PetitionField
       ...PreviewPetitionFieldCommentsDialog_PetitionField
-      ...PreviewPetitionFieldKyc_PetitionField
       previewReplies @client {
         ...RecipientViewPetitionFieldCard_PetitionFieldReply
       }
@@ -286,7 +294,6 @@ PreviewPetitionField.fragments = {
     ${RecipientViewPetitionFieldCard.fragments.PetitionField}
     ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
     ${PreviewPetitionFieldCommentsDialog.fragments.PetitionField}
-    ${PreviewPetitionFieldKyc.fragments.PetitionField}
   `,
   PetitionFieldReply: gql`
     fragment PreviewPetitionField_PetitionFieldReply on PetitionFieldReply {
