@@ -1,7 +1,7 @@
 import { ApolloError } from "apollo-server-core";
 import { arg, booleanArg, list, mutationField, nonNull, nullable, stringArg } from "nexus";
 import pMap from "p-map";
-import { groupBy, isDefined, uniq, zip } from "remeda";
+import { groupBy, isDefined, uniq, uniqBy, zip } from "remeda";
 import { and, authenticate, authenticateAnd, chain, ifArgDefined } from "../../helpers/authorize";
 import { ArgValidationError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -97,23 +97,21 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
 
     if (args.notify) {
       /** we have to notify only those users who didn't have any permission before */
-      const newUserPermissions = newPermissions.filter(
-        (np, index) =>
-          isDefined(np.user_id) &&
-          !currentPermissions.some(
-            // make sure the user dont have previous permission on the petition
-            (cp) => cp.petition_id === np.petition_id && cp.user_id === np.user_id
-          ) &&
-          !newPermissions.some(
-            // removes duplicated <user_id,petition_id> entries to send only one email per user/petition
-            // this can happen when the petition is shared to the user directly and via a group at the same time
-            (np2, index2) =>
-              np.petition_id === np2.petition_id && np.user_id === np2.user_id && index > index2
-          )
+      const newUserPermissions = uniqBy(
+        newPermissions.filter(
+          (np) =>
+            isDefined(np.user_id) &&
+            !currentPermissions.some(
+              // make sure the user dont have previous permission on the petition
+              (cp) => cp.petition_id === np.petition_id && cp.user_id === np.user_id
+            )
+        ),
+        //   // removes duplicated <user_id,petition_id> entries to send only one email per user/petition
+        (p) => `${p.user_id}:${p.petition_id}`
       );
 
       if (newUserPermissions.length > 0) {
-        ctx.emails.sendPetitionSharedEmail(
+        await ctx.emails.sendPetitionSharedEmail(
           ctx.user!.id,
           newUserPermissions.map((p) => p.id),
           args.message ?? null

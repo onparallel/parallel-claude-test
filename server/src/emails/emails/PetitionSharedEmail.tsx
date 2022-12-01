@@ -176,11 +176,11 @@ const email: Email<PetitionSharedEmailProps> = {
                   />
                 </MjmlText>
                 <MjmlText fontSize="16px">
-                  {petitions.map(({ name }) =>
+                  {petitions.map(({ name }, key) =>
                     name ? (
-                      <li>{name}</li>
+                      <li key={key}>{name}</li>
                     ) : (
-                      <li style={{ color: "#A0AEC0", fontStyle: "italic" }}>
+                      <li style={{ color: "#A0AEC0", fontStyle: "italic" }} key={key}>
                         <FormattedMessage
                           id="generic.unnamed-parallel"
                           defaultMessage="Unnamed parallel"
