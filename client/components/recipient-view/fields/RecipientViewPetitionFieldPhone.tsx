@@ -8,7 +8,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
-import { ComponentProps, forwardRef, KeyboardEvent, useRef, useState } from "react";
+import { ComponentProps, forwardRef, KeyboardEvent, MouseEvent, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { isDefined, pick } from "remeda";
 import {
@@ -54,6 +54,12 @@ export function RecipientViewPetitionFieldPhone({
   function handleAddNewReply() {
     setShowNewReply(true);
     setTimeout(() => newReplyRef.current?.focus());
+  }
+
+  async function handleMouseDownNewReply(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    handleAddNewReply();
+    await handleCreate.immediateIfPending(value, false);
   }
 
   const handleUpdate = useMemoFactory(
@@ -152,9 +158,12 @@ export function RecipientViewPetitionFieldPhone({
       isInvalid={isInvalid}
       onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={!isDisabled && field.multiple}
-      addNewReplyIsDisabled={showNewReply}
+      addNewReplyIsDisabled={
+        showNewReply && (value?.length === 0 || (value?.length > 0 && isInvalidValue))
+      }
       onAddNewReply={handleAddNewReply}
       onDownloadAttachment={onDownloadAttachment}
+      onMouseDownNewReply={handleMouseDownNewReply}
     >
       {field.replies.length ? (
         <List as={Stack} marginTop={2}>
@@ -188,12 +197,17 @@ export function RecipientViewPetitionFieldPhone({
                 // prevent creating 2 replies
                 return;
               }
+              if (isDefined(value) && isValid) {
+                handleCreate(value, true);
+              } else {
+                handleCreate.clear();
+              }
               setIsInvalidValue(!isValid && isDefined(value));
               setValue(value);
             }}
             onBlur={async (value: string, { isValid }) => {
               if (value && isValid) {
-                await handleCreate.immediate(value, false);
+                await handleCreate.immediateIfPending(value, false);
                 setShowNewReply(false);
               } else if (!value && field.replies.length > 0) {
                 setShowNewReply(false);

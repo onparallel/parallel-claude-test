@@ -22,7 +22,14 @@ import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { ShortTextFormat, useShortTextFormats } from "@parallel/utils/useShortTextFormats";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ComponentProps, forwardRef, useImperativeHandle, useRef, useState } from "react";
+import {
+  ComponentProps,
+  forwardRef,
+  MouseEvent,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { IMaskInput } from "react-imask";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, pick } from "remeda";
@@ -72,6 +79,12 @@ export function RecipientViewPetitionFieldShortText({
   function handleAddNewReply() {
     setShowNewReply(true);
     setTimeout(() => newReplyRef.current?.focus());
+  }
+
+  async function handleMouseDownNewReply(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    handleAddNewReply();
+    await handleCreate.immediateIfPending(value, false);
   }
 
   const replyProps = useMemoFactory(
@@ -161,6 +174,7 @@ export function RecipientViewPetitionFieldShortText({
 
   const formats = useShortTextFormats();
   const format = isDefined(options.format) ? formats.find((f) => f.value === options.format) : null;
+
   const inputProps: ComponentProps<typeof ShortTextInput> = {
     id: `reply-${field.id}-new`,
     ref: newReplyRef,
@@ -191,7 +205,7 @@ export function RecipientViewPetitionFieldShortText({
       } else if (format?.validate && !format.validate(value)) {
         handleInvalidReply(field.id, true);
       } else {
-        await handleCreate.immediate(value, false);
+        await handleCreate.immediateIfPending(value, false);
         setShowNewReply(false);
       }
 
@@ -202,6 +216,12 @@ export function RecipientViewPetitionFieldShortText({
     onValueChange: (value) => {
       if (isInvalidReply[field.id] && format?.validate && format.validate(value)) {
         handleInvalidReply(field.id, false);
+      }
+
+      if (value.length > 0 && (format?.validate ? format.validate(value) : true)) {
+        handleCreate(value, true);
+      } else {
+        handleCreate.clear();
       }
       setValue(value);
     },
@@ -221,15 +241,18 @@ export function RecipientViewPetitionFieldShortText({
           })),
   };
 
+  const isInvalidValue = value.length === 0 || (format?.validate ? !format.validate(value) : false);
+
   return (
     <RecipientViewPetitionFieldCard
       field={field}
       isInvalid={isInvalid}
       onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={!isDisabled && field.multiple}
-      addNewReplyIsDisabled={showNewReply}
+      addNewReplyIsDisabled={showNewReply && isInvalidValue}
       onAddNewReply={handleAddNewReply}
       onDownloadAttachment={onDownloadAttachment}
+      onMouseDownNewReply={handleMouseDownNewReply}
     >
       {field.replies.length ? (
         <List as={Stack} marginTop={2}>
@@ -307,7 +330,6 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
 
   const formats = useShortTextFormats();
   const format = isDefined(options.format) ? formats.find((f) => f.value === options.format) : null;
-
   const props: ComponentProps<typeof ShortTextInput> = {
     id: `reply-${field.id}-${reply.id}`,
     ref,

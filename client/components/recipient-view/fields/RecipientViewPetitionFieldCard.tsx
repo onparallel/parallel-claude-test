@@ -14,7 +14,7 @@ import {
   Tone,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
-import { ReactNode } from "react";
+import { MouseEvent, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { CommentsButton } from "../CommentsButton";
 
@@ -35,6 +35,7 @@ export interface RecipientViewPetitionFieldCardProps {
   onAddNewReply?: () => void;
   onDownloadAttachment: (attachmentId: string) => void;
   onCommentsButtonClick?: () => void;
+  onMouseDownNewReply?: (event: MouseEvent<HTMLButtonElement>) => void;
   tone?: Tone;
 }
 
@@ -47,6 +48,7 @@ export function RecipientViewPetitionFieldCard({
   onDownloadAttachment,
   children,
   onCommentsButtonClick,
+  onMouseDownNewReply,
   tone = "INFORMAL",
 }: RecipientViewPetitionFieldCardProps) {
   const intl = useIntl();
@@ -170,6 +172,7 @@ export function RecipientViewPetitionFieldCard({
       {showAddNewReply ? (
         <Center marginTop={2}>
           <IconButtonWithTooltip
+            onMouseDown={onMouseDownNewReply}
             isDisabled={addNewReplyIsDisabled}
             icon={<AddIcon />}
             variant="outline"

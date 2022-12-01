@@ -6,8 +6,9 @@ import { isMetaReturn } from "@parallel/utils/keys";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import { isValidDateString } from "@parallel/utils/validation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChangeEvent, forwardRef, KeyboardEvent, useRef, useState } from "react";
+import { ChangeEvent, forwardRef, KeyboardEvent, MouseEvent, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import {
   RecipientViewPetitionFieldCard,
@@ -50,6 +51,12 @@ export function RecipientViewPetitionFieldDate({
   function handleAddNewReply() {
     setShowNewReply(true);
     setTimeout(() => newReplyRef.current?.focus());
+  }
+
+  async function handleMouseDownNewReply(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    handleAddNewReply();
+    await handleCreate.immediateIfPending(value, false);
   }
 
   const handleUpdate = useMemoFactory(
@@ -134,7 +141,7 @@ export function RecipientViewPetitionFieldDate({
     },
     onBlur: async () => {
       if (value) {
-        await handleCreate.immediate(value, false);
+        await handleCreate.immediateIfPending(value, false);
         setShowNewReply(false);
       } else if (!value && field.replies.length > 0) {
         setShowNewReply(false);
@@ -145,7 +152,13 @@ export function RecipientViewPetitionFieldDate({
         // prevent creating 2 replies
         return;
       }
-      setValue(event.target.value);
+      const value = event.target.value;
+      if (isValidDateString(value)) {
+        handleCreate(value, true);
+      } else {
+        handleCreate.clear();
+      }
+      setValue(value);
     },
   };
   return (
@@ -154,9 +167,10 @@ export function RecipientViewPetitionFieldDate({
       isInvalid={isInvalid}
       onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={!isDisabled && field.multiple}
-      addNewReplyIsDisabled={showNewReply}
+      addNewReplyIsDisabled={showNewReply && !isValidDateString(value)}
       onAddNewReply={handleAddNewReply}
       onDownloadAttachment={onDownloadAttachment}
+      onMouseDownNewReply={handleMouseDownNewReply}
     >
       {field.replies.length ? (
         <List as={Stack} marginTop={2}>

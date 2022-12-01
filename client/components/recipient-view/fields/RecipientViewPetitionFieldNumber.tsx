@@ -8,7 +8,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
-import { ComponentPropsWithRef, forwardRef, useEffect, useRef, useState } from "react";
+import { ComponentPropsWithRef, forwardRef, MouseEvent, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import {
@@ -71,6 +71,14 @@ export function RecipientViewPetitionFieldNumber({
     });
   }
 
+  async function handleMouseDownNewReply(event: MouseEvent<HTMLButtonElement>) {
+    if (isDefined(value)) {
+      event.preventDefault();
+      handleAddNewReply();
+      await handleCreate.immediateIfPending(value, false);
+    }
+  }
+
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: number) => {
       await onUpdateReply(replyId, value);
@@ -115,6 +123,16 @@ export function RecipientViewPetitionFieldNumber({
           setValue(undefined);
           if (focusCreatedReply) {
             setShowNewReply(false);
+            setTimeout(() => {
+              const newReplyElement = replyRefs[replyId].current!;
+              if (newReplyElement) {
+                newReplyElement.focus();
+                newReplyElement.setSelectionRange(
+                  newReplyElement.value.length,
+                  newReplyElement.value.length
+                );
+              }
+            });
           }
         }
       } catch {}
@@ -166,7 +184,7 @@ export function RecipientViewPetitionFieldNumber({
       } else if (!isBetweenLimits(range, value)) {
         handleInvalidReply(field.id, true);
       } else {
-        await handleCreate.immediate(value, true);
+        await handleCreate.immediateIfPending(value, true);
         handleCreate.clear();
         setShowNewReply(false);
       }
@@ -180,11 +198,14 @@ export function RecipientViewPetitionFieldNumber({
     onChange: (value) => {
       if (!isDefined(value)) {
         setValue(undefined);
+        handleCreate.clear();
       } else {
         if (!isBetweenLimits(range, value)) {
           handleInvalidReply(field.id, true);
+          handleCreate.clear();
         } else {
           handleInvalidReply(field.id, false);
+          handleCreate(value, true);
         }
         setValue(value);
       }
@@ -194,15 +215,18 @@ export function RecipientViewPetitionFieldNumber({
 
   const hasRange = isDefined(range.min) || isDefined(range.max);
 
+  const isInvalidValue = !isDefined(value) || !isBetweenLimits(range, value!);
+
   return (
     <RecipientViewPetitionFieldCard
       field={field}
       isInvalid={isInvalid}
       onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={!isDisabled && field.multiple}
-      addNewReplyIsDisabled={showNewReply}
+      addNewReplyIsDisabled={showNewReply && isInvalidValue}
       onAddNewReply={handleAddNewReply}
       onDownloadAttachment={onDownloadAttachment}
+      onMouseDownNewReply={handleMouseDownNewReply}
     >
       <Flex flexWrap="wrap" alignItems="center">
         <Text
