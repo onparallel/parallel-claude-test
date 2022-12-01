@@ -1,12 +1,12 @@
+import { Request } from "express";
 import { inject, injectable } from "inversify";
 import { Config, CONFIG } from "../config";
-import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import {
   IntegrationRepository,
   IntegrationSettings,
   SignatureEnvironment,
 } from "../db/repositories/IntegrationRepository";
-import { IntegrationType, OrgIntegration } from "../db/__types";
+import { FeatureFlagName, IntegrationType, OrgIntegration } from "../db/__types";
 import { FetchService, FETCH_SERVICE } from "../services/fetch";
 import { IRedis, REDIS } from "../services/redis";
 import { Replace } from "../util/types";
@@ -27,8 +27,7 @@ export class DocusignOauthIntegration extends OAuthIntegration<DocusignOauthInte
     @inject(CONFIG) config: Config,
     @inject(REDIS) redis: IRedis,
     @inject(IntegrationRepository) integrations: IntegrationRepository,
-    @inject(FETCH_SERVICE) private fetch: FetchService,
-    @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository
+    @inject(FETCH_SERVICE) private fetch: FetchService
   ) {
     super(config, integrations, redis);
   }
@@ -146,7 +145,11 @@ export class DocusignOauthIntegration extends OAuthIntegration<DocusignOauthInte
     };
   }
 
-  protected override async orgHasAccessToIntegration(orgId: number) {
-    return await this.featureFlags.orgHasFeatureFlag(orgId, "PETITION_SIGNATURE");
+  protected override async orgHasAccessToIntegration(orgId: number, req: Request) {
+    const ffs: FeatureFlagName[] = ["PETITION_SIGNATURE"];
+    if (req.query.environment === "sandbox") {
+      ffs.push("DOCUSIGN_SANDBOX_PROVIDER");
+    }
+    return (await req.context.featureFlags.orgHasFeatureFlag(orgId, ffs)).every((ff) => ff);
   }
 }

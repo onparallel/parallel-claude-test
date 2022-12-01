@@ -1,4 +1,4 @@
-import { RequestHandler, Router } from "express";
+import { Request, RequestHandler, Router } from "express";
 import { injectable } from "inversify";
 import { isDefined, omit } from "remeda";
 import { authenticate } from "../api/helpers/authenticate";
@@ -45,7 +45,7 @@ export abstract class OAuthIntegration<
     context: WithAccessTokenContext
   ): Promise<OauthCredentials>;
 
-  protected orgHasAccessToIntegration(orgId: number): MaybePromise<boolean> {
+  protected orgHasAccessToIntegration(orgId: number, req: Request): MaybePromise<boolean> {
     return true;
   }
 
@@ -118,7 +118,7 @@ export abstract class OAuthIntegration<
             environment: SignatureEnvironment;
           };
 
-          if (!(await this.orgHasAccessToIntegration(orgId))) {
+          if (!(await this.orgHasAccessToIntegration(orgId, req))) {
             res.status(403).send("Not authorized");
             return;
           }
@@ -133,7 +133,7 @@ export abstract class OAuthIntegration<
           const url = await this.buildAuthorizationUrl(state);
           res.redirect(url);
         } catch (error) {
-          console.error(error);
+          req.context.logger.error(error);
           next(error);
         }
       })

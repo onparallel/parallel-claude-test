@@ -343,6 +343,7 @@ export type FeatureFlag =
   | "CLIENT_PORTAL"
   | "CUSTOM_HOST_UI"
   | "DEVELOPER_ACCESS"
+  | "DOCUSIGN_SANDBOX_PROVIDER"
   | "DOW_JONES_KYC"
   | "ES_TAX_DOCUMENTS_FIELD"
   | "EXPORT_CUATRECASAS"
@@ -6420,6 +6421,12 @@ export type AddSignatureCredentialsDialog_validateSignaturitApiKeyMutationVariab
 
 export type AddSignatureCredentialsDialog_validateSignaturitApiKeyMutation = {
   validateSignaturitApiKey: { __typename?: "ValidateSignatureCredentialsResult"; success: boolean };
+};
+
+export type useAddSignatureCredentialsDialog_UserFragment = {
+  __typename?: "User";
+  id: string;
+  hasDocusignSandbox: boolean;
 };
 
 export type CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment = {
@@ -15913,6 +15920,7 @@ export type IntegrationsSignature_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasPetitionSignature: boolean;
+    hasDocusignSandbox: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -27501,6 +27509,12 @@ export const DocumentThemeSelect_OrganizationThemeFragmentDoc = gql`
     isDefault
   }
 ` as unknown as DocumentNode<DocumentThemeSelect_OrganizationThemeFragment, unknown>;
+export const useAddSignatureCredentialsDialog_UserFragmentDoc = gql`
+  fragment useAddSignatureCredentialsDialog_User on User {
+    id
+    hasDocusignSandbox: hasFeatureFlag(featureFlag: DOCUSIGN_SANDBOX_PROVIDER)
+  }
+` as unknown as DocumentNode<useAddSignatureCredentialsDialog_UserFragment, unknown>;
 export const CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragmentDoc = gql`
   fragment CreateOrUpdateDocumentThemeDialog_OrganizationTheme on OrganizationTheme {
     name
@@ -34527,6 +34541,7 @@ export const IntegrationsSignature_userDocument = gql`
     me {
       id
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+      ...useAddSignatureCredentialsDialog_User
       organization {
         id
         signatureIntegrations: integrations(type: SIGNATURE, limit: $limit, offset: $offset) {
@@ -34541,6 +34556,7 @@ export const IntegrationsSignature_userDocument = gql`
     }
   }
   ${SettingsLayout_QueryFragmentDoc}
+  ${useAddSignatureCredentialsDialog_UserFragmentDoc}
   ${IntegrationsSignature_SignatureOrgIntegrationFragmentDoc}
 ` as unknown as DocumentNode<
   IntegrationsSignature_userQuery,

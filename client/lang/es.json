@@ -1730,6 +1730,16 @@
     "context": "Developer access"
   },
   {
+    "term": "component.feature-flag-descriptions.docusign-sandbox-provider-description",
+    "definition": "Habilita la configuración para crear una integración de DocuSign en modo Sandbox en la organización.",
+    "context": "Enables the setting to create a DocuSign Sandbox integration on the organization."
+  },
+  {
+    "term": "component.feature-flag-descriptions.docusign-sandbox-provider-name",
+    "definition": "Docusign Sandbox",
+    "context": "DocuSign Sandbox Provider"
+  },
+  {
     "term": "component.feature-flag-descriptions.dow-jones-kyc-description",
     "definition": "Habilita el campo de Dow Jones para la organización.",
     "context": "Enables the Dow Jones petition field on the organization."

@@ -88,7 +88,7 @@ function IntegrationsSignature() {
   );
   const handleAddSignatureProvider = async () => {
     try {
-      const data = await showAddSignatureCredentialsDialog();
+      const data = await showAddSignatureCredentialsDialog(me);
       if (data.provider === "SIGNATURIT") {
         await createSignaturitIntegration({
           variables: {
@@ -508,6 +508,7 @@ IntegrationsSignature.queries = [
       me {
         id
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+        ...useAddSignatureCredentialsDialog_User
         organization {
           id
           signatureIntegrations: integrations(type: SIGNATURE, limit: $limit, offset: $offset) {
@@ -522,6 +523,7 @@ IntegrationsSignature.queries = [
       }
     }
     ${SettingsLayout.fragments.Query}
+    ${useAddSignatureCredentialsDialog.fragments.User}
     ${IntegrationsSignature.fragments.SignatureOrgIntegration}
   `,
 ];

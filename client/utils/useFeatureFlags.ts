@@ -221,6 +221,18 @@ export function useFeatureFlags() {
           defaultMessage: "Allows recipients to access the client portal.",
         }),
       },
+      {
+        name: "DOCUSIGN_SANDBOX_PROVIDER",
+        title: intl.formatMessage({
+          id: "component.feature-flag-descriptions.docusign-sandbox-provider-name",
+          defaultMessage: "DocuSign Sandbox Provider",
+        }),
+        description: intl.formatMessage({
+          id: "component.feature-flag-descriptions.docusign-sandbox-provider-description",
+          defaultMessage:
+            "Enables the setting to create a DocuSign Sandbox integration on the organization.",
+        }),
+      },
     ],
     [intl.locale]
   );

@@ -23,6 +23,7 @@ import { Steps } from "@parallel/components/common/Steps";
 import {
   AddSignatureCredentialsDialog_validateSignaturitApiKeyDocument,
   SignatureOrgIntegrationProvider,
+  useAddSignatureCredentialsDialog_UserFragment,
 } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
 import { useDocusignConsentPopup } from "@parallel/utils/useDocusignConsentPopup";
@@ -46,8 +47,9 @@ interface AddSignatureCredentialsDialogData<
 }
 
 function AddSignatureCredentialsDialog({
+  hasDocusignSandbox,
   ...props
-}: DialogProps<{}, AddSignatureCredentialsDialogData>) {
+}: DialogProps<useAddSignatureCredentialsDialog_UserFragment, AddSignatureCredentialsDialogData>) {
   const {
     valueAsNumber: currentStep,
     isAtMin: isFirstStep,
@@ -68,7 +70,7 @@ function AddSignatureCredentialsDialog({
 
   async function submitForm() {
     const [error] = await withError(
-      form.handleSubmit(props.onResolve, (d) => {
+      form.handleSubmit(props.onResolve, () => {
         throw new Error();
       })
     );
@@ -151,7 +153,7 @@ function AddSignatureCredentialsDialog({
         <FormProvider {...form}>
           <Steps currentStep={currentStep}>
             <AddSignatureCredentialsStep1 />
-            <AddSignatureCredentialsStep2 />
+            <AddSignatureCredentialsStep2 hasDocusignSandbox={hasDocusignSandbox} />
           </Steps>
         </FormProvider>
       }
@@ -299,27 +301,29 @@ function SignaturitCredentialsInput() {
   );
 }
 
-function DocusignCredentialsInput() {
+function DocusignCredentialsInput({ hasDocusignSandbox }: { hasDocusignSandbox: boolean }) {
   const { register } = useFormContext<AddSignatureCredentialsDialogData<"DOCUSIGN">>();
   return (
     <Stack>
-      <FormControl id="credentials.sandboxMode">
-        <FormLabel>
-          <FormattedMessage
-            id="component.add-signature-credentials-dialog.docusign-environment"
-            defaultMessage="Demo mode"
-          />
-          <HelpPopover>
-            <Text fontSize="sm">
-              <FormattedMessage
-                id="component.add-signature-credentials-dialog.docusign-environment-popover"
-                defaultMessage="With Demo mode you can test DocuSign for free, but your signatures won't have any legal validity."
-              />
-            </Text>
-          </HelpPopover>
-          <Switch {...register("credentials.sandboxMode")} marginLeft={2} />
-        </FormLabel>
-      </FormControl>
+      {hasDocusignSandbox ? (
+        <FormControl id="credentials.sandboxMode">
+          <FormLabel>
+            <FormattedMessage
+              id="component.add-signature-credentials-dialog.docusign-environment"
+              defaultMessage="Demo mode"
+            />
+            <HelpPopover>
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="component.add-signature-credentials-dialog.docusign-environment-popover"
+                  defaultMessage="With Demo mode you can test DocuSign for free, but your signatures won't have any legal validity."
+                />
+              </Text>
+            </HelpPopover>
+            <Switch {...register("credentials.sandboxMode")} marginLeft={2} />
+          </FormLabel>
+        </FormControl>
+      ) : null}
       <Text fontSize="sm">
         <FormattedMessage
           id="component.add-signature-credentials-dialog.docusign-explainer"
@@ -330,7 +334,7 @@ function DocusignCredentialsInput() {
   );
 }
 
-function AddSignatureCredentialsStep2() {
+function AddSignatureCredentialsStep2({ hasDocusignSandbox }: { hasDocusignSandbox: boolean }) {
   const {
     register,
     formState: { errors },
@@ -367,7 +371,7 @@ function AddSignatureCredentialsStep2() {
       {selectedProvider === "SIGNATURIT" ? (
         <SignaturitCredentialsInput />
       ) : selectedProvider === "DOCUSIGN" ? (
-        <DocusignCredentialsInput />
+        <DocusignCredentialsInput hasDocusignSandbox={hasDocusignSandbox} />
       ) : null}
       <FormControl>
         <Checkbox {...register("isDefault")}>
@@ -390,3 +394,12 @@ const _mutations = [
     }
   `,
 ];
+
+useAddSignatureCredentialsDialog.fragments = {
+  User: gql`
+    fragment useAddSignatureCredentialsDialog_User on User {
+      id
+      hasDocusignSandbox: hasFeatureFlag(featureFlag: DOCUSIGN_SANDBOX_PROVIDER)
+    }
+  `,
+};
