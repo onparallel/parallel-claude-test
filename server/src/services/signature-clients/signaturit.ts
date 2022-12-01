@@ -6,6 +6,7 @@ import { CONFIG, Config } from "../../config";
 import {
   IntegrationRepository,
   IntegrationSettings,
+  SignatureEnvironment,
 } from "../../db/repositories/IntegrationRepository";
 import { buildEmail } from "../../emails/buildEmail";
 import SignatureCancelledEmail from "../../emails/emails/SignatureCancelledEmail";
@@ -59,7 +60,7 @@ export class SignaturitClient implements ISignatureClient {
           )
           .then(({ status }) => {
             if (status === 200) {
-              return { environment: environment as "sandbox" | "production" };
+              return { environment: environment as SignatureEnvironment };
             } else {
               throw new Error();
             }

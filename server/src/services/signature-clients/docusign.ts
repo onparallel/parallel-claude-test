@@ -3,7 +3,6 @@ import { readFile, stat } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { basename, extname } from "path";
 import { Config, CONFIG } from "../../config";
-import { IntegrationRepository } from "../../db/repositories/IntegrationRepository";
 import {
   DocusignOauthIntegration,
   DocusignOauthIntegrationContext,
@@ -19,7 +18,6 @@ export class DocuSignClient implements ISignatureClient {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(I18N_SERVICE) private i18n: II18nService,
-    @inject(IntegrationRepository) private integrations: IntegrationRepository,
     @inject(DocusignOauthIntegration) private docusignOauth: DocusignOauthIntegration
   ) {}
 

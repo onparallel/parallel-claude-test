@@ -11,6 +11,7 @@ import {
   Radio,
   RadioGroup,
   Spinner,
+  Switch,
   useCounter,
   useToast,
 } from "@chakra-ui/react";
@@ -26,13 +27,13 @@ import {
 import { withError } from "@parallel/utils/promises/withError";
 import { useDocusignConsentPopup } from "@parallel/utils/useDocusignConsentPopup";
 import { useState } from "react";
-import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
+import { Controller, FormProvider, useForm, useFormContext, UseFormReturn } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const PROVIDERS: SignatureOrgIntegrationProvider[] = ["SIGNATURIT", "DOCUSIGN"];
 type SignatureCredentials<TProvider extends SignatureOrgIntegrationProvider> = {
   SIGNATURIT: { API_KEY: string };
-  DOCUSIGN: {};
+  DOCUSIGN: { sandboxMode?: boolean };
 }[TProvider];
 
 interface AddSignatureCredentialsDialogData<
@@ -83,9 +84,13 @@ function AddSignatureCredentialsDialog({
   async function handleConfirmClick() {
     if (isLastStep) {
       if (selectedProvider === "DOCUSIGN") {
+        const docusignForm = form as UseFormReturn<AddSignatureCredentialsDialogData<"DOCUSIGN">>;
         setConsentState("AWAITING");
         const [error] = await withError(
           showDocusignConsentPopup({
+            environment: docusignForm.getValues("credentials.sandboxMode")
+              ? "sandbox"
+              : "production",
             isDefault: form.getValues("isDefault"),
             name: form.getValues("name"),
           })
@@ -295,13 +300,33 @@ function SignaturitCredentialsInput() {
 }
 
 function DocusignCredentialsInput() {
+  const { register } = useFormContext<AddSignatureCredentialsDialogData<"DOCUSIGN">>();
   return (
-    <Text fontSize="sm">
-      <FormattedMessage
-        id="component.add-signature-credentials-dialog.docusign-explainer"
-        defaultMessage="When you click on Authorize a window will open in which Docusign will ask you for permission to send signatures on your behalf."
-      />
-    </Text>
+    <Stack>
+      <FormControl id="credentials.sandboxMode">
+        <FormLabel>
+          <FormattedMessage
+            id="component.add-signature-credentials-dialog.docusign-environment"
+            defaultMessage="Demo mode"
+          />
+          <HelpPopover>
+            <Text fontSize="sm">
+              <FormattedMessage
+                id="component.add-signature-credentials-dialog.docusign-environment-popover"
+                defaultMessage="With Demo mode you can test DocuSign for free, but your signatures won't have any legal validity."
+              />
+            </Text>
+          </HelpPopover>
+          <Switch {...register("credentials.sandboxMode")} marginLeft={2} />
+        </FormLabel>
+      </FormControl>
+      <Text fontSize="sm">
+        <FormattedMessage
+          id="component.add-signature-credentials-dialog.docusign-explainer"
+          defaultMessage="When you click on Authorize a window will open in which Docusign will ask you for permission to send signatures on your behalf."
+        />
+      </Text>
+    </Stack>
   );
 }
 

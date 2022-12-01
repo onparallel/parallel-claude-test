@@ -3,7 +3,10 @@ import { injectable } from "inversify";
 import { isDefined, omit } from "remeda";
 import { authenticate } from "../api/helpers/authenticate";
 import { Config } from "../config";
-import { IntegrationRepository } from "../db/repositories/IntegrationRepository";
+import {
+  IntegrationRepository,
+  SignatureEnvironment,
+} from "../db/repositories/IntegrationRepository";
 import { CreateOrgIntegration, IntegrationType, OrgIntegration } from "../db/__types";
 import { IRedis } from "../services/redis";
 import { fromGlobalId } from "../util/globalId";
@@ -25,18 +28,22 @@ export abstract class OAuthIntegration<
   constructor(
     protected override config: Config,
     protected override integrations: IntegrationRepository,
-    private redis: IRedis
+    protected redis: IRedis
   ) {
     super(config, integrations);
   }
   abstract readonly orgIntegrationType: IntegrationType;
   abstract readonly provider: string;
 
-  abstract buildAuthorizationUrl(state: string): string;
+  abstract buildAuthorizationUrl(state: string): MaybePromise<string>;
   abstract fetchCredentialsAndContextData(
-    code: string
+    code: string,
+    stateArgs: any
   ): Promise<{ CREDENTIALS: OauthCredentials } & WithAccessTokenContext>;
-  abstract refreshCredentials(credentials: OauthCredentials): Promise<OauthCredentials>;
+  abstract refreshCredentials(
+    credentials: OauthCredentials,
+    context: WithAccessTokenContext
+  ): Promise<OauthCredentials>;
 
   protected orgHasAccessToIntegration(orgId: number): MaybePromise<boolean> {
     return true;
@@ -104,10 +111,11 @@ export abstract class OAuthIntegration<
       .get("/authorize", authenticate(), async (req, res, next) => {
         try {
           const orgId = req.context.user!.org_id;
-          const { id, isDefault, name } = req.query as {
+          const { id, isDefault, name, environment } = req.query as {
             id?: string;
             isDefault: string;
             name: string;
+            environment: SignatureEnvironment;
           };
 
           if (!(await this.orgHasAccessToIntegration(orgId))) {
@@ -116,12 +124,13 @@ export abstract class OAuthIntegration<
           }
           const state = random(16);
           await this.storeState(state, {
-            orgId,
-            isDefault: isDefault === "true",
-            name,
             id: id ? fromGlobalId(id, "OrgIntegration").id : null,
+            orgId,
+            name,
+            isDefault: isDefault === "true",
+            environment,
           });
-          const url = this.buildAuthorizationUrl(state);
+          const url = await this.buildAuthorizationUrl(state);
           res.redirect(url);
         } catch (error) {
           console.error(error);
@@ -146,9 +155,10 @@ export abstract class OAuthIntegration<
               orgId: number;
               isDefault: boolean;
               name: string;
+              environment: SignatureEnvironment;
             }>(state);
 
-            const credentials = await this.fetchCredentialsAndContextData(code);
+            const credentials = await this.fetchCredentialsAndContextData(code, args);
             if (isDefined(args.id)) {
               const integration = (await this.integrations.loadIntegration(args.id))!;
               await this.updateIntegration(args.id, {
@@ -192,7 +202,7 @@ export abstract class OAuthIntegration<
         } catch (error) {
           if (error instanceof InvalidCredentialsError && !error.skipRefresh) {
             const [refreshError, newCredentials] = await withError(
-              this.refreshCredentials(credentials)
+              this.refreshCredentials(credentials, context)
             );
             if (isDefined(refreshError)) {
               // we couldn't refresh the access token, permissions might be revoked

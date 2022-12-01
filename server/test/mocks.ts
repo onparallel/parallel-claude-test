@@ -14,6 +14,7 @@ import { IRedis } from "../src/services/redis";
 import { ISignatureService, SignatureService } from "../src/services/signature";
 import { IStorageImpl, IStorageService } from "../src/services/storage";
 import { random } from "../src/util/token";
+import { SignatureEnvironment } from "../src/db/repositories/IntegrationRepository";
 
 export const USER_COGNITO_ID = "test-cognito-id";
 
@@ -158,7 +159,7 @@ export class MockFetchService implements IFetchService {
 
 @injectable()
 export class MockSignatureService extends SignatureService implements ISignatureService {
-  async checkSignaturitApiKey(): Promise<"sandbox" | "production"> {
+  async checkSignaturitApiKey(): Promise<SignatureEnvironment> {
     return "sandbox";
   }
 }

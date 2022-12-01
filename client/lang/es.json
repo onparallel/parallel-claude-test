@@ -140,6 +140,16 @@
     "context": "Authorize"
   },
   {
+    "term": "component.add-signature-credentials-dialog.docusign-environment",
+    "definition": "Modo Demo",
+    "context": "Demo mode"
+  },
+  {
+    "term": "component.add-signature-credentials-dialog.docusign-environment-popover",
+    "definition": "Con el Modo Demo, puedes probar DocuSign de manera gratuita, pero tus firmas no tendrán ninguna validez legal.",
+    "context": "With Demo mode you can test DocuSign for free, but your signatures won't have any legal validity."
+  },
+  {
     "term": "component.add-signature-credentials-dialog.docusign-explainer",
     "definition": "Cuando hagas click en Autorizar se abrirá una ventana en la que Docusign te pedirá permiso para enviar firmas en tu nombre.",
     "context": "When you click on Authorize a window will open in which Docusign will ask you for permission to send signatures on your behalf."

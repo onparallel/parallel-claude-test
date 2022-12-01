@@ -154,11 +154,20 @@ export function buildConfig() {
     },
     oauth: {
       docusign: {
-        baseUri: process.env.DOCUSIGN_BASE_URI!,
-        integrationKey: process.env.DOCUSIGN_INTEGRATION_KEY!,
-        secretKey: process.env.DOCUSIGN_SECRET_KEY!,
-        redirectUri: process.env.DOCUSIGN_REDIRECT_URI!,
-        webhookHmacSecret: process.env.DOCUSIGN_WEBHOOK_HMAC_SECRET!,
+        sandbox: {
+          webhookHmacSecret: process.env.DOCUSIGN_WEBHOOK_HMAC_SECRET!,
+          baseUri: process.env.DOCUSIGN_SANDBOX_BASE_URI!,
+          integrationKey: process.env.DOCUSIGN_SANDBOX_INTEGRATION_KEY!,
+          secretKey: process.env.DOCUSIGN_SANDBOX_SECRET_KEY!,
+          redirectUri: process.env.DOCUSIGN_SANDBOX_REDIRECT_URI!,
+        },
+        production: {
+          webhookHmacSecret: process.env.DOCUSIGN_WEBHOOK_HMAC_SECRET!,
+          baseUri: process.env.DOCUSIGN_BASE_URI!,
+          integrationKey: process.env.DOCUSIGN_INTEGRATION_KEY!,
+          secretKey: process.env.DOCUSIGN_SECRET_KEY!,
+          redirectUri: process.env.DOCUSIGN_REDIRECT_URI!,
+        },
       },
     },
   });

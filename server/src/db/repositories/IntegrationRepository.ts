@@ -15,13 +15,15 @@ type SignatureIntegrationCredentials<TProvider extends SignatureProvider> = {
   DOCUSIGN: OauthCredentials;
 }[TProvider];
 
+export type SignatureEnvironment = "production" | "sandbox";
+
 export type IntegrationSettings<
   TType extends IntegrationType,
   TProvider extends SignatureProvider = any
 > = {
   SIGNATURE: {
     CREDENTIALS: SignatureIntegrationCredentials<TProvider>;
-    ENVIRONMENT?: "production" | "sandbox";
+    ENVIRONMENT?: SignatureEnvironment;
     // Signaturit
     EN_FORMAL_BRANDING_ID?: string;
     ES_FORMAL_BRANDING_ID?: string;

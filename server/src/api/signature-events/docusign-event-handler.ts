@@ -120,7 +120,11 @@ const validateHMACSignature: RequestHandler = (req, res, next) => {
   const isValid = headerKeys.some((key) => {
     const signature = req.headers[key] as string | undefined;
     if (signature) {
-      const hash = createHmac("sha256", req.context.config.oauth.docusign.webhookHmacSecret)
+      const hash = createHmac(
+        "sha256",
+        // no difference between production and sandbox webhookHmacSecrets
+        req.context.config.oauth.docusign.production.webhookHmacSecret
+      )
         .update(JSON.stringify(req.body))
         .digest("base64");
       if (timingSafeEqual(Buffer.from(hash, "base64"), Buffer.from(signature, "base64"))) {

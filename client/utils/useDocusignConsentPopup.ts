@@ -35,7 +35,12 @@ export function useDocusignConsentPopup() {
     []
   );
 
-  return async (params?: { id?: string; isDefault: boolean; name: string }) => {
+  return async (params?: {
+    id?: string;
+    isDefault: boolean;
+    name: string;
+    environment: "sandbox" | "production";
+  }) => {
     setIsRunning(true);
     windowRef.current = await openNewWindow(
       () =>

@@ -173,7 +173,12 @@ function IntegrationsSignature() {
   async function handleDocusignReauthorize(
     i: IntegrationsSignature_SignatureOrgIntegrationFragment
   ) {
-    const [error] = await withError(showDocusignConsentPopup(i));
+    const [error] = await withError(
+      showDocusignConsentPopup({
+        ...i,
+        environment: i.environment === "DEMO" ? "sandbox" : "production",
+      })
+    );
     if (!error) {
       refetch();
     }
