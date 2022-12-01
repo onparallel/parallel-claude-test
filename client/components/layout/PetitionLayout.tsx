@@ -12,6 +12,7 @@ import {
   PetitionLayout_QueryFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useStateSlice } from "@parallel/utils/useStateSlice";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import {
@@ -218,6 +219,8 @@ export const usePetitionShouldConfirmNavigation = createUseContextSlice(
   "usePetitionShouldConfirmNavigation"
 );
 
+const HANDLED_ERRORS = ["ALIAS_ALREADY_EXISTS"];
+
 export function usePetitionStateWrapper() {
   const showError = useErrorDialog();
   const intl = useIntl();
@@ -235,6 +238,9 @@ export function usePetitionStateWrapper() {
         setState("SAVED");
         return result;
       } catch (error) {
+        if (HANDLED_ERRORS.some((type) => isApolloError(error, type))) {
+          throw error;
+        }
         setState("ERROR");
         try {
           await showError({
