@@ -14,7 +14,7 @@ import { useIntl } from "react-intl";
 
 export interface MoreOptionsMenuButtonProps extends Omit<IconButtonProps, "aria-label"> {
   label?: string;
-  menuProps?: MenuProps;
+  menuProps?: Omit<MenuProps, "children">;
   options: ReactNode;
 }
 

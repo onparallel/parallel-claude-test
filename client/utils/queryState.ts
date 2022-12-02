@@ -1,6 +1,7 @@
 import { TableSorting, TableSortingDirection } from "@parallel/components/common/Table";
 import type Router from "next/router";
 import { NextRouter, useRouter } from "next/router";
+import { ParsedUrlQuery } from "querystring";
 import { MouseEvent, useCallback, useMemo } from "react";
 import { equals, isDefined, pick } from "remeda";
 import { fromBase64, toBase64 } from "./base64";
@@ -232,10 +233,42 @@ export function useQueryState<T extends {}>(
   ];
 }
 
+export function buildStateUrl<T extends {}>(
+  shape: QueryStateOf<T>,
+  state: Partial<T>,
+  currentPathname: string,
+  currentQuery: ParsedUrlQuery,
+  { prefix }: QueryStateOptions = {}
+) {
+  const invalid = Object.keys(state).find((k) => !shape.hasOwnProperty(k));
+  if (invalid) {
+    console.error(`Invalid key "${invalid}" in setQueryState`);
+  }
+  const fromPath = pathParams(currentPathname);
+  const fromState = Object.keys(shape).map((key) => (prefix ? prefix + key : key));
+  const newQuery = [
+    ...(Object.entries(state)
+      .filter(
+        ([key, value]) =>
+          value !== null && value !== undefined && !shape[key as keyof T].isDefault(value as any)
+      )
+      .map(([key, value]) => [
+        prefix ? prefix + key : key,
+        shape[key as keyof T].serialize(value as any),
+      ]) as [string, string][]),
+    // keep other params
+    ...(Object.entries(currentQuery).filter(
+      ([key]) => !fromState.includes(key) && !fromPath.includes(key)
+    ) as [string, string][]),
+  ];
+  const route = resolveUrl(currentPathname, currentQuery);
+  return newQuery.length > 0 ? `${route}?${new URLSearchParams(newQuery)}` : route;
+}
+
 function useBuildStateUrlInternal<T extends {}>(
   getCurrentState: () => T,
   shape: QueryStateOf<T>,
-  { prefix }: QueryStateOptions = {}
+  options: QueryStateOptions = {}
 ): (state: NextQueryState<Partial<T>>) => string {
   const router = useRouter();
   const ref = useUpdatingRef<Pick<NextRouter, "query" | "pathname">>(
@@ -244,29 +277,7 @@ function useBuildStateUrlInternal<T extends {}>(
   return useCallback(function (state) {
     const { query, pathname } = ref.current;
     const newState = typeof state === "function" ? state(getCurrentState()) : state;
-    const invalid = Object.keys(newState).find((k) => !shape.hasOwnProperty(k));
-    if (invalid) {
-      console.error(`Invalid key "${invalid}" in setQueryState`);
-    }
-    const fromPath = pathParams(pathname);
-    const fromState = Object.keys(shape).map((key) => (prefix ? prefix + key : key));
-    const newQuery = [
-      ...(Object.entries(newState)
-        .filter(
-          ([key, value]) =>
-            value !== null && value !== undefined && !shape[key as keyof T].isDefault(value as any)
-        )
-        .map(([key, value]) => [
-          prefix ? prefix + key : key,
-          shape[key as keyof T].serialize(value as any),
-        ]) as [string, string][]),
-      // keep other params
-      ...(Object.entries(query).filter(
-        ([key]) => !fromState.includes(key) && !fromPath.includes(key)
-      ) as [string, string][]),
-    ];
-    const route = resolveUrl(pathname, query);
-    return newQuery.length > 0 ? `${route}?${new URLSearchParams(newQuery)}` : route;
+    return buildStateUrl(shape, newState, pathname, query, options);
   }, []);
 }
 

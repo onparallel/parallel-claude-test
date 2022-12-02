@@ -30,7 +30,11 @@ import { RestrictedFeaturePopover } from "@parallel/components/common/Restricted
 import { SearchInOptions } from "@parallel/components/common/SearchAllOrCurrentFolder";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { TablePage } from "@parallel/components/common/TablePage";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import {
+  RedirectError,
+  withApolloData,
+  WithApolloDataContext,
+} from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useCreateFolderDialog } from "@parallel/components/petition-common/dialogs/CreateFolderDialog";
 import { useMoveToFolderDialog } from "@parallel/components/petition-common/dialogs/MoveToFolderDialog";
@@ -43,6 +47,7 @@ import {
   unflatShared,
 } from "@parallel/components/petition-list/filters/shared-with/PetitionListSharedWithFilter";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
+import { ViewTabs } from "@parallel/components/petition-list/ViewTabs";
 import { useNewTemplateDialog } from "@parallel/components/petition-new/dialogs/NewTemplateDialog";
 import {
   PetitionBaseType,
@@ -67,8 +72,10 @@ import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import {
+  buildStateUrl,
   integer,
   object,
+  parseQuery,
   QueryItem,
   QueryStateFrom,
   sorting,
@@ -79,13 +86,14 @@ import {
 import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import { MouseEvent, ReactNode, useCallback, useMemo } from "react";
+import { MouseEvent, ReactNode, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { map, maxBy, pick, pipe } from "remeda";
+import { isDefined, map, maxBy, pick, pipe } from "remeda";
 
 const SORTING = ["name", "createdAt", "sentAt"] as const;
 
 const QUERY_STATE = {
+  view: string(),
   path: string()
     .withValidation((value) => typeof value === "string" && /^\/([^\/]+\/)*$/.test(value))
     .orDefault("/"),
@@ -117,9 +125,78 @@ const QUERY_STATE = {
 
 export type PetitionsQueryState = QueryStateFrom<typeof QUERY_STATE>;
 
-function rowKeyProp(row: PetitionSelection) {
+function rowKeyProp(row: Petitions_PetitionBaseOrFolderFragment) {
   return row.__typename === "PetitionFolder" ? row.folderId : (row as any).id;
 }
+
+interface View {
+  id: string;
+  name: string;
+  filters: Partial<
+    Pick<
+      PetitionsQueryState,
+      | "status"
+      | "tags"
+      | "sharedWith"
+      | "signature"
+      | "fromTemplateId"
+      | "search"
+      | "searchIn"
+      | "path"
+    >
+  >;
+  sortBy: PetitionsQueryState["sort"];
+  isDefault?: boolean;
+}
+
+const VIEWS: View[] = [
+  {
+    id: "00001",
+    name: "Pending",
+    filters: {
+      status: ["PENDING"],
+      sharedWith: null,
+      tags: null,
+      signature: null,
+      fromTemplateId: null,
+      search: null,
+      searchIn: "EVERYWHERE",
+      path: "/",
+    },
+    sortBy: { field: "sentAt", direction: "DESC" },
+    isDefault: true,
+  },
+  {
+    id: "00002",
+    name: "Shared with me",
+    filters: {
+      status: null,
+      sharedWith: { operator: "AND", filters: [{ operator: "SHARED_WITH", value: "yQQfqcU5" }] },
+      tags: null,
+      signature: null,
+      fromTemplateId: null,
+      search: null,
+      searchIn: "EVERYWHERE",
+      path: "/",
+    },
+    sortBy: { field: "sentAt", direction: "DESC" },
+  },
+  {
+    id: "00003",
+    name: "Hola",
+    filters: {
+      status: null,
+      sharedWith: null,
+      tags: ["Dm54GEK"],
+      signature: null,
+      fromTemplateId: null,
+      search: null,
+      searchIn: "EVERYWHERE",
+      path: "/",
+    },
+    sortBy: { field: "sentAt", direction: "DESC" },
+  },
+];
 
 function Petitions() {
   const intl = useIntl();
@@ -165,20 +242,16 @@ function Petitions() {
   );
 
   function handleTypeChange(type: PetitionBaseType) {
-    setQueryState((current) => ({
-      ...current,
-      status: null,
-      path: "/",
-      type,
-      page: 1,
-      // avoid invalid filter/sort combinations
-      sort:
-        type === "TEMPLATE" && current.sort?.field === "sentAt"
-          ? { ...current.sort, field: "createdAt" }
-          : type !== "TEMPLATE" && current.sort?.field === "createdAt"
-          ? { ...current.sort, field: "sentAt" }
-          : current.sort,
-    }));
+    if (type === "PETITION") {
+      const defaultView = views.find((v) => v.isDefault);
+      if (isDefined(defaultView)) {
+        setQueryState({ type, view: defaultView.id, ...defaultView.filters });
+      } else {
+        setQueryState({ type });
+      }
+    } else {
+      setQueryState({ type });
+    }
   }
 
   const showNewTemplateDialog = useNewTemplateDialog();
@@ -288,7 +361,10 @@ function Petitions() {
       });
     } catch {}
   };
-  const handleRowClick = useCallback(function (row: PetitionSelection, event: MouseEvent) {
+  const handleRowClick = useCallback(function (
+    row: Petitions_PetitionBaseOrFolderFragment,
+    event: MouseEvent
+  ) {
     if (row.__typename === "PetitionFolder") {
       setQueryState(
         (current) => ({
@@ -314,7 +390,8 @@ function Petitions() {
         { event }
       );
     }
-  }, []);
+  },
+  []);
 
   const [updatePetition] = useMutation(Petitions_updatePetitionDocument);
   const [renameFolder] = useMutation(Petitions_renameFolderDocument);
@@ -417,6 +494,11 @@ function Petitions() {
     onShareClick: handlePetitionSharingClick,
     onMoveToClick: handleMoveToClick,
   });
+
+  const [views, setViews] = useState([...VIEWS]);
+  const handleReorder = (viewIds: string[]) => {
+    setViews((views) => viewIds.map((id) => views.find((v) => v.id === id)!));
+  };
 
   return (
     <AppLayout
@@ -582,12 +664,23 @@ function Petitions() {
             onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
             actions={actions}
             header={
-              <PetitionListHeader
-                shape={QUERY_STATE}
-                state={state}
-                onStateChange={setQueryState}
-                onReload={() => refetch()}
-              />
+              <>
+                {state.type === "PETITION" ? (
+                  <ViewTabs
+                    state={state}
+                    onStateChange={setQueryState}
+                    views={views}
+                    onReorder={handleReorder}
+                  />
+                ) : null}
+                <PetitionListHeader
+                  shape={QUERY_STATE}
+                  state={state}
+                  onStateChange={setQueryState}
+                  onReload={() => refetch()}
+                  views={views}
+                />
+              </>
             }
             body={
               data?.petitions.totalCount === 0 && !loading ? (
@@ -631,8 +724,6 @@ function Petitions() {
     </AppLayout>
   );
 }
-
-export type PetitionSelection = Petitions_PetitionBaseOrFolderFragment;
 
 Petitions.fragments = {
   User: gql`
@@ -830,7 +921,32 @@ function usePetitionListActions({
   ];
 }
 
-Petitions.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
+Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDataContext) => {
+  const state = parseQuery(query, QUERY_STATE);
+  if (state.type === "PETITION") {
+    if (!isDefined(state.view)) {
+      const defaultView = VIEWS.find((v) => v.isDefault);
+      if (isDefined(defaultView)) {
+        throw new RedirectError(
+          buildStateUrl(
+            QUERY_STATE,
+            { view: defaultView.id, ...defaultView.filters, sort: defaultView.sortBy },
+            pathname,
+            query
+          )
+        );
+      } else {
+        throw new RedirectError(buildStateUrl(QUERY_STATE, { view: "ALL" }, pathname, query));
+      }
+    } else if (state.view !== "ALL") {
+      const view = VIEWS.find((v) => v.id === state.view);
+      if (!isDefined(view)) {
+        throw new RedirectError(
+          buildStateUrl(QUERY_STATE, { ...state, view: "ALL" }, pathname, query)
+        );
+      }
+    }
+  }
   await fetchQuery(Petitions_userDocument);
 };
 

@@ -2121,6 +2121,22 @@ export const StarIcon = createIcon({
   ),
 });
 
+export const StarEmptyIcon = createIcon({
+  displayName: "StarEmptyIcon",
+  viewBox: "0 0 16 16",
+  path: (
+    <path
+      xmlns="http://www.w3.org/2000/svg"
+      d="m7.99992 1.3335 2.05998 4.17333 4.6067.67333-3.3333 3.24667.7866 4.58667-4.11998-2.1667-4.12 2.1667.78667-4.58667-3.33334-3.24667 4.60667-.67333z"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.5"
+      fill="none"
+    />
+  ),
+});
+
 export const AppWindowIcon = createIcon({
   displayName: "AppWindowIcon",
   viewBox: "0 0 18 18",
