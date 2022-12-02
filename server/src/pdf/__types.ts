@@ -323,7 +323,6 @@ export type FeatureFlag =
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "ON_BEHALF_OF"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
-  | "PETITION_PDF_EXPORT"
   | "PETITION_SIGNATURE"
   | "PUBLIC_PETITION_LINK_PREFILL_DATA"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
@@ -1065,6 +1064,8 @@ export type MutationcreatePetitionFieldCommentArgs = {
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
   sharePetition?: InputMaybe<Scalars["Boolean"]>;
+  sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
+  sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]>;
   throwOnNoPermission?: InputMaybe<Scalars["Boolean"]>;
 };
 
@@ -1657,6 +1658,8 @@ export type MutationupdatePetitionFieldCommentArgs = {
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
   sharePetition?: InputMaybe<Scalars["Boolean"]>;
+  sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
+  sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]>;
   throwOnNoPermission?: InputMaybe<Scalars["Boolean"]>;
 };
 
