@@ -1,7 +1,7 @@
 import { addMinutes } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, indexBy, isDefined, mapValues, omit, pipe, toPairs } from "remeda";
+import { groupBy, indexBy, isDefined, mapValues, omit, pipe, toPairs, uniq } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
 import { hash, random } from "../../util/token";
@@ -11,6 +11,7 @@ import { escapeLike, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
   Contact,
+  ContactAuthentication,
   ContactAuthenticationRequest,
   CreateContact,
   CreateContactAuthenticationRequest,
@@ -294,15 +295,26 @@ export class ContactRepository extends BaseRepository {
     return rows.length > 0;
   }
 
-  async verifyContact(contactId: number, cookieValue: string) {
-    const rows = await this.from("contact_authentication")
-      .where({
-        contact_id: contactId,
-        cookie_value_hash: await hash(cookieValue, contactId.toString()),
-      })
-      .select("id");
-    return rows.length > 0 ? rows[0].id : null;
-  }
+  loadContactAuthenticationByContactId = this.buildLoader<
+    { contactId: number; cookieValue: string },
+    ContactAuthentication | null,
+    string
+  >(
+    async (keys, t) => {
+      const hashes = await Promise.all(
+        keys.map(async (k) => await hash(k.cookieValue, k.contactId.toString()))
+      );
+      const rows = await this.from("contact_authentication", t)
+        .whereIn("contact_id", uniq(keys.map((k) => k.contactId)))
+        .whereIn("cookie_value_hash", hashes);
+      const byKey = indexBy(rows, keyBuilder(["contact_id", "cookie_value_hash"]));
+      return keys
+        .map((k, i) => ({ ...k, cookieValueHash: hashes[i] }))
+        .map(keyBuilder(["contactId", "cookieValueHash"]))
+        .map((k) => byKey[k] ?? null);
+    },
+    { cacheKeyFn: keyBuilder(["contactId", "cookieValue"]) }
+  );
 
   async addContactAuthenticationLogAccessEntry(
     contactAuthenticationId: number,

@@ -30,7 +30,10 @@ export function authenticatePublicAccess<
       throw new ApolloError("Contact not found", "CONTACT_NOT_FOUND");
     }
     const cookieValue = getContactAuthCookieValue(ctx.req, contactId);
-    if (cookieValue && (await ctx.contacts.verifyContact(contactId, cookieValue))) {
+    if (
+      cookieValue &&
+      (await ctx.contacts.loadContactAuthenticationByContactId({ contactId, cookieValue }))
+    ) {
       return true;
     } else {
       throw new ApolloError("Contact is not verified", "CONTACT_NOT_VERIFIED");

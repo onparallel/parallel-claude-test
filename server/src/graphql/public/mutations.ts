@@ -108,10 +108,10 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
     const contactId = ctx.access!.contact_id;
     if (await ctx.contacts.hasContactAuthentication(contactId)) {
       const cookieValue = getContactAuthCookieValue(ctx.req, contactId);
-      const authenticationId = cookieValue
-        ? await ctx.contacts.verifyContact(contactId, cookieValue)
+      const contactAuthentication = cookieValue
+        ? await ctx.contacts.loadContactAuthenticationByContactId({ contactId, cookieValue })
         : null;
-      if (authenticationId) {
+      if (contactAuthentication) {
         await ctx.petitions.createEvent({
           type: "ACCESS_OPENED",
           petition_id: ctx.access!.petition_id,
@@ -119,7 +119,10 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
             petition_access_id: ctx.access!.id,
           },
         });
-        await ctx.contacts.addContactAuthenticationLogAccessEntry(authenticationId, logEntry);
+        await ctx.contacts.addContactAuthenticationLogAccessEntry(
+          contactAuthentication.id,
+          logEntry
+        );
         return { isAllowed: true };
       } else {
         return {
