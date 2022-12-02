@@ -57,13 +57,13 @@ export class IntegrationRepository extends BaseRepository {
     q.where({ type: "SIGNATURE" })
   );
 
-  async loadPaginatedIntegrations(
+  getPaginatedIntegrationsForOrg(
     orgId: number,
     opts: {
       type?: IntegrationType | null;
     } & PageOpts
   ) {
-    return await this.loadPageAndCount(
+    return this.getPagination<OrgIntegration>(
       this.from("org_integration")
         .where({ deleted_at: null, is_enabled: true, org_id: orgId })
         .mmodify((q) => {

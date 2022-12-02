@@ -190,7 +190,7 @@ export const Organization = objectType({
           createdAt: "created_at",
           lastActiveAt: "last_active_at",
         } as const;
-        return await ctx.organizations.loadOrgUsers(root.id, {
+        return ctx.organizations.getPaginatedUsersForOrg(root.id, {
           offset,
           limit,
           search,
@@ -216,7 +216,7 @@ export const Organization = objectType({
       },
       authorize: isOwnOrgOrSuperAdmin(),
       resolve: async (root, { limit, offset, type }, ctx) =>
-        await ctx.integrations.loadPaginatedIntegrations(root.id, {
+        ctx.integrations.getPaginatedIntegrationsForOrg(root.id, {
           type,
           offset,
           limit,
@@ -248,7 +248,7 @@ export const Organization = objectType({
         limitName: nonNull("OrganizationUsageLimitName"),
       },
       resolve: async (root, { limitName, limit, offset }, ctx) => {
-        return await ctx.organizations.loadPaginatedUsageLimits(root.id, {
+        return ctx.organizations.getPaginatedUsageLimitsForOrg(root.id, {
           limitName,
           limit,
           offset,

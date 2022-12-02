@@ -28,7 +28,7 @@ export const Contact = objectType({
       type: "PetitionAccess",
       description: "The petition accesses for this contact",
       resolve: async (root, { offset, limit }, ctx) => {
-        return await ctx.contacts.loadAccessesForContact(root.id, ctx.user!.id, {
+        return ctx.contacts.getPaginatedAccessesForContact(root.id, ctx.user!.id, {
           offset,
           limit,
         });

@@ -35,7 +35,7 @@ export const organizationQueries = queryField((t) => {
         createdAt: "created_at",
         name: "name",
       } as const;
-      return await ctx.organizations.loadOrganizations({
+      return ctx.organizations.getPaginatedOrganizations({
         search,
         offset,
         limit,

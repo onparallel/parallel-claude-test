@@ -371,7 +371,7 @@ export const Petition = objectType({
       type: "PetitionEvent",
       description: "The events for the petition.",
       resolve: async (root, { offset, limit }, ctx) => {
-        return await ctx.petitions.loadPaginatedEventsForPetition(root.id, {
+        return ctx.petitions.getPaginatedEventsForPetition(root.id, {
           offset,
           limit,
         });

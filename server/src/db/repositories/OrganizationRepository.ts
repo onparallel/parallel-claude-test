@@ -82,7 +82,7 @@ export class OrganizationRepository extends BaseRepository {
     return org;
   }
 
-  async loadOrgUsers(
+  getPaginatedUsersForOrg(
     orgId: number,
     opts: {
       search?: string | null;
@@ -91,7 +91,7 @@ export class OrganizationRepository extends BaseRepository {
       includeInactive?: boolean | null;
     } & PageOpts
   ) {
-    return await this.loadPageAndCount<any, User[]>(
+    return this.getPagination<User>(
       this.from("user")
         .join("user_data", "user.user_data_id", "user_data.id")
         .where({ org_id: orgId })
@@ -221,14 +221,14 @@ export class OrganizationRepository extends BaseRepository {
     return org;
   }
 
-  async loadOrganizations(
+  getPaginatedOrganizations(
     opts: {
       search?: string | null;
       sortBy?: SortBy<keyof Organization>[];
       status?: OrganizationStatus | null;
     } & PageOpts
   ) {
-    return await this.loadPageAndCount(
+    return this.getPagination<Organization>(
       this.from("organization")
         .whereNull("deleted_at")
         .mmodify((q) => {
@@ -691,13 +691,13 @@ export class OrganizationRepository extends BaseRepository {
     );
   }
 
-  async loadPaginatedUsageLimits(
+  getPaginatedUsageLimitsForOrg(
     orgId: number,
     opts: {
       limitName: OrganizationUsageLimitName;
     } & PageOpts
   ) {
-    return await this.loadPageAndCount(
+    return this.getPagination<OrganizationUsageLimit>(
       this.from("organization_usage_limit")
         .where({ org_id: orgId, limit_name: opts.limitName })
         .orderBy("period_end_date", "desc")

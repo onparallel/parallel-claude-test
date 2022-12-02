@@ -120,7 +120,7 @@ export const landingQueries = queryField((t) => {
       locale: nonNull(arg({ type: "PetitionLocale" })),
     },
     resolve: async (_, { offset, limit, locale, categories }, ctx) => {
-      return await ctx.petitions.loadPublicTemplates({
+      return ctx.petitions.getPaginatedPublicTemplates({
         limit,
         offset,
         locale,
@@ -151,10 +151,7 @@ export const landingQueries = queryField((t) => {
             locale: nonNull(arg({ type: "PetitionLocale" })),
           },
           resolve: async (category, { limit, offset, locale }, ctx) => {
-            if (limit === 0) {
-              return [];
-            }
-            return await ctx.petitions.loadPublicTemplates({
+            return ctx.petitions.getPaginatedPublicTemplates({
               limit,
               offset,
               locale,

@@ -139,7 +139,7 @@ export class ContactRepository extends BaseRepository {
     return count === new Set(contactIds).size;
   }
 
-  async loadContactsForUser(
+  getPaginatedContactsForUser(
     user: User,
     opts: {
       search?: string | null;
@@ -147,7 +147,7 @@ export class ContactRepository extends BaseRepository {
       excludeIds?: number[] | null;
     } & PageOpts
   ) {
-    return await this.loadPageAndCount(
+    return this.getPagination<Contact>(
       this.from("contact")
         .where({
           org_id: user.org_id,
@@ -177,8 +177,8 @@ export class ContactRepository extends BaseRepository {
     );
   }
 
-  async loadAccessesForContact(contactId: number, userId: number, opts: PageOpts) {
-    return await this.loadPageAndCount(
+  getPaginatedAccessesForContact(contactId: number, userId: number, opts: PageOpts) {
+    return this.getPagination<PetitionAccess>(
       this.knex
         .with("pas", (q) => {
           q.from({ pa: "petition_access" })
@@ -193,7 +193,7 @@ export class ContactRepository extends BaseRepository {
         })
         .from("pas")
         .orderBy("pas.created_at", "desc")
-        .select<any, PetitionAccess[]>("pas.*"),
+        .select("pas.*"),
       opts
     );
   }

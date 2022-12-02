@@ -85,39 +85,41 @@ describe("repositories/OrganizationRepository", () => {
     });
 
     test("returns an empty page without options", async () => {
-      const result = await organizations.loadOrgUsers(org1.id, {});
-      expect(result.totalCount).toBe(42);
-      expect(result.items).toHaveLength(0);
+      const result = organizations.getPaginatedUsersForOrg(org1.id, {});
+      expect(await result.totalCount).toBe(42);
+      expect(await result.items).toHaveLength(0);
     });
 
     test("returns the first page of users", async () => {
-      const result = await organizations.loadOrgUsers(org1.id, { limit: 10 });
-      expect(result.totalCount).toBe(42);
-      expect(result.items).toMatchObject(
+      const result = organizations.getPaginatedUsersForOrg(org1.id, { limit: 10 });
+      expect(await result.totalCount).toBe(42);
+      expect(await result.items).toMatchObject(
         // First 10 users created on the client
         org1Users.slice(0, 10).map(pick(["id"]))
       );
     });
 
     test("returns the second page of users", async () => {
-      const result = await organizations.loadOrgUsers(org1.id, {
+      const result = organizations.getPaginatedUsersForOrg(org1.id, {
         limit: 10,
         offset: 10,
       });
-      expect(result.totalCount).toBe(42);
-      expect(result.items).toMatchObject(org1Users.slice(10, 20).map(pick(["id"])));
+      expect(await result.totalCount).toBe(42);
+      expect(await result.items).toMatchObject(org1Users.slice(10, 20).map(pick(["id"])));
     });
 
     test("returns the right amount of non-deleted users", async () => {
-      const result = await organizations.loadOrgUsers(org2.id, { limit: 10 });
-      expect(result.totalCount).toBe(5);
-      expect(result.items).toMatchObject(org2Users.filter((_, i) => i % 2 !== 0).map(pick(["id"])));
+      const result = organizations.getPaginatedUsersForOrg(org2.id, { limit: 10 });
+      expect(await result.totalCount).toBe(5);
+      expect(await result.items).toMatchObject(
+        org2Users.filter((_, i) => i % 2 !== 0).map(pick(["id"]))
+      );
     });
 
     test("returns empty for an org without users", async () => {
-      const result = await organizations.loadOrgUsers(org3.id, { limit: 10 });
-      expect(result.totalCount).toBe(0);
-      expect(result.items).toHaveLength(0);
+      const result = organizations.getPaginatedUsersForOrg(org3.id, { limit: 10 });
+      expect(await result.totalCount).toBe(0);
+      expect(await result.items).toHaveLength(0);
     });
 
     test("filters results by first name", async () => {
@@ -126,13 +128,13 @@ describe("repositories/OrganizationRepository", () => {
         .where("email", "joffrey@kingslanding.com")
         .select("*");
 
-      const result = await organizations.loadOrgUsers(org2.id, {
+      const result = organizations.getPaginatedUsersForOrg(org2.id, {
         limit: 10,
         search: "Joffr",
       });
 
-      expect(result.totalCount).toBe(1);
-      expect(result.items).toMatchObject([
+      expect(await result.totalCount).toBe(1);
+      expect(await result.items).toMatchObject([
         {
           user_data_id: userData.id,
           org_id: org2.id,
@@ -147,13 +149,13 @@ describe("repositories/OrganizationRepository", () => {
         .where("email", "joffrey@kingslanding.com")
         .select("*");
 
-      const result = await organizations.loadOrgUsers(org2.id, {
+      const result = organizations.getPaginatedUsersForOrg(org2.id, {
         limit: 10,
         search: "Joffrey Barath",
       });
 
-      expect(result.totalCount).toBe(1);
-      expect(result.items).toMatchObject([
+      expect(await result.totalCount).toBe(1);
+      expect(await result.items).toMatchObject([
         {
           user_data_id: userData.id,
           org_id: org2.id,
@@ -168,13 +170,13 @@ describe("repositories/OrganizationRepository", () => {
         .whereRaw(`"email" like '%@kingslanding.com'`)
         .select("*");
 
-      const result = await organizations.loadOrgUsers(org2.id, {
+      const result = organizations.getPaginatedUsersForOrg(org2.id, {
         limit: 10,
         search: "kingslanding.com",
       });
 
-      expect(result.totalCount).toBe(2);
-      expect(result.items).toMatchObject([
+      expect(await result.totalCount).toBe(2);
+      expect(await result.items).toMatchObject([
         {
           user_data_id: userData.find((ud) => ud.email === "joffrey@kingslanding.com")!.id,
           org_id: org2.id,

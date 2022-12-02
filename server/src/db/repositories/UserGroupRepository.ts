@@ -14,14 +14,14 @@ export class UserGroupRepository extends BaseRepository {
     super(knex);
   }
 
-  async loadUserGroupsForOrg(
+  getPaginatedUserGroupsForOrg(
     orgId: number,
     opts: {
       search?: string | null;
       sortBy?: SortBy<keyof Pick<UserGroup, "name" | "created_at">>[];
     } & PageOpts
   ) {
-    return await this.loadPageAndCount(
+    return this.getPagination<UserGroup>(
       this.from("user_group")
         .where({ org_id: orgId, deleted_at: null })
         .mmodify((q) => {

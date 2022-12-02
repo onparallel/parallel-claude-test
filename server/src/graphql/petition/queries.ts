@@ -150,7 +150,7 @@ export const petitionsQuery = queryField((t) => {
         }
       }
 
-      return await ctx.petitions.loadPetitionsForUser(ctx.user!.org_id, ctx.user!.id, {
+      return await ctx.petitions.getPaginatedPetitionsForUser(ctx.user!.org_id, ctx.user!.id, {
         search,
         offset,
         filters,
@@ -243,7 +243,7 @@ export const templatesQuery = queryField((t) => {
       ctx
     ) => {
       if (isPublic) {
-        return await ctx.petitions.loadPublicTemplates({
+        return ctx.petitions.getPaginatedPublicTemplates({
           search,
           locale,
           limit,
@@ -252,7 +252,7 @@ export const templatesQuery = queryField((t) => {
         });
       } else {
         const userId = ctx.user!.id;
-        return await ctx.petitions.loadPetitionsForUser(ctx.user!.org_id, userId, {
+        return ctx.petitions.getPaginatedPetitionsForUser(ctx.user!.org_id, userId, {
           search,
           limit,
           offset,

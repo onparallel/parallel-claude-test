@@ -393,7 +393,7 @@ export class PetitionRepository extends BaseRepository {
     return count === new Set(replyIds).size;
   }
 
-  async loadPetitionsForUser(
+  async getPaginatedPetitionsForUser(
     orgId: number,
     userId: number,
     opts: {
@@ -2501,8 +2501,8 @@ export class PetitionRepository extends BaseRepository {
     "petition_id"
   );
 
-  async loadPaginatedEventsForPetition(petitionId: number, opts: PageOpts) {
-    return await this.loadPageAndCount(
+  getPaginatedEventsForPetition(petitionId: number, opts: PageOpts) {
+    return this.getPagination<PetitionEvent>(
       this.from("petition_event")
         .where("petition_id", petitionId)
         .orderBy([
@@ -4203,14 +4203,14 @@ export class PetitionRepository extends BaseRepository {
     }
   }
 
-  async loadPublicTemplates(
+  getPaginatedPublicTemplates(
     opts: {
       search?: string | null;
       locale?: PetitionLocale | null;
       categories?: string[] | null;
     } & PageOpts
   ) {
-    return await this.loadPageAndCount(
+    return this.getPagination<Petition>(
       this.from("petition")
         .where({
           template_public: true,
@@ -4262,7 +4262,7 @@ export class PetitionRepository extends BaseRepository {
           );
           q.orderByRaw(/* sql */ `t.used_count DESC NULLS LAST`).orderBy("created_at", "desc");
         })
-        .select<Petition[]>("petition.*"),
+        .select("petition.*"),
       opts
     );
   }

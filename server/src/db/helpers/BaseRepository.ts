@@ -5,8 +5,9 @@ import { Knex } from "knex";
 import PostgresInterval from "postgres-interval";
 import { chunk, groupBy, indexBy, isDefined, times } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
+import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pFlatMap } from "../../util/promises/pFlatMap";
-import { KeysOfType, MaybeArray, Replace, UnwrapPromise } from "../../util/types";
+import { KeysOfType, MaybeArray, Replace } from "../../util/types";
 import { CreatePetitionEvent, CreateSystemEvent, PetitionEvent, SystemEvent } from "../events";
 import { CreatePetitionUserNotification, PetitionUserNotification } from "../notifications";
 import { OrganizationUsageDetails } from "../repositories/OrganizationRepository";
@@ -231,32 +232,33 @@ export class BaseRepository {
     });
   }
 
-  protected async loadPageAndCount<TRecord extends {}, TResult>(
-    query: Knex.QueryBuilder<TRecord, TResult>,
+  protected getPagination<T>(
+    query: Knex.QueryBuilder<any, T[]>,
     { offset, limit }: PageOpts
-  ): Promise<{
-    totalCount: number;
-    items: UnwrapPromise<Knex.QueryBuilder<TRecord, TResult>>;
-  }> {
-    const [{ count }] = await query
-      .clone()
-      .clearOrder()
-      .clearSelect()
-      .select<{ count: number }[]>(this.count());
-    if (count === 0) {
-      return {
-        totalCount: 0,
-        items: [],
-      } as any;
-    } else {
-      return {
-        totalCount: count as number,
-        items: await query
-          .clone()
-          .offset(offset ?? 0)
-          .limit(limit ?? 0),
-      };
-    }
+  ): {
+    totalCount: Promise<number>;
+    items: Promise<T[]>;
+  } {
+    const totalCount = LazyPromise.from(async () => {
+      const [{ count }] = await query
+        .clone()
+        .clearOrder()
+        .clearSelect()
+        .select<{ count: number }[]>(this.count());
+      return count;
+    });
+    return {
+      totalCount,
+      items: LazyPromise.from(async () => {
+        const count = await totalCount;
+        return count === 0
+          ? ([] as T[])
+          : ((await query
+              .clone()
+              .offset(offset ?? 0)
+              .limit(limit ?? 0)) as T[]);
+      }),
+    };
   }
 
   public async withTransaction<T>(

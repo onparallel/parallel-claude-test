@@ -16,7 +16,7 @@ export const userGroupsQuery = queryField((t) => {
         createdAt: "created_at",
         name: "name",
       } as const;
-      return ctx.userGroups.loadUserGroupsForOrg(ctx.user!.org_id, {
+      return ctx.userGroups.getPaginatedUserGroupsForOrg(ctx.user!.org_id, {
         offset,
         limit,
         search,
