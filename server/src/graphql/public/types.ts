@@ -15,9 +15,7 @@ export const PublicPetitionAccess = objectType({
   sourceType: "db.PetitionAccess",
   description: "A public view of a petition access",
   definition(t) {
-    t.nonNull.id("keycode", {
-      resolve: (root) => root.keycode,
-    });
+    t.nonNull.id("keycode");
     t.field("petition", {
       type: "PublicPetition",
       resolve: async (root, _, ctx) => {
@@ -234,7 +232,10 @@ export const PublicPetition = objectType({
     t.boolean("hasUnreadComments", {
       description: "Shows if the petition has unread comments",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.contactHasUnreadCommmentsInPetition(ctx.contact!.id, root.id);
+        return await ctx.petitions.contactHasUnreadCommentsInPetition({
+          contactId: ctx.contact!.id,
+          petitionId: root.id,
+        });
       },
     });
   },

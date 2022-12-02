@@ -2746,24 +2746,34 @@ export class PetitionRepository extends BaseRepository {
     { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]) }
   );
 
-  async contactHasUnreadCommmentsInPetition(contactId: number, petitionId: number) {
-    const [{ id: accessId }] = await this.knex
-      .from("petition_access")
-      .where("contact_id", contactId)
-      .where("petition_id", petitionId)
-      .where("status", "ACTIVE")
-      .select("id");
-
-    const [{ count }] = await this.knex
-      .from("petition_contact_notification")
-      .where("petition_id", petitionId)
-      .where("petition_access_id", accessId)
-      .where("type", "COMMENT_CREATED")
-      .where("is_read", false)
-      .select(this.count());
-
-    return count > 0;
-  }
+  contactHasUnreadCommentsInPetition = this.buildLoader<
+    {
+      contactId: number;
+      petitionId: number;
+    },
+    boolean,
+    string
+  >(
+    async (keys, t) => {
+      const rows = await this.raw<{ contact_id: number; petition_id: number }>(
+        /* sql */ `
+        select pa.contact_id, pa.petition_id from petition_access pa
+        join petition_contact_notification pcn
+          on pcn.petition_access_id = pa.id and pcn.petition_id = pa.petition_id
+        where pa.contact_id in ? and pa.petition_id in ? and pa.status = 'ACTIVE' 
+          and pcn.type = 'COMMENT_CREATED' and pcn.is_read = false
+      `,
+        [
+          this.sqlIn(uniq(keys.map((k) => k.contactId))),
+          this.sqlIn(uniq(keys.map((k) => k.petitionId))),
+        ],
+        t
+      );
+      const byKey = indexBy(rows, keyBuilder(["contact_id", "petition_id"]));
+      return keys.map(keyBuilder(["contactId", "petitionId"])).map((k) => isDefined(byKey[k]));
+    },
+    { cacheKeyFn: keyBuilder(["contactId", "petitionId"]) }
+  );
 
   readonly loadPetitionFieldUnreadCommentCountForFieldAndUser = this.buildLoader<
     { userId: number; petitionId: number; petitionFieldId: number },
