@@ -1,12 +1,13 @@
 import { Duration } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { indexBy } from "remeda";
+import { indexBy, isDefined, uniq } from "remeda";
 import { Config, CONFIG } from "../../config";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { unMaybeArray } from "../../util/arrays";
 import { BrandTheme, defaultBrandTheme } from "../../util/BrandTheme";
 import { fromGlobalId, isGlobalId } from "../../util/globalId";
+import { keyBuilder } from "../../util/keyBuilder";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
@@ -293,18 +294,32 @@ export class OrganizationRepository extends BaseRepository {
     return owner;
   }
 
-  async getOrganizationCurrentUsageLimit(
+  private _loadCurrentOrganizationUsageLimit = this.buildLoader<
+    { orgId: number; limitName: OrganizationUsageLimitName },
+    OrganizationUsageLimit | null,
+    string
+  >(
+    async (keys, t) => {
+      const rows = await this.from("organization_usage_limit", t)
+        .whereIn("org_id", uniq(keys.map((k) => k.orgId)))
+        .whereIn("limit_name", uniq(keys.map((k) => k.limitName)))
+        .whereNull("period_end_date");
+      const byKey = indexBy(rows, keyBuilder(["org_id", "limit_name"]));
+      return keys.map(keyBuilder(["orgId", "limitName"])).map((k) => byKey[k] ?? null);
+    },
+    { cacheKeyFn: keyBuilder(["orgId", "limitName"]) }
+  );
+
+  async loadCurrentOrganizationUsageLimit(
     orgId: number,
     limitName: OrganizationUsageLimitName,
     t?: Knex.Transaction
   ): Promise<OrganizationUsageLimit | null> {
-    const [row] = await this.from("organization_usage_limit", t).where({
-      org_id: orgId,
-      period_end_date: null,
-      limit_name: limitName,
-    });
-
-    return row;
+    if (isDefined(t)) {
+      return await this._loadCurrentOrganizationUsageLimit.raw({ orgId, limitName }, t);
+    } else {
+      return await this._loadCurrentOrganizationUsageLimit({ orgId, limitName });
+    }
   }
 
   async getOrganizationExpiredUsageLimitsAndDetails() {
@@ -653,7 +668,7 @@ export class OrganizationRepository extends BaseRepository {
     duration: Duration,
     t?: Knex.Transaction
   ) {
-    const currentPeriod = await this.getOrganizationCurrentUsageLimit(orgId, limitName, t);
+    const currentPeriod = await this.loadCurrentOrganizationUsageLimit(orgId, limitName, t);
     let newPeriodStartDate = new Date();
     if (currentPeriod) {
       const oldLimit = await this.updateUsageLimitAsExpired(

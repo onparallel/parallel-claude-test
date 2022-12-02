@@ -10,7 +10,7 @@ export async function organizationLimitsReached(
   context: WorkerContext
 ) {
   const [usageLimit, ownerAndAdmins, parallelOrg] = await Promise.all([
-    context.organizations.getOrganizationCurrentUsageLimit(payload.org_id, payload.limit_name),
+    context.organizations.loadCurrentOrganizationUsageLimit(payload.org_id, payload.limit_name),
     context.organizations.loadOwnerAndAdmins(payload.org_id),
     context.organizations.loadRootOrganization(),
   ]);

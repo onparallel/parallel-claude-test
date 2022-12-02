@@ -616,7 +616,7 @@ export const PublicPublicPetitionLink = objectType({
       resolve: async (o, _, ctx) => {
         const owner = await ctx.petitions.loadTemplateDefaultOwner(o.template_id);
         if (!owner) return false;
-        const orgLimits = await ctx.organizations.getOrganizationCurrentUsageLimit(
+        const orgLimits = await ctx.organizations.loadCurrentOrganizationUsageLimit(
           owner.user.org_id,
           "PETITION_SEND"
         );

@@ -262,7 +262,7 @@ export const Organization = objectType({
         limitName: nonNull("OrganizationUsageLimitName"),
       },
       resolve: async (root, args, ctx) => {
-        return await ctx.organizations.getOrganizationCurrentUsageLimit(root.id, args.limitName);
+        return await ctx.organizations.loadCurrentOrganizationUsageLimit(root.id, args.limitName);
       },
     });
     t.nullable.datetime("subscriptionEndDate", {
@@ -271,7 +271,7 @@ export const Organization = objectType({
         limitName: nonNull("OrganizationUsageLimitName"),
       },
       resolve: async (root, args, ctx) => {
-        const currentUsageLimit = await ctx.organizations.getOrganizationCurrentUsageLimit(
+        const currentUsageLimit = await ctx.organizations.loadCurrentOrganizationUsageLimit(
           root.id,
           args.limitName
         );
@@ -298,7 +298,7 @@ export const Organization = objectType({
       authorize: isOwnOrgOrSuperAdmin(),
       args: { limitName: nonNull("OrganizationUsageLimitName") },
       resolve: async (root, { limitName }, ctx) => {
-        const limit = await ctx.organizations.getOrganizationCurrentUsageLimit(root.id, limitName);
+        const limit = await ctx.organizations.loadCurrentOrganizationUsageLimit(root.id, limitName);
         return !limit || limit.limit <= limit.used;
       },
     });
@@ -342,8 +342,11 @@ export const Organization = objectType({
         const [organization, petitionSendLimits, signatureSendLimits, signatureIntegrations] =
           await Promise.all([
             ctx.organizations.loadOrg(root.id),
-            ctx.organizations.getOrganizationCurrentUsageLimit(root.id, "PETITION_SEND"),
-            ctx.organizations.getOrganizationCurrentUsageLimit(root.id, "SIGNATURIT_SHARED_APIKEY"),
+            ctx.organizations.loadCurrentOrganizationUsageLimit(root.id, "PETITION_SEND"),
+            ctx.organizations.loadCurrentOrganizationUsageLimit(
+              root.id,
+              "SIGNATURIT_SHARED_APIKEY"
+            ),
             ctx.integrations.loadIntegrationsByOrgId(root.id, "SIGNATURE", "SIGNATURIT"),
           ]);
 

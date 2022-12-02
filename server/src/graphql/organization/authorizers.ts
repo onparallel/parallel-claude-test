@@ -114,7 +114,7 @@ export function organizationHasOngoingUsagePeriod<
       const orgId = args[orgIdArg] as unknown as number;
       const limitName = args[limitNameArg] as unknown as OrganizationUsageLimitName;
 
-      const limit = await ctx.organizations.getOrganizationCurrentUsageLimit(orgId, limitName);
+      const limit = await ctx.organizations.loadCurrentOrganizationUsageLimit(orgId, limitName);
       return isDefined(limit);
     } catch {}
     return false;
