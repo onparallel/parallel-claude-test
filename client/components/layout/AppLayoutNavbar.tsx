@@ -13,8 +13,8 @@ import {
 import {
   AddIcon,
   HelpOutlineIcon,
+  HomeIcon,
   NewsIcon,
-  PaperPlaneIcon,
   ReportsIcon,
   UsersIcon,
 } from "@parallel/chakra/icons";
@@ -53,12 +53,13 @@ export const AppLayoutNavbar = Object.assign(
           {
             section: "petitions",
             href: "/app/petitions",
-            icon: <PaperPlaneIcon />,
+            icon: <HomeIcon />,
             isAvailable: true,
-            isActive: pathname.startsWith("/app/petitions"),
+            isActive:
+              pathname.startsWith("/app/petitions") && !pathname.startsWith("/app/petitions/new"),
             text: intl.formatMessage({
-              id: "component.app-layout-navbar.parallels-link",
-              defaultMessage: "Parallels",
+              id: "component.app-layout-navbar.home-link",
+              defaultMessage: "Home",
             }),
             warning: me.organization.isPetitionUsageLimitReached
               ? intl.formatMessage(

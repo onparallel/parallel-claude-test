@@ -2320,3 +2320,20 @@ export const DowJonesIcon = createIcon({
     </g>
   ),
 });
+
+export const HomeIcon = createIcon({
+  displayName: "HomeIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m3 8.99997 9-7 9 7v11.00003c0 .5304-.2107 1.0391-.5858 1.4142s-.8838.5858-1.4142.5858h-14c-.53043 0-1.03914-.2107-1.41421-.5858-.37508-.3751-.58579-.8838-.58579-1.4142z" />
+      <path d="m9 22v-10h6v10" />
+    </g>
+  ),
+});

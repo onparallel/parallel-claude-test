@@ -1,8 +1,22 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Flex, Select, Text } from "@chakra-ui/react";
 import {
+  Box,
+  Button,
+  Flex,
+  Menu,
+  MenuButton,
+  MenuItemOption,
+  MenuList,
+  MenuOptionGroup,
+  Portal,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import {
+  ChevronDownIcon,
   CopyIcon,
   DeleteIcon,
+  DocumentIcon,
   EditSimpleIcon,
   FolderIcon,
   PaperPlaneIcon,
@@ -58,8 +72,7 @@ import {
 import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import { ValueProps } from "@parallel/utils/ValueProps";
-import { MouseEvent, PropsWithChildren, ReactNode, useCallback, useMemo } from "react";
+import { MouseEvent, ReactNode, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { map, maxBy, pick, pipe } from "remeda";
 
@@ -372,118 +385,130 @@ function Petitions() {
       me={me}
       realMe={realMe}
     >
-      <Flex flexDirection="column" flex="1" minHeight={0} padding={4} paddingBottom={16}>
-        <TablePage
-          flex="0 1 auto"
-          minHeight={0}
-          columns={columns}
-          rows={petitions?.items}
-          context={context}
-          rowKeyProp={rowKeyProp}
-          isSelectable
-          isHighlightable
-          loading={loading}
-          onRowClick={handleRowClick}
-          page={state.page}
-          pageSize={state.items}
-          totalCount={petitions?.totalCount}
-          sort={sort}
-          filter={pick(state, ["sharedWith", "status", "tags", "signature"])}
-          onFilterChange={(key, value) => {
-            setQueryState((current) => ({ ...current, [key]: value, page: 1 }));
-          }}
-          onSelectionChange={onChangeSelectedIds}
-          onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-          onPageSizeChange={(items) =>
-            setQueryState((s) => ({ ...s, items: items as any, page: 1 }))
-          }
-          onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
-          actions={actions}
-          header={
-            <PetitionListHeader
-              shape={QUERY_STATE}
-              state={state}
-              onStateChange={setQueryState}
-              onReload={() => refetch()}
-              organizationRole={me.role}
-            />
-          }
-          body={
-            data?.petitions.totalCount === 0 && !loading ? (
-              state.search || state.sharedWith || state.tags || state.status || state.signature ? (
-                <Flex flex="1" alignItems="center" justifyContent="center">
-                  <Text color="gray.300" fontSize="lg">
+      <Stack minHeight={0} paddingX={4} paddingTop={6} paddingBottom={16} spacing={4}>
+        <Box minWidth="0" width="fit-content">
+          <Menu matchWidth={true}>
+            <MenuButton
+              as={Button}
+              size="lg"
+              variant="ghost"
+              fontSize="2xl"
+              paddingX={3}
+              leftIcon={
+                state.type === "PETITION" ? (
+                  <PaperPlaneIcon boxSize={6} />
+                ) : (
+                  <DocumentIcon boxSize={6} />
+                )
+              }
+              rightIcon={<ChevronDownIcon boxSize={5} />}
+            >
+              {state.type === "PETITION"
+                ? intl.formatMessage({
+                    id: "generic.parallel-type-plural",
+                    defaultMessage: "Parallels",
+                  })
+                : intl.formatMessage({
+                    id: "generic.template-type-plural",
+                    defaultMessage: "Templates",
+                  })}
+            </MenuButton>
+            <Portal>
+              <MenuList minWidth="154px">
+                <MenuOptionGroup value={state.type}>
+                  <MenuItemOption value="PETITION" onClick={() => handleTypeChange("PETITION")}>
                     <FormattedMessage
-                      id="petitions.no-results"
-                      defaultMessage="There's no parallels matching your criteria"
+                      id="generic.parallel-type-plural"
+                      defaultMessage="Parallels"
                     />
-                  </Text>
-                </Flex>
-              ) : state.path !== "/" ? (
-                <EmptyFolderIllustration flex="1" isTemplate={state.type === "TEMPLATE"} />
-              ) : (
-                <Flex flex="1" alignItems="center" justifyContent="center">
-                  <Text fontSize="lg">
-                    {state.type === "TEMPLATE" ? (
+                  </MenuItemOption>
+                  <MenuItemOption value="TEMPLATE" onClick={() => handleTypeChange("TEMPLATE")}>
+                    <FormattedMessage
+                      id="generic.template-type-plural"
+                      defaultMessage="Templates"
+                    />
+                  </MenuItemOption>
+                </MenuOptionGroup>
+              </MenuList>
+            </Portal>
+          </Menu>
+        </Box>
+        <Box flex="1">
+          <TablePage
+            flex="0 1 auto"
+            minHeight={0}
+            columns={columns}
+            rows={petitions?.items}
+            context={context}
+            rowKeyProp={rowKeyProp}
+            isSelectable
+            isHighlightable
+            loading={loading}
+            onRowClick={handleRowClick}
+            page={state.page}
+            pageSize={state.items}
+            totalCount={petitions?.totalCount}
+            sort={sort}
+            filter={pick(state, ["sharedWith", "status", "tags", "signature"])}
+            onFilterChange={(key, value) => {
+              setQueryState((current) => ({ ...current, [key]: value, page: 1 }));
+            }}
+            onSelectionChange={onChangeSelectedIds}
+            onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+            onPageSizeChange={(items) =>
+              setQueryState((s) => ({ ...s, items: items as any, page: 1 }))
+            }
+            onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
+            actions={actions}
+            header={
+              <PetitionListHeader
+                shape={QUERY_STATE}
+                state={state}
+                onStateChange={setQueryState}
+                onReload={() => refetch()}
+                organizationRole={me.role}
+              />
+            }
+            body={
+              data?.petitions.totalCount === 0 && !loading ? (
+                state.search ||
+                state.sharedWith ||
+                state.tags ||
+                state.status ||
+                state.signature ? (
+                  <Flex flex="1" alignItems="center" justifyContent="center">
+                    <Text color="gray.300" fontSize="lg">
                       <FormattedMessage
-                        id="petitions.no-templates"
-                        defaultMessage="You have no templates yet. Start by creating one now!"
+                        id="petitions.no-results"
+                        defaultMessage="There's no parallels matching your criteria"
                       />
-                    ) : (
-                      <FormattedMessage
-                        id="petitions.no-parallels"
-                        defaultMessage="You have no parallels yet. Start by creating one now!"
-                      />
-                    )}
-                  </Text>
-                </Flex>
-              )
-            ) : null
-          }
-          Footer={RenderFooter}
-          footerProps={{
-            value: state.type,
-            onChange: handleTypeChange,
-          }}
-        />
-      </Flex>
+                    </Text>
+                  </Flex>
+                ) : state.path !== "/" ? (
+                  <EmptyFolderIllustration flex="1" isTemplate={state.type === "TEMPLATE"} />
+                ) : (
+                  <Flex flex="1" alignItems="center" justifyContent="center">
+                    <Text fontSize="lg">
+                      {state.type === "TEMPLATE" ? (
+                        <FormattedMessage
+                          id="petitions.no-templates"
+                          defaultMessage="You have no templates yet. Start by creating one now!"
+                        />
+                      ) : (
+                        <FormattedMessage
+                          id="petitions.no-parallels"
+                          defaultMessage="You have no parallels yet. Start by creating one now!"
+                        />
+                      )}
+                    </Text>
+                  </Flex>
+                )
+              ) : null
+            }
+          />
+        </Box>
+      </Stack>
     </AppLayout>
-  );
-}
-
-function RenderFooter({
-  children,
-  value,
-  onChange,
-}: PropsWithChildren<ValueProps<PetitionBaseType, false>>) {
-  const intl = useIntl();
-  return (
-    <>
-      <Box>
-        <Select
-          size="sm"
-          variant="unstyled"
-          value={value}
-          onChange={(e) => onChange(e.target.value as PetitionBaseType)}
-          display="flex"
-          alignItems="center"
-        >
-          <option value="PETITION">
-            {intl.formatMessage({
-              id: "generic.parallel-type-plural",
-              defaultMessage: "Parallels",
-            })}
-          </option>
-          <option value="TEMPLATE">
-            {intl.formatMessage({
-              id: "generic.template-type-plural",
-              defaultMessage: "Templates",
-            })}
-          </option>
-        </Select>
-      </Box>
-      {children}
-    </>
   );
 }
 
