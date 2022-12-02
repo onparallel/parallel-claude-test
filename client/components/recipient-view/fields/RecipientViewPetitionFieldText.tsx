@@ -8,7 +8,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChangeEvent, forwardRef, KeyboardEvent, useRef, useState } from "react";
+import { ChangeEvent, forwardRef, KeyboardEvent, MouseEvent, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { pick } from "remeda";
 import {
@@ -56,6 +56,12 @@ export function RecipientViewPetitionFieldText({
   function handleAddNewReply() {
     setShowNewReply(true);
     setTimeout(() => newReplyRef.current?.focus());
+  }
+
+  async function handleMouseDownNewReply(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    handleAddNewReply();
+    await handleCreate.immediateIfPending(value, false);
   }
 
   const handleUpdate = useMemoFactory(
@@ -177,9 +183,10 @@ export function RecipientViewPetitionFieldText({
       isInvalid={isInvalid}
       onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={!isDisabled && field.multiple}
-      addNewReplyIsDisabled={showNewReply}
+      addNewReplyIsDisabled={showNewReply && value.length === 0}
       onAddNewReply={handleAddNewReply}
       onDownloadAttachment={onDownloadAttachment}
+      onMouseDownNewReply={handleMouseDownNewReply}
     >
       {field.replies.length ? (
         <List as={Stack} marginTop={2}>
