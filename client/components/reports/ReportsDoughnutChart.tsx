@@ -97,6 +97,7 @@ export function ReportsDoughnutChart({
                   enabled: true,
                   backgroundColor: theme.colors.white,
                   bodyColor: theme.colors.gray[800],
+                  titleColor: theme.colors.gray[800],
                   borderColor: theme.colors.gray[300],
                   borderWidth: 1,
                   padding: 8,
