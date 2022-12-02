@@ -24,6 +24,7 @@ import {
 import {
   CopyIcon,
   EditIcon,
+  EyeIcon,
   LinkIcon,
   PaperPlaneIcon,
   UserArrowIcon,
@@ -101,6 +102,10 @@ export function TemplateDetailsModal({
     goToPetition(template.id, "compose");
   };
 
+  const handlePreviewTemplate = async () => {
+    goToPetition(template.id, "preview");
+  };
+
   const showPetitionSharingDialog = usePetitionSharingDialog();
   const handlePetitionSharingClick = async () => {
     try {
@@ -114,41 +119,6 @@ export function TemplateDetailsModal({
       }
     } catch {}
   };
-
-  const createPetitionButton = (
-    <Button
-      width="100%"
-      data-action="use-template"
-      colorScheme={template.isPublic ? undefined : "primary"}
-      leftIcon={<PaperPlaneIcon />}
-      onClick={handleCreatePetition}
-    >
-      <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
-    </Button>
-  );
-
-  const sharePetitionButton = (
-    <Button width="100%" onClick={handlePetitionSharingClick} leftIcon={<UserArrowIcon />}>
-      <FormattedMessage
-        id="component.petition-header.share-label-template"
-        defaultMessage="Share template"
-      />
-    </Button>
-  );
-
-  const saveToEditButton = (
-    <Button
-      width="100%"
-      colorScheme={template.isPublic ? "primary" : undefined}
-      onClick={handleCloneTemplate}
-      leftIcon={<CopyIcon />}
-    >
-      <FormattedMessage
-        id="component.template-details-modal.save-to-edit"
-        defaultMessage="Save to edit"
-      />
-    </Button>
-  );
 
   return (
     <Modal size="4xl" {...props}>
@@ -219,27 +189,79 @@ export function TemplateDetailsModal({
             <Flex marginY={6} flexDirection={{ base: "column-reverse", md: "row" }} gridGap={3}>
               <Box flex="1">
                 {template.isPublic ? (
-                  createPetitionButton
+                  <Button
+                    width="100%"
+                    data-action="use-template"
+                    leftIcon={<PaperPlaneIcon />}
+                    onClick={handleCreatePetition}
+                  >
+                    <FormattedMessage
+                      id="generic.create-petition"
+                      defaultMessage="Create parallel"
+                    />
+                  </Button>
+                ) : (
+                  <Button width="100%" leftIcon={<EyeIcon />} onClick={handlePreviewTemplate}>
+                    <FormattedMessage
+                      id="component.template-details-modal.preview-template"
+                      defaultMessage="Preview template"
+                    />
+                  </Button>
+                )}
+              </Box>
+              <HStack flex="1" spacing={3}>
+                {template.isPublic ? (
+                  <Button
+                    width="100%"
+                    colorScheme="primary"
+                    onClick={handleCloneTemplate}
+                    leftIcon={<CopyIcon />}
+                  >
+                    <FormattedMessage
+                      id="component.template-details-modal.save-to-edit"
+                      defaultMessage="Save to edit"
+                    />
+                  </Button>
                 ) : template.publicLink?.isActive ? (
                   <Button
                     width="100%"
+                    colorScheme="primary"
                     leftIcon={<LinkIcon />}
                     onClick={() => onCopyPublicLink({ value: template.publicLink!.url })}
                   >
                     <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
                   </Button>
                 ) : (
-                  sharePetitionButton
+                  <Button
+                    width="100%"
+                    data-action="use-template"
+                    colorScheme="primary"
+                    leftIcon={<PaperPlaneIcon />}
+                    onClick={handleCreatePetition}
+                  >
+                    <FormattedMessage
+                      id="generic.create-petition"
+                      defaultMessage="Create parallel"
+                    />
+                  </Button>
                 )}
-              </Box>
-              <HStack flex="1" spacing={3}>
-                {template.isPublic ? saveToEditButton : createPetitionButton}
                 {isFromPublicTemplates && !template.publicLink?.isActive ? null : (
                   <MoreOptionsMenuButton
                     variant="outline"
                     options={
                       <MenuList width="min-content">
-                        {hasAccess && template.publicLink?.isActive ? (
+                        {template.publicLink?.isActive ? (
+                          <MenuItem
+                            onClick={handleCreatePetition}
+                            icon={<PaperPlaneIcon display="block" boxSize={4} />}
+                          >
+                            <FormattedMessage
+                              id="generic.create-petition"
+                              defaultMessage="Create parallel"
+                            />
+                          </MenuItem>
+                        ) : null}
+                        {hasAccess ? (
                           <MenuItem
                             onClick={handlePetitionSharingClick}
                             icon={<UserArrowIcon display="block" boxSize={4} />}
