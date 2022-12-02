@@ -1917,6 +1917,7 @@ export interface NexusGenFieldTypes {
     firstName: string; // String!
     fullName: string; // String!
     id: NexusGenScalars["GID"]; // GID!
+    initials: string | null; // String
     isMe: boolean; // Boolean!
     lastName: string | null; // String
   };
@@ -3631,6 +3632,7 @@ export interface NexusGenFieldTypeNames {
     firstName: "String";
     fullName: "String";
     id: "GID";
+    initials: "String";
     isMe: "Boolean";
     lastName: "String";
   };

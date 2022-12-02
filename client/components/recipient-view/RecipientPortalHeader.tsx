@@ -106,13 +106,22 @@ export const RecipientPortalHeader = Object.assign(
                   paddingRight={0}
                   transition="all 200ms"
                 >
-                  <Avatar name={contact.fullName} boxSize={10} size="md" />
+                  <Avatar
+                    name={contact.fullName}
+                    boxSize={10}
+                    size="md"
+                    getInitials={contact.initials ? () => contact.initials! : undefined}
+                  />
                 </MenuButton>
               </Tooltip>
               <Portal>
                 <MenuList minW="min-content">
                   <HStack paddingX={3.5} paddingY={1}>
-                    <Avatar name={contact.fullName} size="sm" />
+                    <Avatar
+                      name={contact.fullName}
+                      size="sm"
+                      getInitials={contact.initials ? () => contact.initials! : undefined}
+                    />
                     <Stack spacing={0}>
                       <Text as="div" fontWeight="semibold">
                         {contact.fullName}
@@ -144,6 +153,7 @@ export const RecipientPortalHeader = Object.assign(
           fullName
           firstName
           email
+          initials
         }
       `,
       PublicUser: gql`

@@ -5,6 +5,7 @@ import { PetitionAccess, PetitionMessage } from "../../db/__types";
 import { defaultBrandTheme } from "../../util/BrandTheme";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
+import { getInitials } from "../../util/initials";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { loadOriginalMessageByPetitionAccess } from "../../util/loadOriginalMessageByPetitionAccess";
 import { safeJsonParse } from "../../util/safeJsonParse";
@@ -37,10 +38,7 @@ export const PublicPetitionAccess = objectType({
     t.nullable.field("message", {
       type: "PublicPetitionMessage",
       resolve: async (root, _, ctx) => {
-        const messages = await ctx.petitions.loadMessagesByPetitionAccessId(root.id);
-
         return (
-          messages?.[0] ??
           (await loadOriginalMessageByPetitionAccess(root.id, root.petition_id, ctx.petitions)) ??
           null
         );
@@ -547,12 +545,12 @@ export const PublicContact = objectType({
       description: "The full name of the user.",
       resolve: (o) => fullName(o.first_name, o.last_name),
     });
-    // t.list.field("petitionsAccess", {
-    //   type: "PublicPetitionAccess",
-    //   resolve: async (root, _, ctx) => {
-    //     return await ctx.petitions.loadActiveAccessByContactId(root.id);
-    //   },
-    // });
+    t.nullable.string("initials", {
+      description: "The initials of the user.",
+      resolve: (o) => {
+        return getInitials(fullName(o.first_name, o.last_name));
+      },
+    });
   },
 });
 

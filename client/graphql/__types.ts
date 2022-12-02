@@ -3080,6 +3080,8 @@ export interface PublicContact {
   fullName: Scalars["String"];
   /** The ID of the contact. */
   id: Scalars["GID"];
+  /** The initials of the user. */
+  initials?: Maybe<Scalars["String"]>;
   isMe: Scalars["Boolean"];
   /** The last name of the user. */
   lastName?: Maybe<Scalars["String"]>;
@@ -11981,6 +11983,7 @@ export type RecipientPortalHeader_PublicContactFragment = {
   fullName: string;
   firstName: string;
   email: string;
+  initials?: string | null;
 };
 
 export type RecipientPortalHeader_PublicUserFragment = {
@@ -12194,6 +12197,7 @@ export type RecipientViewHeader_PublicContactFragment = {
   fullName: string;
   firstName: string;
   email: string;
+  initials?: string | null;
 };
 
 export type RecipientViewHeader_PublicUserFragment = {
@@ -23268,6 +23272,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
       email: string;
       id: string;
       fullName: string;
+      initials?: string | null;
     }>;
     fields: Array<{
       __typename?: "PublicPetitionField";
@@ -23356,6 +23361,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
     fullName: string;
     firstName: string;
     email: string;
+    initials?: string | null;
     lastName?: string | null;
   } | null;
   message?: { __typename?: "PublicPetitionMessage"; id: string; subject?: string | null } | null;
@@ -23440,6 +23446,7 @@ export type RecipientView_PublicPetitionFragment = {
     fullName: string;
     firstName: string;
     email: string;
+    initials?: string | null;
   }>;
   organization: {
     __typename?: "PublicOrganization";
@@ -23582,6 +23589,7 @@ export type RecipientView_publicCompletePetitionMutation = {
       fullName: string;
       firstName: string;
       email: string;
+      initials?: string | null;
     }>;
     organization: {
       __typename?: "PublicOrganization";
@@ -23616,6 +23624,7 @@ export type RecipientView_accessQuery = {
         email: string;
         id: string;
         fullName: string;
+        initials?: string | null;
       }>;
       fields: Array<{
         __typename?: "PublicPetitionField";
@@ -23704,6 +23713,7 @@ export type RecipientView_accessQuery = {
       fullName: string;
       firstName: string;
       email: string;
+      initials?: string | null;
       lastName?: string | null;
     } | null;
     message?: { __typename?: "PublicPetitionMessage"; id: string; subject?: string | null } | null;
@@ -23713,6 +23723,13 @@ export type RecipientView_accessQuery = {
     country?: string | null;
     browserName?: string | null;
   };
+};
+
+export type RecipientView_accessesQueryVariables = Exact<{
+  keycode: Scalars["ID"];
+}>;
+
+export type RecipientView_accessesQuery = {
   total: { __typename?: "PublicPetitionAccessPagination"; totalCount: number };
   pending: { __typename?: "PublicPetitionAccessPagination"; totalCount: number };
 };
@@ -23836,6 +23853,7 @@ export type RecipientPortal_PublicPetitionAccessFragment = {
     fullName: string;
     firstName: string;
     email: string;
+    initials?: string | null;
   } | null;
   message?: {
     __typename?: "PublicPetitionMessage";
@@ -23901,6 +23919,7 @@ export type RecipientPortal_accessQuery = {
       fullName: string;
       firstName: string;
       email: string;
+      initials?: string | null;
     } | null;
     message?: {
       __typename?: "PublicPetitionMessage";
@@ -23974,6 +23993,7 @@ export type RecipientPortal_accessesQuery = {
         fullName: string;
         firstName: string;
         email: string;
+        initials?: string | null;
       } | null;
       message?: {
         __typename?: "PublicPetitionMessage";
@@ -29987,6 +30007,7 @@ export const RecipientViewHeader_PublicContactFragmentDoc = gql`
     fullName
     firstName
     email
+    initials
   }
 ` as unknown as DocumentNode<RecipientViewHeader_PublicContactFragment, unknown>;
 export const RecipientViewContentsCard_PublicPetitionFragmentDoc = gql`
@@ -30257,6 +30278,7 @@ export const RecipientPortalHeader_PublicContactFragmentDoc = gql`
     fullName
     firstName
     email
+    initials
   }
 ` as unknown as DocumentNode<RecipientPortalHeader_PublicContactFragment, unknown>;
 export const RecipientPortal_PublicPetitionMessageFragmentDoc = gql`
@@ -33897,6 +33919,12 @@ export const RecipientView_accessDocument = gql`
     metadata(keycode: $keycode) {
       ...RecipientView_ConnectionMetadata
     }
+  }
+  ${RecipientView_PublicPetitionAccessFragmentDoc}
+  ${RecipientView_ConnectionMetadataFragmentDoc}
+` as unknown as DocumentNode<RecipientView_accessQuery, RecipientView_accessQueryVariables>;
+export const RecipientView_accessesDocument = gql`
+  query RecipientView_accesses($keycode: ID!) {
     total: accesses(keycode: $keycode) {
       totalCount
     }
@@ -33904,9 +33932,7 @@ export const RecipientView_accessDocument = gql`
       totalCount
     }
   }
-  ${RecipientView_PublicPetitionAccessFragmentDoc}
-  ${RecipientView_ConnectionMetadataFragmentDoc}
-` as unknown as DocumentNode<RecipientView_accessQuery, RecipientView_accessQueryVariables>;
+` as unknown as DocumentNode<RecipientView_accessesQuery, RecipientView_accessesQueryVariables>;
 export const RecipientPortal_accessDocument = gql`
   query RecipientPortal_access($keycode: ID!) {
     access(keycode: $keycode) {

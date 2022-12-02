@@ -40,6 +40,7 @@ import { RecipientViewPagination } from "@parallel/components/recipient-view/Rec
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
 import {
   RecipientView_accessDocument,
+  RecipientView_accessesDocument,
   RecipientView_publicCompletePetitionDocument,
   RecipientView_PublicUserFragment,
   Tone,
@@ -68,12 +69,16 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const router = useRouter();
   const toast = useToast();
   const {
+    data: { access },
+  } = useAssertQuery(RecipientView_accessDocument, { variables: { keycode } });
+
+  const {
     data: {
-      access,
       total: { totalCount: total },
       pending: { totalCount: pending },
     },
-  } = useAssertQuery(RecipientView_accessDocument, { variables: { keycode } });
+    refetch: refetchAccessesCount,
+  } = useAssertQuery(RecipientView_accessesDocument, { variables: { keycode } });
 
   const petition = access!.petition!;
   const granter = access!.granter!;
@@ -160,6 +165,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
               })
             );
           }
+          refetchAccessesCount();
         } else {
           // go to first repliable field without replies
           let page = 1;
@@ -197,7 +203,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
         }
       }
     },
-    [petition.fields, visibility, granter, router.query]
+    [petition.fields, visibility, granter, router.query, refetchAccessesCount]
   );
 
   const [sidebarTop, setSidebarTop] = useState(0);
@@ -645,6 +651,12 @@ RecipientView.queries = [
       metadata(keycode: $keycode) {
         ...RecipientView_ConnectionMetadata
       }
+    }
+    ${RecipientView.fragments.PublicPetitionAccess}
+    ${RecipientView.fragments.ConnectionMetadata}
+  `,
+  gql`
+    query RecipientView_accesses($keycode: ID!) {
       total: accesses(keycode: $keycode) {
         totalCount
       }
@@ -652,8 +664,6 @@ RecipientView.queries = [
         totalCount
       }
     }
-    ${RecipientView.fragments.PublicPetitionAccess}
-    ${RecipientView.fragments.ConnectionMetadata}
   `,
 ];
 
@@ -665,6 +675,9 @@ RecipientView.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCont
   }
   try {
     const { data } = await fetchQuery(RecipientView_accessDocument, {
+      variables: { keycode },
+    });
+    await fetchQuery(RecipientView_accessesDocument, {
       variables: { keycode },
     });
     const pageCount =

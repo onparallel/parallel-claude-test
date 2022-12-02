@@ -291,7 +291,12 @@ export const RecipientViewHeader = Object.assign(
                       paddingRight={0}
                       transition="all 200ms"
                     >
-                      <Avatar name={contact.fullName} boxSize={10} size="md" />
+                      <Avatar
+                        name={contact.fullName}
+                        boxSize={10}
+                        size="md"
+                        getInitials={contact.initials ? () => contact.initials! : undefined}
+                      />
                       {pendingPetitions ? (
                         <Circle
                           size="16px"
@@ -308,7 +313,11 @@ export const RecipientViewHeader = Object.assign(
                   <Portal>
                     <MenuList minW="min-content">
                       <HStack paddingX={3.5} paddingY={1} position="relative">
-                        <Avatar name={contact.fullName} size="sm" />
+                        <Avatar
+                          name={contact.fullName}
+                          size="sm"
+                          getInitials={contact.initials ? () => contact.initials! : undefined}
+                        />
                         <Stack spacing={0}>
                           <Text as="div" fontWeight="semibold">
                             {contact.fullName}
@@ -523,6 +532,7 @@ export const RecipientViewHeader = Object.assign(
           fullName
           firstName
           email
+          initials
         }
       `,
       PublicUser: gql`
