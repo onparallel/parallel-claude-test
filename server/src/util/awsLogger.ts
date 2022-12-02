@@ -7,6 +7,9 @@ export function awsLogger(logger: ILogger) {
     ["info", "debug", "error", "warn"].map((level) => [
       level,
       (payload: any) => {
+        if (payload === "endpoints") {
+          return;
+        }
         logger.debug(
           fastSafeStringify(
             {
