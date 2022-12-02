@@ -387,6 +387,7 @@ export class OrganizationRepository extends BaseRepository {
       .update({
         limit: newLimit,
       });
+    this._loadCurrentOrganizationUsageLimit.dataloader.clear({ orgId, limitName });
   }
 
   async updateUsageLimitAsExpired(
