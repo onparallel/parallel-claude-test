@@ -181,7 +181,7 @@ export const Organization = objectType({
         exclude: list(nonNull(globalIdArg("User"))),
         includeInactive: booleanArg(),
       },
-      resolve: async (root, { offset, limit, search, sortBy, exclude, includeInactive }, ctx) => {
+      resolve: (root, { offset, limit, search, sortBy, exclude, includeInactive }, ctx) => {
         const columnMap = {
           firstName: "first_name",
           lastName: "last_name",
@@ -215,7 +215,7 @@ export const Organization = objectType({
         ),
       },
       authorize: isOwnOrgOrSuperAdmin(),
-      resolve: async (root, { limit, offset, type }, ctx) =>
+      resolve: (root, { limit, offset, type }, ctx) =>
         ctx.integrations.getPaginatedIntegrationsForOrg(root.id, {
           type,
           offset,
@@ -247,7 +247,7 @@ export const Organization = objectType({
       extendArgs: {
         limitName: nonNull("OrganizationUsageLimitName"),
       },
-      resolve: async (root, { limitName, limit, offset }, ctx) => {
+      resolve: (root, { limitName, limit, offset }, ctx) => {
         return ctx.organizations.getPaginatedUsageLimitsForOrg(root.id, {
           limitName,
           limit,

@@ -11,7 +11,7 @@ export const userGroupsQuery = queryField((t) => {
     authorize: authenticate(),
     searchable: true,
     sortableBy: ["name", "createdAt"],
-    resolve: async (_, { offset, limit, sortBy, search }, ctx) => {
+    resolve: (_, { offset, limit, sortBy, search }, ctx) => {
       const columnMap = {
         createdAt: "created_at",
         name: "name",

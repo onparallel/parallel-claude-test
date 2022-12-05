@@ -393,7 +393,7 @@ export class PetitionRepository extends BaseRepository {
     return count === new Set(replyIds).size;
   }
 
-  async getPaginatedPetitionsForUser(
+  getPaginatedPetitionsForUser(
     orgId: number,
     userId: number,
     opts: {

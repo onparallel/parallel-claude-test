@@ -150,7 +150,7 @@ export const petitionsQuery = queryField((t) => {
         }
       }
 
-      return await ctx.petitions.getPaginatedPetitionsForUser(ctx.user!.org_id, ctx.user!.id, {
+      return ctx.petitions.getPaginatedPetitionsForUser(ctx.user!.org_id, ctx.user!.id, {
         search,
         offset,
         filters,
@@ -237,11 +237,7 @@ export const templatesQuery = queryField((t) => {
       category: stringArg(),
     },
     searchable: true,
-    resolve: async (
-      _,
-      { limit, offset, path, locale, search, isPublic, isOwner, category },
-      ctx
-    ) => {
+    resolve: (_, { limit, offset, path, locale, search, isPublic, isOwner, category }, ctx) => {
       if (isPublic) {
         return ctx.petitions.getPaginatedPublicTemplates({
           search,

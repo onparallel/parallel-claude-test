@@ -18,7 +18,7 @@ export const contactQueries = queryField((t) => {
       exclude: list(nonNull(globalIdArg("Contact"))),
     },
     sortableBy: ["firstName", "lastName", "fullName", "email", "createdAt"],
-    resolve: async (_, { offset, limit, search, sortBy, exclude }, ctx) => {
+    resolve: (_, { offset, limit, search, sortBy, exclude }, ctx) => {
       return ctx.contacts.getPaginatedContactsForUser(ctx.user!, {
         search,
         excludeIds: exclude,

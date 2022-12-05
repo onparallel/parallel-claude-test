@@ -72,13 +72,13 @@ describe("repositories/PetitionRepository", () => {
     });
 
     test("returns an empty page without options", async () => {
-      const result = await petitions.getPaginatedPetitionsForUser(user.org_id, user.id, {});
+      const result = petitions.getPaginatedPetitionsForUser(user.org_id, user.id, {});
       expect(await result.totalCount).toBe(15);
       expect(await result.items).toHaveLength(0);
     });
 
     test("returns a slice of petitions", async () => {
-      const result = await petitions.getPaginatedPetitionsForUser(user.org_id, user.id, {
+      const result = petitions.getPaginatedPetitionsForUser(user.org_id, user.id, {
         offset: 5,
         limit: 5,
       });
@@ -87,7 +87,7 @@ describe("repositories/PetitionRepository", () => {
     });
 
     test("returns a slice of filtered petitions", async () => {
-      const result = await petitions.getPaginatedPetitionsForUser(user.org_id, user.id, {
+      const result = petitions.getPaginatedPetitionsForUser(user.org_id, user.id, {
         offset: 2,
         limit: 5,
         search: "good", // there's only 5 good petitions
@@ -99,7 +99,7 @@ describe("repositories/PetitionRepository", () => {
     });
 
     test("searches petition by recipient name", async () => {
-      const result = await petitions.getPaginatedPetitionsForUser(user.org_id, user.id, {
+      const result = petitions.getPaginatedPetitionsForUser(user.org_id, user.id, {
         offset: 0,
         limit: 10,
         search: "jesse pinkm",
@@ -109,7 +109,7 @@ describe("repositories/PetitionRepository", () => {
     });
 
     test("searches petition by recipient email", async () => {
-      const result = await petitions.getPaginatedPetitionsForUser(user.org_id, user.id, {
+      const result = petitions.getPaginatedPetitionsForUser(user.org_id, user.id, {
         offset: 0,
         limit: 10,
         search: "jesse.pinkman@test.com",

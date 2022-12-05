@@ -27,7 +27,7 @@ export const Contact = objectType({
     t.paginationField("accesses", {
       type: "PetitionAccess",
       description: "The petition accesses for this contact",
-      resolve: async (root, { offset, limit }, ctx) => {
+      resolve: (root, { offset, limit }, ctx) => {
         return ctx.contacts.getPaginatedAccessesForContact(root.id, ctx.user!.id, {
           offset,
           limit,

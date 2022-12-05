@@ -119,7 +119,7 @@ export const landingQueries = queryField((t) => {
       categories: list(nonNull(stringArg())),
       locale: nonNull(arg({ type: "PetitionLocale" })),
     },
-    resolve: async (_, { offset, limit, locale, categories }, ctx) => {
+    resolve: (_, { offset, limit, locale, categories }, ctx) => {
       return ctx.petitions.getPaginatedPublicTemplates({
         limit,
         offset,
@@ -150,7 +150,7 @@ export const landingQueries = queryField((t) => {
           extendArgs: {
             locale: nonNull(arg({ type: "PetitionLocale" })),
           },
-          resolve: async (category, { limit, offset, locale }, ctx) => {
+          resolve: (category, { limit, offset, locale }, ctx) => {
             return ctx.petitions.getPaginatedPublicTemplates({
               limit,
               offset,

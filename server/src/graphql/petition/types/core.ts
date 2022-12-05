@@ -370,7 +370,7 @@ export const Petition = objectType({
     t.paginationField("events", {
       type: "PetitionEvent",
       description: "The events for the petition.",
-      resolve: async (root, { offset, limit }, ctx) => {
+      resolve: (root, { offset, limit }, ctx) => {
         return ctx.petitions.getPaginatedEventsForPetition(root.id, {
           offset,
           limit,

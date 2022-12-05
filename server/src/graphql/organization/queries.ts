@@ -30,7 +30,7 @@ export const organizationQueries = queryField((t) => {
         })
       ),
     },
-    resolve: async (_, { offset, limit, search, status, sortBy }, ctx) => {
+    resolve: (_, { offset, limit, search, status, sortBy }, ctx) => {
       const columnMap = {
         createdAt: "created_at",
         name: "name",
