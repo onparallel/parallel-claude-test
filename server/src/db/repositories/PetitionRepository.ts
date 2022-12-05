@@ -913,6 +913,74 @@ export class PetitionRepository extends BaseRepository {
     });
   });
 
+  readonly loadPublicPetitionProgress = this.buildLoader<
+    number,
+    {
+      replied: number;
+      optional: number;
+      total: number;
+    }
+  >(async (petitionIds, t) => {
+    const [fields, fieldReplies] = await Promise.all([
+      this.from("petition_field", t)
+        .whereIn("petition_id", petitionIds)
+        .whereNull("deleted_at")
+        .whereNot("type", "HEADING"),
+      this.raw<PetitionFieldReply>(
+        /* sql */ `
+          select pfr.* from petition_field_reply as pfr
+          left join petition_field as pf on pf.id = pfr.petition_field_id and pfr.deleted_at is null
+          left join file_upload fu
+            on pfr.type in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'DOW_JONES_KYC')
+            and (pfr.content->>'file_upload_id')::int = fu.id
+            and fu.upload_complete
+          where pf.petition_id in ? and pf.deleted_at is null
+        `,
+        [this.sqlIn(petitionIds)],
+        t
+      ),
+    ]);
+
+    const fieldsByPetition = groupBy(fields, (f) => f.petition_id);
+
+    return petitionIds.map((id) => {
+      const fieldsWithReplies = (fieldsByPetition[id] ?? [])
+        .map((field) => ({
+          ...field,
+          replies: fieldReplies
+            .filter((r) => r.petition_field_id === field.id)
+            .map((reply) => {
+              return {
+                content: isFileTypeField(field.type)
+                  ? {
+                      ...reply.content,
+                      // the query is handling this
+                      uploadComplete: true,
+                    }
+                  : reply.content,
+                status: reply.status,
+                anonymized_at: reply.anonymized_at,
+              };
+            })
+            .filter((r) => r.content !== null),
+        }))
+        .sort((a, b) => a.position! - b.position!);
+
+      const visibleFields = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
+        .filter(([field, isVisible]) => isVisible && !field.is_internal)
+        .map(([field]) => field);
+
+      return {
+        replied: countBy(visibleFields, (f) => completedFieldReplies(f).length > 0),
+        optional: countBy(
+          visibleFields,
+          (f) => f.optional && completedFieldReplies(f).length === 0
+        ),
+        total: visibleFields.length,
+      };
+    });
+  });
+
   readonly loadAccess = this.buildLoadBy("petition_access", "id");
 
   readonly loadAccessByKeycode = this.buildLoadBy("petition_access", "keycode");
@@ -2746,7 +2814,7 @@ export class PetitionRepository extends BaseRepository {
     { cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]) }
   );
 
-  contactHasUnreadCommentsInPetition = this.buildLoader<
+  loadContactHasUnreadCommentsInPetition = this.buildLoader<
     {
       contactId: number;
       petitionId: number;

@@ -3152,6 +3152,8 @@ export interface PublicPetition extends Timestamps {
   locale: PetitionLocale;
   /** The organization of the petition. */
   organization: PublicOrganization;
+  /** The progress of the petition. */
+  progress: PublicPetitionFieldProgress;
   /** The recipients of the petition */
   recipients: Array<PublicContact>;
   /** The signature config of the petition */
@@ -3238,6 +3240,17 @@ export interface PublicPetitionFieldComment {
   isAnonymized: Scalars["Boolean"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
+}
+
+/** The progress of a petition. */
+export interface PublicPetitionFieldProgress {
+  __typename?: "PublicPetitionFieldProgress";
+  /** Number of optional fields not replied or approved */
+  optional: Scalars["Int"];
+  /** Number of fields with a reply and not approved */
+  replied: Scalars["Int"];
+  /** Total number of fields in the petition */
+  total: Scalars["Int"];
 }
 
 /** A reply to a petition field */
@@ -23734,47 +23747,19 @@ export type RecipientView_accessesQuery = {
   pending: { __typename?: "PublicPetitionAccessPagination"; totalCount: number };
 };
 
-export type RecipientPortal_PublicPetitionFieldFragment = {
-  __typename?: "PublicPetitionField";
-  id: string;
-  type: PetitionFieldType;
-  title?: string | null;
-  optional: boolean;
-  isInternal: boolean;
-  isReadOnly: boolean;
-  options: { [key: string]: any };
-  visibility?: { [key: string]: any } | null;
-  replies: Array<{
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-    isAnonymized: boolean;
-  }>;
-};
-
 export type RecipientPortal_PublicPetitionFragment = {
   __typename?: "PublicPetition";
   id: string;
   status: PetitionStatus;
   tone: Tone;
   hasUnreadComments: boolean;
-  fields: Array<{
-    __typename?: "PublicPetitionField";
-    id: string;
-    type: PetitionFieldType;
-    title?: string | null;
-    optional: boolean;
-    isInternal: boolean;
-    isReadOnly: boolean;
-    options: { [key: string]: any };
-    visibility?: { [key: string]: any } | null;
-    replies: Array<{
-      __typename?: "PublicPetitionFieldReply";
-      id: string;
-      content: { [key: string]: any };
-      isAnonymized: boolean;
-    }>;
-  }>;
+  fields: Array<{ __typename?: "PublicPetitionField"; id: string; title?: string | null }>;
+  progress: {
+    __typename?: "PublicPetitionFieldProgress";
+    total: number;
+    replied: number;
+    optional: number;
+  };
 };
 
 export type RecipientPortal_PublicPetitionMessageFragment = {
@@ -23812,23 +23797,13 @@ export type RecipientPortal_PublicPetitionAccessFragment = {
     status: PetitionStatus;
     tone: Tone;
     hasUnreadComments: boolean;
-    fields: Array<{
-      __typename?: "PublicPetitionField";
-      id: string;
-      type: PetitionFieldType;
-      title?: string | null;
-      optional: boolean;
-      isInternal: boolean;
-      isReadOnly: boolean;
-      options: { [key: string]: any };
-      visibility?: { [key: string]: any } | null;
-      replies: Array<{
-        __typename?: "PublicPetitionFieldReply";
-        id: string;
-        content: { [key: string]: any };
-        isAnonymized: boolean;
-      }>;
-    }>;
+    fields: Array<{ __typename?: "PublicPetitionField"; id: string; title?: string | null }>;
+    progress: {
+      __typename?: "PublicPetitionFieldProgress";
+      total: number;
+      replied: number;
+      optional: number;
+    };
   };
   granter?: {
     __typename?: "PublicUser";
@@ -23878,23 +23853,13 @@ export type RecipientPortal_accessQuery = {
       status: PetitionStatus;
       tone: Tone;
       hasUnreadComments: boolean;
-      fields: Array<{
-        __typename?: "PublicPetitionField";
-        id: string;
-        type: PetitionFieldType;
-        title?: string | null;
-        optional: boolean;
-        isInternal: boolean;
-        isReadOnly: boolean;
-        options: { [key: string]: any };
-        visibility?: { [key: string]: any } | null;
-        replies: Array<{
-          __typename?: "PublicPetitionFieldReply";
-          id: string;
-          content: { [key: string]: any };
-          isAnonymized: boolean;
-        }>;
-      }>;
+      fields: Array<{ __typename?: "PublicPetitionField"; id: string; title?: string | null }>;
+      progress: {
+        __typename?: "PublicPetitionFieldProgress";
+        total: number;
+        replied: number;
+        optional: number;
+      };
     };
     granter?: {
       __typename?: "PublicUser";
@@ -23963,23 +23928,13 @@ export type RecipientPortal_accessesQuery = {
         status: PetitionStatus;
         tone: Tone;
         hasUnreadComments: boolean;
-        fields: Array<{
-          __typename?: "PublicPetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: string | null;
-          optional: boolean;
-          isInternal: boolean;
-          isReadOnly: boolean;
-          options: { [key: string]: any };
-          visibility?: { [key: string]: any } | null;
-          replies: Array<{
-            __typename?: "PublicPetitionFieldReply";
-            id: string;
-            content: { [key: string]: any };
-            isAnonymized: boolean;
-          }>;
-        }>;
+        fields: Array<{ __typename?: "PublicPetitionField"; id: string; title?: string | null }>;
+        progress: {
+          __typename?: "PublicPetitionFieldProgress";
+          total: number;
+          replied: number;
+          optional: number;
+        };
       };
       granter?: {
         __typename?: "PublicUser";
@@ -30225,23 +30180,6 @@ export const RecipientView_ConnectionMetadataFragmentDoc = gql`
     browserName
   }
 ` as unknown as DocumentNode<RecipientView_ConnectionMetadataFragment, unknown>;
-export const RecipientPortal_PublicPetitionFieldFragmentDoc = gql`
-  fragment RecipientPortal_PublicPetitionField on PublicPetitionField {
-    id
-    type
-    title
-    optional
-    isInternal
-    isReadOnly
-    replies {
-      id
-    }
-    ...useFieldVisibility_PublicPetitionField
-    ...completedFieldReplies_PublicPetitionField
-  }
-  ${useFieldVisibility_PublicPetitionFieldFragmentDoc}
-  ${completedFieldReplies_PublicPetitionFieldFragmentDoc}
-` as unknown as DocumentNode<RecipientPortal_PublicPetitionFieldFragment, unknown>;
 export const RecipientPortal_PublicPetitionFragmentDoc = gql`
   fragment RecipientPortal_PublicPetition on PublicPetition {
     id
@@ -30249,10 +30187,15 @@ export const RecipientPortal_PublicPetitionFragmentDoc = gql`
     tone
     hasUnreadComments
     fields {
-      ...RecipientPortal_PublicPetitionField
+      id
+      title
+    }
+    progress {
+      total
+      replied
+      optional
     }
   }
-  ${RecipientPortal_PublicPetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<RecipientPortal_PublicPetitionFragment, unknown>;
 export const RecipientPortalHeader_PublicUserFragmentDoc = gql`
   fragment RecipientPortalHeader_PublicUser on PublicUser {

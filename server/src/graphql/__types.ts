@@ -691,6 +691,12 @@ export interface NexusGenObjects {
   };
   PublicPetitionField: db.PetitionField;
   PublicPetitionFieldComment: db.PetitionFieldComment;
+  PublicPetitionFieldProgress: {
+    // root type
+    optional: number; // Int!
+    replied: number; // Int!
+    total: number; // Int!
+  };
   PublicPetitionFieldReply: db.PetitionFieldReply;
   PublicPetitionLink: db.PublicPetitionLink;
   PublicPetitionMessage: db.PetitionMessage;
@@ -1954,6 +1960,7 @@ export interface NexusGenFieldTypes {
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     organization: NexusGenRootTypes["PublicOrganization"]; // PublicOrganization!
+    progress: NexusGenRootTypes["PublicPetitionFieldProgress"]; // PublicPetitionFieldProgress!
     recipients: NexusGenRootTypes["PublicContact"][]; // [PublicContact!]!
     signatureConfig: NexusGenRootTypes["PublicSignatureConfig"] | null; // PublicSignatureConfig
     signatureStatus: NexusGenEnums["PublicSignatureStatus"] | null; // PublicSignatureStatus
@@ -2006,6 +2013,12 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isAnonymized: boolean; // Boolean!
     isUnread: boolean; // Boolean!
+  };
+  PublicPetitionFieldProgress: {
+    // field return type
+    optional: number; // Int!
+    replied: number; // Int!
+    total: number; // Int!
   };
   PublicPetitionFieldReply: {
     // field return type
@@ -3669,6 +3682,7 @@ export interface NexusGenFieldTypeNames {
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
     organization: "PublicOrganization";
+    progress: "PublicPetitionFieldProgress";
     recipients: "PublicContact";
     signatureConfig: "PublicSignatureConfig";
     signatureStatus: "PublicSignatureStatus";
@@ -3721,6 +3735,12 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isAnonymized: "Boolean";
     isUnread: "Boolean";
+  };
+  PublicPetitionFieldProgress: {
+    // field return type name
+    optional: "Int";
+    replied: "Int";
+    total: "Int";
   };
   PublicPetitionFieldReply: {
     // field return type name

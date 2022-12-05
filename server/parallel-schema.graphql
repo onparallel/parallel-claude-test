@@ -4147,6 +4147,11 @@ type PublicPetition implements Timestamps {
   organization: PublicOrganization!
 
   """
+  The progress of the petition.
+  """
+  progress: PublicPetitionFieldProgress!
+
+  """
   The recipients of the petition
   """
   recipients: [PublicContact!]!
@@ -4311,6 +4316,26 @@ type PublicPetitionFieldComment {
   Whether the comment has been read or not.
   """
   isUnread: Boolean!
+}
+
+"""
+The progress of a petition.
+"""
+type PublicPetitionFieldProgress {
+  """
+  Number of optional fields not replied or approved
+  """
+  optional: Int!
+
+  """
+  Number of fields with a reply and not approved
+  """
+  replied: Int!
+
+  """
+  Total number of fields in the petition
+  """
+  total: Int!
 }
 
 """

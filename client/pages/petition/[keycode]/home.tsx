@@ -49,7 +49,6 @@ import {
   RecipientPortal_accessDocument,
   RecipientPortal_accessesDocument,
   RecipientPortal_PublicPetitionAccessFragment,
-  RecipientPortal_PublicPetitionFieldFragment,
   RecipientPortal_statsDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -57,19 +56,16 @@ import {
   useAssertQuery,
   useAssertQueryOrPreviousData,
 } from "@parallel/utils/apollo/useAssertQuery";
-import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
 import { generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
-import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { parseQuery, string, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import Head from "next/head";
-import { Fragment, useCallback, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { FormattedMessage, useIntl } from "react-intl";
-import { zip } from "remeda";
 
 const QUERY_STATE = {
   search: string(),
@@ -383,36 +379,11 @@ function Petitions({
 
 function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccessFragment }) {
   const intl = useIntl();
-
   const { message, granter, petition, keycode, createdAt } = access;
-
   const date = message?.sentAt ?? createdAt;
-
   const hasUnreadComments = petition.hasUnreadComments;
-
-  const visibility = useFieldVisibility(petition.fields);
-  const { replied, optional, total } = useMemo(() => {
-    let replied = 0;
-    let optional = 0;
-    let total = 0;
-    for (const [field, isVisible] of zip<RecipientPortal_PublicPetitionFieldFragment, boolean>(
-      petition.fields,
-      visibility
-    )) {
-      const fieldReplies = completedFieldReplies(field);
-
-      const isHiddenToPublic = field.__typename === "PublicPetitionField" && field.isInternal;
-      if (isVisible && !field.isReadOnly && !isHiddenToPublic) {
-        replied += fieldReplies.length ? 1 : 0;
-        optional += field.optional && !fieldReplies.length ? 1 : 0;
-        total += 1;
-      }
-    }
-    return { replied, optional, total };
-  }, [petition.fields, visibility]);
-
+  const { replied, optional, total } = petition.progress;
   const title = message?.subject ?? petition.fields[0].title;
-
   return (
     <LinkBox>
       <HStack
@@ -549,25 +520,6 @@ function RadioCard(props: RadioProps) {
 }
 
 const _fragments = {
-  get PublicPetitionField() {
-    return gql`
-      fragment RecipientPortal_PublicPetitionField on PublicPetitionField {
-        id
-        type
-        title
-        optional
-        isInternal
-        isReadOnly
-        replies {
-          id
-        }
-        ...useFieldVisibility_PublicPetitionField
-        ...completedFieldReplies_PublicPetitionField
-      }
-      ${useFieldVisibility.fragments.PublicPetitionField}
-      ${completedFieldReplies.fragments.PublicPetitionField}
-    `;
-  },
   get PublicPetition() {
     return gql`
       fragment RecipientPortal_PublicPetition on PublicPetition {
@@ -576,10 +528,15 @@ const _fragments = {
         tone
         hasUnreadComments
         fields {
-          ...RecipientPortal_PublicPetitionField
+          id
+          title
+        }
+        progress {
+          total
+          replied
+          optional
         }
       }
-      ${this.PublicPetitionField}
     `;
   },
   get PublicPetitionMessage() {

@@ -230,10 +230,31 @@ export const PublicPetition = objectType({
     t.boolean("hasUnreadComments", {
       description: "Shows if the petition has unread comments",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.contactHasUnreadCommentsInPetition({
+        return await ctx.petitions.loadContactHasUnreadCommentsInPetition({
           contactId: ctx.contact!.id,
           petitionId: root.id,
         });
+      },
+    });
+    t.field("progress", {
+      type: objectType({
+        name: "PublicPetitionFieldProgress",
+        description: "The progress of a petition.",
+        definition(t) {
+          t.int("replied", {
+            description: "Number of fields with a reply and not approved",
+          });
+          t.int("optional", {
+            description: "Number of optional fields not replied or approved",
+          });
+          t.int("total", {
+            description: "Total number of fields in the petition",
+          });
+        },
+      }),
+      description: "The progress of the petition.",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadPublicPetitionProgress(root.id);
       },
     });
   },
