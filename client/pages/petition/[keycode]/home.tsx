@@ -27,6 +27,7 @@ import {
   TimeIcon,
 } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
+import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -461,13 +462,20 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
                       defaultMessage: "Untitled",
                     })}
                 </Text>
-                <Text fontSize="sm" color="gray.600" noOfLines={2} wordBreak="break-all">
+                <Text fontSize="sm" color="gray.600" noOfLines={2} wordBreak="break-all" zIndex={1}>
                   <FormattedMessage
                     id="recipient-view.client-portal.requested-by"
                     defaultMessage="Requested by {name}, on {date}"
                     values={{
                       name: granter?.fullName ?? "",
-                      date: intl.formatDate(date, FORMATS.L),
+                      date: (
+                        <DateTime
+                          value={date}
+                          format={FORMATS.L}
+                          useRelativeTime={false}
+                          title={intl.formatDate(date, FORMATS.LLL)}
+                        />
+                      ),
                     }}
                   />
                 </Text>
@@ -545,7 +553,7 @@ function RadioCard(props: RadioProps) {
   );
 }
 
-RecipientPortal.fragments = {
+const _fragments = {
   get PublicPetitionField() {
     return gql`
       fragment RecipientPortal_PublicPetitionField on PublicPetitionField {
@@ -633,14 +641,14 @@ RecipientPortal.fragments = {
   },
 };
 
-RecipientPortal.queries = [
+const _queries = [
   gql`
     query RecipientPortal_access($keycode: ID!) {
       access(keycode: $keycode) {
         ...RecipientPortal_PublicPetitionAccess
       }
     }
-    ${RecipientPortal.fragments.PublicPetitionAccess}
+    ${_fragments.PublicPetitionAccess}
   `,
   gql`
     query RecipientPortal_stats($keycode: ID!, $search: String) {
@@ -654,7 +662,7 @@ RecipientPortal.queries = [
         totalCount
       }
     }
-    ${RecipientPortal.fragments.PublicPetitionAccess}
+    ${_fragments.PublicPetitionAccess}
   `,
   gql`
     query RecipientPortal_accesses(
@@ -677,7 +685,7 @@ RecipientPortal.queries = [
         }
       }
     }
-    ${RecipientPortal.fragments.PublicPetitionAccess}
+    ${_fragments.PublicPetitionAccess}
   `,
 ];
 
