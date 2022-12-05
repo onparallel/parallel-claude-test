@@ -5,7 +5,6 @@ import {
   Circle,
   Flex,
   Grid,
-  GridItem,
   Heading,
   HStack,
   Image,
@@ -198,7 +197,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
           <Flex width="100%" justifyContent="center">
             <Stack maxWidth="container.lg" width="100%" spacing={4} paddingY={4} paddingX={2.5}>
               <HStack>
-                <NakedLink href={`/petition/${keycode}/1`}>
+                <NakedLink href={`/petition/${keycode}`}>
                   <IconButtonWithTooltip
                     as="a"
                     icon={<ArrowBackIcon />}
@@ -217,6 +216,41 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                   />
                 </Heading>
               </HStack>
+              <Stack direction={{ base: "column", sm: "row" }} spacing={2}>
+                <HStack width="100%">
+                  <IconButtonWithTooltip
+                    onClick={async () => {
+                      await refetchStats();
+                      await refetch();
+                    }}
+                    icon={<RepeatIcon />}
+                    placement="bottom"
+                    variant="outline"
+                    label={intl.formatMessage({
+                      id: "generic.reload-data",
+                      defaultMessage: "Reload",
+                    })}
+                    backgroundColor="white"
+                  />
+                  <SearchInput
+                    value={search}
+                    onChange={(event) => handleSearchChange(event?.target.value)}
+                    backgroundColor="white"
+                    placeholder={intl.formatMessage({
+                      id: "recipient-view.client-portal.search-placeholder",
+                      defaultMessage: "Search...",
+                    })}
+                  />
+                </HStack>
+                <Box>
+                  <RecipientPortalStatusFilter
+                    width={{ base: "100%", sm: "220px" }}
+                    value={status}
+                    onChange={(value) => value && handleStatusChange(value)}
+                    textAlign="left"
+                  />
+                </Box>
+              </Stack>
 
               <Grid
                 templateColumns={{
@@ -271,41 +305,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                   </Text>
                 </RadioCard>
               </Grid>
-              <Stack direction={{ base: "column", sm: "row" }} spacing={2}>
-                <HStack width="100%">
-                  <IconButtonWithTooltip
-                    onClick={async () => {
-                      await refetchStats();
-                      await refetch();
-                    }}
-                    icon={<RepeatIcon />}
-                    placement="bottom"
-                    variant="outline"
-                    label={intl.formatMessage({
-                      id: "generic.reload-data",
-                      defaultMessage: "Reload",
-                    })}
-                    backgroundColor="white"
-                  />
-                  <SearchInput
-                    value={search}
-                    onChange={(event) => handleSearchChange(event?.target.value)}
-                    backgroundColor="white"
-                    placeholder={intl.formatMessage({
-                      id: "recipient-view.client-portal.search-placeholder",
-                      defaultMessage: "Search...",
-                    })}
-                  />
-                </HStack>
-                <Box>
-                  <RecipientPortalStatusFilter
-                    width={{ base: "100%", sm: "auto" }}
-                    value={status}
-                    onChange={(value) => value && handleStatusChange(value)}
-                    textAlign="left"
-                  />
-                </Box>
-              </Stack>
+
               <Petitions items={accesses} onLoadMore={handleLoadMore} hasMore={hasMore} />
             </Stack>
           </Flex>
@@ -421,7 +421,7 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
         gap={4}
         cursor="pointer"
         _hover={{
-          backgroundColor: "gray.100",
+          backgroundColor: "gray.50",
         }}
         backgroundColor={hasUnreadComments ? "primary.50" : undefined}
       >
@@ -442,46 +442,44 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
           )}
         </Box>
         <Grid
-          templateColumns={{ base: "repeat(1, 1fr)", md: "repeat(2, 1fr)" }}
+          templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
           gap={{ base: 1, md: 4 }}
           width="100%"
         >
-          <NakedLink href={`/petition/${keycode}/1`} passHref>
-            <LinkOverlay>
-              <Stack spacing={0}>
-                <Text
-                  fontWeight={600}
-                  noOfLines={[2, 1]}
-                  wordBreak="break-all"
-                  color={title ? undefined : "gray.500"}
-                  fontStyle={title ? "normal" : "italic"}
-                >
-                  {title ??
-                    intl.formatMessage({
-                      id: "generic.untitled",
-                      defaultMessage: "Untitled",
-                    })}
-                </Text>
-                <Text fontSize="sm" color="gray.600" noOfLines={2} wordBreak="break-all" zIndex={1}>
-                  <FormattedMessage
-                    id="recipient-view.client-portal.requested-by"
-                    defaultMessage="Requested by {name}, on {date}"
-                    values={{
-                      name: granter?.fullName ?? "",
-                      date: (
-                        <DateTime
-                          value={date}
-                          format={FORMATS.L}
-                          useRelativeTime={false}
-                          title={intl.formatDate(date, FORMATS.LLL)}
-                        />
-                      ),
-                    }}
-                  />
-                </Text>
-              </Stack>
-            </LinkOverlay>
-          </NakedLink>
+          <Stack spacing={0}>
+            <NakedLink href={`/petition/${keycode}`} passHref>
+              <LinkOverlay
+                fontWeight={600}
+                noOfLines={[2, 1]}
+                wordBreak="break-all"
+                color={title ? undefined : "gray.500"}
+                fontStyle={title ? "normal" : "italic"}
+              >
+                {title ??
+                  intl.formatMessage({
+                    id: "generic.untitled",
+                    defaultMessage: "Untitled",
+                  })}
+              </LinkOverlay>
+            </NakedLink>
+            <Text fontSize="sm" color="gray.600" noOfLines={2} wordBreak="break-all" zIndex={1}>
+              <FormattedMessage
+                id="recipient-view.client-portal.requested-by"
+                defaultMessage="Requested by {name}, on {date}"
+                values={{
+                  name: granter?.fullName ?? "",
+                  date: (
+                    <DateTime
+                      value={date}
+                      format={FORMATS.L}
+                      useRelativeTime={false}
+                      title={intl.formatDate(date, FORMATS.LLL)}
+                    />
+                  ),
+                }}
+              />
+            </Text>
+          </Stack>
           <Stack
             direction={{ base: "row", md: "column" }}
             alignItems={{ base: "center", md: "start" }}
@@ -531,25 +529,22 @@ function RadioCard(props: RadioProps) {
   const checkbox = getCheckboxProps();
 
   return (
-    <GridItem as="label" gridArea={props.value}>
+    <Card
+      as="label"
+      {...checkbox}
+      padding={4}
+      cursor="pointer"
+      isInteractive
+      gridArea={props.value}
+      _checked={{
+        borderColor: "primary.500",
+      }}
+    >
       <input {...input} />
-      <Card
-        {...checkbox}
-        as={Center}
-        padding={4}
-        cursor="pointer"
-        _checked={{
-          borderColor: "primary.500",
-        }}
-        _focus={{
-          boxShadow: "outline",
-        }}
-      >
-        <Stack alignItems="center" textAlign="center" spacing={0}>
-          {props.children}
-        </Stack>
-      </Card>
-    </GridItem>
+      <Stack alignItems="center" textAlign="center" spacing={0}>
+        {props.children}
+      </Stack>
+    </Card>
   );
 }
 
