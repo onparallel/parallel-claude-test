@@ -129,12 +129,15 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                 if (existing === undefined || variables?.offset === 0) {
                   return incoming;
                 } else {
-                  return {
-                    items: uniqBy([...(existing.items ?? []), ...(incoming.items ?? [])], (obj) =>
-                      readField("keycode", obj)
-                    ),
-                    totalCount: incoming.totalCount,
-                  };
+                  return variables?.offset
+                    ? {
+                        items: uniqBy(
+                          [...(existing.items ?? []), ...(incoming.items ?? [])],
+                          (obj) => readField("keycode", obj)
+                        ),
+                        totalCount: incoming.totalCount,
+                      }
+                    : incoming;
                 }
               },
             },

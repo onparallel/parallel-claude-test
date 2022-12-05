@@ -24,7 +24,7 @@ import { NewPetitionEmptyTemplates } from "@parallel/components/petition-new/New
 import { NewPetitionLanguageFilter } from "@parallel/components/petition-new/NewPetitionLanguageFilter";
 import {
   NewPetitionSharedFilter,
-  NewPetitionSharedFilterValues,
+  NewPetitionSharedFilterValue,
 } from "@parallel/components/petition-new/NewPetitionSharedFilter";
 import { PublicTemplateCard } from "@parallel/components/petition-new/PublicTemplateCard";
 import { TemplateCard } from "@parallel/components/petition-new/TemplateCard";
@@ -154,7 +154,7 @@ function NewPetition() {
     setQueryState((state) => ({ ...state, lang: state.public && lang === null ? "ALL" : lang }));
   };
 
-  const handleSharedFilterChange = (shared: Maybe<NewPetitionSharedFilterValues>) => {
+  const handleSharedFilterChange = (shared: Maybe<NewPetitionSharedFilterValue>) => {
     setQueryState((state) => ({
       ...state,
       owner: shared === "IS_OWNER" ? true : shared === "NOT_IS_OWNER" ? false : null,

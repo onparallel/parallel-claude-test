@@ -12,9 +12,9 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { ValueProps } from "@parallel/utils/ValueProps";
 
-export type RecipientPortalStatusFilterValues = "ALL" | "PENDING" | "COMPLETED";
+export type RecipientPortalStatusFilterValue = "ALL" | "PENDING" | "COMPLETED";
 
-interface RecipientPortalStatusFilterProps extends ValueProps<RecipientPortalStatusFilterValues> {}
+interface RecipientPortalStatusFilterProps extends ValueProps<RecipientPortalStatusFilterValue> {}
 
 export const RecipientPortalStatusFilter = chakraForwardRef<
   "button",
@@ -64,7 +64,7 @@ export const RecipientPortalStatusFilter = chakraForwardRef<
         <MenuList>
           <MenuOptionGroup
             value={value ?? "ALL"}
-            onChange={(value) => onChange(value as RecipientPortalStatusFilterValues)}
+            onChange={(value) => onChange(value as RecipientPortalStatusFilterValue)}
           >
             {options.map((option) => (
               <MenuItemOption key={option.value} value={option.value}>

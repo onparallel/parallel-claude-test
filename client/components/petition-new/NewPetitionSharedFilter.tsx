@@ -12,9 +12,9 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useSimpleSelectOptions } from "../common/SimpleSelect";
 
-export type NewPetitionSharedFilterValues = "IS_OWNER" | "NOT_IS_OWNER";
+export type NewPetitionSharedFilterValue = "IS_OWNER" | "NOT_IS_OWNER";
 
-interface NewPetitionSharedFilterProps extends ValueProps<NewPetitionSharedFilterValues> {}
+interface NewPetitionSharedFilterProps extends ValueProps<NewPetitionSharedFilterValue> {}
 
 export const NewPetitionSharedFilter = chakraForwardRef<"button", NewPetitionSharedFilterProps>(
   function NewPetitionSharedFilter({ value, onChange, ...props }, ref) {
@@ -61,7 +61,7 @@ export const NewPetitionSharedFilter = chakraForwardRef<"button", NewPetitionSha
             <MenuOptionGroup
               value={value ?? "ALL"}
               onChange={(value) =>
-                onChange(value === "ALL" ? null : (value as NewPetitionSharedFilterValues))
+                onChange(value === "ALL" ? null : (value as NewPetitionSharedFilterValue))
               }
             >
               {options.map((option) => (

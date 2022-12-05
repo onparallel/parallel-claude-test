@@ -2984,6 +2984,8 @@ export type PublicContact = {
   fullName: Scalars["String"];
   /** The ID of the contact. */
   id: Scalars["GID"];
+  /** The initials of the user. */
+  initials: Maybe<Scalars["String"]>;
   isMe: Scalars["Boolean"];
   /** The last name of the user. */
   lastName: Maybe<Scalars["String"]>;

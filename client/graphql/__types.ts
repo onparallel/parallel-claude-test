@@ -23930,6 +23930,17 @@ export type RecipientPortal_accessQuery = {
   };
 };
 
+export type RecipientPortal_statsQueryVariables = Exact<{
+  keycode: Scalars["ID"];
+  search?: InputMaybe<Scalars["String"]>;
+}>;
+
+export type RecipientPortal_statsQuery = {
+  total: { __typename?: "PublicPetitionAccessPagination"; totalCount: number };
+  pending: { __typename?: "PublicPetitionAccessPagination"; totalCount: number };
+  completed: { __typename?: "PublicPetitionAccessPagination"; totalCount: number };
+};
+
 export type RecipientPortal_accessesQueryVariables = Exact<{
   keycode: Scalars["ID"];
   offset?: InputMaybe<Scalars["Int"]>;
@@ -24003,9 +24014,6 @@ export type RecipientPortal_accessesQuery = {
       } | null;
     }>;
   };
-  total: { __typename?: "PublicPetitionAccessPagination"; totalCount: number };
-  pending: { __typename?: "PublicPetitionAccessPagination"; totalCount: number };
-  completed: { __typename?: "PublicPetitionAccessPagination"; totalCount: number };
 };
 
 export type RecipientViewVerify_PublicAccessVerificationFragment = {
@@ -33941,6 +33949,19 @@ export const RecipientPortal_accessDocument = gql`
   }
   ${RecipientPortal_PublicPetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<RecipientPortal_accessQuery, RecipientPortal_accessQueryVariables>;
+export const RecipientPortal_statsDocument = gql`
+  query RecipientPortal_stats($keycode: ID!, $search: String) {
+    total: accesses(keycode: $keycode, search: $search, status: null) {
+      totalCount
+    }
+    pending: accesses(keycode: $keycode, search: $search, status: [PENDING]) {
+      totalCount
+    }
+    completed: accesses(keycode: $keycode, search: $search, status: [COMPLETED, CLOSED]) {
+      totalCount
+    }
+  }
+` as unknown as DocumentNode<RecipientPortal_statsQuery, RecipientPortal_statsQueryVariables>;
 export const RecipientPortal_accessesDocument = gql`
   query RecipientPortal_accesses(
     $keycode: ID!
@@ -33954,15 +33975,6 @@ export const RecipientPortal_accessesDocument = gql`
       items {
         ...RecipientPortal_PublicPetitionAccess
       }
-    }
-    total: accesses(keycode: $keycode, search: $search) {
-      totalCount
-    }
-    pending: accesses(keycode: $keycode, search: $search, status: [PENDING]) {
-      totalCount
-    }
-    completed: accesses(keycode: $keycode, search: $search, status: [COMPLETED, CLOSED]) {
-      totalCount
     }
   }
   ${RecipientPortal_PublicPetitionAccessFragmentDoc}

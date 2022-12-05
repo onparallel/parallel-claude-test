@@ -43,13 +43,14 @@ import {
 import { RecipientPortalHeader } from "@parallel/components/recipient-view/RecipientPortalHeader";
 import {
   RecipientPortalStatusFilter,
-  RecipientPortalStatusFilterValues,
+  RecipientPortalStatusFilterValue,
 } from "@parallel/components/recipient-view/RecipientPortalStatusFilter";
 import {
   RecipientPortal_accessDocument,
   RecipientPortal_accessesDocument,
   RecipientPortal_PublicPetitionAccessFragment,
   RecipientPortal_PublicPetitionFieldFragment,
+  RecipientPortal_statsDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import {
@@ -72,11 +73,11 @@ import { zip } from "remeda";
 
 const QUERY_STATE = {
   search: string(),
-  status: values<RecipientPortalStatusFilterValues>(["ALL", "PENDING", "COMPLETED"]).orDefault(
+  status: values<RecipientPortalStatusFilterValue>(["ALL", "PENDING", "COMPLETED"]).orDefault(
     "ALL"
   ),
 };
-const PAGE_SIZE = 15;
+const PAGE_SIZE = 20;
 
 type RecipientPortalProps = UnwrapPromise<ReturnType<typeof RecipientPortal.getInitialProps>>;
 
@@ -98,9 +99,6 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
   const {
     data: {
       accesses: { items: accesses, totalCount },
-      total: { totalCount: total },
-      pending: { totalCount: pending },
-      completed: { totalCount: completed },
     },
     fetchMore,
     refetch,
@@ -111,11 +109,24 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
       limit: PAGE_SIZE,
       search: state.search,
       status:
-        status === "ALL" || !status
+        state.status === "ALL"
           ? null
           : status === "PENDING"
           ? ["PENDING"]
           : ["COMPLETED", "CLOSED"],
+    },
+  });
+  const {
+    data: {
+      total: { totalCount: total },
+      pending: { totalCount: pending },
+      completed: { totalCount: completed },
+    },
+    refetch: refetchStats,
+  } = useAssertQueryOrPreviousData(RecipientPortal_statsDocument, {
+    variables: {
+      keycode,
+      search: state.search,
     },
   });
 
@@ -127,14 +138,14 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
     name: "filter",
     value: status,
     defaultValue: status,
-    onChange: (value: RecipientPortalStatusFilterValues) => handleStatusChange(value),
+    onChange: (value: RecipientPortalStatusFilterValue) => handleStatusChange(value),
   });
 
   const handleLoadMore = useCallback(() => {
     fetchMore({ variables: { offset: accesses.length, limit: PAGE_SIZE } });
   }, [fetchMore, accesses]);
 
-  const handleStatusChange = (status: RecipientPortalStatusFilterValues) => {
+  const handleStatusChange = (status: RecipientPortalStatusFilterValue) => {
     mainRef.current!.scrollTo(0, 0);
     setQueryState((current) => ({
       ...current,
@@ -262,7 +273,10 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
               <Stack direction={{ base: "column", sm: "row" }} spacing={2}>
                 <HStack width="100%">
                   <IconButtonWithTooltip
-                    onClick={() => refetch()}
+                    onClick={async () => {
+                      await refetchStats();
+                      await refetch();
+                    }}
                     icon={<RepeatIcon />}
                     placement="bottom"
                     variant="outline"
@@ -629,6 +643,20 @@ RecipientPortal.queries = [
     ${RecipientPortal.fragments.PublicPetitionAccess}
   `,
   gql`
+    query RecipientPortal_stats($keycode: ID!, $search: String) {
+      total: accesses(keycode: $keycode, search: $search, status: null) {
+        totalCount
+      }
+      pending: accesses(keycode: $keycode, search: $search, status: [PENDING]) {
+        totalCount
+      }
+      completed: accesses(keycode: $keycode, search: $search, status: [COMPLETED, CLOSED]) {
+        totalCount
+      }
+    }
+    ${RecipientPortal.fragments.PublicPetitionAccess}
+  `,
+  gql`
     query RecipientPortal_accesses(
       $keycode: ID!
       $offset: Int
@@ -648,15 +676,6 @@ RecipientPortal.queries = [
           ...RecipientPortal_PublicPetitionAccess
         }
       }
-      total: accesses(keycode: $keycode, search: $search) {
-        totalCount
-      }
-      pending: accesses(keycode: $keycode, search: $search, status: [PENDING]) {
-        totalCount
-      }
-      completed: accesses(keycode: $keycode, search: $search, status: [COMPLETED, CLOSED]) {
-        totalCount
-      }
     }
     ${RecipientPortal.fragments.PublicPetitionAccess}
   `,
@@ -666,23 +685,31 @@ RecipientPortal.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
   const keycode = query.keycode as string;
   const state = parseQuery(query, QUERY_STATE);
   try {
-    await fetchQuery(RecipientPortal_accessDocument, {
-      variables: { keycode },
-    });
-    await fetchQuery(RecipientPortal_accessesDocument, {
-      variables: {
-        keycode,
-        offset: 0,
-        limit: PAGE_SIZE,
-        search: state.search,
-        status:
-          state.status === "ALL" || !state.status
-            ? null
-            : state.status === "PENDING"
-            ? ["PENDING"]
-            : ["COMPLETED", "CLOSED"],
-      },
-    });
+    await Promise.all([
+      fetchQuery(RecipientPortal_accessDocument, {
+        variables: { keycode },
+      }),
+      fetchQuery(RecipientPortal_statsDocument, {
+        variables: {
+          keycode,
+          search: state.search,
+        },
+      }),
+      fetchQuery(RecipientPortal_accessesDocument, {
+        variables: {
+          keycode,
+          offset: 0,
+          limit: PAGE_SIZE,
+          search: state.search,
+          status:
+            state.status === "ALL"
+              ? null
+              : state.status === "PENDING"
+              ? ["PENDING"]
+              : ["COMPLETED", "CLOSED"],
+        },
+      }),
+    ]);
     return {
       keycode,
     };
