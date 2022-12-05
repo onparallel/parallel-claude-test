@@ -34,7 +34,7 @@ export const accessesQuery = queryField((t) => {
     searchable: true,
     authorize: authenticatePublicAccess("keycode" as never),
     resolve: async (root, { offset, limit, status, search }, ctx) => {
-      return await ctx.contacts.loadAccessesForContact(ctx.access!.contact_id!, null, {
+      return await ctx.contacts.getPaginatedAccessesForContact(ctx.access!.contact_id!, {
         search,
         offset,
         limit,

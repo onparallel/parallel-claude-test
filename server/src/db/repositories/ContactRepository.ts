@@ -179,9 +179,29 @@ export class ContactRepository extends BaseRepository {
     );
   }
 
+  getPaginatedContactAccessesForUser(contactId: number, userId: number, opts: PageOpts) {
+    return this.getPagination<PetitionAccess>(
+      this.knex
+        .with("pas", (q) => {
+          q.from({ pa: "petition_access" })
+            .join({ pp: "petition_permission" }, "pp.petition_id", "pa.petition_id")
+            .join({ p: "petition" }, "p.id", "pa.petition_id")
+            .where("pa.contact_id", contactId)
+            .where("pp.user_id", userId)
+            .whereNull("pp.deleted_at")
+            .whereNull("p.deleted_at")
+            .distinctOn("pa.id")
+            .select("pa.*");
+        })
+        .from("pas")
+        .orderBy("pas.created_at", "desc")
+        .select("pas.*"),
+      opts
+    );
+  }
+
   getPaginatedAccessesForContact(
     contactId: number,
-    userId: number,
     opts: PageOpts & {
       search?: string | null;
       status?: PetitionStatus[] | null;
@@ -191,9 +211,14 @@ export class ContactRepository extends BaseRepository {
       this.knex
         .with("pas", (q) => {
           q.from({ pa: "petition_access" })
-            .join({ pp: "petition_permission" }, "pp.petition_id", "pa.petition_id")
             .join({ p: "petition" }, "p.id", "pa.petition_id")
-            .join({ pm: "petition_message" }, "pm.petition_id", "pa.petition_id")
+            .join({ pm: "petition_message" }, function () {
+              this.on("pm.petition_id", "=", "pa.petition_id").andOn(
+                "pm.petition_access_id",
+                "=",
+                "pa.id"
+              );
+            })
             .mmodify((q) => {
               if (isDefined(opts.status) && opts.status.length > 0) {
                 q.whereIn("p.status", opts.status);
@@ -203,12 +228,6 @@ export class ContactRepository extends BaseRepository {
               }
             })
             .where("pa.contact_id", contactId)
-            .mmodify((q) => {
-              if (userId) {
-                q.where("pp.user_id", userId);
-              }
-            })
-            .whereNull("pp.deleted_at")
             .whereNull("p.deleted_at")
             .distinctOn("pa.id")
             .select("pa.*");
