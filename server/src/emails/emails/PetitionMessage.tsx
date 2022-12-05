@@ -76,10 +76,10 @@ const email: Email<PetitionMessageProps> = {
 
 
       ${intl.formatMessage({
-        id: "layout.stop-receiving-emails",
-        defaultMessage: "Stop receiving emails",
+        id: "layout.stop-reminders",
+        defaultMessage: "Stop receiving reminders",
       })}:
-      ${parallelUrl}/${intl.locale}/petition/${keycode}/opt-out?ref=petition-access
+      ${parallelUrl}/${intl.locale}/petition/${keycode}/reminders?ref=petition-access
     `;
   },
   html({
@@ -106,10 +106,10 @@ const email: Email<PetitionMessageProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
-        optOutUrl={`${parallelUrl}/${intl.locale}/petition/${keycode}/opt-out?ref=petition-access`}
+        optOutUrl={`${parallelUrl}/${intl.locale}/petition/${keycode}/reminders?ref=petition-access`}
         optOutText={intl.formatMessage({
-          id: "layout.stop-receiving-emails",
-          defaultMessage: "Stop receiving emails",
+          id: "layout.stop-reminders",
+          defaultMessage: "Stop receiving reminders",
         })}
         utmCampaign="recipients"
         removeParallelBranding={removeParallelBranding}

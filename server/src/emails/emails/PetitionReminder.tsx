@@ -27,6 +27,7 @@ export type PetitionReminderProps = {
   keycode: string;
   removeWhyWeUseParallel: boolean;
   removeParallelBranding: boolean;
+  showOptOutLink: boolean;
 } & LayoutProps;
 
 const email: Email<PetitionReminderProps> = {
@@ -69,6 +70,7 @@ const email: Email<PetitionReminderProps> = {
       deadline,
       keycode,
       parallelUrl,
+      showOptOutLink,
       theme,
     }: PetitionReminderProps,
     intl: IntlShape
@@ -131,11 +133,16 @@ const email: Email<PetitionReminderProps> = {
 
       ${disclaimer({ email: senderEmail }, intl)}
 
-      ${intl.formatMessage({
-        id: "layout.stop-reminders",
-        defaultMessage: "Stop receiving reminders",
-      })}:
-      ${parallelUrl}/${intl.locale}/petition/${keycode}/opt-out?ref=reminder
+      ${
+        showOptOutLink
+          ? `${intl.formatMessage({
+              id: "layout.stop-reminders",
+              defaultMessage: "Stop receiving reminders",
+            })}:
+${parallelUrl}/${intl.locale}/petition/${keycode}/reminders?ref=reminder
+      `
+          : ""
+      }
     `;
   },
   html({
@@ -154,6 +161,7 @@ const email: Email<PetitionReminderProps> = {
     logoAlt,
     removeWhyWeUseParallel,
     removeParallelBranding,
+    showOptOutLink,
     theme,
   }: PetitionReminderProps) {
     const intl = useIntl();
@@ -165,7 +173,11 @@ const email: Email<PetitionReminderProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
-        optOutUrl={`${parallelUrl}/${intl.locale}/petition/${keycode}/opt-out?ref=reminder`}
+        optOutUrl={
+          showOptOutLink
+            ? `${parallelUrl}/${intl.locale}/petition/${keycode}/reminders?ref=reminder`
+            : undefined
+        }
         optOutText={intl.formatMessage({
           id: "layout.stop-reminders",
           defaultMessage: "Stop receiving reminders",

@@ -53,6 +53,7 @@ export async function petitionReminder(
     if (!contact) {
       throw new Error(`Contact not found for petition_access.contact_id ${access.contact_id}`);
     }
+    const remindersSent = await context.petitions.loadReminderCountForAccess(access.id);
     const fieldIds = fields.map((f) => f.id);
     const fieldReplies = await context.petitions.loadRepliesForField(fieldIds);
     const repliesByFieldId = Object.fromEntries(
@@ -94,6 +95,7 @@ export async function petitionReminder(
         deadline: petition.deadline,
         keycode: access.keycode,
         removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
+        showOptOutLink: remindersSent > 1,
         ...layoutProps,
       },
       { locale: petition.locale }

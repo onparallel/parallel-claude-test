@@ -73,6 +73,11 @@ const config = {
         destination: "/app/admin/organizations/:organizationId/users",
         permanent: false,
       },
+      {
+        source: "/petition/:keycode/opt-out",
+        destination: "/petition/:keycode/reminders",
+        permanent: true,
+      },
     ];
   },
   sentry: {
