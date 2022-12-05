@@ -9136,8 +9136,8 @@
   },
   {
     "term": "public.opt-out.done-body",
-    "definition": "We have informed the sender and you will not receive any more emails related to this process.",
-    "context": "We have informed the sender and you will not receive any more emails related to this process."
+    "definition": "We have informed the sender and you will not receive any more reminders related with this process.",
+    "context": "We have informed the sender and you will not receive any more reminders related with this process."
   },
   {
     "term": "public.opt-out.done-title",
@@ -9146,13 +9146,13 @@
   },
   {
     "term": "public.opt-out.feedback-title",
-    "definition": "Please let us know why you would like to stop receiving emails related to this process.",
-    "context": "Please let us know why you would like to stop receiving emails related to this process."
+    "definition": "Please let us know why you would like to stop receiving reminders related with this process.",
+    "context": "Please let us know why you would like to stop receiving reminders related with this process."
   },
   {
     "term": "public.opt-out.opt-out-button",
-    "definition": "Confirm and opt out",
-    "context": "Confirm and opt out"
+    "definition": "Confirm",
+    "context": "Confirm"
   },
   {
     "term": "public.opt-out.other-error-message",
@@ -9166,8 +9166,8 @@
   },
   {
     "term": "public.opt-out.review-before-opt-out",
-    "definition": "Before opting out from receiving emails, check the requested information.",
-    "context": "Before opting out from receiving emails, check the requested information."
+    "definition": "Before opting out from receiving reminders, check the requested information.",
+    "context": "Before opting out from receiving reminders, check the requested information."
   },
   {
     "term": "public.opt-out.review-button",

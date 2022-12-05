@@ -119,7 +119,7 @@ function OptOut(props: OptOutProps) {
               <Text>
                 <FormattedMessage
                   id="public.opt-out.done-body"
-                  defaultMessage="We have informed the sender and you will not receive any more emails related to this process."
+                  defaultMessage="We have informed the sender and you will not receive any more reminders related with this process."
                 />
               </Text>
             </Stack>
@@ -129,7 +129,7 @@ function OptOut(props: OptOutProps) {
                 <Heading>
                   <FormattedMessage
                     id="public.opt-out.feedback-title"
-                    defaultMessage="Please let us know why you would like to stop receiving emails related to this process."
+                    defaultMessage="Please let us know why you would like to stop receiving reminders related with this process."
                   />
                   {" *"}
                 </Heading>
@@ -172,10 +172,7 @@ function OptOut(props: OptOutProps) {
                   variant="solid"
                   type="submit"
                 >
-                  <FormattedMessage
-                    id="public.opt-out.opt-out-button"
-                    defaultMessage="Confirm and opt out"
-                  />
+                  <FormattedMessage id="public.opt-out.opt-out-button" defaultMessage="Confirm" />
                 </Button>
               </Stack>
             </form>
@@ -191,7 +188,7 @@ function OptOut(props: OptOutProps) {
             <Text as="div">
               <FormattedMessage
                 id="public.opt-out.review-before-opt-out"
-                defaultMessage="Before opting out from receiving emails, check the requested information."
+                defaultMessage="Before opting out from receiving reminders, check the requested information."
               />
             </Text>
             <NakedLink href={`/petition/${keycode}`}>
