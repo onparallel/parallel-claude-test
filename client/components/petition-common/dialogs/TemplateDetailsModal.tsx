@@ -44,6 +44,7 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
+import { MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
 import { usePetitionSharingDialog } from "./PetitionSharingDialog";
@@ -91,19 +92,19 @@ export function TemplateDetailsModal({
     goToPetition(petitionId, "preview", { query: { new: "", fromTemplate: "" } });
   };
 
-  const handleCloneTemplate = async () => {
+  const handleCloneTemplate = async (event: MouseEvent) => {
     const [petitionId] = await clonePetitions({
       petitionIds: [template.id],
     });
-    goToPetition(petitionId, "compose", { query: { new: "" } });
+    goToPetition(petitionId, "compose", { query: { new: "" }, event });
   };
 
-  const handleEditTemplate = async () => {
-    goToPetition(template.id, "compose");
+  const handleEditTemplate = async (event: MouseEvent) => {
+    goToPetition(template.id, "compose", { event });
   };
 
-  const handlePreviewTemplate = async () => {
-    goToPetition(template.id, "preview");
+  const handlePreviewTemplate = async (event: MouseEvent) => {
+    goToPetition(template.id, "preview", { event });
   };
 
   const showPetitionSharingDialog = usePetitionSharingDialog();
