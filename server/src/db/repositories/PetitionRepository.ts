@@ -806,11 +806,15 @@ export class PetitionRepository extends BaseRepository {
         .whereIn("petition_id", petitionIds)
         .whereNull("deleted_at")
         .whereNot("type", "HEADING"),
-      this.raw<PetitionFieldReply>(
+      this.raw<PetitionFieldReply & { upload_complete: boolean | null }>(
         /* sql */ `
-          select pfr.* from petition_field_reply as pfr
-          left join petition_field as pf on pf.id = pfr.petition_field_id and pfr.deleted_at is null
-          where pf.petition_id in ? and pf.deleted_at is null
+          select pfr.*, fu.upload_complete
+          from petition_field_reply as pfr
+          join petition_field as pf on pf.id = pfr.petition_field_id 
+          left join file_upload fu
+            on pfr.type in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'DOW_JONES_KYC')
+            and (pfr.content->>'file_upload_id')::int = fu.id
+          where pfr.deleted_at is null and pf.petition_id in ? and pf.deleted_at is null
         `,
         [this.sqlIn(petitionIds)],
         t
@@ -819,37 +823,21 @@ export class PetitionRepository extends BaseRepository {
 
     const fieldsByPetition = groupBy(fields, (f) => f.petition_id);
 
-    const fileUploadIds = uniq(
-      fieldReplies
-        .filter((r) => isFileTypeField(r.type) && r.content?.file_upload_id)
-        .map((r) => r.content.file_upload_id as number)
-    );
-
-    const uploadedFiles = await this.from("file_upload", t)
-      .whereIn("id", fileUploadIds)
-      .whereNull("deleted_at")
-      .select("*");
-
     return petitionIds.map((id) => {
       const fieldsWithReplies = (fieldsByPetition[id] ?? [])
         .map((field) => ({
           ...field,
           replies: fieldReplies
-            .filter((r) => r.petition_field_id === field.id)
+            .filter((r) => r.petition_field_id === field.id && r.content !== null)
+            .filter((r) => (isFileTypeField(field.type) ? r.upload_complete : true))
             .map((reply) => {
-              // for FILE_UPLOADs, we need to make sure the file was correctly uploaded before counting it as a submitted reply
-              const file =
-                isFileTypeField(reply.type) && isDefined(reply.content?.file_upload_id)
-                  ? uploadedFiles.find((f) => f.id === reply.content!.file_upload_id)
-                  : undefined;
-
               return {
-                content: reply.content
+                content: isFileTypeField(field.type)
                   ? {
                       ...reply.content,
-                      uploadComplete: file?.upload_complete,
+                      uploadComplete: true,
                     }
-                  : null,
+                  : reply.content,
                 status: reply.status,
                 anonymized_at: reply.anonymized_at,
               };
@@ -926,15 +914,15 @@ export class PetitionRepository extends BaseRepository {
         .whereIn("petition_id", petitionIds)
         .whereNull("deleted_at")
         .whereNot("type", "HEADING"),
-      this.raw<PetitionFieldReply>(
+      this.raw<PetitionFieldReply & { upload_complete: boolean | null }>(
         /* sql */ `
-          select pfr.* from petition_field_reply as pfr
-          left join petition_field as pf on pf.id = pfr.petition_field_id and pfr.deleted_at is null
+          select pfr.*, fu.upload_complete
+          from petition_field_reply as pfr
+          join petition_field as pf on pf.id = pfr.petition_field_id 
           left join file_upload fu
             on pfr.type in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'DOW_JONES_KYC')
             and (pfr.content->>'file_upload_id')::int = fu.id
-            and fu.upload_complete
-          where pf.petition_id in ? and pf.deleted_at is null
+          where pfr.deleted_at is null and pf.petition_id in ? and pf.deleted_at is null
         `,
         [this.sqlIn(petitionIds)],
         t
@@ -948,21 +936,20 @@ export class PetitionRepository extends BaseRepository {
         .map((field) => ({
           ...field,
           replies: fieldReplies
-            .filter((r) => r.petition_field_id === field.id)
+            .filter((r) => r.petition_field_id === field.id && r.content !== null)
+            .filter((r) => (isFileTypeField(field.type) ? r.upload_complete : true))
             .map((reply) => {
               return {
                 content: isFileTypeField(field.type)
                   ? {
                       ...reply.content,
-                      // the query is handling this
                       uploadComplete: true,
                     }
                   : reply.content,
                 status: reply.status,
                 anonymized_at: reply.anonymized_at,
               };
-            })
-            .filter((r) => r.content !== null),
+            }),
         }))
         .sort((a, b) => a.position! - b.position!);
 

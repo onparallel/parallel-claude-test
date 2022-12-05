@@ -1613,5 +1613,54 @@ describe("repositories/PetitionRepository", () => {
         },
       });
     });
+
+    it("ignores incomplete uploads", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const fields = await mocks.createRandomPetitionFields(petition.id, 4, (i) => ({
+        type: "FILE_UPLOAD",
+        is_internal: i === 0,
+        optional: i === 3,
+      }));
+
+      await mocks.createRandomFileUploadReply(
+        fields[0].id,
+        undefined,
+        1,
+        () => ({ user_id: user.id }),
+        () => ({ upload_complete: false })
+      );
+
+      await mocks.createRandomFileUploadReply(
+        fields[1].id,
+        undefined,
+        1,
+        () => ({ user_id: user.id }),
+        () => ({ upload_complete: false })
+      );
+
+      await mocks.createRandomFileUploadReply(
+        fields[2].id,
+        undefined,
+        1,
+        () => ({ user_id: user.id }),
+        () => ({ upload_complete: true })
+      );
+
+      const progress = await petitions.loadPetitionProgress(petition.id);
+      expect(progress).toMatchObject({
+        external: {
+          approved: 0,
+          replied: 1,
+          optional: 1,
+          total: 3,
+        },
+        internal: {
+          approved: 0,
+          replied: 0,
+          optional: 0,
+          total: 1,
+        },
+      });
+    });
   });
 });

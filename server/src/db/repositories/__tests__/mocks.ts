@@ -444,6 +444,29 @@ export class Mocks {
       .returning("*");
   }
 
+  async createRandomFileUploadReply(
+    fieldId: number,
+    access_id?: number,
+    amount?: number,
+    builder?: (index: number) => Partial<PetitionFieldReply>,
+    fileUploadBuilder?: (index: number) => Partial<FileUpload>
+  ) {
+    const fileUploads = await this.createRandomFileUpload(amount, fileUploadBuilder);
+    return await this.knex<PetitionFieldReply>("petition_field_reply")
+      .insert(
+        range(0, amount || 1).map<CreatePetitionFieldReply>((index) => {
+          return {
+            petition_field_id: fieldId,
+            content: { file_upload_id: fileUploads[index].id },
+            type: "FILE_UPLOAD",
+            petition_access_id: access_id,
+            ...builder?.(index),
+          };
+        })
+      )
+      .returning("*");
+  }
+
   async createRandomFileUpload(amount?: number, builder?: (index: number) => Partial<FileUpload>) {
     return await this.knex<FileUpload>("file_upload")
       .insert(
