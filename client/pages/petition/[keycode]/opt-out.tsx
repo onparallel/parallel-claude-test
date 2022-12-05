@@ -19,10 +19,12 @@ import { CheckIcon } from "@parallel/chakra/icons";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { RecipientViewPageNotAvailableError } from "@parallel/components/recipient-view/RecipientViewPageNotAvailableError";
 import {
   OptOut_accessDocument,
   OptOut_publicOptOutRemindersDocument,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useReminderOptOutReasons } from "@parallel/utils/useReminderOptOutReasons";
 import Head from "next/head";
@@ -33,7 +35,10 @@ import { isDefined } from "remeda";
 
 type OptOutProps = UnwrapPromise<ReturnType<typeof OptOut.getInitialProps>>;
 
-function OptOut({ keycode, access }: OptOutProps) {
+function OptOut({ keycode, access, errorCode }: OptOutProps) {
+  if (errorCode === "PUBLIC_PETITION_NOT_AVAILABLE") {
+    return <RecipientViewPageNotAvailableError />;
+  }
   const intl = useIntl();
 
   const {
@@ -52,7 +57,7 @@ function OptOut({ keycode, access }: OptOutProps) {
 
   const handleOptOut = async (event: FormEvent) => {
     event.preventDefault();
-    await optOut({ variables: { keycode, reason, other, referer: ref as string } });
+    await optOut({ variables: { keycode: keycode!, reason, other, referer: ref as string } });
     setOptedOut(true);
   };
 
@@ -253,11 +258,18 @@ OptOut.queries = [
 
 OptOut.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const keycode = query.keycode as string;
-  const { data } = await fetchQuery(OptOut_accessDocument, { variables: { keycode } });
-  if (!isDefined(data?.access)) {
-    throw new Error();
+  try {
+    const { data } = await fetchQuery(OptOut_accessDocument, { variables: { keycode } });
+    if (!isDefined(data?.access)) {
+      throw new Error();
+    }
+    return { keycode, access: data.access };
+  } catch (error) {
+    if (isApolloError(error, "PUBLIC_PETITION_NOT_AVAILABLE")) {
+      return { errorCode: "PUBLIC_PETITION_NOT_AVAILABLE" };
+    }
+    throw error;
   }
-  return { keycode, access: data.access };
 };
 
 export default withApolloData(OptOut);

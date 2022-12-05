@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
-import { Container, Flex, Text } from "@chakra-ui/react";
+import { Container, Flex } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData } from "@parallel/components/common/withApolloData";
-import { ErrorPage } from "@parallel/components/public/ErrorPage";
 import { RecipientViewContactlessForm } from "@parallel/components/recipient-view/RecipientViewContactlessForm";
 import { RecipientViewNewDevice } from "@parallel/components/recipient-view/RecipientViewNewDevice";
+import { RecipientViewPageNotAvailableError } from "@parallel/components/recipient-view/RecipientViewPageNotAvailableError";
 import {
   RecipientViewVerify_PublicAccessVerificationFragment,
   RecipientViewVerify_verifyPublicAccessDocument,
@@ -17,7 +17,6 @@ import { compose } from "@parallel/utils/compose";
 import { serialize as serializeCookie } from "cookie";
 import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
-import { FormattedMessage } from "react-intl";
 import { getClientIp } from "request-ip";
 
 type RecipientViewVerifyProps =
@@ -26,24 +25,7 @@ type RecipientViewVerifyProps =
 
 function RecipientViewVerify(props: RecipientViewVerifyProps) {
   if ("errorCode" in props) {
-    return (
-      <ErrorPage
-        header={
-          <FormattedMessage
-            id="recipient-view.petition-not-available-error.header"
-            defaultMessage="It seems that this page is no longer available."
-          />
-        }
-        imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_road_sign.svg`}
-      >
-        <Text>
-          <FormattedMessage
-            id="recipient-view.petition-not-available-error.text"
-            defaultMessage="If you need to access it, please reach out to the person that sent it to you."
-          />
-        </Text>
-      </ErrorPage>
-    );
+    return <RecipientViewPageNotAvailableError />;
   }
   const { email, ownerName, isContactlessAccess, organization } = props;
   return (
