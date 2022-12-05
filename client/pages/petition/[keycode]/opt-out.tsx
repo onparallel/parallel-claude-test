@@ -18,25 +18,29 @@ import {
 import { CheckIcon } from "@parallel/chakra/icons";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withApolloData } from "@parallel/components/common/withApolloData";
 import { RecipientViewPageNotAvailableError } from "@parallel/components/recipient-view/RecipientViewPageNotAvailableError";
 import {
   OptOut_accessDocument,
   OptOut_publicOptOutRemindersDocument,
+  OptOut_PublicPetitionAccessFragment,
 } from "@parallel/graphql/__types";
+import { createApolloClient } from "@parallel/utils/apollo/client";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { UnwrapPromise } from "@parallel/utils/types";
 import { useReminderOptOutReasons } from "@parallel/utils/useReminderOptOutReasons";
+import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
-type OptOutProps = UnwrapPromise<ReturnType<typeof OptOut.getInitialProps>>;
+type OptOutProps =
+  | { keycode: string; access: OptOut_PublicPetitionAccessFragment }
+  | { errorCode: "PUBLIC_PETITION_NOT_AVAILABLE" };
 
-function OptOut({ keycode, access, errorCode }: OptOutProps) {
-  if (errorCode === "PUBLIC_PETITION_NOT_AVAILABLE") {
+function OptOut(props: OptOutProps) {
+  if ("errorCode" in props) {
     return <RecipientViewPageNotAvailableError />;
   }
   const intl = useIntl();
@@ -45,7 +49,8 @@ function OptOut({ keycode, access, errorCode }: OptOutProps) {
     query: { ref },
   } = useRouter();
 
-  const granter = access!.granter!;
+  const { keycode, access } = props;
+  const granter = access.granter!;
 
   const [optedOut, setOptedOut] = useState(false);
   const [reason, setReason] = useState("");
@@ -57,7 +62,7 @@ function OptOut({ keycode, access, errorCode }: OptOutProps) {
 
   const handleOptOut = async (event: FormEvent) => {
     event.preventDefault();
-    await optOut({ variables: { keycode: keycode!, reason, other, referer: ref as string } });
+    await optOut({ variables: { keycode, reason, other, referer: ref as string } });
     setOptedOut(true);
   };
 
@@ -256,20 +261,26 @@ OptOut.queries = [
   `,
 ];
 
-OptOut.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  const keycode = query.keycode as string;
+export async function getServerSideProps({
+  params,
+  req,
+}: GetServerSidePropsContext<{ keycode: string }>) {
   try {
-    const { data } = await fetchQuery(OptOut_accessDocument, { variables: { keycode } });
+    const client = createApolloClient({}, { req });
+    const { data } = await client.query({
+      query: OptOut_accessDocument,
+      variables: { keycode: params!.keycode },
+    });
     if (!isDefined(data?.access)) {
       throw new Error();
     }
-    return { keycode, access: data.access };
+    return { props: { keycode: params!.keycode, access: data.access } };
   } catch (error) {
     if (isApolloError(error, "PUBLIC_PETITION_NOT_AVAILABLE")) {
-      return { errorCode: "PUBLIC_PETITION_NOT_AVAILABLE" };
+      return { props: { errorCode: "PUBLIC_PETITION_NOT_AVAILABLE" } };
     }
     throw error;
   }
-};
+}
 
 export default withApolloData(OptOut);
