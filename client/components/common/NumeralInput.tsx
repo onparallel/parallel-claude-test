@@ -19,12 +19,17 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
   ref
 ) {
   function format(value: number | undefined) {
-    return isDefined(value)
-      ? intl.formatNumber(value, {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: decimals ?? 5,
-        })
-      : "";
+    if (!isDefined(value)) return "";
+
+    const formatted = intl.formatNumber(value, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: decimals ?? 5,
+    });
+    return isDefined(prefix)
+      ? prefix + formatted
+      : isDefined(suffix)
+      ? formatted + suffix
+      : formatted;
   }
 
   const intl = useIntl();
