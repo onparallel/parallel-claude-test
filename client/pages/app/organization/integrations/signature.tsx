@@ -348,7 +348,7 @@ function useSignatureTokensTableColumns() {
             ) : row.provider === "DOCUSIGN" ? (
               <Image
                 src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/docusign.png`}
-                alt="Docusign"
+                alt="DocuSign"
                 maxWidth="80px"
               />
             ) : null,

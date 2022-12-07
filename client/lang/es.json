@@ -151,8 +151,8 @@
   },
   {
     "term": "component.add-signature-credentials-dialog.docusign-explainer",
-    "definition": "Cuando hagas click en Autorizar se abrirá una ventana en la que Docusign te pedirá permiso para enviar firmas en tu nombre.",
-    "context": "When you click on Authorize a window will open in which Docusign will ask you for permission to send signatures on your behalf."
+    "definition": "Cuando hagas click en Autorizar se abrirá una ventana en la que DocuSign te pedirá permiso para enviar firmas en tu nombre.",
+    "context": "When you click on Authorize a window will open in which DocuSign will ask you for permission to send signatures on your behalf."
   },
   {
     "term": "component.add-signature-credentials-dialog.name-help",
@@ -1736,7 +1736,7 @@
   },
   {
     "term": "component.feature-flag-descriptions.docusign-sandbox-provider-name",
-    "definition": "Docusign Sandbox",
+    "definition": "DocuSign Sandbox",
     "context": "DocuSign Sandbox Provider"
   },
   {

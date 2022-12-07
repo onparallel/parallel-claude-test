@@ -151,8 +151,8 @@
   },
   {
     "term": "component.add-signature-credentials-dialog.docusign-explainer",
-    "definition": "When you click on Authorize a window will open in which Docusign will ask you for permission to send signatures on your behalf.",
-    "context": "When you click on Authorize a window will open in which Docusign will ask you for permission to send signatures on your behalf."
+    "definition": "When you click on Authorize a window will open in which DocuSign will ask you for permission to send signatures on your behalf.",
+    "context": "When you click on Authorize a window will open in which DocuSign will ask you for permission to send signatures on your behalf."
   },
   {
     "term": "component.add-signature-credentials-dialog.name-help",

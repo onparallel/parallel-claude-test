@@ -112,7 +112,7 @@ function OrganizationIntegrations() {
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/docusign.png`}
-          alt="Docusign"
+          alt="DocuSign"
           maxWidth="124px"
         />
       ),

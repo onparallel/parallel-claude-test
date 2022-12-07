@@ -327,7 +327,7 @@ function DocusignCredentialsInput({ hasDocusignSandbox }: { hasDocusignSandbox: 
       <Text fontSize="sm">
         <FormattedMessage
           id="component.add-signature-credentials-dialog.docusign-explainer"
-          defaultMessage="When you click on Authorize a window will open in which Docusign will ask you for permission to send signatures on your behalf."
+          defaultMessage="When you click on Authorize a window will open in which DocuSign will ask you for permission to send signatures on your behalf."
         />
       </Text>
     </Stack>
