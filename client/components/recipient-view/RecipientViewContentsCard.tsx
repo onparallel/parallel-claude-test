@@ -131,7 +131,7 @@ export const RecipientViewContentsCard = Object.assign(
         <CardHeader headingLevel="h3" headingSize="sm">
           <FormattedMessage id="recipient-view.contents-header" defaultMessage="Contents" />
         </CardHeader>
-        <Stack as={List} spacing={1} paddingY={2} paddingX={1.5} minHeight="10rem" overflow="auto">
+        <Stack as={List} spacing={1} paddingY={2} paddingX={1.5} overflow="auto">
           {pages.map(
             (
               {

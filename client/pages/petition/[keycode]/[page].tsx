@@ -378,7 +378,8 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                     <RecipientViewContentsCard
                       currentPage={currentPage}
                       petition={petition}
-                      maxHeight="calc(100vh - 18rem)"
+                      minHeight="12rem"
+                      maxHeight="calc(100vh - 17rem)"
                     />
                   )}
                 </Stack>
