@@ -918,6 +918,12 @@ type Mutation {
   createPetitionAttachmentUploadLink(
     data: FileUploadInput!
     petitionId: GID!
+
+    """
+    Position of the attachment, beginning from 0 (start). Other attachments after this position will be moved up.
+    """
+    position: Int!
+    type: PetitionAttachmentType!
   ): PetitionAttachmentUploadData!
 
   """
@@ -1073,7 +1079,7 @@ type Mutation {
   """
   Remove a petition attachment
   """
-  deletePetitionAttachment(attachmentId: GID!, petitionId: GID!): Result!
+  deletePetitionAttachment(attachmentId: GID!, petitionId: GID!): PetitionBase!
 
   """
   Deletes a petition field.
@@ -1227,6 +1233,11 @@ type Mutation {
   petitionAttachmentDownloadLink(
     attachmentId: GID!
     petitionId: GID!
+
+    """
+    If true will use content-disposition inline instead of attachment
+    """
+    preview: Boolean
   ): FileUploadDownloadLinkResult!
 
   """
@@ -1481,6 +1492,15 @@ type Mutation {
   Reopens the petition
   """
   reopenPetition(petitionId: GID!): Petition!
+
+  """
+  Reorders the positions of attachments in the petition
+  """
+  reorderPetitionAttachments(
+    attachmentIds: [GID!]!
+    attachmentType: PetitionAttachmentType!
+    petitionId: GID!
+  ): PetitionBase!
 
   """
   Sends the AccountVerification email with confirmation code to unconfirmed user emails
@@ -2341,7 +2361,7 @@ type Petition implements PetitionBase {
   """
   The attachments linked to this petition
   """
-  attachments: [PetitionAttachment!]!
+  attachments: JSONObject!
 
   """
   Time when the petition was closed.
@@ -2648,13 +2668,18 @@ type PetitionAnonymizedEvent implements PetitionEvent {
   type: PetitionEventType!
 }
 
-type PetitionAttachment implements CreatedAt {
-  """
-  Time when the resource was created.
-  """
-  createdAt: DateTime!
+type PetitionAttachment {
   file: FileUpload!
   id: GID!
+  petition: PetitionBase!
+  position: Int!
+  type: PetitionAttachmentType!
+}
+
+enum PetitionAttachmentType {
+  ANNEX
+  BACK
+  FRONT
 }
 
 type PetitionAttachmentUploadData {
@@ -2676,7 +2701,7 @@ interface PetitionBase {
   """
   The attachments linked to this petition
   """
-  attachments: [PetitionAttachment!]!
+  attachments: JSONObject!
 
   """
   The closing email body of the petition.
@@ -3754,7 +3779,7 @@ type PetitionTemplate implements PetitionBase {
   """
   The attachments linked to this petition
   """
-  attachments: [PetitionAttachment!]!
+  attachments: JSONObject!
   backgroundColor: String
   categories: [String!]
 

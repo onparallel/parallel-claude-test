@@ -1,4 +1,5 @@
-import { objectType } from "nexus";
+import { enumType, objectType } from "nexus";
+import { PetitionAttachmentTypeValues } from "../../../db/__types";
 
 export const PetitionFieldAttachment = objectType({
   name: "PetitionFieldAttachment",
@@ -33,11 +34,20 @@ export const PetitionAttachment = objectType({
   name: "PetitionAttachment",
   definition(t) {
     t.globalId("id");
-    t.implements("CreatedAt");
+    t.field("type", {
+      type: enumType({ name: "PetitionAttachmentType", members: PetitionAttachmentTypeValues }),
+    });
+    t.int("position");
     t.field("file", {
       type: "FileUpload",
       resolve: async (o, _, ctx) => {
         return (await ctx.files.loadFileUpload(o.file_upload_id))!;
+      },
+    });
+    t.field("petition", {
+      type: "PetitionBase",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.petitions.loadPetition(o.petition_id))!;
       },
     });
   },

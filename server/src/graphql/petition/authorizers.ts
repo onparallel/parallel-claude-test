@@ -8,6 +8,7 @@ import {
   Petition,
   PetitionAccess,
   PetitionAccessStatus,
+  PetitionAttachmentType,
   PetitionFieldType,
   PetitionPermissionType,
   PetitionStatus,
@@ -241,6 +242,37 @@ export function replyIsForFieldOfType<
     }
 
     return true;
+  };
+}
+
+export function isValidPetitionAttachmentReorder<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, number>,
+  TArg2 extends Arg<TypeName, FieldName, PetitionAttachmentType>,
+  TArg3 extends Arg<TypeName, FieldName, number[]>
+>(
+  petitionIdArg: TArg1,
+  attachmentTypeArg: TArg2,
+  attachmentIdsArg: TArg3
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const petitionId = args[petitionIdArg] as unknown as number;
+      const type = args[attachmentTypeArg] as unknown as PetitionAttachmentType;
+      const attachmentIds = args[attachmentIdsArg] as unknown as number[];
+
+      const attachments = (
+        await ctx.petitions.loadPetitionAttachmentsByPetitionId(petitionId)
+      ).filter((a) => a.type === type);
+
+      // attachmentIds must contain every attachmentId of <type> in the petition
+      return (
+        attachments.length === attachmentIds.length &&
+        attachments.every((a) => attachmentIds.includes(a.id))
+      );
+    } catch {}
+    return false;
   };
 }
 

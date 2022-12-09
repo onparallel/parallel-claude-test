@@ -4643,7 +4643,7 @@ export class PetitionRepository extends BaseRepository {
     });
     return row;
   }
-
+  // TODO: reordenar las posiciones de los attachment restantes
   async deletePetitionAttachment(attachmentId: number, user: User) {
     return await this.withTransaction(async (t) => {
       const [row] = await this.from("petition_attachment", t)
@@ -4694,7 +4694,7 @@ export class PetitionRepository extends BaseRepository {
       t
     );
   }
-
+  // TODO
   private async deletePetitionAttachmentByPetitionId(
     petitionIds: number[],
     user: User,

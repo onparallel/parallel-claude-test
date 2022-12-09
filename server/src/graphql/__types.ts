@@ -286,6 +286,7 @@ export interface NexusGenEnums {
     | "lastName_ASC"
     | "lastName_DESC";
   PetitionAccessStatus: db.PetitionAccessStatus;
+  PetitionAttachmentType: db.PetitionAttachmentType;
   PetitionBaseType: "PETITION" | "TEMPLATE";
   PetitionEventType: db.PetitionEventType;
   PetitionFieldReplyStatus: db.PetitionFieldReplyStatus;
@@ -1271,7 +1272,7 @@ export interface NexusGenFieldTypes {
     deleteEventSubscriptions: NexusGenEnums["Result"]; // Result!
     deleteOrganizationPdfDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
     deletePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
-    deletePetitionAttachment: NexusGenEnums["Result"]; // Result!
+    deletePetitionAttachment: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     deletePetitionField: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     deletePetitionFieldAttachment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     deletePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -1324,6 +1325,7 @@ export interface NexusGenFieldTypes {
     removeUsersFromGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     renameFolder: NexusGenEnums["Success"]; // Success!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
+    reorderPetitionAttachments: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     resendVerificationCode: NexusGenEnums["Result"]; // Result!
     resetTemporaryPassword: NexusGenEnums["Result"]; // Result!
     resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -1486,7 +1488,7 @@ export interface NexusGenFieldTypes {
     accesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     anonymizeAfterMonths: number | null; // Int
     anonymizePurpose: string | null; // String
-    attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    attachments: NexusGenScalars["JSONObject"]; // JSONObject!
     closedAt: NexusGenScalars["DateTime"] | null; // DateTime
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
@@ -1564,9 +1566,11 @@ export interface NexusGenFieldTypes {
   };
   PetitionAttachment: {
     // field return type
-    createdAt: NexusGenScalars["DateTime"]; // DateTime!
     file: NexusGenRootTypes["FileUpload"]; // FileUpload!
     id: NexusGenScalars["GID"]; // GID!
+    petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
+    position: number; // Int!
+    type: NexusGenEnums["PetitionAttachmentType"]; // PetitionAttachmentType!
   };
   PetitionAttachmentUploadData: {
     // field return type
@@ -1852,7 +1856,7 @@ export interface NexusGenFieldTypes {
     // field return type
     anonymizeAfterMonths: number | null; // Int
     anonymizePurpose: string | null; // String
-    attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    attachments: NexusGenScalars["JSONObject"]; // JSONObject!
     backgroundColor: string | null; // String
     categories: string[] | null; // [String!]
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
@@ -2520,7 +2524,7 @@ export interface NexusGenFieldTypes {
     // field return type
     anonymizeAfterMonths: number | null; // Int
     anonymizePurpose: string | null; // String
-    attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    attachments: NexusGenScalars["JSONObject"]; // JSONObject!
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageSubject: string | null; // String
@@ -3002,7 +3006,7 @@ export interface NexusGenFieldTypeNames {
     deleteEventSubscriptions: "Result";
     deleteOrganizationPdfDocumentTheme: "Organization";
     deletePetition: "SupportMethodResponse";
-    deletePetitionAttachment: "Result";
+    deletePetitionAttachment: "PetitionBase";
     deletePetitionField: "PetitionBase";
     deletePetitionFieldAttachment: "PetitionField";
     deletePetitionFieldComment: "PetitionField";
@@ -3055,6 +3059,7 @@ export interface NexusGenFieldTypeNames {
     removeUsersFromGroup: "UserGroup";
     renameFolder: "Success";
     reopenPetition: "Petition";
+    reorderPetitionAttachments: "PetitionBase";
     resendVerificationCode: "Result";
     resetTemporaryPassword: "Result";
     resetUserPassword: "SupportMethodResponse";
@@ -3217,7 +3222,7 @@ export interface NexusGenFieldTypeNames {
     accesses: "PetitionAccess";
     anonymizeAfterMonths: "Int";
     anonymizePurpose: "String";
-    attachments: "PetitionAttachment";
+    attachments: "JSONObject";
     closedAt: "DateTime";
     closingEmailBody: "JSON";
     completingMessageBody: "JSON";
@@ -3295,9 +3300,11 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionAttachment: {
     // field return type name
-    createdAt: "DateTime";
     file: "FileUpload";
     id: "GID";
+    petition: "PetitionBase";
+    position: "Int";
+    type: "PetitionAttachmentType";
   };
   PetitionAttachmentUploadData: {
     // field return type name
@@ -3583,7 +3590,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     anonymizeAfterMonths: "Int";
     anonymizePurpose: "String";
-    attachments: "PetitionAttachment";
+    attachments: "JSONObject";
     backgroundColor: "String";
     categories: "String";
     closingEmailBody: "JSON";
@@ -4251,7 +4258,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     anonymizeAfterMonths: "Int";
     anonymizePurpose: "String";
-    attachments: "PetitionAttachment";
+    attachments: "JSONObject";
     closingEmailBody: "JSON";
     completingMessageBody: "JSON";
     completingMessageSubject: "String";
@@ -4527,6 +4534,8 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["FileUploadInput"]; // FileUploadInput!
       petitionId: NexusGenScalars["GID"]; // GID!
+      position: number; // Int!
+      type: NexusGenEnums["PetitionAttachmentType"]; // PetitionAttachmentType!
     };
     createPetitionField: {
       // args
@@ -4749,6 +4758,7 @@ export interface NexusGenArgTypes {
       // args
       attachmentId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
+      preview?: boolean | null; // Boolean
     };
     petitionAttachmentUploadComplete: {
       // args
@@ -4933,6 +4943,12 @@ export interface NexusGenArgTypes {
     };
     reopenPetition: {
       // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    reorderPetitionAttachments: {
+      // args
+      attachmentIds: NexusGenScalars["GID"][]; // [GID!]!
+      attachmentType: NexusGenEnums["PetitionAttachmentType"]; // PetitionAttachmentType!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     resendVerificationCode: {
@@ -5576,7 +5592,6 @@ export interface NexusGenAbstractTypeMembers {
   UserOrPetitionAccess: "PetitionAccess" | "User";
   UserOrUserGroup: "User" | "UserGroup";
   CreatedAt:
-    | "PetitionAttachment"
     | "PetitionFieldAttachment"
     | "PetitionMessage"
     | "PetitionReminder"
@@ -5685,7 +5700,6 @@ export interface NexusGenTypeInterfaces {
   Petition: "PetitionBase";
   PetitionAccess: "Timestamps";
   PetitionAnonymizedEvent: "PetitionEvent";
-  PetitionAttachment: "CreatedAt";
   PetitionClonedEvent: "PetitionEvent";
   PetitionClosedEvent: "PetitionEvent";
   PetitionClosedNotifiedEvent: "PetitionEvent";

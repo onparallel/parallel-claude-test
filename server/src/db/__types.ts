@@ -88,6 +88,10 @@ export type PetitionAccessStatus = "ACTIVE" | "INACTIVE";
 
 export const PetitionAccessStatusValues = ["ACTIVE", "INACTIVE"] as PetitionAccessStatus[];
 
+export type PetitionAttachmentType = "FRONT" | "ANNEX" | "BACK";
+
+export const PetitionAttachmentTypeValues = ["FRONT", "ANNEX", "BACK"] as PetitionAttachmentType[];
+
 export type PetitionContactNotificationType = "COMMENT_CREATED";
 
 export const PetitionContactNotificationTypeValues = [
@@ -909,15 +913,19 @@ export interface PetitionAttachment {
   id: number; // int4
   petition_id: number; // int4
   file_upload_id: number; // int4
+  type: PetitionAttachmentType; // petition_attachment_type
+  position: number; // int4
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
 }
 
 export type CreatePetitionAttachment = PartialProps<
   Omit<PetitionAttachment, "id">,
-  "created_at" | "created_by" | "deleted_at" | "deleted_by"
+  "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
 >;
 
 export interface PetitionContactNotification {

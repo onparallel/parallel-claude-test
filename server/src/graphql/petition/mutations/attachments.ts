@@ -1,5 +1,5 @@
 import { ApolloError } from "apollo-server-core";
-import { mutationField, nonNull } from "nexus";
+import { booleanArg, intArg, list, mutationField, nonNull } from "nexus";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -8,11 +8,13 @@ import { fileUploadInputMaxSize } from "../../helpers/validators/maxFileSize";
 import {
   fieldAttachmentBelongsToField,
   fieldsBelongsToPetition,
+  isValidPetitionAttachmentReorder,
   petitionAttachmentBelongsToPetition,
   petitionsAreNotPublicTemplates,
   userHasAccessToPetitions,
 } from "../authorizers";
 
+const _10MB = 10 * 1024 * 1024;
 const _50MB = 50 * 1024 * 1024;
 const _100MB = 100 * 1024 * 1024;
 
@@ -172,16 +174,16 @@ export const createPetitionAttachmentUploadLink = mutationField(
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
       data: nonNull("FileUploadInput"),
+      type: nonNull("PetitionAttachmentType"),
+      position: nonNull(
+        intArg({
+          description:
+            "Position of the attachment, beginning from 0 (start). Other attachments after this position will be moved up.",
+        })
+      ),
     },
-    validateArgs: fileUploadInputMaxSize((args) => args.data, _50MB, "data"),
+    validateArgs: fileUploadInputMaxSize((args) => args.data, _10MB, "data"),
     resolve: async (_, args, ctx) => {
-      const attachments = await ctx.petitions.loadPetitionAttachmentsByPetitionId(args.petitionId);
-      if (attachments.length + 1 > 10) {
-        throw new ApolloError(
-          "Maximum number of attachments per petition reached",
-          "MAX_ATTACHMENTS"
-        );
-      }
       const key = random(16);
       const { filename, size, contentType } = args.data;
       const file = await ctx.files.createFileUpload(
@@ -200,6 +202,8 @@ export const createPetitionAttachmentUploadLink = mutationField(
           {
             file_upload_id: file.id,
             petition_id: args.petitionId,
+            position: args.position,
+            type: args.type,
           },
           ctx.user!
         ),
@@ -235,7 +239,7 @@ export const petitionAttachmentUploadComplete = mutationField("petitionAttachmen
 
 export const deletePetitionAttachment = mutationField("deletePetitionAttachment", {
   description: "Remove a petition attachment",
-  type: "Result",
+  type: "PetitionBase",
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     attachmentId: nonNull(globalIdArg("PetitionAttachment")),
@@ -247,7 +251,7 @@ export const deletePetitionAttachment = mutationField("deletePetitionAttachment"
   ),
   resolve: async (_, args, ctx) => {
     await ctx.petitions.deletePetitionAttachment(args.attachmentId, ctx.user!);
-    return RESULT.SUCCESS;
+    return (await ctx.petitions.loadPetition(args.petitionId))!;
   },
 });
 
@@ -261,6 +265,9 @@ export const petitionAttachmentDownloadLink = mutationField("petitionAttachmentD
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     attachmentId: nonNull(globalIdArg("PetitionAttachment")),
+    preview: booleanArg({
+      description: "If true will use content-disposition inline instead of attachment",
+    }),
   },
   resolve: async (_, args, ctx) => {
     try {
@@ -282,7 +289,7 @@ export const petitionAttachmentDownloadLink = mutationField("petitionAttachmentD
         url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
           file!.path,
           file!.filename,
-          "attachment"
+          args.preview ? "inline" : "attachment"
         ),
       };
     } catch {
@@ -290,5 +297,23 @@ export const petitionAttachmentDownloadLink = mutationField("petitionAttachmentD
         result: RESULT.FAILURE,
       };
     }
+  },
+});
+
+export const reorderPetitionAttachments = mutationField("reorderPetitionAttachments", {
+  description: "Reorders the positions of attachments in the petition",
+  type: "PetitionBase",
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionAttachmentBelongsToPetition("petitionId", "attachmentIds"),
+    isValidPetitionAttachmentReorder("petitionId", "attachmentType", "attachmentIds")
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    attachmentType: nonNull("PetitionAttachmentType"),
+    attachmentIds: nonNull(list(nonNull(globalIdArg("PetitionAttachment")))),
+  },
+  resolve: async (_, args, ctx) => {
+    return (await ctx.petitions.loadPetition(args.petitionId))!;
   },
 });

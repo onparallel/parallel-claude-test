@@ -1,6 +1,7 @@
 import { extension } from "mime-types";
 import { arg, enumType, inputObjectType, interfaceType, objectType, unionType } from "nexus";
 import { isDefined, minBy } from "remeda";
+import { PetitionAttachmentTypeValues } from "../../../db/__types";
 import { defaultBrandTheme } from "../../../util/BrandTheme";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
@@ -269,10 +270,17 @@ export const PetitionBase = interfaceType({
       description: "Custom user properties",
       resolve: (o) => o.custom_properties,
     });
-    t.nonNull.list.field("attachments", {
-      type: "PetitionAttachment",
+    t.nonNull.jsonObject("attachments", {
       description: "The attachments linked to this petition",
-      resolve: async (o, _, ctx) => await ctx.petitions.loadPetitionAttachmentsByPetitionId(o.id),
+      resolve: async (o, _, ctx) => {
+        const attachments = await ctx.petitions.loadPetitionAttachmentsByPetitionId(o.id);
+        return Object.fromEntries(
+          PetitionAttachmentTypeValues.map((type) => [
+            type,
+            attachments.filter((a) => a.type === type),
+          ])
+        );
+      },
     });
     t.jsonObject("metadata", {
       description: "Metadata for this petition.",
