@@ -64,6 +64,7 @@ export const DateTime = chakraForwardRef<"time", DateTimeProps>(function DateTim
       {...props}
       {...{ dateTime: date.toISOString() }}
       className={classNames(props.className, "notranslate")}
+      suppressHydrationWarning
     >
       {!_useRelativeTime ? (
         <FormattedDate value={date} {...format} />
