@@ -12002,7 +12002,7 @@ export type RecipientPortalHeader_PublicContactFragment = {
 export type RecipientPortalHeader_PublicUserFragment = {
   __typename?: "PublicUser";
   id: string;
-  organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
+  organization: { __typename?: "PublicOrganization"; name: string; logoUrl80?: string | null };
 };
 
 export type RecipientViewContactlessForm_PublicOrganizationFragment = {
@@ -23778,7 +23778,7 @@ export type RecipientPortal_PublicUserFragment = {
     id: string;
     name: string;
     hasRemoveParallelBranding: boolean;
-    logoUrl?: string | null;
+    logoUrl80?: string | null;
     brandTheme: {
       __typename?: "OrganizationBrandThemeData";
       color: string;
@@ -23814,7 +23814,7 @@ export type RecipientPortal_PublicPetitionAccessFragment = {
       id: string;
       name: string;
       hasRemoveParallelBranding: boolean;
-      logoUrl?: string | null;
+      logoUrl80?: string | null;
       brandTheme: {
         __typename?: "OrganizationBrandThemeData";
         color: string;
@@ -23870,7 +23870,7 @@ export type RecipientPortal_accessQuery = {
         id: string;
         name: string;
         hasRemoveParallelBranding: boolean;
-        logoUrl?: string | null;
+        logoUrl80?: string | null;
         brandTheme: {
           __typename?: "OrganizationBrandThemeData";
           color: string;
@@ -23945,7 +23945,7 @@ export type RecipientPortal_accessesQuery = {
           id: string;
           name: string;
           hasRemoveParallelBranding: boolean;
-          logoUrl?: string | null;
+          logoUrl80?: string | null;
           brandTheme: {
             __typename?: "OrganizationBrandThemeData";
             color: string;
@@ -30202,7 +30202,7 @@ export const RecipientPortalHeader_PublicUserFragmentDoc = gql`
     id
     organization {
       name
-      logoUrl(options: { resize: { height: 80 } })
+      logoUrl80: logoUrl(options: { resize: { height: 80 } })
     }
   }
 ` as unknown as DocumentNode<RecipientPortalHeader_PublicUserFragment, unknown>;

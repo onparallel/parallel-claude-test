@@ -59,9 +59,9 @@ export const RecipientPortalHeader = Object.assign(
           paddingX={2.5}
           justifyContent="space-between"
         >
-          {sender.organization.logoUrl ? (
+          {sender.organization.logoUrl80 ? (
             <Img
-              src={sender.organization.logoUrl}
+              src={sender.organization.logoUrl80}
               aria-label={sender.organization.name}
               width="auto"
               height="40px"
@@ -161,7 +161,7 @@ export const RecipientPortalHeader = Object.assign(
           id
           organization {
             name
-            logoUrl(options: { resize: { height: 80 } })
+            logoUrl80: logoUrl(options: { resize: { height: 80 } })
           }
         }
       `,
