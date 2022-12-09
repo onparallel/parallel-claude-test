@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   AlertDescription,
   AlertIcon,
@@ -72,13 +72,17 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
     data: { access },
   } = useAssertQuery(RecipientView_accessDocument, { variables: { keycode } });
 
-  const {
-    data: {
-      total: { totalCount: total },
-      pending: { totalCount: pending },
-    },
-    refetch: refetchAccessesCount,
-  } = useAssertQuery(RecipientView_accessesDocument, { variables: { keycode } });
+  const { data: accesessData, refetch: refetchAccessesCount } = useQuery(
+    RecipientView_accessesDocument,
+    {
+      variables: { keycode },
+      skip: !access.hasClientPortalAccess,
+    }
+  );
+
+  const pending = access.hasClientPortalAccess
+    ? accesessData!.pending.totalCount - (access.petition.status === "PENDING" ? 1 : 0)
+    : 0;
 
   const petition = access!.petition!;
   const granter = access!.granter!;
@@ -245,7 +249,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
               contact={contact}
               message={message}
               recipients={recipients}
-              hasMultiplePetitions={total > 1}
+              hasClientPortalAccess={access.hasClientPortalAccess}
               pendingPetitions={pending}
               keycode={keycode}
               isClosed={["COMPLETED", "CLOSED"].includes(petition.status)}
@@ -493,7 +497,8 @@ function ReviewBeforeSignDialog({
     />
   );
 }
-RecipientView.fragments = {
+
+const _fragments = {
   get PublicPetitionAccess() {
     return gql`
       fragment RecipientView_PublicPetitionAccess on PublicPetitionAccess {
@@ -622,7 +627,7 @@ RecipientView.fragments = {
   `,
 };
 
-RecipientView.mutations = [
+const _mutations = [
   gql`
     mutation RecipientView_publicCompletePetition(
       $keycode: ID!
@@ -638,29 +643,27 @@ RecipientView.mutations = [
         ...RecipientView_PublicPetition
       }
     }
-    ${RecipientView.fragments.PublicPetition}
+    ${_fragments.PublicPetition}
   `,
 ];
 
-RecipientView.queries = [
+const _queries = [
   gql`
     query RecipientView_access($keycode: ID!) {
       access(keycode: $keycode) {
+        hasClientPortalAccess
         ...RecipientView_PublicPetitionAccess
       }
       metadata(keycode: $keycode) {
         ...RecipientView_ConnectionMetadata
       }
     }
-    ${RecipientView.fragments.PublicPetitionAccess}
-    ${RecipientView.fragments.ConnectionMetadata}
+    ${_fragments.PublicPetitionAccess}
+    ${_fragments.ConnectionMetadata}
   `,
   gql`
     query RecipientView_accesses($keycode: ID!) {
-      total: accesses(keycode: $keycode) {
-        totalCount
-      }
-      pending: accesses(keycode: $keycode, status: [PENDING]) {
+      pending: accesses(keycode: $keycode, status: PENDING) {
         totalCount
       }
     }
@@ -677,9 +680,11 @@ RecipientView.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCont
     const { data } = await fetchQuery(RecipientView_accessDocument, {
       variables: { keycode },
     });
-    await fetchQuery(RecipientView_accessesDocument, {
-      variables: { keycode },
-    });
+    if (data.access.hasClientPortalAccess) {
+      await fetchQuery(RecipientView_accessesDocument, {
+        variables: { keycode },
+      });
+    }
     const pageCount =
       data!.access.petition.fields.filter(
         (f) => f.type === "HEADING" && f.options!.hasPageBreak && !f.isInternal

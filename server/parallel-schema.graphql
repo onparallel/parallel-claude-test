@@ -365,6 +365,7 @@ type EffectivePetitionUserPermission {
 
 enum FeatureFlag {
   AUTO_ANONYMIZE
+  CLIENT_PORTAL
   CUSTOM_HOST_UI
   DEVELOPER_ACCESS
   DOW_JONES_KYC
@@ -4185,6 +4186,7 @@ type PublicPetitionAccess {
   contact: PublicContact
   createdAt: DateTime!
   granter: PublicUser
+  hasClientPortalAccess: Boolean!
   keycode: ID!
   message: PublicPetitionMessage
   petition: PublicPetition!

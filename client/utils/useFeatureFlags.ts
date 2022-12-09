@@ -210,6 +210,17 @@ export function useFeatureFlags() {
           defaultMessage: "Enables the Dow Jones petition field on the organization.",
         }),
       },
+      {
+        name: "CLIENT_PORTAL",
+        title: intl.formatMessage({
+          id: "component.feature-flag-descriptions.client-portal-name",
+          defaultMessage: "Client portal",
+        }),
+        description: intl.formatMessage({
+          id: "component.feature-flag-descriptions.client-portal-description",
+          defaultMessage: "Allows recipients to access the client portal.",
+        }),
+      },
     ],
     [intl.locale]
   );

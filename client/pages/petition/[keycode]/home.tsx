@@ -597,6 +597,7 @@ const _queries = [
   gql`
     query RecipientPortal_access($keycode: ID!) {
       access(keycode: $keycode) {
+        hasClientPortalAccess
         ...RecipientPortal_PublicPetitionAccess
       }
     }
@@ -645,7 +646,13 @@ RecipientPortal.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
   const keycode = query.keycode as string;
   const state = parseQuery(query, QUERY_STATE);
   try {
-    await Promise.all([
+    const [
+      {
+        data: {
+          access: { hasClientPortalAccess },
+        },
+      },
+    ] = await Promise.all([
       fetchQuery(RecipientPortal_accessDocument, {
         variables: { keycode },
       }),
@@ -670,6 +677,9 @@ RecipientPortal.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCo
         },
       }),
     ]);
+    if (!hasClientPortalAccess) {
+      throw new RedirectError(`/petition/${keycode}`);
+    }
     return {
       keycode,
     };

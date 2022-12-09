@@ -1973,6 +1973,7 @@ export interface NexusGenFieldTypes {
     contact: NexusGenRootTypes["PublicContact"] | null; // PublicContact
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     granter: NexusGenRootTypes["PublicUser"] | null; // PublicUser
+    hasClientPortalAccess: boolean; // Boolean!
     keycode: string; // ID!
     message: NexusGenRootTypes["PublicPetitionMessage"] | null; // PublicPetitionMessage
     petition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
@@ -3695,6 +3696,7 @@ export interface NexusGenFieldTypeNames {
     contact: "PublicContact";
     createdAt: "DateTime";
     granter: "PublicUser";
+    hasClientPortalAccess: "Boolean";
     keycode: "ID";
     message: "PublicPetitionMessage";
     petition: "PublicPetition";

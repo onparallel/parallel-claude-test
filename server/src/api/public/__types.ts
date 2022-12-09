@@ -314,6 +314,7 @@ export type EffectivePetitionUserPermission = {
 
 export type FeatureFlag =
   | "AUTO_ANONYMIZE"
+  | "CLIENT_PORTAL"
   | "CUSTOM_HOST_UI"
   | "DEVELOPER_ACCESS"
   | "DOW_JONES_KYC"
@@ -3052,6 +3053,8 @@ export type PublicPetition = Timestamps & {
   locale: PetitionLocale;
   /** The organization of the petition. */
   organization: PublicOrganization;
+  /** The progress of the petition. */
+  progress: PublicPetitionFieldProgress;
   /** The recipients of the petition */
   recipients: Array<PublicContact>;
   /** The signature config of the petition */
@@ -3070,6 +3073,7 @@ export type PublicPetitionAccess = {
   contact: Maybe<PublicContact>;
   createdAt: Scalars["DateTime"];
   granter: Maybe<PublicUser>;
+  hasClientPortalAccess: Scalars["Boolean"];
   keycode: Scalars["ID"];
   message: Maybe<PublicPetitionMessage>;
   petition: PublicPetition;
@@ -3134,6 +3138,16 @@ export type PublicPetitionFieldComment = {
   isAnonymized: Scalars["Boolean"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
+};
+
+/** The progress of a petition. */
+export type PublicPetitionFieldProgress = {
+  /** Number of optional fields not replied or approved */
+  optional: Scalars["Int"];
+  /** Number of fields with a reply and not approved */
+  replied: Scalars["Int"];
+  /** Total number of fields in the petition */
+  total: Scalars["Int"];
 };
 
 /** A reply to a petition field */

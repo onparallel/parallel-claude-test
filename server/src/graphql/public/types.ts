@@ -44,9 +44,17 @@ export const PublicPetitionAccess = objectType({
         );
       },
     });
-
     t.nonNull.datetime("createdAt", {
       resolve: (root) => root.created_at,
+    });
+    t.nonNull.boolean("hasClientPortalAccess", {
+      resolve: async (root, _, ctx) => {
+        const petition = await ctx.petitions.loadPetition(root.petition_id);
+        return (
+          isDefined(petition) &&
+          ctx.featureFlags.orgHasFeatureFlag(petition.org_id, "CLIENT_PORTAL")
+        );
+      },
     });
   },
 });

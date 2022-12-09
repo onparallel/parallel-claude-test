@@ -88,7 +88,7 @@ interface RecipientViewHeaderProps {
   contact: RecipientViewHeader_PublicContactFragment;
   recipients: RecipientViewHeader_PublicContactFragment[];
   message: RecipientView_PublicPetitionMessageFragment | null | undefined;
-  hasMultiplePetitions: boolean;
+  hasClientPortalAccess: boolean;
   pendingPetitions: number;
   keycode: string;
   isClosed: boolean;
@@ -101,7 +101,7 @@ export const RecipientViewHeader = Object.assign(
       contact,
       message,
       recipients,
-      hasMultiplePetitions,
+      hasClientPortalAccess,
       pendingPetitions,
       keycode,
       isClosed,
@@ -188,7 +188,7 @@ export const RecipientViewHeader = Object.assign(
             ) : (
               <Logo width="152px" height="40px" />
             )}
-            <HStack spacing={0} gap={3}>
+            <HStack spacing={3}>
               {lastSaved ? (
                 <SmallPopover
                   content={
@@ -248,7 +248,7 @@ export const RecipientViewHeader = Object.assign(
                   })}
                   variant="ghost"
                 />
-                {hasMultiplePetitions ? null : (
+                {hasClientPortalAccess ? null : (
                   <IconButtonWithTooltip
                     onClick={handleHelpClick}
                     icon={<HelpOutlineIcon boxSize={6} />}
@@ -261,7 +261,7 @@ export const RecipientViewHeader = Object.assign(
                 )}
               </HStack>
 
-              {hasMultiplePetitions ? (
+              {hasClientPortalAccess ? (
                 <Menu placement="bottom-end">
                   <Tooltip
                     placement="bottom"

@@ -69,7 +69,7 @@ export const RecipientPortalHeader = Object.assign(
           ) : (
             <Logo width="152px" height="40px" />
           )}
-          <HStack spacing={0} gap={3}>
+          <HStack spacing={3}>
             <Text>
               <FormattedMessage
                 id="component.recipient-portal-header.hello-name"

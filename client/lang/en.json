@@ -1630,6 +1630,16 @@
     "context": "Compliance feature"
   },
   {
+    "term": "component.feature-flag-descriptions.client-portal-description",
+    "definition": "Allows recipients to access the client portal.",
+    "context": "Allows recipients to access the client portal."
+  },
+  {
+    "term": "component.feature-flag-descriptions.client-portal-name",
+    "definition": "Client portal",
+    "context": "Client portal"
+  },
+  {
     "term": "component.feature-flag-descriptions.custom-host-ui-description",
     "definition": "Remove the enterprise banners around the button to request a subdomain change.",
     "context": "Remove the enterprise banners around the button to request a subdomain change."

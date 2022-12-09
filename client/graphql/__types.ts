@@ -340,6 +340,7 @@ export interface EffectivePetitionUserPermission {
 
 export type FeatureFlag =
   | "AUTO_ANONYMIZE"
+  | "CLIENT_PORTAL"
   | "CUSTOM_HOST_UI"
   | "DEVELOPER_ACCESS"
   | "DOW_JONES_KYC"
@@ -3173,6 +3174,7 @@ export interface PublicPetitionAccess {
   contact?: Maybe<PublicContact>;
   createdAt: Scalars["DateTime"];
   granter?: Maybe<PublicUser>;
+  hasClientPortalAccess: Scalars["Boolean"];
   keycode: Scalars["ID"];
   message?: Maybe<PublicPetitionMessage>;
   petition: PublicPetition;
@@ -23619,6 +23621,7 @@ export type RecipientView_accessQueryVariables = Exact<{
 export type RecipientView_accessQuery = {
   access: {
     __typename?: "PublicPetitionAccess";
+    hasClientPortalAccess: boolean;
     petition: {
       __typename?: "PublicPetition";
       id: string;
@@ -23743,7 +23746,6 @@ export type RecipientView_accessesQueryVariables = Exact<{
 }>;
 
 export type RecipientView_accessesQuery = {
-  total: { __typename?: "PublicPetitionAccessPagination"; totalCount: number };
   pending: { __typename?: "PublicPetitionAccessPagination"; totalCount: number };
 };
 
@@ -23845,6 +23847,7 @@ export type RecipientPortal_accessQueryVariables = Exact<{
 export type RecipientPortal_accessQuery = {
   access: {
     __typename?: "PublicPetitionAccess";
+    hasClientPortalAccess: boolean;
     keycode: string;
     createdAt: string;
     petition: {
@@ -33865,6 +33868,7 @@ export const RecipientView_publicCompletePetitionDocument = gql`
 export const RecipientView_accessDocument = gql`
   query RecipientView_access($keycode: ID!) {
     access(keycode: $keycode) {
+      hasClientPortalAccess
       ...RecipientView_PublicPetitionAccess
     }
     metadata(keycode: $keycode) {
@@ -33876,10 +33880,7 @@ export const RecipientView_accessDocument = gql`
 ` as unknown as DocumentNode<RecipientView_accessQuery, RecipientView_accessQueryVariables>;
 export const RecipientView_accessesDocument = gql`
   query RecipientView_accesses($keycode: ID!) {
-    total: accesses(keycode: $keycode) {
-      totalCount
-    }
-    pending: accesses(keycode: $keycode, status: [PENDING]) {
+    pending: accesses(keycode: $keycode, status: PENDING) {
       totalCount
     }
   }
@@ -33887,6 +33888,7 @@ export const RecipientView_accessesDocument = gql`
 export const RecipientPortal_accessDocument = gql`
   query RecipientPortal_access($keycode: ID!) {
     access(keycode: $keycode) {
+      hasClientPortalAccess
       ...RecipientPortal_PublicPetitionAccess
     }
   }
