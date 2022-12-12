@@ -22,6 +22,7 @@ import {
   CreateOrgIntegration,
   CreatePetition,
   CreatePetitionAccess,
+  CreatePetitionAttachment,
   CreatePetitionEventSubscription,
   CreatePetitionField,
   CreatePetitionFieldReply,
@@ -41,6 +42,7 @@ import {
   Petition,
   PetitionAccess,
   PetitionAttachment,
+  PetitionAttachmentType,
   PetitionEvent,
   PetitionEventSubscription,
   PetitionEventTypeValues,
@@ -511,13 +513,27 @@ export class Mocks {
       .returning("*");
   }
 
-  async createPetitionAttachment(petitionId: number, amount?: number, files?: FileUpload[]) {
-    const fileUploads = files ?? (await this.createRandomFileUpload(amount));
+  async createPetitionAttachment(
+    petitionId: number,
+    type: PetitionAttachmentType,
+    amount?: number,
+    builder?: (i: number) => Partial<PetitionAttachment>
+  ) {
+    const fileUploads = await this.createRandomFileUpload(amount || 1);
+
+    const [{ position }] = await this.knex
+      .from("petition_attachment")
+      .where({ petition_id: petitionId, type, deleted_at: null })
+      .select(this.knex.raw(`coalesce(max("position") + 1, 0) as position`));
+
     return await this.knex<PetitionAttachment>("petition_attachment")
       .insert(
-        fileUploads.map((file) => ({
-          file_upload_id: file.id,
+        range(0, amount || 1).map<CreatePetitionAttachment>((i) => ({
           petition_id: petitionId,
+          file_upload_id: fileUploads[i].id,
+          type,
+          position: position + i,
+          ...builder?.(i),
         }))
       )
       .returning("*");

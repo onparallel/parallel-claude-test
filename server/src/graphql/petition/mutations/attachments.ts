@@ -1,5 +1,5 @@
 import { ApolloError } from "apollo-server-core";
-import { booleanArg, intArg, list, mutationField, nonNull } from "nexus";
+import { booleanArg, list, mutationField, nonNull } from "nexus";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -175,12 +175,6 @@ export const createPetitionAttachmentUploadLink = mutationField(
       petitionId: nonNull(globalIdArg("Petition")),
       data: nonNull("FileUploadInput"),
       type: nonNull("PetitionAttachmentType"),
-      position: nonNull(
-        intArg({
-          description:
-            "Position of the attachment, beginning from 0 (start). Other attachments after this position will be moved up.",
-        })
-      ),
     },
     validateArgs: fileUploadInputMaxSize((args) => args.data, _10MB, "data"),
     resolve: async (_, args, ctx) => {
@@ -202,7 +196,6 @@ export const createPetitionAttachmentUploadLink = mutationField(
           {
             file_upload_id: file.id,
             petition_id: args.petitionId,
-            position: args.position,
             type: args.type,
           },
           ctx.user!
@@ -314,6 +307,11 @@ export const reorderPetitionAttachments = mutationField("reorderPetitionAttachme
     attachmentIds: nonNull(list(nonNull(globalIdArg("PetitionAttachment")))),
   },
   resolve: async (_, args, ctx) => {
-    return (await ctx.petitions.loadPetition(args.petitionId))!;
+    return await ctx.petitions.updatePetitionAttachmentPositions(
+      args.petitionId,
+      args.attachmentType,
+      args.attachmentIds,
+      `User:${ctx.user!.id}`
+    );
   },
 });

@@ -274,7 +274,14 @@ export const PetitionBase = interfaceType({
       description: "Custom user properties",
       resolve: (o) => o.custom_properties,
     });
-    t.nonNull.field("attachments", {
+    /** @deprecated */
+    t.nonNull.list.field("attachments", {
+      deprecation: "use attachmentsList",
+      type: "PetitionAttachment",
+      description: "The attachments linked to this petition",
+      resolve: async (o, _, ctx) => await ctx.petitions.loadPetitionAttachmentsByPetitionId(o.id),
+    });
+    t.nonNull.field("attachmentsList", {
       description: "The attachments linked to this petition",
       type: objectType({
         name: "PetitionAttachmentsList",

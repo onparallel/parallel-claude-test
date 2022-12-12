@@ -918,11 +918,6 @@ type Mutation {
   createPetitionAttachmentUploadLink(
     data: FileUploadInput!
     petitionId: GID!
-
-    """
-    Position of the attachment, beginning from 0 (start). Other attachments after this position will be moved up.
-    """
-    position: Int!
     type: PetitionAttachmentType!
   ): PetitionAttachmentUploadData!
 
@@ -2361,7 +2356,12 @@ type Petition implements PetitionBase {
   """
   The attachments linked to this petition
   """
-  attachments: PetitionAttachmentsList!
+  attachments: [PetitionAttachment!]! @deprecated(reason: "use attachmentsList")
+
+  """
+  The attachments linked to this petition
+  """
+  attachmentsList: PetitionAttachmentsList!
 
   """
   Time when the petition was closed.
@@ -2707,7 +2707,12 @@ interface PetitionBase {
   """
   The attachments linked to this petition
   """
-  attachments: PetitionAttachmentsList!
+  attachments: [PetitionAttachment!]! @deprecated(reason: "use attachmentsList")
+
+  """
+  The attachments linked to this petition
+  """
+  attachmentsList: PetitionAttachmentsList!
 
   """
   The closing email body of the petition.
@@ -3785,7 +3790,12 @@ type PetitionTemplate implements PetitionBase {
   """
   The attachments linked to this petition
   """
-  attachments: PetitionAttachmentsList!
+  attachments: [PetitionAttachment!]! @deprecated(reason: "use attachmentsList")
+
+  """
+  The attachments linked to this petition
+  """
+  attachmentsList: PetitionAttachmentsList!
   backgroundColor: String
   categories: [String!]
 

@@ -64,6 +64,8 @@ import {
   OrgIntegration,
   Petition,
   PetitionAccess,
+  PetitionAttachment,
+  PetitionAttachmentType,
   PetitionContactNotification,
   PetitionContactNotificationType,
   PetitionEventType,
@@ -4615,15 +4617,26 @@ export class PetitionRepository extends BaseRepository {
   readonly loadPetitionAttachmentsByPetitionId = this.buildLoadMultipleBy(
     "petition_attachment",
     "petition_id",
-    (q) => q.whereNull("deleted_at")
+    (q) => q.whereNull("deleted_at").orderBy("position", "asc")
   );
 
-  async createPetitionAttachment(data: CreatePetitionAttachment, user: User) {
-    const [row] = await this.insert("petition_attachment", {
-      ...data,
-      created_by: `User:${user.id}`,
-    });
-    return row;
+  async createPetitionAttachment(data: Omit<CreatePetitionAttachment, "position">, user: User) {
+    const [attachment] = await this.raw<PetitionAttachment>(
+      /* sql */ `
+      insert into petition_attachment (petition_id, file_upload_id, "type", "position", created_by)
+      select ?, ?, ?, coalesce(max(position) + 1, 0), ? from petition_attachment where petition_id = ? and "type" = ? and deleted_at is null
+      returning *;
+    `,
+      [
+        data.petition_id,
+        data.file_upload_id,
+        data.type,
+        `User:${user.id}`,
+        data.petition_id,
+        data.type,
+      ]
+    );
+    return attachment;
   }
 
   readonly loadFieldAttachment = this.buildLoadBy("petition_field_attachment", "id", (q) =>
@@ -4699,7 +4712,7 @@ export class PetitionRepository extends BaseRepository {
       t
     );
   }
-  // TODO
+
   private async deletePetitionAttachmentByPetitionId(
     petitionIds: number[],
     user: User,
@@ -4721,6 +4734,49 @@ export class PetitionRepository extends BaseRepository {
       `User:${user.id}`,
       t
     );
+  }
+
+  async updatePetitionAttachmentPositions(
+    petitionId: number,
+    attachmentType: PetitionAttachmentType,
+    ids: number[],
+    updatedBy: string
+  ) {
+    return await this.withTransaction(async (t) => {
+      await this.raw(
+        /* sql */ `
+      update petition_attachment pa set
+      position = t.position,
+      updated_at = NOW(),
+      updated_by = ?
+      from (?) as t (id, position)
+      where t.id = pa.id
+      and pa.position != t.position
+      and pa.type = ?
+      and pa.petition_id = ?
+      and pa.deleted_at is null;
+    `,
+        [
+          updatedBy,
+          this.sqlValues(
+            ids.map((id, i) => [id, i]),
+            ["int", "int"]
+          ),
+          attachmentType,
+          petitionId,
+        ],
+        t
+      );
+
+      const [petition] = await this.from("petition", t).where("id", petitionId).update(
+        {
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*"
+      );
+      return petition;
+    });
   }
 
   readonly loadPublicPetitionLink = this.buildLoadBy("public_petition_link", "id");

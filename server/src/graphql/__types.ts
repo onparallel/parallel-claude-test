@@ -1494,7 +1494,8 @@ export interface NexusGenFieldTypes {
     accesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     anonymizeAfterMonths: number | null; // Int
     anonymizePurpose: string | null; // String
-    attachments: NexusGenRootTypes["PetitionAttachmentsList"]; // PetitionAttachmentsList!
+    attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    attachmentsList: NexusGenRootTypes["PetitionAttachmentsList"]; // PetitionAttachmentsList!
     closedAt: NexusGenScalars["DateTime"] | null; // DateTime
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
@@ -1868,7 +1869,8 @@ export interface NexusGenFieldTypes {
     // field return type
     anonymizeAfterMonths: number | null; // Int
     anonymizePurpose: string | null; // String
-    attachments: NexusGenRootTypes["PetitionAttachmentsList"]; // PetitionAttachmentsList!
+    attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    attachmentsList: NexusGenRootTypes["PetitionAttachmentsList"]; // PetitionAttachmentsList!
     backgroundColor: string | null; // String
     categories: string[] | null; // [String!]
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
@@ -2536,7 +2538,8 @@ export interface NexusGenFieldTypes {
     // field return type
     anonymizeAfterMonths: number | null; // Int
     anonymizePurpose: string | null; // String
-    attachments: NexusGenRootTypes["PetitionAttachmentsList"]; // PetitionAttachmentsList!
+    attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    attachmentsList: NexusGenRootTypes["PetitionAttachmentsList"]; // PetitionAttachmentsList!
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageSubject: string | null; // String
@@ -3234,7 +3237,8 @@ export interface NexusGenFieldTypeNames {
     accesses: "PetitionAccess";
     anonymizeAfterMonths: "Int";
     anonymizePurpose: "String";
-    attachments: "PetitionAttachmentsList";
+    attachments: "PetitionAttachment";
+    attachmentsList: "PetitionAttachmentsList";
     closedAt: "DateTime";
     closingEmailBody: "JSON";
     completingMessageBody: "JSON";
@@ -3608,7 +3612,8 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     anonymizeAfterMonths: "Int";
     anonymizePurpose: "String";
-    attachments: "PetitionAttachmentsList";
+    attachments: "PetitionAttachment";
+    attachmentsList: "PetitionAttachmentsList";
     backgroundColor: "String";
     categories: "String";
     closingEmailBody: "JSON";
@@ -4276,7 +4281,8 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     anonymizeAfterMonths: "Int";
     anonymizePurpose: "String";
-    attachments: "PetitionAttachmentsList";
+    attachments: "PetitionAttachment";
+    attachmentsList: "PetitionAttachmentsList";
     closingEmailBody: "JSON";
     completingMessageBody: "JSON";
     completingMessageSubject: "String";
@@ -4552,7 +4558,6 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["FileUploadInput"]; // FileUploadInput!
       petitionId: NexusGenScalars["GID"]; // GID!
-      position: number; // Int!
       type: NexusGenEnums["PetitionAttachmentType"]; // PetitionAttachmentType!
     };
     createPetitionField: {
