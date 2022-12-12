@@ -88,9 +88,9 @@ export type PetitionAccessStatus = "ACTIVE" | "INACTIVE";
 
 export const PetitionAccessStatusValues = ["ACTIVE", "INACTIVE"] as PetitionAccessStatus[];
 
-export type PetitionAttachmentType = "FRONT" | "ANNEX" | "BACK";
+export type PetitionAttachmentType = "COVER" | "ANNEX" | "BACK";
 
-export const PetitionAttachmentTypeValues = ["FRONT", "ANNEX", "BACK"] as PetitionAttachmentType[];
+export const PetitionAttachmentTypeValues = ["COVER", "ANNEX", "BACK"] as PetitionAttachmentType[];
 
 export type PetitionContactNotificationType = "COMMENT_CREATED";
 

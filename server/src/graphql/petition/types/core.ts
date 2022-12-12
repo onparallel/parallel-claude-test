@@ -1,7 +1,11 @@
 import { extension } from "mime-types";
 import { arg, enumType, inputObjectType, interfaceType, objectType, unionType } from "nexus";
 import { isDefined, minBy } from "remeda";
-import { PetitionAttachmentTypeValues } from "../../../db/__types";
+import {
+  PetitionAttachment,
+  PetitionAttachmentType,
+  PetitionAttachmentTypeValues,
+} from "../../../db/__types";
 import { defaultBrandTheme } from "../../../util/BrandTheme";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
@@ -270,8 +274,16 @@ export const PetitionBase = interfaceType({
       description: "Custom user properties",
       resolve: (o) => o.custom_properties,
     });
-    t.nonNull.jsonObject("attachments", {
+    t.nonNull.field("attachments", {
       description: "The attachments linked to this petition",
+      type: objectType({
+        name: "PetitionAttachmentsList",
+        definition(t) {
+          PetitionAttachmentTypeValues.map((type) => {
+            t.nonNull.list.nonNull.field(type, { type: "PetitionAttachment" });
+          });
+        },
+      }),
       resolve: async (o, _, ctx) => {
         const attachments = await ctx.petitions.loadPetitionAttachmentsByPetitionId(o.id);
         return Object.fromEntries(
@@ -279,7 +291,7 @@ export const PetitionBase = interfaceType({
             type,
             attachments.filter((a) => a.type === type),
           ])
-        );
+        ) as Record<PetitionAttachmentType, PetitionAttachment[]>;
       },
     });
     t.jsonObject("metadata", {

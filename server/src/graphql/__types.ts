@@ -586,6 +586,12 @@ export interface NexusGenObjects {
     attachment: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
     presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
   };
+  PetitionAttachmentsList: {
+    // root type
+    ANNEX: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    BACK: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    COVER: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+  };
   PetitionBaseMini: db.Petition;
   PetitionBaseOrFolderPagination: {
     // root type
@@ -1488,7 +1494,7 @@ export interface NexusGenFieldTypes {
     accesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     anonymizeAfterMonths: number | null; // Int
     anonymizePurpose: string | null; // String
-    attachments: NexusGenScalars["JSONObject"]; // JSONObject!
+    attachments: NexusGenRootTypes["PetitionAttachmentsList"]; // PetitionAttachmentsList!
     closedAt: NexusGenScalars["DateTime"] | null; // DateTime
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
@@ -1576,6 +1582,12 @@ export interface NexusGenFieldTypes {
     // field return type
     attachment: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
     presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
+  };
+  PetitionAttachmentsList: {
+    // field return type
+    ANNEX: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    BACK: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    COVER: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
   };
   PetitionBaseMini: {
     // field return type
@@ -1856,7 +1868,7 @@ export interface NexusGenFieldTypes {
     // field return type
     anonymizeAfterMonths: number | null; // Int
     anonymizePurpose: string | null; // String
-    attachments: NexusGenScalars["JSONObject"]; // JSONObject!
+    attachments: NexusGenRootTypes["PetitionAttachmentsList"]; // PetitionAttachmentsList!
     backgroundColor: string | null; // String
     categories: string[] | null; // [String!]
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
@@ -2524,7 +2536,7 @@ export interface NexusGenFieldTypes {
     // field return type
     anonymizeAfterMonths: number | null; // Int
     anonymizePurpose: string | null; // String
-    attachments: NexusGenScalars["JSONObject"]; // JSONObject!
+    attachments: NexusGenRootTypes["PetitionAttachmentsList"]; // PetitionAttachmentsList!
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageSubject: string | null; // String
@@ -3222,7 +3234,7 @@ export interface NexusGenFieldTypeNames {
     accesses: "PetitionAccess";
     anonymizeAfterMonths: "Int";
     anonymizePurpose: "String";
-    attachments: "JSONObject";
+    attachments: "PetitionAttachmentsList";
     closedAt: "DateTime";
     closingEmailBody: "JSON";
     completingMessageBody: "JSON";
@@ -3310,6 +3322,12 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     attachment: "PetitionAttachment";
     presignedPostData: "AWSPresignedPostData";
+  };
+  PetitionAttachmentsList: {
+    // field return type name
+    ANNEX: "PetitionAttachment";
+    BACK: "PetitionAttachment";
+    COVER: "PetitionAttachment";
   };
   PetitionBaseMini: {
     // field return type name
@@ -3590,7 +3608,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     anonymizeAfterMonths: "Int";
     anonymizePurpose: "String";
-    attachments: "JSONObject";
+    attachments: "PetitionAttachmentsList";
     backgroundColor: "String";
     categories: "String";
     closingEmailBody: "JSON";
@@ -4258,7 +4276,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     anonymizeAfterMonths: "Int";
     anonymizePurpose: "String";
-    attachments: "JSONObject";
+    attachments: "PetitionAttachmentsList";
     closingEmailBody: "JSON";
     completingMessageBody: "JSON";
     completingMessageSubject: "String";

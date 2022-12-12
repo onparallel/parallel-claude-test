@@ -4643,8 +4643,8 @@ export class PetitionRepository extends BaseRepository {
     });
     return row;
   }
-  // TODO: reordenar las posiciones de los attachment restantes
-  async deletePetitionAttachment(attachmentId: number, user: User) {
+
+  async deletePetitionAttachment(attachmentId: number, user: User, t?: Knex.Transaction) {
     return await this.withTransaction(async (t) => {
       const [row] = await this.from("petition_attachment", t)
         .where("id", attachmentId)
@@ -4654,8 +4654,13 @@ export class PetitionRepository extends BaseRepository {
         })
         .returning("*");
 
+      await this.from("petition_attachment", t)
+        .where({ type: row.type, deleted_at: null })
+        .whereRaw(/* sql */ `"position" > ?`, [row.position])
+        .update({ position: this.knex.raw(`"position" - 1`) });
+
       return await this.files.deleteFileUpload(row.file_upload_id, `User:${user.id}`, t);
-    });
+    }, t);
   }
 
   async deletePetitionFieldAttachment(attachmentId: number, user: User) {

@@ -2361,7 +2361,7 @@ type Petition implements PetitionBase {
   """
   The attachments linked to this petition
   """
-  attachments: JSONObject!
+  attachments: PetitionAttachmentsList!
 
   """
   Time when the petition was closed.
@@ -2679,12 +2679,18 @@ type PetitionAttachment {
 enum PetitionAttachmentType {
   ANNEX
   BACK
-  FRONT
+  COVER
 }
 
 type PetitionAttachmentUploadData {
   attachment: PetitionAttachment!
   presignedPostData: AWSPresignedPostData!
+}
+
+type PetitionAttachmentsList {
+  ANNEX: [PetitionAttachment!]!
+  BACK: [PetitionAttachment!]!
+  COVER: [PetitionAttachment!]!
 }
 
 interface PetitionBase {
@@ -2701,7 +2707,7 @@ interface PetitionBase {
   """
   The attachments linked to this petition
   """
-  attachments: JSONObject!
+  attachments: PetitionAttachmentsList!
 
   """
   The closing email body of the petition.
@@ -3779,7 +3785,7 @@ type PetitionTemplate implements PetitionBase {
   """
   The attachments linked to this petition
   """
-  attachments: JSONObject!
+  attachments: PetitionAttachmentsList!
   backgroundColor: String
   categories: [String!]
 
