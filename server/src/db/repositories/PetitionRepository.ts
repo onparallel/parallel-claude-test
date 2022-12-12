@@ -2360,6 +2360,8 @@ export class PetitionRepository extends BaseRepository {
         await this.cloneFieldAttachments(fields, newFieldIds, t);
       }
 
+      await this.clonePetitionAttachments(petitionId, cloned.id, createdBy, t);
+
       return cloned;
     }, t);
   }
@@ -2445,6 +2447,46 @@ export class PetitionRepository extends BaseRepository {
         petition_field_id: newIds[attachment.petition_field_id],
       });
     });
+  }
+
+  private async clonePetitionAttachments(
+    fromPetitionId: number,
+    toPetitionId: number,
+    createdBy: string,
+    t?: Knex.Transaction
+  ) {
+    await this.withTransaction(async (t) => {
+      const petitionAttachments = await this.loadPetitionAttachmentsByPetitionId.raw(
+        fromPetitionId,
+        t
+      );
+
+      if (petitionAttachments.length === 0) {
+        return;
+      }
+
+      const clonedFileUploads = await pMap(petitionAttachments, async (a) => [
+        a.file_upload_id,
+        (await this.files.cloneFileUpload(a.file_upload_id, t)).id,
+      ]);
+
+      await this.raw(
+        /* sql */ `
+      with new_file_upload_ids as (select * from (?) as t(file_upload_id, new_file_upload_id))
+      insert into petition_attachment (petition_id, file_upload_id, type, position, created_by)
+      select ?, fid.new_file_upload_id, pa.type, pa.position, ?
+      from petition_attachment pa left join new_file_upload_ids fid on fid.file_upload_id = pa.file_upload_id
+      where pa.petition_id = ? and pa.deleted_at is null;
+    `,
+        [
+          this.sqlValues(clonedFileUploads, ["int", "int"]),
+          toPetitionId,
+          createdBy,
+          fromPetitionId,
+        ],
+        t
+      );
+    }, t);
   }
 
   private async getDefaultSignatureOrgIntegration(

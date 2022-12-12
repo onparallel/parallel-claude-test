@@ -822,9 +822,10 @@ describe("GraphQL/PetitionAttachments", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.clonePetitions.attachmentsList.COVER).toHaveLength(2);
-      expect(data?.clonePetitions.attachmentsList.ANNEX).toHaveLength(0);
-      expect(data?.clonePetitions.attachmentsList.BACK).toHaveLength(0);
+      expect(data?.clonePetitions).toHaveLength(1);
+      expect(data?.clonePetitions[0].attachmentsList.COVER).toHaveLength(2);
+      expect(data?.clonePetitions[0].attachmentsList.ANNEX).toHaveLength(0);
+      expect(data?.clonePetitions[0].attachmentsList.BACK).toHaveLength(0);
     });
   });
 });
