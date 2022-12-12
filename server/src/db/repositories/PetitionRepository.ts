@@ -4745,18 +4745,22 @@ export class PetitionRepository extends BaseRepository {
     return await this.withTransaction(async (t) => {
       await this.raw(
         /* sql */ `
-      update petition_attachment pa set
-      position = t.position,
-      updated_at = NOW(),
-      updated_by = ?
-      from (?) as t (id, position)
-      where t.id = pa.id
-      and pa.position != t.position
-      and pa.type = ?
-      and pa.petition_id = ?
-      and pa.deleted_at is null;
-    `,
+          with max_pos as (
+            select coalesce(max(position) + 1, 0) as position from petition_attachment where petition_id = ? and type = ? and deleted_at is null
+          ) update petition_attachment pa set
+            -- prefix with max position of current attachments, to avoid conflict on unique constraint "petition_attachment__petition_id__type__position"
+            position = max_pos.position + t.position, 
+            updated_at = NOW(),
+            updated_by = ?
+            from (?) as t (id, position), max_pos
+            where t.id = pa.id
+            and pa.type = ?
+            and pa.petition_id = ?
+            and pa.deleted_at is null;
+      `,
         [
+          petitionId,
+          attachmentType,
           updatedBy,
           this.sqlValues(
             ids.map((id, i) => [id, i]),

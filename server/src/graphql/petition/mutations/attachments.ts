@@ -307,11 +307,13 @@ export const reorderPetitionAttachments = mutationField("reorderPetitionAttachme
     attachmentIds: nonNull(list(nonNull(globalIdArg("PetitionAttachment")))),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.updatePetitionAttachmentPositions(
+    const petition = await ctx.petitions.updatePetitionAttachmentPositions(
       args.petitionId,
       args.attachmentType,
       args.attachmentIds,
       `User:${ctx.user!.id}`
     );
+    ctx.petitions.loadPetitionAttachmentsByPetitionId.dataloader.clear(args.petitionId);
+    return petition;
   },
 });

@@ -1576,7 +1576,6 @@ export interface NexusGenFieldTypes {
     file: NexusGenRootTypes["FileUpload"]; // FileUpload!
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
-    position: number; // Int!
     type: NexusGenEnums["PetitionAttachmentType"]; // PetitionAttachmentType!
   };
   PetitionAttachmentUploadData: {
@@ -3319,7 +3318,6 @@ export interface NexusGenFieldTypeNames {
     file: "FileUpload";
     id: "GID";
     petition: "PetitionBase";
-    position: "Int";
     type: "PetitionAttachmentType";
   };
   PetitionAttachmentUploadData: {

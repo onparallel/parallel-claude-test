@@ -37,7 +37,6 @@ export const PetitionAttachment = objectType({
     t.field("type", {
       type: enumType({ name: "PetitionAttachmentType", members: PetitionAttachmentTypeValues }),
     });
-    t.int("position");
     t.field("file", {
       type: "FileUpload",
       resolve: async (o, _, ctx) => {

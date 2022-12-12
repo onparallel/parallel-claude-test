@@ -2672,7 +2672,6 @@ type PetitionAttachment {
   file: FileUpload!
   id: GID!
   petition: PetitionBase!
-  position: Int!
   type: PetitionAttachmentType!
 }
 
