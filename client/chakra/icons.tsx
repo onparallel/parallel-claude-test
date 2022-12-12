@@ -2344,3 +2344,39 @@ export const HomeIcon = createIcon({
     </g>
   ),
 });
+
+export const CoverIcon = createIcon({
+  displayName: "CoverIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <rect height="18" rx="1" width="10.474" x="3" y="3" />
+      <path d="m15.4719 4h.3285c1.1046 0 2 .89543 2 2v12c0 1.1046-.8954 2-2 2h-.3285" />
+      <path d="m19.9626 5h.0374c1.1046 0 2 .89543 2 2v10c0 1.1046-.8954 2-2 2h-.0374" />
+    </g>
+  ),
+});
+
+export const BackCoverIcon = createIcon({
+  displayName: "BackCoverIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <rect height="18" rx="1" transform="matrix(-1 0 0 1 20 2)" width="10.474" x="-1" y="1" />
+      <path d="m8.52808 4h-.32849c-1.10457 0-2 .89543-2 2v12c0 1.1046.89543 2 2 2h.32849" />
+      <path d="m4.03741 5h-.03742c-1.10457 0-2 .89543-2 2v10c0 1.1046.89543 2 2 2h.03742" />
+    </g>
+  ),
+});

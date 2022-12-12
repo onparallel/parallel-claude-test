@@ -63,7 +63,7 @@
     "dompurify": "^2.4.1",
     "escape-string-regexp": "^4.0.0",
     "file-selector": "^0.6.0",
-    "framer-motion": "^4.1.17",
+    "framer-motion": "^6.5.1",
     "graphql": "^16.6.0",
     "html-react-parser": "^3.0.4",
     "jsdom": "^20.0.3",

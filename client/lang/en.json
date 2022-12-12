@@ -3700,6 +3700,46 @@
     "context": "and <b>{extra} more</b>"
   },
   {
+    "term": "component.petition-template-attachments.add-attachment",
+    "definition": "Add attachment",
+    "context": "Add attachment"
+  },
+  {
+    "term": "component.petition-template-attachments.annex",
+    "definition": "Annex",
+    "context": "Annex"
+  },
+  {
+    "term": "component.petition-template-attachments.back-cover",
+    "definition": "Back cover",
+    "context": "Back cover"
+  },
+  {
+    "term": "component.petition-template-attachments.cover",
+    "definition": "Cover",
+    "context": "Cover"
+  },
+  {
+    "term": "component.petition-template-attachments.header",
+    "definition": "Document attachments",
+    "context": "Document attachments"
+  },
+  {
+    "term": "component.petition-template-attachments.no-attachments-uploaded",
+    "definition": "No attachments have been uploaded yet",
+    "context": "No attachments have been uploaded yet"
+  },
+  {
+    "term": "component.petition-template-attachments.preview",
+    "definition": "Preview file. ⇧ + click to download",
+    "context": "Preview file. ⇧ + click to download"
+  },
+  {
+    "term": "component.petition-template-attachments.remove",
+    "definition": "Remove attachment",
+    "context": "Remove attachment"
+  },
+  {
     "term": "component.petition-template-closing-message.card-explainer",
     "definition": "This message will be used when selecting the option <b>notify recipients</b> to notify that it has been reviewed and closed.",
     "context": "This message will be used when selecting the option <b>notify recipients</b> to notify that it has been reviewed and closed."

@@ -35,6 +35,7 @@ import {
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionSettings } from "@parallel/components/petition-compose/PetitionSettings";
+import { PetitionTemplateAttachments } from "@parallel/components/petition-compose/PetitionTemplateAttachments";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";
 import { cleanPreviewFieldReplies } from "@parallel/components/petition-preview/clientMutations";
@@ -563,6 +564,16 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               isAttachDisabled={isPublicTemplate || myEffectivePermission === "READ"}
               isTemplate={petition?.__typename === "PetitionTemplate"}
             />
+
+            {petition?.__typename === "PetitionTemplate" ? (
+              <PetitionTemplateAttachments
+                petitionId={petition.id}
+                marginTop="4"
+                onUpdatePetition={handleUpdatePetition}
+                isReadOnly={isReadOnly}
+              />
+            ) : null}
+
             {petition?.__typename === "PetitionTemplate" ? (
               <PetitionTemplateDescriptionEdit
                 petitionId={petition.id}
@@ -572,6 +583,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 isReadOnly={isReadOnly}
               />
             ) : null}
+
             {petition.__typename === "Petition" && petition.accesses.length > 0 ? (
               <Box color="gray.500" marginTop={12} paddingX={4} textAlign="center">
                 <Text>

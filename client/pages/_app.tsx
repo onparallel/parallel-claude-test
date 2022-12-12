@@ -3,7 +3,6 @@ import { Fonts } from "@parallel/chakra/fonts";
 import { theme } from "@parallel/chakra/theme";
 import { I18nProps, I18nProvider } from "@parallel/components/common/I18nProvider";
 import { LiquidProvider } from "@parallel/utils/useLiquid";
-import { AnimateSharedLayout } from "framer-motion";
 import { AppProps } from "next/app";
 import Router from "next/router";
 import { useEffect } from "react";
@@ -31,9 +30,7 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
           {/* default StylesProvider so useStyles doesn't break */}
           <StylesProvider value={{}}>
             <Fonts />
-            <AnimateSharedLayout>
-              <Component {...pageProps} />
-            </AnimateSharedLayout>
+            <Component {...pageProps} />
           </StylesProvider>
         </ChakraProvider>
       </I18nProvider>

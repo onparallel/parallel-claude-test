@@ -31,6 +31,15 @@ export const theme = extendTheme({
     "2xs": "0.6rem",
   },
   colors: {
+    tags: {
+      gray: "#E2E8F0",
+      brown: "#F5EFE8",
+      yellow: "#FEEBC8",
+      red: "#FED7D7",
+      purple: "#DDDCF8",
+      blue: "#CEEDFF",
+      green: "#D5E7DE",
+    },
     gray: {
       50: "#fafdff",
       75: "#f4f7f9",

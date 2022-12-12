@@ -14,7 +14,6 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import { getColor } from "@chakra-ui/theme-tools";
 import {
   ChevronRightIcon,
   ConditionIcon,
@@ -60,6 +59,7 @@ import { NakedLink } from "../common/Link";
 import { SmallPopover } from "../common/SmallPopover";
 import { CheckboxTypeLabel } from "../petition-common/CheckboxTypeLabel";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
+import { PetitionComposeDragActiveIndicator } from "./PetitionComposeDragActiveIndicator";
 import { PetitionComposeFieldAttachment } from "./PetitionComposeFieldAttachment";
 import {
   PetitionFieldOptionsListEditor,
@@ -319,7 +319,22 @@ const _PetitionComposeField = chakraForwardRef<
     >
       <input type="file" {...getInputProps()} />
       {isDragActive ? (
-        <PetitionComposeFieldDragActiveIndicator field={field} draggedFiles={draggedFiles} />
+        <PetitionComposeDragActiveIndicator
+          isOverMaxAttachments={field.attachments.length + draggedFiles.length > 10}
+          message={
+            <FormattedMessage
+              id="component.petition-compose-field.drop-files-to-attach"
+              defaultMessage="Drop here your files to attach them to this field"
+            />
+          }
+          errorMessage={
+            <FormattedMessage
+              id="component.petition-compose-field.too-many-attachments"
+              defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
+              values={{ count: 10 }}
+            />
+          }
+        />
       ) : null}
       <Box
         ref={previewRef}
@@ -1114,65 +1129,6 @@ export const PetitionComposeField = Object.assign(
   memo(_PetitionComposeField, comparePetitionComposeFieldProps) as typeof _PetitionComposeField,
   { fragments }
 );
-
-interface PetitionComposeFieldDragActiveIndicatorProps {
-  field: PetitionComposeField_PetitionFieldFragment;
-  draggedFiles: (File | DataTransferItem)[];
-}
-
-function PetitionComposeFieldDragActiveIndicator({
-  field,
-  draggedFiles,
-}: PetitionComposeFieldDragActiveIndicatorProps) {
-  const isOverMaxAttachments = field.attachments.length + draggedFiles.length > 10;
-  return (
-    <Center position="absolute" inset={0} zIndex={1} backgroundColor="whiteAlpha.700">
-      <Box
-        position="absolute"
-        inset={0}
-        opacity={0.2}
-        sx={{
-          backgroundImage: ((theme: any) => {
-            const c = isOverMaxAttachments
-              ? getColor(theme, "red.100")
-              : getColor(theme, "gray.100");
-            return `linear-gradient(135deg, ${c} 25%, white 25%, white 50%, ${c} 50%, ${c} 75%, white 75%, white)`;
-          }) as any,
-          backgroundSize: `3rem 3rem`,
-          backgroundPosition: "top left",
-        }}
-      />
-      <Box
-        position="absolute"
-        inset={2}
-        border="2px dashed"
-        borderRadius="md"
-        borderColor={isOverMaxAttachments ? "red.300" : "gray.300"}
-      />
-      <Box
-        padding={2}
-        borderRadius="lg"
-        color={isOverMaxAttachments ? "red.500" : "gray.500"}
-        backgroundColor="white"
-        fontWeight="bold"
-        zIndex={1}
-      >
-        {isOverMaxAttachments ? (
-          <FormattedMessage
-            id="component.petition-compose-field.too-many-attachments"
-            defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
-            values={{ count: 10 }}
-          />
-        ) : (
-          <FormattedMessage
-            id="component.petition-compose-field.drop-files-to-attach"
-            defaultMessage="Drop here your files to attach them to this field"
-          />
-        )}
-      </Box>
-    </Center>
-  );
-}
 
 interface DragItem {
   index: number;
