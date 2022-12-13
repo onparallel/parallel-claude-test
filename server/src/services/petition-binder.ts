@@ -10,11 +10,18 @@ import sanitizeFilename from "sanitize-filename";
 import { FileRepository } from "../db/repositories/FileRepository";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
+import {
+  FileUpload,
+  OrganizationTheme,
+  PetitionAttachmentType,
+  PetitionAttachmentTypeValues,
+} from "../db/__types";
 import { evaluateFieldVisibility } from "../util/fieldVisibility";
 import { isFileTypeField } from "../util/isFileTypeField";
 import { pFlatMap } from "../util/promises/pFlatMap";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
+import { ILogger, LOGGER } from "./logger";
 import { IPrinter, PRINTER } from "./printer";
 import { IStorageService, STORAGE_SERVICE } from "./storage";
 
@@ -53,7 +60,8 @@ export class PetitionBinder implements IPetitionBinder {
     @inject(FileRepository) private files: FileRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(STORAGE_SERVICE) private storage: IStorageService,
-    @inject(PRINTER) private printer: IPrinter
+    @inject(PRINTER) private printer: IPrinter,
+    @inject(LOGGER) private logger: ILogger
   ) {}
 
   private temporaryDirectory = "";
@@ -73,9 +81,10 @@ export class PetitionBinder implements IPetitionBinder {
       // first of all, create temporary directory to store all tmp files and delete it when finished
       this.temporaryDirectory = await this.buildTmpDir();
 
-      const [petition, fieldsWithFiles] = await Promise.all([
+      const [petition, fieldsWithFiles, attachments] = await Promise.all([
         this.petitions.loadPetition(petitionId),
         this.getPrintableFiles(petitionId),
+        this.petitions.loadPetitionAttachmentsByPetitionId(petitionId),
       ]);
 
       if (!petition) {
@@ -115,44 +124,41 @@ export class PetitionBinder implements IPetitionBinder {
                 )
               );
 
-              const filePaths = await pMap(
-                files,
-                async (file) => {
-                  if (file.content_type.startsWith("image/")) {
-                    // jpeg can be used directly, other types need processing
-                    const imageUrl =
-                      file.content_type === "image/jpeg"
-                        ? await this.storage.fileUploads.getSignedDownloadEndpoint(
-                            file.path,
-                            file.filename,
-                            "inline"
-                          )
-                        : await this.convertImage(file.path, file.content_type);
-
-                    return await this.writeTemporaryFile(
-                      this.printer.imageToPdf(userId, { imageUrl, theme: documentTheme!.data })
-                    );
-                  } else if (file.content_type === "application/pdf") {
-                    return await this.writeTemporaryFile(
-                      await this.storage.fileUploads.downloadFile(file.path)
-                    );
-                  } else {
-                    throw new Error(`Cannot annex ${file.content_type} to pdf binder`);
-                  }
-                },
-                { concurrency: 1 }
-              );
-
+              const filePaths = await this.loadFileUploadPaths(files, userId, documentTheme);
               return [coverPagePath, ...filePaths];
             },
             { concurrency: 2 }
           )
         : [];
 
-      return await this.merge([mainDocPath, ...annexedDocumentPaths], {
-        maxOutputSize,
-        outputFileName: outputFileName ? sanitizeFilename(outputFileName) : undefined,
-      });
+      const attachmentPaths = Object.fromEntries(
+        await pMap(PetitionAttachmentTypeValues, async (type) => [
+          type,
+          await this.loadFileUploadPaths(
+            (
+              await this.files.loadFileUpload(
+                attachments.filter((a) => a.type === type).map((a) => a.file_upload_id)
+              )
+            ).filter(isDefined),
+            userId,
+            documentTheme
+          ),
+        ])
+      ) as Record<PetitionAttachmentType, string[]>;
+
+      return await this.merge(
+        [
+          ...attachmentPaths.COVER,
+          mainDocPath,
+          ...attachmentPaths.ANNEX,
+          ...annexedDocumentPaths,
+          ...attachmentPaths.BACK,
+        ],
+        {
+          maxOutputSize,
+          outputFileName: outputFileName ? sanitizeFilename(outputFileName) : undefined,
+        }
+      );
     } finally {
       try {
         await rm(this.temporaryDirectory, { recursive: true });
@@ -270,6 +276,41 @@ export class PetitionBinder implements IPetitionBinder {
         .filter((f) => isPrintableContentType(f.content_type));
       return printable.length > 0 ? [[field, printable] as const] : [];
     });
+  }
+
+  private async loadFileUploadPaths(files: FileUpload[], userId: number, theme: OrganizationTheme) {
+    return (
+      await pMap(
+        files,
+        async (file) => {
+          if (file.content_type.startsWith("image/")) {
+            // jpeg can be used directly, other types need processing
+            const imageUrl =
+              file.content_type === "image/jpeg"
+                ? await this.storage.fileUploads.getSignedDownloadEndpoint(
+                    file.path,
+                    file.filename,
+                    "inline"
+                  )
+                : await this.convertImage(file.path, file.content_type);
+
+            return await this.writeTemporaryFile(
+              this.printer.imageToPdf(userId, { imageUrl, theme: theme.data })
+            );
+          } else if (file.content_type === "application/pdf") {
+            return await this.writeTemporaryFile(
+              await this.storage.fileUploads.downloadFile(file.path)
+            );
+          } else {
+            this.logger.warn(
+              `Cannot annex ${file.content_type} FileUpload:${file.id} to pdf binder. Skipping...`
+            );
+            return null;
+          }
+        },
+        { concurrency: 1 }
+      )
+    ).filter(isDefined);
   }
 
   private async writeTemporaryFile(stream: MaybePromise<NodeJS.ReadableStream>) {
