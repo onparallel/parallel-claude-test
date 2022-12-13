@@ -4201,7 +4201,7 @@
   },
   {
     "term": "component.recipient-portal-header.hello-name",
-    "definition": "Hola, {name}!",
+    "definition": "¡Hola, {name}!",
     "context": "Hello, {name}!"
   },
   {
