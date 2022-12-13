@@ -4,7 +4,7 @@ import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { RESULT } from "../../helpers/result";
-import { fileUploadInputMaxSize } from "../../helpers/validators/maxFileSize";
+import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
 import {
   fieldAttachmentBelongsToField,
   fieldsBelongsToPetition,
@@ -33,7 +33,7 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
       fieldId: nonNull(globalIdArg("PetitionField")),
       data: nonNull("FileUploadInput"),
     },
-    validateArgs: fileUploadInputMaxSize((args) => args.data, _100MB, "data"),
+    validateArgs: validFileUploadInput((args) => args.data, { maxSizeBytes: _100MB }, "data"),
     resolve: async (_, args, ctx) => {
       const attachments = await ctx.petitions.loadFieldAttachmentsByFieldId(args.fieldId);
       if (attachments.length + 1 > 10) {
@@ -176,7 +176,11 @@ export const createPetitionAttachmentUploadLink = mutationField(
       data: nonNull("FileUploadInput"),
       type: nonNull("PetitionAttachmentType"),
     },
-    validateArgs: fileUploadInputMaxSize((args) => args.data, _10MB, "data"),
+    validateArgs: validFileUploadInput(
+      (args) => args.data,
+      { maxSizeBytes: _10MB, contentType: "application/pdf" },
+      "data"
+    ),
     resolve: async (_, args, ctx) => {
       const key = random(16);
       const { filename, size, contentType } = args.data;

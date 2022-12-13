@@ -9,7 +9,7 @@ import { random } from "../../../util/token";
 import { and, chain } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { RESULT } from "../../helpers/result";
-import { fileUploadInputMaxSize } from "../../helpers/validators/maxFileSize";
+import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
 import {
   fieldCanBeReplied,
   fieldHasType,
@@ -177,7 +177,11 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
       fieldCanBeReplied("fieldId")
     )
   ),
-  validateArgs: fileUploadInputMaxSize((args) => args.data, 50 * 1024 * 1024, "data"),
+  validateArgs: validFileUploadInput(
+    (args) => args.data,
+    { maxSizeBytes: 50 * 1024 * 1024 },
+    "data"
+  ),
   resolve: async (_, args, ctx) => {
     const key = random(16);
     const { filename, size, contentType } = args.data;

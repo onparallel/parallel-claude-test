@@ -107,6 +107,31 @@ describe("GraphQL/PetitionAttachments", () => {
         .update("deleted_at", mocks.knex.raw("CURRENT_TIMESTAMP"));
     });
 
+    it("should not allow to update files that are not PDFs", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $data: FileUploadInput!, $type: PetitionAttachmentType!) {
+            createPetitionAttachmentUploadLink(petitionId: $petitionId, data: $data, type: $type) {
+              attachment {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          data: {
+            contentType: "image/jpeg",
+            filename: "nomina.jpeg",
+            size: 1024,
+          },
+          type: "ANNEX",
+        }
+      );
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
     it("sends error when trying to create attachment with read access", async () => {
       const { errors, data } = await testClient.execute(
         gql`

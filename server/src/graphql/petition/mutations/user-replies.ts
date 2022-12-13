@@ -8,7 +8,7 @@ import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonObjectArg } from "../../helpers/scalars";
-import { fileUploadInputMaxSize } from "../../helpers/validators/maxFileSize";
+import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
 import {
   fieldCanBeReplied,
   fieldHasType,
@@ -139,7 +139,11 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     fieldCanBeReplied("fieldId"),
     petitionIsNotAnonymized("petitionId")
   ),
-  validateArgs: fileUploadInputMaxSize((args) => args.file, 50 * 1024 * 1024, "file"),
+  validateArgs: validFileUploadInput(
+    (args) => args.file,
+    { maxSizeBytes: 50 * 1024 * 1024 },
+    "file"
+  ),
   resolve: async (_, args, ctx) => {
     const key = random(16);
     try {
@@ -223,7 +227,11 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
     replyCanBeUpdated("replyId"),
     petitionIsNotAnonymized("petitionId")
   ),
-  validateArgs: fileUploadInputMaxSize((args) => args.file, 50 * 1024 * 1024, "file"),
+  validateArgs: validFileUploadInput(
+    (args) => args.file,
+    { maxSizeBytes: 50 * 1024 * 1024 },
+    "file"
+  ),
   resolve: async (_, args, ctx) => {
     const oldReply = (await ctx.petitions.loadFieldReply(args.replyId))!;
 
