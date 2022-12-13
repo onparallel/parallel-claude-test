@@ -3170,16 +3170,6 @@
     "context": "This link is individual and <b>can only be used once</b>. If you want to add more recipients you can do it from the {activityLink} tab."
   },
   {
-    "term": "component.petition-list-header.create-folder",
-    "definition": "Crear carpeta",
-    "context": "Create folder"
-  },
-  {
-    "term": "component.petition-list-header.new-template",
-    "definition": "Nueva plantilla",
-    "context": "New template"
-  },
-  {
     "term": "component.petition-list-header.search-in",
     "definition": "Busca en:",
     "context": "Search in:"
@@ -7678,6 +7668,21 @@
     "term": "page.petitions-list.actions-share",
     "definition": "Compartir",
     "context": "Share"
+  },
+  {
+    "term": "page.petitions-list.create-button",
+    "definition": "Nuevo",
+    "context": "New"
+  },
+  {
+    "term": "page.petitions-list.create-folder",
+    "definition": "Crear carpeta",
+    "context": "Create folder"
+  },
+  {
+    "term": "page.petitions-list.new-template",
+    "definition": "Nueva plantilla",
+    "context": "New template"
   },
   {
     "term": "page.preview.edit-field",

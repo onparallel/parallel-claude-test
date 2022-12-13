@@ -5,6 +5,7 @@ import {
   Flex,
   Menu,
   MenuButton,
+  MenuItem,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
@@ -13,6 +14,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import {
+  AddIcon,
   ChevronDownIcon,
   CopyIcon,
   DeleteIcon,
@@ -23,11 +25,14 @@ import {
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import { SearchInOptions } from "@parallel/components/common/SearchAllOrCurrentFolder";
+import { Spacer } from "@parallel/components/common/Spacer";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { useCreateFolderDialog } from "@parallel/components/petition-common/dialogs/CreateFolderDialog";
 import { useMoveToFolderDialog } from "@parallel/components/petition-common/dialogs/MoveToFolderDialog";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { useRenameDialog } from "@parallel/components/petition-common/dialogs/RenameDialog";
@@ -38,6 +43,7 @@ import {
   unflatShared,
 } from "@parallel/components/petition-list/filters/shared-with/PetitionListSharedWithFilter";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
+import { useNewTemplateDialog } from "@parallel/components/petition-new/dialogs/NewTemplateDialog";
 import {
   PetitionBaseType,
   PetitionPermissionType,
@@ -59,6 +65,7 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
+import { useHandleNavigation } from "@parallel/utils/navigation";
 import {
   integer,
   object,
@@ -174,6 +181,49 @@ function Petitions() {
     }));
   }
 
+  const showNewTemplateDialog = useNewTemplateDialog();
+  const navigate = useHandleNavigation();
+  const handleCreateNewParallelOrTemplate = async () => {
+    try {
+      if (state.type === "PETITION") {
+        navigate(`/app/petitions/new`);
+      } else {
+        const templateId = await showNewTemplateDialog();
+        if (!templateId) {
+          const id = await createPetition({ type: "TEMPLATE", path: state.path });
+          goToPetition(id, "compose", { query: { new: "" } });
+        } else {
+          const petitionIds = await clonePetitions({
+            petitionIds: [templateId],
+            keepTitle: true,
+            path: state.path,
+          });
+          goToPetition(petitionIds[0], "compose", { query: { new: "" } });
+        }
+      }
+    } catch {}
+  };
+
+  const showCreateFolderDialog = useCreateFolderDialog();
+  const [movePetitions] = useMutation(Petitions_movePetitionsDocument);
+  const handleCreateFolder = async () => {
+    try {
+      const data = await showCreateFolderDialog({
+        isTemplate: state.type === "TEMPLATE",
+        currentPath: state.path,
+      });
+      await movePetitions({
+        variables: {
+          ids: data.petitions.map((p) => p.id),
+          source: state.path,
+          destination: `${state.path}${data.name}/`,
+          type: state.type,
+        },
+      });
+      await refetch();
+    } catch {}
+  };
+
   const deletePetitions = useDeletePetitions();
   const handleDeleteClick = useCallback(async () => {
     try {
@@ -267,7 +317,6 @@ function Petitions() {
   }, []);
 
   const [updatePetition] = useMutation(Petitions_updatePetitionDocument);
-  const [movePetitions] = useMutation(Petitions_movePetitionsDocument);
   const [renameFolder] = useMutation(Petitions_renameFolderDocument);
   const showRenameDialog = useRenameDialog();
 
@@ -386,53 +435,124 @@ function Petitions() {
       realMe={realMe}
     >
       <Stack minHeight={0} paddingX={4} paddingTop={6} paddingBottom={16} spacing={4}>
-        <Box minWidth="0" width="fit-content">
-          <Menu matchWidth={true}>
-            <MenuButton
-              as={Button}
-              size="lg"
-              variant="ghost"
-              fontSize="2xl"
-              paddingX={3}
-              leftIcon={
-                state.type === "PETITION" ? (
-                  <PaperPlaneIcon boxSize={6} />
-                ) : (
-                  <DocumentIcon boxSize={6} />
-                )
-              }
-              rightIcon={<ChevronDownIcon boxSize={5} />}
+        <Flex alignItems="center">
+          <Box minWidth="0" width="fit-content">
+            <Menu matchWidth>
+              <MenuButton
+                as={Button}
+                size="lg"
+                variant="ghost"
+                fontSize="2xl"
+                paddingX={3}
+                leftIcon={
+                  state.type === "PETITION" ? (
+                    <PaperPlaneIcon boxSize={6} />
+                  ) : (
+                    <DocumentIcon boxSize={6} />
+                  )
+                }
+                rightIcon={<ChevronDownIcon boxSize={5} />}
+              >
+                {state.type === "PETITION"
+                  ? intl.formatMessage({
+                      id: "generic.parallel-type-plural",
+                      defaultMessage: "Parallels",
+                    })
+                  : intl.formatMessage({
+                      id: "generic.template-type-plural",
+                      defaultMessage: "Templates",
+                    })}
+              </MenuButton>
+              <Portal>
+                <MenuList minWidth="154px">
+                  <MenuOptionGroup value={state.type}>
+                    <MenuItemOption value="PETITION" onClick={() => handleTypeChange("PETITION")}>
+                      <FormattedMessage
+                        id="generic.parallel-type-plural"
+                        defaultMessage="Parallels"
+                      />
+                    </MenuItemOption>
+                    <MenuItemOption value="TEMPLATE" onClick={() => handleTypeChange("TEMPLATE")}>
+                      <FormattedMessage
+                        id="generic.template-type-plural"
+                        defaultMessage="Templates"
+                      />
+                    </MenuItemOption>
+                  </MenuOptionGroup>
+                </MenuList>
+              </Portal>
+            </Menu>
+          </Box>
+          <Spacer />
+          <Flex gap={2}>
+            <RestrictedFeaturePopover isRestricted={me.role === "COLLABORATOR"}>
+              <Button
+                display={{ base: "none", md: "block" }}
+                onClick={handleCreateFolder}
+                isDisabled={me.role === "COLLABORATOR"}
+              >
+                <FormattedMessage
+                  id="page.petitions-list.create-folder"
+                  defaultMessage="Create folder"
+                />
+              </Button>
+            </RestrictedFeaturePopover>
+            <RestrictedFeaturePopover
+              isRestricted={me.role === "COLLABORATOR" && state.type === "TEMPLATE"}
             >
-              {state.type === "PETITION"
-                ? intl.formatMessage({
-                    id: "generic.parallel-type-plural",
-                    defaultMessage: "Parallels",
-                  })
-                : intl.formatMessage({
-                    id: "generic.template-type-plural",
-                    defaultMessage: "Templates",
-                  })}
-            </MenuButton>
-            <Portal>
-              <MenuList minWidth="154px">
-                <MenuOptionGroup value={state.type}>
-                  <MenuItemOption value="PETITION" onClick={() => handleTypeChange("PETITION")}>
+              <Button
+                display={{ base: "none", md: "block" }}
+                colorScheme="primary"
+                onClick={handleCreateNewParallelOrTemplate}
+                isDisabled={me.role === "COLLABORATOR" && state.type === "TEMPLATE"}
+              >
+                {state.type === "PETITION" ? (
+                  <FormattedMessage id="generic.new-petition" defaultMessage="New parallel" />
+                ) : (
+                  <FormattedMessage
+                    id="page.petitions-list.new-template"
+                    defaultMessage="New template"
+                  />
+                )}
+              </Button>
+            </RestrictedFeaturePopover>
+            <Menu>
+              <MenuButton
+                as={IconButtonWithTooltip}
+                display={{ base: "flex", md: "none" }}
+                colorScheme="primary"
+                icon={<AddIcon />}
+                label={intl.formatMessage({
+                  id: "page.petitions-list.create-button",
+                  defaultMessage: "New",
+                })}
+              />
+              <Portal>
+                <MenuList minWidth="fit-content">
+                  <MenuItem onClick={handleCreateFolder} isDisabled={me.role === "COLLABORATOR"}>
                     <FormattedMessage
-                      id="generic.parallel-type-plural"
-                      defaultMessage="Parallels"
+                      id="page.petitions-list.create-folder"
+                      defaultMessage="Create folder"
                     />
-                  </MenuItemOption>
-                  <MenuItemOption value="TEMPLATE" onClick={() => handleTypeChange("TEMPLATE")}>
-                    <FormattedMessage
-                      id="generic.template-type-plural"
-                      defaultMessage="Templates"
-                    />
-                  </MenuItemOption>
-                </MenuOptionGroup>
-              </MenuList>
-            </Portal>
-          </Menu>
-        </Box>
+                  </MenuItem>
+                  <MenuItem
+                    onClick={handleCreateNewParallelOrTemplate}
+                    isDisabled={me.role === "COLLABORATOR" && state.type === "TEMPLATE"}
+                  >
+                    {state.type === "PETITION" ? (
+                      <FormattedMessage id="generic.new-petition" defaultMessage="New parallel" />
+                    ) : (
+                      <FormattedMessage
+                        id="page.petitions-list.new-template"
+                        defaultMessage="New template"
+                      />
+                    )}
+                  </MenuItem>
+                </MenuList>
+              </Portal>
+            </Menu>
+          </Flex>
+        </Flex>
         <Box flex="1">
           <TablePage
             flex="0 1 auto"
@@ -466,7 +586,6 @@ function Petitions() {
                 state={state}
                 onStateChange={setQueryState}
                 onReload={() => refetch()}
-                organizationRole={me.role}
               />
             }
             body={

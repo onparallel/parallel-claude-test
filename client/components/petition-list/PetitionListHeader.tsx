@@ -1,35 +1,20 @@
-import { gql, useMutation } from "@apollo/client";
-import { Box, Button, HStack, MenuItem, MenuList, Stack } from "@chakra-ui/react";
-import { AddIcon, RepeatIcon } from "@parallel/chakra/icons";
-import {
-  OrganizationRole,
-  PetitionListHeader_movePetitionsDocument,
-} from "@parallel/graphql/__types";
+import { Box, HStack, Stack } from "@chakra-ui/react";
+import { RepeatIcon } from "@parallel/chakra/icons";
 import type { PetitionsQueryState } from "@parallel/pages/app/petitions";
-import { useGoToPetition } from "@parallel/utils/goToPetition";
-import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
-import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
-import { useHandleNavigation } from "@parallel/utils/navigation";
 import { QueryStateOf, SetQueryState, useBuildStateUrl } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-import { RestrictedFeaturePopover } from "../common/RestrictedFeaturePopover";
+import { useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
 import { PathBreadcrumbs } from "../common/PathBreadcrumbs";
 import { SearchAllOrCurrentFolder } from "../common/SearchAllOrCurrentFolder";
 import { SearchInput } from "../common/SearchInput";
-import { Spacer } from "../common/Spacer";
-import { useCreateFolderDialog } from "../petition-common/dialogs/CreateFolderDialog";
-import { useNewTemplateDialog } from "../petition-new/dialogs/NewTemplateDialog";
 
 export interface PetitionListHeaderProps {
   shape: QueryStateOf<PetitionsQueryState>;
   state: PetitionsQueryState;
   onStateChange: SetQueryState<Partial<PetitionsQueryState>>;
   onReload: () => void;
-  organizationRole: OrganizationRole;
 }
 
 export function PetitionListHeader({
@@ -37,7 +22,6 @@ export function PetitionListHeader({
   state,
   onStateChange,
   onReload,
-  organizationRole,
 }: PetitionListHeaderProps) {
   const intl = useIntl();
   const [search, setSearch] = useState(state.search ?? "");
@@ -71,71 +55,6 @@ export function PetitionListHeader({
     }));
   };
 
-  const showCreateFolderDialog = useCreateFolderDialog();
-  const [movePetitions] = useMutation(PetitionListHeader_movePetitionsDocument);
-  const handleCreateFolder = async () => {
-    try {
-      const data = await showCreateFolderDialog({
-        isTemplate: state.type === "TEMPLATE",
-        currentPath: state.path,
-      });
-      await movePetitions({
-        variables: {
-          ids: data.petitions.map((p) => p.id),
-          source: state.path,
-          destination: `${state.path}${data.name}/`,
-          type: state.type,
-        },
-        onCompleted: () => {
-          onReload();
-        },
-      });
-    } catch {}
-  };
-
-  const createPetition = useCreatePetition();
-  const goToPetition = useGoToPetition();
-  const clonePetitions = useClonePetitions();
-  const showNewTemplateDialog = useNewTemplateDialog();
-
-  const handleCreateTemplate = useCallback(async () => {
-    try {
-      const id = await createPetition({ type: "TEMPLATE", path: state.path });
-      goToPetition(id, "compose", { query: { new: "" } });
-    } catch {}
-  }, [goToPetition, createPetition, state.path]);
-
-  const navigate = useHandleNavigation();
-  const handleCreateNewParallelOrTemplate = async () => {
-    try {
-      if (state.type === "PETITION") {
-        navigate(`/app/petitions/new`);
-      } else {
-        const templateId = await showNewTemplateDialog();
-        if (!templateId) {
-          handleCreateTemplate();
-        } else {
-          const petitionIds = await clonePetitions({
-            petitionIds: [templateId],
-            keepTitle: true,
-            path: state.path,
-          });
-          goToPetition(petitionIds[0], "compose", { query: { new: "" } });
-        }
-      }
-    } catch {}
-  };
-
-  const newParallelOrTemplateLiteral =
-    state.type === "PETITION" ? (
-      <FormattedMessage id="generic.new-petition" defaultMessage="New parallel" />
-    ) : (
-      <FormattedMessage
-        id="component.petition-list-header.new-template"
-        defaultMessage="New template"
-      />
-    );
-
   return (
     <Stack padding={2}>
       <HStack>
@@ -152,55 +71,6 @@ export function PetitionListHeader({
         <Box flex="0 1 400px">
           <SearchInput value={search ?? ""} onChange={handleSearchChange} />
         </Box>
-        <Spacer />
-        <RestrictedFeaturePopover isRestricted={organizationRole === "COLLABORATOR"}>
-          <Button
-            display={{ base: "none", lg: "block" }}
-            onClick={handleCreateFolder}
-            isDisabled={organizationRole === "COLLABORATOR"}
-          >
-            <FormattedMessage
-              id="component.petition-list-header.create-folder"
-              defaultMessage="Create folder"
-            />
-          </Button>
-        </RestrictedFeaturePopover>
-        <RestrictedFeaturePopover
-          isRestricted={organizationRole === "COLLABORATOR" && state.type === "TEMPLATE"}
-        >
-          <Button
-            display={{ base: "none", lg: "block" }}
-            colorScheme="primary"
-            onClick={handleCreateNewParallelOrTemplate}
-            isDisabled={organizationRole === "COLLABORATOR" && state.type === "TEMPLATE"}
-          >
-            {newParallelOrTemplateLiteral}
-          </Button>
-        </RestrictedFeaturePopover>
-        <MoreOptionsMenuButton
-          display={{ base: "block", lg: "none" }}
-          colorScheme="primary"
-          icon={<AddIcon />}
-          options={
-            <MenuList minWidth="fit-content">
-              <MenuItem
-                onClick={handleCreateFolder}
-                isDisabled={organizationRole === "COLLABORATOR"}
-              >
-                <FormattedMessage
-                  id="component.petition-list-header.create-folder"
-                  defaultMessage="Create folder"
-                />
-              </MenuItem>
-              <MenuItem
-                onClick={handleCreateNewParallelOrTemplate}
-                isDisabled={organizationRole === "COLLABORATOR" && state.type === "TEMPLATE"}
-              >
-                {newParallelOrTemplateLiteral}
-              </MenuItem>
-            </MenuList>
-          }
-        />
       </HStack>
       {state.search ? (
         <SearchAllOrCurrentFolder
@@ -219,23 +89,3 @@ export function PetitionListHeader({
     </Stack>
   );
 }
-
-const _mutations = [
-  gql`
-    mutation PetitionListHeader_movePetitions(
-      $ids: [GID!]
-      $folderIds: [ID!]
-      $source: String!
-      $destination: String!
-      $type: PetitionBaseType!
-    ) {
-      movePetitions(
-        ids: $ids
-        folderIds: $folderIds
-        source: $source
-        destination: $destination
-        type: $type
-      )
-    }
-  `,
-];

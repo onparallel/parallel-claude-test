@@ -10358,16 +10358,6 @@ export type SettingsRowAlias_PetitionFieldFragment = {
   options: { [key: string]: any };
 };
 
-export type PetitionListHeader_movePetitionsMutationVariables = Exact<{
-  ids?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  folderIds?: InputMaybe<Array<Scalars["ID"]> | Scalars["ID"]>;
-  source: Scalars["String"];
-  destination: Scalars["String"];
-  type: PetitionBaseType;
-}>;
-
-export type PetitionListHeader_movePetitionsMutation = { movePetitions: Success };
-
 export type PetitionListTagFilter_TagFragment = {
   __typename?: "Tag";
   id: string;
@@ -31331,26 +31321,6 @@ export const DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument = 
 ` as unknown as DocumentNode<
   DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation,
   DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables
->;
-export const PetitionListHeader_movePetitionsDocument = gql`
-  mutation PetitionListHeader_movePetitions(
-    $ids: [GID!]
-    $folderIds: [ID!]
-    $source: String!
-    $destination: String!
-    $type: PetitionBaseType!
-  ) {
-    movePetitions(
-      ids: $ids
-      folderIds: $folderIds
-      source: $source
-      destination: $destination
-      type: $type
-    )
-  }
-` as unknown as DocumentNode<
-  PetitionListHeader_movePetitionsMutation,
-  PetitionListHeader_movePetitionsMutationVariables
 >;
 export const PetitionListTagFilter_tagsDocument = gql`
   query PetitionListTagFilter_tags($search: String) {
