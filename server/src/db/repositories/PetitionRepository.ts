@@ -4825,6 +4825,31 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
+  async updatePetitionAttachmentType(
+    petitionId: number,
+    attachmentId: number,
+    newType: PetitionAttachmentType,
+    updatedBy: string
+  ) {
+    const [attachment] = await this.raw<PetitionAttachment>(
+      /* sql */ `
+          with max_pos as (
+            select coalesce(max(position) + 1, 0) as position from petition_attachment where petition_id = ? and type = ? and deleted_at is null
+          ) update petition_attachment pa set
+            type = ?,
+            position = mp.position, 
+            updated_at = NOW(),
+            updated_by = ?
+            from max_pos mp
+            where pa.id = ?
+            and pa.deleted_at is null
+            returning *;
+      `,
+      [petitionId, newType, newType, updatedBy, attachmentId]
+    );
+    return attachment;
+  }
+
   readonly loadPublicPetitionLink = this.buildLoadBy("public_petition_link", "id");
 
   readonly loadPublicPetitionLinkBySlug = this.buildLoadBy("public_petition_link", "slug");

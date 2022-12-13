@@ -755,6 +755,64 @@ describe("GraphQL/PetitionAttachments", () => {
     });
   });
 
+  describe("updatePetitionAttachmentType", () => {
+    it("changes the type of an attachment and places it in last position", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const coverAttachments = await mocks.createPetitionAttachment(petition.id, "COVER", 2);
+      const annexAttachments = await mocks.createPetitionAttachment(petition.id, "ANNEX", 2);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $attachmentId: GID!, $type: PetitionAttachmentType!) {
+            updatePetitionAttachmentType(
+              petitionId: $petitionId
+              attachmentId: $attachmentId
+              type: $type
+            ) {
+              id
+              petition {
+                id
+                attachmentsList {
+                  COVER {
+                    id
+                  }
+                  ANNEX {
+                    id
+                  }
+                  BACK {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          attachmentId: toGlobalId("PetitionAttachment", coverAttachments[0].id),
+          type: "ANNEX",
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updatePetitionAttachmentType).toEqual({
+        id: toGlobalId("PetitionAttachment", coverAttachments[0].id),
+        petition: {
+          id: toGlobalId("Petition", petition.id),
+          attachmentsList: {
+            COVER: [{ id: toGlobalId("PetitionAttachment", coverAttachments[1].id) }],
+            ANNEX: [
+              { id: toGlobalId("PetitionAttachment", annexAttachments[0].id) },
+              { id: toGlobalId("PetitionAttachment", annexAttachments[1].id) },
+              { id: toGlobalId("PetitionAttachment", coverAttachments[0].id) },
+            ],
+            BACK: [],
+          },
+        },
+      });
+    });
+  });
+
   describe("createPetition", () => {
     it("creates a petition from a template with attachments", async () => {
       const [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({

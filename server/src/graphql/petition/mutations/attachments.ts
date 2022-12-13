@@ -317,3 +317,25 @@ export const reorderPetitionAttachments = mutationField("reorderPetitionAttachme
     return petition;
   },
 });
+
+export const updatePetitionAttachmentType = mutationField("updatePetitionAttachmentType", {
+  description: "Updates the type of a petition attachment and sets it in the final position",
+  type: "PetitionAttachment",
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionAttachmentBelongsToPetition("petitionId", "attachmentId")
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    attachmentId: nonNull(globalIdArg("PetitionAttachment")),
+    type: nonNull("PetitionAttachmentType"),
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.updatePetitionAttachmentType(
+      args.petitionId,
+      args.attachmentId,
+      args.type,
+      `User:${ctx.user!.id}`
+    );
+  },
+});

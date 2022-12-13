@@ -1794,6 +1794,15 @@ type Mutation {
   updatePetition(data: UpdatePetitionInput!, petitionId: GID!): PetitionBase!
 
   """
+  Updates the type of a petition attachment and sets it in the final position
+  """
+  updatePetitionAttachmentType(
+    attachmentId: GID!
+    petitionId: GID!
+    type: PetitionAttachmentType!
+  ): PetitionAttachment!
+
+  """
   Updates a petition field.
   """
   updatePetitionField(

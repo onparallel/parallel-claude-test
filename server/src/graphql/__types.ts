@@ -1369,6 +1369,7 @@ export interface NexusGenFieldTypes {
     updateOrganizationUser: NexusGenRootTypes["User"]; // User!
     updateOrganizationUserLimit: NexusGenRootTypes["Organization"]; // Organization!
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
+    updatePetitionAttachmentType: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
     updatePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -3111,6 +3112,7 @@ export interface NexusGenFieldTypeNames {
     updateOrganizationUser: "User";
     updateOrganizationUserLimit: "Organization";
     updatePetition: "PetitionBase";
+    updatePetitionAttachmentType: "PetitionAttachment";
     updatePetitionField: "PetitionField";
     updatePetitionFieldComment: "PetitionFieldComment";
     updatePetitionFieldRepliesStatus: "PetitionField";
@@ -5170,6 +5172,12 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["UpdatePetitionInput"]; // UpdatePetitionInput!
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    updatePetitionAttachmentType: {
+      // args
+      attachmentId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      type: NexusGenEnums["PetitionAttachmentType"]; // PetitionAttachmentType!
     };
     updatePetitionField: {
       // args
