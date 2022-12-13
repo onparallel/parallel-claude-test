@@ -22,9 +22,6 @@ export function AdminOrganizationsListTableHeader({
 
   return (
     <Stack direction="row" alignItems="center" padding={2}>
-      <Box flex="0 1 400px">
-        <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
-      </Box>
       <IconButtonWithTooltip
         onClick={onReload}
         icon={<RepeatIcon />}
@@ -35,6 +32,9 @@ export function AdminOrganizationsListTableHeader({
           defaultMessage: "Reload",
         })}
       />
+      <Box flex="0 1 400px">
+        <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
+      </Box>
       <Spacer />
       <Box>
         <Button colorScheme="primary" onClick={onCreateClick}>

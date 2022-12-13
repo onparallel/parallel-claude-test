@@ -139,9 +139,6 @@ export function PetitionListHeader({
   return (
     <Stack padding={2}>
       <HStack>
-        <Box flex="0 1 400px">
-          <SearchInput value={search ?? ""} onChange={handleSearchChange} />
-        </Box>
         <IconButtonWithTooltip
           onClick={() => onReload()}
           icon={<RepeatIcon />}
@@ -152,6 +149,9 @@ export function PetitionListHeader({
             defaultMessage: "Reload",
           })}
         />
+        <Box flex="0 1 400px">
+          <SearchInput value={search ?? ""} onChange={handleSearchChange} />
+        </Box>
         <Spacer />
         <RestrictedFeaturePopover isRestricted={organizationRole === "COLLABORATOR"}>
           <Button

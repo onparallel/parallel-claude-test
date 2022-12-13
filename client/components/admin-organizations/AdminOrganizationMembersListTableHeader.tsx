@@ -24,9 +24,6 @@ export function AdminOrganizationMembersListTableHeader({
 
   return (
     <Stack direction="row" alignItems="center" padding={2}>
-      <Box flex="0 1 400px">
-        <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
-      </Box>
       <IconButtonWithTooltip
         onClick={onReload}
         icon={<RepeatIcon />}
@@ -37,6 +34,9 @@ export function AdminOrganizationMembersListTableHeader({
           defaultMessage: "Reload",
         })}
       />
+      <Box flex="0 1 400px">
+        <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
+      </Box>
       {hasSsoProvider ? (
         <Badge colorScheme="primary">
           <FormattedMessage

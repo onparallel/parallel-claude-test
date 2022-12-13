@@ -29,9 +29,6 @@ export function OrganizationUsersListTableHeader({
 
   return (
     <Stack direction="row" padding={2}>
-      <Box flex="0 1 400px">
-        <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
-      </Box>
       <IconButtonWithTooltip
         onClick={onReload}
         icon={<RepeatIcon />}
@@ -42,6 +39,9 @@ export function OrganizationUsersListTableHeader({
           defaultMessage: "Reload",
         })}
       />
+      <Box flex="0 1 400px">
+        <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
+      </Box>
       <WhenOrgRole role="ADMIN">
         <Spacer />
         {hasSsoProvider ? null : (
