@@ -546,6 +546,8 @@ export type Mutation = {
   addPetitionPermission: Array<PetitionBase>;
   /** Add users to a user group */
   addUsersToUserGroup: UserGroup;
+  /** Anonymizes a petition */
+  anonymizePetition: SupportMethodResponse;
   /** Updates the status of a PENDING petition field replies to APPROVED or REJECTED */
   approveOrRejectPetitionFieldReplies: Petition;
   /** Clones the petition and assigns the given user as owner and creator. */
@@ -885,6 +887,10 @@ export type MutationaddPetitionPermissionArgs = {
 export type MutationaddUsersToUserGroupArgs = {
   userGroupId: Scalars["GID"];
   userIds: Array<Scalars["GID"]>;
+};
+
+export type MutationanonymizePetitionArgs = {
+  petitionId: Scalars["GID"];
 };
 
 export type MutationapproveOrRejectPetitionFieldRepliesArgs = {

@@ -6,6 +6,34 @@ export const supportMethods: {
 }[] = [
   {
     field: {
+      name: "anonymizePetition",
+      description: "Anonymizes a petition",
+      args: [
+        {
+          name: "petitionId",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "assignPetitionToUser",
       description: "Clones the petition and assigns the given user as owner and creator.",
       args: [

@@ -466,3 +466,21 @@ export const restoreDeletedPetition = mutationField("restoreDeletedPetition", {
     return { result: RESULT.FAILURE, message: "We can't restore this petition :(" };
   },
 });
+
+export const anonymizePetition = mutationField("anonymizePetition", {
+  description: "Anonymizes a petition",
+  type: "SupportMethodResponse",
+  authorize: supportMethodAccess(),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+  },
+  resolve: async (_, { petitionId }, ctx) => {
+    try {
+      await ctx.petitions.anonymizePetition(petitionId);
+      return { result: RESULT.SUCCESS, message: "Petition anonymized successfully" };
+    } catch (e) {
+      ctx.logger.error(e);
+    }
+    return { result: RESULT.FAILURE, message: "Something went wrong..." };
+  },
+});

@@ -1217,6 +1217,7 @@ export interface NexusGenFieldTypes {
     activateUser: NexusGenRootTypes["User"][]; // [User!]!
     addPetitionPermission: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     addUsersToUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
+    anonymizePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     approveOrRejectPetitionFieldReplies: NexusGenRootTypes["Petition"]; // Petition!
     assignPetitionToUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     bulkCreateContacts: NexusGenRootTypes["BulkCreateContactsReturnType"]; // BulkCreateContactsReturnType!
@@ -2940,6 +2941,7 @@ export interface NexusGenFieldTypeNames {
     activateUser: "User";
     addPetitionPermission: "PetitionBase";
     addUsersToUserGroup: "UserGroup";
+    anonymizePetition: "SupportMethodResponse";
     approveOrRejectPetitionFieldReplies: "Petition";
     assignPetitionToUser: "SupportMethodResponse";
     bulkCreateContacts: "BulkCreateContactsReturnType";
@@ -4342,6 +4344,10 @@ export interface NexusGenArgTypes {
       // args
       userGroupId: NexusGenScalars["GID"]; // GID!
       userIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    anonymizePetition: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     approveOrRejectPetitionFieldReplies: {
       // args
