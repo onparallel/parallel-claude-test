@@ -383,7 +383,7 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
   const date = message?.sentAt ?? createdAt;
   const hasUnreadComments = petition.hasUnreadComments;
   const { replied, optional, total } = petition.progress;
-  const title = message?.subject ?? petition.fields[0].title;
+  const title = message?.subject;
   return (
     <LinkBox>
       <HStack
@@ -527,10 +527,6 @@ const _fragments = {
         status
         tone
         hasUnreadComments
-        fields {
-          id
-          title
-        }
         progress {
           total
           replied

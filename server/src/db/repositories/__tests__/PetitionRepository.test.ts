@@ -1010,11 +1010,9 @@ describe("repositories/PetitionRepository", () => {
         expect(messages.length).toBeGreaterThan(0);
         expect(reminders.length).toBeGreaterThan(0);
 
-        expect(
-          messages.every(
-            (m) => m.email_body === null && m.email_subject === null && m.anonymized_at !== null
-          )
-        ).toEqual(true);
+        expect(messages.every((m) => m.email_body === null && m.anonymized_at !== null)).toEqual(
+          true
+        );
 
         expect(reminders.every((r) => r.email_body === null && r.anonymized_at !== null)).toEqual(
           true

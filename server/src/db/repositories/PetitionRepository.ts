@@ -5096,7 +5096,6 @@ export class PetitionRepository extends BaseRepository {
         {
           anonymized_at: this.now(),
           email_body: null,
-          email_subject: null,
         },
         "*"
       );

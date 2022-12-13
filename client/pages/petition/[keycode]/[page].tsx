@@ -61,6 +61,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 
 type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getInitialProps>>;
 
@@ -231,8 +232,8 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
           brandTheme={granter.organization.brandTheme}
         >
           <Head>
-            {fields[0]?.type === "HEADING" && fields[0].title ? (
-              <title>{`${fields[0].title} | ${titleOrgName}`}</title>
+            {isDefined(message) ? (
+              <title>{`${message.subject!} | ${titleOrgName}`}</title>
             ) : (
               <title>{titleOrgName}</title>
             )}

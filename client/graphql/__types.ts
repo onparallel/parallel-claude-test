@@ -23751,7 +23751,6 @@ export type RecipientPortal_PublicPetitionFragment = {
   status: PetitionStatus;
   tone: Tone;
   hasUnreadComments: boolean;
-  fields: Array<{ __typename?: "PublicPetitionField"; id: string; title?: string | null }>;
   progress: {
     __typename?: "PublicPetitionFieldProgress";
     total: number;
@@ -23795,7 +23794,6 @@ export type RecipientPortal_PublicPetitionAccessFragment = {
     status: PetitionStatus;
     tone: Tone;
     hasUnreadComments: boolean;
-    fields: Array<{ __typename?: "PublicPetitionField"; id: string; title?: string | null }>;
     progress: {
       __typename?: "PublicPetitionFieldProgress";
       total: number;
@@ -23852,7 +23850,6 @@ export type RecipientPortal_accessQuery = {
       status: PetitionStatus;
       tone: Tone;
       hasUnreadComments: boolean;
-      fields: Array<{ __typename?: "PublicPetitionField"; id: string; title?: string | null }>;
       progress: {
         __typename?: "PublicPetitionFieldProgress";
         total: number;
@@ -23927,7 +23924,6 @@ export type RecipientPortal_accessesQuery = {
         status: PetitionStatus;
         tone: Tone;
         hasUnreadComments: boolean;
-        fields: Array<{ __typename?: "PublicPetitionField"; id: string; title?: string | null }>;
         progress: {
           __typename?: "PublicPetitionFieldProgress";
           total: number;
@@ -30185,10 +30181,6 @@ export const RecipientPortal_PublicPetitionFragmentDoc = gql`
     status
     tone
     hasUnreadComments
-    fields {
-      id
-      title
-    }
     progress {
       total
       replied
