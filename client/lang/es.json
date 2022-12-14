@@ -2700,6 +2700,11 @@
     "context": "There was an error uploading the file. Please try again."
   },
   {
+    "term": "component.petition-compose-attachments.files-limit-reached",
+    "definition": "Se ha llegado al limite de {limit} archivos adjuntos.",
+    "context": "The limit of {limit} attachments has been reached."
+  },
+  {
     "term": "component.petition-compose-attachments.header",
     "definition": "Adjuntos del documento",
     "context": "Document attachments"

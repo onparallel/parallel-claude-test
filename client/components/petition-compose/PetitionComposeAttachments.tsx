@@ -59,6 +59,7 @@ import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { Divider } from "../common/Divider";
 import { FileName } from "../common/FileName";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { RestrictedFeaturePopover } from "../common/RestrictedFeaturePopover";
 import { PetitionComposeDragActiveIndicator } from "./PetitionComposeDragActiveIndicator";
 
 const MAX_FILE_SIZE = 1024 * 1024 * 50;
@@ -169,7 +170,7 @@ export function PetitionComposeAttachments({
     );
   };
 
-  const handleReorderAttachments = useDebouncedAsync(
+  const debouncedReorderPetitionAttachments = useDebouncedAsync(
     async (attachmentType: PetitionAttachmentType, attachmentIds: string[]) => {
       await reorderPetitionAttachments({
         variables: { petitionId, attachmentIds, attachmentType },
@@ -178,6 +179,21 @@ export function PetitionComposeAttachments({
     600,
     []
   );
+
+  const handleReorderAttachments = async (
+    attachmentType: PetitionAttachmentType,
+    attachmentIds: string[]
+  ) => {
+    try {
+      await debouncedReorderPetitionAttachments(attachmentType, attachmentIds);
+    } catch (e) {
+      if (e === "DEBOUNCED") {
+        return "DEBOUNCED";
+      } else {
+        throw e;
+      }
+    }
+  };
 
   const handleChangeType = async (attachmentId: string, type: PetitionAttachmentType) => {
     await updatePetitionAttachmentType({
@@ -333,14 +349,29 @@ export function PetitionComposeAttachments({
       ) : null}
       <CardHeader
         rightAction={
-          <IconButtonWithTooltip
-            icon={<AddIcon />}
-            label={intl.formatMessage({
-              id: "component.petition-compose-attachments.add-attachment",
-              defaultMessage: "Add attachment",
-            })}
-            onClick={open}
-          />
+          <RestrictedFeaturePopover
+            isRestricted={allAttachments.length > 9}
+            borderRadius="xl"
+            content={
+              <Text>
+                <FormattedMessage
+                  id="component.petition-compose-attachments.files-limit-reached"
+                  defaultMessage="The limit of {limit} attachments has been reached."
+                  values={{ limit: 10 }}
+                />
+              </Text>
+            }
+          >
+            <IconButtonWithTooltip
+              icon={<AddIcon />}
+              label={intl.formatMessage({
+                id: "component.petition-compose-attachments.add-attachment",
+                defaultMessage: "Add attachment",
+              })}
+              onClick={open}
+              isDisabled={allAttachments.length > 9}
+            />
+          </RestrictedFeaturePopover>
         }
       >
         <FormattedMessage
@@ -674,7 +705,7 @@ function AttachmentItem({
 
   useEffect(() => {
     // if the index inside the same type changes we reorder the attachments.
-    if (index !== prevIndex.current && item.type === prevType.current) {
+    if (index !== prevIndex.current && item.type === prevType.current && isAnimated) {
       onReorder();
     }
     prevIndex.current = index;
@@ -715,6 +746,7 @@ function AttachmentItem({
           },
         }}
         position="relative"
+        userSelect="none"
       >
         <Box
           className="drag-handle"
