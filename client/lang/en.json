@@ -2670,6 +2670,91 @@
     "context": "Briefly describe the purpose of the data processing."
   },
   {
+    "term": "component.petition-compose-attachments.add-attachment",
+    "definition": "Add attachment",
+    "context": "Add attachment"
+  },
+  {
+    "term": "component.petition-compose-attachments.annex",
+    "definition": "Annex",
+    "context": "Annex"
+  },
+  {
+    "term": "component.petition-compose-attachments.back-cover",
+    "definition": "Back cover",
+    "context": "Back cover"
+  },
+  {
+    "term": "component.petition-compose-attachments.cover",
+    "definition": "Cover",
+    "context": "Cover"
+  },
+  {
+    "term": "component.petition-compose-attachments.file-incomplete",
+    "definition": "There was an error uploading the file. Please try again.",
+    "context": "There was an error uploading the file. Please try again."
+  },
+  {
+    "term": "component.petition-compose-attachments.header",
+    "definition": "Document attachments",
+    "context": "Document attachments"
+  },
+  {
+    "term": "component.petition-compose-attachments.invalid-attachment-header",
+    "definition": "Invalid attachment",
+    "context": "Invalid attachment"
+  },
+  {
+    "term": "component.petition-compose-attachments.invalid-attachment-message",
+    "definition": "Only PDF attachments up to {size} are allowed.",
+    "context": "Only PDF attachments up to {size} are allowed."
+  },
+  {
+    "term": "component.petition-compose-attachments.large-files-alert",
+    "definition": "<b>Heavy files.</b> Large files may cause problems when starting the signature. We recommend to compress the uploaded files and not to exceed {size}.",
+    "context": "<b>Heavy files.</b> Large files may cause problems when starting the signature. We recommend to compress the uploaded files and not to exceed {size}."
+  },
+  {
+    "term": "component.petition-compose-attachments.no-attachments-uploaded",
+    "definition": "No attachments have been uploaded yet",
+    "context": "No attachments have been uploaded yet"
+  },
+  {
+    "term": "component.petition-compose-attachments.petition-with-document-fields-alert",
+    "definition": "{type, select, TEMPLATE {This template} other {This parallel}} has document fields set up to attach your responses to the pdf. They will be included in the final document after the attachments.",
+    "context": "{type, select, TEMPLATE {This template} other {This parallel}} has document fields set up to attach your responses to the pdf. They will be included in the final document after the attachments."
+  },
+  {
+    "term": "component.petition-compose-attachments.prefix-back-cover",
+    "definition": "Back cover {index}:",
+    "context": "Back cover {index}:"
+  },
+  {
+    "term": "component.petition-compose-attachments.prefix-cover",
+    "definition": "Cover {index}:",
+    "context": "Cover {index}:"
+  },
+  {
+    "term": "component.petition-compose-attachments.preview",
+    "definition": "Preview file. ⇧ + click to download",
+    "context": "Preview file. ⇧ + click to download"
+  },
+  {
+    "term": "component.petition-compose-attachments.remove",
+    "definition": "Remove attachment",
+    "context": "Remove attachment"
+  },
+  {
+    "term": "component.petition-compose-attachments.too-many-attachments",
+    "definition": "A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field",
+    "context": "A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
+  },
+  {
+    "term": "component.petition-compose-attachments.too-many-attachments-header",
+    "definition": "Too many attachments",
+    "context": "Too many attachments"
+  },
+  {
     "term": "component.petition-compose-field-attachment.label",
     "definition": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete.",
     "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
@@ -3698,46 +3783,6 @@
     "term": "component.petition-tag-list-cell-content.tags-x-more",
     "definition": "and <b>{extra} more</b>",
     "context": "and <b>{extra} more</b>"
-  },
-  {
-    "term": "component.petition-template-attachments.add-attachment",
-    "definition": "Add attachment",
-    "context": "Add attachment"
-  },
-  {
-    "term": "component.petition-template-attachments.annex",
-    "definition": "Annex",
-    "context": "Annex"
-  },
-  {
-    "term": "component.petition-template-attachments.back-cover",
-    "definition": "Back cover",
-    "context": "Back cover"
-  },
-  {
-    "term": "component.petition-template-attachments.cover",
-    "definition": "Cover",
-    "context": "Cover"
-  },
-  {
-    "term": "component.petition-template-attachments.header",
-    "definition": "Document attachments",
-    "context": "Document attachments"
-  },
-  {
-    "term": "component.petition-template-attachments.no-attachments-uploaded",
-    "definition": "No attachments have been uploaded yet",
-    "context": "No attachments have been uploaded yet"
-  },
-  {
-    "term": "component.petition-template-attachments.preview",
-    "definition": "Preview file. ⇧ + click to download",
-    "context": "Preview file. ⇧ + click to download"
-  },
-  {
-    "term": "component.petition-template-attachments.remove",
-    "definition": "Remove attachment",
-    "context": "Remove attachment"
   },
   {
     "term": "component.petition-template-closing-message.card-explainer",

@@ -6,3 +6,6 @@ extend type PetitionField {
 extend type PetitionFieldAttachment {
   isUploading: Boolean!
 }
+extend type PetitionAttachment {
+  isUploading: Boolean!
+}

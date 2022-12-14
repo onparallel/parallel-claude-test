@@ -35,7 +35,7 @@ import {
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionSettings } from "@parallel/components/petition-compose/PetitionSettings";
-import { PetitionTemplateAttachments } from "@parallel/components/petition-compose/PetitionTemplateAttachments";
+import { PetitionComposeAttachments } from "@parallel/components/petition-compose/PetitionComposeAttachments";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";
 import { cleanPreviewFieldReplies } from "@parallel/components/petition-preview/clientMutations";
@@ -73,6 +73,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 
 type PetitionComposeProps = UnwrapPromise<ReturnType<typeof PetitionCompose.getInitialProps>>;
 
@@ -565,14 +566,16 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               isTemplate={petition?.__typename === "PetitionTemplate"}
             />
 
-            {petition?.__typename === "PetitionTemplate" ? (
-              <PetitionTemplateAttachments
-                petitionId={petition.id}
-                marginTop="4"
-                onUpdatePetition={handleUpdatePetition}
-                isReadOnly={isReadOnly}
-              />
-            ) : null}
+            <PetitionComposeAttachments
+              petitionId={petition.id}
+              marginTop="4"
+              isTemplate={petition?.__typename === "PetitionTemplate"}
+              attachmentsList={petition.attachmentsList}
+              hasDocumentFieldsWithAttachments={petition.fields.some(
+                (field) => isFileTypeField(field.type) && field.options.attachToPdf
+              )}
+              isReadOnly={isReadOnly}
+            />
 
             {petition?.__typename === "PetitionTemplate" ? (
               <PetitionTemplateDescriptionEdit
@@ -619,6 +622,7 @@ PetitionCompose.fragments = {
         id
         ...PetitionLayout_PetitionBase
         ...PetitionSettings_PetitionBase
+        ...PetitionComposeAttachments_PetitionBase
         organization {
           id
           brandTheme {
@@ -655,6 +659,7 @@ PetitionCompose.fragments = {
         isAnonymized
       }
       ${useSendPetitionHandler.fragments.Petition}
+      ${PetitionComposeAttachments.fragments.PetitionBase}
       ${PetitionLayout.fragments.PetitionBase}
       ${PetitionSettings.fragments.PetitionBase}
       ${this.PetitionField}

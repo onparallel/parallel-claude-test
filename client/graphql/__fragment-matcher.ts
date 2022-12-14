@@ -6,7 +6,6 @@ export interface PossibleTypesResultData {
 const result: PossibleTypesResultData = {
   possibleTypes: {
     CreatedAt: [
-      "PetitionAttachment",
       "PetitionFieldAttachment",
       "PetitionMessage",
       "PetitionReminder",

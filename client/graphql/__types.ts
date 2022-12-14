@@ -689,7 +689,7 @@ export interface Mutation {
   /** Soft-deletes any given petition on the database. */
   deletePetition: SupportMethodResponse;
   /** Remove a petition attachment */
-  deletePetitionAttachment: Result;
+  deletePetitionAttachment: PetitionBase;
   /** Deletes a petition field. */
   deletePetitionField: PetitionBase;
   /** Remove a petition field attachment */
@@ -796,6 +796,8 @@ export interface Mutation {
   renameFolder: Success;
   /** Reopens the petition */
   reopenPetition: Petition;
+  /** Reorders the positions of attachments in the petition */
+  reorderPetitionAttachments: PetitionBase;
   /** Sends the AccountVerification email with confirmation code to unconfirmed user emails */
   resendVerificationCode: Result;
   /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
@@ -868,6 +870,8 @@ export interface Mutation {
   updateOrganizationUserLimit: Organization;
   /** Updates a petition. */
   updatePetition: PetitionBase;
+  /** Updates the type of a petition attachment and sets it in the final position */
+  updatePetitionAttachmentType: PetitionAttachment;
   /** Updates a petition field. */
   updatePetitionField: PetitionField;
   /** Update a petition field comment. */
@@ -1100,6 +1104,7 @@ export interface MutationcreatePetitionAccessArgs {
 export interface MutationcreatePetitionAttachmentUploadLinkArgs {
   data: FileUploadInput;
   petitionId: Scalars["GID"];
+  type: PetitionAttachmentType;
 }
 
 export interface MutationcreatePetitionFieldArgs {
@@ -1322,6 +1327,7 @@ export interface MutationmovePetitionsArgs {
 export interface MutationpetitionAttachmentDownloadLinkArgs {
   attachmentId: Scalars["GID"];
   petitionId: Scalars["GID"];
+  preview?: InputMaybe<Scalars["Boolean"]>;
 }
 
 export interface MutationpetitionAttachmentUploadCompleteArgs {
@@ -1506,6 +1512,12 @@ export interface MutationrenameFolderArgs {
 }
 
 export interface MutationreopenPetitionArgs {
+  petitionId: Scalars["GID"];
+}
+
+export interface MutationreorderPetitionAttachmentsArgs {
+  attachmentIds: Array<Scalars["GID"]>;
+  attachmentType: PetitionAttachmentType;
   petitionId: Scalars["GID"];
 }
 
@@ -1706,6 +1718,12 @@ export interface MutationupdateOrganizationUserLimitArgs {
 export interface MutationupdatePetitionArgs {
   data: UpdatePetitionInput;
   petitionId: Scalars["GID"];
+}
+
+export interface MutationupdatePetitionAttachmentTypeArgs {
+  attachmentId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+  type: PetitionAttachmentType;
 }
 
 export interface MutationupdatePetitionFieldArgs {
@@ -2117,8 +2135,13 @@ export interface Petition extends PetitionBase {
   anonymizeAfterMonths?: Maybe<Scalars["Int"]>;
   /** Purpose of the anonymization */
   anonymizePurpose?: Maybe<Scalars["String"]>;
-  /** The attachments linked to this petition */
+  /**
+   * The attachments linked to this petition
+   * @deprecated use attachmentsList
+   */
   attachments: Array<PetitionAttachment>;
+  /** The attachments linked to this petition */
+  attachmentsList: PetitionAttachmentsList;
   /** Time when the petition was closed. */
   closedAt?: Maybe<Scalars["DateTime"]>;
   /** The closing email body of the petition. */
@@ -2269,13 +2292,16 @@ export interface PetitionAnonymizedEvent extends PetitionEvent {
   type: PetitionEventType;
 }
 
-export interface PetitionAttachment extends CreatedAt {
+export interface PetitionAttachment {
   __typename?: "PetitionAttachment";
-  /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
   file: FileUpload;
   id: Scalars["GID"];
+  isUploading: Scalars["Boolean"];
+  petition: PetitionBase;
+  type: PetitionAttachmentType;
 }
+
+export type PetitionAttachmentType = "ANNEX" | "BACK" | "COVER";
 
 export interface PetitionAttachmentUploadData {
   __typename?: "PetitionAttachmentUploadData";
@@ -2283,13 +2309,25 @@ export interface PetitionAttachmentUploadData {
   presignedPostData: AWSPresignedPostData;
 }
 
+export interface PetitionAttachmentsList {
+  __typename?: "PetitionAttachmentsList";
+  ANNEX: Array<PetitionAttachment>;
+  BACK: Array<PetitionAttachment>;
+  COVER: Array<PetitionAttachment>;
+}
+
 export interface PetitionBase {
   /** How many months to wait since the petition is closed to anonymize. */
   anonymizeAfterMonths?: Maybe<Scalars["Int"]>;
   /** Purpose of the anonymization */
   anonymizePurpose?: Maybe<Scalars["String"]>;
-  /** The attachments linked to this petition */
+  /**
+   * The attachments linked to this petition
+   * @deprecated use attachmentsList
+   */
   attachments: Array<PetitionAttachment>;
+  /** The attachments linked to this petition */
+  attachmentsList: PetitionAttachmentsList;
   /** The closing email body of the petition. */
   closingEmailBody?: Maybe<Scalars["JSON"]>;
   /** The body of the optional completing message to be show to recipients */
@@ -2943,8 +2981,13 @@ export interface PetitionTemplate extends PetitionBase {
   anonymizeAfterMonths?: Maybe<Scalars["Int"]>;
   /** Purpose of the anonymization */
   anonymizePurpose?: Maybe<Scalars["String"]>;
-  /** The attachments linked to this petition */
+  /**
+   * The attachments linked to this petition
+   * @deprecated use attachmentsList
+   */
   attachments: Array<PetitionAttachment>;
+  /** The attachments linked to this petition */
+  attachmentsList: PetitionAttachmentsList;
   backgroundColor?: Maybe<Scalars["String"]>;
   categories?: Maybe<Array<Scalars["String"]>>;
   /** The closing email body of the petition. */
@@ -9755,6 +9798,534 @@ export type AddFieldPopover_UserFragment = {
   __typename?: "User";
   hasEsTaxDocumentsField: boolean;
   hasDowJonesField: boolean;
+};
+
+export type PetitionComposeAttachments_PetitionAttachmentFragment = {
+  __typename?: "PetitionAttachment";
+  id: string;
+  type: PetitionAttachmentType;
+  isUploading: boolean;
+  file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+};
+
+export type PetitionComposeAttachments_PetitionAttachmentsListFragment = {
+  __typename?: "PetitionAttachmentsList";
+  COVER: Array<{
+    __typename?: "PetitionAttachment";
+    id: string;
+    type: PetitionAttachmentType;
+    isUploading: boolean;
+    file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+  }>;
+  ANNEX: Array<{
+    __typename?: "PetitionAttachment";
+    id: string;
+    type: PetitionAttachmentType;
+    isUploading: boolean;
+    file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+  }>;
+  BACK: Array<{
+    __typename?: "PetitionAttachment";
+    id: string;
+    type: PetitionAttachmentType;
+    isUploading: boolean;
+    file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+  }>;
+};
+
+export type PetitionComposeAttachments_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  attachmentsList: {
+    __typename?: "PetitionAttachmentsList";
+    COVER: Array<{
+      __typename?: "PetitionAttachment";
+      id: string;
+      type: PetitionAttachmentType;
+      isUploading: boolean;
+      file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+    }>;
+    ANNEX: Array<{
+      __typename?: "PetitionAttachment";
+      id: string;
+      type: PetitionAttachmentType;
+      isUploading: boolean;
+      file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+    }>;
+    BACK: Array<{
+      __typename?: "PetitionAttachment";
+      id: string;
+      type: PetitionAttachmentType;
+      isUploading: boolean;
+      file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+    }>;
+  };
+};
+
+export type PetitionComposeAttachments_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  attachmentsList: {
+    __typename?: "PetitionAttachmentsList";
+    COVER: Array<{
+      __typename?: "PetitionAttachment";
+      id: string;
+      type: PetitionAttachmentType;
+      isUploading: boolean;
+      file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+    }>;
+    ANNEX: Array<{
+      __typename?: "PetitionAttachment";
+      id: string;
+      type: PetitionAttachmentType;
+      isUploading: boolean;
+      file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+    }>;
+    BACK: Array<{
+      __typename?: "PetitionAttachment";
+      id: string;
+      type: PetitionAttachmentType;
+      isUploading: boolean;
+      file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+    }>;
+  };
+};
+
+export type PetitionComposeAttachments_PetitionBaseFragment =
+  | PetitionComposeAttachments_PetitionBase_Petition_Fragment
+  | PetitionComposeAttachments_PetitionBase_PetitionTemplate_Fragment;
+
+export type PetitionComposeAttachments_reorderPetitionAttachmentsMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  attachmentType: PetitionAttachmentType;
+  attachmentIds: Array<Scalars["GID"]> | Scalars["GID"];
+}>;
+
+export type PetitionComposeAttachments_reorderPetitionAttachmentsMutation = {
+  reorderPetitionAttachments:
+    | {
+        __typename?: "Petition";
+        id: string;
+        attachmentsList: {
+          __typename?: "PetitionAttachmentsList";
+          COVER: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+          ANNEX: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+          BACK: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+        };
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        attachmentsList: {
+          __typename?: "PetitionAttachmentsList";
+          COVER: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+          ANNEX: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+          BACK: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+        };
+      };
+};
+
+export type PetitionComposeAttachments_createPetitionAttachmentUploadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  data: FileUploadInput;
+  type: PetitionAttachmentType;
+}>;
+
+export type PetitionComposeAttachments_createPetitionAttachmentUploadLinkMutation = {
+  createPetitionAttachmentUploadLink: {
+    __typename?: "PetitionAttachmentUploadData";
+    presignedPostData: {
+      __typename?: "AWSPresignedPostData";
+      url: string;
+      fields: { [key: string]: any };
+    };
+    attachment: {
+      __typename?: "PetitionAttachment";
+      id: string;
+      type: PetitionAttachmentType;
+      isUploading: boolean;
+      file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+    };
+  };
+};
+
+export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  attachmentId: Scalars["GID"];
+  type: PetitionAttachmentType;
+}>;
+
+export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutation = {
+  updatePetitionAttachmentType: {
+    __typename?: "PetitionAttachment";
+    id: string;
+    type: PetitionAttachmentType;
+    isUploading: boolean;
+    petition:
+      | {
+          __typename?: "Petition";
+          id: string;
+          attachmentsList: {
+            __typename?: "PetitionAttachmentsList";
+            COVER: Array<{
+              __typename?: "PetitionAttachment";
+              id: string;
+              type: PetitionAttachmentType;
+              isUploading: boolean;
+              file: {
+                __typename?: "FileUpload";
+                filename: string;
+                size: number;
+                isComplete: boolean;
+              };
+            }>;
+            ANNEX: Array<{
+              __typename?: "PetitionAttachment";
+              id: string;
+              type: PetitionAttachmentType;
+              isUploading: boolean;
+              file: {
+                __typename?: "FileUpload";
+                filename: string;
+                size: number;
+                isComplete: boolean;
+              };
+            }>;
+            BACK: Array<{
+              __typename?: "PetitionAttachment";
+              id: string;
+              type: PetitionAttachmentType;
+              isUploading: boolean;
+              file: {
+                __typename?: "FileUpload";
+                filename: string;
+                size: number;
+                isComplete: boolean;
+              };
+            }>;
+          };
+        }
+      | {
+          __typename?: "PetitionTemplate";
+          id: string;
+          attachmentsList: {
+            __typename?: "PetitionAttachmentsList";
+            COVER: Array<{
+              __typename?: "PetitionAttachment";
+              id: string;
+              type: PetitionAttachmentType;
+              isUploading: boolean;
+              file: {
+                __typename?: "FileUpload";
+                filename: string;
+                size: number;
+                isComplete: boolean;
+              };
+            }>;
+            ANNEX: Array<{
+              __typename?: "PetitionAttachment";
+              id: string;
+              type: PetitionAttachmentType;
+              isUploading: boolean;
+              file: {
+                __typename?: "FileUpload";
+                filename: string;
+                size: number;
+                isComplete: boolean;
+              };
+            }>;
+            BACK: Array<{
+              __typename?: "PetitionAttachment";
+              id: string;
+              type: PetitionAttachmentType;
+              isUploading: boolean;
+              file: {
+                __typename?: "FileUpload";
+                filename: string;
+                size: number;
+                isComplete: boolean;
+              };
+            }>;
+          };
+        };
+    file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+  };
+};
+
+export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  attachmentId: Scalars["GID"];
+}>;
+
+export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation = {
+  petitionAttachmentUploadComplete: {
+    __typename?: "PetitionAttachment";
+    id: string;
+    type: PetitionAttachmentType;
+    isUploading: boolean;
+    petition:
+      | {
+          __typename?: "Petition";
+          id: string;
+          attachmentsList: {
+            __typename?: "PetitionAttachmentsList";
+            COVER: Array<{
+              __typename?: "PetitionAttachment";
+              id: string;
+              type: PetitionAttachmentType;
+              isUploading: boolean;
+              file: {
+                __typename?: "FileUpload";
+                filename: string;
+                size: number;
+                isComplete: boolean;
+              };
+            }>;
+            ANNEX: Array<{
+              __typename?: "PetitionAttachment";
+              id: string;
+              type: PetitionAttachmentType;
+              isUploading: boolean;
+              file: {
+                __typename?: "FileUpload";
+                filename: string;
+                size: number;
+                isComplete: boolean;
+              };
+            }>;
+            BACK: Array<{
+              __typename?: "PetitionAttachment";
+              id: string;
+              type: PetitionAttachmentType;
+              isUploading: boolean;
+              file: {
+                __typename?: "FileUpload";
+                filename: string;
+                size: number;
+                isComplete: boolean;
+              };
+            }>;
+          };
+        }
+      | {
+          __typename?: "PetitionTemplate";
+          id: string;
+          attachmentsList: {
+            __typename?: "PetitionAttachmentsList";
+            COVER: Array<{
+              __typename?: "PetitionAttachment";
+              id: string;
+              type: PetitionAttachmentType;
+              isUploading: boolean;
+              file: {
+                __typename?: "FileUpload";
+                filename: string;
+                size: number;
+                isComplete: boolean;
+              };
+            }>;
+            ANNEX: Array<{
+              __typename?: "PetitionAttachment";
+              id: string;
+              type: PetitionAttachmentType;
+              isUploading: boolean;
+              file: {
+                __typename?: "FileUpload";
+                filename: string;
+                size: number;
+                isComplete: boolean;
+              };
+            }>;
+            BACK: Array<{
+              __typename?: "PetitionAttachment";
+              id: string;
+              type: PetitionAttachmentType;
+              isUploading: boolean;
+              file: {
+                __typename?: "FileUpload";
+                filename: string;
+                size: number;
+                isComplete: boolean;
+              };
+            }>;
+          };
+        };
+    file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+  };
+};
+
+export type PetitionComposeAttachments_deletePetitionAttachmentMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  attachmentId: Scalars["GID"];
+}>;
+
+export type PetitionComposeAttachments_deletePetitionAttachmentMutation = {
+  deletePetitionAttachment:
+    | {
+        __typename?: "Petition";
+        id: string;
+        attachmentsList: {
+          __typename?: "PetitionAttachmentsList";
+          COVER: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+          ANNEX: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+          BACK: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+        };
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        attachmentsList: {
+          __typename?: "PetitionAttachmentsList";
+          COVER: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+          ANNEX: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+          BACK: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+        };
+      };
+};
+
+export type PetitionComposeAttachments_petitionAttachmentDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  attachmentId: Scalars["GID"];
+  preview?: InputMaybe<Scalars["Boolean"]>;
+}>;
+
+export type PetitionComposeAttachments_petitionAttachmentDownloadLinkMutation = {
+  petitionAttachmentDownloadLink: {
+    __typename?: "FileUploadDownloadLinkResult";
+    url?: string | null;
+  };
 };
 
 export type PetitionComposeField_PetitionFieldFragment = {
@@ -17749,6 +18320,30 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   } | null;
   fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
+  attachmentsList: {
+    __typename?: "PetitionAttachmentsList";
+    COVER: Array<{
+      __typename?: "PetitionAttachment";
+      id: string;
+      type: PetitionAttachmentType;
+      isUploading: boolean;
+      file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+    }>;
+    ANNEX: Array<{
+      __typename?: "PetitionAttachment";
+      id: string;
+      type: PetitionAttachmentType;
+      isUploading: boolean;
+      file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+    }>;
+    BACK: Array<{
+      __typename?: "PetitionAttachment";
+      id: string;
+      type: PetitionAttachmentType;
+      isUploading: boolean;
+      file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+    }>;
+  };
   effectivePermissions: Array<{
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
@@ -17861,6 +18456,30 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     | { __typename?: "TemplateDefaultUserPermission"; id: string }
   >;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
+  attachmentsList: {
+    __typename?: "PetitionAttachmentsList";
+    COVER: Array<{
+      __typename?: "PetitionAttachment";
+      id: string;
+      type: PetitionAttachmentType;
+      isUploading: boolean;
+      file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+    }>;
+    ANNEX: Array<{
+      __typename?: "PetitionAttachment";
+      id: string;
+      type: PetitionAttachmentType;
+      isUploading: boolean;
+      file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+    }>;
+    BACK: Array<{
+      __typename?: "PetitionAttachment";
+      id: string;
+      type: PetitionAttachmentType;
+      isUploading: boolean;
+      file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
+    }>;
+  };
   signatureConfig?: {
     __typename?: "SignatureConfig";
     title?: string | null;
@@ -18688,6 +19307,45 @@ export type PetitionCompose_petitionQuery = {
         } | null;
         fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
+        attachmentsList: {
+          __typename?: "PetitionAttachmentsList";
+          COVER: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+          ANNEX: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+          BACK: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+        };
         effectivePermissions: Array<{
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
@@ -18799,6 +19457,45 @@ export type PetitionCompose_petitionQuery = {
           | { __typename?: "TemplateDefaultUserPermission"; id: string }
         >;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
+        attachmentsList: {
+          __typename?: "PetitionAttachmentsList";
+          COVER: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+          ANNEX: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+          BACK: Array<{
+            __typename?: "PetitionAttachment";
+            id: string;
+            type: PetitionAttachmentType;
+            isUploading: boolean;
+            file: {
+              __typename?: "FileUpload";
+              filename: string;
+              size: number;
+              isComplete: boolean;
+            };
+          }>;
+        };
         signatureConfig?: {
           __typename?: "SignatureConfig";
           title?: string | null;
@@ -28369,6 +29066,41 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
   ${PublicLinkSettingsDialog_PetitionTemplateFragmentDoc}
   ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
 ` as unknown as DocumentNode<PetitionSettings_PetitionBaseFragment, unknown>;
+export const PetitionComposeAttachments_PetitionAttachmentFragmentDoc = gql`
+  fragment PetitionComposeAttachments_PetitionAttachment on PetitionAttachment {
+    id
+    type
+    file {
+      filename
+      size
+      isComplete
+    }
+    isUploading @client
+  }
+` as unknown as DocumentNode<PetitionComposeAttachments_PetitionAttachmentFragment, unknown>;
+export const PetitionComposeAttachments_PetitionAttachmentsListFragmentDoc = gql`
+  fragment PetitionComposeAttachments_PetitionAttachmentsList on PetitionAttachmentsList {
+    COVER {
+      ...PetitionComposeAttachments_PetitionAttachment
+    }
+    ANNEX {
+      ...PetitionComposeAttachments_PetitionAttachment
+    }
+    BACK {
+      ...PetitionComposeAttachments_PetitionAttachment
+    }
+  }
+  ${PetitionComposeAttachments_PetitionAttachmentFragmentDoc}
+` as unknown as DocumentNode<PetitionComposeAttachments_PetitionAttachmentsListFragment, unknown>;
+export const PetitionComposeAttachments_PetitionBaseFragmentDoc = gql`
+  fragment PetitionComposeAttachments_PetitionBase on PetitionBase {
+    id
+    attachmentsList {
+      ...PetitionComposeAttachments_PetitionAttachmentsList
+    }
+  }
+  ${PetitionComposeAttachments_PetitionAttachmentsListFragmentDoc}
+` as unknown as DocumentNode<PetitionComposeAttachments_PetitionBaseFragment, unknown>;
 export const PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc = gql`
   fragment PetitionComposeFieldAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
     id
@@ -28535,6 +29267,7 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
     id
     ...PetitionLayout_PetitionBase
     ...PetitionSettings_PetitionBase
+    ...PetitionComposeAttachments_PetitionBase
     organization {
       id
       brandTheme {
@@ -28572,6 +29305,7 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionSettings_PetitionBaseFragmentDoc}
+  ${PetitionComposeAttachments_PetitionBaseFragmentDoc}
   ${PetitionCompose_PetitionFieldFragmentDoc}
   ${useSendPetitionHandler_PetitionFragmentDoc}
 ` as unknown as DocumentNode<PetitionCompose_PetitionBaseFragment, unknown>;
@@ -31062,6 +31796,119 @@ export const useSendPetitionHandler_addPetitionPermissionDocument = gql`
 ` as unknown as DocumentNode<
   useSendPetitionHandler_addPetitionPermissionMutation,
   useSendPetitionHandler_addPetitionPermissionMutationVariables
+>;
+export const PetitionComposeAttachments_reorderPetitionAttachmentsDocument = gql`
+  mutation PetitionComposeAttachments_reorderPetitionAttachments(
+    $petitionId: GID!
+    $attachmentType: PetitionAttachmentType!
+    $attachmentIds: [GID!]!
+  ) {
+    reorderPetitionAttachments(
+      petitionId: $petitionId
+      attachmentType: $attachmentType
+      attachmentIds: $attachmentIds
+    ) {
+      ...PetitionComposeAttachments_PetitionBase
+    }
+  }
+  ${PetitionComposeAttachments_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionComposeAttachments_reorderPetitionAttachmentsMutation,
+  PetitionComposeAttachments_reorderPetitionAttachmentsMutationVariables
+>;
+export const PetitionComposeAttachments_createPetitionAttachmentUploadLinkDocument = gql`
+  mutation PetitionComposeAttachments_createPetitionAttachmentUploadLink(
+    $petitionId: GID!
+    $data: FileUploadInput!
+    $type: PetitionAttachmentType!
+  ) {
+    createPetitionAttachmentUploadLink(petitionId: $petitionId, data: $data, type: $type) {
+      presignedPostData {
+        ...uploadFile_AWSPresignedPostData
+      }
+      attachment {
+        ...PetitionComposeAttachments_PetitionAttachment
+      }
+    }
+  }
+  ${uploadFile_AWSPresignedPostDataFragmentDoc}
+  ${PetitionComposeAttachments_PetitionAttachmentFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionComposeAttachments_createPetitionAttachmentUploadLinkMutation,
+  PetitionComposeAttachments_createPetitionAttachmentUploadLinkMutationVariables
+>;
+export const PetitionComposeAttachments_updatePetitionAttachmentTypeDocument = gql`
+  mutation PetitionComposeAttachments_updatePetitionAttachmentType(
+    $petitionId: GID!
+    $attachmentId: GID!
+    $type: PetitionAttachmentType!
+  ) {
+    updatePetitionAttachmentType(
+      petitionId: $petitionId
+      attachmentId: $attachmentId
+      type: $type
+    ) {
+      ...PetitionComposeAttachments_PetitionAttachment
+      petition {
+        ...PetitionComposeAttachments_PetitionBase
+      }
+    }
+  }
+  ${PetitionComposeAttachments_PetitionAttachmentFragmentDoc}
+  ${PetitionComposeAttachments_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionComposeAttachments_updatePetitionAttachmentTypeMutation,
+  PetitionComposeAttachments_updatePetitionAttachmentTypeMutationVariables
+>;
+export const PetitionComposeAttachments_petitionAttachmentUploadCompleteDocument = gql`
+  mutation PetitionComposeAttachments_petitionAttachmentUploadComplete(
+    $petitionId: GID!
+    $attachmentId: GID!
+  ) {
+    petitionAttachmentUploadComplete(petitionId: $petitionId, attachmentId: $attachmentId) {
+      ...PetitionComposeAttachments_PetitionAttachment
+      petition {
+        ...PetitionComposeAttachments_PetitionBase
+      }
+    }
+  }
+  ${PetitionComposeAttachments_PetitionAttachmentFragmentDoc}
+  ${PetitionComposeAttachments_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation,
+  PetitionComposeAttachments_petitionAttachmentUploadCompleteMutationVariables
+>;
+export const PetitionComposeAttachments_deletePetitionAttachmentDocument = gql`
+  mutation PetitionComposeAttachments_deletePetitionAttachment(
+    $petitionId: GID!
+    $attachmentId: GID!
+  ) {
+    deletePetitionAttachment(petitionId: $petitionId, attachmentId: $attachmentId) {
+      ...PetitionComposeAttachments_PetitionBase
+    }
+  }
+  ${PetitionComposeAttachments_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionComposeAttachments_deletePetitionAttachmentMutation,
+  PetitionComposeAttachments_deletePetitionAttachmentMutationVariables
+>;
+export const PetitionComposeAttachments_petitionAttachmentDownloadLinkDocument = gql`
+  mutation PetitionComposeAttachments_petitionAttachmentDownloadLink(
+    $petitionId: GID!
+    $attachmentId: GID!
+    $preview: Boolean
+  ) {
+    petitionAttachmentDownloadLink(
+      petitionId: $petitionId
+      attachmentId: $attachmentId
+      preview: $preview
+    ) {
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionComposeAttachments_petitionAttachmentDownloadLinkMutation,
+  PetitionComposeAttachments_petitionAttachmentDownloadLinkMutationVariables
 >;
 export const PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument = gql`
   mutation PetitionComposeField_createPetitionFieldAttachmentUploadLink(

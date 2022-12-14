@@ -320,7 +320,7 @@ const _PetitionComposeField = chakraForwardRef<
       <input type="file" {...getInputProps()} />
       {isDragActive ? (
         <PetitionComposeDragActiveIndicator
-          isOverMaxAttachments={field.attachments.length + draggedFiles.length > 10}
+          showErrorMessage={field.attachments.length + draggedFiles.length > 10}
           message={
             <FormattedMessage
               id="component.petition-compose-field.drop-files-to-attach"

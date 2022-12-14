@@ -645,7 +645,7 @@ export type Mutation = {
   /** Soft-deletes any given petition on the database. */
   deletePetition: SupportMethodResponse;
   /** Remove a petition attachment */
-  deletePetitionAttachment: Result;
+  deletePetitionAttachment: PetitionBase;
   /** Deletes a petition field. */
   deletePetitionField: PetitionBase;
   /** Remove a petition field attachment */
@@ -752,6 +752,8 @@ export type Mutation = {
   renameFolder: Success;
   /** Reopens the petition */
   reopenPetition: Petition;
+  /** Reorders the positions of attachments in the petition */
+  reorderPetitionAttachments: PetitionBase;
   /** Sends the AccountVerification email with confirmation code to unconfirmed user emails */
   resendVerificationCode: Result;
   /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
@@ -1056,6 +1058,7 @@ export type MutationcreatePetitionAccessArgs = {
 export type MutationcreatePetitionAttachmentUploadLinkArgs = {
   data: FileUploadInput;
   petitionId: Scalars["GID"];
+  type: PetitionAttachmentType;
 };
 
 export type MutationcreatePetitionFieldArgs = {
@@ -1278,6 +1281,7 @@ export type MutationmovePetitionsArgs = {
 export type MutationpetitionAttachmentDownloadLinkArgs = {
   attachmentId: Scalars["GID"];
   petitionId: Scalars["GID"];
+  preview?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type MutationpetitionAttachmentUploadCompleteArgs = {
@@ -1462,6 +1466,12 @@ export type MutationrenameFolderArgs = {
 };
 
 export type MutationreopenPetitionArgs = {
+  petitionId: Scalars["GID"];
+};
+
+export type MutationreorderPetitionAttachmentsArgs = {
+  attachmentIds: Array<Scalars["GID"]>;
+  attachmentType: PetitionAttachmentType;
   petitionId: Scalars["GID"];
 };
 
@@ -2061,8 +2071,13 @@ export type Petition = PetitionBase & {
   anonymizeAfterMonths: Maybe<Scalars["Int"]>;
   /** Purpose of the anonymization */
   anonymizePurpose: Maybe<Scalars["String"]>;
-  /** The attachments linked to this petition */
+  /**
+   * The attachments linked to this petition
+   * @deprecated use attachmentsList
+   */
   attachments: Array<PetitionAttachment>;
+  /** The attachments linked to this petition */
+  attachmentsList: PetitionAttachmentsList;
   /** Time when the petition was closed. */
   closedAt: Maybe<Scalars["DateTime"]>;
   /** The closing email body of the petition. */
@@ -2210,16 +2225,24 @@ export type PetitionAnonymizedEvent = PetitionEvent & {
   type: PetitionEventType;
 };
 
-export type PetitionAttachment = CreatedAt & {
-  /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+export type PetitionAttachment = {
   file: FileUpload;
   id: Scalars["GID"];
+  petition: PetitionBase;
+  type: PetitionAttachmentType;
 };
+
+export type PetitionAttachmentType = "ANNEX" | "BACK" | "COVER";
 
 export type PetitionAttachmentUploadData = {
   attachment: PetitionAttachment;
   presignedPostData: AWSPresignedPostData;
+};
+
+export type PetitionAttachmentsList = {
+  ANNEX: Array<PetitionAttachment>;
+  BACK: Array<PetitionAttachment>;
+  COVER: Array<PetitionAttachment>;
 };
 
 export type PetitionBase = {
@@ -2227,8 +2250,13 @@ export type PetitionBase = {
   anonymizeAfterMonths: Maybe<Scalars["Int"]>;
   /** Purpose of the anonymization */
   anonymizePurpose: Maybe<Scalars["String"]>;
-  /** The attachments linked to this petition */
+  /**
+   * The attachments linked to this petition
+   * @deprecated use attachmentsList
+   */
   attachments: Array<PetitionAttachment>;
+  /** The attachments linked to this petition */
+  attachmentsList: PetitionAttachmentsList;
   /** The closing email body of the petition. */
   closingEmailBody: Maybe<Scalars["JSON"]>;
   /** The body of the optional completing message to be show to recipients */
@@ -2849,8 +2877,13 @@ export type PetitionTemplate = PetitionBase & {
   anonymizeAfterMonths: Maybe<Scalars["Int"]>;
   /** Purpose of the anonymization */
   anonymizePurpose: Maybe<Scalars["String"]>;
-  /** The attachments linked to this petition */
+  /**
+   * The attachments linked to this petition
+   * @deprecated use attachmentsList
+   */
   attachments: Array<PetitionAttachment>;
+  /** The attachments linked to this petition */
+  attachmentsList: PetitionAttachmentsList;
   backgroundColor: Maybe<Scalars["String"]>;
   categories: Maybe<Array<Scalars["String"]>>;
   /** The closing email body of the petition. */

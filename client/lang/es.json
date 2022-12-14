@@ -2670,6 +2670,91 @@
     "context": "Briefly describe the purpose of the data processing."
   },
   {
+    "term": "component.petition-compose-attachments.add-attachment",
+    "definition": "Añadir adjunto",
+    "context": "Add attachment"
+  },
+  {
+    "term": "component.petition-compose-attachments.annex",
+    "definition": "Anexo",
+    "context": "Annex"
+  },
+  {
+    "term": "component.petition-compose-attachments.back-cover",
+    "definition": "Contraportada",
+    "context": "Back cover"
+  },
+  {
+    "term": "component.petition-compose-attachments.cover",
+    "definition": "Portada",
+    "context": "Cover"
+  },
+  {
+    "term": "component.petition-compose-attachments.file-incomplete",
+    "definition": "Hubo un error al subir el archivo. Por favor, inténtalo de nuevo.",
+    "context": "There was an error uploading the file. Please try again."
+  },
+  {
+    "term": "component.petition-compose-attachments.header",
+    "definition": "Adjuntos del documento",
+    "context": "Document attachments"
+  },
+  {
+    "term": "component.petition-compose-attachments.invalid-attachment-header",
+    "definition": "Adjunto inválido",
+    "context": "Invalid attachment"
+  },
+  {
+    "term": "component.petition-compose-attachments.invalid-attachment-message",
+    "definition": "Sólo se permiten archivos adjuntos en formato PDF de hasta {size}.",
+    "context": "Only PDF attachments up to {size} are allowed."
+  },
+  {
+    "term": "component.petition-compose-attachments.large-files-alert",
+    "definition": "<b>Archivos pesados.</b> Los archivos pesados pueden dar problemas en el momento de iniciar la firma. Recomendamos comprimir los archivos subidos y no superar los {size}.",
+    "context": "<b>Heavy files.</b> Large files may cause problems when starting the signature. We recommend to compress the uploaded files and not to exceed {size}."
+  },
+  {
+    "term": "component.petition-compose-attachments.no-attachments-uploaded",
+    "definition": "No se ha subido ningún anexo todavía",
+    "context": "No attachments have been uploaded yet"
+  },
+  {
+    "term": "component.petition-compose-attachments.petition-with-document-fields-alert",
+    "definition": "{type, select, TEMPLATE {Esta plantilla} other {Este parallel}} tiene campos de documentos configurados para adjuntar las respuestas al pdf. Se incluirán en el documento final tras los anexos.",
+    "context": "{type, select, TEMPLATE {This template} other {This parallel}} has document fields set up to attach your responses to the pdf. They will be included in the final document after the attachments."
+  },
+  {
+    "term": "component.petition-compose-attachments.prefix-back-cover",
+    "definition": "Contraportada {index}:",
+    "context": "Back cover {index}:"
+  },
+  {
+    "term": "component.petition-compose-attachments.prefix-cover",
+    "definition": "Portada {index}:",
+    "context": "Cover {index}:"
+  },
+  {
+    "term": "component.petition-compose-attachments.preview",
+    "definition": "Previsualizar archivo. ⇧ + click para descargar",
+    "context": "Preview file. ⇧ + click to download"
+  },
+  {
+    "term": "component.petition-compose-attachments.remove",
+    "definition": "Quitar adjunto",
+    "context": "Remove attachment"
+  },
+  {
+    "term": "component.petition-compose-attachments.too-many-attachments",
+    "definition": "Se pueden añadir a un campo hasta un máximo de {count, plural, =1 {un adjunto} other {# adjuntos}}.",
+    "context": "A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
+  },
+  {
+    "term": "component.petition-compose-attachments.too-many-attachments-header",
+    "definition": "Demasiados archivos adjuntos",
+    "context": "Too many attachments"
+  },
+  {
     "term": "component.petition-compose-field-attachment.label",
     "definition": "Archivo adjunto: {filename}. Para ver el archivo, pulsa la tecla Intro. Para eliminarlo, pulsa Suprimir.",
     "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
@@ -3698,46 +3783,6 @@
     "term": "component.petition-tag-list-cell-content.tags-x-more",
     "definition": "y <b>{extra} más</b>",
     "context": "and <b>{extra} more</b>"
-  },
-  {
-    "term": "component.petition-template-attachments.add-attachment",
-    "definition": "Añadir adjunto",
-    "context": "Add attachment"
-  },
-  {
-    "term": "component.petition-template-attachments.annex",
-    "definition": "Anexo",
-    "context": "Annex"
-  },
-  {
-    "term": "component.petition-template-attachments.back-cover",
-    "definition": "Contraportada",
-    "context": "Back cover"
-  },
-  {
-    "term": "component.petition-template-attachments.cover",
-    "definition": "Portada",
-    "context": "Cover"
-  },
-  {
-    "term": "component.petition-template-attachments.header",
-    "definition": "Adjuntos del documento",
-    "context": "Document attachments"
-  },
-  {
-    "term": "component.petition-template-attachments.no-attachments-uploaded",
-    "definition": "No se ha subido ningún anexo todavía",
-    "context": "No attachments have been uploaded yet"
-  },
-  {
-    "term": "component.petition-template-attachments.preview",
-    "definition": "Previsualizar archivo. ⇧ + click para descargar",
-    "context": "Preview file. ⇧ + click to download"
-  },
-  {
-    "term": "component.petition-template-attachments.remove",
-    "definition": "Quitar adjunto",
-    "context": "Remove attachment"
   },
   {
     "term": "component.petition-template-closing-message.card-explainer",
