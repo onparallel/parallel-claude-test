@@ -108,7 +108,7 @@ export function TimelineSignatureCancelledEvent({
                 <Text>
                   <FormattedMessage
                     id="timeline.signature-cancelled-request-error.max-size-exceeded.description"
-                    defaultMessage="The eSignature process has been cancelled because the document exceeds the maximum size allowed {timeAgo}"
+                    defaultMessage="The eSignature process has been cancelled because the document exceeds the maximum size allowed by the provider {timeAgo}"
                     values={{
                       timeAgo: (
                         <DateTime
@@ -123,7 +123,7 @@ export function TimelineSignatureCancelledEvent({
                 <Text>
                   <FormattedMessage
                     id="timeline.signature-cancelled-request-error.max-size-exceeded.help"
-                    defaultMessage="Please, compress the files annexed to the document and try it again."
+                    defaultMessage="Please, reduce the size of the annexed files and try it again."
                   />
                 </Text>
               </>

@@ -14,7 +14,6 @@ import {
   userHasAccessToPetitions,
 } from "../authorizers";
 
-const _10MB = 10 * 1024 * 1024;
 const _50MB = 50 * 1024 * 1024;
 const _100MB = 100 * 1024 * 1024;
 
@@ -178,7 +177,7 @@ export const createPetitionAttachmentUploadLink = mutationField(
     },
     validateArgs: validFileUploadInput(
       (args) => args.data,
-      { maxSizeBytes: _10MB, contentType: "application/pdf" },
+      { maxSizeBytes: _50MB, contentType: "application/pdf" },
       "data"
     ),
     resolve: async (_, args, ctx) => {
