@@ -916,10 +916,10 @@ type Mutation {
   Generates and returns a signed url to upload a petition attachment to AWS S3
   """
   createPetitionAttachmentUploadLink(
-    data: FileUploadInput!
+    data: [FileUploadInput!]!
     petitionId: GID!
     type: PetitionAttachmentType!
-  ): PetitionAttachmentUploadData!
+  ): [PetitionAttachmentUploadData!]!
 
   """
   Creates a petition field

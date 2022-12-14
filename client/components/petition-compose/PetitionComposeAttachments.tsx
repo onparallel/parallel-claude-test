@@ -34,7 +34,6 @@ import {
   PetitionComposeAttachments_deletePetitionAttachmentDocument,
   PetitionComposeAttachments_petitionAttachmentDownloadLinkDocument,
   PetitionComposeAttachments_PetitionAttachmentFragment,
-  PetitionComposeAttachments_PetitionAttachmentFragmentDoc,
   PetitionComposeAttachments_PetitionAttachmentsListFragment,
   PetitionComposeAttachments_petitionAttachmentUploadCompleteDocument,
   PetitionComposeAttachments_PetitionBaseFragmentDoc,
@@ -54,7 +53,7 @@ import { Reorder, useDragControls, useMotionValue } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-import { noop, omit, sumBy, uniqBy } from "remeda";
+import { noop, omit, sumBy, uniqBy, zip } from "remeda";
 import { CloseableAlert } from "../common/CloseableAlert";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { Divider } from "../common/Divider";
@@ -188,7 +187,7 @@ export function PetitionComposeAttachments({
 
   const showErrorDialog = useErrorDialog();
   const [draggedFiles, setDraggedFiles] = useState<(File | DataTransferItem)[]>([]);
-  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
+  const { getRootProps, isDragActive, open } = useDropzone({
     accept: {
       "application/pdf": [],
     },
@@ -237,26 +236,29 @@ export function PetitionComposeAttachments({
         }
         return;
       }
-      await Promise.all(
-        files.map(async (file) => {
-          const { data } = await createPetitionAttachmentUploadLink({
-            variables: {
-              petitionId: petitionId,
-              type: "ANNEX",
-              data: {
-                filename: file.name,
-                size: file.size,
-                contentType: file.type,
-              },
-            },
-            update: async (cache, { data }) => {
-              updateAttachmentUploadingStatus(cache, {
-                ...data!.createPetitionAttachmentUploadLink.attachment,
-                isUploading: true,
-              });
-            },
+
+      const { data } = await createPetitionAttachmentUploadLink({
+        variables: {
+          petitionId,
+          type: "ANNEX",
+          data: files.map((file) => ({
+            filename: file.name,
+            contentType: file.type,
+            size: file.size,
+          })),
+        },
+        update: async (cache, { data }) => {
+          data!.createPetitionAttachmentUploadLink.forEach(({ attachment }) => {
+            updateAttachmentUploadingStatus(cache, {
+              ...attachment,
+              isUploading: true,
+            });
           });
-          const { attachment, presignedPostData } = data!.createPetitionAttachmentUploadLink;
+        },
+      });
+
+      zip(files, data!.createPetitionAttachmentUploadLink).forEach(
+        ([file, { presignedPostData, attachment }]) => {
           uploads.current[attachment.id] = uploadFile(file, presignedPostData, {
             onProgress(progress) {
               setAttachmentUploadProgress((progresses) => ({
@@ -277,7 +279,7 @@ export function PetitionComposeAttachments({
               });
             },
           });
-        })
+        }
       );
     },
     onDragEnter: async (e) => {
@@ -551,7 +553,7 @@ const _mutations = [
   gql`
     mutation PetitionComposeAttachments_createPetitionAttachmentUploadLink(
       $petitionId: GID!
-      $data: FileUploadInput!
+      $data: [FileUploadInput!]!
       $type: PetitionAttachmentType!
     ) {
       createPetitionAttachmentUploadLink(petitionId: $petitionId, data: $data, type: $type) {

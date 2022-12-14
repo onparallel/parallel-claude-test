@@ -1258,7 +1258,7 @@ export interface NexusGenFieldTypes {
     createOrganizationUser: NexusGenRootTypes["User"]; // User!
     createPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     createPetitionAccess: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
-    createPetitionAttachmentUploadLink: NexusGenRootTypes["PetitionAttachmentUploadData"]; // PetitionAttachmentUploadData!
+    createPetitionAttachmentUploadLink: NexusGenRootTypes["PetitionAttachmentUploadData"][]; // [PetitionAttachmentUploadData!]!
     createPetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createPetitionFieldAttachmentUploadLink: NexusGenRootTypes["PetitionFieldAttachmentUploadData"]; // PetitionFieldAttachmentUploadData!
     createPetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
@@ -4556,7 +4556,7 @@ export interface NexusGenArgTypes {
     };
     createPetitionAttachmentUploadLink: {
       // args
-      data: NexusGenInputs["FileUploadInput"]; // FileUploadInput!
+      data: NexusGenInputs["FileUploadInput"][]; // [FileUploadInput!]!
       petitionId: NexusGenScalars["GID"]; // GID!
       type: NexusGenEnums["PetitionAttachmentType"]; // PetitionAttachmentType!
     };

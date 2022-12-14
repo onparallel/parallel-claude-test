@@ -1,5 +1,6 @@
 import { ApolloError } from "apollo-server-core";
 import { booleanArg, list, mutationField, nonNull } from "nexus";
+import pMap from "p-map";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -13,6 +14,7 @@ import {
   petitionsAreNotPublicTemplates,
   userHasAccessToPetitions,
 } from "../authorizers";
+import { petitionCanUploadAttachments } from "./authorizers";
 
 const _50MB = 50 * 1024 * 1024;
 const _100MB = 100 * 1024 * 1024;
@@ -165,14 +167,15 @@ export const createPetitionAttachmentUploadLink = mutationField(
   "createPetitionAttachmentUploadLink",
   {
     description: "Generates and returns a signed url to upload a petition attachment to AWS S3",
-    type: "PetitionAttachmentUploadData",
+    type: list("PetitionAttachmentUploadData"),
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
-      petitionsAreNotPublicTemplates("petitionId")
+      petitionsAreNotPublicTemplates("petitionId"),
+      petitionCanUploadAttachments("petitionId", "data", 10)
     ),
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
-      data: nonNull("FileUploadInput"),
+      data: nonNull(list(nonNull("FileUploadInput"))),
       type: nonNull("PetitionAttachmentType"),
     },
     validateArgs: validFileUploadInput(
@@ -181,31 +184,40 @@ export const createPetitionAttachmentUploadLink = mutationField(
       "data"
     ),
     resolve: async (_, args, ctx) => {
-      const key = random(16);
-      const { filename, size, contentType } = args.data;
-      const file = await ctx.files.createFileUpload(
-        {
-          path: key,
-          filename,
-          size: size.toString(),
-          content_type: contentType,
-          upload_complete: false,
-        },
-        `User:${ctx.user!.id}`
-      );
-      const [presignedPostData, attachment] = await Promise.all([
-        ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
-        ctx.petitions.createPetitionAttachment(
-          {
-            file_upload_id: file.id,
-            petition_id: args.petitionId,
-            type: args.type,
-          },
-          ctx.user!
-        ),
-      ]);
+      const result = await pMap(
+        args.data,
+        async (data) => {
+          const key = random(16);
+          const { filename, size, contentType } = data;
+          const file = await ctx.files.createFileUpload(
+            {
+              path: key,
+              filename,
+              size: size.toString(),
+              content_type: contentType,
+              upload_complete: false,
+            },
+            `User:${ctx.user!.id}`
+          );
+          const [presignedPostData, attachment] = await Promise.all([
+            ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
+            ctx.petitions.createPetitionAttachment(
+              {
+                file_upload_id: file.id,
+                petition_id: args.petitionId,
+                type: args.type,
+              },
+              ctx.user!
+            ),
+          ]);
 
-      return { presignedPostData, attachment };
+          return { presignedPostData, attachment };
+        },
+        { concurrency: 1 }
+      );
+
+      ctx.petitions.loadPetitionAttachmentsByPetitionId.dataloader.clear(args.petitionId);
+      return result;
     },
   }
 );

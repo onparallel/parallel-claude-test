@@ -650,7 +650,7 @@ export interface Mutation {
   /** Creates a contactless petition access */
   createPetitionAccess: PetitionAccess;
   /** Generates and returns a signed url to upload a petition attachment to AWS S3 */
-  createPetitionAttachmentUploadLink: PetitionAttachmentUploadData;
+  createPetitionAttachmentUploadLink: Array<PetitionAttachmentUploadData>;
   /** Creates a petition field */
   createPetitionField: PetitionField;
   /** Generates and returns a signed url to upload a field attachment to AWS S3 */
@@ -1102,7 +1102,7 @@ export interface MutationcreatePetitionAccessArgs {
 }
 
 export interface MutationcreatePetitionAttachmentUploadLinkArgs {
-  data: FileUploadInput;
+  data: Array<FileUploadInput>;
   petitionId: Scalars["GID"];
   type: PetitionAttachmentType;
 }
@@ -9993,12 +9993,12 @@ export type PetitionComposeAttachments_reorderPetitionAttachmentsMutation = {
 
 export type PetitionComposeAttachments_createPetitionAttachmentUploadLinkMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  data: FileUploadInput;
+  data: Array<FileUploadInput> | FileUploadInput;
   type: PetitionAttachmentType;
 }>;
 
 export type PetitionComposeAttachments_createPetitionAttachmentUploadLinkMutation = {
-  createPetitionAttachmentUploadLink: {
+  createPetitionAttachmentUploadLink: Array<{
     __typename?: "PetitionAttachmentUploadData";
     presignedPostData: {
       __typename?: "AWSPresignedPostData";
@@ -10012,7 +10012,7 @@ export type PetitionComposeAttachments_createPetitionAttachmentUploadLinkMutatio
       isUploading: boolean;
       file: { __typename?: "FileUpload"; filename: string; size: number; isComplete: boolean };
     };
-  };
+  }>;
 };
 
 export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutationVariables = Exact<{
@@ -31819,7 +31819,7 @@ export const PetitionComposeAttachments_reorderPetitionAttachmentsDocument = gql
 export const PetitionComposeAttachments_createPetitionAttachmentUploadLinkDocument = gql`
   mutation PetitionComposeAttachments_createPetitionAttachmentUploadLink(
     $petitionId: GID!
-    $data: FileUploadInput!
+    $data: [FileUploadInput!]!
     $type: PetitionAttachmentType!
   ) {
     createPetitionAttachmentUploadLink(petitionId: $petitionId, data: $data, type: $type) {

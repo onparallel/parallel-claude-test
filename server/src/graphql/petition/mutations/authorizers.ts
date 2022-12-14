@@ -130,3 +130,21 @@ export function userCanSendAs<
     return false;
   };
 }
+
+export function petitionCanUploadAttachments<
+  TypeName extends string,
+  FieldName extends string,
+  TArgPetitionId extends Arg<TypeName, FieldName, number>,
+  TArgFileUploadInput extends Arg<TypeName, FieldName, any[]>
+>(
+  petitionIdArg: TArgPetitionId,
+  dataArrArg: TArgFileUploadInput,
+  maxAllowed: number
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = args[petitionIdArg] as unknown as number;
+    const newUploadsCount = (args[dataArrArg] as unknown as any[]).length;
+    const allAttachments = await ctx.petitions.loadPetitionAttachmentsByPetitionId(petitionId);
+    return allAttachments.length + newUploadsCount <= maxAllowed;
+  };
+}

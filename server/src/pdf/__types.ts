@@ -606,7 +606,7 @@ export type Mutation = {
   /** Creates a contactless petition access */
   createPetitionAccess: PetitionAccess;
   /** Generates and returns a signed url to upload a petition attachment to AWS S3 */
-  createPetitionAttachmentUploadLink: PetitionAttachmentUploadData;
+  createPetitionAttachmentUploadLink: Array<PetitionAttachmentUploadData>;
   /** Creates a petition field */
   createPetitionField: PetitionField;
   /** Generates and returns a signed url to upload a field attachment to AWS S3 */
@@ -826,6 +826,8 @@ export type Mutation = {
   updateOrganizationUserLimit: Organization;
   /** Updates a petition. */
   updatePetition: PetitionBase;
+  /** Updates the type of a petition attachment and sets it in the final position */
+  updatePetitionAttachmentType: PetitionAttachment;
   /** Updates a petition field. */
   updatePetitionField: PetitionField;
   /** Update a petition field comment. */
@@ -1056,7 +1058,7 @@ export type MutationcreatePetitionAccessArgs = {
 };
 
 export type MutationcreatePetitionAttachmentUploadLinkArgs = {
-  data: FileUploadInput;
+  data: Array<FileUploadInput>;
   petitionId: Scalars["GID"];
   type: PetitionAttachmentType;
 };
@@ -1672,6 +1674,12 @@ export type MutationupdateOrganizationUserLimitArgs = {
 export type MutationupdatePetitionArgs = {
   data: UpdatePetitionInput;
   petitionId: Scalars["GID"];
+};
+
+export type MutationupdatePetitionAttachmentTypeArgs = {
+  attachmentId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+  type: PetitionAttachmentType;
 };
 
 export type MutationupdatePetitionFieldArgs = {

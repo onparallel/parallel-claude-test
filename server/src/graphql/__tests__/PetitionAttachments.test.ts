@@ -1,7 +1,7 @@
 import { randomInt } from "crypto";
 import { gql } from "graphql-request";
 import { Knex } from "knex";
-import { sortBy } from "remeda";
+import { range, sortBy } from "remeda";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, Petition, PetitionAttachment, User } from "../../db/__types";
@@ -110,7 +110,7 @@ describe("GraphQL/PetitionAttachments", () => {
     it("should not allow to update files that are not PDFs", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($petitionId: GID!, $data: FileUploadInput!, $type: PetitionAttachmentType!) {
+          mutation ($petitionId: GID!, $data: [FileUploadInput!]!, $type: PetitionAttachmentType!) {
             createPetitionAttachmentUploadLink(petitionId: $petitionId, data: $data, type: $type) {
               attachment {
                 id
@@ -120,11 +120,13 @@ describe("GraphQL/PetitionAttachments", () => {
         `,
         {
           petitionId: toGlobalId("Petition", petition.id),
-          data: {
-            contentType: "image/jpeg",
-            filename: "nomina.jpeg",
-            size: 1024,
-          },
+          data: [
+            {
+              contentType: "image/jpeg",
+              filename: "nomina.jpeg",
+              size: 1024,
+            },
+          ],
           type: "ANNEX",
         }
       );
@@ -135,7 +137,7 @@ describe("GraphQL/PetitionAttachments", () => {
     it("sends error when trying to create attachment with read access", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($petitionId: GID!, $data: FileUploadInput!, $type: PetitionAttachmentType!) {
+          mutation ($petitionId: GID!, $data: [FileUploadInput!]!, $type: PetitionAttachmentType!) {
             createPetitionAttachmentUploadLink(petitionId: $petitionId, data: $data, type: $type) {
               attachment {
                 id
@@ -145,11 +147,13 @@ describe("GraphQL/PetitionAttachments", () => {
         `,
         {
           petitionId: toGlobalId("Petition", readonlyPetition.id),
-          data: {
-            contentType: "application/pdf",
-            filename: "nomina.pdf",
-            size: 1024,
-          },
+          data: [
+            {
+              contentType: "application/pdf",
+              filename: "nomina.pdf",
+              size: 1024,
+            },
+          ],
           type: "ANNEX",
         }
       );
@@ -160,7 +164,7 @@ describe("GraphQL/PetitionAttachments", () => {
     it("creates a new attachment on a petition and returns the file information", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($petitionId: GID!, $data: FileUploadInput!, $type: PetitionAttachmentType!) {
+          mutation ($petitionId: GID!, $data: [FileUploadInput!]!, $type: PetitionAttachmentType!) {
             createPetitionAttachmentUploadLink(petitionId: $petitionId, data: $data, type: $type) {
               presignedPostData {
                 url
@@ -194,11 +198,13 @@ describe("GraphQL/PetitionAttachments", () => {
         `,
         {
           petitionId: toGlobalId("Petition", petition.id),
-          data: {
-            contentType: "application/pdf",
-            filename: "nomina.pdf",
-            size: 1024,
-          },
+          data: [
+            {
+              contentType: "application/pdf",
+              filename: "nomina.pdf",
+              size: 1024,
+            },
+          ],
           type: "ANNEX",
         }
       );
@@ -210,35 +216,37 @@ describe("GraphQL/PetitionAttachments", () => {
         .where({ deleted_at: null, petition_id: petition.id })
         .select("*");
 
-      expect(data?.createPetitionAttachmentUploadLink).toEqual({
-        presignedPostData: {
-          url: "", // mocked
-        },
-        attachment: {
-          id: toGlobalId("PetitionAttachment", annex.id),
-          type: "ANNEX",
-          file: {
-            contentType: "application/pdf",
-            filename: "nomina.pdf",
-            size: 1024,
-            isComplete: false,
+      expect(data?.createPetitionAttachmentUploadLink).toEqual([
+        {
+          presignedPostData: {
+            url: "", // mocked
           },
-          petition: {
-            id: toGlobalId("Petition", petition.id),
-            attachmentsList: {
-              COVER: [],
-              ANNEX: [{ id: toGlobalId("PetitionAttachment", annex.id) }],
-              BACK: [],
+          attachment: {
+            id: toGlobalId("PetitionAttachment", annex.id),
+            type: "ANNEX",
+            file: {
+              contentType: "application/pdf",
+              filename: "nomina.pdf",
+              size: 1024,
+              isComplete: false,
+            },
+            petition: {
+              id: toGlobalId("Petition", petition.id),
+              attachmentsList: {
+                COVER: [],
+                ANNEX: [{ id: toGlobalId("PetitionAttachment", annex.id) }],
+                BACK: [],
+              },
             },
           },
         },
-      });
+      ]);
     });
 
     it("sends error if trying to attach a file on an unknown petition", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($petitionId: GID!, $data: FileUploadInput!, $type: PetitionAttachmentType!) {
+          mutation ($petitionId: GID!, $data: [FileUploadInput!]!, $type: PetitionAttachmentType!) {
             createPetitionAttachmentUploadLink(petitionId: $petitionId, data: $data, type: $type) {
               attachment {
                 file {
@@ -253,11 +261,13 @@ describe("GraphQL/PetitionAttachments", () => {
         `,
         {
           petitionId: toGlobalId("Petition", 123123),
-          data: {
-            contentType: "application/pdf",
-            filename: "nomina.pdf",
-            size: 1024,
-          },
+          data: [
+            {
+              contentType: "application/pdf",
+              filename: "nomina.pdf",
+              size: 1024,
+            },
+          ],
           type: "ANNEX",
         }
       );
@@ -265,10 +275,10 @@ describe("GraphQL/PetitionAttachments", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error if trying to attach a file of size > 10MB", async () => {
+    it("sends error if trying to attach a file of size > 50MB", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($petitionId: GID!, $data: FileUploadInput!, $type: PetitionAttachmentType!) {
+          mutation ($petitionId: GID!, $data: [FileUploadInput!]!, $type: PetitionAttachmentType!) {
             createPetitionAttachmentUploadLink(petitionId: $petitionId, data: $data, type: $type) {
               attachment {
                 id
@@ -278,11 +288,13 @@ describe("GraphQL/PetitionAttachments", () => {
         `,
         {
           petitionId: toGlobalId("Petition", petition.id),
-          data: {
-            contentType: "application/pdf",
-            filename: "nomina.pdf",
-            size: 1024 * 1024 * 10 + 1,
-          },
+          data: [
+            {
+              contentType: "application/pdf",
+              filename: "nomina.pdf",
+              size: 1024 * 1024 * 50 + 1,
+            },
+          ],
           type: "COVER",
         }
       );
@@ -294,7 +306,7 @@ describe("GraphQL/PetitionAttachments", () => {
       const attachments = await mocks.createPetitionAttachment(petition.id, "BACK", 2);
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($petitionId: GID!, $data: FileUploadInput!, $type: PetitionAttachmentType!) {
+          mutation ($petitionId: GID!, $data: [FileUploadInput!]!, $type: PetitionAttachmentType!) {
             createPetitionAttachmentUploadLink(petitionId: $petitionId, data: $data, type: $type) {
               attachment {
                 id
@@ -312,26 +324,141 @@ describe("GraphQL/PetitionAttachments", () => {
         `,
         {
           petitionId: toGlobalId("Petition", petition.id),
-          data: {
-            contentType: "application/pdf",
-            filename: "nomina.pdf",
-            size: 1024,
-          },
+          data: [
+            {
+              contentType: "application/pdf",
+              filename: "nomina.pdf",
+              size: 1024,
+            },
+          ],
           type: "BACK",
         }
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createPetitionAttachmentUploadLink.attachment.petition).toEqual({
+      expect(data?.createPetitionAttachmentUploadLink[0].attachment.petition).toEqual({
         id: toGlobalId("Petition", petition.id),
         attachmentsList: {
           BACK: [
             { id: toGlobalId("PetitionAttachment", attachments.find((a) => a.position === 0)!.id) },
             { id: toGlobalId("PetitionAttachment", attachments.find((a) => a.position === 1)!.id) },
-            { id: data!.createPetitionAttachmentUploadLink.attachment.id },
+            { id: data!.createPetitionAttachmentUploadLink[0].attachment.id },
           ],
         },
       });
+    });
+
+    it("should manage to upload 10 files at once", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $data: [FileUploadInput!]!, $type: PetitionAttachmentType!) {
+            createPetitionAttachmentUploadLink(petitionId: $petitionId, data: $data, type: $type) {
+              presignedPostData {
+                url
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          data: range(0, 10).map((i) => ({
+            contentType: "application/pdf",
+            filename: `nomina_${i}.pdf`,
+            size: 1024,
+          })),
+          type: "BACK",
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionAttachmentUploadLink).toEqual(
+        range(0, 10).map(() => ({
+          presignedPostData: {
+            url: "", //mocked
+          },
+        }))
+      );
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(
+        gql`
+          query ($id: GID!) {
+            petition(id: $id) {
+              attachmentsList {
+                BACK {
+                  id
+                }
+                ANNEX {
+                  id
+                }
+                COVER {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          id: toGlobalId("Petition", petition.id),
+        }
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData?.petition.attachmentsList.BACK).toHaveLength(10);
+      expect(queryData?.petition.attachmentsList.ANNEX).toHaveLength(0);
+      expect(queryData?.petition.attachmentsList.COVER).toHaveLength(0);
+    });
+
+    it("should not be able to upload more than 10 files at once", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $data: [FileUploadInput!]!, $type: PetitionAttachmentType!) {
+            createPetitionAttachmentUploadLink(petitionId: $petitionId, data: $data, type: $type) {
+              presignedPostData {
+                url
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          data: range(0, 11).map((i) => ({
+            contentType: "application/pdf",
+            filename: `nomina_${i}.pdf`,
+            size: 1024,
+          })),
+          type: "BACK",
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should send error when new uploads exceed 10 files in total", async () => {
+      await mocks.createPetitionAttachment(petition.id, "ANNEX", 8);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $data: [FileUploadInput!]!, $type: PetitionAttachmentType!) {
+            createPetitionAttachmentUploadLink(petitionId: $petitionId, data: $data, type: $type) {
+              presignedPostData {
+                url
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          data: range(0, 3).map((i) => ({
+            contentType: "application/pdf",
+            filename: `nomina_${i}.pdf`,
+            size: 1024,
+          })),
+          type: "BACK",
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 
