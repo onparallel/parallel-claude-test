@@ -1,7 +1,7 @@
 import { marked } from "@onparallel/marked-do-not-use";
 import { Image, Link, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { Fragment, useMemo } from "react";
-import { zip } from "remeda";
+import { range, zip } from "remeda";
 import { cleanupText } from "../utils/cleanupText";
 import { useTheme } from "../utils/ThemeProvider";
 import { useLiquid } from "../utils/useLiquid";
@@ -152,7 +152,7 @@ function MdTable({ token }: { token: marked.Tokens.Table }) {
   );
 }
 
-function MdList({ token: token, level = 0 }: { token: marked.Tokens.List; level?: number }) {
+function MdList({ token }: { token: marked.Tokens.List }) {
   const theme = useTheme();
   const styles = StyleSheet.create({
     listItemContainer: {
@@ -163,10 +163,20 @@ function MdList({ token: token, level = 0 }: { token: marked.Tokens.List; level?
       display: "flex",
       flexDirection: "row",
       justifyContent: "flex-end",
-      alignItems: "center",
+      alignItems: "flex-start",
+      alignSelf: "stretch",
       width: `${theme.textFontSize * 0.6}mm`,
       marginRight: `${theme.textFontSize * 0.16}mm`,
+    },
+    listItemBulletSymbolContainer: {
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
       height: `${theme.textFontSize * 0.5}mm`,
+    },
+    listPaddingBox: {
+      alignSelf: "stretch",
+      width: `${theme.textFontSize * 0.6}mm`,
     },
     listItemBulletLevel0: {
       height: `${theme.textFontSize * 0.14}mm`,
@@ -186,43 +196,56 @@ function MdList({ token: token, level = 0 }: { token: marked.Tokens.List; level?
       backgroundColor: theme.textColor,
     },
   });
+  const flatten = (
+    list: marked.Tokens.List,
+    level: number
+  ): [token: marked.Token, level: number, index: number, ordered: boolean][] => {
+    return list.items.flatMap((t) =>
+      t.tokens.flatMap(
+        (t, i) =>
+          (t.type === "list"
+            ? flatten(t, level + 1)
+            : [
+                [t, level, typeof list.start === "number" ? list.start + i : i + 1, list.ordered],
+              ]) as [[token: marked.Token, level: number, index: number, ordered: boolean]]
+      )
+    );
+  };
   return (
-    <View>
-      {token.items.map((t, i) => (
-        <View key={i} style={styles.listItemContainer}>
+    <Fragment>
+      {flatten(token, 0).map(([t, level, i, ordered], j) => (
+        <View key={j} style={styles.listItemContainer}>
+          {range(0, level).map((i) => (
+            <View key={i} style={styles.listPaddingBox} />
+          ))}
           <View style={styles.listItemBulletContainer}>
-            {token.ordered ? (
-              <Text>{`${typeof token.start === "number" ? token.start + i : i + 1}.`}</Text>
+            {ordered ? (
+              <Text>{`${i}.`}</Text>
             ) : (
-              <View
-                style={
-                  level === 0
-                    ? styles.listItemBulletLevel0
-                    : level === 1
-                    ? styles.listItemBulletLevel1
-                    : styles.listItemBulletLevel2
-                }
-              />
+              <View style={styles.listItemBulletSymbolContainer}>
+                <View
+                  style={
+                    [styles.listItemBulletLevel0, styles.listItemBulletLevel1][level] ??
+                    styles.listItemBulletLevel2
+                  }
+                />
+              </View>
             )}
           </View>
-          <View key={i} style={{ flex: 1 }}>
-            {t.tokens.map((t, i) =>
-              t.type === "list" ? (
-                <MdList key={i} token={t} level={level + 1} />
-              ) : t.type === "text" ? (
-                <Text key={i}>
-                  <MdInlineContent key={i} tokens={(t as any).tokens} />
-                </Text>
-              ) : t.type === "space" ? (
-                <Text>{t.raw}</Text>
-              ) : process.env.NODE_ENV === "production" ? null : (
-                <Text>{JSON.stringify(t)}</Text>
-              )
+          <View style={{ flex: 1 }}>
+            {t.type === "text" ? (
+              <Text>
+                <MdInlineContent tokens={(t as any).tokens} />
+              </Text>
+            ) : t.type === "space" ? (
+              <Text>{t.raw}</Text>
+            ) : process.env.NODE_ENV === "production" ? null : (
+              <Text>{JSON.stringify(t)}</Text>
             )}
           </View>
         </View>
       ))}
-    </View>
+    </Fragment>
   );
 }
 
