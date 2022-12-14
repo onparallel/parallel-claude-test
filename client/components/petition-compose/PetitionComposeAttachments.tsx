@@ -228,7 +228,7 @@ export function PetitionComposeAttachments({
               message: (
                 <FormattedMessage
                   id="component.petition-compose-attachments.too-many-attachments"
-                  defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
+                  defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added"
                   values={{ count: 10 }}
                 />
               ),
@@ -311,18 +311,19 @@ export function PetitionComposeAttachments({
       {isDragActive ? (
         <PetitionComposeDragActiveIndicator
           showErrorMessage={
-            draggedFiles.length > 10 || draggedFiles.some((file) => file.type === "pdf")
+            allAttachments.length + draggedFiles.length > 10 ||
+            draggedFiles.some((file) => file.type === "pdf")
           }
           message={
             <FormattedMessage
-              id="component.petition-compose-field.drop-files-to-attach"
-              defaultMessage="Drop here your files to attach them to this field"
+              id="component.petition-compose-attachments.drop-files-to-attach"
+              defaultMessage="Drop here your files to attach"
             />
           }
           errorMessage={
             <FormattedMessage
-              id="component.petition-compose-field.too-many-attachments"
-              defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
+              id="component.petition-compose-attachments.too-many-attachments"
+              defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added"
               values={{ count: 10 }}
             />
           }

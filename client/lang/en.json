@@ -2690,6 +2690,11 @@
     "context": "Cover"
   },
   {
+    "term": "component.petition-compose-attachments.drop-files-to-attach",
+    "definition": "Drop here your files to attach",
+    "context": "Drop here your files to attach"
+  },
+  {
     "term": "component.petition-compose-attachments.file-incomplete",
     "definition": "There was an error uploading the file. Please try again.",
     "context": "There was an error uploading the file. Please try again."
@@ -2746,8 +2751,8 @@
   },
   {
     "term": "component.petition-compose-attachments.too-many-attachments",
-    "definition": "A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field",
-    "context": "A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
+    "definition": "A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added",
+    "context": "A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added"
   },
   {
     "term": "component.petition-compose-attachments.too-many-attachments-header",
