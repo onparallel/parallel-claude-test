@@ -444,6 +444,7 @@ function Petitions() {
                 variant="ghost"
                 fontSize="2xl"
                 paddingX={3}
+                data-action="change-parallel-template"
                 leftIcon={
                   state.type === "PETITION" ? (
                     <PaperPlaneIcon boxSize={6} />
