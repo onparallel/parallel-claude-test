@@ -41,7 +41,6 @@ import {
 import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesProgressDialog";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
 import { useSolveUnreviewedRepliesDialog } from "@parallel/components/petition-replies/dialogs/SolveUnreviewedRepliesDialog";
-import { PetitionAttachmentsCard } from "@parallel/components/petition-replies/PetitionAttachmentsCard";
 import {
   PetitionRepliesField,
   PetitionRepliesFieldProps,
@@ -638,14 +637,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               )}
             </LiquidScopeProvider>
           </Stack>
-          {petition.attachments.length > 0 ? (
-            <PetitionAttachmentsCard
-              id="attachments"
-              petition={petition}
-              layerStyle="highlightable"
-              marginTop={8}
-            />
-          ) : null}
         </Box>
       </PaneWithFlyout>
     </PetitionLayout>
@@ -678,7 +669,6 @@ PetitionReplies.fragments = {
         ...PetitionSignaturesCard_Petition
         ...getPetitionSignatureStatus_Petition
         ...getPetitionSignatureEnvironment_Petition
-        ...PetitionAttachmentsCard_Petition
         ...useClosePetitionDialog_Petition
         ...useLiquidScope_PetitionBase
       }
@@ -688,7 +678,6 @@ PetitionReplies.fragments = {
       ${PetitionSignaturesCard.fragments.Petition}
       ${getPetitionSignatureStatus.fragments.Petition}
       ${getPetitionSignatureEnvironment.fragments.Petition}
-      ${PetitionAttachmentsCard.fragments.Petition}
       ${useClosePetitionDialog.fragments.Petition}
       ${useLiquidScope.fragments.PetitionBase}
     `;

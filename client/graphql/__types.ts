@@ -11929,35 +11929,6 @@ export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
   petition: { __typename?: "Petition"; id: string };
 };
 
-export type PetitionAttachmentsCard_PetitionFragment = {
-  __typename?: "Petition";
-  id: string;
-  attachments: Array<{
-    __typename?: "PetitionAttachment";
-    id: string;
-    file: {
-      __typename?: "FileUpload";
-      filename: string;
-      contentType: string;
-      size: number;
-      isComplete: boolean;
-    };
-  }>;
-};
-
-export type PetitionAttachmentsCard_petitionAttachmentDownloadLinkMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  attachmentId: Scalars["GID"];
-}>;
-
-export type PetitionAttachmentsCard_petitionAttachmentDownloadLinkMutation = {
-  petitionAttachmentDownloadLink: {
-    __typename?: "FileUploadDownloadLinkResult";
-    result: Result;
-    url?: string | null;
-  };
-};
-
 export type PetitionRepliesField_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -21737,17 +21708,6 @@ export type PetitionReplies_PetitionFragment = {
       fullName: string;
     } | null>;
   } | null;
-  attachments: Array<{
-    __typename?: "PetitionAttachment";
-    id: string;
-    file: {
-      __typename?: "FileUpload";
-      filename: string;
-      contentType: string;
-      size: number;
-      isComplete: boolean;
-    };
-  }>;
 };
 
 export type PetitionReplies_PetitionFieldFragment = {
@@ -22176,17 +22136,6 @@ export type PetitionReplies_closePetitionMutation = {
         fullName: string;
       } | null>;
     } | null;
-    attachments: Array<{
-      __typename?: "PetitionAttachment";
-      id: string;
-      file: {
-        __typename?: "FileUpload";
-        filename: string;
-        contentType: string;
-        size: number;
-        isComplete: boolean;
-      };
-    }>;
   };
 };
 
@@ -22414,17 +22363,6 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         fullName: string;
       } | null>;
     } | null;
-    attachments: Array<{
-      __typename?: "PetitionAttachment";
-      id: string;
-      file: {
-        __typename?: "FileUpload";
-        filename: string;
-        contentType: string;
-        size: number;
-        isComplete: boolean;
-      };
-    }>;
   };
 };
 
@@ -22757,17 +22695,6 @@ export type PetitionReplies_petitionQuery = {
             fullName: string;
           } | null>;
         } | null;
-        attachments: Array<{
-          __typename?: "PetitionAttachment";
-          id: string;
-          file: {
-            __typename?: "FileUpload";
-            filename: string;
-            contentType: string;
-            size: number;
-            isComplete: boolean;
-          };
-        }>;
       }
     | { __typename?: "PetitionTemplate" }
     | null;
@@ -30186,18 +30113,6 @@ export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
   ${OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc}
   ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
 ` as unknown as DocumentNode<PetitionSignaturesCard_PetitionFragment, unknown>;
-export const PetitionAttachmentsCard_PetitionFragmentDoc = gql`
-  fragment PetitionAttachmentsCard_Petition on Petition {
-    id
-    attachments {
-      id
-      file {
-        ...FileAttachmentButton_FileUpload
-      }
-    }
-  }
-  ${FileAttachmentButton_FileUploadFragmentDoc}
-` as unknown as DocumentNode<PetitionAttachmentsCard_PetitionFragment, unknown>;
 export const useClosePetitionDialog_PetitionFragmentDoc = gql`
   fragment useClosePetitionDialog_Petition on Petition {
     id
@@ -30228,7 +30143,6 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     ...PetitionSignaturesCard_Petition
     ...getPetitionSignatureStatus_Petition
     ...getPetitionSignatureEnvironment_Petition
-    ...PetitionAttachmentsCard_Petition
     ...useClosePetitionDialog_Petition
     ...useLiquidScope_PetitionBase
   }
@@ -30238,7 +30152,6 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
   ${PetitionSignaturesCard_PetitionFragmentDoc}
   ${getPetitionSignatureStatus_PetitionFragmentDoc}
   ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
-  ${PetitionAttachmentsCard_PetitionFragmentDoc}
   ${useClosePetitionDialog_PetitionFragmentDoc}
   ${useLiquidScope_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_PetitionFragment, unknown>;
@@ -32361,20 +32274,6 @@ export const PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument = gql
 ` as unknown as DocumentNode<
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery,
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryQueryVariables
->;
-export const PetitionAttachmentsCard_petitionAttachmentDownloadLinkDocument = gql`
-  mutation PetitionAttachmentsCard_petitionAttachmentDownloadLink(
-    $petitionId: GID!
-    $attachmentId: GID!
-  ) {
-    petitionAttachmentDownloadLink(petitionId: $petitionId, attachmentId: $attachmentId) {
-      result
-      url
-    }
-  }
-` as unknown as DocumentNode<
-  PetitionAttachmentsCard_petitionAttachmentDownloadLinkMutation,
-  PetitionAttachmentsCard_petitionAttachmentDownloadLinkMutationVariables
 >;
 export const PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument = gql`
   mutation PetitionRepliesField_petitionFieldAttachmentDownloadLink(
