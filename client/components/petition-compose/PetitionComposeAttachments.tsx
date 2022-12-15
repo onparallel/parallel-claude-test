@@ -26,6 +26,7 @@ import {
   EyeIcon,
   PaperclipIcon,
 } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { FileSize } from "@parallel/components/common/FileSize";
 import {
@@ -48,6 +49,7 @@ import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useIsAnimated } from "@parallel/utils/useIsAnimated";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
+import useMergedRef from "@react-hook/merged-ref";
 import { fromEvent } from "file-selector";
 import { Reorder, useDragControls, useMotionValue } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
@@ -73,496 +75,507 @@ export interface PetitionComposeAttachmentsProps extends BoxProps {
   isReadOnly?: boolean;
 }
 
-export function PetitionComposeAttachments({
-  petitionId,
-  isTemplate,
-  attachmentsList,
-  hasDocumentFieldsWithAttachments,
-  isReadOnly,
-  ...props
-}: PetitionComposeAttachmentsProps) {
-  const intl = useIntl();
-
-  const { COVER, ANNEX, BACK } = attachmentsList;
-
-  const [cover, setCover] = useState(COVER);
-  const [annex, setAnnex] = useState(ANNEX);
-  const [back, setBack] = useState(BACK);
-
-  const allAttachments = [...cover, ...annex, ...back];
-
-  const totalMaxFilesSizeExceeded =
-    sumBy(
-      allAttachments.filter((item) => item.file.isComplete),
-      (item) => item.file.size
-    ) > TOTAL_MAX_FILES_SIZE;
-
-  const uploads = useRef<Record<string, XMLHttpRequest>>({});
-  const [attachmentUploadProgress, setAttachmentUploadProgress] = useState<Record<string, number>>(
-    {}
-  );
-
-  const [createPetitionAttachmentUploadLink] = useMutation(
-    PetitionComposeAttachments_createPetitionAttachmentUploadLinkDocument
-  );
-  const [petitionAttachmentUploadComplete] = useMutation(
-    PetitionComposeAttachments_petitionAttachmentUploadCompleteDocument
-  );
-
-  const [deletePetitionAttachment] = useMutation(
-    PetitionComposeAttachments_deletePetitionAttachmentDocument
-  );
-
-  const [petitionAttachmentDownloadLink] = useMutation(
-    PetitionComposeAttachments_petitionAttachmentDownloadLinkDocument
-  );
-
-  const [reorderPetitionAttachments] = useMutation(
-    PetitionComposeAttachments_reorderPetitionAttachmentsDocument
-  );
-
-  const [updatePetitionAttachmentType] = useMutation(
-    PetitionComposeAttachments_updatePetitionAttachmentTypeDocument
-  );
-
-  useEffect(() => {
-    setCover(COVER);
-    setAnnex(ANNEX);
-    setBack(BACK);
-  }, [attachmentsList]);
-
-  function updateAttachmentUploadingStatus(
-    cache: DataProxy,
-    attachment: PetitionComposeAttachments_PetitionAttachmentFragment
+export const PetitionComposeAttachments = Object.assign(
+  chakraForwardRef<"div", PetitionComposeAttachmentsProps>(function PetitionComposeAttachments(
+    {
+      petitionId,
+      isTemplate,
+      attachmentsList,
+      hasDocumentFieldsWithAttachments,
+      isReadOnly,
+      ...props
+    },
+    ref
   ) {
-    updateFragment(cache, {
-      fragment: PetitionComposeAttachments_PetitionBaseFragmentDoc,
-      fragmentName: "PetitionComposeAttachments_PetitionBase",
-      id: petitionId,
-      data: (data) => ({
-        ...data!,
-        attachmentsList: {
-          ...data!.attachmentsList,
-          ANNEX: uniqBy([...data!.attachmentsList.ANNEX, attachment], (obj) => obj.id),
-        },
-      }),
-    });
-  }
+    const intl = useIntl();
 
-  const handleRemoveAttachment = async function (attachmentId: string) {
-    uploads.current[attachmentId]?.abort();
-    delete uploads.current[attachmentId];
-    await deletePetitionAttachment({
-      variables: { petitionId, attachmentId },
-    });
-  };
+    const { COVER, ANNEX, BACK } = attachmentsList;
 
-  const handleDownloadAttachment = async function (attachmentId: string, preview: boolean) {
-    await withError(
-      openNewWindow(async () => {
-        const { data } = await petitionAttachmentDownloadLink({
-          variables: { petitionId, attachmentId, preview },
-        });
-        const { url } = data!.petitionAttachmentDownloadLink;
-        return url!;
-      })
+    const [cover, setCover] = useState(COVER);
+    const [annex, setAnnex] = useState(ANNEX);
+    const [back, setBack] = useState(BACK);
+
+    const allAttachments = [...cover, ...annex, ...back];
+
+    const totalMaxFilesSizeExceeded =
+      sumBy(
+        allAttachments.filter((item) => item.file.isComplete),
+        (item) => item.file.size
+      ) > TOTAL_MAX_FILES_SIZE;
+
+    const uploads = useRef<Record<string, XMLHttpRequest>>({});
+    const [attachmentUploadProgress, setAttachmentUploadProgress] = useState<
+      Record<string, number>
+    >({});
+
+    const [createPetitionAttachmentUploadLink] = useMutation(
+      PetitionComposeAttachments_createPetitionAttachmentUploadLinkDocument
     );
-  };
+    const [petitionAttachmentUploadComplete] = useMutation(
+      PetitionComposeAttachments_petitionAttachmentUploadCompleteDocument
+    );
 
-  const debouncedReorderPetitionAttachments = useDebouncedAsync(
-    async (attachmentType: PetitionAttachmentType, attachmentIds: string[]) => {
-      await reorderPetitionAttachments({
-        variables: { petitionId, attachmentIds, attachmentType },
+    const [deletePetitionAttachment] = useMutation(
+      PetitionComposeAttachments_deletePetitionAttachmentDocument
+    );
+
+    const [petitionAttachmentDownloadLink] = useMutation(
+      PetitionComposeAttachments_petitionAttachmentDownloadLinkDocument
+    );
+
+    const [reorderPetitionAttachments] = useMutation(
+      PetitionComposeAttachments_reorderPetitionAttachmentsDocument
+    );
+
+    const [updatePetitionAttachmentType] = useMutation(
+      PetitionComposeAttachments_updatePetitionAttachmentTypeDocument
+    );
+
+    useEffect(() => {
+      setCover(COVER);
+      setAnnex(ANNEX);
+      setBack(BACK);
+    }, [attachmentsList]);
+
+    function updateAttachmentUploadingStatus(
+      cache: DataProxy,
+      attachment: PetitionComposeAttachments_PetitionAttachmentFragment
+    ) {
+      updateFragment(cache, {
+        fragment: PetitionComposeAttachments_PetitionBaseFragmentDoc,
+        fragmentName: "PetitionComposeAttachments_PetitionBase",
+        id: petitionId,
+        data: (data) => ({
+          ...data!,
+          attachmentsList: {
+            ...data!.attachmentsList,
+            ANNEX: uniqBy([...data!.attachmentsList.ANNEX, attachment], (obj) => obj.id),
+          },
+        }),
       });
-    },
-    600,
-    []
-  );
-
-  const handleReorderAttachments = async (
-    attachmentType: PetitionAttachmentType,
-    attachmentIds: string[]
-  ) => {
-    try {
-      await debouncedReorderPetitionAttachments(attachmentType, attachmentIds);
-    } catch (e) {
-      if (e === "DEBOUNCED") {
-        return "DEBOUNCED";
-      } else {
-        throw e;
-      }
     }
-  };
 
-  const handleChangeType = async (attachmentId: string, type: PetitionAttachmentType) => {
-    await updatePetitionAttachmentType({
-      variables: { petitionId, attachmentId, type },
-    });
-  };
+    const handleRemoveAttachment = async function (attachmentId: string) {
+      uploads.current[attachmentId]?.abort();
+      delete uploads.current[attachmentId];
+      await deletePetitionAttachment({
+        variables: { petitionId, attachmentId },
+      });
+    };
 
-  const showErrorDialog = useErrorDialog();
-  const [draggedFiles, setDraggedFiles] = useState<(File | DataTransferItem)[]>([]);
-  const { getRootProps, isDragActive, open } = useDropzone({
-    accept: {
-      "application/pdf": [],
-    },
-    maxSize: MAX_FILE_SIZE,
-    maxFiles: 10 - allAttachments.length,
-    onDropRejected: async (files: FileRejection[], event: DropEvent) => {
-      if (allAttachments.length + files.length > 10) {
-        // on drop event already shows a message on the dropzone, if its not type="drop" means the
-        // file is coming from the "Add attachment" button which doesn't provide any feedback
-        if (event?.type !== "drop") {
-          await withError(
-            showErrorDialog({
-              header: (
-                <FormattedMessage
-                  id="component.petition-compose-attachments.too-many-attachments-header"
-                  defaultMessage="Too many attachments"
-                />
-              ),
-              message: (
-                <FormattedMessage
-                  id="component.petition-compose-attachments.too-many-attachments"
-                  defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added"
-                  values={{ count: 10 }}
-                />
-              ),
-            })
-          );
-        }
-
-        return;
-      }
+    const handleDownloadAttachment = async function (attachmentId: string, preview: boolean) {
       await withError(
-        showErrorDialog({
-          header: (
-            <FormattedMessage
-              id="component.petition-compose-attachments.invalid-attachment-header"
-              defaultMessage="Invalid attachment"
-            />
-          ),
-          message: (
-            <FormattedMessage
-              id="component.petition-compose-attachments.invalid-attachment-message"
-              defaultMessage="Only PDF attachments up to {size} are allowed."
-              values={{ size: <FileSize value={MAX_FILE_SIZE} /> }}
-            />
-          ),
+        openNewWindow(async () => {
+          const { data } = await petitionAttachmentDownloadLink({
+            variables: { petitionId, attachmentId, preview },
+          });
+          const { url } = data!.petitionAttachmentDownloadLink;
+          return url!;
         })
       );
-    },
-    onDrop: async (files: File[], filesRejection: FileRejection[]) => {
-      if (allAttachments.length + files.length + filesRejection.length > 10) {
-        return;
+    };
+
+    const debouncedReorderPetitionAttachments = useDebouncedAsync(
+      async (attachmentType: PetitionAttachmentType, attachmentIds: string[]) => {
+        await reorderPetitionAttachments({
+          variables: { petitionId, attachmentIds, attachmentType },
+        });
+      },
+      600,
+      []
+    );
+
+    const handleReorderAttachments = async (
+      attachmentType: PetitionAttachmentType,
+      attachmentIds: string[]
+    ) => {
+      try {
+        await debouncedReorderPetitionAttachments(attachmentType, attachmentIds);
+      } catch (e) {
+        if (e === "DEBOUNCED") {
+          return "DEBOUNCED";
+        } else {
+          throw e;
+        }
       }
-      const { data } = await createPetitionAttachmentUploadLink({
-        variables: {
-          petitionId,
-          type: "ANNEX",
-          data: files.map((file) => ({
-            filename: file.name,
-            contentType: file.type,
-            size: file.size,
-          })),
-        },
-        update: async (cache, { data }) => {
-          data!.createPetitionAttachmentUploadLink.forEach(({ attachment }) => {
-            updateAttachmentUploadingStatus(cache, {
-              ...attachment,
-              isUploading: true,
-            });
-          });
-        },
+    };
+
+    const handleChangeType = async (attachmentId: string, type: PetitionAttachmentType) => {
+      await updatePetitionAttachmentType({
+        variables: { petitionId, attachmentId, type },
       });
+    };
 
-      zip(files, data!.createPetitionAttachmentUploadLink).forEach(
-        ([file, { presignedPostData, attachment }]) => {
-          uploads.current[attachment.id] = uploadFile(file, presignedPostData, {
-            onProgress(progress) {
-              setAttachmentUploadProgress((progresses) => ({
-                ...progresses,
-                [attachment.id]: progress,
-              }));
-            },
-            async onComplete() {
-              delete uploads.current[attachment.id];
-              await petitionAttachmentUploadComplete({
-                variables: {
-                  petitionId: petitionId,
-                  attachmentId: attachment.id,
-                },
-                update: async (cache) => {
-                  updateAttachmentUploadingStatus(cache, { ...attachment, isUploading: false });
-                },
+    const showErrorDialog = useErrorDialog();
+    const [draggedFiles, setDraggedFiles] = useState<(File | DataTransferItem)[]>([]);
+    const { getRootProps, isDragActive, open } = useDropzone({
+      accept: {
+        "application/pdf": [],
+      },
+      maxSize: MAX_FILE_SIZE,
+      maxFiles: 10 - allAttachments.length,
+      disabled: isReadOnly,
+      onDropRejected: async (files: FileRejection[], event: DropEvent) => {
+        if (allAttachments.length + files.length > 10) {
+          // on drop event already shows a message on the dropzone, if its not type="drop" means the
+          // file is coming from the "Add attachment" button which doesn't provide any feedback
+          if (event?.type !== "drop") {
+            await withError(
+              showErrorDialog({
+                header: (
+                  <FormattedMessage
+                    id="component.petition-compose-attachments.too-many-attachments-header"
+                    defaultMessage="Too many attachments"
+                  />
+                ),
+                message: (
+                  <FormattedMessage
+                    id="component.petition-compose-attachments.too-many-attachments"
+                    defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added"
+                    values={{ count: 10 }}
+                  />
+                ),
+              })
+            );
+          }
+
+          return;
+        }
+        await withError(
+          showErrorDialog({
+            header: (
+              <FormattedMessage
+                id="component.petition-compose-attachments.invalid-attachment-header"
+                defaultMessage="Invalid attachment"
+              />
+            ),
+            message: (
+              <FormattedMessage
+                id="component.petition-compose-attachments.invalid-attachment-message"
+                defaultMessage="Only PDF attachments up to {size} are allowed."
+                values={{ size: <FileSize value={MAX_FILE_SIZE} /> }}
+              />
+            ),
+          })
+        );
+      },
+      onDrop: async (files: File[], filesRejection: FileRejection[]) => {
+        if (allAttachments.length + files.length + filesRejection.length > 10) {
+          return;
+        }
+        const { data } = await createPetitionAttachmentUploadLink({
+          variables: {
+            petitionId,
+            type: "ANNEX",
+            data: files.map((file) => ({
+              filename: file.name,
+              contentType: file.type,
+              size: file.size,
+            })),
+          },
+          update: async (cache, { data }) => {
+            data!.createPetitionAttachmentUploadLink.forEach(({ attachment }) => {
+              updateAttachmentUploadingStatus(cache, {
+                ...attachment,
+                isUploading: true,
               });
-            },
-          });
-        }
-      );
-    },
-    onDragEnter: async (e) => {
-      const files = await fromEvent(e);
-      setDraggedFiles(files);
-    },
-    onDragLeave: async (e) => {
-      setDraggedFiles([]);
-    },
-  });
+            });
+          },
+        });
 
-  const _rootProps = getRootProps();
-  const dropzoneRootProps = omit(_rootProps, [
-    "onBlur",
-    "onClick",
-    "onFocus",
-    "onKeyDown",
-    "ref",
-    "tabIndex",
-    "role",
-  ]);
+        zip(files, data!.createPetitionAttachmentUploadLink).forEach(
+          ([file, { presignedPostData, attachment }]) => {
+            uploads.current[attachment.id] = uploadFile(file, presignedPostData, {
+              onProgress(progress) {
+                setAttachmentUploadProgress((progresses) => ({
+                  ...progresses,
+                  [attachment.id]: progress,
+                }));
+              },
+              async onComplete() {
+                delete uploads.current[attachment.id];
+                await petitionAttachmentUploadComplete({
+                  variables: {
+                    petitionId: petitionId,
+                    attachmentId: attachment.id,
+                  },
+                  update: async (cache) => {
+                    updateAttachmentUploadingStatus(cache, { ...attachment, isUploading: false });
+                  },
+                });
+              },
+            });
+          }
+        );
+      },
+      onDragEnter: async (e) => {
+        const files = await fromEvent(e);
+        setDraggedFiles(files);
+      },
+      onDragLeave: async (e) => {
+        setDraggedFiles([]);
+      },
+    });
 
-  return (
-    <Card
-      ref={_rootProps.ref}
-      id="petition-template-attachments"
-      position="relative"
-      {...dropzoneRootProps}
-      {...props}
-    >
-      {isDragActive ? (
-        <PetitionComposeDragActiveIndicator
-          showErrorMessage={allAttachments.length + draggedFiles.length > 10}
-          message={
-            <FormattedMessage
-              id="component.petition-compose-attachments.drop-files-to-attach"
-              defaultMessage="Drop here your files to attach"
-            />
-          }
-          errorMessage={
-            <FormattedMessage
-              id="component.petition-compose-attachments.too-many-attachments"
-              defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added"
-              values={{ count: 10 }}
-            />
-          }
-        />
-      ) : null}
-      <CardHeader
-        rightAction={
-          <RestrictedFeaturePopover
-            isRestricted={allAttachments.length > 9}
-            borderRadius="xl"
-            content={
-              <Text>
-                <FormattedMessage
-                  id="component.petition-compose-attachments.files-limit-reached"
-                  defaultMessage="The limit of {limit} attachments has been reached."
-                  values={{ limit: 10 }}
-                />
-              </Text>
-            }
-          >
-            <IconButtonWithTooltip
-              icon={<AddIcon />}
-              label={intl.formatMessage({
-                id: "component.petition-compose-attachments.add-attachment",
-                defaultMessage: "Add attachment",
-              })}
-              onClick={open}
-              isDisabled={allAttachments.length > 9}
-            />
-          </RestrictedFeaturePopover>
-        }
+    const _rootProps = getRootProps();
+    const dropzoneRootProps = omit(_rootProps, [
+      "onBlur",
+      "onClick",
+      "onFocus",
+      "onKeyDown",
+      "ref",
+      "tabIndex",
+      "role",
+    ]);
+    const rootRef = useMergedRef(_rootProps.ref, ref);
+
+    return (
+      <Card
+        ref={rootRef}
+        id="petition-template-attachments"
+        position="relative"
+        {...dropzoneRootProps}
+        {...props}
       >
-        <FormattedMessage
-          id="component.petition-compose-attachments.header"
-          defaultMessage="Document attachments"
-        />
-      </CardHeader>
-      <Stack paddingY={4} paddingX={2}>
-        {allAttachments.length > 0 ? (
-          <>
-            {cover.length ? (
-              <Stack
-                listStyleType="none"
-                as={Reorder.Group}
-                axis="y"
-                values={cover}
-                onReorder={setCover}
-              >
-                {cover.map((item, i, arr) => {
-                  return (
-                    <AttachmentItem
-                      key={item.id}
-                      item={item}
-                      index={i}
-                      isDraggable={arr.length > 1}
-                      progress={attachmentUploadProgress[item.id]}
-                      onRemove={handleRemoveAttachment}
-                      onPreview={handleDownloadAttachment}
-                      onChangeType={handleChangeType}
-                      onReorder={() =>
-                        handleReorderAttachments(
-                          "COVER",
-                          cover.map((item) => item.id)
-                        )
-                      }
-                    />
-                  );
-                })}
-              </Stack>
-            ) : null}
-            {cover.length && (annex.length || back.length) ? <Divider /> : null}
-            {annex.length ? (
-              <Stack
-                listStyleType="none"
-                as={Reorder.Group}
-                axis="y"
-                values={annex}
-                onReorder={setAnnex}
-              >
-                {annex.map((item, i, arr) => {
-                  return (
-                    <AttachmentItem
-                      key={item.id}
-                      item={item}
-                      index={i}
-                      isDraggable={arr.length > 1}
-                      progress={attachmentUploadProgress[item.id]}
-                      onRemove={handleRemoveAttachment}
-                      onPreview={handleDownloadAttachment}
-                      onChangeType={handleChangeType}
-                      onReorder={() =>
-                        handleReorderAttachments(
-                          "ANNEX",
-                          annex.map((item) => item.id)
-                        )
-                      }
-                    />
-                  );
-                })}
-              </Stack>
-            ) : null}
-            {annex.length && back.length ? <Divider /> : null}
-            {back.length ? (
-              <Stack
-                listStyleType="none"
-                as={Reorder.Group}
-                axis="y"
-                values={back}
-                onReorder={setBack}
-              >
-                {back.map((item, i, arr) => {
-                  return (
-                    <AttachmentItem
-                      key={item.id}
-                      item={item}
-                      index={i}
-                      isDraggable={arr.length > 1}
-                      progress={attachmentUploadProgress[item.id]}
-                      onRemove={handleRemoveAttachment}
-                      onPreview={handleDownloadAttachment}
-                      onChangeType={handleChangeType}
-                      onReorder={() =>
-                        handleReorderAttachments(
-                          "BACK",
-                          back.map((item) => item.id)
-                        )
-                      }
-                    />
-                  );
-                })}
-              </Stack>
-            ) : null}
-          </>
-        ) : (
-          <Text width="100%" textAlign="center" color="gray.500">
-            <FormattedMessage
-              id="component.petition-compose-attachments.no-attachments-uploaded"
-              defaultMessage="No attachments have been uploaded yet"
-            />
-          </Text>
-        )}
-        {totalMaxFilesSizeExceeded || hasDocumentFieldsWithAttachments ? (
-          <Box>
-            {totalMaxFilesSizeExceeded ? (
-              <CloseableAlert status="warning" variant="subtle" rounded="md" marginTop={4}>
-                <AlertIcon color="yellow.500" />
-                <AlertDescription flex="1">
-                  <Text>
-                    <FormattedMessage
-                      id="component.petition-compose-attachments.large-files-alert"
-                      defaultMessage="<b>Heavy files.</b> Large files may cause problems when starting the signature. We recommend to compress the uploaded files and not to exceed {size}."
-                      values={{ size: <FileSize value={TOTAL_MAX_FILES_SIZE} /> }}
-                    />
-                  </Text>
-                </AlertDescription>
-              </CloseableAlert>
-            ) : null}
-            {hasDocumentFieldsWithAttachments ? (
-              <CloseableAlert status="info" variant="subtle" rounded="md" marginTop={4}>
-                <AlertIcon />
-                <AlertDescription flex="1">
-                  <Text>
-                    <FormattedMessage
-                      id="component.petition-compose-attachments.petition-with-document-fields-alert"
-                      defaultMessage="{type, select, TEMPLATE {This template} other {This parallel}} has document fields set up to attach your responses to the pdf. They will be included in the final document after the attachments."
-                      values={{ type: isTemplate ? "TEMPLATE" : "PETITION" }}
-                    />
-                  </Text>
-                </AlertDescription>
-              </CloseableAlert>
-            ) : null}
-          </Box>
+        {isDragActive ? (
+          <PetitionComposeDragActiveIndicator
+            showErrorMessage={allAttachments.length + draggedFiles.length > 10}
+            message={
+              <FormattedMessage
+                id="component.petition-compose-attachments.drop-files-to-attach"
+                defaultMessage="Drop here your files to attach"
+              />
+            }
+            errorMessage={
+              <FormattedMessage
+                id="component.petition-compose-attachments.too-many-attachments"
+                defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added"
+                values={{ count: 10 }}
+              />
+            }
+          />
         ) : null}
-      </Stack>
-    </Card>
-  );
-}
-
-PetitionComposeAttachments.fragments = {
-  get PetitionAttachment() {
-    return gql`
-      fragment PetitionComposeAttachments_PetitionAttachment on PetitionAttachment {
-        id
-        type
-        file {
-          filename
-          size
-          isComplete
-        }
-        isUploading @client
-      }
-    `;
-  },
-  get PetitionAttachmentsList() {
-    return gql`
-      fragment PetitionComposeAttachments_PetitionAttachmentsList on PetitionAttachmentsList {
-        COVER {
-          ...PetitionComposeAttachments_PetitionAttachment
-        }
-        ANNEX {
-          ...PetitionComposeAttachments_PetitionAttachment
-        }
-        BACK {
-          ...PetitionComposeAttachments_PetitionAttachment
-        }
-      }
-      ${this.PetitionAttachment}
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment PetitionComposeAttachments_PetitionBase on PetitionBase {
-        id
-        attachmentsList {
-          ...PetitionComposeAttachments_PetitionAttachmentsList
-        }
-      }
-      ${this.PetitionAttachmentsList}
-    `;
-  },
-};
+        <CardHeader
+          rightAction={
+            <RestrictedFeaturePopover
+              isRestricted={allAttachments.length > 9}
+              borderRadius="xl"
+              content={
+                <Text>
+                  <FormattedMessage
+                    id="component.petition-compose-attachments.files-limit-reached"
+                    defaultMessage="The limit of {limit} attachments has been reached."
+                    values={{ limit: 10 }}
+                  />
+                </Text>
+              }
+            >
+              <IconButtonWithTooltip
+                icon={<AddIcon />}
+                label={intl.formatMessage({
+                  id: "component.petition-compose-attachments.add-attachment",
+                  defaultMessage: "Add attachment",
+                })}
+                onClick={open}
+                isDisabled={allAttachments.length > 9 || isReadOnly}
+              />
+            </RestrictedFeaturePopover>
+          }
+        >
+          <FormattedMessage
+            id="component.petition-compose-attachments.header"
+            defaultMessage="Document attachments"
+          />
+        </CardHeader>
+        <Stack paddingY={4} paddingX={2}>
+          {allAttachments.length > 0 ? (
+            <>
+              {cover.length ? (
+                <Stack
+                  listStyleType="none"
+                  as={Reorder.Group}
+                  axis="y"
+                  values={cover}
+                  onReorder={setCover}
+                >
+                  {cover.map((item, i, arr) => {
+                    return (
+                      <AttachmentItem
+                        key={item.id}
+                        item={item}
+                        index={i}
+                        progress={attachmentUploadProgress[item.id]}
+                        isDraggable={arr.length > 1}
+                        isDisabled={isReadOnly}
+                        onRemove={handleRemoveAttachment}
+                        onPreview={handleDownloadAttachment}
+                        onChangeType={handleChangeType}
+                        onReorder={() =>
+                          handleReorderAttachments(
+                            "COVER",
+                            cover.map((item) => item.id)
+                          )
+                        }
+                      />
+                    );
+                  })}
+                </Stack>
+              ) : null}
+              {cover.length && (annex.length || back.length) ? <Divider /> : null}
+              {annex.length ? (
+                <Stack
+                  listStyleType="none"
+                  as={Reorder.Group}
+                  axis="y"
+                  values={annex}
+                  onReorder={setAnnex}
+                >
+                  {annex.map((item, i, arr) => {
+                    return (
+                      <AttachmentItem
+                        key={item.id}
+                        item={item}
+                        index={i}
+                        progress={attachmentUploadProgress[item.id]}
+                        isDraggable={arr.length > 1}
+                        isDisabled={isReadOnly}
+                        onRemove={handleRemoveAttachment}
+                        onPreview={handleDownloadAttachment}
+                        onChangeType={handleChangeType}
+                        onReorder={() =>
+                          handleReorderAttachments(
+                            "ANNEX",
+                            annex.map((item) => item.id)
+                          )
+                        }
+                      />
+                    );
+                  })}
+                </Stack>
+              ) : null}
+              {annex.length && back.length ? <Divider /> : null}
+              {back.length ? (
+                <Stack
+                  listStyleType="none"
+                  as={Reorder.Group}
+                  axis="y"
+                  values={back}
+                  onReorder={setBack}
+                >
+                  {back.map((item, i, arr) => {
+                    return (
+                      <AttachmentItem
+                        key={item.id}
+                        item={item}
+                        index={i}
+                        progress={attachmentUploadProgress[item.id]}
+                        isDraggable={arr.length > 1}
+                        isDisabled={isReadOnly}
+                        onRemove={handleRemoveAttachment}
+                        onPreview={handleDownloadAttachment}
+                        onChangeType={handleChangeType}
+                        onReorder={() =>
+                          handleReorderAttachments(
+                            "BACK",
+                            back.map((item) => item.id)
+                          )
+                        }
+                      />
+                    );
+                  })}
+                </Stack>
+              ) : null}
+            </>
+          ) : (
+            <Text width="100%" textAlign="center" color="gray.500">
+              <FormattedMessage
+                id="component.petition-compose-attachments.no-attachments-uploaded"
+                defaultMessage="No attachments have been uploaded yet"
+              />
+            </Text>
+          )}
+          {totalMaxFilesSizeExceeded || hasDocumentFieldsWithAttachments ? (
+            <Box>
+              {totalMaxFilesSizeExceeded ? (
+                <CloseableAlert status="warning" variant="subtle" rounded="md" marginTop={4}>
+                  <AlertIcon color="yellow.500" />
+                  <AlertDescription flex="1">
+                    <Text>
+                      <FormattedMessage
+                        id="component.petition-compose-attachments.large-files-alert"
+                        defaultMessage="<b>Heavy files.</b> Large files may cause problems when starting the signature. We recommend to compress the uploaded files and not to exceed {size}."
+                        values={{ size: <FileSize value={TOTAL_MAX_FILES_SIZE} /> }}
+                      />
+                    </Text>
+                  </AlertDescription>
+                </CloseableAlert>
+              ) : null}
+              {hasDocumentFieldsWithAttachments ? (
+                <CloseableAlert status="info" variant="subtle" rounded="md" marginTop={4}>
+                  <AlertIcon />
+                  <AlertDescription flex="1">
+                    <Text>
+                      <FormattedMessage
+                        id="component.petition-compose-attachments.petition-with-document-fields-alert"
+                        defaultMessage="{type, select, TEMPLATE {This template} other {This parallel}} has document fields set up to attach your responses to the pdf. They will be included in the final document after the attachments."
+                        values={{ type: isTemplate ? "TEMPLATE" : "PETITION" }}
+                      />
+                    </Text>
+                  </AlertDescription>
+                </CloseableAlert>
+              ) : null}
+            </Box>
+          ) : null}
+        </Stack>
+      </Card>
+    );
+  }),
+  {
+    fragments: {
+      get PetitionAttachment() {
+        return gql`
+          fragment PetitionComposeAttachments_PetitionAttachment on PetitionAttachment {
+            id
+            type
+            file {
+              filename
+              size
+              isComplete
+            }
+            isUploading @client
+          }
+        `;
+      },
+      get PetitionAttachmentsList() {
+        return gql`
+          fragment PetitionComposeAttachments_PetitionAttachmentsList on PetitionAttachmentsList {
+            COVER {
+              ...PetitionComposeAttachments_PetitionAttachment
+            }
+            ANNEX {
+              ...PetitionComposeAttachments_PetitionAttachment
+            }
+            BACK {
+              ...PetitionComposeAttachments_PetitionAttachment
+            }
+          }
+          ${this.PetitionAttachment}
+        `;
+      },
+      get PetitionBase() {
+        return gql`
+          fragment PetitionComposeAttachments_PetitionBase on PetitionBase {
+            id
+            attachmentsList {
+              ...PetitionComposeAttachments_PetitionAttachmentsList
+            }
+          }
+          ${this.PetitionAttachmentsList}
+        `;
+      },
+    },
+  }
+);
 
 const _mutations = [
   gql`
@@ -665,24 +678,30 @@ const _mutations = [
 interface AttachmentItemProps {
   item: PetitionComposeAttachments_PetitionAttachmentFragment;
   index: number;
-  isDraggable: boolean;
   progress: number;
+  isDraggable: boolean;
+  isDisabled?: boolean;
   onRemove: (id: string) => Promise<void>;
   onPreview: (id: string, preview: boolean) => void;
   onChangeType: (id: string, type: PetitionAttachmentType) => void;
   onReorder: () => void;
 }
 
-function AttachmentItem({
-  item,
-  index,
-  isDraggable,
-  progress,
-  onRemove,
-  onPreview,
-  onChangeType,
-  onReorder,
-}: AttachmentItemProps) {
+const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function AttachmentItem(
+  {
+    item,
+    index,
+    progress,
+    isDraggable,
+    isDisabled,
+    onRemove,
+    onPreview,
+    onChangeType,
+    onReorder,
+    ...props
+  },
+  ref
+) {
   const intl = useIntl();
   const dragControls = useDragControls();
   const y = useMotionValue(0);
@@ -726,6 +745,7 @@ function AttachmentItem({
       style={{ y }}
     >
       <HStack
+        ref={ref}
         paddingX={3}
         _hover={{
           backgroundColor: "gray.75",
@@ -746,7 +766,8 @@ function AttachmentItem({
           },
         }}
         position="relative"
-        userSelect="none"
+        userSelect={isDisabled ? undefined : "none"}
+        {...props}
       >
         <Box
           className="drag-handle"
@@ -755,16 +776,16 @@ function AttachmentItem({
           display="flex"
           flexDirection="column"
           justifyContent="center"
-          cursor={isDraggable ? "grab" : "not-allowed"}
+          cursor={isDraggable && !isDisabled ? "grab" : "not-allowed"}
           color="gray.400"
           _hover={{
-            color: isDraggable ? "gray.700" : "gray.400",
+            color: isDraggable && !isDisabled ? "gray.700" : "gray.400",
           }}
           aria-label={intl.formatMessage({
             id: "component.petition-compose-field.drag-to-sort-label",
             defaultMessage: "Drag to sort this parallel fields",
           })}
-          onPointerDown={(event) => (isDraggable ? dragControls.start(event) : noop)}
+          onPointerDown={(event) => (isDraggable && !isDisabled ? dragControls.start(event) : noop)}
         >
           <DragHandleIcon role="presentation" boxSize={3} />
         </Box>
@@ -880,10 +901,11 @@ function AttachmentItem({
               defaultMessage: "Remove attachment",
             })}
             variant="ghost"
+            isDisabled={isDisabled}
             onClick={() => onRemove(id)}
           />
         </HStack>
       </HStack>
     </Reorder.Item>
   );
-}
+});
