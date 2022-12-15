@@ -767,10 +767,15 @@ export interface Mutation {
   publicGetTaskResultFileUrl: Scalars["String"];
   /** Marks the specified comments as read. */
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
-  /** Cancel a reminder for a contact. */
+  /**
+   * Cancel a reminder for a contact.
+   * @deprecated Use publicRemindersOptOut
+   */
   publicOptOutReminders: PublicPetitionAccess;
   /** Generates a download link for a field attachment on a public context. */
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
+  /** Cancel a reminder for a contact. */
+  publicRemindersOptOut: Result;
   /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
   publicResetTemporaryPassword: Result;
   publicSendReminder: Result;
@@ -1432,6 +1437,13 @@ export interface MutationpublicPetitionFieldAttachmentDownloadLinkArgs {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
   preview?: InputMaybe<Scalars["Boolean"]>;
+}
+
+export interface MutationpublicRemindersOptOutArgs {
+  keycode: Scalars["ID"];
+  other: Scalars["String"];
+  reason: Scalars["String"];
+  referer?: InputMaybe<Scalars["String"]>;
 }
 
 export interface MutationpublicResetTemporaryPasswordArgs {
@@ -3319,6 +3331,12 @@ export interface PublicPublicPetitionLink {
   title: Scalars["String"];
 }
 
+export interface PublicRemindersOptOut {
+  __typename?: "PublicRemindersOptOut";
+  orgLogoUrl?: Maybe<Scalars["String"]>;
+  orgName: Scalars["String"];
+}
+
 /** The public signature settings of a petition */
 export interface PublicSignatureConfig {
   __typename?: "PublicSignatureConfig";
@@ -3399,6 +3417,8 @@ export interface Query {
   publicTask: Task;
   publicTemplateCategories: Array<Scalars["String"]>;
   realMe: User;
+  /** Exposes minimal information for reminders page so the contact doesn't need to be verified */
+  remindersOptOut?: Maybe<PublicRemindersOptOut>;
   /** Search user groups */
   searchUserGroups: Array<UserGroup>;
   /** Search users and user groups */
@@ -3559,6 +3579,10 @@ export interface QuerypublicPetitionLinkBySlugArgs {
 export interface QuerypublicTaskArgs {
   keycode: Scalars["ID"];
   taskId: Scalars["GID"];
+}
+
+export interface QueryremindersOptOutArgs {
+  keycode: Scalars["ID"];
 }
 
 export interface QuerysearchUserGroupsArgs {
@@ -24021,48 +24045,31 @@ export type RecipientViewVerify_verifyPublicAccessMutation = {
   };
 };
 
-export type OptOut_publicOptOutRemindersMutationVariables = Exact<{
+export type OptOut_publicRemindersOptOutMutationVariables = Exact<{
   keycode: Scalars["ID"];
   reason: Scalars["String"];
   other: Scalars["String"];
   referer?: InputMaybe<Scalars["String"]>;
 }>;
 
-export type OptOut_publicOptOutRemindersMutation = {
-  publicOptOutReminders: {
-    __typename?: "PublicPetitionAccess";
-    petition: { __typename?: "PublicPetition"; id: string };
-  };
+export type OptOut_publicRemindersOptOutMutation = { publicRemindersOptOut: Result };
+
+export type OptOut_PublicRemindersOptOutFragment = {
+  __typename?: "PublicRemindersOptOut";
+  orgLogoUrl?: string | null;
+  orgName: string;
 };
 
-export type OptOut_PublicPetitionAccessFragment = {
-  __typename?: "PublicPetitionAccess";
-  granter?: {
-    __typename?: "PublicUser";
-    id: string;
-    organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
-  } | null;
-};
-
-export type OptOut_PublicUserFragment = {
-  __typename?: "PublicUser";
-  id: string;
-  organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
-};
-
-export type OptOut_accessQueryVariables = Exact<{
+export type OptOut_remindersOptOutQueryVariables = Exact<{
   keycode: Scalars["ID"];
 }>;
 
-export type OptOut_accessQuery = {
-  access: {
-    __typename?: "PublicPetitionAccess";
-    granter?: {
-      __typename?: "PublicUser";
-      id: string;
-      organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
-    } | null;
-  };
+export type OptOut_remindersOptOutQuery = {
+  remindersOptOut?: {
+    __typename?: "PublicRemindersOptOut";
+    orgLogoUrl?: string | null;
+    orgName: string;
+  } | null;
 };
 
 export type PublicPetitionLink_PublicPublicPetitionLinkFragment = {
@@ -30289,23 +30296,12 @@ export const RecipientViewVerify_PublicAccessVerificationFragmentDoc = gql`
   ${RecipientViewNewDevice_PublicOrganizationFragmentDoc}
   ${OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragmentDoc}
 ` as unknown as DocumentNode<RecipientViewVerify_PublicAccessVerificationFragment, unknown>;
-export const OptOut_PublicUserFragmentDoc = gql`
-  fragment OptOut_PublicUser on PublicUser {
-    id
-    organization {
-      name
-      logoUrl
-    }
+export const OptOut_PublicRemindersOptOutFragmentDoc = gql`
+  fragment OptOut_PublicRemindersOptOut on PublicRemindersOptOut {
+    orgLogoUrl
+    orgName
   }
-` as unknown as DocumentNode<OptOut_PublicUserFragment, unknown>;
-export const OptOut_PublicPetitionAccessFragmentDoc = gql`
-  fragment OptOut_PublicPetitionAccess on PublicPetitionAccess {
-    granter {
-      ...OptOut_PublicUser
-    }
-  }
-  ${OptOut_PublicUserFragmentDoc}
-` as unknown as DocumentNode<OptOut_PublicPetitionAccessFragment, unknown>;
+` as unknown as DocumentNode<OptOut_PublicRemindersOptOutFragment, unknown>;
 export const PublicPetitionLink_PublicPublicPetitionLinkFragmentDoc = gql`
   fragment PublicPetitionLink_PublicPublicPetitionLink on PublicPublicPetitionLink {
     title
@@ -33908,31 +33904,27 @@ export const RecipientViewVerify_verifyPublicAccessDocument = gql`
   RecipientViewVerify_verifyPublicAccessMutation,
   RecipientViewVerify_verifyPublicAccessMutationVariables
 >;
-export const OptOut_publicOptOutRemindersDocument = gql`
-  mutation OptOut_publicOptOutReminders(
+export const OptOut_publicRemindersOptOutDocument = gql`
+  mutation OptOut_publicRemindersOptOut(
     $keycode: ID!
     $reason: String!
     $other: String!
     $referer: String
   ) {
-    publicOptOutReminders(keycode: $keycode, reason: $reason, other: $other, referer: $referer) {
-      petition {
-        id
-      }
-    }
+    publicRemindersOptOut(keycode: $keycode, reason: $reason, other: $other, referer: $referer)
   }
 ` as unknown as DocumentNode<
-  OptOut_publicOptOutRemindersMutation,
-  OptOut_publicOptOutRemindersMutationVariables
+  OptOut_publicRemindersOptOutMutation,
+  OptOut_publicRemindersOptOutMutationVariables
 >;
-export const OptOut_accessDocument = gql`
-  query OptOut_access($keycode: ID!) {
-    access(keycode: $keycode) {
-      ...OptOut_PublicPetitionAccess
+export const OptOut_remindersOptOutDocument = gql`
+  query OptOut_remindersOptOut($keycode: ID!) {
+    remindersOptOut(keycode: $keycode) {
+      ...OptOut_PublicRemindersOptOut
     }
   }
-  ${OptOut_PublicPetitionAccessFragmentDoc}
-` as unknown as DocumentNode<OptOut_accessQuery, OptOut_accessQueryVariables>;
+  ${OptOut_PublicRemindersOptOutFragmentDoc}
+` as unknown as DocumentNode<OptOut_remindersOptOutQuery, OptOut_remindersOptOutQueryVariables>;
 export const PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocument = gql`
   mutation PublicPetitionLink_publicCreateAndSendPetitionFromPublicLink(
     $slug: ID!

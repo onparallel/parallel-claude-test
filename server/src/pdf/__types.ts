@@ -723,10 +723,15 @@ export type Mutation = {
   publicGetTaskResultFileUrl: Scalars["String"];
   /** Marks the specified comments as read. */
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
-  /** Cancel a reminder for a contact. */
+  /**
+   * Cancel a reminder for a contact.
+   * @deprecated Use publicRemindersOptOut
+   */
   publicOptOutReminders: PublicPetitionAccess;
   /** Generates a download link for a field attachment on a public context. */
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
+  /** Cancel a reminder for a contact. */
+  publicRemindersOptOut: Result;
   /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
   publicResetTemporaryPassword: Result;
   publicSendReminder: Result;
@@ -1388,6 +1393,13 @@ export type MutationpublicPetitionFieldAttachmentDownloadLinkArgs = {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
   preview?: InputMaybe<Scalars["Boolean"]>;
+};
+
+export type MutationpublicRemindersOptOutArgs = {
+  keycode: Scalars["ID"];
+  other: Scalars["String"];
+  reason: Scalars["String"];
+  referer?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationpublicResetTemporaryPasswordArgs = {
@@ -3210,6 +3222,11 @@ export type PublicPublicPetitionLink = {
   title: Scalars["String"];
 };
 
+export type PublicRemindersOptOut = {
+  orgLogoUrl: Maybe<Scalars["String"]>;
+  orgName: Scalars["String"];
+};
+
 /** The public signature settings of a petition */
 export type PublicSignatureConfig = {
   /** The signers assigned by the petition recipient */
@@ -3287,6 +3304,8 @@ export type Query = {
   publicTask: Task;
   publicTemplateCategories: Array<Scalars["String"]>;
   realMe: User;
+  /** Exposes minimal information for reminders page so the contact doesn't need to be verified */
+  remindersOptOut: Maybe<PublicRemindersOptOut>;
   /** Search user groups */
   searchUserGroups: Array<UserGroup>;
   /** Search users and user groups */
@@ -3447,6 +3466,10 @@ export type QuerypublicPetitionLinkBySlugArgs = {
 export type QuerypublicTaskArgs = {
   keycode: Scalars["ID"];
   taskId: Scalars["GID"];
+};
+
+export type QueryremindersOptOutArgs = {
+  keycode: Scalars["ID"];
 };
 
 export type QuerysearchUserGroupsArgs = {

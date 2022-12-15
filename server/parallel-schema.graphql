@@ -1384,7 +1384,7 @@ type Mutation {
     other: String!
     reason: String!
     referer: String
-  ): PublicPetitionAccess!
+  ): PublicPetitionAccess! @deprecated(reason: "Use publicRemindersOptOut")
 
   """
   Generates a download link for a field attachment on a public context.
@@ -1399,6 +1399,11 @@ type Mutation {
     """
     preview: Boolean
   ): FileUploadDownloadLinkResult!
+
+  """
+  Cancel a reminder for a contact.
+  """
+  publicRemindersOptOut(keycode: ID!, other: String!, reason: String!, referer: String): Result!
 
   """
   Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
@@ -4428,6 +4433,11 @@ type PublicPublicPetitionLink {
   title: String!
 }
 
+type PublicRemindersOptOut {
+  orgLogoUrl: String
+  orgName: String!
+}
+
 """
 The public signature settings of a petition
 """
@@ -4707,6 +4717,11 @@ type Query {
   publicTask(keycode: ID!, taskId: GID!): Task!
   publicTemplateCategories: [String!]!
   realMe: User!
+
+  """
+  Exposes minimal information for reminders page so the contact doesn't need to be verified
+  """
+  remindersOptOut(keycode: ID!): PublicRemindersOptOut
 
   """
   Search user groups

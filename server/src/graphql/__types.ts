@@ -701,6 +701,11 @@ export interface NexusGenObjects {
   PublicPetitionLink: db.PublicPetitionLink;
   PublicPetitionMessage: db.PetitionMessage;
   PublicPublicPetitionLink: db.PublicPetitionLink;
+  PublicRemindersOptOut: {
+    // root type
+    orgLogoUrl?: string | null; // String
+    orgName: string; // String!
+  };
   PublicSignatureConfig: {
     signersInfo: any[];
     review?: boolean;
@@ -1307,6 +1312,7 @@ export interface NexusGenFieldTypes {
     publicMarkPetitionFieldCommentsAsRead: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     publicOptOutReminders: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
     publicPetitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
+    publicRemindersOptOut: NexusGenEnums["Result"]; // Result!
     publicResetTemporaryPassword: NexusGenEnums["Result"]; // Result!
     publicSendReminder: NexusGenEnums["Result"]; // Result!
     publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
@@ -2059,6 +2065,11 @@ export interface NexusGenFieldTypes {
     slug: string; // String!
     title: string; // String!
   };
+  PublicRemindersOptOut: {
+    // field return type
+    orgLogoUrl: string | null; // String
+    orgName: string; // String!
+  };
   PublicSignatureConfig: {
     // field return type
     additionalSigners: NexusGenRootTypes["PetitionSigner"][]; // [PetitionSigner!]!
@@ -2110,6 +2121,7 @@ export interface NexusGenFieldTypes {
     publicTask: NexusGenRootTypes["Task"]; // Task!
     publicTemplateCategories: string[]; // [String!]!
     realMe: NexusGenRootTypes["User"]; // User!
+    remindersOptOut: NexusGenRootTypes["PublicRemindersOptOut"] | null; // PublicRemindersOptOut
     searchUserGroups: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     subscriptions: NexusGenRootTypes["PetitionEventSubscription"][]; // [PetitionEventSubscription!]!
@@ -3031,6 +3043,7 @@ export interface NexusGenFieldTypeNames {
     publicMarkPetitionFieldCommentsAsRead: "PublicPetitionFieldComment";
     publicOptOutReminders: "PublicPetitionAccess";
     publicPetitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
+    publicRemindersOptOut: "Result";
     publicResetTemporaryPassword: "Result";
     publicSendReminder: "Result";
     publicSendVerificationCode: "VerificationCodeRequest";
@@ -3783,6 +3796,11 @@ export interface NexusGenFieldTypeNames {
     slug: "String";
     title: "String";
   };
+  PublicRemindersOptOut: {
+    // field return type name
+    orgLogoUrl: "String";
+    orgName: "String";
+  };
   PublicSignatureConfig: {
     // field return type name
     additionalSigners: "PetitionSigner";
@@ -3834,6 +3852,7 @@ export interface NexusGenFieldTypeNames {
     publicTask: "Task";
     publicTemplateCategories: "String";
     realMe: "User";
+    remindersOptOut: "PublicRemindersOptOut";
     searchUserGroups: "UserGroup";
     searchUsers: "UserOrUserGroup";
     subscriptions: "PetitionEventSubscription";
@@ -4846,6 +4865,13 @@ export interface NexusGenArgTypes {
       keycode: string; // ID!
       preview?: boolean | null; // Boolean
     };
+    publicRemindersOptOut: {
+      // args
+      keycode: string; // ID!
+      other: string; // String!
+      reason: string; // String!
+      referer?: string | null; // String
+    };
     publicResetTemporaryPassword: {
       // args
       email: string; // String!
@@ -5472,6 +5498,10 @@ export interface NexusGenArgTypes {
       // args
       keycode: string; // ID!
       taskId: NexusGenScalars["GID"]; // GID!
+    };
+    remindersOptOut: {
+      // args
+      keycode: string; // ID!
     };
     searchUserGroups: {
       // args

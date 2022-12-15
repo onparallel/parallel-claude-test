@@ -623,7 +623,9 @@ export const publicPetitionFieldAttachmentDownloadLink = mutationField(
   }
 );
 
+/** @deprecated */
 export const publicOptOutReminders = mutationField("publicOptOutReminders", {
+  deprecation: "Use publicRemindersOptOut",
   description: "Cancel a reminder for a contact.",
   type: "PublicPetitionAccess",
   authorize: authenticatePublicAccess("keycode"),
@@ -651,6 +653,40 @@ export const publicOptOutReminders = mutationField("publicOptOutReminders", {
     }
 
     return (await ctx.petitions.optOutReminders([access!.id]))[0];
+  },
+});
+
+export const publicRemindersOptOut = mutationField("publicRemindersOptOut", {
+  description: "Cancel a reminder for a contact.",
+  type: "Result",
+  args: {
+    keycode: nonNull(idArg()),
+    reason: nonNull(stringArg()),
+    other: nonNull(stringArg()),
+    referer: nullable(stringArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    try {
+      const access = await ctx.petitions.loadAccessByKeycode(args.keycode);
+      if (!access) throw new Error();
+
+      if (!access.reminders_opt_out) {
+        await ctx.petitions.createEvent({
+          type: "REMINDERS_OPT_OUT",
+          petition_id: access!.petition_id,
+          data: {
+            petition_access_id: access!.id,
+            reason: args.reason,
+            other: args.other,
+            referer: args.referer,
+          },
+        });
+      }
+
+      await ctx.petitions.optOutReminders([access!.id]);
+      return RESULT.SUCCESS;
+    } catch {}
+    return RESULT.FAILURE;
   },
 });
 

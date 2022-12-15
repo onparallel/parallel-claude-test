@@ -13,6 +13,40 @@ import {
   validPublicPetitionLinkPrefill,
 } from "./authorizers";
 
+export const remindersOptOut = queryField("remindersOptOut", {
+  description:
+    "Exposes minimal information for reminders page so the contact doesn't need to be verified",
+  type: nullable(
+    objectType({
+      name: "PublicRemindersOptOut",
+      definition(t) {
+        t.nullable.string("orgLogoUrl");
+        t.string("orgName");
+      },
+    })
+  ),
+  args: {
+    keycode: nonNull(idArg()),
+  },
+  resolve: async (_, { keycode }, ctx) => {
+    const access = await ctx.petitions.loadAccessByKeycode(keycode);
+    if (!access) return null;
+
+    const granter = await ctx.users.loadUser(access.granter_id);
+    if (!granter) return null;
+
+    const organization = await ctx.organizations.loadOrg(granter.org_id);
+    if (!organization) return null;
+
+    const logoPath = await ctx.organizations.loadOrgLogoPath(organization.id);
+
+    return {
+      orgLogoUrl: isDefined(logoPath) ? await ctx.images.getImageUrl(logoPath) : null,
+      orgName: organization.name,
+    };
+  },
+});
+
 export const accessQuery = queryField("access", {
   type: "PublicPetitionAccess",
   args: {

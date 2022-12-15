@@ -21,9 +21,9 @@ import { Logo } from "@parallel/components/common/Logo";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import { RecipientViewPageNotAvailableError } from "@parallel/components/recipient-view/RecipientViewPageNotAvailableError";
 import {
-  OptOut_accessDocument,
-  OptOut_publicOptOutRemindersDocument,
-  OptOut_PublicPetitionAccessFragment,
+  OptOut_publicRemindersOptOutDocument,
+  OptOut_PublicRemindersOptOutFragment,
+  OptOut_remindersOptOutDocument,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -36,7 +36,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
 type OptOutProps =
-  | { keycode: string; access: OptOut_PublicPetitionAccessFragment }
+  | { keycode: string; optOut: OptOut_PublicRemindersOptOutFragment }
   | { errorCode: "PUBLIC_PETITION_NOT_AVAILABLE" };
 
 function OptOut(props: OptOutProps) {
@@ -49,8 +49,7 @@ function OptOut(props: OptOutProps) {
     query: { ref },
   } = useRouter();
 
-  const { keycode, access } = props;
-  const granter = access.granter!;
+  const { keycode, optOut } = props;
 
   const [optedOut, setOptedOut] = useState(false);
   const [reason, setReason] = useState("");
@@ -58,11 +57,11 @@ function OptOut(props: OptOutProps) {
 
   const answers = useReminderOptOutReasons();
 
-  const [optOut] = useMutation(OptOut_publicOptOutRemindersDocument);
+  const [publicRemindersOptOut] = useMutation(OptOut_publicRemindersOptOutDocument);
 
   const handleOptOut = async (event: FormEvent) => {
     event.preventDefault();
-    await optOut({ variables: { keycode, reason, other, referer: ref as string } });
+    await publicRemindersOptOut({ variables: { keycode, reason, other, referer: ref as string } });
     setOptedOut(true);
   };
 
@@ -90,13 +89,8 @@ function OptOut(props: OptOutProps) {
           paddingX={2.5}
           justifyContent="left"
         >
-          {granter.organization.logoUrl ? (
-            <Img
-              src={granter.organization.logoUrl}
-              aria-label={granter.organization.name}
-              width="auto"
-              height="40px"
-            />
+          {optOut.orgLogoUrl ? (
+            <Img src={optOut.orgLogoUrl} aria-label={optOut.orgName} width="auto" height="40px" />
           ) : (
             <Logo width="152px" height="40px" />
           )}
@@ -208,40 +202,23 @@ function OptOut(props: OptOutProps) {
 
 OptOut.mutations = [
   gql`
-    mutation OptOut_publicOptOutReminders(
+    mutation OptOut_publicRemindersOptOut(
       $keycode: ID!
       $reason: String!
       $other: String!
       $referer: String
     ) {
-      publicOptOutReminders(keycode: $keycode, reason: $reason, other: $other, referer: $referer) {
-        petition {
-          id
-        }
-      }
+      publicRemindersOptOut(keycode: $keycode, reason: $reason, other: $other, referer: $referer)
     }
   `,
 ];
 
 OptOut.fragments = {
-  get PublicPetitionAccess() {
+  get PublicRemindersOptOut() {
     return gql`
-      fragment OptOut_PublicPetitionAccess on PublicPetitionAccess {
-        granter {
-          ...OptOut_PublicUser
-        }
-      }
-      ${this.PublicUser}
-    `;
-  },
-  get PublicUser() {
-    return gql`
-      fragment OptOut_PublicUser on PublicUser {
-        id
-        organization {
-          name
-          logoUrl
-        }
+      fragment OptOut_PublicRemindersOptOut on PublicRemindersOptOut {
+        orgLogoUrl
+        orgName
       }
     `;
   },
@@ -249,40 +226,32 @@ OptOut.fragments = {
 
 OptOut.queries = [
   gql`
-    query OptOut_access($keycode: ID!) {
-      access(keycode: $keycode) {
-        ...OptOut_PublicPetitionAccess
+    query OptOut_remindersOptOut($keycode: ID!) {
+      remindersOptOut(keycode: $keycode) {
+        ...OptOut_PublicRemindersOptOut
       }
     }
-    ${OptOut.fragments.PublicPetitionAccess}
+    ${OptOut.fragments.PublicRemindersOptOut}
   `,
 ];
 
 export async function getServerSideProps({
   params,
   req,
-  locale,
 }: GetServerSidePropsContext<{ keycode: string }>) {
   try {
     const client = createApolloClient({}, { req });
     const { data } = await client.query({
-      query: OptOut_accessDocument,
+      query: OptOut_remindersOptOutDocument,
       variables: { keycode: params!.keycode },
     });
-    if (!isDefined(data?.access)) {
+    if (!isDefined(data?.remindersOptOut)) {
       throw new Error();
     }
-    return { props: { keycode: params!.keycode, access: data.access } };
+    return { props: { keycode: params!.keycode, optOut: data.remindersOptOut } };
   } catch (error) {
     if (isApolloError(error, "PUBLIC_PETITION_NOT_AVAILABLE")) {
       return { props: { errorCode: "PUBLIC_PETITION_NOT_AVAILABLE" } };
-    } else if (isApolloError(error, "CONTACT_NOT_VERIFIED")) {
-      return {
-        redirect: {
-          destination: `/${locale}/petition/${params!.keycode}`,
-          permanent: false,
-        },
-      };
     }
     throw error;
   }
