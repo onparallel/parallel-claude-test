@@ -804,6 +804,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
               aria-label="Options"
               leftIcon={menuIcon}
               rightIcon={<ChevronDownIcon marginLeft={-2} />}
+              isDisabled={isDisabled}
             />
           </Box>
           <Portal>
