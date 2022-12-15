@@ -4782,22 +4782,17 @@ export class PetitionRepository extends BaseRepository {
     return await this.withTransaction(async (t) => {
       await this.raw(
         /* sql */ `
-          with max_pos as (
-            select coalesce(max(position) + 1, 0) as position from petition_attachment where petition_id = ? and type = ? and deleted_at is null
-          ) update petition_attachment pa set
-            -- prefix with max position of current attachments, to avoid conflict on unique constraint "petition_attachment__petition_id__type__position"
-            position = max_pos.position + t.position, 
-            updated_at = NOW(),
-            updated_by = ?
-            from (?) as t (id, position), max_pos
-            where t.id = pa.id
-            and pa.type = ?
-            and pa.petition_id = ?
-            and pa.deleted_at is null;
+        update petition_attachment pa set 
+        position = t.position, 
+        updated_at = NOW(),
+        updated_by = ?
+        from (?) as t (id, position)
+        where pa.id = t.id
+        and pa.type = ?
+        and pa.petition_id = ?
+        and pa.deleted_at is null;
       `,
         [
-          petitionId,
-          attachmentType,
           updatedBy,
           this.sqlValues(
             ids.map((id, i) => [id, i]),
@@ -4826,24 +4821,35 @@ export class PetitionRepository extends BaseRepository {
     newType: PetitionAttachmentType,
     updatedBy: string
   ) {
-    const [attachment] = await this.raw<PetitionAttachment>(
-      /* sql */ `
-          with max_pos as (
-            select coalesce(max(position) + 1, 0) as position from petition_attachment where petition_id = ? and type = ? and deleted_at is null
-          ) update petition_attachment pa set
-            type = ?,
-            -- if new type is same as old type, don't update positions
-            position = (case when type = ? then pa.position else mp.position end), 
-            updated_at = NOW(),
-            updated_by = ?
-            from max_pos mp
-            where pa.id = ?
-            and pa.deleted_at is null
-            returning *;
-      `,
-      [petitionId, newType, newType, newType, updatedBy, attachmentId]
-    );
-    return attachment;
+    const target = (await this.loadPetitionAttachment(attachmentId))!;
+    return await this.withTransaction(async (t) => {
+      const [result] = await this.raw<PetitionAttachment>(
+        /* sql */ `
+            with max_pos as (
+              select coalesce(max(position) + 1, 0) as position from petition_attachment where petition_id = ? and type = ? and deleted_at is null
+            ) update petition_attachment pa set
+              type = ?,
+              -- if new type is same as old type, don't update positions
+              position = (case when type = ? then pa.position else mp.position end), 
+              updated_at = NOW(),
+              updated_by = ?
+              from max_pos mp
+              where pa.id = ?
+              and pa.deleted_at is null
+              returning *;
+        `,
+        [petitionId, newType, newType, newType, updatedBy, attachmentId],
+        t
+      );
+
+      // we also need to update positions of target type attachments so the sequence is 0...x
+      await this.from("petition_attachment", t)
+        .where({ deleted_at: null, type: target.type })
+        .whereRaw(`"position" >= ?`, [target.position])
+        .update({ position: this.knex.raw(`"position" - 1`) });
+
+      return result;
+    });
   }
 
   readonly loadPublicPetitionLink = this.buildLoadBy("public_petition_link", "id");

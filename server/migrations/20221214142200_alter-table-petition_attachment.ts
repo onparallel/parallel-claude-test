@@ -15,10 +15,15 @@ export async function up(knex: Knex): Promise<void> {
     t.integer("position").notNullable();
     timestamps(t);
   }).raw(/* sql */ `
-    -- positions should not repeat between sections of a petition
-    create unique index petition_attachment__petition_id__type__position on "petition_attachment" (petition_id, type, position) where deleted_at is null;
     -- to query all the attachments on the petition
     create index petition_attachment__petition_id on "petition_attachment" (petition_id) where deleted_at is null;
+  `).raw(/* sql */ `
+    -- positions should not repeat between sections of a petition
+      alter table "petition_attachment" 
+      add constraint petition_attachment__petition_id__type__position
+      exclude (petition_id with =, type with =, position with =)
+      where (deleted_at is null)
+      deferrable initially deferred;
   `);
 }
 
