@@ -261,6 +261,7 @@ OptOut.queries = [
 export async function getServerSideProps({
   params,
   req,
+  locale,
 }: GetServerSidePropsContext<{ keycode: string }>) {
   try {
     const client = createApolloClient({}, { req });
@@ -275,6 +276,13 @@ export async function getServerSideProps({
   } catch (error) {
     if (isApolloError(error, "PUBLIC_PETITION_NOT_AVAILABLE")) {
       return { props: { errorCode: "PUBLIC_PETITION_NOT_AVAILABLE" } };
+    } else if (isApolloError(error, "CONTACT_NOT_VERIFIED")) {
+      return {
+        redirect: {
+          destination: `/${locale}/petition/${params!.keycode}`,
+          permanent: false,
+        },
+      };
     }
     throw error;
   }
