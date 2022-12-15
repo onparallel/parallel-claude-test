@@ -2240,7 +2240,7 @@ export type PetitionAttachment = {
   type: PetitionAttachmentType;
 };
 
-export type PetitionAttachmentType = "ANNEX" | "BACK" | "COVER";
+export type PetitionAttachmentType = "ANNEX" | "BACK" | "FRONT";
 
 export type PetitionAttachmentUploadData = {
   attachment: PetitionAttachment;
@@ -2250,7 +2250,7 @@ export type PetitionAttachmentUploadData = {
 export type PetitionAttachmentsList = {
   ANNEX: Array<PetitionAttachment>;
   BACK: Array<PetitionAttachment>;
-  COVER: Array<PetitionAttachment>;
+  FRONT: Array<PetitionAttachment>;
 };
 
 export type PetitionBase = {

@@ -43,7 +43,7 @@ describe("GraphQL/PetitionAttachments", () => {
     let attachments: PetitionAttachment[] = [];
     beforeAll(async () => {
       attachments.push(
-        ...(await mocks.createPetitionAttachment(petition.id, "COVER", randomInt(10)))
+        ...(await mocks.createPetitionAttachment(petition.id, "FRONT", randomInt(10)))
       );
       attachments.push(
         ...(await mocks.createPetitionAttachment(petition.id, "ANNEX", randomInt(10)))
@@ -62,7 +62,7 @@ describe("GraphQL/PetitionAttachments", () => {
           query PetitionFieldAttachments($petitionId: GID!) {
             petition(id: $petitionId) {
               attachmentsList {
-                COVER {
+                FRONT {
                   id
                 }
                 ANNEX {
@@ -83,8 +83,8 @@ describe("GraphQL/PetitionAttachments", () => {
       expect(errors).toBeUndefined();
       expect(data?.petition).toEqual({
         attachmentsList: {
-          COVER: sortBy(
-            attachments.filter((a) => a.type === "COVER"),
+          FRONT: sortBy(
+            attachments.filter((a) => a.type === "FRONT"),
             [(a) => a.position, "asc"]
           ).map((a) => ({ id: toGlobalId("PetitionAttachment", a.id) })),
           ANNEX: sortBy(
@@ -181,7 +181,7 @@ describe("GraphQL/PetitionAttachments", () => {
                 petition {
                   id
                   attachmentsList {
-                    COVER {
+                    FRONT {
                       id
                     }
                     ANNEX {
@@ -233,7 +233,7 @@ describe("GraphQL/PetitionAttachments", () => {
             petition: {
               id: toGlobalId("Petition", petition.id),
               attachmentsList: {
-                COVER: [],
+                FRONT: [],
                 ANNEX: [{ id: toGlobalId("PetitionAttachment", annex.id) }],
                 BACK: [],
               },
@@ -295,7 +295,7 @@ describe("GraphQL/PetitionAttachments", () => {
               size: 1024 * 1024 * 50 + 1,
             },
           ],
-          type: "COVER",
+          type: "FRONT",
         }
       );
       expect(errors).toContainGraphQLError("MAX_FILE_SIZE_EXCEEDED_ERROR");
@@ -390,7 +390,7 @@ describe("GraphQL/PetitionAttachments", () => {
                 ANNEX {
                   id
                 }
-                COVER {
+                FRONT {
                   id
                 }
               }
@@ -405,7 +405,7 @@ describe("GraphQL/PetitionAttachments", () => {
       expect(queryErrors).toBeUndefined();
       expect(queryData?.petition.attachmentsList.BACK).toHaveLength(10);
       expect(queryData?.petition.attachmentsList.ANNEX).toHaveLength(0);
-      expect(queryData?.petition.attachmentsList.COVER).toHaveLength(0);
+      expect(queryData?.petition.attachmentsList.FRONT).toHaveLength(0);
     });
 
     it("should not be able to upload more than 10 files at once", async () => {
@@ -579,7 +579,7 @@ describe("GraphQL/PetitionAttachments", () => {
         size: "2048",
         upload_complete: false,
       }));
-      const [attachment] = await mocks.createPetitionAttachment(petition.id, "COVER", 1, () => ({
+      const [attachment] = await mocks.createPetitionAttachment(petition.id, "FRONT", 1, () => ({
         file_upload_id: file.id,
       }));
       const { errors, data } = await testClient.execute(
@@ -707,7 +707,7 @@ describe("GraphQL/PetitionAttachments", () => {
           query ($id: GID!) {
             petition(id: $id) {
               attachmentsList {
-                COVER {
+                FRONT {
                   id
                 }
                 ANNEX {
@@ -726,7 +726,7 @@ describe("GraphQL/PetitionAttachments", () => {
       expect(dataAfter).toEqual({
         petition: {
           attachmentsList: {
-            COVER: [],
+            FRONT: [],
             ANNEX: [
               { id: toGlobalId("PetitionAttachment", annexes[0].id) },
               { id: toGlobalId("PetitionAttachment", annexes[1].id) },
@@ -744,7 +744,7 @@ describe("GraphQL/PetitionAttachments", () => {
             deletePetitionAttachment(petitionId: $petitionId, attachmentId: $attachmentId) {
               id
               attachmentsList {
-                COVER {
+                FRONT {
                   id
                 }
                 ANNEX {
@@ -767,7 +767,7 @@ describe("GraphQL/PetitionAttachments", () => {
       expect(data?.deletePetitionAttachment).toEqual({
         id: toGlobalId("Petition", petition.id),
         attachmentsList: {
-          COVER: [],
+          FRONT: [],
           ANNEX: [
             { id: toGlobalId("PetitionAttachment", annexes[0].id) },
             { id: toGlobalId("PetitionAttachment", annexes[2].id) },
@@ -780,12 +780,12 @@ describe("GraphQL/PetitionAttachments", () => {
   });
 
   describe("reorderPetitionAttachments", () => {
-    let covers: PetitionAttachment[];
+    let fronts: PetitionAttachment[];
     let annexes: PetitionAttachment[];
     beforeAll(async () => {
       await mocks.knex.from("petition_attachment").update({ deleted_at: new Date() });
 
-      covers = await mocks.createPetitionAttachment(petition.id, "COVER", 5);
+      fronts = await mocks.createPetitionAttachment(petition.id, "FRONT", 5);
       annexes = await mocks.createPetitionAttachment(petition.id, "ANNEX", 5);
     });
 
@@ -808,7 +808,7 @@ describe("GraphQL/PetitionAttachments", () => {
         `,
         {
           petitionId: toGlobalId("Petition", petition.id),
-          attachmentType: "COVER",
+          attachmentType: "FRONT",
           attachmentIds: annexes.map((a) => toGlobalId("PetitionAttachment", a.id)),
         }
       );
@@ -858,7 +858,7 @@ describe("GraphQL/PetitionAttachments", () => {
             ) {
               id
               attachmentsList {
-                COVER {
+                FRONT {
                   id
                 }
                 ANNEX {
@@ -873,13 +873,13 @@ describe("GraphQL/PetitionAttachments", () => {
         `,
         {
           petitionId: toGlobalId("Petition", petition.id),
-          attachmentType: "COVER",
+          attachmentType: "FRONT",
           attachmentIds: [
-            toGlobalId("PetitionAttachment", covers[2].id),
-            toGlobalId("PetitionAttachment", covers[0].id),
-            toGlobalId("PetitionAttachment", covers[4].id),
-            toGlobalId("PetitionAttachment", covers[1].id),
-            toGlobalId("PetitionAttachment", covers[3].id),
+            toGlobalId("PetitionAttachment", fronts[2].id),
+            toGlobalId("PetitionAttachment", fronts[0].id),
+            toGlobalId("PetitionAttachment", fronts[4].id),
+            toGlobalId("PetitionAttachment", fronts[1].id),
+            toGlobalId("PetitionAttachment", fronts[3].id),
           ],
         }
       );
@@ -887,12 +887,12 @@ describe("GraphQL/PetitionAttachments", () => {
       expect(data?.reorderPetitionAttachments).toEqual({
         id: toGlobalId("Petition", petition.id),
         attachmentsList: {
-          COVER: [
-            { id: toGlobalId("PetitionAttachment", covers[2].id) },
-            { id: toGlobalId("PetitionAttachment", covers[0].id) },
-            { id: toGlobalId("PetitionAttachment", covers[4].id) },
-            { id: toGlobalId("PetitionAttachment", covers[1].id) },
-            { id: toGlobalId("PetitionAttachment", covers[3].id) },
+          FRONT: [
+            { id: toGlobalId("PetitionAttachment", fronts[2].id) },
+            { id: toGlobalId("PetitionAttachment", fronts[0].id) },
+            { id: toGlobalId("PetitionAttachment", fronts[4].id) },
+            { id: toGlobalId("PetitionAttachment", fronts[1].id) },
+            { id: toGlobalId("PetitionAttachment", fronts[3].id) },
           ],
           ANNEX: [
             { id: toGlobalId("PetitionAttachment", annexes[0].id) },
@@ -910,7 +910,7 @@ describe("GraphQL/PetitionAttachments", () => {
   describe("updatePetitionAttachmentType", () => {
     it("changes the type of an attachment and places it in last position", async () => {
       const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
-      const coverAttachments = await mocks.createPetitionAttachment(petition.id, "COVER", 2);
+      const frontAttachments = await mocks.createPetitionAttachment(petition.id, "FRONT", 2);
       const annexAttachments = await mocks.createPetitionAttachment(petition.id, "ANNEX", 2);
 
       const { errors, data } = await testClient.execute(
@@ -925,7 +925,7 @@ describe("GraphQL/PetitionAttachments", () => {
               petition {
                 id
                 attachmentsList {
-                  COVER {
+                  FRONT {
                     id
                   }
                   ANNEX {
@@ -941,22 +941,22 @@ describe("GraphQL/PetitionAttachments", () => {
         `,
         {
           petitionId: toGlobalId("Petition", petition.id),
-          attachmentId: toGlobalId("PetitionAttachment", coverAttachments[0].id),
+          attachmentId: toGlobalId("PetitionAttachment", frontAttachments[0].id),
           type: "ANNEX",
         }
       );
 
       expect(errors).toBeUndefined();
       expect(data?.updatePetitionAttachmentType).toEqual({
-        id: toGlobalId("PetitionAttachment", coverAttachments[0].id),
+        id: toGlobalId("PetitionAttachment", frontAttachments[0].id),
         petition: {
           id: toGlobalId("Petition", petition.id),
           attachmentsList: {
-            COVER: [{ id: toGlobalId("PetitionAttachment", coverAttachments[1].id) }],
+            FRONT: [{ id: toGlobalId("PetitionAttachment", frontAttachments[1].id) }],
             ANNEX: [
               { id: toGlobalId("PetitionAttachment", annexAttachments[0].id) },
               { id: toGlobalId("PetitionAttachment", annexAttachments[1].id) },
-              { id: toGlobalId("PetitionAttachment", coverAttachments[0].id) },
+              { id: toGlobalId("PetitionAttachment", frontAttachments[0].id) },
             ],
             BACK: [],
           },
@@ -970,14 +970,14 @@ describe("GraphQL/PetitionAttachments", () => {
       const [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
         is_template: true,
       }));
-      await mocks.createPetitionAttachment(template.id, "COVER", 2);
+      await mocks.createPetitionAttachment(template.id, "FRONT", 2);
 
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($templateId: GID, $type: PetitionBaseType) {
             createPetition(petitionId: $templateId, type: $type) {
               attachmentsList {
-                COVER {
+                FRONT {
                   id
                 }
                 ANNEX {
@@ -997,7 +997,7 @@ describe("GraphQL/PetitionAttachments", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createPetition.attachmentsList.COVER).toHaveLength(2);
+      expect(data?.createPetition.attachmentsList.FRONT).toHaveLength(2);
       expect(data?.createPetition.attachmentsList.ANNEX).toHaveLength(0);
       expect(data?.createPetition.attachmentsList.BACK).toHaveLength(0);
     });
@@ -1008,14 +1008,14 @@ describe("GraphQL/PetitionAttachments", () => {
       const [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
         is_template: true,
       }));
-      await mocks.createPetitionAttachment(template.id, "COVER", 2);
+      await mocks.createPetitionAttachment(template.id, "FRONT", 2);
 
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionIds: [GID!]!) {
             clonePetitions(petitionIds: $petitionIds) {
               attachmentsList {
-                COVER {
+                FRONT {
                   id
                 }
                 ANNEX {
@@ -1033,7 +1033,7 @@ describe("GraphQL/PetitionAttachments", () => {
 
       expect(errors).toBeUndefined();
       expect(data?.clonePetitions).toHaveLength(1);
-      expect(data?.clonePetitions[0].attachmentsList.COVER).toHaveLength(2);
+      expect(data?.clonePetitions[0].attachmentsList.FRONT).toHaveLength(2);
       expect(data?.clonePetitions[0].attachmentsList.ANNEX).toHaveLength(0);
       expect(data?.clonePetitions[0].attachmentsList.BACK).toHaveLength(0);
     });

@@ -590,7 +590,7 @@ export interface NexusGenObjects {
     // root type
     ANNEX: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
     BACK: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
-    COVER: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    FRONT: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
   };
   PetitionBaseMini: db.Petition;
   PetitionBaseOrFolderPagination: {
@@ -1588,7 +1588,7 @@ export interface NexusGenFieldTypes {
     // field return type
     ANNEX: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
     BACK: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
-    COVER: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    FRONT: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
   };
   PetitionBaseMini: {
     // field return type
@@ -3331,7 +3331,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     ANNEX: "PetitionAttachment";
     BACK: "PetitionAttachment";
-    COVER: "PetitionAttachment";
+    FRONT: "PetitionAttachment";
   };
   PetitionBaseMini: {
     // field return type name

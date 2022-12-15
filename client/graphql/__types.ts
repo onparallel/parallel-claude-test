@@ -2301,7 +2301,7 @@ export interface PetitionAttachment {
   type: PetitionAttachmentType;
 }
 
-export type PetitionAttachmentType = "ANNEX" | "BACK" | "COVER";
+export type PetitionAttachmentType = "ANNEX" | "BACK" | "FRONT";
 
 export interface PetitionAttachmentUploadData {
   __typename?: "PetitionAttachmentUploadData";
@@ -2313,7 +2313,7 @@ export interface PetitionAttachmentsList {
   __typename?: "PetitionAttachmentsList";
   ANNEX: Array<PetitionAttachment>;
   BACK: Array<PetitionAttachment>;
-  COVER: Array<PetitionAttachment>;
+  FRONT: Array<PetitionAttachment>;
 }
 
 export interface PetitionBase {
@@ -9810,7 +9810,7 @@ export type PetitionComposeAttachments_PetitionAttachmentFragment = {
 
 export type PetitionComposeAttachments_PetitionAttachmentsListFragment = {
   __typename?: "PetitionAttachmentsList";
-  COVER: Array<{
+  FRONT: Array<{
     __typename?: "PetitionAttachment";
     id: string;
     type: PetitionAttachmentType;
@@ -9838,7 +9838,7 @@ export type PetitionComposeAttachments_PetitionBase_Petition_Fragment = {
   id: string;
   attachmentsList: {
     __typename?: "PetitionAttachmentsList";
-    COVER: Array<{
+    FRONT: Array<{
       __typename?: "PetitionAttachment";
       id: string;
       type: PetitionAttachmentType;
@@ -9867,7 +9867,7 @@ export type PetitionComposeAttachments_PetitionBase_PetitionTemplate_Fragment = 
   id: string;
   attachmentsList: {
     __typename?: "PetitionAttachmentsList";
-    COVER: Array<{
+    FRONT: Array<{
       __typename?: "PetitionAttachment";
       id: string;
       type: PetitionAttachmentType;
@@ -9908,7 +9908,7 @@ export type PetitionComposeAttachments_reorderPetitionAttachmentsMutation = {
         id: string;
         attachmentsList: {
           __typename?: "PetitionAttachmentsList";
-          COVER: Array<{
+          FRONT: Array<{
             __typename?: "PetitionAttachment";
             id: string;
             type: PetitionAttachmentType;
@@ -9951,7 +9951,7 @@ export type PetitionComposeAttachments_reorderPetitionAttachmentsMutation = {
         id: string;
         attachmentsList: {
           __typename?: "PetitionAttachmentsList";
-          COVER: Array<{
+          FRONT: Array<{
             __typename?: "PetitionAttachment";
             id: string;
             type: PetitionAttachmentType;
@@ -10033,7 +10033,7 @@ export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutation = {
           id: string;
           attachmentsList: {
             __typename?: "PetitionAttachmentsList";
-            COVER: Array<{
+            FRONT: Array<{
               __typename?: "PetitionAttachment";
               id: string;
               type: PetitionAttachmentType;
@@ -10076,7 +10076,7 @@ export type PetitionComposeAttachments_updatePetitionAttachmentTypeMutation = {
           id: string;
           attachmentsList: {
             __typename?: "PetitionAttachmentsList";
-            COVER: Array<{
+            FRONT: Array<{
               __typename?: "PetitionAttachment";
               id: string;
               type: PetitionAttachmentType;
@@ -10135,7 +10135,7 @@ export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation 
           id: string;
           attachmentsList: {
             __typename?: "PetitionAttachmentsList";
-            COVER: Array<{
+            FRONT: Array<{
               __typename?: "PetitionAttachment";
               id: string;
               type: PetitionAttachmentType;
@@ -10178,7 +10178,7 @@ export type PetitionComposeAttachments_petitionAttachmentUploadCompleteMutation 
           id: string;
           attachmentsList: {
             __typename?: "PetitionAttachmentsList";
-            COVER: Array<{
+            FRONT: Array<{
               __typename?: "PetitionAttachment";
               id: string;
               type: PetitionAttachmentType;
@@ -10232,7 +10232,7 @@ export type PetitionComposeAttachments_deletePetitionAttachmentMutation = {
         id: string;
         attachmentsList: {
           __typename?: "PetitionAttachmentsList";
-          COVER: Array<{
+          FRONT: Array<{
             __typename?: "PetitionAttachment";
             id: string;
             type: PetitionAttachmentType;
@@ -10275,7 +10275,7 @@ export type PetitionComposeAttachments_deletePetitionAttachmentMutation = {
         id: string;
         attachmentsList: {
           __typename?: "PetitionAttachmentsList";
-          COVER: Array<{
+          FRONT: Array<{
             __typename?: "PetitionAttachment";
             id: string;
             type: PetitionAttachmentType;
@@ -18293,7 +18293,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   attachmentsList: {
     __typename?: "PetitionAttachmentsList";
-    COVER: Array<{
+    FRONT: Array<{
       __typename?: "PetitionAttachment";
       id: string;
       type: PetitionAttachmentType;
@@ -18429,7 +18429,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   attachmentsList: {
     __typename?: "PetitionAttachmentsList";
-    COVER: Array<{
+    FRONT: Array<{
       __typename?: "PetitionAttachment";
       id: string;
       type: PetitionAttachmentType;
@@ -19280,7 +19280,7 @@ export type PetitionCompose_petitionQuery = {
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         attachmentsList: {
           __typename?: "PetitionAttachmentsList";
-          COVER: Array<{
+          FRONT: Array<{
             __typename?: "PetitionAttachment";
             id: string;
             type: PetitionAttachmentType;
@@ -19430,7 +19430,7 @@ export type PetitionCompose_petitionQuery = {
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         attachmentsList: {
           __typename?: "PetitionAttachmentsList";
-          COVER: Array<{
+          FRONT: Array<{
             __typename?: "PetitionAttachment";
             id: string;
             type: PetitionAttachmentType;
@@ -29007,7 +29007,7 @@ export const PetitionComposeAttachments_PetitionAttachmentFragmentDoc = gql`
 ` as unknown as DocumentNode<PetitionComposeAttachments_PetitionAttachmentFragment, unknown>;
 export const PetitionComposeAttachments_PetitionAttachmentsListFragmentDoc = gql`
   fragment PetitionComposeAttachments_PetitionAttachmentsList on PetitionAttachmentsList {
-    COVER {
+    FRONT {
       ...PetitionComposeAttachments_PetitionAttachment
     }
     ANNEX {

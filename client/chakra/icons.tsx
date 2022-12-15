@@ -2345,8 +2345,8 @@ export const HomeIcon = createIcon({
   ),
 });
 
-export const CoverIcon = createIcon({
-  displayName: "CoverIcon",
+export const FrontCoverIcon = createIcon({
+  displayName: "FrontCoverIcon",
   viewBox: "0 0 24 24",
   path: (
     <g

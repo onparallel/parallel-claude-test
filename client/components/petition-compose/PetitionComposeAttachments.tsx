@@ -19,7 +19,7 @@ import {
   AddIcon,
   BackCoverIcon,
   ChevronDownIcon,
-  CoverIcon,
+  FrontCoverIcon,
   DeleteIcon,
   DragHandleIcon,
   EyeIcon,
@@ -88,13 +88,13 @@ export const PetitionComposeAttachments = Object.assign(
   ) {
     const intl = useIntl();
 
-    const { COVER, ANNEX, BACK } = attachmentsList;
+    const { FRONT, ANNEX, BACK } = attachmentsList;
 
-    const [cover, setCover] = useState(COVER);
+    const [front, setFront] = useState(FRONT);
     const [annex, setAnnex] = useState(ANNEX);
     const [back, setBack] = useState(BACK);
 
-    const allAttachments = [...cover, ...annex, ...back];
+    const allAttachments = [...front, ...annex, ...back];
 
     const totalMaxFilesSizeExceeded =
       sumBy(
@@ -131,7 +131,7 @@ export const PetitionComposeAttachments = Object.assign(
     );
 
     useEffect(() => {
-      setCover(COVER);
+      setFront(FRONT);
       setAnnex(ANNEX);
       setBack(BACK);
     }, [attachmentsList]);
@@ -389,15 +389,15 @@ export const PetitionComposeAttachments = Object.assign(
         <Stack paddingY={4} paddingX={2}>
           {allAttachments.length > 0 ? (
             <>
-              {cover.length ? (
+              {front.length ? (
                 <Stack
                   listStyleType="none"
                   as={Reorder.Group}
                   axis="y"
-                  values={cover}
-                  onReorder={setCover}
+                  values={front}
+                  onReorder={setFront}
                 >
-                  {cover.map((item, i, arr) => {
+                  {front.map((item, i, arr) => {
                     return (
                       <AttachmentItem
                         key={item.id}
@@ -411,8 +411,8 @@ export const PetitionComposeAttachments = Object.assign(
                         onChangeType={handleChangeType}
                         onReorder={() =>
                           handleReorderAttachments(
-                            "COVER",
-                            cover.map((item) => item.id)
+                            "FRONT",
+                            front.map((item) => item.id)
                           )
                         }
                       />
@@ -420,7 +420,7 @@ export const PetitionComposeAttachments = Object.assign(
                   })}
                 </Stack>
               ) : null}
-              {cover.length && (annex.length || back.length) ? <Divider /> : null}
+              {front.length && (annex.length || back.length) ? <Divider /> : null}
               {annex.length ? (
                 <Stack
                   listStyleType="none"
@@ -548,7 +548,7 @@ export const PetitionComposeAttachments = Object.assign(
       get PetitionAttachmentsList() {
         return gql`
           fragment PetitionComposeAttachments_PetitionAttachmentsList on PetitionAttachmentsList {
-            COVER {
+            FRONT {
               ...PetitionComposeAttachments_PetitionAttachment
             }
             ANNEX {
@@ -730,8 +730,14 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
   }, [index]);
 
   const menuIcon =
-    type === "COVER" ? <CoverIcon /> : type === "ANNEX" ? <PaperclipIcon /> : <BackCoverIcon />;
-  const buttonColor = type === "COVER" || type === "BACK" ? "tags.brown" : "tags.green";
+    type === "FRONT" ? (
+      <FrontCoverIcon />
+    ) : type === "ANNEX" ? (
+      <PaperclipIcon />
+    ) : (
+      <BackCoverIcon />
+    );
+  const buttonColor = type === "FRONT" || type === "BACK" ? "tags.brown" : "tags.green";
 
   const uploadHasFailed = !isUploading && !isComplete;
 
@@ -808,7 +814,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
           </Box>
           <Portal>
             <MenuList>
-              <MenuItem icon={<CoverIcon />} onClick={() => onChangeType(id, "COVER")}>
+              <MenuItem icon={<FrontCoverIcon />} onClick={() => onChangeType(id, "FRONT")}>
                 <FormattedMessage
                   id="component.petition-compose-attachments.cover"
                   defaultMessage="Cover"
@@ -830,7 +836,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
           </Portal>
         </Menu>
         <HStack flex="1" minWidth="0px">
-          {type === "COVER" ? (
+          {type === "FRONT" ? (
             <Text as="span" fontSize="sm" fontWeight={500} whiteSpace="nowrap">
               <FormattedMessage
                 id="component.petition-compose-attachments.prefix-cover"

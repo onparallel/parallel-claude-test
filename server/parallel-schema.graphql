@@ -2687,7 +2687,7 @@ type PetitionAttachment {
 enum PetitionAttachmentType {
   ANNEX
   BACK
-  COVER
+  FRONT
 }
 
 type PetitionAttachmentUploadData {
@@ -2698,7 +2698,7 @@ type PetitionAttachmentUploadData {
 type PetitionAttachmentsList {
   ANNEX: [PetitionAttachment!]!
   BACK: [PetitionAttachment!]!
-  COVER: [PetitionAttachment!]!
+  FRONT: [PetitionAttachment!]!
 }
 
 interface PetitionBase {

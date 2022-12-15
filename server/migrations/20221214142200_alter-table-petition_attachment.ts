@@ -8,7 +8,7 @@ export async function up(knex: Knex): Promise<void> {
     t.increments("id");
     t.integer("petition_id").references("petition.id").notNullable();
     t.integer("file_upload_id").references("file_upload.id").notNullable();
-    t.enum("type", ["COVER", "ANNEX", "BACK"], {
+    t.enum("type", ["FRONT", "ANNEX", "BACK"], {
       useNative: true,
       enumName: "petition_attachment_type",
     }).notNullable();

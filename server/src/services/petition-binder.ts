@@ -148,7 +148,7 @@ export class PetitionBinder implements IPetitionBinder {
 
       return await this.merge(
         [
-          ...attachmentPaths.COVER,
+          ...attachmentPaths.FRONT,
           mainDocPath,
           ...attachmentPaths.ANNEX,
           ...annexedDocumentPaths,
