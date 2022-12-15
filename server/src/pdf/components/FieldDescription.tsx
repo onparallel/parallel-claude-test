@@ -200,9 +200,9 @@ function MdList({ token }: { token: marked.Tokens.List }) {
     list: marked.Tokens.List,
     level: number
   ): [token: marked.Token, level: number, index: number, ordered: boolean][] => {
-    return list.items.flatMap((t) =>
+    return list.items.flatMap((t, i) =>
       t.tokens.flatMap(
-        (t, i) =>
+        (t) =>
           (t.type === "list"
             ? flatten(t, level + 1)
             : [
