@@ -11,6 +11,8 @@ import {
   fieldsBelongsToPetition,
   isValidPetitionAttachmentReorder,
   petitionAttachmentBelongsToPetition,
+  petitionIsNotAnonymized,
+  petitionsAreEditable,
   petitionsAreNotPublicTemplates,
   userHasAccessToPetitions,
 } from "../authorizers";
@@ -171,6 +173,8 @@ export const createPetitionAttachmentUploadLink = mutationField(
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
       petitionsAreNotPublicTemplates("petitionId"),
+      petitionIsNotAnonymized("petitionId"),
+      petitionsAreEditable("petitionId"),
       petitionCanUploadAttachments("petitionId", "data", 10)
     ),
     args: {
@@ -231,7 +235,10 @@ export const petitionAttachmentUploadComplete = mutationField("petitionAttachmen
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
-    petitionAttachmentBelongsToPetition("petitionId", "attachmentId")
+    petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
+    petitionsAreNotPublicTemplates("petitionId"),
+    petitionIsNotAnonymized("petitionId"),
+    petitionsAreEditable("petitionId")
   ),
   resolve: async (_, args, ctx) => {
     const attachment = (await ctx.petitions.loadPetitionAttachment(args.attachmentId))!;
@@ -255,7 +262,9 @@ export const deletePetitionAttachment = mutationField("deletePetitionAttachment"
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
-    petitionsAreNotPublicTemplates("petitionId")
+    petitionsAreNotPublicTemplates("petitionId"),
+    petitionIsNotAnonymized("petitionId"),
+    petitionsAreEditable("petitionId")
   ),
   resolve: async (_, args, ctx) => {
     await ctx.petitions.deletePetitionAttachment(args.attachmentId, ctx.user!);
@@ -314,7 +323,10 @@ export const reorderPetitionAttachments = mutationField("reorderPetitionAttachme
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionAttachmentBelongsToPetition("petitionId", "attachmentIds"),
-    isValidPetitionAttachmentReorder("petitionId", "attachmentType", "attachmentIds")
+    isValidPetitionAttachmentReorder("petitionId", "attachmentType", "attachmentIds"),
+    petitionsAreNotPublicTemplates("petitionId"),
+    petitionIsNotAnonymized("petitionId"),
+    petitionsAreEditable("petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -338,7 +350,10 @@ export const updatePetitionAttachmentType = mutationField("updatePetitionAttachm
   type: "PetitionAttachment",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
-    petitionAttachmentBelongsToPetition("petitionId", "attachmentId")
+    petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
+    petitionsAreNotPublicTemplates("petitionId"),
+    petitionIsNotAnonymized("petitionId"),
+    petitionsAreEditable("petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
