@@ -51,7 +51,7 @@ import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import { fromEvent } from "file-selector";
 import { Reorder, useDragControls, useMotionValue } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { useDropzone } from "react-dropzone";
+import { DropEvent, FileRejection, useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 import { noop, omit, sumBy, uniqBy, zip } from "remeda";
 import { CloseableAlert } from "../common/CloseableAlert";
@@ -147,7 +147,6 @@ export function PetitionComposeAttachments({
         },
       }),
     });
-    // setAnnex((current) => uniqBy([...current, attachment], (obj) => obj.id));
   }
 
   const handleRemoveAttachment = async function (attachmentId: string) {
@@ -208,30 +207,12 @@ export function PetitionComposeAttachments({
       "application/pdf": [],
     },
     maxSize: MAX_FILE_SIZE,
-    onDropRejected: async () => {
-      await withError(
-        showErrorDialog({
-          header: (
-            <FormattedMessage
-              id="component.petition-compose-attachments.invalid-attachment-header"
-              defaultMessage="Invalid attachment"
-            />
-          ),
-          message: (
-            <FormattedMessage
-              id="component.petition-compose-attachments.invalid-attachment-message"
-              defaultMessage="Only PDF attachments up to {size} are allowed."
-              values={{ size: <FileSize value={MAX_FILE_SIZE} /> }}
-            />
-          ),
-        })
-      );
-    },
-    onDrop: async (files: File[], _, event) => {
+    maxFiles: 10 - allAttachments.length,
+    onDropRejected: async (files: FileRejection[], event: DropEvent) => {
       if (allAttachments.length + files.length > 10) {
-        // on drop event already shows a message on the dropzone, type="change" means the
+        // on drop event already shows a message on the dropzone, if its not type="drop" means the
         // file is coming from the "Add attachment" button which doesn't provide any feedback
-        if (event.type === "change") {
+        if (event?.type !== "drop") {
           await withError(
             showErrorDialog({
               header: (
@@ -250,9 +231,31 @@ export function PetitionComposeAttachments({
             })
           );
         }
+
         return;
       }
-
+      await withError(
+        showErrorDialog({
+          header: (
+            <FormattedMessage
+              id="component.petition-compose-attachments.invalid-attachment-header"
+              defaultMessage="Invalid attachment"
+            />
+          ),
+          message: (
+            <FormattedMessage
+              id="component.petition-compose-attachments.invalid-attachment-message"
+              defaultMessage="Only PDF attachments up to {size} are allowed."
+              values={{ size: <FileSize value={MAX_FILE_SIZE} /> }}
+            />
+          ),
+        })
+      );
+    },
+    onDrop: async (files: File[], filesRejection: FileRejection[]) => {
+      if (allAttachments.length + files.length + filesRejection.length > 10) {
+        return;
+      }
       const { data } = await createPetitionAttachmentUploadLink({
         variables: {
           petitionId,
@@ -328,10 +331,7 @@ export function PetitionComposeAttachments({
     >
       {isDragActive ? (
         <PetitionComposeDragActiveIndicator
-          showErrorMessage={
-            allAttachments.length + draggedFiles.length > 10 ||
-            draggedFiles.some((file) => file.type === "pdf")
-          }
+          showErrorMessage={allAttachments.length + draggedFiles.length > 10}
           message={
             <FormattedMessage
               id="component.petition-compose-attachments.drop-files-to-attach"
@@ -838,16 +838,15 @@ function AttachmentItem({
             <FileSize value={size} />
           </Text>
           {!isComplete && progress ? (
-            <Center height="20px" width="100%">
-              <Progress
-                borderRadius="full"
-                width="100%"
-                isIndeterminate={progress === 1}
-                value={progress * 100}
-                size="sm"
-                colorScheme="green"
-              />
-            </Center>
+            <Progress
+              flex="1"
+              borderRadius="full"
+              minWidth="40px"
+              isIndeterminate={progress === 1}
+              value={progress * 100}
+              size="sm"
+              colorScheme="green"
+            />
           ) : uploadHasFailed ? (
             <Text color="red.600" fontSize="sm">
               <FormattedMessage

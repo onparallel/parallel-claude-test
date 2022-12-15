@@ -2730,6 +2730,11 @@
     "context": "No attachments have been uploaded yet"
   },
   {
+    "term": "component.petition-compose-attachments.only-pdf-attachments",
+    "definition": "",
+    "context": "Only PDF files can be attached"
+  },
+  {
     "term": "component.petition-compose-attachments.petition-with-document-fields-alert",
     "definition": "{type, select, TEMPLATE {Esta plantilla} other {Este parallel}} tiene campos de documentos configurados para adjuntar las respuestas al pdf. Se incluirán en el documento final tras los anexos.",
     "context": "{type, select, TEMPLATE {This template} other {This parallel}} has document fields set up to attach your responses to the pdf. They will be included in the final document after the attachments."
