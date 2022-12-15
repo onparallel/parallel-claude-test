@@ -32,18 +32,18 @@ export class FileRepository extends BaseRepository {
     return rows[0];
   }
 
-  async cloneFileUpload(id: number, t?: Knex.Transaction) {
-    const [file] = await this.raw<FileUpload>(
+  async cloneFileUpload(id: MaybeArray<number>, t?: Knex.Transaction) {
+    const ids = unMaybeArray(id);
+    return await this.raw<FileUpload>(
       /* sql */ `
       insert into file_upload(path, filename, size, content_type, upload_complete, created_at, created_by, updated_at, updated_by)
       select path, filename, size, content_type, upload_complete, created_at, created_by, updated_at, updated_by
-      from file_upload where id = ?
+      from file_upload where id in ?
       returning *
       `,
-      [id],
+      [this.sqlIn(ids)],
       t
     );
-    return file;
   }
 
   async markFileUploadComplete(id: number, updatedBy: string) {

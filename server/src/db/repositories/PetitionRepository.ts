@@ -2376,7 +2376,7 @@ export class PetitionRepository extends BaseRepository {
       const newFileReplies = await pMap(fileReplies, async (r) => ({
         ...r,
         content: {
-          file_upload_id: (await this.files.cloneFileUpload(r.content["file_upload_id"], t)).id,
+          file_upload_id: (await this.files.cloneFileUpload(r.content["file_upload_id"], t))[0].id,
         },
       }));
 
@@ -2440,7 +2440,7 @@ export class PetitionRepository extends BaseRepository {
 
     await pMap(attachmentsByFieldId, async (attachment) => {
       // for each existing attachment, clone its file_upload and insert a new field_attachment on the new field
-      const fileUploadCopy = await this.files.cloneFileUpload(attachment.file_upload_id);
+      const [fileUploadCopy] = await this.files.cloneFileUpload(attachment.file_upload_id);
       await this.from("petition_field_attachment", t).insert({
         ...omit(attachment, ["id"]),
         file_upload_id: fileUploadCopy.id,
@@ -2465,21 +2465,30 @@ export class PetitionRepository extends BaseRepository {
         return;
       }
 
-      const clonedFileUploads = await pMap(petitionAttachments, async (a) => [
-        a.file_upload_id,
-        (await this.files.cloneFileUpload(a.file_upload_id, t)).id,
-      ]);
+      const clonedFileUploads = await this.files.cloneFileUpload(
+        petitionAttachments.map((a) => a.file_upload_id),
+        t
+      );
 
       await this.raw(
         /* sql */ `
-      with new_file_upload_ids as (select * from (?) as t(file_upload_id, new_file_upload_id))
+      with new_file_upload_ids as (
+        select * from (?) as t(file_upload_id, new_file_upload_id)
+      )
       insert into petition_attachment (petition_id, file_upload_id, type, position, created_by)
       select ?, fid.new_file_upload_id, pa.type, pa.position, ?
-      from petition_attachment pa left join new_file_upload_ids fid on fid.file_upload_id = pa.file_upload_id
+      from petition_attachment pa
+      join new_file_upload_ids fid on fid.file_upload_id = pa.file_upload_id
       where pa.petition_id = ? and pa.deleted_at is null;
     `,
         [
-          this.sqlValues(clonedFileUploads, ["int", "int"]),
+          this.sqlValues(
+            zip(
+              petitionAttachments.map((a) => a.file_upload_id),
+              clonedFileUploads.map((f) => f.id)
+            ),
+            ["int", "int"]
+          ),
           toPetitionId,
           createdBy,
           fromPetitionId,
@@ -4666,7 +4675,9 @@ export class PetitionRepository extends BaseRepository {
     const [attachment] = await this.raw<PetitionAttachment>(
       /* sql */ `
       insert into petition_attachment (petition_id, file_upload_id, "type", "position", created_by)
-      select ?, ?, ?, coalesce(max(position) + 1, 0), ? from petition_attachment where petition_id = ? and "type" = ? and deleted_at is null
+      select ?, ?, ?, coalesce(max(position) + 1, 0), ?
+      from petition_attachment 
+      where petition_id = ? and "type" = ? and deleted_at is null
       returning *;
     `,
       [
@@ -4844,8 +4855,8 @@ export class PetitionRepository extends BaseRepository {
 
       // we also need to update positions of target type attachments so the sequence is 0...x
       await this.from("petition_attachment", t)
-        .where({ deleted_at: null, type: target.type })
-        .whereRaw(`"position" >= ?`, [target.position])
+        .where({ deleted_at: null, type: target.type, petition_id: petitionId })
+        .whereRaw(`"position" > ?`, [target.position])
         .update({ position: this.knex.raw(`"position" - 1`) });
 
       return result;
