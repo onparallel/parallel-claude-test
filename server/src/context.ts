@@ -10,6 +10,7 @@ import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
 import { LicenseCodeRepository } from "./db/repositories/LicenseCodeRepository";
 import { OrganizationRepository } from "./db/repositories/OrganizationRepository";
 import { PetitionRepository } from "./db/repositories/PetitionRepository";
+import { PetitionViewRepository } from "./db/repositories/PetitionViewRepository";
 import { SubscriptionRepository } from "./db/repositories/SubscriptionRepository";
 import { SystemRepository } from "./db/repositories/SystemRepository";
 import { TagRepository } from "./db/repositories/TagRepository";
@@ -79,7 +80,8 @@ export class ApiContext {
     public readonly system: SystemRepository,
     public readonly subscriptions: SubscriptionRepository,
     public readonly tasks: TaskRepository,
-    public readonly licenseCodes: LicenseCodeRepository
+    public readonly licenseCodes: LicenseCodeRepository,
+    public readonly views: PetitionViewRepository
   ) {}
 }
 

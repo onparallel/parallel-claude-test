@@ -55,3 +55,6 @@ export * from "./task/mutations";
 export * from "./integrations/types";
 export * from "./integrations/mutations";
 export * from "./integrations/queries";
+
+export * from "./views/types";
+export * from "./views/mutations";

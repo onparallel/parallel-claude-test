@@ -971,6 +971,15 @@ type Mutation {
   createPetitionFieldReply(fieldId: GID!, petitionId: GID!, reply: JSON!): PetitionFieldReply!
 
   """
+  Creates a view with custom filters and ordering on the user's petitions list
+  """
+  createPetitionListView(
+    filters: PetitionListViewFiltersInput
+    name: String!
+    sortBy: QueryPetitions_OrderBy
+  ): PetitionListView!
+
+  """
   Creates a task for printing a PDF of the petition and sends it to the queue
   """
   createPrintPdfTask(includeNdLinks: Boolean, petitionId: GID!, skipAttachments: Boolean): Task!
@@ -1096,6 +1105,11 @@ type Mutation {
   ): PetitionField!
 
   """
+  Deletes a petition list view of the user
+  """
+  deletePetitionListView(id: GID!): User!
+
+  """
   Deletes a reply to a petition field.
   """
   deletePetitionReply(petitionId: GID!, replyId: GID!): PetitionField!
@@ -1176,6 +1190,11 @@ type Mutation {
   """
   getTaskResultFile(preview: Boolean, taskId: GID!): TaskResultFile!
   loginAs(userId: GID!): Result!
+
+  """
+  Sets the default petition list view of the user. If passing null id, default view will be set (no filters/sorting)
+  """
+  markPetitionListViewAsDefault(petitionListViewId: GID): User!
 
   """
   marks a Signature integration as default
@@ -1496,6 +1515,11 @@ type Mutation {
     attachmentType: PetitionAttachmentType!
     petitionId: GID!
   ): PetitionBase!
+
+  """
+  Changes the ordering of a user's petition list views
+  """
+  reorderPetitionListViews(ids: [GID!]!): User!
 
   """
   Sends the AccountVerification email with confirmation code to unconfirmed user emails
@@ -1865,6 +1889,14 @@ type Mutation {
     petitionId: GID!
     replyId: GID!
   ): PetitionFieldReply!
+
+  """
+  Updates a petition list view
+  """
+  updatePetitionListView(
+    data: UpdatePetitionListViewInput!
+    petitionListViewId: GID!
+  ): PetitionListView!
 
   """
   Updates the metadata of the specified petition
@@ -3391,6 +3423,62 @@ type PetitionFolder {
   The name petitions in the folder.
   """
   petitionCount: Int!
+}
+
+type PetitionListView {
+  filters: PetitionListViewFilters!
+  id: GID!
+  isDefault: Boolean!
+  name: String!
+  sortBy: QueryPetitions_OrderBy
+  user: User!
+}
+
+type PetitionListViewFilters {
+  fromTemplateId: GID
+  path: String
+  search: String
+  searchIn: PetitionListViewSearchIn
+  sharedWith: PetitionListViewFiltersSharedWith
+  signature: [PetitionSignatureStatusFilter!]
+  status: [PetitionStatus!]
+  tags: [GID!]
+}
+
+input PetitionListViewFiltersInput {
+  fromTemplateId: GID
+  path: String
+  search: String
+  searchIn: PetitionListViewSearchIn
+  sharedWith: PetitionListViewFiltersSharedWithInput
+  signature: [PetitionSignatureStatusFilter!]
+  status: [PetitionStatus!]
+  tags: [GID!]
+}
+
+type PetitionListViewFiltersSharedWith {
+  filters: [PetitionListViewFiltersSharedWithFilters!]!
+  operator: FilterSharedWithLogicalOperator!
+}
+
+type PetitionListViewFiltersSharedWithFilters {
+  operator: FilterSharedWithOperator!
+  value: GID!
+}
+
+input PetitionListViewFiltersSharedWithFiltersInput {
+  operator: FilterSharedWithOperator!
+  value: GID!
+}
+
+input PetitionListViewFiltersSharedWithInput {
+  filters: [PetitionListViewFiltersSharedWithFiltersInput!]!
+  operator: FilterSharedWithLogicalOperator!
+}
+
+enum PetitionListViewSearchIn {
+  CURRENT_FOLDER
+  EVERYWHERE
 }
 
 """
@@ -5454,6 +5542,12 @@ input UpdatePetitionInput {
   skipForwardSecurity: Boolean
 }
 
+input UpdatePetitionListViewInput {
+  filters: PetitionListViewFiltersInput
+  name: String
+  sortBy: QueryPetitions_OrderBy
+}
+
 input UpdateTagInput {
   color: String
   name: String
@@ -5549,6 +5643,11 @@ type User implements Timestamps {
   Organizations this user belongs to
   """
   organizations: [Organization!]!
+
+  """
+  The petition views of the user
+  """
+  petitionListViews: [PetitionListView!]!
   preferredLocale: String
   role: OrganizationRole!
   status: UserStatus!

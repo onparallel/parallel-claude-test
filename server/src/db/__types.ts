@@ -378,6 +378,7 @@ export interface TableTypes {
   petition_field_attachment: PetitionFieldAttachment;
   petition_field_comment: PetitionFieldComment;
   petition_field_reply: PetitionFieldReply;
+  petition_list_view: PetitionListView;
   petition_message: PetitionMessage;
   petition_permission: PetitionPermission;
   petition_reminder: PetitionReminder;
@@ -426,6 +427,7 @@ export interface TableCreateTypes {
   petition_field_attachment: CreatePetitionFieldAttachment;
   petition_field_comment: CreatePetitionFieldComment;
   petition_field_reply: CreatePetitionFieldReply;
+  petition_list_view: CreatePetitionListView;
   petition_message: CreatePetitionMessage;
   petition_permission: CreatePetitionPermission;
   petition_reminder: CreatePetitionReminder;
@@ -474,6 +476,7 @@ export interface TablePrimaryKeys {
   petition_field_attachment: "id";
   petition_field_comment: "id";
   petition_field_reply: "id";
+  petition_list_view: "id";
   petition_message: "id";
   petition_permission: "id";
   petition_reminder: "id";
@@ -1118,6 +1121,35 @@ export type CreatePetitionFieldReply = PartialProps<
   | "metadata"
   | "user_id"
   | "anonymized_at"
+>;
+
+export interface PetitionListView {
+  id: number; // int4
+  user_id: number; // int4
+  name: string; // varchar
+  filters: any; // jsonb
+  sort_by: Maybe<string>; // varchar
+  position: number; // int4
+  is_default: boolean; // bool
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreatePetitionListView = PartialProps<
+  Omit<PetitionListView, "id">,
+  | "filters"
+  | "sort_by"
+  | "is_default"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
 >;
 
 export interface PetitionMessage {

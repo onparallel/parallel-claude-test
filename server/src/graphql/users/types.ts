@@ -225,6 +225,14 @@ export const User = objectType({
         return sortBy(orgs.filter(isDefined), (o) => usersByOrgId[o.id].created_at);
       },
     });
+    t.list.field("petitionListViews", {
+      type: "PetitionListView",
+      description: "The petition views of the user",
+      authorize: rootIsContextUser(),
+      resolve: async (root, _, ctx) => {
+        return await ctx.views.loadPetitionListViewsByUserId(root.id);
+      },
+    });
   },
 });
 

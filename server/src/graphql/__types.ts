@@ -164,6 +164,27 @@ export interface NexusGenInputs {
     tagIds?: NexusGenScalars["GID"][] | null; // [GID!]
     type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
   };
+  PetitionListViewFiltersInput: {
+    // input type
+    fromTemplateId?: NexusGenScalars["GID"] | null; // GID
+    path?: string | null; // String
+    search?: string | null; // String
+    searchIn?: NexusGenEnums["PetitionListViewSearchIn"] | null; // PetitionListViewSearchIn
+    sharedWith?: NexusGenInputs["PetitionListViewFiltersSharedWithInput"] | null; // PetitionListViewFiltersSharedWithInput
+    signature?: NexusGenEnums["PetitionSignatureStatusFilter"][] | null; // [PetitionSignatureStatusFilter!]
+    status?: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
+    tags?: NexusGenScalars["GID"][] | null; // [GID!]
+  };
+  PetitionListViewFiltersSharedWithFiltersInput: {
+    // input type
+    operator: NexusGenEnums["FilterSharedWithOperator"]; // FilterSharedWithOperator!
+    value: NexusGenScalars["GID"]; // GID!
+  };
+  PetitionListViewFiltersSharedWithInput: {
+    // input type
+    filters: NexusGenInputs["PetitionListViewFiltersSharedWithFiltersInput"][]; // [PetitionListViewFiltersSharedWithFiltersInput!]!
+    operator: NexusGenEnums["FilterSharedWithLogicalOperator"]; // FilterSharedWithLogicalOperator!
+  };
   PetitionSharedWithFilter: {
     // input type
     filters: NexusGenInputs["PetitionSharedWithFilterLine"][]; // [PetitionSharedWithFilterLine!]!
@@ -241,6 +262,12 @@ export interface NexusGenInputs {
     signatureConfig?: NexusGenInputs["SignatureConfigInput"] | null; // SignatureConfigInput
     skipForwardSecurity?: boolean | null; // Boolean
   };
+  UpdatePetitionListViewInput: {
+    // input type
+    filters?: NexusGenInputs["PetitionListViewFiltersInput"] | null; // PetitionListViewFiltersInput
+    name?: string | null; // String
+    sortBy?: NexusGenEnums["QueryPetitions_OrderBy"] | null; // QueryPetitions_OrderBy
+  };
   UpdateTagInput: {
     // input type
     color?: string | null; // String
@@ -291,6 +318,7 @@ export interface NexusGenEnums {
   PetitionEventType: db.PetitionEventType;
   PetitionFieldReplyStatus: db.PetitionFieldReplyStatus;
   PetitionFieldType: db.PetitionFieldType;
+  PetitionListViewSearchIn: "CURRENT_FOLDER" | "EVERYWHERE";
   PetitionLocale: "en" | "es";
   PetitionMessageStatus: db.PetitionMessageStatus;
   PetitionPermissionType: db.PetitionPermissionType;
@@ -635,6 +663,28 @@ export interface NexusGenObjects {
     is_folder: true;
     path: string;
     min_permission: db.PetitionPermissionType;
+  };
+  PetitionListView: db.PetitionListView;
+  PetitionListViewFilters: {
+    // root type
+    fromTemplateId?: NexusGenScalars["GID"] | null; // GID
+    path?: string | null; // String
+    search?: string | null; // String
+    searchIn?: NexusGenEnums["PetitionListViewSearchIn"] | null; // PetitionListViewSearchIn
+    sharedWith?: NexusGenRootTypes["PetitionListViewFiltersSharedWith"] | null; // PetitionListViewFiltersSharedWith
+    signature?: NexusGenEnums["PetitionSignatureStatusFilter"][] | null; // [PetitionSignatureStatusFilter!]
+    status?: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
+    tags?: NexusGenScalars["GID"][] | null; // [GID!]
+  };
+  PetitionListViewFiltersSharedWith: {
+    // root type
+    filters: NexusGenRootTypes["PetitionListViewFiltersSharedWithFilters"][]; // [PetitionListViewFiltersSharedWithFilters!]!
+    operator: NexusGenEnums["FilterSharedWithLogicalOperator"]; // FilterSharedWithLogicalOperator!
+  };
+  PetitionListViewFiltersSharedWithFilters: {
+    // root type
+    operator: NexusGenEnums["FilterSharedWithOperator"]; // FilterSharedWithOperator!
+    value: NexusGenScalars["GID"]; // GID!
   };
   PetitionMessage: db.PetitionMessage;
   PetitionMessageBouncedEvent: events.PetitionMessageBouncedEvent;
@@ -1263,6 +1313,7 @@ export interface NexusGenFieldTypes {
     createPetitionFieldAttachmentUploadLink: NexusGenRootTypes["PetitionFieldAttachmentUploadData"]; // PetitionFieldAttachmentUploadData!
     createPetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     createPetitionFieldReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
+    createPetitionListView: NexusGenRootTypes["PetitionListView"]; // PetitionListView!
     createPrintPdfTask: NexusGenRootTypes["Task"]; // Task!
     createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     createPublicPetitionLinkPrefillData: string; // String!
@@ -1282,6 +1333,7 @@ export interface NexusGenFieldTypes {
     deletePetitionField: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     deletePetitionFieldAttachment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     deletePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    deletePetitionListView: NexusGenRootTypes["User"]; // User!
     deletePetitionReply: NexusGenRootTypes["PetitionField"]; // PetitionField!
     deletePetitions: NexusGenEnums["Success"]; // Success!
     deleteSignatureIntegration: NexusGenEnums["Result"]; // Result!
@@ -1295,6 +1347,7 @@ export interface NexusGenFieldTypes {
     getApiTokenOwner: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     getTaskResultFile: NexusGenRootTypes["TaskResultFile"]; // TaskResultFile!
     loginAs: NexusGenEnums["Result"]; // Result!
+    markPetitionListViewAsDefault: NexusGenRootTypes["User"]; // User!
     markSignatureIntegrationAsDefault: NexusGenRootTypes["IOrgIntegration"]; // IOrgIntegration!
     modifyCurrentUsagePeriod: NexusGenRootTypes["Organization"]; // Organization!
     modifyPetitionCustomProperty: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -1331,6 +1384,7 @@ export interface NexusGenFieldTypes {
     removeUsersFromGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     renameFolder: NexusGenEnums["Success"]; // Success!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
+    reorderPetitionListViews: NexusGenRootTypes["User"]; // User!
     reorderPetitionAttachments: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     resendVerificationCode: NexusGenEnums["Result"]; // Result!
     resetTemporaryPassword: NexusGenEnums["Result"]; // Result!
@@ -1375,6 +1429,7 @@ export interface NexusGenFieldTypes {
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updatePetitionFieldReplyMetadata: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
+    updatePetitionListView: NexusGenRootTypes["PetitionListView"]; // PetitionListView!
     updatePetitionMetadata: NexusGenRootTypes["Petition"]; // Petition!
     updatePetitionPermissionSubscription: NexusGenRootTypes["Petition"]; // Petition!
     updatePetitionRestriction: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -1763,6 +1818,36 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     path: string; // String!
     petitionCount: number; // Int!
+  };
+  PetitionListView: {
+    // field return type
+    filters: NexusGenRootTypes["PetitionListViewFilters"]; // PetitionListViewFilters!
+    id: NexusGenScalars["GID"]; // GID!
+    isDefault: boolean; // Boolean!
+    name: string; // String!
+    sortBy: NexusGenEnums["QueryPetitions_OrderBy"] | null; // QueryPetitions_OrderBy
+    user: NexusGenRootTypes["User"]; // User!
+  };
+  PetitionListViewFilters: {
+    // field return type
+    fromTemplateId: NexusGenScalars["GID"] | null; // GID
+    path: string | null; // String
+    search: string | null; // String
+    searchIn: NexusGenEnums["PetitionListViewSearchIn"] | null; // PetitionListViewSearchIn
+    sharedWith: NexusGenRootTypes["PetitionListViewFiltersSharedWith"] | null; // PetitionListViewFiltersSharedWith
+    signature: NexusGenEnums["PetitionSignatureStatusFilter"][] | null; // [PetitionSignatureStatusFilter!]
+    status: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
+    tags: NexusGenScalars["GID"][] | null; // [GID!]
+  };
+  PetitionListViewFiltersSharedWith: {
+    // field return type
+    filters: NexusGenRootTypes["PetitionListViewFiltersSharedWithFilters"][]; // [PetitionListViewFiltersSharedWithFilters!]!
+    operator: NexusGenEnums["FilterSharedWithLogicalOperator"]; // FilterSharedWithLogicalOperator!
+  };
+  PetitionListViewFiltersSharedWithFilters: {
+    // field return type
+    operator: NexusGenEnums["FilterSharedWithOperator"]; // FilterSharedWithOperator!
+    value: NexusGenScalars["GID"]; // GID!
   };
   PetitionMessage: {
     // field return type
@@ -2404,6 +2489,7 @@ export interface NexusGenFieldTypes {
     notifications: NexusGenRootTypes["UserNotifications_Pagination"]; // UserNotifications_Pagination!
     organization: NexusGenRootTypes["Organization"]; // Organization!
     organizations: NexusGenRootTypes["Organization"][]; // [Organization!]!
+    petitionListViews: NexusGenRootTypes["PetitionListView"][]; // [PetitionListView!]!
     preferredLocale: string | null; // String
     role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     status: NexusGenEnums["UserStatus"]; // UserStatus!
@@ -3006,6 +3092,7 @@ export interface NexusGenFieldTypeNames {
     createPetitionFieldAttachmentUploadLink: "PetitionFieldAttachmentUploadData";
     createPetitionFieldComment: "PetitionFieldComment";
     createPetitionFieldReply: "PetitionFieldReply";
+    createPetitionListView: "PetitionListView";
     createPrintPdfTask: "Task";
     createPublicPetitionLink: "PublicPetitionLink";
     createPublicPetitionLinkPrefillData: "String";
@@ -3025,6 +3112,7 @@ export interface NexusGenFieldTypeNames {
     deletePetitionField: "PetitionBase";
     deletePetitionFieldAttachment: "PetitionField";
     deletePetitionFieldComment: "PetitionField";
+    deletePetitionListView: "User";
     deletePetitionReply: "PetitionField";
     deletePetitions: "Success";
     deleteSignatureIntegration: "Result";
@@ -3038,6 +3126,7 @@ export interface NexusGenFieldTypeNames {
     getApiTokenOwner: "SupportMethodResponse";
     getTaskResultFile: "TaskResultFile";
     loginAs: "Result";
+    markPetitionListViewAsDefault: "User";
     markSignatureIntegrationAsDefault: "IOrgIntegration";
     modifyCurrentUsagePeriod: "Organization";
     modifyPetitionCustomProperty: "PetitionBase";
@@ -3074,6 +3163,7 @@ export interface NexusGenFieldTypeNames {
     removeUsersFromGroup: "UserGroup";
     renameFolder: "Success";
     reopenPetition: "Petition";
+    reorderPetitionListViews: "User";
     reorderPetitionAttachments: "PetitionBase";
     resendVerificationCode: "Result";
     resetTemporaryPassword: "Result";
@@ -3118,6 +3208,7 @@ export interface NexusGenFieldTypeNames {
     updatePetitionFieldRepliesStatus: "PetitionField";
     updatePetitionFieldReply: "PetitionFieldReply";
     updatePetitionFieldReplyMetadata: "PetitionFieldReply";
+    updatePetitionListView: "PetitionListView";
     updatePetitionMetadata: "Petition";
     updatePetitionPermissionSubscription: "Petition";
     updatePetitionRestriction: "PetitionBase";
@@ -3506,6 +3597,36 @@ export interface NexusGenFieldTypeNames {
     name: "String";
     path: "String";
     petitionCount: "Int";
+  };
+  PetitionListView: {
+    // field return type name
+    filters: "PetitionListViewFilters";
+    id: "GID";
+    isDefault: "Boolean";
+    name: "String";
+    sortBy: "QueryPetitions_OrderBy";
+    user: "User";
+  };
+  PetitionListViewFilters: {
+    // field return type name
+    fromTemplateId: "GID";
+    path: "String";
+    search: "String";
+    searchIn: "PetitionListViewSearchIn";
+    sharedWith: "PetitionListViewFiltersSharedWith";
+    signature: "PetitionSignatureStatusFilter";
+    status: "PetitionStatus";
+    tags: "GID";
+  };
+  PetitionListViewFiltersSharedWith: {
+    // field return type name
+    filters: "PetitionListViewFiltersSharedWithFilters";
+    operator: "FilterSharedWithLogicalOperator";
+  };
+  PetitionListViewFiltersSharedWithFilters: {
+    // field return type name
+    operator: "FilterSharedWithOperator";
+    value: "GID";
   };
   PetitionMessage: {
     // field return type name
@@ -4147,6 +4268,7 @@ export interface NexusGenFieldTypeNames {
     notifications: "UserNotifications_Pagination";
     organization: "Organization";
     organizations: "Organization";
+    petitionListViews: "PetitionListView";
     preferredLocale: "String";
     role: "OrganizationRole";
     status: "UserStatus";
@@ -4589,6 +4711,12 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       reply: NexusGenScalars["JSON"]; // JSON!
     };
+    createPetitionListView: {
+      // args
+      filters?: NexusGenInputs["PetitionListViewFiltersInput"] | null; // PetitionListViewFiltersInput
+      name: string; // String!
+      sortBy?: NexusGenEnums["QueryPetitions_OrderBy"] | null; // QueryPetitions_OrderBy
+    };
     createPrintPdfTask: {
       // args
       includeNdLinks?: boolean | null; // Boolean
@@ -4689,6 +4817,10 @@ export interface NexusGenArgTypes {
       petitionFieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
+    deletePetitionListView: {
+      // args
+      id: NexusGenScalars["GID"]; // GID!
+    };
     deletePetitionReply: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
@@ -4752,6 +4884,10 @@ export interface NexusGenArgTypes {
     loginAs: {
       // args
       userId: NexusGenScalars["GID"]; // GID!
+    };
+    markPetitionListViewAsDefault: {
+      // args
+      petitionListViewId?: NexusGenScalars["GID"] | null; // GID
     };
     markSignatureIntegrationAsDefault: {
       // args
@@ -4967,6 +5103,10 @@ export interface NexusGenArgTypes {
     reopenPetition: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    reorderPetitionListViews: {
+      // args
+      ids: NexusGenScalars["GID"][]; // [GID!]!
     };
     reorderPetitionAttachments: {
       // args
@@ -5215,6 +5355,11 @@ export interface NexusGenArgTypes {
       metadata: NexusGenScalars["JSONObject"]; // JSONObject!
       petitionId: NexusGenScalars["GID"]; // GID!
       replyId: NexusGenScalars["GID"]; // GID!
+    };
+    updatePetitionListView: {
+      // args
+      data: NexusGenInputs["UpdatePetitionListViewInput"]; // UpdatePetitionListViewInput!
+      petitionListViewId: NexusGenScalars["GID"]; // GID!
     };
     updatePetitionMetadata: {
       // args
