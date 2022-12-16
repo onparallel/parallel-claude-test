@@ -92,7 +92,7 @@ export function PreviewPetitionFieldCommentsDialog({
       if (comments.at(-1)?.isInternal) {
         setTabIsNotes(true);
       }
-      setTimeout(() => editorRef.current?.focusCurrentInput());
+      setTimeout(() => editorRef.current?.focus());
     }
   }, [loading]);
 

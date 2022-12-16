@@ -26,7 +26,7 @@ interface PetitionCommentsAndNotesEditorProps
 }
 
 export interface PetitionCommentsAndNotesEditorInstance {
-  focusCurrentInput: () => void;
+  focus: () => void;
 }
 
 export const PetitionCommentsAndNotesEditor = chakraForwardRef<
@@ -55,11 +55,11 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
   useImperativeHandle(
     ref,
     () => ({
-      focusCurrentInput: () => {
+      focus: () => {
         editorRef.current?.focus();
       },
     }),
-    [tabIsNotes]
+    []
   );
 
   async function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
