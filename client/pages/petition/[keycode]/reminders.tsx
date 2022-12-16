@@ -22,11 +22,10 @@ import { withApolloData } from "@parallel/components/common/withApolloData";
 import { RecipientViewPageNotAvailableError } from "@parallel/components/recipient-view/RecipientViewPageNotAvailableError";
 import {
   OptOut_publicRemindersOptOutDocument,
-  OptOut_PublicRemindersOptOutFragment,
   OptOut_remindersOptOutDocument,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { UnwrapPromise } from "@parallel/utils/types";
 import { useReminderOptOutReasons } from "@parallel/utils/useReminderOptOutReasons";
 import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
@@ -35,9 +34,7 @@ import { FormEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
-type OptOutProps =
-  | { keycode: string; optOut: OptOut_PublicRemindersOptOutFragment }
-  | { errorCode: "PUBLIC_PETITION_NOT_AVAILABLE" };
+type OptOutProps = UnwrapPromise<ReturnType<typeof getServerSideProps>>["props"];
 
 function OptOut(props: OptOutProps) {
   if ("errorCode" in props) {
@@ -239,22 +236,15 @@ export async function getServerSideProps({
   params,
   req,
 }: GetServerSidePropsContext<{ keycode: string }>) {
-  try {
-    const client = createApolloClient({}, { req });
-    const { data } = await client.query({
-      query: OptOut_remindersOptOutDocument,
-      variables: { keycode: params!.keycode },
-    });
-    if (!isDefined(data?.remindersOptOut)) {
-      throw new Error();
-    }
-    return { props: { keycode: params!.keycode, optOut: data.remindersOptOut } };
-  } catch (error) {
-    if (isApolloError(error, "PUBLIC_PETITION_NOT_AVAILABLE")) {
-      return { props: { errorCode: "PUBLIC_PETITION_NOT_AVAILABLE" } };
-    }
-    throw error;
+  const client = createApolloClient({}, { req });
+  const { data } = await client.query({
+    query: OptOut_remindersOptOutDocument,
+    variables: { keycode: params!.keycode },
+  });
+  if (!isDefined(data?.remindersOptOut)) {
+    return { props: { errorCode: "PUBLIC_PETITION_NOT_AVAILABLE" } };
   }
+  return { props: { keycode: params!.keycode, optOut: data.remindersOptOut } };
 }
 
 export default withApolloData(OptOut);

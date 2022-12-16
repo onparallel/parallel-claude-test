@@ -30,7 +30,7 @@ export const remindersOptOut = queryField("remindersOptOut", {
   },
   resolve: async (_, { keycode }, ctx) => {
     const access = await ctx.petitions.loadAccessByKeycode(keycode);
-    if (!access) return null;
+    if (!access || access.status === "INACTIVE") return null;
 
     const granter = await ctx.users.loadUser(access.granter_id);
     if (!granter) return null;
