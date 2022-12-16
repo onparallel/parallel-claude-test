@@ -262,6 +262,9 @@ export const PetitionComposeAttachments = Object.assign(
         if (allAttachments.length + files.length + filesRejection.length > 10) {
           return;
         }
+        if (files.length === 0) {
+          return;
+        }
         const { data } = await createPetitionAttachmentUploadLink({
           variables: {
             petitionId,

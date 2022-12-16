@@ -124,7 +124,7 @@ export class PetitionBinder implements IPetitionBinder {
                 )
               );
 
-              const filePaths = await this.loadFileUploadPaths(files, userId, documentTheme);
+              const filePaths = await this.downloadFileUpload(files, userId, documentTheme);
               return [coverPagePath, ...filePaths];
             },
             { concurrency: 2 }
@@ -134,7 +134,7 @@ export class PetitionBinder implements IPetitionBinder {
       const attachmentPaths = Object.fromEntries(
         await pMap(PetitionAttachmentTypeValues, async (type) => [
           type,
-          await this.loadFileUploadPaths(
+          await this.downloadFileUpload(
             (
               await this.files.loadFileUpload(
                 attachments.filter((a) => a.type === type).map((a) => a.file_upload_id)
@@ -278,7 +278,7 @@ export class PetitionBinder implements IPetitionBinder {
     });
   }
 
-  private async loadFileUploadPaths(files: FileUpload[], userId: number, theme: OrganizationTheme) {
+  private async downloadFileUpload(files: FileUpload[], userId: number, theme: OrganizationTheme) {
     return (
       await pMap(
         files,

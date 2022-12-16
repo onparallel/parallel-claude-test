@@ -1122,7 +1122,7 @@ export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFi
       file.createReadStream()
     );
 
-    const fileUpload = await ctx.files.createFileUpload(
+    const [fileUpload] = await ctx.files.createFileUpload(
       {
         content_type: file.mimetype,
         filename: file.filename,

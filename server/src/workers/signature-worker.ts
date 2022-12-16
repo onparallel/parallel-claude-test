@@ -434,7 +434,7 @@ async function storeDocument(
   const path = random(16);
   const res = await ctx.storage.fileUploads.uploadFile(path, "application/pdf", buffer);
 
-  return await ctx.files.createFileUpload(
+  const [file] = await ctx.files.createFileUpload(
     {
       content_type: "application/pdf",
       filename,
@@ -444,6 +444,7 @@ async function storeDocument(
     },
     `OrgIntegration:${integrationId}`
   );
+  return file;
 }
 
 async function getDefaultFileName(petitionId: number, locale: string, ctx: WorkerContext) {

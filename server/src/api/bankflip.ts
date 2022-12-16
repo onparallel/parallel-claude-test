@@ -107,7 +107,7 @@ async function uploadEsTaxDocumentsFile(
   const buffer = await pdfData.buffer();
   const path = random(16);
   const res = await context.storage.fileUploads.uploadFile(path, "application/pdf", buffer);
-  return await context.files.createFileUpload(
+  const [file] = await context.files.createFileUpload(
     {
       path,
       content_type: "application/pdf",
@@ -117,4 +117,5 @@ async function uploadEsTaxDocumentsFile(
     },
     uploadedBy
   );
+  return file;
 }

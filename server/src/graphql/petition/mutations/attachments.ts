@@ -1,6 +1,6 @@
 import { ApolloError } from "apollo-server-core";
 import { booleanArg, list, mutationField, nonNull } from "nexus";
-import pMap from "p-map";
+import { maxBy, zip } from "remeda";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -44,7 +44,7 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
       }
       const key = random(16);
       const { filename, size, contentType } = args.data;
-      const file = await ctx.files.createFileUpload(
+      const [file] = await ctx.files.createFileUpload(
         {
           path: key,
           filename,
@@ -188,40 +188,53 @@ export const createPetitionAttachmentUploadLink = mutationField(
       "data"
     ),
     resolve: async (_, args, ctx) => {
-      const result = await pMap(
-        args.data,
-        async (data) => {
-          const key = random(16);
-          const { filename, size, contentType } = data;
-          const file = await ctx.files.createFileUpload(
-            {
-              path: key,
-              filename,
-              size: size.toString(),
-              content_type: contentType,
-              upload_complete: false,
-            },
-            `User:${ctx.user!.id}`
-          );
-          const [presignedPostData, attachment] = await Promise.all([
-            ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
-            ctx.petitions.createPetitionAttachment(
-              {
-                file_upload_id: file.id,
-                petition_id: args.petitionId,
-                type: args.type,
-              },
-              ctx.user!
-            ),
-          ]);
+      const files = await ctx.files.createFileUpload(
+        args.data.map((data) => ({
+          path: random(16),
+          filename: data.filename,
+          size: data.size.toString(),
+          content_type: data.contentType,
+          upload_complete: false,
+        })),
+        `User:${ctx.user!.id}`
+      );
 
-          return { presignedPostData, attachment };
-        },
-        { concurrency: 1 }
+      const presignedPostDataArray = await Promise.all(
+        files.map((file) =>
+          ctx.storage.fileUploads.getSignedUploadEndpoint(
+            file.path,
+            file.content_type,
+            parseInt(file.size)
+          )
+        )
+      );
+
+      const petitionAttachments = await ctx.petitions.loadPetitionAttachmentsByPetitionId(
+        args.petitionId
+      );
+
+      const maxPosition =
+        maxBy(
+          petitionAttachments.filter((a) => a.type === args.type),
+          (a) => a.position
+        )?.position ?? -1;
+
+      const attachments = await ctx.petitions.createPetitionAttachment(
+        files.map((file, i) => ({
+          file_upload_id: file.id,
+          petition_id: args.petitionId,
+          type: args.type,
+          position: maxPosition + 1 + i,
+        })),
+        ctx.user!
       );
 
       ctx.petitions.loadPetitionAttachmentsByPetitionId.dataloader.clear(args.petitionId);
-      return result;
+
+      return zip(presignedPostDataArray, attachments).map(([presignedPostData, attachment]) => ({
+        presignedPostData,
+        attachment,
+      }));
     },
   }
 );

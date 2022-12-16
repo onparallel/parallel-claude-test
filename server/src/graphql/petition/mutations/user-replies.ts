@@ -150,7 +150,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
 
       const { filename, size, contentType } = args.file;
-      const file = await ctx.files.createFileUpload(
+      const [file] = await ctx.files.createFileUpload(
         {
           path: key,
           filename,
@@ -238,7 +238,7 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
     const { size, filename, contentType } = await args.file;
     const key = random(16);
 
-    const newFile = await ctx.files.createFileUpload(
+    const [newFile] = await ctx.files.createFileUpload(
       {
         path: key,
         filename,
@@ -448,7 +448,7 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
         Buffer.from(dowJonesFile.binary_stream, "base64")
       );
 
-      const fileUpload = await ctx.files.createFileUpload(
+      const [fileUpload] = await ctx.files.createFileUpload(
         {
           path,
           filename: `${args.profileId}.pdf`,

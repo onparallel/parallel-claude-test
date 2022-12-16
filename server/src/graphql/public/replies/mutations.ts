@@ -185,7 +185,7 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
   resolve: async (_, args, ctx) => {
     const key = random(16);
     const { filename, size, contentType } = args.data;
-    const file = await ctx.files.createFileUpload(
+    const [file] = await ctx.files.createFileUpload(
       {
         path: key,
         filename,

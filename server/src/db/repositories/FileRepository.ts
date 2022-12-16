@@ -23,13 +23,16 @@ export class FileRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  async createFileUpload(data: CreateFileUpload, createdBy: string) {
-    const rows = await this.insert("file_upload", {
-      ...data,
-      created_by: createdBy,
-      updated_by: createdBy,
-    }).returning("*");
-    return rows[0];
+  async createFileUpload(data: MaybeArray<CreateFileUpload>, createdBy: string) {
+    const dataArr = unMaybeArray(data);
+    return await this.insert(
+      "file_upload",
+      dataArr.map((data) => ({
+        ...data,
+        created_by: createdBy,
+        updated_by: createdBy,
+      }))
+    ).returning("*");
   }
 
   async cloneFileUpload(id: MaybeArray<number>, t?: Knex.Transaction) {

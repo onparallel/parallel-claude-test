@@ -4671,25 +4671,14 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at").orderBy("position", "asc")
   );
 
-  async createPetitionAttachment(data: Omit<CreatePetitionAttachment, "position">, user: User) {
-    const [attachment] = await this.raw<PetitionAttachment>(
-      /* sql */ `
-      insert into petition_attachment (petition_id, file_upload_id, "type", "position", created_by)
-      select ?, ?, ?, coalesce(max(position) + 1, 0), ?
-      from petition_attachment 
-      where petition_id = ? and "type" = ? and deleted_at is null
-      returning *;
-    `,
-      [
-        data.petition_id,
-        data.file_upload_id,
-        data.type,
-        `User:${user.id}`,
-        data.petition_id,
-        data.type,
-      ]
+  async createPetitionAttachment(data: CreatePetitionAttachment[], user: User) {
+    return await this.from("petition_attachment").insert(
+      data.map((attachment) => ({
+        ...attachment,
+        created_by: `User:${user.id}`,
+      })),
+      "*"
     );
-    return attachment;
   }
 
   readonly loadFieldAttachment = this.buildLoadBy("petition_field_attachment", "id", (q) =>
