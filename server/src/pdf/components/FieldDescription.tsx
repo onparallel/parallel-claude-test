@@ -219,18 +219,20 @@ function MdList({ token }: { token: marked.Tokens.List }) {
             <View key={i} style={styles.listPaddingBox} />
           ))}
           <View style={styles.listItemBulletContainer}>
-            {ordered ? (
-              <Text>{`${i}.`}</Text>
-            ) : (
-              <View style={styles.listItemBulletSymbolContainer}>
-                <View
-                  style={
-                    [styles.listItemBulletLevel0, styles.listItemBulletLevel1][level] ??
-                    styles.listItemBulletLevel2
-                  }
-                />
-              </View>
-            )}
+            {t.type === "text" ? (
+              ordered ? (
+                <Text>{`${i}.`}</Text>
+              ) : (
+                <View style={styles.listItemBulletSymbolContainer}>
+                  <View
+                    style={
+                      [styles.listItemBulletLevel0, styles.listItemBulletLevel1][level] ??
+                      styles.listItemBulletLevel2
+                    }
+                  />
+                </View>
+              )
+            ) : null}
           </View>
           <View style={{ flex: 1 }}>
             {t.type === "text" ? (
@@ -238,7 +240,7 @@ function MdList({ token }: { token: marked.Tokens.List }) {
                 <MdInlineContent tokens={(t as any).tokens} />
               </Text>
             ) : t.type === "space" ? (
-              <Text>{t.raw}</Text>
+              <Text>{"\n".repeat((t.raw.match(/\n/g)?.length ?? 1) - 1)}</Text>
             ) : process.env.NODE_ENV === "production" ? null : (
               <Text>{JSON.stringify(t)}</Text>
             )}
