@@ -230,6 +230,10 @@ export const PlateCombobox = <TData extends Data = NoData>({
     });
   }, [id, trigger, searchPattern, controlled, onSelectItem, maxSuggestions, filter, sort]);
 
+  useEffect(() => {
+    comboboxActions.reset();
+  }, [id]);
+
   if (!combobox || !editor.selection || focusedEditorId !== editor.id || activeId !== id) {
     return null;
   }
