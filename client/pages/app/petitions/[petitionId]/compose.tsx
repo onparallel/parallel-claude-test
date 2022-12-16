@@ -28,6 +28,7 @@ import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compo
 import { useHandledPetitionFromTemplateDialog } from "@parallel/components/petition-compose/dialogs/PetitionFromTemplateDialog";
 import { usePublicTemplateDialog } from "@parallel/components/petition-compose/dialogs/PublicTemplateDialog";
 import { useReferencedFieldDialog } from "@parallel/components/petition-compose/dialogs/ReferencedFieldDialog";
+import { PetitionComposeAttachments } from "@parallel/components/petition-compose/PetitionComposeAttachments";
 import {
   PetitionComposeField,
   PetitionComposeFieldRef,
@@ -35,7 +36,6 @@ import {
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionSettings } from "@parallel/components/petition-compose/PetitionSettings";
-import { PetitionComposeAttachments } from "@parallel/components/petition-compose/PetitionComposeAttachments";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";
 import { cleanPreviewFieldReplies } from "@parallel/components/petition-preview/clientMutations";
@@ -73,7 +73,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 
 type PetitionComposeProps = UnwrapPromise<ReturnType<typeof PetitionCompose.getInitialProps>>;
 

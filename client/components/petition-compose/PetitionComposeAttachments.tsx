@@ -3,7 +3,6 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  BoxProps,
   Button,
   HStack,
   Menu,
@@ -19,10 +18,10 @@ import {
   AddIcon,
   BackCoverIcon,
   ChevronDownIcon,
-  FrontCoverIcon,
   DeleteIcon,
   DragHandleIcon,
   EyeIcon,
+  FrontCoverIcon,
   PaperclipIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -34,7 +33,6 @@ import {
   PetitionComposeAttachments_deletePetitionAttachmentDocument,
   PetitionComposeAttachments_petitionAttachmentDownloadLinkDocument,
   PetitionComposeAttachments_PetitionAttachmentFragment,
-  PetitionComposeAttachments_PetitionAttachmentsListFragment,
   PetitionComposeAttachments_petitionAttachmentUploadCompleteDocument,
   PetitionComposeAttachments_PetitionBaseFragment,
   PetitionComposeAttachments_PetitionBaseFragmentDoc,
@@ -46,7 +44,6 @@ import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { uploadFile } from "@parallel/utils/uploadFile";
-import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useIsAnimated } from "@parallel/utils/useIsAnimated";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
