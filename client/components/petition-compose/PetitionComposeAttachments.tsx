@@ -199,10 +199,16 @@ export const PetitionComposeAttachments = Object.assign(
       }
     };
 
-    const handleChangeType = async (attachmentId: string, type: PetitionAttachmentType) => {
-      await updatePetitionAttachmentType({
-        variables: { petitionId, attachmentId, type },
-      });
+    const handleChangeType = async (
+      attachmentId: string,
+      fromType: PetitionAttachmentType,
+      toType: PetitionAttachmentType
+    ) => {
+      if (fromType !== toType) {
+        await updatePetitionAttachmentType({
+          variables: { petitionId, attachmentId, type: toType },
+        });
+      }
     };
 
     const showErrorDialog = useErrorDialog();
@@ -685,7 +691,11 @@ interface AttachmentItemProps {
   isDisabled?: boolean;
   onRemove: (id: string) => Promise<void>;
   onPreview: (id: string, preview: boolean) => void;
-  onChangeType: (id: string, type: PetitionAttachmentType) => void;
+  onChangeType: (
+    id: string,
+    fromType: PetitionAttachmentType,
+    toType: PetitionAttachmentType
+  ) => void;
   onReorder: () => void;
 }
 
@@ -817,19 +827,28 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
           </Box>
           <Portal>
             <MenuList>
-              <MenuItem icon={<FrontCoverIcon />} onClick={() => onChangeType(id, "FRONT")}>
+              <MenuItem
+                icon={<FrontCoverIcon />}
+                onClick={() => onChangeType(id, item.type, "FRONT")}
+              >
                 <FormattedMessage
                   id="component.petition-compose-attachments.cover"
                   defaultMessage="Cover"
                 />
               </MenuItem>
-              <MenuItem icon={<PaperclipIcon />} onClick={() => onChangeType(id, "ANNEX")}>
+              <MenuItem
+                icon={<PaperclipIcon />}
+                onClick={() => onChangeType(id, item.type, "ANNEX")}
+              >
                 <FormattedMessage
                   id="component.petition-compose-attachments.annex"
                   defaultMessage="Annex"
                 />
               </MenuItem>
-              <MenuItem icon={<BackCoverIcon />} onClick={() => onChangeType(id, "BACK")}>
+              <MenuItem
+                icon={<BackCoverIcon />}
+                onClick={() => onChangeType(id, item.type, "BACK")}
+              >
                 <FormattedMessage
                   id="component.petition-compose-attachments.back-cover"
                   defaultMessage="Back cover"

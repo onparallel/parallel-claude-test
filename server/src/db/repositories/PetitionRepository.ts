@@ -4829,8 +4829,7 @@ export class PetitionRepository extends BaseRepository {
               select coalesce(max(position) + 1, 0) as position from petition_attachment where petition_id = ? and type = ? and deleted_at is null
             ) update petition_attachment pa set
               type = ?,
-              -- if new type is same as old type, don't update positions
-              position = (case when type = ? then pa.position else mp.position end), 
+              position = mp.position,
               updated_at = NOW(),
               updated_by = ?
               from max_pos mp
@@ -4838,7 +4837,7 @@ export class PetitionRepository extends BaseRepository {
               and pa.deleted_at is null
               returning *;
         `,
-        [petitionId, newType, newType, newType, updatedBy, attachmentId],
+        [petitionId, newType, newType, updatedBy, attachmentId],
         t
       );
 
