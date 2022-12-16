@@ -1,9 +1,10 @@
 import { Box, Button, HStack, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { isMetaReturn } from "@parallel/utils/keys";
-import { KeyboardEvent, useImperativeHandle, useRef, useState } from "react";
+import { KeyboardEvent, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { HelpPopover } from "../common/HelpPopover";
+import { RadioTab, RadioTabList } from "../common/RadioTab";
 import {
   CommentEditor,
   CommentEditorInstance,
@@ -47,19 +48,15 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
   ref
 ) {
   const intl = useIntl();
-  const [commentDraft, setCommentDraft] = useState(emptyCommentEditorValue());
-  const [noteDraft, setNoteDraft] = useState(emptyCommentEditorValue());
-  const isCommentEmpty = isEmptyCommentEditorValue(commentDraft);
-  const isNoteEmpty = isEmptyCommentEditorValue(noteDraft);
-
-  const commentRef = useRef<CommentEditorInstance>(null);
-  const noteRef = useRef<CommentEditorInstance>(null);
+  const [draft, setDraft] = useState(emptyCommentEditorValue());
+  const isEmpty = isEmptyCommentEditorValue(draft);
+  const editorRef = useRef<CommentEditorInstance>(null);
 
   useImperativeHandle(
     ref,
     () => ({
       focusCurrentInput: () => {
-        tabIsNotes ? noteRef.current?.focus() : commentRef.current?.focus();
+        editorRef.current?.focus();
       },
     }),
     [tabIsNotes]
@@ -73,131 +70,96 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
   }
 
   async function handleSubmitClick() {
-    const content = tabIsNotes ? noteDraft : commentDraft;
-    if (!isEmptyCommentEditorValue(content)) {
+    if (!isEmptyCommentEditorValue(draft)) {
       try {
-        await onSubmit(content, tabIsNotes);
-        (tabIsNotes ? noteRef : commentRef).current?.clear();
+        await onSubmit(draft, tabIsNotes);
+        editorRef.current?.clear();
       } catch {}
     }
   }
 
   return (
     <Box flex="1">
-      <Tabs
-        index={tabIsNotes ? 1 : 0}
-        onChange={(index) => onTabChange(index === 1)}
+      <RadioTabList
         variant="enclosed"
+        name="comments"
+        value={tabIsNotes ? 1 : 0}
+        onChange={(value) => onTabChange(value === "1")}
+        flex={1}
+        minWidth={0}
+        marginTop="-1px"
+        listStyleType="none"
+        position="relative"
       >
-        <TabList>
-          <Tab
-            borderTopLeftRadius={0}
-            isDisabled={!hasCommentsEnabled}
-            cursor={hasCommentsEnabled ? "pointer" : "not-allowed"}
-            color={hasCommentsEnabled ? "inherit" : "gray.400"}
-            fontWeight="semibold"
-            borderLeft="none"
-          >
+        <RadioTab
+          value={0}
+          borderTopLeftRadius={0}
+          isDisabled={!hasCommentsEnabled}
+          cursor={hasCommentsEnabled ? "pointer" : "not-allowed"}
+          color={hasCommentsEnabled ? "inherit" : "gray.400"}
+          fontWeight="semibold"
+          borderLeft="none"
+        >
+          <FormattedMessage
+            id="component.petition-comments-and-notes-editor.comments"
+            defaultMessage="Comments"
+          />
+        </RadioTab>
+        <RadioTab
+          value={1}
+          _checked={{
+            color: "blue.600",
+            bg: "yellow.100",
+            border: "1px solid",
+            borderColor: "gray.200",
+            borderBottomColor: "transparent",
+          }}
+          fontWeight="semibold"
+        >
+          <FormattedMessage
+            id="component.petition-comments-and-notes-editor.notes"
+            defaultMessage="Notes"
+          />
+          <HelpPopover>
             <FormattedMessage
-              id="component.petition-comments-and-notes-editor.comments"
-              defaultMessage="Comments"
+              id="component.petition-comments-and-notes-editor.notes-description"
+              defaultMessage="Notes are only visible within your organization. You can use them to communicate internally."
             />
-          </Tab>
-          <Tab
-            _selected={{
-              color: "blue.600",
-              bg: "yellow.100",
-              border: "1px solid",
-              borderColor: "gray.200",
-              borderBottomColor: "transparent",
-            }}
-            fontWeight="semibold"
+          </HelpPopover>
+        </RadioTab>
+      </RadioTabList>
+      <HStack padding={2} backgroundColor={tabIsNotes ? "yellow.100" : undefined}>
+        <CommentEditor
+          id={`comment-editor-${id}`}
+          ref={editorRef}
+          placeholder={
+            tabIsNotes
+              ? intl.formatMessage({
+                  id: "component.petition-comments-and-notes-editor.note-placeholder",
+                  defaultMessage: "Type @ to mention other users",
+                })
+              : intl.formatMessage({
+                  id: "component.petition-comments-and-notes-editor.comment-placeholder",
+                  defaultMessage: "Write a comment",
+                })
+          }
+          value={draft}
+          isDisabled={isDisabled}
+          onKeyDown={handleKeyDown}
+          onChange={setDraft}
+          defaultMentionables={defaultMentionables}
+          onSearchMentionables={onSearchMentionables}
+        />
+        <Box>
+          <Button
+            colorScheme="primary"
+            isDisabled={isDisabled || isEmpty || isTemplate}
+            onClick={handleSubmitClick}
           >
-            <FormattedMessage
-              id="component.petition-comments-and-notes-editor.notes"
-              defaultMessage="Notes"
-            />
-            <HelpPopover>
-              <FormattedMessage
-                id="component.petition-comments-and-notes-editor.notes-description"
-                defaultMessage="Notes are only visible within your organization. You can use them to communicate internally."
-              />
-            </HelpPopover>
-          </Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel
-            borderTop="1px solid"
-            borderColor="gray.200"
-            as={HStack}
-            alignItems="flex-start"
-            padding={2}
-            minHeight="60px"
-          >
-            <CommentEditor
-              id={`comment-editor-${id}`}
-              ref={commentRef}
-              placeholder={intl.formatMessage({
-                id: "component.petition-comments-and-notes-editor.comment-placeholder",
-                defaultMessage: "Write a comment",
-              })}
-              value={commentDraft}
-              isDisabled={isDisabled}
-              onKeyDown={handleKeyDown}
-              onChange={setCommentDraft}
-              defaultMentionables={defaultMentionables}
-              onSearchMentionables={onSearchMentionables}
-            />
-            <Box>
-              <Button
-                colorScheme="primary"
-                isDisabled={isDisabled || isCommentEmpty || isTemplate}
-                onClick={handleSubmitClick}
-              >
-                <FormattedMessage id="generic.submit" defaultMessage="Submit" />
-              </Button>
-            </Box>
-          </TabPanel>
-          <TabPanel
-            backgroundColor="yellow.100"
-            borderTop="1px solid"
-            borderColor="gray.200"
-            as={HStack}
-            alignItems="flex-start"
-            padding={2}
-            justifyContent="flex-end"
-            minHeight="60px"
-          >
-            {tabIsNotes ? (
-              <>
-                <CommentEditor
-                  ref={noteRef}
-                  id={`note-editor-${id}`}
-                  placeholder={intl.formatMessage({
-                    id: "component.petition-comments-and-notes-editor.note-placeholder",
-                    defaultMessage: "Type @ to mention other users",
-                  })}
-                  value={noteDraft}
-                  isDisabled={isDisabled}
-                  onKeyDown={handleKeyDown}
-                  onChange={setNoteDraft}
-                  defaultMentionables={defaultMentionables}
-                  onSearchMentionables={onSearchMentionables}
-                />
-                <Box>
-                  <Button
-                    colorScheme="primary"
-                    isDisabled={isDisabled || isNoteEmpty || isTemplate}
-                    onClick={handleSubmitClick}
-                  >
-                    <FormattedMessage id="generic.add" defaultMessage="Add" />
-                  </Button>
-                </Box>
-              </>
-            ) : null}
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
+            <FormattedMessage id="generic.submit" defaultMessage="Submit" />
+          </Button>
+        </Box>
+      </HStack>
     </Box>
   );
 });
