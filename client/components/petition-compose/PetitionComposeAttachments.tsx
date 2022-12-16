@@ -36,11 +36,13 @@ import {
   PetitionComposeAttachments_PetitionAttachmentFragment,
   PetitionComposeAttachments_PetitionAttachmentsListFragment,
   PetitionComposeAttachments_petitionAttachmentUploadCompleteDocument,
+  PetitionComposeAttachments_PetitionBaseFragment,
   PetitionComposeAttachments_PetitionBaseFragmentDoc,
   PetitionComposeAttachments_reorderPetitionAttachmentsDocument,
   PetitionComposeAttachments_updatePetitionAttachmentTypeDocument,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
+import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { uploadFile } from "@parallel/utils/uploadFile";
@@ -66,28 +68,24 @@ import { PetitionComposeDragActiveIndicator } from "./PetitionComposeDragActiveI
 const MAX_FILE_SIZE = 1024 * 1024 * 50;
 const TOTAL_MAX_FILES_SIZE = 1024 * 1024 * 10;
 
-export interface PetitionComposeAttachmentsProps extends BoxProps {
-  petitionId: string;
-  isTemplate: boolean;
-  attachmentsList: PetitionComposeAttachments_PetitionAttachmentsListFragment;
-  hasDocumentFieldsWithAttachments: boolean;
+export interface PetitionComposeAttachmentsProps {
+  petition: PetitionComposeAttachments_PetitionBaseFragment;
   isReadOnly?: boolean;
 }
 
 export const PetitionComposeAttachments = Object.assign(
   chakraForwardRef<"div", PetitionComposeAttachmentsProps>(function PetitionComposeAttachments(
-    {
-      petitionId,
-      isTemplate,
-      attachmentsList,
-      hasDocumentFieldsWithAttachments,
-      isReadOnly,
-      ...props
-    },
+    { petition, isReadOnly, ...props },
     ref
   ) {
     const intl = useIntl();
 
+    const petitionId = petition.id;
+    const attachmentsList = petition.attachmentsList;
+    const isTemplate = petition?.__typename === "PetitionTemplate";
+    const hasDocumentFieldsWithAttachments = petition.fields.some(
+      (field) => isFileTypeField(field.type) && field.options.attachToPdf
+    );
     const { FRONT, ANNEX, BACK } = attachmentsList;
 
     const [front, setFront] = useState(FRONT);
@@ -174,29 +172,13 @@ export const PetitionComposeAttachments = Object.assign(
       );
     };
 
-    const debouncedReorderPetitionAttachments = useDebouncedAsync(
-      async (attachmentType: PetitionAttachmentType, attachmentIds: string[]) => {
-        await reorderPetitionAttachments({
-          variables: { petitionId, attachmentIds, attachmentType },
-        });
-      },
-      600,
-      []
-    );
-
     const handleReorderAttachments = async (
       attachmentType: PetitionAttachmentType,
       attachmentIds: string[]
     ) => {
-      try {
-        await debouncedReorderPetitionAttachments(attachmentType, attachmentIds);
-      } catch (e) {
-        if (e === "DEBOUNCED") {
-          return "DEBOUNCED";
-        } else {
-          throw e;
-        }
-      }
+      await reorderPetitionAttachments({
+        variables: { petitionId, attachmentIds, attachmentType },
+      });
     };
 
     const handleChangeType = async (
@@ -397,103 +379,46 @@ export const PetitionComposeAttachments = Object.assign(
         </CardHeader>
         <Stack paddingY={4} paddingX={2}>
           {allAttachments.length > 0 ? (
-            <>
-              {front.length ? (
-                <Stack
-                  listStyleType="none"
-                  as={Reorder.Group}
-                  axis="y"
-                  values={front}
-                  onReorder={setFront}
-                >
-                  {front.map((item, i, arr) => {
-                    return (
-                      <AttachmentItem
-                        key={item.id}
-                        item={item}
-                        index={i}
-                        progress={attachmentUploadProgress[item.id]}
-                        isDraggable={arr.length > 1}
-                        isDisabled={isReadOnly}
-                        onRemove={handleRemoveAttachment}
-                        onPreview={handleDownloadAttachment}
-                        onChangeType={handleChangeType}
-                        onReorder={() =>
-                          handleReorderAttachments(
-                            "FRONT",
-                            front.map((item) => item.id)
-                          )
-                        }
-                      />
-                    );
-                  })}
-                </Stack>
-              ) : null}
-              {front.length && (annex.length || back.length) ? <Divider /> : null}
-              {annex.length ? (
-                <Stack
-                  listStyleType="none"
-                  as={Reorder.Group}
-                  axis="y"
-                  values={annex}
-                  onReorder={setAnnex}
-                >
-                  {annex.map((item, i, arr) => {
-                    return (
-                      <AttachmentItem
-                        key={item.id}
-                        item={item}
-                        index={i}
-                        progress={attachmentUploadProgress[item.id]}
-                        isDraggable={arr.length > 1}
-                        isDisabled={isReadOnly}
-                        onRemove={handleRemoveAttachment}
-                        onPreview={handleDownloadAttachment}
-                        onChangeType={handleChangeType}
-                        onReorder={() =>
-                          handleReorderAttachments(
-                            "ANNEX",
-                            annex.map((item) => item.id)
-                          )
-                        }
-                      />
-                    );
-                  })}
-                </Stack>
-              ) : null}
-              {annex.length && back.length ? <Divider /> : null}
-              {back.length ? (
-                <Stack
-                  listStyleType="none"
-                  as={Reorder.Group}
-                  axis="y"
-                  values={back}
-                  onReorder={setBack}
-                >
-                  {back.map((item, i, arr) => {
-                    return (
-                      <AttachmentItem
-                        key={item.id}
-                        item={item}
-                        index={i}
-                        progress={attachmentUploadProgress[item.id]}
-                        isDraggable={arr.length > 1}
-                        isDisabled={isReadOnly}
-                        onRemove={handleRemoveAttachment}
-                        onPreview={handleDownloadAttachment}
-                        onChangeType={handleChangeType}
-                        onReorder={() =>
-                          handleReorderAttachments(
-                            "BACK",
-                            back.map((item) => item.id)
-                          )
-                        }
-                      />
-                    );
-                  })}
-                </Stack>
-              ) : null}
-            </>
+            <Stack spacing={2} divider={<Divider />}>
+              {[
+                ["FRONT", front, setFront] as const,
+                ["ANNEX", annex, setAnnex] as const,
+                ["BACK", back, setBack] as const,
+              ].map(([position, list, setList]) =>
+                list.length > 0 ? (
+                  <Stack
+                    key={position}
+                    listStyleType="none"
+                    as={Reorder.Group}
+                    axis="y"
+                    values={list}
+                    onReorder={setList}
+                  >
+                    {list.map((item, i) => {
+                      return (
+                        <AttachmentItem
+                          key={item.id}
+                          item={item}
+                          index={i}
+                          progress={attachmentUploadProgress[item.id]}
+                          isDraggable={list.length > 1}
+                          isDisabled={isReadOnly}
+                          onRemove={handleRemoveAttachment}
+                          onPreview={handleDownloadAttachment}
+                          onChangeType={handleChangeType}
+                          onDragEnd={() =>
+                            handleReorderAttachments(
+                              position,
+                              list.map((item) => item.id)
+                            )
+                          }
+                        />
+                      );
+                    })}
+                  </Stack>
+                ) : null
+              )}
+            </Stack>
           ) : (
             <Text width="100%" textAlign="center" color="gray.500">
               <FormattedMessage
@@ -574,6 +499,11 @@ export const PetitionComposeAttachments = Object.assign(
         return gql`
           fragment PetitionComposeAttachments_PetitionBase on PetitionBase {
             id
+            fields {
+              id
+              type
+              options
+            }
             attachmentsList {
               ...PetitionComposeAttachments_PetitionAttachmentsList
             }
@@ -696,7 +626,7 @@ interface AttachmentItemProps {
     fromType: PetitionAttachmentType,
     toType: PetitionAttachmentType
   ) => void;
-  onReorder: () => void;
+  onDragEnd: () => void;
 }
 
 const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function AttachmentItem(
@@ -709,7 +639,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
     onRemove,
     onPreview,
     onChangeType,
-    onReorder,
+    onDragEnd,
     ...props
   },
   ref
@@ -718,8 +648,6 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
   const dragControls = useDragControls();
   const y = useMotionValue(0);
   const isAnimated = useIsAnimated(y);
-  const prevIndex = useRef(index);
-  const prevType = useRef(item.type);
 
   const previewRef = useRef<HTMLButtonElement>(null);
   const isMouseOver = useIsMouseOver(previewRef);
@@ -727,20 +655,6 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
 
   const { type, file, isUploading, id } = item;
   const { filename, size, isComplete } = file;
-
-  useEffect(() => {
-    // update prevType and prevIndex if change the type of attachment to prevent unnecessary reorder.
-    prevType.current = item.type;
-    prevIndex.current = index;
-  }, [item]);
-
-  useEffect(() => {
-    // if the index inside the same type changes we reorder the attachments.
-    if (index !== prevIndex.current && item.type === prevType.current && isAnimated) {
-      onReorder();
-    }
-    prevIndex.current = index;
-  }, [index]);
 
   const menuIcon =
     type === "FRONT" ? (
@@ -754,6 +668,22 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
 
   const uploadHasFailed = !isUploading && !isComplete;
 
+  const menuButtonLabel =
+    type === "FRONT"
+      ? intl.formatMessage({
+          id: "component.petition-compose-attachments.cover",
+          defaultMessage: "Cover",
+        })
+      : type === "ANNEX"
+      ? intl.formatMessage({
+          id: "component.petition-compose-attachments.annex",
+          defaultMessage: "Annex",
+        })
+      : intl.formatMessage({
+          id: "component.petition-compose-attachments.back-cover",
+          defaultMessage: "Back cover",
+        });
+
   return (
     <Reorder.Item
       key={item.id}
@@ -761,6 +691,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
       dragListener={false}
       dragControls={dragControls}
       style={{ y }}
+      onDragEnd={onDragEnd}
     >
       <HStack
         ref={ref}
@@ -800,8 +731,8 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
             color: isDraggable && !isDisabled ? "gray.700" : "gray.400",
           }}
           aria-label={intl.formatMessage({
-            id: "component.petition-compose-field.drag-to-sort-label",
-            defaultMessage: "Drag to sort this parallel fields",
+            id: "component.petition-compose-attachments.drag-to-sort-label",
+            defaultMessage: "Drag to sort this attachment",
           })}
           onPointerDown={(event) => (isDraggable && !isDisabled ? dragControls.start(event) : noop)}
         >
@@ -819,7 +750,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
                 backgroundColor: buttonColor,
               }}
               size="xs"
-              aria-label="Options"
+              aria-label={menuButtonLabel}
               leftIcon={menuIcon}
               rightIcon={<ChevronDownIcon marginLeft={-2} />}
               isDisabled={isDisabled}

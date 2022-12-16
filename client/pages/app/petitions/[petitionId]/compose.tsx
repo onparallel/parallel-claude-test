@@ -566,16 +566,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               isTemplate={petition?.__typename === "PetitionTemplate"}
             />
 
-            <PetitionComposeAttachments
-              petitionId={petition.id}
-              marginTop="4"
-              isTemplate={petition?.__typename === "PetitionTemplate"}
-              attachmentsList={petition.attachmentsList}
-              hasDocumentFieldsWithAttachments={petition.fields.some(
-                (field) => isFileTypeField(field.type) && field.options.attachToPdf
-              )}
-              isReadOnly={isReadOnly}
-            />
+            <PetitionComposeAttachments petition={petition} isReadOnly={isReadOnly} marginTop="4" />
 
             {petition?.__typename === "PetitionTemplate" ? (
               <PetitionTemplateDescriptionEdit
