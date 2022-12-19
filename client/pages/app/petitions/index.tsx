@@ -495,7 +495,12 @@ function Petitions() {
     onMoveToClick: handleMoveToClick,
   });
 
-  const [views, setViews] = useState([...VIEWS]);
+  console.log("me.petitionListViews: ", me.petitionListViews);
+
+  const [views, setViews] = useState(me.petitionListViews ?? []);
+
+  console.log("views :", views);
+
   const handleReorder = (viewIds: string[]) => {
     setViews((views) => viewIds.map((id) => views.find((v) => v.id === id)!));
   };
@@ -726,33 +731,78 @@ function Petitions() {
 }
 
 Petitions.fragments = {
-  User: gql`
-    fragment Petitions_User on User {
-      role
-    }
-  `,
-  PetitionBaseOrFolder: gql`
-    fragment Petitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
-      ...useDeletePetitions_PetitionBaseOrFolder
-      ... on PetitionBase {
-        ...usePetitionsTableColumns_PetitionBase
-        myEffectivePermission {
-          permissionType
+  get PetitionListViewFilters() {
+    return gql`
+      fragment Petition_PetitionListViewFilters on PetitionListViewFilters {
+        status
+        sharedWith {
+          operator
+          filters {
+            value
+            operator
+          }
+        }
+        tags
+        signature
+        fromTemplateId
+        search
+        searchIn
+        path
+      }
+    `;
+  },
+  get PetitionListView() {
+    return gql`
+      fragment Petition_PetitionListView on PetitionListView {
+        id
+        name
+        filters {
+          ...Petition_PetitionListViewFilters
+        }
+        sortBy
+        isDefault
+        user {
+          id
         }
       }
-      ... on PetitionTemplate {
-        isPublic
+      ${this.PetitionListViewFilters}
+    `;
+  },
+  get User() {
+    return gql`
+      fragment Petitions_User on User {
+        role
+        petitionListViews {
+          ...Petition_PetitionListView
+        }
       }
-      ... on PetitionFolder {
-        ...usePetitionsTableColumns_PetitionFolder
-        path
-        minimumPermissionType
+      ${this.PetitionListView}
+    `;
+  },
+  get PetitionBaseOrFolder() {
+    return gql`
+      fragment Petitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
+        ...useDeletePetitions_PetitionBaseOrFolder
+        ... on PetitionBase {
+          ...usePetitionsTableColumns_PetitionBase
+          myEffectivePermission {
+            permissionType
+          }
+        }
+        ... on PetitionTemplate {
+          isPublic
+        }
+        ... on PetitionFolder {
+          ...usePetitionsTableColumns_PetitionFolder
+          path
+          minimumPermissionType
+        }
       }
-    }
-    ${useDeletePetitions.fragments.PetitionBaseOrFolder}
-    ${usePetitionsTableColumns.fragments.PetitionBase}
-    ${usePetitionsTableColumns.fragments.PetitionFolder}
-  `,
+      ${useDeletePetitions.fragments.PetitionBaseOrFolder}
+      ${usePetitionsTableColumns.fragments.PetitionBase}
+      ${usePetitionsTableColumns.fragments.PetitionFolder}
+    `;
+  },
 };
 
 const _queries = [
@@ -923,9 +973,12 @@ function usePetitionListActions({
 
 Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDataContext) => {
   const state = parseQuery(query, QUERY_STATE);
+  const { data } = await fetchQuery(Petitions_userDocument);
+  const views = data.me.petitionListViews ?? [];
+
   if (state.type === "PETITION") {
     if (!isDefined(state.view)) {
-      const defaultView = VIEWS.find((v) => v.isDefault);
+      const defaultView = views.find((v) => v.isDefault);
       if (isDefined(defaultView)) {
         throw new RedirectError(
           buildStateUrl(
@@ -939,7 +992,7 @@ Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDa
         throw new RedirectError(buildStateUrl(QUERY_STATE, { view: "ALL" }, pathname, query));
       }
     } else if (state.view !== "ALL") {
-      const view = VIEWS.find((v) => v.id === state.view);
+      const view = views.find((v) => v.id === state.view);
       if (!isDefined(view)) {
         throw new RedirectError(
           buildStateUrl(QUERY_STATE, { ...state, view: "ALL" }, pathname, query)
@@ -947,7 +1000,6 @@ Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDa
       }
     }
   }
-  await fetchQuery(Petitions_userDocument);
 };
 
 export default compose(withDialogs, withApolloData)(Petitions);

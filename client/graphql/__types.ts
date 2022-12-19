@@ -659,6 +659,8 @@ export interface Mutation {
   createPetitionFieldComment: PetitionFieldComment;
   /** Creates a reply on a petition field */
   createPetitionFieldReply: PetitionFieldReply;
+  /** Creates a view with custom filters and ordering on the user's petitions list */
+  createPetitionListView: PetitionListView;
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
   createPrintPdfTask: Task;
   /** Creates a public link from a user's template */
@@ -696,6 +698,8 @@ export interface Mutation {
   deletePetitionFieldAttachment: PetitionField;
   /** Delete a petition field comment. */
   deletePetitionFieldComment: PetitionField;
+  /** Deletes a petition list view of the user */
+  deletePetitionListView: User;
   /** Deletes a reply to a petition field. */
   deletePetitionReply: PetitionField;
   /** Delete petitions and folders. */
@@ -721,6 +725,8 @@ export interface Mutation {
   /** Returns an object with signed download url and filename for tasks with file output */
   getTaskResultFile: TaskResultFile;
   loginAs: Result;
+  /** Sets the default petition list view of the user. If passing null id, default view will be set (no filters/sorting) */
+  markPetitionListViewAsDefault: User;
   /** marks a Signature integration as default */
   markSignatureIntegrationAsDefault: IOrgIntegration;
   /** Updates the limit of the current usage limit of a given organization */
@@ -798,6 +804,8 @@ export interface Mutation {
   reopenPetition: Petition;
   /** Reorders the positions of attachments in the petition */
   reorderPetitionAttachments: PetitionBase;
+  /** Changes the ordering of a user's petition list views */
+  reorderPetitionListViews: User;
   /** Sends the AccountVerification email with confirmation code to unconfirmed user emails */
   resendVerificationCode: Result;
   /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
@@ -882,6 +890,8 @@ export interface Mutation {
   updatePetitionFieldReply: PetitionFieldReply;
   /** Updates the metadata of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
+  /** Updates a petition list view */
+  updatePetitionListView: PetitionListView;
   /** Updates the metadata of the specified petition */
   updatePetitionMetadata: Petition;
   /** Updates the subscription flag on a PetitionPermission */
@@ -1136,6 +1146,12 @@ export interface MutationcreatePetitionFieldReplyArgs {
   reply: Scalars["JSON"];
 }
 
+export interface MutationcreatePetitionListViewArgs {
+  filters?: InputMaybe<PetitionListViewFiltersInput>;
+  name: Scalars["String"];
+  sortBy?: InputMaybe<QueryPetitions_OrderBy>;
+}
+
 export interface MutationcreatePrintPdfTaskArgs {
   includeNdLinks?: InputMaybe<Scalars["Boolean"]>;
   petitionId: Scalars["GID"];
@@ -1236,6 +1252,10 @@ export interface MutationdeletePetitionFieldCommentArgs {
   petitionId: Scalars["GID"];
 }
 
+export interface MutationdeletePetitionListViewArgs {
+  id: Scalars["GID"];
+}
+
 export interface MutationdeletePetitionReplyArgs {
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
@@ -1298,6 +1318,10 @@ export interface MutationgetTaskResultFileArgs {
 
 export interface MutationloginAsArgs {
   userId: Scalars["GID"];
+}
+
+export interface MutationmarkPetitionListViewAsDefaultArgs {
+  petitionListViewId?: InputMaybe<Scalars["GID"]>;
 }
 
 export interface MutationmarkSignatureIntegrationAsDefaultArgs {
@@ -1519,6 +1543,10 @@ export interface MutationreorderPetitionAttachmentsArgs {
   attachmentIds: Array<Scalars["GID"]>;
   attachmentType: PetitionAttachmentType;
   petitionId: Scalars["GID"];
+}
+
+export interface MutationreorderPetitionListViewsArgs {
+  ids: Array<Scalars["GID"]>;
 }
 
 export interface MutationresendVerificationCodeArgs {
@@ -1761,6 +1789,11 @@ export interface MutationupdatePetitionFieldReplyMetadataArgs {
   metadata: Scalars["JSONObject"];
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
+}
+
+export interface MutationupdatePetitionListViewArgs {
+  data: UpdatePetitionListViewInput;
+  petitionListViewId: Scalars["GID"];
 }
 
 export interface MutationupdatePetitionMetadataArgs {
@@ -2744,6 +2777,63 @@ export interface PetitionFolder {
   /** The name petitions in the folder. */
   petitionCount: Scalars["Int"];
 }
+
+export interface PetitionListView {
+  __typename?: "PetitionListView";
+  filters: PetitionListViewFilters;
+  id: Scalars["GID"];
+  isDefault: Scalars["Boolean"];
+  name: Scalars["String"];
+  sortBy?: Maybe<QueryPetitions_OrderBy>;
+  user: User;
+}
+
+export interface PetitionListViewFilters {
+  __typename?: "PetitionListViewFilters";
+  fromTemplateId?: Maybe<Scalars["GID"]>;
+  path?: Maybe<Scalars["String"]>;
+  search?: Maybe<Scalars["String"]>;
+  searchIn?: Maybe<PetitionListViewSearchIn>;
+  sharedWith?: Maybe<PetitionListViewFiltersSharedWith>;
+  signature?: Maybe<Array<PetitionSignatureStatusFilter>>;
+  status?: Maybe<Array<PetitionStatus>>;
+  tags?: Maybe<Array<Scalars["GID"]>>;
+}
+
+export interface PetitionListViewFiltersInput {
+  fromTemplateId?: InputMaybe<Scalars["GID"]>;
+  path?: InputMaybe<Scalars["String"]>;
+  search?: InputMaybe<Scalars["String"]>;
+  searchIn?: InputMaybe<PetitionListViewSearchIn>;
+  sharedWith?: InputMaybe<PetitionListViewFiltersSharedWithInput>;
+  signature?: InputMaybe<Array<PetitionSignatureStatusFilter>>;
+  status?: InputMaybe<Array<PetitionStatus>>;
+  tags?: InputMaybe<Array<Scalars["GID"]>>;
+}
+
+export interface PetitionListViewFiltersSharedWith {
+  __typename?: "PetitionListViewFiltersSharedWith";
+  filters: Array<PetitionListViewFiltersSharedWithFilters>;
+  operator: FilterSharedWithLogicalOperator;
+}
+
+export interface PetitionListViewFiltersSharedWithFilters {
+  __typename?: "PetitionListViewFiltersSharedWithFilters";
+  operator: FilterSharedWithOperator;
+  value: Scalars["GID"];
+}
+
+export interface PetitionListViewFiltersSharedWithFiltersInput {
+  operator: FilterSharedWithOperator;
+  value: Scalars["GID"];
+}
+
+export interface PetitionListViewFiltersSharedWithInput {
+  filters: Array<PetitionListViewFiltersSharedWithFiltersInput>;
+  operator: FilterSharedWithLogicalOperator;
+}
+
+export type PetitionListViewSearchIn = "CURRENT_FOLDER" | "EVERYWHERE";
 
 /** The locale used for rendering the petition to the contact. */
 export type PetitionLocale = "en" | "es";
@@ -4116,6 +4206,12 @@ export interface UpdatePetitionInput {
   skipForwardSecurity?: InputMaybe<Scalars["Boolean"]>;
 }
 
+export interface UpdatePetitionListViewInput {
+  filters?: InputMaybe<PetitionListViewFiltersInput>;
+  name?: InputMaybe<Scalars["String"]>;
+  sortBy?: InputMaybe<QueryPetitions_OrderBy>;
+}
+
 export interface UpdateTagInput {
   color?: InputMaybe<Scalars["String"]>;
   name?: InputMaybe<Scalars["String"]>;
@@ -4159,6 +4255,8 @@ export interface User extends Timestamps {
   organization: Organization;
   /** Organizations this user belongs to */
   organizations: Array<Organization>;
+  /** The petition views of the user */
+  petitionListViews: Array<PetitionListView>;
   preferredLocale?: Maybe<Scalars["String"]>;
   role: OrganizationRole;
   status: UserStatus;
@@ -22760,7 +22858,85 @@ export type PetitionReplies_petitionQuery = {
     | null;
 };
 
-export type Petitions_UserFragment = { __typename?: "User"; role: OrganizationRole };
+export type Petition_PetitionListViewFiltersFragment = {
+  __typename?: "PetitionListViewFilters";
+  status?: Array<PetitionStatus> | null;
+  tags?: Array<string> | null;
+  signature?: Array<PetitionSignatureStatusFilter> | null;
+  fromTemplateId?: string | null;
+  search?: string | null;
+  searchIn?: PetitionListViewSearchIn | null;
+  path?: string | null;
+  sharedWith?: {
+    __typename?: "PetitionListViewFiltersSharedWith";
+    operator: FilterSharedWithLogicalOperator;
+    filters: Array<{
+      __typename?: "PetitionListViewFiltersSharedWithFilters";
+      value: string;
+      operator: FilterSharedWithOperator;
+    }>;
+  } | null;
+};
+
+export type Petition_PetitionListViewFragment = {
+  __typename?: "PetitionListView";
+  id: string;
+  name: string;
+  sortBy?: QueryPetitions_OrderBy | null;
+  isDefault: boolean;
+  filters: {
+    __typename?: "PetitionListViewFilters";
+    status?: Array<PetitionStatus> | null;
+    tags?: Array<string> | null;
+    signature?: Array<PetitionSignatureStatusFilter> | null;
+    fromTemplateId?: string | null;
+    search?: string | null;
+    searchIn?: PetitionListViewSearchIn | null;
+    path?: string | null;
+    sharedWith?: {
+      __typename?: "PetitionListViewFiltersSharedWith";
+      operator: FilterSharedWithLogicalOperator;
+      filters: Array<{
+        __typename?: "PetitionListViewFiltersSharedWithFilters";
+        value: string;
+        operator: FilterSharedWithOperator;
+      }>;
+    } | null;
+  };
+  user: { __typename?: "User"; id: string };
+};
+
+export type Petitions_UserFragment = {
+  __typename?: "User";
+  role: OrganizationRole;
+  petitionListViews: Array<{
+    __typename?: "PetitionListView";
+    id: string;
+    name: string;
+    sortBy?: QueryPetitions_OrderBy | null;
+    isDefault: boolean;
+    filters: {
+      __typename?: "PetitionListViewFilters";
+      status?: Array<PetitionStatus> | null;
+      tags?: Array<string> | null;
+      signature?: Array<PetitionSignatureStatusFilter> | null;
+      fromTemplateId?: string | null;
+      search?: string | null;
+      searchIn?: PetitionListViewSearchIn | null;
+      path?: string | null;
+      sharedWith?: {
+        __typename?: "PetitionListViewFiltersSharedWith";
+        operator: FilterSharedWithLogicalOperator;
+        filters: Array<{
+          __typename?: "PetitionListViewFiltersSharedWithFilters";
+          value: string;
+          operator: FilterSharedWithOperator;
+        }>;
+      } | null;
+    };
+    user: { __typename?: "User"; id: string };
+  }>;
+};
 
 export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
   __typename?: "Petition";
@@ -30279,10 +30455,47 @@ export const PetitionReplies_QueryFragmentDoc = gql`
   ${PetitionSignaturesCard_UserFragmentDoc}
   ${useUpdateIsReadNotification_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_QueryFragment, unknown>;
+export const Petition_PetitionListViewFiltersFragmentDoc = gql`
+  fragment Petition_PetitionListViewFilters on PetitionListViewFilters {
+    status
+    sharedWith {
+      operator
+      filters {
+        value
+        operator
+      }
+    }
+    tags
+    signature
+    fromTemplateId
+    search
+    searchIn
+    path
+  }
+` as unknown as DocumentNode<Petition_PetitionListViewFiltersFragment, unknown>;
+export const Petition_PetitionListViewFragmentDoc = gql`
+  fragment Petition_PetitionListView on PetitionListView {
+    id
+    name
+    filters {
+      ...Petition_PetitionListViewFilters
+    }
+    sortBy
+    isDefault
+    user {
+      id
+    }
+  }
+  ${Petition_PetitionListViewFiltersFragmentDoc}
+` as unknown as DocumentNode<Petition_PetitionListViewFragment, unknown>;
 export const Petitions_UserFragmentDoc = gql`
   fragment Petitions_User on User {
     role
+    petitionListViews {
+      ...Petition_PetitionListView
+    }
   }
+  ${Petition_PetitionListViewFragmentDoc}
 ` as unknown as DocumentNode<Petitions_UserFragment, unknown>;
 export const useDeletePetitions_PetitionFolderFragmentDoc = gql`
   fragment useDeletePetitions_PetitionFolder on PetitionFolder {
