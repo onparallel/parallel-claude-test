@@ -809,8 +809,13 @@ const _queries = [
   gql`
     query Petitions_user {
       ...AppLayout_Query
+      me {
+        id
+        ...Petitions_User
+      }
     }
     ${AppLayout.fragments.Query}
+    ${Petitions.fragments.User}
   `,
   gql`
     query Petitions_petitions(

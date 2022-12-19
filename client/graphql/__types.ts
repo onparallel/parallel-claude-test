@@ -23133,6 +23133,33 @@ export type Petitions_userQuery = {
         limit: number;
       } | null;
     };
+    petitionListViews: Array<{
+      __typename?: "PetitionListView";
+      id: string;
+      name: string;
+      sortBy?: QueryPetitions_OrderBy | null;
+      isDefault: boolean;
+      filters: {
+        __typename?: "PetitionListViewFilters";
+        status?: Array<PetitionStatus> | null;
+        tags?: Array<string> | null;
+        signature?: Array<PetitionSignatureStatusFilter> | null;
+        fromTemplateId?: string | null;
+        search?: string | null;
+        searchIn?: PetitionListViewSearchIn | null;
+        path?: string | null;
+        sharedWith?: {
+          __typename?: "PetitionListViewFiltersSharedWith";
+          operator: FilterSharedWithLogicalOperator;
+          filters: Array<{
+            __typename?: "PetitionListViewFiltersSharedWithFilters";
+            value: string;
+            operator: FilterSharedWithOperator;
+          }>;
+        } | null;
+      };
+      user: { __typename?: "User"; id: string };
+    }>;
   };
   realMe: {
     __typename?: "User";
@@ -34523,8 +34550,13 @@ export const PetitionReplies_petitionDocument = gql`
 export const Petitions_userDocument = gql`
   query Petitions_user {
     ...AppLayout_Query
+    me {
+      id
+      ...Petitions_User
+    }
   }
   ${AppLayout_QueryFragmentDoc}
+  ${Petitions_UserFragmentDoc}
 ` as unknown as DocumentNode<Petitions_userQuery, Petitions_userQueryVariables>;
 export const Petitions_petitionsDocument = gql`
   query Petitions_petitions(
