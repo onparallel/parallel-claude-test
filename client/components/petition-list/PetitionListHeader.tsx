@@ -286,13 +286,13 @@ const SaveViewMenuButton = chakraForwardRef<"button", { isDirty?: boolean }>(
           }
         >
           <chakra.span display="inline-flex" flex="1" pointerEvents="none" alignItems="center">
-            {isDirty ? (
-              <chakra.span marginRight={2}>
-                <Circle size={2} backgroundColor="primary.500" />
+            {isDirty || isSmallScreen ? (
+              <chakra.span marginRight={isSmallScreen ? 1 : 2}>
+                {isDirty ? <Circle size={2} backgroundColor="primary.500" /> : null}
               </chakra.span>
             ) : null}
             <chakra.span>
-              <SaveIcon aria-hidden focusable={false} />
+              <SaveIcon aria-hidden focusable={false} boxSize={4} display="block" />
             </chakra.span>
             <chakra.span marginLeft={2} display={{ base: "none", md: "inline" }}>
               {intl.formatMessage({

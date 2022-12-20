@@ -5800,6 +5800,16 @@
     "context": "Clone view"
   },
   {
+    "term": "component.view-tabs.new-default-view",
+    "definition": "New default view",
+    "context": "New default view"
+  },
+  {
+    "term": "component.view-tabs.new-default-view-description",
+    "definition": "It will be the first one you will see when you enter.",
+    "context": "It will be the first one you will see when you enter."
+  },
+  {
     "term": "component.view-tabs.rename-view-confirm",
     "definition": "Rename",
     "context": "Rename"
@@ -6135,6 +6145,11 @@
     "context": "After"
   },
   {
+    "term": "generic.all",
+    "definition": "All",
+    "context": "All"
+  },
+  {
     "term": "generic.all-categories",
     "definition": "All categories",
     "context": "All categories"
@@ -6148,11 +6163,6 @@
     "term": "generic.all-event-types",
     "definition": "All events",
     "context": "All events"
-  },
-  {
-    "term": "generic.all-templates-short",
-    "definition": "All",
-    "context": "All"
   },
   {
     "term": "generic.apply",

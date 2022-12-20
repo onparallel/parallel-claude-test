@@ -1384,8 +1384,8 @@ export interface NexusGenFieldTypes {
     removeUsersFromGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     renameFolder: NexusGenEnums["Success"]; // Success!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
-    reorderPetitionListViews: NexusGenRootTypes["User"]; // User!
     reorderPetitionAttachments: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
+    reorderPetitionListViews: NexusGenRootTypes["User"]; // User!
     resendVerificationCode: NexusGenEnums["Result"]; // Result!
     resetTemporaryPassword: NexusGenEnums["Result"]; // Result!
     resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -3163,8 +3163,8 @@ export interface NexusGenFieldTypeNames {
     removeUsersFromGroup: "UserGroup";
     renameFolder: "Success";
     reopenPetition: "Petition";
-    reorderPetitionListViews: "User";
     reorderPetitionAttachments: "PetitionBase";
+    reorderPetitionListViews: "User";
     resendVerificationCode: "Result";
     resetTemporaryPassword: "Result";
     resetUserPassword: "SupportMethodResponse";
@@ -5104,15 +5104,15 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
     };
-    reorderPetitionListViews: {
-      // args
-      ids: NexusGenScalars["GID"][]; // [GID!]!
-    };
     reorderPetitionAttachments: {
       // args
       attachmentIds: NexusGenScalars["GID"][]; // [GID!]!
       attachmentType: NexusGenEnums["PetitionAttachmentType"]; // PetitionAttachmentType!
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    reorderPetitionListViews: {
+      // args
+      ids: NexusGenScalars["GID"][]; // [GID!]!
     };
     resendVerificationCode: {
       // args

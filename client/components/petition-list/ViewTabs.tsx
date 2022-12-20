@@ -1,5 +1,15 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Button, Flex, MenuDivider, MenuItem, MenuList, Square, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  MenuDivider,
+  MenuItem,
+  MenuList,
+  Square,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon, EditIcon, StarEmptyIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
@@ -40,6 +50,7 @@ export const ViewTabs = Object.assign(
     ref
   ) {
     const intl = useIntl();
+    const toast = useToast();
     const lastViews = useRef(views);
 
     useEffect(() => {
@@ -135,6 +146,18 @@ export const ViewTabs = Object.assign(
       (view: ViewTabs_PetitionListViewFragment) => async () => {
         try {
           await markPetitionListViewAsDefault({ variables: { petitionListViewId: view.id } });
+          toast({
+            isClosable: true,
+            status: "success",
+            title: intl.formatMessage({
+              id: "component.view-tabs.new-default-view",
+              defaultMessage: "New default view",
+            }),
+            description: intl.formatMessage({
+              id: "component.view-tabs.new-default-view-description",
+              defaultMessage: "It will be the first one you will see when you enter.",
+            }),
+          });
         } catch {}
       };
 
@@ -144,7 +167,8 @@ export const ViewTabs = Object.assign(
       try {
         await showConfirmDeleteViewDialog({ name: view.name });
         await deletePetitionListView({ variables: { id: view.id } });
-        handleViewChange("ALL");
+        const defaultView = views.find((v) => v.isDefault && v.id !== view.id);
+        handleViewChange(defaultView ? defaultView.id : "ALL");
       } catch {}
     };
 
@@ -215,12 +239,13 @@ export const ViewTabs = Object.assign(
                   right: "0",
                 },
               }}
+              backgroundColor="gray.50"
             >
               {[
                 {
                   id: "ALL",
                   name: intl.formatMessage({
-                    id: "generic.all-templates-short",
+                    id: "generic.all",
                     defaultMessage: "All",
                   }),
                   filters: {
@@ -373,6 +398,7 @@ interface ViewTabProps {
   view: {
     id: string;
     name: string;
+    isDefault?: boolean;
   };
   isActive?: boolean;
   draggedViewId: string | null;
@@ -421,7 +447,7 @@ export function ViewTab({
         _focus={{ boxShadow: "none" }}
         paddingRight={{ base: 1, sm: 2 }}
         gap={{ base: 1, sm: 2 }}
-        backgroundColor="white"
+        backgroundColor={isActive ? "white" : "gray.50"}
         backgroundClip="padding-box"
       >
         <Box flex={1} isTruncated>
@@ -436,7 +462,7 @@ export function ViewTab({
                 <MenuList minWidth="160px">
                   <MenuItem
                     isDisabled={view.id === "ALL"}
-                    icon={<EditIcon />}
+                    icon={<EditIcon boxSize={4} display="block" />}
                     onClick={onRenameView}
                   >
                     <FormattedMessage
@@ -444,15 +470,15 @@ export function ViewTab({
                       defaultMessage="Rename view"
                     />
                   </MenuItem>
-                  <MenuItem icon={<CopyIcon />} onClick={onCloneView}>
+                  <MenuItem icon={<CopyIcon boxSize={4} display="block" />} onClick={onCloneView}>
                     <FormattedMessage
                       id="component.view-tabs.action-clone-view"
                       defaultMessage="Clone view"
                     />
                   </MenuItem>
                   <MenuItem
-                    isDisabled={view.id === "ALL"}
-                    icon={<StarEmptyIcon />}
+                    isDisabled={view.id === "ALL" || view.isDefault}
+                    icon={<StarEmptyIcon boxSize={4} display="block" />}
                     onClick={onMarkViewAsDefault}
                   >
                     <FormattedMessage
@@ -464,7 +490,7 @@ export function ViewTab({
                   <MenuItem
                     isDisabled={view.id === "ALL"}
                     color="red.600"
-                    icon={<DeleteIcon />}
+                    icon={<DeleteIcon boxSize={4} display="block" />}
                     onClick={onDeleteView}
                   >
                     <FormattedMessage

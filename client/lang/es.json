@@ -5776,7 +5776,7 @@
   },
   {
     "term": "component.view-tabs.action-clone-view",
-    "definition": "Clonar vista",
+    "definition": "Duplicar vista",
     "context": "Clone view"
   },
   {
@@ -5786,18 +5786,28 @@
   },
   {
     "term": "component.view-tabs.action-mark-as-default",
-    "definition": "Marcar como predeterminada",
+    "definition": "Marcar favorito",
     "context": "Mark as default"
   },
   {
     "term": "component.view-tabs.action-rename-view",
-    "definition": "Renombrar vista",
+    "definition": "Renombrar",
     "context": "Rename view"
   },
   {
     "term": "component.view-tabs.clone-view",
-    "definition": "Clonar vista",
+    "definition": "Duplicar vista",
     "context": "Clone view"
+  },
+  {
+    "term": "component.view-tabs.new-default-view",
+    "definition": "Nueva vista favorita",
+    "context": "New default view"
+  },
+  {
+    "term": "component.view-tabs.new-default-view-description",
+    "definition": "Será la primera que verás al entrar.",
+    "context": "It will be the first one you will see when you enter."
   },
   {
     "term": "component.view-tabs.rename-view-confirm",
@@ -6135,6 +6145,11 @@
     "context": "After"
   },
   {
+    "term": "generic.all",
+    "definition": "Todo",
+    "context": "All"
+  },
+  {
     "term": "generic.all-categories",
     "definition": "Todas las categorías",
     "context": "All categories"
@@ -6148,11 +6163,6 @@
     "term": "generic.all-event-types",
     "definition": "Todos los eventos",
     "context": "All events"
-  },
-  {
-    "term": "generic.all-templates-short",
-    "definition": "Todas",
-    "context": "All"
   },
   {
     "term": "generic.apply",

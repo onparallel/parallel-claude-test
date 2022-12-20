@@ -1,4 +1,3 @@
-import deepmerge from "deepmerge";
 import { inputObjectType, list, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { isDefined, maxBy } from "remeda";
 import { PetitionListView } from "../../db/__types";
@@ -50,13 +49,11 @@ export const updatePetitionListView = mutationField("updatePetitionListView", {
   },
   resolve: async (_, args, ctx) => {
     const data: Partial<PetitionListView> = {};
-    const view = await ctx.views.loadPetitionListView(args.petitionListViewId);
     if (isDefined(args.data.name)) {
       data.name = args.data.name;
     }
     if (args.data.filters !== undefined) {
-      data.filters =
-        args.data.filters === null ? null : deepmerge(view!.filters, args.data.filters ?? {});
+      data.filters = args.data.filters;
     }
     if (args.data.sortBy !== undefined) {
       data.sort_by = args.data.sortBy;
