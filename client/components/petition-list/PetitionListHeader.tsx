@@ -1,3 +1,4 @@
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
@@ -16,43 +17,30 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon, RepeatIcon, SaveIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import {
+  PetitionListHeader_createPetitionListViewDocument,
+  PetitionListHeader_PetitionListViewFragment,
+  PetitionListHeader_updatePetitionListViewDocument,
+  PetitionListViewFiltersInput,
+} from "@parallel/graphql/__types";
 import type { PetitionsQueryState } from "@parallel/pages/app/petitions";
 import { QueryStateOf, SetQueryState, useBuildStateUrl } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { equals, pick } from "remeda";
+import { equals, omit, pick } from "remeda";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PathBreadcrumbs } from "../common/PathBreadcrumbs";
 import { SearchAllOrCurrentFolder } from "../common/SearchAllOrCurrentFolder";
 import { SearchInput } from "../common/SearchInput";
 import { useAskViewNameDialog } from "./AskViewNameDialog";
 
-interface View {
-  id: string;
-  name: string;
-  filters: Partial<
-    Pick<
-      PetitionsQueryState,
-      | "status"
-      | "tags"
-      | "sharedWith"
-      | "signature"
-      | "fromTemplateId"
-      | "search"
-      | "searchIn"
-      | "path"
-    >
-  >;
-  sortBy: PetitionsQueryState["sort"];
-}
-
 export interface PetitionListHeaderProps {
   shape: QueryStateOf<PetitionsQueryState>;
   state: PetitionsQueryState;
   onStateChange: SetQueryState<Partial<PetitionsQueryState>>;
   onReload: () => void;
-  views: View[];
+  views: PetitionListHeader_PetitionListViewFragment[];
 }
 
 export function PetitionListHeader({
@@ -99,10 +87,13 @@ export function PetitionListHeader({
       return false;
     }
     const currentView = state.view === "ALL" ? null : views.find((v) => v.id === state.view)!;
+
+    if (!currentView && state.view !== "ALL") return;
+
     return !equals(
       state.view === "ALL"
         ? {
-            sortBy: { field: "sentAt", direction: "DESC" },
+            sortBy: null,
             filters: {
               status: null,
               tags: null,
@@ -114,9 +105,16 @@ export function PetitionListHeader({
               path: "/",
             },
           }
-        : pick(currentView!, ["sortBy", "filters"]),
+        : {
+            sortBy: currentView!.sortBy,
+            filters: {
+              ...omit(currentView!.filters, ["__typename"]),
+              path: currentView!.filters.path ?? "/",
+              searchIn: currentView!.filters.searchIn ?? "EVERYWHERE",
+            },
+          },
       {
-        sortBy: state.sort,
+        sortBy: state.sort ? `${state.sort.field}_${state.sort.direction}` : null,
         filters: pick(state, [
           "status",
           "tags",
@@ -124,18 +122,19 @@ export function PetitionListHeader({
           "signature",
           "fromTemplateId",
           "search",
-          "searchIn",
           "path",
+          "searchIn",
         ]),
       }
     );
   }, [state, views]);
 
   const showAskViewNameDialog = useAskViewNameDialog();
+  const [createPetitionListView] = useMutation(PetitionListHeader_createPetitionListViewDocument);
   const handleSaveAsNewViewClick = async () => {
     try {
       const currentView = state.view === "ALL" ? null : views.find((v) => v.id === state.view)!;
-      await showAskViewNameDialog({
+      const name = await showAskViewNameDialog({
         name: currentView?.name,
         header: (
           <FormattedMessage
@@ -149,6 +148,51 @@ export function PetitionListHeader({
             defaultMessage="Create view"
           />
         ),
+      });
+      await createPetitionListView({
+        variables: {
+          name,
+          filters: pick(state, [
+            "status",
+            "sharedWith",
+            "tags",
+            "signature",
+            "fromTemplateId",
+            "search",
+            "searchIn",
+            "path",
+          ]) as PetitionListViewFiltersInput,
+          sortBy: state.sort ? `${state.sort.field}_${state.sort.direction}` : null,
+        },
+      });
+    } catch {}
+  };
+
+  const [updatePetitionListView] = useMutation(PetitionListHeader_updatePetitionListViewDocument);
+  const handleSaveCurrentViewClick = async () => {
+    try {
+      if (state.view === "ALL") return;
+
+      const view = views.find((v) => v.id === state.view)!;
+
+      await updatePetitionListView({
+        variables: {
+          petitionListViewId: view.id,
+          data: {
+            name: view.name,
+            filters: pick(state, [
+              "status",
+              "sharedWith",
+              "tags",
+              "signature",
+              "fromTemplateId",
+              "search",
+              "searchIn",
+              "path",
+            ]) as PetitionListViewFiltersInput,
+            sortBy: state.sort ? `${state.sort.field}_${state.sort.direction}` : null,
+          },
+        },
       });
     } catch {}
   };
@@ -176,7 +220,10 @@ export function PetitionListHeader({
                 <SaveViewMenuButton isDirty={isViewDirty} />
                 <Portal>
                   <MenuList minWidth="160px">
-                    <MenuItem isDisabled={state.view === "ALL"}>
+                    <MenuItem
+                      isDisabled={state.view === "ALL"}
+                      onClick={handleSaveCurrentViewClick}
+                    >
                       <FormattedMessage
                         id="component.petition-list-header.save-current-view"
                         defaultMessage="Save current view"
@@ -262,3 +309,85 @@ const SaveViewMenuButton = chakraForwardRef<"button", { isDirty?: boolean }>(
     );
   }
 );
+
+const _fragments = {
+  get PetitionListViewFilters() {
+    return gql`
+      fragment PetitionListHeader_PetitionListViewFilters on PetitionListViewFilters {
+        status
+        sharedWith {
+          operator
+          filters {
+            value
+            operator
+          }
+        }
+        tags
+        signature
+        fromTemplateId
+        search
+        searchIn
+        path
+      }
+    `;
+  },
+  get PetitionListView() {
+    return gql`
+      fragment PetitionListHeader_PetitionListView on PetitionListView {
+        id
+        name
+        filters {
+          ...PetitionListHeader_PetitionListViewFilters
+        }
+        sortBy
+        isDefault
+      }
+      ${this.PetitionListViewFilters}
+    `;
+  },
+  get User() {
+    return gql`
+      fragment PetitionListHeader_User on User {
+        id
+        petitionListViews {
+          ...PetitionListHeader_PetitionListView
+        }
+      }
+      ${this.PetitionListView}
+    `;
+  },
+};
+
+const _mutations = [
+  gql`
+    mutation PetitionListHeader_createPetitionListView(
+      $name: String!
+      $filters: PetitionListViewFiltersInput
+      $sortBy: QueryPetitions_OrderBy
+    ) {
+      createPetitionListView(name: $name, filters: $filters, sortBy: $sortBy) {
+        ...PetitionListHeader_PetitionListView
+        user {
+          ...PetitionListHeader_User
+        }
+      }
+    }
+    ${_fragments.User}
+    ${_fragments.PetitionListView}
+  `,
+  gql`
+    mutation PetitionListHeader_updatePetitionListView(
+      $petitionListViewId: GID!
+      $data: UpdatePetitionListViewInput!
+    ) {
+      updatePetitionListView(petitionListViewId: $petitionListViewId, data: $data) {
+        ...PetitionListHeader_PetitionListView
+        user {
+          ...PetitionListHeader_User
+        }
+      }
+    }
+    ${_fragments.User}
+    ${_fragments.PetitionListView}
+  `,
+];

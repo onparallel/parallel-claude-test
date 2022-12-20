@@ -29,6 +29,7 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import { SearchInOptions } from "@parallel/components/common/SearchAllOrCurrentFolder";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { TableSortingDirection } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import {
   RedirectError,
@@ -86,7 +87,7 @@ import {
 import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import { MouseEvent, ReactNode, useCallback, useMemo, useState } from "react";
+import { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, map, maxBy, pick, pipe } from "remeda";
 
@@ -128,75 +129,6 @@ export type PetitionsQueryState = QueryStateFrom<typeof QUERY_STATE>;
 function rowKeyProp(row: Petitions_PetitionBaseOrFolderFragment) {
   return row.__typename === "PetitionFolder" ? row.folderId : (row as any).id;
 }
-
-interface View {
-  id: string;
-  name: string;
-  filters: Partial<
-    Pick<
-      PetitionsQueryState,
-      | "status"
-      | "tags"
-      | "sharedWith"
-      | "signature"
-      | "fromTemplateId"
-      | "search"
-      | "searchIn"
-      | "path"
-    >
-  >;
-  sortBy: PetitionsQueryState["sort"];
-  isDefault?: boolean;
-}
-
-const VIEWS: View[] = [
-  {
-    id: "00001",
-    name: "Pending",
-    filters: {
-      status: ["PENDING"],
-      sharedWith: null,
-      tags: null,
-      signature: null,
-      fromTemplateId: null,
-      search: null,
-      searchIn: "EVERYWHERE",
-      path: "/",
-    },
-    sortBy: { field: "sentAt", direction: "DESC" },
-    isDefault: true,
-  },
-  {
-    id: "00002",
-    name: "Shared with me",
-    filters: {
-      status: null,
-      sharedWith: { operator: "AND", filters: [{ operator: "SHARED_WITH", value: "yQQfqcU5" }] },
-      tags: null,
-      signature: null,
-      fromTemplateId: null,
-      search: null,
-      searchIn: "EVERYWHERE",
-      path: "/",
-    },
-    sortBy: { field: "sentAt", direction: "DESC" },
-  },
-  {
-    id: "00003",
-    name: "Hola",
-    filters: {
-      status: null,
-      sharedWith: null,
-      tags: ["Dm54GEK"],
-      signature: null,
-      fromTemplateId: null,
-      search: null,
-      searchIn: "EVERYWHERE",
-      path: "/",
-    },
-    sortBy: { field: "sentAt", direction: "DESC" },
-  },
-];
 
 function Petitions() {
   const intl = useIntl();
@@ -245,7 +177,20 @@ function Petitions() {
     if (type === "PETITION") {
       const defaultView = views.find((v) => v.isDefault);
       if (isDefined(defaultView)) {
-        setQueryState({ type, view: defaultView.id, ...defaultView.filters });
+        setQueryState({
+          type,
+          view: defaultView.id,
+          ...(pick(defaultView.filters, [
+            "status",
+            "tags",
+            "sharedWith",
+            "signature",
+            "fromTemplateId",
+            "search",
+            "searchIn",
+            "path",
+          ]) as Partial<PetitionsQueryState>),
+        });
       } else {
         setQueryState({ type });
       }
@@ -495,11 +440,11 @@ function Petitions() {
     onMoveToClick: handleMoveToClick,
   });
 
-  console.log("me.petitionListViews: ", me.petitionListViews);
+  const [views, setViews] = useState(me.petitionListViews);
 
-  const [views, setViews] = useState(me.petitionListViews ?? []);
-
-  console.log("views :", views);
+  useEffect(() => {
+    setViews(me.petitionListViews);
+  }, [me]);
 
   const handleReorder = (viewIds: string[]) => {
     setViews((views) => viewIds.map((id) => views.find((v) => v.id === id)!));
@@ -731,52 +676,14 @@ function Petitions() {
 }
 
 Petitions.fragments = {
-  get PetitionListViewFilters() {
-    return gql`
-      fragment Petition_PetitionListViewFilters on PetitionListViewFilters {
-        status
-        sharedWith {
-          operator
-          filters {
-            value
-            operator
-          }
-        }
-        tags
-        signature
-        fromTemplateId
-        search
-        searchIn
-        path
-      }
-    `;
-  },
-  get PetitionListView() {
-    return gql`
-      fragment Petition_PetitionListView on PetitionListView {
-        id
-        name
-        filters {
-          ...Petition_PetitionListViewFilters
-        }
-        sortBy
-        isDefault
-        user {
-          id
-        }
-      }
-      ${this.PetitionListViewFilters}
-    `;
-  },
   get User() {
     return gql`
       fragment Petitions_User on User {
+        id
         role
-        petitionListViews {
-          ...Petition_PetitionListView
-        }
+        ...ViewTabs_User
       }
-      ${this.PetitionListView}
+      ${ViewTabs.fragments.User}
     `;
   },
   get PetitionBaseOrFolder() {
@@ -810,7 +717,6 @@ const _queries = [
     query Petitions_user {
       ...AppLayout_Query
       me {
-        id
         ...Petitions_User
       }
     }
@@ -979,16 +885,37 @@ function usePetitionListActions({
 Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDataContext) => {
   const state = parseQuery(query, QUERY_STATE);
   const { data } = await fetchQuery(Petitions_userDocument);
-  const views = data.me.petitionListViews ?? [];
+  const views = data.me.petitionListViews;
 
   if (state.type === "PETITION") {
     if (!isDefined(state.view)) {
       const defaultView = views.find((v) => v.isDefault);
       if (isDefined(defaultView)) {
+        const sortBy = defaultView.sortBy ? defaultView.sortBy.split("_") : null;
+
+        const { status, tags, sharedWith, signature, fromTemplateId, search, searchIn, path } =
+          defaultView.filters;
+
         throw new RedirectError(
           buildStateUrl(
             QUERY_STATE,
-            { view: defaultView.id, ...defaultView.filters, sort: defaultView.sortBy },
+            {
+              view: defaultView.id,
+              status,
+              tags,
+              sharedWith,
+              signature,
+              fromTemplateId: fromTemplateId ? [fromTemplateId] : undefined,
+              search,
+              searchIn: (searchIn as SearchInOptions) ?? undefined,
+              path: path ?? undefined,
+              sort: sortBy
+                ? {
+                    field: sortBy[0] as any,
+                    direction: sortBy[1] as TableSortingDirection,
+                  }
+                : undefined,
+            },
             pathname,
             query
           )

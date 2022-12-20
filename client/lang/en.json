@@ -240,6 +240,16 @@
     "context": "Upgrade your plan to increase your user and parallel limits."
   },
   {
+    "term": "component.ask-view-name-dialog.max-length-error",
+    "definition": "Name cannot exceed {max} characters",
+    "context": "Name cannot exceed {max} characters"
+  },
+  {
+    "term": "component.ask-view-name-dialog.name-label",
+    "definition": "Enter a meaningful name for the view",
+    "context": "Enter a meaningful name for the view"
+  },
+  {
     "term": "component.branding-document-preview.document-title",
     "definition": "Document title",
     "context": "Document title"
@@ -3260,6 +3270,31 @@
     "context": "This link is individual and <b>can only be used once</b>. If you want to add more recipients you can do it from the {activityLink} tab."
   },
   {
+    "term": "component.petition-list-header.save-as-new-view",
+    "definition": "Save as new view",
+    "context": "Save as new view"
+  },
+  {
+    "term": "component.petition-list-header.save-as-new-view-confirm-button",
+    "definition": "Create view",
+    "context": "Create view"
+  },
+  {
+    "term": "component.petition-list-header.save-as-new-view-header",
+    "definition": "Create new view",
+    "context": "Create new view"
+  },
+  {
+    "term": "component.petition-list-header.save-current-view",
+    "definition": "Save current view",
+    "context": "Save current view"
+  },
+  {
+    "term": "component.petition-list-header.save-view-button",
+    "definition": "Save view",
+    "context": "Save view"
+  },
+  {
     "term": "component.petition-list-header.search-in",
     "definition": "Search in:",
     "context": "Search in:"
@@ -5740,6 +5775,51 @@
     "context": "Team"
   },
   {
+    "term": "component.view-tabs.action-clone-view",
+    "definition": "Clone view",
+    "context": "Clone view"
+  },
+  {
+    "term": "component.view-tabs.action-delete-view",
+    "definition": "Delete view",
+    "context": "Delete view"
+  },
+  {
+    "term": "component.view-tabs.action-mark-as-default",
+    "definition": "Mark as default",
+    "context": "Mark as default"
+  },
+  {
+    "term": "component.view-tabs.action-rename-view",
+    "definition": "Rename view",
+    "context": "Rename view"
+  },
+  {
+    "term": "component.view-tabs.clone-view",
+    "definition": "Clone view",
+    "context": "Clone view"
+  },
+  {
+    "term": "component.view-tabs.rename-view-confirm",
+    "definition": "Rename",
+    "context": "Rename"
+  },
+  {
+    "term": "component.view-tabs.rename-view-header",
+    "definition": "Rename view",
+    "context": "Rename view"
+  },
+  {
+    "term": "components.view-tabs.confirm-delete-body",
+    "definition": "Are you sure you want to delete <b>{name}</b>?",
+    "context": "Are you sure you want to delete <b>{name}</b>?"
+  },
+  {
+    "term": "components.view-tabs.confirm-delete-header",
+    "definition": "Delete view",
+    "context": "Delete view"
+  },
+  {
     "term": "contact.edit-details-button",
     "definition": "Edit",
     "context": "Edit"
@@ -6068,6 +6148,11 @@
     "term": "generic.all-event-types",
     "definition": "All events",
     "context": "All events"
+  },
+  {
+    "term": "generic.all-templates-short",
+    "definition": "All",
+    "context": "All"
   },
   {
     "term": "generic.apply",

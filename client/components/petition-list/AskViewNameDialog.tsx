@@ -1,5 +1,6 @@
 import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
+import { isNotEmptyText } from "@parallel/utils/strings";
 import { ReactNode, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
@@ -22,6 +23,7 @@ export function AskViewNameDialog({
   const nameProps = useRegisterWithRef(nameRef, register, "name", {
     maxLength: 40,
     required: true,
+    validate: isNotEmptyText,
   });
 
   return (

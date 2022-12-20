@@ -240,6 +240,16 @@
     "context": "Upgrade your plan to increase your user and parallel limits."
   },
   {
+    "term": "component.ask-view-name-dialog.max-length-error",
+    "definition": "El nombre no puede exceder {max} caracteres",
+    "context": "Name cannot exceed {max} characters"
+  },
+  {
+    "term": "component.ask-view-name-dialog.name-label",
+    "definition": "Introduzca un nombre significativo para la vista",
+    "context": "Enter a meaningful name for the view"
+  },
+  {
     "term": "component.branding-document-preview.document-title",
     "definition": "Título del documento",
     "context": "Document title"
@@ -3260,6 +3270,31 @@
     "context": "This link is individual and <b>can only be used once</b>. If you want to add more recipients you can do it from the {activityLink} tab."
   },
   {
+    "term": "component.petition-list-header.save-as-new-view",
+    "definition": "Guardar como nueva vista",
+    "context": "Save as new view"
+  },
+  {
+    "term": "component.petition-list-header.save-as-new-view-confirm-button",
+    "definition": "Crear vista",
+    "context": "Create view"
+  },
+  {
+    "term": "component.petition-list-header.save-as-new-view-header",
+    "definition": "Crear nueva vista",
+    "context": "Create new view"
+  },
+  {
+    "term": "component.petition-list-header.save-current-view",
+    "definition": "Guardar vista actual",
+    "context": "Save current view"
+  },
+  {
+    "term": "component.petition-list-header.save-view-button",
+    "definition": "Guardar vista",
+    "context": "Save view"
+  },
+  {
     "term": "component.petition-list-header.search-in",
     "definition": "Busca en:",
     "context": "Search in:"
@@ -5740,6 +5775,51 @@
     "context": "Team"
   },
   {
+    "term": "component.view-tabs.action-clone-view",
+    "definition": "Clonar vista",
+    "context": "Clone view"
+  },
+  {
+    "term": "component.view-tabs.action-delete-view",
+    "definition": "Borrar vista",
+    "context": "Delete view"
+  },
+  {
+    "term": "component.view-tabs.action-mark-as-default",
+    "definition": "Marcar como predeterminada",
+    "context": "Mark as default"
+  },
+  {
+    "term": "component.view-tabs.action-rename-view",
+    "definition": "Renombrar vista",
+    "context": "Rename view"
+  },
+  {
+    "term": "component.view-tabs.clone-view",
+    "definition": "Clonar vista",
+    "context": "Clone view"
+  },
+  {
+    "term": "component.view-tabs.rename-view-confirm",
+    "definition": "Renombrar",
+    "context": "Rename"
+  },
+  {
+    "term": "component.view-tabs.rename-view-header",
+    "definition": "Renombrar vista",
+    "context": "Rename view"
+  },
+  {
+    "term": "components.view-tabs.confirm-delete-body",
+    "definition": "¿Estás seguro de que quieres borrar <b>{name}</b>?",
+    "context": "Are you sure you want to delete <b>{name}</b>?"
+  },
+  {
+    "term": "components.view-tabs.confirm-delete-header",
+    "definition": "Borrar vista",
+    "context": "Delete view"
+  },
+  {
     "term": "contact.edit-details-button",
     "definition": "Editar",
     "context": "Edit"
@@ -6068,6 +6148,11 @@
     "term": "generic.all-event-types",
     "definition": "Todos los eventos",
     "context": "All events"
+  },
+  {
+    "term": "generic.all-templates-short",
+    "definition": "Todas",
+    "context": "All"
   },
   {
     "term": "generic.apply",
