@@ -214,7 +214,7 @@ function MdList({ token }: { token: marked.Tokens.List }) {
   return (
     <Fragment>
       {flatten(token, 0).map(([t, level, i, ordered], j) => (
-        <View key={j} style={styles.listItemContainer}>
+        <View key={j} style={styles.listItemContainer} minPresenceAhead={1}>
           {range(0, level).map((i) => (
             <View key={i} style={styles.listPaddingBox} />
           ))}
