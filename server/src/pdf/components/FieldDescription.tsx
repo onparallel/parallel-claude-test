@@ -53,52 +53,54 @@ export function FieldDescription({ description }: FieldDescriptionProps) {
       marginBottom: "2mm",
     },
   });
-  return hasMarkdown ? (
-    <View>
-      {tokens!.map((t, i) =>
-        t.type === "heading" ? (
-          <Fragment key={i}>
-            <Text key={i} style={t.depth === 1 ? styles.title1 : styles.title2}>
-              <MdInlineContent tokens={t.tokens as any} />
-            </Text>
-            <TrailingNewLines raw={t.raw} />
-          </Fragment>
-        ) : t.type === "paragraph" ? (
-          t.tokens.length === 1 && t.tokens[0].type === "image" ? (
-            <View
-              key={i}
-              style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}
-            >
-              <Image src={t.tokens[0].href} style={{ width: "75%" }} />
+  return (
+    <View debug>
+      {hasMarkdown ? (
+        tokens!.map((t, i) =>
+          t.type === "heading" ? (
+            <Fragment key={i}>
+              <Text key={i} style={t.depth === 1 ? styles.title1 : styles.title2}>
+                <MdInlineContent tokens={t.tokens as any} />
+              </Text>
+              <TrailingNewLines raw={t.raw} />
+            </Fragment>
+          ) : t.type === "paragraph" ? (
+            t.tokens.length === 1 && t.tokens[0].type === "image" ? (
+              <View
+                key={i}
+                style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}
+              >
+                <Image src={t.tokens[0].href} style={{ width: "75%" }} />
+              </View>
+            ) : (
+              <Text key={i}>
+                <MdInlineContent tokens={t.tokens as any} />
+              </Text>
+            )
+          ) : t.type === "list" ? (
+            <MdList key={i} token={t} />
+          ) : t.type === "table" ? (
+            <Fragment key={i}>
+              <MdTable token={t} />
+              <TrailingNewLines raw={t.raw} />
+            </Fragment>
+          ) : t.type === "hr" ? (
+            <Fragment key={i}>
+              <View style={{ borderBottom: "1px solid #e2e8f0" }} />
+              <TrailingNewLines raw={t.raw} />
+            </Fragment>
+          ) : t.type === "space" ? (
+            <Text key={i}>{"\n".repeat((t.raw.match(/\n/g)?.length ?? 1) - 1)}</Text>
+          ) : process.env.NODE_ENV === "production" ? null : (
+            <View key={i}>
+              <Text>{JSON.stringify(t, null, "  ")}</Text>
             </View>
-          ) : (
-            <Text key={i}>
-              <MdInlineContent tokens={t.tokens as any} />
-            </Text>
           )
-        ) : t.type === "list" ? (
-          <MdList key={i} token={t} />
-        ) : t.type === "table" ? (
-          <Fragment key={i}>
-            <MdTable token={t} />
-            <TrailingNewLines raw={t.raw} />
-          </Fragment>
-        ) : t.type === "hr" ? (
-          <Fragment key={i}>
-            <View style={{ borderBottom: "1px solid #e2e8f0" }} />
-            <TrailingNewLines raw={t.raw} />
-          </Fragment>
-        ) : t.type === "space" ? (
-          <Text key={i}>{"\n".repeat((t.raw.match(/\n/g)?.length ?? 1) - 1)}</Text>
-        ) : process.env.NODE_ENV === "production" ? null : (
-          <View key={i}>
-            <Text>{JSON.stringify(t, null, "  ")}</Text>
-          </View>
         )
+      ) : (
+        <Text debug>{cleanupText(interpolated || " ")}</Text>
       )}
     </View>
-  ) : (
-    <Text>{cleanupText(interpolated)}</Text>
   );
 }
 
