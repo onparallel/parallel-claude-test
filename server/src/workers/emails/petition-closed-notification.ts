@@ -42,11 +42,17 @@ export async function petitionClosedNotification(
   const emails: EmailLog[] = [];
   for (const accessId of payload.petition_access_ids) {
     const access = await context.petitions.loadAccess(accessId);
+    const granterData = await context.users.loadUserDataByUserId(access!.granter_id);
     const contact = access!.contact_id
       ? await context.contacts.loadContact(access!.contact_id)
       : null;
     if (!contact) {
       context.logger.error(`Expected Contact to be defined on PetitionAccess:${access!.id}`);
+      continue;
+    }
+
+    if (!granterData) {
+      context.logger.error(`Expected granter data to be defined on PetitionAccess:${access!.id}`);
       continue;
     }
 
@@ -56,8 +62,8 @@ export async function petitionClosedNotification(
       PetitionClosedNotification,
       {
         contactFullName: fullName(contact.first_name, contact.last_name)!,
-        senderName: fullName(senderData.first_name, senderData.last_name)!,
-        senderEmail: senderData.email,
+        senderName: fullName(granterData.first_name, granterData.last_name)!,
+        senderEmail: granterData.email,
         bodyHtml: toHtml(payload.message, renderContext),
         bodyPlainText: toPlainText(payload.message, renderContext),
         ...layoutProps,
