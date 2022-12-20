@@ -54,7 +54,7 @@ export function FieldDescription({ description }: FieldDescriptionProps) {
     },
   });
   return (
-    <View debug>
+    <View>
       {hasMarkdown ? (
         tokens!.map((t, i) =>
           t.type === "heading" ? (
@@ -98,7 +98,7 @@ export function FieldDescription({ description }: FieldDescriptionProps) {
           )
         )
       ) : (
-        <Text debug>{cleanupText(interpolated || " ")}</Text>
+        <Text>{cleanupText(interpolated || " ")}</Text>
       )}
     </View>
   );
