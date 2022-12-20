@@ -390,6 +390,7 @@ export class Auth implements IAuth {
   async login(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password } = req.body;
+      req.context.logger.info({ email });
       const auth = await this.initiateAuth(email, password, this.getContextData(req));
       if (auth.AuthenticationResult) {
         const token = await this.storeSessionInRedis(auth.AuthenticationResult as any);
