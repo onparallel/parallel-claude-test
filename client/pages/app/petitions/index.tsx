@@ -895,7 +895,7 @@ Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDa
 
         const { status, tags, sharedWith, signature, fromTemplateId, search, searchIn, path } =
           defaultView.filters;
-
+        // TODO fix sortBy any, or not
         throw new RedirectError(
           buildStateUrl(
             QUERY_STATE,

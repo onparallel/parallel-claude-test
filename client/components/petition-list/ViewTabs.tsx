@@ -24,6 +24,7 @@ import {
 } from "@parallel/graphql/__types";
 import { PetitionsQueryState } from "@parallel/pages/app/petitions";
 import { SetQueryState } from "@parallel/utils/queryState";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { Reorder } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -34,6 +35,7 @@ import { RadioTab, RadioTabList } from "../common/RadioTab";
 import { SearchInOptions } from "../common/SearchAllOrCurrentFolder";
 import { TableSortingDirection } from "../common/Table";
 import { useAskViewNameDialog } from "./AskViewNameDialog";
+import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
 
 const MIN_TAB_WIDTH = 96;
 
@@ -41,7 +43,7 @@ interface ViewTabsProps {
   state: PetitionsQueryState;
   onStateChange: SetQueryState<Partial<PetitionsQueryState>>;
   views: ViewTabs_PetitionListViewFragment[];
-  onReorder: (values: any) => void;
+  onReorder: (values: string[]) => void;
 }
 
 export const ViewTabs = Object.assign(
@@ -52,6 +54,7 @@ export const ViewTabs = Object.assign(
     const intl = useIntl();
     const toast = useToast();
     const lastViews = useRef(views);
+    const showGenericErrorToast = useGenericErrorToast();
 
     useEffect(() => {
       if (views.length && views.length != lastViews.current.length) {
@@ -68,7 +71,7 @@ export const ViewTabs = Object.assign(
           const sortBy = view.sortBy ? view.sortBy.split("_") : null;
           const { status, tags, sharedWith, signature, fromTemplateId, search, searchIn, path } =
             view.filters;
-
+          // TODO fix sortBy any, or not
           onStateChange({
             view: view.id,
             status,
@@ -114,7 +117,13 @@ export const ViewTabs = Object.assign(
         await updatePetitionListView({
           variables: { petitionListViewId: view.id, data: { name } },
         });
-      } catch {}
+      } catch (error) {
+        if (isDialogError(error)) {
+          return;
+        } else {
+          showGenericErrorToast(error);
+        }
+      }
     };
 
     const [createPetitionListView] = useMutation(ViewTabs_createPetitionListViewDocument);
@@ -129,6 +138,7 @@ export const ViewTabs = Object.assign(
             <FormattedMessage id="component.view-tabs.clone-view" defaultMessage="Clone view" />
           ),
         });
+        // TODO fix sortBy any, or not
         await createPetitionListView({
           variables: {
             name,
@@ -136,7 +146,13 @@ export const ViewTabs = Object.assign(
             sortBy: view.sortBy as any,
           },
         });
-      } catch {}
+      } catch (error) {
+        if (isDialogError(error)) {
+          return;
+        } else {
+          showGenericErrorToast(error);
+        }
+      }
     };
 
     const [markPetitionListViewAsDefault] = useMutation(
@@ -158,7 +174,9 @@ export const ViewTabs = Object.assign(
               defaultMessage: "It will be the first one you will see when you enter.",
             }),
           });
-        } catch {}
+        } catch (error) {
+          showGenericErrorToast(error);
+        }
       };
 
     const [deletePetitionListView] = useMutation(ViewTabs_deletePetitionListViewDocument);
@@ -169,7 +187,13 @@ export const ViewTabs = Object.assign(
         await deletePetitionListView({ variables: { id: view.id } });
         const defaultView = views.find((v) => v.isDefault && v.id !== view.id);
         handleViewChange(defaultView ? defaultView.id : "ALL");
-      } catch {}
+      } catch (error) {
+        if (isDialogError(error)) {
+          return;
+        } else {
+          showGenericErrorToast(error);
+        }
+      }
     };
 
     const [viewIds, setViewIds] = useState(() => views.map((v) => v.id));
@@ -189,7 +213,9 @@ export const ViewTabs = Object.assign(
       onReorder(viewIds);
       try {
         await reorderPetitionListViews({ variables: { ids: viewIds } });
-      } catch {}
+      } catch (error) {
+        showGenericErrorToast(error);
+      }
     };
 
     return (

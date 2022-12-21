@@ -26,9 +26,11 @@ import {
 import type { PetitionsQueryState } from "@parallel/pages/app/petitions";
 import { QueryStateOf, SetQueryState, useBuildStateUrl } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { equals, omit, pick } from "remeda";
+import { isDialogError } from "../common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PathBreadcrumbs } from "../common/PathBreadcrumbs";
 import { SearchAllOrCurrentFolder } from "../common/SearchAllOrCurrentFolder";
@@ -52,6 +54,9 @@ export function PetitionListHeader({
 }: PetitionListHeaderProps) {
   const intl = useIntl();
   const [search, setSearch] = useState(state.search ?? "");
+
+  const showGenericErrorToast = useGenericErrorToast();
+
   const debouncedOnSearchChange = useDebouncedCallback(
     (search) =>
       onStateChange(({ searchIn, ...current }) => ({
@@ -165,7 +170,13 @@ export function PetitionListHeader({
           sortBy: state.sort ? `${state.sort.field}_${state.sort.direction}` : null,
         },
       });
-    } catch {}
+    } catch (error) {
+      if (isDialogError(error)) {
+        return;
+      } else {
+        showGenericErrorToast(error);
+      }
+    }
   };
 
   const [updatePetitionListView] = useMutation(PetitionListHeader_updatePetitionListViewDocument);
@@ -194,7 +205,9 @@ export function PetitionListHeader({
           },
         },
       });
-    } catch {}
+    } catch (error) {
+      showGenericErrorToast(error);
+    }
   };
 
   return (
