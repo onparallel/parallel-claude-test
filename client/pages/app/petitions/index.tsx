@@ -430,17 +430,6 @@ function Petitions() {
     onMoveToClick: handleMoveToClick,
   });
 
-  const [viewIds, setViewIds] = useState(me.petitionListViews.map((v) => v.id));
-  const views = viewIds.map((id) => me.petitionListViews.find((v) => v.id === id)!);
-
-  useEffect(() => {
-    setViewIds(me.petitionListViews.map((v) => v.id));
-  }, [me.petitionListViews.map((v) => v.id).join(",")]);
-
-  const handleReorder = (viewIds: string[]) => {
-    setViewIds(viewIds);
-  };
-
   return (
     <AppLayout
       title={
@@ -610,8 +599,7 @@ function Petitions() {
                   <ViewTabs
                     state={state}
                     onStateChange={setQueryState}
-                    views={views}
-                    onReorder={handleReorder}
+                    views={me.petitionListViews}
                   />
                 ) : null}
                 <PetitionListHeader
@@ -619,7 +607,7 @@ function Petitions() {
                   state={state}
                   onStateChange={setQueryState}
                   onReload={() => refetch()}
-                  views={views}
+                  views={me.petitionListViews}
                 />
               </>
             }

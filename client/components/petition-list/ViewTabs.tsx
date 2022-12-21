@@ -40,14 +40,10 @@ interface ViewTabsProps {
   state: PetitionsQueryState;
   onStateChange: SetQueryState<Partial<PetitionsQueryState>>;
   views: ViewTabs_PetitionListViewFragment[];
-  onReorder: (values: string[]) => void;
 }
 
 export const ViewTabs = Object.assign(
-  chakraForwardRef<"div", ViewTabsProps>(function ViewTabs(
-    { state, onStateChange, views, onReorder },
-    ref
-  ) {
+  chakraForwardRef<"div", ViewTabsProps>(function ViewTabs({ state, onStateChange, views }, ref) {
     const intl = useIntl();
     const toast = useToast();
     const showGenericErrorToast = useGenericErrorToast();
@@ -194,7 +190,6 @@ export const ViewTabs = Object.assign(
     const [reorderPetitionListViews] = useMutation(ViewTabs_reorderPetitionListViewsDocument);
     const createDragEndHandler = (view: ViewTabs_PetitionListViewFragment) => async () => {
       setDraggedViewId(null);
-      onReorder(viewIds);
       try {
         await reorderPetitionListViews({ variables: { ids: viewIds } });
       } catch (error) {
