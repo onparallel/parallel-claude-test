@@ -29,7 +29,6 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import { SearchInOptions } from "@parallel/components/common/SearchAllOrCurrentFolder";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { TableSortingDirection } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import {
   RedirectError,
@@ -89,7 +88,7 @@ import { useSelection } from "@parallel/utils/useSelectionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, map, maxBy, pick, pipe } from "remeda";
+import { isDefined, map, maxBy, omit, pick, pipe } from "remeda";
 
 const SORTING = ["name", "createdAt", "sentAt"] as const;
 
@@ -140,6 +139,7 @@ function Petitions() {
     (state.type === "PETITION"
       ? ({ field: "sentAt", direction: "DESC" } as const)
       : ({ field: "createdAt", direction: "DESC" } as const));
+  console.log(">> state.sort", state.sort);
   const {
     data: { me, realMe },
   } = useAssertQuery(Petitions_userDocument);
@@ -180,16 +180,7 @@ function Petitions() {
         setQueryState({
           type,
           view: defaultView.id,
-          ...(pick(defaultView.filters, [
-            "status",
-            "tags",
-            "sharedWith",
-            "signature",
-            "fromTemplateId",
-            "search",
-            "searchIn",
-            "path",
-          ]) as Partial<PetitionsQueryState>),
+          ...omit(defaultView.data, ["__typename"]),
         });
       } else {
         setQueryState({ type });
@@ -891,34 +882,8 @@ Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDa
     if (!isDefined(state.view)) {
       const defaultView = views.find((v) => v.isDefault);
       if (isDefined(defaultView)) {
-        const sortBy = defaultView.sortBy ? defaultView.sortBy.split("_") : null;
-
-        const { status, tags, sharedWith, signature, fromTemplateId, search, searchIn, path } =
-          defaultView.filters;
-        // TODO fix sortBy any, or not
         throw new RedirectError(
-          buildStateUrl(
-            QUERY_STATE,
-            {
-              view: defaultView.id,
-              status,
-              tags,
-              sharedWith,
-              signature,
-              fromTemplateId: fromTemplateId ? [fromTemplateId] : undefined,
-              search,
-              searchIn: (searchIn as SearchInOptions) ?? undefined,
-              path: path ?? undefined,
-              sort: sortBy
-                ? {
-                    field: sortBy[0] as any,
-                    direction: sortBy[1] as TableSortingDirection,
-                  }
-                : undefined,
-            },
-            pathname,
-            query
-          )
+          buildStateUrl(QUERY_STATE, { view: defaultView.id, ...defaultView.data }, pathname, query)
         );
       } else {
         throw new RedirectError(buildStateUrl(QUERY_STATE, { view: "ALL" }, pathname, query));

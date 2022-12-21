@@ -6,8 +6,7 @@ export async function up(knex: Knex): Promise<void> {
     t.increments("id");
     t.integer("user_id").notNullable().references("user.id");
     t.string("name").notNullable();
-    t.jsonb("filters").notNullable().defaultTo("{}");
-    t.string("sort_by").nullable();
+    t.jsonb("data").notNullable();
     t.integer("position").notNullable();
     t.boolean("is_default").notNullable().defaultTo(false);
     timestamps(t);

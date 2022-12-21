@@ -1147,9 +1147,8 @@ export interface MutationcreatePetitionFieldReplyArgs {
 }
 
 export interface MutationcreatePetitionListViewArgs {
-  filters?: InputMaybe<PetitionListViewFiltersInput>;
+  data?: InputMaybe<PetitionListViewDataInput>;
   name: Scalars["String"];
-  sortBy?: InputMaybe<QueryPetitions_OrderBy>;
 }
 
 export interface MutationcreatePrintPdfTaskArgs {
@@ -1792,7 +1791,8 @@ export interface MutationupdatePetitionFieldReplyMetadataArgs {
 }
 
 export interface MutationupdatePetitionListViewArgs {
-  data: UpdatePetitionListViewInput;
+  data?: InputMaybe<PetitionListViewDataInput>;
+  name?: InputMaybe<Scalars["String"]>;
   petitionListViewId: Scalars["GID"];
 }
 
@@ -2780,60 +2780,76 @@ export interface PetitionFolder {
 
 export interface PetitionListView {
   __typename?: "PetitionListView";
-  filters: PetitionListViewFilters;
+  data: PetitionListViewData;
   id: Scalars["GID"];
   isDefault: Scalars["Boolean"];
   name: Scalars["String"];
-  sortBy?: Maybe<QueryPetitions_OrderBy>;
   user: User;
 }
 
-export interface PetitionListViewFilters {
-  __typename?: "PetitionListViewFilters";
-  fromTemplateId?: Maybe<Scalars["GID"]>;
-  path?: Maybe<Scalars["String"]>;
+export interface PetitionListViewData {
+  __typename?: "PetitionListViewData";
+  fromTemplateId?: Maybe<Array<Scalars["GID"]>>;
+  path: Scalars["String"];
   search?: Maybe<Scalars["String"]>;
-  searchIn?: Maybe<PetitionListViewSearchIn>;
-  sharedWith?: Maybe<PetitionListViewFiltersSharedWith>;
+  searchIn: PetitionListViewSearchIn;
+  sharedWith?: Maybe<PetitionListViewDataSharedWith>;
   signature?: Maybe<Array<PetitionSignatureStatusFilter>>;
+  sort?: Maybe<PetitionListViewSort>;
   status?: Maybe<Array<PetitionStatus>>;
   tags?: Maybe<Array<Scalars["GID"]>>;
 }
 
-export interface PetitionListViewFiltersInput {
-  fromTemplateId?: InputMaybe<Scalars["GID"]>;
+export interface PetitionListViewDataInput {
+  fromTemplateId?: InputMaybe<Array<Scalars["GID"]>>;
   path?: InputMaybe<Scalars["String"]>;
   search?: InputMaybe<Scalars["String"]>;
   searchIn?: InputMaybe<PetitionListViewSearchIn>;
-  sharedWith?: InputMaybe<PetitionListViewFiltersSharedWithInput>;
+  sharedWith?: InputMaybe<PetitionListViewDataSharedWithInput>;
   signature?: InputMaybe<Array<PetitionSignatureStatusFilter>>;
+  sort?: InputMaybe<PetitionListViewSortInput>;
   status?: InputMaybe<Array<PetitionStatus>>;
   tags?: InputMaybe<Array<Scalars["GID"]>>;
 }
 
-export interface PetitionListViewFiltersSharedWith {
-  __typename?: "PetitionListViewFiltersSharedWith";
-  filters: Array<PetitionListViewFiltersSharedWithFilters>;
+export interface PetitionListViewDataSharedWith {
+  __typename?: "PetitionListViewDataSharedWith";
+  filters: Array<PetitionListViewDataSharedWithFilters>;
   operator: FilterSharedWithLogicalOperator;
 }
 
-export interface PetitionListViewFiltersSharedWithFilters {
-  __typename?: "PetitionListViewFiltersSharedWithFilters";
+export interface PetitionListViewDataSharedWithFilters {
+  __typename?: "PetitionListViewDataSharedWithFilters";
   operator: FilterSharedWithOperator;
   value: Scalars["GID"];
 }
 
-export interface PetitionListViewFiltersSharedWithFiltersInput {
+export interface PetitionListViewDataSharedWithFiltersInput {
   operator: FilterSharedWithOperator;
   value: Scalars["GID"];
 }
 
-export interface PetitionListViewFiltersSharedWithInput {
-  filters: Array<PetitionListViewFiltersSharedWithFiltersInput>;
+export interface PetitionListViewDataSharedWithInput {
+  filters: Array<PetitionListViewDataSharedWithFiltersInput>;
   operator: FilterSharedWithLogicalOperator;
 }
 
 export type PetitionListViewSearchIn = "CURRENT_FOLDER" | "EVERYWHERE";
+
+export interface PetitionListViewSort {
+  __typename?: "PetitionListViewSort";
+  direction: PetitionListViewSortDirection;
+  field: PetitionListViewSortField;
+}
+
+export type PetitionListViewSortDirection = "ASC" | "DESC";
+
+export type PetitionListViewSortField = "name" | "sentAt";
+
+export interface PetitionListViewSortInput {
+  direction: PetitionListViewSortDirection;
+  field: PetitionListViewSortField;
+}
 
 /** The locale used for rendering the petition to the contact. */
 export type PetitionLocale = "en" | "es";
@@ -4204,12 +4220,6 @@ export interface UpdatePetitionInput {
   remindersConfig?: InputMaybe<RemindersConfigInput>;
   signatureConfig?: InputMaybe<SignatureConfigInput>;
   skipForwardSecurity?: InputMaybe<Scalars["Boolean"]>;
-}
-
-export interface UpdatePetitionListViewInput {
-  filters?: InputMaybe<PetitionListViewFiltersInput>;
-  name?: InputMaybe<Scalars["String"]>;
-  sortBy?: InputMaybe<QueryPetitions_OrderBy>;
 }
 
 export interface UpdateTagInput {
@@ -11111,23 +11121,28 @@ export type SettingsRowAlias_PetitionFieldFragment = {
   options: { [key: string]: any };
 };
 
-export type PetitionListHeader_PetitionListViewFiltersFragment = {
-  __typename?: "PetitionListViewFilters";
+export type PetitionListHeader_PetitionListViewDataFragment = {
+  __typename?: "PetitionListViewData";
   status?: Array<PetitionStatus> | null;
   tags?: Array<string> | null;
   signature?: Array<PetitionSignatureStatusFilter> | null;
-  fromTemplateId?: string | null;
+  fromTemplateId?: Array<string> | null;
   search?: string | null;
-  searchIn?: PetitionListViewSearchIn | null;
-  path?: string | null;
+  searchIn: PetitionListViewSearchIn;
+  path: string;
   sharedWith?: {
-    __typename?: "PetitionListViewFiltersSharedWith";
+    __typename?: "PetitionListViewDataSharedWith";
     operator: FilterSharedWithLogicalOperator;
     filters: Array<{
-      __typename?: "PetitionListViewFiltersSharedWithFilters";
+      __typename?: "PetitionListViewDataSharedWithFilters";
       value: string;
       operator: FilterSharedWithOperator;
     }>;
+  } | null;
+  sort?: {
+    __typename?: "PetitionListViewSort";
+    field: PetitionListViewSortField;
+    direction: PetitionListViewSortDirection;
   } | null;
 };
 
@@ -11135,25 +11150,29 @@ export type PetitionListHeader_PetitionListViewFragment = {
   __typename?: "PetitionListView";
   id: string;
   name: string;
-  sortBy?: QueryPetitions_OrderBy | null;
   isDefault: boolean;
-  filters: {
-    __typename?: "PetitionListViewFilters";
+  data: {
+    __typename?: "PetitionListViewData";
     status?: Array<PetitionStatus> | null;
     tags?: Array<string> | null;
     signature?: Array<PetitionSignatureStatusFilter> | null;
-    fromTemplateId?: string | null;
+    fromTemplateId?: Array<string> | null;
     search?: string | null;
-    searchIn?: PetitionListViewSearchIn | null;
-    path?: string | null;
+    searchIn: PetitionListViewSearchIn;
+    path: string;
     sharedWith?: {
-      __typename?: "PetitionListViewFiltersSharedWith";
+      __typename?: "PetitionListViewDataSharedWith";
       operator: FilterSharedWithLogicalOperator;
       filters: Array<{
-        __typename?: "PetitionListViewFiltersSharedWithFilters";
+        __typename?: "PetitionListViewDataSharedWithFilters";
         value: string;
         operator: FilterSharedWithOperator;
       }>;
+    } | null;
+    sort?: {
+      __typename?: "PetitionListViewSort";
+      field: PetitionListViewSortField;
+      direction: PetitionListViewSortDirection;
     } | null;
   };
 };
@@ -11165,25 +11184,29 @@ export type PetitionListHeader_UserFragment = {
     __typename?: "PetitionListView";
     id: string;
     name: string;
-    sortBy?: QueryPetitions_OrderBy | null;
     isDefault: boolean;
-    filters: {
-      __typename?: "PetitionListViewFilters";
+    data: {
+      __typename?: "PetitionListViewData";
       status?: Array<PetitionStatus> | null;
       tags?: Array<string> | null;
       signature?: Array<PetitionSignatureStatusFilter> | null;
-      fromTemplateId?: string | null;
+      fromTemplateId?: Array<string> | null;
       search?: string | null;
-      searchIn?: PetitionListViewSearchIn | null;
-      path?: string | null;
+      searchIn: PetitionListViewSearchIn;
+      path: string;
       sharedWith?: {
-        __typename?: "PetitionListViewFiltersSharedWith";
+        __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
         filters: Array<{
-          __typename?: "PetitionListViewFiltersSharedWithFilters";
+          __typename?: "PetitionListViewDataSharedWithFilters";
           value: string;
           operator: FilterSharedWithOperator;
         }>;
+      } | null;
+      sort?: {
+        __typename?: "PetitionListViewSort";
+        field: PetitionListViewSortField;
+        direction: PetitionListViewSortDirection;
       } | null;
     };
   }>;
@@ -11191,8 +11214,7 @@ export type PetitionListHeader_UserFragment = {
 
 export type PetitionListHeader_createPetitionListViewMutationVariables = Exact<{
   name: Scalars["String"];
-  filters?: InputMaybe<PetitionListViewFiltersInput>;
-  sortBy?: InputMaybe<QueryPetitions_OrderBy>;
+  data?: InputMaybe<PetitionListViewDataInput>;
 }>;
 
 export type PetitionListHeader_createPetitionListViewMutation = {
@@ -11200,7 +11222,6 @@ export type PetitionListHeader_createPetitionListViewMutation = {
     __typename?: "PetitionListView";
     id: string;
     name: string;
-    sortBy?: QueryPetitions_OrderBy | null;
     isDefault: boolean;
     user: {
       __typename?: "User";
@@ -11209,46 +11230,55 @@ export type PetitionListHeader_createPetitionListViewMutation = {
         __typename?: "PetitionListView";
         id: string;
         name: string;
-        sortBy?: QueryPetitions_OrderBy | null;
         isDefault: boolean;
-        filters: {
-          __typename?: "PetitionListViewFilters";
+        data: {
+          __typename?: "PetitionListViewData";
           status?: Array<PetitionStatus> | null;
           tags?: Array<string> | null;
           signature?: Array<PetitionSignatureStatusFilter> | null;
-          fromTemplateId?: string | null;
+          fromTemplateId?: Array<string> | null;
           search?: string | null;
-          searchIn?: PetitionListViewSearchIn | null;
-          path?: string | null;
+          searchIn: PetitionListViewSearchIn;
+          path: string;
           sharedWith?: {
-            __typename?: "PetitionListViewFiltersSharedWith";
+            __typename?: "PetitionListViewDataSharedWith";
             operator: FilterSharedWithLogicalOperator;
             filters: Array<{
-              __typename?: "PetitionListViewFiltersSharedWithFilters";
+              __typename?: "PetitionListViewDataSharedWithFilters";
               value: string;
               operator: FilterSharedWithOperator;
             }>;
           } | null;
+          sort?: {
+            __typename?: "PetitionListViewSort";
+            field: PetitionListViewSortField;
+            direction: PetitionListViewSortDirection;
+          } | null;
         };
       }>;
     };
-    filters: {
-      __typename?: "PetitionListViewFilters";
+    data: {
+      __typename?: "PetitionListViewData";
       status?: Array<PetitionStatus> | null;
       tags?: Array<string> | null;
       signature?: Array<PetitionSignatureStatusFilter> | null;
-      fromTemplateId?: string | null;
+      fromTemplateId?: Array<string> | null;
       search?: string | null;
-      searchIn?: PetitionListViewSearchIn | null;
-      path?: string | null;
+      searchIn: PetitionListViewSearchIn;
+      path: string;
       sharedWith?: {
-        __typename?: "PetitionListViewFiltersSharedWith";
+        __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
         filters: Array<{
-          __typename?: "PetitionListViewFiltersSharedWithFilters";
+          __typename?: "PetitionListViewDataSharedWithFilters";
           value: string;
           operator: FilterSharedWithOperator;
         }>;
+      } | null;
+      sort?: {
+        __typename?: "PetitionListViewSort";
+        field: PetitionListViewSortField;
+        direction: PetitionListViewSortDirection;
       } | null;
     };
   };
@@ -11256,7 +11286,8 @@ export type PetitionListHeader_createPetitionListViewMutation = {
 
 export type PetitionListHeader_updatePetitionListViewMutationVariables = Exact<{
   petitionListViewId: Scalars["GID"];
-  data: UpdatePetitionListViewInput;
+  name?: InputMaybe<Scalars["String"]>;
+  data?: InputMaybe<PetitionListViewDataInput>;
 }>;
 
 export type PetitionListHeader_updatePetitionListViewMutation = {
@@ -11264,7 +11295,6 @@ export type PetitionListHeader_updatePetitionListViewMutation = {
     __typename?: "PetitionListView";
     id: string;
     name: string;
-    sortBy?: QueryPetitions_OrderBy | null;
     isDefault: boolean;
     user: {
       __typename?: "User";
@@ -11273,68 +11303,82 @@ export type PetitionListHeader_updatePetitionListViewMutation = {
         __typename?: "PetitionListView";
         id: string;
         name: string;
-        sortBy?: QueryPetitions_OrderBy | null;
         isDefault: boolean;
-        filters: {
-          __typename?: "PetitionListViewFilters";
+        data: {
+          __typename?: "PetitionListViewData";
           status?: Array<PetitionStatus> | null;
           tags?: Array<string> | null;
           signature?: Array<PetitionSignatureStatusFilter> | null;
-          fromTemplateId?: string | null;
+          fromTemplateId?: Array<string> | null;
           search?: string | null;
-          searchIn?: PetitionListViewSearchIn | null;
-          path?: string | null;
+          searchIn: PetitionListViewSearchIn;
+          path: string;
           sharedWith?: {
-            __typename?: "PetitionListViewFiltersSharedWith";
+            __typename?: "PetitionListViewDataSharedWith";
             operator: FilterSharedWithLogicalOperator;
             filters: Array<{
-              __typename?: "PetitionListViewFiltersSharedWithFilters";
+              __typename?: "PetitionListViewDataSharedWithFilters";
               value: string;
               operator: FilterSharedWithOperator;
             }>;
           } | null;
+          sort?: {
+            __typename?: "PetitionListViewSort";
+            field: PetitionListViewSortField;
+            direction: PetitionListViewSortDirection;
+          } | null;
         };
       }>;
     };
-    filters: {
-      __typename?: "PetitionListViewFilters";
+    data: {
+      __typename?: "PetitionListViewData";
       status?: Array<PetitionStatus> | null;
       tags?: Array<string> | null;
       signature?: Array<PetitionSignatureStatusFilter> | null;
-      fromTemplateId?: string | null;
+      fromTemplateId?: Array<string> | null;
       search?: string | null;
-      searchIn?: PetitionListViewSearchIn | null;
-      path?: string | null;
+      searchIn: PetitionListViewSearchIn;
+      path: string;
       sharedWith?: {
-        __typename?: "PetitionListViewFiltersSharedWith";
+        __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
         filters: Array<{
-          __typename?: "PetitionListViewFiltersSharedWithFilters";
+          __typename?: "PetitionListViewDataSharedWithFilters";
           value: string;
           operator: FilterSharedWithOperator;
         }>;
+      } | null;
+      sort?: {
+        __typename?: "PetitionListViewSort";
+        field: PetitionListViewSortField;
+        direction: PetitionListViewSortDirection;
       } | null;
     };
   };
 };
 
-export type ViewTabs_PetitionListViewFiltersFragment = {
-  __typename?: "PetitionListViewFilters";
+export type ViewTabs_PetitionListViewDataFragment = {
+  __typename?: "PetitionListViewData";
   status?: Array<PetitionStatus> | null;
   tags?: Array<string> | null;
   signature?: Array<PetitionSignatureStatusFilter> | null;
-  fromTemplateId?: string | null;
+  fromTemplateId?: Array<string> | null;
   search?: string | null;
-  searchIn?: PetitionListViewSearchIn | null;
-  path?: string | null;
+  searchIn: PetitionListViewSearchIn;
+  path: string;
   sharedWith?: {
-    __typename?: "PetitionListViewFiltersSharedWith";
+    __typename?: "PetitionListViewDataSharedWith";
     operator: FilterSharedWithLogicalOperator;
     filters: Array<{
-      __typename?: "PetitionListViewFiltersSharedWithFilters";
+      __typename?: "PetitionListViewDataSharedWithFilters";
       value: string;
       operator: FilterSharedWithOperator;
     }>;
+  } | null;
+  sort?: {
+    __typename?: "PetitionListViewSort";
+    field: PetitionListViewSortField;
+    direction: PetitionListViewSortDirection;
   } | null;
 };
 
@@ -11342,25 +11386,29 @@ export type ViewTabs_PetitionListViewFragment = {
   __typename?: "PetitionListView";
   id: string;
   name: string;
-  sortBy?: QueryPetitions_OrderBy | null;
   isDefault: boolean;
-  filters: {
-    __typename?: "PetitionListViewFilters";
+  data: {
+    __typename?: "PetitionListViewData";
     status?: Array<PetitionStatus> | null;
     tags?: Array<string> | null;
     signature?: Array<PetitionSignatureStatusFilter> | null;
-    fromTemplateId?: string | null;
+    fromTemplateId?: Array<string> | null;
     search?: string | null;
-    searchIn?: PetitionListViewSearchIn | null;
-    path?: string | null;
+    searchIn: PetitionListViewSearchIn;
+    path: string;
     sharedWith?: {
-      __typename?: "PetitionListViewFiltersSharedWith";
+      __typename?: "PetitionListViewDataSharedWith";
       operator: FilterSharedWithLogicalOperator;
       filters: Array<{
-        __typename?: "PetitionListViewFiltersSharedWithFilters";
+        __typename?: "PetitionListViewDataSharedWithFilters";
         value: string;
         operator: FilterSharedWithOperator;
       }>;
+    } | null;
+    sort?: {
+      __typename?: "PetitionListViewSort";
+      field: PetitionListViewSortField;
+      direction: PetitionListViewSortDirection;
     } | null;
   };
 };
@@ -11372,25 +11420,29 @@ export type ViewTabs_UserFragment = {
     __typename?: "PetitionListView";
     id: string;
     name: string;
-    sortBy?: QueryPetitions_OrderBy | null;
     isDefault: boolean;
-    filters: {
-      __typename?: "PetitionListViewFilters";
+    data: {
+      __typename?: "PetitionListViewData";
       status?: Array<PetitionStatus> | null;
       tags?: Array<string> | null;
       signature?: Array<PetitionSignatureStatusFilter> | null;
-      fromTemplateId?: string | null;
+      fromTemplateId?: Array<string> | null;
       search?: string | null;
-      searchIn?: PetitionListViewSearchIn | null;
-      path?: string | null;
+      searchIn: PetitionListViewSearchIn;
+      path: string;
       sharedWith?: {
-        __typename?: "PetitionListViewFiltersSharedWith";
+        __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
         filters: Array<{
-          __typename?: "PetitionListViewFiltersSharedWithFilters";
+          __typename?: "PetitionListViewDataSharedWithFilters";
           value: string;
           operator: FilterSharedWithOperator;
         }>;
+      } | null;
+      sort?: {
+        __typename?: "PetitionListViewSort";
+        field: PetitionListViewSortField;
+        direction: PetitionListViewSortDirection;
       } | null;
     };
   }>;
@@ -11408,25 +11460,29 @@ export type ViewTabs_reorderPetitionListViewsMutation = {
       __typename?: "PetitionListView";
       id: string;
       name: string;
-      sortBy?: QueryPetitions_OrderBy | null;
       isDefault: boolean;
-      filters: {
-        __typename?: "PetitionListViewFilters";
+      data: {
+        __typename?: "PetitionListViewData";
         status?: Array<PetitionStatus> | null;
         tags?: Array<string> | null;
         signature?: Array<PetitionSignatureStatusFilter> | null;
-        fromTemplateId?: string | null;
+        fromTemplateId?: Array<string> | null;
         search?: string | null;
-        searchIn?: PetitionListViewSearchIn | null;
-        path?: string | null;
+        searchIn: PetitionListViewSearchIn;
+        path: string;
         sharedWith?: {
-          __typename?: "PetitionListViewFiltersSharedWith";
+          __typename?: "PetitionListViewDataSharedWith";
           operator: FilterSharedWithLogicalOperator;
           filters: Array<{
-            __typename?: "PetitionListViewFiltersSharedWithFilters";
+            __typename?: "PetitionListViewDataSharedWithFilters";
             value: string;
             operator: FilterSharedWithOperator;
           }>;
+        } | null;
+        sort?: {
+          __typename?: "PetitionListViewSort";
+          field: PetitionListViewSortField;
+          direction: PetitionListViewSortDirection;
         } | null;
       };
     }>;
@@ -11446,25 +11502,29 @@ export type ViewTabs_deletePetitionListViewMutation = {
       __typename?: "PetitionListView";
       id: string;
       name: string;
-      sortBy?: QueryPetitions_OrderBy | null;
       isDefault: boolean;
-      filters: {
-        __typename?: "PetitionListViewFilters";
+      data: {
+        __typename?: "PetitionListViewData";
         status?: Array<PetitionStatus> | null;
         tags?: Array<string> | null;
         signature?: Array<PetitionSignatureStatusFilter> | null;
-        fromTemplateId?: string | null;
+        fromTemplateId?: Array<string> | null;
         search?: string | null;
-        searchIn?: PetitionListViewSearchIn | null;
-        path?: string | null;
+        searchIn: PetitionListViewSearchIn;
+        path: string;
         sharedWith?: {
-          __typename?: "PetitionListViewFiltersSharedWith";
+          __typename?: "PetitionListViewDataSharedWith";
           operator: FilterSharedWithLogicalOperator;
           filters: Array<{
-            __typename?: "PetitionListViewFiltersSharedWithFilters";
+            __typename?: "PetitionListViewDataSharedWithFilters";
             value: string;
             operator: FilterSharedWithOperator;
           }>;
+        } | null;
+        sort?: {
+          __typename?: "PetitionListViewSort";
+          field: PetitionListViewSortField;
+          direction: PetitionListViewSortDirection;
         } | null;
       };
     }>;
@@ -11473,8 +11533,7 @@ export type ViewTabs_deletePetitionListViewMutation = {
 
 export type ViewTabs_createPetitionListViewMutationVariables = Exact<{
   name: Scalars["String"];
-  filters?: InputMaybe<PetitionListViewFiltersInput>;
-  sortBy?: InputMaybe<QueryPetitions_OrderBy>;
+  data: PetitionListViewDataInput;
 }>;
 
 export type ViewTabs_createPetitionListViewMutation = {
@@ -11482,7 +11541,6 @@ export type ViewTabs_createPetitionListViewMutation = {
     __typename?: "PetitionListView";
     id: string;
     name: string;
-    sortBy?: QueryPetitions_OrderBy | null;
     isDefault: boolean;
     user: {
       __typename?: "User";
@@ -11491,46 +11549,55 @@ export type ViewTabs_createPetitionListViewMutation = {
         __typename?: "PetitionListView";
         id: string;
         name: string;
-        sortBy?: QueryPetitions_OrderBy | null;
         isDefault: boolean;
-        filters: {
-          __typename?: "PetitionListViewFilters";
+        data: {
+          __typename?: "PetitionListViewData";
           status?: Array<PetitionStatus> | null;
           tags?: Array<string> | null;
           signature?: Array<PetitionSignatureStatusFilter> | null;
-          fromTemplateId?: string | null;
+          fromTemplateId?: Array<string> | null;
           search?: string | null;
-          searchIn?: PetitionListViewSearchIn | null;
-          path?: string | null;
+          searchIn: PetitionListViewSearchIn;
+          path: string;
           sharedWith?: {
-            __typename?: "PetitionListViewFiltersSharedWith";
+            __typename?: "PetitionListViewDataSharedWith";
             operator: FilterSharedWithLogicalOperator;
             filters: Array<{
-              __typename?: "PetitionListViewFiltersSharedWithFilters";
+              __typename?: "PetitionListViewDataSharedWithFilters";
               value: string;
               operator: FilterSharedWithOperator;
             }>;
           } | null;
+          sort?: {
+            __typename?: "PetitionListViewSort";
+            field: PetitionListViewSortField;
+            direction: PetitionListViewSortDirection;
+          } | null;
         };
       }>;
     };
-    filters: {
-      __typename?: "PetitionListViewFilters";
+    data: {
+      __typename?: "PetitionListViewData";
       status?: Array<PetitionStatus> | null;
       tags?: Array<string> | null;
       signature?: Array<PetitionSignatureStatusFilter> | null;
-      fromTemplateId?: string | null;
+      fromTemplateId?: Array<string> | null;
       search?: string | null;
-      searchIn?: PetitionListViewSearchIn | null;
-      path?: string | null;
+      searchIn: PetitionListViewSearchIn;
+      path: string;
       sharedWith?: {
-        __typename?: "PetitionListViewFiltersSharedWith";
+        __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
         filters: Array<{
-          __typename?: "PetitionListViewFiltersSharedWithFilters";
+          __typename?: "PetitionListViewDataSharedWithFilters";
           value: string;
           operator: FilterSharedWithOperator;
         }>;
+      } | null;
+      sort?: {
+        __typename?: "PetitionListViewSort";
+        field: PetitionListViewSortField;
+        direction: PetitionListViewSortDirection;
       } | null;
     };
   };
@@ -11538,7 +11605,8 @@ export type ViewTabs_createPetitionListViewMutation = {
 
 export type ViewTabs_updatePetitionListViewMutationVariables = Exact<{
   petitionListViewId: Scalars["GID"];
-  data: UpdatePetitionListViewInput;
+  name?: InputMaybe<Scalars["String"]>;
+  data?: InputMaybe<PetitionListViewDataInput>;
 }>;
 
 export type ViewTabs_updatePetitionListViewMutation = {
@@ -11546,7 +11614,6 @@ export type ViewTabs_updatePetitionListViewMutation = {
     __typename?: "PetitionListView";
     id: string;
     name: string;
-    sortBy?: QueryPetitions_OrderBy | null;
     isDefault: boolean;
     user: {
       __typename?: "User";
@@ -11555,46 +11622,55 @@ export type ViewTabs_updatePetitionListViewMutation = {
         __typename?: "PetitionListView";
         id: string;
         name: string;
-        sortBy?: QueryPetitions_OrderBy | null;
         isDefault: boolean;
-        filters: {
-          __typename?: "PetitionListViewFilters";
+        data: {
+          __typename?: "PetitionListViewData";
           status?: Array<PetitionStatus> | null;
           tags?: Array<string> | null;
           signature?: Array<PetitionSignatureStatusFilter> | null;
-          fromTemplateId?: string | null;
+          fromTemplateId?: Array<string> | null;
           search?: string | null;
-          searchIn?: PetitionListViewSearchIn | null;
-          path?: string | null;
+          searchIn: PetitionListViewSearchIn;
+          path: string;
           sharedWith?: {
-            __typename?: "PetitionListViewFiltersSharedWith";
+            __typename?: "PetitionListViewDataSharedWith";
             operator: FilterSharedWithLogicalOperator;
             filters: Array<{
-              __typename?: "PetitionListViewFiltersSharedWithFilters";
+              __typename?: "PetitionListViewDataSharedWithFilters";
               value: string;
               operator: FilterSharedWithOperator;
             }>;
           } | null;
+          sort?: {
+            __typename?: "PetitionListViewSort";
+            field: PetitionListViewSortField;
+            direction: PetitionListViewSortDirection;
+          } | null;
         };
       }>;
     };
-    filters: {
-      __typename?: "PetitionListViewFilters";
+    data: {
+      __typename?: "PetitionListViewData";
       status?: Array<PetitionStatus> | null;
       tags?: Array<string> | null;
       signature?: Array<PetitionSignatureStatusFilter> | null;
-      fromTemplateId?: string | null;
+      fromTemplateId?: Array<string> | null;
       search?: string | null;
-      searchIn?: PetitionListViewSearchIn | null;
-      path?: string | null;
+      searchIn: PetitionListViewSearchIn;
+      path: string;
       sharedWith?: {
-        __typename?: "PetitionListViewFiltersSharedWith";
+        __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
         filters: Array<{
-          __typename?: "PetitionListViewFiltersSharedWithFilters";
+          __typename?: "PetitionListViewDataSharedWithFilters";
           value: string;
           operator: FilterSharedWithOperator;
         }>;
+      } | null;
+      sort?: {
+        __typename?: "PetitionListViewSort";
+        field: PetitionListViewSortField;
+        direction: PetitionListViewSortDirection;
       } | null;
     };
   };
@@ -11612,25 +11688,29 @@ export type ViewTabs_markPetitionListViewAsDefaultMutation = {
       __typename?: "PetitionListView";
       id: string;
       name: string;
-      sortBy?: QueryPetitions_OrderBy | null;
       isDefault: boolean;
-      filters: {
-        __typename?: "PetitionListViewFilters";
+      data: {
+        __typename?: "PetitionListViewData";
         status?: Array<PetitionStatus> | null;
         tags?: Array<string> | null;
         signature?: Array<PetitionSignatureStatusFilter> | null;
-        fromTemplateId?: string | null;
+        fromTemplateId?: Array<string> | null;
         search?: string | null;
-        searchIn?: PetitionListViewSearchIn | null;
-        path?: string | null;
+        searchIn: PetitionListViewSearchIn;
+        path: string;
         sharedWith?: {
-          __typename?: "PetitionListViewFiltersSharedWith";
+          __typename?: "PetitionListViewDataSharedWith";
           operator: FilterSharedWithLogicalOperator;
           filters: Array<{
-            __typename?: "PetitionListViewFiltersSharedWithFilters";
+            __typename?: "PetitionListViewDataSharedWithFilters";
             value: string;
             operator: FilterSharedWithOperator;
           }>;
+        } | null;
+        sort?: {
+          __typename?: "PetitionListViewSort";
+          field: PetitionListViewSortField;
+          direction: PetitionListViewSortDirection;
         } | null;
       };
     }>;
@@ -23392,25 +23472,29 @@ export type Petitions_UserFragment = {
     __typename?: "PetitionListView";
     id: string;
     name: string;
-    sortBy?: QueryPetitions_OrderBy | null;
     isDefault: boolean;
-    filters: {
-      __typename?: "PetitionListViewFilters";
+    data: {
+      __typename?: "PetitionListViewData";
       status?: Array<PetitionStatus> | null;
       tags?: Array<string> | null;
       signature?: Array<PetitionSignatureStatusFilter> | null;
-      fromTemplateId?: string | null;
+      fromTemplateId?: Array<string> | null;
       search?: string | null;
-      searchIn?: PetitionListViewSearchIn | null;
-      path?: string | null;
+      searchIn: PetitionListViewSearchIn;
+      path: string;
       sharedWith?: {
-        __typename?: "PetitionListViewFiltersSharedWith";
+        __typename?: "PetitionListViewDataSharedWith";
         operator: FilterSharedWithLogicalOperator;
         filters: Array<{
-          __typename?: "PetitionListViewFiltersSharedWithFilters";
+          __typename?: "PetitionListViewDataSharedWithFilters";
           value: string;
           operator: FilterSharedWithOperator;
         }>;
+      } | null;
+      sort?: {
+        __typename?: "PetitionListViewSort";
+        field: PetitionListViewSortField;
+        direction: PetitionListViewSortDirection;
       } | null;
     };
   }>;
@@ -23615,25 +23699,29 @@ export type Petitions_userQuery = {
       __typename?: "PetitionListView";
       id: string;
       name: string;
-      sortBy?: QueryPetitions_OrderBy | null;
       isDefault: boolean;
-      filters: {
-        __typename?: "PetitionListViewFilters";
+      data: {
+        __typename?: "PetitionListViewData";
         status?: Array<PetitionStatus> | null;
         tags?: Array<string> | null;
         signature?: Array<PetitionSignatureStatusFilter> | null;
-        fromTemplateId?: string | null;
+        fromTemplateId?: Array<string> | null;
         search?: string | null;
-        searchIn?: PetitionListViewSearchIn | null;
-        path?: string | null;
+        searchIn: PetitionListViewSearchIn;
+        path: string;
         sharedWith?: {
-          __typename?: "PetitionListViewFiltersSharedWith";
+          __typename?: "PetitionListViewDataSharedWith";
           operator: FilterSharedWithLogicalOperator;
           filters: Array<{
-            __typename?: "PetitionListViewFiltersSharedWithFilters";
+            __typename?: "PetitionListViewDataSharedWithFilters";
             value: string;
             operator: FilterSharedWithOperator;
           }>;
+        } | null;
+        sort?: {
+          __typename?: "PetitionListViewSort";
+          field: PetitionListViewSortField;
+          direction: PetitionListViewSortDirection;
         } | null;
       };
     }>;
@@ -27796,8 +27884,8 @@ export const ReferencedFieldDialog_PetitionFieldFragmentDoc = gql`
   }
   ${FieldErrorDialog_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<ReferencedFieldDialog_PetitionFieldFragment, unknown>;
-export const PetitionListHeader_PetitionListViewFiltersFragmentDoc = gql`
-  fragment PetitionListHeader_PetitionListViewFilters on PetitionListViewFilters {
+export const PetitionListHeader_PetitionListViewDataFragmentDoc = gql`
+  fragment PetitionListHeader_PetitionListViewData on PetitionListViewData {
     status
     sharedWith {
       operator
@@ -27812,19 +27900,22 @@ export const PetitionListHeader_PetitionListViewFiltersFragmentDoc = gql`
     search
     searchIn
     path
+    sort {
+      field
+      direction
+    }
   }
-` as unknown as DocumentNode<PetitionListHeader_PetitionListViewFiltersFragment, unknown>;
+` as unknown as DocumentNode<PetitionListHeader_PetitionListViewDataFragment, unknown>;
 export const PetitionListHeader_PetitionListViewFragmentDoc = gql`
   fragment PetitionListHeader_PetitionListView on PetitionListView {
     id
     name
-    filters {
-      ...PetitionListHeader_PetitionListViewFilters
+    data {
+      ...PetitionListHeader_PetitionListViewData
     }
-    sortBy
     isDefault
   }
-  ${PetitionListHeader_PetitionListViewFiltersFragmentDoc}
+  ${PetitionListHeader_PetitionListViewDataFragmentDoc}
 ` as unknown as DocumentNode<PetitionListHeader_PetitionListViewFragment, unknown>;
 export const PetitionListHeader_UserFragmentDoc = gql`
   fragment PetitionListHeader_User on User {
@@ -30998,8 +31089,8 @@ export const PetitionReplies_QueryFragmentDoc = gql`
   ${PetitionSignaturesCard_UserFragmentDoc}
   ${useUpdateIsReadNotification_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_QueryFragment, unknown>;
-export const ViewTabs_PetitionListViewFiltersFragmentDoc = gql`
-  fragment ViewTabs_PetitionListViewFilters on PetitionListViewFilters {
+export const ViewTabs_PetitionListViewDataFragmentDoc = gql`
+  fragment ViewTabs_PetitionListViewData on PetitionListViewData {
     status
     sharedWith {
       operator
@@ -31014,19 +31105,22 @@ export const ViewTabs_PetitionListViewFiltersFragmentDoc = gql`
     search
     searchIn
     path
+    sort {
+      field
+      direction
+    }
   }
-` as unknown as DocumentNode<ViewTabs_PetitionListViewFiltersFragment, unknown>;
+` as unknown as DocumentNode<ViewTabs_PetitionListViewDataFragment, unknown>;
 export const ViewTabs_PetitionListViewFragmentDoc = gql`
   fragment ViewTabs_PetitionListView on PetitionListView {
     id
     name
-    filters {
-      ...ViewTabs_PetitionListViewFilters
+    data {
+      ...ViewTabs_PetitionListViewData
     }
-    sortBy
     isDefault
   }
-  ${ViewTabs_PetitionListViewFiltersFragmentDoc}
+  ${ViewTabs_PetitionListViewDataFragmentDoc}
 ` as unknown as DocumentNode<ViewTabs_PetitionListViewFragment, unknown>;
 export const ViewTabs_UserFragmentDoc = gql`
   fragment ViewTabs_User on User {
@@ -32899,10 +32993,9 @@ export const DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument = 
 export const PetitionListHeader_createPetitionListViewDocument = gql`
   mutation PetitionListHeader_createPetitionListView(
     $name: String!
-    $filters: PetitionListViewFiltersInput
-    $sortBy: QueryPetitions_OrderBy
+    $data: PetitionListViewDataInput
   ) {
-    createPetitionListView(name: $name, filters: $filters, sortBy: $sortBy) {
+    createPetitionListView(name: $name, data: $data) {
       ...PetitionListHeader_PetitionListView
       user {
         ...PetitionListHeader_User
@@ -32918,9 +33011,10 @@ export const PetitionListHeader_createPetitionListViewDocument = gql`
 export const PetitionListHeader_updatePetitionListViewDocument = gql`
   mutation PetitionListHeader_updatePetitionListView(
     $petitionListViewId: GID!
-    $data: UpdatePetitionListViewInput!
+    $name: String
+    $data: PetitionListViewDataInput
   ) {
-    updatePetitionListView(petitionListViewId: $petitionListViewId, data: $data) {
+    updatePetitionListView(petitionListViewId: $petitionListViewId, name: $name, data: $data) {
       ...PetitionListHeader_PetitionListView
       user {
         ...PetitionListHeader_User
@@ -32956,12 +33050,8 @@ export const ViewTabs_deletePetitionListViewDocument = gql`
   ViewTabs_deletePetitionListViewMutationVariables
 >;
 export const ViewTabs_createPetitionListViewDocument = gql`
-  mutation ViewTabs_createPetitionListView(
-    $name: String!
-    $filters: PetitionListViewFiltersInput
-    $sortBy: QueryPetitions_OrderBy
-  ) {
-    createPetitionListView(name: $name, filters: $filters, sortBy: $sortBy) {
+  mutation ViewTabs_createPetitionListView($name: String!, $data: PetitionListViewDataInput!) {
+    createPetitionListView(name: $name, data: $data) {
       ...ViewTabs_PetitionListView
       user {
         ...ViewTabs_User
@@ -32977,9 +33067,10 @@ export const ViewTabs_createPetitionListViewDocument = gql`
 export const ViewTabs_updatePetitionListViewDocument = gql`
   mutation ViewTabs_updatePetitionListView(
     $petitionListViewId: GID!
-    $data: UpdatePetitionListViewInput!
+    $name: String
+    $data: PetitionListViewDataInput
   ) {
-    updatePetitionListView(petitionListViewId: $petitionListViewId, data: $data) {
+    updatePetitionListView(petitionListViewId: $petitionListViewId, name: $name, data: $data) {
       ...ViewTabs_PetitionListView
       user {
         ...ViewTabs_User

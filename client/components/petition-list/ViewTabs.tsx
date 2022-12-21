@@ -12,9 +12,9 @@ import {
 } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon, EditIcon, StarEmptyIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import {
-  PetitionListViewFiltersInput,
   ViewTabs_createPetitionListViewDocument,
   ViewTabs_deletePetitionListViewDocument,
   ViewTabs_markPetitionListViewAsDefaultDocument,
@@ -32,10 +32,7 @@ import { isDefined, omit } from "remeda";
 import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
 import { RadioTab, RadioTabList } from "../common/RadioTab";
-import { SearchInOptions } from "../common/SearchAllOrCurrentFolder";
-import { TableSortingDirection } from "../common/Table";
 import { useAskViewNameDialog } from "./AskViewNameDialog";
-import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
 
 const MIN_TAB_WIDTH = 96;
 
@@ -68,26 +65,9 @@ export const ViewTabs = Object.assign(
       if (viewId !== "ALL") {
         const view = views.find((v) => v.id === viewId);
         if (isDefined(view)) {
-          const sortBy = view.sortBy ? view.sortBy.split("_") : null;
-          const { status, tags, sharedWith, signature, fromTemplateId, search, searchIn, path } =
-            view.filters;
-          // TODO fix sortBy any, or not
           onStateChange({
             view: view.id,
-            status,
-            tags,
-            sharedWith,
-            signature,
-            fromTemplateId: fromTemplateId ? [fromTemplateId] : undefined,
-            search,
-            searchIn: (searchIn as SearchInOptions) ?? undefined,
-            path: path ?? undefined,
-            sort: sortBy
-              ? {
-                  field: sortBy[0] as any,
-                  direction: sortBy[1] as TableSortingDirection,
-                }
-              : undefined,
+            ...view.data,
           });
         }
       } else {
@@ -138,13 +118,8 @@ export const ViewTabs = Object.assign(
             <FormattedMessage id="component.view-tabs.clone-view" defaultMessage="Clone view" />
           ),
         });
-        // TODO fix sortBy any, or not
         await createPetitionListView({
-          variables: {
-            name,
-            filters: omit(view.filters, ["__typename"]) as PetitionListViewFiltersInput,
-            sortBy: view.sortBy as any,
-          },
+          variables: { name, data: omit(view.data, ["__typename"]) },
         });
       } catch (error) {
         if (isDialogError(error)) {
@@ -274,17 +249,17 @@ export const ViewTabs = Object.assign(
                     id: "generic.all",
                     defaultMessage: "All",
                   }),
-                  filters: {
+                  data: {
                     fromTemplateId: null,
-                    path: null,
+                    path: "/",
                     search: null,
-                    searchIn: null,
+                    searchIn: "EVERYWHERE",
                     sharedWith: null,
                     signature: null,
                     status: null,
                     tags: null,
+                    sort: { field: "sentAt", direction: "DESC" },
                   },
-                  sortBy: "sentAt_DESC",
                   isDefault: false,
                 } as ViewTabs_PetitionListViewFragment,
                 ...viewIds.map((id) => views.find((v) => v.id === id)!),
@@ -313,9 +288,9 @@ export const ViewTabs = Object.assign(
   }),
   {
     fragments: {
-      get PetitionListViewFilters() {
+      get PetitionListViewData() {
         return gql`
-          fragment ViewTabs_PetitionListViewFilters on PetitionListViewFilters {
+          fragment ViewTabs_PetitionListViewData on PetitionListViewData {
             status
             sharedWith {
               operator
@@ -330,6 +305,10 @@ export const ViewTabs = Object.assign(
             search
             searchIn
             path
+            sort {
+              field
+              direction
+            }
           }
         `;
       },
@@ -338,13 +317,12 @@ export const ViewTabs = Object.assign(
           fragment ViewTabs_PetitionListView on PetitionListView {
             id
             name
-            filters {
-              ...ViewTabs_PetitionListViewFilters
+            data {
+              ...ViewTabs_PetitionListViewData
             }
-            sortBy
             isDefault
           }
-          ${this.PetitionListViewFilters}
+          ${this.PetitionListViewData}
         `;
       },
       get User() {
@@ -380,12 +358,8 @@ const _mutations = [
     ${ViewTabs.fragments.User}
   `,
   gql`
-    mutation ViewTabs_createPetitionListView(
-      $name: String!
-      $filters: PetitionListViewFiltersInput
-      $sortBy: QueryPetitions_OrderBy
-    ) {
-      createPetitionListView(name: $name, filters: $filters, sortBy: $sortBy) {
+    mutation ViewTabs_createPetitionListView($name: String!, $data: PetitionListViewDataInput!) {
+      createPetitionListView(name: $name, data: $data) {
         ...ViewTabs_PetitionListView
         user {
           ...ViewTabs_User
@@ -398,9 +372,10 @@ const _mutations = [
   gql`
     mutation ViewTabs_updatePetitionListView(
       $petitionListViewId: GID!
-      $data: UpdatePetitionListViewInput!
+      $name: String
+      $data: PetitionListViewDataInput
     ) {
-      updatePetitionListView(petitionListViewId: $petitionListViewId, data: $data) {
+      updatePetitionListView(petitionListViewId: $petitionListViewId, name: $name, data: $data) {
         ...ViewTabs_PetitionListView
         user {
           ...ViewTabs_User

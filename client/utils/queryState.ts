@@ -121,7 +121,7 @@ export function values<T extends string | number>(values: readonly T[]): QueryIt
 }
 
 export function sorting<T extends string>(fields: readonly T[]) {
-  return new QueryItem<TableSorting<T>>(
+  return new QueryItem<TableSorting<T> | null>(
     (value) => {
       if (value) {
         const [field, direction] = (value as string).split("_");

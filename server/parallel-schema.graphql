@@ -973,11 +973,7 @@ type Mutation {
   """
   Creates a view with custom filters and ordering on the user's petitions list
   """
-  createPetitionListView(
-    filters: PetitionListViewFiltersInput
-    name: String!
-    sortBy: QueryPetitions_OrderBy
-  ): PetitionListView!
+  createPetitionListView(data: PetitionListViewDataInput, name: String!): PetitionListView!
 
   """
   Creates a task for printing a PDF of the petition and sends it to the queue
@@ -1894,7 +1890,8 @@ type Mutation {
   Updates a petition list view
   """
   updatePetitionListView(
-    data: UpdatePetitionListViewInput!
+    data: PetitionListViewDataInput
+    name: String
     petitionListViewId: GID!
   ): PetitionListView!
 
@@ -3426,59 +3423,80 @@ type PetitionFolder {
 }
 
 type PetitionListView {
-  filters: PetitionListViewFilters!
+  data: PetitionListViewData!
   id: GID!
   isDefault: Boolean!
   name: String!
-  sortBy: QueryPetitions_OrderBy
   user: User!
 }
 
-type PetitionListViewFilters {
-  fromTemplateId: GID
-  path: String
+type PetitionListViewData {
+  fromTemplateId: [GID!]
+  path: String!
   search: String
-  searchIn: PetitionListViewSearchIn
-  sharedWith: PetitionListViewFiltersSharedWith
+  searchIn: PetitionListViewSearchIn!
+  sharedWith: PetitionListViewDataSharedWith
   signature: [PetitionSignatureStatusFilter!]
+  sort: PetitionListViewSort
   status: [PetitionStatus!]
   tags: [GID!]
 }
 
-input PetitionListViewFiltersInput {
-  fromTemplateId: GID
+input PetitionListViewDataInput {
+  fromTemplateId: [GID!]
   path: String
   search: String
   searchIn: PetitionListViewSearchIn
-  sharedWith: PetitionListViewFiltersSharedWithInput
+  sharedWith: PetitionListViewDataSharedWithInput
   signature: [PetitionSignatureStatusFilter!]
+  sort: PetitionListViewSortInput
   status: [PetitionStatus!]
   tags: [GID!]
 }
 
-type PetitionListViewFiltersSharedWith {
-  filters: [PetitionListViewFiltersSharedWithFilters!]!
+type PetitionListViewDataSharedWith {
+  filters: [PetitionListViewDataSharedWithFilters!]!
   operator: FilterSharedWithLogicalOperator!
 }
 
-type PetitionListViewFiltersSharedWithFilters {
+type PetitionListViewDataSharedWithFilters {
   operator: FilterSharedWithOperator!
   value: GID!
 }
 
-input PetitionListViewFiltersSharedWithFiltersInput {
+input PetitionListViewDataSharedWithFiltersInput {
   operator: FilterSharedWithOperator!
   value: GID!
 }
 
-input PetitionListViewFiltersSharedWithInput {
-  filters: [PetitionListViewFiltersSharedWithFiltersInput!]!
+input PetitionListViewDataSharedWithInput {
+  filters: [PetitionListViewDataSharedWithFiltersInput!]!
   operator: FilterSharedWithLogicalOperator!
 }
 
 enum PetitionListViewSearchIn {
   CURRENT_FOLDER
   EVERYWHERE
+}
+
+type PetitionListViewSort {
+  direction: PetitionListViewSortDirection!
+  field: PetitionListViewSortField!
+}
+
+enum PetitionListViewSortDirection {
+  ASC
+  DESC
+}
+
+enum PetitionListViewSortField {
+  name
+  sentAt
+}
+
+input PetitionListViewSortInput {
+  direction: PetitionListViewSortDirection!
+  field: PetitionListViewSortField!
 }
 
 """
@@ -5540,12 +5558,6 @@ input UpdatePetitionInput {
   remindersConfig: RemindersConfigInput
   signatureConfig: SignatureConfigInput
   skipForwardSecurity: Boolean
-}
-
-input UpdatePetitionListViewInput {
-  filters: PetitionListViewFiltersInput
-  name: String
-  sortBy: QueryPetitions_OrderBy
 }
 
 input UpdateTagInput {

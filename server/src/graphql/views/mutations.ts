@@ -1,4 +1,4 @@
-import { inputObjectType, list, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { list, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { isDefined, maxBy } from "remeda";
 import { PetitionListView } from "../../db/__types";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
@@ -11,22 +11,22 @@ export const createPetitionListView = mutationField("createPetitionListView", {
   authorize: authenticate(),
   args: {
     name: nonNull(stringArg()),
-    filters: "PetitionListViewFiltersInput",
-    sortBy: "QueryPetitions_OrderBy",
+    data: "PetitionListViewDataInput",
   },
   resolve: async (_, args, ctx) => {
-    const userViews = await ctx.views.loadPetitionListViewsByUserId.raw(ctx.user!.id); // raw to avoid caching
+    const userViews = await ctx.views.loadPetitionListViewsByUserId(ctx.user!.id);
     const maxPosition = maxBy(userViews, (v) => v.position)?.position ?? -1;
-    return await ctx.views.createPetitionListView(
+    const view = await ctx.views.createPetitionListView(
       {
         name: args.name,
-        filters: args.filters,
-        sort_by: args.sortBy ?? null,
+        data: args.data,
         user_id: ctx.user!.id,
         position: maxPosition + 1,
       },
       `User:${ctx.user!.id}`
     );
+    ctx.views.loadPetitionListViewsByUserId.dataloader.clear(ctx.user!.id);
+    return view;
   },
 });
 
@@ -36,27 +36,16 @@ export const updatePetitionListView = mutationField("updatePetitionListView", {
   authorize: authenticateAnd(userHasAccessToPetitionListView("petitionListViewId")),
   args: {
     petitionListViewId: nonNull(globalIdArg("PetitionListView")),
-    data: nonNull(
-      inputObjectType({
-        name: "UpdatePetitionListViewInput",
-        definition(t) {
-          t.nullable.string("name");
-          t.nullable.field("filters", { type: "PetitionListViewFiltersInput" });
-          t.nullable.field("sortBy", { type: "QueryPetitions_OrderBy" });
-        },
-      }).asArg()
-    ),
+    name: nullable(stringArg()),
+    data: "PetitionListViewDataInput",
   },
   resolve: async (_, args, ctx) => {
     const data: Partial<PetitionListView> = {};
-    if (isDefined(args.data.name)) {
-      data.name = args.data.name;
+    if (isDefined(args.name)) {
+      data.name = args.name;
     }
-    if (args.data.filters !== undefined) {
-      data.filters = args.data.filters;
-    }
-    if (args.data.sortBy !== undefined) {
-      data.sort_by = args.data.sortBy;
+    if (args.data !== undefined) {
+      data.data = args.data;
     }
     return await ctx.views.updatePetitionListView(args.petitionListViewId, data, ctx.user!);
   },

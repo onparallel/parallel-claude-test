@@ -218,10 +218,6 @@ export const PetitionFieldTypeValues = [
   "DOW_JONES_KYC",
 ] as PetitionFieldType[];
 
-export type PetitionListViewType = "PETITION" | "TEMPLATE";
-
-export const PetitionListViewTypeValues = ["PETITION", "TEMPLATE"] as PetitionListViewType[];
-
 export type PetitionMessageStatus = "SCHEDULED" | "CANCELLED" | "PROCESSING" | "PROCESSED";
 
 export const PetitionMessageStatusValues = [
@@ -1127,8 +1123,7 @@ export interface PetitionListView {
   id: number; // int4
   user_id: number; // int4
   name: string; // varchar
-  filters: any; // jsonb
-  sort_by: Maybe<string>; // varchar
+  data: any; // jsonb
   position: number; // int4
   is_default: boolean; // bool
   created_at: Date; // timestamptz
@@ -1141,8 +1136,6 @@ export interface PetitionListView {
 
 export type CreatePetitionListView = PartialProps<
   Omit<PetitionListView, "id">,
-  | "filters"
-  | "sort_by"
   | "is_default"
   | "created_at"
   | "created_by"

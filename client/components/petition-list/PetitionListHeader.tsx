@@ -21,7 +21,7 @@ import {
   PetitionListHeader_createPetitionListViewDocument,
   PetitionListHeader_PetitionListViewFragment,
   PetitionListHeader_updatePetitionListViewDocument,
-  PetitionListViewFiltersInput,
+  PetitionListViewDataInput,
 } from "@parallel/graphql/__types";
 import type { PetitionsQueryState } from "@parallel/pages/app/petitions";
 import { QueryStateOf, SetQueryState, useBuildStateUrl } from "@parallel/utils/queryState";
@@ -98,39 +98,28 @@ export function PetitionListHeader({
     return !equals(
       state.view === "ALL"
         ? {
-            sortBy: null,
-            filters: {
-              status: null,
-              tags: null,
-              sharedWith: null,
-              signature: null,
-              fromTemplateId: null,
-              search: null,
-              searchIn: "EVERYWHERE",
-              path: "/",
-            },
+            status: null,
+            tags: null,
+            sharedWith: null,
+            signature: null,
+            fromTemplateId: null,
+            search: null,
+            searchIn: "EVERYWHERE",
+            path: "/",
+            sort: null,
           }
-        : {
-            sortBy: currentView!.sortBy,
-            filters: {
-              ...omit(currentView!.filters, ["__typename"]),
-              path: currentView!.filters.path ?? "/",
-              searchIn: currentView!.filters.searchIn ?? "EVERYWHERE",
-            },
-          },
-      {
-        sortBy: state.sort ? `${state.sort.field}_${state.sort.direction}` : null,
-        filters: pick(state, [
-          "status",
-          "tags",
-          "sharedWith",
-          "signature",
-          "fromTemplateId",
-          "search",
-          "path",
-          "searchIn",
-        ]),
-      }
+        : omit(currentView!.data, ["__typename"]),
+      pick(state, [
+        "status",
+        "tags",
+        "sharedWith",
+        "signature",
+        "fromTemplateId",
+        "search",
+        "path",
+        "searchIn",
+        "sort",
+      ])
     );
   }, [state, views]);
 
@@ -157,7 +146,7 @@ export function PetitionListHeader({
       await createPetitionListView({
         variables: {
           name,
-          filters: pick(state, [
+          data: pick(state, [
             "status",
             "sharedWith",
             "tags",
@@ -166,8 +155,8 @@ export function PetitionListHeader({
             "search",
             "searchIn",
             "path",
-          ]) as PetitionListViewFiltersInput,
-          sortBy: state.sort ? `${state.sort.field}_${state.sort.direction}` : null,
+            "sort",
+          ]) as PetitionListViewDataInput,
         },
       });
     } catch (error) {
@@ -189,20 +178,18 @@ export function PetitionListHeader({
       await updatePetitionListView({
         variables: {
           petitionListViewId: view.id,
-          data: {
-            name: view.name,
-            filters: pick(state, [
-              "status",
-              "sharedWith",
-              "tags",
-              "signature",
-              "fromTemplateId",
-              "search",
-              "searchIn",
-              "path",
-            ]) as PetitionListViewFiltersInput,
-            sortBy: state.sort ? `${state.sort.field}_${state.sort.direction}` : null,
-          },
+          name: view.name,
+          data: pick(state, [
+            "status",
+            "sharedWith",
+            "tags",
+            "signature",
+            "fromTemplateId",
+            "search",
+            "searchIn",
+            "path",
+            "sort",
+          ]) as PetitionListViewDataInput,
         },
       });
     } catch (error) {
@@ -324,9 +311,9 @@ const SaveViewMenuButton = chakraForwardRef<"button", { isDirty?: boolean }>(
 );
 
 const _fragments = {
-  get PetitionListViewFilters() {
+  get PetitionListViewData() {
     return gql`
-      fragment PetitionListHeader_PetitionListViewFilters on PetitionListViewFilters {
+      fragment PetitionListHeader_PetitionListViewData on PetitionListViewData {
         status
         sharedWith {
           operator
@@ -341,6 +328,10 @@ const _fragments = {
         search
         searchIn
         path
+        sort {
+          field
+          direction
+        }
       }
     `;
   },
@@ -349,13 +340,12 @@ const _fragments = {
       fragment PetitionListHeader_PetitionListView on PetitionListView {
         id
         name
-        filters {
-          ...PetitionListHeader_PetitionListViewFilters
+        data {
+          ...PetitionListHeader_PetitionListViewData
         }
-        sortBy
         isDefault
       }
-      ${this.PetitionListViewFilters}
+      ${this.PetitionListViewData}
     `;
   },
   get User() {
@@ -375,10 +365,9 @@ const _mutations = [
   gql`
     mutation PetitionListHeader_createPetitionListView(
       $name: String!
-      $filters: PetitionListViewFiltersInput
-      $sortBy: QueryPetitions_OrderBy
+      $data: PetitionListViewDataInput
     ) {
-      createPetitionListView(name: $name, filters: $filters, sortBy: $sortBy) {
+      createPetitionListView(name: $name, data: $data) {
         ...PetitionListHeader_PetitionListView
         user {
           ...PetitionListHeader_User
@@ -391,9 +380,10 @@ const _mutations = [
   gql`
     mutation PetitionListHeader_updatePetitionListView(
       $petitionListViewId: GID!
-      $data: UpdatePetitionListViewInput!
+      $name: String
+      $data: PetitionListViewDataInput
     ) {
-      updatePetitionListView(petitionListViewId: $petitionListViewId, data: $data) {
+      updatePetitionListView(petitionListViewId: $petitionListViewId, name: $name, data: $data) {
         ...PetitionListHeader_PetitionListView
         user {
           ...PetitionListHeader_User
