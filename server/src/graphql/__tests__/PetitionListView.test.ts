@@ -26,7 +26,7 @@ describe("GraphQL/PetitionListView", () => {
       {
         is_default: true,
         user_id: user.id,
-        filters: {
+        data: {
           status: ["CLOSED"],
           signature: ["COMPLETED"],
           sharedWith: {
@@ -38,8 +38,12 @@ describe("GraphQL/PetitionListView", () => {
             ],
             operator: "AND",
           },
+          path: "/",
+          search: null,
+          searchIn: "EVERYWHERE",
+          fromTemplateId: null,
+          sort: { field: "sentAt", direction: "ASC" },
         },
-        sort_by: "createdAt_ASC",
         name: "my default view",
         position: 0,
       },
@@ -64,7 +68,7 @@ describe("GraphQL/PetitionListView", () => {
             petitionListViews {
               id
               isDefault
-              filters {
+              data {
                 status
                 signature
                 fromTemplateId
@@ -79,6 +83,10 @@ describe("GraphQL/PetitionListView", () => {
                   operator
                 }
                 tags
+                sort {
+                  field
+                  direction
+                }
               }
             }
           }
@@ -93,18 +101,19 @@ describe("GraphQL/PetitionListView", () => {
             {
               id: toGlobalId("PetitionListView", defaultView.id),
               isDefault: true,
-              filters: {
+              data: {
                 status: ["CLOSED"],
                 signature: ["COMPLETED"],
                 fromTemplateId: null,
-                path: null,
+                path: "/",
                 search: null,
-                searchIn: null,
+                searchIn: "EVERYWHERE",
                 sharedWith: {
                   filters: [{ operator: "SHARED_WITH", value: toGlobalId("User", user.id) }],
                   operator: "AND",
                 },
                 tags: null,
+                sort: { field: "sentAt", direction: "ASC" },
               },
             },
           ],
@@ -117,17 +126,12 @@ describe("GraphQL/PetitionListView", () => {
     it("creates a new view with custom filters and sorting", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation (
-            $name: String!
-            $filters: PetitionListViewFiltersInput
-            $sortBy: QueryPetitions_OrderBy
-          ) {
-            createPetitionListView(name: $name, filters: $filters, sortBy: $sortBy) {
+          mutation ($name: String!, $data: PetitionListViewDataInput) {
+            createPetitionListView(name: $name, data: $data) {
               id
               name
               isDefault
-              sortBy
-              filters {
+              data {
                 fromTemplateId
                 path
                 search
@@ -142,6 +146,10 @@ describe("GraphQL/PetitionListView", () => {
                 signature
                 status
                 tags
+                sort {
+                  field
+                  direction
+                }
               }
               user {
                 petitionListViews {
@@ -154,14 +162,16 @@ describe("GraphQL/PetitionListView", () => {
         `,
         {
           name: "my first view",
-          sortBy: "sentAt_ASC",
-          filters: {
+          data: {
             search: "aaa",
             searchIn: "CURRENT_FOLDER",
             signature: ["NO_SIGNATURE", "PENDING_START"],
             status: ["COMPLETED", "DRAFT"],
             tags: [],
             path: "/2022/",
+            sharedWith: null,
+            fromTemplateId: null,
+            sort: { field: "sentAt", direction: "ASC" },
           },
         }
       );
@@ -170,8 +180,7 @@ describe("GraphQL/PetitionListView", () => {
       expect(omit(data?.createPetitionListView, ["id"])).toEqual({
         name: "my first view",
         isDefault: false,
-        sortBy: "sentAt_ASC",
-        filters: {
+        data: {
           fromTemplateId: null,
           path: "/2022/",
           search: "aaa",
@@ -180,6 +189,7 @@ describe("GraphQL/PetitionListView", () => {
           signature: ["NO_SIGNATURE", "PENDING_START"],
           status: ["COMPLETED", "DRAFT"],
           tags: [],
+          sort: { field: "sentAt", direction: "ASC" },
         },
         user: {
           petitionListViews: [
@@ -196,12 +206,15 @@ describe("GraphQL/PetitionListView", () => {
       const [tag] = await mocks.createRandomTags(organization.id, 1);
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($petitionListViewId: GID!, $data: UpdatePetitionListViewInput!) {
-            updatePetitionListView(petitionListViewId: $petitionListViewId, data: $data) {
+          mutation ($petitionListViewId: GID!, $name: String, $data: PetitionListViewDataInput) {
+            updatePetitionListView(
+              petitionListViewId: $petitionListViewId
+              name: $name
+              data: $data
+            ) {
               id
               name
-              sortBy
-              filters {
+              data {
                 signature
                 status
                 tags
@@ -212,19 +225,27 @@ describe("GraphQL/PetitionListView", () => {
                   }
                   operator
                 }
+                sort {
+                  field
+                  direction
+                }
               }
             }
           }
         `,
         {
           petitionListViewId: toGlobalId("PetitionListView", defaultView.id),
+          name: "updated name",
           data: {
-            name: "updated name",
-            sortBy: null,
-            filters: {
-              status: null,
-              tags: [toGlobalId("Tag", tag.id)],
-            },
+            fromTemplateId: null,
+            path: "/",
+            search: null,
+            searchIn: "EVERYWHERE",
+            sharedWith: null,
+            signature: null,
+            status: null,
+            tags: [toGlobalId("Tag", tag.id)],
+            sort: null,
           },
         }
       );
@@ -233,15 +254,12 @@ describe("GraphQL/PetitionListView", () => {
       expect(data?.updatePetitionListView).toEqual({
         id: toGlobalId("PetitionListView", defaultView.id),
         name: "updated name",
-        sortBy: null,
-        filters: {
+        data: {
           status: null,
-          signature: ["COMPLETED"],
+          signature: null,
           tags: [toGlobalId("Tag", tag.id)],
-          sharedWith: {
-            filters: [{ operator: "SHARED_WITH", value: toGlobalId("User", user.id) }],
-            operator: "AND",
-          },
+          sharedWith: null,
+          sort: null,
         },
       });
     });
@@ -252,22 +270,24 @@ describe("GraphQL/PetitionListView", () => {
     beforeEach(async () => {
       const { data } = await testClient.execute(
         gql`
-          mutation (
-            $name: String!
-            $filters: PetitionListViewFiltersInput
-            $sortBy: QueryPetitions_OrderBy
-          ) {
-            createPetitionListView(name: $name, filters: $filters, sortBy: $sortBy) {
+          mutation ($name: String!, $data: PetitionListViewDataInput) {
+            createPetitionListView(name: $name, data: $data) {
               id
             }
           }
         `,
         {
           name: "closed petitions from 2022 folder",
-          sortBy: null,
-          filters: {
+          data: {
+            fromTemplateId: null,
+            search: null,
+            searchIn: "EVERYWHERE",
+            sharedWith: null,
+            signature: null,
+            tags: null,
             status: ["CLOSED"],
             path: "/2022/",
+            sort: null,
           },
         }
       );
@@ -334,22 +354,18 @@ describe("GraphQL/PetitionListView", () => {
     beforeEach(async () => {
       const { data } = await testClient.execute(
         gql`
-          mutation (
-            $name: String!
-            $filters: PetitionListViewFiltersInput
-            $sortBy: QueryPetitions_OrderBy
-          ) {
-            createPetitionListView(name: $name, filters: $filters, sortBy: $sortBy) {
+          mutation ($name: String!, $data: PetitionListViewDataInput) {
+            createPetitionListView(name: $name, data: $data) {
               id
             }
           }
         `,
         {
           name: "closed petitions from 2022 folder",
-          sortBy: null,
-          filters: {
+          data: {
             status: ["CLOSED"],
             path: "/2022/",
+            sort: null,
           },
         }
       );
