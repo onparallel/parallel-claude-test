@@ -110,13 +110,16 @@ export const ViewTabs = Object.assign(
           variables: {
             name,
             data: {
-              ...omit(view.data, ["__typename"]),
+              ...omit(view.data, ["__typename", "sharedWith", "sort"]),
               sharedWith: isDefined(view.data.sharedWith)
                 ? {
                     ...omit(view.data.sharedWith, ["__typename"]),
                     filters: view.data.sharedWith.filters.map(omit(["__typename"])),
                   }
                 : view.data.sharedWith,
+              sort: isDefined(view.data.sort)
+                ? omit(view.data.sort, ["__typename"])
+                : view.data.sort,
             },
           },
         });
