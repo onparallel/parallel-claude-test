@@ -111,10 +111,11 @@ export function PetitionRepliesFieldComments({
       </CloseableCardHeader>
       <Box
         maxHeight={{
-          base: `calc(100vh - 364px)`,
-          sm: `calc(100vh - 300px)`,
-          md: `calc(100vh - 300px)`,
+          base: `calc(100vh - 464px)`,
+          sm: `calc(100vh - 400px)`,
+          md: `calc(100vh - 400px)`,
         }}
+        minHeight="100px"
         overflow="auto"
         ref={commentsRef}
       >

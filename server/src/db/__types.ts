@@ -218,6 +218,10 @@ export const PetitionFieldTypeValues = [
   "DOW_JONES_KYC",
 ] as PetitionFieldType[];
 
+export type PetitionListViewType = "PETITION" | "TEMPLATE";
+
+export const PetitionListViewTypeValues = ["PETITION", "TEMPLATE"] as PetitionListViewType[];
+
 export type PetitionMessageStatus = "SCHEDULED" | "CANCELLED" | "PROCESSING" | "PROCESSED";
 
 export const PetitionMessageStatusValues = [

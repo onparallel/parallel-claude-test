@@ -23,7 +23,7 @@ import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
+import { TwoPaneLayout } from "@parallel/components/layout/TwoPaneLayout";
 import {
   PetitionLayout,
   usePetitionStateWrapper,
@@ -549,11 +549,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         </>
       }
     >
-      <PaneWithFlyout
-        isFlyoutActive={Boolean(activeFieldId)}
-        alignWithRef={activeFieldId ? fieldRefs[activeFieldId] : null}
+      <TwoPaneLayout
         top={4}
-        flyout={
+        isSidePaneActive={Boolean(activeFieldId)}
+        sidePane={
           <Box paddingX={4} paddingLeft={{ md: 0 }}>
             {activeFieldId && !!activeField ? (
               <PetitionRepliesFieldComments
@@ -569,7 +568,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 onlyReadPermission={myEffectivePermission === "READ"}
               />
             ) : (
-              <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 14.5rem)`}>
+              <Card
+                display="flex"
+                flexDirection="column"
+                maxHeight={`calc(100vh - 232px)`}
+                minHeight="112px"
+              >
                 <CardHeader
                   leftIcon={<ListIcon fontSize="18px" role="presentation" />}
                   rightAction={<PetitionRepliesFilterButton value={filter} onChange={setFilter} />}
@@ -638,7 +642,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             </LiquidScopeProvider>
           </Stack>
         </Box>
-      </PaneWithFlyout>
+      </TwoPaneLayout>
     </PetitionLayout>
   );
 }

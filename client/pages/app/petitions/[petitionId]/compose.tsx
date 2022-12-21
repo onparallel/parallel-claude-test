@@ -12,7 +12,7 @@ import { Link } from "@parallel/components/common/Link";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
+import { TwoPaneLayout } from "@parallel/components/layout/TwoPaneLayout";
 import {
   PetitionLayout,
   usePetitionStateWrapper,
@@ -473,12 +473,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           </>
         }
       >
-        <PaneWithFlyout
+        <TwoPaneLayout
           backgroundColor={petition?.__typename === "PetitionTemplate" ? "primary.50" : undefined}
-          isFlyoutActive={Boolean(activeFieldId)}
-          alignWithRef={activeFieldId ? fieldRefs[activeFieldId].current?.elementRef ?? null : null}
           top={4}
-          flyout={
+          isSidePaneActive={Boolean(activeFieldId)}
+          sidePane={
             <Box paddingX={{ base: 4 }} paddingLeft={{ md: 0 }}>
               {activeField ? (
                 <PetitionComposeFieldSettings
@@ -492,7 +491,12 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   user={me}
                 />
               ) : (
-                <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 11rem)`}>
+                <Card
+                  display="flex"
+                  flexDirection="column"
+                  maxHeight={`calc(100vh - 175px)`}
+                  minHeight="170px"
+                >
                   <Tabs
                     variant="enclosed"
                     {...extendFlexColumn}
@@ -599,7 +603,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               </Box>
             ) : null}
           </Box>
-        </PaneWithFlyout>
+        </TwoPaneLayout>
       </PetitionLayout>
     </ToneProvider>
   );

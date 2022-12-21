@@ -210,67 +210,69 @@ export function PetitionComposeFieldSettings({
       <CloseableCardHeader onClose={onClose}>
         <FormattedMessage id="petition.field-settings" defaultMessage="Field settings" />
       </CloseableCardHeader>
-      <Stack spacing={4} padding={4} direction="column">
-        <Box>
-          <PetitionFieldTypeSelect
-            type={field.type}
-            onChange={(type) => {
-              if (type !== field.type) {
-                onFieldTypeChange(field.id, type);
-              }
-            }}
-            isDisabled={isReadOnly || field.isFixed}
-            user={user}
-          />
-        </Box>
-        {field.type !== "SHORT_TEXT" ? commonSettings : null}
-        {field.type === "HEADING" ? (
-          <HeadingSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
-        ) : field.type === "FILE_UPLOAD" ? (
-          <FileUploadSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
-        ) : field.type === "TEXT" ? (
-          <TextSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
-        ) : field.type === "SHORT_TEXT" ? (
-          <ShortTextSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly}>
-            {commonSettings}
-          </ShortTextSettings>
-        ) : field.type === "SELECT" ? (
-          <SelectOptionSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
-        ) : field.type === "DYNAMIC_SELECT" ? (
-          <DynamicSelectSettings
-            petitionId={petitionId}
-            field={field}
-            onFieldEdit={onFieldEdit}
-            isReadOnly={isReadOnly}
-          />
-        ) : field.type === "CHECKBOX" ? (
-          <CheckboxSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
-        ) : field.type === "NUMBER" ? (
-          <NumberSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
-        ) : field.type === "PHONE" ? (
-          <PhoneSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
-        ) : field.type === "ES_TAX_DOCUMENTS" ? (
-          <SpanishTaxDocumentsSettings
-            field={field}
-            onFieldEdit={onFieldEdit}
-            isReadOnly={isReadOnly}
-          />
-        ) : null}
-      </Stack>
-      {field.type !== "HEADING" ? (
-        <Stack padding={4} paddingTop={2} spacing={3}>
-          <Heading
-            flex="1"
-            as="h4"
-            size="sm"
-            overflowWrap="anywhere"
-            textStyle={isReadOnly ? "muted" : undefined}
-          >
-            <FormattedMessage id="petition.advanced-options" defaultMessage="Advanced options" />
-          </Heading>
-          <SettingsRowAlias field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+      <Box maxHeight={`calc(100vh - 230px)`} overflow="auto" minHeight="115px">
+        <Stack spacing={4} padding={4} direction="column">
+          <Box>
+            <PetitionFieldTypeSelect
+              type={field.type}
+              onChange={(type) => {
+                if (type !== field.type) {
+                  onFieldTypeChange(field.id, type);
+                }
+              }}
+              isDisabled={isReadOnly || field.isFixed}
+              user={user}
+            />
+          </Box>
+          {field.type !== "SHORT_TEXT" ? commonSettings : null}
+          {field.type === "HEADING" ? (
+            <HeadingSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+          ) : field.type === "FILE_UPLOAD" ? (
+            <FileUploadSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+          ) : field.type === "TEXT" ? (
+            <TextSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+          ) : field.type === "SHORT_TEXT" ? (
+            <ShortTextSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly}>
+              {commonSettings}
+            </ShortTextSettings>
+          ) : field.type === "SELECT" ? (
+            <SelectOptionSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+          ) : field.type === "DYNAMIC_SELECT" ? (
+            <DynamicSelectSettings
+              petitionId={petitionId}
+              field={field}
+              onFieldEdit={onFieldEdit}
+              isReadOnly={isReadOnly}
+            />
+          ) : field.type === "CHECKBOX" ? (
+            <CheckboxSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+          ) : field.type === "NUMBER" ? (
+            <NumberSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+          ) : field.type === "PHONE" ? (
+            <PhoneSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+          ) : field.type === "ES_TAX_DOCUMENTS" ? (
+            <SpanishTaxDocumentsSettings
+              field={field}
+              onFieldEdit={onFieldEdit}
+              isReadOnly={isReadOnly}
+            />
+          ) : null}
         </Stack>
-      ) : null}
+        {field.type !== "HEADING" ? (
+          <Stack padding={4} paddingTop={2} spacing={3}>
+            <Heading
+              flex="1"
+              as="h4"
+              size="sm"
+              overflowWrap="anywhere"
+              textStyle={isReadOnly ? "muted" : undefined}
+            >
+              <FormattedMessage id="petition.advanced-options" defaultMessage="Advanced options" />
+            </Heading>
+            <SettingsRowAlias field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+          </Stack>
+        ) : null}
+      </Box>
     </Card>
   );
 }
