@@ -186,6 +186,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       },
       petition.status
     );
+    refetch();
   }
 
   const handleUpdatePetition = useCallback(
