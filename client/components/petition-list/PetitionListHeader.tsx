@@ -386,7 +386,6 @@ const _mutations = [
 ];
 
 function viewsAreEqual(view1: PetitionListViewData, view2: PetitionListViewData) {
-  console.log(view1, view2);
   return (
     equals(
       omit(view1, ["__typename", "sharedWith", "sort"]),
