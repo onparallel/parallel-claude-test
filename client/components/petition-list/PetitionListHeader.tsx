@@ -406,8 +406,12 @@ function viewsAreEqual(view1: PetitionListViewData, view2: PetitionListViewData)
         : view2.sharedWith
     ) &&
     equals(
-      view1.sort ?? { field: "sentAt", direction: "DESC" },
-      view2.sort ?? { field: "sentAt", direction: "DESC" }
+      isDefined(view1.sort)
+        ? omit(view1.sort, ["__typename"])
+        : { field: "sentAt", direction: "DESC" },
+      isDefined(view2.sort)
+        ? omit(view2.sort, ["__typename"])
+        : { field: "sentAt", direction: "DESC" }
     )
   );
 }
