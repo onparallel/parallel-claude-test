@@ -139,7 +139,6 @@ function Petitions() {
     (state.type === "PETITION"
       ? ({ field: "sentAt", direction: "DESC" } as const)
       : ({ field: "createdAt", direction: "DESC" } as const));
-  console.log(">> state.sort", state.sort);
   const {
     data: { me, realMe },
   } = useAssertQuery(Petitions_userDocument);
@@ -175,7 +174,7 @@ function Petitions() {
 
   function handleTypeChange(type: PetitionBaseType) {
     if (type === "PETITION") {
-      const defaultView = views.find((v) => v.isDefault);
+      const defaultView = me.petitionListViews.find((v) => v.isDefault);
       if (isDefined(defaultView)) {
         setQueryState({
           type,
@@ -431,14 +430,15 @@ function Petitions() {
     onMoveToClick: handleMoveToClick,
   });
 
-  const [views, setViews] = useState(me.petitionListViews);
+  const [viewIds, setViewIds] = useState(me.petitionListViews.map((v) => v.id));
+  const views = viewIds.map((id) => me.petitionListViews.find((v) => v.id === id)!);
 
   useEffect(() => {
-    setViews(me.petitionListViews);
-  }, [me]);
+    setViewIds(me.petitionListViews.map((v) => v.id));
+  }, [me.petitionListViews.map((v) => v.id).join(",")]);
 
   const handleReorder = (viewIds: string[]) => {
-    setViews((views) => viewIds.map((id) => views.find((v) => v.id === id)!));
+    setViewIds(viewIds);
   };
 
   return (
@@ -672,9 +672,13 @@ Petitions.fragments = {
       fragment Petitions_User on User {
         id
         role
-        ...ViewTabs_User
+        petitionListViews {
+          ...ViewTabs_PetitionListView
+          ...PetitionListHeader_PetitionListView
+        }
       }
-      ${ViewTabs.fragments.User}
+      ${PetitionListHeader.fragments.PetitionListView}
+      ${ViewTabs.fragments.PetitionListView}
     `;
   },
   get PetitionBaseOrFolder() {

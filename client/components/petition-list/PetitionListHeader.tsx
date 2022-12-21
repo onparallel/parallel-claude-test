@@ -21,6 +21,7 @@ import {
   PetitionListHeader_createPetitionListViewDocument,
   PetitionListHeader_PetitionListViewFragment,
   PetitionListHeader_updatePetitionListViewDocument,
+  PetitionListViewData,
   PetitionListViewDataInput,
 } from "@parallel/graphql/__types";
 import type { PetitionsQueryState } from "@parallel/pages/app/petitions";
@@ -95,7 +96,7 @@ export function PetitionListHeader({
 
     if (!currentView && state.view !== "ALL") return;
 
-    return !equals(
+    return !viewsAreEqual(
       state.view === "ALL"
         ? {
             status: null,
@@ -108,7 +109,7 @@ export function PetitionListHeader({
             path: "/",
             sort: null,
           }
-        : omit(currentView!.data, ["__typename"]),
+        : currentView!.data,
       pick(state, [
         "status",
         "tags",
@@ -119,7 +120,7 @@ export function PetitionListHeader({
         "path",
         "searchIn",
         "sort",
-      ])
+      ]) as Omit<PetitionListViewData, "__typename">
     );
   }, [state, views]);
 
@@ -171,10 +172,10 @@ export function PetitionListHeader({
   const [updatePetitionListView] = useMutation(PetitionListHeader_updatePetitionListViewDocument);
   const handleSaveCurrentViewClick = async () => {
     try {
-      if (state.view === "ALL") return;
-
+      if (state.view === "ALL") {
+        return;
+      }
       const view = views.find((v) => v.id === state.view)!;
-
       await updatePetitionListView({
         variables: {
           petitionListViewId: view.id,
@@ -310,10 +311,12 @@ const SaveViewMenuButton = chakraForwardRef<"button", { isDirty?: boolean }>(
   }
 );
 
-const _fragments = {
-  get PetitionListViewData() {
-    return gql`
-      fragment PetitionListHeader_PetitionListViewData on PetitionListViewData {
+PetitionListHeader.fragments = {
+  PetitionListView: gql`
+    fragment PetitionListHeader_PetitionListView on PetitionListView {
+      id
+      name
+      data {
         status
         sharedWith {
           operator
@@ -333,32 +336,9 @@ const _fragments = {
           direction
         }
       }
-    `;
-  },
-  get PetitionListView() {
-    return gql`
-      fragment PetitionListHeader_PetitionListView on PetitionListView {
-        id
-        name
-        data {
-          ...PetitionListHeader_PetitionListViewData
-        }
-        isDefault
-      }
-      ${this.PetitionListViewData}
-    `;
-  },
-  get User() {
-    return gql`
-      fragment PetitionListHeader_User on User {
-        id
-        petitionListViews {
-          ...PetitionListHeader_PetitionListView
-        }
-      }
-      ${this.PetitionListView}
-    `;
-  },
+      isDefault
+    }
+  `,
 };
 
 const _mutations = [
@@ -370,12 +350,14 @@ const _mutations = [
       createPetitionListView(name: $name, data: $data) {
         ...PetitionListHeader_PetitionListView
         user {
-          ...PetitionListHeader_User
+          id
+          petitionListViews {
+            id
+          }
         }
       }
     }
-    ${_fragments.User}
-    ${_fragments.PetitionListView}
+    ${PetitionListHeader.fragments.PetitionListView}
   `,
   gql`
     mutation PetitionListHeader_updatePetitionListView(
@@ -386,11 +368,23 @@ const _mutations = [
       updatePetitionListView(petitionListViewId: $petitionListViewId, name: $name, data: $data) {
         ...PetitionListHeader_PetitionListView
         user {
-          ...PetitionListHeader_User
+          id
+          petitionListViews {
+            id
+          }
         }
       }
     }
-    ${_fragments.User}
-    ${_fragments.PetitionListView}
+    ${PetitionListHeader.fragments.PetitionListView}
   `,
 ];
+
+function viewsAreEqual(view1: PetitionListViewData, view2: PetitionListViewData) {
+  return (
+    equals(omit(view1, ["__typename", "sort"]), omit(view2, ["__typename", "sort"])) &&
+    equals(
+      view1.sort ?? { field: "sentAt", direction: "DESC" },
+      view2.sort ?? { field: "sentAt", direction: "DESC" }
+    )
+  );
+}

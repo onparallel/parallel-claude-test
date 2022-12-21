@@ -330,7 +330,7 @@ export const ViewTabs = Object.assign(
           fragment ViewTabs_User on User {
             id
             petitionListViews {
-              ...ViewTabs_PetitionListView
+              id
             }
           }
           ${this.PetitionListView}
@@ -344,29 +344,35 @@ const _mutations = [
   gql`
     mutation ViewTabs_reorderPetitionListViews($ids: [GID!]!) {
       reorderPetitionListViews(ids: $ids) {
-        ...ViewTabs_User
+        id
+        petitionListViews {
+          id
+        }
       }
     }
-    ${ViewTabs.fragments.User}
   `,
   gql`
     mutation ViewTabs_deletePetitionListView($id: GID!) {
       deletePetitionListView(id: $id) {
-        ...Petitions_User
+        id
+        petitionListViews {
+          id
+        }
       }
     }
-    ${ViewTabs.fragments.User}
   `,
   gql`
     mutation ViewTabs_createPetitionListView($name: String!, $data: PetitionListViewDataInput!) {
       createPetitionListView(name: $name, data: $data) {
         ...ViewTabs_PetitionListView
         user {
-          ...ViewTabs_User
+          id
+          petitionListViews {
+            id
+          }
         }
       }
     }
-    ${ViewTabs.fragments.User}
     ${ViewTabs.fragments.PetitionListView}
   `,
   gql`
@@ -378,20 +384,25 @@ const _mutations = [
       updatePetitionListView(petitionListViewId: $petitionListViewId, name: $name, data: $data) {
         ...ViewTabs_PetitionListView
         user {
-          ...ViewTabs_User
+          id
+          petitionListViews {
+            id
+          }
         }
       }
     }
-    ${ViewTabs.fragments.User}
     ${ViewTabs.fragments.PetitionListView}
   `,
   gql`
     mutation ViewTabs_markPetitionListViewAsDefault($petitionListViewId: GID) {
       markPetitionListViewAsDefault(petitionListViewId: $petitionListViewId) {
-        ...ViewTabs_User
+        id
+        petitionListViews {
+          id
+          isDefault
+        }
       }
     }
-    ${ViewTabs.fragments.User}
   `,
 ];
 
