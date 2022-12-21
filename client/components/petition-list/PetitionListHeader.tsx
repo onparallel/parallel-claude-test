@@ -30,7 +30,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { equals, omit, pick } from "remeda";
+import { equals, isDefined, omit, pick } from "remeda";
 import { isDialogError } from "../common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PathBreadcrumbs } from "../common/PathBreadcrumbs";
@@ -144,7 +144,7 @@ export function PetitionListHeader({
           />
         ),
       });
-      await createPetitionListView({
+      const { data } = await createPetitionListView({
         variables: {
           name,
           data: pick(state, [
@@ -160,6 +160,12 @@ export function PetitionListHeader({
           ]) as PetitionListViewDataInput,
         },
       });
+      if (isDefined(data)) {
+        onStateChange({
+          view: data.createPetitionListView.id,
+          ...omit(data.createPetitionListView.data, ["__typename"]),
+        });
+      }
     } catch (error) {
       if (isDialogError(error)) {
         return;

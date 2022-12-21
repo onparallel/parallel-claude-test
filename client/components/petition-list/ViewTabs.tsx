@@ -26,7 +26,7 @@ import { PetitionsQueryState } from "@parallel/pages/app/petitions";
 import { SetQueryState } from "@parallel/utils/queryState";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { Reorder } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, omit } from "remeda";
 import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
@@ -50,15 +50,7 @@ export const ViewTabs = Object.assign(
   ) {
     const intl = useIntl();
     const toast = useToast();
-    const lastViews = useRef(views);
     const showGenericErrorToast = useGenericErrorToast();
-
-    useEffect(() => {
-      if (views.length && views.length != lastViews.current.length) {
-        handleViewChange(views.at(-1)!.id);
-      }
-      lastViews.current = views;
-    }, [views]);
 
     const showAskViewNameDialog = useAskViewNameDialog();
     const handleViewChange = async (viewId: string) => {
@@ -67,7 +59,7 @@ export const ViewTabs = Object.assign(
         if (isDefined(view)) {
           onStateChange({
             view: view.id,
-            ...view.data,
+            ...omit(view.data, ["__typename"]),
           });
         }
       } else {
@@ -95,7 +87,7 @@ export const ViewTabs = Object.assign(
         });
 
         await updatePetitionListView({
-          variables: { petitionListViewId: view.id, data: { name } },
+          variables: { petitionListViewId: view.id, name },
         });
       } catch (error) {
         if (isDialogError(error)) {
@@ -118,9 +110,15 @@ export const ViewTabs = Object.assign(
             <FormattedMessage id="component.view-tabs.clone-view" defaultMessage="Clone view" />
           ),
         });
-        await createPetitionListView({
+        const { data } = await createPetitionListView({
           variables: { name, data: omit(view.data, ["__typename"]) },
         });
+        if (isDefined(data)) {
+          onStateChange({
+            view: data.createPetitionListView.id,
+            ...omit(data.createPetitionListView.data, ["__typename"]),
+          });
+        }
       } catch (error) {
         if (isDialogError(error)) {
           return;
