@@ -386,8 +386,26 @@ const _mutations = [
 ];
 
 function viewsAreEqual(view1: PetitionListViewData, view2: PetitionListViewData) {
+  console.log(view1, view2);
   return (
-    equals(omit(view1, ["__typename", "sort"]), omit(view2, ["__typename", "sort"])) &&
+    equals(
+      omit(view1, ["__typename", "sharedWith", "sort"]),
+      omit(view2, ["__typename", "sharedWith", "sort"])
+    ) &&
+    equals(
+      isDefined(view1.sharedWith)
+        ? {
+            ...omit(view1.sharedWith, ["__typename"]),
+            filters: view1.sharedWith.filters.map(omit(["__typename"])),
+          }
+        : view1.sharedWith,
+      isDefined(view2.sharedWith)
+        ? {
+            ...omit(view2.sharedWith, ["__typename"]),
+            filters: view2.sharedWith.filters.map(omit(["__typename"])),
+          }
+        : view2.sharedWith
+    ) &&
     equals(
       view1.sort ?? { field: "sentAt", direction: "DESC" },
       view2.sort ?? { field: "sentAt", direction: "DESC" }
