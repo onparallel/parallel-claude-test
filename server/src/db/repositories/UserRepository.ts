@@ -27,7 +27,7 @@ export class UserRepository extends BaseRepository {
         update "user" u set last_active_at = NOW()
         from user_data ud 
         where ud.id = u.user_data_id
-        and u.deleted_at is null and ud.deleted_at is null and ud.cognito_id in ?
+        and u.status = 'ACTIVE' and u.deleted_at is null and ud.deleted_at is null and ud.cognito_id in ?
         returning u.*, ud.cognito_id as ud_cognito_id
       `,
       [this.sqlIn(cognitoIds)],
