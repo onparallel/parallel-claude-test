@@ -111,7 +111,18 @@ export const ViewTabs = Object.assign(
           ),
         });
         const { data } = await createPetitionListView({
-          variables: { name, data: omit(view.data, ["__typename"]) },
+          variables: {
+            name,
+            data: {
+              ...omit(view.data, ["__typename"]),
+              sharedWith: isDefined(view.data.sharedWith)
+                ? {
+                    ...omit(view.data.sharedWith, ["__typename"]),
+                    filters: view.data.sharedWith.filters.map(omit(["__typename"])),
+                  }
+                : view.data.sharedWith,
+            },
+          },
         });
         if (isDefined(data)) {
           onStateChange({
