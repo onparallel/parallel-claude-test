@@ -328,6 +328,7 @@ export const PetitionHeader = Object.assign(
             <HeaderNameEditable
               ref={editableRef}
               flex="1"
+              paddingRight={4}
               petition={petition}
               state={state}
               onNameChange={(name) => onUpdatePetition({ name: name || null })}

@@ -30,7 +30,7 @@ export const PetitionHeaderTab = chakraForwardRef<
         textTransform="uppercase"
         variant="ghost"
         fontWeight="normal"
-        _hover={{ color: "blue.600", backgroundColor: "white" }}
+        _hover={{ color: "blue.600" }}
         _activeLink={{ color: "blue.600", WebkitTextStrokeWidth: "0.04em" }}
         _disabled={{ color: "gray.500", cursor: "not-allowed" }}
         {...(props as any)}
