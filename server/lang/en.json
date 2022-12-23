@@ -130,6 +130,21 @@
     "context": "Why we use Parallel?"
   },
   {
+    "term": "default-petition-list-views.closed",
+    "definition": "Closed",
+    "context": "Closed"
+  },
+  {
+    "term": "default-petition-list-views.draft",
+    "definition": "Draft",
+    "context": "Draft"
+  },
+  {
+    "term": "default-petition-list-views.ongoing",
+    "definition": "Ongoing",
+    "context": "Ongoing"
+  },
+  {
     "term": "developer.webhook-error-email.subject",
     "definition": "Error: Event hook",
     "context": "Error: Event hook"

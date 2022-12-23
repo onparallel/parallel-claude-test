@@ -2,6 +2,7 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { groupBy, indexBy, omit, uniq } from "remeda";
 import { CONFIG, Config } from "../../config";
+import { I18N_SERVICE, II18nService } from "../../services/i18n";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
 import { Maybe, MaybeArray } from "../../util/types";
@@ -16,7 +17,8 @@ export class UserRepository extends BaseRepository {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(KNEX) knex: Knex,
-    private system: SystemRepository
+    private system: SystemRepository,
+    @inject(I18N_SERVICE) private intlService: II18nService
   ) {
     super(knex);
   }
@@ -285,6 +287,55 @@ export class UserRepository extends BaseRepository {
         updated_by: createdBy,
       },
       t
+    );
+
+    const intl = await this.intlService.getIntl(userData.details.preferredLocale ?? "en");
+    const defaultView = {
+      path: "/",
+      sort: null,
+      tags: null,
+      search: null,
+      status: null,
+      searchIn: "EVERYWHERE",
+      signature: null,
+      sharedWith: null,
+      fromTemplateId: null,
+    };
+    await this.insert(
+      "petition_list_view",
+      (
+        [
+          [
+            intl.formatMessage({
+              id: "default-petition-list-views.ongoing",
+              defaultMessage: "Ongoing",
+            }),
+            { ...defaultView, status: ["COMPLETED", "PENDING"] },
+          ],
+          [
+            intl.formatMessage({
+              id: "default-petition-list-views.closed",
+              defaultMessage: "Closed",
+            }),
+            { ...defaultView, status: ["CLOSED"] },
+          ],
+          [
+            intl.formatMessage({
+              id: "default-petition-list-views.draft",
+              defaultMessage: "Draft",
+            }),
+            { ...defaultView, status: ["DRAFT"] },
+          ],
+        ] as [string, any][]
+      ).map(([name, data], index) => ({
+        user_id: user.id,
+        name,
+        data: this.json(data),
+        position: index,
+        is_default: false,
+        created_by: `User:${user.id}`,
+        updated_by: `User:${user.id}`,
+      }))
     );
 
     await this.system.createEvent(
