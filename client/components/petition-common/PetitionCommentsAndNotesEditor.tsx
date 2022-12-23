@@ -1,7 +1,7 @@
-import { Box, Button, HStack, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
+import { Box, Button, HStack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { isMetaReturn } from "@parallel/utils/keys";
-import { KeyboardEvent, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { KeyboardEvent, useImperativeHandle, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { HelpPopover } from "../common/HelpPopover";
 import { RadioTab, RadioTabList } from "../common/RadioTab";

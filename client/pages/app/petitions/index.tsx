@@ -86,7 +86,7 @@ import {
 import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { MouseEvent, ReactNode, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, map, maxBy, omit, pick, pipe } from "remeda";
 
