@@ -258,6 +258,7 @@ export const AppLayout = Object.assign(
           {/* Intercom placeholder */}
           {process.env.NODE_ENV === "development" ? (
             <Circle
+              display={{ base: "none", sm: "block" }}
               backgroundColor="black"
               opacity={0.5}
               position="fixed"

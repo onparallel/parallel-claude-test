@@ -482,8 +482,12 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               direction="column"
               paddingX={4}
               paddingLeft={{ md: 0 }}
-              maxHeight={{ base: "calc(100vh - 122px)", md: "calc(100vh - 82px)" }}
-              paddingBottom="80px"
+              maxHeight={{
+                base: "calc(100vh - 188px)",
+                sm: "calc(100vh - 122px)",
+                md: "calc(100vh - 82px)",
+              }}
+              paddingBottom={{ base: 4, sm: "80px" }}
             >
               {activeField ? (
                 <PetitionComposeFieldSettings

@@ -111,7 +111,7 @@ export const PetitionRepliesFieldComments = Object.assign(
       );
 
       return (
-        <Card ref={ref} {...props} overflow="hidden">
+        <Card ref={ref} {...props} display="flex" flexDirection="column" overflow="hidden">
           <CloseableCardHeader onClose={onClose}>
             {field.title || (
               <Text fontWeight="normal" textStyle="hint">
@@ -119,7 +119,7 @@ export const PetitionRepliesFieldComments = Object.assign(
               </Text>
             )}
           </CloseableCardHeader>
-          <Box overflow="auto" ref={commentsRef}>
+          <Box overflow="auto" flex={1} ref={commentsRef}>
             {loading && !comments.length ? (
               <Center minHeight={44}>
                 <Spinner

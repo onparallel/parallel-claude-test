@@ -564,8 +564,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             direction="column"
             paddingX={4}
             paddingLeft={{ md: 0 }}
-            maxHeight={{ base: "calc(100vh - 178px)", md: "calc(100vh - 138px)" }}
-            paddingBottom="80px"
+            maxHeight={{
+              base: "calc(100vh - 244px)",
+              sm: "calc(100vh - 178px)",
+              md: "calc(100vh - 138px)",
+            }}
+            paddingBottom={{ base: 4, sm: "80px" }}
           >
             {activeFieldId && !!activeField ? (
               <PetitionRepliesFieldComments
