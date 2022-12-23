@@ -1,7 +1,6 @@
 import { Box, Flex, PositionProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import useMergedRef from "@react-hook/merged-ref";
-import { ReactNode, useRef } from "react";
+import { ReactNode } from "react";
 
 export interface PaneWithFlyoutProps {
   isSidePaneActive: boolean;
@@ -14,12 +13,8 @@ export const TwoPaneLayout = chakraForwardRef<"div", PaneWithFlyoutProps>(functi
   { isSidePaneActive, sidePane, top = 0, children, ...props },
   ref
 ) {
-  const flyoutRef = useRef<HTMLDivElement>(null);
-  const paneRef = useRef<HTMLDivElement>(null);
-  const _paneRef = useMergedRef(ref, paneRef);
-
   return (
-    <Flex ref={_paneRef} minHeight="100%" {...props}>
+    <Flex ref={ref} minHeight="100%" {...props}>
       <Box
         flex="2"
         minWidth={0}
@@ -33,7 +28,7 @@ export const TwoPaneLayout = chakraForwardRef<"div", PaneWithFlyoutProps>(functi
         display={{ base: isSidePaneActive ? "block" : "none", md: "block" }}
       >
         {sidePane ? (
-          <Box ref={flyoutRef} position={{ base: "relative", md: "sticky" }} top={top}>
+          <Box position={{ base: "relative", md: "sticky" }} top={top}>
             {sidePane}
           </Box>
         ) : null}
