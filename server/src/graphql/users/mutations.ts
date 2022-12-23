@@ -109,10 +109,16 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     "Creates a new user in the same organization as the context user if `orgId` is not provided",
   type: "User",
   authorize: authenticateAnd(
-    orgDoesNotHaveSsoProvider(),
-    orgCanCreateNewUser(),
-    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never)),
-    ifArgDefined("orgId", userIsSuperAdmin(), contextUserHasRole("ADMIN")),
+    ifArgDefined(
+      "orgId",
+      userIsSuperAdmin(),
+      and(
+        orgDoesNotHaveSsoProvider(),
+        orgCanCreateNewUser(),
+        contextUserHasRole("ADMIN"),
+        ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never))
+      )
+    ),
     emailIsNotRegisteredInTargetOrg("email", "orgId" as never)
   ),
   args: {
