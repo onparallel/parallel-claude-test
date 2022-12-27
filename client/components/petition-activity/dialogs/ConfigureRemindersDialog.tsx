@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Alert,
   AlertDescription,
@@ -93,6 +94,30 @@ export function ConfigureRemindersDialog({
     />
   );
 }
+
+useConfigureRemindersDialog.fragments = {
+  RemindersConfig: gql`
+    fragment useConfigureRemindersDialog_RemindersConfig on RemindersConfig {
+      ...PetitionRemindersConfig_RemindersConfig
+    }
+
+    ${PetitionRemindersConfig.fragments.RemindersConfig}
+  `,
+
+  PetitionAccess: gql`
+    fragment useConfigureRemindersDialog_PetitionAccess on PetitionAccess {
+      id
+      contact {
+        ...ContactReference_Contact
+      }
+      remindersConfig {
+        ...PetitionRemindersConfig_RemindersConfig
+      }
+    }
+    ${ContactReference.fragments.Contact}
+    ${PetitionRemindersConfig.fragments.RemindersConfig}
+  `,
+};
 
 export function useConfigureRemindersDialog() {
   return useDialog(ConfigureRemindersDialog);

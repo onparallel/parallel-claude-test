@@ -3724,6 +3724,8 @@ export type ReminderSentEvent = PetitionEvent & {
 
 /** The reminder settings of a petition */
 export type RemindersConfig = {
+  /** The maximum amount of reminders. */
+  limit: Scalars["Int"];
   /** The amount of days between reminders. */
   offset: Scalars["Int"];
   /** The time at which the reminder should be sent. */
@@ -3736,6 +3738,8 @@ export type RemindersConfig = {
 
 /** The reminders settings for the petition */
 export type RemindersConfigInput = {
+  /** The maximum amount of reminders. */
+  limit: Scalars["Int"];
   /** The amount of days between reminders. */
   offset: Scalars["Int"];
   /** The time at which the reminder should be sent. */

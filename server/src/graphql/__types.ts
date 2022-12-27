@@ -209,6 +209,7 @@ export interface NexusGenInputs {
   };
   RemindersConfigInput: {
     // input type
+    limit: number; // Int!
     offset: number; // Int!
     time: string; // String!
     timezone: string; // String!
@@ -785,6 +786,7 @@ export interface NexusGenObjects {
   ReminderSentEvent: events.ReminderSentEvent;
   RemindersConfig: {
     offset: number;
+    limit: number;
     time: string;
     timezone: string;
     weekdaysOnly: boolean;
@@ -2278,6 +2280,7 @@ export interface NexusGenFieldTypes {
   };
   RemindersConfig: {
     // field return type
+    limit: number; // Int!
     offset: number; // Int!
     time: string; // String!
     timezone: string; // String!
@@ -4065,6 +4068,7 @@ export interface NexusGenFieldTypeNames {
   };
   RemindersConfig: {
     // field return type name
+    limit: "Int";
     offset: "Int";
     time: "String";
     timezone: "String";

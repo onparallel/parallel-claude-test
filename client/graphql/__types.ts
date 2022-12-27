@@ -3848,6 +3848,8 @@ export interface ReminderSentEvent extends PetitionEvent {
 /** The reminder settings of a petition */
 export interface RemindersConfig {
   __typename?: "RemindersConfig";
+  /** The maximum amount of reminders. */
+  limit: Scalars["Int"];
   /** The amount of days between reminders. */
   offset: Scalars["Int"];
   /** The time at which the reminder should be sent. */
@@ -3860,6 +3862,8 @@ export interface RemindersConfig {
 
 /** The reminders settings for the petition */
 export interface RemindersConfigInput {
+  /** The maximum amount of reminders. */
+  limit: Scalars["Int"];
   /** The amount of days between reminders. */
   offset: Scalars["Int"];
   /** The time at which the reminder should be sent. */
@@ -6475,6 +6479,7 @@ export type PetitionAccessTable_PetitionFragment = {
     remindersConfig?: {
       __typename?: "RemindersConfig";
       offset: number;
+      limit: number;
       time: string;
       timezone: string;
       weekdaysOnly: boolean;
@@ -6510,6 +6515,7 @@ export type PetitionAccessTable_PetitionAccessFragment = {
   remindersConfig?: {
     __typename?: "RemindersConfig";
     offset: number;
+    limit: number;
     time: string;
     timezone: string;
     weekdaysOnly: boolean;
@@ -7804,6 +7810,7 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   remindersConfig?: {
     __typename?: "RemindersConfig";
     offset: number;
+    limit: number;
     time: string;
     timezone: string;
     weekdaysOnly: boolean;
@@ -7890,6 +7897,7 @@ export type AddPetitionAccessDialog_createPetitionAccessMutation = {
       remindersConfig?: {
         __typename?: "RemindersConfig";
         offset: number;
+        limit: number;
         time: string;
         timezone: string;
         weekdaysOnly: boolean;
@@ -7921,6 +7929,29 @@ export type AddPetitionAccessDialog_createPetitionAccessMutation = {
       defaultOnBehalf?: { __typename?: "User"; id: string } | null;
     } | null;
   };
+};
+
+export type useConfigureRemindersDialog_RemindersConfigFragment = {
+  __typename?: "RemindersConfig";
+  offset: number;
+  limit: number;
+  time: string;
+  timezone: string;
+  weekdaysOnly: boolean;
+};
+
+export type useConfigureRemindersDialog_PetitionAccessFragment = {
+  __typename?: "PetitionAccess";
+  id: string;
+  contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+  remindersConfig?: {
+    __typename?: "RemindersConfig";
+    offset: number;
+    limit: number;
+    time: string;
+    timezone: string;
+    weekdaysOnly: boolean;
+  } | null;
 };
 
 export type ConfirmDeactivateAccessDialog_PetitionAccessFragment = {
@@ -9774,6 +9805,7 @@ export type useSendPetitionHandler_PetitionFragment = {
   remindersConfig?: {
     __typename?: "RemindersConfig";
     offset: number;
+    limit: number;
     time: string;
     timezone: string;
     weekdaysOnly: boolean;
@@ -9890,6 +9922,7 @@ export type useSendPetitionHandler_addPetitionPermissionMutation = {
         remindersConfig?: {
           __typename?: "RemindersConfig";
           offset: number;
+          limit: number;
           time: string;
           timezone: string;
           weekdaysOnly: boolean;
@@ -10675,6 +10708,15 @@ export type PetitionFieldVisibilityEditor_PetitionFieldFragment = {
   title?: string | null;
 };
 
+export type PetitionRemindersConfig_RemindersConfigFragment = {
+  __typename?: "RemindersConfig";
+  offset: number;
+  limit: number;
+  time: string;
+  timezone: string;
+  weekdaysOnly: boolean;
+};
+
 export type PetitionSettings_UserFragment = {
   __typename?: "User";
   id: string;
@@ -10795,6 +10837,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   remindersConfig?: {
     __typename?: "RemindersConfig";
     offset: number;
+    limit: number;
     time: string;
     timezone: string;
     weekdaysOnly: boolean;
@@ -16138,6 +16181,7 @@ export type PetitionActivity_PetitionFragment = {
     remindersConfig?: {
       __typename?: "RemindersConfig";
       offset: number;
+      limit: number;
       time: string;
       timezone: string;
       weekdaysOnly: boolean;
@@ -16862,6 +16906,7 @@ export type PetitionActivity_PetitionFragment = {
   remindersConfig?: {
     __typename?: "RemindersConfig";
     offset: number;
+    limit: number;
     time: string;
     timezone: string;
     weekdaysOnly: boolean;
@@ -16964,6 +17009,7 @@ export type PetitionActivity_updatePetitionMutation = {
           remindersConfig?: {
             __typename?: "RemindersConfig";
             offset: number;
+            limit: number;
             time: string;
             timezone: string;
             weekdaysOnly: boolean;
@@ -17727,6 +17773,7 @@ export type PetitionActivity_updatePetitionMutation = {
         remindersConfig?: {
           __typename?: "RemindersConfig";
           offset: number;
+          limit: number;
           time: string;
           timezone: string;
           weekdaysOnly: boolean;
@@ -17846,6 +17893,7 @@ export type PetitionActivity_petitionQuery = {
           remindersConfig?: {
             __typename?: "RemindersConfig";
             offset: number;
+            limit: number;
             time: string;
             timezone: string;
             weekdaysOnly: boolean;
@@ -18609,6 +18657,7 @@ export type PetitionActivity_petitionQuery = {
         remindersConfig?: {
           __typename?: "RemindersConfig";
           offset: number;
+          limit: number;
           time: string;
           timezone: string;
           weekdaysOnly: boolean;
@@ -18832,6 +18881,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   remindersConfig?: {
     __typename?: "RemindersConfig";
     offset: number;
+    limit: number;
     time: string;
     timezone: string;
     weekdaysOnly: boolean;
@@ -18905,6 +18955,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   remindersConfig?: {
     __typename?: "RemindersConfig";
     offset: number;
+    limit: number;
     time: string;
     timezone: string;
     weekdaysOnly: boolean;
@@ -19155,6 +19206,7 @@ export type PetitionCompose_updatePetitionMutation = {
         remindersConfig?: {
           __typename?: "RemindersConfig";
           offset: number;
+          limit: number;
           time: string;
           timezone: string;
           weekdaysOnly: boolean;
@@ -19204,6 +19256,7 @@ export type PetitionCompose_updatePetitionMutation = {
         remindersConfig?: {
           __typename?: "RemindersConfig";
           offset: number;
+          limit: number;
           time: string;
           timezone: string;
           weekdaysOnly: boolean;
@@ -19836,6 +19889,7 @@ export type PetitionCompose_petitionQuery = {
         remindersConfig?: {
           __typename?: "RemindersConfig";
           offset: number;
+          limit: number;
           time: string;
           timezone: string;
           weekdaysOnly: boolean;
@@ -19908,6 +19962,7 @@ export type PetitionCompose_petitionQuery = {
         remindersConfig?: {
           __typename?: "RemindersConfig";
           offset: number;
+          limit: number;
           time: string;
           timezone: string;
           weekdaysOnly: boolean;
@@ -20873,6 +20928,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   remindersConfig?: {
     __typename?: "RemindersConfig";
     offset: number;
+    limit: number;
     time: string;
     timezone: string;
     weekdaysOnly: boolean;
@@ -21265,6 +21321,7 @@ export type PetitionPreview_updatePetitionMutation = {
         remindersConfig?: {
           __typename?: "RemindersConfig";
           offset: number;
+          limit: number;
           time: string;
           timezone: string;
           weekdaysOnly: boolean;
@@ -21609,6 +21666,7 @@ export type PetitionPreview_completePetitionMutation = {
     remindersConfig?: {
       __typename?: "RemindersConfig";
       offset: number;
+      limit: number;
       time: string;
       timezone: string;
       weekdaysOnly: boolean;
@@ -21811,6 +21869,7 @@ export type PetitionPreview_petitionQuery = {
         remindersConfig?: {
           __typename?: "RemindersConfig";
           offset: number;
+          limit: number;
           time: string;
           timezone: string;
           weekdaysOnly: boolean;
@@ -27333,6 +27392,29 @@ export const CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragmentDoc = gq
     isDefault
   }
 ` as unknown as DocumentNode<CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment, unknown>;
+export const PetitionAccessTable_PetitionAccessRemindersConfigFragmentDoc = gql`
+  fragment PetitionAccessTable_PetitionAccessRemindersConfig on RemindersConfig {
+    offset
+    time
+    timezone
+    weekdaysOnly
+  }
+` as unknown as DocumentNode<PetitionAccessTable_PetitionAccessRemindersConfigFragment, unknown>;
+export const PetitionRemindersConfig_RemindersConfigFragmentDoc = gql`
+  fragment PetitionRemindersConfig_RemindersConfig on RemindersConfig {
+    offset
+    limit
+    time
+    timezone
+    weekdaysOnly
+  }
+` as unknown as DocumentNode<PetitionRemindersConfig_RemindersConfigFragment, unknown>;
+export const useConfigureRemindersDialog_RemindersConfigFragmentDoc = gql`
+  fragment useConfigureRemindersDialog_RemindersConfig on RemindersConfig {
+    ...PetitionRemindersConfig_RemindersConfig
+  }
+  ${PetitionRemindersConfig_RemindersConfigFragmentDoc}
+` as unknown as DocumentNode<useConfigureRemindersDialog_RemindersConfigFragment, unknown>;
 export const CreateFolderDialog_PetitionBaseFragmentDoc = gql`
   fragment CreateFolderDialog_PetitionBase on PetitionBase {
     id
@@ -28366,14 +28448,19 @@ export const PetitionLayout_PetitionBaseFragmentDoc = gql`
   ${useConfirmDiscardDraftDialog_PetitionBaseFragmentDoc}
   ${PetitionHeader_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionLayout_PetitionBaseFragment, unknown>;
-export const PetitionAccessTable_PetitionAccessRemindersConfigFragmentDoc = gql`
-  fragment PetitionAccessTable_PetitionAccessRemindersConfig on RemindersConfig {
-    offset
-    time
-    timezone
-    weekdaysOnly
+export const useConfigureRemindersDialog_PetitionAccessFragmentDoc = gql`
+  fragment useConfigureRemindersDialog_PetitionAccess on PetitionAccess {
+    id
+    contact {
+      ...ContactReference_Contact
+    }
+    remindersConfig {
+      ...PetitionRemindersConfig_RemindersConfig
+    }
   }
-` as unknown as DocumentNode<PetitionAccessTable_PetitionAccessRemindersConfigFragment, unknown>;
+  ${ContactReference_ContactFragmentDoc}
+  ${PetitionRemindersConfig_RemindersConfigFragmentDoc}
+` as unknown as DocumentNode<useConfigureRemindersDialog_PetitionAccessFragment, unknown>;
 export const PetitionAccessTable_PetitionAccessFragmentDoc = gql`
   fragment PetitionAccessTable_PetitionAccess on PetitionAccess {
     id
@@ -28386,15 +28473,13 @@ export const PetitionAccessTable_PetitionAccessFragmentDoc = gql`
     reminderCount
     remindersActive
     remindersOptOut
-    remindersConfig {
-      ...PetitionAccessTable_PetitionAccessRemindersConfig
-    }
     isContactless
     recipientUrl
     createdAt
+    ...useConfigureRemindersDialog_PetitionAccess
   }
   ${ContactReference_ContactFragmentDoc}
-  ${PetitionAccessTable_PetitionAccessRemindersConfigFragmentDoc}
+  ${useConfigureRemindersDialog_PetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<PetitionAccessTable_PetitionAccessFragment, unknown>;
 export const PetitionAccessTable_PetitionFragmentDoc = gql`
   fragment PetitionAccessTable_Petition on Petition {
@@ -29340,10 +29425,7 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
       }
     }
     remindersConfig {
-      offset
-      time
-      timezone
-      weekdaysOnly
+      ...PetitionRemindersConfig_RemindersConfig
     }
     organization {
       id
@@ -29365,6 +29447,7 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
   ${ConfirmPetitionSignersDialog_PetitionSignatureRequestFragmentDoc}
   ${CopySignatureConfigDialog_PetitionSignerFragmentDoc}
   ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
+  ${PetitionRemindersConfig_RemindersConfigFragmentDoc}
   ${ConfirmPetitionSignersDialog_PetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<AddPetitionAccessDialog_PetitionFragment, unknown>;
 export const useSendPetitionHandler_PetitionFragmentDoc = gql`
@@ -29609,6 +29692,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
       ...PublicLinkSettingsDialog_PetitionTemplate
       remindersConfig {
         offset
+        limit
         time
         timezone
         weekdaysOnly

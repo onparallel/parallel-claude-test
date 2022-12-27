@@ -3,6 +3,7 @@ import { format, utcToZonedTime, toDate } from "date-fns-tz";
 
 export type PetitionAccessReminderConfig = {
   offset: number;
+  limit?: number;
   time: string;
   timezone: string;
   weekdaysOnly: boolean;

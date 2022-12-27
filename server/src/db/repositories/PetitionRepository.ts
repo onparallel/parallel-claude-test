@@ -5644,7 +5644,7 @@ export class PetitionRepository extends BaseRepository {
           petition_id: petition.id,
           contact_id: contactId,
           delegate_granter_id: userDelegate ? user.id : null,
-          reminders_left: 10,
+          reminders_left: remindersConfig?.limit ?? 10,
           reminders_active: Boolean(remindersConfig),
           reminders_config: remindersConfig,
           next_reminder_at: remindersConfig

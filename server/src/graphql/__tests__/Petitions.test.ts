@@ -2333,6 +2333,7 @@ describe("GraphQL/Petitions", () => {
               ... on Petition {
                 remindersConfig {
                   offset
+                  limit
                   time
                   timezone
                   weekdaysOnly
@@ -2346,6 +2347,7 @@ describe("GraphQL/Petitions", () => {
           petitionId: toGlobalId("Petition", petitions[4].id),
           remindersConfig: {
             offset: 1,
+            limit: 9,
             time: "12:45",
             timezone: "Europe/Madrid",
             weekdaysOnly: false,
@@ -2359,6 +2361,7 @@ describe("GraphQL/Petitions", () => {
         id: toGlobalId("Petition", petitions[4].id),
         remindersConfig: {
           offset: 1,
+          limit: 9,
           time: "12:45",
           timezone: "Europe/Madrid",
           weekdaysOnly: false,
@@ -4844,6 +4847,7 @@ describe("GraphQL/Petitions", () => {
           start: true,
           remindersConfig: {
             offset: 10,
+            limit: 10,
             time: "10:45",
             timezone: "Europe/Madrid",
             weekdaysOnly: false,
@@ -4883,6 +4887,7 @@ describe("GraphQL/Petitions", () => {
           start: true,
           remindersConfig: {
             offset: 10,
+            limit: 10,
             time: "10:45",
             timezone: "Europe/Madrid",
             weekdaysOnly: false,
@@ -4922,6 +4927,7 @@ describe("GraphQL/Petitions", () => {
           start: true,
           remindersConfig: {
             offset: 10,
+            limit: 10,
             time: "10:45",
             timezone: "Europe/Madrid",
             weekdaysOnly: false,
@@ -4952,6 +4958,7 @@ describe("GraphQL/Petitions", () => {
               remindersActive
               remindersConfig {
                 offset
+                limit
                 time
                 timezone
                 weekdaysOnly
@@ -4965,6 +4972,7 @@ describe("GraphQL/Petitions", () => {
           start: true,
           remindersConfig: {
             offset: 10,
+            limit: 10,
             time: "10:45",
             timezone: "Europe/Madrid",
             weekdaysOnly: false,
@@ -4978,6 +4986,7 @@ describe("GraphQL/Petitions", () => {
           remindersActive: true,
           remindersConfig: {
             offset: 10,
+            limit: 10,
             time: "10:45",
             timezone: "Europe/Madrid",
             weekdaysOnly: false,
@@ -5005,6 +5014,7 @@ describe("GraphQL/Petitions", () => {
               nextReminderAt
               remindersConfig {
                 offset
+                limit
                 time
                 timezone
                 weekdaysOnly
@@ -5026,6 +5036,7 @@ describe("GraphQL/Petitions", () => {
           nextReminderAt: null,
           remindersConfig: {
             offset: 10,
+            limit: 10,
             time: "10:45",
             timezone: "Europe/Madrid",
             weekdaysOnly: false,

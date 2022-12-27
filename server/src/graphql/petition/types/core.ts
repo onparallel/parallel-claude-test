@@ -663,6 +663,9 @@ export const RemindersConfig = objectType({
     t.int("offset", {
       description: "The amount of days between reminders.",
     });
+    t.int("limit", {
+      description: "The maximum amount of reminders.",
+    });
     t.string("time", {
       description: "The time at which the reminder should be sent.",
     });
@@ -675,6 +678,7 @@ export const RemindersConfig = objectType({
   },
   sourceType: /* ts */ `{
     offset: number;
+    limit: number;
     time: string;
     timezone: string;
     weekdaysOnly: boolean;

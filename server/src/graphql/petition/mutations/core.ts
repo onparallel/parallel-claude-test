@@ -483,6 +483,9 @@ export const RemindersConfigInput = inputObjectType({
     t.nonNull.int("offset", {
       description: "The amount of days between reminders.",
     });
+    t.nonNull.int("limit", {
+      description: "The maximum amount of reminders.",
+    });
     t.nonNull.string("time", {
       description: "The time at which the reminder should be sent.",
     });

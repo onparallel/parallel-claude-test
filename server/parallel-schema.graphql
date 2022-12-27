@@ -5053,6 +5053,11 @@ The reminder settings of a petition
 """
 type RemindersConfig {
   """
+  The maximum amount of reminders.
+  """
+  limit: Int!
+
+  """
   The amount of days between reminders.
   """
   offset: Int!
@@ -5077,6 +5082,11 @@ type RemindersConfig {
 The reminders settings for the petition
 """
 input RemindersConfigInput {
+  """
+  The maximum amount of reminders.
+  """
+  limit: Int!
+
   """
   The amount of days between reminders.
   """

@@ -894,6 +894,7 @@ const fragments = {
         ...PublicLinkSettingsDialog_PetitionTemplate
         remindersConfig {
           offset
+          limit
           time
           timezone
           weekdaysOnly

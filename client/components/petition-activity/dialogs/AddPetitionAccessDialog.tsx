@@ -539,10 +539,7 @@ AddPetitionAccessDialog.fragments = {
         }
       }
       remindersConfig {
-        offset
-        time
-        timezone
-        weekdaysOnly
+        ...PetitionRemindersConfig_RemindersConfig
       }
       organization {
         id
@@ -561,6 +558,7 @@ AddPetitionAccessDialog.fragments = {
         id
       }
     }
+    ${PetitionRemindersConfig.fragments.RemindersConfig}
     ${CopySignatureConfigDialog.fragments.PetitionSigner}
     ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
     ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}

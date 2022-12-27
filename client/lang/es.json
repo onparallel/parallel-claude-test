@@ -3426,8 +3426,8 @@
   },
   {
     "term": "component.petition-reminder-settings.text",
-    "definition": "Enviar recordatorios cada <days-input></days-input> días a las <time-input></time-input>",
-    "context": "Send reminders every <days-input></days-input> days at <time-input></time-input>"
+    "definition": "Enviar cada <days-input></days-input> días a las <time-input></time-input> hasta <limit-input></limit-input> recordatorios.",
+    "context": "Send every <days-input></days-input> days at <time-input></time-input> up to <limit-input></limit-input> reminders."
   },
   {
     "term": "component.petition-replies-field.attachments",

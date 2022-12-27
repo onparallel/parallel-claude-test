@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Box,
   BoxProps,
@@ -64,6 +65,7 @@ export function PetitionRemindersConfig({
 
   const defaultRemindersConfig = {
     offset: 2,
+    limit: 10,
     time: sendTime,
     timezone,
     weekdaysOnly: true,
@@ -117,13 +119,14 @@ export function PetitionRemindersConfig({
           borderColor="gray.300"
           borderRadius="md"
         >
-          <Flex alignItems="center">
+          <Flex alignItems="center" whiteSpace="nowrap" flexWrap="wrap" lineHeight="9">
             <FormattedMessage
               id="component.petition-reminder-settings.text"
-              defaultMessage="Send reminders every <days-input></days-input> days at <time-input></time-input>"
+              defaultMessage="Send every <days-input></days-input> days at <time-input></time-input> up to <limit-input></limit-input> reminders."
               values={{
                 "days-input": () => (
                   <NumberInput
+                    lineHeight="1"
                     min={1}
                     max={99}
                     value={value.offset}
@@ -149,13 +152,40 @@ export function PetitionRemindersConfig({
                 ),
                 "time-input": () => (
                   <Input
+                    lineHeight="1"
                     type="time"
                     size="sm"
-                    width="120px"
+                    width="116px"
                     marginX={2}
                     step={5 * 60}
                     {...timeInput}
                   />
+                ),
+                "limit-input": () => (
+                  <NumberInput
+                    lineHeight="1"
+                    min={1}
+                    max={10}
+                    value={value.limit}
+                    onChange={(_, limit) =>
+                      onChange({
+                        ...value,
+                        timezone,
+                        limit: Number.isInteger(limit) ? limit : 10,
+                      })
+                    }
+                    size="sm"
+                    width="64px"
+                    marginX={2}
+                    keepWithinRange
+                    clampValueOnBlur
+                  >
+                    <NumberInputField type="number" />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
                 ),
               }}
             />
@@ -200,3 +230,15 @@ export function PetitionRemindersConfig({
     </Box>
   );
 }
+
+PetitionRemindersConfig.fragments = {
+  RemindersConfig: gql`
+    fragment PetitionRemindersConfig_RemindersConfig on RemindersConfig {
+      offset
+      limit
+      time
+      timezone
+      weekdaysOnly
+    }
+  `,
+};
