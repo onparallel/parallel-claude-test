@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Stack, Text } from "@chakra-ui/react";
+import { Stack, Text } from "@chakra-ui/react";
 import { EmailIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
