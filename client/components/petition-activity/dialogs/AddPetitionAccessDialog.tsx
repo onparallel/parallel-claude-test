@@ -89,7 +89,7 @@ export function AddPetitionAccessDialog({
 }: DialogProps<AddPetitionAccessDialogProps, AddPetitionAccessDialogResult>) {
   const [showErrors, setShowErrors] = useState(false);
   const [recipientGroups, setRecipientGroups] = useState<ContactSelectSelection[][]>([[]]);
-  const [sendAsId, setSendAsId] = useState(user.id);
+  const [sendAsId, setSendAsId] = useState(petition.defaultOnBehalf?.id ?? user.id);
   const [accesses, setAccesses] = useState(petition.accesses);
 
   const [subscribeSender, setSubscribeSender] = useState(false);
@@ -383,7 +383,7 @@ export function AddPetitionAccessDialog({
           ) : null}
           {showSendAs ? (
             <Stack paddingBottom={4}>
-              <Text>
+              <Text fontWeight={500}>
                 <FormattedMessage
                   id="component.add-petition-access-dialog.send-as"
                   defaultMessage="Send as..."
@@ -548,6 +548,9 @@ AddPetitionAccessDialog.fragments = {
         isContactless
         recipientUrl
         ...ConfirmPetitionSignersDialog_PetitionAccess
+      }
+      defaultOnBehalf {
+        id
       }
     }
     ${CopySignatureConfigDialog.fragments.PetitionSigner}

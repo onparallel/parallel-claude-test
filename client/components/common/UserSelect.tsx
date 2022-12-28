@@ -212,6 +212,7 @@ export const UserSelect = Object.assign(
         getOptionLabel={getOptionLabel}
         getOptionValue={getOptionValue}
         placeholder={placeholder}
+        isClearable={props.isClearable}
         {...rsProps}
         {...(extensions as any)}
       />
@@ -225,6 +226,7 @@ export const UserSelect = Object.assign(
         getOptionLabel={getOptionLabel}
         getOptionValue={getOptionValue}
         placeholder={placeholder}
+        isClearable={props.isClearable}
         {...rsProps}
         {...(extensions as any)}
       />

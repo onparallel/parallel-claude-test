@@ -256,6 +256,7 @@ export interface NexusGenInputs {
     completingMessageBody?: NexusGenScalars["JSON"] | null; // JSON
     completingMessageSubject?: string | null; // String
     deadline?: NexusGenScalars["DateTime"] | null; // DateTime
+    defaultOnBehalfId?: NexusGenScalars["GID"] | null; // GID
     defaultPath?: string | null; // String
     description?: NexusGenScalars["JSON"] | null; // JSON
     emailBody?: NexusGenScalars["JSON"] | null; // JSON
@@ -1568,6 +1569,7 @@ export interface NexusGenFieldTypes {
     currentSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"] | null; // PetitionSignatureRequest
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
+    defaultOnBehalf: NexusGenRootTypes["User"] | null; // User
     effectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
@@ -3352,6 +3354,7 @@ export interface NexusGenFieldTypeNames {
     currentSignatureRequest: "PetitionSignatureRequest";
     customProperties: "JSONObject";
     deadline: "DateTime";
+    defaultOnBehalf: "User";
     effectivePermissions: "EffectivePetitionUserPermission";
     emailBody: "JSON";
     emailSubject: "String";

@@ -3885,6 +3885,11 @@
     "context": "Parallel message"
   },
   {
+    "term": "component.petition-template-request-message.send-as",
+    "definition": "Send as...",
+    "context": "Send as..."
+  },
+  {
     "term": "component.petition-template.delete-label",
     "definition": "Delete template",
     "context": "Delete template"

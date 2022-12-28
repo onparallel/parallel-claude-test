@@ -2440,6 +2440,7 @@ type Petition implements PetitionBase {
   The deadline of the petition.
   """
   deadline: DateTime
+  defaultOnBehalf: User
 
   """
   The effective permissions on the petition
@@ -5547,6 +5548,7 @@ input UpdatePetitionInput {
   completingMessageBody: JSON
   completingMessageSubject: String
   deadline: DateTime
+  defaultOnBehalfId: GID
   defaultPath: String
   description: JSON
   emailBody: JSON

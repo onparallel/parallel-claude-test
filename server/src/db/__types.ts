@@ -830,6 +830,7 @@ export interface Petition {
   path: string; // text
   default_path: string; // text
   latest_signature_status: Maybe<string>; // varchar
+  send_on_behalf_user_id: Maybe<number>; // int4
 }
 
 export type CreatePetition = PartialProps<
@@ -874,6 +875,7 @@ export type CreatePetition = PartialProps<
   | "path"
   | "default_path"
   | "latest_signature_status"
+  | "send_on_behalf_user_id"
 >;
 
 export interface PetitionAccess {

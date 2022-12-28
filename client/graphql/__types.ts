@@ -2191,6 +2191,7 @@ export interface Petition extends PetitionBase {
   customProperties: Scalars["JSONObject"];
   /** The deadline of the petition. */
   deadline?: Maybe<Scalars["DateTime"]>;
+  defaultOnBehalf?: Maybe<User>;
   /** The effective permissions on the petition */
   effectivePermissions: Array<EffectivePetitionUserPermission>;
   /** The body of the petition. */
@@ -4209,6 +4210,7 @@ export interface UpdatePetitionInput {
   completingMessageBody?: InputMaybe<Scalars["JSON"]>;
   completingMessageSubject?: InputMaybe<Scalars["String"]>;
   deadline?: InputMaybe<Scalars["DateTime"]>;
+  defaultOnBehalfId?: InputMaybe<Scalars["GID"]>;
   defaultPath?: InputMaybe<Scalars["String"]>;
   description?: InputMaybe<Scalars["JSON"]>;
   emailBody?: InputMaybe<Scalars["JSON"]>;
@@ -7828,6 +7830,7 @@ export type AddPetitionAccessDialog_PetitionFragment = {
       lastName?: string | null;
     } | null;
   }>;
+  defaultOnBehalf?: { __typename?: "User"; id: string } | null;
 };
 
 export type AddPetitionAccessDialog_createPetitionAccessMutationVariables = Exact<{
@@ -7913,6 +7916,7 @@ export type AddPetitionAccessDialog_createPetitionAccessMutation = {
           lastName?: string | null;
         } | null;
       }>;
+      defaultOnBehalf?: { __typename?: "User"; id: string } | null;
     } | null;
   };
 };
@@ -9782,6 +9786,7 @@ export type useSendPetitionHandler_PetitionFragment = {
       used: number;
     } | null;
   };
+  defaultOnBehalf?: { __typename?: "User"; id: string } | null;
 };
 
 export type useSendPetitionHandler_sendPetitionMutationVariables = Exact<{
@@ -9897,6 +9902,7 @@ export type useSendPetitionHandler_addPetitionPermissionMutation = {
             used: number;
           } | null;
         };
+        defaultOnBehalf?: { __typename?: "User"; id: string } | null;
       }
     | { __typename?: "PetitionTemplate" }
   >;
@@ -11483,6 +11489,12 @@ export type PetitionTemplateRequestMessageCard_PetitionTemplateFragment = {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
   } | null;
+};
+
+export type PetitionTemplateRequestMessageCard_UserFragment = {
+  __typename?: "User";
+  id: string;
+  hasOnBehalfOf: boolean;
 };
 
 export type FolderCard_PetitionFolderFragment = {
@@ -16855,6 +16867,7 @@ export type PetitionActivity_PetitionFragment = {
       used: number;
     } | null;
   };
+  defaultOnBehalf?: { __typename?: "User"; id: string } | null;
 };
 
 export type PetitionActivity_QueryFragment = {
@@ -17719,6 +17732,7 @@ export type PetitionActivity_updatePetitionMutation = {
             used: number;
           } | null;
         };
+        defaultOnBehalf?: { __typename?: "User"; id: string } | null;
       }
     | { __typename?: "PetitionTemplate" };
 };
@@ -18600,6 +18614,7 @@ export type PetitionActivity_petitionQuery = {
             used: number;
           } | null;
         };
+        defaultOnBehalf?: { __typename?: "User"; id: string } | null;
       }
     | { __typename?: "PetitionTemplate" }
     | null;
@@ -18812,6 +18827,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     timezone: string;
     weekdaysOnly: boolean;
   } | null;
+  defaultOnBehalf?: { __typename?: "User"; id: string } | null;
 };
 
 export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
@@ -19158,6 +19174,7 @@ export type PetitionCompose_updatePetitionMutation = {
             email: string;
           } | null;
         }>;
+        defaultOnBehalf?: { __typename?: "User"; id: string } | null;
       }
     | {
         __typename: "PetitionTemplate";
@@ -19814,6 +19831,7 @@ export type PetitionCompose_petitionQuery = {
           timezone: string;
           weekdaysOnly: boolean;
         } | null;
+        defaultOnBehalf?: { __typename?: "User"; id: string } | null;
       }
     | {
         __typename: "PetitionTemplate";
@@ -20032,6 +20050,7 @@ export type PetitionMessages_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -20072,6 +20091,7 @@ export type PetitionMessages_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -20830,6 +20850,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     timezone: string;
     weekdaysOnly: boolean;
   } | null;
+  defaultOnBehalf?: { __typename?: "User"; id: string } | null;
 };
 
 export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
@@ -21221,6 +21242,7 @@ export type PetitionPreview_updatePetitionMutation = {
           timezone: string;
           weekdaysOnly: boolean;
         } | null;
+        defaultOnBehalf?: { __typename?: "User"; id: string } | null;
       }
     | {
         __typename?: "PetitionTemplate";
@@ -21564,6 +21586,7 @@ export type PetitionPreview_completePetitionMutation = {
       timezone: string;
       weekdaysOnly: boolean;
     } | null;
+    defaultOnBehalf?: { __typename?: "User"; id: string } | null;
   };
 };
 
@@ -21765,6 +21788,7 @@ export type PetitionPreview_petitionQuery = {
           timezone: string;
           weekdaysOnly: boolean;
         } | null;
+        defaultOnBehalf?: { __typename?: "User"; id: string } | null;
       }
     | {
         __typename?: "PetitionTemplate";
@@ -29267,6 +29291,9 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
       recipientUrl
       ...ConfirmPetitionSignersDialog_PetitionAccess
     }
+    defaultOnBehalf {
+      id
+    }
   }
   ${ConfirmPetitionSignersDialog_PetitionSignatureRequestFragmentDoc}
   ${CopySignatureConfigDialog_PetitionSignerFragmentDoc}
@@ -29926,11 +29953,21 @@ export const PetitionMessages_PetitionBaseFragmentDoc = gql`
   ${PetitionTemplateCompletingMessageCard_PetitionTemplateFragmentDoc}
   ${PetitionTemplateClosingMessageCard_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<PetitionMessages_PetitionBaseFragment, unknown>;
+export const PetitionTemplateRequestMessageCard_UserFragmentDoc = gql`
+  fragment PetitionTemplateRequestMessageCard_User on User {
+    id
+    hasOnBehalfOf: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
+  }
+` as unknown as DocumentNode<PetitionTemplateRequestMessageCard_UserFragment, unknown>;
 export const PetitionMessages_QueryFragmentDoc = gql`
   fragment PetitionMessages_Query on Query {
     ...PetitionLayout_Query
+    me {
+      ...PetitionTemplateRequestMessageCard_User
+    }
   }
   ${PetitionLayout_QueryFragmentDoc}
+  ${PetitionTemplateRequestMessageCard_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionMessages_QueryFragment, unknown>;
 export const DowJonesFieldProfileDetails_PetitionFieldFragmentDoc = gql`
   fragment DowJonesFieldProfileDetails_PetitionField on PetitionField {

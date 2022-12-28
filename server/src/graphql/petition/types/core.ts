@@ -427,6 +427,14 @@ export const Petition = objectType({
       description: "Time when the petition was closed.",
       resolve: (o) => o.closed_at,
     });
+    t.nullable.field("defaultOnBehalf", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return root.send_on_behalf_user_id
+          ? await ctx.users.loadUser(root.send_on_behalf_user_id)
+          : null;
+      },
+    });
   },
 });
 

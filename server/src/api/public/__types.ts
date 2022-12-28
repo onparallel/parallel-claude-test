@@ -1103,9 +1103,8 @@ export type MutationcreatePetitionFieldReplyArgs = {
 };
 
 export type MutationcreatePetitionListViewArgs = {
-  filters?: InputMaybe<PetitionListViewFiltersInput>;
+  data?: InputMaybe<PetitionListViewDataInput>;
   name: Scalars["String"];
-  sortBy?: InputMaybe<QueryPetitions_OrderBy>;
 };
 
 export type MutationcreatePrintPdfTaskArgs = {
@@ -1748,7 +1747,8 @@ export type MutationupdatePetitionFieldReplyMetadataArgs = {
 };
 
 export type MutationupdatePetitionListViewArgs = {
-  data: UpdatePetitionListViewInput;
+  data?: InputMaybe<PetitionListViewDataInput>;
+  name?: InputMaybe<Scalars["String"]>;
   petitionListViewId: Scalars["GID"];
 };
 
@@ -2135,6 +2135,7 @@ export type Petition = PetitionBase & {
   customProperties: Scalars["JSONObject"];
   /** The deadline of the petition. */
   deadline: Maybe<Scalars["DateTime"]>;
+  defaultOnBehalf: Maybe<User>;
   /** The effective permissions on the petition */
   effectivePermissions: Array<EffectivePetitionUserPermission>;
   /** The body of the petition. */
@@ -2694,57 +2695,72 @@ export type PetitionFolder = {
 };
 
 export type PetitionListView = {
-  filters: PetitionListViewFilters;
+  data: PetitionListViewData;
   id: Scalars["GID"];
   isDefault: Scalars["Boolean"];
   name: Scalars["String"];
-  sortBy: Maybe<QueryPetitions_OrderBy>;
   user: User;
 };
 
-export type PetitionListViewFilters = {
-  fromTemplateId: Maybe<Scalars["GID"]>;
-  path: Maybe<Scalars["String"]>;
+export type PetitionListViewData = {
+  fromTemplateId: Maybe<Array<Scalars["GID"]>>;
+  path: Scalars["String"];
   search: Maybe<Scalars["String"]>;
-  searchIn: Maybe<PetitionListViewSearchIn>;
-  sharedWith: Maybe<PetitionListViewFiltersSharedWith>;
+  searchIn: PetitionListViewSearchIn;
+  sharedWith: Maybe<PetitionListViewDataSharedWith>;
   signature: Maybe<Array<PetitionSignatureStatusFilter>>;
+  sort: Maybe<PetitionListViewSort>;
   status: Maybe<Array<PetitionStatus>>;
   tags: Maybe<Array<Scalars["GID"]>>;
 };
 
-export type PetitionListViewFiltersInput = {
-  fromTemplateId?: InputMaybe<Scalars["GID"]>;
+export type PetitionListViewDataInput = {
+  fromTemplateId?: InputMaybe<Array<Scalars["GID"]>>;
   path?: InputMaybe<Scalars["String"]>;
   search?: InputMaybe<Scalars["String"]>;
   searchIn?: InputMaybe<PetitionListViewSearchIn>;
-  sharedWith?: InputMaybe<PetitionListViewFiltersSharedWithInput>;
+  sharedWith?: InputMaybe<PetitionListViewDataSharedWithInput>;
   signature?: InputMaybe<Array<PetitionSignatureStatusFilter>>;
+  sort?: InputMaybe<PetitionListViewSortInput>;
   status?: InputMaybe<Array<PetitionStatus>>;
   tags?: InputMaybe<Array<Scalars["GID"]>>;
 };
 
-export type PetitionListViewFiltersSharedWith = {
-  filters: Array<PetitionListViewFiltersSharedWithFilters>;
+export type PetitionListViewDataSharedWith = {
+  filters: Array<PetitionListViewDataSharedWithFilters>;
   operator: FilterSharedWithLogicalOperator;
 };
 
-export type PetitionListViewFiltersSharedWithFilters = {
+export type PetitionListViewDataSharedWithFilters = {
   operator: FilterSharedWithOperator;
   value: Scalars["GID"];
 };
 
-export type PetitionListViewFiltersSharedWithFiltersInput = {
+export type PetitionListViewDataSharedWithFiltersInput = {
   operator: FilterSharedWithOperator;
   value: Scalars["GID"];
 };
 
-export type PetitionListViewFiltersSharedWithInput = {
-  filters: Array<PetitionListViewFiltersSharedWithFiltersInput>;
+export type PetitionListViewDataSharedWithInput = {
+  filters: Array<PetitionListViewDataSharedWithFiltersInput>;
   operator: FilterSharedWithLogicalOperator;
 };
 
 export type PetitionListViewSearchIn = "CURRENT_FOLDER" | "EVERYWHERE";
+
+export type PetitionListViewSort = {
+  direction: PetitionListViewSortDirection;
+  field: PetitionListViewSortField;
+};
+
+export type PetitionListViewSortDirection = "ASC" | "DESC";
+
+export type PetitionListViewSortField = "name" | "sentAt";
+
+export type PetitionListViewSortInput = {
+  direction: PetitionListViewSortDirection;
+  field: PetitionListViewSortField;
+};
 
 /** The locale used for rendering the petition to the contact. */
 export type PetitionLocale = "en" | "es";
@@ -4049,6 +4065,7 @@ export type UpdatePetitionInput = {
   completingMessageBody?: InputMaybe<Scalars["JSON"]>;
   completingMessageSubject?: InputMaybe<Scalars["String"]>;
   deadline?: InputMaybe<Scalars["DateTime"]>;
+  defaultOnBehalfId?: InputMaybe<Scalars["GID"]>;
   defaultPath?: InputMaybe<Scalars["String"]>;
   description?: InputMaybe<Scalars["JSON"]>;
   emailBody?: InputMaybe<Scalars["JSON"]>;
@@ -4060,12 +4077,6 @@ export type UpdatePetitionInput = {
   remindersConfig?: InputMaybe<RemindersConfigInput>;
   signatureConfig?: InputMaybe<SignatureConfigInput>;
   skipForwardSecurity?: InputMaybe<Scalars["Boolean"]>;
-};
-
-export type UpdatePetitionListViewInput = {
-  filters?: InputMaybe<PetitionListViewFiltersInput>;
-  name?: InputMaybe<Scalars["String"]>;
-  sortBy?: InputMaybe<QueryPetitions_OrderBy>;
 };
 
 export type UpdateTagInput = {

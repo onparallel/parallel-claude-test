@@ -67,7 +67,7 @@ function PetitionMessages({ petitionId }: PetitionMessagesProps) {
       backgroundColor="primary.50"
     >
       <Stack spacing={4} padding={4} maxWidth="container.md" margin="auto">
-        <PetitionTemplateRequestMessageCard {...cardCommonProps} />
+        <PetitionTemplateRequestMessageCard {...cardCommonProps} user={me} />
         <PetitionTemplateCompletingMessageCard {...cardCommonProps} />
         <PetitionTemplateClosingMessageCard {...cardCommonProps} />
       </Stack>
@@ -94,8 +94,12 @@ const _fragments = {
   Query: gql`
     fragment PetitionMessages_Query on Query {
       ...PetitionLayout_Query
+      me {
+        ...PetitionTemplateRequestMessageCard_User
+      }
     }
     ${PetitionLayout.fragments.Query}
+    ${PetitionTemplateRequestMessageCard.fragments.User}
   `,
 };
 

@@ -702,6 +702,7 @@ export const updatePetition = mutationField("updatePetition", {
           t.nullable.string("anonymizePurpose");
           t.nullable.int("anonymizeAfterMonths");
           t.nullable.string("defaultPath");
+          t.nullable.globalId("defaultOnBehalfId", { prefixName: "User" });
         },
       }).asArg()
     ),
@@ -740,6 +741,7 @@ export const updatePetition = mutationField("updatePetition", {
       anonymizeAfterMonths,
       anonymizePurpose,
       defaultPath,
+      defaultOnBehalfId,
     } = args.data;
     const data: Partial<CreatePetition> = {};
     if (name !== undefined) {
@@ -797,6 +799,10 @@ export const updatePetition = mutationField("updatePetition", {
 
     if (defaultPath !== undefined) {
       data.default_path = defaultPath ?? "/";
+    }
+
+    if (defaultOnBehalfId !== undefined) {
+      data.send_on_behalf_user_id = defaultOnBehalfId ? Number(defaultOnBehalfId) : null;
     }
 
     const [petition] = await ctx.petitions.updatePetition(
