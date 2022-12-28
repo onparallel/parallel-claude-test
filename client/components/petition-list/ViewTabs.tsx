@@ -63,6 +63,8 @@ export const ViewTabs = Object.assign(
       }
     };
 
+    const hasDefaultView = views.some((v) => v.isDefault);
+
     const [updatePetitionListView] = useMutation(ViewTabs_updatePetitionListViewDocument);
     const createRenameViewClickHandler = (view: ViewTabs_PetitionListViewFragment) => async () => {
       try {
@@ -144,7 +146,9 @@ export const ViewTabs = Object.assign(
     const createMarkViewAsDefaultClickHandler =
       (view: ViewTabs_PetitionListViewFragment) => async () => {
         try {
-          await markPetitionListViewAsDefault({ variables: { petitionListViewId: view.id } });
+          await markPetitionListViewAsDefault({
+            variables: { petitionListViewId: view.id === "ALL" ? null : view.id },
+          });
           toast({
             isClosable: true,
             status: "success",
@@ -267,7 +271,7 @@ export const ViewTabs = Object.assign(
                     tags: null,
                     sort: { field: "sentAt", direction: "DESC" },
                   },
-                  isDefault: false,
+                  isDefault: hasDefaultView ? false : true,
                 } as ViewTabs_PetitionListViewFragment,
                 ...viewIds.map((id) => views.find((v) => v.id === id)!),
               ].map(
@@ -496,7 +500,7 @@ export function ViewTab({
                     />
                   </MenuItem>
                   <MenuItem
-                    isDisabled={view.id === "ALL" || view.isDefault}
+                    isDisabled={view.isDefault}
                     icon={<StarEmptyIcon boxSize={4} display="block" />}
                     onClick={onMarkViewAsDefault}
                   >
