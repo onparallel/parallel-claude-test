@@ -875,7 +875,12 @@ Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDa
       const defaultView = views.find((v) => v.isDefault);
       if (isDefined(defaultView)) {
         throw new RedirectError(
-          buildStateUrl(QUERY_STATE, { view: defaultView.id, ...defaultView.data }, pathname, query)
+          buildStateUrl(
+            QUERY_STATE,
+            { view: defaultView.id, ...omit(defaultView.data, ["__typename"]) },
+            pathname,
+            query
+          )
         );
       } else {
         throw new RedirectError(buildStateUrl(QUERY_STATE, { view: "ALL" }, pathname, query));
