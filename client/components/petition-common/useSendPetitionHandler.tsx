@@ -111,7 +111,7 @@ export function useSendPetitionHandler(
         );
       }
       const { data } = await task;
-      if (data?.sendPetition.some((r) => r.result !== "SUCCESS")) {
+      if (!isDefined(data) || data.sendPetition.some((r) => r.result !== "SUCCESS")) {
         toast({
           isClosable: true,
           status: "error",
@@ -130,7 +130,7 @@ export function useSendPetitionHandler(
       if (senderId) {
         await addPetitionPermission({
           variables: {
-            petitionIds: [petition.id],
+            petitionIds: data.sendPetition.map((res) => res.petition!.id),
             userIds: [senderId],
             userGroupIds: null,
             permissionType: "WRITE",
