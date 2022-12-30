@@ -11099,6 +11099,7 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
+  title?: string | null;
   optional: boolean;
   multiple: boolean;
   options: { [key: string]: any };
@@ -29679,6 +29680,7 @@ export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
   fragment PetitionComposeFieldSettings_PetitionField on PetitionField {
     id
     type
+    title
     optional
     multiple
     options

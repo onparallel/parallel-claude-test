@@ -9,6 +9,7 @@ import {
   PetitionFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
+import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionFieldTypeSelect } from "../PetitionFieldTypeSelect";
@@ -29,6 +30,7 @@ export interface PetitionComposeFieldSettingsProps {
   petitionId: string;
   user: PetitionComposeFieldSettings_UserFragment;
   field: PetitionComposeFieldSettings_PetitionFieldFragment;
+  fieldIndices: PetitionFieldIndex[];
   onFieldTypeChange: (fieldId: string, type: PetitionFieldType) => void;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
   onClose: () => void;
@@ -39,7 +41,17 @@ export interface PetitionComposeFieldSettingsProps {
 export const PetitionComposeFieldSettings = Object.assign(
   chakraForwardRef<"section", PetitionComposeFieldSettingsProps>(
     function PetitionComposeFieldSettings(
-      { petitionId, user, field, onFieldEdit, onFieldTypeChange, onClose, isReadOnly, ...props },
+      {
+        petitionId,
+        user,
+        field,
+        fieldIndices,
+        onFieldEdit,
+        onFieldTypeChange,
+        onClose,
+        isReadOnly,
+        ...props
+      },
       ref
     ) {
       const intl = useIntl();
@@ -206,7 +218,18 @@ export const PetitionComposeFieldSettings = Object.assign(
       return (
         <Card ref={ref} display="flex" flexDirection="column" {...props}>
           <CloseableCardHeader onClose={onClose}>
-            <FormattedMessage id="petition.field-settings" defaultMessage="Field settings" />
+            {field.title ? (
+              <Text as="span" noOfLines={1}>
+                {`${fieldIndices[field.position]}. ${field.title}`}
+              </Text>
+            ) : (
+              <>
+                <Text as="span">{`${fieldIndices[field.position]}. `}</Text>
+                <Text as="span" textStyle="hint" fontWeight={500}>
+                  <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+                </Text>
+              </>
+            )}
           </CloseableCardHeader>
           <Stack padding={4} spacing={4} flex={1} minHeight={0} overflow="auto">
             <Stack spacing={4} direction="column">
@@ -298,6 +321,7 @@ export const PetitionComposeFieldSettings = Object.assign(
         fragment PetitionComposeFieldSettings_PetitionField on PetitionField {
           id
           type
+          title
           optional
           multiple
           options
