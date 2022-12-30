@@ -4415,6 +4415,16 @@
     "context": "Access"
   },
   {
+    "term": "component.recipient-view-contactless-form.access-already-sent",
+    "definition": "No se ha podido reenviar el acceso",
+    "context": "Access could not be resent"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.access-already-sent-body",
+    "definition": "Ya hay un acceso enviado a <b>{email}</b> recientemente. Comprueba en tu bandeja de entrada o spam.",
+    "context": "There is already an access sent to <b>{email}</b> recently. Please check your inbox or spam."
+  },
+  {
     "term": "component.recipient-view-contactless-form.access-sent",
     "definition": "Acceso enviado",
     "context": "Access sent"

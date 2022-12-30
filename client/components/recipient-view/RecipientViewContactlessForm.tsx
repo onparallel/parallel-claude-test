@@ -143,6 +143,27 @@ export function RecipientViewContactlessForm({
     });
   };
 
+  const errorSentToast = () => {
+    toast({
+      title: intl.formatMessage({
+        id: "component.recipient-view-contactless-form.access-already-sent",
+        defaultMessage: "Access could not be resent",
+      }),
+      description: intl.formatMessage(
+        {
+          id: "component.recipient-view-contactless-form.access-already-sent-body",
+          defaultMessage:
+            "There is already an access sent to <b>{email}</b> recently. Please check your inbox or spam.",
+        },
+        { email }
+      ),
+      duration: null,
+      status: "warning",
+      isClosable: true,
+      variant: "subtle",
+    });
+  };
+
   const handleSendReminder = async () => {
     try {
       const { data } = await publicSendReminder({
@@ -158,7 +179,7 @@ export function RecipientViewContactlessForm({
       }
     } catch (error) {
       if (isApolloError(error, "REMINDER_ALREADY_SENT_ERROR")) {
-        accessSentToast();
+        errorSentToast();
       } else {
         showGenericErrorToast(error);
       }
