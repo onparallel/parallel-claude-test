@@ -37,14 +37,26 @@ export class FileRepository extends BaseRepository {
 
   async cloneFileUpload(id: MaybeArray<number>, t?: Knex.Transaction) {
     const ids = unMaybeArray(id);
+    // we need to use this cte to guarantee that the results are returned in the same order as the ids
     return await this.raw<FileUpload>(
       /* sql */ `
+      with ids as (
+        select * from (?) as t(id_index, id_value)
+      )
       insert into file_upload(path, filename, size, content_type, upload_complete, created_at, created_by, updated_at, updated_by)
       select path, filename, size, content_type, upload_complete, created_at, created_by, updated_at, updated_by
-      from file_upload where id in ?
+      from file_upload join ids on ids.id_value = id
+      where id in ?
+      order by ids.id_index asc
       returning *
       `,
-      [this.sqlIn(ids)],
+      [
+        this.sqlValues(
+          ids.map((id, index) => [index, id]),
+          ["int", "int"]
+        ),
+        this.sqlIn(ids),
+      ],
       t
     );
   }

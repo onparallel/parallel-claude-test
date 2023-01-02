@@ -517,9 +517,10 @@ export class Mocks {
     petitionId: number,
     type: PetitionAttachmentType,
     amount?: number,
-    builder?: (i: number) => Partial<PetitionAttachment>
+    builder?: (i: number) => Partial<PetitionAttachment>,
+    builderFileUploads?: (i: number) => Partial<FileUpload>
   ) {
-    const fileUploads = await this.createRandomFileUpload(amount || 1);
+    const fileUploads = await this.createRandomFileUpload(amount ?? 1, builderFileUploads);
 
     const [{ position }] = await this.knex
       .from("petition_attachment")

@@ -970,7 +970,23 @@ describe("GraphQL/PetitionAttachments", () => {
       const [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
         is_template: true,
       }));
-      await mocks.createPetitionAttachment(template.id, "FRONT", 2);
+      const front = await mocks.createPetitionAttachment(
+        template.id,
+        "FRONT",
+        1,
+        undefined,
+        (i) => ({ filename: `front ${i}.pdf` })
+      );
+      const annex = await mocks.createPetitionAttachment(
+        template.id,
+        "ANNEX",
+        2,
+        undefined,
+        (i) => ({ filename: `annex ${i}.pdf` })
+      );
+      const back = await mocks.createPetitionAttachment(template.id, "BACK", 1, undefined, (i) => ({
+        filename: `back ${i}.pdf`,
+      }));
 
       const { errors, data } = await testClient.execute(
         gql`
@@ -978,13 +994,19 @@ describe("GraphQL/PetitionAttachments", () => {
             createPetition(petitionId: $templateId, type: $type) {
               attachmentsList {
                 FRONT {
-                  id
+                  file {
+                    filename
+                  }
                 }
                 ANNEX {
-                  id
+                  file {
+                    filename
+                  }
                 }
                 BACK {
-                  id
+                  file {
+                    filename
+                  }
                 }
               }
             }
@@ -997,9 +1019,23 @@ describe("GraphQL/PetitionAttachments", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.createPetition.attachmentsList.FRONT).toHaveLength(2);
-      expect(data?.createPetition.attachmentsList.ANNEX).toHaveLength(0);
-      expect(data?.createPetition.attachmentsList.BACK).toHaveLength(0);
+      expect(data!.createPetition.attachmentsList).toEqual({
+        FRONT: sortBy(front, (a) => a.position).map((_, i) => ({
+          file: {
+            filename: `front ${i}.pdf`,
+          },
+        })),
+        ANNEX: sortBy(annex, (a) => a.position).map((_, i) => ({
+          file: {
+            filename: `annex ${i}.pdf`,
+          },
+        })),
+        BACK: sortBy(back, (a) => a.position).map((_, i) => ({
+          file: {
+            filename: `back ${i}.pdf`,
+          },
+        })),
+      });
     });
   });
 
@@ -1008,7 +1044,23 @@ describe("GraphQL/PetitionAttachments", () => {
       const [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
         is_template: true,
       }));
-      await mocks.createPetitionAttachment(template.id, "FRONT", 2);
+      const front = await mocks.createPetitionAttachment(
+        template.id,
+        "FRONT",
+        1,
+        undefined,
+        (i) => ({ filename: `front ${i}.pdf` })
+      );
+      const annex = await mocks.createPetitionAttachment(
+        template.id,
+        "ANNEX",
+        2,
+        undefined,
+        (i) => ({ filename: `annex ${i}.pdf` })
+      );
+      const back = await mocks.createPetitionAttachment(template.id, "BACK", 1, undefined, (i) => ({
+        filename: `back ${i}.pdf`,
+      }));
 
       const { errors, data } = await testClient.execute(
         gql`
@@ -1016,13 +1068,19 @@ describe("GraphQL/PetitionAttachments", () => {
             clonePetitions(petitionIds: $petitionIds) {
               attachmentsList {
                 FRONT {
-                  id
+                  file {
+                    filename
+                  }
                 }
                 ANNEX {
-                  id
+                  file {
+                    filename
+                  }
                 }
                 BACK {
-                  id
+                  file {
+                    filename
+                  }
                 }
               }
             }
@@ -1032,10 +1090,23 @@ describe("GraphQL/PetitionAttachments", () => {
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.clonePetitions).toHaveLength(1);
-      expect(data?.clonePetitions[0].attachmentsList.FRONT).toHaveLength(2);
-      expect(data?.clonePetitions[0].attachmentsList.ANNEX).toHaveLength(0);
-      expect(data?.clonePetitions[0].attachmentsList.BACK).toHaveLength(0);
+      expect(data!.clonePetitions[0].attachmentsList).toEqual({
+        FRONT: sortBy(front, (a) => a.position).map((_, i) => ({
+          file: {
+            filename: `front ${i}.pdf`,
+          },
+        })),
+        ANNEX: sortBy(annex, (a) => a.position).map((_, i) => ({
+          file: {
+            filename: `annex ${i}.pdf`,
+          },
+        })),
+        BACK: sortBy(back, (a) => a.position).map((_, i) => ({
+          file: {
+            filename: `back ${i}.pdf`,
+          },
+        })),
+      });
     });
   });
 });

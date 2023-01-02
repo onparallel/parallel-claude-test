@@ -2472,13 +2472,13 @@ export class PetitionRepository extends BaseRepository {
 
       await this.raw(
         /* sql */ `
-      with new_file_upload_ids as (
+      with nfus as (
         select * from (?) as t(file_upload_id, new_file_upload_id)
       )
       insert into petition_attachment (petition_id, file_upload_id, type, position, created_by)
-      select ?, fid.new_file_upload_id, pa.type, pa.position, ?
+      select ?, nfus.new_file_upload_id, pa.type, pa.position, ?
       from petition_attachment pa
-      join new_file_upload_ids fid on fid.file_upload_id = pa.file_upload_id
+      join nfus on nfus.file_upload_id = pa.file_upload_id
       where pa.petition_id = ? and pa.deleted_at is null;
     `,
         [
