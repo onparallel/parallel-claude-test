@@ -283,6 +283,7 @@ const SaveViewMenuButton = chakraForwardRef<"button", { isDirty?: boolean }>(
         <Button
           {...buttonProps}
           paddingX={{ base: 2, md: 3 }}
+          data-action="save-petition-list-view"
           aria-label={
             isSmallScreen
               ? intl.formatMessage({

@@ -207,6 +207,7 @@ export const ViewTabs = Object.assign(
     return (
       <>
         <Flex
+          data-section="petition-list-views"
           overflowX="auto"
           paddingBottom="1px"
           paddingTop="1px"
@@ -288,6 +289,7 @@ export const ViewTabs = Object.assign(
                       onDeleteView={createDeleteViewClickHandler(view)}
                       onDragStart={createDragStartHandler(view)}
                       onDragEnd={createDragEndHandler(view)}
+                      data-petition-list-view-id={view.id}
                     />
                   )
               )}
