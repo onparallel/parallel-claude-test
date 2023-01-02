@@ -289,7 +289,6 @@ export const ViewTabs = Object.assign(
                       onDeleteView={createDeleteViewClickHandler(view)}
                       onDragStart={createDragStartHandler(view)}
                       onDragEnd={createDragEndHandler(view)}
-                      data-petition-list-view-id={view.id}
                     />
                   )
               )}
@@ -464,6 +463,7 @@ export function ViewTab({
       _grabbed={{
         "> *": { border: "1px solid", borderColor: "inherit" },
       }}
+      data-petition-list-view-id={view.id}
     >
       <RadioTab
         value={view.id}
