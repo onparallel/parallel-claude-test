@@ -292,7 +292,7 @@ export function DocumentThemeEditor({
           />
         </Text>
 
-        <Tabs as={Card} variant="enclosed">
+        <Tabs as={Card} variant="enclosed" key={themeId}>
           <TabList margin={"-1px"}>
             {locales.map(({ key, localizedLabel }) => (
               <Tab key={key}>

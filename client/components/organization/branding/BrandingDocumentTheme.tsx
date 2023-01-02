@@ -21,7 +21,7 @@ import {
   BrandingDocumentTheme_UserFragment,
 } from "@parallel/graphql/__types";
 import { isAdmin } from "@parallel/utils/roles";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, zip } from "remeda";
@@ -53,10 +53,6 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
     reset,
     setValue,
   } = form;
-
-  useEffect(() => {
-    reset(selectedTheme.data);
-  }, [selectedTheme.id]);
 
   useAutoConfirmDiscardChangesDialog(isDirty);
 
@@ -91,6 +87,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
       });
       if (isDefined(data)) {
         const theme = data.createOrganizationPdfDocumentTheme.pdfDocumentThemes[0];
+        reset(theme.data);
         setSelectedTheme(theme);
       }
     } catch {}
@@ -112,6 +109,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
         const theme = data.updateOrganizationPdfDocumentTheme.pdfDocumentThemes.find(
           (t) => t.id === selectedTheme.id
         )!;
+        reset(theme.data);
         setSelectedTheme(theme);
       }
     } catch (e) {
@@ -136,9 +134,11 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
     if (isDirty) {
       try {
         await showConfirmDiscardChangesDialog();
+        reset(theme.data);
         setSelectedTheme(theme);
       } catch {}
     } else {
+      reset(theme.data);
       setSelectedTheme(theme);
     }
   }
