@@ -335,7 +335,8 @@ export class UserRepository extends BaseRepository {
         is_default: false,
         created_by: `User:${user.id}`,
         updated_by: `User:${user.id}`,
-      }))
+      })),
+      t
     );
 
     await this.system.createEvent(
