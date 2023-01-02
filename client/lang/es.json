@@ -2740,6 +2740,11 @@
     "context": "{type, select, TEMPLATE {This template} other {This parallel}} has document fields set up to attach your responses to the pdf. They will be included in the final document after the attachments."
   },
   {
+    "term": "component.petition-compose-attachments.prefix-annex",
+    "definition": "Anexo {index}:",
+    "context": "Annex {index}:"
+  },
+  {
     "term": "component.petition-compose-attachments.prefix-back-cover",
     "definition": "Contraportada {index}:",
     "context": "Back cover {index}:"
@@ -8588,11 +8593,6 @@
     "term": "petition.deadline-label",
     "definition": "Vencimiento",
     "context": "Deadline"
-  },
-  {
-    "term": "petition.field-settings",
-    "definition": "Ajustes de campo",
-    "context": "Field settings"
   },
   {
     "term": "petition.field-type.checkbox",

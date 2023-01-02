@@ -693,12 +693,9 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
       <HStack
         ref={ref}
         paddingX={3}
-        _hover={{
-          backgroundColor: "gray.75",
-          transitionProperty: "none",
-        }}
+        _hover={{ backgroundColor: "gray.50" }}
         borderRadius="md"
-        backgroundColor={isAnimated ? "gray.75" : undefined}
+        backgroundColor="white"
         shadow={isAnimated ? "short" : undefined}
         transitionProperty="all"
         transitionDuration="320ms"
@@ -786,27 +783,27 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
           </Portal>
         </Menu>
         <HStack flex="1" minWidth="0px">
-          {type === "FRONT" ? (
-            <Text as="span" fontSize="sm" fontWeight={500} whiteSpace="nowrap">
+          <Text as="span" fontSize="sm" fontWeight={500} whiteSpace="nowrap">
+            {type === "FRONT" ? (
               <FormattedMessage
                 id="component.petition-compose-attachments.prefix-cover"
                 defaultMessage="Cover {index}:"
                 values={{ index: index + 1 }}
-              />{" "}
-            </Text>
-          ) : type === "BACK" ? (
-            <Text as="span" fontSize="sm" fontWeight={500} whiteSpace="nowrap">
+              />
+            ) : type === "BACK" ? (
               <FormattedMessage
                 id="component.petition-compose-attachments.prefix-back-cover"
                 defaultMessage="Back cover {index}:"
-                values={{
-                  index: index + 1,
-                }}
-              />{" "}
-            </Text>
-          ) : (
-            <Text as="span">{`${index + 1}.`}</Text>
-          )}
+                values={{ index: index + 1 }}
+              />
+            ) : (
+              <FormattedMessage
+                id="component.petition-compose-attachments.prefix-annex"
+                defaultMessage="Annex {index}:"
+                values={{ index: index + 1 }}
+              />
+            )}
+          </Text>
           <FileName value={filename} fontSize="sm" fontWeight="400" />
           <Text as="span" marginX={2}>
             -
