@@ -30,7 +30,7 @@ export interface PetitionComposeFieldSettingsProps {
   petitionId: string;
   user: PetitionComposeFieldSettings_UserFragment;
   field: PetitionComposeFieldSettings_PetitionFieldFragment;
-  fieldIndices: PetitionFieldIndex[];
+  fieldIndex: PetitionFieldIndex;
   onFieldTypeChange: (fieldId: string, type: PetitionFieldType) => void;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
   onClose: () => void;
@@ -45,7 +45,7 @@ export const PetitionComposeFieldSettings = Object.assign(
         petitionId,
         user,
         field,
-        fieldIndices,
+        fieldIndex,
         onFieldEdit,
         onFieldTypeChange,
         onClose,
@@ -218,18 +218,16 @@ export const PetitionComposeFieldSettings = Object.assign(
       return (
         <Card ref={ref} display="flex" flexDirection="column" {...props}>
           <CloseableCardHeader onClose={onClose}>
-            {field.title ? (
-              <Text as="span" noOfLines={1}>
-                {`${fieldIndices[field.position]}. ${field.title}`}
-              </Text>
-            ) : (
-              <>
-                <Text as="span">{`${fieldIndices[field.position]}. `}</Text>
+            <Text as="span" noOfLines={1} wordBreak="break-all">
+              <Text as="span">{`${fieldIndex}. `}</Text>
+              {field.title ? (
+                <Text as="span">{field.title}</Text>
+              ) : (
                 <Text as="span" textStyle="hint" fontWeight={500}>
                   <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
                 </Text>
-              </>
-            )}
+              )}
+            </Text>
           </CloseableCardHeader>
           <Stack padding={4} spacing={4} flex={1} minHeight={0} overflow="auto">
             <Stack spacing={4} direction="column">

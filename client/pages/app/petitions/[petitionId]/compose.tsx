@@ -494,7 +494,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   petitionId={petition.id}
                   key={activeField.id}
                   field={activeField}
-                  fieldIndices={indices}
+                  fieldIndex={indices[activeField.position]}
                   onFieldEdit={handleFieldEdit}
                   onFieldTypeChange={handleFieldTypeChange}
                   onClose={handleSettingsClose}
