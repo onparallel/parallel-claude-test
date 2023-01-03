@@ -41,17 +41,11 @@ export function PublicHeaderMenu(props: StackProps) {
         ))}
       </Select>
 
-      <Button
-        as="a"
-        fontWeight="normal"
-        id="pw-public-login"
-        rightIcon={<ArrowShortRightIcon />}
-        href="/"
-      >
+      <Button as="a" fontWeight="normal" rightIcon={<ArrowShortRightIcon />} href="/">
         <FormattedMessage id="public.go-to-parallel" defaultMessage="Go to Parallel" />
       </Button>
       <NakedLink href="/login">
-        <Button as="a" variant="outline" id="pw-public-login">
+        <Button as="a" variant="outline">
           <FormattedMessage id="public.login-button" defaultMessage="Login" />
         </Button>
       </NakedLink>

@@ -107,6 +107,7 @@ export function PublicLayout({
       </Flex>
       <Box
         id="target-container"
+        data-testid="cookie-consent"
         position="fixed"
         left="200px"
         right="200px"

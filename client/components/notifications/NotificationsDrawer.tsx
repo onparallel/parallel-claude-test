@@ -123,8 +123,8 @@ export function NotificationsDrawer() {
       returnFocusOnClose={false}
     >
       <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton top={4} />
+      <DrawerContent data-testid="notifications-drawer">
+        <DrawerCloseButton top={4} data-testid="notifications-drawer-close" />
         <DrawerHeader
           paddingInlineStart={4}
           paddingInlineEnd={4}

@@ -109,6 +109,7 @@ export const HeaderNameEditable = Object.assign(
                         display="block"
                         noOfLines={1}
                         wordBreak="break-all"
+                        data-testid="petition-name-preview"
                       />
                     </Tooltip>
                     {!isEditing && (
@@ -148,7 +149,12 @@ export const HeaderNameEditable = Object.assign(
                         </Flex>
                       </Tooltip>
                     )}
-                    <EditableInput paddingY={0} paddingX={1} maxLength={255} />
+                    <EditableInput
+                      paddingY={0}
+                      paddingX={1}
+                      maxLength={255}
+                      data-testid="petition-name-input"
+                    />
                   </Flex>
                 )}
               </Flex>

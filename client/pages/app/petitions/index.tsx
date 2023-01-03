@@ -457,6 +457,7 @@ function Petitions() {
                 fontSize="2xl"
                 paddingX={3}
                 data-action="change-parallel-template"
+                data-testid="petition-type-menu"
                 leftIcon={
                   state.type === "PETITION" ? (
                     <PaperPlaneIcon boxSize={6} />
@@ -479,13 +480,21 @@ function Petitions() {
               <Portal>
                 <MenuList minWidth="154px">
                   <MenuOptionGroup value={state.type}>
-                    <MenuItemOption value="PETITION" onClick={() => handleTypeChange("PETITION")}>
+                    <MenuItemOption
+                      value="PETITION"
+                      onClick={() => handleTypeChange("PETITION")}
+                      data-testid="petition-type-petition"
+                    >
                       <FormattedMessage
                         id="generic.parallel-type-plural"
                         defaultMessage="Parallels"
                       />
                     </MenuItemOption>
-                    <MenuItemOption value="TEMPLATE" onClick={() => handleTypeChange("TEMPLATE")}>
+                    <MenuItemOption
+                      value="TEMPLATE"
+                      onClick={() => handleTypeChange("TEMPLATE")}
+                      data-testid="petition-type-template"
+                    >
                       <FormattedMessage
                         id="generic.template-type-plural"
                         defaultMessage="Templates"

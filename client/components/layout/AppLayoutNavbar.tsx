@@ -241,6 +241,7 @@ export const AppLayoutNavbar = Object.assign(
                 defaultMessage: "Help center",
               })}
               as="a"
+              data-testid="help-center-button"
               href={`https://help.onparallel.com/${intl.locale}`}
               rel="noopener"
               target="_blank"

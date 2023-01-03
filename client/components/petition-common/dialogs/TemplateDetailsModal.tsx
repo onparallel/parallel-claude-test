@@ -192,6 +192,7 @@ export function TemplateDetailsModal({
                 {template.isPublic ? (
                   <Button
                     width="100%"
+                    data-testid="create-parallel-button"
                     data-action="use-template"
                     leftIcon={<PaperPlaneIcon />}
                     onClick={handleCreatePetition}
@@ -235,6 +236,7 @@ export function TemplateDetailsModal({
                 ) : (
                   <Button
                     width="100%"
+                    data-testid="create-parallel-button"
                     data-action="use-template"
                     colorScheme="primary"
                     leftIcon={<PaperPlaneIcon />}
@@ -254,6 +256,7 @@ export function TemplateDetailsModal({
                         {template.publicLink?.isActive ? (
                           <MenuItem
                             onClick={handleCreatePetition}
+                            data-testid="create-parallel-button"
                             icon={<PaperPlaneIcon display="block" boxSize={4} />}
                           >
                             <FormattedMessage

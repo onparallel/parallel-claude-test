@@ -3,11 +3,15 @@ node_modules
 client/.next
 client/.env.local
 client/public/static/lang
+client/tsconfig.tsbuildinfo
 
 server/dist
 server/bin/localtunnel-dev.url
 server/lang/compiled
 server/.development.env
 
+e2e/test-results/
+e2e/playwright-report/
+e2e/playwright/.cache/
+
 .DS_Store
-client/tsconfig.tsbuildinfo

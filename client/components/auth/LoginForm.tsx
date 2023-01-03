@@ -91,6 +91,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
             <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
           </FormLabel>
           <Input
+            data-testid="email-input"
             type="email"
             {...register("email", {
               required: true,
@@ -121,7 +122,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
             <FormLabel>
               <FormattedMessage id="generic.forms.password-label" defaultMessage="Password" />
             </FormLabel>
-            <PasswordInput {...passwordRegisterProps} />
+            <PasswordInput {...passwordRegisterProps} data-testid="password-input" />
             {errors.password && (
               <FormErrorMessage>
                 <FormattedMessage
@@ -140,7 +141,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
           colorScheme="primary"
           isLoading={isSubmitting}
           type="submit"
-          id="pw-login-submit"
+          data-testid="login-submit"
         >
           {ssoUrl && !forcePassword ? (
             <FormattedMessage id="generic.continue" defaultMessage="Continue" />

@@ -51,6 +51,7 @@ export const NotificationsButton = chakraForwardRef<"button", {}>(function Notif
     <IconButtonWithTooltip
       ref={ref}
       aria-pressed={isOpen}
+      data-testid="notifications-button"
       label={intl.formatMessage(
         {
           id: "component.notifications-button.notifications",

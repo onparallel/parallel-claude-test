@@ -23,6 +23,10 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
     return () => Router.events.off("routeChangeComplete", handleRouteChange);
   }, []);
 
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("NEXTJS_REHYDRATION_COMPLETE"));
+  }, []);
+
   return (
     <LiquidProvider>
       <I18nProvider {...props}>

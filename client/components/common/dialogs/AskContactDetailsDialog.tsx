@@ -51,7 +51,6 @@ export function AskContactDetailsDialog({
   });
   return (
     <ConfirmDialog
-      id="pw-add-contact"
       hasCloseButton
       closeOnOverlayClick={false}
       initialFocusRef={defaultEmail ? firstNameRef : emailRef}

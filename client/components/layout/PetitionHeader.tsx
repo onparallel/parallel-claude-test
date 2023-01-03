@@ -219,6 +219,7 @@ export const PetitionHeader = Object.assign(
                 }),
                 attributes: {
                   "data-action": "petition-compose",
+                  "data-testid": "petition-section-compose",
                 },
               },
               {
@@ -229,6 +230,7 @@ export const PetitionHeader = Object.assign(
                 }),
                 attributes: {
                   "data-action": "petition-preview",
+                  "data-testid": "petition-section-preview",
                 },
               },
               {
@@ -239,6 +241,7 @@ export const PetitionHeader = Object.assign(
                 }),
                 attributes: {
                   "data-action": "petition-replies",
+                  "data-testid": "petition-section-replies",
                 },
               },
               {
@@ -249,6 +252,7 @@ export const PetitionHeader = Object.assign(
                 }),
                 attributes: {
                   "data-action": "petition-activity",
+                  "data-testid": "petition-section-activity",
                 },
               },
             ]
@@ -262,6 +266,7 @@ export const PetitionHeader = Object.assign(
                 }),
                 attributes: {
                   "data-action": "template-compose",
+                  "data-testid": "petition-section-compose",
                 },
               },
               {
@@ -273,6 +278,7 @@ export const PetitionHeader = Object.assign(
                 }),
                 attributes: {
                   "data-action": "template-messages",
+                  "data-testid": "petition-section-messages",
                 },
               },
               {
@@ -283,6 +289,7 @@ export const PetitionHeader = Object.assign(
                 }),
                 attributes: {
                   "data-action": "template-preview",
+                  "data-testid": "petition-section-preview",
                 },
               },
             ],

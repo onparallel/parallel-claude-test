@@ -66,6 +66,7 @@ export function AccountChangeName({ user, onSubmit, ...props }: AccountChangeNam
           </FormLabel>
           <Input
             backgroundColor="white"
+            data-testid="first-name-input"
             {...register("firstName", { required: true, maxLength: 255 })}
           />
           <FormErrorMessage>
@@ -75,17 +76,13 @@ export function AccountChangeName({ user, onSubmit, ...props }: AccountChangeNam
             />
           </FormErrorMessage>
         </FormControl>
-        <FormControl
-          id="last-name"
-          isInvalid={!!errors.lastName}
-          isDisabled={user.isSsoUser}
-          mb={2}
-        >
+        <FormControl id="last-name" isInvalid={!!errors.lastName} isDisabled={user.isSsoUser}>
           <FormLabel fontWeight="semibold">
             <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
           </FormLabel>
           <Input
             backgroundColor="white"
+            data-testid="last-name-input"
             {...register("lastName", { required: true, maxLength: 255 })}
           />
           <FormErrorMessage>
@@ -100,6 +97,7 @@ export function AccountChangeName({ user, onSubmit, ...props }: AccountChangeNam
           colorScheme="primary"
           isDisabled={user.isSsoUser || !isDirty}
           width="min-content"
+          data-testid="change-name-submit"
         >
           <FormattedMessage id="generic.save" defaultMessage="Save" />
         </Button>

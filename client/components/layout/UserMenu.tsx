@@ -72,6 +72,7 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
             id: "header.user-menu-button",
             defaultMessage: "User menu",
           })}
+          data-testid="user-menu"
           data-action="open-user-menu"
           _hover={{
             shadow: "long",
@@ -101,10 +102,10 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
           <HStack paddingX={3.5} paddingY={1}>
             <UserAvatar user={me} size="sm" />
             <Stack spacing={0}>
-              <Text as="div" fontWeight="semibold">
+              <Text as="div" fontWeight="semibold" data-testid="account-name">
                 {me.fullName}
               </Text>
-              <Text as="div" color="gray.600" fontSize="sm">
+              <Text as="div" color="gray.600" fontSize="sm" data-testid="account-email">
                 {me.email}
               </Text>
             </Stack>
