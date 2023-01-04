@@ -321,6 +321,14 @@ export const PetitionBase = interfaceType({
       },
     });
     t.nonNull.string("path");
+    t.nullable.field("defaultOnBehalf", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return root.send_on_behalf_user_id
+          ? await ctx.users.loadUser(root.send_on_behalf_user_id)
+          : null;
+      },
+    });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   sourceType: "db.Petition",
@@ -426,14 +434,6 @@ export const Petition = objectType({
     t.nullable.datetime("closedAt", {
       description: "Time when the petition was closed.",
       resolve: (o) => o.closed_at,
-    });
-    t.nullable.field("defaultOnBehalf", {
-      type: "User",
-      resolve: async (root, _, ctx) => {
-        return root.send_on_behalf_user_id
-          ? await ctx.users.loadUser(root.send_on_behalf_user_id)
-          : null;
-      },
     });
   },
 });

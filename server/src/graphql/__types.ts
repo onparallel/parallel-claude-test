@@ -1978,6 +1978,7 @@ export interface NexusGenFieldTypes {
     completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
+    defaultOnBehalf: NexusGenRootTypes["User"] | null; // User
     defaultPath: string; // String!
     defaultPermissions: NexusGenRootTypes["TemplateDefaultPermission"][]; // [TemplateDefaultPermission!]!
     description: NexusGenScalars["JSON"] | null; // JSON
@@ -2646,6 +2647,7 @@ export interface NexusGenFieldTypes {
     completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
+    defaultOnBehalf: NexusGenRootTypes["User"] | null; // User
     effectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
@@ -3763,6 +3765,7 @@ export interface NexusGenFieldTypeNames {
     completingMessageSubject: "String";
     createdAt: "DateTime";
     customProperties: "JSONObject";
+    defaultOnBehalf: "User";
     defaultPath: "String";
     defaultPermissions: "TemplateDefaultPermission";
     description: "JSON";
@@ -4431,6 +4434,7 @@ export interface NexusGenFieldTypeNames {
     completingMessageSubject: "String";
     createdAt: "DateTime";
     customProperties: "JSONObject";
+    defaultOnBehalf: "User";
     effectivePermissions: "EffectivePetitionUserPermission";
     emailBody: "JSON";
     emailSubject: "String";

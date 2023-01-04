@@ -2372,6 +2372,7 @@ export interface PetitionBase {
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
   customProperties: Scalars["JSONObject"];
+  defaultOnBehalf?: Maybe<User>;
   /** The effective permissions on the petition */
   effectivePermissions: Array<EffectivePetitionUserPermission>;
   /** The body of the petition. */
@@ -3107,6 +3108,7 @@ export interface PetitionTemplate extends PetitionBase {
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
   customProperties: Scalars["JSONObject"];
+  defaultOnBehalf?: Maybe<User>;
   defaultPath: Scalars["String"];
   defaultPermissions: Array<TemplateDefaultPermission>;
   /** Description of the template. */
@@ -11488,6 +11490,12 @@ export type PetitionTemplateRequestMessageCard_PetitionTemplateFragment = {
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
+  } | null;
+  defaultOnBehalf?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    email: string;
   } | null;
 };
 
@@ -20029,6 +20037,12 @@ export type PetitionMessages_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
   } | null;
+  defaultOnBehalf?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    email: string;
+  } | null;
   signatureConfig?: { __typename: "SignatureConfig" } | null;
 };
 
@@ -20158,6 +20172,12 @@ export type PetitionMessages_petitionQuery = {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
         } | null;
+        defaultOnBehalf?: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          email: string;
+        } | null;
         signatureConfig?: { __typename: "SignatureConfig" } | null;
       }
     | null;
@@ -20205,6 +20225,12 @@ export type PetitionMessages_updatePetitionMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
+        } | null;
+        defaultOnBehalf?: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          email: string;
         } | null;
         signatureConfig?: { __typename: "SignatureConfig" } | null;
       };
@@ -29904,7 +29930,11 @@ export const PetitionTemplateRequestMessageCard_PetitionTemplateFragmentDoc = gq
     myEffectivePermission {
       permissionType
     }
+    defaultOnBehalf {
+      ...UserSelect_User
+    }
   }
+  ${UserSelect_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionTemplateRequestMessageCard_PetitionTemplateFragment, unknown>;
 export const PetitionTemplateCompletingMessageCard_PetitionTemplateFragmentDoc = gql`
   fragment PetitionTemplateCompletingMessageCard_PetitionTemplate on PetitionTemplate {

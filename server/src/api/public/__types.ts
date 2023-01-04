@@ -2309,6 +2309,7 @@ export type PetitionBase = {
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
   customProperties: Scalars["JSONObject"];
+  defaultOnBehalf: Maybe<User>;
   /** The effective permissions on the petition */
   effectivePermissions: Array<EffectivePetitionUserPermission>;
   /** The body of the petition. */
@@ -3006,6 +3007,7 @@ export type PetitionTemplate = PetitionBase & {
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
   customProperties: Scalars["JSONObject"];
+  defaultOnBehalf: Maybe<User>;
   defaultPath: Scalars["String"];
   defaultPermissions: Array<TemplateDefaultPermission>;
   /** Description of the template. */

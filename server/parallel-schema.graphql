@@ -2776,6 +2776,7 @@ interface PetitionBase {
   Custom user properties
   """
   customProperties: JSONObject!
+  defaultOnBehalf: User
 
   """
   The effective permissions on the petition
@@ -3938,6 +3939,7 @@ type PetitionTemplate implements PetitionBase {
   Custom user properties
   """
   customProperties: JSONObject!
+  defaultOnBehalf: User
   defaultPath: String!
   defaultPermissions: [TemplateDefaultPermission!]!
 

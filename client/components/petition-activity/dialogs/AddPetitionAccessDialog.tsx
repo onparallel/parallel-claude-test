@@ -89,7 +89,6 @@ export function AddPetitionAccessDialog({
 }: DialogProps<AddPetitionAccessDialogProps, AddPetitionAccessDialogResult>) {
   const [showErrors, setShowErrors] = useState(false);
   const [recipientGroups, setRecipientGroups] = useState<ContactSelectSelection[][]>([[]]);
-  const [sendAsId, setSendAsId] = useState(petition.defaultOnBehalf?.id ?? user.id);
   const [accesses, setAccesses] = useState(petition.accesses);
 
   const [subscribeSender, setSubscribeSender] = useState(false);
@@ -115,6 +114,14 @@ export function AddPetitionAccessDialog({
   const senderHasPermission = petition.effectivePermissions.some((p) => p.user.id === sendAsId);
 
   const sendAsOptions = useMemo(() => [user, ...user.delegateOf], [user]);
+
+  const [sendAsId, setSendAsId] = useState(
+    // make sure the "send as" is one of the available delegated users
+    // it may not be an allowed user when setting default from the template's Messages tab.
+    sendAsOptions.some((o) => o.id === (petition.defaultOnBehalf?.id ?? user.id))
+      ? petition.defaultOnBehalf?.id ?? user.id
+      : user.id
+  );
 
   const handleSearchContactsByEmail = useSearchContactsByEmail();
 

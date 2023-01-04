@@ -35,7 +35,9 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
         emailBody: petition.emailBody ?? emptyRTEValue(),
       });
 
-      const [onBehalf, setOnBehalf] = useState<UserSelect_UserFragment | null>(null);
+      const [onBehalf, setOnBehalf] = useState<UserSelect_UserFragment | null>(
+        petition.defaultOnBehalf ?? null
+      );
 
       const handleMessagesEmailSubjectChange = (emailSubject: string) => {
         if (emailSubject === messages.emailSubject) return;
@@ -127,7 +129,11 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
           myEffectivePermission {
             permissionType
           }
+          defaultOnBehalf {
+            ...UserSelect_User
+          }
         }
+        ${UserSelect.fragments.User}
       `,
       User: gql`
         fragment PetitionTemplateRequestMessageCard_User on User {

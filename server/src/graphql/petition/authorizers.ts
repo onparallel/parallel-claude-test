@@ -665,7 +665,11 @@ export function defaultOnBehalfUserBelongsToContextOrganization<
 >(dataArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const data = args[dataArg] as unknown as NexusGenInputs["UpdatePetitionInput"];
-    const defaultOnBehalfUserId = data.defaultOnBehalfId!;
+    const defaultOnBehalfUserId = data.defaultOnBehalfId;
+    if (!isDefined(defaultOnBehalfUserId)) {
+      return true;
+    }
+
     const user = await ctx.users.loadUser(defaultOnBehalfUserId);
     return user?.org_id === ctx.user!.org_id;
   };
