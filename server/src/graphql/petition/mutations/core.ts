@@ -71,6 +71,7 @@ import {
   accessesHaveRemindersLeft,
   accessesHaveStatus,
   accessesIsNotOptedOut,
+  defaultOnBehalfUserBelongsToContextOrganization,
   fieldHasType,
   fieldIsNotFixed,
   fieldsBelongsToPetition,
@@ -645,6 +646,7 @@ export const updatePetition = mutationField("updatePetition", {
         args.data.anonymizeAfterMonths,
         args.data.anonymizePurpose,
         args.data.defaultPath,
+        args.data.defaultOnBehalfId,
       ],
       petitionsAreEditable("petitionId")
     ),
@@ -668,6 +670,7 @@ export const updatePetition = mutationField("updatePetition", {
         args.data.anonymizeAfterMonths,
         args.data.anonymizePurpose,
         args.data.defaultPath,
+        args.data.defaultOnBehalfId,
       ],
       petitionIsNotAnonymized("petitionId")
     ),
@@ -675,6 +678,10 @@ export const updatePetition = mutationField("updatePetition", {
     ifSomeDefined(
       (args) => [args.data.anonymizeAfterMonths, args.data.anonymizePurpose],
       and(userHasFeatureFlag("AUTO_ANONYMIZE"), userHasAccessToPetitions("petitionId", ["OWNER"]))
+    ),
+    ifSomeDefined(
+      (args) => [args.data.defaultOnBehalfId],
+      defaultOnBehalfUserBelongsToContextOrganization("data")
     )
   ),
   args: {

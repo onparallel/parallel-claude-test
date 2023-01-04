@@ -17,6 +17,7 @@ import { unMaybeArray } from "../../util/arrays";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
 import { Arg, ArgAuthorizer } from "../helpers/authorize";
+import { NexusGenInputs } from "../__types";
 
 function createPetitionAuthorizer<TRest extends any[] = []>(
   predicate: (petition: Petition, ...rest: TRest) => boolean
@@ -654,5 +655,18 @@ export function userIsOwnerOfPetitionFieldComment<
     }
 
     return true;
+  };
+}
+
+export function defaultOnBehalfUserBelongsToContextOrganization<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, NexusGenInputs["UpdatePetitionInput"]>
+>(dataArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const data = args[dataArg] as unknown as NexusGenInputs["UpdatePetitionInput"];
+    const defaultOnBehalfUserId = data.defaultOnBehalfId!;
+    const user = await ctx.users.loadUser(defaultOnBehalfUserId);
+    return user?.org_id === ctx.user!.org_id;
   };
 }
