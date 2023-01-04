@@ -1235,7 +1235,7 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
       `User:${ctx.user!.id}`
     );
     if (args.status === "REJECTED") {
-      const petition = await ctx.petitions.loadPetition(args.petitionId);
+      const petition = await ctx.petitions.loadPetition.raw(args.petitionId);
       if (petition?.status === "COMPLETED") {
         await ctx.petitions.updatePetition(
           args.petitionId,

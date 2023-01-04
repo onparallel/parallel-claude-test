@@ -186,7 +186,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       },
       petition.status
     );
-    if (status === "REJECTED" && petition.status === "COMPLETED") refetch();
   }
 
   const handleUpdatePetition = useCallback(
