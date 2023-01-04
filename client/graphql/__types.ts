@@ -6491,14 +6491,6 @@ export type PetitionAccessTable_PetitionFragment = {
   } | null;
 };
 
-export type PetitionAccessTable_PetitionAccessRemindersConfigFragment = {
-  __typename?: "RemindersConfig";
-  offset: number;
-  time: string;
-  timezone: string;
-  weekdaysOnly: boolean;
-};
-
 export type PetitionAccessTable_PetitionAccessFragment = {
   __typename?: "PetitionAccess";
   id: string;
@@ -27392,14 +27384,6 @@ export const CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragmentDoc = gq
     isDefault
   }
 ` as unknown as DocumentNode<CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment, unknown>;
-export const PetitionAccessTable_PetitionAccessRemindersConfigFragmentDoc = gql`
-  fragment PetitionAccessTable_PetitionAccessRemindersConfig on RemindersConfig {
-    offset
-    time
-    timezone
-    weekdaysOnly
-  }
-` as unknown as DocumentNode<PetitionAccessTable_PetitionAccessRemindersConfigFragment, unknown>;
 export const PetitionRemindersConfig_RemindersConfigFragmentDoc = gql`
   fragment PetitionRemindersConfig_RemindersConfig on RemindersConfig {
     offset
@@ -29691,11 +29675,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
       isPublic
       ...PublicLinkSettingsDialog_PetitionTemplate
       remindersConfig {
-        offset
-        limit
-        time
-        timezone
-        weekdaysOnly
+        ...PetitionRemindersConfig_RemindersConfig
       }
       publicLink {
         id
@@ -29713,6 +29693,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
   ${SignatureConfigDialog_PetitionBaseFragmentDoc}
   ${CompliancePeriodDialog_PetitionBaseFragmentDoc}
   ${PublicLinkSettingsDialog_PetitionTemplateFragmentDoc}
+  ${PetitionRemindersConfig_RemindersConfigFragmentDoc}
   ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
 ` as unknown as DocumentNode<PetitionSettings_PetitionBaseFragment, unknown>;
 export const PetitionComposeAttachments_PetitionAttachmentFragmentDoc = gql`

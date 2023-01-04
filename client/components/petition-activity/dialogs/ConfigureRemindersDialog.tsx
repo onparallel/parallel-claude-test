@@ -16,7 +16,7 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { PetitionRemindersConfig } from "@parallel/components/petition-compose/PetitionRemindersConfig";
 import {
   PetitionAccessTable_PetitionAccessFragment,
-  RemindersConfig,
+  PetitionRemindersConfig_RemindersConfigFragment,
 } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { useState } from "react";
@@ -24,7 +24,7 @@ import { FormattedMessage } from "react-intl";
 
 export type ConfigureRemindersDialogProps = {
   accesses: PetitionAccessTable_PetitionAccessFragment[];
-  defaultRemindersConfig: Maybe<RemindersConfig>;
+  defaultRemindersConfig: Maybe<PetitionRemindersConfig_RemindersConfigFragment>;
   remindersActive: boolean;
   hideRemindersActiveCheckbox?: boolean;
 };
@@ -35,9 +35,12 @@ export function ConfigureRemindersDialog({
   remindersActive,
   hideRemindersActiveCheckbox,
   ...props
-}: DialogProps<ConfigureRemindersDialogProps, Maybe<RemindersConfig>>) {
+}: DialogProps<
+  ConfigureRemindersDialogProps,
+  Maybe<PetitionRemindersConfig_RemindersConfigFragment>
+>) {
   const [remindersConfig, setRemindersConfig] =
-    useState<Maybe<RemindersConfig>>(defaultRemindersConfig);
+    useState<Maybe<PetitionRemindersConfig_RemindersConfigFragment>>(defaultRemindersConfig);
 
   const optedOut = accesses.filter((access) => access.remindersOptOut);
 

@@ -893,11 +893,7 @@ const fragments = {
         isPublic
         ...PublicLinkSettingsDialog_PetitionTemplate
         remindersConfig {
-          offset
-          limit
-          time
-          timezone
-          weekdaysOnly
+          ...PetitionRemindersConfig_RemindersConfig
         }
         publicLink {
           id
@@ -915,6 +911,7 @@ const fragments = {
     ${SignatureConfigDialog.fragments.PetitionBase}
     ${CompliancePeriodDialog.fragments.PetitionBase}
     ${PublicLinkSettingsDialog.fragments.PetitionTemplate}
+    ${useConfigureRemindersDialog.fragments.RemindersConfig}
     ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
   `,
 };

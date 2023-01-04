@@ -457,12 +457,6 @@ PetitionAccessesTable.fragments = {
         permissionType
       }
     }
-    fragment PetitionAccessTable_PetitionAccessRemindersConfig on RemindersConfig {
-      offset
-      time
-      timezone
-      weekdaysOnly
-    }
     fragment PetitionAccessTable_PetitionAccess on PetitionAccess {
       id
       contact {
