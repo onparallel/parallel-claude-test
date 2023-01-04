@@ -101,6 +101,7 @@ const mutations = [
       cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
         id
         status
+        cancelReason
       }
     }
   `,
@@ -182,14 +183,11 @@ export const PetitionSignaturesCard = Object.assign(
     );
     const handleCancelSignatureProcess = useCallback(
       async (petitionSignatureRequestId: string) => {
-        await updateSignatureConfig({
-          variables: { petitionId: petition.id, signatureConfig: null },
-        });
         await cancelSignatureRequest({
           variables: { petitionSignatureRequestId },
         });
       },
-      [updateSignatureConfig, cancelSignatureRequest]
+      [cancelSignatureRequest]
     );
 
     const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();

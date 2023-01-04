@@ -12908,6 +12908,7 @@ export type PetitionSignaturesCard_cancelSignatureRequestMutation = {
     __typename?: "PetitionSignatureRequest";
     id: string;
     status: PetitionSignatureRequestStatus;
+    cancelReason?: string | null;
   };
 };
 
@@ -33128,6 +33129,7 @@ export const PetitionSignaturesCard_cancelSignatureRequestDocument = gql`
     cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
       id
       status
+      cancelReason
     }
   }
 ` as unknown as DocumentNode<
