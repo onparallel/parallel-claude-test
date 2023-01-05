@@ -366,6 +366,7 @@ const _PetitionComposeField = chakraForwardRef<
         ) : (
           <Box
             ref={dragRef}
+            data-testid="compose-field-drag-handle"
             display="flex"
             flexDirection="column"
             justifyContent="center"
@@ -442,6 +443,7 @@ const _PetitionComposeField = chakraForwardRef<
         />
         <PetitionComposeFieldActions
           field={field}
+          isActive={isActive}
           canChangeVisibility={canChangeVisibility}
           onCloneField={onCloneField}
           onSettingsClick={onSettingsClick}
@@ -560,6 +562,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
         <Box flex={1}>
           <Input
             id={`field-title-${field.id}`}
+            data-testid="compose-field-title"
             ref={titleRef}
             aria-label={intl.formatMessage({
               id: "component.petition-compose-field.field-title-label",
@@ -641,6 +644,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
               <FormattedMessage id="petition.required-label" defaultMessage="Required" />
             </FormLabel>
             <Switch
+              data-testid="compose-field-required"
               id={`field-required-${field.id}`}
               height="20px"
               isChecked={!field.optional}
@@ -677,6 +681,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
         <GrowingTextarea
           ref={descriptionRef}
           id={`field-description-${field.id}`}
+          data-testid="compose-field-description"
           className={"field-description"}
           placeholder={
             field.type === "HEADING"
@@ -767,6 +772,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
         <PetitionFieldOptionsListEditor
           ref={fieldOptionsRef}
           id={`field-options-list-${field.id}`}
+          data-testid="compose-field-options"
           field={field}
           onFieldEdit={onFieldEdit}
           showError={showError}
@@ -838,7 +844,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
 interface PetitionComposeFieldActionsProps
   extends Pick<
     PetitionComposeFieldProps,
-    "field" | "onCloneField" | "onSettingsClick" | "onDeleteClick"
+    "field" | "isActive" | "onCloneField" | "onSettingsClick" | "onDeleteClick"
   > {
   canChangeVisibility: boolean;
   onVisibilityClick: () => void;
@@ -858,6 +864,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
       onSettingsClick,
       onDeleteClick,
       isReadOnly,
+      isActive,
       isAttachDisabled,
       ...props
     },
@@ -951,6 +958,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
         />
         <IconButtonWithTooltip
           data-action="show-field-settings"
+          data-testid="compose-field-settings-button"
           className="field-settings-button"
           icon={<SettingsIcon />}
           size="sm"
@@ -961,6 +969,8 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
             id: "component.petition-compose-field.field-settings",
             defaultMessage: "Field settings",
           })}
+          aria-controls={`compose-petition-field-settings-${field.id}`}
+          aria-expanded={isActive}
           onClick={onSettingsClick}
         />
         <IconButtonWithTooltip

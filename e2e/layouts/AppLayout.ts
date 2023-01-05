@@ -1,4 +1,5 @@
-import { Locator, Page } from "@playwright/test";
+import { Page } from "@playwright/test";
+import { openMenu } from "../helpers/chakra/openMenu";
 
 export class AppLayout {
   constructor(public page: Page) {}
@@ -20,14 +21,8 @@ export class AppLayout {
   }
 
   async openUserMenu() {
-    const button = await this.page.getByTestId("user-menu");
-    const menu = await this.openMenu(button);
+    const button = this.page.getByTestId("user-menu");
+    const menu = await openMenu(this.page, button);
     return menu;
-  }
-
-  protected async openMenu(locator: Locator) {
-    await locator.click();
-    const controls = await locator.getAttribute("aria-controls");
-    return await this.page.locator(`#${controls}`);
   }
 }

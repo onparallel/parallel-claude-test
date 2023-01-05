@@ -73,6 +73,7 @@ export function AskContactDetailsDialog({
             <Input
               {...emailRegisterProps}
               type="email"
+              data-testid="create-contact-email-input"
               placeholder={intl.formatMessage({
                 id: "generic.forms.email-placeholder",
                 defaultMessage: "name@example.com",
@@ -89,7 +90,7 @@ export function AskContactDetailsDialog({
             <FormLabel>
               <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
             </FormLabel>
-            <Input {...firstNameRegisterProps} />
+            <Input data-testid="create-contact-first-name-input" {...firstNameRegisterProps} />
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.forms.invalid-first-name-error"
@@ -101,12 +102,12 @@ export function AskContactDetailsDialog({
             <FormLabel>
               <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
             </FormLabel>
-            <Input {...register("lastName")} />
+            <Input data-testid="create-contact-last-name-input" {...register("lastName")} />
           </FormControl>
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" type="submit" id="create-contact-submit">
+        <Button colorScheme="primary" type="submit" data-testid="create-contact-button">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

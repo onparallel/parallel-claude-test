@@ -266,6 +266,7 @@ export function useReactSelectProps<
   }, [_styles]);
 
   const components = {
+    SelectContainer,
     IndicatorSeparator,
     ClearIndicator,
     DropdownIndicator,
@@ -350,6 +351,21 @@ export function genericRsComponent<
 }
 
 export const rsComponent = genericRsComponent<any, any, any>();
+
+const SelectContainer = rsComponent("SelectContainer", function ({ innerProps, ...props }) {
+  return (
+    <components.SelectContainer
+      innerProps={{
+        ...(props.selectProps.isLoading ? { "data-loading": "" } : {}),
+        ...Object.fromEntries(
+          Object.entries(props.selectProps).filter(([key]) => key.startsWith("data-"))
+        ),
+        ...innerProps,
+      }}
+      {...props}
+    />
+  );
+});
 
 const IndicatorSeparator = rsComponent("IndicatorSeparator", function () {
   return <></>;

@@ -61,7 +61,12 @@ function PetitionFromTemplateDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" variant="solid">
+        <Button
+          type="submit"
+          colorScheme="primary"
+          variant="solid"
+          data-testid="accept-edit-parallel-button"
+        >
           <FormattedMessage id="generic.accept" defaultMessage="Accept" />
         </Button>
       }

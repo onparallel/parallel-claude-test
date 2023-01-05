@@ -272,7 +272,6 @@ export function AddPetitionAccessDialog({
 
   return (
     <ConfirmDialog
-      id="send-petition-dialog"
       closeOnEsc={false}
       closeOnOverlayClick={false}
       closeOnNavigation

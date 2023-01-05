@@ -355,14 +355,20 @@ const SingleValue = rsComponent("SingleValue", function (props) {
 const Option = rsComponent("Option", function ({ children, ...props }) {
   if ((props.data as any).__isNew__) {
     return (
-      <components.Option {...props}>
+      <components.Option
+        {...props}
+        innerProps={{ ...props.innerProps, "data-testid": "create-contact-option" } as any}
+      >
         {children} {/* from formatCreateLabel */}
       </components.Option>
     );
   } else {
     const contact = props.data as ContactSelectSelection;
     return (
-      <components.Option {...props}>
+      <components.Option
+        {...props}
+        innerProps={{ ...props.innerProps, "data-email": contact.email } as any}
+      >
         <Text as="span" verticalAlign="baseline">
           <Text as="span">{contact.fullName}</Text>
           <Text as="span" display="inline-block" width={2} />

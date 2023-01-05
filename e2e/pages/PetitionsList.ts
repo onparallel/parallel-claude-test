@@ -1,4 +1,5 @@
 import { Page } from "@playwright/test";
+import { openMenu } from "../helpers/chakra/openMenu";
 import { AppLayout } from "../layouts/AppLayout";
 
 export class PetitionsList extends AppLayout {
@@ -6,13 +7,16 @@ export class PetitionsList extends AppLayout {
     super(page);
   }
 
+  getPetitionTypeButton() {
+    return this.page.getByTestId("petition-type-menu-button");
+  }
+
   async changePetitionType(type: "PETITION" | "TEMPLATE") {
-    const button = await this.page.getByTestId("petition-type-menu");
-    const menu = await this.openMenu(button);
+    const button = this.getPetitionTypeButton();
+    const menu = await openMenu(this.page, button);
     await (type === "PETITION"
       ? menu.getByTestId("petition-type-petition")
       : menu.getByTestId("petition-type-template")
     ).click();
-    await this.page.waitForLoadState("networkidle");
   }
 }

@@ -39,7 +39,7 @@ export function MessageEmailEditor({
           }
         </FormLabel>
         <Input
-          id="input-message-email-editor-subject"
+          data-testid="petition-email-subject-input"
           type="text"
           ref={subjectRef}
           value={subject}
@@ -66,6 +66,7 @@ export function MessageEmailEditor({
       >
         <RichTextEditor
           id={`email-message-${id}`}
+          data-testid="petition-email-body-rte"
           value={body}
           onChange={onBodyChange}
           placeholder={intl.formatMessage({

@@ -1,5 +1,9 @@
 import { isDefined } from "@chakra-ui/utils";
-import { useReactSelectProps, UseReactSelectProps } from "@parallel/utils/react-select/hooks";
+import {
+  rsComponent,
+  useReactSelectProps,
+  UseReactSelectProps,
+} from "@parallel/utils/react-select/hooks";
 import { OptionBase } from "@parallel/utils/react-select/types";
 import { If } from "@parallel/utils/types";
 import {
@@ -11,7 +15,7 @@ import {
   useMemo,
 } from "react";
 import { IntlShape, useIntl } from "react-intl";
-import Select, { Props as SelectProps, SelectInstance } from "react-select";
+import Select, { Props as SelectProps, SelectInstance, components } from "react-select";
 import { indexBy } from "remeda";
 
 export interface SimpleOption<T extends string = string> extends OptionBase {
@@ -42,7 +46,13 @@ export const SimpleSelect = forwardRef(function SimpleSelect<
   { value, onChange, ...props }: SimpleSelectProps<T, IsMulti, OptionType>,
   ref: ForwardedRef<SelectInstance<OptionType, IsMulti>>
 ) {
-  const rsProps = useReactSelectProps(props);
+  const rsProps = useReactSelectProps({
+    ...props,
+    components: {
+      Option,
+      ...props.components,
+    },
+  });
   const _value = useMemo(() => {
     const _options = indexBy(
       props.options?.flatMap((o) => ("value" in o ? [o] : o.options)) ?? [],
@@ -85,3 +95,12 @@ export function useSimpleSelectOptions<T extends string = string>(
   const intl = useIntl();
   return useMemo(() => factory(intl), [intl.locale, ...(deps ?? [])]);
 }
+
+const Option = rsComponent("Option", function ({ innerProps, ...props }) {
+  return (
+    <components.Option
+      innerProps={{ ...innerProps, "data-value": props.data.value } as any}
+      {...props}
+    />
+  );
+});

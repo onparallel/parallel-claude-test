@@ -438,6 +438,7 @@ export const PetitionComposeFieldList = Object.assign(
     return (
       <>
         <Card
+          data-testid="compose-fields"
           data-section="compose-fields"
           overflow="hidden"
           sx={{
@@ -462,6 +463,7 @@ export const PetitionComposeFieldList = Object.assign(
                   ref={fieldRefs[fieldId]}
                   id={`field-${fieldId}`}
                   data-section="compose-field"
+                  data-testid="compose-field"
                   onMove={handleFieldMove}
                   field={field}
                   fields={fields}
@@ -487,6 +489,7 @@ export const PetitionComposeFieldList = Object.assign(
                       left="50%"
                       transform="translate(-50%, 50%)"
                       className="add-field-after-button"
+                      data-testid="small-add-field-button"
                       colorScheme={isTemplate ? "primary" : undefined}
                       {...addButtonMouseHandlers(fieldId)}
                     />
@@ -500,7 +503,7 @@ export const PetitionComposeFieldList = Object.assign(
           <Flex marginTop={4} justifyContent="center">
             <BigAddFieldButton
               data-action="big-add-field"
-              id="big-add-field-button"
+              data-testid="big-add-field-button"
               onSelectFieldType={onAddField}
               colorScheme={isTemplate ? "primary" : undefined}
               user={user}

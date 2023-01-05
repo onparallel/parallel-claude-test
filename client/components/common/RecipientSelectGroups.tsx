@@ -232,6 +232,7 @@ export function RecipientSelectGroups({
               <Box flex="1" minWidth={0} data-section="recipient-select">
                 <ContactSelect
                   ref={recipientGroupSelectRef[index]}
+                  data-testid="petition-recipient-select"
                   isMulti
                   placeholder={intl.formatMessage({
                     id: "component.recipient-select-groups.recipients-placeholder",
@@ -293,6 +294,7 @@ export function RecipientSelectGroups({
       {canAddRecipientGroups ? (
         <Flex justifyContent="flex-start" alignItems="center" marginTop={4}>
           <Button
+            data-testid="petition-add-recipient-group-button"
             variant="link"
             color="gray.900"
             fontWeight="normal"

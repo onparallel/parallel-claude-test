@@ -447,6 +447,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           petition?.__typename === "Petition" &&
           !petition.accesses?.find((a) => a.status === "ACTIVE" && !a.isContactless) ? (
             <ResponsiveButtonIcon
+              data-testid="compose-send-petition-button"
               data-action="compose-next"
               id="petition-next"
               colorScheme="primary"
@@ -491,6 +492,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             >
               {activeField ? (
                 <PetitionComposeFieldSettings
+                  id={`compose-petition-field-settings-${activeField.id}`}
+                  data-testid="compose-petition-field-settings"
+                  data-field-id={activeField.id}
                   petitionId={petition.id}
                   key={activeField.id}
                   field={activeField}

@@ -457,7 +457,7 @@ function Petitions() {
                 fontSize="2xl"
                 paddingX={3}
                 data-action="change-parallel-template"
-                data-testid="petition-type-menu"
+                data-testid="petition-type-menu-button"
                 leftIcon={
                   state.type === "PETITION" ? (
                     <PaperPlaneIcon boxSize={6} />
