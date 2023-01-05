@@ -1,6 +1,6 @@
 import { SQSClient } from "@aws-sdk/client-sqs";
 import "reflect-metadata";
-import { Consumer } from "@rxfork/sqs-consumer";
+import { Consumer } from "sqs-consumer";
 import yargs from "yargs";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
