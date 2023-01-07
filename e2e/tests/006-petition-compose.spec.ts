@@ -19,6 +19,7 @@ test.describe.only("Petition compose", () => {
   test("should let you create a petition", async ({ page }) => {
     await test.step("create petition", async () => {
       const newPetition = new NewPetition(page);
+      await newPetition.openMyTemplates();
       await newPetition.createPetition(process.env.TEMPLATE1_ID);
       await page.waitForURL("**/app/petitions/*/preview*");
       await expect(page).toHaveTitle("Unnamed parallel - Input | Parallel");
@@ -108,14 +109,24 @@ test.describe.only("Petition compose", () => {
       await compose.selectShortTextFormat("EMAIL");
     });
 
+    await test.step("add a FILE_UPLOAD field", async () => {
+      await compose.addField("FILE_UPLOAD");
+      await compose.fillFieldParams(7, {
+        title: "Photo",
+        description: "Upload your photo",
+      });
+    });
+
     await test.step("send petition", async () => {
       await compose.openSendPetitionDialog();
       await compose.fillSendPetitionDialog({
         recipients: [
           [
-            { email: "santialbo@gmail.com" },
             {
-              email: `santialbo+${faker.datatype.uuid()}@gmail.com`,
+              email: process.env.USER1_EMAIL.replace(
+                "@gmail.com",
+                `+${faker.datatype.uuid()}@gmail.com`
+              ),
               firstName: faker.name.firstName(),
               lastName: faker.name.lastName(),
             },
@@ -124,6 +135,7 @@ test.describe.only("Petition compose", () => {
         subject: "Hello dummy",
         body: "Hello, please complete the following information!",
       });
+      await compose.submitSendPetitionDialog();
     });
   });
 });

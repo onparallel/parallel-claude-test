@@ -19,6 +19,8 @@ export const SendButton = chakraForwardRef<"button", SendButtonProps>(function S
       ref={ref}
       colorScheme="primary"
       leftIcon={<PaperPlaneIcon fontSize="18px" />}
+      data-testid="send-button"
+      moreOptionsButtonProps={{ "data-testid": "send-button-more-options-button" } as any}
       onClick={onSendClick}
       {...props}
       options={
@@ -26,6 +28,7 @@ export const SendButton = chakraForwardRef<"button", SendButtonProps>(function S
           <MenuItem
             onClick={onScheduleClick as any}
             icon={<TimeIcon display="block" boxSize={4} />}
+            data-testid="send-button-schedule-send-option"
           >
             <FormattedMessage id="component.send-button.schedule" defaultMessage="Schedule send" />
           </MenuItem>

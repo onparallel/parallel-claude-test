@@ -220,22 +220,23 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
     const placeholderMenuId = useId(undefined, "rte-placeholder-menu");
     const itemIdPrefix = useId(undefined, "rte-placeholder-menu-item");
 
-    const editableProps = useMemo(
-      () => ({
-        readOnly: isDisabled,
-        placeholder,
-        style: {
-          padding: "12px 16px",
-          maxHeight: "250px",
-          overflow: "auto",
-        } as CSSProperties,
-        "aria-controls": placeholderMenuId,
-        "aria-autocomplete": "list" as const,
-        "aria-activedescendant": selected ? `${itemIdPrefix}-${selected.value}` : undefined,
-        ...focusProps,
-      }),
-      [isDisabled, placeholder, placeholderMenuId, itemIdPrefix, selected?.value, focusProps]
-    );
+    const editableProps = {
+      readOnly: isDisabled,
+      placeholder,
+      style: useMemo(
+        () =>
+          ({
+            padding: "12px 16px",
+            maxHeight: "250px",
+            overflow: "auto",
+          } as CSSProperties),
+        []
+      ),
+      "aria-controls": placeholderMenuId,
+      "aria-autocomplete": "list" as const,
+      "aria-activedescendant": selected ? `${itemIdPrefix}-${selected.value}` : undefined,
+      ...focusProps,
+    };
 
     const { popperRef } = useEditorPopper(editorRef.current! as any, target, {
       strategy: "fixed",
@@ -266,6 +267,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
           aria-disabled={formControl.disabled}
           {...formControlProps}
           {...inputStyles}
+          {...props}
         >
           <RichTextEditorToolbar
             height="40px"

@@ -19,9 +19,7 @@ export const ToolbarPlaceholderButton = chakraForwardRef<"button", ToolbarPlaceh
     const editorRef = useUpdatingRef(editor);
     const handleMouseDown = useCallback(
       getPreventDefaultHandler(() => {
-        if (!editorRef.current.selection) {
-          focusEditor(editorRef.current as any);
-        }
+        focusEditor(editorRef.current as any);
         requestAnimationFrame(() => {
           insertText(editorRef.current, "#", {
             at: editorRef.current.selection?.anchor,

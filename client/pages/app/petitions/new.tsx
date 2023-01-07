@@ -269,6 +269,7 @@ function NewPetition() {
           >
             <TabList flex="1">
               <Tab
+                data-testid="new-petition-my-templates-tab"
                 data-link="my-templates"
                 borderTopRadius="md"
                 _selected={selectTabStyles}
@@ -282,6 +283,7 @@ function NewPetition() {
                 borderBottomRadius={0}
               >
                 <Tab
+                  data-testid="new-petition-public-templates-tab"
                   data-link="public-templates"
                   borderTopRadius="md"
                   _selected={selectTabStyles}

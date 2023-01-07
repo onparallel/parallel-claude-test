@@ -93,6 +93,7 @@ export function PetitionRemindersConfig({
         <Flex alignItems="center">
           <Checkbox
             data-action="enable-reminders"
+            data-testid="enable-reminders-checkbox"
             colorScheme="primary"
             size="lg"
             marginRight={2}
@@ -143,7 +144,7 @@ export function PetitionRemindersConfig({
                     keepWithinRange
                     clampValueOnBlur
                   >
-                    <NumberInputField type="number" />
+                    <NumberInputField type="number" data-testid="reminders-config-offset-input" />
                     <NumberInputStepper>
                       <NumberIncrementStepper />
                       <NumberDecrementStepper />
@@ -154,6 +155,7 @@ export function PetitionRemindersConfig({
                   <Input
                     lineHeight="1"
                     type="time"
+                    data-testid="reminders-config-time-input"
                     size="sm"
                     width="116px"
                     marginX={2}
@@ -192,7 +194,7 @@ export function PetitionRemindersConfig({
           </Flex>
           <Flex alignItems="center" marginTop={2}>
             <Checkbox
-              id="reminder-settings-weekdays"
+              data-testid="reminders-config-weekdays-only-checkbox"
               colorScheme="primary"
               size="md"
               marginRight={2}
@@ -204,13 +206,12 @@ export function PetitionRemindersConfig({
                   weekdaysOnly: event.target.checked,
                 })
               }
-            />
-            <Box as="label" htmlFor="reminder-settings-weekdays">
+            >
               <FormattedMessage
                 id="component.petition-reminder-settings.only-weekdays"
                 defaultMessage="...only on weekdays"
               />
-            </Box>
+            </Checkbox>
           </Flex>
 
           <Text fontSize="sm" fontStyle="italic" marginTop={1}>

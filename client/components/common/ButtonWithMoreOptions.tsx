@@ -14,10 +14,11 @@ import { MoreOptionsMenuButton } from "./MoreOptionsMenuButton";
 
 export interface ButtonWithMoreOptionsProps extends ButtonProps {
   options: ReactNode;
+  moreOptionsButtonProps?: ButtonProps;
 }
 
 export const ButtonWithMoreOptions = chakraForwardRef<"button", ButtonWithMoreOptionsProps>(
-  function ButtonWithMoreOptions({ as, options, ...props }, ref) {
+  function ButtonWithMoreOptions({ as, options, moreOptionsButtonProps, ...props }, ref) {
     const layoutProps = pick(props, layoutPropNames as any);
     const otherProps = omitThemingProps(omit(props, layoutPropNames as any));
     const themingProps = pick(props, ["styleConfig", "size", "variant", "colorScheme"]);
@@ -36,6 +37,7 @@ export const ButtonWithMoreOptions = chakraForwardRef<"button", ButtonWithMoreOp
           minWidth={"auto"}
           padding={2}
           options={options}
+          {...moreOptionsButtonProps}
         />
       </ButtonGroup>
     );

@@ -1,7 +1,7 @@
 import { Page } from "@playwright/test";
 import { isDefined } from "remeda";
 import { fillContactSelect } from "../helpers/react-select/fillContactSelect";
-import { RteInput } from "../helpers/rte/fillRte";
+import { fillRte, RteInput } from "../helpers/rte/fillRte";
 import { waitForGraphQL } from "../helpers/waitForGraphQL";
 import { AppLayout } from "./AppLayout";
 
@@ -43,10 +43,16 @@ export class PetitionLayout extends AppLayout {
     recipients,
     subject,
     body,
+    reminders,
   }: {
     recipients: { email: string; firstName?: string; lastName?: string }[][];
     subject: string;
     body: RteInput;
+    reminders?: {
+      offset: number;
+      time: string;
+      weekdaysOnly: boolean;
+    };
   }) {
     let first = true;
     for (const group of recipients) {
@@ -57,5 +63,19 @@ export class PetitionLayout extends AppLayout {
       const select = this.page.getByTestId("petition-recipient-select").last();
       await fillContactSelect(this.page, select, group);
     }
+    await this.page.getByTestId("petition-email-subject-input").fill(subject);
+    await fillRte(this.page, this.page.getByTestId("petition-email-body-rte"), body);
+    if (isDefined(reminders)) {
+      await this.page.getByTestId("enable-reminders-checkbox").setChecked(true);
+      await this.page.getByTestId("reminders-config-offset-input").fill(`${reminders.offset}`);
+      await this.page.getByTestId("reminders-config-time-input").fill(reminders.time);
+      await this.page
+        .getByTestId("reminders-config-weekdays-only-checkbox")
+        .setChecked(reminders.weekdaysOnly);
+    }
+  }
+
+  async submitSendPetitionDialog() {
+    await this.page.getByTestId("send-button").click();
   }
 }
