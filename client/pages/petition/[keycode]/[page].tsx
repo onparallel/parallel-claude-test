@@ -56,7 +56,7 @@ import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
 import { useLiquidScope } from "@parallel/utils/useLiquidScope";
 import { withMetadata } from "@parallel/utils/withMetadata";
 import useResizeObserver from "@react-hook/resize-observer";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useRef, useState } from "react";
@@ -408,21 +408,19 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                     <AnimatePresence initial={false}>
                       {fields.map((field) => {
                         return (
-                          <motion.div key={field.id} layout="position">
-                            <RecipientViewPetitionField
-                              key={field.id}
-                              petitionId={petition.id}
-                              keycode={keycode}
-                              access={access!}
-                              field={field}
-                              isDisabled={petition.status === "CLOSED"}
-                              isInvalid={
-                                finalized &&
-                                completedFieldReplies(field).length === 0 &&
-                                !field.optional
-                              }
-                            />
-                          </motion.div>
+                          <RecipientViewPetitionField
+                            key={field.id}
+                            petitionId={petition.id}
+                            keycode={keycode}
+                            access={access!}
+                            field={field}
+                            isDisabled={petition.status === "CLOSED"}
+                            isInvalid={
+                              finalized &&
+                              completedFieldReplies(field).length === 0 &&
+                              !field.optional
+                            }
+                          />
                         );
                       })}
                     </AnimatePresence>

@@ -77,7 +77,6 @@ import { useLiquidScope } from "@parallel/utils/useLiquidScope";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { withMetadata } from "@parallel/utils/withMetadata";
-import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -486,88 +485,85 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 <Stack spacing={4} key={0}>
                   <LiquidScopeProvider scope={scope}>
                     {fields.map((field) => (
-                      <motion.div key={field.id} layout="position">
-                        <Box
-                          position="relative"
-                          _focusWithin={{
-                            ".edit-preview-field-buttons": {
-                              display: "flex",
-                            },
-                          }}
-                          _hover={{
-                            ".edit-preview-field-buttons": {
-                              display: "inline-flex",
-                            },
-                          }}
-                        >
-                          <PreviewPetitionField
-                            key={field.id}
-                            petition={petition}
-                            field={field}
-                            isDisabled={
-                              (isPetition && petition.status === "CLOSED") ||
-                              petition.isAnonymized ||
-                              displayPetitionLimitReachedAlert
-                            }
-                            isInvalid={
-                              finalized &&
-                              completedFieldReplies(field).length === 0 &&
-                              !field.optional
-                            }
-                            isCacheOnly={!isPetition}
-                            myEffectivePermission={myEffectivePermission}
-                          />
-                          {showQuickAccessButtons ? (
-                            <Center
-                              position="absolute"
-                              top="0px"
-                              right="-48px"
-                              height="100%"
-                              width="auto"
-                              minWidth="48px"
-                              padding={2}
-                            >
-                              <Stack className={"edit-preview-field-buttons"} display="none">
-                                <NakedLink href={buildUrlToSection("compose", { field: field.id })}>
+                      <Box
+                        key={field.id}
+                        position="relative"
+                        _focusWithin={{
+                          ".edit-preview-field-buttons": {
+                            display: "flex",
+                          },
+                        }}
+                        _hover={{
+                          ".edit-preview-field-buttons": {
+                            display: "inline-flex",
+                          },
+                        }}
+                      >
+                        <PreviewPetitionField
+                          key={field.id}
+                          petition={petition}
+                          field={field}
+                          isDisabled={
+                            (isPetition && petition.status === "CLOSED") ||
+                            petition.isAnonymized ||
+                            displayPetitionLimitReachedAlert
+                          }
+                          isInvalid={
+                            finalized &&
+                            completedFieldReplies(field).length === 0 &&
+                            !field.optional
+                          }
+                          isCacheOnly={!isPetition}
+                          myEffectivePermission={myEffectivePermission}
+                        />
+                        {showQuickAccessButtons ? (
+                          <Center
+                            position="absolute"
+                            top="0px"
+                            right="-48px"
+                            height="100%"
+                            width="auto"
+                            minWidth="48px"
+                            padding={2}
+                          >
+                            <Stack className={"edit-preview-field-buttons"} display="none">
+                              <NakedLink href={buildUrlToSection("compose", { field: field.id })}>
+                                <IconButtonWithTooltip
+                                  as="a"
+                                  size="sm"
+                                  variant="outline"
+                                  backgroundColor="white"
+                                  placement="bottom"
+                                  color="gray.600"
+                                  icon={<EditSimpleIcon boxSize={4} />}
+                                  label={intl.formatMessage({
+                                    id: "page.preview.edit-field",
+                                    defaultMessage: "Edit field",
+                                  })}
+                                />
+                              </NakedLink>
+                              {field.type === "HEADING" || !isPetition ? null : (
+                                <NakedLink href={buildUrlToSection("replies", { field: field.id })}>
                                   <IconButtonWithTooltip
                                     as="a"
+                                    icon={<ChevronRightIcon boxSize={5} />}
                                     size="sm"
                                     variant="outline"
                                     backgroundColor="white"
                                     placement="bottom"
                                     color="gray.600"
-                                    icon={<EditSimpleIcon boxSize={4} />}
+                                    isDisabled={field.replies.length === 0}
                                     label={intl.formatMessage({
-                                      id: "page.preview.edit-field",
-                                      defaultMessage: "Edit field",
+                                      id: "page.preview.review-reply",
+                                      defaultMessage: "Review reply",
                                     })}
                                   />
                                 </NakedLink>
-                                {field.type === "HEADING" || !isPetition ? null : (
-                                  <NakedLink
-                                    href={buildUrlToSection("replies", { field: field.id })}
-                                  >
-                                    <IconButtonWithTooltip
-                                      as="a"
-                                      icon={<ChevronRightIcon boxSize={5} />}
-                                      size="sm"
-                                      variant="outline"
-                                      backgroundColor="white"
-                                      placement="bottom"
-                                      color="gray.600"
-                                      isDisabled={field.replies.length === 0}
-                                      label={intl.formatMessage({
-                                        id: "page.preview.review-reply",
-                                        defaultMessage: "Review reply",
-                                      })}
-                                    />
-                                  </NakedLink>
-                                )}
-                              </Stack>
-                            </Center>
-                          ) : null}
-                        </Box>
-                      </motion.div>
+                              )}
+                            </Stack>
+                          </Center>
+                        ) : null}
+                      </Box>
                     ))}
                   </LiquidScopeProvider>
                 </Stack>
