@@ -20,6 +20,7 @@ import { signatureCancelledDeclinedBySigner } from "./emails/signature-cancelled
 import { signatureCancelledNoCreditsLeft } from "./emails/signature-cancelled-no-credits-left";
 import { signatureCancelledRequestError } from "./emails/signature-cancelled-request-error";
 import { createQueueWorker } from "./helpers/createQueueWorker";
+import escapeStringRegexp from "escape-string-regexp";
 
 const builders = {
   "petition-completed": petitionCompleted,
@@ -63,7 +64,11 @@ createQueueWorker("email-sender", async (payload, context) => {
     if (email) {
       if (
         process.env.NODE_ENV === "development" &&
-        !context.config.development.whitelistedEmails.includes(email.to)
+        !context.config.development.whitelistedEmails.some((e) => {
+          const [l, d] = e.split("@");
+          const [local, domain] = email.to.split("@");
+          return d === domain && (l === local || local.startsWith(l + "+"));
+        })
       ) {
         context.logger.warn(
           `DEVELOPMENT: ${email.to} is not whitelisted in .development.env. Skipping...`
