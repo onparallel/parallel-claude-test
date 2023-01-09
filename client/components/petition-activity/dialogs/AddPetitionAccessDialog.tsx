@@ -118,8 +118,9 @@ export function AddPetitionAccessDialog({
   const [sendAsId, setSendAsId] = useState(
     // make sure the "send as" is one of the available delegated users
     // it may not be an allowed user when setting default from the template's Messages tab.
-    sendAsOptions.some((o) => o.id === (petition.defaultOnBehalf?.id ?? user.id))
-      ? petition.defaultOnBehalf?.id ?? user.id
+    isDefined(petition.defaultOnBehalf) &&
+      sendAsOptions.some((o) => o.id === petition.defaultOnBehalf!.id)
+      ? petition.defaultOnBehalf.id
       : user.id
   );
 
