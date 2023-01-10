@@ -44,7 +44,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useLoadCountryNames } from "@parallel/utils/useCountryName";
-import { useDowJonesProfileDownloadTask } from "@parallel/utils/useDowJonesProfileDownloadTask";
+import { useDowJonesProfileDownloadTask } from "@parallel/utils/tasks/useDowJonesProfileDownloadTask";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import Head from "next/head";
 import { useRouter } from "next/router";

@@ -6,12 +6,17 @@ import {
 } from "@parallel/components/common/dialogs/TaskProgressDialog";
 import {
   usePrintPdfTask_createPrintPdfTaskDocument,
+  usePrintPdfTask_createPrintPdfTaskMutationVariables,
   usePrintPdfTask_getTaskResultFileDocument,
+  usePrintPdfTask_taskDocument,
 } from "@parallel/graphql/__types";
+import { useCallback } from "react";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { openNewWindow } from "./openNewWindow";
-import { withError } from "./promises/withError";
+import { openNewWindow } from "../openNewWindow";
+import { waitFor } from "../promises/waitFor";
+import { withError } from "../promises/withError";
+import { BackgroundTaskOptions } from "./backgroundTaskOptions";
 
 export function usePrintPdfTask() {
   const apollo = useApolloClient();
@@ -80,6 +85,54 @@ export function usePrintPdfTask() {
   };
 }
 
+export function usePrintPdfBackgroundTask() {
+  const apollo = useApolloClient();
+  const [createPrintPdfTask] = useMutation(usePrintPdfTask_createPrintPdfTaskDocument);
+  const [getTaskResultFile] = useMutation(usePrintPdfTask_getTaskResultFileDocument);
+
+  return useCallback(
+    async (
+      variables: usePrintPdfTask_createPrintPdfTaskMutationVariables,
+      { signal, timeout = 60_000, pollingInterval = 3_000 }: BackgroundTaskOptions = {}
+    ) => {
+      const { data: initialData } = await createPrintPdfTask({ variables });
+
+      const task = await (async function () {
+        const startTime = performance.now();
+        while (true) {
+          if (signal?.aborted) {
+            throw new Error("ABORTED");
+          }
+          if (performance.now() - startTime > timeout) {
+            throw new Error("TIMEOUT");
+          }
+          const {
+            data: { task },
+          } = await apollo.query({
+            query: usePrintPdfTask_taskDocument,
+            variables: { id: initialData!.createPrintPdfTask.id },
+            fetchPolicy: "network-only",
+          });
+          if (task.status === "COMPLETED") {
+            return task;
+          } else if (task.status === "FAILED") {
+            throw new Error("FAILED");
+          }
+
+          await waitFor(pollingInterval);
+        }
+      })();
+
+      const { data } = await getTaskResultFile({ variables: { taskId: task!.id } });
+      return {
+        url: data!.getTaskResultFile.url,
+        filename: data!.getTaskResultFile.filename,
+      };
+    },
+    []
+  );
+}
+
 usePrintPdfTask.mutations = [
   gql`
     mutation usePrintPdfTask_createPrintPdfTask($petitionId: GID!) {
@@ -93,6 +146,19 @@ usePrintPdfTask.mutations = [
     mutation usePrintPdfTask_getTaskResultFile($taskId: GID!) {
       getTaskResultFile(taskId: $taskId, preview: true) {
         url
+        filename
+      }
+    }
+  `,
+];
+
+const _queries = [
+  gql`
+    query usePrintPdfTask_task($id: GID!) {
+      task(id: $id) {
+        id
+        status
+        output
       }
     }
   `,

@@ -5,43 +5,45 @@ import {
   useTaskProgressDialog,
 } from "@parallel/components/common/dialogs/TaskProgressDialog";
 import {
-  useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTaskDocument,
-  useDowJonesProfileDownloadTask_getTaskResultFileDocument,
+  usePublicPrintPdfTask_publicCreatePrintPdfTaskDocument,
+  usePublicPrintPdfTask_publicGetTaskResultFileUrlDocument,
 } from "@parallel/graphql/__types";
-
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { openNewWindow } from "./openNewWindow";
-import { withError } from "./promises/withError";
+import { openNewWindow } from "../openNewWindow";
+import { withError } from "../promises/withError";
 
-export function useDowJonesProfileDownloadTask() {
+export function usePublicPrintPdfTask() {
+  const intl = useIntl();
   const apollo = useApolloClient();
   const showError = useErrorDialog();
-  const [getTaskResultFile] = useMutation(useDowJonesProfileDownloadTask_getTaskResultFileDocument);
-
   const showTaskProgressDialog = useTaskProgressDialog();
-  const intl = useIntl();
 
-  return async (profileId: string) => {
+  const [publicGetTaskResultFileUrl] = useMutation(
+    usePublicPrintPdfTask_publicGetTaskResultFileUrlDocument
+  );
+
+  return async (keycode: string) => {
     const [taskError, finishedTask] = await withError(async () => {
       return await showTaskProgressDialog({
+        keycode,
         initTask: async () => {
           const { data } = await apollo.mutate({
-            mutation: useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTaskDocument,
-            variables: { profileId },
+            mutation: usePublicPrintPdfTask_publicCreatePrintPdfTaskDocument,
+            variables: { keycode },
           });
           if (!isDefined(data)) {
             throw new Error();
           }
-          return data.createDowJonesProfileDownloadTask;
+          return data.publicCreatePrintPdfTask;
         },
         dialogHeader: intl.formatMessage({
-          id: "component.dowjones-profile-download-task.header",
+          id: "component.print-pdf-task.header",
           defaultMessage: "Generating PDF file...",
         }),
         confirmText: intl.formatMessage({
-          id: "generic.download",
-          defaultMessage: "Download",
+          id: "component.print-pdf-task.confirm",
+          defaultMessage: "Download PDF",
         }),
       });
     });
@@ -59,13 +61,15 @@ export function useDowJonesProfileDownloadTask() {
     } else if (!taskError) {
       const [error] = await withError(
         openNewWindow(async () => {
-          const { data } = await getTaskResultFile({
-            variables: { taskId: finishedTask!.id },
+          const { data } = await publicGetTaskResultFileUrl({
+            variables: { taskId: finishedTask!.id, keycode },
           });
-          return data!.getTaskResultFile.url;
+          if (!data?.publicGetTaskResultFileUrl) {
+            throw new Error();
+          }
+          return data.publicGetTaskResultFileUrl;
         })
       );
-
       if (error) {
         await withError(
           showError({
@@ -81,20 +85,18 @@ export function useDowJonesProfileDownloadTask() {
   };
 }
 
-useDowJonesProfileDownloadTask.mutations = [
+usePublicPrintPdfTask.mutations = [
   gql`
-    mutation useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTask($profileId: ID!) {
-      createDowJonesProfileDownloadTask(profileId: $profileId) {
+    mutation usePublicPrintPdfTask_publicCreatePrintPdfTask($keycode: ID!) {
+      publicCreatePrintPdfTask(keycode: $keycode) {
         ...TaskProgressDialog_Task
       }
     }
     ${TaskProgressDialog.fragments.Task}
   `,
   gql`
-    mutation useDowJonesProfileDownloadTask_getTaskResultFile($taskId: GID!) {
-      getTaskResultFile(taskId: $taskId, preview: true) {
-        url
-      }
+    mutation usePublicPrintPdfTask_publicGetTaskResultFileUrl($taskId: GID!, $keycode: ID!) {
+      publicGetTaskResultFileUrl(taskId: $taskId, keycode: $keycode)
     }
   `,
 ];

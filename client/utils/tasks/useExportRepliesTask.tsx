@@ -5,48 +5,42 @@ import {
   useTaskProgressDialog,
 } from "@parallel/components/common/dialogs/TaskProgressDialog";
 import {
-  useTemplateRepliesReportTask_createTemplateRepliesReportTaskDocument,
-  useTemplateRepliesReportTask_getTaskResultFileDocument,
+  useExportRepliesTask_createExportRepliesTaskDocument,
+  useExportRepliesTask_getTaskResultFileDocument,
 } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { openNewWindow } from "./openNewWindow";
-import { withError } from "./promises/withError";
-import { Maybe } from "./types";
+import { openNewWindow } from "../openNewWindow";
+import { withError } from "../promises/withError";
+import { Maybe } from "../types";
 
-export function useTemplateRepliesReportTask() {
+export function useExportRepliesTask() {
   const apollo = useApolloClient();
   const showError = useErrorDialog();
-  const [getTaskResultFile] = useMutation(useTemplateRepliesReportTask_getTaskResultFileDocument);
-
+  const [getTaskResultFile] = useMutation(useExportRepliesTask_getTaskResultFileDocument);
   const showTaskProgressDialog = useTaskProgressDialog();
   const intl = useIntl();
 
-  return async (petitionId: string, startDate?: Maybe<string>, endDate?: Maybe<string>) => {
+  return async (petitionId: string, pattern?: Maybe<string>) => {
     const [taskError, finishedTask] = await withError(async () => {
       return await showTaskProgressDialog({
         initTask: async () => {
           const { data } = await apollo.mutate({
-            mutation: useTemplateRepliesReportTask_createTemplateRepliesReportTaskDocument,
-            variables: {
-              petitionId,
-              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-              startDate,
-              endDate,
-            },
+            mutation: useExportRepliesTask_createExportRepliesTaskDocument,
+            variables: { petitionId, pattern },
           });
           if (!isDefined(data)) {
             throw new Error();
           }
-          return data.createTemplateRepliesReportTask;
+          return data.createExportRepliesTask;
         },
         dialogHeader: intl.formatMessage({
-          id: "component.export-report-task.header",
-          defaultMessage: "Generating report...",
+          id: "component.export-replies-task.header",
+          defaultMessage: "Exporting replies...",
         }),
         confirmText: intl.formatMessage({
-          id: "generic.download",
-          defaultMessage: "Download",
+          id: "component.export-replies-task.confirm",
+          defaultMessage: "Download ZIP",
         }),
       });
     });
@@ -70,7 +64,6 @@ export function useTemplateRepliesReportTask() {
           return data!.getTaskResultFile.url;
         })
       );
-
       if (error) {
         await withError(
           showError({
@@ -86,28 +79,18 @@ export function useTemplateRepliesReportTask() {
   };
 }
 
-useTemplateRepliesReportTask.mutations = [
+useExportRepliesTask.mutations = [
   gql`
-    mutation useTemplateRepliesReportTask_createTemplateRepliesReportTask(
-      $petitionId: GID!
-      $timezone: String!
-      $startDate: DateTime
-      $endDate: DateTime
-    ) {
-      createTemplateRepliesReportTask(
-        petitionId: $petitionId
-        timezone: $timezone
-        startDate: $startDate
-        endDate: $endDate
-      ) {
+    mutation useExportRepliesTask_createExportRepliesTask($petitionId: GID!, $pattern: String) {
+      createExportRepliesTask(petitionId: $petitionId, pattern: $pattern) {
         ...TaskProgressDialog_Task
       }
     }
     ${TaskProgressDialog.fragments.Task}
   `,
   gql`
-    mutation useTemplateRepliesReportTask_getTaskResultFile($taskId: GID!) {
-      getTaskResultFile(taskId: $taskId, preview: true) {
+    mutation useExportRepliesTask_getTaskResultFile($taskId: GID!) {
+      getTaskResultFile(taskId: $taskId, preview: false) {
         url
       }
     }

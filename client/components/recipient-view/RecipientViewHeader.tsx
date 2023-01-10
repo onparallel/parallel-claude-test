@@ -46,7 +46,7 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
-import { usePublicPrintPdfTask } from "@parallel/utils/usePublicPrintPdfTask";
+import { usePublicPrintPdfTask } from "@parallel/utils/tasks/usePublicPrintPdfTask";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ContactListPopover } from "../common/ContactListPopover";
 import { HelpPopover } from "../common/HelpPopover";

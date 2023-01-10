@@ -674,6 +674,10 @@ export interface Mutation {
   createTemplateRepliesReportTask: Task;
   /** Creates a task for generating a JSON report of the template usage */
   createTemplateStatsReportTask: Task;
+  /** Creates a task for generating an xlsx file with overview report of logged user's templates */
+  createTemplatesOverviewExportTask: Task;
+  /** Creates a task for generating an overview report of logged user's templates */
+  createTemplatesOverviewReportTask: Task;
   /** Creates a group in the user's organization */
   createUserGroup: UserGroup;
   /** Deactivates the specified active petition accesses. */
@@ -1190,6 +1194,16 @@ export interface MutationcreateTemplateStatsReportTaskArgs {
   endDate?: InputMaybe<Scalars["DateTime"]>;
   startDate?: InputMaybe<Scalars["DateTime"]>;
   templateId: Scalars["GID"];
+}
+
+export interface MutationcreateTemplatesOverviewExportTaskArgs {
+  endDate?: InputMaybe<Scalars["DateTime"]>;
+  startDate?: InputMaybe<Scalars["DateTime"]>;
+}
+
+export interface MutationcreateTemplatesOverviewReportTaskArgs {
+  endDate?: InputMaybe<Scalars["DateTime"]>;
+  startDate?: InputMaybe<Scalars["DateTime"]>;
 }
 
 export interface MutationcreateUserGroupArgs {
@@ -4128,6 +4142,8 @@ export type TaskName =
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
   | "PRINT_PDF"
+  | "TEMPLATES_OVERVIEW_EXPORT"
+  | "TEMPLATES_OVERVIEW_REPORT"
   | "TEMPLATE_REPLIES_REPORT"
   | "TEMPLATE_STATS_REPORT";
 
@@ -26312,81 +26328,6 @@ export type createMentionPlugin_UserOrUserGroupFragment =
   | createMentionPlugin_UserOrUserGroup_User_Fragment
   | createMentionPlugin_UserOrUserGroup_UserGroup_Fragment;
 
-export type uploadFile_AWSPresignedPostDataFragment = {
-  __typename?: "AWSPresignedPostData";
-  url: string;
-  fields: { [key: string]: any };
-};
-
-export type useBackgroundTask_TaskFragment = {
-  __typename?: "Task";
-  id: string;
-  status: TaskStatus;
-  output?: { [key: string]: any } | null;
-};
-
-export type useBackgroundTask_createExportExcelTaskMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-}>;
-
-export type useBackgroundTask_createExportExcelTaskMutation = {
-  createTask: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    output?: { [key: string]: any } | null;
-  };
-};
-
-export type useBackgroundTask_createPrintPdfTaskMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-}>;
-
-export type useBackgroundTask_createPrintPdfTaskMutation = {
-  createTask: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    output?: { [key: string]: any } | null;
-  };
-};
-
-export type useBackgroundTask_createTemplateStatsReportTaskMutationVariables = Exact<{
-  templateId: Scalars["GID"];
-  startDate?: InputMaybe<Scalars["DateTime"]>;
-  endDate?: InputMaybe<Scalars["DateTime"]>;
-}>;
-
-export type useBackgroundTask_createTemplateStatsReportTaskMutation = {
-  createTask: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    output?: { [key: string]: any } | null;
-  };
-};
-
-export type useBackgroundTask_getTaskResultFileMutationVariables = Exact<{
-  taskId: Scalars["GID"];
-}>;
-
-export type useBackgroundTask_getTaskResultFileMutation = {
-  getTaskResultFile: { __typename?: "TaskResultFile"; filename: string; url: string };
-};
-
-export type useBackgroundTask_taskQueryVariables = Exact<{
-  id: Scalars["GID"];
-}>;
-
-export type useBackgroundTask_taskQuery = {
-  task: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    output?: { [key: string]: any } | null;
-  };
-};
-
 export type useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTaskMutationVariables =
   Exact<{
     profileId: Scalars["ID"];
@@ -26407,6 +26348,168 @@ export type useDowJonesProfileDownloadTask_getTaskResultFileMutationVariables = 
 
 export type useDowJonesProfileDownloadTask_getTaskResultFileMutation = {
   getTaskResultFile: { __typename?: "TaskResultFile"; url: string };
+};
+
+export type useExportExcelTask_TaskFragment = {
+  __typename?: "Task";
+  id: string;
+  status: TaskStatus;
+  output?: { [key: string]: any } | null;
+};
+
+export type useExportExcelTask_createExportExcelTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type useExportExcelTask_createExportExcelTaskMutation = {
+  createExportExcelTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    output?: { [key: string]: any } | null;
+  };
+};
+
+export type useExportExcelTask_getTaskResultFileMutationVariables = Exact<{
+  taskId: Scalars["GID"];
+}>;
+
+export type useExportExcelTask_getTaskResultFileMutation = {
+  getTaskResultFile: { __typename?: "TaskResultFile"; filename: string; url: string };
+};
+
+export type useExportExcelTask_taskQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type useExportExcelTask_taskQuery = {
+  task: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    output?: { [key: string]: any } | null;
+  };
+};
+
+export type usePrintPdfTask_createPrintPdfTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type usePrintPdfTask_createPrintPdfTaskMutation = {
+  createPrintPdfTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    progress?: number | null;
+  };
+};
+
+export type usePrintPdfTask_getTaskResultFileMutationVariables = Exact<{
+  taskId: Scalars["GID"];
+}>;
+
+export type usePrintPdfTask_getTaskResultFileMutation = {
+  getTaskResultFile: { __typename?: "TaskResultFile"; url: string; filename: string };
+};
+
+export type usePrintPdfTask_taskQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type usePrintPdfTask_taskQuery = {
+  task: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    output?: { [key: string]: any } | null;
+  };
+};
+
+export type usePublicPrintPdfTask_publicCreatePrintPdfTaskMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+}>;
+
+export type usePublicPrintPdfTask_publicCreatePrintPdfTaskMutation = {
+  publicCreatePrintPdfTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    progress?: number | null;
+  };
+};
+
+export type usePublicPrintPdfTask_publicGetTaskResultFileUrlMutationVariables = Exact<{
+  taskId: Scalars["GID"];
+  keycode: Scalars["ID"];
+}>;
+
+export type usePublicPrintPdfTask_publicGetTaskResultFileUrlMutation = {
+  publicGetTaskResultFileUrl: string;
+};
+
+export type useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  timezone: Scalars["String"];
+  startDate?: InputMaybe<Scalars["DateTime"]>;
+  endDate?: InputMaybe<Scalars["DateTime"]>;
+}>;
+
+export type useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutation = {
+  createTemplateRepliesReportTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    progress?: number | null;
+  };
+};
+
+export type useTemplateRepliesReportTask_getTaskResultFileMutationVariables = Exact<{
+  taskId: Scalars["GID"];
+}>;
+
+export type useTemplateRepliesReportTask_getTaskResultFileMutation = {
+  getTaskResultFile: { __typename?: "TaskResultFile"; url: string };
+};
+
+export type useTemplateStatsReportTask_TaskFragment = {
+  __typename?: "Task";
+  id: string;
+  status: TaskStatus;
+  output?: { [key: string]: any } | null;
+};
+
+export type useTemplateStatsReportTask_createTemplateStatsReportTaskMutationVariables = Exact<{
+  templateId: Scalars["GID"];
+  startDate?: InputMaybe<Scalars["DateTime"]>;
+  endDate?: InputMaybe<Scalars["DateTime"]>;
+}>;
+
+export type useTemplateStatsReportTask_createTemplateStatsReportTaskMutation = {
+  createTemplateStatsReportTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    output?: { [key: string]: any } | null;
+  };
+};
+
+export type useTemplateStatsReportTask_taskQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type useTemplateStatsReportTask_taskQuery = {
+  task: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    output?: { [key: string]: any } | null;
+  };
+};
+
+export type uploadFile_AWSPresignedPostDataFragment = {
+  __typename?: "AWSPresignedPostData";
+  url: string;
+  fields: { [key: string]: any };
 };
 
 export type useExportRepliesTask_createExportRepliesTaskMutationVariables = Exact<{
@@ -26854,49 +26957,6 @@ export type usePetitionsTableColumns_PetitionBaseFragment =
   | usePetitionsTableColumns_PetitionBase_Petition_Fragment
   | usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment;
 
-export type usePrintPdfTask_createPrintPdfTaskMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-}>;
-
-export type usePrintPdfTask_createPrintPdfTaskMutation = {
-  createPrintPdfTask: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    progress?: number | null;
-  };
-};
-
-export type usePrintPdfTask_getTaskResultFileMutationVariables = Exact<{
-  taskId: Scalars["GID"];
-}>;
-
-export type usePrintPdfTask_getTaskResultFileMutation = {
-  getTaskResultFile: { __typename?: "TaskResultFile"; url: string };
-};
-
-export type usePublicPrintPdfTask_publicCreatePrintPdfTaskMutationVariables = Exact<{
-  keycode: Scalars["ID"];
-}>;
-
-export type usePublicPrintPdfTask_publicCreatePrintPdfTaskMutation = {
-  publicCreatePrintPdfTask: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    progress?: number | null;
-  };
-};
-
-export type usePublicPrintPdfTask_publicGetTaskResultFileUrlMutationVariables = Exact<{
-  taskId: Scalars["GID"];
-  keycode: Scalars["ID"];
-}>;
-
-export type usePublicPrintPdfTask_publicGetTaskResultFileUrlMutation = {
-  publicGetTaskResultFileUrl: string;
-};
-
 export type useSearchContacts_contactsQueryVariables = Exact<{
   search?: InputMaybe<Scalars["String"]>;
   exclude?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
@@ -26949,30 +27009,6 @@ export type useSearchUsers_searchUsersQuery = {
 };
 
 export type useSettingsSections_UserFragment = { __typename?: "User"; hasDeveloperAccess: boolean };
-
-export type useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  timezone: Scalars["String"];
-  startDate?: InputMaybe<Scalars["DateTime"]>;
-  endDate?: InputMaybe<Scalars["DateTime"]>;
-}>;
-
-export type useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutation = {
-  createTemplateRepliesReportTask: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    progress?: number | null;
-  };
-};
-
-export type useTemplateRepliesReportTask_getTaskResultFileMutationVariables = Exact<{
-  taskId: Scalars["GID"];
-}>;
-
-export type useTemplateRepliesReportTask_getTaskResultFileMutation = {
-  getTaskResultFile: { __typename?: "TaskResultFile"; url: string };
-};
 
 export type validatePetitionFields_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -31998,19 +32034,26 @@ export const createMentionPlugin_UserOrUserGroupFragmentDoc = gql`
   ${UserSelectOption_UserFragmentDoc}
   ${UserSelectOption_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<createMentionPlugin_UserOrUserGroupFragment, unknown>;
+export const useExportExcelTask_TaskFragmentDoc = gql`
+  fragment useExportExcelTask_Task on Task {
+    id
+    status
+    output
+  }
+` as unknown as DocumentNode<useExportExcelTask_TaskFragment, unknown>;
+export const useTemplateStatsReportTask_TaskFragmentDoc = gql`
+  fragment useTemplateStatsReportTask_Task on Task {
+    id
+    status
+    output
+  }
+` as unknown as DocumentNode<useTemplateStatsReportTask_TaskFragment, unknown>;
 export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`
   fragment uploadFile_AWSPresignedPostData on AWSPresignedPostData {
     url
     fields
   }
 ` as unknown as DocumentNode<uploadFile_AWSPresignedPostDataFragment, unknown>;
-export const useBackgroundTask_TaskFragmentDoc = gql`
-  fragment useBackgroundTask_Task on Task {
-    id
-    status
-    output
-  }
-` as unknown as DocumentNode<useBackgroundTask_TaskFragment, unknown>;
 export const PetitionTagListCellContent_tagsDocument = gql`
   query PetitionTagListCellContent_tags($search: String) {
     tags(search: $search) {
@@ -36158,70 +36201,6 @@ export const useOrgRole_MeDocument = gql`
     }
   }
 ` as unknown as DocumentNode<useOrgRole_MeQuery, useOrgRole_MeQueryVariables>;
-export const useBackgroundTask_createExportExcelTaskDocument = gql`
-  mutation useBackgroundTask_createExportExcelTask($petitionId: GID!) {
-    createTask: createExportExcelTask(petitionId: $petitionId) {
-      ...useBackgroundTask_Task
-    }
-  }
-  ${useBackgroundTask_TaskFragmentDoc}
-` as unknown as DocumentNode<
-  useBackgroundTask_createExportExcelTaskMutation,
-  useBackgroundTask_createExportExcelTaskMutationVariables
->;
-export const useBackgroundTask_createPrintPdfTaskDocument = gql`
-  mutation useBackgroundTask_createPrintPdfTask($petitionId: GID!) {
-    createTask: createPrintPdfTask(
-      petitionId: $petitionId
-      skipAttachments: true
-      includeNdLinks: true
-    ) {
-      ...useBackgroundTask_Task
-    }
-  }
-  ${useBackgroundTask_TaskFragmentDoc}
-` as unknown as DocumentNode<
-  useBackgroundTask_createPrintPdfTaskMutation,
-  useBackgroundTask_createPrintPdfTaskMutationVariables
->;
-export const useBackgroundTask_createTemplateStatsReportTaskDocument = gql`
-  mutation useBackgroundTask_createTemplateStatsReportTask(
-    $templateId: GID!
-    $startDate: DateTime
-    $endDate: DateTime
-  ) {
-    createTask: createTemplateStatsReportTask(
-      templateId: $templateId
-      startDate: $startDate
-      endDate: $endDate
-    ) {
-      ...useBackgroundTask_Task
-    }
-  }
-  ${useBackgroundTask_TaskFragmentDoc}
-` as unknown as DocumentNode<
-  useBackgroundTask_createTemplateStatsReportTaskMutation,
-  useBackgroundTask_createTemplateStatsReportTaskMutationVariables
->;
-export const useBackgroundTask_getTaskResultFileDocument = gql`
-  mutation useBackgroundTask_getTaskResultFile($taskId: GID!) {
-    getTaskResultFile(taskId: $taskId, preview: false) {
-      filename
-      url
-    }
-  }
-` as unknown as DocumentNode<
-  useBackgroundTask_getTaskResultFileMutation,
-  useBackgroundTask_getTaskResultFileMutationVariables
->;
-export const useBackgroundTask_taskDocument = gql`
-  query useBackgroundTask_task($id: GID!) {
-    task(id: $id) {
-      ...useBackgroundTask_Task
-    }
-  }
-  ${useBackgroundTask_TaskFragmentDoc}
-` as unknown as DocumentNode<useBackgroundTask_taskQuery, useBackgroundTask_taskQueryVariables>;
 export const useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTaskDocument = gql`
   mutation useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTask($profileId: ID!) {
     createDowJonesProfileDownloadTask(profileId: $profileId) {
@@ -36242,6 +36221,147 @@ export const useDowJonesProfileDownloadTask_getTaskResultFileDocument = gql`
 ` as unknown as DocumentNode<
   useDowJonesProfileDownloadTask_getTaskResultFileMutation,
   useDowJonesProfileDownloadTask_getTaskResultFileMutationVariables
+>;
+export const useExportExcelTask_createExportExcelTaskDocument = gql`
+  mutation useExportExcelTask_createExportExcelTask($petitionId: GID!) {
+    createExportExcelTask(petitionId: $petitionId) {
+      ...useExportExcelTask_Task
+    }
+  }
+  ${useExportExcelTask_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useExportExcelTask_createExportExcelTaskMutation,
+  useExportExcelTask_createExportExcelTaskMutationVariables
+>;
+export const useExportExcelTask_getTaskResultFileDocument = gql`
+  mutation useExportExcelTask_getTaskResultFile($taskId: GID!) {
+    getTaskResultFile(taskId: $taskId, preview: false) {
+      filename
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  useExportExcelTask_getTaskResultFileMutation,
+  useExportExcelTask_getTaskResultFileMutationVariables
+>;
+export const useExportExcelTask_taskDocument = gql`
+  query useExportExcelTask_task($id: GID!) {
+    task(id: $id) {
+      ...useExportExcelTask_Task
+    }
+  }
+  ${useExportExcelTask_TaskFragmentDoc}
+` as unknown as DocumentNode<useExportExcelTask_taskQuery, useExportExcelTask_taskQueryVariables>;
+export const usePrintPdfTask_createPrintPdfTaskDocument = gql`
+  mutation usePrintPdfTask_createPrintPdfTask($petitionId: GID!) {
+    createPrintPdfTask(petitionId: $petitionId) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  usePrintPdfTask_createPrintPdfTaskMutation,
+  usePrintPdfTask_createPrintPdfTaskMutationVariables
+>;
+export const usePrintPdfTask_getTaskResultFileDocument = gql`
+  mutation usePrintPdfTask_getTaskResultFile($taskId: GID!) {
+    getTaskResultFile(taskId: $taskId, preview: true) {
+      url
+      filename
+    }
+  }
+` as unknown as DocumentNode<
+  usePrintPdfTask_getTaskResultFileMutation,
+  usePrintPdfTask_getTaskResultFileMutationVariables
+>;
+export const usePrintPdfTask_taskDocument = gql`
+  query usePrintPdfTask_task($id: GID!) {
+    task(id: $id) {
+      id
+      status
+      output
+    }
+  }
+` as unknown as DocumentNode<usePrintPdfTask_taskQuery, usePrintPdfTask_taskQueryVariables>;
+export const usePublicPrintPdfTask_publicCreatePrintPdfTaskDocument = gql`
+  mutation usePublicPrintPdfTask_publicCreatePrintPdfTask($keycode: ID!) {
+    publicCreatePrintPdfTask(keycode: $keycode) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  usePublicPrintPdfTask_publicCreatePrintPdfTaskMutation,
+  usePublicPrintPdfTask_publicCreatePrintPdfTaskMutationVariables
+>;
+export const usePublicPrintPdfTask_publicGetTaskResultFileUrlDocument = gql`
+  mutation usePublicPrintPdfTask_publicGetTaskResultFileUrl($taskId: GID!, $keycode: ID!) {
+    publicGetTaskResultFileUrl(taskId: $taskId, keycode: $keycode)
+  }
+` as unknown as DocumentNode<
+  usePublicPrintPdfTask_publicGetTaskResultFileUrlMutation,
+  usePublicPrintPdfTask_publicGetTaskResultFileUrlMutationVariables
+>;
+export const useTemplateRepliesReportTask_createTemplateRepliesReportTaskDocument = gql`
+  mutation useTemplateRepliesReportTask_createTemplateRepliesReportTask(
+    $petitionId: GID!
+    $timezone: String!
+    $startDate: DateTime
+    $endDate: DateTime
+  ) {
+    createTemplateRepliesReportTask(
+      petitionId: $petitionId
+      timezone: $timezone
+      startDate: $startDate
+      endDate: $endDate
+    ) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutation,
+  useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutationVariables
+>;
+export const useTemplateRepliesReportTask_getTaskResultFileDocument = gql`
+  mutation useTemplateRepliesReportTask_getTaskResultFile($taskId: GID!) {
+    getTaskResultFile(taskId: $taskId, preview: true) {
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  useTemplateRepliesReportTask_getTaskResultFileMutation,
+  useTemplateRepliesReportTask_getTaskResultFileMutationVariables
+>;
+export const useTemplateStatsReportTask_createTemplateStatsReportTaskDocument = gql`
+  mutation useTemplateStatsReportTask_createTemplateStatsReportTask(
+    $templateId: GID!
+    $startDate: DateTime
+    $endDate: DateTime
+  ) {
+    createTemplateStatsReportTask(
+      templateId: $templateId
+      startDate: $startDate
+      endDate: $endDate
+    ) {
+      ...useTemplateStatsReportTask_Task
+    }
+  }
+  ${useTemplateStatsReportTask_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useTemplateStatsReportTask_createTemplateStatsReportTaskMutation,
+  useTemplateStatsReportTask_createTemplateStatsReportTaskMutationVariables
+>;
+export const useTemplateStatsReportTask_taskDocument = gql`
+  query useTemplateStatsReportTask_task($id: GID!) {
+    task(id: $id) {
+      ...useTemplateStatsReportTask_Task
+    }
+  }
+  ${useTemplateStatsReportTask_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useTemplateStatsReportTask_taskQuery,
+  useTemplateStatsReportTask_taskQueryVariables
 >;
 export const useExportRepliesTask_createExportRepliesTaskDocument = gql`
   mutation useExportRepliesTask_createExportRepliesTask($petitionId: GID!, $pattern: String) {
@@ -36323,46 +36443,6 @@ export const PetitionSignaturesCardPolling_petitionDocument = gql`
   PetitionSignaturesCardPolling_petitionQuery,
   PetitionSignaturesCardPolling_petitionQueryVariables
 >;
-export const usePrintPdfTask_createPrintPdfTaskDocument = gql`
-  mutation usePrintPdfTask_createPrintPdfTask($petitionId: GID!) {
-    createPrintPdfTask(petitionId: $petitionId) {
-      ...TaskProgressDialog_Task
-    }
-  }
-  ${TaskProgressDialog_TaskFragmentDoc}
-` as unknown as DocumentNode<
-  usePrintPdfTask_createPrintPdfTaskMutation,
-  usePrintPdfTask_createPrintPdfTaskMutationVariables
->;
-export const usePrintPdfTask_getTaskResultFileDocument = gql`
-  mutation usePrintPdfTask_getTaskResultFile($taskId: GID!) {
-    getTaskResultFile(taskId: $taskId, preview: true) {
-      url
-    }
-  }
-` as unknown as DocumentNode<
-  usePrintPdfTask_getTaskResultFileMutation,
-  usePrintPdfTask_getTaskResultFileMutationVariables
->;
-export const usePublicPrintPdfTask_publicCreatePrintPdfTaskDocument = gql`
-  mutation usePublicPrintPdfTask_publicCreatePrintPdfTask($keycode: ID!) {
-    publicCreatePrintPdfTask(keycode: $keycode) {
-      ...TaskProgressDialog_Task
-    }
-  }
-  ${TaskProgressDialog_TaskFragmentDoc}
-` as unknown as DocumentNode<
-  usePublicPrintPdfTask_publicCreatePrintPdfTaskMutation,
-  usePublicPrintPdfTask_publicCreatePrintPdfTaskMutationVariables
->;
-export const usePublicPrintPdfTask_publicGetTaskResultFileUrlDocument = gql`
-  mutation usePublicPrintPdfTask_publicGetTaskResultFileUrl($taskId: GID!, $keycode: ID!) {
-    publicGetTaskResultFileUrl(taskId: $taskId, keycode: $keycode)
-  }
-` as unknown as DocumentNode<
-  usePublicPrintPdfTask_publicGetTaskResultFileUrlMutation,
-  usePublicPrintPdfTask_publicGetTaskResultFileUrlMutationVariables
->;
 export const useSearchContacts_contactsDocument = gql`
   query useSearchContacts_contacts($search: String, $exclude: [GID!]) {
     contacts(limit: 10, search: $search, exclude: $exclude) {
@@ -36415,35 +36495,4 @@ export const useSearchUsers_searchUsersDocument = gql`
 ` as unknown as DocumentNode<
   useSearchUsers_searchUsersQuery,
   useSearchUsers_searchUsersQueryVariables
->;
-export const useTemplateRepliesReportTask_createTemplateRepliesReportTaskDocument = gql`
-  mutation useTemplateRepliesReportTask_createTemplateRepliesReportTask(
-    $petitionId: GID!
-    $timezone: String!
-    $startDate: DateTime
-    $endDate: DateTime
-  ) {
-    createTemplateRepliesReportTask(
-      petitionId: $petitionId
-      timezone: $timezone
-      startDate: $startDate
-      endDate: $endDate
-    ) {
-      ...TaskProgressDialog_Task
-    }
-  }
-  ${TaskProgressDialog_TaskFragmentDoc}
-` as unknown as DocumentNode<
-  useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutation,
-  useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutationVariables
->;
-export const useTemplateRepliesReportTask_getTaskResultFileDocument = gql`
-  mutation useTemplateRepliesReportTask_getTaskResultFile($taskId: GID!) {
-    getTaskResultFile(taskId: $taskId, preview: true) {
-      url
-    }
-  }
-` as unknown as DocumentNode<
-  useTemplateRepliesReportTask_getTaskResultFileMutation,
-  useTemplateRepliesReportTask_getTaskResultFileMutationVariables
 >;

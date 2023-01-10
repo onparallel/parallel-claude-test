@@ -11,7 +11,8 @@ import {
   useCuatrecasasExport_updateSignatureRequestMetadataDocument,
 } from "@parallel/graphql/__types";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
-import { useBackgroundTask } from "@parallel/utils/useBackgroundTask";
+import { useExportExcelBackgroundTask } from "@parallel/utils/tasks/useExportExcelTask";
+import { usePrintPdfBackgroundTask } from "@parallel/utils/tasks/usePrintPdfTask";
 import { MutableRefObject, useRef } from "react";
 import { useAlreadyExportedDialog } from "./dialogs/AlreadyExportedDialog";
 
@@ -72,9 +73,9 @@ interface ExportRefs {
 }
 
 function useExportExcel(clientId: string) {
-  const exportExcelTask = useBackgroundTask("EXPORT_EXCEL");
+  const exportExcelBackgroundTask = useExportExcelBackgroundTask();
   return async (petition: useCuatrecasasExport_PetitionFragment, opts: ExportOpts) => {
-    const result = await exportExcelTask({ petitionId: petition.id });
+    const result = await exportExcelBackgroundTask({ petitionId: petition.id });
     return await cuatrecasasExport(
       result.url,
       result.filename,
@@ -246,7 +247,7 @@ function useExportFieldReply(clientId: string, refs: ExportRefs) {
 }
 
 function useExportPdfDocument(clientId: string, refs: ExportRefs) {
-  const printPdfTask = useBackgroundTask("PRINT_PDF");
+  const printPdfBackgroundTask = usePrintPdfBackgroundTask();
 
   const [updatePetitionMetadata] = useMutation(useCuatrecasasExport_updatePetitionMetadataDocument);
 
@@ -270,7 +271,7 @@ function useExportPdfDocument(clientId: string, refs: ExportRefs) {
       throw new Error("CANCEL");
     }
 
-    const exportedDocument = await printPdfTask({ petitionId: petition.id });
+    const exportedDocument = await printPdfBackgroundTask({ petitionId: petition.id });
 
     const pdfExternalId = await cuatrecasasExport(
       exportedDocument.url,
