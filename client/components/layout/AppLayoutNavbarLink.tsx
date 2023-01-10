@@ -76,7 +76,7 @@ export function AppLayoutNavbarLink({
   ) : (
     <Tooltip
       label={intl.formatMessage({
-        id: "navbar.coming-soon",
+        id: "generic.coming-soon",
         defaultMessage: "Coming soon",
       })}
       placement={isMobile ? "top" : "right"}

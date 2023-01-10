@@ -1,143 +1,78 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
+  Badge,
   Button,
   Center,
   Container,
-  Flex,
   Grid,
-  GridItem,
   Heading,
   HStack,
-  ListItem,
-  OrderedList,
+  Image,
   Stack,
   Text,
 } from "@chakra-ui/react";
-import {
-  CheckIcon,
-  DoubleCheckIcon,
-  PaperPlaneIcon,
-  ReportsIcon,
-  SignatureIcon,
-  TableIcon,
-  TimeIcon,
-} from "@parallel/chakra/icons";
+import { ReportsIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
-import { HelpPopover } from "@parallel/components/common/HelpPopover";
-import { OverflownText } from "@parallel/components/common/OverflownText";
-import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { DateRangePickerButton } from "@parallel/components/reports/DateRangePickerButton";
-import { ReportsDoughnutChart } from "@parallel/components/reports/ReportsDoughnutChart";
-import { ReportsErrorMessage } from "@parallel/components/reports/ReportsErrorMessage";
-import { ReportsLoadingMessage } from "@parallel/components/reports/ReportsLoadingMessage";
-import { ReportsReadyMessage } from "@parallel/components/reports/ReportsReadyMessage";
-import { Reports_templatesDocument, Reports_userDocument } from "@parallel/graphql/__types";
-import { assertTypenameArray } from "@parallel/utils/apollo/typename";
-import {
-  useAssertQuery,
-  useAssertQueryOrPreviousData,
-} from "@parallel/utils/apollo/useAssertQuery";
+import { Reports_userDocument } from "@parallel/graphql/__types";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { stallFor } from "@parallel/utils/promises/stallFor";
-import { date, useQueryState } from "@parallel/utils/queryState";
-import { Maybe } from "@parallel/utils/types";
-import { useBackgroundTask } from "@parallel/utils/useBackgroundTask";
-import { useTemplateRepliesReportTask } from "@parallel/utils/useTemplateRepliesReportTask";
-import { useRef, useState } from "react";
+import { useHandleNavigation } from "@parallel/utils/navigation";
+import { useRoleButton } from "@parallel/utils/useRoleButton";
+import { MouseEvent, MouseEventHandler, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
-import { TimeSpan } from "../../../components/reports/TimeSpan";
-
-interface ReportType {
-  pending: number;
-  completed: number;
-  closed: number;
-  pending_to_complete: Maybe<number>;
-  complete_to_close: Maybe<number>;
-  signatures: {
-    completed: number;
-    time_to_complete: Maybe<number>;
-  };
-}
-
-const QUERY_STATE = {
-  range: date().list(2),
-};
 
 export function Reports() {
   const intl = useIntl();
-  const [state, setQueryState] = useQueryState(QUERY_STATE);
   const {
     data: { me, realMe },
   } = useAssertQuery(Reports_userDocument);
 
-  const [{ status, templateId, prevTemplateId, report }, setState] = useState<{
-    status: "IDLE" | "LOADING" | "ERROR";
-    templateId: string | null;
-    prevTemplateId: string | null;
-    report: ReportType | null;
-  }>({
-    status: "IDLE",
-    templateId: null,
-    prevTemplateId: null,
-    report: null,
-  });
-  const taskAbortController = useRef<AbortController | null>(null);
+  const navigate = useHandleNavigation();
+  const reports = useMemo(
+    () => [
+      {
+        imgSrc: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/reports_overview.png`,
+        title: intl.formatMessage({ id: "page.reports.overview", defaultMessage: "Overview" }),
+        description: intl.formatMessage({
+          id: "page.reports.overview-description",
+          defaultMessage:
+            "Get the report of all the templates with the parallels and average time of each one.",
+        }),
+        onPress: () => {},
+        isPending: true,
+      },
+      {
+        imgSrc: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/reports_templates.png`,
+        title: intl.formatMessage({ id: "page.reports.templates", defaultMessage: "Templates" }),
+        description: intl.formatMessage({
+          id: "page.reports.templates-description",
+          defaultMessage: "Obtain the specific data of a template in a specific period of time.",
+        }),
+        onPress: (event: MouseEvent) => {
+          navigate(`/app/reports/templates`, event);
+        },
+      },
+      {
+        imgSrc: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/reports_replies.png`,
+        title: intl.formatMessage({ id: "page.reports.replies", defaultMessage: "Replies" }),
+        description: intl.formatMessage({
+          id: "page.reports.replies-description",
+          defaultMessage:
+            "Compare the answers obtained in all the templates, for a specific parallel.",
+        }),
 
-  const {
-    data: {
-      templates: { items: templates },
-    },
-  } = useAssertQueryOrPreviousData(Reports_templatesDocument, {
-    variables: {
-      offset: 0,
-      limit: 1999,
-      isPublic: false,
-    },
-  });
-  assertTypenameArray(templates, "PetitionTemplate");
-
-  const templateStatsTask = useBackgroundTask("TEMPLATE_STATS_REPORT");
-
-  const handleGenerateReportClick = async () => {
-    try {
-      setState((state) => ({ ...state, status: "LOADING", prevTemplateId: state.templateId }));
-      taskAbortController.current?.abort();
-      if (isDefined(templateId)) {
-        taskAbortController.current = new AbortController();
-        // add a fake delay
-        const { task } = await stallFor(
-          () =>
-            templateStatsTask(
-              {
-                templateId: templateId,
-                startDate: state.range?.[0].toISOString() ?? null,
-                endDate: state.range?.[1].toISOString() ?? null,
-              },
-              { signal: taskAbortController.current!.signal, timeout: 60_000 }
-            ),
-          2_000 + 1_000 * Math.random()
-        );
-        setState((state) => ({ ...state, report: task.output as any, status: "IDLE" }));
-      }
-    } catch (e: any) {
-      if (e.message === "ABORTED") {
-        // nothing
-      } else {
-        setState((state) => ({ ...state, status: "ERROR" }));
-      }
-    }
-  };
-
-  const handleTemplateRepliesReportTask = useTemplateRepliesReportTask();
-
-  const canGenerateReport = !templateId || (prevTemplateId === templateId && status === "LOADING");
+        onPress: () => {},
+        isPending: true,
+      },
+    ],
+    [navigate, intl.locale]
+  );
 
   return (
     <AppLayout
@@ -174,113 +109,102 @@ export function Reports() {
             <FormattedMessage id="generic.help-question" defaultMessage="Help?" />
           </Button>
         </HStack>
-        <Stack spacing={2}>
+        <Stack spacing={6}>
           <Text>
-            <FormattedMessage id="generic.template" defaultMessage="Template" />:
+            <FormattedMessage
+              id="page.reports.choose-report"
+              defaultMessage="Choose what type of report you need:"
+            />
           </Text>
-          <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2}>
-            <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2} flex="1">
-              <HStack
-                data-section="reports-select-template"
-                flex="1"
-                maxWidth={{ base: "100%", md: "500px" }}
-              >
-                <Box flex="1" minWidth="0">
-                  <SimpleSelect
-                    options={templates.map((t) => ({
-                      label:
-                        t.name ??
-                        intl.formatMessage({
-                          id: "generic.unnamed-template",
-                          defaultMessage: "Unnamed template",
-                        }),
-                      value: t.id,
-                    }))}
-                    placeholder={intl.formatMessage({
-                      id: "page.reports.select-a-template",
-                      defaultMessage: "Select a template...",
-                    })}
-                    isSearchable={true}
-                    value={templateId}
-                    onChange={(templateId) => setState((state) => ({ ...state, templateId }))}
-                  />
-                </Box>
-              </HStack>
-              <DateRangePickerButton
-                value={state.range as [Date, Date] | null}
-                onChange={(range) => setQueryState((s) => ({ ...s, range }))}
-              />
-              <Button
-                minWidth="fit-content"
-                colorScheme="primary"
-                isDisabled={canGenerateReport}
-                onClick={handleGenerateReportClick}
-                fontWeight="500"
-              >
-                <FormattedMessage id="page.reports.generate" defaultMessage="Generate" />
-              </Button>
-            </Stack>
-            {isDefined(report) && status === "IDLE" ? (
-              <Button
-                leftIcon={<TableIcon />}
-                colorScheme="primary"
-                onClick={() =>
-                  handleTemplateRepliesReportTask(
-                    prevTemplateId!,
-                    state.range?.[0].toISOString() ?? null,
-                    state.range?.[1].toISOString() ?? null
-                  )
-                }
-              >
-                <OverflownText>
-                  <FormattedMessage
-                    id="page.reports.download-replies"
-                    defaultMessage="Download replies"
-                  />
-                </OverflownText>
-              </Button>
-            ) : null}
-          </Stack>
+          <Grid
+            gap={5}
+            templateColumns={{
+              md: "repeat(2, 1fr)",
+              lg: "repeat(3, 1fr)",
+            }}
+          >
+            {reports.map((report, i) => (
+              <ReportsCard key={i} {...report} />
+            ))}
+          </Grid>
         </Stack>
-        {isDefined(report) && status === "IDLE" ? (
-          <TemplateStatsReport report={report} />
-        ) : (
-          <Stack minHeight="340px" alignItems="center" justifyContent="center" textAlign="center">
-            {status === "LOADING" ? (
-              <ReportsLoadingMessage />
-            ) : status === "ERROR" ? (
-              <ReportsErrorMessage />
-            ) : (
-              <ReportsReadyMessage />
-            )}
-          </Stack>
-        )}
       </Container>
     </AppLayout>
   );
 }
 
-Reports.fragments = {
-  PetitionTemplate: gql`
-    fragment Reports_PetitionTemplate on PetitionTemplate {
-      id
-      name
-    }
-  `,
-};
+interface ReportsCardProps {
+  imgSrc: string;
+  title: string;
+  description: string;
+  onPress: MouseEventHandler<any>;
+  isPending?: boolean;
+}
+
+const ReportsCard = chakraForwardRef<"div", ReportsCardProps>(function ReportsCard(
+  { imgSrc, title, description, onPress, isPending, ...props },
+  ref
+) {
+  const buttonProps = useRoleButton(onPress);
+  return (
+    <Card
+      ref={ref}
+      as={Stack}
+      minHeight="160px"
+      outline="none"
+      isInteractive
+      overflow="hidden"
+      minWidth={0}
+      cursor={isPending ? "default" : "pointer"}
+      {...props}
+      {...(isPending ? {} : buttonProps)}
+    >
+      <Stack spacing={0} height="100%">
+        <Center
+          position="relative"
+          _before={
+            isPending
+              ? {
+                  position: "absolute",
+                  content: `""`,
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  background: "purple.800",
+                  opacity: 0.2,
+                }
+              : {}
+          }
+          height="100%"
+        >
+          <Image
+            loading="lazy"
+            height="100%"
+            objectFit="contain"
+            src={imgSrc}
+            role="presentation"
+          />
+        </Center>
+        <Stack padding={4} paddingTop={2} paddingBottom={6}>
+          <HStack align="center" wrap="wrap" spacing={0} gap={2}>
+            <Text as="h2" fontSize="2xl" fontWeight="bold">
+              {title}
+            </Text>
+            {isPending ? (
+              <Badge colorScheme="purple">
+                <FormattedMessage id="generic.coming-soon" defaultMessage="Coming soon" />
+              </Badge>
+            ) : null}
+          </HStack>
+          <Text>{description}</Text>
+        </Stack>
+      </Stack>
+    </Card>
+  );
+});
 
 Reports.queries = [
-  gql`
-    query Reports_templates($offset: Int!, $limit: Int!, $isPublic: Boolean!) {
-      templates(offset: $offset, limit: $limit, isPublic: $isPublic) {
-        items {
-          ...Reports_PetitionTemplate
-        }
-        totalCount
-      }
-    }
-    ${Reports.fragments.PetitionTemplate}
-  `,
   gql`
     query Reports_user {
       ...AppLayout_Query
@@ -290,309 +214,7 @@ Reports.queries = [
 ];
 
 Reports.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
-  await Promise.all([
-    fetchQuery(Reports_templatesDocument, {
-      variables: {
-        offset: 0,
-        limit: 1999,
-        isPublic: false,
-      },
-    }),
-    fetchQuery(Reports_userDocument),
-  ]);
+  await fetchQuery(Reports_userDocument);
 };
 
 export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(Reports);
-
-function TemplateStatsReport({ report }: { report: ReportType }) {
-  const pendingToComplete = report.pending_to_complete ?? 0;
-  const completeToClose = report.complete_to_close ?? 0;
-  const timeToComplete = report.signatures.time_to_complete ?? 0;
-
-  const pendingToCompletePercent =
-    (pendingToComplete / (pendingToComplete + completeToClose)) * 100;
-  const completeToClosePercent = (completeToClose / (pendingToComplete + completeToClose)) * 100;
-  const signaturesTimeToComplete = (timeToComplete / completeToClose) * 100;
-
-  const pendingPetitions = report.pending;
-  const completedPetitions = report.completed;
-  const closedPetitions = report.closed;
-
-  const petitionsTotal = closedPetitions + completedPetitions + pendingPetitions;
-  const signaturesCompleted = report.signatures.completed;
-  return (
-    <Grid
-      gridTemplateColumns={{
-        base: "repeat(1,1fr)",
-        lg: "repeat(3,1fr)",
-        xl: "repeat(4,1fr)",
-      }}
-      gridTemplateAreas={{
-        base: `
-          "petitions"
-          "petitions-time"
-          "signatures"
-          "signatures-time"
-          "chart"
-        `,
-        lg: `
-          "petitions petitions-time petitions-time"
-          "signatures signatures-time signatures-time"
-          "chart chart chart"
-        `,
-        xl: `
-          "petitions petitions-time petitions-time chart chart"
-          "signatures signatures-time signatures-time chart chart"
-        `,
-      }}
-      gridGap={4}
-    >
-      <GridItem gridArea="petitions">
-        <Card height="100%" padding={6} as={Stack} spacing={3}>
-          <HStack>
-            <Center>
-              <PaperPlaneIcon />
-            </Center>
-            <Text>
-              <FormattedMessage
-                id="page.reports.started-parallels"
-                defaultMessage="Started parallels"
-              />
-            </Text>
-            <HelpPopover>
-              <Stack>
-                <Text>
-                  <FormattedMessage
-                    id="page.reports.started-parallels-help-1"
-                    defaultMessage="This is the total parallels sent or started, i.e. drafts with at least one response."
-                  />
-                </Text>
-                <Text>
-                  <FormattedMessage
-                    id="page.reports.started-parallels-help-2"
-                    defaultMessage="This number doesn't include deleted o parallels or unanswered drafts."
-                  />
-                </Text>
-              </Stack>
-            </HelpPopover>
-          </HStack>
-          <Text fontWeight="600" fontSize="4xl">
-            {petitionsTotal}
-          </Text>
-        </Card>
-      </GridItem>
-      <GridItem gridArea="signatures">
-        <Card height="100%" padding={6} as={Stack} spacing={3}>
-          <HStack>
-            <Center>
-              <SignatureIcon />
-            </Center>
-            <Text>
-              <FormattedMessage
-                id="page.reports.esignature-completed"
-                defaultMessage="eSignatures completed"
-              />
-            </Text>
-            <HelpPopover>
-              <Stack>
-                <Text>
-                  <FormattedMessage
-                    id="page.reports.esignature-sent-help-1"
-                    defaultMessage="This is the total completed eSignature processes. Includes all signatures sent through one of our integrated eSignature providers."
-                  />
-                </Text>
-                <Text>
-                  <FormattedMessage
-                    id="page.reports.esignature-sent-help-2"
-                    defaultMessage="eSignatures processes in which a signer hasn't yet signed aren't included."
-                  />
-                </Text>
-              </Stack>
-            </HelpPopover>
-          </HStack>
-          {signaturesCompleted || !petitionsTotal ? (
-            <Text fontWeight="600" fontSize="4xl">
-              {signaturesCompleted}
-            </Text>
-          ) : (
-            <Text fontSize="xl" textStyle="hint">
-              <FormattedMessage
-                id="page.reports.no-esignatures-sent"
-                defaultMessage="No eSignatures sent"
-              />
-            </Text>
-          )}
-        </Card>
-      </GridItem>
-      <GridItem gridArea="petitions-time">
-        <Card height="100%" padding={6} as={Stack} spacing={3}>
-          <HStack>
-            <Text>
-              <FormattedMessage
-                id="page.reports.average-duration"
-                defaultMessage="Average duration"
-              />
-            </Text>
-            <HelpPopover>
-              <Stack>
-                <Text>
-                  <FormattedMessage
-                    id="page.reports.average-duration-help-1"
-                    defaultMessage="Duration is divided into two parts."
-                  />
-                </Text>
-                <Box>
-                  <OrderedList>
-                    <ListItem>
-                      <FormattedMessage
-                        id="page.reports.average-duration-help-list-1"
-                        defaultMessage="Average time from the start of the parallel until it is completed."
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <FormattedMessage
-                        id="page.reports.average-duration-help-list-2"
-                        defaultMessage="Average time from completion to closure. "
-                      />
-                    </ListItem>
-                  </OrderedList>
-                </Box>
-                <Text>
-                  <FormattedMessage
-                    id="page.reports.average-duration-help-2"
-                    defaultMessage="The sum of the two is the average duration of the parallels."
-                  />
-                </Text>
-              </Stack>
-            </HelpPopover>
-          </HStack>
-          <Grid
-            templateColumns={{ base: "repeat(4, 1fr)", md: "repeat(5, 1fr)" }}
-            gap={3}
-            alignItems="center"
-          >
-            <GridItem colSpan={{ base: 4, md: 1 }} textAlign={{ base: "left", md: "right" }}>
-              <Text whiteSpace="nowrap">
-                <TimeSpan duration={pendingToComplete} />
-              </Text>
-            </GridItem>
-            <GridItem colSpan={4}>
-              <HStack>
-                <TimeIcon color="yellow.500" />
-                <Box
-                  width={`${pendingToCompletePercent}%`}
-                  minWidth="5px"
-                  height="12px"
-                  borderRadius="full"
-                  background="yellow.400"
-                />
-                <CheckIcon color="green.400" />
-              </HStack>
-            </GridItem>
-            <GridItem colSpan={{ base: 4, md: 1 }} textAlign={{ base: "left", md: "right" }}>
-              <Text whiteSpace="nowrap">
-                <TimeSpan duration={completeToClose} />
-              </Text>
-            </GridItem>
-            <GridItem colSpan={4}>
-              <HStack>
-                <CheckIcon color="green.400" />
-                <Box
-                  width={`${completeToClosePercent}%`}
-                  minWidth="5px"
-                  height="12px"
-                  borderRadius="full"
-                  background="green.600"
-                />
-                <DoubleCheckIcon color="green.500" />
-                {pendingToComplete && !completeToClose ? (
-                  <Text textStyle="hint">
-                    <FormattedMessage
-                      id="page.reports.no-parallels-closed"
-                      defaultMessage="No parallels closed"
-                    />
-                  </Text>
-                ) : null}
-              </HStack>
-            </GridItem>
-          </Grid>
-        </Card>
-      </GridItem>
-      <GridItem gridArea="signatures-time">
-        <Card height="100%" padding={6} as={Stack} spacing={3}>
-          <HStack>
-            <Text>
-              <FormattedMessage
-                id="page.reports.average-signing-time"
-                defaultMessage="Average signing time"
-              />
-            </Text>
-            <HelpPopover>
-              <Stack>
-                <Text>
-                  <FormattedMessage
-                    id="page.reports.average-signing-time-help-1"
-                    defaultMessage="This is the average time for documents to be signed since they were sent."
-                  />
-                </Text>
-                <Text>
-                  <FormattedMessage
-                    id="page.reports.average-signing-time-help-2"
-                    defaultMessage="The bar represents the percentage of the time from the time the parallel is completed until it is closed."
-                  />
-                </Text>
-              </Stack>
-            </HelpPopover>
-          </HStack>
-          <Grid
-            templateColumns={{ base: "repeat(4, 1fr)", md: "repeat(5, 1fr)" }}
-            gap={3}
-            alignItems="center"
-          >
-            {signaturesCompleted || !petitionsTotal ? (
-              <>
-                <GridItem colSpan={{ base: 4, md: 1 }} textAlign={{ base: "left", md: "right" }}>
-                  <Text whiteSpace="nowrap">
-                    <TimeSpan duration={timeToComplete} />
-                  </Text>
-                </GridItem>
-                <GridItem colSpan={4}>
-                  <HStack>
-                    <Flex alignItems="center" gridGap={0} position="relative" paddingX={1}>
-                      <SignatureIcon color="gray.300" boxSize={4} />
-                      <TimeIcon
-                        color="yellow.600"
-                        fontSize="10px"
-                        position="absolute"
-                        top={"-4px"}
-                        right={"1px"}
-                      />
-                    </Flex>
-                    <Box
-                      width={`${signaturesTimeToComplete}%`}
-                      minWidth="5px"
-                      height="12px"
-                      borderRadius="full"
-                      background="yellow.400"
-                    />
-                    <SignatureIcon />
-                  </HStack>
-                </GridItem>
-              </>
-            ) : (
-              <Text fontSize="xl">-</Text>
-            )}
-          </Grid>
-        </Card>
-      </GridItem>
-      <GridItem gridArea="chart">
-        <ReportsDoughnutChart
-          petitionsTotal={petitionsTotal}
-          pendingPetitions={pendingPetitions}
-          closedPetitions={closedPetitions}
-          completedPetitions={completedPetitions}
-        />
-      </GridItem>
-    </Grid>
-  );
-}

@@ -24045,19 +24045,59 @@ export type NewPetition_templateQuery = {
     | null;
 };
 
-export type Reports_PetitionTemplateFragment = {
+export type Reports_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type Reports_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      iconUrl92?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
+export type ReportsTemplates_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
 };
 
-export type Reports_templatesQueryVariables = Exact<{
+export type ReportsTemplates_templatesQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   isPublic: Scalars["Boolean"];
 }>;
 
-export type Reports_templatesQuery = {
+export type ReportsTemplates_templatesQuery = {
   templates: {
     __typename?: "PetitionBaseOrFolderPagination";
     totalCount: number;
@@ -24069,9 +24109,9 @@ export type Reports_templatesQuery = {
   };
 };
 
-export type Reports_userQueryVariables = Exact<{ [key: string]: never }>;
+export type ReportsTemplates_userQueryVariables = Exact<{ [key: string]: never }>;
 
-export type Reports_userQuery = {
+export type ReportsTemplates_userQuery = {
   me: {
     __typename?: "User";
     id: string;
@@ -31071,12 +31111,12 @@ export const NewPetition_PetitionBaseOrFolderFragmentDoc = gql`
   ${PublicTemplateCard_PetitionTemplateFragmentDoc}
   ${FolderCard_PetitionFolderFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_PetitionBaseOrFolderFragment, unknown>;
-export const Reports_PetitionTemplateFragmentDoc = gql`
-  fragment Reports_PetitionTemplate on PetitionTemplate {
+export const ReportsTemplates_PetitionTemplateFragmentDoc = gql`
+  fragment ReportsTemplates_PetitionTemplate on PetitionTemplate {
     id
     name
   }
-` as unknown as DocumentNode<Reports_PetitionTemplateFragment, unknown>;
+` as unknown as DocumentNode<ReportsTemplates_PetitionTemplateFragment, unknown>;
 export const useSettingsSections_UserFragmentDoc = gql`
   fragment useSettingsSections_User on User {
     hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
@@ -35164,23 +35204,32 @@ export const NewPetition_templateDocument = gql`
   }
   ${TemplateDetailsModal_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_templateQuery, NewPetition_templateQueryVariables>;
-export const Reports_templatesDocument = gql`
-  query Reports_templates($offset: Int!, $limit: Int!, $isPublic: Boolean!) {
-    templates(offset: $offset, limit: $limit, isPublic: $isPublic) {
-      items {
-        ...Reports_PetitionTemplate
-      }
-      totalCount
-    }
-  }
-  ${Reports_PetitionTemplateFragmentDoc}
-` as unknown as DocumentNode<Reports_templatesQuery, Reports_templatesQueryVariables>;
 export const Reports_userDocument = gql`
   query Reports_user {
     ...AppLayout_Query
   }
   ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Reports_userQuery, Reports_userQueryVariables>;
+export const ReportsTemplates_templatesDocument = gql`
+  query ReportsTemplates_templates($offset: Int!, $limit: Int!, $isPublic: Boolean!) {
+    templates(offset: $offset, limit: $limit, isPublic: $isPublic) {
+      items {
+        ...ReportsTemplates_PetitionTemplate
+      }
+      totalCount
+    }
+  }
+  ${ReportsTemplates_PetitionTemplateFragmentDoc}
+` as unknown as DocumentNode<
+  ReportsTemplates_templatesQuery,
+  ReportsTemplates_templatesQueryVariables
+>;
+export const ReportsTemplates_userDocument = gql`
+  query ReportsTemplates_user {
+    ...AppLayout_Query
+  }
+  ${AppLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<ReportsTemplates_userQuery, ReportsTemplates_userQueryVariables>;
 export const Account_updateAccountDocument = gql`
   mutation Account_updateAccount($firstName: String, $lastName: String) {
     updateUser(firstName: $firstName, lastName: $lastName) {

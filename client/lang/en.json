@@ -6285,6 +6285,11 @@
     "context": "yellow"
   },
   {
+    "term": "generic.coming-soon",
+    "definition": "Coming soon",
+    "context": "Coming soon"
+  },
+  {
     "term": "generic.comments-button-label",
     "definition": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
     "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}"
@@ -7245,11 +7250,6 @@
     "context": "Terms and conditions"
   },
   {
-    "term": "navbar.coming-soon",
-    "definition": "Coming soon",
-    "context": "Coming soon"
-  },
-  {
     "term": "navbar.feature-requests",
     "definition": "Feature requests",
     "context": "Feature requests"
@@ -8105,6 +8105,11 @@
     "context": "The bar represents the percentage of the time from the time the parallel is completed until it is closed."
   },
   {
+    "term": "page.reports.choose-report",
+    "definition": "Choose what type of report you need:",
+    "context": "Choose what type of report you need:"
+  },
+  {
     "term": "page.reports.download-replies",
     "definition": "Download replies",
     "context": "Download replies"
@@ -8145,6 +8150,26 @@
     "context": "No parallels closed"
   },
   {
+    "term": "page.reports.overview",
+    "definition": "Overview",
+    "context": "Overview"
+  },
+  {
+    "term": "page.reports.overview-description",
+    "definition": "Get the report of all the templates with the parallels and average time of each one.",
+    "context": "Get the report of all the templates with the parallels and average time of each one."
+  },
+  {
+    "term": "page.reports.replies",
+    "definition": "Replies",
+    "context": "Replies"
+  },
+  {
+    "term": "page.reports.replies-description",
+    "definition": "Compare the answers obtained in all the templates, for a specific parallel.",
+    "context": "Compare the answers obtained in all the templates, for a specific parallel."
+  },
+  {
     "term": "page.reports.select-a-template",
     "definition": "Select a template...",
     "context": "Select a template..."
@@ -8163,6 +8188,16 @@
     "term": "page.reports.started-parallels-help-2",
     "definition": "This number doesn't include deleted o parallels or unanswered drafts.",
     "context": "This number doesn't include deleted o parallels or unanswered drafts."
+  },
+  {
+    "term": "page.reports.templates",
+    "definition": "Templates",
+    "context": "Templates"
+  },
+  {
+    "term": "page.reports.templates-description",
+    "definition": "Obtain the specific data of a template in a specific period of time.",
+    "context": "Obtain the specific data of a template in a specific period of time."
   },
   {
     "term": "page.reports.title",
