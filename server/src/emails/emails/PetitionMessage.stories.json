@@ -22,7 +22,6 @@
         "logoAlt": "Parallel",
         "removeWhyWeUseParallel": false,
         "removeParallelBranding": false,
-        "showNextButton": false,
         "theme": {
           "color": "#f75959",
           "fontFamily": "Trebuchet MS, Helvetica, sans-serif",
@@ -46,7 +45,6 @@
         "logoAlt": { "control": { "type": "text" } },
         "removeWhyWeUseParallel": { "control": { "type": "boolean" } },
         "removeParallelBranding": { "control": { "type": "boolean" } },
-        "showNextButton": { "control": { "type": "boolean" } },
         "theme": { "control": { "type": "object" } }
       }
     }

@@ -5143,10 +5143,10 @@
   resolved "https://registry.yarnpkg.com/@exodus/schemasafe/-/schemasafe-1.0.0-rc.6.tgz#7985f681564cff4ffaebb5896eb4be20af3aae7a"
   integrity sha512-dDnQizD94EdBwEj/fh3zPRa/HWCS9O5au2PuHhZBbuM3xWHxuaKzPBOEWze7Nn0xW68MIpZ7Xdyn1CoCpjKCuQ==
 
-"@faire/mjml-react@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@faire/mjml-react/-/mjml-react-3.0.0.tgz#52f6c8807719c04e2e6baddc9dfa72b7d34becaa"
-  integrity sha512-j0Kw1h4R/vUrkxvQkYGJ37SomA9/IcEci9WzAYfTCRS90BhRlqWg9+9Euq9APG2awbadSMN5QsM/ZeaGz9IA+g==
+"@faire/mjml-react@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@faire/mjml-react/-/mjml-react-3.0.2.tgz#702a51fa921a7fb91bc3e2bb2af44b35d2f9d157"
+  integrity sha512-2VUhVPpFUM9DxtaaYFnsp779rUjgDqsFhgAp2VkxJHH1YaFs9va9sIUaBTOZZUZGYCq+5E1NuiBgkZ9CTRPm5A==
   dependencies:
     lodash.kebabcase "^4.1.1"
 

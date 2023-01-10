@@ -178,10 +178,6 @@ ${parallelUrl}/${intl.locale}/petition/${keycode}/reminders?ref=reminder
             ? `${parallelUrl}/${intl.locale}/petition/${keycode}/reminders?ref=reminder`
             : undefined
         }
-        optOutText={intl.formatMessage({
-          id: "layout.stop-reminders",
-          defaultMessage: "Stop receiving reminders",
-        })}
         utmCampaign="recipients"
         removeParallelBranding={removeParallelBranding}
         theme={theme}

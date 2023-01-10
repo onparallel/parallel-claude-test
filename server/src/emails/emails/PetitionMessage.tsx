@@ -1,6 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "@faire/mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, useIntl } from "react-intl";
+import { FORMATS } from "../../util/dates";
 import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../components/CompleteInfoButton";
 import { DateTime } from "../components/DateTime";
@@ -9,10 +10,8 @@ import { Layout, LayoutProps } from "../components/Layout";
 import { disclaimer } from "../components/texts";
 import { UserMessageBox } from "../components/UserMessageBox";
 import { WhyWeUseParallel } from "../components/WhyWeUseParallel";
-import { FORMATS } from "../../util/dates";
-import { Button } from "../components/Button";
 
-export type PetitionMessageProps = {
+export interface PetitionMessageProps extends LayoutProps {
   senderName: string;
   senderEmail: string;
   subject: string | null;
@@ -22,8 +21,7 @@ export type PetitionMessageProps = {
   keycode: string;
   removeWhyWeUseParallel: boolean;
   removeParallelBranding: boolean;
-  showNextButton: boolean;
-} & LayoutProps;
+}
 
 const email: Email<PetitionMessageProps> = {
   from({ senderName }, intl) {
@@ -94,7 +92,6 @@ const email: Email<PetitionMessageProps> = {
     logoAlt,
     removeWhyWeUseParallel,
     removeParallelBranding,
-    showNextButton,
     theme,
   }: PetitionMessageProps) {
     const intl = useIntl();
@@ -107,10 +104,6 @@ const email: Email<PetitionMessageProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         optOutUrl={`${parallelUrl}/${intl.locale}/petition/${keycode}/reminders?ref=petition-access`}
-        optOutText={intl.formatMessage({
-          id: "layout.stop-reminders",
-          defaultMessage: "Stop receiving reminders",
-        })}
         utmCampaign="recipients"
         removeParallelBranding={removeParallelBranding}
         theme={theme}
@@ -151,19 +144,10 @@ const email: Email<PetitionMessageProps> = {
               </MjmlText>
             ) : null}
             <MjmlSpacer height="10px" />
-            {showNextButton ? (
-              <Button href={`${parallelUrl}/${intl.locale}/petition/${keycode}`} fontWeight="500">
-                <FormattedMessage
-                  id="new-petition.next-button"
-                  defaultMessage="Complete the information"
-                />
-              </Button>
-            ) : (
-              <CompleteInfoButton
-                tone={theme.preferredTone}
-                href={`${parallelUrl}/${intl.locale}/petition/${keycode}`}
-              />
-            )}
+            <CompleteInfoButton
+              tone={theme.preferredTone}
+              href={`${parallelUrl}/${intl.locale}/petition/${keycode}`}
+            />
             <MjmlSpacer height="10px" />
             <Disclaimer email={senderEmail} />
           </MjmlColumn>

@@ -1,10 +1,8 @@
-import { isDefined } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionMessage from "../../emails/emails/PetitionMessage";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { toGlobalId } from "../../util/globalId";
 import { toHtml, toPlainText } from "../../util/slate";
 import { getLayoutProps } from "../helpers/getLayoutProps";
 
@@ -51,24 +49,6 @@ export async function petitionMessage(
     orgId,
     "REMOVE_WHY_WE_USE_PARALLEL"
   );
-  const showNextButton = isDefined(petition.from_template_id)
-    ? [
-        "zas25KHxAByKWUeXTpW",
-        "zas25KHxAByKWUgEGU6",
-        "zas25KHxAByKWUgEGU9",
-        "zas25KHxAByKWUgEcdC",
-        "zas25KHxAByKWUgEchk",
-        "zas25KHxAByKWUgEcoS",
-        "zas25KHxAByKWUgEd43",
-        "zas25KHxAByKWUgEcxY",
-        "zas25KHxAByKWUgEcht",
-        "zas25KHxAByKWUgEd44",
-        "zas25KHxAByKWUhv4PT",
-        "zas25KHxAByKWUb99wL",
-        "zas25KHxAByKWUgGsWN",
-        "zas25KHxAByKWUhv4Yb",
-      ].includes(toGlobalId("Petition", petition.from_template_id))
-    : false;
 
   const { html, text, subject, from } = await buildEmail(
     PetitionMessage,
@@ -80,7 +60,6 @@ export async function petitionMessage(
       bodyPlainText: toPlainText(bodyJson, renderContext),
       deadline: petition.deadline,
       keycode: access.keycode,
-      showNextButton,
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       ...layoutProps,
     },

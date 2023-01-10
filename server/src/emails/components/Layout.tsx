@@ -33,7 +33,6 @@ export type LayoutProps = {
   contentHeading?: ReactNode;
   useAlternativeSlogan?: boolean;
   optOutUrl?: string;
-  optOutText?: string;
   omitGdprDisclaimer?: boolean;
   utmCampaign?: string;
   removeParallelBranding?: boolean;
@@ -56,7 +55,6 @@ const ThemedLayout: FC<Omit<LayoutProps, "theme">> = function ThemedLayout({
   children,
   contentHeading,
   optOutUrl,
-  optOutText,
   useAlternativeSlogan,
   omitGdprDisclaimer,
   utmCampaign,
@@ -203,7 +201,10 @@ const ThemedLayout: FC<Omit<LayoutProps, "theme">> = function ThemedLayout({
             {optOutUrl ? (
               <MjmlText align="center" fontSize="14px">
                 <a className="link" href={optOutUrl}>
-                  {optOutText}
+                  <FormattedMessage
+                    id="layout.stop-reminders"
+                    defaultMessage="Stop receiving reminders"
+                  />
                 </a>
               </MjmlText>
             ) : null}
