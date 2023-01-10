@@ -1332,6 +1332,8 @@ export interface NexusGenFieldTypes {
     createTag: NexusGenRootTypes["Tag"]; // Tag!
     createTemplateRepliesReportTask: NexusGenRootTypes["Task"]; // Task!
     createTemplateStatsReportTask: NexusGenRootTypes["Task"]; // Task!
+    createTemplatesOverviewExportTask: NexusGenRootTypes["Task"]; // Task!
+    createTemplatesOverviewReportTask: NexusGenRootTypes["Task"]; // Task!
     createUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     deactivateUser: NexusGenRootTypes["User"][]; // [User!]!
@@ -3123,6 +3125,8 @@ export interface NexusGenFieldTypeNames {
     createTag: "Tag";
     createTemplateRepliesReportTask: "Task";
     createTemplateStatsReportTask: "Task";
+    createTemplatesOverviewExportTask: "Task";
+    createTemplatesOverviewReportTask: "Task";
     createUserGroup: "UserGroup";
     deactivateAccesses: "PetitionAccess";
     deactivateUser: "User";
@@ -4790,6 +4794,16 @@ export interface NexusGenArgTypes {
       endDate?: NexusGenScalars["DateTime"] | null; // DateTime
       startDate?: NexusGenScalars["DateTime"] | null; // DateTime
       templateId: NexusGenScalars["GID"]; // GID!
+    };
+    createTemplatesOverviewExportTask: {
+      // args
+      endDate?: NexusGenScalars["DateTime"] | null; // DateTime
+      startDate?: NexusGenScalars["DateTime"] | null; // DateTime
+    };
+    createTemplatesOverviewReportTask: {
+      // args
+      endDate?: NexusGenScalars["DateTime"] | null; // DateTime
+      startDate?: NexusGenScalars["DateTime"] | null; // DateTime
     };
     createUserGroup: {
       // args

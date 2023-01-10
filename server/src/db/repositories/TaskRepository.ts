@@ -7,26 +7,57 @@ import { KNEX } from "../knex";
 import { Task as DbTask, TaskName } from "../__types";
 
 export type TaskInput<TName extends TaskName> = {
+  /**
+   * Generates ZIP file containing xlsx file with with petition replies and comments, and every uploaded file reply.
+   * Pattern can be used to rename file replies.
+   */
   EXPORT_REPLIES: { petition_id: number; pattern?: Maybe<string> };
+  /** generates a PDF version of the petition */
   PRINT_PDF: {
     petition_id: number;
     skip_attachments?: boolean;
     include_netdocuments_links?: boolean;
   };
+  /** generates xlsx file containing petition text replies and comments */
   EXPORT_EXCEL: { petition_id: number };
+  /**
+   * Generates a xlsx file containing every petition coming from the selected template,
+   * with its recipients information, send dates and replies
+   */
   TEMPLATE_REPLIES_REPORT: {
     petition_id: number;
     timezone: string;
-    startDate?: Date | null;
+    startDate?: Date | null; // TODO convert to snake_case
     endDate?: Date | null;
   };
+  /**
+   * generates a report on the template with it's petitions statistics.
+   * (petitions count, signatures count, time to complete, time to sign, etc)
+   */
   TEMPLATE_STATS_REPORT: {
     template_id: number;
     startDate?: Date | null;
     endDate?: Date | null;
   };
+  /** calls the DowJones API to download a PDF file with selected profile information */
   DOW_JONES_PROFILE_DOWNLOAD: {
     profile_id: string;
+  };
+  /**
+   * generates an 'overview' report for all templates of the user,
+   * containing count and time statistics on template's petitions.
+   * similar to TEMPLATE_STATS_REPORT, but for every template of the user.
+   */
+  TEMPLATES_OVERVIEW_REPORT: {
+    start_date?: Date | null;
+    end_date?: Date | null;
+  };
+  /**
+   * same as TEMPLATES_OVERVIEW_REPORT, but exports the information into an xlsx file
+   */
+  TEMPLATES_OVERVIEW_EXPORT: {
+    start_date?: Date | null;
+    end_date?: Date | null;
   };
 }[TName];
 
@@ -44,6 +75,29 @@ export type TaskOutput<TName extends TaskName> = {
     signatures: { completed: number; time_to_complete: number | null };
   };
   DOW_JONES_PROFILE_DOWNLOAD: { temporary_file_id: number };
+  TEMPLATES_OVERVIEW_REPORT: {
+    total: number;
+    completed: number;
+    signed: number;
+    closed: number;
+    template_status: {
+      id: number;
+      name: Maybe<string>;
+      total: number;
+      completed: number;
+      signed: number;
+      closed: number;
+    }[];
+    template_times: {
+      id: number;
+      name: Maybe<string>;
+      total: number;
+      time_to_complete: Maybe<number>;
+      time_to_sign: Maybe<number>;
+      time_to_close: Maybe<number>;
+    }[];
+  };
+  TEMPLATES_OVERVIEW_EXPORT: { temporary_file_id: number };
 }[TName];
 
 export type Task<TName extends TaskName> = Replace<

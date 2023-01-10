@@ -4,12 +4,14 @@ import { Task } from "../db/repositories/TaskRepository";
 import { TaskName } from "../db/__types";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 import { TaskRunner } from "./helpers/TaskRunner";
+import { DowJonesProfileDownloadRunner } from "./tasks/DowJonesProfileDownloadRunner";
 import { ExportExcelRunner } from "./tasks/ExportExcelRunner";
 import { ExportRepliesRunner } from "./tasks/ExportRepliesRunner";
-import { TemplateRepliesReportRunner } from "./tasks/TemplateRepliesReportRunner";
 import { PrintPdfRunner } from "./tasks/PrintPdfRunner";
+import { TemplateRepliesReportRunner } from "./tasks/TemplateRepliesReportRunner";
+import { TemplatesOverviewExportRunner } from "./tasks/TemplatesOverviewExportRunner";
+import { TemplatesOverviewReportRunner } from "./tasks/TemplatesOverviewReportRunner";
 import { TemplateStatsReportRunner } from "./tasks/TemplateStatsReportRunner";
-import { DowJonesProfileDownloadRunner } from "./tasks/DowJonesProfileDownloadRunner";
 
 const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => TaskRunner<any>> = {
   PRINT_PDF: PrintPdfRunner,
@@ -18,6 +20,8 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   TEMPLATE_REPLIES_REPORT: TemplateRepliesReportRunner,
   TEMPLATE_STATS_REPORT: TemplateStatsReportRunner,
   DOW_JONES_PROFILE_DOWNLOAD: DowJonesProfileDownloadRunner,
+  TEMPLATES_OVERVIEW_REPORT: TemplatesOverviewReportRunner,
+  TEMPLATES_OVERVIEW_EXPORT: TemplatesOverviewExportRunner,
 };
 
 export type TaskWorkerPayload = {

@@ -1016,6 +1016,16 @@ type Mutation {
   createTemplateStatsReportTask(endDate: DateTime, startDate: DateTime, templateId: GID!): Task!
 
   """
+  Creates a task for generating an xlsx file with overview report of logged user's templates
+  """
+  createTemplatesOverviewExportTask(endDate: DateTime, startDate: DateTime): Task!
+
+  """
+  Creates a task for generating an overview report of logged user's templates
+  """
+  createTemplatesOverviewReportTask(endDate: DateTime, startDate: DateTime): Task!
+
+  """
   Creates a group in the user's organization
   """
   createUserGroup(name: String!, userIds: [GID!]!): UserGroup!
@@ -5405,6 +5415,8 @@ enum TaskName {
   EXPORT_EXCEL
   EXPORT_REPLIES
   PRINT_PDF
+  TEMPLATES_OVERVIEW_EXPORT
+  TEMPLATES_OVERVIEW_REPORT
   TEMPLATE_REPLIES_REPORT
   TEMPLATE_STATS_REPORT
 }
