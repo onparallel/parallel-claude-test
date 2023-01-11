@@ -1,4 +1,11 @@
-import { MjmlColumn, MjmlSection, MjmlText } from "@faire/mjml-react";
+import {
+  MjmlColumn,
+  MjmlHtmlAttribute,
+  MjmlHtmlAttributes,
+  MjmlSection,
+  MjmlSelector,
+  MjmlText,
+} from "@faire/mjml-react";
 import outdent from "outdent";
 import { FormattedMessage } from "react-intl";
 import { Email } from "../buildEmail";
@@ -110,6 +117,13 @@ const email: Email<ContactAuthenticationRequest> = {
         utmCampaign="recipients"
         removeParallelBranding={removeParallelBranding}
         theme={theme}
+        head={
+          <MjmlHtmlAttributes>
+            <MjmlSelector path=".verification-code div">
+              <MjmlHtmlAttribute name="data-testid">verification-code</MjmlHtmlAttribute>
+            </MjmlSelector>
+          </MjmlHtmlAttributes>
+        }
       >
         <MjmlSection padding="0">
           <MjmlColumn>
@@ -135,7 +149,13 @@ const email: Email<ContactAuthenticationRequest> = {
         </MjmlSection>
         <MjmlSection paddingTop="10px">
           <MjmlColumn width="110px" borderRadius="3px" padding="10px" backgroundColor="#F4F7F9">
-            <MjmlText fontFamily="monospace" fontSize="24px" align="center" padding="0">
+            <MjmlText
+              cssClass="verification-code"
+              fontFamily="monospace"
+              fontSize="24px"
+              align="center"
+              padding="0"
+            >
               {code}
             </MjmlText>
           </MjmlColumn>

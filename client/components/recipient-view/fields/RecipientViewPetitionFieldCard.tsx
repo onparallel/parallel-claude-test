@@ -58,6 +58,8 @@ export function RecipientViewPetitionFieldCard({
   return (
     <Card
       id={`field-${field.id}`}
+      data-testid="recipient-view-field"
+      data-field-type={field.type}
       padding={4}
       overflow="hidden"
       {...(isInvalid

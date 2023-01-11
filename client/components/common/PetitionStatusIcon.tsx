@@ -58,7 +58,7 @@ export const PetitionStatusIcon = chakraForwardRef<"svg", PetitionStatusIconProp
     return showStatus ? (
       <HStack color={color} alignContent="center">
         {icon}{" "}
-        <Text fontSize="sm" lineHeight="24px">
+        <Text as="span" fontSize="sm" lineHeight="24px">
           {labels[status]}
         </Text>
       </HStack>

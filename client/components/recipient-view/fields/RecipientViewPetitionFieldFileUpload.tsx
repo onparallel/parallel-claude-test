@@ -301,6 +301,7 @@ function PetitionFieldFileUploadDropzone({
     <>
       <Dropzone
         as={Center}
+        data-testid="recipient-view-field-file-upload-new-reply-dropzone"
         {...(props as any)}
         minHeight="100px"
         textAlign="center"

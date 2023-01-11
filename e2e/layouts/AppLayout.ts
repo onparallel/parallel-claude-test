@@ -2,7 +2,7 @@ import { Page } from "@playwright/test";
 import { openMenu } from "../helpers/chakra/openMenu";
 
 export class AppLayout {
-  constructor(public page: Page) {}
+  constructor(protected page: Page) {}
 
   async dismissUserflow() {
     await this.page.locator("#userflow-ui").getByLabel("Close guide").click();
@@ -11,7 +11,7 @@ export class AppLayout {
 
   async openNotificationsDrawer() {
     await this.page.getByTestId("notifications-button").click();
-    const drawer = await this.page.getByTestId("notifications-drawer");
+    const drawer = this.page.getByTestId("notifications-drawer");
     await drawer.click({ trial: true });
     return drawer;
   }

@@ -343,8 +343,13 @@ export const PetitionHeader = Object.assign(
           </Flex>
           <HStack spacing={1}>
             {petition.__typename === "Petition" ? (
-              <Center data-section="petition-status-icon" data-status={status} paddingX={1}>
-                <PetitionStatusIcon status={status} showStatus={true} />
+              <Center
+                data-testid="petition-status"
+                data-section="petition-status-icon"
+                data-status={status}
+                paddingX={1}
+              >
+                <PetitionStatusIcon status={status} showStatus />
               </Center>
             ) : (
               <Badge colorScheme="primary" marginRight={2}>

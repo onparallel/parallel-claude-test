@@ -80,6 +80,7 @@ export class PetitionCompose extends PetitionLayout {
       handleBox!.y + handleBox!.height / 2
     );
     await this.page.mouse.down();
+    await this.page.waitForTimeout(1);
     if (fromIndex > toIndex) {
       // move past the centerpoint of the next field
       await this.page.mouse.move(

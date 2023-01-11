@@ -44,7 +44,7 @@ export function RecipientViewPinForm({
         }}
       >
         <PinInput autoFocus value={code} onChange={setCode} isInvalid={isInvalid}>
-          <PinInputField ref={firstInputRef} />
+          <PinInputField ref={firstInputRef} data-testid="pin-code-input" />
           <PinInputField />
           <PinInputField />
           <PinInputField />
@@ -67,6 +67,7 @@ export function RecipientViewPinForm({
         isLoading={isLoading}
         isDisabled={code.length < 6}
         marginTop={4}
+        data-testid="pin-input-verify-button"
       >
         <FormattedMessage id="recipient-view.verify-button" defaultMessage="Verify code" />
       </Button>

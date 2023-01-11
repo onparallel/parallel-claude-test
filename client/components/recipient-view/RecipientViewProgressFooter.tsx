@@ -89,13 +89,14 @@ export const RecipientViewProgressFooter = Object.assign(
         borderX="none"
         {...props}
       >
-        <Heading display="flex" as="h3" fontSize="md" fontWeight="normal" alignItems="center">
+        <Heading as="h3" fontSize="md" fontWeight="normal" data-testid="recipient-view-progress">
           <Text as="span">
-            <FormattedMessage id="recipient-view.progress" defaultMessage="Progress" />
+            <FormattedMessage
+              id="recipient-view.progress"
+              defaultMessage="Progress {current}/{total}"
+              values={{ current: replied, total }}
+            />
           </Text>
-          <Spacer minWidth={2} />
-          <Text as="span">{replied}</Text>
-          <Text as="span">/{total}</Text>
         </Heading>
         <Flex flex="1" marginX={4}>
           <ProgressTrack size="lg" min={0} max={total} value={replied} flex="1" borderRadius="1rem">
@@ -130,6 +131,7 @@ export const RecipientViewProgressFooter = Object.assign(
         >
           <PopoverTrigger>
             <Button
+              data-testid="recipient-view-finalize-button"
               data-action="finalize"
               colorScheme="primary"
               size="sm"

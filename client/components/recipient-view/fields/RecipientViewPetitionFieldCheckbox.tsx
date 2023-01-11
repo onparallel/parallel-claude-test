@@ -167,6 +167,7 @@ export function RecipientViewPetitionFieldCheckbox({
         {values.map((option: string, index: number) => (
           <Checkbox
             key={index}
+            data-value={option}
             isInvalid={isRejected}
             isDisabled={isDisabled || reply?.status === "APPROVED" || reply?.isAnonymized}
             isChecked={checkedItems.includes(option)}

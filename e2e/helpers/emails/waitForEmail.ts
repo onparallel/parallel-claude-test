@@ -7,7 +7,7 @@ import { Email, EmailEnvelope } from "./types";
 
 const parseEmail = promisify<Source, Email>(simpleParser);
 
-interface WaitForEmailOptions {
+export interface WaitForEmailOptions {
   user: string;
   password: string;
 }
@@ -35,8 +35,8 @@ export async function waitForEmail(
       try {
         const range = `${mailbox.exists}:${Math.max(mailbox.exists - 20, 1)}`;
         let uid: number | undefined = undefined;
-        for await (const message of client.fetch(range, { envelope: true })) {
-          if (!seen[message.uid]) {
+        for await (const message of client.fetch(range, { envelope: true, flags: true })) {
+          if (!message.flags.has("\\Seen") && !seen[message.uid]) {
             seen[message.uid] = true;
             if (predicate(message.envelope)) {
               uid = message.uid;
@@ -45,6 +45,7 @@ export async function waitForEmail(
         }
         if (isDefined(uid)) {
           const message = await client.fetchOne(`${uid}`, { source: true }, { uid: true });
+          await client.messageFlagsAdd(`${uid}`, ["\\Seen"], { uid: true });
           return await parseEmail(message.source);
         }
       } finally {

@@ -9911,8 +9911,8 @@
   },
   {
     "term": "recipient-view.progress",
-    "definition": "Progress",
-    "context": "Progress"
+    "definition": "Progress {current}/{total}",
+    "context": "Progress {current}/{total}"
   },
   {
     "term": "recipient-view.remaining-attempts",

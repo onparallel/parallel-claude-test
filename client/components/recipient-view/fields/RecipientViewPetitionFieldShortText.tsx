@@ -280,7 +280,11 @@ export function RecipientViewPetitionFieldShortText({
       <FormControl isInvalid={isInvalidReply[field.id]}>
         {(field.multiple && showNewReply) || field.replies.length === 0 ? (
           <Flex flex="1" position="relative" marginTop={2}>
-            <ShortTextInput {...inputProps} format={format} />
+            <ShortTextInput
+              data-testid="recipient-view-field-short-text-new-reply-input"
+              {...inputProps}
+              format={format}
+            />
             <Center boxSize={10} position="absolute" right={0} bottom={0}>
               <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
             </Center>
@@ -392,7 +396,11 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
     <FormControl isInvalid={reply.status === "REJECTED" || isInvalid}>
       <HStack>
         <Flex flex="1" position="relative">
-          <ShortTextInput {...props} format={format} />
+          <ShortTextInput
+            data-testid="recipient-view-field-short-text-reply-input"
+            {...props}
+            format={format}
+          />
           <Center boxSize={10} position="absolute" right={0} bottom={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
           </Center>

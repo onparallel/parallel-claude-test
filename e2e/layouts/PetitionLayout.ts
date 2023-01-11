@@ -2,7 +2,6 @@ import { Page } from "@playwright/test";
 import { isDefined } from "remeda";
 import { fillContactSelect } from "../helpers/react-select/fillContactSelect";
 import { fillRte, RteInput } from "../helpers/rte/fillRte";
-import { waitForGraphQL } from "../helpers/waitForGraphQL";
 import { AppLayout } from "./AppLayout";
 
 export class PetitionLayout extends AppLayout {
@@ -12,6 +11,10 @@ export class PetitionLayout extends AppLayout {
 
   getPetitionNameInput() {
     return this.page.getByTestId("petition-name-input");
+  }
+
+  getPetitionStatus() {
+    return this.page.getByTestId("petition-status");
   }
 
   async goToSection(section: "COMPOSE" | "PREVIEW" | "REPLIES" | "ACTIVITY" | "MESSAGES") {

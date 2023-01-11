@@ -24,7 +24,7 @@ import { BrandTheme } from "../../util/BrandTheme";
 import { ThemeProvider, useTheme } from "../utils/ThemeProvider";
 import { GdprDisclaimer } from "./GdprDisclaimer";
 
-export type LayoutProps = {
+export interface LayoutProps {
   title?: string;
   parallelUrl: string;
   logoUrl: string;
@@ -37,7 +37,8 @@ export type LayoutProps = {
   utmCampaign?: string;
   removeParallelBranding?: boolean;
   theme: BrandTheme;
-};
+  head?: ReactNode;
+}
 
 export const Layout: FC<LayoutProps> = function Layout({ theme, ...props }) {
   return (
@@ -59,6 +60,7 @@ const ThemedLayout: FC<Omit<LayoutProps, "theme">> = function ThemedLayout({
   omitGdprDisclaimer,
   utmCampaign,
   removeParallelBranding,
+  head,
 }) {
   const { locale } = useIntl();
   const utm = new URLSearchParams({
@@ -95,6 +97,7 @@ const ThemedLayout: FC<Omit<LayoutProps, "theme">> = function ThemedLayout({
           }
         `
         }</MjmlStyle>
+        {head}
       </MjmlHead>
       <MjmlBody>
         {/* Header */}

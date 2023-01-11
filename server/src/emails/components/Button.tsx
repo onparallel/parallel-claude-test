@@ -10,7 +10,7 @@ export interface ButtonProps extends IMjmlButtonProps {
 
 export function Button({ type = "primary", href, children, ...props }: ButtonProps) {
   return (
-    <MjmlButton mj-class={`button-${type}`} href={href} {...props}>
+    <MjmlButton mjmlClass={`button-${type}`} href={href} {...props}>
       {children}
     </MjmlButton>
   );

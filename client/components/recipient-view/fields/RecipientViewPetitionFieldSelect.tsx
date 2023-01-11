@@ -123,6 +123,7 @@ export function RecipientViewPetitionFieldSelect({
           <Box flex="1" position="relative" marginTop={2} minWidth="0">
             <SimpleSelect
               ref={newReplyRef as any}
+              data-testid="recipient-view-field-select-new-reply-select"
               isDisabled={isDisabled}
               value={value}
               options={values}
@@ -197,6 +198,7 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
           <Box position="relative">
             <SimpleSelect
               ref={ref}
+              data-testid="recipient-view-field-select-reply-select"
               isDisabled={isDisabled || reply.status === "APPROVED"}
               isInvalid={reply.status === "REJECTED"}
               value={value}

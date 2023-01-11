@@ -136,11 +136,19 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
             </Button>
           ) : null}
           {page < 2 ? (
-            <Button colorScheme="primary" onClick={() => paginate(1)}>
+            <Button
+              colorScheme="primary"
+              onClick={() => paginate(1)}
+              data-testid="help-dialog-continue-button"
+            >
               <FormattedMessage id="generic.continue" defaultMessage="Continue" />
             </Button>
           ) : (
-            <Button colorScheme="primary" onClick={() => props.onResolve()}>
+            <Button
+              colorScheme="primary"
+              onClick={() => props.onResolve()}
+              data-testid="help-dialog-continue-button"
+            >
               <FormattedMessage id="generic.understood" defaultMessage="Understood" />
             </Button>
           )}

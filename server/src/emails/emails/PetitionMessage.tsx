@@ -1,4 +1,12 @@
-import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "@faire/mjml-react";
+import {
+  MjmlColumn,
+  MjmlHtmlAttribute,
+  MjmlHtmlAttributes,
+  MjmlSection,
+  MjmlSelector,
+  MjmlSpacer,
+  MjmlText,
+} from "@faire/mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, useIntl } from "react-intl";
 import { FORMATS } from "../../util/dates";
@@ -107,6 +115,13 @@ const email: Email<PetitionMessageProps> = {
         utmCampaign="recipients"
         removeParallelBranding={removeParallelBranding}
         theme={theme}
+        head={
+          <MjmlHtmlAttributes>
+            <MjmlSelector path=".complete-information a">
+              <MjmlHtmlAttribute name="data-testid">complete-information-button</MjmlHtmlAttribute>
+            </MjmlSelector>
+          </MjmlHtmlAttributes>
+        }
       >
         <MjmlSection padding="0">
           <MjmlColumn>
@@ -145,6 +160,7 @@ const email: Email<PetitionMessageProps> = {
             ) : null}
             <MjmlSpacer height="10px" />
             <CompleteInfoButton
+              cssClass="complete-information"
               tone={theme.preferredTone}
               href={`${parallelUrl}/${intl.locale}/petition/${keycode}`}
             />

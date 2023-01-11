@@ -163,6 +163,7 @@ export function RecipientViewNewDevice({ organization, email }: RecipientViewNew
               colorScheme="primary"
               isLoading={isSendingCode}
               onClick={handleSendVerificationCode}
+              data-testid="send-verification-code-button"
             >
               <FormattedMessage
                 id="recipient-view.send-code"

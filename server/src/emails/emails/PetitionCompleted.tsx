@@ -1,4 +1,11 @@
-import { MjmlColumn, MjmlSection, MjmlText } from "@faire/mjml-react";
+import {
+  MjmlColumn,
+  MjmlHtmlAttribute,
+  MjmlHtmlAttributes,
+  MjmlSection,
+  MjmlSelector,
+  MjmlText,
+} from "@faire/mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
@@ -94,6 +101,13 @@ const email: Email<PetitionCompletedProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         theme={theme}
+        head={
+          <MjmlHtmlAttributes>
+            <MjmlSelector path=".access-information a">
+              <MjmlHtmlAttribute name="data-testid">access-information-button</MjmlHtmlAttribute>
+            </MjmlSelector>
+          </MjmlHtmlAttributes>
+        }
       >
         <MjmlSection padding="0">
           <MjmlColumn>
@@ -130,9 +144,16 @@ const email: Email<PetitionCompletedProps> = {
 
         <MjmlSection>
           <MjmlColumn>
-            <AccessInfoButton
+            <Button
               href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/replies`}
-            />
+              fontWeight="500"
+              cssClass="access-information"
+            >
+              <FormattedMessage
+                id="petition-completed.access-button"
+                defaultMessage="Access the information"
+              />
+            </Button>
             <ClosingParallelTeam />
           </MjmlColumn>
         </MjmlSection>
@@ -142,14 +163,3 @@ const email: Email<PetitionCompletedProps> = {
 };
 
 export default email;
-
-function AccessInfoButton({ href }: { href: string }) {
-  return (
-    <Button href={href} fontWeight="500">
-      <FormattedMessage
-        id="petition-completed.access-button"
-        defaultMessage="Access the information"
-      />
-    </Button>
-  );
-}

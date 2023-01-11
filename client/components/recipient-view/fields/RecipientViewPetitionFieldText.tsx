@@ -213,7 +213,10 @@ export function RecipientViewPetitionFieldText({
       ) : null}
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
-          <GrowingTextarea {...inputProps} />
+          <GrowingTextarea
+            data-testid="recipient-view-field-text-new-reply-textarea"
+            {...inputProps}
+          />
           <Center boxSize={10} position="absolute" right={0} bottom={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
           </Center>
@@ -301,7 +304,7 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
   return (
     <Stack direction="row">
       <Flex flex="1" position="relative">
-        <GrowingTextarea {...props} />
+        <GrowingTextarea data-testid="recipient-view-field-text-reply-textarea" {...props} />
         <Center boxSize={10} position="absolute" right={0} bottom={0}>
           <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
         </Center>

@@ -304,7 +304,7 @@ export function RecipientViewPetitionFieldNumber({
       ) : null}
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
-          <NumeralInput {...inputProps} />
+          <NumeralInput data-testid="recipient-view-field-number-new-reply-input" {...inputProps} />
           <Center boxSize={10} position="absolute" right={0} bottom={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
           </Center>
@@ -415,7 +415,7 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
   return (
     <Stack direction="row">
       <Flex flex="1" position="relative">
-        <NumeralInput {...props} />
+        <NumeralInput data-testid="recipient-view-field-number-reply-input" {...props} />
         <Center boxSize={10} position="absolute" right={0} bottom={0}>
           <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
         </Center>

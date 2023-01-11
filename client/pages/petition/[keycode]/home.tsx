@@ -458,9 +458,12 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
           >
             <Text fontSize="sm" as="span">
               <Text as="span" display={{ base: "none", md: "inline-block" }}>
-                <FormattedMessage id="recipient-view.progress" defaultMessage="Progress" />
-              </Text>{" "}
-              {replied}/{total}
+                <FormattedMessage
+                  id="recipient-view.progress"
+                  defaultMessage="Progress {current}/{total}"
+                  values={{ current: replied, total }}
+                />
+              </Text>
             </Text>
             <ProgressTrack
               size="md"
