@@ -5327,6 +5327,9 @@ export class PetitionRepository extends BaseRepository {
     startDate?: Date | null,
     endDate?: Date | null
   ) {
+    if (fromTemplateId.length === 0) {
+      return [];
+    }
     const petitionStatus = await this.raw<{
       id: number;
       name: Maybe<string>;
@@ -5439,7 +5442,7 @@ export class PetitionRepository extends BaseRepository {
           .filter(isDefined);
 
         return {
-          from_template_id: toGlobalId("Petition", parseInt(fromTemplateId)),
+          template_id: toGlobalId("Petition", parseInt(fromTemplateId)),
           pending: countBy(petitions, (r) => r.status === "PENDING"),
           completed: countBy(petitions, (r) => r.status === "COMPLETED"),
           closed: countBy(petitions, (r) => r.status === "CLOSED"),

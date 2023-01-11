@@ -31,7 +31,7 @@ export class TemplatesOverviewReportRunner extends TaskRunner<"TEMPLATES_OVERVIE
       completed: countBy(petitions, (p) => p.status === "COMPLETED"),
       signed: countBy(petitions, (p) => p.latest_signature_status === "COMPLETED"),
       templates: templateStats.map((stats) => {
-        const templateId = fromGlobalId(stats.from_template_id, "Petition").id;
+        const templateId = fromGlobalId(stats.template_id, "Petition").id;
         return {
           name: templates.find((t) => t.id === templateId)?.name ?? null,
           ...stats,

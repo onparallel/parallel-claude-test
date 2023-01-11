@@ -55,7 +55,7 @@ export type TaskInput<TName extends TaskName> = {
 }[TName];
 
 type TemplateStats = {
-  from_template_id: string;
+  template_id: string;
   pending: number;
   completed: number;
   closed: number;
