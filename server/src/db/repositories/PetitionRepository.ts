@@ -2651,15 +2651,17 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async getPetitionEventsByType<T extends PetitionEventType>(
-    petitionId: number,
+    petitionIds: MaybeArray<number>,
     eventType: T[]
   ): Promise<GenericPetitionEvent<T>[]> {
-    const events = await this.from("petition_event")
-      .where("petition_id", petitionId)
-      .whereIn("type", eventType)
-      .orderBy("created_at", "desc")
-      .select("*");
-    return events as any;
+    const ids = unMaybeArray(petitionIds);
+    return pFlatMap(chunk(ids, 100), async (idsChunk) => {
+      return await this.from("petition_event")
+        .whereIn("petition_id", idsChunk)
+        .whereIn("type", eventType)
+        .orderBy("created_at", "desc")
+        .select("*");
+    }) as any;
   }
 
   async getPetitionEventsForUser(
@@ -5818,5 +5820,30 @@ export class PetitionRepository extends BaseRepository {
         .where("id", petitionId)
         .update({ deleted_at: null, deleted_by: null });
     });
+  }
+
+  async getUserPetitionsForOverviewReport(
+    userId: number,
+    startDate?: Maybe<Date>,
+    endDate?: Maybe<Date>
+  ) {
+    // select distinct(p.id), p.name,p.status, p.is_template , p.from_template_id , p.latest_signature_status, p.created_at
+    // from petition_permission pp
+    // join petition p on p.id = pp.petition_id
+    // where pp.user_id = 5 and p.org_id = 1 and pp.deleted_at is null and p.deleted_at is null and p.anonymized_at is null
+    // and p.created_at between '2020-12-01' and '2020-12-02'
+    // order by p.id;
+    return await this.from("petition")
+      .join("petition_permission", "petition.id", "petition_permission.petition_id")
+      .where("petition_permission.user_id", userId)
+      .whereNull("petition_permission.deleted_at")
+      .whereNull("petition.deleted_at")
+      .whereNull("petition.anonymized_at")
+      .mmodify((q) => {
+        if (startDate && endDate) {
+          q.whereBetween("petition.created_at", [startDate, endDate]);
+        }
+      })
+      .select<Petition[]>("petition.*");
   }
 }
