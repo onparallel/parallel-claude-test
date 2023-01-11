@@ -8,6 +8,8 @@ import {
   Heading,
   HStack,
   Image,
+  LinkBox,
+  LinkOverlay,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -16,6 +18,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
+import { NakedLink } from "@parallel/components/common/Link";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
@@ -44,7 +47,7 @@ export function Reports() {
           defaultMessage:
             "Get the report of all the templates with the parallels and average time of each one.",
         }),
-        onPress: () => {},
+        href: "",
         isPending: true,
       },
       {
@@ -54,9 +57,7 @@ export function Reports() {
           id: "page.reports.templates-description",
           defaultMessage: "Obtain the specific data of a template in a specific period of time.",
         }),
-        onPress: (event: MouseEvent) => {
-          navigate(`/app/reports/templates`, event);
-        },
+        href: "/app/reports/templates",
       },
       {
         imgSrc: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/reports_replies.png`,
@@ -66,8 +67,7 @@ export function Reports() {
           defaultMessage:
             "Compare the answers obtained in all the templates, for a specific parallel.",
         }),
-
-        onPress: () => {},
+        href: "",
         isPending: true,
       },
     ],
@@ -137,19 +137,18 @@ interface ReportsCardProps {
   imgSrc: string;
   title: string;
   description: string;
-  onPress: MouseEventHandler<any>;
+  href: string;
   isPending?: boolean;
 }
 
 const ReportsCard = chakraForwardRef<"div", ReportsCardProps>(function ReportsCard(
-  { imgSrc, title, description, onPress, isPending, ...props },
+  { imgSrc, title, description, href, isPending, ...props },
   ref
 ) {
-  const buttonProps = useRoleButton(onPress);
   return (
-    <Card
+    <LinkBox
       ref={ref}
-      as={Stack}
+      as={Card}
       minHeight="160px"
       outline="none"
       isInteractive
@@ -157,7 +156,6 @@ const ReportsCard = chakraForwardRef<"div", ReportsCardProps>(function ReportsCa
       minWidth={0}
       cursor={isPending ? "default" : "pointer"}
       {...props}
-      {...(isPending ? {} : buttonProps)}
     >
       <Stack spacing={0} height="100%">
         <Center
@@ -188,19 +186,29 @@ const ReportsCard = chakraForwardRef<"div", ReportsCardProps>(function ReportsCa
         </Center>
         <Stack padding={4} paddingTop={2} paddingBottom={6}>
           <HStack align="center" wrap="wrap" spacing={0} gap={2}>
-            <Text as="h2" fontSize="2xl" fontWeight="bold">
-              {title}
-            </Text>
             {isPending ? (
-              <Badge colorScheme="purple">
-                <FormattedMessage id="generic.coming-soon" defaultMessage="Coming soon" />
-              </Badge>
-            ) : null}
+              <>
+                <Text as="h2" fontSize="2xl" fontWeight="bold">
+                  {title}
+                </Text>
+                <Badge colorScheme="purple">
+                  <FormattedMessage id="generic.coming-soon" defaultMessage="Coming soon" />
+                </Badge>
+              </>
+            ) : (
+              <NakedLink passHref href={href}>
+                <LinkOverlay>
+                  <Text as="h2" fontSize="2xl" fontWeight="bold">
+                    {title}
+                  </Text>
+                </LinkOverlay>
+              </NakedLink>
+            )}
           </HStack>
           <Text>{description}</Text>
         </Stack>
       </Stack>
-    </Card>
+    </LinkBox>
   );
 });
 
