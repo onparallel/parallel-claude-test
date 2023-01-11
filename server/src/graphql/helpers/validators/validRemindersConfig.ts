@@ -12,7 +12,7 @@ export function validRemindersConfig<TypeName extends string, FieldName extends 
   return ((_, args, ctx, info) => {
     const remindersConfig = prop(args);
     if (remindersConfig) {
-      const { time, timezone, offset } = remindersConfig;
+      const { time, timezone, offset, limit } = remindersConfig;
       if (!isValidTime(time)) {
         throw new ArgValidationError(
           info,
@@ -26,6 +26,9 @@ export function validRemindersConfig<TypeName extends string, FieldName extends 
           `${argName}.timezone`,
           `Value must be a valid timezone.`
         );
+      }
+      if (limit > 10 || limit < 1) {
+        throw new ArgValidationError(info, `${argName}.limit`, `Value must be between 1 and 10.`);
       }
       if (offset < 1) {
         throw new ArgValidationError(info, `${argName}.offset`, `Value must be larger than 0.`);
