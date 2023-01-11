@@ -9,7 +9,6 @@ import { ExportExcelRunner } from "./tasks/ExportExcelRunner";
 import { ExportRepliesRunner } from "./tasks/ExportRepliesRunner";
 import { PrintPdfRunner } from "./tasks/PrintPdfRunner";
 import { TemplateRepliesReportRunner } from "./tasks/TemplateRepliesReportRunner";
-import { TemplatesOverviewExportRunner } from "./tasks/TemplatesOverviewExportRunner";
 import { TemplatesOverviewReportRunner } from "./tasks/TemplatesOverviewReportRunner";
 import { TemplateStatsReportRunner } from "./tasks/TemplateStatsReportRunner";
 
@@ -21,7 +20,6 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   TEMPLATE_STATS_REPORT: TemplateStatsReportRunner,
   DOW_JONES_PROFILE_DOWNLOAD: DowJonesProfileDownloadRunner,
   TEMPLATES_OVERVIEW_REPORT: TemplatesOverviewReportRunner,
-  TEMPLATES_OVERVIEW_EXPORT: TemplatesOverviewExportRunner,
 };
 
 export type TaskWorkerPayload = {

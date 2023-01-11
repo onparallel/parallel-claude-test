@@ -219,33 +219,6 @@ export const createTemplatesOverviewReportTask = mutationField(
   }
 );
 
-export const createTemplatesOverviewExportTask = mutationField(
-  "createTemplatesOverviewExportTask",
-  {
-    description:
-      "Creates a task for generating an xlsx file with overview report of logged user's templates",
-    type: "Task",
-    authorize: authenticateAnd(contextUserHasRole("ADMIN")),
-    args: {
-      startDate: datetimeArg(),
-      endDate: datetimeArg(),
-    },
-    resolve: async (_, args, ctx) => {
-      return await ctx.tasks.createTask(
-        {
-          name: "TEMPLATES_OVERVIEW_EXPORT",
-          user_id: ctx.user!.id,
-          input: {
-            start_date: args.startDate,
-            end_date: args.endDate,
-          },
-        },
-        `User:${ctx.user!.id}`
-      );
-    },
-  }
-);
-
 export const getTaskResultFile = mutationField("getTaskResultFile", {
   description: "Returns an object with signed download url and filename for tasks with file output",
   type: objectType({
@@ -263,7 +236,6 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
       "EXPORT_EXCEL",
       "TEMPLATE_REPLIES_REPORT",
       "DOW_JONES_PROFILE_DOWNLOAD",
-      "TEMPLATES_OVERVIEW_EXPORT",
     ])
   ),
   args: {
@@ -276,8 +248,7 @@ export const getTaskResultFile = mutationField("getTaskResultFile", {
       | Task<"PRINT_PDF">
       | Task<"EXPORT_EXCEL">
       | Task<"TEMPLATE_REPLIES_REPORT">
-      | Task<"DOW_JONES_PROFILE_DOWNLOAD">
-      | Task<"TEMPLATES_OVERVIEW_EXPORT">;
+      | Task<"DOW_JONES_PROFILE_DOWNLOAD">;
 
     const file = isDefined(task.output)
       ? await ctx.files.loadTemporaryFile(task.output.temporary_file_id)

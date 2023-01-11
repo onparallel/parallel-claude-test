@@ -674,8 +674,6 @@ export interface Mutation {
   createTemplateRepliesReportTask: Task;
   /** Creates a task for generating a JSON report of the template usage */
   createTemplateStatsReportTask: Task;
-  /** Creates a task for generating an xlsx file with overview report of logged user's templates */
-  createTemplatesOverviewExportTask: Task;
   /** Creates a task for generating an overview report of logged user's templates */
   createTemplatesOverviewReportTask: Task;
   /** Creates a group in the user's organization */
@@ -1194,11 +1192,6 @@ export interface MutationcreateTemplateStatsReportTaskArgs {
   endDate?: InputMaybe<Scalars["DateTime"]>;
   startDate?: InputMaybe<Scalars["DateTime"]>;
   templateId: Scalars["GID"];
-}
-
-export interface MutationcreateTemplatesOverviewExportTaskArgs {
-  endDate?: InputMaybe<Scalars["DateTime"]>;
-  startDate?: InputMaybe<Scalars["DateTime"]>;
 }
 
 export interface MutationcreateTemplatesOverviewReportTaskArgs {
@@ -4142,7 +4135,6 @@ export type TaskName =
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
   | "PRINT_PDF"
-  | "TEMPLATES_OVERVIEW_EXPORT"
   | "TEMPLATES_OVERVIEW_REPORT"
   | "TEMPLATE_REPLIES_REPORT"
   | "TEMPLATE_STATS_REPORT";
@@ -26528,49 +26520,6 @@ export type useTemplateStatsReportTask_taskQuery = {
   };
 };
 
-export type useTemplatesOverviewExportTask_TaskFragment = {
-  __typename?: "Task";
-  id: string;
-  status: TaskStatus;
-  output?: { [key: string]: any } | null;
-};
-
-export type useTemplatesOverviewExportTask_createTemplatesOverviewExportTaskMutationVariables =
-  Exact<{
-    startDate?: InputMaybe<Scalars["DateTime"]>;
-    endDate?: InputMaybe<Scalars["DateTime"]>;
-  }>;
-
-export type useTemplatesOverviewExportTask_createTemplatesOverviewExportTaskMutation = {
-  createTemplatesOverviewExportTask: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    output?: { [key: string]: any } | null;
-  };
-};
-
-export type useTemplatesOverviewExportTask_getTaskResultFileMutationVariables = Exact<{
-  taskId: Scalars["GID"];
-}>;
-
-export type useTemplatesOverviewExportTask_getTaskResultFileMutation = {
-  getTaskResultFile: { __typename?: "TaskResultFile"; url: string; filename: string };
-};
-
-export type useTemplatesOverviewExportTask_taskQueryVariables = Exact<{
-  id: Scalars["GID"];
-}>;
-
-export type useTemplatesOverviewExportTask_taskQuery = {
-  task: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    output?: { [key: string]: any } | null;
-  };
-};
-
 export type useTemplatesOverviewReportTask_TaskFragment = {
   __typename?: "Task";
   id: string;
@@ -32126,13 +32075,6 @@ export const useTemplateStatsReportTask_TaskFragmentDoc = gql`
     output
   }
 ` as unknown as DocumentNode<useTemplateStatsReportTask_TaskFragment, unknown>;
-export const useTemplatesOverviewExportTask_TaskFragmentDoc = gql`
-  fragment useTemplatesOverviewExportTask_Task on Task {
-    id
-    status
-    output
-  }
-` as unknown as DocumentNode<useTemplatesOverviewExportTask_TaskFragment, unknown>;
 export const useTemplatesOverviewReportTask_TaskFragmentDoc = gql`
   fragment useTemplatesOverviewReportTask_Task on Task {
     id
@@ -36475,42 +36417,6 @@ export const useTemplateStatsReportTask_taskDocument = gql`
 ` as unknown as DocumentNode<
   useTemplateStatsReportTask_taskQuery,
   useTemplateStatsReportTask_taskQueryVariables
->;
-export const useTemplatesOverviewExportTask_createTemplatesOverviewExportTaskDocument = gql`
-  mutation useTemplatesOverviewExportTask_createTemplatesOverviewExportTask(
-    $startDate: DateTime
-    $endDate: DateTime
-  ) {
-    createTemplatesOverviewExportTask(startDate: $startDate, endDate: $endDate) {
-      ...useTemplatesOverviewExportTask_Task
-    }
-  }
-  ${useTemplatesOverviewExportTask_TaskFragmentDoc}
-` as unknown as DocumentNode<
-  useTemplatesOverviewExportTask_createTemplatesOverviewExportTaskMutation,
-  useTemplatesOverviewExportTask_createTemplatesOverviewExportTaskMutationVariables
->;
-export const useTemplatesOverviewExportTask_getTaskResultFileDocument = gql`
-  mutation useTemplatesOverviewExportTask_getTaskResultFile($taskId: GID!) {
-    getTaskResultFile(taskId: $taskId, preview: true) {
-      url
-      filename
-    }
-  }
-` as unknown as DocumentNode<
-  useTemplatesOverviewExportTask_getTaskResultFileMutation,
-  useTemplatesOverviewExportTask_getTaskResultFileMutationVariables
->;
-export const useTemplatesOverviewExportTask_taskDocument = gql`
-  query useTemplatesOverviewExportTask_task($id: GID!) {
-    task(id: $id) {
-      ...useTemplatesOverviewExportTask_Task
-    }
-  }
-  ${useTemplatesOverviewExportTask_TaskFragmentDoc}
-` as unknown as DocumentNode<
-  useTemplatesOverviewExportTask_taskQuery,
-  useTemplatesOverviewExportTask_taskQueryVariables
 >;
 export const useTemplatesOverviewReportTask_createTemplatesOverviewReportTaskDocument = gql`
   mutation useTemplatesOverviewReportTask_createTemplatesOverviewReportTask(

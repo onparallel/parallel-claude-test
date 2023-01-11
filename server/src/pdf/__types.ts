@@ -630,6 +630,8 @@ export type Mutation = {
   createTemplateRepliesReportTask: Task;
   /** Creates a task for generating a JSON report of the template usage */
   createTemplateStatsReportTask: Task;
+  /** Creates a task for generating an overview report of logged user's templates */
+  createTemplatesOverviewReportTask: Task;
   /** Creates a group in the user's organization */
   createUserGroup: UserGroup;
   /** Deactivates the specified active petition accesses. */
@@ -1146,6 +1148,11 @@ export type MutationcreateTemplateStatsReportTaskArgs = {
   endDate?: InputMaybe<Scalars["DateTime"]>;
   startDate?: InputMaybe<Scalars["DateTime"]>;
   templateId: Scalars["GID"];
+};
+
+export type MutationcreateTemplatesOverviewReportTaskArgs = {
+  endDate?: InputMaybe<Scalars["DateTime"]>;
+  startDate?: InputMaybe<Scalars["DateTime"]>;
 };
 
 export type MutationcreateUserGroupArgs = {
@@ -3985,6 +3992,7 @@ export type TaskName =
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
   | "PRINT_PDF"
+  | "TEMPLATES_OVERVIEW_REPORT"
   | "TEMPLATE_REPLIES_REPORT"
   | "TEMPLATE_STATS_REPORT";
 

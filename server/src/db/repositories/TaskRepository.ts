@@ -52,13 +52,6 @@ export type TaskInput<TName extends TaskName> = {
     start_date?: Date | null;
     end_date?: Date | null;
   };
-  /**
-   * same as TEMPLATES_OVERVIEW_REPORT, but exports the information into an xlsx file
-   */
-  TEMPLATES_OVERVIEW_EXPORT: {
-    start_date?: Date | null;
-    end_date?: Date | null;
-  };
 }[TName];
 
 type TemplateStats = {
@@ -87,7 +80,6 @@ export type TaskOutput<TName extends TaskName> = {
       name: Maybe<string>;
     } & TemplateStats)[];
   };
-  TEMPLATES_OVERVIEW_EXPORT: { temporary_file_id: number };
 }[TName];
 
 export type Task<TName extends TaskName> = Replace<
