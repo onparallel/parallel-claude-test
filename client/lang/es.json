@@ -2595,6 +2595,21 @@
     "context": "Used"
   },
   {
+    "term": "component.overview-reports-list-table-header.download-csv",
+    "definition": "Descargar CSV",
+    "context": "Download CSV"
+  },
+  {
+    "term": "component.overview-reports-list-table-header.status",
+    "definition": "Estado",
+    "context": "Status"
+  },
+  {
+    "term": "component.overview-reports-list-table-header.time",
+    "definition": "Tiempo",
+    "context": "Time"
+  },
+  {
     "term": "component.overwrite-documentation-dialog.body",
     "definition": "{tone, select, INFORMAL{Ya se ha completado una subida. Si continúas, volverás al proceso inicial y se sobrescribirá la documentación actual. ¿Estás seguro de querer empezar de nuevo?} other{El proceso de subida ha sido completado al menos una vez. Si continúa, volverá al proceso inicial y se sobrescribirá la documentación actual. ¿Está seguro de querer empezar de nuevo?}}",
     "context": "An upload has already been completed. If you continue, you will return to the initial process and the current documentation will be overwritten. Are you sure you want to start over?"
@@ -6320,6 +6335,11 @@
     "context": "Close"
   },
   {
+    "term": "page.reports-overview.closed",
+    "definition": "Cerrados",
+    "context": "Closed"
+  },
+  {
     "term": "generic.collapse",
     "definition": "Contraer",
     "context": "Collapse"
@@ -6368,6 +6388,11 @@
     "term": "generic.comments-button-label",
     "definition": "{commentCount, plural, =0 {Sin comentarios} =1 {# comentario} other {# comentarios}}",
     "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}"
+  },
+  {
+    "term": "page.reports-overview.completed",
+    "definition": "Completados",
+    "context": "Completed"
   },
   {
     "term": "generic.confirm-continue",
@@ -7145,6 +7170,11 @@
     "context": "Production"
   },
   {
+    "term": "page.reports-overview.signed",
+    "definition": "Firmados",
+    "context": "Signed"
+  },
+  {
     "term": "generic.something-went-wrong",
     "definition": "Algo ha fallado",
     "context": "Something went wrong"
@@ -7190,6 +7220,21 @@
     "context": "Thanks"
   },
   {
+    "term": "page.reports-overview.time-to-close",
+    "definition": "Tiempo en cerrar",
+    "context": "Time to close"
+  },
+  {
+    "term": "page.reports-overview.time-to-complete",
+    "definition": "Tiempo en completar",
+    "context": "Time to complete"
+  },
+  {
+    "term": "page.reports-overview.time-to-sign",
+    "definition": "Tiempo en firmar",
+    "context": "Time to sign"
+  },
+  {
     "term": "generic.today-at",
     "definition": "Hoy a las {time}",
     "context": "Today at {time}"
@@ -7208,6 +7253,11 @@
     "term": "generic.tone-informal",
     "definition": "Informal",
     "context": "Informal"
+  },
+  {
+    "term": "page.reports-overview.total",
+    "definition": "Total",
+    "context": "Total"
   },
   {
     "term": "generic.transfer-ownership",
@@ -8143,6 +8193,51 @@
     "term": "page.pricing.zapier-integration",
     "definition": "Integración con Zapier",
     "context": "Zapier integration"
+  },
+  {
+    "term": "page.reports-overview.choose-date-range",
+    "definition": "Elige el rango de fechas que necesites para ver los resultados de tus plantillas",
+    "context": "Choose the date range you need to view the results of your templates"
+  },
+  {
+    "term": "page.reports-overview.closed-parallels",
+    "definition": "Cerrados",
+    "context": "Closed"
+  },
+  {
+    "term": "page.reports-overview.completed-parallels",
+    "definition": "Completados",
+    "context": "Completed"
+  },
+  {
+    "term": "page.reports-overview.no-templates-matching-search",
+    "definition": "No hay plantillas que coincidan con tu búsqueda",
+    "context": "There's no templates matching your search"
+  },
+  {
+    "term": "page.reports-overview.no-templates-range",
+    "definition": "No hay plantillas en este periodo",
+    "context": "No templates in this timeframe"
+  },
+  {
+    "term": "page.reports-overview.ready-to-generate",
+    "definition": "¡Estamos listos para generar tu informe general!",
+    "context": "We are ready to generate your overview report!"
+  },
+  {
+    "term": "page.reports-overview.signed-parallels",
+    "definition": "Firmados",
+    "context": "Signed"
+  },
+  {
+    "term": "page.reports-overview.total-parallels",
+    "definition": "Total parallels",
+    "context": "Total parallels"
+  },
+  {
+    "term": "page.reports-templates.ready-to-generate",
+    "definition": "¡Estamos listos para generar el informe de tu plantilla!",
+    "context": "We are ready to generate your template report!"
   },
   {
     "term": "page.reports.average-duration",

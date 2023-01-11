@@ -24311,6 +24311,134 @@ export type ReportsTemplates_userQuery = {
   };
 };
 
+export type Overview_PetitionTemplateFragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  name?: string | null;
+};
+
+export type Overview_templatesQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  isPublic: Scalars["Boolean"];
+}>;
+
+export type Overview_templatesQuery = {
+  templates: {
+    __typename?: "PetitionBaseOrFolderPagination";
+    totalCount: number;
+    items: Array<
+      | { __typename?: "Petition" }
+      | { __typename?: "PetitionFolder" }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null }
+    >;
+  };
+};
+
+export type Overview_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type Overview_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      iconUrl92?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
+export type ReportsTemplates_PetitionTemplateFragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  name?: string | null;
+};
+
+export type ReportsTemplates_templatesQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  isPublic: Scalars["Boolean"];
+}>;
+
+export type ReportsTemplates_templatesQuery = {
+  templates: {
+    __typename?: "PetitionBaseOrFolderPagination";
+    totalCount: number;
+    items: Array<
+      | { __typename?: "Petition" }
+      | { __typename?: "PetitionFolder" }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null }
+    >;
+  };
+};
+
+export type ReportsTemplates_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type ReportsTemplates_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      iconUrl92?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
 export type Account_QueryFragment = {
   me: {
     __typename?: "User";

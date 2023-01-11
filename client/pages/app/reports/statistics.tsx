@@ -1,9 +1,9 @@
+
 import { gql } from "@apollo/client";
 import {
   Box,
   Button,
   Center,
-  Container,
   Flex,
   Grid,
   GridItem,
@@ -18,7 +18,6 @@ import {
   CheckIcon,
   DoubleCheckIcon,
   PaperPlaneIcon,
-  ReportsIcon,
   SignatureIcon,
   TableIcon,
   TimeIcon,
@@ -32,6 +31,7 @@ import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { DateRangePickerButton } from "@parallel/components/reports/DateRangePickerButton";
 import { ReportsDoughnutChart } from "@parallel/components/reports/ReportsDoughnutChart";
 import { ReportsErrorMessage } from "@parallel/components/reports/ReportsErrorMessage";
@@ -49,9 +49,10 @@ import {
 import { compose } from "@parallel/utils/compose";
 import { stallFor } from "@parallel/utils/promises/stallFor";
 import { date, useQueryState } from "@parallel/utils/queryState";
+import { useTemplateRepliesReportTask } from "@parallel/utils/tasks/useTemplateRepliesReportTask";
+import { useTemplateStatsReportBackgroundTask } from "@parallel/utils/tasks/useTemplateStatsReportTask";
 import { Maybe } from "@parallel/utils/types";
-import { useBackgroundTask } from "@parallel/utils/useBackgroundTask";
-import { useTemplateRepliesReportTask } from "@parallel/utils/useTemplateRepliesReportTask";
+import { useReportsSections } from "@parallel/utils/useReportsSections";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -80,6 +81,8 @@ export function ReportsTemplates() {
     data: { me, realMe },
   } = useAssertQuery(ReportsTemplates_userDocument);
 
+  const sections = useReportsSections();
+
   const [{ status, templateId, prevTemplateId, report }, setState] = useState<{
     status: "IDLE" | "LOADING" | "ERROR";
     templateId: string | null;
@@ -106,7 +109,7 @@ export function ReportsTemplates() {
   });
   assertTypenameArray(templates, "PetitionTemplate");
 
-  const templateStatsTask = useBackgroundTask("TEMPLATE_STATS_REPORT");
+  const templateStatsReportBackgroundTask = useTemplateStatsReportBackgroundTask();
 
   const handleGenerateReportClick = async () => {
     try {
@@ -117,7 +120,7 @@ export function ReportsTemplates() {
         // add a fake delay
         const { task } = await stallFor(
           () =>
-            templateStatsTask(
+            templateStatsReportBackgroundTask(
               {
                 templateId: templateId,
                 startDate: state.range?.[0].toISOString() ?? null,
@@ -143,30 +146,21 @@ export function ReportsTemplates() {
   const canGenerateReport = !templateId || (prevTemplateId === templateId && status === "LOADING");
 
   return (
-    <AppLayout
-      id="main-container"
+    <SettingsLayout
       title={intl.formatMessage({
-        id: "page.reports.title",
-        defaultMessage: "Reports",
+        id: "page.reports.templates",
+        defaultMessage: "Templates",
       })}
+      basePath="/app/reports"
+      sections={sections}
       me={me}
       realMe={realMe}
-    >
-      <Container
-        maxWidth="container.xl"
-        flex="1"
-        display="flex"
-        flexDirection="column"
-        padding={{ base: 9, md: 9 }}
-        gridGap={7}
-      >
+      sectionsHeader={<FormattedMessage id="page.reports.title" defaultMessage="Reports" />}
+      header={
         <HStack width="100%" justifyContent="space-between" flexWrap="wrap">
-          <HStack>
-            <ReportsIcon boxSize={6} />
-            <Heading as="h2" size="lg">
-              <FormattedMessage id="page.reports.title" defaultMessage="Reports" />
-            </Heading>
-          </HStack>
+          <Heading as="h3" size="md">
+            <FormattedMessage id="page.reports.templates" defaultMessage="Templates" />
+          </Heading>
           <Button
             as={NakedHelpCenterLink}
             variant="ghost"
@@ -177,89 +171,95 @@ export function ReportsTemplates() {
             <FormattedMessage id="generic.help-question" defaultMessage="Help?" />
           </Button>
         </HStack>
-        <Stack spacing={2}>
-          <Text>
-            <FormattedMessage id="generic.template" defaultMessage="Template" />:
-          </Text>
-          <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2}>
-            <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2} flex="1">
-              <HStack
-                data-section="reports-select-template"
-                flex="1"
-                maxWidth={{ base: "100%", md: "500px" }}
-              >
-                <Box flex="1" minWidth="0">
-                  <SimpleSelect
-                    options={templates.map((t) => ({
-                      label:
-                        t.name ??
-                        intl.formatMessage({
-                          id: "generic.unnamed-template",
-                          defaultMessage: "Unnamed template",
-                        }),
-                      value: t.id,
-                    }))}
-                    placeholder={intl.formatMessage({
-                      id: "page.reports.select-a-template",
-                      defaultMessage: "Select a template...",
-                    })}
-                    isSearchable={true}
-                    value={templateId}
-                    onChange={(templateId) => setState((state) => ({ ...state, templateId }))}
-                  />
-                </Box>
-              </HStack>
-              <DateRangePickerButton
-                value={state.range as [Date, Date] | null}
-                onChange={(range) => setQueryState((s) => ({ ...s, range }))}
-              />
-              <Button
-                minWidth="fit-content"
-                colorScheme="primary"
-                isDisabled={canGenerateReport}
-                onClick={handleGenerateReportClick}
-                fontWeight="500"
-              >
-                <FormattedMessage id="page.reports.generate" defaultMessage="Generate" />
-              </Button>
-            </Stack>
-            {isDefined(report) && status === "IDLE" ? (
-              <Button
-                leftIcon={<TableIcon />}
-                colorScheme="primary"
-                onClick={() =>
-                  handleTemplateRepliesReportTask(
-                    prevTemplateId!,
-                    state.range?.[0].toISOString() ?? null,
-                    state.range?.[1].toISOString() ?? null
-                  )
-                }
-              >
-                <OverflownText>
-                  <FormattedMessage
-                    id="page.reports.download-replies"
-                    defaultMessage="Download replies"
-                  />
-                </OverflownText>
-              </Button>
-            ) : null}
+      }
+    >
+      <Stack spacing={2} padding={6}>
+        <Text>
+          <FormattedMessage id="generic.template" defaultMessage="Template" />:
+        </Text>
+        <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2}>
+          <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2} flex="1">
+            <HStack
+              data-section="reports-select-template"
+              flex="1"
+              maxWidth={{ base: "100%", md: "500px" }}
+            >
+              <Box flex="1" minWidth="0">
+                <SimpleSelect
+                  options={templates.map((t) => ({
+                    label:
+                      t.name ??
+                      intl.formatMessage({
+                        id: "generic.unnamed-template",
+                        defaultMessage: "Unnamed template",
+                      }),
+                    value: t.id,
+                  }))}
+                  placeholder={intl.formatMessage({
+                    id: "page.reports.select-a-template",
+                    defaultMessage: "Select a template...",
+                  })}
+                  isSearchable={true}
+                  value={templateId}
+                  onChange={(templateId) => setState((state) => ({ ...state, templateId }))}
+                />
+              </Box>
+            </HStack>
+            <DateRangePickerButton
+              value={state.range as [Date, Date] | null}
+              onChange={(range) => setQueryState((s) => ({ ...s, range }))}
+            />
+            <Button
+              minWidth="fit-content"
+              colorScheme="primary"
+              isDisabled={canGenerateReport}
+              onClick={handleGenerateReportClick}
+              fontWeight="500"
+            >
+              <FormattedMessage id="page.reports.generate" defaultMessage="Generate" />
+            </Button>
           </Stack>
+          {isDefined(report) && status === "IDLE" ? (
+            <Button
+              leftIcon={<TableIcon />}
+              colorScheme="primary"
+              onClick={() =>
+                handleTemplateRepliesReportTask(
+                  prevTemplateId!,
+                  state.range?.[0].toISOString() ?? null,
+                  state.range?.[1].toISOString() ?? null
+                )
+              }
+            >
+              <OverflownText>
+                <FormattedMessage
+                  id="page.reports.download-replies"
+                  defaultMessage="Download replies"
+                />
+              </OverflownText>
+            </Button>
+          ) : null}
         </Stack>
-        {isDefined(report) && status === "IDLE" ? (
-          <TemplateStatsReport report={report} />
-        ) : (
-          <Stack minHeight="340px" alignItems="center" justifyContent="center" textAlign="center">
-            {status === "LOADING" ? (
-              <ReportsLoadingMessage />
-            ) : status === "ERROR" ? (
-              <ReportsErrorMessage />
-            ) : (
-              <ReportsReadyMessage />
-            )}
-          </Stack>
-        )}
-      </Container>
-    </AppLayout>
+      </Stack>
+      {isDefined(report) && status === "IDLE" ? (
+        <TemplateStatsReport report={report} />
+      ) : (
+        <Stack minHeight="340px" alignItems="center" justifyContent="center" textAlign="center">
+          {status === "LOADING" ? (
+            <ReportsLoadingMessage />
+          ) : status === "ERROR" ? (
+            <ReportsErrorMessage />
+          ) : (
+            <ReportsReadyMessage
+              title={intl.formatMessage({
+                id: "page.reports-templates.ready-to-generate",
+                defaultMessage: "We are ready to generate your template report!",
+              })}
+            />
+          )}
+        </Stack>
+      )}
+    </SettingsLayout>
   );
 }
 
