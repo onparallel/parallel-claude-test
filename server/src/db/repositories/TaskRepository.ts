@@ -61,41 +61,31 @@ export type TaskInput<TName extends TaskName> = {
   };
 }[TName];
 
+type TemplateStats = {
+  from_template_id: string;
+  pending: number;
+  completed: number;
+  closed: number;
+  pending_to_complete: number | null;
+  complete_to_close: number | null;
+  signatures: { completed: number; time_to_complete: number | null };
+};
+
 export type TaskOutput<TName extends TaskName> = {
   EXPORT_REPLIES: { temporary_file_id: number };
   PRINT_PDF: { temporary_file_id: number };
   EXPORT_EXCEL: { temporary_file_id: number };
   TEMPLATE_REPLIES_REPORT: { temporary_file_id: number };
-  TEMPLATE_STATS_REPORT: {
-    pending: number;
-    completed: number;
-    closed: number;
-    pending_to_complete: number | null;
-    complete_to_close: number | null;
-    signatures: { completed: number; time_to_complete: number | null };
-  };
+  TEMPLATE_STATS_REPORT: TemplateStats;
   DOW_JONES_PROFILE_DOWNLOAD: { temporary_file_id: number };
   TEMPLATES_OVERVIEW_REPORT: {
     total: number;
     completed: number;
     signed: number;
     closed: number;
-    template_status: {
-      id: number;
+    templates: ({
       name: Maybe<string>;
-      total: number;
-      completed: number;
-      signed: number;
-      closed: number;
-    }[];
-    template_times: {
-      id: number;
-      name: Maybe<string>;
-      total: number;
-      time_to_complete: Maybe<number>;
-      time_to_sign: Maybe<number>;
-      time_to_close: Maybe<number>;
-    }[];
+    } & TemplateStats)[];
   };
   TEMPLATES_OVERVIEW_EXPORT: { temporary_file_id: number };
 }[TName];
