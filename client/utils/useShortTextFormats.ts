@@ -70,7 +70,6 @@ export function useShortTextFormats() {
           prepare,
           dispatch: function (appended, { value, compiledMasks }) {
             const prefix = (value + appended).slice(0, 2);
-            console.log(compiledMasks);
             const mask = compiledMasks.find((m) => {
               return ((m as any).country as string).startsWith(prefix);
             });
