@@ -26,8 +26,7 @@ import { Reports_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useHandleNavigation } from "@parallel/utils/navigation";
-import { useRoleButton } from "@parallel/utils/useRoleButton";
-import { MouseEvent, MouseEventHandler, useMemo } from "react";
+import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export function Reports() {
