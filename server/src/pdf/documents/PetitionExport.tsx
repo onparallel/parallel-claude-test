@@ -161,6 +161,10 @@ export default function PetitionExport({
         field.replies.some((r) => !!r.metadata.EXTERNAL_ID_CUATRECASAS)
     )?.replies[0].metadata.EXTERNAL_ID_CUATRECASAS;
 
+  function notEmptyHeading(field: PetitionExport_PetitionFieldFragment) {
+    return !(field.type === "HEADING" && !field.title && !field.description);
+  }
+
   return (
     <LiquidProvider>
       <LiquidScopeProvider scope={scope}>
@@ -192,7 +196,7 @@ export default function PetitionExport({
                     ) : null}
                   </View>
                 ) : null}
-                {page.map((field, i) => (
+                {page.filter(notEmptyHeading).map((field, i) => (
                   <View key={i} style={{ marginBottom: "5mm" }}>
                     {field.type === "HEADING" ? (
                       <View>
