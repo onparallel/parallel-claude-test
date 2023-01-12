@@ -25,6 +25,7 @@ import { isDefined } from "remeda";
 import { SettingsRowSwitch } from "../SettingsRowSwitch";
 import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
 import { SettingsRowPlaceholder } from "./SettingsRowPlaceholder";
+import { SettingsRow } from "./SettingsRow";
 
 export function NumberSettings({
   field,
@@ -121,7 +122,7 @@ export function NumberSettings({
   return (
     <Stack spacing={4}>
       <FormControl as={HStack} flex={1} isDisabled={isReadOnly}>
-        <FormLabel margin={0}>
+        <FormLabel margin={0} fontWeight="normal">
           <FormattedMessage
             id="component.field-settings-number.decimals"
             defaultMessage="No. of decimals allowed:"
