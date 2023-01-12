@@ -144,10 +144,8 @@ export function Overview() {
           ),
         2_000 + 1_000 * Math.random()
       );
-      console.log("task out: ", task.output);
       setState((state) => ({ ...state, report: task.output as any, status: "IDLE" }));
     } catch (e: any) {
-      console.log("handleGenerateReportClick error: ", e);
       if (e.message === "ABORTED") {
         // nothing
       } else {
@@ -251,7 +249,6 @@ export function Overview() {
                 <OverviewReportsListTableHeader
                   search={search}
                   tableType={tableType}
-                  onReload={handleGenerateReportClick}
                   onSearchChange={handleSearchChange}
                   onChangeTableType={(tableType: OverviewTableType) =>
                     setState((s) => ({ ...s, tableType }))
@@ -270,14 +267,20 @@ export function Overview() {
                       </Text>
                     </Flex>
                   ) : (
-                    <Flex flex="1" alignItems="center" justifyContent="center">
+                    <Stack flex="1" alignItems="center" justifyContent="center">
                       <Text fontSize="lg">
                         <FormattedMessage
-                          id="page.reports-overview.no-templates-created"
-                          defaultMessage="No template has been created yet, start creating one!"
+                          id="page.reports-overview.no-templates-found"
+                          defaultMessage="We have not found any template."
                         />
                       </Text>
-                    </Flex>
+                      <Text fontSize="lg">
+                        <FormattedMessage
+                          id="page.reports-overview.select-dates-or-create"
+                          defaultMessage="Please select other dates or create a new template."
+                        />
+                      </Text>
+                    </Stack>
                   )
                 ) : null
               }
@@ -369,7 +372,7 @@ function useOverviewTemplateStatusColumns(): TableColumn<TemplateStats>[] {
           width: "10%",
           minWidth: "120px",
         },
-        CellContent: ({ row }) => <>{row.signatures.completed + row.completed + row.closed}</>,
+        CellContent: ({ row }) => <>{row.pending + row.completed + row.closed}</>,
       },
       {
         key: "completed",
@@ -448,7 +451,9 @@ function useOverviewTemplateTimesColumns(): TableColumn<TemplateStats>[] {
           width: "10%",
           minWidth: "120px",
         },
-        CellContent: ({ row }) => <>{row.closed + row.completed + row.signatures.completed}</>,
+        CellContent: ({ row }) => (
+          <TimeSpan duration={(row.pending_to_complete ?? 0) + (row.complete_to_close ?? 0)} />
+        ),
       },
       {
         key: "time_to_complete",
@@ -484,9 +489,7 @@ function useOverviewTemplateTimesColumns(): TableColumn<TemplateStats>[] {
           width: "10%",
           minWidth: "120px",
         },
-        CellContent: ({ row }) => (
-          <TimeSpan duration={(row.pending_to_complete ?? 0) + (row.complete_to_close ?? 0)} />
-        ),
+        CellContent: ({ row }) => <TimeSpan duration={row.complete_to_close ?? 0} />,
       },
     ],
     [intl.locale]

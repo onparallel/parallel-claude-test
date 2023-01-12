@@ -8185,9 +8185,9 @@
     "context": "Completed"
   },
   {
-    "term": "page.reports-overview.no-templates-created",
-    "definition": "No template has been created yet, start creating one!",
-    "context": "No template has been created yet, start creating one!"
+    "term": "page.reports-overview.no-templates-found",
+    "definition": "We have not found any template.",
+    "context": "We have not found any template."
   },
   {
     "term": "page.reports-overview.no-templates-matching-search",
@@ -8198,6 +8198,11 @@
     "term": "page.reports-overview.ready-to-generate",
     "definition": "We are ready to generate your overview report!",
     "context": "We are ready to generate your overview report!"
+  },
+  {
+    "term": "page.reports-overview.select-dates-or-create",
+    "definition": "Please select other dates or create a new template.",
+    "context": "Please select other dates or create a new template."
   },
   {
     "term": "page.reports-overview.signed",

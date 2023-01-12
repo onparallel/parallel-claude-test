@@ -176,12 +176,12 @@ export function ReportsTemplates() {
         <Text>
           <FormattedMessage id="generic.template" defaultMessage="Template" />:
         </Text>
-        <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2}>
-          <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2} flex="1">
+        <Stack direction={{ base: "column", lg: "row" }} spacing={0} gridGap={2}>
+          <Stack direction={{ base: "column", lg: "row" }} spacing={0} gridGap={2} flex="1">
             <HStack
               data-section="reports-select-template"
               flex="1"
-              maxWidth={{ base: "100%", md: "500px" }}
+              maxWidth={{ base: "100%", lg: "500px" }}
             >
               <Box flex="1" minWidth="0">
                 <SimpleSelect
@@ -239,25 +239,25 @@ export function ReportsTemplates() {
             </Button>
           ) : null}
         </Stack>
+        {isDefined(report) && status === "IDLE" ? (
+          <TemplateStatsReport report={report} />
+        ) : (
+          <Stack minHeight="340px" alignItems="center" justifyContent="center" textAlign="center">
+            {status === "LOADING" ? (
+              <ReportsLoadingMessage />
+            ) : status === "ERROR" ? (
+              <ReportsErrorMessage />
+            ) : (
+              <ReportsReadyMessage
+                title={intl.formatMessage({
+                  id: "page.reports-templates.ready-to-generate",
+                  defaultMessage: "We are ready to generate your template report!",
+                })}
+              />
+            )}
+          </Stack>
+        )}
       </Stack>
-      {isDefined(report) && status === "IDLE" ? (
-        <TemplateStatsReport report={report} />
-      ) : (
-        <Stack minHeight="340px" alignItems="center" justifyContent="center" textAlign="center">
-          {status === "LOADING" ? (
-            <ReportsLoadingMessage />
-          ) : status === "ERROR" ? (
-            <ReportsErrorMessage />
-          ) : (
-            <ReportsReadyMessage
-              title={intl.formatMessage({
-                id: "page.reports-templates.ready-to-generate",
-                defaultMessage: "We are ready to generate your template report!",
-              })}
-            />
-          )}
-        </Stack>
-      )}
     </SettingsLayout>
   );
 }
@@ -348,6 +348,7 @@ function TemplateStatsReport({ report }: { report: ReportType }) {
         `,
       }}
       gridGap={4}
+      paddingTop={4}
     >
       <GridItem gridArea="petitions">
         <Card height="100%" padding={6} as={Stack} spacing={3}>
