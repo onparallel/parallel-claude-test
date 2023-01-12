@@ -1178,14 +1178,19 @@ type Mutation {
   generateUserAuthToken(tokenName: String!): GenerateUserAuthTokenResponse!
 
   """
-  Get the user who owns an API Token
-  """
-  getApiTokenOwner(token: String!): SupportMethodResponse!
-
-  """
   Returns an object with signed download url and filename for tasks with file output
   """
   getTaskResultFile(preview: Boolean, taskId: GID!): TaskResultFile!
+
+  """
+  Imports a petition from a JSON file
+  """
+  importPetitionFromJson(
+    """
+    Petition to import in json format @form:type=textarea
+    """
+    json: String!
+  ): SupportMethodResponse!
   loginAs(userId: GID!): Result!
 
   """
@@ -4744,6 +4749,16 @@ type Query {
   Checks if the provided email is available to be registered as a user on Parallel
   """
   emailIsAvailable(email: String!): Boolean!
+
+  """
+  Exports basic petition + fields configuration as JSON object
+  """
+  exportPetitionToJson(petitionId: GID!): SupportMethodResponse!
+
+  """
+  Get the user who owns an API Token
+  """
+  getApiTokenOwner(token: String!): SupportMethodResponse!
   getSlugForPublicPetitionLink(petitionName: String): String!
 
   """
@@ -5373,6 +5388,7 @@ Return type for all support methods
 type SupportMethodResponse {
   message: String
   result: Result!
+  type: String
 }
 
 type Tag {

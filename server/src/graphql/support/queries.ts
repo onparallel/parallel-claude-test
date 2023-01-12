@@ -1,5 +1,8 @@
 import { idArg, nonNull, queryField, stringArg } from "nexus";
+import { isDefined } from "remeda";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { hash } from "../../util/token";
+import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { supportMethodAccess } from "./authorizers";
 
@@ -37,5 +40,59 @@ export const globalIdEncode = queryField("globalIdEncode", {
     } catch (e: any) {
       return { result: RESULT.FAILURE, message: e.toString() };
     }
+  },
+});
+
+export const getApiTokenOwner = queryField("getApiTokenOwner", {
+  description: "Get the user who owns an API Token",
+  type: "SupportMethodResponse",
+  args: {
+    token: nonNull(stringArg()),
+  },
+  authorize: supportMethodAccess(),
+  resolve: async (_, { token }, ctx) => {
+    try {
+      const tokenHash = await hash(token, "");
+      const userToken = await ctx.userAuthentication.loadUserAuthenticationByTokenHash(tokenHash);
+      if (!isDefined(userToken)) {
+        throw new Error("Token not found");
+      }
+      const user = await ctx.users.loadUser(userToken.user_id);
+      const userData = user ? await ctx.users.loadUserData(user.user_data_id) : null;
+
+      if (!isDefined(user) || !isDefined(userData)) {
+        throw new Error("Token found but user is deleted");
+      }
+      return {
+        result: RESULT.SUCCESS,
+        message: `User:${user.id} with email ${userData.email}.`,
+      };
+    } catch (error: any) {
+      return {
+        result: RESULT.FAILURE,
+        message: error.message,
+      };
+    }
+  },
+});
+
+export const exportPetitionToJson = queryField("exportPetitionToJson", {
+  description: "Exports basic petition + fields configuration as JSON object",
+  type: "SupportMethodResponse",
+  authorize: supportMethodAccess(),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+  },
+  resolve: async (_, { petitionId }, ctx) => {
+    try {
+      return {
+        result: RESULT.SUCCESS,
+        type: "copy-to-clipboard",
+        message: JSON.stringify(await ctx.petitionImportExport.toJson(petitionId), null, 2),
+      };
+    } catch (e) {
+      console.error(e);
+    }
+    return { result: RESULT.FAILURE, message: "Something went wrong..." };
   },
 });

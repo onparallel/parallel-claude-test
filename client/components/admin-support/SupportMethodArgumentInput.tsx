@@ -7,6 +7,7 @@ import {
   Select,
   Switch,
   Text,
+  Textarea,
 } from "@chakra-ui/react";
 import { unCamelCase } from "@parallel/utils/strings";
 import {
@@ -26,8 +27,49 @@ type SupportMethodArgumentInputProps = {
   onValue: (value: any) => void;
 };
 
+/**
+ * parses a querystring like type=textarea&min=5&max=10...
+ * into an object {"type": "textarea", "min": "5", "max": "10", ...}
+ */
+function parseQueryString(qs: string) {
+  const params = new URLSearchParams(qs);
+  const obj: Record<string, string> = {};
+
+  const iterator = params.entries();
+  let next = iterator.next();
+  while (!next.done) {
+    const [key, value] = next.value;
+    obj[key] = value;
+    next = iterator.next();
+  }
+
+  return obj;
+}
+
 export function SupportMethodArgumentInput(props: SupportMethodArgumentInputProps) {
   const type = props.arg.type.kind === "NON_NULL" ? props.arg.type.ofType : props.arg.type;
+
+  const qs = props.arg.description?.match(/@form:([^\s]+)/)?.[1]; // match text from @form: until first space or end of line
+  if (qs) {
+    const data = parseQueryString(qs);
+    if (data.type === "textarea") {
+      return (
+        <>
+          <Text as="label" lineHeight={10}>
+            {unCamelCase(props.arg.name)}
+          </Text>
+          <Textarea
+            width="100%"
+            placeholder={props.arg.description ?? ""}
+            isInvalid={props.isInvalid}
+            value={props.value}
+            onChange={(e) => props.onValue(e.target.value || null)}
+          />
+        </>
+      );
+    }
+  }
+
   switch (type.kind) {
     case "SCALAR":
       return (

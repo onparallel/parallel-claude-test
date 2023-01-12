@@ -475,7 +475,7 @@ export function petitionHasRepliableFields<
 }
 
 export const petitionsAreEditable = createPetitionAuthorizer(
-  (petition) => !isDefined(petition.restricted_by_user_id)
+  (petition) => !isDefined(petition.restricted_at)
 );
 
 export function templateDoesNotHavePublicPetitionLink<

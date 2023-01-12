@@ -5,6 +5,7 @@ export const SupportMethodResponse = objectType({
   description: "Return type for all support methods",
   definition(t) {
     t.field("result", { type: "Result" });
+    t.nullable.string("type");
     t.nullable.string("message");
   },
 });

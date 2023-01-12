@@ -826,6 +826,7 @@ export interface NexusGenObjects {
     // root type
     message?: string | null; // String
     result: NexusGenEnums["Result"]; // Result!
+    type?: string | null; // String
   };
   Tag: db.Tag;
   TagPagination: {
@@ -1355,8 +1356,8 @@ export interface NexusGenFieldTypes {
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     forceUpdateSignatureOrganizationBrandings: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
-    getApiTokenOwner: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     getTaskResultFile: NexusGenRootTypes["TaskResultFile"]; // TaskResultFile!
+    importPetitionFromJson: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     loginAs: NexusGenEnums["Result"]; // Result!
     markPetitionListViewAsDefault: NexusGenRootTypes["User"]; // User!
     markSignatureIntegrationAsDefault: NexusGenRootTypes["IOrgIntegration"]; // IOrgIntegration!
@@ -2219,6 +2220,8 @@ export interface NexusGenFieldTypes {
     dowJonesKycEntityProfile: NexusGenRootTypes["DowJonesKycEntityProfileResult"]; // DowJonesKycEntityProfileResult!
     dowJonesKycEntitySearch: NexusGenRootTypes["DowJonesKycEntitySearchResultPagination"]; // DowJonesKycEntitySearchResultPagination!
     emailIsAvailable: boolean; // Boolean!
+    exportPetitionToJson: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    getApiTokenOwner: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     getSlugForPublicPetitionLink: string; // String!
     getUsersOrGroups: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     globalIdDecode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -2437,6 +2440,7 @@ export interface NexusGenFieldTypes {
     // field return type
     message: string | null; // String
     result: NexusGenEnums["Result"]; // Result!
+    type: string | null; // String
   };
   Tag: {
     // field return type
@@ -3145,8 +3149,8 @@ export interface NexusGenFieldTypeNames {
     fileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     forceUpdateSignatureOrganizationBrandings: "SupportMethodResponse";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
-    getApiTokenOwner: "SupportMethodResponse";
     getTaskResultFile: "TaskResultFile";
+    importPetitionFromJson: "SupportMethodResponse";
     loginAs: "Result";
     markPetitionListViewAsDefault: "User";
     markSignatureIntegrationAsDefault: "IOrgIntegration";
@@ -4009,6 +4013,8 @@ export interface NexusGenFieldTypeNames {
     dowJonesKycEntityProfile: "DowJonesKycEntityProfileResult";
     dowJonesKycEntitySearch: "DowJonesKycEntitySearchResultPagination";
     emailIsAvailable: "Boolean";
+    exportPetitionToJson: "SupportMethodResponse";
+    getApiTokenOwner: "SupportMethodResponse";
     getSlugForPublicPetitionLink: "String";
     getUsersOrGroups: "UserOrUserGroup";
     globalIdDecode: "SupportMethodResponse";
@@ -4227,6 +4233,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     message: "String";
     result: "Result";
+    type: "String";
   };
   Tag: {
     // field return type name
@@ -4904,14 +4911,14 @@ export interface NexusGenArgTypes {
       // args
       tokenName: string; // String!
     };
-    getApiTokenOwner: {
-      // args
-      token: string; // String!
-    };
     getTaskResultFile: {
       // args
       preview?: boolean | null; // Boolean
       taskId: NexusGenScalars["GID"]; // GID!
+    };
+    importPetitionFromJson: {
+      // args
+      json: string; // String!
     };
     loginAs: {
       // args
@@ -5621,6 +5628,14 @@ export interface NexusGenArgTypes {
     emailIsAvailable: {
       // args
       email: string; // String!
+    };
+    exportPetitionToJson: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    getApiTokenOwner: {
+      // args
+      token: string; // String!
     };
     getSlugForPublicPetitionLink: {
       // args

@@ -1305,11 +1305,10 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async createPetition(
-    data: Omit<
-      TableCreateTypes["petition"],
-      "org_id" | "status" | "document_organization_theme_id"
-    >,
-    user: User
+    data: Omit<TableCreateTypes["petition"], "org_id" | "document_organization_theme_id">,
+    user: User,
+    skipFields?: boolean,
+    t?: Knex.Transaction
   ) {
     return await this.withTransaction(async (t) => {
       const [defaultDocumentTheme] = await this.from("organization_theme", t)
@@ -1325,9 +1324,9 @@ export class PetitionRepository extends BaseRepository {
         "petition",
         {
           org_id: user.org_id,
-          status: data.is_template ? null : "DRAFT",
           document_organization_theme_id: defaultDocumentTheme.id,
-          ...data,
+          status: data.is_template ? null : data.status ?? "DRAFT",
+          ...omit(data, ["status"]),
           created_by: `User:${user.id}`,
           updated_by: `User:${user.id}`,
         },
@@ -1345,22 +1344,24 @@ export class PetitionRepository extends BaseRepository {
         t
       );
 
-      await this.insert(
-        "petition_field",
-        (["HEADING", "SHORT_TEXT"] as PetitionFieldType[]).map((type, index) => ({
-          ...defaultFieldOptions(type),
-          petition_id: petition.id,
-          type,
-          is_fixed: type === "HEADING",
-          position: index,
-          created_by: `User:${user.id}`,
-          updated_by: `User:${user.id}`,
-        })),
-        t
-      );
+      if (!skipFields) {
+        await this.insert(
+          "petition_field",
+          (["HEADING", "SHORT_TEXT"] as PetitionFieldType[]).map((type, index) => ({
+            ...defaultFieldOptions(type),
+            petition_id: petition.id,
+            type,
+            is_fixed: type === "HEADING",
+            position: index,
+            created_by: `User:${user.id}`,
+            updated_by: `User:${user.id}`,
+          })),
+          t
+        );
+      }
 
       return petition;
-    });
+    }, t);
   }
 
   async deleteUserPermissions(

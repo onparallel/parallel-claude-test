@@ -34,6 +34,10 @@ import {
   ORGANIZATION_CREDITS_SERVICE,
 } from "./services/organization-credits";
 import { IPetitionBinder, PETITION_BINDER } from "./services/petition-binder";
+import {
+  IPetitionImportExportService,
+  PETITION_IMPORT_EXPORT_SERVICE,
+} from "./services/petition-import-export";
 import { IPrinter, PRINTER } from "./services/printer";
 import { IQueuesService, QUEUES_SERVICE } from "./services/queues";
 import { IRedis, REDIS } from "./services/redis";
@@ -69,6 +73,8 @@ export class ApiContext {
     @inject(BANKFLIP_SERVICE) public readonly bankflip: IBankflipService,
     // TODO Bankflip Legacy: old version of Bankflip API. Soon to be deprecated by them */
     @inject(BANKFLIP_LEGACY_SERVICE) public readonly bankflipLegacy: IBankflipLegacyService,
+    @inject(PETITION_IMPORT_EXPORT_SERVICE)
+    public readonly petitionImportExport: IPetitionImportExportService,
 
     // Repositories
     public readonly contacts: ContactRepository,

@@ -721,10 +721,10 @@ export interface Mutation {
   forceUpdateSignatureOrganizationBrandings: SupportMethodResponse;
   /** Generates a new API token for the context user */
   generateUserAuthToken: GenerateUserAuthTokenResponse;
-  /** Get the user who owns an API Token */
-  getApiTokenOwner: SupportMethodResponse;
   /** Returns an object with signed download url and filename for tasks with file output */
   getTaskResultFile: TaskResultFile;
+  /** Imports a petition from a JSON file */
+  importPetitionFromJson: SupportMethodResponse;
   loginAs: Result;
   /** Sets the default petition list view of the user. If passing null id, default view will be set (no filters/sorting) */
   markPetitionListViewAsDefault: User;
@@ -1312,13 +1312,13 @@ export interface MutationgenerateUserAuthTokenArgs {
   tokenName: Scalars["String"];
 }
 
-export interface MutationgetApiTokenOwnerArgs {
-  token: Scalars["String"];
-}
-
 export interface MutationgetTaskResultFileArgs {
   preview?: InputMaybe<Scalars["Boolean"]>;
   taskId: Scalars["GID"];
+}
+
+export interface MutationimportPetitionFromJsonArgs {
+  json: Scalars["String"];
 }
 
 export interface MutationloginAsArgs {
@@ -3547,6 +3547,10 @@ export interface Query {
   dowJonesKycEntitySearch: DowJonesKycEntitySearchResultPagination;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
+  /** Exports basic petition + fields configuration as JSON object */
+  exportPetitionToJson: SupportMethodResponse;
+  /** Get the user who owns an API Token */
+  getApiTokenOwner: SupportMethodResponse;
   getSlugForPublicPetitionLink: Scalars["String"];
   /** Get users or groups from IDs */
   getUsersOrGroups: Array<UserOrUserGroup>;
@@ -3638,6 +3642,14 @@ export interface QuerydowJonesKycEntitySearchArgs {
 
 export interface QueryemailIsAvailableArgs {
   email: Scalars["String"];
+}
+
+export interface QueryexportPetitionToJsonArgs {
+  petitionId: Scalars["GID"];
+}
+
+export interface QuerygetApiTokenOwnerArgs {
+  token: Scalars["String"];
 }
 
 export interface QuerygetSlugForPublicPetitionLinkArgs {
@@ -4094,6 +4106,7 @@ export interface SupportMethodResponse {
   __typename?: "SupportMethodResponse";
   message?: Maybe<Scalars["String"]>;
   result: Result;
+  type?: Maybe<Scalars["String"]>;
 }
 
 export interface Tag {

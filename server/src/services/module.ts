@@ -19,6 +19,11 @@ import {
   ORGANIZATION_CREDITS_SERVICE,
 } from "./organization-credits";
 import { IPetitionBinder, PetitionBinder, PETITION_BINDER } from "./petition-binder";
+import {
+  IPetitionImportExportService,
+  PetitionImportExportService,
+  PETITION_IMPORT_EXPORT_SERVICE,
+} from "./petition-import-export";
 import { IPrinter, Printer, PRINTER } from "./printer";
 import { IQueuesService, QueuesService, QUEUES_SERVICE } from "./queues";
 import { IRedis, REDIS, Redis } from "./redis";
@@ -47,4 +52,7 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IDowJonesKycService>(DOW_JONES_KYC_SERVICE).to(DowJonesKycService);
   bind<IBankflipService>(BANKFLIP_SERVICE).to(BankflipService);
   bind<IBankflipLegacyService>(BANKFLIP_LEGACY_SERVICE).to(BankflipLegacyService); // TODO Bankflip Legacy: remove when deprecated
+  bind<IPetitionImportExportService>(PETITION_IMPORT_EXPORT_SERVICE).to(
+    PetitionImportExportService
+  );
 });

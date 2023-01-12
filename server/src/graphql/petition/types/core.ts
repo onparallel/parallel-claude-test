@@ -247,7 +247,7 @@ export const PetitionBase = interfaceType({
       },
     });
     t.nonNull.boolean("isRestricted", {
-      resolve: (o) => o.restricted_by_user_id !== null,
+      resolve: (o) => o.restricted_at !== null,
     });
     t.nonNull.boolean("isRestrictedWithPassword", {
       resolve: (o) => o.restricted_password_hash !== null,

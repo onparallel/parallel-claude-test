@@ -2,7 +2,7 @@ import { booleanArg, idArg, intArg, mutationField, nonNull, nullable, stringArg 
 import { isDefined, uniq } from "remeda";
 import { fullName } from "../../util/fullName";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
-import { hash, random } from "../../util/token";
+import { random } from "../../util/token";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
@@ -146,39 +146,6 @@ export const resetUserPassword = mutationField("resetUserPassword", {
           message: `User with email ${email} not found.`,
         };
       }
-    } catch (error: any) {
-      return {
-        result: RESULT.FAILURE,
-        message: error.message,
-      };
-    }
-  },
-});
-
-export const getApiTokenOwner = mutationField("getApiTokenOwner", {
-  description: "Get the user who owns an API Token",
-  type: "SupportMethodResponse",
-  args: {
-    token: nonNull(stringArg()),
-  },
-  authorize: supportMethodAccess(),
-  resolve: async (_, { token }, ctx) => {
-    try {
-      const tokenHash = await hash(token, "");
-      const userToken = await ctx.userAuthentication.loadUserAuthenticationByTokenHash(tokenHash);
-      if (!isDefined(userToken)) {
-        throw new Error("Token not found");
-      }
-      const user = await ctx.users.loadUser(userToken.user_id);
-      const userData = user ? await ctx.users.loadUserData(user.user_data_id) : null;
-
-      if (!isDefined(user) || !isDefined(userData)) {
-        throw new Error("Token found but user is deleted");
-      }
-      return {
-        result: RESULT.SUCCESS,
-        message: `User:${user.id} with email ${userData.email}.`,
-      };
     } catch (error: any) {
       return {
         result: RESULT.FAILURE,
@@ -335,6 +302,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
     }
   },
 });
+
 export const uploadUserAvatar = mutationField("uploadUserAvatar", {
   description: "Uploads a user avatar image",
   type: "SupportMethodResponse",
@@ -480,6 +448,32 @@ export const anonymizePetition = mutationField("anonymizePetition", {
       return { result: RESULT.SUCCESS, message: "Petition anonymized successfully" };
     } catch (e) {
       ctx.logger.error(e);
+    }
+    return { result: RESULT.FAILURE, message: "Something went wrong..." };
+  },
+});
+
+export const importPetitionFromJson = mutationField("importPetitionFromJson", {
+  description: "Imports a petition from a JSON file",
+  type: "SupportMethodResponse",
+  authorize: supportMethodAccess(),
+  args: {
+    json: nonNull(
+      stringArg({ description: "Petition to import in json format @form:type=textarea" })
+    ),
+  },
+  resolve: async (_, { json }, ctx) => {
+    try {
+      const petition = await ctx.petitionImportExport.fromJson(JSON.parse(json), ctx.user!);
+      return {
+        result: RESULT.SUCCESS,
+        message: `Petition with id ${toGlobalId("Petition", petition.id)} imported successfully.`,
+      };
+    } catch (e: any) {
+      console.error(e);
+      if (e.message.startsWith("Unexpected token")) {
+        return { result: RESULT.FAILURE, message: "Input is not a valid JSON object" };
+      }
     }
     return { result: RESULT.FAILURE, message: "Something went wrong..." };
   },

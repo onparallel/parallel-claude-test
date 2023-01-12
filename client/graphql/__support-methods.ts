@@ -102,6 +102,34 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "exportPetitionToJson",
+      description: "Exports basic petition + fields configuration as JSON object",
+      args: [
+        {
+          name: "petitionId",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "query",
+  },
+  {
+    field: {
       name: "forceUpdateSignatureOrganizationBrandings",
       description:
         "Forces an update of the branding of every signature integration of the selected organization.",
@@ -155,7 +183,7 @@ export const supportMethods: {
       isDeprecated: false,
       deprecationReason: null,
     },
-    queryType: "mutation",
+    queryType: "query",
   },
   {
     field: {
@@ -224,6 +252,34 @@ export const supportMethods: {
       deprecationReason: null,
     },
     queryType: "query",
+  },
+  {
+    field: {
+      name: "importPetitionFromJson",
+      description: "Imports a petition from a JSON file",
+      args: [
+        {
+          name: "json",
+          description: "Petition to import in json format @form:type=textarea",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
   },
   {
     field: {
@@ -549,6 +605,14 @@ export const schemaTypes: IntrospectionType[] = [
           name: null,
           ofType: { kind: "ENUM", name: "Result", ofType: null },
         },
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
+        name: "type",
+        description: null,
+        args: [],
+        type: { kind: "SCALAR", name: "String", ofType: null },
         isDeprecated: false,
         deprecationReason: null,
       },

@@ -120,7 +120,7 @@ function UploadedFileData({
   onRemoveOptions,
   isReadOnly,
 }: {
-  file?: { name: string; size: number; updatedAt: Date };
+  file?: { id?: string; name: string; size: number; updatedAt: Date };
   onDownload?: () => void;
   onRemoveOptions?: () => void;
   isReadOnly?: boolean;
@@ -171,7 +171,7 @@ function UploadedFileData({
 
       <IconButtonWithTooltip
         variant="ghost"
-        isDisabled={!file}
+        isDisabled={!file || !file.id}
         icon={<DownloadIcon />}
         label={intl.formatMessage({
           id: "generic.download",

@@ -11,6 +11,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { CheckIcon } from "@parallel/chakra/icons";
 import { SupportMethodResponse } from "@parallel/graphql/__types";
 import { unCamelCase } from "@parallel/utils/strings";
 import { Maybe } from "@parallel/utils/types";
@@ -69,6 +70,7 @@ export function SupportMethodModal({ field, queryType, schemaTypes, onClose }: M
       ${queryType} support_${field.name}(${argsDef}) {
         ${field.name}(${argsAssignment}) {
           result
+          type
           message
         }
       }
@@ -191,9 +193,25 @@ function StatusTag({
       }}
     >
       {status.data.result}
-      {status.data.message ? (
+      {status.data.type === "copy-to-clipboard" ? (
+        <CopyToClipboardButton content={status.data.message ?? ""} />
+      ) : status.data.message ? (
         <HtmlBlock dangerousInnerHtml={status.data.message.split("\n").join("<br/>")} />
       ) : null}
     </Text>
+  );
+}
+
+function CopyToClipboardButton({ content }: { content: string }) {
+  const [copied, setCopied] = useState(false);
+  function handleExportClick() {
+    navigator.clipboard.writeText(content);
+    setCopied(true);
+  }
+  return (
+    <Button color="black" onClick={handleExportClick}>
+      {copied ? "Copied to clipboard!" : "Copy to clipboard"}
+      {copied ? <CheckIcon marginLeft={1} color="green.500" /> : null}
+    </Button>
   );
 }
