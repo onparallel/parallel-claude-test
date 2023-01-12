@@ -4135,6 +4135,7 @@ export type TaskName =
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
   | "PRINT_PDF"
+  | "TEMPLATES_OVERVIEW_EXPORT"
   | "TEMPLATES_OVERVIEW_REPORT"
   | "TEMPLATE_REPLIES_REPORT"
   | "TEMPLATE_STATS_REPORT";
@@ -24247,92 +24248,10 @@ export type Reports_userQuery = {
   };
 };
 
-export type ReportsTemplates_PetitionTemplateFragment = {
-  __typename?: "PetitionTemplate";
-  id: string;
-  name?: string | null;
-};
-
-export type ReportsTemplates_templatesQueryVariables = Exact<{
-  offset: Scalars["Int"];
-  limit: Scalars["Int"];
-  isPublic: Scalars["Boolean"];
-}>;
-
-export type ReportsTemplates_templatesQuery = {
-  templates: {
-    __typename?: "PetitionBaseOrFolderPagination";
-    totalCount: number;
-    items: Array<
-      | { __typename?: "Petition" }
-      | { __typename?: "PetitionFolder" }
-      | { __typename?: "PetitionTemplate"; id: string; name?: string | null }
-    >;
-  };
-};
-
-export type ReportsTemplates_userQueryVariables = Exact<{ [key: string]: never }>;
-
-export type ReportsTemplates_userQuery = {
-  me: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    firstName?: string | null;
-    lastName?: string | null;
-    email: string;
-    createdAt: string;
-    role: OrganizationRole;
-    lastActiveAt?: string | null;
-    isSuperAdmin: boolean;
-    avatarUrl?: string | null;
-    initials?: string | null;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      name: string;
-      petitionsSubscriptionEndDate?: string | null;
-      iconUrl92?: string | null;
-      isPetitionUsageLimitReached: boolean;
-      currentUsagePeriod?: {
-        __typename?: "OrganizationUsageLimit";
-        id: string;
-        limit: number;
-      } | null;
-    };
-  };
-  realMe: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    avatarUrl?: string | null;
-    initials?: string | null;
-    organizations: Array<{ __typename?: "Organization"; id: string }>;
-  };
-};
-
 export type Overview_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
-};
-
-export type Overview_templatesQueryVariables = Exact<{
-  offset: Scalars["Int"];
-  limit: Scalars["Int"];
-  isPublic: Scalars["Boolean"];
-}>;
-
-export type Overview_templatesQuery = {
-  templates: {
-    __typename?: "PetitionBaseOrFolderPagination";
-    totalCount: number;
-    items: Array<
-      | { __typename?: "Petition" }
-      | { __typename?: "PetitionFolder" }
-      | { __typename?: "PetitionTemplate"; id: string; name?: string | null }
-    >;
-  };
 };
 
 export type Overview_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -31517,6 +31436,12 @@ export const NewPetition_PetitionBaseOrFolderFragmentDoc = gql`
   ${PublicTemplateCard_PetitionTemplateFragmentDoc}
   ${FolderCard_PetitionFolderFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_PetitionBaseOrFolderFragment, unknown>;
+export const Overview_PetitionTemplateFragmentDoc = gql`
+  fragment Overview_PetitionTemplate on PetitionTemplate {
+    id
+    name
+  }
+` as unknown as DocumentNode<Overview_PetitionTemplateFragment, unknown>;
 export const ReportsTemplates_PetitionTemplateFragmentDoc = gql`
   fragment ReportsTemplates_PetitionTemplate on PetitionTemplate {
     id
@@ -35639,6 +35564,12 @@ export const Reports_userDocument = gql`
   }
   ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Reports_userQuery, Reports_userQueryVariables>;
+export const Overview_userDocument = gql`
+  query Overview_user {
+    ...AppLayout_Query
+  }
+  ${AppLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<Overview_userQuery, Overview_userQueryVariables>;
 export const ReportsTemplates_templatesDocument = gql`
   query ReportsTemplates_templates($offset: Int!, $limit: Int!, $isPublic: Boolean!) {
     templates(offset: $offset, limit: $limit, isPublic: $isPublic) {

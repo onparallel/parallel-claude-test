@@ -65,8 +65,8 @@ export function OverviewReportsListTableHeader({
       <IconButtonWithTooltip
         icon={<DownloadIcon />}
         label={intl.formatMessage({
-          id: "component.overview-reports-list-table-header.download-csv",
-          defaultMessage: "Download CSV",
+          id: "component.overview-reports-list-table-header.download-report",
+          defaultMessage: "Download report",
         })}
       />
     </Stack>

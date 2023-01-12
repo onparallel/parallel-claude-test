@@ -273,8 +273,8 @@ export function Overview() {
                     <Flex flex="1" alignItems="center" justifyContent="center">
                       <Text fontSize="lg">
                         <FormattedMessage
-                          id="page.reports-overview.no-templates-range"
-                          defaultMessage="No templates in this timeframe"
+                          id="page.reports-overview.no-templates-created"
+                          defaultMessage="No template has been created yet, start creating one!"
                         />
                       </Text>
                     </Flex>

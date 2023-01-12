@@ -2595,9 +2595,9 @@
     "context": "Used"
   },
   {
-    "term": "component.overview-reports-list-table-header.download-csv",
-    "definition": "Download CSV",
-    "context": "Download CSV"
+    "term": "component.overview-reports-list-table-header.download-report",
+    "definition": "Download report",
+    "context": "Download report"
   },
   {
     "term": "component.overview-reports-list-table-header.status",
@@ -6335,11 +6335,6 @@
     "context": "Close"
   },
   {
-    "term": "page.reports-overview.closed",
-    "definition": "Closed",
-    "context": "Closed"
-  },
-  {
     "term": "generic.collapse",
     "definition": "Collapse",
     "context": "Collapse"
@@ -6388,11 +6383,6 @@
     "term": "generic.comments-button-label",
     "definition": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
     "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}"
-  },
-  {
-    "term": "page.reports-overview.completed",
-    "definition": "Completed",
-    "context": "Completed"
   },
   {
     "term": "generic.confirm-continue",
@@ -7170,11 +7160,6 @@
     "context": "Production"
   },
   {
-    "term": "page.reports-overview.signed",
-    "definition": "Signed",
-    "context": "Signed"
-  },
-  {
     "term": "generic.something-went-wrong",
     "definition": "Something went wrong",
     "context": "Something went wrong"
@@ -7220,21 +7205,6 @@
     "context": "Thanks"
   },
   {
-    "term": "page.reports-overview.time-to-close",
-    "definition": "Time to close",
-    "context": "Time to close"
-  },
-  {
-    "term": "page.reports-overview.time-to-complete",
-    "definition": "Time to complete",
-    "context": "Time to complete"
-  },
-  {
-    "term": "page.reports-overview.time-to-sign",
-    "definition": "Time to sign",
-    "context": "Time to sign"
-  },
-  {
     "term": "generic.today-at",
     "definition": "Today at {time}",
     "context": "Today at {time}"
@@ -7253,11 +7223,6 @@
     "term": "generic.tone-informal",
     "definition": "Informal",
     "context": "Informal"
-  },
-  {
-    "term": "page.reports-overview.total",
-    "definition": "Total",
-    "context": "Total"
   },
   {
     "term": "generic.transfer-ownership",
@@ -8200,9 +8165,19 @@
     "context": "Choose the date range you need to view the results of your templates"
   },
   {
+    "term": "page.reports-overview.closed",
+    "definition": "Closed",
+    "context": "Closed"
+  },
+  {
     "term": "page.reports-overview.closed-parallels",
     "definition": "Closed",
     "context": "Closed"
+  },
+  {
+    "term": "page.reports-overview.completed",
+    "definition": "Completed",
+    "context": "Completed"
   },
   {
     "term": "page.reports-overview.completed-parallels",
@@ -8210,14 +8185,14 @@
     "context": "Completed"
   },
   {
+    "term": "page.reports-overview.no-templates-created",
+    "definition": "No template has been created yet, start creating one!",
+    "context": "No template has been created yet, start creating one!"
+  },
+  {
     "term": "page.reports-overview.no-templates-matching-search",
     "definition": "There's no templates matching your search",
     "context": "There's no templates matching your search"
-  },
-  {
-    "term": "page.reports-overview.no-templates-range",
-    "definition": "No templates in this timeframe",
-    "context": "No templates in this timeframe"
   },
   {
     "term": "page.reports-overview.ready-to-generate",
@@ -8225,9 +8200,34 @@
     "context": "We are ready to generate your overview report!"
   },
   {
+    "term": "page.reports-overview.signed",
+    "definition": "Signed",
+    "context": "Signed"
+  },
+  {
     "term": "page.reports-overview.signed-parallels",
     "definition": "Signed",
     "context": "Signed"
+  },
+  {
+    "term": "page.reports-overview.time-to-close",
+    "definition": "Time to close",
+    "context": "Time to close"
+  },
+  {
+    "term": "page.reports-overview.time-to-complete",
+    "definition": "Time to complete",
+    "context": "Time to complete"
+  },
+  {
+    "term": "page.reports-overview.time-to-sign",
+    "definition": "Time to sign",
+    "context": "Time to sign"
+  },
+  {
+    "term": "page.reports-overview.total",
+    "definition": "Total",
+    "context": "Total"
   },
   {
     "term": "page.reports-overview.total-parallels",

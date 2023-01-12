@@ -45,8 +45,7 @@ export function Reports() {
           id: "page.reports.overview-description",
           defaultMessage: "Get an overview of the volume and status of all the parallels.",
         }),
-        href: "",
-        isPending: true,
+        href: "/app/reports/overview",
       },
       {
         imgSrc: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/reports_templates.png`,
