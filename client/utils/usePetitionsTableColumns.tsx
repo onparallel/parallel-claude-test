@@ -183,7 +183,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   </Tooltip>
                 ),
                 isFilterable: true,
-                align: "center",
+                align: "left",
                 Filter: PetitionListSignatureStatusFilter,
                 headerProps: { padding: 0 },
                 cellProps: { padding: 0, minWidth: "72px" },
