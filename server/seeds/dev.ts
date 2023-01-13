@@ -1,7 +1,6 @@
 import { Knex } from "knex";
 import pMap from "p-map";
 import {
-  CreatePetitionPermission,
   CreateUserGroupMember,
   Organization,
   OrganizationTheme,
@@ -330,17 +329,6 @@ export async function seed(knex: Knex): Promise<any> {
         ],
         "id"
       );
-
-      const petitionOwners: CreatePetitionPermission[] = [
-        {
-          petition_id: petitions[0].id,
-          user_id: ownerId,
-          created_by: `User:${ownerId}`,
-          updated_by: `User:${ownerId}`,
-          type: "OWNER",
-          is_subscribed: true,
-        },
-      ];
 
       await knex<PetitionPermission>("petition_permission").insert(
         petitions.map((p) => ({

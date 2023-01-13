@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { login } from "../helpers/login";
+import { waitForRehydration } from "../helpers/waitForRehydration";
 import { PetitionsList } from "../pages/PetitionsList";
 
 test.beforeEach(async ({ page }) => {
@@ -8,7 +9,7 @@ test.beforeEach(async ({ page }) => {
     password: process.env.USER1_PASSWORD,
   });
   await page.goto(`${process.env.BASE_URL}/app/petitions`);
-  await page.waitForLoadState();
+  await waitForRehydration(page);
 });
 
 test.describe("Petitions list", () => {

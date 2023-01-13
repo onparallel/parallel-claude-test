@@ -24,6 +24,7 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
   }, []);
 
   useEffect(() => {
+    (window as any).__REHYDRATED__ = true;
     window.dispatchEvent(new CustomEvent("NEXTJS_REHYDRATION_COMPLETE"));
   }, []);
 

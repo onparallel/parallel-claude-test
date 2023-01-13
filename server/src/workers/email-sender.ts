@@ -20,7 +20,6 @@ import { signatureCancelledDeclinedBySigner } from "./emails/signature-cancelled
 import { signatureCancelledNoCreditsLeft } from "./emails/signature-cancelled-no-credits-left";
 import { signatureCancelledRequestError } from "./emails/signature-cancelled-request-error";
 import { createQueueWorker } from "./helpers/createQueueWorker";
-import escapeStringRegexp from "escape-string-regexp";
 
 const builders = {
   "petition-completed": petitionCompleted,

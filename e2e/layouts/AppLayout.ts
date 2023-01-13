@@ -1,4 +1,5 @@
 import { Page } from "@playwright/test";
+import { closeMenu } from "../helpers/chakra/closeMenu";
 import { openMenu } from "../helpers/chakra/openMenu";
 
 export class AppLayout {
@@ -24,5 +25,10 @@ export class AppLayout {
     const button = this.page.getByTestId("user-menu");
     const menu = await openMenu(this.page, button);
     return menu;
+  }
+
+  async closeUserMenu() {
+    const button = this.page.getByTestId("user-menu");
+    await closeMenu(this.page, button);
   }
 }

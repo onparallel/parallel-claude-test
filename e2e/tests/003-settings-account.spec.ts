@@ -1,5 +1,8 @@
+import { faker } from "@faker-js/faker";
 import { expect, test } from "@playwright/test";
 import { login } from "../helpers/login";
+import { waitForGraphQL } from "../helpers/waitForGraphQL";
+import { waitForRehydration } from "../helpers/waitForRehydration";
 import { SettingsAccount } from "../pages/SettingsAccount";
 
 test.beforeEach(async ({ page }) => {
@@ -8,25 +11,35 @@ test.beforeEach(async ({ page }) => {
     password: process.env.USER1_PASSWORD,
   });
   await page.goto(`${process.env.BASE_URL}/app/settings/account`);
-  await page.waitForLoadState();
+  await waitForRehydration(page);
 });
 
 test.describe("Settings > Account", () => {
   test("should let you change the name", async ({ page }) => {
     const account = new SettingsAccount(page);
-    await account.fillChangeNameForm({ firstName: "Nancy", lastName: "Pelosi" });
-    await account.submitChangeNameForm();
+    const firstName = faker.name.firstName();
+    const lastName = faker.name.lastName();
+    await account.fillChangeNameForm({ firstName, lastName });
+    await Promise.all([
+      waitForGraphQL(page, (o) => o.operationName === "Account_updateAccount"),
+      account.submitChangeNameForm(),
+    ]);
     let menu = await account.openUserMenu();
-    await expect(menu.getByTestId("account-name")).toHaveText("Nancy Pelosi");
-    await account.fillChangeNameForm({ firstName: "Santi", lastName: "Albo" });
-    await account.submitChangeNameForm();
+    await expect(menu.getByTestId("account-name")).toHaveText(`${firstName} ${lastName}`);
+    await account.closeUserMenu();
+    await account.fillChangeNameForm({ firstName: "User", lastName: "1" });
+    await Promise.all([
+      waitForGraphQL(page, (o) => o.operationName === "Account_updateAccount"),
+      account.submitChangeNameForm(),
+    ]);
     menu = await account.openUserMenu();
-    await expect(menu.getByTestId("account-name")).toHaveText("Santi Albo");
+    await expect(menu.getByTestId("account-name")).toHaveText("User 1");
+    await account.closeUserMenu();
   });
 
   test("should not let you change the name without a last name", async ({ page }) => {
     const account = new SettingsAccount(page);
-    await account.fillChangeNameForm({ firstName: "Nancy", lastName: "" });
+    await account.fillChangeNameForm({ firstName: faker.name.firstName(), lastName: "" });
     await account.submitChangeNameForm();
     await expect(page.getByTestId("last-name-input")).toHaveAttribute("aria-invalid", "true");
   });

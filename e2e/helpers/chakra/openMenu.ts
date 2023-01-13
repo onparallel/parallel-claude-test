@@ -1,7 +1,11 @@
 import { Locator, Page } from "@playwright/test";
 
 export async function openMenu(page: Page, locator: Locator) {
-  await locator.click();
   const ariaControls = await locator.getAttribute("aria-controls");
-  return page.locator(`#${ariaControls}`);
+  const ariaExpanded = await locator.getAttribute("aria-expanded");
+  const menu = page.locator(`#${ariaControls}`);
+  if (ariaExpanded === "false") {
+    await Promise.all([menu.waitFor({ state: "visible" }), locator.click()]);
+  }
+  return menu;
 }

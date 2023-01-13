@@ -46,8 +46,7 @@ const config: PlaywrightTestConfig = {
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        headless: false,
-        // viewport: { width: 1600, height: 1200 },
+        // headless: false,
       },
     },
 
@@ -55,6 +54,7 @@ const config: PlaywrightTestConfig = {
       name: "firefox",
       use: {
         ...devices["Desktop Firefox"],
+        // headless: false,
       },
     },
 
@@ -62,6 +62,7 @@ const config: PlaywrightTestConfig = {
       name: "webkit",
       use: {
         ...devices["Desktop Safari"],
+        // headless: false,
       },
     },
 

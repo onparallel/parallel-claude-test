@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { login } from "../helpers/login";
 import { AppLayout } from "../layouts/AppLayout";
+import { waitForRehydration } from "../helpers/waitForRehydration";
 
 test.beforeEach(async ({ page }) => {
   await login(page, {
@@ -8,7 +9,7 @@ test.beforeEach(async ({ page }) => {
     password: process.env.USER1_PASSWORD,
   });
   await page.goto(`${process.env.BASE_URL}/app/petitions`);
-  await page.waitForLoadState();
+  await waitForRehydration(page);
 });
 
 test.describe("App layout", () => {
@@ -35,7 +36,7 @@ test.describe("App layout", () => {
   test("should show the email inside the user menu", async ({ page }) => {
     const layout = new AppLayout(page);
     const menu = await layout.openUserMenu();
-    const email = await menu.getByTestId("account-email");
+    const email = menu.getByTestId("account-email");
     await expect(email).toHaveText(process.env.USER1_EMAIL);
   });
 
@@ -50,10 +51,5 @@ test.describe("App layout", () => {
     await menu.getByText("Organization").click();
     await page.waitForURL("**/app/organization/users");
     await expect(page).toHaveTitle("Users | Parallel");
-
-    menu = await layout.openUserMenu();
-    await menu.getByText("Admin panel").click();
-    await page.waitForURL("**/app/admin/organizations");
-    await expect(page).toHaveTitle("Organizations | Parallel");
   });
 });

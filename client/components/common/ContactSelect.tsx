@@ -60,7 +60,14 @@ export const ContactSelect = Object.assign(
     }: ContactSelectProps<IsMulti>,
     ref: ForwardedRef<ContactSelectInstance<IsMulti>>
   ) {
-    const [isCreating, setIsCreating] = useState(false);
+    const [isCreating, _setIsCreating] = useState(false);
+    // we need this because the create handler is called twice when clicking on the create menu option,
+    // one because of the click and another one from the input blur
+    const isCreatingRef = useRef(false);
+    function setIsCreating(value: boolean) {
+      _setIsCreating(value);
+      isCreatingRef.current = value;
+    }
 
     const [options, setOptions] = useState<ContactSelectSelection[]>();
 
@@ -93,6 +100,9 @@ export const ContactSelect = Object.assign(
     }
 
     async function handleCreate(email: string) {
+      if (isCreatingRef.current) {
+        return;
+      }
       setIsCreating(true);
       try {
         const contact = await onCreateContact({ defaultEmail: email });

@@ -26,7 +26,6 @@ import { useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { zip } from "remeda";
 import { ProgressIndicator, ProgressTrack } from "../common/Progress";
-import { Spacer } from "../common/Spacer";
 import { useTone } from "../common/ToneProvider";
 
 type PetitionSelection =

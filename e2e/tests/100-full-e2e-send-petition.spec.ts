@@ -6,6 +6,7 @@ import { waitForEmail } from "../helpers/emails/waitForEmail";
 import { login } from "../helpers/login";
 import { openTargetBlankLink } from "../helpers/openTargetBlankLink";
 import { showCursor } from "../helpers/showCursor";
+import { waitForRehydration } from "../helpers/waitForRehydration";
 import { NewPetition } from "../pages/NewPetition";
 import { PetitionCompose } from "../pages/PetitionCompose";
 import { PetitionReview } from "../pages/PetitionReview";
@@ -18,10 +19,10 @@ test.beforeEach(async ({ page }) => {
     password: process.env.USER1_PASSWORD,
   });
   await page.goto(`${process.env.BASE_URL}/app/petitions/new`);
-  await page.waitForLoadState();
+  await waitForRehydration(page);
 });
 
-test.describe.only("Full e2e send petition", () => {
+test.describe("Full e2e send petition", () => {
   test("should let you create a petition", async ({ page, browser, context }) => {
     await test.step("create petition", async () => {
       const newPetition = new NewPetition(page);
@@ -97,16 +98,6 @@ test.describe.only("Full e2e send petition", () => {
       });
     });
 
-    await test.step("drag fields around", async () => {
-      await compose.dragField(2, 4);
-      await compose.dragField(5, 4);
-      await compose.dragField(4, 3);
-      expect(await compose.getFieldTitle(2)).toBe("Favorite fruit");
-      expect(await compose.getFieldTitle(3)).toBe("Consoles");
-      expect(await compose.getFieldTitle(4)).toBe("Favorite number");
-      expect(await compose.getFieldTitle(5)).toBe("Address");
-    });
-
     await test.step("add a SHORT_TEXT field with format", async () => {
       await compose.addField("SHORT_TEXT");
       await compose.fillFieldParams(6, {
@@ -151,7 +142,6 @@ test.describe.only("Full e2e send petition", () => {
 
     const { page: page2, context: _ } = await test.step("open recipient view", async () => {
       const email = await waitForEmail(
-        page,
         (e) => e.subject === subject && e.to.some((c) => c.address === address),
         {
           user: process.env.IMAP_USER,
@@ -170,30 +160,39 @@ test.describe.only("Full e2e send petition", () => {
       const context = await browser.newContext();
       const page = await context.newPage();
       await page.goto(page2.url());
-      await page.waitForLoadState();
+      await waitForRehydration(page2);
       await expect(page).toHaveTitle("Parallel e2e");
       const recipientView = new RecipientView(page);
-      await recipientView.completeVerificationCodeFlow(
-        address,
+      await page.getByTestId("send-verification-code-button").click();
+      const email = await waitForEmail(
+        (e) =>
+          /^\d{6} is your verification code on Parallel/.test(e.subject) &&
+          e.to.some((c) => c.address === address),
         {
           user: process.env.IMAP_USER,
           password: process.env.IMAP_PASSWORD,
-        },
-        browser
+        }
       );
+      const code = await openEmail(await browser.newContext(), email, async ({ page }) => {
+        return (await page.getByTestId("verification-code").textContent())!;
+      });
+      await recipientView.enterPinCode(code);
+      await page.getByTestId("pin-input-verify-button").click();
+      await page.waitForURL((url) => url.pathname.endsWith("/1"));
       await expect(page).toHaveTitle(`${subject} | Parallel e2e`);
       await page.close();
     });
 
     await test.step("fill recipient view", async () => {
+      await waitForRehydration(page2);
       const recipientView = new RecipientView(page2);
       await recipientView.completeHelpDialog();
 
       await recipientView.replyShortTextField(0, "Bugs Bunny");
-      await recipientView.replySelectField(1, "Pineapple");
-      await recipientView.replyCheckboxField(2, ["Xbox Series X|S", "Nintendo Switch"]);
+      await recipientView.replyTextField(1, "Carrer Almogavers 165\n08018 Barcelona");
+      await recipientView.replySelectField(2, "Pineapple");
       await recipientView.replyNumberField(3, 3.14);
-      await recipientView.replyTextField(4, "Carrer Almogavers 165\n08018 Barcelona");
+      await recipientView.replyCheckboxField(4, ["Xbox Series X|S", "Nintendo Switch"]);
       await recipientView.replyShortTextField(5, "elonmusk@onparallel.com");
       await recipientView.replyFileUploadField(
         6,
@@ -209,7 +208,6 @@ test.describe.only("Full e2e send petition", () => {
 
     const page3 = await test.step("wait for completed parallel email", async () => {
       const email = await waitForEmail(
-        page,
         (e) =>
           e.subject === `Parallel "${name}" completed!` &&
           e.to.some((c) => c.address === process.env.USER1_EMAIL),

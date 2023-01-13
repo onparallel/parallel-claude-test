@@ -25,6 +25,7 @@ export async function fillContactSelect(
         if (!isDefined(recipient.firstName)) {
           throw new Error("Contact doesn't exist and first name was not provided.");
         }
+        await page.waitForTimeout(1);
         await page.getByTestId("create-contact-first-name-input").fill(recipient.firstName);
         if (isDefined(recipient.lastName)) {
           await page.getByTestId("create-contact-last-name-input").fill(recipient.lastName);

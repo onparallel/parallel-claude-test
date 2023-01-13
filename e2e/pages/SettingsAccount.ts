@@ -7,8 +7,11 @@ export class SettingsAccount extends SettingsLayout {
   }
 
   async fillChangeNameForm({ firstName, lastName }: { firstName: string; lastName: string }) {
-    await this.page.getByTestId("first-name-input").fill(firstName);
-    await this.page.getByTestId("last-name-input").fill(lastName);
+    const firstNameInput = this.page.getByTestId("first-name-input");
+    await firstNameInput.fill(firstName);
+    await this.page.waitForTimeout(1);
+    const lastNameInput = this.page.getByTestId("last-name-input");
+    await lastNameInput.fill(lastName);
   }
 
   async submitChangeNameForm() {

@@ -1,4 +1,3 @@
-import { Page } from "@playwright/test";
 import { ImapFlow } from "imapflow";
 import { simpleParser, Source } from "mailparser";
 import { isDefined, noop } from "remeda";
@@ -13,7 +12,6 @@ export interface WaitForEmailOptions {
 }
 
 export async function waitForEmail(
-  page: Page,
   predicate: (envelope: EmailEnvelope) => boolean,
   { user, password }: WaitForEmailOptions
 ): Promise<Email> {
@@ -51,7 +49,7 @@ export async function waitForEmail(
       } finally {
         await client.mailboxClose();
       }
-      await page.waitForTimeout(5_000);
+      await new Promise((resolve) => setTimeout(resolve, 5_000));
     }
   } finally {
     await client.logout();

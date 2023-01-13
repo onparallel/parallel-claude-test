@@ -31,26 +31,41 @@ export class PetitionCompose extends PetitionLayout {
   ) {
     const field = this.getField(index);
     if (isDefined(title)) {
-      await field.getByTestId("compose-field-title").fill(title);
+      const titleInput = field.getByTestId("compose-field-title");
+      await titleInput.fill(title);
+      await Promise.all([
+        waitForGraphQL(this.page, (o) => o.operationName === "PetitionCompose_updatePetitionField"),
+        titleInput.blur(),
+      ]);
     }
     if (isDefined(description)) {
-      await field.getByTestId("compose-field-description").fill(description);
+      const descriptionTextArea = field.getByTestId("compose-field-description");
+      await descriptionTextArea.fill(description);
+      await Promise.all([
+        waitForGraphQL(this.page, (o) => o.operationName === "PetitionCompose_updatePetitionField"),
+        descriptionTextArea.blur(),
+      ]);
     }
     if (isDefined(required)) {
       await field.hover();
       const isChecked = await field.getByTestId("compose-field-required").isChecked();
       if (isChecked !== required) {
-        await field.getByTestId("compose-field-required").click();
+        await Promise.all([
+          waitForGraphQL(
+            this.page,
+            (o) => o.operationName === "PetitionCompose_updatePetitionField"
+          ),
+          field.getByTestId("compose-field-required").click(),
+        ]);
       }
     }
     if (isDefined(options)) {
       await field.getByTestId("compose-field-options").type(options.join("\n"));
-      await field.getByTestId("compose-field-options").blur();
+      await Promise.all([
+        waitForGraphQL(this.page, (o) => o.operationName === "PetitionCompose_updatePetitionField"),
+        field.getByTestId("compose-field-options").blur(),
+      ]);
     }
-    await waitForGraphQL(
-      this.page,
-      (o) => o.operationName === "PetitionCompose_updatePetitionField"
-    );
   }
 
   async getFieldTitle(index: number) {
@@ -109,12 +124,10 @@ export class PetitionCompose extends PetitionLayout {
       );
     }
     await this.page.waitForTimeout(1);
-    await this.page.mouse.up();
-    await this.page.waitForTimeout(1);
-    await waitForGraphQL(
-      this.page,
-      (o) => o.operationName === "PetitionCompose_updateFieldPositions"
-    );
+    await Promise.all([
+      waitForGraphQL(this.page, (o) => o.operationName === "PetitionCompose_updateFieldPositions"),
+      this.page.mouse.up(),
+    ]);
   }
 
   async openFieldSettings(index: number) {
