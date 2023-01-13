@@ -10396,7 +10396,7 @@
   },
   {
     "term": "timeline.petition-correct-notified-description-delegated",
-    "definition": "{userIsYou, select, true {Notificaste} other {{user} notificó}} a {contact} como {senderIsYou, select, true {tu} other {{sender}}} que el parallel está correcto {timeAgo}",
+    "definition": "{userIsYou, select, true {Notificaste} other {{user} notificó}} a {contact} como {senderIsYou, select, true {tú} other {{sender}}} que el parallel está correcto {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} as {senderIsYou, select, true {you} other {{sender}}} notified {contact} that the parallel is correct {timeAgo}"
   },
   {
@@ -10436,7 +10436,7 @@
   },
   {
     "term": "timeline.reminder-sent-description-automatic-delegated",
-    "definition": "Se envió un recordatorio automático como {senderIsYou, select, true {tu} other {{sender}}} a {contact} {timeAgo}",
+    "definition": "Se envió un recordatorio automático como {senderIsYou, select, true {tú} other {{sender}}} a {contact} {timeAgo}",
     "context": "An automatic reminder as {senderIsYou, select, true {you} other {{sender}}} was sent to {contact} {timeAgo}"
   },
   {
@@ -10446,7 +10446,7 @@
   },
   {
     "term": "timeline.reminder-sent-description-manual-delegated",
-    "definition": "{userIsYou, select, true {Enviaste} other {{user} envió}} un recordatorio manual como {senderIsYou, select, true {tu} other {{sender}}} a {contact} {timeAgo}",
+    "definition": "{userIsYou, select, true {Enviaste} other {{user} envió}} un recordatorio manual como {senderIsYou, select, true {tú} other {{sender}}} a {contact} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} sent a manual reminder as {senderIsYou, select, true {you} other {{sender}}} to {contact} {timeAgo}"
   },
   {
