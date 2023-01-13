@@ -28,17 +28,48 @@ export function TimelineReminderSentEvent({
       await showSentReminderMessage({ reminder });
     } catch {}
   }
+
   return (
     <TimelineItem icon={<TimelineIcon icon={BellIcon} color="black" backgroundColor="gray.200" />}>
       <Flex align="center">
         <Box>
           {reminder.type === "MANUAL" ? (
+            reminder.access.delegateGranter ? (
+              <FormattedMessage
+                id="timeline.reminder-sent-description-manual-delegated"
+                defaultMessage="{userIsYou, select, true {You} other {{user}}} sent a manual reminder as {senderIsYou, select, true {you} other {{sender}}} to {contact} {timeAgo}"
+                values={{
+                  userIsYou: userId === reminder.sender?.id,
+                  user: <UserReference user={reminder.sender} />,
+                  senderIsYou: userId === reminder.access.granter?.id,
+                  sender: <UserReference user={reminder.access.granter} />,
+                  contact: <ContactReference contact={reminder.access.contact} />,
+                  timeAgo: (
+                    <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                  ),
+                }}
+              />
+            ) : (
+              <FormattedMessage
+                id="timeline.reminder-sent-description-manual"
+                defaultMessage="{userIsYou, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}"
+                values={{
+                  userIsYou: userId === reminder.sender?.id,
+                  user: <UserReference user={reminder.sender} />,
+                  contact: <ContactReference contact={reminder.access.contact} />,
+                  timeAgo: (
+                    <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                  ),
+                }}
+              />
+            )
+          ) : reminder.access.delegateGranter ? (
             <FormattedMessage
-              id="timeline.reminder-sent-description-manual"
-              defaultMessage="{userIsYou, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}"
+              id="timeline.reminder-sent-description-automatic-delegated"
+              defaultMessage="An automatic reminder as {senderIsYou, select, true {you} other {{sender}}} was sent to {contact} {timeAgo}"
               values={{
-                userIsYou: userId === reminder.sender?.id,
-                user: <UserReference user={reminder.sender} />,
+                senderIsYou: userId === reminder.access.granter?.id,
+                sender: <UserReference user={reminder.access.granter} />,
                 contact: <ContactReference contact={reminder.access.contact} />,
                 timeAgo: (
                   <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
@@ -77,6 +108,12 @@ TimelineReminderSentEvent.fragments = {
           ...UserReference_User
         }
         access {
+          delegateGranter {
+            id
+          }
+          granter {
+            ...UserReference_User
+          }
           contact {
             ...ContactReference_Contact
           }

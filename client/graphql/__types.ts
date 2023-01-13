@@ -4117,6 +4117,7 @@ export type TaskName =
   | "EXPORT_EXCEL"
   | "EXPORT_REPLIES"
   | "PRINT_PDF"
+  | "TEMPLATES_OVERVIEW_EXPORT"
   | "TEMPLATE_REPLIES_REPORT"
   | "TEMPLATE_STATS_REPORT";
 
@@ -6881,6 +6882,13 @@ export type PetitionActivityTimeline_PetitionFragment = {
           } | null;
           access: {
             __typename?: "PetitionAccess";
+            delegateGranter?: { __typename?: "User"; id: string } | null;
+            granter?: {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              status: UserStatus;
+            } | null;
             contact?: {
               __typename?: "Contact";
               id: string;
@@ -6986,6 +6994,13 @@ export type PetitionActivityTimeline_PetitionFragment = {
             } | null;
             access: {
               __typename?: "PetitionAccess";
+              delegateGranter?: { __typename?: "User"; id: string } | null;
+              granter?: {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null;
+                status: UserStatus;
+              } | null;
               contact?: {
                 __typename?: "Contact";
                 id: string;
@@ -7435,6 +7450,13 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_F
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   access: {
     __typename?: "PetitionAccess";
+    delegateGranter?: { __typename?: "User"; id: string } | null;
+    granter?: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      status: UserStatus;
+    } | null;
     contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
@@ -7521,6 +7543,13 @@ export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment = 
     } | null;
     access: {
       __typename?: "PetitionAccess";
+      delegateGranter?: { __typename?: "User"; id: string } | null;
+      granter?: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        status: UserStatus;
+      } | null;
       contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
@@ -8223,6 +8252,13 @@ export type TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragm
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   access: {
     __typename?: "PetitionAccess";
+    delegateGranter?: { __typename?: "User"; id: string } | null;
+    granter?: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      status: UserStatus;
+    } | null;
     contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
@@ -8297,6 +8333,13 @@ export type TimelineReminderSentEvent_ReminderSentEventFragment = {
     } | null;
     access: {
       __typename?: "PetitionAccess";
+      delegateGranter?: { __typename?: "User"; id: string } | null;
+      granter?: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        status: UserStatus;
+      } | null;
       contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
@@ -16556,6 +16599,13 @@ export type PetitionActivity_PetitionFragment = {
           } | null;
           access: {
             __typename?: "PetitionAccess";
+            delegateGranter?: { __typename?: "User"; id: string } | null;
+            granter?: {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              status: UserStatus;
+            } | null;
             contact?: {
               __typename?: "Contact";
               id: string;
@@ -16661,6 +16711,13 @@ export type PetitionActivity_PetitionFragment = {
             } | null;
             access: {
               __typename?: "PetitionAccess";
+              delegateGranter?: { __typename?: "User"; id: string } | null;
+              granter?: {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null;
+                status: UserStatus;
+              } | null;
               contact?: {
                 __typename?: "Contact";
                 id: string;
@@ -17394,6 +17451,13 @@ export type PetitionActivity_updatePetitionMutation = {
                 } | null;
                 access: {
                   __typename?: "PetitionAccess";
+                  delegateGranter?: { __typename?: "User"; id: string } | null;
+                  granter?: {
+                    __typename?: "User";
+                    id: string;
+                    fullName?: string | null;
+                    status: UserStatus;
+                  } | null;
                   contact?: {
                     __typename?: "Contact";
                     id: string;
@@ -17504,6 +17568,13 @@ export type PetitionActivity_updatePetitionMutation = {
                   } | null;
                   access: {
                     __typename?: "PetitionAccess";
+                    delegateGranter?: { __typename?: "User"; id: string } | null;
+                    granter?: {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null;
+                      status: UserStatus;
+                    } | null;
                     contact?: {
                       __typename?: "Contact";
                       id: string;
@@ -18278,6 +18349,13 @@ export type PetitionActivity_petitionQuery = {
                 } | null;
                 access: {
                   __typename?: "PetitionAccess";
+                  delegateGranter?: { __typename?: "User"; id: string } | null;
+                  granter?: {
+                    __typename?: "User";
+                    id: string;
+                    fullName?: string | null;
+                    status: UserStatus;
+                  } | null;
                   contact?: {
                     __typename?: "Contact";
                     id: string;
@@ -18388,6 +18466,13 @@ export type PetitionActivity_petitionQuery = {
                   } | null;
                   access: {
                     __typename?: "PetitionAccess";
+                    delegateGranter?: { __typename?: "User"; id: string } | null;
+                    granter?: {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null;
+                      status: UserStatus;
+                    } | null;
                     contact?: {
                       __typename?: "Contact";
                       id: string;
@@ -28663,6 +28748,12 @@ export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
         ...UserReference_User
       }
       access {
+        delegateGranter {
+          id
+        }
+        granter {
+          ...UserReference_User
+        }
         contact {
           ...ContactReference_Contact
         }
@@ -28889,6 +28980,12 @@ export const TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFrag
       ...UserReference_User
     }
     access {
+      delegateGranter {
+        id
+      }
+      granter {
+        ...UserReference_User
+      }
       contact {
         ...ContactReference_Contact
       }
