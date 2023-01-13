@@ -25,7 +25,6 @@ import { isDefined } from "remeda";
 import { SettingsRowSwitch } from "../SettingsRowSwitch";
 import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
 import { SettingsRowPlaceholder } from "./SettingsRowPlaceholder";
-import { SettingsRow } from "./SettingsRow";
 
 export function NumberSettings({
   field,
