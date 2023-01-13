@@ -97,6 +97,7 @@ export const ContactSelect = Object.assign(
       try {
         const contact = await onCreateContact({ defaultEmail: email });
         if (!isDefined(contact)) {
+          setIsCreating(false);
           return;
         }
         if (isMulti) {
@@ -122,7 +123,6 @@ export const ContactSelect = Object.assign(
       setIsCreating(false);
       return false;
     }
-
     async function handleInputChange(_value: string, meta: InputActionMeta) {
       switch (meta.action) {
         case "input-change":
