@@ -1,7 +1,7 @@
 import { ApolloError } from "apollo-server-core";
 import { arg, booleanArg, list, mutationField, nonNull, nullable, stringArg } from "nexus";
 import pMap from "p-map";
-import { groupBy, isDefined, uniq, uniqBy, zip } from "remeda";
+import { differenceWith, filter, groupBy, isDefined, pipe, uniq, uniqBy, zip } from "remeda";
 import { and, authenticate, authenticateAnd, chain, ifArgDefined } from "../../helpers/authorize";
 import { ArgValidationError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -96,18 +96,16 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
     );
 
     if (args.notify) {
-      /** we have to notify only those users who didn't have any permission before */
-      const newUserPermissions = uniqBy(
-        newPermissions.filter(
-          (np) =>
-            isDefined(np.user_id) &&
-            !currentPermissions.some(
-              // make sure the user dont have previous permission on the petition
-              (cp) => cp.petition_id === np.petition_id && cp.user_id === np.user_id
-            )
-        ),
-        //   // removes duplicated <user_id,petition_id> entries to send only one email per user/petition
-        (p) => `${p.user_id}:${p.petition_id}`
+      const newUserPermissions = pipe(
+        newPermissions,
+        filter((p) => isDefined(p.user_id)),
+        // remove duplicated <user_id,petition_id> entries to send only one email per user/petition
+        uniqBy((p) => `${p.user_id}:${p.petition_id}`),
+        // omit users who had access previously
+        differenceWith(
+          currentPermissions,
+          (p1, p2) => p1.petition_id === p2.petition_id && p1.user_id === p2.user_id
+        )
       );
 
       if (newUserPermissions.length > 0) {
