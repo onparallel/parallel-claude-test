@@ -976,7 +976,11 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         contactIds,
         body: message,
         subject,
-        ...pick(body, ["remindersConfig", "scheduledAt"]),
+        scheduledAt: body.scheduledAt,
+        remindersConfig: body.remindersConfig && {
+          limit: 10,
+          ...body.remindersConfig,
+        },
         includeFields: query.include?.includes("fields") ?? false,
         includeReplies: false,
         includeRecipients: query.include?.includes("recipients") ?? false,

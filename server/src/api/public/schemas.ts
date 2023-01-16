@@ -608,12 +608,19 @@ const _RemindersConfig = {
       description: "Whether to send reminders only on weekdays",
       type: "boolean",
     },
+    limit: {
+      description: "Whether to send reminders only on weekdays",
+      type: "integer",
+      maximum: 10,
+      minimum: 1,
+    },
   },
   example: {
     offset: 2,
     time: "09:30",
     timezone: "Europe/Madrid",
     weekdaysOnly: false,
+    limit: 5,
   },
 } as const;
 
