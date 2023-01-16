@@ -76,8 +76,8 @@ export function PetitionFieldVisibilityEditor({
             index,
           ] as const
       );
-    const _fields: typeof pairs[0][0][] = [];
-    const _indices: typeof pairs[0][1][] = [];
+    const _fields: (typeof pairs)[0][0][] = [];
+    const _indices: (typeof pairs)[0][1][] = [];
     for (const [field, index] of pairs) {
       _fields.push(field);
       _indices.push(index);

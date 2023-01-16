@@ -46,7 +46,7 @@ const builders = {
 export type EmailType = keyof typeof builders;
 
 export type EmailPayload = {
-  [K in EmailType]: Parameters<typeof builders[K]>[0];
+  [K in EmailType]: Parameters<(typeof builders)[K]>[0];
 };
 
 export type EmailSenderWorkerPayload = {

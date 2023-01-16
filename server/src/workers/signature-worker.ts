@@ -348,7 +348,7 @@ const handlers = {
 type HandlerType = keyof typeof handlers;
 
 export type SignaturePayload = {
-  [K in HandlerType]: Parameters<typeof handlers[K]>[0];
+  [K in HandlerType]: Parameters<(typeof handlers)[K]>[0];
 };
 
 export type SignatureWorkerPayload = {

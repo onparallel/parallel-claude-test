@@ -169,7 +169,7 @@ export interface ParseQueryOptions {
 }
 
 export function parseQuery<T extends {}>(
-  query: typeof Router["query"],
+  query: (typeof Router)["query"],
   shape: QueryStateOf<T>,
   { prefix }: ParseQueryOptions = {}
 ): T {

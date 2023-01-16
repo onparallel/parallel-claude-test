@@ -24,7 +24,7 @@ interface BackgroundTaskOptions {
 }
 
 export interface BackgroundTask<Task extends keyof typeof TASK_DOCUMENTS> {
-  (variables: VariablesOf<typeof TASK_DOCUMENTS[Task]>, options?: BackgroundTaskOptions): Promise<
+  (variables: VariablesOf<(typeof TASK_DOCUMENTS)[Task]>, options?: BackgroundTaskOptions): Promise<
     Task extends "TEMPLATE_STATS_REPORT"
       ? {
           task: useBackgroundTask_TaskFragment;

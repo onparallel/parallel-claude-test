@@ -1,6 +1,6 @@
 import type Router from "next/router";
 
-export function resolveUrl(pathname: string, query: typeof Router["query"]) {
+export function resolveUrl(pathname: string, query: (typeof Router)["query"]) {
   return pathname.replace(/\[(\.{3})?([^\]]*)]/g, (_, spread, name) => {
     const parameter = query[name];
     if (spread && Array.isArray(parameter)) {
