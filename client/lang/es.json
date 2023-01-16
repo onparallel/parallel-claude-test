@@ -8175,6 +8175,11 @@
     "context": "Closed"
   },
   {
+    "term": "page.reports-overview.closed-parallels-description",
+    "definition": "Este es el número de parallels cerrados en la organización.",
+    "context": "This is the total parallels closed in the organization."
+  },
+  {
     "term": "page.reports-overview.completed",
     "definition": "Completados",
     "context": "Completed"
@@ -8185,6 +8190,11 @@
     "context": "Completed"
   },
   {
+    "term": "page.reports-overview.completed-parallels-description",
+    "definition": "Este es el número de parallels completados en la organización.",
+    "context": "This is the total parallels completed in the organization."
+  },
+  {
     "term": "page.reports-overview.no-templates-found",
     "definition": "No hemos encontrado ninguna plantilla.",
     "context": "We have not found any template."
@@ -8193,6 +8203,16 @@
     "term": "page.reports-overview.no-templates-matching-search",
     "definition": "No hay plantillas que coincidan con tu búsqueda",
     "context": "There's no templates matching your search"
+  },
+  {
+    "term": "page.reports-overview.not-include-deleted-or-drafts",
+    "definition": "No entran en esta cifra los parallels eliminados, ni los borradores sin respuestas.",
+    "context": "This number doesn't include deleted o parallels or unanswered drafts."
+  },
+  {
+    "term": "page.reports-overview.not-include-unsigned",
+    "definition": "No entran en esta cifra procesos de firma en los que falte algún firmante por firmar.",
+    "context": "Processes in which a signer hasn't yet signed aren't included."
   },
   {
     "term": "page.reports-overview.ready-to-generate",
@@ -8215,9 +8235,19 @@
     "context": "Signed"
   },
   {
+    "term": "page.reports-overview.signed-parallels-description",
+    "definition": "Este es el número total de firmas completadas en la organización, a través de uno de nuestros proveedores integrados.",
+    "context": "This is the total signatures completed in the organization, through one of our integrated eSignature providers."
+  },
+  {
     "term": "page.reports-overview.time-to-close",
     "definition": "Tiempo en cerrar",
     "context": "Time to close"
+  },
+  {
+    "term": "page.reports-overview.time-to-close-help",
+    "definition": "Tiempo medio en que tardó en cerrarse el parallel desde que se completó.",
+    "context": "Average time from the completion of the parallel until it is closed."
   },
   {
     "term": "page.reports-overview.time-to-complete",
@@ -8225,9 +8255,24 @@
     "context": "Time to complete"
   },
   {
+    "term": "page.reports-overview.time-to-complete-help-1",
+    "definition": "Tiempo medio en que tardaron en completarse los parallels.",
+    "context": "Average time from the start of the parallel until it is completed."
+  },
+  {
+    "term": "page.reports-overview.time-to-complete-help-2",
+    "definition": "Esta cifra tiene en cuenta tanto los parallels completados internamente como enviados a un tercero.",
+    "context": "This figure counts parallels completed internally as well as those sent to a third party."
+  },
+  {
     "term": "page.reports-overview.time-to-sign",
     "definition": "Tiempo en firmar",
     "context": "Time to sign"
+  },
+  {
+    "term": "page.reports-overview.time-to-sign-help",
+    "definition": "Tiempo medio en que tardaron en firmarse los documentos una vez enviados.",
+    "context": "This is the average time for documents to be signed since they were sent."
   },
   {
     "term": "page.reports-overview.total",
@@ -8235,9 +8280,24 @@
     "context": "Total"
   },
   {
+    "term": "page.reports-overview.total-help-1",
+    "definition": "Este total es la media de tiempo que tarda un parallel en cerrarse desde que comienza. Es decir, desde que está pendiente (🕒) hasta que se cierra (✅✅).",
+    "context": "This total is the average time from the start of the parallel until it is closed. That is, from when it's pending (🕒) until it's closed (✅✅)."
+  },
+  {
+    "term": "page.reports-overview.total-help-2",
+    "definition": "No entran en esta cifra, los parallels eliminados ni los borradores sin respuestas.",
+    "context": "This number doesn't include deleted o parallels or unanswered drafts."
+  },
+  {
     "term": "page.reports-overview.total-parallels",
     "definition": "Total parallels",
     "context": "Total parallels"
+  },
+  {
+    "term": "page.reports-overview.total-parallels-description",
+    "definition": "Este es el número total de parallels creados en la organización.",
+    "context": "This is the total number of parallels created in the organization."
   },
   {
     "term": "page.reports-templates.ready-to-generate",

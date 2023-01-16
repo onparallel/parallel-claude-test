@@ -37,6 +37,7 @@ import {
   ComponentType,
   memo,
   MouseEvent,
+  ReactNode,
   useCallback,
   useEffect,
   useMemo,
@@ -45,6 +46,7 @@ import {
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Card } from "./Card";
+import { HelpPopover } from "./HelpPopover";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
 
 export type TableSortingDirection = "ASC" | "DESC";
@@ -108,6 +110,7 @@ export interface TableColumn<TRow, TContext = unknown, TFilter = unknown> {
   isFilterable?: true;
   Filter?: ComponentType<TableColumnFilterProps<TFilter, TContext>>;
   header: string;
+  headerHelp?: string | ReactNode;
   Header?: ComponentType<TableHeaderProps<TRow, TContext, TFilter>>;
   headerProps?: MaybeFunction<HTMLChakraProps<"th">, [TContext]>;
   CellContent: ComponentType<TableCellProps<TRow, TContext, TFilter>>;
@@ -591,6 +594,8 @@ export function DefaultHeader({
         <Text as="div" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
           {column.header}
         </Text>
+        {column.headerHelp ? <HelpPopover>{column.headerHelp}</HelpPopover> : null}
+
         {column.isFilterable ? (
           <IconButtonWithTooltip
             ref={filterButtonRef}

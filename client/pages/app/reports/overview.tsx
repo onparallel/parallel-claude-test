@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client";
-import { Button, Flex, Grid, Heading, Stack, Text } from "@chakra-ui/react";
+import { Button, Flex, Grid, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
@@ -22,13 +23,15 @@ import { Maybe, Overview_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { stallFor } from "@parallel/utils/promises/stallFor";
-import { date, integer, string, useQueryState, values } from "@parallel/utils/queryState";
+import { date, integer, string, useQueryState, values, sorting } from "@parallel/utils/queryState";
 import { useTemplatesOverviewReportBackgroundTask } from "@parallel/utils/tasks/useTemplatesOverviewReportTask";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useReportsSections } from "@parallel/utils/useReportsSections";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { ReactNode, useCallback, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { isDefined, sort, sortBy } from "remeda";
+
+const SORTING = ["name", "total", "completed", "signed", "closed"] as const;
 
 type TemplateStats = {
   template_id: string;
@@ -54,14 +57,21 @@ export const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
   search: string(),
   items: values([10, 25, 50]).orDefault(10),
+  sort: sorting(SORTING).orDefault({
+    field: "name",
+    direction: "ASC",
+  }),
 };
 
-function StatsCard({ title, amount }: { title: string; amount: number }) {
+function StatsCard({ title, amount, help }: { title: string; amount: number; help: ReactNode }) {
   return (
     <Card padding={6}>
-      <Text fontWeight={500} color="gray.600">
-        {title}
-      </Text>
+      <HStack>
+        <Text fontWeight={500} color="gray.600">
+          {title}
+        </Text>
+        <HelpPopover>{help}</HelpPopover>
+      </HStack>
       <Text fontWeight={600} fontSize="3xl">
         {amount}
       </Text>
@@ -89,7 +99,12 @@ export function Overview() {
   });
 
   const [list, searchedList] = useMemo(() => {
-    const { items, page, search } = state;
+    const {
+      items,
+      page,
+      search,
+      sort: { direction, field },
+    } = state;
 
     let templates = report?.templates ?? [];
     if (search) {
@@ -98,8 +113,39 @@ export function Overview() {
       });
     }
 
+    if (field === "name") {
+      templates = sort(templates, (a, b) => (a[field] ?? "").localeCompare(b[field] ?? ""));
+    } else {
+      templates = sortBy(templates, (row) => {
+        switch (field) {
+          case "total":
+            return tableType === "TIME"
+              ? (row.pending_to_complete ?? 0) + (row.complete_to_close ?? 0)
+              : row.pending + row.completed + row.closed;
+
+          case "signed":
+            return tableType === "TIME"
+              ? (row.pending_to_complete ?? 0) + (row.complete_to_close ?? 0)
+              : row.signatures.completed;
+
+          case "completed":
+            return tableType === "TIME" ? row.pending_to_complete ?? 0 : row.completed;
+
+          case "closed":
+            return tableType === "TIME" ? row.complete_to_close ?? 0 : row.closed;
+
+          default:
+            return row[field];
+        }
+      });
+    }
+
+    if (direction === "DESC") {
+      templates = templates.reverse();
+    }
+
     return [templates.slice((page - 1) * items, page * items), templates];
-  }, [report, state]);
+  }, [report, state, tableType]);
 
   const [search, setSearch] = useState(state.search);
   const debouncedOnSearchChange = useDebouncedCallback(
@@ -130,9 +176,7 @@ export function Overview() {
     try {
       setState((state) => ({ ...state, status: "LOADING" }));
       taskAbortController.current?.abort();
-
       taskAbortController.current = new AbortController();
-      console.log("handleGenerateReportClick start");
       const { task } = await stallFor(
         () =>
           templatesOverviewTask(
@@ -205,6 +249,22 @@ export function Overview() {
                   defaultMessage: "Total parallels",
                 })}
                 amount={report.total}
+                help={
+                  <Stack>
+                    <Text>
+                      <FormattedMessage
+                        id="page.reports-overview.total-parallels-description"
+                        defaultMessage="This is the total number of parallels created in the organization. "
+                      />
+                    </Text>
+                    <Text>
+                      <FormattedMessage
+                        id="page.reports-overview.not-include-deleted-or-drafts"
+                        defaultMessage="This number doesn't include deleted o parallels or unanswered drafts."
+                      />
+                    </Text>
+                  </Stack>
+                }
               />
               <StatsCard
                 title={intl.formatMessage({
@@ -212,6 +272,22 @@ export function Overview() {
                   defaultMessage: "Completed",
                 })}
                 amount={report.completed}
+                help={
+                  <Stack>
+                    <Text>
+                      <FormattedMessage
+                        id="page.reports-overview.completed-parallels-description"
+                        defaultMessage="This is the total parallels completed in the organization."
+                      />
+                    </Text>
+                    <Text>
+                      <FormattedMessage
+                        id="page.reports-overview.not-include-deleted-or-drafts"
+                        defaultMessage="This number doesn't include deleted o parallels or unanswered drafts."
+                      />
+                    </Text>
+                  </Stack>
+                }
               />
               <StatsCard
                 title={intl.formatMessage({
@@ -219,6 +295,22 @@ export function Overview() {
                   defaultMessage: "Signed",
                 })}
                 amount={report.signed}
+                help={
+                  <Stack>
+                    <Text>
+                      <FormattedMessage
+                        id="page.reports-overview.signed-parallels-description"
+                        defaultMessage="This is the total signatures completed in the organization, through one of our integrated eSignature providers."
+                      />
+                    </Text>
+                    <Text>
+                      <FormattedMessage
+                        id="page.reports-overview.not-include-unsigned"
+                        defaultMessage="Processes in which a signer hasn't yet signed aren't included."
+                      />
+                    </Text>
+                  </Stack>
+                }
               />
               <StatsCard
                 title={intl.formatMessage({
@@ -226,6 +318,22 @@ export function Overview() {
                   defaultMessage: "Closed",
                 })}
                 amount={report.closed}
+                help={
+                  <Stack>
+                    <Text>
+                      <FormattedMessage
+                        id="page.reports-overview.closed-parallels-description"
+                        defaultMessage="This is the total parallels closed in the organization."
+                      />
+                    </Text>
+                    <Text>
+                      <FormattedMessage
+                        id="page.reports-overview.not-include-deleted-or-drafts"
+                        defaultMessage="This number doesn't include deleted o parallels or unanswered drafts."
+                      />
+                    </Text>
+                  </Stack>
+                }
               />
             </Grid>
             <TablePage
@@ -240,6 +348,7 @@ export function Overview() {
               page={state.page}
               pageSize={state.items}
               totalCount={searchedList?.length ?? 0}
+              sort={state.sort}
               onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
               onPageSizeChange={(items) =>
                 setQueryState((s) => ({ ...s, items: items as any, page: 1 }))
@@ -342,6 +451,7 @@ function useOverviewTemplateStatusColumns(): TableColumn<TemplateStats>[] {
     () => [
       {
         key: "name",
+        isSortable: true,
         header: intl.formatMessage({
           id: "generic.template",
           defaultMessage: "Template",
@@ -364,6 +474,7 @@ function useOverviewTemplateStatusColumns(): TableColumn<TemplateStats>[] {
       },
       {
         key: "total",
+        isSortable: true,
         header: intl.formatMessage({
           id: "page.reports-overview.total",
           defaultMessage: "Total",
@@ -376,6 +487,7 @@ function useOverviewTemplateStatusColumns(): TableColumn<TemplateStats>[] {
       },
       {
         key: "completed",
+        isSortable: true,
         header: intl.formatMessage({
           id: "page.reports-overview.completed",
           defaultMessage: "Completed",
@@ -388,6 +500,7 @@ function useOverviewTemplateStatusColumns(): TableColumn<TemplateStats>[] {
       },
       {
         key: "signed",
+        isSortable: true,
         header: intl.formatMessage({
           id: "page.reports-overview.signed",
           defaultMessage: "Signed",
@@ -400,6 +513,7 @@ function useOverviewTemplateStatusColumns(): TableColumn<TemplateStats>[] {
       },
       {
         key: "closed",
+        isSortable: true,
         header: intl.formatMessage({
           id: "page.reports-overview.closed",
           defaultMessage: "Closed",
@@ -421,6 +535,7 @@ function useOverviewTemplateTimesColumns(): TableColumn<TemplateStats>[] {
     () => [
       {
         key: "name",
+        isSortable: true,
         header: intl.formatMessage({
           id: "generic.template",
           defaultMessage: "Template",
@@ -443,10 +558,27 @@ function useOverviewTemplateTimesColumns(): TableColumn<TemplateStats>[] {
       },
       {
         key: "total",
+        isSortable: true,
         header: intl.formatMessage({
           id: "page.reports-overview.total",
           defaultMessage: "Total",
         }),
+        headerHelp: (
+          <Stack>
+            <Text>
+              <FormattedMessage
+                id="page.reports-overview.total-help-1"
+                defaultMessage="This total is the average time from the start of the parallel until it is closed. That is, from when it's pending (🕒) until it's closed (✅✅)."
+              />
+            </Text>
+            <Text>
+              <FormattedMessage
+                id="page.reports-overview.total-help-2"
+                defaultMessage="This number doesn't include deleted o parallels or unanswered drafts."
+              />
+            </Text>
+          </Stack>
+        ),
         cellProps: {
           width: "10%",
           minWidth: "120px",
@@ -456,11 +588,28 @@ function useOverviewTemplateTimesColumns(): TableColumn<TemplateStats>[] {
         ),
       },
       {
-        key: "time_to_complete",
+        key: "completed",
+        isSortable: true,
         header: intl.formatMessage({
           id: "page.reports-overview.time-to-complete",
           defaultMessage: "Time to complete",
         }),
+        headerHelp: (
+          <Stack>
+            <Text>
+              <FormattedMessage
+                id="page.reports-overview.time-to-complete-help-1"
+                defaultMessage="Average time from the start of the parallel until it is completed."
+              />
+            </Text>
+            <Text>
+              <FormattedMessage
+                id="page.reports-overview.time-to-complete-help-2"
+                defaultMessage="This figure counts parallels completed internally as well as those sent to a third party."
+              />
+            </Text>
+          </Stack>
+        ),
         cellProps: {
           width: "10%",
           minWidth: "120px",
@@ -468,10 +617,16 @@ function useOverviewTemplateTimesColumns(): TableColumn<TemplateStats>[] {
         CellContent: ({ row }) => <TimeSpan duration={row.pending_to_complete ?? 0} />,
       },
       {
-        key: "time_to_sign",
+        key: "signed",
+        isSortable: true,
         header: intl.formatMessage({
           id: "page.reports-overview.time-to-sign",
           defaultMessage: "Time to sign",
+        }),
+        headerHelp: intl.formatMessage({
+          id: "page.reports-overview.time-to-sign-help",
+          defaultMessage:
+            "This is the average time for documents to be signed since they were sent.",
         }),
         cellProps: {
           width: "10%",
@@ -480,10 +635,15 @@ function useOverviewTemplateTimesColumns(): TableColumn<TemplateStats>[] {
         CellContent: ({ row }) => <TimeSpan duration={row.signatures.time_to_complete ?? 0} />,
       },
       {
-        key: "time_to_close",
+        key: "closed",
+        isSortable: true,
         header: intl.formatMessage({
           id: "page.reports-overview.time-to-close",
           defaultMessage: "Time to close",
+        }),
+        headerHelp: intl.formatMessage({
+          id: "page.reports-overview.time-to-close-help",
+          defaultMessage: "Average time from the completion of the parallel until it is closed.",
         }),
         cellProps: {
           width: "10%",
