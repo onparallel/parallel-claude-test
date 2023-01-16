@@ -1,121 +1,46 @@
-import { json, Router } from "express";
-import { isDefined } from "remeda";
-import { ApiContext } from "../context";
-import { Contact, User } from "../db/__types";
-import { fromGlobalId } from "../util/globalId";
+import { createHmac, timingSafeEqual } from "crypto";
+import { json, Request, Response, Router } from "express";
+import {
+  ModelExtractedWebhookEvent,
+  SessionCompletedWebhookEvent,
+  SessionPayload,
+} from "../services/bankflip";
 import { verify } from "../util/jwt";
-import { random } from "../util/token";
-import { Maybe } from "../util/types";
 
-type BankflipDocument = {
-  id: string;
-  user_id: string;
-  extension: string;
-  name: string;
-  content_type: string;
+type BankflipWebhookBody = ModelExtractedWebhookEvent | SessionCompletedWebhookEvent;
+
+const verifyHMAC = (req: Request, _: Response, buffer: Buffer) => {
+  const secret = req.context.config.bankflip.webhookSecret;
+  const requestUri = `https://${req.hostname}${req.originalUrl}`;
+  const requestMethod = req.method;
+  const requestBody = buffer.toString();
+  const timestamp = req.headers["x-signature-timestamp"] as string;
+  const requestSignature = req.headers["x-signature-v1"] as string;
+
+  const hash = createHmac("sha256", Buffer.from(secret, "base64"))
+    .update(Buffer.from(requestMethod + requestUri + requestBody + timestamp))
+    .digest();
+
+  if (!timingSafeEqual(Buffer.from(requestSignature, "base64"), hash)) {
+    throw new Error("HMAC signature verification failed");
+  }
 };
 
-type BankflipWebhookBody = {
-  type: string;
-  payload: {
-    request: {
-      id: string;
-      user_id: string;
-      webhook_url: string;
-      results: {
-        aeat_datos_fiscales: BankflipDocument[];
-      };
-      metadata: {};
-    };
-  };
-};
+export const bankflip = Router().post("/", json({ verify: verifyHMAC }), async (req, res, next) => {
+  try {
+    const payload = await verify<SessionPayload>(
+      req.query.token as string,
+      req.context.config.security.jwtSecret
+    );
 
-type TokenPayload = { userId: string; fieldId: string } | { accessId: string; fieldId: string };
-
-export const bankflip = Router()
-  .use(json())
-  .post("/", async (req, res, next) => {
-    try {
-      const payload = await verify<TokenPayload>(
-        req.query.token as string,
-        req.context.config.security.jwtSecret
-      );
-
-      const fieldId = fromGlobalId(payload.fieldId, "PetitionField").id;
-      let user: Maybe<User> = null;
-      let contact: Maybe<Contact> = null;
-      if ("userId" in payload) {
-        const userId = fromGlobalId(payload.userId, "User").id;
-        user = await req.context.users.loadUser(userId);
-      } else {
-        const accessId = fromGlobalId(payload.accessId, "PetitionAccess").id;
-        contact = await req.context.contacts.loadContactByAccessId(accessId);
-      }
-      if (!user && !contact) {
-        throw new Error(`User or Contact not found on payload: ${JSON.stringify(payload)}`);
-      }
-      const body = req.body as BankflipWebhookBody;
-      if (body.type === "request_succeeded") {
-        const pdfDocument = body.payload.request.results.aeat_datos_fiscales.find(
-          (d) => d.extension === "pdf"
-        );
-        if (!pdfDocument) {
-          throw new Error(`Document not found`);
-        }
-
-        // only consume credits if a user requested the upload
-        if (isDefined(user)) {
-          const field = (await req.context.petitions.loadField(fieldId))!;
-          await req.context.orgCredits.ensurePetitionHasConsumedCredit(
-            field.petition_id,
-            `User:${user.id}`
-          );
-        }
-
-        const createdBy = user ? `User:${user.id}` : `Contact:${contact!.id}`;
-        const fileUpload = await uploadEsTaxDocumentsFile(pdfDocument, createdBy, req.context);
-
-        const data =
-          "userId" in payload
-            ? { user_id: fromGlobalId(payload.userId, "User").id }
-            : { petition_access_id: fromGlobalId(payload.accessId, "PetitionAccess").id };
-
-        await req.context.petitions.createPetitionFieldReply(
-          {
-            petition_field_id: fieldId,
-            type: "ES_TAX_DOCUMENTS",
-            content: { file_upload_id: fileUpload.id },
-            ...data,
-          },
-          user ?? contact!
-        );
-      }
-      res.sendStatus(200).end();
-    } catch (error: any) {
-      req.context.logger.error(error.message, { stack: error.stack });
-      next(error);
+    const body = req.body as BankflipWebhookBody;
+    if (body.name === "SESSION_COMPLETED") {
+      await req.context.bankflip.sessionCompleted(payload, body);
     }
-  });
 
-async function uploadEsTaxDocumentsFile(
-  document: BankflipDocument,
-  uploadedBy: string,
-  context: ApiContext
-) {
-  const pdfData = await context.fetch.fetch(`https://api.bankflip.io/file/${document.id}.pdf`);
-
-  const buffer = await pdfData.buffer();
-  const path = random(16);
-  const res = await context.storage.fileUploads.uploadFile(path, "application/pdf", buffer);
-  const [file] = await context.files.createFileUpload(
-    {
-      path,
-      content_type: "application/pdf",
-      filename: `${document.name}.pdf`,
-      size: res["ContentLength"]!.toString(),
-      upload_complete: true,
-    },
-    uploadedBy
-  );
-  return file;
-}
+    res.sendStatus(200).end();
+  } catch (error: any) {
+    req.context.logger.error(error.message, { stack: error.stack });
+    next(error);
+  }
+});

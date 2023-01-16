@@ -1,6 +1,7 @@
 import { ContainerModule } from "inversify";
 import { ANALYTICS, AnalyticsService, IAnalyticsService } from "./analytics";
 import { AUTH, Auth, IAuth } from "./auth";
+import { BankflipService, BANKFLIP_SERVICE, IBankflipService } from "./bankflip";
 import { DowJonesKycService, DOW_JONES_KYC_SERVICE, IDowJonesKycService } from "./dowjones";
 import { EMAILS, EmailsService, IEmailsService } from "./emails";
 import { FetchService, FETCH_SERVICE, IFetchService } from "./fetch";
@@ -39,4 +40,5 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<II18nService>(I18N_SERVICE).to(I18nService).inSingletonScope();
   bind<IOrganizationCreditsService>(ORGANIZATION_CREDITS_SERVICE).to(OrganizationCreditsService);
   bind<IDowJonesKycService>(DOW_JONES_KYC_SERVICE).to(DowJonesKycService);
+  bind<IBankflipService>(BANKFLIP_SERVICE).to(BankflipService);
 });

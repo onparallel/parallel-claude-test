@@ -147,6 +147,11 @@ export function buildConfig() {
       username: process.env.APPSUMO_USERNAME!,
       password: process.env.APPSUMO_PASSWORD!,
     },
+    bankflip: {
+      host: process.env.BANKFLIP_HOST!,
+      apiKey: process.env.BANKFLIP_API_KEY!,
+      webhookSecret: process.env.BANKFLIP_WEBHOOK_SECRET!,
+    },
   });
 }
 

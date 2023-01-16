@@ -1,9 +1,6 @@
 import { ApolloError } from "apollo-server-core";
 import { idArg, mutationField, nonNull, objectType } from "nexus";
-import { isDefined } from "remeda";
-import { getBaseWebhookUrl } from "../../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../../util/globalId";
-import { sign } from "../../../util/jwt";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -343,42 +340,15 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
     fieldCanBeReplied("fieldId")
   ),
-  resolve: async (_, { petitionId, fieldId }, ctx) => {
-    const payload = {
+  resolve: async (_, { fieldId }, ctx) => {
+    const session = await ctx.bankflip.createSession({
       fieldId: toGlobalId("PetitionField", fieldId),
       userId: toGlobalId("User", ctx.user!.id),
-    };
-
-    const token = await sign(payload, ctx.config.security.jwtSecret, { expiresIn: "1d" });
-
-    const baseWebhookUrl = await getBaseWebhookUrl(ctx.config.misc.webhooksUrl);
-
-    const userId = toGlobalId("User", ctx.user!.id);
-    const res = await ctx.fetch.fetch(`https://api.bankflip.io/request`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip?token=${token}`,
-        userId,
-        metadata: {
-          ...payload,
-          petitionId: toGlobalId("Petition", petitionId),
-        },
-      }),
     });
-    const result = await res.json();
-
-    if (!isDefined(result.id)) {
-      throw new ApolloError("BAD_REQUEST", "BAD_REQUEST");
-    }
 
     return {
       type: "WINDOW",
-      url: `https://app.bankflip.io?${new URLSearchParams({
-        userId,
-        requestId: result.id,
-        companyName: "Parallel",
-      })}`,
+      url: session.widgetLink,
     };
   },
 });

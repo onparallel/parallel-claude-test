@@ -8,7 +8,7 @@ import { ApolloServer } from "apollo-server-express";
 import { ApolloServerPlugin } from "apollo-server-plugin-base";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import express, { json } from "express";
+import express from "express";
 import graphqlUploadExpress from "graphql-upload/graphqlUploadExpress.js";
 import { api } from "./api";
 import { createContainer } from "./container";
@@ -28,7 +28,7 @@ app.get("/ping", (req, res, next) =>
   res.set("content-type", "text/plain").status(200).send("pong")
 );
 
-app.use("/api", json(), cors(), cookieParser(), api(container));
+app.use("/api", cors(), cookieParser(), api(container));
 
 app.use("/graphql", graphqlUploadExpress());
 const server = new ApolloServer({

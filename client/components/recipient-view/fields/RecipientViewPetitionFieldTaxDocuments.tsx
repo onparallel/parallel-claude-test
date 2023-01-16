@@ -78,10 +78,15 @@ export function RecipientViewPetitionFieldTaxDocuments({
   useEffect(() => {
     const handler = function (e: MessageEvent) {
       const popup = popupRef.current;
-      if (isDefined(popup) && e.source === popup && e.data.name === "success") {
-        onRefreshField();
-        popup.close();
-        setState("IDLE");
+      if (isDefined(popup) && e.source === popup) {
+        if (e.data.name === "user_requested_closure") {
+          onRefreshField();
+          popup.close();
+        }
+        if (e.data.name === "session_expired") {
+          popup.close();
+          setState("ERROR");
+        }
       }
     };
     window.addEventListener("message", handler);

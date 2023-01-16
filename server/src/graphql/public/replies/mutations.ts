@@ -1,10 +1,6 @@
-import { ApolloError } from "apollo-server-core";
 import { booleanArg, idArg, mutationField, nonNull, objectType } from "nexus";
-import { isDefined } from "remeda";
-import { getBaseWebhookUrl } from "../../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
-import { sign } from "../../../util/jwt";
 import { random } from "../../../util/token";
 import { and, chain } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -282,43 +278,15 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
       fieldCanBeReplied("fieldId")
     )
   ),
-  resolve: async (_, { keycode, fieldId }, ctx) => {
-    const payload = {
-      accessId: toGlobalId("PetitionAccess", ctx.access!.id),
+  resolve: async (_, { fieldId }, ctx) => {
+    const session = await ctx.bankflip.createSession({
       fieldId: toGlobalId("PetitionField", fieldId),
-    };
-
-    const token = await sign(payload, ctx.config.security.jwtSecret, {
-      expiresIn: "1d",
+      accessId: toGlobalId("PetitionAccess", ctx.access!.id),
     });
-
-    const baseWebhookUrl = await getBaseWebhookUrl(ctx.config.misc.webhooksUrl);
-
-    const res = await ctx.fetch.fetch(`https://api.bankflip.io/request`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip?token=${token}`,
-        userId: keycode,
-        metadata: {
-          ...payload,
-          petitionId: toGlobalId("Petition", ctx.access!.petition_id),
-        },
-      }),
-    });
-    const result = await res.json();
-
-    if (!isDefined(result.id)) {
-      throw new ApolloError("BAD_REQUEST", "BAD_REQUEST");
-    }
 
     return {
       type: "WINDOW",
-      url: `https://app.bankflip.io?${new URLSearchParams({
-        userId: keycode,
-        requestId: result.id,
-        companyName: "Parallel",
-      })}`,
+      url: session.widgetLink,
     };
   },
 });

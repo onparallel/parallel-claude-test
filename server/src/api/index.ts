@@ -1,4 +1,4 @@
-import { ErrorRequestHandler, Router } from "express";
+import { ErrorRequestHandler, json, Router } from "express";
 import { Container } from "inversify";
 import morgan from "morgan";
 import { ApiContext } from "../context";
@@ -27,11 +27,11 @@ export function api(container: Container) {
         skip: (req, res) => res.statusCode >= 500,
       }) as any
     )
-    .use("/auth", auth)
+    .use("/auth", json(), auth)
     .use("/webhooks", webhooks)
-    .use("/lambda", lambdas)
-    .use("/v1", publicApi.handler())
-    .use("/docs", publicApi.spec())
+    .use("/lambda", json(), lambdas)
+    .use("/v1", json(), publicApi.handler())
+    .use("/docs", json(), publicApi.spec())
     .use(((err, req, res, next) => {
       logger.error(err?.message, { stack: err?.stack });
       next(err);

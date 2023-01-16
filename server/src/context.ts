@@ -21,6 +21,7 @@ import { UserRepository } from "./db/repositories/UserRepository";
 import { Contact, Organization, PetitionAccess, User } from "./db/__types";
 import { ANALYTICS, IAnalyticsService } from "./services/analytics";
 import { AUTH, IAuth } from "./services/auth";
+import { BANKFLIP_SERVICE, IBankflipService } from "./services/bankflip";
 import { DOW_JONES_KYC_SERVICE, IDowJonesKycService } from "./services/dowjones";
 import { EMAILS, IEmailsService } from "./services/emails";
 import { FETCH_SERVICE, IFetchService } from "./services/fetch";
@@ -64,6 +65,7 @@ export class ApiContext {
     @inject(ORGANIZATION_CREDITS_SERVICE) public readonly orgCredits: IOrganizationCreditsService,
     @inject(DOW_JONES_KYC_SERVICE) public readonly dowJonesKyc: IDowJonesKycService,
     @inject(REDIS) public readonly redis: IRedis,
+    @inject(BANKFLIP_SERVICE) public readonly bankflip: IBankflipService,
 
     // Repositories
     public readonly contacts: ContactRepository,
