@@ -34,7 +34,7 @@ export const schema = makeSchema({
   ],
   sourceTypes: {
     headers: [
-      `import { FileUpload } from "graphql-upload";`,
+      `import { FileUpload } from "graphql-upload/Upload.js";`,
       `import { Duration } from "date-fns";`,
     ],
     modules: [

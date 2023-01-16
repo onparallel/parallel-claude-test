@@ -1,7 +1,7 @@
 import { core } from "nexus";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 import { ArgValidationError } from "../errors";
-import { FileUpload } from "graphql-upload";
+import { FileUpload } from "graphql-upload/Upload.js";
 import match from "mime-match";
 import { fromStream } from "file-type";
 import { MaybeArray } from "../../../util/types";

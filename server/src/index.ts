@@ -1,4 +1,5 @@
 import "./init";
+// keep this space to prevent import sorting, removing init from top
 import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginLandingPageGraphQLPlayground,
@@ -8,7 +9,7 @@ import { ApolloServerPlugin } from "apollo-server-plugin-base";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { json } from "express";
-import { graphqlUploadExpress } from "graphql-upload";
+import graphqlUploadExpress from "graphql-upload/graphqlUploadExpress.js";
 import { api } from "./api";
 import { createContainer } from "./container";
 import { ApiContext } from "./context";

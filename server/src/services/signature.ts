@@ -1,6 +1,5 @@
 import { Container, inject, injectable } from "inversify";
 import { Knex } from "knex";
-import "reflect-metadata";
 import { countBy, isDefined, omit } from "remeda";
 import { CONFIG, Config } from "../config";
 import {

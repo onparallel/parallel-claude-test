@@ -1,5 +1,5 @@
 import { GraphQLDateTime, GraphQLJSON, GraphQLJSONObject } from "graphql-scalars";
-import { GraphQLUpload as _GraphQLUpload } from "graphql-upload";
+import { default as _GraphQLUpload } from "graphql-upload/GraphQLUpload.js";
 import { arg, asNexusMethod, core, enumType, scalarType } from "nexus";
 import { DURATION_SCHEMA, ensureDuration, parseDuration } from "./duration";
 

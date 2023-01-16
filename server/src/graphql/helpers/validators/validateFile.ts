@@ -1,5 +1,5 @@
 import { core } from "nexus";
-import { FileUpload } from "graphql-upload";
+import { FileUpload } from "graphql-upload/Upload.js";
 import { validateAnd } from "../validateArgs";
 import { contentType as contentTypeValidator } from "./contentType";
 import { maxFileSize } from "./maxFileSize";

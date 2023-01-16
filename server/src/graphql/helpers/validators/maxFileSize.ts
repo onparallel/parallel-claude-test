@@ -1,4 +1,4 @@
-import { FileUpload } from "graphql-upload";
+import { FileUpload } from "graphql-upload/Upload.js";
 import { core } from "nexus";
 import { MaxFileSizeExceededError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";

@@ -1,4 +1,5 @@
 import "reflect-metadata";
+// keep this space to prevent import sorting, removing init from top
 import fetch from "node-fetch";
 import { loadEnv } from "./util/loadEnv";
 loadEnv();

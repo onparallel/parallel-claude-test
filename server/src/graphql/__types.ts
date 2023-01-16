@@ -1,4 +1,4 @@
-import { FileUpload } from "graphql-upload";
+import { FileUpload } from "graphql-upload/Upload.js";
 import { Duration } from "date-fns";
 import type * as db from "./../db/__types";
 import type * as events from "./../db/events";
