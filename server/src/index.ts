@@ -20,6 +20,8 @@ import { IRedis, REDIS } from "./services/redis";
 import { stopwatchEnd } from "./util/stopwatch";
 
 const app = express();
+app.disable("x-powered-by");
+
 const container = createContainer();
 
 app.get("/ping", (req, res, next) =>
