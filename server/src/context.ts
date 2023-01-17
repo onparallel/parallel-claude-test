@@ -22,6 +22,7 @@ import { Contact, Organization, PetitionAccess, User } from "./db/__types";
 import { ANALYTICS, IAnalyticsService } from "./services/analytics";
 import { AUTH, IAuth } from "./services/auth";
 import { BANKFLIP_SERVICE, IBankflipService } from "./services/bankflip";
+import { BANKFLIP_LEGACY_SERVICE, IBankflipLegacyService } from "./services/bankflip-legacy";
 import { DOW_JONES_KYC_SERVICE, IDowJonesKycService } from "./services/dowjones";
 import { EMAILS, IEmailsService } from "./services/emails";
 import { FETCH_SERVICE, IFetchService } from "./services/fetch";
@@ -66,6 +67,8 @@ export class ApiContext {
     @inject(DOW_JONES_KYC_SERVICE) public readonly dowJonesKyc: IDowJonesKycService,
     @inject(REDIS) public readonly redis: IRedis,
     @inject(BANKFLIP_SERVICE) public readonly bankflip: IBankflipService,
+    /** @deprecated old version of Bankflip API. Soon to be deprecated by them */
+    @inject(BANKFLIP_LEGACY_SERVICE) public readonly bankflipLegacy: IBankflipLegacyService,
 
     // Repositories
     public readonly contacts: ContactRepository,

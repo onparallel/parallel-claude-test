@@ -279,14 +279,23 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
     )
   ),
   resolve: async (_, { fieldId }, ctx) => {
-    const session = await ctx.bankflip.createSession({
-      fieldId: toGlobalId("PetitionField", fieldId),
-      accessId: toGlobalId("PetitionAccess", ctx.access!.id),
-    });
+    const field = await ctx.petitions.loadField(fieldId);
+    if (field?.options.legacy) {
+      return ctx.bankflipLegacy.createContactRequest({
+        fieldId: toGlobalId("PetitionField", fieldId),
+        accessId: toGlobalId("PetitionAccess", ctx.access!.id),
+        keycode: ctx.access!.keycode,
+      });
+    } else {
+      const session = await ctx.bankflip.createSession({
+        fieldId: toGlobalId("PetitionField", fieldId),
+        accessId: toGlobalId("PetitionAccess", ctx.access!.id),
+      });
 
-    return {
-      type: "WINDOW",
-      url: session.widgetLink,
-    };
+      return {
+        type: "WINDOW",
+        url: session.widgetLink,
+      };
+    }
   },
 });

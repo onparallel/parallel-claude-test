@@ -191,12 +191,68 @@ const SCHEMAS = {
   },
   ES_TAX_DOCUMENTS: {
     type: "object",
-    required: ["attachToPdf"],
-    additionalProperties: false,
+    // TODO Bankflip Legacy: uncomment when bankflip legacy API is removed
+    required: ["attachToPdf" /* "models"*/],
+    // additionalProperties: false,
+    additionalProperties: true,
     properties: {
       attachToPdf: {
         type: ["boolean", "null"],
       },
+      legacy: {
+        // TODO Bankflip Legacy: remove when legacy API is removed
+        type: "boolean",
+        description: "set to true to use bankflip legacy API",
+      },
+      /*models: {
+        type: "array",
+        items: {
+          type: "object",
+          required: ["model"],
+          additionalProperties: false,
+          properties: {
+            model: {
+              type: "object",
+              required: ["type"],
+              additionalProperties: false,
+              properties: {
+                type: {
+                  type: "string",
+                  enum: [
+                    "AEAT_036_CENSO_EMPRESARIOS",
+                    "AEAT_100_RENTA",
+                    "AEAT_111_IRPF_RENDIMIENTOS_TRABAJO_AUTOLIQUIDACION",
+                    "AEAT_115_IRPF_RENDIMIENTO_INMUEBLES",
+                    "AEAT_130_IRPF_DIRECTA",
+                    "AEAT_131_IRPF_OBJETIVA",
+                    "AEAT_180_IRPF_RENDIMIENTO_INMUEBLES_RESUMEN",
+                    "AEAT_190_IRPF_RENDIMIENTOS_TRABAJO_RESUMEN",
+                    "AEAT_303_IVA_AUTOLIQUIDACION",
+                    "AEAT_309_IVA_LIQUIDACION_NO_PERIODICA",
+                    "AEAT_349_IVA_OPERACIONES_INTRACOMUNITARIAS",
+                    "AEAT_390_IVA_RESUMEN",
+                    "AEAT_CERT_CENSAL",
+                    "AEAT_CERT_IRPF",
+                    "AEAT_CERT_OBLIG_TRIB",
+                    "DGT_VEHICLE_DATA",
+                    "SEG_SOCIAL_BASE_COTIZACIONES",
+                    "SEG_SOCIAL_CERT_INTEGRAL_PRESTACIONES",
+                    "SEG_SOCIAL_CERT_OBLIG",
+                    "SEG_SOCIAL_VIDA_LABORAL",
+                  ],
+                },
+                year: { type: "number" },
+                month: {
+                  type: "string",
+                  enum: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+                },
+                quarter: { type: "string", enum: ["Q1", "Q2", "Q3", "Q4"] },
+                licensePlate: { type: "string" },
+              },
+            },
+          },
+        },
+      },*/
     },
   },
   DOW_JONES_KYC: {

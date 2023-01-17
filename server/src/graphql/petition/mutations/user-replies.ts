@@ -340,16 +340,26 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
     fieldCanBeReplied("fieldId")
   ),
-  resolve: async (_, { fieldId }, ctx) => {
-    const session = await ctx.bankflip.createSession({
-      fieldId: toGlobalId("PetitionField", fieldId),
-      userId: toGlobalId("User", ctx.user!.id),
-    });
+  resolve: async (_, { petitionId, fieldId }, ctx) => {
+    const field = await ctx.petitions.loadField(fieldId);
 
-    return {
-      type: "WINDOW",
-      url: session.widgetLink,
-    };
+    if (field?.options.legacy) {
+      return await ctx.bankflipLegacy.createUserRequest({
+        fieldId: toGlobalId("PetitionField", fieldId),
+        petitionId: toGlobalId("Petition", petitionId),
+        userId: toGlobalId("User", ctx.user!.id),
+      });
+    } else {
+      const session = await ctx.bankflip.createSession({
+        fieldId: toGlobalId("PetitionField", fieldId),
+        userId: toGlobalId("User", ctx.user!.id),
+      });
+
+      return {
+        type: "WINDOW",
+        url: session.widgetLink,
+      };
+    }
   },
 });
 
