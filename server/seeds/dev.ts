@@ -1,7 +1,6 @@
 import { Knex } from "knex";
 import pMap from "p-map";
 import {
-  CreateUserGroupMember,
   Organization,
   OrganizationTheme,
   OrganizationUsageLimit,
@@ -137,112 +136,76 @@ export async function seed(knex: Knex): Promise<any> {
     ["id", "org_id", "organization_role"]
   );
 
-  const orgOwners = orgIds.map((id) => [
-    id,
-    users.find((u) => u.org_id === id && u.organization_role === "OWNER")!.id,
-  ]);
-
-  const userIds = users.map((u) => u.id);
-  for (const [orgId, ownerId] of orgOwners) {
-    await knex<Organization>("organization")
-      .where("id", orgId)
-      .update({
-        created_by: `User:${ownerId}`,
-        updated_by: `User:${ownerId}`,
-      });
-  }
-
-  for (const [orgId] of orgOwners) {
-    await knex<OrganizationUsageLimit>("organization_usage_limit").insert([
-      {
-        org_id: orgId,
-        limit_name: "PETITION_SEND",
-        limit: 5000,
-        period: "P1M" as any,
-        used: 0,
-      },
-      {
-        org_id: orgId,
-        limit_name: "SIGNATURIT_SHARED_APIKEY",
-        limit: 5000,
-        period: "P1M" as any,
-        used: 0,
-      },
-    ]);
-  }
-
-  for (const [orgId, ownerId] of orgOwners) {
-    await knex<OrgIntegration>("org_integration").insert([
-      {
-        org_id: orgId,
-        type: "SIGNATURE",
-        provider: "SIGNATURIT",
-        name: "Signaturit Sandbox",
-        settings: {
-          CREDENTIALS: { API_KEY: process.env.SIGNATURIT_SANDBOX_API_KEY },
-          ENVIRONMENT: "sandbox",
-        },
-        is_enabled: true,
-        created_by: `User:${ownerId}`,
-        is_default: true,
-      },
-    ]);
-  }
-
-  const groups = await knex<UserGroup>("user_group").insert(
-    [
-      {
-        org_id: orgIds[0],
-        name: "Empty",
-        created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`,
-      },
-      {
-        org_id: orgIds[0],
-        name: "Dev",
-        created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`,
-      },
-      {
-        org_id: orgIds[0],
-        name: "All",
-        created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`,
-      },
-    ],
-    "id"
-  );
-
-  const userGroupIds = groups.map((g) => g.id);
-
-  const userGroupMembers: CreateUserGroupMember[] = [
-    {
-      user_group_id: userGroupIds[1],
-      user_id: userIds[2],
-      created_by: `User:${userIds[2]}`,
-    },
-    {
-      user_group_id: userGroupIds[1],
-      user_id: userIds[3],
-      created_by: `User:${userIds[2]}`,
-    },
-    {
-      user_group_id: userGroupIds[1],
-      user_id: userIds[4],
-      created_by: `User:${userIds[2]}`,
-    },
-    ...userIds.map((userId) => ({
-      user_group_id: userGroupIds[2],
-      user_id: userId,
-      created_by: `User:${userIds[2]}`,
-    })),
-  ];
-
-  await knex<UserGroupMember>("user_group_member").insert(userGroupMembers);
+  const orgUsers = orgIds.map((id) => [id, users.filter((u) => u.org_id === id)] as const);
 
   await pMap(
-    orgOwners,
-    async ([orgId, ownerId], i) => {
+    orgUsers,
+    async ([orgId, users], i) => {
+      const ownerId = users.find((u) => u.organization_role === "OWNER")!.id;
+      await knex<Organization>("organization")
+        .where("id", orgId)
+        .update({
+          created_by: `User:${ownerId}`,
+          updated_by: `User:${ownerId}`,
+        });
+      await knex<OrganizationUsageLimit>("organization_usage_limit").insert([
+        {
+          org_id: orgId,
+          limit_name: "PETITION_SEND",
+          limit: 5000,
+          period: "P1M" as any,
+          used: 0,
+        },
+        {
+          org_id: orgId,
+          limit_name: "SIGNATURIT_SHARED_APIKEY",
+          limit: 5000,
+          period: "P1M" as any,
+          used: 0,
+        },
+      ]);
+      await knex<OrgIntegration>("org_integration").insert([
+        {
+          org_id: orgId,
+          type: "SIGNATURE",
+          provider: "SIGNATURIT",
+          name: "Signaturit Sandbox",
+          settings: {
+            CREDENTIALS: { API_KEY: process.env.SIGNATURIT_SANDBOX_API_KEY },
+            ENVIRONMENT: "sandbox",
+          },
+          is_enabled: true,
+          created_by: `User:${ownerId}`,
+          is_default: true,
+        },
+      ]);
+
+      const groups = await knex<UserGroup>("user_group").insert(
+        [
+          {
+            org_id: orgIds[0],
+            name: "All",
+            created_by: `User:${ownerId}`,
+            updated_by: `User:${ownerId}`,
+          },
+          {
+            org_id: orgIds[0],
+            name: "Empty",
+            created_by: `User:${ownerId}`,
+            updated_by: `User:${ownerId}`,
+          },
+        ],
+        "id"
+      );
+
+      await knex<UserGroupMember>("user_group_member").insert(
+        users.map((u) => ({
+          user_group_id: groups[0].id,
+          user_id: u.id,
+          created_by: `User:${ownerId}`,
+        }))
+      );
+
       const orgThemes = await knex<OrganizationTheme>("organization_theme").insert(
         [
           {
@@ -283,7 +246,7 @@ export async function seed(knex: Knex): Promise<any> {
             updated_by: `User:${ownerId}`,
             reminders_config: null,
             template_description: null,
-            template_public: true,
+            template_public: i === 0,
             from_template_id: null,
             signature_config: null,
             hide_recipient_view_contents: false,
@@ -308,7 +271,7 @@ export async function seed(knex: Knex): Promise<any> {
             reminders_config: null,
             template_description:
               '[{"type":"paragraph","children":[{"text":"Esta plantilla está pensada para facilitarte lo máximo posible tus primeros pasos con Parallel."}]},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"Te recomendamos utilizarla para"},{"bold":true,"text":" realizar un primer envío y enviártela a tu propia dirección de correo"},{"text":" de forma que puedas ver la experiencia que tendrán tus destinatarios."}],"type":"paragraph"},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"El listado de información que aparece abajo, son los campos que luego verás como destinatario. Algunos campos están ocultos, de forma que solo se mostrarán si se cumplen las condiciones."}],"type":"paragraph"}]',
-            template_public: true,
+            template_public: i === 0,
             from_template_id: null,
             signature_config: null,
             hide_recipient_view_contents: false,
@@ -331,14 +294,16 @@ export async function seed(knex: Knex): Promise<any> {
       );
 
       await knex<PetitionPermission>("petition_permission").insert(
-        petitions.map((p) => ({
-          petition_id: p.id,
-          user_id: ownerId,
-          created_by: `User:${ownerId}`,
-          updated_by: `User:${ownerId}`,
-          type: "OWNER",
-          is_subscribed: true,
-        }))
+        petitions.flatMap((p) =>
+          users.map((u) => ({
+            petition_id: p.id,
+            user_id: u.id,
+            created_by: `User:${ownerId}`,
+            updated_by: `User:${ownerId}`,
+            type: u.organization_role === "OWNER" ? "OWNER" : "WRITE",
+            is_subscribed: true,
+          }))
+        )
       );
 
       await knex<PetitionField>("petition_field").insert([
