@@ -26,21 +26,27 @@ const verifyHMAC = (req: Request, _: Response, buffer: Buffer) => {
   }
 };
 
-export const bankflip = Router().post("/", json({ verify: verifyHMAC }), async (req, res, next) => {
-  try {
-    const payload = await verify<SessionPayload>(
-      req.query.token as string,
-      req.context.config.security.jwtSecret
-    );
+export const bankflip = Router()
+  .post("/", json({ verify: verifyHMAC }), async (req, res, next) => {
+    try {
+      const payload = await verify<SessionPayload>(
+        req.query.token as string,
+        req.context.config.security.jwtSecret
+      );
 
-    const body = req.body as BankflipWebhookBody;
-    if (body.name === "SESSION_COMPLETED") {
-      await req.context.bankflip.sessionCompleted(payload, body);
+      const body = req.body as BankflipWebhookBody;
+      if (body.name === "SESSION_COMPLETED") {
+        await req.context.bankflip.sessionCompleted(payload, body);
+      }
+
+      res.sendStatus(200).end();
+    } catch (error: any) {
+      req.context.logger.error(error.message, { stack: error.stack });
+      next(error);
     }
-
-    res.sendStatus(200).end();
-  } catch (error: any) {
-    req.context.logger.error(error.message, { stack: error.stack });
-    next(error);
-  }
-});
+  })
+  // endpoint for the frontend to poll and know when all documents have been uploaded by the backend
+  .get("/:fieldId/status", json(), async (req, res) => {
+    const status = await req.context.redis.get(`bankflip-${req.params.fieldId}-status`);
+    res.json({ status }).end();
+  });

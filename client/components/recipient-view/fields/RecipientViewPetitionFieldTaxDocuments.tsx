@@ -57,35 +57,66 @@ export function RecipientViewPetitionFieldTaxDocuments({
   const popupRef = useRef<Window>();
   useInterval(
     async (done) => {
-      if (field.replies.length > 0) {
-        setState("IDLE");
-        done();
-      } else if (state === "FETCHING") {
-        if (isDefined(popupRef.current) && popupRef.current.closed) {
+      if (field.options.legacy) {
+        if (field.replies.length > 0) {
           setState("IDLE");
           done();
+        } else if (state === "FETCHING") {
+          if (isDefined(popupRef.current) && popupRef.current.closed) {
+            setState("IDLE");
+            done();
+          } else {
+            onRefreshField();
+          }
         } else {
-          onRefreshField();
+          done();
         }
       } else {
-        done();
+        if (state === "FETCHING") {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_PARALLEL_URL}/api/webhooks/bankflip/${field.id}/status`
+          );
+          const json = await response.json();
+          if (isDefined(popupRef.current) && popupRef.current.closed) {
+            if (json.status === "uploading") {
+              onRefreshField();
+            } else if (json.status === "idle") {
+              setState("IDLE");
+              done();
+            }
+          }
+
+          if (json.status === "completed") {
+            onRefreshField();
+            setState("IDLE");
+            done();
+          }
+        }
       }
     },
-    10000,
+    1000,
     [onRefreshField, state, field.replies.length]
   );
 
   useEffect(() => {
     const handler = function (e: MessageEvent) {
       const popup = popupRef.current;
-      if (isDefined(popup) && e.source === popup) {
-        if (e.data.name === "user_requested_closure") {
+      if (field.options.legacy) {
+        if (isDefined(popup) && e.source === popup && e.data.name === "success") {
           onRefreshField();
           popup.close();
+          setState("IDLE");
         }
-        if (e.data.name === "session_expired") {
-          popup.close();
-          setState("ERROR");
+      } else {
+        if (isDefined(popup) && e.source === popup) {
+          if (e.data.name === "user_requested_closure") {
+            onRefreshField();
+            popup.close();
+          }
+          if (e.data.name === "session_expired") {
+            popup.close();
+            setState("ERROR");
+          }
         }
       }
     };

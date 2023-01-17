@@ -191,20 +191,19 @@ const SCHEMAS = {
   },
   ES_TAX_DOCUMENTS: {
     type: "object",
-    // TODO Bankflip Legacy: uncomment when bankflip legacy API is removed
-    required: ["attachToPdf" /* "models"*/],
-    // additionalProperties: false,
-    additionalProperties: true,
+    // TODO Bankflip Legacy: make "models" a required property when legacy is removed
+    required: ["attachToPdf"],
+    additionalProperties: false,
     properties: {
       attachToPdf: {
         type: ["boolean", "null"],
       },
+      // TODO Bankflip Legacy: remove when legacy API is removed
       legacy: {
-        // TODO Bankflip Legacy: remove when legacy API is removed
         type: "boolean",
         description: "set to true to use bankflip legacy API",
       },
-      /*models: {
+      models: {
         type: "array",
         items: {
           type: "object",
@@ -252,7 +251,7 @@ const SCHEMAS = {
             },
           },
         },
-      },*/
+      },
     },
   },
   DOW_JONES_KYC: {
@@ -373,6 +372,7 @@ export function defaultFieldOptions(
       case "ES_TAX_DOCUMENTS":
         return {
           attachToPdf: false,
+          legacy: true, // TODO Bankflip Legacy: remove when this is deprecated
         };
       case "DYNAMIC_SELECT": {
         return {
