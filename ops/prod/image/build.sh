@@ -1,7 +1,7 @@
 #! /bin/bash
 
-nodejs_version="16"
-nginx_version="1.22.0"
+nodejs_version="18"
+nginx_version="1.22.1"
 
 echo "Adding public keys"
 cat authorized_keys >> .ssh/authorized_keys
@@ -27,7 +27,6 @@ yum install -y \
     amazon-efs-utils \
     awslogs 
 
-
 function download_and_untar() {
   curl --silent --location --output $1.tar.gz $2
   mkdir $1
@@ -45,8 +44,9 @@ yum -y install yarn
 echo "Installing nginx"
 download_and_untar nginx-${nginx_version} https://nginx.org/download/nginx-${nginx_version}.tar.gz
 git clone https://github.com/giom/nginx_accept_language_module
-download_and_untar ngx_devel_kit https://github.com/vision5/ngx_devel_kit/archive/refs/tags/v0.3.1.tar.gz
+download_and_untar ngx_devel_kit https://github.com/vision5/ngx_devel_kit/archive/refs/tags/v0.3.2.tar.gz
 download_and_untar set-misc-nginx-module https://github.com/openresty/set-misc-nginx-module/archive/refs/tags/v0.33.tar.gz
+download_and_untar headers-more-nginx-module https://github.com/openresty/headers-more-nginx-module/archive/refs/tags/v0.34.tar.gz
 
 pushd nginx-${nginx_version}
 ./configure \
@@ -95,14 +95,15 @@ pushd nginx-${nginx_version}
     --with-ld-opt=' -Wl,-E' \
     --add-module=../nginx_accept_language_module \
     --add-module=../ngx_devel_kit \
-    --add-module=../set-misc-nginx-module
+    --add-module=../set-misc-nginx-module \
+    --add-module=../headers-more-nginx-module
 make
 make install
 popd > /dev/null
 
 echo "Installing exiftool"
-download_and_untar Image-ExifTool-12.41 https://exiftool.org/Image-ExifTool-12.41.tar.gz
-pushd Image-ExifTool-12.41
+download_and_untar Image-ExifTool-12.54 https://exiftool.org/Image-ExifTool-12.54.tar.gz
+pushd Image-ExifTool-12.54
 perl Makefile.PL
 make test
 make install
