@@ -1,6 +1,6 @@
 #! /bin/bash
 
-nodejs_version="18"
+nodejs_version="16"
 nginx_version="1.22.1"
 
 echo "Adding public keys"
@@ -36,7 +36,6 @@ function download_and_untar() {
 
 echo "Installing node.js"
 curl -sL https://rpm.nodesource.com/setup_18.x | bash -
-yum -y install nodejs
 
 echo "Installing yarn"
 curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
