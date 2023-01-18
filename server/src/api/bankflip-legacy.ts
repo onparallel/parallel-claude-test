@@ -1,4 +1,4 @@
-import { json, Router } from "express";
+import { Router } from "express";
 import { isDefined } from "remeda";
 import { ApiContext } from "../context";
 import { Contact, User } from "../db/__types";
