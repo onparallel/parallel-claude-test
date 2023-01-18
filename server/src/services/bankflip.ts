@@ -118,14 +118,14 @@ export class BankflipService implements IBankflipService {
     const baseWebhookUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
     const fieldId = fromGlobalId(payload.fieldId, "PetitionField").id;
     const field = await this.petitions.loadField(fieldId);
-    if (!field?.options.models) {
+    if (!field?.options.requests) {
       throw new Error(`Expected to have models configured in PetitionField:${fieldId}`);
     }
 
     return await this.apiRequest<CreateSessionResponse>("/session", {
       method: "POST",
       body: JSON.stringify({
-        requests: field.options.models,
+        requests: field.options.requests,
         webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip?token=${token}`,
         customization: {
           companyName: "Parallel",
