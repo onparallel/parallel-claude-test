@@ -8166,8 +8166,8 @@
   },
   {
     "term": "page.reports.replies-description",
-    "definition": "Compara las respuestas obtenidas en todas las plantillas, de un parallel concreto.",
-    "context": "Compare the answers obtained in all the templates, for a specific parallel."
+    "definition": "Compara las respuestas obtenidas en los parallels de una plantilla",
+    "context": "Compare the answers obtained in the parallels of a template."
   },
   {
     "term": "page.reports.select-a-template",

@@ -63,8 +63,7 @@ export function Reports() {
         title: intl.formatMessage({ id: "page.reports.replies", defaultMessage: "Replies" }),
         description: intl.formatMessage({
           id: "page.reports.replies-description",
-          defaultMessage:
-            "Compare the answers obtained in all the templates, for a specific parallel.",
+          defaultMessage: "Compare the answers obtained in the parallels of a template.",
         }),
         href: "",
         isPending: true,
