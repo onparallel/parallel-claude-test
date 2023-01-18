@@ -26388,6 +26388,47 @@ export type useDowJonesProfileDownloadTask_getTaskResultFileMutation = {
   getTaskResultFile: { __typename?: "TaskResultFile"; url: string };
 };
 
+export type useExportExcelTask_TaskFragment = {
+  __typename?: "Task";
+  id: string;
+  status: TaskStatus;
+  output?: { [key: string]: any } | null;
+};
+
+export type useExportExcelTask_createExportExcelTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type useExportExcelTask_createExportExcelTaskMutation = {
+  createExportExcelTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    output?: { [key: string]: any } | null;
+  };
+};
+
+export type useExportExcelTask_getTaskResultFileMutationVariables = Exact<{
+  taskId: Scalars["GID"];
+}>;
+
+export type useExportExcelTask_getTaskResultFileMutation = {
+  getTaskResultFile: { __typename?: "TaskResultFile"; filename: string; url: string };
+};
+
+export type useExportExcelTask_taskQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type useExportExcelTask_taskQuery = {
+  task: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    output?: { [key: string]: any } | null;
+  };
+};
+
 export type useExportRepliesTask_createExportRepliesTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   pattern?: InputMaybe<Scalars["String"]>;
@@ -32072,6 +32113,13 @@ export const createMentionPlugin_UserOrUserGroupFragmentDoc = gql`
   ${UserSelectOption_UserFragmentDoc}
   ${UserSelectOption_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<createMentionPlugin_UserOrUserGroupFragment, unknown>;
+export const useExportExcelTask_TaskFragmentDoc = gql`
+  fragment useExportExcelTask_Task on Task {
+    id
+    status
+    output
+  }
+` as unknown as DocumentNode<useExportExcelTask_TaskFragment, unknown>;
 export const useTemplateStatsReportTask_TaskFragmentDoc = gql`
   fragment useTemplateStatsReportTask_Task on Task {
     id
@@ -36266,6 +36314,36 @@ export const useDowJonesProfileDownloadTask_getTaskResultFileDocument = gql`
   useDowJonesProfileDownloadTask_getTaskResultFileMutation,
   useDowJonesProfileDownloadTask_getTaskResultFileMutationVariables
 >;
+export const useExportExcelTask_createExportExcelTaskDocument = gql`
+  mutation useExportExcelTask_createExportExcelTask($petitionId: GID!) {
+    createExportExcelTask(petitionId: $petitionId) {
+      ...useExportExcelTask_Task
+    }
+  }
+  ${useExportExcelTask_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useExportExcelTask_createExportExcelTaskMutation,
+  useExportExcelTask_createExportExcelTaskMutationVariables
+>;
+export const useExportExcelTask_getTaskResultFileDocument = gql`
+  mutation useExportExcelTask_getTaskResultFile($taskId: GID!) {
+    getTaskResultFile(taskId: $taskId, preview: false) {
+      filename
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  useExportExcelTask_getTaskResultFileMutation,
+  useExportExcelTask_getTaskResultFileMutationVariables
+>;
+export const useExportExcelTask_taskDocument = gql`
+  query useExportExcelTask_task($id: GID!) {
+    task(id: $id) {
+      ...useExportExcelTask_Task
+    }
+  }
+  ${useExportExcelTask_TaskFragmentDoc}
+` as unknown as DocumentNode<useExportExcelTask_taskQuery, useExportExcelTask_taskQueryVariables>;
 export const useExportRepliesTask_createExportRepliesTaskDocument = gql`
   mutation useExportRepliesTask_createExportRepliesTask($petitionId: GID!, $pattern: String) {
     createExportRepliesTask(petitionId: $petitionId, pattern: $pattern) {
