@@ -46,7 +46,7 @@ export const bankflip = Router()
     }
   })
   // endpoint for the frontend to poll and know when all documents have been uploaded by the backend
-  .get("/:fieldId/status", json(), async (req, res) => {
+  .get("/:fieldId/status", async (req, res) => {
     const status = await req.context.redis.get(`bankflip-${req.params.fieldId}-status`);
     res.json({ status }).end();
   });

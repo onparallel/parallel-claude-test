@@ -21,15 +21,15 @@ export type SessionPayload =
   | { fieldId: string; accessId: string };
 
 /** When the Session is completed. (every requested model has been extracted) */
-export type SessionCompletedWebhookEvent = {
+export interface SessionCompletedWebhookEvent {
   name: "SESSION_COMPLETED";
   payload: {
     sessionId: string;
   };
-};
+}
 
 /** Each time that modelRequest has extracted one or more documents. */
-export type ModelExtractedWebhookEvent = {
+export interface ModelExtractedWebhookEvent {
   name: "MODEL_EXTRACTED";
   payload: {
     sessionId: string;
@@ -42,9 +42,9 @@ export type ModelExtractedWebhookEvent = {
       licensePlate?: string;
     };
   };
-};
+}
 
-type ModelRequestDocument = {
+interface ModelRequestDocument {
   contentType: string;
   createdAt: string;
   extension: string;
@@ -54,19 +54,19 @@ type ModelRequestDocument = {
   };
   name: string;
   sessionId: string;
-};
+}
 
-type CreateSessionResponse = {
+interface CreateSessionResponse {
   id: string;
   widgetLink: string;
-};
+}
 
-type SessionSummaryResponse = {
+interface SessionSummaryResponse {
   modelRequestOutcomes: {
     completed: boolean;
     documents: Maybe<ModelRequestDocument[]>;
   }[];
-};
+}
 
 export const BANKFLIP_SERVICE = Symbol.for("BANKFLIP_SERVICE");
 

@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response, Router } from "express";
+import { json, Request, RequestHandler, Response, Router } from "express";
 import { OpenAPIV3 } from "openapi-types";
 import pProps from "p-props";
 import { omit } from "remeda";
@@ -314,7 +314,7 @@ export type RestApiContext<TContext = {}, TParams = any, TQuery = any, TBody = a
 };
 
 export class RestApi<TContext = {}> {
-  private router: Router = Router();
+  private router: Router = Router().use(json());
   private paths: PathResolver<TContext, any, any>[] = [];
   private _spec: Omit<RestApiOptions, "middleware">;
 

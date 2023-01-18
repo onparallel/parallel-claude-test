@@ -1,6 +1,7 @@
-import { Router } from "express";
+import { json, Router } from "express";
 
 export const auth = Router()
+  .use(json())
   .post("/guess-login", (req, res, next) => req.context.auth.guessLogin(req, res, next))
   .get("/callback", (req, res, next) => req.context.auth.callback(req, res, next))
   .post("/login", (req, res, next) => req.context.auth.login(req, res, next))
