@@ -73,6 +73,15 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
               date,
             } as SignatureBoxProps,
           ]
+        : ["zas25KHxAByKWmEFbpV", "zas25KHxAByKWmEFbpU", "zas25KHxAByKWmEFbpT"].includes(templateId)
+        ? [
+            {
+              fullName: "Carlos Guerrero Martín",
+              signatureImageUrl:
+                "https://static.onparallel.com/static/images/signatures/carlos-guerrero-martin-debify.png",
+              date,
+            } as SignatureBoxProps,
+          ]
         : []
       : []),
     ...signatureConfig.signers!.map(
