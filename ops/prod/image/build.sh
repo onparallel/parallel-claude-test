@@ -35,7 +35,7 @@ function download_and_untar() {
 }
 
 echo "Installing node.js"
-curl -sL https://rpm.nodesource.com/setup_18.x | bash -
+curl -sL https://rpm.nodesource.com/setup_${nodejs_version}.x | bash -
 
 echo "Installing yarn"
 curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
