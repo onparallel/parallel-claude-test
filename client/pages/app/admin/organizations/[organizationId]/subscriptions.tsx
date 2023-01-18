@@ -508,8 +508,6 @@ export function OrganizationUsagePeriodsTable({
     [intl.locale]
   );
 
-  const isCurrentPeriodExpired = isDefined(items?.items[0].periodEndDate);
-
   return (
     <Flex flexDirection="column" flex="1" marginTop={2}>
       <TablePage<TableRow>
@@ -562,12 +560,17 @@ export function OrganizationUsagePeriodsTable({
                 />
               </Text>
             </HStack>
-            <Button onClick={onModifyCurrentPeriod} isDisabled={isCurrentPeriodExpired}>
-              <FormattedMessage
-                id="component.organization-usage-periods-table.modify-ongoing-period-button"
-                defaultMessage="Modify ongoing period"
-              />
-            </Button>
+            {isDefined(items?.items?.[0]) ? (
+              <Button
+                onClick={onModifyCurrentPeriod}
+                isDisabled={isDefined(items?.items[0].periodEndDate)}
+              >
+                <FormattedMessage
+                  id="component.organization-usage-periods-table.modify-ongoing-period-button"
+                  defaultMessage="Modify ongoing period"
+                />
+              </Button>
+            ) : null}
           </HStack>
         }
       />
