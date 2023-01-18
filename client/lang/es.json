@@ -8187,7 +8187,7 @@
   {
     "term": "page.reports.started-parallels-help-2",
     "definition": "No entran en esta cifra los parallels eliminados, ni los borradores sin respuestas.",
-    "context": "This number doesn't include deleted o parallels or unanswered drafts."
+    "context": "This number doesn't include deleted parallels or unanswered drafts."
   },
   {
     "term": "page.reports.templates",

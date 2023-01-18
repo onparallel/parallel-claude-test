@@ -8186,8 +8186,8 @@
   },
   {
     "term": "page.reports.started-parallels-help-2",
-    "definition": "This number doesn't include deleted o parallels or unanswered drafts.",
-    "context": "This number doesn't include deleted o parallels or unanswered drafts."
+    "definition": "This number doesn't include deleted parallels or unanswered drafts.",
+    "context": "This number doesn't include deleted parallels or unanswered drafts."
   },
   {
     "term": "page.reports.templates",

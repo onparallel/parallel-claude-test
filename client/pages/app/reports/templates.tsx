@@ -373,7 +373,7 @@ function TemplateStatsReport({ report }: { report: ReportType }) {
                 <Text>
                   <FormattedMessage
                     id="page.reports.started-parallels-help-2"
-                    defaultMessage="This number doesn't include deleted o parallels or unanswered drafts."
+                    defaultMessage="This number doesn't include deleted parallels or unanswered drafts."
                   />
                 </Text>
               </Stack>
