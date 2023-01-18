@@ -67,7 +67,7 @@ export class ApiContext {
     @inject(DOW_JONES_KYC_SERVICE) public readonly dowJonesKyc: IDowJonesKycService,
     @inject(REDIS) public readonly redis: IRedis,
     @inject(BANKFLIP_SERVICE) public readonly bankflip: IBankflipService,
-    /** @deprecated old version of Bankflip API. Soon to be deprecated by them */
+    // TODO Bankflip Legacy: old version of Bankflip API. Soon to be deprecated by them */
     @inject(BANKFLIP_LEGACY_SERVICE) public readonly bankflipLegacy: IBankflipLegacyService,
 
     // Repositories

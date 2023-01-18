@@ -79,8 +79,10 @@ export function RecipientViewPetitionFieldTaxDocuments({
           const json = await response.json();
           if (isDefined(popupRef.current) && popupRef.current.closed) {
             if (json.status === "uploading") {
+              // server is still uploading file replies, keep polling
               onRefreshField();
             } else if (json.status === "idle") {
+              // server didn't start uploading files, if popup is closed the process can be cancelled
               setState("IDLE");
               done();
             }
@@ -94,29 +96,27 @@ export function RecipientViewPetitionFieldTaxDocuments({
         }
       }
     },
-    1000,
+    5000,
     [onRefreshField, state, field.replies.length]
   );
 
   useEffect(() => {
     const handler = function (e: MessageEvent) {
       const popup = popupRef.current;
-      if (field.options.legacy) {
-        if (isDefined(popup) && e.source === popup && e.data.name === "success") {
+      if (isDefined(popup) && e.source === popup) {
+        // TODO Bankflip Legacy: legacy event, will be removed by Bankflip on May 2023
+        if (field.options.legacy && e.data.name === "success") {
           onRefreshField();
           popup.close();
           setState("IDLE");
         }
-      } else {
-        if (isDefined(popup) && e.source === popup) {
-          if (e.data.name === "user_requested_closure") {
-            onRefreshField();
-            popup.close();
-          }
-          if (e.data.name === "session_expired") {
-            popup.close();
-            setState("ERROR");
-          }
+        if (e.data.name === "user_requested_closure") {
+          onRefreshField();
+          popup.close();
+        }
+        if (e.data.name === "session_expired") {
+          popup.close();
+          setState("ERROR");
         }
       }
     };

@@ -174,10 +174,6 @@ export class BankflipService implements IBankflipService {
     documents: Maybe<ModelRequestDocument[]>
   ) {
     const fieldId = fromGlobalId(payload.fieldId, "PetitionField").id;
-    const data =
-      "userId" in payload
-        ? { user_id: fromGlobalId(payload.userId, "User").id }
-        : { petition_access_id: fromGlobalId(payload.accessId, "PetitionAccess").id };
 
     const creator =
       "userId" in payload
