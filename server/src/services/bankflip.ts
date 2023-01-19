@@ -11,16 +11,13 @@ import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { getBaseWebhookUrl } from "../util/getBaseWebhookUrl";
 import { fromGlobalId } from "../util/globalId";
-import { sign } from "../util/jwt";
 import { random } from "../util/token";
 import { Maybe } from "../util/types";
 import { FETCH_SERVICE, IFetchService } from "./fetch";
 import { OrganizationCreditsService, ORGANIZATION_CREDITS_SERVICE } from "./organization-credits";
 import { StorageService, STORAGE_SERVICE } from "./storage";
 
-export type SessionPayload =
-  | { fieldId: string; userId: string }
-  | { fieldId: string; accessId: string };
+type SessionMetadata = { fieldId: string; userId: string } | { fieldId: string; accessId: string };
 
 /** When the Session is completed. (every requested model has been extracted) */
 export interface SessionCompletedWebhookEvent {
@@ -78,13 +75,18 @@ interface SessionSummaryResponse {
   modelRequestOutcomes: ModelRequestOutcome[];
 }
 
+interface SessionResponse {
+  id: string;
+  metadata: SessionMetadata;
+}
+
 export const BANKFLIP_SERVICE = Symbol.for("BANKFLIP_SERVICE");
 
 export interface IBankflipService {
   /** called to start a session with Bankflip to request a person's documents */
-  createSession(payload: SessionPayload): Promise<CreateSessionResponse>;
+  createSession(metadata: SessionMetadata): Promise<CreateSessionResponse>;
   /** webhook callback for when document extraction has finished and the session is completed */
-  sessionCompleted(payload: SessionPayload, event: SessionCompletedWebhookEvent): Promise<void>;
+  sessionCompleted(event: SessionCompletedWebhookEvent): Promise<void>;
 }
 
 @injectable()
@@ -105,7 +107,7 @@ export class BankflipService implements IBankflipService {
   private async apiRequest<T>(
     url: string,
     init?: RequestInit,
-    type: "json" | "buffer" | "text" = "json"
+    type: "json" | "buffer" = "json"
   ): Promise<T> {
     const response = await this.fetch.fetch(`${this.config.bankflip.host}${url}`, {
       headers: {
@@ -119,11 +121,9 @@ export class BankflipService implements IBankflipService {
     return await response[type]();
   }
 
-  async createSession(payload: SessionPayload) {
-    const token = await sign(payload, this.config.security.jwtSecret, { expiresIn: "1d" });
-
+  async createSession(metadata: SessionMetadata) {
     const baseWebhookUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
-    const fieldId = fromGlobalId(payload.fieldId, "PetitionField").id;
+    const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
     const field = await this.petitions.loadField(fieldId);
     if (!field?.options.requests) {
       throw new Error(`Expected to have models configured in PetitionField:${fieldId}`);
@@ -139,35 +139,35 @@ export class BankflipService implements IBankflipService {
       method: "POST",
       body: JSON.stringify({
         requests: field.options.requests,
-        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/v2?token=${token}`,
+        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/v2`,
         customization: {
           companyName: hasRemoveParallelBranding ? organization!.name : "Parallel",
         },
+        metadata,
       }),
     });
   }
 
-  async sessionCompleted(
-    payload: SessionPayload,
-    event: SessionCompletedWebhookEvent
-  ): Promise<void> {
-    await this.consumePetitionCredits(payload);
+  async sessionCompleted(event: SessionCompletedWebhookEvent): Promise<void> {
+    const session = await this.apiRequest<SessionResponse>(`/session/${event.payload.sessionId}`);
+    const { metadata } = session;
+    await this.consumePetitionCredits(metadata);
 
     const summary = await this.apiRequest<SessionSummaryResponse>(
       `/session/${event.payload.sessionId}/summary`
     );
 
     const replyContents = await pMap(
-      summary.modelRequestOutcomes.filter((outcome) => outcome.completed),
-      async (model) => await this.extractAndUploadModelDocuments(payload, model),
+      summary.modelRequestOutcomes,
+      async (model) => await this.extractAndUploadModelDocuments(metadata, model),
       { concurrency: 2 }
     );
 
-    const fieldId = fromGlobalId(payload.fieldId, "PetitionField").id;
+    const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
     const data =
-      "userId" in payload
-        ? { user_id: fromGlobalId(payload.userId, "User").id }
-        : { petition_access_id: fromGlobalId(payload.accessId, "PetitionAccess").id };
+      "userId" in metadata
+        ? { user_id: fromGlobalId(metadata.userId, "User").id }
+        : { petition_access_id: fromGlobalId(metadata.accessId, "PetitionAccess").id };
 
     const createdBy =
       "user_id" in data ? `User:${data.user_id}` : `PetitionAccess:${data.petition_access_id}`;
@@ -183,10 +183,10 @@ export class BankflipService implements IBankflipService {
     );
   }
 
-  private async consumePetitionCredits(payload: SessionPayload) {
-    if ("userId" in payload) {
-      const fieldId = fromGlobalId(payload.fieldId, "PetitionField").id;
-      const userId = fromGlobalId(payload.userId, "User").id;
+  private async consumePetitionCredits(metadata: SessionMetadata) {
+    if ("userId" in metadata) {
+      const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
+      const userId = fromGlobalId(metadata.userId, "User").id;
       const field = (await this.petitions.loadField(fieldId))!;
       await this.orgCredits.ensurePetitionHasConsumedCredit(field.petition_id, `User:${userId}`);
     }
@@ -196,7 +196,7 @@ export class BankflipService implements IBankflipService {
    * extracts the contents of the documents on a given model outcome, uploads the files to S3 and returns the data for creating an ES_TAX_DOCUMENTS reply.
    */
   private async extractAndUploadModelDocuments(
-    payload: SessionPayload,
+    metadata: SessionMetadata,
     modelRequestOutcome: ModelRequestOutcome
   ): Promise<any> {
     if (isDefined(modelRequestOutcome.noDocumentReasons)) {
@@ -208,7 +208,7 @@ export class BankflipService implements IBankflipService {
     }
 
     const documents: Record<string, Maybe<ModelRequestDocument>> = {};
-    ["pdf", "json", "xml"].forEach((extension) => {
+    ["pdf", "json"].forEach((extension) => {
       documents[extension] =
         modelRequestOutcome.documents?.find((d) => d.extension === extension) ?? null;
     });
@@ -238,24 +238,17 @@ export class BankflipService implements IBankflipService {
         size: res["ContentLength"]!.toString(),
         upload_complete: true,
       },
-      "userId" in payload
-        ? `User:${fromGlobalId(payload.userId, "User").id}`
-        : `PetitionAccess:${fromGlobalId(payload.accessId, "User").id}`
+      "userId" in metadata
+        ? `User:${fromGlobalId(metadata.userId, "User").id}`
+        : `PetitionAccess:${fromGlobalId(metadata.accessId, "PetitionAccess").id}`
     );
 
-    const replyContents: Record<string, any> = {
+    return {
       file_upload_id: file.id,
       request: modelRequestOutcome.modelRequest,
+      json_contents: documents.json
+        ? await this.apiRequest<any>(`/document/${documents.json.id}/content`)
+        : null,
     };
-
-    await pMap([documents.json, documents.xml].filter(isDefined), async (document) => {
-      replyContents[`${document.extension}_contents`] = await this.apiRequest<any>(
-        `/document/${document.id}/content`,
-        {},
-        document.extension === "json" ? "json" : "text"
-      );
-    });
-
-    return replyContents;
   }
 }

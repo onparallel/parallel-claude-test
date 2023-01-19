@@ -1,11 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { json, Request, Response, Router } from "express";
-import {
-  ModelExtractedWebhookEvent,
-  SessionCompletedWebhookEvent,
-  SessionPayload,
-} from "../services/bankflip";
-import { verify } from "../util/jwt";
+import { ModelExtractedWebhookEvent, SessionCompletedWebhookEvent } from "../services/bankflip";
 
 type BankflipWebhookBody = ModelExtractedWebhookEvent | SessionCompletedWebhookEvent;
 
@@ -28,14 +23,9 @@ const verifyHMAC = (req: Request, _: Response, buffer: Buffer) => {
 
 export const bankflip = Router().post("/", json({ verify: verifyHMAC }), async (req, res, next) => {
   try {
-    const payload = await verify<SessionPayload>(
-      req.query.token as string,
-      req.context.config.security.jwtSecret
-    );
-
     const body = req.body as BankflipWebhookBody;
     if (body.name === "SESSION_COMPLETED") {
-      await req.context.bankflip.sessionCompleted(payload, body);
+      await req.context.bankflip.sessionCompleted(body);
     }
 
     res.sendStatus(200).end();
