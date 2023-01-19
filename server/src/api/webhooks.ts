@@ -1,4 +1,4 @@
-import { json, Router } from "express";
+import { Router } from "express";
 import { appsumo } from "./appsumo";
 import { bankflip } from "./bankflip";
 import { bankflipLegacy } from "./bankflip-legacy";

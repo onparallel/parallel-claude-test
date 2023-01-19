@@ -189,18 +189,6 @@ export class BankflipService implements IBankflipService {
     payload: SessionPayload,
     modelRequestOutcome: ModelRequestOutcome
   ): Promise<any> {
-    const creator =
-      "userId" in payload
-        ? await this.users.loadUser(fromGlobalId(payload.userId, "User").id)
-        : await this.contacts.loadContactByAccessId(
-            fromGlobalId(payload.accessId, "PetitionAccess").id
-          );
-
-    const data =
-      "userId" in payload
-        ? { user_id: fromGlobalId(payload.userId, "User").id }
-        : { petition_access_id: fromGlobalId(payload.accessId, "PetitionAccess").id };
-
     if (isDefined(modelRequestOutcome.noDocumentReasons)) {
       return {
         file_upload_id: null,
@@ -240,7 +228,9 @@ export class BankflipService implements IBankflipService {
         size: res["ContentLength"]!.toString(),
         upload_complete: true,
       },
-      "userId" in payload ? `User:${creator!.id}` : `Contact:${creator!.id}`
+      "userId" in payload
+        ? `User:${fromGlobalId(payload.userId, "User").id}`
+        : `PetitionAccess:${fromGlobalId(payload.accessId, "User").id}`
     );
 
     const replyContents: Record<string, any> = {

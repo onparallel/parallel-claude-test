@@ -1,4 +1,4 @@
-import { ErrorRequestHandler, json, Router } from "express";
+import { ErrorRequestHandler, Router } from "express";
 import { Container } from "inversify";
 import morgan from "morgan";
 import { ApiContext } from "../context";
