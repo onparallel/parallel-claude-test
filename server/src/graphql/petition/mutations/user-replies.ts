@@ -50,16 +50,17 @@ export const createPetitionFieldReply = mutationField("createPetitionFieldReply"
 
     try {
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
-      return await ctx.petitions.createPetitionFieldReply(
+      const [reply] = await ctx.petitions.createPetitionFieldReply(
+        args.fieldId,
         {
-          petition_field_id: args.fieldId,
           user_id: ctx.user!.id,
           type,
           status: "PENDING",
           content: { value: args.reply },
         },
-        ctx.user!
+        `User:${ctx.user!.id}`
       );
+      return reply;
     } catch (error: any) {
       if (error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(
@@ -158,17 +159,17 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
         `User:${ctx.user!.id}`
       );
 
-      const [presignedPostData, reply] = await Promise.all([
+      const [presignedPostData, [reply]] = await Promise.all([
         ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
         ctx.petitions.createPetitionFieldReply(
+          args.fieldId,
           {
-            petition_field_id: args.fieldId,
             user_id: ctx.user!.id,
             type: "FILE_UPLOAD",
             content: { file_upload_id: file.id },
             status: "PENDING",
           },
-          ctx.user!
+          `User:${ctx.user!.id}`
         ),
       ]);
       return { presignedPostData, reply };
@@ -439,9 +440,9 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
         `User:${ctx.user!.id}`
       );
 
-      return await ctx.petitions.createPetitionFieldReply(
+      const [reply] = await ctx.petitions.createPetitionFieldReply(
+        args.fieldId,
         {
-          petition_field_id: args.fieldId,
           user_id: ctx.user!.id,
           type: "DOW_JONES_KYC",
           content: {
@@ -460,8 +461,10 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
           },
           status: "PENDING",
         },
-        ctx.user!
+        `User:${ctx.user!.id}`
       );
+
+      return reply;
     } catch (error: any) {
       if (error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(

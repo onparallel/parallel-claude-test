@@ -57,43 +57,18 @@ export function RecipientViewPetitionFieldTaxDocuments({
   const popupRef = useRef<Window>();
   useInterval(
     async (done) => {
-      if (field.options.legacy) {
-        if (field.replies.length > 0) {
+      if (field.replies.length > 0) {
+        setState("IDLE");
+        done();
+      } else if (state === "FETCHING") {
+        if (isDefined(popupRef.current) && popupRef.current.closed && field.options.legacy) {
           setState("IDLE");
           done();
-        } else if (state === "FETCHING") {
-          if (isDefined(popupRef.current) && popupRef.current.closed) {
-            setState("IDLE");
-            done();
-          } else {
-            onRefreshField();
-          }
         } else {
-          done();
+          onRefreshField();
         }
       } else {
-        if (state === "FETCHING") {
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_PARALLEL_URL}/api/webhooks/bankflip/${field.id}/status`
-          );
-          const json = await response.json();
-          if (isDefined(popupRef.current) && popupRef.current.closed) {
-            if (json.status === "uploading") {
-              // server is still uploading file replies, keep polling
-              onRefreshField();
-            } else if (json.status === "idle") {
-              // server didn't start uploading files, if popup is closed the process can be cancelled
-              setState("IDLE");
-              done();
-            }
-          }
-
-          if (json.status === "completed") {
-            onRefreshField();
-            setState("IDLE");
-            done();
-          }
-        }
+        done();
       }
     },
     5000,
@@ -180,6 +155,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
               >
                 <RecipientViewPetitionFieldReplyFileUpload
                   id={`reply-${field.id}-${reply.id}`}
+                  type="ES_TAX_DOCUMENTS"
                   reply={reply}
                   isDisabled={isDisabled || isDeletingReply[reply.id]}
                   onRemove={() => handleDeletePetitionReply({ replyId: reply.id })}

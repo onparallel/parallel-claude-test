@@ -531,7 +531,11 @@ export const PublicPetitionFieldReply = objectType({
                 extension: extension(file.content_type) || null,
                 uploadComplete: file.upload_complete,
               }
-            : {};
+            : {
+                ...(root.type === "ES_TAX_DOCUMENTS"
+                  ? { request: root.content.request, error: root.content.error }
+                  : {}),
+              };
         } else {
           return root.content ?? {};
         }

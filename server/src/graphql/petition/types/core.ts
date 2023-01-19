@@ -910,7 +910,11 @@ export const PetitionFieldReply = objectType({
                 uploadComplete: file.upload_complete,
                 ...(root.type === "DOW_JONES_KYC" ? { entity: root.content.entity } : {}),
               }
-            : {};
+            : {
+                ...(root.type === "ES_TAX_DOCUMENTS"
+                  ? { request: root.content.request, error: root.content.error }
+                  : {}),
+              };
         } else {
           return root.content ?? {};
         }

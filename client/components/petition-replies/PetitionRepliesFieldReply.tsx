@@ -109,8 +109,10 @@ export function PetitionRepliesFieldReply({
               paddingLeft={2}
             >
               <HStack alignItems={"center"} gridGap={2} spacing={0}>
-                {reply.isAnonymized ? (
+                {reply.isAnonymized && !content.error ? (
                   <ReplyNotAvailable type={type} />
+                ) : type === "ES_TAX_DOCUMENTS" && content.error ? (
+                  <Text>{content.request.model.type}</Text>
                 ) : isFileTypeField(type) && type !== "DOW_JONES_KYC" ? (
                   <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
                     <VisuallyHidden>
@@ -194,7 +196,8 @@ export function PetitionRepliesFieldReply({
           borderColor="gray.200"
           paddingLeft={2}
         >
-          {isFileTypeField(type) && reply.content.uploadComplete === false ? (
+          {isFileTypeField(type) &&
+          (reply.content.uploadComplete === false || reply.content.error) ? (
             <Text color="red.500">
               <FormattedMessage
                 id="petition-replies.petition-field-reply.file-upload.file-incomplete"

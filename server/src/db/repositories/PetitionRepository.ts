@@ -1835,29 +1835,30 @@ export class PetitionRepository extends BaseRepository {
     }, t);
   }
 
-  async createPetitionFieldReply<TCreator extends User | Contact>(
-    data: TCreator extends User
-      ? Omit<CreatePetitionFieldReply, "petition_access_id"> & {
-          user_id: number;
-        }
-      : Omit<CreatePetitionFieldReply, "user_id"> & {
-          petition_access_id: number;
-        },
-    creator: TCreator
+  async createPetitionFieldReply(
+    petitionFieldId: number,
+    data: MaybeArray<Omit<CreatePetitionFieldReply, "petition_field_id">>,
+    createdBy: string
   ) {
-    const createdBy = isDefined((data as any).petition_access_id) ? "Contact" : "User";
-    const field = await this.loadField(data.petition_field_id);
+    const dataArray = unMaybeArray(data);
+
+    const field = await this.loadField(petitionFieldId);
     if (!field) {
-      throw new Error(`PetitionField:${data.petition_field_id} not found`);
+      throw new Error(`PetitionField:${petitionFieldId} not found`);
     }
     const petition = (await this.loadPetition(field.petition_id))!;
 
-    this.loadRepliesForField.dataloader.clear(data.petition_field_id);
-    const [reply] = await this.insert("petition_field_reply", {
-      ...data,
-      updated_by: `${createdBy}:${creator.id}`,
-      created_by: `${createdBy}:${creator.id}`,
-    });
+    this.loadRepliesForField.dataloader.clear(petitionFieldId);
+
+    const replies = await this.insert(
+      "petition_field_reply",
+      dataArray.map((data) => ({
+        ...data,
+        petition_field_id: petitionFieldId,
+        updated_by: createdBy,
+        created_by: createdBy,
+      }))
+    );
 
     await this.updatePetition(
       field.petition_id,
@@ -1866,26 +1867,32 @@ export class PetitionRepository extends BaseRepository {
         closed_at: !field.is_internal ? null : petition.closed_at,
         credits_used: 1,
       },
-      `${createdBy}:${creator.id}`
+      createdBy
     );
     // clear cache to make sure petition status is updated in next graphql calls
     this.loadPetition.dataloader.clear(field.petition_id);
 
-    await this.createEventWithDelay(
-      {
-        type: "REPLY_CREATED",
-        petition_id: field.petition_id,
-        data: {
-          ...(createdBy === "User"
-            ? { user_id: reply.user_id! }
-            : { petition_access_id: reply.petition_access_id! }),
-          petition_field_id: reply.petition_field_id,
-          petition_field_reply_id: reply.id,
-        },
+    await pMap(
+      replies,
+      async (reply) => {
+        await this.createEventWithDelay(
+          {
+            type: "REPLY_CREATED",
+            petition_id: field.petition_id,
+            data: {
+              ...(createdBy.startsWith("User")
+                ? { user_id: reply.user_id! }
+                : { petition_access_id: reply.petition_access_id! }),
+              petition_field_id: reply.petition_field_id,
+              petition_field_reply_id: reply.id,
+            },
+          },
+          this.REPLY_EVENTS_DELAY_SECONDS
+        );
       },
-      this.REPLY_EVENTS_DELAY_SECONDS
+      { concurrency: 1 }
     );
-    return reply;
+    return replies;
   }
 
   async updatePetitionFieldReply(
@@ -5697,13 +5704,13 @@ export class PetitionRepository extends BaseRepository {
       replies,
       async ({ fieldId, fieldType, reply }) => {
         await this.createPetitionFieldReply(
+          fieldId,
           {
             user_id: owner.id,
-            petition_field_id: fieldId,
             content: { value: reply },
             type: fieldType,
           },
-          owner
+          `User:${owner.id}`
         );
       },
       { concurrency: 1 }

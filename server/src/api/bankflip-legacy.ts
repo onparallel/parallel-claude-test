@@ -81,13 +81,13 @@ export const bankflipLegacy = Router()
             : { petition_access_id: fromGlobalId(payload.accessId, "PetitionAccess").id };
 
         await req.context.petitions.createPetitionFieldReply(
+          fieldId,
           {
-            petition_field_id: fieldId,
             type: "ES_TAX_DOCUMENTS",
             content: { file_upload_id: fileUpload.id },
             ...data,
           },
-          user ?? contact!
+          createdBy
         );
       }
       res.sendStatus(200).end();

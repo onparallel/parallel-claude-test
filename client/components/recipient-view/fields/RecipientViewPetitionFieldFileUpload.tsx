@@ -18,6 +18,7 @@ import { FileName } from "@parallel/components/common/FileName";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { useTone } from "@parallel/components/common/ToneProvider";
+import { PetitionFieldType } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { MaybePromise } from "@parallel/utils/types";
 import { AnimatePresence, motion } from "framer-motion";
@@ -85,6 +86,7 @@ export function RecipientViewPetitionFieldFileUpload({
               >
                 <RecipientViewPetitionFieldReplyFileUpload
                   id={`reply-${field.id}-${reply.id}`}
+                  type="FILE_UPLOAD"
                   reply={reply}
                   isDisabled={isDisabled || isDeletingReply[reply.id] || reply.isAnonymized}
                   onRemove={() => handleDeletePetitionReply({ replyId: reply.id })}
@@ -109,6 +111,7 @@ export function RecipientViewPetitionFieldFileUpload({
 
 interface RecipientViewPetitionFieldReplyFileUploadProps {
   id: string;
+  type: PetitionFieldType;
   reply: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
   isDisabled: boolean;
   onRemove?: () => void;
@@ -119,6 +122,7 @@ interface RecipientViewPetitionFieldReplyFileUploadProps {
 export function RecipientViewPetitionFieldReplyFileUpload({
   id,
   reply,
+  type,
   isDisabled,
   onRemove,
   onDownload,
@@ -127,7 +131,8 @@ export function RecipientViewPetitionFieldReplyFileUpload({
   const intl = useIntl();
   const tone = useTone();
   const uploadHasFailed =
-    reply.content.uploadComplete === false && reply.content.progress === undefined;
+    (reply.content.uploadComplete === false && reply.content.progress === undefined) ||
+    reply.content.error;
 
   return (
     <Stack direction="row" alignItems="center" backgroundColor="white" id={id}>
@@ -153,7 +158,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
       </Center>
       <Box flex="1" overflow="hidden" paddingBottom="2px">
         <Flex minWidth={0} whiteSpace="nowrap" alignItems="baseline">
-          {!reply.isAnonymized ? (
+          {!reply.isAnonymized && !reply.content.error ? (
             <>
               <FileName value={reply.content?.filename} />
               <Text as="span" marginX={2}>
@@ -163,14 +168,16 @@ export function RecipientViewPetitionFieldReplyFileUpload({
                 <FileSize value={reply.content?.size} />
               </Text>
             </>
-          ) : (
+          ) : reply.isAnonymized ? (
             <Text textStyle="hint">
               <FormattedMessage
                 id="generic.document-not-available"
                 defaultMessage="Document not available"
               />
             </Text>
-          )}
+          ) : type === "ES_TAX_DOCUMENTS" ? (
+            <Text>{reply.content.request.model.type}</Text>
+          ) : null}
         </Flex>
         {reply.isAnonymized || (reply.content!.uploadComplete === false && !uploadHasFailed) ? (
           <Center height="18px">
@@ -226,7 +233,9 @@ export function RecipientViewPetitionFieldReplyFileUpload({
       ) : null}
       {onDownload !== undefined ? (
         <IconButtonWithTooltip
-          isDisabled={reply.content!.uploadComplete === false || isDownloadDisabled}
+          isDisabled={
+            reply.content!.uploadComplete === false || isDownloadDisabled || reply.content.error
+          }
           onClick={() => onDownload(reply.id)}
           variant="ghost"
           icon={<DownloadIcon />}

@@ -50,15 +50,17 @@ export const publicCreatePetitionFieldReply = mutationField("publicCreatePetitio
   validateArgs: validateFieldReply("fieldId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
     const field = (await ctx.petitions.loadField(args.fieldId))!;
-    return await ctx.petitions.createPetitionFieldReply(
+    const [reply] = await ctx.petitions.createPetitionFieldReply(
+      args.fieldId,
       {
-        petition_field_id: args.fieldId,
         petition_access_id: ctx.access!.id,
         type: field.type,
         content: { value: args.reply },
       },
-      ctx.contact!
+      `Contact:${ctx.contact!.id}`
     );
+
+    return reply;
   },
 });
 
@@ -190,16 +192,16 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
       },
       `Contact:${ctx.contact!.id}`
     );
-    const [presignedPostData, reply] = await Promise.all([
+    const [presignedPostData, [reply]] = await Promise.all([
       ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
       ctx.petitions.createPetitionFieldReply(
+        args.fieldId,
         {
-          petition_field_id: args.fieldId,
           petition_access_id: ctx.access!.id,
           type: "FILE_UPLOAD",
           content: { file_upload_id: file.id },
         },
-        ctx.contact!
+        `Contact:${ctx.contact!.id}`
       ),
     ]);
     return { presignedPostData, reply };

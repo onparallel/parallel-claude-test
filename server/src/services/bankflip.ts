@@ -1,6 +1,7 @@
 import { inject, injectable } from "inversify";
 import { RequestInit } from "node-fetch";
 import pMap from "p-map";
+import { isDefined } from "remeda";
 import { Config, CONFIG } from "../config";
 import { ContactRepository } from "../db/repositories/ContactRepository";
 import { FileRepository } from "../db/repositories/FileRepository";
@@ -13,7 +14,6 @@ import { random } from "../util/token";
 import { Maybe } from "../util/types";
 import { FETCH_SERVICE, IFetchService } from "./fetch";
 import { OrganizationCreditsService, ORGANIZATION_CREDITS_SERVICE } from "./organization-credits";
-import { IRedis, REDIS } from "./redis";
 import { StorageService, STORAGE_SERVICE } from "./storage";
 
 export type SessionPayload =
@@ -28,19 +28,21 @@ export interface SessionCompletedWebhookEvent {
   };
 }
 
+interface ModelRequest {
+  type: string;
+  year?: number;
+  month?: "01" | "02" | "03" | "04" | "05" | "06" | "07" | "08" | "09" | "10" | "11" | "12";
+  quarter?: "Q1" | "Q2" | "Q3" | "Q4";
+  licensePlate?: string;
+}
+
 /** Each time that modelRequest has extracted one or more documents. */
 export interface ModelExtractedWebhookEvent {
   name: "MODEL_EXTRACTED";
   payload: {
     sessionId: string;
     documentIds: string[];
-    model: {
-      type: string;
-      year?: number;
-      month?: "01" | "02" | "03" | "04" | "05" | "06" | "07" | "08" | "09" | "10" | "11" | "12";
-      quarter?: "Q1" | "Q2" | "Q3" | "Q4";
-      licensePlate?: string;
-    };
+    model: ModelRequest;
   };
 }
 
@@ -49,9 +51,7 @@ interface ModelRequestDocument {
   createdAt: string;
   extension: string;
   id: string;
-  model: {
-    type: string;
-  };
+  model: ModelRequest;
   name: string;
   sessionId: string;
 }
@@ -61,11 +61,19 @@ interface CreateSessionResponse {
   widgetLink: string;
 }
 
+interface NoDocumentReason {
+  reason: string;
+  subreason: Maybe<string>;
+}
+
+interface ModelRequestOutcome {
+  completed: boolean;
+  documents: Maybe<ModelRequestDocument[]>;
+  modelRequest: { model: ModelRequest };
+  noDocumentReasons: Maybe<NoDocumentReason[]>;
+}
 interface SessionSummaryResponse {
-  modelRequestOutcomes: {
-    completed: boolean;
-    documents: Maybe<ModelRequestDocument[]>;
-  }[];
+  modelRequestOutcomes: ModelRequestOutcome[];
 }
 
 export const BANKFLIP_SERVICE = Symbol.for("BANKFLIP_SERVICE");
@@ -87,14 +95,13 @@ export class BankflipService implements IBankflipService {
     @inject(STORAGE_SERVICE) private storage: StorageService,
     @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: OrganizationCreditsService,
     @inject(FETCH_SERVICE) private fetch: IFetchService,
-    @inject(CONFIG) private config: Config,
-    @inject(REDIS) private redis: IRedis
+    @inject(CONFIG) private config: Config
   ) {}
 
   private async apiRequest<T>(
     url: string,
     init?: RequestInit,
-    type: "json" | "buffer" = "json"
+    type: "json" | "buffer" | "text" = "json"
   ): Promise<T> {
     const response = await this.fetch.fetch(`${this.config.bankflip.host}${url}`, {
       headers: {
@@ -109,10 +116,6 @@ export class BankflipService implements IBankflipService {
   }
 
   async createSession(payload: SessionPayload) {
-    // there is a bankflip request started, but documents are not yet being processed.
-    // in this stage client needs to stop polling if popup is closed
-    await this.redis.set(`bankflip-${payload.fieldId}-status`, "idle", 60);
-
     const token = await sign(payload, this.config.security.jwtSecret, { expiresIn: "1d" });
 
     const baseWebhookUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
@@ -138,25 +141,36 @@ export class BankflipService implements IBankflipService {
     payload: SessionPayload,
     event: SessionCompletedWebhookEvent
   ): Promise<void> {
-    // webhook received, set uploading status on redis so client keeps polling for result even if popup is closed
-    await this.redis.set(`bankflip-${payload.fieldId}-status`, "uploading", 60);
-
     await this.consumePetitionCredits(payload);
 
     const summary = await this.apiRequest<SessionSummaryResponse>(
       `/session/${event.payload.sessionId}/summary`
     );
 
-    await pMap(
+    const replyContents = await pMap(
       summary.modelRequestOutcomes.filter((outcome) => outcome.completed),
-      async (model) => {
-        await this.extractAndUploadModelDocuments(payload, model.documents);
-      },
+      async (model) => await this.extractAndUploadModelDocuments(payload, model),
       { concurrency: 2 }
     );
 
-    // set a 1 min key in redis so front-end is able to recognize when all models have been processed to stop polling (success or error)
-    await this.redis.set(`bankflip-${payload.fieldId}-status`, "completed", 60);
+    const fieldId = fromGlobalId(payload.fieldId, "PetitionField").id;
+    const data =
+      "userId" in payload
+        ? { user_id: fromGlobalId(payload.userId, "User").id }
+        : { petition_access_id: fromGlobalId(payload.accessId, "PetitionAccess").id };
+
+    const createdBy =
+      "user_id" in data ? `User:${data.user_id}` : `PetitionAccess:${data.petition_access_id}`;
+
+    await this.petitions.createPetitionFieldReply(
+      fieldId,
+      replyContents.map((content) => ({
+        type: "ES_TAX_DOCUMENTS",
+        content,
+        ...data,
+      })),
+      createdBy
+    );
   }
 
   private async consumePetitionCredits(payload: SessionPayload) {
@@ -168,13 +182,13 @@ export class BankflipService implements IBankflipService {
     }
   }
 
-  /** given a list of documents of the same model, download the contents and upload them as a field reply */
+  /**
+   * extracts the contents of the documents on a given model outcome, uploads the files to S3 and returns the data for creating an ES_TAX_DOCUMENTS reply.
+   */
   private async extractAndUploadModelDocuments(
     payload: SessionPayload,
-    documents: Maybe<ModelRequestDocument[]>
-  ) {
-    const fieldId = fromGlobalId(payload.fieldId, "PetitionField").id;
-
+    modelRequestOutcome: ModelRequestOutcome
+  ): Promise<any> {
     const creator =
       "userId" in payload
         ? await this.users.loadUser(fromGlobalId(payload.userId, "User").id)
@@ -182,58 +196,66 @@ export class BankflipService implements IBankflipService {
             fromGlobalId(payload.accessId, "PetitionAccess").id
           );
 
-    const jsonDocument = (documents ?? []).find((doc) => doc.extension === "json");
-    const pdfDocument = (documents ?? []).find((doc) => doc.extension === "pdf");
+    const data =
+      "userId" in payload
+        ? { user_id: fromGlobalId(payload.userId, "User").id }
+        : { petition_access_id: fromGlobalId(payload.accessId, "PetitionAccess").id };
 
-    try {
-      if (!pdfDocument) {
-        throw new Error(
-          `Couldn't find a PDF document to be uploaded as reply on PetitionField:${fieldId}`
-        );
-      }
+    if (isDefined(modelRequestOutcome.noDocumentReasons)) {
+      return {
+        file_upload_id: null,
+        request: modelRequestOutcome.modelRequest,
+        error: modelRequestOutcome.noDocumentReasons,
+      };
+    }
 
-      const jsonContents = jsonDocument
-        ? await this.apiRequest<any>(`/document/${jsonDocument.id}/content`)
-        : null;
+    const documents: Record<string, Maybe<ModelRequestDocument>> = {};
+    ["pdf", "json", "xml"].forEach((extension) => {
+      documents[extension] =
+        modelRequestOutcome.documents?.find((d) => d.extension === extension) ?? null;
+    });
 
-      const pdfBuffer = await this.apiRequest<Buffer>(
-        `/document/${pdfDocument.id}/content`,
+    if (!documents.pdf) {
+      // should not happen
+      return {
+        file_upload_id: null,
+        request: modelRequestOutcome.modelRequest,
+        error: [],
+      };
+    }
+
+    const pdfBuffer = await this.apiRequest<Buffer>(
+      `/document/${documents.pdf.id}/content`,
+      {},
+      "buffer"
+    );
+
+    const path = random(16);
+    const res = await this.storage.fileUploads.uploadFile(path, "application/pdf", pdfBuffer);
+    const [file] = await this.files.createFileUpload(
+      {
+        path,
+        content_type: "application/pdf",
+        filename: documents.pdf.name,
+        size: res["ContentLength"]!.toString(),
+        upload_complete: true,
+      },
+      "userId" in payload ? `User:${creator!.id}` : `Contact:${creator!.id}`
+    );
+
+    const replyContents: Record<string, any> = {
+      file_upload_id: file.id,
+      request: modelRequestOutcome.modelRequest,
+    };
+
+    await pMap([documents.json, documents.xml].filter(isDefined), async (document) => {
+      replyContents[`${document.extension}_contents`] = await this.apiRequest<any>(
+        `/document/${document.id}/content`,
         {},
-        "buffer"
+        document.extension === "json" ? "json" : "text"
       );
+    });
 
-      const path = random(16);
-      const res = await this.storage.fileUploads.uploadFile(path, "application/pdf", pdfBuffer);
-      const [file] = await this.files.createFileUpload(
-        {
-          path,
-          content_type: "application/pdf",
-          filename: pdfDocument.name,
-          size: res["ContentLength"]!.toString(),
-          upload_complete: true,
-        },
-        "userId" in payload ? `User:${creator!.id}` : `Contact:${creator!.id}`
-      );
-
-      const data =
-        "userId" in payload
-          ? { user_id: fromGlobalId(payload.userId, "User").id }
-          : { petition_access_id: fromGlobalId(payload.accessId, "PetitionAccess").id };
-
-      await this.petitions.createPetitionFieldReply(
-        {
-          petition_field_id: fieldId,
-          type: "ES_TAX_DOCUMENTS",
-          content: {
-            file_upload_id: file.id,
-            json_contents: jsonDocument
-              ? { model: jsonDocument.model, document: jsonContents }
-              : null,
-          },
-          ...data,
-        },
-        creator!
-      );
-    } catch {}
+    return replyContents;
   }
 }
