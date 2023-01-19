@@ -96,7 +96,15 @@ export class SignatureService implements ISignatureService {
 
     const emails = allSigners.map((s) => s.email);
     if (process.env.NODE_ENV === "development") {
-      if (!emails.every((email) => this.config.development.whitelistedEmails.includes(email))) {
+      if (
+        !emails.every((email) =>
+          this.config.development.whitelistedEmails.some((e) => {
+            const [l, d] = e.split("@");
+            const [local, domain] = email.split("@");
+            return d === domain && (l === local || local.startsWith(l + "+"));
+          })
+        )
+      ) {
         throw new Error(
           "DEVELOPMENT: Every recipient email must be whitelisted in .development.env"
         );
