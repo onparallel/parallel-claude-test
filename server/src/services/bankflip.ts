@@ -4,7 +4,9 @@ import pMap from "p-map";
 import { isDefined } from "remeda";
 import { Config, CONFIG } from "../config";
 import { ContactRepository } from "../db/repositories/ContactRepository";
+import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import { FileRepository } from "../db/repositories/FileRepository";
+import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { getBaseWebhookUrl } from "../util/getBaseWebhookUrl";
@@ -92,6 +94,8 @@ export class BankflipService implements IBankflipService {
     @inject(UserRepository) private users: UserRepository,
     @inject(ContactRepository) private contacts: ContactRepository,
     @inject(FileRepository) private files: FileRepository,
+    @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository,
+    @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(STORAGE_SERVICE) private storage: StorageService,
     @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: OrganizationCreditsService,
     @inject(FETCH_SERVICE) private fetch: IFetchService,
@@ -124,6 +128,12 @@ export class BankflipService implements IBankflipService {
     if (!field?.options.requests) {
       throw new Error(`Expected to have models configured in PetitionField:${fieldId}`);
     }
+    const petition = await this.petitions.loadPetition(field.petition_id);
+    const organization = await this.organizations.loadOrg(petition!.org_id);
+    const hasRemoveParallelBranding = await this.featureFlags.orgHasFeatureFlag(
+      organization!.id,
+      "REMOVE_PARALLEL_BRANDING"
+    );
 
     return await this.apiRequest<CreateSessionResponse>("/session", {
       method: "POST",
@@ -131,7 +141,7 @@ export class BankflipService implements IBankflipService {
         requests: field.options.requests,
         webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/v2?token=${token}`,
         customization: {
-          companyName: "Parallel",
+          companyName: hasRemoveParallelBranding ? organization!.name : "Parallel",
         },
       }),
     });
