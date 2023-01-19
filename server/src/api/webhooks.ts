@@ -8,9 +8,9 @@ import { signaturitEventHandlers } from "./webhook-event-handlers/signaturit-eve
 export const webhooks = Router()
   .use("/signaturit", signaturitEventHandlers)
   // bankflip webhook for ES_TAX_DOCUMENTS field completion
-  .use("/bankflip", bankflip)
+  .use("/bankflip/v2", bankflip)
   // TODO Bankflip Legacy: remove when deprecated
-  .use("/bankflip-legacy", bankflipLegacy)
+  .use("/bankflip", bankflipLegacy)
   // SCIM endpoints for User Provisioning
   .use("/scim", scim)
   // AppSumo endpoints for product tiers purchase/upgrade/downgrade/refund

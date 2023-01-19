@@ -36,7 +36,7 @@ export class BankflipLegacyService implements IBankflipLegacyService {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip-legacy?token=${token}`,
+        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip?token=${token}`,
         userId: payload.userId,
         metadata: {
           ...payload,
@@ -71,7 +71,7 @@ export class BankflipLegacyService implements IBankflipLegacyService {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip-legacy?token=${token}`,
+        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip?token=${token}`,
         userId: payload.keycode,
         metadata: payload,
       }),

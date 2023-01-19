@@ -129,7 +129,7 @@ export class BankflipService implements IBankflipService {
       method: "POST",
       body: JSON.stringify({
         requests: field.options.requests,
-        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip?token=${token}`,
+        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/v2?token=${token}`,
         customization: {
           companyName: "Parallel",
         },
