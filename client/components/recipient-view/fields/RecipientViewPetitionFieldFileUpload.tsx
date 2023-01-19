@@ -18,6 +18,7 @@ import { FileName } from "@parallel/components/common/FileName";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { useTone } from "@parallel/components/common/ToneProvider";
+import { EsTaxDocumentsContentErrorMessage } from "@parallel/components/petition-common/EsTaxDocumentsContentErrorMessage";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { MaybePromise } from "@parallel/utils/types";
@@ -131,8 +132,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
   const intl = useIntl();
   const tone = useTone();
   const uploadHasFailed =
-    (reply.content.uploadComplete === false && reply.content.progress === undefined) ||
-    reply.content.error;
+    reply.content.uploadComplete === false && reply.content.progress === undefined;
 
   return (
     <Stack direction="row" alignItems="center" backgroundColor="white" id={id}>
@@ -152,34 +152,37 @@ export function RecipientViewPetitionFieldReplyFileUpload({
             boxSize={5}
             filename={reply.content!.filename}
             contentType={reply.content!.contentType}
-            hasFailed={uploadHasFailed}
+            hasFailed={uploadHasFailed || reply.content.error}
           />
         ) : null}
       </Center>
       <Box flex="1" overflow="hidden" paddingBottom="2px">
         <Flex minWidth={0} whiteSpace="nowrap" alignItems="baseline">
-          {!reply.isAnonymized && !reply.content.error ? (
-            <>
-              <FileName value={reply.content?.filename} />
-              <Text as="span" marginX={2}>
-                -
-              </Text>
-              <Text as="span" fontSize="xs" color="gray.500">
-                <FileSize value={reply.content?.size} />
-              </Text>
-            </>
-          ) : reply.isAnonymized ? (
+          {!reply.isAnonymized ? (
+            reply.content.error ? (
+              <Text>{reply.content.request.model.type}</Text>
+            ) : (
+              <>
+                <FileName value={reply.content?.filename} />
+                <Text as="span" marginX={2}>
+                  -
+                </Text>
+                <Text as="span" fontSize="xs" color="gray.500">
+                  <FileSize value={reply.content?.size} />
+                </Text>
+              </>
+            )
+          ) : (
             <Text textStyle="hint">
               <FormattedMessage
                 id="generic.document-not-available"
                 defaultMessage="Document not available"
               />
             </Text>
-          ) : type === "ES_TAX_DOCUMENTS" ? (
-            <Text>{reply.content.request.model.type}</Text>
-          ) : null}
+          )}
         </Flex>
-        {reply.isAnonymized || (reply.content!.uploadComplete === false && !uploadHasFailed) ? (
+        {reply.isAnonymized ||
+        (reply.content!.uploadComplete === false && !uploadHasFailed && !reply.content.error) ? (
           <Center height="18px">
             <Progress
               borderRadius="sm"
@@ -202,6 +205,8 @@ export function RecipientViewPetitionFieldReplyFileUpload({
                   }}
                 />
               </Text>
+            ) : type === "ES_TAX_DOCUMENTS" && reply.content.error ? (
+              <EsTaxDocumentsContentErrorMessage error={reply.content.error} />
             ) : (
               <DateTime value={reply.createdAt} format={FORMATS.LLL} useRelativeTime />
             )}

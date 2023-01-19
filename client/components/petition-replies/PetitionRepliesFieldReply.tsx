@@ -26,6 +26,7 @@ import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
 import { UserOrContactReference } from "../petition-activity/UserOrContactReference";
 import { DowJonesRiskLabel } from "../petition-common/DowJonesRiskLabel";
+import { EsTaxDocumentsContentErrorMessage } from "../petition-common/EsTaxDocumentsContentErrorMessage";
 import { CopyOrDownloadReplyButton } from "./CopyOrDownloadReplyButton";
 
 export interface PetitionRepliesFieldReplyProps {
@@ -109,7 +110,7 @@ export function PetitionRepliesFieldReply({
               paddingLeft={2}
             >
               <HStack alignItems={"center"} gridGap={2} spacing={0}>
-                {reply.isAnonymized && !content.error ? (
+                {reply.isAnonymized ? (
                   <ReplyNotAvailable type={type} />
                 ) : type === "ES_TAX_DOCUMENTS" && content.error ? (
                   <Text>{content.request.model.type}</Text>
@@ -198,12 +199,16 @@ export function PetitionRepliesFieldReply({
         >
           {isFileTypeField(type) &&
           (reply.content.uploadComplete === false || reply.content.error) ? (
-            <Text color="red.500">
-              <FormattedMessage
-                id="petition-replies.petition-field-reply.file-upload.file-incomplete"
-                defaultMessage="There was an error uploading the file. Please request a new upload."
-              />
-            </Text>
+            reply.content.uploadComplete === false ? (
+              <Text color="red.500">
+                <FormattedMessage
+                  id="petition-replies.petition-field-reply.file-upload.file-incomplete"
+                  defaultMessage="There was an error uploading the file. Please request a new upload."
+                />
+              </Text>
+            ) : type === "ES_TAX_DOCUMENTS" ? (
+              <EsTaxDocumentsContentErrorMessage error={reply.content.error} />
+            ) : null
           ) : (
             <Text color="gray.500">
               {reply.updatedBy?.__typename === "User" && reply.updatedBy.isMe ? (

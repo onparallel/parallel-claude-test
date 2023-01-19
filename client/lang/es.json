@@ -1525,6 +1525,36 @@
     "context": "Error"
   },
   {
+    "term": "component.es-tax-documents-content-error-message.blocked-credentials",
+    "definition": "La Administración Pública bloqueó su acceso por razones de seguridad. Por favor, vuelva a intentarlo más tarde.",
+    "context": "The Public Administration has blocked your access for security reasons. Please, try again later."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.document-not-found",
+    "definition": "No pudimos encontrar el documento solicitado en la Administración Pública",
+    "context": "We couldn't find the requested document in the Public Administration"
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.generic",
+    "definition": "Ocurrió un error desconocido.",
+    "context": "An unknown error happened."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.timeout",
+    "definition": "La Administración Pública tardó demasiado en procesar tu solicitud. Por favor, vuelva a intentarlo.",
+    "context": "The Public Administration took too long to process your request. Please, try again."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.user-aborted",
+    "definition": "Se canceló la solicitud antes de que se pueda completar. Por favor, vuelva a intentarlo.",
+    "context": "You cancelled the request before it could finish. Please, try again."
+  },
+  {
+    "term": "component.es-tax-documents-content-error-message.user-not-registered",
+    "definition": "El usuario no está registrado en la Administración Pública",
+    "context": "The user is not registered in the Public Administration"
+  },
+  {
     "term": "component.export-replies-dialog.download-files",
     "definition": "Descargar ZIP con los archivos",
     "context": "Download files as a ZIP"
