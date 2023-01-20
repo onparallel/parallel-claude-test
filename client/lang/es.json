@@ -3920,6 +3920,11 @@
     "context": "Send as..."
   },
   {
+    "term": "component.petition-template-request-message.send-as-help",
+    "definition": "Opción predeterminada. Si el usuario no tiene delegado el envío por el usuario elegido, se enviará por defecto desde su propio correo.",
+    "context": "Default option. If the user cannot send on behalf of the chosen user, the user's own email would be used by default."
+  },
+  {
     "term": "component.petition-template.delete-label",
     "definition": "Eliminar plantilla",
     "context": "Delete template"

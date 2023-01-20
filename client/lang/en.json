@@ -3920,6 +3920,11 @@
     "context": "Send as..."
   },
   {
+    "term": "component.petition-template-request-message.send-as-help",
+    "definition": "Default option. If the user cannot send on behalf of the chosen user, the user's own email would be used by default.",
+    "context": "Default option. If the user cannot send on behalf of the chosen user, the user's own email would be used by default."
+  },
+  {
     "term": "component.petition-template.delete-label",
     "definition": "Delete template",
     "context": "Delete template"

@@ -5,6 +5,7 @@ import {
   Box,
   FormControl,
   FormLabel,
+  HStack,
   Image,
   Input,
   Switch,
@@ -110,20 +111,22 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
               <Switch isChecked={isEnabled} onChange={handleSwitchChange} isDisabled={isReadOnly} />
             }
           >
-            <FormattedMessage
-              id="component.petition-template-completing-message.card-header"
-              defaultMessage="Thank you message"
-            />
-            <HelpPopover>
+            <HStack>
               <FormattedMessage
-                id="component.petition-template-completing-message.popover"
-                defaultMessage="Your message will be displayed in a pop-up upon completion."
+                id="component.petition-template-completing-message.card-header"
+                defaultMessage="Thank you message"
               />
-              <Image
-                marginTop={2}
-                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/thankyou_message_${intl.locale}.gif`}
-              />
-            </HelpPopover>
+              <HelpPopover>
+                <FormattedMessage
+                  id="component.petition-template-completing-message.popover"
+                  defaultMessage="Your message will be displayed in a pop-up upon completion."
+                />
+                <Image
+                  marginTop={2}
+                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/thankyou_message_${intl.locale}.gif`}
+                />
+              </HelpPopover>
+            </HStack>
           </CardHeader>
           <Box padding={4}>
             <Text marginBottom={2}>

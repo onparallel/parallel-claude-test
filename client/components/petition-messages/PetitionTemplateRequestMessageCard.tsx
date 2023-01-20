@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Stack, Text } from "@chakra-ui/react";
+import { HStack, Stack, Text } from "@chakra-ui/react";
 import { EmailIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
@@ -15,6 +15,7 @@ import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useCallback, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { Card, CardHeader } from "../common/Card";
+import { HelpPopover } from "../common/HelpPopover";
 import { UserSelect } from "../common/UserSelect";
 import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
 
@@ -86,12 +87,22 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
             </Text>
             {user.hasOnBehalfOf ? (
               <>
-                <Text fontWeight={500}>
-                  <FormattedMessage
-                    id="component.petition-template-request-message.send-as"
-                    defaultMessage="Send as..."
-                  />
-                </Text>
+                <HStack>
+                  <Text fontWeight={500}>
+                    <FormattedMessage
+                      id="component.petition-template-request-message.send-as"
+                      defaultMessage="Send as..."
+                    />
+                  </Text>
+                  <HelpPopover>
+                    <Text>
+                      <FormattedMessage
+                        id="component.petition-template-request-message.send-as-help"
+                        defaultMessage="Default option. If the user cannot send on behalf of the chosen user, the user's own email would be used by default."
+                      />
+                    </Text>
+                  </HelpPopover>
+                </HStack>
                 <UserSelect
                   onSearch={handleSearchUsers}
                   value={onBehalf}
