@@ -184,7 +184,7 @@ const ReportsCard = chakraForwardRef<"div", ReportsCardProps>(function ReportsCa
             role="presentation"
           />
         </Center>
-        <Stack padding={4} paddingTop={2} paddingBottom={6}>
+        <Stack padding={4} paddingTop={2} paddingBottom={6} minHeight="124px">
           <HStack align="center" wrap="wrap" spacing={0} gap={2}>
             {isPending ? (
               <>
