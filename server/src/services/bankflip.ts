@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { RequestInit } from "node-fetch";
 import pMap from "p-map";
-import { isDefined } from "remeda";
+import { groupBy, isDefined } from "remeda";
 import { Config, CONFIG } from "../config";
 import { ContactRepository } from "../db/repositories/ContactRepository";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
@@ -11,6 +11,7 @@ import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { getBaseWebhookUrl } from "../util/getBaseWebhookUrl";
 import { fromGlobalId } from "../util/globalId";
+import { pFlatMap } from "../util/promises/pFlatMap";
 import { random } from "../util/token";
 import { Maybe } from "../util/types";
 import { FETCH_SERVICE, IFetchService } from "./fetch";
@@ -168,7 +169,7 @@ export class BankflipService implements IBankflipService {
       `/session/${event.payload.sessionId}/summary`
     );
 
-    const replyContents = await pMap(
+    const replyContents = await pFlatMap(
       summary.modelRequestOutcomes,
       async (model) => await this.extractAndUploadModelDocuments(metadata, model),
       { concurrency: 2 }
@@ -209,57 +210,62 @@ export class BankflipService implements IBankflipService {
   private async extractAndUploadModelDocuments(
     metadata: SessionMetadata,
     modelRequestOutcome: ModelRequestOutcome
-  ): Promise<any> {
+  ): Promise<any[]> {
     if (isDefined(modelRequestOutcome.noDocumentReasons)) {
-      return {
-        file_upload_id: null,
-        request: modelRequestOutcome.modelRequest,
-        error: modelRequestOutcome.noDocumentReasons,
-      };
+      return [
+        {
+          file_upload_id: null,
+          request: modelRequestOutcome.modelRequest,
+          error: modelRequestOutcome.noDocumentReasons,
+        },
+      ];
     }
 
-    const documents: Record<string, Maybe<ModelRequestDocument>> = {};
-    ["pdf", "json"].forEach((extension) => {
-      documents[extension] =
-        modelRequestOutcome.documents?.find((d) => d.extension === extension) ?? null;
+    // a set of documents with the same name will be all part of the same PetitionFieldReply
+    const groupedByName = groupBy(modelRequestOutcome.documents ?? [], (d) => d.name);
+    return await pMap(Object.values(groupedByName), async (docs) => {
+      const documents: Record<string, Maybe<ModelRequestDocument>> = {};
+      ["pdf", "json"].forEach((extension) => {
+        documents[extension] = docs.find((d) => d.extension === extension) ?? null;
+      });
+
+      if (!documents.pdf) {
+        // should not happen
+        return {
+          file_upload_id: null,
+          request: modelRequestOutcome.modelRequest,
+          error: [],
+        };
+      }
+
+      const pdfBuffer = await this.apiRequest<Buffer>(
+        `/document/${documents.pdf.id}/content`,
+        {},
+        "buffer"
+      );
+
+      const path = random(16);
+      const res = await this.storage.fileUploads.uploadFile(path, "application/pdf", pdfBuffer);
+      const [file] = await this.files.createFileUpload(
+        {
+          path,
+          content_type: "application/pdf",
+          filename: `${documents.pdf.name}.pdf`,
+          size: res["ContentLength"]!.toString(),
+          upload_complete: true,
+        },
+        "userId" in metadata
+          ? `User:${fromGlobalId(metadata.userId, "User").id}`
+          : `PetitionAccess:${fromGlobalId(metadata.accessId, "PetitionAccess").id}`
+      );
+
+      return {
+        file_upload_id: file.id,
+        request: documents.pdf.model,
+        json_contents: documents.json
+          ? await this.apiRequest<any>(`/document/${documents.json.id}/content`)
+          : null,
+      };
     });
-
-    if (!documents.pdf) {
-      // should not happen
-      return {
-        file_upload_id: null,
-        request: modelRequestOutcome.modelRequest,
-        error: [],
-      };
-    }
-
-    const pdfBuffer = await this.apiRequest<Buffer>(
-      `/document/${documents.pdf.id}/content`,
-      {},
-      "buffer"
-    );
-
-    const path = random(16);
-    const res = await this.storage.fileUploads.uploadFile(path, "application/pdf", pdfBuffer);
-    const [file] = await this.files.createFileUpload(
-      {
-        path,
-        content_type: "application/pdf",
-        filename: documents.pdf.name,
-        size: res["ContentLength"]!.toString(),
-        upload_complete: true,
-      },
-      "userId" in metadata
-        ? `User:${fromGlobalId(metadata.userId, "User").id}`
-        : `PetitionAccess:${fromGlobalId(metadata.accessId, "PetitionAccess").id}`
-    );
-
-    return {
-      file_upload_id: file.id,
-      request: modelRequestOutcome.modelRequest,
-      json_contents: documents.json
-        ? await this.apiRequest<any>(`/document/${documents.json.id}/content`)
-        : null,
-    };
   }
 }
