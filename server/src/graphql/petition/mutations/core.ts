@@ -1250,16 +1250,6 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
       args.status,
       `User:${ctx.user!.id}`
     );
-    if (args.status === "REJECTED") {
-      const petition = await ctx.petitions.loadPetition.raw(args.petitionId);
-      if (petition?.status === "COMPLETED") {
-        await ctx.petitions.updatePetition(
-          args.petitionId,
-          { status: "PENDING" },
-          `User:${ctx.user!.id}`
-        );
-      }
-    }
     return (await ctx.petitions.loadField(args.petitionFieldId))!;
   },
 });
