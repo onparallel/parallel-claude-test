@@ -27,6 +27,7 @@ export function TimeSpan(props: { duration: Duration | number }) {
       value={[
         isDefined(duration.years) ? (
           <FormattedMessage
+            key="years"
             id="component.timespan.years-part"
             defaultMessage="{n, plural, =1{# year} other{# years}}"
             values={{ n: duration.years }}
@@ -34,6 +35,7 @@ export function TimeSpan(props: { duration: Duration | number }) {
         ) : null,
         isDefined(duration.months) ? (
           <FormattedMessage
+            key="months"
             id="component.timespan.months-part"
             defaultMessage="{n, plural, =1{# month} other{# months}}"
             values={{ n: duration.months }}
@@ -41,6 +43,7 @@ export function TimeSpan(props: { duration: Duration | number }) {
         ) : null,
         isDefined(duration.weeks) ? (
           <FormattedMessage
+            key="weeks"
             id="component.timespan.weeks-part"
             defaultMessage="{n, plural, =1{# week} other{# weeks}}"
             values={{ n: duration.weeks }}
@@ -48,6 +51,7 @@ export function TimeSpan(props: { duration: Duration | number }) {
         ) : null,
         isDefined(duration.days) ? (
           <FormattedMessage
+            key="days"
             id="component.timespan.days-part"
             defaultMessage="{n, plural, =1{# day} other{# days}}"
             values={{ n: duration.days }}
@@ -55,6 +59,7 @@ export function TimeSpan(props: { duration: Duration | number }) {
         ) : null,
         isDefined(duration.hours) ? (
           <FormattedMessage
+            key="hours"
             id="component.timespan.hours-part"
             defaultMessage="{n}h"
             values={{ n: duration.hours }}
@@ -62,6 +67,7 @@ export function TimeSpan(props: { duration: Duration | number }) {
         ) : null,
         isDefined(duration.minutes) ? (
           <FormattedMessage
+            key="minutes"
             id="component.timespan.minutes-part"
             defaultMessage="{n}'"
             values={{ n: duration.minutes }}
@@ -69,6 +75,7 @@ export function TimeSpan(props: { duration: Duration | number }) {
         ) : null,
         isDefined(duration.seconds) ? (
           <FormattedMessage
+            key="seconds"
             id="component.timespan.seconds-part"
             defaultMessage="{n}''"
             values={{ n: duration.seconds }}

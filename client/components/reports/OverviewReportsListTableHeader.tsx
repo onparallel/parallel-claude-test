@@ -13,6 +13,7 @@ export type OverviewReportsListTableHeaderProps = {
   search: string | null;
   onSearchChange: (value: string | null) => void;
   onChangeTableType: (value: OverviewTableType) => void;
+  onDownloadReport: () => void;
 };
 
 export function OverviewReportsListTableHeader({
@@ -20,6 +21,7 @@ export function OverviewReportsListTableHeader({
   search,
   onSearchChange,
   onChangeTableType,
+  onDownloadReport,
 }: OverviewReportsListTableHeaderProps) {
   const intl = useIntl();
 
@@ -50,6 +52,7 @@ export function OverviewReportsListTableHeader({
         </RadioButton>
       </ButtonGroup>
       <IconButtonWithTooltip
+        onClick={onDownloadReport}
         icon={<DownloadIcon />}
         label={intl.formatMessage({
           id: "component.overview-reports-list-table-header.download-report",
