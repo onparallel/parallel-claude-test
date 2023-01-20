@@ -4865,7 +4865,7 @@ type Query {
   ): PetitionBaseOrFolderPagination!
   petitionsById(folders: FoldersInput, ids: [GID!]): [PetitionBase]!
   publicLicenseCode(code: String!, token: ID!): PublicLicenseCode
-  publicOrgLogoUrl(id: GID!): String
+  publicOrg(id: GID!): PublicOrganization
 
   """
   The comments for this field.

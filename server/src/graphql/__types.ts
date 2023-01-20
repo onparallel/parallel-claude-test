@@ -2236,7 +2236,7 @@ export interface NexusGenFieldTypes {
     petitions: NexusGenRootTypes["PetitionBaseOrFolderPagination"]; // PetitionBaseOrFolderPagination!
     petitionsById: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
     publicLicenseCode: NexusGenRootTypes["PublicLicenseCode"] | null; // PublicLicenseCode
-    publicOrgLogoUrl: string | null; // String
+    publicOrg: NexusGenRootTypes["PublicOrganization"] | null; // PublicOrganization
     publicPetitionField: NexusGenRootTypes["PublicPetitionField"]; // PublicPetitionField!
     publicPetitionLinkBySlug: NexusGenRootTypes["PublicPublicPetitionLink"] | null; // PublicPublicPetitionLink
     publicTask: NexusGenRootTypes["Task"]; // Task!
@@ -4024,7 +4024,7 @@ export interface NexusGenFieldTypeNames {
     petitions: "PetitionBaseOrFolderPagination";
     petitionsById: "PetitionBase";
     publicLicenseCode: "PublicLicenseCode";
-    publicOrgLogoUrl: "String";
+    publicOrg: "PublicOrganization";
     publicPetitionField: "PublicPetitionField";
     publicPetitionLinkBySlug: "PublicPublicPetitionLink";
     publicTask: "Task";
@@ -5699,7 +5699,7 @@ export interface NexusGenArgTypes {
       code: string; // String!
       token: string; // ID!
     };
-    publicOrgLogoUrl: {
+    publicOrg: {
       // args
       id: NexusGenScalars["GID"]; // GID!
     };

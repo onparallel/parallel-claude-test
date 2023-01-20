@@ -4,31 +4,36 @@ import { CheckIcon, LinkedInSimpleIcon, TwitterIcon } from "@parallel/chakra/ico
 import { Card } from "@parallel/components/common/Card";
 import { Link, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { Thanks_petitionLogoDocument } from "@parallel/graphql/__types";
+import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
+import {
+  RedirectError,
+  withApolloData,
+  WithApolloDataContext,
+} from "@parallel/components/common/withApolloData";
+import { Thanks_publicOrganizationDocument } from "@parallel/graphql/__types";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 
 function ThanksForSigning() {
   const { query } = useRouter();
   const intl = useIntl();
 
-  const { data } = useQuery(Thanks_petitionLogoDocument, {
+  const { data } = useQuery(Thanks_publicOrganizationDocument, {
     variables: { id: query.o as string },
-    skip: !query.o,
   });
-  const logoUrl = data?.publicOrgLogoUrl;
+
+  const organization = data!.publicOrg!;
 
   return (
     <>
       <Head>
         <title>
-          {intl.formatMessage({
+          {`${intl.formatMessage({
             id: "generic.thanks",
             defaultMessage: "Thanks",
-          })}{" "}
-          | Parallel
+          })} | ${organization.hasRemoveParallelBranding ? organization.name : "Parallel"}`}
         </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
@@ -42,28 +47,37 @@ function ThanksForSigning() {
           justifyContent="center"
         >
           <Center>
-            {logoUrl ? <Image src={logoUrl} width="200px" /> : <Logo width="200px" />}
+            {isDefined(organization.logoUrl340) ? (
+              <Image src={organization.logoUrl340} width="200px" />
+            ) : (
+              <Logo width="200px" />
+            )}
           </Center>
-          <Card paddingY={8} paddingX={10} textAlign="center">
-            <Stack spacing={4}>
-              <Center margin="auto" borderRadius="full" background="primary.500" boxSize={10}>
-                <CheckIcon color="white" role="presentation" boxSize={6} />
-              </Center>
-              <Heading size="md">
-                <FormattedMessage
-                  id="petition.signature-successful.title"
-                  defaultMessage="Document signed successfully"
-                />
-              </Heading>
-              <Text>
-                <FormattedMessage
-                  id="petition.signature-successful.subtitle"
-                  defaultMessage="We have sent a signed copy of the document to your email."
-                />
-              </Text>
-            </Stack>
-          </Card>
-          <ThanksFooter />
+          <OverrideWithOrganizationTheme
+            cssVarsRoot="#thanks-card"
+            brandTheme={organization.brandTheme}
+          >
+            <Card id="thanks-card" paddingY={8} paddingX={10} textAlign="center">
+              <Stack spacing={4}>
+                <Center margin="auto" borderRadius="full" background="primary.500" boxSize={10}>
+                  <CheckIcon color="white" role="presentation" boxSize={6} />
+                </Center>
+                <Heading size="md">
+                  <FormattedMessage
+                    id="petition.signature-successful.title"
+                    defaultMessage="Document signed successfully"
+                  />
+                </Heading>
+                <Text>
+                  <FormattedMessage
+                    id="petition.signature-successful.subtitle"
+                    defaultMessage="We have sent a signed copy of the document to your email."
+                  />
+                </Text>
+              </Stack>
+            </Card>
+          </OverrideWithOrganizationTheme>
+          {organization.hasRemoveParallelBranding ? null : <ThanksFooter />}
         </Stack>
       </Flex>
     </>
@@ -119,23 +133,41 @@ function ThanksFooter() {
   );
 }
 
+ThanksForSigning.fragments = {
+  PublicOrganization: gql`
+    fragment ThanksForSigning_PublicOrganization on PublicOrganization {
+      name
+      logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
+      hasRemoveParallelBranding
+      brandTheme {
+        ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
+      }
+    }
+    ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
+  `,
+};
+
 ThanksForSigning.queries = [
   gql`
-    query Thanks_petitionLogo($id: GID!) {
-      publicOrgLogoUrl(id: $id)
+    query Thanks_publicOrganization($id: GID!) {
+      publicOrg(id: $id) {
+        ...ThanksForSigning_PublicOrganization
+      }
     }
+    ${ThanksForSigning.fragments.PublicOrganization}
   `,
 ];
 
 ThanksForSigning.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  try {
-    if (query.o) {
-      await fetchQuery(Thanks_petitionLogoDocument, {
-        variables: { id: query.o as string },
-      });
+  if (query.o) {
+    const { data } = await fetchQuery(Thanks_publicOrganizationDocument, {
+      variables: { id: query.o as string },
+    });
+    if (!isDefined(data?.publicOrg)) {
+      throw new RedirectError("/");
     }
-  } catch (error: any) {
-    return {};
+  } else {
+    throw new RedirectError("/");
   }
 };
 

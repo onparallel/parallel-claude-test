@@ -3562,7 +3562,7 @@ export interface Query {
   petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
   publicLicenseCode?: Maybe<PublicLicenseCode>;
-  publicOrgLogoUrl?: Maybe<Scalars["String"]>;
+  publicOrg?: Maybe<PublicOrganization>;
   /** The comments for this field. */
   publicPetitionField: PublicPetitionField;
   publicPetitionLinkBySlug?: Maybe<PublicPublicPetitionLink>;
@@ -3714,7 +3714,7 @@ export interface QuerypublicLicenseCodeArgs {
   token: Scalars["ID"];
 }
 
-export interface QuerypublicOrgLogoUrlArgs {
+export interface QuerypublicOrgArgs {
   id: Scalars["GID"];
 }
 
@@ -25725,11 +25725,35 @@ export type LandingTemplates_categorySamplesQuery = {
   }>;
 };
 
-export type Thanks_petitionLogoQueryVariables = Exact<{
+export type ThanksForSigning_PublicOrganizationFragment = {
+  __typename?: "PublicOrganization";
+  name: string;
+  hasRemoveParallelBranding: boolean;
+  logoUrl340?: string | null;
+  brandTheme: {
+    __typename?: "OrganizationBrandThemeData";
+    color: string;
+    fontFamily?: string | null;
+  };
+};
+
+export type Thanks_publicOrganizationQueryVariables = Exact<{
   id: Scalars["GID"];
 }>;
 
-export type Thanks_petitionLogoQuery = { publicOrgLogoUrl?: string | null };
+export type Thanks_publicOrganizationQuery = {
+  publicOrg?: {
+    __typename?: "PublicOrganization";
+    name: string;
+    hasRemoveParallelBranding: boolean;
+    logoUrl340?: string | null;
+    brandTheme: {
+      __typename?: "OrganizationBrandThemeData";
+      color: string;
+      fontFamily?: string | null;
+    };
+  } | null;
+};
 
 export type GetMyIdQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -31891,6 +31915,17 @@ export const LandintTemplatesCategory_LandingTemplateCategorySampleFragmentDoc =
   LandintTemplatesCategory_LandingTemplateCategorySampleFragment,
   unknown
 >;
+export const ThanksForSigning_PublicOrganizationFragmentDoc = gql`
+  fragment ThanksForSigning_PublicOrganization on PublicOrganization {
+    name
+    logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
+    hasRemoveParallelBranding
+    brandTheme {
+      ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
+    }
+  }
+  ${OverrideWithOrganizationTheme_OrganizationBrandThemeDataFragmentDoc}
+` as unknown as DocumentNode<ThanksForSigning_PublicOrganizationFragment, unknown>;
 export const usePetitionCommentsMutations_PetitionFieldFragmentDoc = gql`
   fragment usePetitionCommentsMutations_PetitionField on PetitionField {
     id
@@ -35855,11 +35890,17 @@ export const LandingTemplates_categorySamplesDocument = gql`
   LandingTemplates_categorySamplesQuery,
   LandingTemplates_categorySamplesQueryVariables
 >;
-export const Thanks_petitionLogoDocument = gql`
-  query Thanks_petitionLogo($id: GID!) {
-    publicOrgLogoUrl(id: $id)
+export const Thanks_publicOrganizationDocument = gql`
+  query Thanks_publicOrganization($id: GID!) {
+    publicOrg(id: $id) {
+      ...ThanksForSigning_PublicOrganization
+    }
   }
-` as unknown as DocumentNode<Thanks_petitionLogoQuery, Thanks_petitionLogoQueryVariables>;
+  ${ThanksForSigning_PublicOrganizationFragmentDoc}
+` as unknown as DocumentNode<
+  Thanks_publicOrganizationQuery,
+  Thanks_publicOrganizationQueryVariables
+>;
 export const GetMyIdDocument = gql`
   query GetMyId {
     me {

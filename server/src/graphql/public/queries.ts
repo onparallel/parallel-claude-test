@@ -125,14 +125,13 @@ export const publicPetitionFieldQuery = queryField("publicPetitionField", {
   },
 });
 
-export const publicOrgLogo = queryField("publicOrgLogoUrl", {
-  type: nullable("String"),
+export const publicOrg = queryField("publicOrg", {
+  type: nullable("PublicOrganization"),
   args: {
     id: nonNull(globalIdArg("Organization")),
   },
   resolve: async (_, { id }, ctx) => {
-    const path = await ctx.organizations.loadOrgLogoPath(id);
-    return isDefined(path) ? await ctx.images.getImageUrl(path, { resize: { width: 400 } }) : null;
+    return await ctx.organizations.loadOrg(id);
   },
 });
 
