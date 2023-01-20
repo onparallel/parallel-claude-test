@@ -131,6 +131,17 @@ export const AppLayout = Object.assign(
     // Initialize userflow
     useEffect(() => {
       if (!userflow.isIdentified() && process.env.NODE_ENV === "production") {
+        // don't show userflow to certain users for better e2e testing purposes
+        const userflowOmitEmails = (process.env.NEXT_PUBLIC_USERFLOW_OMIT ?? "").split(",");
+        if (
+          userflowOmitEmails.some((e) => {
+            const [l, d] = e.split("@");
+            const [local, domain] = me.email.split("@");
+            return d === domain && (l === local || local.startsWith(l + "+"));
+          })
+        ) {
+          return;
+        }
         userflow.init(process.env.NEXT_PUBLIC_USERFLOW_TOKEN);
         userflow.identify(me.id, {
           name: me.fullName,
