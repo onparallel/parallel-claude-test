@@ -14,10 +14,10 @@ export function useReportsSections() {
       },
       {
         title: intl.formatMessage({
-          id: "page.reports.templates",
-          defaultMessage: "Templates",
+          id: "page.reports.statistics",
+          defaultMessage: "Template statistics",
         }),
-        path: "/app/reports/templates",
+        path: "/app/reports/statistics",
       },
     ];
   }, [intl.locale]);

@@ -22,16 +22,16 @@ import { TimeSpan } from "@parallel/components/reports/TimeSpan";
 import { Maybe, Overview_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { FORMATS } from "@parallel/utils/dates";
 import { stallFor } from "@parallel/utils/promises/stallFor";
-import { date, integer, string, useQueryState, values, sorting } from "@parallel/utils/queryState";
+import { date, integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { useTemplatesOverviewReportBackgroundTask } from "@parallel/utils/tasks/useTemplatesOverviewReportTask";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useReportsSections } from "@parallel/utils/useReportsSections";
-import { ReactNode, useCallback, useMemo, useRef, useState } from "react";
-import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
-import { isDefined, sort, sortBy } from "remeda";
 import { Workbook } from "exceljs";
-import { FORMATS } from "@parallel/utils/dates";
+import { ReactNode, useCallback, useMemo, useRef, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined, sort, sortBy } from "remeda";
 
 const SORTING = ["name", "total", "completed", "signed", "closed"] as const;
 

@@ -147,8 +147,8 @@ export function ReportsTemplates() {
   return (
     <SettingsLayout
       title={intl.formatMessage({
-        id: "page.reports.templates",
-        defaultMessage: "Templates",
+        id: "page.reports.statistics",
+        defaultMessage: "Template statistics",
       })}
       basePath="/app/reports"
       sections={sections}
@@ -158,7 +158,7 @@ export function ReportsTemplates() {
       header={
         <HStack width="100%" justifyContent="space-between" flexWrap="wrap">
           <Heading as="h3" size="md">
-            <FormattedMessage id="page.reports.templates" defaultMessage="Templates" />
+            <FormattedMessage id="page.reports.statistics" defaultMessage="Template statistics" />
           </Heading>
           <Button
             as={NakedHelpCenterLink}
