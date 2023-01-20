@@ -14,6 +14,7 @@ import { fromGlobalId } from "../util/globalId";
 import { random } from "../util/token";
 import { Maybe } from "../util/types";
 import { FETCH_SERVICE, IFetchService } from "./fetch";
+import { IImageService, IMAGE_SERVICE } from "./image";
 import { OrganizationCreditsService, ORGANIZATION_CREDITS_SERVICE } from "./organization-credits";
 import { StorageService, STORAGE_SERVICE } from "./storage";
 
@@ -98,6 +99,7 @@ export class BankflipService implements IBankflipService {
     @inject(FileRepository) private files: FileRepository,
     @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
+    @inject(IMAGE_SERVICE) private images: IImageService,
     @inject(STORAGE_SERVICE) private storage: StorageService,
     @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: OrganizationCreditsService,
     @inject(FETCH_SERVICE) private fetch: IFetchService,
@@ -135,14 +137,21 @@ export class BankflipService implements IBankflipService {
       "REMOVE_PARALLEL_BRANDING"
     );
 
+    const customization: any = {};
+    if (hasRemoveParallelBranding) {
+      customization["companyName"] = organization!.name;
+      const customLogoPath = await this.organizations.loadOrgIconPath(organization!.id);
+      if (isDefined(customLogoPath)) {
+        customization["companyLogo"] = await this.images.getImageUrl(customLogoPath);
+      }
+    }
+
     return await this.apiRequest<CreateSessionResponse>("/session", {
       method: "POST",
       body: JSON.stringify({
         requests: field.options.requests,
         webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/v2`,
-        customization: {
-          companyName: hasRemoveParallelBranding ? organization!.name : "Parallel",
-        },
+        customization,
         metadata,
       }),
     });

@@ -52,6 +52,9 @@ export function RecipientViewPetitionFieldTaxDocuments({
   const tone = useTone();
   const [state, setState] = useState<"IDLE" | "ERROR" | "FETCHING">("IDLE");
 
+  // ready means bankflip exported all requested docs and sent event to our webhook to start uploading replies
+  const [bankflipSessionReady, setBankflipSessionReady] = useState(false);
+
   const showOverwriteDocumentationDialog = useOverwriteDocumentationDialog();
 
   const popupRef = useRef<Window>();
@@ -61,7 +64,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
         setState("IDLE");
         done();
       } else if (state === "FETCHING") {
-        if (isDefined(popupRef.current) && popupRef.current.closed && field.options.legacy) {
+        if (isDefined(popupRef.current) && popupRef.current.closed && !bankflipSessionReady) {
           setState("IDLE");
           done();
         } else {
@@ -72,7 +75,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
       }
     },
     5000,
-    [onRefreshField, state, field.replies.length]
+    [onRefreshField, state, field.replies.length, bankflipSessionReady]
   );
 
   useEffect(() => {
@@ -80,18 +83,22 @@ export function RecipientViewPetitionFieldTaxDocuments({
       const popup = popupRef.current;
       if (isDefined(popup) && e.source === popup) {
         // TODO Bankflip Legacy: legacy event, will be removed by Bankflip on May 2023
-        if (field.options.legacy && e.data.name === "success") {
+        if (field.options.legacy) {
           onRefreshField();
           popup.close();
           setState("IDLE");
-        }
-        if (e.data.name === "user_requested_closure") {
-          onRefreshField();
-          popup.close();
-        }
-        if (e.data.name === "session_expired") {
-          popup.close();
-          setState("ERROR");
+        } else {
+          if (e.data.name === "session_completed") {
+            setBankflipSessionReady(true);
+          }
+          if (e.data.name === "user_requested_closure") {
+            onRefreshField();
+            popup.close();
+          }
+          if (e.data.name === "session_expired") {
+            popup.close();
+            setState("ERROR");
+          }
         }
       }
     };
@@ -105,6 +112,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
       for (const reply of field.replies) {
         await handleDeletePetitionReply({ replyId: reply.id });
       }
+      setBankflipSessionReady(false);
       setState("FETCHING");
       popupRef.current = await openNewWindow(async () => {
         const data = await onStartAsyncFieldCompletion();
