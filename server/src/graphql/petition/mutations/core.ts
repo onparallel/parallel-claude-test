@@ -2020,17 +2020,23 @@ export const completePetition = mutationField("completePetition", {
         data: { user_id: ctx.user!.id },
       });
 
-      if (petition.signature_config?.review === false) {
-        const { petition: updatedPetition } = await ctx.signature.createSignatureRequest(
-          petition.id,
-          {
-            ...petition.signature_config,
-            additionalSignersInfo: args.additionalSigners ?? [],
-            message: args.message ?? undefined,
-          },
-          ctx.user!
-        );
-        petition = updatedPetition ?? petition;
+      if (petition.signature_config) {
+        if (petition.signature_config.review === false) {
+          // start a new signature request, cancelling previous pending requests if any
+          const { petition: updatedPetition } = await ctx.signature.createSignatureRequest(
+            petition.id,
+            {
+              ...petition.signature_config,
+              additionalSignersInfo: args.additionalSigners ?? [],
+              message: args.message ?? undefined,
+            },
+            ctx.user!
+          );
+          petition = updatedPetition ?? petition;
+        } else {
+          // signature is configured to be reviewed after start, so just cancel if there are pending requests
+          await ctx.signature.cancelPendingSignatureRequests(petition.id, ctx.user!);
+        }
       }
       return petition;
     } catch (error: any) {

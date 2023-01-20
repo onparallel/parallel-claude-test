@@ -359,18 +359,25 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
         data: { petition_access_id: ctx.access!.id },
       });
 
-      if (petition.signature_config?.review === false) {
-        const { petition: updatedPetition } = await ctx.signature.createSignatureRequest(
-          petition.id,
-          {
-            ...petition.signature_config,
-            additionalSignersInfo: args.additionalSigners ?? [],
-            message: args.message ?? undefined,
-          },
-          ctx.access!
-        );
-        petition = updatedPetition ?? petition;
+      if (petition.signature_config) {
+        if (petition.signature_config.review === false) {
+          // start a new signature request, cancelling previous pending requests if any
+          const { petition: updatedPetition } = await ctx.signature.createSignatureRequest(
+            petition.id,
+            {
+              ...petition.signature_config,
+              additionalSignersInfo: args.additionalSigners ?? [],
+              message: args.message ?? undefined,
+            },
+            ctx.access!
+          );
+          petition = updatedPetition ?? petition;
+        } else {
+          // signature is configured to be reviewed after start, so just cancel if there are pending requests
+          await ctx.signature.cancelPendingSignatureRequests(petition.id, ctx.access!);
+        }
       } else {
+        // no signature configured, petition is completed
         await ctx.emails.sendPetitionCompletedEmail(petition.id, {
           accessId: ctx.access!.id,
         });
