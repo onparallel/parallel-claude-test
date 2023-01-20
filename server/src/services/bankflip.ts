@@ -142,7 +142,9 @@ export class BankflipService implements IBankflipService {
       customization["companyName"] = organization!.name;
       const customLogoPath = await this.organizations.loadOrgIconPath(organization!.id);
       if (isDefined(customLogoPath)) {
-        customization["companyLogo"] = await this.images.getImageUrl(customLogoPath);
+        customization["companyLogo"] = await this.images.getImageUrl(customLogoPath, {
+          resize: { height: 75, width: 75 },
+        });
       }
     }
 
