@@ -8191,8 +8191,8 @@
   },
   {
     "term": "page.reports.overview-description",
-    "definition": "Obtén el informe de todas las plantillas con los parallels y tiempo medios de cada una.",
-    "context": "Get the report of all the templates with the parallels and average time of each one."
+    "definition": "Obtén una visión general del volumen y el estado de todos los parallels.",
+    "context": "Get an overview of the volume and status of all the parallels."
   },
   {
     "term": "page.reports.replies",
@@ -8201,8 +8201,8 @@
   },
   {
     "term": "page.reports.replies-description",
-    "definition": "Compara las respuestas obtenidas en los parallels de una plantilla",
-    "context": "Compare the answers obtained in the parallels of a template."
+    "definition": "Analiza las respuestas obtenidas en los parallels.",
+    "context": "Analyze the answers obtained in the parallels."
   },
   {
     "term": "page.reports.select-a-template",
@@ -8225,14 +8225,14 @@
     "context": "This number doesn't include deleted parallels or unanswered drafts."
   },
   {
-    "term": "page.reports.templates",
-    "definition": "Plantillas",
-    "context": "Templates"
+    "term": "page.reports.statistics",
+    "definition": "Estadísticas de plantillas",
+    "context": "Template statistics"
   },
   {
-    "term": "page.reports.templates-description",
-    "definition": "Obtén los datos específicos de una plantilla en un periodo de tiempo concreto.",
-    "context": "Obtain the specific data of a template in a specific period of time."
+    "term": "page.reports.statistics-description",
+    "definition": "Analiza las estadísticas obtenidas de los procesos de una plantilla.",
+    "context": "Analyze the statistics obtained from the parallels of a template."
   },
   {
     "term": "page.reports.title",

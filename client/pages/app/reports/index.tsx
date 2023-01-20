@@ -43,27 +43,29 @@ export function Reports() {
         title: intl.formatMessage({ id: "page.reports.overview", defaultMessage: "Overview" }),
         description: intl.formatMessage({
           id: "page.reports.overview-description",
-          defaultMessage:
-            "Get the report of all the templates with the parallels and average time of each one.",
+          defaultMessage: "Get an overview of the volume and status of all the parallels.",
         }),
         href: "",
         isPending: true,
       },
       {
         imgSrc: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/reports_templates.png`,
-        title: intl.formatMessage({ id: "page.reports.templates", defaultMessage: "Templates" }),
-        description: intl.formatMessage({
-          id: "page.reports.templates-description",
-          defaultMessage: "Obtain the specific data of a template in a specific period of time.",
+        title: intl.formatMessage({
+          id: "page.reports.statistics",
+          defaultMessage: "Template statistics",
         }),
-        href: "/app/reports/templates",
+        description: intl.formatMessage({
+          id: "page.reports.statistics-description",
+          defaultMessage: "Analyze the statistics obtained from the parallels of a template.",
+        }),
+        href: "/app/reports/statistics",
       },
       {
         imgSrc: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/reports_replies.png`,
         title: intl.formatMessage({ id: "page.reports.replies", defaultMessage: "Replies" }),
         description: intl.formatMessage({
           id: "page.reports.replies-description",
-          defaultMessage: "Compare the answers obtained in the parallels of a template.",
+          defaultMessage: "Analyze the answers obtained in the parallels.",
         }),
         href: "",
         isPending: true,
