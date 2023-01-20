@@ -28,9 +28,10 @@ import { useTemplatesOverviewReportBackgroundTask } from "@parallel/utils/tasks/
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useReportsSections } from "@parallel/utils/useReportsSections";
 import { ReactNode, useCallback, useMemo, useRef, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
 import { isDefined, sort, sortBy } from "remeda";
 import { Workbook } from "exceljs";
+import { FORMATS } from "@parallel/utils/dates";
 
 const SORTING = ["name", "total", "completed", "signed", "closed"] as const;
 
@@ -100,6 +101,7 @@ export function Overview() {
     report: null,
     tableType: "STATUS",
   });
+  const reportDateRange = useRef<Date[] | null>(null);
 
   const otherTemplates = report?.other_templates
     ? {
@@ -220,6 +222,7 @@ export function Overview() {
           ),
         2_000 + 1_000 * Math.random()
       );
+      reportDateRange.current = state.range;
       setState((state) => ({ ...state, report: task.output as any, status: "IDLE" }));
     } catch (e: any) {
       if (e.message === "ABORTED") {
@@ -318,10 +321,25 @@ export function Overview() {
   const handleDownloadReport = async () => {
     const exceljs = (await import("exceljs")).default;
 
-    const startDate = state.range?.[0].toISOString().substring(0, 10) ?? null;
-    const endDate = state.range?.[1].toISOString().substring(0, 10) ?? null;
-    const today = new Date().toISOString().substring(0, 10);
-    const range = startDate ? `${startDate}_${endDate ?? today}` : today;
+    const dateRange = reportDateRange.current;
+
+    const startDate = dateRange?.[0];
+    const endDate = dateRange?.[1];
+    const range = startDate
+      ? `${intl
+          .formatDate(startDate, {
+            ...FORMATS["L"],
+          })
+          .replace(/\//g, "-")}_${intl
+          .formatDate(endDate, {
+            ...FORMATS["L"],
+          })
+          .replace(/\//g, "-")}`
+      : intl
+          .formatDate(new Date(), {
+            ...FORMATS["L"],
+          })
+          .replace(/\//g, "-");
 
     const workbook = new exceljs.Workbook();
     const worksheet = workbook.addWorksheet(
