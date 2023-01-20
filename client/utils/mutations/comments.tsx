@@ -170,7 +170,7 @@ const _mutations = [
       $petitionId: GID!
       $petitionFieldId: GID!
       $content: JSON!
-      $isInternal: Boolean
+      $isInternal: Boolean!
       $sharePetition: Boolean
       $sharePetitionPermission: PetitionPermissionTypeRW
       $sharePetitionSubscribed: Boolean

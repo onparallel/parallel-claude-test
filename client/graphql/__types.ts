@@ -1131,7 +1131,7 @@ export interface MutationcreatePetitionFieldAttachmentUploadLinkArgs {
 
 export interface MutationcreatePetitionFieldCommentArgs {
   content: Scalars["JSON"];
-  isInternal?: InputMaybe<Scalars["Boolean"]>;
+  isInternal: Scalars["Boolean"];
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
   sharePetition?: InputMaybe<Scalars["Boolean"]>;
@@ -25920,7 +25920,7 @@ export type usePetitionCommentsMutations_createPetitionFieldCommentMutationVaria
   petitionId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
   content: Scalars["JSON"];
-  isInternal?: InputMaybe<Scalars["Boolean"]>;
+  isInternal: Scalars["Boolean"];
   sharePetition?: InputMaybe<Scalars["Boolean"]>;
   sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
   sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]>;
@@ -35890,7 +35890,7 @@ export const usePetitionCommentsMutations_createPetitionFieldCommentDocument = g
     $petitionId: GID!
     $petitionFieldId: GID!
     $content: JSON!
-    $isInternal: Boolean
+    $isInternal: Boolean!
     $sharePetition: Boolean
     $sharePetitionPermission: PetitionPermissionTypeRW
     $sharePetitionSubscribed: Boolean

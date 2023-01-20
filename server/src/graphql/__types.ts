@@ -4726,7 +4726,7 @@ export interface NexusGenArgTypes {
     createPetitionFieldComment: {
       // args
       content: NexusGenScalars["JSON"]; // JSON!
-      isInternal?: boolean | null; // Boolean
+      isInternal: boolean; // Boolean!
       petitionFieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
       sharePetition?: boolean | null; // Boolean

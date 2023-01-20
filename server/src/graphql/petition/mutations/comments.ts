@@ -32,7 +32,7 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
     ifArgEquals(
       "sharePetitionPermission",
       "WRITE",
-      userHasAccessToPetitions("petitionId", ["OWNER"])
+      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])
     ),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     petitionIsNotAnonymized("petitionId"),
@@ -42,7 +42,7 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
     petitionId: nonNull(globalIdArg("Petition")),
     petitionFieldId: nonNull(globalIdArg("PetitionField")),
     content: nonNull(jsonArg()),
-    isInternal: booleanArg(),
+    isInternal: nonNull(booleanArg()),
     sharePetition: booleanArg({
       description: "Automatically share the petition with mentioned users that have no permissions",
     }),

@@ -84,7 +84,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           mutation (
             $petitionId: GID!
             $petitionFieldId: GID!
-            $isInternal: Boolean
+            $isInternal: Boolean!
             $content: JSON!
           ) {
             createPetitionFieldComment(
@@ -114,7 +114,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           mutation (
             $petitionId: GID!
             $petitionFieldId: GID!
-            $isInternal: Boolean
+            $isInternal: Boolean!
             $content: JSON!
           ) {
             createPetitionFieldComment(
@@ -143,11 +143,17 @@ describe("GraphQL/Petition Fields Comments", () => {
       const content = mocks.createRandomCommentContent();
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($petitionId: GID!, $petitionFieldId: GID!, $content: JSON!) {
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $content: JSON!
+            $isInternal: Boolean!
+          ) {
             createPetitionFieldComment(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               content: $content
+              isInternal: $isInternal
             ) {
               id
               contentHtml
@@ -165,6 +171,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", headingField.id),
           content,
+          isInternal: false,
         }
       );
 
@@ -188,7 +195,7 @@ describe("GraphQL/Petition Fields Comments", () => {
             $petitionId: GID!
             $petitionFieldId: GID!
             $content: JSON!
-            $isInternal: Boolean
+            $isInternal: Boolean!
           ) {
             createPetitionFieldComment(
               petitionId: $petitionId
@@ -235,7 +242,7 @@ describe("GraphQL/Petition Fields Comments", () => {
             $petitionId: GID!
             $petitionFieldId: GID!
             $content: JSON!
-            $isInternal: Boolean
+            $isInternal: Boolean!
           ) {
             createPetitionFieldComment(
               petitionId: $petitionId
@@ -266,7 +273,7 @@ describe("GraphQL/Petition Fields Comments", () => {
             $petitionId: GID!
             $petitionFieldId: GID!
             $content: JSON!
-            $isInternal: Boolean
+            $isInternal: Boolean!
           ) {
             createPetitionFieldComment(
               petitionId: $petitionId
@@ -303,7 +310,7 @@ describe("GraphQL/Petition Fields Comments", () => {
             $petitionId: GID!
             $petitionFieldId: GID!
             $content: JSON!
-            $isInternal: Boolean
+            $isInternal: Boolean!
           ) {
             createPetitionFieldComment(
               petitionId: $petitionId
@@ -361,7 +368,7 @@ describe("GraphQL/Petition Fields Comments", () => {
             $petitionId: GID!
             $petitionFieldId: GID!
             $content: JSON!
-            $isInternal: Boolean
+            $isInternal: Boolean!
           ) {
             createPetitionFieldComment(
               petitionId: $petitionId
@@ -410,7 +417,7 @@ describe("GraphQL/Petition Fields Comments", () => {
             $petitionId: GID!
             $petitionFieldId: GID!
             $content: JSON!
-            $isInternal: Boolean
+            $isInternal: Boolean!
           ) {
             createPetitionFieldComment(
               petitionId: $petitionId
@@ -465,7 +472,7 @@ describe("GraphQL/Petition Fields Comments", () => {
             $petitionId: GID!
             $petitionFieldId: GID!
             $content: JSON!
-            $isInternal: Boolean
+            $isInternal: Boolean!
             $throwOnNoPermission: Boolean
             $sharePetition: Boolean
           ) {

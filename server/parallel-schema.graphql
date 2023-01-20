@@ -940,7 +940,7 @@ type Mutation {
   """
   createPetitionFieldComment(
     content: JSON!
-    isInternal: Boolean
+    isInternal: Boolean!
     petitionFieldId: GID!
     petitionId: GID!
 

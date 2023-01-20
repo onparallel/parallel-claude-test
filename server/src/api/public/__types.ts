@@ -1087,7 +1087,7 @@ export type MutationcreatePetitionFieldAttachmentUploadLinkArgs = {
 
 export type MutationcreatePetitionFieldCommentArgs = {
   content: Scalars["JSON"];
-  isInternal?: InputMaybe<Scalars["Boolean"]>;
+  isInternal: Scalars["Boolean"];
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
   sharePetition?: InputMaybe<Scalars["Boolean"]>;
