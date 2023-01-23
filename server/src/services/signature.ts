@@ -252,24 +252,24 @@ export class SignatureService implements ISignatureService {
 
     // cancel pending signature request before starting a new one
     if (enqueuedSignatureRequest || pendingSignatureRequest) {
-      await Promise.all([
-        this.petitionsRepository.cancelPetitionSignatureRequest(
-          [enqueuedSignatureRequest, pendingSignatureRequest].filter(isDefined),
-          "REQUEST_RESTARTED",
-          isAccess ? { petition_access_id: canceller.id } : { user_id: canceller.id }
-        ),
-        this.petitionsRepository.loadPetitionSignaturesByPetitionId.dataloader.clear(petitionId),
-        pendingSignatureRequest
-          ? // only send a cancel request if the signature request has been already processed
-            this.queues.enqueueMessages("signature-worker", {
-              groupId: `signature-${toGlobalId("Petition", pendingSignatureRequest.petition_id)}`,
-              body: {
-                type: "cancel-signature-process",
-                payload: { petitionSignatureRequestId: pendingSignatureRequest.id },
-              },
-            })
-          : null,
-      ]);
+      await this.petitionsRepository.cancelPetitionSignatureRequest(
+        [enqueuedSignatureRequest, pendingSignatureRequest].filter(isDefined),
+        "REQUEST_RESTARTED",
+        isAccess ? { petition_access_id: canceller.id } : { user_id: canceller.id }
+      );
+
+      if (pendingSignatureRequest) {
+        // only send a cancel request if the signature request has been already processed
+        await this.queues.enqueueMessages("signature-worker", {
+          groupId: `signature-${toGlobalId("Petition", pendingSignatureRequest.petition_id)}`,
+          body: {
+            type: "cancel-signature-process",
+            payload: { petitionSignatureRequestId: pendingSignatureRequest.id },
+          },
+        });
+      }
+
+      this.petitionsRepository.loadPetitionSignaturesByPetitionId.dataloader.clear(petitionId);
     }
   }
 
