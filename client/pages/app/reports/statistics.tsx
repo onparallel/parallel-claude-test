@@ -75,22 +75,24 @@ const QUERY_STATE = {
 
 export function ReportsTemplates() {
   const intl = useIntl();
-  const [state, setQueryState] = useQueryState(QUERY_STATE);
+  const [queryState, setQueryState] = useQueryState(QUERY_STATE);
   const {
     data: { me, realMe },
   } = useAssertQuery(ReportsTemplates_userDocument);
 
   const sections = useReportsSections();
 
-  const [{ status, templateId, prevTemplateId, report }, setState] = useState<{
-    status: "IDLE" | "LOADING" | "ERROR";
+  const [{ status, templateId, activeTemplateId, activeRange, report }, setState] = useState<{
+    status: "IDLE" | "LOADING" | "LOADED" | "ERROR";
     templateId: string | null;
-    prevTemplateId: string | null;
+    activeTemplateId: string | null;
+    activeRange: Date[] | null;
     report: ReportType | null;
   }>({
     status: "IDLE",
     templateId: null,
-    prevTemplateId: null,
+    activeTemplateId: null,
+    activeRange: null,
     report: null,
   });
   const taskAbortController = useRef<AbortController | null>(null);
@@ -108,11 +110,21 @@ export function ReportsTemplates() {
   });
   assertTypenameArray(templates, "PetitionTemplate");
 
+  const handleDateRangeChange = (range: [Date, Date] | null) => {
+    setState((state) => ({ ...state, status: "IDLE" }));
+    setQueryState((s) => ({ ...s, range }));
+  };
+
   const templateStatsReportBackgroundTask = useTemplateStatsReportBackgroundTask();
 
   const handleGenerateReportClick = async () => {
     try {
-      setState((state) => ({ ...state, status: "LOADING", prevTemplateId: state.templateId }));
+      setState((state) => ({
+        ...state,
+        status: "LOADING",
+        activeTemplateId: state.templateId,
+        activeRange: queryState.range,
+      }));
       taskAbortController.current?.abort();
       if (isDefined(templateId)) {
         taskAbortController.current = new AbortController();
@@ -122,14 +134,14 @@ export function ReportsTemplates() {
             templateStatsReportBackgroundTask(
               {
                 templateId: templateId,
-                startDate: state.range?.[0].toISOString() ?? null,
-                endDate: state.range?.[1].toISOString() ?? null,
+                startDate: queryState.range?.[0].toISOString() ?? null,
+                endDate: queryState.range?.[1].toISOString() ?? null,
               },
               { signal: taskAbortController.current!.signal, timeout: 60_000 }
             ),
           2_000 + 1_000 * Math.random()
         );
-        setState((state) => ({ ...state, report: task.output as any, status: "IDLE" }));
+        setState((state) => ({ ...state, report: task.output as any, status: "LOADED" }));
       }
     } catch (e: any) {
       if (e.message === "ABORTED") {
@@ -141,8 +153,6 @@ export function ReportsTemplates() {
   };
 
   const handleTemplateRepliesReportTask = useTemplateRepliesReportTask();
-
-  const canGenerateReport = !templateId || (prevTemplateId === templateId && status === "LOADING");
 
   return (
     <SettingsLayout
@@ -200,33 +210,37 @@ export function ReportsTemplates() {
                   })}
                   isSearchable={true}
                   value={templateId}
-                  onChange={(templateId) => setState((state) => ({ ...state, templateId }))}
+                  onChange={(templateId) =>
+                    setState((state) => ({ ...state, templateId, status: "IDLE" }))
+                  }
+                  isDisabled={status === "LOADING"}
                 />
               </Box>
             </HStack>
             <DateRangePickerButton
-              value={state.range as [Date, Date] | null}
-              onChange={(range) => setQueryState((s) => ({ ...s, range }))}
+              value={queryState.range as [Date, Date] | null}
+              onChange={handleDateRangeChange}
+              isDisabled={status === "LOADING"}
             />
             <Button
               minWidth="fit-content"
               colorScheme="primary"
-              isDisabled={canGenerateReport}
+              isDisabled={status === "LOADED" || status === "LOADING"}
               onClick={handleGenerateReportClick}
               fontWeight="500"
             >
               <FormattedMessage id="page.reports.generate" defaultMessage="Generate" />
             </Button>
           </Stack>
-          {isDefined(report) && status === "IDLE" ? (
+          {isDefined(report) && (status === "IDLE" || status === "LOADED") ? (
             <Button
               leftIcon={<TableIcon />}
               colorScheme="primary"
               onClick={() =>
                 handleTemplateRepliesReportTask(
-                  prevTemplateId!,
-                  state.range?.[0].toISOString() ?? null,
-                  state.range?.[1].toISOString() ?? null
+                  activeTemplateId!,
+                  activeRange?.[0].toISOString() ?? null,
+                  activeRange?.[1].toISOString() ?? null
                 )
               }
             >
@@ -239,7 +253,7 @@ export function ReportsTemplates() {
             </Button>
           ) : null}
         </Stack>
-        {isDefined(report) && status === "IDLE" ? (
+        {isDefined(report) && (status === "IDLE" || status === "LOADED") ? (
           <TemplateStatsReport report={report} />
         ) : (
           <Stack minHeight="340px" alignItems="center" justifyContent="center" textAlign="center">

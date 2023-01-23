@@ -39,11 +39,14 @@ import {
 
 interface DateRangePickerButton
   extends ValueProps<[Date, Date]>,
-    Omit<DateRangePickerProps, "value" | "onChange"> {}
+    Omit<DateRangePickerProps, "value" | "onChange"> {
+  isDisabled?: boolean;
+}
 
 export function DateRangePickerButton({
   value: _value,
   onChange,
+  isDisabled,
   ...props
 }: DateRangePickerButton) {
   const intl = useIntl();
@@ -85,6 +88,7 @@ export function DateRangePickerButton({
       fontWeight={isDefined(_value) ? "600" : "500"}
       onClick={onOpen}
       width="100%"
+      isDisabled={isDisabled}
     >
       {isDefined(currentActiveRange)
         ? currentActiveRange.text
@@ -105,6 +109,7 @@ export function DateRangePickerButton({
         id: "component.date-range-picker-button.clear-range",
         defaultMessage: "Clear date range",
       })}
+      isDisabled={isDisabled}
     />
   ) : null;
 
