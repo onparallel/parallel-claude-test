@@ -8,7 +8,7 @@ import {
 import { useEffect } from "react";
 import { isDefined } from "remeda";
 
-const POLL_INTERVAL = 10000;
+const POLL_INTERVAL = 30_000;
 
 export function usePetitionSignaturesCardPolling(
   petition: PetitionSignaturesCard_PetitionFragment

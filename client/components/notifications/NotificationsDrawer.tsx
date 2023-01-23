@@ -28,7 +28,7 @@ import { NotificationsFilterSelect } from "./NotificationsFilterSelect";
 import { NotificationsList } from "./NotificationsList";
 
 const NOTIFICATIONS_LIMIT = 16;
-const POLL_INTERVAL = 10000;
+const POLL_INTERVAL = 30_000;
 
 const MotionFooter = motion<Omit<ModalFooterProps, "transition">>(DrawerFooter);
 

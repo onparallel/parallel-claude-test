@@ -11,7 +11,7 @@ import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
 const MotionBox = motion<Omit<BoxProps, "transition">>(Box);
 
-const POLL_INTERVAL = 20000;
+const POLL_INTERVAL = 30_000;
 
 export const NotificationsButton = chakraForwardRef<"button", {}>(function NotificationsBell(
   props,
