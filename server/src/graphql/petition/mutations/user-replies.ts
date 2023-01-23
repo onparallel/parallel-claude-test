@@ -352,6 +352,7 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
       });
     } else {
       const session = await ctx.bankflip.createSession({
+        orgId: toGlobalId("Organization", ctx.user!.org_id),
         fieldId: toGlobalId("PetitionField", fieldId),
         userId: toGlobalId("User", ctx.user!.id),
       });

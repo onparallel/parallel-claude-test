@@ -19,7 +19,8 @@ import { IImageService, IMAGE_SERVICE } from "./image";
 import { OrganizationCreditsService, ORGANIZATION_CREDITS_SERVICE } from "./organization-credits";
 import { StorageService, STORAGE_SERVICE } from "./storage";
 
-type SessionMetadata = { fieldId: string; userId: string } | { fieldId: string; accessId: string };
+type SessionMetadata =
+  | { fieldId: string; orgId: string } & ({ userId: string } | { accessId: string });
 
 /** When the Session is completed. (every requested model has been extracted) */
 export interface SessionCompletedWebhookEvent {
