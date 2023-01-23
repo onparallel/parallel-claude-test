@@ -34,25 +34,29 @@ import { isDefined, sort, sortBy } from "remeda";
 
 const SORTING = ["name", "total", "completed", "signed", "closed"] as const;
 
-type TemplateStats = {
-  template_id: string;
-  name: Maybe<string>;
+interface PetitionStatusCount {
+  all: number;
   pending: number;
   completed: number;
   closed: number;
-  pending_to_complete: number | null;
-  complete_to_close: number | null;
-  signatures: { completed: number; time_to_complete: number | null };
-};
+  signed: number;
+}
+interface TemplateStats {
+  from_template_id: string;
+  name: Maybe<string>;
+  status: PetitionStatusCount;
+  times: {
+    pending_to_complete: Maybe<number>;
+    complete_to_close: Maybe<number>;
+    signature_completed: Maybe<number>;
+  };
+}
 
 interface ReportType {
-  total: number;
-  completed: number;
-  signed: number;
-  closed: number;
+  totals: PetitionStatusCount;
   templates: TemplateStats[];
   other_templates?: TemplateStats;
-  parallels_scratch?: TemplateStats;
+  petitions_scratch?: TemplateStats;
 }
 
 export const QUERY_STATE = {
@@ -118,9 +122,9 @@ export function Overview() {
       }
     : null;
 
-  const parallelsScratch = report?.parallels_scratch
+  const parallelsScratch = report?.petitions_scratch
     ? {
-        ...report!.parallels_scratch,
+        ...report!.petitions_scratch,
         name: intl.formatMessage({
           id: "page.reports-overview.parallels-scratch",
           defaultMessage: "Parallels created from scratch",
@@ -154,19 +158,19 @@ export function Overview() {
         switch (field) {
           case "total":
             return tableType === "TIME"
-              ? (row.pending_to_complete ?? 0) + (row.complete_to_close ?? 0)
-              : row.pending + row.completed + row.closed;
+              ? (row.times.pending_to_complete ?? 0) + (row.times.complete_to_close ?? 0)
+              : row.status.pending + row.status.completed + row.status.closed;
 
           case "signed":
             return tableType === "TIME"
-              ? (row.pending_to_complete ?? 0) + (row.complete_to_close ?? 0)
-              : row.signatures.completed;
+              ? (row.times.pending_to_complete ?? 0) + (row.times.complete_to_close ?? 0)
+              : row.status.signed;
 
           case "completed":
-            return tableType === "TIME" ? row.pending_to_complete ?? 0 : row.completed;
+            return tableType === "TIME" ? row.times.pending_to_complete ?? 0 : row.status.completed;
 
           case "closed":
-            return tableType === "TIME" ? row.complete_to_close ?? 0 : row.closed;
+            return tableType === "TIME" ? row.times.complete_to_close ?? 0 : row.status.closed;
 
           default:
             return row[field];
@@ -299,7 +303,7 @@ export function Overview() {
                   id: "page.reports-overview.total-parallels",
                   defaultMessage: "Total parallels",
                 })}
-                amount={report.total}
+                amount={report.totals.all}
                 help={
                   <Stack>
                     <Text>
@@ -322,7 +326,7 @@ export function Overview() {
                   id: "page.reports-overview.completed-parallels",
                   defaultMessage: "Completed",
                 })}
-                amount={report.completed}
+                amount={report.totals.completed}
                 help={
                   <Stack>
                     <Text>
@@ -345,7 +349,7 @@ export function Overview() {
                   id: "page.reports-overview.signed-parallels",
                   defaultMessage: "Signed",
                 })}
-                amount={report.signed}
+                amount={report.totals.signed}
                 help={
                   <Stack>
                     <Text>
@@ -368,7 +372,7 @@ export function Overview() {
                   id: "page.reports-overview.closed-parallels",
                   defaultMessage: "Closed",
                 })}
-                amount={report.closed}
+                amount={report.totals.closed}
                 help={
                   <Stack>
                     <Text>
@@ -394,7 +398,7 @@ export function Overview() {
               isHighlightable
               columns={tableType === "STATUS" ? columnsStatus : columnsTime}
               rows={list}
-              rowKeyProp="template_id"
+              rowKeyProp="from_template_id"
               loading={false}
               page={state.page}
               pageSize={state.items}
@@ -535,7 +539,7 @@ function useOverviewTemplateStatusColumns(): TableColumn<TemplateStats>[] {
           width: "10%",
           minWidth: "120px",
         },
-        CellContent: ({ row }) => <>{row.pending + row.completed + row.closed}</>,
+        CellContent: ({ row }) => <>{row.status.all}</>,
       },
       {
         key: "completed",
@@ -548,7 +552,7 @@ function useOverviewTemplateStatusColumns(): TableColumn<TemplateStats>[] {
           width: "10%",
           minWidth: "120px",
         },
-        CellContent: ({ row }) => <>{row.completed}</>,
+        CellContent: ({ row }) => <>{row.status.completed}</>,
       },
       {
         key: "signed",
@@ -561,7 +565,7 @@ function useOverviewTemplateStatusColumns(): TableColumn<TemplateStats>[] {
           width: "10%",
           minWidth: "120px",
         },
-        CellContent: ({ row }) => <>{row.signatures.completed}</>,
+        CellContent: ({ row }) => <>{row.status.signed}</>,
       },
       {
         key: "closed",
@@ -574,7 +578,7 @@ function useOverviewTemplateStatusColumns(): TableColumn<TemplateStats>[] {
           width: "10%",
           minWidth: "120px",
         },
-        CellContent: ({ row }) => <>{row.closed}</>,
+        CellContent: ({ row }) => <>{row.status.closed}</>,
       },
     ],
     [intl.locale]
@@ -636,7 +640,9 @@ function useOverviewTemplateTimesColumns(): TableColumn<TemplateStats>[] {
           minWidth: "120px",
         },
         CellContent: ({ row }) => (
-          <TimeSpan duration={(row.pending_to_complete ?? 0) + (row.complete_to_close ?? 0)} />
+          <TimeSpan
+            duration={(row.times.pending_to_complete ?? 0) + (row.times.complete_to_close ?? 0)}
+          />
         ),
       },
       {
@@ -666,7 +672,7 @@ function useOverviewTemplateTimesColumns(): TableColumn<TemplateStats>[] {
           width: "10%",
           minWidth: "120px",
         },
-        CellContent: ({ row }) => <TimeSpan duration={row.pending_to_complete ?? 0} />,
+        CellContent: ({ row }) => <TimeSpan duration={row.times.pending_to_complete ?? 0} />,
       },
       {
         key: "signed",
@@ -684,7 +690,7 @@ function useOverviewTemplateTimesColumns(): TableColumn<TemplateStats>[] {
           width: "10%",
           minWidth: "120px",
         },
-        CellContent: ({ row }) => <TimeSpan duration={row.signatures.time_to_complete ?? 0} />,
+        CellContent: ({ row }) => <TimeSpan duration={row.times.signature_completed ?? 0} />,
       },
       {
         key: "closed",
@@ -701,7 +707,7 @@ function useOverviewTemplateTimesColumns(): TableColumn<TemplateStats>[] {
           width: "10%",
           minWidth: "120px",
         },
-        CellContent: ({ row }) => <TimeSpan duration={row.complete_to_close ?? 0} />,
+        CellContent: ({ row }) => <TimeSpan duration={row.times.complete_to_close ?? 0} />,
       },
     ],
     [intl.locale]
@@ -711,7 +717,7 @@ function useOverviewTemplateTimesColumns(): TableColumn<TemplateStats>[] {
 function useDownloadOverviewExcel() {
   const intl = useIntl();
 
-  const workseetColumns = useMemo(
+  const worksheetColumns = useMemo(
     () => [
       {
         key: "name",
@@ -830,7 +836,7 @@ function useDownloadOverviewExcel() {
 
     const _templates = sort(templates, (a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
 
-    worksheet.columns = workseetColumns;
+    worksheet.columns = worksheetColumns;
     worksheet.spliceRows(1, 0, []);
     worksheet.mergeCells("B1:E1");
     worksheet.mergeCells("F1:I1");
@@ -846,14 +852,15 @@ function useDownloadOverviewExcel() {
     worksheet.addRows(
       _templates.map((row) => ({
         name: row.name,
-        total: row.pending + row.completed + row.closed,
-        completed: row.completed,
-        signed: row.signatures.completed,
-        closed: row.closed,
-        total_time: ((row.pending_to_complete ?? 0) + (row.complete_to_close ?? 0)) / 3600,
-        time_to_complete: (row.pending_to_complete ?? 0) / 3600,
-        time_to_sign: (row.signatures.time_to_complete ?? 0) / 3600,
-        time_to_close: (row.complete_to_close ?? 0) / 3600,
+        total: row.status.all,
+        completed: row.status.completed,
+        signed: row.status.signed,
+        closed: row.status.closed,
+        total_time:
+          ((row.times.pending_to_complete ?? 0) + (row.times.complete_to_close ?? 0)) / 3600,
+        time_to_complete: (row.times.pending_to_complete ?? 0) / 3600,
+        time_to_sign: (row.times.signature_completed ?? 0) / 3600,
+        time_to_close: (row.times.complete_to_close ?? 0) / 3600,
       }))
     );
 

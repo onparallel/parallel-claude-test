@@ -5330,15 +5330,26 @@ export class PetitionRepository extends BaseRepository {
     if (fromTemplateId.length === 0) {
       return [];
     }
+    const templateNames = await this.from("petition")
+      .whereIn("id", fromTemplateId)
+      .select("id", "name");
+
     const petitionStatus = await this.raw<{
       id: number;
       name: Maybe<string>;
       status: PetitionStatus;
       from_template_id: number;
+      latest_signature_status: Maybe<string>;
     }>(
       /* sql */ `
         with ps as (
-          select id, name, status, from_template_id from petition p where p.from_template_id in ? and p.org_id = ? and p.deleted_at is null 
+          select id, name, status, from_template_id, latest_signature_status
+          from petition p 
+          where p.from_template_id in ? 
+          and p.org_id = ? 
+          and p.is_template = false
+          and p.status != 'DRAFT' 
+          and p.deleted_at is null 
           and (?::timestamptz is null or ?::timestamptz is null or created_at between ? and ?)
         ),
         pas as (
@@ -5349,7 +5360,7 @@ export class PetitionRepository extends BaseRepository {
             join petition_field_reply pfr on pfr.petition_field_id = pf.id
           where pf.petition_id in (select id from ps) and pf.deleted_at is null and pfr.deleted_at is null
         )
-        select distinct ps.id, ps.status, ps.name, ps.from_template_id from ps
+        select distinct ps.id, ps.status, ps.name, ps.from_template_id, ps.latest_signature_status from ps
           left join pas on pas.petition_id = ps.id
           left join pfrs on pfrs.petition_id = ps.id
         where pas.has_been_sent or pfrs.has_reply;
@@ -5364,7 +5375,12 @@ export class PetitionRepository extends BaseRepository {
       ]
     );
 
-    const statsByFromTemplateId = groupBy(petitionStatus, (p) => p.from_template_id);
+    const statsByFromTemplateId: Record<number, typeof petitionStatus> = {};
+    fromTemplateId.forEach((templateId) => {
+      statsByFromTemplateId[templateId] = petitionStatus.filter(
+        (p) => p.from_template_id === templateId
+      );
+    });
 
     return await pMap(
       Object.entries(statsByFromTemplateId),
@@ -5389,7 +5405,6 @@ export class PetitionRepository extends BaseRepository {
           (e) => e.created_at,
           "asc",
         ]);
-        const signatures = await this.loadLatestPetitionSignatureByPetitionId(petitionIds);
 
         const eventsByPetitionId = groupBy(sortedPetitionEvents, (e) => e.petition_id);
 
@@ -5442,6 +5457,31 @@ export class PetitionRepository extends BaseRepository {
           .filter(isDefined);
 
         return {
+          from_template_id: toGlobalId("Petition", parseInt(fromTemplateId)),
+          name: templateNames.find((t) => t.id === parseInt(fromTemplateId))?.name ?? null,
+          status: {
+            all: petitions.length,
+            pending: countBy(petitions, (p) => p.status === "PENDING"),
+            completed: countBy(petitions, (p) => p.status === "COMPLETED"),
+            closed: countBy(petitions, (p) => p.status === "CLOSED"),
+            signed: countBy(petitions, (p) => p.latest_signature_status === "COMPLETED"),
+          },
+          times: {
+            pending_to_complete:
+              pendingToCompletePetitionTimes.length > 0
+                ? average(pendingToCompletePetitionTimes)
+                : null,
+            complete_to_close:
+              completeToClosePetitionTimes.length > 0
+                ? average(completeToClosePetitionTimes)
+                : null,
+            signature_completed:
+              timeToCompleteSignatureTimes.length > 0
+                ? average(timeToCompleteSignatureTimes)
+                : null,
+          },
+
+          /** @deprecated until end. Keeping for retrocompatibility with frontend */
           template_id: toGlobalId("Petition", parseInt(fromTemplateId)),
           pending: countBy(petitions, (r) => r.status === "PENDING"),
           completed: countBy(petitions, (r) => r.status === "COMPLETED"),
@@ -5453,7 +5493,7 @@ export class PetitionRepository extends BaseRepository {
           complete_to_close:
             completeToClosePetitionTimes.length > 0 ? average(completeToClosePetitionTimes) : null,
           signatures: {
-            completed: countBy(signatures, (s) => s?.status === "COMPLETED"),
+            completed: countBy(petitions, (p) => p.latest_signature_status === "COMPLETED"),
             time_to_complete:
               timeToCompleteSignatureTimes.length > 0
                 ? average(timeToCompleteSignatureTimes)
@@ -5860,18 +5900,14 @@ export class PetitionRepository extends BaseRepository {
     startDate?: Maybe<Date>,
     endDate?: Maybe<Date>
   ) {
-    // select distinct(p.id), p.name,p.status, p.is_template , p.from_template_id , p.latest_signature_status, p.created_at
-    // from petition_permission pp
-    // join petition p on p.id = pp.petition_id
-    // where pp.user_id = 5 and p.org_id = 1 and pp.deleted_at is null and p.deleted_at is null and p.anonymized_at is null
-    // and p.created_at between '2020-12-01' and '2020-12-02'
-    // order by p.id;
     return await this.from("petition")
-      .join("petition_permission", "petition.id", "petition_permission.petition_id")
-      .where("petition_permission.user_id", userId)
-      .whereNull("petition_permission.deleted_at")
+      .joinRaw(
+        "join petition_permission pp on pp.petition_id = petition.id and pp.user_id = ?",
+        userId
+      )
+      .whereNull("pp.deleted_at")
       .whereNull("petition.deleted_at")
-      .whereNull("petition.anonymized_at")
+      .whereRaw(/* sql */ `(petition.status != 'DRAFT' or petition.is_template = true)`)
       .mmodify((q) => {
         if (startDate && endDate) {
           q.whereBetween("petition.created_at", [startDate, endDate]);

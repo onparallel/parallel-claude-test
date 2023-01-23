@@ -26,17 +26,30 @@ export class TemplatesOverviewReportRunner extends TaskRunner<"TEMPLATES_OVERVIE
       endDate
     );
     return {
-      total: petitions.length,
-      closed: countBy(petitions, (p) => p.status === "CLOSED"),
-      completed: countBy(petitions, (p) => p.status === "COMPLETED"),
-      signed: countBy(petitions, (p) => p.latest_signature_status === "COMPLETED"),
-      templates: templateStats.map((stats) => {
-        const templateId = fromGlobalId(stats.template_id, "Petition").id;
-        return {
-          name: templates.find((t) => t.id === templateId)?.name ?? null,
-          ...stats,
-        };
-      }),
+      totals: {
+        all: petitions.length,
+        pending: countBy(petitions, (p) => p.status === "PENDING"),
+        completed: countBy(petitions, (p) => p.status === "COMPLETED"),
+        closed: countBy(petitions, (p) => p.status === "CLOSED"),
+        signed: countBy(petitions, (p) => p.latest_signature_status === "COMPLETED"),
+      },
+      templates: templateStats,
+      // other_templates: {
+      //   status: { all: 0, pending: 0, completed: 0, closed: 0, signed: 0 },
+      //   times: {
+      //     pending_to_complete: null,
+      //     complete_to_close: null,
+      //     signature_completed: null,
+      //   },
+      // },
+      // petitions_scratch: {
+      //   status: { all: 0, pending: 0, completed: 0, closed: 0, signed: 0 },
+      //   times: {
+      //     pending_to_complete: null,
+      //     complete_to_close: null,
+      //     signature_completed: null,
+      //   },
+      // },
     };
   }
 }

@@ -58,14 +58,17 @@ import { isDefined } from "remeda";
 import { TimeSpan } from "../../../components/reports/TimeSpan";
 
 interface ReportType {
-  pending: number;
-  completed: number;
-  closed: number;
-  pending_to_complete: Maybe<number>;
-  complete_to_close: Maybe<number>;
-  signatures: {
+  from_template_id: string;
+  status: {
+    pending: number;
     completed: number;
-    time_to_complete: Maybe<number>;
+    closed: number;
+    signed: number;
+  };
+  times: {
+    pending_to_complete: Maybe<number>;
+    complete_to_close: Maybe<number>;
+    signature_completed: Maybe<number>;
   };
 }
 
@@ -225,7 +228,7 @@ export function ReportsTemplates() {
             <Button
               minWidth="fit-content"
               colorScheme="primary"
-              isDisabled={status === "LOADED" || status === "LOADING"}
+              isDisabled={status === "LOADED" || status === "LOADING" || !templateId}
               onClick={handleGenerateReportClick}
               fontWeight="500"
             >
@@ -321,21 +324,21 @@ ReportsTemplates.getInitialProps = async ({ fetchQuery }: WithApolloDataContext)
 export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(ReportsTemplates);
 
 function TemplateStatsReport({ report }: { report: ReportType }) {
-  const pendingToComplete = report.pending_to_complete ?? 0;
-  const completeToClose = report.complete_to_close ?? 0;
-  const timeToComplete = report.signatures.time_to_complete ?? 0;
+  const pendingToComplete = report.times.pending_to_complete ?? 0;
+  const completeToClose = report.times.complete_to_close ?? 0;
+  const timeToComplete = report.times.signature_completed ?? 0;
 
   const pendingToCompletePercent =
     (pendingToComplete / (pendingToComplete + completeToClose)) * 100;
   const completeToClosePercent = (completeToClose / (pendingToComplete + completeToClose)) * 100;
   const signaturesTimeToComplete = (timeToComplete / completeToClose) * 100;
 
-  const pendingPetitions = report.pending;
-  const completedPetitions = report.completed;
-  const closedPetitions = report.closed;
+  const pendingPetitions = report.status.pending;
+  const completedPetitions = report.status.completed;
+  const closedPetitions = report.status.closed;
 
   const petitionsTotal = closedPetitions + completedPetitions + pendingPetitions;
-  const signaturesCompleted = report.signatures.completed;
+  const signaturesCompleted = report.status.signed;
   return (
     <Grid
       gridTemplateColumns={{

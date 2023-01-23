@@ -54,15 +54,23 @@ export type TaskInput<TName extends TaskName> = {
   };
 }[TName];
 
-type TemplateStats = {
-  template_id: string;
+interface PetitionStatusCount {
+  all: number;
   pending: number;
   completed: number;
   closed: number;
-  pending_to_complete: number | null;
-  complete_to_close: number | null;
-  signatures: { completed: number; time_to_complete: number | null };
-};
+  signed: number;
+}
+interface TemplateStats {
+  from_template_id: string;
+  name: Maybe<string>;
+  status: PetitionStatusCount;
+  times: {
+    pending_to_complete: Maybe<number>;
+    complete_to_close: Maybe<number>;
+    signature_completed: Maybe<number>;
+  };
+}
 
 export type TaskOutput<TName extends TaskName> = {
   EXPORT_REPLIES: { temporary_file_id: number };
@@ -72,13 +80,10 @@ export type TaskOutput<TName extends TaskName> = {
   TEMPLATE_STATS_REPORT: TemplateStats;
   DOW_JONES_PROFILE_DOWNLOAD: { temporary_file_id: number };
   TEMPLATES_OVERVIEW_REPORT: {
-    total: number;
-    completed: number;
-    signed: number;
-    closed: number;
-    templates: ({
-      name: Maybe<string>;
-    } & TemplateStats)[];
+    totals: PetitionStatusCount;
+    templates: TemplateStats[];
+    other_templates?: TemplateStats;
+    petitions_scratch?: TemplateStats;
   };
 }[TName];
 
