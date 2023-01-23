@@ -2,7 +2,7 @@ import { TaskRunner } from "../helpers/TaskRunner";
 
 export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT"> {
   async run() {
-    const { template_id: templateId, startDate, endDate } = this.task.input;
+    const { template_id: templateId, start_date: startDate, end_date: endDate } = this.task.input;
 
     const [user, hasAccess] = await Promise.all([
       this.ctx.readonlyUsers.loadUser(this.task.user_id!),

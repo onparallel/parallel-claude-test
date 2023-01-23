@@ -11,7 +11,12 @@ import { TaskRunner } from "../helpers/TaskRunner";
 
 export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_REPORT"> {
   async run() {
-    const { petition_id: templateId, timezone, startDate, endDate } = this.task.input;
+    const {
+      petition_id: templateId,
+      timezone,
+      start_date: startDate,
+      end_date: endDate,
+    } = this.task.input;
 
     if (!this.task.user_id) {
       throw new Error(`Task ${this.task.id} is missing user_id`);

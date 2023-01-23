@@ -127,8 +127,8 @@ export const createTemplateRepliesReportTask = mutationField("createTemplateRepl
         input: {
           petition_id: args.petitionId,
           timezone: args.timezone,
-          startDate: args.startDate,
-          endDate: args.endDate,
+          start_date: args.startDate,
+          end_date: args.endDate,
         },
       },
       `User:${ctx.user!.id}`
@@ -156,8 +156,8 @@ export const createTemplateStatsReportTask = mutationField("createTemplateStatsR
         user_id: ctx.user!.id,
         input: {
           template_id: args.templateId,
-          startDate: args.startDate,
-          endDate: args.endDate,
+          start_date: args.startDate,
+          end_date: args.endDate,
         },
       },
       `User:${ctx.user!.id}`

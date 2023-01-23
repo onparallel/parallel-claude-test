@@ -27,8 +27,8 @@ export type TaskInput<TName extends TaskName> = {
   TEMPLATE_REPLIES_REPORT: {
     petition_id: number;
     timezone: string;
-    startDate?: Date | null; // TODO convert to snake_case
-    endDate?: Date | null;
+    start_date?: Maybe<Date>;
+    end_date?: Maybe<Date>;
   };
   /**
    * generates a report on the template with it's petitions statistics.
@@ -36,8 +36,8 @@ export type TaskInput<TName extends TaskName> = {
    */
   TEMPLATE_STATS_REPORT: {
     template_id: number;
-    startDate?: Date | null;
-    endDate?: Date | null;
+    start_date?: Maybe<Date>;
+    end_date?: Maybe<Date>;
   };
   /** calls the DowJones API to download a PDF file with selected profile information */
   DOW_JONES_PROFILE_DOWNLOAD: {
