@@ -1,7 +1,7 @@
 import "reflect-metadata";
 // keep this space to prevent import sorting, removing init from top
 import { SQSClient } from "@aws-sdk/client-sqs";
-import { Consumer } from "sqs-consumer";
+import { Consumer } from "@rxfork/sqs-consumer";
 import yargs from "yargs";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
@@ -10,12 +10,12 @@ import { ILogger, LOGGER } from "../../services/logger";
 import { awsLogger } from "../../util/awsLogger";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
+import { DelayQueuePayload } from "../delay-queue";
 import { EmailEventsWorkerPayload } from "../email-events";
 import { EmailSenderWorkerPayload } from "../email-sender";
 import { EventProcessorPayload } from "../event-processor";
 import { SignatureWorkerPayload } from "../signature-worker";
 import { TaskWorkerPayload } from "../task-worker";
-import { DelayQueuePayload } from "../delay-queue";
 
 export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
   "email-events": EmailEventsWorkerPayload;
