@@ -127,7 +127,7 @@
     "type-is": "^1.6.18",
     "typed-url-params": "^1.0.1",
     "typescript-memoize": "^1.1.1",
-    "ua-parser-js": "^1.0.32",
+    "ua-parser-js": "^1.0.33",
     "winston": "^3.8.2",
     "winston-cloudwatch": "^6.1.1",
     "yargs": "^17.6.2"
