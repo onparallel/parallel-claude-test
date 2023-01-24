@@ -1,10 +1,11 @@
 import { chakra, Flex, Text, TextProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Maybe } from "@parallel/graphql/__types";
 import useMergedRef from "@react-hook/merged-ref";
 import { useEffect, useRef, useState } from "react";
 
 export interface FileNameProps extends TextProps {
-  value: string;
+  value: Maybe<string>;
 }
 
 export const FileName = chakraForwardRef<"span", FileNameProps>(function FileName(
@@ -39,14 +40,14 @@ export const FileName = chakraForwardRef<"span", FileNameProps>(function FileNam
         ref={mergedRef as any}
         as="span"
         minWidth={0}
-        title={isTruncated ? value : undefined}
+        title={isTruncated && value ? value : undefined}
         {...props}
       >
         <chakra.span whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
-          {value.slice(0, -10)}
+          {value?.slice(0, -10)}
         </chakra.span>
         <chakra.span flexShrink={0} position="relative" left="-0.2rem">
-          {value.slice(-10)}
+          {value?.slice(-10)}
         </chakra.span>
       </Flex>
     );

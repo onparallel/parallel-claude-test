@@ -196,7 +196,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
         ) : (
           <Text fontSize="xs">
             {uploadHasFailed ? (
-              <Text color="red.600">
+              <Text as="span" color="red.600">
                 <FormattedMessage
                   id="component.recipient-view-petition-field-reply.file-incomplete"
                   defaultMessage="There was an error uploading the file. {tone, select, INFORMAL {Please try again} other {Please upload it again}}."

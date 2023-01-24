@@ -522,48 +522,52 @@ export function OrganizationUsagePeriodsTable({
         onPageSizeChange={(items) => onTableStateChange({ ...tableState, items: items as any })}
         pageSizeOptions={[5, 10, 25]}
         header={
-          <HStack justifyContent="space-between" padding={4}>
-            <HStack>
-              <Text fontWeight="bold" display="contents">
-                <FormattedMessage
-                  id="component.organization-usage-periods-table.selector-label"
-                  defaultMessage="Periods of {selector}"
-                  values={{
-                    selector: (
-                      <Stack marginLeft={4}>
-                        <SimpleSelect<OrganizationUsageLimitName>
-                          isSearchable={false}
-                          options={[
-                            {
-                              label: intl.formatMessage({
-                                id: "component.organization-usage-periods-table.selector-parallels-label",
-                                defaultMessage: "parallels",
-                              }),
-                              value: "PETITION_SEND",
-                            },
-                            {
-                              label: intl.formatMessage({
-                                id: "component.organization-usage-periods-table.selector-signatures-label",
-                                defaultMessage: "signatures",
-                              }),
-                              value: "SIGNATURIT_SHARED_APIKEY",
-                            },
-                          ]}
-                          value={tableState.limitName}
-                          onChange={(limitName) =>
-                            onTableStateChange({ ...tableState, limitName: limitName! })
-                          }
-                        />
-                      </Stack>
-                    ),
-                  }}
-                />
-              </Text>
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            justifyContent="space-between"
+            padding={4}
+            wrap="wrap"
+            gap={2}
+          >
+            <HStack fontWeight="bold" minWidth="0">
+              <FormattedMessage
+                id="component.organization-usage-periods-table.selector-label"
+                defaultMessage="Periods of {selector}"
+                values={{
+                  selector: (
+                    <Stack marginLeft={4}>
+                      <SimpleSelect<OrganizationUsageLimitName>
+                        isSearchable={false}
+                        options={[
+                          {
+                            label: intl.formatMessage({
+                              id: "component.organization-usage-periods-table.selector-parallels-label",
+                              defaultMessage: "parallels",
+                            }),
+                            value: "PETITION_SEND",
+                          },
+                          {
+                            label: intl.formatMessage({
+                              id: "component.organization-usage-periods-table.selector-signatures-label",
+                              defaultMessage: "signatures",
+                            }),
+                            value: "SIGNATURIT_SHARED_APIKEY",
+                          },
+                        ]}
+                        value={tableState.limitName}
+                        onChange={(limitName) =>
+                          onTableStateChange({ ...tableState, limitName: limitName! })
+                        }
+                      />
+                    </Stack>
+                  ),
+                }}
+              />
             </HStack>
             {isDefined(items?.items?.[0]) ? (
               <Button
                 onClick={onModifyCurrentPeriod}
-                isDisabled={isDefined(items?.items[0].periodEndDate)}
+                isDisabled={isDefined(items?.items[0]?.periodEndDate)}
               >
                 <FormattedMessage
                   id="component.organization-usage-periods-table.modify-ongoing-period-button"
@@ -571,7 +575,7 @@ export function OrganizationUsagePeriodsTable({
                 />
               </Button>
             ) : null}
-          </HStack>
+          </Flex>
         }
       />
     </Flex>

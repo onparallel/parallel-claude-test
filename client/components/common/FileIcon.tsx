@@ -9,11 +9,12 @@ import {
   FileZipIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Maybe } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 
 export interface FileIconProps {
-  filename: string;
-  contentType: string;
+  filename: Maybe<string>;
+  contentType: Maybe<string>;
   hasFailed?: boolean;
 }
 
@@ -21,11 +22,11 @@ export const FileIcon = chakraForwardRef<"svg", FileIconProps>(function FileIcon
   { filename, contentType, hasFailed, ...props },
   ref
 ) {
-  const [Icon, label] = useGetIconAndLabelForFile(filename, contentType, hasFailed);
-  return <Icon color={hasFailed ? "red.500" : "inherit"} alt={label} {...props} />;
+  const [Icon, label] = useGetIconAndLabelForFile({ filename, contentType, hasFailed });
+  return <Icon ref={ref} color={hasFailed ? "red.500" : "inherit"} alt={label} {...props} />;
 });
 
-function useGetIconAndLabelForFile(filename: string, contentType: string, hasFailed?: boolean) {
+function useGetIconAndLabelForFile({ filename, contentType, hasFailed }: FileIconProps) {
   const intl = useIntl();
 
   if (hasFailed) {
@@ -37,12 +38,25 @@ function useGetIconAndLabelForFile(filename: string, contentType: string, hasFai
       }),
     ];
   }
+
+  if (!filename && !contentType) {
+    return [
+      FileOtherIcon,
+      intl.formatMessage({
+        id: "component.file-icon.other-file",
+        defaultMessage: "File",
+      }),
+    ];
+  }
+
+  const type = contentType ?? "";
+
   if (
     [
       "application/vnd.ms-word",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ].includes(contentType) ||
-    filename.endsWith(".pages")
+    ].includes(type) ||
+    filename?.endsWith(".pages")
   ) {
     return [
       FileDocIcon,
@@ -56,8 +70,8 @@ function useGetIconAndLabelForFile(filename: string, contentType: string, hasFai
       "application/vnd.ms-excel",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       "application/csv",
-    ].includes(contentType) ||
-    filename.endsWith(".numbers")
+    ].includes(type) ||
+    filename?.endsWith(".numbers")
   ) {
     return [
       FileSpreadsheetIcon,
@@ -66,7 +80,7 @@ function useGetIconAndLabelForFile(filename: string, contentType: string, hasFai
         defaultMessage: "Spreadsheet file",
       }),
     ] as const;
-  } else if (["application/pdf"].includes(contentType)) {
+  } else if (["application/pdf"].includes(type)) {
     return [
       FilePdfIcon,
       intl.formatMessage({
@@ -74,7 +88,7 @@ function useGetIconAndLabelForFile(filename: string, contentType: string, hasFai
         defaultMessage: "PDF file",
       }),
     ] as const;
-  } else if (["application/zip", "application/x-zip-compressed"].includes(contentType)) {
+  } else if (["application/zip", "application/x-zip-compressed"].includes(type)) {
     return [
       FileZipIcon,
       intl.formatMessage({
@@ -82,7 +96,7 @@ function useGetIconAndLabelForFile(filename: string, contentType: string, hasFai
         defaultMessage: "Zip file",
       }),
     ] as const;
-  } else if (contentType.startsWith("image/")) {
+  } else if (type.startsWith("image/")) {
     return [
       FileImageIcon,
       intl.formatMessage({
@@ -90,7 +104,7 @@ function useGetIconAndLabelForFile(filename: string, contentType: string, hasFai
         defaultMessage: "Image file",
       }),
     ] as const;
-  } else if (contentType.startsWith("audio/")) {
+  } else if (type.startsWith("audio/")) {
     return [
       FileMediaIcon,
       intl.formatMessage({
@@ -98,7 +112,7 @@ function useGetIconAndLabelForFile(filename: string, contentType: string, hasFai
         defaultMessage: "Audio file",
       }),
     ] as const;
-  } else if (contentType.startsWith("video/")) {
+  } else if (type.startsWith("video/")) {
     return [
       FileMediaIcon,
       intl.formatMessage({
