@@ -114,6 +114,7 @@ const HANDLERS: Partial<
   "recipient-reassign": recipientReassigned,
 };
 
+/*
 const validateHMACSignature: RequestHandler = (req, res, next) => {
   // check against multiple keys to allow for key rotation on Docusign panel
   const headerKeys = ["x-docusign-signature-1", "x-docusign-signature-2"];
@@ -122,7 +123,6 @@ const validateHMACSignature: RequestHandler = (req, res, next) => {
     if (signature) {
       const hash = createHmac(
         "sha256",
-        // no difference between production and sandbox webhookHmacSecrets
         req.context.config.oauth.docusign.production.webhookHmacSecret
       )
         .update(JSON.stringify(req.body))
@@ -140,35 +140,39 @@ const validateHMACSignature: RequestHandler = (req, res, next) => {
     res.sendStatus(401).end();
   }
 };
+*/
 
 export const docusignEventHandlers: RequestHandler = Router()
   .use(json())
-  .post("/:petitionId/events", validateHMACSignature, async (req, res, next) => {
-    try {
-      const body = req.body as DocuSignEventBody;
-      const signature = await req.context.petitions.loadPetitionSignatureByExternalId(
-        `DOCUSIGN/${body.data.envelopeId}`
-      );
+  .post(
+    "/:petitionId/events",
+    /*validateHMACSignature,*/ async (req, res, next) => {
+      try {
+        const body = req.body as DocuSignEventBody;
+        const signature = await req.context.petitions.loadPetitionSignatureByExternalId(
+          `DOCUSIGN/${body.data.envelopeId}`
+        );
 
-      if (!isDefined(signature) || signature.status === "CANCELLED") {
-        // status 200 to kill request but avoid sending an error to signaturit
-        return res.sendStatus(200).end();
-      }
-      const handler = HANDLERS[body.event] ?? appendEventLogs;
-      const petitionId = fromGlobalId(req.params.petitionId, "Petition").id;
-      (async function () {
-        try {
-          await handler?.(req.context, body, petitionId);
-        } catch (error: any) {
-          req.context.logger.error(error.message, { stack: error.stack });
+        if (!isDefined(signature) || signature.status === "CANCELLED") {
+          // status 200 to kill request but avoid sending an error to signaturit
+          return res.sendStatus(200).end();
         }
-      })();
-      res.sendStatus(200).end();
-    } catch (error: any) {
-      req.context.logger.error(error.message, { stack: error.stack });
-      next(error);
+        const handler = HANDLERS[body.event] ?? appendEventLogs;
+        const petitionId = fromGlobalId(req.params.petitionId, "Petition").id;
+        (async function () {
+          try {
+            await handler?.(req.context, body, petitionId);
+          } catch (error: any) {
+            req.context.logger.error(error.message, { stack: error.stack });
+          }
+        })();
+        res.sendStatus(200).end();
+      } catch (error: any) {
+        req.context.logger.error(error.message, { stack: error.stack });
+        next(error);
+      }
     }
-  });
+  );
 
 /** email is sent to the recipient signifying that it is their turn to sign an envelope. */
 async function recipientSent(ctx: ApiContext, body: DocuSignEventBody, petitionId: number) {
