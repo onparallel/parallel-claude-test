@@ -61,6 +61,7 @@ interface PetitionStatusCount {
   closed: number;
   signed: number;
 }
+
 interface TemplateStats {
   from_template_id: string;
   name: Maybe<string>;
@@ -80,11 +81,17 @@ export type TaskOutput<TName extends TaskName> = {
   TEMPLATE_STATS_REPORT: TemplateStats;
   DOW_JONES_PROFILE_DOWNLOAD: { temporary_file_id: number };
   TEMPLATES_OVERVIEW_REPORT: {
-    totals: PetitionStatusCount;
-    templates: TemplateStats[];
-    other_templates?: TemplateStats;
-    petitions_scratch?: TemplateStats;
-  };
+    aggregation_type: "TEMPLATE" | "NO_ACCESS" | "NO_TEMPLATE";
+    template_id?: number;
+    template_name?: Maybe<string>;
+    template_count?: number;
+    status: PetitionStatusCount;
+    times: {
+      pending_to_complete: Maybe<number>;
+      complete_to_close: Maybe<number>;
+      signature_completed: Maybe<number>;
+    };
+  }[];
 }[TName];
 
 export type Task<TName extends TaskName> = Replace<

@@ -30,7 +30,7 @@ import { removeNotDefined } from "../../util/remedaExtensions";
 import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/reminderUtils";
 import { getMentions } from "../../util/slate";
 import { random } from "../../util/token";
-import { Maybe, MaybeArray } from "../../util/types";
+import { Maybe, MaybeArray, UnwrapArray } from "../../util/types";
 import { validateReplyValue } from "../../util/validateReplyValue";
 import {
   CreatePetitionEvent,
@@ -5322,19 +5322,16 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async getPetitionStatsByFromTemplateId(
-    fromTemplateId: number[],
+    fromTemplateId: number,
     orgId: number,
     startDate?: Date | null,
     endDate?: Date | null
   ) {
-    if (fromTemplateId.length === 0) {
-      return [];
-    }
     const templateNames = await this.from("petition")
-      .whereIn("id", fromTemplateId)
+      .where("id", fromTemplateId)
       .select("id", "name");
 
-    const petitionStatus = await this.raw<{
+    const petitions = await this.raw<{
       id: number;
       name: Maybe<string>;
       status: PetitionStatus;
@@ -5342,31 +5339,18 @@ export class PetitionRepository extends BaseRepository {
       latest_signature_status: Maybe<string>;
     }>(
       /* sql */ `
-        with ps as (
-          select id, name, status, from_template_id, latest_signature_status
-          from petition p 
-          where p.from_template_id in ? 
-          and p.org_id = ? 
-          and p.is_template = false
-          and p.status != 'DRAFT' 
-          and p.deleted_at is null 
-          and (?::timestamptz is null or ?::timestamptz is null or created_at between ? and ?)
-        ),
-        pas as (
-          select distinct(pa.petition_id), true as has_been_sent from petition_access pa where pa.petition_id in (select id from ps)
-        ),
-        pfrs as (
-          select distinct(pf.petition_id), true as has_reply from petition_field pf
-            join petition_field_reply pfr on pfr.petition_field_id = pf.id
-          where pf.petition_id in (select id from ps) and pf.deleted_at is null and pfr.deleted_at is null
-        )
-        select distinct ps.id, ps.status, ps.name, ps.from_template_id, ps.latest_signature_status from ps
-          left join pas on pas.petition_id = ps.id
-          left join pfrs on pfrs.petition_id = ps.id
-        where pas.has_been_sent or pfrs.has_reply;
+      select distinct on (p.id) p.id, p.name, p.status, p.from_template_id, p.latest_signature_status,
+      from petition p 
+      left join petition_permission pp on pp.petition_id = p.id and pp.user_id 
+      where p.from_template_id in ? 
+        and p.org_id = ? 
+        and p.is_template = false
+        and p.status != 'DRAFT' 
+        and p.deleted_at is null 
+        and (?::timestamptz is null or ?::timestamptz is null or created_at between ? and ?)
     `,
       [
-        this.sqlIn(fromTemplateId),
+        fromTemplateId,
         orgId,
         startDate ?? null,
         endDate ?? null,
@@ -5375,133 +5359,205 @@ export class PetitionRepository extends BaseRepository {
       ]
     );
 
-    const statsByFromTemplateId: Record<number, typeof petitionStatus> = {};
-    fromTemplateId.forEach((templateId) => {
-      statsByFromTemplateId[templateId] = petitionStatus.filter(
-        (p) => p.from_template_id === templateId
-      );
+    const stats = await pFlatMap(chunk(petitions, 200), async (petitions) => {
+      return await this.getPetitionTimeStats(petitions.map((s) => s.id));
+    });
+    const times = {
+      pending_to_complete: average(stats.map((p) => p.pending_to_complete).filter(isDefined)),
+      complete_to_close: average(stats.map((p) => p.complete_to_close).filter(isDefined)),
+      signature_completed: average(stats.map((p) => p.signature_completed).filter(isDefined)),
+    };
+    return {
+      from_template_id: toGlobalId("Petition", fromTemplateId),
+      name: templateNames.find((t) => t.id === fromTemplateId)?.name ?? null,
+      status: {
+        all: petitions.length,
+        pending: countBy(petitions, (p) => p.status === "PENDING"),
+        completed: countBy(petitions, (p) => p.status === "COMPLETED"),
+        closed: countBy(petitions, (p) => p.status === "CLOSED"),
+        signed: countBy(petitions, (p) => p.latest_signature_status === "COMPLETED"),
+      },
+      times,
+      /** @deprecated until end. Keeping for retrocompatibility with frontend */
+      template_id: toGlobalId("Petition", fromTemplateId),
+      pending: countBy(petitions, (r) => r.status === "PENDING"),
+      completed: countBy(petitions, (r) => r.status === "COMPLETED"),
+      closed: countBy(petitions, (r) => r.status === "CLOSED"),
+      pending_to_complete: times.pending_to_complete,
+      complete_to_close: times.complete_to_close,
+      signatures: {
+        completed: countBy(petitions, (p) => p.latest_signature_status === "COMPLETED"),
+        time_to_complete: times.signature_completed,
+      },
+    };
+  }
+
+  async getPetitionStatsOverview(
+    orgId: number,
+    userId: number,
+    startDate?: Date | null,
+    endDate?: Date | null
+  ) {
+    const petitions = await this.raw<{
+      id: number;
+      name: Maybe<string>;
+      status: PetitionStatus;
+      from_template_id: Maybe<number>;
+      latest_signature_status: Maybe<string>;
+    }>(
+      /* sql */ `
+      select distinct on (p.id) p.id, p.status, p.from_template_id, p.latest_signature_status
+      from petition p
+      where p.org_id = ? 
+        and p.is_template = false
+        and p.status != 'DRAFT' 
+        and p.deleted_at is null 
+        and (?::timestamptz is null or ?::timestamptz is null or created_at between ? and ?)
+    `,
+      [orgId, startDate ?? null, endDate ?? null, startDate ?? null, endDate ?? null]
+    );
+
+    const templates = await this.raw<{
+      id: number;
+      name: string;
+      has_access: boolean;
+    }>(
+      /* sql */ `
+      select distinct on (p.id)
+        p.id, p.name, coalesce(pp.id::bool, false) as has_access
+      from petition p
+      left join petition_permission pp on p.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null
+      where p.id in ? and p.deleted_at is null
+    `,
+      [userId, this.sqlIn(uniq(petitions.map((p) => p.from_template_id)))]
+    );
+
+    const petitionsWithStats = await pFlatMap(
+      chunk(petitions, 200),
+      async (petitionsChunk) => {
+        return zip(
+          petitionsChunk,
+          await this.getPetitionTimeStats(petitionsChunk.map((p) => p.id))
+        ).map(([petition, stats]) => ({ ...petition, ...stats }));
+      },
+      { concurrency: 5 }
+    );
+
+    const templatesWithPetitionsWithStats = Object.values(
+      groupBy(petitionsWithStats, (p) => p.from_template_id ?? 0)
+    ).map((group) => {
+      const template = isDefined(group[0].from_template_id)
+        ? templates.find((t) => t.id === group[0].from_template_id) ?? null
+        : null;
+      return [template, group] as const;
     });
 
-    return await pMap(
-      Object.entries(statsByFromTemplateId),
-      async ([fromTemplateId, petitions]) => {
-        const petitionIds = petitions.map((s) => s.id);
+    function groupStats(petitions: UnwrapArray<typeof petitionsWithStats>[]) {
+      return {
+        status: {
+          all: petitions.length,
+          pending: countBy(petitions, (p) => p.status === "PENDING"),
+          completed: countBy(petitions, (p) => p.status === "COMPLETED"),
+          closed: countBy(petitions, (p) => p.status === "CLOSED"),
+          signed: countBy(petitions, (p) => p.latest_signature_status === "COMPLETED"),
+        },
+        times: {
+          pending_to_complete: average(
+            petitions.map((p) => p.pending_to_complete).filter(isDefined)
+          ),
+          complete_to_close: average(petitions.map((p) => p.complete_to_close).filter(isDefined)),
+          signature_completed: average(
+            petitions.map((p) => p.signature_completed).filter(isDefined)
+          ),
+        },
+      };
+    }
 
-        const petitionEvents = await pFlatMap(chunk(petitionIds, 100), async (idsChunk) => {
-          return await this.from("petition_event")
-            .whereIn("petition_id", idsChunk)
-            .whereIn("type", [
-              "ACCESS_ACTIVATED",
-              "REPLY_CREATED",
-              "PETITION_COMPLETED",
-              "PETITION_CLOSED",
-              "SIGNATURE_STARTED",
-              "SIGNATURE_COMPLETED",
-            ])
-            .select("*");
-        });
-
-        const sortedPetitionEvents = sortBy(petitionEvents, (e) => e.petition_id, [
-          (e) => e.created_at,
-          "asc",
-        ]);
-
-        const eventsByPetitionId = groupBy(sortedPetitionEvents, (e) => e.petition_id);
-
-        const petitionTimes = Object.values(eventsByPetitionId)
-          .map((events) => ({
-            pendingAt: events
-              .find((e) => e.type === "ACCESS_ACTIVATED" || e.type === "REPLY_CREATED") // first ACCESS_ACTIVATED or REPLY_CREATED event marks the first time the petition moved to PENDING status
-              ?.created_at.getTime(),
-            completedAt: findLast(
-              events,
-              (e) => e.type === "PETITION_COMPLETED"
-            )?.created_at.getTime(),
-            closedAt: findLast(events, (e) => e.type === "PETITION_CLOSED")?.created_at.getTime(),
-          }))
-          .map(({ pendingAt, completedAt, closedAt }) => ({
-            pendingToComplete:
-              isDefined(completedAt) && isDefined(pendingAt) && completedAt > pendingAt
-                ? (completedAt - pendingAt) / 1000
-                : null,
-            completeToClose:
-              isDefined(closedAt) && isDefined(completedAt) && closedAt > completedAt
-                ? (closedAt - completedAt) / 1000
-                : null,
-          }));
-
-        const pendingToCompletePetitionTimes = petitionTimes
-          .filter((t) => isDefined(t.pendingToComplete))
-          .map((t) => t.pendingToComplete!);
-
-        const completeToClosePetitionTimes = petitionTimes
-          .filter((t) => isDefined(t.completeToClose))
-          .map((t) => t.completeToClose!);
-
-        const timeToCompleteSignatureTimes = Object.values(eventsByPetitionId)
-          .map((events) => ({
-            startedAt: findLast(
-              events,
-              (e) => e.type === "SIGNATURE_STARTED"
-            )?.created_at.getTime(),
-            completedAt: findLast(
-              events,
-              (e) => e.type === "SIGNATURE_COMPLETED"
-            )?.created_at.getTime(),
-          }))
-          .map(({ startedAt, completedAt }) =>
-            isDefined(startedAt) && isDefined(completedAt) && completedAt > startedAt
-              ? (completedAt - startedAt) / 1000
-              : null
-          )
-          .filter(isDefined);
-
-        return {
-          from_template_id: toGlobalId("Petition", parseInt(fromTemplateId)),
-          name: templateNames.find((t) => t.id === parseInt(fromTemplateId))?.name ?? null,
-          status: {
-            all: petitions.length,
-            pending: countBy(petitions, (p) => p.status === "PENDING"),
-            completed: countBy(petitions, (p) => p.status === "COMPLETED"),
-            closed: countBy(petitions, (p) => p.status === "CLOSED"),
-            signed: countBy(petitions, (p) => p.latest_signature_status === "COMPLETED"),
-          },
-          times: {
-            pending_to_complete:
-              pendingToCompletePetitionTimes.length > 0
-                ? average(pendingToCompletePetitionTimes)
-                : null,
-            complete_to_close:
-              completeToClosePetitionTimes.length > 0
-                ? average(completeToClosePetitionTimes)
-                : null,
-            signature_completed:
-              timeToCompleteSignatureTimes.length > 0
-                ? average(timeToCompleteSignatureTimes)
-                : null,
-          },
-
-          /** @deprecated until end. Keeping for retrocompatibility with frontend */
-          template_id: toGlobalId("Petition", parseInt(fromTemplateId)),
-          pending: countBy(petitions, (r) => r.status === "PENDING"),
-          completed: countBy(petitions, (r) => r.status === "COMPLETED"),
-          closed: countBy(petitions, (r) => r.status === "CLOSED"),
-          pending_to_complete:
-            pendingToCompletePetitionTimes.length > 0
-              ? average(pendingToCompletePetitionTimes)
-              : null,
-          complete_to_close:
-            completeToClosePetitionTimes.length > 0 ? average(completeToClosePetitionTimes) : null,
-          signatures: {
-            completed: countBy(petitions, (p) => p.latest_signature_status === "COMPLETED"),
-            time_to_complete:
-              timeToCompleteSignatureTimes.length > 0
-                ? average(timeToCompleteSignatureTimes)
-                : null,
-          },
-        };
-      }
+    return sortBy(
+      [
+        ...templatesWithPetitionsWithStats
+          .filter(([t]) => t?.has_access === true)
+          .map(([template, petitions]) => {
+            return {
+              aggregation_type: "TEMPLATE" as const,
+              template_id: template?.id,
+              template_name: template?.name,
+              ...groupStats(petitions),
+            };
+          }),
+        (() => {
+          const noAccess = templatesWithPetitionsWithStats.filter(([t]) => t?.has_access === false);
+          return {
+            aggregation_type: "NO_ACCESS" as const,
+            template_count: noAccess.length,
+            ...groupStats(noAccess.flatMap(([, petitions]) => petitions)),
+          };
+        })(),
+        {
+          aggregation_type: "NO_TEMPLATE" as const,
+          ...groupStats(
+            templatesWithPetitionsWithStats
+              .filter(([t]) => !isDefined(t))
+              .flatMap(([, petitions]) => petitions)
+          ),
+        },
+      ],
+      [(t) => t.status.all, "desc"]
     );
+  }
+
+  private async getPetitionTimeStats(petitionIds: number[]) {
+    const events = await this.from("petition_event")
+      .whereIn("petition_id", petitionIds)
+      .whereIn("type", [
+        "ACCESS_ACTIVATED",
+        "REPLY_CREATED",
+        "PETITION_COMPLETED",
+        "PETITION_CLOSED",
+        "SIGNATURE_STARTED",
+        "SIGNATURE_COMPLETED",
+      ])
+      .orderBy("created_at", "ASC")
+      .select("*");
+
+    const eventsByPetitionId = groupBy(events, (e) => e.petition_id);
+
+    return petitionIds.map((petitionId) => {
+      const events = eventsByPetitionId[petitionId];
+      const pendingAt = events
+        .find((e) => e.type === "ACCESS_ACTIVATED" || e.type === "REPLY_CREATED") // first ACCESS_ACTIVATED or REPLY_CREATED event marks the first time the petition moved to PENDING status
+        ?.created_at.getTime();
+      const completedAt = findLast(
+        events,
+        (e) => e.type === "PETITION_COMPLETED"
+      )?.created_at.getTime();
+      const closedAt = findLast(events, (e) => e.type === "PETITION_CLOSED")?.created_at.getTime();
+      const signatureStartedAt = findLast(
+        events,
+        (e) => e.type === "SIGNATURE_STARTED"
+      )?.created_at.getTime();
+      const signatureCompletedAt = findLast(
+        events,
+        (e) => e.type === "SIGNATURE_COMPLETED"
+      )?.created_at.getTime();
+
+      return {
+        pending_to_complete:
+          isDefined(completedAt) && isDefined(pendingAt) && completedAt > pendingAt
+            ? (completedAt - pendingAt) / 1000
+            : null,
+        complete_to_close:
+          isDefined(closedAt) && isDefined(completedAt) && closedAt > completedAt
+            ? (closedAt - completedAt) / 1000
+            : null,
+        signature_completed:
+          isDefined(signatureStartedAt) &&
+          isDefined(signatureCompletedAt) &&
+          signatureCompletedAt > signatureStartedAt
+            ? (signatureCompletedAt - signatureStartedAt) / 1000
+            : null,
+      };
+    });
   }
 
   async getFirstDefinedTitleFromHeadings(petitionId: number) {
@@ -5893,26 +5949,5 @@ export class PetitionRepository extends BaseRepository {
         .where("id", petitionId)
         .update({ deleted_at: null, deleted_by: null });
     });
-  }
-
-  async getUserPetitionsForOverviewReport(
-    userId: number,
-    startDate?: Maybe<Date>,
-    endDate?: Maybe<Date>
-  ) {
-    return await this.from("petition")
-      .joinRaw(
-        "join petition_permission pp on pp.petition_id = petition.id and pp.user_id = ?",
-        userId
-      )
-      .whereNull("pp.deleted_at")
-      .whereNull("petition.deleted_at")
-      .whereRaw(/* sql */ `(petition.status != 'DRAFT' or petition.is_template = true)`)
-      .mmodify((q) => {
-        if (startDate && endDate) {
-          q.whereBetween("petition.created_at", [startDate, endDate]);
-        }
-      })
-      .select<Petition[]>("petition.*");
   }
 }
