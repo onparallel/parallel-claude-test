@@ -1,3 +1,4 @@
+import { ComponentWithAs, IconProps } from "@chakra-ui/react";
 import {
   ExclamationOutlineIcon,
   FileDocIcon,
@@ -10,7 +11,9 @@ import {
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Maybe } from "@parallel/graphql/__types";
-import { useIntl } from "react-intl";
+import match from "mime-match";
+import { IntlShape, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 
 export interface FileIconProps {
   filename: Maybe<string>;
@@ -26,9 +29,99 @@ export const FileIcon = chakraForwardRef<"svg", FileIconProps>(function FileIcon
   return <Icon ref={ref} color={hasFailed ? "red.500" : "inherit"} alt={label} {...props} />;
 });
 
-function useGetIconAndLabelForFile({ filename, contentType, hasFailed }: FileIconProps) {
-  const intl = useIntl();
+interface FileType {
+  icon: ComponentWithAs<"svg", IconProps>;
+  name: (intl: IntlShape) => string;
+  contentTypes: string[];
+  extensions: string[];
+}
 
+const FILE_TYPES: FileType[] = [
+  {
+    name: (intl) =>
+      intl.formatMessage({
+        id: "component.file-icon.document-file",
+        defaultMessage: "Document file",
+      }),
+    icon: FileDocIcon,
+    contentTypes: [
+      "application/vnd.ms-word",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ],
+    extensions: [".pages", ".docx", ".doc"],
+  },
+  {
+    name: (intl) =>
+      intl.formatMessage({
+        id: "component.file-icon.spreadsheet-file",
+        defaultMessage: "Spreadsheet file",
+      }),
+    icon: FileSpreadsheetIcon,
+    contentTypes: [
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/csv",
+    ],
+    extensions: [".numbers", ".csv", ".xls", ".xlsx"],
+  },
+  {
+    name: (intl) =>
+      intl.formatMessage({
+        id: "component.file-icon.pdf-file",
+        defaultMessage: "PDF file",
+      }),
+    icon: FilePdfIcon,
+    contentTypes: ["application/pdf"],
+    extensions: [".pdf"],
+  },
+  {
+    name: (intl) =>
+      intl.formatMessage({
+        id: "component.file-icon.zip-file",
+        defaultMessage: "Zip file",
+      }),
+    icon: FileZipIcon,
+    contentTypes: ["application/zip", "application/x-zip-compressed"],
+    extensions: [".zip"],
+  },
+  {
+    name: (intl) =>
+      intl.formatMessage({
+        id: "component.file-icon.image-file",
+        defaultMessage: "Image file",
+      }),
+    icon: FileImageIcon,
+    contentTypes: ["image/*"],
+    extensions: [],
+  },
+  {
+    name: (intl) =>
+      intl.formatMessage({
+        id: "component.file-icon.audio-file",
+        defaultMessage: "Audio file",
+      }),
+    icon: FileMediaIcon,
+    contentTypes: ["audio/*"],
+    extensions: [],
+  },
+  {
+    name: (intl) =>
+      intl.formatMessage({
+        id: "component.file-icon.video-file",
+        defaultMessage: "Video file",
+      }),
+    icon: FileMediaIcon,
+    contentTypes: ["video/*"],
+    extensions: [],
+  },
+];
+
+function useGetIconAndLabelForFile({
+  filename,
+  contentType,
+  hasFailed,
+}: FileIconProps): [ComponentWithAs<"svg", IconProps>, string] {
+  const intl = useIntl();
   if (hasFailed) {
     return [
       ExclamationOutlineIcon,
@@ -38,95 +131,19 @@ function useGetIconAndLabelForFile({ filename, contentType, hasFailed }: FileIco
       }),
     ];
   }
-
-  if (!filename && !contentType) {
-    return [
-      FileOtherIcon,
-      intl.formatMessage({
-        id: "component.file-icon.other-file",
-        defaultMessage: "File",
-      }),
-    ];
+  for (const { icon, name, contentTypes, extensions } of FILE_TYPES) {
+    if (
+      (isDefined(contentType) && contentTypes.some((t) => match(contentType, t))) ||
+      (isDefined(filename) && extensions.some((e) => filename.toLowerCase().endsWith(e)))
+    ) {
+      return [icon, name(intl)];
+    }
   }
-
-  const type = contentType ?? "";
-
-  if (
-    [
-      "application/vnd.ms-word",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ].includes(type) ||
-    filename?.endsWith(".pages")
-  ) {
-    return [
-      FileDocIcon,
-      intl.formatMessage({
-        id: "component.file-icon.document-file",
-        defaultMessage: "Document file",
-      }),
-    ] as const;
-  } else if (
-    [
-      "application/vnd.ms-excel",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "application/csv",
-    ].includes(type) ||
-    filename?.endsWith(".numbers")
-  ) {
-    return [
-      FileSpreadsheetIcon,
-      intl.formatMessage({
-        id: "component.file-icon.spreadsheet-file",
-        defaultMessage: "Spreadsheet file",
-      }),
-    ] as const;
-  } else if (["application/pdf"].includes(type)) {
-    return [
-      FilePdfIcon,
-      intl.formatMessage({
-        id: "component.file-icon.pdf-file",
-        defaultMessage: "PDF file",
-      }),
-    ] as const;
-  } else if (["application/zip", "application/x-zip-compressed"].includes(type)) {
-    return [
-      FileZipIcon,
-      intl.formatMessage({
-        id: "component.file-icon.zip-file",
-        defaultMessage: "Zip file",
-      }),
-    ] as const;
-  } else if (type.startsWith("image/")) {
-    return [
-      FileImageIcon,
-      intl.formatMessage({
-        id: "component.file-icon.image-file",
-        defaultMessage: "Image file",
-      }),
-    ] as const;
-  } else if (type.startsWith("audio/")) {
-    return [
-      FileMediaIcon,
-      intl.formatMessage({
-        id: "component.file-icon.audio-file",
-        defaultMessage: "Audio file",
-      }),
-    ] as const;
-  } else if (type.startsWith("video/")) {
-    return [
-      FileMediaIcon,
-      intl.formatMessage({
-        id: "component.file-icon.video-file",
-        defaultMessage: "Video file",
-      }),
-    ] as const;
-  } else {
-    return [
-      FileOtherIcon,
-      intl.formatMessage({
-        id: "component.file-icon.other-file",
-        defaultMessage: "File",
-      }),
-    ] as const;
-  }
+  return [
+    FileOtherIcon,
+    intl.formatMessage({
+      id: "component.file-icon.other-file",
+      defaultMessage: "File",
+    }),
+  ];
 }
