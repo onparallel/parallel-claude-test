@@ -5400,7 +5400,7 @@ type TagPagination {
 type Task {
   id: GID!
   name: TaskName!
-  output: JSONObject
+  output: JSON
   progress: Int
   status: TaskStatus!
 }

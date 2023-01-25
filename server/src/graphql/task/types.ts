@@ -19,7 +19,7 @@ export const Task = objectType({
       }),
     });
     t.nullable.int("progress");
-    t.nullable.jsonObject("output", {
+    t.nullable.json("output", {
       resolve: (t) => {
         return isDefined(t.output?.temporary_file_id) ? {} : t.output;
       },

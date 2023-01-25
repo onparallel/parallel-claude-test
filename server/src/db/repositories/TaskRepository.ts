@@ -54,7 +54,7 @@ export type TaskInput<TName extends TaskName> = {
   };
 }[TName];
 
-interface PetitionStatusCount {
+interface PetitionReportStatusCount {
   all: number;
   pending: number;
   completed: number;
@@ -62,15 +62,10 @@ interface PetitionStatusCount {
   signed: number;
 }
 
-interface TemplateStats {
-  from_template_id: string;
-  name: Maybe<string>;
-  status: PetitionStatusCount;
-  times: {
-    pending_to_complete: Maybe<number>;
-    complete_to_close: Maybe<number>;
-    signature_completed: Maybe<number>;
-  };
+interface PetitionReportTimes {
+  pending_to_complete: Maybe<number>;
+  complete_to_close: Maybe<number>;
+  signature_completed: Maybe<number>;
 }
 
 export type TaskOutput<TName extends TaskName> = {
@@ -78,19 +73,18 @@ export type TaskOutput<TName extends TaskName> = {
   PRINT_PDF: { temporary_file_id: number };
   EXPORT_EXCEL: { temporary_file_id: number };
   TEMPLATE_REPLIES_REPORT: { temporary_file_id: number };
-  TEMPLATE_STATS_REPORT: TemplateStats;
+  TEMPLATE_STATS_REPORT: {
+    from_template_id: string;
+    status: PetitionReportStatusCount;
+    times: PetitionReportTimes;
+  };
   DOW_JONES_PROFILE_DOWNLOAD: { temporary_file_id: number };
   TEMPLATES_OVERVIEW_REPORT: {
     aggregation_type: "TEMPLATE" | "NO_ACCESS" | "NO_TEMPLATE";
-    template_id?: number;
-    template_name?: Maybe<string>;
+    name?: Maybe<string>;
     template_count?: number;
-    status: PetitionStatusCount;
-    times: {
-      pending_to_complete: Maybe<number>;
-      complete_to_close: Maybe<number>;
-      signature_completed: Maybe<number>;
-    };
+    status: PetitionReportStatusCount;
+    times: PetitionReportTimes;
   }[];
 }[TName];
 
@@ -125,7 +119,7 @@ export class TaskRepository extends BaseRepository {
       {
         status: "COMPLETED",
         progress: 100,
-        output,
+        output: this.json(output),
         finished_at: this.now(),
       },
       updatedBy

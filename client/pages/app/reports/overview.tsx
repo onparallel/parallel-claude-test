@@ -30,7 +30,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useReportsSections } from "@parallel/utils/useReportsSections";
 import { ReactNode, useCallback, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, sort, sortBy } from "remeda";
+import { isDefined, sort, sortBy, sumBy } from "remeda";
 
 const SORTING = ["name", "total", "completed", "signed", "closed"] as const;
 
@@ -41,9 +41,12 @@ interface PetitionStatusCount {
   closed: number;
   signed: number;
 }
+
 interface TemplateStats {
-  from_template_id: string;
-  name: Maybe<string>;
+  id: string;
+  aggregation_type: "TEMPLATE" | "NO_ACCESS" | "NO_TEMPLATE";
+  name?: Maybe<string>;
+  template_count?: number;
   status: PetitionStatusCount;
   times: {
     pending_to_complete: Maybe<number>;
@@ -52,12 +55,7 @@ interface TemplateStats {
   };
 }
 
-interface ReportType {
-  totals: PetitionStatusCount;
-  templates: TemplateStats[];
-  other_templates?: TemplateStats;
-  petitions_scratch?: TemplateStats;
-}
+type ReportType = TemplateStats[];
 
 export const QUERY_STATE = {
   range: date().list(2),
@@ -107,31 +105,6 @@ export function Overview() {
 
   const reportDateRange = useRef<Date[] | null>(null);
 
-  const otherTemplates = report?.other_templates
-    ? {
-        ...report!.other_templates,
-        name: intl.formatMessage(
-          {
-            id: "page.reports-overview.other-templates",
-            defaultMessage: "Other templates not shared with me ({count})",
-          },
-          {
-            count: 80,
-          }
-        ),
-      }
-    : null;
-
-  const parallelsScratch = report?.petitions_scratch
-    ? {
-        ...report!.petitions_scratch,
-        name: intl.formatMessage({
-          id: "page.reports-overview.parallels-scratch",
-          defaultMessage: "Parallels created from scratch",
-        }),
-      }
-    : null;
-
   const [list, searchedList] = useMemo(() => {
     const {
       items,
@@ -140,10 +113,7 @@ export function Overview() {
       sort: { direction, field },
     } = state;
 
-    let templates = report?.templates ?? [];
-
-    otherTemplates && templates.push(otherTemplates);
-    parallelsScratch && templates.push(parallelsScratch);
+    let templates = (report ?? []).map((r, id) => ({ ...r, id: id.toString() }));
 
     if (search) {
       templates = templates.filter(({ name }) => {
@@ -247,12 +217,7 @@ export function Overview() {
 
   const downloadExcel = useDownloadOverviewExcel();
   const handleDownloadReport = async () => {
-    let templates = [...report!.templates];
-
-    otherTemplates && templates.push(otherTemplates);
-    parallelsScratch && templates.push(parallelsScratch);
-
-    downloadExcel({ range: state.range, templates });
+    downloadExcel({ range: state.range, templates: report ?? [] });
   };
 
   return (
@@ -303,7 +268,7 @@ export function Overview() {
                   id: "page.reports-overview.total-parallels",
                   defaultMessage: "Total parallels",
                 })}
-                amount={report.totals.all}
+                amount={sumBy(report ?? [], (r) => r.status.all)}
                 help={
                   <Stack>
                     <Text>
@@ -326,7 +291,7 @@ export function Overview() {
                   id: "page.reports-overview.completed-parallels",
                   defaultMessage: "Completed",
                 })}
-                amount={report.totals.completed}
+                amount={sumBy(report ?? [], (r) => r.status.completed)}
                 help={
                   <Stack>
                     <Text>
@@ -349,7 +314,7 @@ export function Overview() {
                   id: "page.reports-overview.signed-parallels",
                   defaultMessage: "Signed",
                 })}
-                amount={report.totals.signed}
+                amount={sumBy(report ?? [], (r) => r.status.signed)}
                 help={
                   <Stack>
                     <Text>
@@ -372,7 +337,7 @@ export function Overview() {
                   id: "page.reports-overview.closed-parallels",
                   defaultMessage: "Closed",
                 })}
-                amount={report.totals.closed}
+                amount={sumBy(report ?? [], (r) => r.status.closed)}
                 help={
                   <Stack>
                     <Text>
@@ -398,7 +363,7 @@ export function Overview() {
               isHighlightable
               columns={tableType === "STATUS" ? columnsStatus : columnsTime}
               rows={list}
-              rowKeyProp="from_template_id"
+              rowKeyProp="id"
               loading={false}
               page={state.page}
               pageSize={state.items}
@@ -519,11 +484,24 @@ function useOverviewTemplateStatusColumns(): TableColumn<TemplateStats>[] {
         CellContent: ({ row }) => {
           return (
             <OverflownText textStyle={row.name ? undefined : "hint"}>
-              {row.name ||
+              {row.aggregation_type === "NO_ACCESS" ? (
+                <FormattedMessage
+                  id="page.reports-overview.other-templates"
+                  defaultMessage="Other templates not shared with me ({count})"
+                  values={{ count: row.template_count ?? 0 }}
+                />
+              ) : row.aggregation_type === "NO_TEMPLATE" ? (
+                <FormattedMessage
+                  id="page.reports-overview.parallels-scratch"
+                  defaultMessage="Parallels created from scratch"
+                />
+              ) : (
+                row.name ||
                 intl.formatMessage({
                   id: "generic.unnamed-template",
                   defaultMessage: "Unnamed template",
-                })}
+                })
+              )}
             </OverflownText>
           );
         },
@@ -603,11 +581,24 @@ function useOverviewTemplateTimesColumns(): TableColumn<TemplateStats>[] {
         CellContent: ({ row }) => {
           return (
             <OverflownText textStyle={row.name ? undefined : "hint"}>
-              {row.name ||
+              {row.aggregation_type === "NO_ACCESS" ? (
+                <FormattedMessage
+                  id="page.reports-overview.other-templates"
+                  defaultMessage="Other templates not shared with me ({count})"
+                  values={{ count: row.template_count ?? 0 }}
+                />
+              ) : row.aggregation_type === "NO_TEMPLATE" ? (
+                <FormattedMessage
+                  id="page.reports-overview.parallels-scratch"
+                  defaultMessage="Parallels created from scratch"
+                />
+              ) : (
+                row.name ||
                 intl.formatMessage({
                   id: "generic.unnamed-template",
                   defaultMessage: "Unnamed template",
-                })}
+                })
+              )}
             </OverflownText>
           );
         },

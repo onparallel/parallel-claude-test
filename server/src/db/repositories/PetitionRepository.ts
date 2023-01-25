@@ -5327,22 +5327,17 @@ export class PetitionRepository extends BaseRepository {
     startDate?: Date | null,
     endDate?: Date | null
   ) {
-    const templateNames = await this.from("petition")
-      .where("id", fromTemplateId)
-      .select("id", "name");
-
-    const petitions = await this.raw<{
+    // list of all the organization petitions coming from a specific template
+    const orgPetitions = await this.raw<{
       id: number;
       name: Maybe<string>;
       status: PetitionStatus;
-      from_template_id: number;
       latest_signature_status: Maybe<string>;
     }>(
       /* sql */ `
-      select distinct on (p.id) p.id, p.name, p.status, p.from_template_id, p.latest_signature_status,
+      select distinct on (p.id) p.id, p.name, p.status, p.latest_signature_status
       from petition p 
-      left join petition_permission pp on pp.petition_id = p.id and pp.user_id 
-      where p.from_template_id in ? 
+      where p.from_template_id = ? 
         and p.org_id = ? 
         and p.is_template = false
         and p.status != 'DRAFT' 
@@ -5359,8 +5354,8 @@ export class PetitionRepository extends BaseRepository {
       ]
     );
 
-    const stats = await pFlatMap(chunk(petitions, 200), async (petitions) => {
-      return await this.getPetitionTimeStats(petitions.map((s) => s.id));
+    const stats = await pFlatMap(chunk(orgPetitions, 200), async (petitionsChunk) => {
+      return await this.getPetitionTimeStats(petitionsChunk.map((s) => s.id));
     });
     const times = {
       pending_to_complete: average(stats.map((p) => p.pending_to_complete).filter(isDefined)),
@@ -5369,24 +5364,24 @@ export class PetitionRepository extends BaseRepository {
     };
     return {
       from_template_id: toGlobalId("Petition", fromTemplateId),
-      name: templateNames.find((t) => t.id === fromTemplateId)?.name ?? null,
       status: {
-        all: petitions.length,
-        pending: countBy(petitions, (p) => p.status === "PENDING"),
-        completed: countBy(petitions, (p) => p.status === "COMPLETED"),
-        closed: countBy(petitions, (p) => p.status === "CLOSED"),
-        signed: countBy(petitions, (p) => p.latest_signature_status === "COMPLETED"),
+        all: orgPetitions.length,
+        pending: countBy(orgPetitions, (p) => p.status === "PENDING"),
+        completed: countBy(orgPetitions, (p) => p.status === "COMPLETED"),
+        closed: countBy(orgPetitions, (p) => p.status === "CLOSED"),
+        signed: countBy(orgPetitions, (p) => p.latest_signature_status === "COMPLETED"),
       },
       times,
+
       /** @deprecated until end. Keeping for retrocompatibility with frontend */
       template_id: toGlobalId("Petition", fromTemplateId),
-      pending: countBy(petitions, (r) => r.status === "PENDING"),
-      completed: countBy(petitions, (r) => r.status === "COMPLETED"),
-      closed: countBy(petitions, (r) => r.status === "CLOSED"),
+      pending: countBy(orgPetitions, (r) => r.status === "PENDING"),
+      completed: countBy(orgPetitions, (r) => r.status === "COMPLETED"),
+      closed: countBy(orgPetitions, (r) => r.status === "CLOSED"),
       pending_to_complete: times.pending_to_complete,
       complete_to_close: times.complete_to_close,
       signatures: {
-        completed: countBy(petitions, (p) => p.latest_signature_status === "COMPLETED"),
+        completed: countBy(orgPetitions, (p) => p.latest_signature_status === "COMPLETED"),
         time_to_complete: times.signature_completed,
       },
     };
@@ -5398,42 +5393,47 @@ export class PetitionRepository extends BaseRepository {
     startDate?: Date | null,
     endDate?: Date | null
   ) {
-    const petitions = await this.raw<{
+    // list of all the organization's petitions (excluding templates)
+    const orgPetitions = await this.raw<{
       id: number;
-      name: Maybe<string>;
       status: PetitionStatus;
       from_template_id: Maybe<number>;
       latest_signature_status: Maybe<string>;
     }>(
       /* sql */ `
-      select distinct on (p.id) p.id, p.status, p.from_template_id, p.latest_signature_status
-      from petition p
-      where p.org_id = ? 
-        and p.is_template = false
-        and p.status != 'DRAFT' 
-        and p.deleted_at is null 
-        and (?::timestamptz is null or ?::timestamptz is null or created_at between ? and ?)
-    `,
+        select distinct on (p.id) p.id, p.status, p.from_template_id, p.latest_signature_status
+        from petition p
+        where p.org_id = ? 
+          and p.is_template = false
+          and p.status != 'DRAFT' 
+          and p.deleted_at is null 
+          and (?::timestamptz is null or ?::timestamptz is null or created_at between ? and ?)
+      `,
       [orgId, startDate ?? null, endDate ?? null, startDate ?? null, endDate ?? null]
     );
 
-    const templates = await this.raw<{
-      id: number;
-      name: string;
-      has_access: boolean;
-    }>(
-      /* sql */ `
-      select distinct on (p.id)
-        p.id, p.name, coalesce(pp.id::bool, false) as has_access
-      from petition p
-      left join petition_permission pp on p.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null
-      where p.id in ? and p.deleted_at is null
-    `,
-      [userId, this.sqlIn(uniq(petitions.map((p) => p.from_template_id)))]
-    );
+    const fromTemplateIds = uniq(orgPetitions.map((p) => p.from_template_id).filter(isDefined));
+
+    const templates =
+      fromTemplateIds.length > 0
+        ? await this.raw<{
+            id: number;
+            name: string;
+            has_access: boolean;
+          }>(
+            /* sql */ `
+              select distinct on (p.id)
+                p.id, p.name, coalesce(pp.id::bool, false) as has_access
+              from petition p
+              left join petition_permission pp on p.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null
+              where p.id in ? and p.deleted_at is null
+            `,
+            [userId, this.sqlIn(fromTemplateIds)]
+          )
+        : [];
 
     const petitionsWithStats = await pFlatMap(
-      chunk(petitions, 200),
+      chunk(orgPetitions, 200),
       async (petitionsChunk) => {
         return zip(
           petitionsChunk,
@@ -5480,8 +5480,7 @@ export class PetitionRepository extends BaseRepository {
           .map(([template, petitions]) => {
             return {
               aggregation_type: "TEMPLATE" as const,
-              template_id: template?.id,
-              template_name: template?.name,
+              name: template?.name,
               ...groupStats(petitions),
             };
           }),
