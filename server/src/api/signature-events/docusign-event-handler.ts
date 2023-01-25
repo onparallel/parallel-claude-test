@@ -156,10 +156,11 @@ export const docusignEventHandlers: RequestHandler = Router()
           // status 200 to kill request but avoid sending an error to signaturit
           return res.sendStatus(200).end();
         }
-        const handler = HANDLERS[body.event] ?? appendEventLogs;
+        const handler = HANDLERS[body.event];
         const petitionId = fromGlobalId(req.params.petitionId, "Petition").id;
         (async function () {
           try {
+            await appendEventLogs(req.context, body);
             await handler?.(req.context, body, petitionId);
           } catch (error: any) {
             req.context.logger.error(error.message, { stack: error.stack });
@@ -207,8 +208,6 @@ async function recipientSent(ctx: ApiContext, body: DocuSignEventBody, petitionI
     },
     ctx
   );
-
-  await appendEventLogs(ctx, body);
 }
 
 /** a signer opened the signing page on the signature provider */
@@ -239,8 +238,6 @@ async function recipientDelivered(ctx: ApiContext, body: DocuSignEventBody, peti
       petition_signature_request_id: signature!.id,
     },
   });
-
-  await appendEventLogs(ctx, body);
 }
 
 /** signer declined the document. Whole signature process will be cancelled */
@@ -276,7 +273,6 @@ async function recipientDeclined(ctx: ApiContext, body: DocuSignEventBody, petit
   );
 
   await ctx.signature.cancelSignatureRequest(signature);
-  await appendEventLogs(ctx, body);
 }
 
 /**
@@ -310,7 +306,6 @@ async function envelopeVoided(ctx: ApiContext, body: DocuSignEventBody, petition
       },
     }
   );
-  await appendEventLogs(ctx, body);
 }
 
 /** recipient signed the document */
@@ -348,8 +343,6 @@ async function recipientCompleted(ctx: ApiContext, body: DocuSignEventBody, peti
       petition_signature_request_id: signature!.id,
     },
   });
-
-  await appendEventLogs(ctx, body);
 }
 
 /** document is completed (everyone has already signed). document and audit trail are ready to be downloaded */
@@ -368,8 +361,6 @@ async function envelopeCompleted(ctx: ApiContext, body: DocuSignEventBody, petit
 
   await ctx.signature.storeSignedDocument(signature, body.data.envelopeId, signer);
   await ctx.signature.storeAuditTrail(signature, body.data.envelopeId);
-
-  await appendEventLogs(ctx, body);
 }
 
 /** Sent when DocuSign gets notification that an email delivery has failed. */
@@ -404,8 +395,6 @@ async function recipientAutoresponded(
     { email_bounced_at: new Date(body.generatedDateTime) },
     ctx
   );
-
-  await appendEventLogs(ctx, body);
 }
 
 /** one of the recipients reassigned their signature to another person. We need to update the recipientIds to point to the new signer */
@@ -424,8 +413,6 @@ async function recipientReassigned(ctx: ApiContext, body: DocuSignEventBody, pet
       })),
     },
   });
-
-  await appendEventLogs(ctx, body);
 }
 
 async function appendEventLogs(ctx: ApiContext, body: DocuSignEventBody): Promise<void> {

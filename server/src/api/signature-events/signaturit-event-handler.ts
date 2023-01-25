@@ -56,10 +56,11 @@ export const signaturitEventHandlers: RequestHandler = Router()
         // status 200 to kill request but avoid sending an error to signaturit
         return res.sendStatus(200).end();
       }
-      const handler = HANDLERS[body.type] ?? appendEventLogs;
+      const handler = HANDLERS[body.type];
       const petitionId = fromGlobalId(req.params.petitionId, "Petition").id;
       (async function () {
         try {
+          await appendEventLogs(req.context, body);
           await handler?.(req.context, body, petitionId);
         } catch (error: any) {
           req.context.logger.error(error.message, { stack: error.stack });
@@ -94,7 +95,6 @@ async function documentOpened(ctx: ApiContext, data: SignaturItEventBody, petiti
       petition_signature_request_id: signature!.id,
     },
   });
-  await appendEventLogs(ctx, data);
 }
 
 /** the document was signed by any of the assigned signers */
@@ -125,7 +125,6 @@ async function documentSigned(ctx: ApiContext, data: SignaturItEventBody, petiti
       petition_signature_request_id: signature!.id,
     },
   });
-  await appendEventLogs(ctx, data);
 }
 
 /** signer declined the document. Whole signature process will be cancelled */
@@ -153,7 +152,6 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
       },
     }
   );
-  await appendEventLogs(ctx, data);
 }
 /** signed document has been completed and is ready to be downloaded */
 async function documentCompleted(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
@@ -166,7 +164,6 @@ async function documentCompleted(ctx: ApiContext, data: SignaturItEventBody, pet
   const [signer] = findSigner(signature!.signature_config.signersInfo, data.document);
 
   await ctx.signature.storeSignedDocument(signature, `${signatureId}/${documentId}`, signer);
-  await appendEventLogs(ctx, data);
 }
 
 /** audit trail has been completed and is ready to be downloaded */
@@ -179,7 +176,6 @@ async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, p
   const signature = await fetchPetitionSignature(signatureId, ctx);
 
   await ctx.signature.storeAuditTrail(signature, `${signatureId}/${documentId}`);
-  await appendEventLogs(ctx, data);
 }
 
 async function emailDelivered(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
@@ -199,7 +195,6 @@ async function emailDelivered(ctx: ApiContext, data: SignaturItEventBody, petiti
     { email_delivered_at: new Date(data.created_at) },
     ctx
   );
-  await appendEventLogs(ctx, data);
 }
 
 async function emailOpened(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
@@ -208,7 +203,6 @@ async function emailOpened(ctx: ApiContext, data: SignaturItEventBody, petitionI
     { email_opened_at: new Date(data.created_at) },
     ctx
   );
-  await appendEventLogs(ctx, data);
 }
 
 async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
@@ -243,7 +237,6 @@ async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petition
     { email_bounced_at: new Date(data.created_at) },
     ctx
   );
-  await appendEventLogs(ctx, data);
 }
 
 async function fetchPetitionSignature(signatureId: string, ctx: ApiContext) {
