@@ -21,7 +21,7 @@
     "_strip-js": "yarn workspace @parallel/bin strip-js"
   },
   "dependencies": {
-    "@apollo/client": "^3.7.4",
+    "@apollo/client": "^3.7.5",
     "@chakra-ui/react": "^1.8.9",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
