@@ -8286,7 +8286,7 @@
   },
   {
     "term": "page.signature.consent-required-popover",
-    "definition": "<a>Haz click aquí</a> para reautorizar to integración de DocuSign.",
+    "definition": "<a>Haz click aquí</a> para reautorizar tu integración de DocuSign.",
     "context": "<a>Click here</a> to reauthorize your DocuSign integration."
   },
   {
@@ -8306,6 +8306,16 @@
   },
   {
     "term": "page.signature.provider-added-successfully.toast-title",
+    "definition": "Éxito",
+    "context": "Success"
+  },
+  {
+    "term": "page.signature.provider-updated-successfully.toast-description",
+    "definition": "La integración con {provider} se actualizó correctamente.",
+    "context": "{provider} integration updated successfully."
+  },
+  {
+    "term": "page.signature.provider-updated-successfully.toast-title",
     "definition": "Éxito",
     "context": "Success"
   },

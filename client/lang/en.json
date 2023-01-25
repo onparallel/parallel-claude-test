@@ -8310,6 +8310,16 @@
     "context": "Success"
   },
   {
+    "term": "page.signature.provider-updated-successfully.toast-description",
+    "definition": "{provider} integration updated successfully.",
+    "context": "{provider} integration updated successfully."
+  },
+  {
+    "term": "page.signature.provider-updated-successfully.toast-title",
+    "definition": "Success",
+    "context": "Success"
+  },
+  {
     "term": "page.signature.upgrade-plan-alert-1",
     "definition": "You currently have unlimited trial signatures included in the free plan.",
     "context": "You currently have unlimited trial signatures included in the free plan."

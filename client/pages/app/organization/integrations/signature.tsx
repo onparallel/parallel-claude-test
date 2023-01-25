@@ -181,6 +181,20 @@ function IntegrationsSignature() {
     );
     if (!error) {
       refetch();
+      toast({
+        status: "success",
+        title: intl.formatMessage({
+          id: "page.signature.provider-updated-successfully.toast-title",
+          defaultMessage: "Success",
+        }),
+        description: intl.formatMessage(
+          {
+            id: "page.signature.provider-updated-successfully.toast-description",
+            defaultMessage: "{provider} integration updated successfully.",
+          },
+          { provider: "Docusign" }
+        ),
+      });
     }
   }
 
