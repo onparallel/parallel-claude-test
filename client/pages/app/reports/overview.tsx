@@ -86,24 +86,24 @@ function StatsCard({ title, amount, help }: { title: string; amount: number; hel
 
 export function Overview() {
   const intl = useIntl();
-  const [state, setQueryState] = useQueryState(QUERY_STATE);
+  const [queryState, setQueryState] = useQueryState(QUERY_STATE);
   const {
     data: { me, realMe },
   } = useAssertQuery(Overview_userDocument);
 
   const sections = useReportsSections();
 
-  const [{ status, report, tableType }, setState] = useState<{
+  const [{ status, report, activeRange, tableType }, setState] = useState<{
     status: "IDLE" | "LOADING" | "LOADED" | "ERROR";
     report: ReportType | null;
+    activeRange: Date[] | null;
     tableType: OverviewTableType;
   }>({
     status: "IDLE",
     report: null,
+    activeRange: null,
     tableType: "STATUS",
   });
-
-  const reportDateRange = useRef<Date[] | null>(null);
 
   const [list, searchedList] = useMemo(() => {
     const {
@@ -111,9 +111,16 @@ export function Overview() {
       page,
       search,
       sort: { direction, field },
-    } = state;
+    } = queryState;
 
-    let templates = (report ?? []).map((r, id) => ({ ...r, id: id.toString() }));
+    let templates = (report ?? [])
+      .map((r, id) => ({ ...r, id: id.toString() }))
+      .filter((t) =>
+        (t.aggregation_type === "NO_ACCESS" && !t.template_count) ||
+        (t.aggregation_type === "NO_TEMPLATE" && t.status.all === 0)
+          ? false
+          : true
+      );
 
     if (search) {
       templates = templates.filter(({ name }) => {
@@ -153,9 +160,9 @@ export function Overview() {
     }
 
     return [templates.slice((page - 1) * items, page * items), templates];
-  }, [report, state, tableType]);
+  }, [report, queryState, tableType]);
 
-  const [search, setSearch] = useState(state.search);
+  const [search, setSearch] = useState(queryState.search);
   const debouncedOnSearchChange = useDebouncedCallback(
     (value) => {
       setQueryState((current) => ({
@@ -182,21 +189,20 @@ export function Overview() {
 
   const handleGenerateReportClick = async () => {
     try {
-      setState((state) => ({ ...state, status: "LOADING" }));
+      setState((state) => ({ ...state, status: "LOADING", activeRange: queryState.range }));
       taskAbortController.current?.abort();
       taskAbortController.current = new AbortController();
       const { task } = await stallFor(
         () =>
           templatesOverviewTask(
             {
-              startDate: state.range?.[0].toISOString() ?? null,
-              endDate: state.range?.[1].toISOString() ?? null,
+              startDate: queryState.range?.[0].toISOString() ?? null,
+              endDate: queryState.range?.[1].toISOString() ?? null,
             },
             { signal: taskAbortController.current!.signal, timeout: 60_000 }
           ),
         2_000 + 1_000 * Math.random()
       );
-      reportDateRange.current = state.range;
       setState((state) => ({ ...state, report: task.output as any, status: "LOADED" }));
     } catch (e: any) {
       if (e.message === "ABORTED") {
@@ -217,7 +223,7 @@ export function Overview() {
 
   const downloadExcel = useDownloadOverviewExcel();
   const handleDownloadReport = async () => {
-    downloadExcel({ range: state.range, templates: report ?? [] });
+    downloadExcel({ range: activeRange, templates: report ?? [] });
   };
 
   return (
@@ -240,7 +246,7 @@ export function Overview() {
       <Stack spacing={6} padding={6}>
         <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2} flex="1">
           <DateRangePickerButton
-            value={state.range as [Date, Date] | null}
+            value={queryState.range as [Date, Date] | null}
             onChange={handleDateRangeChange}
             isDisabled={status === "LOADING"}
           />
@@ -365,10 +371,10 @@ export function Overview() {
               rows={list}
               rowKeyProp="id"
               loading={false}
-              page={state.page}
-              pageSize={state.items}
+              page={queryState.page}
+              pageSize={queryState.items}
               totalCount={searchedList?.length ?? 0}
-              sort={state.sort}
+              sort={queryState.sort}
               onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
               onPageSizeChange={(items) =>
                 setQueryState((s) => ({ ...s, items: items as any, page: 1 }))
@@ -387,7 +393,7 @@ export function Overview() {
               }
               body={
                 list.length === 0 ? (
-                  state.search ? (
+                  queryState.search ? (
                     <Flex flex="1" alignItems="center" justifyContent="center">
                       <Text color="gray.300" fontSize="lg">
                         <FormattedMessage
@@ -825,7 +831,15 @@ function useDownloadOverviewExcel() {
       })
     );
 
-    const _templates = sort(templates, (a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
+    const _templates = sort(
+      templates.filter((t) =>
+        (t.aggregation_type === "NO_ACCESS" && !t.template_count) ||
+        (t.aggregation_type === "NO_TEMPLATE" && t.status.all === 0)
+          ? false
+          : true
+      ),
+      (a, b) => (a.name ?? "").localeCompare(b.name ?? "")
+    );
 
     worksheet.columns = worksheetColumns;
     worksheet.spliceRows(1, 0, []);
@@ -842,7 +856,25 @@ function useDownloadOverviewExcel() {
     });
     worksheet.addRows(
       _templates.map((row) => ({
-        name: row.name,
+        name:
+          row.aggregation_type === "NO_ACCESS"
+            ? intl.formatMessage(
+                {
+                  id: "page.reports-overview.other-templates",
+                  defaultMessage: "Other templates not shared with me ({count})",
+                },
+                { count: row.template_count ?? 0 }
+              )
+            : row.aggregation_type === "NO_TEMPLATE"
+            ? intl.formatMessage({
+                id: "page.reports-overview.parallels-scratch",
+                defaultMessage: "Parallels created from scratch",
+              })
+            : row.name ||
+              intl.formatMessage({
+                id: "generic.unnamed-template",
+                defaultMessage: "Unnamed template",
+              }),
         total: row.status.all,
         completed: row.status.completed,
         signed: row.status.signed,
