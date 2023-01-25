@@ -45,21 +45,39 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
         headers: { "Content-Type": "application/json" },
       });
 
-      if (status !== 200) {
+      if (status !== 200 && !subscription.is_failing) {
         await ctx.emails.sendDeveloperWebhookFailedEmail(
           subscription.id,
           petition.id,
           `Error ${status}: ${statusText} for POST ${subscription.endpoint}`,
           mappedEvent
         );
+        await ctx.subscriptions.updateSubscription(
+          subscription.id,
+          { is_failing: true },
+          `PetitionEventSubscription:${subscription.id}`
+        );
+      } else if (status === 200 && subscription.is_failing) {
+        await ctx.subscriptions.updateSubscription(
+          subscription.id,
+          { is_failing: false },
+          `PetitionEventSubscription:${subscription.id}`
+        );
       }
     } catch (e: any) {
-      await ctx.emails.sendDeveloperWebhookFailedEmail(
-        subscription.id,
-        petition.id,
-        e.message ?? "",
-        mappedEvent
-      );
+      if (!subscription.is_failing) {
+        await ctx.emails.sendDeveloperWebhookFailedEmail(
+          subscription.id,
+          petition.id,
+          e.message ?? "",
+          mappedEvent
+        );
+        await ctx.subscriptions.updateSubscription(
+          subscription.id,
+          { is_failing: true },
+          `PetitionEventSubscription:${subscription.id}`
+        );
+      }
     }
   }
 };

@@ -5,6 +5,7 @@ export const PetitionEventSubscription = objectType({
   definition(t) {
     t.globalId("id");
     t.nonNull.boolean("isEnabled", { resolve: (o) => o.is_enabled });
+    t.nonNull.boolean("isFailing", { resolve: (o) => o.is_failing });
     t.nonNull.string("eventsUrl", { resolve: (o) => o.endpoint });
     t.nullable.list.nonNull.field("eventTypes", {
       type: "PetitionEventType",

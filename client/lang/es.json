@@ -10120,6 +10120,11 @@
     "context": "Unnamed subscription"
   },
   {
+    "term": "settings.developers.subscriptions.webhook-is-failing",
+    "definition": "No se han podido enviar los eventos a la URL, si el error continúa revisa el webhook",
+    "context": "The events could not be sent to the URL, if the error persists check the webhook"
+  },
+  {
     "term": "settings.security",
     "definition": "Seguridad",
     "context": "Security"

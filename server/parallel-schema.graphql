@@ -3000,6 +3000,7 @@ type PetitionEventSubscription {
   fromTemplate: PetitionBaseMini
   id: GID!
   isEnabled: Boolean!
+  isFailing: Boolean!
   name: String
 }
 

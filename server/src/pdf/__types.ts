@@ -2461,6 +2461,7 @@ export type PetitionEventSubscription = {
   fromTemplate: Maybe<PetitionBaseMini>;
   id: Scalars["GID"];
   isEnabled: Scalars["Boolean"];
+  isFailing: Scalars["Boolean"];
   name: Maybe<Scalars["String"]>;
 };
 

@@ -2535,6 +2535,7 @@ export interface PetitionEventSubscription {
   fromTemplate?: Maybe<PetitionBaseMini>;
   id: Scalars["GID"];
   isEnabled: Scalars["Boolean"];
+  isFailing: Scalars["Boolean"];
   name?: Maybe<Scalars["String"]>;
 }
 
@@ -24424,6 +24425,7 @@ export type Developers_PetitionEventSubscriptionFragment = {
   eventsUrl: string;
   eventTypes?: Array<PetitionEventType> | null;
   isEnabled: boolean;
+  isFailing: boolean;
   name?: string | null;
   fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
 };
@@ -24448,6 +24450,7 @@ export type Developers_createEventSubscriptionMutation = {
     eventsUrl: string;
     eventTypes?: Array<PetitionEventType> | null;
     isEnabled: boolean;
+    isFailing: boolean;
     name?: string | null;
     fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
   };
@@ -24465,6 +24468,7 @@ export type Developers_updateEventSubscriptionMutation = {
     eventsUrl: string;
     eventTypes?: Array<PetitionEventType> | null;
     isEnabled: boolean;
+    isFailing: boolean;
     name?: string | null;
     fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
   };
@@ -24502,6 +24506,7 @@ export type Developers_subscriptionsQuery = {
     eventsUrl: string;
     eventTypes?: Array<PetitionEventType> | null;
     isEnabled: boolean;
+    isFailing: boolean;
     name?: string | null;
     fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
   }>;
@@ -31360,6 +31365,7 @@ export const Developers_PetitionEventSubscriptionFragmentDoc = gql`
     eventsUrl
     eventTypes
     isEnabled
+    isFailing
     name
     fromTemplate {
       id

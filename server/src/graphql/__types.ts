@@ -1741,6 +1741,7 @@ export interface NexusGenFieldTypes {
     fromTemplate: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
     id: NexusGenScalars["GID"]; // GID!
     isEnabled: boolean; // Boolean!
+    isFailing: boolean; // Boolean!
     name: string | null; // String
   };
   PetitionField: {
@@ -3529,6 +3530,7 @@ export interface NexusGenFieldTypeNames {
     fromTemplate: "PetitionBaseMini";
     id: "GID";
     isEnabled: "Boolean";
+    isFailing: "Boolean";
     name: "String";
   };
   PetitionField: {

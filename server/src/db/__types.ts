@@ -977,6 +977,7 @@ export interface PetitionEventSubscription {
   event_types: Maybe<any>; // jsonb
   name: Maybe<string>; // varchar
   from_template_id: Maybe<number>; // int4
+  is_failing: boolean; // bool
 }
 
 export type CreatePetitionEventSubscription = PartialProps<
@@ -991,6 +992,7 @@ export type CreatePetitionEventSubscription = PartialProps<
   | "event_types"
   | "name"
   | "from_template_id"
+  | "is_failing"
 >;
 
 export interface PetitionField {

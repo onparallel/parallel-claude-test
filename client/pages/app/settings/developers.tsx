@@ -5,13 +5,15 @@ import {
   Center,
   Divider,
   Heading,
+  HStack,
   List,
   ListItem,
   Stack,
   Switch,
   Text,
+  Tooltip,
 } from "@chakra-ui/react";
-import { RepeatIcon } from "@parallel/chakra/icons";
+import { AlertCircleFilledIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -388,14 +390,27 @@ function useSubscriptionsColumns(): TableColumn<
           defaultMessage: "Name",
         }),
         CellContent: ({ row }) => (
-          <Text textStyle={row.name ? undefined : "hint"}>
-            {row.name ?? (
-              <FormattedMessage
-                id="settings.developers.subscriptions.unnamed-subscription"
-                defaultMessage="Unnamed subscription"
-              />
-            )}
-          </Text>
+          <HStack>
+            {row.isFailing ? (
+              <Tooltip
+                label={intl.formatMessage({
+                  id: "settings.developers.subscriptions.webhook-is-failing",
+                  defaultMessage:
+                    "The events could not be sent to the URL, if the error persists check the webhook",
+                })}
+              >
+                <AlertCircleFilledIcon color="red.500" />
+              </Tooltip>
+            ) : null}
+            <Text textStyle={row.name ? undefined : "hint"}>
+              {row.name ?? (
+                <FormattedMessage
+                  id="settings.developers.subscriptions.unnamed-subscription"
+                  defaultMessage="Unnamed subscription"
+                />
+              )}
+            </Text>
+          </HStack>
         ),
       },
       {
@@ -534,6 +549,7 @@ Developers.fragments = {
       eventsUrl
       eventTypes
       isEnabled
+      isFailing
       name
       fromTemplate {
         id
