@@ -39,43 +39,32 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
   const mappedEvent = mapEvent(event);
   for (const subscription of userSubscriptions) {
     try {
-      const { status, statusText } = await fetch(subscription.endpoint, {
+      const res = await fetch(subscription.endpoint, {
         method: "POST",
         body: JSON.stringify(mappedEvent),
         headers: { "Content-Type": "application/json" },
       });
-
-      if (status !== 200 && !subscription.is_failing) {
-        await ctx.emails.sendDeveloperWebhookFailedEmail(
-          subscription.id,
-          petition.id,
-          `Error ${status}: ${statusText} for POST ${subscription.endpoint}`,
-          mappedEvent
-        );
-        await ctx.subscriptions.updateSubscription(
-          subscription.id,
-          { is_failing: true },
-          `PetitionEventSubscription:${subscription.id}`
-        );
-      } else if (status === 200 && subscription.is_failing) {
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}: ${res.statusText} for POST ${subscription.endpoint}`);
+      } else if (subscription.is_failing) {
         await ctx.subscriptions.updateSubscription(
           subscription.id,
           { is_failing: false },
-          `PetitionEventSubscription:${subscription.id}`
+          `EventProcessorWorker:${event.id}`
         );
       }
-    } catch (e: any) {
+    } catch (e) {
       if (!subscription.is_failing) {
         await ctx.emails.sendDeveloperWebhookFailedEmail(
           subscription.id,
           petition.id,
-          e.message ?? "",
+          (e as any)?.message ?? "",
           mappedEvent
         );
         await ctx.subscriptions.updateSubscription(
           subscription.id,
           { is_failing: true },
-          `PetitionEventSubscription:${subscription.id}`
+          `EventProcessorWorker:${event.id}`
         );
       }
     }
