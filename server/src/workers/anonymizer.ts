@@ -39,7 +39,7 @@ createCronWorker("anonymizer", async (ctx, config) => {
   await ctx.files.updateFileUpload(
     filesToDelete.map((f) => f.id),
     { file_deleted_at: new Date() },
-    "Worker:Anonymizer"
+    "AnonymizerWorker"
   );
 
   // search for closed parallels that are configured to be anonymized after a certain time

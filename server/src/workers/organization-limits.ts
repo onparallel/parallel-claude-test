@@ -30,7 +30,7 @@ createCronWorker("organization-limits", async (context) => {
           id: limit.org_id,
           usage_details: limit.usage_details,
         },
-        "Worker:OrganizationLimits"
+        "OrganizationLimitsWorker"
       );
     }
   }

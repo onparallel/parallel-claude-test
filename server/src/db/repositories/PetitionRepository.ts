@@ -1229,7 +1229,7 @@ export class PetitionRepository extends BaseRepository {
             petition_access_id: access.id,
             user_id: userId,
             reason:
-              updatedBy === "Worker:Anonymizer"
+              updatedBy === "AnonymizerWorker"
                 ? "PETITION_ANONYMIZED"
                 : ((isDefined(userId) ? "DEACTIVATED_BY_USER" : "EMAIL_BOUNCED") as any),
           },
@@ -5106,7 +5106,7 @@ export class PetitionRepository extends BaseRepository {
       await this.updatePetition(
         petitionId,
         { signature_config: null, anonymized_at: this.now() },
-        "Worker:Anonymizer",
+        "AnonymizerWorker",
         t
       );
 
@@ -5144,7 +5144,7 @@ export class PetitionRepository extends BaseRepository {
         this.deactivateAccesses(
           petitionId,
           accesses.map((a) => a.id),
-          "Worker:Anonymizer",
+          "AnonymizerWorker",
           undefined,
           t
         ),
@@ -5160,7 +5160,7 @@ export class PetitionRepository extends BaseRepository {
 
       await this.anonymizePetitionSignatureRequests(petitionId, t);
 
-      await this.deactivatePublicPetitionLinks(petitionId, "Worker:Anonymizer", t);
+      await this.deactivatePublicPetitionLinks(petitionId, "AnonymizerWorker", t);
 
       await this.createEvent(
         {
@@ -5209,7 +5209,7 @@ export class PetitionRepository extends BaseRepository {
         `),
       });
 
-    await this.files.deleteFileUpload(fileUploadIds, "Worker:Anonymizer", t);
+    await this.files.deleteFileUpload(fileUploadIds, "AnonymizerWorker", t);
   }
 
   async anonymizePetitionFieldComments(
@@ -5306,7 +5306,7 @@ export class PetitionRepository extends BaseRepository {
         .map((s) => s.file_upload_audit_trail_id!),
     ];
 
-    await this.files.deleteFileUpload(fileUploadIds, "Worker:Anonymizer", t);
+    await this.files.deleteFileUpload(fileUploadIds, "AnonymizerWorker", t);
   }
 
   private async deactivatePublicPetitionLinks(
