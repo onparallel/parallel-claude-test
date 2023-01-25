@@ -82,6 +82,22 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
               date,
             } as SignatureBoxProps,
           ]
+        : [
+            "zas25KHxAByKWmFx9gf",
+            "zas25KHxAByKWmHefVF",
+            "zas25KHxAByKWmHefVH",
+            "zas25KHxAByKWmHefVK",
+            "zas25KHxAByKWmHefZj",
+            "zas25KHxAByKWmHefZm",
+          ].includes(templateId)
+        ? [
+            {
+              fullName: "Jorge Arturo Cáceres Quezada",
+              signatureImageUrl:
+                "https://static.onparallel.com/static/images/signatures/jorge-arturo-caceres-rive.png",
+              date,
+            } as SignatureBoxProps,
+          ]
         : []
       : []),
     ...signatureConfig.signers!.map(
