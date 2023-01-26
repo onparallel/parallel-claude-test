@@ -3,12 +3,10 @@ import { RequestInit } from "node-fetch";
 import pMap from "p-map";
 import { groupBy, isDefined } from "remeda";
 import { Config, CONFIG } from "../config";
-import { ContactRepository } from "../db/repositories/ContactRepository";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import { FileRepository } from "../db/repositories/FileRepository";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
-import { UserRepository } from "../db/repositories/UserRepository";
 import { getBaseWebhookUrl } from "../util/getBaseWebhookUrl";
 import { fromGlobalId } from "../util/globalId";
 import { pFlatMap } from "../util/promises/pFlatMap";
@@ -89,15 +87,14 @@ export interface IBankflipService {
   /** called to start a session with Bankflip to request a person's documents */
   createSession(metadata: SessionMetadata): Promise<CreateSessionResponse>;
   /** webhook callback for when document extraction has finished and the session is completed */
-  sessionCompleted(event: SessionCompletedWebhookEvent): Promise<void>;
+  sessionCompleted(orgId: string, event: SessionCompletedWebhookEvent): Promise<void>;
+  webhookSecret(orgId: string): string;
 }
 
 @injectable()
 export class BankflipService implements IBankflipService {
   constructor(
     @inject(PetitionRepository) private petitions: PetitionRepository,
-    @inject(UserRepository) private users: UserRepository,
-    @inject(ContactRepository) private contacts: ContactRepository,
     @inject(FileRepository) private files: FileRepository,
     @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
@@ -108,16 +105,36 @@ export class BankflipService implements IBankflipService {
     @inject(CONFIG) private config: Config
   ) {}
 
+  public webhookSecret(orgId: string) {
+    return orgId === this.config.bankflip.saldadosOrgId
+      ? this.config.bankflip.saldadosWebhookSecret
+      : this.config.bankflip.webhookSecret;
+  }
+
+  private bankflipHost(orgId: string) {
+    return orgId === this.config.bankflip.saldadosOrgId
+      ? this.config.bankflip.saldadosHost
+      : this.config.bankflip.host;
+  }
+
+  private bankflipApiKey(orgId: string) {
+    return orgId === this.config.bankflip.saldadosOrgId
+      ? this.config.bankflip.saldadosApiKey
+      : this.config.bankflip.apiKey;
+  }
+
   private async apiRequest<T>(
+    orgId: string,
     url: string,
     init?: RequestInit,
     type: "json" | "buffer" = "json"
   ): Promise<T> {
-    const response = await this.fetch.fetch(`${this.config.bankflip.host}${url}`, {
+    const host = this.bankflipHost(orgId);
+    const apiKey = this.bankflipApiKey(orgId);
+    const response = await this.fetch.fetch(`${host}${url}`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${this.config.bankflip.apiKey}`,
-        ...init?.headers,
+        Authorization: `Bearer ${apiKey}`,
       },
       ...init,
     });
@@ -150,23 +167,27 @@ export class BankflipService implements IBankflipService {
       }
     }
 
-    return await this.apiRequest<CreateSessionResponse>("/session", {
+    return await this.apiRequest<CreateSessionResponse>(metadata.orgId, "/session", {
       method: "POST",
       body: JSON.stringify({
         requests: field.options.requests,
-        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/v2`,
+        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/v2/${metadata.orgId}`,
         customization,
         metadata,
       }),
     });
   }
 
-  async sessionCompleted(event: SessionCompletedWebhookEvent): Promise<void> {
-    const session = await this.apiRequest<SessionResponse>(`/session/${event.payload.sessionId}`);
+  async sessionCompleted(orgId: string, event: SessionCompletedWebhookEvent): Promise<void> {
+    const session = await this.apiRequest<SessionResponse>(
+      orgId,
+      `/session/${event.payload.sessionId}`
+    );
     const { metadata } = session;
     await this.consumePetitionCredits(metadata);
 
     const summary = await this.apiRequest<SessionSummaryResponse>(
+      orgId,
       `/session/${event.payload.sessionId}/summary`
     );
 
@@ -240,6 +261,7 @@ export class BankflipService implements IBankflipService {
       }
 
       const pdfBuffer = await this.apiRequest<Buffer>(
+        metadata.orgId,
         `/document/${documents.pdf.id}/content`,
         {},
         "buffer"
@@ -264,7 +286,7 @@ export class BankflipService implements IBankflipService {
         file_upload_id: file.id,
         request: documents.pdf.model,
         json_contents: documents.json
-          ? await this.apiRequest<any>(`/document/${documents.json.id}/content`)
+          ? await this.apiRequest<any>(metadata.orgId, `/document/${documents.json.id}/content`)
           : null,
       };
     });

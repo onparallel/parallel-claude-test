@@ -151,6 +151,11 @@ export function buildConfig() {
       host: process.env.BANKFLIP_HOST!,
       apiKey: process.env.BANKFLIP_API_KEY!,
       webhookSecret: process.env.BANKFLIP_WEBHOOK_SECRET!,
+      // temporal patch for Saldados org until we have bankflip via integrations
+      saldadosOrgId: process.env.BANKFLIP_SALDADOS_ORG_GID, // if undefined, ignore this special rule (for local and staging)
+      saldadosHost: process.env.BANKFLIP_SALDADOS_HOST!,
+      saldadosApiKey: process.env.BANKFLIP_SALDADOS_API_KEY!,
+      saldadosWebhookSecret: process.env.BANKFLIP_SALDADOS_WEBHOOK_SECRET!,
     },
     oauth: {
       docusign: {

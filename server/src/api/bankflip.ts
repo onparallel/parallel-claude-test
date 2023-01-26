@@ -5,7 +5,7 @@ import { ModelExtractedWebhookEvent, SessionCompletedWebhookEvent } from "../ser
 type BankflipWebhookBody = ModelExtractedWebhookEvent | SessionCompletedWebhookEvent;
 
 const verifyHMAC = (req: Request, _: Response, buffer: Buffer) => {
-  const secret = req.context.config.bankflip.webhookSecret;
+  const secret = req.context.bankflip.webhookSecret(req.params.orgId);
   const requestUri = `https://${req.hostname}${req.originalUrl}`;
   const requestMethod = req.method;
   const requestBody = buffer.toString();
@@ -21,16 +21,20 @@ const verifyHMAC = (req: Request, _: Response, buffer: Buffer) => {
   }
 };
 
-export const bankflip = Router().post("/", json({ verify: verifyHMAC }), async (req, res, next) => {
-  try {
-    const body = req.body as BankflipWebhookBody;
-    if (body.name === "SESSION_COMPLETED") {
-      await req.context.bankflip.sessionCompleted(body);
-    }
+export const bankflip = Router().post(
+  "/:orgId",
+  json({ verify: verifyHMAC }),
+  async (req, res, next) => {
+    try {
+      const body = req.body as BankflipWebhookBody;
+      if (body.name === "SESSION_COMPLETED") {
+        await req.context.bankflip.sessionCompleted(req.params.orgId, body);
+      }
 
-    res.sendStatus(200).end();
-  } catch (error: any) {
-    req.context.logger.error(error.message, { stack: error.stack });
-    next(error);
+      res.sendStatus(200).end();
+    } catch (error: any) {
+      req.context.logger.error(error.message, { stack: error.stack });
+      next(error);
+    }
   }
-});
+);
