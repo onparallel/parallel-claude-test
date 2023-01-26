@@ -446,7 +446,7 @@ function Petitions() {
       me={me}
       realMe={realMe}
     >
-      <Stack minHeight={0} paddingX={4} paddingTop={6} paddingBottom={16} spacing={4}>
+      <Stack minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
         <Flex alignItems="center">
           <Box minWidth="0" width="fit-content">
             <Menu matchWidth>
@@ -575,7 +575,7 @@ function Petitions() {
             </Menu>
           </Flex>
         </Flex>
-        <Box flex="1">
+        <Box flex="1" paddingBottom={16}>
           <TablePage
             flex="0 1 auto"
             minHeight={0}
