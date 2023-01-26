@@ -12,7 +12,7 @@ async function main() {
     const { domain } = await yargs_1.default.usage("Usage: $0 --domain [domain]").option("domain", {
         required: true,
         type: "string",
-        description: "The commit sha",
+        description: "The domain to create the certificate for",
     }).argv;
     if (!process.env.SUDO_UID) {
         throw new Error("Run this script with sudo");
