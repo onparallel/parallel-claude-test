@@ -15,7 +15,7 @@ const INSTANCE_TYPES = {
     staging: "t2.medium",
 };
 const KEY_NAME = "ops";
-const IMAGE_ID = "ami-0b191a4b0e33fae0c";
+const IMAGE_ID = "ami-06cc1a6d580e7e2dd";
 const SECURITY_GROUP_IDS = ["sg-0486098a6131eb458"];
 const IAM_ROLE = "parallel-server";
 const SUBNET_ID = "subnet-d3cc68b9";

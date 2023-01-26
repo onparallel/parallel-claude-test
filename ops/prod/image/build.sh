@@ -102,7 +102,7 @@ make install
 popd > /dev/null
 
 echo "Installing exiftool"
-download_and_untar Image-ExifTool-12.54 https://exiftool.org/Image-ExifTool-12.54.tar.gz
+download_and_untar Image-ExifTool-12.54 https://exiftool.org/Image-ExifTool-12.55.tar.gz
 pushd Image-ExifTool-12.54
 perl Makefile.PL
 make test
