@@ -185,20 +185,20 @@ function MdList({ token }: { token: marked.Tokens.List }) {
       width: `${theme.textFontSize * 0.14}mm`,
       backgroundColor: theme.textColor,
       borderRadius: "100%",
-      marginRight: `${theme.textFontSize * 0.1}mm`,
+      marginRight: `${theme.textFontSize * 0.09}mm`,
     },
     listItemBulletLevel1: {
       height: `${theme.textFontSize * 0.14}mm`,
       width: `${theme.textFontSize * 0.14}mm`,
       borderRadius: "100%",
       border: `1px solid ${theme.textColor}`,
-      marginRight: `${theme.textFontSize * 0.1}mm`,
+      marginRight: `${theme.textFontSize * 0.09}mm`,
     },
     listItemBulletLevel2: {
       height: `${theme.textFontSize * 0.14}mm`,
       width: `${theme.textFontSize * 0.14}mm`,
       backgroundColor: theme.textColor,
-      marginRight: `${theme.textFontSize * 0.1}mm`,
+      marginRight: `${theme.textFontSize * 0.09}mm`,
     },
   });
   const flatten = (
