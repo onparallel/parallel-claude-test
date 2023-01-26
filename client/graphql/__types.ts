@@ -595,8 +595,6 @@ export interface Mutation {
   anonymizePetition: SupportMethodResponse;
   /** Updates the status of a PENDING petition field replies to APPROVED or REJECTED */
   approveOrRejectPetitionFieldReplies: Petition;
-  /** Clones the petition and assigns the given user as owner and creator. */
-  assignPetitionToUser: SupportMethodResponse;
   /** Load contacts from an excel file, creating the ones not found on database */
   bulkCreateContacts: BulkCreateContactsReturnType;
   /** Submits multiple replies on a petition at once given a JSON input where the keys are field aliases and values are the replie(s) for that field. */
@@ -689,8 +687,6 @@ export interface Mutation {
   /** Deletes event subscriptions */
   deleteEventSubscriptions: Result;
   deleteOrganizationPdfDocumentTheme: Organization;
-  /** Soft-deletes any given petition on the database. */
-  deletePetition: SupportMethodResponse;
   /** Remove a petition attachment */
   deletePetitionAttachment: PetitionBase;
   /** Deletes a petition field. */
@@ -967,11 +963,6 @@ export interface MutationapproveOrRejectPetitionFieldRepliesArgs {
   status: PetitionFieldReplyStatus;
 }
 
-export interface MutationassignPetitionToUserArgs {
-  petitionId: Scalars["ID"];
-  userId: Scalars["GID"];
-}
-
 export interface MutationbulkCreateContactsArgs {
   file: Scalars["Upload"];
   force?: InputMaybe<Scalars["Boolean"]>;
@@ -1228,10 +1219,6 @@ export interface MutationdeleteEventSubscriptionsArgs {
 
 export interface MutationdeleteOrganizationPdfDocumentThemeArgs {
   orgThemeId: Scalars["GID"];
-}
-
-export interface MutationdeletePetitionArgs {
-  petitionId: Scalars["ID"];
 }
 
 export interface MutationdeletePetitionAttachmentArgs {

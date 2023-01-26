@@ -551,8 +551,6 @@ export type Mutation = {
   anonymizePetition: SupportMethodResponse;
   /** Updates the status of a PENDING petition field replies to APPROVED or REJECTED */
   approveOrRejectPetitionFieldReplies: Petition;
-  /** Clones the petition and assigns the given user as owner and creator. */
-  assignPetitionToUser: SupportMethodResponse;
   /** Load contacts from an excel file, creating the ones not found on database */
   bulkCreateContacts: BulkCreateContactsReturnType;
   /** Submits multiple replies on a petition at once given a JSON input where the keys are field aliases and values are the replie(s) for that field. */
@@ -645,8 +643,6 @@ export type Mutation = {
   /** Deletes event subscriptions */
   deleteEventSubscriptions: Result;
   deleteOrganizationPdfDocumentTheme: Organization;
-  /** Soft-deletes any given petition on the database. */
-  deletePetition: SupportMethodResponse;
   /** Remove a petition attachment */
   deletePetitionAttachment: PetitionBase;
   /** Deletes a petition field. */
@@ -923,11 +919,6 @@ export type MutationapproveOrRejectPetitionFieldRepliesArgs = {
   status: PetitionFieldReplyStatus;
 };
 
-export type MutationassignPetitionToUserArgs = {
-  petitionId: Scalars["ID"];
-  userId: Scalars["GID"];
-};
-
 export type MutationbulkCreateContactsArgs = {
   file: Scalars["Upload"];
   force?: InputMaybe<Scalars["Boolean"]>;
@@ -1184,10 +1175,6 @@ export type MutationdeleteEventSubscriptionsArgs = {
 
 export type MutationdeleteOrganizationPdfDocumentThemeArgs = {
   orgThemeId: Scalars["GID"];
-};
-
-export type MutationdeletePetitionArgs = {
-  petitionId: Scalars["ID"];
 };
 
 export type MutationdeletePetitionAttachmentArgs = {
@@ -3457,7 +3444,7 @@ export type Query = {
   petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
   publicLicenseCode: Maybe<PublicLicenseCode>;
-  publicOrgLogoUrl: Maybe<Scalars["String"]>;
+  publicOrg: Maybe<PublicOrganization>;
   /** The comments for this field. */
   publicPetitionField: PublicPetitionField;
   publicPetitionLinkBySlug: Maybe<PublicPublicPetitionLink>;
@@ -3617,7 +3604,7 @@ export type QuerypublicLicenseCodeArgs = {
   token: Scalars["ID"];
 };
 
-export type QuerypublicOrgLogoUrlArgs = {
+export type QuerypublicOrgArgs = {
   id: Scalars["GID"];
 };
 

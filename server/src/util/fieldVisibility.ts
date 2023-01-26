@@ -14,11 +14,7 @@ export interface PetitionFieldVisibility {
   conditions: PetitionFieldVisibilityCondition[];
 }
 export interface PetitionFieldVisibilityCondition {
-  /*
-    When used on the GraphQL validator, the fieldId will be a string (coming from the client)
-    When used to evaluate a field visibility, the field will be a number (coming from the database)
-  */
-  fieldId: number | string;
+  fieldId: number;
   column?: number;
   modifier: "ANY" | "ALL" | "NONE" | "NUMBER_OF_REPLIES";
   operator:
@@ -39,7 +35,7 @@ export interface PetitionFieldVisibilityCondition {
 }
 
 type VisibilityField = {
-  id: number | string;
+  id: number;
   type: PetitionFieldType;
   options: any;
   visibility: PetitionFieldVisibility | null;

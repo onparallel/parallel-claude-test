@@ -1811,7 +1811,7 @@ export class PetitionRepository extends BaseRepository {
     if (!field) {
       throw new Error("Petition field not found");
     }
-    validateFieldOptions(field?.type, { ...field.options, ...data.options });
+    validateFieldOptions(field.type, { ...field.options, ...data.options });
     return field;
   }
 

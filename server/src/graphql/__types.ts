@@ -1293,7 +1293,6 @@ export interface NexusGenFieldTypes {
     addUsersToUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     anonymizePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     approveOrRejectPetitionFieldReplies: NexusGenRootTypes["Petition"]; // Petition!
-    assignPetitionToUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     bulkCreateContacts: NexusGenRootTypes["BulkCreateContactsReturnType"]; // BulkCreateContactsReturnType!
     bulkCreatePetitionReplies: NexusGenRootTypes["Petition"]; // Petition!
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
@@ -1340,7 +1339,6 @@ export interface NexusGenFieldTypes {
     deleteDowJonesKycIntegration: NexusGenRootTypes["Organization"]; // Organization!
     deleteEventSubscriptions: NexusGenEnums["Result"]; // Result!
     deleteOrganizationPdfDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
-    deletePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     deletePetitionAttachment: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     deletePetitionField: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     deletePetitionFieldAttachment: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -3086,7 +3084,6 @@ export interface NexusGenFieldTypeNames {
     addUsersToUserGroup: "UserGroup";
     anonymizePetition: "SupportMethodResponse";
     approveOrRejectPetitionFieldReplies: "Petition";
-    assignPetitionToUser: "SupportMethodResponse";
     bulkCreateContacts: "BulkCreateContactsReturnType";
     bulkCreatePetitionReplies: "Petition";
     cancelScheduledMessage: "PetitionMessage";
@@ -3133,7 +3130,6 @@ export interface NexusGenFieldTypeNames {
     deleteDowJonesKycIntegration: "Organization";
     deleteEventSubscriptions: "Result";
     deleteOrganizationPdfDocumentTheme: "Organization";
-    deletePetition: "SupportMethodResponse";
     deletePetitionAttachment: "PetitionBase";
     deletePetitionField: "PetitionBase";
     deletePetitionFieldAttachment: "PetitionField";
@@ -4566,11 +4562,6 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     };
-    assignPetitionToUser: {
-      // args
-      petitionId: string; // ID!
-      userId: NexusGenScalars["GID"]; // GID!
-    };
     bulkCreateContacts: {
       // args
       file: NexusGenScalars["Upload"]; // Upload!
@@ -4828,10 +4819,6 @@ export interface NexusGenArgTypes {
     deleteOrganizationPdfDocumentTheme: {
       // args
       orgThemeId: NexusGenScalars["GID"]; // GID!
-    };
-    deletePetition: {
-      // args
-      petitionId: string; // ID!
     };
     deletePetitionAttachment: {
       // args

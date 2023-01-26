@@ -696,21 +696,6 @@ type Mutation {
   ): Petition!
 
   """
-  Clones the petition and assigns the given user as owner and creator.
-  """
-  assignPetitionToUser(
-    """
-    Global ID of the petition
-    """
-    petitionId: ID!
-
-    """
-    Global ID of the user
-    """
-    userId: GID!
-  ): SupportMethodResponse!
-
-  """
   Load contacts from an excel file, creating the ones not found on database
   """
   bulkCreateContacts(
@@ -1066,16 +1051,6 @@ type Mutation {
   """
   deleteEventSubscriptions(ids: [GID!]!): Result!
   deleteOrganizationPdfDocumentTheme(orgThemeId: GID!): Organization!
-
-  """
-  Soft-deletes any given petition on the database.
-  """
-  deletePetition(
-    """
-    Global ID of the petition
-    """
-    petitionId: ID!
-  ): SupportMethodResponse!
 
   """
   Remove a petition attachment

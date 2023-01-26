@@ -1,6 +1,9 @@
-import { jsonSchema } from "./jsonSchema";
+import Ajv from "ajv";
+import { core } from "nexus";
+import { ArgValidationError } from "../errors";
+import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
-export const validRichTextContent = jsonSchema({
+const RICH_TEXT_CONTENT_SCHEMA = {
   definitions: {
     "list-item": {
       type: "object",
@@ -103,4 +106,29 @@ export const validRichTextContent = jsonSchema({
     },
   },
   $ref: "#/definitions/root",
-});
+};
+
+export function validateRichTextContent(json: any) {
+  const ajv = new Ajv();
+  const valid = ajv.validate(RICH_TEXT_CONTENT_SCHEMA, json);
+  if (!valid) {
+    throw new Error(ajv.errorsText());
+  }
+}
+
+export function validRichTextContent<TypeName extends string, FieldName extends string>(
+  prop: (args: core.ArgsValue<TypeName, FieldName>) => any,
+  argName: string
+) {
+  return ((_, args, ctx, info) => {
+    try {
+      const value = prop(args);
+      if (!value) {
+        return;
+      }
+      validateRichTextContent(value);
+    } catch (e: any) {
+      throw new ArgValidationError(info, argName, e.message);
+    }
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}

@@ -15,70 +15,6 @@ import { validateHexColor } from "../tag/validators";
 import { supportMethodAccess } from "./authorizers";
 import { validatePublicTemplateCategories } from "./validators";
 
-export const assignPetitionToUser = mutationField("assignPetitionToUser", {
-  description: "Clones the petition and assigns the given user as owner and creator.",
-  type: "SupportMethodResponse",
-  args: {
-    petitionId: nonNull(idArg({ description: "Global ID of the petition" })),
-    userId: nonNull(globalIdArg("User", { description: "Global ID of the user" })),
-  },
-  authorize: supportMethodAccess(),
-  resolve: async (_, args, ctx) => {
-    try {
-      const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-      const petition = await ctx.petitions.loadPetition(petitionId);
-      if (!petition) {
-        throw new Error(`Petition ${args.petitionId} not found`);
-      }
-      const user = await ctx.users.loadUser(args.userId);
-      const userData = user ? await ctx.users.loadUserData(user.user_data_id) : null;
-      if (!user || !userData) {
-        throw new Error(`User ${args.userId} not found`);
-      }
-      const newPetition = await ctx.petitions.clonePetition(petitionId, user);
-
-      return {
-        result: RESULT.SUCCESS,
-        message: `Petition successfully assigned to ${userData.first_name} ${
-          userData.last_name
-        }, new petition id: ${toGlobalId("Petition", newPetition.id)}`,
-      };
-    } catch (e: any) {
-      return { result: RESULT.FAILURE, message: e.message };
-    }
-  },
-});
-
-export const deletePetition = mutationField("deletePetition", {
-  description: "Soft-deletes any given petition on the database.",
-  type: "SupportMethodResponse",
-  args: {
-    petitionId: nonNull(idArg({ description: "Global ID of the petition" })),
-  },
-  authorize: supportMethodAccess(),
-  resolve: async (_, args, ctx) => {
-    try {
-      const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-      const petition = await ctx.petitions.loadPetition(petitionId);
-      if (!petition) {
-        throw new Error(`Petition ${args.petitionId} not found.`);
-      }
-
-      await ctx.petitions.withTransaction(async (t) => {
-        await ctx.petitions.deleteAllPermissions([petitionId], ctx.user!, t);
-        await ctx.petitions.deletePetitionUserNotificationsByPetitionId([petitionId], undefined, t);
-        await ctx.petitions.deletePetition(petitionId, ctx.user!, t);
-      });
-      return {
-        result: RESULT.SUCCESS,
-        message: `Petition ${args.petitionId} deleted.`,
-      };
-    } catch (e: any) {
-      return { result: RESULT.FAILURE, message: e.message };
-    }
-  },
-});
-
 export const forceUpdateSignatureOrganizationBrandings = mutationField(
   "forceUpdateSignatureOrganizationBrandings",
   {
@@ -464,17 +400,13 @@ export const importPetitionFromJson = mutationField("importPetitionFromJson", {
   },
   resolve: async (_, { json }, ctx) => {
     try {
-      const petition = await ctx.petitionImportExport.fromJson(JSON.parse(json), ctx.user!);
+      const petitionId = await ctx.petitionImportExport.fromJson(JSON.parse(json), ctx.user!);
       return {
         result: RESULT.SUCCESS,
-        message: `Petition with id ${toGlobalId("Petition", petition.id)} imported successfully.`,
+        message: `Petition with id ${toGlobalId("Petition", petitionId)} imported successfully.`,
       };
     } catch (e: any) {
-      console.error(e);
-      if (e.message.startsWith("Unexpected token")) {
-        return { result: RESULT.FAILURE, message: "Input is not a valid JSON object" };
-      }
+      return { result: RESULT.FAILURE, message: e.message };
     }
-    return { result: RESULT.FAILURE, message: "Something went wrong..." };
   },
 });

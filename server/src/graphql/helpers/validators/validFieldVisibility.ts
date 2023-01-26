@@ -28,7 +28,7 @@ const schema = {
         additionalProperties: false,
         required: ["fieldId", "modifier", "operator", "value"],
         properties: {
-          fieldId: { type: "string" },
+          fieldId: { type: "number" },
           modifier: {
             enum: ["ANY", "ALL", "NONE", "NUMBER_OF_REPLIES"],
           },
@@ -82,16 +82,24 @@ function assertOneOf<T>(value: T, options: T[], errorMessage: string) {
   assert(options.includes(value), errorMessage);
 }
 
-function validateCondition(ctx: ApiContext, petitionId: number, field: PetitionField) {
-  assert(
-    field.type !== "HEADING" || !field.options.hasPageBreak,
-    `Can't add visibility conditions on a heading with page break`
-  );
+function validateCondition<
+  TField extends Pick<
+    PetitionField,
+    "id" | "type" | "position" | "options" | "visibility" | "petition_id"
+  >
+>(field: TField, fields: TField[]) {
+  return (c: PetitionFieldVisibilityCondition, index: number) => {
+    assert(
+      field.type !== "HEADING" || !field.options.hasPageBreak,
+      `Can't add visibility conditions on a heading with page break`
+    );
+    const referencedField = fields.find((f) => f.id === c.fieldId);
 
-  return async (c: PetitionFieldVisibilityCondition) => {
-    const referencedField = await loadField(c.fieldId as string, ctx);
-
-    if (referencedField === null) {
+    assert(
+      referencedField !== undefined,
+      `Can't find PetitionField:${c.fieldId} referenced in PetitionField:${field.id}, condition ${index}`
+    );
+    if (!referencedField) {
       return;
     }
 
@@ -100,8 +108,8 @@ function validateCondition(ctx: ApiContext, petitionId: number, field: PetitionF
     assert(referencedField.type !== "HEADING", `Conditions can't reference HEADING fields`);
     assert(referencedField.id !== field.id, `Can't add a reference to field itself`);
     assert(
-      referencedField.petition_id === petitionId,
-      `Field with id ${referencedField.id} is not linked to petition with id ${petitionId}`
+      referencedField.petition_id === field.petition_id,
+      `Field with id ${referencedField.id} is not linked to petition with id ${field.petition_id}`
     );
 
     // check operator/modifier compatibility
@@ -166,23 +174,25 @@ function validateCondition(ctx: ApiContext, petitionId: number, field: PetitionF
   };
 }
 
-export async function validateFieldVisibilityConditions(
-  json: any,
-  petitionId: number,
-  fieldId: number,
-  ctx: ApiContext
-) {
+export function validateFieldVisibilityConditions<
+  TField extends Pick<
+    PetitionField,
+    "id" | "type" | "position" | "options" | "visibility" | "petition_id"
+  >
+>(field: TField, allFields: TField[]) {
+  if (!field.visibility) {
+    return;
+  }
+
   const validator = new Ajv({
     allowUnionTypes: true,
   }).compile<PetitionFieldVisibility>(schema);
 
-  if (!validator(json)) {
+  if (!validator(field.visibility)) {
     throw new Error(JSON.stringify(validator.errors));
   }
 
-  const field = (await ctx.petitions.loadField(fieldId))!;
-
-  await Promise.all(json.conditions.map(validateCondition(ctx, petitionId, field)));
+  field.visibility.conditions.forEach(validateCondition(field, allFields));
 }
 
 export function validFieldVisibilityJson<TypeName extends string, FieldName extends string>(
@@ -191,12 +201,24 @@ export function validFieldVisibilityJson<TypeName extends string, FieldName exte
   prop: (args: core.ArgsValue<TypeName, FieldName>) => any,
   argName: string
 ) {
-  return (async (root, args, ctx, info) => {
+  return (async (_, args, ctx, info) => {
     try {
       const json = prop(args);
       const petitionId = petitionIdProp(args);
       const fieldId = fieldIdProp(args);
-      await validateFieldVisibilityConditions(json, petitionId, fieldId, ctx);
+      const field = await ctx.petitions.loadField(fieldId);
+      const allFields = await ctx.petitions.loadFieldsForPetition(petitionId);
+
+      // replace GIDs with numeric for ajv validation
+      const visibility = {
+        ...json,
+        conditions: json.conditions.map((c: any) => ({
+          ...c,
+          fieldId: fromGlobalId(c.fieldId, "PetitionField").id,
+        })),
+      };
+
+      validateFieldVisibilityConditions({ ...field!, visibility }, allFields);
     } catch (e: any) {
       throw new ArgValidationError(info, argName, e.message);
     }

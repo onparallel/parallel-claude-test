@@ -1,66 +1,89 @@
+import Ajv from "ajv";
 import { inject, injectable } from "inversify";
 import pMap from "p-map";
 import { isDefined, omit } from "remeda";
+import { validateFieldOptions } from "../db/helpers/fieldOptions";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
-import { Petition, PetitionField, PetitionFieldType, PetitionStatus, User } from "../db/__types";
-import { toGlobalId } from "../util/globalId";
+import { PetitionFieldType, PetitionFieldTypeValues, User } from "../db/__types";
+import { validateFieldVisibilityConditions } from "../graphql/helpers/validators/validFieldVisibility";
+import { validateRichTextContent } from "../graphql/helpers/validators/validRichTextContent";
 import { Maybe } from "../util/types";
 
 export const PETITION_IMPORT_EXPORT_SERVICE = Symbol.for("PETITION_IMPORT_EXPORT_SERVICE");
 
-type PetitionFieldJson = {
-  id: string;
-  alias: Maybe<string>;
-  deletedAt: Maybe<Date>;
-  description: Maybe<string>;
-  hasCommentsEnabled: boolean;
-  isFixed: boolean;
-  isInternal: boolean;
-  multiple: boolean;
-  optional: boolean;
-  options: any;
-  position: Maybe<number>;
-  showInPdf: boolean;
-  title: Maybe<string>;
-  type: PetitionFieldType;
-  visibility: any;
+const PETITION_JSON_SCHEMA = {
+  type: "object",
+  required: ["name", "locale", "isTemplate", "fields"],
+  additionalProperties: false,
+  properties: {
+    name: { type: ["string", "null"] },
+    locale: { type: "string", enum: ["en", "es"] },
+    isTemplate: { type: "boolean" },
+    templateDescription: { type: ["array", "null"], items: { type: "object" } },
+    fields: {
+      type: "array",
+      items: {
+        type: "object",
+        required: [
+          "id",
+          "type",
+          "title",
+          "description",
+          "optional",
+          "multiple",
+          "options",
+          "visibility",
+          "alias",
+          "isInternal",
+          "showInPdf",
+          "hasCommentsEnabled",
+        ],
+        additionalProperties: false,
+        properties: {
+          id: { type: "number" },
+          type: { type: "string", enum: PetitionFieldTypeValues },
+          title: { type: ["string", "null"] },
+          description: { type: ["string", "null"] },
+          optional: { type: "boolean" },
+          multiple: { type: "boolean" },
+          options: { type: "object" },
+          visibility: { type: ["object", "null"] },
+          alias: { type: ["string", "null"] },
+          isInternal: { type: "boolean" },
+          showInPdf: { type: "boolean" },
+          hasCommentsEnabled: { type: "boolean" },
+        },
+      },
+    },
+  },
 };
 
-type PetitionJson = {
-  anonymizeAfterMonths: Maybe<number>;
-  anonymizePurpose: Maybe<string>;
-  anonymizedAt: Maybe<Date>;
-  closedAt: Maybe<Date>;
-  closingEmailBody: Maybe<string>;
-  completingMessageBody: Maybe<string>;
-  completingMessageSubject: Maybe<string>;
-  customProperties: any;
-  deadline: Maybe<Date>;
-  defaultPath: string;
-  deletedAt: Maybe<Date>;
-  emailBody: Maybe<string>;
-  emailSubject: Maybe<string>;
-  hideRecipientViewContents: boolean;
-  isCompletingMessageEnabled: boolean;
-  isTemplate: boolean;
-  locale: string;
+interface PetitionJson {
   name: Maybe<string>;
-  path: string;
-  metadata: any;
-  remindersConfig: any;
-  skipForwardSecurity: boolean;
-  status: Maybe<PetitionStatus>;
+  locale: string;
+  isTemplate: boolean;
   templateDescription: Maybe<string>;
-  templatePublic: boolean;
-  publicMetadata: Maybe<any>;
-  fields: PetitionFieldJson[];
-};
+  fields: {
+    id: number;
+    type: PetitionFieldType;
+    title: Maybe<string>;
+    description: Maybe<string>;
+    optional: boolean;
+    multiple: boolean;
+    options: any;
+    visibility: any;
+    alias: Maybe<string>;
+    isInternal: boolean;
+    showInPdf: boolean;
+    hasCommentsEnabled: boolean;
+  }[];
+}
 
 export interface IPetitionImportExportService {
   /** exports basic information of petition as JSON object */
   toJson(petitionId: number): Promise<PetitionJson>;
   /** creates a petition with fields based on the input json */
-  fromJson(json: PetitionJson, user: User): Promise<Petition & { fields: PetitionField[] }>;
+  fromJson(json: PetitionJson, user: User): Promise<number>;
 }
 
 @injectable()
@@ -75,147 +98,122 @@ export class PetitionImportExportService implements IPetitionImportExportService
 
     if (!petition) throw new Error(`Petition:${petitionId} not found`);
 
+    const customFieldIds: number[] = [];
     return {
-      anonymizeAfterMonths: petition.anonymize_after_months,
-      anonymizePurpose: petition.anonymize_purpose,
-      anonymizedAt: petition.anonymized_at,
-      closedAt: petition.closed_at,
-      closingEmailBody: petition.closing_email_body,
-      completingMessageBody: petition.completing_message_body,
-      completingMessageSubject: petition.completing_message_subject,
-      customProperties: petition.custom_properties,
-      deadline: petition.deadline,
-      defaultPath: petition.default_path,
-      deletedAt: petition.deleted_at,
-      emailBody: petition.email_body,
-      emailSubject: petition.email_subject,
-      hideRecipientViewContents: petition.hide_recipient_view_contents,
-      isCompletingMessageEnabled: petition.is_completing_message_enabled,
-      isTemplate: petition.is_template,
-      locale: petition.locale,
       name: petition.name,
-      path: petition.path,
-      metadata: petition.metadata,
-      remindersConfig: petition.reminders_config,
-      skipForwardSecurity: petition.skip_forward_security,
-      status: petition.status,
+      locale: petition.locale,
+      isTemplate: petition.is_template,
       templateDescription: petition.template_description,
-      templatePublic: petition.template_public,
-      publicMetadata: petition.public_metadata,
       fields: fields.map((field) => {
+        customFieldIds.push(field.id);
         return {
-          // the id field is needed for field visibility condition references, but it will be ignored when importing
-          id: toGlobalId("PetitionField", field.id),
-          alias: field.alias,
-          deletedAt: field.deleted_at,
-          description: field.description,
-          hasCommentsEnabled: field.has_comments_enabled,
-          isFixed: field.is_fixed,
-          isInternal: field.is_internal,
-          multiple: field.multiple,
-          optional: field.optional,
-          options: omit(field.options, ["file"]),
-          position: field.position,
-          showInPdf: field.show_in_pdf,
-          title: field.title,
+          // replace the DB id with incremental integers to not expose database info.
+          // This is required to reconstruct visibility conditions
+          id: customFieldIds.length - 1,
           type: field.type,
+          title: field.title,
+          description: field.description,
+          optional: field.optional,
+          multiple: field.multiple,
+          options: omit(field.options, ["file"]),
           visibility: isDefined(field.visibility)
             ? {
                 ...field.visibility,
                 conditions: field.visibility.conditions.map((c: any) => ({
                   ...c,
-                  fieldId: toGlobalId("PetitionField", c.fieldId),
+                  fieldId: customFieldIds.indexOf(c.fieldId as number),
                 })),
               }
             : null,
+          alias: field.alias,
+          isInternal: field.is_internal,
+          showInPdf: field.show_in_pdf,
+          hasCommentsEnabled: field.has_comments_enabled,
         };
       }),
     };
   }
 
   async fromJson(json: PetitionJson, user: User) {
+    const ajv = new Ajv({ strict: false, allowUnionTypes: true });
+    const valid = ajv.validate(PETITION_JSON_SCHEMA, json);
+    if (!valid) {
+      throw new Error(ajv.errorsText());
+    }
+
+    if (isDefined(json.templateDescription)) {
+      validateRichTextContent(json.templateDescription);
+    }
+
+    // restore "position" property on fields based on array index
+    const fieldsWithPositions = json.fields.map((f, position) => ({
+      ...f,
+      position,
+      // petition_id is needed for part of the verification
+      // in this service fields are not present in DB so hardcode any number
+      petition_id: 0,
+    }));
+
+    fieldsWithPositions.forEach((field) => {
+      validateFieldOptions(field.type, field.options);
+      validateFieldVisibilityConditions(field, fieldsWithPositions);
+    });
+
     return await this.petitions.withTransaction(async (t) => {
       const petition = await this.petitions.createPetition(
         {
-          locale: json.locale,
-          anonymize_after_months: json.anonymizeAfterMonths,
-          anonymize_purpose: json.anonymizePurpose,
-          anonymized_at: json.anonymizedAt,
-          closed_at: json.closedAt,
-          closing_email_body: json.closingEmailBody,
-          completing_message_body: json.completingMessageBody,
-          completing_message_subject: json.completingMessageSubject,
-          custom_properties: json.customProperties,
-          deadline: json.deadline,
-          default_path: json.defaultPath,
-          deleted_at: json.deletedAt,
-          email_body: json.emailBody,
-          email_subject: json.emailSubject,
-          hide_recipient_view_contents: json.hideRecipientViewContents,
-          is_completing_message_enabled: json.isCompletingMessageEnabled,
-          is_template: json.isTemplate,
           name: json.name,
-          path: json.path,
-          metadata: json.metadata,
-          reminders_config: json.remindersConfig,
-          skip_forward_security: json.skipForwardSecurity,
-          status: json.status,
+          locale: json.locale,
+          is_template: json.isTemplate,
           template_description: json.templateDescription,
-          template_public: json.templatePublic,
         },
         user,
         true,
         t
       );
 
-      const fieldIdsMap: Record<string, number> = {};
-
-      const fields = await pMap(
-        json.fields,
+      const newFieldIds: number[] = [];
+      await pMap(
+        fieldsWithPositions,
         async (jsonField) => {
           const field = await this.petitions.createPetitionFieldAtPosition(
             petition.id,
             {
               type: jsonField.type,
-              alias: jsonField.alias,
-              deleted_at: jsonField.deletedAt,
-              description: jsonField.description,
-              has_comments_enabled: jsonField.hasCommentsEnabled,
-              is_fixed: jsonField.isFixed,
-              is_internal: jsonField.isInternal,
-              multiple: jsonField.multiple,
-              optional: jsonField.optional,
-              options: jsonField.options,
-              show_in_pdf: jsonField.showInPdf,
               title: jsonField.title,
+              description: jsonField.description,
+              optional: jsonField.optional,
+              multiple: jsonField.multiple,
+              options: jsonField.options,
               visibility: isDefined(jsonField.visibility)
                 ? {
                     ...jsonField.visibility,
                     conditions: jsonField.visibility.conditions.map((c: any) => {
                       // the field.id should always be set on the map, as visibility conditions can only be applied on previous fields
-                      const fieldId = fieldIdsMap[c.fieldId];
+                      const fieldId = newFieldIds[c.fieldId];
                       if (!fieldId) {
                         throw new Error(`Expected PetitionField ${c.fieldId} to be present on map`);
                       }
-                      return {
-                        ...c,
-                        fieldId: fieldIdsMap[c.fieldId],
-                      };
+                      return { ...c, fieldId };
                     }),
                   }
                 : null,
+              alias: jsonField.alias,
+              is_internal: jsonField.isInternal,
+              show_in_pdf: jsonField.showInPdf,
+              has_comments_enabled: jsonField.hasCommentsEnabled,
             },
-            jsonField.position!,
+            jsonField.position,
             user,
             t
           );
 
-          fieldIdsMap[jsonField.id] = field.id;
+          newFieldIds.push(field.id);
           return field;
         },
         { concurrency: 1 }
       );
-      return { ...petition, fields };
+      return petition.id;
     });
   }
 }
