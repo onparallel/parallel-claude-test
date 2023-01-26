@@ -1,16 +1,15 @@
-import { core } from "nexus";
-import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 import Ajv from "ajv";
-import { ArgValidationError } from "../errors";
-import { fromGlobalId } from "../../../util/globalId";
-import { ApiContext } from "../../../context";
-import {
-  PetitionFieldVisibilityCondition,
-  PetitionFieldVisibility,
-} from "../../../util/fieldVisibility";
+import { core } from "nexus";
 import { PetitionField } from "../../../db/__types";
+import {
+  PetitionFieldVisibility,
+  PetitionFieldVisibilityCondition,
+} from "../../../util/fieldVisibility";
+import { fromGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
+import { ArgValidationError } from "../errors";
 import { DynamicSelectOption } from "../parseDynamicSelectValues";
+import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 const schema = {
   type: "object",
@@ -61,16 +60,6 @@ const schema = {
     },
   },
 };
-
-async function loadField(fieldId: string, ctx: ApiContext) {
-  const { id } = fromGlobalId(fieldId, "PetitionField");
-  const field = await ctx.petitions.loadField(id);
-  if (!field) {
-    throw new Error(`Can't find field with id ${id}`);
-  }
-
-  return field;
-}
 
 function assert(predicate: boolean, errorMessage: string) {
   if (!predicate) {
