@@ -109,10 +109,12 @@ export function SupportMethodModal({ field, queryType, schemaTypes, onClose }: M
           ? await apolloClient.query({
               query: graphQLQuery,
               variables,
+              fetchPolicy: "no-cache",
             })
           : await apolloClient.mutate({
               mutation: graphQLQuery,
               variables,
+              fetchPolicy: "no-cache",
             });
       setStatus({ loading: false, data: data[field.name] });
     } catch (e: any) {
