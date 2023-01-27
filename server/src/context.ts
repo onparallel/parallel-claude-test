@@ -33,6 +33,10 @@ import {
   IOrganizationCreditsService,
   ORGANIZATION_CREDITS_SERVICE,
 } from "./services/organization-credits";
+import {
+  IOrganizationLayoutService,
+  ORGANIZATION_LAYOUT_SERVICE,
+} from "./services/organization-layout";
 import { IPetitionBinder, PETITION_BINDER } from "./services/petition-binder";
 import {
   IPetitionImportExportService,
@@ -114,6 +118,8 @@ export class WorkerContext {
     @inject(QUEUES_SERVICE) public readonly queues: IQueuesService,
     @inject(TIERS_SERVICE) public readonly tiers: ITiersService,
     @inject(DOW_JONES_KYC_SERVICE) public readonly dowJonesKyc: IDowJonesKycService,
+    @inject(ORGANIZATION_LAYOUT_SERVICE)
+    public readonly layouts: IOrganizationLayoutService,
 
     // Repositories
     public readonly contacts: ContactRepository,

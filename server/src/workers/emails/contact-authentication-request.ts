@@ -4,7 +4,6 @@ import { buildEmail } from "../../emails/buildEmail";
 import ContactAuthenticationRequest from "../../emails/emails/ContactAuthenticationRequest";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function contactAuthenticationRequest(
   payload: { contact_authentication_request_id: number; is_contact_verification: boolean },
@@ -35,7 +34,7 @@ export async function contactAuthenticationRequest(
   }
   const ua = request.user_agent ? new UAParser(request.user_agent) : null;
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
+  const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(petition.org_id);
 
   const { html, text, subject, from } = await buildEmail(
     ContactAuthenticationRequest,

@@ -3,9 +3,8 @@ import { buildEmail } from "../../emails/buildEmail";
 import AccessDelegatedEmail from "../../emails/emails/AccessDelegatedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { toHtml, toPlainText } from "../../util/slate";
-import { getLayoutProps } from "../helpers/getLayoutProps";
 import { loadOriginalMessageByPetitionAccess } from "../../util/loadOriginalMessageByPetitionAccess";
+import { toHtml, toPlainText } from "../../util/slate";
 
 export async function petitionAccessDelegated(
   payload: {
@@ -61,7 +60,7 @@ export async function petitionAccessDelegated(
     orgId,
     "REMOVE_WHY_WE_USE_PARALLEL"
   );
-  const { emailFrom, ...layoutProps } = await getLayoutProps(orgId, context);
+  const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(orgId);
   const { html, text, subject, from } = await buildEmail(
     AccessDelegatedEmail,
     {

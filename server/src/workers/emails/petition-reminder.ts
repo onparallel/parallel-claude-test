@@ -5,9 +5,8 @@ import PetitionReminder from "../../emails/emails/PetitionReminder";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fullName } from "../../util/fullName";
-import { toHtml, toPlainText } from "../../util/slate";
-import { getLayoutProps } from "../helpers/getLayoutProps";
 import { loadOriginalMessageByPetitionAccess } from "../../util/loadOriginalMessageByPetitionAccess";
+import { toHtml, toPlainText } from "../../util/slate";
 
 export async function petitionReminder(
   payload: { petition_reminder_id: number },
@@ -79,7 +78,7 @@ export async function petitionReminder(
     const missingFieldCount = countBy(repliableFields, ([field]) => field.replies.length === 0);
     const bodyJson = reminder.email_body ? JSON.parse(reminder.email_body) : null;
     const renderContext = { contact, user: granterData, petition };
-    const { emailFrom, ...layoutProps } = await getLayoutProps(orgId, context);
+    const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(orgId);
     const { html, text, subject, from } = await buildEmail(
       PetitionReminder,
       {

@@ -5,9 +5,8 @@ import { buildEmail } from "../../emails/buildEmail";
 import PetitionCommentsContactNotification from "../../emails/emails/PetitionCommentsContactNotification";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { buildFieldWithComments } from "../helpers/getFieldWithComments";
-import { getLayoutProps } from "../helpers/getLayoutProps";
 import { loadOriginalMessageByPetitionAccess } from "../../util/loadOriginalMessageByPetitionAccess";
+import { buildFieldWithComments } from "../helpers/getFieldWithComments";
 
 export async function commentsContactNotification(
   payload: {
@@ -37,7 +36,7 @@ export async function commentsContactNotification(
   if (!access) {
     throw new Error(`Access not found for petition_access_id ${payload.petition_access_id}`);
   }
-  const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
+  const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(petition.org_id);
   const comments = _comments.filter(isDefined);
   const fieldIds = uniq(comments.map((c) => c!.petition_field_id));
   const _fields = (await context.petitions.loadField(fieldIds)).filter(isDefined);

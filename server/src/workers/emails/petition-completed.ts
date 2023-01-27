@@ -8,7 +8,6 @@ import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { Maybe } from "../../util/types";
-import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function petitionCompleted(
   payload: {
@@ -57,7 +56,7 @@ export async function petitionCompleted(
     return;
   }
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
+  const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(petition.org_id);
 
   const emails: EmailLog[] = [];
 

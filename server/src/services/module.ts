@@ -18,6 +18,11 @@ import {
   OrganizationCreditsService,
   ORGANIZATION_CREDITS_SERVICE,
 } from "./organization-credits";
+import {
+  IOrganizationLayoutService,
+  OrganizationLayoutService,
+  ORGANIZATION_LAYOUT_SERVICE,
+} from "./organization-layout";
 import { IPetitionBinder, PetitionBinder, PETITION_BINDER } from "./petition-binder";
 import {
   IPetitionImportExportService,
@@ -55,4 +60,5 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IPetitionImportExportService>(PETITION_IMPORT_EXPORT_SERVICE).to(
     PetitionImportExportService
   );
+  bind<IOrganizationLayoutService>(ORGANIZATION_LAYOUT_SERVICE).to(OrganizationLayoutService);
 });

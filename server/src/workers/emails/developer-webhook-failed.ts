@@ -3,7 +3,6 @@ import { buildEmail } from "../../emails/buildEmail";
 import DeveloperWebhookFailedEmail from "../../emails/emails/DeveloperWebhookFailedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function developerWebhookFailed(
   payload: {
@@ -33,7 +32,7 @@ export async function developerWebhookFailed(
     );
   }
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
+  const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(petition.org_id);
   const { html, text, subject, from } = await buildEmail(
     DeveloperWebhookFailedEmail,
     {

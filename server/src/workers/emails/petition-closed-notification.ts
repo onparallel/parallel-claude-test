@@ -8,7 +8,6 @@ import { fullName } from "../../util/fullName";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { toHtml, toPlainText } from "../../util/slate";
 import { random } from "../../util/token";
-import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function petitionClosedNotification(
   payload: {
@@ -37,7 +36,7 @@ export async function petitionClosedNotification(
     throw new Error(`UserData not found for User:${payload.user_id}`);
   }
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(sender.org_id, context);
+  const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(sender.org_id);
 
   const emails: EmailLog[] = [];
   for (const accessId of payload.petition_access_ids) {

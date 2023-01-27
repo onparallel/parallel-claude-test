@@ -5,7 +5,6 @@ import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { toHtml, toPlainText } from "../../util/slate";
-import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function petitionMessageBounced(
   payload: { petition_message_id: number },
@@ -40,7 +39,7 @@ export async function petitionMessageBounced(
     throw new Error(`Contact not found for petition_access.contact_id ${access.contact_id}`);
   }
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(sender.org_id, context);
+  const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(sender.org_id);
 
   const renderContext = { contact, user: senderData, petition };
   const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];

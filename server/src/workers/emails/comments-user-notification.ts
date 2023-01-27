@@ -6,7 +6,6 @@ import PetitionCommentsUserNotification from "../../emails/emails/PetitionCommen
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { toGlobalId } from "../../util/globalId";
 import { buildFieldWithComments } from "../helpers/getFieldWithComments";
-import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function commentsUserNotification(
   payload: {
@@ -28,7 +27,7 @@ export async function commentsUserNotification(
     throw new Error(`UserData not found for User:${payload.user_id}`);
   }
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
+  const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(petition.org_id);
   const comments = _comments.filter(isDefined);
   const fieldIds = uniq(comments.map((c) => c!.petition_field_id));
   const _fields = (await context.petitions.loadField(fieldIds)).filter(isDefined);

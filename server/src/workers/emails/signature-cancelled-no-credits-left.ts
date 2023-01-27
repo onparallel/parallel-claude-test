@@ -4,7 +4,6 @@ import { buildEmail } from "../../emails/buildEmail";
 import SignatureCancelledNoCreditsLeftEmail from "../../emails/emails/SignatureCancelledNoCreditsLeftEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function signatureCancelledNoCreditsLeft(
   payload: { petition_signature_request_id: number },
@@ -43,7 +42,7 @@ export async function signatureCancelledNoCreditsLeft(
     if (!userData) {
       throw new Error(`UserData:${user.user_data_id} not found for User:${user.id}`);
     }
-    const { emailFrom, ...layoutProps } = await getLayoutProps(parallelOrg.id, context);
+    const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(parallelOrg.id);
 
     const { html, text, subject, from } = await buildEmail(
       SignatureCancelledNoCreditsLeftEmail,

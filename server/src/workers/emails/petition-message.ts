@@ -4,7 +4,6 @@ import PetitionMessage from "../../emails/emails/PetitionMessage";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toHtml, toPlainText } from "../../util/slate";
-import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function petitionMessage(
   payload: { petition_message_id: number },
@@ -41,7 +40,7 @@ export async function petitionMessage(
 
   const orgId = sender.org_id;
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(orgId, context);
+  const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(orgId);
   const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
   const renderContext = { contact, user: senderData, petition };
 

@@ -7,7 +7,6 @@ import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { Maybe } from "../../util/types";
-import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function petitionShared(
   payload: {
@@ -36,7 +35,7 @@ export async function petitionShared(
   ]);
   const usersById = indexBy(users.filter(isDefined), (p) => p.id);
   const emails: EmailLog[] = [];
-  const { emailFrom, ...layoutProps } = await getLayoutProps(user.org_id, context);
+  const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(user.org_id);
 
   const permissionsByUserId = groupBy(
     permissions.filter((p) => isDefined(p?.user_id)),

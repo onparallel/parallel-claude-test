@@ -3,7 +3,6 @@ import { OrganizationUsageLimitName } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
 import OrganizationLimitsReachedEmail from "../../emails/emails/OrganizationLimitsReachedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
-import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function organizationLimitsReached(
   payload: { org_id: number; limit_name: OrganizationUsageLimitName },
@@ -21,7 +20,7 @@ export async function organizationLimitsReached(
     );
   }
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(parallelOrg.id, context);
+  const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(parallelOrg.id);
 
   const emails = [];
   for (const user of ownerAndAdmins) {

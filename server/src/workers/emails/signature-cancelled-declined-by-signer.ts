@@ -5,7 +5,6 @@ import SignatureCancelledDeclinedBySignerEmail from "../../emails/emails/Signatu
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
-import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function signatureCancelledDeclinedBySigner(
   payload: { petition_signature_request_id: number },
@@ -44,7 +43,7 @@ export async function signatureCancelledDeclinedBySigner(
     if (!userData) {
       throw new Error(`UserData:${user.user_data_id} not found for User:${user.id}`);
     }
-    const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
+    const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(petition.org_id);
 
     const { html, text, subject, from } = await buildEmail(
       SignatureCancelledDeclinedBySignerEmail,

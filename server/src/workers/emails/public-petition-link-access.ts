@@ -3,7 +3,6 @@ import { buildEmail } from "../../emails/buildEmail";
 import PublicPetitionLinkAccess from "../../emails/emails/PublicPetitionLinkAccess";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function publicPetitionLinkAccess(
   payload: { petition_message_id: number },
@@ -52,7 +51,7 @@ export async function publicPetitionLinkAccess(
     orgId,
     "REMOVE_WHY_WE_USE_PARALLEL"
   );
-  const { emailFrom, ...layoutProps } = await getLayoutProps(orgId, context);
+  const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(orgId);
   const { html, text, subject, from } = await buildEmail(
     PublicPetitionLinkAccess,
     {
