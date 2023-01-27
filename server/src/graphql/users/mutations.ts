@@ -523,58 +523,81 @@ export const userSignUp = mutationField("userSignUp", {
         t
       );
 
-      const [[signatureSandboxIntegration], [pdfDocTheme]] = await Promise.all([
+      const [signatureIntegrations, defaultOrgThemes] = await Promise.all([
         ctx.integrations.loadIntegrationsByOrgId(org.id, "SIGNATURE", "SIGNATURIT", t),
         ctx.organizations.loadPdfDocumentThemesByOrgId.raw(org.id, t),
       ]);
 
       // once the user is created, we need to update the created_by column on the different entries
-      const [[newUser]] = await Promise.all([
-        ctx.users.updateUserById(user.id, { created_by: `User:${user.id}` }, `User:${user.id}`, t),
-        ctx.users.updateUserData(
-          user.user_data_id,
+      const [newUser] = await ctx.users.updateUserById(
+        user.id,
+        { created_by: `User:${user.id}` },
+        `User:${user.id}`,
+        t
+      );
+
+      await ctx.users.updateUserData(
+        user.user_data_id,
+        { created_by: `User:${user.id}` },
+        `User:${user.id}`,
+        t
+      );
+
+      if (logoFile) {
+        await ctx.files.updatePublicFile(
+          logoFile.id,
           { created_by: `User:${user.id}` },
           `User:${user.id}`,
           t
-        ),
-        logoFile
-          ? ctx.files.updatePublicFile(
-              logoFile.id,
-              { created_by: `User:${user.id}` },
-              `User:${user.id}`,
-              t
-            )
-          : null,
-        ctx.organizations.updateOrganization(
-          org.id,
-          {
-            created_by: `User:${user.id}`,
-          },
+        );
+      }
+
+      await ctx.organizations.updateOrganization(
+        org.id,
+        {
+          created_by: `User:${user.id}`,
+        },
+        `User:${user.id}`,
+        t
+      );
+
+      await pMap(
+        signatureIntegrations,
+        async (i) => {
+          await ctx.integrations.updateOrgIntegration(
+            i.id,
+            { created_by: `User:${user.id}` },
+            `User:${user.id}`,
+            t
+          );
+        },
+        { concurrency: 1 }
+      );
+
+      await pMap(
+        defaultOrgThemes,
+        async (theme) => {
+          ctx.organizations.updateOrganizationTheme(
+            theme.id,
+            { created_by: `User:${user.id}` },
+            `User:${user.id}`,
+            t
+          );
+        },
+        { concurrency: 1 }
+      );
+
+      await ctx.tiers.updateOrganizationTier(org, tierKey, `User:${user.id}`, t);
+
+      if (licenseCode) {
+        await ctx.licenseCodes.updateLicenseCode(
+          licenseCode.id,
+          { status: "REDEEMED" },
           `User:${user.id}`,
           t
-        ),
-        ctx.integrations.updateOrgIntegration(
-          signatureSandboxIntegration.id,
-          { created_by: `User:${user.id}` },
-          `User:${user.id}`,
-          t
-        ),
-        ctx.organizations.updateOrganizationTheme(
-          pdfDocTheme.id,
-          { created_by: `User:${user.id}` },
-          `User:${user.id}`,
-          t
-        ),
-        ctx.tiers.updateOrganizationTier(org, tierKey, `User:${user.id}`, t),
-        licenseCode
-          ? ctx.licenseCodes.updateLicenseCode(
-              licenseCode.id,
-              { status: "REDEEMED" },
-              `User:${user.id}`,
-              t
-            )
-          : null,
-      ]);
+        );
+      }
+
       return newUser;
     });
   },
