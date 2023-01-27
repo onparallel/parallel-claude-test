@@ -119,7 +119,7 @@ createQueueWorker(
         await context.petitions.markPetitionAccessEmailBounceStatus(
           message?.petition_access_id ?? reminder!.petition_access_id,
           false,
-          "EmailEventsWorker"
+          `EmailEventsWorker:${emailLogId}`
         );
       }
     }
