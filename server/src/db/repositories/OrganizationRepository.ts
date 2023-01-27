@@ -202,7 +202,7 @@ export class OrganizationRepository extends BaseRepository {
     return org;
   }
 
-  async createOrganization(data: CreateOrganization, createdBy?: string, t?: Knex.Transaction) {
+  async createOrganization(data: CreateOrganization, createdBy: string, t?: Knex.Transaction) {
     const [org] = await this.insert(
       "organization",
       {
@@ -459,7 +459,7 @@ export class OrganizationRepository extends BaseRepository {
     return credits;
   }
 
-  async createSandboxSignatureIntegration(orgId: number, createdBy?: string, t?: Knex.Transaction) {
+  async createSandboxSignatureIntegration(orgId: number, createdBy: string, t?: Knex.Transaction) {
     return await this.from("org_integration", t).insert(
       {
         org_id: orgId,
@@ -507,7 +507,7 @@ export class OrganizationRepository extends BaseRepository {
     (q) => q.where("type", "PDF_DOCUMENT").whereNull("deleted_at").orderBy("created_at", "desc")
   );
 
-  async createDefaultOrganizationThemes(orgId: number, createdBy?: string, t?: Knex.Transaction) {
+  async createDefaultOrganizationThemes(orgId: number, createdBy: string, t?: Knex.Transaction) {
     await this.from("organization_theme", t).insert([
       {
         org_id: orgId,

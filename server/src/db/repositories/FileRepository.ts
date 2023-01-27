@@ -99,7 +99,7 @@ export class FileRepository extends BaseRepository {
       .returning("*");
   }
 
-  async deleteFileUpload(id: MaybeArray<number>, deletedBy?: string, t?: Knex.Transaction) {
+  async deleteFileUpload(id: MaybeArray<number>, deletedBy: string, t?: Knex.Transaction) {
     const ids = unMaybeArray(id);
     if (ids.length > 0) {
       await this.from("file_upload", t)
@@ -128,7 +128,7 @@ export class FileRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  async createPublicFile(data: CreatePublicFileUpload, createdBy?: string, t?: Knex.Transaction) {
+  async createPublicFile(data: CreatePublicFileUpload, createdBy: string, t?: Knex.Transaction) {
     const rows = await this.insert(
       "public_file_upload",
       {

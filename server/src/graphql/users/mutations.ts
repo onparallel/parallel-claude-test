@@ -474,12 +474,15 @@ export const userSignUp = mutationField("userSignUp", {
       const filename = random(16);
       const path = `uploads/${filename}`;
       const res = await ctx.storage.publicFiles.uploadFile(path, mimetype, createReadStream());
-      logoFile = await ctx.files.createPublicFile({
-        path,
-        filename,
-        content_type: mimetype,
-        size: res["ContentLength"]!.toString(),
-      });
+      logoFile = await ctx.files.createPublicFile(
+        {
+          path,
+          filename,
+          content_type: mimetype,
+          size: res["ContentLength"]!.toString(),
+        },
+        `UserSignUp:${args.email}`
+      );
     }
 
     return await ctx.users.withTransaction(async (t) => {
@@ -496,7 +499,7 @@ export const userSignUp = mutationField("userSignUp", {
                 }
               : null,
         },
-        undefined,
+        `UserSignUp:${args.email}`,
         t
       );
 
@@ -519,72 +522,8 @@ export const userSignUp = mutationField("userSignUp", {
             preferredLocale: args.locale ?? "en",
           },
         },
-        undefined,
+        `UserSignUp:${args.email}`,
         t
-      );
-
-      const [signatureIntegrations, defaultOrgThemes] = await Promise.all([
-        ctx.integrations.loadIntegrationsByOrgId(org.id, "SIGNATURE", "SIGNATURIT", t),
-        ctx.organizations.loadPdfDocumentThemesByOrgId.raw(org.id, t),
-      ]);
-
-      // once the user is created, we need to update the created_by column on the different entries
-      const [newUser] = await ctx.users.updateUserById(
-        user.id,
-        { created_by: `User:${user.id}` },
-        `User:${user.id}`,
-        t
-      );
-
-      await ctx.users.updateUserData(
-        user.user_data_id,
-        { created_by: `User:${user.id}` },
-        `User:${user.id}`,
-        t
-      );
-
-      if (logoFile) {
-        await ctx.files.updatePublicFile(
-          logoFile.id,
-          { created_by: `User:${user.id}` },
-          `User:${user.id}`,
-          t
-        );
-      }
-
-      await ctx.organizations.updateOrganization(
-        org.id,
-        {
-          created_by: `User:${user.id}`,
-        },
-        `User:${user.id}`,
-        t
-      );
-
-      await pMap(
-        signatureIntegrations,
-        async (i) => {
-          await ctx.integrations.updateOrgIntegration(
-            i.id,
-            { created_by: `User:${user.id}` },
-            `User:${user.id}`,
-            t
-          );
-        },
-        { concurrency: 1 }
-      );
-
-      await pMap(
-        defaultOrgThemes,
-        async (theme) => {
-          ctx.organizations.updateOrganizationTheme(
-            theme.id,
-            { created_by: `User:${user.id}` },
-            `User:${user.id}`,
-            t
-          );
-        },
-        { concurrency: 1 }
       );
 
       await ctx.tiers.updateOrganizationTier(org, tierKey, `User:${user.id}`, t);
@@ -598,7 +537,7 @@ export const userSignUp = mutationField("userSignUp", {
         );
       }
 
-      return newUser;
+      return user;
     });
   },
 });

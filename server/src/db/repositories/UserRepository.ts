@@ -250,7 +250,7 @@ export class UserRepository extends BaseRepository {
     return userData;
   }
 
-  async getOrCreateUserData(data: CreateUserData, createdBy?: string, t?: Knex.Transaction) {
+  async getOrCreateUserData(data: CreateUserData, createdBy: string, t?: Knex.Transaction) {
     const [userData] = await this.raw<UserData>(
       /* sql */ `
       ? 
@@ -274,7 +274,7 @@ export class UserRepository extends BaseRepository {
   async createUser(
     data: Omit<CreateUser, "user_data_id">,
     userData: CreateUserData,
-    createdBy?: string,
+    createdBy: string,
     t?: Knex.Transaction
   ) {
     const _userData = await this.getOrCreateUserData(userData, createdBy, t);
