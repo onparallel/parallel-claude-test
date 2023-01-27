@@ -21,7 +21,13 @@ import { EMAILS, IEmailsService } from "../emails";
 import { FETCH_SERVICE, IFetchService } from "../fetch";
 import { I18N_SERVICE, II18nService } from "../i18n";
 import { IOrganizationCreditsService, ORGANIZATION_CREDITS_SERVICE } from "../organization-credits";
-import { BrandingIdKey, ISignatureClient, Recipient, SignatureOptions } from "./client";
+import {
+  BrandingIdKey,
+  ISignatureClient,
+  Recipient,
+  SignatureOptions,
+  BrandingOptions,
+} from "./client";
 
 type SignaturitClientContext = {
   isSharedProductionApiKey: boolean;
@@ -199,16 +205,14 @@ export class SignaturitClient implements ISignatureClient {
     });
   }
 
-  async updateBranding(
-    brandingId: string,
-    opts: Pick<SignatureOptions, "locale" | "templateData">
-  ) {
+  async updateBranding(brandingId: string, opts: BrandingOptions) {
     await this.withSignaturitSDK(async (sdk) => {
       const intl = await this.i18n.getIntl(opts.locale);
 
       await sdk.updateBranding(
         brandingId,
         removeNotDefined({
+          show_csv: opts.showCsv,
           layout_color: opts.templateData?.theme?.color,
           logo: opts.templateData?.logoUrl
             ? await downloadImageBase64(opts.templateData.logoUrl)
@@ -230,12 +234,13 @@ export class SignaturitClient implements ISignatureClient {
     });
   }
 
-  private async createBranding(opts: SignatureOptions) {
+  private async createBranding(opts: BrandingOptions) {
     return await this.withSignaturitSDK(async (sdk) => {
       const intl = await this.i18n.getIntl(opts.locale);
 
       const branding = await sdk.createBranding({
         show_welcome_page: false,
+        show_csv: opts.showCsv,
         layout_color: opts.templateData?.theme?.color ?? "#6059F7",
         text_color: "#F6F6F6",
         logo: opts.templateData?.logoUrl

@@ -830,6 +830,8 @@ export interface Mutation {
   setUserPreferredLocale: User;
   /** Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag. */
   shareSignaturitApiKey: Organization;
+  /** Enables/disables CSV stamp on documents for Signaturit integrations. */
+  signaturitIntegrationShowCsv: SupportMethodResponse;
   /** Generates a download link for the signed PDF petition. */
   signedPetitionDownloadLink: FileUploadDownloadLinkResult;
   /** Starts the completion of an async field */
@@ -1612,6 +1614,11 @@ export interface MutationshareSignaturitApiKeyArgs {
   duration: Scalars["Duration"];
   limit: Scalars["Int"];
   orgId: Scalars["GID"];
+}
+
+export interface MutationsignaturitIntegrationShowCsvArgs {
+  integrationId: Scalars["Int"];
+  showCsv: Scalars["Boolean"];
 }
 
 export interface MutationsignedPetitionDownloadLinkArgs {

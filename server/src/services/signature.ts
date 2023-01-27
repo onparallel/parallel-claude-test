@@ -16,6 +16,10 @@ import { MaybeArray } from "../util/types";
 import { IQueuesService, QUEUES_SERVICE } from "./queues";
 import { ISignatureClient, SIGNATURE_CLIENT } from "./signature-clients/client";
 
+interface UpdateBrandingOpts {
+  exclude?: SignatureProvider[];
+  integrationId?: number;
+}
 export interface ISignatureService {
   getClient<TClient extends ISignatureClient>(integration: {
     id?: number;
@@ -44,11 +48,7 @@ export interface ISignatureService {
     signature: PetitionSignatureRequest,
     signedDocumentExternalId: string
   ): Promise<void>;
-  updateBranding(
-    orgId: number,
-    opts?: { exclude?: SignatureProvider[] },
-    t?: Knex.Transaction
-  ): Promise<void>;
+  updateBranding(orgId: number, opts?: UpdateBrandingOpts, t?: Knex.Transaction): Promise<void>;
 }
 
 export const SIGNATURE = Symbol.for("SIGNATURE");
@@ -222,7 +222,7 @@ export class SignatureService implements ISignatureService {
 
   async updateBranding(
     orgId: number,
-    opts?: { exclude?: SignatureProvider[] },
+    opts?: UpdateBrandingOpts,
     t?: Knex.Transaction
   ): Promise<void> {
     await this.queues.enqueueMessages(
@@ -233,6 +233,7 @@ export class SignatureService implements ISignatureService {
           type: "update-branding",
           payload: {
             orgId,
+            integrationId: opts?.integrationId ?? null,
             exclude: opts?.exclude ?? null,
             _: random(10), // random value on message body to override sqs contentBasedDeduplication and allow processing repeated messages in short periods of time
           },

@@ -11,7 +11,13 @@ import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { I18N_SERVICE, II18nService } from "../i18n";
-import { ISignatureClient, Recipient, SignatureOptions, SignatureResponse } from "./client";
+import {
+  ISignatureClient,
+  Recipient,
+  SignatureOptions,
+  SignatureResponse,
+  BrandingOptions,
+} from "./client";
 
 @injectable()
 export class DocuSignClient implements ISignatureClient {
@@ -229,10 +235,7 @@ export class DocuSignClient implements ISignatureClient {
     });
   }
 
-  async updateBranding(
-    brandingId: string,
-    opts: Pick<SignatureOptions, "locale" | "templateData">
-  ) {
+  async updateBranding(brandingId: string, opts: BrandingOptions) {
     // await this.withDocusignSdk(async ({ accounts }, { USER_ACCOUNT_ID: userAccountId }) => {
     //   try {
     //     await accounts.updateBrand(userAccountId, brandingId, {

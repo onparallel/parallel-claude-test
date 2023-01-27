@@ -29,6 +29,7 @@ export type IntegrationSettings<
     ES_FORMAL_BRANDING_ID?: string;
     EN_INFORMAL_BRANDING_ID?: string;
     ES_INFORMAL_BRANDING_ID?: string;
+    SHOW_CSV?: boolean; // show a security stamp on the margin of each page of the document
     // Docusign
     API_BASE_PATH?: string;
     USER_ACCOUNT_ID?: string;

@@ -15,7 +15,7 @@ import { fullName } from "../util/fullName";
 import { removeKeys, removeNotDefined } from "../util/remedaExtensions";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { random } from "../util/token";
-import { Replace } from "../util/types";
+import { Maybe, Replace } from "../util/types";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 import { getLayoutProps } from "./helpers/getLayoutProps";
 
@@ -89,6 +89,7 @@ async function startSignatureProcess(
       recipients,
       {
         locale: petition.locale,
+        showCsv: integration.settings.SHOW_CSV,
         templateData: {
           ...(await getLayoutProps(petition.org_id, ctx)),
           organizationName: organization.name,
@@ -313,7 +314,12 @@ async function storeAuditTrail(
 }
 
 async function updateOrganizationBranding(
-  payload: { orgId: number; exclude: SignatureProvider[] | null; _: string },
+  payload: {
+    orgId: number;
+    exclude: Maybe<SignatureProvider[]>;
+    integrationId: Maybe<number>;
+    _: string;
+  },
   ctx: WorkerContext
 ) {
   const [organization, signatureIntegrations, layoutProps] = await Promise.all([
@@ -333,6 +339,11 @@ async function updateOrganizationBranding(
         return;
       }
 
+      // if targeting a single integration for update, make sure to skip every other
+      if (isDefined(payload.integrationId) && integration.id !== payload.integrationId) {
+        return;
+      }
+
       const settings = integration.settings;
       const definedBrandingIds = removeNotDefined<Record<BrandingIdKey, string | undefined>>({
         EN_FORMAL_BRANDING_ID: settings.EN_FORMAL_BRANDING_ID,
@@ -347,6 +358,7 @@ async function updateOrganizationBranding(
         try {
           await client.updateBranding(brandingId!, {
             locale: locale.toLowerCase(),
+            showCsv: settings.SHOW_CSV,
             templateData: {
               ...layoutProps,
               theme: {

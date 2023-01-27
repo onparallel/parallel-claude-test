@@ -1588,6 +1588,21 @@ type Mutation {
   ): Organization!
 
   """
+  Enables/disables CSV stamp on documents for Signaturit integrations.
+  """
+  signaturitIntegrationShowCsv(
+    """
+    Numeric ID of the integration
+    """
+    integrationId: Int!
+
+    """
+    Enable CSV stamp
+    """
+    showCsv: Boolean!
+  ): SupportMethodResponse!
+
+  """
   Generates a download link for the signed PDF petition.
   """
   signedPetitionDownloadLink(

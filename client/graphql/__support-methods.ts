@@ -284,6 +284,46 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "signaturitIntegrationShowCsv",
+      description: "Enables/disables CSV stamp on documents for Signaturit integrations.",
+      args: [
+        {
+          name: "integrationId",
+          description: "Numeric ID of the integration",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Int", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "showCsv",
+          description: "Enable CSV stamp",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Boolean", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "transferOrganizationOwnership",
       description:
         "Transfers the ownership of an organization to a given user. Old owner will get ADMIN role",

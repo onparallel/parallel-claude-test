@@ -410,3 +410,47 @@ export const importPetitionFromJson = mutationField("importPetitionFromJson", {
     }
   },
 });
+
+export const signaturitIntegrationShowCsv = mutationField("signaturitIntegrationShowCsv", {
+  description: "Enables/disables CSV stamp on documents for Signaturit integrations.",
+  type: "SupportMethodResponse",
+  authorize: supportMethodAccess(),
+  args: {
+    integrationId: nonNull(intArg({ description: "Numeric ID of the integration" })),
+    showCsv: nonNull(booleanArg({ description: "Enable CSV stamp" })),
+  },
+  resolve: async (_, { integrationId, showCsv }, ctx) => {
+    const integration = await ctx.integrations.loadIntegration(integrationId);
+    if (!integration) {
+      return {
+        result: RESULT.FAILURE,
+        message: `OrgIntegration:${integrationId} not found`,
+      };
+    }
+
+    if (integration.type !== "SIGNATURE" || integration.provider !== "SIGNATURIT") {
+      return {
+        result: RESULT.FAILURE,
+        message: `OrgIntegration:${integrationId} is not a SIGNATURIT provider`,
+      };
+    }
+
+    if (integration.settings.SHOW_CSV !== showCsv) {
+      await ctx.integrations.updateOrgIntegration(
+        integrationId,
+        { settings: { ...integration.settings, SHOW_CSV: showCsv } },
+        `User:${ctx.user!.id}`
+      );
+
+      await ctx.signature.updateBranding(integration.org_id, {
+        exclude: ["DOCUSIGN"],
+        integrationId,
+      });
+    }
+
+    return {
+      result: RESULT.SUCCESS,
+      message: `OrgIntegration:${integrationId} updated successfully.`,
+    };
+  },
+});
