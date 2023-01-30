@@ -5357,11 +5357,13 @@ export class PetitionRepository extends BaseRepository {
     const stats = await pFlatMap(chunk(orgPetitions, 200), async (petitionsChunk) => {
       return await this.getPetitionTimeStats(petitionsChunk.map((s) => s.id));
     });
+
     const times = {
       pending_to_complete: average(stats.map((p) => p.pending_to_complete).filter(isDefined)),
       complete_to_close: average(stats.map((p) => p.complete_to_close).filter(isDefined)),
       signature_completed: average(stats.map((p) => p.signature_completed).filter(isDefined)),
     };
+
     return {
       from_template_id: toGlobalId("Petition", fromTemplateId),
       status: {
@@ -5501,7 +5503,7 @@ export class PetitionRepository extends BaseRepository {
               .flatMap(([, petitions]) => petitions)
           ),
         },
-      ],
+      ].filter((r) => r.status.all > 0),
       [(t) => t.status.all, "desc"]
     );
   }

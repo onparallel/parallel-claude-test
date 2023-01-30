@@ -11,8 +11,8 @@ export function TimeSpan(props: { duration: Duration | number }) {
   if (typeof props.duration === "number") {
     const [days, rem0] = quotientAndRemainder(props.duration, 24 * 60 * 60);
     const [hours, rem1] = quotientAndRemainder(rem0, 60 * 60);
-    const [minutes, _] = quotientAndRemainder(rem1, 60);
-    duration = { days, hours, minutes };
+    const [minutes, seconds] = quotientAndRemainder(rem1, 60);
+    duration = { days, hours, minutes: minutes > 0 ? minutes : seconds > 0 ? 1 : 0 };
   } else {
     Object.entries(props.duration).forEach(([key, value]) => {
       if (value !== null) {

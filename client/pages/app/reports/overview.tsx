@@ -1,20 +1,32 @@
 import { gql } from "@apollo/client";
-import { Button, Flex, Grid, Heading, HStack, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Flex,
+  Grid,
+  Heading,
+  HStack,
+  Stack,
+  Text,
+  useRadioGroup,
+} from "@chakra-ui/react";
+import { DownloadIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { OverflownText } from "@parallel/components/common/OverflownText";
-import { TableColumn } from "@parallel/components/common/Table";
+import { RadioButton } from "@parallel/components/common/RadioButton";
+import { SearchInput } from "@parallel/components/common/SearchInput";
+import { Spacer } from "@parallel/components/common/Spacer";
+import { TableColumn, TableSorting } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { DateRangePickerButton } from "@parallel/components/reports/DateRangePickerButton";
-import {
-  OverviewReportsListTableHeader,
-  OverviewTableType,
-} from "@parallel/components/reports/OverviewReportsListTableHeader";
 import { ReportsErrorMessage } from "@parallel/components/reports/ReportsErrorMessage";
 import { ReportsLoadingMessage } from "@parallel/components/reports/ReportsLoadingMessage";
 import { ReportsReadyMessage } from "@parallel/components/reports/ReportsReadyMessage";
@@ -24,15 +36,13 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { stallFor } from "@parallel/utils/promises/stallFor";
-import { date, integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
+import { date, useQueryState } from "@parallel/utils/queryState";
 import { useTemplatesOverviewReportBackgroundTask } from "@parallel/utils/tasks/useTemplatesOverviewReportTask";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useReportsSections } from "@parallel/utils/useReportsSections";
-import { ReactNode, useCallback, useMemo, useRef, useState } from "react";
+import { ReactNode, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, sort, sortBy, sumBy } from "remeda";
-
-const SORTING = ["name", "total", "completed", "signed", "closed"] as const;
+import { isDefined, sortBy, sumBy } from "remeda";
 
 interface PetitionStatusCount {
   all: number;
@@ -43,9 +53,9 @@ interface PetitionStatusCount {
 }
 
 interface TemplateStats {
-  id: string;
   aggregation_type: "TEMPLATE" | "NO_ACCESS" | "NO_TEMPLATE";
-  name?: Maybe<string>;
+  template_id?: Maybe<string>;
+  template_name?: Maybe<string>;
   template_count?: number;
   status: PetitionStatusCount;
   times: {
@@ -55,34 +65,22 @@ interface TemplateStats {
   };
 }
 
-type ReportType = TemplateStats[];
-
 export const QUERY_STATE = {
   range: date().list(2),
-  page: integer({ min: 1 }).orDefault(1),
-  search: string(),
-  items: values([10, 25, 50]).orDefault(10),
-  sort: sorting(SORTING).orDefault({
-    field: "name",
-    direction: "ASC",
-  }),
 };
 
-function StatsCard({ title, amount, help }: { title: string; amount: number; help: ReactNode }) {
-  return (
-    <Card padding={6}>
-      <HStack>
-        <Text fontWeight={500} color="gray.600">
-          {title}
-        </Text>
-        <HelpPopover>{help}</HelpPopover>
-      </HStack>
-      <Text fontWeight={600} fontSize="3xl">
-        {amount}
-      </Text>
-    </Card>
-  );
-}
+type OverviewTableSorting =
+  | "template_name"
+  | "status.all"
+  | "status.completed"
+  | "status.signed"
+  | "status.closed"
+  | "times.total"
+  | "times.pending_to_complete"
+  | "times.signature_completed"
+  | "times.complete_to_close";
+
+type OverviewTableType = "STATUS" | "TIME";
 
 export function Overview() {
   const intl = useIntl();
@@ -93,95 +91,70 @@ export function Overview() {
 
   const sections = useReportsSections();
 
-  const [{ status, report, activeRange, tableType }, setState] = useState<{
+  const [{ status, report, activeRange }, setState] = useState<{
     status: "IDLE" | "LOADING" | "LOADED" | "ERROR";
-    report: ReportType | null;
+    report: TemplateStats[] | null;
     activeRange: Date[] | null;
-    tableType: OverviewTableType;
   }>({
     status: "IDLE",
     report: null,
     activeRange: null,
-    tableType: "STATUS",
   });
 
-  const [list, searchedList] = useMemo(() => {
-    const {
-      items,
-      page,
-      search,
-      sort: { direction, field },
-    } = queryState;
+  const [{ page, search, items, sort, tableType }, setTableState] = useState({
+    page: 1,
+    search: "",
+    items: 10,
+    sort: {
+      field: "status.all",
+      direction: "DESC",
+    } as TableSorting<OverviewTableSorting>,
+    tableType: "STATUS" as OverviewTableType,
+  });
+  const [_search, setSearch] = useState("");
 
-    let templates = (report ?? [])
-      .map((r, id) => ({ ...r, id: id.toString() }))
-      .filter((t) =>
-        (t.aggregation_type === "NO_ACCESS" && !t.template_count) ||
-        (t.aggregation_type === "NO_TEMPLATE" && t.status.all === 0)
-          ? false
-          : true
-      );
-
+  const [tableRows, totalCount] = useMemo(() => {
+    let rows = report ?? [];
     if (search) {
-      templates = templates.filter(({ name }) => {
-        return name && name.includes(search);
-      });
+      const _search = search.toLowerCase();
+      rows = rows.filter((t) => t.template_name?.toLowerCase().includes(_search));
     }
-
-    if (field === "name") {
-      templates = sort(templates, (a, b) => (a[field] ?? "").localeCompare(b[field] ?? ""));
-    } else {
-      templates = sortBy(templates, (row) => {
-        switch (field) {
-          case "total":
-            return tableType === "TIME"
-              ? (row.times.pending_to_complete ?? 0) + (row.times.complete_to_close ?? 0)
-              : row.status.pending + row.status.completed + row.status.closed;
-
-          case "signed":
-            return tableType === "TIME"
-              ? (row.times.pending_to_complete ?? 0) + (row.times.complete_to_close ?? 0)
-              : row.status.signed;
-
-          case "completed":
-            return tableType === "TIME" ? row.times.pending_to_complete ?? 0 : row.status.completed;
-
-          case "closed":
-            return tableType === "TIME" ? row.times.complete_to_close ?? 0 : row.status.closed;
-
-          default:
-            return row[field];
-        }
-      });
+    switch (sort.field) {
+      case "template_name":
+        rows = sortBy(rows, [(r) => r.template_name ?? "", sort.direction.toLowerCase() as any]);
+        break;
+      case "times.total":
+        rows = sortBy(rows, [
+          (r) => (r.times.pending_to_complete ?? 0) + (r.times.complete_to_close ?? 0),
+          sort.direction.toLowerCase() as any,
+        ]);
+        break;
+      default:
+        rows = sortBy(rows, [
+          (r) => sort.field.split(".").reduce((acc, prop) => acc?.[prop], r as any) ?? 0,
+          sort.direction.toLowerCase() as any,
+        ]);
+        break;
     }
+    return [rows.slice((page - 1) * items, page * items), rows.length];
+  }, [report, page, search, items, sort.field, sort.direction, tableType]);
 
-    if (direction === "DESC") {
-      templates = templates.reverse();
-    }
-
-    return [templates.slice((page - 1) * items, page * items), templates];
-  }, [report, queryState, tableType]);
-
-  const [search, setSearch] = useState(queryState.search);
-  const debouncedOnSearchChange = useDebouncedCallback(
+  const debouncedSearchChange = useDebouncedCallback(
     (value) => {
-      setQueryState((current) => ({
+      setTableState((current) => ({
         ...current,
         search: value,
         page: 1,
       }));
     },
     300,
-    [setQueryState]
+    [setTableState]
   );
 
-  const handleSearchChange = useCallback(
-    (value: string | null) => {
-      setSearch(value);
-      debouncedOnSearchChange(value || null);
-    },
-    [debouncedOnSearchChange]
-  );
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    debouncedSearchChange(value);
+  };
 
   const taskAbortController = useRef<AbortController | null>(null);
 
@@ -218,8 +191,7 @@ export function Overview() {
     setQueryState((s) => ({ ...s, range }));
   };
 
-  const columnsStatus = useOverviewTemplateStatusColumns();
-  const columnsTime = useOverviewTemplateTimesColumns();
+  const columns = useOverviewColumns(tableType);
 
   const downloadExcel = useDownloadOverviewExcel();
   const handleDownloadReport = async () => {
@@ -367,33 +339,38 @@ export function Overview() {
               flex="0 1 auto"
               minHeight={0}
               isHighlightable
-              columns={tableType === "STATUS" ? columnsStatus : columnsTime}
-              rows={list}
-              rowKeyProp="id"
-              loading={false}
-              page={queryState.page}
-              pageSize={queryState.items}
-              totalCount={searchedList?.length ?? 0}
-              sort={queryState.sort}
-              onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-              onPageSizeChange={(items) =>
-                setQueryState((s) => ({ ...s, items: items as any, page: 1 }))
+              columns={columns}
+              rows={tableRows}
+              rowKeyProp={(row) =>
+                row.aggregation_type === "TEMPLATE" ? row.template_id! : row.aggregation_type
               }
-              onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
+              loading={false}
+              page={page}
+              pageSize={items}
+              totalCount={totalCount}
+              sort={sort}
+              onPageChange={(page) => setTableState((s) => ({ ...s, page }))}
+              onPageSizeChange={(items) => setTableState((s) => ({ ...s, items, page: 1 }))}
+              onSortChange={(sort) => setTableState((s) => ({ ...s, sort, page: 1 }))}
               header={
                 <OverviewReportsListTableHeader
-                  search={search}
+                  search={_search}
                   tableType={tableType}
                   onSearchChange={handleSearchChange}
-                  onChangeTableType={(tableType: OverviewTableType) =>
-                    setState((s) => ({ ...s, tableType }))
-                  }
-                  onDownloadReport={handleDownloadReport}
+                  onTableTypeChange={(tableType) => {
+                    setTableState((s) => ({
+                      ...s,
+                      tableType,
+                      page: 1,
+                      sort: { field: "status.all", direction: "DESC" },
+                    }));
+                  }}
+                  onReportDownload={handleDownloadReport}
                 />
               }
               body={
-                list.length === 0 ? (
-                  queryState.search ? (
+                tableRows.length === 0 ? (
+                  search ? (
                     <Flex flex="1" alignItems="center" justifyContent="center">
                       <Text color="gray.300" fontSize="lg">
                         <FormattedMessage
@@ -472,242 +449,283 @@ Overview.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
 
 export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(Overview);
 
-function useOverviewTemplateStatusColumns(): TableColumn<TemplateStats>[] {
-  const intl = useIntl();
-  return useMemo(
-    () => [
-      {
-        key: "name",
-        isSortable: true,
-        header: intl.formatMessage({
-          id: "generic.template",
-          defaultMessage: "Template",
-        }),
-        cellProps: {
-          width: "60%",
-          minWidth: "240px",
-        },
-        CellContent: ({ row }) => {
-          return (
-            <OverflownText textStyle={row.name ? undefined : "hint"}>
-              {row.aggregation_type === "NO_ACCESS" ? (
-                <FormattedMessage
-                  id="page.reports-overview.other-templates"
-                  defaultMessage="Other templates not shared with me ({count})"
-                  values={{ count: row.template_count ?? 0 }}
-                />
-              ) : row.aggregation_type === "NO_TEMPLATE" ? (
-                <FormattedMessage
-                  id="page.reports-overview.parallels-scratch"
-                  defaultMessage="Parallels created from scratch"
-                />
-              ) : (
-                row.name ||
-                intl.formatMessage({
-                  id: "generic.unnamed-template",
-                  defaultMessage: "Unnamed template",
-                })
-              )}
-            </OverflownText>
-          );
-        },
-      },
-      {
-        key: "total",
-        isSortable: true,
-        header: intl.formatMessage({
-          id: "page.reports-overview.total",
-          defaultMessage: "Total",
-        }),
-        cellProps: {
-          width: "10%",
-          minWidth: "120px",
-        },
-        CellContent: ({ row }) => <>{row.status.all}</>,
-      },
-      {
-        key: "completed",
-        isSortable: true,
-        header: intl.formatMessage({
-          id: "page.reports-overview.completed",
-          defaultMessage: "Completed",
-        }),
-        cellProps: {
-          width: "10%",
-          minWidth: "120px",
-        },
-        CellContent: ({ row }) => <>{row.status.completed}</>,
-      },
-      {
-        key: "signed",
-        isSortable: true,
-        header: intl.formatMessage({
-          id: "page.reports-overview.signed",
-          defaultMessage: "Signed",
-        }),
-        cellProps: {
-          width: "10%",
-          minWidth: "120px",
-        },
-        CellContent: ({ row }) => <>{row.status.signed}</>,
-      },
-      {
-        key: "closed",
-        isSortable: true,
-        header: intl.formatMessage({
-          id: "page.reports-overview.closed",
-          defaultMessage: "Closed",
-        }),
-        cellProps: {
-          width: "10%",
-          minWidth: "120px",
-        },
-        CellContent: ({ row }) => <>{row.status.closed}</>,
-      },
-    ],
-    [intl.locale]
+function StatsCard({ title, amount, help }: { title: string; amount: number; help: ReactNode }) {
+  return (
+    <Card padding={6}>
+      <HStack>
+        <Text fontWeight={500} color="gray.600">
+          {title}
+        </Text>
+        <HelpPopover>{help}</HelpPopover>
+      </HStack>
+      <Text fontWeight={600} fontSize="3xl">
+        {amount}
+      </Text>
+    </Card>
   );
 }
 
-function useOverviewTemplateTimesColumns(): TableColumn<TemplateStats>[] {
+interface OverviewReportsListTableHeaderProps {
+  tableType: OverviewTableType;
+  search: string;
+  onSearchChange: (value: string) => void;
+  onTableTypeChange: (value: OverviewTableType) => void;
+  onReportDownload: () => void;
+}
+
+function OverviewReportsListTableHeader({
+  tableType,
+  search,
+  onSearchChange,
+  onTableTypeChange,
+  onReportDownload,
+}: OverviewReportsListTableHeaderProps) {
+  const intl = useIntl();
+
+  const { getRootProps, getRadioProps } = useRadioGroup({
+    name: "categories",
+    value: tableType,
+    onChange: onTableTypeChange,
+  });
+
+  return (
+    <Stack direction="row" padding={2}>
+      <Box flex="0 1 400px">
+        <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
+      </Box>
+      <Spacer />
+      <ButtonGroup isAttached variant="outline" {...getRootProps()}>
+        <RadioButton {...getRadioProps({ value: "STATUS" })} minWidth="fit-content">
+          <FormattedMessage
+            id="component.overview-reports-list-table-header.status"
+            defaultMessage="Status"
+          />
+        </RadioButton>
+        <RadioButton {...getRadioProps({ value: "TIME" })}>
+          <FormattedMessage
+            id="component.overview-reports-list-table-header.time"
+            defaultMessage="Time"
+          />
+        </RadioButton>
+      </ButtonGroup>
+      <IconButtonWithTooltip
+        onClick={onReportDownload}
+        icon={<DownloadIcon />}
+        label={intl.formatMessage({
+          id: "component.overview-reports-list-table-header.download-report",
+          defaultMessage: "Download report",
+        })}
+      />
+    </Stack>
+  );
+}
+
+function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateStats>[] {
   const intl = useIntl();
   return useMemo(
-    () => [
-      {
-        key: "name",
-        isSortable: true,
-        header: intl.formatMessage({
-          id: "generic.template",
-          defaultMessage: "Template",
-        }),
-        cellProps: {
-          width: "60%",
-          minWidth: "240px",
-        },
-        CellContent: ({ row }) => {
-          return (
-            <OverflownText textStyle={row.name ? undefined : "hint"}>
-              {row.aggregation_type === "NO_ACCESS" ? (
+    () =>
+      [
+        {
+          key: "template_name",
+          isSortable: true,
+          header: intl.formatMessage({
+            id: "generic.template",
+            defaultMessage: "Template",
+          }),
+          cellProps: {
+            width: "60%",
+            minWidth: "240px",
+          },
+          CellContent: ({ row }) => {
+            return row.aggregation_type === "NO_ACCESS" ? (
+              <OverflownText fontStyle="italic">
                 <FormattedMessage
                   id="page.reports-overview.other-templates"
                   defaultMessage="Other templates not shared with me ({count})"
                   values={{ count: row.template_count ?? 0 }}
                 />
-              ) : row.aggregation_type === "NO_TEMPLATE" ? (
+              </OverflownText>
+            ) : row.aggregation_type === "NO_TEMPLATE" ? (
+              <OverflownText fontStyle="italic">
                 <FormattedMessage
                   id="page.reports-overview.parallels-scratch"
                   defaultMessage="Parallels created from scratch"
                 />
-              ) : (
-                row.name ||
-                intl.formatMessage({
-                  id: "generic.unnamed-template",
-                  defaultMessage: "Unnamed template",
-                })
-              )}
-            </OverflownText>
-          );
+              </OverflownText>
+            ) : (
+              <OverflownText textStyle={row.template_name ? undefined : "hint"}>
+                {row.template_name ||
+                  intl.formatMessage({
+                    id: "generic.unnamed-template",
+                    defaultMessage: "Unnamed template",
+                  })}
+              </OverflownText>
+            );
+          },
         },
-      },
-      {
-        key: "total",
-        isSortable: true,
-        header: intl.formatMessage({
-          id: "page.reports-overview.total",
-          defaultMessage: "Total",
-        }),
-        headerHelp: (
-          <Stack>
-            <Text>
-              <FormattedMessage
-                id="page.reports-overview.total-help-1"
-                defaultMessage="This total is the average time from the start of the parallel until it is closed. That is, from when it's pending (🕒) until it's closed (✅✅)."
-              />
-            </Text>
-            <Text>
-              <FormattedMessage
-                id="page.reports-overview.total-help-2"
-                defaultMessage="This number doesn't include deleted o parallels or unanswered drafts."
-              />
-            </Text>
-          </Stack>
-        ),
-        cellProps: {
-          width: "10%",
-          minWidth: "120px",
-        },
-        CellContent: ({ row }) => (
-          <TimeSpan
-            duration={(row.times.pending_to_complete ?? 0) + (row.times.complete_to_close ?? 0)}
-          />
-        ),
-      },
-      {
-        key: "completed",
-        isSortable: true,
-        header: intl.formatMessage({
-          id: "page.reports-overview.time-to-complete",
-          defaultMessage: "Time to complete",
-        }),
-        headerHelp: (
-          <Stack>
-            <Text>
-              <FormattedMessage
-                id="page.reports-overview.time-to-complete-help-1"
-                defaultMessage="Average time from the start of the parallel until it is completed."
-              />
-            </Text>
-            <Text>
-              <FormattedMessage
-                id="page.reports-overview.time-to-complete-help-2"
-                defaultMessage="This figure counts parallels completed internally as well as those sent to a third party."
-              />
-            </Text>
-          </Stack>
-        ),
-        cellProps: {
-          width: "10%",
-          minWidth: "120px",
-        },
-        CellContent: ({ row }) => <TimeSpan duration={row.times.pending_to_complete ?? 0} />,
-      },
-      {
-        key: "signed",
-        isSortable: true,
-        header: intl.formatMessage({
-          id: "page.reports-overview.time-to-sign",
-          defaultMessage: "Time to sign",
-        }),
-        headerHelp: intl.formatMessage({
-          id: "page.reports-overview.time-to-sign-help",
-          defaultMessage:
-            "This is the average time for documents to be signed since they were sent.",
-        }),
-        cellProps: {
-          width: "10%",
-          minWidth: "120px",
-        },
-        CellContent: ({ row }) => <TimeSpan duration={row.times.signature_completed ?? 0} />,
-      },
-      {
-        key: "closed",
-        isSortable: true,
-        header: intl.formatMessage({
-          id: "page.reports-overview.time-to-close",
-          defaultMessage: "Time to close",
-        }),
-        headerHelp: intl.formatMessage({
-          id: "page.reports-overview.time-to-close-help",
-          defaultMessage: "Average time from the completion of the parallel until it is closed.",
-        }),
-        cellProps: {
-          width: "10%",
-          minWidth: "120px",
-        },
-        CellContent: ({ row }) => <TimeSpan duration={row.times.complete_to_close ?? 0} />,
-      },
-    ],
-    [intl.locale]
+        ...(tableType === "STATUS"
+          ? ([
+              {
+                key: "status.all",
+                isSortable: true,
+                header: intl.formatMessage({
+                  id: "page.reports-overview.total",
+                  defaultMessage: "Total",
+                }),
+                cellProps: {
+                  width: "10%",
+                  minWidth: "120px",
+                },
+                CellContent: ({ row }) => <>{row.status.all}</>,
+              },
+              {
+                key: "status.completed",
+                isSortable: true,
+                header: intl.formatMessage({
+                  id: "page.reports-overview.completed",
+                  defaultMessage: "Completed",
+                }),
+                cellProps: {
+                  width: "10%",
+                  minWidth: "120px",
+                },
+                CellContent: ({ row }) => <>{row.status.completed}</>,
+              },
+              {
+                key: "status.signed",
+                isSortable: true,
+                header: intl.formatMessage({
+                  id: "page.reports-overview.signed",
+                  defaultMessage: "Signed",
+                }),
+                cellProps: {
+                  width: "10%",
+                  minWidth: "120px",
+                },
+                CellContent: ({ row }) => <>{row.status.signed}</>,
+              },
+              {
+                key: "status.closed",
+                isSortable: true,
+                header: intl.formatMessage({
+                  id: "page.reports-overview.closed",
+                  defaultMessage: "Closed",
+                }),
+                cellProps: {
+                  width: "10%",
+                  minWidth: "120px",
+                },
+                CellContent: ({ row }) => <>{row.status.closed}</>,
+              },
+            ] as TableColumn<TemplateStats>[])
+          : ([
+              {
+                key: "times.total",
+                isSortable: true,
+                header: intl.formatMessage({
+                  id: "page.reports-overview.total",
+                  defaultMessage: "Total",
+                }),
+                headerHelp: (
+                  <Stack>
+                    <Text>
+                      <FormattedMessage
+                        id="page.reports-overview.total-help-1"
+                        defaultMessage="This total is the average time from the start of the parallel until it is closed. That is, from when it's pending (🕒) until it's closed (✅✅)."
+                      />
+                    </Text>
+                    <Text>
+                      <FormattedMessage
+                        id="page.reports-overview.total-help-2"
+                        defaultMessage="This number doesn't include deleted o parallels or unanswered drafts."
+                      />
+                    </Text>
+                  </Stack>
+                ),
+                cellProps: {
+                  width: "10%",
+                  minWidth: "120px",
+                },
+                CellContent: ({ row }) => (
+                  <TimeSpan
+                    duration={
+                      (row.times.pending_to_complete ?? 0) + (row.times.complete_to_close ?? 0)
+                    }
+                  />
+                ),
+              },
+              {
+                key: "times.pending_to_complete",
+                isSortable: true,
+                header: intl.formatMessage({
+                  id: "page.reports-overview.time-to-complete",
+                  defaultMessage: "Time to complete",
+                }),
+                headerHelp: (
+                  <Stack>
+                    <Text>
+                      <FormattedMessage
+                        id="page.reports-overview.time-to-complete-help-1"
+                        defaultMessage="Average time from the start of the parallel until it is completed."
+                      />
+                    </Text>
+                    <Text>
+                      <FormattedMessage
+                        id="page.reports-overview.time-to-complete-help-2"
+                        defaultMessage="This figure counts parallels completed internally as well as those sent to a third party."
+                      />
+                    </Text>
+                  </Stack>
+                ),
+                cellProps: {
+                  width: "10%",
+                  minWidth: "120px",
+                },
+                CellContent: ({ row }) => (
+                  <TimeSpan duration={row.times.pending_to_complete ?? 0} />
+                ),
+              },
+              {
+                key: "times.signature_completed",
+                isSortable: true,
+                header: intl.formatMessage({
+                  id: "page.reports-overview.time-to-sign",
+                  defaultMessage: "Time to sign",
+                }),
+                headerHelp: intl.formatMessage({
+                  id: "page.reports-overview.time-to-sign-help",
+                  defaultMessage:
+                    "This is the average time for documents to be signed since they were sent.",
+                }),
+                cellProps: {
+                  width: "10%",
+                  minWidth: "120px",
+                },
+                CellContent: ({ row }) => (
+                  <TimeSpan duration={row.times.signature_completed ?? 0} />
+                ),
+              },
+              {
+                key: "times.complete_to_close",
+                isSortable: true,
+                header: intl.formatMessage({
+                  id: "page.reports-overview.time-to-close",
+                  defaultMessage: "Time to close",
+                }),
+                headerHelp: intl.formatMessage({
+                  id: "page.reports-overview.time-to-close-help",
+                  defaultMessage:
+                    "Average time from the completion of the parallel until it is closed.",
+                }),
+                cellProps: {
+                  width: "10%",
+                  minWidth: "120px",
+                },
+                CellContent: ({ row }) => <TimeSpan duration={row.times.complete_to_close ?? 0} />,
+              },
+            ] as TableColumn<TemplateStats>[])),
+      ] as TableColumn<TemplateStats>[],
+    [intl.locale, tableType]
   );
 }
 
@@ -831,16 +849,6 @@ function useDownloadOverviewExcel() {
       })
     );
 
-    const _templates = sort(
-      templates.filter((t) =>
-        (t.aggregation_type === "NO_ACCESS" && !t.template_count) ||
-        (t.aggregation_type === "NO_TEMPLATE" && t.status.all === 0)
-          ? false
-          : true
-      ),
-      (a, b) => (a.name ?? "").localeCompare(b.name ?? "")
-    );
-
     worksheet.columns = worksheetColumns;
     worksheet.spliceRows(1, 0, []);
     worksheet.mergeCells("B1:E1");
@@ -855,7 +863,7 @@ function useDownloadOverviewExcel() {
       defaultMessage: "Time (hours)",
     });
     worksheet.addRows(
-      _templates.map((row) => ({
+      templates.map((row) => ({
         name:
           row.aggregation_type === "NO_ACCESS"
             ? intl.formatMessage(
@@ -870,7 +878,7 @@ function useDownloadOverviewExcel() {
                 id: "page.reports-overview.parallels-scratch",
                 defaultMessage: "Parallels created from scratch",
               })
-            : row.name ||
+            : row.template_name ||
               intl.formatMessage({
                 id: "generic.unnamed-template",
                 defaultMessage: "Unnamed template",
