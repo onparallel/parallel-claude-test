@@ -7,7 +7,7 @@ export class TemplatesOverviewReportRunner extends TaskRunner<"TEMPLATES_OVERVIE
     }
     const user = await this.ctx.users.loadUser(this.task.user_id);
     const { start_date: startDate, end_date: endDate } = this.task.input;
-    return await this.ctx.petitions.getPetitionStatsOverview(
+    return await this.ctx.readonlyPetitions.getPetitionStatsOverview(
       user!.org_id,
       user!.id,
       startDate,
