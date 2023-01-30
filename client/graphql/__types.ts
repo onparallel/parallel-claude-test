@@ -4125,7 +4125,7 @@ export interface Task {
   __typename?: "Task";
   id: Scalars["GID"];
   name: TaskName;
-  output?: Maybe<Scalars["JSONObject"]>;
+  output?: Maybe<Scalars["JSON"]>;
   progress?: Maybe<Scalars["Int"]>;
   status: TaskStatus;
 }
@@ -26392,7 +26392,7 @@ export type useExportExcelTask_TaskFragment = {
   __typename?: "Task";
   id: string;
   status: TaskStatus;
-  output?: { [key: string]: any } | null;
+  output?: any | null;
 };
 
 export type useExportExcelTask_createExportExcelTaskMutationVariables = Exact<{
@@ -26404,7 +26404,7 @@ export type useExportExcelTask_createExportExcelTaskMutation = {
     __typename?: "Task";
     id: string;
     status: TaskStatus;
-    output?: { [key: string]: any } | null;
+    output?: any | null;
   };
 };
 
@@ -26421,12 +26421,7 @@ export type useExportExcelTask_taskQueryVariables = Exact<{
 }>;
 
 export type useExportExcelTask_taskQuery = {
-  task: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    output?: { [key: string]: any } | null;
-  };
+  task: { __typename?: "Task"; id: string; status: TaskStatus; output?: any | null };
 };
 
 export type useExportRepliesTask_createExportRepliesTaskMutationVariables = Exact<{
@@ -26477,12 +26472,7 @@ export type usePrintPdfTask_taskQueryVariables = Exact<{
 }>;
 
 export type usePrintPdfTask_taskQuery = {
-  task: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    output?: { [key: string]: any } | null;
-  };
+  task: { __typename?: "Task"; id: string; status: TaskStatus; output?: any | null };
 };
 
 export type usePublicPrintPdfTask_publicCreatePrintPdfTaskMutationVariables = Exact<{
@@ -26535,7 +26525,7 @@ export type useTemplateStatsReportTask_TaskFragment = {
   __typename?: "Task";
   id: string;
   status: TaskStatus;
-  output?: { [key: string]: any } | null;
+  output?: any | null;
 };
 
 export type useTemplateStatsReportTask_createTemplateStatsReportTaskMutationVariables = Exact<{
@@ -26549,7 +26539,7 @@ export type useTemplateStatsReportTask_createTemplateStatsReportTaskMutation = {
     __typename?: "Task";
     id: string;
     status: TaskStatus;
-    output?: { [key: string]: any } | null;
+    output?: any | null;
   };
 };
 
@@ -26558,19 +26548,14 @@ export type useTemplateStatsReportTask_taskQueryVariables = Exact<{
 }>;
 
 export type useTemplateStatsReportTask_taskQuery = {
-  task: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    output?: { [key: string]: any } | null;
-  };
+  task: { __typename?: "Task"; id: string; status: TaskStatus; output?: any | null };
 };
 
 export type useTemplatesOverviewReportTask_TaskFragment = {
   __typename?: "Task";
   id: string;
   status: TaskStatus;
-  output?: { [key: string]: any } | null;
+  output?: any | null;
 };
 
 export type useTemplatesOverviewReportTask_createTemplatesOverviewReportTaskMutationVariables =
@@ -26584,7 +26569,7 @@ export type useTemplatesOverviewReportTask_createTemplatesOverviewReportTaskMuta
     __typename?: "Task";
     id: string;
     status: TaskStatus;
-    output?: { [key: string]: any } | null;
+    output?: any | null;
   };
 };
 
@@ -26593,12 +26578,7 @@ export type useTemplatesOverviewReportTask_taskQueryVariables = Exact<{
 }>;
 
 export type useTemplatesOverviewReportTask_taskQuery = {
-  task: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    output?: { [key: string]: any } | null;
-  };
+  task: { __typename?: "Task"; id: string; status: TaskStatus; output?: any | null };
 };
 
 export type uploadFile_AWSPresignedPostDataFragment = {

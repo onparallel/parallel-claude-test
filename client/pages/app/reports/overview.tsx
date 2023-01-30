@@ -43,6 +43,7 @@ import { useReportsSections } from "@parallel/utils/useReportsSections";
 import { ReactNode, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, sortBy, sumBy } from "remeda";
+import { PetitionStatusIcon } from "@parallel/components/common/PetitionStatusIcon";
 
 interface PetitionStatusCount {
   all: number;
@@ -215,7 +216,7 @@ export function Overview() {
         </Heading>
       }
     >
-      <Stack spacing={6} padding={6}>
+      <Stack spacing={6} padding={6} paddingBottom={20}>
         <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2} flex="1">
           <DateRangePickerButton
             value={queryState.range as [Date, Date] | null}
@@ -335,7 +336,6 @@ export function Overview() {
               />
             </Grid>
             <TablePage
-              zIndex={1}
               flex="0 1 auto"
               minHeight={0}
               isHighlightable
@@ -631,7 +631,11 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                     <Text>
                       <FormattedMessage
                         id="page.reports-overview.total-help-1"
-                        defaultMessage="This total is the average time from the start of the parallel until it is closed. That is, from when it's pending (🕒) until it's closed (✅✅)."
+                        defaultMessage="This total is the average time from the start of the parallel until it is closed. That is, from when it's pending {clockIcon} until it's closed {closedIcon}."
+                        values={{
+                          clockIcon: <PetitionStatusIcon status="PENDING" />,
+                          closedIcon: <PetitionStatusIcon status="CLOSED" />,
+                        }}
                       />
                     </Text>
                     <Text>
@@ -701,9 +705,17 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                   width: "10%",
                   minWidth: "120px",
                 },
-                CellContent: ({ row }) => (
-                  <TimeSpan duration={row.times.signature_completed ?? 0} />
-                ),
+                CellContent: ({ row }) =>
+                  isDefined(row.times.signature_completed) ? (
+                    <TimeSpan duration={row.times.signature_completed} />
+                  ) : (
+                    <Text>
+                      <FormattedMessage
+                        id="page.reports-overview.not-availabled"
+                        defaultMessage="Not available"
+                      />
+                    </Text>
+                  ),
               },
               {
                 key: "times.complete_to_close",
@@ -890,7 +902,9 @@ function useDownloadOverviewExcel() {
         total_time:
           ((row.times.pending_to_complete ?? 0) + (row.times.complete_to_close ?? 0)) / 3600,
         time_to_complete: (row.times.pending_to_complete ?? 0) / 3600,
-        time_to_sign: (row.times.signature_completed ?? 0) / 3600,
+        time_to_sign: isDefined(row.times.signature_completed)
+          ? (row.times.signature_completed ?? 0) / 3600
+          : "",
         time_to_close: (row.times.complete_to_close ?? 0) / 3600,
       }))
     );

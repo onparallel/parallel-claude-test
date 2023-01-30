@@ -8210,6 +8210,11 @@
     "context": "There's no templates matching your search"
   },
   {
+    "term": "page.reports-overview.not-availabled",
+    "definition": "Not available",
+    "context": "Not available"
+  },
+  {
     "term": "page.reports-overview.not-include-deleted-or-drafts",
     "definition": "This number doesn't include deleted o parallels or unanswered drafts.",
     "context": "This number doesn't include deleted o parallels or unanswered drafts."
@@ -8306,8 +8311,8 @@
   },
   {
     "term": "page.reports-overview.total-help-1",
-    "definition": "This total is the average time from the start of the parallel until it is closed. That is, from when it's pending (🕒) until it's closed (✅✅).",
-    "context": "This total is the average time from the start of the parallel until it is closed. That is, from when it's pending (🕒) until it's closed (✅✅)."
+    "definition": "This total is the average time from the start of the parallel until it is closed. That is, from when it's pending {clockIcon} until it's closed {closedIcon}.",
+    "context": "This total is the average time from the start of the parallel until it is closed. That is, from when it's pending {clockIcon} until it's closed {closedIcon}."
   },
   {
     "term": "page.reports-overview.total-help-2",

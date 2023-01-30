@@ -27,8 +27,8 @@ export type FeatureFlagName =
   | "TEMPLATE_REPLIES_PREVIEW_URL"
   | "DOW_JONES_KYC"
   | "PUBLIC_PETITION_LINK_PREFILL_DATA"
-  | "CLIENT_PORTAL"
-  | "DOCUSIGN_SANDBOX_PROVIDER";
+  | "DOCUSIGN_SANDBOX_PROVIDER"
+  | "CLIENT_PORTAL";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -48,8 +48,8 @@ export const FeatureFlagNameValues = [
   "TEMPLATE_REPLIES_PREVIEW_URL",
   "DOW_JONES_KYC",
   "PUBLIC_PETITION_LINK_PREFILL_DATA",
-  "CLIENT_PORTAL",
   "DOCUSIGN_SANDBOX_PROVIDER",
+  "CLIENT_PORTAL",
 ] as FeatureFlagName[];
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING" | "DOW_JONES_KYC";
