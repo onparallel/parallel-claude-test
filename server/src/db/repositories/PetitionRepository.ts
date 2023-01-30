@@ -5525,9 +5525,10 @@ export class PetitionRepository extends BaseRepository {
     const eventsByPetitionId = groupBy(events, (e) => e.petition_id);
 
     return petitionIds.map((petitionId) => {
-      const events = eventsByPetitionId[petitionId];
+      const events = eventsByPetitionId[petitionId] ?? [];
+      // first ACCESS_ACTIVATED or REPLY_CREATED event marks the first time the petition moved to PENDING status
       const pendingAt = events
-        .find((e) => e.type === "ACCESS_ACTIVATED" || e.type === "REPLY_CREATED") // first ACCESS_ACTIVATED or REPLY_CREATED event marks the first time the petition moved to PENDING status
+        .find((e) => e.type === "ACCESS_ACTIVATED" || e.type === "REPLY_CREATED")
         ?.created_at.getTime();
       const completedAt = findLast(
         events,
