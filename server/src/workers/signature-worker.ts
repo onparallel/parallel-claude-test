@@ -353,7 +353,11 @@ export type SignatureWorkerPayload = {
 }[HandlerType];
 
 createQueueWorker("signature-worker", async (data, ctx) => {
-  await handlers[data.type](data.payload as any, ctx);
+  try {
+    await handlers[data.type](data.payload as any, ctx);
+  } catch (error: any) {
+    ctx.logger.error(error.message, { stack: error.stack });
+  }
 });
 
 async function fetchOrgSignatureIntegration(
