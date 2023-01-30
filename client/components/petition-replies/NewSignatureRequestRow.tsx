@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, GridItem, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, GridItem, Heading, Stack, Text } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import {
   NewSignatureRequestRow_PetitionFragment,
@@ -102,29 +102,24 @@ export function NewSignatureRequestRow({
         </Box>
       </GridItem>
       <GridItem padding={2} paddingRight={4} marginLeft="auto">
-        <Flex alignItems="center">
-          <Button width="24" onClick={() => onUpdateConfig(null)} isDisabled={isDisabled}>
-            <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-          </Button>
-          <Button
-            colorScheme="primary"
-            marginLeft={2}
-            onClick={handleStartSignature}
-            isDisabled={isDisabled}
-          >
-            {startSignature ? (
-              <FormattedMessage
-                id="component.petition-signatures-card.start"
-                defaultMessage="Start..."
-              />
-            ) : (
-              <FormattedMessage
-                id="component.petition-signatures-card.edit-signers"
-                defaultMessage="Edit signers"
-              />
-            )}
-          </Button>
-        </Flex>
+        <Button
+          colorScheme="primary"
+          marginLeft={2}
+          onClick={handleStartSignature}
+          isDisabled={isDisabled}
+        >
+          {startSignature ? (
+            <FormattedMessage
+              id="component.petition-signatures-card.start"
+              defaultMessage="Start..."
+            />
+          ) : (
+            <FormattedMessage
+              id="component.petition-signatures-card.edit-signers"
+              defaultMessage="Edit signers"
+            />
+          )}
+        </Button>
       </GridItem>
     </>
   );
