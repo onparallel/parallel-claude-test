@@ -308,7 +308,6 @@ async function updateOrganizationBranding(
   payload: {
     orgId: number;
     integrationId: Maybe<number>;
-    _: string;
   },
   ctx: WorkerContext
 ) {

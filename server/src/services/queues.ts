@@ -16,8 +16,19 @@ export interface IQueuesService {
   enqueueMessages<Q extends keyof Config["queueWorkers"]>(
     queue: Q,
     messages:
-      | { id: string; body: QueueWorkerPayload<Q>; groupId: string; delaySeconds?: number }[]
-      | { body: QueueWorkerPayload<Q>; groupId: string; delaySeconds?: number },
+      | {
+          id: string;
+          body: QueueWorkerPayload<Q>;
+          groupId?: string;
+          deduplicationId?: string;
+          delaySeconds?: number;
+        }[]
+      | {
+          body: QueueWorkerPayload<Q>;
+          groupId?: string;
+          deduplicationId?: string;
+          delaySeconds?: number;
+        },
     t?: Knex.Transaction
   ): Promise<void>;
   enqueueEvents<TName extends "petition_event" | "system_event">(
@@ -73,8 +84,19 @@ export class QueuesService implements IQueuesService {
   private async sendSQSMessage<Q extends keyof Config["queueWorkers"]>(
     queue: Q,
     messages:
-      | { id: string; body: QueueWorkerPayload<Q>; groupId?: string; delaySeconds?: number }[]
-      | { body: QueueWorkerPayload<Q>; groupId?: string; delaySeconds?: number }
+      | {
+          id: string;
+          body: QueueWorkerPayload<Q>;
+          groupId?: string;
+          deduplicationId?: string;
+          delaySeconds?: number;
+        }[]
+      | {
+          body: QueueWorkerPayload<Q>;
+          groupId?: string;
+          deduplicationId?: string;
+          delaySeconds?: number;
+        }
   ) {
     const queueUrl = this.config.queueWorkers[queue].queueUrl;
     if (Array.isArray(messages)) {
@@ -82,10 +104,11 @@ export class QueuesService implements IQueuesService {
         await this.sqs.send(
           new SendMessageBatchCommand({
             QueueUrl: queueUrl,
-            Entries: batch.map(({ id, body, groupId, delaySeconds }) => ({
+            Entries: batch.map(({ id, body, groupId, deduplicationId, delaySeconds }) => ({
               Id: this.hash(id),
               MessageBody: JSON.stringify(body),
               MessageGroupId: groupId ? this.hash(groupId) : undefined,
+              MessageDeduplicationId: deduplicationId,
               DelaySeconds: delaySeconds,
             })),
           })
@@ -97,6 +120,7 @@ export class QueuesService implements IQueuesService {
           QueueUrl: queueUrl,
           MessageBody: JSON.stringify(messages.body),
           MessageGroupId: messages.groupId,
+          MessageDeduplicationId: messages.deduplicationId,
           DelaySeconds: messages.delaySeconds,
         })
       );

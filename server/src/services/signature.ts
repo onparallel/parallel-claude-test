@@ -222,12 +222,13 @@ export class SignatureService implements ISignatureService {
   async onOrganizationBrandChange(orgId: number, opts?: UpdateBrandingOpts) {
     await this.queues.enqueueMessages("signature-worker", {
       groupId: `signature-branding-${toGlobalId("Organization", orgId)}`,
+      // add deduplication since payload is going to be the same when changing more than once.
+      deduplicationId: random(10),
       body: {
         type: "update-branding",
         payload: {
           orgId,
           integrationId: opts?.integrationId ?? null,
-          _: random(10), // random value on message body to override sqs contentBasedDeduplication and allow processing repeated messages in short periods of time
         },
       },
     });
