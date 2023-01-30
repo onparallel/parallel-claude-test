@@ -1,6 +1,4 @@
 import { Tone } from "../../emails/utils/types";
-import { BrandTheme } from "../../util/BrandTheme";
-import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
 
 interface Document {
   id: string;
@@ -21,19 +19,6 @@ interface Document {
 
 export interface SignatureOptions {
   locale: string;
-  templateData?: {
-    logoUrl: string;
-    logoAlt: string;
-    parallelUrl: string;
-    assetsUrl: string;
-    removeParallelBranding: boolean;
-    theme: BrandTheme;
-    organizationName?: string;
-  };
-  /** (Signaturit) show a security stamp on the margin of each page of the document */
-  showCsv?: boolean;
-  signingMode?: "parallel" | "sequential";
-  pdfDocumentTheme: PdfDocumentTheme;
   /**
    * Optional plain-text custom message to include in the "signature requested" emails
    */
@@ -53,9 +38,10 @@ export interface Recipient {
   name: string;
 }
 
+// TODO remove from here
 export type BrandingIdKey = `${"EN" | "ES"}_${Tone}_BRANDING_ID`;
 
-export type BrandingOptions = Pick<SignatureOptions, "locale" | "templateData" | "showCsv">;
+export type BrandingOptions = any;
 
 export const SIGNATURE_CLIENT = Symbol.for("SIGNATURE_CLIENT");
 

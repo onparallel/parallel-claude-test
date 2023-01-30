@@ -8,11 +8,14 @@ import {
   IntegrationSettings,
   SignatureEnvironment,
 } from "../../db/repositories/IntegrationRepository";
+import { OrganizationRepository } from "../../db/repositories/OrganizationRepository";
+import { PetitionRepository } from "../../db/repositories/PetitionRepository";
 import { buildEmail } from "../../emails/buildEmail";
 import SignatureCancelledEmail from "../../emails/emails/SignatureCancelledEmail";
 import SignatureCompletedEmail from "../../emails/emails/SignatureCompletedEmail";
 import SignatureReminderEmail from "../../emails/emails/SignatureReminderEmail";
 import SignatureRequestedEmail from "../../emails/emails/SignatureRequestedEmail";
+import { Tone } from "../../emails/utils/types";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { downloadImageBase64 } from "../../util/images";
@@ -22,17 +25,19 @@ import { FETCH_SERVICE, IFetchService } from "../fetch";
 import { I18N_SERVICE, II18nService } from "../i18n";
 import { IOrganizationCreditsService, ORGANIZATION_CREDITS_SERVICE } from "../organization-credits";
 import {
-  BrandingIdKey,
-  ISignatureClient,
-  Recipient,
-  SignatureOptions,
-  BrandingOptions,
-} from "./client";
+  IOrganizationLayoutService,
+  OrganizationLayout,
+  ORGANIZATION_LAYOUT_SERVICE,
+} from "../organization-layout";
+import { BrandingOptions, ISignatureClient, Recipient, SignatureOptions } from "./client";
 
-type SignaturitClientContext = {
+interface SignaturitClientContext {
   isSharedProductionApiKey: boolean;
   apiKeyHint: string;
-};
+  showCsv: boolean;
+}
+
+type BrandingIdKey = `${"EN" | "ES"}_${Tone}_BRANDING_ID`;
 
 @injectable()
 export class SignaturitClient implements ISignatureClient {
@@ -42,7 +47,10 @@ export class SignaturitClient implements ISignatureClient {
     @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(EMAILS) private emails: IEmailsService,
     @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: IOrganizationCreditsService,
-    @inject(IntegrationRepository) private integrationRepository: IntegrationRepository
+    @inject(ORGANIZATION_LAYOUT_SERVICE) private layouts: IOrganizationLayoutService,
+    @inject(IntegrationRepository) private integrations: IntegrationRepository,
+    @inject(PetitionRepository) private petitions: PetitionRepository,
+    @inject(OrganizationRepository) private organizations: OrganizationRepository
   ) {}
   private integrationId!: number;
 
@@ -78,7 +86,7 @@ export class SignaturitClient implements ISignatureClient {
   private async withSignaturitSDK<TResult>(
     handler: (sdk: SignaturitSDK, context: SignaturitClientContext) => Promise<TResult>
   ): Promise<TResult> {
-    const integration = (await this.integrationRepository.loadIntegration(this.integrationId))!;
+    const integration = (await this.integrations.loadIntegration(this.integrationId))!;
     const settings = integration.settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
     const sdk = new SignaturitSDK(
       settings.CREDENTIALS.API_KEY,
@@ -89,6 +97,7 @@ export class SignaturitClient implements ISignatureClient {
       apiKeyHint: settings.CREDENTIALS.API_KEY.slice(0, 10),
       isSharedProductionApiKey:
         settings.CREDENTIALS.API_KEY === this.config.signature.signaturitSharedProductionApiKey,
+      showCsv: settings.SHOW_CSV ?? false,
     };
 
     return await handler(sdk, context);
@@ -106,23 +115,34 @@ export class SignaturitClient implements ISignatureClient {
       if (recipients.length > 40) {
         throw new Error("MAX_RECIPIENTS_EXCEEDED_ERROR");
       }
+
+      const petition = await this.petitions.loadPetition(petitionId);
+      const petitionTheme = await this.organizations.loadOrganizationTheme(
+        petition!.document_organization_theme_id
+      );
+      if (!petitionTheme) {
+        throw new Error(`Expected Petition:${petitionId} to have defined PDF_DOCUMENT theme`);
+      }
+
+      const templateData = await this.layouts.getLayoutProps(orgId);
+
       const locale = opts.locale;
-      const tone = opts.templateData?.theme.preferredTone ?? "INFORMAL";
+      const tone = templateData.theme.preferredTone ?? "INFORMAL";
 
       try {
         if (context.isSharedProductionApiKey) {
           await this.orgCredits.consumeSignaturitApiKeyCredits(orgId, 1);
         }
 
-        const integration = (await this.integrationRepository.loadIntegration(this.integrationId))!;
+        const integration = (await this.integrations.loadIntegration(this.integrationId))!;
         const settings = integration.settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
         const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as BrandingIdKey;
         let brandingId = settings[key];
         if (!brandingId) {
-          brandingId = await this.createBranding(opts);
+          brandingId = await this.createSignaturitBranding(orgId, opts);
           settings[key] = brandingId;
 
-          this.integrationRepository.updateOrgIntegration<"SIGNATURE">(
+          this.integrations.updateOrgIntegration<"SIGNATURE">(
             this.integrationId,
             { settings },
             `OrgIntegration:${this.integrationId}`
@@ -134,7 +154,7 @@ export class SignaturitClient implements ISignatureClient {
         return await sdk.createSignature(files, recipients, {
           body: opts.initialMessage,
           delivery_type: "email",
-          signing_mode: opts.signingMode ?? "parallel",
+          signing_mode: "parallel",
           branding_id: brandingId,
           events_url: `${baseEventsUrl}/api/webhooks/signaturit/${toGlobalId(
             "Petition",
@@ -153,8 +173,8 @@ export class SignaturitClient implements ISignatureClient {
                 height: 7.5, // 7.5% of page height
                 width:
                   ((210 -
-                    opts.pdfDocumentTheme.marginLeft -
-                    opts.pdfDocumentTheme.marginRight -
+                    petitionTheme.data.marginLeft -
+                    petitionTheme.data.marginRight -
                     5 /* grid gap */ * 2) /
                     3 /
                     210) *
@@ -224,37 +244,31 @@ export class SignaturitClient implements ISignatureClient {
             }),
           },
           templates: isDefined(opts.templateData)
-            ? await this.buildSignaturItBrandingTemplates({
-                locale: opts.locale,
-                templateData: opts.templateData!,
-              })
+            ? await this.buildSignaturItBrandingTemplates(opts.locale, opts.templateData!)
             : undefined,
         })
       );
     });
   }
 
-  private async createBranding(opts: BrandingOptions) {
-    return await this.withSignaturitSDK(async (sdk) => {
+  private async createSignaturitBranding(orgId: number, opts: SignatureOptions) {
+    return await this.withSignaturitSDK(async (sdk, context) => {
       const intl = await this.i18n.getIntl(opts.locale);
 
+      const templateData = await this.layouts.getLayoutProps(orgId);
       const branding = await sdk.createBranding({
         show_welcome_page: false,
-        show_csv: opts.showCsv,
-        layout_color: opts.templateData?.theme?.color ?? "#6059F7",
+        show_csv: context.showCsv,
+        layout_color: templateData.theme.color ?? "#6059F7",
         text_color: "#F6F6F6",
-        logo: opts.templateData?.logoUrl
-          ? await downloadImageBase64(opts.templateData.logoUrl)
-          : undefined,
+        logo: templateData.logoUrl ? await downloadImageBase64(templateData.logoUrl) : undefined,
         application_texts: {
           open_sign_button: intl.formatMessage({
             id: "signature-client.open-document",
             defaultMessage: "Open document",
           }),
         },
-        templates: isDefined(opts.templateData)
-          ? await this.buildSignaturItBrandingTemplates(opts)
-          : undefined,
+        templates: await this.buildSignaturItBrandingTemplates(opts.locale, templateData),
       });
 
       return branding.id;
@@ -262,7 +276,8 @@ export class SignaturitClient implements ISignatureClient {
   }
 
   private async buildSignaturItBrandingTemplates(
-    opts: Pick<SignatureOptions, "locale" | "templateData">
+    locale: string,
+    templateData: OrganizationLayout
   ): Promise<BrandingParams["templates"]> {
     const [
       { html: signatureRequestedEmail },
@@ -277,9 +292,9 @@ export class SignaturitClient implements ISignatureClient {
           signerName: "{{signer_name}}",
           documentName: "{{filename}}",
           emailBody: "{{email_body}}",
-          ...opts.templateData!,
+          ...templateData,
         },
-        { locale: opts.locale }
+        { locale }
       ),
       buildEmail(
         SignatureCompletedEmail,
@@ -287,18 +302,18 @@ export class SignaturitClient implements ISignatureClient {
           signatureProvider: "Signaturit",
           signerName: "{{signer_name}}",
           documentName: "{{filename}}",
-          ...opts.templateData!,
+          ...templateData,
         },
-        { locale: opts.locale }
+        { locale }
       ),
       buildEmail(
         SignatureCancelledEmail,
         {
           signatureProvider: "Signaturit",
           signerName: "{{signer_name}}",
-          ...opts.templateData!,
+          ...templateData,
         },
-        { locale: opts.locale }
+        { locale }
       ),
       buildEmail(
         SignatureReminderEmail,
@@ -306,9 +321,9 @@ export class SignaturitClient implements ISignatureClient {
           documentName: "{{filename}}",
           signerName: "{{signer_name}}",
           signButton: "{{sign_button}}",
-          ...opts.templateData!,
+          ...templateData,
         },
-        { locale: opts.locale }
+        { locale }
       ),
     ]);
 

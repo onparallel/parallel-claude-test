@@ -6,7 +6,7 @@ import { OrganizationRepository } from "../db/repositories/OrganizationRepositor
 import { BrandTheme } from "../util/BrandTheme";
 import { IImageService, IMAGE_SERVICE } from "./image";
 
-interface OrganizationLayout {
+export interface OrganizationLayout {
   assetsUrl: string;
   parallelUrl: string;
   logoUrl: string;

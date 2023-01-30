@@ -17,7 +17,6 @@ import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { random } from "../util/token";
 import { Maybe, Replace } from "../util/types";
 import { createQueueWorker } from "./helpers/createQueueWorker";
-import { getLayoutProps } from "./helpers/getLayoutProps";
 
 type SignatureOrgIntegration = Replace<
   OrgIntegration,
@@ -89,14 +88,7 @@ async function startSignatureProcess(
       recipients,
       {
         locale: petition.locale,
-        showCsv: integration.settings.SHOW_CSV,
-        templateData: {
-          ...(await getLayoutProps(petition.org_id, ctx)),
-          organizationName: organization.name,
-        },
-        signingMode: "parallel",
         initialMessage: message,
-        pdfDocumentTheme: petitionTheme.data,
       }
     );
 
@@ -325,7 +317,7 @@ async function updateOrganizationBranding(
   const [organization, signatureIntegrations, layoutProps] = await Promise.all([
     ctx.organizations.loadOrg(payload.orgId),
     ctx.integrations.loadIntegrationsByOrgId(payload.orgId, "SIGNATURE"),
-    getLayoutProps(payload.orgId, ctx),
+    ctx.layouts.getLayoutProps(payload.orgId),
   ]);
 
   if (!organization) {
