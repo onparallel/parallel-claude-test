@@ -87,14 +87,18 @@ export function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
           handleMessage: async (message) => {
             const payload = parser(message.Body!);
             const context = container.get<WorkerContext>(WorkerContext);
-            logger.info("Start processing message", { payload });
-            const duration = await stopwatch(async () => {
-              await handler(payload, context, config.queueWorkers[name]);
-            });
-            logger.info(`Successfully processed message in ${duration}ms`, {
-              payload,
-              duration,
-            });
+            try {
+              logger.info("Start processing message", { payload });
+              const duration = await stopwatch(async () => {
+                await handler(payload, context, config.queueWorkers[name]);
+              });
+              logger.info(`Successfully processed message in ${duration}ms`, {
+                payload,
+                duration,
+              });
+            } catch (error: any) {
+              context.logger.error(error.message, { stack: error.stack });
+            }
           },
           sqs: new SQSClient({
             ...config.aws,
