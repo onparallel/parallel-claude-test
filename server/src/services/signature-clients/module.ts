@@ -4,13 +4,7 @@ import { DocuSignClient } from "./docusign";
 import { SignaturitClient } from "./signaturit";
 
 export const signatureClientsModule = new ContainerModule((bind) => {
-  bind<ISignatureClient>(SIGNATURE_CLIENT)
-    .to(SignaturitClient)
-    .inSingletonScope()
-    .whenTargetNamed("SIGNATURIT");
+  bind<ISignatureClient>(SIGNATURE_CLIENT).to(SignaturitClient).whenTargetNamed("SIGNATURIT");
 
-  bind<ISignatureClient>(SIGNATURE_CLIENT)
-    .to(DocuSignClient)
-    .inSingletonScope()
-    .whenTargetNamed("DOCUSIGN");
+  bind<ISignatureClient>(SIGNATURE_CLIENT).to(DocuSignClient).whenTargetNamed("DOCUSIGN");
 });

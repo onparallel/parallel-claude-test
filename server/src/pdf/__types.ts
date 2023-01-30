@@ -786,8 +786,8 @@ export type Mutation = {
   setUserPreferredLocale: User;
   /** Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag. */
   shareSignaturitApiKey: Organization;
-  /** Enables/disables CSV stamp on documents for Signaturit integrations. */
-  signaturitIntegrationShowCsv: SupportMethodResponse;
+  /** Enables/disables security stamp on documents for Signaturit integrations. */
+  signaturitIntegrationShowSecurityStamp: SupportMethodResponse;
   /** Generates a download link for the signed PDF petition. */
   signedPetitionDownloadLink: FileUploadDownloadLinkResult;
   /** Starts the completion of an async field */
@@ -1572,7 +1572,7 @@ export type MutationshareSignaturitApiKeyArgs = {
   orgId: Scalars["GID"];
 };
 
-export type MutationsignaturitIntegrationShowCsvArgs = {
+export type MutationsignaturitIntegrationShowSecurityStampArgs = {
   integrationId: Scalars["Int"];
   showCsv: Scalars["Boolean"];
 };

@@ -1410,7 +1410,7 @@ export interface NexusGenFieldTypes {
     setUserDelegates: NexusGenRootTypes["User"]; // User!
     setUserPreferredLocale: NexusGenRootTypes["User"]; // User!
     shareSignaturitApiKey: NexusGenRootTypes["Organization"]; // Organization!
-    signaturitIntegrationShowCsv: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    signaturitIntegrationShowSecurityStamp: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     signedPetitionDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     startAsyncFieldCompletion: NexusGenRootTypes["AsyncFieldCompletionResponse"]; // AsyncFieldCompletionResponse!
     startSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
@@ -3203,7 +3203,7 @@ export interface NexusGenFieldTypeNames {
     setUserDelegates: "User";
     setUserPreferredLocale: "User";
     shareSignaturitApiKey: "Organization";
-    signaturitIntegrationShowCsv: "SupportMethodResponse";
+    signaturitIntegrationShowSecurityStamp: "SupportMethodResponse";
     signedPetitionDownloadLink: "FileUploadDownloadLinkResult";
     startAsyncFieldCompletion: "AsyncFieldCompletionResponse";
     startSignatureRequest: "PetitionSignatureRequest";
@@ -5215,7 +5215,7 @@ export interface NexusGenArgTypes {
       limit: number; // Int!
       orgId: NexusGenScalars["GID"]; // GID!
     };
-    signaturitIntegrationShowCsv: {
+    signaturitIntegrationShowSecurityStamp: {
       // args
       integrationId: number; // Int!
       showCsv: boolean; // Boolean!

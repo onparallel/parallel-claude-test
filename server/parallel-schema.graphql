@@ -1588,9 +1588,9 @@ type Mutation {
   ): Organization!
 
   """
-  Enables/disables CSV stamp on documents for Signaturit integrations.
+  Enables/disables security stamp on documents for Signaturit integrations.
   """
-  signaturitIntegrationShowCsv(
+  signaturitIntegrationShowSecurityStamp(
     """
     Numeric ID of the integration
     """

@@ -284,8 +284,8 @@ export const supportMethods: {
   },
   {
     field: {
-      name: "signaturitIntegrationShowCsv",
-      description: "Enables/disables CSV stamp on documents for Signaturit integrations.",
+      name: "signaturitIntegrationShowSecurityStamp",
+      description: "Enables/disables security stamp on documents for Signaturit integrations.",
       args: [
         {
           name: "integrationId",
