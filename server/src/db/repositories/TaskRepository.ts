@@ -81,8 +81,9 @@ export type TaskOutput<TName extends TaskName> = {
   DOW_JONES_PROFILE_DOWNLOAD: { temporary_file_id: number };
   TEMPLATES_OVERVIEW_REPORT: {
     aggregation_type: "TEMPLATE" | "NO_ACCESS" | "NO_TEMPLATE";
-    name?: Maybe<string>;
-    template_count?: number;
+    template_id?: string; // set when aggregation_type === TEMPLATE
+    template_name?: Maybe<string>; // set when aggregation_type === TEMPLATE
+    template_count?: number; // set when aggregation_type !== TEMPLATE
     status: PetitionReportStatusCount;
     times: PetitionReportTimes;
   }[];

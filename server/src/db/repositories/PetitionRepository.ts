@@ -5480,7 +5480,8 @@ export class PetitionRepository extends BaseRepository {
           .map(([template, petitions]) => {
             return {
               aggregation_type: "TEMPLATE" as const,
-              name: template?.name,
+              template_id: toGlobalId("Petition", template!.id),
+              template_name: template?.name,
               ...groupStats(petitions),
             };
           }),
