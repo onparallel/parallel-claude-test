@@ -7001,12 +7001,12 @@
   },
   {
     "term": "generic.parallel-status.closed",
-    "definition": "Cerrada",
+    "definition": "Cerrado",
     "context": "Closed"
   },
   {
     "term": "generic.parallel-status.completed",
-    "definition": "Completada",
+    "definition": "Completado",
     "context": "Completed"
   },
   {
@@ -8276,8 +8276,8 @@
   },
   {
     "term": "page.reports-overview.time-to-close-help",
-    "definition": "Tiempo medio en que tardó en cerrarse el parallel desde que se completó.",
-    "context": "Average time from the completion of the parallel until it is closed."
+    "definition": "Tiempo medio que tardan los parallels en pasar de {completedStatus} a {closedStatus}.",
+    "context": "This is the average time that takes the parallels to go from {completedStatus} to {closedStatus}."
   },
   {
     "term": "page.reports-overview.time-to-complete",
@@ -8286,13 +8286,13 @@
   },
   {
     "term": "page.reports-overview.time-to-complete-help-1",
-    "definition": "Tiempo medio en que tardaron en completarse los parallels.",
-    "context": "Average time from the start of the parallel until it is completed."
+    "definition": "Tiempo medio que tardan los parallels en pasar a {completedStatus}.",
+    "context": "This is the average time that takes the parallels to be {completedStatus}."
   },
   {
     "term": "page.reports-overview.time-to-complete-help-2",
-    "definition": "Esta cifra tiene en cuenta tanto los parallels completados internamente como enviados a un tercero.",
-    "context": "This figure counts parallels completed internally as well as those sent to a third party."
+    "definition": "Esta cifra tiene en cuenta tanto los parallels completados internamente como los enviados a terceros.",
+    "context": "This takes into consideration parallels that are completed internally as well as those sent to third parties."
   },
   {
     "term": "page.reports-overview.time-to-sign",
@@ -8301,8 +8301,8 @@
   },
   {
     "term": "page.reports-overview.time-to-sign-help",
-    "definition": "Tiempo medio en que tardaron en firmarse los documentos una vez enviados.",
-    "context": "This is the average time for documents to be signed since they were sent."
+    "definition": "Tiempo medio que tardan los documentos en ser firmados una vez enviados.",
+    "context": "This is the average time that takes the documents to be signed once they have been sent."
   },
   {
     "term": "page.reports-overview.total",
@@ -8311,13 +8311,13 @@
   },
   {
     "term": "page.reports-overview.total-help-1",
-    "definition": "Este total es la media de tiempo que tarda un parallel en cerrarse desde que comienza. Es decir, desde que está pendiente {clockIcon} hasta que se cierra {closedIcon}.",
-    "context": "This total is the average time from the start of the parallel until it is closed. That is, from when it's pending {clockIcon} until it's closed {closedIcon}."
+    "definition": "Este total es la media de tiempo que tardan los parallels en cerrarse. Es decir, en pasar de {pendingStatus} a {closedStatus}.",
+    "context": "This is the average time that takes the parallels to be closed. That is, from {pendingStatus} to {closedStatus}."
   },
   {
     "term": "page.reports-overview.total-help-2",
     "definition": "No entran en esta cifra, los parallels eliminados ni los borradores sin respuestas.",
-    "context": "This number doesn't include deleted o parallels or unanswered drafts."
+    "context": "This number doesn't include deleted parallels or unanswered drafts."
   },
   {
     "term": "page.reports-overview.total-parallels",

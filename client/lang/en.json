@@ -8276,8 +8276,8 @@
   },
   {
     "term": "page.reports-overview.time-to-close-help",
-    "definition": "Average time from the completion of the parallel until it is closed.",
-    "context": "Average time from the completion of the parallel until it is closed."
+    "definition": "This is the average time that takes the parallels to go from {completedStatus} to {closedStatus}.",
+    "context": "This is the average time that takes the parallels to go from {completedStatus} to {closedStatus}."
   },
   {
     "term": "page.reports-overview.time-to-complete",
@@ -8286,13 +8286,13 @@
   },
   {
     "term": "page.reports-overview.time-to-complete-help-1",
-    "definition": "Average time from the start of the parallel until it is completed.",
-    "context": "Average time from the start of the parallel until it is completed."
+    "definition": "This is the average time that takes the parallels to be {completedStatus}.",
+    "context": "This is the average time that takes the parallels to be {completedStatus}."
   },
   {
     "term": "page.reports-overview.time-to-complete-help-2",
-    "definition": "This figure counts parallels completed internally as well as those sent to a third party.",
-    "context": "This figure counts parallels completed internally as well as those sent to a third party."
+    "definition": "This takes into consideration parallels that are completed internally as well as those sent to third parties.",
+    "context": "This takes into consideration parallels that are completed internally as well as those sent to third parties."
   },
   {
     "term": "page.reports-overview.time-to-sign",
@@ -8301,8 +8301,8 @@
   },
   {
     "term": "page.reports-overview.time-to-sign-help",
-    "definition": "This is the average time for documents to be signed since they were sent.",
-    "context": "This is the average time for documents to be signed since they were sent."
+    "definition": "This is the average time that takes the documents to be signed once they have been sent.",
+    "context": "This is the average time that takes the documents to be signed once they have been sent."
   },
   {
     "term": "page.reports-overview.total",
@@ -8311,13 +8311,13 @@
   },
   {
     "term": "page.reports-overview.total-help-1",
-    "definition": "This total is the average time from the start of the parallel until it is closed. That is, from when it's pending {clockIcon} until it's closed {closedIcon}.",
-    "context": "This total is the average time from the start of the parallel until it is closed. That is, from when it's pending {clockIcon} until it's closed {closedIcon}."
+    "definition": "This is the average time that takes the parallels to be closed. That is, from {pendingStatus} to {closedStatus}.",
+    "context": "This is the average time that takes the parallels to be closed. That is, from {pendingStatus} to {closedStatus}."
   },
   {
     "term": "page.reports-overview.total-help-2",
-    "definition": "This number doesn't include deleted o parallels or unanswered drafts.",
-    "context": "This number doesn't include deleted o parallels or unanswered drafts."
+    "definition": "This number doesn't include deleted parallels or unanswered drafts.",
+    "context": "This number doesn't include deleted parallels or unanswered drafts."
   },
   {
     "term": "page.reports-overview.total-parallels",

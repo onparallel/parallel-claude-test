@@ -17,6 +17,7 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { OverflownText } from "@parallel/components/common/OverflownText";
+import { PetitionStatusLabel } from "@parallel/components/common/PetitionStatusLabel";
 import { RadioButton } from "@parallel/components/common/RadioButton";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -43,7 +44,6 @@ import { useReportsSections } from "@parallel/utils/useReportsSections";
 import { ReactNode, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, sortBy, sumBy } from "remeda";
-import { PetitionStatusIcon } from "@parallel/components/common/PetitionStatusIcon";
 
 interface PetitionStatusCount {
   all: number;
@@ -631,17 +631,35 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                     <Text>
                       <FormattedMessage
                         id="page.reports-overview.total-help-1"
-                        defaultMessage="This total is the average time from the start of the parallel until it is closed. That is, from when it's pending {clockIcon} until it's closed {closedIcon}."
+                        defaultMessage="This is the average time that takes the parallels to be closed. That is, from {pendingStatus} to {closedStatus}."
                         values={{
-                          clockIcon: <PetitionStatusIcon status="PENDING" />,
-                          closedIcon: <PetitionStatusIcon status="CLOSED" />,
+                          pendingStatus: (
+                            <PetitionStatusLabel
+                              as="span"
+                              spacing={1}
+                              display="inline-flex"
+                              height="21px"
+                              verticalAlign="bottom"
+                              status="PENDING"
+                            />
+                          ),
+                          closedStatus: (
+                            <PetitionStatusLabel
+                              as="span"
+                              spacing={1}
+                              display="inline-flex"
+                              height="21px"
+                              verticalAlign="bottom"
+                              status="CLOSED"
+                            />
+                          ),
                         }}
                       />
                     </Text>
                     <Text>
                       <FormattedMessage
                         id="page.reports-overview.total-help-2"
-                        defaultMessage="This number doesn't include deleted o parallels or unanswered drafts."
+                        defaultMessage="This number doesn't include deleted parallels or unanswered drafts."
                       />
                     </Text>
                   </Stack>
@@ -670,13 +688,25 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                     <Text>
                       <FormattedMessage
                         id="page.reports-overview.time-to-complete-help-1"
-                        defaultMessage="Average time from the start of the parallel until it is completed."
+                        defaultMessage="This is the average time that takes the parallels to be {completedStatus}."
+                        values={{
+                          completedStatus: (
+                            <PetitionStatusLabel
+                              as="span"
+                              spacing={1}
+                              display="inline-flex"
+                              height="21px"
+                              verticalAlign="bottom"
+                              status="COMPLETED"
+                            />
+                          ),
+                        }}
                       />
                     </Text>
                     <Text>
                       <FormattedMessage
                         id="page.reports-overview.time-to-complete-help-2"
-                        defaultMessage="This figure counts parallels completed internally as well as those sent to a third party."
+                        defaultMessage="This takes into consideration parallels that are completed internally as well as those sent to third parties."
                       />
                     </Text>
                   </Stack>
@@ -696,11 +726,12 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                   id: "page.reports-overview.time-to-sign",
                   defaultMessage: "Time to sign",
                 }),
-                headerHelp: intl.formatMessage({
-                  id: "page.reports-overview.time-to-sign-help",
-                  defaultMessage:
-                    "This is the average time for documents to be signed since they were sent.",
-                }),
+                headerHelp: (
+                  <FormattedMessage
+                    id="page.reports-overview.time-to-sign-help"
+                    defaultMessage="This is the average time that takes the documents to be signed once they have been sent."
+                  />
+                ),
                 cellProps: {
                   width: "10%",
                   minWidth: "120px",
@@ -724,11 +755,34 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                   id: "page.reports-overview.time-to-close",
                   defaultMessage: "Time to close",
                 }),
-                headerHelp: intl.formatMessage({
-                  id: "page.reports-overview.time-to-close-help",
-                  defaultMessage:
-                    "Average time from the completion of the parallel until it is closed.",
-                }),
+                headerHelp: (
+                  <FormattedMessage
+                    id="page.reports-overview.time-to-close-help"
+                    defaultMessage="This is the average time that takes the parallels to go from {completedStatus} to {closedStatus}."
+                    values={{
+                      completedStatus: (
+                        <PetitionStatusLabel
+                          as="span"
+                          spacing={1}
+                          display="inline-flex"
+                          height="21px"
+                          verticalAlign="bottom"
+                          status="COMPLETED"
+                        />
+                      ),
+                      closedStatus: (
+                        <PetitionStatusLabel
+                          as="span"
+                          spacing={1}
+                          display="inline-flex"
+                          height="21px"
+                          verticalAlign="bottom"
+                          status="CLOSED"
+                        />
+                      ),
+                    }}
+                  />
+                ),
                 cellProps: {
                   width: "10%",
                   minWidth: "120px",

@@ -57,7 +57,7 @@ import { Divider } from "../common/Divider";
 import { NakedLink } from "../common/Link";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
 import { PathName } from "../common/PathName";
-import { PetitionStatusIcon } from "../common/PetitionStatusIcon";
+import { PetitionStatusLabel } from "../common/PetitionStatusLabel";
 import { SmallPopover } from "../common/SmallPopover";
 import { useMoveToFolderDialog } from "../petition-common/dialogs/MoveToFolderDialog";
 import { usePetitionSharingDialog } from "../petition-common/dialogs/PetitionSharingDialog";
@@ -349,7 +349,7 @@ export const PetitionHeader = Object.assign(
                 data-status={status}
                 paddingX={1}
               >
-                <PetitionStatusIcon status={status} showStatus />
+                <PetitionStatusLabel status={status} />
               </Center>
             ) : (
               <Badge colorScheme="primary" marginRight={2}>
