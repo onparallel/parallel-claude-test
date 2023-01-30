@@ -1,4 +1,5 @@
 import { inject, injectable } from "inversify";
+import pMap from "p-map";
 import { isDefined } from "remeda";
 import SignaturitSDK, { BrandingParams } from "signaturit-sdk";
 import { URLSearchParams } from "url";
@@ -19,7 +20,6 @@ import { Tone } from "../../emails/utils/types";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { downloadImageBase64 } from "../../util/images";
-import { removeNotDefined } from "../../util/remedaExtensions";
 import { EMAILS, IEmailsService } from "../emails";
 import { FETCH_SERVICE, IFetchService } from "../fetch";
 import { I18N_SERVICE, II18nService } from "../i18n";
@@ -29,15 +29,22 @@ import {
   OrganizationLayout,
   ORGANIZATION_LAYOUT_SERVICE,
 } from "../organization-layout";
-import { BrandingOptions, ISignatureClient, Recipient, SignatureOptions } from "./client";
+import { ISignatureClient, Recipient, SignatureOptions } from "./client";
+
+type BrandingIdKey = `${"EN" | "ES"}_${Tone}_BRANDING_ID`;
+
+interface SignaturitBranding {
+  locale: string;
+  tone: Tone;
+  brandingId: string;
+}
 
 interface SignaturitClientContext {
   isSharedProductionApiKey: boolean;
   apiKeyHint: string;
   showCsv: boolean;
+  brandings: SignaturitBranding[];
 }
-
-type BrandingIdKey = `${"EN" | "ES"}_${Tone}_BRANDING_ID`;
 
 @injectable()
 export class SignaturitClient implements ISignatureClient {
@@ -93,11 +100,24 @@ export class SignaturitClient implements ISignatureClient {
       settings.ENVIRONMENT === "production"
     );
 
+    const brandings: SignaturitBranding[] = [];
+    ["EN_FORMAL", "EN_INFORMAL", "ES_FORMAL", "ES_INFORMAL"].forEach((key) => {
+      if (isDefined(settings[`${key}_BRANDING_ID` as BrandingIdKey])) {
+        const [locale, tone] = key.split("_") as ["EN" | "ES", Tone];
+        brandings.push({
+          locale: locale.toLowerCase(),
+          tone,
+          brandingId: settings[`${key}_BRANDING_ID` as BrandingIdKey]!,
+        });
+      }
+    });
+
     const context = {
       apiKeyHint: settings.CREDENTIALS.API_KEY.slice(0, 10),
       isSharedProductionApiKey:
         settings.CREDENTIALS.API_KEY === this.config.signature.signaturitSharedProductionApiKey,
       showCsv: settings.SHOW_CSV ?? false,
+      brandings,
     };
 
     return await handler(sdk, context);
@@ -139,7 +159,7 @@ export class SignaturitClient implements ISignatureClient {
         const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as BrandingIdKey;
         let brandingId = settings[key];
         if (!brandingId) {
-          brandingId = await this.createSignaturitBranding(orgId, opts);
+          brandingId = await this.createSignaturitBranding(orgId, locale);
           settings[key] = brandingId;
 
           this.integrations.updateOrgIntegration<"SIGNATURE">(
@@ -225,35 +245,27 @@ export class SignaturitClient implements ISignatureClient {
     });
   }
 
-  async updateBranding(brandingId: string, opts: BrandingOptions) {
-    await this.withSignaturitSDK(async (sdk) => {
-      const intl = await this.i18n.getIntl(opts.locale);
-
-      await sdk.updateBranding(
-        brandingId,
-        removeNotDefined({
-          show_csv: opts.showCsv,
-          layout_color: opts.templateData?.theme?.color,
-          logo: opts.templateData?.logoUrl
-            ? await downloadImageBase64(opts.templateData.logoUrl)
-            : undefined,
-          application_texts: {
-            open_sign_button: intl.formatMessage({
-              id: "signature-client.open-document",
-              defaultMessage: "Open document",
-            }),
-          },
-          templates: isDefined(opts.templateData)
-            ? await this.buildSignaturItBrandingTemplates(opts.locale, opts.templateData!)
-            : undefined,
-        })
+  async onOrganizationBrandChange(orgId: number) {
+    await this.withSignaturitSDK(async (sdk, context) => {
+      const templateData = await this.layouts.getLayoutProps(orgId);
+      await pMap(
+        context.brandings,
+        async ({ locale, brandingId }) => {
+          await sdk.updateBranding(brandingId, {
+            show_csv: context.showCsv,
+            logo: await downloadImageBase64(templateData.logoUrl),
+            layout_color: templateData.theme.color,
+            templates: await this.buildSignaturItBrandingTemplates(locale, templateData),
+          });
+        },
+        { concurrency: 1 }
       );
     });
   }
 
-  private async createSignaturitBranding(orgId: number, opts: SignatureOptions) {
+  private async createSignaturitBranding(orgId: number, locale: string) {
     return await this.withSignaturitSDK(async (sdk, context) => {
-      const intl = await this.i18n.getIntl(opts.locale);
+      const intl = await this.i18n.getIntl(locale);
 
       const templateData = await this.layouts.getLayoutProps(orgId);
       const branding = await sdk.createBranding({
@@ -268,7 +280,7 @@ export class SignaturitClient implements ISignatureClient {
             defaultMessage: "Open document",
           }),
         },
-        templates: await this.buildSignaturItBrandingTemplates(opts.locale, templateData),
+        templates: await this.buildSignaturItBrandingTemplates(locale, templateData),
       });
 
       return branding.id;

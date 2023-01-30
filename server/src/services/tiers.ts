@@ -91,24 +91,23 @@ export class TiersService implements ITiersService {
 
     await this.organizations.withTransaction(async (t) => {
       await this.featureFlags.removeFeatureFlagOverrides(org.id, t);
-      await Promise.all([
-        this.organizations.updateOrganization(
-          org.id,
-          { usage_details: newUsageDetails },
-          updatedBy,
-          t
-        ),
-        this.featureFlags.upsertFeatureFlagOverride(org.id, tier.FEATURE_FLAGS, t),
-        this.organizations.upsertOrganizationUsageLimit(
-          org.id,
-          "PETITION_SEND",
-          tier.PETITION_SEND.limit,
-          tier.PETITION_SEND.duration,
-          t
-        ),
-        this.signatures.updateBranding(org.id, { exclude: ["DOCUSIGN"] }, t),
-      ]);
+      await this.organizations.updateOrganization(
+        org.id,
+        { usage_details: newUsageDetails },
+        updatedBy,
+        t
+      );
+      await this.featureFlags.upsertFeatureFlagOverride(org.id, tier.FEATURE_FLAGS, t);
+      await this.organizations.upsertOrganizationUsageLimit(
+        org.id,
+        "PETITION_SEND",
+        tier.PETITION_SEND.limit,
+        tier.PETITION_SEND.duration,
+        t
+      );
     }, t);
+
+    await this.signatures.onOrganizationBrandChange(org.id);
 
     return tier;
   }

@@ -8,11 +8,10 @@ import {
   PetitionSignatureRequestCancelData,
 } from "../db/repositories/PetitionRepository";
 import { OrgIntegration } from "../db/__types";
-import { Tone } from "../emails/utils/types";
 import { InvalidCredentialsError } from "../integrations/GenericIntegration";
-import { BrandingIdKey, SignatureResponse } from "../services/signature-clients/client";
+import { SignatureResponse } from "../services/signature-clients/client";
 import { fullName } from "../util/fullName";
-import { removeKeys, removeNotDefined } from "../util/remedaExtensions";
+import { removeKeys } from "../util/remedaExtensions";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { random } from "../util/token";
 import { Maybe, Replace } from "../util/types";
@@ -308,65 +307,25 @@ async function storeAuditTrail(
 async function updateOrganizationBranding(
   payload: {
     orgId: number;
-    exclude: Maybe<SignatureProvider[]>;
     integrationId: Maybe<number>;
     _: string;
   },
   ctx: WorkerContext
 ) {
-  const [organization, signatureIntegrations, layoutProps] = await Promise.all([
-    ctx.organizations.loadOrg(payload.orgId),
-    ctx.integrations.loadIntegrationsByOrgId(payload.orgId, "SIGNATURE"),
-    ctx.layouts.getLayoutProps(payload.orgId),
-  ]);
-
-  if (!organization) {
-    return;
-  }
+  const signatureIntegrations = await ctx.integrations.loadIntegrationsByOrgId(
+    payload.orgId,
+    "SIGNATURE"
+  );
 
   await pMap(
     signatureIntegrations as SignatureOrgIntegration[],
     async (integration) => {
-      if (payload.exclude?.includes(integration.provider)) {
-        return;
-      }
-
       // if targeting a single integration for update, make sure to skip every other
       if (isDefined(payload.integrationId) && integration.id !== payload.integrationId) {
         return;
       }
 
-      const settings = integration.settings;
-      const definedBrandingIds = removeNotDefined<Record<BrandingIdKey, string | undefined>>({
-        EN_FORMAL_BRANDING_ID: settings.EN_FORMAL_BRANDING_ID,
-        EN_INFORMAL_BRANDING_ID: settings.EN_INFORMAL_BRANDING_ID,
-        ES_FORMAL_BRANDING_ID: settings.ES_FORMAL_BRANDING_ID,
-        ES_INFORMAL_BRANDING_ID: settings.ES_INFORMAL_BRANDING_ID,
-      });
-
-      const client = ctx.signature.getClient(integration);
-      for (const [key, brandingId] of Object.entries(definedBrandingIds)) {
-        const [locale, tone]: string[] = key.split("_");
-        try {
-          await client.updateBranding(brandingId!, {
-            locale: locale.toLowerCase(),
-            showCsv: settings.SHOW_CSV,
-            templateData: {
-              ...layoutProps,
-              theme: {
-                ...layoutProps.theme,
-                preferredTone: tone as Tone,
-              },
-              organizationName: organization.name,
-            },
-          });
-        } catch (error) {
-          ctx.logger.error(
-            `Error updating ${key} branding on OrgIntegration:${integration.id}:`,
-            error
-          );
-        }
-      }
+      await ctx.signature.getClient(integration).onOrganizationBrandChange?.(payload.orgId);
     },
     { concurrency: 1 }
   );

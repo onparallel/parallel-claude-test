@@ -1,5 +1,3 @@
-import { Tone } from "../../emails/utils/types";
-
 interface Document {
   id: string;
   created_at: Date;
@@ -38,11 +36,6 @@ export interface Recipient {
   name: string;
 }
 
-// TODO remove from here
-export type BrandingIdKey = `${"EN" | "ES"}_${Tone}_BRANDING_ID`;
-
-export type BrandingOptions = any;
-
 export const SIGNATURE_CLIENT = Symbol.for("SIGNATURE_CLIENT");
 
 export interface ISignatureClient {
@@ -58,5 +51,5 @@ export interface ISignatureClient {
   downloadSignedDocument: (externalId: string) => Promise<Buffer>;
   downloadAuditTrail: (externalId: string) => Promise<Buffer>;
   sendPendingSignatureReminder: (signatureId: string) => Promise<void>;
-  updateBranding(brandingId: string, opts: BrandingOptions): Promise<void>;
+  onOrganizationBrandChange?(orgId: number): Promise<void>;
 }

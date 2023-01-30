@@ -76,7 +76,7 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
     );
 
     if (!args.isIcon) {
-      await ctx.signature.updateBranding(ctx.user!.org_id, { exclude: ["DOCUSIGN"] });
+      await ctx.signature.onOrganizationBrandChange(ctx.user!.org_id);
     }
 
     return org;
@@ -138,7 +138,7 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
       `User:${ctx.user!.id}`
     );
 
-    await ctx.signature.updateBranding(ctx.user!.org_id, { exclude: ["DOCUSIGN"] });
+    await ctx.signature.onOrganizationBrandChange(ctx.user!.org_id);
     return (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
   },
 });
@@ -284,7 +284,7 @@ export const updateFeatureFlags = mutationField("updateFeatureFlags", {
 
     await ctx.featureFlags.upsertFeatureFlagOverride(orgId, featureFlags);
     if (needRemoveBranding) {
-      await ctx.signature.updateBranding(orgId);
+      await ctx.signature.onOrganizationBrandChange(orgId);
     }
 
     return (await ctx.organizations.loadOrg(orgId))!;

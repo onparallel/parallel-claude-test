@@ -34,7 +34,7 @@ export const forceUpdateSignatureOrganizationBrandings = mutationField(
             message: `Can't find organization with id ${orgId}`,
           };
         }
-        await ctx.signature.updateBranding(orgId);
+        await ctx.signature.onOrganizationBrandChange(orgId);
         return {
           result: RESULT.SUCCESS,
           message: `Brandings queued to update successfully`,
@@ -412,7 +412,7 @@ export const importPetitionFromJson = mutationField("importPetitionFromJson", {
 });
 
 export const signaturitIntegrationShowCsv = mutationField("signaturitIntegrationShowCsv", {
-  description: "Enables/disables CSV stamp on documents for Signaturit integrations.",
+  description: "Enables/disables security stamp on documents for Signaturit integrations.",
   type: "SupportMethodResponse",
   authorize: supportMethodAccess(),
   args: {
@@ -442,8 +442,7 @@ export const signaturitIntegrationShowCsv = mutationField("signaturitIntegration
         `User:${ctx.user!.id}`
       );
 
-      await ctx.signature.updateBranding(integration.org_id, {
-        exclude: ["DOCUSIGN"],
+      await ctx.signature.onOrganizationBrandChange(integration.org_id, {
         integrationId,
       });
     }

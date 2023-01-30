@@ -17,7 +17,6 @@ import { IQueuesService, QUEUES_SERVICE } from "./queues";
 import { ISignatureClient, SIGNATURE_CLIENT } from "./signature-clients/client";
 
 interface UpdateBrandingOpts {
-  exclude?: SignatureProvider[];
   integrationId?: number;
 }
 export interface ISignatureService {
@@ -48,7 +47,7 @@ export interface ISignatureService {
     signature: PetitionSignatureRequest,
     signedDocumentExternalId: string
   ): Promise<void>;
-  updateBranding(orgId: number, opts?: UpdateBrandingOpts, t?: Knex.Transaction): Promise<void>;
+  onOrganizationBrandChange(orgId: number, opts?: UpdateBrandingOpts): Promise<void>;
 }
 
 export const SIGNATURE = Symbol.for("SIGNATURE");
@@ -203,7 +202,7 @@ export class SignatureService implements ISignatureService {
     }
   }
 
-  async sendSignatureReminders(signature: MaybeArray<PetitionSignatureRequest>): Promise<void> {
+  async sendSignatureReminders(signature: MaybeArray<PetitionSignatureRequest>) {
     const signatures = unMaybeArray(signature).filter((s) => s.status === "PROCESSED");
     if (signatures.length > 0) {
       await this.queues.enqueueMessages(
@@ -220,27 +219,18 @@ export class SignatureService implements ISignatureService {
     }
   }
 
-  async updateBranding(
-    orgId: number,
-    opts?: UpdateBrandingOpts,
-    t?: Knex.Transaction
-  ): Promise<void> {
-    await this.queues.enqueueMessages(
-      "signature-worker",
-      {
-        groupId: `signature-branding-${toGlobalId("Organization", orgId)}`,
-        body: {
-          type: "update-branding",
-          payload: {
-            orgId,
-            integrationId: opts?.integrationId ?? null,
-            exclude: opts?.exclude ?? null,
-            _: random(10), // random value on message body to override sqs contentBasedDeduplication and allow processing repeated messages in short periods of time
-          },
+  async onOrganizationBrandChange(orgId: number, opts?: UpdateBrandingOpts) {
+    await this.queues.enqueueMessages("signature-worker", {
+      groupId: `signature-branding-${toGlobalId("Organization", orgId)}`,
+      body: {
+        type: "update-branding",
+        payload: {
+          orgId,
+          integrationId: opts?.integrationId ?? null,
+          _: random(10), // random value on message body to override sqs contentBasedDeduplication and allow processing repeated messages in short periods of time
         },
       },
-      t
-    );
+    });
   }
 
   async cancelPendingSignatureRequests(petitionId: number, canceller: PetitionAccess | User) {

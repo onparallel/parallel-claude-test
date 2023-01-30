@@ -11,13 +11,7 @@ import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { I18N_SERVICE, II18nService } from "../i18n";
-import {
-  ISignatureClient,
-  Recipient,
-  SignatureOptions,
-  SignatureResponse,
-  BrandingOptions,
-} from "./client";
+import { ISignatureClient, Recipient, SignatureOptions, SignatureResponse } from "./client";
 
 @injectable()
 export class DocuSignClient implements ISignatureClient {
@@ -78,20 +72,6 @@ export class DocuSignClient implements ISignatureClient {
     recipients: Recipient[],
     options: SignatureOptions
   ): Promise<SignatureResponse> {
-    // const key = `${options.locale.toUpperCase()}_INFORMAL_BRANDING_ID` as BrandingIdKey;
-    // let brandingId = this.settings[key];
-    // if (!brandingId) {
-    //   brandingId = await this.createBranding(options);
-    //   this.settings[key] = brandingId;
-
-    //   if (isDefined(this.integrationId)) {
-    //     this.integrations.updateOrgIntegration<"SIGNATURE">(
-    //       this.integrationId,
-    //       { settings: this.settings },
-    //       `OrgIntegration:${this.integrationId}`
-    //     );
-    //   }
-    // }
     return await this.withDocusignSdk(async ({ envelopes }, { USER_ACCOUNT_ID: userAccountId }) => {
       const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.parallelUrl);
 
@@ -234,44 +214,4 @@ export class DocuSignClient implements ISignatureClient {
       });
     });
   }
-
-  async updateBranding(brandingId: string, opts: BrandingOptions) {
-    // await this.withDocusignSdk(async ({ accounts }, { USER_ACCOUNT_ID: userAccountId }) => {
-    //   try {
-    //     await accounts.updateBrand(userAccountId, brandingId, {
-    //       brand: {
-    //         brandCompany: opts.templateData?.organizationName,
-    //       } as Brand,
-    //     });
-    //   } catch (error: any) {
-    //     if (error.response?.body?.errorCode === "INVALID_BRAND_ID") {
-    //       // branding has probably been deleted on docusign admin dashboard, so we need to remove the id from our database
-    //       const integration = (await this.integrations.loadIntegration(this.integrationId))!;
-    //       const settings = integration.settings as IntegrationSettings<"SIGNATURE", "DOCUSIGN">;
-    //       delete settings[`${opts.locale.toUpperCase()}_INFORMAL_BRANDING_ID` as BrandingIdKey];
-    //       await this.integrations.updateOrgIntegration(
-    //         this.integrationId,
-    //         { settings },
-    //         `OrgIntegration:${this.integrationId}`
-    //       );
-    //     } else {
-    //       throw error;
-    //     }
-    //   }
-    // });
-  }
-
-  // private async createBranding(opts: SignatureOptions) {
-  //   const response = await this.accountsApi.createBrand(this.apiAccountId, {
-  //     brand: {
-  //       isOverridingCompanyName: true,
-  //       brandCompany: opts.templateData?.organizationName,
-  //       brandLanguages: [opts.locale],
-  //       defaultBrandLanguage: opts.locale,
-  //       brandName: `Parallel Brand (${opts.locale})`,
-  //     } as Brand,
-  //   });
-
-  //   return response.brands![0].brandId!;
-  // }
 }
