@@ -192,7 +192,6 @@ function OrganizationGeneral() {
                   as={Center}
                   onDrop={handleIconUpload}
                   accept={{
-                    "image/gif": [".gif"],
                     "image/png": [".png"],
                     "image/jpeg": [".jpeg", ".jpg"],
                   }}

@@ -49,7 +49,7 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
   authorize: authenticateAnd(contextUserHasRole("ADMIN")),
   validateArgs: validateFile(
     (args) => args.file,
-    { contentType: ["image/gif", "image/png", "image/jpeg"], maxSize: 1024 * 1024 },
+    { contentType: ["image/png", "image/jpeg"], maxSize: 1024 * 1024 },
     "file"
   ),
   resolve: async (root, args, ctx) => {

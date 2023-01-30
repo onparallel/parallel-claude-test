@@ -192,7 +192,6 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                   }}
                   accept={{
                     "image/png": [".png"],
-                    "image/gif": [".gif"],
                     "image/jpeg": [".jpeg", ".jpg"],
                   }}
                   maxSize={MAX_FILE_SIZE}
