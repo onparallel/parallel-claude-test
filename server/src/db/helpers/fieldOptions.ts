@@ -87,7 +87,7 @@ const SCHEMAS = {
         },
       },
       attachToPdf: {
-        type: ["boolean", "null"],
+        type: "boolean",
       },
     },
   },
@@ -196,7 +196,7 @@ const SCHEMAS = {
     additionalProperties: false,
     properties: {
       attachToPdf: {
-        type: ["boolean", "null"],
+        type: "boolean",
       },
       // TODO Bankflip Legacy: remove when legacy API is removed
       legacy: {
