@@ -141,7 +141,7 @@ export abstract class OAuthIntegration<
         try {
           const response = (success: boolean) => /* html */ `
             <script>
-              window.opener.postMessage({ success: ${success} }, window.origin);
+              window.opener.postMessage({ success: ${success} }, "*");
               window.close();
             </script>
           `;
