@@ -44,7 +44,7 @@ export function useDocusignConsentPopup() {
     setIsRunning(true);
     windowRef.current = await openNewWindow(
       () =>
-        `${process.env.NEXT_PUBLIC_PARALLEL_URL}/api/oauth/docusign/authorize?${new URLSearchParams(
+        `/api/oauth/docusign/authorize?${new URLSearchParams(
           params
             ? {
                 ...params,
