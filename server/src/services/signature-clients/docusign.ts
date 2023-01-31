@@ -10,6 +10,7 @@ import {
 import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
+import { safeJsonParse } from "../../util/safeJsonParse";
 import { I18N_SERVICE, II18nService } from "../i18n";
 import { ISignatureClient, Recipient, SignatureOptions, SignatureResponse } from "./client";
 
@@ -34,6 +35,11 @@ export class DocuSignClient implements ISignatureClient {
     return (error as any)?.status === 401;
   }
 
+  private isAccountSuspendedError(error: any) {
+    const jsonError = safeJsonParse(error?.response?.text);
+    return (error as any)?.status === 400 && jsonError?.errorCode === "ACCOUNT_HAS_BEEN_SUSPENDED";
+  }
+
   private async withDocusignSdk<TResult>(
     handler: (
       apis: { envelopes: EnvelopesApi; accounts: AccountsApi },
@@ -55,10 +61,13 @@ export class DocuSignClient implements ISignatureClient {
         );
       } catch (error) {
         if (this.isConsentRequiredError(error)) {
-          throw new InvalidCredentialsError(true);
+          throw new InvalidCredentialsError("CONSENT_REQUIRED", true);
         }
         if (this.isAccessTokenExpiredError(error)) {
-          throw new InvalidCredentialsError();
+          throw new InvalidCredentialsError("EXPIRED_CREDENTIALS");
+        }
+        if (this.isAccountSuspendedError(error)) {
+          throw new InvalidCredentialsError("ACCOUNT_SUSPENDED");
         }
         throw error;
       }
@@ -73,7 +82,7 @@ export class DocuSignClient implements ISignatureClient {
     options: SignatureOptions
   ): Promise<SignatureResponse> {
     return await this.withDocusignSdk(async ({ envelopes }, { USER_ACCOUNT_ID: userAccountId }) => {
-      const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.parallelUrl);
+      const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
 
       const intl = await this.i18n.getIntl(options.locale);
       const ext = extname(filePath);
@@ -141,6 +150,7 @@ export class DocuSignClient implements ISignatureClient {
                     anchorUnits: "inches",
                     anchorXOffset: "0.2",
                     anchorYOffset: "0.5",
+                    scaleValue: "1.4",
                   },
                 ],
               },

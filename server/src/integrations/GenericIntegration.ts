@@ -49,7 +49,7 @@ export class GenericIntegration<TCredentials extends {}, TContext extends {} = {
 
 export class InvalidCredentialsError extends Error {
   override name = "InvalidCredentialsError";
-  constructor(public skipRefresh = false) {
-    super("InvalidCredentialsError");
+  constructor(message: string, public skipRefresh = false) {
+    super(message);
   }
 }

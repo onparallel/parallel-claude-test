@@ -141,7 +141,7 @@ export abstract class OAuthIntegration<
         try {
           const response = (success: boolean) => /* html */ `
             <script>
-              window.opener.postMessage({ success: ${success} });
+              window.opener.postMessage({ success: ${success} }, window.origin);
               window.close();
             </script>
           `;
@@ -200,13 +200,17 @@ export abstract class OAuthIntegration<
         try {
           return await handler(credentials.ACCESS_TOKEN, context);
         } catch (error) {
-          if (error instanceof InvalidCredentialsError && !error.skipRefresh) {
+          if (
+            error instanceof InvalidCredentialsError &&
+            error.message === "EXPIRED_CREDENTIALS" &&
+            !error.skipRefresh
+          ) {
             const [refreshError, newCredentials] = await withError(
               this.refreshCredentials(credentials, context)
             );
             if (isDefined(refreshError)) {
               // we couldn't refresh the access token, permissions might be revoked
-              throw new InvalidCredentialsError(true);
+              throw new InvalidCredentialsError("CONSENT_REQUIRED", true);
             } else {
               await this.updateIntegration(orgIntegrationId, {
                 settings: {
