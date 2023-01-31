@@ -16,8 +16,7 @@
     "extract-i18n-terms": "yarn workspace @parallel/bin extract-i18n-terms --locales en es --input '../client/{components,pages,utils}/**/*.{ts,tsx}' --output '../client/lang'",
     "generate-i18n-files": "yarn workspace @parallel/bin generate-i18n-files --locales en es --input '../client/lang' --output-raw '../client/public/static/lang' --output-compiled '../client/public/static/lang/compiled'",
     "download-flag-emojis": "yarn workspace @parallel/bin download-flag-emojis --output '../client/public/static/countries/flags'",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook",
+    "storybook": "storybook dev --port 6006",
     "_strip-js": "yarn workspace @parallel/bin strip-js"
   },
   "dependencies": {
@@ -122,8 +121,9 @@
     "@graphql-codegen/typed-document-node": "^2.3.13",
     "@graphql-codegen/typescript": "^2.8.8",
     "@graphql-codegen/typescript-operations": "^2.5.13",
-    "@storybook/addon-essentials": "^6.5.16",
-    "@storybook/react": "^6.5.16",
+    "@storybook/addon-essentials": "^7.0.0-beta.38",
+    "@storybook/nextjs": "^7.0.0-beta.38",
+    "@storybook/react": "^7.0.0-beta.38",
     "@types/apollo-upload-client": "^17.0.2",
     "@types/autosize": "^4.0.1",
     "@types/color": "^3.0.3",
@@ -145,6 +145,7 @@
     "babel-loader": "^9.1.2",
     "cross-env": "^7.0.3",
     "rimraf": "^4.1.2",
+    "storybook": "^7.0.0-beta.38",
     "svgo": "^3.0.2",
     "typescript": "^4.9.4",
     "webpack-merge": "^5.8.0"
