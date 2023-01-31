@@ -22,6 +22,7 @@ const PETITION_JSON_SCHEMA = {
     templateDescription: { type: ["array", "null"], items: { type: "object" } },
     fields: {
       type: "array",
+      minItems: 1,
       items: {
         type: "object",
         required: [
@@ -145,6 +146,10 @@ export class PetitionImportExportService implements IPetitionImportExportService
       validateRichTextContent(json.templateDescription);
     }
 
+    if (json.fields[0].type !== "HEADING") {
+      throw new Error(`First field should be a HEADING`);
+    }
+
     // restore "position" property on fields based on array index
     const fieldsWithPositions = json.fields.map((f, position) => ({
       ...f,
@@ -180,6 +185,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
             petition.id,
             {
               type: jsonField.type,
+              is_fixed: jsonField.type === "HEADING" && jsonField.position === 0,
               title: jsonField.title,
               description: jsonField.description,
               optional: jsonField.optional,
