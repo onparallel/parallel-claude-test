@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const { specifiedRules } = require("graphql");
-
 module.exports = {
   parser: "@typescript-eslint/parser",
   parserOptions: {
@@ -53,24 +50,8 @@ module.exports = {
     "formatjs/enforce-default-message": ["error", "literal"],
     "formatjs/enforce-placeholders": ["error", { ignoreList: ["b"] }],
     "formatjs/no-multiple-whitespaces": "error",
-    "graphql/template-strings": [
-      "error",
-      {
-        env: "apollo",
-        validators: specifiedRules
-          .map((f) => f.name)
-          .filter(
-            (r) =>
-              ![
-                "NoUnusedFragmentsRule",
-                "KnownFragmentNamesRule",
-                "NoUnusedVariablesRule",
-              ].includes(r)
-          ),
-      },
-    ],
   },
-  plugins: ["formatjs", "prettier", "graphql"],
+  plugins: ["formatjs", "prettier"],
   settings: {
     react: {
       version: "detect",
