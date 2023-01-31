@@ -1,4 +1,4 @@
-const port = process.env.EMAILS_PORT || 5000;
+const port = process.env.SERVER_STORIES_PORT || 5000;
 
 export const parameters = {
   a11y: {
@@ -9,7 +9,7 @@ export const parameters = {
     },
   },
   docs: {
-    iframeHeight: "200px",
+    story: { iframeHeight: "200px" },
   },
   server: {
     url: `http://localhost:${port}`,

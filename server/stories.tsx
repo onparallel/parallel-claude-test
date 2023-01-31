@@ -150,7 +150,7 @@ function header({ subject, from }: { subject: string; from: string }) {
   `;
 }
 
-const port = process.env.EMAILS_PORT || 5000;
+const port = process.env.SERVER_STORIES_PORT || 5000;
 
 app.listen(port, () => {
   console.log(`ready on http://localhost:${port}`);
