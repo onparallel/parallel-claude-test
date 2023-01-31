@@ -182,7 +182,11 @@ export function RecipientViewPetitionFieldTaxDocuments({
             variant="outline"
             width="min-content"
             onClick={handleStartAgain}
-            isDisabled={state === "FETCHING" || field.replies.some((r) => r.status === "APPROVED")}
+            isDisabled={
+              isDisabled ||
+              state === "FETCHING" ||
+              field.replies.some((r) => r.status === "APPROVED")
+            }
           >
             <FormattedMessage
               id="component.recipient-view-petition-field-tax-documents.start-again-button"

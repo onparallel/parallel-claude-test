@@ -5202,7 +5202,7 @@ export class PetitionRepository extends BaseRepository {
             when 'DOW_JONES_KYC' then
               content || jsonb_build_object('file_upload_id', null, 'entity', null)
             when 'ES_TAX_DOCUMENTS' then
-              content || jsonb_build_object('file_upload_id', null, 'request', null, 'error', null)
+              content || jsonb_build_object('file_upload_id', null, 'json_contents', null)
             else 
               content || jsonb_build_object('value', null)
             end

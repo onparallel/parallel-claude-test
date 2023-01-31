@@ -210,7 +210,7 @@ export class BankflipService implements IBankflipService {
       fieldId,
       replyContents.map((content) => ({
         type: "ES_TAX_DOCUMENTS",
-        content,
+        content: { ...content, bankflip_session_id: event.payload.sessionId },
         ...data,
       })),
       createdBy
