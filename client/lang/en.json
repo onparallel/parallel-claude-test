@@ -8220,14 +8220,14 @@
     "context": "Processes in which a signer hasn't yet signed aren't included."
   },
   {
-    "term": "page.reports-overview.other-templates",
+    "term": "page.reports-overview.parallels-no-access",
     "definition": "Other templates not shared with me ({count})",
     "context": "Other templates not shared with me ({count})"
   },
   {
-    "term": "page.reports-overview.parallels-scratch",
-    "definition": "Parallels created from scratch",
-    "context": "Parallels created from scratch"
+    "term": "page.reports-overview.parallels-no-template",
+    "definition": "Parallels without a template",
+    "context": "Parallels without a template"
   },
   {
     "term": "page.reports-overview.ready-to-generate",

@@ -540,7 +540,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
             return row.aggregation_type === "NO_ACCESS" ? (
               <OverflownText fontStyle="italic">
                 <FormattedMessage
-                  id="page.reports-overview.other-templates"
+                  id="page.reports-overview.parallels-no-access"
                   defaultMessage="Other templates not shared with me ({count})"
                   values={{ count: row.template_count ?? 0 }}
                 />
@@ -548,8 +548,8 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
             ) : row.aggregation_type === "NO_TEMPLATE" ? (
               <OverflownText fontStyle="italic">
                 <FormattedMessage
-                  id="page.reports-overview.parallels-scratch"
-                  defaultMessage="Parallels created from scratch"
+                  id="page.reports-overview.parallels-no-template"
+                  defaultMessage="Parallels without a template"
                 />
               </OverflownText>
             ) : (
@@ -934,15 +934,15 @@ function useDownloadOverviewExcel() {
           row.aggregation_type === "NO_ACCESS"
             ? intl.formatMessage(
                 {
-                  id: "page.reports-overview.other-templates",
+                  id: "page.reports-overview.parallels-no-access",
                   defaultMessage: "Other templates not shared with me ({count})",
                 },
                 { count: row.template_count ?? 0 }
               )
             : row.aggregation_type === "NO_TEMPLATE"
             ? intl.formatMessage({
-                id: "page.reports-overview.parallels-scratch",
-                defaultMessage: "Parallels created from scratch",
+                id: "page.reports-overview.parallels-no-template",
+                defaultMessage: "Parallels without a template",
               })
             : row.template_name ||
               intl.formatMessage({
