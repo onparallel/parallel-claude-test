@@ -15,7 +15,16 @@ import { WithChakraProps } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableProps, useTableColors } from "@parallel/components/common/Table";
-import { ComponentType, Key, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  ComponentType,
+  Fragment,
+  Key,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { identity, isDefined, pick } from "remeda";
 
@@ -202,17 +211,11 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
                         values={{ count: (context as any).selectedCount }}
                       />
                     </Box>
-                    {actions?.map(({ key, wrap = identity, ...props }) =>
-                      wrap(
-                        <Button
-                          key={key}
-                          variant="ghost"
-                          size="sm"
-                          fontWeight="normal"
-                          {...props}
-                        />
-                      )
-                    )}
+                    {actions?.map(({ key, wrap = identity, ...props }) => (
+                      <Fragment key={key}>
+                        {wrap(<Button variant="ghost" size="sm" fontWeight="normal" {...props} />)}
+                      </Fragment>
+                    ))}
                   </HStack>
                 </Box>
               ),
