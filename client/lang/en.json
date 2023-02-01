@@ -4985,19 +4985,14 @@
     "context": "The sum of all is the total number of parallels created."
   },
   {
-    "term": "component.reports-error-message.contact-support",
-    "definition": "If the problem persists, please <a>contact support</a> via chat.",
-    "context": "If the problem persists, please <a>contact support</a> via chat."
-  },
-  {
     "term": "component.reports-error-message.title",
     "definition": "Oops, looks like something went wrong",
     "context": "Oops, looks like something went wrong"
   },
   {
     "term": "component.reports-error-message.try-again",
-    "definition": "Try again or select another template.",
-    "context": "Try again or select another template."
+    "definition": "Try again and if the problem persists, please <a>contact support</a> via chat.",
+    "context": "Try again and if the problem persists, please <a>contact support</a> via chat."
   },
   {
     "term": "component.reports-loading-message.wait-while-load",
