@@ -1,9 +1,19 @@
-import type { PlaywrightTestConfig } from "@playwright/test";
+import type { PlaywrightTestConfig, PlaywrightTestOptions } from "@playwright/test";
 import { devices } from "@playwright/test";
 import { config as dotEnvConfig } from "dotenv";
 import { resolve } from "path";
 
 dotEnvConfig({ path: resolve(__dirname, `.env.${process.env.ENV ?? "local"}`) });
+
+const options: Partial<PlaywrightTestOptions> =
+  process.env.ENV === "staging"
+    ? {
+        httpCredentials: {
+          username: "parallel",
+          password: "cascanueces",
+        },
+      }
+    : {};
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -46,7 +56,7 @@ const config: PlaywrightTestConfig = {
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        // headless: false,
+        ...options,
       },
     },
 
@@ -54,7 +64,7 @@ const config: PlaywrightTestConfig = {
       name: "firefox",
       use: {
         ...devices["Desktop Firefox"],
-        // headless: false,
+        ...options,
       },
     },
 
@@ -62,47 +72,10 @@ const config: PlaywrightTestConfig = {
       name: "webkit",
       use: {
         ...devices["Desktop Safari"],
-        // headless: false,
+        ...options,
       },
     },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: {
-    //     ...devices['Pixel 5'],
-    //   },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: {
-    //     ...devices['iPhone 12'],
-    //   },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: {
-    //     channel: 'msedge',
-    //   },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: {
-    //     channel: 'chrome',
-    //   },
-    // },
   ],
-
-  /* Folder for test artifacts such as screenshots, videos, traces, etc. */
-  // outputDir: 'test-results/',
-
-  /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   port: 3000,
-  // },
 };
 
 export default config;
