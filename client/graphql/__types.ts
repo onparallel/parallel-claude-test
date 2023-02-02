@@ -24463,6 +24463,70 @@ export type Overview_userQuery = {
   };
 };
 
+export type ReportsReplies_PetitionTemplateFragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  name?: string | null;
+};
+
+export type ReportsReplies_templatesQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  isPublic: Scalars["Boolean"];
+}>;
+
+export type ReportsReplies_templatesQuery = {
+  templates: {
+    __typename?: "PetitionBaseOrFolderPagination";
+    totalCount: number;
+    items: Array<
+      | { __typename?: "Petition" }
+      | { __typename?: "PetitionFolder" }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null }
+    >;
+  };
+};
+
+export type ReportsReplies_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type ReportsReplies_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      iconUrl92?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
 export type ReportsTemplates_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
@@ -31620,6 +31684,12 @@ export const Overview_PetitionTemplateFragmentDoc = gql`
     name
   }
 ` as unknown as DocumentNode<Overview_PetitionTemplateFragment, unknown>;
+export const ReportsReplies_PetitionTemplateFragmentDoc = gql`
+  fragment ReportsReplies_PetitionTemplate on PetitionTemplate {
+    id
+    name
+  }
+` as unknown as DocumentNode<ReportsReplies_PetitionTemplateFragment, unknown>;
 export const ReportsTemplates_PetitionTemplateFragmentDoc = gql`
   fragment ReportsTemplates_PetitionTemplate on PetitionTemplate {
     id
@@ -35759,6 +35829,23 @@ export const Overview_userDocument = gql`
   }
   ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Overview_userQuery, Overview_userQueryVariables>;
+export const ReportsReplies_templatesDocument = gql`
+  query ReportsReplies_templates($offset: Int!, $limit: Int!, $isPublic: Boolean!) {
+    templates(offset: $offset, limit: $limit, isPublic: $isPublic) {
+      items {
+        ...ReportsReplies_PetitionTemplate
+      }
+      totalCount
+    }
+  }
+  ${ReportsReplies_PetitionTemplateFragmentDoc}
+` as unknown as DocumentNode<ReportsReplies_templatesQuery, ReportsReplies_templatesQueryVariables>;
+export const ReportsReplies_userDocument = gql`
+  query ReportsReplies_user {
+    ...AppLayout_Query
+  }
+  ${AppLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<ReportsReplies_userQuery, ReportsReplies_userQueryVariables>;
 export const ReportsTemplates_templatesDocument = gql`
   query ReportsTemplates_templates($offset: Int!, $limit: Int!, $isPublic: Boolean!) {
     templates(offset: $offset, limit: $limit, isPublic: $isPublic) {

@@ -18,14 +18,12 @@ import {
   DoubleCheckIcon,
   PaperPlaneIcon,
   SignatureIcon,
-  TableIcon,
   TimeIcon,
 } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
-import { OverflownText } from "@parallel/components/common/OverflownText";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
@@ -48,7 +46,6 @@ import {
 import { compose } from "@parallel/utils/compose";
 import { stallFor } from "@parallel/utils/promises/stallFor";
 import { date, useQueryState } from "@parallel/utils/queryState";
-import { useTemplateRepliesReportTask } from "@parallel/utils/tasks/useTemplateRepliesReportTask";
 import { useTemplateStatsReportBackgroundTask } from "@parallel/utils/tasks/useTemplateStatsReportTask";
 import { Maybe } from "@parallel/utils/types";
 import { useReportsSections } from "@parallel/utils/useReportsSections";
@@ -85,17 +82,13 @@ export function ReportsTemplates() {
 
   const sections = useReportsSections();
 
-  const [{ status, templateId, activeTemplateId, activeRange, report }, setState] = useState<{
+  const [{ status, templateId, report }, setState] = useState<{
     status: "IDLE" | "LOADING" | "LOADED" | "ERROR";
     templateId: string | null;
-    activeTemplateId: string | null;
-    activeRange: Date[] | null;
     report: ReportType | null;
   }>({
     status: "IDLE",
     templateId: null,
-    activeTemplateId: null,
-    activeRange: null,
     report: null,
   });
   const taskAbortController = useRef<AbortController | null>(null);
@@ -125,8 +118,6 @@ export function ReportsTemplates() {
       setState((state) => ({
         ...state,
         status: "LOADING",
-        activeTemplateId: state.templateId,
-        activeRange: queryState.range,
       }));
       taskAbortController.current?.abort();
       if (isDefined(templateId)) {
@@ -154,8 +145,6 @@ export function ReportsTemplates() {
       }
     }
   };
-
-  const handleTemplateRepliesReportTask = useTemplateRepliesReportTask();
 
   return (
     <SettingsLayout
@@ -190,71 +179,49 @@ export function ReportsTemplates() {
           <FormattedMessage id="generic.template" defaultMessage="Template" />:
         </Text>
         <Stack direction={{ base: "column", lg: "row" }} spacing={0} gridGap={2}>
-          <Stack direction={{ base: "column", lg: "row" }} spacing={0} gridGap={2} flex="1">
-            <HStack
-              data-section="reports-select-template"
-              flex="1"
-              maxWidth={{ base: "100%", lg: "500px" }}
-            >
-              <Box flex="1" minWidth="0">
-                <SimpleSelect
-                  options={templates.map((t) => ({
-                    label:
-                      t.name ??
-                      intl.formatMessage({
-                        id: "generic.unnamed-template",
-                        defaultMessage: "Unnamed template",
-                      }),
-                    value: t.id,
-                  }))}
-                  placeholder={intl.formatMessage({
-                    id: "page.reports.select-a-template",
-                    defaultMessage: "Select a template...",
-                  })}
-                  isSearchable={true}
-                  value={templateId}
-                  onChange={(templateId) =>
-                    setState((state) => ({ ...state, templateId, status: "IDLE" }))
-                  }
-                  isDisabled={status === "LOADING"}
-                />
-              </Box>
-            </HStack>
-            <DateRangePickerButton
-              value={queryState.range as [Date, Date] | null}
-              onChange={handleDateRangeChange}
-              isDisabled={status === "LOADING"}
-            />
-            <Button
-              minWidth="fit-content"
-              colorScheme="primary"
-              isDisabled={status === "LOADED" || status === "LOADING" || !templateId}
-              onClick={handleGenerateReportClick}
-              fontWeight="500"
-            >
-              <FormattedMessage id="page.reports.generate" defaultMessage="Generate" />
-            </Button>
-          </Stack>
-          {isDefined(report) && (status === "IDLE" || status === "LOADED") ? (
-            <Button
-              leftIcon={<TableIcon />}
-              colorScheme="primary"
-              onClick={() =>
-                handleTemplateRepliesReportTask(
-                  activeTemplateId!,
-                  activeRange?.[0].toISOString() ?? null,
-                  activeRange?.[1].toISOString() ?? null
-                )
-              }
-            >
-              <OverflownText>
-                <FormattedMessage
-                  id="page.reports.download-replies"
-                  defaultMessage="Download replies"
-                />
-              </OverflownText>
-            </Button>
-          ) : null}
+          <HStack
+            data-section="reports-select-template"
+            flex="1"
+            maxWidth={{ base: "100%", lg: "500px" }}
+          >
+            <Box flex="1" minWidth="0">
+              <SimpleSelect
+                options={templates.map((t) => ({
+                  label:
+                    t.name ??
+                    intl.formatMessage({
+                      id: "generic.unnamed-template",
+                      defaultMessage: "Unnamed template",
+                    }),
+                  value: t.id,
+                }))}
+                placeholder={intl.formatMessage({
+                  id: "page.reports.select-a-template",
+                  defaultMessage: "Select a template...",
+                })}
+                isSearchable={true}
+                value={templateId}
+                onChange={(templateId) =>
+                  setState((state) => ({ ...state, templateId, status: "IDLE" }))
+                }
+                isDisabled={status === "LOADING"}
+              />
+            </Box>
+          </HStack>
+          <DateRangePickerButton
+            value={queryState.range as [Date, Date] | null}
+            onChange={handleDateRangeChange}
+            isDisabled={status === "LOADING"}
+          />
+          <Button
+            minWidth="fit-content"
+            colorScheme="primary"
+            isDisabled={status === "LOADED" || status === "LOADING" || !templateId}
+            onClick={handleGenerateReportClick}
+            fontWeight="500"
+          >
+            <FormattedMessage id="page.reports.generate" defaultMessage="Generate" />
+          </Button>
         </Stack>
         {isDefined(report) && (status === "IDLE" || status === "LOADED") ? (
           <TemplateStatsReport report={report} />

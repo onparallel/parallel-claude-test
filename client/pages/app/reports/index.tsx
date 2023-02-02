@@ -66,8 +66,7 @@ export function Reports() {
           id: "page.reports.replies-description",
           defaultMessage: "Analyze the answers obtained in the parallels.",
         }),
-        href: "",
-        isPending: true,
+        href: "/app/reports/replies",
       },
     ],
     [navigate, intl.locale]

@@ -19,6 +19,13 @@ export function useReportsSections() {
         }),
         path: "/app/reports/statistics",
       },
+      {
+        title: intl.formatMessage({
+          id: "page.reports.replies",
+          defaultMessage: "Replies",
+        }),
+        path: "/app/reports/replies",
+      },
     ];
   }, [intl.locale]);
 }
