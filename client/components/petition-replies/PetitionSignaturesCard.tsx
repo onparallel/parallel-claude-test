@@ -4,6 +4,7 @@ import { AddIcon, SignatureIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionSignaturesCard_cancelSignatureRequestDocument,
+  PetitionSignaturesCard_completePetitionDocument,
   PetitionSignaturesCard_PetitionFragment,
   PetitionSignaturesCard_sendSignatureRequestRemindersDocument,
   PetitionSignaturesCard_signedPetitionDownloadLinkDocument,
@@ -136,6 +137,14 @@ const mutations = [
       sendSignatureRequestReminders(petitionSignatureRequestId: $petitionSignatureRequestId)
     }
   `,
+  gql`
+    mutation PetitionSignaturesCard_completePetition($petitionId: GID!, $message: String) {
+      completePetition(petitionId: $petitionId, message: $message) {
+        ...PetitionSignaturesCard_Petition
+      }
+    }
+    ${fragments.Petition}
+  `,
 ];
 
 export const PetitionSignaturesCard = Object.assign(
@@ -190,14 +199,26 @@ export const PetitionSignaturesCard = Object.assign(
       [cancelSignatureRequest]
     );
 
+    const [completePetition] = useMutation(PetitionSignaturesCard_completePetitionDocument);
+
     const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
 
     const handleStartSignatureProcess = useCallback(
-      async (message?: Maybe<string>) => {
+      async (message?: Maybe<string>, complete?: boolean) => {
         try {
-          await startSignatureRequest({
-            variables: { petitionId: petition.id, message },
-          });
+          if (complete) {
+            await completePetition({
+              variables: {
+                petitionId: petition.id,
+                message,
+              },
+            });
+          } else {
+            await startSignatureRequest({
+              variables: { petitionId: petition.id, message },
+            });
+          }
+
           toast({
             isClosable: true,
             duration: 5000,
@@ -218,7 +239,7 @@ export const PetitionSignaturesCard = Object.assign(
           }
         }
       },
-      [startSignatureRequest, petition]
+      [completePetition, startSignatureRequest, petition]
     );
 
     const handleDownloadSignedDoc = useCallback(

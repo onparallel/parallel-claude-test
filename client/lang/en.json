@@ -3815,6 +3815,11 @@
     "context": "Edit signers"
   },
   {
+    "term": "component.petition-signatures-card.finalize-and-sign",
+    "definition": "Finalize and sign",
+    "context": "Finalize and sign"
+  },
+  {
     "term": "component.petition-signatures-card.more-info-button",
     "definition": "More information",
     "context": "More information"

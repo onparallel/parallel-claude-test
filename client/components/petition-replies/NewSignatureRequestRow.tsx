@@ -6,6 +6,8 @@ import {
   NewSignatureRequestRow_UserFragment,
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
+import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { isDefined, omit } from "remeda";
@@ -19,7 +21,7 @@ interface NewSignatureRequestRowProps {
   petition: NewSignatureRequestRow_PetitionFragment;
   user: NewSignatureRequestRow_UserFragment;
   onUpdateConfig: (data: SignatureConfigInput | null) => Promise<void>;
-  onStart: (message?: Maybe<string>) => void;
+  onStart: (message: Maybe<string>, completePetition: boolean) => void;
   isDisabled?: boolean;
 }
 
@@ -37,6 +39,13 @@ export function NewSignatureRequestRow({
 
   const startSignature = reviewBeforeSigning || petition.status === "COMPLETED";
 
+  const fieldVisibility = useFieldVisibility(petition.fields);
+
+  const canFinalize = petition.fields.every(
+    (f, index) =>
+      !fieldVisibility[index] || f.optional || completedFieldReplies(f).length > 0 || f.isReadOnly
+  );
+
   const handleStartSignature = async () => {
     try {
       const {
@@ -48,7 +57,7 @@ export function NewSignatureRequestRow({
         accesses: petition.accesses,
         presetSigners: signers,
         allowAdditionalSigners,
-        isUpdate: !startSignature,
+        isUpdate: !startSignature && !canFinalize,
         previousSignatures: petition.signatureRequests,
       });
 
@@ -59,7 +68,11 @@ export function NewSignatureRequestRow({
         signersInfo,
       });
 
-      if (startSignature) onStart(message);
+      const completePetition = !reviewBeforeSigning && canFinalize;
+
+      if (startSignature || completePetition) {
+        onStart(message, completePetition);
+      }
     } catch {}
   };
 
@@ -113,6 +126,11 @@ export function NewSignatureRequestRow({
               id="component.petition-signatures-card.start"
               defaultMessage="Start..."
             />
+          ) : canFinalize ? (
+            <FormattedMessage
+              id="component.petition-signatures-card.finalize-and-sign"
+              defaultMessage="Finalize and sign"
+            />
           ) : (
             <FormattedMessage
               id="component.petition-signatures-card.edit-signers"
@@ -135,6 +153,13 @@ NewSignatureRequestRow.fragments = {
   Petition: gql`
     fragment NewSignatureRequestRow_Petition on Petition {
       status
+      fields {
+        id
+        isReadOnly
+        optional
+        ...useFieldVisibility_PetitionField
+        ...completedFieldReplies_PetitionField
+      }
       signatureConfig {
         signers {
           ...SignerReference_PetitionSigner
@@ -157,6 +182,8 @@ NewSignatureRequestRow.fragments = {
         ...ConfirmPetitionSignersDialog_PetitionSignatureRequest
       }
     }
+    ${completedFieldReplies.fragments.PetitionField}
+    ${useFieldVisibility.fragments.PetitionField}
     ${SignerReference.fragments.PetitionSigner}
     ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
     ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
