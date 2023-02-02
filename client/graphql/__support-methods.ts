@@ -202,6 +202,18 @@ export const supportMethods: {
           isDeprecated: false,
           deprecationReason: null,
         },
+        {
+          name: "userId",
+          description: "Global ID of the user to assign this petition",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
       ],
       type: {
         kind: "NON_NULL",

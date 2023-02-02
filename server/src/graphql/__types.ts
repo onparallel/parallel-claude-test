@@ -4915,6 +4915,7 @@ export interface NexusGenArgTypes {
     importPetitionFromJson: {
       // args
       json: string; // String!
+      userId: NexusGenScalars["GID"]; // GID!
     };
     loginAs: {
       // args

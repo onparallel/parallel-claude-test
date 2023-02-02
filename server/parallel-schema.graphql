@@ -1170,6 +1170,11 @@ type Mutation {
     Petition to import in json format @form:type=textarea
     """
     json: String!
+
+    """
+    Global ID of the user to assign this petition
+    """
+    userId: GID!
   ): SupportMethodResponse!
   loginAs(userId: GID!): Result!
 

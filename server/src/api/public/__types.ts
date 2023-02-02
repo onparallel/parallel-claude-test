@@ -1271,6 +1271,7 @@ export type MutationgetTaskResultFileArgs = {
 
 export type MutationimportPetitionFromJsonArgs = {
   json: Scalars["String"];
+  userId: Scalars["GID"];
 };
 
 export type MutationloginAsArgs = {
@@ -3989,7 +3990,7 @@ export type TagPagination = {
 export type Task = {
   id: Scalars["GID"];
   name: TaskName;
-  output: Maybe<Scalars["JSONObject"]>;
+  output: Maybe<Scalars["JSON"]>;
   progress: Maybe<Scalars["Int"]>;
   status: TaskStatus;
 };

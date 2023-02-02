@@ -1315,6 +1315,7 @@ export interface MutationgetTaskResultFileArgs {
 
 export interface MutationimportPetitionFromJsonArgs {
   json: Scalars["String"];
+  userId: Scalars["GID"];
 }
 
 export interface MutationloginAsArgs {

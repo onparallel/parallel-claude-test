@@ -7,6 +7,7 @@ import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { PetitionFieldType, PetitionFieldTypeValues, User } from "../db/__types";
 import { validateFieldVisibilityConditions } from "../graphql/helpers/validators/validFieldVisibility";
 import { validateRichTextContent } from "../graphql/helpers/validators/validRichTextContent";
+import { safeJsonParse } from "../util/safeJsonParse";
 import { Maybe } from "../util/types";
 
 export const PETITION_IMPORT_EXPORT_SERVICE = Symbol.for("PETITION_IMPORT_EXPORT_SERVICE");
@@ -104,7 +105,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
       name: petition.name,
       locale: petition.locale,
       isTemplate: petition.is_template,
-      templateDescription: petition.template_description,
+      templateDescription: safeJsonParse(petition.template_description),
       fields: fields.map((field) => {
         customFieldIds.push(field.id);
         return {
@@ -170,7 +171,9 @@ export class PetitionImportExportService implements IPetitionImportExportService
           name: json.name,
           locale: json.locale,
           is_template: json.isTemplate,
-          template_description: json.templateDescription,
+          template_description: isDefined(json.templateDescription)
+            ? JSON.stringify(json.templateDescription)
+            : null,
         },
         user,
         true,

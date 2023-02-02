@@ -95,7 +95,7 @@ if (process.env.TS_NODE_DEV) {
   const redis = container.get<IRedis>(REDIS);
   await redis.connect();
   await server.start();
-  server.applyMiddleware({ app });
+  server.applyMiddleware({ app, bodyParserConfig: { limit: "2mb" } });
   const port = process.env.PORT || 4000;
   app.listen(port, () => {
     const host = `http://localhost:${port}`;

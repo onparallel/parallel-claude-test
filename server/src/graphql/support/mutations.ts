@@ -397,10 +397,18 @@ export const importPetitionFromJson = mutationField("importPetitionFromJson", {
     json: nonNull(
       stringArg({ description: "Petition to import in json format @form:type=textarea" })
     ),
+    userId: nonNull(
+      globalIdArg("User", { description: "Global ID of the user to assign this petition" })
+    ),
   },
-  resolve: async (_, { json }, ctx) => {
+  resolve: async (_, { json, userId }, ctx) => {
     try {
-      const petitionId = await ctx.petitionImportExport.fromJson(JSON.parse(json), ctx.user!);
+      const user = await ctx.users.loadUser(userId);
+      if (!user) {
+        throw new Error(`User:${userId} not found`);
+      }
+
+      const petitionId = await ctx.petitionImportExport.fromJson(JSON.parse(json), user);
       return {
         result: RESULT.SUCCESS,
         message: `Petition with id ${toGlobalId("Petition", petitionId)} imported successfully.`,
