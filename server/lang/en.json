@@ -501,8 +501,18 @@
   },
   {
     "term": "new-petition.text",
-    "definition": "{senderName} ({senderEmail}) has shared with you this link.",
-    "context": "{senderName} ({senderEmail}) has shared with you this link."
+    "definition": "{senderName} ({senderEmail}) has shared this link with you.",
+    "context": "{senderName} ({senderEmail}) has shared this link with you."
+  },
+  {
+    "term": "new-petition.text-multiple-recipients",
+    "definition": "{senderName} ({senderEmail}) has shared this link with {list}.",
+    "context": "{senderName} ({senderEmail}) has shared this link with {list}."
+  },
+  {
+    "term": "new-petition.text-multiple-recipients.with-you",
+    "definition": "you",
+    "context": "you"
   },
   {
     "term": "organization-limits-reached.parallel-send.few-credits-remaining-text",

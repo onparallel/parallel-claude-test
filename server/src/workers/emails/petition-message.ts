@@ -1,3 +1,4 @@
+import { isDefined } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionMessage from "../../emails/emails/PetitionMessage";
@@ -13,11 +14,12 @@ export async function petitionMessage(
   if (!message) {
     throw new Error(`Parallel message not found for id ${payload.petition_message_id}`);
   }
-  const [petition, sender, senderData, access] = await Promise.all([
+  const [petition, sender, senderData, access, accesses] = await Promise.all([
     context.petitions.loadPetition(message.petition_id),
     context.users.loadUser(message.sender_id),
     context.users.loadUserDataByUserId(message.sender_id),
     context.petitions.loadAccess(message.petition_access_id),
+    context.petitions.loadAccessesForPetition(message.petition_id),
   ]);
   if (!petition) {
     return; // if the petition was deleted, return without throwing error
@@ -49,6 +51,17 @@ export async function petitionMessage(
     "REMOVE_WHY_WE_USE_PARALLEL"
   );
 
+  const contactIds = accesses
+    .filter((a) => a.id !== access.id && isDefined(access.contact_id))
+    .map((a) => a.contact_id!);
+
+  const recipients = contactIds.length
+    ? (await context.contacts.loadContact(contactIds)).filter(isDefined).map((r) => ({
+        name: fullName(r.first_name, r.last_name),
+        email: r.email,
+      }))
+    : null;
+
   const { html, text, subject, from } = await buildEmail(
     PetitionMessage,
     {
@@ -59,6 +72,7 @@ export async function petitionMessage(
       bodyPlainText: toPlainText(bodyJson, renderContext),
       deadline: petition.deadline,
       keycode: access.keycode,
+      recipients,
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       ...layoutProps,
     },

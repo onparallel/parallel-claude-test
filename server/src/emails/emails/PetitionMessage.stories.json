@@ -26,7 +26,11 @@
           "color": "#f75959",
           "fontFamily": "Trebuchet MS, Helvetica, sans-serif",
           "preferredTone": "FORMAL"
-        }
+        },
+        "recipients": [
+          { "name": "FirstName LastName", "email": "email@test.com" },
+          { "name": "NoLastName", "email": "nolastname@test.com" }
+        ]
       },
       "argTypes": {
         "senderName": { "control": { "type": "text" } },
@@ -45,7 +49,8 @@
         "logoAlt": { "control": { "type": "text" } },
         "removeWhyWeUseParallel": { "control": { "type": "boolean" } },
         "removeParallelBranding": { "control": { "type": "boolean" } },
-        "theme": { "control": { "type": "object" } }
+        "theme": { "control": { "type": "object" } },
+        "recipients": { "control": { "type": "object" } }
       }
     }
   ]

@@ -502,7 +502,17 @@
   {
     "term": "new-petition.text",
     "definition": "{tone, select, INFORMAL{{senderName} ({senderEmail}) te ha compartido este enlace:} other{{senderName} ({senderEmail}) le ha compartido este enlace:}}",
-    "context": "{senderName} ({senderEmail}) has shared with you this link."
+    "context": "{senderName} ({senderEmail}) has shared this link with you."
+  },
+  {
+    "term": "new-petition.text-multiple-recipients",
+    "definition": "{senderName} ({senderEmail}) ha compartido este enlace con {list}.",
+    "context": "{senderName} ({senderEmail}) has shared this link with {list}."
+  },
+  {
+    "term": "new-petition.text-multiple-recipients.with-you",
+    "definition": "{tone, select, INFORMAL{contigo} other{con usted}}",
+    "context": "you"
   },
   {
     "term": "organization-limits-reached.parallel-send.few-credits-remaining-text",

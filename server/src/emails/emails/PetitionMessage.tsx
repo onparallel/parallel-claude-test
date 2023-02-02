@@ -27,6 +27,7 @@ export interface PetitionMessageProps extends LayoutProps {
   bodyPlainText: string;
   deadline: Date | null;
   keycode: string;
+  recipients: { name: string; email: string }[] | null;
   removeWhyWeUseParallel: boolean;
   removeParallelBranding: boolean;
 }
@@ -44,15 +45,42 @@ const email: Email<PetitionMessageProps> = {
   subject({ subject }) {
     return subject || "";
   },
-  text({ senderName, senderEmail, bodyPlainText, deadline, keycode, parallelUrl, theme }, intl) {
+  text(
+    { senderName, senderEmail, recipients, bodyPlainText, deadline, keycode, parallelUrl, theme },
+    intl
+  ) {
     return outdent`
-      ${intl.formatMessage(
-        {
-          id: "new-petition.text",
-          defaultMessage: "{senderName} ({senderEmail}) has shared with you this link.",
-        },
-        { senderName, senderEmail, tone: theme.preferredTone }
-      )}
+      ${
+        recipients
+          ? intl.formatMessage(
+              {
+                id: "new-petition.text-multiple-recipients",
+                defaultMessage: "{senderName} ({senderEmail}) has shared this link with {list}.",
+              },
+              {
+                senderName,
+                senderEmail,
+                tone: theme.preferredTone,
+                list: intl.formatList([
+                  ...recipients.map((contact) => `${contact.name} <${contact.email}>`),
+                  intl.formatMessage(
+                    {
+                      id: "new-petition.text-multiple-recipients.with-you",
+                      defaultMessage: "you",
+                    },
+                    { tone: theme.preferredTone }
+                  ),
+                ]),
+              }
+            )
+          : intl.formatMessage(
+              {
+                id: "new-petition.text",
+                defaultMessage: "{senderName} ({senderEmail}) has shared this link with you.",
+              },
+              { senderName, senderEmail, tone: theme.preferredTone }
+            )
+      }
 
       ${bodyPlainText}
      ${
@@ -91,6 +119,7 @@ const email: Email<PetitionMessageProps> = {
   html({
     senderName,
     senderEmail,
+    recipients,
     bodyHtml,
     deadline,
     keycode,
@@ -126,15 +155,37 @@ const email: Email<PetitionMessageProps> = {
         <MjmlSection padding="0">
           <MjmlColumn>
             <MjmlText align="center">
-              <FormattedMessage
-                id="new-petition.text"
-                defaultMessage="{senderName} ({senderEmail}) has shared with you this link."
-                values={{
-                  senderName: <b>{senderName}</b>,
-                  senderEmail: <b>{senderEmail}</b>,
-                  tone: theme.preferredTone,
-                }}
-              />
+              {recipients ? (
+                <FormattedMessage
+                  id="new-petition.text-multiple-recipients"
+                  defaultMessage="{senderName} ({senderEmail}) has shared this link with {list}."
+                  values={{
+                    senderName: <b>{senderName}</b>,
+                    senderEmail: <b>{senderEmail}</b>,
+                    tone: theme.preferredTone,
+                    list: intl.formatList([
+                      ...recipients.map((contact) => `${contact.name} <${contact.email}>`),
+                      intl.formatMessage(
+                        {
+                          id: "new-petition.text-multiple-recipients.with-you",
+                          defaultMessage: "you",
+                        },
+                        { tone: theme.preferredTone }
+                      ),
+                    ]),
+                  }}
+                />
+              ) : (
+                <FormattedMessage
+                  id="new-petition.text"
+                  defaultMessage="{senderName} ({senderEmail}) has shared this link with you."
+                  values={{
+                    senderName: <b>{senderName}</b>,
+                    senderEmail: <b>{senderEmail}</b>,
+                    tone: theme.preferredTone,
+                  }}
+                />
+              )}
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>
