@@ -207,8 +207,9 @@ export class PetitionRepository extends BaseRepository {
     return await this.from("petition")
       .where({
         from_template_id: templateId,
+        deleted_at: null,
+        anonymized_at: null,
       })
-      .whereNull("deleted_at")
       .mmodify((q) => {
         if (startDate && endDate) {
           q.andWhereBetween("created_at", [startDate, endDate]);
