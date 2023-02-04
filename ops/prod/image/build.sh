@@ -1,7 +1,7 @@
 #! /bin/bash
 
 nodejs_version="16"
-nginx_version="1.22.1"
+nginx_version="1.23.3"
 
 echo "Adding public keys"
 cat authorized_keys >> .ssh/authorized_keys
