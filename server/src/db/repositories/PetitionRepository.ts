@@ -198,7 +198,7 @@ export class PetitionRepository extends BaseRepository {
     }
   );
 
-  async getPetitionsByFromTemplateId(
+  async getPetitionsForTemplateRepliesReport(
     templateId: number,
     startDate?: Maybe<Date>,
     endDate?: Maybe<Date>

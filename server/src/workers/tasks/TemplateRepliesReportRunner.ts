@@ -29,7 +29,11 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
     }
     const [template, petitions] = await Promise.all([
       this.ctx.readonlyPetitions.loadPetition(templateId),
-      this.ctx.readonlyPetitions.getPetitionsByFromTemplateId(templateId, startDate, endDate),
+      this.ctx.readonlyPetitions.getPetitionsForTemplateRepliesReport(
+        templateId,
+        startDate,
+        endDate
+      ),
     ]);
 
     const intl = await this.ctx.i18n.getIntl(template!.locale);
