@@ -4,6 +4,7 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { PhoneInputLazy } from "@parallel/components/common/PhoneInputLazy";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
+import { waitFor } from "@parallel/utils/promises/waitFor";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
@@ -111,17 +112,16 @@ export function RecipientViewPetitionFieldPhone({
           setValue("");
           if (focusCreatedReply) {
             setShowNewReply(false);
-            setTimeout(() => {
-              const newReplyElement = replyRefs[replyId].current!;
-              if (newReplyElement) {
-                Object.assign(newReplyElement, selection);
-                newReplyElement.focus();
-                newReplyElement.setSelectionRange(
-                  newReplyElement.value.length,
-                  newReplyElement.value.length
-                );
-              }
-            });
+            await waitFor(1);
+            const newReplyElement = replyRefs[replyId].current!;
+            if (newReplyElement) {
+              Object.assign(newReplyElement, selection);
+              newReplyElement.focus();
+              newReplyElement.setSelectionRange(
+                newReplyElement.value.length,
+                newReplyElement.value.length
+              );
+            }
           }
         }
       } catch {}

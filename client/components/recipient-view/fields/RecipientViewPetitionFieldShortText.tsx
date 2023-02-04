@@ -15,6 +15,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
+import { waitFor } from "@parallel/utils/promises/waitFor";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
@@ -144,17 +145,16 @@ export function RecipientViewPetitionFieldShortText({
           setValue("");
           if (focusCreatedReply) {
             setShowNewReply(false);
-            setTimeout(() => {
-              const newReplyElement = replyRefs[replyId].current!;
-              if (options.format !== "EMAIL") {
-                Object.assign(newReplyElement, selection);
-                newReplyElement?.setSelectionRange(
-                  newReplyElement.value.length,
-                  newReplyElement.value.length
-                );
-              }
-              newReplyElement?.focus();
-            });
+            await waitFor(1);
+            const newReplyElement = replyRefs[replyId].current!;
+            if (options.format !== "EMAIL") {
+              Object.assign(newReplyElement, selection);
+              newReplyElement?.setSelectionRange(
+                newReplyElement.value.length,
+                newReplyElement.value.length
+              );
+            }
+            newReplyElement?.focus();
           }
         }
       } catch {}

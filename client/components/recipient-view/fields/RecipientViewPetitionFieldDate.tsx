@@ -3,6 +3,7 @@ import { DeleteIcon, FieldDateIcon } from "@parallel/chakra/icons";
 import { DateInput } from "@parallel/components/common/DateInput";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { isMetaReturn } from "@parallel/utils/keys";
+import { waitFor } from "@parallel/utils/promises/waitFor";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
@@ -104,12 +105,11 @@ export function RecipientViewPetitionFieldDate({
           setValue("");
           if (focusCreatedReply) {
             setShowNewReply(false);
-            setTimeout(() => {
-              const newReplyElement = replyRefs[replyId].current!;
-              if (newReplyElement) {
-                newReplyElement.focus();
-              }
-            });
+            await waitFor(1);
+            const newReplyElement = replyRefs[replyId].current!;
+            if (newReplyElement) {
+              newReplyElement.focus();
+            }
           }
         }
       } catch {}

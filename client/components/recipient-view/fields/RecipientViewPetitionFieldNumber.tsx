@@ -4,6 +4,7 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
+import { waitFor } from "@parallel/utils/promises/waitFor";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
@@ -123,16 +124,15 @@ export function RecipientViewPetitionFieldNumber({
           setValue(undefined);
           if (focusCreatedReply) {
             setShowNewReply(false);
-            setTimeout(() => {
-              const newReplyElement = replyRefs[replyId].current!;
-              if (newReplyElement) {
-                newReplyElement.focus();
-                newReplyElement.setSelectionRange(
-                  newReplyElement.value.length,
-                  newReplyElement.value.length
-                );
-              }
-            });
+            await waitFor(1);
+            const newReplyElement = replyRefs[replyId].current!;
+            if (newReplyElement) {
+              newReplyElement.focus();
+              newReplyElement.setSelectionRange(
+                newReplyElement.value.length,
+                newReplyElement.value.length
+              );
+            }
           }
         }
       } catch {}
@@ -184,7 +184,7 @@ export function RecipientViewPetitionFieldNumber({
       } else if (!isBetweenLimits(range, value)) {
         handleInvalidReply(field.id, true);
       } else {
-        await handleCreate.immediateIfPending(value, true);
+        await handleCreate.immediateIfPending(value, false);
         handleCreate.clear();
         setShowNewReply(false);
       }

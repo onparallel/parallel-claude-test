@@ -7,6 +7,7 @@ import {
   toSimpleSelectOption,
 } from "@parallel/components/common/SimpleSelect";
 import { FieldOptions } from "@parallel/utils/petitionFields";
+import { waitFor } from "@parallel/utils/promises/waitFor";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
@@ -135,9 +136,8 @@ export function RecipientViewPetitionFieldSelect({
                   if (replyId) {
                     setShowNewReply(false);
                     setValue(null);
-                    setTimeout(() => {
-                      replyRefs[replyId].current?.focus();
-                    });
+                    await waitFor(1);
+                    replyRefs[replyId].current?.focus();
                   }
                 } catch {}
                 setIsSaving(false);
