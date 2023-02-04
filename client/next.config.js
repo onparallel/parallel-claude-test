@@ -53,7 +53,7 @@ const config = {
           {
             source: "/(.*)",
             headers: createSecureHeaders({
-              forceHTTPSRedirect: [true, { maxAge: 60 * 60 * 24 * 30, includeSubDomains: true }],
+              forceHTTPSRedirect: false, // this is set on nginx
               referrerPolicy: "same-origin",
               frameGuard: "sameorigin",
               xssProtection: "sanitize",

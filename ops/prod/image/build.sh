@@ -16,7 +16,7 @@ yum install -y \
     curl \
     pcre-devel \
     zlib-devel \
-    openssl-devel \
+    openssl11-devel \
     perl-devel \
     perl-CPAN \
     perl-ExtUtils-Embed \
