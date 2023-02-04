@@ -14,6 +14,7 @@ export async function petitionCompleted(
     petition_id: number;
     petition_access_id?: number;
     signer?: PetitionSignatureConfigSigner;
+    completed_by: string;
   },
   context: WorkerContext
 ) {
@@ -85,7 +86,7 @@ export async function petitionCompleted(
         subject,
         text,
         html,
-        created_from: `PetitionAccess:${payload.petition_access_id}`,
+        created_from: payload.completed_by,
       })
     );
   }

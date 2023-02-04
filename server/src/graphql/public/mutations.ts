@@ -378,9 +378,11 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
         }
       } else {
         // no signature configured, petition is completed
-        await ctx.emails.sendPetitionCompletedEmail(petition.id, {
-          accessId: ctx.access!.id,
-        });
+        await ctx.emails.sendPetitionCompletedEmail(
+          petition.id,
+          { accessId: ctx.access!.id },
+          `PetitionAccess:${ctx.access!.id}`
+        );
       }
 
       return petition;

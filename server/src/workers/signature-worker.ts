@@ -246,9 +246,11 @@ async function storeSignedDocument(
       ctx
     );
 
-    await ctx.emails.sendPetitionCompletedEmail(petition.id, {
-      signer: payload.signer,
-    });
+    await ctx.emails.sendPetitionCompletedEmail(
+      petition.id,
+      { signer: payload.signer },
+      `SignatureWorker:${payload.petitionSignatureRequestId}`
+    );
     await ctx.petitions.createEvent({
       type: "SIGNATURE_COMPLETED",
       petition_id: petition.id,
@@ -264,7 +266,7 @@ async function storeSignedDocument(
     await ctx.petitions.updatePetition(
       petition.id,
       { signature_config: null }, // when completed, set signature_config to null so the signatures card on replies page don't show a "pending start" row
-      `OrgIntegration:${integration.id}`
+      `SignatureWorker:${payload.petitionSignatureRequestId}`
     );
   } catch (error: any) {
     if (!(error instanceof InvalidCredentialsError)) {

@@ -129,7 +129,6 @@ type EffectivePetitionPermission = Pick<
   "petition_id" | "user_id" | "type" | "is_subscribed"
 >;
 export type PetitionSignatureConfigSigner = {
-  contactId?: number;
   firstName: string;
   lastName: string;
   email: string;

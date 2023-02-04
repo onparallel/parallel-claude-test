@@ -23,7 +23,8 @@ export interface IEmailsService {
     }: {
       accessId?: number;
       signer?: PetitionSignatureConfigSigner;
-    }
+    },
+    completedBy: string
   ): Promise<void>;
   sendPetitionCommentsContactNotificationEmail(
     petitionId: number,
@@ -138,7 +139,8 @@ export class EmailsService implements IEmailsService {
     }: {
       accessId?: number;
       signer?: PetitionSignatureConfigSigner;
-    }
+    },
+    completedBy: string
   ) {
     if (!accessId && !signer) {
       return;
@@ -148,11 +150,13 @@ export class EmailsService implements IEmailsService {
           id: this.buildQueueId("PetitionAccess", accessId),
           petition_id: petitionId,
           petition_access_id: accessId,
+          completed_by: completedBy,
         }
       : {
           id: this.buildQueueId("PetitionSigned", petitionId),
           petition_id: petitionId,
           signer,
+          completed_by: completedBy,
         };
     return await this.enqueueEmail("petition-completed", payload);
   }
