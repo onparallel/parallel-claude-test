@@ -50,7 +50,7 @@ async function main() {
         InstanceType: INSTANCE_TYPES[env],
         Placement: {
             AvailabilityZone: AVAILABILITY_ZONE,
-            Tenancy: "default",
+            Tenancy: client_ec2_1.Tenancy.default,
         },
         SubnetId: SUBNET_ID,
         MaxCount: 1,
@@ -60,7 +60,7 @@ async function main() {
         },
         TagSpecifications: [
             {
-                ResourceType: "instance",
+                ResourceType: client_ec2_1.ResourceType.instance,
                 Tags: [
                     {
                         Key: "Name",
@@ -77,6 +77,10 @@ async function main() {
                 ],
             },
         ],
+        MetadataOptions: {
+            HttpEndpoint: client_ec2_1.InstanceMetadataEndpointState.enabled,
+            HttpTokens: client_ec2_1.HttpTokensState.required,
+        },
     }));
     const instanceId = result.Instances[0].InstanceId;
     const ipAddress = result.Instances[0].PrivateIpAddress;
@@ -84,8 +88,8 @@ async function main() {
     await (0, wait_1.wait)(5000);
     await (0, wait_1.waitFor)(async () => {
         var _a, _b, _c;
-        const result = await ec2.send(new client_ec2_1.DescribeInstancesCommand({ InstanceIds: [instanceId] }));
-        return ((_c = (_b = (_a = result.Reservations) === null || _a === void 0 ? void 0 : _a[0].Instances) === null || _b === void 0 ? void 0 : _b[0].State) === null || _c === void 0 ? void 0 : _c.Name) === "running";
+        const result = await ec2.send(new client_ec2_1.DescribeInstanceStatusCommand({ InstanceIds: [instanceId] }));
+        return ((_c = (_b = (_a = result.InstanceStatuses) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.InstanceState) === null || _c === void 0 ? void 0 : _c.Name) === client_ec2_1.InstanceStateName.running;
     }, (0, chalk_1.default) `Instance {yellow pending}. Waiting 10 more seconds...`, 10000);
     console.log((0, chalk_1.default) `Instance {green ✓ running}`);
     await waitForInstance(ipAddress);

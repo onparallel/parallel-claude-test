@@ -1,4 +1,13 @@
-import { DescribeInstancesCommand, EC2Client, RunInstancesCommand } from "@aws-sdk/client-ec2";
+import {
+  DescribeInstanceStatusCommand,
+  EC2Client,
+  HttpTokensState,
+  InstanceMetadataEndpointState,
+  InstanceStateName,
+  ResourceType,
+  RunInstancesCommand,
+  Tenancy,
+} from "@aws-sdk/client-ec2";
 import { fromIni } from "@aws-sdk/credential-providers"; // ES6 import
 import chalk from "chalk";
 import { execSync } from "child_process";
@@ -51,7 +60,7 @@ async function main() {
       InstanceType: (INSTANCE_TYPES as any)[env!],
       Placement: {
         AvailabilityZone: AVAILABILITY_ZONE,
-        Tenancy: "default",
+        Tenancy: Tenancy.default,
       },
       SubnetId: SUBNET_ID,
       MaxCount: 1,
@@ -61,7 +70,7 @@ async function main() {
       },
       TagSpecifications: [
         {
-          ResourceType: "instance",
+          ResourceType: ResourceType.instance,
           Tags: [
             {
               Key: "Name",
@@ -78,6 +87,10 @@ async function main() {
           ],
         },
       ],
+      MetadataOptions: {
+        HttpEndpoint: InstanceMetadataEndpointState.enabled,
+        HttpTokens: HttpTokensState.required,
+      },
     })
   );
   const instanceId = result.Instances![0].InstanceId!;
@@ -86,8 +99,10 @@ async function main() {
   await wait(5000);
   await waitFor(
     async () => {
-      const result = await ec2.send(new DescribeInstancesCommand({ InstanceIds: [instanceId] }));
-      return result.Reservations?.[0].Instances?.[0].State?.Name === "running";
+      const result = await ec2.send(
+        new DescribeInstanceStatusCommand({ InstanceIds: [instanceId] })
+      );
+      return result.InstanceStatuses?.[0]?.InstanceState?.Name === InstanceStateName.running;
     },
     chalk`Instance {yellow pending}. Waiting 10 more seconds...`,
     10000
