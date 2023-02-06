@@ -50,7 +50,7 @@ const QUERY_STATE = {
 type OrganizationSelection = AdminOrganizations_OrganizationFragment;
 
 interface AdminOrganizationsTableContext {
-  copyToClipboard: (opts: Partial<UseClipboardWithToastOptions>) => void;
+  onCopyToClipboard: (opts: Partial<UseClipboardWithToastOptions>) => void;
 }
 
 function AdminOrganizations() {
@@ -75,16 +75,15 @@ function AdminOrganizations() {
   const toast = useToast();
   const sections = useAdminSections();
   const columns = useOrganizationColumns();
-  const context = useMemo<AdminOrganizationsTableContext>(
-    () => ({
-      copyToClipboard: useClipboardWithToast({
-        text: intl.formatMessage({
-          id: "organization-users.header.id.copied-toast",
-          defaultMessage: "ID copied to clipboard",
-        }),
-      }),
+  const onCopyToClipboard = useClipboardWithToast({
+    text: intl.formatMessage({
+      id: "organization-users.header.id.copied-toast",
+      defaultMessage: "ID copied to clipboard",
     }),
-    []
+  });
+  const context = useMemo<AdminOrganizationsTableContext>(
+    () => ({ onCopyToClipboard }),
+    [onCopyToClipboard]
   );
 
   const [search, setSearch] = useState(state.search);
@@ -217,13 +216,13 @@ function useOrganizationColumns() {
         cellProps: {
           width: "1px",
         },
-        CellContent: ({ row, context }) => {
+        CellContent: ({ row, context: { onCopyToClipboard } }) => {
           return (
             <Text
               cursor="pointer"
               onClick={(e) => {
                 e.stopPropagation();
-                context.copyToClipboard({ value: row.id });
+                onCopyToClipboard({ value: row.id });
               }}
             >
               {row.id}
