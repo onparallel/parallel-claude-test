@@ -3,10 +3,10 @@ import { Duration } from "date-fns";
 import { injectable } from "inversify";
 import { Knex } from "knex";
 import PostgresInterval from "postgres-interval";
-import { chunk, groupBy, indexBy, isDefined, times } from "remeda";
+import { groupBy, indexBy, isDefined, times } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { LazyPromise } from "../../util/promises/LazyPromise";
-import { pFlatMap } from "../../util/promises/pFlatMap";
+import { pMapChunk } from "../../util/promises/pMapChunk";
 import { KeysOfType, MaybeArray, Replace } from "../../util/types";
 import { CreatePetitionEvent, CreateSystemEvent, PetitionEvent, SystemEvent } from "../events";
 import { CreatePetitionUserNotification, PetitionUserNotification } from "../notifications";
@@ -159,7 +159,8 @@ export class BaseRepository {
     options?: DataLoader.Options<K, V, C>
   ): Loader<K, V, C> {
     const dataloader = new DataLoader<K, V, C>(
-      async (keys) => pFlatMap(chunk(keys, 10_000), (keys) => loadFn(keys), { concurrency: 1 }),
+      async (keys) =>
+        pMapChunk(keys, (chunk) => loadFn(chunk), { concurrency: 1, chunkSize: 10_000 }),
       options
     );
     return Object.assign(

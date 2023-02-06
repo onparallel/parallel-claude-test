@@ -3,7 +3,6 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import pMap from "p-map";
 import {
-  chunk,
   countBy,
   groupBy,
   indexBy,
@@ -25,7 +24,7 @@ import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { keyBuilder } from "../../util/keyBuilder";
 import { LazyPromise } from "../../util/promises/LazyPromise";
-import { pFlatMap } from "../../util/promises/pFlatMap";
+import { pMapChunk } from "../../util/promises/pMapChunk";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/reminderUtils";
 import { getMentions } from "../../util/slate";
@@ -2655,13 +2654,17 @@ export class PetitionRepository extends BaseRepository {
     eventType: T[]
   ): Promise<GenericPetitionEvent<T>[]> {
     const ids = unMaybeArray(petitionIds);
-    return pFlatMap(chunk(ids, 100), async (idsChunk) => {
-      return await this.from("petition_event")
-        .whereIn("petition_id", idsChunk)
-        .whereIn("type", eventType)
-        .orderBy("created_at", "desc")
-        .select("*");
-    }) as any;
+    return pMapChunk(
+      ids,
+      async (chunk) => {
+        return await this.from("petition_event")
+          .whereIn("petition_id", chunk)
+          .whereIn("type", eventType)
+          .orderBy("created_at", "desc")
+          .select("*");
+      },
+      { chunkSize: 1_000, concurrency: 1 }
+    ) as any;
   }
 
   async getPetitionEventsForUser(
@@ -5354,9 +5357,13 @@ export class PetitionRepository extends BaseRepository {
       ]
     );
 
-    const stats = await pFlatMap(chunk(orgPetitions, 200), async (petitionsChunk) => {
-      return await this.getPetitionTimeStats(petitionsChunk.map((s) => s.id));
-    });
+    const stats = await pMapChunk(
+      orgPetitions,
+      async (chunk) => {
+        return await this.getPetitionTimeStats(chunk.map((s) => s.id));
+      },
+      { chunkSize: 200, concurrency: 5 }
+    );
 
     const times = {
       pending_to_complete: average(stats.map((p) => p.pending_to_complete).filter(isDefined)),
@@ -5434,15 +5441,14 @@ export class PetitionRepository extends BaseRepository {
           )
         : [];
 
-    const petitionsWithStats = await pFlatMap(
-      chunk(orgPetitions, 200),
-      async (petitionsChunk) => {
-        return zip(
-          petitionsChunk,
-          await this.getPetitionTimeStats(petitionsChunk.map((p) => p.id))
-        ).map(([petition, stats]) => ({ ...petition, ...stats }));
+    const petitionsWithStats = await pMapChunk(
+      orgPetitions,
+      async (chunk) => {
+        return zip(chunk, await this.getPetitionTimeStats(chunk.map((p) => p.id))).map(
+          ([petition, stats]) => ({ ...petition, ...stats })
+        );
       },
-      { concurrency: 5 }
+      { chunkSize: 200, concurrency: 5 }
     );
 
     const templatesWithPetitionsWithStats = Object.values(
