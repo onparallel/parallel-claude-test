@@ -1,6 +1,7 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { unMaybeArray } from "../../util/arrays";
+import { pMapChunk } from "../../util/promises/pMapChunk";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
@@ -101,17 +102,25 @@ export class FileRepository extends BaseRepository {
 
   async deleteFileUpload(id: MaybeArray<number>, deletedBy: string, t?: Knex.Transaction) {
     const ids = unMaybeArray(id);
-    if (ids.length > 0) {
-      await this.from("file_upload", t)
-        .update(
-          {
-            deleted_at: this.now(),
-            deleted_by: deletedBy,
-          },
-          "*"
-        )
-        .whereIn("id", ids);
+    if (ids.length === 0) {
+      return;
     }
+
+    await pMapChunk(
+      ids,
+      async (idsChunk) => {
+        await this.from("file_upload", t)
+          .update(
+            {
+              deleted_at: this.now(),
+              deleted_by: deletedBy,
+            },
+            "*"
+          )
+          .whereIn("id", idsChunk);
+      },
+      { chunkSize: 200, concurrency: 5 }
+    );
   }
 
   readonly loadTemporaryFile = this.buildLoadBy("temporary_file", "id");

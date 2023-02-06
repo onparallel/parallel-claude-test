@@ -5105,6 +5105,34 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async anonymizePetition(petitionId: number) {
+    const [accesses, fields] = await Promise.all([
+      this.from("petition_access").where("petition_id", petitionId).select("id"),
+      this.from("petition_field").where("petition_id", petitionId).select("id"),
+    ]);
+
+    const fieldIds = fields.map((f) => f.id);
+
+    const replies = await pMapChunk(
+      fieldIds,
+      async (fieldIdsChunk) =>
+        await this.from("petition_field_reply")
+          .whereIn("petition_field_id", fieldIdsChunk)
+          .whereNull("anonymized_at")
+          .select("id", "type", "content", "anonymized_at"),
+      { concurrency: 1, chunkSize: 200 }
+    );
+
+    const comments = await pMapChunk(
+      fieldIds,
+      async (fieldIdsChunk) =>
+        await this.from("petition_field_comment")
+          .where("petition_id", petitionId)
+          .whereIn("petition_field_id", fieldIdsChunk)
+          .whereNull("anonymized_at")
+          .select("id"),
+      { concurrency: 1, chunkSize: 200 }
+    );
+
     await this.withTransaction(async (t) => {
       await this.updatePetition(
         petitionId,
@@ -5113,29 +5141,6 @@ export class PetitionRepository extends BaseRepository {
         t
       );
 
-      const [accesses, fields] = await Promise.all([
-        this.from("petition_access", t).where("petition_id", petitionId).select("*"),
-        this.from("petition_field", t).where("petition_id", petitionId).select("*"),
-      ]);
-
-      const [replies, comments] = await Promise.all([
-        this.from("petition_field_reply", t)
-          .whereIn(
-            "petition_field_id",
-            fields.map((f) => f.id)
-          )
-          .whereNull("anonymized_at")
-          .select("*"),
-        this.from("petition_field_comment", t)
-          .where("petition_id", petitionId)
-          .whereIn(
-            "petition_field_id",
-            fields.map((f) => f.id)
-          )
-          .whereNull("anonymized_at")
-          .select("*"),
-      ]);
-
       const [messages, reminders] = await Promise.all([
         this.anonymizePetitionMessages(petitionId, t),
         this.anonymizePetitionReminders(
@@ -5143,7 +5148,10 @@ export class PetitionRepository extends BaseRepository {
           t
         ),
         this.anonymizePetitionFieldReplies(replies, t),
-        this.anonymizePetitionFieldComments(comments, t),
+        this.anonymizePetitionFieldComments(
+          comments.map((c) => c.id),
+          t
+        ),
         this.deactivateAccesses(
           petitionId,
           accesses.map((a) => a.id),
@@ -5177,7 +5185,7 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async anonymizePetitionFieldReplies(
-    replies: MaybeArray<PetitionFieldReply>,
+    replies: MaybeArray<Pick<PetitionFieldReply, "id" | "type" | "content" | "anonymized_at">>,
     t?: Knex.Transaction
   ) {
     const repliesArray = unMaybeArray(replies);
@@ -5190,15 +5198,15 @@ export class PetitionRepository extends BaseRepository {
       )
       .map((r) => r.content.file_upload_id as number);
 
-    await this.from("petition_field_reply", t)
-      .whereIn(
-        "id",
-        repliesArray.map((r) => r.id)
-      )
-      .whereNull("anonymized_at")
-      .update({
-        anonymized_at: this.now(),
-        content: this.knex.raw(/* sql */ `
+    await pMapChunk(
+      repliesArray.map((r) => r.id),
+      async (ids) => {
+        await this.from("petition_field_reply", t)
+          .whereIn("id", ids)
+          .whereNull("anonymized_at")
+          .update({
+            anonymized_at: this.now(),
+            content: this.knex.raw(/* sql */ `
           case "type"
             when 'FILE_UPLOAD' then
               content || jsonb_build_object('file_upload_id', null)
@@ -5210,28 +5218,31 @@ export class PetitionRepository extends BaseRepository {
               content || jsonb_build_object('value', null)
             end
         `),
-      });
+          });
+      },
+      { chunkSize: 200, concurrency: 5 }
+    );
 
     await this.files.deleteFileUpload(fileUploadIds, "AnonymizerWorker", t);
   }
 
-  async anonymizePetitionFieldComments(
-    comments: MaybeArray<PetitionFieldComment>,
-    t?: Knex.Transaction
-  ) {
-    const commentsArray = unMaybeArray(comments);
-    if (commentsArray.length === 0) return;
+  async anonymizePetitionFieldComments(ids: MaybeArray<number>, t?: Knex.Transaction) {
+    const commentIds = unMaybeArray(ids);
+    if (commentIds.length === 0) return;
 
-    await this.from("petition_field_comment", t)
-      .whereIn(
-        "id",
-        commentsArray.map((c) => c.id)
-      )
-      .whereNull("anonymized_at")
-      .update({
-        anonymized_at: this.now(),
-        content_json: null,
-      });
+    await pMapChunk(
+      commentIds,
+      async (ids) => {
+        await this.from("petition_field_comment", t)
+          .whereIn("id", ids)
+          .whereNull("anonymized_at")
+          .update({
+            anonymized_at: this.now(),
+            content_json: null,
+          });
+      },
+      { chunkSize: 200, concurrency: 5 }
+    );
   }
 
   private async anonymizePetitionMessages(petitionId: number, t: Knex.Transaction) {
@@ -5243,7 +5254,7 @@ export class PetitionRepository extends BaseRepository {
           anonymized_at: this.now(),
           email_body: null,
         },
-        "*"
+        "email_log_id"
       );
   }
 
@@ -5259,7 +5270,7 @@ export class PetitionRepository extends BaseRepository {
           anonymized_at: this.now(),
           email_body: null,
         },
-        "*"
+        "email_log_id"
       );
   }
 
