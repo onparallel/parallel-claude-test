@@ -68,11 +68,11 @@ export const supportMethods: {
       args: [
         {
           name: "orgId",
-          description: null,
+          description: "Global ID of the Organization",
           type: {
             kind: "NON_NULL",
             name: null,
-            ofType: { kind: "SCALAR", name: "Int", ofType: null },
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
           },
           defaultValue: null,
           isDeprecated: false,
@@ -341,12 +341,12 @@ export const supportMethods: {
         "Transfers the ownership of an organization to a given user. Old owner will get ADMIN role",
       args: [
         {
-          name: "organizationId",
-          description: "Numeric ID of the organization",
+          name: "orgId",
+          description: "Global ID of the Organization",
           type: {
             kind: "NON_NULL",
             name: null,
-            ofType: { kind: "SCALAR", name: "Int", ofType: null },
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
           },
           defaultValue: null,
           isDeprecated: false,
@@ -422,11 +422,11 @@ export const supportMethods: {
         },
         {
           name: "templateId",
-          description: "global ID of the template",
+          description: "Global ID of the template",
           type: {
             kind: "NON_NULL",
             name: null,
-            ofType: { kind: "SCALAR", name: "ID", ofType: null },
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
           },
           defaultValue: null,
           isDeprecated: false,
@@ -450,11 +450,11 @@ export const supportMethods: {
       args: [
         {
           name: "orgId",
-          description: "Numeric ID of the Organization",
+          description: "Global ID of the Organization",
           type: {
             kind: "NON_NULL",
             name: null,
-            ofType: { kind: "SCALAR", name: "Int", ofType: null },
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
           },
           defaultValue: null,
           isDeprecated: false,

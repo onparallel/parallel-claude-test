@@ -5392,18 +5392,6 @@ export class PetitionRepository extends BaseRepository {
         signed: countBy(orgPetitions, (p) => p.latest_signature_status === "COMPLETED"),
       },
       times,
-
-      /** @deprecated until end. Keeping for retrocompatibility with frontend */
-      template_id: toGlobalId("Petition", fromTemplateId),
-      pending: countBy(orgPetitions, (r) => r.status === "PENDING"),
-      completed: countBy(orgPetitions, (r) => r.status === "COMPLETED"),
-      closed: countBy(orgPetitions, (r) => r.status === "CLOSED"),
-      pending_to_complete: times.pending_to_complete,
-      complete_to_close: times.complete_to_close,
-      signatures: {
-        completed: countBy(orgPetitions, (p) => p.latest_signature_status === "COMPLETED"),
-        time_to_complete: times.signature_completed,
-      },
     };
   }
 

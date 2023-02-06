@@ -1150,7 +1150,12 @@ type Mutation {
   """
   Forces an update of the branding of every signature integration of the selected organization.
   """
-  forceUpdateSignatureOrganizationBrandings(orgId: Int!): SupportMethodResponse!
+  forceUpdateSignatureOrganizationBrandings(
+    """
+    Global ID of the Organization
+    """
+    orgId: GID!
+  ): SupportMethodResponse!
 
   """
   Generates a new API token for the context user
@@ -1387,16 +1392,6 @@ type Mutation {
     keycode: ID!
     petitionFieldCommentIds: [GID!]!
   ): [PublicPetitionFieldComment!]!
-
-  """
-  Cancel a reminder for a contact.
-  """
-  publicOptOutReminders(
-    keycode: ID!
-    other: String!
-    reason: String!
-    referer: String
-  ): PublicPetitionAccess! @deprecated(reason: "Use publicRemindersOptOut")
 
   """
   Generates a download link for a field attachment on a public context.
@@ -1649,9 +1644,9 @@ type Mutation {
   """
   transferOrganizationOwnership(
     """
-    Numeric ID of the organization
+    Global ID of the Organization
     """
-    organizationId: Int!
+    orgId: GID!
 
     """
     Global ID of the new owner
@@ -1729,9 +1724,9 @@ type Mutation {
     slug: String
 
     """
-    global ID of the template
+    Global ID of the template
     """
-    templateId: ID!
+    templateId: GID!
   ): SupportMethodResponse!
 
   """
@@ -1764,9 +1759,9 @@ type Mutation {
   """
   updateOrganizationTier(
     """
-    Numeric ID of the Organization
+    Global ID of the Organization
     """
-    orgId: Int!
+    orgId: GID!
 
     """
     e.g.: FREE, APPSUMO1, APPSUMO2, APPSUMO3...
@@ -2035,14 +2030,6 @@ type Mutation {
   validateDowJonesKycCredentials(clientId: String!, password: String!, username: String!): Boolean!
 
   """
-  Runs backend checks to validate signature credentials.
-  """
-  validateSignatureCredentials(
-    credentials: JSONObject!
-    provider: SignatureOrgIntegrationProvider!
-  ): ValidateSignatureCredentialsResult! @deprecated(reason: "Use validateSignaturitApiKey")
-
-  """
   Runs backend checks to validate signaturit credentials.
   """
   validateSignaturitApiKey(apiKey: String!): ValidateSignatureCredentialsResult!
@@ -2091,8 +2078,6 @@ enum OrgLicenseSource {
 An organization in the system.
 """
 type Organization implements Timestamps {
-  _id: Int! @deprecated(reason: "Temporal solution for support methods, don't use")
-
   """
   The total number of active users
   """
@@ -2180,7 +2165,6 @@ type Organization implements Timestamps {
   """
   updatedAt: DateTime!
   usageDetails: JSONObject!
-  usageLimits: OrganizationUsageLimits! @deprecated(reason: "use usagePeriods pagination")
   usagePeriods(
     """
     Number of elements to take from the list.
@@ -2344,16 +2328,6 @@ type OrganizationUsageLimitPagination {
   totalCount: Int!
 }
 
-type OrganizationUsageLimits {
-  petitions: OrganizationUsageLimit!
-  signatures: OrganizationUsageLimit
-  users: OrganizationUsageUserLimit!
-}
-
-type OrganizationUsageUserLimit {
-  limit: Int!
-}
-
 """
 Order to use on Organization.users
 """
@@ -2401,11 +2375,6 @@ type Petition implements PetitionBase {
   Purpose of the anonymization
   """
   anonymizePurpose: String
-
-  """
-  The attachments linked to this petition
-  """
-  attachments: [PetitionAttachment!]! @deprecated(reason: "use attachmentsList")
 
   """
   The attachments linked to this petition
@@ -2497,11 +2466,6 @@ type Petition implements PetitionBase {
   The template used for this petition
   """
   fromTemplate: PetitionBaseMini
-
-  """
-  The template GID used for this petition
-  """
-  fromTemplateId: GID @deprecated(reason: "use fromTemplate.id")
 
   """
   The ID of the petition or template.
@@ -2752,11 +2716,6 @@ interface PetitionBase {
   Purpose of the anonymization
   """
   anonymizePurpose: String
-
-  """
-  The attachments linked to this petition
-  """
-  attachments: [PetitionAttachment!]! @deprecated(reason: "use attachmentsList")
 
   """
   The attachments linked to this petition
@@ -3918,11 +3877,6 @@ type PetitionTemplate implements PetitionBase {
   """
   The attachments linked to this petition
   """
-  attachments: [PetitionAttachment!]! @deprecated(reason: "use attachmentsList")
-
-  """
-  The attachments linked to this petition
-  """
   attachmentsList: PetitionAttachmentsList!
   backgroundColor: String
   categories: [String!]
@@ -4290,12 +4244,6 @@ type PublicPetition implements Timestamps {
   The field definition of the petition.
   """
   fields: [PublicPetitionField!]!
-
-  """
-  If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled
-  """
-  hasRemoveParallelBranding: Boolean!
-    @deprecated(reason: "Use PublicOrganization.hasRemoveParallelBranding")
 
   """
   Shows if the petition has unread comments

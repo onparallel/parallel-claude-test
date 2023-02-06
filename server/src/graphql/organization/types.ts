@@ -10,9 +10,9 @@ import {
   objectType,
   stringArg,
 } from "nexus";
-import { isDefined, omit, pick } from "remeda";
+import { isDefined, omit } from "remeda";
 import { defaultBrandTheme } from "../../util/BrandTheme";
-import { or, userIsSuperAdmin } from "../helpers/authorize";
+import { or } from "../helpers/authorize";
 import { addDuration, multiplyDuration } from "../helpers/duration";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
@@ -115,11 +115,6 @@ export const Organization = objectType({
   description: "An organization in the system.",
   definition(t) {
     t.implements("Timestamps");
-    t.int("_id", {
-      deprecation: "Temporal solution for support methods, don't use",
-      authorize: userIsSuperAdmin(),
-      resolve: ({ id }) => id,
-    });
     t.globalId("id", {
       description: "The ID of the organization.",
     });
@@ -300,80 +295,6 @@ export const Organization = objectType({
       resolve: async (root, { limitName }, ctx) => {
         const limit = await ctx.organizations.loadCurrentOrganizationUsageLimit(root.id, limitName);
         return !limit || limit.limit <= limit.used;
-      },
-    });
-    /** @deprecated */
-    t.nonNull.field("usageLimits", {
-      deprecation: "use usagePeriods pagination",
-      authorize: isOwnOrgOrSuperAdmin(),
-      type: objectType({
-        name: "OrganizationUsageLimits",
-        sourceType: /* ts*/ `{
-          petitions: {
-            limit: number,
-            used: number
-          },
-          users: {
-            limit: number,
-          },
-          signatures: {
-            limit: number,
-            used: number,
-          } | null
-        }`,
-        definition(t) {
-          t.nonNull.field("petitions", {
-            type: "OrganizationUsageLimit",
-          });
-          t.nonNull.field("users", {
-            type: objectType({
-              name: "OrganizationUsageUserLimit",
-              definition(d) {
-                d.nonNull.int("limit");
-              },
-            }),
-          });
-          t.nullable.field("signatures", {
-            type: "OrganizationUsageLimit",
-          });
-        },
-      }),
-      resolve: async (root, _, ctx) => {
-        const [organization, petitionSendLimits, signatureSendLimits, signatureIntegrations] =
-          await Promise.all([
-            ctx.organizations.loadOrg(root.id),
-            ctx.organizations.loadCurrentOrganizationUsageLimit(root.id, "PETITION_SEND"),
-            ctx.organizations.loadCurrentOrganizationUsageLimit(
-              root.id,
-              "SIGNATURIT_SHARED_APIKEY"
-            ),
-            ctx.integrations.loadIntegrationsByOrgId(root.id, "SIGNATURE", "SIGNATURIT"),
-          ]);
-
-        // only return signature limits if org has an enabled signature integration with our shared APIKEY
-        const hasSharedSignatureIntegration =
-          isDefined(signatureSendLimits) &&
-          signatureIntegrations.some(
-            (i) =>
-              i.settings.CREDENTIALS.API_KEY ===
-                ctx.config.signature.signaturitSharedProductionApiKey &&
-              i.settings.ENVIRONMENT === "production" &&
-              i.is_enabled
-          );
-
-        return {
-          petitions: {
-            limit: petitionSendLimits?.limit || 0,
-            used: petitionSendLimits?.used || 0,
-            period: petitionSendLimits!.period as any,
-          },
-          users: {
-            limit: organization!.usage_details.USER_LIMIT,
-          },
-          signatures: hasSharedSignatureIntegration
-            ? pick(signatureSendLimits, ["limit", "used", "period"])
-            : null,
-        };
       },
     });
     t.nonNull.list.nonNull.field("pdfDocumentThemes", {

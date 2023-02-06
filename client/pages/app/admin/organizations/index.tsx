@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Badge, Flex, Heading, useToast } from "@chakra-ui/react";
+import { Badge, Flex, Heading, Text, useToast } from "@chakra-ui/react";
 import { AdminOrganizationsListTableHeader } from "@parallel/components/admin-organizations/AdminOrganizationsListTableHeader";
 import { useCreateOrganizationDialog } from "@parallel/components/admin-organizations/dialogs/CreateOrganizationDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -24,6 +24,10 @@ import { FORMATS } from "@parallel/utils/dates";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { useAdminSections } from "@parallel/utils/useAdminSections";
+import {
+  useClipboardWithToast,
+  UseClipboardWithToastOptions,
+} from "@parallel/utils/useClipboardWithToast";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
@@ -44,6 +48,10 @@ const QUERY_STATE = {
 };
 
 type OrganizationSelection = AdminOrganizations_OrganizationFragment;
+
+interface AdminOrganizationsTableContext {
+  copyToClipboard: (opts: Partial<UseClipboardWithToastOptions>) => void;
+}
 
 function AdminOrganizations() {
   const intl = useIntl();
@@ -67,6 +75,18 @@ function AdminOrganizations() {
   const toast = useToast();
   const sections = useAdminSections();
   const columns = useOrganizationColumns();
+  const context = useMemo<AdminOrganizationsTableContext>(
+    () => ({
+      copyToClipboard: useClipboardWithToast({
+        text: intl.formatMessage({
+          id: "organization-users.header.id.copied-toast",
+          defaultMessage: "ID copied to clipboard",
+        }),
+      }),
+    }),
+    []
+  );
+
   const [search, setSearch] = useState(state.search);
 
   const debouncedOnSearchChange = useDebouncedCallback(
@@ -158,6 +178,7 @@ function AdminOrganizations() {
           flex="0 1 auto"
           minHeight={0}
           columns={columns}
+          context={context}
           rows={organizations?.items}
           onRowClick={handleRowClick}
           rowKeyProp={"id"}
@@ -188,12 +209,27 @@ function AdminOrganizations() {
 
 function useOrganizationColumns() {
   const intl = useIntl();
-  return useMemo<TableColumn<OrganizationSelection>[]>(
+  return useMemo<TableColumn<OrganizationSelection, AdminOrganizationsTableContext>[]>(
     () => [
       {
-        key: "_id",
+        key: "id",
         header: "ID",
-        CellContent: ({ row }) => <>{row._id}</>,
+        cellProps: {
+          width: "1px",
+        },
+        CellContent: ({ row, context }) => {
+          return (
+            <Text
+              cursor="pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                context.copyToClipboard({ value: row.id });
+              }}
+            >
+              {row.id}
+            </Text>
+          );
+        },
       },
       {
         key: "name",
@@ -289,7 +325,6 @@ AdminOrganizations.fragments = {
     return gql`
       fragment AdminOrganizations_Organization on Organization {
         id
-        _id
         name
         status
         activeUserCount

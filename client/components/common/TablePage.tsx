@@ -14,7 +14,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@parallel/chakra/icons";
 import { WithChakraProps } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { Table, TableProps, useTableColors } from "@parallel/components/common/Table";
+import { Table, TableColumn, TableProps, useTableColors } from "@parallel/components/common/Table";
 import {
   ComponentType,
   Fragment,
@@ -194,10 +194,10 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
     },
     [onSelectionChange]
   );
-  columns = useMemo(
+  const _columns = useMemo(
     () =>
       selectedCount > 0 && isDefined(actions)
-        ? [
+        ? ([
             {
               ...pick(columns[0], ["key", "CellContent", "cellProps"]),
               header: "",
@@ -208,7 +208,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
                       <FormattedMessage
                         id="component.table-page.n-selected"
                         defaultMessage="{count} selected"
-                        values={{ count: (context as any).selectedCount }}
+                        values={{ count: context.selectedCount }}
                       />
                     </Box>
                     {actions?.map(({ key, wrap = identity, ...props }) => (
@@ -224,9 +224,13 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
               ...column,
               Header: () => null,
             })),
-          ]
-        : columns,
+          ] as TableColumn<TRow, TContext & { selectedCount: number }>[])
+        : (columns as TableColumn<TRow, TContext & { selectedCount: number }>[]),
     [columns, actions, selectedCount]
+  );
+  const _context = useMemo(
+    () => Object.assign({}, context, { selectedCount }),
+    [context, selectedCount]
   );
   return (
     <Card display="flex" flexDirection="column" {...props}>
@@ -257,9 +261,9 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
           </Flex>
         ) : null}
         <Table
-          columns={columns}
+          columns={_columns}
           rows={rows}
-          context={{ ...context, selectedCount } as any}
+          context={_context}
           rowKeyProp={rowKeyProp}
           isExpandable={isExpandable}
           isSelectable={isSelectable}

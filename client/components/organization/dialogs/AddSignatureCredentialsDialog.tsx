@@ -27,7 +27,7 @@ import {
 } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
 import { useDocusignConsentPopup } from "@parallel/utils/useDocusignConsentPopup";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm, useFormContext, UseFormReturn } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -343,7 +343,12 @@ function AddSignatureCredentialsStep2({ hasDocusignSandbox }: { hasDocusignSandb
   } = useFormContext<AddSignatureCredentialsDialogData>();
 
   const selectedProvider = watch("provider");
-  setValue("name", selectedProvider[0].toUpperCase() + selectedProvider.substring(1).toLowerCase());
+  useEffect(() => {
+    setValue(
+      "name",
+      selectedProvider[0].toUpperCase() + selectedProvider.substring(1).toLowerCase()
+    );
+  }, [selectedProvider]);
 
   return (
     <Stack>

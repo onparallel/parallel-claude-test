@@ -56,7 +56,7 @@ interface SignatureTokensTableContext {
   onDeleteIntegration: (id: string) => void;
   onMarkIntegrationAsDefault: (id: string) => void;
   onDocusignReauthorize: (
-    i: IntegrationsSignature_SignatureOrgIntegrationFragment
+    integration: IntegrationsSignature_SignatureOrgIntegrationFragment
   ) => Promise<void>;
   refetch: () => Promise<any>;
 }
@@ -140,72 +140,68 @@ function IntegrationsSignature() {
   const [deleteSignatureIntegration] = useMutation(
     IntegrationsSignature_deleteSignatureIntegrationDocument
   );
-  const handleDeleteIntegration = async (id: string) => {
-    if (numberOfIntegrations < 2) return;
-    try {
-      await removeSignatureToken();
-      await deleteSignatureIntegration({ variables: { id } });
-    } catch (error) {
-      if (isApolloError(error, "SIGNATURE_INTEGRATION_IN_USE_ERROR")) {
-        try {
-          await confirmRemoveSignatureToken({
-            pendingSignaturesCount: error.graphQLErrors[0].extensions
-              .pendingSignaturesCount as number,
-          });
-          await deleteSignatureIntegration({ variables: { id, force: true } });
-        } catch {}
-      }
-    }
-    refetch();
-  };
-
   const [markIntegrationAsDefault] = useMutation(
     IntegrationsSignature_markSignatureIntegrationAsDefaultDocument
   );
-  const handleMarkIntegrationAsDefault = async (id: string) => {
-    try {
-      await markIntegrationAsDefault({ variables: { id } });
-      refetch();
-    } catch (error) {}
-  };
-
   const showDocusignConsentPopup = useDocusignConsentPopup();
-  async function handleDocusignReauthorize(
-    i: IntegrationsSignature_SignatureOrgIntegrationFragment
-  ) {
-    const [error] = await withError(
-      showDocusignConsentPopup({
-        ...i,
-        environment: i.environment === "DEMO" ? "sandbox" : "production",
-      })
-    );
-    if (!error) {
-      refetch();
-      toast({
-        status: "success",
-        title: intl.formatMessage({
-          id: "page.signature.provider-updated-successfully.toast-title",
-          defaultMessage: "Success",
-        }),
-        description: intl.formatMessage(
-          {
-            id: "page.signature.provider-updated-successfully.toast-description",
-            defaultMessage: "{provider} integration updated successfully.",
-          },
-          { provider: "Docusign" }
-        ),
-      });
-    }
-  }
 
-  const context = {
-    hasSignature: me.hasPetitionSignature,
-    numberOfIntegrations,
-    onDeleteIntegration: handleDeleteIntegration,
-    onMarkIntegrationAsDefault: handleMarkIntegrationAsDefault,
-    refetch,
-    onDocusignReauthorize: handleDocusignReauthorize,
-  } as SignatureTokensTableContext;
+  const context = useMemo<SignatureTokensTableContext>(
+    () => ({
+      hasSignature: me.hasPetitionSignature,
+      numberOfIntegrations,
+      refetch,
+      async onDeleteIntegration(id) {
+        if (numberOfIntegrations < 2) return;
+        try {
+          await removeSignatureToken();
+          await deleteSignatureIntegration({ variables: { id } });
+        } catch (error) {
+          if (isApolloError(error, "SIGNATURE_INTEGRATION_IN_USE_ERROR")) {
+            try {
+              await confirmRemoveSignatureToken({
+                pendingSignaturesCount: error.graphQLErrors[0].extensions
+                  .pendingSignaturesCount as number,
+              });
+              await deleteSignatureIntegration({ variables: { id, force: true } });
+            } catch {}
+          }
+        }
+        refetch();
+      },
+      async onMarkIntegrationAsDefault(id) {
+        try {
+          await markIntegrationAsDefault({ variables: { id } });
+          refetch();
+        } catch (error) {}
+      },
+      async onDocusignReauthorize(integration) {
+        const [error] = await withError(
+          showDocusignConsentPopup({
+            ...integration,
+            environment: integration.environment === "DEMO" ? "sandbox" : "production",
+          })
+        );
+        if (!error) {
+          refetch();
+          toast({
+            status: "success",
+            title: intl.formatMessage({
+              id: "page.signature.provider-updated-successfully.toast-title",
+              defaultMessage: "Success",
+            }),
+            description: intl.formatMessage(
+              {
+                id: "page.signature.provider-updated-successfully.toast-description",
+                defaultMessage: "{provider} integration updated successfully.",
+              },
+              { provider: "Docusign" }
+            ),
+          });
+        }
+      },
+    }),
+    [me.hasPetitionSignature, numberOfIntegrations, refetch]
+  );
 
   return (
     <SettingsLayout

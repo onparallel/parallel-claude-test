@@ -1,7 +1,7 @@
-import { booleanArg, idArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { booleanArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { isDefined, uniq } from "remeda";
 import { fullName } from "../../util/fullName";
-import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -22,7 +22,7 @@ export const forceUpdateSignatureOrganizationBrandings = mutationField(
       "Forces an update of the branding of every signature integration of the selected organization.",
     type: "SupportMethodResponse",
     args: {
-      orgId: nonNull(intArg()),
+      orgId: nonNull(globalIdArg("Organization", { description: "Global ID of the Organization" })),
     },
     authorize: supportMethodAccess(),
     resolve: async (_, { orgId }, ctx) => {
@@ -96,11 +96,11 @@ export const transferOrganizationOwnership = mutationField("transferOrganization
     "Transfers the ownership of an organization to a given user. Old owner will get ADMIN role",
   type: "SupportMethodResponse",
   args: {
-    organizationId: nonNull(intArg({ description: "Numeric ID of the organization" })),
+    orgId: nonNull(globalIdArg("Organization", { description: "Global ID of the Organization" })),
     userId: nonNull(globalIdArg("User", { description: "Global ID of the new owner" })),
   },
   authorize: supportMethodAccess(),
-  resolve: async (_, { organizationId, userId }, ctx) => {
+  resolve: async (_, { orgId, userId }, ctx) => {
     const newOwner = await ctx.users.loadUser(userId);
     if (!newOwner) {
       return {
@@ -108,14 +108,14 @@ export const transferOrganizationOwnership = mutationField("transferOrganization
         message: `Can't find user with id ${userId}`,
       };
     }
-    if (newOwner.org_id !== organizationId) {
+    if (newOwner.org_id !== orgId) {
       return {
         result: RESULT.FAILURE,
-        message: `User ${userId} does not belong to organization ${organizationId}.`,
+        message: `User ${userId} does not belong to organization ${orgId}.`,
       };
     }
 
-    const currentOwner = await ctx.organizations.getOrganizationOwner(organizationId);
+    const currentOwner = await ctx.organizations.getOrganizationOwner(orgId);
 
     await ctx.users.withTransaction(async (t) => {
       await ctx.users.updateUserById(
@@ -143,7 +143,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
   description: "Updates the metadata of a public landing template.",
   type: "SupportMethodResponse",
   args: {
-    templateId: nonNull(idArg({ description: "global ID of the template" })),
+    templateId: nonNull(globalIdArg("Petition", { description: "Global ID of the template" })),
     backgroundColor: nullable(
       stringArg({
         description: "for example: #A0FFCE",
@@ -170,8 +170,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
   authorize: supportMethodAccess(),
   resolve: async (_, args, ctx, info) => {
     try {
-      const { id } = fromGlobalId(args.templateId, "Petition");
-      const template = await ctx.petitions.loadPetition(id);
+      const template = await ctx.petitions.loadPetition(args.templateId);
       if (!template || !template.is_template) {
         throw new ArgValidationError(info, "templateId", "Id does not correspond to a template");
       }
@@ -221,7 +220,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
       }
 
       await ctx.petitions.updatePetition(
-        id,
+        template.id,
         { public_metadata: newMetadata },
         `User:${ctx.user!.id}`
       );
@@ -331,7 +330,7 @@ export const updateOrganizationTier = mutationField("updateOrganizationTier", {
   type: "SupportMethodResponse",
   authorize: supportMethodAccess(),
   args: {
-    orgId: nonNull(intArg({ description: "Numeric ID of the Organization" })),
+    orgId: nonNull(globalIdArg("Organization", { description: "Global ID of the Organization" })),
     tier: nonNull(stringArg({ description: "e.g.: FREE, APPSUMO1, APPSUMO2, APPSUMO3..." })),
   },
   resolve: async (_, args, ctx) => {

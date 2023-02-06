@@ -274,13 +274,6 @@ export const PetitionBase = interfaceType({
       description: "Custom user properties",
       resolve: (o) => o.custom_properties,
     });
-    /** @deprecated */
-    t.nonNull.list.field("attachments", {
-      deprecation: "use attachmentsList",
-      type: "PetitionAttachment",
-      description: "The attachments linked to this petition",
-      resolve: async (o, _, ctx) => await ctx.petitions.loadPetitionAttachmentsByPetitionId(o.id),
-    });
     t.nonNull.field("attachmentsList", {
       description: "The attachments linked to this petition",
       type: objectType({
@@ -411,12 +404,6 @@ export const Petition = objectType({
           limit,
         });
       },
-    });
-    /** @deprecated */
-    t.nullable.globalId("fromTemplateId", {
-      deprecation: "use fromTemplate.id",
-      description: "The template GID used for this petition",
-      resolve: (root) => root.from_template_id,
     });
     t.nullable.field("fromTemplate", {
       /**

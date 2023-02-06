@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { isDefined } from "remeda";
 import { centeredPopup, openNewWindow } from "./openNewWindow";
 import { useInterval } from "./useInterval";
@@ -10,6 +10,7 @@ export function useDocusignConsentPopup() {
   const windowRef = useRef<Window>();
   const [isRunning, setIsRunning] = useState(false);
   const promiseArgsRef = useRef<PromiseArgs>();
+
   useInterval(
     () => {
       if (windowRef.current?.closed) {
@@ -25,9 +26,12 @@ export function useDocusignConsentPopup() {
     (m) => {
       const window = windowRef.current;
       if (isDefined(window) && m.source === windowRef.current) {
-        if (m.data.success) {
-          setIsRunning(false);
-          promiseArgsRef.current?.[0]();
+        if (isDefined(m.data.success)) {
+          if (m.data.success === true) {
+            setIsRunning(false);
+            promiseArgsRef.current?.[0]();
+          }
+          window.close();
         }
       }
     },
@@ -35,27 +39,30 @@ export function useDocusignConsentPopup() {
     []
   );
 
-  return async (params?: {
-    id?: string;
-    isDefault: boolean;
-    name: string;
-    environment: "sandbox" | "production";
-  }) => {
-    setIsRunning(true);
-    windowRef.current = await openNewWindow(
-      () =>
-        `/api/oauth/docusign/authorize?${new URLSearchParams(
-          params
-            ? {
-                ...params,
-                isDefault: params.isDefault.toString(),
-              }
-            : {}
-        )}`,
-      centeredPopup({ width: 500, height: 600 })
-    );
-    return new Promise<void>((...params) => {
-      promiseArgsRef.current = params;
-    });
-  };
+  return useCallback(
+    async (params?: {
+      id?: string;
+      isDefault: boolean;
+      name: string;
+      environment: "sandbox" | "production";
+    }) => {
+      setIsRunning(true);
+      windowRef.current = await openNewWindow(
+        () =>
+          `/api/oauth/docusign/authorize?${new URLSearchParams(
+            params
+              ? {
+                  ...params,
+                  isDefault: params.isDefault.toString(),
+                }
+              : {}
+          )}`,
+        centeredPopup({ width: 500, height: 600 })
+      );
+      return new Promise<void>((...params) => {
+        promiseArgsRef.current = params;
+      });
+    },
+    []
+  );
 }

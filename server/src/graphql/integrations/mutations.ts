@@ -34,39 +34,17 @@ export const markSignatureIntegrationAsDefault = mutationField(
   }
 );
 
-/** @deprecated */
-export const validateSignatureCredentials = mutationField("validateSignatureCredentials", {
-  deprecation: "Use validateSignaturitApiKey",
-  description: "Runs backend checks to validate signature credentials.",
-  type: objectType({
-    name: "ValidateSignatureCredentialsResult",
-    definition(t) {
-      t.nonNull.boolean("success");
-      t.nullable.jsonObject("data");
-    },
-  }),
-  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("PETITION_SIGNATURE")),
-  args: {
-    provider: nonNull("SignatureOrgIntegrationProvider"),
-    credentials: nonNull("JSONObject"),
-  },
-  resolve: async (_, args, ctx) => {
-    try {
-      const signaturit = ctx.signature.getClient<SignaturitClient>({
-        provider: "SIGNATURIT",
-      });
-      return {
-        success: true,
-        data: await signaturit.authenticate(args.credentials.API_KEY),
-      };
-    } catch {}
-    return { success: false };
-  },
-});
-
 export const validateSignaturitApiKey = mutationField("validateSignaturitApiKey", {
   description: "Runs backend checks to validate signaturit credentials.",
-  type: nonNull("ValidateSignatureCredentialsResult"),
+  type: nonNull(
+    objectType({
+      name: "ValidateSignatureCredentialsResult",
+      definition(t) {
+        t.nonNull.boolean("success");
+        t.nullable.jsonObject("data");
+      },
+    })
+  ),
   authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("PETITION_SIGNATURE")),
   args: {
     apiKey: nonNull(stringArg()),

@@ -728,11 +728,6 @@ export type Mutation = {
   publicGetTaskResultFileUrl: Scalars["String"];
   /** Marks the specified comments as read. */
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
-  /**
-   * Cancel a reminder for a contact.
-   * @deprecated Use publicRemindersOptOut
-   */
-  publicOptOutReminders: PublicPetitionAccess;
   /** Generates a download link for a field attachment on a public context. */
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Cancel a reminder for a contact. */
@@ -885,11 +880,6 @@ export type Mutation = {
   userSignUp: User;
   /** Tries to get an access_token with provided credentials */
   validateDowJonesKycCredentials: Scalars["Boolean"];
-  /**
-   * Runs backend checks to validate signature credentials.
-   * @deprecated Use validateSignaturitApiKey
-   */
-  validateSignatureCredentials: ValidateSignatureCredentialsResult;
   /** Runs backend checks to validate signaturit credentials. */
   validateSignaturitApiKey: ValidateSignatureCredentialsResult;
   verifyPublicAccess: PublicAccessVerification;
@@ -1257,7 +1247,7 @@ export type MutationfileUploadReplyDownloadLinkArgs = {
 };
 
 export type MutationforceUpdateSignatureOrganizationBrandingsArgs = {
-  orgId: Scalars["Int"];
+  orgId: Scalars["GID"];
 };
 
 export type MutationgenerateUserAuthTokenArgs = {
@@ -1411,13 +1401,6 @@ export type MutationpublicGetTaskResultFileUrlArgs = {
 export type MutationpublicMarkPetitionFieldCommentsAsReadArgs = {
   keycode: Scalars["ID"];
   petitionFieldCommentIds: Array<Scalars["GID"]>;
-};
-
-export type MutationpublicOptOutRemindersArgs = {
-  keycode: Scalars["ID"];
-  other: Scalars["String"];
-  reason: Scalars["String"];
-  referer?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationpublicPetitionFieldAttachmentDownloadLinkArgs = {
@@ -1607,7 +1590,7 @@ export type MutationtagPetitionArgs = {
 };
 
 export type MutationtransferOrganizationOwnershipArgs = {
-  organizationId: Scalars["Int"];
+  orgId: Scalars["GID"];
   userId: Scalars["GID"];
 };
 
@@ -1658,7 +1641,7 @@ export type MutationupdateLandingTemplateMetadataArgs = {
   description?: InputMaybe<Scalars["String"]>;
   image?: InputMaybe<Scalars["Upload"]>;
   slug?: InputMaybe<Scalars["String"]>;
-  templateId: Scalars["ID"];
+  templateId: Scalars["GID"];
 };
 
 export type MutationupdateOrganizationAutoAnonymizePeriodArgs = {
@@ -1682,7 +1665,7 @@ export type MutationupdateOrganizationPdfDocumentThemeArgs = {
 };
 
 export type MutationupdateOrganizationTierArgs = {
-  orgId: Scalars["Int"];
+  orgId: Scalars["GID"];
   tier: Scalars["String"];
 };
 
@@ -1860,11 +1843,6 @@ export type MutationvalidateDowJonesKycCredentialsArgs = {
   username: Scalars["String"];
 };
 
-export type MutationvalidateSignatureCredentialsArgs = {
-  credentials: Scalars["JSONObject"];
-  provider: SignatureOrgIntegrationProvider;
-};
-
 export type MutationvalidateSignaturitApiKeyArgs = {
   apiKey: Scalars["String"];
 };
@@ -1898,8 +1876,6 @@ export type OrgLicenseSource = "APPSUMO";
 
 /** An organization in the system. */
 export type Organization = Timestamps & {
-  /** @deprecated Temporal solution for support methods, don't use */
-  _id: Scalars["Int"];
   /** The total number of active users */
   activeUserCount: Scalars["Int"];
   anonymizePetitionsAfterMonths: Maybe<Scalars["Int"]>;
@@ -1934,8 +1910,6 @@ export type Organization = Timestamps & {
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   usageDetails: Scalars["JSONObject"];
-  /** @deprecated use usagePeriods pagination */
-  usageLimits: OrganizationUsageLimits;
   usagePeriods: OrganizationUsageLimitPagination;
   /** The users in the organization. */
   users: UserPagination;
@@ -2080,16 +2054,6 @@ export type OrganizationUsageLimitPagination = {
   totalCount: Scalars["Int"];
 };
 
-export type OrganizationUsageLimits = {
-  petitions: OrganizationUsageLimit;
-  signatures: Maybe<OrganizationUsageLimit>;
-  users: OrganizationUsageUserLimit;
-};
-
-export type OrganizationUsageUserLimit = {
-  limit: Scalars["Int"];
-};
-
 /** Order to use on Organization.users */
 export type OrganizationUsers_OrderBy =
   | "createdAt_ASC"
@@ -2124,11 +2088,6 @@ export type Petition = PetitionBase & {
   anonymizeAfterMonths: Maybe<Scalars["Int"]>;
   /** Purpose of the anonymization */
   anonymizePurpose: Maybe<Scalars["String"]>;
-  /**
-   * The attachments linked to this petition
-   * @deprecated use attachmentsList
-   */
-  attachments: Array<PetitionAttachment>;
   /** The attachments linked to this petition */
   attachmentsList: PetitionAttachmentsList;
   /** Time when the petition was closed. */
@@ -2162,11 +2121,6 @@ export type Petition = PetitionBase & {
   fields: Array<PetitionField>;
   /** The template used for this petition */
   fromTemplate: Maybe<PetitionBaseMini>;
-  /**
-   * The template GID used for this petition
-   * @deprecated use fromTemplate.id
-   */
-  fromTemplateId: Maybe<Scalars["GID"]>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
   isAnonymized: Scalars["Boolean"];
@@ -2304,11 +2258,6 @@ export type PetitionBase = {
   anonymizeAfterMonths: Maybe<Scalars["Int"]>;
   /** Purpose of the anonymization */
   anonymizePurpose: Maybe<Scalars["String"]>;
-  /**
-   * The attachments linked to this petition
-   * @deprecated use attachmentsList
-   */
-  attachments: Array<PetitionAttachment>;
   /** The attachments linked to this petition */
   attachmentsList: PetitionAttachmentsList;
   /** The closing email body of the petition. */
@@ -3001,11 +2950,6 @@ export type PetitionTemplate = PetitionBase & {
   anonymizeAfterMonths: Maybe<Scalars["Int"]>;
   /** Purpose of the anonymization */
   anonymizePurpose: Maybe<Scalars["String"]>;
-  /**
-   * The attachments linked to this petition
-   * @deprecated use attachmentsList
-   */
-  attachments: Array<PetitionAttachment>;
   /** The attachments linked to this petition */
   attachmentsList: PetitionAttachmentsList;
   backgroundColor: Maybe<Scalars["String"]>;
@@ -3209,11 +3153,6 @@ export type PublicPetition = Timestamps & {
   deadline: Maybe<Scalars["DateTime"]>;
   /** The field definition of the petition. */
   fields: Array<PublicPetitionField>;
-  /**
-   * If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled
-   * @deprecated Use PublicOrganization.hasRemoveParallelBranding
-   */
-  hasRemoveParallelBranding: Scalars["Boolean"];
   /** Shows if the petition has unread comments */
   hasUnreadComments: Scalars["Boolean"];
   /** The ID of the petition. */

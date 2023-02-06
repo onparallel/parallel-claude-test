@@ -140,10 +140,7 @@ export abstract class OAuthIntegration<
       .get("/redirect", async (req, res, next) => {
         try {
           const response = (success: boolean) => /* html */ `
-            <script>
-              window.opener.postMessage({ success: ${success} }, "*");
-              window.close();
-            </script>
+            <script>window.opener.postMessage({ success: ${success} }, "*");</script>
           `;
 
           const { state, code } = req.query;
