@@ -6,7 +6,7 @@ import { CreatePetitionField, PetitionField, PetitionFieldType } from "../__type
 const SCHEMAS = {
   NUMBER: {
     type: "object",
-    required: ["placeholder", "range", "decimals"],
+    required: ["range", "decimals"],
     additionalProperties: false,
     properties: {
       placeholder: {
@@ -37,7 +37,7 @@ const SCHEMAS = {
   },
   PHONE: {
     type: "object",
-    required: ["placeholder"],
+    required: [],
     additionalProperties: false,
     properties: {
       placeholder: {
@@ -47,7 +47,7 @@ const SCHEMAS = {
   },
   TEXT: {
     type: "object",
-    required: ["placeholder", "maxLength"],
+    required: ["maxLength"],
     additionalProperties: false,
     properties: {
       placeholder: {
@@ -60,7 +60,7 @@ const SCHEMAS = {
   },
   SHORT_TEXT: {
     type: "object",
-    required: ["placeholder", "maxLength", "format"],
+    required: ["maxLength", "format"],
     additionalProperties: false,
     properties: {
       placeholder: {
@@ -310,7 +310,9 @@ export function defaultFieldOptions(
       case "TEXT": {
         return {
           placeholder:
-            isDefined(field) && hasPlaceholder(field.type) ? field.options.placeholder : null,
+            isDefined(field) && hasPlaceholder(field.type)
+              ? field.options.placeholder ?? null
+              : null,
           maxLength:
             isDefined(field) &&
             ["TEXT", "SHORT_TEXT"].includes(field.type) &&
@@ -322,7 +324,9 @@ export function defaultFieldOptions(
       case "SHORT_TEXT": {
         return {
           placeholder:
-            isDefined(field) && hasPlaceholder(field.type) ? field.options.placeholder : null,
+            isDefined(field) && hasPlaceholder(field.type)
+              ? field.options.placeholder ?? null
+              : null,
           maxLength:
             isDefined(field) &&
             ["TEXT", "SHORT_TEXT"].includes(field.type) &&
@@ -339,7 +343,9 @@ export function defaultFieldOptions(
       case "NUMBER": {
         return {
           placeholder:
-            isDefined(field) && hasPlaceholder(field.type) ? field.options.placeholder : null,
+            isDefined(field) && hasPlaceholder(field.type)
+              ? field.options.placeholder ?? null
+              : null,
           range: {
             min: 0,
           },
@@ -351,7 +357,9 @@ export function defaultFieldOptions(
       case "PHONE": {
         return {
           placeholder:
-            isDefined(field) && hasPlaceholder(field.type) ? field.options.placeholder : null,
+            isDefined(field) && hasPlaceholder(field.type)
+              ? field.options.placeholder ?? null
+              : null,
         };
       }
       case "SELECT": {
@@ -361,7 +369,9 @@ export function defaultFieldOptions(
               ? field.options.values
               : [],
           placeholder:
-            isDefined(field) && hasPlaceholder(field.type) ? field.options.placeholder : null,
+            isDefined(field) && hasPlaceholder(field.type)
+              ? field.options.placeholder ?? null
+              : null,
         };
       }
       case "FILE_UPLOAD":

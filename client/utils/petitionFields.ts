@@ -16,16 +16,16 @@ export type FieldOptions = {
     accepts: Maybe<FileUploadAccepts[]>;
   };
   SHORT_TEXT: {
-    placeholder: Maybe<string>;
+    placeholder?: Maybe<string>;
     format: Maybe<string>;
     maxLength: Maybe<number>;
   };
   TEXT: {
-    placeholder: Maybe<string>;
+    placeholder?: Maybe<string>;
     maxLength: Maybe<number>;
   };
   NUMBER: {
-    placeholder: Maybe<string>;
+    placeholder?: Maybe<string>;
     range: {
       min: number | undefined;
       max: number | undefined;
@@ -35,11 +35,11 @@ export type FieldOptions = {
     suffix: Maybe<string>;
   };
   PHONE: {
-    placeholder: Maybe<string>;
+    placeholder?: Maybe<string>;
   };
   SELECT: {
     values: string[];
-    placeholder: Maybe<string>;
+    placeholder?: Maybe<string>;
   };
   DYNAMIC_SELECT: {
     values: DynamicSelectOption[];
