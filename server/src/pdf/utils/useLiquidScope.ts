@@ -1,4 +1,4 @@
-import { gql } from "graphql-request";
+import gql from "graphql-tag";
 import { useMemo } from "react";
 import { isDefined, zip } from "remeda";
 import { getFieldIndices } from "../../util/fieldIndices";

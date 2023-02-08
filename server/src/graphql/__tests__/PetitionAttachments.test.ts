@@ -1,5 +1,5 @@
 import { randomInt } from "crypto";
-import { gql } from "graphql-request";
+import gql from "graphql-tag";
 import { Knex } from "knex";
 import { range, sortBy } from "remeda";
 import { KNEX } from "../../db/knex";

@@ -1,5 +1,4 @@
 import { nameCase } from "@foundernest/namecase";
-import { ApolloError } from "apollo-server-core";
 import {
   booleanArg,
   inputObjectType,
@@ -14,6 +13,7 @@ import { chunk, countBy, isDefined, uniqBy } from "remeda";
 import { CreateContact } from "../../db/__types";
 import { withError } from "../../util/promises/withError";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
+import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { importFromExcel } from "../helpers/importDataFromExcel";
 import { parseContactList } from "../helpers/parseContactList";

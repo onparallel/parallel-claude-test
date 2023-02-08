@@ -1,8 +1,8 @@
-import { ApolloError } from "apollo-server-core";
 import { booleanArg, list, mutationField, nonNull } from "nexus";
 import { maxBy, zip } from "remeda";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
+import { ApolloError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { RESULT } from "../../helpers/result";
 import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";

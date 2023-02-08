@@ -1,7 +1,7 @@
-import { ApolloError } from "apollo-server-core";
 import { inputObjectType, mutationField, nonNull, stringArg } from "nexus";
 import { CreateTag } from "../../db/__types";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
+import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { validateAnd } from "../helpers/validateArgs";

@@ -1,5 +1,4 @@
 import Ajv from "ajv";
-import { ApolloError } from "apollo-server-core";
 import { parse as parseCookie } from "cookie";
 import { IncomingMessage } from "http";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
@@ -10,7 +9,7 @@ import { verify } from "../../util/jwt";
 import { getMentions } from "../../util/slate";
 import { MaybeArray } from "../../util/types";
 import { Arg, chain } from "../helpers/authorize";
-import { ArgValidationError, PublicPetitionNotAvailableError } from "../helpers/errors";
+import { ApolloError, ArgValidationError } from "../helpers/errors";
 
 export function authenticatePublicAccess<
   TypeName extends string,
@@ -59,12 +58,14 @@ export function fetchPetitionAccess<
     const keycode = args[argKeycode] as unknown as string;
     const access = await ctx.petitions.loadAccessByKeycode(keycode);
     if (!access) {
-      throw new PublicPetitionNotAvailableError(
-        `Petition access with keycode ${keycode} not found`
+      throw new ApolloError(
+        `Petition access with keycode ${keycode} not found`,
+        "PUBLIC_PETITION_NOT_AVAILABLE"
       );
     } else if (access.status !== "ACTIVE") {
-      throw new PublicPetitionNotAvailableError(
-        `Petition access with keycode ${keycode} not active`
+      throw new ApolloError(
+        `Petition access with keycode ${keycode} not active`,
+        "PUBLIC_PETITION_NOT_AVAILABLE"
       );
     } else {
       ctx.access = access;
@@ -75,8 +76,9 @@ export function fetchPetitionAccess<
       ctx.contact = contact;
 
       if (!petition) {
-        throw new PublicPetitionNotAvailableError(
-          `Petition for petition access with keycode ${keycode} not found`
+        throw new ApolloError(
+          `Petition for petition access with keycode ${keycode} not found`,
+          "PUBLIC_PETITION_NOT_AVAILABLE"
         );
       }
     }

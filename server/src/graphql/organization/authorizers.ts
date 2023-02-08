@@ -1,8 +1,8 @@
-import { ApolloError } from "apollo-server-core";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isDefined } from "remeda";
 import { OrganizationThemeType, OrganizationUsageLimitName } from "../../db/__types";
 import { Arg, or, userIsSuperAdmin } from "../helpers/authorize";
+import { ApolloError } from "../helpers/errors";
 
 export function isOwnOrg<FieldName extends string>(): FieldAuthorizeResolver<
   "Organization",

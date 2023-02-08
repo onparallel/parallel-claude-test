@@ -1,4 +1,3 @@
-import { ApolloError } from "apollo-server-core";
 import { Knex } from "knex";
 import { createTestContainer } from "../../../test/testContainer";
 import { ApiContext } from "../../context";
@@ -7,6 +6,7 @@ import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Contact, Organization, OrgIntegration, User } from "../../db/__types";
 import { deleteAllData } from "../../util/knexUtils";
 import { random } from "../../util/token";
+import { ApolloError } from "../helpers/errors";
 import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
 import { validPassword } from "../helpers/validators/validPassword";
 import { validRemindersConfig } from "../helpers/validators/validRemindersConfig";

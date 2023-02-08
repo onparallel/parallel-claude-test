@@ -1,5 +1,5 @@
 import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
-import { gql } from "apollo-server-core";
+import gql from "graphql-tag";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, zip } from "remeda";
 import { FORMATS } from "../../util/dates";

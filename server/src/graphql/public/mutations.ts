@@ -1,4 +1,3 @@
-import { ApolloError } from "apollo-server-core";
 import { differenceInDays } from "date-fns";
 import { decode, JwtPayload } from "jsonwebtoken";
 import {
@@ -20,6 +19,7 @@ import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { stallFor } from "../../util/promises/stallFor";
 import { and, chain, checkClientServerToken, ifArgDefined } from "../helpers/authorize";
+import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { jsonArg } from "../helpers/scalars";

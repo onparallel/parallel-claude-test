@@ -1,5 +1,5 @@
-import { ApolloError } from "apollo-server-core";
 import { core } from "nexus";
+import { ApolloError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function emailDomainIsNotSSO<TypeName extends string, FieldName extends string>(

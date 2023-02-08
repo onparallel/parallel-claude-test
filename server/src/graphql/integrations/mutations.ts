@@ -1,9 +1,9 @@
-import { ApolloError } from "apollo-server-core";
 import { booleanArg, mutationField, nonNull, nullable, objectType, stringArg } from "nexus";
 import { SignaturitClient } from "../../services/signature-clients/signaturit";
 import { withError } from "../../util/promises/withError";
 import { encrypt } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
+import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { userHasFeatureFlag } from "../petition/authorizers";

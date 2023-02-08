@@ -1,4 +1,4 @@
-import { gql } from "graphql-request";
+import gql from "graphql-tag";
 import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
 import { PetitionUserNotification } from "../../db/notifications";

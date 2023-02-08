@@ -1,8 +1,8 @@
-import { ApolloError } from "apollo-server-core";
 import { idArg, mutationField, nonNull, objectType } from "nexus";
 import { toGlobalId } from "../../../util/globalId";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
+import { ApolloError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonObjectArg } from "../../helpers/scalars";
 import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";

@@ -1,17 +1,39 @@
-import { ApolloError } from "apollo-server-express";
-import { GraphQLResolveInfo } from "graphql";
+import { GraphQLError, GraphQLResolveInfo } from "graphql";
+import {} from "@apollo/server/errors";
 
-export class PublicPetitionNotAvailableError extends ApolloError {
-  override readonly name = "PublicPetitionNotAvailableError";
-  constructor(message: string) {
-    super(message, "PUBLIC_PETITION_NOT_AVAILABLE");
+export class ApolloError extends GraphQLError {
+  override readonly name: string = "ApolloError";
+  constructor(message: string, code?: string, extensions?: Record<string, any>) {
+    super(message, { extensions: { code, ...extensions } });
+
+    if (extensions?.extensions) {
+      throw Error(
+        "Pass extensions directly as the third argument of the ApolloError constructor: `new " +
+          "ApolloError(message, code, {myExt: value})`, not `new ApolloError(message, code, " +
+          "{extensions: {myExt: value}})`"
+      );
+    }
+  }
+}
+
+export class ForbiddenError extends ApolloError {
+  override readonly name = "ForbiddenError";
+  constructor(message: string, extensions?: Record<string, any>) {
+    super(message, "FORBIDDEN", extensions);
+  }
+}
+
+export class AuthenticationError extends ApolloError {
+  override readonly name = "AuthenticationError";
+  constructor(message: string, extensions?: Record<string, any>) {
+    super(message, "UNAUTHENTICATED", extensions);
   }
 }
 
 export class UnknownError extends ApolloError {
   override readonly name = "UnknownError";
-  constructor(message: string) {
-    super(message, "UNKNOWN_ERROR");
+  constructor(message: string, extensions?: Record<string, any>) {
+    super(message, "UNKNOWN_ERROR", extensions);
   }
 }
 

@@ -1,5 +1,5 @@
 import { addDays, subDays } from "date-fns";
-import { gql } from "graphql-request";
+import gql from "graphql-tag";
 import { Knex } from "knex";
 import { indexBy, omit } from "remeda";
 import { KNEX } from "../../db/knex";

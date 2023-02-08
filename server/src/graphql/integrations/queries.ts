@@ -1,7 +1,7 @@
-import { ApolloError } from "apollo-server-core";
 import { idArg, nonNull, queryField, stringArg } from "nexus";
 import { toGlobalId } from "../../util/globalId";
 import { authenticateAnd } from "../helpers/authorize";
+import { ApolloError } from "../helpers/errors";
 import { datetimeArg } from "../helpers/scalars";
 import { userHasEnabledIntegration, userHasFeatureFlag } from "../petition/authorizers";
 

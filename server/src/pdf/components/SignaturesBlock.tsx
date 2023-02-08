@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "@react-pdf/renderer";
 import { Style } from "@react-pdf/types";
-import { gql } from "apollo-server-core";
+import gql from "graphql-tag";
 import { useIntl } from "react-intl";
 import { chunk, isDefined, times } from "remeda";
 import { FORMATS } from "../../util/dates";

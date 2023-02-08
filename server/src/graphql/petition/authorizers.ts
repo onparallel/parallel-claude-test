@@ -1,4 +1,3 @@
-import { ApolloError } from "apollo-server-express";
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { countBy, isDefined, uniq } from "remeda";
@@ -17,6 +16,7 @@ import { unMaybeArray } from "../../util/arrays";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
 import { Arg, ArgAuthorizer } from "../helpers/authorize";
+import { ApolloError } from "../helpers/errors";
 import { NexusGenInputs } from "../__types";
 
 function createPetitionAuthorizer<TRest extends any[] = []>(

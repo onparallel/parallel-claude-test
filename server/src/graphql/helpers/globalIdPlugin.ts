@@ -1,4 +1,3 @@
-import { ForbiddenError } from "apollo-server-express";
 import {
   GraphQLInputType,
   GraphQLResolveInfo,
@@ -11,6 +10,7 @@ import { core, dynamicInputMethod, dynamicOutputMethod, plugin } from "nexus";
 import { isDefined, mapValues } from "remeda";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { If, UnwrapArray } from "../../util/types";
+import { ForbiddenError } from "./errors";
 
 export type GlobalIdConfig = {
   prefixName: string;

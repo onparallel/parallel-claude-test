@@ -1,9 +1,8 @@
-import { ApolloError } from "apollo-server-core";
 import { arg, booleanArg, list, mutationField, nonNull, nullable, stringArg } from "nexus";
 import pMap from "p-map";
 import { differenceWith, filter, groupBy, isDefined, pipe, uniq, uniqBy, zip } from "remeda";
 import { and, authenticate, authenticateAnd, chain, ifArgDefined } from "../../helpers/authorize";
-import { ArgValidationError } from "../../helpers/errors";
+import { ApolloError, ArgValidationError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { validateAnd, validateIf } from "../../helpers/validateArgs";
 import { maxLength } from "../../helpers/validators/maxLength";

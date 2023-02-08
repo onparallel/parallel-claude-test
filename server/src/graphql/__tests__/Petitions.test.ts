@@ -1,4 +1,4 @@
-import { gql } from "graphql-request";
+import gql from "graphql-tag";
 import { faker } from "@faker-js/faker";
 import { Knex } from "knex";
 import { range, sortBy } from "remeda";

@@ -1,14 +1,12 @@
 import "./init";
-// keep this space to prevent import sorting, removing init from top
-import {
-  ApolloServerPluginLandingPageDisabled,
-  ApolloServerPluginLandingPageGraphQLPlayground,
-} from "apollo-server-core";
-import { ApolloServer } from "apollo-server-express";
-import { ApolloServerPlugin } from "apollo-server-plugin-base";
+// keep this space to prevent import sorting removing init from top
+
+import { ApolloServer, ApolloServerPlugin } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
+import { ApolloServerPluginLandingPageDisabled } from "@apollo/server/plugin/disabled";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import express from "express";
+import express, { json } from "express";
 import graphqlUploadExpress from "graphql-upload/graphqlUploadExpress.js";
 import { api } from "./api";
 import { createContainer } from "./container";
@@ -18,6 +16,7 @@ import { schema } from "./schema";
 import { ILogger, LOGGER } from "./services/logger";
 import { IRedis, REDIS } from "./services/redis";
 import { stopwatchEnd } from "./util/stopwatch";
+import assert from "assert";
 
 const app = express();
 app.disable("x-powered-by");
@@ -30,45 +29,45 @@ app.get("/ping", (req, res, next) =>
 
 app.use("/api", cors(), cookieParser(), api(container));
 
-app.use("/graphql", graphqlUploadExpress());
 const server = new ApolloServer({
   // this allows us to send the error stacktrace to the context logger (cloudwatch)
   // as we don't expose the stacktrace anywhere else, it's safe to leave it as true for all environments
-  // starting from @apollo/server v4 the debug param will be replaced by includeStacktraceInErrorResponses
-  // https://www.apollographql.com/docs/apollo-server/api/apollo-server/#includestacktraceinerrorresponses
-  // includeStacktraceInErrorResponses: true,
-  debug: true,
-  cache: "bounded",
+  includeStacktraceInErrorResponses: true,
+  allowBatchedHttpRequests: true,
   schema: schema,
   plugins: [
-    process.env.NODE_ENV === "production"
-      ? ApolloServerPluginLandingPageDisabled()
-      : ApolloServerPluginLandingPageGraphQLPlayground(),
+    ...(process.env.NODE_ENV === "production" ? [ApolloServerPluginLandingPageDisabled()] : []),
     {
       async requestDidStart() {
         const time = process.hrtime();
         return {
-          async willSendResponse({ request: { operationName, variables }, response, context }) {
-            if (response.errors) {
-              response.errors = response.errors.map((error) => {
+          async willSendResponse({
+            request: { operationName, variables },
+            response,
+            contextValue,
+          }) {
+            assert(response.body.kind === "single");
+            const result = response.body.singleResult;
+            if (result.errors) {
+              result.errors = result.errors.map((error) => {
                 switch (error.extensions?.code) {
                   case "INTERNAL_SERVER_ERROR": {
-                    const stack = (error.extensions?.exception as any).stacktrace;
-                    context.logger.error(error.message, stack && { stack });
+                    const stack = error.extensions?.stacktrace;
+                    contextValue.logger.error(error.message, stack && { stack });
                     return new UnknownError("Internal server error");
                   }
                   default:
-                    const stack = (error.extensions?.exception as any).stacktrace;
-                    context.logger.warn(error.message, stack && { stack });
-                    if (error.extensions?.exception) {
-                      delete error.extensions.exception;
+                    const stack = error.extensions?.stacktrace;
+                    contextValue.logger.warn(error.message, stack && { stack });
+                    if (error.extensions?.stacktrace) {
+                      delete error.extensions.stacktrace;
                     }
                     return error;
                 }
               });
             }
             const duration = stopwatchEnd(time);
-            context.logger.info(`GraphQL operation "${operationName}" - ${duration}ms`, {
+            contextValue.logger.info(`GraphQL operation "${operationName}" - ${duration}ms`, {
               operation: { name: operationName, variables },
               duration,
             });
@@ -77,11 +76,6 @@ const server = new ApolloServer({
       },
     } as ApolloServerPlugin<ApiContext>,
   ],
-  context: async ({ req }) => {
-    const context = container.get<ApiContext>(ApiContext);
-    context.req = req;
-    return context;
-  },
 });
 
 if (process.env.TS_NODE_DEV) {
@@ -93,16 +87,28 @@ if (process.env.TS_NODE_DEV) {
 
 (async function start() {
   const redis = container.get<IRedis>(REDIS);
-  await redis.connect();
-  await server.start();
-  server.applyMiddleware({ app, bodyParserConfig: { limit: "2mb" } });
+  await Promise.all([redis.connect(), server.start()]);
+  app.use(
+    "/graphql",
+    cors(),
+    json({ limit: "2mb" }),
+    graphqlUploadExpress(),
+    expressMiddleware(server, {
+      context: async ({ req }) => {
+        const context = container.get<ApiContext>(ApiContext);
+        context.req = req;
+        return context;
+      },
+    })
+  );
+
   const port = process.env.PORT || 4000;
   app.listen(port, () => {
     const host = `http://localhost:${port}`;
     const logger = container.get<ILogger>(LOGGER);
     logger.info(`Ready on ${host}`);
     if (process.env.NODE_ENV !== "production") {
-      logger.info(`GraphQL playground available on ${host}${server.graphqlPath}`);
+      logger.info(`GraphQL playground available on ${host}/graphql`);
     }
   });
 })().then();

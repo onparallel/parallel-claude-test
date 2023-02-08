@@ -1,4 +1,3 @@
-import { ApolloError } from "apollo-server-core";
 import { addMinutes } from "date-fns";
 import {
   arg,
@@ -94,7 +93,7 @@ import {
   userHasPermissionInFolders,
 } from "../authorizers";
 import { validatePublicPetitionLinkSlug } from "../validations";
-import { ArgValidationError } from "./../../helpers/errors";
+import { ApolloError, ArgValidationError } from "./../../helpers/errors";
 import {
   userCanSendAs,
   userHasAccessToPublicPetitionLink,
@@ -1342,7 +1341,8 @@ export const sendPetition = mutationField("sendPetition", {
     petitionHasRepliableFields("petitionId"),
     userHasAccessToContactGroups("contactIdGroups"),
     userCanSendAs("senderId" as never),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
+    petitionsAreOfTypePetition("petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),

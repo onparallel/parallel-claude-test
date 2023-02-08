@@ -25,7 +25,6 @@ import {
   UserNotConfirmedException,
   UserNotFoundException,
 } from "@aws-sdk/client-cognito-identity-provider";
-import { ApolloError, ForbiddenError } from "apollo-server-core";
 import { parse as parseCookie } from "cookie";
 import DataLoader from "dataloader";
 import { differenceInMinutes } from "date-fns";
@@ -48,6 +47,7 @@ import { SystemRepository } from "../db/repositories/SystemRepository";
 import { UserAuthenticationRepository } from "../db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { User } from "../db/__types";
+import { ApolloError, ForbiddenError } from "../graphql/helpers/errors";
 import { awsLogger } from "../util/awsLogger";
 import { fullName } from "../util/fullName";
 import { sign, verify } from "../util/jwt";

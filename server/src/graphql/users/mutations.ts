@@ -2,7 +2,6 @@ import {
   InvalidPasswordException,
   NotAuthorizedException,
 } from "@aws-sdk/client-cognito-identity-provider";
-import { ApolloError, ForbiddenError } from "apollo-server-core";
 import { differenceInMinutes } from "date-fns";
 import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
@@ -22,7 +21,7 @@ import {
   userIsSuperAdmin,
   verifyCaptcha,
 } from "../helpers/authorize";
-import { ArgValidationError } from "../helpers/errors";
+import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { uploadArg } from "../helpers/scalars";

@@ -44,6 +44,7 @@
     "sync-migrations": "ts-node ./migrations/scripts/sync-migrations.ts"
   },
   "dependencies": {
+    "@apollo/server": "^4.3.2",
     "@aws-sdk/client-cloudwatch-logs": "^3.259.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.259.0",
     "@aws-sdk/client-s3": "^3.259.0",
@@ -62,9 +63,6 @@
     "ajv-formats": "^2.1.1",
     "amazon-cognito-identity-js": "^6.1.2",
     "analytics-node": "^6.2.0",
-    "apollo-server-core": "^3.11.1",
-    "apollo-server-express": "^3.11.1",
-    "apollo-server-plugin-base": "^3.7.1",
     "archiver": "^5.3.1",
     "byte-length": "^1.0.2",
     "content-disposition": "^0.5.4",
@@ -93,6 +91,7 @@
     "graphql": "^16.6.0",
     "graphql-request": "^5.1.0",
     "graphql-scalars": "^1.20.1",
+    "graphql-tag": "^2.12.6",
     "graphql-upload": "^15.0.2",
     "inversify": "^6.0.1",
     "json-schema-to-ts": "^2.6.2",

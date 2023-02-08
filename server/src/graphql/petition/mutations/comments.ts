@@ -1,7 +1,7 @@
-import { ApolloError } from "apollo-server-core";
 import { arg, booleanArg, mutationField, nonNull } from "nexus";
 import { getMentions } from "../../../util/slate";
 import { and, authenticateAnd, ifArgEquals } from "../../helpers/authorize";
+import { ApolloError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonArg } from "../../helpers/scalars";
 import { validPetitionFieldCommentContent } from "../../public/authorizers";

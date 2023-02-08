@@ -1,4 +1,3 @@
-import { ApolloError } from "apollo-server-core";
 import ASCIIFolder from "fold-to-ascii";
 import {
   arg,
@@ -16,6 +15,7 @@ import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import { validateObject } from "../../util/validateObject";
 import { authenticate, authenticateAnd, ifArgDefined, or } from "../helpers/authorize";
+import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { validateAnd } from "../helpers/validateArgs";

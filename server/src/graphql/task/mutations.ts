@@ -1,11 +1,10 @@
-import { ApolloError } from "apollo-server-core";
 import { differenceInDays } from "date-fns";
 import { booleanArg, idArg, mutationField, nonNull, nullable, objectType, stringArg } from "nexus";
 import { isDefined } from "remeda";
 import { Task } from "../../db/repositories/TaskRepository";
 import { isValidTimezone } from "../../util/validators";
 import { authenticateAnd } from "../helpers/authorize";
-import { ArgValidationError } from "../helpers/errors";
+import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { datetimeArg } from "../helpers/scalars";
 import {

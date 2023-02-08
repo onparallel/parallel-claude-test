@@ -1,4 +1,3 @@
-import { AuthenticationError } from "apollo-server-express";
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import pAll from "p-all";
@@ -7,6 +6,7 @@ import { getClientIp } from "request-ip";
 import { authenticateFromRequest } from "../../util/authenticateFromRequest";
 import { KeysOfType } from "../../util/types";
 import { userHasRole } from "../../util/userHasRole";
+import { AuthenticationError } from "./errors";
 
 export type ArgAuthorizer<TArg, TRest extends any[] = []> = <
   TypeName extends string,

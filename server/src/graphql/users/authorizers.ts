@@ -1,10 +1,10 @@
-import { ApolloError } from "apollo-server-core";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { UserOrganizationRole } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { Maybe, MaybeArray } from "../../util/types";
 import { userHasRole } from "../../util/userHasRole";
 import { Arg } from "../helpers/authorize";
+import { ApolloError } from "../helpers/errors";
 
 export function rootIsContextUser<FieldName extends string>(): FieldAuthorizeResolver<
   "User",

@@ -1,7 +1,7 @@
-import { ForbiddenError } from "apollo-server-express";
 import { booleanArg, idArg, list, nonNull, queryField, stringArg } from "nexus";
 import { fromGlobalId } from "../../util/globalId";
 import { authenticate, authenticateAnd, ifArgDefined } from "../helpers/authorize";
+import { ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validateAnd } from "../helpers/validateArgs";
 import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
