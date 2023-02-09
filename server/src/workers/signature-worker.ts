@@ -1,12 +1,10 @@
+import stringify from "fast-safe-stringify";
 import { unlink } from "fs/promises";
 import pMap from "p-map";
-import { isDefined } from "remeda";
+import { isDefined, pick } from "remeda";
 import { WorkerContext } from "../context";
 import { IntegrationSettings, SignatureProvider } from "../db/repositories/IntegrationRepository";
-import {
-  PetitionSignatureConfigSigner,
-  PetitionSignatureRequestCancelData,
-} from "../db/repositories/PetitionRepository";
+import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
 import { OrgIntegration } from "../db/__types";
 import { InvalidCredentialsError } from "../integrations/GenericIntegration";
 import { SignatureResponse } from "../services/signature-clients/client";
@@ -111,21 +109,28 @@ async function startSignatureProcess(
       },
       status: "PROCESSED",
     });
-  } catch (error: any) {
-    const cancelData = {
-      error: error.stack ?? error,
-    } as PetitionSignatureRequestCancelData<"REQUEST_ERROR">;
+  } catch (error) {
+    const errorCode =
+      error instanceof Error &&
+      [
+        "MAX_SIZE_EXCEEDED", // pdf binder for signature failed
+        "INSUFFICIENT_SIGNATURE_CREDITS", // org lacks signature credits for shared signaturit apikey.includes(error.message)
+      ].includes(error.message)
+        ? error.message
+        : error instanceof InvalidCredentialsError &&
+          [
+            "CONSENT_REQUIRED", // docusign app needs user consent
+            "ACCOUNT_SUSPENDED", // docusign user account has been suspended and can't be used on a production environment
+            "INVALID_CREDENTIALS", // signaturit apikey is invalid
+          ].includes(error.code)
+        ? error.code
+        : "UNKNOWN_ERROR";
 
-    const knownErrors = ["MAX_SIZE_EXCEEDED", "INSUFFICIENT_SIGNATURE_CREDITS"];
-    if (knownErrors.includes(error.message)) {
-      cancelData.error_code = error.message;
-    }
+    await ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", {
+      error_code: errorCode,
+      error: error instanceof Error ? pick(error, ["message", "stack"]) : stringify(error),
+    });
 
-    if (error instanceof InvalidCredentialsError) {
-      cancelData.error_code = error.code;
-    }
-
-    await ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData);
     // update signature_config with additional signers specified by recipient so user can restart the signature request knowing who are the signers
     await ctx.petitions.updatePetition(
       petition.id,
@@ -138,7 +143,7 @@ async function startSignatureProcess(
       `SignatureWorker:${payload.petitionSignatureRequestId}`
     );
 
-    if (!(error instanceof InvalidCredentialsError)) {
+    if (errorCode === "UNKNOWN_ERROR") {
       throw error;
     }
   } finally {

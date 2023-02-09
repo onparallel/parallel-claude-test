@@ -1,4 +1,5 @@
 import { AccountsApi, ApiClient, Envelope, EnvelopeDefinition, EnvelopesApi } from "docusign-esign";
+import stringify from "fast-safe-stringify";
 import { readFile, stat } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { basename, extname } from "path";
@@ -74,10 +75,16 @@ export class DocuSignClient implements ISignatureClient {
           throw new OauthExpiredCredentialsError();
         }
         if (this.isAccountSuspendedError(error)) {
-          throw new InvalidCredentialsError("ACCOUNT_SUSPENDED");
+          throw new InvalidCredentialsError(
+            "ACCOUNT_SUSPENDED",
+            error instanceof Error ? error.message : stringify(error)
+          );
         }
         if (this.isConsentRequiredError(error)) {
-          throw new InvalidCredentialsError("CONSENT_REQUIRED");
+          throw new InvalidCredentialsError(
+            "CONSENT_REQUIRED",
+            error instanceof Error ? error.message : stringify(error)
+          );
         }
         throw error;
       }

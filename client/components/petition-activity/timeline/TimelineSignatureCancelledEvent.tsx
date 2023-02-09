@@ -115,7 +115,8 @@ export function TimelineSignatureCancelledEvent({
                         id="timeline.signature-cancelled-request-error.max-size-exceeded.description"
                         defaultMessage="The document exceeds the maximum size allowed. Please, reduce the size of the annexed files and try it again."
                       />
-                    ) : event.errorCode === "CONSENT_REQUIRED" ? (
+                    ) : event.errorCode === "CONSENT_REQUIRED" ||
+                      event.errorCode === "ACCOUNT_SUSPENDED" ? (
                       <FormattedMessage
                         id="timeline.signature-cancelled-request-error.consent-required.description"
                         defaultMessage="The integration has expired and needs to be reauthorized."

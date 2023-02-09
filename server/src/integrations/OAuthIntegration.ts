@@ -1,4 +1,5 @@
 import { Request, RequestHandler, Router } from "express";
+import stringify from "fast-safe-stringify";
 import { injectable } from "inversify";
 import { isDefined } from "remeda";
 import { authenticate } from "../api/helpers/authenticate";
@@ -164,7 +165,10 @@ export abstract class OAuthIntegration<
             newCredentials = await this.refreshCredentials(credentials, context);
           } catch (error) {
             // we couldn't refresh the access token, permissions might be revoked
-            throw new InvalidCredentialsError("CONSENT_REQUIRED");
+            throw new InvalidCredentialsError(
+              "CONSENT_REQUIRED",
+              error instanceof Error ? error.message : stringify(error)
+            );
           }
           await this.updateOrgIntegration(orgIntegrationId, {
             settings: { CREDENTIALS: newCredentials } as IntegrationSettings<TType, TProvider>,
