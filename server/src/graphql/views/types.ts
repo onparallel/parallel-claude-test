@@ -29,7 +29,7 @@ export const PetitionListViewData = objectType({
             type: objectType({
               name: "PetitionListViewDataSharedWithFilters",
               definition(t) {
-                t.nonNull.globalId("value", { prefixName: "User" });
+                t.nonNull.id("value");
                 t.nonNull.field("operator", {
                   type: "FilterSharedWithOperator",
                 });
@@ -87,7 +87,7 @@ export const PetitionListViewDataInput = inputObjectType({
             type: inputObjectType({
               name: "PetitionListViewDataSharedWithFiltersInput",
               definition(t) {
-                t.nonNull.globalId("value", { prefixName: "User" });
+                t.nonNull.id("value");
                 t.nonNull.field("operator", {
                   type: "FilterSharedWithOperator",
                 });

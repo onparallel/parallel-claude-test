@@ -1138,7 +1138,7 @@ export interface MutationcreatePetitionFieldReplyArgs {
 }
 
 export interface MutationcreatePetitionListViewArgs {
-  data?: InputMaybe<PetitionListViewDataInput>;
+  data: PetitionListViewDataInput;
   name: Scalars["String"];
 }
 
@@ -2783,12 +2783,12 @@ export interface PetitionListViewDataSharedWith {
 export interface PetitionListViewDataSharedWithFilters {
   __typename?: "PetitionListViewDataSharedWithFilters";
   operator: FilterSharedWithOperator;
-  value: Scalars["GID"];
+  value: Scalars["ID"];
 }
 
 export interface PetitionListViewDataSharedWithFiltersInput {
   operator: FilterSharedWithOperator;
-  value: Scalars["GID"];
+  value: Scalars["ID"];
 }
 
 export interface PetitionListViewDataSharedWithInput {
@@ -11212,7 +11212,7 @@ export type PetitionListHeader_PetitionListViewFragment = {
 
 export type PetitionListHeader_createPetitionListViewMutationVariables = Exact<{
   name: Scalars["String"];
-  data?: InputMaybe<PetitionListViewDataInput>;
+  data: PetitionListViewDataInput;
 }>;
 
 export type PetitionListHeader_createPetitionListViewMutation = {
@@ -33339,7 +33339,7 @@ export const DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument = 
 export const PetitionListHeader_createPetitionListViewDocument = gql`
   mutation PetitionListHeader_createPetitionListView(
     $name: String!
-    $data: PetitionListViewDataInput
+    $data: PetitionListViewDataInput!
   ) {
     createPetitionListView(name: $name, data: $data) {
       ...PetitionListHeader_PetitionListView

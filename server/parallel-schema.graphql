@@ -959,7 +959,7 @@ type Mutation {
   """
   Creates a view with custom filters and ordering on the user's petitions list
   """
-  createPetitionListView(data: PetitionListViewDataInput, name: String!): PetitionListView!
+  createPetitionListView(data: PetitionListViewDataInput!, name: String!): PetitionListView!
 
   """
   Creates a task for printing a PDF of the petition and sends it to the queue
@@ -3434,12 +3434,12 @@ type PetitionListViewDataSharedWith {
 
 type PetitionListViewDataSharedWithFilters {
   operator: FilterSharedWithOperator!
-  value: GID!
+  value: ID!
 }
 
 input PetitionListViewDataSharedWithFiltersInput {
   operator: FilterSharedWithOperator!
-  value: GID!
+  value: ID!
 }
 
 input PetitionListViewDataSharedWithInput {

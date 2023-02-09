@@ -179,7 +179,7 @@ export interface NexusGenInputs {
   PetitionListViewDataSharedWithFiltersInput: {
     // input type
     operator: NexusGenEnums["FilterSharedWithOperator"]; // FilterSharedWithOperator!
-    value: NexusGenScalars["GID"]; // GID!
+    value: string; // ID!
   };
   PetitionListViewDataSharedWithInput: {
     // input type
@@ -672,7 +672,7 @@ export interface NexusGenObjects {
   PetitionListViewDataSharedWithFilters: {
     // root type
     operator: NexusGenEnums["FilterSharedWithOperator"]; // FilterSharedWithOperator!
-    value: NexusGenScalars["GID"]; // GID!
+    value: string; // ID!
   };
   PetitionListViewSort: {
     // root type
@@ -1824,7 +1824,7 @@ export interface NexusGenFieldTypes {
   PetitionListViewDataSharedWithFilters: {
     // field return type
     operator: NexusGenEnums["FilterSharedWithOperator"]; // FilterSharedWithOperator!
-    value: NexusGenScalars["GID"]; // GID!
+    value: string; // ID!
   };
   PetitionListViewSort: {
     // field return type
@@ -3593,7 +3593,7 @@ export interface NexusGenFieldTypeNames {
   PetitionListViewDataSharedWithFilters: {
     // field return type name
     operator: "FilterSharedWithOperator";
-    value: "GID";
+    value: "ID";
   };
   PetitionListViewSort: {
     // field return type name
@@ -4678,7 +4678,7 @@ export interface NexusGenArgTypes {
     };
     createPetitionListView: {
       // args
-      data?: NexusGenInputs["PetitionListViewDataInput"] | null; // PetitionListViewDataInput
+      data: NexusGenInputs["PetitionListViewDataInput"]; // PetitionListViewDataInput!
       name: string; // String!
     };
     createPrintPdfTask: {

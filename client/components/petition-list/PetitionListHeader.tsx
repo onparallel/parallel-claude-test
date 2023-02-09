@@ -352,7 +352,7 @@ const _mutations = [
   gql`
     mutation PetitionListHeader_createPetitionListView(
       $name: String!
-      $data: PetitionListViewDataInput
+      $data: PetitionListViewDataInput!
     ) {
       createPetitionListView(name: $name, data: $data) {
         ...PetitionListHeader_PetitionListView

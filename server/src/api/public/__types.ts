@@ -1094,7 +1094,7 @@ export type MutationcreatePetitionFieldReplyArgs = {
 };
 
 export type MutationcreatePetitionListViewArgs = {
-  data?: InputMaybe<PetitionListViewDataInput>;
+  data: PetitionListViewDataInput;
   name: Scalars["String"];
 };
 
@@ -2696,12 +2696,12 @@ export type PetitionListViewDataSharedWith = {
 
 export type PetitionListViewDataSharedWithFilters = {
   operator: FilterSharedWithOperator;
-  value: Scalars["GID"];
+  value: Scalars["ID"];
 };
 
 export type PetitionListViewDataSharedWithFiltersInput = {
   operator: FilterSharedWithOperator;
-  value: Scalars["GID"];
+  value: Scalars["ID"];
 };
 
 export type PetitionListViewDataSharedWithInput = {

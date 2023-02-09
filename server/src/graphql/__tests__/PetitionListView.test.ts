@@ -33,7 +33,7 @@ describe("GraphQL/PetitionListView", () => {
             filters: [
               {
                 operator: "SHARED_WITH",
-                value: user.id,
+                value: toGlobalId("User", user.id),
               },
             ],
             operator: "AND",
@@ -126,7 +126,7 @@ describe("GraphQL/PetitionListView", () => {
     it("creates a new view with custom filters and sorting", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($name: String!, $data: PetitionListViewDataInput) {
+          mutation ($name: String!, $data: PetitionListViewDataInput!) {
             createPetitionListView(name: $name, data: $data) {
               id
               name
@@ -270,7 +270,7 @@ describe("GraphQL/PetitionListView", () => {
     beforeEach(async () => {
       const { data } = await testClient.execute(
         gql`
-          mutation ($name: String!, $data: PetitionListViewDataInput) {
+          mutation ($name: String!, $data: PetitionListViewDataInput!) {
             createPetitionListView(name: $name, data: $data) {
               id
             }
@@ -354,7 +354,7 @@ describe("GraphQL/PetitionListView", () => {
     beforeEach(async () => {
       const { data } = await testClient.execute(
         gql`
-          mutation ($name: String!, $data: PetitionListViewDataInput) {
+          mutation ($name: String!, $data: PetitionListViewDataInput!) {
             createPetitionListView(name: $name, data: $data) {
               id
             }
