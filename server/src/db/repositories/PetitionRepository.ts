@@ -2257,7 +2257,7 @@ export class PetitionRepository extends BaseRepository {
               fields.map((field) => ({
                 ...omit(field, ["id", "petition_id", "created_at", "updated_at"]),
                 petition_id: cloned.id,
-                from_petition_field_id: field.id,
+                from_petition_field_id: field.from_petition_field_id ?? field.id,
                 created_by: createdBy,
                 updated_by: createdBy,
               })),
