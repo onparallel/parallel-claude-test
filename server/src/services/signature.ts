@@ -21,7 +21,7 @@ interface UpdateBrandingOpts {
 }
 export interface ISignatureService {
   getClient<TClient extends ISignatureClient>(integration: {
-    id?: number;
+    id: number;
     provider: SignatureProvider;
   }): TClient;
   createSignatureRequest(
@@ -63,13 +63,11 @@ export class SignatureService implements ISignatureService {
   ) {}
 
   public getClient<TClient extends ISignatureClient>(integration: {
-    id?: number;
+    id: number;
     provider: SignatureProvider;
   }) {
     const client = this.container.getNamed<TClient>(SIGNATURE_CLIENT, integration.provider);
-    if (isDefined(integration.id)) {
-      client.configure(integration.id);
-    }
+    client.configure(integration.id);
     return client;
   }
 

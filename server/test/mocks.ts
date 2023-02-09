@@ -7,14 +7,12 @@ import { User } from "../src/db/__types";
 import { EMAIL_REGEX } from "../src/graphql/helpers/validators/validEmail";
 import { IAnalyticsService } from "../src/services/analytics";
 import { IAuth } from "../src/services/auth";
-import { IQueuesService } from "../src/services/queues";
 import { IEmailsService } from "../src/services/emails";
 import { IFetchService } from "../src/services/fetch";
+import { IQueuesService } from "../src/services/queues";
 import { IRedis } from "../src/services/redis";
-import { ISignatureService, SignatureService } from "../src/services/signature";
 import { IStorageImpl, IStorageService } from "../src/services/storage";
 import { random } from "../src/util/token";
-import { SignatureEnvironment } from "../src/db/repositories/IntegrationRepository";
 
 export const USER_COGNITO_ID = "test-cognito-id";
 
@@ -154,12 +152,5 @@ export class MockFetchService implements IFetchService {
   }
   async fetchWithTimeout() {
     return new Response("OK", { status: 200 });
-  }
-}
-
-@injectable()
-export class MockSignatureService extends SignatureService implements ISignatureService {
-  async checkSignaturitApiKey(): Promise<SignatureEnvironment> {
-    return "sandbox";
   }
 }

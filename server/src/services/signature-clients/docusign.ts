@@ -4,10 +4,11 @@ import { inject, injectable } from "inversify";
 import { basename, extname } from "path";
 import { Config, CONFIG } from "../../config";
 import {
-  DocusignOauthIntegration,
-  DocusignOauthIntegrationContext,
-} from "../../integrations/DocusignOauthIntegration";
+  DocusignIntegration,
+  DocusignIntegrationContext,
+} from "../../integrations/DocusignIntegration";
 import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
+import { OauthExpiredCredentialsError } from "../../integrations/OAuthIntegration";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { safeJsonParse } from "../../util/safeJsonParse";
@@ -19,7 +20,7 @@ export class DocuSignClient implements ISignatureClient {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(I18N_SERVICE) private i18n: II18nService,
-    @inject(DocusignOauthIntegration) private docusignOauth: DocusignOauthIntegration
+    @inject(DocusignIntegration) private docusignOauth: DocusignIntegration
   ) {}
 
   private integrationId!: number;
@@ -43,12 +44,12 @@ export class DocuSignClient implements ISignatureClient {
   private async withDocusignSdk<TResult>(
     handler: (
       apis: { envelopes: EnvelopesApi; accounts: AccountsApi },
-      context: DocusignOauthIntegrationContext
+      context: DocusignIntegrationContext
     ) => Promise<TResult>
   ): Promise<TResult> {
     return this.docusignOauth.withAccessToken(this.integrationId, async (accessToken, context) => {
       const client = new ApiClient();
-      client.setBasePath(`${context.API_BASE_PATH}/restapi`);
+      client.setBasePath(`${context.apiBasePath}/restapi`);
       client.addDefaultHeader("Authorization", `Bearer ${accessToken}`);
 
       try {
@@ -60,14 +61,14 @@ export class DocuSignClient implements ISignatureClient {
           context
         );
       } catch (error) {
-        if (this.isConsentRequiredError(error)) {
-          throw new InvalidCredentialsError("CONSENT_REQUIRED", true);
-        }
         if (this.isAccessTokenExpiredError(error)) {
-          throw new InvalidCredentialsError("EXPIRED_CREDENTIALS");
+          throw new OauthExpiredCredentialsError();
         }
         if (this.isAccountSuspendedError(error)) {
           throw new InvalidCredentialsError("ACCOUNT_SUSPENDED");
+        }
+        if (this.isConsentRequiredError(error)) {
+          throw new InvalidCredentialsError("CONSENT_REQUIRED");
         }
         throw error;
       }
@@ -81,7 +82,7 @@ export class DocuSignClient implements ISignatureClient {
     recipients: Recipient[],
     options: SignatureOptions
   ): Promise<SignatureResponse> {
-    return await this.withDocusignSdk(async ({ envelopes }, { USER_ACCOUNT_ID: userAccountId }) => {
+    return await this.withDocusignSdk(async ({ envelopes }, { userAccountId }) => {
       const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
 
       const intl = await this.i18n.getIntl(options.locale);
@@ -181,7 +182,7 @@ export class DocuSignClient implements ISignatureClient {
   }
 
   async cancelSignatureRequest(externalId: string) {
-    await this.withDocusignSdk(async ({ envelopes }, { USER_ACCOUNT_ID: userAccountId }) => {
+    await this.withDocusignSdk(async ({ envelopes }, { userAccountId }) => {
       const intl = await this.i18n.getIntl("es");
       await envelopes.update(userAccountId, externalId, {
         envelope: {
@@ -200,7 +201,7 @@ export class DocuSignClient implements ISignatureClient {
   }
 
   async downloadSignedDocument(externalId: string): Promise<Buffer> {
-    return await this.withDocusignSdk(async ({ envelopes }, { USER_ACCOUNT_ID: userAccountId }) => {
+    return await this.withDocusignSdk(async ({ envelopes }, { userAccountId }) => {
       return Buffer.from(
         await envelopes.getDocument(userAccountId, externalId, "combined", {}),
         "binary"
@@ -209,7 +210,7 @@ export class DocuSignClient implements ISignatureClient {
   }
 
   async downloadAuditTrail(externalId: string): Promise<Buffer> {
-    return await this.withDocusignSdk(async ({ envelopes }, { USER_ACCOUNT_ID: userAccountId }) => {
+    return await this.withDocusignSdk(async ({ envelopes }, { userAccountId }) => {
       return Buffer.from(
         await envelopes.getDocument(userAccountId, externalId, "certificate", {}),
         "binary"
@@ -218,7 +219,7 @@ export class DocuSignClient implements ISignatureClient {
   }
 
   async sendPendingSignatureReminder(externalId: string) {
-    await this.withDocusignSdk(async ({ envelopes }, { USER_ACCOUNT_ID: userAccountId }) => {
+    await this.withDocusignSdk(async ({ envelopes }, { userAccountId }) => {
       await envelopes.update(userAccountId, externalId, {
         resendEnvelope: true,
       });

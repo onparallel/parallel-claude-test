@@ -1,14 +1,9 @@
 import { inject, injectable } from "inversify";
 import pMap from "p-map";
-import { isDefined } from "remeda";
 import SignaturitSDK, { BrandingParams } from "signaturit-sdk";
 import { URLSearchParams } from "url";
 import { CONFIG, Config } from "../../config";
-import {
-  IntegrationRepository,
-  IntegrationSettings,
-  SignatureEnvironment,
-} from "../../db/repositories/IntegrationRepository";
+import { IntegrationRepository } from "../../db/repositories/IntegrationRepository";
 import { OrganizationRepository } from "../../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../../db/repositories/PetitionRepository";
 import { buildEmail } from "../../emails/buildEmail";
@@ -16,12 +11,16 @@ import SignatureCancelledEmail from "../../emails/emails/SignatureCancelledEmail
 import SignatureCompletedEmail from "../../emails/emails/SignatureCompletedEmail";
 import SignatureReminderEmail from "../../emails/emails/SignatureReminderEmail";
 import SignatureRequestedEmail from "../../emails/emails/SignatureRequestedEmail";
-import { Tone } from "../../emails/utils/types";
+import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
+import {
+  BrandingIdKey,
+  SignaturitIntegration,
+  SignaturitIntegrationContext,
+} from "../../integrations/SignaturitIntegration";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { downloadImageBase64 } from "../../util/images";
 import { EMAILS, IEmailsService } from "../emails";
-import { FETCH_SERVICE, IFetchService } from "../fetch";
 import { I18N_SERVICE, II18nService } from "../i18n";
 import { IOrganizationCreditsService, ORGANIZATION_CREDITS_SERVICE } from "../organization-credits";
 import {
@@ -31,33 +30,18 @@ import {
 } from "../organization-layout";
 import { ISignatureClient, Recipient, SignatureOptions } from "./client";
 
-type BrandingIdKey = `${"EN" | "ES"}_${Tone}_BRANDING_ID`;
-
-interface SignaturitBranding {
-  locale: string;
-  tone: Tone;
-  brandingId: string;
-}
-
-interface SignaturitClientContext {
-  isSharedProductionApiKey: boolean;
-  apiKeyHint: string;
-  showCsv: boolean;
-  brandings: SignaturitBranding[];
-}
-
 @injectable()
 export class SignaturitClient implements ISignatureClient {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(I18N_SERVICE) private i18n: II18nService,
-    @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(EMAILS) private emails: IEmailsService,
     @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: IOrganizationCreditsService,
     @inject(ORGANIZATION_LAYOUT_SERVICE) private layouts: IOrganizationLayoutService,
     @inject(IntegrationRepository) private integrations: IntegrationRepository,
     @inject(PetitionRepository) private petitions: PetitionRepository,
-    @inject(OrganizationRepository) private organizations: OrganizationRepository
+    @inject(OrganizationRepository) private organizations: OrganizationRepository,
+    @inject(SignaturitIntegration) private signaturitApiKey: SignaturitIntegration
   ) {}
   private integrationId!: number;
 
@@ -65,62 +49,20 @@ export class SignaturitClient implements ISignatureClient {
     this.integrationId = integrationId;
   }
 
-  async authenticate(apiKey: string) {
-    return await Promise.any(
-      Object.entries({
-        sandbox: "https://api.sandbox.signaturit.com",
-        production: "https://api.signaturit.com",
-      }).map(([environment, url]) =>
-        this.fetch
-          .fetchWithTimeout(
-            `${url}/v3/team/users.json`,
-            {
-              headers: { authorization: `Bearer ${apiKey}` },
-            },
-            5000
-          )
-          .then(({ status }) => {
-            if (status === 200) {
-              return { environment: environment as SignatureEnvironment };
-            } else {
-              throw new Error();
-            }
-          })
-      )
-    );
-  }
-
   private async withSignaturitSDK<TResult>(
-    handler: (sdk: SignaturitSDK, context: SignaturitClientContext) => Promise<TResult>
+    handler: (sdk: SignaturitSDK, context: SignaturitIntegrationContext) => Promise<TResult>
   ): Promise<TResult> {
-    const integration = (await this.integrations.loadIntegration(this.integrationId))!;
-    const settings = integration.settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
-    const sdk = new SignaturitSDK(
-      settings.CREDENTIALS.API_KEY,
-      settings.ENVIRONMENT === "production"
-    );
-
-    const brandings: SignaturitBranding[] = [];
-    ["EN_FORMAL", "EN_INFORMAL", "ES_FORMAL", "ES_INFORMAL"].forEach((key) => {
-      if (isDefined(settings[`${key}_BRANDING_ID` as BrandingIdKey])) {
-        const [locale, tone] = key.split("_") as ["EN" | "ES", Tone];
-        brandings.push({
-          locale: locale.toLowerCase(),
-          tone,
-          brandingId: settings[`${key}_BRANDING_ID` as BrandingIdKey]!,
-        });
+    return this.signaturitApiKey.withApiKey(this.integrationId, async (apiKey, context) => {
+      try {
+        const sdk = new SignaturitSDK(apiKey, context.environment === "production");
+        return await handler(sdk, context);
+      } catch (e: any) {
+        if (e?.error === "invalid_grant") {
+          throw new InvalidCredentialsError("INVALID_CREDENTIALS", e?.message);
+        }
+        throw e;
       }
     });
-
-    const context = {
-      apiKeyHint: settings.CREDENTIALS.API_KEY.slice(0, 10),
-      isSharedProductionApiKey:
-        settings.CREDENTIALS.API_KEY === this.config.signature.signaturitSharedProductionApiKey,
-      showCsv: settings.SHOW_CSV ?? false,
-      brandings,
-    };
-
-    return await handler(sdk, context);
   }
 
   async startSignatureRequest(
@@ -150,23 +92,16 @@ export class SignaturitClient implements ISignatureClient {
       const tone = templateData.theme.preferredTone ?? "INFORMAL";
 
       try {
-        if (context.isSharedProductionApiKey) {
+        if (context.isParallelManaged) {
           await this.orgCredits.consumeSignaturitApiKeyCredits(orgId, 1);
         }
 
-        const integration = (await this.integrations.loadIntegration(this.integrationId))!;
-        const settings = integration.settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
-        const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as BrandingIdKey;
-        let brandingId = settings[key];
+        const branding = context.brandings.find((b) => b.locale === locale && b.tone === tone);
+        let brandingId = branding?.brandingId;
         if (!brandingId) {
           brandingId = await this.createSignaturitBranding(orgId, locale);
-          settings[key] = brandingId;
-
-          this.integrations.updateOrgIntegration<"SIGNATURE">(
-            this.integrationId,
-            { settings },
-            `OrgIntegration:${this.integrationId}`
-          );
+          const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as BrandingIdKey;
+          await context.onUpdateBrandingId(key, brandingId);
         }
 
         const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);

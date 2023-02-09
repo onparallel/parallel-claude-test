@@ -8520,6 +8520,11 @@
     "context": "Error"
   },
   {
+    "term": "page.signature.invalid-credentials-popover",
+    "definition": "Las credenciales proporcionadas no son más válidas y necesitan ser actualizadas.",
+    "context": "The provided credentials are not valid anymore and need to be updated."
+  },
+  {
     "term": "page.signature.provider-added-successfully.toast-description",
     "definition": "La integración con {provider} se creó correctamente.",
     "context": "{provider} integration created successfully."
@@ -10816,33 +10821,38 @@
   },
   {
     "term": "timeline.signature-cancelled-request-error.consent-required.description",
-    "definition": "La integración de firma digital ha caducado y necesita reautorizarse {timeAgo}",
-    "context": "The eSignature integration has expired and needs to be reauthorized {timeAgo}"
+    "definition": "La integración de firma digital ha caducado y necesita reautorizarse.",
+    "context": "The integration has expired and needs to be reauthorized."
+  },
+  {
+    "term": "timeline.signature-cancelled-request-error.description",
+    "definition": "La firma se ha cancelado debido a un error con el proveedor {timeAgo}: {message}",
+    "context": "The eSignature has been cancelled due to an error from the provider {timeAgo}: {message}"
   },
   {
     "term": "timeline.signature-cancelled-request-error.email-bounced.description",
-    "definition": "El proceso de firma se ha cancelado debido a un error con {hasEmail, select, true{el correo <b><{signerEmail}></b>} other{un correo}} {timeAgo}",
-    "context": "The eSignature process has been cancelled due to an error with {hasEmail, select, true{<b><{signerEmail}></b>} other{an email}} {timeAgo}"
+    "definition": "{hasEmail, select, true{El correo <{signerEmail}>} other{Un correo}} ha rebotado.",
+    "context": "{hasEmail, select, true{The email<{signerEmail}>} other{an email}} has bounced."
   },
   {
     "term": "timeline.signature-cancelled-request-error.insufficient-credits.description",
-    "definition": "No se ha podido iniciar el proceso de firma por falta de créditos de firma {timeAgo}",
+    "definition": "No se ha podido iniciar el proceso de firma por falta de créditos {timeAgo}",
     "context": "The eSignature could not be started due to lack of signature credits {timeAgo}"
   },
   {
-    "term": "timeline.signature-cancelled-request-error.max-size-exceeded.description",
-    "definition": "El proceso de firma se ha cancelado porque el documento excede el tamaño máximo permitido por el proveedor {timeAgo}",
-    "context": "The eSignature process has been cancelled because the document exceeds the maximum size allowed by the provider {timeAgo}"
+    "term": "timeline.signature-cancelled-request-error.invalid-credentials.description",
+    "definition": "Las credenciales proporcionadas no son más válidas y necesitan ser actualizadas.",
+    "context": "The provided credentials are not valid anymore and need to be updated."
   },
   {
-    "term": "timeline.signature-cancelled-request-error.max-size-exceeded.help",
-    "definition": "Por favor, reduce el tamaño de los archivos anexos e inténtalo de nuevo.",
-    "context": "Please, reduce the size of the annexed files and try it again."
+    "term": "timeline.signature-cancelled-request-error.max-size-exceeded.description",
+    "definition": "El documento excede el tamaño máximo permitido. Por favor, reduce el tamaño de los archivos anexos e inténtalo de nuevo.",
+    "context": "The document exceeds the maximum size allowed. Please, reduce the size of the annexed files and try it again."
   },
   {
     "term": "timeline.signature-cancelled-request-error.unknown.description",
-    "definition": "El proceso de firma ha sido cancelado debido a un error desconocido {timeAgo}",
-    "context": "The eSignature process has been cancelled due to an unknown error {timeAgo}"
+    "definition": "Ocurrió un error desconocido.",
+    "context": "An unknown error happened."
   },
   {
     "term": "timeline.signature-completed-description",

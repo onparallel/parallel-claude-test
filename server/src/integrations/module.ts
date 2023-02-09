@@ -1,6 +1,8 @@
 import { ContainerModule } from "inversify";
-import { DocusignOauthIntegration } from "./DocusignOauthIntegration";
+import { DocusignIntegration } from "./DocusignIntegration";
+import { SignaturitIntegration } from "./SignaturitIntegration";
 
 export const integrationsModule = new ContainerModule((bind) => {
-  bind<DocusignOauthIntegration>(DocusignOauthIntegration).toSelf();
+  bind<DocusignIntegration>(DocusignIntegration).toSelf();
+  bind<SignaturitIntegration>(SignaturitIntegration).toSelf();
 });

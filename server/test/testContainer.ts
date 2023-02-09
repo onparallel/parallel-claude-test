@@ -1,21 +1,19 @@
 import { createContainer } from "../src/container";
 import { ANALYTICS, IAnalyticsService } from "../src/services/analytics";
 import { AUTH, IAuth } from "../src/services/auth";
-import { QUEUES_SERVICE, IQueuesService } from "../src/services/queues";
 import { EMAILS, IEmailsService } from "../src/services/emails";
 import { FETCH_SERVICE, IFetchService } from "../src/services/fetch";
 import { ILogger, LOGGER } from "../src/services/logger";
+import { IQueuesService, QUEUES_SERVICE } from "../src/services/queues";
 import { IRedis, REDIS } from "../src/services/redis";
-import { ISignatureService, SIGNATURE } from "../src/services/signature";
 import { IStorageService, STORAGE_SERVICE } from "../src/services/storage";
 import {
   MockAnalyticsService,
   MockAuth,
-  MockQueuesService,
   MockEmailsService,
   MockFetchService,
+  MockQueuesService,
   MockRedis,
-  MockSignatureService,
   MockStorage,
 } from "./mocks";
 
@@ -28,7 +26,6 @@ export function createTestContainer() {
   container.rebind<IEmailsService>(EMAILS).to(MockEmailsService).inSingletonScope();
   container.rebind<IQueuesService>(QUEUES_SERVICE).to(MockQueuesService).inSingletonScope();
   container.rebind<IFetchService>(FETCH_SERVICE).to(MockFetchService).inSingletonScope();
-  container.rebind<ISignatureService>(SIGNATURE).to(MockSignatureService).inSingletonScope();
   container.rebind<IStorageService>(STORAGE_SERVICE).to(MockStorage);
   return container;
 }

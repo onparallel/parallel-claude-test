@@ -1,5 +1,5 @@
-import { booleanArg, mutationField, nonNull, nullable, objectType, stringArg } from "nexus";
-import { SignaturitClient } from "../../services/signature-clients/signaturit";
+import { booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { SignaturitEnvironment } from "../../integrations/SignaturitIntegration";
 import { withError } from "../../util/promises/withError";
 import { encrypt } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
@@ -36,30 +36,17 @@ export const markSignatureIntegrationAsDefault = mutationField(
 
 export const validateSignaturitApiKey = mutationField("validateSignaturitApiKey", {
   description: "Runs backend checks to validate signaturit credentials.",
-  type: nonNull(
-    objectType({
-      name: "ValidateSignatureCredentialsResult",
-      definition(t) {
-        t.nonNull.boolean("success");
-        t.nullable.jsonObject("data");
-      },
-    })
-  ),
+  type: nonNull("Result"),
   authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("PETITION_SIGNATURE")),
   args: {
     apiKey: nonNull(stringArg()),
   },
   resolve: async (_, args, ctx) => {
     try {
-      const signaturit = ctx.signature.getClient<SignaturitClient>({
-        provider: "SIGNATURIT",
-      });
-      return {
-        success: true,
-        data: await signaturit.authenticate(args.apiKey),
-      };
+      await ctx.setup.authenticateSignaturitApiKey(args.apiKey);
+      return RESULT.SUCCESS;
     } catch {}
-    return { success: false };
+    return RESULT.FAILURE;
   },
 });
 
@@ -73,42 +60,27 @@ export const createSignaturitIntegration = mutationField("createSignaturitIntegr
     isDefault: nullable(booleanArg()),
   },
   resolve: async (_, args, ctx) => {
-    const signaturit = ctx.signature.getClient<SignaturitClient>({ provider: "SIGNATURIT" });
-    const [error, data] = await withError(signaturit.authenticate(args.apiKey));
-    if (error || !data.environment) {
+    let environment: SignaturitEnvironment | undefined;
+    try {
+      const result = await ctx.setup.authenticateSignaturitApiKey(args.apiKey);
+      environment = result.environment;
+    } catch {
       throw new ApolloError(
         `Unable to check Signaturit APIKEY environment`,
         "INVALID_APIKEY_ERROR"
       );
     }
-
-    const newIntegration = await ctx.integrations.createOrgIntegration<"SIGNATURE", "SIGNATURIT">(
+    return await ctx.setup.createSignaturitIntegration(
       {
-        type: "SIGNATURE",
-        provider: "SIGNATURIT",
-        org_id: ctx.user!.org_id,
         name: args.name,
-        settings: {
-          CREDENTIALS: {
-            API_KEY: args.apiKey,
-          },
-          ENVIRONMENT: data.environment,
-        },
-        is_enabled: true,
+        org_id: ctx.user!.org_id,
+        is_default: args.isDefault ?? false,
       },
+      args.apiKey,
+      environment,
+      false,
       `User:${ctx.user!.id}`
     );
-
-    if (args.isDefault) {
-      return await ctx.integrations.setDefaultOrgIntegration(
-        newIntegration.id,
-        "SIGNATURE",
-        ctx.user!.org_id,
-        `User:${ctx.user!.id}`
-      );
-    } else {
-      return newIntegration;
-    }
   },
 });
 

@@ -881,7 +881,7 @@ export type Mutation = {
   /** Tries to get an access_token with provided credentials */
   validateDowJonesKycCredentials: Scalars["Boolean"];
   /** Runs backend checks to validate signaturit credentials. */
-  validateSignaturitApiKey: ValidateSignatureCredentialsResult;
+  validateSignaturitApiKey: Result;
   verifyPublicAccess: PublicAccessVerification;
 };
 
@@ -4217,11 +4217,6 @@ export type UserPermissionRemovedEvent = PetitionEvent & {
 };
 
 export type UserStatus = "ACTIVE" | "INACTIVE";
-
-export type ValidateSignatureCredentialsResult = {
-  data: Maybe<Scalars["JSONObject"]>;
-  success: Scalars["Boolean"];
-};
 
 export type VerificationCodeCheck = {
   remainingAttempts: Maybe<Scalars["Int"]>;

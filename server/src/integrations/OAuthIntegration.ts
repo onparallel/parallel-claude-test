@@ -1,18 +1,18 @@
 import { Request, RequestHandler, Router } from "express";
 import { injectable } from "inversify";
-import { isDefined, omit } from "remeda";
+import { isDefined } from "remeda";
 import { authenticate } from "../api/helpers/authenticate";
 import { Config } from "../config";
 import {
+  IntegrationProvider,
   IntegrationRepository,
-  SignatureEnvironment,
+  IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
-import { CreateOrgIntegration, IntegrationType, OrgIntegration } from "../db/__types";
+import { IntegrationType } from "../db/__types";
 import { IRedis } from "../services/redis";
 import { fromGlobalId } from "../util/globalId";
-import { withError } from "../util/promises/withError";
 import { random } from "../util/token";
-import { Maybe, MaybePromise } from "../util/types";
+import { MaybePromise } from "../util/types";
 
 import { GenericIntegration, InvalidCredentialsError } from "./GenericIntegration";
 
@@ -21,10 +21,21 @@ export interface OauthCredentials {
   REFRESH_TOKEN: string;
 }
 
+export interface OauthIntegrationState {
+  // When reautorizing this is the OrgIntegration ID
+  id?: number;
+  orgId: number;
+  name: string;
+  isDefault: boolean;
+}
+
 @injectable()
 export abstract class OAuthIntegration<
+  TType extends IntegrationType,
+  TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
+  TState extends OauthIntegrationState = OauthIntegrationState,
   WithAccessTokenContext extends {} = {}
-> extends GenericIntegration<OauthCredentials, WithAccessTokenContext> {
+> extends GenericIntegration<TType, TProvider, WithAccessTokenContext> {
   constructor(
     protected override config: Config,
     protected override integrations: IntegrationRepository,
@@ -32,28 +43,46 @@ export abstract class OAuthIntegration<
   ) {
     super(config, integrations);
   }
-  abstract readonly orgIntegrationType: IntegrationType;
-  abstract readonly provider: string;
 
-  abstract buildAuthorizationUrl(state: string): MaybePromise<string>;
-  abstract fetchCredentialsAndContextData(
+  protected async orgHasAccessToIntegration(orgId: number, state: TState): Promise<boolean> {
+    return true;
+  }
+
+  protected buildState(req: Request): MaybePromise<TState> {
+    const orgId = req.context.user!.org_id;
+    const { id, isDefault, name } = req.query as {
+      id?: string;
+      isDefault: string;
+      name: string;
+    };
+    const state = {
+      orgId,
+      name,
+      isDefault: isDefault === "true",
+    } as TState;
+    if (isDefined(id)) {
+      state.id = fromGlobalId(id, "OrgIntegration").id;
+    }
+    return state;
+  }
+
+  abstract buildAuthorizationUrl(state: string, stateValue: TState): MaybePromise<string>;
+
+  abstract fetchIntegrationSettings(
     code: string,
-    stateArgs: any
-  ): Promise<{ CREDENTIALS: OauthCredentials } & WithAccessTokenContext>;
+    state: TState
+  ): Promise<IntegrationSettings<TType, TProvider>>;
+
   abstract refreshCredentials(
     credentials: OauthCredentials,
     context: WithAccessTokenContext
   ): Promise<OauthCredentials>;
 
-  protected orgHasAccessToIntegration(orgId: number, req: Request): MaybePromise<boolean> {
-    return true;
-  }
-
-  private async storeState(key: string, value: any) {
+  private async storeState(key: string, value: TState) {
     await this.redis.set(`oauth.${key}`, JSON.stringify(value), 10 * 60);
   }
 
-  private async getState<T = any>(key: string): Promise<T> {
+  private async getState(key: string): Promise<TState> {
     const result = await this.redis.get(`oauth.${key}`);
     if (!isDefined(result)) {
       throw new Error("Missing state");
@@ -61,76 +90,19 @@ export abstract class OAuthIntegration<
     return JSON.parse(result);
   }
 
-  private async createIntegration(data: CreateOrgIntegration) {
-    const integration = await this.integrations.createOrgIntegration(
-      {
-        ...data,
-        settings: {
-          CREDENTIALS: this.encryptCredentials(data.settings.CREDENTIALS),
-          ...omit(data!.settings, ["CREDENTIALS"]),
-        },
-      },
-      `Organization:${data.org_id}`
-    );
-    if (data.is_default) {
-      await this.integrations.setDefaultOrgIntegration(
-        integration.id,
-        data.type,
-        data.org_id,
-        `Organization:${data.org_id}`
-      );
-    }
-  }
-
-  private async updateIntegration(orgIntegrationId: number, data: Partial<OrgIntegration>) {
-    const integration = (await this.integrations.loadIntegration(orgIntegrationId))!;
-    await this.integrations.updateOrgIntegration(
-      orgIntegrationId,
-      {
-        ...data,
-        settings: {
-          CREDENTIALS: this.encryptCredentials(data.settings.CREDENTIALS),
-          ...omit(data!.settings, ["CREDENTIALS"]),
-        },
-      },
-      `OrgIntegration:${orgIntegrationId}`
-    );
-
-    if (data.is_default) {
-      await this.integrations.setDefaultOrgIntegration(
-        orgIntegrationId,
-        integration.type,
-        integration.org_id,
-        `OrgIntegration:${orgIntegrationId}`
-      );
-    }
-  }
-
   public handler(): RequestHandler {
     return Router()
       .get("/authorize", authenticate(), async (req, res, next) => {
         try {
-          const orgId = req.context.user!.org_id;
-          const { id, isDefault, name, environment } = req.query as {
-            id?: string;
-            isDefault: string;
-            name: string;
-            environment: SignatureEnvironment;
-          };
+          const state = await this.buildState(req);
 
-          if (!(await this.orgHasAccessToIntegration(orgId, req))) {
+          if (!(await this.orgHasAccessToIntegration(state.orgId, state))) {
             res.status(403).send("Not authorized");
             return;
           }
-          const state = random(16);
-          await this.storeState(state, {
-            id: id ? fromGlobalId(id, "OrgIntegration").id : null,
-            orgId,
-            name,
-            isDefault: isDefault === "true",
-            environment,
-          });
-          const url = await this.buildAuthorizationUrl(state);
+          const key = random(16);
+          await this.storeState(key, state);
+          const url = await this.buildAuthorizationUrl(key, state);
           res.redirect(url);
         } catch (error) {
           req.context.logger.error(error);
@@ -143,40 +115,30 @@ export abstract class OAuthIntegration<
             <script>window.opener.postMessage({ success: ${success} }, "*");</script>
           `;
 
-          const { state, code } = req.query;
-          if (typeof state !== "string" || typeof code !== "string") {
+          const { state: key, code } = req.query;
+          if (typeof key !== "string" || typeof code !== "string") {
             res.send(response(false));
           } else {
-            const args = await this.getState<{
-              id: Maybe<number>;
-              orgId: number;
-              isDefault: boolean;
-              name: string;
-              environment: SignatureEnvironment;
-            }>(state);
+            const state = await this.getState(key);
 
-            const credentials = await this.fetchCredentialsAndContextData(code, args);
-            if (isDefined(args.id)) {
-              const integration = (await this.integrations.loadIntegration(args.id))!;
-              await this.updateIntegration(args.id, {
-                name: args.name,
-                is_default: args.isDefault,
-                settings: {
-                  ...integration.settings,
-                  ...credentials,
-                },
+            const settings = await this.fetchIntegrationSettings(code, state);
+            if (isDefined(state.id)) {
+              await this.updateOrgIntegration(state.id, {
+                name: state.name,
+                is_default: state.isDefault,
+                settings,
                 invalid_credentials: false,
               });
             } else {
-              await this.createIntegration({
-                type: this.orgIntegrationType,
-                provider: this.provider,
-                name: args.name,
-                org_id: args.orgId,
-                is_default: args.isDefault,
-                is_enabled: true,
-                settings: credentials,
-              });
+              await this.createOrgIntegration(
+                {
+                  name: state.name,
+                  org_id: state.orgId,
+                  is_default: state.isDefault,
+                  settings,
+                },
+                `Organization:${state.orgId}`
+              );
             }
 
             res.send(response(true));
@@ -191,36 +153,33 @@ export abstract class OAuthIntegration<
     orgIntegrationId: number,
     handler: (accessToken: string, context: WithAccessTokenContext) => Promise<TResult>
   ): Promise<TResult> {
-    return await this.withCredentials(
-      orgIntegrationId,
-      async (credentials, context, integration) => {
-        try {
-          return await handler(credentials.ACCESS_TOKEN, context);
-        } catch (error) {
-          if (
-            error instanceof InvalidCredentialsError &&
-            error.message === "EXPIRED_CREDENTIALS" &&
-            !error.skipRefresh
-          ) {
-            const [refreshError, newCredentials] = await withError(
-              this.refreshCredentials(credentials, context)
-            );
-            if (isDefined(refreshError)) {
-              // we couldn't refresh the access token, permissions might be revoked
-              throw new InvalidCredentialsError("CONSENT_REQUIRED", true);
-            } else {
-              await this.updateIntegration(orgIntegrationId, {
-                settings: {
-                  ...integration.settings,
-                  CREDENTIALS: newCredentials,
-                },
-              });
-              return await handler(newCredentials!.ACCESS_TOKEN, context);
-            }
+    return await this.withCredentials(orgIntegrationId, async (credentials, context) => {
+      try {
+        return await handler(credentials.ACCESS_TOKEN, context);
+      } catch (error) {
+        if (error instanceof OauthExpiredCredentialsError) {
+          // Refresh credentials and try again
+          let newCredentials: OauthCredentials | undefined;
+          try {
+            newCredentials = await this.refreshCredentials(credentials, context);
+          } catch (error) {
+            // we couldn't refresh the access token, permissions might be revoked
+            throw new InvalidCredentialsError("CONSENT_REQUIRED");
           }
-          throw error;
+          await this.updateOrgIntegration(orgIntegrationId, {
+            settings: { CREDENTIALS: newCredentials } as IntegrationSettings<TType, TProvider>,
+          });
+          return await handler(newCredentials!.ACCESS_TOKEN, context);
         }
+        throw error;
       }
-    );
+    });
+  }
+}
+
+export class OauthExpiredCredentialsError extends InvalidCredentialsError {
+  override name = "ExpiredCredentialsError";
+  constructor(message?: string) {
+    super("EXPIRED_CREDENTIALS", message);
   }
 }

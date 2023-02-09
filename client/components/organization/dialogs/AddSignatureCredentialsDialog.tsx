@@ -260,7 +260,7 @@ function SignaturitCredentialsInput() {
                 const data = await validateSignaturitApiKey({
                   variables: { apiKey },
                 });
-                return data.data?.validateSignaturitApiKey.success ?? false;
+                return data.data?.validateSignaturitApiKey === "SUCCESS";
               },
             })}
           />
@@ -393,9 +393,7 @@ function AddSignatureCredentialsStep2({ hasDocusignSandbox }: { hasDocusignSandb
 const _mutations = [
   gql`
     mutation AddSignatureCredentialsDialog_validateSignaturitApiKey($apiKey: String!) {
-      validateSignaturitApiKey(apiKey: $apiKey) {
-        success
-      }
+      validateSignaturitApiKey(apiKey: $apiKey)
     }
   `,
 ];

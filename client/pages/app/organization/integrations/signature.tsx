@@ -314,22 +314,31 @@ function useSignatureTokensTableColumns() {
           CellContent: ({ row, context: { onDocusignReauthorize } }) => {
             return (
               <>
-                {row.provider === "DOCUSIGN" && row.invalidCredentials ? (
+                {row.invalidCredentials ? (
                   <SmallPopover
                     content={
-                      <Text fontSize="sm">
-                        <FormattedMessage
-                          id="page.signature.consent-required-popover"
-                          defaultMessage="<a>Click here</a> to reauthorize your DocuSign integration."
-                          values={{
-                            a: (chunks: any[]) => (
-                              <NormalLink onClick={() => onDocusignReauthorize(row)}>
-                                {chunks}
-                              </NormalLink>
-                            ),
-                          }}
-                        />
-                      </Text>
+                      row.provider === "DOCUSIGN" ? (
+                        <Text fontSize="sm">
+                          <FormattedMessage
+                            id="page.signature.consent-required-popover"
+                            defaultMessage="<a>Click here</a> to reauthorize your DocuSign integration."
+                            values={{
+                              a: (chunks: any[]) => (
+                                <NormalLink onClick={() => onDocusignReauthorize(row)}>
+                                  {chunks}
+                                </NormalLink>
+                              ),
+                            }}
+                          />
+                        </Text>
+                      ) : row.provider === "SIGNATURIT" ? (
+                        <Text fontSize="sm">
+                          <FormattedMessage
+                            id="page.signature.invalid-credentials-popover"
+                            defaultMessage="The provided credentials are not valid anymore and need to be updated."
+                          />
+                        </Text>
+                      ) : null
                     }
                   >
                     <AlertCircleFilledIcon color="yellow.500" marginRight={1} />

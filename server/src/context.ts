@@ -45,6 +45,7 @@ import {
 import { IPrinter, PRINTER } from "./services/printer";
 import { IQueuesService, QUEUES_SERVICE } from "./services/queues";
 import { IRedis, REDIS } from "./services/redis";
+import { SetupService, SETUP_SERVICE } from "./services/setup";
 import { ISignatureService, SIGNATURE } from "./services/signature";
 import { ISmtp, SMTP } from "./services/smtp";
 import { IStorageService, STORAGE_SERVICE } from "./services/storage";
@@ -79,6 +80,7 @@ export class ApiContext {
     @inject(BANKFLIP_LEGACY_SERVICE) public readonly bankflipLegacy: IBankflipLegacyService,
     @inject(PETITION_IMPORT_EXPORT_SERVICE)
     public readonly petitionImportExport: IPetitionImportExportService,
+    @inject(SETUP_SERVICE) public readonly setup: SetupService,
 
     // Repositories
     public readonly contacts: ContactRepository,

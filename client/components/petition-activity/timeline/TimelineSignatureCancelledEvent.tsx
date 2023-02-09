@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Box, Button, Flex } from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { NakedLink } from "@parallel/components/common/Link";
@@ -73,8 +73,8 @@ export function TimelineSignatureCancelledEvent({
               }}
             />
           )}
-          {event.cancelType === "REQUEST_ERROR" &&
-            (event.errorCode === "INSUFFICIENT_SIGNATURE_CREDITS" ? (
+          {event.cancelType === "REQUEST_ERROR" ? (
+            event.errorCode === "INSUFFICIENT_SIGNATURE_CREDITS" ? (
               <FormattedMessage
                 id="timeline.signature-cancelled-request-error.insufficient-credits.description"
                 defaultMessage="The eSignature could not be started due to lack of signature credits {timeAgo}"
@@ -88,64 +88,10 @@ export function TimelineSignatureCancelledEvent({
                   ),
                 }}
               />
-            ) : event.errorCode === "EMAIL_BOUNCED" ? (
-              <FormattedMessage
-                id="timeline.signature-cancelled-request-error.email-bounced.description"
-                defaultMessage="The eSignature process has been cancelled due to an error with {hasEmail, select, true{<b><{signerEmail}></b>} other{an email}} {timeAgo}"
-                values={{
-                  timeAgo: (
-                    <DateTime
-                      value={event.createdAt}
-                      format={FORMATS.LLL}
-                      useRelativeTime="always"
-                    />
-                  ),
-                  hasEmail: Boolean(event.extraErrorData?.email),
-                  signerEmail: event.extraErrorData?.email,
-                }}
-              />
-            ) : event.errorCode === "MAX_SIZE_EXCEEDED" ? (
-              <>
-                <Text>
-                  <FormattedMessage
-                    id="timeline.signature-cancelled-request-error.max-size-exceeded.description"
-                    defaultMessage="The eSignature process has been cancelled because the document exceeds the maximum size allowed by the provider {timeAgo}"
-                    values={{
-                      timeAgo: (
-                        <DateTime
-                          value={event.createdAt}
-                          format={FORMATS.LLL}
-                          useRelativeTime="always"
-                        />
-                      ),
-                    }}
-                  />
-                </Text>
-                <Text>
-                  <FormattedMessage
-                    id="timeline.signature-cancelled-request-error.max-size-exceeded.help"
-                    defaultMessage="Please, reduce the size of the annexed files and try it again."
-                  />
-                </Text>
-              </>
-            ) : event.errorCode === "CONSENT_REQUIRED" ? (
-              <FormattedMessage
-                id="timeline.signature-cancelled-request-error.consent-required.description"
-                defaultMessage="The eSignature integration has expired and needs to be reauthorized {timeAgo}"
-                values={{
-                  timeAgo: (
-                    <DateTime
-                      value={event.createdAt}
-                      format={FORMATS.LLL}
-                      useRelativeTime="always"
-                    />
-                  ),
-                }}
-              />
             ) : (
               <FormattedMessage
-                id="timeline.signature-cancelled-request-error.unknown.description"
-                defaultMessage="The eSignature process has been cancelled due to an unknown error {timeAgo}"
+                id="timeline.signature-cancelled-request-error.description"
+                defaultMessage="The eSignature has been cancelled due to an error from the provider {timeAgo}: {message}"
                 values={{
                   timeAgo: (
                     <DateTime
@@ -154,9 +100,41 @@ export function TimelineSignatureCancelledEvent({
                       useRelativeTime="always"
                     />
                   ),
+                  message:
+                    event.errorCode === "EMAIL_BOUNCED" ? (
+                      <FormattedMessage
+                        id="timeline.signature-cancelled-request-error.email-bounced.description"
+                        defaultMessage="{hasEmail, select, true{The email<{signerEmail}>} other{an email}} has bounced."
+                        values={{
+                          hasEmail: Boolean(event.extraErrorData?.email),
+                          signerEmail: event.extraErrorData?.email,
+                        }}
+                      />
+                    ) : event.errorCode === "MAX_SIZE_EXCEEDED" ? (
+                      <FormattedMessage
+                        id="timeline.signature-cancelled-request-error.max-size-exceeded.description"
+                        defaultMessage="The document exceeds the maximum size allowed. Please, reduce the size of the annexed files and try it again."
+                      />
+                    ) : event.errorCode === "CONSENT_REQUIRED" ? (
+                      <FormattedMessage
+                        id="timeline.signature-cancelled-request-error.consent-required.description"
+                        defaultMessage="The integration has expired and needs to be reauthorized."
+                      />
+                    ) : event.errorCode === "INVALID_CREDENTIALS" ? (
+                      <FormattedMessage
+                        id="timeline.signature-cancelled-request-error.invalid-credentials.description"
+                        defaultMessage="The provided credentials are not valid anymore and need to be updated."
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="timeline.signature-cancelled-request-error.unknown.description"
+                        defaultMessage="An unknown error happened."
+                      />
+                    ),
                 }}
               />
-            ))}
+            )
+          ) : null}
         </Box>
         {event.cancelType === "DECLINED_BY_SIGNER" && event.cancellerReason && (
           <Button onClick={handleSeeMessageClick} size="sm" variant="outline" marginLeft={4}>
@@ -166,13 +144,14 @@ export function TimelineSignatureCancelledEvent({
             />
           </Button>
         )}
-        {event.cancelType === "REQUEST_ERROR" && event.errorCode === "CONSENT_REQUIRED" && (
-          <NakedLink href="/app/organization/integrations/signature">
-            <Button as="a" variant="outline" size="sm" marginLeft={4}>
-              <FormattedMessage id="timeline.signature-declined.review" defaultMessage="Review" />
-            </Button>
-          </NakedLink>
-        )}
+        {event.cancelType === "REQUEST_ERROR" &&
+          (event.errorCode === "CONSENT_REQUIRED" || event.errorCode === "INVALID_CREDENTIALS") && (
+            <NakedLink href="/app/organization/integrations/signature">
+              <Button as="a" variant="outline" size="sm" marginLeft={4}>
+                <FormattedMessage id="timeline.signature-declined.review" defaultMessage="Review" />
+              </Button>
+            </NakedLink>
+          )}
       </Flex>
     </TimelineItem>
   );

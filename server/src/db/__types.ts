@@ -593,7 +593,7 @@ export interface EmailLog {
   html: string; // text
   track_opens: boolean; // bool
   created_at: Date; // timestamptz
-  created_from: string; // varchar
+  created_from: string; // text
   sent_at: Maybe<Date>; // timestamptz
   response: Maybe<string>; // text
   external_id: Maybe<string>; // varchar

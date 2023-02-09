@@ -122,7 +122,7 @@ async function startSignatureProcess(
     }
 
     if (error instanceof InvalidCredentialsError) {
-      cancelData.error_code = "CONSENT_REQUIRED";
+      cancelData.error_code = error.code;
     }
 
     await ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData);
@@ -319,7 +319,7 @@ async function updateOrganizationBranding(
   );
 
   await pMap(
-    signatureIntegrations as SignatureOrgIntegration[],
+    signatureIntegrations,
     async (integration) => {
       // if targeting a single integration for update, make sure to skip every other
       if (isDefined(payload.integrationId) && integration.id !== payload.integrationId) {

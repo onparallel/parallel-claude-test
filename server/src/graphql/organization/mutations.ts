@@ -314,7 +314,7 @@ export const createOrganization = mutationField("createOrganization", {
     }
   ),
   resolve: async (_, args, ctx) => {
-    const org = await ctx.organizations.createOrganization(
+    const org = await ctx.setup.createOrganization(
       {
         name: args.name.trim(),
         status: args.status,
@@ -469,58 +469,52 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
       signatureIntegrations.length > 0 &&
       signatureIntegrations.some(
         (i) =>
-          i.settings.CREDENTIALS.API_KEY ===
-            ctx.config.signature.signaturitSharedProductionApiKey &&
-          i.settings.ENVIRONMENT === "production" &&
-          i.is_enabled
+          i.settings.IS_PARALLEL_MANAGED && i.settings.ENVIRONMENT === "production" && i.is_enabled
       );
 
     return await ctx.organizations.withTransaction(async (t) => {
-      const [organization] = await Promise.all([
-        ctx.organizations.updateOrganizationUsageDetails(
-          orgId,
-          {
-            SIGNATURIT_SHARED_APIKEY: {
-              limit,
-              duration,
-              renewal_cycles: null, // TODO check this
-            },
+      const organization = await ctx.organizations.updateOrganizationUsageDetails(
+        orgId,
+        {
+          SIGNATURIT_SHARED_APIKEY: {
+            limit,
+            duration,
+            renewal_cycles: null,
           },
+        },
+        `User:${ctx.user!.id}`,
+        t
+      );
+
+      if (!hasSharedSignaturitApiKey) {
+        await ctx.setup.createSignaturitIntegration(
+          {
+            name: "Signaturit",
+            org_id: orgId,
+            is_default: false,
+          },
+          ctx.config.signature.signaturitSharedProductionApiKey,
+          "production",
+          true,
           `User:${ctx.user!.id}`,
           t
-        ),
-        !hasSharedSignaturitApiKey
-          ? ctx.integrations.createOrgIntegration<"SIGNATURE", "SIGNATURIT">(
-              {
-                type: "SIGNATURE",
-                provider: "SIGNATURIT",
-                name: "Signaturit",
-                org_id: orgId,
-                settings: {
-                  CREDENTIALS: {
-                    API_KEY: ctx.config.signature.signaturitSharedProductionApiKey,
-                  },
-                  ENVIRONMENT: "production",
-                },
-                is_enabled: true,
-              },
-              `User:${ctx.user!.id}`,
-              t
-            )
-          : null,
-        ctx.organizations.startNewOrganizationUsageLimitPeriod(
-          orgId,
-          "SIGNATURIT_SHARED_APIKEY",
-          limit,
-          duration,
-          t
-        ),
-        ctx.featureFlags.upsertFeatureFlagOverride(
-          orgId,
-          { name: "PETITION_SIGNATURE", value: true },
-          t
-        ),
-      ]);
+        );
+      }
+
+      await ctx.organizations.startNewOrganizationUsageLimitPeriod(
+        orgId,
+        "SIGNATURIT_SHARED_APIKEY",
+        limit,
+        duration,
+        t
+      );
+
+      await ctx.featureFlags.upsertFeatureFlagOverride(
+        orgId,
+        { name: "PETITION_SIGNATURE", value: true },
+        t
+      );
+
       return organization;
     });
   },

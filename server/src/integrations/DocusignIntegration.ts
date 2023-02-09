@@ -1,60 +1,89 @@
 import { Request } from "express";
 import { inject, injectable } from "inversify";
 import { Config, CONFIG } from "../config";
+import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import {
   IntegrationRepository,
   IntegrationSettings,
-  SignatureEnvironment,
 } from "../db/repositories/IntegrationRepository";
-import { FeatureFlagName, IntegrationType, OrgIntegration } from "../db/__types";
+import { FeatureFlagName, OrgIntegration } from "../db/__types";
 import { FetchService, FETCH_SERVICE } from "../services/fetch";
 import { IRedis, REDIS } from "../services/redis";
 import { Replace } from "../util/types";
-import { OauthCredentials, OAuthIntegration } from "./OAuthIntegration";
+import { OauthCredentials, OAuthIntegration, OauthIntegrationState } from "./OAuthIntegration";
 
-export interface DocusignOauthIntegrationContext {
-  USER_ACCOUNT_ID: string;
-  API_BASE_PATH: string;
-  ENVIRONMENT: SignatureEnvironment;
+export interface DocusignIntegrationContext {
+  userAccountId: string;
+  apiBasePath: string;
+  environment: DocusignEnvironment;
+}
+
+export type DocusignEnvironment = IntegrationSettings<"SIGNATURE", "DOCUSIGN">["ENVIRONMENT"];
+
+interface DocusignIntegrationState extends OauthIntegrationState {
+  environment: DocusignEnvironment;
 }
 
 @injectable()
-export class DocusignOauthIntegration extends OAuthIntegration<DocusignOauthIntegrationContext> {
-  orgIntegrationType: IntegrationType = "SIGNATURE";
-  provider = "DOCUSIGN";
+export class DocusignIntegration extends OAuthIntegration<
+  "SIGNATURE",
+  "DOCUSIGN",
+  DocusignIntegrationState,
+  DocusignIntegrationContext
+> {
+  protected type = "SIGNATURE" as const;
+  protected provider = "DOCUSIGN" as const;
 
   constructor(
     @inject(CONFIG) config: Config,
     @inject(REDIS) redis: IRedis,
     @inject(IntegrationRepository) integrations: IntegrationRepository,
+    @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository,
     @inject(FETCH_SERVICE) private fetch: FetchService
   ) {
     super(config, integrations, redis);
   }
 
-  private baseUri(environment: keyof typeof this.config.oauth.docusign) {
+  protected override getContext(
+    integration: Replace<OrgIntegration, { settings: IntegrationSettings<"SIGNATURE", "DOCUSIGN"> }>
+  ): DocusignIntegrationContext {
+    return {
+      userAccountId: integration.settings.USER_ACCOUNT_ID,
+      apiBasePath: integration.settings.API_BASE_PATH,
+      environment: integration.settings.ENVIRONMENT,
+    };
+  }
+
+  protected override async buildState(req: Request) {
+    if (
+      typeof req.query.environment !== "string" ||
+      !["production", "sandbox"].includes(req.query.environment)
+    ) {
+      throw new Error(`Invalid environment in query ${req.query.environment}`);
+    }
+    return {
+      ...(await super.buildState(req)),
+      environment: req.query.environment as DocusignEnvironment,
+    };
+  }
+
+  private baseUri(environment: DocusignEnvironment) {
     return this.config.oauth.docusign[environment].baseUri;
   }
 
-  private integrationKey(environment: keyof typeof this.config.oauth.docusign) {
+  private integrationKey(environment: DocusignEnvironment) {
     return this.config.oauth.docusign[environment].integrationKey;
   }
 
-  private redirectUri(environment: keyof typeof this.config.oauth.docusign) {
+  private redirectUri(environment: DocusignEnvironment) {
     return this.config.oauth.docusign[environment].redirectUri;
   }
 
-  private secretKey(environment: keyof typeof this.config.oauth.docusign) {
+  private secretKey(environment: DocusignEnvironment) {
     return this.config.oauth.docusign[environment].secretKey;
   }
 
-  async buildAuthorizationUrl(state: string) {
-    const key = `oauth.${state}`;
-    const redisCache = await this.redis.get(key);
-    if (!redisCache) {
-      throw new Error(`Expected key ${key} on Redis cache.`);
-    }
-    const { environment }: { environment: SignatureEnvironment } = JSON.parse(redisCache);
+  async buildAuthorizationUrl(state: string, { environment }: DocusignIntegrationState) {
     return `${this.baseUri(environment)}/auth?${new URLSearchParams({
       state,
       response_type: "code",
@@ -64,10 +93,10 @@ export class DocusignOauthIntegration extends OAuthIntegration<DocusignOauthInte
     })}`;
   }
 
-  async fetchCredentialsAndContextData(
+  async fetchIntegrationSettings(
     code: string,
-    { environment }: { environment: SignatureEnvironment }
-  ): Promise<{ CREDENTIALS: OauthCredentials } & DocusignOauthIntegrationContext> {
+    { environment }: DocusignIntegrationState
+  ): Promise<IntegrationSettings<"SIGNATURE", "DOCUSIGN">> {
     const tokenResponse = await this.fetch.fetch(`${this.baseUri(environment)}/token`, {
       method: "POST",
       headers: {
@@ -109,7 +138,7 @@ export class DocusignOauthIntegration extends OAuthIntegration<DocusignOauthInte
 
   async refreshCredentials(
     credentials: OauthCredentials,
-    { ENVIRONMENT: environment }: DocusignOauthIntegrationContext
+    { environment }: DocusignIntegrationContext
   ): Promise<OauthCredentials> {
     const response = await this.fetch.fetch(`${this.baseUri(environment)}/token`, {
       method: "POST",
@@ -135,21 +164,14 @@ export class DocusignOauthIntegration extends OAuthIntegration<DocusignOauthInte
     }
   }
 
-  protected override getContext(
-    integration: Replace<OrgIntegration, { settings: IntegrationSettings<"SIGNATURE", "DOCUSIGN"> }>
-  ): DocusignOauthIntegrationContext {
-    return {
-      USER_ACCOUNT_ID: integration.settings.USER_ACCOUNT_ID!,
-      API_BASE_PATH: integration.settings.API_BASE_PATH!,
-      ENVIRONMENT: integration.settings.ENVIRONMENT!,
-    };
-  }
-
-  protected override async orgHasAccessToIntegration(orgId: number, req: Request) {
+  protected override async orgHasAccessToIntegration(
+    orgId: number,
+    state: DocusignIntegrationState
+  ) {
     const ffs: FeatureFlagName[] = ["PETITION_SIGNATURE"];
-    if (req.query.environment === "sandbox") {
+    if (state.environment === "sandbox") {
       ffs.push("DOCUSIGN_SANDBOX_PROVIDER");
     }
-    return (await req.context.featureFlags.orgHasFeatureFlag(orgId, ffs)).every((ff) => ff);
+    return (await this.featureFlags.orgHasFeatureFlag(orgId, ffs)).every((ff) => ff);
   }
 }

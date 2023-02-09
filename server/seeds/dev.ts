@@ -16,6 +16,7 @@ import {
 import { defaultBrandTheme } from "../src/util/BrandTheme";
 import { deleteAllData } from "../src/util/knexUtils";
 import { defaultPdfDocumentTheme } from "../src/util/PdfDocumentTheme";
+import { encrypt } from "../src/util/token";
 
 export async function seed(knex: Knex): Promise<any> {
   await deleteAllData(knex);
@@ -171,8 +172,12 @@ export async function seed(knex: Knex): Promise<any> {
           provider: "SIGNATURIT",
           name: "Signaturit Sandbox",
           settings: {
-            CREDENTIALS: { API_KEY: process.env.SIGNATURIT_SANDBOX_API_KEY },
+            CREDENTIALS: encrypt(
+              JSON.stringify({ API_KEY: process.env.SIGNATURIT_SANDBOX_API_KEY }),
+              Buffer.from(process.env.SECURITY_ENCRYPTION_KEY_BASE64!, "base64")
+            ).toString("hex"),
             ENVIRONMENT: "sandbox",
+            IS_PARALLEL_MANAGED: false,
           },
           is_enabled: true,
           created_by: `User:${ownerId}`,

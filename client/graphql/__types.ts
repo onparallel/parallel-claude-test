@@ -925,7 +925,7 @@ export interface Mutation {
   /** Tries to get an access_token with provided credentials */
   validateDowJonesKycCredentials: Scalars["Boolean"];
   /** Runs backend checks to validate signaturit credentials. */
-  validateSignaturitApiKey: ValidateSignatureCredentialsResult;
+  validateSignaturitApiKey: Result;
   verifyPublicAccess: PublicAccessVerification;
 }
 
@@ -4371,12 +4371,6 @@ export interface UserPermissionRemovedEvent extends PetitionEvent {
 
 export type UserStatus = "ACTIVE" | "INACTIVE";
 
-export interface ValidateSignatureCredentialsResult {
-  __typename?: "ValidateSignatureCredentialsResult";
-  data?: Maybe<Scalars["JSONObject"]>;
-  success: Scalars["Boolean"];
-}
-
 export interface VerificationCodeCheck {
   __typename?: "VerificationCodeCheck";
   remainingAttempts?: Maybe<Scalars["Int"]>;
@@ -6373,7 +6367,7 @@ export type AddSignatureCredentialsDialog_validateSignaturitApiKeyMutationVariab
 }>;
 
 export type AddSignatureCredentialsDialog_validateSignaturitApiKeyMutation = {
-  validateSignaturitApiKey: { __typename?: "ValidateSignatureCredentialsResult"; success: boolean };
+  validateSignaturitApiKey: Result;
 };
 
 export type useAddSignatureCredentialsDialog_UserFragment = {
@@ -32661,9 +32655,7 @@ export const BrandingGeneral_updateOrganizationBrandThemeDocument = gql`
 >;
 export const AddSignatureCredentialsDialog_validateSignaturitApiKeyDocument = gql`
   mutation AddSignatureCredentialsDialog_validateSignaturitApiKey($apiKey: String!) {
-    validateSignaturitApiKey(apiKey: $apiKey) {
-      success
-    }
+    validateSignaturitApiKey(apiKey: $apiKey)
   }
 ` as unknown as DocumentNode<
   AddSignatureCredentialsDialog_validateSignaturitApiKeyMutation,

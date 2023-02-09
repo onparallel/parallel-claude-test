@@ -2,7 +2,6 @@ import { Duration } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { indexBy, isDefined, uniq } from "remeda";
-import { Config, CONFIG } from "../../config";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { unMaybeArray } from "../../util/arrays";
 import { BrandTheme, defaultBrandTheme } from "../../util/BrandTheme";
@@ -43,7 +42,6 @@ export type OrganizationUsageDetails = {
 @injectable()
 export class OrganizationRepository extends BaseRepository {
   constructor(
-    @inject(CONFIG) private config: Config,
     @inject(KNEX) knex: Knex,
     @inject(EMAILS) private readonly emails: IEmailsService,
     @inject(SystemRepository) private system: SystemRepository
@@ -212,10 +210,6 @@ export class OrganizationRepository extends BaseRepository {
       },
       t
     );
-
-    await this.createSandboxSignatureIntegration(org.id, createdBy, t);
-    await this.createDefaultOrganizationThemes(org.id, createdBy, t);
-
     return org;
   }
 
@@ -457,28 +451,6 @@ export class OrganizationRepository extends BaseRepository {
     }
 
     return credits;
-  }
-
-  async createSandboxSignatureIntegration(orgId: number, createdBy: string, t?: Knex.Transaction) {
-    return await this.from("org_integration", t).insert(
-      {
-        org_id: orgId,
-        type: "SIGNATURE",
-        provider: "SIGNATURIT",
-        name: "Signaturit Sandbox",
-        settings: {
-          CREDENTIALS: {
-            API_KEY: this.config.signature.signaturitSandboxApiKey,
-          },
-          ENVIRONMENT: "sandbox",
-        },
-        is_default: true,
-        is_enabled: true,
-        created_at: this.now(),
-        created_by: createdBy,
-      },
-      "*"
-    );
   }
 
   async getOrganizationsWithFeatureFlag(name: FeatureFlagName) {

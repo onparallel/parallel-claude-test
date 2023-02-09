@@ -848,11 +848,6 @@ export interface NexusGenObjects {
   UserPermissionAddedEvent: events.UserPermissionAddedEvent;
   UserPermissionEditedEvent: events.UserPermissionEditedEvent;
   UserPermissionRemovedEvent: events.UserPermissionRemovedEvent;
-  ValidateSignatureCredentialsResult: {
-    // root type
-    data?: NexusGenScalars["JSONObject"] | null; // JSONObject
-    success: boolean; // Boolean!
-  };
   VerificationCodeCheck: {
     // root type
     remainingAttempts?: number | null; // Int
@@ -1440,7 +1435,7 @@ export interface NexusGenFieldTypes {
     uploadUserAvatar: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     userSignUp: NexusGenRootTypes["User"]; // User!
     validateDowJonesKycCredentials: boolean; // Boolean!
-    validateSignaturitApiKey: NexusGenRootTypes["ValidateSignatureCredentialsResult"]; // ValidateSignatureCredentialsResult!
+    validateSignaturitApiKey: NexusGenEnums["Result"]; // Result!
     verifyPublicAccess: NexusGenRootTypes["PublicAccessVerification"]; // PublicAccessVerification!
   };
   OrgIntegration: {
@@ -2560,11 +2555,6 @@ export interface NexusGenFieldTypes {
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
-  ValidateSignatureCredentialsResult: {
-    // field return type
-    data: NexusGenScalars["JSONObject"] | null; // JSONObject
-    success: boolean; // Boolean!
-  };
   VerificationCodeCheck: {
     // field return type
     remainingAttempts: number | null; // Int
@@ -3214,7 +3204,7 @@ export interface NexusGenFieldTypeNames {
     uploadUserAvatar: "SupportMethodResponse";
     userSignUp: "User";
     validateDowJonesKycCredentials: "Boolean";
-    validateSignaturitApiKey: "ValidateSignatureCredentialsResult";
+    validateSignaturitApiKey: "Result";
     verifyPublicAccess: "PublicAccessVerification";
   };
   OrgIntegration: {
@@ -4333,11 +4323,6 @@ export interface NexusGenFieldTypeNames {
     petition: "Petition";
     type: "PetitionEventType";
     user: "User";
-  };
-  ValidateSignatureCredentialsResult: {
-    // field return type name
-    data: "JSONObject";
-    success: "Boolean";
   };
   VerificationCodeCheck: {
     // field return type name

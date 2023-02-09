@@ -230,7 +230,7 @@ export class DowJonesKycService implements IDowJonesKycService {
     const jsonData = await response.json();
     if (response.ok && !jsonData.error) {
       const accessToken = await this.getAccessToken(jsonData.access_token, clientId);
-      const [updatedIntegration] = await this.integrations.updateOrgIntegration(
+      const [updatedIntegration] = await this.integrations.updateOrgIntegration<"DOW_JONES_KYC">(
         integration.id,
         {
           settings: {

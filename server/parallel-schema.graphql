@@ -2032,7 +2032,7 @@ type Mutation {
   """
   Runs backend checks to validate signaturit credentials.
   """
-  validateSignaturitApiKey(apiKey: String!): ValidateSignatureCredentialsResult!
+  validateSignaturitApiKey(apiKey: String!): Result!
   verifyPublicAccess(
     ip: String
     keycode: ID!
@@ -5784,11 +5784,6 @@ type UserPermissionRemovedEvent implements PetitionEvent {
 enum UserStatus {
   ACTIVE
   INACTIVE
-}
-
-type ValidateSignatureCredentialsResult {
-  data: JSONObject
-  success: Boolean!
 }
 
 type VerificationCodeCheck {

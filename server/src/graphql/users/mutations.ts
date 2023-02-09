@@ -484,60 +484,55 @@ export const userSignUp = mutationField("userSignUp", {
       );
     }
 
-    return await ctx.users.withTransaction(async (t) => {
-      const org = await ctx.organizations.createOrganization(
-        {
-          name: args.organizationName,
-          status: source !== "self-service" ? "ACTIVE" : "DEMO",
-          logo_public_file_id: logoFile?.id ?? null,
-          appsumo_license:
-            licenseCode && licenseCode.source === "AppSumo"
-              ? {
-                  ...licenseCode.details,
-                  events: [licenseCode.details],
-                }
-              : null,
+    const org = await ctx.setup.createOrganization(
+      {
+        name: args.organizationName,
+        status: source !== "self-service" ? "ACTIVE" : "DEMO",
+        logo_public_file_id: logoFile?.id ?? null,
+        appsumo_license:
+          licenseCode && licenseCode.source === "AppSumo"
+            ? {
+                ...licenseCode.details,
+                events: [licenseCode.details],
+              }
+            : null,
+      },
+      `UserSignUp:${args.email}`
+    );
+
+    const user = await ctx.users.createUser(
+      {
+        organization_role: "OWNER",
+        org_id: org.id,
+        status: "ACTIVE",
+      },
+      {
+        cognito_id: cognitoId!,
+        email,
+        first_name: args.firstName,
+        last_name: args.lastName,
+        details: {
+          source,
+          industry: args.industry,
+          role: args.role,
+          position: args.position,
+          preferredLocale: args.locale ?? "en",
         },
-        `UserSignUp:${args.email}`,
-        t
+      },
+      `UserSignUp:${args.email}`
+    );
+
+    await ctx.tiers.updateOrganizationTier(org, tierKey, `User:${user.id}`);
+
+    if (licenseCode) {
+      await ctx.licenseCodes.updateLicenseCode(
+        licenseCode.id,
+        { status: "REDEEMED" },
+        `User:${user.id}`
       );
+    }
 
-      const user = await ctx.users.createUser(
-        {
-          organization_role: "OWNER",
-          org_id: org.id,
-          status: "ACTIVE",
-        },
-        {
-          cognito_id: cognitoId!,
-          email,
-          first_name: args.firstName,
-          last_name: args.lastName,
-          details: {
-            source,
-            industry: args.industry,
-            role: args.role,
-            position: args.position,
-            preferredLocale: args.locale ?? "en",
-          },
-        },
-        `UserSignUp:${args.email}`,
-        t
-      );
-
-      await ctx.tiers.updateOrganizationTier(org, tierKey, `User:${user.id}`, t);
-
-      if (licenseCode) {
-        await ctx.licenseCodes.updateLicenseCode(
-          licenseCode.id,
-          { status: "REDEEMED" },
-          `User:${user.id}`,
-          t
-        );
-      }
-
-      return user;
-    });
+    return user;
   },
 });
 

@@ -2,55 +2,119 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { isDefined, uniq } from "remeda";
 import { keyBuilder } from "../../util/keyBuilder";
-import { OauthCredentials } from "../../integrations/OAuthIntegration";
 import { Replace } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 import { CreateOrgIntegration, IntegrationType, OrgIntegration, User } from "../__types";
 
-export type SignatureProvider = "SIGNATURIT" | "DOCUSIGN";
+export type IntegrationProviders = {
+  SIGNATURE: "SIGNATURIT" | "DOCUSIGN";
+};
 
-type SignatureIntegrationCredentials<TProvider extends SignatureProvider> = {
-  SIGNATURIT: { API_KEY: string };
-  DOCUSIGN: OauthCredentials;
-}[TProvider];
+export type SignatureProvider = IntegrationProviders["SIGNATURE"];
 
-export type SignatureEnvironment = "production" | "sandbox";
+export type IntegrationProvider<TType extends IntegrationType> =
+  TType extends keyof IntegrationProviders ? IntegrationProviders[TType] : string;
 
 export type IntegrationSettings<
   TType extends IntegrationType,
-  TProvider extends SignatureProvider = any
-> = {
-  SIGNATURE: {
-    CREDENTIALS: SignatureIntegrationCredentials<TProvider>;
-    ENVIRONMENT?: SignatureEnvironment;
-    // Signaturit
-    EN_FORMAL_BRANDING_ID?: string;
-    ES_FORMAL_BRANDING_ID?: string;
-    EN_INFORMAL_BRANDING_ID?: string;
-    ES_INFORMAL_BRANDING_ID?: string;
-    SHOW_CSV?: boolean; // show a security stamp on the margin of each page of the document
-    // Docusign
-    API_BASE_PATH?: string;
-    USER_ACCOUNT_ID?: string;
-  };
-  SSO: {
-    EMAIL_DOMAINS: string[];
-    COGNITO_PROVIDER: string;
-  };
-  USER_PROVISIONING: {
-    AUTH_KEY: string;
-  };
-  DOW_JONES_KYC: {
-    CREDENTIALS: {
-      ACCESS_TOKEN: string;
-      REFRESH_TOKEN: string;
-      CLIENT_ID: string;
-      USERNAME: string;
-      PASSWORD: string;
-    };
-  };
-}[TType];
+  TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>
+> = TType extends "SIGNATURE"
+  ? TProvider extends "SIGNATURIT"
+    ? {
+        CREDENTIALS: { API_KEY: string };
+        ENVIRONMENT: "production" | "sandbox";
+        IS_PARALLEL_MANAGED: boolean;
+        EN_FORMAL_BRANDING_ID?: string;
+        ES_FORMAL_BRANDING_ID?: string;
+        EN_INFORMAL_BRANDING_ID?: string;
+        ES_INFORMAL_BRANDING_ID?: string;
+        SHOW_CSV?: boolean; // show a security stamp on the margin of each page of the document
+        // TODO delete after migration
+        _CREDENTIALS: { API_KEY: string };
+      }
+    : TProvider extends "DOCUSIGN"
+    ? {
+        CREDENTIALS: { ACCESS_TOKEN: string; REFRESH_TOKEN: string };
+        ENVIRONMENT: "production" | "sandbox";
+        API_BASE_PATH: string;
+        USER_ACCOUNT_ID: string;
+      }
+    : never
+  : TType extends "SSO"
+  ? {
+      EMAIL_DOMAINS: string[];
+      COGNITO_PROVIDER: string;
+    }
+  : TType extends "USER_PROVISIONING"
+  ? {
+      AUTH_KEY: string;
+    }
+  : TType extends "DOW_JONES_KYC"
+  ? {
+      CREDENTIALS: {
+        ACCESS_TOKEN: string;
+        REFRESH_TOKEN: string;
+        CLIENT_ID: string;
+        USERNAME: string;
+        PASSWORD: string;
+      };
+    }
+  : never;
+
+export type IntegrationCredentials<
+  TType extends IntegrationType,
+  TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>
+> = EnhancedIntegrationSettings<TType, TProvider, false> extends { CREDENTIALS: any }
+  ? EnhancedIntegrationSettings<TType, TProvider, false>["CREDENTIALS"]
+  : never;
+
+// TODO: Sustituir por lo de abajo cuando se utilice GenericInegration para DOW_JONES_KYC
+export type EnhancedIntegrationSettings<
+  TType extends IntegrationType,
+  TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
+  TEncrypted extends boolean = true
+> = TEncrypted extends true
+  ? TType extends "SIGNATURE"
+    ? Omit<IntegrationSettings<TType, TProvider>, "CREDENTIALS"> & { CREDENTIALS: string }
+    : IntegrationSettings<TType, TProvider>
+  : IntegrationSettings<TType, TProvider>;
+
+// export type EnhancedIntegrationSettings<
+//   TType extends IntegrationType,
+//   TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
+//   TEncrypted extends boolean = true
+// > = TEncrypted extends true
+//   ? IntegrationSettings<TType, TProvider> extends { CREDENTIALS: any }
+//     ? Omit<IntegrationSettings<TType, TProvider>, "CREDENTIALS"> & { CREDENTIALS: string }
+//     : IntegrationSettings<TType, TProvider>
+//   : IntegrationSettings<TType, TProvider>;
+
+export type EnhancedOrgIntegration<
+  TType extends IntegrationType,
+  TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
+  TEncrypted extends boolean = true
+> = Replace<
+  OrgIntegration,
+  {
+    type: TType;
+    provider: TProvider;
+    settings: EnhancedIntegrationSettings<TType, TProvider, TEncrypted>;
+  }
+>;
+
+export type EnhancedCreateOrgIntegration<
+  TType extends IntegrationType,
+  TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
+  TEncrypted extends boolean = true
+> = Replace<
+  CreateOrgIntegration,
+  {
+    type: TType;
+    provider: TProvider;
+    settings: EnhancedIntegrationSettings<TType, TProvider, TEncrypted>;
+  }
+>;
 
 @injectable()
 export class IntegrationRepository extends BaseRepository {
@@ -126,16 +190,26 @@ export class IntegrationRepository extends BaseRepository {
     }
   );
 
-  async loadIntegrationsByOrgId<IType extends IntegrationType>(
+  async loadIntegrationsByOrgId<
+    TType extends IntegrationType,
+    TProvider extends IntegrationProvider<TType> & string = IntegrationProvider<TType>
+  >(
     orgId: number,
-    type: IType,
-    provider?: string | null,
+    type: TType,
+    provider?: TProvider | null,
     t?: Knex.Transaction
-  ): Promise<Replace<OrgIntegration, { settings: IntegrationSettings<IType> }>[]> {
+  ): Promise<EnhancedOrgIntegration<TType, TProvider, true>[]> {
     if (isDefined(t)) {
-      return await this._loadIntegrationsByOrgId.raw({ orgId, type, provider }, t);
+      return (await this._loadIntegrationsByOrgId.raw(
+        { orgId, type, provider },
+        t
+      )) as EnhancedOrgIntegration<TType, TProvider, true>[];
     } else {
-      return await this._loadIntegrationsByOrgId({ orgId, type, provider });
+      return (await this._loadIntegrationsByOrgId({
+        orgId,
+        type,
+        provider,
+      })) as EnhancedOrgIntegration<TType, TProvider, true>[];
     }
   }
 
@@ -169,9 +243,12 @@ export class IntegrationRepository extends BaseRepository {
     return integration;
   }
 
-  async updateOrgIntegration<K extends IntegrationType>(
+  async updateOrgIntegration<
+    TType extends IntegrationType,
+    TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>
+  >(
     integrationId: number,
-    data: Partial<Replace<OrgIntegration, { settings: IntegrationSettings<K> }>>,
+    data: Partial<EnhancedOrgIntegration<TType, TProvider, true>>,
     updatedBy: string,
     t?: Knex.Transaction
   ) {
@@ -208,7 +285,8 @@ export class IntegrationRepository extends BaseRepository {
     id: number,
     type: IntegrationType,
     orgId: number,
-    updatedBy: string
+    updatedBy: string,
+    t?: Knex.Transaction
   ) {
     return this.withTransaction(async (t) => {
       const [integration] = await this.from("org_integration", t)
@@ -230,14 +308,14 @@ export class IntegrationRepository extends BaseRepository {
           updated_at: this.now(),
         });
       return integration;
-    });
+    }, t);
   }
 
   async createOrgIntegration<
-    IType extends IntegrationType,
-    TProvider extends SignatureProvider = any
+    TType extends IntegrationType,
+    TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>
   >(
-    data: Replace<CreateOrgIntegration, { settings: IntegrationSettings<IType, TProvider> }>,
+    data: EnhancedCreateOrgIntegration<TType, TProvider, true>,
     createdBy: string,
     t?: Knex.Transaction
   ) {
@@ -249,7 +327,7 @@ export class IntegrationRepository extends BaseRepository {
       },
       t
     ).returning("*");
-    return integration;
+    return integration as EnhancedOrgIntegration<TType, TProvider, true>;
   }
 
   async deleteOrgIntegration(id: number, deletedBy: string) {
