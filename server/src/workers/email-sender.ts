@@ -16,6 +16,7 @@ import { petitionMessageBounced } from "./emails/petition-message-bounced";
 import { petitionReminder } from "./emails/petition-reminder";
 import { petitionShared } from "./emails/petition-shared";
 import { publicPetitionLinkAccess } from "./emails/public-petition-link-access";
+import { sendFromDatabase } from "./emails/send-from-database";
 import { signatureCancelledDeclinedBySigner } from "./emails/signature-cancelled-declined-by-signer";
 import { signatureCancelledNoCreditsLeft } from "./emails/signature-cancelled-no-credits-left";
 import { signatureCancelledRequestError } from "./emails/signature-cancelled-request-error";
@@ -41,6 +42,7 @@ const builders = {
   "signature-cancelled-request-error": signatureCancelledRequestError,
   "signature-cancelled-declined-by-signer": signatureCancelledDeclinedBySigner,
   invitation,
+  "from-database": sendFromDatabase,
 };
 
 export type EmailType = keyof typeof builders;
