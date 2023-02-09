@@ -37,8 +37,6 @@ export type IntegrationSettings<
     ? {
         CREDENTIALS: { ACCESS_TOKEN: string; REFRESH_TOKEN: string };
         ENVIRONMENT: "production" | "sandbox";
-        API_BASE_PATH: string;
-        USER_ACCOUNT_ID: string;
       }
     : never
   : TType extends "SSO"

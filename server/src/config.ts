@@ -160,13 +160,13 @@ export function buildConfig() {
     oauth: {
       docusign: {
         sandbox: {
-          baseUri: process.env.DOCUSIGN_SANDBOX_BASE_URI!,
+          oauthBaseUri: process.env.DOCUSIGN_SANDBOX_OAUTH_BASE_URI!,
           integrationKey: process.env.DOCUSIGN_SANDBOX_INTEGRATION_KEY!,
           secretKey: process.env.DOCUSIGN_SANDBOX_SECRET_KEY!,
           redirectUri: process.env.DOCUSIGN_SANDBOX_REDIRECT_URI!,
         },
         production: {
-          baseUri: process.env.DOCUSIGN_BASE_URI!,
+          oauthBaseUri: process.env.DOCUSIGN_OAUTH_BASE_URI!,
           integrationKey: process.env.DOCUSIGN_INTEGRATION_KEY!,
           secretKey: process.env.DOCUSIGN_SECRET_KEY!,
           redirectUri: process.env.DOCUSIGN_REDIRECT_URI!,

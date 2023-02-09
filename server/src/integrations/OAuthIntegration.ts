@@ -66,14 +66,14 @@ export abstract class OAuthIntegration<
     return state;
   }
 
-  abstract buildAuthorizationUrl(state: string, stateValue: TState): MaybePromise<string>;
+  protected abstract buildAuthorizationUrl(state: string, stateValue: TState): MaybePromise<string>;
 
-  abstract fetchIntegrationSettings(
+  protected abstract fetchIntegrationSettings(
     code: string,
     state: TState
   ): Promise<IntegrationSettings<TType, TProvider>>;
 
-  abstract refreshCredentials(
+  protected abstract refreshCredentials(
     credentials: OauthCredentials,
     context: WithAccessTokenContext
   ): Promise<OauthCredentials>;

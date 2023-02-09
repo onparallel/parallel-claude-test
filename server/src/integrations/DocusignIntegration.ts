@@ -1,5 +1,7 @@
 import { Request } from "express";
 import { inject, injectable } from "inversify";
+import { RequestInit } from "node-fetch";
+import { omit } from "remeda";
 import { Config, CONFIG } from "../config";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import {
@@ -13,8 +15,6 @@ import { Replace } from "../util/types";
 import { OauthCredentials, OAuthIntegration, OauthIntegrationState } from "./OAuthIntegration";
 
 export interface DocusignIntegrationContext {
-  userAccountId: string;
-  apiBasePath: string;
   environment: DocusignEnvironment;
 }
 
@@ -22,6 +22,11 @@ export type DocusignEnvironment = IntegrationSettings<"SIGNATURE", "DOCUSIGN">["
 
 interface DocusignIntegrationState extends OauthIntegrationState {
   environment: DocusignEnvironment;
+}
+
+interface TokenResponse {
+  access_token: string;
+  refresh_token: string;
 }
 
 @injectable()
@@ -48,8 +53,6 @@ export class DocusignIntegration extends OAuthIntegration<
     integration: Replace<OrgIntegration, { settings: IntegrationSettings<"SIGNATURE", "DOCUSIGN"> }>
   ): DocusignIntegrationContext {
     return {
-      userAccountId: integration.settings.USER_ACCOUNT_ID,
-      apiBasePath: integration.settings.API_BASE_PATH,
       environment: integration.settings.ENVIRONMENT,
     };
   }
@@ -68,7 +71,7 @@ export class DocusignIntegration extends OAuthIntegration<
   }
 
   private baseUri(environment: DocusignEnvironment) {
-    return this.config.oauth.docusign[environment].baseUri;
+    return `${this.config.oauth.docusign[environment].oauthBaseUri}/oauth`;
   }
 
   private integrationKey(environment: DocusignEnvironment) {
@@ -83,7 +86,36 @@ export class DocusignIntegration extends OAuthIntegration<
     return this.config.oauth.docusign[environment].secretKey;
   }
 
-  async buildAuthorizationUrl(state: string, { environment }: DocusignIntegrationState) {
+  private basicAuthorization(environment: DocusignEnvironment) {
+    return `Basic ${Buffer.from(
+      this.integrationKey(environment) + ":" + this.secretKey(environment)
+    ).toString("base64")}`;
+  }
+
+  private async apiRequest<T>(
+    environment: DocusignEnvironment,
+    url: string,
+    init: RequestInit
+  ): Promise<T> {
+    const response = await this.fetch.fetch(`${this.baseUri(environment)}${url}`, {
+      ...omit(init, ["headers"]),
+      headers: {
+        ...init.headers,
+        "Cache-Control": "no-store",
+        Pragma: "no-cache",
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw response;
+    }
+
+    return data;
+  }
+
+  protected async buildAuthorizationUrl(state: string, { environment }: DocusignIntegrationState) {
     return `${this.baseUri(environment)}/auth?${new URLSearchParams({
       state,
       response_type: "code",
@@ -93,59 +125,38 @@ export class DocusignIntegration extends OAuthIntegration<
     })}`;
   }
 
-  async fetchIntegrationSettings(
+  protected async fetchIntegrationSettings(
     code: string,
     { environment }: DocusignIntegrationState
   ): Promise<IntegrationSettings<"SIGNATURE", "DOCUSIGN">> {
-    const tokenResponse = await this.fetch.fetch(`${this.baseUri(environment)}/token`, {
+    const data = await this.apiRequest<TokenResponse>(environment, "/token", {
       method: "POST",
       headers: {
-        Authorization: `Basic ${Buffer.from(
-          this.integrationKey(environment) + ":" + this.secretKey(environment)
-        ).toString("base64")}`,
+        Authorization: this.basicAuthorization(environment),
       },
       body: new URLSearchParams({
         grant_type: "authorization_code",
         code,
       }),
     });
-    const data = await tokenResponse.json();
-    if (tokenResponse.ok) {
-      const userInfoResponse = await this.fetch.fetch(`${this.baseUri(environment)}/userinfo`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${data.access_token}`,
-          "Cache-Control": "no-store",
-          Pragma: "no-cache",
-        },
-      });
 
-      const userInfoData = await userInfoResponse.json();
-      const userInfo = userInfoData.accounts.find((account: any) => account.is_default);
-      return {
-        CREDENTIALS: {
-          ACCESS_TOKEN: data.access_token,
-          REFRESH_TOKEN: data.refresh_token,
-        },
-        USER_ACCOUNT_ID: userInfo.account_id,
-        API_BASE_PATH: userInfo.base_uri,
-        ENVIRONMENT: environment,
-      };
-    } else {
-      throw new Error(data);
-    }
+    return {
+      CREDENTIALS: {
+        ACCESS_TOKEN: data.access_token,
+        REFRESH_TOKEN: data.refresh_token,
+      },
+      ENVIRONMENT: environment,
+    };
   }
 
-  async refreshCredentials(
+  protected async refreshCredentials(
     credentials: OauthCredentials,
     { environment }: DocusignIntegrationContext
   ): Promise<OauthCredentials> {
-    const response = await this.fetch.fetch(`${this.baseUri(environment)}/token`, {
+    const data = await this.apiRequest<TokenResponse>(environment, "/token", {
       method: "POST",
       headers: {
-        Authorization: `Basic ${Buffer.from(
-          this.integrationKey(environment) + ":" + this.secretKey(environment)
-        ).toString("base64")}`,
+        Authorization: this.basicAuthorization(environment),
       },
       body: new URLSearchParams({
         grant_type: "refresh_token",
@@ -153,15 +164,10 @@ export class DocusignIntegration extends OAuthIntegration<
       }),
     });
 
-    const data = await response.json();
-    if (response.ok) {
-      return {
-        ACCESS_TOKEN: data.access_token,
-        REFRESH_TOKEN: data.refresh_token,
-      };
-    } else {
-      throw new Error(JSON.stringify(data));
-    }
+    return {
+      ACCESS_TOKEN: data.access_token,
+      REFRESH_TOKEN: data.refresh_token,
+    };
   }
 
   protected override async orgHasAccessToIntegration(

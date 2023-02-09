@@ -15,6 +15,9 @@ import { safeJsonParse } from "../../util/safeJsonParse";
 import { I18N_SERVICE, II18nService } from "../i18n";
 import { ISignatureClient, Recipient, SignatureOptions, SignatureResponse } from "./client";
 
+interface UserInfoResponse {
+  accounts: { accountId: string; baseUri: string; isDefault: "true" | "false" }[];
+}
 @injectable()
 export class DocuSignClient implements ISignatureClient {
   constructor(
@@ -44,21 +47,27 @@ export class DocuSignClient implements ISignatureClient {
   private async withDocusignSdk<TResult>(
     handler: (
       apis: { envelopes: EnvelopesApi; accounts: AccountsApi },
-      context: DocusignIntegrationContext
+      context: DocusignIntegrationContext & { userAccountId: string }
     ) => Promise<TResult>
   ): Promise<TResult> {
     return this.docusignOauth.withAccessToken(this.integrationId, async (accessToken, context) => {
-      const client = new ApiClient();
-      client.setBasePath(`${context.apiBasePath}/restapi`);
-      client.addDefaultHeader("Authorization", `Bearer ${accessToken}`);
-
       try {
+        const client = new ApiClient();
+        client.setOAuthBasePath(
+          this.config.oauth.docusign[context.environment].oauthBaseUri.replace("https://", "")
+        );
+        const userInfo = (await client.getUserInfo(accessToken)) as UserInfoResponse;
+        const defaultAccount = userInfo.accounts.find((a) => a.isDefault === "true")!;
+
+        client.setBasePath(`${defaultAccount.baseUri}/restapi`);
+        client.addDefaultHeader("Authorization", `Bearer ${accessToken}`);
+
         return await handler(
           {
             envelopes: new EnvelopesApi(client),
             accounts: new AccountsApi(client),
           },
-          context
+          { ...context, userAccountId: defaultAccount.accountId }
         );
       } catch (error) {
         if (this.isAccessTokenExpiredError(error)) {
