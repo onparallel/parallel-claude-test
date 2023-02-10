@@ -52,8 +52,9 @@ export async function petitionMessage(
   );
 
   const contactIds = accesses
-    .filter((a) => a.id !== access.id && isDefined(access.contact_id))
-    .map((a) => a.contact_id!);
+    .filter((a) => a.id !== access.id)
+    .map((a) => a.contact_id)
+    .filter(isDefined);
 
   const recipients = contactIds.length
     ? (await context.contacts.loadContact(contactIds)).filter(isDefined).map((r) => ({
