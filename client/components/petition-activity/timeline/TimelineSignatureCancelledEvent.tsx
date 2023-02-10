@@ -146,7 +146,10 @@ export function TimelineSignatureCancelledEvent({
           </Button>
         )}
         {event.cancelType === "REQUEST_ERROR" &&
-          (event.errorCode === "CONSENT_REQUIRED" || event.errorCode === "INVALID_CREDENTIALS") && (
+          event.errorCode &&
+          ["CONSENT_REQUIRED", "INVALID_CREDENTIALS", "ACCOUNT_SUSPENDED"].includes(
+            event.errorCode
+          ) && (
             <NakedLink href="/app/organization/integrations/signature">
               <Button as="a" variant="outline" size="sm" marginLeft={4}>
                 <FormattedMessage id="timeline.signature-declined.review" defaultMessage="Review" />
