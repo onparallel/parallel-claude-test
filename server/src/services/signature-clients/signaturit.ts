@@ -143,7 +143,7 @@ export class SignaturitClient implements ISignatureClient {
           reminders: 0,
         });
 
-        if (!isDefined(response.id) || isDefined(!response.documents)) {
+        if (!isDefined(response.id) || !isDefined(response.documents)) {
           throw new Error(
             `Invalid response: ${stringify({ petitionId, opts, recipients, response })}`
           );
