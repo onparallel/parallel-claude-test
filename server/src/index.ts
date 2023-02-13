@@ -35,6 +35,7 @@ const server = new ApolloServer({
   includeStacktraceInErrorResponses: true,
   allowBatchedHttpRequests: true,
   schema: schema,
+  csrfPrevention: true,
   plugins: [
     ...(process.env.NODE_ENV === "production" ? [ApolloServerPluginLandingPageDisabled()] : []),
     {

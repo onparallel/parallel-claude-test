@@ -69,7 +69,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
     },
     // Batch requests happening concurrently
     new BatchHttpLink({ uri, batchInterval: 0 }),
-    createUploadLink({ uri })
+    createUploadLink({ uri, headers: { "Apollo-Require-Preflight": "true" } })
   );
 
   const authLink = setContext((_, { headers }) => {
