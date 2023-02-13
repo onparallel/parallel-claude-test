@@ -1,5 +1,7 @@
+import stringify from "fast-safe-stringify";
 import { inject, injectable } from "inversify";
 import pMap from "p-map";
+import { isDefined } from "remeda";
 import SignaturitSDK, { BrandingParams } from "signaturit-sdk";
 import { URLSearchParams } from "url";
 import { CONFIG, Config } from "../../config";
@@ -106,7 +108,7 @@ export class SignaturitClient implements ISignatureClient {
 
         const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
 
-        return await sdk.createSignature(files, recipients, {
+        const response = await sdk.createSignature(files, recipients, {
           body: opts.initialMessage,
           delivery_type: "email",
           signing_mode: "parallel",
@@ -140,6 +142,13 @@ export class SignaturitClient implements ISignatureClient {
           expire_time: 0, // disable signaturit automatic reminder emails
           reminders: 0,
         });
+
+        if (!isDefined(response.id) || isDefined(!response.documents)) {
+          throw new Error(
+            `Invalid response: ${stringify({ petitionId, opts, recipients, response })}`
+          );
+        }
+        return response;
       } catch (error: any) {
         if (error.message === "Account depleted all it's advanced signature requests") {
           await this.emails.sendInternalSignaturitAccountDepletedCreditsEmail(
