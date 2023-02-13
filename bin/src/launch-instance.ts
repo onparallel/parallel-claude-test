@@ -20,7 +20,7 @@ const INSTANCE_TYPES = {
   staging: "t2.medium",
 };
 const KEY_NAME = "ops";
-const IMAGE_ID = "ami-0323ddba904baf4d5";
+const IMAGE_ID = "ami-0e35e2e950193aeb0";
 const SECURITY_GROUP_IDS = ["sg-0486098a6131eb458"];
 const IAM_ROLE = "parallel-server";
 const SUBNET_ID = "subnet-d3cc68b9";
@@ -57,7 +57,7 @@ async function main() {
       IamInstanceProfile: {
         Name: IAM_ROLE,
       },
-      InstanceType: (INSTANCE_TYPES as any)[env!],
+      InstanceType: INSTANCE_TYPES[env as keyof typeof INSTANCE_TYPES],
       Placement: {
         AvailabilityZone: AVAILABILITY_ZONE,
         Tenancy: Tenancy.default,

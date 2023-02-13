@@ -6,7 +6,7 @@ The server image is built by copying all files inside `ops/prod/image` in a vani
 cd ops/prod/image
 scp -i ~/.ssh/ops.pem * ec2-user@[INSTANCE_IP]:~
 ssh ec2-user@[INSTANCE_IP]
-sudo bash build.sh
+./build.sh
 ```
 
 This script will install all the dependencies needed, including:

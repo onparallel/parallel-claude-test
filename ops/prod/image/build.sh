@@ -1,54 +1,80 @@
 #! /bin/bash
 
+
+# versions
 nodejs_version="16"
-nginx_version="1.23.3"
+nginx_version="1.23.3" # http://nginx.org/en/download.html
+modsecurity_version="3.0.8" # https://github.com/SpiderLabs/ModSecurity/releases
+modsecurity_nginx_version="1.0.3" # https://github.com/SpiderLabs/ModSecurity-nginx/releases
+coreruleset_version="3.3.4" # https://github.com/coreruleset/coreruleset/releases
+ngx_devel_kit_version="0.3.2" # https://github.com/vision5/ngx_devel_kit/releases
+set_misc_nginx_module_version="0.33" # https://github.com/openresty/set-misc-nginx-module/tags
+headers_more_nginx_module_version="0.34" # https://github.com/openresty/headers-more-nginx-module/tags
+image_exiftool_version="12.55" # https://exiftool.org/
 
 echo "Adding public keys"
 cat authorized_keys >> .ssh/authorized_keys
 rm authorized_keys
 
-yum update -y
-yum install -y \
-    git \
-    gcc \
-    gcc-c++ \
-    make \
-    curl \
-    pcre-devel \
-    zlib-devel \
-    openssl11-devel \
-    perl-devel \
-    perl-CPAN \
-    perl-ExtUtils-Embed \
-    ghostscript \
-    ImageMagick \
-    ImageMagick-devel \
-    qpdf \
-    amazon-efs-utils \
-    awslogs 
+sudo yum update -y
+
+# install binary dependencies
+sudo yum install -y \
+  ghostscript \
+  ImageMagick \
+  qpdf \
+  amazon-efs-utils \
+  awslogs
 
 function download_and_untar() {
   curl --silent --location --output $1.tar.gz $2
   mkdir $1
-  tar -xvf $1.tar.gz --directory $1 --strip-components 1
+  tar -xf $1.tar.gz --directory $1 --strip-components 1
   rm $1.tar.gz
 }
 
 echo "Installing node.js"
-curl -sL https://rpm.nodesource.com/setup_${nodejs_version}.x | bash -
+curl -sL https://rpm.nodesource.com/setup_${nodejs_version}.x | sudo bash -
+sudo yum install -y nodejs
 
 echo "Installing yarn"
-curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
-yum -y install yarn
+curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
+sudo yum -y install yarn
 
 echo "Installing nginx"
-download_and_untar nginx-${nginx_version} https://nginx.org/download/nginx-${nginx_version}.tar.gz
-git clone https://github.com/giom/nginx_accept_language_module
-download_and_untar ngx_devel_kit https://github.com/vision5/ngx_devel_kit/archive/refs/tags/v0.3.2.tar.gz
-download_and_untar set-misc-nginx-module https://github.com/openresty/set-misc-nginx-module/archive/refs/tags/v0.33.tar.gz
-download_and_untar headers-more-nginx-module https://github.com/openresty/headers-more-nginx-module/archive/refs/tags/v0.34.tar.gz
+download_and_untar nginx https://nginx.org/download/nginx-${nginx_version}.tar.gz
+download_and_untar modsecurity https://github.com/SpiderLabs/ModSecurity/releases/download/v${modsecurity_version}/modsecurity-v${modsecurity_version}.tar.gz
+download_and_untar modsecurity-nginx https://github.com/SpiderLabs/ModSecurity-nginx/releases/download/v${modsecurity_nginx_version}/modsecurity-nginx-v${modsecurity_nginx_version}.tar.gz
+download_and_untar modsecurity-crs https://github.com/coreruleset/coreruleset/archive/refs/tags/v${coreruleset_version}.tar.gz
+download_and_untar nginx-accept-language-module https://github.com/giom/nginx_accept_language_module/tarball/master
+download_and_untar ngx-devel-kit https://github.com/vision5/ngx_devel_kit/archive/refs/tags/v${ngx_devel_kit_version}.tar.gz
+download_and_untar set-misc-nginx-module https://github.com/openresty/set-misc-nginx-module/archive/refs/tags/v${set_misc_nginx_module_version}.tar.gz
+download_and_untar headers-more-nginx-module https://github.com/openresty/headers-more-nginx-module/archive/refs/tags/v${headers_more_nginx_module_version}.tar.gz
 
-pushd nginx-${nginx_version}
+pushd modsecurity
+sudo yum install -y \
+  pcre-devel \
+  gcc-c++ \
+  libtool \
+  automake \
+  yajl-devel \
+  GeoIP-devel
+./build.sh
+./configure
+make
+sudo make install
+sudo mkdir -p /etc/nginx/modsec
+sudo cp unicode.mapping /etc/nginx/modsec/
+popd
+
+pushd nginx
+sudo yum install -y \
+  gcc \
+  pcre-devel \
+  openssl11-devel \
+  perl-ExtUtils-Embed \
+  zlib-devel \
+  GeoIP-devel
 ./configure \
     --prefix=/usr/share/nginx \
     --sbin-path=/usr/sbin/nginx \
@@ -84,6 +110,7 @@ pushd nginx-${nginx_version}
     --with-http_stub_status_module \
     --with-http_perl_module=dynamic \
     --with-http_auth_request_module \
+    --with-http_geoip_module \
     --with-mail=dynamic \
     --with-mail_ssl_module \
     --with-pcre \
@@ -93,18 +120,45 @@ pushd nginx-${nginx_version}
     --with-debug \
     --with-cc-opt='-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic' \
     --with-ld-opt=' -Wl,-E' \
-    --add-module=../nginx_accept_language_module \
-    --add-module=../ngx_devel_kit \
+    --add-module=../modsecurity-nginx \
+    --add-module=../nginx-accept-language-module \
+    --add-module=../ngx-devel-kit \
     --add-module=../set-misc-nginx-module \
     --add-module=../headers-more-nginx-module
 make
-make install
-popd > /dev/null
+sudo make install
+popd
+
+pushd modsecurity-crs
+mv crs-setup.conf.example crs-setup.conf
+mv rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
+popd
+sudo mv modsecurity-crs /etc/nginx/modsec/
 
 echo "Installing exiftool"
-download_and_untar Image-ExifTool-12.54 https://exiftool.org/Image-ExifTool-12.55.tar.gz
-pushd Image-ExifTool-12.54
+download_and_untar image-exiftool https://exiftool.org/Image-ExifTool-${image_exiftool_version}.tar.gz
+pushd image-exiftool
 perl Makefile.PL
 make test
-make install
-popd > /dev/null
+sudo make install
+popd
+
+if node -v | grep -q "v${nodejs_version}."; then
+  echo "Node.js.......ok"
+else
+  echo "Node.js.......failed"
+  exit 1 
+fi
+if /usr/sbin/nginx -v 2>&1 | grep -q "nginx version: nginx/${nginx_version}"; then
+  echo "Nginx.........ok"
+else
+  echo "Nginx.........failed"
+  exit 1 
+fi
+if exiftool -ver | grep -q "${exiftool_version}"; then
+  echo "Exiftool......ok"
+else
+  echo "Exiftool......failed"
+  exit 1 
+fi
+exit 0
