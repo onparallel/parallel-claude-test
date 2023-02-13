@@ -101,6 +101,15 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
               date,
             } as SignatureBoxProps,
           ]
+        : ["zas25KHxAByKWmKNDXb", "zas25KHxAByKWmKRZgb"].includes(templateId)
+        ? [
+            {
+              fullName: "Dña Ana Ortiz Canela",
+              signatureImageUrl:
+                "https://static.onparallel.com/static/images/signatures/ana-ortiz-canela-gesdocument.png",
+              date,
+            },
+          ]
         : []
       : []),
     ...signatureConfig.signers!.map(
