@@ -65,11 +65,16 @@ export async function petitionCompleted(
   const subscribedUsersData = (await context.users.loadUserDataByUserId(subscribedUserIds)).filter(
     isDefined
   );
+
+  const isSigned = isDefined(payload.signer);
+  const isManualStartSignature = !isSigned && petition.signature_config?.review === true;
+
   for (const userData of subscribedUsersData) {
     const { html, text, subject, from } = await buildEmail(
       PetitionCompleted,
       {
-        isSigned: !!payload.signer,
+        isSigned,
+        isManualStartSignature,
         userName: userData.first_name,
         petitionId: toGlobalId("Petition", petitionId),
         petitionName: petition.name,

@@ -376,8 +376,12 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
           // signature is configured to be reviewed after start, so just cancel if there are pending requests
           await ctx.signature.cancelPendingSignatureRequests(petition.id, ctx.access!);
         }
-      } else {
-        // no signature configured, petition is completed
+      }
+
+      if (
+        !isDefined(petition.signature_config) || // signature is not configured, process has finished
+        petition.signature_config.review === true // signature needs to be manually started, send email to user
+      ) {
         await ctx.emails.sendPetitionCompletedEmail(
           petition.id,
           { accessId: ctx.access!.id },
