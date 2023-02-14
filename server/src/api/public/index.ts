@@ -1002,7 +1002,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
             email: string;
             error_code: string;
           };
-          if (errorCode === "INVALID_EMAIL_ERROR") {
+          if (errorCode === "INVALID_EMAIL_ERROR" || errorCode === "INVALID_MX_EMAIL_ERROR") {
             throw new BadRequestError(`${email} is not a valid email`);
           }
         } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
