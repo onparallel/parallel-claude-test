@@ -42,6 +42,7 @@ sudo systemctl enable parallel-scheduled-trigger-cron.service
 sudo systemctl enable parallel-petition-notifications-cron.service
 sudo systemctl enable parallel-organization-limits-cron.service
 sudo systemctl enable parallel-anonymizer-cron.service
+sudo systemctl enable parallel-old-notifications-cron.service
 sudo systemctl enable nginx.service 
 sudo systemctl enable awslogsd.service
 

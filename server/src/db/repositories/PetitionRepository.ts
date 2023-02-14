@@ -3016,6 +3016,18 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.where({ is_read: false }).orderBy("created_at", "desc")
   );
 
+  async markOldPetitionUserNotificationsAsRead(months: number) {
+    await this.from("petition_user_notification")
+      .where({
+        is_read: false,
+      })
+      .whereRaw(/* sql */ `created_at < NOW() - make_interval(months => ?)`, [months])
+      .update({
+        is_read: true,
+        processed_at: this.now(),
+      });
+  }
+
   private filterPetitionUserNotificationQueryBuilder(
     filter?: Maybe<PetitionUserNotificationFilter>
   ): Knex.QueryCallback<PetitionUserNotification<false>> {
@@ -3078,18 +3090,24 @@ export class PetitionRepository extends BaseRepository {
     userId: number,
     filter?: Maybe<PetitionUserNotificationFilter>
   ) {
-    return await this.from("petition_user_notification")
-      .whereIn("id", petitionUserNotificationIds)
-      .where("user_id", userId)
-      .where("is_read", !isRead) // to return only the updated notifications
-      .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
-      .update(
-        removeNotDefined({
-          is_read: isRead,
-          processed_at: isRead ? this.now() : undefined,
-        }),
-        "*"
-      );
+    return await pMapChunk(
+      petitionUserNotificationIds,
+      async (idsChunk) => {
+        return await this.from("petition_user_notification")
+          .whereIn("id", idsChunk)
+          .where("user_id", userId)
+          .where("is_read", !isRead) // to return only the updated notifications
+          .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
+          .update(
+            removeNotDefined({
+              is_read: isRead,
+              processed_at: isRead ? this.now() : undefined,
+            }),
+            "*"
+          );
+      },
+      { chunkSize: 500, concurrency: 1 }
+    );
   }
 
   async updatePetitionUserNotificationsReadStatusByPetitionId(
@@ -3098,19 +3116,25 @@ export class PetitionRepository extends BaseRepository {
     userId: number,
     filter?: Maybe<PetitionUserNotificationFilter>
   ) {
-    return await this.from("petition_user_notification")
-      .whereIn("petition_id", petitionIds)
-      .where("user_id", userId)
-      .where("is_read", !isRead)
-      .whereNot("type", "COMMENT_CREATED")
-      .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
-      .update(
-        removeNotDefined({
-          is_read: isRead,
-          processed_at: isRead ? this.now() : undefined,
-        }),
-        "*"
-      );
+    return await pMapChunk(
+      petitionIds,
+      async (idsChunk) => {
+        return await this.from("petition_user_notification")
+          .whereIn("petition_id", idsChunk)
+          .where("user_id", userId)
+          .where("is_read", !isRead)
+          .whereNot("type", "COMMENT_CREATED")
+          .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
+          .update(
+            removeNotDefined({
+              is_read: isRead,
+              processed_at: isRead ? this.now() : undefined,
+            }),
+            "*"
+          );
+      },
+      { chunkSize: 500, concurrency: 1 }
+    );
   }
 
   async updatePetitionUserNotificationsReadStatusByCommentIds(
@@ -3119,32 +3143,39 @@ export class PetitionRepository extends BaseRepository {
     userId: number,
     filter?: Maybe<PetitionUserNotificationFilter>
   ) {
-    const comments = (await this.loadPetitionFieldComment(
-      petitionFieldCommentIds
-    )) as PetitionFieldComment[];
-    return await this.from("petition_user_notification")
-      .where({
-        user_id: userId,
-        type: "COMMENT_CREATED",
-      })
-      .where("is_read", !isRead)
-      .whereIn("petition_id", uniq(comments.map((c) => c.petition_id)))
-      .whereIn(
-        this.knex.raw("data ->> 'petition_field_id'") as any,
-        uniq(comments.map((c) => c.petition_field_id))
-      )
-      .whereIn(
-        this.knex.raw("data ->> 'petition_field_comment_id'") as any,
-        uniq(comments.map((c) => c.id))
-      )
-      .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
-      .update(
-        removeNotDefined({
-          is_read: isRead,
-          processed_at: isRead ? this.now() : undefined,
-        }),
-        "*"
-      );
+    return await pMapChunk(
+      petitionFieldCommentIds,
+      async (idsChunk) => {
+        const comments = (await this.loadPetitionFieldComment(idsChunk)) as PetitionFieldComment[];
+        return await this.from("petition_user_notification")
+          .where({
+            user_id: userId,
+            type: "COMMENT_CREATED",
+          })
+          .where("is_read", !isRead)
+          .whereIn("petition_id", uniq(comments.map((c) => c.petition_id)))
+          .whereIn(
+            this.knex.raw("data ->> 'petition_field_id'") as any,
+            uniq(comments.map((c) => c.petition_field_id))
+          )
+          .whereIn(
+            this.knex.raw("data ->> 'petition_field_comment_id'") as any,
+            uniq(comments.map((c) => c.id))
+          )
+          .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
+          .update(
+            removeNotDefined({
+              is_read: isRead,
+              processed_at: isRead ? this.now() : undefined,
+            }),
+            "*"
+          );
+      },
+      {
+        chunkSize: 500,
+        concurrency: 1,
+      }
+    );
   }
 
   async updatePetitionUserNotificationsReadStatusByUserId(

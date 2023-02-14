@@ -13,6 +13,7 @@ if [[ "$COMMAND" == "start" ]]; then
   sudo systemctl ${COMMAND} parallel-petition-notifications-cron.service
   sudo systemctl ${COMMAND} parallel-organization-limits-cron.service
   sudo systemctl ${COMMAND} parallel-anonymizer-cron.service
+  sudo systemctl ${COMMAND} parallel-old-notifications-cron.service
 else
   sudo systemctl ${COMMAND} parallel-*-{cron,queue}.service
 fi

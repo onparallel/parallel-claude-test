@@ -124,6 +124,9 @@ export function buildConfig() {
         rule: process.env.WORKERS_ANONYMIZER_RULE!,
         anonymizeAfterDays: parseInt(process.env.WORKERS_ANONYMIZER_AFTER_DAYS!),
       },
+      "old-notifications": {
+        rule: process.env.WORKERS_OLD_NOTIFICATIONS_RULE!,
+      },
     },
     imageProxy: {
       secret: process.env.IMAGE_PROXY_SIGNATURE_SECRET!,
