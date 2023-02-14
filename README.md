@@ -34,7 +34,20 @@ As external dependencies, the backend uses:
 
 This libraries are used to generate a PDF document binder containing the replies of a given petition.
 You can install this dependencies via brew:
+
 `brew install ghostscript imagemagick exiftool qpdf`
+
+On dev environment, we use [Ngrok](https://ngrok.com/) to launch a local tunnel in order to:
+- Receive webhook events from different integrations (Signaturit, Docusign, Bankflip, ...)
+- Receive custom emails from AWS Cognito (SignUp, ResendCode, AdminCreateUser, ForgotPassword). After launching ngrok, you will need to configure the https localtunnel url on AWS Lambda function "cognito-custom-messages-development" as an environment variable.
+
+`brew install ngrok`
+
+In order to launch the localtunnel, run:
+
+`yarn workspace @parallel/server localtunnel`
+
+This command will run ngrok command and write the URL to a text file located in server/bin/localtunnel-dev.url so the integrations can read it.
 
 ### Commands
 
