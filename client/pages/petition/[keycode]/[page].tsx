@@ -1,14 +1,5 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import {
-  AlertDescription,
-  AlertIcon,
-  Box,
-  Button,
-  Flex,
-  Stack,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
+import { AlertDescription, AlertIcon, Box, Button, Flex, Stack, Text } from "@chakra-ui/react";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -68,7 +59,6 @@ type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getIniti
 function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const intl = useIntl();
   const router = useRouter();
-  const toast = useToast();
   const {
     data: { access },
   } = useAssertQuery(RecipientView_accessDocument, { variables: { keycode } });
@@ -143,24 +133,6 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
           });
           if (petition.signatureConfig?.review) {
             await showReviewBeforeSigningDialog({ granter, tone });
-          }
-          if (!toast.isActive("petition-completed-toast") && !showFullScreenDialog) {
-            toast({
-              id: "petition-completed-toast",
-              title: intl.formatMessage({
-                id: "recipient-view.completed-petition.toast-title",
-                defaultMessage: "Parallel completed!",
-              }),
-              description: intl.formatMessage(
-                {
-                  id: "recipient-view.completed-petition.toast-description",
-                  defaultMessage: "{name} will be notified for its revision.",
-                },
-                { name: granter.fullName }
-              ),
-              status: "success",
-              isClosable: true,
-            });
           }
           if (showFullScreenDialog) {
             await withError(
