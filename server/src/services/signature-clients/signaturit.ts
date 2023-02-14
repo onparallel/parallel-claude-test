@@ -22,6 +22,7 @@ import {
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { downloadImageBase64 } from "../../util/images";
+import { retry } from "../../util/retry";
 import { EMAILS, IEmailsService } from "../emails";
 import { I18N_SERVICE, II18nService } from "../i18n";
 import { IOrganizationCreditsService, ORGANIZATION_CREDITS_SERVICE } from "../organization-credits";
@@ -108,40 +109,47 @@ export class SignaturitClient implements ISignatureClient {
 
         const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
 
-        const response = await sdk.createSignature(files, recipients, {
-          body: opts.initialMessage,
-          delivery_type: "email",
-          signing_mode: "parallel",
-          branding_id: brandingId,
-          events_url: `${baseEventsUrl}/api/webhooks/signaturit/${toGlobalId(
-            "Petition",
-            petitionId
-          )}/events`,
-          callback_url: `${this.config.misc.parallelUrl}/${locale}/thanks?${new URLSearchParams({
-            o: toGlobalId("Organization", orgId),
-          })}`,
-          recipients: recipients.map((r, recipientIndex) => ({
-            email: r.email,
-            name: r.name,
-            widgets: [
-              {
-                type: "signature",
-                word_anchor: `3cb39pzCQA9wJ${recipientIndex}`,
-                height: 7.5, // 7.5% of page height
-                width:
-                  ((210 -
-                    petitionTheme.data.marginLeft -
-                    petitionTheme.data.marginRight -
-                    5 /* grid gap */ * 2) /
-                    3 /
-                    210) *
-                  100,
-              },
-            ],
-          })),
-          expire_time: 0, // disable signaturit automatic reminder emails
-          reminders: 0,
-        });
+        const response = await retry(
+          async () => {
+            return await sdk.createSignature(files, recipients, {
+              body: opts.initialMessage,
+              delivery_type: "email",
+              signing_mode: "parallel",
+              branding_id: brandingId,
+              events_url: `${baseEventsUrl}/api/webhooks/signaturit/${toGlobalId(
+                "Petition",
+                petitionId
+              )}/events`,
+              callback_url: `${this.config.misc.parallelUrl}/${locale}/thanks?${new URLSearchParams(
+                {
+                  o: toGlobalId("Organization", orgId),
+                }
+              )}`,
+              recipients: recipients.map((r, recipientIndex) => ({
+                email: r.email,
+                name: r.name,
+                widgets: [
+                  {
+                    type: "signature",
+                    word_anchor: `3cb39pzCQA9wJ${recipientIndex}`,
+                    height: 7.5, // 7.5% of page height
+                    width:
+                      ((210 -
+                        petitionTheme.data.marginLeft -
+                        petitionTheme.data.marginRight -
+                        5 /* grid gap */ * 2) /
+                        3 /
+                        210) *
+                      100,
+                  },
+                ],
+              })),
+              expire_time: 0, // disable signaturit automatic reminder emails
+              reminders: 0,
+            });
+          },
+          { maxRetries: 3, delay: 5_000 }
+        );
 
         if (!isDefined(response.id) || !isDefined(response.documents)) {
           throw new Error(

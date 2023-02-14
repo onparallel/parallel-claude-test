@@ -24,7 +24,7 @@ export async function retry<TResult>(
     try {
       return await operation(iteration++);
     } catch (error) {
-      if (maxRetries === 1) {
+      if (maxRetries === 0) {
         throw error;
       } else if (delay) {
         await waitFor(delay);
