@@ -778,6 +778,7 @@ export interface NexusGenObjects {
   RemindersOptOutNotification: notifications.RemindersOptOutNotification;
   ReplyCreatedEvent: events.ReplyCreatedEvent;
   ReplyDeletedEvent: events.ReplyDeletedEvent;
+  ReplyStatusChangedEvent: events.ReplyStatusChangedEvent;
   ReplyUpdatedEvent: events.ReplyUpdatedEvent;
   SendPetitionResult: {
     // root type
@@ -2292,6 +2293,18 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+  };
+  ReplyStatusChangedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
+    field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
+    id: NexusGenScalars["GID"]; // GID!
+    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    reply: NexusGenRootTypes["PetitionFieldReply"] | null; // PetitionFieldReply
+    status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
+    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+    updatedBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
   };
   ReplyUpdatedEvent: {
     // field return type
@@ -4062,6 +4075,18 @@ export interface NexusGenFieldTypeNames {
     petition: "Petition";
     type: "PetitionEventType";
   };
+  ReplyStatusChangedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    data: "JSONObject";
+    field: "PetitionField";
+    id: "GID";
+    petition: "Petition";
+    reply: "PetitionFieldReply";
+    status: "PetitionFieldReplyStatus";
+    type: "PetitionEventType";
+    updatedBy: "UserOrPetitionAccess";
+  };
   ReplyUpdatedEvent: {
     // field return type name
     createdAt: "DateTime";
@@ -5780,6 +5805,7 @@ export interface NexusGenAbstractTypeMembers {
     | "RemindersOptOutEvent"
     | "ReplyCreatedEvent"
     | "ReplyDeletedEvent"
+    | "ReplyStatusChangedEvent"
     | "ReplyUpdatedEvent"
     | "SignatureCancelledEvent"
     | "SignatureCompletedEvent"
@@ -5874,6 +5900,7 @@ export interface NexusGenTypeInterfaces {
   RemindersOptOutNotification: "PetitionUserNotification";
   ReplyCreatedEvent: "PetitionEvent";
   ReplyDeletedEvent: "PetitionEvent";
+  ReplyStatusChangedEvent: "PetitionEvent";
   ReplyUpdatedEvent: "PetitionEvent";
   SignatureCancelledEvent: "PetitionEvent";
   SignatureCancelledUserNotification: "PetitionUserNotification";

@@ -21,7 +21,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   };
   ACCESS_OPENED: { petition_access_id: number };
   ACCESS_DELEGATED: {
-    new_petition_access_id: number; // new petition access created by the contact
+    new_petition_access_id: number; // new petition access created by the contact∏
     petition_access_id: number; // original access from where the delegation ocurred
   };
   MESSAGE_SCHEDULED: { petition_message_id: number };
@@ -171,6 +171,13 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     petition_reminder_id: number;
   };
   PETITION_ANONYMIZED: {};
+  REPLY_STATUS_CHANGED: {
+    status: "APPROVED" | "REJECTED" | "PENDING";
+    petition_access_id?: number;
+    user_id?: number;
+    petition_field_id: number;
+    petition_field_reply_id: number;
+  };
 }[TType];
 
 export type GenericPetitionEvent<
@@ -342,6 +349,11 @@ export type PetitionAnonymizedEvent<IsCreate extends boolean = false> = GenericP
   IsCreate
 >;
 
+export type ReplyStatusChangedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "REPLY_STATUS_CHANGED",
+  IsCreate
+>;
+
 export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionCreatedEvent<IsCreate>
   | PetitionCompletedEvent<IsCreate>
@@ -381,7 +393,8 @@ export type PetitionEvent<IsCreate extends boolean = false> =
   | RecipientSignedEvent<IsCreate>
   | PetitionReminderBouncedEvent<IsCreate>
   | PetitionMessageBouncedEvent<IsCreate>
-  | PetitionAnonymizedEvent<IsCreate>;
+  | PetitionAnonymizedEvent<IsCreate>
+  | ReplyStatusChangedEvent<IsCreate>;
 
 export type CreatePetitionEvent = PetitionEvent<true>;
 

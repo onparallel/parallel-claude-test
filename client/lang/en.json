@@ -10800,14 +10800,29 @@
     "context": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
   },
   {
+    "term": "timeline.reply-deleted",
+    "definition": "Reply deleted",
+    "context": "Reply deleted"
+  },
+  {
     "term": "timeline.reply-deleted-description",
     "definition": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}"
   },
   {
+    "term": "timeline.reply-status-changed-description",
+    "definition": "{userIsYou, select, true {You} other {{updatedBy}}} {status, select, APPROVED{approved} REJECTED{rejected} other{set as pending}} {multiple, select, true{one of the replies} other {a reply}} to the field {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{updatedBy}}} {status, select, APPROVED{approved} REJECTED{rejected} other{set as pending}} {multiple, select, true{one of the replies} other {a reply}} to the field {field} {timeAgo}"
+  },
+  {
     "term": "timeline.reply-updated-description",
     "definition": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
+  },
+  {
+    "term": "timeline.see",
+    "definition": "See",
+    "context": "See"
   },
   {
     "term": "timeline.signature-cancelled-by-user.description",

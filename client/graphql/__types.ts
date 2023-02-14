@@ -2528,6 +2528,7 @@ export type PetitionEventType =
   | "REMINDER_SENT"
   | "REPLY_CREATED"
   | "REPLY_DELETED"
+  | "REPLY_STATUS_CHANGED"
   | "REPLY_UPDATED"
   | "SIGNATURE_CANCELLED"
   | "SIGNATURE_COMPLETED"
@@ -3880,6 +3881,19 @@ export interface ReplyDeletedEvent extends PetitionEvent {
   id: Scalars["GID"];
   petition?: Maybe<Petition>;
   type: PetitionEventType;
+}
+
+export interface ReplyStatusChangedEvent extends PetitionEvent {
+  __typename?: "ReplyStatusChangedEvent";
+  createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
+  field?: Maybe<PetitionField>;
+  id: Scalars["GID"];
+  petition?: Maybe<Petition>;
+  reply?: Maybe<PetitionFieldReply>;
+  status: PetitionFieldReplyStatus;
+  type: PetitionEventType;
+  updatedBy?: Maybe<UserOrPetitionAccess>;
 }
 
 export interface ReplyUpdatedEvent extends PetitionEvent {
@@ -7001,7 +7015,12 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "ReplyCreatedEvent";
           id: string;
           createdAt: string;
-          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+          field?: {
+            __typename?: "PetitionField";
+            id: string;
+            title?: string | null;
+            replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+          } | null;
           createdBy?:
             | {
                 __typename?: "PetitionAccess";
@@ -7014,6 +7033,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
               }
             | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
             | null;
+          reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
         }
       | {
           __typename?: "ReplyDeletedEvent";
@@ -7034,10 +7054,17 @@ export type PetitionActivityTimeline_PetitionFragment = {
             | null;
         }
       | {
-          __typename?: "ReplyUpdatedEvent";
+          __typename?: "ReplyStatusChangedEvent";
           id: string;
+          status: PetitionFieldReplyStatus;
           createdAt: string;
-          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+          field?: {
+            __typename?: "PetitionField";
+            id: string;
+            multiple: boolean;
+            title?: string | null;
+            replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+          } | null;
           updatedBy?:
             | {
                 __typename?: "PetitionAccess";
@@ -7050,6 +7077,31 @@ export type PetitionActivityTimeline_PetitionFragment = {
               }
             | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
             | null;
+          reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
+        }
+      | {
+          __typename?: "ReplyUpdatedEvent";
+          id: string;
+          createdAt: string;
+          field?: {
+            __typename?: "PetitionField";
+            id: string;
+            title?: string | null;
+            replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+          } | null;
+          updatedBy?:
+            | {
+                __typename?: "PetitionAccess";
+                contact?: {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName: string;
+                  email: string;
+                } | null;
+              }
+            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+            | null;
+          reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
         }
       | {
           __typename?: "SignatureCancelledEvent";
@@ -7542,7 +7594,12 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment = 
   __typename?: "ReplyCreatedEvent";
   id: string;
   createdAt: string;
-  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+  field?: {
+    __typename?: "PetitionField";
+    id: string;
+    title?: string | null;
+    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+  } | null;
   createdBy?:
     | {
         __typename?: "PetitionAccess";
@@ -7550,6 +7607,7 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment = 
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
+  reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment = {
@@ -7566,11 +7624,18 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment = 
     | null;
 };
 
-export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment = {
-  __typename?: "ReplyUpdatedEvent";
+export type PetitionActivityTimeline_PetitionEvent_ReplyStatusChangedEvent_Fragment = {
+  __typename?: "ReplyStatusChangedEvent";
   id: string;
+  status: PetitionFieldReplyStatus;
   createdAt: string;
-  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+  field?: {
+    __typename?: "PetitionField";
+    id: string;
+    multiple: boolean;
+    title?: string | null;
+    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+  } | null;
   updatedBy?:
     | {
         __typename?: "PetitionAccess";
@@ -7578,6 +7643,27 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment = 
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
+  reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
+};
+
+export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment = {
+  __typename?: "ReplyUpdatedEvent";
+  id: string;
+  createdAt: string;
+  field?: {
+    __typename?: "PetitionField";
+    id: string;
+    title?: string | null;
+    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+  } | null;
+  updatedBy?:
+    | {
+        __typename?: "PetitionAccess";
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+      }
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | null;
+  reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment = {
@@ -7703,6 +7789,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_RemindersOptOutEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_ReplyStatusChangedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragment
@@ -8330,7 +8417,12 @@ export type TimelineRemindersOptOutEvent_RemindersOptOutEventFragment = {
 export type TimelineReplyCreatedEvent_ReplyCreatedEventFragment = {
   __typename?: "ReplyCreatedEvent";
   createdAt: string;
-  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+  field?: {
+    __typename?: "PetitionField";
+    id: string;
+    title?: string | null;
+    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+  } | null;
   createdBy?:
     | {
         __typename?: "PetitionAccess";
@@ -8338,6 +8430,7 @@ export type TimelineReplyCreatedEvent_ReplyCreatedEventFragment = {
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
+  reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
 };
 
 export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
@@ -8353,10 +8446,17 @@ export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
     | null;
 };
 
-export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
-  __typename?: "ReplyUpdatedEvent";
+export type TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragment = {
+  __typename?: "ReplyStatusChangedEvent";
+  status: PetitionFieldReplyStatus;
   createdAt: string;
-  field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+  field?: {
+    __typename?: "PetitionField";
+    id: string;
+    multiple: boolean;
+    title?: string | null;
+    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+  } | null;
   updatedBy?:
     | {
         __typename?: "PetitionAccess";
@@ -8364,6 +8464,37 @@ export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
+  reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
+};
+
+export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
+  __typename?: "ReplyUpdatedEvent";
+  createdAt: string;
+  field?: {
+    __typename?: "PetitionField";
+    id: string;
+    title?: string | null;
+    replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+  } | null;
+  updatedBy?:
+    | {
+        __typename?: "PetitionAccess";
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+      }
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | null;
+  reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
+};
+
+export type TimelineSeeReplyButton_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+};
+
+export type TimelineSeeReplyButton_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  id: string;
 };
 
 export type TimelineSignatureCancelledEvent_SignatureCancelledEventFragment = {
@@ -16872,7 +17003,12 @@ export type PetitionActivity_PetitionFragment = {
           __typename?: "ReplyCreatedEvent";
           id: string;
           createdAt: string;
-          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+          field?: {
+            __typename?: "PetitionField";
+            id: string;
+            title?: string | null;
+            replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+          } | null;
           createdBy?:
             | {
                 __typename?: "PetitionAccess";
@@ -16885,6 +17021,7 @@ export type PetitionActivity_PetitionFragment = {
               }
             | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
             | null;
+          reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
         }
       | {
           __typename?: "ReplyDeletedEvent";
@@ -16905,10 +17042,17 @@ export type PetitionActivity_PetitionFragment = {
             | null;
         }
       | {
-          __typename?: "ReplyUpdatedEvent";
+          __typename?: "ReplyStatusChangedEvent";
           id: string;
+          status: PetitionFieldReplyStatus;
           createdAt: string;
-          field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+          field?: {
+            __typename?: "PetitionField";
+            id: string;
+            multiple: boolean;
+            title?: string | null;
+            replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+          } | null;
           updatedBy?:
             | {
                 __typename?: "PetitionAccess";
@@ -16921,6 +17065,31 @@ export type PetitionActivity_PetitionFragment = {
               }
             | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
             | null;
+          reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
+        }
+      | {
+          __typename?: "ReplyUpdatedEvent";
+          id: string;
+          createdAt: string;
+          field?: {
+            __typename?: "PetitionField";
+            id: string;
+            title?: string | null;
+            replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+          } | null;
+          updatedBy?:
+            | {
+                __typename?: "PetitionAccess";
+                contact?: {
+                  __typename?: "Contact";
+                  id: string;
+                  fullName: string;
+                  email: string;
+                } | null;
+              }
+            | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+            | null;
+          reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
         }
       | {
           __typename?: "SignatureCancelledEvent";
@@ -17729,7 +17898,12 @@ export type PetitionActivity_updatePetitionMutation = {
                 __typename?: "ReplyCreatedEvent";
                 id: string;
                 createdAt: string;
-                field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+                field?: {
+                  __typename?: "PetitionField";
+                  id: string;
+                  title?: string | null;
+                  replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+                } | null;
                 createdBy?:
                   | {
                       __typename?: "PetitionAccess";
@@ -17747,6 +17921,7 @@ export type PetitionActivity_updatePetitionMutation = {
                       status: UserStatus;
                     }
                   | null;
+                reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
               }
             | {
                 __typename?: "ReplyDeletedEvent";
@@ -17772,10 +17947,17 @@ export type PetitionActivity_updatePetitionMutation = {
                   | null;
               }
             | {
-                __typename?: "ReplyUpdatedEvent";
+                __typename?: "ReplyStatusChangedEvent";
                 id: string;
+                status: PetitionFieldReplyStatus;
                 createdAt: string;
-                field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+                field?: {
+                  __typename?: "PetitionField";
+                  id: string;
+                  multiple: boolean;
+                  title?: string | null;
+                  replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+                } | null;
                 updatedBy?:
                   | {
                       __typename?: "PetitionAccess";
@@ -17793,6 +17975,36 @@ export type PetitionActivity_updatePetitionMutation = {
                       status: UserStatus;
                     }
                   | null;
+                reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
+              }
+            | {
+                __typename?: "ReplyUpdatedEvent";
+                id: string;
+                createdAt: string;
+                field?: {
+                  __typename?: "PetitionField";
+                  id: string;
+                  title?: string | null;
+                  replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+                } | null;
+                updatedBy?:
+                  | {
+                      __typename?: "PetitionAccess";
+                      contact?: {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName: string;
+                        email: string;
+                      } | null;
+                    }
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null;
+                      status: UserStatus;
+                    }
+                  | null;
+                reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
               }
             | {
                 __typename?: "SignatureCancelledEvent";
@@ -18627,7 +18839,12 @@ export type PetitionActivity_petitionQuery = {
                 __typename?: "ReplyCreatedEvent";
                 id: string;
                 createdAt: string;
-                field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+                field?: {
+                  __typename?: "PetitionField";
+                  id: string;
+                  title?: string | null;
+                  replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+                } | null;
                 createdBy?:
                   | {
                       __typename?: "PetitionAccess";
@@ -18645,6 +18862,7 @@ export type PetitionActivity_petitionQuery = {
                       status: UserStatus;
                     }
                   | null;
+                reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
               }
             | {
                 __typename?: "ReplyDeletedEvent";
@@ -18670,10 +18888,17 @@ export type PetitionActivity_petitionQuery = {
                   | null;
               }
             | {
-                __typename?: "ReplyUpdatedEvent";
+                __typename?: "ReplyStatusChangedEvent";
                 id: string;
+                status: PetitionFieldReplyStatus;
                 createdAt: string;
-                field?: { __typename?: "PetitionField"; id: string; title?: string | null } | null;
+                field?: {
+                  __typename?: "PetitionField";
+                  id: string;
+                  multiple: boolean;
+                  title?: string | null;
+                  replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+                } | null;
                 updatedBy?:
                   | {
                       __typename?: "PetitionAccess";
@@ -18691,6 +18916,36 @@ export type PetitionActivity_petitionQuery = {
                       status: UserStatus;
                     }
                   | null;
+                reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
+              }
+            | {
+                __typename?: "ReplyUpdatedEvent";
+                id: string;
+                createdAt: string;
+                field?: {
+                  __typename?: "PetitionField";
+                  id: string;
+                  title?: string | null;
+                  replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+                } | null;
+                updatedBy?:
+                  | {
+                      __typename?: "PetitionAccess";
+                      contact?: {
+                        __typename?: "Contact";
+                        id: string;
+                        fullName: string;
+                        email: string;
+                      } | null;
+                    }
+                  | {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null;
+                      status: UserStatus;
+                    }
+                  | null;
+                reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
               }
             | {
                 __typename?: "SignatureCancelledEvent";
@@ -29090,9 +29345,23 @@ export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
   ${ContactReference_ContactFragmentDoc}
   ${SentReminderMessageDialog_PetitionReminderFragmentDoc}
 ` as unknown as DocumentNode<TimelineReminderSentEvent_ReminderSentEventFragment, unknown>;
+export const TimelineSeeReplyButton_PetitionFieldFragmentDoc = gql`
+  fragment TimelineSeeReplyButton_PetitionField on PetitionField {
+    id
+    replies {
+      id
+    }
+  }
+` as unknown as DocumentNode<TimelineSeeReplyButton_PetitionFieldFragment, unknown>;
+export const TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc = gql`
+  fragment TimelineSeeReplyButton_PetitionFieldReply on PetitionFieldReply {
+    id
+  }
+` as unknown as DocumentNode<TimelineSeeReplyButton_PetitionFieldReplyFragment, unknown>;
 export const TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc = gql`
   fragment TimelineReplyCreatedEvent_ReplyCreatedEvent on ReplyCreatedEvent {
     field {
+      ...TimelineSeeReplyButton_PetitionField
       ...PetitionFieldReference_PetitionField
     }
     createdBy {
@@ -29105,15 +29374,21 @@ export const TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc = gql`
         }
       }
     }
+    reply {
+      ...TimelineSeeReplyButton_PetitionFieldReply
+    }
     createdAt
   }
+  ${TimelineSeeReplyButton_PetitionFieldFragmentDoc}
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${UserReference_UserFragmentDoc}
   ${ContactReference_ContactFragmentDoc}
+  ${TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<TimelineReplyCreatedEvent_ReplyCreatedEventFragment, unknown>;
 export const TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc = gql`
   fragment TimelineReplyUpdatedEvent_ReplyUpdatedEvent on ReplyUpdatedEvent {
     field {
+      ...TimelineSeeReplyButton_PetitionField
       ...PetitionFieldReference_PetitionField
     }
     updatedBy {
@@ -29126,11 +29401,16 @@ export const TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc = gql`
         }
       }
     }
+    reply {
+      ...TimelineSeeReplyButton_PetitionFieldReply
+    }
     createdAt
   }
+  ${TimelineSeeReplyButton_PetitionFieldFragmentDoc}
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${UserReference_UserFragmentDoc}
   ${ContactReference_ContactFragmentDoc}
+  ${TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment, unknown>;
 export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
   fragment TimelineReplyDeletedEvent_ReplyDeletedEvent on ReplyDeletedEvent {
@@ -29557,6 +29837,39 @@ export const TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragmentDoc 
   TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragment,
   unknown
 >;
+export const TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragmentDoc = gql`
+  fragment TimelineReplyStatusChangedEvent_ReplyStatusChangedEvent on ReplyStatusChangedEvent {
+    field {
+      id
+      multiple
+      ...TimelineSeeReplyButton_PetitionField
+      ...PetitionFieldReference_PetitionField
+    }
+    updatedBy {
+      ... on User {
+        ...UserReference_User
+      }
+      ... on PetitionAccess {
+        contact {
+          ...ContactReference_Contact
+        }
+      }
+    }
+    reply {
+      ...TimelineSeeReplyButton_PetitionFieldReply
+    }
+    status
+    createdAt
+  }
+  ${TimelineSeeReplyButton_PetitionFieldFragmentDoc}
+  ${PetitionFieldReference_PetitionFieldFragmentDoc}
+  ${UserReference_UserFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
+  ${TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragment,
+  unknown
+>;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -29674,6 +29987,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on PetitionAnonymizedEvent {
       ...TimelinePetitionAnonymizedEvent_PetitionAnonymizedEvent
     }
+    ... on ReplyStatusChangedEvent {
+      ...TimelineReplyStatusChangedEvent_ReplyStatusChangedEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -29712,6 +30028,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragmentDoc}
   ${TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFragmentDoc}
   ${TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragmentDoc}
+  ${TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivityTimeline_PetitionEventFragment, unknown>;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {

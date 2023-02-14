@@ -52,6 +52,7 @@ const result: PossibleTypesResultData = {
       "RemindersOptOutEvent",
       "ReplyCreatedEvent",
       "ReplyDeletedEvent",
+      "ReplyStatusChangedEvent",
       "ReplyUpdatedEvent",
       "SignatureCancelledEvent",
       "SignatureCompletedEvent",

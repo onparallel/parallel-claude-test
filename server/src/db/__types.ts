@@ -139,7 +139,8 @@ export type PetitionEventType =
   | "PETITION_REMINDER_BOUNCED"
   | "SIGNATURE_REMINDER"
   | "SIGNATURE_OPENED"
-  | "PETITION_ANONYMIZED";
+  | "PETITION_ANONYMIZED"
+  | "REPLY_STATUS_CHANGED";
 
 export const PetitionEventTypeValues = [
   "PETITION_CREATED",
@@ -181,6 +182,7 @@ export const PetitionEventTypeValues = [
   "SIGNATURE_REMINDER",
   "SIGNATURE_OPENED",
   "PETITION_ANONYMIZED",
+  "REPLY_STATUS_CHANGED",
 ] as PetitionEventType[];
 
 export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";

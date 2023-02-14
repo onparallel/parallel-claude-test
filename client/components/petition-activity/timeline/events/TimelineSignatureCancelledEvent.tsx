@@ -1,0 +1,189 @@
+import { gql } from "@apollo/client";
+import { Box, Button, Flex } from "@chakra-ui/react";
+import { SignatureIcon } from "@parallel/chakra/icons";
+import { DateTime } from "@parallel/components/common/DateTime";
+import { NakedLink } from "@parallel/components/common/Link";
+import { SignerReference } from "@parallel/components/common/SignerReference";
+import { TimelineSignatureCancelledEvent_SignatureCancelledEventFragment } from "@parallel/graphql/__types";
+import { FORMATS } from "@parallel/utils/dates";
+import { FormattedMessage } from "react-intl";
+import { useDeclinedSignatureReasonDialog } from "../../dialogs/DeclinedSignatureReasonDialog";
+import { UserOrContactReference } from "../../UserOrContactReference";
+import { TimelineIcon } from "../common/TimelineIcon";
+import { TimelineItem } from "../common/TimelineItem";
+
+export type TimelineSignatureCancelledEventProps = {
+  userId: string;
+  event: TimelineSignatureCancelledEvent_SignatureCancelledEventFragment;
+};
+
+export function TimelineSignatureCancelledEvent({
+  event,
+  userId,
+}: TimelineSignatureCancelledEventProps) {
+  const showDeclinedSignatureReason = useDeclinedSignatureReasonDialog();
+  async function handleSeeMessageClick() {
+    try {
+      await showDeclinedSignatureReason({
+        signer: event.canceller ?? null,
+        declineReason: event.cancellerReason!,
+      });
+    } catch {}
+  }
+
+  return (
+    <TimelineItem
+      icon={<TimelineIcon icon={SignatureIcon} color="white" backgroundColor="red.500" />}
+    >
+      <Flex alignItems="center">
+        <Box>
+          {event.cancelType === "CANCELLED_BY_USER" && (
+            <FormattedMessage
+              id="timeline.signature-cancelled-by-user.description"
+              defaultMessage="{userIsYou, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}"
+              values={{
+                userIsYou:
+                  event.cancelledBy?.__typename === "User" && userId === event.cancelledBy.id,
+                name: <UserOrContactReference userOrAccess={event.cancelledBy} />,
+                timeAgo: (
+                  <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                ),
+              }}
+            />
+          )}
+          {event.cancelType === "DECLINED_BY_SIGNER" && (
+            <FormattedMessage
+              id="timeline.signature-declined-by-signer.description"
+              defaultMessage="{signer} has declined the eSignature process {timeAgo}"
+              values={{
+                signer: <SignerReference signer={event.canceller} />,
+                timeAgo: (
+                  <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                ),
+              }}
+            />
+          )}
+          {event.cancelType === "REQUEST_RESTARTED" && (
+            <FormattedMessage
+              id="timeline.signature-restarted.description"
+              defaultMessage="The eSignature process has been restarted {timeAgo}"
+              values={{
+                timeAgo: (
+                  <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                ),
+              }}
+            />
+          )}
+          {event.cancelType === "REQUEST_ERROR" ? (
+            event.errorCode === "INSUFFICIENT_SIGNATURE_CREDITS" ? (
+              <FormattedMessage
+                id="timeline.signature-cancelled-request-error.insufficient-credits.description"
+                defaultMessage="The eSignature could not be started due to lack of signature credits {timeAgo}"
+                values={{
+                  timeAgo: (
+                    <DateTime
+                      value={event.createdAt}
+                      format={FORMATS.LLL}
+                      useRelativeTime="always"
+                    />
+                  ),
+                }}
+              />
+            ) : (
+              <FormattedMessage
+                id="timeline.signature-cancelled-request-error.description"
+                defaultMessage="The eSignature has been cancelled due to an error from the provider {timeAgo}: {message}"
+                values={{
+                  timeAgo: (
+                    <DateTime
+                      value={event.createdAt}
+                      format={FORMATS.LLL}
+                      useRelativeTime="always"
+                    />
+                  ),
+                  message:
+                    event.errorCode === "EMAIL_BOUNCED" ? (
+                      <FormattedMessage
+                        id="timeline.signature-cancelled-request-error.email-bounced.description"
+                        defaultMessage="{hasEmail, select, true{The email<{signerEmail}>} other{an email}} has bounced."
+                        values={{
+                          hasEmail: Boolean(event.extraErrorData?.email),
+                          signerEmail: event.extraErrorData?.email,
+                        }}
+                      />
+                    ) : event.errorCode === "MAX_SIZE_EXCEEDED" ? (
+                      <FormattedMessage
+                        id="timeline.signature-cancelled-request-error.max-size-exceeded.description"
+                        defaultMessage="The document exceeds the maximum size allowed. Please, reduce the size of the annexed files and try it again."
+                      />
+                    ) : event.errorCode === "CONSENT_REQUIRED" ||
+                      event.errorCode === "ACCOUNT_SUSPENDED" ? (
+                      <FormattedMessage
+                        id="timeline.signature-cancelled-request-error.consent-required.description"
+                        defaultMessage="The integration has expired and needs to be reauthorized."
+                      />
+                    ) : event.errorCode === "INVALID_CREDENTIALS" ? (
+                      <FormattedMessage
+                        id="timeline.signature-cancelled-request-error.invalid-credentials.description"
+                        defaultMessage="The provided credentials are not valid anymore and need to be updated."
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="timeline.signature-cancelled-request-error.unknown.description"
+                        defaultMessage="An unknown error happened."
+                      />
+                    ),
+                }}
+              />
+            )
+          ) : null}
+        </Box>
+        {event.cancelType === "DECLINED_BY_SIGNER" && event.cancellerReason && (
+          <Button
+            onClick={handleSeeMessageClick}
+            size="sm"
+            variant="outline"
+            marginLeft={4}
+            background="white"
+          >
+            <FormattedMessage
+              id="timeline.signature-declined.see-reason"
+              defaultMessage="See reason"
+            />
+          </Button>
+        )}
+        {event.cancelType === "REQUEST_ERROR" &&
+          event.errorCode &&
+          ["CONSENT_REQUIRED", "INVALID_CREDENTIALS", "ACCOUNT_SUSPENDED"].includes(
+            event.errorCode
+          ) && (
+            <NakedLink href="/app/organization/integrations/signature">
+              <Button as="a" variant="outline" size="sm" marginLeft={4}>
+                <FormattedMessage id="timeline.signature-declined.review" defaultMessage="Review" />
+              </Button>
+            </NakedLink>
+          )}
+      </Flex>
+    </TimelineItem>
+  );
+}
+
+TimelineSignatureCancelledEvent.fragments = {
+  SignatureCancelledEvent: gql`
+    fragment TimelineSignatureCancelledEvent_SignatureCancelledEvent on SignatureCancelledEvent {
+      cancelledBy {
+        ...UserOrContactReference_UserOrPetitionAccess
+      }
+      canceller {
+        ...SignerReference_PetitionSigner
+      }
+      cancelType
+      errorCode
+      extraErrorData
+      cancellerReason
+      createdAt
+    }
+    ${UserOrContactReference.fragments.UserOrPetitionAccess}
+    ${SignerReference.fragments.PetitionSigner}
+  `,
+};

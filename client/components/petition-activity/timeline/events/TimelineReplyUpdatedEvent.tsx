@@ -1,0 +1,67 @@
+import { gql } from "@apollo/client";
+import { HStack, Text } from "@chakra-ui/react";
+import { PlusCircleIcon } from "@parallel/chakra/icons";
+import { DateTime } from "@parallel/components/common/DateTime";
+import { TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment } from "@parallel/graphql/__types";
+import { FORMATS } from "@parallel/utils/dates";
+import { FormattedMessage } from "react-intl";
+import { PetitionFieldReference } from "../../PetitionFieldReference";
+import { UserOrContactReference } from "../../UserOrContactReference";
+import { TimelineIcon } from "../common/TimelineIcon";
+import { TimelineItem } from "../common/TimelineItem";
+import { TimelineSeeReplyButton } from "../common/TimelineSeeReplyButton";
+
+export type TimelineReplyUpdatedEventProps = {
+  event: TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment;
+  userId: string;
+};
+
+export function TimelineReplyUpdatedEvent({
+  event: { updatedBy, field, reply, createdAt },
+  userId,
+}: TimelineReplyUpdatedEventProps) {
+  return (
+    <TimelineItem
+      icon={<TimelineIcon icon={PlusCircleIcon} color="gray.600" size="18px" />}
+      paddingY={2}
+    >
+      <HStack spacing={2}>
+        <Text>
+          <FormattedMessage
+            id="timeline.reply-updated-description"
+            defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
+            values={{
+              userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
+              updatedBy: <UserOrContactReference userOrAccess={updatedBy} />,
+              field: <PetitionFieldReference field={field} />,
+              timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+            }}
+          />
+        </Text>
+        <TimelineSeeReplyButton field={field} replyId={reply?.id} />
+      </HStack>
+    </TimelineItem>
+  );
+}
+
+TimelineReplyUpdatedEvent.fragments = {
+  ReplyUpdatedEvent: gql`
+    fragment TimelineReplyUpdatedEvent_ReplyUpdatedEvent on ReplyUpdatedEvent {
+      field {
+        ...TimelineSeeReplyButton_PetitionField
+        ...PetitionFieldReference_PetitionField
+      }
+      updatedBy {
+        ...UserOrContactReference_UserOrPetitionAccess
+      }
+      reply {
+        ...TimelineSeeReplyButton_PetitionFieldReply
+      }
+      createdAt
+    }
+    ${UserOrContactReference.fragments.UserOrPetitionAccess}
+    ${TimelineSeeReplyButton.fragments.PetitionField}
+    ${TimelineSeeReplyButton.fragments.PetitionFieldReply}
+    ${PetitionFieldReference.fragments.PetitionField}
+  `,
+};

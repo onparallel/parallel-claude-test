@@ -2456,6 +2456,7 @@ export type PetitionEventType =
   | "REMINDER_SENT"
   | "REPLY_CREATED"
   | "REPLY_DELETED"
+  | "REPLY_STATUS_CHANGED"
   | "REPLY_UPDATED"
   | "SIGNATURE_CANCELLED"
   | "SIGNATURE_COMPLETED"
@@ -3754,6 +3755,18 @@ export type ReplyDeletedEvent = PetitionEvent & {
   id: Scalars["GID"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
+};
+
+export type ReplyStatusChangedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
+  field: Maybe<PetitionField>;
+  id: Scalars["GID"];
+  petition: Maybe<Petition>;
+  reply: Maybe<PetitionFieldReply>;
+  status: PetitionFieldReplyStatus;
+  type: PetitionEventType;
+  updatedBy: Maybe<User>;
 };
 
 export type ReplyUpdatedEvent = PetitionEvent & {

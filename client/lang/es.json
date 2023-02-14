@@ -10800,14 +10800,29 @@
     "context": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
   },
   {
+    "term": "timeline.reply-deleted",
+    "definition": "Respuesta borrada",
+    "context": "Reply deleted"
+  },
+  {
     "term": "timeline.reply-deleted-description",
     "definition": "{userIsYou, select, true {Eliminaste} other {{deletedBy} eliminó}} una respuesta al campo {field} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}"
   },
   {
+    "term": "timeline.reply-status-changed-description",
+    "definition": "{userIsYou, select, true {{status, select, APPROVED{Aprobaste} REJECTED{Rechazaste} other{Modificaste a pendiente}}} other {{updatedBy} {status, select, APPROVED{aprobó} REJECTED{rechazó} other{modificó a pendiente}}}} {multiple, select, true{una de las respuestas} other {la respuesta}} al campo {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{updatedBy}}} {status, select, APPROVED{approved} REJECTED{rejected} other{set as pending}} {multiple, select, true{one of the replies} other {a reply}} to the field {field} {timeAgo}"
+  },
+  {
     "term": "timeline.reply-updated-description",
     "definition": "{userIsYou, select, true {Actualizaste} other {{updatedBy} actualizó}} una respuesta al campo {field} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
+  },
+  {
+    "term": "timeline.see",
+    "definition": "Ver",
+    "context": "See"
   },
   {
     "term": "timeline.signature-cancelled-by-user.description",

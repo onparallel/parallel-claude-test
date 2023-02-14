@@ -410,4 +410,5 @@ const eventTypes: PetitionEventType[] = [
   "USER_PERMISSION_REMOVED",
   "REMINDERS_OPT_OUT",
   "PETITION_ANONYMIZED",
+  "REPLY_STATUS_CHANGED",
 ];

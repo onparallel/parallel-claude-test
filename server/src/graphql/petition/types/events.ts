@@ -103,6 +103,8 @@ export const PetitionEvent = interfaceType({
         return "PetitionReminderBouncedEvent";
       case "PETITION_ANONYMIZED":
         return "PetitionAnonymizedEvent";
+      case "REPLY_STATUS_CHANGED":
+        return "ReplyStatusChangedEvent";
     }
   },
   sourceType: "events.PetitionEvent",
@@ -662,3 +664,28 @@ export const PetitionReminderBouncedEvent = createPetitionEvent(
 );
 
 export const PetitionAnonymizedEvent = createPetitionEvent("PetitionAnonymizedEvent", (t) => {});
+
+export const ReplyStatusChangedEvent = createPetitionEvent("ReplyStatusChangedEvent", (t) => {
+  t.nullable.field("updatedBy", {
+    type: "UserOrPetitionAccess",
+    resolve: userOrPetitionAccessResolver,
+  });
+  t.nullable.field("field", {
+    type: "PetitionField",
+    resolve: async (root, _, ctx) => {
+      return await ctx.petitions.loadField(root.data.petition_field_id);
+    },
+  });
+  t.nullable.field("reply", {
+    type: "PetitionFieldReply",
+    resolve: async (root, _, ctx) => {
+      return await ctx.petitions.loadFieldReply(root.data.petition_field_reply_id);
+    },
+  });
+  t.field("status", {
+    type: "PetitionFieldReplyStatus",
+    resolve: (root) => {
+      return root.data.status;
+    },
+  });
+});

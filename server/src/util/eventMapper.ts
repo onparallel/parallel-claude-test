@@ -307,6 +307,17 @@ export function mapEventPayload(event: PetitionEvent) {
         petitionReminderId: toGlobalId("PetitionReminder", event.data.petition_reminder_id),
       };
     }
+    case "REPLY_STATUS_CHANGED": {
+      return {
+        status: event.data.status,
+        petitionAccessId: event.data.petition_access_id
+          ? toGlobalId("PetitionAccess", event.data.petition_access_id)
+          : null,
+        userId: event.data.user_id ? toGlobalId("User", event.data.user_id) : null,
+        petitionFieldId: toGlobalId("PetitionField", event.data.petition_field_id),
+        petitionFieldReplyId: toGlobalId("PetitionFieldReply", event.data.petition_field_reply_id),
+      };
+    }
     default:
       return {};
   }

@@ -1901,6 +1901,8 @@ export class PetitionRepository extends BaseRepository {
     updater: User | PetitionAccess
   ) {
     const field = await this.loadFieldForReply(replyId);
+    const oldReply = await this.loadFieldReply(replyId);
+
     if (!field) {
       throw new Error("Petition field not found");
     }
@@ -1932,11 +1934,25 @@ export class PetitionRepository extends BaseRepository {
       this.loadPetition.dataloader.clear(field.petition_id);
     }
 
-    await this.createOrUpdateReplyEvent(
-      field.petition_id,
-      reply,
-      isContact ? { petition_access_id: updater.id } : { user_id: updater.id }
-    );
+    const petitionAccessIdOrUserId = isContact
+      ? { petition_access_id: updater.id }
+      : { user_id: updater.id };
+
+    await this.createOrUpdateReplyEvent(field.petition_id, reply, petitionAccessIdOrUserId);
+
+    if (oldReply && oldReply.status !== "PENDING") {
+      await this.createEvent({
+        type: "REPLY_STATUS_CHANGED",
+        petition_id: field.petition_id,
+        data: {
+          status: "PENDING",
+          petition_field_id: reply.petition_field_id,
+          petition_field_reply_id: reply.id,
+          ...petitionAccessIdOrUserId,
+        },
+      });
+    }
+
     return reply;
   }
 
@@ -2031,22 +2047,37 @@ export class PetitionRepository extends BaseRepository {
   async updatePendingPetitionFieldRepliesStatusByPetitionId(
     petitionId: number,
     status: PetitionFieldReplyStatus,
-    updatedBy: string
+    updater: User
   ) {
     const fields = await this.loadFieldsForPetition(petitionId);
     const fieldIds = fields.flatMap((f) => f.id);
 
-    return await this.from("petition_field_reply")
+    const replies = await this.from("petition_field_reply")
       .whereIn("petition_field_id", fieldIds)
       .andWhere("status", "PENDING")
       .update(
         {
           status,
           updated_at: this.now(),
-          updated_by: updatedBy,
+          updated_by: `User:${updater!.id}`,
         },
         "*"
       );
+
+    await this.createEvent(
+      replies.map((reply) => ({
+        type: "REPLY_STATUS_CHANGED",
+        petition_id: petitionId,
+        data: {
+          status,
+          petition_field_id: reply.petition_field_id,
+          petition_field_reply_id: reply.id,
+          user_id: updater.id,
+        },
+      }))
+    );
+
+    return replies;
   }
 
   async updatePetitionFieldRepliesStatus(

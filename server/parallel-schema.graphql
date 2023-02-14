@@ -3004,6 +3004,7 @@ enum PetitionEventType {
   REMINDER_SENT
   REPLY_CREATED
   REPLY_DELETED
+  REPLY_STATUS_CHANGED
   REPLY_UPDATED
   SIGNATURE_CANCELLED
   SIGNATURE_COMPLETED
@@ -5118,6 +5119,18 @@ type ReplyDeletedEvent implements PetitionEvent {
   id: GID!
   petition: Petition
   type: PetitionEventType!
+}
+
+type ReplyStatusChangedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  data: JSONObject!
+  field: PetitionField
+  id: GID!
+  petition: Petition
+  reply: PetitionFieldReply
+  status: PetitionFieldReplyStatus!
+  type: PetitionEventType!
+  updatedBy: UserOrPetitionAccess
 }
 
 type ReplyUpdatedEvent implements PetitionEvent {

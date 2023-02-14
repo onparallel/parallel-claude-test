@@ -1220,7 +1220,7 @@ export const approveOrRejectPetitionFieldReplies = mutationField(
       await ctx.petitions.updatePendingPetitionFieldRepliesStatusByPetitionId(
         args.petitionId,
         args.status,
-        `User:${ctx.user!.id}`
+        ctx.user!
       );
 
       return (await ctx.petitions.loadPetition(args.petitionId))!;
@@ -1249,6 +1249,20 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
       args.status,
       `User:${ctx.user!.id}`
     );
+
+    await ctx.petitions.createEvent(
+      args.petitionFieldReplyIds.map((replyId) => ({
+        type: "REPLY_STATUS_CHANGED",
+        petition_id: args.petitionId,
+        data: {
+          status: args.status,
+          petition_field_id: args.petitionFieldId,
+          petition_field_reply_id: replyId,
+          user_id: ctx.user!.id,
+        },
+      }))
+    );
+
     return (await ctx.petitions.loadField(args.petitionFieldId))!;
   },
 });
