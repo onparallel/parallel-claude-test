@@ -4513,6 +4513,7 @@ export type GetPetitions_petitionsQueryVariables = Exact<{
   includeRecipientUrl: Scalars["Boolean"];
   includeReplies: Scalars["Boolean"];
   includeProgress: Scalars["Boolean"];
+  fromTemplateId?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
 }>;
 
 export type GetPetitions_petitionsQuery = {
@@ -6362,12 +6363,13 @@ export const GetPetitions_petitionsDocument = gql`
     $includeRecipientUrl: Boolean!
     $includeReplies: Boolean!
     $includeProgress: Boolean!
+    $fromTemplateId: [GID!]
   ) {
     petitions(
       offset: $offset
       limit: $limit
       sortBy: $sortBy
-      filters: { status: $status, type: PETITION, tagIds: $tagIds }
+      filters: { status: $status, type: PETITION, tagIds: $tagIds, fromTemplateId: $fromTemplateId }
     ) {
       items {
         ...Petition

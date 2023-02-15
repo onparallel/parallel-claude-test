@@ -418,6 +418,12 @@ api
           required: false,
           array: true,
         }),
+        fromTemplateId: stringParam({
+          description: "List of template IDs used to create the parallels",
+          example: [toGlobalId("Petition", 101), toGlobalId("Petition", 57)].join(","),
+          required: false,
+          array: true,
+        }),
         ...petitionIncludeParam,
       },
       responses: { 200: SuccessResponse(PaginatedPetitions) },
@@ -450,12 +456,18 @@ api
           $includeRecipientUrl: Boolean!
           $includeReplies: Boolean!
           $includeProgress: Boolean!
+          $fromTemplateId: [GID!]
         ) {
           petitions(
             offset: $offset
             limit: $limit
             sortBy: $sortBy
-            filters: { status: $status, type: PETITION, tagIds: $tagIds }
+            filters: {
+              status: $status
+              type: PETITION
+              tagIds: $tagIds
+              fromTemplateId: $fromTemplateId
+            }
           ) {
             items {
               ...Petition
@@ -466,7 +478,7 @@ api
         ${PetitionFragment}
       `;
       const result = await client.request(GetPetitions_petitionsDocument, {
-        ...pick(query, ["offset", "limit", "status", "sortBy"]),
+        ...pick(query, ["offset", "limit", "status", "fromTemplateId", "sortBy"]),
         tagIds,
         includeFields: query.include?.includes("fields") ?? false,
         includeReplies: query.include?.includes("replies") ?? false,
