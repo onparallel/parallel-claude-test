@@ -8065,6 +8065,17 @@ export type SentReminderMessageDialog_PetitionReminderFragment = {
   };
 };
 
+export type TimelineSeeReplyButton_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+};
+
+export type TimelineSeeReplyButton_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  id: string;
+};
+
 export type TimelineAccessActivatedEvent_AccessActivatedEventFragment = {
   __typename?: "AccessActivatedEvent";
   createdAt: string;
@@ -8484,17 +8495,6 @@ export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
   reply?: { __typename?: "PetitionFieldReply"; id: string } | null;
-};
-
-export type TimelineSeeReplyButton_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-};
-
-export type TimelineSeeReplyButton_PetitionFieldReplyFragment = {
-  __typename?: "PetitionFieldReply";
-  id: string;
 };
 
 export type TimelineSignatureCancelledEvent_SignatureCancelledEventFragment = {
@@ -29365,14 +29365,7 @@ export const TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc = gql`
       ...PetitionFieldReference_PetitionField
     }
     createdBy {
-      ... on User {
-        ...UserReference_User
-      }
-      ... on PetitionAccess {
-        contact {
-          ...ContactReference_Contact
-        }
-      }
+      ...UserOrContactReference_UserOrPetitionAccess
     }
     reply {
       ...TimelineSeeReplyButton_PetitionFieldReply
@@ -29381,8 +29374,7 @@ export const TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc = gql`
   }
   ${TimelineSeeReplyButton_PetitionFieldFragmentDoc}
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
-  ${UserReference_UserFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
   ${TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<TimelineReplyCreatedEvent_ReplyCreatedEventFragment, unknown>;
 export const TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc = gql`
@@ -29392,14 +29384,7 @@ export const TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc = gql`
       ...PetitionFieldReference_PetitionField
     }
     updatedBy {
-      ... on User {
-        ...UserReference_User
-      }
-      ... on PetitionAccess {
-        contact {
-          ...ContactReference_Contact
-        }
-      }
+      ...UserOrContactReference_UserOrPetitionAccess
     }
     reply {
       ...TimelineSeeReplyButton_PetitionFieldReply
@@ -29408,8 +29393,7 @@ export const TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc = gql`
   }
   ${TimelineSeeReplyButton_PetitionFieldFragmentDoc}
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
-  ${UserReference_UserFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
   ${TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment, unknown>;
 export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
@@ -29418,20 +29402,12 @@ export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
       ...PetitionFieldReference_PetitionField
     }
     deletedBy {
-      ... on User {
-        ...UserReference_User
-      }
-      ... on PetitionAccess {
-        contact {
-          ...ContactReference_Contact
-        }
-      }
+      ...UserOrContactReference_UserOrPetitionAccess
     }
     createdAt
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
-  ${UserReference_UserFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<TimelineReplyDeletedEvent_ReplyDeletedEventFragment, unknown>;
 export const Mention_PetitionFieldCommentMentionFragmentDoc = gql`
   fragment Mention_PetitionFieldCommentMention on PetitionFieldCommentMention {
@@ -29846,14 +29822,7 @@ export const TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragmentDoc 
       ...PetitionFieldReference_PetitionField
     }
     updatedBy {
-      ... on User {
-        ...UserReference_User
-      }
-      ... on PetitionAccess {
-        contact {
-          ...ContactReference_Contact
-        }
-      }
+      ...UserOrContactReference_UserOrPetitionAccess
     }
     reply {
       ...TimelineSeeReplyButton_PetitionFieldReply
@@ -29863,8 +29832,7 @@ export const TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragmentDoc 
   }
   ${TimelineSeeReplyButton_PetitionFieldFragmentDoc}
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
-  ${UserReference_UserFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
   ${TimelineSeeReplyButton_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
   TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragment,

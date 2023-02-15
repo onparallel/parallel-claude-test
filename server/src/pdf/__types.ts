@@ -3766,7 +3766,7 @@ export type ReplyStatusChangedEvent = PetitionEvent & {
   reply: Maybe<PetitionFieldReply>;
   status: PetitionFieldReplyStatus;
   type: PetitionEventType;
-  updatedBy: Maybe<User>;
+  updatedBy: Maybe<UserOrPetitionAccess>;
 };
 
 export type ReplyUpdatedEvent = PetitionEvent & {
