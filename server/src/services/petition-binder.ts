@@ -185,7 +185,9 @@ export class PetitionBinder implements IPetitionBinder {
     }
 
     // don't use temporaryDirectory here, as we dont want to delete the final result after the binder completed
-    const output = resolve(tmpdir(), random(16), `${opts?.outputFileName ?? random(10)}.pdf`);
+    const path = resolve(tmpdir(), random(10));
+    await mkdir(path, { recursive: true });
+    const output = resolve(path, `${opts?.outputFileName ?? random(10)}.pdf`);
     await this.stripMetadata(file, output);
     return output;
   }
