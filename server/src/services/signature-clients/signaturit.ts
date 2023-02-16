@@ -157,8 +157,11 @@ export class SignaturitClient implements ISignatureClient {
           );
         }
         return response;
-      } catch (error: any) {
-        if (error.message === "Account depleted all it's advanced signature requests") {
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message === "Account depleted all it's advanced signature requests"
+        ) {
           await this.emails.sendInternalSignaturitAccountDepletedCreditsEmail(
             orgId,
             petitionId,

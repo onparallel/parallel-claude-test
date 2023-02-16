@@ -96,8 +96,12 @@ export function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                 payload,
                 duration,
               });
-            } catch (error: any) {
-              context.logger.error(error.message, { stack: error.stack });
+            } catch (error) {
+              if (error instanceof Error) {
+                context.logger.error(error.message, { stack: error.stack });
+              } else {
+                context.logger.error(error);
+              }
             }
           },
           sqs: new SQSClient({

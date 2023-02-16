@@ -57,10 +57,10 @@ export class SignaturitIntegration extends GenericIntegration<
     integration: EnhancedOrgIntegration<"SIGNATURE", "SIGNATURIT", false>
   ): SignaturitIntegrationContext {
     const settings = integration.settings;
-    const brandings = (["EN", "ES"] as const)
+    const brandings = (["en", "es"] as const)
       .flatMap((locale) =>
         (["FORMAL", "INFORMAL"] as const).map((tone) => {
-          const key = `${locale}_${tone}_BRANDING_ID` as const;
+          const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as const;
           if (key in settings) {
             return { locale, tone, brandingId: (settings as any)[key] };
           }

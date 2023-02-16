@@ -183,7 +183,7 @@ async function cancelSignatureProcess(
     }
     const signatureClient = ctx.signature.getClient(integration);
     await signatureClient.cancelSignatureRequest(signature.external_id.replace(/^.*?\//, ""));
-  } catch (error: any) {
+  } catch (error) {
     if (!(error instanceof InvalidCredentialsError)) {
       throw error;
     }
@@ -211,7 +211,7 @@ async function sendSignatureReminder(
 
     const signatureClient = ctx.signature.getClient(integration);
     await signatureClient.sendPendingSignatureReminder(signature.external_id.replace(/^.*?\//, ""));
-  } catch (error: any) {
+  } catch (error) {
     if (!(error instanceof InvalidCredentialsError)) {
       throw error;
     }
@@ -273,7 +273,7 @@ async function storeSignedDocument(
       { signature_config: null }, // when completed, set signature_config to null so the signatures card on replies page don't show a "pending start" row
       `SignatureWorker:${payload.petitionSignatureRequestId}`
     );
-  } catch (error: any) {
+  } catch (error) {
     if (!(error instanceof InvalidCredentialsError)) {
       throw error;
     }
@@ -304,7 +304,7 @@ async function storeAuditTrail(
     await ctx.petitions.updatePetitionSignature(signature.id, {
       file_upload_audit_trail_id: auditTrail.id,
     });
-  } catch (error: any) {
+  } catch (error) {
     if (!(error instanceof InvalidCredentialsError)) {
       throw error;
     }
