@@ -224,27 +224,28 @@ export class UserRepository extends BaseRepository {
     updatedBy: string,
     t?: Knex.Transaction
   ) {
-    const [userData] = await this.raw<UserData>(
-      /* sql */ `
-      update "user_data" ud
-      set 
-        first_name = ?,
-        last_name = ?,
-        updated_at = NOW(),
-        updated_by = ?
-      from "user" u 
-      where u.user_data_id = ud.id
-        and u.org_id = ?
-        and u.external_id = ? 
-        and u.deleted_at is null
-        and ud.deleted_at is null
-      returning ud.*;
-    `,
-      [data.first_name, data.last_name, updatedBy, orgId, externalId].filter(
-        (v) => v !== undefined
-      ) as Knex.RawBinding[],
-      t
-    );
+    const [user] = await this.from("user", t)
+      .where({
+        org_id: orgId,
+        external_id: externalId,
+        deleted_at: null,
+      })
+      .select("user_data_id");
+
+    const [userData] = await this.from("user_data", t)
+      .where({
+        id: user.user_data_id,
+        deleted_at: null,
+      })
+      .update(
+        {
+          ...data,
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*"
+      );
+
     userData ? this.loadUserData.dataloader.clear(userData.id) : null;
     this.loadUserByExternalId.dataloader.clear({ externalId, orgId });
     return userData;
