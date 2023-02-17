@@ -1,4 +1,4 @@
-import { ChakraProvider, StylesProvider } from "@chakra-ui/react";
+import { ChakraProvider, IdProvider, StylesProvider } from "@chakra-ui/react";
 import { Fonts } from "@parallel/chakra/fonts";
 import { theme } from "@parallel/chakra/theme";
 import { I18nProps, I18nProvider } from "@parallel/components/common/I18nProvider";
@@ -8,6 +8,8 @@ import Router from "next/router";
 import { useEffect } from "react";
 
 type MyAppProps = AppProps & I18nProps;
+
+const styles = {};
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
@@ -33,7 +35,7 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
       <I18nProvider {...props}>
         <ChakraProvider theme={theme} resetCSS portalZIndex={40} cssVarsRoot="body">
           {/* default StylesProvider so useStyles doesn't break */}
-          <StylesProvider value={{}}>
+          <StylesProvider value={styles}>
             <Fonts />
             <Component {...pageProps} />
           </StylesProvider>

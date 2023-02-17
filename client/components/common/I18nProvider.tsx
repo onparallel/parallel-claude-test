@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { IntlConfig, IntlProvider } from "react-intl";
+import { noop } from "remeda";
 
 const SetLocaleProvider = createContext<((locale: string) => void) | undefined>(undefined);
 
@@ -20,6 +21,10 @@ export interface IntlCache {
   };
 }
 
+const defaultRichTextElements = {
+  b: (chunks: any) => <strong>{chunks}</strong>,
+};
+
 export function I18nProvider({ children, ...props }: I18nProps & { children: ReactNode }) {
   const { locale, messages, setLocale } =
     typeof window !== "undefined"
@@ -30,10 +35,8 @@ export function I18nProvider({ children, ...props }: I18nProps & { children: Rea
       <IntlProvider
         locale={locale}
         messages={messages}
-        defaultRichTextElements={{
-          b: (chunks: any) => <strong>{chunks}</strong>,
-        }}
-        onWarn={() => {}}
+        defaultRichTextElements={defaultRichTextElements}
+        onWarn={noop}
       >
         {children}
       </IntlProvider>
