@@ -14,7 +14,7 @@ import { CustomSelectProps } from "@parallel/utils/react-select/types";
 import { If } from "@parallel/utils/types";
 import { memo, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select, { components } from "react-select";
+import Select, { ActionMeta, components } from "react-select";
 import { zip } from "remeda";
 
 export interface PetitionFieldSelectProps<
@@ -90,11 +90,14 @@ export function PetitionFieldSelect<
     return { options, _value };
   }, [fields, indices, expandFields, value]);
   const handleChange = useCallback(
-    (value: PetitionFieldSelectOption<OptionType>) => {
+    (
+      value: PetitionFieldSelectOption<OptionType>,
+      actionMeta: ActionMeta<PetitionFieldSelectOption<OptionType>>
+    ) => {
       if (value.type === "FIELD") {
-        onChange(value.field as any);
+        onChange(value.field as any, actionMeta as any);
       } else {
-        onChange([value.field, value.column] as any);
+        onChange([value.field, value.column] as any, actionMeta as any);
       }
     },
     [onChange]

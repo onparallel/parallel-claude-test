@@ -110,22 +110,24 @@ export const ContactSelect = Object.assign(
           setIsCreating(false);
           return;
         }
+        const option = pick(contact, [
+          "id",
+          "email",
+          "firstName",
+          "lastName",
+          "fullName",
+          "hasBouncedEmail",
+        ]) as ContactSelectSelection;
         if (isMulti) {
-          onChange([
-            ...((value ?? []) as ContactSelectSelection[]).filter((v) => v.id !== email),
-            pick(contact, ["id", "email", "firstName", "lastName", "fullName", "hasBouncedEmail"]),
-          ] as any);
-        } else {
           onChange(
-            pick(contact, [
-              "id",
-              "email",
-              "firstName",
-              "lastName",
-              "fullName",
-              "hasBouncedEmail",
-            ]) as any
+            [
+              ...((value ?? []) as ContactSelectSelection[]).filter((v) => v.id !== email),
+              option,
+            ] as any,
+            { action: "select-option", option }
           );
+        } else {
+          onChange(option as any, { action: "select-option", option });
         }
         setIsCreating(false);
         return true;
@@ -152,7 +154,10 @@ export const ContactSelect = Object.assign(
           if (EMAIL_REGEX.test(cleaned)) {
             const option = options?.find((o) => o.email === cleaned);
             if (option) {
-              onChange([...((value ?? []) as ContactSelectSelection[]), option] as any);
+              onChange([...((value ?? []) as ContactSelectSelection[]), option] as any, {
+                action: "select-option",
+                option,
+              });
               setInputValue("");
               setOptions(undefined);
             } else {
