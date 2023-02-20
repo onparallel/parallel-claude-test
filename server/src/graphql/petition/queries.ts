@@ -1,3 +1,4 @@
+import assert from "assert";
 import ASCIIFolder from "fold-to-ascii";
 import {
   arg,
@@ -10,7 +11,7 @@ import {
   queryField,
   stringArg,
 } from "nexus";
-import { isDefined, sort, uniq } from "remeda";
+import { isDefined, partition, sort, uniq } from "remeda";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import { validateObject } from "../../util/validateObject";
@@ -136,10 +137,26 @@ export const petitionsQuery = queryField((t) => {
               );
             },
             sharedWith: async (sharedWith) => {
-              return sharedWith.filters.every((f) => {
-                const type = fromGlobalId(f.value).type;
-                return type === "User" || type === "UserGroup";
-              });
+              assert(sharedWith.filters.length <= 5, "maximum of 5 filter lines");
+              const targets = sharedWith.filters.map((f) => fromGlobalId(f.value));
+              assert(
+                targets.every(({ type }) => type === "User" || type === "UserGroup"),
+                "all ids refer to either users or user groups"
+              );
+              const [userIds, userGroupIds] = partition(targets, (t) => t.type === "User");
+              const [users, userGroups] = await Promise.all([
+                ctx.users.loadUser(userIds.map((u) => u.id)),
+                ctx.userGroups.loadUserGroup(userGroupIds.map((g) => g.id)),
+              ]);
+              assert(
+                users.every((u) => u?.org_id === ctx.user!.org_id),
+                "users belong to same org"
+              );
+              assert(
+                userGroups.every((g) => g?.org_id === ctx.user!.org_id),
+                "user groups belong to same org"
+              );
+              return true;
             },
             fromTemplateId: async (fromTemplateId) => {
               return await ctx.petitions.userHasAccessToPetitions(ctx.user!.id, fromTemplateId);

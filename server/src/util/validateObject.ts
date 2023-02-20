@@ -13,9 +13,13 @@ export async function validateObject<T extends {}>(
     Object.entries(validateKeys),
     async ([key, validator]) => {
       if (isDefined(object[key as keyof T])) {
-        const valid: boolean = await (validator as any)(object[key as keyof T]);
-        if (!valid) {
-          throw new Error(`Invalid key: ${key}`);
+        try {
+          const valid: boolean = await (validator as any)(object[key as keyof T]);
+          if (!valid) {
+            throw new Error(`Invalid key: ${key}`);
+          }
+        } catch (e) {
+          throw new Error(`Invalid key: ${key}`, { cause: e });
         }
       }
     },

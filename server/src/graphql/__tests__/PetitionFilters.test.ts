@@ -55,8 +55,8 @@ describe("Petition Filters", () => {
   });
 
   it("petitions owned by me", async () => {
-    const { errors, data } = await testClient.query({
-      query: gql`
+    const { errors, data } = await testClient.execute(
+      gql`
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
@@ -67,7 +67,7 @@ describe("Petition Filters", () => {
           }
         }
       `,
-      variables: {
+      {
         filters: {
           sharedWith: {
             operator: "AND",
@@ -79,8 +79,8 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      },
-    });
+      }
+    );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
       items: [
@@ -93,8 +93,8 @@ describe("Petition Filters", () => {
   });
 
   it("petitions owned by another user", async () => {
-    const { errors, data } = await testClient.query({
-      query: gql`
+    const { errors, data } = await testClient.execute(
+      gql`
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
@@ -105,7 +105,7 @@ describe("Petition Filters", () => {
           }
         }
       `,
-      variables: {
+      {
         filters: {
           sharedWith: {
             operator: "AND",
@@ -117,8 +117,8 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      },
-    });
+      }
+    );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
       items: [],
@@ -126,8 +126,8 @@ describe("Petition Filters", () => {
   });
 
   it("petitions shared with a user through a group", async () => {
-    const { errors, data } = await testClient.query({
-      query: gql`
+    const { errors, data } = await testClient.execute(
+      gql`
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
@@ -138,7 +138,7 @@ describe("Petition Filters", () => {
           }
         }
       `,
-      variables: {
+      {
         filters: {
           sharedWith: {
             operator: "AND",
@@ -150,8 +150,8 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      },
-    });
+      }
+    );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
       items: [
@@ -163,8 +163,8 @@ describe("Petition Filters", () => {
   });
 
   it("petitions shared with other user", async () => {
-    const { errors, data } = await testClient.query({
-      query: gql`
+    const { errors, data } = await testClient.execute(
+      gql`
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
@@ -175,7 +175,7 @@ describe("Petition Filters", () => {
           }
         }
       `,
-      variables: {
+      {
         filters: {
           sharedWith: {
             operator: "AND",
@@ -187,8 +187,8 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      },
-    });
+      }
+    );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
       items: [
@@ -199,8 +199,8 @@ describe("Petition Filters", () => {
   });
 
   it("petitions shared with a user group", async () => {
-    const { errors, data } = await testClient.query({
-      query: gql`
+    const { errors, data } = await testClient.execute(
+      gql`
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
@@ -211,7 +211,7 @@ describe("Petition Filters", () => {
           }
         }
       `,
-      variables: {
+      {
         filters: {
           sharedWith: {
             operator: "AND",
@@ -223,8 +223,8 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      },
-    });
+      }
+    );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
       items: [
@@ -235,8 +235,8 @@ describe("Petition Filters", () => {
   });
 
   it("petitions shared with me and other user", async () => {
-    const { errors, data } = await testClient.query({
-      query: gql`
+    const { errors, data } = await testClient.execute(
+      gql`
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
@@ -247,7 +247,7 @@ describe("Petition Filters", () => {
           }
         }
       `,
-      variables: {
+      {
         filters: {
           sharedWith: {
             operator: "AND",
@@ -263,8 +263,8 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      },
-    });
+      }
+    );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
       items: [
@@ -275,8 +275,8 @@ describe("Petition Filters", () => {
   });
 
   it("petitions owned by other user", async () => {
-    const { errors, data } = await testClient.query({
-      query: gql`
+    const { errors, data } = await testClient.execute(
+      gql`
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
@@ -287,20 +287,20 @@ describe("Petition Filters", () => {
           }
         }
       `,
-      variables: {
+      {
         filters: {
           sharedWith: {
             operator: "AND",
             filters: [
               {
                 operator: "IS_OWNER",
-                value: toGlobalId("UserGroup", users[1].id),
+                value: toGlobalId("User", users[1].id),
               },
             ],
           },
         },
-      },
-    });
+      }
+    );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
       items: [{ id: toGlobalId("Petition", petitions[4].id) }],
@@ -308,8 +308,8 @@ describe("Petition Filters", () => {
   });
 
   it("petitions not shared with a user group", async () => {
-    const { errors, data } = await testClient.query({
-      query: gql`
+    const { errors, data } = await testClient.execute(
+      gql`
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
@@ -320,7 +320,7 @@ describe("Petition Filters", () => {
           }
         }
       `,
-      variables: {
+      {
         filters: {
           sharedWith: {
             operator: "AND",
@@ -332,8 +332,8 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      },
-    });
+      }
+    );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
       items: [
@@ -345,8 +345,8 @@ describe("Petition Filters", () => {
   });
 
   it("petitions owned by one user or shared to other user", async () => {
-    const { errors, data } = await testClient.query({
-      query: gql`
+    const { errors, data } = await testClient.execute(
+      gql`
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
@@ -357,7 +357,7 @@ describe("Petition Filters", () => {
           }
         }
       `,
-      variables: {
+      {
         filters: {
           sharedWith: {
             operator: "OR",
@@ -373,8 +373,8 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      },
-    });
+      }
+    );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
       items: [
@@ -385,8 +385,8 @@ describe("Petition Filters", () => {
   });
 
   it("petitions not shared with a user", async () => {
-    const { errors, data } = await testClient.query({
-      query: gql`
+    const { errors, data } = await testClient.execute(
+      gql`
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
@@ -397,7 +397,7 @@ describe("Petition Filters", () => {
           }
         }
       `,
-      variables: {
+      {
         filters: {
           sharedWith: {
             operator: "AND",
@@ -409,8 +409,8 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      },
-    });
+      }
+    );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
       items: [
@@ -422,8 +422,8 @@ describe("Petition Filters", () => {
   });
 
   it("petitions not shared with a user group and owned by me", async () => {
-    const { errors, data } = await testClient.query({
-      query: gql`
+    const { errors, data } = await testClient.execute(
+      gql`
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
@@ -434,7 +434,7 @@ describe("Petition Filters", () => {
           }
         }
       `,
-      variables: {
+      {
         filters: {
           sharedWith: {
             operator: "AND",
@@ -450,8 +450,8 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      },
-    });
+      }
+    );
     expect(errors).toBeUndefined();
     expect(data?.petitions).toEqual({
       items: [
@@ -462,8 +462,8 @@ describe("Petition Filters", () => {
   });
 
   it("sends error when passing a globalId value different than User or UserGroup", async () => {
-    const { errors, data } = await testClient.query({
-      query: gql`
+    const { errors, data } = await testClient.execute(
+      gql`
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
@@ -474,7 +474,7 @@ describe("Petition Filters", () => {
           }
         }
       `,
-      variables: {
+      {
         filters: {
           sharedWith: {
             operator: "AND",
@@ -486,8 +486,8 @@ describe("Petition Filters", () => {
             ],
           },
         },
-      },
-    });
+      }
+    );
     expect(errors).toContainGraphQLError("INVALID_FILTER");
     expect(data).toBeNull();
   });
