@@ -6,7 +6,7 @@ import { ParseUrlParams } from "typed-url-params";
 import { Memoize } from "typescript-memoize";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray, MaybePromise } from "../../util/types";
-import { HttpError, InvalidParameterError, UnknownError } from "./errors";
+import { HttpError, InvalidParameterError, InvalidRequestBodyError, UnknownError } from "./errors";
 import { ParseError } from "./params";
 import { JsonSchemaFor } from "./schemas";
 
@@ -314,7 +314,20 @@ export type RestApiContext<TContext = {}, TParams = any, TQuery = any, TBody = a
 };
 
 export class RestApi<TContext = {}> {
-  private router: Router = Router().use(json());
+  private router: Router = Router().use(
+    (() => {
+      const parser = json();
+      return function (req, res, next) {
+        parser(req, res, function (error) {
+          if (error instanceof Error) {
+            new InvalidRequestBodyError(error.message).apply(res);
+          } else {
+            next(error);
+          }
+        });
+      };
+    })()
+  );
   private paths: PathResolver<TContext, any, any>[] = [];
   private _spec: Omit<RestApiOptions, "middleware">;
 
