@@ -2445,11 +2445,19 @@ export class PetitionRepository extends BaseRepository {
     repliesMap: Record<string, number>,
     t?: Knex.Transaction
   ) {
-    const events = await this.getPetitionEventsByType(fromPetitionId, [
-      "REPLY_CREATED",
-      "REPLY_UPDATED",
-      "REPLY_DELETED",
-    ]);
+    const events = (
+      await this.getPetitionEventsByType(fromPetitionId, [
+        "REPLY_CREATED",
+        "REPLY_UPDATED",
+        "REPLY_DELETED",
+      ])
+    ).filter(
+      (e) =>
+        // there could be events for fields and replies that are deleted in the original petition
+        // so we need to make sure the petition_field_id and petition_field_reply_id in the events are present in the maps before inserting
+        isDefined(fieldsMap[e.data.petition_field_id]) &&
+        isDefined(repliesMap[e.data.petition_field_reply_id])
+    );
 
     if (events.length > 0) {
       await this.from("petition_event", t).insert(
