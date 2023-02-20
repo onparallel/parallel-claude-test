@@ -1,7 +1,7 @@
 import { JSONSchema6TypeName } from "json-schema";
 import { FromSchema } from "json-schema-to-ts";
 import { outdent } from "outdent";
-import { PetitionEventType } from "../../db/__types";
+import { PetitionEventType, PetitionFieldReplyStatusValues } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { titleize } from "../../util/strings";
 import { JsonSchema, JsonSchemaFor, schema } from "../rest/schemas";
@@ -1695,6 +1695,38 @@ const PetitionEventSchemas = {
   PETITION_ANONYMIZED: {
     description: "The parallel has been anonymized.",
     properties: {},
+  },
+  REPLY_STATUS_CHANGED: {
+    description: "The status of a reply has changed",
+    properties: {
+      status: {
+        description: "The new status of the reply",
+        enum: PetitionFieldReplyStatusValues,
+        type: "string",
+        example: "APPROVED",
+      },
+      petitionAccessId: {
+        description:
+          "The ID of the access. If set, the reply was updated by the recipient linked to this access",
+        type: ["string", "null"],
+        example: toGlobalId("PetitionAccess", 1),
+      },
+      userId: {
+        description: "The ID of the user. If set, the reply was updated by this user.",
+        type: ["string", "null"],
+        example: null,
+      },
+      petitionFieldId: {
+        description: "The ID of the field where the reply belongs",
+        type: "string",
+        example: toGlobalId("PetitionField", 1),
+      },
+      petitionFieldReplyId: {
+        description: "The ID of the updated reply",
+        type: "string",
+        example: toGlobalId("PetitionFieldReply", 1),
+      },
+    },
   },
 } as Record<PetitionEventType, JsonSchema>;
 
