@@ -1,5 +1,6 @@
 import { GraphQLFormattedError } from "graphql";
 import { outdent } from "outdent";
+import { equals } from "remeda";
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -29,8 +30,10 @@ expect.extend({
         pass: expectedErrorCode
           ? errorCode === expectedErrorCode &&
             (expectedExtra
-              ? JSON.stringify({ ...(errors[0].extensions ?? {}), ...expectedExtra }) ===
-                JSON.stringify(errors[0].extensions ?? {})
+              ? equals(
+                  { ...(errors[0].extensions ?? {}), ...expectedExtra },
+                  errors[0].extensions ?? {}
+                )
               : true)
           : true,
       };

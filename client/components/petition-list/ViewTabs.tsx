@@ -269,7 +269,7 @@ export const ViewTabs = Object.assign(
                     sharedWith: null,
                     signature: null,
                     status: null,
-                    tags: null,
+                    tagsFilters: null,
                     sort: { field: "sentAt", direction: "DESC" },
                   },
                   isDefault: hasDefaultView ? false : true,
@@ -311,7 +311,13 @@ export const ViewTabs = Object.assign(
                 operator
               }
             }
-            tags
+            tagsFilters {
+              operator
+              filters {
+                value
+                operator
+              }
+            }
             signature
             fromTemplateId
             search

@@ -1,13 +1,18 @@
-import { queryField } from "nexus";
-import { authenticate } from "../helpers/authorize";
+import { list, nonNull, queryField } from "nexus";
+import { authenticateAnd } from "../helpers/authorize";
 import Fuse from "fuse.js";
+import { globalIdArg } from "../helpers/globalIdPlugin";
+import { userHasAccessToTags } from "./authorizers";
 
 export const tagsQuery = queryField((t) => {
   t.paginationField("tags", {
     type: "Tag",
     description: "Paginated list of tags in the organization",
-    authorize: authenticate(),
+    authorize: authenticateAnd(userHasAccessToTags("tagIds")),
     searchable: true,
+    extendArgs: {
+      tagIds: list(nonNull(globalIdArg("Tag"))),
+    },
     resolve: async (_, args, ctx) => {
       let items = await ctx.tags.loadTagsByOrganizationId(ctx.user!.org_id);
 

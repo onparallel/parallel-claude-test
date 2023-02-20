@@ -1,4 +1,5 @@
-import { DependencyList, useCallback, useEffect, useRef } from "react";
+import { DependencyList, useCallback, useRef } from "react";
+import { useEffectSkipFirst } from "./useEffectSkipFirst";
 
 /**
  * Similar to useDebouncedCallback but for functions returning promises
@@ -10,7 +11,7 @@ export function useDebouncedAsync<TReturn, T extends (...args: any[]) => Promise
 ): T {
   const timeout = useRef<any>(null);
   const promise = useRef<any>(null);
-  useEffect(() => {
+  useEffectSkipFirst(() => {
     if (timeout.current) {
       clearTimeout(timeout.current);
     }

@@ -1,9 +1,7 @@
-import assert from "assert";
 import ASCIIFolder from "fold-to-ascii";
 import {
   arg,
   booleanArg,
-  enumType,
   inputObjectType,
   list,
   nonNull,
@@ -11,12 +9,11 @@ import {
   queryField,
   stringArg,
 } from "nexus";
-import { isDefined, partition, sort, uniq } from "remeda";
-import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../util/globalId";
+import { isDefined, sort, uniq } from "remeda";
+import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
-import { validateObject } from "../../util/validateObject";
 import { authenticate, authenticateAnd, ifArgDefined, or } from "../helpers/authorize";
-import { ApolloError } from "../helpers/errors";
+import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { validateAnd } from "../helpers/validateArgs";
@@ -28,6 +25,7 @@ import {
   petitionsArePublicTemplates,
   userHasAccessToPetitions,
 } from "./authorizers";
+import { validPetitionSharedWithFilter, validPetitionTagFilter } from "./types/filters";
 import { validatePublicPetitionLinkSlug } from "./validations";
 
 export const petitionsQuery = queryField((t) => {
@@ -39,134 +37,53 @@ export const petitionsQuery = queryField((t) => {
       filters: inputObjectType({
         name: "PetitionFilter",
         definition(t) {
-          t.nullable.list.nonNull.field("status", {
-            type: "PetitionStatus",
-          });
+          t.nullable.list.nonNull.field("status", { type: "PetitionStatus" });
           t.nullable.string("path");
-          t.nullable.field("locale", {
-            type: "PetitionLocale",
+          t.nullable.field("locale", { type: "PetitionLocale" });
+          t.nullable.field("type", { type: "PetitionBaseType" });
+          /** @deprecated */
+          t.nullable.list.nonNull.globalId("tagIds", {
+            prefixName: "Tag",
+            deprecation: "use tags field",
           });
-          t.nullable.field("type", {
-            type: "PetitionBaseType",
-          });
-          t.nullable.list.nonNull.globalId("tagIds", { prefixName: "Tag" });
-          t.nullable.field("sharedWith", {
-            type: inputObjectType({
-              name: "PetitionSharedWithFilter",
-              definition(t) {
-                t.nonNull.field("operator", {
-                  type: enumType({
-                    name: "FilterSharedWithLogicalOperator",
-                    members: ["AND", "OR"],
-                  }),
-                });
-                t.nonNull.list.nonNull.field("filters", {
-                  type: inputObjectType({
-                    name: "PetitionSharedWithFilterLine",
-                    definition(t) {
-                      t.nonNull.id("value");
-                      t.nonNull.field("operator", {
-                        type: enumType({
-                          name: "FilterSharedWithOperator",
-                          members: ["SHARED_WITH", "NOT_SHARED_WITH", "IS_OWNER", "NOT_IS_OWNER"],
-                        }),
-                      });
-                    },
-                  }),
-                });
-              },
-            }),
-          });
-          t.nullable.list.nonNull.field("signature", {
-            type: enumType({
-              name: "PetitionSignatureStatusFilter",
-              description: "Filters petitions by the status of its latest eSignature request.",
-              members: [
-                {
-                  name: "NO_SIGNATURE",
-                  description:
-                    "Petitions with no eSignature configured and no past eSignature requests.",
-                },
-                {
-                  name: "NOT_STARTED",
-                  description:
-                    "Petitions with configured eSignature that have not yet been started (petition is PENDING).",
-                },
-                {
-                  name: "PENDING_START",
-                  description:
-                    "Completed petitions with configured signatures to be started after user reviews the replies. Need to manually start the eSignature.",
-                },
-                {
-                  name: "PROCESSING",
-                  description:
-                    "Petitions with ongoing eSignature process. Awaiting for the signers to sign the document.",
-                },
-                {
-                  name: "COMPLETED",
-                  description:
-                    "Petition with eSignature completed. Every signer signed the document.",
-                },
-                {
-                  name: "CANCELLED",
-                  description:
-                    "Petitions with cancelled eSignatures. Request errors, user cancels, signer declines, etc...",
-                },
-              ],
-            }),
-          });
-          t.nullable.list.nonNull.globalId("fromTemplateId", {
-            prefixName: "Petition",
-          });
+          t.nullable.field("tags", { type: "PetitionTagFilter" });
+          t.nullable.field("sharedWith", { type: "PetitionSharedWithFilter" });
+          t.nullable.list.nonNull.field("signature", { type: "PetitionSignatureStatusFilter" });
+          t.nullable.list.nonNull.globalId("fromTemplateId", { prefixName: "Petition" });
         },
       }).asArg(),
     },
     searchable: true,
     sortableBy: ["createdAt", "sentAt", "name", "lastUsedAt"] as any,
-    resolve: async (_, { offset, limit, search, sortBy, filters }, ctx) => {
-      // move this to validator if it grows in complexity
-      if (isDefined(filters)) {
-        try {
-          await validateObject(filters, {
-            tagIds: async (tagIds) => {
-              return (
-                tagIds.length <= 10 &&
-                (await ctx.tags.loadTag(tagIds)).every(
-                  (t) => t?.organization_id === ctx.user!.org_id
-                )
-              );
-            },
-            sharedWith: async (sharedWith) => {
-              assert(sharedWith.filters.length <= 5, "maximum of 5 filter lines");
-              const targets = sharedWith.filters.map((f) => fromGlobalId(f.value));
-              assert(
-                targets.every(({ type }) => type === "User" || type === "UserGroup"),
-                "all ids refer to either users or user groups"
-              );
-              const [userIds, userGroupIds] = partition(targets, (t) => t.type === "User");
-              const [users, userGroups] = await Promise.all([
-                ctx.users.loadUser(userIds.map((u) => u.id)),
-                ctx.userGroups.loadUserGroup(userGroupIds.map((g) => g.id)),
-              ]);
-              assert(
-                users.every((u) => u?.org_id === ctx.user!.org_id),
-                "users belong to same org"
-              );
-              assert(
-                userGroups.every((g) => g?.org_id === ctx.user!.org_id),
-                "user groups belong to same org"
-              );
-              return true;
-            },
-            fromTemplateId: async (fromTemplateId) => {
-              return await ctx.petitions.userHasAccessToPetitions(ctx.user!.id, fromTemplateId);
-            },
-          });
-        } catch (e) {
-          throw new ApolloError("Invalid filter", "INVALID_FILTER");
+    validateArgs: validateAnd(
+      validPetitionSharedWithFilter((args) => args.filters?.sharedWith, "filters.sharedWith"),
+      validPetitionTagFilter((args) => args.filters?.tags, "filters.tags"),
+      async (_, args, ctx, info) => {
+        const fromTemplateId = args.filters?.fromTemplateId;
+        if (isDefined(fromTemplateId)) {
+          const hasAccess = await ctx.petitions.userHasAccessToPetitions(
+            ctx.user!.id,
+            fromTemplateId
+          );
+          if (!hasAccess) {
+            throw new ArgValidationError(info, "filters.fromTemplateId", "Invalid template ID");
+          }
+        }
+      },
+      /** @deprecated remove next release */
+      async (_, args, ctx, info) => {
+        const tagIds = args.filters?.tagIds;
+        if (isDefined(tagIds)) {
+          const valid =
+            tagIds.length <= 10 &&
+            (await ctx.tags.loadTag(tagIds)).every((t) => t?.organization_id === ctx.user!.org_id);
+          if (!valid) {
+            throw new ArgValidationError(info, "filters.tagIds", "Invalid tag ids");
+          }
         }
       }
-
+    ),
+    resolve: async (_, { offset, limit, search, sortBy, filters }, ctx) => {
       return ctx.petitions.getPaginatedPetitionsForUser(ctx.user!.org_id, ctx.user!.id, {
         search,
         offset,

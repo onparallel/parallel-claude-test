@@ -37,6 +37,8 @@ import { PathBreadcrumbs } from "../common/PathBreadcrumbs";
 import { SearchAllOrCurrentFolder } from "../common/SearchAllOrCurrentFolder";
 import { SearchInput } from "../common/SearchInput";
 import { useAskViewNameDialog } from "./AskViewNameDialog";
+import { removeInvalidSharedWithFilterLines } from "./filters/shared-with/PetitionListSharedWithFilter";
+import { removeInvalidTagFilterLines } from "./filters/tags/PetitionListTagFilter";
 
 export interface PetitionListHeaderProps {
   shape: QueryStateOf<PetitionsQueryState>;
@@ -100,7 +102,7 @@ export function PetitionListHeader({
       state.view === "ALL"
         ? {
             status: null,
-            tags: null,
+            tagsFilters: null,
             sharedWith: null,
             signature: null,
             fromTemplateId: null,
@@ -112,7 +114,7 @@ export function PetitionListHeader({
         : currentView!.data,
       pick(state, [
         "status",
-        "tags",
+        "tagsFilters",
         "sharedWith",
         "signature",
         "fromTemplateId",
@@ -147,17 +149,19 @@ export function PetitionListHeader({
       const { data } = await createPetitionListView({
         variables: {
           name,
-          data: pick(state, [
-            "status",
-            "sharedWith",
-            "tags",
-            "signature",
-            "fromTemplateId",
-            "search",
-            "searchIn",
-            "path",
-            "sort",
-          ]) as PetitionListViewDataInput,
+          data: {
+            tagsFilters: removeInvalidTagFilterLines(state.tagsFilters),
+            sharedWith: removeInvalidSharedWithFilterLines(state.sharedWith),
+            ...pick(state, [
+              "status",
+              "signature",
+              "fromTemplateId",
+              "search",
+              "searchIn",
+              "path",
+              "sort",
+            ]),
+          } as PetitionListViewDataInput,
         },
       });
       if (isDefined(data)) {
@@ -186,17 +190,19 @@ export function PetitionListHeader({
         variables: {
           petitionListViewId: view.id,
           name: view.name,
-          data: pick(state, [
-            "status",
-            "sharedWith",
-            "tags",
-            "signature",
-            "fromTemplateId",
-            "search",
-            "searchIn",
-            "path",
-            "sort",
-          ]) as PetitionListViewDataInput,
+          data: {
+            tagsFilters: removeInvalidTagFilterLines(state.tagsFilters),
+            sharedWith: removeInvalidSharedWithFilterLines(state.sharedWith),
+            ...pick(state, [
+              "status",
+              "signature",
+              "fromTemplateId",
+              "search",
+              "searchIn",
+              "path",
+              "sort",
+            ]),
+          } as PetitionListViewDataInput,
         },
       });
     } catch (error) {
@@ -332,7 +338,13 @@ PetitionListHeader.fragments = {
             operator
           }
         }
-        tags
+        tagsFilters {
+          operator
+          filters {
+            value
+            operator
+          }
+        }
         signature
         fromTemplateId
         search
@@ -389,8 +401,8 @@ const _mutations = [
 function viewsAreEqual(view1: PetitionListViewData, view2: PetitionListViewData) {
   return (
     equals(
-      omit(view1, ["__typename", "sharedWith", "sort"]),
-      omit(view2, ["__typename", "sharedWith", "sort"])
+      omit(view1, ["__typename", "sharedWith", "sort", "tagsFilters"]),
+      omit(view2, ["__typename", "sharedWith", "sort", "tagsFilters"])
     ) &&
     equals(
       isDefined(view1.sharedWith)
@@ -413,6 +425,20 @@ function viewsAreEqual(view1: PetitionListViewData, view2: PetitionListViewData)
       isDefined(view2.sort)
         ? omit(view2.sort, ["__typename"])
         : { field: "sentAt", direction: "DESC" }
+    ) &&
+    equals(
+      isDefined(view1.tagsFilters)
+        ? {
+            ...omit(view1.tagsFilters, ["__typename"]),
+            filters: view1.tagsFilters.filters.map(omit(["__typename"])),
+          }
+        : view1.tagsFilters,
+      isDefined(view2.tagsFilters)
+        ? {
+            ...omit(view2.tagsFilters, ["__typename"]),
+            filters: view2.tagsFilters.filters.map(omit(["__typename"])),
+          }
+        : view2.tagsFilters
     )
   );
 }

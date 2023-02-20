@@ -4,7 +4,7 @@ import { PetitionListView } from "../../db/__types";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { userHasAccessToPetitionListView, validPetitionListViewReorder } from "./authorizers";
-import { validPetitionListViewDataInput } from "./validations";
+import { validPetitionListViewData } from "./validations";
 
 export const createPetitionListView = mutationField("createPetitionListView", {
   description: "Creates a view with custom filters and ordering on the user's petitions list",
@@ -14,7 +14,7 @@ export const createPetitionListView = mutationField("createPetitionListView", {
     name: nonNull(stringArg()),
     data: nonNull("PetitionListViewDataInput"),
   },
-  validateArgs: validPetitionListViewDataInput((args) => args.data, "data"),
+  validateArgs: validPetitionListViewData((args) => args.data, "data"),
   resolve: async (_, args, ctx) => {
     const userViews = await ctx.views.loadPetitionListViewsByUserId(ctx.user!.id);
     const maxPosition = maxBy(userViews, (v) => v.position)?.position ?? -1;
@@ -41,7 +41,7 @@ export const updatePetitionListView = mutationField("updatePetitionListView", {
     name: nullable(stringArg()),
     data: "PetitionListViewDataInput",
   },
-  validateArgs: validPetitionListViewDataInput((args) => args.data, "data"),
+  validateArgs: validPetitionListViewData((args) => args.data, "data"),
   resolve: async (_, args, ctx) => {
     const data: Partial<PetitionListView> = {};
     if (isDefined(args.name)) {

@@ -162,6 +162,7 @@ export interface NexusGenInputs {
     signature?: NexusGenEnums["PetitionSignatureStatusFilter"][] | null; // [PetitionSignatureStatusFilter!]
     status?: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
     tagIds?: NexusGenScalars["GID"][] | null; // [GID!]
+    tags?: NexusGenInputs["PetitionTagFilter"] | null; // PetitionTagFilter
     type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
   };
   PetitionListViewDataInput: {
@@ -170,21 +171,12 @@ export interface NexusGenInputs {
     path?: string | null; // String
     search?: string | null; // String
     searchIn?: NexusGenEnums["PetitionListViewSearchIn"] | null; // PetitionListViewSearchIn
-    sharedWith?: NexusGenInputs["PetitionListViewDataSharedWithInput"] | null; // PetitionListViewDataSharedWithInput
+    sharedWith?: NexusGenInputs["PetitionSharedWithFilter"] | null; // PetitionSharedWithFilter
     signature?: NexusGenEnums["PetitionSignatureStatusFilter"][] | null; // [PetitionSignatureStatusFilter!]
     sort?: NexusGenInputs["PetitionListViewSortInput"] | null; // PetitionListViewSortInput
     status?: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
     tags?: NexusGenScalars["GID"][] | null; // [GID!]
-  };
-  PetitionListViewDataSharedWithFiltersInput: {
-    // input type
-    operator: NexusGenEnums["FilterSharedWithOperator"]; // FilterSharedWithOperator!
-    value: string; // ID!
-  };
-  PetitionListViewDataSharedWithInput: {
-    // input type
-    filters: NexusGenInputs["PetitionListViewDataSharedWithFiltersInput"][]; // [PetitionListViewDataSharedWithFiltersInput!]!
-    operator: NexusGenEnums["FilterSharedWithLogicalOperator"]; // FilterSharedWithLogicalOperator!
+    tagsFilters?: NexusGenInputs["PetitionTagFilter"] | null; // PetitionTagFilter
   };
   PetitionListViewSortInput: {
     // input type
@@ -200,6 +192,16 @@ export interface NexusGenInputs {
     // input type
     operator: NexusGenEnums["FilterSharedWithOperator"]; // FilterSharedWithOperator!
     value: string; // ID!
+  };
+  PetitionTagFilter: {
+    // input type
+    filters: NexusGenInputs["PetitionTagFilterLine"][]; // [PetitionTagFilterLine!]!
+    operator: NexusGenEnums["PetitionTagFilterLogicalOperator"]; // PetitionTagFilterLogicalOperator!
+  };
+  PetitionTagFilterLine: {
+    // input type
+    operator: NexusGenEnums["PetitionTagFilterLineOperator"]; // PetitionTagFilterLineOperator!
+    value: NexusGenScalars["GID"][]; // [GID!]!
   };
   PublicPetitionSignerDataInput: {
     // input type
@@ -343,6 +345,8 @@ export interface NexusGenEnums {
     | "PENDING_START"
     | "PROCESSING";
   PetitionStatus: db.PetitionStatus;
+  PetitionTagFilterLineOperator: "CONTAINS" | "DOES_NOT_CONTAIN" | "IS_EMPTY";
+  PetitionTagFilterLogicalOperator: "AND" | "OR";
   PetitionUserNotificationFilter: "ALL" | "COMMENTS" | "COMPLETED" | "OTHER" | "SHARED" | "UNREAD";
   PublicSignatureStatus: "COMPLETED" | "STARTED";
   QueryContacts_OrderBy:
@@ -663,6 +667,7 @@ export interface NexusGenObjects {
     sort?: NexusGenRootTypes["PetitionListViewSort"] | null; // PetitionListViewSort
     status?: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
     tags?: NexusGenScalars["GID"][] | null; // [GID!]
+    tagsFilters?: NexusGenRootTypes["PetitionListViewDataTags"] | null; // PetitionListViewDataTags
   };
   PetitionListViewDataSharedWith: {
     // root type
@@ -673,6 +678,16 @@ export interface NexusGenObjects {
     // root type
     operator: NexusGenEnums["FilterSharedWithOperator"]; // FilterSharedWithOperator!
     value: string; // ID!
+  };
+  PetitionListViewDataTags: {
+    // root type
+    filters: NexusGenRootTypes["PetitionListViewDataTagsFilters"][]; // [PetitionListViewDataTagsFilters!]!
+    operator: NexusGenEnums["PetitionTagFilterLogicalOperator"]; // PetitionTagFilterLogicalOperator!
+  };
+  PetitionListViewDataTagsFilters: {
+    // root type
+    operator: NexusGenEnums["PetitionTagFilterLineOperator"]; // PetitionTagFilterLineOperator!
+    value: NexusGenScalars["GID"][]; // [GID!]!
   };
   PetitionListViewSort: {
     // root type
@@ -1816,6 +1831,7 @@ export interface NexusGenFieldTypes {
     sort: NexusGenRootTypes["PetitionListViewSort"] | null; // PetitionListViewSort
     status: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
     tags: NexusGenScalars["GID"][] | null; // [GID!]
+    tagsFilters: NexusGenRootTypes["PetitionListViewDataTags"] | null; // PetitionListViewDataTags
   };
   PetitionListViewDataSharedWith: {
     // field return type
@@ -1826,6 +1842,16 @@ export interface NexusGenFieldTypes {
     // field return type
     operator: NexusGenEnums["FilterSharedWithOperator"]; // FilterSharedWithOperator!
     value: string; // ID!
+  };
+  PetitionListViewDataTags: {
+    // field return type
+    filters: NexusGenRootTypes["PetitionListViewDataTagsFilters"][]; // [PetitionListViewDataTagsFilters!]!
+    operator: NexusGenEnums["PetitionTagFilterLogicalOperator"]; // PetitionTagFilterLogicalOperator!
+  };
+  PetitionListViewDataTagsFilters: {
+    // field return type
+    operator: NexusGenEnums["PetitionTagFilterLineOperator"]; // PetitionTagFilterLineOperator!
+    value: NexusGenScalars["GID"][]; // [GID!]!
   };
   PetitionListViewSort: {
     // field return type
@@ -3597,6 +3623,7 @@ export interface NexusGenFieldTypeNames {
     sort: "PetitionListViewSort";
     status: "PetitionStatus";
     tags: "GID";
+    tagsFilters: "PetitionListViewDataTags";
   };
   PetitionListViewDataSharedWith: {
     // field return type name
@@ -3607,6 +3634,16 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     operator: "FilterSharedWithOperator";
     value: "ID";
+  };
+  PetitionListViewDataTags: {
+    // field return type name
+    filters: "PetitionListViewDataTagsFilters";
+    operator: "PetitionTagFilterLogicalOperator";
+  };
+  PetitionListViewDataTagsFilters: {
+    // field return type name
+    operator: "PetitionTagFilterLineOperator";
+    value: "GID";
   };
   PetitionListViewSort: {
     // field return type name
@@ -5708,6 +5745,7 @@ export interface NexusGenArgTypes {
       limit?: number | null; // Int
       offset?: number | null; // Int
       search?: string | null; // String
+      tagIds?: NexusGenScalars["GID"][] | null; // [GID!]
     };
     task: {
       // args

@@ -145,7 +145,13 @@ describe("GraphQL/PetitionListView", () => {
                 }
                 signature
                 status
-                tags
+                tagsFilters {
+                  filters {
+                    operator
+                    value
+                  }
+                  operator
+                }
                 sort {
                   field
                   direction
@@ -167,7 +173,15 @@ describe("GraphQL/PetitionListView", () => {
             searchIn: "CURRENT_FOLDER",
             signature: ["NO_SIGNATURE", "PENDING_START"],
             status: ["COMPLETED", "DRAFT"],
-            tags: [],
+            tagsFilters: {
+              filters: [
+                {
+                  value: [],
+                  operator: "IS_EMPTY",
+                },
+              ],
+              operator: "AND",
+            },
             path: "/2022/",
             sharedWith: null,
             fromTemplateId: null,
@@ -188,7 +202,15 @@ describe("GraphQL/PetitionListView", () => {
           sharedWith: null,
           signature: ["NO_SIGNATURE", "PENDING_START"],
           status: ["COMPLETED", "DRAFT"],
-          tags: [],
+          tagsFilters: {
+            filters: [
+              {
+                value: [],
+                operator: "IS_EMPTY",
+              },
+            ],
+            operator: "AND",
+          },
           sort: { field: "sentAt", direction: "ASC" },
         },
         user: {
@@ -217,7 +239,13 @@ describe("GraphQL/PetitionListView", () => {
               data {
                 signature
                 status
-                tags
+                tagsFilters {
+                  filters {
+                    operator
+                    value
+                  }
+                  operator
+                }
                 sharedWith {
                   filters {
                     operator
@@ -244,7 +272,15 @@ describe("GraphQL/PetitionListView", () => {
             sharedWith: null,
             signature: null,
             status: null,
-            tags: [toGlobalId("Tag", tag.id)],
+            tagsFilters: {
+              filters: [
+                {
+                  value: [toGlobalId("Tag", tag.id)],
+                  operator: "CONTAINS",
+                },
+              ],
+              operator: "AND",
+            },
             sort: null,
           },
         }
@@ -257,7 +293,15 @@ describe("GraphQL/PetitionListView", () => {
         data: {
           status: null,
           signature: null,
-          tags: [toGlobalId("Tag", tag.id)],
+          tagsFilters: {
+            filters: [
+              {
+                value: [toGlobalId("Tag", tag.id)],
+                operator: "CONTAINS",
+              },
+            ],
+            operator: "AND",
+          },
           sharedWith: null,
           sort: null,
         },
@@ -284,7 +328,7 @@ describe("GraphQL/PetitionListView", () => {
             searchIn: "EVERYWHERE",
             sharedWith: null,
             signature: null,
-            tags: null,
+            tagsFilters: null,
             status: ["CLOSED"],
             path: "/2022/",
             sort: null,

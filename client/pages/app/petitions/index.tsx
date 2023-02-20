@@ -42,17 +42,19 @@ import { usePetitionSharingDialog } from "@parallel/components/petition-common/d
 import { useRenameDialog } from "@parallel/components/petition-common/dialogs/RenameDialog";
 import { EmptyFolderIllustration } from "@parallel/components/petition-common/EmptyFolderIllustration";
 import {
-  flatShared,
-  removeInvalidLines,
-  unflatShared,
+  removeInvalidSharedWithFilterLines,
+  sharedWithQueryItem,
 } from "@parallel/components/petition-list/filters/shared-with/PetitionListSharedWithFilter";
+import {
+  removeInvalidTagFilterLines,
+  tagFilterQueryItem,
+} from "@parallel/components/petition-list/filters/tags/PetitionListTagFilter";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
 import { ViewTabs } from "@parallel/components/petition-list/ViewTabs";
 import { useNewTemplateDialog } from "@parallel/components/petition-new/dialogs/NewTemplateDialog";
 import {
   PetitionBaseType,
   PetitionPermissionType,
-  PetitionSharedWithFilter,
   PetitionSignatureStatusFilter,
   PetitionStatus,
   Petitions_movePetitionsDocument,
@@ -61,6 +63,7 @@ import {
   Petitions_renameFolderDocument,
   Petitions_updatePetitionDocument,
   Petitions_userDocument,
+  PetitionTagFilter,
 } from "@parallel/graphql/__types";
 import { isTypename } from "@parallel/utils/apollo/typename";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
@@ -74,7 +77,6 @@ import { useHandleNavigation } from "@parallel/utils/navigation";
 import {
   buildStateUrl,
   integer,
-  object,
   parseQuery,
   QueryItem,
   QueryStateFrom,
@@ -103,15 +105,9 @@ const QUERY_STATE = {
   type: values<PetitionBaseType>(["PETITION", "TEMPLATE"]).orDefault("PETITION"),
   search: string(),
   searchIn: values<SearchInOptions>(["EVERYWHERE", "CURRENT_FOLDER"]).orDefault("EVERYWHERE"),
-  tags: new QueryItem<string[] | null>(
-    (value) => (typeof value === "string" ? (value === "NO_TAGS" ? [] : value.split(",")) : null),
-    (value) => (value.length === 0 ? "NO_TAGS" : value.join(","))
-  ),
   sort: sorting(SORTING),
-  sharedWith: object<PetitionSharedWithFilter>({
-    flatten: flatShared,
-    unflatten: unflatShared,
-  }),
+  sharedWith: sharedWithQueryItem(),
+  tagsFilters: tagFilterQueryItem(),
   fromTemplateId: string().list(),
   signature: values<PetitionSignatureStatusFilter>([
     "NO_SIGNATURE",
@@ -154,8 +150,8 @@ function Petitions() {
           status: state.status,
           signature: state.signature,
           type: state.type,
-          tagIds: state.tags,
-          sharedWith: removeInvalidLines(state.sharedWith),
+          tags: removeInvalidTagFilterLines(state.tagsFilters),
+          sharedWith: removeInvalidSharedWithFilterLines(state.sharedWith),
           fromTemplateId: state.fromTemplateId,
         },
         sortBy: [`${sort.field}_${sort.direction}`],
@@ -591,7 +587,7 @@ function Petitions() {
             pageSize={state.items}
             totalCount={petitions?.totalCount}
             sort={sort}
-            filter={pick(state, ["sharedWith", "status", "tags", "signature"])}
+            filter={pick(state, ["sharedWith", "status", "tagsFilters", "signature"])}
             onFilterChange={(key, value) => {
               setQueryState((current) => ({ ...current, [key]: value, page: 1 }));
             }}
@@ -624,7 +620,7 @@ function Petitions() {
               data?.petitions.totalCount === 0 && !loading ? (
                 state.search ||
                 state.sharedWith ||
-                state.tags ||
+                state.tagsFilters ||
                 state.status ||
                 state.signature ? (
                   <Flex flex="1" alignItems="center" justifyContent="center">
@@ -880,27 +876,82 @@ Petitions.getInitialProps = async ({ fetchQuery, query, pathname }: WithApolloDa
   const views = data.me.petitionListViews;
 
   if (state.type === "PETITION") {
+    let tags: PetitionTagFilter | undefined = undefined;
+    if (isDefined(query.tags)) {
+      const tagsState = parseQuery(query, {
+        tags: new QueryItem<string[] | null>((value) =>
+          typeof value === "string" ? (value === "NO_TAGS" ? [] : value.split(",")) : null
+        ),
+      });
+      if (Array.isArray(tagsState.tags)) {
+        tags = (
+          tagsState.tags.length === 0
+            ? {
+                filters: [
+                  {
+                    value: [],
+                    operator: "IS_EMPTY",
+                  },
+                ],
+                operator: "AND",
+              }
+            : {
+                filters: [
+                  {
+                    value: tagsState.tags,
+                    operator: "CONTAINS",
+                  },
+                ],
+                operator: "AND",
+              }
+        ) as PetitionTagFilter;
+      }
+    }
+
+    const tagsFiltersOrNothing = tags ? { tagsFilters: tags } : {};
+
     if (!isDefined(state.view)) {
       const defaultView = views.find((v) => v.isDefault);
       if (isDefined(defaultView)) {
         throw new RedirectError(
           buildStateUrl(
             QUERY_STATE,
-            { view: defaultView.id, ...omit(defaultView.data, ["__typename"]) },
+            {
+              view: defaultView.id,
+              ...omit(defaultView.data, ["__typename"]),
+              ...tagsFiltersOrNothing,
+            },
             pathname,
-            query
+            omit(query, ["tags"])
           )
         );
       } else {
-        throw new RedirectError(buildStateUrl(QUERY_STATE, { view: "ALL" }, pathname, query));
+        throw new RedirectError(
+          buildStateUrl(
+            QUERY_STATE,
+            { view: "ALL", ...tagsFiltersOrNothing },
+            pathname,
+            omit(query, ["tags"])
+          )
+        );
       }
     } else if (state.view !== "ALL") {
       const view = views.find((v) => v.id === state.view);
       if (!isDefined(view)) {
         throw new RedirectError(
-          buildStateUrl(QUERY_STATE, { ...state, view: "ALL" }, pathname, query)
+          buildStateUrl(
+            QUERY_STATE,
+            { ...state, view: "ALL", ...tagsFiltersOrNothing },
+            pathname,
+            omit(query, ["tags"])
+          )
         );
       }
+    }
+    if (tags) {
+      throw new RedirectError(
+        buildStateUrl(QUERY_STATE, { ...state, tagsFilters: tags }, pathname, omit(query, ["tags"]))
+      );
     }
   }
 };

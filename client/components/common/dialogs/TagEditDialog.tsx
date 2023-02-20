@@ -1,8 +1,7 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
-  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -12,65 +11,68 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { EditIcon } from "@parallel/chakra/icons";
-import {
-  TagEditDialog_TagFragment,
-  TagEditDialog_tagsDocument,
-  TagEditDialog_updateTagDocument,
-} from "@parallel/graphql/__types";
+import { TagEditDialog_updateTagDocument } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { genericRsComponent, useReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import { isNotEmptyText } from "@parallel/utils/strings";
+import { ReactNode, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import Select, { components, Props as SelectProps, StylesConfig } from "react-select";
-import { maxBy, pick } from "remeda";
-import { Tag } from "../Tag";
+import { isDefined } from "remeda";
 import { TagColorSelect } from "../TagColorSelect";
+import { TagSelect } from "../TagSelect";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
 
-type TagSelection = TagEditDialog_TagFragment;
+interface TagEditDialogData {
+  tagId: string | null;
+  name: string;
+  color: string | null;
+}
 
 export function TagEditDialog({ ...props }: DialogProps) {
-  const { data } = useQuery(TagEditDialog_tagsDocument, {
-    fetchPolicy: "cache-and-network",
-  });
-  const isDisabled = !data || data.tags.items.length === 0;
-  const [tag, setTag] = useState<TagSelection | null>(null);
-  const [error, setError] = useState<string | undefined>();
-  const [updateTag] = useMutation(TagEditDialog_updateTagDocument);
-  useEffect(() => {
-    if (data && data.tags.items.length > 0 && tag === null) {
-      const selected = maxBy(data.tags.items, (t) => new Date(t.createdAt).valueOf());
-      setTag({ ...selected! });
-    }
-  }, [data]);
-  useEffect(() => {
-    if (data) {
-      const selected = maxBy(data.tags.items, (t) => new Date(t.createdAt).valueOf());
-      setTag({ ...selected! });
-    }
-  }, []);
-  const handleTagChange = useDebouncedCallback(
-    async function (tag: TagSelection) {
-      if (tag.name.trim().length > 0) {
-        try {
-          await updateTag({
-            variables: { id: tag.id, data: pick(tag, ["name", "color"]) },
-          });
-        } catch (e) {
-          if (isApolloError(e)) {
-            setError(e.graphQLErrors[0]?.extensions?.code as string);
-          }
-        }
-      }
+  const {
+    handleSubmit,
+    register,
+    reset,
+    control,
+    watch,
+    setError,
+    formState: { errors, isDirty },
+  } = useForm<TagEditDialogData>({
+    mode: "onSubmit",
+    defaultValues: {
+      tagId: null,
+      name: "",
+      color: null,
     },
-    300,
-    []
-  );
+  });
+
+  const [updateTag, { loading: isUpdating }] = useMutation(TagEditDialog_updateTagDocument);
+  const tagId = watch("tagId");
+
+  const [id, setId] = useState(0);
+
   return (
     <ConfirmDialog
       {...props}
+      content={{
+        as: "form",
+        onSubmit: handleSubmit(async ({ tagId, color, name }) => {
+          try {
+            await updateTag({
+              variables: { id: tagId!, data: { color, name } },
+            });
+            reset({ tagId, color, name });
+            setId((id) => id + 1);
+          } catch (e) {
+            if (isApolloError(e, "TAG_ALREADY_EXISTS")) {
+              setError("name", { type: "unavailable" });
+            }
+          }
+        }),
+      }}
+      hasCloseButton
+      closeOnEsc
       header={
         <Stack direction="row" alignItems="center">
           <EditIcon position="relative" />
@@ -81,63 +83,72 @@ export function TagEditDialog({ ...props }: DialogProps) {
       }
       body={
         <Box>
-          <FormControl isDisabled={isDisabled}>
+          <FormControl>
             <FormLabel>
               <FormattedMessage id="component.tag-edit-dialog.tag-label" defaultMessage="Tag" />
             </FormLabel>
-            <TagSelect
-              value={tag}
-              options={data?.tags.items ?? []}
-              onChange={(tag) => setTag({ ...tag! })}
+            <Controller
+              name="tagId"
+              control={control}
+              render={({ field }) => (
+                <TagSelect
+                  key={id}
+                  value={field.value}
+                  onChange={(tag) => reset({ tagId: tag!.id, name: tag!.name, color: tag!.color })}
+                />
+              )}
             />
           </FormControl>
           <Grid gridTemplateColumns="auto 1fr" alignItems="center" gridRowGap={2} marginTop={4}>
-            <FormControl as={NoElement} isDisabled={isDisabled} isInvalid={!!error}>
+            <FormControl as={NoElement} isDisabled={!isDefined(tagId)} isInvalid={!!errors.name}>
               <FormLabel marginBottom="0">
                 <FormattedMessage
                   id="component.tag-edit-dialog.name-label"
-                  defaultMessage="Edit text"
+                  defaultMessage="Tag name"
                 />
               </FormLabel>
-              <Input
-                value={tag?.name ?? ""}
-                onChange={(e) => {
-                  const name = e.target.value;
-                  setTag({ ...tag!, name });
-                  handleTagChange({ ...tag!, name });
-                }}
-                onBlur={() => handleTagChange.immediateIfPending(tag!)}
-              />
-              {error === "TAG_ALREADY_EXISTS" ? (
-                <FormErrorMessage gridColumn="2" marginTop={0}>
+              <Input {...register("name", { required: true, validate: { isNotEmptyText } })} />
+
+              <FormErrorMessage gridColumn="2" marginTop={0}>
+                {errors.name?.type === "unavailable" ? (
                   <FormattedMessage
                     id="component.tag-edit-dialog.existing-tag"
                     defaultMessage="A tag with the same name already exists"
                   />
-                </FormErrorMessage>
-              ) : null}
+                ) : (
+                  <FormattedMessage
+                    id="generic.forms.field-required-error"
+                    defaultMessage="This field is required"
+                  />
+                )}
+              </FormErrorMessage>
             </FormControl>
-            <FormControl as={NoElement} isDisabled={isDisabled}>
+            <FormControl as={NoElement} isDisabled={!isDefined(tagId)}>
               <FormLabel marginBottom="0">
                 <FormattedMessage
                   id="component.tag-edit-dialog.color-label"
                   defaultMessage="Color"
                 />
               </FormLabel>
-              <TagColorSelect
-                value={tag?.color ?? null}
-                onChange={(color) => {
-                  setTag({ ...tag!, color: color! });
-                  handleTagChange.immediate({ ...tag!, color: color! });
-                }}
+              <Controller
+                name="color"
+                control={control}
+                render={({ field }) => (
+                  <TagColorSelect
+                    value={field.value}
+                    onChange={(color) => {
+                      field.onChange(color);
+                    }}
+                  />
+                )}
               />
             </FormControl>
           </Grid>
         </Box>
       }
       confirm={
-        <Button colorScheme="primary" onClick={() => props.onResolve()}>
-          <FormattedMessage id="generic.done" defaultMessage="Done" />
+        <Button isLoading={isUpdating} isDisabled={!isDirty} type="submit" colorScheme="primary">
+          <FormattedMessage id="generic.save-changes" defaultMessage="Save changes" />
         </Button>
       }
       cancel={<></>}
@@ -149,107 +160,17 @@ function NoElement({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-TagEditDialog.fragments = {
-  get Tag() {
-    return gql`
-      fragment TagEditDialog_Tag on Tag {
-        id
-        ...Tag_Tag
-        createdAt
-      }
-      ${Tag.fragments.Tag}
-    `;
-  },
-};
-
-TagEditDialog.queries = {
-  tags: gql`
-    query TagEditDialog_tags {
-      tags {
-        items {
-          ...TagEditDialog_Tag
-        }
-      }
-    }
-    ${TagEditDialog.fragments.Tag}
-  `,
-};
-
 TagEditDialog.mutations = [
   gql`
     mutation TagEditDialog_updateTag($id: GID!, $data: UpdateTagInput!) {
       updateTag(id: $id, data: $data) {
-        ...TagEditDialog_Tag
+        ...TagSelect_Tag
       }
     }
-    ${TagEditDialog.fragments.Tag}
+    ${TagSelect.fragments.Tag}
   `,
 ];
 
 export function useTagEditDialog() {
   return useDialog(TagEditDialog);
 }
-
-function TagSelect({ value, onChange, ...props }: SelectProps<TagSelection, false, never>) {
-  const rsProps = useReactSelectProps<TagSelection, false, never>({});
-
-  const components = useMemo(
-    () => ({
-      ...rsProps.components,
-      SingleValue,
-      Option,
-    }),
-    [rsProps.components]
-  );
-
-  const styles = useMemo<StylesConfig<TagSelection, false, never>>(
-    () => ({
-      ...rsProps.styles,
-      valueContainer: (styles) => ({
-        ...styles,
-        flexWrap: "nowrap",
-        paddingLeft: "1rem",
-        paddingRight: "1rem",
-      }),
-      option: (styles) => ({
-        ...styles,
-        display: "flex",
-        padding: "0.25rem 1rem",
-      }),
-    }),
-    [rsProps.styles]
-  );
-
-  return (
-    <Select
-      {...props}
-      {...rsProps}
-      getOptionValue={(o) => o.id}
-      getOptionLabel={(o) => o.name}
-      components={components}
-      styles={styles}
-      value={value}
-      onChange={onChange}
-    />
-  );
-}
-
-const rsComponent = genericRsComponent<TagSelection, false, never>();
-
-const SingleValue = rsComponent("SingleValue", function (props) {
-  return (
-    <components.SingleValue {...props}>
-      <Flex>
-        <Tag tag={props.data} />
-      </Flex>
-    </components.SingleValue>
-  );
-});
-
-const Option = rsComponent("Option", function (props) {
-  return (
-    <components.Option {...props}>
-      <Tag flex="0 1 auto" minWidth="0" tag={props.data as TagSelection} />
-    </components.Option>
-  );
-});

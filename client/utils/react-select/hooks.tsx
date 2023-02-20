@@ -215,7 +215,8 @@ export function useReactSelectProps<
       menuList: (styles) => {
         return {
           ...styles,
-          padding: "0.5rem 0",
+          paddingTop: "0.5rem",
+          paddingBottom: "0.5rem",
         };
       },
       singleValue: (styles, { selectProps }) => {

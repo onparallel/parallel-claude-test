@@ -1,4 +1,4 @@
-import { GroupBase, Props as SelectProps } from "react-select";
+import { GroupBase, Props as SelectProps, ActionMeta } from "react-select";
 import { AsyncProps } from "react-select/async";
 import { AsyncCreatableProps } from "react-select/async-creatable";
 import { If } from "../types";
@@ -17,7 +17,7 @@ export interface CustomSelectProps<
 > extends UseReactSelectProps<OptionType, IsMulti, GroupType>,
     Omit<SelectProps<OptionType, IsMulti, GroupType>, "value" | "onChange"> {
   value: ValueType<OptionType, IsMulti>;
-  onChange: (value: ValueType<OptionType, IsMulti>) => void;
+  onChange: (value: ValueType<OptionType, IsMulti>, actionMeta: ActionMeta<OptionType>) => void;
 }
 
 export interface CustomAsyncSelectProps<
@@ -27,7 +27,7 @@ export interface CustomAsyncSelectProps<
 > extends UseReactSelectProps<OptionType, IsMulti, GroupType>,
     Omit<AsyncProps<OptionType, IsMulti, GroupType>, "value" | "onChange"> {
   value: ValueType<OptionType, IsMulti>;
-  onChange: (value: ValueType<OptionType, IsMulti>) => void;
+  onChange: (value: ValueType<OptionType, IsMulti>, actionMeta: ActionMeta<OptionType>) => void;
 }
 
 export interface CustomAsyncCreatableSelectProps<
@@ -37,5 +37,5 @@ export interface CustomAsyncCreatableSelectProps<
 > extends UseReactSelectProps<OptionType, IsMulti, GroupType>,
     Omit<AsyncCreatableProps<OptionType, IsMulti, GroupType>, "value" | "onChange"> {
   value: ValueType<OptionType, IsMulti>;
-  onChange: (value: ValueType<OptionType, IsMulti>) => void;
+  onChange: (value: ValueType<OptionType, IsMulti>, actionMeta: ActionMeta<OptionType>) => void;
 }

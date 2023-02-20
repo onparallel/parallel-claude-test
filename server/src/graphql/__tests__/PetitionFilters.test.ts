@@ -488,7 +488,10 @@ describe("Petition Filters", () => {
         },
       }
     );
-    expect(errors).toContainGraphQLError("INVALID_FILTER");
+    expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+      argName: "filters.sharedWith",
+      message: "All IDs must refer to either users or user groups",
+    });
     expect(data).toBeNull();
   });
 });

@@ -1,33 +1,30 @@
 import { ArgsValue } from "nexus/dist/core";
 import { isDefined } from "remeda";
-import { fromGlobalId } from "../../util/globalId";
 import { ArgValidationError } from "../helpers/errors";
-import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
+import { validateAnd } from "../helpers/validateArgs";
+import { validPetitionSharedWithFilter, validPetitionTagFilter } from "../petition/types/filters";
 import { NexusGenInputs } from "../__types";
 
-export function validPetitionListViewDataInput<TypeName extends string, FieldName extends string>(
+export function validPetitionListViewData<TypeName extends string, FieldName extends string>(
   prop: (
     args: ArgsValue<TypeName, FieldName>
   ) => NexusGenInputs["PetitionListViewDataInput"] | null | undefined,
   name: string
 ) {
-  return (async (_, args, ctx, info) => {
-    const data = prop(args);
-    if (!data) {
-      return;
-    }
-
-    try {
-      if (isDefined(data.sharedWith)) {
-        data.sharedWith.filters.map((f) => {
-          const { type } = fromGlobalId(f.value);
-          if (type !== "User" && type !== "UserGroup") {
-            throw new Error(`Invalid id ${f.value}`);
-          }
-        });
+  return validateAnd<TypeName, FieldName>(
+    validPetitionSharedWithFilter((args) => prop(args)?.sharedWith, `${name}.sharedWith`),
+    validPetitionTagFilter((args) => prop(args)?.tagsFilters, `${name}.tagsFilters`),
+    async (_, args, ctx, info) => {
+      const fromTemplateId = prop(args)?.fromTemplateId;
+      if (isDefined(fromTemplateId)) {
+        const hasAccess = await ctx.petitions.userHasAccessToPetitions(
+          ctx.user!.id,
+          fromTemplateId
+        );
+        if (!hasAccess) {
+          throw new ArgValidationError(info, `${name}.fromTemplateId`, "Invalid template ID");
+        }
       }
-    } catch (e: any) {
-      throw new ArgValidationError(info, e.message, name);
     }
-  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+  );
 }

@@ -2642,6 +2642,7 @@ export type PetitionFilter = {
   signature?: InputMaybe<Array<PetitionSignatureStatusFilter>>;
   status?: InputMaybe<Array<PetitionStatus>>;
   tagIds?: InputMaybe<Array<Scalars["GID"]>>;
+  tags?: InputMaybe<PetitionTagFilter>;
   type?: InputMaybe<PetitionBaseType>;
 };
 
@@ -2675,7 +2676,9 @@ export type PetitionListViewData = {
   signature: Maybe<Array<PetitionSignatureStatusFilter>>;
   sort: Maybe<PetitionListViewSort>;
   status: Maybe<Array<PetitionStatus>>;
+  /** @deprecated use tagsFilters */
   tags: Maybe<Array<Scalars["GID"]>>;
+  tagsFilters: Maybe<PetitionListViewDataTags>;
 };
 
 export type PetitionListViewDataInput = {
@@ -2683,11 +2686,12 @@ export type PetitionListViewDataInput = {
   path?: InputMaybe<Scalars["String"]>;
   search?: InputMaybe<Scalars["String"]>;
   searchIn?: InputMaybe<PetitionListViewSearchIn>;
-  sharedWith?: InputMaybe<PetitionListViewDataSharedWithInput>;
+  sharedWith?: InputMaybe<PetitionSharedWithFilter>;
   signature?: InputMaybe<Array<PetitionSignatureStatusFilter>>;
   sort?: InputMaybe<PetitionListViewSortInput>;
   status?: InputMaybe<Array<PetitionStatus>>;
   tags?: InputMaybe<Array<Scalars["GID"]>>;
+  tagsFilters?: InputMaybe<PetitionTagFilter>;
 };
 
 export type PetitionListViewDataSharedWith = {
@@ -2700,14 +2704,14 @@ export type PetitionListViewDataSharedWithFilters = {
   value: Scalars["ID"];
 };
 
-export type PetitionListViewDataSharedWithFiltersInput = {
-  operator: FilterSharedWithOperator;
-  value: Scalars["ID"];
+export type PetitionListViewDataTags = {
+  filters: Array<PetitionListViewDataTagsFilters>;
+  operator: PetitionTagFilterLogicalOperator;
 };
 
-export type PetitionListViewDataSharedWithInput = {
-  filters: Array<PetitionListViewDataSharedWithFiltersInput>;
-  operator: FilterSharedWithLogicalOperator;
+export type PetitionListViewDataTagsFilters = {
+  operator: PetitionTagFilterLineOperator;
+  value: Array<Scalars["GID"]>;
 };
 
 export type PetitionListViewSearchIn = "CURRENT_FOLDER" | "EVERYWHERE";
@@ -2944,6 +2948,20 @@ export type PetitionStatus =
   | "DRAFT"
   /** The petition has been sent and is awaiting completion. */
   | "PENDING";
+
+export type PetitionTagFilter = {
+  filters: Array<PetitionTagFilterLine>;
+  operator: PetitionTagFilterLogicalOperator;
+};
+
+export type PetitionTagFilterLine = {
+  operator: PetitionTagFilterLineOperator;
+  value: Array<Scalars["GID"]>;
+};
+
+export type PetitionTagFilterLineOperator = "CONTAINS" | "DOES_NOT_CONTAIN" | "IS_EMPTY";
+
+export type PetitionTagFilterLogicalOperator = "AND" | "OR";
 
 /** A petition template */
 export type PetitionTemplate = PetitionBase & {
@@ -3599,6 +3617,7 @@ export type QuerytagsArgs = {
   limit?: InputMaybe<Scalars["Int"]>;
   offset?: InputMaybe<Scalars["Int"]>;
   search?: InputMaybe<Scalars["String"]>;
+  tagIds?: InputMaybe<Array<Scalars["GID"]>>;
 };
 
 export type QuerytaskArgs = {
@@ -4505,7 +4524,7 @@ export type GetPetitions_petitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   status?: InputMaybe<Array<PetitionStatus> | PetitionStatus>;
-  tagIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  tags?: InputMaybe<PetitionTagFilter>;
   sortBy?: InputMaybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
   includeRecipients: Scalars["Boolean"];
   includeFields: Scalars["Boolean"];
@@ -6355,7 +6374,7 @@ export const GetPetitions_petitionsDocument = gql`
     $offset: Int!
     $limit: Int!
     $status: [PetitionStatus!]
-    $tagIds: [GID!]
+    $tags: PetitionTagFilter
     $sortBy: [QueryPetitions_OrderBy!]
     $includeRecipients: Boolean!
     $includeFields: Boolean!
@@ -6369,7 +6388,7 @@ export const GetPetitions_petitionsDocument = gql`
       offset: $offset
       limit: $limit
       sortBy: $sortBy
-      filters: { status: $status, type: PETITION, tagIds: $tagIds, fromTemplateId: $fromTemplateId }
+      filters: { status: $status, type: PETITION, tags: $tags, fromTemplateId: $fromTemplateId }
     ) {
       items {
         ...Petition

@@ -1,32 +1,22 @@
-import { gql, useApolloClient, useMutation } from "@apollo/client";
-import { Box, Button, Circle, Flex, List, ListItem, Stack, Text } from "@chakra-ui/react";
-import { AddIcon, EditIcon } from "@parallel/chakra/icons";
+import { gql, useMutation } from "@apollo/client";
+import { Box, Circle, Flex, List, ListItem, Stack, Text } from "@chakra-ui/react";
+import { AddIcon } from "@parallel/chakra/icons";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { Tag } from "@parallel/components/common/Tag";
 import {
-  PetitionTagListCellContent_createTagDocument,
   PetitionTagListCellContent_PetitionBaseFragment,
   PetitionTagListCellContent_TagFragment,
   PetitionTagListCellContent_tagPetitionDocument,
-  PetitionTagListCellContent_tagsDocument,
   PetitionTagListCellContent_untagPetitionDocument,
 } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
-import {
-  genericRsComponent,
-  rsStyles,
-  useReactSelectProps,
-} from "@parallel/utils/react-select/hooks";
-import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/types";
-import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
-import { forwardRef, MouseEvent, useRef, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-import { ActionMeta, components, SelectInstance } from "react-select";
-import AsyncCreatableSelect from "react-select/async-creatable";
+import { MouseEvent, useRef, useState } from "react";
+import { FormattedMessage } from "react-intl";
+import { ActionMeta } from "react-select";
 import { omit } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { useTagEditDialog } from "./dialogs/TagEditDialog";
-import { DEFAULT_COLORS } from "./TagColorSelect";
+import { TagSelect, TagSelectInstance } from "./TagSelect";
 
 type TagSelection = PetitionTagListCellContent_TagFragment;
 
@@ -36,22 +26,8 @@ export function PetitionTagListCellContent({
   petition: PetitionTagListCellContent_PetitionBaseFragment;
 }) {
   const selectWrapperRef = useRef<HTMLDivElement>(null);
-  const selectRef = useRef<TagSelectInstance>(null);
+  const selectRef = useRef<TagSelectInstance<true>>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const intl = useIntl();
-  const apollo = useApolloClient();
-  const loadOptions = useDebouncedAsync(
-    async (search: string) => {
-      const { data } = await apollo.query({
-        query: PetitionTagListCellContent_tagsDocument,
-        variables: { search },
-        fetchPolicy: "no-cache",
-      });
-      return data!.tags.items;
-    },
-    300,
-    []
-  );
 
   const handleClick = async function (e: MouseEvent) {
     e.stopPropagation();
@@ -76,32 +52,28 @@ export function PetitionTagListCellContent({
     }
   };
 
-  const [tagPetition] = useMutation(PetitionTagListCellContent_tagPetitionDocument);
-  async function handleAddTag(tag: TagSelection) {
-    await withError(
-      tagPetition({
-        variables: { tagId: tag.id, petitionId: petition.id },
-      })
-    );
-  }
-
-  const [untagPetition] = useMutation(PetitionTagListCellContent_untagPetitionDocument);
-  async function handleRemoveTag(tag: TagSelection) {
-    await untagPetition({
-      variables: { tagId: tag.id, petitionId: petition.id },
-    });
-  }
-
   const showTagEditDialog = useTagEditDialog();
   const handleEditTags = async () => {
     await withError(showTagEditDialog());
   };
 
-  const [createTag] = useMutation(PetitionTagListCellContent_createTagDocument);
-  const handleCreateTag = async (tag: Pick<TagSelection, "name" | "color">) => {
-    const [, result] = await withError(createTag({ variables: tag }));
-    if (result) {
-      await handleAddTag(result.data!.createTag);
+  const [tagPetition] = useMutation(PetitionTagListCellContent_tagPetitionDocument);
+  const [untagPetition] = useMutation(PetitionTagListCellContent_untagPetitionDocument);
+  const handleChange = async function (_: any, action: ActionMeta<TagSelection>) {
+    switch (action.action) {
+      case "select-option":
+        await tagPetition({
+          variables: { tagId: action.option!.id, petitionId: petition.id },
+        });
+        break;
+      case "pop-value":
+      case "remove-value":
+        if (action.removedValue) {
+          await untagPetition({
+            variables: { tagId: action.removedValue.id, petitionId: petition.id },
+          });
+        }
+        break;
     }
   };
 
@@ -122,18 +94,33 @@ export function PetitionTagListCellContent({
           <TagSelect
             ref={selectRef}
             size="sm"
+            isMulti
+            defaultMenuIsOpen
             value={petition.tags}
-            placeholder={intl.formatMessage({
-              id: "component.petition-tag-list-cell-content.add-tags",
-              defaultMessage: "Add tags",
-            })}
-            defaultOptions
-            loadOptions={loadOptions}
             onBlur={() => setIsEditing(false)}
-            onAddTag={handleAddTag}
-            onRemoveTag={handleRemoveTag}
+            onChange={handleChange}
             onEditTags={handleEditTags}
-            onCreateTag={handleCreateTag}
+            styles={{
+              container: (styles) => ({ ...styles, width: "100%" }),
+              valueContainer: (styles) => ({
+                ...omit(styles as any, ["padding"]),
+                paddingLeft: "0.5rem",
+                paddingRight: "0.5rem",
+                paddingTop: "6px",
+                paddingBottom: "6px",
+                fontSize: "14px",
+                gridGap: "0.25rem",
+              }),
+              control: (styles, { isFocused, theme }: any) => ({
+                ...styles,
+                minHeight: "40px",
+                borderRadius: 0,
+                border: "none",
+                boxShadow: isFocused ? `inset 0 0 0 2px ${theme.colors.primary}` : undefined,
+              }),
+            }}
+            components={{ IndicatorsContainer }}
+            canCreateTags
           />
         </Box>
       ) : (
@@ -219,8 +206,10 @@ PetitionTagListCellContent.fragments = {
       fragment PetitionTagListCellContent_Tag on Tag {
         id
         ...Tag_Tag
+        ...TagSelect_Tag
       }
       ${Tag.fragments.Tag}
+      ${TagSelect.fragments.Tag}
     `;
   },
   get PetitionBase() {
@@ -235,19 +224,6 @@ PetitionTagListCellContent.fragments = {
     `;
   },
 };
-
-PetitionTagListCellContent.queries = [
-  gql`
-    query PetitionTagListCellContent_tags($search: String) {
-      tags(search: $search) {
-        items {
-          ...PetitionTagListCellContent_Tag
-        }
-      }
-    }
-    ${PetitionTagListCellContent.fragments.Tag}
-  `,
-];
 
 PetitionTagListCellContent.mutations = [
   gql`
@@ -272,247 +248,8 @@ PetitionTagListCellContent.mutations = [
     }
     ${PetitionTagListCellContent.fragments.Tag}
   `,
-  gql`
-    mutation PetitionTagListCellContent_createTag($name: String!, $color: String!) {
-      createTag(name: $name, color: $color) {
-        ...PetitionTagListCellContent_Tag
-      }
-    }
-    ${PetitionTagListCellContent.fragments.Tag}
-  `,
 ];
 
-type TagSelectInstance = SelectInstance<TagSelection, true, never>;
-
-interface TagSelectProps
-  extends Omit<CustomAsyncCreatableSelectProps<TagSelection, true, never>, "onChange"> {
-  onAddTag: (tag: TagSelection) => void;
-  onRemoveTag: (tag: TagSelection) => void;
-  onEditTags: () => void;
-  onCreateTag: (tag: Pick<TagSelection, "name" | "color">) => void;
-}
-
-function randomColor() {
-  return DEFAULT_COLORS[Math.floor(Math.random() * DEFAULT_COLORS.length)];
-}
-
-const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(function TagSelect(
-  { value, onAddTag, onRemoveTag, onEditTags, onCreateTag, ...props },
-  ref
-) {
-  const intl = useIntl();
-  const [newTagColor, setNewTagColor] = useState(randomColor());
-  const rsProps = useReactSelectProps<TagSelection, true, never>({
-    ...props,
-    components: {
-      IndicatorsContainer,
-      MultiValue,
-      Option,
-      NoOptionsMessage,
-      MenuList,
-    },
-    styles: rsStyles({
-      container: (styles) => ({ ...styles, width: "100%" }),
-      valueContainer: (styles) => ({
-        ...omit(styles as any, ["padding"]),
-        paddingLeft: "0.375rem",
-        paddingRight: "0.375rem",
-        paddingTop: "6px",
-        paddingBottom: "6px",
-        fontSize: "14px",
-      }),
-      control: (styles, { isFocused, theme }: any) => ({
-        ...styles,
-        minHeight: "40px",
-        borderRadius: 0,
-        border: "none",
-        boxShadow: isFocused ? `inset 0 0 0 2px ${theme.colors.primary}` : undefined,
-      }),
-      option: (styles) => ({
-        ...styles,
-        display: "flex",
-        padding: "0.25rem 1rem",
-        fontSize: "14px",
-      }),
-      menuList: (styles) => ({
-        ...styles,
-        paddingBottom: 0,
-      }),
-    }),
-  });
-
-  const handleChange = function (_: any, action: ActionMeta<TagSelection>) {
-    switch (action.action) {
-      case "select-option":
-        onAddTag(action.option!);
-        break;
-      case "pop-value":
-      case "remove-value":
-        if (action.removedValue) {
-          onRemoveTag(action.removedValue);
-        }
-        break;
-    }
-  };
-
-  return (
-    <AsyncCreatableSelect<TagSelection, true, never>
-      ref={ref}
-      {...props}
-      {...rsProps}
-      isMulti
-      isClearable={false}
-      defaultMenuIsOpen
-      closeMenuOnSelect={false}
-      placeholder={intl.formatMessage({
-        id: "component.tag-select.placeholder",
-        defaultMessage: "Enter tags...",
-      })}
-      value={value}
-      onChange={handleChange}
-      getOptionValue={(o) => o.id}
-      getOptionLabel={(o) => o.name}
-      isValidNewOption={(value, _, options) => {
-        const name = value.trim().replace(/\s+/g, " ");
-        return name.length > 0 && !options.some((o) => o.name === name);
-      }}
-      onMenuOpen={() => setNewTagColor(randomColor())}
-      onCreateOption={(name) => {
-        onCreateTag({ name, color: newTagColor });
-        setNewTagColor(randomColor());
-      }}
-      {...({
-        newTagColor: newTagColor,
-        onEditTags: onEditTags,
-      } as any)}
-    />
-  );
-});
-
-const rsComponent = genericRsComponent<
-  TagSelection,
-  true,
-  never,
-  {
-    selectProps: {
-      newTagColor: string;
-      onEditTags: () => void;
-    };
-  }
->();
-
-const IndicatorsContainer = rsComponent("IndicatorsContainer", function () {
+const IndicatorsContainer = function () {
   return <></>;
-});
-
-const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
-  return (
-    <Stack
-      direction="column"
-      spacing={1}
-      textStyle="hint"
-      fontSize="sm"
-      paddingX={2}
-      paddingY={4}
-      textAlign="center"
-    >
-      {props.options.length === 0 && !props.selectProps.inputValue ? (
-        <>
-          <Text>
-            <FormattedMessage
-              id="component.petition-tag-list-cell-content.no-options-1"
-              defaultMessage="Your organization doesn't have any tags yet."
-            />
-          </Text>
-          <Text>
-            <FormattedMessage
-              id="component.petition-tag-list-cell-content.no-options-2"
-              defaultMessage="Write something to create the first one."
-            />
-          </Text>
-        </>
-      ) : (
-        <Text as="div">
-          <FormattedMessage
-            id="component.petition-tag-list-cell-content.no-options-3"
-            defaultMessage="Type to create a new tag"
-          />
-        </Text>
-      )}
-    </Stack>
-  );
-});
-
-const MultiValue = rsComponent("MultiValue", function ({ data, removeProps, innerProps }) {
-  return (
-    <Tag
-      tag={data}
-      margin="2px"
-      isRemovable
-      onRemove={removeProps.onClick}
-      minWidth="0"
-      {...(innerProps as any)}
-    />
-  );
-});
-
-const Option = rsComponent("Option", function (props) {
-  const {
-    selectProps: { newTagColor },
-  } = props;
-  return (props.data as any).__isNew__ ? (
-    <components.Option {...props}>
-      <Flex alignItems="baseline">
-        <FormattedMessage
-          id="component.petition-tag-list-cell-content.tags-create"
-          defaultMessage="Create {tag}"
-          values={{
-            tag: (
-              <Tag
-                marginLeft="0.5rem"
-                flex="0 1 auto"
-                minWidth="0"
-                tag={{
-                  name: (props.data as any).value.trim().replace(/\s+/g, " "),
-                  color: newTagColor,
-                }}
-              />
-            ),
-          }}
-        />
-      </Flex>
-    </components.Option>
-  ) : (
-    <components.Option {...props}>
-      <Tag flex="0 1 auto" minWidth="0" tag={props.data as TagSelection} />
-    </components.Option>
-  );
-});
-
-const MenuList = rsComponent("MenuList", function (props) {
-  const {
-    selectProps: { onEditTags },
-  } = props;
-  return (
-    <components.MenuList {...props}>
-      {props.children}
-      {props.options.length > 0 ? (
-        <Box position="sticky" bottom="0" padding={2} paddingBottom={0} backgroundColor="white">
-          <Button
-            width="100%"
-            size="sm"
-            variant="outline"
-            fontWeight="normal"
-            leftIcon={<EditIcon position="relative" top="-1px" />}
-            onClick={() => onEditTags()}
-          >
-            <FormattedMessage
-              id="component.petition-tag-list-cell-content.edit-tags"
-              defaultMessage="Edit tags"
-            />
-          </Button>
-        </Box>
-      ) : null}
-    </components.MenuList>
-  );
-});
+};

@@ -1,3 +1,4 @@
+import { GraphQLResolveInfo } from "graphql";
 import {
   arg,
   core,
@@ -11,10 +12,10 @@ import {
   plugin,
   stringArg,
 } from "nexus";
-import { GraphQLResolveInfo } from "graphql";
 import { omit } from "remeda";
 import { KeysOfType } from "../../util/types";
 import { ArgValidationError } from "./errors";
+import { validateAnd } from "./validateArgs";
 
 export function reverseSortDirection(direction: "asc" | "desc") {
   return direction === "asc" ? "desc" : "asc";
@@ -70,10 +71,6 @@ export type PaginationFieldConfig<
    * The description to annotate the GraphQL SDL
    */
   description?: string;
-  /**
-   * Custom logic to validate the arguments.
-   */
-  validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo) => void;
   /**
    * Dynamically adds additional fields to the current "pagination" when it is defined.
    * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,
@@ -217,6 +214,9 @@ export function paginationPlugin() {
             };
             t.field(fieldName, {
               ...nonPaginationFieldProps(fieldConfig),
+              validateArgs: fieldConfig.validateArgs
+                ? validateAnd(fieldConfig.validateArgs, validateArgs)
+                : validateArgs,
               args:
                 typeof fieldConfig.extendArgs === "function"
                   ? fieldConfig.extendArgs(args)
@@ -225,7 +225,6 @@ export function paginationPlugin() {
                   : args,
               type: paginationName as any,
               resolve(root, args, ctx, info) {
-                validateArgs(args, info);
                 return fieldConfig.resolve(root, args, ctx, info);
               },
             });
@@ -245,7 +244,6 @@ function nonPaginationFieldProps(fieldConfig: PaginationFieldConfig<any, any, an
     "extendPagination",
     "resolve",
     "type",
-    "validateArgs",
   ]);
 }
 
@@ -279,11 +277,16 @@ const upperFirst = (fieldName: string) => {
   return fieldName.slice(0, 1).toUpperCase().concat(fieldName.slice(1));
 };
 
-function validateArgs(args: Record<string, any> = {}, info: GraphQLResolveInfo) {
-  if (args.offset < 0) {
+function validateArgs<TypeName extends string, FieldName extends string>(
+  root: core.GetGen2<"rootTypes", TypeName>,
+  args: core.ArgsValue<TypeName, FieldName>,
+  context: core.GetGen<"context">,
+  info: GraphQLResolveInfo
+) {
+  if ((args as any).offset < 0) {
     throw new ArgValidationError(info, "offset", "Value can't be negative.");
   }
-  if (args.limit < 0) {
+  if ((args as any).limit < 0) {
     throw new ArgValidationError(info, "limit", "Value can't be negative.");
   }
 }

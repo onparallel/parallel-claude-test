@@ -4,8 +4,10 @@ import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSe
 import { TableColumnFilterProps } from "@parallel/components/common/Table";
 import {
   FilterSharedWithLogicalOperator,
+  FilterSharedWithOperator,
   PetitionSharedWithFilter,
 } from "@parallel/graphql/__types";
+import { object } from "@parallel/utils/queryState";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionListSharedWithFilterLine } from "./PetitionListSharedWithFilterLine";
@@ -95,13 +97,12 @@ export function PetitionListSharedWithFilter({
       )}
       <HStack>
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
-          leftIcon={
-            <PlusCircleFilledIcon color="primary.500" position="relative" fontSize="18px" />
-          }
+          fontWeight="normal"
+          leftIcon={<PlusCircleFilledIcon color="primary.500" position="relative" boxSize={5} />}
           onClick={handleAddFilter}
-          isDisabled={value?.filters && value.filters.length > 4}
+          isDisabled={value?.filters && value.filters.length >= 5}
         >
           <FormattedMessage
             id="component.petition-list-shared-with-filter.add-filter"
@@ -123,27 +124,30 @@ export function PetitionListSharedWithFilter({
   );
 }
 
-export function flatShared(data: PetitionSharedWithFilter) {
-  return ([data.operator] as any[]).concat(data.filters.flatMap((f) => [f.operator, f.value]));
+export function sharedWithQueryItem() {
+  return object<PetitionSharedWithFilter>({
+    flatten(data) {
+      return [data.operator, ...data.filters.flatMap((f) => [f.operator, f.value])];
+    },
+    unflatten(data: string[]) {
+      const value: PetitionSharedWithFilter = {
+        operator: data[0] as FilterSharedWithLogicalOperator,
+        filters: [],
+      };
+      let i = 1;
+      while (i < data.length) {
+        value.filters.push({
+          operator: data[i] as FilterSharedWithOperator,
+          value: data[i + 1],
+        });
+        i += 2;
+      }
+      return value;
+    },
+  });
 }
 
-export function unflatShared(data: any[]): PetitionSharedWithFilter {
-  const value: PetitionSharedWithFilter = {
-    operator: data[0] as FilterSharedWithLogicalOperator,
-    filters: [],
-  };
-  let i = 1;
-  while (i < data.length) {
-    value.filters.push({
-      operator: data[i],
-      value: data[i + 1],
-    });
-    i += 2;
-  }
-  return value;
-}
-
-export function removeInvalidLines(
+export function removeInvalidSharedWithFilterLines(
   value: PetitionSharedWithFilter | null
 ): PetitionSharedWithFilter | null {
   const filters = value?.filters.filter((l) => l.value !== null) ?? [];

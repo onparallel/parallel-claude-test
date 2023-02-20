@@ -3366,6 +3366,7 @@ input PetitionFilter {
   signature: [PetitionSignatureStatusFilter!]
   status: [PetitionStatus!]
   tagIds: [GID!]
+  tags: PetitionTagFilter
   type: PetitionBaseType
 }
 
@@ -3413,7 +3414,8 @@ type PetitionListViewData {
   signature: [PetitionSignatureStatusFilter!]
   sort: PetitionListViewSort
   status: [PetitionStatus!]
-  tags: [GID!]
+  tags: [GID!] @deprecated(reason: "use tagsFilters")
+  tagsFilters: PetitionListViewDataTags
 }
 
 input PetitionListViewDataInput {
@@ -3421,11 +3423,12 @@ input PetitionListViewDataInput {
   path: String
   search: String
   searchIn: PetitionListViewSearchIn
-  sharedWith: PetitionListViewDataSharedWithInput
+  sharedWith: PetitionSharedWithFilter
   signature: [PetitionSignatureStatusFilter!]
   sort: PetitionListViewSortInput
   status: [PetitionStatus!]
   tags: [GID!]
+  tagsFilters: PetitionTagFilter
 }
 
 type PetitionListViewDataSharedWith {
@@ -3438,14 +3441,14 @@ type PetitionListViewDataSharedWithFilters {
   value: ID!
 }
 
-input PetitionListViewDataSharedWithFiltersInput {
-  operator: FilterSharedWithOperator!
-  value: ID!
+type PetitionListViewDataTags {
+  filters: [PetitionListViewDataTagsFilters!]!
+  operator: PetitionTagFilterLogicalOperator!
 }
 
-input PetitionListViewDataSharedWithInput {
-  filters: [PetitionListViewDataSharedWithFiltersInput!]!
-  operator: FilterSharedWithLogicalOperator!
+type PetitionListViewDataTagsFilters {
+  operator: PetitionTagFilterLineOperator!
+  value: [GID!]!
 }
 
 enum PetitionListViewSearchIn {
@@ -3859,6 +3862,27 @@ enum PetitionStatus {
   The petition has been sent and is awaiting completion.
   """
   PENDING
+}
+
+input PetitionTagFilter {
+  filters: [PetitionTagFilterLine!]!
+  operator: PetitionTagFilterLogicalOperator!
+}
+
+input PetitionTagFilterLine {
+  operator: PetitionTagFilterLineOperator!
+  value: [GID!]!
+}
+
+enum PetitionTagFilterLineOperator {
+  CONTAINS
+  DOES_NOT_CONTAIN
+  IS_EMPTY
+}
+
+enum PetitionTagFilterLogicalOperator {
+  AND
+  OR
 }
 
 """
@@ -4887,6 +4911,7 @@ type Query {
     Optional text to search in the collection.
     """
     search: String
+    tagIds: [GID!]
   ): TagPagination!
   task(id: GID!): Task!
 

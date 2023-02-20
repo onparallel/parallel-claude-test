@@ -104,13 +104,23 @@ type PetitionSignatureStatusFilter =
   | "COMPLETED"
   | "CANCELLED";
 
+interface PetitionTagFilter {
+  filters: {
+    operator: "CONTAINS" | "DOES_NOT_CONTAIN" | "IS_EMPTY";
+    value: number[];
+  }[];
+  operator: "AND" | "OR";
+}
+
 interface PetitionFilter {
   path?: string | null;
   status?: PetitionStatus[] | null;
   locale?: PetitionLocale | null;
   signature?: PetitionSignatureStatusFilter[] | null;
   type?: PetitionType | null;
+  /** @deprecated */
   tagIds?: number[] | null;
+  tags?: PetitionTagFilter | null;
   sharedWith?: PetitionSharedWithFilter | null;
   fromTemplateId?: number[] | null;
 }
@@ -405,6 +415,7 @@ export class PetitionRepository extends BaseRepository {
   ) {
     const type = opts.filters?.type || "PETITION";
     const { search, filters } = opts;
+
     const builders: Knex.QueryCallbackWithArgs[] = [
       (q) =>
         q
@@ -462,7 +473,31 @@ export class PetitionRepository extends BaseRepository {
     if (filters?.status && type === "PETITION") {
       builders.push((q) => q.whereRaw("p.status in ?", [this.sqlIn(filters.status!)]));
     }
-    if (filters?.tagIds) {
+
+    if (filters?.tags) {
+      const { filters: tagsFilters, operator } = filters.tags;
+
+      builders.push((q) => {
+        q.joinRaw(/* sql */ `left join petition_tag pt on pt.petition_id = p.id`).modify((q) => {
+          for (const filter of tagsFilters) {
+            q = operator === "AND" ? q.and : q.or;
+
+            switch (filter.operator) {
+              case "CONTAINS":
+              case "DOES_NOT_CONTAIN":
+                q = filter.operator.startsWith("DOES_NOT_") ? q.not : q;
+                q.havingRaw(/* sql */ `array_agg(distinct pt.tag_id) @> ?`, [
+                  this.sqlArray(filter.value, "int"),
+                ]);
+                break;
+              case "IS_EMPTY":
+                q.havingRaw(/* sql */ `count(distinct pt.tag_id) = 0`);
+                break;
+            }
+          }
+        });
+      });
+    } else if (filters?.tagIds) {
       builders.push((q) => {
         q.joinRaw(/* sql */ `left join petition_tag pt on pt.petition_id = p.id`);
         if (filters.tagIds!.length === 0) {
@@ -475,6 +510,7 @@ export class PetitionRepository extends BaseRepository {
         }
       });
     }
+
     if (filters?.sharedWith && filters.sharedWith.filters.length > 0) {
       const { filters: sharedWithFilters, operator } = filters.sharedWith;
       builders.push((q) => {

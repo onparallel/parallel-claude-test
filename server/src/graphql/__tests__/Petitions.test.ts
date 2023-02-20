@@ -226,7 +226,15 @@ describe("GraphQL/Petitions", () => {
         `,
         variables: {
           filters: {
-            tagIds: [toGlobalId("Tag", tags[0].id)],
+            tags: {
+              filters: [
+                {
+                  value: [toGlobalId("Tag", tags[0].id)],
+                  operator: "CONTAINS",
+                },
+              ],
+              operator: "AND",
+            },
           },
         },
       });
@@ -256,7 +264,15 @@ describe("GraphQL/Petitions", () => {
         `,
         variables: {
           filters: {
-            tagIds: [toGlobalId("Tag", tags[0].id), toGlobalId("Tag", tags[1].id)],
+            tags: {
+              filters: [
+                {
+                  value: [toGlobalId("Tag", tags[0].id), toGlobalId("Tag", tags[1].id)],
+                  operator: "CONTAINS",
+                },
+              ],
+              operator: "AND",
+            },
           },
         },
       });
@@ -284,16 +300,27 @@ describe("GraphQL/Petitions", () => {
         `,
         variables: {
           filters: {
-            tagIds: [toGlobalId("Tag", privateTag.id)],
+            tags: {
+              filters: [
+                {
+                  value: [toGlobalId("Tag", privateTag.id)],
+                  operator: "CONTAINS",
+                },
+              ],
+              operator: "AND",
+            },
           },
         },
       });
 
-      expect(errors).toContainGraphQLError("INVALID_FILTER");
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        argName: "filters.tags",
+        message: "Tags must belong to the same organization",
+      });
       expect(data).toBeNull();
     });
 
-    it("filters petitions with tags when passing an empty tagIds array", async () => {
+    it("filters petitions with tags when passing an IS_EMPTY tags filter", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
           query ($filters: PetitionFilter) {
@@ -307,7 +334,19 @@ describe("GraphQL/Petitions", () => {
             }
           }
         `,
-        variables: { filters: { tagIds: [] } },
+        variables: {
+          filters: {
+            tags: {
+              filters: [
+                {
+                  value: [],
+                  operator: "IS_EMPTY",
+                },
+              ],
+              operator: "AND",
+            },
+          },
+        },
       });
 
       const expectedPetitions = petitions.filter(
@@ -338,12 +377,23 @@ describe("GraphQL/Petitions", () => {
         `,
         variables: {
           filters: {
-            tagIds: tags.map((tag) => toGlobalId("Tag", tag.id)),
+            tags: {
+              filters: [
+                {
+                  value: tags.map((tag) => toGlobalId("Tag", tag.id)),
+                  operator: "CONTAINS",
+                },
+              ],
+              operator: "AND",
+            },
           },
         },
       });
 
-      expect(errors).toContainGraphQLError("INVALID_FILTER");
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+        argName: "filters.tags",
+        message: "A maximum of 10 tags is allowed in each filter line",
+      });
       expect(data).toBeNull();
     });
 

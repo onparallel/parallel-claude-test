@@ -6,3 +6,4 @@ export * from "./comments";
 export * from "./permissions";
 export * from "./signature-request";
 export * from "./attachments";
+export * from "./filters";

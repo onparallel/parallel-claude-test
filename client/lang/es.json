@@ -3430,19 +3430,19 @@
     "context": "Clear filter"
   },
   {
-    "term": "component.petition-list-tag-filter.clear-filter",
-    "definition": "Quitar filtro",
-    "context": "Clear filter"
+    "term": "component.petition-list-tag-filter.contains",
+    "definition": "Contiene",
+    "context": "Contains"
   },
   {
-    "term": "component.petition-list-tag-filter.placeholder",
-    "definition": "Buscar etiquetas...",
-    "context": "Search for tags..."
+    "term": "component.petition-list-tag-filter.does-not-contain",
+    "definition": "No contiene",
+    "context": "Does not contain"
   },
   {
-    "term": "component.petition-list-tag-filter.without-tags",
-    "definition": "Sin etiquetas",
-    "context": "Without tags"
+    "term": "component.petition-list-tag-filter.is-empty",
+    "definition": "Está vacío",
+    "context": "Is empty"
   },
   {
     "term": "component.petition-permission-row.default-owner",
@@ -3888,31 +3888,6 @@
     "term": "component.petition-tag-list-cell-content.add-tags",
     "definition": "Añadir etiquetas",
     "context": "Add tags"
-  },
-  {
-    "term": "component.petition-tag-list-cell-content.edit-tags",
-    "definition": "Editar etiquetas",
-    "context": "Edit tags"
-  },
-  {
-    "term": "component.petition-tag-list-cell-content.no-options-1",
-    "definition": "Tu organización aún no ha creado etiquetas.",
-    "context": "Your organization doesn't have any tags yet."
-  },
-  {
-    "term": "component.petition-tag-list-cell-content.no-options-2",
-    "definition": "Escribe para crear la primera.",
-    "context": "Write something to create the first one."
-  },
-  {
-    "term": "component.petition-tag-list-cell-content.no-options-3",
-    "definition": "Escribe para crear una etiqueta",
-    "context": "Type to create a new tag"
-  },
-  {
-    "term": "component.petition-tag-list-cell-content.tags-create",
-    "definition": "Crear {tag}",
-    "context": "Create {tag}"
   },
   {
     "term": "component.petition-tag-list-cell-content.tags-x-more",
@@ -5491,8 +5466,8 @@
   },
   {
     "term": "component.tag-edit-dialog.name-label",
-    "definition": "Editar texto",
-    "context": "Edit text"
+    "definition": "Nombre de etiqueta",
+    "context": "Tag name"
   },
   {
     "term": "component.tag-edit-dialog.tag-label",
@@ -5500,9 +5475,44 @@
     "context": "Tag"
   },
   {
-    "term": "component.tag-select.placeholder",
+    "term": "component.tag-select.edit-tags",
+    "definition": "Editar etiquetas",
+    "context": "Edit tags"
+  },
+  {
+    "term": "component.tag-select.no-options-1",
+    "definition": "Tu organización aún no ha creado etiquetas.",
+    "context": "Your organization doesn't have any tags yet."
+  },
+  {
+    "term": "component.tag-select.no-options-2",
+    "definition": "Escribe para crear la primera.",
+    "context": "Write something to create the first one."
+  },
+  {
+    "term": "component.tag-select.no-options-3",
+    "definition": "Escribe para crear una etiqueta",
+    "context": "Type to create a new tag"
+  },
+  {
+    "term": "component.tag-select.no-options-4",
+    "definition": "No se encontraron etiquetas",
+    "context": "No tags matching"
+  },
+  {
+    "term": "component.tag-select.placeholder-multi",
     "definition": "Introduce etiquetas...",
     "context": "Enter tags..."
+  },
+  {
+    "term": "component.tag-select.placeholder-single",
+    "definition": "Selecciona una etiqueta...",
+    "context": "Select a tag..."
+  },
+  {
+    "term": "component.tag-select.tags-create",
+    "definition": "Crear {tag}",
+    "context": "Create {tag}"
   },
   {
     "term": "component.tag.remove-tag",

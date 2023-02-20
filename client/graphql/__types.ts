@@ -2724,6 +2724,7 @@ export interface PetitionFilter {
   signature?: InputMaybe<Array<PetitionSignatureStatusFilter>>;
   status?: InputMaybe<Array<PetitionStatus>>;
   tagIds?: InputMaybe<Array<Scalars["GID"]>>;
+  tags?: InputMaybe<PetitionTagFilter>;
   type?: InputMaybe<PetitionBaseType>;
 }
 
@@ -2760,7 +2761,9 @@ export interface PetitionListViewData {
   signature?: Maybe<Array<PetitionSignatureStatusFilter>>;
   sort?: Maybe<PetitionListViewSort>;
   status?: Maybe<Array<PetitionStatus>>;
+  /** @deprecated use tagsFilters */
   tags?: Maybe<Array<Scalars["GID"]>>;
+  tagsFilters?: Maybe<PetitionListViewDataTags>;
 }
 
 export interface PetitionListViewDataInput {
@@ -2773,6 +2776,7 @@ export interface PetitionListViewDataInput {
   sort?: InputMaybe<PetitionListViewSortInput>;
   status?: InputMaybe<Array<PetitionStatus>>;
   tags?: InputMaybe<Array<Scalars["GID"]>>;
+  tagsFilters?: InputMaybe<PetitionListViewDataTagsInput>;
 }
 
 export interface PetitionListViewDataSharedWith {
@@ -2795,6 +2799,28 @@ export interface PetitionListViewDataSharedWithFiltersInput {
 export interface PetitionListViewDataSharedWithInput {
   filters: Array<PetitionListViewDataSharedWithFiltersInput>;
   operator: FilterSharedWithLogicalOperator;
+}
+
+export interface PetitionListViewDataTags {
+  __typename?: "PetitionListViewDataTags";
+  filters: Array<PetitionListViewDataTagsFilters>;
+  operator: PetitionTagFilterLogicalOperator;
+}
+
+export interface PetitionListViewDataTagsFilters {
+  __typename?: "PetitionListViewDataTagsFilters";
+  operator: PetitionTagFilterLineOperator;
+  value: Array<Scalars["GID"]>;
+}
+
+export interface PetitionListViewDataTagsFiltersInput {
+  operator: PetitionTagFilterLineOperator;
+  value: Array<Scalars["GID"]>;
+}
+
+export interface PetitionListViewDataTagsInput {
+  filters: Array<PetitionListViewDataTagsFiltersInput>;
+  operator: PetitionTagFilterLogicalOperator;
 }
 
 export type PetitionListViewSearchIn = "CURRENT_FOLDER" | "EVERYWHERE";
@@ -3042,6 +3068,20 @@ export type PetitionStatus =
   | "DRAFT"
   /** The petition has been sent and is awaiting completion. */
   | "PENDING";
+
+export interface PetitionTagFilter {
+  filters: Array<PetitionTagFilterLine>;
+  operator: PetitionTagFilterLogicalOperator;
+}
+
+export interface PetitionTagFilterLine {
+  operator: PetitionTagFilterLineOperator;
+  value: Array<Scalars["GID"]>;
+}
+
+export type PetitionTagFilterLineOperator = "CONTAINS" | "DOES_NOT_CONTAIN" | "IS_EMPTY";
+
+export type PetitionTagFilterLogicalOperator = "AND" | "OR";
 
 /** A petition template */
 export interface PetitionTemplate extends PetitionBase {
@@ -3717,6 +3757,7 @@ export interface QuerytagsArgs {
   limit?: InputMaybe<Scalars["Int"]>;
   offset?: InputMaybe<Scalars["Int"]>;
   search?: InputMaybe<Scalars["String"]>;
+  tagIds?: InputMaybe<Array<Scalars["GID"]>>;
 }
 
 export interface QuerytaskArgs {
@@ -4739,17 +4780,6 @@ export type PetitionTagListCellContent_PetitionBaseFragment =
   | PetitionTagListCellContent_PetitionBase_Petition_Fragment
   | PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment;
 
-export type PetitionTagListCellContent_tagsQueryVariables = Exact<{
-  search?: InputMaybe<Scalars["String"]>;
-}>;
-
-export type PetitionTagListCellContent_tagsQuery = {
-  tags: {
-    __typename?: "TagPagination";
-    items: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-  };
-};
-
 export type PetitionTagListCellContent_tagPetitionMutationVariables = Exact<{
   tagId: Scalars["GID"];
   petitionId: Scalars["GID"];
@@ -4786,15 +4816,6 @@ export type PetitionTagListCellContent_untagPetitionMutation = {
         id: string;
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
       };
-};
-
-export type PetitionTagListCellContent_createTagMutationVariables = Exact<{
-  name: Scalars["String"];
-  color: Scalars["String"];
-}>;
-
-export type PetitionTagListCellContent_createTagMutation = {
-  createTag: { __typename?: "Tag"; id: string; name: string; color: string };
 };
 
 export type PublicPetitionFieldComment_PublicPetitionFieldCommentFragment = {
@@ -4859,6 +4880,29 @@ export type SignerReference_PetitionSignerFragment = {
 };
 
 export type Tag_TagFragment = { __typename?: "Tag"; name: string; color: string };
+
+export type TagSelect_TagFragment = { __typename?: "Tag"; id: string; name: string; color: string };
+
+export type TagSelect_tagsQueryVariables = Exact<{
+  search?: InputMaybe<Scalars["String"]>;
+  tagIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+}>;
+
+export type TagSelect_tagsQuery = {
+  tags: {
+    __typename?: "TagPagination";
+    items: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
+  };
+};
+
+export type TagSelect_createTagMutationVariables = Exact<{
+  name: Scalars["String"];
+  color: Scalars["String"];
+}>;
+
+export type TagSelect_createTagMutation = {
+  createTag: { __typename?: "Tag"; id: string; name: string; color: string };
+};
 
 export type UserAvatar_UserFragment = {
   __typename?: "User";
@@ -5013,36 +5057,13 @@ export type FieldErrorDialog_PetitionFieldFragment = {
   type: PetitionFieldType;
 };
 
-export type TagEditDialog_TagFragment = {
-  __typename?: "Tag";
-  id: string;
-  createdAt: string;
-  name: string;
-  color: string;
-};
-
-export type TagEditDialog_tagsQueryVariables = Exact<{ [key: string]: never }>;
-
-export type TagEditDialog_tagsQuery = {
-  tags: {
-    __typename?: "TagPagination";
-    items: Array<{
-      __typename?: "Tag";
-      id: string;
-      createdAt: string;
-      name: string;
-      color: string;
-    }>;
-  };
-};
-
 export type TagEditDialog_updateTagMutationVariables = Exact<{
   id: Scalars["GID"];
   data: UpdateTagInput;
 }>;
 
 export type TagEditDialog_updateTagMutation = {
-  updateTag: { __typename?: "Tag"; id: string; createdAt: string; name: string; color: string };
+  updateTag: { __typename?: "Tag"; id: string; name: string; color: string };
 };
 
 export type TaskProgressDialog_TaskFragment = {
@@ -11318,7 +11339,6 @@ export type PetitionListHeader_PetitionListViewFragment = {
   data: {
     __typename?: "PetitionListViewData";
     status?: Array<PetitionStatus> | null;
-    tags?: Array<string> | null;
     signature?: Array<PetitionSignatureStatusFilter> | null;
     fromTemplateId?: Array<string> | null;
     search?: string | null;
@@ -11331,6 +11351,15 @@ export type PetitionListHeader_PetitionListViewFragment = {
         __typename?: "PetitionListViewDataSharedWithFilters";
         value: string;
         operator: FilterSharedWithOperator;
+      }>;
+    } | null;
+    tagsFilters?: {
+      __typename?: "PetitionListViewDataTags";
+      operator: PetitionTagFilterLogicalOperator;
+      filters: Array<{
+        __typename?: "PetitionListViewDataTagsFilters";
+        value: Array<string>;
+        operator: PetitionTagFilterLineOperator;
       }>;
     } | null;
     sort?: {
@@ -11360,7 +11389,6 @@ export type PetitionListHeader_createPetitionListViewMutation = {
     data: {
       __typename?: "PetitionListViewData";
       status?: Array<PetitionStatus> | null;
-      tags?: Array<string> | null;
       signature?: Array<PetitionSignatureStatusFilter> | null;
       fromTemplateId?: Array<string> | null;
       search?: string | null;
@@ -11373,6 +11401,15 @@ export type PetitionListHeader_createPetitionListViewMutation = {
           __typename?: "PetitionListViewDataSharedWithFilters";
           value: string;
           operator: FilterSharedWithOperator;
+        }>;
+      } | null;
+      tagsFilters?: {
+        __typename?: "PetitionListViewDataTags";
+        operator: PetitionTagFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "PetitionListViewDataTagsFilters";
+          value: Array<string>;
+          operator: PetitionTagFilterLineOperator;
         }>;
       } | null;
       sort?: {
@@ -11404,7 +11441,6 @@ export type PetitionListHeader_updatePetitionListViewMutation = {
     data: {
       __typename?: "PetitionListViewData";
       status?: Array<PetitionStatus> | null;
-      tags?: Array<string> | null;
       signature?: Array<PetitionSignatureStatusFilter> | null;
       fromTemplateId?: Array<string> | null;
       search?: string | null;
@@ -11419,6 +11455,15 @@ export type PetitionListHeader_updatePetitionListViewMutation = {
           operator: FilterSharedWithOperator;
         }>;
       } | null;
+      tagsFilters?: {
+        __typename?: "PetitionListViewDataTags";
+        operator: PetitionTagFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "PetitionListViewDataTagsFilters";
+          value: Array<string>;
+          operator: PetitionTagFilterLineOperator;
+        }>;
+      } | null;
       sort?: {
         __typename?: "PetitionListViewSort";
         field: PetitionListViewSortField;
@@ -11431,7 +11476,6 @@ export type PetitionListHeader_updatePetitionListViewMutation = {
 export type ViewTabs_PetitionListViewDataFragment = {
   __typename?: "PetitionListViewData";
   status?: Array<PetitionStatus> | null;
-  tags?: Array<string> | null;
   signature?: Array<PetitionSignatureStatusFilter> | null;
   fromTemplateId?: Array<string> | null;
   search?: string | null;
@@ -11444,6 +11488,15 @@ export type ViewTabs_PetitionListViewDataFragment = {
       __typename?: "PetitionListViewDataSharedWithFilters";
       value: string;
       operator: FilterSharedWithOperator;
+    }>;
+  } | null;
+  tagsFilters?: {
+    __typename?: "PetitionListViewDataTags";
+    operator: PetitionTagFilterLogicalOperator;
+    filters: Array<{
+      __typename?: "PetitionListViewDataTagsFilters";
+      value: Array<string>;
+      operator: PetitionTagFilterLineOperator;
     }>;
   } | null;
   sort?: {
@@ -11461,7 +11514,6 @@ export type ViewTabs_PetitionListViewFragment = {
   data: {
     __typename?: "PetitionListViewData";
     status?: Array<PetitionStatus> | null;
-    tags?: Array<string> | null;
     signature?: Array<PetitionSignatureStatusFilter> | null;
     fromTemplateId?: Array<string> | null;
     search?: string | null;
@@ -11474,6 +11526,15 @@ export type ViewTabs_PetitionListViewFragment = {
         __typename?: "PetitionListViewDataSharedWithFilters";
         value: string;
         operator: FilterSharedWithOperator;
+      }>;
+    } | null;
+    tagsFilters?: {
+      __typename?: "PetitionListViewDataTags";
+      operator: PetitionTagFilterLogicalOperator;
+      filters: Array<{
+        __typename?: "PetitionListViewDataTagsFilters";
+        value: Array<string>;
+        operator: PetitionTagFilterLineOperator;
       }>;
     } | null;
     sort?: {
@@ -11533,7 +11594,6 @@ export type ViewTabs_createPetitionListViewMutation = {
     data: {
       __typename?: "PetitionListViewData";
       status?: Array<PetitionStatus> | null;
-      tags?: Array<string> | null;
       signature?: Array<PetitionSignatureStatusFilter> | null;
       fromTemplateId?: Array<string> | null;
       search?: string | null;
@@ -11546,6 +11606,15 @@ export type ViewTabs_createPetitionListViewMutation = {
           __typename?: "PetitionListViewDataSharedWithFilters";
           value: string;
           operator: FilterSharedWithOperator;
+        }>;
+      } | null;
+      tagsFilters?: {
+        __typename?: "PetitionListViewDataTags";
+        operator: PetitionTagFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "PetitionListViewDataTagsFilters";
+          value: Array<string>;
+          operator: PetitionTagFilterLineOperator;
         }>;
       } | null;
       sort?: {
@@ -11577,7 +11646,6 @@ export type ViewTabs_updatePetitionListViewMutation = {
     data: {
       __typename?: "PetitionListViewData";
       status?: Array<PetitionStatus> | null;
-      tags?: Array<string> | null;
       signature?: Array<PetitionSignatureStatusFilter> | null;
       fromTemplateId?: Array<string> | null;
       search?: string | null;
@@ -11590,6 +11658,15 @@ export type ViewTabs_updatePetitionListViewMutation = {
           __typename?: "PetitionListViewDataSharedWithFilters";
           value: string;
           operator: FilterSharedWithOperator;
+        }>;
+      } | null;
+      tagsFilters?: {
+        __typename?: "PetitionListViewDataTags";
+        operator: PetitionTagFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "PetitionListViewDataTagsFilters";
+          value: Array<string>;
+          operator: PetitionTagFilterLineOperator;
         }>;
       } | null;
       sort?: {
@@ -11618,17 +11695,6 @@ export type PetitionListTagFilter_TagFragment = {
   id: string;
   name: string;
   color: string;
-};
-
-export type PetitionListTagFilter_tagsQueryVariables = Exact<{
-  search?: InputMaybe<Scalars["String"]>;
-}>;
-
-export type PetitionListTagFilter_tagsQuery = {
-  tags: {
-    __typename?: "TagPagination";
-    items: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-  };
 };
 
 export type PetitionTemplateClosingMessageCard_PetitionTemplateFragment = {
@@ -23751,7 +23817,6 @@ export type Petitions_UserFragment = {
     data: {
       __typename?: "PetitionListViewData";
       status?: Array<PetitionStatus> | null;
-      tags?: Array<string> | null;
       signature?: Array<PetitionSignatureStatusFilter> | null;
       fromTemplateId?: Array<string> | null;
       search?: string | null;
@@ -23764,6 +23829,15 @@ export type Petitions_UserFragment = {
           __typename?: "PetitionListViewDataSharedWithFilters";
           value: string;
           operator: FilterSharedWithOperator;
+        }>;
+      } | null;
+      tagsFilters?: {
+        __typename?: "PetitionListViewDataTags";
+        operator: PetitionTagFilterLogicalOperator;
+        filters: Array<{
+          __typename?: "PetitionListViewDataTagsFilters";
+          value: Array<string>;
+          operator: PetitionTagFilterLineOperator;
         }>;
       } | null;
       sort?: {
@@ -23978,7 +24052,6 @@ export type Petitions_userQuery = {
       data: {
         __typename?: "PetitionListViewData";
         status?: Array<PetitionStatus> | null;
-        tags?: Array<string> | null;
         signature?: Array<PetitionSignatureStatusFilter> | null;
         fromTemplateId?: Array<string> | null;
         search?: string | null;
@@ -23991,6 +24064,15 @@ export type Petitions_userQuery = {
             __typename?: "PetitionListViewDataSharedWithFilters";
             value: string;
             operator: FilterSharedWithOperator;
+          }>;
+        } | null;
+        tagsFilters?: {
+          __typename?: "PetitionListViewDataTags";
+          operator: PetitionTagFilterLogicalOperator;
+          filters: Array<{
+            __typename?: "PetitionListViewDataTagsFilters";
+            value: Array<string>;
+            operator: PetitionTagFilterLineOperator;
           }>;
         } | null;
         sort?: {
@@ -27688,20 +27770,6 @@ export const ConfirmCommentMentionAndShareDialog_PetitionFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<ConfirmCommentMentionAndShareDialog_PetitionFragment, unknown>;
-export const Tag_TagFragmentDoc = gql`
-  fragment Tag_Tag on Tag {
-    name
-    color
-  }
-` as unknown as DocumentNode<Tag_TagFragment, unknown>;
-export const TagEditDialog_TagFragmentDoc = gql`
-  fragment TagEditDialog_Tag on Tag {
-    id
-    ...Tag_Tag
-    createdAt
-  }
-  ${Tag_TagFragmentDoc}
-` as unknown as DocumentNode<TagEditDialog_TagFragment, unknown>;
 export const TaskProgressDialog_TaskFragmentDoc = gql`
   fragment TaskProgressDialog_Task on Task {
     id
@@ -28421,6 +28489,12 @@ export const ViewTabs_UserFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<ViewTabs_UserFragment, unknown>;
+export const Tag_TagFragmentDoc = gql`
+  fragment Tag_Tag on Tag {
+    name
+    color
+  }
+` as unknown as DocumentNode<Tag_TagFragment, unknown>;
 export const PetitionListTagFilter_TagFragmentDoc = gql`
   fragment PetitionListTagFilter_Tag on Tag {
     id
@@ -31662,7 +31736,13 @@ export const ViewTabs_PetitionListViewDataFragmentDoc = gql`
         operator
       }
     }
-    tags
+    tagsFilters {
+      operator
+      filters {
+        value
+        operator
+      }
+    }
     signature
     fromTemplateId
     search
@@ -31698,7 +31778,13 @@ export const PetitionListHeader_PetitionListViewFragmentDoc = gql`
           operator
         }
       }
-      tags
+      tagsFilters {
+        operator
+        filters {
+          value
+          operator
+        }
+      }
       signature
       fromTemplateId
       search
@@ -31743,12 +31829,21 @@ export const useDeletePetitions_PetitionBaseOrFolderFragmentDoc = gql`
   ${useDeletePetitions_PetitionBaseFragmentDoc}
   ${useDeletePetitions_PetitionFolderFragmentDoc}
 ` as unknown as DocumentNode<useDeletePetitions_PetitionBaseOrFolderFragment, unknown>;
-export const PetitionTagListCellContent_TagFragmentDoc = gql`
-  fragment PetitionTagListCellContent_Tag on Tag {
+export const TagSelect_TagFragmentDoc = gql`
+  fragment TagSelect_Tag on Tag {
     id
     ...Tag_Tag
   }
   ${Tag_TagFragmentDoc}
+` as unknown as DocumentNode<TagSelect_TagFragment, unknown>;
+export const PetitionTagListCellContent_TagFragmentDoc = gql`
+  fragment PetitionTagListCellContent_Tag on Tag {
+    id
+    ...Tag_Tag
+    ...TagSelect_Tag
+  }
+  ${Tag_TagFragmentDoc}
+  ${TagSelect_TagFragmentDoc}
 ` as unknown as DocumentNode<PetitionTagListCellContent_TagFragment, unknown>;
 export const PetitionTagListCellContent_PetitionBaseFragmentDoc = gql`
   fragment PetitionTagListCellContent_PetitionBase on PetitionBase {
@@ -32602,19 +32697,6 @@ export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`
     fields
   }
 ` as unknown as DocumentNode<uploadFile_AWSPresignedPostDataFragment, unknown>;
-export const PetitionTagListCellContent_tagsDocument = gql`
-  query PetitionTagListCellContent_tags($search: String) {
-    tags(search: $search) {
-      items {
-        ...PetitionTagListCellContent_Tag
-      }
-    }
-  }
-  ${PetitionTagListCellContent_TagFragmentDoc}
-` as unknown as DocumentNode<
-  PetitionTagListCellContent_tagsQuery,
-  PetitionTagListCellContent_tagsQueryVariables
->;
 export const PetitionTagListCellContent_tagPetitionDocument = gql`
   mutation PetitionTagListCellContent_tagPetition($tagId: GID!, $petitionId: GID!) {
     tagPetition(tagId: $tagId, petitionId: $petitionId) {
@@ -32643,17 +32725,24 @@ export const PetitionTagListCellContent_untagPetitionDocument = gql`
   PetitionTagListCellContent_untagPetitionMutation,
   PetitionTagListCellContent_untagPetitionMutationVariables
 >;
-export const PetitionTagListCellContent_createTagDocument = gql`
-  mutation PetitionTagListCellContent_createTag($name: String!, $color: String!) {
-    createTag(name: $name, color: $color) {
-      ...PetitionTagListCellContent_Tag
+export const TagSelect_tagsDocument = gql`
+  query TagSelect_tags($search: String, $tagIds: [GID!]) {
+    tags(search: $search, tagIds: $tagIds) {
+      items {
+        ...TagSelect_Tag
+      }
     }
   }
-  ${PetitionTagListCellContent_TagFragmentDoc}
-` as unknown as DocumentNode<
-  PetitionTagListCellContent_createTagMutation,
-  PetitionTagListCellContent_createTagMutationVariables
->;
+  ${TagSelect_TagFragmentDoc}
+` as unknown as DocumentNode<TagSelect_tagsQuery, TagSelect_tagsQueryVariables>;
+export const TagSelect_createTagDocument = gql`
+  mutation TagSelect_createTag($name: String!, $color: String!) {
+    createTag(name: $name, color: $color) {
+      ...TagSelect_Tag
+    }
+  }
+  ${TagSelect_TagFragmentDoc}
+` as unknown as DocumentNode<TagSelect_createTagMutation, TagSelect_createTagMutationVariables>;
 export const UserGroupMembersPopover_getMembersDocument = gql`
   query UserGroupMembersPopover_getMembers($userGroupId: ID!) {
     getUsersOrGroups(ids: [$userGroupId]) {
@@ -32706,23 +32795,13 @@ export const UserSelect_useGetUsersOrGroupsDocument = gql`
   UserSelect_useGetUsersOrGroupsQuery,
   UserSelect_useGetUsersOrGroupsQueryVariables
 >;
-export const TagEditDialog_tagsDocument = gql`
-  query TagEditDialog_tags {
-    tags {
-      items {
-        ...TagEditDialog_Tag
-      }
-    }
-  }
-  ${TagEditDialog_TagFragmentDoc}
-` as unknown as DocumentNode<TagEditDialog_tagsQuery, TagEditDialog_tagsQueryVariables>;
 export const TagEditDialog_updateTagDocument = gql`
   mutation TagEditDialog_updateTag($id: GID!, $data: UpdateTagInput!) {
     updateTag(id: $id, data: $data) {
-      ...TagEditDialog_Tag
+      ...TagSelect_Tag
     }
   }
-  ${TagEditDialog_TagFragmentDoc}
+  ${TagSelect_TagFragmentDoc}
 ` as unknown as DocumentNode<
   TagEditDialog_updateTagMutation,
   TagEditDialog_updateTagMutationVariables
@@ -33739,19 +33818,6 @@ export const ViewTabs_markPetitionListViewAsDefaultDocument = gql`
 ` as unknown as DocumentNode<
   ViewTabs_markPetitionListViewAsDefaultMutation,
   ViewTabs_markPetitionListViewAsDefaultMutationVariables
->;
-export const PetitionListTagFilter_tagsDocument = gql`
-  query PetitionListTagFilter_tags($search: String) {
-    tags(search: $search) {
-      items {
-        ...PetitionTagListCellContent_Tag
-      }
-    }
-  }
-  ${PetitionTagListCellContent_TagFragmentDoc}
-` as unknown as DocumentNode<
-  PetitionListTagFilter_tagsQuery,
-  PetitionListTagFilter_tagsQueryVariables
 >;
 export const PreviewPetitionField_PetitionFieldDocument = gql`
   query PreviewPetitionField_PetitionField($petitionId: GID!, $fieldId: GID!) {

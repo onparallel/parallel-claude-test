@@ -39,7 +39,29 @@ export const PetitionListViewData = objectType({
         },
       }),
     });
-    t.nullable.list.nonNull.globalId("tags", { prefixName: "Tag" });
+    /** @deprecated use tagsFilters */
+    t.nullable.list.nonNull.globalId("tags", { prefixName: "Tag", deprecation: "use tagsFilters" });
+    t.nullable.field("tagsFilters", {
+      type: objectType({
+        name: "PetitionListViewDataTags",
+        definition(t) {
+          t.nonNull.field("operator", {
+            type: "PetitionTagFilterLogicalOperator",
+          });
+          t.nonNull.list.nonNull.field("filters", {
+            type: objectType({
+              name: "PetitionListViewDataTagsFilters",
+              definition(t) {
+                t.nonNull.list.nonNull.globalId("value", { prefixName: "Tag" });
+                t.nonNull.field("operator", {
+                  type: "PetitionTagFilterLineOperator",
+                });
+              },
+            }),
+          });
+        },
+      }),
+    });
     t.nullable.list.nonNull.field("signature", { type: "PetitionSignatureStatusFilter" });
     t.nullable.list.nonNull.globalId("fromTemplateId", { prefixName: "Petition" });
     t.nullable.string("search");
@@ -76,28 +98,10 @@ export const PetitionListViewDataInput = inputObjectType({
   name: "PetitionListViewDataInput",
   definition(t) {
     t.nullable.list.nonNull.field("status", { type: "PetitionStatus" });
-    t.nullable.field("sharedWith", {
-      type: inputObjectType({
-        name: "PetitionListViewDataSharedWithInput",
-        definition(t) {
-          t.nonNull.field("operator", {
-            type: "FilterSharedWithLogicalOperator",
-          });
-          t.nonNull.list.nonNull.field("filters", {
-            type: inputObjectType({
-              name: "PetitionListViewDataSharedWithFiltersInput",
-              definition(t) {
-                t.nonNull.id("value");
-                t.nonNull.field("operator", {
-                  type: "FilterSharedWithOperator",
-                });
-              },
-            }),
-          });
-        },
-      }),
-    });
-    t.nullable.list.nonNull.globalId("tags", { prefixName: "Tag" });
+    t.nullable.field("sharedWith", { type: "PetitionSharedWithFilter" });
+    /** @deprecated use tagsFilters */
+    t.nullable.list.nonNull.globalId("tags", { prefixName: "Tag", deprecation: "Use tagsFilters" });
+    t.nullable.field("tagsFilters", { type: "PetitionTagFilter" });
     t.nullable.list.nonNull.field("signature", { type: "PetitionSignatureStatusFilter" });
     t.nullable.list.nonNull.globalId("fromTemplateId", { prefixName: "Petition" });
     t.nullable.string("search");

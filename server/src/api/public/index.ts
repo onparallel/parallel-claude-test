@@ -121,6 +121,7 @@ import {
   OrganizationFragmentDoc,
   PetitionFragment as PetitionFragmentType,
   PetitionReplies_repliesDocument,
+  PetitionTagFilter,
   ReadPetitionCustomPropertiesDocument,
   RemoveUserGroupPermission_removePetitionPermissionDocument,
   RemoveUserPermission_removePetitionPermissionDocument,
@@ -430,25 +431,42 @@ api
       tags: ["Parallels"],
     },
     async ({ client, query }) => {
-      let tagIds: string[] | undefined = undefined;
+      let tags: PetitionTagFilter | undefined = undefined;
       if (isDefined(query.tags)) {
         if (query.tags.length > 0) {
           const allTags = await getTags(client);
-          const tags = query.tags.map((tagName) => allTags.find((t) => t.name === tagName));
-          if (tags.some((t) => !isDefined(t))) {
+          const _tags = query.tags.map((tagName) => allTags.find((t) => t.name === tagName));
+          if (_tags.some((t) => !isDefined(t))) {
             return Ok({ totalCount: 0, items: [] });
           }
-          tagIds = tags.map((t) => t!.id);
+          tags = {
+            filters: [
+              {
+                value: _tags.map((t) => t!.id),
+                operator: "CONTAINS",
+              },
+            ],
+            operator: "AND",
+          };
         } else {
-          tagIds = [];
+          tags = {
+            filters: [
+              {
+                value: [],
+                operator: "IS_EMPTY",
+              },
+            ],
+            operator: "AND",
+          };
         }
       }
+
       const _query = gql`
         query GetPetitions_petitions(
           $offset: Int!
           $limit: Int!
           $status: [PetitionStatus!]
-          $tagIds: [GID!]
+          $tags: PetitionTagFilter
           $sortBy: [QueryPetitions_OrderBy!]
           $includeRecipients: Boolean!
           $includeFields: Boolean!
@@ -465,7 +483,7 @@ api
             filters: {
               status: $status
               type: PETITION
-              tagIds: $tagIds
+              tags: $tags
               fromTemplateId: $fromTemplateId
             }
           ) {
@@ -479,7 +497,7 @@ api
       `;
       const result = await client.request(GetPetitions_petitionsDocument, {
         ...pick(query, ["offset", "limit", "status", "fromTemplateId", "sortBy"]),
-        tagIds,
+        tags,
         includeFields: query.include?.includes("fields") ?? false,
         includeReplies: query.include?.includes("replies") ?? false,
         includeRecipients: query.include?.includes("recipients") ?? false,

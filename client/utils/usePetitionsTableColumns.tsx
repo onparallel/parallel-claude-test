@@ -384,7 +384,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
               },
             ] as PetitionsTableColumns_PetitionTemplateOrFolder[])),
         {
-          key: "tags",
+          key: "tagsFilters",
           header: intl.formatMessage({
             id: "petitions.header.tags",
             defaultMessage: "Tags",
