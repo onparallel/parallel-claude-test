@@ -38,7 +38,10 @@ export const HeaderNameEditable = Object.assign(
       const previewRef = useRef<HTMLElement>(null);
       useImperativeHandle(ref, () => ({ focus: () => previewRef.current?.focus() }), []);
 
-      const isReadOnly = isPublic || myEffectivePermission === "READ";
+      const isReadOnly =
+        isPublic ||
+        myEffectivePermission === "READ" ||
+        (petition.isRestricted && petition.__typename === "PetitionTemplate");
 
       const placeholder =
         petition.__typename === "Petition"
@@ -170,6 +173,7 @@ export const HeaderNameEditable = Object.assign(
         fragment HeaderNameEditable_PetitionBase on PetitionBase {
           name
           updatedAt
+          isRestricted
           myEffectivePermission {
             permissionType
           }

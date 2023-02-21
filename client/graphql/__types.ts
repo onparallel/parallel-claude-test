@@ -5182,6 +5182,7 @@ export type HeaderNameEditable_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   name?: string | null;
   updatedAt: string;
+  isRestricted: boolean;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -5193,6 +5194,7 @@ export type HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment = {
   isPublic: boolean;
   name?: string | null;
   updatedAt: string;
+  isRestricted: boolean;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -29088,6 +29090,7 @@ export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`
   fragment HeaderNameEditable_PetitionBase on PetitionBase {
     name
     updatedAt
+    isRestricted
     myEffectivePermission {
       permissionType
     }
