@@ -3035,6 +3035,21 @@
     "context": "Select a field"
   },
   {
+    "term": "component.petition-field-type-select-dropdown.category-advanced-fields",
+    "definition": "Advanced fields",
+    "context": "Advanced fields"
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.category-headings",
+    "definition": "Headings",
+    "context": "Headings"
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.category-questions",
+    "definition": "Questions",
+    "context": "Questions"
+  },
+  {
     "term": "component.petition-field-type-select-dropdown.checkbox",
     "definition": "Allow the recipient to select one or more options from a short list of possible answers.",
     "context": "Allow the recipient to select one or more options from a short list of possible answers."

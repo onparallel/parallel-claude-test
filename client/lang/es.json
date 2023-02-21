@@ -3035,6 +3035,21 @@
     "context": "Select a field"
   },
   {
+    "term": "component.petition-field-type-select-dropdown.category-advanced-fields",
+    "definition": "Campos avanzados",
+    "context": "Advanced fields"
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.category-headings",
+    "definition": "Títulos",
+    "context": "Headings"
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.category-questions",
+    "definition": "Preguntas",
+    "context": "Questions"
+  },
+  {
     "term": "component.petition-field-type-select-dropdown.checkbox",
     "definition": "Permite al destinatario seleccionar varias opciones entre un listado no muy largo de opciones predefinidas.",
     "context": "Allow the recipient to select one or more options from a short list of possible answers."

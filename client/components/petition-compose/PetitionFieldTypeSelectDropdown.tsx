@@ -4,6 +4,7 @@ import {
   Box,
   Heading,
   Image,
+  MenuGroup,
   MenuItem,
   MenuList,
   MenuListProps,
@@ -68,23 +69,45 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
       const fieldListWidth = 260;
       const descriptionWidth = 270;
 
-      const fieldTypes = useMemo(
+      const fieldCategories = useMemo(
         () =>
           [
-            "HEADING",
-            "SHORT_TEXT",
-            "TEXT",
-            "FILE_UPLOAD",
-            "CHECKBOX",
-            "SELECT",
-            "DATE",
-            "PHONE",
-            "NUMBER",
-            ...(user.hasDowJonesField ? ["DOW_JONES_KYC"] : []),
-            ...(user.hasEsTaxDocumentsField ? ["ES_TAX_DOCUMENTS"] : []),
-            "DYNAMIC_SELECT",
-          ] as PetitionFieldType[],
-        [user.hasEsTaxDocumentsField]
+            {
+              category: intl.formatMessage({
+                id: "component.petition-field-type-select-dropdown.category-headings",
+                defaultMessage: "Headings",
+              }),
+              fields: ["HEADING"],
+            },
+            {
+              category: intl.formatMessage({
+                id: "component.petition-field-type-select-dropdown.category-questions",
+                defaultMessage: "Questions",
+              }),
+              fields: [
+                "SHORT_TEXT",
+                "TEXT",
+                "FILE_UPLOAD",
+                "CHECKBOX",
+                "SELECT",
+                "DATE",
+                "PHONE",
+                "NUMBER",
+              ],
+            },
+            {
+              category: intl.formatMessage({
+                id: "component.petition-field-type-select-dropdown.category-advanced-fields",
+                defaultMessage: "Advanced fields",
+              }),
+              fields: [
+                ...(user.hasDowJonesField ? ["DOW_JONES_KYC"] : []),
+                ...(user.hasEsTaxDocumentsField ? ["ES_TAX_DOCUMENTS"] : []),
+                "DYNAMIC_SELECT",
+              ],
+            },
+          ] as { category: string; fields: PetitionFieldType[] }[],
+        [user.hasEsTaxDocumentsField, user.hasDowJonesField]
       );
 
       const { locale } = useIntl();
@@ -120,18 +143,31 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
             </Box>
             <Box>
               <Box paddingBottom={2} paddingTop={{ base: 2, sm: showHeader ? 0 : 2 }}>
-                {fieldTypes.map((type) => (
-                  <MenuItem
-                    key={type}
-                    paddingY={2}
-                    aria-describedby={activeType === type ? `field-description-${type}` : undefined}
-                    data-field-type={type}
-                    onClick={() => onSelectFieldType(type)}
-                    onFocus={() => setActiveType(type)}
-                  >
-                    <PetitionFieldTypeLabel type={type} />
-                  </MenuItem>
-                ))}
+                {fieldCategories.map(({ category, fields }, index) => {
+                  return (
+                    <MenuGroup
+                      key={index}
+                      title={category}
+                      color="gray.600"
+                      textTransform="uppercase"
+                    >
+                      {fields.map((type) => (
+                        <MenuItem
+                          key={type}
+                          paddingY={2}
+                          aria-describedby={
+                            activeType === type ? `field-description-${type}` : undefined
+                          }
+                          data-field-type={type}
+                          onClick={() => onSelectFieldType(type)}
+                          onFocus={() => setActiveType(type)}
+                        >
+                          <PetitionFieldTypeLabel type={type} />
+                        </MenuItem>
+                      ))}
+                    </MenuGroup>
+                  );
+                })}
               </Box>
             </Box>
           </Box>
