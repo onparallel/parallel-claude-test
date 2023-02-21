@@ -7,11 +7,12 @@ sudo hostnamectl set-hostname "parallel-${ENV}-${COMMIT_SHA}"
 sudo mkdir -p /nfs/parallel
 sudo mount -t efs -o tls -O _netdev fs-05b0e1c4df3ecd227:/ /nfs/parallel
 
-sed -i "s/#ENV#/${ENV}/g" main/ops/prod/systemd/parallel-client.service main/ops/prod/systemd/parallel-server.service main/ops/prod/awslogs.conf
+cd /home/ec2-user
+sed -i "s/#ENV#/${ENV}/g" main/ops/prod/systemd/parallel-client.service main/ops/prod/systemd/parallel-server.service main/ops/prod/amazon-cloudwatch-agent/config.json
 sed -i "s/#COMMIT_SHA#/${COMMIT_SHA}/g" main/ops/prod/nginx/helpers/common.conf main/ops/prod/systemd/parallel-client.service
 sudo cp main/ops/prod/systemd/* /lib/systemd/system
 sudo cp -r main/ops/prod/nginx/* /etc/nginx/
-sudo cp main/ops/prod/awslogs.conf /etc/awslogs/awslogs.conf
+sudo cp main/ops/prod/amazon-cloudwatch-agent/config.json /opt/aws/amazon-cloudwatch-agent/bin/config.json
 
 echo 'parallel:$apr1$wY1qv83a$ErfofKvlFLeIZ4r4ijEDw/' >>.htpasswd
 sudo mv .htpasswd /etc/nginx/.htpasswd
@@ -24,9 +25,6 @@ sudo chown nginx /var/lib/nginx/tmp
 sudo chgrp nginx /var/lib/nginx/tmp
 sudo chown nginx /var/cache/nginx
 sudo chgrp nginx /var/cache/nginx
-
-# setup awslogs
-sudo sed -i "s/region =.*/region = eu-central-1/g" /etc/awslogs/awscli.conf
 
 sudo systemctl daemon-reload
 sudo systemctl enable parallel-server.service
@@ -44,9 +42,8 @@ sudo systemctl enable parallel-organization-limits-cron.service
 sudo systemctl enable parallel-anonymizer-cron.service
 sudo systemctl enable parallel-old-notifications-cron.service
 sudo systemctl enable nginx.service 
-sudo systemctl enable awslogsd.service
 
 sudo systemctl start parallel-server
 sudo systemctl start parallel-client
 sudo systemctl start nginx
-sudo systemctl start awslogsd.service
+sudo amazon-cloudwatch-agent-ctl -a fetch-config -s -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json

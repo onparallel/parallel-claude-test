@@ -20,11 +20,14 @@ sudo yum update -y
 
 # install binary dependencies
 sudo yum install -y \
+  amazon-cloudwatch-agent \
   ghostscript \
   ImageMagick \
   qpdf \
-  amazon-efs-utils \
-  awslogs
+  amazon-efs-utils
+
+sudo amazon-linux-extras install -y \
+  collectd
 
 function download_and_untar() {
   curl --silent --location --output $1.tar.gz $2

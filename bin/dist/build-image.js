@@ -29,7 +29,6 @@ async function main() {
         Filters: [{ Name: "name", Values: ["amzn2-ami-kernel-5.10-hvm-*-x86_64-gp2"] }],
     }));
     const image = (0, remeda_1.maxBy)(imagesResult.Images, (i) => new Date(i.CreationDate).valueOf());
-    image.ImageId;
     const instanceResult = await ec2.send(new client_ec2_1.RunInstancesCommand({
         ImageId: image.ImageId,
         KeyName: KEY_NAME,
@@ -45,16 +44,18 @@ async function main() {
         Monitoring: {
             Enabled: ENHANCED_MONITORING,
         },
-        TagSpecifications: [
+        BlockDeviceMappings: [
             {
-                ResourceType: client_ec2_1.ResourceType.instance,
-                Tags: [
-                    {
-                        Key: "Name",
-                        Value: `image-build`,
-                    },
-                ],
+                DeviceName: "/dev/xvda",
+                Ebs: {
+                    VolumeSize: 30,
+                    DeleteOnTermination: true,
+                    VolumeType: "gp2",
+                },
             },
+        ],
+        TagSpecifications: [
+            { ResourceType: client_ec2_1.ResourceType.instance, Tags: [{ Key: "Name", Value: `image-build` }] },
         ],
         MetadataOptions: {
             HttpEndpoint: client_ec2_1.InstanceMetadataEndpointState.enabled,
@@ -74,7 +75,7 @@ async function main() {
             ipAddress = instance.PublicIpAddress;
         }
         return isRunning;
-    }, (0, chalk_1.default) `Instance {yellow pending}. Waiting 10 more seconds...`, 5000);
+    }, chalk_1.default.italic `Instance {yellow pending}. Waiting 10 more seconds...`, 10000);
     (0, assert_1.default)((0, remeda_1.isDefined)(ipAddress));
     console.log((0, chalk_1.default) `Instance {green ✓ running}`);
     await waitForInstance(ipAddress);
@@ -90,11 +91,13 @@ async function main() {
     -o "UserKnownHostsFile=/dev/null" \
     -o StrictHostKeyChecking=no \
     ec2-user@${ipAddress} /home/ec2-user/build.sh`, { stdio: "inherit" });
+    console.log("Creating Image.");
     const createImageResult = await ec2.send(new client_ec2_1.CreateImageCommand({
         InstanceId: instanceId,
         Name: `parallel-server-${(0, timestamp_1.timestamp)()}`,
     }));
     const imageId = createImageResult.ImageId;
+    console.log(chalk_1.default.green `Image created: ${imageId}`);
     await (0, wait_1.waitFor)(async () => {
         var _a;
         const result = await ec2.send(new client_ec2_1.DescribeImagesCommand({
@@ -107,7 +110,7 @@ async function main() {
         else {
             throw new Error(`Error creating image ${imageId}, state: ${imageState}`);
         }
-    }, 5000);
+    }, chalk_1.default.italic `Waiting for image to become available...`, 30000);
     await ec2.send(new client_ec2_1.TerminateInstancesCommand({
         InstanceIds: [instanceId],
     }));
@@ -118,6 +121,7 @@ async function waitForInstance(ipAddress) {
     await (0, wait_1.waitFor)(async () => {
         try {
             (0, child_process_1.execSync)(`ssh \
+            -i ~/.ssh/ops.pem \
             -o ConnectTimeout=1 \
             -o "UserKnownHostsFile=/dev/null" \
             -o StrictHostKeyChecking=no \
@@ -127,5 +131,5 @@ async function waitForInstance(ipAddress) {
         catch {
             return false;
         }
-    }, (0, chalk_1.default) `SSH not available. Waiting 5 more seconds...`, 5000);
+    }, chalk_1.default.italic `SSH not available. Waiting 5 more seconds...`, 5000);
 }

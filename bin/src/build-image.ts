@@ -42,7 +42,6 @@ async function main() {
     })
   );
   const image = maxBy(imagesResult.Images!, (i) => new Date(i.CreationDate!).valueOf())!;
-  image.ImageId!;
   const instanceResult = await ec2.send(
     new RunInstancesCommand({
       ImageId: image.ImageId!,
@@ -59,16 +58,18 @@ async function main() {
       Monitoring: {
         Enabled: ENHANCED_MONITORING,
       },
-      TagSpecifications: [
+      BlockDeviceMappings: [
         {
-          ResourceType: ResourceType.instance,
-          Tags: [
-            {
-              Key: "Name",
-              Value: `image-build`,
-            },
-          ],
+          DeviceName: "/dev/xvda",
+          Ebs: {
+            VolumeSize: 30,
+            DeleteOnTermination: true,
+            VolumeType: "gp2",
+          },
         },
+      ],
+      TagSpecifications: [
+        { ResourceType: ResourceType.instance, Tags: [{ Key: "Name", Value: `image-build` }] },
       ],
       MetadataOptions: {
         HttpEndpoint: InstanceMetadataEndpointState.enabled,
@@ -91,7 +92,7 @@ async function main() {
       return isRunning;
     },
     chalk.italic`Instance {yellow pending}. Waiting 10 more seconds...`,
-    5_000
+    10_000
   );
   assert(isDefined(ipAddress));
   console.log(chalk`Instance {green ✓ running}`);
@@ -157,6 +158,7 @@ async function waitForInstance(ipAddress: string) {
       try {
         execSync(
           `ssh \
+            -i ~/.ssh/ops.pem \
             -o ConnectTimeout=1 \
             -o "UserKnownHostsFile=/dev/null" \
             -o StrictHostKeyChecking=no \
@@ -168,6 +170,6 @@ async function waitForInstance(ipAddress: string) {
       }
     },
     chalk.italic`SSH not available. Waiting 5 more seconds...`,
-    50_000
+    5_000
   );
 }
