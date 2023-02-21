@@ -30,8 +30,6 @@ export type IntegrationSettings<
         EN_INFORMAL_BRANDING_ID?: string;
         ES_INFORMAL_BRANDING_ID?: string;
         SHOW_CSV?: boolean; // show a security stamp on the margin of each page of the document
-        // TODO delete after migration
-        _CREDENTIALS: { API_KEY: string };
       }
     : TProvider extends "DOCUSIGN"
     ? {

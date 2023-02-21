@@ -91,8 +91,6 @@ export class SetupService implements ISetupService {
           CREDENTIALS: { API_KEY: apiKey },
           ENVIRONMENT: environment,
           IS_PARALLEL_MANAGED: isParallelManaged,
-          // TODO: delete after migration successful
-          _CREDENTIALS: { API_KEY: apiKey },
         },
       },
       createdBy,
