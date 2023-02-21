@@ -2771,12 +2771,12 @@ export interface PetitionListViewDataInput {
   path?: InputMaybe<Scalars["String"]>;
   search?: InputMaybe<Scalars["String"]>;
   searchIn?: InputMaybe<PetitionListViewSearchIn>;
-  sharedWith?: InputMaybe<PetitionListViewDataSharedWithInput>;
+  sharedWith?: InputMaybe<PetitionSharedWithFilter>;
   signature?: InputMaybe<Array<PetitionSignatureStatusFilter>>;
   sort?: InputMaybe<PetitionListViewSortInput>;
   status?: InputMaybe<Array<PetitionStatus>>;
   tags?: InputMaybe<Array<Scalars["GID"]>>;
-  tagsFilters?: InputMaybe<PetitionListViewDataTagsInput>;
+  tagsFilters?: InputMaybe<PetitionTagFilter>;
 }
 
 export interface PetitionListViewDataSharedWith {
@@ -2791,16 +2791,6 @@ export interface PetitionListViewDataSharedWithFilters {
   value: Scalars["ID"];
 }
 
-export interface PetitionListViewDataSharedWithFiltersInput {
-  operator: FilterSharedWithOperator;
-  value: Scalars["ID"];
-}
-
-export interface PetitionListViewDataSharedWithInput {
-  filters: Array<PetitionListViewDataSharedWithFiltersInput>;
-  operator: FilterSharedWithLogicalOperator;
-}
-
 export interface PetitionListViewDataTags {
   __typename?: "PetitionListViewDataTags";
   filters: Array<PetitionListViewDataTagsFilters>;
@@ -2811,16 +2801,6 @@ export interface PetitionListViewDataTagsFilters {
   __typename?: "PetitionListViewDataTagsFilters";
   operator: PetitionTagFilterLineOperator;
   value: Array<Scalars["GID"]>;
-}
-
-export interface PetitionListViewDataTagsFiltersInput {
-  operator: PetitionTagFilterLineOperator;
-  value: Array<Scalars["GID"]>;
-}
-
-export interface PetitionListViewDataTagsInput {
-  filters: Array<PetitionListViewDataTagsFiltersInput>;
-  operator: PetitionTagFilterLogicalOperator;
 }
 
 export type PetitionListViewSearchIn = "CURRENT_FOLDER" | "EVERYWHERE";
