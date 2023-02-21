@@ -216,10 +216,12 @@ export const AppLayoutNavbar = Object.assign(
             <IconButtonWithTooltip
               sx={{
                 ".Canny_BadgeContainer .Canny_Badge": {
-                  backgroundColor: "primary.500",
+                  backgroundColor: "red.500",
                   border: "2px solid white",
                   top: "5px",
-                  right: "6px",
+                  right: "3px",
+                  width: "16px",
+                  height: "16px",
                 },
               }}
               label={intl.formatMessage({

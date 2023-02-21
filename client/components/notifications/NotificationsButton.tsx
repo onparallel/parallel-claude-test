@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import { Box, BoxProps, Circle } from "@chakra-ui/react";
+import { Badge, Box, BoxProps } from "@chakra-ui/react";
 import { BellIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Notifications_UnreadPetitionUserNotificationIdsQuery } from "@parallel/graphql/__types";
@@ -88,10 +88,21 @@ export const NotificationsButton = chakraForwardRef<"button", {}>(function Notif
                 backgroundColor="inherit"
                 boxSize="14px"
                 padding="2px"
-                right="6px"
-                top="6px"
+                right="9px"
+                top="0px"
               >
-                <Circle size="10px" background="primary.500" />
+                <Badge
+                  background="red.500"
+                  color="white"
+                  fontSize="10px"
+                  borderRadius="full"
+                  minW="18px"
+                  minH="18px"
+                  lineHeight="14px"
+                  border="2px solid white"
+                >
+                  {unreadCount < 1000 ? unreadCount : "999+"}
+                </Badge>
               </MotionBox>
             ) : null}
           </AnimatePresence>
