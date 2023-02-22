@@ -73,7 +73,12 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
               date,
             } as SignatureBoxProps,
           ]
-        : ["zas25KHxAByKWmEFbpV", "zas25KHxAByKWmEFbpU", "zas25KHxAByKWmEFbpT"].includes(templateId)
+        : [
+            "zas25KHxAByKWmEFbpV",
+            "zas25KHxAByKWmEFbpU",
+            "zas25KHxAByKWmEFbpT",
+            "zas25KHxAByKWmM6rrm",
+          ].includes(templateId)
         ? [
             {
               fullName: "Carlos Guerrero Martín",
