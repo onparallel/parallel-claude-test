@@ -90,9 +90,9 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
                 "FILE_UPLOAD",
                 "CHECKBOX",
                 "SELECT",
+                "NUMBER",
                 "DATE",
                 "PHONE",
-                "NUMBER",
               ],
             },
             {
@@ -101,9 +101,9 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
                 defaultMessage: "Advanced fields",
               }),
               fields: [
-                ...(user.hasDowJonesField ? ["DOW_JONES_KYC"] : []),
-                ...(user.hasEsTaxDocumentsField ? ["ES_TAX_DOCUMENTS"] : []),
                 "DYNAMIC_SELECT",
+                ...(user.hasEsTaxDocumentsField ? ["ES_TAX_DOCUMENTS"] : []),
+                ...(user.hasDowJonesField ? ["DOW_JONES_KYC"] : []),
               ],
             },
           ] as { category: string; fields: PetitionFieldType[] }[],
