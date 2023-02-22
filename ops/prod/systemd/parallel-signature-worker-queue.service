@@ -9,6 +9,7 @@ WorkingDirectory=/home/ec2-user/main/server
 Type=simple
 User=ec2-user
 ExecStart=/usr/bin/node /home/ec2-user/main/server/dist/workers/signature-worker.js start
+ExecStartPost=/bin/sh -c 'pgrep -xf "/usr/bin/node /home/ec2-user/main/server/dist/workers/signature-worker.js start" | sudo tee /var/run/parallel-signature-worker-queue.pid > /dev/null'
 Restart=always
 
 [Install]

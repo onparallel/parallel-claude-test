@@ -9,6 +9,7 @@ WorkingDirectory=/home/ec2-user/main/server
 Type=simple
 User=ec2-user
 ExecStart=/usr/bin/node /home/ec2-user/main/server/dist/workers/email-sender.js start
+ExecStartPost=/bin/sh -c 'pgrep -xf "/usr/bin/node /home/ec2-user/main/server/dist/workers/email-sender.js start" | sudo tee /var/run/parallel-email-sender-queue.pid > /dev/null'
 Restart=always
 
 [Install]

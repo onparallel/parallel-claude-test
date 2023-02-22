@@ -11,6 +11,7 @@ WorkingDirectory=/home/ec2-user/main/server
 Type=simple
 User=ec2-user
 ExecStart=/usr/bin/node /home/ec2-user/main/server/dist/index.js
+ExecStartPost=/bin/sh -c 'pgrep -xf "/usr/bin/node /home/ec2-user/main/server/dist/index.js" | sudo tee /var/run/parallel-server.pid > /dev/null'
 Restart=always
 
 [Install]

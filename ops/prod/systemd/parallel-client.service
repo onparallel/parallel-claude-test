@@ -11,6 +11,7 @@ WorkingDirectory=/home/ec2-user/main/client
 Type=simple
 User=ec2-user
 ExecStart=/home/ec2-user/main/node_modules/.bin/next start
+ExecStartPost=/bin/sh -c 'pgrep -xf "node /home/ec2-user/main/node_modules/.bin/next start" | sudo tee /var/run/parallel-client.pid > /dev/null'
 Restart=always
 
 [Install]
