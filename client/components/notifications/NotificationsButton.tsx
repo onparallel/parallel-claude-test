@@ -94,11 +94,11 @@ export const NotificationsButton = chakraForwardRef<"button", {}>(function Notif
                 <Badge
                   background="red.500"
                   color="white"
-                  fontSize="10px"
+                  fontSize="14px"
                   borderRadius="full"
                   minW="18px"
                   minH="18px"
-                  lineHeight="14px"
+                  lineHeight="16px"
                   border="2px solid white"
                 >
                   {unreadCount < 1000 ? unreadCount : "999+"}
