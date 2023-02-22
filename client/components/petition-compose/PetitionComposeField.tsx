@@ -423,7 +423,7 @@ const _PetitionComposeField = chakraForwardRef<
         <PetitionComposeFieldInner
           ref={ref}
           flex="1"
-          paddingLeft={4}
+          paddingLeft={3}
           paddingTop={2}
           paddingBottom={10}
           paddingRight={4}

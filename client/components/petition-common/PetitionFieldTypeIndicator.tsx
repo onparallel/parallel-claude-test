@@ -40,7 +40,7 @@ export const PetitionFieldTypeIndicator = chakraForwardRef<
         {...props}
       >
         {hideIcon ? null : <PetitionFieldTypeIcon type={type} boxSize="16px" role="presentation" />}
-        <Text width={4} as="span" fontSize="xs" marginLeft={hideIcon ? 0 : 1} textAlign="center">
+        <Text width={5} as="span" fontSize="xs" marginLeft={hideIcon ? 0 : 0.5} textAlign="center">
           {fieldIndex}
         </Text>
       </Button>
