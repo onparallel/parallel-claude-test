@@ -59,7 +59,84 @@
         "metrics_aggregation_interval": 60,
         "metrics_collection_interval": 10,
         "service_address": ":8125"
-      }
+      },
+      "procstat": [
+        {
+          "pid_file": "/var/run/nginx.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10
+        },
+        {
+          "pid_file": "/var/run/parallel-server.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10
+        },
+        {
+          "pid_file": "/var/run/parallel-client.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10
+        },
+        {
+          "pid_file": "/var/run/parallel-email-events-queue.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10
+        },
+        {
+          "pid_file": "/var/run/parallel-email-sender-queue.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10
+        },
+        {
+          "pid_file": "/var/run/parallel-event-processor-queue.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10
+        },
+        {
+          "pid_file": "/var/run/parallel-signature-worker-queue.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10
+        },
+        {
+          "pid_file": "/var/run/parallel-task-worker-queue.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10
+        },
+        {
+          "pid_file": "/var/run/parallel-delay-queue-queue.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10
+        },
+        {
+          "pid_file": "/var/run/parallel-reminder-trigger-cron.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10
+        },
+        {
+          "pid_file": "/var/run/parallel-scheduled-trigger-cron.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10
+        },
+        {
+          "pid_file": "/var/run/parallel-petition-notifications-cron.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10
+        },
+        {
+          "pid_file": "/var/run/parallel-organization-limits-cron.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10
+        },
+        {
+          "pid_file": "/var/run/parallel-anonymizer-cron.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10
+        },
+        {
+          "pid_file": "/var/run/parallel-old-notifications-cron.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10
+        }
+      ]
     }
   }
 }
