@@ -8,8 +8,14 @@ sudo mkdir -p /nfs/parallel
 sudo mount -t efs -o tls -O _netdev fs-05b0e1c4df3ecd227:/ /nfs/parallel
 
 cd /home/ec2-user
-sed -i "s/#ENV#/${ENV}/g" main/ops/prod/systemd/parallel-client.service main/ops/prod/systemd/parallel-server.service main/ops/prod/amazon-cloudwatch-agent/config.json
-sed -i "s/#COMMIT_SHA#/${COMMIT_SHA}/g" main/ops/prod/nginx/helpers/common.conf main/ops/prod/systemd/parallel-client.service
+sed -i "s/#ENV#/${ENV}/g" \
+  main/ops/prod/systemd/parallel-client.service \
+  main/ops/prod/systemd/parallel-server.service \
+  main/ops/prod/amazon-cloudwatch-agent/config.json
+sed -i "s/#COMMIT_SHA#/${COMMIT_SHA}/g" \
+  main/ops/prod/nginx/helpers/common.conf \
+  main/ops/prod/systemd/parallel-client.service \
+  main/ops/prod/amazon-cloudwatch-agent/config.json
 sudo cp main/ops/prod/systemd/* /lib/systemd/system
 sudo cp -r main/ops/prod/nginx/* /etc/nginx/
 sudo cp main/ops/prod/amazon-cloudwatch-agent/config.json /opt/aws/amazon-cloudwatch-agent/bin/config.json
