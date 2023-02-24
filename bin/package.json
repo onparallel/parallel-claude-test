@@ -20,7 +20,8 @@
     "strip-js": "node dist/strip-js.js",
     "create-cert": "node dist/create-cert.js",
     "build-image": "node dist/build-image.js",
-    "clear-nginx-cache": "node dist/clear-nginx-cache.js"
+    "clear-nginx-cache": "node dist/clear-nginx-cache.js",
+    "cnc": "node dist/clear-nginx-cache.js"
   },
   "dependencies": {
     "@aws-sdk/client-cloudfront": "^3.259.0",
