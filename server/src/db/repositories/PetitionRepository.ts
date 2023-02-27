@@ -3055,10 +3055,16 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadPetitionUserNotifications = this.buildLoadBy("petition_user_notification", "id");
 
-  readonly loadUnreadPetitionUserNotificationsByUserId = this.buildLoadMultipleBy(
-    "petition_user_notification",
-    "user_id",
-    (q) => q.where({ is_read: false }).orderBy("created_at", "desc")
+  readonly loadUnreadPetitionUserNotificationsIdsByUserId = this.buildLoader<number, number[]>(
+    async (keys, t) => {
+      const notifications = await this.from("petition_user_notification", t)
+        .whereIn("user_id", keys)
+        .where("is_read", false)
+        .select(["user_id", "id"])
+        .orderBy("created_at", "desc");
+      const byUserId = groupBy(notifications, (n) => n.user_id);
+      return keys.map((k) => byUserId[k]?.map((n) => n.id) ?? []);
+    }
   );
 
   async markOldPetitionUserNotificationsAsRead(months: number) {
@@ -5187,12 +5193,14 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async getDeletedPetitionsToAnonymize(daysAfterDeletion: number) {
-    return await this.from("petition")
+  async getDeletedPetitionIdsToAnonymize(daysAfterDeletion: number) {
+    const petitions = await this.from("petition")
       .whereNotNull("deleted_at")
       .whereNull("anonymized_at")
       .whereRaw(/* sql */ `"deleted_at" < NOW() - make_interval(days => ?)`, [daysAfterDeletion])
-      .select("*");
+      .select("id");
+
+    return petitions.map((p) => p.id);
   }
 
   async getDeletedPetitionFieldRepliesToAnonymize(daysAfterDeletion: number) {
@@ -5203,12 +5211,14 @@ export class PetitionRepository extends BaseRepository {
       .select("*");
   }
 
-  async getDeletedPetitionFieldCommentsToAnonymize(daysAfterDeletion: number) {
-    return await this.from("petition_field_comment")
+  async getDeletedPetitionFieldCommentIdsToAnonymize(daysAfterDeletion: number) {
+    const comments = await this.from("petition_field_comment")
       .whereNotNull("deleted_at")
       .whereNull("anonymized_at")
       .whereRaw(/* sql */ `"deleted_at" < NOW() - make_interval(days => ?)`, [daysAfterDeletion])
-      .select("*");
+      .select("id");
+
+    return comments.map((c) => c.id);
   }
 
   async anonymizePetition(petitionId: number) {

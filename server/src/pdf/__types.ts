@@ -4138,7 +4138,7 @@ export type User = Timestamps & {
   status: UserStatus;
   /** Lists the API tokens this user has. */
   tokens: Array<UserAuthenticationToken>;
-  unreadNotificationIds: Array<Scalars["ID"]>;
+  unreadNotificationIds: Array<Scalars["GID"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   userGroups: Array<UserGroup>;

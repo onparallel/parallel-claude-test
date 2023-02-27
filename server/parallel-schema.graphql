@@ -5698,7 +5698,7 @@ type User implements Timestamps {
   Lists the API tokens this user has.
   """
   tokens: [UserAuthenticationToken!]!
-  unreadNotificationIds: [ID!]!
+  unreadNotificationIds: [GID!]!
 
   """
   Time when the resource was last updated.

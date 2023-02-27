@@ -4,14 +4,14 @@ import { createCronWorker } from "./helpers/createCronWorker";
 createCronWorker("anonymizer", async (ctx, config) => {
   const DAYS = config.anonymizeAfterDays;
 
-  const petitions = await ctx.petitions.getDeletedPetitionsToAnonymize(DAYS);
+  const petitionIds = await ctx.petitions.getDeletedPetitionIdsToAnonymize(DAYS);
   let count = 0;
-  ctx.logger.debug(`Anonymizing ${petitions.length} deleted petitions`);
-  for (const petition of petitions) {
+  ctx.logger.debug(`Anonymizing ${petitionIds.length} deleted petitions`);
+  for (const petitionId of petitionIds) {
     ctx.logger.debug(
-      `Anonymizing deleted petition ${petition.id} (${++count}/${petitions.length})`
+      `Anonymizing deleted petition ${petitionId} (${++count}/${petitionIds.length})`
     );
-    await ctx.petitions.anonymizePetition(petition.id);
+    await ctx.petitions.anonymizePetition(petitionId);
   }
 
   const replies = await ctx.petitions.getDeletedPetitionFieldRepliesToAnonymize(DAYS);
@@ -20,10 +20,10 @@ createCronWorker("anonymizer", async (ctx, config) => {
     await ctx.petitions.anonymizePetitionFieldReplies(replies);
   }
 
-  const comments = await ctx.petitions.getDeletedPetitionFieldCommentsToAnonymize(DAYS);
-  ctx.logger.debug(`Anonymizing ${comments.length} deleted comments`);
-  if (comments.length > 0) {
-    await ctx.petitions.anonymizePetitionFieldComments(comments.map((c) => c.id));
+  const commentIds = await ctx.petitions.getDeletedPetitionFieldCommentIdsToAnonymize(DAYS);
+  ctx.logger.debug(`Anonymizing ${commentIds.length} deleted comments`);
+  if (commentIds.length > 0) {
+    await ctx.petitions.anonymizePetitionFieldComments(commentIds);
   }
 
   // anonymizes contacts deleted more than `anonymizeAfterDays` days ago

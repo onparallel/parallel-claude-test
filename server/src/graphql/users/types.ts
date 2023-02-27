@@ -1,4 +1,4 @@
-import { arg, enumType, list, nonNull, objectType, unionType } from "nexus";
+import { arg, enumType, nonNull, objectType, unionType } from "nexus";
 import { indexBy, isDefined, omit, sortBy, uniq } from "remeda";
 import {
   FeatureFlagNameValues,
@@ -6,7 +6,6 @@ import {
   UserStatusValues,
 } from "../../db/__types";
 import { fullName } from "../../util/fullName";
-import { toGlobalId } from "../../util/globalId";
 import { getInitials } from "../../util/initials";
 import { userHasRole } from "../../util/userHasRole";
 import { datetimeArg } from "../helpers/scalars";
@@ -138,12 +137,11 @@ export const User = objectType({
         return await ctx.userAuthentication.loadUserAuthenticationTokens(root.id);
       },
     });
-    t.field("unreadNotificationIds", {
+    t.list.globalId("unreadNotificationIds", {
+      prefixName: "PetitionUserNotification",
       authorize: rootIsContextUser(),
-      type: list("ID"),
-      resolve: async ({ id }, _, ctx) => {
-        const notifications = await ctx.petitions.loadUnreadPetitionUserNotificationsByUserId(id);
-        return notifications.map((n) => toGlobalId("PetitionUserNotification", n.id));
+      resolve: async (o, _, ctx) => {
+        return await ctx.petitions.loadUnreadPetitionUserNotificationsIdsByUserId(o.id);
       },
     });
     t.paginationField("notifications", {
