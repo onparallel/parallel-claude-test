@@ -463,3 +463,28 @@ export const signaturitIntegrationShowSecurityStamp = mutationField(
     },
   }
 );
+
+export const removePetitionPassword = mutationField("removePetitionPassword", {
+  description: "Removes the password on a petition or template",
+  type: "SupportMethodResponse",
+  authorize: supportMethodAccess(),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+  },
+  resolve: async (_, { petitionId }, ctx) => {
+    try {
+      await ctx.petitions.updatePetition(
+        petitionId,
+        {
+          restricted_password_hash: null,
+          restricted_password_salt: null,
+        },
+        `User:${ctx.user!.id}`
+      );
+      return { result: RESULT.SUCCESS, message: "Password removed" };
+    } catch (e) {
+      ctx.logger.error(e);
+      return { result: RESULT.FAILURE, message: "Something went wrong..." };
+    }
+  },
+});

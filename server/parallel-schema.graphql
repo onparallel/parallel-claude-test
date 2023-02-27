@@ -1454,6 +1454,11 @@ type Mutation {
   reactivateAccesses(accessIds: [GID!]!, petitionId: GID!): [PetitionAccess!]!
 
   """
+  Removes the password on a petition or template
+  """
+  removePetitionPassword(petitionId: GID!): SupportMethodResponse!
+
+  """
   Removes permissions on given parallel and users
   """
   removePetitionPermission(

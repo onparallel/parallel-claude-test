@@ -1384,6 +1384,7 @@ export interface NexusGenFieldTypes {
     publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicUpdatePetitionFieldReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
+    removePetitionPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     removePetitionPermission: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
     removeUsersFromGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     renameFolder: NexusGenEnums["Success"]; // Success!
@@ -3176,6 +3177,7 @@ export interface NexusGenFieldTypeNames {
     publicUpdatePetitionFieldComment: "PublicPetitionFieldComment";
     publicUpdatePetitionFieldReply: "PublicPetitionFieldReply";
     reactivateAccesses: "PetitionAccess";
+    removePetitionPassword: "SupportMethodResponse";
     removePetitionPermission: "PetitionBase";
     removeUsersFromGroup: "UserGroup";
     renameFolder: "Success";
@@ -5101,6 +5103,10 @@ export interface NexusGenArgTypes {
     reactivateAccesses: {
       // args
       accessIds: NexusGenScalars["GID"][]; // [GID!]!
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    removePetitionPassword: {
+      // args
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     removePetitionPermission: {

@@ -788,6 +788,8 @@ export interface Mutation {
   publicUpdatePetitionFieldReply: PublicPetitionFieldReply;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
+  /** Removes the password on a petition or template */
+  removePetitionPassword: SupportMethodResponse;
   /** Removes permissions on given parallel and users */
   removePetitionPermission: Array<Maybe<PetitionBase>>;
   /** Removes users from a user group */
@@ -1499,6 +1501,10 @@ export interface MutationpublicUpdatePetitionFieldReplyArgs {
 
 export interface MutationreactivateAccessesArgs {
   accessIds: Array<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
+}
+
+export interface MutationremovePetitionPasswordArgs {
   petitionId: Scalars["GID"];
 }
 

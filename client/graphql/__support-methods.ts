@@ -227,6 +227,34 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "removePetitionPassword",
+      description: "Removes the password on a petition or template",
+      args: [
+        {
+          name: "petitionId",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "resetUserPassword",
       description:
         "Resets the given user password on AWS Cognito and sends an email with new temporary.",
