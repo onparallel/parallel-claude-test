@@ -2091,6 +2091,7 @@ export class PetitionRepository extends BaseRepository {
     const replies = await this.from("petition_field_reply")
       .whereIn("petition_field_id", fieldIds)
       .andWhere("status", "PENDING")
+      .andWhere("deleted_at", null)
       .update(
         {
           status,
