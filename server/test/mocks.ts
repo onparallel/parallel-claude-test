@@ -150,7 +150,4 @@ export class MockFetchService implements IFetchService {
   async fetch() {
     return new Response("OK", { status: 200 });
   }
-  async fetchWithTimeout() {
-    return new Response("OK", { status: 200 });
-  }
 }

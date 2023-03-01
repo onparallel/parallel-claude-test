@@ -1,6 +1,8 @@
-import fetch from "node-fetch";
+import { sign } from "crypto";
+import pMap from "p-map";
 import { PetitionEvent } from "../../db/events";
 import { mapEvent } from "../../util/eventMapper";
+import { decrypt } from "../../util/token";
 import { EventListener } from "../event-processor";
 
 export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (event, ctx) => {
@@ -36,37 +38,74 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
     return;
   }
 
+  const subscriptionKeys = (
+    await ctx.subscriptions.loadEventSubscriptionSignatureKeysBySubscriptionId(
+      userSubscriptions.map((s) => s.id)
+    )
+  ).flat();
+
   const mappedEvent = mapEvent(event);
-  for (const subscription of userSubscriptions) {
-    try {
-      const res = await fetch(subscription.endpoint, {
-        method: "POST",
-        body: JSON.stringify(mappedEvent),
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!res.ok) {
-        throw new Error(`Error ${res.status}: ${res.statusText} for POST ${subscription.endpoint}`);
-      } else if (subscription.is_failing) {
-        await ctx.subscriptions.updateSubscription(
-          subscription.id,
-          { is_failing: false },
-          `EventProcessorWorker:${event.id}`
-        );
+
+  await pMap(
+    userSubscriptions,
+    async (subscription) => {
+      try {
+        const body = JSON.stringify(mappedEvent);
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+          "User-Agent": "Parallel Webooks (https://www.onparallel.com)",
+        };
+
+        const keys = subscriptionKeys.filter((k) => k.event_subscription_id === subscription.id);
+
+        keys.forEach((key, i) => {
+          const privateKey = decrypt(
+            Buffer.from(key.private_key, "base64"),
+            Buffer.from(ctx.config.security.encryptKeyBase64, "base64")
+          ).toString();
+
+          headers[`X-Parallel-Signature-${i + 1}`] = sign(null, Buffer.from(body), {
+            key: Buffer.from(privateKey, "base64"),
+            format: "der",
+            type: "pkcs8",
+          }).toString("base64");
+        });
+
+        const response = await ctx.fetch.fetch(subscription.endpoint, {
+          method: "POST",
+          body,
+          headers,
+          maxRetries: 3,
+          delay: 5_000,
+        });
+        if (!response.ok) {
+          throw new Error(
+            `Error ${response.status}: ${response.statusText} for POST ${subscription.endpoint}`
+          );
+        }
+        if (subscription.is_failing) {
+          await ctx.subscriptions.updateSubscription(
+            subscription.id,
+            { is_failing: false },
+            `EventProcessorWorker:${event.id}`
+          );
+        }
+      } catch (e) {
+        if (!subscription.is_failing) {
+          await ctx.emails.sendDeveloperWebhookFailedEmail(
+            subscription.id,
+            petition.id,
+            (e as any)?.message ?? "",
+            mappedEvent
+          );
+          await ctx.subscriptions.updateSubscription(
+            subscription.id,
+            { is_failing: true },
+            `EventProcessorWorker:${event.id}`
+          );
+        }
       }
-    } catch (e) {
-      if (!subscription.is_failing) {
-        await ctx.emails.sendDeveloperWebhookFailedEmail(
-          subscription.id,
-          petition.id,
-          (e as any)?.message ?? "",
-          mappedEvent
-        );
-        await ctx.subscriptions.updateSubscription(
-          subscription.id,
-          { is_failing: true },
-          `EventProcessorWorker:${event.id}`
-        );
-      }
-    }
-  }
+    },
+    { concurrency: 10 }
+  );
 };

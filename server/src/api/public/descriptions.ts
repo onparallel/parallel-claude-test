@@ -112,3 +112,40 @@ In case you need any help with your integration, please drop an email to
 [devs@onparallel.com](mailto:devs@onparallel.com?subject=Parallel%20API%20support).
 We will be pleased to help you with any problem.
 `;
+
+export const newParallelEvent = outdent`
+A new event was triggered on one of your subscribed parallels.
+
+A POST request will be sent to the provided events URL containing the event information.
+
+Additionally, if you created one or more signature keys, special headers will be sent with the request, containing the event signatures. You can validate the authenticity and integrity of your events by verifying those event signature with any of your signature key.
+
+\`\`\`javascript
+const crypto = require("crypto");
+
+/** 
+ *  @param payload raw body of the POST request, must be a Buffer. 
+ * @param signatureKey any of your created signature keys.
+ * @param signature the value of the special signatures header
+ * @returns true if the provided signature could be verified
+ */
+function isSignatureVerified(payload, signatureKey, signature) {
+  const signatureKeyBuffer = Buffer.from(signatureKey, "base64");
+  const signatureBuffer = Buffer.from(signature, "base64");
+  return crypto.verify(
+    null,
+    payload,
+    {
+      key: signatureKeyBuffer,
+      format: "der",
+      type: "spki"
+    },
+    signatureBuffer
+  );
+}
+\`\`\`  
+
+If you created more than one signature keys, you should verify any of those keys against every provided **X-Parallel-Signature** header. 
+As long as a signature key can validate one of the event signatures, your events will be secured.
+This will allow you to safely rotate signature keys without breaking your application.
+`;

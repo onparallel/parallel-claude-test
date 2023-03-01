@@ -338,6 +338,12 @@ export interface EffectivePetitionUserPermission {
   user: User;
 }
 
+export interface EventSubscriptionSignatureKey {
+  __typename?: "EventSubscriptionSignatureKey";
+  id: Scalars["GID"];
+  publicKey: Scalars["String"];
+}
+
 export type FeatureFlag =
   | "AUTO_ANONYMIZE"
   | "CLIENT_PORTAL"
@@ -630,6 +636,8 @@ export interface Mutation {
   createDowJonesProfileDownloadTask: Task;
   /** Creates an event subscription for the user's petitions */
   createEventSubscription: PetitionEventSubscription;
+  /** Creates a pair of asymmetric keys to be used for signing webhook events */
+  createEventSubscriptionSignatureKey: EventSubscriptionSignatureKey;
   /** Creates a task for exporting an xlsx file with petition text replies and sends it to the queue */
   createExportExcelTask: Task;
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
@@ -686,6 +694,8 @@ export interface Mutation {
   deleteContacts: Result;
   /** Removes the DOW JONES integration of the user's organization */
   deleteDowJonesKycIntegration: Organization;
+  /** Deletes a subscription signature key */
+  deleteEventSubscriptionSignatureKeys: Result;
   /** Deletes event subscriptions */
   deleteEventSubscriptions: Result;
   deleteOrganizationPdfDocumentTheme: Organization;
@@ -1048,6 +1058,10 @@ export interface MutationcreateEventSubscriptionArgs {
   name?: InputMaybe<Scalars["String"]>;
 }
 
+export interface MutationcreateEventSubscriptionSignatureKeyArgs {
+  subscriptionId: Scalars["GID"];
+}
+
 export interface MutationcreateExportExcelTaskArgs {
   petitionId: Scalars["GID"];
 }
@@ -1211,6 +1225,10 @@ export interface MutationdeactivateUserArgs {
 
 export interface MutationdeleteContactsArgs {
   force?: InputMaybe<Scalars["Boolean"]>;
+  ids: Array<Scalars["GID"]>;
+}
+
+export interface MutationdeleteEventSubscriptionSignatureKeysArgs {
   ids: Array<Scalars["GID"]>;
 }
 
@@ -1660,8 +1678,12 @@ export interface MutationupdateContactArgs {
 }
 
 export interface MutationupdateEventSubscriptionArgs {
+  eventTypes?: InputMaybe<Array<PetitionEventType>>;
+  eventsUrl?: InputMaybe<Scalars["String"]>;
+  fromTemplateId?: InputMaybe<Scalars["GID"]>;
   id: Scalars["GID"];
-  isEnabled: Scalars["Boolean"];
+  isEnabled?: InputMaybe<Scalars["Boolean"]>;
+  name?: InputMaybe<Scalars["String"]>;
 }
 
 export interface MutationupdateFeatureFlagsArgs {
@@ -2502,6 +2524,7 @@ export interface PetitionEventSubscription {
   isEnabled: Scalars["Boolean"];
   isFailing: Scalars["Boolean"];
   name?: Maybe<Scalars["String"]>;
+  signatureKeys: Array<EventSubscriptionSignatureKey>;
 }
 
 export type PetitionEventType =
@@ -5092,12 +5115,6 @@ export type WithSuperAdminAccessQueryVariables = Exact<{ [key: string]: never }>
 
 export type WithSuperAdminAccessQuery = {
   me: { __typename?: "User"; id: string; isSuperAdmin: boolean };
-};
-
-export type useConfirmDeleteContactsDialog_ContactFragment = {
-  __typename?: "Contact";
-  fullName: string;
-  email: string;
 };
 
 export type ImportContactsDialog_bulkCreateContactsMutationVariables = Exact<{
@@ -14354,23 +14371,157 @@ export type AccountLocaleChange_UserFragment = {
   preferredLocale?: string | null;
 };
 
-export type CreateEventSubscriptionDialog_PetitionBase_Petition_Fragment = {
+export type ApiTokensTable_UserAuthenticationTokenFragment = {
+  __typename?: "UserAuthenticationToken";
+  id: string;
+  tokenName: string;
+  hint?: string | null;
+  createdAt: string;
+  lastUsedAt?: string | null;
+};
+
+export type ApiTokensTable_revokeUserAuthTokenMutationVariables = Exact<{
+  authTokenIds: Array<Scalars["GID"]> | Scalars["GID"];
+}>;
+
+export type ApiTokensTable_revokeUserAuthTokenMutation = { revokeUserAuthToken: Result };
+
+export type WebhookSubscriptionsTable_PetitionEventSubscriptionFragment = {
+  __typename?: "PetitionEventSubscription";
+  id: string;
+  eventsUrl: string;
+  eventTypes?: Array<PetitionEventType> | null;
+  isEnabled: boolean;
+  isFailing: boolean;
+  name?: string | null;
+  fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
+  signatureKeys: Array<{
+    __typename?: "EventSubscriptionSignatureKey";
+    id: string;
+    publicKey: string;
+  }>;
+};
+
+export type WebhookSubscriptionsTable_createEventSubscriptionMutationVariables = Exact<{
+  eventsUrl: Scalars["String"];
+  eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
+  name?: InputMaybe<Scalars["String"]>;
+  fromTemplateId?: InputMaybe<Scalars["GID"]>;
+}>;
+
+export type WebhookSubscriptionsTable_createEventSubscriptionMutation = {
+  createEventSubscription: {
+    __typename?: "PetitionEventSubscription";
+    id: string;
+    eventsUrl: string;
+    eventTypes?: Array<PetitionEventType> | null;
+    isEnabled: boolean;
+    isFailing: boolean;
+    name?: string | null;
+    fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
+    signatureKeys: Array<{
+      __typename?: "EventSubscriptionSignatureKey";
+      id: string;
+      publicKey: string;
+    }>;
+  };
+};
+
+export type WebhookSubscriptionsTable_updateEventSubscriptionMutationVariables = Exact<{
+  id: Scalars["GID"];
+  isEnabled?: InputMaybe<Scalars["Boolean"]>;
+  eventsUrl?: InputMaybe<Scalars["String"]>;
+  eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
+  name?: InputMaybe<Scalars["String"]>;
+  fromTemplateId?: InputMaybe<Scalars["GID"]>;
+}>;
+
+export type WebhookSubscriptionsTable_updateEventSubscriptionMutation = {
+  updateEventSubscription: {
+    __typename?: "PetitionEventSubscription";
+    id: string;
+    eventsUrl: string;
+    eventTypes?: Array<PetitionEventType> | null;
+    isEnabled: boolean;
+    isFailing: boolean;
+    name?: string | null;
+    fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
+    signatureKeys: Array<{
+      __typename?: "EventSubscriptionSignatureKey";
+      id: string;
+      publicKey: string;
+    }>;
+  };
+};
+
+export type WebhookSubscriptionsTable_deleteEventSubscriptionsMutationVariables = Exact<{
+  ids: Array<Scalars["GID"]> | Scalars["GID"];
+}>;
+
+export type WebhookSubscriptionsTable_deleteEventSubscriptionsMutation = {
+  deleteEventSubscriptions: Result;
+};
+
+export type WebhookSubscriptionsTable_createEventSubscriptionSignatureKeyMutationVariables = Exact<{
+  subscriptionId: Scalars["GID"];
+}>;
+
+export type WebhookSubscriptionsTable_createEventSubscriptionSignatureKeyMutation = {
+  createEventSubscriptionSignatureKey: {
+    __typename?: "EventSubscriptionSignatureKey";
+    id: string;
+    publicKey: string;
+  };
+};
+
+export type WebhookSubscriptionsTable_deleteEventSubscriptionSignatureKeysMutationVariables =
+  Exact<{
+    ids: Array<Scalars["GID"]> | Scalars["GID"];
+  }>;
+
+export type WebhookSubscriptionsTable_deleteEventSubscriptionSignatureKeysMutation = {
+  deleteEventSubscriptionSignatureKeys: Result;
+};
+
+export type CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment = {
+  __typename?: "PetitionEventSubscription";
+  id: string;
+  eventsUrl: string;
+  eventTypes?: Array<PetitionEventType> | null;
+  isEnabled: boolean;
+  isFailing: boolean;
+  name?: string | null;
+  fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
+  signatureKeys: Array<{
+    __typename?: "EventSubscriptionSignatureKey";
+    id: string;
+    publicKey: string;
+  }>;
+};
+
+export type CreateOrUpdateEventSubscriptionDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
   name?: string | null;
 };
 
-export type CreateEventSubscriptionDialog_PetitionBase_PetitionTemplate_Fragment = {
+export type CreateOrUpdateEventSubscriptionDialog_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
 };
 
-export type CreateEventSubscriptionDialog_PetitionBaseFragment =
-  | CreateEventSubscriptionDialog_PetitionBase_Petition_Fragment
-  | CreateEventSubscriptionDialog_PetitionBase_PetitionTemplate_Fragment;
+export type CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment =
+  | CreateOrUpdateEventSubscriptionDialog_PetitionBase_Petition_Fragment
+  | CreateOrUpdateEventSubscriptionDialog_PetitionBase_PetitionTemplate_Fragment;
 
-export type CreateEventSubscriptionDialog_petitionsQueryVariables = Exact<{
+export type CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment = {
+  __typename?: "EventSubscriptionSignatureKey";
+  id: string;
+  publicKey: string;
+};
+
+export type CreateOrUpdateEventSubscriptionDialog_petitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   search?: InputMaybe<Scalars["String"]>;
@@ -14378,7 +14529,7 @@ export type CreateEventSubscriptionDialog_petitionsQueryVariables = Exact<{
   filters?: InputMaybe<PetitionFilter>;
 }>;
 
-export type CreateEventSubscriptionDialog_petitionsQuery = {
+export type CreateOrUpdateEventSubscriptionDialog_petitionsQuery = {
   petitions: {
     __typename?: "PetitionBaseOrFolderPagination";
     items: Array<
@@ -24970,76 +25121,6 @@ export type Account_userQuery = {
   };
 };
 
-export type Developers_UserAuthenticationTokenFragment = {
-  __typename?: "UserAuthenticationToken";
-  id: string;
-  tokenName: string;
-  hint?: string | null;
-  createdAt: string;
-  lastUsedAt?: string | null;
-};
-
-export type Developers_PetitionEventSubscriptionFragment = {
-  __typename?: "PetitionEventSubscription";
-  id: string;
-  eventsUrl: string;
-  eventTypes?: Array<PetitionEventType> | null;
-  isEnabled: boolean;
-  isFailing: boolean;
-  name?: string | null;
-  fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
-};
-
-export type Developers_revokeUserAuthTokenMutationVariables = Exact<{
-  authTokenIds: Array<Scalars["GID"]> | Scalars["GID"];
-}>;
-
-export type Developers_revokeUserAuthTokenMutation = { revokeUserAuthToken: Result };
-
-export type Developers_createEventSubscriptionMutationVariables = Exact<{
-  eventsUrl: Scalars["String"];
-  eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
-  name?: InputMaybe<Scalars["String"]>;
-  fromTemplateId?: InputMaybe<Scalars["GID"]>;
-}>;
-
-export type Developers_createEventSubscriptionMutation = {
-  createEventSubscription: {
-    __typename?: "PetitionEventSubscription";
-    id: string;
-    eventsUrl: string;
-    eventTypes?: Array<PetitionEventType> | null;
-    isEnabled: boolean;
-    isFailing: boolean;
-    name?: string | null;
-    fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
-  };
-};
-
-export type Developers_updateEventSubscriptionMutationVariables = Exact<{
-  id: Scalars["GID"];
-  isEnabled: Scalars["Boolean"];
-}>;
-
-export type Developers_updateEventSubscriptionMutation = {
-  updateEventSubscription: {
-    __typename?: "PetitionEventSubscription";
-    id: string;
-    eventsUrl: string;
-    eventTypes?: Array<PetitionEventType> | null;
-    isEnabled: boolean;
-    isFailing: boolean;
-    name?: string | null;
-    fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
-  };
-};
-
-export type Developers_deleteEventSubscriptionsMutationVariables = Exact<{
-  ids: Array<Scalars["GID"]> | Scalars["GID"];
-}>;
-
-export type Developers_deleteEventSubscriptionsMutation = { deleteEventSubscriptions: Result };
-
 export type Developers_tokensQueryVariables = Exact<{ [key: string]: never }>;
 
 export type Developers_tokensQuery = {
@@ -25069,6 +25150,11 @@ export type Developers_subscriptionsQuery = {
     isFailing: boolean;
     name?: string | null;
     fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
+    signatureKeys: Array<{
+      __typename?: "EventSubscriptionSignatureKey";
+      id: string;
+      publicKey: string;
+    }>;
   }>;
 };
 
@@ -28681,12 +28767,70 @@ export const RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetiti
     RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment,
     unknown
   >;
-export const CreateEventSubscriptionDialog_PetitionBaseFragmentDoc = gql`
-  fragment CreateEventSubscriptionDialog_PetitionBase on PetitionBase {
+export const ApiTokensTable_UserAuthenticationTokenFragmentDoc = gql`
+  fragment ApiTokensTable_UserAuthenticationToken on UserAuthenticationToken {
+    id
+    tokenName
+    hint
+    createdAt
+    lastUsedAt
+  }
+` as unknown as DocumentNode<ApiTokensTable_UserAuthenticationTokenFragment, unknown>;
+export const CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKeyFragmentDoc = gql`
+  fragment CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKey on EventSubscriptionSignatureKey {
+    id
+    publicKey
+  }
+` as unknown as DocumentNode<
+  CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment,
+  unknown
+>;
+export const CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragmentDoc = gql`
+  fragment CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription on PetitionEventSubscription {
+    id
+    eventsUrl
+    eventTypes
+    isEnabled
+    isFailing
+    name
+    fromTemplate {
+      id
+      name
+    }
+    signatureKeys {
+      ...CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKey
+    }
+  }
+  ${CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKeyFragmentDoc}
+` as unknown as DocumentNode<
+  CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment,
+  unknown
+>;
+export const WebhookSubscriptionsTable_PetitionEventSubscriptionFragmentDoc = gql`
+  fragment WebhookSubscriptionsTable_PetitionEventSubscription on PetitionEventSubscription {
+    id
+    eventsUrl
+    eventTypes
+    isEnabled
+    isFailing
+    name
+    fromTemplate {
+      id
+      name
+    }
+    signatureKeys {
+      id
+    }
+    ...CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription
+  }
+  ${CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragmentDoc}
+` as unknown as DocumentNode<WebhookSubscriptionsTable_PetitionEventSubscriptionFragment, unknown>;
+export const CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragmentDoc = gql`
+  fragment CreateOrUpdateEventSubscriptionDialog_PetitionBase on PetitionBase {
     id
     name
   }
-` as unknown as DocumentNode<CreateEventSubscriptionDialog_PetitionBaseFragment, unknown>;
+` as unknown as DocumentNode<CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment, unknown>;
 export const AdminOrganizationsFeatures_OrganizationFragmentDoc = gql`
   fragment AdminOrganizationsFeatures_Organization on Organization {
     id
@@ -28793,18 +28937,12 @@ export const Contact_Contact_ProfileFragmentDoc = gql`
     lastName
   }
 ` as unknown as DocumentNode<Contact_Contact_ProfileFragment, unknown>;
-export const useConfirmDeleteContactsDialog_ContactFragmentDoc = gql`
-  fragment useConfirmDeleteContactsDialog_Contact on Contact {
-    fullName
-    email
-  }
-` as unknown as DocumentNode<useConfirmDeleteContactsDialog_ContactFragment, unknown>;
 export const useDeleteContacts_ContactFragmentDoc = gql`
   fragment useDeleteContacts_Contact on Contact {
     id
-    ...useConfirmDeleteContactsDialog_Contact
+    fullName
+    email
   }
-  ${useConfirmDeleteContactsDialog_ContactFragmentDoc}
 ` as unknown as DocumentNode<useDeleteContacts_ContactFragment, unknown>;
 export const PetitionProgressBar_PetitionFieldProgressFragmentDoc = gql`
   fragment PetitionProgressBar_PetitionFieldProgress on PetitionFieldProgress {
@@ -32036,29 +32174,6 @@ export const Account_QueryFragmentDoc = gql`
   ${AccountLocaleChange_UserFragmentDoc}
   ${AccountDelegates_UserFragmentDoc}
 ` as unknown as DocumentNode<Account_QueryFragment, unknown>;
-export const Developers_UserAuthenticationTokenFragmentDoc = gql`
-  fragment Developers_UserAuthenticationToken on UserAuthenticationToken {
-    id
-    tokenName
-    hint
-    createdAt
-    lastUsedAt
-  }
-` as unknown as DocumentNode<Developers_UserAuthenticationTokenFragment, unknown>;
-export const Developers_PetitionEventSubscriptionFragmentDoc = gql`
-  fragment Developers_PetitionEventSubscription on PetitionEventSubscription {
-    id
-    eventsUrl
-    eventTypes
-    isEnabled
-    isFailing
-    name
-    fromTemplate {
-      id
-      name
-    }
-  }
-` as unknown as DocumentNode<Developers_PetitionEventSubscriptionFragment, unknown>;
 export const RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCard_PublicPetitionFieldReply on PublicPetitionFieldReply {
     id
@@ -34517,8 +34632,91 @@ export const RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDo
   RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation,
   RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutationVariables
 >;
-export const CreateEventSubscriptionDialog_petitionsDocument = gql`
-  query CreateEventSubscriptionDialog_petitions(
+export const ApiTokensTable_revokeUserAuthTokenDocument = gql`
+  mutation ApiTokensTable_revokeUserAuthToken($authTokenIds: [GID!]!) {
+    revokeUserAuthToken(authTokenIds: $authTokenIds)
+  }
+` as unknown as DocumentNode<
+  ApiTokensTable_revokeUserAuthTokenMutation,
+  ApiTokensTable_revokeUserAuthTokenMutationVariables
+>;
+export const WebhookSubscriptionsTable_createEventSubscriptionDocument = gql`
+  mutation WebhookSubscriptionsTable_createEventSubscription(
+    $eventsUrl: String!
+    $eventTypes: [PetitionEventType!]
+    $name: String
+    $fromTemplateId: GID
+  ) {
+    createEventSubscription(
+      eventsUrl: $eventsUrl
+      eventTypes: $eventTypes
+      name: $name
+      fromTemplateId: $fromTemplateId
+    ) {
+      ...WebhookSubscriptionsTable_PetitionEventSubscription
+    }
+  }
+  ${WebhookSubscriptionsTable_PetitionEventSubscriptionFragmentDoc}
+` as unknown as DocumentNode<
+  WebhookSubscriptionsTable_createEventSubscriptionMutation,
+  WebhookSubscriptionsTable_createEventSubscriptionMutationVariables
+>;
+export const WebhookSubscriptionsTable_updateEventSubscriptionDocument = gql`
+  mutation WebhookSubscriptionsTable_updateEventSubscription(
+    $id: GID!
+    $isEnabled: Boolean
+    $eventsUrl: String
+    $eventTypes: [PetitionEventType!]
+    $name: String
+    $fromTemplateId: GID
+  ) {
+    updateEventSubscription(
+      id: $id
+      isEnabled: $isEnabled
+      eventsUrl: $eventsUrl
+      eventTypes: $eventTypes
+      name: $name
+      fromTemplateId: $fromTemplateId
+    ) {
+      ...WebhookSubscriptionsTable_PetitionEventSubscription
+      ...CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription
+    }
+  }
+  ${WebhookSubscriptionsTable_PetitionEventSubscriptionFragmentDoc}
+  ${CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragmentDoc}
+` as unknown as DocumentNode<
+  WebhookSubscriptionsTable_updateEventSubscriptionMutation,
+  WebhookSubscriptionsTable_updateEventSubscriptionMutationVariables
+>;
+export const WebhookSubscriptionsTable_deleteEventSubscriptionsDocument = gql`
+  mutation WebhookSubscriptionsTable_deleteEventSubscriptions($ids: [GID!]!) {
+    deleteEventSubscriptions(ids: $ids)
+  }
+` as unknown as DocumentNode<
+  WebhookSubscriptionsTable_deleteEventSubscriptionsMutation,
+  WebhookSubscriptionsTable_deleteEventSubscriptionsMutationVariables
+>;
+export const WebhookSubscriptionsTable_createEventSubscriptionSignatureKeyDocument = gql`
+  mutation WebhookSubscriptionsTable_createEventSubscriptionSignatureKey($subscriptionId: GID!) {
+    createEventSubscriptionSignatureKey(subscriptionId: $subscriptionId) {
+      id
+      publicKey
+    }
+  }
+` as unknown as DocumentNode<
+  WebhookSubscriptionsTable_createEventSubscriptionSignatureKeyMutation,
+  WebhookSubscriptionsTable_createEventSubscriptionSignatureKeyMutationVariables
+>;
+export const WebhookSubscriptionsTable_deleteEventSubscriptionSignatureKeysDocument = gql`
+  mutation WebhookSubscriptionsTable_deleteEventSubscriptionSignatureKeys($ids: [GID!]!) {
+    deleteEventSubscriptionSignatureKeys(ids: $ids)
+  }
+` as unknown as DocumentNode<
+  WebhookSubscriptionsTable_deleteEventSubscriptionSignatureKeysMutation,
+  WebhookSubscriptionsTable_deleteEventSubscriptionSignatureKeysMutationVariables
+>;
+export const CreateOrUpdateEventSubscriptionDialog_petitionsDocument = gql`
+  query CreateOrUpdateEventSubscriptionDialog_petitions(
     $offset: Int!
     $limit: Int!
     $search: String
@@ -34527,14 +34725,14 @@ export const CreateEventSubscriptionDialog_petitionsDocument = gql`
   ) {
     petitions(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filters: $filters) {
       items {
-        ...CreateEventSubscriptionDialog_PetitionBase
+        ...CreateOrUpdateEventSubscriptionDialog_PetitionBase
       }
     }
   }
-  ${CreateEventSubscriptionDialog_PetitionBaseFragmentDoc}
+  ${CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<
-  CreateEventSubscriptionDialog_petitionsQuery,
-  CreateEventSubscriptionDialog_petitionsQueryVariables
+  CreateOrUpdateEventSubscriptionDialog_petitionsQuery,
+  CreateOrUpdateEventSubscriptionDialog_petitionsQueryVariables
 >;
 export const GenerateNewTokenDialog_generateUserAuthTokenDocument = gql`
   mutation GenerateNewTokenDialog_generateUserAuthToken($tokenName: String!) {
@@ -36173,72 +36371,24 @@ export const Account_userDocument = gql`
   }
   ${Account_QueryFragmentDoc}
 ` as unknown as DocumentNode<Account_userQuery, Account_userQueryVariables>;
-export const Developers_revokeUserAuthTokenDocument = gql`
-  mutation Developers_revokeUserAuthToken($authTokenIds: [GID!]!) {
-    revokeUserAuthToken(authTokenIds: $authTokenIds)
-  }
-` as unknown as DocumentNode<
-  Developers_revokeUserAuthTokenMutation,
-  Developers_revokeUserAuthTokenMutationVariables
->;
-export const Developers_createEventSubscriptionDocument = gql`
-  mutation Developers_createEventSubscription(
-    $eventsUrl: String!
-    $eventTypes: [PetitionEventType!]
-    $name: String
-    $fromTemplateId: GID
-  ) {
-    createEventSubscription(
-      eventsUrl: $eventsUrl
-      eventTypes: $eventTypes
-      name: $name
-      fromTemplateId: $fromTemplateId
-    ) {
-      ...Developers_PetitionEventSubscription
-    }
-  }
-  ${Developers_PetitionEventSubscriptionFragmentDoc}
-` as unknown as DocumentNode<
-  Developers_createEventSubscriptionMutation,
-  Developers_createEventSubscriptionMutationVariables
->;
-export const Developers_updateEventSubscriptionDocument = gql`
-  mutation Developers_updateEventSubscription($id: GID!, $isEnabled: Boolean!) {
-    updateEventSubscription(id: $id, isEnabled: $isEnabled) {
-      ...Developers_PetitionEventSubscription
-    }
-  }
-  ${Developers_PetitionEventSubscriptionFragmentDoc}
-` as unknown as DocumentNode<
-  Developers_updateEventSubscriptionMutation,
-  Developers_updateEventSubscriptionMutationVariables
->;
-export const Developers_deleteEventSubscriptionsDocument = gql`
-  mutation Developers_deleteEventSubscriptions($ids: [GID!]!) {
-    deleteEventSubscriptions(ids: $ids)
-  }
-` as unknown as DocumentNode<
-  Developers_deleteEventSubscriptionsMutation,
-  Developers_deleteEventSubscriptionsMutationVariables
->;
 export const Developers_tokensDocument = gql`
   query Developers_tokens {
     me {
       id
       tokens {
-        ...Developers_UserAuthenticationToken
+        ...ApiTokensTable_UserAuthenticationToken
       }
     }
   }
-  ${Developers_UserAuthenticationTokenFragmentDoc}
+  ${ApiTokensTable_UserAuthenticationTokenFragmentDoc}
 ` as unknown as DocumentNode<Developers_tokensQuery, Developers_tokensQueryVariables>;
 export const Developers_subscriptionsDocument = gql`
   query Developers_subscriptions {
     subscriptions {
-      ...Developers_PetitionEventSubscription
+      ...WebhookSubscriptionsTable_PetitionEventSubscription
     }
   }
-  ${Developers_PetitionEventSubscriptionFragmentDoc}
+  ${WebhookSubscriptionsTable_PetitionEventSubscriptionFragmentDoc}
 ` as unknown as DocumentNode<Developers_subscriptionsQuery, Developers_subscriptionsQueryVariables>;
 export const Developers_userDocument = gql`
   query Developers_user {

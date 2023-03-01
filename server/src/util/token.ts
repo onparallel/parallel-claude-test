@@ -1,4 +1,4 @@
-import { createCipheriv, createDecipheriv, randomBytes, scrypt } from "crypto";
+import { createCipheriv, createDecipheriv, generateKeyPairSync, randomBytes, scrypt } from "crypto";
 
 const ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
   .split("")
@@ -120,4 +120,11 @@ export function decrypt(value: Buffer, key: Buffer) {
   const decipher = createDecipheriv("aes-256-gcm", key, iv);
   decipher.setAuthTag(authTag);
   return Buffer.concat([decipher.update(value.subarray(ivSize + 17)), decipher.final()]);
+}
+
+export function generateEDKeyPair() {
+  return generateKeyPairSync("ed25519", {
+    publicKeyEncoding: { format: "der", type: "spki" },
+    privateKeyEncoding: { format: "der", type: "pkcs8" },
+  });
 }

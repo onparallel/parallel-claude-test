@@ -18,7 +18,7 @@ import {
   RedirectResponse,
   SuccessResponse,
 } from "../rest/responses";
-import { description } from "./description";
+import { description, newParallelEvent } from "./descriptions";
 import {
   ContactFragment,
   PermissionFragment,
@@ -2478,6 +2478,27 @@ api
       responses: {
         201: SuccessResponse(Subscription),
         400: ErrorResponse({ description: "Invalid request" }),
+      },
+      callbacks: {
+        PetitionEventCreated: {
+          "{$request.body#/eventsUrl}": {
+            post: {
+              operationId: "PetitionEventCreated",
+              summary: "New Parallel Event",
+              description: newParallelEvent,
+              requestBody: {
+                required: true,
+                content: { "application/json": { schema: _PetitionEvent } },
+              },
+              responses: {
+                "200": {
+                  description:
+                    "Your server implementation should return this HTTP status code\nif the data was received successfully\n",
+                },
+              },
+            },
+          },
+        },
       },
       tags: ["Subscriptions"],
     },

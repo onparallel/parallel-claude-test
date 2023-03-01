@@ -312,6 +312,11 @@ export type EffectivePetitionUserPermission = {
   user: User;
 };
 
+export type EventSubscriptionSignatureKey = {
+  id: Scalars["GID"];
+  publicKey: Scalars["String"];
+};
+
 export type FeatureFlag =
   | "AUTO_ANONYMIZE"
   | "CLIENT_PORTAL"
@@ -586,6 +591,8 @@ export type Mutation = {
   createDowJonesProfileDownloadTask: Task;
   /** Creates an event subscription for the user's petitions */
   createEventSubscription: PetitionEventSubscription;
+  /** Creates a pair of asymmetric keys to be used for signing webhook events */
+  createEventSubscriptionSignatureKey: EventSubscriptionSignatureKey;
   /** Creates a task for exporting an xlsx file with petition text replies and sends it to the queue */
   createExportExcelTask: Task;
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
@@ -642,6 +649,8 @@ export type Mutation = {
   deleteContacts: Result;
   /** Removes the DOW JONES integration of the user's organization */
   deleteDowJonesKycIntegration: Organization;
+  /** Deletes a subscription signature key */
+  deleteEventSubscriptionSignatureKeys: Result;
   /** Deletes event subscriptions */
   deleteEventSubscriptions: Result;
   deleteOrganizationPdfDocumentTheme: Organization;
@@ -1004,6 +1013,10 @@ export type MutationcreateEventSubscriptionArgs = {
   name?: InputMaybe<Scalars["String"]>;
 };
 
+export type MutationcreateEventSubscriptionSignatureKeyArgs = {
+  subscriptionId: Scalars["GID"];
+};
+
 export type MutationcreateExportExcelTaskArgs = {
   petitionId: Scalars["GID"];
 };
@@ -1167,6 +1180,10 @@ export type MutationdeactivateUserArgs = {
 
 export type MutationdeleteContactsArgs = {
   force?: InputMaybe<Scalars["Boolean"]>;
+  ids: Array<Scalars["GID"]>;
+};
+
+export type MutationdeleteEventSubscriptionSignatureKeysArgs = {
   ids: Array<Scalars["GID"]>;
 };
 
@@ -2430,6 +2447,7 @@ export type PetitionEventSubscription = {
   isEnabled: Scalars["Boolean"];
   isFailing: Scalars["Boolean"];
   name: Maybe<Scalars["String"]>;
+  signatureKeys: Array<EventSubscriptionSignatureKey>;
 };
 
 export type PetitionEventType =

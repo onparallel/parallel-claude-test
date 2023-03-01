@@ -362,6 +362,7 @@ export interface TableTypes {
   email_attachment: EmailAttachment;
   email_event: EmailEvent;
   email_log: EmailLog;
+  event_subscription_signature_key: EventSubscriptionSignatureKey;
   feature_flag: FeatureFlag;
   feature_flag_override: FeatureFlagOverride;
   file_upload: FileUpload;
@@ -411,6 +412,7 @@ export interface TableCreateTypes {
   email_attachment: CreateEmailAttachment;
   email_event: CreateEmailEvent;
   email_log: CreateEmailLog;
+  event_subscription_signature_key: CreateEventSubscriptionSignatureKey;
   feature_flag: CreateFeatureFlag;
   feature_flag_override: CreateFeatureFlagOverride;
   file_upload: CreateFileUpload;
@@ -460,6 +462,7 @@ export interface TablePrimaryKeys {
   email_attachment: "id";
   email_event: "id";
   email_log: "id";
+  event_subscription_signature_key: "id";
   feature_flag: "id";
   feature_flag_override: "id";
   file_upload: "id";
@@ -612,6 +615,22 @@ export type CreateEmailLog = PartialProps<
   | "external_id"
   | "reply_to"
   | "anonymized_at"
+>;
+
+export interface EventSubscriptionSignatureKey {
+  id: number; // int4
+  event_subscription_id: number; // int4
+  public_key: string; // text
+  private_key: string; // text
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateEventSubscriptionSignatureKey = PartialProps<
+  Omit<EventSubscriptionSignatureKey, "id">,
+  "created_at" | "created_by" | "deleted_at" | "deleted_by"
 >;
 
 export interface FeatureFlag {

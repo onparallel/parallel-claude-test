@@ -521,6 +521,7 @@ export interface NexusGenObjects {
     db.PetitionPermission,
     "petition_id" | "user_id" | "type" | "is_subscribed"
   >;
+  EventSubscriptionSignatureKey: db.EventSubscriptionSignatureKey;
   FeatureFlagNameValue: {
     // root type
     name: NexusGenEnums["FeatureFlag"]; // FeatureFlag!
@@ -1142,6 +1143,11 @@ export interface NexusGenFieldTypes {
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
     user: NexusGenRootTypes["User"]; // User!
   };
+  EventSubscriptionSignatureKey: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    publicKey: string; // String!
+  };
   FeatureFlagNameValue: {
     // field return type
     name: NexusGenEnums["FeatureFlag"]; // FeatureFlag!
@@ -1304,6 +1310,7 @@ export interface NexusGenFieldTypes {
     createDowJonesKycReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createDowJonesProfileDownloadTask: NexusGenRootTypes["Task"]; // Task!
     createEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
+    createEventSubscriptionSignatureKey: NexusGenRootTypes["EventSubscriptionSignatureKey"]; // EventSubscriptionSignatureKey!
     createExportExcelTask: NexusGenRootTypes["Task"]; // Task!
     createExportRepliesTask: NexusGenRootTypes["Task"]; // Task!
     createFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
@@ -1332,6 +1339,7 @@ export interface NexusGenFieldTypes {
     deactivateUser: NexusGenRootTypes["User"][]; // [User!]!
     deleteContacts: NexusGenEnums["Result"]; // Result!
     deleteDowJonesKycIntegration: NexusGenRootTypes["Organization"]; // Organization!
+    deleteEventSubscriptionSignatureKeys: NexusGenEnums["Result"]; // Result!
     deleteEventSubscriptions: NexusGenEnums["Result"]; // Result!
     deleteOrganizationPdfDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
     deletePetitionAttachment: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -1724,6 +1732,7 @@ export interface NexusGenFieldTypes {
     isEnabled: boolean; // Boolean!
     isFailing: boolean; // Boolean!
     name: string | null; // String
+    signatureKeys: NexusGenRootTypes["EventSubscriptionSignatureKey"][]; // [EventSubscriptionSignatureKey!]!
   };
   PetitionField: {
     // field return type
@@ -2935,6 +2944,11 @@ export interface NexusGenFieldTypeNames {
     permissionType: "PetitionPermissionType";
     user: "User";
   };
+  EventSubscriptionSignatureKey: {
+    // field return type name
+    id: "GID";
+    publicKey: "String";
+  };
   FeatureFlagNameValue: {
     // field return type name
     name: "FeatureFlag";
@@ -3097,6 +3111,7 @@ export interface NexusGenFieldTypeNames {
     createDowJonesKycReply: "PetitionFieldReply";
     createDowJonesProfileDownloadTask: "Task";
     createEventSubscription: "PetitionEventSubscription";
+    createEventSubscriptionSignatureKey: "EventSubscriptionSignatureKey";
     createExportExcelTask: "Task";
     createExportRepliesTask: "Task";
     createFileUploadReply: "FileUploadReplyResponse";
@@ -3125,6 +3140,7 @@ export interface NexusGenFieldTypeNames {
     deactivateUser: "User";
     deleteContacts: "Result";
     deleteDowJonesKycIntegration: "Organization";
+    deleteEventSubscriptionSignatureKeys: "Result";
     deleteEventSubscriptions: "Result";
     deleteOrganizationPdfDocumentTheme: "Organization";
     deletePetitionAttachment: "PetitionBase";
@@ -3517,6 +3533,7 @@ export interface NexusGenFieldTypeNames {
     isEnabled: "Boolean";
     isFailing: "Boolean";
     name: "String";
+    signatureKeys: "EventSubscriptionSignatureKey";
   };
   PetitionField: {
     // field return type name
@@ -4649,6 +4666,10 @@ export interface NexusGenArgTypes {
       fromTemplateId?: NexusGenScalars["GID"] | null; // GID
       name?: string | null; // String
     };
+    createEventSubscriptionSignatureKey: {
+      // args
+      subscriptionId: NexusGenScalars["GID"]; // GID!
+    };
     createExportExcelTask: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
@@ -4813,6 +4834,10 @@ export interface NexusGenArgTypes {
     deleteContacts: {
       // args
       force?: boolean | null; // Boolean
+      ids: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    deleteEventSubscriptionSignatureKeys: {
+      // args
       ids: NexusGenScalars["GID"][]; // [GID!]!
     };
     deleteEventSubscriptions: {
@@ -5262,8 +5287,12 @@ export interface NexusGenArgTypes {
     };
     updateEventSubscription: {
       // args
+      eventTypes?: NexusGenEnums["PetitionEventType"][] | null; // [PetitionEventType!]
+      eventsUrl?: string | null; // String
+      fromTemplateId?: NexusGenScalars["GID"] | null; // GID
       id: NexusGenScalars["GID"]; // GID!
-      isEnabled: boolean; // Boolean!
+      isEnabled?: boolean | null; // Boolean
+      name?: string | null; // String
     };
     updateFeatureFlags: {
       // args

@@ -154,22 +154,19 @@ export class DowJonesKycService implements IDowJonesKycService {
     username: string,
     password: string
   ): Promise<{ idToken: string; refreshToken: string }> {
-    const response = await this.fetch.fetchWithTimeout(
-      "https://accounts.dowjones.com/oauth2/v1/token",
-      {
-        method: "POST",
-        body: new URLSearchParams({
-          client_id: clientId,
-          connection: "service-account",
-          device: "parallel-server",
-          username,
-          password,
-          grant_type: "password",
-          scope: "openid service_account_id offline_access",
-        }),
-      },
-      5000
-    );
+    const response = await this.fetch.fetch("https://accounts.dowjones.com/oauth2/v1/token", {
+      method: "POST",
+      body: new URLSearchParams({
+        client_id: clientId,
+        connection: "service-account",
+        device: "parallel-server",
+        username,
+        password,
+        grant_type: "password",
+        scope: "openid service_account_id offline_access",
+      }),
+      timeout: 5_000,
+    });
 
     const jsonData = await response.json();
     if (response.ok && !jsonData.error) {
@@ -180,19 +177,16 @@ export class DowJonesKycService implements IDowJonesKycService {
   }
 
   private async getAccessToken(idToken: string, clientId: string): Promise<string> {
-    const response = await this.fetch.fetchWithTimeout(
-      "https://accounts.dowjones.com/oauth2/v1/token",
-      {
-        method: "POST",
-        body: new URLSearchParams({
-          assertion: idToken,
-          client_id: clientId,
-          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-          scope: "openid pib",
-        }),
-      },
-      5000
-    );
+    const response = await this.fetch.fetch("https://accounts.dowjones.com/oauth2/v1/token", {
+      method: "POST",
+      body: new URLSearchParams({
+        assertion: idToken,
+        client_id: clientId,
+        grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+        scope: "openid pib",
+      }),
+      timeout: 5_000,
+    });
 
     const jsonData = await response.json();
     if (response.ok && !jsonData.error) {
@@ -213,19 +207,16 @@ export class DowJonesKycService implements IDowJonesKycService {
       key
     ).toString("utf8");
 
-    const response = await this.fetch.fetchWithTimeout(
-      "https://accounts.dowjones.com/oauth2/v1/token",
-      {
-        method: "POST",
-        body: new URLSearchParams({
-          client_id: clientId,
-          grant_type: "refresh_token",
-          refresh_token: refreshToken,
-          scope: "openid service_account_id",
-        }),
-      },
-      5000
-    );
+    const response = await this.fetch.fetch("https://accounts.dowjones.com/oauth2/v1/token", {
+      method: "POST",
+      body: new URLSearchParams({
+        client_id: clientId,
+        grant_type: "refresh_token",
+        refresh_token: refreshToken,
+        scope: "openid service_account_id",
+      }),
+      timeout: 5_000,
+    });
 
     const jsonData = await response.json();
     if (response.ok && !jsonData.error) {
@@ -290,18 +281,15 @@ export class DowJonesKycService implements IDowJonesKycService {
       Buffer.from(this.config.security.encryptKeyBase64, "base64")
     ).toString("utf8");
 
-    const response = await this.fetch.fetchWithTimeout(
-      url,
-      {
-        method: opts.method,
-        body: opts.body ? JSON.stringify(opts.body) : undefined,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
+    const response = await this.fetch.fetch(url, {
+      method: opts.method,
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
       },
-      5000
-    );
+      timeout: 5_000,
+    });
 
     const jsonData = await response.json();
     if (response.ok) {

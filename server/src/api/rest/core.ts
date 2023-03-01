@@ -61,6 +61,7 @@ export interface RestOperationOptions<TQuery, TBody, TResponses extends RestResp
   body?: RestBody<TBody>;
   query?: RestParameters<TQuery>;
   responses?: TResponses;
+  callbacks?: { [key: string]: OpenAPIV3.CallbackObject };
   middleware?: MaybeArray<RequestHandler>;
   excludeFromSpec?: boolean;
   [x: string]: unknown;

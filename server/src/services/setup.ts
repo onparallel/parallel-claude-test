@@ -58,13 +58,10 @@ export class SetupService implements ISetupService {
         production: "https://api.signaturit.com",
       }).map(([environment, url]) =>
         this.fetch
-          .fetchWithTimeout(
-            `${url}/v3/team/users.json`,
-            {
-              headers: { authorization: `Bearer ${apiKey}` },
-            },
-            5000
-          )
+          .fetch(`${url}/v3/team/users.json`, {
+            headers: { authorization: `Bearer ${apiKey}` },
+            timeout: 5_000,
+          })
           .then(({ status }) => {
             if (status === 200) {
               return { environment: environment as SignaturitEnvironment };

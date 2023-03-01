@@ -363,6 +363,11 @@ type EffectivePetitionUserPermission {
   user: User!
 }
 
+type EventSubscriptionSignatureKey {
+  id: GID!
+  publicKey: String!
+}
+
 enum FeatureFlag {
   AUTO_ANONYMIZE
   CLIENT_PORTAL
@@ -806,6 +811,11 @@ type Mutation {
   ): PetitionEventSubscription!
 
   """
+  Creates a pair of asymmetric keys to be used for signing webhook events
+  """
+  createEventSubscriptionSignatureKey(subscriptionId: GID!): EventSubscriptionSignatureKey!
+
+  """
   Creates a task for exporting an xlsx file with petition text replies and sends it to the queue
   """
   createExportExcelTask(petitionId: GID!): Task!
@@ -1050,6 +1060,11 @@ type Mutation {
   Removes the DOW JONES integration of the user's organization
   """
   deleteDowJonesKycIntegration: Organization!
+
+  """
+  Deletes a subscription signature key
+  """
+  deleteEventSubscriptionSignatureKeys(ids: [GID!]!): Result!
 
   """
   Deletes event subscriptions
@@ -1677,7 +1692,14 @@ type Mutation {
   """
   Updates an existing event subscription for the user's petitions
   """
-  updateEventSubscription(id: GID!, isEnabled: Boolean!): PetitionEventSubscription!
+  updateEventSubscription(
+    eventTypes: [PetitionEventType!]
+    eventsUrl: String
+    fromTemplateId: GID
+    id: GID!
+    isEnabled: Boolean
+    name: String
+  ): PetitionEventSubscription!
 
   """
   Activate or deactivate a list of organization feature flag
@@ -2977,6 +2999,7 @@ type PetitionEventSubscription {
   isEnabled: Boolean!
   isFailing: Boolean!
   name: String
+  signatureKeys: [EventSubscriptionSignatureKey!]!
 }
 
 enum PetitionEventType {

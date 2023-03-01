@@ -4,7 +4,11 @@ import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { CreatePetitionEventSubscription, PetitionEventSubscription } from "../__types";
+import {
+  CreateEventSubscriptionSignatureKey,
+  CreatePetitionEventSubscription,
+  PetitionEventSubscription,
+} from "../__types";
 
 @injectable()
 export class SubscriptionRepository extends BaseRepository {
@@ -20,6 +24,18 @@ export class SubscriptionRepository extends BaseRepository {
     "petition_event_subscription",
     "user_id",
     (q) => q.whereNull("deleted_at").orderBy("created_at", "desc")
+  );
+
+  readonly loadEventSubscriptionSignatureKey = this.buildLoadBy(
+    "event_subscription_signature_key",
+    "id",
+    (q) => q.whereNull("deleted_at")
+  );
+
+  readonly loadEventSubscriptionSignatureKeysBySubscriptionId = this.buildLoadMultipleBy(
+    "event_subscription_signature_key",
+    "event_subscription_id",
+    (q) => q.whereNull("deleted_at").orderBy("created_at", "asc")
   );
 
   async createSubscription(
@@ -64,6 +80,50 @@ export class SubscriptionRepository extends BaseRepository {
       .update({
         deleted_by: deletedBy,
         deleted_at: this.now(),
+      });
+  }
+
+  async createEventSubscriptionSignatureKey(
+    data: CreateEventSubscriptionSignatureKey,
+    createdBy: string
+  ) {
+    const [signatureKey] = await this.insert("event_subscription_signature_key", {
+      ...data,
+      created_at: this.now(),
+      created_by: createdBy,
+    });
+
+    return signatureKey;
+  }
+
+  async deleteEventSubscriptionSignatureKeys(ids: MaybeArray<number>, deletedBy: string) {
+    const _ids = unMaybeArray(ids);
+    if (_ids.length === 0) {
+      return;
+    }
+    await this.from("event_subscription_signature_key")
+      .whereIn("id", _ids)
+      .whereNull("deleted_at")
+      .update({
+        deleted_at: this.now(),
+        deleted_by: deletedBy,
+      });
+  }
+
+  async deleteEventSubscriptionSignatureKeysBySubscriptionIds(
+    ids: MaybeArray<number>,
+    deletedBy: string
+  ) {
+    const _ids = unMaybeArray(ids);
+    if (_ids.length === 0) {
+      return;
+    }
+    await this.from("event_subscription_signature_key")
+      .whereIn("event_subscription_id", _ids)
+      .whereNull("deleted_at")
+      .update({
+        deleted_at: this.now(),
+        deleted_by: deletedBy,
       });
   }
 }

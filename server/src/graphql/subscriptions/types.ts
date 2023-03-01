@@ -18,5 +18,18 @@ export const PetitionEventSubscription = objectType({
       },
     });
     t.nullable.string("name");
+    t.nonNull.list.nonNull.field("signatureKeys", {
+      type: "EventSubscriptionSignatureKey",
+      resolve: async (o, _, ctx) =>
+        await ctx.subscriptions.loadEventSubscriptionSignatureKeysBySubscriptionId(o.id),
+    });
+  },
+});
+
+export const EventSubscriptionSignatureKey = objectType({
+  name: "EventSubscriptionSignatureKey",
+  definition(t) {
+    t.globalId("id");
+    t.nonNull.string("publicKey", { resolve: (o) => o.public_key });
   },
 });

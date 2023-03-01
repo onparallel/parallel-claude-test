@@ -1,7 +1,7 @@
-import { waitFor } from "./promises/waitFor";
+import { waitFor, WaitForOptions } from "./promises/waitFor";
 import { MaybePromise } from "./types";
 
-interface RetryOptions {
+export interface RetryOptions extends WaitForOptions {
   maxRetries: number;
   delay?: number;
 }
@@ -14,22 +14,31 @@ interface RetryOptions {
  */
 export async function retry<TResult>(
   operation: (iteration: number) => MaybePromise<TResult>,
-  { maxRetries, delay }: RetryOptions
+  { maxRetries, delay, signal }: RetryOptions
 ): Promise<TResult> {
-  if (maxRetries < 1) {
-    throw new Error("maxRetries option must be greater than or equal to 1");
+  if (maxRetries < 0) {
+    throw new Error("maxRetries option must be greater than or equal to 0");
   }
   let iteration = 0;
-  while (maxRetries-- > 0) {
+  do {
     try {
       return await operation(iteration++);
     } catch (error) {
+      if (error instanceof StopRetryError) {
+        throw error.cause;
+      }
       if (maxRetries === 0) {
         throw error;
       } else if (delay) {
-        await waitFor(delay);
+        await waitFor(delay, { signal });
       }
     }
-  }
+  } while (maxRetries-- > 0);
   return null as never;
+}
+
+export class StopRetryError extends Error {
+  constructor(public override cause: Error) {
+    super();
+  }
 }

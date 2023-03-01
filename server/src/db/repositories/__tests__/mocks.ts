@@ -9,7 +9,7 @@ import { defaultPdfDocumentTheme } from "../../../util/PdfDocumentTheme";
 import { removeNotDefined } from "../../../util/remedaExtensions";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { titleize } from "../../../util/strings";
-import { hash, random } from "../../../util/token";
+import { encrypt, generateEDKeyPair, hash, random } from "../../../util/token";
 import { MaybeArray, Replace } from "../../../util/types";
 import {
   Contact,
@@ -32,6 +32,7 @@ import {
   CreateUserData,
   CreateUserGroup,
   EmailLog,
+  EventSubscriptionSignatureKey,
   FeatureFlagName,
   FileUpload,
   Organization,
@@ -45,6 +46,7 @@ import {
   PetitionAttachmentType,
   PetitionEvent,
   PetitionEventSubscription,
+  PetitionEventType,
   PetitionEventTypeValues,
   PetitionField,
   PetitionFieldAttachment,
@@ -952,7 +954,10 @@ export class Mocks {
       return [];
     }
     return await this.knex<PetitionEventSubscription>("petition_event_subscription").insert(
-      dataArr,
+      dataArr.map((d) => ({
+        ...d,
+        event_types: d.event_types ? this.knex.raw(`?::json`, JSON.stringify(d.event_types)) : null,
+      })),
       "*"
     );
   }
@@ -983,11 +988,17 @@ export class Mocks {
     return reply;
   }
 
-  async createRandomPetitionEvents(userId: number, petitionId: number, amount: number) {
+  async createRandomPetitionEvents(
+    userId: number,
+    petitionId: number,
+    amount: number,
+    types?: PetitionEventType[]
+  ) {
+    const eventTypes = types ?? PetitionEventTypeValues;
     const petitionEvents = await this.knex<PetitionEvent>("petition_event")
       .insert(
         range(0, amount || 1).map(() => ({
-          type: PetitionEventTypeValues[Math.floor(Math.random() * PetitionEventTypeValues.length)],
+          type: eventTypes[Math.floor(Math.random() * eventTypes.length)],
           data: {},
           petition_id: petitionId,
         }))
@@ -1046,6 +1057,29 @@ export class Mocks {
         }))
       )
       .returning("*");
+  }
+
+  async createEventSubscriptionSignatureKey(
+    subscriptionId: number,
+    keyB64: string,
+    amount?: number
+  ) {
+    return await this.knex<EventSubscriptionSignatureKey>(
+      "event_subscription_signature_key"
+    ).insert(
+      range(0, amount || 1).map(() => {
+        const { privateKey, publicKey } = generateEDKeyPair();
+        return {
+          event_subscription_id: subscriptionId,
+          public_key: publicKey.toString("base64"),
+          private_key: encrypt(
+            privateKey.toString("base64"),
+            Buffer.from(keyB64, "base64")
+          ).toString("base64"),
+        };
+      }),
+      "*"
+    );
   }
 }
 

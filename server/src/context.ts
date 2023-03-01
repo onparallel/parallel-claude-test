@@ -122,6 +122,7 @@ export class WorkerContext {
     @inject(DOW_JONES_KYC_SERVICE) public readonly dowJonesKyc: IDowJonesKycService,
     @inject(ORGANIZATION_LAYOUT_SERVICE)
     public readonly layouts: IOrganizationLayoutService,
+    @inject(FETCH_SERVICE) public readonly fetch: IFetchService,
 
     // Repositories
     public readonly contacts: ContactRepository,

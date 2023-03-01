@@ -131,7 +131,7 @@ describe("GraphQL/PetitionEventSubscription", () => {
   describe("createEventSubscription", () => {
     it("creates and returns a new subscription for the user's petitions", async () => {
       const fetch = testClient.container.get<IFetchService>(FETCH_SERVICE);
-      const spy = jest.spyOn(fetch, "fetchWithTimeout");
+      const spy = jest.spyOn(fetch, "fetch");
       const { data, errors } = await testClient.mutate({
         mutation: gql`
           mutation ($eventsUrl: String!, $name: String) {
@@ -155,11 +155,7 @@ describe("GraphQL/PetitionEventSubscription", () => {
         eventsUrl: "https://www.example.com/api",
       });
       subscriptionId = data!.createEventSubscription.id;
-      expect(spy).toHaveBeenCalledWith(
-        "https://www.example.com/api",
-        expect.anything(),
-        expect.anything()
-      );
+      expect(spy).toHaveBeenCalledWith("https://www.example.com/api", expect.anything());
     });
 
     it("creates and returns a new subscription for the user's petitions created from some template", async () => {
