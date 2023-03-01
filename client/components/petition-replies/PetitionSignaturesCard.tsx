@@ -192,9 +192,11 @@ export const PetitionSignaturesCard = Object.assign(
     );
     const handleCancelSignatureProcess = useCallback(
       async (petitionSignatureRequestId: string) => {
-        await cancelSignatureRequest({
-          variables: { petitionSignatureRequestId },
-        });
+        try {
+          await cancelSignatureRequest({
+            variables: { petitionSignatureRequestId },
+          });
+        } catch {}
       },
       [cancelSignatureRequest]
     );

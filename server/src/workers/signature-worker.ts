@@ -163,9 +163,7 @@ async function cancelSignatureProcess(
   try {
     const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
     if (!signature.external_id) {
-      throw new Error(
-        `Can't find external_id on petition signature request ${payload.petitionSignatureRequestId}`
-      );
+      return;
     }
 
     const { orgIntegrationId } = signature.signature_config;

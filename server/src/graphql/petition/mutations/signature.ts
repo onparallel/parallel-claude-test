@@ -6,6 +6,7 @@ import { RESULT } from "../../helpers/result";
 import { jsonObjectArg } from "../../helpers/scalars";
 import {
   petitionIsNotAnonymized,
+  signatureRequestHasStatus,
   signatureRequestIsNotAnonymized,
   userHasAccessToPetitions,
   userHasAccessToSignatureRequest,
@@ -65,7 +66,13 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"]),
-    signatureRequestIsNotAnonymized("petitionSignatureRequestId")
+    signatureRequestIsNotAnonymized("petitionSignatureRequestId"),
+    signatureRequestHasStatus("petitionSignatureRequestId", [
+      "ENQUEUED",
+      "PROCESSING",
+      "PROCESSED",
+      "CANCELLED",
+    ])
   ),
   resolve: async (_, { petitionSignatureRequestId }, ctx) => {
     const signature = await ctx.petitions.loadPetitionSignatureById(petitionSignatureRequestId);

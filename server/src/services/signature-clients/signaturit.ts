@@ -183,14 +183,26 @@ export class SignaturitClient implements ISignatureClient {
   async downloadSignedDocument(externalId: string) {
     return await this.withSignaturitSDK(async (sdk) => {
       const [signatureId, documentId] = externalId.split("/");
-      return Buffer.from(await sdk.downloadSignedDocument(signatureId, documentId));
+
+      const result = await retry(
+        async () => await sdk.downloadSignedDocument(signatureId, documentId),
+        { maxRetries: 3, delay: 5_000 }
+      );
+
+      return Buffer.from(result);
     });
   }
 
   async downloadAuditTrail(externalId: string) {
     return await this.withSignaturitSDK(async (sdk) => {
       const [signatureId, documentId] = externalId.split("/");
-      return Buffer.from(await sdk.downloadAuditTrail(signatureId, documentId));
+
+      const result = await retry(
+        async () => await sdk.downloadAuditTrail(signatureId, documentId),
+        { maxRetries: 3, delay: 5_000 }
+      );
+
+      return Buffer.from(result);
     });
   }
 
