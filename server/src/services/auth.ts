@@ -278,6 +278,9 @@ export class Auth implements IAuth {
 
   async callback(req: Request, res: Response, next: NextFunction) {
     try {
+      if (typeof req.query.state !== "string") {
+        throw new Error("Invalid state");
+      }
       const state = new URLSearchParams(
         Buffer.from(req.query.state as string, "base64").toString("ascii")
       );
@@ -382,8 +385,11 @@ export class Auth implements IAuth {
           ? state.get("redirect")!
           : "/app";
       res.redirect(302, prefix + path);
-    } catch (error: any) {
-      next(error);
+    } catch (e) {
+      if (e instanceof Error && e.message === "Invalid state") {
+        return res.redirect(302, "/login");
+      }
+      next(e);
     }
   }
 
