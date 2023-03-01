@@ -6,7 +6,6 @@ import { RESULT } from "../../helpers/result";
 import { jsonObjectArg } from "../../helpers/scalars";
 import {
   petitionIsNotAnonymized,
-  signatureRequestHasStatus,
   signatureRequestIsNotAnonymized,
   userHasAccessToPetitions,
   userHasAccessToSignatureRequest,
@@ -66,13 +65,7 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"]),
-    signatureRequestIsNotAnonymized("petitionSignatureRequestId"),
-    signatureRequestHasStatus("petitionSignatureRequestId", [
-      "ENQUEUED",
-      "PROCESSING",
-      "PROCESSED",
-      "CANCELLED",
-    ])
+    signatureRequestIsNotAnonymized("petitionSignatureRequestId")
   ),
   resolve: async (_, { petitionSignatureRequestId }, ctx) => {
     const signature = await ctx.petitions.loadPetitionSignatureById(petitionSignatureRequestId);
@@ -81,8 +74,8 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
       throw new Error(`Petition signature request with id ${petitionSignatureRequestId} not found`);
     }
 
-    // if, for any reason, signature was already cancelled, just return it
-    if (signature.status === "CANCELLED") {
+    // if, for any reason, signature was already cancelled or completed, just return it
+    if (signature.status === "CANCELLED" || signature.status === "COMPLETED") {
       return signature;
     }
 
