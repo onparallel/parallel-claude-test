@@ -2,7 +2,6 @@ import { gql, useMutation } from "@apollo/client";
 import { Alert, AlertIcon, Box, Button, Stack, Text } from "@chakra-ui/react";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import {
-  useConfirmDeleteContactsDialog_ContactFragment,
   useDeleteContacts_ContactFragment,
   useDeleteContacts_deleteContactsDocument,
 } from "@parallel/graphql/__types";
@@ -55,7 +54,7 @@ function useConfirmDeleteContactsDialog() {
       contacts,
       extra,
     }: {
-      contacts: useConfirmDeleteContactsDialog_ContactFragment[];
+      contacts: useDeleteContacts_ContactFragment[];
       extra: { PENDING: number; COMPLETED: number; CLOSED: number };
     }) => {
       return await showDialog({
