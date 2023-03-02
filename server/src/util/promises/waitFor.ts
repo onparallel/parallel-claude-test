@@ -9,7 +9,7 @@ export function waitFor(millis: number, options?: WaitForOptions) {
     }, millis);
     options?.signal?.addEventListener("abort", () => {
       clearTimeout(timeout);
-      reject(new Error("Aborted"));
+      reject(new Error("The operation was aborted."));
     });
   });
 }

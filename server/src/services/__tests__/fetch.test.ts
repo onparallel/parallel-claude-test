@@ -1,9 +1,13 @@
 jest.mock("node-fetch");
 const fetch = require("node-fetch");
 const { Response } = jest.requireActual("node-fetch");
-import { RequestInit, RequestInfo } from "node-fetch";
+import { RequestInfo, RequestInit } from "node-fetch";
 import { waitFor } from "../../util/promises/waitFor";
-import { FetchService, IFetchService } from "../fetch";
+import { FetchService, IFetchService, TimeoutError } from "../fetch";
+
+function flushPromises() {
+  return new Promise(jest.requireActual("timers").setImmediate);
+}
 
 describe("FetchService", () => {
   let fetchService: IFetchService;
@@ -38,7 +42,7 @@ describe("FetchService", () => {
 
     const promise = fetchService.fetch("https://www.example.com", { timeout: 1_000 });
     jest.advanceTimersByTime(2_000);
-    await expect(promise).rejects.toThrowError("Aborted");
+    await expect(promise).rejects.toThrow(TimeoutError);
   });
 
   it("retries once if fetch does not succed", async () => {
@@ -54,5 +58,30 @@ describe("FetchService", () => {
     const response = await fetchService.fetch("https://www.example.com", { maxRetries: 1 });
     expect(response).toMatchObject({ ok: true, status: 200, statusText: "OK" });
     expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it("stops retrying if aborted from outside", async () => {
+    fetch.mockImplementation(async (url: RequestInfo, init?: RequestInit) => {
+      await waitFor(1_000, { signal: (init?.signal ?? undefined) as any });
+      return new Response("Bad Gateway", { status: 502 });
+    });
+
+    const controller = new AbortController();
+    const promise = fetchService.fetch("https://www.example.com", {
+      signal: controller.signal as any,
+      maxRetries: 3,
+    });
+    const wait = waitFor(2_500).then(() => controller.abort());
+    expect(fetch).toHaveBeenCalledTimes(1);
+    jest.advanceTimersByTime(1_000);
+    await flushPromises();
+    expect(fetch).toHaveBeenCalledTimes(2);
+    jest.advanceTimersByTime(1_000);
+    await flushPromises();
+    expect(fetch).toHaveBeenCalledTimes(3);
+    jest.advanceTimersByTime(600);
+    await expect(promise).rejects.toThrow();
+    await flushPromises();
+    expect(fetch).toHaveBeenCalledTimes(3);
   });
 });

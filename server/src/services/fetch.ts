@@ -1,7 +1,7 @@
 import { injectable } from "inversify";
 import fetch, { RequestInfo, RequestInit, Response } from "node-fetch";
 import { isDefined } from "remeda";
-import { retry, RetryOptions } from "../util/retry";
+import { retry, RetryOptions, StopRetryError } from "../util/retry";
 
 export const FETCH_SERVICE = Symbol.for("FETCH_SERVICE");
 
@@ -35,6 +35,14 @@ export class FetchService implements IFetchService {
               throw response;
             }
             return response;
+          } catch (e) {
+            if (e instanceof Error && init.signal?.aborted) {
+              throw new StopRetryError(e);
+            }
+            if (e instanceof Error && controller?.signal.aborted) {
+              throw new TimeoutError("Fetch duration exceeded timeout.");
+            }
+            throw e;
           } finally {
             if (isDefined(cancelTimeout)) {
               clearTimeout(cancelTimeout);
@@ -52,3 +60,5 @@ export class FetchService implements IFetchService {
     }
   }
 }
+
+export class TimeoutError extends Error {}
