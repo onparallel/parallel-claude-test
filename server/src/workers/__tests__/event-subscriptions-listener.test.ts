@@ -144,7 +144,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         body,
         headers: {
           "Content-Type": "application/json",
-          "User-Agent": "Parallel Webooks (https://www.onparallel.com)",
+          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
         },
         delay: 5_000,
         maxRetries: 3,
@@ -158,7 +158,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         body,
         headers: {
           "Content-Type": "application/json",
-          "User-Agent": "Parallel Webooks (https://www.onparallel.com)",
+          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
         },
         delay: 5_000,
         maxRetries: 3,
@@ -172,7 +172,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         body,
         headers: {
           "Content-Type": "application/json",
-          "User-Agent": "Parallel Webooks (https://www.onparallel.com)",
+          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
         },
         delay: 5_000,
         maxRetries: 3,
@@ -215,7 +215,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         body,
         headers: {
           "Content-Type": "application/json",
-          "User-Agent": "Parallel Webooks (https://www.onparallel.com)",
+          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
         },
         delay: 5_000,
         maxRetries: 3,
@@ -281,7 +281,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         body,
         headers: {
           "Content-Type": "application/json",
-          "User-Agent": "Parallel Webooks (https://www.onparallel.com)",
+          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
         },
         delay: 5_000,
         maxRetries: 3,
@@ -296,7 +296,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         body,
         headers: {
           "Content-Type": "application/json",
-          "User-Agent": "Parallel Webooks (https://www.onparallel.com)",
+          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
           "X-Parallel-Signature-1": xParallelSignatures[0],
           "X-Parallel-Signature-2": xParallelSignatures[1],
         },

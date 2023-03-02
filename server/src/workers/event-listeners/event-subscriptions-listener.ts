@@ -53,7 +53,7 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
         const body = JSON.stringify(mappedEvent);
         const headers: Record<string, string> = {
           "Content-Type": "application/json",
-          "User-Agent": "Parallel Webooks (https://www.onparallel.com)",
+          "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
         };
 
         const keys = subscriptionKeys.filter((k) => k.event_subscription_id === subscription.id);

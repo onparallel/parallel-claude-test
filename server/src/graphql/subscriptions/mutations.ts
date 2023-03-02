@@ -22,7 +22,7 @@ async function challengeWebhookUrl(url: string, fetch: IFetchService) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "User-Agent": "Parallel Webooks (https://www.onparallel.com)",
+        "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
       } as any,
       body: JSON.stringify({}),
       timeout: 5_000,
