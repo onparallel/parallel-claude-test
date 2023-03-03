@@ -36,7 +36,6 @@ const HANDLERS: Partial<
   document_opened: documentOpened,
   document_signed: documentSigned,
   document_declined: documentDeclined,
-  document_completed: documentCompleted,
   audit_trail_completed: auditTrailCompleted,
   email_delivered: emailDelivered,
   email_opened: emailOpened,
@@ -153,8 +152,9 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
     }
   );
 }
-/** signed document has been completed and is ready to be downloaded */
-async function documentCompleted(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
+
+/** audit trail has been completed, audit trail and signed document are ready to be downloaded */
+async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
   const {
     id: documentId,
     signature: { id: signatureId },
@@ -164,17 +164,6 @@ async function documentCompleted(ctx: ApiContext, data: SignaturItEventBody, pet
   const [signer] = findSigner(signature!.signature_config.signersInfo, data.document);
 
   await ctx.signature.storeSignedDocument(signature, `${signatureId}/${documentId}`, signer);
-}
-
-/** audit trail has been completed and is ready to be downloaded */
-async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
-  const {
-    id: documentId,
-    signature: { id: signatureId },
-  } = data.document;
-
-  const signature = await fetchPetitionSignature(signatureId, ctx);
-
   await ctx.signature.storeAuditTrail(signature, `${signatureId}/${documentId}`);
 }
 
