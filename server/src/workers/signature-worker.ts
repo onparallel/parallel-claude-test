@@ -1,5 +1,5 @@
 import stringify from "fast-safe-stringify";
-import { unlink } from "fs/promises";
+import { readFile, unlink } from "fs/promises";
 import pMap from "p-map";
 import { isDefined, pick } from "remeda";
 import { WorkerContext } from "../context";
@@ -65,6 +65,17 @@ async function startSignatureProcess(
       maxOutputSize: 10 * 1024 * 1024, // signaturit has a 15MB limit for emails
       outputFileName,
       includeAnnexedDocuments: true,
+    });
+
+    const documentTmpFile = await storeTemporaryDocument(
+      documentTmpPath,
+      outputFileName,
+      integration.id,
+      ctx
+    );
+
+    await ctx.petitions.updatePetitionSignature(signature.id, {
+      temporary_file_document_id: documentTmpFile.id,
     });
 
     const signatureClient = ctx.signature.getClient(integration);
@@ -444,6 +455,27 @@ async function storeDocument(
     `OrgIntegration:${integrationId}`
   );
   return file;
+}
+
+async function storeTemporaryDocument(
+  filePath: string,
+  filename: string,
+  integrationId: number,
+  ctx: WorkerContext
+) {
+  const path = random(16);
+  const buffer = await readFile(filePath);
+  const res = await ctx.storage.temporaryFiles.uploadFile(path, "application/pdf", buffer);
+
+  return await ctx.files.createTemporaryFile(
+    {
+      content_type: "application/pdf",
+      filename,
+      path,
+      size: res["ContentLength"]!.toString(),
+    },
+    `OrgIntegration:${integrationId}`
+  );
 }
 
 async function getDefaultFileName(petitionId: number, locale: string, ctx: WorkerContext) {

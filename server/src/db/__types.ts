@@ -1266,6 +1266,7 @@ export interface PetitionSignatureRequest {
   metadata: any; // jsonb
   signer_status: any; // jsonb
   anonymized_at: Maybe<Date>; // timestamptz
+  temporary_file_document_id: Maybe<number>; // int4
 }
 
 export type CreatePetitionSignatureRequest = PartialProps<
@@ -1283,6 +1284,7 @@ export type CreatePetitionSignatureRequest = PartialProps<
   | "metadata"
   | "signer_status"
   | "anonymized_at"
+  | "temporary_file_document_id"
 >;
 
 export interface PetitionTag {
