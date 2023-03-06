@@ -786,6 +786,7 @@ OrganizationUsers.queries = [
       $sortBy: [OrganizationUsers_OrderBy!]
     ) {
       me {
+        id
         organization {
           id
           users(

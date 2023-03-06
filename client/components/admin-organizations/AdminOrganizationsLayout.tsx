@@ -136,7 +136,6 @@ AdminOrganizationsLayout.fragments = {
         me {
           id
           organization {
-            name
             ...AdminOrganizationsLayout_Organization
           }
         }

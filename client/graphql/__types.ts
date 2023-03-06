@@ -4470,8 +4470,8 @@ export type AdminOrganizationsLayout_QueryFragment = {
     initials?: string | null;
     organization: {
       __typename?: "Organization";
-      name: string;
       id: string;
+      name: string;
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
@@ -14631,8 +14631,8 @@ export type AdminOrganizationsFeatures_queryQuery = {
     initials?: string | null;
     organization: {
       __typename?: "Organization";
-      name: string;
       id: string;
+      name: string;
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
@@ -14758,8 +14758,8 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     initials?: string | null;
     organization: {
       __typename?: "Organization";
-      name: string;
       id: string;
+      name: string;
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
@@ -14996,8 +14996,8 @@ export type AdminOrganizationsMembers_queryQuery = {
     initials?: string | null;
     organization: {
       __typename?: "Organization";
-      name: string;
       id: string;
+      name: string;
       petitionsSubscriptionEndDate?: string | null;
       iconUrl92?: string | null;
       isPetitionUsageLimitReached: boolean;
@@ -16610,6 +16610,7 @@ export type OrganizationUsers_orgUsersQueryVariables = Exact<{
 export type OrganizationUsers_orgUsersQuery = {
   me: {
     __typename?: "User";
+    id: string;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -27753,7 +27754,6 @@ export const AdminOrganizationsLayout_QueryFragmentDoc = gql`
     me {
       id
       organization {
-        name
         ...AdminOrganizationsLayout_Organization
       }
     }
@@ -35544,6 +35544,7 @@ export const OrganizationUsers_orgUsersDocument = gql`
     $sortBy: [OrganizationUsers_OrderBy!]
   ) {
     me {
+      id
       organization {
         id
         users(
