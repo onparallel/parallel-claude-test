@@ -1633,8 +1633,12 @@ export type MutationupdateContactArgs = {
 };
 
 export type MutationupdateEventSubscriptionArgs = {
+  eventTypes?: InputMaybe<Array<PetitionEventType>>;
+  eventsUrl?: InputMaybe<Scalars["String"]>;
+  fromTemplateId?: InputMaybe<Scalars["GID"]>;
   id: Scalars["GID"];
-  isEnabled: Scalars["Boolean"];
+  isEnabled?: InputMaybe<Scalars["Boolean"]>;
+  name?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationupdateFeatureFlagsArgs = {
@@ -5417,7 +5421,7 @@ export type DownloadSignedDocument_downloadAuditTrailMutation = {
 export type GetTemplates_templatesQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
-  tagIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  tags?: InputMaybe<PetitionTagFilter>;
   sortBy?: InputMaybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
   includeFields: Scalars["Boolean"];
   includeTags: Scalars["Boolean"];
@@ -6845,7 +6849,7 @@ export const GetTemplates_templatesDocument = gql`
   query GetTemplates_templates(
     $offset: Int!
     $limit: Int!
-    $tagIds: [GID!]
+    $tags: PetitionTagFilter
     $sortBy: [QueryPetitions_OrderBy!]
     $includeFields: Boolean!
     $includeTags: Boolean!
@@ -6854,7 +6858,7 @@ export const GetTemplates_templatesDocument = gql`
       offset: $offset
       limit: $limit
       sortBy: $sortBy
-      filters: { type: TEMPLATE, tagIds: $tagIds }
+      filters: { type: TEMPLATE, tags: $tags }
     ) {
       items {
         ...Template

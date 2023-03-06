@@ -1633,8 +1633,12 @@ export type MutationupdateContactArgs = {
 };
 
 export type MutationupdateEventSubscriptionArgs = {
+  eventTypes?: InputMaybe<Array<PetitionEventType>>;
+  eventsUrl?: InputMaybe<Scalars["String"]>;
+  fromTemplateId?: InputMaybe<Scalars["GID"]>;
   id: Scalars["GID"];
-  isEnabled: Scalars["Boolean"];
+  isEnabled?: InputMaybe<Scalars["Boolean"]>;
+  name?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationupdateFeatureFlagsArgs = {

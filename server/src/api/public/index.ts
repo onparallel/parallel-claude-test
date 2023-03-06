@@ -32,6 +32,7 @@ import {
   UserFragment,
 } from "./fragments";
 import {
+  buildTagsFilter,
   containsGraphQLError,
   getTags,
   getTaskResultFileUrl,
@@ -433,31 +434,13 @@ api
     async ({ client, query }) => {
       let tags: PetitionTagFilter | undefined = undefined;
       if (isDefined(query.tags)) {
-        if (query.tags.length > 0) {
+        try {
           const allTags = await getTags(client);
-          const _tags = query.tags.map((tagName) => allTags.find((t) => t.name === tagName));
-          if (_tags.some((t) => !isDefined(t))) {
+          tags = buildTagsFilter(allTags, query.tags);
+        } catch (e) {
+          if (e instanceof Error && e.message === "UNKNOWN_TAG_NAME") {
             return Ok({ totalCount: 0, items: [] });
           }
-          tags = {
-            filters: [
-              {
-                value: _tags.map((t) => t!.id),
-                operator: "CONTAINS",
-              },
-            ],
-            operator: "AND",
-          };
-        } else {
-          tags = {
-            filters: [
-              {
-                value: [],
-                operator: "IS_EMPTY",
-              },
-            ],
-            operator: "AND",
-          };
         }
       }
 
@@ -2177,24 +2160,22 @@ api.path("/templates").get(
     tags: ["Templates"],
   },
   async ({ client, query }) => {
-    let tagIds: string[] | undefined = undefined;
+    let tags: PetitionTagFilter | undefined = undefined;
     if (isDefined(query.tags)) {
-      if (query.tags.length > 0) {
+      try {
         const allTags = await getTags(client);
-        const tags = query.tags.map((tagName) => allTags.find((t) => t.name === tagName));
-        if (tags.some((t) => !isDefined(t))) {
+        tags = buildTagsFilter(allTags, query.tags);
+      } catch (e) {
+        if (e instanceof Error && e.message === "UNKNOWN_TAG_NAME") {
           return Ok({ totalCount: 0, items: [] });
         }
-        tagIds = tags.map((t) => t!.id);
-      } else {
-        tagIds = [];
       }
     }
     const _query = gql`
       query GetTemplates_templates(
         $offset: Int!
         $limit: Int!
-        $tagIds: [GID!]
+        $tags: PetitionTagFilter
         $sortBy: [QueryPetitions_OrderBy!]
         $includeFields: Boolean!
         $includeTags: Boolean!
@@ -2203,7 +2184,7 @@ api.path("/templates").get(
           offset: $offset
           limit: $limit
           sortBy: $sortBy
-          filters: { type: TEMPLATE, tagIds: $tagIds }
+          filters: { type: TEMPLATE, tags: $tags }
         ) {
           items {
             ...Template
@@ -2215,7 +2196,7 @@ api.path("/templates").get(
     `;
     const result = await client.request(GetTemplates_templatesDocument, {
       ...pick(query, ["offset", "limit", "sortBy"]),
-      tagIds,
+      tags,
       includeFields: query.include?.includes("fields") ?? false,
       includeTags: query.include?.includes("tags") ?? false,
     });

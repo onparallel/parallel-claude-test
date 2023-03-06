@@ -29,6 +29,7 @@ import {
   PetitionFieldReplyFragment,
   PetitionFieldType,
   PetitionFragment,
+  PetitionTagFilter,
   SubscriptionFragment,
   TagFragmentDoc,
   TaskFragment as TaskType,
@@ -328,4 +329,36 @@ export function mapSubscription(subscription: SubscriptionFragment) {
     ...omit(subscription, ["fromTemplate"]),
     fromTemplateId: subscription.fromTemplate?.id,
   };
+}
+
+export function buildTagsFilter(
+  allTags: { id: string; name: string }[],
+  tags: string[]
+): PetitionTagFilter {
+  if (tags.length > 0) {
+    const _tags = tags.map((tagName) => allTags.find((t) => t.name === tagName));
+    if (_tags.some((t) => !isDefined(t))) {
+      throw new Error("UNKNOWN_TAG_NAME");
+    }
+
+    return {
+      filters: [
+        {
+          value: _tags.map((t) => t!.id),
+          operator: "CONTAINS",
+        },
+      ],
+      operator: "AND",
+    };
+  } else {
+    return {
+      filters: [
+        {
+          value: [],
+          operator: "IS_EMPTY",
+        },
+      ],
+      operator: "AND",
+    };
+  }
 }
