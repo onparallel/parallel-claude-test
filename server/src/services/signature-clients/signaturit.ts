@@ -8,6 +8,7 @@ import { CONFIG, Config } from "../../config";
 import { IntegrationRepository } from "../../db/repositories/IntegrationRepository";
 import { OrganizationRepository } from "../../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../../db/repositories/PetitionRepository";
+import { ContactLocale } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
 import SignatureCancelledEmail from "../../emails/emails/SignatureCancelledEmail";
 import SignatureCompletedEmail from "../../emails/emails/SignatureCompletedEmail";
@@ -15,7 +16,7 @@ import SignatureReminderEmail from "../../emails/emails/SignatureReminderEmail";
 import SignatureRequestedEmail from "../../emails/emails/SignatureRequestedEmail";
 import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
 import {
-  BrandingIdKey,
+  SignaturitBrandingIdKey,
   SignaturitIntegration,
   SignaturitIntegrationContext,
 } from "../../integrations/SignaturitIntegration";
@@ -103,7 +104,7 @@ export class SignaturitClient implements ISignatureClient {
         let brandingId = branding?.brandingId;
         if (!brandingId) {
           brandingId = await this.createSignaturitBranding(orgId, locale);
-          const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as BrandingIdKey;
+          const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as SignaturitBrandingIdKey;
           await context.onUpdateBrandingId(key, brandingId);
         }
 
@@ -230,7 +231,7 @@ export class SignaturitClient implements ISignatureClient {
     });
   }
 
-  private async createSignaturitBranding(orgId: number, locale: string) {
+  private async createSignaturitBranding(orgId: number, locale: ContactLocale) {
     return await this.withSignaturitSDK(async (sdk, context) => {
       const intl = await this.i18n.getIntl(locale);
 
@@ -255,7 +256,7 @@ export class SignaturitClient implements ISignatureClient {
   }
 
   private async buildSignaturItBrandingTemplates(
-    locale: string,
+    locale: ContactLocale,
     templateData: OrganizationLayout
   ): Promise<BrandingParams["templates"]> {
     const [

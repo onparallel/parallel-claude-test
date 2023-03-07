@@ -20,12 +20,14 @@ export class ExportRepliesRunner extends TaskRunner<"EXPORT_REPLIES"> {
     const petition = (await this.ctx.petitions.loadPetition(petitionId))!;
     const name = petition.name?.replace(/\./g, "_") ?? "files";
 
+    const userData = await this.ctx.users.loadUserDataByUserId(this.task.user_id);
+
     const zipFile = createZipFile(
       getPetitionFiles(
         petitionId,
         {
           pattern: pattern ?? undefined,
-          locale: petition.locale,
+          locale: userData!.preferred_locale,
           onProgress: async (progress) => {
             const currentProgress = progress * 100;
             // Avoid updating progress too many times.

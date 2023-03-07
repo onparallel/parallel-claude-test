@@ -76,7 +76,7 @@ export async function petitionAccessDelegated(
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       ...layoutProps,
     },
-    { locale: petition.locale }
+    { locale: petition.recipient_locale }
   );
 
   return await context.emailLogs.createEmail({

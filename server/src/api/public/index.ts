@@ -3,6 +3,7 @@ import { ClientError, gql, GraphQLClient } from "graphql-request";
 import { outdent } from "outdent";
 import pMap from "p-map";
 import { isDefined, pick, uniq } from "remeda";
+import { PetitionEventTypeValues } from "../../db/__types";
 import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
 import { toGlobalId } from "../../util/globalId";
 import { Body, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
@@ -68,7 +69,6 @@ import {
   PaginatedUsers,
   Petition,
   PetitionCustomProperties,
-  petitionEventTypes,
   PetitionField,
   PetitionFieldReply,
   SendPetition,
@@ -2585,7 +2585,7 @@ api.path("/petition-events").get(
         required: false,
       }),
       eventTypes: enumParam({
-        values: petitionEventTypes,
+        values: PetitionEventTypeValues,
         description: "Filter events by types",
         required: false,
         array: true,

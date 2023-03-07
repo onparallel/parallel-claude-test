@@ -4,7 +4,13 @@ import pMap from "p-map";
 import { isDefined, omit } from "remeda";
 import { validateFieldOptions } from "../db/helpers/fieldOptions";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
-import { PetitionFieldType, PetitionFieldTypeValues, User } from "../db/__types";
+import {
+  ContactLocale,
+  ContactLocaleValues,
+  PetitionFieldType,
+  PetitionFieldTypeValues,
+  User,
+} from "../db/__types";
 import { validateFieldVisibilityConditions } from "../graphql/helpers/validators/validFieldVisibility";
 import { validateRichTextContent } from "../graphql/helpers/validators/validRichTextContent";
 import { safeJsonParse } from "../util/safeJsonParse";
@@ -18,7 +24,7 @@ const PETITION_JSON_SCHEMA = {
   additionalProperties: false,
   properties: {
     name: { type: ["string", "null"] },
-    locale: { type: "string", enum: ["en", "es"] },
+    locale: { type: "string", enum: ContactLocaleValues },
     isTemplate: { type: "boolean" },
     templateDescription: { type: ["array", "null"], items: { type: "object" } },
     fields: {
@@ -64,7 +70,7 @@ const PETITION_JSON_SCHEMA = {
 
 interface PetitionJson {
   name: Maybe<string>;
-  locale: string;
+  locale: ContactLocale;
   isTemplate: boolean;
   templateDescription: Maybe<string>;
   fields: {
@@ -106,7 +112,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
     const customFieldIds: number[] = [];
     return {
       name: petition.name,
-      locale: petition.locale,
+      locale: petition.recipient_locale,
       isTemplate: petition.is_template,
       templateDescription: safeJsonParse(petition.template_description),
       fields: fields.map((field) => {
@@ -173,7 +179,9 @@ export class PetitionImportExportService implements IPetitionImportExportService
       const petition = await this.petitions.createPetition(
         {
           name: json.name,
+          /** @deprecated REMOVE! */
           locale: json.locale,
+          recipient_locale: json.locale as ContactLocale,
           is_template: json.isTemplate,
           template_description: isDefined(json.templateDescription)
             ? JSON.stringify(json.templateDescription)

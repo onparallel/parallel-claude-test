@@ -55,7 +55,7 @@ export async function petitionMessageBounced(
       contactEmail: contact.email,
       ...layoutProps,
     },
-    { locale: senderData.details?.preferredLocale ?? "en" }
+    { locale: senderData.preferred_locale }
   );
 
   return await context.emailLogs.createEmail({

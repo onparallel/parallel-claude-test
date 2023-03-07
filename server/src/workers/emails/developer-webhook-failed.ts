@@ -41,7 +41,7 @@ export async function developerWebhookFailed(
       postBody: payload.post_body,
       ...layoutProps,
     },
-    { locale: subscribedUserData.details?.preferredLocale ?? "en" }
+    { locale: subscribedUserData.preferred_locale }
   );
   return await context.emailLogs.createEmail({
     from: buildFrom(from, emailFrom),

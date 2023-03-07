@@ -9,6 +9,10 @@ type Maybe<T> = T | null;
 
 type PartialProps<T, K extends keyof T = never> = Omit<T, K> & Partial<Pick<T, K>>;
 
+export type ContactLocale = "en" | "es";
+
+export const ContactLocaleValues = ["en", "es"] as ContactLocale[];
+
 export type FeatureFlagName =
   | "PETITION_SIGNATURE"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
@@ -343,6 +347,10 @@ export const TaskNameValues = [
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";
 
 export const TaskStatusValues = ["ENQUEUED", "PROCESSING", "COMPLETED", "FAILED"] as TaskStatus[];
+
+export type UserLocale = "en" | "es";
+
+export const UserLocaleValues = ["en", "es"] as UserLocale[];
 
 export type UserOrganizationRole = "COLLABORATOR" | "NORMAL" | "ADMIN" | "OWNER";
 
@@ -858,6 +866,7 @@ export interface Petition {
   default_path: string; // text
   latest_signature_status: Maybe<string>; // varchar
   send_on_behalf_user_id: Maybe<number>; // int4
+  recipient_locale: ContactLocale; // contact_locale
 }
 
 export type CreatePetition = PartialProps<
@@ -1544,6 +1553,7 @@ export interface UserData {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  preferred_locale: UserLocale; // user_locale
 }
 
 export type CreateUserData = PartialProps<

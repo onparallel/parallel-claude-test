@@ -48,7 +48,7 @@ export async function signatureCancelledRequestError(
         })),
         ...layoutProps,
       },
-      { locale: userData.details?.preferredLocale ?? "en" }
+      { locale: userData.preferred_locale }
     );
 
     emails.push(

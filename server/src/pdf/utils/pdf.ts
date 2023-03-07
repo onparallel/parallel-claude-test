@@ -1,10 +1,11 @@
 import { GraphQLClient } from "graphql-request";
 import { ComponentType } from "react";
+import { ContactLocale } from "../../db/__types";
 import { MaybePromise } from "../../util/types";
 
 export interface PdfDocumentGetPropsContext {
   client?: GraphQLClient;
-  locale: string;
+  locale: ContactLocale;
 }
 
 export type PdfDocumentGetProps<ID = unknown, P = ID> = (

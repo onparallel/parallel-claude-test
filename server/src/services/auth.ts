@@ -46,7 +46,7 @@ import { OrganizationRepository } from "../db/repositories/OrganizationRepositor
 import { SystemRepository } from "../db/repositories/SystemRepository";
 import { UserAuthenticationRepository } from "../db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
-import { User } from "../db/__types";
+import { User, UserLocale } from "../db/__types";
 import { ApolloError, ForbiddenError } from "../graphql/helpers/errors";
 import { awsLogger } from "../util/awsLogger";
 import { fullName } from "../util/fullName";
@@ -75,7 +75,7 @@ export interface IAuth {
   changePassword(req: IncomingMessage, password: string, newPassword: string): Promise<void>;
   updateSessionLogin(req: Request, userId: number, asUserId: number): Promise<void>;
   restoreSessionLogin(req: Request, userId: number): Promise<void>;
-  resetTempPassword(email: string, locale: string): Promise<void>;
+  resetTempPassword(email: string, locale: UserLocale): Promise<void>;
   verifyCaptcha(captcha: string, ip: string): Promise<boolean>;
   getOrCreateCognitoUser(
     email: string,
@@ -85,7 +85,7 @@ export interface IAuth {
     clientMetadata: {
       organizationName: string;
       organizationUser: string;
-      locale: string;
+      locale: UserLocale;
     },
     sendInviteEmail?: boolean
   ): Promise<string>;
@@ -94,16 +94,17 @@ export interface IAuth {
     password: string,
     firstName: string,
     lastName: string,
-    clientMetadata: { locale: string }
+    clientMetadata: { locale: UserLocale }
   ): Promise<string>;
   deleteUser(email: string): Promise<void>;
-  resendVerificationCode(email: string, clientMetadata: { locale: string }): Promise<void>;
+  resendVerificationCode(email: string, clientMetadata: { locale: UserLocale }): Promise<void>;
+
   resetUserPassword(
     email: string,
     clientMetadata: {
       organizationName: string;
       organizationUser: string;
-      locale: string;
+      locale: UserLocale;
     }
   ): Promise<void>;
 }
@@ -149,7 +150,7 @@ export class Auth implements IAuth {
     clientMetadata: {
       organizationName: string;
       organizationUser: string;
-      locale: string;
+      locale: UserLocale;
     },
     sendInviteEmail?: boolean
   ) {
@@ -196,7 +197,7 @@ export class Auth implements IAuth {
     password: string,
     firstName: string,
     lastName: string,
-    clientMetadata: { locale: string }
+    clientMetadata: { locale: UserLocale }
   ) {
     const res = await this.cognitoIdP.send(
       new SignUpCommand({
@@ -224,7 +225,7 @@ export class Auth implements IAuth {
     );
   }
 
-  async resendVerificationCode(email: string, clientMetadata: { locale: string }) {
+  async resendVerificationCode(email: string, clientMetadata: { locale: UserLocale }) {
     await this.cognitoIdP.send(
       new ResendConfirmationCodeCommand({
         ClientId: this.config.cognito.clientId,
@@ -341,6 +342,7 @@ export class Auth implements IAuth {
             cognito_id: cognitoId,
             is_sso_user: true,
             details: { source: "SSO" },
+            preferred_locale: state.has("locale") ? (state.get("locale") as UserLocale) : "en",
           },
           `OrganizationSSO:${org.id}`
         );
@@ -379,7 +381,7 @@ export class Auth implements IAuth {
       });
       this.setSession(res, token);
       const prefix =
-        userData?.details?.preferredLocale ?? state.has("locale") ? `/${state.get("locale")}` : "";
+        userData?.preferred_locale ?? state.has("locale") ? `/${state.get("locale")}` : "";
       const path =
         state.has("redirect") && state.get("redirect")!.startsWith("/")
           ? state.get("redirect")!
@@ -408,7 +410,7 @@ export class Auth implements IAuth {
         const userData = await this.users.loadUserData(user.user_data_id);
         await this.trackSessionLogin(user);
         this.setSession(res, token);
-        res.status(201).send({ preferredLocale: userData?.details?.preferredLocale });
+        res.status(201).send({ preferredLocale: userData?.preferred_locale });
       } else if (auth.ChallengeName === "NEW_PASSWORD_REQUIRED") {
         res.status(401).send({ error: "NewPasswordRequired" });
       } else {
@@ -819,7 +821,11 @@ export class Auth implements IAuth {
   }
 
   async verifyEmail(req: Request, res: Response, next: NextFunction) {
-    const { email, code, locale } = req.query as { email: string; code: string; locale: string };
+    const { email, code, locale } = req.query as {
+      email: string;
+      code: string;
+      locale: UserLocale;
+    };
     try {
       const [user] = await req.context.users.loadUsersByEmail(email);
       if (user) {
@@ -861,7 +867,7 @@ export class Auth implements IAuth {
     await this.redis.set(`session:${token}:meta`, JSON.stringify({ userId }), this.EXPIRY);
   }
 
-  async resetTempPassword(email: string, locale: string) {
+  async resetTempPassword(email: string, locale: UserLocale) {
     const [users, cognitoUser] = await Promise.all([
       this.users.loadUsersByEmail(email),
       this.getUser(email),
@@ -917,7 +923,11 @@ export class Auth implements IAuth {
 
   async resetUserPassword(
     email: string,
-    clientMetadata: { organizationName: string; organizationUser: string; locale: string }
+    clientMetadata: {
+      organizationName: string;
+      organizationUser: string;
+      locale: UserLocale;
+    }
   ): Promise<void> {
     await this.cognitoIdP.send(
       new AdminCreateUserCommand({

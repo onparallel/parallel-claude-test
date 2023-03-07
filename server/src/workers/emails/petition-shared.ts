@@ -63,7 +63,7 @@ export async function petitionShared(
         isTemplate: _petitions[0]!.is_template,
         ...layoutProps,
       },
-      { locale: permissionUserData.details?.preferredLocale ?? "en" }
+      { locale: permissionUserData.preferred_locale }
     );
     const email = await context.emailLogs.createEmail({
       from: buildFrom(from, emailFrom),

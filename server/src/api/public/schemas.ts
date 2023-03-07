@@ -1,10 +1,10 @@
 import { JSONSchema6TypeName } from "json-schema";
 import { FromSchema } from "json-schema-to-ts";
 import { outdent } from "outdent";
-import { PetitionEventType, PetitionFieldReplyStatusValues } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { titleize } from "../../util/strings";
 import { JsonSchema, JsonSchemaFor, schema } from "../rest/schemas";
+import { NexusGenEnums } from "./../../graphql/__types";
 
 function _ListOf<T extends JsonSchema>(item: T) {
   return {
@@ -1746,7 +1746,7 @@ const PetitionEventSchemas = {
     properties: {
       status: {
         description: "The new status of the reply",
-        enum: PetitionFieldReplyStatusValues,
+        enum: ["PENDING", "REJECTED", "APPROVED"],
         type: "string",
         example: "APPROVED",
       },
@@ -1773,9 +1773,11 @@ const PetitionEventSchemas = {
       },
     },
   },
-} as Record<PetitionEventType, JsonSchema>;
+} as Record<NexusGenEnums["PetitionEventType"], JsonSchema>;
 
-export const petitionEventTypes = Object.keys(PetitionEventSchemas) as PetitionEventType[];
+export const petitionEventTypes = Object.keys(
+  PetitionEventSchemas
+) as NexusGenEnums["PetitionEventType"][];
 
 export const _PetitionEvent = {
   type: "object",
@@ -1796,7 +1798,7 @@ export const _PetitionEvent = {
             },
             type: {
               type: "string",
-              const: event as PetitionEventType,
+              const: event as NexusGenEnums["PetitionEventType"],
               description: `\`${event}\``,
               example: event,
             },
@@ -1825,7 +1827,7 @@ export const _PetitionEvent = {
 
 export const PetitionEvent = _PetitionEvent as JsonSchemaFor<{
   id: string;
-  type: PetitionEventType;
+  type: NexusGenEnums["PetitionEventType"];
   petitionId: string;
   data: any;
   createdAt: string;

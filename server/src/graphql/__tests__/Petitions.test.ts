@@ -51,7 +51,9 @@ function petitionsBuilder(orgId: number, signatureIntegrationId: number) {
     org_id: orgId,
     created_at: new Date(),
     created_by: "User:1",
+    /** @deprecated REMOVE! */
     locale: "en",
+    recipient_locale: "en",
     name: index > 5 ? `Template ${index}` : `Petition ${index}`,
     template_description: index > 5 ? `Template description ${index}` : null,
     signature_config:
@@ -178,7 +180,7 @@ describe("GraphQL/Petitions", () => {
 
     // a public template from secondary organization
     [publicTemplate] = await mocks.createRandomPetitions(otherOrg.id, otherUser.id, 1, () => ({
-      locale: "en",
+      recipient_locale: "en",
       template_public: true,
       is_template: true,
       status: null,
@@ -1246,7 +1248,7 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toBeUndefined();
       expect(data!.createPetition).toEqual({
         name: null, // name is not copied when making a petition from template
-        locale: publicTemplate.locale,
+        locale: publicTemplate.recipient_locale,
         owner: { id: toGlobalId("User", sessionUser.id) },
         status: "DRAFT",
         __typename: "Petition",
@@ -1622,7 +1624,7 @@ describe("GraphQL/Petitions", () => {
       expect(data!.clonePetitions).toEqual([
         {
           name: petition.name!.concat(" (copy)"),
-          locale: petition.locale,
+          locale: petition.recipient_locale,
           owner: { id: toGlobalId("User", sessionUser.id) },
           status: "DRAFT",
           __typename: "Petition",
@@ -1664,7 +1666,9 @@ describe("GraphQL/Petitions", () => {
       });
       expect(errors).toBeUndefined();
       expect(data!.clonePetitions[0]).toEqual({
-        name: publicTemplate.name?.concat(publicTemplate.locale === "en" ? " (copy)" : " (copia)"),
+        name: publicTemplate.name?.concat(
+          publicTemplate.recipient_locale === "en" ? " (copy)" : " (copia)"
+        ),
         isPublic: false,
         __typename: "PetitionTemplate",
       });

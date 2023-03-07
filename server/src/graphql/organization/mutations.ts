@@ -301,6 +301,7 @@ export const createOrganization = mutationField("createOrganization", {
     firstName: nonNull(stringArg({ description: "First name of the organization owner" })),
     lastName: nonNull(stringArg({ description: "Last name of the organization owner" })),
     email: nonNull(stringArg({ description: "Email of the organization owner" })),
+    // TODO make UserLocale
     locale: nonNull("PetitionLocale"),
   },
   authorize: authenticateAnd(userIsSuperAdmin()),
@@ -330,7 +331,7 @@ export const createOrganization = mutationField("createOrganization", {
       args.firstName,
       args.lastName,
       {
-        locale: args.locale ?? "en",
+        locale: args.locale,
         organizationName: org.name,
         organizationUser: fullName(userData.first_name, userData.last_name),
       },
@@ -347,7 +348,12 @@ export const createOrganization = mutationField("createOrganization", {
         email,
         first_name: args.firstName,
         last_name: args.lastName,
-        details: { source: "parallel", preferredLocale: args.locale ?? "en" },
+        details: {
+          source: "parallel",
+          /** @deprecated REMOVE! */
+          preferredLocale: args.locale,
+        },
+        preferred_locale: args.locale,
       },
       `User:${ctx.user!.id}`
     );

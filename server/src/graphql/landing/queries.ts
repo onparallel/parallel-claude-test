@@ -33,7 +33,7 @@ export const LandingTemplate = objectType({
     });
     t.field("locale", {
       type: "PetitionLocale",
-      resolve: (o) => o.locale as any,
+      resolve: (o) => o.recipient_locale,
     });
     t.nullable.string("shortDescription", {
       resolve: (o) => o.public_metadata.description,
@@ -105,7 +105,7 @@ export const LandingTemplate = objectType({
         // for now we just expose only the first created
         const [link] = await ctx.petitions.loadPublicPetitionLinksByTemplateId(root.id);
         return link?.is_active
-          ? `${ctx.config.misc.parallelUrl}/${root.locale}/pp/${link.slug}`
+          ? `${ctx.config.misc.parallelUrl}/${root.recipient_locale}/pp/${link.slug}`
           : null;
       },
     });
@@ -117,6 +117,7 @@ export const landingQueries = queryField((t) => {
     type: "LandingTemplate",
     extendArgs: {
       categories: list(nonNull(stringArg())),
+      // TODO make ContactLocale
       locale: nonNull(arg({ type: "PetitionLocale" })),
     },
     resolve: (_, { offset, limit, locale, categories }, ctx) => {
@@ -148,6 +149,7 @@ export const landingQueries = queryField((t) => {
         t.paginationField("templates", {
           type: "LandingTemplate",
           extendArgs: {
+            // TODO make ContactLocale
             locale: nonNull(arg({ type: "PetitionLocale" })),
           },
           resolve: (category, { limit, offset, locale }, ctx) => {

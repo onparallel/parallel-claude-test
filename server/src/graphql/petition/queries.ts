@@ -165,6 +165,7 @@ export const templatesQuery = queryField((t) => {
     authorize: authenticate(),
     extendArgs: {
       path: stringArg(),
+      // TODO make ContactLocale
       locale: arg({ type: "PetitionLocale" }),
       isPublic: nonNull(booleanArg()),
       isOwner: booleanArg(),

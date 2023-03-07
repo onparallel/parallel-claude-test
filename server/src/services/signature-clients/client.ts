@@ -1,3 +1,5 @@
+import { ContactLocale } from "../../db/__types";
+
 interface Document {
   id: string;
   created_at: Date;
@@ -16,7 +18,7 @@ interface Document {
 }
 
 export interface SignatureOptions {
-  locale: string;
+  locale: ContactLocale;
   /**
    * Optional plain-text custom message to include in the "signature requested" emails
    */

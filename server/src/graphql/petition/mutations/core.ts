@@ -115,6 +115,7 @@ export const createPetition = mutationField("createPetition", {
   ),
   args: {
     name: stringArg(),
+    // TODO: make nonNull ContactLocale
     locale: arg({ type: "PetitionLocale" }),
     petitionId: globalIdArg("Petition", {
       description: "GID of petition to base from",
@@ -208,7 +209,9 @@ export const createPetition = mutationField("createPetition", {
       petition = await ctx.petitions.createPetition(
         {
           name,
+          /** @deprecated REMOVE! */
           locale: locale!,
+          recipient_locale: locale!,
           email_subject: name,
           is_template: isTemplate,
           path: path ?? undefined,
@@ -248,7 +251,11 @@ export const clonePetitions = mutationField("clonePetitions", {
     return await pMap(
       unMaybeArray(args.petitionIds),
       async (petitionId) => {
-        const { name, locale, path } = (await ctx.petitions.loadPetition(petitionId))!;
+        const {
+          name,
+          recipient_locale: locale,
+          path,
+        } = (await ctx.petitions.loadPetition(petitionId))!;
         const intl = await ctx.i18n.getIntl(locale);
         const mark = `(${intl.formatMessage({
           id: "generic.copy",
@@ -757,7 +764,9 @@ export const updatePetition = mutationField("updatePetition", {
       data.name = name?.trim() || null;
     }
     if (isDefined(locale)) {
+      /** @deprecated REMOVE! */
       data.locale = locale;
+      data.recipient_locale = locale;
     }
     if (deadline !== undefined) {
       data.deadline = deadline;
@@ -2200,7 +2209,7 @@ export const createPublicPetitionLinkPrefillData = mutationField(
         ? `${protocol}://${org.custom_host}`
         : ctx.config.misc.parallelUrl;
 
-      return `${prefix}/${template.locale}/pp/${publicLink.slug}?${new URLSearchParams({
+      return `${prefix}/${template.recipient_locale}/pp/${publicLink.slug}?${new URLSearchParams({
         pk: prefillData.keycode,
       })}`;
     },
