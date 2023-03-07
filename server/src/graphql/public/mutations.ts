@@ -183,7 +183,7 @@ export const publicSendVerificationCode = mutationField("publicSendVerificationC
 
         const petition = await ctx.petitions.loadPetition(ctx.access!.petition_id);
         const contact = await ctx.contacts.loadContactByEmail({
-          email,
+          email: email.toLowerCase(),
           orgId: petition!.org_id,
         });
 
@@ -209,7 +209,7 @@ export const publicSendVerificationCode = mutationField("publicSendVerificationC
         ip: getClientIp(ctx.req),
         contact_first_name: firstName,
         contact_last_name: lastName,
-        contact_email: email,
+        contact_email: email?.toLowerCase(),
       });
       await ctx.emails.sendContactAuthenticationRequestEmail(request.id, isContactless);
       return {
