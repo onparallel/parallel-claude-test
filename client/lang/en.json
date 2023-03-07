@@ -3695,6 +3695,11 @@
     "context": "Internal field"
   },
   {
+    "term": "component.petition-settings.petition-show-activity-pdf",
+    "definition": "Show reply activity",
+    "context": "Show reply activity"
+  },
+  {
     "term": "component.petition-settings.petition-shown-in-pdf",
     "definition": "Show in PDF",
     "context": "Show in PDF"
@@ -6358,6 +6363,11 @@
     "term": "field-settings.reference-invalid-error",
     "definition": "Use only letters, numbers or _",
     "context": "Use only letters, numbers or _"
+  },
+  {
+    "term": "field-settings.show-activity-pdf-description",
+    "definition": "Enable this option to include who and when added each reply and their approval in the pdf.",
+    "context": "Enable this option to include who and when added each reply and their approval in the pdf."
   },
   {
     "term": "field-settings.show-in-pdf-description",

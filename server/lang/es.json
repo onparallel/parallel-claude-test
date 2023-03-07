@@ -185,6 +185,16 @@
     "context": "No replies have been submitted."
   },
   {
+    "term": "document.petition-export.reply-approved-by",
+    "definition": "Aprobado por {name} el {date}",
+    "context": "Approved by {name} on {date}"
+  },
+  {
+    "term": "document.petition-export.reply-updated-by",
+    "definition": "Respuesta por {name} el {date}",
+    "context": "Reply by {name} on {date}"
+  },
+  {
     "term": "document.petition-export.view-replies-in-nd",
     "definition": "Ver respuestas en ND",
     "context": "See answers in ND"
@@ -378,6 +388,16 @@
     "term": "generic.copy",
     "definition": "copia",
     "context": "copy"
+  },
+  {
+    "term": "generic.deleted-contact",
+    "definition": "Contacto eliminado",
+    "context": "Deleted Contact"
+  },
+  {
+    "term": "generic.deleted-user",
+    "definition": "Usuario eliminado",
+    "context": "Deleted user"
   },
   {
     "term": "generic.no",

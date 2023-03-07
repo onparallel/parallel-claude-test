@@ -7,13 +7,14 @@ import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fileSize } from "../../util/fileSize";
 import { formatNumberWithPrefix } from "../../util/formatNumberWithPrefix";
 import { isFileTypeField } from "../../util/isFileTypeField";
+import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
+import { FieldActivity } from "../components/FieldActivity";
 import { FieldDescription } from "../components/FieldDescription";
 import { NetDocumentsExternalLink } from "../components/NetDocumentsExternalLink";
 import { SignaturesBlock } from "../components/SignaturesBlock";
 import { cleanupText } from "../utils/cleanupText";
 import { PdfDocumentGetProps } from "../utils/pdf";
 import { ThemeProvider } from "../utils/ThemeProvider";
-import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { LiquidProvider, LiquidScopeProvider } from "../utils/useLiquid";
 import { useLiquidScope } from "../utils/useLiquidScope";
 import {
@@ -232,89 +233,94 @@ export default function PetitionExport({
                           </View>
                         ) : null}
                         <View style={styles.fieldReplies}>
-                          {field.replies.map((reply) =>
-                            isFileTypeField(field.type) ? (
-                              <View
-                                key={reply.id}
-                                style={[
-                                  {
-                                    display: "flex",
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                  },
-                                ]}
-                              >
-                                <Text style={[styles.text]}>
-                                  {`${reply.content.filename} - ${fileSize(
-                                    intl,
-                                    reply.content.size
-                                  )}`}
-                                  {reply.status === "APPROVED" ? null : (
-                                    <Text style={[styles.text]}>
-                                      {" "}
-                                      <FormattedMessage
-                                        id="document.petition-export.file-pending-review"
-                                        defaultMessage="(Pending review)"
-                                      />
-                                    </Text>
-                                  )}
-                                </Text>
-                                {includeNetDocumentsLinks &&
-                                reply.metadata.EXTERNAL_ID_CUATRECASAS ? (
-                                  <NetDocumentsExternalLink
-                                    variant="button"
-                                    style={{ marginLeft: "1mm" }}
-                                    externalId={reply.metadata.EXTERNAL_ID_CUATRECASAS}
-                                  />
-                                ) : null}
-                              </View>
-                            ) : field.type === "DYNAMIC_SELECT" ? (
-                              <View key={reply.id}>
-                                {(reply.content.value as [string, string | null][]).map(
-                                  ([label, value], i) => (
-                                    <Text style={[styles.text]} key={i}>
-                                      {label}:{" "}
-                                      {value ?? (
-                                        <Text style={[styles.text, styles.noReplies]}>
-                                          <FormattedMessage
-                                            id="document.petition-export.no-replies"
-                                            defaultMessage="No replies have been submitted."
-                                          />
-                                        </Text>
-                                      )}
-                                    </Text>
-                                  )
-                                )}
-                              </View>
-                            ) : field.type === "CHECKBOX" ? (
-                              <View key={reply.id}>
-                                {(reply.content.value as [string]).map((value, i) => (
-                                  <Text style={[styles.text]} key={i}>
-                                    {value}
+                          {field.replies.map((reply) => (
+                            <>
+                              {isFileTypeField(field.type) ? (
+                                <View
+                                  key={reply.id}
+                                  style={[
+                                    {
+                                      display: "flex",
+                                      flexDirection: "row",
+                                      alignItems: "center",
+                                    },
+                                  ]}
+                                >
+                                  <Text style={[styles.text]}>
+                                    {`${reply.content.filename} - ${fileSize(
+                                      intl,
+                                      reply.content.size
+                                    )}`}
+                                    {reply.status === "APPROVED" ? null : (
+                                      <Text style={[styles.text]}>
+                                        {" "}
+                                        <FormattedMessage
+                                          id="document.petition-export.file-pending-review"
+                                          defaultMessage="(Pending review)"
+                                        />
+                                      </Text>
+                                    )}
                                   </Text>
-                                ))}
-                              </View>
-                            ) : field.type === "NUMBER" ? (
-                              <Text style={[styles.text]} key={reply.id}>
-                                {formatNumberWithPrefix(reply.content.value, field!.options)}
-                              </Text>
-                            ) : field.type === "DATE" ? (
-                              <Text style={[styles.text]} key={reply.id}>
-                                {intl.formatDate(reply.content.value, {
-                                  ...FORMATS.L,
-                                  timeZone: "UTC",
-                                })}
-                              </Text>
-                            ) : field.type === "PHONE" ? (
-                              <Text style={[styles.text]} key={reply.id}>
-                                {reply.content.value}
-                              </Text>
-                            ) : (
-                              <Text style={[styles.text]} key={reply.id}>
-                                {reply.content.value}
-                              </Text>
-                            )
-                          )}
+                                  {includeNetDocumentsLinks &&
+                                  reply.metadata.EXTERNAL_ID_CUATRECASAS ? (
+                                    <NetDocumentsExternalLink
+                                      variant="button"
+                                      style={{ marginLeft: "1mm" }}
+                                      externalId={reply.metadata.EXTERNAL_ID_CUATRECASAS}
+                                    />
+                                  ) : null}
+                                </View>
+                              ) : field.type === "DYNAMIC_SELECT" ? (
+                                <View key={reply.id}>
+                                  {(reply.content.value as [string, string | null][]).map(
+                                    ([label, value], i) => (
+                                      <Text style={[styles.text]} key={i}>
+                                        {label}:{" "}
+                                        {value ?? (
+                                          <Text style={[styles.text, styles.noReplies]}>
+                                            <FormattedMessage
+                                              id="document.petition-export.no-replies"
+                                              defaultMessage="No replies have been submitted."
+                                            />
+                                          </Text>
+                                        )}
+                                      </Text>
+                                    )
+                                  )}
+                                </View>
+                              ) : field.type === "CHECKBOX" ? (
+                                <View key={reply.id}>
+                                  {(reply.content.value as [string]).map((value, i) => (
+                                    <Text style={[styles.text]} key={i}>
+                                      {value}
+                                    </Text>
+                                  ))}
+                                </View>
+                              ) : field.type === "NUMBER" ? (
+                                <Text style={[styles.text]} key={reply.id}>
+                                  {formatNumberWithPrefix(reply.content.value, field!.options)}
+                                </Text>
+                              ) : field.type === "DATE" ? (
+                                <Text style={[styles.text]} key={reply.id}>
+                                  {intl.formatDate(reply.content.value, {
+                                    ...FORMATS.L,
+                                    timeZone: "UTC",
+                                  })}
+                                </Text>
+                              ) : field.type === "PHONE" ? (
+                                <Text style={[styles.text]} key={reply.id}>
+                                  {reply.content.value}
+                                </Text>
+                              ) : (
+                                <Text style={[styles.text]} key={reply.id}>
+                                  {reply.content.value}
+                                </Text>
+                              )}
+                              {petition.__typename === "Petition" && field.showActivityInPdf ? (
+                                <FieldActivity reply={reply} style={styles.text} />
+                              ) : null}
+                            </>
+                          ))}
                           {field.replies.length === 0 ? (
                             <Text style={[styles.text, styles.noReplies]}>
                               {isFileTypeField(field.type) ? (
@@ -415,6 +421,7 @@ PetitionExport.fragments = {
         __typename
       }
       ${this.PetitionField}
+
       ${SignaturesBlock.fragments.SignatureConfig}
       ${useLiquidScope.fragments.PetitionBase}
     `;
@@ -428,14 +435,17 @@ PetitionExport.fragments = {
         options
         description
         showInPdf
+        showActivityInPdf
         visibility
         replies {
           id
           status
           content
           metadata
+          ...FieldActivity_PetitionFieldReply
         }
       }
+      ${FieldActivity.fragments.PetitionFieldReply}
     `;
   },
 };

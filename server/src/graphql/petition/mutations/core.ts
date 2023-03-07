@@ -958,6 +958,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           t.nullable.boolean("multiple");
           t.nullable.boolean("isInternal");
           t.nullable.boolean("showInPdf");
+          t.nullable.boolean("showActivityInPdf");
           t.nullable.field("visibility", { type: "JSONObject" });
           t.nullable.string("alias");
           t.nullable.boolean("hasCommentsEnabled");
@@ -995,6 +996,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       alias,
       isInternal,
       showInPdf,
+      showActivityInPdf,
       hasCommentsEnabled,
     } = args.data;
     const data: Partial<CreatePetitionField> = {};
@@ -1016,6 +1018,10 @@ export const updatePetitionField = mutationField("updatePetitionField", {
 
     if (isDefined(showInPdf)) {
       data.show_in_pdf = showInPdf;
+    }
+
+    if (isDefined(showActivityInPdf)) {
+      data.show_activity_in_pdf = showActivityInPdf;
     }
 
     if (alias !== undefined) {

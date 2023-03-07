@@ -3119,6 +3119,11 @@ type PetitionField {
   replies: [PetitionFieldReply!]!
 
   """
+  Determines if the field last activity is visible in PDF export.
+  """
+  showActivityInPdf: Boolean!
+
+  """
   Determines if the field is visible in PDF export.
   """
   showInPdf: Boolean!
@@ -3260,6 +3265,16 @@ A reply to a petition field
 """
 type PetitionFieldReply implements Timestamps {
   """
+  When the reply was created or last updated
+  """
+  approvedAt: DateTime
+
+  """
+  The person that approved the reply.
+  """
+  approvedBy: User
+
+  """
   The content of the reply.
   """
   content: JSONObject!
@@ -3284,6 +3299,16 @@ type PetitionFieldReply implements Timestamps {
   Metadata for this reply.
   """
   metadata: JSONObject!
+
+  """
+  When the reply was created or last updated
+  """
+  repliedAt: DateTime!
+
+  """
+  The person that created the reply or the last person that edited the reply.
+  """
+  repliedBy: UserOrPetitionAccess
 
   """
   The status of the reply.
@@ -5587,6 +5612,7 @@ input UpdatePetitionFieldInput {
   multiple: Boolean
   optional: Boolean
   options: JSONObject
+  showActivityInPdf: Boolean
   showInPdf: Boolean
   title: String
   visibility: JSONObject

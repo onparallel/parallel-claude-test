@@ -1,6 +1,7 @@
 import { extension } from "mime-types";
 import { arg, enumType, inputObjectType, interfaceType, objectType, unionType } from "nexus";
-import { isDefined, minBy } from "remeda";
+import { findLast, isDefined, minBy } from "remeda";
+import { ReplyStatusChangedEvent } from "../../../db/events";
 import {
   PetitionAttachment,
   PetitionAttachmentType,
@@ -563,6 +564,10 @@ export const PetitionField = objectType({
       description: "Determines if the field is visible in PDF export.",
       resolve: (o) => o.type !== "DOW_JONES_KYC" && o.show_in_pdf,
     });
+    t.boolean("showActivityInPdf", {
+      description: "Determines if the field last activity is visible in PDF export.",
+      resolve: (o) => o.type !== "DOW_JONES_KYC" && o.show_activity_in_pdf,
+    });
     t.boolean("isReadOnly", {
       description: "Determines if the field accepts replies",
       resolve: ({ type }) => ["HEADING"].includes(type),
@@ -933,6 +938,67 @@ export const PetitionFieldReply = objectType({
           const access = await ctx.petitions.loadAccess(root.petition_access_id!);
           return access && { __type: "PetitionAccess", ...access };
         }
+      },
+    });
+    t.nullable.field("repliedBy", {
+      type: "UserOrPetitionAccess",
+      description: "The person that created the reply or the last person that edited the reply.",
+      resolve: async (root, _, ctx) => {
+        const event = findLast(
+          await ctx.petitions.loadPetitionFieldReplyEvents(root.id),
+          (e) => e.type === "REPLY_CREATED" || e.type === "REPLY_UPDATED"
+        )!;
+
+        if (isDefined(event.data.user_id)) {
+          const user = await ctx.users.loadUser(event.data.user_id);
+          return user && { __type: "User", ...user };
+        } else {
+          const access = await ctx.petitions.loadAccess(event.data.petition_access_id!);
+          return access && { __type: "PetitionAccess", ...access };
+        }
+      },
+    });
+    t.datetime("repliedAt", {
+      description: "When the reply was created or last updated",
+      resolve: async (root, _, ctx) => {
+        const event = findLast(
+          await ctx.petitions.loadPetitionFieldReplyEvents(root.id),
+          (e) => e.type === "REPLY_CREATED" || e.type === "REPLY_UPDATED"
+        )!;
+        return event.created_at;
+      },
+    });
+    t.nullable.field("approvedBy", {
+      type: "User",
+      description: "The person that approved the reply.",
+      resolve: async (root, _, ctx) => {
+        if (root.status !== "APPROVED") {
+          return null;
+        }
+        const event = findLast(
+          await ctx.petitions.loadPetitionFieldReplyEvents(root.id),
+          (e) => e.type === "REPLY_STATUS_CHANGED"
+        ) as ReplyStatusChangedEvent;
+        if (!isDefined(event) || event.data.status !== "APPROVED") {
+          return null;
+        }
+        return ctx.users.loadUser(event.data.user_id!);
+      },
+    });
+    t.nullable.datetime("approvedAt", {
+      description: "When the reply was created or last updated",
+      resolve: async (root, _, ctx) => {
+        if (root.status !== "APPROVED") {
+          return null;
+        }
+        const event = findLast(
+          await ctx.petitions.loadPetitionFieldReplyEvents(root.id),
+          (e) => e.type === "REPLY_STATUS_CHANGED"
+        ) as ReplyStatusChangedEvent;
+        if (!isDefined(event) || event.data.status !== "APPROVED") {
+          return null;
+        }
+        return event.created_at;
       },
     });
     t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });

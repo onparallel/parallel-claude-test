@@ -2528,6 +2528,8 @@ export type PetitionField = {
   position: Scalars["Int"];
   /** The replies to the petition field */
   replies: Array<PetitionFieldReply>;
+  /** Determines if the field last activity is visible in PDF export. */
+  showActivityInPdf: Scalars["Boolean"];
   /** Determines if the field is visible in PDF export. */
   showInPdf: Scalars["Boolean"];
   /** The title of the petition field. */
@@ -2607,6 +2609,10 @@ export type PetitionFieldProgress = {
 
 /** A reply to a petition field */
 export type PetitionFieldReply = Timestamps & {
+  /** When the reply was created or last updated */
+  approvedAt: Maybe<Scalars["DateTime"]>;
+  /** The person that approved the reply. */
+  approvedBy: Maybe<User>;
   /** The content of the reply. */
   content: Scalars["JSONObject"];
   /** Time when the resource was created. */
@@ -2618,6 +2624,10 @@ export type PetitionFieldReply = Timestamps & {
   isAnonymized: Scalars["Boolean"];
   /** Metadata for this reply. */
   metadata: Scalars["JSONObject"];
+  /** When the reply was created or last updated */
+  repliedAt: Scalars["DateTime"];
+  /** The person that created the reply or the last person that edited the reply. */
+  repliedBy: Maybe<UserOrPetitionAccess>;
   /** The status of the reply. */
   status: PetitionFieldReplyStatus;
   /** Time when the resource was last updated. */
@@ -4085,6 +4095,7 @@ export type UpdatePetitionFieldInput = {
   multiple?: InputMaybe<Scalars["Boolean"]>;
   optional?: InputMaybe<Scalars["Boolean"]>;
   options?: InputMaybe<Scalars["JSONObject"]>;
+  showActivityInPdf?: InputMaybe<Scalars["Boolean"]>;
   showInPdf?: InputMaybe<Scalars["Boolean"]>;
   title?: InputMaybe<Scalars["String"]>;
   visibility?: InputMaybe<Scalars["JSONObject"]>;
@@ -4289,10 +4300,40 @@ export type VerificationCodeRequest = {
   token: Scalars["ID"];
 };
 
+export type ContactReference_ContactFragment = { id: string; fullName: string };
+
+export type FieldActivity_PetitionFieldReplyFragment = {
+  id: string;
+  repliedAt: string;
+  approvedAt: string | null;
+  repliedBy:
+    | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
+    | { __typename: "User"; id: string; fullName: string | null }
+    | null;
+  approvedBy: { id: string; fullName: string | null } | null;
+};
+
 export type SignaturesBlock_SignatureConfigFragment = {
   timezone: string;
   signers: Array<{ fullName: string; email: string } | null>;
 };
+
+export type UserOrContactReference_UserOrPetitionAccess_PetitionAccess_Fragment = {
+  __typename: "PetitionAccess";
+  contact: { id: string; fullName: string } | null;
+};
+
+export type UserOrContactReference_UserOrPetitionAccess_User_Fragment = {
+  __typename: "User";
+  id: string;
+  fullName: string | null;
+};
+
+export type UserOrContactReference_UserOrPetitionAccessFragment =
+  | UserOrContactReference_UserOrPetitionAccess_PetitionAccess_Fragment
+  | UserOrContactReference_UserOrPetitionAccess_User_Fragment;
+
+export type UserReference_UserFragment = { id: string; fullName: string | null };
 
 export type PetitionExport_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
@@ -4314,12 +4355,20 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
     title: string | null;
     description: string | null;
     showInPdf: boolean;
+    showActivityInPdf: boolean;
     visibility: { [key: string]: any } | null;
     replies: Array<{
       content: { [key: string]: any };
       id: string;
       status: PetitionFieldReplyStatus;
       metadata: { [key: string]: any };
+      repliedAt: string;
+      approvedAt: string | null;
+      repliedBy:
+        | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
+        | { __typename: "User"; id: string; fullName: string | null }
+        | null;
+      approvedBy: { id: string; fullName: string | null } | null;
     }>;
   }>;
   organization: { name: string; logoUrl: string | null };
@@ -4339,12 +4388,20 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
     title: string | null;
     description: string | null;
     showInPdf: boolean;
+    showActivityInPdf: boolean;
     visibility: { [key: string]: any } | null;
     replies: Array<{
       content: { [key: string]: any };
       id: string;
       status: PetitionFieldReplyStatus;
       metadata: { [key: string]: any };
+      repliedAt: string;
+      approvedAt: string | null;
+      repliedBy:
+        | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
+        | { __typename: "User"; id: string; fullName: string | null }
+        | null;
+      approvedBy: { id: string; fullName: string | null } | null;
     }>;
   }>;
   organization: { name: string; logoUrl: string | null };
@@ -4362,12 +4419,20 @@ export type PetitionExport_PetitionFieldFragment = {
   options: { [key: string]: any };
   description: string | null;
   showInPdf: boolean;
+  showActivityInPdf: boolean;
   visibility: { [key: string]: any } | null;
   replies: Array<{
     id: string;
     status: PetitionFieldReplyStatus;
     content: { [key: string]: any };
     metadata: { [key: string]: any };
+    repliedAt: string;
+    approvedAt: string | null;
+    repliedBy:
+      | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
+      | { __typename: "User"; id: string; fullName: string | null }
+      | null;
+    approvedBy: { id: string; fullName: string | null } | null;
   }>;
 };
 
@@ -4397,12 +4462,20 @@ export type PetitionExport_petitionQuery = {
           title: string | null;
           description: string | null;
           showInPdf: boolean;
+          showActivityInPdf: boolean;
           visibility: { [key: string]: any } | null;
           replies: Array<{
             content: { [key: string]: any };
             id: string;
             status: PetitionFieldReplyStatus;
             metadata: { [key: string]: any };
+            repliedAt: string;
+            approvedAt: string | null;
+            repliedBy:
+              | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
+              | { __typename: "User"; id: string; fullName: string | null }
+              | null;
+            approvedBy: { id: string; fullName: string | null } | null;
           }>;
         }>;
         organization: { name: string; logoUrl: string | null };
@@ -4421,12 +4494,20 @@ export type PetitionExport_petitionQuery = {
           title: string | null;
           description: string | null;
           showInPdf: boolean;
+          showActivityInPdf: boolean;
           visibility: { [key: string]: any } | null;
           replies: Array<{
             content: { [key: string]: any };
             id: string;
             status: PetitionFieldReplyStatus;
             metadata: { [key: string]: any };
+            repliedAt: string;
+            approvedAt: string | null;
+            repliedBy:
+              | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
+              | { __typename: "User"; id: string; fullName: string | null }
+              | null;
+            approvedBy: { id: string; fullName: string | null } | null;
           }>;
         }>;
         organization: { name: string; logoUrl: string | null };
@@ -4459,6 +4540,48 @@ export type useLiquidScope_PetitionBaseFragment =
   | useLiquidScope_PetitionBase_Petition_Fragment
   | useLiquidScope_PetitionBase_PetitionTemplate_Fragment;
 
+export const UserReference_UserFragmentDoc = gql`
+  fragment UserReference_User on User {
+    id
+    fullName
+  }
+` as unknown as DocumentNode<UserReference_UserFragment, unknown>;
+export const ContactReference_ContactFragmentDoc = gql`
+  fragment ContactReference_Contact on Contact {
+    id
+    fullName
+  }
+` as unknown as DocumentNode<ContactReference_ContactFragment, unknown>;
+export const UserOrContactReference_UserOrPetitionAccessFragmentDoc = gql`
+  fragment UserOrContactReference_UserOrPetitionAccess on UserOrPetitionAccess {
+    __typename
+    ... on User {
+      ...UserReference_User
+    }
+    ... on PetitionAccess {
+      contact {
+        ...ContactReference_Contact
+      }
+    }
+  }
+  ${UserReference_UserFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<UserOrContactReference_UserOrPetitionAccessFragment, unknown>;
+export const FieldActivity_PetitionFieldReplyFragmentDoc = gql`
+  fragment FieldActivity_PetitionFieldReply on PetitionFieldReply {
+    id
+    repliedBy {
+      ...UserOrContactReference_UserOrPetitionAccess
+    }
+    repliedAt
+    approvedBy {
+      ...UserReference_User
+    }
+    approvedAt
+  }
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
+  ${UserReference_UserFragmentDoc}
+` as unknown as DocumentNode<FieldActivity_PetitionFieldReplyFragment, unknown>;
 export const PetitionExport_PetitionFieldFragmentDoc = gql`
   fragment PetitionExport_PetitionField on PetitionField {
     id
@@ -4467,14 +4590,17 @@ export const PetitionExport_PetitionFieldFragmentDoc = gql`
     options
     description
     showInPdf
+    showActivityInPdf
     visibility
     replies {
       id
       status
       content
       metadata
+      ...FieldActivity_PetitionFieldReply
     }
   }
+  ${FieldActivity_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<PetitionExport_PetitionFieldFragment, unknown>;
 export const SignaturesBlock_SignatureConfigFragmentDoc = gql`
   fragment SignaturesBlock_SignatureConfig on SignatureConfig {

@@ -247,6 +247,7 @@ export interface NexusGenInputs {
     multiple?: boolean | null; // Boolean
     optional?: boolean | null; // Boolean
     options?: NexusGenScalars["JSONObject"] | null; // JSONObject
+    showActivityInPdf?: boolean | null; // Boolean
     showInPdf?: boolean | null; // Boolean
     title?: string | null; // String
     visibility?: NexusGenScalars["JSONObject"] | null; // JSONObject
@@ -1753,6 +1754,7 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     position: number; // Int!
     replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
+    showActivityInPdf: boolean; // Boolean!
     showInPdf: boolean; // Boolean!
     title: string | null; // String
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
@@ -1804,12 +1806,16 @@ export interface NexusGenFieldTypes {
   };
   PetitionFieldReply: {
     // field return type
+    approvedAt: NexusGenScalars["DateTime"] | null; // DateTime
+    approvedBy: NexusGenRootTypes["User"] | null; // User
     content: NexusGenScalars["JSONObject"]; // JSONObject!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: NexusGenScalars["GID"]; // GID!
     isAnonymized: boolean; // Boolean!
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
+    repliedAt: NexusGenScalars["DateTime"]; // DateTime!
+    repliedBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
     status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     updatedBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
@@ -3554,6 +3560,7 @@ export interface NexusGenFieldTypeNames {
     petition: "PetitionBase";
     position: "Int";
     replies: "PetitionFieldReply";
+    showActivityInPdf: "Boolean";
     showInPdf: "Boolean";
     title: "String";
     type: "PetitionFieldType";
@@ -3605,12 +3612,16 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionFieldReply: {
     // field return type name
+    approvedAt: "DateTime";
+    approvedBy: "User";
     content: "JSONObject";
     createdAt: "DateTime";
     field: "PetitionField";
     id: "GID";
     isAnonymized: "Boolean";
     metadata: "JSONObject";
+    repliedAt: "DateTime";
+    repliedBy: "UserOrPetitionAccess";
     status: "PetitionFieldReplyStatus";
     updatedAt: "DateTime";
     updatedBy: "UserOrPetitionAccess";

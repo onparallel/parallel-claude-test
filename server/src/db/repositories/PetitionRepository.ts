@@ -7,9 +7,12 @@ import {
   groupBy,
   indexBy,
   isDefined,
+  mapValues,
   maxBy,
   omit,
   partition,
+  pipe,
+  sort,
   sortBy,
   uniq,
   zip,
@@ -35,6 +38,9 @@ import {
   CreatePetitionEvent,
   GenericPetitionEvent,
   PetitionEvent,
+  ReplyCreatedEvent,
+  ReplyDeletedEvent,
+  ReplyStatusChangedEvent,
   ReplyUpdatedEvent,
 } from "../events";
 import { BaseRepository, PageOpts, TableCreateTypes, TableTypes } from "../helpers/BaseRepository";
@@ -2692,6 +2698,40 @@ export class PetitionRepository extends BaseRepository {
     "petition_id"
   );
 
+  readonly loadPetitionFieldReplyEvents = this.buildLoader<
+    number,
+    (ReplyCreatedEvent | ReplyUpdatedEvent | ReplyDeletedEvent | ReplyStatusChangedEvent)[]
+  >(async (keys, t) => {
+    const petitions = await this.raw<{ id: number }>(
+      /* sql */ `
+        select distinct pf.petition_id as id from petition_field_reply pfr
+        join petition_field pf on pfr.petition_field_id = pf.id
+        where pfr.id in ?
+      `,
+      [this.sqlIn(keys)],
+      t
+    );
+    const events = await this.raw<
+      ReplyCreatedEvent | ReplyUpdatedEvent | ReplyDeletedEvent | ReplyStatusChangedEvent
+    >(
+      /* sql */ `
+        select * from petition_event
+        where petition_id in ?
+          and type in ('REPLY_CREATED', 'REPLY_UPDATED', 'REPLY_DELETED', 'REPLY_STATUS_CHANGED')
+          and data->>'petition_field_reply_id' in ?
+      `,
+      [this.sqlIn(petitions.map((p) => p.id)), this.sqlIn(keys)],
+      t
+    );
+
+    const byReplyId = pipe(
+      events,
+      groupBy((e) => e.data.petition_field_reply_id),
+      mapValues(sort((a, b) => new Date(a.created_at).valueOf() - new Date(b.created_at).valueOf()))
+    );
+    return keys.map((id) => byReplyId[id] ?? []);
+  });
+
   getPaginatedEventsForPetition(petitionId: number, opts: PageOpts) {
     return this.getPagination<PetitionEvent>(
       this.from("petition_event")
@@ -2705,17 +2745,12 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async loadLastEventsByType<T extends PetitionEventType>(
+  async getLastEventsByType<T extends PetitionEventType>(
     petitionId: number,
     eventTypes: T[]
   ): Promise<
     // Distribute union type
-    (T extends any
-      ? {
-          type: T;
-          last_used_at: Date;
-        }
-      : never)[]
+    (T extends any ? { type: T; last_used_at: Date } : never)[]
   > {
     const events = await this.from("petition_event")
       .where("petition_id", petitionId)
@@ -2780,7 +2815,7 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async shouldNotifyPetitionClosed(petitionId: number) {
-    const events = await this.loadLastEventsByType(petitionId, [
+    const events = await this.getLastEventsByType(petitionId, [
       "PETITION_CLOSED_NOTIFIED",
       "REPLY_CREATED",
     ]);

@@ -131,42 +131,76 @@ export const PetitionComposeFieldSettings = Object.assign(
             </RestrictedFeaturePopover>
           </SettingsRow>
           {isOnlyInternal ? null : (
-            <SettingsRow
-              isDisabled={isReadOnly}
-              label={
-                <FormattedMessage
-                  id="component.petition-settings.petition-shown-in-pdf"
-                  defaultMessage="Show in PDF"
-                />
-              }
-              description={
-                <>
-                  <FormattedMessage
-                    id="field-settings.show-in-pdf-description"
-                    defaultMessage="Enabling this option will make the content appear in the exported PDF and the document to be signed."
-                  />
-                  <Image
-                    marginTop={2}
-                    src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/FILE_UPLOAD_show_in_pdf_setting_${intl.locale}.png`}
-                  />
-                </>
-              }
-              controlId="show-in-pdf"
-            >
-              <Switch
-                height="20px"
-                display="block"
-                id="show-in-pdf"
-                color="green"
-                isChecked={field.showInPdf}
-                onChange={(event) =>
-                  onFieldEdit(field.id, {
-                    showInPdf: event.target.checked,
-                  })
-                }
+            <>
+              <SettingsRow
                 isDisabled={isReadOnly}
-              />
-            </SettingsRow>
+                label={
+                  <FormattedMessage
+                    id="component.petition-settings.petition-shown-in-pdf"
+                    defaultMessage="Show in PDF"
+                  />
+                }
+                description={
+                  <>
+                    <FormattedMessage
+                      id="field-settings.show-in-pdf-description"
+                      defaultMessage="Enabling this option will make the content appear in the exported PDF and the document to be signed."
+                    />
+                    <Image
+                      marginTop={2}
+                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/FILE_UPLOAD_show_in_pdf_setting_${intl.locale}.png`}
+                    />
+                  </>
+                }
+                controlId="show-in-pdf"
+              >
+                <Switch
+                  height="20px"
+                  display="block"
+                  id="show-in-pdf"
+                  color="green"
+                  isChecked={field.showInPdf}
+                  onChange={(event) =>
+                    onFieldEdit(field.id, {
+                      showInPdf: event.target.checked,
+                    })
+                  }
+                  isDisabled={isReadOnly}
+                />
+              </SettingsRow>
+              {field.showInPdf && field.type !== "HEADING" ? (
+                <SettingsRow
+                  isDisabled={isReadOnly}
+                  label={
+                    <FormattedMessage
+                      id="component.petition-settings.petition-show-activity-pdf"
+                      defaultMessage="Show reply activity"
+                    />
+                  }
+                  description={
+                    <FormattedMessage
+                      id="field-settings.show-activity-pdf-description"
+                      defaultMessage="Enable this option to include who and when added each reply and their approval in the pdf."
+                    />
+                  }
+                  controlId="show-activity-in-pdf"
+                >
+                  <Switch
+                    height="20px"
+                    display="block"
+                    id="show-activity-in-pdf"
+                    color="green"
+                    isChecked={field.showActivityInPdf}
+                    onChange={(event) =>
+                      onFieldEdit(field.id, {
+                        showActivityInPdf: event.target.checked,
+                      })
+                    }
+                    isDisabled={isReadOnly}
+                  />
+                </SettingsRow>
+              ) : null}
+            </>
           )}
 
           {!field.isReadOnly &&
@@ -326,6 +360,7 @@ export const PetitionComposeFieldSettings = Object.assign(
           isInternal
           isReadOnly
           showInPdf
+          showActivityInPdf
           isFixed
           position
           visibility

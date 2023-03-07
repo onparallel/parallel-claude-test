@@ -2528,6 +2528,8 @@ export type PetitionField = {
   position: Scalars["Int"];
   /** The replies to the petition field */
   replies: Array<PetitionFieldReply>;
+  /** Determines if the field last activity is visible in PDF export. */
+  showActivityInPdf: Scalars["Boolean"];
   /** Determines if the field is visible in PDF export. */
   showInPdf: Scalars["Boolean"];
   /** The title of the petition field. */
@@ -2607,6 +2609,10 @@ export type PetitionFieldProgress = {
 
 /** A reply to a petition field */
 export type PetitionFieldReply = Timestamps & {
+  /** When the reply was created or last updated */
+  approvedAt: Maybe<Scalars["DateTime"]>;
+  /** The person that approved the reply. */
+  approvedBy: Maybe<User>;
   /** The content of the reply. */
   content: Scalars["JSONObject"];
   /** Time when the resource was created. */
@@ -2618,6 +2624,10 @@ export type PetitionFieldReply = Timestamps & {
   isAnonymized: Scalars["Boolean"];
   /** Metadata for this reply. */
   metadata: Scalars["JSONObject"];
+  /** When the reply was created or last updated */
+  repliedAt: Scalars["DateTime"];
+  /** The person that created the reply or the last person that edited the reply. */
+  repliedBy: Maybe<UserOrPetitionAccess>;
   /** The status of the reply. */
   status: PetitionFieldReplyStatus;
   /** Time when the resource was last updated. */
@@ -4085,6 +4095,7 @@ export type UpdatePetitionFieldInput = {
   multiple?: InputMaybe<Scalars["Boolean"]>;
   optional?: InputMaybe<Scalars["Boolean"]>;
   options?: InputMaybe<Scalars["JSONObject"]>;
+  showActivityInPdf?: InputMaybe<Scalars["Boolean"]>;
   showInPdf?: InputMaybe<Scalars["Boolean"]>;
   title?: InputMaybe<Scalars["String"]>;
   visibility?: InputMaybe<Scalars["JSONObject"]>;

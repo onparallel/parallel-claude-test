@@ -3695,6 +3695,11 @@
     "context": "Internal field"
   },
   {
+    "term": "component.petition-settings.petition-show-activity-pdf",
+    "definition": "Mostrar actividad de respuesta",
+    "context": "Show reply activity"
+  },
+  {
     "term": "component.petition-settings.petition-shown-in-pdf",
     "definition": "Mostrar en PDF",
     "context": "Show in PDF"
@@ -6358,6 +6363,11 @@
     "term": "field-settings.reference-invalid-error",
     "definition": "Utiliza solo letras, números o _",
     "context": "Use only letters, numbers or _"
+  },
+  {
+    "term": "field-settings.show-activity-pdf-description",
+    "definition": "Activar esta opción incluirá la actividad de quién y cuando añadió cada respuesta y su aprobación en el pdf.",
+    "context": "Enable this option to include who and when added each reply and their approval in the pdf."
   },
   {
     "term": "field-settings.show-in-pdf-description",

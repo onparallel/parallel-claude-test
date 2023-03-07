@@ -38,6 +38,7 @@ const PETITION_JSON_SCHEMA = {
           "alias",
           "isInternal",
           "showInPdf",
+          "showActivityInPdf",
           "hasCommentsEnabled",
         ],
         additionalProperties: false,
@@ -53,6 +54,7 @@ const PETITION_JSON_SCHEMA = {
           alias: { type: ["string", "null"] },
           isInternal: { type: "boolean" },
           showInPdf: { type: "boolean" },
+          showActivityInPdf: { type: "boolean" },
           hasCommentsEnabled: { type: "boolean" },
         },
       },
@@ -77,6 +79,7 @@ interface PetitionJson {
     alias: Maybe<string>;
     isInternal: boolean;
     showInPdf: boolean;
+    showActivityInPdf: boolean;
     hasCommentsEnabled: boolean;
   }[];
 }
@@ -130,6 +133,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
           alias: field.alias,
           isInternal: field.is_internal,
           showInPdf: field.show_in_pdf,
+          showActivityInPdf: field.show_activity_in_pdf,
           hasCommentsEnabled: field.has_comments_enabled,
         };
       }),
@@ -210,6 +214,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
               alias: jsonField.alias,
               is_internal: jsonField.isInternal,
               show_in_pdf: jsonField.showInPdf,
+              show_activity_in_pdf: jsonField.showActivityInPdf,
               has_comments_enabled: jsonField.hasCommentsEnabled,
             },
             jsonField.position,

@@ -2603,6 +2603,8 @@ export interface PetitionField {
   previewReplies: Array<PetitionFieldReply>;
   /** The replies to the petition field */
   replies: Array<PetitionFieldReply>;
+  /** Determines if the field last activity is visible in PDF export. */
+  showActivityInPdf: Scalars["Boolean"];
   /** Determines if the field is visible in PDF export. */
   showInPdf: Scalars["Boolean"];
   /** The title of the petition field. */
@@ -2690,6 +2692,10 @@ export interface PetitionFieldProgress {
 /** A reply to a petition field */
 export interface PetitionFieldReply extends Timestamps {
   __typename?: "PetitionFieldReply";
+  /** When the reply was created or last updated */
+  approvedAt?: Maybe<Scalars["DateTime"]>;
+  /** The person that approved the reply. */
+  approvedBy?: Maybe<User>;
   /** The content of the reply. */
   content: Scalars["JSONObject"];
   /** Time when the resource was created. */
@@ -2701,6 +2707,10 @@ export interface PetitionFieldReply extends Timestamps {
   isAnonymized: Scalars["Boolean"];
   /** Metadata for this reply. */
   metadata: Scalars["JSONObject"];
+  /** When the reply was created or last updated */
+  repliedAt: Scalars["DateTime"];
+  /** The person that created the reply or the last person that edited the reply. */
+  repliedBy?: Maybe<UserOrPetitionAccess>;
   /** The status of the reply. */
   status: PetitionFieldReplyStatus;
   /** Time when the resource was last updated. */
@@ -4232,6 +4242,7 @@ export interface UpdatePetitionFieldInput {
   multiple?: InputMaybe<Scalars["Boolean"]>;
   optional?: InputMaybe<Scalars["Boolean"]>;
   options?: InputMaybe<Scalars["JSONObject"]>;
+  showActivityInPdf?: InputMaybe<Scalars["Boolean"]>;
   showInPdf?: InputMaybe<Scalars["Boolean"]>;
   title?: InputMaybe<Scalars["String"]>;
   visibility?: InputMaybe<Scalars["JSONObject"]>;
@@ -11320,6 +11331,7 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   isInternal: boolean;
   isReadOnly: boolean;
   showInPdf: boolean;
+  showActivityInPdf: boolean;
   isFixed: boolean;
   position: number;
   visibility?: { [key: string]: any } | null;
@@ -19465,6 +19477,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     isReadOnly: boolean;
     visibility?: { [key: string]: any } | null;
     showInPdf: boolean;
+    showActivityInPdf: boolean;
     position: number;
     alias?: string | null;
     hasCommentsEnabled: boolean;
@@ -19589,6 +19602,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     isReadOnly: boolean;
     visibility?: { [key: string]: any } | null;
     showInPdf: boolean;
+    showActivityInPdf: boolean;
     position: number;
     alias?: string | null;
     hasCommentsEnabled: boolean;
@@ -19702,6 +19716,7 @@ export type PetitionCompose_PetitionFieldFragment = {
   visibility?: { [key: string]: any } | null;
   options: { [key: string]: any };
   showInPdf: boolean;
+  showActivityInPdf: boolean;
   position: number;
   alias?: string | null;
   hasCommentsEnabled: boolean;
@@ -20030,6 +20045,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
     visibility?: { [key: string]: any } | null;
     options: { [key: string]: any };
     showInPdf: boolean;
+    showActivityInPdf: boolean;
     position: number;
     alias?: string | null;
     hasCommentsEnabled: boolean;
@@ -20108,6 +20124,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
     visibility?: { [key: string]: any } | null;
     options: { [key: string]: any };
     showInPdf: boolean;
+    showActivityInPdf: boolean;
     position: number;
     alias?: string | null;
     hasCommentsEnabled: boolean;
@@ -20231,6 +20248,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
     visibility?: { [key: string]: any } | null;
     options: { [key: string]: any };
     showInPdf: boolean;
+    showActivityInPdf: boolean;
     position: number;
     alias?: string | null;
     hasCommentsEnabled: boolean;
@@ -20280,6 +20298,7 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
     visibility?: { [key: string]: any } | null;
     options: { [key: string]: any };
     showInPdf: boolean;
+    showActivityInPdf: boolean;
     position: number;
     alias?: string | null;
     hasCommentsEnabled: boolean;
@@ -20458,6 +20477,7 @@ export type PetitionCompose_petitionQuery = {
           isReadOnly: boolean;
           visibility?: { [key: string]: any } | null;
           showInPdf: boolean;
+          showActivityInPdf: boolean;
           position: number;
           alias?: string | null;
           hasCommentsEnabled: boolean;
@@ -20596,6 +20616,7 @@ export type PetitionCompose_petitionQuery = {
           isReadOnly: boolean;
           visibility?: { [key: string]: any } | null;
           showInPdf: boolean;
+          showActivityInPdf: boolean;
           position: number;
           alias?: string | null;
           hasCommentsEnabled: boolean;
@@ -30753,6 +30774,7 @@ export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
     isInternal
     isReadOnly
     showInPdf
+    showActivityInPdf
     isFixed
     position
     visibility

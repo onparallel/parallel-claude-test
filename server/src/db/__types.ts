@@ -1043,6 +1043,7 @@ export interface PetitionField {
   is_internal: boolean; // bool
   show_in_pdf: boolean; // bool
   has_comments_enabled: boolean; // bool
+  show_activity_in_pdf: boolean; // bool
 }
 
 export type CreatePetitionField = PartialProps<
@@ -1066,6 +1067,7 @@ export type CreatePetitionField = PartialProps<
   | "is_internal"
   | "show_in_pdf"
   | "has_comments_enabled"
+  | "show_activity_in_pdf"
 >;
 
 export interface PetitionFieldAttachment {
