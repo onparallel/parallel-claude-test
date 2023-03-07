@@ -179,7 +179,7 @@ export default function PetitionExport({
                       <Image
                         src={
                           petition.organization.logoUrl ??
-                          "http://static.onparallel.com/static/emails/logo.png"
+                          "https://static.onparallel.com/static/emails/logo.png"
                         }
                         style={styles.documentLogo}
                       />
