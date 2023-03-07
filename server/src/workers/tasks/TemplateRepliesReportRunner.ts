@@ -1,7 +1,9 @@
 import Excel from "exceljs";
+import { IntlShape } from "react-intl";
 import { isDefined, minBy, zip } from "remeda";
 import { Readable } from "stream";
 import { PetitionFieldReply, PetitionMessage } from "../../db/__types";
+import { FORMATS } from "../../util/dates";
 import { getFieldIndices } from "../../util/fieldIndices";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
@@ -284,9 +286,9 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           const replies = petitionFieldsReplies[i];
           row[`${field.from_petition_field_id ?? field.id}`] = {
             position: (fieldIndex as number) - 1 + fixedColsLength,
-            title: field.title,
+            title: field.type === "DATE_TIME" ? field.title + " (UTC)" : field.title,
             content: !isFileTypeField(field.type)
-              ? replies.map(this.replyContent).join("; ")
+              ? replies.map((r) => this.replyContent(r, intl as IntlShape)).join("; ")
               : replies.length > 0
               ? intl.formatMessage(
                   {
@@ -320,7 +322,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
     return { temporary_file_id: tmpFile.id };
   }
 
-  private replyContent(r: PetitionFieldReply) {
+  private replyContent(r: PetitionFieldReply, intl: IntlShape) {
     switch (r.type) {
       case "CHECKBOX":
         return (r.content.value as string[]).join(", ");
@@ -329,6 +331,11 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           .map((value) => (value[1] !== null ? value.join(": ") : null))
           .filter(isDefined)
           .join(", ");
+      case "DATE_TIME":
+        return intl.formatDate(r.content.value, {
+          ...FORMATS["L+LT"],
+          timeZone: "Etc/UTC",
+        });
       default:
         return r.content.value as string;
     }

@@ -88,7 +88,7 @@ export function useBuildAliasInterpolation(
 
   return useCallback(
     (alias) => {
-      const defaultFilter = type === "DATE" ? " | date" : type === "NUMBER" ? " | number" : "";
+      const defaultFilter = type === "NUMBER" ? " | number" : "";
       const loopVariable = intl.formatMessage({
         id: "component.reference-options-menu.loop-variable",
         defaultMessage: "reply",

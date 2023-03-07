@@ -12,7 +12,7 @@ import {
   PetitionFieldType,
   PetitionRepliesFieldReply_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
-import { FORMATS } from "@parallel/utils/dates";
+import { FORMATS, prettifyTimezone } from "@parallel/utils/dates";
 import { formatNumberWithPrefix } from "@parallel/utils/formatNumberWithPrefix";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
@@ -22,6 +22,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
+import { HelpPopover } from "../common/HelpPopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
 import { UserOrContactReference } from "../petition-activity/UserOrContactReference";
@@ -47,12 +48,21 @@ export function PetitionRepliesFieldReply({
   const intl = useIntl();
   const type = reply.field!.type;
 
+  const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   const contents = isFileTypeField(type)
     ? [reply.content]
     : type === "NUMBER"
     ? [formatNumberWithPrefix(reply.content.value, reply.field!.options as FieldOptions["NUMBER"])]
     : type === "DATE"
     ? [intl.formatDate(reply.content.value as string, { ...FORMATS.L, timeZone: "UTC" })]
+    : type === "DATE_TIME"
+    ? [
+        `${intl.formatDate(reply.content.value as string, {
+          timeZone: reply.content.timezone,
+          ...FORMATS["L+LT"],
+        })} (${prettifyTimezone(reply.content.timezone)})`,
+      ]
     : Array.isArray(reply.content.value)
     ? type === "DYNAMIC_SELECT"
       ? reply.content.value.map((v) => v[1])
@@ -179,12 +189,23 @@ export function PetitionRepliesFieldReply({
                     </Flex>
                   </Stack>
                 ) : (
-                  <Box>
-                    <BreakLines>{content}</BreakLines>
+                  <HStack>
+                    <BreakLines>{content}</BreakLines>{" "}
+                    {reply.field?.type === "DATE_TIME" &&
+                    currentTimezone !== reply.content.timezone ? (
+                      <HelpPopover>
+                        <Text>
+                          {`${intl.formatDate(reply.content.value as string, {
+                            ...FORMATS["L+LT"],
+                            timeZone: currentTimezone,
+                          })} (${prettifyTimezone(currentTimezone)})`}
+                        </Text>
+                      </HelpPopover>
+                    ) : null}
                     <Box display="inline-block" height={6} marginLeft={2} verticalAlign="baseline">
                       {editReplyIconButton(reply.field?.type === "DYNAMIC_SELECT" ? `-${i}` : "")}
                     </Box>
-                  </Box>
+                  </HStack>
                 )}
               </HStack>
             </GridItem>

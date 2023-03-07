@@ -1490,6 +1490,27 @@ export const FieldDateIcon = createIcon({
   ),
 });
 
+export const FieldDateTimeIcon = createIcon({
+  displayName: "FieldDateTimeIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      stroke="currentColor"
+      fill="none"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m11.5 22h-6.5c-1.10457 0-2-.8954-2-2v-14c0-1.10457.89543-2 2-2h14c1.1046 0 2 .89543 2 2v5" />
+      <path d="m16 2v4" />
+      <path d="m8 2v4" />
+      <path d="m3 9h18" />
+      <path d="m17.25 22c2.6234 0 4.75-2.1266 4.75-4.75s-2.1266-4.75-4.75-4.75-4.75 2.1266-4.75 4.75 2.1266 4.75 4.75 4.75z" />
+      <path d="m17.25 15.4688v2.0781l1.1875.8906" />
+    </g>
+  ),
+});
+
 export const FieldPhoneIcon = createIcon({
   displayName: "FieldPhoneIcon",
   viewBox: "0 0 24 24",

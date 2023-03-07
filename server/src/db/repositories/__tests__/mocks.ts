@@ -414,6 +414,32 @@ export class Mocks {
       .returning("*");
   }
 
+  async createRandomDatetimeReply(
+    dateFieldId: number,
+    access_id: number,
+    amount?: number,
+    builder?: (index: number) => Partial<PetitionFieldReply>
+  ) {
+    return await this.knex<PetitionFieldReply>("petition_field_reply")
+      .insert(
+        range(0, amount || 1).map<CreatePetitionFieldReply>((index) => {
+          const value = faker.date.soon(10).toISOString();
+          return {
+            petition_field_id: dateFieldId,
+            content: {
+              value,
+              datetime: value.substring(0, 16),
+              timezone: "Europe/Madrid",
+            },
+            type: "DATE_TIME",
+            petition_access_id: access_id,
+            ...builder?.(index),
+          };
+        })
+      )
+      .returning("*");
+  }
+
   async createRandomPhoneReply(
     phoneFieldId: number,
     access_id: number,

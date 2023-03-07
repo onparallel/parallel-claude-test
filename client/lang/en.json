@@ -3051,8 +3051,13 @@
   },
   {
     "term": "component.petition-field-type-select-dropdown.date",
-    "definition": "Allows the recipient to respond with dates.",
-    "context": "Allows the recipient to respond with dates."
+    "definition": "Allows the recipient to respond with a date.",
+    "context": "Allows the recipient to respond with a date."
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.date-time",
+    "definition": "Allows the recipient to respond with a date and time.",
+    "context": "Allows the recipient to respond with a date and time."
   },
   {
     "term": "component.petition-field-type-select-dropdown.dow-jones-kyc-research-description",
@@ -3143,6 +3148,11 @@
     "term": "component.petition-field-visibility-editor.contain-default",
     "definition": "{modifier, select, ALL {contain} other {contains}}",
     "context": "{modifier, select, ALL {contain} other {contains}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.date-time-help",
+    "definition": "This date and time use your current timezone {timezone}.",
+    "context": "This date and time use your current timezone {timezone}."
   },
   {
     "term": "component.petition-field-visibility-editor.end-with-default",
@@ -4615,6 +4625,26 @@
     "context": "{count}/{total} submitted"
   },
   {
+    "term": "component.recipient-view-petition-field-date-time.change-zone",
+    "definition": "Change",
+    "context": "Change"
+  },
+  {
+    "term": "component.recipient-view-petition-field-date-time.restore-defaults",
+    "definition": "Restore default",
+    "context": "Restore default"
+  },
+  {
+    "term": "component.recipient-view-petition-field-date-time.select-timezone",
+    "definition": "Select the time zone you need.",
+    "context": "Select the time zone you need."
+  },
+  {
+    "term": "component.recipient-view-petition-field-date-time.using-timezone",
+    "definition": "You are using the time zone {timezone}.",
+    "context": "You are using the time zone {timezone}."
+  },
+  {
     "term": "component.recipient-view-petition-field-number.only-numbers",
     "definition": "Numeric {multiple, select, true{answers} other {answer}}",
     "context": "Numeric {multiple, select, true{answers} other {answer}}"
@@ -5703,6 +5733,11 @@
     "term": "component.timespan.years-part",
     "definition": "{n, plural, =1{# year} other{# years}}",
     "context": "{n, plural, =1{# year} other{# years}}"
+  },
+  {
+    "term": "component.timezone-select.other",
+    "definition": "Other",
+    "context": "Other"
   },
   {
     "term": "component.update-organization-current-usage-period-dialog.limit-label",
@@ -9158,6 +9193,11 @@
     "term": "petition.field-type.date",
     "definition": "Date",
     "context": "Date"
+  },
+  {
+    "term": "petition.field-type.date-and-time",
+    "definition": "Date and time",
+    "context": "Date and time"
   },
   {
     "term": "petition.field-type.dow-jones-kyc-research",

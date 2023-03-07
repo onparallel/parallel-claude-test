@@ -3361,6 +3361,11 @@ enum PetitionFieldType {
   DATE
 
   """
+  A datepicker with time and timezone field.
+  """
+  DATE_TIME
+
+  """
   A saerch in Dow Jones field.
   """
   DOW_JONES_KYC

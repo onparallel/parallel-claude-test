@@ -286,6 +286,7 @@ function useFormulasByTypeField({
         case "SELECT":
         case "PHONE":
         case "DATE":
+        case "DATE_TIME":
           return commonFormulas;
         case "NUMBER":
           return [

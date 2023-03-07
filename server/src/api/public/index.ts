@@ -1139,7 +1139,8 @@ const replyBodyDescription = outdent`
   For other types of fields the request will be a normal \`application/json\` request containing the value of the reply.
     - For \`TEXT\`, \`SHORT_TEXT\` and \`SELECT\` fields, the reply must be a string.
     - For \`PHONE\` fields, the repy must be a string with a valid phone number in e164 format.
-    - For \`DATE\` fields, reply must be a string representing a date with format YYYY-MM-DD.
+    - For \`DATE\` fields, reply must be a string representing a date with format \`YYYY-MM-DD\`.
+    - For \`DATE_TIME\` fields, reply must be a object with format \`{datetime: "YYYY-MM-DDTHH:mm", timezone: "Europe/Madrid"}\` where timezone must be a valid [tz database timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
     - For \`NUMBER\` fields, the reply must be a number.
     - For \`CHECKBOX\` fields, the reply must be an array of strings containing all the chosen options.
     - For \`DYNAMIC_SELECT\` fields, the reply must be an array of strings in which each position in the array represents the selected option in the same level. 
@@ -1197,6 +1198,19 @@ api
           case "NUMBER":
           case "CHECKBOX":
           case "DYNAMIC_SELECT":
+            ({ createPetitionFieldReply: newReply } = await client.request(
+              SubmitReply_createPetitionFieldReplyDocument,
+              {
+                petitionId: params.petitionId,
+                fieldId: params.fieldId,
+                reply: replyValue,
+              }
+            ));
+            break;
+          case "DATE_TIME":
+            if (typeof body.reply !== "object") {
+              throw new BadRequestError(`Reply for ${fieldType} field must be a valid object.`);
+            }
             ({ createPetitionFieldReply: newReply } = await client.request(
               SubmitReply_createPetitionFieldReplyDocument,
               {
@@ -1314,6 +1328,19 @@ api
           case "PHONE":
             if (typeof body.reply !== "string") {
               throw new BadRequestError(`Reply for ${fieldType} field must be plain text.`);
+            }
+            ({ updatePetitionFieldReply: updatedReply } = await client.request(
+              UpdateReply_updatePetitionFieldReplyDocument,
+              {
+                petitionId: params.petitionId,
+                replyId: params.replyId,
+                reply: body.reply,
+              }
+            ));
+            break;
+          case "DATE_TIME":
+            if (typeof body.reply !== "object") {
+              throw new BadRequestError(`Reply for ${fieldType} field must be a valid object.`);
             }
             ({ updatePetitionFieldReply: updatedReply } = await client.request(
               UpdateReply_updatePetitionFieldReplyDocument,

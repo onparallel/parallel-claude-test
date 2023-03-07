@@ -1,3 +1,4 @@
+import { zonedTimeToUtc } from "date-fns-tz";
 import { idArg, mutationField, nonNull, objectType } from "nexus";
 import { toGlobalId } from "../../../util/globalId";
 import { random } from "../../../util/token";
@@ -39,6 +40,7 @@ export const createPetitionFieldReply = mutationField("createPetitionFieldReply"
       "NUMBER",
       "DYNAMIC_SELECT",
       "DATE",
+      "DATE_TIME",
       "CHECKBOX",
     ]),
     fieldCanBeReplied("fieldId"),
@@ -50,13 +52,21 @@ export const createPetitionFieldReply = mutationField("createPetitionFieldReply"
 
     try {
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
+      const content =
+        type === "DATE_TIME"
+          ? {
+              ...args.reply,
+              value: zonedTimeToUtc(args.reply.datetime, args.reply.timezone).toISOString(),
+            }
+          : { value: args.reply };
+
       const [reply] = await ctx.petitions.createPetitionFieldReply(
         args.fieldId,
         {
           user_id: ctx.user!.id,
           type,
           status: "PENDING",
-          content: { value: args.reply },
+          content,
         },
         `User:${ctx.user!.id}`
       );
@@ -92,6 +102,7 @@ export const updatePetitionFieldReply = mutationField("updatePetitionFieldReply"
       "NUMBER",
       "DYNAMIC_SELECT",
       "DATE",
+      "DATE_TIME",
       "CHECKBOX",
     ]),
     replyCanBeUpdated("replyId"),
@@ -99,12 +110,21 @@ export const updatePetitionFieldReply = mutationField("updatePetitionFieldReply"
   ),
   validateArgs: validateReplyUpdate("replyId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
+    const { type } = (await ctx.petitions.loadFieldForReply(args.replyId))!;
+    const content =
+      type === "DATE_TIME"
+        ? {
+            ...args.reply,
+            value: zonedTimeToUtc(args.reply.datetime, args.reply.timezone).toISOString(),
+          }
+        : { value: args.reply };
+
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
       {
         petition_access_id: null,
         user_id: ctx.user!.id,
-        content: { value: args.reply },
+        content,
         status: "PENDING",
       },
       ctx.user!

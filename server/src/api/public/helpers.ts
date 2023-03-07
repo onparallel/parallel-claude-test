@@ -117,6 +117,12 @@ function mapFieldReplyContent(fieldType: PetitionFieldType, content: any) {
       return content.value as string[];
     case "NUMBER":
       return content.value as number;
+    case "DATE_TIME":
+      return content as {
+        value: string;
+        datetime: string;
+        timezone: string;
+      };
     default:
       return content.value as string;
   }
@@ -196,6 +202,12 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
           return replies.map((c) => c.content.value.map((v: string[]) => v[1] ?? null));
         } else {
           return replies[0].content.value.map((v: string[]) => v[1] ?? null) ?? null;
+        }
+      case "DATE_TIME":
+        if (replies.length > 1) {
+          return replies.map((r) => r.content);
+        } else {
+          return replies[0].content ?? null;
         }
       default:
         return null;
@@ -320,7 +332,8 @@ export function mapReplyResponse(
 ) {
   return {
     ...omit(reply, ["field"]),
-    content: reply.content.value ?? reply.content,
+    content:
+      Object.keys(reply.content).length > 1 ? reply.content : reply.content.value ?? reply.content,
   };
 }
 

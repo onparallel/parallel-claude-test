@@ -2008,6 +2008,121 @@ describe("GraphQL/Petition Field Replies", () => {
       });
     });
 
+    describe("DATE_TIME", () => {
+      let dateTimeField: PetitionField;
+      let dateTimeReply: PetitionFieldReply;
+
+      beforeAll(async () => {
+        [dateTimeField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+          type: "DATE_TIME",
+          multiple: true,
+        }));
+        [dateTimeReply] = await mocks.createRandomDateReply(dateTimeField.id, 0, 1, () => ({
+          user_id: user.id,
+          petition_access_id: null,
+          type: "DATE_TIME",
+        }));
+      });
+
+      it("updates a reply type DATE_TIME", async () => {
+        const { data, errors } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $replyId: GID!, $reply: JSON!) {
+              updatePetitionFieldReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+                id
+                status
+                content
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            replyId: toGlobalId("PetitionFieldReply", dateTimeReply.id),
+            reply: {
+              datetime: "2023-03-03T03:00",
+              timezone: "Europe/Madrid",
+            },
+          }
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data!.updatePetitionFieldReply).toEqual({
+          id: toGlobalId("PetitionFieldReply", dateTimeReply.id),
+          status: "PENDING",
+          content: {
+            value: "2023-03-03T02:00:00.000Z",
+            datetime: "2023-03-03T03:00",
+            timezone: "Europe/Madrid",
+          },
+        });
+      });
+
+      it("sends error when updating a DATE_TIME reply with invalid values", async () => {
+        for (const reply of [
+          10,
+          { datetime: "2023-03-03", timezone: "Europe/Madrid" },
+          { datetime: "2023-03-03T00:10", timezone: "Madrid" },
+          { datetime: "2023.03.03 10:30", timezone: "UTC" },
+          ["Hello!"],
+          true,
+          "2012-22-24",
+          "2012.01.24",
+          "random text",
+        ]) {
+          const { data, errors } = await testClient.execute(
+            gql`
+              mutation ($petitionId: GID!, $replyId: GID!, $reply: JSON!) {
+                updatePetitionFieldReply(
+                  petitionId: $petitionId
+                  replyId: $replyId
+                  reply: $reply
+                ) {
+                  id
+                }
+              }
+            `,
+            {
+              petitionId: toGlobalId("Petition", petition.id),
+              replyId: toGlobalId("PetitionFieldReply", dateTimeReply.id),
+              reply,
+            }
+          );
+
+          expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+          expect(data).toBeNull();
+        }
+      });
+
+      it("sends error when updating a DATE_TIME reply with invalid timezone or datetime", async () => {
+        for (const reply of [
+          { datetime: "2023.03.03 02:00", timezone: "Europe/Madrid" },
+          { datetime: "2023-03-03T00:10", timezone: "Madrid" },
+        ]) {
+          const { data, errors } = await testClient.execute(
+            gql`
+              mutation ($petitionId: GID!, $replyId: GID!, $reply: JSON!) {
+                updatePetitionFieldReply(
+                  petitionId: $petitionId
+                  replyId: $replyId
+                  reply: $reply
+                ) {
+                  id
+                }
+              }
+            `,
+            {
+              petitionId: toGlobalId("Petition", petition.id),
+              replyId: toGlobalId("PetitionFieldReply", dateTimeReply.id),
+              reply,
+            }
+          );
+
+          expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+          expect(data).toBeNull();
+        }
+      });
+    });
+
     describe("NUMBER", () => {
       let numberReply: PetitionFieldReply;
       let limitedNumberReply: PetitionFieldReply;

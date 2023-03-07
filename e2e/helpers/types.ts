@@ -9,5 +9,6 @@ export type PetitionFieldType =
   | "NUMBER"
   | "PHONE"
   | "DATE"
+  | "DATE_TIME"
   | "ES_TAX_DOCUMENTS"
   | "DOW_JONES_KYC";

@@ -2,7 +2,7 @@ import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/render
 import gql from "graphql-tag";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, zip } from "remeda";
-import { FORMATS } from "../../util/dates";
+import { FORMATS, prettifyTimezone } from "../../util/dates";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fileSize } from "../../util/fileSize";
 import { formatNumberWithPrefix } from "../../util/formatNumberWithPrefix";
@@ -306,6 +306,13 @@ export default function PetitionExport({
                                     ...FORMATS.L,
                                     timeZone: "UTC",
                                   })}
+                                </Text>
+                              ) : field.type === "DATE_TIME" ? (
+                                <Text style={[styles.text]} key={reply.id}>
+                                  {`${intl.formatDate(reply.content.value, {
+                                    ...FORMATS["L+LT"],
+                                    timeZone: reply.content.timezone,
+                                  })} (${prettifyTimezone(reply.content.timezone)})`}
                                 </Text>
                               ) : field.type === "PHONE" ? (
                                 <Text style={[styles.text]} key={reply.id}>

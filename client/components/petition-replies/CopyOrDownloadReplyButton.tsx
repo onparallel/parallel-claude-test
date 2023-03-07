@@ -3,7 +3,6 @@ import { Stack } from "@chakra-ui/react";
 import { DownloadIcon, EyeIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { CopyOrDownloadReplyButton_PetitionFieldReplyFragment } from "@parallel/graphql/__types";
-import { FORMATS } from "@parallel/utils/dates";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
@@ -27,7 +26,6 @@ export function CopyOrDownloadReplyButton({
   onAction,
 }: CopyOrDownloadReplyButtonProps) {
   const intl = useIntl();
-
   return (
     <Stack spacing={1}>
       {reply.field!.type === "NUMBER" ? (
@@ -37,15 +35,6 @@ export function CopyOrDownloadReplyButton({
           text={intl.formatNumber(content, {
             minimumFractionDigits: 0,
             maximumFractionDigits: 20,
-          })}
-        />
-      ) : reply.field!.type === "DATE" ? (
-        <CopyToClipboardButton
-          size="xs"
-          isDisabled={reply.isAnonymized}
-          text={intl.formatDate(content, {
-            ...FORMATS.L,
-            timeZone: "UTC",
           })}
         />
       ) : isFileTypeField(reply.field!.type) ? (

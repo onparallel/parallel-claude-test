@@ -1,4 +1,5 @@
 import { differenceInSeconds, isSameMonth, isThisMonth, subMonths } from "date-fns";
+import { zonedTimeToUtc } from "date-fns-tz";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import pMap from "p-map";
@@ -5995,11 +5996,19 @@ export class PetitionRepository extends BaseRepository {
     await pMap(
       replies,
       async ({ fieldId, fieldType, reply }) => {
+        const content =
+          fieldType === "DATE_TIME"
+            ? {
+                ...reply,
+                value: zonedTimeToUtc(reply.datetime, reply.timezone).toISOString(),
+              }
+            : { value: reply };
+
         await this.createPetitionFieldReply(
           fieldId,
           {
             user_id: owner.id,
-            content: { value: reply },
+            content,
             type: fieldType,
           },
           `User:${owner.id}`

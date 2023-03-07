@@ -267,6 +267,7 @@ const _PetitionField = {
         "CHECKBOX",
         "NUMBER",
         "DATE",
+        "DATE_TIME",
         "PHONE",
         "ES_TAX_DOCUMENTS",
         "DOW_JONES_KYC",
@@ -378,6 +379,30 @@ const _PetitionFieldReply = {
           type: "number",
           description: "The value entered by the recipient",
           example: 123,
+        },
+        {
+          title: "Datetime reply",
+          description: "An object with the date and timezone.",
+          type: "object",
+          required: ["value", "datetime", "timezone"],
+          additionalProperties: false,
+          properties: {
+            value: {
+              type: "string",
+              description: "The date in UTC ISO 8601 format",
+              example: "2023-03-03T02:01:00.000Z",
+            },
+            datetime: {
+              type: "string",
+              description: "The date in YYYY-MM-DDTHH:mm format",
+              example: "2003-03-03T02:00",
+            },
+            timezone: {
+              type: "string",
+              description: "The timezone of the date",
+              example: "Europe/Madrid",
+            },
+          },
         },
       ],
     },
@@ -957,6 +982,25 @@ const _DynamicSelectReplySubmitContent = {
   example: ["Cataluña", "Barcelona"],
 } as const;
 
+const _DateTimeReplySubmitContent = {
+  title: "DateTimeReplySubmitContent",
+  type: "object",
+  required: ["datetime", "timezone"],
+  additionalProperties: false,
+  properties: {
+    datetime: {
+      type: "string",
+      description: "The date in YYYY-MM-DDTHH:mm format",
+      example: "2003-03-03T02:00",
+    },
+    timezone: {
+      type: "string",
+      description: "The timezone of the date",
+      example: "Europe/Madrid",
+    },
+  },
+} as const;
+
 const _PetitionFieldReplyStatus = {
   type: "string",
   description:
@@ -978,6 +1022,7 @@ export const SubmitReply = schema({
         _NumberReplySubmitContent,
         _CheckboxReplySubmitContent,
         _DynamicSelectReplySubmitContent,
+        _DateTimeReplySubmitContent,
       ],
     },
     status: _PetitionFieldReplyStatus,
@@ -1996,6 +2041,11 @@ export const SubmitPetitionReplies = schema({
     \`{ "date": "2022-05-31" }\` will submit a single reply on the date field with the provided date.
     or: \`{ "date": ["2022-05-31", "2022-01-10"] }\` will submit two replies on the field.
     The date must be passed in format \`YYYY-MM-DD\`.
+
+    For \`DATE_TIME\` fields:
+    \`{ "datetime" : {"datetime": "2022-05-31T02:00", timezone: "Etc/UTC"} }\` will submit a single reply on the datetime field with the provided date and timezone.
+    or: \`{ "datetime": [{"datetime": "2022-05-31T02:00", timezone: "Etc/UTC"}, {"datetime": "2022-02-31T04:00", timezone: "Europe/Madrid"}] }\` will submit two replies on the field.
+    The date must be passed in format \`YYYY-MM-DDTHH:mm\` and the timezone must be a valid [tz database timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
     For \`PHONE\` fields:
     \`{ "phone": "+3400000000" }\` will submit a single reply on the phone field with the provided value.

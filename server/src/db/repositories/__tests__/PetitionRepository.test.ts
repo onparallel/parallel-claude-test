@@ -1384,7 +1384,7 @@ describe("repositories/PetitionRepository", () => {
 
     it("creates single replies for each type of alias-able field", async () => {
       // please, add the new field type to this test if this check fails
-      expect(PetitionFieldTypeValues).toHaveLength(12);
+      expect(PetitionFieldTypeValues).toHaveLength(13);
 
       await petitions.prefillPetition(
         petition.id,
@@ -1401,13 +1401,17 @@ describe("repositories/PetitionRepository", () => {
           DATE: ["2024-05-21"],
           ES_TAX_DOCUMENTS: "this should be ignored",
           DOW_JONES_KYC: "this should be ignored",
+          DATE_TIME: {
+            datetime: "2023-03-03T03:00",
+            timezone: "Europe/Madrid",
+          },
         },
         user
       );
 
       const replies = (await petitions.loadRepliesForField.raw(fields.map((f) => f.id))).flat();
 
-      expect(replies).toHaveLength(8);
+      expect(replies).toHaveLength(9);
       expect(replies.map((r) => pick(r, ["type", "content", "petition_field_id"]))).toEqual([
         {
           type: "TEXT",
@@ -1446,12 +1450,21 @@ describe("repositories/PetitionRepository", () => {
           content: { value: "2024-05-21" },
           petition_field_id: fieldId(fields, "DATE"),
         },
+        {
+          type: "DATE_TIME",
+          content: {
+            value: "2023-03-03T02:00:00.000Z",
+            datetime: "2023-03-03T03:00",
+            timezone: "Europe/Madrid",
+          },
+          petition_field_id: fieldId(fields, "DATE_TIME"),
+        },
       ]);
     });
 
     it("creates multiple replies for each type of alias-able field", async () => {
       // please, add the new field type to this test if this check fails
-      expect(PetitionFieldTypeValues).toHaveLength(12);
+      expect(PetitionFieldTypeValues).toHaveLength(13);
 
       await petitions.prefillPetition(
         petition.id,
@@ -1471,6 +1484,16 @@ describe("repositories/PetitionRepository", () => {
           DATE: ["2024-05-21", "2011-08-29"],
           ES_TAX_DOCUMENTS: "this should be ignored",
           DOW_JONES_KYC: "this should be ignored",
+          DATE_TIME: [
+            {
+              datetime: "2023-03-03T03:00",
+              timezone: "Europe/Madrid",
+            },
+            {
+              datetime: "2023-01-03T02:00",
+              timezone: "Europe/Madrid",
+            },
+          ],
         },
         user
       );
@@ -1554,12 +1577,30 @@ describe("repositories/PetitionRepository", () => {
           content: { value: "2011-08-29" },
           petition_field_id: fieldId(fields, "DATE"),
         },
+        {
+          type: "DATE_TIME",
+          content: {
+            value: "2023-03-03T02:00:00.000Z",
+            datetime: "2023-03-03T03:00",
+            timezone: "Europe/Madrid",
+          },
+          petition_field_id: fieldId(fields, "DATE_TIME"),
+        },
+        {
+          type: "DATE_TIME",
+          content: {
+            value: "2023-01-03T01:00:00.000Z",
+            datetime: "2023-01-03T02:00",
+            timezone: "Europe/Madrid",
+          },
+          petition_field_id: fieldId(fields, "DATE_TIME"),
+        },
       ]);
     });
 
     it("ignores a reply if it does not match with field options", async () => {
       // please, add the new field type to this test if this check fails
-      expect(PetitionFieldTypeValues).toHaveLength(12);
+      expect(PetitionFieldTypeValues).toHaveLength(13);
 
       await petitions.prefillPetition(
         petition.id,
@@ -1570,16 +1611,29 @@ describe("repositories/PetitionRepository", () => {
           CHECKBOX: ["A", "B", "C"], // options are right, but field has subtype RADIO
           NUMBER: [1, 10],
           DOW_JONES_KYC: "this should be ignored",
+          DATE_TIME: {
+            datetime: "2023-03-03T03:00",
+            timezone: "Europe/Madrid",
+          },
         },
         user
       );
 
       const replies = (await petitions.loadRepliesForField.raw(fields.map((f) => f.id))).flat();
 
-      expect(replies).toHaveLength(2);
+      expect(replies).toHaveLength(3);
       expect(replies.map((r) => pick(r, ["type", "content", "petition_field_id"]))).toEqual([
         { type: "SELECT", content: { value: "C" }, petition_field_id: fieldId(fields, "SELECT") },
         { type: "NUMBER", content: { value: 10 }, petition_field_id: fieldId(fields, "NUMBER") },
+        {
+          type: "DATE_TIME",
+          content: {
+            value: "2023-03-03T02:00:00.000Z",
+            datetime: "2023-03-03T03:00",
+            timezone: "Europe/Madrid",
+          },
+          petition_field_id: fieldId(fields, "DATE_TIME"),
+        },
       ]);
     });
   });

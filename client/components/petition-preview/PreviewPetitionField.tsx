@@ -41,6 +41,7 @@ import {
   PreviewPetitionFieldCommentsDialog,
   usePreviewPetitionFieldCommentsDialog,
 } from "./dialogs/PreviewPetitionFieldCommentsDialog";
+import { RecipientViewPetitionFieldDateTime } from "../recipient-view/fields/RecipientViewPetitionFieldDateTime";
 
 export interface PreviewPetitionFieldProps
   extends Omit<
@@ -253,6 +254,8 @@ export function PreviewPetitionField({
     <RecipientViewPetitionFieldNumber {...props} {...commonProps} />
   ) : field.type === "DATE" ? (
     <RecipientViewPetitionFieldDate {...props} {...commonProps} />
+  ) : field.type === "DATE_TIME" ? (
+    <RecipientViewPetitionFieldDateTime {...props} {...commonProps} />
   ) : field.type === "PHONE" ? (
     <RecipientViewPetitionFieldPhone {...props} {...commonProps} />
   ) : field.type === "ES_TAX_DOCUMENTS" ? (

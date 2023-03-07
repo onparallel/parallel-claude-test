@@ -1782,6 +1782,126 @@ describe("GraphQL/Public", () => {
         });
       });
 
+      describe("DATE_TIME", () => {
+        let datetimeReply: PetitionFieldReply;
+        beforeAll(async () => {
+          const [datetimeField] = await mocks.createRandomPetitionFields(
+            access.petition_id,
+            1,
+            () => ({
+              type: "DATE_TIME",
+              multiple: true,
+              optional: true,
+            })
+          );
+
+          [datetimeReply] = await mocks.createRandomDateReply(datetimeField.id, access.id, 1);
+        });
+
+        it("updates a DATE_TIME reply", async () => {
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
+                publicUpdatePetitionFieldReply(
+                  keycode: $keycode
+                  replyId: $replyId
+                  reply: $reply
+                ) {
+                  id
+                  status
+                  content
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              replyId: toGlobalId("PetitionFieldReply", datetimeReply.id),
+              reply: {
+                datetime: "2023-03-03T03:00",
+                timezone: "Europe/Madrid",
+              },
+            }
+          );
+
+          expect(errors).toBeUndefined();
+          expect(data?.publicUpdatePetitionFieldReply).toEqual({
+            id: toGlobalId("PetitionFieldReply", datetimeReply.id),
+            status: "PENDING",
+            content: {
+              value: "2023-03-03T02:00:00.000Z",
+              datetime: "2023-03-03T03:00",
+              timezone: "Europe/Madrid",
+            },
+          });
+        });
+
+        it("sends error when updating a DATE_TIME reply with invalid timezone or datetime", async () => {
+          for (const reply of [
+            { datetime: "2023.03.03 10:30", timezone: "Europe/Madrid" },
+            { datetime: "2023-03-03T00:10", timezone: "Madrid" },
+          ]) {
+            const { errors, data } = await testClient.execute(
+              gql`
+                mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
+                  publicUpdatePetitionFieldReply(
+                    keycode: $keycode
+                    replyId: $replyId
+                    reply: $reply
+                  ) {
+                    id
+                  }
+                }
+              `,
+              {
+                keycode: access.keycode,
+                replyId: toGlobalId("PetitionFieldReply", datetimeReply.id),
+                reply,
+              }
+            );
+
+            expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+            expect(data).toBeNull();
+            setCookieHeader(testClient, access.contact_id!, cookieValue);
+          }
+        });
+
+        it("sends error trying to update a DATE_TIME reply with invalid value", async () => {
+          for (const reply of [
+            { datetime: "2023-03-03", timezone: "Europe/Madrid" },
+            { datetime: "2023-03-03T00:10", timezone: "Madrid" },
+            { datetime: "2023.03.03 10:30", timezone: "UTC" },
+            "2077-55-52",
+            "12-12-2022",
+            "2012.01.12",
+            "hello",
+            123,
+          ]) {
+            const { errors, data } = await testClient.execute(
+              gql`
+                mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
+                  publicUpdatePetitionFieldReply(
+                    keycode: $keycode
+                    replyId: $replyId
+                    reply: $reply
+                  ) {
+                    id
+                  }
+                }
+              `,
+              {
+                keycode: access.keycode,
+                replyId: toGlobalId("PetitionFieldReply", datetimeReply.id),
+                reply,
+              }
+            );
+
+            expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+            expect(data).toBeNull();
+            setCookieHeader(testClient, access.contact_id!, cookieValue);
+          }
+        });
+      });
+
       describe("NUMBER", () => {
         let numberReply: PetitionFieldReply;
         let limitedNumberReply: PetitionFieldReply;

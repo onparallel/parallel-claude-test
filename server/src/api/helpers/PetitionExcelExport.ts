@@ -56,6 +56,8 @@ export class PetitionExcelExport {
       this.textRepliesTab.addNumericReply(field, replies);
     } else if (field.type === "DATE") {
       this.textRepliesTab.addDateReply(field, replies);
+    } else if (field.type === "DATE_TIME") {
+      this.textRepliesTab.addDateTimeReply(field, replies);
     }
   }
 

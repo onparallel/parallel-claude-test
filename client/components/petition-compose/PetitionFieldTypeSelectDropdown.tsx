@@ -92,6 +92,7 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
                 "SELECT",
                 "NUMBER",
                 "DATE",
+                "DATE_TIME",
                 "PHONE",
               ],
             },
@@ -266,7 +267,12 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
                 ) : activeType === "DATE" ? (
                   <FormattedMessage
                     id="component.petition-field-type-select-dropdown.date"
-                    defaultMessage="Allows the recipient to respond with dates."
+                    defaultMessage="Allows the recipient to respond with a date."
+                  />
+                ) : activeType === "DATE_TIME" ? (
+                  <FormattedMessage
+                    id="component.petition-field-type-select-dropdown.date-time"
+                    defaultMessage="Allows the recipient to respond with a date and time."
                   />
                 ) : activeType === "PHONE" ? (
                   <FormattedMessage

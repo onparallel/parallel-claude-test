@@ -517,6 +517,7 @@ export const PetitionFieldType = enumType({
     { name: "CHECKBOX", description: "A options list." },
     { name: "NUMBER", description: "A only numbers field." },
     { name: "DATE", description: "A datepicker field." },
+    { name: "DATE_TIME", description: "A datepicker with time and timezone field." },
     { name: "PHONE", description: "A phone formatted field." },
     { name: "ES_TAX_DOCUMENTS", description: "A tax documents/info field." },
     { name: "DOW_JONES_KYC", description: "A saerch in Dow Jones field." },

@@ -25,6 +25,18 @@ export const FORMATS = (() => {
       hour12: false,
     },
     /**
+     * E.g. 05/03/2020 14:16:00
+     */
+    "L+LTS": {
+      day: "numeric",
+      month: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hour12: false,
+    },
+    /**
      * E.g. March 5, 2020
      */
     LL: {
@@ -45,6 +57,15 @@ export const FORMATS = (() => {
     LT: {
       hour: "numeric",
       minute: "numeric",
+      hour12: false,
+    },
+    /**
+     * E.g. 14:16:00
+     */
+    LTS: {
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
       hour12: false,
     },
     /**
@@ -73,3 +94,7 @@ export const FORMATS = (() => {
   };
   return formats as Record<keyof typeof formats, DateTimeFormatOptions>;
 })();
+
+export function prettifyTimezone(timezone: string) {
+  return timezone.replaceAll("_", " ");
+}

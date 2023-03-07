@@ -3,7 +3,7 @@ import { difference } from "remeda";
 import { PetitionField } from "../db/__types";
 import { DynamicSelectOption } from "../graphql/helpers/parseDynamicSelectValues";
 import { Maybe } from "./types";
-import { isValidDate } from "./validators";
+import { isValidDate, isValidDatetime, isValidTimezone } from "./validators";
 
 export function validateReplyValue(field: PetitionField, reply: any) {
   switch (field.type) {
@@ -40,6 +40,26 @@ export function validateReplyValue(field: PetitionField, reply: any) {
         throw {
           code: "INVALID_VALUE_ERROR",
           message: "Reply is not a valid date with YYYY-MM-DD format.",
+        };
+      }
+      break;
+    }
+    case "DATE_TIME": {
+      if (typeof reply !== "object") {
+        throw { code: "INVALID_TYPE_ERROR", message: "Reply must be of type object." };
+      }
+
+      if (!isValidDatetime(reply.datetime)) {
+        throw {
+          code: "INVALID_VALUE_ERROR",
+          message: "Reply has not a valid date with YYYY-MM-DDTHH:mm format.",
+        };
+      }
+
+      if (!isValidTimezone(reply.timezone)) {
+        throw {
+          code: "INVALID_VALUE_ERROR",
+          message: "Reply has not a valid timezone.",
         };
       }
       break;

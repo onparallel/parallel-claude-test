@@ -4,6 +4,7 @@ import {
   Button,
   Flex,
   Grid,
+  HStack,
   IconButton,
   Input,
   NumberDecrementStepper,
@@ -12,6 +13,7 @@ import {
   NumberInputField,
   NumberInputStepper,
   Stack,
+  Text,
 } from "@chakra-ui/react";
 import { DeleteIcon, PlusCircleIcon } from "@parallel/chakra/icons";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
@@ -20,6 +22,7 @@ import {
   useSimpleSelectOptions,
 } from "@parallel/components/common/SimpleSelect";
 import { PetitionFieldVisibilityEditor_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { dateToDatetimeLocal, prettifyTimezone } from "@parallel/utils/dates";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import {
   defaultCondition,
@@ -42,6 +45,7 @@ import { Fragment, SetStateAction, useCallback, useEffect, useMemo, useState } f
 import { FormattedMessage, useIntl } from "react-intl";
 import { createFilter } from "react-select";
 import { pick, uniq, zip } from "remeda";
+import { HelpPopover } from "../common/HelpPopover";
 import { NumeralInput } from "../common/NumeralInput";
 import { SimpleOption, SimpleSelect, SimpleSelectProps } from "../common/SimpleSelect";
 
@@ -410,7 +414,7 @@ function ConditionPredicate({
           { label: "≤", value: "LESS_THAN_OR_EQUAL" },
           { label: "≥", value: "GREATER_THAN_OR_EQUAL" }
         );
-      } else if (field.type === "DATE") {
+      } else if (field.type === "DATE" || field.type === "DATE_TIME") {
         options.push(
           {
             label: intl.formatMessage({
@@ -690,6 +694,27 @@ function ConditionPredicate({
             onChange={onChange}
             isReadOnly={isReadOnly}
           />
+        ) : field.type === "DATE_TIME" ? (
+          <HStack>
+            <ConditionPredicateValueDatetime
+              field={field}
+              showError={showError}
+              value={condition}
+              onChange={onChange}
+              isReadOnly={isReadOnly}
+            />
+            <HelpPopover>
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="component.petition-field-visibility-editor.date-time-help"
+                  defaultMessage="This date and time use your current timezone {timezone}."
+                  values={{
+                    timezone: prettifyTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone),
+                  }}
+                />
+              </Text>
+            </HelpPopover>
+          </HStack>
         ) : (
           <ConditionPredicateValueString
             field={field}
@@ -718,6 +743,38 @@ function ConditionPredicateValueDate({
       type="date"
       onChange={(e) => setValue(e.target.value || null)}
       onBlur={() => onChange({ ...condition!, value })}
+      value={value ?? ""}
+      backgroundColor="white"
+      isInvalid={showError && value === null}
+      placeholder={intl.formatMessage({
+        id: "generic.enter-a-value",
+        defaultMessage: "Enter a value",
+      })}
+      isDisabled={isReadOnly}
+      opacity={isReadOnly ? "1 !important" : undefined}
+    />
+  );
+}
+
+function ConditionPredicateValueDatetime({
+  showError,
+  value: condition,
+  onChange,
+  isReadOnly,
+}: ConditionPredicateProps) {
+  const intl = useIntl();
+  const [value, setValue] = useState(
+    condition.value && typeof condition.value === "string"
+      ? dateToDatetimeLocal(condition.value)
+      : null
+  );
+
+  return (
+    <Input
+      size="sm"
+      type="datetime-local"
+      onChange={(e) => setValue(e.target.value || null)}
+      onBlur={() => onChange({ ...condition!, value: value && new Date(value).toISOString() })}
       value={value ?? ""}
       backgroundColor="white"
       isInvalid={showError && value === null}

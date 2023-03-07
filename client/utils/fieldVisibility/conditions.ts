@@ -27,7 +27,7 @@ export function defaultCondition<T extends Pick<PetitionField, "id" | "type" | "
       ? "CONTAIN"
       : field.type === "NUMBER"
       ? "GREATER_THAN"
-      : field.type === "DATE"
+      : field.type === "DATE" || field.type === "DATE_TIME"
       ? "LESS_THAN"
       : "EQUAL",
     value: defaultConditionFieldValue(field, column),
@@ -56,6 +56,8 @@ function defaultConditionFieldValue<T extends Pick<PetitionField, "id" | "type" 
     return 0;
   } else if (field.type === "DATE") {
     return format(new Date(), "yyyy-MM-dd");
+  } else if (field.type === "DATE_TIME") {
+    return format(new Date(), "yyyy-MM-dd HH:mm");
   } else {
     return null;
   }

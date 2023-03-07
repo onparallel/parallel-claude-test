@@ -2651,6 +2651,8 @@ export type PetitionFieldType =
   | "CHECKBOX"
   /** A datepicker field. */
   | "DATE"
+  /** A datepicker with time and timezone field. */
+  | "DATE_TIME"
   /** A saerch in Dow Jones field. */
   | "DOW_JONES_KYC"
   /** A dynamic select field. */

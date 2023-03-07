@@ -28,6 +28,7 @@ import {
 } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldCheckbox } from "./RecipientViewPetitionFieldCheckbox";
 import { RecipientViewPetitionFieldDate } from "./RecipientViewPetitionFieldDate";
+import { RecipientViewPetitionFieldDateTime } from "./RecipientViewPetitionFieldDateTime";
 import { RecipientViewPetitionFieldDynamicSelect } from "./RecipientViewPetitionFieldDynamicSelect";
 import { RecipientViewPetitionFieldFileUpload } from "./RecipientViewPetitionFieldFileUpload";
 import { RecipientViewPetitionFieldHeading } from "./RecipientViewPetitionFieldHeading";
@@ -251,6 +252,8 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
     <RecipientViewPetitionFieldNumber {...props} {...commonProps} />
   ) : props.field.type === "DATE" ? (
     <RecipientViewPetitionFieldDate {...props} {...commonProps} />
+  ) : props.field.type === "DATE_TIME" ? (
+    <RecipientViewPetitionFieldDateTime {...props} {...commonProps} />
   ) : props.field.type === "PHONE" ? (
     <RecipientViewPetitionFieldPhone {...props} {...commonProps} />
   ) : props.field.type === "ES_TAX_DOCUMENTS" ? (

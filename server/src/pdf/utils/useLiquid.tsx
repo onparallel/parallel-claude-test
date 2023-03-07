@@ -2,7 +2,8 @@ import { Liquid } from "liquidjs";
 import { createContext, PropsWithChildren, useContext, useMemo } from "react";
 import { IntlShape, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { FORMATS } from "../../util/dates";
+import { FORMATS, prettifyTimezone } from "../../util/dates";
+import { DateLiquidValue, DateTimeLiquidValue } from "./useLiquidScope";
 
 function useCreateLiquid() {
   return useMemo(() => {
@@ -48,19 +49,43 @@ function useCreateLiquid() {
       });
     });
 
-    engine.registerFilter("date", function (value: string | number | Date, format?: string) {
-      if (value === undefined) {
-        return "";
+    engine.registerFilter(
+      "date",
+      function (value: string | number | Date | DateLiquidValue, format?: string) {
+        if (value === undefined) {
+          return "";
+        }
+        if (!isDefined(format) || !["LL", "L"].includes(format)) {
+          format = "LL";
+        }
+        const _value = value instanceof DateLiquidValue ? value.value : value;
+        const intl = (this.context.globals as any)["intl"] as IntlShape;
+        return intl.formatDate(_value, {
+          timeZone: "UTC",
+          ...FORMATS[format as keyof typeof FORMATS],
+        });
       }
-      if (!isDefined(format) || !["LL", "L"].includes(format)) {
-        format = "LL";
+    );
+
+    engine.registerFilter(
+      "datetime",
+      function (value: string | number | Date | DateTimeLiquidValue, format?: string) {
+        if (value === undefined) {
+          return "";
+        }
+        if (!isDefined(format) || !["LLL", "L+LT", "L+LTS"].includes(format)) {
+          format = "LLL";
+        }
+        const _value = value instanceof DateTimeLiquidValue ? value.value : value;
+        const timezone = value instanceof DateTimeLiquidValue ? value.timezone : "UTC";
+        const intl = (this.context.globals as any)["intl"] as IntlShape;
+
+        return `${intl.formatDate(_value, {
+          timeZone: timezone,
+          ...FORMATS[format as keyof typeof FORMATS],
+        })} (${prettifyTimezone(timezone)})`;
       }
-      const intl = (this.context.globals as any)["intl"] as IntlShape;
-      return intl.formatDate(value, {
-        timeZone: "UTC",
-        ...FORMATS[format as keyof typeof FORMATS],
-      });
-    });
+    );
 
     for (const filter of ["escape", "escape_once", "url_decode", "newline_to_br", "strip_html"]) {
       engine.registerFilter(filter, function () {

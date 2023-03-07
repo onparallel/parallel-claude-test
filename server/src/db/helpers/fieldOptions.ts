@@ -35,6 +35,11 @@ const SCHEMAS = {
     additionalProperties: false,
     properties: {},
   },
+  DATE_TIME: {
+    type: "object",
+    additionalProperties: false,
+    properties: {},
+  },
   PHONE: {
     type: "object",
     required: [],
@@ -337,6 +342,7 @@ export function defaultFieldOptions(
         };
       }
       case "DOW_JONES_KYC":
+      case "DATE_TIME":
       case "DATE": {
         return {};
       }

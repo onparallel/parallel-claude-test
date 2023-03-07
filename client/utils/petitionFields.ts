@@ -117,6 +117,11 @@ export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
           id: "petition.field-type.date",
           defaultMessage: "Date",
         });
+      case "DATE_TIME":
+        return intl.formatMessage({
+          id: "petition.field-type.date-and-time",
+          defaultMessage: "Date and time",
+        });
       case "ES_TAX_DOCUMENTS":
         return intl.formatMessage({
           id: "petition.field-type.tax-documents",
@@ -147,6 +152,7 @@ export function usePetitionFieldTypeColor(type: PetitionFieldType) {
       NUMBER: theme.colors.orange[500],
       PHONE: theme.colors.orange[400],
       DATE: theme.colors.orange[300],
+      DATE_TIME: "#EB9753",
       ES_TAX_DOCUMENTS: theme.colors.teal[500],
       DOW_JONES_KYC: "#48A3D3",
     } as Record<PetitionFieldType, string>

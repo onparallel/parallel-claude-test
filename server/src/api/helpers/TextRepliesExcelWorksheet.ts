@@ -2,12 +2,13 @@ import { IntlShape } from "@formatjs/intl";
 import Excel from "exceljs";
 import { ApiContext, WorkerContext } from "../../context";
 import { PetitionField, PetitionFieldReply } from "../../db/__types";
+import { FORMATS } from "../../util/dates";
 import { Maybe } from "../../util/types";
 import { ExcelWorksheet } from "./ExcelWorksheet";
 
 export type TextReplyRow = {
   title: Maybe<string>;
-  answer: string | number | Date;
+  answer: string | number;
 };
 
 export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
@@ -74,7 +75,23 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
       this.addRows(
         replies.map((r, i) => ({
           title: field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
-          answer: new Date(r.content.value),
+          answer: this.intl.formatDate(r.content.value, { ...FORMATS["L"], timeZone: "Etc/UTC" }),
+        }))
+      );
+    } else {
+      this.addEmptyReply(field);
+    }
+  }
+
+  public addDateTimeReply(field: PetitionField, replies: PetitionFieldReply[]) {
+    if (replies.length > 0) {
+      this.addRows(
+        replies.map((r, i) => ({
+          title: field.title?.concat(field.multiple ? ` [${i + 1}] (UTC)` : " (UTC)") || " (UTC)",
+          answer: this.intl.formatDate(r.content.value, {
+            ...FORMATS["L+LTS"],
+            timeZone: "Etc/UTC",
+          }),
         }))
       );
     } else {
