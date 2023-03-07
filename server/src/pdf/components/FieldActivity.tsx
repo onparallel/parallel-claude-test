@@ -39,7 +39,12 @@ export function FieldActivity({
                 _deleted={{ textTransform: "lowercase" }}
               />
             ),
-            date: <DateTime value={reply.repliedAt} format={FORMATS.LLL} />,
+            date: (
+              <DateTime
+                value={reply.repliedAt}
+                format={{ timeZone: "UTC", timeZoneName: "short", ...FORMATS.LLL }}
+              />
+            ),
           }}
         />
       </Text>
@@ -62,7 +67,12 @@ export function FieldActivity({
                     _deleted={{ textTransform: "lowercase" }}
                   />
                 ),
-                date: <DateTime value={reply.approvedAt ?? 0} format={FORMATS.LLL} />,
+                date: (
+                  <DateTime
+                    value={reply.approvedAt ?? 0}
+                    format={{ timeZone: "UTC", timeZoneName: "short", ...FORMATS.LLL }}
+                  />
+                ),
               }}
             />
           </Text>
