@@ -180,7 +180,7 @@ export const PetitionComposeFieldSettings = Object.assign(
                   description={
                     <FormattedMessage
                       id="field-settings.show-activity-pdf-description"
-                      defaultMessage="Enable this option to include who and when added each reply and their approval in the pdf."
+                      defaultMessage="Enabling this option will include who and when a reply and its approval were submitted in the PDF."
                     />
                   }
                   controlId="show-activity-in-pdf"

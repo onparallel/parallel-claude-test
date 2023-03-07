@@ -191,7 +191,7 @@
   },
   {
     "term": "document.petition-export.reply-updated-by",
-    "definition": "Respuesta por {name} el {date}",
+    "definition": "Respondido por {name} el {date}",
     "context": "Reply by {name} on {date}"
   },
   {

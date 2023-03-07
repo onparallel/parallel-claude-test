@@ -6366,8 +6366,8 @@
   },
   {
     "term": "field-settings.show-activity-pdf-description",
-    "definition": "Activar esta opción incluirá la actividad de quién y cuando añadió cada respuesta y su aprobación en el pdf.",
-    "context": "Enable this option to include who and when added each reply and their approval in the pdf."
+    "definition": "Al activar esta opción se incluirá la actividad de quién y cuándo añadió cada respuesta y su aprobación en el PDF.",
+    "context": "Enabling this option will include who and when a reply and its approval were submitted in the PDF."
   },
   {
     "term": "field-settings.show-in-pdf-description",
