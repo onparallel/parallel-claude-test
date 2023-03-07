@@ -31,6 +31,7 @@ interface DbColumn {
   isNullable: boolean;
   hasDefault: boolean;
   position: number;
+  comment: string | undefined;
 }
 
 interface DbTable {
@@ -92,7 +93,20 @@ export interface TablePrimaryKeys {
 export interface ${table.name} {
   ${table.columns
     .sort((a, b) => a.position - b.position)
-    .map((c) => `${c.name}: ${c.isNullable ? `Maybe<${c.type}>` : c.type}; // ${c.realType}`)
+    .map((c) => {
+      const definition = `${c.name}: ${c.isNullable ? `Maybe<${c.type}>` : c.type}; // ${
+        c.realType
+      }`;
+      return c.comment
+        ? ["/**"]
+            .concat(
+              ...c.comment.split("\n").map((line) => ` * ${line.replaceAll("*/", "*\\/")}`),
+              " */",
+              definition
+            )
+            .join("\n")
+        : definition;
+    })
     .join("\n  ")}
 }
 
@@ -195,6 +209,27 @@ async function getDefinedTables(tables: string[], enums: Map<string, DbEnum>) {
     ),
     (pk) => pk.table_name
   );
+
+  const comments = await query<{
+    table_name: string;
+    column_name: string;
+    description: string;
+  }>(/* sql */ `
+    select
+      c.table_name,
+      c.column_name,
+      pgd.description
+    from pg_catalog.pg_statio_all_tables as st
+    inner join pg_catalog.pg_description pgd on (
+      pgd.objoid = st.relid
+    )
+    inner join information_schema.columns c on (
+      pgd.objsubid   = c.ordinal_position and
+      c.table_schema = st.schemaname and
+      c.table_name   = st.relname
+    );
+
+  `);
   return new Map<string, DbTable>(
     Object.entries(columns).map(([tableName, columns]) => [
       tableName,
@@ -208,6 +243,9 @@ async function getDefinedTables(tables: string[], enums: Map<string, DbEnum>) {
           isNullable: column.is_nullable === "YES",
           hasDefault: !!column.column_default,
           position: column.ordinal_position,
+          comment: comments.find(
+            (c) => c.table_name === tableName && c.column_name === column.column_name
+          )?.description,
           _: column,
         })),
         primaryKey: primaryKeys[tableName].column_name,
