@@ -3835,6 +3835,11 @@
     "context": "Audit trail"
   },
   {
+    "term": "component.petition-signatures-card.cancelling",
+    "definition": "Cancelando",
+    "context": "Cancelling"
+  },
+  {
     "term": "component.petition-signatures-card.edit-signers",
     "definition": "Editar firmantes",
     "context": "Edit signers"

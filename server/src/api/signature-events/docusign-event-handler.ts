@@ -2,10 +2,7 @@ import { json, RequestHandler, Router } from "express";
 import { isDefined, maxBy } from "remeda";
 import { ApiContext } from "../../context";
 import { SignatureStartedEvent } from "../../db/events";
-import {
-  PetitionSignatureConfigSigner,
-  PetitionSignatureRequestCancelData,
-} from "../../db/repositories/PetitionRepository";
+import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
 import { fullName } from "../../util/fullName";
 import { fromGlobalId } from "../../util/globalId";
 
@@ -254,7 +251,7 @@ async function recipientDeclined(ctx: ApiContext, body: DocuSignEventBody, petit
     (s) => s.recipientId === body.data.recipientId!
   )?.declinedReason;
 
-  await ctx.petitions.cancelPetitionSignatureRequest(
+  await ctx.signature.cancelSignatureRequest(
     signature,
     "DECLINED_BY_SIGNER",
     {
@@ -271,8 +268,6 @@ async function recipientDeclined(ctx: ApiContext, body: DocuSignEventBody, petit
       },
     }
   );
-
-  await ctx.signature.cancelSignatureRequest(signature);
 }
 
 /**
@@ -289,23 +284,20 @@ async function envelopeVoided(ctx: ApiContext, body: DocuSignEventBody, petition
     `DOCUSIGN/${body.data.envelopeId}`
   ))!;
   const [canceller, cancellerIndex] = [signature.signature_config.signersInfo[0], 0];
-  await ctx.petitions.cancelPetitionSignatureRequest(
-    signature,
-    "DECLINED_BY_SIGNER",
-    {
+  await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature, {
+    cancel_reason: "DECLINED_BY_SIGNER",
+    cancel_data: {
       canceller,
       decline_reason: body.data.envelopeSummary.voidedReason,
     },
-    {
-      signer_status: {
-        ...signature.signer_status,
-        [cancellerIndex]: {
-          ...signature.signer_status[cancellerIndex],
-          declined_at: new Date(body.generatedDateTime),
-        },
+    signer_status: {
+      ...signature.signer_status,
+      [cancellerIndex]: {
+        ...signature.signer_status[cancellerIndex],
+        declined_at: new Date(body.generatedDateTime),
       },
-    }
-  );
+    },
+  });
 }
 
 /** recipient signed the document */
@@ -374,21 +366,34 @@ async function recipientAutoresponded(
   ))!;
 
   const bouncedSignerExternalId = body.data.recipientId!;
-  const signer = signature.signature_config.signersInfo.find(
+  const bouncedSignerIndex = signature.signature_config.signersInfo.findIndex(
     (s) => s.externalId === bouncedSignerExternalId
   );
+  const bouncedSigner = signature.signature_config.signersInfo[bouncedSignerIndex];
 
-  const cancelData: PetitionSignatureRequestCancelData<"REQUEST_ERROR"> = {
-    error: signer ? `email ${signer.email} bounced` : "email bounced",
-    error_code: "EMAIL_BOUNCED",
-    extra: signer
-      ? { email: signer.email, name: fullName(signer.firstName, signer.lastName) }
-      : null,
-  };
-
-  await ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData);
-
-  await ctx.signature.cancelSignatureRequest(signature);
+  await ctx.signature.cancelSignatureRequest(
+    signature,
+    "REQUEST_ERROR",
+    {
+      error: bouncedSigner ? `email ${bouncedSigner.email} bounced` : "email bounced",
+      error_code: "EMAIL_BOUNCED",
+      extra: bouncedSigner
+        ? {
+            email: bouncedSigner.email,
+            name: fullName(bouncedSigner.firstName, bouncedSigner.lastName),
+          }
+        : null,
+    },
+    {
+      signer_status: {
+        ...signature.signer_status,
+        [bouncedSignerIndex]: {
+          ...signature.signer_status[bouncedSignerIndex],
+          bounced_at: new Date(body.generatedDateTime),
+        },
+      },
+    }
+  );
 
   await updateSignatureStartedEvent(
     petitionId,

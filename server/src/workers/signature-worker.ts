@@ -7,7 +7,7 @@ import { IntegrationSettings, SignatureProvider } from "../db/repositories/Integ
 import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
 import { ContactLocale, OrgIntegration } from "../db/__types";
 import { InvalidCredentialsError } from "../integrations/GenericIntegration";
-import { SignatureResponse } from "../services/signature-clients/client";
+import { CancelAbortedError, SignatureResponse } from "../services/signature-clients/client";
 import { fullName } from "../util/fullName";
 import { removeKeys } from "../util/remedaExtensions";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
@@ -25,16 +25,17 @@ async function startSignatureProcess(
   payload: { petitionSignatureRequestId: number },
   ctx: WorkerContext
 ) {
-  const signature = await ctx.petitions.updatePetitionSignature(
-    payload.petitionSignatureRequestId,
-    { status: "PROCESSING" },
-    { status: "ENQUEUED" }
+  const enqueued = await ctx.petitions.loadPetitionSignatureById.raw(
+    payload.petitionSignatureRequestId
   );
-
   // the signature wasn't found or with status !== ENQUEUED, ignore and finish
-  if (!signature) {
+  if (!enqueued || enqueued.status !== "ENQUEUED") {
     return;
   }
+
+  const [signature] = (await ctx.petitions.updatePetitionSignatures(enqueued.id, {
+    status: "PROCESSING",
+  }))!;
 
   const petition = await fetchPetition(signature.petition_id, ctx);
   const organization = await ctx.organizations.loadOrg(petition.org_id);
@@ -75,7 +76,7 @@ async function startSignatureProcess(
       ctx
     );
 
-    await ctx.petitions.updatePetitionSignature(signature.id, {
+    await ctx.petitions.updatePetitionSignatures(signature.id, {
       temporary_file_document_id: documentTmpFile.id,
     });
 
@@ -88,6 +89,15 @@ async function startSignatureProcess(
     if (petitionTheme?.type !== "PDF_DOCUMENT") {
       throw new Error(`Expected theme of type PDF_DOCUMENT on Petition:${petition.id}`);
     }
+
+    // create event before sending request to signature client, no matter the client's response
+    await ctx.petitions.createEvent({
+      type: "SIGNATURE_STARTED",
+      petition_id: petition.id,
+      data: {
+        petition_signature_request_id: signature.id,
+      },
+    });
 
     // send request to signature client
     const data = await signatureClient.startSignatureRequest(
@@ -102,7 +112,9 @@ async function startSignatureProcess(
     );
 
     // remove events array from data before saving to DB
-    data.documents = data.documents.map((doc) => removeKeys(doc, ([key]) => key !== "events"));
+    data.documents = data.documents.map((doc) =>
+      removeKeys(doc as any, ([key]) => key !== "events")
+    );
 
     // update signers on signature_config to include the externalId provided by provider so we can match it later on events webhook
     const updatedSignersInfo = signature.signature_config.signersInfo.map(
@@ -112,7 +124,7 @@ async function startSignatureProcess(
       })
     );
 
-    await ctx.petitions.updatePetitionSignature(signature.id, {
+    await ctx.petitions.updatePetitionSignatures(signature.id, {
       external_id: `${integration.provider.toUpperCase()}/${data.id}`,
       data,
       signature_config: {
@@ -138,9 +150,12 @@ async function startSignatureProcess(
         ? error.code
         : "UNKNOWN_ERROR";
 
-    await ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", {
-      error_code: errorCode,
-      error: error instanceof Error ? pick(error, ["message", "stack"]) : stringify(error),
+    await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature, {
+      cancel_reason: "REQUEST_ERROR",
+      cancel_data: {
+        error_code: errorCode,
+        error: error instanceof Error ? pick(error, ["message", "stack"]) : stringify(error),
+      },
     });
 
     // update signature_config with additional signers specified by recipient so user can restart the signature request knowing who are the signers
@@ -193,8 +208,11 @@ async function cancelSignatureProcess(
     }
     const signatureClient = ctx.signature.getClient(integration);
     await signatureClient.cancelSignatureRequest(signature.external_id.replace(/^.*?\//, ""));
+
+    // after signature client confirmed the cancellation, it's safe to move the signature from CANCELLING to CANCELLED
+    await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature);
   } catch (error) {
-    if (!(error instanceof InvalidCredentialsError)) {
+    if (!(error instanceof InvalidCredentialsError) && !(error instanceof CancelAbortedError)) {
       throw error;
     }
   }
@@ -202,7 +220,7 @@ async function cancelSignatureProcess(
 
 /** sends a reminder email to every pending signer of the signature request */
 async function sendSignatureReminder(
-  payload: { petitionSignatureRequestId: number },
+  payload: { petitionSignatureRequestId: number; userId: number },
   ctx: WorkerContext
 ) {
   try {
@@ -221,6 +239,15 @@ async function sendSignatureReminder(
 
     const signatureClient = ctx.signature.getClient(integration);
     await signatureClient.sendPendingSignatureReminder(signature.external_id.replace(/^.*?\//, ""));
+
+    ctx.petitions.createEvent({
+      type: "SIGNATURE_REMINDER",
+      petition_id: signature.petition_id,
+      data: {
+        user_id: payload.userId,
+        petition_signature_request_id: signature.id,
+      },
+    });
   } catch (error) {
     if (!(error instanceof InvalidCredentialsError)) {
       throw error;
@@ -238,6 +265,10 @@ async function storeSignedDocument(
 ) {
   try {
     const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
+    if (isDefined(signature.file_upload_id)) {
+      // signed document is already available on signature, do nothing
+      return;
+    }
     const petition = await fetchPetition(signature.petition_id, ctx);
 
     const { title, orgIntegrationId } = signature.signature_config;
@@ -261,11 +292,18 @@ async function storeSignedDocument(
       ctx
     );
 
-    await ctx.emails.sendPetitionCompletedEmail(
-      petition.id,
-      { signer: payload.signer },
-      `SignatureWorker:${payload.petitionSignatureRequestId}`
-    );
+    const petitionSignatures = await ctx.petitions.loadPetitionSignaturesByPetitionId(petition.id);
+    // don't send email if there is a pending signature request on the petition
+    if (
+      !petitionSignatures.some((s) => ["ENQUEUED", "PROCESSED", "PROCESSING"].includes(s.status))
+    ) {
+      await ctx.emails.sendPetitionCompletedEmail(
+        petition.id,
+        { signer: payload.signer },
+        `SignatureWorker:${payload.petitionSignatureRequestId}`
+      );
+    }
+
     await ctx.petitions.createEvent({
       type: "SIGNATURE_COMPLETED",
       petition_id: petition.id,
@@ -274,8 +312,10 @@ async function storeSignedDocument(
         file_upload_id: signedDocument.id,
       },
     });
-    await ctx.petitions.updatePetitionSignature(payload.petitionSignatureRequestId, {
+    await ctx.petitions.updatePetitionSignatures(payload.petitionSignatureRequestId, {
       status: "COMPLETED",
+      cancel_data: null,
+      cancel_reason: null,
       file_upload_id: signedDocument.id,
     });
     await ctx.petitions.updatePetition(
@@ -296,6 +336,10 @@ async function storeAuditTrail(
 ) {
   try {
     const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
+    if (isDefined(signature.file_upload_audit_trail_id)) {
+      // audit trail is already available on signature, do nothing
+      return;
+    }
     const petition = await fetchPetition(signature.petition_id, ctx);
     const { orgIntegrationId, title } = signature.signature_config;
     const integration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
@@ -311,7 +355,7 @@ async function storeAuditTrail(
       ctx
     );
 
-    await ctx.petitions.updatePetitionSignature(signature.id, {
+    await ctx.petitions.updatePetitionSignatures(signature.id, {
       file_upload_audit_trail_id: auditTrail.id,
     });
   } catch (error) {

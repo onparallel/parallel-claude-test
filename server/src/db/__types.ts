@@ -270,6 +270,7 @@ export type PetitionSignatureStatus =
   | "ENQUEUED"
   | "PROCESSING"
   | "PROCESSED"
+  | "CANCELLING"
   | "CANCELLED"
   | "COMPLETED";
 
@@ -277,6 +278,7 @@ export const PetitionSignatureStatusValues = [
   "ENQUEUED",
   "PROCESSING",
   "PROCESSED",
+  "CANCELLING",
   "CANCELLED",
   "COMPLETED",
 ] as PetitionSignatureStatus[];

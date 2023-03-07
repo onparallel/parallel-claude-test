@@ -3,10 +3,7 @@ import { isDefined, pick } from "remeda";
 import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
 import { SignatureStartedEvent } from "../../db/events";
-import {
-  PetitionSignatureConfigSigner,
-  PetitionSignatureRequestCancelData,
-} from "../../db/repositories/PetitionRepository";
+import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
 import { fromGlobalId } from "../../util/globalId";
 
 export interface SignaturItEventBody {
@@ -134,23 +131,20 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
     data.document
   );
 
-  await ctx.petitions.cancelPetitionSignatureRequest(
-    signature,
-    "DECLINED_BY_SIGNER",
-    {
+  await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature, {
+    cancel_reason: "DECLINED_BY_SIGNER",
+    cancel_data: {
       canceller,
       decline_reason: data.document.decline_reason,
     },
-    {
-      signer_status: {
-        ...signature.signer_status,
-        [cancellerIndex]: {
-          ...signature.signer_status[cancellerIndex],
-          declined_at: new Date(data.created_at),
-        },
+    signer_status: {
+      ...signature.signer_status,
+      [cancellerIndex]: {
+        ...signature.signer_status[cancellerIndex],
+        declined_at: new Date(data.created_at),
       },
-    }
-  );
+    },
+  });
 }
 
 /** audit trail has been completed, audit trail and signed document are ready to be downloaded */
@@ -205,14 +199,14 @@ async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petition
     );
   }
 
-  const cancelData: PetitionSignatureRequestCancelData<"REQUEST_ERROR"> = {
-    error: data.reason ?? `email ${data.document.email} bounced`,
-    error_code: "EMAIL_BOUNCED",
-    extra: pick(data.document, ["email", "name"]),
-  };
-
   const [, signerIndex] = findSigner(signature.signature_config.signersInfo, data.document);
-  await ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData, {
+  await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature, {
+    cancel_reason: "REQUEST_ERROR",
+    cancel_data: {
+      error: data.reason ?? `email ${data.document.email} bounced`,
+      error_code: "EMAIL_BOUNCED",
+      extra: pick(data.document, ["email", "name"]),
+    },
     signer_status: {
       ...signature.signer_status,
       [signerIndex]: {

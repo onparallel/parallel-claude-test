@@ -47,6 +47,7 @@ declare module "signaturit-sdk" {
     /** Deletes a subscription. */
     deleteSubscription: (subscriptionId: string) => Promise<any[]>;
     sendSignatureReminder: (signatureId: string) => Promise<SignatureResponse>;
+    getSignature: (signatureId: string) => Promise<SignatureResponse>;
   };
 
   export type BrandingParams = {
@@ -169,6 +170,7 @@ declare module "signaturit-sdk" {
 
   export type Document = {
     id: string;
+    decline_reason?: string;
     created_at: Date;
     file: {
       name: string;

@@ -5,7 +5,6 @@ import { isDefined } from "remeda";
 import SignaturitSDK, { BrandingParams } from "signaturit-sdk";
 import { URLSearchParams } from "url";
 import { CONFIG, Config } from "../../config";
-import { IntegrationRepository } from "../../db/repositories/IntegrationRepository";
 import { OrganizationRepository } from "../../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../../db/repositories/PetitionRepository";
 import { ContactLocale } from "../../db/__types";
@@ -32,7 +31,19 @@ import {
   OrganizationLayout,
   ORGANIZATION_LAYOUT_SERVICE,
 } from "../organization-layout";
-import { ISignatureClient, Recipient, SignatureOptions } from "./client";
+import { SIGNATURE, SignatureService } from "../signature";
+import {
+  CancelAbortedError,
+  ISignatureClient,
+  Recipient,
+  SignatureOptions,
+  SignatureResponse,
+} from "./client";
+
+interface SignaturitError {
+  status_code: number;
+  message: string;
+}
 
 @injectable()
 export class SignaturitClient implements ISignatureClient {
@@ -42,7 +53,7 @@ export class SignaturitClient implements ISignatureClient {
     @inject(EMAILS) private emails: IEmailsService,
     @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: IOrganizationCreditsService,
     @inject(ORGANIZATION_LAYOUT_SERVICE) private layouts: IOrganizationLayoutService,
-    @inject(IntegrationRepository) private integrations: IntegrationRepository,
+    @inject(SIGNATURE) private signature: SignatureService,
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(SignaturitIntegration) private signaturitApiKey: SignaturitIntegration
@@ -176,7 +187,19 @@ export class SignaturitClient implements ISignatureClient {
 
   async cancelSignatureRequest(externalId: string) {
     await this.withSignaturitSDK(async (sdk) => {
-      await sdk.cancelSignature(externalId);
+      try {
+        await sdk.cancelSignature(externalId);
+      } catch (e) {
+        if (this.isCancelNonReadyRequestError(e)) {
+          const signature = await sdk.getSignature(externalId);
+          if (signature.documents.every((d) => d.status === "completed")) {
+            await this.handleDocumentsAlreadySigned(signature);
+            throw new CancelAbortedError();
+          }
+        } else {
+          throw e;
+        }
+      }
     });
   }
 
@@ -209,7 +232,16 @@ export class SignaturitClient implements ISignatureClient {
 
   async sendPendingSignatureReminder(signatureId: string) {
     await this.withSignaturitSDK(async (sdk) => {
-      await sdk.sendSignatureReminder(signatureId);
+      try {
+        await sdk.sendSignatureReminder(signatureId);
+      } catch (e) {
+        if (this.isDocumentsAlreadySignedError(e)) {
+          const signature = await sdk.getSignature(signatureId);
+          await this.handleDocumentsAlreadySigned(signature);
+        } else {
+          throw e;
+        }
+      }
     });
   }
 
@@ -313,5 +345,92 @@ export class SignaturitClient implements ISignatureClient {
       document_canceled: signatureCancelledEmail,
       pending_sign: signatureReminderEmail,
     };
+  }
+
+  private isSignaturitError(e: unknown): e is SignaturitError {
+    return (
+      isDefined(e) &&
+      typeof e === "object" &&
+      "status_code" in e &&
+      typeof e.status_code === "number" &&
+      "message" in e &&
+      typeof e.message === "string"
+    );
+  }
+
+  private isDocumentsAlreadySignedError(e: unknown) {
+    return (
+      this.isSignaturitError(e) && e.status_code === 403 && e.message === "Documents already signed"
+    );
+  }
+
+  private isCancelNonReadyRequestError(e: unknown) {
+    return (
+      this.isSignaturitError(e) &&
+      e.status_code === 403 &&
+      e.message === "You cannot cancel a non-ready request"
+    );
+  }
+
+  /** "documents already signed" error occurrs when trying to send a signature reminder on a signature that is already fully signed, or a signature that was cancelled by any reason.
+   * For this reason, before doing anything we have to get the current status of the signature to be able to sync.
+   *
+   * If the documents on signaturit are canceled, we have to cancel the signature request
+   * If the documents are completed, try to download the signed document and audit trail. If everything is ok, set signature to COMPLETED
+   */
+  private async handleDocumentsAlreadySigned(signature: SignatureResponse) {
+    if (signature.documents.some((d) => d.status === "canceled")) {
+      // the document was manually cancelled by an User, data is in sync
+      return;
+    }
+    const signatureRequest = await this.petitions.loadPetitionSignatureByExternalId(
+      `SIGNATURIT/${signature.id}`
+    );
+    if (!signatureRequest) {
+      throw new Error(`PetitionSignatureRequest with externalId ${signature.id} not found`);
+    }
+
+    if (signature.documents.every((d) => d.status === "completed")) {
+      // we can't be sure who was the last person to sign the document.
+      // so we take the last configured signer, their name will be used in the PetitionCompleted email
+      const lastSigner = signature.documents.at(-1)!;
+      if (!isDefined(signatureRequest.file_upload_audit_trail_id)) {
+        await this.signature.storeAuditTrail(signatureRequest, `${signature.id}/${lastSigner.id}`);
+      }
+      if (!isDefined(signatureRequest.file_upload_id)) {
+        await this.signature.storeSignedDocument(
+          signatureRequest,
+          `${signature.id}/${lastSigner.id}`,
+          signatureRequest.signature_config.signersInfo.find((s) => s.externalId === lastSigner.id)!
+        );
+      }
+    } else if (
+      signature.documents.some((d) => d.status === "declined") &&
+      signatureRequest.status !== "CANCELLED"
+    ) {
+      const declinedDocument = signature.documents.find((d) => d.status === "declined")!;
+      const cancellerIndex = signatureRequest.signature_config.signersInfo.findIndex(
+        (s) => s.externalId === declinedDocument.id
+      )!;
+      const canceller = signatureRequest.signature_config.signersInfo[cancellerIndex];
+      await this.petitions.updatePetitionSignatureRequestAsCancelled(signatureRequest, {
+        cancel_reason: "DECLINED_BY_SIGNER",
+        cancel_data: {
+          decline_reason: declinedDocument.decline_reason,
+          canceller: {
+            email: canceller.email,
+            firstName: canceller.firstName,
+            lastName: canceller.lastName,
+          },
+        },
+        signer_status: {
+          ...signatureRequest.signer_status,
+          [cancellerIndex]: {
+            ...signatureRequest.signer_status[cancellerIndex],
+            declined_at: new Date(declinedDocument.created_at),
+          },
+        },
+      });
+    }
   }
 }

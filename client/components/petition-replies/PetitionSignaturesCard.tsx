@@ -23,6 +23,7 @@ import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionL
 import { usePetitionSignaturesCardPolling } from "@parallel/utils/usePetitionSignaturesCardPolling";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 import { Card, CardHeader } from "../common/Card";
 import { HelpPopover } from "../common/HelpPopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -166,7 +167,8 @@ export const PetitionSignaturesCard = Object.assign(
      */
     if (
       petition.signatureConfig &&
-      (current?.status === "COMPLETED" || current?.status === "CANCELLED")
+      isDefined(current) &&
+      ["COMPLETED", "CANCELLING", "CANCELLED"].includes(current.status)
     ) {
       older.unshift(current);
       current = null;

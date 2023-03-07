@@ -334,6 +334,7 @@ export interface NexusGenEnums {
   PetitionSignatureCancelReason: db.PetitionSignatureCancelReason;
   PetitionSignatureRequestStatus:
     | "CANCELLED"
+    | "CANCELLING"
     | "COMPLETED"
     | "ENQUEUED"
     | "PROCESSED"

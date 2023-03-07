@@ -332,7 +332,7 @@ describe("GraphQL/OrgIntegrations", () => {
       .where({ id: signatureRequest.id })
       .select("status");
 
-    expect(request).toEqual([{ status: "CANCELLED" }]);
+    expect(request).toEqual([{ status: "CANCELLING" }]);
   });
 
   it("throws error if a normal user tries to create an integration", async () => {

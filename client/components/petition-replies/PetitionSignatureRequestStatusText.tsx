@@ -35,6 +35,18 @@ export function PetitionSignatureRequestStatusText({
           </Text>
         </Stack>
       );
+    case "CANCELLING":
+      return (
+        <Stack direction="row" display="inline-flex" alignItems="center" color="red.500">
+          <AlertCircleIcon />
+          <Text>
+            <FormattedMessage
+              id="component.petition-signatures-card.cancelling"
+              defaultMessage="Cancelling"
+            />
+          </Text>
+        </Stack>
+      );
     case "CANCELLED":
       return (
         <Stack direction="row" display="inline-flex" alignItems="center" color="red.500">

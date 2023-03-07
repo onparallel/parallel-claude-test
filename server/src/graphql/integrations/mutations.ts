@@ -141,12 +141,9 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
         );
       }
       if (pendingSignatures.length > 0) {
-        await Promise.all([
-          ctx.petitions.cancelPetitionSignatureRequest(pendingSignatures, "CANCELLED_BY_USER", {
-            user_id: ctx.user!.id,
-          }),
-          ctx.signature.cancelSignatureRequest(pendingSignatures),
-        ]);
+        await ctx.signature.cancelSignatureRequest(pendingSignatures, "CANCELLED_BY_USER", {
+          user_id: ctx.user!.id,
+        });
       }
 
       await ctx.integrations.deleteOrgIntegration(args.id, `User:${ctx.user!.id}`);

@@ -33,7 +33,7 @@ import { removeNotDefined } from "../../util/remedaExtensions";
 import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/reminderUtils";
 import { getMentions } from "../../util/slate";
 import { random } from "../../util/token";
-import { Maybe, MaybeArray, UnwrapArray } from "../../util/types";
+import { Maybe, MaybeArray, Replace, UnwrapArray } from "../../util/types";
 import { validateReplyValue } from "../../util/validateReplyValue";
 import {
   CreatePetitionEvent,
@@ -4670,13 +4670,14 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
-  async updatePetitionSignature(
-    petitionSignatureId: number,
+  async updatePetitionSignatures(
+    petitionSignatureId: MaybeArray<number>,
     data: Partial<PetitionSignatureRequest>,
-    where?: Partial<PetitionSignatureRequest>
-  ): Promise<TableTypes["petition_signature_request"] | undefined> {
-    const [row] = await this.from("petition_signature_request")
-      .where({ id: petitionSignatureId, ...where })
+    t?: Knex.Transaction
+  ) {
+    const ids = unMaybeArray(petitionSignatureId);
+    const rows = await this.from("petition_signature_request", t)
+      .whereIn("id", ids)
       .update({
         ...data,
         updated_at: this.now(),
@@ -4684,15 +4685,15 @@ export class PetitionRepository extends BaseRepository {
       .returning("*");
 
     if (isDefined(data.status)) {
-      await this.from("petition")
-        .where("id", row.petition_id)
+      await this.from("petition", t)
+        .whereIn("id", uniq(rows.map((r) => r.petition_id)))
         .update({
           latest_signature_status:
             data.cancel_reason === "CANCELLED_BY_USER" ? "CANCELLED_BY_USER" : data.status,
         });
     }
 
-    return row;
+    return rows;
   }
 
   async updatePetitionSignatureByExternalId(
@@ -4719,11 +4720,14 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
-  async cancelPetitionSignatureRequest<CancelReason extends PetitionSignatureCancelReason>(
+  async updatePetitionSignatureRequestAsCancelled<
+    CancelReason extends PetitionSignatureCancelReason
+  >(
     petitionSignatures: MaybeArray<Pick<PetitionSignatureRequest, "id" | "petition_id">>,
-    reason: CancelReason,
-    cancelData: PetitionSignatureRequestCancelData<CancelReason>,
-    extraData?: Partial<PetitionSignatureRequest>,
+    data?: Replace<
+      Partial<PetitionSignatureRequest>,
+      { cancel_reason: CancelReason; cancel_data: PetitionSignatureRequestCancelData<CancelReason> }
+    >,
     t?: Knex.Transaction
   ) {
     const signatures = unMaybeArray(petitionSignatures);
@@ -4737,19 +4741,29 @@ export class PetitionRepository extends BaseRepository {
       )
       .whereNotIn("status", ["COMPLETED", "CANCELLED"])
       .update({
-        ...extraData,
+        ...data,
         status: "CANCELLED",
-        cancel_reason: reason,
-        cancel_data: cancelData,
         updated_at: this.now(),
       })
       .returning("*");
 
-    await this.from("petition", t)
-      .whereIn("id", uniq(signatures.map((s) => s.petition_id)))
-      .update({
-        latest_signature_status: reason === "CANCELLED_BY_USER" ? "CANCELLED_BY_USER" : "CANCELLED",
-      });
+    const byPetitionId = groupBy(rows, (r) => r.petition_id);
+
+    await pMap(
+      Object.values(byPetitionId),
+      async (signatures) => {
+        const [latestSignature] = sortBy(signatures, [(s) => s.created_at, "desc"]);
+        await this.from("petition", t)
+          .where("id", latestSignature.petition_id)
+          .update({
+            latest_signature_status:
+              latestSignature.cancel_reason === "CANCELLED_BY_USER"
+                ? "CANCELLED_BY_USER"
+                : "CANCELLED",
+          });
+      },
+      { concurrency: 5 }
+    );
 
     await this.createEvent(
       rows.map((signature) => ({
@@ -4757,8 +4771,8 @@ export class PetitionRepository extends BaseRepository {
         petition_id: signature.petition_id,
         data: {
           petition_signature_request_id: signature.id,
-          cancel_reason: reason,
-          cancel_data: cancelData,
+          cancel_reason: signature.cancel_reason!,
+          cancel_data: signature.cancel_data,
         },
       })),
       t

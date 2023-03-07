@@ -3049,6 +3049,7 @@ export interface PetitionSignatureRequestSignerStatus {
 
 export type PetitionSignatureRequestStatus =
   | "CANCELLED"
+  | "CANCELLING"
   | "COMPLETED"
   | "ENQUEUED"
   | "PROCESSED"

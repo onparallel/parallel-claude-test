@@ -438,16 +438,13 @@ export const deletePetitions = mutationField("deletePetitions", {
       ).flat();
 
       if (pendingSignatureRequests.length > 0) {
-        await Promise.all([
-          ctx.petitions.cancelPetitionSignatureRequest(
-            pendingSignatureRequests,
-            "CANCELLED_BY_USER",
-            { user_id: ctx.user!.id },
-            undefined,
-            t
-          ),
-          ctx.signature.cancelSignatureRequest(pendingSignatureRequests, t),
-        ]);
+        await ctx.signature.cancelSignatureRequest(
+          pendingSignatureRequests,
+          "CANCELLED_BY_USER",
+          { user_id: ctx.user!.id },
+          {},
+          t
+        );
       }
     });
     return SUCCESS;

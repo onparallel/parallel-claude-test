@@ -86,12 +86,13 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
       );
     }
 
-    const [[signatureRequest]] = await Promise.all([
-      ctx.petitions.cancelPetitionSignatureRequest(signature, "CANCELLED_BY_USER", {
+    const [signatureRequest] = await ctx.signature.cancelSignatureRequest(
+      signature,
+      "CANCELLED_BY_USER",
+      {
         user_id: ctx.user!.id,
-      }),
-      ctx.signature.cancelSignatureRequest(signature),
-    ]);
+      }
+    );
 
     return signatureRequest;
   },
@@ -109,9 +110,13 @@ export const updateSignatureRequestMetadata = mutationField("updateSignatureRequ
     metadata: nonNull(jsonObjectArg()),
   },
   resolve: async (_, args, ctx) => {
-    return (await ctx.petitions.updatePetitionSignature(args.petitionSignatureRequestId, {
-      metadata: args.metadata,
-    }))!;
+    const [signature] = await ctx.petitions.updatePetitionSignatures(
+      args.petitionSignatureRequestId,
+      {
+        metadata: args.metadata,
+      }
+    );
+    return signature!;
   },
 });
 
@@ -200,17 +205,7 @@ export const sendSignatureRequestReminders = mutationField("sendSignatureRequest
     }
 
     if (signature.status === "PROCESSED") {
-      await Promise.all([
-        ctx.signature.sendSignatureReminders(signature),
-        ctx.petitions.createEvent({
-          type: "SIGNATURE_REMINDER",
-          petition_id: petition.id,
-          data: {
-            user_id: ctx.user!.id,
-            petition_signature_request_id: petitionSignatureRequestId,
-          },
-        }),
-      ]);
+      await ctx.signature.sendSignatureReminders(signature, ctx.user!.id);
     }
 
     return RESULT.SUCCESS;

@@ -3845,6 +3845,7 @@ type PetitionSignatureRequestSignerStatus {
 
 enum PetitionSignatureRequestStatus {
   CANCELLED
+  CANCELLING
   COMPLETED
   ENQUEUED
   PROCESSED

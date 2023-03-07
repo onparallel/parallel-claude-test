@@ -1,14 +1,20 @@
 import { Container, inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { countBy, isDefined, omit } from "remeda";
+import { countBy, omit } from "remeda";
 import { CONFIG, Config } from "../config";
 import { IntegrationRepository, SignatureProvider } from "../db/repositories/IntegrationRepository";
 import {
   PetitionRepository,
   PetitionSignatureConfig,
   PetitionSignatureConfigSigner,
+  PetitionSignatureRequestCancelData,
 } from "../db/repositories/PetitionRepository";
-import { PetitionAccess, PetitionSignatureRequest, User } from "../db/__types";
+import {
+  PetitionAccess,
+  PetitionSignatureCancelReason,
+  PetitionSignatureRequest,
+  User,
+} from "../db/__types";
 import { unMaybeArray } from "../util/arrays";
 import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";
@@ -29,15 +35,21 @@ export interface ISignatureService {
     signatureConfig: PetitionSignatureConfig,
     starter: User | PetitionAccess
   ): Promise<any>;
-  cancelSignatureRequest(
+  cancelSignatureRequest<CancelReason extends PetitionSignatureCancelReason>(
     signatures: MaybeArray<PetitionSignatureRequest>,
+    cancelReason: CancelReason,
+    cancelData: PetitionSignatureRequestCancelData<CancelReason>,
+    extraData?: Partial<PetitionSignatureRequest>,
     t?: Knex.Transaction
-  ): Promise<void>;
+  ): Promise<PetitionSignatureRequest[]>;
   cancelPendingSignatureRequests(
     petitionId: number,
     canceller: PetitionAccess | User
   ): Promise<void>;
-  sendSignatureReminders(signatures: MaybeArray<PetitionSignatureRequest>): Promise<void>;
+  sendSignatureReminders(
+    signatures: MaybeArray<PetitionSignatureRequest>,
+    userId: number
+  ): Promise<void>;
   storeSignedDocument(
     signature: PetitionSignatureRequest,
     signedDocumentExternalId: string,
@@ -128,22 +140,13 @@ export class SignatureService implements ISignatureService {
       },
     });
 
-    await Promise.all([
-      this.queues.enqueueMessages("signature-worker", {
-        groupId: `signature-${toGlobalId("Petition", petitionId)}`,
-        body: {
-          type: "start-signature-process",
-          payload: { petitionSignatureRequestId: signatureRequest.id },
-        },
-      }),
-      this.petitions.createEvent({
-        type: "SIGNATURE_STARTED",
-        petition_id: petitionId,
-        data: {
-          petition_signature_request_id: signatureRequest.id,
-        },
-      }),
-    ]);
+    await this.queues.enqueueMessages("signature-worker", {
+      groupId: `signature-${toGlobalId("Petition", petitionId)}`,
+      body: {
+        type: "start-signature-process",
+        payload: { petitionSignatureRequestId: signatureRequest.id },
+      },
+    });
 
     return { petition: updatedPetition, signatureRequest };
   }
@@ -179,15 +182,30 @@ export class SignatureService implements ISignatureService {
     });
   }
 
-  async cancelSignatureRequest(
+  async cancelSignatureRequest<CancelReason extends PetitionSignatureCancelReason>(
     signature: MaybeArray<PetitionSignatureRequest>,
+    cancelReason: CancelReason,
+    cancelData: PetitionSignatureRequestCancelData<CancelReason>,
+    extraData?: Partial<PetitionSignatureRequest>,
     t?: Knex.Transaction
-  ): Promise<void> {
+  ) {
     const signatures = unMaybeArray(signature).filter((s) => s.status === "PROCESSED");
-    if (signatures.length > 0) {
+
+    const rows = await this.petitions.updatePetitionSignatures(
+      signatures.map((s) => s.id),
+      {
+        status: "CANCELLING",
+        cancel_reason: cancelReason,
+        cancel_data: cancelData,
+        ...extraData,
+      },
+      t
+    );
+
+    if (rows.length > 0) {
       await this.queues.enqueueMessages(
         "signature-worker",
-        signatures.map((s) => ({
+        rows.map((s) => ({
           id: `signature-${toGlobalId("Petition", s.petition_id)}`,
           groupId: `signature-${toGlobalId("Petition", s.petition_id)}`,
           body: {
@@ -198,9 +216,11 @@ export class SignatureService implements ISignatureService {
         t
       );
     }
+
+    return rows;
   }
 
-  async sendSignatureReminders(signature: MaybeArray<PetitionSignatureRequest>) {
+  async sendSignatureReminders(signature: MaybeArray<PetitionSignatureRequest>, userId: number) {
     const signatures = unMaybeArray(signature).filter((s) => s.status === "PROCESSED");
     if (signatures.length > 0) {
       await this.queues.enqueueMessages(
@@ -210,7 +230,7 @@ export class SignatureService implements ISignatureService {
           groupId: `signature-${toGlobalId("Petition", s.petition_id)}`,
           body: {
             type: "send-signature-reminder" as const,
-            payload: { petitionSignatureRequestId: s.id },
+            payload: { petitionSignatureRequestId: s.id, userId },
           },
         }))
       );
@@ -253,26 +273,23 @@ export class SignatureService implements ISignatureService {
     const pendingSignatureRequest = previousSignatureRequests.find((r) => r.status === "PROCESSED");
 
     // cancel pending signature request before starting a new one
-    if (enqueuedSignatureRequest || pendingSignatureRequest) {
-      await this.petitions.cancelPetitionSignatureRequest(
-        [enqueuedSignatureRequest, pendingSignatureRequest].filter(isDefined),
+    if (enqueuedSignatureRequest) {
+      await this.petitions.updatePetitionSignatureRequestAsCancelled(enqueuedSignatureRequest, {
+        cancel_reason: "REQUEST_RESTARTED",
+        cancel_data: isAccess ? { petition_access_id: canceller.id } : { user_id: canceller.id },
+      });
+    }
+
+    // only send a cancel request if the signature request has been already processed
+    if (pendingSignatureRequest) {
+      await this.cancelSignatureRequest(
+        pendingSignatureRequest,
         "REQUEST_RESTARTED",
         isAccess ? { petition_access_id: canceller.id } : { user_id: canceller.id }
       );
-
-      if (pendingSignatureRequest) {
-        // only send a cancel request if the signature request has been already processed
-        await this.queues.enqueueMessages("signature-worker", {
-          groupId: `signature-${toGlobalId("Petition", pendingSignatureRequest.petition_id)}`,
-          body: {
-            type: "cancel-signature-process",
-            payload: { petitionSignatureRequestId: pendingSignatureRequest.id },
-          },
-        });
-      }
-
-      this.petitions.loadPetitionSignaturesByPetitionId.dataloader.clear(petitionId);
     }
+
+    this.petitions.loadPetitionSignaturesByPetitionId.dataloader.clear(petitionId);
   }
 
   /**

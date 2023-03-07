@@ -4081,22 +4081,10 @@ describe("GraphQL/Petitions", () => {
           status: "ENQUEUED",
         },
         events: {
-          totalCount: 2,
-          items: [{ type: "SIGNATURE_STARTED" }, { type: "PETITION_COMPLETED" }],
+          totalCount: 1,
+          items: [{ type: "PETITION_COMPLETED" }],
         },
       });
-
-      // update enqueued signature request to have status "PROCESSED" (skip ENQUEUED, PROCESSING cancel check error)
-      await mocks.knex
-        .from<PetitionSignatureRequest>("petition_signature_request")
-        .where(
-          "id",
-          fromGlobalId(
-            data!.completePetition.currentSignatureRequest.id,
-            "PetitionSignatureRequest"
-          ).id
-        )
-        .update("status", "PROCESSED");
     });
 
     it("cancels the pending signature process when completing a second time", async () => {
@@ -4116,6 +4104,7 @@ describe("GraphQL/Petitions", () => {
               status
               signatureRequests {
                 status
+                cancelReason
               }
               currentSignatureRequest {
                 status
@@ -4141,15 +4130,14 @@ describe("GraphQL/Petitions", () => {
       expect(data?.completePetition).toEqual({
         id: toGlobalId("Petition", petitions[1].id),
         status: "COMPLETED",
-        signatureRequests: [{ status: "ENQUEUED" }, { status: "CANCELLED" }],
+        signatureRequests: [
+          { status: "ENQUEUED", cancelReason: null },
+          { status: "CANCELLED", cancelReason: "REQUEST_RESTARTED" },
+        ],
         currentSignatureRequest: { status: "ENQUEUED" },
         events: {
-          totalCount: 3,
-          items: [
-            { type: "SIGNATURE_STARTED" },
-            { type: "SIGNATURE_CANCELLED" },
-            { type: "PETITION_COMPLETED" },
-          ],
+          totalCount: 2,
+          items: [{ type: "SIGNATURE_CANCELLED" }, { type: "PETITION_COMPLETED" }],
         },
       });
     });

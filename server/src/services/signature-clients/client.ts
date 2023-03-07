@@ -2,6 +2,7 @@ import { ContactLocale } from "../../db/__types";
 
 interface Document {
   id: string;
+  decline_reason?: string;
   created_at: Date;
   file: {
     name: string;
@@ -55,3 +56,5 @@ export interface ISignatureClient {
   sendPendingSignatureReminder: (signatureId: string) => Promise<void>;
   onOrganizationBrandChange?(orgId: number): Promise<void>;
 }
+
+export class CancelAbortedError extends Error {}
