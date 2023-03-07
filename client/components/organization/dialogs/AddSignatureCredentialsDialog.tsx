@@ -6,11 +6,8 @@ import {
   Checkbox,
   Image,
   Input,
-  InputGroup,
-  InputRightElement,
   Radio,
   RadioGroup,
-  Spinner,
   Switch,
   useCounter,
   useToast,
@@ -25,10 +22,9 @@ import {
   SignatureOrgIntegrationProvider,
   useAddSignatureCredentialsDialog_UserFragment,
 } from "@parallel/graphql/__types";
-import { withError } from "@parallel/utils/promises/withError";
 import { useDocusignConsentPopup } from "@parallel/utils/useDocusignConsentPopup";
-import { useEffect, useState } from "react";
-import { Controller, FormProvider, useForm, useFormContext, UseFormReturn } from "react-hook-form";
+import { MouseEvent, useEffect } from "react";
+import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const PROVIDERS: SignatureOrgIntegrationProvider[] = ["SIGNATURIT", "DOCUSIGN"];
@@ -52,7 +48,6 @@ function AddSignatureCredentialsDialog({
 }: DialogProps<useAddSignatureCredentialsDialog_UserFragment, AddSignatureCredentialsDialogData>) {
   const {
     valueAsNumber: currentStep,
-    isAtMin: isFirstStep,
     isAtMax: isLastStep,
     increment: nextStep,
     decrement: previousStep,
@@ -63,79 +58,73 @@ function AddSignatureCredentialsDialog({
       provider: "SIGNATURIT",
       isDefault: false,
     },
-    reValidateMode: "onSubmit",
+    mode: "onSubmit",
   });
+  const { handleSubmit, watch, setError, resetField, setFocus } = form;
 
-  const selectedProvider = form.watch("provider");
-
-  async function submitForm() {
-    const [error] = await withError(
-      form.handleSubmit(props.onResolve, () => {
-        throw new Error();
-      })
-    );
-    if (!error) {
-      props.onResolve(form.getValues());
-    }
-  }
-
-  const [consentState, setConsentState] = useState<"IDLE" | "AWAITING">("IDLE");
-
+  const selectedProvider = watch("provider");
   const showDocusignConsentPopup = useDocusignConsentPopup();
   const toast = useToast();
-  async function handleConfirmClick() {
-    if (isLastStep) {
-      if (selectedProvider === "DOCUSIGN") {
-        const docusignForm = form as UseFormReturn<AddSignatureCredentialsDialogData<"DOCUSIGN">>;
-        setConsentState("AWAITING");
-        const [error] = await withError(
-          showDocusignConsentPopup({
-            environment: docusignForm.getValues("credentials.sandboxMode")
-              ? "sandbox"
-              : "production",
-            isDefault: form.getValues("isDefault"),
-            name: form.getValues("name"),
-          })
-        );
-        setConsentState("IDLE");
-        if (!error) {
-          toast({
-            isClosable: true,
-            status: "success",
-            title: intl.formatMessage({
-              id: "component.add-signature-credentials-dialog.toast-title",
-              defaultMessage: "Success",
-            }),
-            description: intl.formatMessage(
-              {
-                id: "component.add-signature-credentials-dialog.toast-description",
-                defaultMessage: "{provider} integration created successfully.",
-              },
-              { provider: "Docusign" }
-            ),
-          });
-          props.onResolve(form.getValues());
-        }
-      } else {
-        await submitForm();
-      }
-    } else {
-      nextStep();
-    }
-  }
 
-  function handleCancelClick() {
-    if (isFirstStep) {
-      props.onReject();
-    } else {
-      previousStep();
+  const [validateSignaturitApiKey] = useMutation(
+    AddSignatureCredentialsDialog_validateSignaturitApiKeyDocument
+  );
+
+  function handleNextClick(e: MouseEvent) {
+    e.preventDefault();
+    if (selectedProvider === "SIGNATURIT") {
+      resetField("credentials", { defaultValue: { API_KEY: "" } });
+      setTimeout(() => setFocus("credentials.API_KEY"));
+    } else if (selectedProvider === "DOCUSIGN") {
+      resetField("credentials", { defaultValue: { sandboxMode: false } });
     }
+    nextStep();
   }
 
   return (
     <ConfirmDialog
       hasCloseButton
       closeOnOverlayClick={false}
+      content={{
+        as: "form",
+        onSubmit: handleSubmit(async ({ name, provider, credentials, isDefault }) => {
+          if (provider === "SIGNATURIT") {
+            const { data } = await validateSignaturitApiKey({
+              variables: { apiKey: credentials.API_KEY },
+            });
+            if (data?.validateSignaturitApiKey !== "SUCCESS") {
+              setError("credentials.API_KEY", { type: "invalid" }, { shouldFocus: true });
+              return;
+            }
+          } else if (provider === "DOCUSIGN") {
+            try {
+              await showDocusignConsentPopup({
+                environment: credentials.sandboxMode ? "sandbox" : "production",
+                isDefault: form.getValues("isDefault"),
+                name: form.getValues("name"),
+              });
+              toast({
+                isClosable: true,
+                status: "success",
+                title: intl.formatMessage({
+                  id: "component.add-signature-credentials-dialog.toast-title",
+                  defaultMessage: "Success",
+                }),
+                description: intl.formatMessage(
+                  {
+                    id: "component.add-signature-credentials-dialog.toast-description",
+                    defaultMessage: "{provider} integration created successfully.",
+                  },
+                  { provider: "Docusign" }
+                ),
+              });
+            } catch (e) {
+              return;
+            }
+          }
+          props.onResolve({ name, provider, credentials, isDefault });
+        }),
+      }}
       header={
         <Flex alignItems="baseline">
           <Text>
@@ -158,34 +147,29 @@ function AddSignatureCredentialsDialog({
         </FormProvider>
       }
       confirm={
-        <Button
-          colorScheme="primary"
-          variant="solid"
-          onClick={handleConfirmClick}
-          isLoading={form.formState.isSubmitting || consentState === "AWAITING"}
-        >
-          {isLastStep ? (
-            selectedProvider === "DOCUSIGN" ? (
+        isLastStep ? (
+          <Button colorScheme="primary" type="submit" isLoading={form.formState.isSubmitting}>
+            {selectedProvider === "DOCUSIGN" ? (
               <FormattedMessage
                 id="component.add-signature-credentials-dialog.docusign-authorize.button"
                 defaultMessage="Authorize"
               />
             ) : (
               <FormattedMessage id="generic.accept" defaultMessage="Accept" />
-            )
-          ) : (
+            )}
+          </Button>
+        ) : (
+          <Button type="button" colorScheme="primary" variant="solid" onClick={handleNextClick}>
             <FormattedMessage id="generic.continue" defaultMessage="Continue" />
-          )}
-        </Button>
+          </Button>
+        )
       }
       cancel={
-        <Button onClick={handleCancelClick}>
-          {isFirstStep ? (
-            <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-          ) : (
+        isLastStep ? (
+          <Button type="button" onClick={() => previousStep()}>
             <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
-          )}
-        </Button>
+          </Button>
+        ) : null
       }
       {...props}
     />
@@ -231,10 +215,6 @@ function SignaturitCredentialsInput() {
     register,
   } = useFormContext<AddSignatureCredentialsDialogData<"SIGNATURIT">>();
 
-  const [validateSignaturitApiKey, { loading: isValidating }] = useMutation(
-    AddSignatureCredentialsDialog_validateSignaturitApiKeyDocument
-  );
-
   return (
     <FormControl id="apikey" isInvalid={!!errors.credentials}>
       <FormLabel>
@@ -252,24 +232,7 @@ function SignaturitCredentialsInput() {
         </HStack>
       </FormLabel>
       <Stack>
-        <InputGroup>
-          <Input
-            {...register("credentials.API_KEY", {
-              required: true,
-              validate: async (apiKey: string) => {
-                const data = await validateSignaturitApiKey({
-                  variables: { apiKey },
-                });
-                return data.data?.validateSignaturitApiKey === "SUCCESS";
-              },
-            })}
-          />
-          <InputRightElement>
-            {isValidating ? (
-              <Spinner thickness="2px" speed="0.65s" emptyColor="gray.200" color="gray.500" />
-            ) : null}
-          </InputRightElement>
-        </InputGroup>
+        <Input {...register("credentials.API_KEY", { required: true })} />
         <FormErrorMessage>
           <FormattedMessage
             id="component.add-signature-credentials-dialog.signaturit-api-key-required-error"
@@ -338,16 +301,14 @@ function AddSignatureCredentialsStep2({ hasDocusignSandbox }: { hasDocusignSandb
   const {
     register,
     formState: { errors },
-    setValue,
+    resetField,
     watch,
   } = useFormContext<AddSignatureCredentialsDialogData>();
 
   const selectedProvider = watch("provider");
   useEffect(() => {
-    setValue(
-      "name",
-      selectedProvider[0].toUpperCase() + selectedProvider.substring(1).toLowerCase()
-    );
+    const name = selectedProvider[0].toUpperCase() + selectedProvider.slice(1).toLowerCase();
+    resetField("name", { defaultValue: name });
   }, [selectedProvider]);
 
   return (
@@ -372,7 +333,6 @@ function AddSignatureCredentialsStep2({ hasDocusignSandbox }: { hasDocusignSandb
           </Text>
         </Stack>
       </FormControl>
-
       {selectedProvider === "SIGNATURIT" ? (
         <SignaturitCredentialsInput />
       ) : selectedProvider === "DOCUSIGN" ? (
