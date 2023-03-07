@@ -24,7 +24,8 @@ export function createLogger({ container }: interfaces.Context): ILogger {
   const logger = winston.createLogger({
     transports: [
       new winston.transports.Console({
-        level: process.env.NODE_ENV === "production" ? "info" : "debug",
+        level:
+          process.env.NODE_ENV === "production" ? "info" : process.env.DEBUG ? "debug" : "info",
         format:
           process.env.NODE_ENV === "production"
             ? winston.format.simple()
