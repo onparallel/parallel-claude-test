@@ -67,7 +67,15 @@ export abstract class GenericIntegration<
       },
     } as EnhancedOrgIntegration<TType, TProvider, false>);
     try {
-      return await handler(credentials, context);
+      const response = await handler(credentials, context);
+      if (integration.invalid_credentials) {
+        await this.integrations.updateOrgIntegration(
+          orgIntegrationId,
+          { invalid_credentials: false },
+          `OrgIntegration:${orgIntegrationId}`
+        );
+      }
+      return response;
     } catch (error) {
       if (error instanceof InvalidCredentialsError) {
         await this.integrations.updateOrgIntegration(

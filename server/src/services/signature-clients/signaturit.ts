@@ -71,9 +71,12 @@ export class SignaturitClient implements ISignatureClient {
       try {
         const sdk = new SignaturitSDK(apiKey, context.environment === "production");
         return await handler(sdk, context);
-      } catch (e: any) {
-        if (e?.error === "invalid_grant") {
-          throw new InvalidCredentialsError("INVALID_CREDENTIALS", e?.message);
+      } catch (e) {
+        if (this.isInvalidGrantError(e)) {
+          throw new InvalidCredentialsError("INVALID_CREDENTIALS", e.error_message);
+        }
+        if (this.isUserIsBannedError(e)) {
+          throw new InvalidCredentialsError("INVALID_CREDENTIALS", e.message);
         }
         throw e;
       }
@@ -369,6 +372,22 @@ export class SignaturitClient implements ISignatureClient {
       this.isSignaturitError(e) &&
       e.status_code === 403 &&
       e.message === "You cannot cancel a non-ready request"
+    );
+  }
+
+  private isUserIsBannedError(e: unknown): e is SignaturitError {
+    return this.isSignaturitError(e) && e.status_code === 403 && e.message === "The user is banned";
+  }
+
+  private isInvalidGrantError(e: unknown): e is { error: string; error_message: string } {
+    return (
+      isDefined(e) &&
+      typeof e === "object" &&
+      "error" in e &&
+      typeof e.error === "string" &&
+      "error_message" in e &&
+      typeof e.error_message === "string" &&
+      e.error === "invalid_grant"
     );
   }
 
