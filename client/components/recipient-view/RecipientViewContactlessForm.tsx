@@ -243,8 +243,12 @@ export function RecipientViewContactlessForm({
             codeExpired();
           }
         }
-      } catch {
-        window.location.reload();
+      } catch (error) {
+        if (isApolloError(error, "ACCESS_ALREADY_EXISTS")) {
+          setState({ step: "EMAIL_EXISTS" });
+        } else {
+          window.location.reload();
+        }
       }
     }
   }

@@ -11,6 +11,7 @@ import {
   stringArg,
 } from "nexus";
 import { outdent } from "outdent";
+import { DatabaseError } from "pg";
 import { isDefined } from "remeda";
 import { getClientIp } from "request-ip";
 import { Task } from "../../db/repositories/TaskRepository";
@@ -257,33 +258,42 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
               `PetitionAccess:${access!.id}`
             );
 
-            await ctx.petitions.withTransaction(async (t) => {
-              ctx.contact = (
-                await ctx.contacts.loadOrCreate(
-                  {
-                    email,
-                    org_id: petition.org_id,
-                    first_name: result.data!.contact_first_name!,
-                    last_name: result.data!.contact_last_name || null,
-                  },
-                  `PetitionAccess:${access!.id}`,
-                  t
-                )
-              )[0];
+            ctx.contact = (
+              await ctx.contacts.loadOrCreate(
+                {
+                  email,
+                  org_id: petition.org_id,
+                  first_name: result.data!.contact_first_name!,
+                  last_name: result.data!.contact_last_name || null,
+                },
+                `PetitionAccess:${access!.id}`
+              )
+            )[0];
+            try {
               await ctx.petitions.addContactToPetitionAccess(
                 access!.id,
                 ctx.contact!.id,
-                `PetitionAccess:${access!.id}`,
-                t
+                `PetitionAccess:${access!.id}`
               );
+            } catch (e) {
+              if (
+                e instanceof DatabaseError &&
+                e.constraint === "petition_access__petition_id_contact_id_active"
+              ) {
+                throw new ApolloError(
+                  "The contact already has an access in this petition",
+                  "ACCESS_ALREADY_EXISTS"
+                );
+              } else {
+                throw e;
+              }
+            }
 
-              await ctx.petitions.updatePetition(
-                petition.id,
-                { status: "PENDING", closed_at: null },
-                `PetitionAccess:${access!.id}`,
-                t
-              );
-            });
+            await ctx.petitions.updatePetition(
+              petition.id,
+              { status: "PENDING", closed_at: null },
+              `PetitionAccess:${access!.id}`
+            );
           }
         }
 
