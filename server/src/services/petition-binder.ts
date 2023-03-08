@@ -275,7 +275,7 @@ export class PetitionBinder implements IPetitionBinder {
       const files = await this.files.loadFileUpload(replies.map((r) => r.content.file_upload_id));
       const printable = files
         .filter(isDefined)
-        .filter((f) => isPrintableContentType(f.content_type));
+        .filter((f) => f.upload_complete && isPrintableContentType(f.content_type));
       return printable.length > 0 ? [[field, printable] as const] : [];
     });
   }
