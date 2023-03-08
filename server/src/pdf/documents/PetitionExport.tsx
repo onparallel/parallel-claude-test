@@ -234,10 +234,9 @@ export default function PetitionExport({
                         ) : null}
                         <View style={styles.fieldReplies}>
                           {field.replies.map((reply) => (
-                            <>
+                            <View key={reply.id}>
                               {isFileTypeField(field.type) ? (
                                 <View
-                                  key={reply.id}
                                   style={[
                                     {
                                       display: "flex",
@@ -271,7 +270,7 @@ export default function PetitionExport({
                                   ) : null}
                                 </View>
                               ) : field.type === "DYNAMIC_SELECT" ? (
-                                <View key={reply.id}>
+                                <View>
                                   {(reply.content.value as [string, string | null][]).map(
                                     ([label, value], i) => (
                                       <Text style={[styles.text]} key={i}>
@@ -289,7 +288,7 @@ export default function PetitionExport({
                                   )}
                                 </View>
                               ) : field.type === "CHECKBOX" ? (
-                                <View key={reply.id}>
+                                <View>
                                   {(reply.content.value as [string]).map((value, i) => (
                                     <Text style={[styles.text]} key={i}>
                                       {value}
@@ -297,36 +296,32 @@ export default function PetitionExport({
                                   ))}
                                 </View>
                               ) : field.type === "NUMBER" ? (
-                                <Text style={[styles.text]} key={reply.id}>
+                                <Text style={[styles.text]}>
                                   {formatNumberWithPrefix(reply.content.value, field!.options)}
                                 </Text>
                               ) : field.type === "DATE" ? (
-                                <Text style={[styles.text]} key={reply.id}>
+                                <Text style={[styles.text]}>
                                   {intl.formatDate(reply.content.value, {
                                     ...FORMATS.L,
                                     timeZone: "UTC",
                                   })}
                                 </Text>
                               ) : field.type === "DATE_TIME" ? (
-                                <Text style={[styles.text]} key={reply.id}>
+                                <Text style={[styles.text]}>
                                   {`${intl.formatDate(reply.content.value, {
                                     ...FORMATS["L+LT"],
                                     timeZone: reply.content.timezone,
                                   })} (${prettifyTimezone(reply.content.timezone)})`}
                                 </Text>
                               ) : field.type === "PHONE" ? (
-                                <Text style={[styles.text]} key={reply.id}>
-                                  {reply.content.value}
-                                </Text>
+                                <Text style={[styles.text]}>{reply.content.value}</Text>
                               ) : (
-                                <Text style={[styles.text]} key={reply.id}>
-                                  {reply.content.value}
-                                </Text>
+                                <Text style={[styles.text]}>{reply.content.value}</Text>
                               )}
                               {petition.__typename === "Petition" && field.showActivityInPdf ? (
                                 <FieldActivity reply={reply} style={styles.text} />
                               ) : null}
-                            </>
+                            </View>
                           ))}
                           {field.replies.length === 0 ? (
                             <Text style={[styles.text, styles.noReplies]}>
