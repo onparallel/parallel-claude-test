@@ -121,6 +121,7 @@ export async function seed(knex: Knex): Promise<any> {
       cognito_id: u.cognito_id,
       first_name: u.first_name,
       last_name: u.last_name,
+      preferred_locale: "en",
     })),
     "*"
   );
