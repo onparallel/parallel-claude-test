@@ -14364,6 +14364,21 @@ export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMut
   };
 };
 
+export type RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReplyMutationVariables =
+  Exact<{
+    replyId: Scalars["GID"];
+    keycode: Scalars["ID"];
+  }>;
+
+export type RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReplyMutation = {
+  publicDeletePetitionFieldReply: {
+    __typename?: "PublicPetitionField";
+    id: string;
+    replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
+    petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
+  };
+};
+
 export type RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment =
   { __typename?: "PublicPetitionFieldReply"; content: { [key: string]: any } };
 
@@ -34656,6 +34671,26 @@ export const RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDo
 ` as unknown as DocumentNode<
   RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation,
   RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutationVariables
+>;
+export const RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReplyDocument = gql`
+  mutation RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReply(
+    $replyId: GID!
+    $keycode: ID!
+  ) {
+    publicDeletePetitionFieldReply(replyId: $replyId, keycode: $keycode) {
+      id
+      replies {
+        id
+      }
+      petition {
+        id
+        status
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReplyMutation,
+  RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReplyMutationVariables
 >;
 export const ApiTokensTable_revokeUserAuthTokenDocument = gql`
   mutation ApiTokensTable_revokeUserAuthToken($authTokenIds: [GID!]!) {

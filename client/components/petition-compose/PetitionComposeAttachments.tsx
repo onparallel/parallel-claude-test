@@ -43,13 +43,14 @@ import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
-import { uploadFile } from "@parallel/utils/uploadFile";
+import { uploadFile, UploadFileError } from "@parallel/utils/uploadFile";
 import { useIsAnimated } from "@parallel/utils/useIsAnimated";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import useMergedRef from "@react-hook/merged-ref";
 import { fromEvent } from "file-selector";
 import { Reorder, useDragControls, useMotionValue } from "framer-motion";
+import pMap from "p-map";
 import { useEffect, useRef, useState } from "react";
 import { DropEvent, FileRejection, useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -97,7 +98,7 @@ export const PetitionComposeAttachments = Object.assign(
         (item) => item.file.size
       ) > TOTAL_MAX_FILES_SIZE;
 
-    const uploads = useRef<Record<string, XMLHttpRequest>>({});
+    const uploads = useRef<Record<string, AbortController>>({});
     const [attachmentUploadProgress, setAttachmentUploadProgress] = useState<
       Record<string, number>
     >({});
@@ -269,30 +270,43 @@ export const PetitionComposeAttachments = Object.assign(
             });
           },
         });
-
-        zip(files, data!.createPetitionAttachmentUploadLink).forEach(
-          ([file, { presignedPostData, attachment }]) => {
-            uploads.current[attachment.id] = uploadFile(file, presignedPostData, {
-              onProgress(progress) {
-                setAttachmentUploadProgress((progresses) => ({
-                  ...progresses,
-                  [attachment.id]: progress,
-                }));
-              },
-              async onComplete() {
-                delete uploads.current[attachment.id];
-                await petitionAttachmentUploadComplete({
-                  variables: {
-                    petitionId: petitionId,
-                    attachmentId: attachment.id,
-                  },
-                  update: async (cache) => {
-                    updateAttachmentUploadingStatus(cache, { ...attachment, isUploading: false });
-                  },
+        await pMap(
+          zip(files, data!.createPetitionAttachmentUploadLink),
+          async ([file, { presignedPostData, attachment }]) => {
+            const controller = new AbortController();
+            uploads.current[attachment.id] = controller;
+            try {
+              await uploadFile(file, presignedPostData, {
+                signal: controller.signal,
+                onProgress(progress) {
+                  setAttachmentUploadProgress((progresses) => ({
+                    ...progresses,
+                    [attachment.id]: progress,
+                  }));
+                },
+              });
+            } catch (e) {
+              if (e instanceof UploadFileError && e.message !== "Aborted") {
+                // handled when aborted
+                await deletePetitionAttachment({
+                  variables: { petitionId, attachmentId: attachment.id },
                 });
+              }
+              return;
+            } finally {
+              delete uploads.current[attachment.id];
+            }
+            await petitionAttachmentUploadComplete({
+              variables: {
+                petitionId: petitionId,
+                attachmentId: attachment.id,
+              },
+              update: async (cache) => {
+                updateAttachmentUploadingStatus(cache, { ...attachment, isUploading: false });
               },
             });
-          }
+          },
+          { concurrency: 3 }
         );
       },
       onDragEnter: async (e) => {

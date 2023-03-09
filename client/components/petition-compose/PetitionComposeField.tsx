@@ -42,9 +42,10 @@ import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { getMinMaxCheckboxLimit, usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
 import { withError } from "@parallel/utils/promises/withError";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
-import { uploadFile } from "@parallel/utils/uploadFile";
+import { uploadFile, UploadFileError } from "@parallel/utils/uploadFile";
 import useMergedRef from "@react-hook/merged-ref";
 import { fromEvent } from "file-selector";
+import pMap from "p-map";
 import { memo, RefObject, useCallback, useImperativeHandle, useRef, useState } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { useDropzone } from "react-dropzone";
@@ -141,7 +142,7 @@ const _PetitionComposeField = chakraForwardRef<
       )
       .filter((f) => !f.isReadOnly).length > 0;
 
-  const uploads = useRef<Record<string, XMLHttpRequest>>({});
+  const uploads = useRef<Record<string, AbortController>>({});
   const [attachmentUploadProgress, setAttachmentUploadProgress] = useState<Record<string, number>>(
     {}
   );
@@ -160,7 +161,6 @@ const _PetitionComposeField = chakraForwardRef<
 
   const handleRemoveAttachment = async function (attachmentId: string) {
     uploads.current[attachmentId]?.abort();
-    delete uploads.current[attachmentId];
     await deletePetitionFieldAttachment({
       variables: { petitionId, fieldId: field.id, attachmentId },
     });
@@ -236,17 +236,14 @@ const _PetitionComposeField = chakraForwardRef<
         }
         return;
       }
-      await Promise.all(
-        files.map(async (file) => {
+      await pMap(
+        files,
+        async (file) => {
           const { data } = await createPetitionFieldAttachmentUploadLink({
             variables: {
               petitionId: petitionId,
               fieldId: field.id,
-              data: {
-                filename: file.name,
-                size: file.size,
-                contentType: file.type,
-              },
+              data: { filename: file.name, size: file.size, contentType: file.type },
             },
             update: async (cache, { data }) => {
               updateAttachmentUploadingStatus(
@@ -257,28 +254,41 @@ const _PetitionComposeField = chakraForwardRef<
             },
           });
           const { attachment, presignedPostData } = data!.createPetitionFieldAttachmentUploadLink;
-          uploads.current[attachment.id] = uploadFile(file, presignedPostData, {
-            onProgress(progress) {
-              setAttachmentUploadProgress((progresses) => ({
-                ...progresses,
-                [attachment.id]: progress,
-              }));
-            },
-            async onComplete() {
-              delete uploads.current[attachment.id];
-              await petitionFieldAttachmentUploadComplete({
-                variables: {
-                  petitionId: petitionId,
-                  fieldId: field.id,
-                  attachmentId: attachment.id,
-                },
-                update: async (cache) => {
-                  updateAttachmentUploadingStatus(cache, attachment.id, false);
-                },
+          const controller = new AbortController();
+          uploads.current[attachment.id] = controller;
+          try {
+            await uploadFile(file, presignedPostData, {
+              signal: controller.signal,
+              onProgress(progress) {
+                setAttachmentUploadProgress((progresses) => ({
+                  ...progresses,
+                  [attachment.id]: progress,
+                }));
+              },
+            });
+          } catch (e) {
+            if (e instanceof UploadFileError && e.message !== "Aborted") {
+              // handled when aborted
+              await deletePetitionFieldAttachment({
+                variables: { petitionId, fieldId: field.id, attachmentId: attachment.id },
               });
+            }
+            return;
+          } finally {
+            delete uploads.current[attachment.id];
+          }
+          await petitionFieldAttachmentUploadComplete({
+            variables: {
+              petitionId: petitionId,
+              fieldId: field.id,
+              attachmentId: attachment.id,
+            },
+            update: async (cache) => {
+              updateAttachmentUploadingStatus(cache, attachment.id, false);
             },
           });
-        })
+        },
+        { concurrency: 3 }
       );
     },
     onDragEnter: async (e) => {

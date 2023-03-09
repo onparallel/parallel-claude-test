@@ -13,7 +13,6 @@ import { withError } from "@parallel/utils/promises/withError";
 import { useCallback, useRef } from "react";
 import { useTone } from "../common/ToneProvider";
 import { useFailureGeneratingLinkDialog } from "../petition-replies/dialogs/FailureGeneratingLinkDialog";
-import { UploadCache } from "../recipient-view/fields/RecipientViewPetitionField";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -64,7 +63,7 @@ export function PreviewPetitionField({
   ...props
 }: PreviewPetitionFieldProps) {
   const petitionId = petition.id;
-  const uploads = useRef<UploadCache>({});
+  const uploads = useRef<Record<string, AbortController>>({});
   const fieldId = field.id;
   const tone = useTone();
   const [petitionFieldAttachmentDownloadLink] = useMutation(

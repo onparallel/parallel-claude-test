@@ -51,10 +51,8 @@ export interface RecipientViewPetitionFieldProps
   isDisabled: boolean;
 }
 
-export type UploadCache = Record<string, XMLHttpRequest>;
-
 export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProps) {
-  const uploads = useRef<UploadCache>({});
+  const uploads = useRef<Record<string, AbortController>>({});
   const { updateLastSaved } = useLastSaved();
   const tone = useTone();
 

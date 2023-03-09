@@ -84,7 +84,7 @@ class StorageImpl implements IStorageImpl {
           })
         );
       },
-      { maxRetries: 3, delay: 3_000 }
+      { maxRetries: 3, delay: 1_000 }
     );
   }
 

@@ -12,8 +12,9 @@ import {
   Scalars,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
-import { uploadFile } from "@parallel/utils/uploadFile";
+import { uploadFile, UploadFileError } from "@parallel/utils/uploadFile";
 import { customAlphabet } from "nanoid";
+import pMap from "p-map";
 import { MutableRefObject, useCallback } from "react";
 import { RecipientViewPetitionFieldCard } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
 
@@ -253,6 +254,9 @@ export function useCreateFileUploadReply() {
   const [createFileUploadReplyComplete] = useMutation(
     PreviewPetitionFieldMutations_createFileUploadReplyCompleteDocument
   );
+  const [deletePetitionReply] = useMutation(
+    PreviewPetitionFieldMutations_deletePetitionReplyDocument
+  );
   const apollo = useApolloClient();
 
   return useCallback(
@@ -266,7 +270,7 @@ export function useCreateFileUploadReply() {
       petitionId: string;
       fieldId: string;
       content: File[];
-      uploads: MutableRefObject<Record<string, XMLHttpRequest>>;
+      uploads: MutableRefObject<Record<string, AbortController>>;
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
@@ -291,42 +295,57 @@ export function useCreateFileUploadReply() {
           ]);
         }
       } else {
-        for (const file of content) {
-          const { data } = await createFileUploadReply({
-            variables: {
-              petitionId,
-              fieldId: fieldId,
-              file: {
-                filename: file.name,
-                size: file.size,
-                contentType: file.type,
+        await pMap(
+          content,
+          async (file) => {
+            const { data } = await createFileUploadReply({
+              variables: {
+                petitionId,
+                fieldId: fieldId,
+                file: {
+                  filename: file.name,
+                  size: file.size,
+                  contentType: file.type,
+                },
               },
-            },
-            update(cache, { data }) {
-              const reply = data!.createFileUploadReply.reply;
-              updateReplyContent(cache, reply.id, (content) => ({
-                ...content,
-                progress: 0,
-              }));
-            },
-          });
-          const { reply, presignedPostData } = data!.createFileUploadReply;
-
-          uploads.current[reply.id] = uploadFile(file, presignedPostData, {
-            onProgress(progress) {
-              updateReplyContent(apollo, reply.id, (content) => ({
-                ...content,
-                progress,
-              }));
-            },
-            async onComplete() {
-              delete uploads.current[reply.id];
-              await createFileUploadReplyComplete({
-                variables: { petitionId, replyId: reply.id },
+              update(cache, { data }) {
+                const reply = data!.createFileUploadReply.reply;
+                updateReplyContent(cache, reply.id, (content) => ({
+                  ...content,
+                  progress: 0,
+                }));
+              },
+            });
+            const { reply, presignedPostData } = data!.createFileUploadReply;
+            const controller = new AbortController();
+            uploads.current[reply.id] = controller;
+            try {
+              await uploadFile(file, presignedPostData, {
+                signal: controller.signal,
+                onProgress(progress) {
+                  updateReplyContent(apollo, reply.id, (content) => ({
+                    ...content,
+                    progress,
+                  }));
+                },
               });
-            },
-          });
-        }
+            } catch (e) {
+              if (e instanceof UploadFileError && e.message !== "Aborted") {
+                // handled when aborted
+                await deletePetitionReply({
+                  variables: { petitionId, replyId: reply.id },
+                });
+              }
+              return;
+            } finally {
+              delete uploads.current[reply.id];
+            }
+            await createFileUploadReplyComplete({
+              variables: { petitionId, replyId: reply.id },
+            });
+          },
+          { concurrency: 3 }
+        );
       }
     },
     [createFileUploadReply, createFileUploadReplyComplete]
