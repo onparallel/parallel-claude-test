@@ -191,7 +191,10 @@ export class SignaturitClient implements ISignatureClient {
   async cancelSignatureRequest(externalId: string) {
     await this.withSignaturitSDK(async (sdk) => {
       try {
-        await sdk.cancelSignature(externalId);
+        await retry(async () => await sdk.cancelSignature(externalId), {
+          maxRetries: 3,
+          delay: 5_000,
+        });
       } catch (e) {
         if (this.isCancelNonReadyRequestError(e)) {
           const signature = await sdk.getSignature(externalId);
