@@ -1431,7 +1431,19 @@ type Mutation {
   Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
   """
   publicResetTemporaryPassword(email: String!, locale: String!): Result!
-  publicSendReminder(contactEmail: String!, keycode: ID, slug: ID): Result!
+
+  """
+  Sends an access reminder for a contact that is trying to open a petition through a contactless access but already has another active access
+  """
+  publicSendReminder(
+    contactEmail: String!
+
+    """
+    keycode of the contactless access
+    """
+    keycode: ID
+    slug: ID
+  ): Result!
   publicSendVerificationCode(
     email: String
     firstName: String

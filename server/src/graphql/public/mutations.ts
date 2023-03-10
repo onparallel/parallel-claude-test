@@ -831,10 +831,12 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
 );
 
 export const publicSendReminder = mutationField("publicSendReminder", {
+  description:
+    "Sends an access reminder for a contact that is trying to open a petition through a contactless access but already has another active access",
   type: "Result",
   args: {
     contactEmail: nonNull(stringArg()),
-    keycode: idArg(),
+    keycode: idArg({ description: "keycode of the contactless access" }),
     slug: idArg(),
   },
   authorize: chain(
@@ -847,13 +849,20 @@ export const publicSendReminder = mutationField("publicSendReminder", {
     let owner: User;
 
     if (args.keycode) {
-      access = ctx.access!;
-      const petition = (await ctx.petitions.loadPetition(access!.petition_id))!;
+      const petition = (await ctx.petitions.loadPetition(ctx.access!.petition_id))!;
       const contact = await ctx.contacts.loadContactByEmail({
-        email: args.contactEmail,
+        email: args.contactEmail.toLowerCase(),
         orgId: petition.org_id,
       });
-      access = (await ctx.petitions.loadActiveAccessByContactId(contact!.id))![0];
+      const allPetitionAccesses = await ctx.petitions.loadAccessesForPetition(
+        ctx.access!.petition_id
+      );
+      access = allPetitionAccesses.find(
+        (a) => a.contact_id === contact?.id && a.status === "ACTIVE"
+      )!;
+      if (!access) {
+        return RESULT.FAILURE;
+      }
       owner = (await ctx.petitions.loadPetitionOwner(petition.id))!;
     } else {
       const link = (await ctx.petitions.loadPublicPetitionLinkBySlug(args.slug!))!;

@@ -743,6 +743,7 @@ export type Mutation = {
   publicRemindersOptOut: Result;
   /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
   publicResetTemporaryPassword: Result;
+  /** Sends an access reminder for a contact that is trying to open a petition through a contactless access but already has another active access */
   publicSendReminder: Result;
   publicSendVerificationCode: VerificationCodeRequest;
   /** Starts the completion of an async field */
@@ -2949,6 +2950,7 @@ export type PetitionSignatureRequestSignerStatus = {
 
 export type PetitionSignatureRequestStatus =
   | "CANCELLED"
+  | "CANCELLING"
   | "COMPLETED"
   | "ENQUEUED"
   | "PROCESSED"
