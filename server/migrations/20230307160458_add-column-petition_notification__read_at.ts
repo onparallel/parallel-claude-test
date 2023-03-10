@@ -14,10 +14,12 @@ export async function up(knex: Knex): Promise<void> {
     comment on column petition_contact_notification.is_read is '@deprecated';
 
     -- update read_at with processed_at for read notifications
-    update petition_user_notification set "read_at" = "processed_at"
+    update petition_user_notification set
+      "read_at" = "processed_at"
     where is_read = true and processed_at is not null;
 
-    update petition_contact_notification set "read_at" = "processed_at"
+    update petition_contact_notification
+      set "read_at" = "processed_at"
     where is_read = true and processed_at is not null;
 
 

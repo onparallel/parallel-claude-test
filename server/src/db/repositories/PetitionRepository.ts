@@ -3666,7 +3666,7 @@ export class PetitionRepository extends BaseRepository {
         this.knex.raw("data ->> 'petition_field_comment_id'") as any,
         uniq(comments.map((c) => c.id))
       )
-      .update({ read_at: this.now() });
+      .update({ read_at: this.now(), processed_at: this.now() });
     return comments;
   }
 
