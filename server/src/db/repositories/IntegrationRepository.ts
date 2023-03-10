@@ -154,16 +154,21 @@ export class IntegrationRepository extends BaseRepository {
     string
   >(
     async (keys, t) => {
+      if (keys.some((k) => !isDefined(k.type) && isDefined(k.provider))) {
+        throw new Error("Must define type when defining provider");
+      }
       const integrations = await this.from("org_integration", t)
         .whereIn("org_id", uniq(keys.map((k) => k.orgId)))
         .where((q) => {
-          const types = uniq(keys.map((k) => k.type)).filter(isDefined);
-          if (types.length > 0) {
+          const types = uniq(keys.map((k) => k.type));
+          const allHaveTypes = types.every(isDefined);
+          if (types.length > 0 && allHaveTypes) {
             q.whereIn("type", types);
-          }
-          const providers = uniq(keys.map((k) => k.provider)).filter(isDefined);
-          if (providers.length > 0) {
-            q.whereIn("provider", providers);
+            const providers = uniq(keys.map((k) => k.provider));
+            const allHaveProviders = providers.every(isDefined);
+            if (providers.length > 0 && allHaveProviders) {
+              q.whereIn("provider", providers);
+            }
           }
         })
         .whereNull("deleted_at")
