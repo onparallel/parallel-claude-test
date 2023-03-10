@@ -18,6 +18,7 @@ sed -i "s/#COMMIT_SHA#/${COMMIT_SHA}/g" \
   main/ops/prod/amazon-cloudwatch-agent/config.json
 sudo cp main/ops/prod/systemd/* /lib/systemd/system
 sudo cp -r main/ops/prod/nginx/* /etc/nginx/
+sudo rm /etc/nginx/modsec/modsecurity-crs/rules/REQUEST-903.*
 sudo cp main/ops/prod/amazon-cloudwatch-agent/config.json /opt/aws/amazon-cloudwatch-agent/bin/config.json
 
 echo 'parallel:$apr1$wY1qv83a$ErfofKvlFLeIZ4r4ijEDw/' >>.htpasswd
