@@ -78,6 +78,7 @@ export function PreviewPetitionFieldCommentsDialog({
   const closeRef = useRef<HTMLButtonElement>(null);
   const editorRef = useRef<PetitionCommentsAndNotesEditorInstance>(null);
   const [tabIsNotes, setTabIsNotes] = useState(!hasCommentsEnabled || onlyReadPermission);
+  const [markedAsUnreadIds, setMarkedAsUnreadIds] = useState<string[]>([]);
 
   const updateIsReadNotification = useUpdateIsReadNotification();
   async function handleMarkAsUnread(commentId: string) {
@@ -85,6 +86,7 @@ export function PreviewPetitionFieldCommentsDialog({
       petitionFieldCommentIds: [commentId],
       isRead: false,
     });
+    setMarkedAsUnreadIds((ids) => [...ids, commentId]);
   }
 
   useEffect(() => {
@@ -98,13 +100,16 @@ export function PreviewPetitionFieldCommentsDialog({
 
   useTimeoutEffect(
     async (isMounted) => {
-      const unreadCommentIds = comments.filter((c) => c.isUnread).map((c) => c.id);
+      const unreadCommentIds = comments
+        .filter((c) => c.isUnread)
+        .map((c) => c.id)
+        .filter((id) => !markedAsUnreadIds.includes(id));
       if (unreadCommentIds.length > 0 && isMounted()) {
         await updateIsReadNotification({ petitionFieldCommentIds: unreadCommentIds, isRead: true });
       }
     },
     1000,
-    [comments]
+    [comments, markedAsUnreadIds]
   );
 
   const createPetitionFieldComment = useCreatePetitionFieldComment();

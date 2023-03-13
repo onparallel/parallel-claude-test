@@ -69,10 +69,15 @@ export const PetitionRepliesFieldComments = Object.assign(
       const defaultMentionables = useGetDefaultMentionables(petitionId);
       const comments = data?.petitionField.comments ?? [];
 
+      const [markedAsUnreadIds, setMarkedAsUnreadIds] = useState<string[]>([]);
+
       const updateIsReadNotification = useUpdateIsReadNotification();
       useTimeoutEffect(
         async (isMounted) => {
-          const unreadCommentIds = comments.filter((c) => c.isUnread).map((c) => c.id);
+          const unreadCommentIds = comments
+            .filter((c) => c.isUnread)
+            .map((c) => c.id)
+            .filter((id) => !markedAsUnreadIds.includes(id));
           if (unreadCommentIds.length > 0 && isMounted()) {
             await updateIsReadNotification({
               petitionFieldCommentIds: unreadCommentIds,
@@ -81,7 +86,7 @@ export const PetitionRepliesFieldComments = Object.assign(
           }
         },
         1000,
-        [comments]
+        [comments, markedAsUnreadIds]
       );
 
       useEffect(() => {
@@ -185,7 +190,10 @@ export const PetitionRepliesFieldComments = Object.assign(
                     onSearchMentionables={handleSearchMentionables}
                     onEdit={(content) => onUpdateComment(comment.id, content, comment.isInternal)}
                     onDelete={() => onDeleteComment(comment.id)}
-                    onMarkAsUnread={() => onMarkAsUnread(comment.id)}
+                    onMarkAsUnread={() => {
+                      onMarkAsUnread(comment.id);
+                      setMarkedAsUnreadIds((ids) => [...ids, comment.id]);
+                    }}
                   />
                 ))}
               </Stack>
