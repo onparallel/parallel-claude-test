@@ -20,14 +20,10 @@ export function RecipientViewPetitionFieldHeading({
     <Stack as="header" id={`field-${field.id}`} spacing={1} paddingX={2} paddingY={2}>
       <HStack alignItems="flex-start">
         <Box flex="1">
-          {field.title ? (
-            <Heading size="md">
-              {field.isInternal ? (
-                <InternalFieldBadge marginRight={2.5} marginBottom={0.5} />
-              ) : null}
-              {field.title}
-            </Heading>
-          ) : null}
+          <Heading size="md">
+            {field.isInternal ? <InternalFieldBadge marginRight={2.5} marginBottom={0.5} /> : null}
+            {field.title ? field.title : null}
+          </Heading>
         </Box>
         {field.hasCommentsEnabled || field.__typename === "PetitionField" ? (
           <Box paddingRight={2}>
