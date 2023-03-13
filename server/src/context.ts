@@ -23,7 +23,7 @@ import { ANALYTICS, IAnalyticsService } from "./services/analytics";
 import { AUTH, IAuth } from "./services/auth";
 import { BANKFLIP_SERVICE, IBankflipService } from "./services/bankflip";
 import { BANKFLIP_LEGACY_SERVICE, IBankflipLegacyService } from "./services/bankflip-legacy";
-import { DOW_JONES_KYC_SERVICE, IDowJonesKycService } from "./services/dowjones";
+import { DOW_JONES_CLIENT, IDowJonesClient } from "./services/dowjones";
 import { EMAILS, IEmailsService } from "./services/emails";
 import { FETCH_SERVICE, IFetchService } from "./services/fetch";
 import { I18N_SERVICE, II18nService } from "./services/i18n";
@@ -74,7 +74,7 @@ export class ApiContext {
     @inject(I18N_SERVICE) public readonly i18n: II18nService,
     @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
     @inject(ORGANIZATION_CREDITS_SERVICE) public readonly orgCredits: IOrganizationCreditsService,
-    @inject(DOW_JONES_KYC_SERVICE) public readonly dowJonesKyc: IDowJonesKycService,
+    @inject(DOW_JONES_CLIENT) public readonly dowJonesKyc: IDowJonesClient,
     @inject(REDIS) public readonly redis: IRedis,
     @inject(BANKFLIP_SERVICE) public readonly bankflip: IBankflipService,
     // TODO Bankflip Legacy: old version of Bankflip API. Soon to be deprecated by them */
@@ -120,7 +120,7 @@ export class WorkerContext {
     @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
     @inject(QUEUES_SERVICE) public readonly queues: IQueuesService,
     @inject(TIERS_SERVICE) public readonly tiers: ITiersService,
-    @inject(DOW_JONES_KYC_SERVICE) public readonly dowJonesKyc: IDowJonesKycService,
+    @inject(DOW_JONES_CLIENT) public readonly dowJonesKyc: IDowJonesClient,
     @inject(ORGANIZATION_LAYOUT_SERVICE)
     public readonly layouts: IOrganizationLayoutService,
     @inject(FETCH_SERVICE) public readonly fetch: IFetchService,

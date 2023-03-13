@@ -51,6 +51,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 
 function DowJonesFieldProfileDetails({
   petitionId,
@@ -63,9 +64,13 @@ function DowJonesFieldProfileDetails({
   const { query } = router;
   const showGenericErrorToast = useGenericErrorToast();
 
-  const { data, loading } = useQuery(DowJonesFieldProfileDetails_profileDocument, {
+  const { data, loading, error } = useQuery(DowJonesFieldProfileDetails_profileDocument, {
     variables: { profileId },
   });
+
+  if (isDefined(error)) {
+    showGenericErrorToast();
+  }
 
   const details = data?.dowJonesKycEntityProfile;
 
@@ -100,7 +105,12 @@ function DowJonesFieldProfileDetails({
       setReplyId(replyId);
       window.opener.postMessage("refresh", window.origin);
     } catch (e) {
-      showGenericErrorToast(e);
+      if (isApolloError(e, "INVALID_CREDENTIALS")) {
+        // don't log error to Sentry if it's an INVALID_CREDENTIALS
+        showGenericErrorToast();
+      } else {
+        showGenericErrorToast(e);
+      }
     }
   };
 

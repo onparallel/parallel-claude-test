@@ -7,7 +7,7 @@ import {
   BANKFLIP_LEGACY_SERVICE,
   IBankflipLegacyService,
 } from "./bankflip-legacy";
-import { DowJonesKycService, DOW_JONES_KYC_SERVICE, IDowJonesKycService } from "./dowjones";
+import { DowJonesClient, DOW_JONES_CLIENT, IDowJonesClient } from "./dowjones";
 import { EMAILS, EmailsService, IEmailsService } from "./emails";
 import { FetchService, FETCH_SERVICE, IFetchService } from "./fetch";
 import { I18nService, I18N_SERVICE, II18nService } from "./i18n";
@@ -56,7 +56,7 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<ITiersService>(TIERS_SERVICE).to(TiersService);
   bind<II18nService>(I18N_SERVICE).to(I18nService).inSingletonScope();
   bind<IOrganizationCreditsService>(ORGANIZATION_CREDITS_SERVICE).to(OrganizationCreditsService);
-  bind<IDowJonesKycService>(DOW_JONES_KYC_SERVICE).to(DowJonesKycService);
+  bind<IDowJonesClient>(DOW_JONES_CLIENT).to(DowJonesClient);
   bind<IBankflipService>(BANKFLIP_SERVICE).to(BankflipService);
   bind<IBankflipLegacyService>(BANKFLIP_LEGACY_SERVICE).to(BankflipLegacyService); // TODO Bankflip Legacy: remove when deprecated
   bind<IPetitionImportExportService>(PETITION_IMPORT_EXPORT_SERVICE).to(

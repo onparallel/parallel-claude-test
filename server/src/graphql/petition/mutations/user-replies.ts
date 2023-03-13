@@ -1,5 +1,6 @@
 import { zonedTimeToUtc } from "date-fns-tz";
 import { idArg, mutationField, nonNull, objectType } from "nexus";
+import { InvalidCredentialsError } from "../../../integrations/GenericIntegration";
 import { toGlobalId } from "../../../util/globalId";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
@@ -439,8 +440,8 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
         "DOW_JONES_KYC"
       );
       const [dowJonesFile, dowJonesProfile] = await Promise.all([
-        ctx.dowJonesKyc.riskEntityProfilePdf(args.profileId, integration),
-        ctx.dowJonesKyc.riskEntityProfile(args.profileId, integration),
+        ctx.dowJonesKyc.riskEntityProfilePdf(integration.id, args.profileId),
+        ctx.dowJonesKyc.riskEntityProfile(integration.id, args.profileId),
       ]);
 
       const path = random(16);
@@ -486,12 +487,14 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
       );
 
       return reply;
-    } catch (error: any) {
-      if (error.message === "PETITION_SEND_LIMIT_REACHED") {
+    } catch (error) {
+      if (error instanceof Error && error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(
           "Can't submit a reply due to lack of credits",
           "PETITION_SEND_LIMIT_REACHED"
         );
+      } else if (error instanceof InvalidCredentialsError && error.code === "FORBIDDEN") {
+        throw new ApolloError("Forbidden", "INVALID_CREDENTIALS");
       }
       throw error;
     }

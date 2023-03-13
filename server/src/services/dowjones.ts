@@ -1,21 +1,12 @@
 import { inject, injectable } from "inversify";
 import { isDefined } from "remeda";
-import { Config, CONFIG } from "../config";
-import {
-  IntegrationRepository,
-  IntegrationSettings,
-} from "../db/repositories/IntegrationRepository";
-import { OrgIntegration } from "../db/__types";
-import { decrypt, encrypt } from "../util/token";
-import { Maybe, Replace } from "../util/types";
+import { DowJonesIntegration } from "../integrations/DowJonesIntegration";
+import { ExpiredCredentialsError } from "../integrations/ExpirableCredentialsIntegration";
+import { InvalidCredentialsError } from "../integrations/GenericIntegration";
+import { Maybe } from "../util/types";
 import { FETCH_SERVICE, IFetchService } from "./fetch";
 
-export const DOW_JONES_KYC_SERVICE = Symbol.for("DOW_JONES_KYC_SERVICE");
-
-type DowJonesIntegration = Replace<
-  OrgIntegration,
-  { settings: IntegrationSettings<"DOW_JONES_KYC"> }
->;
+export const DOW_JONES_CLIENT = Symbol.for("DOW_JONES_CLIENT");
 
 type RiskEntityType = "Person" | "Entity";
 
@@ -106,39 +97,31 @@ type RiskEntityProfilePdfResult = {
   binary_stream: string;
 };
 
-export interface IDowJonesKycService {
-  fetchCredentials(
-    clientId: string,
-    username: string,
-    password: string
-  ): Promise<DowJonesIntegration["settings"]["CREDENTIALS"]>;
+export interface IDowJonesClient {
   riskEntitySearch(
+    integrationId: number,
     args: {
       name: string;
       dateOfBirth?: Maybe<Date>;
       limit?: Maybe<number>;
       offset?: Maybe<number>;
-    },
-    integration: DowJonesIntegration
+    }
   ): Promise<RiskEntitySearchResult>;
-  riskEntityProfile(
-    profileId: string,
-    integration: DowJonesIntegration
-  ): Promise<RiskEntityProfileResult>;
+  riskEntityProfile(integrationId: number, profileId: string): Promise<RiskEntityProfileResult>;
   riskEntityProfilePdf(
-    profileId: string,
-    integration: DowJonesIntegration
+    integrationId: number,
+    profileId: string
   ): Promise<RiskEntityProfilePdfResult>;
   entityFullName(name: RiskEntityPersonName | RiskEntityEntityName): string;
 }
 
 @injectable()
-export class DowJonesKycService implements IDowJonesKycService {
+export class DowJonesClient implements IDowJonesClient {
   constructor(
-    @inject(CONFIG) private config: Config,
     @inject(FETCH_SERVICE) private fetch: IFetchService,
-    @inject(IntegrationRepository) private integrations: IntegrationRepository
+    @inject(DowJonesIntegration) private dowJonesIntegration: DowJonesIntegration
   ) {}
+
   entityFullName(name: RiskEntityPersonName | RiskEntityEntityName) {
     if ("name" in name) {
       return name.name;
@@ -149,203 +132,55 @@ export class DowJonesKycService implements IDowJonesKycService {
     }
   }
 
-  private async getAuthenticationIdToken(
-    clientId: string,
-    username: string,
-    password: string
-  ): Promise<{ idToken: string; refreshToken: string }> {
-    const response = await this.fetch.fetch("https://accounts.dowjones.com/oauth2/v1/token", {
-      method: "POST",
-      body: new URLSearchParams({
-        client_id: clientId,
-        connection: "service-account",
-        device: "parallel-server",
-        username,
-        password,
-        grant_type: "password",
-        scope: "openid service_account_id offline_access",
-      }),
-      timeout: 5_000,
-    });
-
-    const jsonData = await response.json();
-    if (response.ok && !jsonData.error) {
-      return { idToken: jsonData.id_token, refreshToken: jsonData.refresh_token };
-    } else {
-      throw new Error("INVALID_CREDENTIALS_ERROR");
-    }
-  }
-
-  private async getAccessToken(idToken: string, clientId: string): Promise<string> {
-    const response = await this.fetch.fetch("https://accounts.dowjones.com/oauth2/v1/token", {
-      method: "POST",
-      body: new URLSearchParams({
-        assertion: idToken,
-        client_id: clientId,
-        grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-        scope: "openid pib",
-      }),
-      timeout: 5_000,
-    });
-
-    const jsonData = await response.json();
-    if (response.ok && !jsonData.error) {
-      return jsonData.access_token;
-    } else {
-      throw new Error("INVALID_CREDENTIALS_ERROR");
-    }
-  }
-
-  private async refreshAccessToken(integration: DowJonesIntegration) {
-    const key = Buffer.from(this.config.security.encryptKeyBase64, "base64");
-    const clientId = decrypt(
-      Buffer.from(integration.settings.CREDENTIALS.CLIENT_ID, "hex"),
-      key
-    ).toString("utf8");
-    const refreshToken = decrypt(
-      Buffer.from(integration.settings.CREDENTIALS.REFRESH_TOKEN, "hex"),
-      key
-    ).toString("utf8");
-
-    const response = await this.fetch.fetch("https://accounts.dowjones.com/oauth2/v1/token", {
-      method: "POST",
-      body: new URLSearchParams({
-        client_id: clientId,
-        grant_type: "refresh_token",
-        refresh_token: refreshToken,
-        scope: "openid service_account_id",
-      }),
-      timeout: 5_000,
-    });
-
-    const jsonData = await response.json();
-    if (response.ok && !jsonData.error) {
-      const accessToken = await this.getAccessToken(jsonData.access_token, clientId);
-      const [updatedIntegration] = await this.integrations.updateOrgIntegration<"DOW_JONES_KYC">(
-        integration.id,
-        {
-          settings: {
-            ...integration.settings,
-            CREDENTIALS: {
-              ...integration.settings.CREDENTIALS,
-              ACCESS_TOKEN: encrypt(accessToken, key).toString("hex"),
-            },
-          },
-        },
-        `OrgIntegration:${integration.id}`
-      );
-      return updatedIntegration;
-    } else {
-      throw new Error("INVALID_CREDENTIALS_ERROR");
-    }
-  }
-
-  private async updateIntegrationCredentials(integration: DowJonesIntegration) {
-    const encryptionKey = Buffer.from(this.config.security.encryptKeyBase64, "base64");
-    const clientId = decrypt(
-      Buffer.from(integration.settings.CREDENTIALS.CLIENT_ID, "hex"),
-      encryptionKey
-    ).toString("utf8");
-    const username = integration.settings.CREDENTIALS.USERNAME;
-    const password = decrypt(
-      Buffer.from(integration.settings.CREDENTIALS.PASSWORD, "hex"),
-      encryptionKey
-    ).toString("utf8");
-    const newCredentials = await this.fetchCredentials(clientId, username, password);
-    const [updatedIntegration] = await this.integrations.updateOrgIntegration(
-      integration.id,
-      {
-        settings: {
-          ...integration.settings,
-          CREDENTIALS: {
-            ...integration.settings.CREDENTIALS,
-            REFRESH_TOKEN: encrypt(newCredentials.REFRESH_TOKEN, encryptionKey).toString("hex"),
-            ACCESS_TOKEN: encrypt(newCredentials.ACCESS_TOKEN, encryptionKey).toString("hex"),
-          },
-        },
-      },
-      `OrgIntegration:${integration.id}`
-    );
-
-    return updatedIntegration;
-  }
-
-  private async makeApiCall<TResult = any>(
+  private async makeApiCall<TResult>(
+    integrationId: number,
     url: string,
-    opts: { method: "GET" | "POST"; body?: any },
-    integration: DowJonesIntegration,
-    retryCount = 0
+    opts: { method: "GET" | "POST"; body?: any }
   ): Promise<TResult> {
-    const accessToken = decrypt(
-      Buffer.from(integration.settings.CREDENTIALS.ACCESS_TOKEN, "hex"),
-      Buffer.from(this.config.security.encryptKeyBase64, "base64")
-    ).toString("utf8");
+    return await this.dowJonesIntegration.withCredentials(
+      integrationId,
+      async ({ ACCESS_TOKEN: accessToken }) => {
+        const response = await this.fetch.fetch(url, {
+          method: opts.method,
+          body: opts.body ? JSON.stringify(opts.body) : undefined,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          timeout: 5_000,
+        });
 
-    const response = await this.fetch.fetch(url, {
-      method: opts.method,
-      body: opts.body ? JSON.stringify(opts.body) : undefined,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      timeout: 5_000,
-    });
+        const data = await response.json();
 
-    const jsonData = await response.json();
-    if (response.ok) {
-      return jsonData as TResult;
-    } else if (response.status === 401) {
-      if (retryCount === 0) {
-        // first retry, we assume access_token is expired, refresh it and try again
-        const updatedIntegration = await this.refreshAccessToken(integration);
-        return await this.makeApiCall<TResult>(url, opts, updatedIntegration, retryCount + 1);
-      } else if (retryCount === 1) {
-        // second retry, refreshing with refresh_token did not work, get new access_token using username and password credentials
-        const updatedIntegration = await this.updateIntegrationCredentials(integration);
-        return await this.makeApiCall<TResult>(url, opts, updatedIntegration, retryCount + 1);
-      } else {
-        // third retry, refreshing with username and password failed. Mark integration credentials as invalid :/
-        await this.integrations.updateOrgIntegration(
-          integration.id,
-          { invalid_credentials: true },
-          `OrgIntegration:${integration.id}`
-        );
+        if (!response.ok) {
+          if (response.status === 401) {
+            // invalid credentials, will try to refresh access token
+            throw new ExpiredCredentialsError();
+          } else if (response.status === 403) {
+            // forbidden, refreshing credentials will not work, throw and mark integration invalid_credentials
+            throw new InvalidCredentialsError("FORBIDDEN", response.statusText);
+          } else if (response.status === 404) {
+            throw new Error("PROFILE_NOT_FOUND");
+          }
+          throw response;
+        }
 
-        throw new Error(JSON.stringify(jsonData));
+        return data;
       }
-    } else if (response.status === 404) {
-      throw new Error("PROFILE_NOT_FOUND");
-    }
-
-    throw new Error(JSON.stringify(jsonData));
-  }
-
-  async fetchCredentials(clientId: string, username: string, password: string) {
-    const { idToken, refreshToken } = await this.getAuthenticationIdToken(
-      clientId,
-      username,
-      password
     );
-    const accessToken = await this.getAccessToken(idToken, clientId);
-    return {
-      CLIENT_ID: clientId,
-      ACCESS_TOKEN: accessToken,
-      REFRESH_TOKEN: refreshToken,
-      USERNAME: username,
-      PASSWORD: password,
-    };
   }
 
   async riskEntitySearch(
+    integrationId: number,
     args: {
       name: string;
       dateOfBirth?: Maybe<Date>;
       limit?: Maybe<number>;
       offset?: Maybe<number>;
-    },
-    integration: DowJonesIntegration
-  ): Promise<RiskEntitySearchResult> {
+    }
+  ) {
     return await this.makeApiCall<RiskEntitySearchResult>(
+      integrationId,
       "https://api.dowjones.com/riskentities/search",
       {
         method: "POST",
@@ -390,27 +225,21 @@ export class DowJonesKycService implements IDowJonesKycService {
             },
           },
         },
-      },
-      integration
+      }
     );
   }
 
-  async riskEntityProfile(
-    profileId: string,
-    integration: DowJonesIntegration
-  ): Promise<RiskEntityProfileResult> {
+  async riskEntityProfile(integrationId: number, profileId: string) {
     return await this.makeApiCall<RiskEntityProfileResult>(
+      integrationId,
       "https://api.dowjones.com/riskentities/profiles/" + profileId,
-      { method: "GET" },
-      integration
+      { method: "GET" }
     );
   }
 
-  async riskEntityProfilePdf(
-    profileId: string,
-    integration: DowJonesIntegration
-  ): Promise<RiskEntityProfilePdfResult> {
+  async riskEntityProfilePdf(integrationId: number, profileId: string) {
     return await this.makeApiCall<RiskEntityProfilePdfResult>(
+      integrationId,
       "https://api.riskcenter.dowjones.com/profile-pdf",
       {
         method: "POST",
@@ -422,8 +251,7 @@ export class DowJonesKycService implements IDowJonesKycService {
             },
           },
         },
-      },
-      integration
+      }
     );
   }
 }

@@ -88,7 +88,7 @@ export abstract class GenericIntegration<
     }
   }
 
-  protected async createOrgIntegration(
+  public async createOrgIntegration(
     data: Omit<
       EnhancedCreateOrgIntegration<TType, TProvider, false>,
       "type" | "provider" | "is_enabled"

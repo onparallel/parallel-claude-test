@@ -29,7 +29,6 @@ import {
   IntegrationSwitchCardProps,
 } from "@parallel/components/organization/IntegrationSwitchCard";
 import {
-  OrganizationIntegrations_createDowJonesKycIntegrationDocument,
   OrganizationIntegrations_deleteDowJonesKycIntegrationDocument,
   OrganizationIntegrations_userDocument,
 } from "@parallel/graphql/__types";
@@ -55,9 +54,6 @@ function OrganizationIntegrations() {
   const hasDownJones = me.organization.hasDowJones;
   const hasErrorDownJones = me.organization.integrations.items[0]?.invalidCredentials;
 
-  const [createDowJonesKycIntegration] = useMutation(
-    OrganizationIntegrations_createDowJonesKycIntegrationDocument
-  );
   const [deleteDowJonesKycIntegration] = useMutation(
     OrganizationIntegrations_deleteDowJonesKycIntegrationDocument
   );
@@ -67,8 +63,7 @@ function OrganizationIntegrations() {
   const handleSwitchDownJones = async (isChecked: boolean) => {
     if (isChecked) {
       try {
-        const data = await showDowJonesIntegrationDialog();
-        await createDowJonesKycIntegration({ variables: data });
+        await showDowJonesIntegrationDialog();
         refetch();
       } catch {}
     } else {
@@ -349,17 +344,6 @@ OrganizationIntegrations.queries = [
 ];
 
 OrganizationIntegrations.mutations = [
-  gql`
-    mutation OrganizationIntegrations_createDowJonesKycIntegration(
-      $clientId: String!
-      $username: String!
-      $password: String!
-    ) {
-      createDowJonesKycIntegration(clientId: $clientId, username: $username, password: $password) {
-        id
-      }
-    }
-  `,
   gql`
     mutation OrganizationIntegrations_deleteDowJonesKycIntegration {
       deleteDowJonesKycIntegration {

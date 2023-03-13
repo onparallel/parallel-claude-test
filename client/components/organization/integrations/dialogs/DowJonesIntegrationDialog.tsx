@@ -12,7 +12,7 @@ import {
 import { ArrowForwardIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { DowJonesIntegrationDialog_validateDowJonesKycCredentialsDocument } from "@parallel/graphql/__types";
+import { useDowJonesIntegrationDialog_createDowJonesKycIntegrationDocument } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { isNotEmptyText } from "@parallel/utils/strings";
 import { useEffect, useRef, useState } from "react";
@@ -25,16 +25,14 @@ interface DowJonesIntegrationDialogData {
   password: string;
 }
 
-export function DowJonesIntegrationDialog({
-  ...props
-}: DialogProps<{}, DowJonesIntegrationDialogData>) {
+export function DowJonesIntegrationDialog({ ...props }: DialogProps) {
   const [isInvalid, setIsInvalid] = useState(false);
 
   const {
     handleSubmit,
     register,
     reset,
-    formState: { errors, isDirty },
+    formState: { errors, isDirty, isSubmitting },
   } = useForm<DowJonesIntegrationDialogData>({
     mode: "onSubmit",
     defaultValues: {
@@ -56,10 +54,9 @@ export function DowJonesIntegrationDialog({
     validate: { isNotEmptyText },
   });
 
-  const [validateIntegration, { loading }] = useMutation(
-    DowJonesIntegrationDialog_validateDowJonesKycCredentialsDocument
+  const [createDowJonesKycIntegration] = useMutation(
+    useDowJonesIntegrationDialog_createDowJonesKycIntegrationDocument
   );
-
   return (
     <ConfirmDialog
       hasCloseButton
@@ -67,16 +64,15 @@ export function DowJonesIntegrationDialog({
         as: "form",
         onSubmit: handleSubmit(async (data) => {
           try {
-            const res = await validateIntegration({ variables: data });
-            if (res.data?.validateDowJonesKycCredentials) {
-              props.onResolve(data);
-            } else {
-              reset(undefined, {
-                keepValues: true,
-              });
-              setIsInvalid(true);
-            }
-          } catch {}
+            await createDowJonesKycIntegration({ variables: data });
+            props.onResolve();
+          } catch {
+            reset(undefined, {
+              keepValues: true,
+            });
+            setIsInvalid(true);
+            return;
+          }
         }),
       }}
       initialFocusRef={clientIdRef}
@@ -161,7 +157,7 @@ export function DowJonesIntegrationDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" variant="solid" isLoading={loading}>
+        <Button type="submit" colorScheme="primary" variant="solid" isLoading={isSubmitting}>
           <FormattedMessage
             id="component.dow-jones-integration-dialog.connect"
             defaultMessage="Connect"
@@ -173,18 +169,20 @@ export function DowJonesIntegrationDialog({
   );
 }
 
-export function useDowJonesIntegrationDialog() {
-  return useDialog(DowJonesIntegrationDialog);
-}
-
-DowJonesIntegrationDialog.mutations = [
+const _mutations = [
   gql`
-    mutation DowJonesIntegrationDialog_validateDowJonesKycCredentials(
+    mutation useDowJonesIntegrationDialog_createDowJonesKycIntegration(
       $clientId: String!
       $username: String!
       $password: String!
     ) {
-      validateDowJonesKycCredentials(clientId: $clientId, username: $username, password: $password)
+      createDowJonesKycIntegration(clientId: $clientId, username: $username, password: $password) {
+        id
+      }
     }
   `,
 ];
+
+export function useDowJonesIntegrationDialog() {
+  return useDialog(DowJonesIntegrationDialog);
+}

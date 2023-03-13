@@ -890,9 +890,15 @@ export type Mutation = {
   uploadUserAvatar: SupportMethodResponse;
   /** Triggered by new users that want to sign up into Parallel */
   userSignUp: User;
-  /** Tries to get an access_token with provided credentials */
+  /**
+   * Tries to get an access_token with provided credentials
+   * @deprecated deprecated, use createDowJonesKycIntegration directly
+   */
   validateDowJonesKycCredentials: Scalars["Boolean"];
-  /** Runs backend checks to validate signaturit credentials. */
+  /**
+   * Runs backend checks to validate signaturit credentials.
+   * @deprecated deprecated, use createSignaturitIntegration directly
+   */
   validateSignaturitApiKey: Result;
   verifyPublicAccess: PublicAccessVerification;
 };

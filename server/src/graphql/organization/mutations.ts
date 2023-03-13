@@ -500,7 +500,6 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
             is_default: false,
           },
           ctx.config.signature.signaturitSharedProductionApiKey,
-          "production",
           true,
           `User:${ctx.user!.id}`,
           t

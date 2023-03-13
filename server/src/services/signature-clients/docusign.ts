@@ -8,8 +8,8 @@ import {
   DocusignIntegration,
   DocusignIntegrationContext,
 } from "../../integrations/DocusignIntegration";
+import { ExpiredCredentialsError } from "../../integrations/ExpirableCredentialsIntegration";
 import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
-import { OauthExpiredCredentialsError } from "../../integrations/OAuthIntegration";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { safeJsonParse } from "../../util/safeJsonParse";
@@ -32,10 +32,6 @@ export class DocuSignClient implements ISignatureClient {
     this.integrationId = integrationId;
   }
 
-  private isConsentRequiredError(error: any) {
-    return error?.error === "invalid_grant";
-  }
-
   private isAccessTokenExpiredError(error: any) {
     return (error as any)?.status === 401;
   }
@@ -51,44 +47,41 @@ export class DocuSignClient implements ISignatureClient {
       context: DocusignIntegrationContext & { userAccountId: string }
     ) => Promise<TResult>
   ): Promise<TResult> {
-    return this.docusignOauth.withAccessToken(this.integrationId, async (accessToken, context) => {
-      try {
-        const client = new ApiClient();
-        client.setOAuthBasePath(
-          this.config.oauth.docusign[context.environment].oauthBaseUri.replace("https://", "")
-        );
-        const userInfo = (await client.getUserInfo(accessToken)) as UserInfoResponse;
-        const defaultAccount = userInfo.accounts.find((a) => a.isDefault === "true")!;
-
-        client.setBasePath(`${defaultAccount.baseUri}/restapi`);
-        client.addDefaultHeader("Authorization", `Bearer ${accessToken}`);
-
-        return await handler(
-          {
-            envelopes: new EnvelopesApi(client),
-            accounts: new AccountsApi(client),
-          },
-          { ...context, userAccountId: defaultAccount.accountId }
-        );
-      } catch (error) {
-        if (this.isAccessTokenExpiredError(error)) {
-          throw new OauthExpiredCredentialsError();
-        }
-        if (this.isAccountSuspendedError(error)) {
-          throw new InvalidCredentialsError(
-            "ACCOUNT_SUSPENDED",
-            error instanceof Error ? error.message : stringify(error)
+    return await this.docusignOauth.withCredentials(
+      this.integrationId,
+      async ({ ACCESS_TOKEN: accessToken }, context) => {
+        try {
+          const client = new ApiClient();
+          client.setOAuthBasePath(
+            this.config.oauth.docusign[context.environment].oauthBaseUri.replace("https://", "")
           );
-        }
-        if (this.isConsentRequiredError(error)) {
-          throw new InvalidCredentialsError(
-            "CONSENT_REQUIRED",
-            error instanceof Error ? error.message : stringify(error)
+          const userInfo = (await client.getUserInfo(accessToken)) as UserInfoResponse;
+          const defaultAccount = userInfo.accounts.find((a) => a.isDefault === "true")!;
+
+          client.setBasePath(`${defaultAccount.baseUri}/restapi`);
+          client.addDefaultHeader("Authorization", `Bearer ${accessToken}`);
+
+          return await handler(
+            {
+              envelopes: new EnvelopesApi(client),
+              accounts: new AccountsApi(client),
+            },
+            { ...context, userAccountId: defaultAccount.accountId }
           );
+        } catch (error) {
+          if (this.isAccessTokenExpiredError(error)) {
+            throw new ExpiredCredentialsError();
+          }
+          if (this.isAccountSuspendedError(error)) {
+            throw new InvalidCredentialsError(
+              "ACCOUNT_SUSPENDED",
+              error instanceof Error ? error.message : stringify(error)
+            );
+          }
+          throw error;
         }
-        throw error;
       }
-    });
+    );
   }
 
   async startSignatureRequest(

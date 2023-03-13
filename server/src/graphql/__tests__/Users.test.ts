@@ -252,7 +252,7 @@ describe("GraphQL/Users", () => {
       ]);
 
       await userRepo.updateUserData(
-        users[2].id,
+        users[2].user_data_id,
         { email: "newemail@gmail.com", is_sso_user: true },
         "Test"
       );

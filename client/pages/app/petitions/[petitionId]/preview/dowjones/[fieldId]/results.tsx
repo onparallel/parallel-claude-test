@@ -16,6 +16,7 @@ import {
   DowJonesFieldSearchResults_PetitionFieldFragment,
   DowJonesFieldSearchResults_searchDocument,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
@@ -28,6 +29,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 
 type DowJonesFieldSearchResults_Selection =
   DowJonesFieldSearchResults_DowJonesKycEntitySearchResultFragment;
@@ -61,15 +63,24 @@ function DowJonesFieldSearchResults({
   });
 
   const [state, setQueryState] = useQueryState(QUERY_STATE);
-  const { data, loading } = useQueryOrPreviousData(DowJonesFieldSearchResults_searchDocument, {
-    variables: {
-      offset: state.items * (state.page - 1),
-      limit: state.items,
-      name: state.name!,
-      dateOfBirth: state.dateOfBirth ? new Date(state.dateOfBirth).toISOString() : null,
-    },
-    fetchPolicy: "cache-and-network",
-  });
+  const { data, loading, error } = useQueryOrPreviousData(
+    DowJonesFieldSearchResults_searchDocument,
+    {
+      variables: {
+        offset: state.items * (state.page - 1),
+        limit: state.items,
+        name: state.name!,
+        dateOfBirth: state.dateOfBirth ? new Date(state.dateOfBirth).toISOString() : null,
+      },
+      fetchPolicy: "cache-and-network",
+    }
+  );
+
+  const showGenericErrorToast = useGenericErrorToast();
+
+  if (isDefined(error)) {
+    showGenericErrorToast();
+  }
 
   const result = data?.dowJonesKycEntitySearch;
   const columns = useDowJonesKycDataColumns();
@@ -81,8 +92,6 @@ function DowJonesFieldSearchResults({
     },
     [router.query]
   );
-
-  const showGenericErrorToast = useGenericErrorToast();
 
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
   const [isCreatingReply, setIsCreatingReply] = useState<Record<string, boolean>>({});
@@ -123,7 +132,12 @@ function DowJonesFieldSearchResults({
 
           window.opener.postMessage("refresh", window.origin);
         } catch (e) {
-          showGenericErrorToast(e);
+          if (isApolloError(e, "INVALID_CREDENTIALS")) {
+            // don't log error to Sentry if it's an INVALID_CREDENTIALS
+            showGenericErrorToast();
+          } else {
+            showGenericErrorToast(e);
+          }
         }
         setIsCreatingReply(({ [profileId]: _, ...curr }) => curr);
       },

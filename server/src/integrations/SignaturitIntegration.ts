@@ -1,9 +1,7 @@
 import { inject, injectable } from "inversify";
-import { Knex } from "knex";
 import { isDefined } from "remeda";
 import { CONFIG, Config } from "../config";
 import {
-  EnhancedCreateOrgIntegration,
   EnhancedOrgIntegration,
   IntegrationRepository,
   IntegrationSettings,
@@ -78,16 +76,5 @@ export class SignaturitIntegration extends GenericIntegration<
         await this.updateOrgIntegration(integration.id, { settings: { [key]: id } });
       },
     };
-  }
-
-  public override createOrgIntegration(
-    data: Omit<
-      EnhancedCreateOrgIntegration<"SIGNATURE", "SIGNATURIT", false>,
-      "type" | "provider" | "is_enabled"
-    >,
-    createdBy: string,
-    t?: Knex.Transaction
-  ): Promise<EnhancedOrgIntegration<"SIGNATURE", "SIGNATURIT", true>> {
-    return super.createOrgIntegration(data, createdBy, t);
   }
 }

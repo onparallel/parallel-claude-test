@@ -2067,11 +2067,13 @@ type Mutation {
   Tries to get an access_token with provided credentials
   """
   validateDowJonesKycCredentials(clientId: String!, password: String!, username: String!): Boolean!
+    @deprecated(reason: "deprecated, use createDowJonesKycIntegration directly")
 
   """
   Runs backend checks to validate signaturit credentials.
   """
   validateSignaturitApiKey(apiKey: String!): Result!
+    @deprecated(reason: "deprecated, use createSignaturitIntegration directly")
   verifyPublicAccess(
     ip: String
     keycode: ID!

@@ -27,8 +27,8 @@ export class DowJonesProfileDownloadRunner extends TaskRunner<"DOW_JONES_PROFILE
     }
 
     const response = await this.ctx.dowJonesKyc.riskEntityProfilePdf(
-      this.task.input.profile_id,
-      dowJonesIntegration
+      dowJonesIntegration.id,
+      this.task.input.profile_id
     );
 
     const tmpFile = await this.uploadTemporaryFile({

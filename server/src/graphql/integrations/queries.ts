@@ -1,4 +1,5 @@
 import { idArg, nonNull, queryField, stringArg } from "nexus";
+import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
 import { toGlobalId } from "../../util/globalId";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
@@ -21,32 +22,39 @@ export const queries = queryField((t) => {
         ctx.user!.org_id,
         "DOW_JONES_KYC"
       );
-
-      const result = await ctx.dowJonesKyc.riskEntitySearch(args, integration);
-      return {
-        totalCount: result.meta.total_count,
-        items: (result.data ?? []).map((i) => ({
-          id: toGlobalId("DowJonesKycEntitySearchResult", i.id),
-          profileId: i.id,
-          type: i.attributes.type,
-          name: i.attributes.primary_name,
-          title: i.attributes.title,
-          countryTerritoryName:
-            i.attributes.country_territory_code !== "NOTK"
-              ? i.attributes.country_territory_name
+      try {
+        const result = await ctx.dowJonesKyc.riskEntitySearch(integration.id, args);
+        return {
+          totalCount: result.meta.total_count,
+          items: (result.data ?? []).map((i) => ({
+            id: toGlobalId("DowJonesKycEntitySearchResult", i.id),
+            profileId: i.id,
+            type: i.attributes.type,
+            name: i.attributes.primary_name,
+            title: i.attributes.title,
+            countryTerritoryName:
+              i.attributes.country_territory_code !== "NOTK"
+                ? i.attributes.country_territory_name
+                : null,
+            isSubsidiary: i.attributes.is_subsidiary,
+            iconHints: i.attributes.icon_hints,
+            gender: i.attributes.gender,
+            dateOfBirth: i.attributes.date_of_birth
+              ? {
+                  year: parseInt(i.attributes.date_of_birth[0].year) || null,
+                  month: parseInt(i.attributes.date_of_birth[0].month) || null,
+                  day: parseInt(i.attributes.date_of_birth[0].day) || null,
+                }
               : null,
-          isSubsidiary: i.attributes.is_subsidiary,
-          iconHints: i.attributes.icon_hints,
-          gender: i.attributes.gender,
-          dateOfBirth: i.attributes.date_of_birth
-            ? {
-                year: parseInt(i.attributes.date_of_birth[0].year) || null,
-                month: parseInt(i.attributes.date_of_birth[0].month) || null,
-                day: parseInt(i.attributes.date_of_birth[0].day) || null,
-              }
-            : null,
-        })),
-      };
+          })),
+        };
+      } catch (e) {
+        if (e instanceof InvalidCredentialsError && e.code === "FORBIDDEN") {
+          throw new ApolloError("Forbidden", "INVALID_CREDENTIALS");
+        } else {
+          throw e;
+        }
+      }
     },
   });
 
@@ -72,7 +80,7 @@ export const queries = queryField((t) => {
           "DOW_JONES_KYC"
         );
 
-        const profile = await ctx.dowJonesKyc.riskEntityProfile(args.profileId, integration);
+        const profile = await ctx.dowJonesKyc.riskEntityProfile(integration.id, args.profileId);
 
         const citizenship = (
           profile.data.attributes.person?.country_territory_details.citizenship ?? []
@@ -146,12 +154,14 @@ export const queries = queryField((t) => {
         await ctx.redis.set(redisKey, JSON.stringify(result), 15 * 60); // 15 min cache
 
         return result;
-      } catch (error: any) {
-        if (error.message === "PROFILE_NOT_FOUND") {
+      } catch (error) {
+        if (error instanceof Error && error.message === "PROFILE_NOT_FOUND") {
           throw new ApolloError(
             `Couldn't find profile with id ${args.profileId}`,
             "PROFILE_NOT_FOUND"
           );
+        } else if (error instanceof InvalidCredentialsError && error.code === "FORBIDDEN") {
+          throw new ApolloError("Forbidden", "INVALID_CREDENTIALS");
         }
         throw error;
       }

@@ -1,7 +1,4 @@
 import { booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
-import { SignaturitEnvironment } from "../../integrations/SignaturitIntegration";
-import { withError } from "../../util/promises/withError";
-import { encrypt } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -34,7 +31,9 @@ export const markSignatureIntegrationAsDefault = mutationField(
   }
 );
 
+/** @deprecated */
 export const validateSignaturitApiKey = mutationField("validateSignaturitApiKey", {
+  deprecation: "deprecated, use createSignaturitIntegration directly",
   description: "Runs backend checks to validate signaturit credentials.",
   type: nonNull("Result"),
   authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("PETITION_SIGNATURE")),
@@ -43,7 +42,7 @@ export const validateSignaturitApiKey = mutationField("validateSignaturitApiKey"
   },
   resolve: async (_, args, ctx) => {
     try {
-      await ctx.setup.authenticateSignaturitApiKey(args.apiKey);
+      // await ctx.setup.authenticateSignaturitApiKey(args.apiKey);
       return RESULT.SUCCESS;
     } catch {}
     return RESULT.FAILURE;
@@ -60,27 +59,20 @@ export const createSignaturitIntegration = mutationField("createSignaturitIntegr
     isDefault: nullable(booleanArg()),
   },
   resolve: async (_, args, ctx) => {
-    let environment: SignaturitEnvironment | undefined;
     try {
-      const result = await ctx.setup.authenticateSignaturitApiKey(args.apiKey);
-      environment = result.environment;
-    } catch {
-      throw new ApolloError(
-        `Unable to check Signaturit APIKEY environment`,
-        "INVALID_APIKEY_ERROR"
+      return await ctx.setup.createSignaturitIntegration(
+        {
+          name: args.name,
+          org_id: ctx.user!.org_id,
+          is_default: args.isDefault ?? false,
+        },
+        args.apiKey,
+        false,
+        `User:${ctx.user!.id}`
       );
+    } catch {
+      throw new ApolloError(`Unable to validate credentials`, "INVALID_CREDENTIALS_ERROR");
     }
-    return await ctx.setup.createSignaturitIntegration(
-      {
-        name: args.name,
-        org_id: ctx.user!.org_id,
-        is_default: args.isDefault ?? false,
-      },
-      args.apiKey,
-      environment,
-      false,
-      `User:${ctx.user!.id}`
-    );
   },
 });
 
@@ -153,7 +145,9 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
   },
 });
 
+/** @deprecated */
 export const validateDowJonesKycCredentials = mutationField("validateDowJonesKycCredentials", {
+  deprecation: "deprecated, use createDowJonesKycIntegration directly",
   description: "Tries to get an access_token with provided credentials",
   type: "Boolean",
   authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("DOW_JONES_KYC")),
@@ -164,7 +158,7 @@ export const validateDowJonesKycCredentials = mutationField("validateDowJonesKyc
   },
   resolve: async (_, args, ctx) => {
     try {
-      await ctx.dowJonesKyc.fetchCredentials(args.clientId, args.username, args.password);
+      // await ctx.setup.authenticateDowJonesCredentials(args.clientId, args.username, args.password);
       return true;
     } catch {
       return false;
@@ -191,33 +185,18 @@ export const createDowJonesKycIntegration = mutationField("createDowJonesKycInte
       );
     }
 
-    const [error, credentials] = await withError(
-      ctx.dowJonesKyc.fetchCredentials(args.clientId, args.username, args.password)
-    );
-    if (error || !credentials) {
+    try {
+      return await ctx.setup.createDowJonesIntegration(
+        {
+          org_id: ctx.user!.org_id,
+          name: "Dow Jones KYC",
+        },
+        { CLIENT_ID: args.clientId, USERNAME: args.username, PASSWORD: args.password },
+        `User:${ctx.user!.id}`
+      );
+    } catch {
       throw new ApolloError(`Unable to validate credentials`, "INVALID_CREDENTIALS_ERROR");
     }
-
-    const encryptionKey = Buffer.from(ctx.config.security.encryptKeyBase64, "base64");
-    return await ctx.integrations.createOrgIntegration<"DOW_JONES_KYC">(
-      {
-        type: "DOW_JONES_KYC",
-        provider: "DOW_JONES_KYC",
-        org_id: ctx.user!.org_id,
-        name: "Dow Jones KYC",
-        settings: {
-          CREDENTIALS: {
-            ACCESS_TOKEN: encrypt(credentials.ACCESS_TOKEN, encryptionKey).toString("hex"),
-            REFRESH_TOKEN: encrypt(credentials.REFRESH_TOKEN, encryptionKey).toString("hex"),
-            CLIENT_ID: encrypt(credentials.CLIENT_ID, encryptionKey).toString("hex"),
-            USERNAME: credentials.USERNAME,
-            PASSWORD: encrypt(credentials.PASSWORD, encryptionKey).toString("hex"),
-          },
-        },
-        is_enabled: true,
-      },
-      `User:${ctx.user!.id}`
-    );
   },
 });
 
@@ -232,6 +211,10 @@ export const deleteDowJonesKycIntegration = mutationField("deleteDowJonesKycInte
     );
     if (integration) {
       await ctx.integrations.deleteOrgIntegration(integration.id, `User:${ctx.user!.id}`);
+      ctx.integrations.clearLoadIntegrationsByOrgIdDataloader({
+        orgId: ctx.user!.org_id,
+        type: "DOW_JONES_KYC",
+      });
     }
     return (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
   },

@@ -1,5 +1,4 @@
 import { Request, RequestHandler, Router } from "express";
-import stringify from "fast-safe-stringify";
 import { injectable } from "inversify";
 import { isDefined } from "remeda";
 import { authenticate } from "../api/helpers/authenticate";
@@ -14,8 +13,7 @@ import { IRedis } from "../services/redis";
 import { fromGlobalId } from "../util/globalId";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
-
-import { GenericIntegration, InvalidCredentialsError } from "./GenericIntegration";
+import { ExpirableCredentialsIntegration } from "./ExpirableCredentialsIntegration";
 
 export interface OauthCredentials {
   ACCESS_TOKEN: string;
@@ -36,7 +34,7 @@ export abstract class OAuthIntegration<
   TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
   TState extends OauthIntegrationState = OauthIntegrationState,
   WithAccessTokenContext extends {} = {}
-> extends GenericIntegration<TType, TProvider, WithAccessTokenContext> {
+> extends ExpirableCredentialsIntegration<TType, TProvider, WithAccessTokenContext> {
   constructor(
     protected override config: Config,
     protected override integrations: IntegrationRepository,
@@ -73,11 +71,6 @@ export abstract class OAuthIntegration<
     code: string,
     state: TState
   ): Promise<IntegrationSettings<TType, TProvider>>;
-
-  protected abstract refreshCredentials(
-    credentials: OauthCredentials,
-    context: WithAccessTokenContext
-  ): Promise<OauthCredentials>;
 
   private async storeState(key: string, value: TState) {
     await this.redis.set(`oauth.${key}`, JSON.stringify(value), 10 * 60);
@@ -148,42 +141,5 @@ export abstract class OAuthIntegration<
           next(error);
         }
       });
-  }
-
-  public async withAccessToken<TResult>(
-    orgIntegrationId: number,
-    handler: (accessToken: string, context: WithAccessTokenContext) => Promise<TResult>
-  ): Promise<TResult> {
-    return await this.withCredentials(orgIntegrationId, async (credentials, context) => {
-      try {
-        return await handler(credentials.ACCESS_TOKEN, context);
-      } catch (error) {
-        if (error instanceof OauthExpiredCredentialsError) {
-          // Refresh credentials and try again
-          let newCredentials: OauthCredentials | undefined;
-          try {
-            newCredentials = await this.refreshCredentials(credentials, context);
-          } catch (error) {
-            // we couldn't refresh the access token, permissions might be revoked
-            throw new InvalidCredentialsError(
-              "CONSENT_REQUIRED",
-              error instanceof Error ? error.message : stringify(error)
-            );
-          }
-          await this.updateOrgIntegration(orgIntegrationId, {
-            settings: { CREDENTIALS: newCredentials } as IntegrationSettings<TType, TProvider>,
-          });
-          return await handler(newCredentials!.ACCESS_TOKEN, context);
-        }
-        throw error;
-      }
-    });
-  }
-}
-
-export class OauthExpiredCredentialsError extends InvalidCredentialsError {
-  override name = "ExpiredCredentialsError";
-  constructor(message?: string) {
-    super("EXPIRED_CREDENTIALS", message);
   }
 }

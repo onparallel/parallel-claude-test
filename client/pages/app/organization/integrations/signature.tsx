@@ -27,7 +27,6 @@ import { useAddSignatureCredentialsDialog } from "@parallel/components/organizat
 import { useDeleteSignatureErrorConfirmationDialog } from "@parallel/components/organization/dialogs/DeleteSignatureErrorConfirmationDialog";
 import { useDeleteSignatureTokenDialog } from "@parallel/components/organization/dialogs/DeleteSignatureTokenDialog";
 import {
-  IntegrationsSignature_createSignaturitIntegrationDocument,
   IntegrationsSignature_deleteSignatureIntegrationDocument,
   IntegrationsSignature_markSignatureIntegrationAsDefaultDocument,
   IntegrationsSignature_SignatureOrgIntegrationFragment,
@@ -83,35 +82,24 @@ function IntegrationsSignature() {
 
   const showGenericErrorToast = useGenericErrorToast();
   const showAddSignatureCredentialsDialog = useAddSignatureCredentialsDialog();
-  const [createSignaturitIntegration] = useMutation(
-    IntegrationsSignature_createSignaturitIntegrationDocument
-  );
+
   const handleAddSignatureProvider = async () => {
     try {
-      const data = await showAddSignatureCredentialsDialog(me);
-      if (data.provider === "SIGNATURIT") {
-        await createSignaturitIntegration({
-          variables: {
-            apiKey: data.credentials.API_KEY,
-            isDefault: data.isDefault,
-            name: data.name,
+      await showAddSignatureCredentialsDialog({ user: me });
+      toast({
+        status: "success",
+        title: intl.formatMessage({
+          id: "page.signature.provider-added-successfully.toast-title",
+          defaultMessage: "Success",
+        }),
+        description: intl.formatMessage(
+          {
+            id: "page.signature.provider-added-successfully.toast-description",
+            defaultMessage: "{provider} integration created successfully.",
           },
-        });
-        toast({
-          status: "success",
-          title: intl.formatMessage({
-            id: "page.signature.provider-added-successfully.toast-title",
-            defaultMessage: "Success",
-          }),
-          description: intl.formatMessage(
-            {
-              id: "page.signature.provider-added-successfully.toast-description",
-              defaultMessage: "{provider} integration created successfully.",
-            },
-            { provider: "Signaturit" }
-          ),
-        });
-      }
+          { provider: "Signaturit" }
+        ),
+      });
       refetch();
     } catch (error) {
       if (isDialogError(error)) {
@@ -493,18 +481,6 @@ IntegrationsSignature.fragments = {
 };
 
 IntegrationsSignature.mutations = [
-  gql`
-    mutation IntegrationsSignature_createSignaturitIntegration(
-      $name: String!
-      $apiKey: String!
-      $isDefault: Boolean
-    ) {
-      createSignaturitIntegration(name: $name, apiKey: $apiKey, isDefault: $isDefault) {
-        ...IntegrationsSignature_SignatureOrgIntegration
-      }
-    }
-    ${IntegrationsSignature.fragments.SignatureOrgIntegration}
-  `,
   gql`
     mutation IntegrationsSignature_markSignatureIntegrationAsDefault($id: GID!) {
       markSignatureIntegrationAsDefault(id: $id) {

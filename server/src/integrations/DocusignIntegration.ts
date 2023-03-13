@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { inject, injectable } from "inversify";
-import { RequestInit } from "node-fetch";
+import { RequestInit, Response } from "node-fetch";
 import { omit } from "remeda";
 import { Config, CONFIG } from "../config";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
@@ -12,6 +12,7 @@ import { FeatureFlagName, OrgIntegration } from "../db/__types";
 import { FetchService, FETCH_SERVICE } from "../services/fetch";
 import { IRedis, REDIS } from "../services/redis";
 import { Replace } from "../util/types";
+import { InvalidCredentialsError } from "./GenericIntegration";
 import { OauthCredentials, OAuthIntegration, OauthIntegrationState } from "./OAuthIntegration";
 
 export interface DocusignIntegrationContext {
@@ -106,13 +107,11 @@ export class DocusignIntegration extends OAuthIntegration<
       },
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
       throw response;
     }
 
-    return data;
+    return await response.json();
   }
 
   protected async buildAuthorizationUrl(state: string, { environment }: DocusignIntegrationState) {
@@ -153,21 +152,31 @@ export class DocusignIntegration extends OAuthIntegration<
     credentials: OauthCredentials,
     { environment }: DocusignIntegrationContext
   ): Promise<OauthCredentials> {
-    const data = await this.apiRequest<TokenResponse>(environment, "/token", {
-      method: "POST",
-      headers: {
-        Authorization: this.basicAuthorization(environment),
-      },
-      body: new URLSearchParams({
-        grant_type: "refresh_token",
-        refresh_token: credentials.REFRESH_TOKEN,
-      }),
-    });
+    try {
+      const data = await this.apiRequest<TokenResponse>(environment, "/token", {
+        method: "POST",
+        headers: {
+          Authorization: this.basicAuthorization(environment),
+        },
+        body: new URLSearchParams({
+          grant_type: "refresh_token",
+          refresh_token: credentials.REFRESH_TOKEN,
+        }),
+      });
 
-    return {
-      ACCESS_TOKEN: data.access_token,
-      REFRESH_TOKEN: data.refresh_token,
-    };
+      return {
+        ACCESS_TOKEN: data.access_token,
+        REFRESH_TOKEN: data.refresh_token,
+      };
+    } catch (error) {
+      if (error instanceof Response) {
+        const errorData = await error.json();
+        if (errorData.error === "invalid_grant") {
+          throw new InvalidCredentialsError("CONSENT_REQUIRED", errorData);
+        }
+      }
+      throw error;
+    }
   }
 
   protected override async orgHasAccessToIntegration(

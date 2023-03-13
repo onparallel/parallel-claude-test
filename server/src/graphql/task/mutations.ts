@@ -172,7 +172,8 @@ export const createDowJonesProfileDownloadTask = mutationField(
     type: "Task",
     authorize: authenticateAnd(
       userHasFeatureFlag("DOW_JONES_KYC"),
-      userHasEnabledIntegration("DOW_JONES_KYC")
+      // avoid creating task if credentials are invalid, so TaskRunner doesn't throw error
+      userHasEnabledIntegration("DOW_JONES_KYC", true)
     ),
     args: {
       profileId: nonNull(idArg()),

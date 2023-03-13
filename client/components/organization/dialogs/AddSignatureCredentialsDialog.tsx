@@ -18,8 +18,8 @@ import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Steps } from "@parallel/components/common/Steps";
 import {
-  AddSignatureCredentialsDialog_validateSignaturitApiKeyDocument,
   SignatureOrgIntegrationProvider,
+  useAddSignatureCredentialsDialog_createSignaturitIntegrationDocument,
   useAddSignatureCredentialsDialog_UserFragment,
 } from "@parallel/graphql/__types";
 import { useDocusignConsentPopup } from "@parallel/utils/useDocusignConsentPopup";
@@ -42,10 +42,14 @@ interface AddSignatureCredentialsDialogData<
   isDefault: boolean;
 }
 
+interface AddSignatureCredentialsDialogProps {
+  user: useAddSignatureCredentialsDialog_UserFragment;
+}
+
 function AddSignatureCredentialsDialog({
-  hasDocusignSandbox,
+  user,
   ...props
-}: DialogProps<useAddSignatureCredentialsDialog_UserFragment, AddSignatureCredentialsDialogData>) {
+}: DialogProps<AddSignatureCredentialsDialogProps>) {
   const {
     valueAsNumber: currentStep,
     isAtMax: isLastStep,
@@ -66,10 +70,6 @@ function AddSignatureCredentialsDialog({
   const showDocusignConsentPopup = useDocusignConsentPopup();
   const toast = useToast();
 
-  const [validateSignaturitApiKey] = useMutation(
-    AddSignatureCredentialsDialog_validateSignaturitApiKeyDocument
-  );
-
   function handleNextClick(e: MouseEvent) {
     e.preventDefault();
     if (selectedProvider === "SIGNATURIT") {
@@ -81,25 +81,34 @@ function AddSignatureCredentialsDialog({
     nextStep();
   }
 
+  const [createSignaturitIntegration] = useMutation(
+    useAddSignatureCredentialsDialog_createSignaturitIntegrationDocument
+  );
+
   return (
     <ConfirmDialog
       hasCloseButton
       closeOnOverlayClick={false}
       content={{
         as: "form",
-        onSubmit: handleSubmit(async ({ name, provider, credentials, isDefault }) => {
-          if (provider === "SIGNATURIT") {
-            const { data } = await validateSignaturitApiKey({
-              variables: { apiKey: credentials.API_KEY },
-            });
-            if (data?.validateSignaturitApiKey !== "SUCCESS") {
+        onSubmit: handleSubmit(async (data) => {
+          if (data.provider === "SIGNATURIT") {
+            try {
+              await createSignaturitIntegration({
+                variables: {
+                  apiKey: data.credentials.API_KEY,
+                  name: data.name,
+                  isDefault: data.isDefault,
+                },
+              });
+            } catch {
               setError("credentials.API_KEY", { type: "invalid" }, { shouldFocus: true });
               return;
             }
-          } else if (provider === "DOCUSIGN") {
+          } else if (data.provider === "DOCUSIGN") {
             try {
               await showDocusignConsentPopup({
-                environment: credentials.sandboxMode ? "sandbox" : "production",
+                environment: data.credentials.sandboxMode ? "sandbox" : "production",
                 isDefault: form.getValues("isDefault"),
                 name: form.getValues("name"),
               });
@@ -122,7 +131,7 @@ function AddSignatureCredentialsDialog({
               return;
             }
           }
-          props.onResolve({ name, provider, credentials, isDefault });
+          props.onResolve();
         }),
       }}
       header={
@@ -142,7 +151,7 @@ function AddSignatureCredentialsDialog({
         <FormProvider {...form}>
           <Steps currentStep={currentStep}>
             <AddSignatureCredentialsStep1 />
-            <AddSignatureCredentialsStep2 hasDocusignSandbox={hasDocusignSandbox} />
+            <AddSignatureCredentialsStep2 hasDocusignSandbox={user.hasDocusignSandbox} />
           </Steps>
         </FormProvider>
       }
@@ -350,14 +359,6 @@ function AddSignatureCredentialsStep2({ hasDocusignSandbox }: { hasDocusignSandb
   );
 }
 
-const _mutations = [
-  gql`
-    mutation AddSignatureCredentialsDialog_validateSignaturitApiKey($apiKey: String!) {
-      validateSignaturitApiKey(apiKey: $apiKey)
-    }
-  `,
-];
-
 useAddSignatureCredentialsDialog.fragments = {
   User: gql`
     fragment useAddSignatureCredentialsDialog_User on User {
@@ -366,3 +367,17 @@ useAddSignatureCredentialsDialog.fragments = {
     }
   `,
 };
+
+const _mutations = [
+  gql`
+    mutation useAddSignatureCredentialsDialog_createSignaturitIntegration(
+      $name: String!
+      $apiKey: String!
+      $isDefault: Boolean
+    ) {
+      createSignaturitIntegration(name: $name, apiKey: $apiKey, isDefault: $isDefault) {
+        id
+      }
+    }
+  `,
+];

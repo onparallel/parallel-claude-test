@@ -10,6 +10,7 @@ import { CreateOrgIntegration, IntegrationType, OrgIntegration, User } from "../
 
 export type IntegrationProviders = {
   SIGNATURE: "SIGNATURIT" | "DOCUSIGN";
+  DOW_JONES_KYC: "DOW_JONES_KYC";
 };
 
 export type SignatureProvider = IntegrationProviders["SIGNATURE"];
@@ -62,26 +63,15 @@ export type IntegrationCredentials<
   ? EnhancedIntegrationSettings<TType, TProvider, false>["CREDENTIALS"]
   : never;
 
-// TODO: Sustituir por lo de abajo cuando se utilice GenericInegration para DOW_JONES_KYC
 export type EnhancedIntegrationSettings<
   TType extends IntegrationType,
   TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
   TEncrypted extends boolean = true
 > = TEncrypted extends true
-  ? TType extends "SIGNATURE"
+  ? IntegrationSettings<TType, TProvider> extends { CREDENTIALS: any }
     ? Omit<IntegrationSettings<TType, TProvider>, "CREDENTIALS"> & { CREDENTIALS: string }
     : IntegrationSettings<TType, TProvider>
   : IntegrationSettings<TType, TProvider>;
-
-// export type EnhancedIntegrationSettings<
-//   TType extends IntegrationType,
-//   TProvider extends IntegrationProvider<TType> = IntegrationProvider<TType>,
-//   TEncrypted extends boolean = true
-// > = TEncrypted extends true
-//   ? IntegrationSettings<TType, TProvider> extends { CREDENTIALS: any }
-//     ? Omit<IntegrationSettings<TType, TProvider>, "CREDENTIALS"> & { CREDENTIALS: string }
-//     : IntegrationSettings<TType, TProvider>
-//   : IntegrationSettings<TType, TProvider>;
 
 export type EnhancedOrgIntegration<
   TType extends IntegrationType,
@@ -142,6 +132,14 @@ export class IntegrationRepository extends BaseRepository {
         .select("*"),
       opts
     );
+  }
+
+  async clearLoadIntegrationsByOrgIdDataloader(key: {
+    orgId: number;
+    type?: IntegrationType | null;
+    provider?: string | null;
+  }) {
+    this._loadIntegrationsByOrgId.dataloader.clear(key);
   }
 
   private _loadIntegrationsByOrgId = this.buildLoader<

@@ -495,12 +495,18 @@ export function templateDoesNotHavePublicPetitionLink<
 }
 
 export function userHasEnabledIntegration<TypeName extends string, FieldName extends string>(
-  type: IntegrationType
+  type: IntegrationType,
+  onlyValidCredentials?: boolean
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       const integrations = await ctx.integrations.loadIntegrationsByOrgId(ctx.user!.org_id, type);
-      return integrations.length > 0;
+
+      return (
+        integrations.filter(
+          (i) => (onlyValidCredentials && !i.invalid_credentials) || !onlyValidCredentials
+        ).length > 0
+      );
     } catch {}
     return false;
   };

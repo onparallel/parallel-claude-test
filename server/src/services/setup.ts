@@ -1,9 +1,13 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { CONFIG, Config } from "../config";
-import { EnhancedOrgIntegration } from "../db/repositories/IntegrationRepository";
+import {
+  EnhancedOrgIntegration,
+  IntegrationCredentials,
+} from "../db/repositories/IntegrationRepository";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { CreateOrganization, CreateOrgIntegration, Organization } from "../db/__types";
+import { DowJonesIntegration } from "../integrations/DowJonesIntegration";
 import {
   SignaturitEnvironment,
   SignaturitIntegration,
@@ -13,15 +17,19 @@ import { FETCH_SERVICE, IFetchService } from "./fetch";
 export const SETUP_SERVICE = Symbol.for("SETUP_SERVICE");
 export interface ISetupService {
   createOrganization(data: CreateOrganization, createdBy: string): Promise<Organization>;
-  authenticateSignaturitApiKey(apiKey: string): Promise<{ environment: SignaturitEnvironment }>;
   createSignaturitIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default">,
     apiKey: string,
-    environment: SignaturitEnvironment,
     isParallelManaged: boolean,
     createdBy: string,
     t?: Knex.Transaction
   ): Promise<EnhancedOrgIntegration<"SIGNATURE", "SIGNATURIT">>;
+  createDowJonesIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default">,
+    credentials: IntegrationCredentials<"DOW_JONES_KYC", "DOW_JONES_KYC">,
+    createdBy: string,
+    t?: Knex.Transaction
+  ): Promise<EnhancedOrgIntegration<"DOW_JONES_KYC", "DOW_JONES_KYC">>;
 }
 
 @injectable()
@@ -30,7 +38,8 @@ export class SetupService implements ISetupService {
     @inject(CONFIG) public config: Config,
     @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
-    @inject(SignaturitIntegration) private signaturitIntegration: SignaturitIntegration
+    @inject(SignaturitIntegration) private signaturitIntegration: SignaturitIntegration,
+    @inject(DowJonesIntegration) private dowJonesIntegration: DowJonesIntegration
   ) {}
 
   async createOrganization(data: CreateOrganization, createdBy: string) {
@@ -43,7 +52,6 @@ export class SetupService implements ISetupService {
         is_default: true,
       },
       this.config.signature.signaturitSandboxApiKey,
-      "sandbox",
       false,
       createdBy
     );
@@ -51,7 +59,7 @@ export class SetupService implements ISetupService {
     return org;
   }
 
-  public async authenticateSignaturitApiKey(apiKey: string) {
+  private async authenticateSignaturitApiKey(apiKey: string) {
     return await Promise.any(
       Object.entries({
         sandbox: "https://api.sandbox.signaturit.com",
@@ -76,11 +84,11 @@ export class SetupService implements ISetupService {
   async createSignaturitIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default">,
     apiKey: string,
-    environment: SignaturitEnvironment,
     isParallelManaged: boolean,
     createdBy: string,
     t?: Knex.Transaction
   ) {
+    const { environment } = await this.authenticateSignaturitApiKey(apiKey);
     return await this.signaturitIntegration.createOrgIntegration(
       {
         ...data,
@@ -90,6 +98,23 @@ export class SetupService implements ISetupService {
           IS_PARALLEL_MANAGED: isParallelManaged,
         },
       },
+      createdBy,
+      t
+    );
+  }
+
+  public async createDowJonesIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default">,
+    credentials: Pick<
+      IntegrationCredentials<"DOW_JONES_KYC", "DOW_JONES_KYC">,
+      "CLIENT_ID" | "USERNAME" | "PASSWORD"
+    >,
+    createdBy: string,
+    t?: Knex.Transaction
+  ): Promise<EnhancedOrgIntegration<"DOW_JONES_KYC", "DOW_JONES_KYC">> {
+    return await this.dowJonesIntegration.createDowJonesIntegration(
+      data,
+      credentials,
       createdBy,
       t
     );

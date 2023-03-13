@@ -935,9 +935,15 @@ export interface Mutation {
   uploadUserAvatar: SupportMethodResponse;
   /** Triggered by new users that want to sign up into Parallel */
   userSignUp: User;
-  /** Tries to get an access_token with provided credentials */
+  /**
+   * Tries to get an access_token with provided credentials
+   * @deprecated deprecated, use createDowJonesKycIntegration directly
+   */
   validateDowJonesKycCredentials: Scalars["Boolean"];
-  /** Runs backend checks to validate signaturit credentials. */
+  /**
+   * Runs backend checks to validate signaturit credentials.
+   * @deprecated deprecated, use createSignaturitIntegration directly
+   */
   validateSignaturitApiKey: Result;
   verifyPublicAccess: PublicAccessVerification;
 }
@@ -6417,18 +6423,20 @@ export type DocumentThemeSelect_OrganizationThemeFragment = {
   isDefault: boolean;
 };
 
-export type AddSignatureCredentialsDialog_validateSignaturitApiKeyMutationVariables = Exact<{
-  apiKey: Scalars["String"];
-}>;
-
-export type AddSignatureCredentialsDialog_validateSignaturitApiKeyMutation = {
-  validateSignaturitApiKey: Result;
-};
-
 export type useAddSignatureCredentialsDialog_UserFragment = {
   __typename?: "User";
   id: string;
   hasDocusignSandbox: boolean;
+};
+
+export type useAddSignatureCredentialsDialog_createSignaturitIntegrationMutationVariables = Exact<{
+  name: Scalars["String"];
+  apiKey: Scalars["String"];
+  isDefault?: InputMaybe<Scalars["Boolean"]>;
+}>;
+
+export type useAddSignatureCredentialsDialog_createSignaturitIntegrationMutation = {
+  createSignaturitIntegration: { __typename?: "SignatureOrgIntegration"; id: string };
 };
 
 export type CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment = {
@@ -6462,14 +6470,14 @@ export type CreateUserDialog_emailIsAvailableQueryVariables = Exact<{
 
 export type CreateUserDialog_emailIsAvailableQuery = { emailIsAvailable: boolean };
 
-export type DowJonesIntegrationDialog_validateDowJonesKycCredentialsMutationVariables = Exact<{
+export type useDowJonesIntegrationDialog_createDowJonesKycIntegrationMutationVariables = Exact<{
   clientId: Scalars["String"];
   username: Scalars["String"];
   password: Scalars["String"];
 }>;
 
-export type DowJonesIntegrationDialog_validateDowJonesKycCredentialsMutation = {
-  validateDowJonesKycCredentials: boolean;
+export type useDowJonesIntegrationDialog_createDowJonesKycIntegrationMutation = {
+  createDowJonesKycIntegration: { __typename?: "OrgIntegration"; id: string };
 };
 
 export type EmailEventsIndicator_PetitionMessageFragment = {
@@ -16301,16 +16309,6 @@ export type OrganizationIntegrations_userQuery = {
   };
 };
 
-export type OrganizationIntegrations_createDowJonesKycIntegrationMutationVariables = Exact<{
-  clientId: Scalars["String"];
-  username: Scalars["String"];
-  password: Scalars["String"];
-}>;
-
-export type OrganizationIntegrations_createDowJonesKycIntegrationMutation = {
-  createDowJonesKycIntegration: { __typename?: "OrgIntegration"; id: string };
-};
-
 export type OrganizationIntegrations_deleteDowJonesKycIntegrationMutationVariables = Exact<{
   [key: string]: never;
 }>;
@@ -16327,24 +16325,6 @@ export type IntegrationsSignature_SignatureOrgIntegrationFragment = {
   isDefault: boolean;
   environment: SignatureOrgIntegrationEnvironment;
   invalidCredentials: boolean;
-};
-
-export type IntegrationsSignature_createSignaturitIntegrationMutationVariables = Exact<{
-  name: Scalars["String"];
-  apiKey: Scalars["String"];
-  isDefault?: InputMaybe<Scalars["Boolean"]>;
-}>;
-
-export type IntegrationsSignature_createSignaturitIntegrationMutation = {
-  createSignaturitIntegration: {
-    __typename?: "SignatureOrgIntegration";
-    id: string;
-    name: string;
-    provider: SignatureOrgIntegrationProvider;
-    isDefault: boolean;
-    environment: SignatureOrgIntegrationEnvironment;
-    invalidCredentials: boolean;
-  };
 };
 
 export type IntegrationsSignature_markSignatureIntegrationAsDefaultMutationVariables = Exact<{
@@ -33162,13 +33142,19 @@ export const BrandingGeneral_updateOrganizationBrandThemeDocument = gql`
   BrandingGeneral_updateOrganizationBrandThemeMutation,
   BrandingGeneral_updateOrganizationBrandThemeMutationVariables
 >;
-export const AddSignatureCredentialsDialog_validateSignaturitApiKeyDocument = gql`
-  mutation AddSignatureCredentialsDialog_validateSignaturitApiKey($apiKey: String!) {
-    validateSignaturitApiKey(apiKey: $apiKey)
+export const useAddSignatureCredentialsDialog_createSignaturitIntegrationDocument = gql`
+  mutation useAddSignatureCredentialsDialog_createSignaturitIntegration(
+    $name: String!
+    $apiKey: String!
+    $isDefault: Boolean
+  ) {
+    createSignaturitIntegration(name: $name, apiKey: $apiKey, isDefault: $isDefault) {
+      id
+    }
   }
 ` as unknown as DocumentNode<
-  AddSignatureCredentialsDialog_validateSignaturitApiKeyMutation,
-  AddSignatureCredentialsDialog_validateSignaturitApiKeyMutationVariables
+  useAddSignatureCredentialsDialog_createSignaturitIntegrationMutation,
+  useAddSignatureCredentialsDialog_createSignaturitIntegrationMutationVariables
 >;
 export const CreateUserDialog_emailIsAvailableDocument = gql`
   query CreateUserDialog_emailIsAvailable($email: String!) {
@@ -33178,17 +33164,19 @@ export const CreateUserDialog_emailIsAvailableDocument = gql`
   CreateUserDialog_emailIsAvailableQuery,
   CreateUserDialog_emailIsAvailableQueryVariables
 >;
-export const DowJonesIntegrationDialog_validateDowJonesKycCredentialsDocument = gql`
-  mutation DowJonesIntegrationDialog_validateDowJonesKycCredentials(
+export const useDowJonesIntegrationDialog_createDowJonesKycIntegrationDocument = gql`
+  mutation useDowJonesIntegrationDialog_createDowJonesKycIntegration(
     $clientId: String!
     $username: String!
     $password: String!
   ) {
-    validateDowJonesKycCredentials(clientId: $clientId, username: $username, password: $password)
+    createDowJonesKycIntegration(clientId: $clientId, username: $username, password: $password) {
+      id
+    }
   }
 ` as unknown as DocumentNode<
-  DowJonesIntegrationDialog_validateDowJonesKycCredentialsMutation,
-  DowJonesIntegrationDialog_validateDowJonesKycCredentialsMutationVariables
+  useDowJonesIntegrationDialog_createDowJonesKycIntegrationMutation,
+  useDowJonesIntegrationDialog_createDowJonesKycIntegrationMutationVariables
 >;
 export const AddPetitionAccessDialog_createPetitionAccessDocument = gql`
   mutation AddPetitionAccessDialog_createPetitionAccess($petitionId: GID!) {
@@ -35390,20 +35378,6 @@ export const OrganizationIntegrations_userDocument = gql`
   OrganizationIntegrations_userQuery,
   OrganizationIntegrations_userQueryVariables
 >;
-export const OrganizationIntegrations_createDowJonesKycIntegrationDocument = gql`
-  mutation OrganizationIntegrations_createDowJonesKycIntegration(
-    $clientId: String!
-    $username: String!
-    $password: String!
-  ) {
-    createDowJonesKycIntegration(clientId: $clientId, username: $username, password: $password) {
-      id
-    }
-  }
-` as unknown as DocumentNode<
-  OrganizationIntegrations_createDowJonesKycIntegrationMutation,
-  OrganizationIntegrations_createDowJonesKycIntegrationMutationVariables
->;
 export const OrganizationIntegrations_deleteDowJonesKycIntegrationDocument = gql`
   mutation OrganizationIntegrations_deleteDowJonesKycIntegration {
     deleteDowJonesKycIntegration {
@@ -35414,21 +35388,6 @@ export const OrganizationIntegrations_deleteDowJonesKycIntegrationDocument = gql
 ` as unknown as DocumentNode<
   OrganizationIntegrations_deleteDowJonesKycIntegrationMutation,
   OrganizationIntegrations_deleteDowJonesKycIntegrationMutationVariables
->;
-export const IntegrationsSignature_createSignaturitIntegrationDocument = gql`
-  mutation IntegrationsSignature_createSignaturitIntegration(
-    $name: String!
-    $apiKey: String!
-    $isDefault: Boolean
-  ) {
-    createSignaturitIntegration(name: $name, apiKey: $apiKey, isDefault: $isDefault) {
-      ...IntegrationsSignature_SignatureOrgIntegration
-    }
-  }
-  ${IntegrationsSignature_SignatureOrgIntegrationFragmentDoc}
-` as unknown as DocumentNode<
-  IntegrationsSignature_createSignaturitIntegrationMutation,
-  IntegrationsSignature_createSignaturitIntegrationMutationVariables
 >;
 export const IntegrationsSignature_markSignatureIntegrationAsDefaultDocument = gql`
   mutation IntegrationsSignature_markSignatureIntegrationAsDefault($id: GID!) {
