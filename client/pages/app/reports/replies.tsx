@@ -9,9 +9,9 @@ import { withApolloData, WithApolloDataContext } from "@parallel/components/comm
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { DateRangePickerButton } from "@parallel/components/reports/DateRangePickerButton";
-import { ReportsLoadingMessage } from "@parallel/components/reports/ReportsLoadingMessage";
-import { ReportsReadyMessage } from "@parallel/components/reports/ReportsReadyMessage";
+import { DateRangePickerButton } from "@parallel/components/reports/common/DateRangePickerButton";
+import { ReportsLoadingMessage } from "@parallel/components/reports/common/ReportsLoadingMessage";
+import { ReportsReadyMessage } from "@parallel/components/reports/common/ReportsReadyMessage";
 import {
   ReportsReplies_templatesDocument,
   ReportsReplies_userDocument,
@@ -22,7 +22,7 @@ import {
   useAssertQueryOrPreviousData,
 } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { date, useQueryState } from "@parallel/utils/queryState";
+import { date, string, useQueryState } from "@parallel/utils/queryState";
 import { useTemplateRepliesReportTask } from "@parallel/utils/tasks/useTemplateRepliesReportTask";
 import { useReportsSections } from "@parallel/utils/useReportsSections";
 import { useState } from "react";
@@ -30,6 +30,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 const QUERY_STATE = {
   range: date().list(2),
+  template: string(),
 };
 
 export function ReportsReplies() {
@@ -41,15 +42,13 @@ export function ReportsReplies() {
 
   const sections = useReportsSections();
 
-  const [{ status, templateId, activeTemplateId, activeRange, showDownload }, setState] = useState<{
+  const [{ status, activeTemplateId, activeRange, showDownload }, setState] = useState<{
     status: "IDLE" | "LOADING" | "ERROR";
-    templateId: string | null;
     activeTemplateId: string | null;
     activeRange: Date[] | null;
     showDownload: boolean;
   }>({
     status: "IDLE",
-    templateId: null,
     activeTemplateId: null,
     activeRange: null,
     showDownload: false,
@@ -76,7 +75,7 @@ export function ReportsReplies() {
         ...state,
         status: "IDLE",
         showDownload: true,
-        activeTemplateId: state.templateId,
+        activeTemplateId: queryState.template,
         activeRange: queryState.range,
       }));
     }, 2000);
@@ -139,10 +138,11 @@ export function ReportsReplies() {
                   defaultMessage: "Select a template...",
                 })}
                 isSearchable={true}
-                value={templateId}
-                onChange={(templateId) =>
-                  setState((state) => ({ ...state, templateId, showDownload: false }))
-                }
+                value={queryState.template}
+                onChange={(template) => {
+                  setQueryState((state) => ({ ...state, template }));
+                  setState((state) => ({ ...state, showDownload: false }));
+                }}
               />
             </Box>
           </HStack>
@@ -158,7 +158,7 @@ export function ReportsReplies() {
             colorScheme="primary"
             onClick={handleGenerateReportClick}
             fontWeight="500"
-            isDisabled={showDownload || !templateId}
+            isDisabled={showDownload || !queryState.template}
           >
             <FormattedMessage id="page.reports.generate" defaultMessage="Generate" />
           </Button>

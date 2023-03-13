@@ -5,6 +5,7 @@ import { Knex } from "knex";
 import pMap from "p-map";
 import {
   countBy,
+  findLast,
   groupBy,
   indexBy,
   isDefined,
@@ -21,7 +22,8 @@ import {
 import { RESULT } from "../../graphql";
 import { ILogger, LOGGER } from "../../services/logger";
 import { QueuesService, QUEUES_SERVICE } from "../../services/queues";
-import { average, findLast, unMaybeArray } from "../../util/arrays";
+import { TemplateStatsReportInput } from "../../services/reports";
+import { average, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fieldVisibility";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
@@ -5536,28 +5538,28 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
-  async getPetitionStatsByFromTemplateId(
+  async getPetitionsForTemplateStatsReport(
     fromTemplateId: number,
     orgId: number,
     startDate?: Date | null,
     endDate?: Date | null
   ) {
-    // list of all the organization petitions coming from a specific template
-    const orgPetitions = await this.raw<{
-      id: number;
-      name: Maybe<string>;
-      status: PetitionStatus;
-      latest_signature_status: Maybe<string>;
-    }>(
+    return await this.raw<TemplateStatsReportInput>(
       /* sql */ `
-      select distinct on (p.id) p.id, p.name, p.status, p.latest_signature_status
+      select 
+        distinct on (p.id) p.id,
+        p.name, 
+        p.status, 
+        p.latest_signature_status, 
+        (pa.id is not null) as is_sent
       from petition p 
+      left join petition_access pa on p.id = pa.petition_id
       where p.from_template_id = ? 
         and p.org_id = ? 
         and p.is_template = false
         and p.status != 'DRAFT' 
-        and p.deleted_at is null 
-        and (?::timestamptz is null or ?::timestamptz is null or created_at between ? and ?)
+        and p.deleted_at is null
+        and (?::timestamptz is null or ?::timestamptz is null or p.created_at between ? and ?)
     `,
       [
         fromTemplateId,
@@ -5568,32 +5570,6 @@ export class PetitionRepository extends BaseRepository {
         endDate ?? null,
       ]
     );
-
-    const stats = await pMapChunk(
-      orgPetitions,
-      async (chunk) => {
-        return await this.getPetitionTimeStats(chunk.map((s) => s.id));
-      },
-      { chunkSize: 200, concurrency: 5 }
-    );
-
-    const times = {
-      pending_to_complete: average(stats.map((p) => p.pending_to_complete).filter(isDefined)),
-      complete_to_close: average(stats.map((p) => p.complete_to_close).filter(isDefined)),
-      signature_completed: average(stats.map((p) => p.signature_completed).filter(isDefined)),
-    };
-
-    return {
-      from_template_id: toGlobalId("Petition", fromTemplateId),
-      status: {
-        all: orgPetitions.length,
-        pending: countBy(orgPetitions, (p) => p.status === "PENDING"),
-        completed: countBy(orgPetitions, (p) => p.status === "COMPLETED"),
-        closed: countBy(orgPetitions, (p) => p.status === "CLOSED"),
-        signed: countBy(orgPetitions, (p) => p.latest_signature_status === "COMPLETED"),
-      },
-      times,
-    };
   }
 
   async getPetitionStatsOverview(
@@ -5644,7 +5620,7 @@ export class PetitionRepository extends BaseRepository {
     const petitionsWithStats = await pMapChunk(
       orgPetitions,
       async (chunk) => {
-        return zip(chunk, await this.getPetitionTimeStats(chunk.map((p) => p.id))).map(
+        return zip(chunk, await this.getPetitionTimes(chunk.map((p) => p.id))).map(
           ([petition, stats]) => ({ ...petition, ...stats })
         );
       },
@@ -5714,7 +5690,7 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  private async getPetitionTimeStats(petitionIds: number[]) {
+  private async getPetitionTimes(petitionIds: number[]) {
     const events = await this.from("petition_event")
       .whereIn("petition_id", petitionIds)
       .whereIn("type", [

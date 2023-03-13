@@ -27,15 +27,16 @@ import { withApolloData, WithApolloDataContext } from "@parallel/components/comm
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { DateRangePickerButton } from "@parallel/components/reports/DateRangePickerButton";
-import { ReportsErrorMessage } from "@parallel/components/reports/ReportsErrorMessage";
-import { ReportsLoadingMessage } from "@parallel/components/reports/ReportsLoadingMessage";
-import { ReportsReadyMessage } from "@parallel/components/reports/ReportsReadyMessage";
-import { TimeSpan } from "@parallel/components/reports/TimeSpan";
+import { DateRangePickerButton } from "@parallel/components/reports/common/DateRangePickerButton";
+import { ReportsErrorMessage } from "@parallel/components/reports/common/ReportsErrorMessage";
+import { ReportsLoadingMessage } from "@parallel/components/reports/common/ReportsLoadingMessage";
+import { ReportsReadyMessage } from "@parallel/components/reports/common/ReportsReadyMessage";
+import { TimeSpan } from "@parallel/components/reports/common/TimeSpan";
 import { Maybe, Overview_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { FORMATS } from "@parallel/utils/dates";
+import { dateToFilenameFormat } from "@parallel/utils/dates";
+import { downloadSpreadsheet } from "@parallel/utils/downloadSpreadsheet";
 import { stallFor } from "@parallel/utils/promises/stallFor";
 import { date, useQueryState } from "@parallel/utils/queryState";
 import { useTemplatesOverviewReportBackgroundTask } from "@parallel/utils/tasks/useTemplatesOverviewReportTask";
@@ -163,7 +164,7 @@ export function Overview() {
 
   const handleGenerateReportClick = async () => {
     try {
-      setState((state) => ({ ...state, status: "LOADING", activeRange: queryState.range }));
+      setState((state) => ({ ...state, status: "LOADING" }));
       taskAbortController.current?.abort();
       taskAbortController.current = new AbortController();
       const { task } = await stallFor(
@@ -177,7 +178,12 @@ export function Overview() {
           ),
         2_000 + 1_000 * Math.random()
       );
-      setState((state) => ({ ...state, report: task.output as any, status: "LOADED" }));
+      setState((state) => ({
+        ...state,
+        report: task.output as any,
+        status: "LOADED",
+        activeRange: queryState.range,
+      }));
     } catch (e: any) {
       if (e.message === "ABORTED") {
         // nothing
@@ -195,7 +201,7 @@ export function Overview() {
   const columns = useOverviewColumns(tableType);
 
   const downloadExcel = useDownloadOverviewExcel();
-  const handleDownloadReport = async () => {
+  const handleDownloadReport = () => {
     downloadExcel({ range: activeRange, templates: report ?? [] });
   };
 
@@ -512,7 +518,7 @@ function OverviewReportsListTableHeader({
         onClick={onReportDownload}
         icon={<DownloadIcon />}
         label={intl.formatMessage({
-          id: "component.overview-reports-list-table-header.download-report",
+          id: "generic.download-report",
           defaultMessage: "Download report",
         })}
       />
@@ -797,187 +803,152 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
 
 function useDownloadOverviewExcel() {
   const intl = useIntl();
-
-  const worksheetColumns = useMemo(
-    () => [
-      {
-        key: "name",
-        header: intl.formatMessage({
-          id: "generic.template",
-          defaultMessage: "Template",
-        }),
-        width: 30,
-      },
-      {
-        key: "total",
-        header: intl.formatMessage({
-          id: "page.reports-overview.total",
-          defaultMessage: "Total",
-        }),
-        width: 12,
-      },
-      {
-        key: "completed",
-        header: intl.formatMessage({
-          id: "page.reports-overview.completed",
-          defaultMessage: "Completed",
-        }),
-        width: 12,
-      },
-      {
-        key: "signed",
-        header: intl.formatMessage({
-          id: "page.reports-overview.signed",
-          defaultMessage: "Signed",
-        }),
-        width: 12,
-      },
-      {
-        key: "closed",
-        header: intl.formatMessage({
-          id: "page.reports-overview.closed",
-          defaultMessage: "Closed",
-        }),
-        width: 12,
-      },
-      {
-        key: "total_time",
-        header: intl.formatMessage({
-          id: "page.reports-overview.total",
-          defaultMessage: "Total",
-        }),
-        width: 20,
-        style: { numFmt: "0.00" },
-      },
-      {
-        key: "time_to_complete",
-        header: intl.formatMessage({
-          id: "page.reports-overview.time-to-complete",
-          defaultMessage: "Time to complete",
-        }),
-        width: 20,
-        style: { numFmt: "0.00" },
-      },
-      {
-        key: "time_to_sign",
-        header: intl.formatMessage({
-          id: "page.reports-overview.time-to-sign",
-          defaultMessage: "Time to sign",
-        }),
-        width: 20,
-        style: { numFmt: "0.00" },
-      },
-      {
-        key: "time_to_close",
-        header: intl.formatMessage({
-          id: "page.reports-overview.time-to-close",
-          defaultMessage: "Time to close",
-        }),
-        width: 20,
-        style: { numFmt: "0.00" },
-      },
-    ],
-    [intl.locale]
-  );
-
-  return async ({
-    range: dateRange,
-    templates,
-  }: {
-    range: Date[] | null;
-    templates: TemplateStats[];
-  }) => {
-    const exceljs = (await import("exceljs")).default;
-
-    const startDate = dateRange?.[0];
-    const endDate = dateRange?.[1];
-    const range = startDate
-      ? `${intl
-          .formatDate(startDate, {
-            ...FORMATS["L"],
+  return async ({ range, templates }: { range: Date[] | null; templates: TemplateStats[] }) => {
+    await downloadSpreadsheet(
+      intl.formatMessage(
+        {
+          id: "page.reports-overview.export-file-name",
+          defaultMessage: "overview-report-{range}",
+        },
+        {
+          range: isDefined(range)
+            ? range.map((d) => dateToFilenameFormat(d)).join("-")
+            : dateToFilenameFormat(new Date()),
+        }
+      ),
+      async (workbook) => {
+        const worksheet = workbook.addWorksheet(
+          intl.formatMessage({
+            id: "page.reports-overview.worksheet-name",
+            defaultMessage: "Overview report",
           })
-          .replace(/\//g, "-")}_${intl
-          .formatDate(endDate, {
-            ...FORMATS["L"],
-          })
-          .replace(/\//g, "-")}`
-      : intl
-          .formatDate(new Date(), {
-            ...FORMATS["L"],
-          })
-          .replace(/\//g, "-");
+        );
 
-    const workbook = new exceljs.Workbook();
-    const worksheet = workbook.addWorksheet(
-      intl.formatMessage({
-        id: "page.reports-overview.worksheet-name",
-        defaultMessage: "Overview report",
-      })
-    );
-
-    worksheet.columns = worksheetColumns;
-    worksheet.spliceRows(1, 0, []);
-    worksheet.mergeCells("B1:E1");
-    worksheet.mergeCells("F1:I1");
-    worksheet.getCell("A1").value = "";
-    worksheet.getCell("B1").value = intl.formatMessage({
-      id: "page.reports-overview.status",
-      defaultMessage: "Status",
-    });
-    worksheet.getCell("F1").value = intl.formatMessage({
-      id: "page.reports-overview.time-hours",
-      defaultMessage: "Time (hours)",
-    });
-    worksheet.addRows(
-      templates.map((row) => ({
-        name:
-          row.aggregation_type === "NO_ACCESS"
-            ? intl.formatMessage(
-                {
-                  id: "page.reports-overview.parallels-no-access",
-                  defaultMessage: "Other templates not shared with me ({count})",
-                },
-                { count: row.template_count ?? 0 }
-              )
-            : row.aggregation_type === "NO_TEMPLATE"
-            ? intl.formatMessage({
-                id: "page.reports-overview.parallels-no-template",
-                defaultMessage: "Parallels without a template",
-              })
-            : row.template_name ||
-              intl.formatMessage({
-                id: "generic.unnamed-template",
-                defaultMessage: "Unnamed template",
-              }),
-        total: row.status.all,
-        completed: row.status.completed,
-        signed: row.status.signed,
-        closed: row.status.closed,
-        total_time:
-          ((row.times.pending_to_complete ?? 0) + (row.times.complete_to_close ?? 0)) / 3600,
-        time_to_complete: (row.times.pending_to_complete ?? 0) / 3600,
-        time_to_sign: isDefined(row.times.signature_completed)
-          ? (row.times.signature_completed ?? 0) / 3600
-          : "",
-        time_to_close: (row.times.complete_to_close ?? 0) / 3600,
-      }))
-    );
-
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-    const link = document.createElement("a");
-    link.href = window.URL.createObjectURL(blob);
-    link.download = intl.formatMessage(
-      {
-        id: "page.reports-overview.export-file-name",
-        defaultMessage: "overview-report_{range}",
-      },
-      {
-        range,
+        worksheet.columns = [
+          {
+            key: "name",
+            header: intl.formatMessage({
+              id: "generic.template",
+              defaultMessage: "Template",
+            }),
+            width: 30,
+          },
+          {
+            key: "total",
+            header: intl.formatMessage({
+              id: "page.reports-overview.total",
+              defaultMessage: "Total",
+            }),
+            width: 12,
+          },
+          {
+            key: "completed",
+            header: intl.formatMessage({
+              id: "page.reports-overview.completed",
+              defaultMessage: "Completed",
+            }),
+            width: 12,
+          },
+          {
+            key: "signed",
+            header: intl.formatMessage({
+              id: "page.reports-overview.signed",
+              defaultMessage: "Signed",
+            }),
+            width: 12,
+          },
+          {
+            key: "closed",
+            header: intl.formatMessage({
+              id: "page.reports-overview.closed",
+              defaultMessage: "Closed",
+            }),
+            width: 12,
+          },
+          {
+            key: "total_time",
+            header: intl.formatMessage({
+              id: "page.reports-overview.total",
+              defaultMessage: "Total",
+            }),
+            width: 20,
+            style: { numFmt: "0.00" },
+          },
+          {
+            key: "time_to_complete",
+            header: intl.formatMessage({
+              id: "page.reports-overview.time-to-complete",
+              defaultMessage: "Time to complete",
+            }),
+            width: 20,
+            style: { numFmt: "0.00" },
+          },
+          {
+            key: "time_to_sign",
+            header: intl.formatMessage({
+              id: "page.reports-overview.time-to-sign",
+              defaultMessage: "Time to sign",
+            }),
+            width: 20,
+            style: { numFmt: "0.00" },
+          },
+          {
+            key: "time_to_close",
+            header: intl.formatMessage({
+              id: "page.reports-overview.time-to-close",
+              defaultMessage: "Time to close",
+            }),
+            width: 20,
+            style: { numFmt: "0.00" },
+          },
+        ];
+        worksheet.spliceRows(1, 0, []);
+        worksheet.mergeCells("B1:E1");
+        worksheet.mergeCells("F1:I1");
+        worksheet.getCell("A1").value = "";
+        worksheet.getCell("B1").value = intl.formatMessage({
+          id: "page.reports-overview.status",
+          defaultMessage: "Status",
+        });
+        worksheet.getCell("F1").value = intl.formatMessage({
+          id: "page.reports-overview.time-hours",
+          defaultMessage: "Time (hours)",
+        });
+        worksheet.addRows(
+          templates.map((row) => ({
+            name:
+              row.aggregation_type === "NO_ACCESS"
+                ? intl.formatMessage(
+                    {
+                      id: "page.reports-overview.parallels-no-access",
+                      defaultMessage: "Other templates not shared with me ({count})",
+                    },
+                    { count: row.template_count ?? 0 }
+                  )
+                : row.aggregation_type === "NO_TEMPLATE"
+                ? intl.formatMessage({
+                    id: "page.reports-overview.parallels-no-template",
+                    defaultMessage: "Parallels without a template",
+                  })
+                : row.template_name ||
+                  intl.formatMessage({
+                    id: "generic.unnamed-template",
+                    defaultMessage: "Unnamed template",
+                  }),
+            total: row.status.all,
+            completed: row.status.completed,
+            signed: row.status.signed,
+            closed: row.status.closed,
+            total_time:
+              ((row.times.pending_to_complete ?? 0) + (row.times.complete_to_close ?? 0)) / 3600,
+            time_to_complete: (row.times.pending_to_complete ?? 0) / 3600,
+            time_to_sign: isDefined(row.times.signature_completed)
+              ? (row.times.signature_completed ?? 0) / 3600
+              : "",
+            time_to_close: (row.times.complete_to_close ?? 0) / 3600,
+          }))
+        );
       }
     );
-    link.click();
   };
 }

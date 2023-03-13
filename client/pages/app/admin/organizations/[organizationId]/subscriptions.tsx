@@ -16,7 +16,7 @@ import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
-import { TimeSpan } from "@parallel/components/reports/TimeSpan";
+import { TimeSpan } from "@parallel/components/reports/common/TimeSpan";
 import {
   AdminOrganizationsSubscriptions_modifyCurrentUsagePeriodDocument,
   AdminOrganizationsSubscriptions_organizationUsagePeriodsQueryDocument,

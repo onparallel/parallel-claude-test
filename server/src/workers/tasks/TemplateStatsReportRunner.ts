@@ -13,7 +13,7 @@ export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT
       throw new Error(`User ${this.task.user_id} has no access to template ${templateId}`);
     }
 
-    return await this.ctx.readonlyPetitions.getPetitionStatsByFromTemplateId(
+    return await this.ctx.reports.generateTemplateStatsReport(
       templateId,
       user!.org_id,
       startDate,

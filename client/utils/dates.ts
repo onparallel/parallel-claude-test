@@ -126,3 +126,17 @@ export function dateToDatetimeLocal(date: string | number | Date) {
   );
   return `${year}-${month}-${day}T${hour}:${minute}:${second}`;
 }
+
+export function dateToFilenameFormat(date: string | number | Date) {
+  const { year, month, day } = pipe(
+    new Intl.DateTimeFormat("en", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).formatToParts(new Date(date)),
+    filter((p) => p.type !== "literal"),
+    indexBy((p) => p.type),
+    mapValues((p) => p.value)
+  );
+  return `${year}${month}${day}`;
+}

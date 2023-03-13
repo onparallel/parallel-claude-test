@@ -2590,11 +2590,6 @@
     "context": "Used"
   },
   {
-    "term": "component.overview-reports-list-table-header.download-report",
-    "definition": "Descargar informe",
-    "context": "Download report"
-  },
-  {
     "term": "component.overview-reports-list-table-header.status",
     "definition": "Estado",
     "context": "Status"
@@ -4986,18 +4981,18 @@
   },
   {
     "term": "component.reports-doughnut-chart.closed",
-    "definition": "Cerrados",
-    "context": "Closed"
+    "definition": "{count, plural, =1{# Cerrado} other{# Cerrados}}",
+    "context": "{count} Closed"
   },
   {
     "term": "component.reports-doughnut-chart.completed",
-    "definition": "Completados",
-    "context": "Completed"
+    "definition": "{count, plural, =1{# Completado} other{# Completados}}",
+    "context": "{count} Completed"
   },
   {
     "term": "component.reports-doughnut-chart.pending",
-    "definition": "Pendientes",
-    "context": "Pending"
+    "definition": "{count, plural, =1{# Pendiente} other{# Pendientes}}",
+    "context": "{count} Pending"
   },
   {
     "term": "component.reports-doughnut-chart.status-of-parallels",
@@ -5038,6 +5033,231 @@
     "term": "component.reports-ready-message.ready-to-generate-reports",
     "definition": "¡Estamos listos para generar tus informes!",
     "context": "We are ready to generate your reports!"
+  },
+  {
+    "term": "component.reports-statistics-conversion.absolute",
+    "definition": "Absoluto",
+    "context": "Absolute"
+  },
+  {
+    "term": "component.reports-statistics-conversion.closed",
+    "definition": "Cerrado",
+    "context": "Closed"
+  },
+  {
+    "term": "component.reports-statistics-conversion.column-drop-off",
+    "definition": "Caídas",
+    "context": "Drop off"
+  },
+  {
+    "term": "component.reports-statistics-conversion.completed",
+    "definition": "Completado",
+    "context": "Completed"
+  },
+  {
+    "term": "component.reports-statistics-conversion.conversion-funnel",
+    "definition": "Funnel de conversión",
+    "context": "Conversion funnel"
+  },
+  {
+    "term": "component.reports-statistics-conversion.conversion-funnel-help-1",
+    "definition": "Este funnel representa desde que se envía un parallel hasta que se cierra. El porcentaje se calcula respecto al paso anterior.",
+    "context": "This is the conversion funnel from sending the parallel until it is closed. The percentage is calculated with respect to the previous step."
+  },
+  {
+    "term": "component.reports-statistics-conversion.conversion-funnel-help-2",
+    "definition": "No entran en este informe parallels que no hayan sido enviados a un destinatario.",
+    "context": "This report doesn't include parallels that have not been sent."
+  },
+  {
+    "term": "component.reports-statistics-conversion.conversion-report",
+    "definition": "Informe de conversión",
+    "context": "Conversion report"
+  },
+  {
+    "term": "component.reports-statistics-conversion.drop-off",
+    "definition": "{percentage}% caidas ({amount})",
+    "context": "{percentage}% drop off ({amount})"
+  },
+  {
+    "term": "component.reports-statistics-conversion.drop-off-percentage",
+    "definition": "Porcentaje de caidas",
+    "context": "Drop off percentage"
+  },
+  {
+    "term": "component.reports-statistics-conversion.export-file-name",
+    "definition": "informe-conversion-{templateId}_{range}",
+    "context": "conversion-report-{templateId}_{range}"
+  },
+  {
+    "term": "component.reports-statistics-conversion.first-reply",
+    "definition": "Primera respuesta",
+    "context": "First reply"
+  },
+  {
+    "term": "component.reports-statistics-conversion.not-enough-data",
+    "definition": "No hay información suficiente para generar este informe ",
+    "context": "Not enough data available to generate this report"
+  },
+  {
+    "term": "component.reports-statistics-conversion.of-total",
+    "definition": "{percentage}% del total",
+    "context": "{percentage}% of total"
+  },
+  {
+    "term": "component.reports-statistics-conversion.opened",
+    "definition": "Abierto",
+    "context": "Opened"
+  },
+  {
+    "term": "component.reports-statistics-conversion.parallels-closed-no-sent",
+    "definition": "Algunos parallels se completaron sin enviarse. Este funnel solo incluye parallels enviados a un destinatario.",
+    "context": "Some parallels were completed without being sent. This funnel only includes parallels sent to one recipient."
+  },
+  {
+    "term": "component.reports-statistics-conversion.percentage-relative",
+    "definition": "Porcentaje relativo",
+    "context": "Percentage relative"
+  },
+  {
+    "term": "component.reports-statistics-conversion.percentage-total",
+    "definition": "Porcentaje sobre el total",
+    "context": "Percentage of total"
+  },
+  {
+    "term": "component.reports-statistics-conversion.relative",
+    "definition": "Relativo",
+    "context": "Relative"
+  },
+  {
+    "term": "component.reports-statistics-conversion.sent",
+    "definition": "Enviado",
+    "context": "Sent"
+  },
+  {
+    "term": "component.reports-statistics-conversion.signed",
+    "definition": "Firmado",
+    "context": "Signed"
+  },
+  {
+    "term": "component.reports-statistics-conversion.steps",
+    "definition": "Pasos",
+    "context": "Steps"
+  },
+  {
+    "term": "component.reports-statistics-time.closed",
+    "definition": "Cerrado",
+    "context": "Closed"
+  },
+  {
+    "term": "component.reports-statistics-time.completed",
+    "definition": "Completado",
+    "context": "Completed"
+  },
+  {
+    "term": "component.reports-statistics-time.days",
+    "definition": "Días",
+    "context": "Days"
+  },
+  {
+    "term": "component.reports-statistics-time.export-file-name",
+    "definition": "estadisticas-tiempo-{templateId}_{range}",
+    "context": "time-statistics-{templateId}_{range}"
+  },
+  {
+    "term": "component.reports-statistics-time.first-reply",
+    "definition": "Primera respuesta",
+    "context": "First reply added"
+  },
+  {
+    "term": "component.reports-statistics-time.hours",
+    "definition": "Horas",
+    "context": "Hours"
+  },
+  {
+    "term": "component.reports-statistics-time.max-tooltip",
+    "definition": "Máx: {value}",
+    "context": "Max: {value}"
+  },
+  {
+    "term": "component.reports-statistics-time.maximum",
+    "definition": "Máximo",
+    "context": "Maximum"
+  },
+  {
+    "term": "component.reports-statistics-time.mean",
+    "definition": "Media",
+    "context": "Mean"
+  },
+  {
+    "term": "component.reports-statistics-time.mean-tooltip",
+    "definition": "Media: {value}",
+    "context": "Mean: {value}"
+  },
+  {
+    "term": "component.reports-statistics-time.median",
+    "definition": "Mediana",
+    "context": "Median"
+  },
+  {
+    "term": "component.reports-statistics-time.median-tooltip",
+    "definition": "Mediana: {value}",
+    "context": "Median: {value}"
+  },
+  {
+    "term": "component.reports-statistics-time.min-tooltip",
+    "definition": "Mín: {value}",
+    "context": "Min: {value}"
+  },
+  {
+    "term": "component.reports-statistics-time.minimum",
+    "definition": "Mínimo",
+    "context": "Minimum"
+  },
+  {
+    "term": "component.reports-statistics-time.minutes",
+    "definition": "Minutos",
+    "context": "Minutes"
+  },
+  {
+    "term": "component.reports-statistics-time.opened",
+    "definition": "Apertura",
+    "context": "Opened"
+  },
+  {
+    "term": "component.reports-statistics-time.p25-tooltip",
+    "definition": "P25: {value}",
+    "context": "P25: {value}"
+  },
+  {
+    "term": "component.reports-statistics-time.p75-tooltip",
+    "definition": "P75: {value}",
+    "context": "P75: {value}"
+  },
+  {
+    "term": "component.reports-statistics-time.signed",
+    "definition": "Firmado",
+    "context": "Signed"
+  },
+  {
+    "term": "component.reports-statistics-time.steps",
+    "definition": "Pasos",
+    "context": "Steps"
+  },
+  {
+    "term": "component.reports-statistics-time.time-statistics",
+    "definition": "Estadísticas de tiempo",
+    "context": "Time statistics"
+  },
+  {
+    "term": "component.reports-statistics-time.time-statistics-help-1",
+    "definition": "Esta tabla representa los diferentes tiempos de cada paso.",
+    "context": "This table represents the different times for each step."
+  },
+  {
+    "term": "component.reports-statistics-time.time-statistics-help-2",
+    "definition": "Todos los tiempos se cuentan desde el paso anterior, no respecto al total.",
+    "context": "All times are counted from the previous step, not with respect to the total."
   },
   {
     "term": "component.restrict-petition.optional-password-label",
@@ -6718,6 +6938,11 @@
     "term": "generic.download-qr",
     "definition": "Descargar código QR",
     "context": "Download QR code"
+  },
+  {
+    "term": "generic.download-report",
+    "definition": "Descargar informe",
+    "context": "Download report"
   },
   {
     "term": "generic.dropzone-default",
@@ -8445,6 +8670,11 @@
     "context": "Parallels without a template"
   },
   {
+    "term": "page.reports-overview.pending",
+    "definition": "Pendientes",
+    "context": "Pending"
+  },
+  {
     "term": "page.reports-overview.ready-to-generate",
     "definition": "¡Estamos listos para generar tu informe general!",
     "context": "We are ready to generate your overview report!"
@@ -8573,6 +8803,21 @@
     "term": "page.reports-replies.under-construction",
     "definition": "Oops! Esta página está en construcción",
     "context": "Oops! This section is under construction"
+  },
+  {
+    "term": "page.reports-statistics.export-file-name",
+    "definition": "estadisticas-{templateId}_{range}",
+    "context": "statistics-{templateId}_{range}"
+  },
+  {
+    "term": "page.reports-statistics.parallels-signed-alert",
+    "definition": "Algunos parallels se han firmado a pesar de que la plantilla no tiene proceso de firma configurado.",
+    "context": "Some parallels have been signed even though the template has no signature process set up."
+  },
+  {
+    "term": "page.reports-statistics.worksheet-name",
+    "definition": "Informe estadístico",
+    "context": "Statistics report"
   },
   {
     "term": "page.reports-templates.ready-to-generate",
@@ -8890,7 +9135,7 @@
     "context": "Review the replies and send the signature to close the parallel."
   },
   {
-    "term": "petition-preview.signature-sended.toast-description",
+    "term": "petition-preview.signature-sent.toast-description",
     "definition": "Tu firma está en camino.",
     "context": "Your signature is on its way."
   },
@@ -10455,7 +10700,7 @@
     "context": "Send verification code"
   },
   {
-    "term": "recipient-view.signature-sended.toast-title",
+    "term": "recipient-view.signature-sent.toast-title",
     "definition": "Firma enviada",
     "context": "Signature sent"
   },

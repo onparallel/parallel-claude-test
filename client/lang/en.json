@@ -2590,11 +2590,6 @@
     "context": "Used"
   },
   {
-    "term": "component.overview-reports-list-table-header.download-report",
-    "definition": "Download report",
-    "context": "Download report"
-  },
-  {
     "term": "component.overview-reports-list-table-header.status",
     "definition": "Status",
     "context": "Status"
@@ -4986,18 +4981,18 @@
   },
   {
     "term": "component.reports-doughnut-chart.closed",
-    "definition": "Closed",
-    "context": "Closed"
+    "definition": "{count} Closed",
+    "context": "{count} Closed"
   },
   {
     "term": "component.reports-doughnut-chart.completed",
-    "definition": "Completed",
-    "context": "Completed"
+    "definition": "{count} Completed",
+    "context": "{count} Completed"
   },
   {
     "term": "component.reports-doughnut-chart.pending",
-    "definition": "Pending",
-    "context": "Pending"
+    "definition": "{count} Pending",
+    "context": "{count} Pending"
   },
   {
     "term": "component.reports-doughnut-chart.status-of-parallels",
@@ -5038,6 +5033,231 @@
     "term": "component.reports-ready-message.ready-to-generate-reports",
     "definition": "We are ready to generate your reports!",
     "context": "We are ready to generate your reports!"
+  },
+  {
+    "term": "component.reports-statistics-conversion.absolute",
+    "definition": "Absolute",
+    "context": "Absolute"
+  },
+  {
+    "term": "component.reports-statistics-conversion.closed",
+    "definition": "Closed",
+    "context": "Closed"
+  },
+  {
+    "term": "component.reports-statistics-conversion.column-drop-off",
+    "definition": "Drop off",
+    "context": "Drop off"
+  },
+  {
+    "term": "component.reports-statistics-conversion.completed",
+    "definition": "Completed",
+    "context": "Completed"
+  },
+  {
+    "term": "component.reports-statistics-conversion.conversion-funnel",
+    "definition": "Conversion funnel",
+    "context": "Conversion funnel"
+  },
+  {
+    "term": "component.reports-statistics-conversion.conversion-funnel-help-1",
+    "definition": "This is the conversion funnel from sending the parallel until it is closed. The percentage is calculated with respect to the previous step.",
+    "context": "This is the conversion funnel from sending the parallel until it is closed. The percentage is calculated with respect to the previous step."
+  },
+  {
+    "term": "component.reports-statistics-conversion.conversion-funnel-help-2",
+    "definition": "This report doesn't include parallels that have not been sent.",
+    "context": "This report doesn't include parallels that have not been sent."
+  },
+  {
+    "term": "component.reports-statistics-conversion.conversion-report",
+    "definition": "Conversion report",
+    "context": "Conversion report"
+  },
+  {
+    "term": "component.reports-statistics-conversion.drop-off",
+    "definition": "{percentage}% drop off ({amount})",
+    "context": "{percentage}% drop off ({amount})"
+  },
+  {
+    "term": "component.reports-statistics-conversion.drop-off-percentage",
+    "definition": "Drop off percentage",
+    "context": "Drop off percentage"
+  },
+  {
+    "term": "component.reports-statistics-conversion.export-file-name",
+    "definition": "conversion-report-{templateId}_{range}",
+    "context": "conversion-report-{templateId}_{range}"
+  },
+  {
+    "term": "component.reports-statistics-conversion.first-reply",
+    "definition": "First reply",
+    "context": "First reply"
+  },
+  {
+    "term": "component.reports-statistics-conversion.not-enough-data",
+    "definition": "Not enough data available to generate this report",
+    "context": "Not enough data available to generate this report"
+  },
+  {
+    "term": "component.reports-statistics-conversion.of-total",
+    "definition": "{percentage}% of total",
+    "context": "{percentage}% of total"
+  },
+  {
+    "term": "component.reports-statistics-conversion.opened",
+    "definition": "Opened",
+    "context": "Opened"
+  },
+  {
+    "term": "component.reports-statistics-conversion.parallels-closed-no-sent",
+    "definition": "Some parallels were completed without being sent. This funnel only includes parallels sent to one recipient.",
+    "context": "Some parallels were completed without being sent. This funnel only includes parallels sent to one recipient."
+  },
+  {
+    "term": "component.reports-statistics-conversion.percentage-relative",
+    "definition": "Percentage relative",
+    "context": "Percentage relative"
+  },
+  {
+    "term": "component.reports-statistics-conversion.percentage-total",
+    "definition": "Percentage of total",
+    "context": "Percentage of total"
+  },
+  {
+    "term": "component.reports-statistics-conversion.relative",
+    "definition": "Relative",
+    "context": "Relative"
+  },
+  {
+    "term": "component.reports-statistics-conversion.sent",
+    "definition": "Sent",
+    "context": "Sent"
+  },
+  {
+    "term": "component.reports-statistics-conversion.signed",
+    "definition": "Signed",
+    "context": "Signed"
+  },
+  {
+    "term": "component.reports-statistics-conversion.steps",
+    "definition": "Steps",
+    "context": "Steps"
+  },
+  {
+    "term": "component.reports-statistics-time.closed",
+    "definition": "Closed",
+    "context": "Closed"
+  },
+  {
+    "term": "component.reports-statistics-time.completed",
+    "definition": "Completed",
+    "context": "Completed"
+  },
+  {
+    "term": "component.reports-statistics-time.days",
+    "definition": "Days",
+    "context": "Days"
+  },
+  {
+    "term": "component.reports-statistics-time.export-file-name",
+    "definition": "time-statistics-{templateId}_{range}",
+    "context": "time-statistics-{templateId}_{range}"
+  },
+  {
+    "term": "component.reports-statistics-time.first-reply",
+    "definition": "First reply added",
+    "context": "First reply added"
+  },
+  {
+    "term": "component.reports-statistics-time.hours",
+    "definition": "Hours",
+    "context": "Hours"
+  },
+  {
+    "term": "component.reports-statistics-time.max-tooltip",
+    "definition": "Max: {value}",
+    "context": "Max: {value}"
+  },
+  {
+    "term": "component.reports-statistics-time.maximum",
+    "definition": "Maximum",
+    "context": "Maximum"
+  },
+  {
+    "term": "component.reports-statistics-time.mean",
+    "definition": "Mean",
+    "context": "Mean"
+  },
+  {
+    "term": "component.reports-statistics-time.mean-tooltip",
+    "definition": "Mean: {value}",
+    "context": "Mean: {value}"
+  },
+  {
+    "term": "component.reports-statistics-time.median",
+    "definition": "Median",
+    "context": "Median"
+  },
+  {
+    "term": "component.reports-statistics-time.median-tooltip",
+    "definition": "Median: {value}",
+    "context": "Median: {value}"
+  },
+  {
+    "term": "component.reports-statistics-time.min-tooltip",
+    "definition": "Min: {value}",
+    "context": "Min: {value}"
+  },
+  {
+    "term": "component.reports-statistics-time.minimum",
+    "definition": "Minimum",
+    "context": "Minimum"
+  },
+  {
+    "term": "component.reports-statistics-time.minutes",
+    "definition": "Minutes",
+    "context": "Minutes"
+  },
+  {
+    "term": "component.reports-statistics-time.opened",
+    "definition": "Opened",
+    "context": "Opened"
+  },
+  {
+    "term": "component.reports-statistics-time.p25-tooltip",
+    "definition": "P25: {value}",
+    "context": "P25: {value}"
+  },
+  {
+    "term": "component.reports-statistics-time.p75-tooltip",
+    "definition": "P75: {value}",
+    "context": "P75: {value}"
+  },
+  {
+    "term": "component.reports-statistics-time.signed",
+    "definition": "Signed",
+    "context": "Signed"
+  },
+  {
+    "term": "component.reports-statistics-time.steps",
+    "definition": "Steps",
+    "context": "Steps"
+  },
+  {
+    "term": "component.reports-statistics-time.time-statistics",
+    "definition": "Time statistics",
+    "context": "Time statistics"
+  },
+  {
+    "term": "component.reports-statistics-time.time-statistics-help-1",
+    "definition": "This table represents the different times for each step.",
+    "context": "This table represents the different times for each step."
+  },
+  {
+    "term": "component.reports-statistics-time.time-statistics-help-2",
+    "definition": "All times are counted from the previous step, not with respect to the total.",
+    "context": "All times are counted from the previous step, not with respect to the total."
   },
   {
     "term": "component.restrict-petition.optional-password-label",
@@ -6718,6 +6938,11 @@
     "term": "generic.download-qr",
     "definition": "Download QR code",
     "context": "Download QR code"
+  },
+  {
+    "term": "generic.download-report",
+    "definition": "Download report",
+    "context": "Download report"
   },
   {
     "term": "generic.dropzone-default",
@@ -8445,6 +8670,11 @@
     "context": "Parallels without a template"
   },
   {
+    "term": "page.reports-overview.pending",
+    "definition": "Pending",
+    "context": "Pending"
+  },
+  {
     "term": "page.reports-overview.ready-to-generate",
     "definition": "We are ready to generate your overview report!",
     "context": "We are ready to generate your overview report!"
@@ -8573,6 +8803,21 @@
     "term": "page.reports-replies.under-construction",
     "definition": "Oops! This section is under construction",
     "context": "Oops! This section is under construction"
+  },
+  {
+    "term": "page.reports-statistics.export-file-name",
+    "definition": "statistics-{templateId}_{range}",
+    "context": "statistics-{templateId}_{range}"
+  },
+  {
+    "term": "page.reports-statistics.parallels-signed-alert",
+    "definition": "Some parallels have been signed even though the template has no signature process set up.",
+    "context": "Some parallels have been signed even though the template has no signature process set up."
+  },
+  {
+    "term": "page.reports-statistics.worksheet-name",
+    "definition": "Statistics report",
+    "context": "Statistics report"
   },
   {
     "term": "page.reports-templates.ready-to-generate",
@@ -8890,7 +9135,7 @@
     "context": "Review the replies and send the signature to close the parallel."
   },
   {
-    "term": "petition-preview.signature-sended.toast-description",
+    "term": "petition-preview.signature-sent.toast-description",
     "definition": "Your signature is on its way.",
     "context": "Your signature is on its way."
   },
@@ -10455,7 +10700,7 @@
     "context": "Send verification code"
   },
   {
-    "term": "recipient-view.signature-sended.toast-title",
+    "term": "recipient-view.signature-sent.toast-title",
     "definition": "Signature sent",
     "context": "Signature sent"
   },

@@ -25,7 +25,7 @@ export function TimeSpan(props: { duration: Duration | number }) {
       style="narrow"
       type="unit"
       value={[
-        isDefined(duration.years) ? (
+        duration.years ? (
           <FormattedMessage
             key="years"
             id="component.timespan.years-part"
@@ -33,7 +33,7 @@ export function TimeSpan(props: { duration: Duration | number }) {
             values={{ n: duration.years }}
           />
         ) : null,
-        isDefined(duration.months) ? (
+        duration.months ? (
           <FormattedMessage
             key="months"
             id="component.timespan.months-part"
@@ -41,7 +41,7 @@ export function TimeSpan(props: { duration: Duration | number }) {
             values={{ n: duration.months }}
           />
         ) : null,
-        isDefined(duration.weeks) ? (
+        duration.weeks ? (
           <FormattedMessage
             key="weeks"
             id="component.timespan.weeks-part"
@@ -49,7 +49,7 @@ export function TimeSpan(props: { duration: Duration | number }) {
             values={{ n: duration.weeks }}
           />
         ) : null,
-        isDefined(duration.days) ? (
+        duration.days ? (
           <FormattedMessage
             key="days"
             id="component.timespan.days-part"
@@ -57,7 +57,7 @@ export function TimeSpan(props: { duration: Duration | number }) {
             values={{ n: duration.days }}
           />
         ) : null,
-        isDefined(duration.hours) ? (
+        duration.hours ? (
           <FormattedMessage
             key="hours"
             id="component.timespan.hours-part"

@@ -54,7 +54,7 @@ export type TaskInput<TName extends TaskName> = {
   };
 }[TName];
 
-interface PetitionReportStatusCount {
+export interface PetitionReportStatusCount {
   all: number;
   pending: number;
   completed: number;
@@ -62,10 +62,36 @@ interface PetitionReportStatusCount {
   signed: number;
 }
 
-interface PetitionReportTimes {
+export interface PetitionReportTimes {
   pending_to_complete: Maybe<number>;
   complete_to_close: Maybe<number>;
   signature_completed: Maybe<number>;
+}
+
+interface TimeStatistic {
+  min: number;
+  max: number;
+  q1: number;
+  q3: number;
+  mean: number;
+  median: number;
+}
+
+export interface PetitionConversionFunnel {
+  sent: number;
+  opened: number;
+  first_reply: number;
+  completed: number;
+  signed: number;
+  closed: number;
+}
+
+export interface PetitionTimeStatistics {
+  opened: TimeStatistic;
+  first_reply: TimeStatistic;
+  completed: TimeStatistic;
+  signed: TimeStatistic;
+  closed: TimeStatistic;
 }
 
 export type TaskOutput<TName extends TaskName> = {
@@ -77,6 +103,18 @@ export type TaskOutput<TName extends TaskName> = {
     from_template_id: string;
     status: PetitionReportStatusCount;
     times: PetitionReportTimes;
+    /**
+     * needed for a popover info message,
+     * tells if the template has any petition with at least 1 reply that hasn't been sent to any recipient
+     */
+    has_replied_unsent: boolean;
+    /**
+     * needed for a popover info message,
+     * tells if the template has a signature configured.
+     */
+    has_signature_config: boolean;
+    conversion_funnel: PetitionConversionFunnel;
+    time_statistics: PetitionTimeStatistics;
   };
   DOW_JONES_PROFILE_DOWNLOAD: { temporary_file_id: number };
   TEMPLATES_OVERVIEW_REPORT: {

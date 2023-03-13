@@ -45,6 +45,7 @@ import {
 import { IPrinter, PRINTER } from "./services/printer";
 import { IQueuesService, QUEUES_SERVICE } from "./services/queues";
 import { IRedis, REDIS } from "./services/redis";
+import { IReportsService, REPORTS_SERVICE } from "./services/reports";
 import { SetupService, SETUP_SERVICE } from "./services/setup";
 import { ISignatureService, SIGNATURE } from "./services/signature";
 import { ISmtp, SMTP } from "./services/smtp";
@@ -123,6 +124,7 @@ export class WorkerContext {
     @inject(ORGANIZATION_LAYOUT_SERVICE)
     public readonly layouts: IOrganizationLayoutService,
     @inject(FETCH_SERVICE) public readonly fetch: IFetchService,
+    @inject(REPORTS_SERVICE) public readonly reports: IReportsService,
 
     // Repositories
     public readonly contacts: ContactRepository,

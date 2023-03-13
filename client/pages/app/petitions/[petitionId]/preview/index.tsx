@@ -300,15 +300,15 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             }
             router.push(`/app/petitions/${query.petitionId}/replies`);
           } else {
-            if (!toast.isActive("petition-completed-signature-sended-toast")) {
+            if (!toast.isActive("petition-completed-signature-sent-toast")) {
               toast({
-                id: "petition-completed-signature-sended-toast",
+                id: "petition-completed-signature-sent-toast",
                 title: intl.formatMessage({
-                  id: "recipient-view.signature-sended.toast-title",
+                  id: "recipient-view.signature-sent.toast-title",
                   defaultMessage: "Signature sent",
                 }),
                 description: intl.formatMessage({
-                  id: "petition-preview.signature-sended.toast-description",
+                  id: "petition-preview.signature-sent.toast-description",
                   defaultMessage: "Your signature is on its way.",
                 }),
                 status: "success",
