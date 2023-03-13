@@ -821,7 +821,14 @@ function _PetitionSettings({
             </>
           }
         >
-          <Button size="sm" id="default-path" onClick={handleChangeDefaultPath}>
+          <Button
+            size="sm"
+            id="default-path"
+            onClick={handleChangeDefaultPath}
+            isDisabled={
+              petition.isRestricted || isPublicTemplate || myEffectivePermission === "READ"
+            }
+          >
             <FormattedMessage id="generic.change" defaultMessage="Change" />
           </Button>
         </SettingsRow>
