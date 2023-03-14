@@ -76,11 +76,11 @@ describe("Worker - User Notifications Listener", () => {
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select("read_at", "processed_at", "data", "petition_id", "type", "user_id");
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual(
       users.map((user) => ({
-        read_at: null,
+        is_read: false,
         processed_at: null,
         petition_id: petition.id,
         type: "PETITION_COMPLETED",
@@ -111,11 +111,11 @@ describe("Worker - User Notifications Listener", () => {
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select("read_at", "processed_at", "data", "petition_id", "type", "user_id");
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual(
       users.map((user) => ({
-        read_at: null,
+        is_read: false,
         processed_at: null,
         petition_id: petition.id,
         type: "COMMENT_CREATED",
@@ -148,11 +148,11 @@ describe("Worker - User Notifications Listener", () => {
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select("read_at", "processed_at", "data", "petition_id", "type", "user_id");
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual([
       {
-        read_at: null,
+        is_read: false,
         processed_at: null,
         petition_id: petition.id,
         type: "COMMENT_CREATED",
@@ -186,11 +186,11 @@ describe("Worker - User Notifications Listener", () => {
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select("read_at", "processed_at", "data", "petition_id", "type", "user_id");
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual([
       {
-        read_at: null,
+        is_read: false,
         processed_at: null,
         petition_id: petition.id,
         type: "COMMENT_CREATED",
@@ -228,11 +228,11 @@ describe("Worker - User Notifications Listener", () => {
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select("read_at", "processed_at", "data", "petition_id", "type", "user_id");
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual([
       {
-        read_at: null,
+        is_read: false,
         processed_at: null,
         petition_id: petition.id,
         type: "COMMENT_CREATED",
@@ -266,11 +266,11 @@ describe("Worker - User Notifications Listener", () => {
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select("read_at", "processed_at", "data", "petition_id", "type", "user_id");
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual([
       {
-        read_at: null,
+        is_read: false,
         processed_at: null,
         petition_id: petition.id,
         type: "PETITION_SHARED",
@@ -310,11 +310,11 @@ describe("Worker - User Notifications Listener", () => {
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select("read_at", "processed_at", "data", "petition_id", "type", "user_id");
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual(
       members.map((member) => ({
-        read_at: null,
+        is_read: false,
         processed_at: null,
         petition_id: petition.id,
         type: "PETITION_SHARED",
@@ -346,11 +346,11 @@ describe("Worker - User Notifications Listener", () => {
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select("read_at", "processed_at", "data", "petition_id", "type", "user_id");
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual(
       users.map((user) => ({
-        read_at: null,
+        is_read: false,
         processed_at: null,
         petition_id: petition.id,
         type: "SIGNATURE_COMPLETED",
@@ -383,13 +383,13 @@ describe("Worker - User Notifications Listener", () => {
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select("read_at", "processed_at", "data", "petition_id", "type", "user_id");
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual(
       users
         .filter((u) => u.id !== users[1].id)
         .map((user) => ({
-          read_at: null,
+          is_read: false,
           processed_at: null,
           petition_id: petition.id,
           type: "SIGNATURE_CANCELLED",
@@ -429,11 +429,11 @@ describe("Worker - User Notifications Listener", () => {
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select("read_at", "processed_at", "data", "petition_id", "type", "user_id");
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual([
       {
-        read_at: null,
+        is_read: false,
         processed_at: null,
         petition_id: petition.id,
         type: "MESSAGE_EMAIL_BOUNCED",
@@ -467,11 +467,11 @@ describe("Worker - User Notifications Listener", () => {
 
     const notifications = await knex<PetitionUserNotification>("petition_user_notification")
       .where({ petition_id: petition.id })
-      .select("read_at", "processed_at", "data", "petition_id", "type", "user_id");
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
 
     expect(notifications).toEqual(
       [...users, unsubscribedUser].map((user) => ({
-        read_at: null,
+        is_read: false,
         processed_at: null,
         petition_id: petition.id,
         type: "PETITION_COMPLETED",

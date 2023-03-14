@@ -1,5 +1,4 @@
 import { core, enumType, interfaceType, objectType } from "nexus";
-import { isDefined } from "remeda";
 import { userOrPetitionAccessResolver } from "../helpers/userOrPetitionAccessResolver";
 
 export const PetitionUserNotificationFilter = enumType({
@@ -20,7 +19,7 @@ export const PetitionUserNotification = interfaceType({
       },
     });
     t.boolean("isRead", {
-      resolve: (o) => isDefined(o.read_at),
+      resolve: (o) => o.is_read,
     });
     t.datetime("createdAt", {
       resolve: (o) => o.created_at,

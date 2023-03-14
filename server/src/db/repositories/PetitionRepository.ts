@@ -2951,7 +2951,7 @@ export class PetitionRepository extends BaseRepository {
           uniq(keys.map((x) => x.petitionFieldId))
         )
         .where("type", "COMMENT_CREATED")
-        .whereNull("read_at")
+        .where("is_read", false)
         .groupBy(
           "petition_id",
           "petition_access_id",
@@ -2996,7 +2996,7 @@ export class PetitionRepository extends BaseRepository {
         join petition_contact_notification pcn
           on pcn.petition_access_id = pa.id and pcn.petition_id = pa.petition_id
         where pa.contact_id in ? and pa.petition_id in ? and pa.status = 'ACTIVE' 
-          and pcn.type = 'COMMENT_CREATED' and pcn.read_at is null
+          and pcn.type = 'COMMENT_CREATED' and pcn.is_read = false
       `,
         [
           this.sqlIn(uniq(keys.map((k) => k.contactId))),
@@ -3024,7 +3024,7 @@ export class PetitionRepository extends BaseRepository {
           uniq(keys.map((x) => x.petitionFieldId))
         )
         .where("type", "COMMENT_CREATED")
-        .whereNull("read_at")
+        .where("is_read", false)
         .groupBy("petition_id", "user_id", this.knex.raw("(data ->> 'petition_field_id')::int"))
         .select<
           (Pick<PetitionUserNotification, "petition_id" | "user_id"> & {
@@ -3079,14 +3079,14 @@ export class PetitionRepository extends BaseRepository {
     type: Type
   ) {
     return await this.knex<GenericPetitionUserNotification<Type>>("petition_user_notification")
-      .where({ processed_at: null, read_at: null, type })
+      .where({ processed_at: null, is_read: false, type })
       .orderBy("created_at", "desc")
       .select("*");
   }
 
   async loadUnprocessedContactNotificationsOfType(type: PetitionContactNotificationType) {
     return await this.from("petition_contact_notification")
-      .where({ processed_at: null, read_at: null, type })
+      .where({ processed_at: null, is_read: false, type })
       .orderBy("created_at", "desc")
       .select("*");
   }
@@ -3097,7 +3097,7 @@ export class PetitionRepository extends BaseRepository {
     async (keys, t) => {
       const notifications = await this.from("petition_user_notification", t)
         .whereIn("user_id", keys)
-        .whereNull("read_at")
+        .where("is_read", false)
         .select(["user_id", "id"])
         .orderBy("created_at", "desc");
       const byUserId = groupBy(notifications, (n) => n.user_id);
@@ -3107,10 +3107,12 @@ export class PetitionRepository extends BaseRepository {
 
   async markOldPetitionUserNotificationsAsRead(months: number) {
     await this.from("petition_user_notification")
-      .whereNull("read_at")
+      .where({
+        is_read: false,
+      })
       .whereRaw(/* sql */ `created_at < NOW() - make_interval(months => ?)`, [months])
       .update({
-        read_at: this.now(),
+        is_read: true,
         processed_at: this.now(),
       });
   }
@@ -3120,7 +3122,7 @@ export class PetitionRepository extends BaseRepository {
   ): Knex.QueryCallback<PetitionUserNotification<false>> {
     return (q) => {
       if (filter === "UNREAD") {
-        q.whereNull("read_at");
+        q.where("is_read", false);
       } else if (filter === "COMMENTS") {
         q.where("type", "COMMENT_CREATED");
       } else if (filter === "COMPLETED") {
@@ -3183,22 +3185,13 @@ export class PetitionRepository extends BaseRepository {
         return await this.from("petition_user_notification")
           .whereIn("id", idsChunk)
           .where("user_id", userId)
-          .mmodify((q) => {
-            // to return only the updated notifications
-            if (isRead) {
-              q.whereNull("read_at");
-            } else {
-              q.whereNotNull("read_at");
-            }
-          })
+          .where("is_read", !isRead) // to return only the updated notifications
           .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
           .update(
-            {
-              read_at: isRead ? this.now() : null,
-              ...removeNotDefined({
-                processed_at: isRead ? this.now() : undefined,
-              }),
-            },
+            removeNotDefined({
+              is_read: isRead,
+              processed_at: isRead ? this.now() : undefined,
+            }),
             "*"
           );
       },
@@ -3218,23 +3211,14 @@ export class PetitionRepository extends BaseRepository {
         return await this.from("petition_user_notification")
           .whereIn("petition_id", idsChunk)
           .where("user_id", userId)
-          .mmodify((q) => {
-            // to return only the updated notifications
-            if (isRead) {
-              q.whereNull("read_at");
-            } else {
-              q.whereNotNull("read_at");
-            }
-          })
+          .where("is_read", !isRead)
           .whereNot("type", "COMMENT_CREATED")
           .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
           .update(
-            {
-              read_at: isRead ? this.now() : null,
-              ...removeNotDefined({
-                processed_at: isRead ? this.now() : undefined,
-              }),
-            },
+            removeNotDefined({
+              is_read: isRead,
+              processed_at: isRead ? this.now() : undefined,
+            }),
             "*"
           );
       },
@@ -3257,14 +3241,7 @@ export class PetitionRepository extends BaseRepository {
             user_id: userId,
             type: "COMMENT_CREATED",
           })
-          .mmodify((q) => {
-            // to return only the updated notifications
-            if (isRead) {
-              q.whereNull("read_at");
-            } else {
-              q.whereNotNull("read_at");
-            }
-          })
+          .where("is_read", !isRead)
           .whereIn("petition_id", uniq(comments.map((c) => c.petition_id)))
           .whereIn(
             this.knex.raw("data ->> 'petition_field_id'") as any,
@@ -3276,12 +3253,10 @@ export class PetitionRepository extends BaseRepository {
           )
           .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
           .update(
-            {
-              read_at: isRead ? this.now() : null,
-              ...removeNotDefined({
-                processed_at: isRead ? this.now() : undefined,
-              }),
-            },
+            removeNotDefined({
+              is_read: isRead,
+              processed_at: isRead ? this.now() : undefined,
+            }),
             "*"
           );
       },
@@ -3299,22 +3274,13 @@ export class PetitionRepository extends BaseRepository {
   ) {
     return await this.from("petition_user_notification")
       .where("user_id", userId)
-      .mmodify((q) => {
-        // to return only the updated notifications
-        if (isRead) {
-          q.whereNull("read_at");
-        } else {
-          q.whereNotNull("read_at");
-        }
-      })
+      .where("is_read", !isRead)
       .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
       .update(
-        {
-          read_at: isRead ? this.now() : null,
-          ...removeNotDefined({
-            processed_at: isRead ? this.now() : undefined,
-          }),
-        },
+        removeNotDefined({
+          is_read: isRead,
+          processed_at: isRead ? this.now() : undefined,
+        }),
         "*"
       );
   }
@@ -3399,7 +3365,7 @@ export class PetitionRepository extends BaseRepository {
       );
       return keys
         .map(keyBuilder(["userId", "petitionId", "petitionFieldId", "petitionFieldCommentId"]))
-        .map((key) => byId[key]?.read_at === null);
+        .map((key) => !(byId[key]?.is_read ?? true));
     },
     {
       cacheKeyFn: keyBuilder(["userId", "petitionId", "petitionFieldId", "petitionFieldCommentId"]),
@@ -3449,7 +3415,7 @@ export class PetitionRepository extends BaseRepository {
             "petitionFieldCommentId",
           ])
         )
-        .map((key) => byId[key]?.read_at === null);
+        .map((key) => !(byId[key]?.is_read ?? true));
     },
     {
       cacheKeyFn: keyBuilder([
@@ -3668,7 +3634,7 @@ export class PetitionRepository extends BaseRepository {
         this.knex.raw("data ->> 'petition_field_comment_id'") as any,
         uniq(comments.map((c) => c.id))
       )
-      .update({ read_at: this.now(), processed_at: this.now() });
+      .update({ is_read: true, processed_at: this.now() });
     return comments;
   }
 

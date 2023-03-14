@@ -52,16 +52,7 @@ export type GenericPetitionUserNotification<
   IsCreate extends boolean = false
 > = Omit<
   DbPetitionUserNotification,
-  | "type"
-  | "data"
-  | If<
-      IsCreate,
-      | "id"
-      | "created_at"
-      | "is_read" // @deprecated
-      | "read_at"
-      | "processed_at"
-    >
+  "type" | "data" | If<IsCreate, "id" | "created_at" | "is_read" | "processed_at">
 > & {
   type: TType;
   data: PetitionUserNotificationPayload<TType>;
