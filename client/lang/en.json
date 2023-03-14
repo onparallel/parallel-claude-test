@@ -1580,6 +1580,26 @@
     "context": "The user is not registered in the Public Administration"
   },
   {
+    "term": "component.export-failed-dialog.body",
+    "definition": "Exporting to LocalAPI of the file {fileName} on field {fieldName} has failed.",
+    "context": "Exporting to LocalAPI of the file {fileName} on field {fieldName} has failed."
+  },
+  {
+    "term": "component.export-failed-dialog.cancel",
+    "definition": "Stop export",
+    "context": "Stop export"
+  },
+  {
+    "term": "component.export-failed-dialog.confirm",
+    "definition": "Omit file and continue",
+    "context": "Omit file and continue"
+  },
+  {
+    "term": "component.export-failed-dialog.heading",
+    "definition": "Export failed",
+    "context": "Export failed"
+  },
+  {
     "term": "component.export-replies-dialog.download-files",
     "definition": "Download files as a ZIP",
     "context": "Download files as a ZIP"
@@ -5086,8 +5106,8 @@
   },
   {
     "term": "component.reports-statistics-conversion.export-file-name",
-    "definition": "conversion-report-{templateId}_{range}",
-    "context": "conversion-report-{templateId}_{range}"
+    "definition": "conversion-report-{templateId}-{range}",
+    "context": "conversion-report-{templateId}-{range}"
   },
   {
     "term": "component.reports-statistics-conversion.first-reply",
@@ -5161,8 +5181,8 @@
   },
   {
     "term": "component.reports-statistics-time.export-file-name",
-    "definition": "time-statistics-{templateId}_{range}",
-    "context": "time-statistics-{templateId}_{range}"
+    "definition": "time-statistics-{templateId}-{range}",
+    "context": "time-statistics-{templateId}-{range}"
   },
   {
     "term": "component.reports-statistics-time.first-reply",
@@ -8631,8 +8651,8 @@
   },
   {
     "term": "page.reports-overview.export-file-name",
-    "definition": "overview-report_{range}",
-    "context": "overview-report_{range}"
+    "definition": "overview-report-{range}",
+    "context": "overview-report-{range}"
   },
   {
     "term": "page.reports-overview.no-templates-found",

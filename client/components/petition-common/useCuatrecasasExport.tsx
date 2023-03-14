@@ -13,9 +13,16 @@ import {
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useExportExcelBackgroundTask } from "@parallel/utils/tasks/useExportExcelTask";
 import { usePrintPdfBackgroundTask } from "@parallel/utils/tasks/usePrintPdfTask";
+import { Maybe } from "@parallel/utils/types";
 import { MutableRefObject, useRef } from "react";
+import { isDefined } from "remeda";
 import { useAlreadyExportedDialog } from "./dialogs/AlreadyExportedDialog";
 
+export class CuatrecasasExportError extends Error {
+  constructor(public fileName: string, public fieldName?: Maybe<string>) {
+    super("EXPORT_ERROR");
+  }
+}
 function cuatrecasasExport(
   url: string,
   fileName: string,
@@ -53,7 +60,7 @@ function cuatrecasasExport(
         } else {
           reject(result);
         }
-      } catch (e: any) {
+      } catch (e) {
         reject(e);
       }
     };
@@ -213,23 +220,44 @@ function useExportFieldReply(clientId: string, refs: ExportRefs) {
         },
       });
 
-      const externalId = await cuatrecasasExport(
-        res.data!.fileUploadReplyDownloadLink.url!,
-        opts.filename,
-        clientId,
-        opts.signal,
-        opts.onProgress
-      );
-      await updatePetitionFieldReplyMetadata({
-        variables: {
-          petitionId,
-          replyId: reply.id,
-          metadata: {
-            ...reply.metadata,
-            EXTERNAL_ID_CUATRECASAS: externalId,
+      let externalId: string | undefined = undefined;
+
+      try {
+        externalId = await cuatrecasasExport(
+          res.data!.fileUploadReplyDownloadLink.url!,
+          opts.filename,
+          clientId,
+          opts.signal,
+          opts.onProgress
+        );
+      } catch (e) {
+        if (
+          isDefined(e) &&
+          typeof e === "object" &&
+          "Status" in e &&
+          e.Status === false &&
+          "IdND" in e &&
+          e.IdND === null
+        ) {
+          // error from NetDocuments, show dialog to skip file or cancel export
+          throw new CuatrecasasExportError(opts.filename, field.title);
+        } else {
+          throw e;
+        }
+      }
+
+      if (externalId) {
+        await updatePetitionFieldReplyMetadata({
+          variables: {
+            petitionId,
+            replyId: reply.id,
+            metadata: {
+              ...reply.metadata,
+              EXTERNAL_ID_CUATRECASAS: externalId,
+            },
           },
-        },
-      });
+        });
+      }
     } else if (excelExternalId) {
       // for non FILE_UPLOAD replies, update reply metadata with externalId of excel file
       await updatePetitionFieldReplyMetadata({
@@ -344,6 +372,7 @@ useCuatrecasasExport.fragments = {
   get PetitionField() {
     return gql`
       fragment useCuatrecasasExport_PetitionField on PetitionField {
+        title
         type
       }
     `;

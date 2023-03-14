@@ -9816,6 +9816,7 @@ export type useCuatrecasasExport_PetitionFragment = {
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
+    title?: string | null;
     type: PetitionFieldType;
     replies: Array<{
       __typename?: "PetitionFieldReply";
@@ -9843,6 +9844,7 @@ export type useCuatrecasasExport_PetitionSignatureRequestFragment = {
 
 export type useCuatrecasasExport_PetitionFieldFragment = {
   __typename?: "PetitionField";
+  title?: string | null;
   type: PetitionFieldType;
 };
 
@@ -28744,6 +28746,7 @@ export const PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReply
 >;
 export const useCuatrecasasExport_PetitionFieldFragmentDoc = gql`
   fragment useCuatrecasasExport_PetitionField on PetitionField {
+    title
     type
   }
 ` as unknown as DocumentNode<useCuatrecasasExport_PetitionFieldFragment, unknown>;

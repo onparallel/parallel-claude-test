@@ -16,13 +16,18 @@ import { CheckIcon, CloudUploadIcon } from "@parallel/chakra/icons";
 import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { useCuatrecasasExport } from "@parallel/components/petition-common/useCuatrecasasExport";
+import {
+  CuatrecasasExportError,
+  useCuatrecasasExport,
+} from "@parallel/components/petition-common/useCuatrecasasExport";
 import { ExportRepliesProgressDialog_petitionDocument } from "@parallel/graphql/__types";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
+import { withError } from "@parallel/utils/promises/withError";
 import { useFilenamePlaceholdersRename } from "@parallel/utils/useFilenamePlaceholders";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
-import { countBy } from "remeda";
+import { countBy, pick } from "remeda";
+import { useExportFailedDialog } from "./ExportFailedDialog";
 
 export interface ExportRepliesProgressDialogProps {
   externalClientId: string;
@@ -50,6 +55,8 @@ export function ExportRepliesProgressDialog({
   const showErrorDialog = useErrorDialog();
 
   const cuatrecasasExport = useCuatrecasasExport(externalClientId);
+
+  const showExportFailedDialog = useExportFailedDialog();
 
   useEffect(() => {
     async function exportReplies() {
@@ -94,20 +101,37 @@ export function ExportRepliesProgressDialog({
         }
 
         for (const { reply, field } of replies) {
-          await cuatrecasasExport.exportFieldReply(
-            {
-              petitionId: petition.id,
-              excelExternalId,
-              field,
-              reply,
-            },
-            {
-              filename: isFileTypeField(field.type) ? rename(field, reply, pattern) : "",
-              onProgress: ({ loaded, total }) =>
-                setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
-              signal: abort.signal,
+          try {
+            await cuatrecasasExport.exportFieldReply(
+              {
+                petitionId: petition.id,
+                excelExternalId: excelExternalId ?? null,
+                field,
+                reply,
+              },
+              {
+                filename: isFileTypeField(field.type) ? rename(field, reply, pattern) : "",
+                onProgress: ({ loaded, total }) =>
+                  setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
+                signal: abort.signal,
+              }
+            );
+          } catch (e) {
+            if (e instanceof CuatrecasasExportError) {
+              const [stop] = await withError(
+                showExportFailedDialog(pick(e, ["fileName", "fieldName"]))
+              );
+
+              if (stop) {
+                throw new Error("CANCEL");
+              } else {
+                continue;
+              }
+            } else {
+              throw e;
             }
-          );
+          }
+
           if (isFileTypeField(field.type)) {
             setProgress(++uploaded / totalFiles);
           }
@@ -149,10 +173,8 @@ export function ExportRepliesProgressDialog({
         setProgress(++uploaded / totalFiles);
 
         setState("FINISHED");
-      } catch (e: any) {
-        if (e.message !== "CANCEL") {
-          return await processError(e);
-        }
+      } catch (e) {
+        return await processError(e);
       }
     }
     if (data && !isRunning.current) {
@@ -263,6 +285,8 @@ export function ExportRepliesProgressDialog({
           }),
         });
       } catch {}
+    } else {
+      props.onReject(e);
     }
   }
 }
