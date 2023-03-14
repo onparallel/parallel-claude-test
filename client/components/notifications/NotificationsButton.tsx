@@ -2,7 +2,7 @@ import { gql, useQuery } from "@apollo/client";
 import { Badge, Box, BoxProps } from "@chakra-ui/react";
 import { BellIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Notifications_UnreadPetitionUserNotificationIdsQuery } from "@parallel/graphql/__types";
+import { Notifications_UnreadPetitionUserNotificationIdsDocument } from "@parallel/graphql/__types";
 import { useNotificationsState } from "@parallel/utils/useNotificationsState";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
@@ -18,18 +18,10 @@ export const NotificationsButton = chakraForwardRef<"button", {}>(function Notif
   ref
 ) {
   const intl = useIntl();
-  const { data, startPolling, stopPolling } =
-    useQuery<Notifications_UnreadPetitionUserNotificationIdsQuery>(
-      gql`
-        query Notifications_UnreadPetitionUserNotificationIds {
-          me {
-            id
-            unreadNotificationIds
-          }
-        }
-      `,
-      { pollInterval: POLL_INTERVAL }
-    );
+  const { data, startPolling, stopPolling } = useQuery(
+    Notifications_UnreadPetitionUserNotificationIdsDocument,
+    { pollInterval: POLL_INTERVAL }
+  );
   const { isOpen, onOpen } = useNotificationsState();
 
   useEffect(() => {
@@ -112,3 +104,14 @@ export const NotificationsButton = chakraForwardRef<"button", {}>(function Notif
     />
   );
 });
+
+const _queries = [
+  gql`
+    query Notifications_UnreadPetitionUserNotificationIds {
+      me {
+        id
+        unreadNotificationIds
+      }
+    }
+  `,
+];
