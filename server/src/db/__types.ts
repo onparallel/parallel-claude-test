@@ -1438,6 +1438,7 @@ export interface Task {
   petition_access_id: Maybe<number>; // int4
   started_at: Maybe<Date>; // timestamptz
   finished_at: Maybe<Date>; // timestamptz
+  anonymized_at: Maybe<Date>; // timestamptz
 }
 
 export type CreateTask = PartialProps<
@@ -1455,6 +1456,7 @@ export type CreateTask = PartialProps<
   | "petition_access_id"
   | "started_at"
   | "finished_at"
+  | "anonymized_at"
 >;
 
 export interface TemplateDefaultPermission {

@@ -228,4 +228,14 @@ export class TaskRepository extends BaseRepository {
       .select("id");
     return rows.length === 1;
   }
+
+  async anonymizeOldTasks(daysAfterDeletion: number) {
+    await this.from("task")
+      .whereNull("anonymized_at")
+      .whereRaw(/* sql */ `"created_at" < NOW() - make_interval(days => ?)`, [daysAfterDeletion])
+      .update({
+        anonymized_at: this.now(),
+        output: null,
+      });
+  }
 }

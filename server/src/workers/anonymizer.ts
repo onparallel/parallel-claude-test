@@ -56,4 +56,8 @@ createCronWorker("anonymizer", async (ctx, config) => {
       await ctx.petitions.anonymizePetition(petition.id);
     }
   }
+
+  // delete information of tasks created more than `anonymizeAfterDays` days ago
+  ctx.logger.debug(`Anonymizing old tasks`);
+  await ctx.tasks.anonymizeOldTasks(DAYS);
 });
