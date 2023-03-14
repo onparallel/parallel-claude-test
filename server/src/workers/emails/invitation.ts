@@ -1,5 +1,4 @@
 import { WorkerContext } from "../../context";
-import { UserLocale } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
 import Invitation from "../../emails/emails/Invitation";
 import { buildFrom } from "../../emails/utils/buildFrom";
@@ -10,7 +9,7 @@ export async function invitation(
     user_cognito_id: string;
     org_name: string;
     org_user: string;
-    locale: UserLocale;
+    locale: string;
     is_new_user: boolean;
   },
   context: WorkerContext

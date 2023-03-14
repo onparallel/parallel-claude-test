@@ -49,7 +49,7 @@ export async function contactAuthenticationRequest(
       isContactVerification: payload.is_contact_verification,
       ...layoutProps,
     },
-    { locale: petition.recipient_locale }
+    { locale: petition.locale }
   );
   const email = await context.emailLogs.createEmail({
     from: buildFrom(from, emailFrom),

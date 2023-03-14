@@ -1,11 +1,10 @@
 import { render } from "@faire/mjml-react/utils/render";
 import { ComponentType, createElement } from "react";
 import { createIntl, IntlConfig, IntlProvider, IntlShape } from "react-intl";
-import { ContactLocale, UserLocale } from "../db/__types";
 import { loadMessages } from "../util/loadMessages";
 
 export interface EmailOptions {
-  locale: ContactLocale | UserLocale;
+  locale: string;
 }
 
 export interface Email<T extends {}> {

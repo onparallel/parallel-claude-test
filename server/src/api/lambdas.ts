@@ -1,6 +1,5 @@
 import { Handler, json, Router } from "express";
 import { Config } from "../config";
-import { UserLocale } from "../db/__types";
 import { buildEmail } from "../emails/buildEmail";
 import AccountVerification from "../emails/emails/AccountVerification";
 import ForgotPassword from "../emails/emails/ForgotPassword";
@@ -16,11 +15,7 @@ interface CustomMessageRequest {
   };
   codeParameter: string;
   usernameParameter: string | null;
-  clientMetadata: {
-    organizationName: string;
-    organizationUser: string;
-    locale: UserLocale;
-  };
+  clientMetadata: { [key: string]: string };
 }
 
 function layoutProps(config: Config["misc"]) {
@@ -50,7 +45,7 @@ function customMessageAccountVerificationResponse(): Handler {
         userAttributes: { given_name: firstName, family_name: lastName, email },
         clientMetadata: { locale },
         codeParameter,
-      } = req.body as CustomMessageRequest;
+      } = req.body;
 
       const { subject, html } = await buildEmail(
         AccountVerification,

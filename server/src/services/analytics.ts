@@ -262,7 +262,7 @@ export class AnalyticsService implements IAnalyticsService {
         role: userData.details?.role,
         position: userData.details?.position,
         source: userData.details?.source,
-        locale: userData.preferred_locale,
+        locale: userData.details?.preferredLocale,
         company: {
           id: toGlobalId("Organization", org.id),
           name: org.name,

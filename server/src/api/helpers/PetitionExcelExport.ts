@@ -1,7 +1,7 @@
 import Excel from "exceljs";
 import { Readable } from "stream";
 import { ApiContext, WorkerContext } from "../../context";
-import { PetitionField, PetitionFieldReply, UserLocale } from "../../db/__types";
+import { PetitionField, PetitionFieldReply } from "../../db/__types";
 import { ZipFileInput } from "../../util/createZipFile";
 import { FieldCommentsExcelWorksheet } from "./FieldCommentsExcelWorksheet";
 import { TextRepliesExcelWorksheet } from "./TextRepliesExcelWorksheet";
@@ -10,9 +10,13 @@ export class PetitionExcelExport {
   private wb: Excel.Workbook;
   private textRepliesTab!: TextRepliesExcelWorksheet;
   private fieldCommentsTab!: FieldCommentsExcelWorksheet;
+  private locale: string;
+  private context: ApiContext | WorkerContext;
 
-  constructor(private locale: UserLocale, private context: ApiContext | WorkerContext) {
+  constructor(locale: string, context: ApiContext | WorkerContext) {
     this.wb = new Excel.Workbook();
+    this.locale = locale;
+    this.context = context;
   }
 
   public async init() {
@@ -23,21 +27,22 @@ export class PetitionExcelExport {
         id: "petition-excel-export.replies",
         defaultMessage: "Replies",
       }),
+      this.locale,
       this.wb,
-
       this.context
     );
-    await this.textRepliesTab.init(this.locale);
+    await this.textRepliesTab.init();
 
     this.fieldCommentsTab = new FieldCommentsExcelWorksheet(
       intl.formatMessage({
         id: "petition-excel-export.comments",
         defaultMessage: "Comments",
       }),
+      this.locale,
       this.wb,
       this.context
     );
-    await this.fieldCommentsTab.init(this.locale);
+    await this.fieldCommentsTab.init();
   }
 
   public addPetitionFieldReply(field: PetitionField, replies: PetitionFieldReply[]) {

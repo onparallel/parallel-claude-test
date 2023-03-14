@@ -6,7 +6,7 @@ import { differenceInMinutes } from "date-fns";
 import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
 import { difference, isDefined, partition, zip } from "remeda";
-import { LicenseCode, PublicFileUpload, UserLocale } from "../../db/__types";
+import { LicenseCode, PublicFileUpload } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { withError } from "../../util/promises/withError";
 import { removeNotDefined } from "../../util/remedaExtensions";
@@ -125,7 +125,6 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     firstName: nonNull(stringArg()),
     lastName: nonNull(stringArg()),
     role: nonNull(arg({ type: "OrganizationRole" })),
-    // TODO make nonNull UserLocale
     locale: stringArg(),
     userGroupIds: list(nonNull(globalIdArg("UserGroup"))),
     orgId: globalIdArg("Organization"),
@@ -157,7 +156,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
       firstName,
       lastName,
       {
-        locale: (args.locale ?? "en") as UserLocale,
+        locale: args.locale ?? "en",
         organizationName: organization!.name,
         organizationUser: args.orgId ? "" : fullName(userData!.first_name, userData!.last_name),
       },
@@ -174,12 +173,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
           email,
           first_name: firstName,
           last_name: lastName,
-          details: {
-            source: "org-invitation",
-            /** @deprecated REMOVE! */
-            preferredLocale: args.locale ?? "en",
-          },
-          preferred_locale: (args.locale ?? "en") as UserLocale,
+          details: { source: "org-invitation", preferredLocale: args.locale ?? "en" },
         },
         `User:${ctx.user!.id}`
       ),
@@ -421,7 +415,6 @@ export const userSignUp = mutationField("userSignUp", {
     firstName: nonNull(stringArg()),
     lastName: nonNull(stringArg()),
     organizationName: nonNull(stringArg()),
-    // TODO: make nonNull UserLocale
     locale: stringArg({
       description: "Preferred locale for AWS Cognito CustomMessages.",
     }),
@@ -466,7 +459,7 @@ export const userSignUp = mutationField("userSignUp", {
     const email = args.email.trim().toLowerCase();
     const [error, cognitoId] = await withError(
       ctx.auth.signUpUser(email, args.password, args.firstName, args.lastName, {
-        locale: (args.locale ?? "en") as UserLocale,
+        locale: args.locale ?? "en",
       })
     );
     if (error) {
@@ -523,10 +516,8 @@ export const userSignUp = mutationField("userSignUp", {
           industry: args.industry,
           role: args.role,
           position: args.position,
-          /** @deprecated REMOVE! */
           preferredLocale: args.locale ?? "en",
         },
-        preferred_locale: (args.locale ?? "en") as UserLocale,
       },
       `UserSignUp:${args.email}`
     );
@@ -551,7 +542,6 @@ export const resendVerificationCode = mutationField("resendVerificationCode", {
   type: "Result",
   args: {
     email: nonNull(stringArg()),
-    // TODO make nonNull UserLocale
     locale: stringArg(),
   },
   validateArgs: validateAnd(
@@ -585,7 +575,7 @@ export const resendVerificationCode = mutationField("resendVerificationCode", {
           },
           `User:${user.id}`
         );
-        await ctx.auth.resendVerificationCode(email, { locale: (locale ?? "en") as UserLocale });
+        await ctx.auth.resendVerificationCode(email, { locale: locale ?? "en" });
       }
     } catch {}
     return RESULT.SUCCESS;
@@ -598,7 +588,6 @@ export const publicResetTemporaryPassword = mutationField("publicResetTemporaryP
   type: "Result",
   args: {
     email: nonNull(stringArg()),
-    // TODO make UserLocale
     locale: nonNull(stringArg()),
   },
   validateArgs: validateAnd(
@@ -607,7 +596,7 @@ export const publicResetTemporaryPassword = mutationField("publicResetTemporaryP
   ),
   resolve: async (_, { email, locale }, ctx) => {
     try {
-      await ctx.auth.resetTempPassword(email, locale as UserLocale);
+      await ctx.auth.resetTempPassword(email, locale);
     } catch {}
 
     // always return SUCCESS to avoid leaking errors and user statuses
@@ -621,7 +610,6 @@ export const resetTemporaryPassword = mutationField("resetTemporaryPassword", {
   type: "Result",
   args: {
     email: nonNull(stringArg()),
-    // TODO make UserLocale
     locale: nonNull(stringArg()),
   },
   authorize: authenticateAnd(contextUserHasRole("ADMIN")),
@@ -630,7 +618,7 @@ export const resetTemporaryPassword = mutationField("resetTemporaryPassword", {
     validLocale((args) => args.locale, "locale")
   ),
   resolve: async (_, { email, locale }, ctx) => {
-    await ctx.auth.resetTempPassword(email, locale as UserLocale);
+    await ctx.auth.resetTempPassword(email, locale);
 
     return RESULT.SUCCESS;
   },
@@ -641,7 +629,6 @@ export const setUserPreferredLocale = mutationField("setUserPreferredLocale", {
     "Sets the locale passed as arg as the preferred language of the user to see the page",
   type: "User",
   args: {
-    // TODO make UserLocale
     locale: nonNull(stringArg()),
   },
   authorize: authenticate(),
@@ -653,10 +640,8 @@ export const setUserPreferredLocale = mutationField("setUserPreferredLocale", {
       {
         details: {
           ...(userData.details ?? {}),
-          /** @deprecated REMOVE! */
           preferredLocale: locale,
         },
-        preferred_locale: locale as UserLocale,
       },
       `User:${ctx.user!.id}`
     );

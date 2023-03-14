@@ -14,7 +14,6 @@ import { MaybeArray, Replace } from "../../../util/types";
 import {
   Contact,
   ContactAuthentication,
-  ContactLocale,
   CreateContact,
   CreateFeatureFlag,
   CreateFileUpload,
@@ -71,7 +70,6 @@ import {
   UserData,
   UserGroup,
   UserGroupMember,
-  UserLocale,
   UserOrganizationRole,
   UserPetitionEventLog,
 } from "../../__types";
@@ -180,7 +178,6 @@ export class Mocks {
           last_name: lastName,
           email: faker.internet.email(firstName, lastName).toLowerCase(),
           cognito_id: faker.datatype.uuid(),
-          preferred_locale: randomUserPreferredLocale(),
           ...userDataBuilder?.(index),
         };
       }),
@@ -249,15 +246,12 @@ export class Mocks {
     const petitions = await this.knex<Petition>("petition")
       .insert(
         range(0, amount || 1).map<CreatePetition>((index) => {
-          const locale = randomContactLocale();
           return {
             org_id: orgId,
             is_template: false,
             status: builder?.(index).is_template ? null : randomPetitionStatus(),
             name: faker.random.words(),
-            /** @deprecated REMOVE! */
-            locale,
-            recipient_locale: locale,
+            locale: randomSupportedLocale(),
             document_organization_theme_id: theme.id,
             ...builder?.(index),
           };
@@ -295,15 +289,12 @@ export class Mocks {
     const petitions = await this.knex<Petition>("petition")
       .insert(
         range(0, amount || 1).map<CreatePetition>((index) => {
-          const locale = randomContactLocale();
           return {
             org_id: orgId,
             is_template: true,
             status: null,
             name: faker.random.words(),
-            /** @deprecated REMOVE! */
-            locale,
-            recipient_locale: locale,
+            locale: randomSupportedLocale(),
             document_organization_theme_id: theme.id,
             ...builder?.(index),
           };
@@ -1126,12 +1117,8 @@ function randomPetitionFieldType() {
   return faker.helpers.arrayElement<PetitionFieldType>(["FILE_UPLOAD", "TEXT", "SELECT"]);
 }
 
-function randomContactLocale() {
-  return faker.helpers.arrayElement<ContactLocale>(["en", "es"]);
-}
-
-function randomUserPreferredLocale() {
-  return faker.helpers.arrayElement<UserLocale>(["en", "es"]);
+function randomSupportedLocale() {
+  return faker.helpers.arrayElement(["en", "es"]);
 }
 
 function randomPetitionFieldOptions(type: PetitionFieldType) {

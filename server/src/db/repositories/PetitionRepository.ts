@@ -58,7 +58,6 @@ import {
 } from "../notifications";
 import {
   Contact,
-  ContactLocale,
   CreatePetitionAccess,
   CreatePetitionAttachment,
   CreatePetitionContactNotification,
@@ -96,6 +95,7 @@ import {
 import { FileRepository } from "./FileRepository";
 import { OrganizationRepository } from "./OrganizationRepository";
 type PetitionType = "PETITION" | "TEMPLATE";
+type PetitionLocale = "en" | "es";
 
 type PetitionSharedWithFilter = {
   operator: "AND" | "OR";
@@ -124,7 +124,7 @@ interface PetitionTagFilter {
 interface PetitionFilter {
   path?: string | null;
   status?: PetitionStatus[] | null;
-  locale?: ContactLocale | null;
+  locale?: PetitionLocale | null;
   signature?: PetitionSignatureStatusFilter[] | null;
   type?: PetitionType | null;
   /** @deprecated */
@@ -477,7 +477,7 @@ export class PetitionRepository extends BaseRepository {
       });
     }
     if (filters?.locale) {
-      builders.push((q) => q.where("recipient_locale", filters.locale));
+      builders.push((q) => q.where("locale", filters.locale));
     }
     if (filters?.status && type === "PETITION") {
       builders.push((q) => q.whereRaw("p.status in ?", [this.sqlIn(filters.status!)]));
@@ -4507,7 +4507,7 @@ export class PetitionRepository extends BaseRepository {
   getPaginatedPublicTemplates(
     opts: {
       search?: string | null;
-      locale?: ContactLocale | null;
+      locale?: PetitionLocale | null;
       categories?: string[] | null;
     } & PageOpts
   ) {
@@ -4520,7 +4520,7 @@ export class PetitionRepository extends BaseRepository {
         .mmodify((q) => {
           const { search, locale, categories } = opts;
           if (locale) {
-            q.where("recipient_locale", locale);
+            q.where("locale", locale);
           }
           if (search) {
             const escapedSearch = `%${escapeLike(search, "\\")}%`;

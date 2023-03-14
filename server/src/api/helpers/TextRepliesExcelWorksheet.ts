@@ -1,7 +1,7 @@
 import { IntlShape } from "@formatjs/intl";
 import Excel from "exceljs";
 import { ApiContext, WorkerContext } from "../../context";
-import { PetitionField, PetitionFieldReply, UserLocale } from "../../db/__types";
+import { PetitionField, PetitionFieldReply } from "../../db/__types";
 import { FORMATS } from "../../util/dates";
 import { Maybe } from "../../util/types";
 import { ExcelWorksheet } from "./ExcelWorksheet";
@@ -14,15 +14,17 @@ export type TextReplyRow = {
 export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
   constructor(
     worksheetName: string,
+    locale: string,
     wb: Excel.Workbook,
     private context: ApiContext | WorkerContext
   ) {
-    super(worksheetName, wb);
+    super(worksheetName, locale, wb);
+    this.locale = locale;
   }
 
   private intl!: IntlShape;
-  public async init(locale: UserLocale) {
-    this.intl = await this.context.i18n.getIntl(locale);
+  public async init() {
+    this.intl = await this.context.i18n.getIntl(this.locale);
 
     this.page.columns = [
       {

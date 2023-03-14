@@ -1,7 +1,6 @@
 import { GraphQLClient } from "graphql-request";
 import { inject, injectable } from "inversify";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
-import { ContactLocale } from "../db/__types";
 import { buildPdf } from "../pdf/buildPdf";
 import AnnexCoverPage, { AnnexCoverPageProps } from "../pdf/documents/AnnexCoverPage";
 import ImageToPdf, { ImageToPdfProps } from "../pdf/documents/ImageToPdf";
@@ -17,7 +16,7 @@ export interface IPrinter {
   annexCoverPage(
     userId: number,
     props: AnnexCoverPageProps,
-    locale: ContactLocale
+    locale: string
   ): Promise<NodeJS.ReadableStream>;
   imageToPdf(userId: number, props: ImageToPdfProps): Promise<NodeJS.ReadableStream>;
 }
@@ -47,11 +46,11 @@ export class Printer implements IPrinter {
     return await buildPdf(
       PetitionExport,
       { ...data, petitionId: toGlobalId("Petition", petitionId) },
-      { client, locale: petition.recipient_locale }
+      { client, locale: petition.locale }
     );
   }
 
-  public async annexCoverPage(userId: number, props: AnnexCoverPageProps, locale: ContactLocale) {
+  public async annexCoverPage(userId: number, props: AnnexCoverPageProps, locale: string) {
     const client = await this.createClient(userId);
     return await buildPdf(AnnexCoverPage, props, { client, locale });
   }

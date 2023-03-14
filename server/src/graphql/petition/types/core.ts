@@ -847,9 +847,7 @@ export const PetitionAccess = objectType({
         );
 
         if (hasFeatureFlag || root.contact_id === null) {
-          const { recipient_locale: locale } = (await ctx.petitions.loadPetition(
-            root.petition_id
-          ))!;
+          const { locale } = (await ctx.petitions.loadPetition(root.petition_id))!;
           return `${ctx.config.misc.parallelUrl}/${locale}/petition/${root.keycode}`;
         }
 
@@ -1089,7 +1087,7 @@ export const PublicPetitionLink = objectType({
         const prefix = org.custom_host
           ? `${protocol}://${org.custom_host}`
           : ctx.config.misc.parallelUrl;
-        return `${prefix}/${template.recipient_locale}/pp/${root.slug}`;
+        return `${prefix}/${template.locale}/pp/${root.slug}`;
       },
     });
     t.field("owner", {

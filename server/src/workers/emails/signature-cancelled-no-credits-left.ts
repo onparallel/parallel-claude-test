@@ -54,7 +54,7 @@ export async function signatureCancelledNoCreditsLeft(
         signatureProvider: signatureIntegration!.name,
         ...layoutProps,
       },
-      { locale: userData.preferred_locale }
+      { locale: userData.details?.preferredLocale ?? "en" }
     );
 
     emails.push(

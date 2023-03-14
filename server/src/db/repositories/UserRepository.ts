@@ -290,7 +290,7 @@ export class UserRepository extends BaseRepository {
       t
     );
 
-    const intl = await this.intlService.getIntl(userData.preferred_locale);
+    const intl = await this.intlService.getIntl(userData.details.preferredLocale ?? "en");
     const defaultView = {
       path: "/",
       sort: null,

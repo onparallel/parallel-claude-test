@@ -6,11 +6,10 @@ import {
   IntegrationRepository,
   IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
-import { ContactLocale, ContactLocaleValues } from "../db/__types";
 import { Tone } from "../emails/utils/types";
 import { GenericIntegration } from "./GenericIntegration";
 
-export type SignaturitBrandingIdKey = `${Uppercase<ContactLocale>}_${Tone}_BRANDING_ID`;
+export type BrandingIdKey = `${"EN" | "ES"}_${Tone}_BRANDING_ID`;
 
 export type SignaturitEnvironment = IntegrationSettings<"SIGNATURE", "SIGNATURIT">["ENVIRONMENT"];
 
@@ -19,12 +18,12 @@ export interface SignaturitIntegrationContext {
   apiKeyHint: string;
   showCsv: boolean;
   brandings: {
-    locale: ContactLocale;
+    locale: string;
     tone: Tone;
     brandingId: string;
   }[];
   environment: SignaturitEnvironment;
-  onUpdateBrandingId(key: SignaturitBrandingIdKey, id: string): Promise<void>;
+  onUpdateBrandingId(key: BrandingIdKey, id: string): Promise<void>;
 }
 
 @injectable()
@@ -56,15 +55,16 @@ export class SignaturitIntegration extends GenericIntegration<
     integration: EnhancedOrgIntegration<"SIGNATURE", "SIGNATURIT", false>
   ): SignaturitIntegrationContext {
     const settings = integration.settings;
-    const brandings = ContactLocaleValues.flatMap((locale) =>
-      (["FORMAL", "INFORMAL"] as Tone[]).map((tone) => {
-        const key =
-          `${locale.toUpperCase()}_${tone}_BRANDING_ID` as Uppercase<`${ContactLocale}_${Tone}_BRANDING_ID`>;
-        if (key in settings) {
-          return { locale, tone, brandingId: settings[key]! };
-        }
-      })
-    ).filter(isDefined);
+    const brandings = (["en", "es"] as const)
+      .flatMap((locale) =>
+        (["FORMAL", "INFORMAL"] as const).map((tone) => {
+          const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as const;
+          if (key in settings) {
+            return { locale, tone, brandingId: (settings as any)[key] };
+          }
+        })
+      )
+      .filter(isDefined);
     const apiKey = settings.CREDENTIALS.API_KEY;
     return {
       apiKeyHint: apiKey.slice(0, 10),

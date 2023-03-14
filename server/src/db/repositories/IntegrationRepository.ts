@@ -1,7 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { isDefined, uniq } from "remeda";
-import { SignaturitBrandingIdKey } from "../../integrations/SignaturitIntegration";
 import { keyBuilder } from "../../util/keyBuilder";
 import { Replace } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
@@ -27,8 +26,12 @@ export type IntegrationSettings<
         CREDENTIALS: { API_KEY: string };
         ENVIRONMENT: "production" | "sandbox";
         IS_PARALLEL_MANAGED: boolean;
+        EN_FORMAL_BRANDING_ID?: string;
+        ES_FORMAL_BRANDING_ID?: string;
+        EN_INFORMAL_BRANDING_ID?: string;
+        ES_INFORMAL_BRANDING_ID?: string;
         SHOW_CSV?: boolean; // show a security stamp on the margin of each page of the document
-      } & { [key in SignaturitBrandingIdKey]?: string }
+      }
     : TProvider extends "DOCUSIGN"
     ? {
         CREDENTIALS: { ACCESS_TOKEN: string; REFRESH_TOKEN: string };

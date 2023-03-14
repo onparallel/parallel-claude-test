@@ -77,7 +77,7 @@ export async function petitionMessage(
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       ...layoutProps,
     },
-    { locale: petition.recipient_locale }
+    { locale: petition.locale }
   );
   const email = await context.emailLogs.createEmail({
     from: buildFrom(from, emailFrom),

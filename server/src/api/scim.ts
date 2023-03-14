@@ -138,7 +138,6 @@ scim
               first_name: givenName,
               last_name: familyName,
               details: { source: "SCIM" },
-              preferred_locale: "en",
             },
             `Provisioning:${req.context.organization!.id}`
           );

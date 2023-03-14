@@ -16,13 +16,12 @@ export class ExportExcelRunner extends TaskRunner<"EXPORT_EXCEL"> {
     if (!hasAccess) {
       throw new Error(`User ${this.task.user_id} has no access to petition ${petitionId}`);
     }
-
-    const userData = await this.ctx.users.loadUserDataByUserId(this.task.user_id);
+    const petition = (await this.ctx.petitions.loadPetition(petitionId))!;
 
     const exportExcel = await getPetitionFiles(
       petitionId,
       {
-        locale: userData!.preferred_locale,
+        locale: petition.locale,
         xlsxOnly: true,
         onProgress: async (progress) => {
           const currentProgress = progress * 100;

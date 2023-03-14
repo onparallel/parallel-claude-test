@@ -38,7 +38,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       ),
     ]);
 
-    const intl = await this.ctx.i18n.getIntl(template!.recipient_locale);
+    const intl = await this.ctx.i18n.getIntl(template!.locale);
 
     const [
       includePreviewUrl,

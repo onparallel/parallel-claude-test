@@ -1,5 +1,3 @@
-import { ContactLocale } from "../../db/__types";
-
 interface Document {
   id: string;
   decline_reason?: string;
@@ -19,7 +17,7 @@ interface Document {
 }
 
 export interface SignatureOptions {
-  locale: ContactLocale;
+  locale: string;
   /**
    * Optional plain-text custom message to include in the "signature requested" emails
    */
