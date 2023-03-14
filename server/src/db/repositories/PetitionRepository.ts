@@ -5321,6 +5321,7 @@ export class PetitionRepository extends BaseRepository {
         await this.from("petition_field_reply")
           .whereIn("petition_field_id", fieldIdsChunk)
           .whereNull("anonymized_at")
+          .whereNull("deleted_at")
           .select("id", "type", "content", "anonymized_at"),
       { concurrency: 1, chunkSize: 200 }
     );
