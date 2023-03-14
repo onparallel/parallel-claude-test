@@ -9,6 +9,17 @@ import { isDefined } from "remeda";
 
 const POLL_INTERVAL = 30_000;
 
+const _queries = [
+  gql`
+    query PetitionSignaturesCardPolling_petition($petitionId: GID!) {
+      petition(id: $petitionId) {
+        ...PetitionSignaturesCard_Petition
+      }
+    }
+    ${PetitionSignaturesCard.fragments.Petition}
+  `,
+];
+
 export function usePetitionSignaturesCardPolling(
   petition: PetitionSignaturesCard_PetitionFragment
 ) {
@@ -31,14 +42,3 @@ export function usePetitionSignaturesCardPolling(
     return stopPolling;
   }, [current?.status, current?.auditTrailFilename]);
 }
-
-const _queries = [
-  gql`
-    query PetitionSignaturesCardPolling_petition($petitionId: GID!) {
-      petition(id: $petitionId) {
-        ...PetitionSignaturesCard_Petition
-      }
-    }
-    ${PetitionSignaturesCard.fragments.Petition}
-  `,
-];

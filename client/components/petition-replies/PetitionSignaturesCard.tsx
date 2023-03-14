@@ -1,10 +1,11 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { Box, Center, Grid, Text, useToast } from "@chakra-ui/react";
 import { AddIcon, SignatureIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionSignaturesCard_cancelSignatureRequestDocument,
   PetitionSignaturesCard_completePetitionDocument,
+  PetitionSignaturesCard_petitionDocument,
   PetitionSignaturesCard_PetitionFragment,
   PetitionSignaturesCard_sendSignatureRequestRemindersDocument,
   PetitionSignaturesCard_signedPetitionDownloadLinkDocument,
@@ -20,8 +21,7 @@ import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
-import { usePetitionSignaturesCardPolling } from "@parallel/utils/usePetitionSignaturesCardPolling";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { Card, CardHeader } from "../common/Card";
@@ -84,7 +84,8 @@ const fragments = {
     ${getPetitionSignatureEnvironment.fragments.Petition}
   `,
 };
-const mutations = [
+
+const _mutations = [
   gql`
     mutation PetitionSignaturesCard_updatePetitionSignatureConfig(
       $petitionId: GID!
@@ -141,6 +142,17 @@ const mutations = [
   gql`
     mutation PetitionSignaturesCard_completePetition($petitionId: GID!, $message: String) {
       completePetition(petitionId: $petitionId, message: $message) {
+        ...PetitionSignaturesCard_Petition
+      }
+    }
+    ${fragments.Petition}
+  `,
+];
+
+const _queries = [
+  gql`
+    query PetitionSignaturesCard_petition($petitionId: GID!) {
+      petition(id: $petitionId) {
         ...PetitionSignaturesCard_Petition
       }
     }
@@ -385,5 +397,28 @@ export const PetitionSignaturesCard = Object.assign(
       </Card>
     );
   }),
-  { fragments, mutations }
+  { fragments }
 );
+
+const POLL_INTERVAL = 30_000;
+
+function usePetitionSignaturesCardPolling(petition: PetitionSignaturesCard_PetitionFragment) {
+  const current = petition.signatureRequests.at(0);
+  const { startPolling, stopPolling } = useQuery(PetitionSignaturesCard_petitionDocument, {
+    pollInterval: POLL_INTERVAL,
+    variables: { petitionId: petition.id },
+  });
+
+  useEffect(() => {
+    if (current && current.status !== "CANCELLED" && !isDefined(current.auditTrailFilename)) {
+      startPolling(POLL_INTERVAL);
+    } else if (
+      (current?.status === "COMPLETED" && isDefined(current.auditTrailFilename)) ||
+      current?.status === "CANCELLED"
+    ) {
+      stopPolling();
+    }
+
+    return stopPolling;
+  }, [current?.status, current?.auditTrailFilename]);
+}

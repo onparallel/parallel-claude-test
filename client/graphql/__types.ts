@@ -13385,6 +13385,111 @@ export type PetitionSignaturesCard_completePetitionMutation = {
   };
 };
 
+export type PetitionSignaturesCard_petitionQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type PetitionSignaturesCard_petitionQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        status: PetitionStatus;
+        name?: string | null;
+        signatureRequests: Array<{
+          __typename?: "PetitionSignatureRequest";
+          id: string;
+          status: PetitionSignatureRequestStatus;
+          isAnonymized: boolean;
+          metadata: { [key: string]: any };
+          auditTrailFilename?: string | null;
+          cancelReason?: string | null;
+          signatureConfig: {
+            __typename?: "SignatureConfig";
+            signers: Array<{
+              __typename?: "PetitionSigner";
+              contactId?: string | null;
+              email: string;
+              firstName: string;
+              lastName?: string | null;
+            } | null>;
+          };
+          signerStatus: Array<{
+            __typename?: "PetitionSignatureRequestSignerStatus";
+            status: string;
+            sentAt?: string | null;
+            openedAt?: string | null;
+            signedAt?: string | null;
+            declinedAt?: string | null;
+            bouncedAt?: string | null;
+            signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
+          }>;
+          petition: { __typename?: "Petition"; id: string };
+        }>;
+        accesses: Array<{
+          __typename?: "PetitionAccess";
+          status: PetitionAccessStatus;
+          id: string;
+          contact?: {
+            __typename?: "Contact";
+            id: string;
+            firstName: string;
+            lastName?: string | null;
+            email: string;
+          } | null;
+        }>;
+        signatureConfig?: {
+          __typename?: "SignatureConfig";
+          title?: string | null;
+          review: boolean;
+          allowAdditionalSigners: boolean;
+          timezone: string;
+          integration?: {
+            __typename?: "SignatureOrgIntegration";
+            id: string;
+            name: string;
+            provider: SignatureOrgIntegrationProvider;
+            environment: SignatureOrgIntegrationEnvironment;
+            isDefault: boolean;
+          } | null;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            contactId?: string | null;
+            firstName: string;
+            lastName?: string | null;
+            email: string;
+            fullName: string;
+          } | null>;
+        } | null;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          isReadOnly: boolean;
+          optional: boolean;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          visibility?: { [key: string]: any } | null;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+          }>;
+          previewReplies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+          }>;
+        }>;
+        currentSignatureRequest?: {
+          __typename?: "PetitionSignatureRequest";
+          environment: SignatureOrgIntegrationEnvironment;
+        } | null;
+      }
+    | { __typename?: "PetitionTemplate" }
+    | null;
+};
+
 export type useClosePetitionDialog_PetitionFragment = {
   __typename?: "Petition";
   id: string;
@@ -34249,6 +34354,17 @@ export const PetitionSignaturesCard_completePetitionDocument = gql`
 ` as unknown as DocumentNode<
   PetitionSignaturesCard_completePetitionMutation,
   PetitionSignaturesCard_completePetitionMutationVariables
+>;
+export const PetitionSignaturesCard_petitionDocument = gql`
+  query PetitionSignaturesCard_petition($petitionId: GID!) {
+    petition(id: $petitionId) {
+      ...PetitionSignaturesCard_Petition
+    }
+  }
+  ${PetitionSignaturesCard_PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionSignaturesCard_petitionQuery,
+  PetitionSignaturesCard_petitionQueryVariables
 >;
 export const ExportRepliesProgressDialog_petitionDocument = gql`
   query ExportRepliesProgressDialog_petition($petitionId: GID!) {
