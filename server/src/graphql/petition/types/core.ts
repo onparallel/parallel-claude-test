@@ -148,7 +148,6 @@ export const PetitionBase = interfaceType({
     t.field("locale", {
       type: "PetitionLocale",
       description: "The locale of the parallel.",
-      resolve: (o) => o.recipient_locale,
     });
     t.field("owner", {
       type: "User",
