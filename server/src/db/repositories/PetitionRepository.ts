@@ -2951,6 +2951,8 @@ export class PetitionRepository extends BaseRepository {
           uniq(keys.map((x) => x.petitionFieldId))
         )
         .where("type", "COMMENT_CREATED")
+        // TODO read_at
+        // .whereNull("read_at")
         .where("is_read", false)
         .groupBy(
           "petition_id",
@@ -2990,6 +2992,7 @@ export class PetitionRepository extends BaseRepository {
     string
   >(
     async (keys, t) => {
+      // TODO read_at
       const rows = await this.raw<{ contact_id: number; petition_id: number }>(
         /* sql */ `
         select pa.contact_id, pa.petition_id from petition_access pa
@@ -2997,6 +3000,7 @@ export class PetitionRepository extends BaseRepository {
           on pcn.petition_access_id = pa.id and pcn.petition_id = pa.petition_id
         where pa.contact_id in ? and pa.petition_id in ? and pa.status = 'ACTIVE' 
           and pcn.type = 'COMMENT_CREATED' and pcn.is_read = false
+          -- and pcn.read_at is null
       `,
         [
           this.sqlIn(uniq(keys.map((k) => k.contactId))),
@@ -3024,6 +3028,8 @@ export class PetitionRepository extends BaseRepository {
           uniq(keys.map((x) => x.petitionFieldId))
         )
         .where("type", "COMMENT_CREATED")
+        // TODO read_at
+        // .whereNull("read_at")
         .where("is_read", false)
         .groupBy("petition_id", "user_id", this.knex.raw("(data ->> 'petition_field_id')::int"))
         .select<
@@ -3079,14 +3085,26 @@ export class PetitionRepository extends BaseRepository {
     type: Type
   ) {
     return await this.knex<GenericPetitionUserNotification<Type>>("petition_user_notification")
-      .where({ processed_at: null, is_read: false, type })
+      .where({
+        processed_at: null,
+        // TODO read_at
+        // read_at: null,
+        is_read: false,
+        type,
+      })
       .orderBy("created_at", "desc")
       .select("*");
   }
 
   async loadUnprocessedContactNotificationsOfType(type: PetitionContactNotificationType) {
     return await this.from("petition_contact_notification")
-      .where({ processed_at: null, is_read: false, type })
+      .where({
+        processed_at: null,
+        // TODO read_at
+        // read_at: null,
+        is_read: false,
+        type,
+      })
       .orderBy("created_at", "desc")
       .select("*");
   }
@@ -3097,6 +3115,8 @@ export class PetitionRepository extends BaseRepository {
     async (keys, t) => {
       const notifications = await this.from("petition_user_notification", t)
         .whereIn("user_id", keys)
+        // TODO read_at
+        // .whereNull("read_at")
         .where("is_read", false)
         .select(["user_id", "id"])
         .orderBy("created_at", "desc");
@@ -3107,11 +3127,15 @@ export class PetitionRepository extends BaseRepository {
 
   async markOldPetitionUserNotificationsAsRead(months: number) {
     await this.from("petition_user_notification")
+      // TODO is_read
+      // .whereNull("read_at")
       .where({
         is_read: false,
       })
       .whereRaw(/* sql */ `created_at < NOW() - make_interval(months => ?)`, [months])
       .update({
+        read_at: this.now(),
+        // TODO read_at
         is_read: true,
         processed_at: this.now(),
       });
@@ -3122,6 +3146,8 @@ export class PetitionRepository extends BaseRepository {
   ): Knex.QueryCallback<PetitionUserNotification<false>> {
     return (q) => {
       if (filter === "UNREAD") {
+        // TODO read_at
+        // q.whereNull("read_at");
         q.where("is_read", false);
       } else if (filter === "COMMENTS") {
         q.where("type", "COMMENT_CREATED");
@@ -3185,13 +3211,26 @@ export class PetitionRepository extends BaseRepository {
         return await this.from("petition_user_notification")
           .whereIn("id", idsChunk)
           .where("user_id", userId)
-          .where("is_read", !isRead) // to return only the updated notifications
+          .where("is_read", !isRead)
+          // TODO read_at
+          // .mmodify((q) => {
+          //   // to return only the updated notifications
+          //   if (isRead) {
+          //     q.whereNull("read_at");
+          //   } else {
+          //     q.whereNotNull("read_at");
+          //   }
+          // })
           .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
           .update(
-            removeNotDefined({
+            {
+              read_at: isRead ? this.now() : null,
+              // TODO read_at
               is_read: isRead,
-              processed_at: isRead ? this.now() : undefined,
-            }),
+              ...removeNotDefined({
+                processed_at: isRead ? this.now() : undefined,
+              }),
+            },
             "*"
           );
       },
@@ -3212,13 +3251,26 @@ export class PetitionRepository extends BaseRepository {
           .whereIn("petition_id", idsChunk)
           .where("user_id", userId)
           .where("is_read", !isRead)
+          // TODO read_at
+          // .mmodify((q) => {
+          //   // to return only the updated notifications
+          //   if (isRead) {
+          //     q.whereNull("read_at");
+          //   } else {
+          //     q.whereNotNull("read_at");
+          //   }
+          // })
           .whereNot("type", "COMMENT_CREATED")
           .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
           .update(
-            removeNotDefined({
+            {
+              read_at: isRead ? this.now() : null,
+              // TODO read_at
               is_read: isRead,
-              processed_at: isRead ? this.now() : undefined,
-            }),
+              ...removeNotDefined({
+                processed_at: isRead ? this.now() : undefined,
+              }),
+            },
             "*"
           );
       },
@@ -3242,6 +3294,15 @@ export class PetitionRepository extends BaseRepository {
             type: "COMMENT_CREATED",
           })
           .where("is_read", !isRead)
+          // TODO read_at
+          // .mmodify((q) => {
+          //   // to return only the updated notifications
+          //   if (isRead) {
+          //     q.whereNull("read_at");
+          //   } else {
+          //     q.whereNotNull("read_at");
+          //   }
+          // })
           .whereIn("petition_id", uniq(comments.map((c) => c.petition_id)))
           .whereIn(
             this.knex.raw("data ->> 'petition_field_id'") as any,
@@ -3253,10 +3314,14 @@ export class PetitionRepository extends BaseRepository {
           )
           .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
           .update(
-            removeNotDefined({
+            {
+              read_at: isRead ? this.now() : null,
+              // TODO read_at
               is_read: isRead,
-              processed_at: isRead ? this.now() : undefined,
-            }),
+              ...removeNotDefined({
+                processed_at: isRead ? this.now() : undefined,
+              }),
+            },
             "*"
           );
       },
@@ -3275,12 +3340,25 @@ export class PetitionRepository extends BaseRepository {
     return await this.from("petition_user_notification")
       .where("user_id", userId)
       .where("is_read", !isRead)
+      // TODO read_at
+      // .mmodify((q) => {
+      //   // to return only the updated notifications
+      //   if (isRead) {
+      //     q.whereNull("read_at");
+      //   } else {
+      //     q.whereNotNull("read_at");
+      //   }
+      // })
       .mmodify(this.filterPetitionUserNotificationQueryBuilder(filter))
       .update(
-        removeNotDefined({
+        {
+          read_at: isRead ? this.now() : null,
+          // TODO read_at
           is_read: isRead,
-          processed_at: isRead ? this.now() : undefined,
-        }),
+          ...removeNotDefined({
+            processed_at: isRead ? this.now() : undefined,
+          }),
+        },
         "*"
       );
   }
@@ -3366,6 +3444,8 @@ export class PetitionRepository extends BaseRepository {
       return keys
         .map(keyBuilder(["userId", "petitionId", "petitionFieldId", "petitionFieldCommentId"]))
         .map((key) => !(byId[key]?.is_read ?? true));
+      // TODO read_at
+      // .map((key) => byId[key]?.read_at === null);
     },
     {
       cacheKeyFn: keyBuilder(["userId", "petitionId", "petitionFieldId", "petitionFieldCommentId"]),
@@ -3416,6 +3496,8 @@ export class PetitionRepository extends BaseRepository {
           ])
         )
         .map((key) => !(byId[key]?.is_read ?? true));
+      // TODO read_at
+      // .map((key) => byId[key]?.read_at === null);
     },
     {
       cacheKeyFn: keyBuilder([
@@ -3634,7 +3716,8 @@ export class PetitionRepository extends BaseRepository {
         this.knex.raw("data ->> 'petition_field_comment_id'") as any,
         uniq(comments.map((c) => c.id))
       )
-      .update({ is_read: true, processed_at: this.now() });
+      // TODO read_at
+      .update({ is_read: true, read_at: this.now(), processed_at: this.now() });
     return comments;
   }
 

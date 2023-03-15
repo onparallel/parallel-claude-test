@@ -20,6 +20,8 @@ export const PetitionUserNotification = interfaceType({
     });
     t.boolean("isRead", {
       resolve: (o) => o.is_read,
+      // TODO read_at
+      // resolve: (o) => isDefined(o.read_at),
     });
     t.datetime("createdAt", {
       resolve: (o) => o.created_at,

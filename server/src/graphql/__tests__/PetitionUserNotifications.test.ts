@@ -77,6 +77,8 @@ describe("GraphQL - PetitionUserNotifications", () => {
           created_at: new Date("2021-06-10T10:00:00Z"),
           type: "PETITION_SHARED",
           user_id: sessionUser.id,
+          read_at: new Date(),
+          // TODO read_at
           is_read: true,
           petition_id: petition.id,
           data: {
@@ -735,6 +737,8 @@ describe("GraphQL - PetitionUserNotifications", () => {
       created_at: new Date("2021-07-10T10:00:00Z"),
       type: "PETITION_SHARED",
       user_id: sessionUser.id,
+      read_at: new Date(),
+      // TODO read_at
       is_read: true,
       petition_id: groupPetition.id,
       data: {

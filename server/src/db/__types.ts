@@ -968,14 +968,18 @@ export interface PetitionContactNotification {
   petition_id: number; // int4
   type: PetitionContactNotificationType; // petition_contact_notification_type
   data: Maybe<any>; // jsonb
+  /**
+   * @deprecated
+   */
   is_read: boolean; // bool
   created_at: Date; // timestamptz
   processed_at: Maybe<Date>; // timestamptz
+  read_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetitionContactNotification = PartialProps<
   Omit<PetitionContactNotification, "id">,
-  "data" | "is_read" | "created_at" | "processed_at"
+  "data" | "is_read" | "created_at" | "processed_at" | "read_at"
 >;
 
 export interface PetitionEvent {
@@ -1309,14 +1313,18 @@ export interface PetitionUserNotification {
   petition_id: number; // int4
   type: PetitionUserNotificationType; // petition_user_notification_type
   data: Maybe<any>; // jsonb
+  /**
+   * @deprecated
+   */
   is_read: boolean; // bool
   created_at: Date; // timestamptz
   processed_at: Maybe<Date>; // timestamptz
+  read_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetitionUserNotification = PartialProps<
   Omit<PetitionUserNotification, "id">,
-  "data" | "is_read" | "created_at" | "processed_at"
+  "data" | "is_read" | "created_at" | "processed_at" | "read_at"
 >;
 
 export interface PublicFileUpload {
