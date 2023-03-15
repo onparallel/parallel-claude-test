@@ -188,9 +188,7 @@ export const User = objectType({
     t.nullable.string("preferredLocale", {
       resolve: async (o, _, ctx) => {
         const userData = await ctx.users.loadUserData(o.user_data_id);
-        // TODO locales
-        // return userData!.preferred_locale;
-        return userData!.details?.preferredLocale ?? null;
+        return userData!.preferred_locale;
       },
     });
     t.list.field("userGroups", {

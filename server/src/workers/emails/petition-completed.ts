@@ -82,9 +82,7 @@ export async function petitionCompleted(
         contactEmail: contact.email!,
         ...layoutProps,
       },
-      // TODO locales
-      // { locale: userData.preferred_locale }
-      { locale: userData.details?.preferredLocale ?? "en" }
+      { locale: userData.preferred_locale }
     );
     emails.push(
       await context.emailLogs.createEmail({

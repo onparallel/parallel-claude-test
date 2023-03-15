@@ -33,9 +33,7 @@ export const LandingTemplate = objectType({
     });
     t.field("locale", {
       type: "PetitionLocale",
-      // TODO locales
-      // resolve: (o) => o.recipient_locale,
-      resolve: (o) => o.locale as any,
+      resolve: (o) => o.recipient_locale,
     });
     t.nullable.string("shortDescription", {
       resolve: (o) => o.public_metadata.description,
@@ -106,12 +104,8 @@ export const LandingTemplate = objectType({
       resolve: async (root, _, ctx) => {
         // for now we just expose only the first created
         const [link] = await ctx.petitions.loadPublicPetitionLinksByTemplateId(root.id);
-        // TODO locales
-        // return link?.is_active
-        //   ? `${ctx.config.misc.parallelUrl}/${root.recipient_locale}/pp/${link.slug}`
-        //   : null;
         return link?.is_active
-          ? `${ctx.config.misc.parallelUrl}/${root.locale}/pp/${link.slug}`
+          ? `${ctx.config.misc.parallelUrl}/${root.recipient_locale}/pp/${link.slug}`
           : null;
       },
     });

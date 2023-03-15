@@ -1,7 +1,7 @@
 import Excel from "exceljs";
 import { Readable } from "stream";
 import { ApiContext, WorkerContext } from "../../context";
-import { PetitionField, PetitionFieldReply } from "../../db/__types";
+import { PetitionField, PetitionFieldReply, UserLocale } from "../../db/__types";
 import { ZipFileInput } from "../../util/createZipFile";
 import { FieldCommentsExcelWorksheet } from "./FieldCommentsExcelWorksheet";
 import { TextRepliesExcelWorksheet } from "./TextRepliesExcelWorksheet";
@@ -11,12 +11,7 @@ export class PetitionExcelExport {
   private textRepliesTab!: TextRepliesExcelWorksheet;
   private fieldCommentsTab!: FieldCommentsExcelWorksheet;
 
-  constructor(
-    // TODO locales
-    // private locale: UserLocale,
-    private locale: string,
-    private context: ApiContext | WorkerContext
-  ) {
+  constructor(private locale: UserLocale, private context: ApiContext | WorkerContext) {
     this.wb = new Excel.Workbook();
   }
 

@@ -253,9 +253,7 @@ export const clonePetitions = mutationField("clonePetitions", {
       async (petitionId) => {
         const {
           name,
-          // TODO locales
-          // recipient_locale: locale,
-          locale,
+          recipient_locale: locale,
           path,
         } = (await ctx.petitions.loadPetition(petitionId))!;
         const intl = await ctx.i18n.getIntl(locale);
@@ -2208,11 +2206,7 @@ export const createPublicPetitionLinkPrefillData = mutationField(
         ? `${protocol}://${org.custom_host}`
         : ctx.config.misc.parallelUrl;
 
-      // TODO locales
-      // return `${prefix}/${template.recipient_locale}/pp/${publicLink.slug}?${new URLSearchParams({
-      //   pk: prefillData.keycode,
-      // })}`;
-      return `${prefix}/${template.locale}/pp/${publicLink.slug}?${new URLSearchParams({
+      return `${prefix}/${template.recipient_locale}/pp/${publicLink.slug}?${new URLSearchParams({
         pk: prefillData.keycode,
       })}`;
     },

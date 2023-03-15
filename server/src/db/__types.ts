@@ -871,7 +871,7 @@ export interface Petition {
   default_path: string; // text
   latest_signature_status: Maybe<string>; // varchar
   send_on_behalf_user_id: Maybe<number>; // int4
-  recipient_locale: Maybe<ContactLocale>; // contact_locale
+  recipient_locale: ContactLocale; // contact_locale
 }
 
 export type CreatePetition = PartialProps<
@@ -917,7 +917,6 @@ export type CreatePetition = PartialProps<
   | "default_path"
   | "latest_signature_status"
   | "send_on_behalf_user_id"
-  | "recipient_locale"
 >;
 
 export interface PetitionAccess {
@@ -1572,7 +1571,7 @@ export interface UserData {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
-  preferred_locale: Maybe<UserLocale>; // user_locale
+  preferred_locale: UserLocale; // user_locale
 }
 
 export type CreateUserData = PartialProps<
@@ -1588,7 +1587,6 @@ export type CreateUserData = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
-  | "preferred_locale"
 >;
 
 export interface UserDelegate {

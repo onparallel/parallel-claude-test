@@ -120,9 +120,7 @@ export class PetitionBinder implements IPetitionBinder {
                     fieldTitle: field.title,
                     theme: documentTheme.data,
                   },
-                  // TODO locales
-                  // petition?.recipient_locale ?? "en"
-                  petition?.locale ?? "en"
+                  petition?.recipient_locale ?? "en"
                 )
               );
 

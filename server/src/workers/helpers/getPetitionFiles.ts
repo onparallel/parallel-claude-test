@@ -2,6 +2,7 @@ import escapeStringRegexp from "escape-string-regexp";
 import { indexBy, isDefined, zip } from "remeda";
 import { PetitionExcelExport } from "../../api/helpers/PetitionExcelExport";
 import { WorkerContext } from "../../context";
+import { UserLocale } from "../../db/__types";
 import { ZipFileInput } from "../../util/createZipFile";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { isFileTypeField } from "../../util/isFileTypeField";
@@ -12,9 +13,7 @@ const placeholders = ["field-number", "field-title", "file-name"] as const;
 export async function* getPetitionFiles(
   petitionId: number,
   options: {
-    // TODO locales
-    // locale: UserLocale;
-    locale: string;
+    locale: UserLocale;
     pattern?: string;
     xlsxOnly?: boolean;
     onProgress?: (value: number) => Promise<void>;

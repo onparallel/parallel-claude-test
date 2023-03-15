@@ -97,9 +97,7 @@ export async function petitionReminder(
         showOptOutLink: remindersSent > 1,
         ...layoutProps,
       },
-      // TODO locales
-      // { locale: petition.recipient_locale }
-      { locale: petition.locale }
+      { locale: petition.recipient_locale }
     );
     const email = await context.emailLogs.createEmail({
       from: buildFrom(from, emailFrom),

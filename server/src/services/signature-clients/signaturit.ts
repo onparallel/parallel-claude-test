@@ -7,6 +7,7 @@ import { URLSearchParams } from "url";
 import { CONFIG, Config } from "../../config";
 import { OrganizationRepository } from "../../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../../db/repositories/PetitionRepository";
+import { ContactLocale } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
 import SignatureCancelledEmail from "../../emails/emails/SignatureCancelledEmail";
 import SignatureCompletedEmail from "../../emails/emails/SignatureCompletedEmail";
@@ -268,12 +269,7 @@ export class SignaturitClient implements ISignatureClient {
     });
   }
 
-  private async createSignaturitBranding(
-    orgId: number,
-    // TODO locales
-    //  locale: ContactLocale
-    locale: string
-  ) {
+  private async createSignaturitBranding(orgId: number, locale: ContactLocale) {
     return await this.withSignaturitSDK(async (sdk, context) => {
       const intl = await this.i18n.getIntl(locale);
 
@@ -298,9 +294,7 @@ export class SignaturitClient implements ISignatureClient {
   }
 
   private async buildSignaturItBrandingTemplates(
-    // TODO locales
-    // locale: ContactLocale,
-    locale: string,
+    locale: ContactLocale,
     templateData: OrganizationLayout
   ): Promise<BrandingParams["templates"]> {
     const [

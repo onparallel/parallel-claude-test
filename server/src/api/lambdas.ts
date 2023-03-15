@@ -1,5 +1,6 @@
 import { Handler, json, Router } from "express";
 import { Config } from "../config";
+import { UserLocale } from "../db/__types";
 import { buildEmail } from "../emails/buildEmail";
 import AccountVerification from "../emails/emails/AccountVerification";
 import ForgotPassword from "../emails/emails/ForgotPassword";
@@ -18,9 +19,7 @@ interface CustomMessageRequest {
   clientMetadata: {
     organizationName: string;
     organizationUser: string;
-    // TODO locales
-    // locale: UserLocale;
-    locale: string;
+    locale: UserLocale;
   };
 }
 

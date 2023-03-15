@@ -148,8 +148,7 @@ export const PetitionBase = interfaceType({
     t.field("locale", {
       type: "PetitionLocale",
       description: "The locale of the parallel.",
-      // TODO locales
-      // resolve: (o) => o.recipient_locale,
+      resolve: (o) => o.recipient_locale,
     });
     t.field("owner", {
       type: "User",
@@ -848,11 +847,9 @@ export const PetitionAccess = objectType({
         );
 
         if (hasFeatureFlag || root.contact_id === null) {
-          // TODO locales
-          // const { recipient_locale: locale } = (await ctx.petitions.loadPetition(
-          //   root.petition_id
-          // ))!;
-          const { locale } = (await ctx.petitions.loadPetition(root.petition_id))!;
+          const { recipient_locale: locale } = (await ctx.petitions.loadPetition(
+            root.petition_id
+          ))!;
           return `${ctx.config.misc.parallelUrl}/${locale}/petition/${root.keycode}`;
         }
 
@@ -1092,9 +1089,7 @@ export const PublicPetitionLink = objectType({
         const prefix = org.custom_host
           ? `${protocol}://${org.custom_host}`
           : ctx.config.misc.parallelUrl;
-        // TODO locales
-        // return `${prefix}/${template.recipient_locale}/pp/${root.slug}`;
-        return `${prefix}/${template.locale}/pp/${root.slug}`;
+        return `${prefix}/${template.recipient_locale}/pp/${root.slug}`;
       },
     });
     t.field("owner", {

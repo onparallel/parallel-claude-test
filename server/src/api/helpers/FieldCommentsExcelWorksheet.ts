@@ -2,7 +2,13 @@ import { IntlShape } from "@formatjs/intl";
 import Excel from "exceljs";
 import pMap from "p-map";
 import { ApiContext, WorkerContext } from "../../context";
-import { Contact, PetitionField, PetitionFieldComment, UserData } from "../../db/__types";
+import {
+  Contact,
+  PetitionField,
+  PetitionFieldComment,
+  UserData,
+  UserLocale,
+} from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { pFlatMap } from "../../util/promises/pFlatMap";
 import { toPlainText } from "../../util/slate";
@@ -27,11 +33,7 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
     super(worksheetName, wb);
   }
   private intl!: IntlShape;
-  public async init(
-    // TODO locales
-    // locale: UserLocale
-    locale: string
-  ) {
+  public async init(locale: UserLocale) {
     this.intl = await this.context.i18n.getIntl(locale);
 
     this.page.columns = [

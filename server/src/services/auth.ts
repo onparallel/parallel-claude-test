@@ -75,12 +75,7 @@ export interface IAuth {
   changePassword(req: IncomingMessage, password: string, newPassword: string): Promise<void>;
   updateSessionLogin(req: Request, userId: number, asUserId: number): Promise<void>;
   restoreSessionLogin(req: Request, userId: number): Promise<void>;
-  resetTempPassword(
-    email: string,
-    // TODO locales
-    // locale: UserLocale
-    locale: string
-  ): Promise<void>;
+  resetTempPassword(email: string, locale: UserLocale): Promise<void>;
   verifyCaptcha(captcha: string, ip: string): Promise<boolean>;
   getOrCreateCognitoUser(
     email: string,
@@ -90,9 +85,7 @@ export interface IAuth {
     clientMetadata: {
       organizationName: string;
       organizationUser: string;
-      // TODO locales
-      // locale: UserLocale;
-      locale: string;
+      locale: UserLocale;
     },
     sendInviteEmail?: boolean
   ): Promise<string>;
@@ -102,18 +95,14 @@ export interface IAuth {
     firstName: string,
     lastName: string,
     clientMetadata: {
-      // TODO locales
-      // locale: UserLocale
-      locale: string;
+      locale: UserLocale;
     }
   ): Promise<string>;
   deleteUser(email: string): Promise<void>;
   resendVerificationCode(
     email: string,
     clientMetadata: {
-      // TODO locales
-      //  locale: UserLocale
-      locale: string;
+      locale: UserLocale;
     }
   ): Promise<void>;
 
@@ -122,9 +111,7 @@ export interface IAuth {
     clientMetadata: {
       organizationName: string;
       organizationUser: string;
-      // TODO locales
-      // locale: UserLocale;
-      locale: string;
+      locale: UserLocale;
     }
   ): Promise<void>;
 }
@@ -170,9 +157,7 @@ export class Auth implements IAuth {
     clientMetadata: {
       organizationName: string;
       organizationUser: string;
-      // TODO locales
-      // locale: UserLocale;
-      locale: string;
+      locale: UserLocale;
     },
     sendInviteEmail?: boolean
   ) {
@@ -220,9 +205,7 @@ export class Auth implements IAuth {
     firstName: string,
     lastName: string,
     clientMetadata: {
-      // TODO locales
-      // locale: UserLocale;
-      locale: string;
+      locale: UserLocale;
     }
   ) {
     const res = await this.cognitoIdP.send(
@@ -254,9 +237,7 @@ export class Auth implements IAuth {
   async resendVerificationCode(
     email: string,
     clientMetadata: {
-      // TODO locales
-      // locale: UserLocale
-      locale: string;
+      locale: UserLocale;
     }
   ) {
     await this.cognitoIdP.send(
@@ -418,11 +399,8 @@ export class Auth implements IAuth {
         RefreshToken: tokens["refresh_token"],
       });
       this.setSession(res, token);
-      // TODO locales
-      // const prefix =
-      //   userData?.preferred_locale ?? state.has("locale") ? `/${state.get("locale")}` : "";
       const prefix =
-        userData?.details?.preferredLocale ?? state.has("locale") ? `/${state.get("locale")}` : "";
+        userData?.preferred_locale ?? state.has("locale") ? `/${state.get("locale")}` : "";
       const path =
         state.has("redirect") && state.get("redirect")!.startsWith("/")
           ? state.get("redirect")!
@@ -451,9 +429,7 @@ export class Auth implements IAuth {
         const userData = await this.users.loadUserData(user.user_data_id);
         await this.trackSessionLogin(user);
         this.setSession(res, token);
-        // TODO locales
-        // res.status(201).send({ preferredLocale: userData?.preferred_locale });
-        res.status(201).send({ preferredLocale: userData?.details?.preferredLocale });
+        res.status(201).send({ preferredLocale: userData?.preferred_locale });
       } else if (auth.ChallengeName === "NEW_PASSWORD_REQUIRED") {
         res.status(401).send({ error: "NewPasswordRequired" });
       } else {
@@ -867,9 +843,7 @@ export class Auth implements IAuth {
     const { email, code, locale } = req.query as {
       email: string;
       code: string;
-      // TODO locales
-      // locale: UserLocale;
-      locale: string;
+      locale: UserLocale;
     };
     try {
       const [user] = await req.context.users.loadUsersByEmail(email);
@@ -912,12 +886,7 @@ export class Auth implements IAuth {
     await this.redis.set(`session:${token}:meta`, JSON.stringify({ userId }), this.EXPIRY);
   }
 
-  async resetTempPassword(
-    email: string,
-    // TODO locales
-    //  locale: UserLocale
-    locale: string
-  ) {
+  async resetTempPassword(email: string, locale: UserLocale) {
     const [users, cognitoUser] = await Promise.all([
       this.users.loadUsersByEmail(email),
       this.getUser(email),
@@ -976,9 +945,7 @@ export class Auth implements IAuth {
     clientMetadata: {
       organizationName: string;
       organizationUser: string;
-      // TODO locales
-      // locale: UserLocale;
-      locale: string;
+      locale: UserLocale;
     }
   ): Promise<void> {
     await this.cognitoIdP.send(

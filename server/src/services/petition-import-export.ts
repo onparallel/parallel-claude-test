@@ -4,7 +4,13 @@ import pMap from "p-map";
 import { isDefined, omit } from "remeda";
 import { validateFieldOptions } from "../db/helpers/fieldOptions";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
-import { ContactLocale, PetitionFieldType, PetitionFieldTypeValues, User } from "../db/__types";
+import {
+  ContactLocale,
+  ContactLocaleValues,
+  PetitionFieldType,
+  PetitionFieldTypeValues,
+  User,
+} from "../db/__types";
 import { validateFieldVisibilityConditions } from "../graphql/helpers/validators/validFieldVisibility";
 import { validateRichTextContent } from "../graphql/helpers/validators/validRichTextContent";
 import { safeJsonParse } from "../util/safeJsonParse";
@@ -20,9 +26,7 @@ const PETITION_JSON_SCHEMA = {
     name: { type: ["string", "null"] },
     locale: {
       type: "string",
-      // TODO locales
-      // enum: ContactLocaleValues
-      enum: ["en", "es"],
+      enum: ContactLocaleValues,
     },
     isTemplate: { type: "boolean" },
     templateDescription: { type: ["array", "null"], items: { type: "object" } },
@@ -69,9 +73,7 @@ const PETITION_JSON_SCHEMA = {
 
 interface PetitionJson {
   name: Maybe<string>;
-  // TODO locales
-  // locale: ContactLocale;
-  locale: string;
+  locale: ContactLocale;
   isTemplate: boolean;
   templateDescription: Maybe<string>;
   fields: {
@@ -113,9 +115,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
     const customFieldIds: number[] = [];
     return {
       name: petition.name,
-      // TODO locales
-      // locale: petition.recipient_locale,
-      locale: petition.locale,
+      locale: petition.recipient_locale,
       isTemplate: petition.is_template,
       templateDescription: safeJsonParse(petition.template_description),
       fields: fields.map((field) => {

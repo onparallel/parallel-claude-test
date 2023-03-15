@@ -1250,9 +1250,7 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toBeUndefined();
       expect(data!.createPetition).toEqual({
         name: null, // name is not copied when making a petition from template
-        // TODO locales
-        // locale: publicTemplate.recipient_locale,
-        locale: publicTemplate.locale,
+        locale: publicTemplate.recipient_locale,
         owner: { id: toGlobalId("User", sessionUser.id) },
         status: "DRAFT",
         __typename: "Petition",
@@ -1628,9 +1626,7 @@ describe("GraphQL/Petitions", () => {
       expect(data!.clonePetitions).toEqual([
         {
           name: petition.name!.concat(" (copy)"),
-          // TODO locales
-          // locale: petition.recipient_locale,
-          locale: petition.locale,
+          locale: petition.recipient_locale,
           owner: { id: toGlobalId("User", sessionUser.id) },
           status: "DRAFT",
           __typename: "Petition",
@@ -1672,11 +1668,9 @@ describe("GraphQL/Petitions", () => {
       });
       expect(errors).toBeUndefined();
       expect(data!.clonePetitions[0]).toEqual({
-        // TODO locales
-        // name: publicTemplate.name?.concat(
-        //   publicTemplate.recipient_locale === "en" ? " (copy)" : " (copia)"
-        //   ),
-        name: publicTemplate.name?.concat(publicTemplate.locale === "en" ? " (copy)" : " (copia)"),
+        name: publicTemplate.name?.concat(
+          publicTemplate.recipient_locale === "en" ? " (copy)" : " (copia)"
+        ),
         isPublic: false,
         __typename: "PetitionTemplate",
       });

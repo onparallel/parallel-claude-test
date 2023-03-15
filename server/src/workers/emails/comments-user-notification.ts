@@ -46,9 +46,7 @@ export async function commentsUserNotification(
       fields,
       ...layoutProps,
     },
-    // TODO locales
-    // { locale: userData.preferred_locale }
-    { locale: userData.details?.preferredLocale ?? "en" }
+    { locale: userData.preferred_locale }
   );
   const email = await context.emailLogs.createEmail({
     from: buildFrom(from, emailFrom),

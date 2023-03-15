@@ -331,9 +331,7 @@ export const createOrganization = mutationField("createOrganization", {
       args.firstName,
       args.lastName,
       {
-        // TODO locales
-        // locale: args.locale,
-        locale: args.locale ?? "en",
+        locale: args.locale,
         organizationName: org.name,
         organizationUser: fullName(userData.first_name, userData.last_name),
       },

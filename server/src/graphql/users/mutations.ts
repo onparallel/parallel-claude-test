@@ -157,9 +157,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
       firstName,
       lastName,
       {
-        // TODO locales
-        // locale: (args.locale ?? "en") as UserLocale,
-        locale: args.locale ?? "en",
+        locale: (args.locale ?? "en") as UserLocale,
         organizationName: organization!.name,
         organizationUser: args.orgId ? "" : fullName(userData!.first_name, userData!.last_name),
       },
@@ -468,9 +466,7 @@ export const userSignUp = mutationField("userSignUp", {
     const email = args.email.trim().toLowerCase();
     const [error, cognitoId] = await withError(
       ctx.auth.signUpUser(email, args.password, args.firstName, args.lastName, {
-        // TODO locales
-        // locale: (args.locale ?? "en") as UserLocale,
-        locale: args.locale ?? "en",
+        locale: (args.locale ?? "en") as UserLocale,
       })
     );
     if (error) {
@@ -589,9 +585,7 @@ export const resendVerificationCode = mutationField("resendVerificationCode", {
           },
           `User:${user.id}`
         );
-        // TODO locales
-        // await ctx.auth.resendVerificationCode(email, { locale: (locale ?? "en") as UserLocale });
-        await ctx.auth.resendVerificationCode(email, { locale: locale ?? "en" });
+        await ctx.auth.resendVerificationCode(email, { locale: (locale ?? "en") as UserLocale });
       }
     } catch {}
     return RESULT.SUCCESS;
@@ -613,9 +607,7 @@ export const publicResetTemporaryPassword = mutationField("publicResetTemporaryP
   ),
   resolve: async (_, { email, locale }, ctx) => {
     try {
-      // TODO locales
-      // await ctx.auth.resetTempPassword(email, locale as UserLocale);
-      await ctx.auth.resetTempPassword(email, locale);
+      await ctx.auth.resetTempPassword(email, locale as UserLocale);
     } catch {}
 
     // always return SUCCESS to avoid leaking errors and user statuses
@@ -638,10 +630,7 @@ export const resetTemporaryPassword = mutationField("resetTemporaryPassword", {
     validLocale((args) => args.locale, "locale")
   ),
   resolve: async (_, { email, locale }, ctx) => {
-    // TODO locales
-    // await ctx.auth.resetTempPassword(email, locale as UserLocale);
-    await ctx.auth.resetTempPassword(email, locale);
-
+    await ctx.auth.resetTempPassword(email, locale as UserLocale);
     return RESULT.SUCCESS;
   },
 });
