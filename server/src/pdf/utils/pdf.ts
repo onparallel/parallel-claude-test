@@ -4,6 +4,8 @@ import { MaybePromise } from "../../util/types";
 
 export interface PdfDocumentGetPropsContext {
   client?: GraphQLClient;
+  // TODO locales
+  // locale: ContactLocale;
   locale: string;
 }
 

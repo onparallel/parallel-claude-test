@@ -15,7 +15,13 @@ interface CustomMessageRequest {
   };
   codeParameter: string;
   usernameParameter: string | null;
-  clientMetadata: { [key: string]: string };
+  clientMetadata: {
+    organizationName: string;
+    organizationUser: string;
+    // TODO locales
+    // locale: UserLocale;
+    locale: string;
+  };
 }
 
 function layoutProps(config: Config["misc"]) {
@@ -45,7 +51,7 @@ function customMessageAccountVerificationResponse(): Handler {
         userAttributes: { given_name: firstName, family_name: lastName, email },
         clientMetadata: { locale },
         codeParameter,
-      } = req.body;
+      } = req.body as CustomMessageRequest;
 
       const { subject, html } = await buildEmail(
         AccountVerification,

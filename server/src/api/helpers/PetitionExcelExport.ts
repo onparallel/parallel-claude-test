@@ -10,13 +10,14 @@ export class PetitionExcelExport {
   private wb: Excel.Workbook;
   private textRepliesTab!: TextRepliesExcelWorksheet;
   private fieldCommentsTab!: FieldCommentsExcelWorksheet;
-  private locale: string;
-  private context: ApiContext | WorkerContext;
 
-  constructor(locale: string, context: ApiContext | WorkerContext) {
+  constructor(
+    // TODO locales
+    // private locale: UserLocale,
+    private locale: string,
+    private context: ApiContext | WorkerContext
+  ) {
     this.wb = new Excel.Workbook();
-    this.locale = locale;
-    this.context = context;
   }
 
   public async init() {
@@ -27,22 +28,20 @@ export class PetitionExcelExport {
         id: "petition-excel-export.replies",
         defaultMessage: "Replies",
       }),
-      this.locale,
       this.wb,
       this.context
     );
-    await this.textRepliesTab.init();
+    await this.textRepliesTab.init(this.locale);
 
     this.fieldCommentsTab = new FieldCommentsExcelWorksheet(
       intl.formatMessage({
         id: "petition-excel-export.comments",
         defaultMessage: "Comments",
       }),
-      this.locale,
       this.wb,
       this.context
     );
-    await this.fieldCommentsTab.init();
+    await this.fieldCommentsTab.init(this.locale);
   }
 
   public addPetitionFieldReply(field: PetitionField, replies: PetitionFieldReply[]) {

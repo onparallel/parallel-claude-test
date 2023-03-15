@@ -55,6 +55,8 @@ export async function petitionMessageBounced(
       contactEmail: contact.email,
       ...layoutProps,
     },
+    // TODO locales
+    // { locale: senderData.preferred_locale }
     { locale: senderData.details?.preferredLocale ?? "en" }
   );
 

@@ -117,6 +117,8 @@ export const PublicPetition = objectType({
     t.field("locale", {
       type: "PetitionLocale",
       description: "The locale of the parallel.",
+      // TODO locales
+      // resolve: (o) => o.recipient_locale,
     });
     t.field("status", {
       type: "PetitionStatus",

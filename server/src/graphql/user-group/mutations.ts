@@ -135,6 +135,7 @@ export const cloneUserGroup = mutationField("cloneUserGroup", {
   type: list("UserGroup"),
   args: {
     userGroupIds: nonNull(list(nonNull(globalIdArg("UserGroup")))),
+    // TODO locales make nonNull UserLocale
     locale: stringArg(),
   },
   authorize: authenticateAnd(

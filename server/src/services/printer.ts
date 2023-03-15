@@ -16,6 +16,8 @@ export interface IPrinter {
   annexCoverPage(
     userId: number,
     props: AnnexCoverPageProps,
+    // TODO locales
+    // locale: ContactLocale
     locale: string
   ): Promise<NodeJS.ReadableStream>;
   imageToPdf(userId: number, props: ImageToPdfProps): Promise<NodeJS.ReadableStream>;
@@ -46,11 +48,19 @@ export class Printer implements IPrinter {
     return await buildPdf(
       PetitionExport,
       { ...data, petitionId: toGlobalId("Petition", petitionId) },
+      // TODO locales
+      // { client, locale: petition.recipient_locale }
       { client, locale: petition.locale }
     );
   }
 
-  public async annexCoverPage(userId: number, props: AnnexCoverPageProps, locale: string) {
+  public async annexCoverPage(
+    userId: number,
+    props: AnnexCoverPageProps,
+    // TODO locales
+    // locale: ContactLocale,
+    locale: string
+  ) {
     const client = await this.createClient(userId);
     return await buildPdf(AnnexCoverPage, props, { client, locale });
   }

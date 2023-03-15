@@ -1,3 +1,4 @@
+import { IntlShape } from "@formatjs/intl";
 import Excel from "exceljs";
 import pMap from "p-map";
 import { ApiContext, WorkerContext } from "../../context";
@@ -20,56 +21,58 @@ export type FieldCommentRow = {
 export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow> {
   constructor(
     worksheetName: string,
-    locale: string,
     wb: Excel.Workbook,
     private context: ApiContext | WorkerContext
   ) {
-    super(worksheetName, locale, wb);
-    this.locale = locale;
+    super(worksheetName, wb);
   }
-
-  public async init() {
-    const intl = await this.context.i18n.getIntl(this.locale);
+  private intl!: IntlShape;
+  public async init(
+    // TODO locales
+    // locale: UserLocale
+    locale: string
+  ) {
+    this.intl = await this.context.i18n.getIntl(locale);
 
     this.page.columns = [
       {
         key: "content",
-        header: intl.formatMessage({
+        header: this.intl.formatMessage({
           id: "field-comments-excel-worksheet.message",
           defaultMessage: "Message",
         }),
       },
       {
         key: "fieldName",
-        header: intl.formatMessage({
+        header: this.intl.formatMessage({
           id: "field-comments-excel-worksheet.field",
           defaultMessage: "Field",
         }),
       },
       {
         key: "authorFullName",
-        header: intl.formatMessage({
+        header: this.intl.formatMessage({
           id: "field-comments-excel-worksheet.full-name",
           defaultMessage: "Full name",
         }),
       },
       {
         key: "authorEmail",
-        header: intl.formatMessage({
+        header: this.intl.formatMessage({
           id: "field-comments-excel-worksheet.email",
           defaultMessage: "Email",
         }),
       },
       {
         key: "createdAt",
-        header: intl.formatMessage({
+        header: this.intl.formatMessage({
           id: "field-comments-excel-worksheet.message-sent-at",
           defaultMessage: "Message sent at",
         }),
       },
       {
         key: "isInternal",
-        header: intl.formatMessage({
+        header: this.intl.formatMessage({
           id: "field-comments-excel-worksheet.internal-comment",
           defaultMessage: "Internal comment?",
         }),
@@ -78,7 +81,6 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
   }
 
   public async addFieldComments(fields: PetitionField[]) {
-    const intl = await this.context.i18n.getIntl(this.locale);
     const comments = await pFlatMap(fields, async (field) => {
       const comments = await this.context.petitions.loadPetitionFieldCommentsForField({
         petitionFieldId: field.id,
@@ -98,8 +100,8 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
         createdAt: comment.created_at.toISOString(),
         fieldName: field.title,
         isInternal: comment.is_internal
-          ? intl.formatMessage({ id: "generic.yes", defaultMessage: "Yes" })
-          : intl.formatMessage({ id: "generic.no", defaultMessage: "No" }),
+          ? this.intl.formatMessage({ id: "generic.yes", defaultMessage: "Yes" })
+          : this.intl.formatMessage({ id: "generic.no", defaultMessage: "No" }),
       });
     }
   }

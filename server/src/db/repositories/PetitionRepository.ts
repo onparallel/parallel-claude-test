@@ -95,6 +95,7 @@ import {
 import { FileRepository } from "./FileRepository";
 import { OrganizationRepository } from "./OrganizationRepository";
 type PetitionType = "PETITION" | "TEMPLATE";
+// TODO locales remove
 type PetitionLocale = "en" | "es";
 
 type PetitionSharedWithFilter = {
@@ -124,6 +125,8 @@ interface PetitionTagFilter {
 interface PetitionFilter {
   path?: string | null;
   status?: PetitionStatus[] | null;
+  // TODO locales
+  // locale?: ContactLocale | null;
   locale?: PetitionLocale | null;
   signature?: PetitionSignatureStatusFilter[] | null;
   type?: PetitionType | null;
@@ -477,6 +480,8 @@ export class PetitionRepository extends BaseRepository {
       });
     }
     if (filters?.locale) {
+      // TODO locales
+      // builders.push((q) => q.where("recipient_locale", filters.locale));
       builders.push((q) => q.where("locale", filters.locale));
     }
     if (filters?.status && type === "PETITION") {
@@ -4550,6 +4555,8 @@ export class PetitionRepository extends BaseRepository {
   getPaginatedPublicTemplates(
     opts: {
       search?: string | null;
+      // TODO locales
+      // locale?: ContactLocale | null;
       locale?: PetitionLocale | null;
       categories?: string[] | null;
     } & PageOpts
@@ -4563,6 +4570,8 @@ export class PetitionRepository extends BaseRepository {
         .mmodify((q) => {
           const { search, locale, categories } = opts;
           if (locale) {
+            // TODO locales
+            // q.where("recipient_locale", locale);
             q.where("locale", locale);
           }
           if (search) {

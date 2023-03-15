@@ -184,9 +184,12 @@ export const User = objectType({
         return isDefined(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
       },
     });
+    // TODO locales make nonNull UserLocale
     t.nullable.string("preferredLocale", {
       resolve: async (o, _, ctx) => {
         const userData = await ctx.users.loadUserData(o.user_data_id);
+        // TODO locales
+        // return userData!.preferred_locale;
         return userData!.details?.preferredLocale ?? null;
       },
     });

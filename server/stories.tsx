@@ -62,6 +62,14 @@ app
         }
       }
       const document = req.params.document;
+      // TODO locales
+      // if (
+      //   typeof req.query.locale !== "string" ||
+      //   !ContactLocaleValues.includes(req.query.locale as any)
+      // ) {
+      //   throw new Error(`Unknown ContactLocale ${req.query.locale}`);
+      // }
+      // const locale = req.query.locale as ContactLocale;
       const locale = req.query.locale as string;
       const client = new GraphQLClient("http://localhost/graphql", {
         headers: { authorization: `Bearer ${process.env.ACCESS_TOKEN}` },
@@ -98,6 +106,14 @@ app.get("/emails/:email", async (req, res, next) => {
       }
     }
     const name = req.params.email;
+    // TODO locales
+    // if (
+    //   typeof req.query.locale !== "string" ||
+    //   !ContactLocaleValues.includes(req.query.locale as any)
+    // ) {
+    //   throw new Error(`Unknown ContactLocale ${req.query.locale}`);
+    // }
+    // const locale = req.query.locale as ContactLocale;
     const locale = req.query.locale as string;
     const type = req.query.type as string;
     const { default: email } = await import(`./src/emails/emails/${name}.tsx`);

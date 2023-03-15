@@ -64,6 +64,8 @@ export async function publicPetitionLinkAccess(
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       ...layoutProps,
     },
+    // TODO locales
+    // { locale: petition.recipient_locale }
     { locale: petition.locale }
   );
   const email = await context.emailLogs.createEmail({

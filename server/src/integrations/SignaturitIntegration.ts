@@ -9,7 +9,9 @@ import {
 import { Tone } from "../emails/utils/types";
 import { GenericIntegration } from "./GenericIntegration";
 
-export type BrandingIdKey = `${"EN" | "ES"}_${Tone}_BRANDING_ID`;
+// TODO locales
+// export type SignaturitBrandingIdKey = `${Uppercase<ContactLocale>}_${Tone}_BRANDING_ID`;
+export type SignaturitBrandingIdKey = `${Uppercase<"es" | "en">}_${Tone}_BRANDING_ID`;
 
 export type SignaturitEnvironment = IntegrationSettings<"SIGNATURE", "SIGNATURIT">["ENVIRONMENT"];
 
@@ -18,12 +20,14 @@ export interface SignaturitIntegrationContext {
   apiKeyHint: string;
   showCsv: boolean;
   brandings: {
+    // TODO locales
+    // locale: ContactLocale;
     locale: string;
     tone: Tone;
     brandingId: string;
   }[];
   environment: SignaturitEnvironment;
-  onUpdateBrandingId(key: BrandingIdKey, id: string): Promise<void>;
+  onUpdateBrandingId(key: SignaturitBrandingIdKey, id: string): Promise<void>;
 }
 
 @injectable()
@@ -55,16 +59,19 @@ export class SignaturitIntegration extends GenericIntegration<
     integration: EnhancedOrgIntegration<"SIGNATURE", "SIGNATURIT", false>
   ): SignaturitIntegrationContext {
     const settings = integration.settings;
-    const brandings = (["en", "es"] as const)
-      .flatMap((locale) =>
-        (["FORMAL", "INFORMAL"] as const).map((tone) => {
-          const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as const;
-          if (key in settings) {
-            return { locale, tone, brandingId: (settings as any)[key] };
-          }
-        })
-      )
-      .filter(isDefined);
+    const brandings =
+      // TODO locales
+      // ContactLocaleValues
+      (["en", "es"] as const)
+        .flatMap((locale) =>
+          (["FORMAL", "INFORMAL"] as Tone[]).map((tone) => {
+            const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as SignaturitBrandingIdKey;
+            if (key in settings) {
+              return { locale, tone, brandingId: settings[key]! };
+            }
+          })
+        )
+        .filter(isDefined);
     const apiKey = settings.CREDENTIALS.API_KEY;
     return {
       apiKeyHint: apiKey.slice(0, 10),

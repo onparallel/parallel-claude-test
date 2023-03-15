@@ -14,17 +14,19 @@ export type TextReplyRow = {
 export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
   constructor(
     worksheetName: string,
-    locale: string,
     wb: Excel.Workbook,
     private context: ApiContext | WorkerContext
   ) {
-    super(worksheetName, locale, wb);
-    this.locale = locale;
+    super(worksheetName, wb);
   }
 
   private intl!: IntlShape;
-  public async init() {
-    this.intl = await this.context.i18n.getIntl(this.locale);
+  public async init(
+    // TODO locales
+    // locale: UserLocale
+    locale: string
+  ) {
+    this.intl = await this.context.i18n.getIntl(locale);
 
     this.page.columns = [
       {

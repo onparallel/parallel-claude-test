@@ -63,6 +63,8 @@ export async function petitionShared(
         isTemplate: _petitions[0]!.is_template,
         ...layoutProps,
       },
+      // TODO locales
+      // { locale: permissionUserData.preferred_locale }
       { locale: permissionUserData.details?.preferredLocale ?? "en" }
     );
     const email = await context.emailLogs.createEmail({

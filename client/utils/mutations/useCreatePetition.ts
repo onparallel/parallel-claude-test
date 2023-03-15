@@ -28,7 +28,6 @@ export function useCreatePetition() {
 
   return useCallback(async function ({
     name = null,
-    locale = router.locale as PetitionLocale,
     petitionId = null,
     type = null,
     path = null,

@@ -52,6 +52,7 @@ export const resetUserPassword = mutationField("resetUserPassword", {
   type: "SupportMethodResponse",
   args: {
     email: nonNull(stringArg()),
+    // TODO locales make UserLocale
     locale: nonNull("PetitionLocale"),
   },
   authorize: supportMethodAccess(),

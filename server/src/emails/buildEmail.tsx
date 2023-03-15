@@ -4,6 +4,8 @@ import { createIntl, IntlConfig, IntlProvider, IntlShape } from "react-intl";
 import { loadMessages } from "../util/loadMessages";
 
 export interface EmailOptions {
+  // TODO locales
+  // locale: ContactLocale | UserLocale;
   locale: string;
 }
 

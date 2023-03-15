@@ -37,7 +37,8 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         endDate
       ),
     ]);
-
+    // TODO locales
+    // const intl = await this.ctx.i18n.getIntl(template!.recipient_locale);
     const intl = await this.ctx.i18n.getIntl(template!.locale);
 
     const [

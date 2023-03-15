@@ -137,7 +137,12 @@ scim
               email: email.toLowerCase(),
               first_name: givenName,
               last_name: familyName,
-              details: { source: "SCIM" },
+              details: {
+                source: "SCIM",
+                // TODO locales @deprecated
+                preferredLocale: "en",
+              },
+              preferred_locale: "en",
             },
             `Provisioning:${req.context.organization!.id}`
           );

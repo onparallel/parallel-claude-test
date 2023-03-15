@@ -6,6 +6,8 @@ export const I18N_SERVICE = Symbol.for("I18N_SERVICE");
 
 export interface II18nService {
   getIntl(
+    // TODO locales
+    // locale: ContactLocale | UserLocale,
     locale: string,
     options?: Omit<IntlConfig, "locale" | "messages" | "onWarn">
   ): Promise<IntlShape>;
@@ -14,6 +16,8 @@ export interface II18nService {
 @injectable()
 export class I18nService implements II18nService {
   async getIntl(
+    // TODO locales
+    // locale: ContactLocale | UserLocale,
     locale: string,
     options?: Omit<IntlConfig, "locale" | "messages" | "onWarn">
   ): Promise<IntlShape> {

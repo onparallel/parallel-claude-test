@@ -14,7 +14,7 @@ import SignatureReminderEmail from "../../emails/emails/SignatureReminderEmail";
 import SignatureRequestedEmail from "../../emails/emails/SignatureRequestedEmail";
 import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
 import {
-  BrandingIdKey,
+  SignaturitBrandingIdKey,
   SignaturitIntegration,
   SignaturitIntegrationContext,
 } from "../../integrations/SignaturitIntegration";
@@ -117,7 +117,7 @@ export class SignaturitClient implements ISignatureClient {
         let brandingId = branding?.brandingId;
         if (!brandingId) {
           brandingId = await this.createSignaturitBranding(orgId, locale);
-          const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as BrandingIdKey;
+          const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as SignaturitBrandingIdKey;
           await context.onUpdateBrandingId(key, brandingId);
         }
 
@@ -268,7 +268,12 @@ export class SignaturitClient implements ISignatureClient {
     });
   }
 
-  private async createSignaturitBranding(orgId: number, locale: string) {
+  private async createSignaturitBranding(
+    orgId: number,
+    // TODO locales
+    //  locale: ContactLocale
+    locale: string
+  ) {
     return await this.withSignaturitSDK(async (sdk, context) => {
       const intl = await this.i18n.getIntl(locale);
 
@@ -293,6 +298,8 @@ export class SignaturitClient implements ISignatureClient {
   }
 
   private async buildSignaturItBrandingTemplates(
+    // TODO locales
+    // locale: ContactLocale,
     locale: string,
     templateData: OrganizationLayout
   ): Promise<BrandingParams["templates"]> {

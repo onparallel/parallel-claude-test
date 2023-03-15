@@ -12,6 +12,8 @@ const placeholders = ["field-number", "field-title", "file-name"] as const;
 export async function* getPetitionFiles(
   petitionId: number,
   options: {
+    // TODO locales
+    // locale: UserLocale;
     locale: string;
     pattern?: string;
     xlsxOnly?: boolean;

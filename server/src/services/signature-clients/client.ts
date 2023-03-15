@@ -17,6 +17,8 @@ interface Document {
 }
 
 export interface SignatureOptions {
+  // TODO locales
+  // locale: ContactLocale;
   locale: string;
   /**
    * Optional plain-text custom message to include in the "signature requested" emails

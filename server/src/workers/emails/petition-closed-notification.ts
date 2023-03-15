@@ -67,6 +67,8 @@ export async function petitionClosedNotification(
         bodyPlainText: toPlainText(payload.message, renderContext),
         ...layoutProps,
       },
+      // TODO locales
+      // { locale: petition.recipient_locale }
       { locale: petition.locale }
     );
     const email = await context.emailLogs.createEmail({

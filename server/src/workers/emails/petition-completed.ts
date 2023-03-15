@@ -82,6 +82,8 @@ export async function petitionCompleted(
         contactEmail: contact.email!,
         ...layoutProps,
       },
+      // TODO locales
+      // { locale: userData.preferred_locale }
       { locale: userData.details?.preferredLocale ?? "en" }
     );
     emails.push(

@@ -9,6 +9,10 @@ type Maybe<T> = T | null;
 
 type PartialProps<T, K extends keyof T = never> = Omit<T, K> & Partial<Pick<T, K>>;
 
+export type ContactLocale = "en" | "es";
+
+export const ContactLocaleValues = ["en", "es"] as ContactLocale[];
+
 export type FeatureFlagName =
   | "PETITION_SIGNATURE"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
@@ -345,6 +349,10 @@ export const TaskNameValues = [
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";
 
 export const TaskStatusValues = ["ENQUEUED", "PROCESSING", "COMPLETED", "FAILED"] as TaskStatus[];
+
+export type UserLocale = "en" | "es";
+
+export const UserLocaleValues = ["en", "es"] as UserLocale[];
 
 export type UserOrganizationRole = "COLLABORATOR" | "NORMAL" | "ADMIN" | "OWNER";
 
@@ -819,6 +827,9 @@ export interface Petition {
   org_id: number; // int4
   name: Maybe<string>; // varchar
   custom_ref: Maybe<string>; // varchar
+  /**
+   * @deprecated
+   */
   locale: string; // varchar
   is_template: boolean; // bool
   status: Maybe<PetitionStatus>; // petition_status
@@ -860,6 +871,7 @@ export interface Petition {
   default_path: string; // text
   latest_signature_status: Maybe<string>; // varchar
   send_on_behalf_user_id: Maybe<number>; // int4
+  recipient_locale: Maybe<ContactLocale>; // contact_locale
 }
 
 export type CreatePetition = PartialProps<
@@ -905,6 +917,7 @@ export type CreatePetition = PartialProps<
   | "default_path"
   | "latest_signature_status"
   | "send_on_behalf_user_id"
+  | "recipient_locale"
 >;
 
 export interface PetitionAccess {
@@ -1549,6 +1562,9 @@ export interface UserData {
   last_name: Maybe<string>; // varchar
   is_sso_user: boolean; // bool
   avatar_public_file_id: Maybe<number>; // int4
+  /**
+   * @deprecated details->preferredLocale
+   */
   details: Maybe<any>; // jsonb
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
@@ -1556,6 +1572,7 @@ export interface UserData {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  preferred_locale: Maybe<UserLocale>; // user_locale
 }
 
 export type CreateUserData = PartialProps<
@@ -1571,6 +1588,7 @@ export type CreateUserData = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
+  | "preferred_locale"
 >;
 
 export interface UserDelegate {

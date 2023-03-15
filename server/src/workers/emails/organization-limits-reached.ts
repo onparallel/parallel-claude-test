@@ -37,6 +37,8 @@ export async function organizationLimitsReached(
         used: usageLimit.used,
         ...layoutProps,
       },
+      // TODO locales
+      // { locale: userData.preferred_locale }
       { locale: userData.details?.preferredLocale ?? "en" }
     );
 

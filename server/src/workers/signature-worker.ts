@@ -57,6 +57,8 @@ async function startSignatureProcess(
       email: signer.email,
     }));
 
+    // TODO locales
+    // const outputFileName = title || (await getDefaultFileName(petition.id, petition.recipient_locale, ctx));
     const outputFileName = title || (await getDefaultFileName(petition.id, petition.locale, ctx));
 
     documentTmpPath = await ctx.petitionBinder.createBinder(owner!.id, {
@@ -105,6 +107,8 @@ async function startSignatureProcess(
       documentTmpPath,
       recipients,
       {
+        // TODO locales
+        // locale: petition.recipient_locale,
         locale: petition.locale,
         initialMessage: message,
       }
@@ -275,12 +279,15 @@ async function storeSignedDocument(
     const integration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
 
     const client = ctx.signature.getClient(integration);
-
+    // TODO locales
+    // const intl = await ctx.i18n.getIntl(petition.recipient_locale);
     const intl = await ctx.i18n.getIntl(petition.locale);
 
     const signedDocument = await storeDocument(
       await client.downloadSignedDocument(payload.signedDocumentExternalId),
       sanitizeFilenameWithSuffix(
+        // TODO locales
+        // title || (await getDefaultFileName(petition.id, petition.recipient_locale, ctx)),
         title || (await getDefaultFileName(petition.id, petition.locale, ctx)),
         `_${intl.formatMessage({
           id: "signature-worker.signed",
@@ -347,6 +354,8 @@ async function storeAuditTrail(
     const auditTrail = await storeDocument(
       await client.downloadAuditTrail(payload.signedDocumentExternalId),
       sanitizeFilenameWithSuffix(
+        // TODO locales
+        // title || (await getDefaultFileName(petition.id, petition.recipient_locale, ctx)),
         title || (await getDefaultFileName(petition.id, petition.locale, ctx)),
         "_audit_trail.pdf"
       ),
@@ -522,7 +531,13 @@ async function storeTemporaryDocument(
   );
 }
 
-async function getDefaultFileName(petitionId: number, locale: string, ctx: WorkerContext) {
+async function getDefaultFileName(
+  petitionId: number,
+  // TODO locales
+  // locale: ContactLocale,
+  locale: string,
+  ctx: WorkerContext
+) {
   return (
     (await ctx.petitions.getFirstDefinedTitleFromHeadings(petitionId)) ||
     (await ctx.i18n.getIntl(locale)).formatMessage({

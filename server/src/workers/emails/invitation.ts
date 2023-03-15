@@ -9,6 +9,8 @@ export async function invitation(
     user_cognito_id: string;
     org_name: string;
     org_user: string;
+    // TODO locales
+    // locale: UserLocale;
     locale: string;
     is_new_user: boolean;
   },
