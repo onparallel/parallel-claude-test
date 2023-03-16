@@ -827,10 +827,6 @@ export interface Petition {
   org_id: number; // int4
   name: Maybe<string>; // varchar
   custom_ref: Maybe<string>; // varchar
-  /**
-   * @deprecated
-   */
-  locale: Maybe<string>; // varchar
   is_template: boolean; // bool
   status: Maybe<PetitionStatus>; // petition_status
   deadline: Maybe<Date>; // timestamptz
@@ -878,7 +874,6 @@ export type CreatePetition = PartialProps<
   Omit<Petition, "id">,
   | "name"
   | "custom_ref"
-  | "locale"
   | "is_template"
   | "status"
   | "deadline"
@@ -1554,9 +1549,6 @@ export interface UserData {
   last_name: Maybe<string>; // varchar
   is_sso_user: boolean; // bool
   avatar_public_file_id: Maybe<number>; // int4
-  /**
-   * @deprecated details->preferredLocale
-   */
   details: Maybe<any>; // jsonb
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
