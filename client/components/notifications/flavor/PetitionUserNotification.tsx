@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Circle, Flex, LinkOverlay, Stack, Text } from "@chakra-ui/react";
+import { Box, Circle, Flex, LinkOverlay, Stack, Text } from "@chakra-ui/react";
 import { EmailIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -70,7 +70,7 @@ export const PetitionUserNotification = Object.assign(
         paddingY={2}
         _hover={{
           background: "gray.75",
-          ".mark-as": { display: "flex" },
+          ".mark-as": { display: "block" },
         }}
         borderBottom="1px solid"
         borderColor="gray.200"
@@ -134,27 +134,24 @@ export const PetitionUserNotification = Object.assign(
             useRelativeTime
           />
         </Stack>
-        <IconButtonWithTooltip
-          display="none"
-          className="mark-as"
-          position="absolute"
-          right={4}
-          top={2}
-          tabIndex={-1}
-          label={markAsReadText}
-          icon={isRead ? <EmailIcon /> : <EmailOpenedIcon />}
-          fontSize="16px"
-          onClick={(e) => {
-            e.preventDefault();
-            handleMarkAsReadUnread();
-          }}
-          size="sm"
-          background="white"
-          boxShadow="md"
-          _hover={{
-            boxShadow: "lg",
-          }}
-        />
+        <Box display="none" className="mark-as" position="absolute" right={4} top={2}>
+          <IconButtonWithTooltip
+            tabIndex={-1}
+            label={markAsReadText}
+            icon={isRead ? <EmailIcon /> : <EmailOpenedIcon />}
+            fontSize="16px"
+            onClick={(e) => {
+              e.preventDefault();
+              handleMarkAsReadUnread();
+            }}
+            size="sm"
+            background="white"
+            boxShadow="md"
+            _hover={{
+              boxShadow: "lg",
+            }}
+          />
+        </Box>
       </Stack>
     );
   }),
