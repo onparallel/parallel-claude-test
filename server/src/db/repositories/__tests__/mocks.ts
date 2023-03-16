@@ -257,8 +257,6 @@ export class Mocks {
             is_template: false,
             status: builder?.(index).is_template ? null : randomPetitionStatus(),
             name: faker.random.words(),
-            // TODO locales @deprecated
-            locale,
             recipient_locale: locale,
             document_organization_theme_id: theme.id,
             ...builder?.(index),
@@ -303,8 +301,6 @@ export class Mocks {
             is_template: true,
             status: null,
             name: faker.random.words(),
-            // TODO locales @deprecated
-            locale,
             recipient_locale: locale,
             document_organization_theme_id: theme.id,
             ...builder?.(index),

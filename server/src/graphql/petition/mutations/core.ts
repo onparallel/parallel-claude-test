@@ -209,8 +209,6 @@ export const createPetition = mutationField("createPetition", {
       petition = await ctx.petitions.createPetition(
         {
           name,
-          // TODO locales @deprecated
-          locale: locale!,
           recipient_locale: locale!,
           email_subject: name,
           is_template: isTemplate,
@@ -761,8 +759,6 @@ export const updatePetition = mutationField("updatePetition", {
       data.name = name?.trim() || null;
     }
     if (isDefined(locale)) {
-      // TODO locales @deprecated
-      data.locale = locale;
       data.recipient_locale = locale;
     }
     if (deadline !== undefined) {

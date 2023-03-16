@@ -139,8 +139,6 @@ scim
               last_name: familyName,
               details: {
                 source: "SCIM",
-                // TODO locales @deprecated
-                preferredLocale: "en",
               },
               preferred_locale: "en",
             },

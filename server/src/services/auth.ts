@@ -358,8 +358,6 @@ export class Auth implements IAuth {
             is_sso_user: true,
             details: {
               source: "SSO",
-              // TODO locales @deprecated
-              preferredLocale,
             },
             preferred_locale: preferredLocale,
           },

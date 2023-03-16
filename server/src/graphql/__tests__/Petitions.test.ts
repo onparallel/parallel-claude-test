@@ -51,8 +51,6 @@ function petitionsBuilder(orgId: number, signatureIntegrationId: number) {
     org_id: orgId,
     created_at: new Date(),
     created_by: "User:1",
-    // TODO locales @deprecated
-    locale: "en",
     recipient_locale: "en",
     name: index > 5 ? `Template ${index}` : `Petition ${index}`,
     template_description: index > 5 ? `Template description ${index}` : null,
@@ -180,8 +178,6 @@ describe("GraphQL/Petitions", () => {
 
     // a public template from secondary organization
     [publicTemplate] = await mocks.createRandomPetitions(otherOrg.id, otherUser.id, 1, () => ({
-      // TODO locales @deprecated
-      locale: "en",
       recipient_locale: "en",
       template_public: true,
       is_template: true,

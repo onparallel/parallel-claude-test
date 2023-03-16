@@ -1493,8 +1493,6 @@ describe("GraphQL/PublicPetitionLink", () => {
 
       const [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
         is_template: true,
-        // TODO locales @deprecated
-        locale: "es",
         recipient_locale: "es",
       }));
       publicLink = await mocks.createRandomPublicPetitionLink(template.id);

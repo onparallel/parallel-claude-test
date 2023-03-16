@@ -182,8 +182,6 @@ export class PetitionImportExportService implements IPetitionImportExportService
       const petition = await this.petitions.createPetition(
         {
           name: json.name,
-          // TODO locales @deprecated
-          locale: json.locale,
           recipient_locale: json.locale as ContactLocale,
           is_template: json.isTemplate,
           template_description: isDefined(json.templateDescription)

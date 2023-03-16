@@ -830,7 +830,7 @@ export interface Petition {
   /**
    * @deprecated
    */
-  locale: string; // varchar
+  locale: Maybe<string>; // varchar
   is_template: boolean; // bool
   status: Maybe<PetitionStatus>; // petition_status
   deadline: Maybe<Date>; // timestamptz
@@ -878,6 +878,7 @@ export type CreatePetition = PartialProps<
   Omit<Petition, "id">,
   | "name"
   | "custom_ref"
+  | "locale"
   | "is_template"
   | "status"
   | "deadline"

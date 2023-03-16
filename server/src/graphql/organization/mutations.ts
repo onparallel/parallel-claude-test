@@ -350,8 +350,6 @@ export const createOrganization = mutationField("createOrganization", {
         last_name: args.lastName,
         details: {
           source: "parallel",
-          // TODO locales @deprecated
-          preferredLocale: args.locale ?? "en",
         },
         preferred_locale: args.locale,
       },

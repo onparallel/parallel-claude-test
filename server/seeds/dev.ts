@@ -242,8 +242,6 @@ export async function seed(knex: Knex): Promise<any> {
             org_id: orgId,
             name: "Empty template",
             custom_ref: null,
-            // TODO locales @deprecated
-            locale: "en",
             recipient_locale: "en",
             is_template: true,
             status: null,
@@ -267,8 +265,6 @@ export async function seed(knex: Knex): Promise<any> {
             org_id: orgId,
             name: "Tu primer envío con Parallel",
             custom_ref: null,
-            // TODO locales @deprecated
-            locale: "es",
             recipient_locale: "es",
             is_template: true,
             status: null,

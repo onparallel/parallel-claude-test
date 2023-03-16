@@ -176,8 +176,6 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
           last_name: lastName,
           details: {
             source: "org-invitation",
-            // TODO locales @deprecated
-            preferredLocale: args.locale ?? "en",
           },
           preferred_locale: (args.locale ?? "en") as UserLocale,
         },
@@ -523,8 +521,6 @@ export const userSignUp = mutationField("userSignUp", {
           industry: args.industry,
           role: args.role,
           position: args.position,
-          // TODO locales @deprecated
-          preferredLocale: args.locale ?? "en",
         },
         preferred_locale: (args.locale ?? "en") as UserLocale,
       },
@@ -652,8 +648,6 @@ export const setUserPreferredLocale = mutationField("setUserPreferredLocale", {
       {
         details: {
           ...(userData.details ?? {}),
-          // TODO locales @deprecated
-          preferredLocale: locale,
         },
         preferred_locale: locale as UserLocale,
       },
