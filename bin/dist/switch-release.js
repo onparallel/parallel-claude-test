@@ -9,6 +9,7 @@ const client_elastic_load_balancing_1 = require("@aws-sdk/client-elastic-load-ba
 const credential_providers_1 = require("@aws-sdk/credential-providers");
 const chalk_1 = __importDefault(require("chalk"));
 const child_process_1 = require("child_process");
+const remeda_1 = require("remeda");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 const wait_1 = require("./utils/wait");
@@ -33,6 +34,9 @@ async function main() {
     }).argv;
     const commit = _commit.slice(0, 7);
     const buildId = `parallel-${env}-${commit}`;
+    const oldInstances = await elb
+        .send(new client_elastic_load_balancing_1.DescribeLoadBalancersCommand({ LoadBalancerNames: [`parallel-${env}`] }))
+        .then((r) => r.LoadBalancerDescriptions[0].Instances);
     const newInstances = await ec2
         .send(new client_ec2_1.DescribeInstancesCommand({
         Filters: [
@@ -45,9 +49,25 @@ async function main() {
     if (newInstances.length === 0) {
         throw new Error(`No running instances for environment ${env} and release ${commit}.`);
     }
-    const oldInstances = await elb
-        .send(new client_elastic_load_balancing_1.DescribeLoadBalancersCommand({ LoadBalancerNames: [`parallel-${env}`] }))
-        .then((r) => r.LoadBalancerDescriptions[0].Instances);
+    // if (env === "production") {
+    const addresses = await ec2
+        .send(new client_ec2_1.DescribeAddressesCommand({
+        Filters: [{ Name: "tag:Environment", Values: [env] }],
+    }))
+        .then((r) => r.Addresses);
+    const availableAddresses = addresses.filter((a) => !oldInstances.some((i) => a.InstanceId === i.InstanceId));
+    if (availableAddresses.length < newInstances.length) {
+        throw new Error("Not enough available elastic IPs");
+    }
+    for (const [instance, address] of (0, remeda_1.zip)(newInstances, availableAddresses)) {
+        const addressName = address.Tags.find((t) => t.Key === "Name").Value;
+        console.log(`Associating address ${addressName} with instance ${instance.InstanceId}`);
+        await ec2.send(new client_ec2_1.AssociateAddressCommand({
+            InstanceId: instance.InstanceId,
+            AllocationId: address.AllocationId,
+        }));
+    }
+    // }
     const oldInstancesFull = oldInstances.length
         ? await ec2
             .send(new client_ec2_1.DescribeInstancesCommand({

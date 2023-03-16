@@ -4,7 +4,12 @@ import {
   ListDistributionsCommand,
   CloudFrontServiceException,
 } from "@aws-sdk/client-cloudfront";
-import { DescribeInstancesCommand, EC2Client } from "@aws-sdk/client-ec2";
+import {
+  AssociateAddressCommand,
+  DescribeAddressesCommand,
+  DescribeInstancesCommand,
+  EC2Client,
+} from "@aws-sdk/client-ec2";
 import {
   DeregisterInstancesFromLoadBalancerCommand,
   DescribeInstanceHealthCommand,
@@ -15,6 +20,7 @@ import {
 import { fromIni } from "@aws-sdk/credential-providers";
 import chalk from "chalk";
 import { execSync } from "child_process";
+import { isDefined, zip } from "remeda";
 import yargs from "yargs";
 import { run } from "./utils/run";
 import { waitFor } from "./utils/wait";
@@ -43,6 +49,10 @@ async function main() {
   const commit = _commit.slice(0, 7);
   const buildId = `parallel-${env}-${commit}`;
 
+  const oldInstances = await elb
+    .send(new DescribeLoadBalancersCommand({ LoadBalancerNames: [`parallel-${env}`] }))
+    .then((r) => r.LoadBalancerDescriptions![0].Instances!);
+
   const newInstances = await ec2
     .send(
       new DescribeInstancesCommand({
@@ -61,9 +71,34 @@ async function main() {
     throw new Error(`No running instances for environment ${env} and release ${commit}.`);
   }
 
-  const oldInstances = await elb
-    .send(new DescribeLoadBalancersCommand({ LoadBalancerNames: [`parallel-${env}`] }))
-    .then((r) => r.LoadBalancerDescriptions![0].Instances!);
+  if (env === "production") {
+    const addresses = await ec2
+      .send(
+        new DescribeAddressesCommand({
+          Filters: [{ Name: "tag:Environment", Values: [env] }],
+        })
+      )
+      .then((r) => r.Addresses!);
+
+    const availableAddresses = addresses.filter(
+      (a) => !oldInstances.some((i) => a.InstanceId === i.InstanceId)
+    );
+
+    if (availableAddresses.length < newInstances.length) {
+      throw new Error("Not enough available elastic IPs");
+    }
+
+    for (const [instance, address] of zip(newInstances, availableAddresses)) {
+      const addressName = address.Tags!.find((t) => t.Key === "Name")!.Value!;
+      console.log(`Associating address ${addressName} with instance ${instance.InstanceId}`);
+      await ec2.send(
+        new AssociateAddressCommand({
+          InstanceId: instance.InstanceId,
+          AllocationId: address.AllocationId,
+        })
+      );
+    }
+  }
 
   const oldInstancesFull = oldInstances.length
     ? await ec2
