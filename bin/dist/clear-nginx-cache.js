@@ -2,13 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_ec2_1 = require("@aws-sdk/client-ec2");
 const client_elastic_load_balancing_1 = require("@aws-sdk/client-elastic-load-balancing");
-const credential_providers_1 = require("@aws-sdk/credential-providers");
 const child_process_1 = require("child_process");
 const run_1 = require("./utils/run");
-const ec2 = new client_ec2_1.EC2Client({ credentials: (0, credential_providers_1.fromIni)({ profile: "parallel-deploy" }) });
-const elb = new client_elastic_load_balancing_1.ElasticLoadBalancingClient({
-    credentials: (0, credential_providers_1.fromIni)({ profile: "parallel-deploy" }),
-});
+const ec2 = new client_ec2_1.EC2Client({});
+const elb = new client_elastic_load_balancing_1.ElasticLoadBalancingClient({});
 async function main() {
     const instances = await ec2
         .send(new client_ec2_1.DescribeInstancesCommand({

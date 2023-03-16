@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_ec2_1 = require("@aws-sdk/client-ec2");
-const credential_providers_1 = require("@aws-sdk/credential-providers"); // ES6 import
+const credential_providers_1 = require("@aws-sdk/credential-providers");
 const assert_1 = __importDefault(require("assert"));
 const chalk_1 = __importDefault(require("chalk"));
 const child_process_1 = require("child_process");

@@ -4,15 +4,12 @@ import {
   DescribeLoadBalancersCommand,
   ElasticLoadBalancingClient,
 } from "@aws-sdk/client-elastic-load-balancing";
-import { fromIni } from "@aws-sdk/credential-providers";
 import chalk from "chalk";
 import Table from "cli-table3";
 import { run } from "./utils/run";
 
-const ec2 = new EC2Client({ credentials: fromIni({ profile: "parallel-deploy" }) });
-const elb = new ElasticLoadBalancingClient({
-  credentials: fromIni({ profile: "parallel-deploy" }),
-});
+const ec2 = new EC2Client({});
+const elb = new ElasticLoadBalancingClient({});
 
 async function main() {
   const instances = await ec2

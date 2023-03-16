@@ -6,18 +6,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const client_cloudfront_1 = require("@aws-sdk/client-cloudfront");
 const client_ec2_1 = require("@aws-sdk/client-ec2");
 const client_elastic_load_balancing_1 = require("@aws-sdk/client-elastic-load-balancing");
-const credential_providers_1 = require("@aws-sdk/credential-providers");
 const chalk_1 = __importDefault(require("chalk"));
 const child_process_1 = require("child_process");
 const remeda_1 = require("remeda");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 const wait_1 = require("./utils/wait");
-const ec2 = new client_ec2_1.EC2Client({ credentials: (0, credential_providers_1.fromIni)({ profile: "parallel-deploy" }) });
-const elb = new client_elastic_load_balancing_1.ElasticLoadBalancingClient({
-    credentials: (0, credential_providers_1.fromIni)({ profile: "parallel-deploy" }),
-});
-const cloudfront = new client_cloudfront_1.CloudFrontClient({ credentials: (0, credential_providers_1.fromIni)({ profile: "parallel-deploy" }) });
+const ec2 = new client_ec2_1.EC2Client({});
+const elb = new client_elastic_load_balancing_1.ElasticLoadBalancingClient({});
+const cloudfront = new client_cloudfront_1.CloudFrontClient({});
 const OPS_DIR = "/home/ec2-user/main/ops/prod";
 async function main() {
     const { commit: _commit, env } = await yargs_1.default

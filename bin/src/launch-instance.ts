@@ -8,7 +8,6 @@ import {
   RunInstancesCommand,
   Tenancy,
 } from "@aws-sdk/client-ec2";
-import { fromIni } from "@aws-sdk/credential-providers"; // ES6 import
 import chalk from "chalk";
 import { execSync } from "child_process";
 import yargs from "yargs";
@@ -29,9 +28,7 @@ const AVAILABILITY_ZONE = `${REGION}a`;
 const ENHANCED_MONITORING = true;
 const OPS_DIR = "/home/ec2-user/parallel/ops/prod";
 
-const ec2 = new EC2Client({
-  credentials: fromIni({ profile: "parallel-deploy" }),
-});
+const ec2 = new EC2Client({});
 
 async function main() {
   const { commit: _commit, env } = await yargs
@@ -69,6 +66,10 @@ async function main() {
         Enabled: ENHANCED_MONITORING,
       },
       TagSpecifications: [
+        {
+          ResourceType: ResourceType.volume,
+          Tags: [{ Key: "Name", Value: `parallel-${env}-${commit}` }],
+        },
         {
           ResourceType: ResourceType.instance,
           Tags: [

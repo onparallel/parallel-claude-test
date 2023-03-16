@@ -12,7 +12,7 @@ import {
   Tenancy,
   TerminateInstancesCommand,
 } from "@aws-sdk/client-ec2";
-import { fromIni } from "@aws-sdk/credential-providers"; // ES6 import
+import { fromIni } from "@aws-sdk/credential-providers";
 import assert from "assert";
 import chalk from "chalk";
 import { execSync } from "child_process";

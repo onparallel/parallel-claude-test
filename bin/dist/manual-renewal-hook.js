@@ -15,16 +15,13 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_route_53_1 = require("@aws-sdk/client-route-53");
-const credential_providers_1 = require("@aws-sdk/credential-providers"); // ES6 import
 const remeda_1 = require("remeda");
 const run_1 = require("./utils/run");
 const wait_1 = require("./utils/wait");
 const ZONE_MAP = {
     "onparallel.com": "Z06439012HTRIULUNI0UO",
 };
-const route53 = new client_route_53_1.Route53Client({
-    credentials: (0, credential_providers_1.fromIni)({ profile: "default" }),
-});
+const route53 = new client_route_53_1.Route53Client({});
 async function main() {
     const { CERTBOT_AUTH_OUTPUT: output, CERTBOT_DOMAIN: domain, CERTBOT_VALIDATION: challenge, } = process.env;
     const isCleanup = (0, remeda_1.isDefined)(output);

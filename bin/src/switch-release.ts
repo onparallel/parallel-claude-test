@@ -1,8 +1,8 @@
 import {
   CloudFrontClient,
+  CloudFrontServiceException,
   CreateInvalidationCommand,
   ListDistributionsCommand,
-  CloudFrontServiceException,
 } from "@aws-sdk/client-cloudfront";
 import {
   AssociateAddressCommand,
@@ -17,19 +17,16 @@ import {
   ElasticLoadBalancingClient,
   RegisterInstancesWithLoadBalancerCommand,
 } from "@aws-sdk/client-elastic-load-balancing";
-import { fromIni } from "@aws-sdk/credential-providers";
 import chalk from "chalk";
 import { execSync } from "child_process";
-import { isDefined, zip } from "remeda";
+import { zip } from "remeda";
 import yargs from "yargs";
 import { run } from "./utils/run";
 import { waitFor } from "./utils/wait";
 
-const ec2 = new EC2Client({ credentials: fromIni({ profile: "parallel-deploy" }) });
-const elb = new ElasticLoadBalancingClient({
-  credentials: fromIni({ profile: "parallel-deploy" }),
-});
-const cloudfront = new CloudFrontClient({ credentials: fromIni({ profile: "parallel-deploy" }) });
+const ec2 = new EC2Client({});
+const elb = new ElasticLoadBalancingClient({});
+const cloudfront = new CloudFrontClient({});
 const OPS_DIR = "/home/ec2-user/main/ops/prod";
 
 async function main() {

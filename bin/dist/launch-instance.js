@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_ec2_1 = require("@aws-sdk/client-ec2");
-const credential_providers_1 = require("@aws-sdk/credential-providers"); // ES6 import
 const chalk_1 = __importDefault(require("chalk"));
 const child_process_1 = require("child_process");
 const yargs_1 = __importDefault(require("yargs"));
@@ -23,9 +22,7 @@ const REGION = "eu-central-1";
 const AVAILABILITY_ZONE = `${REGION}a`;
 const ENHANCED_MONITORING = true;
 const OPS_DIR = "/home/ec2-user/parallel/ops/prod";
-const ec2 = new client_ec2_1.EC2Client({
-    credentials: (0, credential_providers_1.fromIni)({ profile: "parallel-deploy" }),
-});
+const ec2 = new client_ec2_1.EC2Client({});
 async function main() {
     const { commit: _commit, env } = await yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")
@@ -59,6 +56,10 @@ async function main() {
             Enabled: ENHANCED_MONITORING,
         },
         TagSpecifications: [
+            {
+                ResourceType: client_ec2_1.ResourceType.volume,
+                Tags: [{ Key: "Name", Value: `parallel-${env}-${commit}` }],
+            },
             {
                 ResourceType: client_ec2_1.ResourceType.instance,
                 Tags: [

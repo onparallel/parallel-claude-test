@@ -19,7 +19,6 @@ import {
   ListResourceRecordSetsCommand,
   Route53Client,
 } from "@aws-sdk/client-route-53";
-import { fromIni } from "@aws-sdk/credential-providers"; // ES6 import
 import { isDefined } from "remeda";
 import { run } from "./utils/run";
 import { waitFor } from "./utils/wait";
@@ -28,9 +27,7 @@ const ZONE_MAP: Record<string, string> = {
   "onparallel.com": "Z06439012HTRIULUNI0UO",
 };
 
-const route53 = new Route53Client({
-  credentials: fromIni({ profile: "default" }),
-});
+const route53 = new Route53Client({});
 
 async function main() {
   const {

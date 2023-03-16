@@ -88,15 +88,13 @@ async function main() {
     `aws s3 sync \
       ${buildDir}/client/.next/static \
       s3://parallel-static-${env}/_next/static \
-      --cache-control max-age=31536000 \
-      --profile parallel-deploy`
+      --cache-control max-age=31536000`
   );
   execSync(
     `aws s3 sync \
       ${buildDir}/client/public/static \
       s3://parallel-static-${env}/static \
-      --cache-control max-age=2592000 \
-      --profile parallel-deploy`
+      --cache-control max-age=2592000`
   );
 
   console.log("Building the server");
@@ -119,10 +117,10 @@ async function main() {
     encoding: "utf-8",
   });
   execSync(`rm -rf ${buildDir}`, { cwd: WORK_DIR, encoding: "utf-8" });
-  execSync(
-    `aws s3 mv ${buildId}.tar.gz s3://parallel-builds/${buildId}.tar.gz --profile parallel-deploy`,
-    { cwd: WORK_DIR, encoding: "utf-8" }
-  );
+  execSync(`aws s3 mv ${buildId}.tar.gz s3://parallel-builds/${buildId}.tar.gz`, {
+    cwd: WORK_DIR,
+    encoding: "utf-8",
+  });
 }
 
 run(main);
