@@ -23,6 +23,21 @@ export type EventListener<
 createQueueWorker(
   "event-processor",
   new EventProcessor()
+    .register(
+      [
+        "PETITION_COMPLETED",
+        "COMMENT_PUBLISHED",
+        "PETITION_MESSAGE_BOUNCED",
+        "PETITION_REMINDER_BOUNCED",
+        "SIGNATURE_COMPLETED",
+        "SIGNATURE_CANCELLED",
+        "USER_PERMISSION_ADDED",
+        "GROUP_PERMISSION_ADDED",
+        "REMINDERS_OPT_OUT",
+        "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
+      ],
+      userNotificationsListener
+    )
     .register("*", eventSubscriptionsListener)
     .register(
       [
@@ -51,21 +66,6 @@ createQueueWorker(
         "ORGANIZATION_LIMIT_REACHED",
       ],
       analyticsEventListener
-    )
-    .register(
-      [
-        "PETITION_COMPLETED",
-        "COMMENT_PUBLISHED",
-        "PETITION_MESSAGE_BOUNCED",
-        "PETITION_REMINDER_BOUNCED",
-        "SIGNATURE_COMPLETED",
-        "SIGNATURE_CANCELLED",
-        "USER_PERMISSION_ADDED",
-        "GROUP_PERMISSION_ADDED",
-        "REMINDERS_OPT_OUT",
-        "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
-      ],
-      userNotificationsListener
     )
     .listen()
 );
