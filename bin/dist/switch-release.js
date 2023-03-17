@@ -46,25 +46,25 @@ async function main() {
     if (newInstances.length === 0) {
         throw new Error(`No running instances for environment ${env} and release ${commit}.`);
     }
-    // if (env === "production") {
-    const addresses = await ec2
-        .send(new client_ec2_1.DescribeAddressesCommand({
-        Filters: [{ Name: "tag:Environment", Values: [env] }],
-    }))
-        .then((r) => r.Addresses);
-    const availableAddresses = addresses.filter((a) => !oldInstances.some((i) => a.InstanceId === i.InstanceId));
-    if (availableAddresses.length < newInstances.length) {
-        throw new Error("Not enough available elastic IPs");
+    if (env === "production") {
+        const addresses = await ec2
+            .send(new client_ec2_1.DescribeAddressesCommand({
+            Filters: [{ Name: "tag:Environment", Values: [env] }],
+        }))
+            .then((r) => r.Addresses);
+        const availableAddresses = addresses.filter((a) => !oldInstances.some((i) => a.InstanceId === i.InstanceId));
+        if (availableAddresses.length < newInstances.length) {
+            throw new Error("Not enough available elastic IPs");
+        }
+        for (const [instance, address] of (0, remeda_1.zip)(newInstances, availableAddresses)) {
+            const addressName = address.Tags.find((t) => t.Key === "Name").Value;
+            console.log(`Associating address ${addressName} with instance ${instance.InstanceId}`);
+            await ec2.send(new client_ec2_1.AssociateAddressCommand({
+                InstanceId: instance.InstanceId,
+                AllocationId: address.AllocationId,
+            }));
+        }
     }
-    for (const [instance, address] of (0, remeda_1.zip)(newInstances, availableAddresses)) {
-        const addressName = address.Tags.find((t) => t.Key === "Name").Value;
-        console.log(`Associating address ${addressName} with instance ${instance.InstanceId}`);
-        await ec2.send(new client_ec2_1.AssociateAddressCommand({
-            InstanceId: instance.InstanceId,
-            AllocationId: address.AllocationId,
-        }));
-    }
-    // }
     const oldInstancesFull = oldInstances.length
         ? await ec2
             .send(new client_ec2_1.DescribeInstancesCommand({
