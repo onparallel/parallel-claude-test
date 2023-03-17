@@ -8,6 +8,7 @@ const client_ec2_1 = require("@aws-sdk/client-ec2");
 const client_elastic_load_balancing_1 = require("@aws-sdk/client-elastic-load-balancing");
 const chalk_1 = __importDefault(require("chalk"));
 const child_process_1 = require("child_process");
+const p_map_1 = __importDefault(require("p-map"));
 const remeda_1 = require("remeda");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
@@ -42,15 +43,13 @@ async function main() {
             { Name: "instance-state-name", Values: ["running"] },
         ],
     }))
-        .then((r) => r.Reservations.flatMap((r) => r.Instances).map((i) => ({ InstanceId: i.InstanceId })));
+        .then((r) => r.Reservations.flatMap((r) => r.Instances));
     if (newInstances.length === 0) {
         throw new Error(`No running instances for environment ${env} and release ${commit}.`);
     }
     if (env === "production") {
         const addresses = await ec2
-            .send(new client_ec2_1.DescribeAddressesCommand({
-            Filters: [{ Name: "tag:Environment", Values: [env] }],
-        }))
+            .send(new client_ec2_1.DescribeAddressesCommand({ Filters: [{ Name: "tag:Environment", Values: [env] }] }))
             .then((r) => r.Addresses);
         const availableAddresses = addresses.filter((a) => !oldInstances.some((i) => a.InstanceId === i.InstanceId));
         if (availableAddresses.length < newInstances.length) {
@@ -65,24 +64,24 @@ async function main() {
             }));
         }
     }
+    for (const instance of newInstances) {
+        const ipAddress = instance.PrivateIpAddress;
+        executeRemoteCommand(ipAddress, `${OPS_DIR}/server.sh start`);
+        console.log(`Server started in ${instance.InstanceId}`);
+    }
     const oldInstancesFull = oldInstances.length
         ? await ec2
-            .send(new client_ec2_1.DescribeInstancesCommand({
-            InstanceIds: oldInstances.map((i) => i.InstanceId),
-        }))
+            .send(new client_ec2_1.DescribeInstancesCommand({ InstanceIds: oldInstances.map((i) => i.InstanceId) }))
             .then((r) => r.Reservations.flatMap((r) => r.Instances))
         : [];
-    await Promise.all(oldInstancesFull.map(async (instance) => {
+    await (0, p_map_1.default)(oldInstancesFull, async (instance) => {
         var _a;
         const ipAddress = instance.PrivateIpAddress;
         const instanceName = (_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value;
         console.log(chalk_1.default.yellow `Stopping workers on ${instance.InstanceId} ${instanceName}`);
-        (0, child_process_1.execSync)(`ssh \
-      -o "UserKnownHostsFile=/dev/null" \
-      -o StrictHostKeyChecking=no \
-      ${ipAddress} ${OPS_DIR}/workers.sh stop`);
+        executeRemoteCommand(ipAddress, `${OPS_DIR}/workers.sh stop`);
         console.log(chalk_1.default.green.bold `Workers stopped on ${instance.InstanceId} ${instanceName}`);
-    }));
+    });
     console.log(chalk_1.default.yellow `Registering new instances on LB`);
     await elb.send(new client_elastic_load_balancing_1.RegisterInstancesWithLoadBalancerCommand({
         LoadBalancerName: `parallel-${env}`,
@@ -140,21 +139,24 @@ async function main() {
         }, chalk_1.default.yellow.italic `...Waiting for old instances to become out of service`, 3000);
         console.log(chalk_1.default.green.bold `Old instances deregistered`);
     }
-    const newInstancesFull = await ec2
-        .send(new client_ec2_1.DescribeInstancesCommand({
-        InstanceIds: newInstances.map((i) => i.InstanceId),
-    }))
-        .then((r) => r.Reservations.flatMap((r) => r.Instances));
-    await Promise.all(newInstancesFull.map(async (instance) => {
+    await (0, p_map_1.default)(newInstances, async (instance) => {
         var _a;
         const ipAddress = instance.PrivateIpAddress;
         const instanceName = (_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value;
         console.log(chalk_1.default.yellow `Starting workers on ${instance.InstanceId} ${instanceName}`);
-        (0, child_process_1.execSync)(`ssh \
-      -o "UserKnownHostsFile=/dev/null" \
-      -o StrictHostKeyChecking=no \
-      ${ipAddress} ${OPS_DIR}/workers.sh start`);
+        executeRemoteCommand(ipAddress, `${OPS_DIR}/workers.sh start`);
         console.log(chalk_1.default.green.bold `Workers started on ${instance.InstanceId} ${instanceName}`);
-    }));
+    });
+    // Uncomment after next release
+    // await pMap(oldInstancesFull, async (instance) => {
+    //   const ipAddress = instance.PrivateIpAddress!;
+    //   executeRemoteCommand(ipAddress, `${OPS_DIR}/server.sh stop`);
+    // });
 }
 (0, run_1.run)(main);
+function executeRemoteCommand(ipAddress, command) {
+    (0, child_process_1.execSync)(`ssh \
+  -o "UserKnownHostsFile=/dev/null" \
+  -o StrictHostKeyChecking=no \
+  ${ipAddress} ${command}`);
+}

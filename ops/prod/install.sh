@@ -50,7 +50,4 @@ sudo systemctl enable parallel-anonymizer-cron.service
 sudo systemctl enable parallel-old-notifications-cron.service
 sudo systemctl enable nginx.service 
 
-sudo systemctl start parallel-server
-sudo systemctl start parallel-client
-sudo systemctl start nginx
 sudo amazon-cloudwatch-agent-ctl -a fetch-config -s -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
