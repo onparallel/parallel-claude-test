@@ -34,10 +34,14 @@ export function buildConfig() {
       port: parseInt(process.env.REDIS_PORT!),
     },
     aws: {
-      credentials: {
-        accessKeyId: process.env._AWS_ACCESS_KEY_ID!,
-        secretAccessKey: process.env._AWS_SECRET_ACCESS_KEY!,
-      },
+      ...(process.env.NODE_ENV === "development"
+        ? {
+            credentials: {
+              accessKeyId: process.env._AWS_ACCESS_KEY_ID!,
+              secretAccessKey: process.env._AWS_SECRET_ACCESS_KEY!,
+            },
+          }
+        : {}),
       region: process.env._AWS_REGION!,
     },
     s3: {

@@ -16,7 +16,6 @@ const INSTANCE_TYPES = {
 const KEY_NAME = "ops";
 const IMAGE_ID = "ami-06a824dabe40d2df3";
 const SECURITY_GROUP_IDS = ["sg-0486098a6131eb458"];
-const IAM_ROLE = "parallel-server";
 const SUBNET_ID = "subnet-d3cc68b9";
 const REGION = "eu-central-1";
 const AVAILABILITY_ZONE = `${REGION}a`;
@@ -42,7 +41,7 @@ async function main() {
         KeyName: KEY_NAME,
         SecurityGroupIds: SECURITY_GROUP_IDS,
         IamInstanceProfile: {
-            Name: IAM_ROLE,
+            Name: `parallel-server-${env}`,
         },
         InstanceType: INSTANCE_TYPES[env],
         Placement: {
