@@ -18,6 +18,7 @@ const elb = new client_elastic_load_balancing_1.ElasticLoadBalancingClient({});
 const cloudfront = new client_cloudfront_1.CloudFrontClient({});
 const OPS_DIR = "/home/ec2-user/main/ops/prod";
 async function main() {
+    var _a;
     const { commit: _commit, env } = await yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")
         .option("commit", {
@@ -66,8 +67,9 @@ async function main() {
     }
     for (const instance of newInstances) {
         const ipAddress = instance.PrivateIpAddress;
+        const instanceName = (_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value;
         executeRemoteCommand(ipAddress, `${OPS_DIR}/server.sh start`);
-        console.log(`Server started in ${instance.InstanceId}`);
+        console.log(chalk_1.default.green `Server started in ${instance.InstanceId} ${instanceName}`);
     }
     const oldInstancesFull = oldInstances.length
         ? await ec2
@@ -147,11 +149,13 @@ async function main() {
         executeRemoteCommand(ipAddress, `${OPS_DIR}/workers.sh start`);
         console.log(chalk_1.default.green.bold `Workers started on ${instance.InstanceId} ${instanceName}`);
     });
-    // Uncomment after next release
-    // await pMap(oldInstancesFull, async (instance) => {
-    //   const ipAddress = instance.PrivateIpAddress!;
-    //   executeRemoteCommand(ipAddress, `${OPS_DIR}/server.sh stop`);
-    // });
+    await (0, p_map_1.default)(oldInstancesFull, async (instance) => {
+        var _a;
+        const ipAddress = instance.PrivateIpAddress;
+        const instanceName = (_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value;
+        executeRemoteCommand(ipAddress, `${OPS_DIR}/server.sh stop`);
+        console.log(chalk_1.default.green `Server stopped in ${instance.InstanceId} ${instanceName}`);
+    });
 }
 (0, run_1.run)(main);
 function executeRemoteCommand(ipAddress, command) {

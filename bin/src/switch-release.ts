@@ -94,8 +94,9 @@ async function main() {
 
   for (const instance of newInstances) {
     const ipAddress = instance.PrivateIpAddress!;
+    const instanceName = instance.Tags?.find((t) => t.Key === "Name")!.Value;
     executeRemoteCommand(ipAddress, `${OPS_DIR}/server.sh start`);
-    console.log(`Server started in ${instance.InstanceId}`);
+    console.log(chalk.green`Server started in ${instance.InstanceId} ${instanceName}`);
   }
 
   const oldInstancesFull = oldInstances.length
@@ -205,11 +206,12 @@ async function main() {
     console.log(chalk.green.bold`Workers started on ${instance.InstanceId!} ${instanceName}`);
   });
 
-  // Uncomment after next release
-  // await pMap(oldInstancesFull, async (instance) => {
-  //   const ipAddress = instance.PrivateIpAddress!;
-  //   executeRemoteCommand(ipAddress, `${OPS_DIR}/server.sh stop`);
-  // });
+  await pMap(oldInstancesFull, async (instance) => {
+    const ipAddress = instance.PrivateIpAddress!;
+    const instanceName = instance.Tags?.find((t) => t.Key === "Name")!.Value;
+    executeRemoteCommand(ipAddress, `${OPS_DIR}/server.sh stop`);
+    console.log(chalk.green`Server stopped in ${instance.InstanceId} ${instanceName}`);
+  });
 }
 
 run(main);
