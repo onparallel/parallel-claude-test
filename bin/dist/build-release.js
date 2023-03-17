@@ -99,7 +99,7 @@ async function main() {
         encoding: "utf-8",
     });
     (0, child_process_1.execSync)(`rm -rf ${buildDir}`, { cwd: WORK_DIR, encoding: "utf-8" });
-    (0, child_process_1.execSync)(`aws s3 mv ${buildId}.tar.gz s3://parallel-builds/${buildId}.tar.gz`, {
+    (0, child_process_1.execSync)(`aws s3 mv ${buildId}.tar.gz s3://parallel-builds-${env}/${buildId}.tar.gz`, {
         cwd: WORK_DIR,
         encoding: "utf-8",
     });
