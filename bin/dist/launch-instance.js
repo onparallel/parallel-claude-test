@@ -15,7 +15,10 @@ const INSTANCE_TYPES = {
 };
 const KEY_NAME = "ops";
 const IMAGE_ID = "ami-06a824dabe40d2df3";
-const SECURITY_GROUP_IDS = ["sg-0486098a6131eb458"];
+const SECURITY_GROUP_IDS = {
+    production: ["sg-078abc8a772035e7a"],
+    staging: ["sg-083d7b4facd31a090"],
+};
 const SUBNET_ID = "subnet-d3cc68b9";
 const REGION = "eu-central-1";
 const AVAILABILITY_ZONE = `${REGION}a`;
@@ -23,7 +26,7 @@ const ENHANCED_MONITORING = true;
 const OPS_DIR = "/home/ec2-user/parallel/ops/prod";
 const ec2 = new client_ec2_1.EC2Client({});
 async function main() {
-    const { commit: _commit, env } = await yargs_1.default
+    const { commit: _commit, env: _env } = await yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")
         .option("commit", {
         required: true,
@@ -36,10 +39,11 @@ async function main() {
         description: "The environment for the build",
     }).argv;
     const commit = _commit.slice(0, 7);
+    const env = _env;
     const result = await ec2.send(new client_ec2_1.RunInstancesCommand({
         ImageId: IMAGE_ID,
         KeyName: KEY_NAME,
-        SecurityGroupIds: SECURITY_GROUP_IDS,
+        SecurityGroupIds: SECURITY_GROUP_IDS[env],
         IamInstanceProfile: {
             Name: `parallel-server-${env}`,
         },

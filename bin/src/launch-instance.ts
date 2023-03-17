@@ -20,7 +20,10 @@ const INSTANCE_TYPES = {
 };
 const KEY_NAME = "ops";
 const IMAGE_ID = "ami-06a824dabe40d2df3";
-const SECURITY_GROUP_IDS = ["sg-0486098a6131eb458"];
+const SECURITY_GROUP_IDS = {
+  production: ["sg-078abc8a772035e7a"],
+  staging: ["sg-083d7b4facd31a090"],
+};
 const SUBNET_ID = "subnet-d3cc68b9";
 const REGION = "eu-central-1";
 const AVAILABILITY_ZONE = `${REGION}a`;
@@ -30,7 +33,7 @@ const OPS_DIR = "/home/ec2-user/parallel/ops/prod";
 const ec2 = new EC2Client({});
 
 async function main() {
-  const { commit: _commit, env } = await yargs
+  const { commit: _commit, env: _env } = await yargs
     .usage("Usage: $0 --commit [commit] --env [env]")
     .option("commit", {
       required: true,
@@ -44,16 +47,17 @@ async function main() {
     }).argv;
 
   const commit = _commit.slice(0, 7);
+  const env = _env as "production" | "staging";
 
   const result = await ec2.send(
     new RunInstancesCommand({
       ImageId: IMAGE_ID,
       KeyName: KEY_NAME,
-      SecurityGroupIds: SECURITY_GROUP_IDS,
+      SecurityGroupIds: SECURITY_GROUP_IDS[env],
       IamInstanceProfile: {
         Name: `parallel-server-${env}`,
       },
-      InstanceType: INSTANCE_TYPES[env as keyof typeof INSTANCE_TYPES],
+      InstanceType: INSTANCE_TYPES[env],
       Placement: {
         AvailabilityZone: AVAILABILITY_ZONE,
         Tenancy: Tenancy.default,
