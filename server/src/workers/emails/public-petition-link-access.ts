@@ -3,6 +3,7 @@ import { buildEmail } from "../../emails/buildEmail";
 import PublicPetitionLinkAccess from "../../emails/emails/PublicPetitionLinkAccess";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
+import { toHtml, toPlainText } from "../../util/slate";
 
 export async function publicPetitionLinkAccess(
   payload: { petition_message_id: number },
@@ -51,6 +52,10 @@ export async function publicPetitionLinkAccess(
     orgId,
     "REMOVE_WHY_WE_USE_PARALLEL"
   );
+
+  const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
+  const renderContext = { contact, user: senderData, petition };
+
   const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(orgId);
   const { html, text, subject, from } = await buildEmail(
     PublicPetitionLinkAccess,
@@ -61,6 +66,8 @@ export async function publicPetitionLinkAccess(
       emailSubject: petition.email_subject,
       petitionTitle: publicPetitionLink.title,
       keycode: access.keycode,
+      bodyHtml: toHtml(bodyJson, renderContext),
+      bodyPlainText: toPlainText(bodyJson, renderContext),
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       ...layoutProps,
     },
