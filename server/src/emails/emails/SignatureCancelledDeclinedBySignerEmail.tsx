@@ -3,10 +3,9 @@ import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../components/Button";
-import { ClosingParallelTeam } from "../components/ClosingParallelTeam";
 import { GreetingUser } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
-import { closing, greetingUser } from "../components/texts";
+import { greetingUser } from "../components/texts";
 
 type SignatureCancelledDeclinedBySignerProps = {
   userName: string | null;
@@ -66,8 +65,6 @@ const email: Email<SignatureCancelledDeclinedBySignerProps> = {
 
       ${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/replies#signatures
 
-      ${closing({}, intl)}
-
     `;
   },
   html({
@@ -122,7 +119,6 @@ const email: Email<SignatureCancelledDeclinedBySignerProps> = {
                 defaultMessage="Access the parallel"
               />
             </Button>
-            <ClosingParallelTeam />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

@@ -5,10 +5,9 @@ import { FormattedList, FormattedMessage, IntlShape, useIntl } from "react-intl"
 import { Email } from "../buildEmail";
 import { Alert } from "../components/Alert";
 import { Button } from "../components/Button";
-import { ClosingParallelTeam } from "../components/ClosingParallelTeam";
 import { GreetingUser } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
-import { closing, greetingUser } from "../components/texts";
+import { greetingUser } from "../components/texts";
 
 type SignatureCancelledRequestErrorProps = {
   userName: string | null;
@@ -78,8 +77,6 @@ const email: Email<SignatureCancelledRequestErrorProps> = {
       id: "signature-cancelled-request-error.text-3",
       defaultMessage: "If the problem persists, please contact our support team via support chat.",
     })}
-
-    ${closing({}, intl)}
 
     `;
   },
@@ -160,7 +157,6 @@ const email: Email<SignatureCancelledRequestErrorProps> = {
                 defaultMessage="If the problem persists, please contact our support team via support chat."
               />
             </MjmlText>
-            <ClosingParallelTeam />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

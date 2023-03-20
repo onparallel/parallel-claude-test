@@ -4,7 +4,6 @@ import { FormattedMessage, IntlShape } from "react-intl";
 import { OrganizationUsageLimitName } from "../../db/__types";
 import { Email } from "../buildEmail";
 import { Alert } from "../components/Alert";
-import { ClosingParallelTeam } from "../components/ClosingParallelTeam";
 import { GreetingUser } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
 import { closing, greetingUser } from "../components/texts";
@@ -182,7 +181,6 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
           { a: (chunks: any[]) => chunks }
         )}
 
-        ${closing({}, intl)}
       `
       : (null as never);
   },
@@ -340,7 +338,6 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
             ) : (
               (null as never)
             )}
-            <ClosingParallelTeam />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

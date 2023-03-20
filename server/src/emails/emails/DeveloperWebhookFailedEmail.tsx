@@ -2,10 +2,9 @@ import { MjmlColumn, MjmlSection, MjmlText } from "@faire/mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape } from "react-intl";
 import { Email } from "../buildEmail";
-import { ClosingParallelTeam } from "../components/ClosingParallelTeam";
 import { GreetingUser } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
-import { closing, greetingUser } from "../components/texts";
+import { greetingUser } from "../components/texts";
 
 export type DeveloperWebhookFailedEmailProps = {
   userName: string | null;
@@ -45,7 +44,6 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
         "Please, make sure your subscription configuration is correct and the URL is valid and accepts requests.",
     })}
       
-    ${closing({}, intl)}
     `;
   },
   html({
@@ -95,7 +93,6 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
                 defaultMessage="Please, make sure your subscription configuration is correct and the URL is valid and accepts requests."
               />
             </MjmlText>
-            <ClosingParallelTeam />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

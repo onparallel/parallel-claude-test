@@ -10,10 +10,9 @@ import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../components/Button";
-import { ClosingParallelTeam } from "../components/ClosingParallelTeam";
 import { GreetingUser } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
-import { closing, greetingUser } from "../components/texts";
+import { greetingUser } from "../components/texts";
 
 export type PetitionCompletedProps = {
   isSigned: boolean;
@@ -36,9 +35,16 @@ const email: Email<PetitionCompletedProps> = {
     return intl.formatMessage(
       {
         id: "petition-completed.subject",
-        defaultMessage: 'Parallel "{petitionName}" completed!',
+        defaultMessage: "{petitionName} completed!",
       },
-      { petitionName }
+      {
+        petitionName:
+          petitionName ||
+          intl.formatMessage({
+            id: "generic.unnamed-parallel",
+            defaultMessage: "Unnamed parallel",
+          }),
+      }
     );
   },
   text(
@@ -62,34 +68,46 @@ const email: Email<PetitionCompletedProps> = {
           ? intl.formatMessage(
               {
                 id: "petition-completed-and-signed.text",
-                defaultMessage: "{recipient} completed and signed the parallel you sent.",
+                defaultMessage: "{recipient} completed and signed {parallelName} 🎉",
               },
-              { recipient: `${contactName} (${contactEmail})` }
-            )
-          : isManualStartSignature
-          ? intl.formatMessage(
               {
-                id: "petition-completed.signature-required.text",
-                defaultMessage:
-                  "{recipient} completed the parallel you sent. You can access the information and start the signature to complete the process.",
-              },
-              { recipient: `${contactName} (${contactEmail})` }
+                recipient: `${contactName} (${contactEmail})`,
+                parallelName:
+                  petitionName ||
+                  intl.formatMessage({
+                    id: "generic.unnamed-parallel",
+                    defaultMessage: "Unnamed parallel",
+                  }),
+              }
             )
           : intl.formatMessage(
               {
                 id: "petition-completed.text",
-                defaultMessage: "{recipient} completed the parallel you sent.",
+                defaultMessage: "{recipient} completed {parallelName} 🎉",
+              },
+              {
+                recipient: `${contactName} (${contactEmail})`,
+                parallelName:
+                  petitionName ||
+                  intl.formatMessage({
+                    id: "generic.unnamed-parallel",
+                    defaultMessage: "Unnamed parallel",
+                  }),
+              }
+            )
+      }
+
+      ${
+        isManualStartSignature
+          ? intl.formatMessage(
+              {
+                id: "petition-completed.signature-required.text",
+                defaultMessage:
+                  "You can access the information and start the signature to complete the process.",
               },
               { recipient: `${contactName} (${contactEmail})` }
             )
-      }
-      
-      ${
-        petitionName ||
-        intl.formatMessage({
-          id: "generic.unnamed-parallel",
-          defaultMessage: "Unnamed parallel",
-        })
+          : null
       }
 
       ${intl.formatMessage({
@@ -98,7 +116,6 @@ const email: Email<PetitionCompletedProps> = {
       })}
       ${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/replies
 
-      ${closing({}, intl)}
     `;
   },
   html({
@@ -138,54 +155,57 @@ const email: Email<PetitionCompletedProps> = {
               {isSigned ? (
                 <FormattedMessage
                   id="petition-completed-and-signed.text"
-                  defaultMessage="{recipient} completed and signed the parallel you sent."
+                  defaultMessage="{recipient} completed and signed {parallelName} 🎉"
                   values={{
                     recipient: (
                       <b>
                         {contactName} ({contactEmail})
                       </b>
                     ),
-                  }}
-                />
-              ) : isManualStartSignature ? (
-                <FormattedMessage
-                  id="petition-completed.signature-required.text"
-                  defaultMessage="{recipient} completed the parallel you sent. You can access the information and start the signature to complete the process."
-                  values={{
-                    recipient: (
-                      <b>
-                        {contactName} ({contactEmail})
-                      </b>
+                    parallelName: petitionName ? (
+                      petitionName
+                    ) : (
+                      <span style={{ color: "#A0AEC0", fontStyle: "italic" }}>
+                        <FormattedMessage
+                          id="generic.unnamed-parallel"
+                          defaultMessage="Unnamed parallel"
+                        />
+                      </span>
                     ),
                   }}
                 />
               ) : (
                 <FormattedMessage
                   id="petition-completed.text"
-                  defaultMessage="{recipient} completed the parallel you sent."
+                  defaultMessage="{recipient} completed {parallelName} 🎉"
                   values={{
                     recipient: (
                       <b>
                         {contactName} ({contactEmail})
                       </b>
                     ),
+                    parallelName: petitionName ? (
+                      petitionName
+                    ) : (
+                      <span style={{ color: "#A0AEC0", fontStyle: "italic" }}>
+                        <FormattedMessage
+                          id="generic.unnamed-parallel"
+                          defaultMessage="Unnamed parallel"
+                        />
+                      </span>
+                    ),
                   }}
                 />
               )}
             </MjmlText>
-
-            <MjmlText fontSize="16px" fontWeight="400">
-              {petitionName ? (
-                <li>{petitionName}</li>
-              ) : (
-                <li style={{ color: "#A0AEC0", fontStyle: "italic" }}>
-                  <FormattedMessage
-                    id="generic.unnamed-parallel"
-                    defaultMessage="Unnamed parallel"
-                  />
-                </li>
-              )}
-            </MjmlText>
+            {isManualStartSignature ? (
+              <MjmlText>
+                <FormattedMessage
+                  id="petition-completed.signature-required.text"
+                  defaultMessage="You can access the information and start the signature to complete the process."
+                />
+              </MjmlText>
+            ) : null}
           </MjmlColumn>
         </MjmlSection>
 
@@ -201,7 +221,6 @@ const email: Email<PetitionCompletedProps> = {
                 defaultMessage="Access the information"
               />
             </Button>
-            <ClosingParallelTeam />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

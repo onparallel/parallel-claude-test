@@ -2,10 +2,9 @@ import { MjmlColumn, MjmlSection, MjmlText } from "@faire/mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape } from "react-intl";
 import { Email } from "../buildEmail";
-import { ClosingParallelTeam } from "../components/ClosingParallelTeam";
 import { GreetingUser } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
-import { closing, greetingUser } from "../components/texts";
+import { greetingUser } from "../components/texts";
 
 export type ForgotPasswordProps = {
   name: string | null;
@@ -42,7 +41,6 @@ const email: Email<ForgotPasswordProps> = {
         "This verification code will expire in 30 minutes, please make sure you use it as soon as possible.",
     })}
 
-    ${closing({}, intl)}
     `;
   },
   html({
@@ -89,8 +87,6 @@ const email: Email<ForgotPasswordProps> = {
                 defaultMessage="This verification code will expire in 30 minutes, please make sure you use it as soon as possible."
               />
             </MjmlText>
-
-            <ClosingParallelTeam />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

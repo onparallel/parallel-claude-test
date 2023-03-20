@@ -4,10 +4,9 @@ import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { Alert } from "../components/Alert";
 import { Button } from "../components/Button";
-import { ClosingParallelTeam } from "../components/ClosingParallelTeam";
 import { GreetingUser } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
-import { closing, greetingUser } from "../components/texts";
+import { greetingUser } from "../components/texts";
 import { UserMessageBox } from "../components/UserMessageBox";
 
 export type MessageBouncedEmailProps = {
@@ -87,7 +86,6 @@ const email: Email<MessageBouncedEmailProps> = {
       })}
       ${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/activity
 
-      ${closing({}, intl)}
     `;
   },
   html({
@@ -168,7 +166,6 @@ const email: Email<MessageBouncedEmailProps> = {
                 defaultMessage="Access the parallel"
               />
             </Button>
-            <ClosingParallelTeam />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

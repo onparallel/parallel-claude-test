@@ -681,8 +681,8 @@
   },
   {
     "term": "petition-completed-and-signed.text",
-    "definition": "{recipient} completed and signed the parallel you sent.",
-    "context": "{recipient} completed and signed the parallel you sent."
+    "definition": "{recipient} completed and signed {parallelName} 🎉",
+    "context": "{recipient} completed and signed {parallelName} 🎉"
   },
   {
     "term": "petition-completed.access-button",
@@ -696,18 +696,18 @@
   },
   {
     "term": "petition-completed.signature-required.text",
-    "definition": "{recipient} completed the parallel you sent. You can access the information and start the signature to complete the process.",
-    "context": "{recipient} completed the parallel you sent. You can access the information and start the signature to complete the process."
+    "definition": "You can access the information and start the signature to complete the process.",
+    "context": "You can access the information and start the signature to complete the process."
   },
   {
     "term": "petition-completed.subject",
-    "definition": "Parallel \"{petitionName}\" completed!",
-    "context": "Parallel \"{petitionName}\" completed!"
+    "definition": "{petitionName} completed!",
+    "context": "{petitionName} completed!"
   },
   {
     "term": "petition-completed.text",
-    "definition": "{recipient} completed the parallel you sent.",
-    "context": "{recipient} completed the parallel you sent."
+    "definition": "{recipient} completed {parallelName} 🎉",
+    "context": "{recipient} completed {parallelName} 🎉"
   },
   {
     "term": "petition-excel-export.comments",

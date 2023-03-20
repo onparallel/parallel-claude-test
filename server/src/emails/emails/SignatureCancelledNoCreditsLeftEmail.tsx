@@ -3,10 +3,9 @@ import outdent from "outdent";
 import { FormattedMessage, IntlShape } from "react-intl";
 import { Email } from "../buildEmail";
 import { Alert } from "../components/Alert";
-import { ClosingParallelTeam } from "../components/ClosingParallelTeam";
 import { GreetingUser } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
-import { closing, greetingUser } from "../components/texts";
+import { greetingUser } from "../components/texts";
 
 export type SignatureCancelledNoCreditsLeftEmailProps = {
   senderName: string | null;
@@ -72,7 +71,6 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
         { a: () => orgContactEmail, orgContactEmail, orgContactName }
       )}
 
-      ${closing({}, intl)}
     `;
   },
   html({
@@ -140,7 +138,6 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
                 }}
               />
             </MjmlText>
-            <ClosingParallelTeam />
           </MjmlColumn>
         </MjmlSection>
       </Layout>
