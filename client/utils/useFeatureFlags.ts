@@ -290,17 +290,6 @@ export function useFeatureFlags() {
           },
         ],
       },
-      {
-        name: "STATISTICS_VIEW",
-        title: intl.formatMessage({
-          id: "component.feature-flag-descriptions.statistics-view-name",
-          defaultMessage: "Statistics View",
-        }),
-        description: intl.formatMessage({
-          id: "component.feature-flag-descriptions.statistics-view-description",
-          defaultMessage: "Enables the new views on statistics page.",
-        }),
-      },
     ],
     [intl.locale]
   );
