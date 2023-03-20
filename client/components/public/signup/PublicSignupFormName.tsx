@@ -36,7 +36,10 @@ export function PublicSignupFormName({ onNext }: PublicSignupFormNameProps) {
     <Box
       as="form"
       onSubmit={handleSubmit(({ firstName, lastName }) => {
-        onNext({ firstName, lastName });
+        onNext({
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+        });
       })}
     >
       <Text color="gray.500" fontSize="sm">
@@ -65,6 +68,7 @@ export function PublicSignupFormName({ onNext }: PublicSignupFormNameProps) {
           <Input
             {...register("firstName", {
               required: true,
+              validate: (v) => v.trim().length > 0,
             })}
             autoFocus
             autoComplete="given-name"
@@ -86,6 +90,7 @@ export function PublicSignupFormName({ onNext }: PublicSignupFormNameProps) {
           <Input
             {...register("lastName", {
               required: true,
+              validate: (v) => v.trim().length > 0,
             })}
             autoComplete="family-name"
           />
