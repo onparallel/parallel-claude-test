@@ -152,7 +152,9 @@ export class UserRepository extends BaseRepository {
     return emails.map((email) => byEmail[email]?.map((u) => omit(u, ["ud_email"])) ?? []);
   });
 
-  readonly loadUsersByUserDataId = this.buildLoadMultipleBy("user", "user_data_id");
+  readonly loadUsersByUserDataId = this.buildLoadMultipleBy("user", "user_data_id", (q) =>
+    q.whereNull("deleted_at")
+  );
 
   async updateUserData(
     id: MaybeArray<number>,
