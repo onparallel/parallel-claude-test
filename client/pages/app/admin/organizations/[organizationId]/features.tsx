@@ -75,7 +75,7 @@ function AdminOrganizationsFeatures({ organizationId }: AdminOrganizationsFeatur
     } catch {}
   }
 
-  const featureFlags = useFeatureFlags();
+  const featureFlagsCategories = useFeatureFlags();
 
   return (
     <AdminOrganizationsLayout tabKey="features" me={me} organization={organization} realMe={realMe}>
@@ -89,46 +89,58 @@ function AdminOrganizationsFeatures({ organizationId }: AdminOrganizationsFeatur
           </CardHeader>
           <Stack paddingX={6} paddingY={4} spacing={4}>
             <SearchInput value={search ?? ""} onChange={(e) => setSearch(e.target.value)} />
-            {featureFlags
-              .filter(({ name, title }) => {
+            {featureFlagsCategories
+              .filter(({ featureFlags }) => {
                 const _search = search.toLowerCase().trim();
-                return (
-                  name.toLowerCase().includes(_search) || title.toLowerCase().includes(_search)
+                return featureFlags.some(
+                  ({ name, title }) =>
+                    name.toLowerCase().includes(_search) || title.toLowerCase().includes(_search)
                 );
               })
-              .map(({ name, title, description, articleId }) => {
-                const index = fields.findIndex((f) => f.name === name)!;
+              .map(({ category, featureFlags }) => {
                 return (
-                  <FormControl key={fields[index].id} as={HStack} alignItems="center">
-                    <Flex flex={1} alignItems="center">
-                      <FormLabel margin={0}>
-                        <HighlightText as="span" search={search}>
-                          {title}
-                        </HighlightText>
-                      </FormLabel>
-                      <HelpPopover popoverWidth="xs">
-                        <Text fontSize="sm">{description}</Text>
-                        {isDefined(articleId) ? (
-                          <HelpCenterLink articleId={articleId} width="fit-content">
-                            <FormattedMessage
-                              id="generic.help-center-article"
-                              defaultMessage="Help center article"
-                            />
-                          </HelpCenterLink>
-                        ) : null}
-                      </HelpPopover>
-                    </Flex>
-                    <HStack alignItems="center">
-                      {formState.dirtyFields?.features?.[index]?.value ? (
-                        <Badge colorScheme="yellow">
-                          <FormattedMessage id="generic.edited-indicator" defaultMessage="Edited" />
-                        </Badge>
-                      ) : null}
-                      <Switch {...register(`features.${index}.value`)} />
-                    </HStack>
-                  </FormControl>
+                  <Stack key={category}>
+                    <Text fontWeight={500}>{category}</Text>
+                    {featureFlags.map(({ name, title, description, articleId }) => {
+                      const index = fields.findIndex((f) => f.name === name)!;
+                      return (
+                        <FormControl key={fields[index].id} as={HStack} alignItems="center">
+                          <Flex flex={1} alignItems="center">
+                            <FormLabel margin={0} fontWeight={400} marginLeft={2}>
+                              <HighlightText as="span" search={search}>
+                                {title}
+                              </HighlightText>
+                            </FormLabel>
+                            <HelpPopover popoverWidth="xs">
+                              <Text fontSize="sm">{description}</Text>
+                              {isDefined(articleId) ? (
+                                <HelpCenterLink articleId={articleId} width="fit-content">
+                                  <FormattedMessage
+                                    id="generic.help-center-article"
+                                    defaultMessage="Help center article"
+                                  />
+                                </HelpCenterLink>
+                              ) : null}
+                            </HelpPopover>
+                          </Flex>
+                          <HStack alignItems="center">
+                            {formState.dirtyFields?.features?.[index]?.value ? (
+                              <Badge colorScheme="yellow">
+                                <FormattedMessage
+                                  id="generic.edited-indicator"
+                                  defaultMessage="Edited"
+                                />
+                              </Badge>
+                            ) : null}
+                            <Switch {...register(`features.${index}.value`)} />
+                          </HStack>
+                        </FormControl>
+                      );
+                    })}
+                  </Stack>
                 );
               })}
+
             <HStack paddingTop={6} alignSelf="flex-end">
               <Button
                 onClick={() => reset({ features: organization.features })}

@@ -1715,6 +1715,11 @@
     "context": "Compliance feature"
   },
   {
+    "term": "component.feature-flag-descriptions.branding",
+    "definition": "Branding",
+    "context": "Branding"
+  },
+  {
     "term": "component.feature-flag-descriptions.client-portal-description",
     "definition": "Allows recipients to access the client portal.",
     "context": "Allows recipients to access the client portal."
@@ -1735,6 +1740,11 @@
     "context": "Subdomain feature (UI)"
   },
   {
+    "term": "component.feature-flag-descriptions.custom-solutions",
+    "definition": "Custom solutions",
+    "context": "Custom solutions"
+  },
+  {
     "term": "component.feature-flag-descriptions.developer-access-description",
     "definition": "Gives access to the developers view.",
     "context": "Gives access to the developers view."
@@ -1743,6 +1753,11 @@
     "term": "component.feature-flag-descriptions.developer-access-name",
     "definition": "Developer access",
     "context": "Developer access"
+  },
+  {
+    "term": "component.feature-flag-descriptions.developers-solutions",
+    "definition": "Developers solutions",
+    "context": "Developers solutions"
   },
   {
     "term": "component.feature-flag-descriptions.docusign-sandbox-provider-description",
@@ -1763,6 +1778,11 @@
     "term": "component.feature-flag-descriptions.dow-jones-kyc-name",
     "definition": "Dow Jones Field",
     "context": "Dow Jones Field"
+  },
+  {
+    "term": "component.feature-flag-descriptions.enterprise",
+    "definition": "Enterprise",
+    "context": "Enterprise"
   },
   {
     "term": "component.feature-flag-descriptions.es-tax-documents-field-description",
@@ -1805,6 +1825,11 @@
     "context": "Hide recipient view contents"
   },
   {
+    "term": "component.feature-flag-descriptions.integrations",
+    "definition": "Integrations",
+    "context": "Integrations"
+  },
+  {
     "term": "component.feature-flag-descriptions.on-behalf-of-description",
     "definition": "Add the option to send parallels on behalf of another user from their organization.",
     "context": "Add the option to send parallels on behalf of another user from their organization."
@@ -1813,6 +1838,11 @@
     "term": "component.feature-flag-descriptions.on-behalf-of-name",
     "definition": "\"Send as\" feature",
     "context": "\"Send as\" feature"
+  },
+  {
+    "term": "component.feature-flag-descriptions.others",
+    "definition": "Others",
+    "context": "Others"
   },
   {
     "term": "component.feature-flag-descriptions.petition-access-recipient-url-field-description",
