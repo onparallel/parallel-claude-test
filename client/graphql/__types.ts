@@ -363,6 +363,7 @@ export type FeatureFlag =
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SKIP_FORWARD_SECURITY"
+  | "STATISTICS_VIEW"
   | "TEMPLATE_REPLIES_PREVIEW_URL";
 
 /** A feature flag name with his value */
@@ -25101,6 +25102,7 @@ export type ReportsTemplates_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasStatisticsView: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -36476,6 +36478,9 @@ export const ReportsTemplates_templatesDocument = gql`
 export const ReportsTemplates_userDocument = gql`
   query ReportsTemplates_user {
     ...AppLayout_Query
+    me {
+      hasStatisticsView: hasFeatureFlag(featureFlag: STATISTICS_VIEW)
+    }
   }
   ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<ReportsTemplates_userQuery, ReportsTemplates_userQueryVariables>;

@@ -233,6 +233,17 @@ export function useFeatureFlags() {
             "Enables the setting to create a DocuSign Sandbox integration on the organization.",
         }),
       },
+      {
+        name: "STATISTICS_VIEW",
+        title: intl.formatMessage({
+          id: "component.feature-flag-descriptions.statistics-view-name",
+          defaultMessage: "Statistics View",
+        }),
+        description: intl.formatMessage({
+          id: "component.feature-flag-descriptions.statistics-view-description",
+          defaultMessage: "Enables the new views on statistics page.",
+        }),
+      },
     ],
     [intl.locale]
   );
