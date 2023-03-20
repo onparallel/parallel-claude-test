@@ -1292,6 +1292,7 @@ export interface MutationdeleteSignatureIntegrationArgs {
 }
 
 export interface MutationdeleteTagArgs {
+  force?: InputMaybe<Scalars["Boolean"]>;
   id: Scalars["GID"];
 }
 
@@ -4934,6 +4935,15 @@ export type TagSelect_createTagMutation = {
   createTag: { __typename?: "Tag"; id: string; name: string; color: string };
 };
 
+export type TagEditDialog_updateTagMutationVariables = Exact<{
+  id: Scalars["GID"];
+  data: UpdateTagInput;
+}>;
+
+export type TagEditDialog_updateTagMutation = {
+  updateTag: { __typename?: "Tag"; id: string; name: string; color: string };
+};
+
 export type UserAvatar_UserFragment = {
   __typename?: "User";
   fullName?: string | null;
@@ -5085,15 +5095,6 @@ export type FieldErrorDialog_PetitionFieldFragment = {
   id: string;
   title?: string | null;
   type: PetitionFieldType;
-};
-
-export type TagEditDialog_updateTagMutationVariables = Exact<{
-  id: Scalars["GID"];
-  data: UpdateTagInput;
-}>;
-
-export type TagEditDialog_updateTagMutation = {
-  updateTag: { __typename?: "Tag"; id: string; name: string; color: string };
 };
 
 export type TaskProgressDialog_TaskFragment = {
@@ -27002,6 +27003,13 @@ export type useDeletePetitions_deletePetitionsMutationVariables = Exact<{
 
 export type useDeletePetitions_deletePetitionsMutation = { deletePetitions: Success };
 
+export type useDeleteTag_deleteTagMutationVariables = Exact<{
+  id: Scalars["GID"];
+  force?: InputMaybe<Scalars["Boolean"]>;
+}>;
+
+export type useDeleteTag_deleteTagMutation = { deleteTag: Result };
+
 export type useUpdateIsReadNotification_UserFragment = {
   __typename?: "User";
   id: string;
@@ -32971,11 +32979,23 @@ export const TagSelect_tagsDocument = gql`
 export const TagSelect_createTagDocument = gql`
   mutation TagSelect_createTag($name: String!, $color: String!) {
     createTag(name: $name, color: $color) {
+      id
       ...TagSelect_Tag
     }
   }
   ${TagSelect_TagFragmentDoc}
 ` as unknown as DocumentNode<TagSelect_createTagMutation, TagSelect_createTagMutationVariables>;
+export const TagEditDialog_updateTagDocument = gql`
+  mutation TagEditDialog_updateTag($id: GID!, $data: UpdateTagInput!) {
+    updateTag(id: $id, data: $data) {
+      ...TagSelect_Tag
+    }
+  }
+  ${TagSelect_TagFragmentDoc}
+` as unknown as DocumentNode<
+  TagEditDialog_updateTagMutation,
+  TagEditDialog_updateTagMutationVariables
+>;
 export const UserGroupMembersPopover_getMembersDocument = gql`
   query UserGroupMembersPopover_getMembers($userGroupId: ID!) {
     getUsersOrGroups(ids: [$userGroupId]) {
@@ -33027,17 +33047,6 @@ export const UserSelect_useGetUsersOrGroupsDocument = gql`
 ` as unknown as DocumentNode<
   UserSelect_useGetUsersOrGroupsQuery,
   UserSelect_useGetUsersOrGroupsQueryVariables
->;
-export const TagEditDialog_updateTagDocument = gql`
-  mutation TagEditDialog_updateTag($id: GID!, $data: UpdateTagInput!) {
-    updateTag(id: $id, data: $data) {
-      ...TagSelect_Tag
-    }
-  }
-  ${TagSelect_TagFragmentDoc}
-` as unknown as DocumentNode<
-  TagEditDialog_updateTagMutation,
-  TagEditDialog_updateTagMutationVariables
 >;
 export const TaskProgressDialog_taskDocument = gql`
   query TaskProgressDialog_task($id: GID!) {
@@ -37090,6 +37099,14 @@ export const useDeletePetitions_deletePetitionsDocument = gql`
 ` as unknown as DocumentNode<
   useDeletePetitions_deletePetitionsMutation,
   useDeletePetitions_deletePetitionsMutationVariables
+>;
+export const useDeleteTag_deleteTagDocument = gql`
+  mutation useDeleteTag_deleteTag($id: GID!, $force: Boolean) {
+    deleteTag(id: $id, force: $force)
+  }
+` as unknown as DocumentNode<
+  useDeleteTag_deleteTagMutation,
+  useDeleteTag_deleteTagMutationVariables
 >;
 export const useUpdateIsReadNotification_updatePetitionUserNotificationReadStatusDocument = gql`
   mutation useUpdateIsReadNotification_updatePetitionUserNotificationReadStatus(

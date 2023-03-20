@@ -30,7 +30,7 @@ function filterCookies(cookies: string) {
 }
 
 export function mergeArraysBy(path: string[]): FieldMergeFunction {
-  return function merge(existing, incoming, { readField, mergeObjects, fieldName }) {
+  return function merge(existing, incoming, { canRead, readField, mergeObjects, fieldName }) {
     const getKey = (value: any) => {
       return path.reduce((acc, curr) => {
         const next = readField(curr, acc as any);
@@ -43,7 +43,7 @@ export function mergeArraysBy(path: string[]): FieldMergeFunction {
     if (existing === undefined) {
       return incoming;
     } else {
-      const existingByKey = indexBy(existing, getKey);
+      const existingByKey = indexBy(existing.filter(canRead), getKey);
       return incoming.map((value: any) => {
         const key = getKey(value);
         return existingByKey[key] ? mergeObjects(existingByKey[key], value) : value;
@@ -278,6 +278,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                 }
               },
             },
+            petitionListViews: { merge: false },
           },
         },
       },

@@ -4906,6 +4906,7 @@ export interface NexusGenArgTypes {
     };
     deleteTag: {
       // args
+      force?: boolean | null; // Boolean
       id: NexusGenScalars["GID"]; // GID!
     };
     deleteUserGroup: {

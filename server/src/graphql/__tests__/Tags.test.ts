@@ -44,8 +44,8 @@ describe("GraphQL/Tags", () => {
 
     const [otherUser] = await mocks.createRandomUsers(otherOrg.id, 2);
 
-    tags = await mocks.createRandomTags(organization.id, 5, (i) => ({
-      name: ["important", "to do", "todo", "outdated", "missing info"][i],
+    tags = await mocks.createRandomTags(organization.id, 6, (i) => ({
+      name: ["important", "to do", "todo", "outdated", "missing info", "other"][i],
     }));
     tags = sortBy(tags, (t) => t.name);
 
@@ -54,6 +54,7 @@ describe("GraphQL/Tags", () => {
     [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
     [privatePetition] = await mocks.createRandomPetitions(otherOrg.id, otherUser.id, 1);
     await mocks.tagPetitions([petition.id], tags[4].id);
+    await mocks.tagPetitions([petition.id], tags[5].id);
   });
 
   afterAll(async () => {
@@ -299,12 +300,13 @@ describe("GraphQL/Tags", () => {
     it("removes the tag from every petition when deleting it", async () => {
       const { errors: deleteError, data: deleteData } = await testClient.mutate({
         mutation: gql`
-          mutation ($id: GID!) {
-            deleteTag(id: $id)
+          mutation ($id: GID!, $force: Boolean) {
+            deleteTag(id: $id, force: $force)
           }
         `,
         variables: {
           id: toGlobalId("Tag", tags[4].id),
+          force: true,
         },
       });
 
@@ -330,8 +332,23 @@ describe("GraphQL/Tags", () => {
       expect(petitionError).toBeUndefined();
       expect(petitionData?.petition).toEqual({
         id: toGlobalId("Petition", petition.id),
-        tags: [],
+        tags: [{ id: toGlobalId("Tag", tags[5].id) }],
       });
+    });
+
+    it("sends error when trying to delete a tag used in petitions or views whitout force", async () => {
+      const { data, errors } = await testClient.mutate({
+        mutation: gql`
+          mutation ($id: GID!) {
+            deleteTag(id: $id)
+          }
+        `,
+        variables: {
+          id: toGlobalId("Tag", tags[5].id),
+        },
+      });
+      expect(errors).toContainGraphQLError("TAG_IS_USED");
+      expect(data).toBeNull();
     });
 
     it("sends error when trying to delete a private tag", async () => {

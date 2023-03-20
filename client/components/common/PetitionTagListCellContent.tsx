@@ -9,13 +9,12 @@ import {
   PetitionTagListCellContent_tagPetitionDocument,
   PetitionTagListCellContent_untagPetitionDocument,
 } from "@parallel/graphql/__types";
-import { withError } from "@parallel/utils/promises/withError";
+import { isAdmin, useOrgRole } from "@parallel/utils/roles";
 import { MouseEvent, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { ActionMeta } from "react-select";
 import { omit } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { useTagEditDialog } from "./dialogs/TagEditDialog";
 import { TagSelect, TagSelectInstance } from "./TagSelect";
 
 type TagSelection = PetitionTagListCellContent_TagFragment;
@@ -52,11 +51,6 @@ export function PetitionTagListCellContent({
     }
   };
 
-  const showTagEditDialog = useTagEditDialog();
-  const handleEditTags = async () => {
-    await withError(showTagEditDialog());
-  };
-
   const [tagPetition] = useMutation(PetitionTagListCellContent_tagPetitionDocument);
   const [untagPetition] = useMutation(PetitionTagListCellContent_untagPetitionDocument);
   const handleChange = async function (_: any, action: ActionMeta<TagSelection>) {
@@ -77,6 +71,8 @@ export function PetitionTagListCellContent({
     }
   };
 
+  const myRole = useOrgRole();
+  const userIsAdmin = myRole ? isAdmin(myRole) : false;
   const tags = petition.tags;
   const sample = tags.length > 4 ? tags.slice(0, 3) : tags;
   const extra = tags.length > 4 ? tags.slice(3) : [];
@@ -99,7 +95,6 @@ export function PetitionTagListCellContent({
             value={petition.tags}
             onBlur={() => setIsEditing(false)}
             onChange={handleChange}
-            onEditTags={handleEditTags}
             styles={{
               container: (styles) => ({ ...styles, width: "100%" }),
               valueContainer: (styles) => ({
@@ -121,6 +116,7 @@ export function PetitionTagListCellContent({
             }}
             components={{ IndicatorsContainer }}
             canCreateTags
+            canEditTags={userIsAdmin}
           />
         </Box>
       ) : (

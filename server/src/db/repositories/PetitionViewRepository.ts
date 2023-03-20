@@ -21,6 +21,21 @@ export class PetitionViewRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at").orderBy("position", "asc")
   );
 
+  async getPetitionListViewUsingTags(tagId: number) {
+    return await this.from("petition_list_view")
+      .whereNotNull("data")
+      .whereRaw(
+        `"data"->'tagsFilters'->'filters' @> jsonb_build_array(
+          jsonb_build_object(
+            'value',
+            jsonb_build_array(?::int)
+          )
+        )`,
+        [tagId]
+      )
+      .select("*");
+  }
+
   async createPetitionListView(data: CreatePetitionListView, createdBy: string) {
     const [view] = await this.from("petition_list_view").insert(
       { ...data, created_by: createdBy },
@@ -29,8 +44,13 @@ export class PetitionViewRepository extends BaseRepository {
     return view;
   }
 
-  async updatePetitionListView(id: number, data: Partial<PetitionListView>, user: User) {
-    const [view] = await this.from("petition_list_view")
+  async updatePetitionListView(
+    id: number,
+    data: Partial<PetitionListView>,
+    user: User,
+    t?: Knex.Transaction
+  ) {
+    const [view] = await this.from("petition_list_view", t)
       .where({ id, deleted_at: null, user_id: user.id })
       .update(
         {
@@ -42,6 +62,33 @@ export class PetitionViewRepository extends BaseRepository {
       );
 
     return view;
+  }
+
+  /**
+   *
+   * @param input list of bidimensional array where first argument is the ID of the view
+   * and the second argument is its new configuration
+   */
+  async updatePetitionListViewData(input: [number, any][], user: User, t?: Knex.Transaction) {
+    if (input.length > 0) {
+      await this.raw(
+        /* sql */ `
+      with update_data("id", "data") as (?)
+      update petition_list_view plv
+      set 
+        "data" = ud.data,
+        "updated_at" = NOW(),
+        "updated_by" = ?
+      from "update_data" ud
+      where 
+        plv.id = ud.id
+        and plv.deleted_at is null
+        and plv.user_id = ?
+    `,
+        [this.sqlValues(input, ["int", "jsonb"]), `User:${user.id}`, user.id],
+        t
+      );
+    }
   }
 
   async markDefaultPetitionListView(id: Maybe<number>, user: User) {

@@ -1247,6 +1247,7 @@ export type MutationdeleteSignatureIntegrationArgs = {
 };
 
 export type MutationdeleteTagArgs = {
+  force?: InputMaybe<Scalars["Boolean"]>;
   id: Scalars["GID"];
 };
 

@@ -4694,6 +4694,21 @@ export class PetitionRepository extends BaseRepository {
       .whereNull("deleted_at");
   }
 
+  async getTaggedPetitions(tagId: MaybeArray<number>) {
+    const tagIds = unMaybeArray(tagId);
+    if (tagIds.length === 0) {
+      return [];
+    }
+    return await this.raw<Petition>(
+      /* sql */ `
+      select p.* from petition_tag pt
+      join petition p on pt.petition_id = p.id
+      where pt.tag_id in ? and p.deleted_at is null
+    `,
+      [this.sqlIn(tagIds)]
+    );
+  }
+
   async createPetitionSignature(
     petitionId: number,
     data: Omit<CreatePetitionSignatureRequest, "petition_id">,

@@ -1,45 +1,69 @@
-import { gql, useApolloClient } from "@apollo/client";
-import { Box, Button, Flex, Stack, Text } from "@chakra-ui/react";
+import { gql, useApolloClient, useMutation } from "@apollo/client";
+import {
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Grid,
+  Input,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { EditIcon } from "@parallel/chakra/icons";
 import {
+  TagEditDialog_updateTagDocument,
   TagSelect_createTagDocument,
   TagSelect_TagFragment,
   TagSelect_TagFragmentDoc,
   TagSelect_tagsDocument,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { useDeleteTag } from "@parallel/utils/mutations/useDeleteTag";
+import { withError } from "@parallel/utils/promises/withError";
 import {
   genericRsComponent,
   rsStyles,
   useReactSelectProps,
 } from "@parallel/utils/react-select/hooks";
 import { CustomAsyncSelectProps } from "@parallel/utils/react-select/types";
+import { isNotEmptyText } from "@parallel/utils/strings";
 import { If, MaybeArray, unMaybeArray } from "@parallel/utils/types";
 import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import {
+  DependencyList,
   ForwardedRef,
   forwardRef,
   ReactElement,
+  ReactNode,
   RefAttributes,
   useCallback,
+  useEffect,
+  useRef,
   useState,
 } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { components, SelectComponentsConfig, SelectInstance } from "react-select";
 import AsyncSelect from "react-select/async";
 import AsyncCreatableSelect from "react-select/async-creatable";
 import { indexBy, isDefined, zip } from "remeda";
 import { assert } from "ts-essentials";
+import { ConfirmDialog } from "./dialogs/ConfirmDialog";
+import { DialogProps, useDialog } from "./dialogs/DialogProvider";
 import { Tag } from "./Tag";
-import { DEFAULT_COLORS } from "./TagColorSelect";
+import { DEFAULT_COLORS, TagColorSelect } from "./TagColorSelect";
 
 type TagSelection = TagSelect_TagFragment;
 
 interface TagSelectProps<IsMulti extends boolean = false>
   extends Omit<CustomAsyncSelectProps<TagSelection, IsMulti, never>, "value"> {
   value: If<IsMulti, TagSelection[] | string[], TagSelection | string | null>;
-  onEditTags?: () => void;
+  canEditTags?: boolean;
   canCreateTags?: boolean;
   maxItems?: number;
 }
@@ -56,13 +80,36 @@ export type TagSelectInstance<IsMulti extends boolean = false> = SelectInstance<
 
 export const TagSelect = Object.assign(
   forwardRef(function TagSelect<IsMulti extends boolean = false>(
-    { value, onEditTags, canCreateTags, maxItems, ...props }: TagSelectProps<IsMulti>,
+    { value, canEditTags, canCreateTags, maxItems, ...props }: TagSelectProps<IsMulti>,
     ref: ForwardedRef<TagSelectInstance<IsMulti>>
   ) {
     const intl = useIntl();
     const [newTagColor, setNewTagColor] = useState(randomColor());
-    const _value = useGetTagValues(value, props.isMulti ?? false);
     const apollo = useApolloClient();
+    const [id, setId] = useState(0);
+    const _value = useGetTagValues(value, props.isMulti ?? false, [id]);
+
+    // The following code makes sure the component is rerendered whenever the tag search is invalidated
+    const firstLoadRef = useRef(true);
+    useEffect(() => {
+      const subscription = apollo
+        .watchQuery({
+          query: TagSelect_tagsDocument,
+          variables: { search: "" },
+          fetchPolicy: "cache-only",
+        })
+        .subscribe(({ data, partial }) => {
+          if (firstLoadRef.current) {
+            firstLoadRef.current = false;
+          } else {
+            if (!isDefined(data.tags) && partial) {
+              setId((id) => id + 1);
+            }
+          }
+        });
+      return () => subscription.unsubscribe();
+    }, []);
+
     const loadOptions = useDebouncedAsync(
       async (search: string) => {
         const { data } = await apollo.query({
@@ -104,7 +151,7 @@ export const TagSelect = Object.assign(
         menuList: (styles, { selectProps }) => {
           return {
             ...styles,
-            ...((selectProps as any).onEditTags ? { paddingBottom: 0 } : {}),
+            ...((selectProps as any).canEditTags ? { paddingBottom: 0 } : {}),
           };
         },
         ...props.styles,
@@ -135,6 +182,7 @@ export const TagSelect = Object.assign(
 
     return (
       <Component
+        key={id}
         ref={ref}
         getOptionValue={(o) => o.id}
         getOptionLabel={(o) => o.name}
@@ -171,7 +219,7 @@ export const TagSelect = Object.assign(
         {...({
           canCreateTags,
           newTagColor,
-          onEditTags,
+          canEditTags,
         } as any)}
       />
     );
@@ -208,6 +256,7 @@ const _mutations = [
   gql`
     mutation TagSelect_createTag($name: String!, $color: String!) {
       createTag(name: $name, color: $color) {
+        id
         ...TagSelect_Tag
       }
     }
@@ -222,7 +271,7 @@ const rsComponent = genericRsComponent<
   {
     selectProps: {
       newTagColor: string;
-      onEditTags?: () => void;
+      canEditTags?: () => void;
       canCreateTags?: boolean;
     };
   }
@@ -335,12 +384,16 @@ const Option = rsComponent("Option", function (props) {
 
 const MenuList = rsComponent("MenuList", function (props) {
   const {
-    selectProps: { onEditTags },
+    selectProps: { canEditTags },
   } = props;
+  const showTagEditDialog = useTagEditDialog();
+  const handleEditTags = async () => {
+    await withError(showTagEditDialog());
+  };
   return (
     <components.MenuList {...props}>
       {props.children}
-      {props.options.length > 0 && onEditTags ? (
+      {props.options.length > 0 && canEditTags ? (
         <Box position="sticky" bottom="0" padding={2} backgroundColor="white">
           <Button
             width="100%"
@@ -348,7 +401,7 @@ const MenuList = rsComponent("MenuList", function (props) {
             variant="outline"
             fontWeight="normal"
             leftIcon={<EditIcon position="relative" top="-1px" />}
-            onClick={() => onEditTags()}
+            onClick={handleEditTags}
           >
             <FormattedMessage id="component.tag-select.edit-tags" defaultMessage="Edit tags" />
           </Button>
@@ -360,7 +413,8 @@ const MenuList = rsComponent("MenuList", function (props) {
 
 function useGetTagValues<IsMulti extends boolean = false>(
   value: If<IsMulti, TagSelection[] | string[], TagSelection | string | null>,
-  isMulti: IsMulti
+  isMulti: IsMulti,
+  deps: DependencyList
 ) {
   assert(!isMulti || Array.isArray(value));
   const client = useApolloClient();
@@ -384,16 +438,18 @@ function useGetTagValues<IsMulti extends boolean = false>(
     );
     const missing = fromCache.filter(([, value]) => value === null).map(([id]) => id);
     if (missing.length) {
-      const fromServer = await client.query({
-        query: TagSelect_tagsDocument,
-        variables: {
-          tagIds: missing,
-        },
-        fetchPolicy: "network-only",
-      });
-      const fromServerById = indexBy(fromServer.data.tags.items, (x) => x.id);
-      const result = fromCache.map(([id, value]) => value ?? fromServerById[id]!);
-      return isMulti ? result : result[0];
+      try {
+        const fromServer = await client.query({
+          query: TagSelect_tagsDocument,
+          variables: {
+            tagIds: missing,
+          },
+          fetchPolicy: "network-only",
+        });
+        const fromServerById = indexBy(fromServer.data.tags.items, (x) => x.id);
+        const result = fromCache.map(([id, value]) => value ?? fromServerById[id]!);
+        return isMulti ? result : result[0];
+      } catch {}
     } else {
       const result = fromCache.map(([, value]) => value!);
       return isMulti ? result : result[0];
@@ -422,7 +478,184 @@ function useGetTagValues<IsMulti extends boolean = false>(
           unMaybeArray(value as any)
             .map((x) => x.id)
             .join(","),
+      ...deps,
     ],
     isMulti ? [] : null
   );
+}
+
+interface TagEditDialogData {
+  tagId: string | null;
+  name: string;
+  color: string | null;
+}
+
+interface TagEditDialogProps extends DialogProps {}
+
+export function TagEditDialog({ ...props }: TagEditDialogProps) {
+  const {
+    handleSubmit,
+    register,
+    reset,
+    control,
+    watch,
+    setError,
+    formState: { errors, isDirty },
+  } = useForm<TagEditDialogData>({
+    mode: "onSubmit",
+    defaultValues: {
+      tagId: null,
+      name: "",
+      color: null,
+    },
+  });
+
+  const [updateTag, { loading: isUpdating }] = useMutation(TagEditDialog_updateTagDocument);
+  const tagId = watch("tagId");
+
+  const [selectedTag, setSelectedTag] = useState<TagSelect_TagFragment | null>(null);
+
+  const showGenericErrorToast = useGenericErrorToast();
+  const deleteTag = useDeleteTag();
+  const handleDeleteTag = async () => {
+    try {
+      const result = await deleteTag({ id: tagId!, name: selectedTag!.name });
+
+      if (result === "SUCCESS") {
+        reset({ tagId: null, name: "", color: null });
+        setSelectedTag(null);
+      } else {
+        showGenericErrorToast();
+      }
+    } catch {}
+  };
+
+  return (
+    <ConfirmDialog
+      {...props}
+      content={{
+        as: "form",
+        onSubmit: handleSubmit(async ({ tagId, color, name }) => {
+          try {
+            await updateTag({
+              variables: { id: tagId!, data: { color, name } },
+              update(cache) {
+                cache.evict({ fieldName: "tags", args: { search: "" } });
+                cache.gc();
+              },
+            });
+            reset({ tagId, color, name });
+          } catch (e) {
+            if (isApolloError(e, "TAG_ALREADY_EXISTS")) {
+              setError("name", { type: "unavailable" });
+            }
+          }
+        }),
+      }}
+      hasCloseButton
+      closeOnEsc
+      header={
+        <Stack direction="row" alignItems="center">
+          <EditIcon position="relative" />
+          <Text as="div" flex="1">
+            <FormattedMessage id="component.tag-edit-dialog.header" defaultMessage="Edit tags" />
+          </Text>
+        </Stack>
+      }
+      body={
+        <Box>
+          <FormControl>
+            <FormLabel>
+              <FormattedMessage id="component.tag-edit-dialog.tag-label" defaultMessage="Tag" />
+            </FormLabel>
+            <Controller
+              name="tagId"
+              control={control}
+              render={({ field }) => (
+                <TagSelect
+                  value={field.value}
+                  onChange={(tag) => {
+                    setSelectedTag(tag);
+                    reset({ tagId: tag!.id, name: tag!.name, color: tag!.color });
+                  }}
+                />
+              )}
+            />
+          </FormControl>
+          <Grid gridTemplateColumns="auto 1fr" alignItems="center" gridRowGap={2} marginTop={4}>
+            <FormControl as={NoElement} isDisabled={!isDefined(tagId)} isInvalid={!!errors.name}>
+              <FormLabel marginBottom="0">
+                <FormattedMessage id="component.tag-edit-dialog.rename" defaultMessage="Rename" />
+              </FormLabel>
+              <Input {...register("name", { required: true, validate: { isNotEmptyText } })} />
+
+              <FormErrorMessage gridColumn="2" marginTop={0}>
+                {errors.name?.type === "unavailable" ? (
+                  <FormattedMessage
+                    id="component.tag-edit-dialog.existing-tag"
+                    defaultMessage="A tag with the same name already exists"
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="generic.forms.field-required-error"
+                    defaultMessage="This field is required"
+                  />
+                )}
+              </FormErrorMessage>
+            </FormControl>
+            <FormControl as={NoElement} isDisabled={!isDefined(tagId)}>
+              <FormLabel marginBottom="0">
+                <FormattedMessage
+                  id="component.tag-edit-dialog.color-label"
+                  defaultMessage="Color"
+                />
+              </FormLabel>
+              <Controller
+                name="color"
+                control={control}
+                render={({ field }) => (
+                  <TagColorSelect
+                    value={field.value}
+                    onChange={(color) => {
+                      field.onChange(color);
+                    }}
+                  />
+                )}
+              />
+            </FormControl>
+          </Grid>
+        </Box>
+      }
+      confirm={
+        <Button isLoading={isUpdating} isDisabled={!isDirty} type="submit" colorScheme="primary">
+          <FormattedMessage id="generic.save-changes" defaultMessage="Save changes" />
+        </Button>
+      }
+      alternative={
+        <Button isDisabled={!tagId} colorScheme="red" variant="outline" onClick={handleDeleteTag}>
+          <FormattedMessage id="generic.delete" defaultMessage="Delete" />
+        </Button>
+      }
+      cancel={<></>}
+    />
+  );
+}
+
+function NoElement({ children }: { children: ReactNode }) {
+  return <>{children}</>;
+}
+
+TagEditDialog.mutations = [
+  gql`
+    mutation TagEditDialog_updateTag($id: GID!, $data: UpdateTagInput!) {
+      updateTag(id: $id, data: $data) {
+        ...TagSelect_Tag
+      }
+    }
+    ${TagSelect.fragments.Tag}
+  `,
+];
+
+export function useTagEditDialog() {
+  return useDialog(TagEditDialog);
 }

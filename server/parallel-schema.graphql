@@ -1127,7 +1127,13 @@ type Mutation {
   """
   Removes the tag from every petition and soft-deletes it
   """
-  deleteTag(id: GID!): Result!
+  deleteTag(
+    """
+    Pass true to force deleting tag with assigned parallels.
+    """
+    force: Boolean
+    id: GID!
+  ): Result!
 
   """
   Deletes a group

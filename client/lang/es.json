@@ -5755,9 +5755,9 @@
     "context": "Edit tags"
   },
   {
-    "term": "component.tag-edit-dialog.name-label",
-    "definition": "Nombre de etiqueta",
-    "context": "Tag name"
+    "term": "component.tag-edit-dialog.rename",
+    "definition": "Renombrar",
+    "context": "Rename"
   },
   {
     "term": "component.tag-edit-dialog.tag-label",
@@ -6133,6 +6133,36 @@
     "term": "component.use-delete-contact.confirm-delete-header",
     "definition": "Eliminar {count, plural, =1{{email}} other {# contactos}}",
     "context": "Delete {count, plural, =1{{email}} other {# contacts}}"
+  },
+  {
+    "term": "component.use-delete-tag.confirm-tag-header",
+    "definition": "Eliminar \"{tag}\"",
+    "context": "Delete \"{tag}\""
+  },
+  {
+    "term": "component.use-delete-tag.deleting-tag-parallels-views",
+    "definition": "Al eliminar la etiqueta se quitará de los parallels y vistas que la estén utilizando.",
+    "context": "Deleting the tag will remove it from the parallels and views that are using it."
+  },
+  {
+    "term": "component.use-delete-tag.parallel-count",
+    "definition": "{count, plural, =1 {# parallel} other {# parallels}}",
+    "context": "{count, plural, =1 {# parallel} other {# parallels}}"
+  },
+  {
+    "term": "component.use-delete-tag.template-count",
+    "definition": "{count, plural, =1 {# plantilla} other {# plantillas}}",
+    "context": "{count, plural, =1 {# template} other {# templates}}"
+  },
+  {
+    "term": "component.use-delete-tag.users-with-tag",
+    "definition": "Los siguientes usuarios están utilizando la etiqueta seleccionada:",
+    "context": "The following users are using the selected tag:"
+  },
+  {
+    "term": "component.use-delete-tag.views-count",
+    "definition": "{count, plural, =1 {# vista} other {# vistas}}",
+    "context": "{count, plural, =1 {# view} other {# views}}"
   },
   {
     "term": "component.user-dropdown-empty.invite-button",

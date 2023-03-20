@@ -1,5 +1,7 @@
-import { inputObjectType, mutationField, nonNull, stringArg } from "nexus";
+import { booleanArg, inputObjectType, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { countBy, uniq, zip } from "remeda";
 import { CreateTag } from "../../db/__types";
+import { fullName } from "../../util/fullName";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -8,6 +10,7 @@ import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyString } from "../helpers/validators/notEmptyString";
 import { petitionsAreNotPublicTemplates, userHasAccessToPetitions } from "../petition/authorizers";
+import { contextUserHasRole } from "../users/authorizers";
 import { userHasAccessToTags } from "./authorizers";
 import { validateHexColor } from "./validators";
 
@@ -49,7 +52,7 @@ export const createTag = mutationField("createTag", {
 export const updateTag = mutationField("updateTag", {
   description: "Updates the name and color of a given tag",
   type: "Tag",
-  authorize: authenticateAnd(userHasAccessToTags("id")),
+  authorize: authenticateAnd(userHasAccessToTags("id"), contextUserHasRole("ADMIN")),
   validateArgs: validateAnd(
     validateHexColor((args) => args.data.color, "data.color"),
     notEmptyString((args) => args.data.name, "data.name"),
@@ -94,16 +97,79 @@ export const updateTag = mutationField("updateTag", {
 export const deleteTag = mutationField("deleteTag", {
   description: "Removes the tag from every petition and soft-deletes it",
   type: "Result",
-  authorize: authenticateAnd(userHasAccessToTags("id")),
+  authorize: authenticateAnd(userHasAccessToTags("id"), contextUserHasRole("ADMIN")),
   args: {
     id: nonNull(globalIdArg("Tag")),
+    force: nullable(
+      booleanArg({
+        description: "Pass true to force deleting tag with assigned parallels.",
+      })
+    ),
   },
-  resolve: async (_, { id }, ctx) => {
+  resolve: async (_, { id, force }, ctx) => {
+    const taggedPetitions = await ctx.petitions.getTaggedPetitions(id);
+    const viewsWithTag = await ctx.views.getPetitionListViewUsingTags(id);
+
+    if ((viewsWithTag.length > 0 || taggedPetitions.length > 0) && !force) {
+      const petitionOwners = await ctx.petitions.loadPetitionOwner(
+        taggedPetitions.map((p) => p.id)
+      );
+      const viewsOwners = await ctx.users.loadUser(viewsWithTag.map((v) => v.user_id));
+      const usersData = await ctx.users.loadUserData(
+        uniq([
+          ...petitionOwners.map((o) => o!.user_data_id),
+          ...viewsOwners.map((vo) => vo!.user_data_id),
+        ])
+      );
+      const data = usersData.map((ownerData) => {
+        return {
+          fullName: fullName(ownerData!.first_name, ownerData!.last_name),
+          email: ownerData!.email,
+          petitionCount: countBy(
+            zip(taggedPetitions, petitionOwners),
+            ([p, o]) => !p.is_template && o!.user_data_id === ownerData!.id
+          ),
+          templateCount: countBy(
+            zip(taggedPetitions, petitionOwners),
+            ([p, o]) => p.is_template && o!.user_data_id === ownerData!.id
+          ),
+          petitionListViewCount: countBy(viewsOwners, (vo) => vo!.user_data_id === ownerData!.id),
+        };
+      });
+
+      throw new ApolloError(
+        "The tag has assigned parallels or views. Pass force=true to force deletion",
+        "TAG_IS_USED",
+        { data }
+      );
+    }
+
     try {
+      const input = viewsWithTag.map((view) => {
+        const filtersWithoutTag = (
+          view.data.tagsFilters.filters as { value: number[]; operator: string }[]
+        )
+          .map(({ value, operator }) => {
+            if (value.length === 1 && value[0] === id) return null;
+            return { value: value.filter((v) => v !== id), operator };
+          })
+          .filter((f) => f !== null);
+
+        const tagsFilters = filtersWithoutTag.length
+          ? {
+              operator: view.data.tagsFilters.operator,
+              filters: filtersWithoutTag,
+            }
+          : null;
+        return [view.id, { ...view.data, tagsFilters }] as [number, any];
+      });
+
       await ctx.tags.withTransaction(async (t) => {
+        await ctx.views.updatePetitionListViewData(input, ctx.user!, t);
         await ctx.tags.untagPetition(id, undefined, t);
         await ctx.tags.deleteTag(id, ctx.user!, t);
       });
+
       return RESULT.SUCCESS;
     } catch {
       return RESULT.FAILURE;
