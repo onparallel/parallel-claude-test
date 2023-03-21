@@ -42,6 +42,7 @@ type CalculatedData = {
   percentage: number;
   relativePercentage: number;
   dropOff: number;
+  relativeDropOffPercentage: number;
   dropOffPercentage: number;
   total: number;
 };
@@ -60,7 +61,7 @@ export function ReportsStatisticsConversion({
   const intl = useIntl();
   const { colors } = useTheme();
 
-  const [chartType, setChartType] = useState<"RELATIVE" | "ABSOLUTE">("RELATIVE");
+  const [chartType, setChartType] = useState<"RELATIVE" | "ABSOLUTE">("ABSOLUTE");
   const [isLoading, setIsLoading] = useState(true);
 
   const {
@@ -102,6 +103,7 @@ export function ReportsStatisticsConversion({
         relativePercentage: sent && 100,
         dropOff: 0,
         dropOffPercentage: 0,
+        relativeDropOffPercentage: 0,
         total: sent,
       },
       {
@@ -114,6 +116,7 @@ export function ReportsStatisticsConversion({
         relativePercentage: opened && (opened / sent) * 100,
         dropOff: sent - opened,
         dropOffPercentage: ((sent - opened) / sent) * 100,
+        relativeDropOffPercentage: ((sent - opened) / sent) * 100,
         total: opened,
       },
       {
@@ -122,10 +125,11 @@ export function ReportsStatisticsConversion({
           id: "component.reports-statistics-conversion.first-reply",
           defaultMessage: "First reply",
         }),
-        percentage: firstReply && (firstReply / opened) * 100,
-        relativePercentage: firstReply && (firstReply / sent) * 100,
+        percentage: firstReply && (firstReply / sent) * 100,
+        relativePercentage: firstReply && (firstReply / opened) * 100,
         dropOff: opened - firstReply,
-        dropOffPercentage: ((opened - firstReply) / opened) * 100,
+        dropOffPercentage: ((opened - firstReply) / sent) * 100,
+        relativeDropOffPercentage: ((opened - firstReply) / opened) * 100,
         total: firstReply,
       },
       {
@@ -134,10 +138,11 @@ export function ReportsStatisticsConversion({
           id: "component.reports-statistics-conversion.completed",
           defaultMessage: "Completed",
         }),
-        percentage: completed && (completed / firstReply) * 100,
-        relativePercentage: completed && (completed / sent) * 100,
+        percentage: completed && (completed / sent) * 100,
+        relativePercentage: completed && (completed / firstReply) * 100,
         dropOff: firstReply - completed,
-        dropOffPercentage: ((firstReply - completed) / firstReply) * 100,
+        dropOffPercentage: ((firstReply - completed) / sent) * 100,
+        relativeDropOffPercentage: ((firstReply - completed) / firstReply) * 100,
         total: completed,
       },
       ...(hasSignature || signed > 0
@@ -148,10 +153,11 @@ export function ReportsStatisticsConversion({
                 id: "component.reports-statistics-conversion.signed",
                 defaultMessage: "Signed",
               }),
-              percentage: (signed / completed) * 100,
-              relativePercentage: signed && (signed / sent) * 100,
+              percentage: signed && (signed / sent) * 100,
+              relativePercentage: (signed / completed) * 100,
               dropOff: completed - signed,
-              dropOffPercentage: ((completed - signed) / completed) * 100,
+              dropOffPercentage: ((completed - signed) / sent) * 100,
+              relativeDropOffPercentage: ((completed - signed) / completed) * 100,
               total: signed,
             },
           ]
@@ -163,10 +169,11 @@ export function ReportsStatisticsConversion({
           id: "component.reports-statistics-conversion.closed",
           defaultMessage: "Closed",
         }),
-        percentage: closed && (closed / (hasSignature ? signed : completed)) * 100,
-        relativePercentage: closed && (closed / sent) * 100,
+        percentage: closed && (closed / sent) * 100,
+        relativePercentage: closed && (closed / (hasSignature ? signed : completed)) * 100,
         dropOff: (hasSignature ? signed : completed) - closed,
-        dropOffPercentage:
+        dropOffPercentage: (((hasSignature ? signed : completed) - closed) / sent) * 100,
+        relativeDropOffPercentage:
           (((hasSignature ? signed : completed) - closed) / (hasSignature ? signed : completed)) *
           100,
         total: closed,
@@ -178,7 +185,7 @@ export function ReportsStatisticsConversion({
     const options = {
       indexAxis: "x",
       plugins: {
-        stacked100: { enable: chartType === "ABSOLUTE" ? true : false },
+        stacked100: { enable: chartType === "RELATIVE" ? true : false },
         legend: {
           display: false,
         },
@@ -209,8 +216,16 @@ export function ReportsStatisticsConversion({
               //Pick the correct percentage to show depends of what dataset is coming from
               const percentage =
                 datasetIndex === 1
-                  ? Math.round(calculatedData[dataIndex].dropOffPercentage)
-                  : Math.round(calculatedData[dataIndex].relativePercentage);
+                  ? Math.round(
+                      chartType === "RELATIVE"
+                        ? calculatedData[dataIndex].relativeDropOffPercentage
+                        : calculatedData[dataIndex].dropOffPercentage
+                    )
+                  : Math.round(
+                      chartType === "RELATIVE"
+                        ? calculatedData[dataIndex].relativePercentage
+                        : calculatedData[dataIndex].percentage
+                    );
 
               // To avoid print the dropOff data in the first column
               if (datasetIndex === 1 && dataIndex === 0) {
@@ -229,13 +244,21 @@ export function ReportsStatisticsConversion({
               }
 
               //Percentage of total label
-              return intl.formatMessage(
-                {
-                  id: "component.reports-statistics-conversion.of-total",
-                  defaultMessage: "{percentage}% of total",
-                },
-                { percentage }
-              );
+              return chartType === "RELATIVE"
+                ? intl.formatMessage(
+                    {
+                      id: "component.reports-statistics-conversion.of-previous",
+                      defaultMessage: "{percentage}% of previous",
+                    },
+                    { percentage }
+                  )
+                : intl.formatMessage(
+                    {
+                      id: "component.reports-statistics-conversion.of-total",
+                      defaultMessage: "{percentage}% of total",
+                    },
+                    { percentage }
+                  );
             },
           },
         },
@@ -260,7 +283,7 @@ export function ReportsStatisticsConversion({
         y: {
           min: 0,
           max: 100,
-          stacked: chartType === "ABSOLUTE" ? true : false,
+          stacked: chartType === "RELATIVE" ? true : false,
           ticks: {
             callback: function (value, index, arr) {
               return value + "%  ";
@@ -316,16 +339,16 @@ export function ReportsStatisticsConversion({
         },
         {
           data: calculatedData.map((data, index, arr) => {
-            if (chartType === "ABSOLUTE") {
-              return index === 0 ? 0 : data.dropOffPercentage;
+            if (chartType === "RELATIVE") {
+              return index === 0 ? 0 : data.relativeDropOffPercentage;
             }
 
             // if has signed without signature we compare with the completed instead of the signed column
             return index === 0
-              ? data.relativePercentage
+              ? data.percentage
               : data.id === "closed" && conversionFunnel.signed > 0 && !hasSignature
-              ? arr[index - 2].relativePercentage
-              : arr[index - 1].relativePercentage;
+              ? arr[index - 2].percentage
+              : arr[index - 1].percentage;
           }),
           barPercentage: 0.95,
           categoryPercentage: 0.95,
@@ -380,7 +403,7 @@ export function ReportsStatisticsConversion({
             <Text>
               <FormattedMessage
                 id="component.reports-statistics-conversion.conversion-funnel-help-1"
-                defaultMessage="This is the conversion funnel from sending the parallel until it is closed. The percentage is calculated with respect to the previous step."
+                defaultMessage="This funnel includes the steps of a parallel from the moment it is sent until it is closed."
               />
             </Text>
             <Text>
@@ -394,16 +417,16 @@ export function ReportsStatisticsConversion({
         <Spacer />
         <HStack>
           <ButtonGroup isAttached variant="outline" size="sm" {...getRootProps()}>
-            <RadioButton {...getRadioProps({ value: "RELATIVE" })} minWidth="fit-content">
-              <FormattedMessage
-                id="component.reports-statistics-conversion.relative"
-                defaultMessage="Relative"
-              />
-            </RadioButton>
             <RadioButton {...getRadioProps({ value: "ABSOLUTE" })}>
               <FormattedMessage
                 id="component.reports-statistics-conversion.absolute"
                 defaultMessage="Absolute"
+              />
+            </RadioButton>
+            <RadioButton {...getRadioProps({ value: "RELATIVE" })} minWidth="fit-content">
+              <FormattedMessage
+                id="component.reports-statistics-conversion.relative"
+                defaultMessage="Relative"
               />
             </RadioButton>
           </ButtonGroup>
@@ -430,7 +453,9 @@ export function ReportsStatisticsConversion({
             paddingRight={4}
             justifyContent="space-between"
           >
-            {calculatedData.map(({ id, label, total, percentage }) => {
+            {calculatedData.map(({ id, label, total, percentage, relativePercentage }) => {
+              const percent = chartType === "ABSOLUTE" ? percentage : relativePercentage;
+
               return (
                 <Stack key={id} spacing={0} paddingX={0} width="100%">
                   <HStack>
@@ -461,7 +486,7 @@ export function ReportsStatisticsConversion({
                   {hasEnoughData ? (
                     <HStack fontWeight={600}>
                       <Text fontSize="2xl" as="span">{`${
-                        percentage ? Math.round(percentage) : 0
+                        percent ? Math.round(percent) : 0
                       }%`}</Text>
                       <Text fontSize="sm" as="span">
                         ({total})

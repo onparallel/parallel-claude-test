@@ -5121,8 +5121,8 @@
   },
   {
     "term": "component.reports-statistics-conversion.conversion-funnel-help-1",
-    "definition": "Este funnel representa desde que se envía un parallel hasta que se cierra. El porcentaje se calcula respecto al paso anterior.",
-    "context": "This is the conversion funnel from sending the parallel until it is closed. The percentage is calculated with respect to the previous step."
+    "definition": "Este embudo incluye los pasos de un parallel desde que se envía hasta que se cierra.",
+    "context": "This funnel includes the steps of a parallel from the moment it is sent until it is closed."
   },
   {
     "term": "component.reports-statistics-conversion.conversion-funnel-help-2",
@@ -5158,6 +5158,11 @@
     "term": "component.reports-statistics-conversion.not-enough-data",
     "definition": "No hay información suficiente para generar este informe ",
     "context": "Not enough data available to generate this report"
+  },
+  {
+    "term": "component.reports-statistics-conversion.of-previous",
+    "definition": "{percentage}% del anterior",
+    "context": "{percentage}% of previous"
   },
   {
     "term": "component.reports-statistics-conversion.of-total",
@@ -5311,8 +5316,8 @@
   },
   {
     "term": "component.reports-statistics-time.time-statistics-help-1",
-    "definition": "Esta tabla representa los diferentes tiempos de cada paso.",
-    "context": "This table represents the different times for each step."
+    "definition": "Esta tabla incluye la duración de cada paso.",
+    "context": "This table includes the duration of each step."
   },
   {
     "term": "component.reports-statistics-time.time-statistics-help-2",

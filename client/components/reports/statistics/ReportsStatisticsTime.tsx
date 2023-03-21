@@ -300,7 +300,7 @@ export function ReportsStatisticsTime({
             <Text>
               <FormattedMessage
                 id="component.reports-statistics-time.time-statistics-help-1"
-                defaultMessage="This table represents the different times for each step. "
+                defaultMessage="This table includes the duration of each step."
               />
             </Text>
             <Text>
