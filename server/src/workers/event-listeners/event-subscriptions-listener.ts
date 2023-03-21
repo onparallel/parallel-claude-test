@@ -2,7 +2,6 @@ import { sign } from "crypto";
 import pMap from "p-map";
 import { PetitionEvent } from "../../db/events";
 import { mapEvent } from "../../util/eventMapper";
-import { decrypt } from "../../util/token";
 import { EventListener } from "../event-processor";
 
 export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (event, ctx) => {
@@ -59,11 +58,7 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
         const keys = subscriptionKeys.filter((k) => k.event_subscription_id === subscription.id);
 
         keys.forEach((key, i) => {
-          const privateKey = decrypt(
-            Buffer.from(key.private_key, "base64"),
-            Buffer.from(ctx.config.security.encryptKeyBase64, "base64")
-          ).toString();
-
+          const privateKey = ctx.encryption.decrypt(Buffer.from(key.private_key, "base64"));
           headers[`X-Parallel-Signature-${i + 1}`] = sign(null, Buffer.from(body), {
             key: Buffer.from(privateKey, "base64"),
             format: "der",

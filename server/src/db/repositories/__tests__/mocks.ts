@@ -2,14 +2,16 @@ import { faker } from "@faker-js/faker";
 import { Knex } from "knex";
 import { isDefined, range } from "remeda";
 import { USER_COGNITO_ID } from "../../../../test/mocks";
+import { IEncryptionService } from "../../../services/encryption";
 import { unMaybeArray } from "../../../util/arrays";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
+import { generateEDKeyPair } from "../../../util/keyPairs";
 import { defaultPdfDocumentTheme } from "../../../util/PdfDocumentTheme";
 import { removeNotDefined } from "../../../util/remedaExtensions";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { titleize } from "../../../util/strings";
-import { encrypt, generateEDKeyPair, hash, random } from "../../../util/token";
+import { hash, random } from "../../../util/token";
 import { MaybeArray, Replace } from "../../../util/types";
 import {
   Contact,
@@ -1094,7 +1096,7 @@ export class Mocks {
 
   async createEventSubscriptionSignatureKey(
     subscriptionId: number,
-    keyB64: string,
+    encryption: IEncryptionService,
     amount?: number
   ) {
     return await this.knex<EventSubscriptionSignatureKey>(
@@ -1105,10 +1107,7 @@ export class Mocks {
         return {
           event_subscription_id: subscriptionId,
           public_key: publicKey.toString("base64"),
-          private_key: encrypt(
-            privateKey.toString("base64"),
-            Buffer.from(keyB64, "base64")
-          ).toString("base64"),
+          private_key: encryption.encrypt(privateKey.toString("base64"), "base64"),
         };
       }),
       "*"

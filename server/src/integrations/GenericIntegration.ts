@@ -4,7 +4,6 @@ import { injectable } from "inversify";
 import { Knex } from "knex";
 import { isDefined, omit } from "remeda";
 import { assert } from "ts-essentials";
-import { Config } from "../config";
 import {
   EnhancedCreateOrgIntegration,
   EnhancedIntegrationSettings,
@@ -14,7 +13,7 @@ import {
   IntegrationRepository,
 } from "../db/repositories/IntegrationRepository";
 import { IntegrationType } from "../db/__types";
-import { decrypt, encrypt } from "../util/token";
+import { EncryptionService } from "../services/encryption";
 import { Replace } from "../util/types";
 
 @injectable()
@@ -26,16 +25,17 @@ export abstract class GenericIntegration<
   protected abstract type: TType;
   protected abstract provider: TProvider;
 
-  constructor(protected config: Config, protected integrations: IntegrationRepository) {}
+  constructor(
+    protected encryption: EncryptionService,
+    protected integrations: IntegrationRepository
+  ) {}
 
-  protected encryptCredentials(credentials: IntegrationCredentials<TType, TProvider>): string {
-    const encryptionKey = Buffer.from(this.config.security.encryptKeyBase64, "base64");
-    return encrypt(JSON.stringify(credentials), encryptionKey).toString("hex");
+  private encryptCredentials(credentials: IntegrationCredentials<TType, TProvider>): string {
+    return this.encryption.encrypt(JSON.stringify(credentials), "hex");
   }
 
-  protected decryptCredentials(encrypted: string): IntegrationCredentials<TType, TProvider> {
-    const encryptionKey = Buffer.from(this.config.security.encryptKeyBase64, "base64");
-    const decrypted = decrypt(Buffer.from(encrypted, "hex"), encryptionKey).toString("utf8");
+  private decryptCredentials(encrypted: string): IntegrationCredentials<TType, TProvider> {
+    const decrypted = this.encryption.decrypt(Buffer.from(encrypted, "hex"), "utf8");
     return JSON.parse(decrypted);
   }
 

@@ -33,6 +33,7 @@ import { IPrinter, Printer, PRINTER } from "./printer";
 import { IQueuesService, QueuesService, QUEUES_SERVICE } from "./queues";
 import { IRedis, REDIS, Redis } from "./redis";
 import { IReportsService, ReportsService, REPORTS_SERVICE } from "./reports";
+import { IEncryptionService, EncryptionService, ENCRYPTION_SERVICE } from "./encryption";
 import { ISetupService, SetupService, SETUP_SERVICE } from "./setup";
 import { ISignatureService, SIGNATURE, SignatureService } from "./signature";
 import { ISmtp, Smtp, SMTP } from "./smtp";
@@ -65,4 +66,5 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IOrganizationLayoutService>(ORGANIZATION_LAYOUT_SERVICE).to(OrganizationLayoutService);
   bind<ISetupService>(SETUP_SERVICE).to(SetupService);
   bind<IReportsService>(REPORTS_SERVICE).to(ReportsService);
+  bind<IEncryptionService>(ENCRYPTION_SERVICE).to(EncryptionService);
 });

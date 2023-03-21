@@ -1,6 +1,5 @@
 import { inject, injectable } from "inversify";
 import { isDefined } from "remeda";
-import { CONFIG, Config } from "../config";
 import {
   EnhancedOrgIntegration,
   IntegrationRepository,
@@ -8,6 +7,7 @@ import {
 } from "../db/repositories/IntegrationRepository";
 import { ContactLocale, ContactLocaleValues } from "../db/__types";
 import { Tone } from "../emails/utils/types";
+import { EncryptionService, ENCRYPTION_SERVICE } from "../services/encryption";
 import { GenericIntegration } from "./GenericIntegration";
 
 export type SignaturitBrandingIdKey = `${Uppercase<ContactLocale>}_${Tone}_BRANDING_ID`;
@@ -37,10 +37,10 @@ export class SignaturitIntegration extends GenericIntegration<
   protected provider = "SIGNATURIT" as const;
 
   constructor(
-    @inject(CONFIG) config: Config,
+    @inject(ENCRYPTION_SERVICE) encryption: EncryptionService,
     @inject(IntegrationRepository) integrations: IntegrationRepository
   ) {
-    super(config, integrations);
+    super(encryption, integrations);
   }
 
   public async withApiKey<TResult>(

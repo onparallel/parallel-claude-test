@@ -5,24 +5,26 @@ import { Config, CONFIG } from "../../config";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { EventSubscriptionSignatureKey, PetitionEventSubscription, User } from "../../db/__types";
+import { IEncryptionService, ENCRYPTION_SERVICE } from "../../services/encryption";
 import { toGlobalId } from "../../util/globalId";
-import { decrypt } from "../../util/token";
 import { initServer, TestClient } from "./server";
 
 describe("GraphQL/EventSubscriptionSignatureKeys", () => {
   let testClient: TestClient;
   let mocks: Mocks;
   let user: User;
-  let encryptKeyBase64 = "";
 
   let subscription: PetitionEventSubscription;
   let signatureKeys: EventSubscriptionSignatureKey[];
+
+  let encryptionService: IEncryptionService;
 
   beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
     const config = testClient.container.get<Config>(CONFIG);
-    encryptKeyBase64 = config.security.encryptKeyBase64;
+
+    encryptionService = testClient.container.get<IEncryptionService>(ENCRYPTION_SERVICE);
     mocks = new Mocks(knex);
 
     ({ user } = await mocks.createSessionUserAndOrganization());
@@ -36,7 +38,7 @@ describe("GraphQL/EventSubscriptionSignatureKeys", () => {
 
     signatureKeys = await mocks.createEventSubscriptionSignatureKey(
       subscription.id,
-      config.security.encryptKeyBase64,
+      encryptionService,
       2
     );
   });
@@ -87,10 +89,7 @@ describe("GraphQL/EventSubscriptionSignatureKeys", () => {
 
       expect(() => {
         for (const key of keys) {
-          const privateKey = decrypt(
-            Buffer.from(key.private_key, "base64"),
-            Buffer.from(encryptKeyBase64, "base64")
-          ).toString();
+          const privateKey = encryptionService.decrypt(Buffer.from(key.private_key, "base64"));
 
           const privateKeyBuffer = Buffer.from(privateKey, "base64");
           assert(privateKeyBuffer instanceof Buffer);

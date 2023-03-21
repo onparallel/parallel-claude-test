@@ -2,7 +2,6 @@ import { Request, RequestHandler, Router } from "express";
 import { injectable } from "inversify";
 import { isDefined } from "remeda";
 import { authenticate } from "../api/helpers/authenticate";
-import { Config } from "../config";
 import {
   IntegrationProvider,
   IntegrationRepository,
@@ -10,6 +9,7 @@ import {
 } from "../db/repositories/IntegrationRepository";
 import { IntegrationType } from "../db/__types";
 import { IRedis } from "../services/redis";
+import { EncryptionService } from "../services/encryption";
 import { fromGlobalId } from "../util/globalId";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
@@ -36,11 +36,11 @@ export abstract class OAuthIntegration<
   WithAccessTokenContext extends {} = {}
 > extends ExpirableCredentialsIntegration<TType, TProvider, WithAccessTokenContext> {
   constructor(
-    protected override config: Config,
+    protected override encryption: EncryptionService,
     protected override integrations: IntegrationRepository,
     protected redis: IRedis
   ) {
-    super(config, integrations);
+    super(encryption, integrations);
   }
 
   protected async orgHasAccessToIntegration(orgId: number, state: TState): Promise<boolean> {

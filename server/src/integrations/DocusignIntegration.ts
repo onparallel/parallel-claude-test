@@ -11,6 +11,7 @@ import {
 import { FeatureFlagName, OrgIntegration } from "../db/__types";
 import { FetchService, FETCH_SERVICE } from "../services/fetch";
 import { IRedis, REDIS } from "../services/redis";
+import { EncryptionService, ENCRYPTION_SERVICE } from "../services/encryption";
 import { Replace } from "../util/types";
 import { InvalidCredentialsError } from "./GenericIntegration";
 import { OauthCredentials, OAuthIntegration, OauthIntegrationState } from "./OAuthIntegration";
@@ -41,13 +42,14 @@ export class DocusignIntegration extends OAuthIntegration<
   protected provider = "DOCUSIGN" as const;
 
   constructor(
-    @inject(CONFIG) config: Config,
+    @inject(CONFIG) private config: Config,
     @inject(REDIS) redis: IRedis,
     @inject(IntegrationRepository) integrations: IntegrationRepository,
     @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository,
-    @inject(FETCH_SERVICE) private fetch: FetchService
+    @inject(FETCH_SERVICE) private fetch: FetchService,
+    @inject(ENCRYPTION_SERVICE) protected override encryption: EncryptionService
   ) {
-    super(config, integrations, redis);
+    super(encryption, integrations, redis);
   }
 
   protected override getContext(

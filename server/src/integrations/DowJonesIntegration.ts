@@ -1,6 +1,5 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { CONFIG, Config } from "../config";
 import {
   EnhancedOrgIntegration,
   IntegrationCredentials,
@@ -8,6 +7,7 @@ import {
 } from "../db/repositories/IntegrationRepository";
 import { CreateOrgIntegration } from "../db/__types";
 import { FetchService, FETCH_SERVICE } from "../services/fetch";
+import { EncryptionService, ENCRYPTION_SERVICE } from "../services/encryption";
 import { ExpirableCredentialsIntegration } from "./ExpirableCredentialsIntegration";
 import { InvalidCredentialsError } from "./GenericIntegration";
 
@@ -21,11 +21,11 @@ export class DowJonesIntegration extends ExpirableCredentialsIntegration<
   protected provider = "DOW_JONES_KYC" as const;
 
   constructor(
-    @inject(CONFIG) config: Config,
+    @inject(ENCRYPTION_SERVICE) encryption: EncryptionService,
     @inject(FETCH_SERVICE) private fetch: FetchService,
     @inject(IntegrationRepository) integrations: IntegrationRepository
   ) {
-    super(config, integrations);
+    super(encryption, integrations);
   }
 
   protected async refreshCredentials(credentials: DowJonesCredentials) {

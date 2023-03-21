@@ -1,11 +1,11 @@
 import { injectable } from "inversify";
-import { Config } from "../config";
 import {
   IntegrationCredentials,
   IntegrationProvider,
   IntegrationRepository,
 } from "../db/repositories/IntegrationRepository";
 import { IntegrationType } from "../db/__types";
+import { EncryptionService } from "../services/encryption";
 
 import { GenericIntegration, InvalidCredentialsError } from "./GenericIntegration";
 
@@ -16,10 +16,10 @@ export abstract class ExpirableCredentialsIntegration<
   TContext extends {} = {}
 > extends GenericIntegration<TType, TProvider, TContext> {
   constructor(
-    protected override config: Config,
+    protected override encryption: EncryptionService,
     protected override integrations: IntegrationRepository
   ) {
-    super(config, integrations);
+    super(encryption, integrations);
   }
 
   protected abstract refreshCredentials(

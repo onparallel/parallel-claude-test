@@ -2,8 +2,8 @@ import { booleanArg, list, mutationField, nonNull, stringArg } from "nexus";
 import { isDefined } from "remeda";
 import { PetitionEventSubscription } from "../../db/__types";
 import { IFetchService } from "../../services/fetch";
+import { generateEDKeyPair } from "../../util/keyPairs";
 import { withError } from "../../util/promises/withError";
-import { encrypt, generateEDKeyPair } from "../../util/token";
 import { and, authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -151,10 +151,7 @@ export const createEventSubscriptionSignatureKey = mutationField(
         {
           event_subscription_id: subscriptionId,
           public_key: publicKey.toString("base64"),
-          private_key: encrypt(
-            privateKey.toString("base64"),
-            Buffer.from(ctx.config.security.encryptKeyBase64, "base64")
-          ).toString("base64"),
+          private_key: ctx.encryption.encrypt(privateKey.toString("base64"), "base64"),
         },
         `User:${ctx.user!.id}`
       );

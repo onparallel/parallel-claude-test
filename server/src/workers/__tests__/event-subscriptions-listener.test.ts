@@ -1,16 +1,15 @@
-import { sign } from "crypto";
+import { verify } from "crypto";
 import { Knex } from "knex";
 import { createTestContainer } from "../../../test/testContainer";
-import { CONFIG, Config } from "../../config";
 import { WorkerContext } from "../../context";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, Petition, PetitionEventSubscription, User } from "../../db/__types";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { FetchOptions, FETCH_SERVICE, IFetchService } from "../../services/fetch";
+import { IEncryptionService, ENCRYPTION_SERVICE } from "../../services/encryption";
 import { toGlobalId } from "../../util/globalId";
 import { deleteAllData } from "../../util/knexUtils";
-import { decrypt } from "../../util/token";
 import { eventSubscriptionsListener } from "../event-listeners/event-subscriptions-listener";
 
 describe("Worker - Event Subscriptions Listener", () => {
@@ -27,7 +26,8 @@ describe("Worker - Event Subscriptions Listener", () => {
 
   let fetchSpy: jest.SpyInstance;
   let emailSpy: jest.SpyInstance;
-  let encryptKeyBase64 = "";
+
+  let encryptionService: IEncryptionService;
 
   beforeAll(async () => {
     const container = createTestContainer();
@@ -91,7 +91,8 @@ describe("Worker - Event Subscriptions Listener", () => {
 
     emailSpy = jest.spyOn(container.get<IEmailsService>(EMAILS), "sendDeveloperWebhookFailedEmail");
     fetchSpy = jest.spyOn(container.get<IFetchService>(FETCH_SERVICE), "fetch");
-    encryptKeyBase64 = container.get<Config>(CONFIG).security.encryptKeyBase64;
+
+    encryptionService = container.get<IEncryptionService>(ENCRYPTION_SERVICE);
   });
 
   afterEach(() => {
@@ -228,7 +229,7 @@ describe("Worker - Event Subscriptions Listener", () => {
 
     const keys = await mocks.createEventSubscriptionSignatureKey(
       subscription.id,
-      encryptKeyBase64,
+      encryptionService,
       2
     );
 
@@ -258,20 +259,6 @@ describe("Worker - Event Subscriptions Listener", () => {
       createdAt: event.created_at,
     });
 
-    const xParallelSignatures = keys.map((key) =>
-      sign(null, Buffer.from(body), {
-        key: Buffer.from(
-          decrypt(
-            Buffer.from(key.private_key, "base64"),
-            Buffer.from(encryptKeyBase64, "base64")
-          ).toString(),
-          "base64"
-        ),
-        format: "der",
-        type: "pkcs8",
-      }).toString("base64")
-    );
-
     expect(fetchSpy).toHaveBeenCalledTimes(2);
     expect(fetchSpy).toHaveBeenNthCalledWith<[string, FetchOptions]>(
       1,
@@ -297,13 +284,29 @@ describe("Worker - Event Subscriptions Listener", () => {
         headers: {
           "Content-Type": "application/json",
           "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
-          "X-Parallel-Signature-1": xParallelSignatures[0],
-          "X-Parallel-Signature-2": xParallelSignatures[1],
+          "X-Parallel-Signature-1": expect.any(String),
+          "X-Parallel-Signature-2": expect.any(String),
         },
         delay: 5_000,
         maxRetries: 3,
       }
     );
+
+    const lastCallArgs = fetchSpy.mock.lastCall![1] as FetchOptions;
+    ["X-Parallel-Signature-1", "X-Parallel-Signature-2"].forEach((headerKey, index) => {
+      expect(
+        verify(
+          null,
+          Buffer.from(body),
+          {
+            key: Buffer.from(keys[index].public_key, "base64"),
+            format: "der",
+            type: "spki",
+          },
+          Buffer.from((lastCallArgs.headers as any)[headerKey], "base64")
+        )
+      ).toBe(true);
+    });
   });
 
   it("sends email and sets subscription as failing when event can not be delivered", async () => {

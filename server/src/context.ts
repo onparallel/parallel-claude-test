@@ -46,6 +46,7 @@ import { IPrinter, PRINTER } from "./services/printer";
 import { IQueuesService, QUEUES_SERVICE } from "./services/queues";
 import { IRedis, REDIS } from "./services/redis";
 import { IReportsService, REPORTS_SERVICE } from "./services/reports";
+import { EncryptionService, ENCRYPTION_SERVICE } from "./services/encryption";
 import { SetupService, SETUP_SERVICE } from "./services/setup";
 import { ISignatureService, SIGNATURE } from "./services/signature";
 import { ISmtp, SMTP } from "./services/smtp";
@@ -82,6 +83,7 @@ export class ApiContext {
     @inject(PETITION_IMPORT_EXPORT_SERVICE)
     public readonly petitionImportExport: IPetitionImportExportService,
     @inject(SETUP_SERVICE) public readonly setup: SetupService,
+    @inject(ENCRYPTION_SERVICE) public readonly encryption: EncryptionService,
 
     // Repositories
     public readonly contacts: ContactRepository,
@@ -125,6 +127,7 @@ export class WorkerContext {
     public readonly layouts: IOrganizationLayoutService,
     @inject(FETCH_SERVICE) public readonly fetch: IFetchService,
     @inject(REPORTS_SERVICE) public readonly reports: IReportsService,
+    @inject(ENCRYPTION_SERVICE) public readonly encryption: EncryptionService,
 
     // Repositories
     public readonly contacts: ContactRepository,

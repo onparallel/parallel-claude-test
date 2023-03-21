@@ -1,3 +1,5 @@
+import "reflect-metadata";
+// keep this space to prevent import sorting, removing init from top
 import { Knex } from "knex";
 import pMap from "p-map";
 import {
@@ -13,13 +15,17 @@ import {
   UserGroup,
   UserGroupMember,
 } from "../src/db/__types";
+import { EncryptionService } from "../src/services/encryption";
 import { defaultBrandTheme } from "../src/util/BrandTheme";
 import { deleteAllData } from "../src/util/knexUtils";
 import { defaultPdfDocumentTheme } from "../src/util/PdfDocumentTheme";
-import { encrypt } from "../src/util/token";
 
 export async function seed(knex: Knex): Promise<any> {
   await deleteAllData(knex);
+
+  const encryption = new EncryptionService({
+    security: { encryptKeyBase64: process.env.SECURITY_ENCRYPTION_KEY_BASE64!, jwtSecret: "" },
+  });
 
   await knex.raw(/* sql */ `
     insert into feature_flag (name, default_value)
@@ -173,10 +179,10 @@ export async function seed(knex: Knex): Promise<any> {
           provider: "SIGNATURIT",
           name: "Signaturit Sandbox",
           settings: {
-            CREDENTIALS: encrypt(
+            CREDENTIALS: encryption.encrypt(
               JSON.stringify({ API_KEY: process.env.SIGNATURIT_SANDBOX_API_KEY }),
-              Buffer.from(process.env.SECURITY_ENCRYPTION_KEY_BASE64!, "base64")
-            ).toString("hex"),
+              "hex"
+            ),
             ENVIRONMENT: "sandbox",
             IS_PARALLEL_MANAGED: false,
           },
