@@ -115,7 +115,6 @@ export const createPetition = mutationField("createPetition", {
   ),
   args: {
     name: stringArg(),
-    // TODO locales make nonNull ContactLocale
     locale: arg({ type: "PetitionLocale" }),
     petitionId: globalIdArg("Petition", {
       description: "GID of petition to base from",

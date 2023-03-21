@@ -11,10 +11,10 @@ import {
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { OrganizationRole } from "@parallel/graphql/__types";
+import { OrganizationRole, UserLocale } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
-import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
+import { asSupportedUserLocale, useSupportedUserLocales } from "@parallel/utils/locales";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -24,7 +24,7 @@ interface InviteUserDialogData {
   email: string;
   firstName: string;
   lastName: string;
-  locale: string;
+  locale: UserLocale;
   role: OrganizationRole;
 }
 
@@ -40,7 +40,7 @@ export function InviteUserDialog({ ...props }: DialogProps<{}, InviteUserDialogD
       email: "",
       firstName: "",
       lastName: "",
-      locale: intl.locale,
+      locale: asSupportedUserLocale(intl.locale),
       role: "NORMAL",
     },
   });
@@ -51,7 +51,7 @@ export function InviteUserDialog({ ...props }: DialogProps<{}, InviteUserDialogD
     pattern: EMAIL_REGEX,
   });
 
-  const locales = useSupportedLocales();
+  const locales = useSupportedUserLocales();
   const roles = useOrganizationRoles();
 
   return (

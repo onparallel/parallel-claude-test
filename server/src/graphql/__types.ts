@@ -326,7 +326,7 @@ export interface NexusGenEnums {
   PetitionListViewSearchIn: "CURRENT_FOLDER" | "EVERYWHERE";
   PetitionListViewSortDirection: "ASC" | "DESC";
   PetitionListViewSortField: "name" | "sentAt";
-  PetitionLocale: "en" | "es";
+  PetitionLocale: db.ContactLocale;
   PetitionMessageStatus: db.PetitionMessageStatus;
   PetitionPermissionType: db.PetitionPermissionType;
   PetitionPermissionTypeRW: "READ" | "WRITE";
@@ -380,6 +380,7 @@ export interface NexusGenEnums {
   TaskName: db.TaskName;
   TaskStatus: db.TaskStatus;
   Tone: "FORMAL" | "INFORMAL";
+  UserLocale: db.UserLocale;
   UserStatus: db.UserStatus;
 }
 
@@ -1305,6 +1306,7 @@ export interface NexusGenFieldTypes {
     clonePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     clonePetitions: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     cloneUserGroup: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
+    cloneUserGroups: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     closePetition: NexusGenRootTypes["Petition"]; // Petition!
     completePetition: NexusGenRootTypes["Petition"]; // Petition!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
@@ -1361,6 +1363,7 @@ export interface NexusGenFieldTypes {
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
     getTaskResultFile: NexusGenRootTypes["TaskResultFile"]; // TaskResultFile!
     importPetitionFromJson: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    inviteUserToOrganization: NexusGenRootTypes["User"]; // User!
     loginAs: NexusGenEnums["Result"]; // Result!
     markPetitionListViewAsDefault: NexusGenRootTypes["User"]; // User!
     markSignatureIntegrationAsDefault: NexusGenRootTypes["IOrgIntegration"]; // IOrgIntegration!
@@ -1387,6 +1390,7 @@ export interface NexusGenFieldTypes {
     publicMarkPetitionFieldCommentsAsRead: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     publicPetitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     publicRemindersOptOut: NexusGenEnums["Result"]; // Result!
+    publicResetTempPassword: NexusGenEnums["Result"]; // Result!
     publicResetTemporaryPassword: NexusGenEnums["Result"]; // Result!
     publicSendReminder: NexusGenEnums["Result"]; // Result!
     publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
@@ -1402,6 +1406,8 @@ export interface NexusGenFieldTypes {
     reorderPetitionAttachments: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     reorderPetitionListViews: NexusGenRootTypes["User"]; // User!
     resendVerificationCode: NexusGenEnums["Result"]; // Result!
+    resendVerificationEmail: NexusGenEnums["Result"]; // Result!
+    resetTempPassword: NexusGenEnums["Result"]; // Result!
     resetTemporaryPassword: NexusGenEnums["Result"]; // Result!
     resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     restoreDeletedPetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -1414,6 +1420,7 @@ export interface NexusGenFieldTypes {
     setUserDelegates: NexusGenRootTypes["User"]; // User!
     setUserPreferredLocale: NexusGenRootTypes["User"]; // User!
     shareSignaturitApiKey: NexusGenRootTypes["Organization"]; // Organization!
+    signUp: NexusGenRootTypes["User"]; // User!
     signaturitIntegrationShowSecurityStamp: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     signedPetitionDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     startAsyncFieldCompletion: NexusGenRootTypes["AsyncFieldCompletionResponse"]; // AsyncFieldCompletionResponse!
@@ -1458,6 +1465,7 @@ export interface NexusGenFieldTypes {
     updateTemplateDocumentTheme: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateUser: NexusGenRootTypes["User"]; // User!
     updateUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
+    updateUserPreferredLocale: NexusGenRootTypes["User"]; // User!
     uploadDynamicSelectFieldFile: NexusGenRootTypes["PetitionField"]; // PetitionField!
     uploadUserAvatar: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     userSignUp: NexusGenRootTypes["User"]; // User!
@@ -2531,7 +2539,7 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"]; // Organization!
     organizations: NexusGenRootTypes["Organization"][]; // [Organization!]!
     petitionListViews: NexusGenRootTypes["PetitionListView"][]; // [PetitionListView!]!
-    preferredLocale: string | null; // String
+    preferredLocale: NexusGenEnums["UserLocale"]; // UserLocale!
     role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     status: NexusGenEnums["UserStatus"]; // UserStatus!
     tokens: NexusGenRootTypes["UserAuthenticationToken"][]; // [UserAuthenticationToken!]!
@@ -3111,6 +3119,7 @@ export interface NexusGenFieldTypeNames {
     clonePetitionField: "PetitionField";
     clonePetitions: "PetitionBase";
     cloneUserGroup: "UserGroup";
+    cloneUserGroups: "UserGroup";
     closePetition: "Petition";
     completePetition: "Petition";
     createContact: "Contact";
@@ -3167,6 +3176,7 @@ export interface NexusGenFieldTypeNames {
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
     getTaskResultFile: "TaskResultFile";
     importPetitionFromJson: "SupportMethodResponse";
+    inviteUserToOrganization: "User";
     loginAs: "Result";
     markPetitionListViewAsDefault: "User";
     markSignatureIntegrationAsDefault: "IOrgIntegration";
@@ -3193,6 +3203,7 @@ export interface NexusGenFieldTypeNames {
     publicMarkPetitionFieldCommentsAsRead: "PublicPetitionFieldComment";
     publicPetitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     publicRemindersOptOut: "Result";
+    publicResetTempPassword: "Result";
     publicResetTemporaryPassword: "Result";
     publicSendReminder: "Result";
     publicSendVerificationCode: "VerificationCodeRequest";
@@ -3208,6 +3219,8 @@ export interface NexusGenFieldTypeNames {
     reorderPetitionAttachments: "PetitionBase";
     reorderPetitionListViews: "User";
     resendVerificationCode: "Result";
+    resendVerificationEmail: "Result";
+    resetTempPassword: "Result";
     resetTemporaryPassword: "Result";
     resetUserPassword: "SupportMethodResponse";
     restoreDeletedPetition: "SupportMethodResponse";
@@ -3220,6 +3233,7 @@ export interface NexusGenFieldTypeNames {
     setUserDelegates: "User";
     setUserPreferredLocale: "User";
     shareSignaturitApiKey: "Organization";
+    signUp: "User";
     signaturitIntegrationShowSecurityStamp: "SupportMethodResponse";
     signedPetitionDownloadLink: "FileUploadDownloadLinkResult";
     startAsyncFieldCompletion: "AsyncFieldCompletionResponse";
@@ -3264,6 +3278,7 @@ export interface NexusGenFieldTypeNames {
     updateTemplateDocumentTheme: "PetitionBase";
     updateUser: "User";
     updateUserGroup: "UserGroup";
+    updateUserPreferredLocale: "User";
     uploadDynamicSelectFieldFile: "PetitionField";
     uploadUserAvatar: "SupportMethodResponse";
     userSignUp: "User";
@@ -4337,7 +4352,7 @@ export interface NexusGenFieldTypeNames {
     organization: "Organization";
     organizations: "Organization";
     petitionListViews: "PetitionListView";
-    preferredLocale: "String";
+    preferredLocale: "UserLocale";
     role: "OrganizationRole";
     status: "UserStatus";
     tokens: "UserAuthenticationToken";
@@ -4640,6 +4655,11 @@ export interface NexusGenArgTypes {
       locale?: string | null; // String
       userGroupIds: NexusGenScalars["GID"][]; // [GID!]!
     };
+    cloneUserGroups: {
+      // args
+      locale: NexusGenEnums["UserLocale"]; // UserLocale!
+      userGroupIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
     closePetition: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
@@ -4707,7 +4727,7 @@ export interface NexusGenArgTypes {
       email: string; // String!
       firstName: string; // String!
       lastName: string; // String!
-      locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+      locale: NexusGenEnums["UserLocale"]; // UserLocale!
       name: string; // String!
       status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
     };
@@ -4949,6 +4969,16 @@ export interface NexusGenArgTypes {
       json: string; // String!
       userId: NexusGenScalars["GID"]; // GID!
     };
+    inviteUserToOrganization: {
+      // args
+      email: string; // String!
+      firstName: string; // String!
+      lastName: string; // String!
+      locale: NexusGenEnums["UserLocale"]; // UserLocale!
+      orgId?: NexusGenScalars["GID"] | null; // GID
+      role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
+      userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
+    };
     loginAs: {
       // args
       userId: NexusGenScalars["GID"]; // GID!
@@ -5102,6 +5132,11 @@ export interface NexusGenArgTypes {
       reason: string; // String!
       referer?: string | null; // String
     };
+    publicResetTempPassword: {
+      // args
+      email: string; // String!
+      locale: NexusGenEnums["UserLocale"]; // UserLocale!
+    };
     publicResetTemporaryPassword: {
       // args
       email: string; // String!
@@ -5184,6 +5219,16 @@ export interface NexusGenArgTypes {
       email: string; // String!
       locale?: string | null; // String
     };
+    resendVerificationEmail: {
+      // args
+      email: string; // String!
+      locale: NexusGenEnums["UserLocale"]; // UserLocale!
+    };
+    resetTempPassword: {
+      // args
+      email: string; // String!
+      locale: NexusGenEnums["UserLocale"]; // UserLocale!
+    };
     resetTemporaryPassword: {
       // args
       email: string; // String!
@@ -5192,7 +5237,7 @@ export interface NexusGenArgTypes {
     resetUserPassword: {
       // args
       email: string; // String!
-      locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+      locale: NexusGenEnums["UserLocale"]; // UserLocale!
     };
     restoreDeletedPetition: {
       // args
@@ -5244,6 +5289,21 @@ export interface NexusGenArgTypes {
       duration: NexusGenScalars["Duration"]; // Duration!
       limit: number; // Int!
       orgId: NexusGenScalars["GID"]; // GID!
+    };
+    signUp: {
+      // args
+      captcha: string; // String!
+      email: string; // String!
+      firstName: string; // String!
+      industry?: string | null; // String
+      lastName: string; // String!
+      licenseCode?: string | null; // String
+      locale: NexusGenEnums["UserLocale"]; // UserLocale!
+      organizationLogo?: NexusGenScalars["Upload"] | null; // Upload
+      organizationName: string; // String!
+      password: string; // String!
+      position?: string | null; // String
+      role?: string | null; // String
     };
     signaturitIntegrationShowSecurityStamp: {
       // args
@@ -5503,6 +5563,10 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["UpdateUserGroupInput"]; // UpdateUserGroupInput!
       id: NexusGenScalars["GID"]; // GID!
+    };
+    updateUserPreferredLocale: {
+      // args
+      locale: NexusGenEnums["UserLocale"]; // UserLocale!
     };
     uploadDynamicSelectFieldFile: {
       // args

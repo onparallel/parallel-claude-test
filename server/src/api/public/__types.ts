@@ -573,8 +573,13 @@ export type Mutation = {
   clonePetitionField: PetitionField;
   /** Clone petition. */
   clonePetitions: Array<PetitionBase>;
-  /** Clones the user group with all its members */
+  /**
+   * Clones the user group with all its members
+   * @deprecated Use cloneUserGroups
+   */
   cloneUserGroup: Array<UserGroup>;
+  /** Clones the user groups with all its members */
+  cloneUserGroups: Array<UserGroup>;
   /** Closes an open petition. */
   closePetition: Petition;
   /**
@@ -606,7 +611,10 @@ export type Mutation = {
   createOrganization: Organization;
   /** Creates a new PDF_DOCUMENT theme on the user's organization */
   createOrganizationPdfDocumentTheme: Organization;
-  /** Creates a new user in the same organization as the context user if `orgId` is not provided */
+  /**
+   * Creates a new user in the same organization as the context user if `orgId` is not provided
+   * @deprecated use inviteUserToOrganization
+   */
   createOrganizationUser: User;
   /** Create parallel. */
   createPetition: PetitionBase;
@@ -689,6 +697,8 @@ export type Mutation = {
   getTaskResultFile: TaskResultFile;
   /** Imports a petition from a JSON file */
   importPetitionFromJson: SupportMethodResponse;
+  /** Creates a new user in the same organization as the context user if `orgId` is not provided */
+  inviteUserToOrganization: User;
   loginAs: Result;
   /** Sets the default petition list view of the user. If passing null id, default view will be set (no filters/sorting) */
   markPetitionListViewAsDefault: User;
@@ -743,6 +753,11 @@ export type Mutation = {
   /** Cancel a reminder for a contact. */
   publicRemindersOptOut: Result;
   /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
+  publicResetTempPassword: Result;
+  /**
+   * Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
+   * @deprecated use publicResetTempPassword
+   */
   publicResetTemporaryPassword: Result;
   /** Sends an access reminder for a contact that is trying to open a petition through a contactless access but already has another active access */
   publicSendReminder: Result;
@@ -769,9 +784,19 @@ export type Mutation = {
   reorderPetitionAttachments: PetitionBase;
   /** Changes the ordering of a user's petition list views */
   reorderPetitionListViews: User;
-  /** Sends the AccountVerification email with confirmation code to unconfirmed user emails */
+  /**
+   * Sends the AccountVerification email with confirmation code to unconfirmed user emails
+   * @deprecated use resendVerificationEmail
+   */
   resendVerificationCode: Result;
+  /** Sends the AccountVerification email with confirmation code to unconfirmed user emails */
+  resendVerificationEmail: Result;
   /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
+  resetTempPassword: Result;
+  /**
+   * Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
+   * @deprecated use resetTempPassword
+   */
   resetTemporaryPassword: Result;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
   resetUserPassword: SupportMethodResponse;
@@ -790,10 +815,15 @@ export type Mutation = {
   sendSignatureRequestReminders: Result;
   /** Set the delegades of a user */
   setUserDelegates: User;
-  /** Sets the locale passed as arg as the preferred language of the user to see the page */
+  /**
+   * Sets the locale passed as arg as the preferred language of the user to see the page
+   * @deprecated use updateUserPreferredLocale
+   */
   setUserPreferredLocale: User;
   /** Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag. */
   shareSignaturitApiKey: Organization;
+  /** Triggered by new users that want to sign up into Parallel */
+  signUp: User;
   /** Enables/disables security stamp on documents for Signaturit integrations. */
   signaturitIntegrationShowSecurityStamp: SupportMethodResponse;
   /** Generates a download link for the signed PDF petition. */
@@ -885,11 +915,16 @@ export type Mutation = {
   updateUser: User;
   /** Updates the name of a given user group */
   updateUserGroup: UserGroup;
+  /** Sets the locale passed as arg as the preferred language of the user to see the page */
+  updateUserPreferredLocale: User;
   /** Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options */
   uploadDynamicSelectFieldFile: PetitionField;
   /** Uploads a user avatar image */
   uploadUserAvatar: SupportMethodResponse;
-  /** Triggered by new users that want to sign up into Parallel */
+  /**
+   * Triggered by new users that want to sign up into Parallel
+   * @deprecated use signUp
+   */
   userSignUp: User;
   /**
    * Tries to get an access_token with provided credentials
@@ -983,6 +1018,11 @@ export type MutationcloneUserGroupArgs = {
   userGroupIds: Array<Scalars["GID"]>;
 };
 
+export type MutationcloneUserGroupsArgs = {
+  locale: UserLocale;
+  userGroupIds: Array<Scalars["GID"]>;
+};
+
 export type MutationclosePetitionArgs = {
   petitionId: Scalars["GID"];
 };
@@ -1049,7 +1089,7 @@ export type MutationcreateOrganizationArgs = {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
-  locale: PetitionLocale;
+  locale: UserLocale;
   name: Scalars["String"];
   status: OrganizationStatus;
 };
@@ -1292,6 +1332,16 @@ export type MutationimportPetitionFromJsonArgs = {
   userId: Scalars["GID"];
 };
 
+export type MutationinviteUserToOrganizationArgs = {
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  locale: UserLocale;
+  orgId?: InputMaybe<Scalars["GID"]>;
+  role: OrganizationRole;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
+};
+
 export type MutationloginAsArgs = {
   userId: Scalars["GID"];
 };
@@ -1445,6 +1495,11 @@ export type MutationpublicRemindersOptOutArgs = {
   referer?: InputMaybe<Scalars["String"]>;
 };
 
+export type MutationpublicResetTempPasswordArgs = {
+  email: Scalars["String"];
+  locale: UserLocale;
+};
+
 export type MutationpublicResetTemporaryPasswordArgs = {
   email: Scalars["String"];
   locale: Scalars["String"];
@@ -1527,6 +1582,16 @@ export type MutationresendVerificationCodeArgs = {
   locale?: InputMaybe<Scalars["String"]>;
 };
 
+export type MutationresendVerificationEmailArgs = {
+  email: Scalars["String"];
+  locale: UserLocale;
+};
+
+export type MutationresetTempPasswordArgs = {
+  email: Scalars["String"];
+  locale: UserLocale;
+};
+
 export type MutationresetTemporaryPasswordArgs = {
   email: Scalars["String"];
   locale: Scalars["String"];
@@ -1534,7 +1599,7 @@ export type MutationresetTemporaryPasswordArgs = {
 
 export type MutationresetUserPasswordArgs = {
   email: Scalars["String"];
-  locale: PetitionLocale;
+  locale: UserLocale;
 };
 
 export type MutationrestoreDeletedPetitionArgs = {
@@ -1586,6 +1651,21 @@ export type MutationshareSignaturitApiKeyArgs = {
   duration: Scalars["Duration"];
   limit: Scalars["Int"];
   orgId: Scalars["GID"];
+};
+
+export type MutationsignUpArgs = {
+  captcha: Scalars["String"];
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  industry?: InputMaybe<Scalars["String"]>;
+  lastName: Scalars["String"];
+  licenseCode?: InputMaybe<Scalars["String"]>;
+  locale: UserLocale;
+  organizationLogo?: InputMaybe<Scalars["Upload"]>;
+  organizationName: Scalars["String"];
+  password: Scalars["String"];
+  position?: InputMaybe<Scalars["String"]>;
+  role?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationsignaturitIntegrationShowSecurityStampArgs = {
@@ -1845,6 +1925,10 @@ export type MutationupdateUserArgs = {
 export type MutationupdateUserGroupArgs = {
   data: UpdateUserGroupInput;
   id: Scalars["GID"];
+};
+
+export type MutationupdateUserPreferredLocaleArgs = {
+  locale: UserLocale;
 };
 
 export type MutationuploadDynamicSelectFieldFileArgs = {
@@ -4178,7 +4262,7 @@ export type User = Timestamps & {
   organizations: Array<Organization>;
   /** The petition views of the user */
   petitionListViews: Array<PetitionListView>;
-  preferredLocale: Maybe<Scalars["String"]>;
+  preferredLocale: UserLocale;
   role: OrganizationRole;
   status: UserStatus;
   /** Lists the API tokens this user has. */
@@ -4241,6 +4325,9 @@ export type UserGroupPagination = {
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
 };
+
+/** The preferred locale for the user */
+export type UserLocale = "en" | "es";
 
 export type UserNotifications_Pagination = {
   /** Whether this resource has more items. */

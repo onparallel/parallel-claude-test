@@ -11,9 +11,10 @@ import { AccountDelegates } from "@parallel/components/settings/AccountDelegates
 import { AccountLocaleChange } from "@parallel/components/settings/AccountLocaleChange";
 import {
   Account_setUserDelegatesDocument,
-  Account_setUserPreferredLocaleDocument,
+  Account_updateUserPreferredLocaleDocument,
   Account_updateAccountDocument,
   Account_userDocument,
+  UserLocale,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -49,7 +50,7 @@ function Account() {
   const sections = useSettingsSections(me);
 
   const [updateAccount] = useMutation(Account_updateAccountDocument);
-  const [setUserLocale] = useMutation(Account_setUserPreferredLocaleDocument);
+  const [updateUserPreferredLocale] = useMutation(Account_updateUserPreferredLocaleDocument);
   const [setUserDelegates] = useMutation(Account_setUserDelegatesDocument);
 
   async function onSaveName({ firstName, lastName }: AccountChangeNameData) {
@@ -71,9 +72,9 @@ function Account() {
     }
   }
 
-  async function handleLocaleChange(locale: string) {
+  async function handleLocaleChange(locale: UserLocale) {
     try {
-      await setUserLocale({ variables: { locale } });
+      await updateUserPreferredLocale({ variables: { locale } });
       window.analytics?.identify(me.id, { locale, name: me.fullName! });
       window.Intercom?.("boot", { language_override: locale });
       router.push(router.asPath, undefined, { locale });
@@ -142,8 +143,8 @@ Account.mutations = [
     }
   `,
   gql`
-    mutation Account_setUserPreferredLocale($locale: String!) {
-      setUserPreferredLocale(locale: $locale) {
+    mutation Account_updateUserPreferredLocale($locale: UserLocale!) {
+      updateUserPreferredLocale(locale: $locale) {
         id
         ...AccountLocaleChange_User
       }

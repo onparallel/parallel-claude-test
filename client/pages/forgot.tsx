@@ -14,9 +14,10 @@ import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
 import { PublicSignupRightHeading } from "@parallel/components/public/signup/PublicSignupRightHeading";
 import {
-  Forgot_publicResetTemporaryPasswordDocument,
-  Forgot_resendVerificationCodeDocument,
+  Forgot_publicResetTempPasswordDocument,
+  Forgot_resendVerificationEmailDocument,
 } from "@parallel/graphql/__types";
+import { asSupportedUserLocale } from "@parallel/utils/locales";
 import { postJSON } from "@parallel/utils/rest";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -109,18 +110,18 @@ function Forgot() {
     setIsSubmitting(false);
   }
 
-  const [resendVerificationCode] = useMutation(Forgot_resendVerificationCodeDocument);
-  const [publicResetTemporaryPassword] = useMutation(Forgot_publicResetTemporaryPasswordDocument);
+  const [resendVerificationEmail] = useMutation(Forgot_resendVerificationEmailDocument);
+  const [publicResetTempPassword] = useMutation(Forgot_publicResetTempPasswordDocument);
   async function handleResendEmail() {
     try {
       if (verification.email) {
         if (verification.isEmailNotVerifiedError) {
-          await resendVerificationCode({
-            variables: { email: verification.email, locale: intl.locale },
+          await resendVerificationEmail({
+            variables: { email: verification.email, locale: asSupportedUserLocale(intl.locale) },
           });
         } else if (verification.isForceChangePasswordError) {
-          await publicResetTemporaryPassword({
-            variables: { email: verification.email, locale: intl.locale },
+          await publicResetTempPassword({
+            variables: { email: verification.email, locale: asSupportedUserLocale(intl.locale) },
           });
         }
         return true;
@@ -241,13 +242,13 @@ function Forgot() {
 
 Forgot.mutations = [
   gql`
-    mutation Forgot_resendVerificationCode($email: String!, $locale: String) {
-      resendVerificationCode(email: $email, locale: $locale)
+    mutation Forgot_resendVerificationEmail($email: String!, $locale: UserLocale!) {
+      resendVerificationEmail(email: $email, locale: $locale)
     }
   `,
   gql`
-    mutation Forgot_publicResetTemporaryPassword($email: String!, $locale: String!) {
-      publicResetTemporaryPassword(email: $email, locale: $locale)
+    mutation Forgot_publicResetTempPassword($email: String!, $locale: UserLocale!) {
+      publicResetTempPassword(email: $email, locale: $locale)
     }
   `,
 ];

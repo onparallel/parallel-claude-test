@@ -17,8 +17,10 @@ import { PublicUserFormContainer } from "@parallel/components/public/PublicUserC
 import { PublicSignupRightHeading } from "@parallel/components/public/signup/PublicSignupRightHeading";
 import {
   Login_currentUserDocument,
-  Login_resendVerificationCodeDocument,
+  Login_resendVerificationEmailDocument,
+  UserLocale,
 } from "@parallel/graphql/__types";
+import { asSupportedUserLocale } from "@parallel/utils/locales";
 import { postJSON } from "@parallel/utils/rest";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
@@ -46,7 +48,7 @@ function Login() {
 
   const toast = useToast();
 
-  function redirectToApp(locale?: string, continueToApp?: boolean) {
+  function redirectToApp(locale?: UserLocale, continueToApp?: boolean) {
     router.push(
       typeof router.query.redirect === "string" && router.query.redirect.startsWith("/")
         ? router.query.redirect
@@ -59,7 +61,7 @@ function Login() {
   async function handleLoginSubmit({ email, password }: LoginData) {
     setIsSubmitting(true);
     try {
-      const data = await postJSON<{ preferredLocale?: string }>("/api/auth/login", {
+      const data = await postJSON<{ preferredLocale: UserLocale }>("/api/auth/login", {
         email,
         password,
       });
@@ -161,16 +163,16 @@ function Login() {
     }
   }
 
-  const [resendVerificationCode] = useMutation(Login_resendVerificationCodeDocument);
+  const [resendVerificationEmail] = useMutation(Login_resendVerificationEmailDocument);
   const handleResendVerificationEmail = async () => {
     try {
-      const { data } = await resendVerificationCode({
+      const { data } = await resendVerificationEmail({
         variables: {
           email: nonVerifiedEmail.current,
-          locale: intl.locale,
+          locale: asSupportedUserLocale(intl.locale),
         },
       });
-      return data?.resendVerificationCode === "SUCCESS";
+      return data?.resendVerificationEmail === "SUCCESS";
     } catch (error) {}
     return false;
   };
@@ -225,7 +227,7 @@ function Login() {
                 <AlreadyLoggedIn
                   me={data!.me}
                   onRelogin={() => setShowContinueAs(false)}
-                  onContinueAs={() => redirectToApp(data!.me.preferredLocale ?? undefined, true)}
+                  onContinueAs={() => redirectToApp(data!.me.preferredLocale, true)}
                 />
               ) : passwordChange?.type === "CHANGE" ? (
                 <PasswordChangeForm
@@ -291,8 +293,8 @@ function Login() {
 
 Login.mutations = [
   gql`
-    mutation Login_resendVerificationCode($email: String!, $locale: String) {
-      resendVerificationCode(email: $email, locale: $locale)
+    mutation Login_resendVerificationEmail($email: String!, $locale: UserLocale!) {
+      resendVerificationEmail(email: $email, locale: $locale)
     }
   `,
 ];

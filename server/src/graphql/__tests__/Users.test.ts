@@ -941,7 +941,7 @@ describe("GraphQL/Users", () => {
     });
   });
 
-  describe("createOrganizationUser", () => {
+  describe("inviteUserToOrganization", () => {
     let normalUser: User;
     let normalUserApiKey: string;
 
@@ -974,12 +974,14 @@ describe("GraphQL/Users", () => {
             $firstName: String!
             $lastName: String!
             $role: OrganizationRole!
+            $locale: UserLocale!
           ) {
-            createOrganizationUser(
+            inviteUserToOrganization(
               email: $email
               firstName: $firstName
               lastName: $lastName
               role: $role
+              locale: $locale
             ) {
               id
             }
@@ -990,6 +992,7 @@ describe("GraphQL/Users", () => {
           firstName: "Dwight",
           lastName: "Schrute",
           role: "NORMAL",
+          locale: "en",
         },
       });
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -1004,12 +1007,14 @@ describe("GraphQL/Users", () => {
             $firstName: String!
             $lastName: String!
             $role: OrganizationRole!
+            $locale: UserLocale!
           ) {
-            createOrganizationUser(
+            inviteUserToOrganization(
               email: $email
               firstName: $firstName
               lastName: $lastName
               role: $role
+              locale: $locale
             ) {
               fullName
               role
@@ -1021,6 +1026,7 @@ describe("GraphQL/Users", () => {
           firstName: "Michael",
           lastName: "Scott",
           role: "ADMIN",
+          locale: "en",
         },
       });
 
@@ -1045,12 +1051,14 @@ describe("GraphQL/Users", () => {
             $firstName: String!
             $lastName: String!
             $role: OrganizationRole!
+            $locale: UserLocale!
           ) {
-            createOrganizationUser(
+            inviteUserToOrganization(
               email: $email
               firstName: $firstName
               lastName: $lastName
               role: $role
+              locale: $locale
             ) {
               fullName
               role
@@ -1062,6 +1070,7 @@ describe("GraphQL/Users", () => {
           firstName: "Michael",
           lastName: "Scott",
           role: "ADMIN",
+          locale: "en",
         },
       });
 
@@ -1079,12 +1088,14 @@ describe("GraphQL/Users", () => {
             $firstName: String!
             $lastName: String!
             $role: OrganizationRole!
+            $locale: UserLocale!
           ) {
-            createOrganizationUser(
+            inviteUserToOrganization(
               email: $email
               firstName: $firstName
               lastName: $lastName
               role: $role
+              locale: $locale
             ) {
               fullName
               role
@@ -1096,11 +1107,12 @@ describe("GraphQL/Users", () => {
           firstName: "Michael",
           lastName: "Scott",
           role: "ADMIN",
+          locale: "en",
         },
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.createOrganizationUser).toEqual({ fullName: "Michael Scott", role: "ADMIN" });
+      expect(data?.inviteUserToOrganization).toEqual({ fullName: "Michael Scott", role: "ADMIN" });
     });
 
     it("should not create a user if the organization reached the max limit of users", async () => {
@@ -1111,12 +1123,14 @@ describe("GraphQL/Users", () => {
             $firstName: String!
             $lastName: String!
             $role: OrganizationRole!
+            $locale: UserLocale!
           ) {
-            createOrganizationUser(
+            inviteUserToOrganization(
               email: $email
               firstName: $firstName
               lastName: $lastName
               role: $role
+              locale: $locale
             ) {
               id
             }
@@ -1127,6 +1141,7 @@ describe("GraphQL/Users", () => {
           firstName: "Jim",
           lastName: "Halpert",
           role: "NORMAL",
+          locale: "en",
         },
       });
       expect(errors).toContainGraphQLError("USER_LIMIT_ERROR", { userLimit: 3 });
@@ -1134,7 +1149,7 @@ describe("GraphQL/Users", () => {
     });
   });
 
-  describe("userSignUp", () => {
+  describe("signUp", () => {
     it("user signup creates organization and default entries", async () => {
       const { errors, data } = await testClient.execute(
         gql`
@@ -1145,14 +1160,16 @@ describe("GraphQL/Users", () => {
             $lastName: String!
             $organizationName: String!
             $password: String!
+            $locale: UserLocale!
           ) {
-            userSignUp(
+            signUp(
               captcha: $captcha
               email: $email
               firstName: $firstName
               lastName: $lastName
               organizationName: $organizationName
               password: $password
+              locale: $locale
             ) {
               id
             }
@@ -1165,6 +1182,7 @@ describe("GraphQL/Users", () => {
           lastName: "User",
           organizationName: "MyOrganization",
           password: "sup€rs@f3P4ssw0rd",
+          locale: "en",
         }
       );
 
@@ -1172,7 +1190,7 @@ describe("GraphQL/Users", () => {
 
       const { apiKey } = await mocks.createUserAuthToken(
         "api-token",
-        fromGlobalId(data!.userSignUp.id, "User").id
+        fromGlobalId(data!.signUp.id, "User").id
       );
       const { errors: queryErrors, data: queryData } = await testClient.withApiKey(apiKey)
         .execute(gql`
@@ -1180,6 +1198,7 @@ describe("GraphQL/Users", () => {
           me {
             id
             fullName
+            preferredLocale
             organization {
               name
               integrations(limit: 10, offset: 0) {
@@ -1222,8 +1241,9 @@ describe("GraphQL/Users", () => {
       expect(queryErrors).toBeUndefined();
       expect(queryData).toEqual({
         me: {
-          id: data!.userSignUp.id,
+          id: data!.signUp.id,
           fullName: "Test User",
+          preferredLocale: "en",
           organization: {
             name: "MyOrganization",
             integrations: {

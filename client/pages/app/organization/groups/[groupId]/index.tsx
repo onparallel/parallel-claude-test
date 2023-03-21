@@ -28,7 +28,7 @@ import { useConfirmRemoveMemberDialog } from "@parallel/components/organization/
 import { OrganizationGroupListTableHeader } from "@parallel/components/organization/OrganizationGroupListTableHeader";
 import {
   OrganizationGroup_addUsersToUserGroupDocument,
-  OrganizationGroup_cloneUserGroupDocument,
+  OrganizationGroup_cloneUserGroupsDocument,
   OrganizationGroup_deleteUserGroupDocument,
   OrganizationGroup_removeUsersFromGroupDocument,
   OrganizationGroup_updateUserGroupDocument,
@@ -39,6 +39,7 @@ import {
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { asSupportedUserLocale } from "@parallel/utils/locales";
 import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { isAdmin } from "@parallel/utils/roles";
@@ -173,13 +174,13 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     }
   };
 
-  const [_cloneUserGroup] = useMutation(OrganizationGroup_cloneUserGroupDocument);
+  const [cloneUserGroups] = useMutation(OrganizationGroup_cloneUserGroupsDocument);
 
   const handleCloneGroup = async () => {
-    const { data } = await _cloneUserGroup({
-      variables: { ids: [groupId], locale: intl.locale },
+    const { data } = await cloneUserGroups({
+      variables: { ids: [groupId], locale: asSupportedUserLocale(intl.locale) },
     });
-    const cloneUserGroupId = data?.cloneUserGroup[0].id || "";
+    const cloneUserGroupId = data?.cloneUserGroups[0].id || "";
 
     router.push(`/app/organization/groups/${cloneUserGroupId}`);
   };
@@ -534,8 +535,8 @@ const _mutations = [
     }
   `,
   gql`
-    mutation OrganizationGroup_cloneUserGroup($ids: [GID!]!, $locale: String!) {
-      cloneUserGroup(userGroupIds: $ids, locale: $locale) {
+    mutation OrganizationGroup_cloneUserGroups($ids: [GID!]!, $locale: UserLocale!) {
+      cloneUserGroups(userGroupIds: $ids, locale: $locale) {
         ...OrganizationGroup_UserGroup
       }
     }

@@ -3,6 +3,7 @@ import { arg, enumType, inputObjectType, interfaceType, objectType, unionType } 
 import { findLast, isDefined, minBy } from "remeda";
 import { ReplyStatusChangedEvent } from "../../../db/events";
 import {
+  ContactLocaleValues,
   PetitionAttachment,
   PetitionAttachmentType,
   PetitionAttachmentTypeValues,
@@ -17,7 +18,8 @@ import { toHtml, toPlainText } from "../../../util/slate";
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
   description: "The locale used for rendering the petition to the contact.",
-  members: ["en", "es"],
+  members: ContactLocaleValues,
+  sourceType: "db.ContactLocale",
 });
 
 export const PetitionStatus = enumType({

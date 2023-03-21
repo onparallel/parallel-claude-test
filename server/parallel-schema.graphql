@@ -754,6 +754,12 @@ type Mutation {
   Clones the user group with all its members
   """
   cloneUserGroup(locale: String, userGroupIds: [GID!]!): [UserGroup!]!
+    @deprecated(reason: "Use cloneUserGroups")
+
+  """
+  Clones the user groups with all its members
+  """
+  cloneUserGroups(locale: UserLocale!, userGroupIds: [GID!]!): [UserGroup!]!
 
   """
   Closes an open petition.
@@ -858,7 +864,7 @@ type Mutation {
     Last name of the organization owner
     """
     lastName: String!
-    locale: PetitionLocale!
+    locale: UserLocale!
 
     """
     Name of the organization
@@ -883,7 +889,7 @@ type Mutation {
     orgId: GID
     role: OrganizationRole!
     userGroupIds: [GID!]
-  ): User!
+  ): User! @deprecated(reason: "use inviteUserToOrganization")
 
   """
   Create parallel.
@@ -1203,6 +1209,19 @@ type Mutation {
     """
     userId: GID!
   ): SupportMethodResponse!
+
+  """
+  Creates a new user in the same organization as the context user if `orgId` is not provided
+  """
+  inviteUserToOrganization(
+    email: String!
+    firstName: String!
+    lastName: String!
+    locale: UserLocale!
+    orgId: GID
+    role: OrganizationRole!
+    userGroupIds: [GID!]
+  ): User!
   loginAs(userId: GID!): Result!
 
   """
@@ -1437,7 +1456,13 @@ type Mutation {
   """
   Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
   """
+  publicResetTempPassword(email: String!, locale: UserLocale!): Result!
+
+  """
+  Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
+  """
   publicResetTemporaryPassword(email: String!, locale: String!): Result!
+    @deprecated(reason: "use publicResetTempPassword")
 
   """
   Sends an access reminder for a contact that is trying to open a petition through a contactless access but already has another active access
@@ -1546,16 +1571,28 @@ type Mutation {
   Sends the AccountVerification email with confirmation code to unconfirmed user emails
   """
   resendVerificationCode(email: String!, locale: String): Result!
+    @deprecated(reason: "use resendVerificationEmail")
+
+  """
+  Sends the AccountVerification email with confirmation code to unconfirmed user emails
+  """
+  resendVerificationEmail(email: String!, locale: UserLocale!): Result!
+
+  """
+  Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
+  """
+  resetTempPassword(email: String!, locale: UserLocale!): Result!
 
   """
   Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
   """
   resetTemporaryPassword(email: String!, locale: String!): Result!
+    @deprecated(reason: "use resetTempPassword")
 
   """
   Resets the given user password on AWS Cognito and sends an email with new temporary.
   """
-  resetUserPassword(email: String!, locale: PetitionLocale!): SupportMethodResponse!
+  resetUserPassword(email: String!, locale: UserLocale!): SupportMethodResponse!
 
   """
   Restores a deleted petition if it's not already anonymized.
@@ -1612,6 +1649,7 @@ type Mutation {
   Sets the locale passed as arg as the preferred language of the user to see the page
   """
   setUserPreferredLocale(locale: String!): User!
+    @deprecated(reason: "use updateUserPreferredLocale")
 
   """
   Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag.
@@ -1625,6 +1663,28 @@ type Mutation {
     limit: Int!
     orgId: GID!
   ): Organization!
+
+  """
+  Triggered by new users that want to sign up into Parallel
+  """
+  signUp(
+    captcha: String!
+    email: String!
+    firstName: String!
+    industry: String
+    lastName: String!
+    licenseCode: String
+
+    """
+    Preferred locale for AWS Cognito CustomMessages.
+    """
+    locale: UserLocale!
+    organizationLogo: Upload
+    organizationName: String!
+    password: String!
+    position: String
+    role: String
+  ): User!
 
   """
   Enables/disables security stamp on documents for Signaturit integrations.
@@ -2032,6 +2092,11 @@ type Mutation {
   updateUserGroup(data: UpdateUserGroupInput!, id: GID!): UserGroup!
 
   """
+  Sets the locale passed as arg as the preferred language of the user to see the page
+  """
+  updateUserPreferredLocale(locale: UserLocale!): User!
+
+  """
   Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options
   """
   uploadDynamicSelectFieldFile(fieldId: GID!, file: Upload!, petitionId: GID!): PetitionField!
@@ -2068,7 +2133,7 @@ type Mutation {
     password: String!
     position: String
     role: String
-  ): User!
+  ): User! @deprecated(reason: "use signUp")
 
   """
   Tries to get an access_token with provided credentials
@@ -5766,7 +5831,7 @@ type User implements Timestamps {
   The petition views of the user
   """
   petitionListViews: [PetitionListView!]!
-  preferredLocale: String
+  preferredLocale: UserLocale!
   role: OrganizationRole!
   status: UserStatus!
 
@@ -5831,6 +5896,14 @@ type UserGroupPagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+"""
+The preferred locale for the user
+"""
+enum UserLocale {
+  en
+  es
 }
 
 type UserNotifications_Pagination {

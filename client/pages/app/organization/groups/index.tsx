@@ -17,7 +17,7 @@ import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useCreateGroupDialog } from "@parallel/components/organization/dialogs/CreateGroupDialog";
 import { OrganizationGroupsListTableHeader } from "@parallel/components/organization/OrganizationGroupsListTableHeader";
 import {
-  OrganizationGroups_cloneUserGroupDocument,
+  OrganizationGroups_cloneUserGroupsDocument,
   OrganizationGroups_createUserGroupDocument,
   OrganizationGroups_deleteUserGroupDocument,
   OrganizationGroups_userDocument,
@@ -29,6 +29,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { asSupportedUserLocale } from "@parallel/utils/locales";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
@@ -113,13 +114,13 @@ function OrganizationGroups() {
   },
   []);
 
-  const [cloneUserGroup] = useMutation(OrganizationGroups_cloneUserGroupDocument);
+  const [cloneUserGroups] = useMutation(OrganizationGroups_cloneUserGroupsDocument);
   const handleCloneClick = useCallback(
     async function () {
-      await cloneUserGroup({
+      await cloneUserGroups({
         variables: {
           ids: selectedIds,
-          locale: intl.locale,
+          locale: asSupportedUserLocale(intl.locale),
         },
       });
       refetch();
@@ -483,8 +484,8 @@ OrganizationGroups.mutations = [
     }
   `,
   gql`
-    mutation OrganizationGroups_cloneUserGroup($ids: [GID!]!, $locale: String!) {
-      cloneUserGroup(userGroupIds: $ids, locale: $locale) {
+    mutation OrganizationGroups_cloneUserGroups($ids: [GID!]!, $locale: UserLocale!) {
+      cloneUserGroups(userGroupIds: $ids, locale: $locale) {
         ...OrganizationGroups_UserGroup
       }
     }

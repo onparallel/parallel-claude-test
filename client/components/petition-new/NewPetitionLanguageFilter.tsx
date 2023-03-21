@@ -10,7 +10,7 @@ import {
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionLocale } from "@parallel/graphql/__types";
-import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
+import { useSupportedPetitionLocales } from "@parallel/utils/locales";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { FormattedMessage } from "react-intl";
 
@@ -18,7 +18,7 @@ interface NewPetitionLanguageFilterProps extends ValueProps<PetitionLocale> {}
 
 export const NewPetitionLanguageFilter = chakraForwardRef<"button", NewPetitionLanguageFilterProps>(
   function NewPetitionLanguageFilter({ value, onChange, ...props }, ref) {
-    const locales = useSupportedLocales();
+    const locales = useSupportedPetitionLocales();
 
     return (
       <Menu matchWidth={true}>

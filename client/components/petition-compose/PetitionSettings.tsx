@@ -53,7 +53,7 @@ import { Maybe } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
-import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
+import { useSupportedPetitionLocales } from "@parallel/utils/locales";
 import { memo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, noop, pick } from "remeda";
@@ -105,7 +105,7 @@ function _PetitionSettings({
   onUpdatePetition,
   validPetitionFields,
 }: PetitionSettingsProps) {
-  const locales = useSupportedLocales();
+  const locales = useSupportedPetitionLocales();
   const intl = useIntl();
 
   const signatureIntegrations = user.organization.signatureIntegrations.items;

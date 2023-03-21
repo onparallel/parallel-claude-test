@@ -2,7 +2,7 @@ import { Button, Select, Stack, StackProps } from "@chakra-ui/react";
 import { ArrowShortRightIcon } from "@parallel/chakra/icons";
 import { NakedLink } from "@parallel/components/common/Link";
 import { resolveUrl } from "@parallel/utils/next";
-import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
+import { useSupportedUserLocales } from "@parallel/utils/locales";
 import { useRouter } from "next/router";
 import { ChangeEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -19,7 +19,7 @@ export function PublicHeaderMenu(props: StackProps) {
     router.push(resolveUrl(router.pathname, { ...router.query }), undefined, { locale });
   }
 
-  const locales = useSupportedLocales();
+  const locales = useSupportedUserLocales();
 
   return (
     <Stack {...props}>

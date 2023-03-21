@@ -130,12 +130,42 @@ export const removeUsersFromGroup = mutationField("removeUsersFromGroup", {
   },
 });
 
+export const cloneUserGroups = mutationField("cloneUserGroups", {
+  description: "Clones the user groups with all its members",
+  type: list("UserGroup"),
+  args: {
+    userGroupIds: nonNull(list(nonNull(globalIdArg("UserGroup")))),
+    locale: nonNull("UserLocale"),
+  },
+  authorize: authenticateAnd(
+    contextUserHasRole("ADMIN"),
+    userHasAccessToUserGroups("userGroupIds")
+  ),
+  resolve: async (_, args, ctx) => {
+    const groups = (await ctx.userGroups.loadUserGroup(args.userGroupIds)) as UserGroup[];
+    const intl = await ctx.i18n.getIntl(args.locale);
+    return await pMap(groups, (group) =>
+      ctx.userGroups.cloneUserGroup(
+        group.id,
+        group.name.concat(
+          ` (${intl.formatMessage({
+            id: "generic.copy",
+            defaultMessage: "copy",
+          })})`
+        ),
+        ctx.user!
+      )
+    );
+  },
+});
+
+/** @deprecated */
 export const cloneUserGroup = mutationField("cloneUserGroup", {
+  deprecation: "Use cloneUserGroups",
   description: "Clones the user group with all its members",
   type: list("UserGroup"),
   args: {
     userGroupIds: nonNull(list(nonNull(globalIdArg("UserGroup")))),
-    // TODO locales make nonNull UserLocale
     locale: stringArg(),
   },
   authorize: authenticateAnd(

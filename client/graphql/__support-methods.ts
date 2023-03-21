@@ -277,7 +277,7 @@ export const supportMethods: {
           type: {
             kind: "NON_NULL",
             name: null,
-            ofType: { kind: "ENUM", name: "PetitionLocale", ofType: null },
+            ofType: { kind: "ENUM", name: "UserLocale", ofType: null },
           },
           defaultValue: null,
           isDeprecated: false,
@@ -650,8 +650,8 @@ export const schemaTypes: IntrospectionType[] = [
   },
   {
     kind: "ENUM",
-    name: "PetitionLocale",
-    description: "The locale used for rendering the petition to the contact.",
+    name: "UserLocale",
+    description: "The preferred locale for the user",
     specifiedByURL: null,
     fields: null,
     inputFields: null,

@@ -117,7 +117,6 @@ export const landingQueries = queryField((t) => {
     type: "LandingTemplate",
     extendArgs: {
       categories: list(nonNull(stringArg())),
-      // TODO locales make ContactLocale
       locale: nonNull(arg({ type: "PetitionLocale" })),
     },
     resolve: (_, { offset, limit, locale, categories }, ctx) => {
@@ -149,7 +148,6 @@ export const landingQueries = queryField((t) => {
         t.paginationField("templates", {
           type: "LandingTemplate",
           extendArgs: {
-            // TODO locales make ContactLocale
             locale: nonNull(arg({ type: "PetitionLocale" })),
           },
           resolve: (category, { limit, offset, locale }, ctx) => {

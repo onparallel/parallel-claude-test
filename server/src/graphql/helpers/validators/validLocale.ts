@@ -4,6 +4,7 @@ import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 const LOCALES = ["en", "es"];
 
+/** @deprecated should not be needed */
 export function validLocale<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
   argName: string

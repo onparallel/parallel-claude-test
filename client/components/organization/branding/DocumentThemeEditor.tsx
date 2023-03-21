@@ -18,7 +18,7 @@ import { ColorInput } from "@parallel/components/common/ColorInput";
 import { Divider } from "@parallel/components/common/Divider";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor";
-import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
+import { useSupportedPetitionLocales } from "@parallel/utils/locales";
 import { useEffect, useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -77,7 +77,7 @@ export function DocumentThemeEditor({
     return () => unsubscribe();
   }, [watch]);
 
-  const locales = useSupportedLocales();
+  const locales = useSupportedPetitionLocales();
 
   const sortedFonts = useMemo(
     () =>

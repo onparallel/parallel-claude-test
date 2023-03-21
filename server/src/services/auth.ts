@@ -46,14 +46,14 @@ import { OrganizationRepository } from "../db/repositories/OrganizationRepositor
 import { SystemRepository } from "../db/repositories/SystemRepository";
 import { UserAuthenticationRepository } from "../db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
-import { User, UserLocale } from "../db/__types";
+import { User, UserLocale, UserLocaleValues } from "../db/__types";
 import { ApolloError, ForbiddenError } from "../graphql/helpers/errors";
 import { awsLogger } from "../util/awsLogger";
 import { fullName } from "../util/fullName";
 import { sign, verify } from "../util/jwt";
 import { withError } from "../util/promises/withError";
 import { random } from "../util/token";
-import { MaybePromise } from "../util/types";
+import { Maybe, MaybePromise } from "../util/types";
 import { userHasRole } from "../util/userHasRole";
 import { EmailPayload } from "../workers/email-sender";
 import { ILogger, LOGGER } from "./logger";
@@ -344,7 +344,7 @@ export class Auth implements IAuth {
         if (!isDefined(integration) || integration.org_id !== orgId) {
           throw new Error("Invalid user");
         }
-        const preferredLocale = state.has("locale") ? (state.get("locale") as UserLocale) : "en";
+        const preferredLocale = this.asUserLocale(state.get("locale"));
         user = await this.users.createUser(
           {
             org_id: org.id,
@@ -427,7 +427,7 @@ export class Auth implements IAuth {
         const userData = await this.users.loadUserData(user.user_data_id);
         await this.trackSessionLogin(user);
         this.setSession(res, token);
-        res.status(201).send({ preferredLocale: userData?.preferred_locale });
+        res.status(201).send({ preferredLocale: userData!.preferred_locale });
       } else if (auth.ChallengeName === "NEW_PASSWORD_REQUIRED") {
         res.status(401).send({ error: "NewPasswordRequired" });
       } else {
@@ -1023,5 +1023,12 @@ export class Auth implements IAuth {
         payload,
       },
     });
+  }
+
+  private asUserLocale(locale: Maybe<string>): UserLocale {
+    if (UserLocaleValues.some((value) => value === locale)) {
+      return locale as UserLocale;
+    }
+    return "en";
   }
 }

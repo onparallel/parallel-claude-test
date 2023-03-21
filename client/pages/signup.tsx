@@ -10,11 +10,9 @@ import { PublicSignupFormInbox } from "@parallel/components/public/signup/Public
 import { PublicSignupFormName } from "@parallel/components/public/signup/PublicSignupFormName";
 import { PublicSignupFormOrganization } from "@parallel/components/public/signup/PublicSignupFormOrganization";
 import { PublicSignupRightHeading } from "@parallel/components/public/signup/PublicSignupRightHeading";
-import {
-  Signup_publicLicenseCodeDocument,
-  Signup_userSignUpDocument,
-} from "@parallel/graphql/__types";
+import { Signup_publicLicenseCodeDocument, Signup_signUpDocument } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
+import { asSupportedUserLocale } from "@parallel/utils/locales";
 import { Maybe } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { GetServerSidePropsContext, GetServerSidePropsResult } from "next";
@@ -54,7 +52,7 @@ function Signup({ code, source, activationEmail }: SignupProps) {
     decrement: prevStep,
   } = useCounter({ min: 0, max: 4, defaultValue: 0 });
 
-  const [userSignUp, { loading }] = useMutation(Signup_userSignUpDocument);
+  const [signUp, { loading }] = useMutation(Signup_signUpDocument);
 
   const SUBMIT_STEP = 3;
   const handleNextPage = async (data: Partial<SignupFormData>) => {
@@ -62,10 +60,10 @@ function Signup({ code, source, activationEmail }: SignupProps) {
 
     if (currentStep === SUBMIT_STEP) {
       try {
-        await userSignUp({
+        await signUp({
           variables: {
             ...(formData.current as SignupFormData),
-            locale: intl.locale,
+            locale: asSupportedUserLocale(intl.locale),
             licenseCode: code,
           },
         });
@@ -217,13 +215,13 @@ function Signup({ code, source, activationEmail }: SignupProps) {
 
 Signup.mutations = [
   gql`
-    mutation Signup_userSignUp(
+    mutation Signup_signUp(
       $email: String!
       $password: String!
       $firstName: String!
       $lastName: String!
       $organizationName: String!
-      $locale: String
+      $locale: UserLocale!
       $organizationLogo: Upload
       $industry: String
       $role: String
@@ -231,7 +229,7 @@ Signup.mutations = [
       $captcha: String!
       $licenseCode: String
     ) {
-      userSignUp(
+      signUp(
         email: $email
         password: $password
         firstName: $firstName

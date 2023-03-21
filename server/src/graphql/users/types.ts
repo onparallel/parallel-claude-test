@@ -2,6 +2,7 @@ import { arg, enumType, nonNull, objectType, unionType } from "nexus";
 import { indexBy, isDefined, omit, sortBy, uniq } from "remeda";
 import {
   FeatureFlagNameValues,
+  UserLocaleValues,
   UserOrganizationRoleValues,
   UserStatusValues,
 } from "../../db/__types";
@@ -10,6 +11,13 @@ import { getInitials } from "../../util/initials";
 import { userHasRole } from "../../util/userHasRole";
 import { datetimeArg } from "../helpers/scalars";
 import { rootIsContextRealUser, rootIsContextUser } from "./authorizers";
+
+export const UserLocale = enumType({
+  name: "UserLocale",
+  members: UserLocaleValues,
+  description: "The preferred locale for the user",
+  sourceType: "db.UserLocale",
+});
 
 export const OrganizationRole = enumType({
   name: "OrganizationRole",
@@ -184,8 +192,8 @@ export const User = objectType({
         return isDefined(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
       },
     });
-    // TODO locales make nonNull UserLocale
-    t.nullable.string("preferredLocale", {
+    t.field("preferredLocale", {
+      type: "UserLocale",
       resolve: async (o, _, ctx) => {
         const userData = await ctx.users.loadUserData(o.user_data_id);
         return userData!.preferred_locale;

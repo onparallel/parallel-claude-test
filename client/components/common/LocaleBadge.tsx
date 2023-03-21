@@ -1,12 +1,12 @@
 import { Badge, Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionLocale } from "@parallel/graphql/__types";
-import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
+import { useSupportedPetitionLocales } from "@parallel/utils/locales";
 import { SmallPopover } from "./SmallPopover";
 
 export const LocaleBadge = chakraForwardRef<"abbr", { locale: PetitionLocale }>(
   function LocaleBadge({ locale, ...props }, ref) {
-    const locales = useSupportedLocales();
+    const locales = useSupportedPetitionLocales();
     const localeLabel = locales.find(({ key }) => key === locale)!.localizedLabel;
     return (
       <SmallPopover content={<Text fontSize="sm">{localeLabel}</Text>} width="auto">

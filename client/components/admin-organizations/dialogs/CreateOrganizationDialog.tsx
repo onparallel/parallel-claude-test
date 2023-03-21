@@ -10,9 +10,9 @@ import {
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { OrganizationStatus, PetitionLocale } from "@parallel/graphql/__types";
+import { OrganizationStatus, UserLocale } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
+import { asSupportedUserLocale, useSupportedUserLocales } from "@parallel/utils/locales";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -22,7 +22,7 @@ interface CreateOrganizationDialogData {
   email: string;
   firstName: string;
   lastName: string;
-  locale: PetitionLocale;
+  locale: UserLocale;
   name: string;
   status: OrganizationStatus;
 }
@@ -41,7 +41,7 @@ export function CreateOrganizationDialog({
       email: "",
       firstName: "",
       lastName: "",
-      locale: (intl.locale as PetitionLocale) || "en",
+      locale: asSupportedUserLocale(intl.locale),
       name: "",
       status: "ACTIVE",
     },
@@ -53,7 +53,7 @@ export function CreateOrganizationDialog({
     pattern: EMAIL_REGEX,
   });
 
-  const locales = useSupportedLocales();
+  const locales = useSupportedUserLocales();
   const status = ["ACTIVE", "CHURNED", "DEMO", "DEV", "ROOT"] as OrganizationStatus[];
 
   return (

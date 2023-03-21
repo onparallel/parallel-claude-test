@@ -455,8 +455,8 @@ describe("GraphQL/UserGroups", () => {
   it("clones a user group and all its members", async () => {
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation UserGroups_cloneUserGroup($userGroupIds: [GID!]!) {
-          cloneUserGroup(userGroupIds: $userGroupIds, locale: "en") {
+        mutation UserGroups_cloneUserGroups($userGroupIds: [GID!]!, $locale: UserLocale!) {
+          cloneUserGroups(userGroupIds: $userGroupIds, locale: $locale) {
             name
             members {
               user {
@@ -468,10 +468,11 @@ describe("GraphQL/UserGroups", () => {
       `,
       variables: {
         userGroupIds: [toGlobalId("UserGroup", userGroups[0].id)],
+        locale: "en",
       },
     });
     expect(errors).toBeUndefined();
-    expect(data?.cloneUserGroup).toEqual([
+    expect(data?.cloneUserGroups).toEqual([
       {
         name: userGroups[0].name.concat(" (copy)"),
         members: users.slice(0, 3).map((user) => ({ user: { id: toGlobalId("User", user.id) } })),
@@ -482,18 +483,19 @@ describe("GraphQL/UserGroups", () => {
   it("cloning a user group should not clone the group permissions", async () => {
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation UserGroups_cloneUserGroup($userGroupIds: [GID!]!) {
-          cloneUserGroup(userGroupIds: $userGroupIds, locale: "en") {
+        mutation UserGroups_cloneUserGroups($userGroupIds: [GID!]!, $locale: UserLocale!) {
+          cloneUserGroups(userGroupIds: $userGroupIds, locale: $locale) {
             id
           }
         }
       `,
       variables: {
         userGroupIds: [toGlobalId("UserGroup", userGroups[0].id)],
+        locale: "en",
       },
     });
     expect(errors).toBeUndefined();
-    const newGroupId = fromGlobalId(data?.cloneUserGroup[0].id, "UserGroup").id;
+    const newGroupId = fromGlobalId(data?.cloneUserGroups[0].id, "UserGroup").id;
     const newGroupPermissions = await mocks
       .knex<PetitionPermission>("petition_permission")
       .whereNull("deleted_at")

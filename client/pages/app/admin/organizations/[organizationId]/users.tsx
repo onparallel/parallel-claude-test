@@ -3,15 +3,15 @@ import { Badge, Flex, Text, Tooltip, useToast } from "@chakra-ui/react";
 import { ForbiddenIcon, LogInIcon } from "@parallel/chakra/icons";
 import { AdminOrganizationMembersListTableHeader } from "@parallel/components/admin-organizations/AdminOrganizationMembersListTableHeader";
 import { AdminOrganizationsLayout } from "@parallel/components/admin-organizations/AdminOrganizationsLayout";
+import { useInviteUserDialog } from "@parallel/components/admin-organizations/dialogs/InviteUserDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
-import { useInviteUserDialog } from "@parallel/components/admin-organizations/dialogs/InviteUserDialog";
 import {
-  AdminOrganizationsMembers_createOrganizationUserDocument,
+  AdminOrganizationsMembers_inviteUserToOrganizationDocument,
   AdminOrganizationsMembers_organizationDocument,
   AdminOrganizationsMembers_OrganizationUserFragment,
   AdminOrganizationsMembers_queryDocument,
@@ -88,15 +88,15 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
   const intl = useIntl();
   const toast = useToast();
   const showGenericErrorToast = useGenericErrorToast();
-  const [createOrganizationUser] = useMutation(
-    AdminOrganizationsMembers_createOrganizationUserDocument
+  const [inviteUserToOrganization] = useMutation(
+    AdminOrganizationsMembers_inviteUserToOrganizationDocument
   );
   const showInviteUserDialog = useInviteUserDialog();
   async function handleInviteUser() {
     try {
       const user = await showInviteUserDialog();
 
-      await createOrganizationUser({
+      await inviteUserToOrganization({
         variables: {
           ...user,
           orgId: organization.id,
@@ -475,15 +475,15 @@ const _queries = [
 
 const _mutations = [
   gql`
-    mutation AdminOrganizationsMembers_createOrganizationUser(
+    mutation AdminOrganizationsMembers_inviteUserToOrganization(
       $firstName: String!
       $lastName: String!
       $email: String!
       $role: OrganizationRole!
-      $locale: String
+      $locale: UserLocale!
       $orgId: GID
     ) {
-      createOrganizationUser(
+      inviteUserToOrganization(
         email: $email
         firstName: $firstName
         lastName: $lastName

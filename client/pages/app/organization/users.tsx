@@ -24,11 +24,11 @@ import { UserLimitReachedAlert } from "@parallel/components/organization/UserLim
 import {
   OrganizationRole,
   OrganizationUsers_activateUserDocument,
-  OrganizationUsers_createOrganizationUserDocument,
   OrganizationUsers_deactivateUserDocument,
+  OrganizationUsers_inviteUserToOrganizationDocument,
   OrganizationUsers_OrderBy,
   OrganizationUsers_orgUsersDocument,
-  OrganizationUsers_resetTemporaryPasswordDocument,
+  OrganizationUsers_resetTempPasswordDocument,
   OrganizationUsers_updateOrganizationUserDocument,
   OrganizationUsers_userDocument,
   OrganizationUsers_UserFragment,
@@ -40,6 +40,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { asSupportedUserLocale } from "@parallel/utils/locales";
 import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { isAdmin } from "@parallel/utils/roles";
@@ -130,17 +131,19 @@ function OrganizationUsers() {
   );
 
   const showGenericErrorToast = useGenericErrorToast();
-  const [createOrganizationUser] = useMutation(OrganizationUsers_createOrganizationUserDocument);
+  const [inviteUserToOrganization] = useMutation(
+    OrganizationUsers_inviteUserToOrganizationDocument
+  );
   const showCreateOrUpdateUserDialog = useCreateOrUpdateUserDialog();
   const handleCreateUser = async () => {
     try {
       const data = await showCreateOrUpdateUserDialog({});
       const { userGroups, ...user } = data;
-      await createOrganizationUser({
+      await inviteUserToOrganization({
         variables: {
           ...user,
           userGroupIds: userGroups.map((userGroup) => userGroup.id),
-          locale: intl.locale,
+          locale: asSupportedUserLocale(intl.locale),
         },
         update: () => {
           refetch();
@@ -266,12 +269,12 @@ function OrganizationUsers() {
   };
 
   const showConfirmResendInvitationDialog = useConfirmResendInvitationDialog();
-  const [resetTemporaryPassword] = useMutation(OrganizationUsers_resetTemporaryPasswordDocument);
+  const [resetTempPassword] = useMutation(OrganizationUsers_resetTempPasswordDocument);
   async function handleResendInvitation() {
     try {
       await showConfirmResendInvitationDialog({ fullName: selectedRows[0].fullName ?? "" });
-      await resetTemporaryPassword({
-        variables: { email: selectedRows[0].email, locale: intl.locale },
+      await resetTempPassword({
+        variables: { email: selectedRows[0].email, locale: asSupportedUserLocale(intl.locale) },
       });
 
       toast({
@@ -698,15 +701,15 @@ OrganizationUsers.fragments = {
 
 const _mutations = [
   gql`
-    mutation OrganizationUsers_createOrganizationUser(
+    mutation OrganizationUsers_inviteUserToOrganization(
       $firstName: String!
       $lastName: String!
       $email: String!
       $role: OrganizationRole!
-      $locale: String
+      $locale: UserLocale!
       $userGroupIds: [GID!]
     ) {
-      createOrganizationUser(
+      inviteUserToOrganization(
         email: $email
         firstName: $firstName
         lastName: $lastName
@@ -756,8 +759,8 @@ const _mutations = [
     }
   `,
   gql`
-    mutation OrganizationUsers_resetTemporaryPassword($email: String!, $locale: String!) {
-      resetTemporaryPassword(email: $email, locale: $locale)
+    mutation OrganizationUsers_resetTempPassword($email: String!, $locale: UserLocale!) {
+      resetTempPassword(email: $email, locale: $locale)
     }
   `,
 ];

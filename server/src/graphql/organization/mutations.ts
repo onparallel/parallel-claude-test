@@ -27,7 +27,6 @@ import { maxLength } from "../helpers/validators/maxLength";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validFontFamily } from "../helpers/validators/validFontFamily";
-import { validLocale } from "../helpers/validators/validLocale";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 import { validWebSafeFontFamily } from "../helpers/validators/validWebSafeFontFamily";
 import { userHasFeatureFlag } from "../petition/authorizers";
@@ -301,12 +300,10 @@ export const createOrganization = mutationField("createOrganization", {
     firstName: nonNull(stringArg({ description: "First name of the organization owner" })),
     lastName: nonNull(stringArg({ description: "Last name of the organization owner" })),
     email: nonNull(stringArg({ description: "Email of the organization owner" })),
-    // TODO locales make UserLocale
-    locale: nonNull("PetitionLocale"),
+    locale: nonNull("UserLocale"),
   },
   authorize: authenticateAnd(userIsSuperAdmin()),
   validateArgs: validateAnd(
-    validLocale((args) => args.locale, "locale"),
     validEmail((args) => args.email, "email"),
     (_, { status }, ctx, info) => {
       if (status === "ROOT") {

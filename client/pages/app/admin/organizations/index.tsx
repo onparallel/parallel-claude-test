@@ -379,7 +379,7 @@ AdminOrganizations.mutations = [
       $firstName: String!
       $lastName: String!
       $email: String!
-      $locale: PetitionLocale!
+      $locale: UserLocale!
     ) {
       createOrganization(
         name: $name
