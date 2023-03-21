@@ -39,7 +39,7 @@ import { useMemo, useState } from "react";
 import { Chart } from "react-chartjs-2";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { TimeSpan } from "../common/TimeSpan";
+import { getTimeSpan, TimeSpan } from "../common/TimeSpan";
 
 type RadioValues = "opened" | "first_reply" | "completed" | "signed" | "closed";
 
@@ -63,33 +63,15 @@ export function ReportsStatisticsTime({
 
   const { has_signature_config: hasSignature, time_statistics: timeStatistics } = report;
 
-  const maxDuration = {
-    minutes: (timeStatistics[selectedValue]!.max ?? 0) / 60,
-    hours: (timeStatistics[selectedValue]!.max ?? 0) / 3_600,
-    days: (timeStatistics[selectedValue]!.max ?? 0) / 86_400,
+  const meanDuration = {
+    minutes: (timeStatistics[selectedValue]!.mean ?? 0) / 60,
+    hours: (timeStatistics[selectedValue]!.mean ?? 0) / 3_600,
+    days: (timeStatistics[selectedValue]!.mean ?? 0) / 86_400,
   };
 
-  const hoursDaysOrMinutes = maxDuration.hours > 120 ? "d" : maxDuration.minutes > 240 ? "h" : "'";
-  const divideBy = maxDuration.hours > 120 ? 86_400 : maxDuration.minutes > 240 ? 3_600 : 60;
-
-  const tootlipTitle = useMemo(() => {
-    if (hoursDaysOrMinutes === "d") {
-      return intl.formatMessage({
-        id: "component.reports-statistics-time.days",
-        defaultMessage: "Days",
-      });
-    } else if (hoursDaysOrMinutes === "h") {
-      return intl.formatMessage({
-        id: "component.reports-statistics-time.hours",
-        defaultMessage: "Hours",
-      });
-    } else {
-      return intl.formatMessage({
-        id: "component.reports-statistics-time.minutes",
-        defaultMessage: "Minutes",
-      });
-    }
-  }, [hoursDaysOrMinutes]);
+  const hoursDaysOrMinutes =
+    meanDuration.hours > 120 ? "d" : meanDuration.minutes > 240 ? "h" : "'";
+  const divideBy = meanDuration.hours > 120 ? 86_400 : meanDuration.minutes > 240 ? 3_600 : 60;
 
   const hasEnoughData = Object.values(timeStatistics).some(
     (value) => value && Object.values(value).some((v) => (v ?? 0) > 0)
@@ -139,6 +121,27 @@ export function ReportsStatisticsTime({
     ];
   }, [intl.locale, timeStatistics.signed.max, hasSignature]);
 
+  const labelStringTimeSpans = {
+    min: isDefined(timeStatistics[selectedValue]!.min)
+      ? getTimeSpan(intl, timeStatistics[selectedValue]!.min ?? 0)
+      : "-",
+    max: isDefined(timeStatistics[selectedValue]!.max)
+      ? getTimeSpan(intl, timeStatistics[selectedValue]!.max ?? 0)
+      : "-",
+    mean: isDefined(timeStatistics[selectedValue]!.mean)
+      ? getTimeSpan(intl, timeStatistics[selectedValue]!.mean ?? 0)
+      : "-",
+    q1: isDefined(timeStatistics[selectedValue]!.q1)
+      ? getTimeSpan(intl, timeStatistics[selectedValue]!.q1 ?? 0)
+      : "-",
+    median: isDefined(timeStatistics[selectedValue]!.median)
+      ? getTimeSpan(intl, timeStatistics[selectedValue]!.median ?? 0)
+      : "-",
+    q3: isDefined(timeStatistics[selectedValue]!.q3)
+      ? getTimeSpan(intl, timeStatistics[selectedValue]!.q3 ?? 0)
+      : "-",
+  };
+
   const { data, options } = useMemo(() => {
     const data = {
       labels: hasEnoughData ? [labels.find((label) => label.value === selectedValue)?.label] : [],
@@ -169,6 +172,7 @@ export function ReportsStatisticsTime({
               : [],
           barPercentage: 0.4,
           categoryPercentage: 0.4,
+          maxStats: "whiskerMax",
         },
       ],
     } as ChartData;
@@ -179,7 +183,7 @@ export function ReportsStatisticsTime({
           display: false,
         },
         tooltip: {
-          mode: "index",
+          xAlign: "left",
           enabled: true,
           backgroundColor: colors.white,
           bodyColor: colors.gray[800],
@@ -189,25 +193,29 @@ export function ReportsStatisticsTime({
           padding: 14,
           callbacks: {
             title: function () {
-              return tootlipTitle;
+              return "";
             },
             beforeBody: function (obj) {
               const parsed = obj[0].parsed;
-              const { min, max, mean, median, q1, q3 } = parsed;
+              const { mean, median } = parsed;
               const meanMedian = [
                 intl.formatMessage(
                   {
                     id: "component.reports-statistics-time.mean-tooltip",
                     defaultMessage: "Mean: {value}",
                   },
-                  { value: mean }
+                  {
+                    value: labelStringTimeSpans.mean,
+                  }
                 ),
                 intl.formatMessage(
                   {
                     id: "component.reports-statistics-time.median-tooltip",
                     defaultMessage: "Median: {value}",
                   },
-                  { value: median }
+                  {
+                    value: labelStringTimeSpans.median,
+                  }
                 ),
               ];
 
@@ -217,14 +225,18 @@ export function ReportsStatisticsTime({
                     id: "component.reports-statistics-time.max-tooltip",
                     defaultMessage: "Max: {value}",
                   },
-                  { value: max }
+                  {
+                    value: labelStringTimeSpans.max,
+                  }
                 ),
                 intl.formatMessage(
                   {
                     id: "component.reports-statistics-time.p75-tooltip",
                     defaultMessage: "P75: {value}",
                   },
-                  { value: q3 }
+                  {
+                    value: labelStringTimeSpans.q3,
+                  }
                 ),
                 ...(median > mean ? meanMedian.reverse() : meanMedian),
                 intl.formatMessage(
@@ -232,14 +244,18 @@ export function ReportsStatisticsTime({
                     id: "component.reports-statistics-time.p25-tooltip",
                     defaultMessage: "P25: {value}",
                   },
-                  { value: q1 }
+                  {
+                    value: labelStringTimeSpans.q1,
+                  }
                 ),
                 intl.formatMessage(
                   {
                     id: "component.reports-statistics-time.min-tooltip",
                     defaultMessage: "Min: {value}",
                   },
-                  { value: min }
+                  {
+                    value: labelStringTimeSpans.min,
+                  }
                 ),
               ];
             },

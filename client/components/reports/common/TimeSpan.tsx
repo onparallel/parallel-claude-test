@@ -1,87 +1,105 @@
 import { Duration } from "date-fns";
-import { FormattedList, FormattedMessage } from "react-intl";
+import { FormattedList, IntlShape, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
 function quotientAndRemainder(divident: number, divisor: number) {
   return [Math.floor(divident / divisor), divident % divisor];
 }
 
-export function TimeSpan(props: { duration: Duration | number }) {
-  let duration: Duration = {};
-  if (typeof props.duration === "number") {
-    const [days, rem0] = quotientAndRemainder(props.duration, 24 * 60 * 60);
+function cleanDuration(value: Duration | number): Duration {
+  if (typeof value === "number") {
+    const [days, rem0] = quotientAndRemainder(value, 24 * 60 * 60);
     const [hours, rem1] = quotientAndRemainder(rem0, 60 * 60);
     const [minutes, seconds] = quotientAndRemainder(rem1, 60);
-    duration = { days, hours, minutes: minutes > 0 ? minutes : seconds > 0 ? 1 : 0 };
+    return {
+      days,
+      hours,
+      minutes: minutes > 0 ? minutes : seconds > 0 ? 1 : 0,
+    };
   } else {
-    Object.entries(props.duration).forEach(([key, value]) => {
-      if (value !== null) {
-        duration[key as keyof Duration] = value as number;
-      }
-    });
+    return Object.fromEntries(Object.entries(value).filter(([, value]) => isDefined(value)));
   }
+}
+
+function getParts(intl: IntlShape, duration: Duration) {
+  return [
+    duration.years
+      ? intl.formatMessage(
+          {
+            id: "component.timespan.years-part",
+            defaultMessage: "{n, plural, =1{# year} other{# years}}",
+          },
+          { n: duration.years }
+        )
+      : null,
+    duration.months
+      ? intl.formatMessage(
+          {
+            id: "component.timespan.months-part",
+            defaultMessage: "{n, plural, =1{# month} other{# months}}",
+          },
+          { n: duration.months }
+        )
+      : null,
+    duration.weeks
+      ? intl.formatMessage(
+          {
+            id: "component.timespan.weeks-part",
+            defaultMessage: "{n, plural, =1{# week} other{# weeks}}",
+          },
+          { n: duration.weeks }
+        )
+      : null,
+    duration.days
+      ? intl.formatMessage(
+          {
+            id: "component.timespan.days-part",
+            defaultMessage: "{n, plural, =1{# day} other{# days}}",
+          },
+          { n: duration.days }
+        )
+      : null,
+    duration.hours
+      ? intl.formatMessage(
+          {
+            id: "component.timespan.hours-part",
+            defaultMessage: "{n}h",
+          },
+          { n: duration.hours }
+        )
+      : null,
+    isDefined(duration.minutes)
+      ? intl.formatMessage(
+          {
+            id: "component.timespan.minutes-part",
+            defaultMessage: "{n}'",
+          },
+          { n: duration.minutes }
+        )
+      : null,
+    isDefined(duration.seconds)
+      ? intl.formatMessage(
+          {
+            id: "component.timespan.seconds-part",
+            defaultMessage: "{n}''",
+          },
+          { n: duration.seconds }
+        )
+      : null,
+  ].filter(isDefined);
+}
+
+export function TimeSpan(props: { duration: Duration | number }) {
+  const intl = useIntl();
   return (
     <FormattedList
       style="narrow"
       type="unit"
-      value={[
-        duration.years ? (
-          <FormattedMessage
-            key="years"
-            id="component.timespan.years-part"
-            defaultMessage="{n, plural, =1{# year} other{# years}}"
-            values={{ n: duration.years }}
-          />
-        ) : null,
-        duration.months ? (
-          <FormattedMessage
-            key="months"
-            id="component.timespan.months-part"
-            defaultMessage="{n, plural, =1{# month} other{# months}}"
-            values={{ n: duration.months }}
-          />
-        ) : null,
-        duration.weeks ? (
-          <FormattedMessage
-            key="weeks"
-            id="component.timespan.weeks-part"
-            defaultMessage="{n, plural, =1{# week} other{# weeks}}"
-            values={{ n: duration.weeks }}
-          />
-        ) : null,
-        duration.days ? (
-          <FormattedMessage
-            key="days"
-            id="component.timespan.days-part"
-            defaultMessage="{n, plural, =1{# day} other{# days}}"
-            values={{ n: duration.days }}
-          />
-        ) : null,
-        duration.hours ? (
-          <FormattedMessage
-            key="hours"
-            id="component.timespan.hours-part"
-            defaultMessage="{n}h"
-            values={{ n: duration.hours }}
-          />
-        ) : null,
-        isDefined(duration.minutes) ? (
-          <FormattedMessage
-            key="minutes"
-            id="component.timespan.minutes-part"
-            defaultMessage="{n}'"
-            values={{ n: duration.minutes }}
-          />
-        ) : null,
-        isDefined(duration.seconds) ? (
-          <FormattedMessage
-            key="seconds"
-            id="component.timespan.seconds-part"
-            defaultMessage="{n}''"
-            values={{ n: duration.seconds }}
-          />
-        ) : null,
-      ].filter(isDefined)}
+      value={getParts(intl, cleanDuration(props.duration))}
     />
   );
+}
+
+export function getTimeSpan(intl: IntlShape, value: Duration | number) {
+  return intl.formatList(getParts(intl, cleanDuration(value)), { type: "unit", style: "narrow" });
 }
