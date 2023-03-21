@@ -34,12 +34,12 @@ import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArray";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
-import { validIsDefined } from "../helpers/validators/validIsDefined";
 import { validLocale } from "../helpers/validators/validLocale";
 import { validPassword } from "../helpers/validators/validPassword";
 import { orgCanCreateNewUser, orgDoesNotHaveSsoProvider } from "../organization/authorizers";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { argUserHasActiveStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
+import { userHasAccessToTags } from "../tag/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
 import {
   contextUserHasRole,
@@ -329,30 +329,22 @@ export const activateUser = mutationField("activateUser", {
 
 export const deactivateUser = mutationField("deactivateUser", {
   description:
-    "Updates user status to INACTIVE, transfers their owned petitions to another user in the org or delete all petitions.",
+    "Updates user status to INACTIVE and transfers their owned petitions to another user in the org.",
   type: list("User"),
   authorize: authenticateAnd(
     contextUserHasRole("ADMIN"),
     userHasAccessToUsers("userIds"),
     userIsNotSSO("userIds"),
     userIsNotOrgOwner("userIds"),
-    ifArgDefined(
-      "transferToUserId",
-      and(
-        userHasAccessToUsers("transferToUserId" as any),
-        argUserHasActiveStatus("transferToUserId" as any)
-      )
-    )
+    userHasAccessToUsers("transferToUserId"),
+    argUserHasActiveStatus("transferToUserId"),
+    userHasAccessToTags("tagIds")
   ),
   validateArgs: validateAnd(
     notEmptyArray((args) => args.userIds, "userIds"),
     userIdNotIncludedInArray((args) => args.userIds, "userIds"),
-    validIsDefined((args) => args.transferToUserId, "transferToUserId"),
-    (_, { userIds, transferToUserId, deletePetitions }, ctx, info) => {
-      if (deletePetitions) {
-        throw new ArgValidationError(info, "transferToUserId", "Can't deletePetitions from user");
-      }
-      if (transferToUserId && userIds.includes(transferToUserId)) {
+    (_, { userIds, transferToUserId }, ctx, info) => {
+      if (userIds.includes(transferToUserId)) {
         throw new ArgValidationError(
           info,
           "transferToUserId",
@@ -363,16 +355,18 @@ export const deactivateUser = mutationField("deactivateUser", {
   ),
   args: {
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
-    transferToUserId: globalIdArg("User"),
-    deletePetitions: booleanArg(),
+    transferToUserId: nonNull(globalIdArg("User")),
+    tagIds: list(nonNull(globalIdArg("Tag"))),
+    includeDrafts: booleanArg(),
   },
-  resolve: async (_, { userIds, transferToUserId, deletePetitions }, ctx) => {
+  resolve: async (_, { userIds, transferToUserId, tagIds, includeDrafts }, ctx) => {
+    const permissions = await ctx.petitions.loadDirectlyAssignedUserPetitionPermissionsByUserId(
+      userIds
+    );
+
     return await ctx.petitions.withTransaction(async (t) => {
       await ctx.userGroups.removeUsersFromAllGroups(userIds, `User:${ctx.user!.id}`, t);
 
-      const permissions = await ctx.petitions.loadDirectlyAssignedUserPetitionPermissionsByUserId(
-        userIds
-      );
       return await pMap(
         zip(userIds, permissions),
         async ([userId, userPermissions]) => {
@@ -380,62 +374,61 @@ export const deactivateUser = mutationField("deactivateUser", {
             userPermissions,
             (p) => p.type === "OWNER"
           );
-          // until allowed on the UI
-          deletePetitions = false;
-          const deleteOrTransferPetitionsMethods = deletePetitions
-            ? [
-                // make sure to also remove every remaining permission on deleted owned petitions
-                ctx.petitions.deleteAllPermissions(
-                  ownedPermissions.map((p) => p.petition_id),
-                  ctx.user!,
-                  t
-                ),
-                //finally, delete only petitions OWNED by me
-                ctx.petitions.deletePetition(
-                  ownedPermissions.map((p) => p.petition_id),
-                  ctx.user!,
-                  t
-                ),
-                // delete every user notification on the deleted petitions
-                ctx.petitions.deletePetitionUserNotificationsByPetitionId(
-                  userPermissions.map((p) => p.petition_id),
-                  undefined,
-                  t
-                ),
-                // TODO: delete all ownership of public links
-              ]
-            : [
-                // transfer OWNER permissions to new user and remove original permissions
-                ownedPermissions.length > 0
-                  ? ctx.petitions.transferOwnership(
-                      ownedPermissions.map((p) => p.petition_id),
-                      transferToUserId!,
-                      false,
-                      ctx.user!,
-                      t
-                    )
-                  : undefined,
-                ctx.petitions.transferPublicLinkOwnership(userId, transferToUserId!, ctx.user!, t),
-              ];
 
-          const [[user]] = await Promise.all([
-            ctx.users.updateUserById(userId, { status: "INACTIVE" }, `User:${ctx.user!.id}`, t),
-            // delete permissions with type !== OWNER
-            notOwnedPermissions.length > 0
-              ? ctx.petitions.deleteUserPermissions(
-                  notOwnedPermissions.map((p) => p.petition_id),
-                  userId,
-                  ctx.user!,
-                  t
-                )
-              : undefined,
-            ctx.petitions.removeTemplateDefaultPermissionsForUser(
-              userId,
-              `User:${ctx.user!.id}`,
+          const petitions = (
+            await ctx.petitions.loadPetition.raw(
+              ownedPermissions.map((p) => p.petition_id),
               t
-            ),
-            ...deleteOrTransferPetitionsMethods,
-          ]);
+            )
+          ).filter(isDefined);
+          const draftsIds = petitions.filter((p) => p.status === "DRAFT").map((p) => p.id);
+          const ownedPetitionIds = petitions
+            .filter((p) => (includeDrafts ? true : p.status !== "DRAFT"))
+            .map((p) => p.id);
+
+          const [user] = await ctx.users.updateUserById(
+            userId,
+            { status: "INACTIVE" },
+            `User:${ctx.user!.id}`,
+            t
+          );
+
+          if (notOwnedPermissions.length > 0) {
+            // delete permissions with type !== OWNER
+            await ctx.petitions.deleteUserPermissions(
+              notOwnedPermissions.map((p) => p.petition_id),
+              userId,
+              ctx.user!,
+              t
+            );
+          }
+
+          await ctx.petitions.removeTemplateDefaultPermissionsForUser(
+            userId,
+            `User:${ctx.user!.id}`,
+            t
+          );
+
+          if (ownedPermissions.length > 0) {
+            // transfer OWNER permissions to new user and remove original permissions
+            await ctx.petitions.transferOwnership(
+              ownedPermissions.map((p) => p.petition_id),
+              transferToUserId,
+              false,
+              ctx.user!,
+              t
+            );
+          }
+
+          await ctx.petitions.transferPublicLinkOwnership(userId, transferToUserId, ctx.user!, t);
+
+          if (isDefined(tagIds) && ownedPetitionIds.length > 0) {
+            await ctx.tags.tagPetition(tagIds, ownedPetitionIds, ctx.user!, t);
+          }
+
+          if (!includeDrafts && draftsIds.length > 0) {
+            await ctx.petitions.deletePetition(draftsIds, ctx.user!, t);
+          }
 
           return user;
         },

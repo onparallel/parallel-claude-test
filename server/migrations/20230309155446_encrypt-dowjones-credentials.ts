@@ -32,7 +32,6 @@ export async function up(knex: Knex): Promise<void> {
     );
   }
   if (environment === "local") {
-    console.warn("local environment, skipping migration...");
     return;
   }
 

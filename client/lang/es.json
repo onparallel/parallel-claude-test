@@ -560,6 +560,21 @@
     "context": "Any applications or scripts using this event subscription will no longer receive event notifications from Parallel."
   },
   {
+    "term": "component.confirm-deactivate-user-dialog.include-drafts",
+    "definition": "Incluir borradores",
+    "context": "Include drafts"
+  },
+  {
+    "term": "component.confirm-deactivate-user-dialog.include-drafts-help",
+    "definition": "Al marcar esta opción se transferirán todos los parallels incluyendo borradores. Si no, los borradores del usuario desactivado se eliminarán.",
+    "context": "Checking this option will also transfer all draft parallels from the selected users/users. Otherwise, drafts will be deleted."
+  },
+  {
+    "term": "component.confirm-deactivate-user-dialog.tags-label",
+    "definition": "Etiquetas",
+    "context": "Tags"
+  },
+  {
     "term": "component.confirm-delete-petitions-dialog.body",
     "definition": "¿Estás seguro de que quieres eliminar {list}?",
     "context": "Are you sure you want to delete {list}?"
@@ -8091,18 +8106,13 @@
   },
   {
     "term": "organization.confirm-deactivate-user-dialog.body",
-    "definition": "Estás seguro que quieres <b>desactivar</b> {count, plural, =1{el usuario seleccionado} other{los usuarios seleccionados}}?",
-    "context": "Are you sure you want to <b>deactivate</b> the selected {count, plural, =1{user} other {users}}?"
-  },
-  {
-    "term": "organization.confirm-deactivate-user-dialog.body-2",
-    "definition": "Los usuarios inactivos no podrán acceder ni utilizar Parallel de ninguna manera.",
-    "context": "Inactive users won't be able to login or use Parallel in any way."
+    "definition": "Si desactivas {count, plural, =1{el usuario seleccionado no podrá} other {los usuarios seleccionados no podrán}} acceder ni utilizar Parallel de ninguna manera.",
+    "context": "If you deactivate the selected {count, plural, =1{user} other {users}}, they won't be able to access Parallel."
   },
   {
     "term": "organization.confirm-deactivate-user-dialog.transfer-to-user",
-    "definition": "Para continuar, debes seleccionar un usuario en tu organización para transferirle todos los parallels de{count, plural, =1{l usuario} other { los usuarios}} a desactivar.",
-    "context": "To continue, you must select a user from your organization to transfer all the parallels of the {count, plural, =1{user} other {users}} to deactivate."
+    "definition": "Para continuar, debes seleccionar un usuario en tu organización para transferirle todos los parallels de{count, plural, =1{l usuario} other { los usuarios}} a desactivar. Puedes añadirles una etiqueta para identificarlos fácilmente.",
+    "context": "Choose a user to transfer all the parallels from the selected {count, plural, =1{user} other {users}}. You can also add tags to identify them later."
   },
   {
     "term": "organization.confirm-deactivate.user-select.input-error",

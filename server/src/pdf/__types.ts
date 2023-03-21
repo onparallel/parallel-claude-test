@@ -652,7 +652,7 @@ export type Mutation = {
   createUserGroup: UserGroup;
   /** Deactivates the specified active petition accesses. */
   deactivateAccesses: Array<PetitionAccess>;
-  /** Updates user status to INACTIVE, transfers their owned petitions to another user in the org or delete all petitions. */
+  /** Updates user status to INACTIVE and transfers their owned petitions to another user in the org. */
   deactivateUser: Array<User>;
   /** Delete contacts. */
   deleteContacts: Result;
@@ -1221,8 +1221,9 @@ export type MutationdeactivateAccessesArgs = {
 };
 
 export type MutationdeactivateUserArgs = {
-  deletePetitions?: InputMaybe<Scalars["Boolean"]>;
-  transferToUserId?: InputMaybe<Scalars["GID"]>;
+  includeDrafts?: InputMaybe<Scalars["Boolean"]>;
+  tagIds?: InputMaybe<Array<Scalars["GID"]>>;
+  transferToUserId: Scalars["GID"];
   userIds: Array<Scalars["GID"]>;
 };
 

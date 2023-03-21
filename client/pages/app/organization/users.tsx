@@ -12,7 +12,6 @@ import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
-import { UserSelectSelection } from "@parallel/components/common/UserSelect";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useConfirmActivateUsersDialog } from "@parallel/components/organization/dialogs/ConfirmActivateUsersDialog";
@@ -44,7 +43,6 @@ import { asSupportedUserLocale } from "@parallel/utils/locales";
 import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { isAdmin } from "@parallel/utils/roles";
-import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useLoginAs } from "@parallel/utils/useLoginAs";
@@ -233,7 +231,6 @@ function OrganizationUsers() {
 
   const handleUpdateUserStatus = async (newStatus: UserStatus) => {
     try {
-      let transferToUser: Maybe<UserSelectSelection> = null;
       if (newStatus === "ACTIVE") {
         await showConfirmActivateUserDialog({ count: selectedIds.length });
 
@@ -243,12 +240,16 @@ function OrganizationUsers() {
           },
         });
       } else if (newStatus === "INACTIVE") {
-        transferToUser = await showConfirmDeactivateUserDialog({ userIds: selectedIds });
+        const { userId, tagIds, includeDrafts } = await showConfirmDeactivateUserDialog({
+          userIds: selectedIds,
+        });
 
         await deactivateUser({
           variables: {
             userIds: selectedIds,
-            transferToUserId: transferToUser?.id,
+            transferToUserId: userId,
+            tagIds,
+            includeDrafts,
           },
         });
       }
@@ -745,13 +746,15 @@ const _mutations = [
   gql`
     mutation OrganizationUsers_deactivateUser(
       $userIds: [GID!]!
-      $transferToUserId: GID
-      $deletePetitions: Boolean
+      $transferToUserId: GID!
+      $tagIds: [GID!]
+      $includeDrafts: Boolean
     ) {
       deactivateUser(
         userIds: $userIds
         transferToUserId: $transferToUserId
-        deletePetitions: $deletePetitions
+        tagIds: $tagIds
+        includeDrafts: $includeDrafts
       ) {
         id
         status

@@ -1,6 +1,8 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { groupBy, omit, sortBy } from "remeda";
+import { unMaybeArray } from "../../util/arrays";
+import { MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 import { CreateTag, Tag, User } from "../__types";
@@ -72,12 +74,30 @@ export class TagRepository extends BaseRepository {
       });
   }
 
-  async tagPetition(tagId: number, petitionId: number, user: User) {
-    await this.insert("petition_tag", {
-      tag_id: tagId,
-      petition_id: petitionId,
-      created_by: `User:${user.id}`,
-    });
+  async tagPetition(
+    tagId: MaybeArray<number>,
+    petitionId: MaybeArray<number>,
+    user: User,
+    t?: Knex.Transaction
+  ) {
+    const petitionIdArr = unMaybeArray(petitionId);
+    const tagIdArr = unMaybeArray(tagId);
+
+    if (petitionIdArr.length === 0 || tagIdArr.length === 0) {
+      return;
+    }
+
+    await this.insert(
+      "petition_tag",
+      petitionIdArr.flatMap((petitionId) =>
+        tagIdArr.map((tagId) => ({
+          tag_id: tagId,
+          petition_id: petitionId,
+          created_by: `User:${user.id}`,
+        }))
+      ),
+      t
+    );
   }
 
   async untagPetition(tagId: number, petitionId?: number, t?: Knex.Transaction) {

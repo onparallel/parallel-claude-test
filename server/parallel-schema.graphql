@@ -1048,9 +1048,14 @@ type Mutation {
   deactivateAccesses(accessIds: [GID!]!, petitionId: GID!): [PetitionAccess!]!
 
   """
-  Updates user status to INACTIVE, transfers their owned petitions to another user in the org or delete all petitions.
+  Updates user status to INACTIVE and transfers their owned petitions to another user in the org.
   """
-  deactivateUser(deletePetitions: Boolean, transferToUserId: GID, userIds: [GID!]!): [User!]!
+  deactivateUser(
+    includeDrafts: Boolean
+    tagIds: [GID!]
+    transferToUserId: GID!
+    userIds: [GID!]!
+  ): [User!]!
 
   """
   Delete contacts.

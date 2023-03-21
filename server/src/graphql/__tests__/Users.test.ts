@@ -381,7 +381,6 @@ describe("GraphQL/Users", () => {
       }));
 
       [user0Petition] = await mocks.createRandomPetitions(organization.id, activeUsers[0].id, 1);
-      [user0Petition] = await mocks.createRandomPetitions(organization.id, activeUsers[0].id, 1);
 
       user1Petitions = await mocks.createRandomPetitions(organization.id, activeUsers[1].id, 3);
       [user1Template] = await mocks.createRandomPetitions(
@@ -404,8 +403,12 @@ describe("GraphQL/Users", () => {
     it("updates user status to inactive and transfers petition to session user", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $transferToUserId: GID) {
-            deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
+          mutation ($userIds: [GID!]!, $transferToUserId: GID!, $includeDrafts: Boolean) {
+            deactivateUser(
+              userIds: $userIds
+              transferToUserId: $transferToUserId
+              includeDrafts: $includeDrafts
+            ) {
               id
               status
             }
@@ -414,6 +417,7 @@ describe("GraphQL/Users", () => {
         variables: {
           userIds: [toGlobalId("User", activeUsers[0].id)],
           transferToUserId: sessionUserGID,
+          includeDrafts: true, // also transfer drafts, this way those won't be deleted and the next query on this test will not fail
         },
       });
 
@@ -469,7 +473,7 @@ describe("GraphQL/Users", () => {
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $transferToUserId: GID) {
+          mutation ($userIds: [GID!]!, $transferToUserId: GID!) {
             deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
               id
               status
@@ -538,7 +542,7 @@ describe("GraphQL/Users", () => {
     it("updates multiple users to INACTIVE, and transfers all their petitions to another user in the org", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $transferToUserId: GID) {
+          mutation ($userIds: [GID!]!, $transferToUserId: GID!) {
             deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
               id
               status
@@ -569,7 +573,8 @@ describe("GraphQL/Users", () => {
         /* sql */ `
         select petition_id, type, user_id, updated_by 
         from petition_permission 
-        where petition_id in (?,?,?,?) and deleted_at is null`,
+        where petition_id in (?,?,?,?) and deleted_at is null
+        order by petition_id asc`,
         [user0Petition.id, ...user1Petitions.map((p) => p.id)]
       );
 
@@ -642,7 +647,7 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to transfer petitions to an inactive user", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $transferToUserId: GID) {
+          mutation ($userIds: [GID!]!, $transferToUserId: GID!) {
             deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
               id
               status
@@ -662,7 +667,7 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to transfer petitions to a user in another organization", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $transferToUserId: GID) {
+          mutation ($userIds: [GID!]!, $transferToUserId: GID!) {
             deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
               id
               status
@@ -679,61 +684,18 @@ describe("GraphQL/Users", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error when trying to set status to inactive without specifying transferToUserId argument", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($userIds: [GID!]!) {
-            deactivateUser(userIds: $userIds) {
-              id
-              status
-            }
-          }
-        `,
-        variables: {
-          userIds: [toGlobalId("User", activeUsers[0].id)],
-        },
-      });
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
-    });
-
-    it("sends error when trying to set status to inactive specifying transferToUserId anb deletePetitions", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($userIds: [GID!]!, $transferToUserId: GID, $deletePetitions: Boolean) {
-            deactivateUser(
-              userIds: $userIds
-              transferToUserId: $transferToUserId
-              deletePetitions: $deletePetitions
-            ) {
-              id
-              status
-            }
-          }
-        `,
-        variables: {
-          userIds: [toGlobalId("User", activeUsers[0].id), toGlobalId("User", activeUsers[1].id)],
-          transferToUserId: toGlobalId("User", activeUsers[2].id),
-          deletePetitions: true,
-        },
-      });
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
-    });
-
     it("sends error when trying to set own status", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!) {
-            deactivateUser(userIds: $userIds) {
+          mutation ($userIds: [GID!]!, $transferToUserId: GID!) {
+            deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
               id
             }
           }
         `,
         variables: {
           userIds: [sessionUserGID],
+          transferToUserId: toGlobalId("User", activeUsers[0].id),
         },
       });
 
@@ -744,7 +706,7 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to transfer petitions to the same user that will be set as inactive", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userIds: [GID!]!, $transferToUserId: GID) {
+          mutation ($userIds: [GID!]!, $transferToUserId: GID!) {
             deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
               id
               status

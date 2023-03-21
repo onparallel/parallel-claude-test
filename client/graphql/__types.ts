@@ -697,7 +697,7 @@ export interface Mutation {
   createUserGroup: UserGroup;
   /** Deactivates the specified active petition accesses. */
   deactivateAccesses: Array<PetitionAccess>;
-  /** Updates user status to INACTIVE, transfers their owned petitions to another user in the org or delete all petitions. */
+  /** Updates user status to INACTIVE and transfers their owned petitions to another user in the org. */
   deactivateUser: Array<User>;
   /** Delete contacts. */
   deleteContacts: Result;
@@ -1266,8 +1266,9 @@ export interface MutationdeactivateAccessesArgs {
 }
 
 export interface MutationdeactivateUserArgs {
-  deletePetitions?: InputMaybe<Scalars["Boolean"]>;
-  transferToUserId?: InputMaybe<Scalars["GID"]>;
+  includeDrafts?: InputMaybe<Scalars["Boolean"]>;
+  tagIds?: InputMaybe<Array<Scalars["GID"]>>;
+  transferToUserId: Scalars["GID"];
   userIds: Array<Scalars["GID"]>;
 }
 
@@ -16745,8 +16746,9 @@ export type OrganizationUsers_activateUserMutation = {
 
 export type OrganizationUsers_deactivateUserMutationVariables = Exact<{
   userIds: Array<Scalars["GID"]> | Scalars["GID"];
-  transferToUserId?: InputMaybe<Scalars["GID"]>;
-  deletePetitions?: InputMaybe<Scalars["Boolean"]>;
+  transferToUserId: Scalars["GID"];
+  tagIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  includeDrafts?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
 export type OrganizationUsers_deactivateUserMutation = {
@@ -35731,13 +35733,15 @@ export const OrganizationUsers_activateUserDocument = gql`
 export const OrganizationUsers_deactivateUserDocument = gql`
   mutation OrganizationUsers_deactivateUser(
     $userIds: [GID!]!
-    $transferToUserId: GID
-    $deletePetitions: Boolean
+    $transferToUserId: GID!
+    $tagIds: [GID!]
+    $includeDrafts: Boolean
   ) {
     deactivateUser(
       userIds: $userIds
       transferToUserId: $transferToUserId
-      deletePetitions: $deletePetitions
+      tagIds: $tagIds
+      includeDrafts: $includeDrafts
     ) {
       id
       status

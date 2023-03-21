@@ -1,6 +1,17 @@
-import { Button, FormControl, FormErrorMessage, Stack, Text } from "@chakra-ui/react";
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  HStack,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { TagSelect } from "@parallel/components/common/TagSelect";
 import {
   UserSelect,
   UserSelectInstance,
@@ -11,21 +22,31 @@ import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 
+type ConfirmDeactivateUserDialogData = {
+  userId: string;
+  tagIds: string[];
+  includeDrafts: boolean;
+};
+
 function ConfirmDeactivateUserDialog({
   userIds,
   ...props
-}: DialogProps<{ userIds: string[] }, UserSelectSelection>) {
+}: DialogProps<{ userIds: string[] }, ConfirmDeactivateUserDialogData>) {
   const {
     control,
     handleSubmit,
+    register,
     formState: { errors },
   } = useForm<{
     user: UserSelectSelection | null;
-    confirm: boolean;
+    tagIds: string[];
+    includeDrafts: boolean;
   }>({
-    mode: "all",
+    mode: "onSubmit",
     defaultValues: {
       user: null,
+      tagIds: [],
+      includeDrafts: false,
     },
   });
 
@@ -47,8 +68,8 @@ function ConfirmDeactivateUserDialog({
       initialFocusRef={userSelectRef}
       content={{
         as: "form",
-        onSubmit: handleSubmit(({ user }) => {
-          props.onResolve(user!);
+        onSubmit: handleSubmit(({ user, tagIds, includeDrafts }) => {
+          props.onResolve({ userId: user!.id, tagIds, includeDrafts });
         }),
       }}
       header={
@@ -63,25 +84,19 @@ function ConfirmDeactivateUserDialog({
           <Text>
             <FormattedMessage
               id="organization.confirm-deactivate-user-dialog.body"
-              defaultMessage="Are you sure you want to <b>deactivate</b> the selected {count, plural, =1{user} other {users}}?"
+              defaultMessage="If you deactivate the selected {count, plural, =1{user} other {users}}, they won't be able to access Parallel."
               values={{ count: userIds.length }}
-            />
-            <br />
-            <FormattedMessage
-              id="organization.confirm-deactivate-user-dialog.body-2"
-              defaultMessage="Inactive users won't be able to login or use Parallel in any way."
             />
           </Text>
           <Text>
             <FormattedMessage
               id="organization.confirm-deactivate-user-dialog.transfer-to-user"
-              defaultMessage="To continue, you must select a user from your organization to transfer all the parallels of the {count, plural, =1{user} other {users}} to deactivate."
+              defaultMessage="Choose a user to transfer all the parallels from the selected {count, plural, =1{user} other {users}}. You can also add tags to identify them later."
               values={{
                 count: userIds.length,
               }}
             />
           </Text>
-
           <FormControl id="user" isInvalid={!!errors.user}>
             <Controller
               name="user"
@@ -103,6 +118,47 @@ function ConfirmDeactivateUserDialog({
                 defaultMessage="Please, select a user"
               />
             </FormErrorMessage>
+          </FormControl>
+          <FormControl id="includeDrafts">
+            <Checkbox {...register("includeDrafts")}>
+              <HStack>
+                <Text>
+                  <FormattedMessage
+                    id="component.confirm-deactivate-user-dialog.include-drafts"
+                    defaultMessage="Include drafts"
+                  />
+                </Text>
+                <HelpPopover>
+                  <Text>
+                    <FormattedMessage
+                      id="component.confirm-deactivate-user-dialog.include-drafts-help"
+                      defaultMessage="Checking this option will also transfer all draft parallels from the selected users/users. Otherwise, drafts will be deleted."
+                    />
+                  </Text>
+                </HelpPopover>
+              </HStack>
+            </Checkbox>
+          </FormControl>
+          <FormControl id="tagIds">
+            <FormLabel fontWeight={400}>
+              <FormattedMessage
+                id="component.confirm-deactivate-user-dialog.tags-label"
+                defaultMessage="Tags"
+              />
+            </FormLabel>
+            <Controller
+              name="tagIds"
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <TagSelect
+                  isClearable
+                  canCreateTags
+                  isMulti
+                  value={value}
+                  onChange={(tags) => onChange(tags.map((tag) => tag.id))}
+                />
+              )}
+            />
           </FormControl>
         </Stack>
       }
