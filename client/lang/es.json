@@ -95,26 +95,6 @@
     "context": "You reached the limit of parallels sent."
   },
   {
-    "term": "component.add-petition-access-dialog.recipient-groups-description",
-    "definition": "Cada grupo responderá parallels diferentes.",
-    "context": "Each group will reply to different parallels."
-  },
-  {
-    "term": "component.add-petition-access-dialog.recipient-groups-label",
-    "definition": "Grupos de destinatarios",
-    "context": "Recipient groups"
-  },
-  {
-    "term": "component.add-petition-access-dialog.recipients-description",
-    "definition": "Responderán al mismo parallel colaborativamente.",
-    "context": "Will reply to the same parallel collaboratively."
-  },
-  {
-    "term": "component.add-petition-access-dialog.recipients-label",
-    "definition": "Destinatarios",
-    "context": "Recipients"
-  },
-  {
     "term": "component.add-petition-access-dialog.send-as",
     "definition": "Enviar como...",
     "context": "Send as..."
@@ -2321,18 +2301,18 @@
   },
   {
     "term": "component.multiple-emails-pasted-dialog.message-2",
-    "definition": "¿Quieres añadirlos en <b>grupos separados</b> (recibirán parallels diferentes) o <b>agruparlos en un único parallel</b>?",
-    "context": "Do you want to add them to <b>separate groups</b> (they will fill different parallels) or <b>group them in the same parallel</b>?"
+    "definition": "¿Quieres crear varios parallels para que cada uno responda el suyo o prefieres que completen un único parallel colaborativamente?",
+    "context": "Do you want to create separate parallels so that each person can reply individually, or do you prefer that they complete the same parallel collaboratively?"
   },
   {
-    "term": "component.multiple-emails-pasted-dialog.same-group",
-    "definition": "Todos en un único parallel",
-    "context": "All in the same parallel"
+    "term": "component.multiple-emails-pasted-dialog.same-parallel",
+    "definition": "Enviar el mismo a todos",
+    "context": "Send the same to everyone"
   },
   {
-    "term": "component.multiple-emails-pasted-dialog.separate-groups",
-    "definition": "Crear grupos separados",
-    "context": "Add to separate groups"
+    "term": "component.multiple-emails-pasted-dialog.separate-parallels",
+    "definition": "Crear varios parallels",
+    "context": "Create separate parallels"
   },
   {
     "term": "component.netdocuments-iconbutton.open-file",
@@ -4500,9 +4480,9 @@
     "context": "Pending processes"
   },
   {
-    "term": "component.recipient-select-groups.add-recipient-group",
-    "definition": "Añadir grupo de destinatarios",
-    "context": "Add recipient group"
+    "term": "component.recipient-select-groups.add-another-parallel",
+    "definition": "Añadir otro parallel",
+    "context": "Add another parallel"
   },
   {
     "term": "component.recipient-select-groups.delete-group.label",
@@ -4515,14 +4495,14 @@
     "context": "The following {count, plural, =1{email has} other{emails have}} bounced previously. Please, make sure the email addresses are valid."
   },
   {
-    "term": "component.recipient-select-groups.recipients-label",
-    "definition": "Destinatarios",
-    "context": "Recipients"
+    "term": "component.recipient-select-groups.for-label",
+    "definition": "{total, plural, =1{Para:} other{(Parallel {number}) Para:}}",
+    "context": "{total, plural, =1{For:} other{(Parallel {number}) For:}}"
   },
   {
-    "term": "component.recipient-select-groups.recipients-nth-group",
-    "definition": "({number, selectordinal, one{#er} other{#°}} parallel)",
-    "context": "({number, selectordinal, one{#st} two{#nd} few{#rd} other{#th}} parallel)"
+    "term": "component.recipient-select-groups.recipients-description",
+    "definition": "Los destinatarios de cada parallel responderán el mismo formulario.",
+    "context": "The recipients of each parallel will answer the same form."
   },
   {
     "term": "component.recipient-select-groups.recipients-placeholder",
@@ -4541,8 +4521,8 @@
   },
   {
     "term": "component.recipient-select-groups.same-petition-warning",
-    "definition": "Todos los {recipientCount} destinatarios recibirán un enlace al mismo parallel para rellenarlo de forma colaborativa. Añade un <b>grupo de destinatarios</b> para enviar diferentes parallels a cada grupo.",
-    "context": "All {recipientCount} recipients will receive a link to the same parallel so they can fill it out collaboratively. Add a <b>recipient group</b> to send different parallels to each group."
+    "definition": "Los destinatarios recibirán <b>un único parallel</b>. Añade otro parallel para enviarles formularios separados.",
+    "context": "Recipients will receive <b>a single parallel</b>. Add another parallel to send them separate forms."
   },
   {
     "term": "component.recipient-select-groups.unknown-contacts-header",
@@ -9401,8 +9381,8 @@
   },
   {
     "term": "petition.add-access.header",
-    "definition": "¿A quién quieres enviárselo?",
-    "context": "Who do you want to send it to?"
+    "definition": "¿Quién quieres que lo complete?",
+    "context": "Who do you want to complete it?"
   },
   {
     "term": "petition.add-another-field-button",

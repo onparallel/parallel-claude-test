@@ -1,4 +1,4 @@
-import { FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, FormLabelProps, Input } from "@chakra-ui/react";
 import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
@@ -15,6 +15,7 @@ export function MessageEmailEditor({
   onSubjectChange,
   onBodyChange,
   isReadOnly,
+  labelProps,
 }: {
   id: string;
   showErrors: boolean;
@@ -24,13 +25,14 @@ export function MessageEmailEditor({
   onSubjectChange: (value: string) => void;
   onBodyChange: (value: RichTextEditorValue) => void;
   isReadOnly?: boolean;
+  labelProps?: FormLabelProps;
 }) {
   const intl = useIntl();
   const placeholderOptions = usePetitionMessagePlaceholderOptions();
   return (
     <>
       <FormControl isInvalid={showErrors && !subject} isDisabled={isReadOnly}>
-        <FormLabel paddingBottom={0}>
+        <FormLabel paddingBottom={0} {...labelProps}>
           {
             <FormattedMessage
               id="component.message-email-editor.subject-label"

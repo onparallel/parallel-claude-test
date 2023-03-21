@@ -95,26 +95,6 @@
     "context": "You reached the limit of parallels sent."
   },
   {
-    "term": "component.add-petition-access-dialog.recipient-groups-description",
-    "definition": "Each group will reply to different parallels.",
-    "context": "Each group will reply to different parallels."
-  },
-  {
-    "term": "component.add-petition-access-dialog.recipient-groups-label",
-    "definition": "Recipient groups",
-    "context": "Recipient groups"
-  },
-  {
-    "term": "component.add-petition-access-dialog.recipients-description",
-    "definition": "Will reply to the same parallel collaboratively.",
-    "context": "Will reply to the same parallel collaboratively."
-  },
-  {
-    "term": "component.add-petition-access-dialog.recipients-label",
-    "definition": "Recipients",
-    "context": "Recipients"
-  },
-  {
     "term": "component.add-petition-access-dialog.send-as",
     "definition": "Send as...",
     "context": "Send as..."
@@ -2321,18 +2301,18 @@
   },
   {
     "term": "component.multiple-emails-pasted-dialog.message-2",
-    "definition": "Do you want to add them to <b>separate groups</b> (they will fill different parallels) or <b>group them in the same parallel</b>?",
-    "context": "Do you want to add them to <b>separate groups</b> (they will fill different parallels) or <b>group them in the same parallel</b>?"
+    "definition": "Do you want to create separate parallels so that each person can reply individually, or do you prefer that they complete the same parallel collaboratively?",
+    "context": "Do you want to create separate parallels so that each person can reply individually, or do you prefer that they complete the same parallel collaboratively?"
   },
   {
-    "term": "component.multiple-emails-pasted-dialog.same-group",
-    "definition": "All in the same parallel",
-    "context": "All in the same parallel"
+    "term": "component.multiple-emails-pasted-dialog.same-parallel",
+    "definition": "Send the same to everyone",
+    "context": "Send the same to everyone"
   },
   {
-    "term": "component.multiple-emails-pasted-dialog.separate-groups",
-    "definition": "Add to separate groups",
-    "context": "Add to separate groups"
+    "term": "component.multiple-emails-pasted-dialog.separate-parallels",
+    "definition": "Create separate parallels",
+    "context": "Create separate parallels"
   },
   {
     "term": "component.netdocuments-iconbutton.open-file",
@@ -4500,9 +4480,9 @@
     "context": "Pending processes"
   },
   {
-    "term": "component.recipient-select-groups.add-recipient-group",
-    "definition": "Add recipient group",
-    "context": "Add recipient group"
+    "term": "component.recipient-select-groups.add-another-parallel",
+    "definition": "Add another parallel",
+    "context": "Add another parallel"
   },
   {
     "term": "component.recipient-select-groups.delete-group.label",
@@ -4515,14 +4495,14 @@
     "context": "The following {count, plural, =1{email has} other{emails have}} bounced previously. Please, make sure the email addresses are valid."
   },
   {
-    "term": "component.recipient-select-groups.recipients-label",
-    "definition": "Recipients",
-    "context": "Recipients"
+    "term": "component.recipient-select-groups.for-label",
+    "definition": "{total, plural, =1{For:} other{(Parallel {number}) For:}}",
+    "context": "{total, plural, =1{For:} other{(Parallel {number}) For:}}"
   },
   {
-    "term": "component.recipient-select-groups.recipients-nth-group",
-    "definition": "({number, selectordinal, one{#st} two{#nd} few{#rd} other{#th}} parallel)",
-    "context": "({number, selectordinal, one{#st} two{#nd} few{#rd} other{#th}} parallel)"
+    "term": "component.recipient-select-groups.recipients-description",
+    "definition": "The recipients of each parallel will answer the same form.",
+    "context": "The recipients of each parallel will answer the same form."
   },
   {
     "term": "component.recipient-select-groups.recipients-placeholder",
@@ -4541,8 +4521,8 @@
   },
   {
     "term": "component.recipient-select-groups.same-petition-warning",
-    "definition": "All {recipientCount} recipients will receive a link to the same parallel so they can fill it out collaboratively. Add a <b>recipient group</b> to send different parallels to each group.",
-    "context": "All {recipientCount} recipients will receive a link to the same parallel so they can fill it out collaboratively. Add a <b>recipient group</b> to send different parallels to each group."
+    "definition": "Recipients will receive <b>a single parallel</b>. Add another parallel to send them separate forms.",
+    "context": "Recipients will receive <b>a single parallel</b>. Add another parallel to send them separate forms."
   },
   {
     "term": "component.recipient-select-groups.unknown-contacts-header",
@@ -9401,8 +9381,8 @@
   },
   {
     "term": "petition.add-access.header",
-    "definition": "Who do you want to send it to?",
-    "context": "Who do you want to send it to?"
+    "definition": "Who do you want to complete it?",
+    "context": "Who do you want to complete it?"
   },
   {
     "term": "petition.add-another-field-button",

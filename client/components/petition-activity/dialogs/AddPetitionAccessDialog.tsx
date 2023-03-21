@@ -7,9 +7,7 @@ import {
   Center,
   Checkbox,
   Flex,
-  Heading,
   HStack,
-  Image,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -282,56 +280,8 @@ export function AddPetitionAccessDialog({
         <Flex alignItems="center">
           <FormattedMessage
             id="petition.add-access.header"
-            defaultMessage="Who do you want to send it to?"
+            defaultMessage="Who do you want to complete it?"
           />
-          {canAddRecipientGroups ? (
-            <HelpPopover
-              popoverWidth="container.2xs"
-              color="blue.200"
-              _hover={{ color: "blue.300" }}
-            >
-              <Stack direction="row">
-                <Stack flex="1" alignItems="flex-start">
-                  <Image
-                    height="40px"
-                    marginRight={2}
-                    src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/recipient-collaboration.svg`}
-                  />
-                  <Heading size="sm">
-                    <FormattedMessage
-                      id="component.add-petition-access-dialog.recipients-label"
-                      defaultMessage="Recipients"
-                    />
-                  </Heading>
-                  <Text fontSize="sm">
-                    <FormattedMessage
-                      id="component.add-petition-access-dialog.recipients-description"
-                      defaultMessage="Will reply to the same parallel collaboratively."
-                    />
-                  </Text>
-                </Stack>
-                <Stack flex="1" alignItems="flex-start">
-                  <Image
-                    height="40px"
-                    marginRight={2}
-                    src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/recipient-groups.svg`}
-                  />
-                  <Heading size="sm">
-                    <FormattedMessage
-                      id="component.add-petition-access-dialog.recipient-groups-label"
-                      defaultMessage="Recipient groups"
-                    />
-                  </Heading>
-                  <Text fontSize="sm">
-                    <FormattedMessage
-                      id="component.add-petition-access-dialog.recipient-groups-description"
-                      defaultMessage="Each group will reply to different parallels."
-                    />
-                  </Text>
-                </Stack>
-              </Stack>
-            </HelpPopover>
-          ) : null}
         </Flex>
       }
       body={
@@ -449,6 +399,7 @@ export function AddPetitionAccessDialog({
               body={body}
               onSubjectChange={handleSubjectChange}
               onBodyChange={handleBodyChange}
+              labelProps={{ fontWeight: "normal" }}
             />
           </Box>
           <PetitionRemindersConfig

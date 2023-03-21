@@ -8,7 +8,9 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
+  HStack,
   IconButton,
+  Image,
   ListItem,
   Radio,
   RadioGroup,
@@ -33,6 +35,7 @@ import {
 import { ConfirmDialog } from "./dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "./dialogs/DialogProvider";
 import { useErrorDialog } from "./dialogs/ErrorDialog";
+import { HelpPopover } from "./HelpPopover";
 import { Link } from "./Link";
 
 interface RecipientSelectGroupsProps {
@@ -212,20 +215,37 @@ export function RecipientSelectGroups({
               showErrors && (recipients.length === 0 || invalidRecipients(index).length > 0)
             }
           >
-            <FormLabel display="flex" alignItems="center">
+            <FormLabel display="flex" alignItems="center" fontWeight="normal">
               <FormattedMessage
-                id="component.recipient-select-groups.recipients-label"
-                defaultMessage="Recipients"
+                id="component.recipient-select-groups.for-label"
+                defaultMessage="{total, plural, =1{For:} other{(Parallel {number}) For:}}"
+                values={{ total: recipientGroups.length, number: index + 1 }}
               />
-              {index > 0 ? (
-                <>
-                  {" "}
-                  <FormattedMessage
-                    id="component.recipient-select-groups.recipients-nth-group"
-                    defaultMessage="({number, selectordinal, one{#st} two{#nd} few{#rd} other{#th}} parallel)"
-                    values={{ number: index + 1 }}
-                  />
-                </>
+              {canAddRecipientGroups && index === 0 ? (
+                <HelpPopover>
+                  <Stack>
+                    <Text fontSize="sm">
+                      <FormattedMessage
+                        id="component.recipient-select-groups.recipients-description"
+                        defaultMessage="The recipients of each parallel will answer the same form."
+                      />
+                    </Text>
+                    <Stack spacing={0.5}>
+                      <HStack>
+                        <Text>Parallel 1:</Text>
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/multiple-recipient-group.svg`}
+                        />
+                      </HStack>
+                      <HStack>
+                        <Text>Parallel 2:</Text>
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/individual-recipient-group.svg`}
+                        />
+                      </HStack>
+                    </Stack>
+                  </Stack>
+                </HelpPopover>
               ) : null}
             </FormLabel>
             <Flex>
@@ -290,25 +310,42 @@ export function RecipientSelectGroups({
           </FormControl>
         ))}
       </Stack>
-
+      {recipientGroups.length === 1 &&
+      validRecipients(0).length >= 2 &&
+      invalidRecipients(0).length === 0 ? (
+        <CloseableAlert status="info" marginTop={2} borderRadius="base">
+          <AlertIcon />
+          <Text display="block">
+            <FormattedMessage
+              id="component.recipient-select-groups.same-petition-warning"
+              defaultMessage="Recipients will receive <b>a single parallel</b>. Add another parallel to send them separate forms."
+              values={{
+                recipientCount: validRecipients(0).length,
+              }}
+            />
+          </Text>
+        </CloseableAlert>
+      ) : null}
       {canAddRecipientGroups ? (
-        <Flex justifyContent="flex-start" alignItems="center" marginTop={4}>
+        <Flex justifyContent="flex-start" alignItems="center" marginTop={2}>
           <Button
             data-testid="petition-add-recipient-group-button"
-            variant="link"
+            variant="outline"
             color="gray.900"
-            fontWeight="normal"
+            fontWeight={500}
+            size="sm"
+            fontSize="md"
             isDisabled={maxGroups <= recipientGroups.length}
             leftIcon={
-              <Circle backgroundColor="primary.500" size={5}>
-                <AddIcon color="white" fontSize="xs" aria-hidden="true" />
+              <Circle backgroundColor="primary.500" size={4}>
+                <AddIcon color="white" fontSize="2xs" aria-hidden="true" />
               </Circle>
             }
             onClick={addRecipientGroup}
           >
             <FormattedMessage
-              id="component.recipient-select-groups.add-recipient-group"
-              defaultMessage="Add recipient group"
+              id="component.recipient-select-groups.add-another-parallel"
+              defaultMessage="Add another parallel"
             />
           </Button>
         </Flex>
@@ -318,7 +355,7 @@ export function RecipientSelectGroups({
           status="warning"
           backgroundColor="orange.100"
           borderRadius="base"
-          marginTop={4}
+          marginTop={2}
         >
           <AlertIcon color="yellow.500" />
           <AlertDescription>
@@ -337,23 +374,6 @@ export function RecipientSelectGroups({
               ))}
             </UnorderedList>
           </AlertDescription>
-        </CloseableAlert>
-      ) : null}
-
-      {recipientGroups.length === 1 &&
-      validRecipients(0).length >= 2 &&
-      invalidRecipients(0).length === 0 ? (
-        <CloseableAlert status="info" marginTop={4} borderRadius="base">
-          <AlertIcon />
-          <Text display="block">
-            <FormattedMessage
-              id="component.recipient-select-groups.same-petition-warning"
-              defaultMessage="All {recipientCount} recipients will receive a link to the same parallel so they can fill it out collaboratively. Add a <b>recipient group</b> to send different parallels to each group."
-              values={{
-                recipientCount: validRecipients(0).length,
-              }}
-            />
-          </Text>
         </CloseableAlert>
       ) : null}
     </>
@@ -389,7 +409,7 @@ function MultipleEmailsPastedDialog(props: DialogProps<{}, MultipleEmailsPastedA
             <Text>
               <FormattedMessage
                 id="component.multiple-emails-pasted-dialog.message-2"
-                defaultMessage="Do you want to add them to <b>separate groups</b> (they will fill different parallels) or <b>group them in the same parallel</b>?"
+                defaultMessage="Do you want to create separate parallels so that each person can reply individually, or do you prefer that they complete the same parallel collaboratively?"
               />
             </Text>
           </Stack>
@@ -401,14 +421,14 @@ function MultipleEmailsPastedDialog(props: DialogProps<{}, MultipleEmailsPastedA
           >
             <Radio value="SEPARATE_GROUPS" ref={initialFocusRef as any}>
               <FormattedMessage
-                id="component.multiple-emails-pasted-dialog.separate-groups"
-                defaultMessage="Add to separate groups"
+                id="component.multiple-emails-pasted-dialog.separate-parallels"
+                defaultMessage="Create separate parallels"
               />
             </Radio>
             <Radio value="SAME_GROUP">
               <FormattedMessage
-                id="component.multiple-emails-pasted-dialog.same-group"
-                defaultMessage="All in the same parallel"
+                id="component.multiple-emails-pasted-dialog.same-parallel"
+                defaultMessage="Send the same to everyone"
               />
             </Radio>
           </RadioGroup>
