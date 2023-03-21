@@ -35,8 +35,14 @@ export function uploadFile(
       }
     });
     request.addEventListener("error", () => {
-      const error = new UploadFileError("Error", request);
-      Sentry.captureException(error);
+      const error = new UploadFileError("Error when uploading to AWS", request);
+      Sentry.captureException(error, {
+        extra: {
+          status: request.status,
+          presignedPostDataUrl: presignedPostData.url,
+          presignedPostDataFields: JSON.stringify(presignedPostData.fields),
+        },
+      });
       reject(error);
     });
     request.addEventListener("abort", () => reject(new UploadFileError("Aborted", request)));
