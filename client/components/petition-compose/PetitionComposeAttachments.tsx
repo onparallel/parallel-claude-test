@@ -286,8 +286,9 @@ export const PetitionComposeAttachments = Object.assign(
                 },
               });
             } catch (e) {
-              if (e instanceof UploadFileError && e.message !== "Aborted") {
+              if (e instanceof UploadFileError && e.message === "Aborted") {
                 // handled when aborted
+              } else {
                 await deletePetitionAttachment({
                   variables: { petitionId, attachmentId: attachment.id },
                 });

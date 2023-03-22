@@ -129,8 +129,9 @@ export function useCreateFileUploadReply() {
               },
             });
           } catch (e) {
-            if (e instanceof UploadFileError && e.message !== "Aborted") {
+            if (e instanceof UploadFileError && e.message === "Aborted") {
               // handled when aborted
+            } else {
               await deletePetitionFieldReply({
                 variables: { keycode, replyId: reply.id },
               });
