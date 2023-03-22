@@ -4,7 +4,7 @@ import { createReadStream, PathLike } from "fs";
 import { inject, injectable } from "inversify";
 import { BodyInit } from "node-fetch";
 import pMap from "p-map";
-import qs from "qs";
+import { flatten } from "q-flat";
 import { isDefined, omit } from "remeda";
 import { URLSearchParams } from "url";
 import { CONFIG, Config } from "../../config";
@@ -741,7 +741,7 @@ class SignaturitSDK {
     return await this.apiRequest<SignaturitBrandingResponse>(
       "POST",
       "/v3/brandings.json",
-      new URLSearchParams(qs.stringify(params))
+      new URLSearchParams(flatten(params))
     );
   }
 
@@ -749,7 +749,7 @@ class SignaturitSDK {
     return await this.apiRequest<SignaturitBrandingResponse>(
       "PATCH",
       `/v3/brandings/${brandingId}.json`,
-      new URLSearchParams(qs.stringify(params))
+      new URLSearchParams(flatten(params))
     );
   }
 }
