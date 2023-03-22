@@ -1,9 +1,9 @@
 import { RequestHandler, Router, urlencoded } from "express";
 import { isDefined, pick } from "remeda";
-import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
 import { SignatureStartedEvent } from "../../db/events";
 import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
+import { SignaturitEvents } from "../../services/signature-clients/signaturit";
 import { fromGlobalId } from "../../util/globalId";
 
 export interface SignaturItEventBody {
@@ -14,7 +14,7 @@ export interface SignaturItEventBody {
     id: string;
     events?: {
       created_at: string;
-      type: SignatureEvents;
+      type: SignaturitEvents;
       decline_reason?: string;
     }[];
     signature: { id: string };
@@ -23,12 +23,12 @@ export interface SignaturItEventBody {
     status: string;
   };
   created_at: string;
-  type: SignatureEvents;
+  type: SignaturitEvents;
   reason?: string;
 }
 
 const HANDLERS: Partial<
-  Record<SignatureEvents, (ctx: ApiContext, data: SignaturItEventBody, petitionId: number) => void>
+  Record<SignaturitEvents, (ctx: ApiContext, data: SignaturItEventBody, petitionId: number) => void>
 > = {
   document_opened: documentOpened,
   document_signed: documentSigned,
