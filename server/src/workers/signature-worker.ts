@@ -291,18 +291,6 @@ async function storeSignedDocument(
       ctx
     );
 
-    const petitionSignatures = await ctx.petitions.loadPetitionSignaturesByPetitionId(petition.id);
-    // don't send email if there is a pending signature request on the petition
-    if (
-      !petitionSignatures.some((s) => ["ENQUEUED", "PROCESSED", "PROCESSING"].includes(s.status))
-    ) {
-      await ctx.emails.sendPetitionCompletedEmail(
-        petition.id,
-        { signer: payload.signer },
-        `SignatureWorker:${payload.petitionSignatureRequestId}`
-      );
-    }
-
     await ctx.petitions.createEvent({
       type: "SIGNATURE_COMPLETED",
       petition_id: petition.id,
@@ -322,6 +310,18 @@ async function storeSignedDocument(
       { signature_config: null }, // when completed, set signature_config to null so the signatures card on replies page don't show a "pending start" row
       `SignatureWorker:${payload.petitionSignatureRequestId}`
     );
+
+    const petitionSignatures = await ctx.petitions.loadPetitionSignaturesByPetitionId(petition.id);
+    // don't send email if there is a pending signature request on the petition
+    if (
+      !petitionSignatures.some((s) => ["ENQUEUED", "PROCESSED", "PROCESSING"].includes(s.status))
+    ) {
+      await ctx.emails.sendPetitionCompletedEmail(
+        petition.id,
+        { signer: payload.signer },
+        `SignatureWorker:${payload.petitionSignatureRequestId}`
+      );
+    }
   } catch (error) {
     if (!(error instanceof InvalidCredentialsError)) {
       throw error;
