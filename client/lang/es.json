@@ -5026,18 +5026,18 @@
   },
   {
     "term": "component.reports-doughnut-chart.closed",
-    "definition": "{count, plural, =1{# Cerrado} other{# Cerrados}}",
-    "context": "{count} Closed"
+    "definition": "{count, plural, =1{{count, number} Cerrado} other{{count, number} Cerrados}}",
+    "context": "{count, number} Closed"
   },
   {
     "term": "component.reports-doughnut-chart.completed",
-    "definition": "{count, plural, =1{# Completado} other{# Completados}}",
-    "context": "{count} Completed"
+    "definition": "{count, plural, =1{{count, number} Completado} other{{count, number} Completados}}",
+    "context": "{count, number} Completed"
   },
   {
     "term": "component.reports-doughnut-chart.pending",
-    "definition": "{count, plural, =1{# Pendiente} other{# Pendientes}}",
-    "context": "{count} Pending"
+    "definition": "{count, plural, =1{{count, number} Pendiente} other{{count, number} Pendientes}}",
+    "context": "{count, number} Pending"
   },
   {
     "term": "component.reports-doughnut-chart.status-of-parallels",
@@ -5120,14 +5120,19 @@
     "context": "Conversion report"
   },
   {
-    "term": "component.reports-statistics-conversion.drop-off",
-    "definition": "{percentage}% caidas ({amount})",
-    "context": "{percentage}% drop off ({amount})"
+    "term": "component.reports-statistics-conversion.drop-off-absolute",
+    "definition": "{ratio, number, percent} caídas del total ({amount, number})",
+    "context": "{ratio, number, percent} drop off from total ({amount, number})"
   },
   {
     "term": "component.reports-statistics-conversion.drop-off-percentage",
-    "definition": "Porcentaje de caidas",
+    "definition": "Porcentaje de caídas",
     "context": "Drop off percentage"
+  },
+  {
+    "term": "component.reports-statistics-conversion.drop-off-relative",
+    "definition": "{ratio, number, percent} caídas relativo al paso anterior ({amount, number})",
+    "context": "{ratio, number, percent} drop off from previous step ({amount, number})"
   },
   {
     "term": "component.reports-statistics-conversion.export-file-name",
@@ -5145,16 +5150,6 @@
     "context": "Not enough data available to generate this report"
   },
   {
-    "term": "component.reports-statistics-conversion.of-previous",
-    "definition": "{percentage}% del anterior",
-    "context": "{percentage}% of previous"
-  },
-  {
-    "term": "component.reports-statistics-conversion.of-total",
-    "definition": "{percentage}% del total",
-    "context": "{percentage}% of total"
-  },
-  {
     "term": "component.reports-statistics-conversion.opened",
     "definition": "Abierto",
     "context": "Opened"
@@ -5163,6 +5158,16 @@
     "term": "component.reports-statistics-conversion.parallels-closed-no-sent",
     "definition": "Algunos parallels se completaron sin enviarse. Este funnel solo incluye parallels enviados a un destinatario.",
     "context": "Some parallels were completed without being sent. This funnel only includes parallels sent to one recipient."
+  },
+  {
+    "term": "component.reports-statistics-conversion.passing-absolute",
+    "definition": "{ratio, number, percent} del total ({amount, number})",
+    "context": "{ratio, number, percent} from total ({amount, number})"
+  },
+  {
+    "term": "component.reports-statistics-conversion.passing-relative",
+    "definition": "{ratio, number, percent} relativo al paso anterior ({amount, number})",
+    "context": "{ratio, number, percent} from previous step ({amount, number})"
   },
   {
     "term": "component.reports-statistics-conversion.percentage-relative",

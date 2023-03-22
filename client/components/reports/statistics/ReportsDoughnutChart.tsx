@@ -35,21 +35,21 @@ export function ReportsDoughnutChart({
         intl.formatMessage(
           {
             id: "component.reports-doughnut-chart.pending",
-            defaultMessage: "{count} Pending",
+            defaultMessage: "{count, number} Pending",
           },
           { count: pendingPetitions }
         ),
         intl.formatMessage(
           {
             id: "component.reports-doughnut-chart.completed",
-            defaultMessage: "{count} Completed",
+            defaultMessage: "{count, number} Completed",
           },
           { count: completedPetitions }
         ),
         intl.formatMessage(
           {
             id: "component.reports-doughnut-chart.closed",
-            defaultMessage: "{count} Closed",
+            defaultMessage: "{count, number} Closed",
           },
           { count: closedPetitions }
         ),
@@ -166,7 +166,7 @@ export function ReportsDoughnutChart({
           <Text>
             <FormattedMessage
               id="component.reports-doughnut-chart.pending"
-              defaultMessage="{count} Pending"
+              defaultMessage="{count, number} Pending"
               values={{ count: pendingPetitions }}
             />
           </Text>
@@ -176,7 +176,7 @@ export function ReportsDoughnutChart({
           <Text>
             <FormattedMessage
               id="component.reports-doughnut-chart.completed"
-              defaultMessage="{count} Completed"
+              defaultMessage="{count, number} Completed"
               values={{ count: completedPetitions }}
             />
           </Text>
@@ -186,7 +186,7 @@ export function ReportsDoughnutChart({
           <Text>
             <FormattedMessage
               id="component.reports-doughnut-chart.closed"
-              defaultMessage="{count} Closed"
+              defaultMessage="{count, number} Closed"
               values={{ count: closedPetitions }}
             />
           </Text>

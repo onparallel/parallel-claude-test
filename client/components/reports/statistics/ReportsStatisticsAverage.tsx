@@ -23,7 +23,7 @@ import { ReportsDoughnutChart } from "@parallel/components/reports/statistics/Re
 import { ReportTypeStatistics } from "@parallel/pages/app/reports/statistics";
 import { dateToFilenameFormat } from "@parallel/utils/dates";
 import { downloadSpreadsheet } from "@parallel/utils/downloadSpreadsheet";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { TimeSpan } from "../common/TimeSpan";
 
@@ -117,7 +117,7 @@ export function ReportsStatisticsAverage({
             </HelpPopover>
           </HStack>
           <Text fontWeight="600" fontSize="4xl">
-            {petitionsTotal}
+            <FormattedNumber value={petitionsTotal} />
           </Text>
         </Card>
       </GridItem>
@@ -152,7 +152,7 @@ export function ReportsStatisticsAverage({
           </HStack>
           {signaturesCompleted || !petitionsTotal ? (
             <Text fontWeight="600" fontSize="4xl">
-              {signaturesCompleted}
+              <FormattedNumber value={signaturesCompleted} />
             </Text>
           ) : (
             <Text fontSize="lg" textStyle="hint">

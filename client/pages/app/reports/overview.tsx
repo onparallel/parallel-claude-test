@@ -43,7 +43,7 @@ import { useTemplatesOverviewReportBackgroundTask } from "@parallel/utils/tasks/
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useReportsSections } from "@parallel/utils/useReportsSections";
 import { ReactNode, useMemo, useRef, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { isDefined, sortBy, sumBy } from "remeda";
 
 interface PetitionStatusCount {
@@ -465,7 +465,7 @@ function StatsCard({ title, amount, help }: { title: string; amount: number; hel
         <HelpPopover>{help}</HelpPopover>
       </HStack>
       <Text fontWeight={600} fontSize="3xl">
-        {amount}
+        <FormattedNumber value={amount} />
       </Text>
     </Card>
   );

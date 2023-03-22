@@ -36,7 +36,7 @@ import { Bar } from "react-chartjs-2";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
-type CalculatedData = {
+interface CalculatedData {
   id: string;
   label: string;
   percentage: number;
@@ -45,7 +45,7 @@ type CalculatedData = {
   relativeDropOffPercentage: number;
   dropOffPercentage: number;
   total: number;
-};
+}
 
 export function ReportsStatisticsConversion({
   report,
@@ -201,18 +201,12 @@ export function ReportsStatisticsConversion({
           boxPadding: 4,
           usePointStyle: true,
           callbacks: {
-            labelPointStyle: function () {
-              return {
-                pointStyle: "rectRounded",
-                rotation: 0,
-              };
-            },
-            title: function () {
-              return "";
-            },
-            label: function (obj) {
-              const { datasetIndex, dataIndex } = obj;
-
+            labelPointStyle: () => ({
+              pointStyle: "rectRounded",
+              rotation: 0,
+            }),
+            title: () => "",
+            label: ({ datasetIndex, dataIndex }) => {
               //Pick the correct percentage to show depends of what dataset is coming from
               const percentage =
                 datasetIndex === 1
@@ -234,30 +228,41 @@ export function ReportsStatisticsConversion({
 
               if (datasetIndex === 1) {
                 //DropOff label
-                return intl.formatMessage(
-                  {
-                    id: "component.reports-statistics-conversion.drop-off",
-                    defaultMessage: "{percentage}% drop off ({amount})",
-                  },
-                  { percentage, amount: calculatedData[dataIndex].dropOff ?? 0 }
-                );
+                return chartType === "RELATIVE"
+                  ? intl.formatMessage(
+                      {
+                        id: "component.reports-statistics-conversion.drop-off-relative",
+                        defaultMessage:
+                          "{ratio, number, percent} drop off from previous step ({amount, number})",
+                      },
+                      { ratio: percentage / 100, amount: calculatedData[dataIndex].dropOff ?? 0 }
+                    )
+                  : intl.formatMessage(
+                      {
+                        id: "component.reports-statistics-conversion.drop-off-absolute",
+                        defaultMessage:
+                          "{ratio, number, percent} drop off from total ({amount, number})",
+                      },
+                      { ratio: percentage / 100, amount: calculatedData[dataIndex].dropOff ?? 0 }
+                    );
               }
 
               //Percentage of total label
               return chartType === "RELATIVE"
                 ? intl.formatMessage(
                     {
-                      id: "component.reports-statistics-conversion.of-previous",
-                      defaultMessage: "{percentage}% of previous",
+                      id: "component.reports-statistics-conversion.passing-relative",
+                      defaultMessage:
+                        "{ratio, number, percent} from previous step ({amount, number})",
                     },
-                    { percentage }
+                    { ratio: percentage / 100, amount: calculatedData[dataIndex].total }
                   )
                 : intl.formatMessage(
                     {
-                      id: "component.reports-statistics-conversion.of-total",
-                      defaultMessage: "{percentage}% of total",
+                      id: "component.reports-statistics-conversion.passing-absolute",
+                      defaultMessage: "{ratio, number, percent} from total ({amount, number})",
                     },
-                    { percentage }
+                    { ratio: percentage / 100, amount: calculatedData[dataIndex].total }
                   );
             },
           },
@@ -455,7 +460,6 @@ export function ReportsStatisticsConversion({
           >
             {calculatedData.map(({ id, label, total, percentage, relativePercentage }) => {
               const percent = chartType === "ABSOLUTE" ? percentage : relativePercentage;
-
               return (
                 <Stack key={id} spacing={0} paddingX={0} width="100%">
                   <HStack>
@@ -485,11 +489,15 @@ export function ReportsStatisticsConversion({
                   </HStack>
                   {hasEnoughData ? (
                     <HStack fontWeight={600}>
-                      <Text fontSize="2xl" as="span">{`${
-                        percent ? Math.round(percent) : 0
-                      }%`}</Text>
+                      <Text fontSize="2xl" as="span">
+                        {intl.formatNumber(percent / 100, {
+                          style: "percent",
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0,
+                        })}
+                      </Text>
                       <Text fontSize="sm" as="span">
-                        ({total})
+                        ({intl.formatNumber(total)})
                       </Text>
                     </HStack>
                   ) : (
