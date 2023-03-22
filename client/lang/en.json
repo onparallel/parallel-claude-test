@@ -5205,11 +5205,6 @@
     "context": "Completed"
   },
   {
-    "term": "component.reports-statistics-time.days",
-    "definition": "Days",
-    "context": "Days"
-  },
-  {
     "term": "component.reports-statistics-time.export-file-name",
     "definition": "time-statistics-{templateId}-{range}",
     "context": "time-statistics-{templateId}-{range}"
@@ -5220,14 +5215,14 @@
     "context": "First reply added"
   },
   {
-    "term": "component.reports-statistics-time.hours",
-    "definition": "Hours",
-    "context": "Hours"
+    "term": "component.reports-statistics-time.max",
+    "definition": "Max.",
+    "context": "Max."
   },
   {
     "term": "component.reports-statistics-time.max-tooltip",
-    "definition": "Max: {value}",
-    "context": "Max: {value}"
+    "definition": "Max.: {value}",
+    "context": "Max.: {value}"
   },
   {
     "term": "component.reports-statistics-time.maximum",
@@ -5256,18 +5251,13 @@
   },
   {
     "term": "component.reports-statistics-time.min-tooltip",
-    "definition": "Min: {value}",
-    "context": "Min: {value}"
+    "definition": "Min.: {value}",
+    "context": "Min.: {value}"
   },
   {
     "term": "component.reports-statistics-time.minimum",
     "definition": "Minimum",
     "context": "Minimum"
-  },
-  {
-    "term": "component.reports-statistics-time.minutes",
-    "definition": "Minutes",
-    "context": "Minutes"
   },
   {
     "term": "component.reports-statistics-time.opened",

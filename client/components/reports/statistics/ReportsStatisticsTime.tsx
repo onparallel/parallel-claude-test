@@ -223,7 +223,7 @@ export function ReportsStatisticsTime({
                 intl.formatMessage(
                   {
                     id: "component.reports-statistics-time.max-tooltip",
-                    defaultMessage: "Max: {value}",
+                    defaultMessage: "Max.: {value}",
                   },
                   {
                     value: labelStringTimeSpans.max,
@@ -251,7 +251,7 @@ export function ReportsStatisticsTime({
                 intl.formatMessage(
                   {
                     id: "component.reports-statistics-time.min-tooltip",
-                    defaultMessage: "Min: {value}",
+                    defaultMessage: "Min.: {value}",
                   },
                   {
                     value: labelStringTimeSpans.min,
@@ -373,12 +373,6 @@ export function ReportsStatisticsTime({
                         />
                       </Text>
                     </Th>
-                    <Th textAlign="end">
-                      <FormattedMessage
-                        id="component.reports-statistics-time.mean"
-                        defaultMessage="Mean"
-                      />
-                    </Th>
                     <Th textAlign="end">P25</Th>
                     <Th textAlign="end">
                       <FormattedMessage
@@ -387,6 +381,12 @@ export function ReportsStatisticsTime({
                       />
                     </Th>
                     <Th textAlign="end">P75</Th>
+                    <Th textAlign="end">
+                      <FormattedMessage
+                        id="component.reports-statistics-time.max"
+                        defaultMessage="Max."
+                      />
+                    </Th>
                   </Tr>
                 </Thead>
 
@@ -431,13 +431,6 @@ export function ReportsStatisticsTime({
                           </Radio>
                         </Td>
                         <Td textAlign="end">
-                          {isDefined(timeStatistics[value]!.mean) ? (
-                            <TimeSpan duration={timeStatistics[value]!.mean ?? 0} />
-                          ) : (
-                            "-"
-                          )}
-                        </Td>
-                        <Td textAlign="end">
                           {isDefined(timeStatistics[value]!.q1) ? (
                             <TimeSpan duration={timeStatistics[value]!.q1 ?? 0} />
                           ) : (
@@ -454,6 +447,13 @@ export function ReportsStatisticsTime({
                         <Td textAlign="end">
                           {isDefined(timeStatistics[value]!.q3) ? (
                             <TimeSpan duration={timeStatistics[value]!.q3 ?? 0} />
+                          ) : (
+                            "-"
+                          )}
+                        </Td>
+                        <Td textAlign="end">
+                          {isDefined(timeStatistics[value]!.max) ? (
+                            <TimeSpan duration={timeStatistics[value]!.max ?? 0} />
                           ) : (
                             "-"
                           )}
