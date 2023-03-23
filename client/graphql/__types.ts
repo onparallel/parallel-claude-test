@@ -12385,6 +12385,12 @@ export type PreviewPetitionFieldMutations_updatePetitionFieldReplyMutation = {
   };
 };
 
+export type useCreatePetitionFieldReply_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+};
+
 export type PreviewPetitionFieldMutations_createPetitionFieldReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   fieldId: Scalars["GID"];
@@ -28804,6 +28810,12 @@ export const PreviewPetitionField_PetitionFieldReplyFragmentDoc = gql`
     content
   }
 ` as unknown as DocumentNode<PreviewPetitionField_PetitionFieldReplyFragment, unknown>;
+export const useCreatePetitionFieldReply_PetitionFieldFragmentDoc = gql`
+  fragment useCreatePetitionFieldReply_PetitionField on PetitionField {
+    id
+    type
+  }
+` as unknown as DocumentNode<useCreatePetitionFieldReply_PetitionFieldFragment, unknown>;
 export const PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReplyFragmentDoc =
   gql`
     fragment PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply on PetitionFieldReply {

@@ -10,6 +10,7 @@ import {
   PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragmentDoc,
   PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc,
   Scalars,
+  useCreatePetitionFieldReply_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { uploadFile, UploadFileError } from "@parallel/utils/uploadFile";
@@ -104,19 +105,36 @@ export function useUpdatePetitionFieldReply() {
   return useCallback(
     async function _updatePetitionFieldReply({
       petitionId,
+      fieldId,
       replyId,
       reply,
       isCacheOnly,
     }: {
       petitionId: string;
+      fieldId: string;
       replyId: string;
       reply: any;
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
+        const field = client.readFragment<useCreatePetitionFieldReply_PetitionFieldFragment>({
+          fragment: gql`
+            fragment useCreatePetitionFieldReply_PetitionField on PetitionField {
+              id
+              type
+            }
+          `,
+          id: fieldId,
+        });
+        const { zonedTimeToUtc } = await import("date-fns-tz");
         updateReplyContent(client, replyId, (content) => ({
           ...content,
-          value: reply,
+          ...(field?.type === "DATE_TIME"
+            ? {
+                ...reply,
+                value: zonedTimeToUtc(reply.datetime, reply.timezone).toISOString(),
+              }
+            : { value: reply }),
         }));
       } else {
         await updatePetitionFieldReply({
@@ -177,13 +195,30 @@ export function useCreatePetitionFieldReply() {
     }) {
       if (isCacheOnly) {
         const id = `${fieldId}-${getRandomId()}`;
+        const field = client.readFragment<useCreatePetitionFieldReply_PetitionFieldFragment>({
+          fragment: gql`
+            fragment useCreatePetitionFieldReply_PetitionField on PetitionField {
+              id
+              type
+            }
+          `,
+          id: fieldId,
+        });
+        const { zonedTimeToUtc } = await import("date-fns-tz");
+        const content =
+          field?.type === "DATE_TIME"
+            ? {
+                ...reply,
+                value: zonedTimeToUtc(reply.datetime, reply.timezone).toISOString(),
+              }
+            : { value: reply };
         updatePreviewFieldReplies(client, fieldId, (replies) => [
           ...(replies ?? []),
           {
             id,
             __typename: "PetitionFieldReply",
             status: "PENDING",
-            content: { value: reply },
+            content,
             isAnonymized: false,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),

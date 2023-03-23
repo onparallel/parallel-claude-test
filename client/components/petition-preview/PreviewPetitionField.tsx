@@ -124,6 +124,7 @@ export function PreviewPetitionField({
       try {
         await updatePetitionFieldReply({
           petitionId,
+          fieldId,
           replyId,
           reply,
           isCacheOnly,

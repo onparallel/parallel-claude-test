@@ -61,6 +61,7 @@
     "copy-to-clipboard": "^3.3.3",
     "core-js": "^3.27.2",
     "date-fns": "^2.29.3",
+    "date-fns-tz": "^2.0.0",
     "dompurify": "^2.4.3",
     "escape-string-regexp": "^4.0.0",
     "exceljs": "^4.3.0",
