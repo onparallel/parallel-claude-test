@@ -619,6 +619,8 @@ type LandingTemplatePagination {
   totalCount: Int!
 }
 
+scalar LocalizableUserText
+
 type MessageCancelledEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!

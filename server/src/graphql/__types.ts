@@ -1,5 +1,6 @@
-import { FileUpload } from "graphql-upload/Upload.js";
-import { Duration } from "date-fns";
+import type { FileUpload } from "graphql-upload/Upload.js";
+import type { Duration } from "date-fns";
+import type { LocalizableUserText } from "./helpers/scalars/LocalizableUserText";
 import type * as db from "./../db/__types";
 import type * as events from "./../db/events";
 import type * as notifications from "./../db/notifications";
@@ -39,6 +40,10 @@ declare global {
       fieldName: FieldName,
       opts?: core.CommonInputFieldConfig<TypeName, FieldName>
     ): void; // "JSON";
+    localizableUserText<FieldName extends string>(
+      fieldName: FieldName,
+      opts?: core.CommonInputFieldConfig<TypeName, FieldName>
+    ): void; // "LocalizableUserText";
     globalId<FieldName extends string>(
       fieldName: FieldName,
       opts: GlobalIdInputFieldConfig<TypeName, FieldName>
@@ -72,6 +77,10 @@ declare global {
       fieldName: FieldName,
       ...opts: core.ScalarOutSpread<TypeName, FieldName>
     ): void; // "JSON";
+    localizableUserText<FieldName extends string>(
+      fieldName: FieldName,
+      ...opts: core.ScalarOutSpread<TypeName, FieldName>
+    ): void; // "LocalizableUserText";
     globalId<FieldName extends string>(
       fieldName: FieldName,
       ...opts: GlobalIdOutputFieldConfigSpread<TypeName, FieldName>
@@ -395,6 +404,7 @@ export interface NexusGenScalars {
   GID: number;
   JSON: any;
   JSONObject: { [key: string]: any };
+  LocalizableUserText: LocalizableUserText;
   Upload: Promise<FileUpload>;
 }
 

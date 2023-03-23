@@ -560,11 +560,6 @@
     "context": "Any applications or scripts using this event subscription will no longer receive event notifications from Parallel."
   },
   {
-    "term": "component.confirm-deactivate-user-dialog.selected-users-deactivated",
-    "definition": "Los usuarios seleccionados han sido desactivados.",
-    "context": "The selected users have been deactivated."
-  },
-  {
     "term": "component.confirm-deactivate-user-dialog.include-drafts",
     "definition": "Incluir borradores",
     "context": "Include drafts"
@@ -573,6 +568,11 @@
     "term": "component.confirm-deactivate-user-dialog.include-drafts-help",
     "definition": "Al marcar esta opción se transferirán todos los parallels incluyendo borradores. Si no, los borradores del usuario desactivado se eliminarán.",
     "context": "Checking this option will transfer all parallels including drafts. Otherwise, the drafts of the deactivated user will be deleted."
+  },
+  {
+    "term": "component.confirm-deactivate-user-dialog.selected-users-deactivated",
+    "definition": "Los usuarios seleccionados han sido desactivados.",
+    "context": "The selected users have been deactivated."
   },
   {
     "term": "component.confirm-deactivate-user-dialog.tags-label",
@@ -2253,6 +2253,11 @@
     "term": "component.loading-dynamic-text.searching-parallels",
     "definition": "Buscando parallels en cada rincón...",
     "context": "Searching for parallels in every corner..."
+  },
+  {
+    "term": "component.localizable-user-text-input.translated-badge",
+    "definition": "Traducido",
+    "context": "Translated"
   },
   {
     "term": "component.message-closing-email-editor.body-label",

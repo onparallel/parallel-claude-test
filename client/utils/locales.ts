@@ -6,6 +6,7 @@ interface Locale<T extends string> {
   key: T;
   label: string;
   localizedLabel: (intl: IntlShape) => string;
+  flag: string;
 }
 
 const USER_LOCALES: Locale<UserLocale>[] = [
@@ -17,6 +18,7 @@ const USER_LOCALES: Locale<UserLocale>[] = [
         id: "supported-locales.english",
         defaultMessage: "English",
       }),
+    flag: "us",
   },
   {
     key: "es",
@@ -26,6 +28,7 @@ const USER_LOCALES: Locale<UserLocale>[] = [
         id: "supported-locales.spanish",
         defaultMessage: "Spanish",
       }),
+    flag: "es",
   },
 ];
 
@@ -33,10 +36,11 @@ export function useSupportedUserLocales() {
   const intl = useIntl();
   return useMemo(
     () =>
-      USER_LOCALES.map(({ key, label, localizedLabel }) => ({
+      USER_LOCALES.map(({ key, label, localizedLabel, flag }) => ({
         key,
         label,
         localizedLabel: localizedLabel(intl),
+        flag,
       })),
     [intl.locale]
   );
@@ -59,6 +63,7 @@ const PETITION_LOCALES: Locale<PetitionLocale>[] = [
         id: "supported-locales.english",
         defaultMessage: "English",
       }),
+    flag: "us",
   },
   {
     key: "es",
@@ -68,6 +73,7 @@ const PETITION_LOCALES: Locale<PetitionLocale>[] = [
         id: "supported-locales.spanish",
         defaultMessage: "Spanish",
       }),
+    flag: "es",
   },
 ];
 

@@ -1,0 +1,26 @@
+import { Scalars, UserLocale } from "@parallel/graphql/__types";
+import { asSupportedUserLocale } from "@parallel/utils/locales";
+import { ReactNode } from "react";
+import { useIntl } from "react-intl";
+import { isDefined } from "remeda";
+
+interface LocalizableUserTextRenderProps {
+  value: Scalars["LocalizableUserText"];
+  locale?: UserLocale;
+  default?: ReactNode;
+}
+
+export function LocalizableUserTextRender({
+  value,
+  locale: _locale,
+  default: _default,
+}: LocalizableUserTextRenderProps) {
+  const intl = useIntl();
+  const locale = [
+    _locale,
+    asSupportedUserLocale(intl.locale),
+    "en" as UserLocale,
+    Object.keys(value)[0] as UserLocale,
+  ].find((l) => isDefined(l) && isDefined(value[l]));
+  return <>{isDefined(locale) ? value[locale] : _default}</>;
+}
