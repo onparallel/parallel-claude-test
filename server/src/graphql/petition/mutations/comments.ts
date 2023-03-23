@@ -3,7 +3,7 @@ import { getMentions } from "../../../util/slate";
 import { and, authenticateAnd, ifArgEquals } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { jsonArg } from "../../helpers/scalars";
+import { jsonArg } from "../../helpers/scalars/JSON";
 import { validPetitionFieldCommentContent } from "../../public/authorizers";
 import {
   commentsBelongsToPetition,

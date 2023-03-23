@@ -9,7 +9,7 @@ import {
 import { fullName } from "../../util/fullName";
 import { getInitials } from "../../util/initials";
 import { userHasRole } from "../../util/userHasRole";
-import { datetimeArg } from "../helpers/scalars";
+import { datetimeArg } from "../helpers/scalars/DateTime";
 import { rootIsContextRealUser, rootIsContextUser } from "./authorizers";
 
 export const UserLocale = enumType({

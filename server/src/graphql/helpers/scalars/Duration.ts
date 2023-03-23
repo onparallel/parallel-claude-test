@@ -1,19 +1,21 @@
+import { arg, core, scalarType } from "nexus";
 import Ajv from "ajv";
-import { GraphQLScalarLiteralParser, Kind, ValueNode } from "graphql";
+import { GraphQLScalarLiteralParser, GraphQLScalarTypeConfig, Kind, ValueNode } from "graphql";
 import { ObjMap } from "graphql/jsutils/ObjMap";
 import { Maybe } from "graphql/jsutils/Maybe";
 import { isDefined } from "remeda";
+import type { Duration as _Duration } from "date-fns";
 
 const KEYS = ["years", "months", "weeks", "days", "hours", "minutes", "seconds"];
 
-export const DURATION_SCHEMA = {
+const DURATION_SCHEMA = {
   type: "object",
   properties: Object.fromEntries(KEYS.map((key) => [key, { type: "number" }])),
   additionalProperties: false,
   anyOf: KEYS.map((key) => ({ required: [key] })),
 };
 
-export function ensureDuration(value: any, strict: boolean): Duration {
+function ensureDuration(value: any, strict: boolean): _Duration {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     throw new Error(`Value is not a valid Duration: ${value}`);
   }
@@ -31,7 +33,7 @@ export function ensureDuration(value: any, strict: boolean): Duration {
   );
 }
 
-export const parseDuration: GraphQLScalarLiteralParser<Duration> = function parseDuration(
+const parseDuration: GraphQLScalarLiteralParser<_Duration> = function parseDuration(
   ast,
   variables
 ) {
@@ -53,23 +55,6 @@ export const parseDuration: GraphQLScalarLiteralParser<Duration> = function pars
   return value;
 };
 
-export function addDuration(d1: Duration, d2: Duration) {
-  const newDuration: Duration = {};
-  KEYS.forEach((key) => {
-    const dKey = key as keyof Duration;
-    newDuration[dKey] = (d1[dKey] ?? 0) + (d2[dKey] ?? 0);
-  });
-  return newDuration;
-}
-
-export function multiplyDuration(duration: Duration, multiplier: number) {
-  const newDuration: Duration = {};
-  Object.entries(duration).forEach(([unit, value]) => {
-    newDuration[unit as keyof Duration] = value * multiplier;
-  });
-  return newDuration;
-}
-
 function parseDurationAmount(ast: ValueNode, variables: Maybe<ObjMap<unknown>>): any {
   switch (ast.kind) {
     case Kind.INT:
@@ -83,4 +68,22 @@ function parseDurationAmount(ast: ValueNode, variables: Maybe<ObjMap<unknown>>):
       throw new Error(`Invalid Duration object`);
     }
   }
+}
+
+export const Duration = scalarType({
+  asNexusMethod: "duration",
+  sourceType: "Duration",
+  ...({
+    name: "Duration",
+    serialize: (value) => ensureDuration(value, false),
+    parseValue: (value) => ensureDuration(value, true),
+    parseLiteral: parseDuration,
+    extensions: {
+      jsonSchema: DURATION_SCHEMA,
+    },
+  } satisfies GraphQLScalarTypeConfig<Duration, Duration>),
+});
+
+export function durationArg(opts?: Omit<core.NexusArgConfig<"Duration">, "type">) {
+  return arg({ ...opts, type: "Duration" });
 }

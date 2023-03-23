@@ -3,7 +3,7 @@ import pMap from "p-map";
 import { CreateUserGroup, UserGroup } from "../../db/__types";
 import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { RESULT } from "../helpers/result";
+import { RESULT } from "../helpers/Result";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyString } from "../helpers/validators/notEmptyString";

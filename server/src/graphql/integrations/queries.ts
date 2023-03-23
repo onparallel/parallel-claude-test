@@ -3,7 +3,7 @@ import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
 import { toGlobalId } from "../../util/globalId";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
-import { datetimeArg } from "../helpers/scalars";
+import { datetimeArg } from "../helpers/scalars/DateTime";
 import { userHasEnabledIntegration, userHasFeatureFlag } from "../petition/authorizers";
 
 export const queries = queryField((t) => {

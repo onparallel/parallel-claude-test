@@ -43,8 +43,11 @@ import {
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { importFromExcel } from "../../helpers/importDataFromExcel";
 import { parseDynamicSelectValues } from "../../helpers/parseDynamicSelectValues";
-import { RESULT } from "../../helpers/result";
-import { datetimeArg, jsonArg, jsonObjectArg, SUCCESS, uploadArg } from "../../helpers/scalars";
+import { RESULT } from "../../helpers/Result";
+import { datetimeArg } from "../../helpers/scalars/DateTime";
+import { jsonArg, jsonObjectArg } from "../../helpers/scalars/JSON";
+import { SUCCESS } from "../../helpers/Success";
+import { uploadArg } from "../../helpers/scalars/Upload";
 import { validateAnd, validateIf, validateIfDefined, validateOr } from "../../helpers/validateArgs";
 import { inRange } from "../../helpers/validators/inRange";
 import { jsonSchema } from "../../helpers/validators/jsonSchema";

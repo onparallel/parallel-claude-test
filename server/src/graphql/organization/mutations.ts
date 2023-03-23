@@ -19,7 +19,7 @@ import { random } from "../../util/token";
 import { authenticateAnd, userIsSuperAdmin } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { uploadArg } from "../helpers/scalars";
+import { uploadArg } from "../helpers/scalars/Upload";
 import { validateAnd } from "../helpers/validateArgs";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 import { inRange } from "../helpers/validators/inRange";

@@ -23,8 +23,8 @@ import {
 } from "../helpers/authorize";
 import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { RESULT } from "../helpers/result";
-import { uploadArg } from "../helpers/scalars";
+import { RESULT } from "../helpers/Result";
+import { uploadArg } from "../helpers/scalars/Upload";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
 import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";

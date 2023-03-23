@@ -9,6 +9,7 @@ generates:
       - typescript-operations
       - typed-document-node
     config:
+      useTypeImports: true
       strictScalars: true
       scalars:
         DateTime: string

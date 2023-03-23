@@ -6,7 +6,7 @@ import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { jsonObjectArg } from "../../helpers/scalars";
+import { jsonObjectArg } from "../../helpers/scalars/JSON";
 import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
 import {
   fieldCanBeReplied,

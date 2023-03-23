@@ -2,8 +2,8 @@ import { booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { authenticateAnd } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { RESULT } from "../../helpers/result";
-import { jsonObjectArg } from "../../helpers/scalars";
+import { RESULT } from "../../helpers/Result";
+import { jsonObjectArg } from "../../helpers/scalars/JSON";
 import {
   petitionIsNotAnonymized,
   signatureRequestIsNotAnonymized,

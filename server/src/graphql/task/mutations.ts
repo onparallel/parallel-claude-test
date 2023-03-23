@@ -6,7 +6,7 @@ import { isValidTimezone } from "../../util/validators";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { datetimeArg } from "../helpers/scalars";
+import { datetimeArg } from "../helpers/scalars/DateTime";
 import {
   petitionIsNotAnonymized,
   petitionsAreOfTypeTemplate,

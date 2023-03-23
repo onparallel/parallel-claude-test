@@ -7,7 +7,7 @@ import { withError } from "../../util/promises/withError";
 import { and, authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { RESULT } from "../helpers/result";
+import { RESULT } from "../helpers/Result";
 import { validUrl } from "../helpers/validators/validUrl";
 import { petitionsAreOfTypeTemplate, userHasAccessToPetitions } from "../petition/authorizers";
 import {

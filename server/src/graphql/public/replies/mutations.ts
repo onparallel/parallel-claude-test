@@ -5,7 +5,7 @@ import { isFileTypeField } from "../../../util/isFileTypeField";
 import { random } from "../../../util/token";
 import { and, chain } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { RESULT } from "../../helpers/result";
+import { RESULT } from "../../helpers/Result";
 import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
 import {
   fieldCanBeReplied,

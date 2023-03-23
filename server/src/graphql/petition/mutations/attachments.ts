@@ -4,7 +4,7 @@ import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { RESULT } from "../../helpers/result";
+import { RESULT } from "../../helpers/Result";
 import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
 import {
   fieldAttachmentBelongsToField,

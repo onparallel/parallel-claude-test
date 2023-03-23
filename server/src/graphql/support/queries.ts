@@ -3,7 +3,7 @@ import { isDefined } from "remeda";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { hash } from "../../util/token";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { RESULT } from "../helpers/result";
+import { RESULT } from "../helpers/Result";
 import { supportMethodAccess } from "./authorizers";
 
 export const globalIdDecode = queryField("globalIdDecode", {

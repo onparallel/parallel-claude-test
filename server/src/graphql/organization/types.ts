@@ -13,7 +13,7 @@ import {
 import { isDefined, omit } from "remeda";
 import { defaultBrandTheme } from "../../util/BrandTheme";
 import { or } from "../helpers/authorize";
-import { addDuration, multiplyDuration } from "../helpers/duration";
+import { addDuration, multiplyDuration } from "../../util/duration";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { isOwnOrgOrSuperAdmin } from "./authorizers";

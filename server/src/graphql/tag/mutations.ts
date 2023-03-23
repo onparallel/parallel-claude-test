@@ -5,7 +5,7 @@ import { fullName } from "../../util/fullName";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { RESULT } from "../helpers/result";
+import { RESULT } from "../helpers/Result";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyString } from "../helpers/validators/notEmptyString";
