@@ -1,7 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { groupBy, indexBy, omit, uniq } from "remeda";
-import { CONFIG, Config } from "../../config";
 import { I18N_SERVICE, II18nService } from "../../services/i18n";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
@@ -15,7 +14,6 @@ import { SystemRepository } from "./SystemRepository";
 @injectable()
 export class UserRepository extends BaseRepository {
   constructor(
-    @inject(CONFIG) private config: Config,
     @inject(KNEX) knex: Knex,
     private system: SystemRepository,
     @inject(I18N_SERVICE) private intlService: II18nService

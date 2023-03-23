@@ -365,9 +365,9 @@ export const UserOrganizationRoleValues = [
   "OWNER",
 ] as UserOrganizationRole[];
 
-export type UserStatus = "ACTIVE" | "INACTIVE";
+export type UserStatus = "ACTIVE" | "INACTIVE" | "ON_HOLD";
 
-export const UserStatusValues = ["ACTIVE", "INACTIVE"] as UserStatus[];
+export const UserStatusValues = ["ACTIVE", "INACTIVE", "ON_HOLD"] as UserStatus[];
 
 export interface TableTypes {
   contact: Contact;

@@ -1,6 +1,7 @@
 import { json, Router } from "express";
 import { isDefined, pick } from "remeda";
-import { CreateUser, CreateUserData, User, UserData } from "../db/__types";
+import { ApiContext } from "../context";
+import { CreateUser, CreateUserData, User, UserData, UserStatus } from "../db/__types";
 import { Maybe } from "../util/types";
 
 export const scim = Router().use(
@@ -89,13 +90,18 @@ scim
       const userData = user ? await req.context.users.loadUserData(user.user_data_id) : null;
       if (user && userData) {
         if ((user.status === "ACTIVE") !== active) {
+          const status = await getUserNewStatus(user.id, active, req.context);
           [user] = await req.context.users.updateUserById(
             user.id,
-            {
-              status: active ? "ACTIVE" : "INACTIVE",
-            },
+            { status },
             `Provisioning:${req.context.organization!.id}`
           );
+          if (status === "ON_HOLD") {
+            await req.context.emails.sendTransferParallelsEmail(
+              externalId,
+              req.context.organization!.id
+            );
+          }
         }
         // TODO: descomentar cuando Cuatre deje de hacer cosas raras
         // if (userData.first_name !== givenName || userData.last_name !== familyName) {
@@ -199,7 +205,8 @@ scim
     try {
       const userUpdate: Partial<CreateUser> = {};
       const userDataUpdate: Partial<CreateUserData> = {};
-      req.body.Operations.forEach((op: any) => {
+
+      for (const op of req.body.Operations) {
         if (op.op === "Replace") {
           switch (op.path) {
             case "name.givenName":
@@ -208,14 +215,23 @@ scim
             case "name.familyName":
               userDataUpdate.last_name = op.value;
               break;
-            case "active":
-              userUpdate.status = op.value === "True" ? "ACTIVE" : "INACTIVE";
+            case "active": {
+              const user = await req.context.users.loadUserByExternalId({
+                externalId: req.params.externalId,
+                orgId: req.context.organization!.id,
+              });
+              userUpdate.status = await getUserNewStatus(
+                user!.id,
+                op.value === "True",
+                req.context
+              );
               break;
+            }
             default:
               break;
           }
         }
-      });
+      }
       if (isDefined(userUpdate.status)) {
         await req.context.users.updateUserByExternalId(
           req.params.externalId,
@@ -223,6 +239,13 @@ scim
           userUpdate,
           `Provisioning:${req.context.organization!.id}`
         );
+
+        if (userUpdate.status === "ON_HOLD") {
+          await req.context.emails.sendTransferParallelsEmail(
+            req.params.externalId,
+            req.context.organization!.id
+          );
+        }
       }
       if (isDefined(userDataUpdate.first_name) || isDefined(userDataUpdate.last_name)) {
         await req.context.users.updateUserDataByExternalId(
@@ -262,7 +285,15 @@ scim
         userDataUpdate.last_name = req.body.name.familyName;
       }
       if (isDefined(req.body.active)) {
-        userUpdate.status = req.body.active === "True" ? "ACTIVE" : "INACTIVE";
+        const user = await req.context.users.loadUserByExternalId({
+          externalId: req.params.externalId,
+          orgId: req.context.organization!.id,
+        });
+        userUpdate.status = await getUserNewStatus(
+          user!.id,
+          req.body.active === "True",
+          req.context
+        );
       }
 
       if (isDefined(userUpdate.status)) {
@@ -272,6 +303,12 @@ scim
           userUpdate,
           `Provisioning:${req.context.organization!.id}`
         );
+        if (userUpdate.status === "ON_HOLD") {
+          await req.context.emails.sendTransferParallelsEmail(
+            req.params.externalId,
+            req.context.organization!.id
+          );
+        }
       }
       if (isDefined(userDataUpdate.first_name) || isDefined(userDataUpdate.last_name)) {
         await req.context.users.updateUserDataByExternalId(
@@ -302,12 +339,23 @@ scim
   })
   .delete(async (req, res, next) => {
     try {
+      const user = await req.context.users.loadUserByExternalId({
+        externalId: req.params.externalId,
+        orgId: req.context.organization!.id,
+      });
+      const status = await getUserNewStatus(user!.id, false, req.context);
       await req.context.users.updateUserByExternalId(
         req.params.externalId,
         req.context.organization!.id,
-        { status: "INACTIVE" },
+        { status },
         `Provisioning:${req.context.organization!.id}`
       );
+      if (status === "ON_HOLD") {
+        await req.context.emails.sendTransferParallelsEmail(
+          req.params.externalId,
+          req.context.organization!.id
+        );
+      }
       res.sendStatus(204);
     } catch (error) {
       next(error);
@@ -339,4 +387,20 @@ function toScimUser(
       },
     ],
   };
+}
+
+async function getUserNewStatus(
+  userId: number,
+  active: boolean,
+  ctx: ApiContext
+): Promise<UserStatus> {
+  if (active) {
+    return "ACTIVE";
+  }
+  const userPermissions = await ctx.petitions.loadPetitionPermissionsByUserId(userId);
+  if (userPermissions.some((p) => p.type === "OWNER")) {
+    return "ON_HOLD";
+  }
+
+  return "INACTIVE";
 }

@@ -83,6 +83,7 @@ export interface IEmailsService {
   sendSignatureCancelledNoCreditsLeftEmail(petitionSignatureRequestId: number): Promise<void>;
   sendSignatureCancelledRequestErrorEmail(petitionSignatureRequestId: number): Promise<void>;
   sendSignatureCancelledDeclinedBySignerEmail(petitionSignatureRequestId: number): Promise<void>;
+  sendTransferParallelsEmail(userExternalId: string, orgId: number): Promise<void>;
 }
 export const EMAILS = Symbol.for("EMAILS");
 
@@ -309,6 +310,14 @@ export class EmailsService implements IEmailsService {
       orgId,
       petitionId,
       apiKeyHint,
+    });
+  }
+
+  async sendTransferParallelsEmail(userExternalId: string, orgId: number) {
+    return await this.enqueueEmail("transfer-parallels", {
+      id: this.buildQueueId("TransferParallels", [userExternalId, orgId]),
+      userExternalId,
+      orgId,
     });
   }
 

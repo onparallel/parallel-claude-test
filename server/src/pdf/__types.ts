@@ -4387,7 +4387,7 @@ export type UserPermissionRemovedEvent = PetitionEvent & {
   user: Maybe<User>;
 };
 
-export type UserStatus = "ACTIVE" | "INACTIVE";
+export type UserStatus = "ACTIVE" | "INACTIVE" | "ON_HOLD";
 
 export type VerificationCodeCheck = {
   remainingAttempts: Maybe<Scalars["Int"]>;

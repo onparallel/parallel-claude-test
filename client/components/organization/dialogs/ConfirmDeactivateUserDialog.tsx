@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Button,
   Checkbox,
@@ -17,6 +18,7 @@ import {
   UserSelectInstance,
   UserSelectSelection,
 } from "@parallel/components/common/UserSelect";
+import { useConfirmDeactivateUserDialog_UserFragment } from "@parallel/graphql/__types";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -28,10 +30,14 @@ type ConfirmDeactivateUserDialogData = {
   includeDrafts: boolean;
 };
 
+interface ConfirmDeactivateUserDialogProps extends DialogProps {
+  users: useConfirmDeactivateUserDialog_UserFragment[];
+}
+
 function ConfirmDeactivateUserDialog({
-  userIds,
+  users,
   ...props
-}: DialogProps<{ userIds: string[] }, ConfirmDeactivateUserDialogData>) {
+}: DialogProps<ConfirmDeactivateUserDialogProps, ConfirmDeactivateUserDialogData>) {
   const {
     control,
     handleSubmit,
@@ -50,13 +56,15 @@ function ConfirmDeactivateUserDialog({
     },
   });
 
+  const showTransferText = users.every((user) => user.status === "ON_HOLD");
+
   const userSelectRef = useRef<UserSelectInstance<false>>(null);
 
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
     async (search: string, excludeUsers: string[]) => {
       return await _handleSearchUsers(search, {
-        excludeUsers: [...excludeUsers, ...userIds],
+        excludeUsers: [...excludeUsers, ...users.map((user) => user.id)],
       });
     },
     [_handleSearchUsers]
@@ -73,30 +81,65 @@ function ConfirmDeactivateUserDialog({
         }),
       }}
       header={
-        <FormattedMessage
-          id="organization-users.deactivate"
-          defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
-          values={{ count: userIds.length }}
-        />
+        showTransferText ? (
+          <FormattedMessage
+            id="component.confirm-deactivate-user-dialog.transfer-parallels"
+            defaultMessage="Transfer parallels"
+          />
+        ) : (
+          <FormattedMessage
+            id="organization-users.deactivate"
+            defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
+            values={{ count: users!.length }}
+          />
+        )
       }
       body={
         <Stack spacing={4}>
-          <Text>
-            <FormattedMessage
-              id="organization.confirm-deactivate-user-dialog.body"
-              defaultMessage="If you deactivate the selected {count, plural, =1{user} other {users}}, they won't be able to access Parallel."
-              values={{ count: userIds.length }}
-            />
-          </Text>
-          <Text>
-            <FormattedMessage
-              id="organization.confirm-deactivate-user-dialog.transfer-to-user"
-              defaultMessage="Choose a user to transfer all the parallels from the selected {count, plural, =1{user} other {users}}. You can also add tags to identify them later."
-              values={{
-                count: userIds.length,
-              }}
-            />
-          </Text>
+          {showTransferText ? (
+            <Stack>
+              <Text>
+                {users.length === 1 ? (
+                  <FormattedMessage
+                    id="component.confirm-deactivate-user-dialog.transfer-onhold-body"
+                    defaultMessage="The user {fullName} ({email}) has been deactivated."
+                    values={{ fullName: users[0].fullName, email: users[0].email }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="component.confirm-deactivate-user-dialog.selected-users-deactivated"
+                    defaultMessage="The selected users have been deactivated."
+                  />
+                )}
+              </Text>
+              <Text>
+                <FormattedMessage
+                  id="component.confirm-deactivate-user-dialog.transfer-onhold-body-2"
+                  defaultMessage="In order not to lose access to your parallels and templates, please specify a user to transfer everything to."
+                />
+              </Text>
+            </Stack>
+          ) : (
+            <>
+              <Text>
+                <FormattedMessage
+                  id="organization.confirm-deactivate-user-dialog.body"
+                  defaultMessage="If you deactivate the selected {count, plural, =1{user} other {users}}, they won't be able to access Parallel."
+                  values={{ count: users!.length }}
+                />
+              </Text>
+              <Text>
+                <FormattedMessage
+                  id="organization.confirm-deactivate-user-dialog.transfer-to-user"
+                  defaultMessage="Choose a user to transfer all the parallels from the selected {count, plural, =1{user} other {users}}. You can also add tags to identify them later."
+                  values={{
+                    count: users!.length,
+                  }}
+                />
+              </Text>
+            </>
+          )}
+
           <FormControl id="user" isInvalid={!!errors.user}>
             <Controller
               name="user"
@@ -132,7 +175,7 @@ function ConfirmDeactivateUserDialog({
                   <Text>
                     <FormattedMessage
                       id="component.confirm-deactivate-user-dialog.include-drafts-help"
-                      defaultMessage="Checking this option will also transfer all draft parallels from the selected users/users. Otherwise, drafts will be deleted."
+                      defaultMessage="Checking this option will transfer all parallels including drafts. Otherwise, the drafts of the deactivated user will be deleted."
                     />
                   </Text>
                 </HelpPopover>
@@ -163,15 +206,24 @@ function ConfirmDeactivateUserDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="red">
-          <FormattedMessage
-            id="petition.confirm-deactivate-users.confirm"
-            defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
-            values={{
-              count: userIds.length,
-            }}
-          />
-        </Button>
+        showTransferText ? (
+          <Button type="submit" colorScheme="primary">
+            <FormattedMessage
+              id="component.confirm-deactivate-user-dialog.transfer"
+              defaultMessage="Transfer"
+            />
+          </Button>
+        ) : (
+          <Button type="submit" colorScheme="red">
+            <FormattedMessage
+              id="petition.confirm-deactivate-users.confirm"
+              defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
+              values={{
+                count: users!.length,
+              }}
+            />
+          </Button>
+        )
       }
       {...props}
     />
@@ -181,3 +233,16 @@ function ConfirmDeactivateUserDialog({
 export function useConfirmDeactivateUserDialog() {
   return useDialog(ConfirmDeactivateUserDialog);
 }
+
+useConfirmDeactivateUserDialog.fragments = {
+  get User() {
+    return gql`
+      fragment useConfirmDeactivateUserDialog_User on User {
+        id
+        fullName
+        email
+        status
+      }
+    `;
+  },
+};

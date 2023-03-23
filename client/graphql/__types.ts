@@ -4544,7 +4544,7 @@ export interface UserPermissionRemovedEvent extends PetitionEvent {
   user?: Maybe<User>;
 }
 
-export type UserStatus = "ACTIVE" | "INACTIVE";
+export type UserStatus = "ACTIVE" | "INACTIVE" | "ON_HOLD";
 
 export interface VerificationCodeCheck {
   __typename?: "VerificationCodeCheck";
@@ -6527,6 +6527,14 @@ export type useAddSignatureCredentialsDialog_createSignaturitIntegrationMutation
 
 export type useAddSignatureCredentialsDialog_createSignaturitIntegrationMutation = {
   createSignaturitIntegration: { __typename?: "SignatureOrgIntegration"; id: string };
+};
+
+export type useConfirmDeactivateUserDialog_UserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: string | null;
+  email: string;
+  status: UserStatus;
 };
 
 export type CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment = {
@@ -29411,6 +29419,14 @@ export const useCreateOrUpdateUserDialog_UserFragmentDoc = gql`
   }
   ${useCreateOrUpdateUserDialog_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<useCreateOrUpdateUserDialog_UserFragment, unknown>;
+export const useConfirmDeactivateUserDialog_UserFragmentDoc = gql`
+  fragment useConfirmDeactivateUserDialog_User on User {
+    id
+    fullName
+    email
+    status
+  }
+` as unknown as DocumentNode<useConfirmDeactivateUserDialog_UserFragment, unknown>;
 export const OrganizationUsers_UserFragmentDoc = gql`
   fragment OrganizationUsers_User on User {
     id
@@ -29424,8 +29440,10 @@ export const OrganizationUsers_UserFragmentDoc = gql`
     status
     isSsoUser
     ...useCreateOrUpdateUserDialog_User
+    ...useConfirmDeactivateUserDialog_User
   }
   ${useCreateOrUpdateUserDialog_UserFragmentDoc}
+  ${useConfirmDeactivateUserDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<OrganizationUsers_UserFragment, unknown>;
 export const ConfirmDeactivateAccessDialog_PetitionAccessFragmentDoc = gql`
   fragment ConfirmDeactivateAccessDialog_PetitionAccess on PetitionAccess {

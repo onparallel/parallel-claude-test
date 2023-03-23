@@ -38,7 +38,7 @@ import { validLocale } from "../helpers/validators/validLocale";
 import { validPassword } from "../helpers/validators/validPassword";
 import { orgCanCreateNewUser, orgDoesNotHaveSsoProvider } from "../organization/authorizers";
 import { userHasFeatureFlag } from "../petition/authorizers";
-import { argUserHasActiveStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
+import { argUserHasStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
 import { userHasAccessToTags } from "../tag/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
 import {
@@ -334,10 +334,10 @@ export const deactivateUser = mutationField("deactivateUser", {
   authorize: authenticateAnd(
     contextUserHasRole("ADMIN"),
     userHasAccessToUsers("userIds"),
-    userIsNotSSO("userIds"),
+    or(userIsNotSSO("userIds"), argUserHasStatus("userIds", "ON_HOLD")),
     userIsNotOrgOwner("userIds"),
     userHasAccessToUsers("transferToUserId"),
-    argUserHasActiveStatus("transferToUserId"),
+    argUserHasStatus("transferToUserId", "ACTIVE"),
     userHasAccessToTags("tagIds")
   ),
   validateArgs: validateAnd(

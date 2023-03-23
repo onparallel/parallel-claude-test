@@ -101,6 +101,7 @@ export class MockEmailsService implements IEmailsService {
   async sendInternalSignaturitAccountDepletedCreditsEmail() {}
   async sendSignatureCancelledRequestErrorEmail() {}
   async sendSignatureCancelledDeclinedBySignerEmail() {}
+  async sendTransferParallelsEmail() {}
   async validateEmail(email: string) {
     return EMAIL_REGEX.test(email);
   }

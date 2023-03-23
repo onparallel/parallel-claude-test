@@ -950,6 +950,26 @@
     "context": "Reply"
   },
   {
+    "term": "transfer-parallels-email.access-click-link",
+    "definition": "Follow the link below to transfer the parallels.",
+    "context": "Follow the link below to transfer the parallels."
+  },
+  {
+    "term": "transfer-parallels-email.intro-text",
+    "definition": "The account of the user {user} has been disabled. In order not to lose access to your parallels, we need you to transfer them to another user in the organization.",
+    "context": "The account of the user {user} has been disabled. In order not to lose access to your parallels, we need you to transfer them to another user in the organization."
+  },
+  {
+    "term": "transfer-parallels-email.subject",
+    "definition": "You have parallels pending transfer",
+    "context": "You have parallels pending transfer"
+  },
+  {
+    "term": "transfer-parallels-email.transfer-parallels-button",
+    "definition": "Transfer parallels",
+    "context": "Transfer parallels"
+  },
+  {
     "term": "verification-code-request.code-label",
     "definition": "Verification code:",
     "context": "Verification code:"

@@ -5981,6 +5981,7 @@ type UserPermissionRemovedEvent implements PetitionEvent {
 enum UserStatus {
   ACTIVE
   INACTIVE
+  ON_HOLD
 }
 
 type VerificationCodeCheck {

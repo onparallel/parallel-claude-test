@@ -20,6 +20,7 @@ import { sendFromDatabase } from "./emails/send-from-database";
 import { signatureCancelledDeclinedBySigner } from "./emails/signature-cancelled-declined-by-signer";
 import { signatureCancelledNoCreditsLeft } from "./emails/signature-cancelled-no-credits-left";
 import { signatureCancelledRequestError } from "./emails/signature-cancelled-request-error";
+import { transferParallels } from "./emails/transfer-parallels";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 
 const builders = {
@@ -43,6 +44,7 @@ const builders = {
   "signature-cancelled-declined-by-signer": signatureCancelledDeclinedBySigner,
   invitation,
   "from-database": sendFromDatabase,
+  "transfer-parallels": transferParallels,
 };
 
 export type EmailType = keyof typeof builders;

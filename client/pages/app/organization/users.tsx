@@ -1,6 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import { Badge, Flex, Heading, Text, Tooltip, useToast } from "@chakra-ui/react";
 import {
+  AlertCircleFilledIcon,
   ArrowUpRightIcon,
   ForbiddenIcon,
   LogInIcon,
@@ -50,8 +51,9 @@ import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
 
@@ -88,6 +90,8 @@ function OrganizationUsers() {
   const hasSsoProvider = me.organization.hasSsoProvider;
   const users = data?.me.organization.users;
 
+  const showTransferUserDialog = useRef(false);
+
   const { selectedRows, selectedIds, onChangeSelectedIds } = useSelection(users?.items, "id");
 
   const isUserLimitReached =
@@ -98,6 +102,22 @@ function OrganizationUsers() {
       handleCreateUser();
     }
   });
+
+  useTempQueryParam("transfer", () => {
+    showTransferUserDialog.current = true;
+  });
+
+  useEffect(() => {
+    if (showTransferUserDialog.current) {
+      if (isDefined(state.search) && isDefined(users)) {
+        const user = users.items.find((user) => user!.email === state.search);
+        if (user?.status === "ON_HOLD") {
+          handleUpdateUser(user);
+        }
+        showTransferUserDialog.current = false;
+      }
+    }
+  }, [users, loading]);
 
   const isActivateUserButtonDisabled =
     me.organization.activeUserCount + selectedRows.filter((u) => u.status === "INACTIVE").length >
@@ -200,32 +220,56 @@ function OrganizationUsers() {
     }
   };
 
+  const showConfirmDeactivateUserDialog = useConfirmDeactivateUserDialog();
   const [updateOrganizationUser] = useMutation(OrganizationUsers_updateOrganizationUserDocument);
   const handleUpdateUser = async (user: OrganizationUsers_UserFragment) => {
     try {
-      const { role, userGroups } = await showCreateOrUpdateUserDialog({ user });
+      if (user.status === "ON_HOLD") {
+        const { userId, tagIds, includeDrafts } = await showConfirmDeactivateUserDialog({
+          users: [user],
+        });
 
-      await updateOrganizationUser({
-        variables: {
-          userId: user.id,
-          role,
-          userGroupIds: userGroups.map((userGroup) => userGroup.id),
-        },
-      });
-      toast({
-        title: intl.formatMessage({
-          id: "organization.user-updated-success.toast-title",
-          defaultMessage: "User updated successfully.",
-        }),
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
+        await deactivateUser({
+          variables: {
+            userIds: [user.id],
+            transferToUserId: userId,
+            tagIds,
+            includeDrafts,
+          },
+        });
+        toast({
+          title: intl.formatMessage({
+            id: "organization.parallels-transfer-success.toast-title",
+            defaultMessage: "Parallels transferred successfully.",
+          }),
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      } else {
+        const { role, userGroups } = await showCreateOrUpdateUserDialog({ user });
+
+        await updateOrganizationUser({
+          variables: {
+            userId: user.id,
+            role,
+            userGroupIds: userGroups.map((userGroup) => userGroup.id),
+          },
+        });
+        toast({
+          title: intl.formatMessage({
+            id: "organization.user-updated-success.toast-title",
+            defaultMessage: "User updated successfully.",
+          }),
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
     } catch {}
   };
 
   const showConfirmActivateUserDialog = useConfirmActivateUsersDialog();
-  const showConfirmDeactivateUserDialog = useConfirmDeactivateUserDialog();
   const [activateUser] = useMutation(OrganizationUsers_activateUserDocument);
   const [deactivateUser] = useMutation(OrganizationUsers_deactivateUserDocument);
 
@@ -241,7 +285,7 @@ function OrganizationUsers() {
         });
       } else if (newStatus === "INACTIVE") {
         const { userId, tagIds, includeDrafts } = await showConfirmDeactivateUserDialog({
-          userIds: selectedIds,
+          users: selectedRows,
         });
 
         await deactivateUser({
@@ -400,7 +444,7 @@ function OrganizationUsers() {
           }),
         })
       );
-    } else if (selectedRows.some((u) => u.isSsoUser)) {
+    } else if (selectedRows.some((u) => u.isSsoUser && u.status !== "ON_HOLD")) {
       await withError(
         showErrorDialog({
           message: intl.formatMessage(
@@ -562,7 +606,13 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
         },
         CellContent: ({ row }) => {
           return (
-            <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
+            <Text
+              as="span"
+              display="inline-flex"
+              whiteSpace="nowrap"
+              alignItems="center"
+              opacity={row.status === "INACTIVE" ? 0.5 : 1}
+            >
               <Text as="span" textDecoration={row.status === "INACTIVE" ? "line-through" : "none"}>
                 {row.fullName}
               </Text>
@@ -575,10 +625,25 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
                 >
                   <ForbiddenIcon
                     marginLeft={2}
-                    color="red.300"
                     aria-label={intl.formatMessage({
                       id: "organization-users.header.inactive-user",
                       defaultMessage: "Inactive user",
+                    })}
+                  />
+                </Tooltip>
+              ) : row.status === "ON_HOLD" ? (
+                <Tooltip
+                  label={intl.formatMessage({
+                    id: "organization-users.header.untransferred-parallels",
+                    defaultMessage: "Untransferred parallels",
+                  })}
+                >
+                  <AlertCircleFilledIcon
+                    color="yellow.500"
+                    marginLeft={2}
+                    aria-label={intl.formatMessage({
+                      id: "organization-users.header.untransferred-parallels",
+                      defaultMessage: "Untransferred parallels",
                     })}
                   />
                 </Tooltip>
@@ -598,7 +663,9 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
           width: "30%",
           minWidth: "220px",
         },
-        CellContent: ({ row }) => <>{row.email}</>,
+        CellContent: ({ row }) => (
+          <Text opacity={row.status === "INACTIVE" ? 0.5 : 1}>{row.email}</Text>
+        ),
       },
       {
         key: "role",
@@ -612,6 +679,7 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
         },
         CellContent: ({ row }) => (
           <Badge
+            opacity={row.status === "INACTIVE" ? 0.5 : 1}
             colorScheme={
               (
                 {
@@ -645,6 +713,7 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
                     format={FORMATS.LLL}
                     useRelativeTime
                     whiteSpace="nowrap"
+                    opacity={row.status === "INACTIVE" ? 0.5 : 1}
                   />
                 ) : (
                   <Text textStyle="hint">
@@ -671,6 +740,7 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
             format={FORMATS.LLL}
             useRelativeTime
             whiteSpace="nowrap"
+            opacity={row.status === "INACTIVE" ? 0.5 : 1}
           />
         ),
       },
@@ -694,8 +764,10 @@ OrganizationUsers.fragments = {
         status
         isSsoUser
         ...useCreateOrUpdateUserDialog_User
+        ...useConfirmDeactivateUserDialog_User
       }
       ${useCreateOrUpdateUserDialog.fragments.User}
+      ${useConfirmDeactivateUserDialog.fragments.User}
     `;
   },
 };

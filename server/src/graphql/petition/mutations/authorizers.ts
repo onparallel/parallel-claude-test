@@ -1,7 +1,7 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isDefined, partition } from "remeda";
 import { ApiContext } from "../../../context";
-import { PetitionPermissionType } from "../../../db/__types";
+import { PetitionPermissionType, UserStatus } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
 import { Maybe, MaybeArray } from "../../../util/types";
 import { Arg } from "../../helpers/authorize";
@@ -70,11 +70,11 @@ export function userHasAccessToUserOrUserGroupPermissions<
   };
 }
 
-export function argUserHasActiveStatus<
+export function argUserHasStatus<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
->(argNameUserId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+>(argNameUserId: TArg, status: UserStatus): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       const userIds = unMaybeArray(args[argNameUserId] as unknown as MaybeArray<number>);
@@ -82,9 +82,7 @@ export function argUserHasActiveStatus<
         return true;
       }
 
-      return (await ctx.users.loadUser(userIds)).every(
-        (u) => isDefined(u) && u.status === "ACTIVE"
-      );
+      return (await ctx.users.loadUser(userIds)).every((u) => isDefined(u) && u.status === status);
     } catch {}
     return false;
   };

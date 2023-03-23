@@ -560,19 +560,44 @@
     "context": "Any applications or scripts using this event subscription will no longer receive event notifications from Parallel."
   },
   {
+    "term": "component.confirm-deactivate-user-dialog.selected-users-deactivated",
+    "definition": "The selected users have been deactivated.",
+    "context": "The selected users have been deactivated."
+  },
+  {
     "term": "component.confirm-deactivate-user-dialog.include-drafts",
     "definition": "Include drafts",
     "context": "Include drafts"
   },
   {
     "term": "component.confirm-deactivate-user-dialog.include-drafts-help",
-    "definition": "Checking this option will also transfer all draft parallels from the selected users/users. Otherwise, drafts will be deleted.",
-    "context": "Checking this option will also transfer all draft parallels from the selected users/users. Otherwise, drafts will be deleted."
+    "definition": "Checking this option will transfer all parallels including drafts. Otherwise, the drafts of the deactivated user will be deleted.",
+    "context": "Checking this option will transfer all parallels including drafts. Otherwise, the drafts of the deactivated user will be deleted."
   },
   {
     "term": "component.confirm-deactivate-user-dialog.tags-label",
     "definition": "Tags",
     "context": "Tags"
+  },
+  {
+    "term": "component.confirm-deactivate-user-dialog.transfer",
+    "definition": "Transfer",
+    "context": "Transfer"
+  },
+  {
+    "term": "component.confirm-deactivate-user-dialog.transfer-onhold-body",
+    "definition": "The user {fullName} ({email}) has been deactivated.",
+    "context": "The user {fullName} ({email}) has been deactivated."
+  },
+  {
+    "term": "component.confirm-deactivate-user-dialog.transfer-onhold-body-2",
+    "definition": "In order not to lose access to your parallels and templates, please specify a user to transfer everything to.",
+    "context": "In order not to lose access to your parallels and templates, please specify a user to transfer everything to."
+  },
+  {
+    "term": "component.confirm-deactivate-user-dialog.transfer-parallels",
+    "definition": "Transfer parallels",
+    "context": "Transfer parallels"
   },
   {
     "term": "component.confirm-delete-petitions-dialog.body",
@@ -7985,6 +8010,11 @@
     "context": "Name"
   },
   {
+    "term": "organization-users.header.untransferred-parallels",
+    "definition": "Untransferred parallels",
+    "context": "Untransferred parallels"
+  },
+  {
     "term": "organization-users.header.user-email",
     "definition": "Email",
     "context": "Email"
@@ -8238,6 +8268,11 @@
     "term": "organization.organization-created-success.toast-title",
     "definition": "Organization created successfully.",
     "context": "Organization created successfully."
+  },
+  {
+    "term": "organization.parallels-transfer-success.toast-title",
+    "definition": "Parallels transferred successfully.",
+    "context": "Parallels transferred successfully."
   },
   {
     "term": "organization.signature-integrations.title",

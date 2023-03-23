@@ -8,7 +8,7 @@ export async function authenticateFromRequest(req: IncomingMessage, ctx: ApiCont
     return false;
   }
   const [user, realUser] = users;
-  if (!(user.status === "ACTIVE") || (isDefined(realUser) && !(realUser.status === "ACTIVE"))) {
+  if (user.status === "INACTIVE" || realUser?.status === "INACTIVE") {
     return false;
   } else {
     ctx.user = user;
