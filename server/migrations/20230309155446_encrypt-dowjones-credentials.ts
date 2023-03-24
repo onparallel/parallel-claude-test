@@ -23,7 +23,8 @@ const encryptedCredentialsMap: { [key: string]: Record<string, string> } = {
 };
 
 export async function up(knex: Knex): Promise<void> {
-  const environment = process.env.MIGRATION_ENV;
+  return;
+  const environment = process.env.MIGRATION_ENV ?? "local";
   if (!isDefined(environment) || !validEnvironments.includes(environment)) {
     throw new Error(
       `run this migration as: MIGRATION_ENV=<env> yarn migrate. <env>: ${validEnvironments.join(

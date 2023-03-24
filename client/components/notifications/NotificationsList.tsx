@@ -1,19 +1,10 @@
 import { gql } from "@apollo/client";
-import {
-  AbsoluteCenterProps,
-  Center,
-  Circle,
-  Flex,
-  LinkBox,
-  Spinner,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { AbsoluteCenterProps, Center, Circle, Flex, Spinner, Stack, Text } from "@chakra-ui/react";
 import { NotificationsDrawer_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { AnimatePresence, motion } from "framer-motion";
-import { KeyboardEvent } from "react";
+import { Fragment, KeyboardEvent } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { FormattedMessage } from "react-intl";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
@@ -181,7 +172,7 @@ export function NotificationsList({
             isFirst: i === 0,
           };
           return (
-            <LinkBox key={notification.id}>
+            <Fragment key={notification.id}>
               {notification.__typename === "PetitionCompletedUserNotification" ? (
                 <PetitionCompletedUserNotification notification={notification} {...props} />
               ) : notification.__typename === "SignatureCompletedUserNotification" ? (
@@ -202,7 +193,7 @@ export function NotificationsList({
                 "AccessActivatedFromPublicPetitionLinkUserNotification" ? (
                 <AccessActivatedFromLinkNotification notification={notification} {...props} />
               ) : null}
-            </LinkBox>
+            </Fragment>
           );
         })}
       </InfiniteScroll>

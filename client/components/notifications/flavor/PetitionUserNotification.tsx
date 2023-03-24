@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Circle, Flex, LinkOverlay, Stack, Text } from "@chakra-ui/react";
+import { Box, Circle, Flex, LinkBox, LinkOverlay, Stack, Text } from "@chakra-ui/react";
 import { EmailIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -61,8 +61,10 @@ export const PetitionUserNotification = Object.assign(
       }
     }, [intl.locale]);
     return (
-      <Stack
+      <LinkBox
+        as={Stack}
         data-notification-id={notification.id}
+        data-notification-type={notification.__typename}
         ref={ref as any}
         direction="row"
         background={isRead ? "white" : "primary.50"}
@@ -76,7 +78,14 @@ export const PetitionUserNotification = Object.assign(
         borderColor="gray.200"
       >
         <Flex minWidth={16} paddingLeft={4} alignItems="center" justifyContent="flex-end">
-          {isRead ? null : <Circle size={2} backgroundColor="primary.400" marginRight={1} />}
+          {isRead ? null : (
+            <Circle
+              data-testid="notification-circle"
+              size={2}
+              backgroundColor="primary.400"
+              marginRight={1}
+            />
+          )}
           {icon}
         </Flex>
         <Stack flex="1 1 auto" minWidth="0" spacing={0} ref={bodyRef}>
@@ -98,6 +107,7 @@ export const PetitionUserNotification = Object.assign(
               }}
             >
               <Text
+                data-testid="notification-title"
                 as="div"
                 position="relative"
                 paddingX={4}
@@ -121,7 +131,13 @@ export const PetitionUserNotification = Object.assign(
               </Text>
             </LinkOverlay>
           </Link>
-          <Text noOfLines={3} paddingX={4} paddingBottom={1} paddingTop={0.5}>
+          <Text
+            data-testid="notification-text"
+            noOfLines={3}
+            paddingX={4}
+            paddingBottom={1}
+            paddingTop={0.5}
+          >
             {children}
           </Text>
           <DateTime
@@ -152,7 +168,7 @@ export const PetitionUserNotification = Object.assign(
             }}
           />
         </Box>
-      </Stack>
+      </LinkBox>
     );
   }),
   {

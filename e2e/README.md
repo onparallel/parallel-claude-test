@@ -41,6 +41,13 @@ For running the tests on your local machine, make sure you have client and serve
 - `yarn workspace @parallel/server dev`
 - `yarn workspace @parallel/client dev`
 
+and the following workers running:
+
+- email-sender
+- event-processor
+
+- `yarn workspace @parallel/server worker:[workername] start`
+
 The test suite will work with client process in development mode, but it will run much faster when compiled and ran in production mode:
 
 - `yarn workspace @parallel/client build`

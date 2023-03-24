@@ -141,7 +141,12 @@ export function NotificationsDrawer() {
               />
             </Text>
           </Stack>
-          <NotificationsFilterSelect ref={filterRef} value={filter} onChange={handleFilterChange} />
+          <NotificationsFilterSelect
+            data-testid="notifications-filter-select"
+            ref={filterRef}
+            value={filter}
+            onChange={handleFilterChange}
+          />
         </DrawerHeader>
         <DrawerBody
           paddingInlineStart={0}

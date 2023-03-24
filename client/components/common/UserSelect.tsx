@@ -213,6 +213,7 @@ export const UserSelect = Object.assign(
         getOptionValue={getOptionValue}
         placeholder={placeholder}
         isClearable={props.isClearable}
+        {...props}
         {...rsProps}
         {...(extensions as any)}
       />
@@ -227,6 +228,7 @@ export const UserSelect = Object.assign(
         getOptionValue={getOptionValue}
         placeholder={placeholder}
         isClearable={props.isClearable}
+        {...props}
         {...rsProps}
         {...(extensions as any)}
       />
@@ -368,7 +370,23 @@ const MultiValueLabel = rsComponent("MultiValueLabel", function ({ children, ...
 
 const Option = rsComponent("Option", function ({ children, ...props }) {
   return (
-    <components.Option {...props}>
+    <components.Option
+      {...props}
+      innerProps={{
+        ...props.innerProps,
+        ...(props.data.__typename === "User"
+          ? {
+              "data-option-type": "User",
+              "data-email": props.data.email,
+            }
+          : props.data.__typename === "UserGroup"
+          ? {
+              "data-option-type": "UserGroup",
+              "data-name": props.data.name,
+            }
+          : {}),
+      }}
+    >
       <UserSelectOption
         data={props.data}
         highlight={props.selectProps.inputValue}

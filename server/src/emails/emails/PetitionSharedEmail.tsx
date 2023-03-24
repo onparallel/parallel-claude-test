@@ -1,4 +1,11 @@
-import { MjmlColumn, MjmlSection, MjmlText } from "@faire/mjml-react";
+import {
+  MjmlColumn,
+  MjmlHtmlAttribute,
+  MjmlHtmlAttributes,
+  MjmlSection,
+  MjmlSelector,
+  MjmlText,
+} from "@faire/mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { BreakLines } from "../../util/BreakLines";
@@ -155,6 +162,16 @@ const email: Email<PetitionSharedEmailProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         theme={theme}
+        head={
+          <MjmlHtmlAttributes>
+            <MjmlSelector path=".go-to-parallel a">
+              <MjmlHtmlAttribute name="data-testid">go-to-parallel-button</MjmlHtmlAttribute>
+            </MjmlSelector>
+            <MjmlSelector path=".user-message-box div">
+              <MjmlHtmlAttribute name="data-testid">shared-message</MjmlHtmlAttribute>
+            </MjmlSelector>
+          </MjmlHtmlAttributes>
+        }
       >
         <MjmlSection padding="0">
           <MjmlColumn>
@@ -232,14 +249,17 @@ const email: Email<PetitionSharedEmailProps> = {
         <MjmlSection>
           <MjmlColumn>
             {petitions.length > 1 ? (
-              <Button href={`${parallelUrl}/${locale}/app/petitions`}>
+              <Button cssClass="go-to-parallel" href={`${parallelUrl}/${locale}/app/petitions`}>
                 <FormattedMessage
                   id="petition-shared-email.go-to-parallel"
                   defaultMessage="Go to Parallel"
                 />
               </Button>
             ) : (
-              <Button href={`${parallelUrl}/${locale}/app/petitions/${petitions[0].globalId}`}>
+              <Button
+                cssClass="go-to-parallel"
+                href={`${parallelUrl}/${locale}/app/petitions/${petitions[0].globalId}`}
+              >
                 <FormattedMessage
                   id="petition-shared-email.access-button"
                   defaultMessage="Access the {isTemplate, select, true{template} other{parallel}}"

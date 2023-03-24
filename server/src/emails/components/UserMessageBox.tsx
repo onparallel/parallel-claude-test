@@ -10,7 +10,7 @@ export function UserMessageBox({ children, dangerouslySetInnerHTML }: UserMessag
     <MjmlWrapper padding="10px 25px">
       <MjmlSection backgroundColor="#F4F7F9" borderRadius="5px" padding="12px 16px">
         <MjmlColumn>
-          <MjmlText lineHeight="21px" padding="0">
+          <MjmlText lineHeight="21px" padding="0" cssClass="user-message-box">
             {children ? (
               children
             ) : (

@@ -17,7 +17,8 @@ export async function waitForGraphQL(
       return false;
     }
     try {
-      return predicate(JSON.parse(data));
+      const parsedData = JSON.parse(data);
+      return predicate(Array.isArray(parsedData) ? parsedData[0] : parsedData);
     } catch {}
     return false;
   });

@@ -78,6 +78,7 @@ export async function seed(knex: Knex): Promise<any> {
       organization_role: "OWNER",
       first_name: "Harvey",
       last_name: "Specter",
+      preferred_locale: "en",
     },
     {
       org_id: orgIds[0],
@@ -86,6 +87,7 @@ export async function seed(knex: Knex): Promise<any> {
       organization_role: "NORMAL",
       first_name: "Mike",
       last_name: "Ross",
+      preferred_locale: "en",
     },
     {
       org_id: orgIds[0],
@@ -94,6 +96,7 @@ export async function seed(knex: Knex): Promise<any> {
       organization_role: "ADMIN",
       first_name: "Santi",
       last_name: "Albo",
+      preferred_locale: "en",
     },
     {
       org_id: orgIds[0],
@@ -102,6 +105,7 @@ export async function seed(knex: Knex): Promise<any> {
       organization_role: "ADMIN",
       first_name: "Mariano",
       last_name: "Rodriguez",
+      preferred_locale: "en",
     },
     {
       org_id: orgIds[0],
@@ -110,6 +114,7 @@ export async function seed(knex: Knex): Promise<any> {
       organization_role: "ADMIN",
       first_name: "Konstantin",
       last_name: "Klykov",
+      preferred_locale: "en",
     },
     {
       org_id: orgIds[1],
@@ -118,6 +123,16 @@ export async function seed(knex: Knex): Promise<any> {
       organization_role: "OWNER",
       first_name: "User",
       last_name: "1",
+      preferred_locale: "en",
+    },
+    {
+      org_id: orgIds[1],
+      cognito_id: "fd1ab908-4270-42a8-ad32-a8e67f71f6e4",
+      email: "parallele2euser1+user2@gmail.com",
+      organization_role: "ADMIN",
+      first_name: "User",
+      last_name: "2",
+      preferred_locale: "en",
     },
   ] as (User & UserData)[];
 
@@ -127,7 +142,7 @@ export async function seed(knex: Knex): Promise<any> {
       cognito_id: u.cognito_id,
       first_name: u.first_name,
       last_name: u.last_name,
-      preferred_locale: "en",
+      preferred_locale: u.preferred_locale,
     })),
     "*"
   );

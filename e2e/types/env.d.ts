@@ -1,9 +1,6 @@
 declare namespace NodeJS {
-  interface ProcessEnv {
+  interface ProcessEnv extends UserEnvs {
     readonly BASE_URL: string;
-
-    readonly USER1_EMAIL: string;
-    readonly USER1_PASSWORD: string;
 
     readonly IMAP_USER: string;
     readonly IMAP_PASSWORD: string;
@@ -11,3 +8,5 @@ declare namespace NodeJS {
     readonly TEMPLATE1_ID: string;
   }
 }
+
+type UserEnvs = Readonly<Record<`USER${1 | 2}_${"EMAIL" | "PASSWORD"}`, string>>;

@@ -333,6 +333,7 @@ export function PetitionSharingDialog({
                   rules={{ minLength: 1 }}
                   render={({ field: { onChange, onBlur, value } }) => (
                     <UserSelect
+                      data-testid="share-petition-select"
                       isMulti
                       includeGroups
                       ref={usersRef}
@@ -374,7 +375,12 @@ export function PetitionSharingDialog({
               </FormControl>
             </Flex>
             <Stack display={hasUsers ? "flex" : "none"}>
-              <Checkbox {...register("notify")} colorScheme="primary" defaultChecked>
+              <Checkbox
+                {...register("notify")}
+                colorScheme="primary"
+                defaultChecked
+                data-testid="notify-users-checkbox"
+              >
                 <FormattedMessage
                   id="petition-sharing.notify-checkbox"
                   defaultMessage="Notify users"
@@ -382,6 +388,7 @@ export function PetitionSharingDialog({
               </Checkbox>
               <PaddedCollapse in={notify}>
                 <GrowingTextarea
+                  data-testid="notify-users-message"
                   {...messageRegisterProps}
                   maxHeight="30vh"
                   aria-label={intl.formatMessage({
@@ -686,7 +693,12 @@ export function PetitionSharingDialog({
       }
       confirm={
         hasUsers ? (
-          <Button type="submit" colorScheme="primary" variant="solid">
+          <Button
+            data-testid="share-petition-send-button"
+            type="submit"
+            colorScheme="primary"
+            variant="solid"
+          >
             <FormattedMessage id="generic.send" defaultMessage="Send" />
           </Button>
         ) : (

@@ -1,5 +1,6 @@
 import { Page } from "@playwright/test";
 import { isDefined } from "remeda";
+import { openMenu } from "../helpers/chakra/openMenu";
 import { fillContactSelect } from "../helpers/react-select/fillContactSelect";
 import { fillRte, RteInput } from "../helpers/rte/fillRte";
 import { AppLayout } from "./AppLayout";
@@ -40,6 +41,13 @@ export class PetitionLayout extends AppLayout {
 
   async openSendPetitionDialog() {
     await this.page.getByTestId("compose-send-petition-button").click();
+  }
+
+  async deletePetition() {
+    const moreOptionsButton = this.page.getByTestId("petition-layout-header-menu-options");
+    const menu = await openMenu(this.page, moreOptionsButton);
+    await menu.getByTestId("delete-button").click();
+    await this.page.getByTestId("dialog-delete-button").click();
   }
 
   async fillSendPetitionDialog({

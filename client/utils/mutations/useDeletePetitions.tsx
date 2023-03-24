@@ -249,7 +249,11 @@ function ConfirmDeletePetitionsDialog({
         />
       }
       confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
+        <Button
+          data-testid="dialog-delete-button"
+          colorScheme="red"
+          onClick={() => props.onResolve()}
+        >
           <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
         </Button>
       }
@@ -343,7 +347,11 @@ function ConfirmDeleteSharedPetitionsDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
+        <Button
+          data-testid="dialog-delete-button"
+          colorScheme="red"
+          onClick={() => props.onResolve()}
+        >
           <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
         </Button>
       }

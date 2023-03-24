@@ -124,7 +124,7 @@ export function TemplateDetailsModal({
   return (
     <Modal size="4xl" {...props}>
       <ModalOverlay>
-        <ModalContent>
+        <ModalContent data-template-id={template.id}>
           <ModalHeader
             paddingLeft={6}
             paddingTop={6}
@@ -159,6 +159,7 @@ export function TemplateDetailsModal({
             )}
           </ModalHeader>
           <ModalCloseButton
+            data-testid="close-template-modal-button"
             aria-label={intl.formatMessage({
               id: "generic.close",
               defaultMessage: "Close",
@@ -251,6 +252,7 @@ export function TemplateDetailsModal({
                 {isFromPublicTemplates && !template.publicLink?.isActive ? null : (
                   <MoreOptionsMenuButton
                     variant="outline"
+                    data-testid="template-more-options-button"
                     options={
                       <MenuList width="min-content">
                         {template.publicLink?.isActive ? (
@@ -268,6 +270,7 @@ export function TemplateDetailsModal({
                         {hasAccess ? (
                           <MenuItem
                             onClick={handlePetitionSharingClick}
+                            data-testid="share-template-button"
                             icon={<UserArrowIcon display="block" boxSize={4} />}
                           >
                             <FormattedMessage
@@ -279,6 +282,7 @@ export function TemplateDetailsModal({
                         {!isFromPublicTemplates ? (
                           <MenuItem
                             onClick={handleCloneTemplate}
+                            data-testid="duplicate-template-button"
                             icon={<CopyIcon display="block" boxSize={4} />}
                             isDisabled={me.role === "COLLABORATOR"}
                           >
@@ -290,6 +294,7 @@ export function TemplateDetailsModal({
                         ) : null}
                         {hasAccess ? (
                           <MenuItem
+                            data-testid="edit-template-button"
                             justifyContent="left"
                             type="submit"
                             onClick={handleEditTemplate}

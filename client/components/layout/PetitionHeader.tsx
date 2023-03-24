@@ -427,6 +427,7 @@ export const PetitionHeader = Object.assign(
           )}
           <Box>
             <MoreOptionsMenuButton
+              data-testid="petition-layout-header-menu-options"
               variant="outline"
               options={
                 <MenuList width="min-content" minWidth="16rem">
@@ -523,6 +524,7 @@ export const PetitionHeader = Object.assign(
                     <>
                       <MenuDivider />
                       <MenuItem
+                        data-testid="delete-button"
                         color="red.500"
                         onClick={handleDeleteClick}
                         icon={<DeleteIcon display="block" boxSize={4} />}
@@ -583,6 +585,7 @@ export const PetitionHeader = Object.assign(
                       </MenuOptionGroup>
                       <MenuDivider />
                       <MenuItem
+                        data-testid="delete-button"
                         color="red.500"
                         onClick={handleDeleteClick}
                         icon={<DeleteIcon display="block" boxSize={4} />}

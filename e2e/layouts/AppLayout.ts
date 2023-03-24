@@ -5,6 +5,10 @@ import { openMenu } from "../helpers/chakra/openMenu";
 export class AppLayout {
   constructor(protected page: Page) {}
 
+  async goToNewPetition() {
+    await this.page.getByTestId("create-new-petition-button").click();
+  }
+
   async dismissUserflow() {
     await this.page.locator("#userflow-ui").getByLabel("Close guide").click();
     await this.page.getByLabel("Guide menu").getByText("Close guide").click();
@@ -15,6 +19,13 @@ export class AppLayout {
     const drawer = this.page.getByTestId("notifications-drawer");
     await drawer.click({ trial: true });
     return drawer;
+  }
+
+  async closeNotificationsDrawer() {
+    const drawer = this.page.getByTestId("notifications-drawer");
+    await drawer.getByTestId("notifications-drawer-close").click();
+    await drawer.waitFor({ state: "detached" });
+    await this.page.getByTestId("notifications-button").click();
   }
 
   async openHelpCenter() {
