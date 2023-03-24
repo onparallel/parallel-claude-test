@@ -87,7 +87,7 @@ scim
         externalId,
         orgId: req.context.organization!.id,
       });
-      const userData = user ? await req.context.users.loadUserData(user.user_data_id) : null;
+      let userData = user ? await req.context.users.loadUserData(user.user_data_id) : null;
       if (user && userData) {
         if ((user.status === "ACTIVE") !== active) {
           const status = await getUserNewStatus(user.id, active, req.context);
@@ -103,17 +103,16 @@ scim
             );
           }
         }
-        // TODO: descomentar cuando Cuatre deje de hacer cosas raras
-        // if (userData.first_name !== givenName || userData.last_name !== familyName) {
-        //   [userData] = await req.context.users.updateUserData(
-        //     userData.id,
-        //     {
-        //       first_name: givenName,
-        //       last_name: familyName,
-        //     },
-        //     `Provisioning:${req.context.organization!.id}`
-        //   );
-        // }
+        if (userData.first_name !== givenName || userData.last_name !== familyName) {
+          [userData] = await req.context.users.updateUserData(
+            userData.id,
+            {
+              first_name: givenName,
+              last_name: familyName,
+            },
+            `Provisioning:${req.context.organization!.id}`
+          );
+        }
         res.json(
           toScimUser({
             email: userData.email,
