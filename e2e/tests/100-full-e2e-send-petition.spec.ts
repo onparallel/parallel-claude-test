@@ -209,7 +209,7 @@ test.describe("Full e2e send petition", () => {
     const page3 = await test.step("wait for completed parallel email", async () => {
       const email = await waitForEmail(
         (e) =>
-          e.subject === `Parallel "${name}" completed!` &&
+          e.subject === `${name} completed!` &&
           e.to.some((c) => c.address === process.env.USER1_EMAIL),
         {
           user: process.env.IMAP_USER,
