@@ -8,8 +8,7 @@ import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { AdminSettingsLayout } from "@parallel/components/layout/AdminSettingsLayout";
 import {
   AdminOrganizations_OrganizationFragment,
   AdminOrganizations_organizationsDocument,
@@ -23,7 +22,6 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
-import { useAdminSections } from "@parallel/utils/useAdminSections";
 import {
   useClipboardWithToast,
   UseClipboardWithToastOptions,
@@ -73,7 +71,7 @@ function AdminOrganizations() {
   );
   const organizations = data?.organizations;
   const toast = useToast();
-  const sections = useAdminSections();
+
   const columns = useOrganizationColumns();
   const onCopyToClipboard = useClipboardWithToast({
     text: intl.formatMessage({
@@ -156,16 +154,13 @@ function AdminOrganizations() {
   }, []);
 
   return (
-    <SettingsLayout
+    <AdminSettingsLayout
       title={intl.formatMessage({
         id: "admin.organizations",
         defaultMessage: "Organizations",
       })}
-      basePath="/app/admin"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={<FormattedMessage id="admin.title" defaultMessage="Admin panel" />}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="admin.organizations" defaultMessage="Organizations" />
@@ -202,7 +197,7 @@ function AdminOrganizations() {
           }
         />
       </Flex>
-    </SettingsLayout>
+    </AdminSettingsLayout>
   );
 }
 
@@ -365,9 +360,9 @@ AdminOrganizations.queries = [
   `,
   gql`
     query AdminOrganizations_user {
-      ...AppLayout_Query
+      ...AdminSettingsLayout_Query
     }
-    ${AppLayout.fragments.Query}
+    ${AdminSettingsLayout.fragments.Query}
   `,
 ];
 

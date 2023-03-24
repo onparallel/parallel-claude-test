@@ -15,6 +15,7 @@ import {
   HelpOutlineIcon,
   HomeIcon,
   NewsIcon,
+  ProfilesIcon,
   ReportsIcon,
   UsersIcon,
 } from "@parallel/chakra/icons";
@@ -85,6 +86,21 @@ export const AppLayoutNavbar = Object.assign(
                 )
               : undefined,
           },
+          ...(me.hasProfilesAccess
+            ? [
+                {
+                  section: "profiles",
+                  href: "/app/profiles",
+                  icon: <ProfilesIcon />,
+                  isActive: pathname.startsWith("/app/profiles"),
+                  isAvailable: true,
+                  text: intl.formatMessage({
+                    id: "component.app-layout-navbar.profiles-link",
+                    defaultMessage: "Profiles",
+                  }),
+                },
+              ]
+            : []),
           {
             section: "contacts",
             href: "/app/contacts",
@@ -284,6 +300,7 @@ export const AppLayoutNavbar = Object.assign(
             me {
               id
               role
+              hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
               organization {
                 id
                 name

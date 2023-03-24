@@ -4,12 +4,11 @@ import { AppSumoLicenseAlert } from "@parallel/components/common/AppSumoLicenseA
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { UsageCard } from "@parallel/components/organization/UsageCard";
 import { OrganizationUsage_userDocument } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
 
 function OrganizationUsage() {
@@ -19,26 +18,19 @@ function OrganizationUsage() {
     data: { me, realMe },
   } = useAssertQueryOrPreviousData(OrganizationUsage_userDocument);
 
-  const sections = useOrganizationSections(me);
-
   const { organization } = me;
 
   const { activeUserCount, license, usageDetails, petitionsPeriod, signaturesPeriod } =
     organization;
 
   return (
-    <SettingsLayout
+    <OrganizationSettingsLayout
       title={intl.formatMessage({
         id: "organization.usage.title",
         defaultMessage: "Usage",
       })}
-      basePath="/app/organization"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={
-        <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
-      }
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="organization.usage.title" defaultMessage="Usage" />
@@ -87,14 +79,14 @@ function OrganizationUsage() {
           ) : null}
         </Grid>
       </Stack>
-    </SettingsLayout>
+    </OrganizationSettingsLayout>
   );
 }
 
 OrganizationUsage.queries = [
   gql`
     query OrganizationUsage_user {
-      ...SettingsLayout_Query
+      ...OrganizationSettingsLayout_Query
       me {
         organization {
           id
@@ -117,7 +109,7 @@ OrganizationUsage.queries = [
         }
       }
     }
-    ${SettingsLayout.fragments.Query}
+    ${OrganizationSettingsLayout.fragments.Query}
     ${AppSumoLicenseAlert.fragments.OrgLicense}
   `,
 ];

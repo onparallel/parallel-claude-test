@@ -5,8 +5,7 @@ import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink"
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { ReportsSidebarLayout } from "@parallel/components/layout/ReportsSidebarLayout";
 import { DateRangePickerButton } from "@parallel/components/reports/common/DateRangePickerButton";
 import { ReportsErrorMessage } from "@parallel/components/reports/common/ReportsErrorMessage";
 import { ReportsLoadingMessage } from "@parallel/components/reports/common/ReportsLoadingMessage";
@@ -28,7 +27,6 @@ import { stallFor } from "@parallel/utils/promises/stallFor";
 import { date, string, useQueryState } from "@parallel/utils/queryState";
 import { useTemplateStatsReportBackgroundTask } from "@parallel/utils/tasks/useTemplateStatsReportTask";
 import { Maybe } from "@parallel/utils/types";
-import { useReportsSections } from "@parallel/utils/useReportsSections";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -93,8 +91,6 @@ export function ReportsTemplates() {
   const {
     data: { me, realMe },
   } = useAssertQuery(ReportsTemplates_userDocument);
-
-  const sections = useReportsSections();
 
   const [{ status, activeTemplateId, report, activeRange }, setState] = useState<{
     status: "IDLE" | "LOADING" | "LOADED" | "ERROR";
@@ -172,16 +168,13 @@ export function ReportsTemplates() {
   const templateName = templates.find((template) => template.id === activeTemplateId)?.name;
 
   return (
-    <SettingsLayout
+    <ReportsSidebarLayout
       title={intl.formatMessage({
         id: "page.reports.statistics",
         defaultMessage: "Template statistics",
       })}
-      basePath="/app/reports"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={<FormattedMessage id="page.reports.title" defaultMessage="Reports" />}
       header={
         <HStack width="100%" justifyContent="space-between" flexWrap="wrap">
           <Heading as="h3" size="md">
@@ -291,7 +284,7 @@ export function ReportsTemplates() {
           </Stack>
         )}
       </Stack>
-    </SettingsLayout>
+    </ReportsSidebarLayout>
   );
 }
 
@@ -318,12 +311,12 @@ ReportsTemplates.queries = [
   `,
   gql`
     query ReportsTemplates_user {
-      ...AppLayout_Query
+      ...ReportsSidebarLayout_Query
       me {
         hasStatisticsView: hasFeatureFlag(featureFlag: STATISTICS_VIEW)
       }
     }
-    ${AppLayout.fragments.Query}
+    ${ReportsSidebarLayout.fragments.Query}
   `,
 ];
 

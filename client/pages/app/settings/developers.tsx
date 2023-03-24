@@ -3,7 +3,7 @@ import { Divider, Heading, Stack } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { UserSettingsLayout } from "@parallel/components/layout/UserSettingsLayout";
 import { ApiTokensTable } from "@parallel/components/settings/developers/ApiTokensTable";
 import { WebhookSubscriptionsTable } from "@parallel/components/settings/developers/WebhookSubscriptionsTable";
 import {
@@ -13,7 +13,6 @@ import {
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { FormattedMessage, useIntl } from "react-intl";
 
 function Developers() {
@@ -33,19 +32,14 @@ function Developers() {
     refetch: refetchSubscriptions,
   } = useAssertQuery(Developers_subscriptionsDocument);
 
-  const sections = useSettingsSections(me);
-
   return (
-    <SettingsLayout
+    <UserSettingsLayout
       title={intl.formatMessage({
         id: "settings.developers",
         defaultMessage: "Developers",
       })}
-      basePath="/app/settings"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={<FormattedMessage id="settings.title" defaultMessage="Settings" />}
       header={
         <Heading as="h2" size="md">
           <FormattedMessage id="settings.developers" defaultMessage="Developers" />
@@ -60,7 +54,7 @@ function Developers() {
           onRefetch={() => refetchSubscriptions()}
         />
       </Stack>
-    </SettingsLayout>
+    </UserSettingsLayout>
   );
 }
 
@@ -86,14 +80,9 @@ Developers.queries = [
   `,
   gql`
     query Developers_user {
-      ...SettingsLayout_Query
-      me {
-        id
-        ...useSettingsSections_User
-      }
+      ...UserSettingsLayout_Query
     }
-    ${SettingsLayout.fragments.Query}
-    ${useSettingsSections.fragments.User}
+    ${UserSettingsLayout.fragments.Query}
   `,
 ];
 

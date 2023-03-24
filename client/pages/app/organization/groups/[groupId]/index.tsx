@@ -22,7 +22,7 @@ import { TablePage } from "@parallel/components/common/TablePage";
 import { WhenOrgRole } from "@parallel/components/common/WhenOrgRole";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { useAddMemberGroupDialog } from "@parallel/components/organization/dialogs/AddMemberGroupDialog";
 import { useConfirmRemoveMemberDialog } from "@parallel/components/organization/dialogs/ConfirmRemoveMemberDialog";
 import { OrganizationGroupListTableHeader } from "@parallel/components/organization/OrganizationGroupListTableHeader";
@@ -45,7 +45,6 @@ import { integer, sorting, string, useQueryState, values } from "@parallel/utils
 import { isAdmin } from "@parallel/utils/roles";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useRouter } from "next/router";
@@ -125,8 +124,6 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   useEffect(() => {
     setName(userGroup?.name ?? "");
   }, [userGroup]);
-
-  const sections = useOrganizationSections(me);
 
   const columns = useOrganizationGroupTableColumns();
 
@@ -228,15 +225,11 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   };
 
   return (
-    <SettingsLayout
+    <OrganizationSettingsLayout
       title={name}
       basePath="/app/organization/groups"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={
-        <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
-      }
       header={
         <Flex width="100%" justifyContent="space-between" alignItems="center">
           <EditableHeading isDisabled={!canEdit} value={name} onChange={handleChangeGroupName} />
@@ -340,7 +333,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
           }
         />
       </Flex>
-    </SettingsLayout>
+    </OrganizationSettingsLayout>
   );
 }
 

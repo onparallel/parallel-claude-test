@@ -14,11 +14,10 @@ import {
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { UserSettingsLayout } from "@parallel/components/layout/UserSettingsLayout";
 import { Security_updatePasswordDocument, Security_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -34,7 +33,6 @@ function Security() {
   const {
     data: { me, realMe },
   } = useAssertQuery(Security_userDocument);
-  const sections = useSettingsSections(me);
 
   const [updatePassword] = useMutation(Security_updatePasswordDocument);
   const {
@@ -83,16 +81,13 @@ function Security() {
   }
 
   return (
-    <SettingsLayout
+    <UserSettingsLayout
       title={intl.formatMessage({
         id: "settings.security",
         defaultMessage: "Security",
       })}
-      basePath="/app/settings"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={<FormattedMessage id="settings.title" defaultMessage="Settings" />}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="settings.security" defaultMessage="Security" />
@@ -210,7 +205,7 @@ function Security() {
         </Stack>
         <Divider borderColor="gray.300" />
       </Stack>
-    </SettingsLayout>
+    </UserSettingsLayout>
   );
 }
 
@@ -225,14 +220,12 @@ Security.mutations = [
 Security.queries = [
   gql`
     query Security_user {
-      ...SettingsLayout_Query
+      ...UserSettingsLayout_Query
       me {
         isSsoUser
-        ...useSettingsSections_User
       }
     }
-    ${SettingsLayout.fragments.Query}
-    ${useSettingsSections.fragments.User}
+    ${UserSettingsLayout.fragments.Query}
   `,
 ];
 

@@ -260,6 +260,11 @@
     "context": "It seems that you have reached your limit of {limit} parallels, <a>reach out to us to upgrade your plan.</a>"
   },
   {
+    "term": "component.app-layout-navbar.profiles-link",
+    "definition": "Perfiles",
+    "context": "Profiles"
+  },
+  {
     "term": "component.app-layout-navbar.reports-link",
     "definition": "Informes",
     "context": "Reports"
@@ -8278,6 +8283,21 @@
     "term": "organization.parallels-transfer-success.toast-title",
     "definition": "Parallels transferidos con éxito.",
     "context": "Parallels transferred successfully."
+  },
+  {
+    "term": "organization.profiles.profile-types",
+    "definition": "Tipos de perfiles",
+    "context": "Profile types"
+  },
+  {
+    "term": "organization.profiles.relationships",
+    "definition": "Relaciones",
+    "context": "Relationships"
+  },
+  {
+    "term": "organization.profiles.title",
+    "definition": "Perfiles",
+    "context": "Profiles"
   },
   {
     "term": "organization.signature-integrations.title",

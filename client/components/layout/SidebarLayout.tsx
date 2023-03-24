@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Flex, Heading, IconButton, Text } from "@chakra-ui/react";
 import { ArrowBackIcon, ChevronRightIcon } from "@parallel/chakra/icons";
-import { SettingsLayout_QueryFragment } from "@parallel/graphql/__types";
+import { SidebarLayout_QueryFragment } from "@parallel/graphql/__types";
 import { useOnMediaQueryChange } from "@parallel/utils/useOnMediaQueryChange";
 import { useRouter } from "next/router";
 import { ReactNode, useCallback } from "react";
@@ -9,7 +9,7 @@ import { useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 import { AppLayout } from "./AppLayout";
 
-export interface SettingsLayoutProps extends SettingsLayout_QueryFragment {
+export interface SidebarLayoutProps extends SidebarLayout_QueryFragment {
   basePath: string;
   title: string;
   sections: { title: string; path: string }[];
@@ -20,7 +20,7 @@ export interface SettingsLayoutProps extends SettingsLayout_QueryFragment {
   children?: ReactNode;
 }
 
-export function SettingsLayout({
+export function SidebarLayout({
   basePath,
   title,
   me,
@@ -31,7 +31,7 @@ export function SettingsLayout({
   showBackButton,
   header,
   children,
-}: SettingsLayoutProps) {
+}: SidebarLayoutProps) {
   const intl = useIntl();
   const router = useRouter();
   useOnMediaQueryChange(
@@ -69,9 +69,9 @@ export function SettingsLayout({
             </Heading>
           </Flex>
           {sections.map((section, index) => (
-            <SettingsLayoutMenuItem key={index} path={section.path}>
+            <SidebarLayoutMenuItem key={index} path={section.path}>
               {section.title}
-            </SettingsLayoutMenuItem>
+            </SidebarLayoutMenuItem>
           ))}
         </Box>
         {isBase ? null : (
@@ -127,21 +127,21 @@ export function SettingsLayout({
   );
 }
 
-SettingsLayout.fragments = {
+SidebarLayout.fragments = {
   Query: gql`
-    fragment SettingsLayout_Query on Query {
+    fragment SidebarLayout_Query on Query {
       ...AppLayout_Query
     }
     ${AppLayout.fragments.Query}
   `,
 };
 
-interface SettingsLayoutMenuItemProps {
+interface SidebarLayoutMenuItemProps {
   path: string;
   children: ReactNode;
 }
 
-function SettingsLayoutMenuItem({ path, children }: SettingsLayoutMenuItemProps) {
+function SidebarLayoutMenuItem({ path, children }: SidebarLayoutMenuItemProps) {
   const { pathname } = useRouter();
 
   const active = pathname.startsWith(path);

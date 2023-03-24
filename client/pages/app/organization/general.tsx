@@ -23,7 +23,7 @@ import { Logo } from "@parallel/components/common/Logo";
 import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import {
   OrganizationGeneral_updateOrgLogoDocument,
   OrganizationGeneral_userDocument,
@@ -31,7 +31,6 @@ import {
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { isAtLeast } from "@parallel/utils/roles";
-import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useRef } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -46,7 +45,6 @@ function OrganizationGeneral() {
 
   const hasAdminRole = isAtLeast("ADMIN", me.role);
 
-  const sections = useOrganizationSections(me);
   const dropzoneRef = useRef<DropzoneRef>(null);
 
   const iconSrc = me.organization.iconUrl240;
@@ -74,18 +72,13 @@ function OrganizationGeneral() {
   };
 
   return (
-    <SettingsLayout
+    <OrganizationSettingsLayout
       title={intl.formatMessage({
         id: "organization.general.title",
         defaultMessage: "General",
       })}
-      basePath="/app/organization"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={
-        <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
-      }
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="organization.general.title" defaultMessage="General" />
@@ -255,7 +248,7 @@ function OrganizationGeneral() {
           </Stack>
         </Stack>
       </Stack>
-    </SettingsLayout>
+    </OrganizationSettingsLayout>
   );
 }
 
@@ -274,7 +267,7 @@ OrganizationGeneral.mutations = [
 OrganizationGeneral.queries = [
   gql`
     query OrganizationGeneral_user {
-      ...SettingsLayout_Query
+      ...OrganizationSettingsLayout_Query
       me {
         id
         role
@@ -287,7 +280,7 @@ OrganizationGeneral.queries = [
         }
       }
     }
-    ${SettingsLayout.fragments.Query}
+    ${OrganizationSettingsLayout.fragments.Query}
   `,
 ];
 

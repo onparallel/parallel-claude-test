@@ -25,8 +25,7 @@ import { TableColumn, TableSorting } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { ReportsSidebarLayout } from "@parallel/components/layout/ReportsSidebarLayout";
 import { DateRangePickerButton } from "@parallel/components/reports/common/DateRangePickerButton";
 import { ReportsErrorMessage } from "@parallel/components/reports/common/ReportsErrorMessage";
 import { ReportsLoadingMessage } from "@parallel/components/reports/common/ReportsLoadingMessage";
@@ -41,7 +40,6 @@ import { stallFor } from "@parallel/utils/promises/stallFor";
 import { date, useQueryState } from "@parallel/utils/queryState";
 import { useTemplatesOverviewReportBackgroundTask } from "@parallel/utils/tasks/useTemplatesOverviewReportTask";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { useReportsSections } from "@parallel/utils/useReportsSections";
 import { ReactNode, useMemo, useRef, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { isDefined, sortBy, sumBy } from "remeda";
@@ -90,8 +88,6 @@ export function Overview() {
   const {
     data: { me, realMe },
   } = useAssertQuery(Overview_userDocument);
-
-  const sections = useReportsSections();
 
   const [{ status, report, activeRange }, setState] = useState<{
     status: "IDLE" | "LOADING" | "LOADED" | "ERROR";
@@ -206,16 +202,13 @@ export function Overview() {
   };
 
   return (
-    <SettingsLayout
+    <ReportsSidebarLayout
       title={intl.formatMessage({
         id: "page.reports.overview",
         defaultMessage: "Overview",
       })}
-      basePath="/app/reports"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={<FormattedMessage id="page.reports.title" defaultMessage="Reports" />}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="page.reports.overview" defaultMessage="Overview" />
@@ -427,7 +420,7 @@ export function Overview() {
           </Stack>
         )}
       </Stack>
-    </SettingsLayout>
+    </ReportsSidebarLayout>
   );
 }
 
@@ -443,9 +436,9 @@ Overview.fragments = {
 Overview.queries = [
   gql`
     query Overview_user {
-      ...AppLayout_Query
+      ...ReportsSidebarLayout_Query
     }
-    ${AppLayout.fragments.Query}
+    ${ReportsSidebarLayout.fragments.Query}
   `,
 ];
 

@@ -7,14 +7,13 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
+import { AdminSettingsLayout } from "@parallel/components/layout/AdminSettingsLayout";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { AdminSupportMethods_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { unCamelCase } from "@parallel/utils/strings";
 import { Maybe, UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
-import { useAdminSections } from "@parallel/utils/useAdminSections";
 import { useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -28,7 +27,6 @@ function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethod
   const {
     data: { me, realMe },
   } = useAssertQuery(AdminSupportMethods_userDocument);
-  const sections = useAdminSections();
 
   const [search, setSearch] = useState("");
 
@@ -44,16 +42,13 @@ function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethod
   const [selected, setSelected] = useState<Maybe<UnwrapArray<typeof supportMethods>>>(null);
 
   return (
-    <SettingsLayout
+    <AdminSettingsLayout
       title={intl.formatMessage({
         id: "admin.support-methods",
         defaultMessage: "Support methods",
       })}
-      basePath="/app/admin"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={<FormattedMessage id="admin.title" defaultMessage="Admin panel" />}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="admin.support-methods" defaultMessage="Support methods" />
@@ -95,7 +90,7 @@ function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethod
           />
         )}
       </Box>
-    </SettingsLayout>
+    </AdminSettingsLayout>
   );
 }
 

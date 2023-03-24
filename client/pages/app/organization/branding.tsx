@@ -2,14 +2,13 @@ import { gql } from "@apollo/client";
 import { Heading, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { BrandingDocumentTheme } from "@parallel/components/organization/branding/BrandingDocumentTheme";
 import { BrandingGeneral } from "@parallel/components/organization/branding/BrandingGeneral";
 import { OrganizationBranding_userDocument } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useQueryState, useQueryStateSlice, values } from "@parallel/utils/queryState";
-import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const styles = ["general", "document"] as ("general" | "document")[];
@@ -24,23 +23,17 @@ function OrganizationBranding() {
     data: { me, realMe },
   } = useAssertQueryOrPreviousData(OrganizationBranding_userDocument);
 
-  const sections = useOrganizationSections(me);
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const [style, setStyle] = useQueryStateSlice(state, setQueryState, "style");
 
   return (
-    <SettingsLayout
+    <OrganizationSettingsLayout
       title={intl.formatMessage({
         id: "organization.branding.title",
         defaultMessage: "Branding",
       })}
-      basePath="/app/organization"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={
-        <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
-      }
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="organization.branding.title" defaultMessage="Branding" />
@@ -90,20 +83,21 @@ function OrganizationBranding() {
           </TabPanel>
         </TabPanels>
       </Tabs>
-    </SettingsLayout>
+    </OrganizationSettingsLayout>
   );
 }
 
 OrganizationBranding.queries = [
   gql`
     query OrganizationBranding_user {
+      ...OrganizationSettingsLayout_Query
       me {
         id
         ...BrandingGeneral_User
         ...BrandingDocumentTheme_User
       }
     }
-    ${SettingsLayout.fragments.Query}
+    ${OrganizationSettingsLayout.fragments.Query}
     ${BrandingGeneral.fragments.User}
     ${BrandingDocumentTheme.fragments.User}
   `,

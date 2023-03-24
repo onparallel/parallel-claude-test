@@ -19,7 +19,7 @@ import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import {
   IntegrationLinkCard,
   IntegrationLinkCardProps,
@@ -35,7 +35,6 @@ import {
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { isAtLeast } from "@parallel/utils/roles";
-import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { useDeactivateDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DeactivateDowJonesIntegrationDialog";
@@ -47,7 +46,6 @@ function OrganizationIntegrations() {
     data: { me, realMe },
     refetch,
   } = useAssertQuery(OrganizationIntegrations_userDocument);
-  const sections = useOrganizationSections(me);
 
   const hasAdminRole = isAtLeast("ADMIN", me.role);
 
@@ -227,18 +225,13 @@ function OrganizationIntegrations() {
   ] as (IntegrationLinkCardProps | IntegrationSwitchCardProps)[];
 
   return (
-    <SettingsLayout
+    <OrganizationSettingsLayout
       title={intl.formatMessage({
         id: "organization.integrations.title",
         defaultMessage: "Integrations",
       })}
-      basePath="/app/organization"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={
-        <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
-      }
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="organization.integrations.title" defaultMessage="Integrations" />
@@ -303,14 +296,14 @@ function OrganizationIntegrations() {
         })}
         {!hasAdminRole ? <OnlyAdminsAlert /> : null}
       </Stack>
-    </SettingsLayout>
+    </OrganizationSettingsLayout>
   );
 }
 
 OrganizationIntegrations.queries = [
   gql`
     query OrganizationIntegrations_user {
-      ...SettingsLayout_Query
+      ...OrganizationSettingsLayout_Query
       me {
         id
         role
@@ -339,7 +332,7 @@ OrganizationIntegrations.queries = [
         }
       }
     }
-    ${SettingsLayout.fragments.Query}
+    ${OrganizationSettingsLayout.fragments.Query}
   `,
 ];
 

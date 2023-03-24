@@ -22,7 +22,7 @@ import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { useAddSignatureCredentialsDialog } from "@parallel/components/organization/dialogs/AddSignatureCredentialsDialog";
 import { useDeleteSignatureErrorConfirmationDialog } from "@parallel/components/organization/dialogs/DeleteSignatureErrorConfirmationDialog";
 import { useDeleteSignatureTokenDialog } from "@parallel/components/organization/dialogs/DeleteSignatureTokenDialog";
@@ -40,7 +40,6 @@ import { withError } from "@parallel/utils/promises/withError";
 import { integer, parseQuery, useQueryState, values } from "@parallel/utils/queryState";
 import { useDocusignConsentPopup } from "@parallel/utils/useDocusignConsentPopup";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
-import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -77,7 +76,6 @@ function IntegrationsSignature() {
   const { totalCount: numberOfIntegrations, items: integrations } =
     me.organization.signatureIntegrations;
   assertTypenameArray(integrations, "SignatureOrgIntegration");
-  const sections = useOrganizationSections(me);
   const columns = useSignatureTokensTableColumns();
 
   const showGenericErrorToast = useGenericErrorToast();
@@ -192,18 +190,14 @@ function IntegrationsSignature() {
   );
 
   return (
-    <SettingsLayout
+    <OrganizationSettingsLayout
       title={intl.formatMessage({
         id: "organization.signature-integrations.title",
         defaultMessage: "Signature integrations",
       })}
       basePath="/app/organization/integrations"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={
-        <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
-      }
       header={
         <Heading as="h3" size="md">
           <FormattedMessage
@@ -284,7 +278,7 @@ function IntegrationsSignature() {
           />
         ) : null}
       </Stack>
-    </SettingsLayout>
+    </OrganizationSettingsLayout>
   );
 }
 
@@ -499,7 +493,7 @@ IntegrationsSignature.mutations = [
 IntegrationsSignature.queries = [
   gql`
     query IntegrationsSignature_user($limit: Int!, $offset: Int!) {
-      ...SettingsLayout_Query
+      ...OrganizationSettingsLayout_Query
       me {
         id
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
@@ -517,7 +511,7 @@ IntegrationsSignature.queries = [
         }
       }
     }
-    ${SettingsLayout.fragments.Query}
+    ${OrganizationSettingsLayout.fragments.Query}
     ${useAddSignatureCredentialsDialog.fragments.User}
     ${IntegrationsSignature.fragments.SignatureOrgIntegration}
   `,

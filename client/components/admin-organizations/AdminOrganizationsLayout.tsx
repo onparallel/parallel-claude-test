@@ -1,14 +1,13 @@
 import { gql } from "@apollo/client";
 import { Heading, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { AdminSettingsLayout } from "@parallel/components/layout/AdminSettingsLayout";
 import {
-  AdminOrganizationsLayout_QueryFragment,
   AdminOrganizationsLayout_OrganizationFragment,
+  AdminOrganizationsLayout_QueryFragment,
 } from "@parallel/graphql/__types";
-import { useAdminSections } from "@parallel/utils/useAdminSections";
 import { useRouter } from "next/router";
 import { ReactNode, useEffect, useMemo, useRef } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 
 type AdminOrganizationsSection = "users" | "features" | "subscriptions";
@@ -27,7 +26,6 @@ export function AdminOrganizationsLayout({
   organization,
 }: AdminOrganizationsLayoutProps) {
   const router = useRouter();
-  const adminSections = useAdminSections();
   const tabs = useAdminOrganizationsTabs();
   const currentTab = tabs.find((t) => t.key === tabKey)!;
   const currentTabRef = useRef<HTMLAnchorElement>(null);
@@ -36,13 +34,11 @@ export function AdminOrganizationsLayout({
   }, []);
 
   return (
-    <SettingsLayout
+    <AdminSettingsLayout
       title={`${organization.name} | ${currentTab.title}`}
       basePath="/app/admin/organizations"
-      sections={adminSections}
       me={me}
       realMe={realMe}
-      sectionsHeader={<FormattedMessage id="admin.title" defaultMessage="Admin panel" />}
       header={
         <Heading as="h3" size="md">
           {organization.name}
@@ -86,7 +82,7 @@ export function AdminOrganizationsLayout({
           ))}
         </TabPanels>
       </Tabs>
-    </SettingsLayout>
+    </AdminSettingsLayout>
   );
 }
 
@@ -132,7 +128,7 @@ AdminOrganizationsLayout.fragments = {
   get Query() {
     return gql`
       fragment AdminOrganizationsLayout_Query on Query {
-        ...SettingsLayout_Query
+        ...AdminSettingsLayout_Query
         me {
           id
           organization {
@@ -140,7 +136,7 @@ AdminOrganizationsLayout.fragments = {
           }
         }
       }
-      ${SettingsLayout.fragments.Query}
+      ${AdminSettingsLayout.fragments.Query}
       ${AdminOrganizationsLayout.fragments.Organization}
     `;
   },

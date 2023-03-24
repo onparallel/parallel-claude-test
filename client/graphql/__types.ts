@@ -359,6 +359,7 @@ export type FeatureFlag =
   | "ON_BEHALF_OF"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "PETITION_SIGNATURE"
+  | "PROFILES"
   | "PUBLIC_PETITION_LINK_PREFILL_DATA"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "REMOVE_PARALLEL_BRANDING"
@@ -4580,6 +4581,7 @@ export type AdminOrganizationsLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -5242,6 +5244,45 @@ export type ImportContactsDialog_bulkCreateContactsMutation = {
   };
 };
 
+export type AdminSettingsLayout_QueryFragment = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasProfilesAccess: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      iconUrl92?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
 export type AppLayout_QueryFragment = {
   me: {
     __typename?: "User";
@@ -5256,6 +5297,7 @@ export type AppLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -5298,6 +5340,7 @@ export type AppLayoutNavbar_QueryFragment = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -5339,6 +5382,45 @@ export type HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment = {
 export type HeaderNameEditable_PetitionBaseFragment =
   | HeaderNameEditable_PetitionBase_Petition_Fragment
   | HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment;
+
+export type OrganizationSettingsLayout_QueryFragment = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasProfilesAccess: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      iconUrl92?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
 
 export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
@@ -5517,6 +5599,7 @@ export type PetitionLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -5541,7 +5624,7 @@ export type PetitionLayout_QueryFragment = {
   };
 };
 
-export type SettingsLayout_QueryFragment = {
+export type ReportsSidebarLayout_QueryFragment = {
   me: {
     __typename?: "User";
     id: string;
@@ -5555,6 +5638,46 @@ export type SettingsLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      iconUrl92?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
+export type SidebarLayout_QueryFragment = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -5596,6 +5719,46 @@ export type UserMenu_QueryFragment = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+  };
+};
+
+export type UserSettingsLayout_QueryFragment = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasProfilesAccess: boolean;
+    hasDeveloperAccess: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      iconUrl92?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -14822,6 +14985,7 @@ export type Admin_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -14877,6 +15041,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -15004,6 +15169,7 @@ export type AdminOrganizationsSubscriptions_queryQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -15242,6 +15408,7 @@ export type AdminOrganizationsMembers_queryQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -15379,6 +15546,7 @@ export type AdminOrganizations_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -15446,6 +15614,7 @@ export type AdminSupportMethods_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -15701,6 +15870,7 @@ export type Contact_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -15856,6 +16026,7 @@ export type Contacts_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -15931,6 +16102,7 @@ export type OrganizationBranding_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     hasRemovedParallelBranding: boolean;
     organization: {
       __typename?: "Organization";
@@ -16005,6 +16177,7 @@ export type OrganizationCompliance_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasAutoAnonymize: boolean;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -16061,6 +16234,7 @@ export type OrganizationGeneral_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasCustomHost: boolean;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -16228,6 +16402,7 @@ export type OrganizationGroup_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -16390,6 +16565,7 @@ export type OrganizationGroups_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -16430,6 +16606,7 @@ export type OrganizationSettings_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -16473,6 +16650,7 @@ export type OrganizationIntegrations_userQuery = {
     hasPetitionSignature: boolean;
     hasDeveloperAccess: boolean;
     hasDowJonesFeature: boolean;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -16583,6 +16761,7 @@ export type IntegrationsSignature_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasPetitionSignature: boolean;
+    hasProfilesAccess: boolean;
     hasDocusignSandbox: boolean;
     organization: {
       __typename?: "Organization";
@@ -16624,6 +16803,47 @@ export type IntegrationsSignature_userQuery = {
   };
 };
 
+export type OrganizationProfiles_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type OrganizationProfiles_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasProfilesAccess: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      iconUrl92?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
 export type OrganizationUsage_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationUsage_userQuery = {
@@ -16640,6 +16860,7 @@ export type OrganizationUsage_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -16794,6 +17015,7 @@ export type OrganizationUsers_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasGhostLogin: boolean;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -17709,6 +17931,7 @@ export type PetitionActivity_QueryFragment = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -19579,6 +19802,7 @@ export type PetitionActivity_userQuery = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -19964,6 +20188,7 @@ export type PetitionCompose_QueryFragment = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasAutoAnonymize: boolean;
@@ -20552,6 +20777,7 @@ export type PetitionCompose_userQuery = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasAutoAnonymize: boolean;
@@ -21013,6 +21239,7 @@ export type PetitionMessages_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -21054,6 +21281,7 @@ export type PetitionMessages_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -21987,6 +22215,7 @@ export type PetitionPreview_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -22928,6 +23157,7 @@ export type PetitionPreview_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasPublicLinkPrefill: boolean;
+    hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -23308,6 +23538,7 @@ export type PetitionReplies_QueryFragment = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     hasExportCuatrecasas: boolean;
     hasPetitionSignature: boolean;
     organization: {
@@ -23906,6 +24137,7 @@ export type PetitionReplies_userQuery = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     hasExportCuatrecasas: boolean;
     hasPetitionSignature: boolean;
     organization: {
@@ -24401,6 +24633,7 @@ export type Petitions_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -24883,6 +25116,7 @@ export type NewPetition_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -25013,6 +25247,88 @@ export type NewPetition_templateQuery = {
     | null;
 };
 
+export type ProfileDetail_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type ProfileDetail_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasProfilesAccess: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      iconUrl92?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
+export type Profiles_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type Profiles_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasProfilesAccess: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      iconUrl92?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
 export type Reports_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type Reports_userQuery = {
@@ -25029,6 +25345,7 @@ export type Reports_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -25075,6 +25392,7 @@ export type Overview_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -25139,6 +25457,7 @@ export type ReportsReplies_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -25204,6 +25523,7 @@ export type ReportsTemplates_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasStatisticsView: boolean;
+    hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -25244,8 +25564,9 @@ export type Account_QueryFragment = {
     preferredLocale: UserLocale;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasDeveloperAccess: boolean;
+    hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
+    hasDeveloperAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -25326,8 +25647,9 @@ export type Account_userQuery = {
     preferredLocale: UserLocale;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasDeveloperAccess: boolean;
+    hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
+    hasDeveloperAccess: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -25406,6 +25728,7 @@ export type Developers_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     hasDeveloperAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -25447,6 +25770,7 @@ export type Settings_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     hasDeveloperAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -25496,6 +25820,7 @@ export type Security_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasProfilesAccess: boolean;
     hasDeveloperAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -27586,6 +27911,12 @@ export type useLoginAs_restoreLoginMutationVariables = Exact<{ [key: string]: ne
 
 export type useLoginAs_restoreLoginMutation = { restoreLogin: Result };
 
+export type useOrganizationSections_UserFragment = {
+  __typename?: "User";
+  role: OrganizationRole;
+  hasProfilesAccess: boolean;
+};
+
 export type PetitionSignaturesCardPolling_petitionQueryVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
@@ -27939,6 +28270,7 @@ export const AppLayoutNavbar_QueryFragmentDoc = gql`
     me {
       id
       role
+      hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
       organization {
         id
         name
@@ -27974,12 +28306,18 @@ export const AppLayout_QueryFragmentDoc = gql`
   }
   ${AppLayoutNavbar_QueryFragmentDoc}
 ` as unknown as DocumentNode<AppLayout_QueryFragment, unknown>;
-export const SettingsLayout_QueryFragmentDoc = gql`
-  fragment SettingsLayout_Query on Query {
+export const SidebarLayout_QueryFragmentDoc = gql`
+  fragment SidebarLayout_Query on Query {
     ...AppLayout_Query
   }
   ${AppLayout_QueryFragmentDoc}
-` as unknown as DocumentNode<SettingsLayout_QueryFragment, unknown>;
+` as unknown as DocumentNode<SidebarLayout_QueryFragment, unknown>;
+export const AdminSettingsLayout_QueryFragmentDoc = gql`
+  fragment AdminSettingsLayout_Query on Query {
+    ...SidebarLayout_Query
+  }
+  ${SidebarLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<AdminSettingsLayout_QueryFragment, unknown>;
 export const AdminOrganizationsLayout_OrganizationFragmentDoc = gql`
   fragment AdminOrganizationsLayout_Organization on Organization {
     id
@@ -27988,7 +28326,7 @@ export const AdminOrganizationsLayout_OrganizationFragmentDoc = gql`
 ` as unknown as DocumentNode<AdminOrganizationsLayout_OrganizationFragment, unknown>;
 export const AdminOrganizationsLayout_QueryFragmentDoc = gql`
   fragment AdminOrganizationsLayout_Query on Query {
-    ...SettingsLayout_Query
+    ...AdminSettingsLayout_Query
     me {
       id
       organization {
@@ -27996,7 +28334,7 @@ export const AdminOrganizationsLayout_QueryFragmentDoc = gql`
       }
     }
   }
-  ${SettingsLayout_QueryFragmentDoc}
+  ${AdminSettingsLayout_QueryFragmentDoc}
   ${AdminOrganizationsLayout_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<AdminOrganizationsLayout_QueryFragment, unknown>;
 export const UpdateOrganizationCurrentUsagePeriodDialog_OrganizationUsageLimitFragmentDoc = gql`
@@ -28089,11 +28427,34 @@ export const TaskProgressDialog_TaskFragmentDoc = gql`
     progress
   }
 ` as unknown as DocumentNode<TaskProgressDialog_TaskFragment, unknown>;
+export const useOrganizationSections_UserFragmentDoc = gql`
+  fragment useOrganizationSections_User on User {
+    role
+    hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
+  }
+` as unknown as DocumentNode<useOrganizationSections_UserFragment, unknown>;
+export const OrganizationSettingsLayout_QueryFragmentDoc = gql`
+  fragment OrganizationSettingsLayout_Query on Query {
+    ...SidebarLayout_Query
+    me {
+      id
+      ...useOrganizationSections_User
+    }
+  }
+  ${SidebarLayout_QueryFragmentDoc}
+  ${useOrganizationSections_UserFragmentDoc}
+` as unknown as DocumentNode<OrganizationSettingsLayout_QueryFragment, unknown>;
 export const PetitionHeader_PetitionBase_updatePathFragmentDoc = gql`
   fragment PetitionHeader_PetitionBase_updatePath on PetitionBase {
     path
   }
 ` as unknown as DocumentNode<PetitionHeader_PetitionBase_updatePathFragment, unknown>;
+export const ReportsSidebarLayout_QueryFragmentDoc = gql`
+  fragment ReportsSidebarLayout_Query on Query {
+    ...SidebarLayout_Query
+  }
+  ${SidebarLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<ReportsSidebarLayout_QueryFragment, unknown>;
 export const PetitionUserNotification_PetitionUserNotificationFragmentDoc = gql`
   fragment PetitionUserNotification_PetitionUserNotification on PetitionUserNotification {
     id
@@ -32392,6 +32753,17 @@ export const useSettingsSections_UserFragmentDoc = gql`
     hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
   }
 ` as unknown as DocumentNode<useSettingsSections_UserFragment, unknown>;
+export const UserSettingsLayout_QueryFragmentDoc = gql`
+  fragment UserSettingsLayout_Query on Query {
+    ...SidebarLayout_Query
+    me {
+      id
+      ...useSettingsSections_User
+    }
+  }
+  ${SidebarLayout_QueryFragmentDoc}
+  ${useSettingsSections_UserFragmentDoc}
+` as unknown as DocumentNode<UserSettingsLayout_QueryFragment, unknown>;
 export const AccountChangeName_UserFragmentDoc = gql`
   fragment AccountChangeName_User on User {
     firstName
@@ -32416,16 +32788,14 @@ export const AccountDelegates_UserFragmentDoc = gql`
 ` as unknown as DocumentNode<AccountDelegates_UserFragment, unknown>;
 export const Account_QueryFragmentDoc = gql`
   fragment Account_Query on Query {
-    ...SettingsLayout_Query
+    ...UserSettingsLayout_Query
     me {
-      ...useSettingsSections_User
       ...AccountChangeName_User
       ...AccountLocaleChange_User
       ...AccountDelegates_User
     }
   }
-  ${SettingsLayout_QueryFragmentDoc}
-  ${useSettingsSections_UserFragmentDoc}
+  ${UserSettingsLayout_QueryFragmentDoc}
   ${AccountChangeName_UserFragmentDoc}
   ${AccountLocaleChange_UserFragmentDoc}
   ${AccountDelegates_UserFragmentDoc}
@@ -35048,9 +35418,9 @@ export const GenerateNewTokenDialog_generateUserAuthTokenDocument = gql`
 >;
 export const Admin_userDocument = gql`
   query Admin_user {
-    ...AppLayout_Query
+    ...AdminSettingsLayout_Query
   }
-  ${AppLayout_QueryFragmentDoc}
+  ${AdminSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Admin_userQuery, Admin_userQueryVariables>;
 export const AdminOrganizationsFeatures_queryDocument = gql`
   query AdminOrganizationsFeatures_query($id: GID!) {
@@ -35284,9 +35654,9 @@ export const AdminOrganizations_organizationsDocument = gql`
 >;
 export const AdminOrganizations_userDocument = gql`
   query AdminOrganizations_user {
-    ...AppLayout_Query
+    ...AdminSettingsLayout_Query
   }
-  ${AppLayout_QueryFragmentDoc}
+  ${AdminSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<AdminOrganizations_userQuery, AdminOrganizations_userQueryVariables>;
 export const AdminOrganizations_createOrganizationDocument = gql`
   mutation AdminOrganizations_createOrganization(
@@ -35389,14 +35759,14 @@ export const ChooseOrg_changeOrganizationDocument = gql`
 >;
 export const OrganizationBranding_userDocument = gql`
   query OrganizationBranding_user {
-    ...SettingsLayout_Query
+    ...OrganizationSettingsLayout_Query
     me {
       id
       ...BrandingGeneral_User
       ...BrandingDocumentTheme_User
     }
   }
-  ${SettingsLayout_QueryFragmentDoc}
+  ${OrganizationSettingsLayout_QueryFragmentDoc}
   ${BrandingGeneral_UserFragmentDoc}
   ${BrandingDocumentTheme_UserFragmentDoc}
 ` as unknown as DocumentNode<
@@ -35416,7 +35786,7 @@ export const OrganizationCompliance_updateOrganizationAutoAnonymizePeriodDocumen
 >;
 export const OrganizationCompliance_userDocument = gql`
   query OrganizationCompliance_user {
-    ...SettingsLayout_Query
+    ...OrganizationSettingsLayout_Query
     me {
       hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
       organization {
@@ -35424,7 +35794,7 @@ export const OrganizationCompliance_userDocument = gql`
       }
     }
   }
-  ${SettingsLayout_QueryFragmentDoc}
+  ${OrganizationSettingsLayout_QueryFragmentDoc}
   ${OrganizationCompliance_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<
   OrganizationCompliance_userQuery,
@@ -35444,7 +35814,7 @@ export const OrganizationGeneral_updateOrgLogoDocument = gql`
 >;
 export const OrganizationGeneral_userDocument = gql`
   query OrganizationGeneral_user {
-    ...SettingsLayout_Query
+    ...OrganizationSettingsLayout_Query
     me {
       id
       role
@@ -35457,7 +35827,7 @@ export const OrganizationGeneral_userDocument = gql`
       }
     }
   }
-  ${SettingsLayout_QueryFragmentDoc}
+  ${OrganizationSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<OrganizationGeneral_userQuery, OrganizationGeneral_userQueryVariables>;
 export const OrganizationGroup_updateUserGroupDocument = gql`
   mutation OrganizationGroup_updateUserGroup($id: GID!, $data: UpdateUserGroupInput!) {
@@ -35576,22 +35946,22 @@ export const OrganizationGroups_userGroupsDocument = gql`
 >;
 export const OrganizationGroups_userDocument = gql`
   query OrganizationGroups_user {
-    ...SettingsLayout_Query
+    ...OrganizationSettingsLayout_Query
   }
-  ${SettingsLayout_QueryFragmentDoc}
+  ${OrganizationSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<OrganizationGroups_userQuery, OrganizationGroups_userQueryVariables>;
 export const OrganizationSettings_userDocument = gql`
   query OrganizationSettings_user {
-    ...SettingsLayout_Query
+    ...OrganizationSettingsLayout_Query
   }
-  ${SettingsLayout_QueryFragmentDoc}
+  ${OrganizationSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<
   OrganizationSettings_userQuery,
   OrganizationSettings_userQueryVariables
 >;
 export const OrganizationIntegrations_userDocument = gql`
   query OrganizationIntegrations_user {
-    ...SettingsLayout_Query
+    ...OrganizationSettingsLayout_Query
     me {
       id
       role
@@ -35620,7 +35990,7 @@ export const OrganizationIntegrations_userDocument = gql`
       }
     }
   }
-  ${SettingsLayout_QueryFragmentDoc}
+  ${OrganizationSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<
   OrganizationIntegrations_userQuery,
   OrganizationIntegrations_userQueryVariables
@@ -35657,7 +36027,7 @@ export const IntegrationsSignature_deleteSignatureIntegrationDocument = gql`
 >;
 export const IntegrationsSignature_userDocument = gql`
   query IntegrationsSignature_user($limit: Int!, $offset: Int!) {
-    ...SettingsLayout_Query
+    ...OrganizationSettingsLayout_Query
     me {
       id
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
@@ -35675,16 +36045,25 @@ export const IntegrationsSignature_userDocument = gql`
       }
     }
   }
-  ${SettingsLayout_QueryFragmentDoc}
+  ${OrganizationSettingsLayout_QueryFragmentDoc}
   ${useAddSignatureCredentialsDialog_UserFragmentDoc}
   ${IntegrationsSignature_SignatureOrgIntegrationFragmentDoc}
 ` as unknown as DocumentNode<
   IntegrationsSignature_userQuery,
   IntegrationsSignature_userQueryVariables
 >;
+export const OrganizationProfiles_userDocument = gql`
+  query OrganizationProfiles_user {
+    ...OrganizationSettingsLayout_Query
+  }
+  ${OrganizationSettingsLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<
+  OrganizationProfiles_userQuery,
+  OrganizationProfiles_userQueryVariables
+>;
 export const OrganizationUsage_userDocument = gql`
   query OrganizationUsage_user {
-    ...SettingsLayout_Query
+    ...OrganizationSettingsLayout_Query
     me {
       organization {
         id
@@ -35707,7 +36086,7 @@ export const OrganizationUsage_userDocument = gql`
       }
     }
   }
-  ${SettingsLayout_QueryFragmentDoc}
+  ${OrganizationSettingsLayout_QueryFragmentDoc}
   ${AppSumoLicenseAlert_OrgLicenseFragmentDoc}
 ` as unknown as DocumentNode<OrganizationUsage_userQuery, OrganizationUsage_userQueryVariables>;
 export const OrganizationUsers_inviteUserToOrganizationDocument = gql`
@@ -35792,7 +36171,7 @@ export const OrganizationUsers_resetTempPasswordDocument = gql`
 >;
 export const OrganizationUsers_userDocument = gql`
   query OrganizationUsers_user {
-    ...SettingsLayout_Query
+    ...OrganizationSettingsLayout_Query
     me {
       hasGhostLogin: hasFeatureFlag(featureFlag: GHOST_LOGIN)
       organization {
@@ -35803,7 +36182,7 @@ export const OrganizationUsers_userDocument = gql`
       }
     }
   }
-  ${SettingsLayout_QueryFragmentDoc}
+  ${OrganizationSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<OrganizationUsers_userQuery, OrganizationUsers_userQueryVariables>;
 export const OrganizationUsers_orgUsersDocument = gql`
   query OrganizationUsers_orgUsers(
@@ -36551,6 +36930,18 @@ export const NewPetition_templateDocument = gql`
   }
   ${TemplateDetailsModal_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_templateQuery, NewPetition_templateQueryVariables>;
+export const ProfileDetail_userDocument = gql`
+  query ProfileDetail_user {
+    ...AppLayout_Query
+  }
+  ${AppLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<ProfileDetail_userQuery, ProfileDetail_userQueryVariables>;
+export const Profiles_userDocument = gql`
+  query Profiles_user {
+    ...AppLayout_Query
+  }
+  ${AppLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<Profiles_userQuery, Profiles_userQueryVariables>;
 export const Reports_userDocument = gql`
   query Reports_user {
     ...AppLayout_Query
@@ -36559,9 +36950,9 @@ export const Reports_userDocument = gql`
 ` as unknown as DocumentNode<Reports_userQuery, Reports_userQueryVariables>;
 export const Overview_userDocument = gql`
   query Overview_user {
-    ...AppLayout_Query
+    ...ReportsSidebarLayout_Query
   }
-  ${AppLayout_QueryFragmentDoc}
+  ${ReportsSidebarLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Overview_userQuery, Overview_userQueryVariables>;
 export const ReportsReplies_templatesDocument = gql`
   query ReportsReplies_templates($offset: Int!, $limit: Int!, $isPublic: Boolean!) {
@@ -36576,9 +36967,9 @@ export const ReportsReplies_templatesDocument = gql`
 ` as unknown as DocumentNode<ReportsReplies_templatesQuery, ReportsReplies_templatesQueryVariables>;
 export const ReportsReplies_userDocument = gql`
   query ReportsReplies_user {
-    ...AppLayout_Query
+    ...ReportsSidebarLayout_Query
   }
-  ${AppLayout_QueryFragmentDoc}
+  ${ReportsSidebarLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<ReportsReplies_userQuery, ReportsReplies_userQueryVariables>;
 export const ReportsTemplates_templatesDocument = gql`
   query ReportsTemplates_templates($offset: Int!, $limit: Int!, $isPublic: Boolean!) {
@@ -36596,12 +36987,12 @@ export const ReportsTemplates_templatesDocument = gql`
 >;
 export const ReportsTemplates_userDocument = gql`
   query ReportsTemplates_user {
-    ...AppLayout_Query
+    ...ReportsSidebarLayout_Query
     me {
       hasStatisticsView: hasFeatureFlag(featureFlag: STATISTICS_VIEW)
     }
   }
-  ${AppLayout_QueryFragmentDoc}
+  ${ReportsSidebarLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<ReportsTemplates_userQuery, ReportsTemplates_userQueryVariables>;
 export const Account_updateAccountDocument = gql`
   mutation Account_updateAccount($firstName: String, $lastName: String) {
@@ -36665,25 +37056,15 @@ export const Developers_subscriptionsDocument = gql`
 ` as unknown as DocumentNode<Developers_subscriptionsQuery, Developers_subscriptionsQueryVariables>;
 export const Developers_userDocument = gql`
   query Developers_user {
-    ...SettingsLayout_Query
-    me {
-      id
-      ...useSettingsSections_User
-    }
+    ...UserSettingsLayout_Query
   }
-  ${SettingsLayout_QueryFragmentDoc}
-  ${useSettingsSections_UserFragmentDoc}
+  ${UserSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Developers_userQuery, Developers_userQueryVariables>;
 export const Settings_userDocument = gql`
   query Settings_user {
-    ...SettingsLayout_Query
-    me {
-      id
-      ...useSettingsSections_User
-    }
+    ...UserSettingsLayout_Query
   }
-  ${SettingsLayout_QueryFragmentDoc}
-  ${useSettingsSections_UserFragmentDoc}
+  ${UserSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Settings_userQuery, Settings_userQueryVariables>;
 export const Security_updatePasswordDocument = gql`
   mutation Security_updatePassword($password: String!, $newPassword: String!) {
@@ -36695,14 +37076,12 @@ export const Security_updatePasswordDocument = gql`
 >;
 export const Security_userDocument = gql`
   query Security_user {
-    ...SettingsLayout_Query
+    ...UserSettingsLayout_Query
     me {
       isSsoUser
-      ...useSettingsSections_User
     }
   }
-  ${SettingsLayout_QueryFragmentDoc}
-  ${useSettingsSections_UserFragmentDoc}
+  ${UserSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Security_userQuery, Security_userQueryVariables>;
 export const Forgot_resendVerificationEmailDocument = gql`
   mutation Forgot_resendVerificationEmail($email: String!, $locale: UserLocale!) {

@@ -14,7 +14,7 @@ import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog"
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { useConfirmActivateUsersDialog } from "@parallel/components/organization/dialogs/ConfirmActivateUsersDialog";
 import { useConfirmDeactivateUserDialog } from "@parallel/components/organization/dialogs/ConfirmDeactivateUserDialog";
 import { useConfirmResendInvitationDialog } from "@parallel/components/organization/dialogs/ConfirmResendInvitationDialog";
@@ -48,7 +48,6 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useLoginAs } from "@parallel/utils/useLoginAs";
 import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
-import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -124,8 +123,6 @@ function OrganizationUsers() {
     me.organization.usageDetails.USER_LIMIT;
 
   const [search, setSearch] = useState(state.search);
-
-  const sections = useOrganizationSections(me);
 
   const columns = useOrganizationUsersTableColumns(me);
 
@@ -463,18 +460,13 @@ function OrganizationUsers() {
   };
 
   return (
-    <SettingsLayout
+    <OrganizationSettingsLayout
       title={intl.formatMessage({
         id: "organization.users.title",
         defaultMessage: "Users",
       })}
-      basePath="/app/organization"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={
-        <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
-      }
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="organization.users.title" defaultMessage="Users" />
@@ -583,7 +575,7 @@ function OrganizationUsers() {
           }
         />
       </Flex>
-    </SettingsLayout>
+    </OrganizationSettingsLayout>
   );
 }
 
@@ -843,7 +835,7 @@ const _mutations = [
 OrganizationUsers.queries = [
   gql`
     query OrganizationUsers_user {
-      ...SettingsLayout_Query
+      ...OrganizationSettingsLayout_Query
       me {
         hasGhostLogin: hasFeatureFlag(featureFlag: GHOST_LOGIN)
         organization {
@@ -854,7 +846,7 @@ OrganizationUsers.queries = [
         }
       }
     }
-    ${SettingsLayout.fragments.Query}
+    ${OrganizationSettingsLayout.fragments.Query}
   `,
   gql`
     query OrganizationUsers_orgUsers(

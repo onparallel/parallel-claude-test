@@ -2,7 +2,7 @@ import { gql, useMutation } from "@apollo/client";
 import { Divider, Heading, Stack, useToast } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { UserSettingsLayout } from "@parallel/components/layout/UserSettingsLayout";
 import {
   AccountChangeName,
   AccountChangeNameData,
@@ -11,15 +11,14 @@ import { AccountDelegates } from "@parallel/components/settings/AccountDelegates
 import { AccountLocaleChange } from "@parallel/components/settings/AccountLocaleChange";
 import {
   Account_setUserDelegatesDocument,
-  Account_updateUserPreferredLocaleDocument,
   Account_updateAccountDocument,
+  Account_updateUserPreferredLocaleDocument,
   Account_userDocument,
   UserLocale,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
-import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -47,7 +46,6 @@ function Account() {
   const {
     data: { me, realMe },
   } = useAssertQuery(Account_userDocument);
-  const sections = useSettingsSections(me);
 
   const [updateAccount] = useMutation(Account_updateAccountDocument);
   const [updateUserPreferredLocale] = useMutation(Account_updateUserPreferredLocaleDocument);
@@ -84,16 +82,13 @@ function Account() {
   }
 
   return (
-    <SettingsLayout
+    <UserSettingsLayout
       title={intl.formatMessage({
         id: "settings.account",
         defaultMessage: "Account",
       })}
-      basePath="/app/settings"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={<FormattedMessage id="settings.title" defaultMessage="Settings" />}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="settings.account" defaultMessage="Account" />
@@ -107,23 +102,21 @@ function Account() {
         <Divider borderColor="gray.300" />
         <AccountDelegates user={me} onSubmit={onSaveDelegates} />
       </Stack>
-    </SettingsLayout>
+    </UserSettingsLayout>
   );
 }
 
 Account.fragments = {
   Query: gql`
     fragment Account_Query on Query {
-      ...SettingsLayout_Query
+      ...UserSettingsLayout_Query
       me {
-        ...useSettingsSections_User
         ...AccountChangeName_User
         ...AccountLocaleChange_User
         ...AccountDelegates_User
       }
     }
-    ${SettingsLayout.fragments.Query}
-    ${useSettingsSections.fragments.User}
+    ${UserSettingsLayout.fragments.Query}
     ${AccountChangeName.fragments.User}
     ${AccountLocaleChange.fragments.User}
     ${AccountDelegates.fragments.User}

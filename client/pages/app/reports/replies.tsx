@@ -7,8 +7,7 @@ import { OverflownText } from "@parallel/components/common/OverflownText";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { ReportsSidebarLayout } from "@parallel/components/layout/ReportsSidebarLayout";
 import { DateRangePickerButton } from "@parallel/components/reports/common/DateRangePickerButton";
 import { ReportsLoadingMessage } from "@parallel/components/reports/common/ReportsLoadingMessage";
 import { ReportsReadyMessage } from "@parallel/components/reports/common/ReportsReadyMessage";
@@ -24,7 +23,6 @@ import {
 import { compose } from "@parallel/utils/compose";
 import { date, string, useQueryState } from "@parallel/utils/queryState";
 import { useTemplateRepliesReportTask } from "@parallel/utils/tasks/useTemplateRepliesReportTask";
-import { useReportsSections } from "@parallel/utils/useReportsSections";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -39,8 +37,6 @@ export function ReportsReplies() {
   const {
     data: { me, realMe },
   } = useAssertQuery(ReportsReplies_userDocument);
-
-  const sections = useReportsSections();
 
   const [{ status, activeTemplateId, activeRange, showDownload }, setState] = useState<{
     status: "IDLE" | "LOADING" | "ERROR";
@@ -84,16 +80,13 @@ export function ReportsReplies() {
   const handleTemplateRepliesReportTask = useTemplateRepliesReportTask();
 
   return (
-    <SettingsLayout
+    <ReportsSidebarLayout
       title={intl.formatMessage({
         id: "page.reports.replies",
         defaultMessage: "Replies",
       })}
-      basePath="/app/replies"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={<FormattedMessage id="page.reports.title" defaultMessage="Reports" />}
       header={
         <HStack width="100%" justifyContent="space-between" flexWrap="wrap">
           <Heading as="h3" size="md">
@@ -226,7 +219,7 @@ export function ReportsReplies() {
           </Stack>
         )}
       </Stack>
-    </SettingsLayout>
+    </ReportsSidebarLayout>
   );
 }
 
@@ -253,9 +246,9 @@ ReportsReplies.queries = [
   `,
   gql`
     query ReportsReplies_user {
-      ...AppLayout_Query
+      ...ReportsSidebarLayout_Query
     }
-    ${AppLayout.fragments.Query}
+    ${ReportsSidebarLayout.fragments.Query}
   `,
 ];
 

@@ -1,9 +1,10 @@
-import { User } from "@parallel/graphql/__types";
+import { gql } from "@apollo/client";
+import { useOrganizationSections_UserFragment } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 import { isAdmin } from "./roles";
 
-export function useOrganizationSections(user: Pick<User, "role">) {
+export function useOrganizationSections(user: useOrganizationSections_UserFragment) {
   const userIsAdmin = isAdmin(user.role);
   const intl = useIntl();
   return useMemo(
@@ -29,6 +30,17 @@ export function useOrganizationSections(user: Pick<User, "role">) {
         }),
         path: "/app/organization/general",
       },
+      ...(user.hasProfilesAccess
+        ? [
+            {
+              title: intl.formatMessage({
+                id: "organization.profiles.title",
+                defaultMessage: "Profiles",
+              }),
+              path: "/app/organization/profiles",
+            },
+          ]
+        : []),
       {
         title: intl.formatMessage({
           id: "organization.branding.title",
@@ -65,3 +77,12 @@ export function useOrganizationSections(user: Pick<User, "role">) {
     [intl.locale, userIsAdmin]
   );
 }
+
+useOrganizationSections.fragments = {
+  User: gql`
+    fragment useOrganizationSections_User on User {
+      role
+      hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
+    }
+  `,
+};

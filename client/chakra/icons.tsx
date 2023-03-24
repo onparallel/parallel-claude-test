@@ -2414,3 +2414,21 @@ export const BackCoverIcon = createIcon({
     </g>
   ),
 });
+
+export const ProfilesIcon = createIcon({
+  displayName: "ProfilesIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m12 1.78711c-3.92957 0-9 2-9 5s5.07043 4.99999 9 4.99999c3.9296 0 9-1.99999 9-4.99999s-5.0704-5-9-5z" />
+      <path d="m3 13s2.7 4 9 4 9-4 9-4" />
+      <path d="m21 7.28711v10.49999s-2.25 4-9 4-9-4-9-4v-10.49999" />
+    </g>
+  ),
+});

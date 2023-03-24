@@ -32,14 +32,13 @@ import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { SupportLink } from "@parallel/components/common/SupportLink";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import {
   OrganizationCompliance_updateOrganizationAutoAnonymizePeriodDocument,
   OrganizationCompliance_userDocument,
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -91,8 +90,6 @@ function OrganizationCompliance() {
   const isActive = watch("isActive");
   const period = Number(watch("period"));
 
-  const sections = useOrganizationSections(me);
-
   const [updateOrganizationAutoAnonymizePeriod] = useMutation(
     OrganizationCompliance_updateOrganizationAutoAnonymizePeriodDocument
   );
@@ -107,18 +104,13 @@ function OrganizationCompliance() {
   };
 
   return (
-    <SettingsLayout
+    <OrganizationSettingsLayout
       title={intl.formatMessage({
         id: "organization.compliance.title",
         defaultMessage: "Compliance",
       })}
-      basePath="/app/organization"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={
-        <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
-      }
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="organization.compliance.title" defaultMessage="Compliance" />
@@ -359,7 +351,7 @@ function OrganizationCompliance() {
           </Box>
         </Stack>
       </Box>
-    </SettingsLayout>
+    </OrganizationSettingsLayout>
   );
 }
 
@@ -386,7 +378,7 @@ const _mutations = [
 OrganizationCompliance.queries = [
   gql`
     query OrganizationCompliance_user {
-      ...SettingsLayout_Query
+      ...OrganizationSettingsLayout_Query
       me {
         hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
         organization {
@@ -394,7 +386,7 @@ OrganizationCompliance.queries = [
         }
       }
     }
-    ${SettingsLayout.fragments.Query}
+    ${OrganizationSettingsLayout.fragments.Query}
     ${_fragments.Organization}
   `,
 ];

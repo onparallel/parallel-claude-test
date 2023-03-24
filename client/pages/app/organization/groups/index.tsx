@@ -13,7 +13,7 @@ import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { useCreateGroupDialog } from "@parallel/components/organization/dialogs/CreateGroupDialog";
 import { OrganizationGroupsListTableHeader } from "@parallel/components/organization/OrganizationGroupsListTableHeader";
 import {
@@ -35,7 +35,6 @@ import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { isAdmin } from "@parallel/utils/roles";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -79,8 +78,6 @@ function OrganizationGroups() {
   const canEdit = isAdmin(me.role);
 
   const [search, setSearch] = useState(state.search);
-
-  const sections = useOrganizationSections(me);
 
   const columns = useOrganizationGroupsTableColumns();
 
@@ -221,18 +218,13 @@ function OrganizationGroups() {
   };
 
   return (
-    <SettingsLayout
+    <OrganizationSettingsLayout
       title={intl.formatMessage({
         id: "view.groups.title",
         defaultMessage: "Teams",
       })}
-      basePath="/app/organization"
-      sections={sections}
       me={me}
       realMe={realMe}
-      sectionsHeader={
-        <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
-      }
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="view.groups.title" defaultMessage="Teams" />
@@ -320,7 +312,7 @@ function OrganizationGroups() {
           }
         />
       </Flex>
-    </SettingsLayout>
+    </OrganizationSettingsLayout>
   );
 }
 
@@ -509,9 +501,9 @@ OrganizationGroups.queries = [
   `,
   gql`
     query OrganizationGroups_user {
-      ...SettingsLayout_Query
+      ...OrganizationSettingsLayout_Query
     }
-    ${SettingsLayout.fragments.Query}
+    ${OrganizationSettingsLayout.fragments.Query}
   `,
 ];
 
