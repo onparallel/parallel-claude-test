@@ -329,7 +329,7 @@ export class PetitionBinder implements IPetitionBinder {
           if (code === 0) {
             resolve();
           } else {
-            reject();
+            reject(new Error(`Error running "${command}" with args ${args}`));
           }
         });
     });

@@ -1,3 +1,4 @@
+import fastSafeStringify from "fast-safe-stringify";
 import { Readable } from "stream";
 import { WorkerContext } from "../../context";
 import { Task, TaskOutput } from "../../db/repositories/TaskRepository";
@@ -23,6 +24,13 @@ export abstract class TaskRunner<T extends TaskName> {
         await this.ctx.tasks.taskFailed(
           this.task.id,
           { message: error.message, stack: error.stack },
+          `TaskWorker:${this.task.id}`
+        );
+      } else {
+        this.ctx.logger.error(`Unknnown Error ${fastSafeStringify(error)}`);
+        await this.ctx.tasks.taskFailed(
+          this.task.id,
+          { message: `Unknnown Error ${fastSafeStringify(error)}` },
           `TaskWorker:${this.task.id}`
         );
       }
