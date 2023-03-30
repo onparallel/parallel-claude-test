@@ -12,10 +12,13 @@ import { fromGlobalId } from "../util/globalId";
 import { pFlatMap } from "../util/promises/pFlatMap";
 import { random } from "../util/token";
 import { Maybe } from "../util/types";
-import { FETCH_SERVICE, IFetchService } from "./fetch";
-import { IImageService, IMAGE_SERVICE } from "./image";
-import { OrganizationCreditsService, ORGANIZATION_CREDITS_SERVICE } from "./organization-credits";
-import { StorageService, STORAGE_SERVICE } from "./storage";
+import { FETCH_SERVICE, IFetchService } from "./FetchService";
+import { IImageService, IMAGE_SERVICE } from "./ImageService";
+import {
+  OrganizationCreditsService,
+  ORGANIZATION_CREDITS_SERVICE,
+} from "./OrganizationCreditsService";
+import { StorageService, STORAGE_SERVICE } from "./StorageService";
 
 type SessionMetadata =
   | { fieldId: string; orgId: string } & ({ userId: string } | { accessId: string });

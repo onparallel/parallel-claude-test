@@ -1,44 +1,44 @@
 import { ContainerModule } from "inversify";
-import { ANALYTICS, AnalyticsService, IAnalyticsService } from "./analytics";
-import { AUTH, Auth, IAuth } from "./auth";
-import { BankflipService, BANKFLIP_SERVICE, IBankflipService } from "./bankflip";
+import { ANALYTICS, AnalyticsService, IAnalyticsService } from "./AnalyticsService";
+import { AUTH, Auth, IAuth } from "./AuthService";
+import { BankflipService, BANKFLIP_SERVICE, IBankflipService } from "./BankflipService";
 import {
   BankflipLegacyService,
   BANKFLIP_LEGACY_SERVICE,
   IBankflipLegacyService,
-} from "./bankflip-legacy";
-import { DowJonesClient, DOW_JONES_CLIENT, IDowJonesClient } from "./dowjones";
-import { EMAILS, EmailsService, IEmailsService } from "./emails";
-import { FetchService, FETCH_SERVICE, IFetchService } from "./fetch";
-import { I18nService, I18N_SERVICE, II18nService } from "./i18n";
-import { IImageService, ImageService, IMAGE_SERVICE } from "./image";
-import { createLogger, ILogger, LOGGER } from "./logger";
+} from "./BankflipLegacyService";
+import { DowJonesClient, DOW_JONES_CLIENT, IDowJonesClient } from "./DowJonesClient";
+import { EMAILS, EmailsService, IEmailsService } from "./EmailsService";
+import { FetchService, FETCH_SERVICE, IFetchService } from "./FetchService";
+import { I18nService, I18N_SERVICE, II18nService } from "./I18nService";
+import { IImageService, ImageService, IMAGE_SERVICE } from "./ImageService";
+import { createLogger, ILogger, LOGGER } from "./Logger";
 import {
   IOrganizationCreditsService,
   OrganizationCreditsService,
   ORGANIZATION_CREDITS_SERVICE,
-} from "./organization-credits";
+} from "./OrganizationCreditsService";
 import {
   IOrganizationLayoutService,
   OrganizationLayoutService,
   ORGANIZATION_LAYOUT_SERVICE,
-} from "./organization-layout";
-import { IPetitionBinder, PetitionBinder, PETITION_BINDER } from "./petition-binder";
+} from "./OrganizationLayoutService";
+import { IPetitionBinder, PetitionBinder, PETITION_BINDER } from "./PetitionBinder";
 import {
   IPetitionImportExportService,
   PetitionImportExportService,
   PETITION_IMPORT_EXPORT_SERVICE,
-} from "./petition-import-export";
-import { IPrinter, Printer, PRINTER } from "./printer";
-import { IQueuesService, QueuesService, QUEUES_SERVICE } from "./queues";
-import { IRedis, REDIS, Redis } from "./redis";
-import { IReportsService, ReportsService, REPORTS_SERVICE } from "./reports";
-import { IEncryptionService, EncryptionService, ENCRYPTION_SERVICE } from "./encryption";
+} from "./PetitionImportExportService";
+import { IPrinter, Printer, PRINTER } from "./Printer";
+import { IQueuesService, QueuesService, QUEUES_SERVICE } from "./QueuesService";
+import { IRedis, REDIS, Redis } from "./Redis";
+import { IReportsService, ReportsService, REPORTS_SERVICE } from "./ReportsService";
+import { IEncryptionService, EncryptionService, ENCRYPTION_SERVICE } from "./EncryptionService";
 import { ISetupService, SetupService, SETUP_SERVICE } from "./setup";
-import { ISignatureService, SIGNATURE, SignatureService } from "./signature";
-import { ISmtp, Smtp, SMTP } from "./smtp";
-import { IStorageService, StorageService, STORAGE_SERVICE } from "./storage";
-import { ITiersService, TiersService, TIERS_SERVICE } from "./tiers";
+import { ISignatureService, SIGNATURE, SignatureService } from "./SignatureService";
+import { ISmtp, Smtp, SMTP } from "./Smtp";
+import { IStorageService, StorageService, STORAGE_SERVICE } from "./StorageService";
+import { ITiersService, TiersService, TIERS_SERVICE } from "./TiersService";
 
 export const servicesModule = new ContainerModule((bind) => {
   bind<ILogger>(LOGGER).toDynamicValue(createLogger).inSingletonScope();

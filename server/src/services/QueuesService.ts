@@ -10,7 +10,7 @@ import { unMaybeArray } from "../util/arrays";
 import { awsLogger } from "../util/awsLogger";
 import { MaybeArray } from "../util/types";
 import { QueueWorkerPayload } from "../workers/helpers/createQueueWorker";
-import { ILogger, LOGGER } from "./logger";
+import { ILogger, LOGGER } from "./Logger";
 
 export interface IQueuesService {
   enqueueMessages<Q extends keyof Config["queueWorkers"]>(

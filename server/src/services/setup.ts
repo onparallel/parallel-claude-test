@@ -12,7 +12,7 @@ import {
   SignaturitEnvironment,
   SignaturitIntegration,
 } from "../integrations/SignaturitIntegration";
-import { FETCH_SERVICE, IFetchService } from "./fetch";
+import { FETCH_SERVICE, IFetchService } from "./FetchService";
 
 export const SETUP_SERVICE = Symbol.for("SETUP_SERVICE");
 export interface ISetupService {

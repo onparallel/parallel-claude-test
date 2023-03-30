@@ -10,7 +10,7 @@ import {
   User,
   UserGroup,
 } from "../../db/__types";
-import { EMAILS, IEmailsService } from "../../services/emails";
+import { EMAILS, IEmailsService } from "../../services/EmailsService";
 import { toGlobalId } from "../../util/globalId";
 import { Maybe, MaybeArray } from "../../util/types";
 import { initServer, TestClient } from "./server";

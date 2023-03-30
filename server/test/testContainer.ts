@@ -1,12 +1,12 @@
 import { createContainer } from "../src/container";
-import { ANALYTICS, IAnalyticsService } from "../src/services/analytics";
-import { AUTH, IAuth } from "../src/services/auth";
-import { EMAILS, IEmailsService } from "../src/services/emails";
-import { FETCH_SERVICE, IFetchService } from "../src/services/fetch";
-import { ILogger, LOGGER } from "../src/services/logger";
-import { IQueuesService, QUEUES_SERVICE } from "../src/services/queues";
-import { IRedis, REDIS } from "../src/services/redis";
-import { IStorageService, STORAGE_SERVICE } from "../src/services/storage";
+import { ANALYTICS, IAnalyticsService } from "../src/services/AnalyticsService";
+import { AUTH, IAuth } from "../src/services/AuthService";
+import { EMAILS, IEmailsService } from "../src/services/EmailsService";
+import { FETCH_SERVICE, IFetchService } from "../src/services/FetchService";
+import { ILogger, LOGGER } from "../src/services/Logger";
+import { IQueuesService, QUEUES_SERVICE } from "../src/services/QueuesService";
+import { IRedis, REDIS } from "../src/services/Redis";
+import { IStorageService, STORAGE_SERVICE } from "../src/services/StorageService";
 import {
   MockAnalyticsService,
   MockAuth,

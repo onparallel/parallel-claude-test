@@ -1,7 +1,7 @@
 import { booleanArg, list, mutationField, nonNull, stringArg } from "nexus";
 import { isDefined } from "remeda";
 import { PetitionEventSubscription } from "../../db/__types";
-import { IFetchService } from "../../services/fetch";
+import { IFetchService } from "../../services/FetchService";
 import { generateEDKeyPair } from "../../util/keyPairs";
 import { withError } from "../../util/promises/withError";
 import { and, authenticateAnd, ifArgDefined } from "../helpers/authorize";

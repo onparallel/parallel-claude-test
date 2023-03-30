@@ -19,7 +19,7 @@ import { unMaybeArray } from "../util/arrays";
 import { awsLogger } from "../util/awsLogger";
 import { retry } from "../util/retry";
 import { MaybeArray } from "../util/types";
-import { ILogger, LOGGER } from "./logger";
+import { ILogger, LOGGER } from "./Logger";
 
 export interface IStorageImpl {
   getSignedUploadEndpoint(

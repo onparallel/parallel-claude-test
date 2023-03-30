@@ -1,5 +1,5 @@
 import { randomBytes } from "crypto";
-import { EncryptionService } from "../encryption";
+import { EncryptionService } from "../EncryptionService";
 
 describe("EncryptionService", () => {
   it("should encrypt and decrypt a JSON object", () => {

@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { IQueuesService, QUEUES_SERVICE } from "../../services/queues";
+import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { Maybe, Replace } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";

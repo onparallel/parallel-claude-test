@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { groupBy, indexBy, omit, uniq } from "remeda";
-import { I18N_SERVICE, II18nService } from "../../services/i18n";
+import { I18N_SERVICE, II18nService } from "../../services/I18nService";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
 import { Maybe, MaybeArray } from "../../util/types";

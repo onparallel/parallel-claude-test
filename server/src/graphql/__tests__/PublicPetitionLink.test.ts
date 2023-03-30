@@ -12,7 +12,7 @@ import {
   User,
   UserGroup,
 } from "../../db/__types";
-import { EMAILS, IEmailsService } from "../../services/emails";
+import { EMAILS, IEmailsService } from "../../services/EmailsService";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 import { faker } from "@faker-js/faker";

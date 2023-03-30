@@ -13,8 +13,13 @@ import { InvalidCredentialsError } from "../../integrations/GenericIntegration";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { safeJsonParse } from "../../util/safeJsonParse";
-import { I18N_SERVICE, II18nService } from "../i18n";
-import { ISignatureClient, Recipient, SignatureOptions, SignatureResponse } from "./client";
+import { I18N_SERVICE, II18nService } from "../I18nService";
+import {
+  ISignatureClient,
+  Recipient,
+  SignatureOptions,
+  SignatureResponse,
+} from "./SignatureClient";
 
 interface UserInfoResponse {
   accounts: { accountId: string; baseUri: string; isDefault: "true" | "false" }[];

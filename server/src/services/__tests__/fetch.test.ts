@@ -3,7 +3,7 @@ const fetch = require("node-fetch");
 const { Response } = jest.requireActual("node-fetch");
 import { RequestInfo, RequestInit } from "node-fetch";
 import { waitFor } from "../../util/promises/waitFor";
-import { FetchService, IFetchService, TimeoutError } from "../fetch";
+import { FetchService, IFetchService, TimeoutError } from "../FetchService";
 
 function flushPromises() {
   return new Promise(jest.requireActual("timers").setImmediate);

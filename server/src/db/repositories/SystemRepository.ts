@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { QUEUES_SERVICE, IQueuesService } from "../../services/queues";
+import { QUEUES_SERVICE, IQueuesService } from "../../services/QueuesService";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { CreateSystemEvent } from "../events";

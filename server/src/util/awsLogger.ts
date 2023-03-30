@@ -1,6 +1,6 @@
 import { Logger } from "@aws-sdk/types";
 import fastSafeStringify from "fast-safe-stringify";
-import { ILogger } from "../services/logger";
+import { ILogger } from "../services/Logger";
 
 export function awsLogger(logger: ILogger) {
   return Object.fromEntries(

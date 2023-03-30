@@ -1,6 +1,9 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { json, Request, Response, Router } from "express";
-import { ModelExtractedWebhookEvent, SessionCompletedWebhookEvent } from "../services/bankflip";
+import {
+  ModelExtractedWebhookEvent,
+  SessionCompletedWebhookEvent,
+} from "../services/BankflipService";
 
 type BankflipWebhookBody = ModelExtractedWebhookEvent | SessionCompletedWebhookEvent;
 

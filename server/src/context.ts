@@ -19,39 +19,39 @@ import { UserAuthenticationRepository } from "./db/repositories/UserAuthenticati
 import { UserGroupRepository } from "./db/repositories/UserGroupRepository";
 import { UserRepository } from "./db/repositories/UserRepository";
 import { Contact, Organization, PetitionAccess, User } from "./db/__types";
-import { ANALYTICS, IAnalyticsService } from "./services/analytics";
-import { AUTH, IAuth } from "./services/auth";
-import { BANKFLIP_SERVICE, IBankflipService } from "./services/bankflip";
-import { BANKFLIP_LEGACY_SERVICE, IBankflipLegacyService } from "./services/bankflip-legacy";
-import { DOW_JONES_CLIENT, IDowJonesClient } from "./services/dowjones";
-import { EMAILS, IEmailsService } from "./services/emails";
-import { FETCH_SERVICE, IFetchService } from "./services/fetch";
-import { I18N_SERVICE, II18nService } from "./services/i18n";
-import { IImageService, IMAGE_SERVICE } from "./services/image";
-import { ILogger, LOGGER } from "./services/logger";
+import { ANALYTICS, IAnalyticsService } from "./services/AnalyticsService";
+import { AUTH, IAuth } from "./services/AuthService";
+import { BANKFLIP_SERVICE, IBankflipService } from "./services/BankflipService";
+import { BANKFLIP_LEGACY_SERVICE, IBankflipLegacyService } from "./services/BankflipLegacyService";
+import { DOW_JONES_CLIENT, IDowJonesClient } from "./services/DowJonesClient";
+import { EMAILS, IEmailsService } from "./services/EmailsService";
+import { FETCH_SERVICE, IFetchService } from "./services/FetchService";
+import { I18N_SERVICE, II18nService } from "./services/I18nService";
+import { IImageService, IMAGE_SERVICE } from "./services/ImageService";
+import { ILogger, LOGGER } from "./services/Logger";
 import {
   IOrganizationCreditsService,
   ORGANIZATION_CREDITS_SERVICE,
-} from "./services/organization-credits";
+} from "./services/OrganizationCreditsService";
 import {
   IOrganizationLayoutService,
   ORGANIZATION_LAYOUT_SERVICE,
-} from "./services/organization-layout";
-import { IPetitionBinder, PETITION_BINDER } from "./services/petition-binder";
+} from "./services/OrganizationLayoutService";
+import { IPetitionBinder, PETITION_BINDER } from "./services/PetitionBinder";
 import {
   IPetitionImportExportService,
   PETITION_IMPORT_EXPORT_SERVICE,
-} from "./services/petition-import-export";
-import { IPrinter, PRINTER } from "./services/printer";
-import { IQueuesService, QUEUES_SERVICE } from "./services/queues";
-import { IRedis, REDIS } from "./services/redis";
-import { IReportsService, REPORTS_SERVICE } from "./services/reports";
-import { EncryptionService, ENCRYPTION_SERVICE } from "./services/encryption";
+} from "./services/PetitionImportExportService";
+import { IPrinter, PRINTER } from "./services/Printer";
+import { IQueuesService, QUEUES_SERVICE } from "./services/QueuesService";
+import { IRedis, REDIS } from "./services/Redis";
+import { IReportsService, REPORTS_SERVICE } from "./services/ReportsService";
+import { EncryptionService, ENCRYPTION_SERVICE } from "./services/EncryptionService";
 import { SetupService, SETUP_SERVICE } from "./services/setup";
-import { ISignatureService, SIGNATURE } from "./services/signature";
-import { ISmtp, SMTP } from "./services/smtp";
-import { IStorageService, STORAGE_SERVICE } from "./services/storage";
-import { ITiersService, TIERS_SERVICE } from "./services/tiers";
+import { ISignatureService, SIGNATURE } from "./services/SignatureService";
+import { ISmtp, SMTP } from "./services/Smtp";
+import { IStorageService, STORAGE_SERVICE } from "./services/StorageService";
+import { ITiersService, TIERS_SERVICE } from "./services/TiersService";
 
 @injectable()
 export class ApiContext {

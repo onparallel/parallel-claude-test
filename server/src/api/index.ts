@@ -2,7 +2,7 @@ import { ErrorRequestHandler, Router } from "express";
 import { Container } from "inversify";
 import morgan from "morgan";
 import { ApiContext } from "../context";
-import { ILogger, LOGGER } from "../services/logger";
+import { ILogger, LOGGER } from "../services/Logger";
 import { auth } from "./auth";
 import { lambdas } from "./lambdas";
 import { oauth } from "./oauth";

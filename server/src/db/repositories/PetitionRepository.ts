@@ -20,9 +20,9 @@ import {
   zip,
 } from "remeda";
 import { RESULT } from "../../graphql";
-import { ILogger, LOGGER } from "../../services/logger";
-import { QueuesService, QUEUES_SERVICE } from "../../services/queues";
-import { TemplateStatsReportInput } from "../../services/reports";
+import { ILogger, LOGGER } from "../../services/Logger";
+import { QueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
+import { TemplateStatsReportInput } from "../../services/ReportsService";
 import { average, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fieldVisibility";

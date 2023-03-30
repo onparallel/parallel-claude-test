@@ -2,7 +2,7 @@ import { Duration } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { indexBy, isDefined, uniq } from "remeda";
-import { EMAILS, IEmailsService } from "../../services/emails";
+import { EMAILS, IEmailsService } from "../../services/EmailsService";
 import { unMaybeArray } from "../../util/arrays";
 import { BrandTheme, defaultBrandTheme } from "../../util/BrandTheme";
 import { fromGlobalId, isGlobalId } from "../../util/globalId";

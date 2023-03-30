@@ -1,7 +1,7 @@
 import { createTaggedDecorator, interfaces } from "inversify";
 import { Knex, knex } from "knex";
 import { CONFIG, Config } from "../config";
-import { ILogger, LOGGER } from "../services/logger";
+import { ILogger, LOGGER } from "../services/Logger";
 import "./helpers/knexExtensions";
 import { TableTypes } from "./__types";
 import pg from "pg";

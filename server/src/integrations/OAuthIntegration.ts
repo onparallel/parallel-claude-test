@@ -8,8 +8,8 @@ import {
   IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
 import { IntegrationType } from "../db/__types";
-import { IRedis } from "../services/redis";
-import { EncryptionService } from "../services/encryption";
+import { IRedis } from "../services/Redis";
+import { EncryptionService } from "../services/EncryptionService";
 import { fromGlobalId } from "../util/globalId";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";

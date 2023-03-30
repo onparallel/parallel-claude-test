@@ -6,7 +6,7 @@ import yargs from "yargs";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
 import { WorkerContext } from "../../context";
-import { ILogger, LOGGER } from "../../services/logger";
+import { ILogger, LOGGER } from "../../services/Logger";
 import { awsLogger } from "../../util/awsLogger";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";

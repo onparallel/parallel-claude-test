@@ -5,7 +5,7 @@ import { EventEmitter } from "events";
 import { Config, CONFIG } from "../../config";
 import { createContainer } from "../../container";
 import { WorkerContext } from "../../context";
-import { LOGGER, ILogger } from "../../services/logger";
+import { LOGGER, ILogger } from "../../services/Logger";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
 import yargs from "yargs";

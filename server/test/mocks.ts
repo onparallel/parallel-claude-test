@@ -5,13 +5,13 @@ import { UserAuthenticationRepository } from "../src/db/repositories/UserAuthent
 import { UserRepository } from "../src/db/repositories/UserRepository";
 import { User } from "../src/db/__types";
 import { EMAIL_REGEX } from "../src/graphql/helpers/validators/validEmail";
-import { IAnalyticsService } from "../src/services/analytics";
-import { IAuth } from "../src/services/auth";
-import { IEmailsService } from "../src/services/emails";
-import { IFetchService } from "../src/services/fetch";
-import { IQueuesService } from "../src/services/queues";
-import { IRedis } from "../src/services/redis";
-import { IStorageImpl, IStorageService } from "../src/services/storage";
+import { IAnalyticsService } from "../src/services/AnalyticsService";
+import { IAuth } from "../src/services/AuthService";
+import { IEmailsService } from "../src/services/EmailsService";
+import { IFetchService } from "../src/services/FetchService";
+import { IQueuesService } from "../src/services/QueuesService";
+import { IRedis } from "../src/services/Redis";
+import { IStorageImpl, IStorageService } from "../src/services/StorageService";
 import { random } from "../src/util/token";
 
 export const USER_COGNITO_ID = "test-cognito-id";

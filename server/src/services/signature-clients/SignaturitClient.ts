@@ -26,23 +26,26 @@ import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { downloadImageBase64 } from "../../util/images";
 import { retry } from "../../util/retry";
-import { EMAILS, IEmailsService } from "../emails";
-import { FETCH_SERVICE, IFetchService } from "../fetch";
-import { I18N_SERVICE, II18nService } from "../i18n";
-import { IOrganizationCreditsService, ORGANIZATION_CREDITS_SERVICE } from "../organization-credits";
+import { EMAILS, IEmailsService } from "../EmailsService";
+import { FETCH_SERVICE, IFetchService } from "../FetchService";
+import { I18N_SERVICE, II18nService } from "../I18nService";
+import {
+  IOrganizationCreditsService,
+  ORGANIZATION_CREDITS_SERVICE,
+} from "../OrganizationCreditsService";
 import {
   IOrganizationLayoutService,
   OrganizationLayout,
   ORGANIZATION_LAYOUT_SERVICE,
-} from "../organization-layout";
-import { SIGNATURE, SignatureService } from "../signature";
+} from "../OrganizationLayoutService";
+import { SIGNATURE, SignatureService } from "../SignatureService";
 import {
   CancelAbortedError,
   ISignatureClient,
   Recipient,
   SignatureOptions,
   SignatureResponse,
-} from "./client";
+} from "./SignatureClient";
 
 interface SignaturitError {
   status_code: number;

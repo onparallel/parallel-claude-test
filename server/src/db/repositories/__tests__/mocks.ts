@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { Knex } from "knex";
 import { isDefined, range } from "remeda";
 import { USER_COGNITO_ID } from "../../../../test/mocks";
-import { IEncryptionService } from "../../../services/encryption";
+import { IEncryptionService } from "../../../services/EncryptionService";
 import { unMaybeArray } from "../../../util/arrays";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";

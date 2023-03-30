@@ -7,7 +7,10 @@ import { IntegrationSettings, SignatureProvider } from "../db/repositories/Integ
 import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
 import { ContactLocale, OrgIntegration } from "../db/__types";
 import { InvalidCredentialsError } from "../integrations/GenericIntegration";
-import { CancelAbortedError, SignatureResponse } from "../services/signature-clients/client";
+import {
+  CancelAbortedError,
+  SignatureResponse,
+} from "../services/signature-clients/SignatureClient";
 import { fullName } from "../util/fullName";
 import { removeKeys } from "../util/remedaExtensions";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";

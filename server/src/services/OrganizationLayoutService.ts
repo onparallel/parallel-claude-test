@@ -4,7 +4,7 @@ import { Config, CONFIG } from "../config";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { BrandTheme } from "../util/BrandTheme";
-import { IImageService, IMAGE_SERVICE } from "./image";
+import { IImageService, IMAGE_SERVICE } from "./ImageService";
 
 export interface OrganizationLayout {
   assetsUrl: string;

@@ -19,8 +19,8 @@ import { unMaybeArray } from "../util/arrays";
 import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";
 import { MaybeArray } from "../util/types";
-import { IQueuesService, QUEUES_SERVICE } from "./queues";
-import { ISignatureClient, SIGNATURE_CLIENT } from "./signature-clients/client";
+import { IQueuesService, QUEUES_SERVICE } from "./QueuesService";
+import { ISignatureClient, SIGNATURE_CLIENT } from "./signature-clients/SignatureClient";
 
 interface UpdateBrandingOpts {
   integrationId?: number;

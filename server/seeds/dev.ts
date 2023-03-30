@@ -15,7 +15,7 @@ import {
   UserGroup,
   UserGroupMember,
 } from "../src/db/__types";
-import { EncryptionService } from "../src/services/encryption";
+import { EncryptionService } from "../src/services/EncryptionService";
 import { defaultBrandTheme } from "../src/util/BrandTheme";
 import { deleteAllData } from "../src/util/knexUtils";
 import { defaultPdfDocumentTheme } from "../src/util/PdfDocumentTheme";

@@ -13,8 +13,8 @@ import { createContainer } from "./container";
 import { ApiContext } from "./context";
 import { UnknownError } from "./graphql/helpers/errors";
 import { schema } from "./schema";
-import { ILogger, LOGGER } from "./services/logger";
-import { IRedis, REDIS } from "./services/redis";
+import { ILogger, LOGGER } from "./services/Logger";
+import { IRedis, REDIS } from "./services/Redis";
 import { stopwatchEnd } from "./util/stopwatch";
 import assert from "assert";
 

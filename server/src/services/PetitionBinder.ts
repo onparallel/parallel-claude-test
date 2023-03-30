@@ -21,9 +21,9 @@ import { isFileTypeField } from "../util/isFileTypeField";
 import { pFlatMap } from "../util/promises/pFlatMap";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
-import { ILogger, LOGGER } from "./logger";
-import { IPrinter, PRINTER } from "./printer";
-import { IStorageService, STORAGE_SERVICE } from "./storage";
+import { ILogger, LOGGER } from "./Logger";
+import { IPrinter, PRINTER } from "./Printer";
+import { IStorageService, STORAGE_SERVICE } from "./StorageService";
 
 function isPrintableContentType(contentType: string) {
   return [

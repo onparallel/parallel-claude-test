@@ -3,7 +3,7 @@ import { isDefined } from "remeda";
 import { Config, CONFIG } from "../config";
 import { getBaseWebhookUrl } from "../util/getBaseWebhookUrl";
 import { sign } from "../util/jwt";
-import { FETCH_SERVICE, IFetchService } from "./fetch";
+import { FETCH_SERVICE, IFetchService } from "./FetchService";
 
 export const BANKFLIP_LEGACY_SERVICE = Symbol.for("BANKFLIP_LEGACY_SERVICE");
 

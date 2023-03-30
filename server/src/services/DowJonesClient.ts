@@ -4,7 +4,7 @@ import { DowJonesIntegration } from "../integrations/DowJonesIntegration";
 import { ExpiredCredentialsError } from "../integrations/ExpirableCredentialsIntegration";
 import { InvalidCredentialsError } from "../integrations/GenericIntegration";
 import { Maybe } from "../util/types";
-import { FETCH_SERVICE, IFetchService } from "./fetch";
+import { FETCH_SERVICE, IFetchService } from "./FetchService";
 
 export const DOW_JONES_CLIENT = Symbol.for("DOW_JONES_CLIENT");
 

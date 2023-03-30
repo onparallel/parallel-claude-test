@@ -3,7 +3,7 @@ import { isDefined, pick } from "remeda";
 import { ApiContext } from "../../context";
 import { SignatureStartedEvent } from "../../db/events";
 import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
-import { SignaturitEvents } from "../../services/signature-clients/signaturit";
+import { SignaturitEvents } from "../../services/signature-clients/SignaturitClient";
 import { fromGlobalId } from "../../util/globalId";
 
 export interface SignaturItEventBody {

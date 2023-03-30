@@ -5,7 +5,7 @@ import { Config, CONFIG } from "../../config";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { EventSubscriptionSignatureKey, PetitionEventSubscription, User } from "../../db/__types";
-import { IEncryptionService, ENCRYPTION_SERVICE } from "../../services/encryption";
+import { IEncryptionService, ENCRYPTION_SERVICE } from "../../services/EncryptionService";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 

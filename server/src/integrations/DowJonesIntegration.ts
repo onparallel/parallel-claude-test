@@ -6,8 +6,8 @@ import {
   IntegrationRepository,
 } from "../db/repositories/IntegrationRepository";
 import { CreateOrgIntegration } from "../db/__types";
-import { FetchService, FETCH_SERVICE } from "../services/fetch";
-import { EncryptionService, ENCRYPTION_SERVICE } from "../services/encryption";
+import { FetchService, FETCH_SERVICE } from "../services/FetchService";
+import { EncryptionService, ENCRYPTION_SERVICE } from "../services/EncryptionService";
 import { ExpirableCredentialsIntegration } from "./ExpirableCredentialsIntegration";
 import { InvalidCredentialsError } from "./GenericIntegration";
 

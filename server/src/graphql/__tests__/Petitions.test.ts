@@ -22,7 +22,7 @@ import {
   UserData,
   UserGroup,
 } from "../../db/__types";
-import { AUTH, IAuth } from "../../services/auth";
+import { AUTH, IAuth } from "../../services/AuthService";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { fromPlainText } from "../../util/slate";
 import { initServer, TestClient } from "./server";

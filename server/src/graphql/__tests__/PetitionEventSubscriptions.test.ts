@@ -4,7 +4,7 @@ import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, PetitionEvent, PetitionEventSubscription, User } from "../../db/__types";
-import { FETCH_SERVICE, IFetchService } from "../../services/fetch";
+import { FETCH_SERVICE, IFetchService } from "../../services/FetchService";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 

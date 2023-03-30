@@ -56,9 +56,9 @@ import { random } from "../util/token";
 import { Maybe, MaybePromise } from "../util/types";
 import { userHasRole } from "../util/userHasRole";
 import { EmailPayload } from "../workers/email-sender";
-import { ILogger, LOGGER } from "./logger";
-import { IQueuesService, QUEUES_SERVICE } from "./queues";
-import { IRedis, REDIS } from "./redis";
+import { ILogger, LOGGER } from "./Logger";
+import { IQueuesService, QUEUES_SERVICE } from "./QueuesService";
+import { IRedis, REDIS } from "./Redis";
 
 export interface IAuth {
   guessLogin: RequestHandler;

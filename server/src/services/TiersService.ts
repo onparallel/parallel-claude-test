@@ -7,7 +7,7 @@ import {
   OrganizationUsageDetails,
 } from "../db/repositories/OrganizationRepository";
 import { FeatureFlagName, Organization } from "../db/__types";
-import { SIGNATURE, SignatureService } from "./signature";
+import { SIGNATURE, SignatureService } from "./SignatureService";
 
 export const TIERS_SERVICE = Symbol.for("TIERS_SERVICE");
 

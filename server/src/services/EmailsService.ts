@@ -10,7 +10,7 @@ import { EMAIL_REGEX } from "../graphql/helpers/validators/validEmail";
 import { unMaybeArray } from "../util/arrays";
 import { Maybe, MaybeArray } from "../util/types";
 import { EmailPayload } from "../workers/email-sender";
-import { QueuesService, QUEUES_SERVICE } from "./queues";
+import { QueuesService, QUEUES_SERVICE } from "./QueuesService";
 
 export interface IEmailsService {
   sendPetitionMessageEmail(messageIds: MaybeArray<number>): Promise<void>;

@@ -9,9 +9,9 @@ import {
   IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
 import { FeatureFlagName, OrgIntegration } from "../db/__types";
-import { FetchService, FETCH_SERVICE } from "../services/fetch";
-import { IRedis, REDIS } from "../services/redis";
-import { EncryptionService, ENCRYPTION_SERVICE } from "../services/encryption";
+import { FetchService, FETCH_SERVICE } from "../services/FetchService";
+import { IRedis, REDIS } from "../services/Redis";
+import { EncryptionService, ENCRYPTION_SERVICE } from "../services/EncryptionService";
 import { Replace } from "../util/types";
 import { InvalidCredentialsError } from "./GenericIntegration";
 import { OauthCredentials, OAuthIntegration, OauthIntegrationState } from "./OAuthIntegration";

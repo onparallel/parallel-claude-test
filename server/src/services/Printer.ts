@@ -7,7 +7,7 @@ import AnnexCoverPage, { AnnexCoverPageProps } from "../pdf/documents/AnnexCover
 import ImageToPdf, { ImageToPdfProps } from "../pdf/documents/ImageToPdf";
 import PetitionExport, { PetitionExportInitialData } from "../pdf/documents/PetitionExport";
 import { toGlobalId } from "../util/globalId";
-import { AUTH, IAuth } from "./auth";
+import { AUTH, IAuth } from "./AuthService";
 
 export interface IPrinter {
   petitionExport(

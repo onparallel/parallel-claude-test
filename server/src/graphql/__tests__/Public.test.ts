@@ -12,7 +12,7 @@ import {
   PetitionFieldReply,
   Task,
 } from "../../db/__types";
-import { EMAILS, IEmailsService } from "../../services/emails";
+import { EMAILS, IEmailsService } from "../../services/EmailsService";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 
