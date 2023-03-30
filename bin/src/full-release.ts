@@ -7,6 +7,7 @@ async function main() {
     commit: _commit,
     env,
     skipBuild,
+    skipPrune,
   } = await yargs
     .usage("Usage: $0 --commit [commit] --env [env]")
     .option("commit", {
@@ -23,6 +24,11 @@ async function main() {
       default: false,
       type: "boolean",
       description: "Wether to skip the build step",
+    })
+    .option("skip-prune", {
+      default: false,
+      type: "boolean",
+      description: "Wether to skip the prune step",
     }).argv;
 
   const commit = _commit.slice(0, 7);
@@ -31,7 +37,7 @@ async function main() {
     ...(skipBuild ? [] : [`yarn build-release --commit ${commit} --env ${env}`]),
     `yarn launch-instance --commit ${commit} --env ${env}`,
     `yarn switch-release --commit ${commit} --env ${env}`,
-    `yarn prune-instances --env ${env}`,
+    ...(skipPrune ? [] : [`yarn prune-instances --env ${env}`]),
   ]) {
     execSync(command, { encoding: "utf-8", stdio: "inherit" });
   }

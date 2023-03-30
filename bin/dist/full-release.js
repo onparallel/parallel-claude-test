@@ -7,7 +7,7 @@ const child_process_1 = require("child_process");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 async function main() {
-    const { commit: _commit, env, skipBuild, } = await yargs_1.default
+    const { commit: _commit, env, skipBuild, skipPrune, } = await yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")
         .option("commit", {
         required: true,
@@ -23,13 +23,18 @@ async function main() {
         default: false,
         type: "boolean",
         description: "Wether to skip the build step",
+    })
+        .option("skip-prune", {
+        default: false,
+        type: "boolean",
+        description: "Wether to skip the prune step",
     }).argv;
     const commit = _commit.slice(0, 7);
     for (const command of [
         ...(skipBuild ? [] : [`yarn build-release --commit ${commit} --env ${env}`]),
         `yarn launch-instance --commit ${commit} --env ${env}`,
         `yarn switch-release --commit ${commit} --env ${env}`,
-        `yarn prune-instances --env ${env}`,
+        ...(skipPrune ? [] : [`yarn prune-instances --env ${env}`]),
     ]) {
         (0, child_process_1.execSync)(command, { encoding: "utf-8", stdio: "inherit" });
     }

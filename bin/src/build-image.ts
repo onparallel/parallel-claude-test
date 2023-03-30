@@ -17,7 +17,7 @@ import assert from "assert";
 import chalk from "chalk";
 import { execSync } from "child_process";
 import path from "path";
-import { isDefined, maxBy } from "remeda";
+import { isDefined } from "remeda";
 import { run } from "./utils/run";
 import { timestamp } from "./utils/timestamp";
 import { wait, waitFor } from "./utils/wait";
@@ -35,16 +35,10 @@ const ec2 = new EC2Client({
 });
 
 async function main() {
-  const imagesResult = await ec2.send(
-    new DescribeImagesCommand({
-      Owners: ["amazon"],
-      Filters: [{ Name: "name", Values: ["amzn2-ami-kernel-5.10-hvm-*-x86_64-gp2"] }],
-    })
-  );
-  const image = maxBy(imagesResult.Images!, (i) => new Date(i.CreationDate!).valueOf())!;
+  const name = `parallel-server-${timestamp()}`;
   const instanceResult = await ec2.send(
     new RunInstancesCommand({
-      ImageId: image.ImageId!,
+      ImageId: "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64",
       KeyName: KEY_NAME,
       SecurityGroupIds: SECURITY_GROUP_IDS,
       InstanceType: INSTANCE_TYPE,
@@ -70,6 +64,7 @@ async function main() {
       ],
       TagSpecifications: [
         { ResourceType: ResourceType.instance, Tags: [{ Key: "Name", Value: `image-build` }] },
+        { ResourceType: ResourceType.volume, Tags: [{ Key: "Name", Value: name }] },
       ],
       MetadataOptions: {
         HttpEndpoint: InstanceMetadataEndpointState.enabled,
@@ -120,7 +115,11 @@ async function main() {
   const createImageResult = await ec2.send(
     new CreateImageCommand({
       InstanceId: instanceId,
-      Name: `parallel-server-${timestamp()}`,
+      Name: name,
+      TagSpecifications: [
+        { ResourceType: ResourceType.image, Tags: [{ Key: "Name", Value: name }] },
+        { ResourceType: ResourceType.snapshot, Tags: [{ Key: "Name", Value: name }] },
+      ],
     })
   );
   const imageId = createImageResult.ImageId!;

@@ -24,13 +24,9 @@ const ec2 = new client_ec2_1.EC2Client({
     credentials: (0, credential_providers_1.fromIni)({ profile: "santi-admin" }),
 });
 async function main() {
-    const imagesResult = await ec2.send(new client_ec2_1.DescribeImagesCommand({
-        Owners: ["amazon"],
-        Filters: [{ Name: "name", Values: ["amzn2-ami-kernel-5.10-hvm-*-x86_64-gp2"] }],
-    }));
-    const image = (0, remeda_1.maxBy)(imagesResult.Images, (i) => new Date(i.CreationDate).valueOf());
+    const name = `parallel-server-${(0, timestamp_1.timestamp)()}`;
     const instanceResult = await ec2.send(new client_ec2_1.RunInstancesCommand({
-        ImageId: image.ImageId,
+        ImageId: "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64",
         KeyName: KEY_NAME,
         SecurityGroupIds: SECURITY_GROUP_IDS,
         InstanceType: INSTANCE_TYPE,
@@ -56,6 +52,7 @@ async function main() {
         ],
         TagSpecifications: [
             { ResourceType: client_ec2_1.ResourceType.instance, Tags: [{ Key: "Name", Value: `image-build` }] },
+            { ResourceType: client_ec2_1.ResourceType.volume, Tags: [{ Key: "Name", Value: name }] },
         ],
         MetadataOptions: {
             HttpEndpoint: client_ec2_1.InstanceMetadataEndpointState.enabled,
@@ -94,7 +91,11 @@ async function main() {
     console.log("Creating Image.");
     const createImageResult = await ec2.send(new client_ec2_1.CreateImageCommand({
         InstanceId: instanceId,
-        Name: `parallel-server-${(0, timestamp_1.timestamp)()}`,
+        Name: name,
+        TagSpecifications: [
+            { ResourceType: client_ec2_1.ResourceType.image, Tags: [{ Key: "Name", Value: name }] },
+            { ResourceType: client_ec2_1.ResourceType.snapshot, Tags: [{ Key: "Name", Value: name }] },
+        ],
     }));
     const imageId = createImageResult.ImageId;
     console.log(chalk_1.default.green `Image created: ${imageId}`);

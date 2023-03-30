@@ -798,7 +798,8 @@ export class Auth implements IAuth {
             }
           }
           return users.length > 0 ? ([users[0]] as [User]) : null;
-        } catch (error: any) {
+        } catch (error) {
+          this.logger.error(error);
           return null;
         }
       })();
