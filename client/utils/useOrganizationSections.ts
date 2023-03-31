@@ -37,7 +37,7 @@ export function useOrganizationSections(user: useOrganizationSections_UserFragme
                 id: "organization.profiles.title",
                 defaultMessage: "Profiles",
               }),
-              path: "/app/organization/profiles",
+              path: "/app/organization/profiles/types",
             },
           ]
         : []),

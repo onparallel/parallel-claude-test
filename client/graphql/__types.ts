@@ -6889,6 +6889,45 @@ export type useDowJonesIntegrationDialog_createDowJonesKycIntegrationMutation = 
   createDowJonesKycIntegration: { __typename?: "OrgIntegration"; id: string };
 };
 
+export type OrganizationProfilesLayout_QueryFragment = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasProfilesAccess: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      iconUrl92?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
 export type EmailEventsIndicator_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
   bouncedAt?: string | null;
@@ -16950,9 +16989,50 @@ export type IntegrationsSignature_userQuery = {
   };
 };
 
-export type OrganizationProfiles_userQueryVariables = Exact<{ [key: string]: never }>;
+export type OrganizationProfileType_userQueryVariables = Exact<{ [key: string]: never }>;
 
-export type OrganizationProfiles_userQuery = {
+export type OrganizationProfileType_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasProfilesAccess: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      iconUrl92?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
+export type OrganizationProfileTypes_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type OrganizationProfileTypes_userQuery = {
   me: {
     __typename?: "User";
     id: string;
@@ -28574,23 +28654,6 @@ export const TaskProgressDialog_TaskFragmentDoc = gql`
     progress
   }
 ` as unknown as DocumentNode<TaskProgressDialog_TaskFragment, unknown>;
-export const useOrganizationSections_UserFragmentDoc = gql`
-  fragment useOrganizationSections_User on User {
-    role
-    hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
-  }
-` as unknown as DocumentNode<useOrganizationSections_UserFragment, unknown>;
-export const OrganizationSettingsLayout_QueryFragmentDoc = gql`
-  fragment OrganizationSettingsLayout_Query on Query {
-    ...SidebarLayout_Query
-    me {
-      id
-      ...useOrganizationSections_User
-    }
-  }
-  ${SidebarLayout_QueryFragmentDoc}
-  ${useOrganizationSections_UserFragmentDoc}
-` as unknown as DocumentNode<OrganizationSettingsLayout_QueryFragment, unknown>;
 export const PetitionHeader_PetitionBase_updatePathFragmentDoc = gql`
   fragment PetitionHeader_PetitionBase_updatePath on PetitionBase {
     path
@@ -28936,6 +28999,29 @@ export const CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragmentDoc = gq
     isDefault
   }
 ` as unknown as DocumentNode<CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment, unknown>;
+export const useOrganizationSections_UserFragmentDoc = gql`
+  fragment useOrganizationSections_User on User {
+    role
+    hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
+  }
+` as unknown as DocumentNode<useOrganizationSections_UserFragment, unknown>;
+export const OrganizationSettingsLayout_QueryFragmentDoc = gql`
+  fragment OrganizationSettingsLayout_Query on Query {
+    ...SidebarLayout_Query
+    me {
+      id
+      ...useOrganizationSections_User
+    }
+  }
+  ${SidebarLayout_QueryFragmentDoc}
+  ${useOrganizationSections_UserFragmentDoc}
+` as unknown as DocumentNode<OrganizationSettingsLayout_QueryFragment, unknown>;
+export const OrganizationProfilesLayout_QueryFragmentDoc = gql`
+  fragment OrganizationProfilesLayout_Query on Query {
+    ...OrganizationSettingsLayout_Query
+  }
+  ${OrganizationSettingsLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<OrganizationProfilesLayout_QueryFragment, unknown>;
 export const PetitionRemindersConfig_RemindersConfigFragmentDoc = gql`
   fragment PetitionRemindersConfig_RemindersConfig on RemindersConfig {
     offset
@@ -36041,9 +36127,9 @@ export const OrganizationGroup_userGroupDocument = gql`
 >;
 export const OrganizationGroup_userDocument = gql`
   query OrganizationGroup_user {
-    ...AppLayout_Query
+    ...OrganizationSettingsLayout_Query
   }
-  ${AppLayout_QueryFragmentDoc}
+  ${OrganizationSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<OrganizationGroup_userQuery, OrganizationGroup_userQueryVariables>;
 export const OrganizationGroups_createUserGroupDocument = gql`
   mutation OrganizationGroups_createUserGroup($name: String!, $userIds: [GID!]!) {
@@ -36199,14 +36285,23 @@ export const IntegrationsSignature_userDocument = gql`
   IntegrationsSignature_userQuery,
   IntegrationsSignature_userQueryVariables
 >;
-export const OrganizationProfiles_userDocument = gql`
-  query OrganizationProfiles_user {
+export const OrganizationProfileType_userDocument = gql`
+  query OrganizationProfileType_user {
     ...OrganizationSettingsLayout_Query
   }
   ${OrganizationSettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<
-  OrganizationProfiles_userQuery,
-  OrganizationProfiles_userQueryVariables
+  OrganizationProfileType_userQuery,
+  OrganizationProfileType_userQueryVariables
+>;
+export const OrganizationProfileTypes_userDocument = gql`
+  query OrganizationProfileTypes_user {
+    ...OrganizationProfilesLayout_Query
+  }
+  ${OrganizationProfilesLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<
+  OrganizationProfileTypes_userQuery,
+  OrganizationProfileTypes_userQueryVariables
 >;
 export const OrganizationUsage_userDocument = gql`
   query OrganizationUsage_user {

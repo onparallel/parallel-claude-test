@@ -1,27 +1,14 @@
 import { gql, useMutation } from "@apollo/client";
-import {
-  Editable,
-  EditableInput,
-  EditablePreview,
-  Flex,
-  Heading,
-  MenuDivider,
-  MenuItem,
-  MenuList,
-  Text,
-  useEditableControls,
-  useToast,
-} from "@chakra-ui/react";
-import { CopyIcon, DeleteIcon, EditSimpleIcon, UserXIcon } from "@parallel/chakra/icons";
+import { Flex, MenuDivider, MenuItem, MenuList, Text, useToast } from "@chakra-ui/react";
+import { CopyIcon, DeleteIcon, UserXIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { EditableHeading } from "@parallel/components/common/EditableHeading";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { WhenOrgRole } from "@parallel/components/common/WhenOrgRole";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { useAddMemberGroupDialog } from "@parallel/components/organization/dialogs/AddMemberGroupDialog";
 import { useConfirmRemoveMemberDialog } from "@parallel/components/organization/dialogs/ConfirmRemoveMemberDialog";
@@ -46,9 +33,8 @@ import { isAdmin } from "@parallel/utils/roles";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useSelection } from "@parallel/utils/useSelectionState";
-import { ValueProps } from "@parallel/utils/ValueProps";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { sort, sortBy } from "remeda";
 import { useConfirmDeleteGroupsDialog } from "..";
@@ -389,85 +375,6 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
   );
 }
 
-const EditableControls = ({ ...props }) => {
-  const { isEditing, getEditButtonProps } = useEditableControls();
-
-  return isEditing ? null : (
-    <IconButtonWithTooltip
-      label={props.label}
-      size="sm"
-      icon={<EditSimpleIcon />}
-      {...getEditButtonProps()}
-      {...props}
-    />
-  );
-};
-
-interface EditableHeadingProps extends ValueProps<string, false> {
-  isDisabled?: boolean;
-}
-
-function EditableHeading({ isDisabled, value, onChange }: EditableHeadingProps) {
-  const intl = useIntl();
-  const [name, setName] = useState(value);
-  const [inputWidth, setInputWidth] = useState(0);
-  const previewRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    setName(value);
-    setInputWidth(previewRef?.current?.offsetWidth ?? 0);
-  }, [value]);
-
-  return (
-    <Heading as="h3" size="md">
-      {isDisabled ? (
-        <Text as="span" paddingX={2} paddingY={1}>
-          {name}
-        </Text>
-      ) : (
-        <Editable
-          value={name}
-          onChange={setName}
-          onSubmit={onChange}
-          display="flex"
-          alignItems="center"
-          submitOnBlur
-        >
-          <EditablePreview
-            paddingY={1}
-            paddingX={1.5}
-            ref={previewRef}
-            borderRadius="md"
-            borderWidth="2px"
-            borderColor="transparent"
-            transitionProperty="border"
-            transitionDuration="normal"
-            _hover={{
-              borderColor: "gray.300",
-            }}
-            noOfLines={1}
-            wordBreak="break-all"
-            maxWidth={655}
-          />
-
-          <EditableInput paddingY={1} paddingX={2} minWidth={255} width={inputWidth} />
-          <EditableControls
-            marginLeft={1}
-            background={"white"}
-            color={"gray.400"}
-            fontSize={18}
-            _hover={{ backgroundColor: "white", color: "gray.600" }}
-            label={intl.formatMessage({
-              id: "view.group.edit-name",
-              defaultMessage: "Edit name",
-            })}
-          />
-        </Editable>
-      )}
-    </Heading>
-  );
-}
-
 const _fragments = {
   get UserGroup() {
     return gql`
@@ -548,9 +455,9 @@ const _queries = [
   `,
   gql`
     query OrganizationGroup_user {
-      ...AppLayout_Query
+      ...OrganizationSettingsLayout_Query
     }
-    ${AppLayout.fragments.Query}
+    ${OrganizationSettingsLayout.fragments.Query}
   `,
 ];
 

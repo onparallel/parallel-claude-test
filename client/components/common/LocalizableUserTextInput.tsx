@@ -110,7 +110,8 @@ function LocaleSelect({ value, onChange, localizableUserText, ...props }: Locale
             />
             <Text as="span">{locale.localizedLabel}</Text>
             <Spacer />
-            {isDefined(localizableUserText[locale.key]) ? (
+            {isDefined(localizableUserText[locale.key]) &&
+            localizableUserText[locale.key]!.trim().length ? (
               <Badge variant="subtle" colorScheme="green">
                 <FormattedMessage
                   id="component.localizable-user-text-input.translated-badge"

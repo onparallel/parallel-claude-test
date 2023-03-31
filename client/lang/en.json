@@ -625,6 +625,16 @@
     "context": "Delete {count, plural, =1 {template} other {templates}}"
   },
   {
+    "term": "component.confirm-delete-profile-type.confirm-delete-header",
+    "definition": "Delete {count, plural, =1 {profile type} other {profile types}}",
+    "context": "Delete {count, plural, =1 {profile type} other {profile types}}"
+  },
+  {
+    "term": "component.confirm-delete-profile-type.want-delete-profile-types",
+    "definition": "Are you sure you want to delete <b>{count, plural, =1 {{name}} other {# selected profile types}}</b>?",
+    "context": "Are you sure you want to delete <b>{count, plural, =1 {{name}} other {# selected profile types}}</b>?"
+  },
+  {
     "term": "component.confirm-disable-ongoing-signature-petition-close.body",
     "definition": "There is an ongoing eSignature process. If you close this parallel now, the process will be cancelled.",
     "context": "There is an ongoing eSignature process. If you close this parallel now, the process will be cancelled."
@@ -1143,6 +1153,36 @@
     "term": "component.create-organization-dialog.organization-status",
     "definition": "Organization status",
     "context": "Organization status"
+  },
+  {
+    "term": "component.create-profile-dialog.new-profile",
+    "definition": "New profile",
+    "context": "New profile"
+  },
+  {
+    "term": "component.create-profile-dialog.profile-name",
+    "definition": "Profile name",
+    "context": "Profile name"
+  },
+  {
+    "term": "component.create-profile-dialog.profile-type",
+    "definition": "Profile type",
+    "context": "Profile type"
+  },
+  {
+    "term": "component.create-profile-type-dialog.edit-profile-type-name",
+    "definition": "Edit profile type name",
+    "context": "Edit profile type name"
+  },
+  {
+    "term": "component.create-profile-type-dialog.name",
+    "definition": "Name",
+    "context": "Name"
+  },
+  {
+    "term": "component.create-profile-type-dialog.new-profile-type",
+    "definition": "New profile type",
+    "context": "New profile type"
   },
   {
     "term": "component.create-reference-dialog.body",
@@ -2313,6 +2353,16 @@
     "term": "component.message-events-indicator.opened-explanation",
     "definition": "The email was opened on {date}",
     "context": "The email was opened on {date}"
+  },
+  {
+    "term": "component.more-options-menu-profile.delete-profile",
+    "definition": "Delete profile",
+    "context": "Delete profile"
+  },
+  {
+    "term": "component.more-options-menu-profile.duplicate-profile",
+    "definition": "Duplicate profile",
+    "context": "Duplicate profile"
   },
   {
     "term": "component.move-to-folder-dialog.currently-in",
@@ -4133,6 +4183,36 @@
     "term": "component.print-pdf-task.header",
     "definition": "Generating PDF file...",
     "context": "Generating PDF file..."
+  },
+  {
+    "term": "component.profile-table-columns.type",
+    "definition": "Type",
+    "context": "Type"
+  },
+  {
+    "term": "component.profile-type-header.clone-label",
+    "definition": "Clone profile type",
+    "context": "Clone profile type"
+  },
+  {
+    "term": "component.profile-type-header.delete-label",
+    "definition": "Delete profile type",
+    "context": "Delete profile type"
+  },
+  {
+    "term": "component.profile-types-table.new-type",
+    "definition": "New type",
+    "context": "New type"
+  },
+  {
+    "term": "component.profile-types-table.no-profiles",
+    "definition": "You have no profile types yet. Start by creating one now!",
+    "context": "You have no profile types yet. Start by creating one now!"
+  },
+  {
+    "term": "component.profile-types-table.no-results",
+    "definition": "There's no profile types matching your criteria",
+    "context": "There's no profile types matching your criteria"
   },
   {
     "term": "component.public-signup-form-experience.captcha-error",
@@ -6193,6 +6273,41 @@
     "term": "component.use-delete-contact.confirm-delete-header",
     "definition": "Delete {count, plural, =1{{email}} other {# contacts}}",
     "context": "Delete {count, plural, =1{{email}} other {# contacts}}"
+  },
+  {
+    "term": "component.use-delete-profile-type.confirm-delete-header",
+    "definition": "Delete {count, plural, =1 {profile type} other {# profile types}}",
+    "context": "Delete {count, plural, =1 {profile type} other {# profile types}}"
+  },
+  {
+    "term": "component.use-delete-profile-type.found-profiles-in-use",
+    "definition": "We have found profiles created from one of these profile types.",
+    "context": "We have found profiles created from one of these profile types."
+  },
+  {
+    "term": "component.use-delete-profile-type.if-proceed-delete-profiles",
+    "definition": "If you proceed, the profiles will be deleted and the information they contain will be lost.",
+    "context": "If you proceed, the profiles will be deleted and the information they contain will be lost."
+  },
+  {
+    "term": "component.use-delete-profile-type.profiles-in-use",
+    "definition": "There are <b>{count, plural, =1 {1 profile} other {# profiles}}</b> created using this profile type.",
+    "context": "There are <b>{count, plural, =1 {1 profile} other {# profiles}}</b> created using this profile type."
+  },
+  {
+    "term": "component.use-delete-profile-type.want-delete-profile-types",
+    "definition": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other {these profile types}}?",
+    "context": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other {these profile types}}?"
+  },
+  {
+    "term": "component.use-delete-profile.confirm-profile-header",
+    "definition": "Delete profile",
+    "context": "Delete profile"
+  },
+  {
+    "term": "component.use-delete-profile.properties-in-use",
+    "definition": "You are about to delete this profile. Please note that there <b>{count, plural, =1 {is 1 property} other {are # properties}}</b> responded to on this profile, and if you proceed, {count, plural, =1 {this reply} other {these replies}} will be permanently deleted.",
+    "context": "You are about to delete this profile. Please note that there <b>{count, plural, =1 {is 1 property} other {are # properties}}</b> responded to on this profile, and if you proceed, {count, plural, =1 {this reply} other {these replies}} will be permanently deleted."
   },
   {
     "term": "component.use-delete-tag.confirm-tag-header",
@@ -8723,6 +8838,41 @@
     "term": "page.pricing.zapier-integration",
     "definition": "Zapier integration",
     "context": "Zapier integration"
+  },
+  {
+    "term": "page.profile-details.about-this-profile-type",
+    "definition": "About this {type}",
+    "context": "About this {type}"
+  },
+  {
+    "term": "page.profile-details.hidden-properties",
+    "definition": "Hidden properties",
+    "context": "Hidden properties"
+  },
+  {
+    "term": "page.profile-details.hidden-properties-description",
+    "definition": "Request permission to see these properties.",
+    "context": "Request permission to see these properties."
+  },
+  {
+    "term": "page.profile-details.title",
+    "definition": "Profile details",
+    "context": "Profile details"
+  },
+  {
+    "term": "page.profiles.create-profile",
+    "definition": "Create profile",
+    "context": "Create profile"
+  },
+  {
+    "term": "page.profiles.no-profiles",
+    "definition": "You have no profiles yet. Start by creating one now!",
+    "context": "You have no profiles yet. Start by creating one now!"
+  },
+  {
+    "term": "page.profiles.no-results",
+    "definition": "There's no profiles matching your criteria",
+    "context": "There's no profiles matching your criteria"
   },
   {
     "term": "page.reports-overview.choose-date-range",

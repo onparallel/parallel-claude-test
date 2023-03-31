@@ -1,13 +1,13 @@
 import { Scalars, UserLocale } from "@parallel/graphql/__types";
 import { asSupportedUserLocale } from "@parallel/utils/locales";
 import { ReactNode } from "react";
-import { useIntl } from "react-intl";
+import { IntlShape, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
 interface LocalizableUserTextRenderProps {
   value: Scalars["LocalizableUserText"];
   locale?: UserLocale;
-  default?: ReactNode;
+  default: ReactNode;
 }
 
 export function LocalizableUserTextRender({
@@ -22,5 +22,27 @@ export function LocalizableUserTextRender({
     "en" as UserLocale,
     Object.keys(value)[0] as UserLocale,
   ].find((l) => isDefined(l) && isDefined(value[l]));
-  return <>{isDefined(locale) ? value[locale] : _default}</>;
+  return <>{isDefined(locale) ? value[locale]?.trim() || _default : _default}</>;
+}
+
+interface LocalizableUserTextRenderOptions {
+  intl: IntlShape;
+  value: Scalars["LocalizableUserText"];
+  locale?: UserLocale;
+  default: string;
+}
+
+export function localizableUserTextRender({
+  intl,
+  value,
+  locale: _locale,
+  default: _default,
+}: LocalizableUserTextRenderOptions) {
+  const locale = [
+    _locale,
+    asSupportedUserLocale(intl.locale),
+    "en" as UserLocale,
+    Object.keys(value)[0] as UserLocale,
+  ].find((l) => isDefined(l) && isDefined(value[l]));
+  return isDefined(locale) ? value[locale]?.trim() || _default : _default;
 }
