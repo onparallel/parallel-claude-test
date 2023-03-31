@@ -7925,6 +7925,11 @@
     "context": "Unnamed parallel"
   },
   {
+    "term": "generic.unnamed-profile-type",
+    "definition": "Unnamed profile type",
+    "context": "Unnamed profile type"
+  },
+  {
     "term": "generic.unnamed-template",
     "definition": "Unnamed template",
     "context": "Unnamed template"

@@ -7925,6 +7925,11 @@
     "context": "Unnamed parallel"
   },
   {
+    "term": "generic.unnamed-profile-type",
+    "definition": "Tipo de perfil sin nombre",
+    "context": "Unnamed profile type"
+  },
+  {
     "term": "generic.unnamed-template",
     "definition": "Plantilla sin nombre",
     "context": "Unnamed template"
