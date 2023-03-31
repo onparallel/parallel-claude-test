@@ -211,13 +211,9 @@ export interface CreateProfileInput {
 
 export interface CreateProfileTypeFieldInput {
   alias?: InputMaybe<Scalars["String"]>;
-  expires?: InputMaybe<Scalars["Boolean"]>;
+  isExpirable?: InputMaybe<Scalars["Boolean"]>;
   name: Scalars["LocalizableUserText"];
   type: ProfileTypeFieldType;
-}
-
-export interface CreateProfileTypeInput {
-  name: Scalars["String"];
 }
 
 export interface CreatedAt {
@@ -742,9 +738,9 @@ export interface Mutation {
   deletePetitionReply: PetitionField;
   /** Delete petitions and folders. */
   deletePetitions: Success;
-  deleteProfile: Result;
-  deleteProfileType: Result;
-  deleteProfileTypeField: Result;
+  deleteProfile: Success;
+  deleteProfileType: Success;
+  deleteProfileTypeField: ProfileType;
   /** Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests */
   deleteSignatureIntegration: Result;
   /** Removes the tag from every petition and soft-deletes it */
@@ -969,11 +965,9 @@ export interface Mutation {
    *   - petitionFieldCommentIds
    */
   updatePetitionUserNotificationReadStatus: Array<PetitionUserNotification>;
-  updateProfile: Profile;
   updateProfileType: ProfileType;
   updateProfileTypeField: ProfileTypeField;
   updateProfileTypeFieldPositions: ProfileType;
-  updateProfileTypeFieldType: ProfileTypeField;
   /** Updates the info and permissions of a public link */
   updatePublicPetitionLink: PublicPetitionLink;
   /** Updates template_public from template */
@@ -1246,7 +1240,7 @@ export interface MutationcreateProfileArgs {
 }
 
 export interface MutationcreateProfileTypeArgs {
-  data: CreateProfileTypeInput;
+  name: Scalars["LocalizableUserText"];
 }
 
 export interface MutationcreateProfileTypeFieldArgs {
@@ -1984,11 +1978,6 @@ export interface MutationupdatePetitionUserNotificationReadStatusArgs {
   petitionUserNotificationIds?: InputMaybe<Array<Scalars["GID"]>>;
 }
 
-export interface MutationupdateProfileArgs {
-  data: UpdateProfileInput;
-  profileId: Scalars["GID"];
-}
-
 export interface MutationupdateProfileTypeArgs {
   data: UpdateProfileTypeInput;
   id: Scalars["GID"];
@@ -2003,12 +1992,6 @@ export interface MutationupdateProfileTypeFieldArgs {
 export interface MutationupdateProfileTypeFieldPositionsArgs {
   profileTypeFieldIds: Array<Scalars["GID"]>;
   profileTypeId: Scalars["GID"];
-}
-
-export interface MutationupdateProfileTypeFieldTypeArgs {
-  profileTypeFieldId: Scalars["GID"];
-  profileTypeId: Scalars["GID"];
-  type: ProfileTypeFieldType;
 }
 
 export interface MutationupdatePublicPetitionLinkArgs {
@@ -3423,26 +3406,49 @@ export interface PetitionUserPermission extends PetitionPermission, Timestamps {
   user: User;
 }
 
-export interface Profile {
+export interface Profile extends Timestamps {
   __typename?: "Profile";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  fields: Array<ProfileFieldAndValue>;
   id: Scalars["GID"];
   name: Scalars["String"];
   profileType: ProfileType;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
 }
 
-export interface ProfileType {
+export interface ProfileFieldAndValue {
+  __typename?: "ProfileFieldAndValue";
+  field: ProfileTypeField;
+  value?: Maybe<ProfileFieldValue>;
+}
+
+export interface ProfileFieldValue extends CreatedAt {
+  __typename?: "ProfileFieldValue";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  createdBy?: Maybe<User>;
+  id: Scalars["GID"];
+}
+
+export interface ProfileType extends Timestamps {
   __typename?: "ProfileType";
+  /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   fields: Array<ProfileTypeField>;
   id: Scalars["GID"];
-  name: Scalars["String"];
+  name: Scalars["LocalizableUserText"];
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
 }
 
 export interface ProfileTypeField {
   __typename?: "ProfileTypeField";
   alias?: Maybe<Scalars["String"]>;
-  expires: Scalars["Boolean"];
   id: Scalars["GID"];
+  isExpirable: Scalars["Boolean"];
+  myPermission: ProfileTypeFieldPermission;
   name: Scalars["LocalizableUserText"];
   options: Scalars["JSONObject"];
   position: Scalars["Int"];
@@ -3450,7 +3456,9 @@ export interface ProfileTypeField {
   type: ProfileTypeFieldType;
 }
 
-export type ProfileTypeFieldType = "DATE" | "FILE" | "SHORT_TEXT" | "TEXT";
+export type ProfileTypeFieldPermission = "WRITE";
+
+export type ProfileTypeFieldType = "DATE" | "FILE" | "NUMBER" | "PHONE" | "SHORT_TEXT" | "TEXT";
 
 export interface ProfileTypePagination {
   __typename?: "ProfileTypePagination";
@@ -3791,6 +3799,7 @@ export interface Query {
   /** The petitions of the user */
   petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
+  profileType: ProfileType;
   profileTypes: ProfileTypePagination;
   publicLicenseCode?: Maybe<PublicLicenseCode>;
   publicOrg?: Maybe<PublicOrganization>;
@@ -3948,8 +3957,13 @@ export interface QuerypetitionsByIdArgs {
   ids?: InputMaybe<Array<Scalars["GID"]>>;
 }
 
+export interface QueryprofileTypeArgs {
+  profileTypeId: Scalars["GID"];
+}
+
 export interface QueryprofileTypesArgs {
   limit?: InputMaybe<Scalars["Int"]>;
+  locale?: InputMaybe<UserLocale>;
   offset?: InputMaybe<Scalars["Int"]>;
   search?: InputMaybe<Scalars["String"]>;
   sortBy?: InputMaybe<Array<QueryProfileTypes_OrderBy>>;
@@ -4500,19 +4514,15 @@ export interface UpdatePetitionInput {
   skipForwardSecurity?: InputMaybe<Scalars["Boolean"]>;
 }
 
-export interface UpdateProfileInput {
-  name?: InputMaybe<Scalars["String"]>;
-}
-
 export interface UpdateProfileTypeFieldInput {
   alias?: InputMaybe<Scalars["String"]>;
-  expires?: InputMaybe<Scalars["Boolean"]>;
+  isExpirable?: InputMaybe<Scalars["Boolean"]>;
   name?: InputMaybe<Scalars["LocalizableUserText"]>;
   options?: InputMaybe<Scalars["JSONObject"]>;
 }
 
 export interface UpdateProfileTypeInput {
-  name?: InputMaybe<Scalars["String"]>;
+  name?: InputMaybe<Scalars["LocalizableUserText"]>;
 }
 
 export interface UpdateTagInput {

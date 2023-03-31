@@ -9,6 +9,7 @@ const result: PossibleTypesResultData = {
       "PetitionFieldAttachment",
       "PetitionMessage",
       "PetitionReminder",
+      "ProfileFieldValue",
       "UserAuthenticationToken",
     ],
     DowJonesKycEntityProfileResult: [
@@ -93,6 +94,8 @@ const result: PossibleTypesResultData = {
       "PetitionSignatureRequest",
       "PetitionUserGroupPermission",
       "PetitionUserPermission",
+      "Profile",
+      "ProfileType",
       "PublicPetition",
       "PublicPetitionFieldReply",
       "TemplateDefaultUserGroupPermission",

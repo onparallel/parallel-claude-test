@@ -10,9 +10,10 @@ import {
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { WhenOrgRole } from "@parallel/components/common/WhenOrgRole";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { useCreateOrEditProfileTypeDialog } from "@parallel/components/organization/profiles/dialogs/CreateOrEditProfileTypeDialog";
-import { OrganizationProfileType_userDocument, UserLocale } from "@parallel/graphql/__types";
+import { OrganizationProfileType_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useDeleteProfileType } from "@parallel/utils/mutations/useDeleteProfileType";
@@ -147,4 +148,8 @@ OrganizationProfileType.getInitialProps = async ({ query, fetchQuery }: WithApol
   return { profileTypeId };
 };
 
-export default compose(withDialogs, withApolloData)(OrganizationProfileType);
+export default compose(
+  withDialogs,
+  withFeatureFlag("PROFILES", "/app/organization"),
+  withApolloData
+)(OrganizationProfileType);
