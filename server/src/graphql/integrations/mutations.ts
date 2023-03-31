@@ -60,7 +60,7 @@ export const createSignaturitIntegration = mutationField("createSignaturitIntegr
   },
   resolve: async (_, args, ctx) => {
     try {
-      return await ctx.setup.createSignaturitIntegration(
+      return await ctx.integrationsSetup.createSignaturitIntegration(
         {
           name: args.name,
           org_id: ctx.user!.org_id,
@@ -186,7 +186,7 @@ export const createDowJonesKycIntegration = mutationField("createDowJonesKycInte
     }
 
     try {
-      return await ctx.setup.createDowJonesIntegration(
+      return await ctx.integrationsSetup.createDowJonesIntegration(
         {
           org_id: ctx.user!.org_id,
           name: "Dow Jones KYC",

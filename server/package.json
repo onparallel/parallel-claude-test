@@ -14,7 +14,7 @@
     "migrate-dryrun": "knex migrate:list",
     "migrate-down": "knex migrate:down",
     "postmigrate-down": "yarn generate-db-types",
-    "seed": "knex seed:run",
+    "seed": "knex seed:run --specific=dev.ts",
     "generate-db-types": "ts-node ./bin/generate-db-types.ts",
     "test": "jest --runInBand",
     "extract-i18n-terms": "yarn workspace @parallel/bin extract-i18n-terms --locales en es --input '../server/src/**/*.{ts,tsx}' --output '../server/lang'",

@@ -3,7 +3,7 @@ import { difference } from "remeda";
 import { PetitionField } from "../db/__types";
 import { DynamicSelectOption } from "../graphql/helpers/parseDynamicSelectValues";
 import { Maybe } from "./types";
-import { isValidDate, isValidDatetime, isValidTimezone } from "./validators";
+import { isValidDate, isValidDatetime, isValidTimezone } from "./time";
 
 export function validateReplyValue(field: PetitionField, reply: any) {
   switch (field.type) {

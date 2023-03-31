@@ -5,8 +5,7 @@ import {
   EnhancedOrgIntegration,
   IntegrationCredentials,
 } from "../db/repositories/IntegrationRepository";
-import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
-import { CreateOrganization, CreateOrgIntegration, Organization } from "../db/__types";
+import { CreateOrgIntegration } from "../db/__types";
 import { DowJonesIntegration } from "../integrations/DowJonesIntegration";
 import {
   SignaturitEnvironment,
@@ -14,9 +13,8 @@ import {
 } from "../integrations/SignaturitIntegration";
 import { FETCH_SERVICE, IFetchService } from "./FetchService";
 
-export const SETUP_SERVICE = Symbol.for("SETUP_SERVICE");
-export interface ISetupService {
-  createOrganization(data: CreateOrganization, createdBy: string): Promise<Organization>;
+export const INTEGRATIONS_SETUP_SERVICE = Symbol.for("INTEGRATIONS_SETUP_SERVICE");
+export interface IIntegrationsSetupService {
   createSignaturitIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default">,
     apiKey: string,
@@ -26,38 +24,23 @@ export interface ISetupService {
   ): Promise<EnhancedOrgIntegration<"SIGNATURE", "SIGNATURIT">>;
   createDowJonesIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default">,
-    credentials: IntegrationCredentials<"DOW_JONES_KYC", "DOW_JONES_KYC">,
+    credentials: Pick<
+      IntegrationCredentials<"DOW_JONES_KYC", "DOW_JONES_KYC">,
+      "CLIENT_ID" | "USERNAME" | "PASSWORD"
+    >,
     createdBy: string,
     t?: Knex.Transaction
   ): Promise<EnhancedOrgIntegration<"DOW_JONES_KYC", "DOW_JONES_KYC">>;
 }
 
 @injectable()
-export class SetupService implements ISetupService {
+export class IntegrationsSetupService implements IIntegrationsSetupService {
   constructor(
-    @inject(CONFIG) public config: Config,
+    @inject(CONFIG) private config: Config,
     @inject(FETCH_SERVICE) private fetch: IFetchService,
-    @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(SignaturitIntegration) private signaturitIntegration: SignaturitIntegration,
     @inject(DowJonesIntegration) private dowJonesIntegration: DowJonesIntegration
   ) {}
-
-  async createOrganization(data: CreateOrganization, createdBy: string) {
-    const org = await this.organizations.createOrganization(data, createdBy);
-    await this.organizations.createDefaultOrganizationThemes(org.id, createdBy);
-    await this.createSignaturitIntegration(
-      {
-        name: "Signaturit Sandbox",
-        org_id: org.id,
-        is_default: true,
-      },
-      this.config.signature.signaturitSandboxApiKey,
-      false,
-      createdBy
-    );
-
-    return org;
-  }
 
   private async authenticateSignaturitApiKey(apiKey: string) {
     return await Promise.any(

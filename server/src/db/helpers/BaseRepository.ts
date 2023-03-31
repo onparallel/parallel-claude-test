@@ -4,6 +4,7 @@ import { injectable } from "inversify";
 import { Knex } from "knex";
 import PostgresInterval from "postgres-interval";
 import { groupBy, indexBy, isDefined, times } from "remeda";
+import { LocalizableUserText } from "../../graphql";
 import { unMaybeArray } from "../../util/arrays";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
@@ -18,9 +19,11 @@ import {
 import {
   CreatePetition,
   CreatePetitionSignatureRequest,
+  CreateProfileTypeField,
   Organization,
   Petition,
   PetitionSignatureRequest,
+  ProfileTypeField,
   TableCreateTypes as _TableCreateTypes,
   TableTypes as _TableTypes,
 } from "../__types";
@@ -43,6 +46,7 @@ export interface TableTypes
           >;
         }
       >;
+      profile_type_field: Replace<ProfileTypeField, { name: LocalizableUserText }>;
     }
   > {}
 
@@ -58,6 +62,7 @@ export interface TableCreateTypes
         CreatePetitionSignatureRequest,
         { signature_config: PetitionSignatureConfig }
       >;
+      profile_type_field: Replace<CreateProfileTypeField, { name: LocalizableUserText }>;
     }
   > {}
 

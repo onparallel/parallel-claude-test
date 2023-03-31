@@ -63,3 +63,7 @@ export * from "./integrations/queries";
 
 export * from "./views/types";
 export * from "./views/mutations";
+
+export * from "./profile/types";
+export * from "./profile/queries";
+export * from "./profile/mutations";

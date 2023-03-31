@@ -34,11 +34,25 @@ import { IQueuesService, QueuesService, QUEUES_SERVICE } from "./QueuesService";
 import { IRedis, REDIS, Redis } from "./Redis";
 import { IReportsService, ReportsService, REPORTS_SERVICE } from "./ReportsService";
 import { IEncryptionService, EncryptionService, ENCRYPTION_SERVICE } from "./EncryptionService";
-import { ISetupService, SetupService, SETUP_SERVICE } from "./setup";
+import {
+  IAccountSetupService,
+  AccountSetupService,
+  ACCOUNT_SETUP_SERVICE,
+} from "./AccountSetupService";
 import { ISignatureService, SIGNATURE, SignatureService } from "./SignatureService";
 import { ISmtp, Smtp, SMTP } from "./Smtp";
 import { IStorageService, StorageService, STORAGE_SERVICE } from "./StorageService";
 import { ITiersService, TiersService, TIERS_SERVICE } from "./TiersService";
+import {
+  IIntegrationsSetupService,
+  IntegrationsSetupService,
+  INTEGRATIONS_SETUP_SERVICE,
+} from "./IntegrationsSetupService";
+import {
+  IProfilesSetupService,
+  ProfilesSetupService,
+  PROFILES_SETUP_SERVICE,
+} from "./ProfilesSetupService";
 
 export const servicesModule = new ContainerModule((bind) => {
   bind<ILogger>(LOGGER).toDynamicValue(createLogger).inSingletonScope();
@@ -56,6 +70,7 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IPetitionBinder>(PETITION_BINDER).to(PetitionBinder);
   bind<ITiersService>(TIERS_SERVICE).to(TiersService);
   bind<II18nService>(I18N_SERVICE).to(I18nService).inSingletonScope();
+  bind<IEncryptionService>(ENCRYPTION_SERVICE).to(EncryptionService).inSingletonScope();
   bind<IOrganizationCreditsService>(ORGANIZATION_CREDITS_SERVICE).to(OrganizationCreditsService);
   bind<IDowJonesClient>(DOW_JONES_CLIENT).to(DowJonesClient);
   bind<IBankflipService>(BANKFLIP_SERVICE).to(BankflipService);
@@ -64,7 +79,8 @@ export const servicesModule = new ContainerModule((bind) => {
     PetitionImportExportService
   );
   bind<IOrganizationLayoutService>(ORGANIZATION_LAYOUT_SERVICE).to(OrganizationLayoutService);
-  bind<ISetupService>(SETUP_SERVICE).to(SetupService);
   bind<IReportsService>(REPORTS_SERVICE).to(ReportsService);
-  bind<IEncryptionService>(ENCRYPTION_SERVICE).to(EncryptionService);
+  bind<IAccountSetupService>(ACCOUNT_SETUP_SERVICE).to(AccountSetupService);
+  bind<IIntegrationsSetupService>(INTEGRATIONS_SETUP_SERVICE).to(IntegrationsSetupService);
+  bind<IProfilesSetupService>(PROFILES_SETUP_SERVICE).to(ProfilesSetupService);
 });

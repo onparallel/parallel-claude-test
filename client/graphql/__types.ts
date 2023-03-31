@@ -205,6 +205,21 @@ export interface CreateContactInput {
   lastName?: InputMaybe<Scalars["String"]>;
 }
 
+export interface CreateProfileInput {
+  name: Scalars["String"];
+}
+
+export interface CreateProfileTypeFieldInput {
+  alias?: InputMaybe<Scalars["String"]>;
+  expires?: InputMaybe<Scalars["Boolean"]>;
+  name: Scalars["LocalizableUserText"];
+  type: ProfileTypeFieldType;
+}
+
+export interface CreateProfileTypeInput {
+  name: Scalars["String"];
+}
+
 export interface CreatedAt {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -681,6 +696,9 @@ export interface Mutation {
   createPetitionListView: PetitionListView;
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
   createPrintPdfTask: Task;
+  createProfile: Profile;
+  createProfileType: ProfileType;
+  createProfileTypeField: ProfileTypeField;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
   /** Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition. */
@@ -724,6 +742,9 @@ export interface Mutation {
   deletePetitionReply: PetitionField;
   /** Delete petitions and folders. */
   deletePetitions: Success;
+  deleteProfile: Result;
+  deleteProfileType: Result;
+  deleteProfileTypeField: Result;
   /** Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests */
   deleteSignatureIntegration: Result;
   /** Removes the tag from every petition and soft-deletes it */
@@ -948,6 +969,11 @@ export interface Mutation {
    *   - petitionFieldCommentIds
    */
   updatePetitionUserNotificationReadStatus: Array<PetitionUserNotification>;
+  updateProfile: Profile;
+  updateProfileType: ProfileType;
+  updateProfileTypeField: ProfileTypeField;
+  updateProfileTypeFieldPositions: ProfileType;
+  updateProfileTypeFieldType: ProfileTypeField;
   /** Updates the info and permissions of a public link */
   updatePublicPetitionLink: PublicPetitionLink;
   /** Updates template_public from template */
@@ -1214,6 +1240,20 @@ export interface MutationcreatePrintPdfTaskArgs {
   skipAttachments?: InputMaybe<Scalars["Boolean"]>;
 }
 
+export interface MutationcreateProfileArgs {
+  data: CreateProfileInput;
+  profileTypeId: Scalars["GID"];
+}
+
+export interface MutationcreateProfileTypeArgs {
+  data: CreateProfileTypeInput;
+}
+
+export interface MutationcreateProfileTypeFieldArgs {
+  data: CreateProfileTypeFieldInput;
+  profileTypeId: Scalars["GID"];
+}
+
 export interface MutationcreatePublicPetitionLinkArgs {
   description: Scalars["String"];
   prefillSecret?: InputMaybe<Scalars["String"]>;
@@ -1328,6 +1368,19 @@ export interface MutationdeletePetitionsArgs {
   folders?: InputMaybe<FoldersInput>;
   force?: InputMaybe<Scalars["Boolean"]>;
   ids?: InputMaybe<Array<Scalars["GID"]>>;
+}
+
+export interface MutationdeleteProfileArgs {
+  profileIds: Array<Scalars["GID"]>;
+}
+
+export interface MutationdeleteProfileTypeArgs {
+  ids: Array<Scalars["GID"]>;
+}
+
+export interface MutationdeleteProfileTypeFieldArgs {
+  profileTypeFieldIds: Array<Scalars["GID"]>;
+  profileTypeId: Scalars["GID"];
 }
 
 export interface MutationdeleteSignatureIntegrationArgs {
@@ -1929,6 +1982,33 @@ export interface MutationupdatePetitionUserNotificationReadStatusArgs {
   petitionFieldCommentIds?: InputMaybe<Array<Scalars["GID"]>>;
   petitionIds?: InputMaybe<Array<Scalars["GID"]>>;
   petitionUserNotificationIds?: InputMaybe<Array<Scalars["GID"]>>;
+}
+
+export interface MutationupdateProfileArgs {
+  data: UpdateProfileInput;
+  profileId: Scalars["GID"];
+}
+
+export interface MutationupdateProfileTypeArgs {
+  data: UpdateProfileTypeInput;
+  id: Scalars["GID"];
+}
+
+export interface MutationupdateProfileTypeFieldArgs {
+  data: UpdateProfileTypeFieldInput;
+  profileTypeFieldId: Scalars["GID"];
+  profileTypeId: Scalars["GID"];
+}
+
+export interface MutationupdateProfileTypeFieldPositionsArgs {
+  profileTypeFieldIds: Array<Scalars["GID"]>;
+  profileTypeId: Scalars["GID"];
+}
+
+export interface MutationupdateProfileTypeFieldTypeArgs {
+  profileTypeFieldId: Scalars["GID"];
+  profileTypeId: Scalars["GID"];
+  type: ProfileTypeFieldType;
 }
 
 export interface MutationupdatePublicPetitionLinkArgs {
@@ -3343,6 +3423,43 @@ export interface PetitionUserPermission extends PetitionPermission, Timestamps {
   user: User;
 }
 
+export interface Profile {
+  __typename?: "Profile";
+  id: Scalars["GID"];
+  name: Scalars["String"];
+  profileType: ProfileType;
+}
+
+export interface ProfileType {
+  __typename?: "ProfileType";
+  createdAt: Scalars["DateTime"];
+  fields: Array<ProfileTypeField>;
+  id: Scalars["GID"];
+  name: Scalars["String"];
+}
+
+export interface ProfileTypeField {
+  __typename?: "ProfileTypeField";
+  alias?: Maybe<Scalars["String"]>;
+  expires: Scalars["Boolean"];
+  id: Scalars["GID"];
+  name: Scalars["LocalizableUserText"];
+  options: Scalars["JSONObject"];
+  position: Scalars["Int"];
+  profileType: ProfileType;
+  type: ProfileTypeFieldType;
+}
+
+export type ProfileTypeFieldType = "DATE" | "FILE" | "SHORT_TEXT" | "TEXT";
+
+export interface ProfileTypePagination {
+  __typename?: "ProfileTypePagination";
+  /** The requested slice of items. */
+  items: Array<ProfileType>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+}
+
 export interface PublicAccessVerification {
   __typename?: "PublicAccessVerification";
   cookieName?: Maybe<Scalars["String"]>;
@@ -3674,6 +3791,7 @@ export interface Query {
   /** The petitions of the user */
   petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
+  profileTypes: ProfileTypePagination;
   publicLicenseCode?: Maybe<PublicLicenseCode>;
   publicOrg?: Maybe<PublicOrganization>;
   /** The comments for this field. */
@@ -3830,6 +3948,13 @@ export interface QuerypetitionsByIdArgs {
   ids?: InputMaybe<Array<Scalars["GID"]>>;
 }
 
+export interface QueryprofileTypesArgs {
+  limit?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+  search?: InputMaybe<Scalars["String"]>;
+  sortBy?: InputMaybe<Array<QueryProfileTypes_OrderBy>>;
+}
+
 export interface QuerypublicLicenseCodeArgs {
   code: Scalars["String"];
   token: Scalars["ID"];
@@ -3934,6 +4059,13 @@ export type QueryPetitions_OrderBy =
   | "name_DESC"
   | "sentAt_ASC"
   | "sentAt_DESC";
+
+/** Order to use on Query.profileTypes */
+export type QueryProfileTypes_OrderBy =
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "name_ASC"
+  | "name_DESC";
 
 /** Order to use on Query.userGroups */
 export type QueryUserGroups_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
@@ -4366,6 +4498,21 @@ export interface UpdatePetitionInput {
   remindersConfig?: InputMaybe<RemindersConfigInput>;
   signatureConfig?: InputMaybe<SignatureConfigInput>;
   skipForwardSecurity?: InputMaybe<Scalars["Boolean"]>;
+}
+
+export interface UpdateProfileInput {
+  name?: InputMaybe<Scalars["String"]>;
+}
+
+export interface UpdateProfileTypeFieldInput {
+  alias?: InputMaybe<Scalars["String"]>;
+  expires?: InputMaybe<Scalars["Boolean"]>;
+  name?: InputMaybe<Scalars["LocalizableUserText"]>;
+  options?: InputMaybe<Scalars["JSONObject"]>;
+}
+
+export interface UpdateProfileTypeInput {
+  name?: InputMaybe<Scalars["String"]>;
 }
 
 export interface UpdateTagInput {

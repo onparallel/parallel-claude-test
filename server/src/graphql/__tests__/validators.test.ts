@@ -185,10 +185,14 @@ describe("GraphQL custom validators", () => {
     let contacts: Contact[];
     beforeAll(async () => {
       await mocks.createFeatureFlags([{ name: "PETITION_SIGNATURE", default_value: false }]);
-      await knex.from("feature_flag_override").insert([
-        { feature_flag_name: "PETITION_SIGNATURE", user_id: users[0].id, value: true },
-        { feature_flag_name: "PETITION_SIGNATURE", user_id: users[1].id, value: false },
-      ]);
+      await mocks.createFeatureFlagOverride("PETITION_SIGNATURE", {
+        user_id: users[0].id,
+        value: true,
+      });
+      await mocks.createFeatureFlagOverride("PETITION_SIGNATURE", {
+        user_id: users[1].id,
+        value: false,
+      });
 
       await mocks.createOrgIntegration([
         {

@@ -11,6 +11,7 @@ import { LicenseCodeRepository } from "./db/repositories/LicenseCodeRepository";
 import { OrganizationRepository } from "./db/repositories/OrganizationRepository";
 import { PetitionRepository } from "./db/repositories/PetitionRepository";
 import { PetitionViewRepository } from "./db/repositories/PetitionViewRepository";
+import { ProfileRepository } from "./db/repositories/ProfileRepository";
 import { SubscriptionRepository } from "./db/repositories/SubscriptionRepository";
 import { SystemRepository } from "./db/repositories/SystemRepository";
 import { TagRepository } from "./db/repositories/TagRepository";
@@ -19,15 +20,21 @@ import { UserAuthenticationRepository } from "./db/repositories/UserAuthenticati
 import { UserGroupRepository } from "./db/repositories/UserGroupRepository";
 import { UserRepository } from "./db/repositories/UserRepository";
 import { Contact, Organization, PetitionAccess, User } from "./db/__types";
+import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./services/AccountSetupService";
 import { ANALYTICS, IAnalyticsService } from "./services/AnalyticsService";
 import { AUTH, IAuth } from "./services/AuthService";
-import { BANKFLIP_SERVICE, IBankflipService } from "./services/BankflipService";
 import { BANKFLIP_LEGACY_SERVICE, IBankflipLegacyService } from "./services/BankflipLegacyService";
+import { BANKFLIP_SERVICE, IBankflipService } from "./services/BankflipService";
 import { DOW_JONES_CLIENT, IDowJonesClient } from "./services/DowJonesClient";
 import { EMAILS, IEmailsService } from "./services/EmailsService";
+import { EncryptionService, ENCRYPTION_SERVICE } from "./services/EncryptionService";
 import { FETCH_SERVICE, IFetchService } from "./services/FetchService";
 import { I18N_SERVICE, II18nService } from "./services/I18nService";
 import { IImageService, IMAGE_SERVICE } from "./services/ImageService";
+import {
+  IIntegrationsSetupService,
+  INTEGRATIONS_SETUP_SERVICE,
+} from "./services/IntegrationsSetupService";
 import { ILogger, LOGGER } from "./services/Logger";
 import {
   IOrganizationCreditsService,
@@ -43,11 +50,10 @@ import {
   PETITION_IMPORT_EXPORT_SERVICE,
 } from "./services/PetitionImportExportService";
 import { IPrinter, PRINTER } from "./services/Printer";
+import { IProfilesSetupService, PROFILES_SETUP_SERVICE } from "./services/ProfilesSetupService";
 import { IQueuesService, QUEUES_SERVICE } from "./services/QueuesService";
 import { IRedis, REDIS } from "./services/Redis";
 import { IReportsService, REPORTS_SERVICE } from "./services/ReportsService";
-import { EncryptionService, ENCRYPTION_SERVICE } from "./services/EncryptionService";
-import { SetupService, SETUP_SERVICE } from "./services/setup";
 import { ISignatureService, SIGNATURE } from "./services/SignatureService";
 import { ISmtp, SMTP } from "./services/Smtp";
 import { IStorageService, STORAGE_SERVICE } from "./services/StorageService";
@@ -74,6 +80,7 @@ export class ApiContext {
     @inject(TIERS_SERVICE) public readonly tiers: ITiersService,
     @inject(I18N_SERVICE) public readonly i18n: II18nService,
     @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
+    @inject(ENCRYPTION_SERVICE) public readonly encryption: EncryptionService,
     @inject(ORGANIZATION_CREDITS_SERVICE) public readonly orgCredits: IOrganizationCreditsService,
     @inject(DOW_JONES_CLIENT) public readonly dowJonesKyc: IDowJonesClient,
     @inject(REDIS) public readonly redis: IRedis,
@@ -82,8 +89,13 @@ export class ApiContext {
     @inject(BANKFLIP_LEGACY_SERVICE) public readonly bankflipLegacy: IBankflipLegacyService,
     @inject(PETITION_IMPORT_EXPORT_SERVICE)
     public readonly petitionImportExport: IPetitionImportExportService,
-    @inject(SETUP_SERVICE) public readonly setup: SetupService,
-    @inject(ENCRYPTION_SERVICE) public readonly encryption: EncryptionService,
+
+    // Setup services
+    @inject(ACCOUNT_SETUP_SERVICE) public readonly accountSetup: IAccountSetupService,
+    @inject(INTEGRATIONS_SETUP_SERVICE)
+    public readonly integrationsSetup: IIntegrationsSetupService,
+    @inject(PROFILES_SETUP_SERVICE)
+    public readonly profilesSetup: IProfilesSetupService,
 
     // Repositories
     public readonly contacts: ContactRepository,
@@ -101,7 +113,8 @@ export class ApiContext {
     public readonly subscriptions: SubscriptionRepository,
     public readonly tasks: TaskRepository,
     public readonly licenseCodes: LicenseCodeRepository,
-    public readonly views: PetitionViewRepository
+    public readonly views: PetitionViewRepository,
+    public readonly profiles: ProfileRepository
   ) {}
 }
 

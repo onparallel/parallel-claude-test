@@ -1,4 +1,5 @@
 import { list, mutationField, nonNull, objectType, stringArg } from "nexus";
+import { DatabaseError } from "pg";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -24,8 +25,11 @@ export const generateUserAuthToken = mutationField("generateUserAuthToken", {
   resolve: async (_, { tokenName }, ctx) => {
     try {
       return await ctx.userAuthentication.createUserAuthenticationToken(tokenName, ctx.user!);
-    } catch (e: any) {
-      if (e.constraint === "user_authentication_token__token_name_user_id") {
+    } catch (e) {
+      if (
+        e instanceof DatabaseError &&
+        e.constraint === "user_authentication_token__token_name_user_id"
+      ) {
         throw new ApolloError("Token name must be unique", "UNIQUE_TOKEN_NAME_ERROR");
       } else {
         throw e;

@@ -1,5 +1,6 @@
 import { arg, booleanArg, list, mutationField, nonNull, nullable, stringArg } from "nexus";
 import pMap from "p-map";
+import { DatabaseError } from "pg";
 import { differenceWith, filter, groupBy, isDefined, pipe, uniq, uniqBy, zip } from "remeda";
 import { and, authenticate, authenticateAnd, chain, ifArgDefined } from "../../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../../helpers/errors";
@@ -161,8 +162,8 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
         args.permissionType,
         ctx.user!
       );
-    } catch (e: any) {
-      if (e.constraint === "petition_permission__owner") {
+    } catch (e) {
+      if (e instanceof DatabaseError && e.constraint === "petition_permission__owner") {
         throw new ApolloError(
           "A petition can't have more than one owner.",
           "PETITION_OWNER_CONSTRAINT_ERROR"

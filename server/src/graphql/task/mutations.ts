@@ -2,7 +2,7 @@ import { differenceInDays } from "date-fns";
 import { booleanArg, idArg, mutationField, nonNull, nullable, objectType, stringArg } from "nexus";
 import { isDefined } from "remeda";
 import { Task } from "../../db/repositories/TaskRepository";
-import { isValidTimezone } from "../../util/validators";
+import { isValidTimezone } from "../../util/time";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";

@@ -10,6 +10,7 @@ import { LicenseCodeRepository } from "./repositories/LicenseCodeRepository";
 import { OrganizationRepository } from "./repositories/OrganizationRepository";
 import { PetitionRepository } from "./repositories/PetitionRepository";
 import { PetitionViewRepository } from "./repositories/PetitionViewRepository";
+import { ProfileRepository } from "./repositories/ProfileRepository";
 import { SubscriptionRepository } from "./repositories/SubscriptionRepository";
 import { SystemRepository } from "./repositories/SystemRepository";
 import { TagRepository } from "./repositories/TagRepository";
@@ -45,4 +46,5 @@ export const dbModule = new ContainerModule((bind) => {
   bind<TaskRepository>(TaskRepository).toSelf();
   bind<LicenseCodeRepository>(LicenseCodeRepository).toSelf();
   bind<PetitionViewRepository>(PetitionViewRepository).toSelf();
+  bind<ProfileRepository>(ProfileRepository).toSelf();
 });

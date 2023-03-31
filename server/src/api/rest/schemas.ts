@@ -1,7 +1,7 @@
 import Ajv, { ValidateFunction } from "ajv";
 import addFormats from "ajv-formats";
 import { FromSchema, JSONSchema as _JSONSchema, JSONSchema7 } from "json-schema-to-ts";
-import { isValidTime, isValidTimezone } from "../../util/validators";
+import { isValidTime, isValidTimezone } from "../../util/time";
 
 export type JsonSchema = Exclude<_JSONSchema, boolean>;
 

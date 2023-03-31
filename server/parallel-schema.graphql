@@ -215,6 +215,17 @@ input CreateContactInput {
   lastName: String
 }
 
+input CreateProfileInput {
+  name: String!
+}
+
+input CreateProfileTypeFieldInput {
+  alias: String
+  isExpirable: Boolean
+  name: LocalizableUserText!
+  type: ProfileTypeFieldType!
+}
+
 interface CreatedAt {
   """
   Time when the resource was created.
@@ -985,6 +996,9 @@ type Mutation {
   Creates a task for printing a PDF of the petition and sends it to the queue
   """
   createPrintPdfTask(includeNdLinks: Boolean, petitionId: GID!, skipAttachments: Boolean): Task!
+  createProfile(data: CreateProfileInput!, profileTypeId: GID!): Profile!
+  createProfileType(name: LocalizableUserText!): ProfileType!
+  createProfileTypeField(data: CreateProfileTypeFieldInput!, profileTypeId: GID!): ProfileTypeField!
 
   """
   Creates a public link from a user's template
@@ -1133,6 +1147,9 @@ type Mutation {
     force: Boolean = false
     ids: [GID!]
   ): Success!
+  deleteProfile(profileIds: [GID!]!): Success!
+  deleteProfileType(ids: [GID!]!): Success!
+  deleteProfileTypeField(profileTypeFieldIds: [GID!]!, profileTypeId: GID!): ProfileType!
 
   """
   Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests
@@ -2043,6 +2060,13 @@ type Mutation {
     petitionIds: [GID!]
     petitionUserNotificationIds: [GID!]
   ): [PetitionUserNotification!]!
+  updateProfileType(data: UpdateProfileTypeInput!, id: GID!): ProfileType!
+  updateProfileTypeField(
+    data: UpdateProfileTypeFieldInput!
+    profileTypeFieldId: GID!
+    profileTypeId: GID!
+  ): ProfileTypeField!
+  updateProfileTypeFieldPositions(profileTypeFieldIds: [GID!]!, profileTypeId: GID!): ProfileType!
 
   """
   Updates the info and permissions of a public link
@@ -4310,6 +4334,88 @@ type PetitionUserPermission implements PetitionPermission & Timestamps {
   user: User!
 }
 
+type Profile implements Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+  fields: [ProfileFieldAndValue!]!
+  id: GID!
+  name: String!
+  profileType: ProfileType!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
+type ProfileFieldAndValue {
+  field: ProfileTypeField!
+  value: ProfileFieldValue
+}
+
+type ProfileFieldValue implements CreatedAt {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+  createdBy: User
+  id: GID!
+}
+
+type ProfileType implements Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+  fields: [ProfileTypeField!]!
+  id: GID!
+  name: LocalizableUserText!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
+type ProfileTypeField {
+  alias: String
+  id: GID!
+  isExpirable: Boolean!
+  myPermission: ProfileTypeFieldPermission!
+  name: LocalizableUserText!
+  options: JSONObject!
+  position: Int!
+  profileType: ProfileType!
+  type: ProfileTypeFieldType!
+}
+
+enum ProfileTypeFieldPermission {
+  WRITE
+}
+
+enum ProfileTypeFieldType {
+  DATE
+  FILE
+  NUMBER
+  PHONE
+  SHORT_TEXT
+  TEXT
+}
+
+type ProfileTypePagination {
+  """
+  The requested slice of items.
+  """
+  items: [ProfileType!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
+}
+
 type PublicAccessVerification {
   cookieName: String
   cookieValue: String
@@ -5012,6 +5118,29 @@ type Query {
     sortBy: [QueryPetitions_OrderBy!]
   ): PetitionBaseOrFolderPagination!
   petitionsById(folders: FoldersInput, ids: [GID!]): [PetitionBase]!
+  profileType(profileTypeId: GID!): ProfileType!
+  profileTypes(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+    locale: UserLocale
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+
+    """
+    Optional text to search in the collection.
+    """
+    search: String
+
+    """
+    Sorting to use on the collection
+    """
+    sortBy: [QueryProfileTypes_OrderBy!]
+  ): ProfileTypePagination!
   publicLicenseCode(code: String!, token: ID!): PublicLicenseCode
   publicOrg(id: GID!): PublicOrganization
 
@@ -5159,6 +5288,16 @@ enum QueryPetitions_OrderBy {
   name_DESC
   sentAt_ASC
   sentAt_DESC
+}
+
+"""
+Order to use on Query.profileTypes
+"""
+enum QueryProfileTypes_OrderBy {
+  createdAt_ASC
+  createdAt_DESC
+  name_ASC
+  name_DESC
 }
 
 """
@@ -5737,6 +5876,17 @@ input UpdatePetitionInput {
   remindersConfig: RemindersConfigInput
   signatureConfig: SignatureConfigInput
   skipForwardSecurity: Boolean
+}
+
+input UpdateProfileTypeFieldInput {
+  alias: String
+  isExpirable: Boolean
+  name: LocalizableUserText
+  options: JSONObject
+}
+
+input UpdateProfileTypeInput {
+  name: LocalizableUserText
 }
 
 input UpdateTagInput {

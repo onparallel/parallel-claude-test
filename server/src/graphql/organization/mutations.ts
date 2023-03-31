@@ -312,7 +312,7 @@ export const createOrganization = mutationField("createOrganization", {
     }
   ),
   resolve: async (_, args, ctx) => {
-    const org = await ctx.setup.createOrganization(
+    const org = await ctx.accountSetup.createOrganization(
       {
         name: args.name.trim(),
         status: args.status,
@@ -488,7 +488,7 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
       );
 
       if (!hasSharedSignaturitApiKey) {
-        await ctx.setup.createSignaturitIntegration(
+        await ctx.integrationsSetup.createSignaturitIntegration(
           {
             name: "Signaturit",
             org_id: orgId,

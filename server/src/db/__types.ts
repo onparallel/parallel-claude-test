@@ -314,6 +314,32 @@ export const PetitionUserNotificationTypeValues = [
   "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
 ] as PetitionUserNotificationType[];
 
+export type ProfileEventType =
+  | "PROFILE_CREATED"
+  | "PROFILE_UPDATED"
+  | "PROFILE_DELETED"
+  | "PROFILE_FIELD_VALUE_UPDATED"
+  | "PROFILE_FIELD_VALUE_DELETED";
+
+export const ProfileEventTypeValues = [
+  "PROFILE_CREATED",
+  "PROFILE_UPDATED",
+  "PROFILE_DELETED",
+  "PROFILE_FIELD_VALUE_UPDATED",
+  "PROFILE_FIELD_VALUE_DELETED",
+] as ProfileEventType[];
+
+export type ProfileTypeFieldType = "TEXT" | "SHORT_TEXT" | "FILE" | "DATE" | "PHONE" | "NUMBER";
+
+export const ProfileTypeFieldTypeValues = [
+  "TEXT",
+  "SHORT_TEXT",
+  "FILE",
+  "DATE",
+  "PHONE",
+  "NUMBER",
+] as ProfileTypeFieldType[];
+
 export type SystemEventType =
   | "USER_CREATED"
   | "USER_LOGGED_IN"
@@ -404,6 +430,11 @@ export interface TableTypes {
   petition_signature_request: PetitionSignatureRequest;
   petition_tag: PetitionTag;
   petition_user_notification: PetitionUserNotification;
+  profile: Profile;
+  profile_event: ProfileEvent;
+  profile_field_value: ProfileFieldValue;
+  profile_type: ProfileType;
+  profile_type_field: ProfileTypeField;
   public_file_upload: PublicFileUpload;
   public_petition_link: PublicPetitionLink;
   public_petition_link_prefill_data: PublicPetitionLinkPrefillData;
@@ -454,6 +485,11 @@ export interface TableCreateTypes {
   petition_signature_request: CreatePetitionSignatureRequest;
   petition_tag: CreatePetitionTag;
   petition_user_notification: CreatePetitionUserNotification;
+  profile: CreateProfile;
+  profile_event: CreateProfileEvent;
+  profile_field_value: CreateProfileFieldValue;
+  profile_type: CreateProfileType;
+  profile_type_field: CreateProfileTypeField;
   public_file_upload: CreatePublicFileUpload;
   public_petition_link: CreatePublicPetitionLink;
   public_petition_link_prefill_data: CreatePublicPetitionLinkPrefillData;
@@ -504,6 +540,11 @@ export interface TablePrimaryKeys {
   petition_signature_request: "id";
   petition_tag: "id";
   petition_user_notification: "id";
+  profile: "id";
+  profile_event: "id";
+  profile_field_value: "id";
+  profile_type: "id";
+  profile_type_field: "id";
   public_file_upload: "id";
   public_petition_link: "id";
   public_petition_link_prefill_data: "id";
@@ -1329,6 +1370,117 @@ export interface PetitionUserNotification {
 export type CreatePetitionUserNotification = PartialProps<
   Omit<PetitionUserNotification, "id">,
   "data" | "created_at" | "processed_at" | "read_at"
+>;
+
+export interface Profile {
+  id: number; // int4
+  org_id: number; // int4
+  profile_type_id: number; // int4
+  name: string; // varchar
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateProfile = PartialProps<
+  Omit<Profile, "id">,
+  "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "deleted_by"
+>;
+
+export interface ProfileEvent {
+  id: number; // int4
+  org_id: number; // int4
+  profile_id: number; // int4
+  type: ProfileEventType; // profile_event_type
+  data: any; // jsonb
+  created_at: Date; // timestamptz
+  processed_at: Maybe<Date>; // timestamptz
+}
+
+export type CreateProfileEvent = PartialProps<
+  Omit<ProfileEvent, "id">,
+  "data" | "created_at" | "processed_at"
+>;
+
+export interface ProfileFieldValue {
+  id: number; // int4
+  profile_id: number; // int4
+  profile_type_field_id: number; // int4
+  content: any; // jsonb
+  user_id: number; // int4
+  expires_at: Maybe<Date>; // timestamptz
+  is_current: boolean; // bool
+  version: number; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  anonymized_at: Maybe<Date>; // timestamptz
+  replaced_at: Maybe<Date>; // timestamptz
+}
+
+export type CreateProfileFieldValue = PartialProps<
+  Omit<ProfileFieldValue, "id">,
+  "content" | "expires_at" | "created_at" | "created_by" | "anonymized_at" | "replaced_at"
+>;
+
+export interface ProfileType {
+  id: number; // int4
+  org_id: number; // int4
+  name: any; // jsonb
+  profile_name_pattern: Maybe<string>; // text
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateProfileType = PartialProps<
+  Omit<ProfileType, "id">,
+  | "name"
+  | "profile_name_pattern"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+>;
+
+export interface ProfileTypeField {
+  id: number; // int4
+  profile_type_id: number; // int4
+  position: number; // int4
+  name: any; // jsonb
+  type: ProfileTypeFieldType; // profile_type_field_type
+  options: any; // jsonb
+  alias: Maybe<string>; // varchar
+  is_expirable: boolean; // bool
+  expiry_alert_ahead_time: Maybe<Duration>; // interval
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateProfileTypeField = PartialProps<
+  Omit<ProfileTypeField, "id">,
+  | "name"
+  | "options"
+  | "alias"
+  | "is_expirable"
+  | "expiry_alert_ahead_time"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
 >;
 
 export interface PublicFileUpload {

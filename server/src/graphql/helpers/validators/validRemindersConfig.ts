@@ -1,7 +1,7 @@
 import { core } from "nexus";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
-import { isValidTime, isValidTimezone } from "../../../util/validators";
+import { isValidTime, isValidTimezone } from "../../../util/time";
 
 export function validRemindersConfig<TypeName extends string, FieldName extends string>(
   prop: (

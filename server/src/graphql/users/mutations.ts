@@ -584,7 +584,7 @@ export const userSignUp = mutationField("userSignUp", {
       );
     }
 
-    const org = await ctx.setup.createOrganization(
+    const org = await ctx.accountSetup.createOrganization(
       {
         name: args.organizationName,
         status: source !== "self-service" ? "ACTIVE" : "DEMO",
@@ -716,7 +716,7 @@ export const signUp = mutationField("signUp", {
       );
     }
 
-    const org = await ctx.setup.createOrganization(
+    const org = await ctx.accountSetup.createOrganization(
       {
         name: args.organizationName,
         status: source !== "self-service" ? "ACTIVE" : "DEMO",

@@ -32,6 +32,7 @@ async function extractTerms(input) {
         (0, child_process_1.execSync)(`formatjs extract \
        --ignore='../**/*.d.ts' \
        --extract-source-location \
+       --additional-function-names getLocalizableUserText \
        --throws \
        --out-file ${tmpFileName} \
       ${isWindows ? input : `'${input}'`}`, { encoding: "utf-8" });

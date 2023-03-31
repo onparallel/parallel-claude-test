@@ -1,6 +1,6 @@
 import { core } from "nexus";
 import { isDefined } from "remeda";
-import { isValidTimezone } from "../../../util/validators";
+import { isValidTimezone } from "../../../util/time";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 import { EMAIL_REGEX } from "./validEmail";

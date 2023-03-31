@@ -47,6 +47,7 @@ async function extractTerms(input: string) {
       `formatjs extract \
        --ignore='../**/*.d.ts' \
        --extract-source-location \
+       --additional-function-names getLocalizableUserText \
        --throws \
        --out-file ${tmpFileName} \
       ${isWindows ? input : `'${input}'`}`,

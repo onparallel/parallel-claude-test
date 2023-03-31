@@ -8,6 +8,7 @@ export default async function () {
   await waitUntilReady(dc);
 
   execSync("cross-env NODE_ENV=test MIGRATION_ENV=local knex migrate:latest");
+  execSync("cross-env knex seed:run --specific=test.ts");
 }
 
 function waitUntilReady(process: ChildProcessWithoutNullStreams) {

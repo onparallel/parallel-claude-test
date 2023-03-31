@@ -20,6 +20,7 @@ import {
   ContactLocaleValues,
   CreateContact,
   CreateFeatureFlag,
+  CreateFeatureFlagOverride,
   CreateFileUpload,
   CreateOrganization,
   CreateOrganizationTheme,
@@ -64,6 +65,10 @@ import {
   PetitionSignatureRequest,
   PetitionStatus,
   PetitionUserNotification,
+  ProfileType,
+  ProfileTypeField,
+  ProfileTypeFieldType,
+  ProfileTypeFieldTypeValues,
   PublicPetitionLink,
   Tag,
   TaskName,
@@ -211,6 +216,16 @@ export class Mocks {
 
   async updateFeatureFlag(name: FeatureFlagName, value: boolean) {
     await this.knex.from("feature_flag").where({ name }).update({ default_value: value });
+  }
+
+  async createFeatureFlagOverride(
+    featureFlag: FeatureFlagName,
+    override: Pick<CreateFeatureFlagOverride, "user_id" | "org_id" | "value">
+  ) {
+    await this.knex.into("feature_flag_override").insert({
+      feature_flag_name: featureFlag,
+      ...override,
+    });
   }
 
   async createRandomContacts(
@@ -1113,6 +1128,54 @@ export class Mocks {
       "*"
     );
   }
+
+  async createRandomProfileTypes(
+    orgId: number,
+    amount?: number,
+    builder?: (i: number) => Partial<ProfileType>
+  ) {
+    return await this.knex<ProfileType>("profile_type").insert(
+      range(0, amount || 1).map((i) => ({
+        org_id: orgId,
+        name: this.knex.raw(
+          "?::jsonb",
+          JSON.stringify({ es: faker.random.words(2), en: faker.random.words(2) })
+        ),
+        ...builder?.(i),
+      })),
+      "*"
+    );
+  }
+
+  async createRandomProfileTypeFields(
+    orgId: number,
+    profileTypeId: number,
+    amount?: number,
+    builder?: (i: number) => Partial<ProfileTypeField>
+  ) {
+    const [{ max }] = await this.knex("profile_type_field")
+      .where("profile_type_id", profileTypeId)
+      .whereNull("deleted_at")
+      .max("position");
+
+    return await this.knex<ProfileTypeField>("profile_type_field").insert(
+      range(0, amount || 1).map((i) => {
+        const type = randomProfileTypeFieldType();
+        return {
+          profile_type_id: profileTypeId,
+          position: (max ?? -1) + 1 + i,
+          name: this.knex.raw(
+            "?::jsonb",
+            JSON.stringify({ es: faker.random.words(2), en: faker.random.words(2) })
+          ),
+          type,
+          options: randomProfileTypeFieldOptions(type),
+          ...builder?.(i),
+        };
+      }),
+      "*"
+    );
+  }
 }
 
 function randomPetitionStatus() {
@@ -1129,6 +1192,14 @@ function randomContactLocale() {
 
 function randomUserPreferredLocale() {
   return faker.helpers.arrayElement<UserLocale>(UserLocaleValues);
+}
+
+function randomProfileTypeFieldType() {
+  return faker.helpers.arrayElement<ProfileTypeFieldType>(ProfileTypeFieldTypeValues);
+}
+
+function randomProfileTypeFieldOptions(type: ProfileTypeFieldType) {
+  return {};
 }
 
 function randomPetitionFieldOptions(type: PetitionFieldType) {

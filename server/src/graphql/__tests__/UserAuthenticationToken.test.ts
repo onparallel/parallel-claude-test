@@ -20,9 +20,8 @@ describe("GraphQL/UserAuthenticationToken", () => {
     ({ organization, user } = await mocks.createSessionUserAndOrganization());
 
     await mocks.createFeatureFlags([{ name: "DEVELOPER_ACCESS", default_value: false }]);
-    await knex.from<FeatureFlagOverride>("feature_flag_override").insert({
+    await mocks.createFeatureFlagOverride("DEVELOPER_ACCESS", {
       org_id: organization.id,
-      feature_flag_name: "DEVELOPER_ACCESS",
       value: true,
     });
   });

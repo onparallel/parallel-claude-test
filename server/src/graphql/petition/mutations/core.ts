@@ -102,6 +102,7 @@ import {
   userHasAccessToPublicPetitionLink,
   userHasAccessToUserOrUserGroupPermissions,
 } from "./authorizers";
+import { DatabaseError } from "pg";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create parallel.",
@@ -1088,14 +1089,17 @@ export const updatePetitionField = mutationField("updatePetitionField", {
         data,
         ctx.user!
       );
-    } catch (error: any) {
-      if (error.constraint === "petition_field__petition_id__alias__unique") {
+    } catch (e) {
+      if (
+        e instanceof DatabaseError &&
+        e.constraint === "petition_field__petition_id__alias__unique"
+      ) {
         throw new ApolloError(
           "The alias for this field already exists in this petition",
           "ALIAS_ALREADY_EXISTS"
         );
       } else {
-        throw error;
+        throw e;
       }
     }
   },
