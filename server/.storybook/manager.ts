@@ -6,5 +6,4 @@ addons.setConfig({
   showNav: true,
   showPanel: true,
   panelPosition: "right",
-  theme: themes.light,
 });
