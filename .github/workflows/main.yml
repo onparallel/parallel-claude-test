@@ -16,12 +16,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/cache@v3
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        id: yarn-cache
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-yarn-cache-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-cache-
+      - name: Install node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.12
       - name: Show node version
         run: node -v
       - name: Install dependencies
@@ -33,7 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/cache@v3
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        id: yarn-cache
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-yarn-cache-${{ hashFiles('yarn.lock') }}
@@ -42,11 +46,11 @@ jobs:
       - name: Check translations
         run: |
           echo "Checking server translations..."
-          yarn --cwd server/ extract-i18n-terms
-          yarn --cwd server/ generate-i18n-files
+          yarn workspace @parallel/server extract-i18n-terms
+          yarn workspace @parallel/server generate-i18n-files
           echo "Checking client translations..."
-          yarn --cwd client/ extract-i18n-terms
-          yarn --cwd client/ generate-i18n-files
+          yarn workspace @parallel/client extract-i18n-terms
+          yarn workspace @parallel/client generate-i18n-files
 
   linter:
     needs: setup
@@ -55,7 +59,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/cache@v3
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        id: yarn-cache
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-yarn-cache-${{ hashFiles('yarn.lock') }}
@@ -68,13 +72,11 @@ jobs:
   server-test-suite:
     needs: setup
     name: Server Test Suite
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - uses: actions/checkout@v3
       - uses: actions/cache@v3
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        id: yarn-cache
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-yarn-cache-${{ hashFiles('yarn.lock') }}
