@@ -6,7 +6,7 @@ import { differenceInMinutes } from "date-fns";
 import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
 import { difference, isDefined, partition, zip } from "remeda";
-import { LicenseCode, PublicFileUpload, UserLocale } from "../../db/__types";
+import { LicenseCode, PublicFileUpload } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { withError } from "../../util/promises/withError";
 import { removeNotDefined } from "../../util/remedaExtensions";
@@ -34,7 +34,6 @@ import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArray";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
-import { validLocale } from "../helpers/validators/validLocale";
 import { validPassword } from "../helpers/validators/validPassword";
 import { orgCanCreateNewUser, orgDoesNotHaveSsoProvider } from "../organization/authorizers";
 import { userHasFeatureFlag } from "../petition/authorizers";
@@ -100,109 +99,6 @@ export const changePassword = mutationField("changePassword", {
         throw error;
       }
     }
-  },
-});
-
-/** @deprecated */
-export const createOrganizationUser = mutationField("createOrganizationUser", {
-  deprecation: "use inviteUserToOrganization",
-  description:
-    "Creates a new user in the same organization as the context user if `orgId` is not provided",
-  type: "User",
-  authorize: authenticateAnd(
-    ifArgDefined(
-      "orgId",
-      userIsSuperAdmin(),
-      and(
-        orgDoesNotHaveSsoProvider(),
-        orgCanCreateNewUser(),
-        contextUserHasRole("ADMIN"),
-        ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never))
-      )
-    ),
-    emailIsNotRegisteredInTargetOrg("email", "orgId" as never)
-  ),
-  args: {
-    email: nonNull(stringArg()),
-    firstName: nonNull(stringArg()),
-    lastName: nonNull(stringArg()),
-    role: nonNull(arg({ type: "OrganizationRole" })),
-    locale: stringArg(),
-    userGroupIds: list(nonNull(globalIdArg("UserGroup"))),
-    orgId: globalIdArg("Organization"),
-  },
-  validateArgs: validateAnd(
-    validLocale((args) => args.locale, "locale"),
-    validEmail((args) => args.email, "email"),
-    (_, { role }, ctx, info) => {
-      if (role === "OWNER") {
-        throw new ArgValidationError(info, "role", "Can't create a new user with OWNER role.");
-      }
-    }
-  ),
-  resolve: async (_, args, ctx) => {
-    // if orgId is provided the invitation email will be anonymous
-    const orgId = args.orgId ?? ctx.user!.org_id;
-
-    const [organization, userData] = await Promise.all([
-      ctx.organizations.loadOrg(orgId),
-      ctx.users.loadUserData(ctx.user!.user_data_id),
-    ]);
-    const email = args.email.trim().toLowerCase();
-    const firstName = args.firstName.trim();
-    const lastName = args.lastName.trim();
-
-    const cognitoId = await ctx.auth.getOrCreateCognitoUser(
-      email,
-      null,
-      firstName,
-      lastName,
-      {
-        locale: (args.locale ?? "en") as UserLocale,
-        organizationName: organization!.name,
-        organizationUser: args.orgId ? "" : fullName(userData!.first_name, userData!.last_name),
-      },
-      true
-    );
-    const [user] = await Promise.all([
-      ctx.users.createUser(
-        {
-          org_id: orgId,
-          organization_role: args.role,
-        },
-        {
-          cognito_id: cognitoId!,
-          email,
-          first_name: firstName,
-          last_name: lastName,
-          details: {
-            source: "org-invitation",
-          },
-          preferred_locale: (args.locale ?? "en") as UserLocale,
-        },
-        `User:${ctx.user!.id}`
-      ),
-      ctx.system.createEvent({
-        type: "INVITE_SENT",
-        data: {
-          invited_by: ctx.user!.id,
-          email,
-          first_name: firstName,
-          last_name: lastName,
-          role: args.role,
-        },
-      }),
-    ]);
-
-    if (args.userGroupIds) {
-      await pMap(args.userGroupIds, (userGroupId) =>
-        ctx.userGroups.addUsersToGroup(userGroupId, user.id, `User:${ctx.user!.id}`)
-      );
-
-      ctx.userGroups.loadUserGroupsByUserId.dataloader.clear(user.id);
-    }
-
-    return user;
   },
 });
 
@@ -504,138 +400,6 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
   },
 });
 
-/** @deprecated  */
-export const userSignUp = mutationField("userSignUp", {
-  deprecation: "use signUp",
-  description: "Triggered by new users that want to sign up into Parallel",
-  type: "User",
-  args: {
-    email: nonNull(stringArg()),
-    password: nonNull(stringArg()),
-    firstName: nonNull(stringArg()),
-    lastName: nonNull(stringArg()),
-    organizationName: nonNull(stringArg()),
-    locale: stringArg({
-      description: "Preferred locale for AWS Cognito CustomMessages.",
-    }),
-    organizationLogo: uploadArg(),
-    industry: stringArg(),
-    role: stringArg(),
-    position: stringArg(),
-    captcha: nonNull(stringArg()),
-    licenseCode: stringArg(),
-  },
-  authorize: verifyCaptcha("captcha"),
-  validateArgs: validateAnd(
-    validLocale((args) => args.locale, "locale"),
-    validPassword((args) => args.password),
-    validEmail((args) => args.email, "email"),
-    emailIsAvailable((args) => args.email),
-    emailDomainIsNotSSO((args) => args.email),
-    validateIf(
-      (args) => isDefined(args.organizationLogo),
-      validateFile(
-        (args) => args.organizationLogo!,
-        { contentType: ["image/png", "image/jpeg"], maxSize: 1024 * 1024 },
-        "organizationLogo"
-      )
-    )
-  ),
-  resolve: async (_, args, ctx) => {
-    let licenseCode: LicenseCode | null = null;
-    if (isDefined(args.licenseCode)) {
-      licenseCode = await ctx.licenseCodes.loadLicenseCode(args.licenseCode);
-      if (licenseCode?.status !== "PENDING") {
-        throw new ApolloError(
-          `Provided license code is ${licenseCode?.status} and can't be used`,
-          "INVALID_LICENSE_CODE"
-        );
-      }
-    }
-
-    const source = licenseCode?.source ?? "self-service";
-    const tierKey = licenseCode?.details.parallel_tier ?? "FREE";
-
-    const email = args.email.trim().toLowerCase();
-    const [error, cognitoId] = await withError(
-      ctx.auth.signUpUser(email, args.password, args.firstName, args.lastName, {
-        locale: (args.locale ?? "en") as UserLocale,
-      })
-    );
-    if (error) {
-      await withError(ctx.auth.deleteUser(email));
-      throw error;
-    }
-
-    let logoFile: Maybe<PublicFileUpload> = null;
-    if (args.organizationLogo) {
-      const { mimetype, createReadStream } = await args.organizationLogo;
-      const filename = random(16);
-      const path = `uploads/${filename}`;
-      const res = await ctx.storage.publicFiles.uploadFile(path, mimetype, createReadStream());
-      logoFile = await ctx.files.createPublicFile(
-        {
-          path,
-          filename,
-          content_type: mimetype,
-          size: res["ContentLength"]!.toString(),
-        },
-        `UserSignUp:${args.email}`
-      );
-    }
-
-    const org = await ctx.accountSetup.createOrganization(
-      {
-        name: args.organizationName,
-        status: source !== "self-service" ? "ACTIVE" : "DEMO",
-        logo_public_file_id: logoFile?.id ?? null,
-        appsumo_license:
-          licenseCode && licenseCode.source === "AppSumo"
-            ? {
-                ...licenseCode.details,
-                events: [licenseCode.details],
-              }
-            : null,
-      },
-      `UserSignUp:${args.email}`
-    );
-
-    const user = await ctx.users.createUser(
-      {
-        organization_role: "OWNER",
-        org_id: org.id,
-        status: "ACTIVE",
-      },
-      {
-        cognito_id: cognitoId!,
-        email,
-        first_name: args.firstName,
-        last_name: args.lastName,
-        details: {
-          source,
-          industry: args.industry,
-          role: args.role,
-          position: args.position,
-        },
-        preferred_locale: (args.locale ?? "en") as UserLocale,
-      },
-      `UserSignUp:${args.email}`
-    );
-
-    await ctx.tiers.updateOrganizationTier(org, tierKey, `User:${user.id}`);
-
-    if (licenseCode) {
-      await ctx.licenseCodes.updateLicenseCode(
-        licenseCode.id,
-        { status: "REDEEMED" },
-        `User:${user.id}`
-      );
-    }
-
-    return user;
-  },
-});
-
 export const signUp = mutationField("signUp", {
   description: "Triggered by new users that want to sign up into Parallel",
   type: "User",
@@ -768,54 +532,6 @@ export const signUp = mutationField("signUp", {
   },
 });
 
-/** @deprecated */
-export const resendVerificationCode = mutationField("resendVerificationCode", {
-  deprecation: "use resendVerificationEmail",
-  description:
-    "Sends the AccountVerification email with confirmation code to unconfirmed user emails",
-  type: "Result",
-  args: {
-    email: nonNull(stringArg()),
-    locale: stringArg(),
-  },
-  validateArgs: validateAnd(
-    validEmail((args) => args.email, "email"),
-    validLocale((args) => args.locale, "locale")
-  ),
-  resolve: async (_, { email, locale }, ctx) => {
-    try {
-      const users = await ctx.users.loadUsersByEmail(email);
-      if (users.length === 0) {
-        return RESULT.SUCCESS;
-      }
-
-      const [user] = users;
-      const userData = await ctx.users.loadUserData(user.user_data_id);
-      if (!userData) {
-        return RESULT.SUCCESS;
-      }
-      if (
-        !userData.is_sso_user &&
-        (!userData.details.verificationCodeSentAt ||
-          differenceInMinutes(new Date(), new Date(userData.details.verificationCodeSentAt)) >= 60)
-      ) {
-        await ctx.users.updateUserData(
-          userData.id,
-          {
-            details: {
-              ...(userData.details ?? {}),
-              verificationCodeSentAt: new Date(),
-            },
-          },
-          `User:${user.id}`
-        );
-        await ctx.auth.resendVerificationCode(email, { locale: (locale ?? "en") as UserLocale });
-      }
-    } catch {}
-    return RESULT.SUCCESS;
-  },
-});
-
 export const resendVerificationEmail = mutationField("resendVerificationEmail", {
   description:
     "Sends the AccountVerification email with confirmation code to unconfirmed user emails",
@@ -859,30 +575,6 @@ export const resendVerificationEmail = mutationField("resendVerificationEmail", 
   },
 });
 
-/** @deprecated */
-export const publicResetTemporaryPassword = mutationField("publicResetTemporaryPassword", {
-  deprecation: "use publicResetTempPassword",
-  description:
-    "Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD",
-  type: "Result",
-  args: {
-    email: nonNull(stringArg()),
-    locale: nonNull(stringArg()),
-  },
-  validateArgs: validateAnd(
-    validEmail((args) => args.email, "email"),
-    validLocale((args) => args.locale, "locale")
-  ),
-  resolve: async (_, { email, locale }, ctx) => {
-    try {
-      await ctx.auth.resetTempPassword(email, locale as UserLocale);
-    } catch {}
-
-    // always return SUCCESS to avoid leaking errors and user statuses
-    return RESULT.SUCCESS;
-  },
-});
-
 export const publicResetTempPassword = mutationField("publicResetTempPassword", {
   description:
     "Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD",
@@ -902,27 +594,6 @@ export const publicResetTempPassword = mutationField("publicResetTempPassword", 
   },
 });
 
-/** @deprecated */
-export const resetTemporaryPassword = mutationField("resetTemporaryPassword", {
-  deprecation: "use resetTempPassword",
-  description:
-    "Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD",
-  type: "Result",
-  args: {
-    email: nonNull(stringArg()),
-    locale: nonNull(stringArg()),
-  },
-  authorize: authenticateAnd(contextUserHasRole("ADMIN")),
-  validateArgs: validateAnd(
-    validEmail((args) => args.email, "email"),
-    validLocale((args) => args.locale, "locale")
-  ),
-  resolve: async (_, { email, locale }, ctx) => {
-    await ctx.auth.resetTempPassword(email, locale as UserLocale);
-    return RESULT.SUCCESS;
-  },
-});
-
 export const resetTempPassword = mutationField("resetTempPassword", {
   description:
     "Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD",
@@ -937,33 +608,6 @@ export const resetTempPassword = mutationField("resetTempPassword", {
     await ctx.auth.resetTempPassword(email, locale);
 
     return RESULT.SUCCESS;
-  },
-});
-
-/** @deprecated */
-export const setUserPreferredLocale = mutationField("setUserPreferredLocale", {
-  deprecation: "use updateUserPreferredLocale",
-  description:
-    "Sets the locale passed as arg as the preferred language of the user to see the page",
-  type: "User",
-  args: {
-    locale: nonNull(stringArg()),
-  },
-  authorize: authenticate(),
-  validateArgs: validLocale((args) => args.locale, "locale"),
-  resolve: async (_, { locale }, ctx) => {
-    const userData = (await ctx.users.loadUserData(ctx.user!.user_data_id))!;
-    await ctx.users.updateUserData(
-      userData.id,
-      {
-        details: {
-          ...(userData.details ?? {}),
-        },
-        preferred_locale: locale as UserLocale,
-      },
-      `User:${ctx.user!.id}`
-    );
-    return ctx.user!;
   },
 });
 

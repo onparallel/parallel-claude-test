@@ -39,7 +39,6 @@ export const PetitionListViewData = objectType({
         },
       }),
     });
-    /** @deprecated use tagsFilters */
     t.nullable.list.nonNull.globalId("tags", { prefixName: "Tag", deprecation: "use tagsFilters" });
     t.nullable.field("tagsFilters", {
       type: objectType({

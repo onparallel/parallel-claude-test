@@ -765,12 +765,6 @@ type Mutation {
   clonePetitions(keepTitle: Boolean = false, path: String, petitionIds: [GID!]!): [PetitionBase!]!
 
   """
-  Clones the user group with all its members
-  """
-  cloneUserGroup(locale: String, userGroupIds: [GID!]!): [UserGroup!]!
-    @deprecated(reason: "Use cloneUserGroups")
-
-  """
   Clones the user groups with all its members
   """
   cloneUserGroups(locale: UserLocale!, userGroupIds: [GID!]!): [UserGroup!]!
@@ -891,19 +885,6 @@ type Mutation {
   Creates a new PDF_DOCUMENT theme on the user's organization
   """
   createOrganizationPdfDocumentTheme(isDefault: Boolean!, name: String!): Organization!
-
-  """
-  Creates a new user in the same organization as the context user if `orgId` is not provided
-  """
-  createOrganizationUser(
-    email: String!
-    firstName: String!
-    lastName: String!
-    locale: String
-    orgId: GID
-    role: OrganizationRole!
-    userGroupIds: [GID!]
-  ): User! @deprecated(reason: "use inviteUserToOrganization")
 
   """
   Create parallel.
@@ -1484,12 +1465,6 @@ type Mutation {
   publicResetTempPassword(email: String!, locale: UserLocale!): Result!
 
   """
-  Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
-  """
-  publicResetTemporaryPassword(email: String!, locale: String!): Result!
-    @deprecated(reason: "use publicResetTempPassword")
-
-  """
   Sends an access reminder for a contact that is trying to open a petition through a contactless access but already has another active access
   """
   publicSendReminder(
@@ -1595,24 +1570,12 @@ type Mutation {
   """
   Sends the AccountVerification email with confirmation code to unconfirmed user emails
   """
-  resendVerificationCode(email: String!, locale: String): Result!
-    @deprecated(reason: "use resendVerificationEmail")
-
-  """
-  Sends the AccountVerification email with confirmation code to unconfirmed user emails
-  """
   resendVerificationEmail(email: String!, locale: UserLocale!): Result!
 
   """
   Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
   """
   resetTempPassword(email: String!, locale: UserLocale!): Result!
-
-  """
-  Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
-  """
-  resetTemporaryPassword(email: String!, locale: String!): Result!
-    @deprecated(reason: "use resetTempPassword")
 
   """
   Resets the given user password on AWS Cognito and sends an email with new temporary.
@@ -1669,12 +1632,6 @@ type Mutation {
   Set the delegades of a user
   """
   setUserDelegates(delegateIds: [GID!]!): User!
-
-  """
-  Sets the locale passed as arg as the preferred language of the user to see the page
-  """
-  setUserPreferredLocale(locale: String!): User!
-    @deprecated(reason: "use updateUserPreferredLocale")
 
   """
   Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag.
@@ -2144,40 +2101,6 @@ type Mutation {
     """
     userId: GID!
   ): SupportMethodResponse!
-
-  """
-  Triggered by new users that want to sign up into Parallel
-  """
-  userSignUp(
-    captcha: String!
-    email: String!
-    firstName: String!
-    industry: String
-    lastName: String!
-    licenseCode: String
-
-    """
-    Preferred locale for AWS Cognito CustomMessages.
-    """
-    locale: String
-    organizationLogo: Upload
-    organizationName: String!
-    password: String!
-    position: String
-    role: String
-  ): User! @deprecated(reason: "use signUp")
-
-  """
-  Tries to get an access_token with provided credentials
-  """
-  validateDowJonesKycCredentials(clientId: String!, password: String!, username: String!): Boolean!
-    @deprecated(reason: "deprecated, use createDowJonesKycIntegration directly")
-
-  """
-  Runs backend checks to validate signaturit credentials.
-  """
-  validateSignaturitApiKey(apiKey: String!): Result!
-    @deprecated(reason: "deprecated, use createSignaturitIntegration directly")
   verifyPublicAccess(
     ip: String
     keycode: ID!

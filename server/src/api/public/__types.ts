@@ -586,11 +586,6 @@ export type Mutation = {
   clonePetitionField: PetitionField;
   /** Clone petition. */
   clonePetitions: Array<PetitionBase>;
-  /**
-   * Clones the user group with all its members
-   * @deprecated Use cloneUserGroups
-   */
-  cloneUserGroup: Array<UserGroup>;
   /** Clones the user groups with all its members */
   cloneUserGroups: Array<UserGroup>;
   /** Closes an open petition. */
@@ -624,11 +619,6 @@ export type Mutation = {
   createOrganization: Organization;
   /** Creates a new PDF_DOCUMENT theme on the user's organization */
   createOrganizationPdfDocumentTheme: Organization;
-  /**
-   * Creates a new user in the same organization as the context user if `orgId` is not provided
-   * @deprecated use inviteUserToOrganization
-   */
-  createOrganizationUser: User;
   /** Create parallel. */
   createPetition: PetitionBase;
   /** Creates a contactless petition access */
@@ -773,11 +763,6 @@ export type Mutation = {
   publicRemindersOptOut: Result;
   /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
   publicResetTempPassword: Result;
-  /**
-   * Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
-   * @deprecated use publicResetTempPassword
-   */
-  publicResetTemporaryPassword: Result;
   /** Sends an access reminder for a contact that is trying to open a petition through a contactless access but already has another active access */
   publicSendReminder: Result;
   publicSendVerificationCode: VerificationCodeRequest;
@@ -803,20 +788,10 @@ export type Mutation = {
   reorderPetitionAttachments: PetitionBase;
   /** Changes the ordering of a user's petition list views */
   reorderPetitionListViews: User;
-  /**
-   * Sends the AccountVerification email with confirmation code to unconfirmed user emails
-   * @deprecated use resendVerificationEmail
-   */
-  resendVerificationCode: Result;
   /** Sends the AccountVerification email with confirmation code to unconfirmed user emails */
   resendVerificationEmail: Result;
   /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
   resetTempPassword: Result;
-  /**
-   * Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
-   * @deprecated use resetTempPassword
-   */
-  resetTemporaryPassword: Result;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
   resetUserPassword: SupportMethodResponse;
   /** Restores a deleted petition if it's not already anonymized. */
@@ -834,11 +809,6 @@ export type Mutation = {
   sendSignatureRequestReminders: Result;
   /** Set the delegades of a user */
   setUserDelegates: User;
-  /**
-   * Sets the locale passed as arg as the preferred language of the user to see the page
-   * @deprecated use updateUserPreferredLocale
-   */
-  setUserPreferredLocale: User;
   /** Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag. */
   shareSignaturitApiKey: Organization;
   /** Triggered by new users that want to sign up into Parallel */
@@ -943,21 +913,6 @@ export type Mutation = {
   uploadDynamicSelectFieldFile: PetitionField;
   /** Uploads a user avatar image */
   uploadUserAvatar: SupportMethodResponse;
-  /**
-   * Triggered by new users that want to sign up into Parallel
-   * @deprecated use signUp
-   */
-  userSignUp: User;
-  /**
-   * Tries to get an access_token with provided credentials
-   * @deprecated deprecated, use createDowJonesKycIntegration directly
-   */
-  validateDowJonesKycCredentials: Scalars["Boolean"];
-  /**
-   * Runs backend checks to validate signaturit credentials.
-   * @deprecated deprecated, use createSignaturitIntegration directly
-   */
-  validateSignaturitApiKey: Result;
   verifyPublicAccess: PublicAccessVerification;
 };
 
@@ -1033,11 +988,6 @@ export type MutationclonePetitionsArgs = {
   keepTitle?: InputMaybe<Scalars["Boolean"]>;
   path?: InputMaybe<Scalars["String"]>;
   petitionIds: Array<Scalars["GID"]>;
-};
-
-export type MutationcloneUserGroupArgs = {
-  locale?: InputMaybe<Scalars["String"]>;
-  userGroupIds: Array<Scalars["GID"]>;
 };
 
 export type MutationcloneUserGroupsArgs = {
@@ -1119,16 +1069,6 @@ export type MutationcreateOrganizationArgs = {
 export type MutationcreateOrganizationPdfDocumentThemeArgs = {
   isDefault: Scalars["Boolean"];
   name: Scalars["String"];
-};
-
-export type MutationcreateOrganizationUserArgs = {
-  email: Scalars["String"];
-  firstName: Scalars["String"];
-  lastName: Scalars["String"];
-  locale?: InputMaybe<Scalars["String"]>;
-  orgId?: InputMaybe<Scalars["GID"]>;
-  role: OrganizationRole;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
 };
 
 export type MutationcreatePetitionArgs = {
@@ -1550,11 +1490,6 @@ export type MutationpublicResetTempPasswordArgs = {
   locale: UserLocale;
 };
 
-export type MutationpublicResetTemporaryPasswordArgs = {
-  email: Scalars["String"];
-  locale: Scalars["String"];
-};
-
 export type MutationpublicSendReminderArgs = {
   contactEmail: Scalars["String"];
   keycode?: InputMaybe<Scalars["ID"]>;
@@ -1627,11 +1562,6 @@ export type MutationreorderPetitionListViewsArgs = {
   ids: Array<Scalars["GID"]>;
 };
 
-export type MutationresendVerificationCodeArgs = {
-  email: Scalars["String"];
-  locale?: InputMaybe<Scalars["String"]>;
-};
-
 export type MutationresendVerificationEmailArgs = {
   email: Scalars["String"];
   locale: UserLocale;
@@ -1640,11 +1570,6 @@ export type MutationresendVerificationEmailArgs = {
 export type MutationresetTempPasswordArgs = {
   email: Scalars["String"];
   locale: UserLocale;
-};
-
-export type MutationresetTemporaryPasswordArgs = {
-  email: Scalars["String"];
-  locale: Scalars["String"];
 };
 
 export type MutationresetUserPasswordArgs = {
@@ -1691,10 +1616,6 @@ export type MutationsendSignatureRequestRemindersArgs = {
 
 export type MutationsetUserDelegatesArgs = {
   delegateIds: Array<Scalars["GID"]>;
-};
-
-export type MutationsetUserPreferredLocaleArgs = {
-  locale: Scalars["String"];
 };
 
 export type MutationshareSignaturitApiKeyArgs = {
@@ -2006,31 +1927,6 @@ export type MutationuploadDynamicSelectFieldFileArgs = {
 export type MutationuploadUserAvatarArgs = {
   image: Scalars["Upload"];
   userId: Scalars["GID"];
-};
-
-export type MutationuserSignUpArgs = {
-  captcha: Scalars["String"];
-  email: Scalars["String"];
-  firstName: Scalars["String"];
-  industry?: InputMaybe<Scalars["String"]>;
-  lastName: Scalars["String"];
-  licenseCode?: InputMaybe<Scalars["String"]>;
-  locale?: InputMaybe<Scalars["String"]>;
-  organizationLogo?: InputMaybe<Scalars["Upload"]>;
-  organizationName: Scalars["String"];
-  password: Scalars["String"];
-  position?: InputMaybe<Scalars["String"]>;
-  role?: InputMaybe<Scalars["String"]>;
-};
-
-export type MutationvalidateDowJonesKycCredentialsArgs = {
-  clientId: Scalars["String"];
-  password: Scalars["String"];
-  username: Scalars["String"];
-};
-
-export type MutationvalidateSignaturitApiKeyArgs = {
-  apiKey: Scalars["String"];
 };
 
 export type MutationverifyPublicAccessArgs = {

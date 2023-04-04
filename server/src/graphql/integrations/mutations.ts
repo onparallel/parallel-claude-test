@@ -31,24 +31,6 @@ export const markSignatureIntegrationAsDefault = mutationField(
   }
 );
 
-/** @deprecated */
-export const validateSignaturitApiKey = mutationField("validateSignaturitApiKey", {
-  deprecation: "deprecated, use createSignaturitIntegration directly",
-  description: "Runs backend checks to validate signaturit credentials.",
-  type: nonNull("Result"),
-  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("PETITION_SIGNATURE")),
-  args: {
-    apiKey: nonNull(stringArg()),
-  },
-  resolve: async (_, args, ctx) => {
-    try {
-      // await ctx.setup.authenticateSignaturitApiKey(args.apiKey);
-      return RESULT.SUCCESS;
-    } catch {}
-    return RESULT.FAILURE;
-  },
-});
-
 export const createSignaturitIntegration = mutationField("createSignaturitIntegration", {
   description: "Creates a new Signaturit integration on the user's organization",
   type: nonNull("SignatureOrgIntegration"),
@@ -142,27 +124,6 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
       return RESULT.SUCCESS;
     } catch {}
     return RESULT.FAILURE;
-  },
-});
-
-/** @deprecated */
-export const validateDowJonesKycCredentials = mutationField("validateDowJonesKycCredentials", {
-  deprecation: "deprecated, use createDowJonesKycIntegration directly",
-  description: "Tries to get an access_token with provided credentials",
-  type: "Boolean",
-  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("DOW_JONES_KYC")),
-  args: {
-    clientId: nonNull(stringArg()),
-    username: nonNull(stringArg()),
-    password: nonNull(stringArg()),
-  },
-  resolve: async (_, args, ctx) => {
-    try {
-      // await ctx.setup.authenticateDowJonesCredentials(args.clientId, args.username, args.password);
-      return true;
-    } catch {
-      return false;
-    }
   },
 });
 
