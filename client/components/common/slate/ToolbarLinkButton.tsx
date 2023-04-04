@@ -3,7 +3,7 @@ import { LinkIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { withError } from "@parallel/utils/promises/withError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { CustomEditor, SlateElement, SlateText } from "@parallel/utils/slate/types";
+import { SlateElement, SlateText } from "@parallel/utils/slate/types";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import {
   getAbove,
@@ -11,7 +11,7 @@ import {
   insertNodes,
   isCollapsed,
 } from "@udecode/plate-common";
-import { focusEditor, moveSelection, select } from "@udecode/plate-core";
+import { focusEditor, moveSelection, select, usePlateEditorRef } from "@udecode/plate-core";
 import { upsertLink } from "@udecode/plate-link";
 import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -22,18 +22,17 @@ import { DialogProps, useDialog } from "../dialogs/DialogProvider";
 import { ToolbarButton, ToolbarButtonProps } from "./ToolbarButton";
 
 export interface ToolbarLinkButtonProps
-  extends Omit<ToolbarButtonProps, "isToggeable" | "type" | "label" | "icon"> {
-  editor: CustomEditor;
-}
+  extends Omit<ToolbarButtonProps, "isToggeable" | "type" | "label" | "icon"> {}
 
 interface LinkNode extends SlateElement<"link", SlateText> {
   url: string;
 }
 
 export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonProps>(
-  function ToolbarLinkButton({ editor, ...props }, ref) {
+  function ToolbarLinkButton({ ...props }, ref) {
     const intl = useIntl();
     const showAddLinkDialog = useAddLinkDialog();
+    const editor = usePlateEditorRef();
     const editorRef = useUpdatingRef(editor);
     const handleMouseDown = useCallback(
       getPreventDefaultHandler(async () => {
@@ -83,6 +82,7 @@ export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonPro
     );
     return (
       <ToolbarButton
+        ref={ref}
         icon={<LinkIcon />}
         label={intl.formatMessage({
           id: "component.rich-text-editor.link",

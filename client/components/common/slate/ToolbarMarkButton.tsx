@@ -1,15 +1,15 @@
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { CustomEditor } from "@parallel/utils/slate/types";
 import { getPreventDefaultHandler, isMarkActive, toggleMark } from "@udecode/plate-common";
+import { usePlateEditorRef } from "@udecode/plate-core";
 import { ToolbarButton, ToolbarButtonProps } from "./ToolbarButton";
 
 export interface ToolbarMarkButtonProps extends Omit<ToolbarButtonProps, "isToggeable" | "type"> {
-  editor: CustomEditor;
   type: string;
 }
 
 export const ToolbarMarkButton = chakraForwardRef<"button", ToolbarMarkButtonProps>(
-  function ToolbarMarkButton({ type, editor, ...props }, ref) {
+  function ToolbarMarkButton({ type, ...props }, ref) {
+    const editor = usePlateEditorRef();
     const isActive = isMarkActive(editor as any, type);
     return (
       <ToolbarButton

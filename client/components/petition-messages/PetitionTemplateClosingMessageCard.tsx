@@ -7,8 +7,8 @@ import {
   PetitionTemplateClosingMessageCard_PetitionTemplateFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
-import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
-import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
+import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/textWithPlaceholder";
+import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { outdent } from "outdent";
@@ -24,7 +24,7 @@ interface PetitionTemplateClosingMessageCardProps {
 
 const messages: Record<PetitionLocale, string> = {
   en: outdent`
-    Dear #contact-first-name#,
+    Dear {{contact-first-name}},
 
     We have reviewed all the information that we requested, and we can confirm that everything is correct.
 
@@ -33,7 +33,7 @@ const messages: Record<PetitionLocale, string> = {
     Best regards.
   `,
   es: outdent`
-    Apreciado/a #contact-first-name#,
+    Apreciado/a {{contact-first-name}},
 
     Le comunicamos que hemos revisado toda la información que le requerimos y le confirmamos que está todo correcto.
     

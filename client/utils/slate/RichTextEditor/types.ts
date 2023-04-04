@@ -1,4 +1,4 @@
-import { PlaceholderElement } from "../placeholders/PlaceholderPlugin";
+import { PlaceholderElement } from "../PlaceholderPlugin";
 import { SlateElement, SlateText } from "../types";
 
 export type RichTextEditorValue = (RichTextEditorBlock | RichTextEditorList)[];

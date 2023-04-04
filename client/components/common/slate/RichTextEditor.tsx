@@ -1,15 +1,14 @@
-import { Box, Portal, Text, useFormControl, useId, useMultiStyleConfig } from "@chakra-ui/react";
-import { PlaceholderMenu } from "@parallel/components/common/slate/PlaceholderMenu";
+import { Box, Text, useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
 import { formatList } from "@parallel/utils/slate/formatList";
 import {
+  createPlaceholderPlugin,
+  PlaceholderCombobox,
   PlaceholderOption,
-  usePlaceholderPlugin,
-} from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
+  removePlaceholderInputElements,
+} from "@parallel/utils/slate/PlaceholderPlugin";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { CustomEditor } from "@parallel/utils/slate/types";
-import { useEditorPopper } from "@parallel/utils/slate/useEditorPopper";
 import { useConstant } from "@parallel/utils/useConstant";
-import { useFocus } from "@parallel/utils/useFocus";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { createAutoformatPlugin } from "@udecode/plate-autoformat";
 import {
@@ -21,12 +20,14 @@ import {
   MARK_UNDERLINE,
 } from "@udecode/plate-basic-marks";
 import { createExitBreakPlugin } from "@udecode/plate-break";
+import { createComboboxPlugin } from "@udecode/plate-combobox";
 import { withProps } from "@udecode/plate-common";
 import {
   createHistoryPlugin,
   createPlugins,
   createReactPlugin,
   focusEditor,
+  PlatePlugin,
   PlateProvider,
 } from "@udecode/plate-core";
 import { createHeadingPlugin, ELEMENT_H1, ELEMENT_H2 } from "@udecode/plate-heading";
@@ -40,8 +41,8 @@ import {
   unwrapList,
 } from "@udecode/plate-list";
 import { createParagraphPlugin, ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
-import { CSSProperties, forwardRef, ReactNode, useImperativeHandle, useMemo, useRef } from "react";
-import { omit, pick } from "remeda";
+import { forwardRef, useImperativeHandle, useRef } from "react";
+import { createPipe, identity, isDefined, omit, pick } from "remeda";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { PlateWithEditorRef } from "./PlateWithEditorRef";
 import { RichTextEditorToolbar } from "./RichTextEditorToolbar";
@@ -102,23 +103,13 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
       isRequired,
       isReadOnly,
       placeholder,
-      placeholderOptions = [],
+      placeholderOptions,
       toolbarOpts,
-      onFocus,
-      onBlur,
       ...props
     },
     ref
   ) {
-    const {
-      plugin: placholderPlugin,
-      onAddPlaceholder,
-      onHighlightOption,
-      index,
-      search,
-      target,
-      values,
-    } = usePlaceholderPlugin(placeholderOptions);
+    const hasPlaceholders = isDefined(placeholderOptions) && placeholderOptions.length > 0;
     const plugins = useConstant(() =>
       createPlugins<RichTextEditorValue, RichTextPEditor>(
         [
@@ -149,7 +140,13 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
               ],
             },
           }),
-          placholderPlugin as any,
+          ...(hasPlaceholders
+            ? ([createComboboxPlugin(), createPlaceholderPlugin()] as PlatePlugin<
+                any,
+                RichTextEditorValue,
+                RichTextPEditor
+              >[])
+            : []),
           createHeadingPlugin({ options: { levels: 2 } }),
           createLinkPlugin(),
           createExitBreakPlugin({
@@ -195,57 +192,18 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
 
     const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
     const inputStyles = {
-      ...omit(inputStyleConfig as any, [
-        "px",
-        "pl",
-        "pr",
-        "paddingX",
-        "paddingRight",
-        "paddingLeft",
-        "paddingY",
-        "h",
-        "height",
-        "_focus",
-        "_invalid",
-      ]),
+      ...omit(inputStyleConfig as any, ["px", "h", "_focus", "_invalid"]),
       _focusWithin: (inputStyleConfig as any)._focus,
       _invalid: (inputStyleConfig as any)._invalid,
     } as any;
 
-    const [isFocused, focusProps] = useFocus({ onBlur, onFocus });
-
-    const isMenuOpen = Boolean(isFocused && target && values.length > 0);
-    const selected = isMenuOpen ? values[index] : undefined;
-
-    const placeholderMenuId = useId(undefined, "rte-placeholder-menu");
-    const itemIdPrefix = useId(undefined, "rte-placeholder-menu-item");
-
     const editableProps = {
       readOnly: isDisabled,
+      "aria-disabled": formControl.disabled,
       placeholder,
-      style: useMemo(
-        () =>
-          ({
-            padding: "12px 16px",
-            maxHeight: "250px",
-            overflow: "auto",
-          } as CSSProperties),
-        []
-      ),
-      "aria-controls": placeholderMenuId,
-      "aria-autocomplete": "list" as const,
-      "aria-activedescendant": selected ? `${itemIdPrefix}-${selected.value}` : undefined,
-      ...focusProps,
     };
 
-    const { popperRef } = useEditorPopper(editorRef.current! as any, target, {
-      strategy: "fixed",
-      placement: "bottom-start",
-      enabled: isMenuOpen,
-    });
-
-    // for some reason frozen objects from the apollo cache cause issues when typing
-    const initialValue = useConstant(() => JSON.parse(JSON.stringify(value)));
+    const initialValue = useConstant(() => structuredClone(value));
 
     const formControlProps = pick(formControl, [
       "id",
@@ -259,7 +217,11 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
       <PlateProvider<RichTextEditorValue, RichTextPEditor>
         plugins={plugins}
         initialValue={initialValue}
-        onChange={!isDisabled ? onChange : undefined}
+        onChange={
+          !isDisabled
+            ? createPipe(hasPlaceholders ? removePlaceholderInputElements : identity, onChange)
+            : undefined
+        }
       >
         <Box
           role="application"
@@ -268,36 +230,36 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
           {...formControlProps}
           {...inputStyles}
           {...props}
+          sx={{
+            '[contenteditable="false"]': {
+              width: "auto !important",
+            },
+            '> [role="textbox"]': {
+              minHeight: "120px !important",
+              paddingX: 4,
+              paddingY: 3,
+              maxHeight: "250px",
+              overflow: "auto",
+            },
+            "[data-slate-placeholder]": {
+              opacity: "1 !important",
+              color: "gray.400",
+            },
+          }}
         >
           <RichTextEditorToolbar
             height="40px"
             isDisabled={formControl.disabled || formControl.readOnly}
-            hasPlaceholders={placeholderOptions.length > 0}
+            hasPlaceholders={hasPlaceholders}
             hasHeadingButton={toolbarOpts?.headingButton}
             hasListButtons={toolbarOpts?.listButtons}
           />
           <PlateWithEditorRef<RichTextEditorValue, RichTextPEditor>
             editorRef={editorRef}
             editableProps={editableProps}
-            renderEditable={renderEditable}
-          />
-          <Portal>
-            <PlaceholderMenu
-              ref={popperRef}
-              isOpen={isMenuOpen}
-              menuId={placeholderMenuId}
-              itemIdPrefix={itemIdPrefix}
-              search={search}
-              values={values}
-              highlightedIndex={index}
-              onAddPlaceholder={(placeholder) =>
-                onAddPlaceholder(editorRef.current! as any, placeholder)
-              }
-              onHighlightOption={onHighlightOption}
-              width="fit-content"
-              position="relative"
-            />
-          </Portal>
+          >
+            {hasPlaceholders ? <PlaceholderCombobox placeholders={placeholderOptions} /> : null}
+          </PlateWithEditorRef>
         </Box>
       </PlateProvider>
     );
@@ -320,26 +282,5 @@ function RenderLink({ attributes, nodeProps, styles, element, editor, ...props }
       {...attributes}
       {...props}
     />
-  );
-}
-
-function renderEditable(editable: ReactNode) {
-  return (
-    <Box
-      sx={{
-        '[contenteditable="false"]': {
-          width: "auto !important",
-        },
-        "> div": {
-          minHeight: "120px !important",
-        },
-        "[data-slate-placeholder]": {
-          opacity: "1 !important",
-          color: "gray.400",
-        },
-      }}
-    >
-      {editable}
-    </Box>
   );
 }

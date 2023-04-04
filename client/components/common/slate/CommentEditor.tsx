@@ -13,7 +13,6 @@ import { Maybe } from "@parallel/utils/types";
 import { useConstant } from "@parallel/utils/useConstant";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { createComboboxPlugin } from "@udecode/plate-combobox";
-import { withProps } from "@udecode/plate-common";
 import {
   createHistoryPlugin,
   createPlugins,
@@ -21,10 +20,11 @@ import {
   focusEditor,
   getEndPoint,
   PlateProvider,
+  withProps,
 } from "@udecode/plate-core";
 import { ELEMENT_MENTION_INPUT } from "@udecode/plate-mention";
 import { createParagraphPlugin, ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
-import { CSSProperties, forwardRef, useImperativeHandle, useMemo, useRef } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import { isDefined, omit, pick } from "remeda";
 import { Editor, Transforms } from "slate";
 import { EditableProps } from "slate-react/dist/components/editable";
@@ -32,7 +32,6 @@ import { PlateWithEditorRef } from "./PlateWithEditorRef";
 
 const components = {
   [ELEMENT_PARAGRAPH]: withProps(RenderElement, { as: "p" }),
-  [ELEMENT_MENTION_INPUT]: MentionInputElement,
 };
 
 export type CommentEditorValue = CommentEditorBlock[];
@@ -189,16 +188,11 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
       readOnly: isDisabled,
       "aria-disabled": formControl.disabled,
       placeholder,
-      style: {
-        padding: "8px 12px",
-        maxHeight: "250px",
-        overflow: "auto",
-      } as CSSProperties,
       ...props,
     };
 
     // for some reason frozen objects from the apollo cache cause issues when typing
-    const initialValue = useConstant(() => JSON.parse(JSON.stringify(value)));
+    const initialValue = useConstant(() => structuredClone(value));
 
     const formControlProps = pick(formControl, [
       "id",
@@ -217,14 +211,19 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
       >
         <Box
           overflow="hidden"
+          aria-disabled={formControl.disabled}
           {...formControlProps}
           {...inputStyles}
           sx={{
             '[contenteditable="false"]': {
               width: "auto !important",
             },
-            "> div": {
+            '> [role="textbox"]': {
               minHeight: "40px !important",
+              paddingX: 3,
+              paddingY: 2,
+              maxHeight: "250px",
+              overflow: "auto",
             },
             "[data-slate-placeholder]": {
               opacity: "1 !important",

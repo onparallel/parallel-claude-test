@@ -7,7 +7,6 @@ import {
   UnderlineIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { usePlateEditorRef } from "@udecode/plate-core";
 import { useIntl } from "react-intl";
 import { ToolbarHeadingButton } from "./ToolbarHeadingButton";
 import { ToolbarLinkButton } from "./ToolbarLinkButton";
@@ -28,7 +27,6 @@ export const RichTextEditorToolbar = chakraForwardRef<"div", RichTextEditorToolb
     ref
   ) {
     const intl = useIntl();
-    const editor = usePlateEditorRef();
     return (
       <Stack
         ref={ref}
@@ -38,9 +36,8 @@ export const RichTextEditorToolbar = chakraForwardRef<"div", RichTextEditorToolb
         padding={1}
         {...props}
       >
-        {hasHeadingButton ? <ToolbarHeadingButton editor={editor} disabled={isDisabled} /> : null}
+        {hasHeadingButton ? <ToolbarHeadingButton disabled={isDisabled} /> : null}
         <ToolbarMarkButton
-          editor={editor}
           type="bold"
           icon={<BoldIcon fontSize="16px" />}
           isDisabled={isDisabled}
@@ -50,7 +47,6 @@ export const RichTextEditorToolbar = chakraForwardRef<"div", RichTextEditorToolb
           })}
         />
         <ToolbarMarkButton
-          editor={editor}
           type="italic"
           icon={<ItalicIcon fontSize="16px" />}
           isDisabled={isDisabled}
@@ -60,7 +56,6 @@ export const RichTextEditorToolbar = chakraForwardRef<"div", RichTextEditorToolb
           })}
         />
         <ToolbarMarkButton
-          editor={editor}
           type="underline"
           icon={<UnderlineIcon fontSize="16px" />}
           isDisabled={isDisabled}
@@ -72,7 +67,6 @@ export const RichTextEditorToolbar = chakraForwardRef<"div", RichTextEditorToolb
         {hasListButtons ? (
           <>
             <ToolbarListButton
-              editor={editor}
               type="bulleted-list"
               icon={<ListIcon fontSize="16px" />}
               isDisabled={isDisabled}
@@ -82,7 +76,6 @@ export const RichTextEditorToolbar = chakraForwardRef<"div", RichTextEditorToolb
               })}
             />
             <ToolbarListButton
-              editor={editor}
               type="numbered-list"
               icon={<OrderedListIcon fontSize="16px" />}
               isDisabled={isDisabled}
@@ -93,10 +86,8 @@ export const RichTextEditorToolbar = chakraForwardRef<"div", RichTextEditorToolb
             />
           </>
         ) : null}
-        {hasPlaceholders ? (
-          <ToolbarPlaceholderButton editor={editor} isDisabled={isDisabled} />
-        ) : null}
-        <ToolbarLinkButton editor={editor} isDisabled={isDisabled} />
+        {hasPlaceholders ? <ToolbarPlaceholderButton isDisabled={isDisabled} /> : null}
+        <ToolbarLinkButton isDisabled={isDisabled} />
       </Stack>
     );
   }

@@ -8,8 +8,9 @@ import escapeStringRegexp from "escape-string-regexp";
 import { useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { sanitizeFilenameWithSuffix } from "./sanitizeFilenameWithSuffix";
+import { PlaceholderOption } from "./slate/PlaceholderPlugin";
 
-export function useFilenamePlaceholders() {
+export function useFilenamePlaceholders(): PlaceholderOption[] {
   const intl = useIntl();
   return useMemo(
     () => [
@@ -58,14 +59,14 @@ export function useFilenamePlaceholdersRename() {
         const extension = (reply.content.filename as string).match(/\.[a-z0-9]+$/)?.[0] ?? "";
         const parts = pattern.split(
           new RegExp(
-            `(#(?:${placeholders.map((p) => escapeStringRegexp(p.value)).join("|")})#)`,
+            `(\\{\\{(?:${placeholders.map((p) => escapeStringRegexp(p.value)).join("|")})\\}\\})`,
             "g"
           )
         );
         const name = parts
           .map((part) => {
-            if (part.startsWith("#") && part.endsWith("#")) {
-              const value = part.slice(1, -1);
+            if (part.startsWith("{{") && part.endsWith("}}")) {
+              const value = part.slice(2, -2);
               switch (value) {
                 case "field-number":
                   return index;
@@ -74,9 +75,11 @@ export function useFilenamePlaceholdersRename() {
                 case "file-name":
                   // remove file extension since it's added back later
                   return reply.content.filename.replace(/\.[a-z0-9]+$/, "");
+                default:
+                  return "";
               }
             }
-            return part;
+            return part.replaceAll("\\{", "{");
           })
           .join("");
 

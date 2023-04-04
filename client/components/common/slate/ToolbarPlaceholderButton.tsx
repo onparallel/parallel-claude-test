@@ -1,37 +1,42 @@
-import { SharpIcon } from "@parallel/chakra/icons";
+import { BracesIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { CustomEditor } from "@parallel/utils/slate/types";
+import { ELEMENT_PLACEHOLDER_INPUT } from "@parallel/utils/slate/PlaceholderPlugin";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { getPreventDefaultHandler } from "@udecode/plate-common";
-import { focusEditor, insertText } from "@udecode/plate-core";
+import { focusEditor, insertNode, usePlateEditorRef } from "@udecode/plate-core";
+import { isSelectionInMentionInput } from "@udecode/plate-mention";
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
 import { ToolbarButton, ToolbarButtonProps } from "./ToolbarButton";
 
 export interface ToolbarPlaceholderButtonProps
-  extends Omit<ToolbarButtonProps, "isToggeable" | "type" | "label" | "icon"> {
-  editor: CustomEditor;
-}
+  extends Omit<ToolbarButtonProps, "isToggeable" | "type" | "label" | "icon"> {}
 
 export const ToolbarPlaceholderButton = chakraForwardRef<"button", ToolbarPlaceholderButtonProps>(
-  function ToolbarPlaceholderButton({ editor, ...props }, ref) {
+  function ToolbarPlaceholderButton({ ...props }, ref) {
     const intl = useIntl();
+    const editor = usePlateEditorRef();
     const editorRef = useUpdatingRef(editor);
     const handleMouseDown = useCallback(
       getPreventDefaultHandler(() => {
         focusEditor(editorRef.current as any);
-        requestAnimationFrame(() => {
-          insertText(editorRef.current, "#", {
-            at: editorRef.current.selection?.anchor,
+        if (!isSelectionInMentionInput(editorRef.current)) {
+          requestAnimationFrame(() => {
+            insertNode(editorRef.current, {
+              type: ELEMENT_PLACEHOLDER_INPUT,
+              children: [{ text: "" }],
+              trigger: "{",
+            });
           });
-        });
+        }
       }),
       []
     );
     return (
       <ToolbarButton
+        ref={ref}
         data-action="add-placeholder"
-        icon={<SharpIcon fontSize="16px" />}
+        icon={<BracesIcon fontSize="16px" />}
         label={intl.formatMessage({
           id: "component.rich-text-editor.personalize",
           defaultMessage: "Personalize",

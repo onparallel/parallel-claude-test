@@ -76,7 +76,7 @@ export async function* getPetitionFiles(
         const file = filesById[reply.content["file_upload_id"]];
         if (file?.upload_complete) {
           const extension = file.filename.match(/\.[a-z0-9]+$/i)?.[0] ?? "";
-          const name = rename(options.pattern ?? "#file-name#", placeholders, (placeholder) => {
+          const name = rename(options.pattern ?? "{{file-name}}", placeholders, (placeholder) => {
             switch (placeholder) {
               case "field-number":
                 return `${field.position! + 1 - headingCount}`;
@@ -143,17 +143,19 @@ function rename<T extends string>(
   replacer: (value: T) => string
 ) {
   const parts = pattern.split(
-    new RegExp(`(#(?:${placeholders.map((p) => escapeStringRegexp(p)).join("|")})#)`, "g")
+    new RegExp(`(\\{\\{(?:${placeholders.map((p) => escapeStringRegexp(p)).join("|")})\\}\\})`, "g")
   );
   return parts
     .map((part) => {
-      if (part.startsWith("#") && part.endsWith("#")) {
-        const value = part.slice(1, -1);
+      if (part.startsWith("{{") && part.endsWith("}}")) {
+        const value = part.slice(2, -2);
         if (placeholders.includes(value as any)) {
           return replacer(value as T);
+        } else {
+          return "";
         }
       }
-      return part;
+      return part.replaceAll("\\{", "{");
     })
     .join("");
 }

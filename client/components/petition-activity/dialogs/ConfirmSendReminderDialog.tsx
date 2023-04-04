@@ -19,7 +19,7 @@ import {
   RichTextEditorInstance,
 } from "@parallel/components/common/slate/RichTextEditor";
 import { PetitionAccessTable_PetitionAccessFragment } from "@parallel/graphql/__types";
-import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
+import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
 import { emptyRTEValue } from "@parallel/utils/slate/RichTextEditor/emptyRTEValue";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";

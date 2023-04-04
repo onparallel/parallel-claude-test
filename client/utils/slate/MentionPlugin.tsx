@@ -63,19 +63,22 @@ export function createMentionPlugin<
         };
       },
     },
+    overrideByKey: {
+      [ELEMENT_MENTION_INPUT]: {
+        component: MentionInputElement,
+      },
+    },
     component: MentionElement,
   });
 }
 
 export interface MentionComboboxProps extends Pick<Partial<ComboboxProps<Mentionable>>, "id"> {
-  onSearchMentionables: (
-    search: string
-  ) => MaybePromise<createMentionPlugin_UserOrUserGroupFragment[]>;
-  defaultMentionables?: createMentionPlugin_UserOrUserGroupFragment[];
+  onSearchMentionables: (search: string) => MaybePromise<Mentionable[]>;
+  defaultMentionables?: Mentionable[];
   pluginKey?: string;
 }
 
-function mapMentionable(mentionable: createMentionPlugin_UserOrUserGroupFragment) {
+function mapMentionable(mentionable: Mentionable) {
   const text =
     mentionable.__typename === "User"
       ? mentionable.fullName!
@@ -152,12 +155,13 @@ function MentionElement({
       data-mention-id={element.mentionId}
       {...attributes}
       as="span"
+      fontSize="sm"
+      height="21px"
       display="inline-block"
       backgroundColor="gray.75"
       borderRadius="sm"
       boxShadow={isSelected && isFocused ? "outline" : "none"}
       paddingX={1}
-      marginX="0.1em"
     >
       <Box
         as="span"
@@ -184,9 +188,10 @@ export const MentionInputElement = (props: any) => {
       display="inline-block"
       backgroundColor="gray.75"
       borderRadius="sm"
+      fontSize="sm"
+      height="21px"
       boxShadow={isSelected && isFocused ? "outline" : "none"}
       paddingX={1}
-      marginX="0.1em"
       _before={{ content: '"@"' }}
       {...attributes}
     >

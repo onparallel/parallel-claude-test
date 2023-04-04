@@ -2228,8 +2228,8 @@ export const NewPropertyIcon = createIcon({
   ),
 });
 
-export const CopyPropertyIcon = createIcon({
-  displayName: "CopyPropertyIcon",
+export const BracesIcon = createIcon({
+  displayName: "BracesIcon",
   viewBox: "0 0 24 24",
   path: (
     <g

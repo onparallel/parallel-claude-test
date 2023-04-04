@@ -1,5 +1,5 @@
 import { FormControl, FormLabel } from "@chakra-ui/react";
-import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
+import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { RichTextEditor } from "../common/slate/RichTextEditor";

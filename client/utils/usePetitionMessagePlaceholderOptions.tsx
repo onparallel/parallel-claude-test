@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
+import { PlaceholderOption } from "./slate/PlaceholderPlugin";
 
-export function usePetitionMessagePlaceholderOptions() {
+export function usePetitionMessagePlaceholderOptions(): PlaceholderOption[] {
   const intl = useIntl();
   return useMemo(
     () => [

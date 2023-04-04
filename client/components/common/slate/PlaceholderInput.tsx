@@ -1,222 +1,204 @@
-import {
-  Box,
-  Portal,
-  Text,
-  Tooltip,
-  useId,
-  useMultiStyleConfig,
-  usePopper,
-} from "@chakra-ui/react";
+import { Box, Center, Text, useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { PlaceholderMenu } from "@parallel/components/common/slate/PlaceholderMenu";
 import {
+  createPlaceholderPlugin,
+  ELEMENT_PLACEHOLDER_INPUT,
+  PlaceholderCombobox,
   PlaceholderElement,
+  PlaceholderInputElement,
   PlaceholderOption,
-  PLACEHOLDER_TYPE,
-  usePlaceholderPlugin,
-} from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
-import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
+} from "@parallel/utils/slate/PlaceholderPlugin";
 import { createSingleLinePlugin } from "@parallel/utils/slate/SingleLinePlugin";
+import {
+  slateNodesToTextWithPlaceholders,
+  textWithPlaceholderToSlateNodes,
+} from "@parallel/utils/slate/textWithPlaceholder";
 import { CustomEditor, SlateElement, SlateText } from "@parallel/utils/slate/types";
 import { useConstant } from "@parallel/utils/useConstant";
+import { ValueProps } from "@parallel/utils/ValueProps";
+import { createComboboxPlugin } from "@udecode/plate-combobox";
 import {
   createHistoryPlugin,
   createPlugins,
   createReactPlugin,
   focusEditor,
   getEndPoint,
-  insertText,
   PlateProvider,
-  select,
+  withProps,
 } from "@udecode/plate-core";
-import { createParagraphPlugin } from "@udecode/plate-paragraph";
-import { CSSProperties, MouseEvent, useImperativeHandle, useMemo, useRef } from "react";
-import { useIntl } from "react-intl";
+import { ELEMENT_MENTION_INPUT } from "@udecode/plate-mention";
+import { createParagraphPlugin, ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
+import { useImperativeHandle, useRef } from "react";
+import { omit, pick } from "remeda";
+import { Editor, Transforms } from "slate";
+import { EditableProps } from "slate-react/dist/components/editable";
 import { PlateWithEditorRef } from "./PlateWithEditorRef";
+import { ToolbarPlaceholderButton } from "./ToolbarPlaceholderButton";
 
-type PlaceholderInputValue = [PlaceholderInputBlock];
+export type PlaceholderInputValue = [PlaceholderInputBlock];
 
 interface PlaceholderInputBlock extends SlateElement<"paragraph", PlaceholderInputBlockContent> {}
 
-type PlaceholderInputBlockContent = SlateText | PlaceholderElement;
+type PlaceholderInputBlockContent = SlateText | PlaceholderElement | PlaceholderInputElement;
 
 type PlaceholderInputEditor = CustomEditor<PlaceholderInputValue>;
 
-export type PlaceholderInputProps = {
+export interface PlaceholderInputProps
+  extends ValueProps<string, false>,
+    Omit<EditableProps, "value" | "onChange"> {
   placeholders: PlaceholderOption[];
-  value: string;
   isDisabled?: boolean;
-  onChange: (value: string) => void;
-};
+  isInvalid?: boolean;
+  isRequired?: boolean;
+  isReadOnly?: boolean;
+}
 
-export type PlaceholderInputRef = {
+export interface PlaceholderInputInstance {
   focus: () => void;
+  clear(): void;
+}
+
+const components = {
+  [ELEMENT_PARAGRAPH]: withProps(RenderElement, { as: "p" }),
 };
 
-function RenderElement({ attributes, nodeProps, styles, element, ...props }: any) {
+function RenderElement({ attributes, nodeProps, styles, element, editor, ...props }: any) {
   return <Text {...attributes} {...props} />;
 }
 
-export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, PlaceholderInputRef>(
-  ({ id, placeholder, placeholders, value, isDisabled, onChange, ...props }, ref) => {
-    const intl = useIntl();
-    const { plugin, onAddPlaceholder, onHighlightOption, index, search, target, values } =
-      usePlaceholderPlugin(placeholders);
+export const PlaceholderInput = chakraForwardRef<
+  "div",
+  PlaceholderInputProps,
+  PlaceholderInputInstance
+>(
+  (
+    {
+      id,
+      placeholder,
+      placeholders,
+      value,
+      isDisabled,
+      isInvalid,
+      isRequired,
+      isReadOnly,
+      onChange,
+      ...props
+    },
+    ref
+  ) => {
     const plugins = useConstant(() =>
-      createPlugins<PlaceholderInputValue, PlaceholderInputEditor>([
-        createReactPlugin(),
-        createHistoryPlugin(),
-        createParagraphPlugin({ type: "paragraph", component: RenderElement }),
-        createSingleLinePlugin(),
-        plugin as any,
-      ])
+      createPlugins<PlaceholderInputValue, PlaceholderInputEditor>(
+        [
+          createReactPlugin(),
+          createHistoryPlugin(),
+          createParagraphPlugin(),
+          createSingleLinePlugin(),
+          createComboboxPlugin(),
+          createPlaceholderPlugin(),
+        ],
+        {
+          components,
+          overrideByKey: {
+            [ELEMENT_PARAGRAPH]: { type: "paragraph" },
+            [ELEMENT_MENTION_INPUT]: { type: ELEMENT_PLACEHOLDER_INPUT },
+          },
+        }
+      )
     );
+    const formControl = useFormControl({
+      id,
+      isDisabled,
+      isInvalid,
+      isRequired,
+      isReadOnly,
+    });
     const editorRef = useRef<PlaceholderInputEditor>(null);
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        focus: () => {
-          const editor = editorRef.current!;
-          focusEditor(editor);
-          select(editor, getEndPoint(editor, []));
-        },
-      }),
-      []
-    );
+    useImperativeHandle(ref, () => ({
+      focus: () => {
+        focusEditor(editorRef.current!, getEndPoint(editorRef.current!, []));
+      },
+      clear: () => {
+        const editor = editorRef.current! as any;
+        Transforms.delete(editor, {
+          at: {
+            anchor: Editor.start(editor, []),
+            focus: Editor.end(editor, []),
+          },
+        });
+      },
+    }));
 
-    const placeholderMenuId = useId(undefined, "placeholder-menu");
-    const itemIdPrefix = useId(undefined, "placeholder-menu-item");
-    const isOpen = Boolean(target && values.length > 0);
+    const initialValue = useConstant(
+      () => textWithPlaceholderToSlateNodes(value, placeholders) as PlaceholderInputValue
+    );
 
     const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
     const inputStyles = {
-      ...inputStyleConfig,
+      ...omit(inputStyleConfig as any, ["px", "_focus", "_invalid", "bg"]),
+      backgroundColor: "white",
       _focusWithin: (inputStyleConfig as any)._focus,
+      _invalid: (inputStyleConfig as any)._invalid,
     } as any;
 
-    const slateValue = useMemo(
-      () => textWithPlaceholderToSlateNodes(value, placeholders) as PlaceholderInputValue,
-      [value]
-    );
-    const selected = isOpen ? values[index] : undefined;
+    const editableProps = {
+      readOnly: isDisabled,
+      "aria-disabled": formControl.disabled,
+      placeholder,
+      ...props,
+    };
 
-    function onPlaceholderButtonClick(event: MouseEvent) {
-      const editor = editorRef.current!;
-      event.preventDefault();
-      insertText(editor, "#", { at: editor.selection?.anchor });
-      focusEditor(editor);
-    }
-
-    const { referenceRef, popperRef } = usePopper({
-      placement: "bottom",
-      gutter: 2,
-      matchWidth: true,
-    });
-
-    const style = useMemo(
-      () =>
-        ({
-          flex: 1,
-          padding: "0 0.25rem",
-          whiteSpace: "pre",
-          overflow: "hidden",
-        } as CSSProperties),
-      []
-    );
+    const formControlProps = pick(formControl, [
+      "id",
+      "aria-invalid",
+      "aria-required",
+      "aria-readonly",
+      "aria-describedby",
+    ]);
 
     return (
       <PlateProvider<PlaceholderInputValue, PlaceholderInputEditor>
+        id={id}
         plugins={plugins}
-        value={slateValue}
-        onChange={(value) =>
-          onChange(slateNodesToTextWithPlaceholders(value as PlaceholderInputValue))
-        }
+        initialValue={initialValue}
+        onChange={(value) => onChange(slateNodesToTextWithPlaceholders(value, placeholders))}
       >
         <Box
-          id={id}
-          ref={referenceRef}
-          role="combobox"
-          aria-owns={placeholderMenuId}
-          aria-haspopup="listbox"
-          aria-expanded={isOpen}
-          aria-disabled={isDisabled}
-          display="flex"
-          alignItems="center"
+          overflow="hidden"
+          position="relative"
+          {...formControlProps}
           {...inputStyles}
-          {...props}
+          display="flex"
+          sx={{
+            '[contenteditable="false"]': {
+              width: "auto !important",
+            },
+            '> [role="textbox"]': {
+              flex: 1,
+              ...pick(inputStyleConfig, ["px"]),
+              whiteSpace: "pre",
+              overflow: "hidden",
+              display: "flex",
+              alignItems: "center",
+            },
+            "[data-slate-placeholder]": {
+              opacity: "1 !important",
+              color: "gray.400",
+            },
+          }}
         >
           <PlateWithEditorRef<PlaceholderInputValue, PlaceholderInputEditor>
             editorRef={editorRef}
-            editableProps={{
-              readOnly: isDisabled,
-              placeholder,
-              style,
-              "aria-controls": placeholderMenuId,
-              "aria-autocomplete": "list",
-              "aria-activedescendant": selected ? `${itemIdPrefix}-${selected.value}` : undefined,
-            }}
-          />
-          <Tooltip
-            label={intl.formatMessage({
-              id: "component.placeholder-input.hint",
-              defaultMessage: "Press # to add replaceable placeholders",
-            })}
-            placement="top"
+            id={id}
+            editableProps={editableProps}
           >
-            <Box
-              as="button"
-              display="inline-block"
-              border="1px solid"
-              borderBottomWidth="3px"
-              color="gray.600"
-              borderColor="gray.300"
-              borderRadius="sm"
-              textTransform="uppercase"
-              fontSize="xs"
-              paddingX={1}
-              marginLeft={1}
-              cursor="default"
-              _hover={{
-                borderColor: "gray.400",
-                color: "gray.900",
-              }}
-              onMouseDown={onPlaceholderButtonClick}
-            >
-              <Box as="span" aria-hidden="true">
-                #
-              </Box>
-            </Box>
-          </Tooltip>
+            <PlaceholderCombobox placeholders={placeholders} />
+          </PlateWithEditorRef>
+          <Center paddingRight={1} height="full">
+            <ToolbarPlaceholderButton variant="outline" size="sm" />
+          </Center>
         </Box>
-        <Portal>
-          <PlaceholderMenu
-            isOpen={isOpen}
-            ref={popperRef}
-            menuId={placeholderMenuId}
-            itemIdPrefix={itemIdPrefix}
-            search={search}
-            values={values}
-            highlightedIndex={index}
-            onAddPlaceholder={(placeholder) =>
-              onAddPlaceholder(editorRef.current! as any, placeholder)
-            }
-            onHighlightOption={onHighlightOption}
-          />
-        </Portal>
       </PlateProvider>
     );
   }
 );
-
-function slateNodesToTextWithPlaceholders(value: PlaceholderInputValue) {
-  return value[0].children
-    .map((child) => {
-      if ("type" in child) {
-        return child.type === PLACEHOLDER_TYPE ? `#${child.placeholder}#` : "";
-      } else {
-        return child.text;
-      }
-    })
-    .join("");
-}

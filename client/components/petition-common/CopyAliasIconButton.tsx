@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { CopyPropertyIcon } from "@parallel/chakra/icons";
+import { BracesIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   CopyAliasIconButton_PetitionFieldFragment,
@@ -31,7 +31,7 @@ export const CopyAliasIconButton = Object.assign(
       return (
         <IconButtonWithTooltip
           ref={ref}
-          icon={<CopyPropertyIcon />}
+          icon={<BracesIcon />}
           fontSize="16px"
           onClick={handleClick}
           size="xs"
@@ -48,7 +48,7 @@ export const CopyAliasIconButton = Object.assign(
       <CopyToClipboardButton
         ref={ref}
         text={buildAliasInterpolation(field.alias)}
-        icon={<CopyPropertyIcon />}
+        icon={<BracesIcon />}
         fontSize="16px"
         onClick={handleClick}
         size="xs"

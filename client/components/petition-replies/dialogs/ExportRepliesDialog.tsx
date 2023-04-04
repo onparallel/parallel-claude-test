@@ -18,7 +18,7 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   PlaceholderInput,
-  PlaceholderInputRef,
+  PlaceholderInputInstance,
 } from "@parallel/components/common/slate/PlaceholderInput";
 import {
   ExportRepliesDialog_PetitionFieldFragment,
@@ -104,8 +104,8 @@ export function ExportRepliesDialog({
   }, [user.hasExportCuatrecasas]);
 
   const [rename, setRename] = useUserPreference("export-replies-rename", true);
-  const [pattern, setPattern] = useState("#field-title#");
   const placeholders = useFilenamePlaceholders();
+  const [pattern, setPattern] = useState("{{file-name}}");
   const [externalClientId, setExternalClientId] = useState("");
   const [clientIdError, setClientIdError] = useState(false);
   const clientIdRef = useRef<HTMLInputElement>(null);
@@ -117,9 +117,9 @@ export function ExportRepliesDialog({
     return [reply.content.filename, placeholdersRename(fields)(field, reply, pattern)];
   }, [fields, placeholdersRename, pattern]);
 
-  const inputRef = useRef<PlaceholderInputRef>(null);
+  const inputRef = useRef<PlaceholderInputInstance>(null);
   const handleConfirmClick = () => {
-    const _pattern = rename ? pattern : "#file-name#";
+    const _pattern = rename ? pattern : "{{file-name}}";
     if (selectedOption === "DOWNLOAD_ZIP") {
       props.onResolve({ type: selectedOption, pattern: _pattern });
     } else if (selectedOption === "EXPORT_CUATRECASAS") {

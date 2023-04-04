@@ -18,8 +18,8 @@ import {
   PetitionTemplateCompletingMessageCard_PetitionTemplateFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
-import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
-import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
+import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/textWithPlaceholder";
+import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { outdent } from "outdent";
@@ -47,10 +47,10 @@ const messagesSubject: Record<PetitionLocale, string> = {
 
 const messagesBody: Record<PetitionLocale, string> = {
   en: outdent`
-    We have notified #user-first-name# that he will receive the information in order to continue with the process.
+    We have notified {{user-first-name}} that he will receive the information in order to continue with the process.
   `,
   es: outdent`
-    Hemos notificado a #user-first-name# que recibirá la información para poder continuar con el proceso.
+    Hemos notificado a {{user-first-name}} que recibirá la información para poder continuar con el proceso.
   `,
 };
 
