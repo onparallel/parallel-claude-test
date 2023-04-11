@@ -17,7 +17,7 @@ import assert from "assert";
 import chalk from "chalk";
 import { execSync } from "child_process";
 import path from "path";
-import { isDefined } from "remeda";
+import { isDefined, maxBy } from "remeda";
 import { run } from "./utils/run";
 import { timestamp } from "./utils/timestamp";
 import { wait, waitFor } from "./utils/wait";
@@ -36,9 +36,16 @@ const ec2 = new EC2Client({
 
 async function main() {
   const name = `parallel-server-${timestamp()}`;
+  const imagesResult = await ec2.send(
+    new DescribeImagesCommand({
+      Owners: ["amazon"],
+      Filters: [{ Name: "name", Values: ["amzn2-ami-kernel-5.10-hvm-*-x86_64-gp2"] }],
+    })
+  );
+  const image = maxBy(imagesResult.Images!, (i) => new Date(i.CreationDate!).valueOf())!;
   const instanceResult = await ec2.send(
     new RunInstancesCommand({
-      ImageId: "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64",
+      ImageId: image.ImageId!,
       KeyName: KEY_NAME,
       SecurityGroupIds: SECURITY_GROUP_IDS,
       InstanceType: INSTANCE_TYPE,

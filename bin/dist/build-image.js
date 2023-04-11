@@ -25,8 +25,13 @@ const ec2 = new client_ec2_1.EC2Client({
 });
 async function main() {
     const name = `parallel-server-${(0, timestamp_1.timestamp)()}`;
+    const imagesResult = await ec2.send(new client_ec2_1.DescribeImagesCommand({
+        Owners: ["amazon"],
+        Filters: [{ Name: "name", Values: ["amzn2-ami-kernel-5.10-hvm-*-x86_64-gp2"] }],
+    }));
+    const image = (0, remeda_1.maxBy)(imagesResult.Images, (i) => new Date(i.CreationDate).valueOf());
     const instanceResult = await ec2.send(new client_ec2_1.RunInstancesCommand({
-        ImageId: "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64",
+        ImageId: image.ImageId,
         KeyName: KEY_NAME,
         SecurityGroupIds: SECURITY_GROUP_IDS,
         InstanceType: INSTANCE_TYPE,
