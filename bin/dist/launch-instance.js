@@ -21,12 +21,18 @@ const SECURITY_GROUP_IDS = {
     production: ["sg-078abc8a772035e7a"],
     staging: ["sg-083d7b4facd31a090"],
 };
-const SUBNET_ID = "subnet-d3cc68b9";
 const REGION = "eu-central-1";
 const ENHANCED_MONITORING = true;
 const HOME_DIR = "/home/ec2-user";
 const OPS_DIR = `${HOME_DIR}/parallel/ops/prod`;
-const AVAILABILITY_ZONES = [`${REGION}a`, `${REGION}b`, `${REGION}c`];
+const AVAILABILITY_ZONES = (0, remeda_1.range)(0, 9)
+    .map((i) => `${REGION}${["a", "b", "c"][i % 3]}`)
+    .reverse();
+const SUBNET_ID = {
+    "eu-central-1a": "subnet-d3cc68b9",
+    "eu-central-1b": "subnet-77f2e10a",
+    "eu-central-1c": "subnet-eb22c4a7",
+};
 const numInstances = {
     production: 1,
     staging: 1,
@@ -49,45 +55,60 @@ async function main() {
     const env = _env;
     (0, p_map_1.default)((0, remeda_1.range)(0, numInstances[env]), async (i) => {
         const name = `parallel-${env}-${commit}-${i + 1}`;
-        const result = await ec2.send(new client_ec2_1.RunInstancesCommand({
-            ImageId: IMAGE_ID,
-            KeyName: KEY_NAME,
-            SecurityGroupIds: SECURITY_GROUP_IDS[env],
-            IamInstanceProfile: {
-                Name: `parallel-server-${env}`,
-            },
-            InstanceType: INSTANCE_TYPES[env],
-            Placement: {
-                AvailabilityZone: AVAILABILITY_ZONES[i % AVAILABILITY_ZONES.length],
-                Tenancy: client_ec2_1.Tenancy.default,
-            },
-            SubnetId: SUBNET_ID,
-            MaxCount: 1,
-            MinCount: 1,
-            Monitoring: {
-                Enabled: ENHANCED_MONITORING,
-            },
-            TagSpecifications: [
-                {
-                    ResourceType: client_ec2_1.ResourceType.volume,
-                    Tags: [{ Key: "Name", Value: name }],
-                },
-                {
-                    ResourceType: client_ec2_1.ResourceType.instance,
-                    Tags: [
-                        { Key: "Name", Value: name },
-                        { Key: "Release", Value: commit },
-                        { Key: "Environment", Value: env },
-                        { Key: "InstanceNumber", Value: `${i + 1}` },
-                    ],
-                },
-            ],
-            MetadataOptions: {
-                HttpEndpoint: client_ec2_1.InstanceMetadataEndpointState.enabled,
-                HttpTokens: client_ec2_1.HttpTokensState.required,
-                InstanceMetadataTags: client_ec2_1.InstanceMetadataTagsState.enabled,
-            },
-        }));
+        const result = await (async () => {
+            while (AVAILABILITY_ZONES.length > 0) {
+                const az = AVAILABILITY_ZONES.pop();
+                try {
+                    return await ec2.send(new client_ec2_1.RunInstancesCommand({
+                        ImageId: IMAGE_ID,
+                        KeyName: KEY_NAME,
+                        SecurityGroupIds: SECURITY_GROUP_IDS[env],
+                        IamInstanceProfile: {
+                            Name: `parallel-server-${env}`,
+                        },
+                        InstanceType: INSTANCE_TYPES[env],
+                        Placement: {
+                            AvailabilityZone: az,
+                            Tenancy: client_ec2_1.Tenancy.default,
+                        },
+                        SubnetId: SUBNET_ID[az],
+                        MaxCount: 1,
+                        MinCount: 1,
+                        Monitoring: {
+                            Enabled: ENHANCED_MONITORING,
+                        },
+                        TagSpecifications: [
+                            {
+                                ResourceType: client_ec2_1.ResourceType.volume,
+                                Tags: [{ Key: "Name", Value: name }],
+                            },
+                            {
+                                ResourceType: client_ec2_1.ResourceType.instance,
+                                Tags: [
+                                    { Key: "Name", Value: name },
+                                    { Key: "Release", Value: commit },
+                                    { Key: "Environment", Value: env },
+                                    { Key: "InstanceNumber", Value: `${i + 1}` },
+                                ],
+                            },
+                        ],
+                        MetadataOptions: {
+                            HttpEndpoint: client_ec2_1.InstanceMetadataEndpointState.enabled,
+                            HttpTokens: client_ec2_1.HttpTokensState.required,
+                            InstanceMetadataTags: client_ec2_1.InstanceMetadataTagsState.enabled,
+                        },
+                    }));
+                }
+                catch (e) {
+                    if (e instanceof client_ec2_1.EC2ServiceException && e.name === "InsufficientInstanceCapacity") {
+                        console.log((0, chalk_1.default) `Not enough capacity in ${az}, trying next...`);
+                        continue;
+                    }
+                    throw e;
+                }
+            }
+            throw new Error("No AZ available");
+        })();
         const instance = result.Instances[0];
         const instanceId = instance.InstanceId;
         const ipAddress = instance.PrivateIpAddress;

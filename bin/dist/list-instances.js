@@ -52,6 +52,7 @@ async function main() {
             "Instance IP",
             "Instance Name",
             "Release",
+            "AZ",
             "State",
             "Load Balancer",
             "Health",
@@ -62,7 +63,7 @@ async function main() {
         },
     });
     table.push(...instances.map((i) => {
-        var _a, _b, _c, _d, _e, _f, _g, _h;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         const state = (() => {
             var _a, _b;
             switch ((_a = i.State) === null || _a === void 0 ? void 0 : _a.Name) {
@@ -91,10 +92,11 @@ async function main() {
             i.PrivateIpAddress,
             (_c = (_b = (_a = i.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name")) === null || _b === void 0 ? void 0 : _b.Value) !== null && _c !== void 0 ? _c : chalk_1.default.gray `-`,
             (_f = (_e = (_d = i.Tags) === null || _d === void 0 ? void 0 : _d.find((t) => t.Key === "Release")) === null || _e === void 0 ? void 0 : _e.Value) !== null && _f !== void 0 ? _f : chalk_1.default.gray `-`,
+            (_g = i.Placement) === null || _g === void 0 ? void 0 : _g.AvailabilityZone,
             state,
-            (_g = instancesToLb[i.InstanceId]) !== null && _g !== void 0 ? _g : chalk_1.default.red `⨯`,
+            (_h = instancesToLb[i.InstanceId]) !== null && _h !== void 0 ? _h : chalk_1.default.red `⨯`,
             health,
-            (_h = i.LaunchTime) === null || _h === void 0 ? void 0 : _h.toLocaleString("en-GB"),
+            (_j = i.LaunchTime) === null || _j === void 0 ? void 0 : _j.toLocaleString("en-GB"),
         ];
     }));
     console.log(table.toString());
