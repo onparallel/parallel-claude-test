@@ -240,9 +240,8 @@ export function ExportRepliesDialog({
                     value={pattern}
                     onChange={setPattern}
                     placeholders={placeholders}
-                    marginBottom={2}
                   />
-                  <Text as="div" fontSize="xs" color="gray.500">
+                  <Text as="div" fontSize="xs" color="gray.500" marginTop={2}>
                     <FormattedMessage
                       id="generic.for-example"
                       defaultMessage="E.g. {example}"
