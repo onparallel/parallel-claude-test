@@ -2,6 +2,7 @@ import "reflect-metadata";
 // keep this space to prevent import sorting, removing init from top
 import { SQSClient } from "@aws-sdk/client-sqs";
 import { Consumer } from "@rxfork/sqs-consumer";
+import { fork } from "child_process";
 import yargs from "yargs";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
@@ -41,6 +42,8 @@ export function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
 ) {
   loadEnv(`.${name}.env`);
 
+  const script = process.argv[1];
+
   const { parser } = {
     parser: (message: string) => JSON.parse(message) as QueueWorkerPayload<Q>,
     ...options,
@@ -58,17 +61,18 @@ export function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
           demandOption: true,
         }),
       async ({ payload }: { payload: string }) => {
+        const context = container.get<WorkerContext>(WorkerContext);
         try {
-          await handler(
-            parser(payload),
-            container.get<WorkerContext>(WorkerContext),
-            config.queueWorkers[name]
-          );
-        } catch (error: any) {
-          console.log(error);
+          await handler(parser(payload), context, config.queueWorkers[name]);
+        } catch (error) {
+          if (error instanceof Error) {
+            context.logger.error(error.message, { stack: error.stack });
+          } else {
+            context.logger.error(error);
+          }
           process.exit(1);
         }
-        if (process.env.NODE_ENV === "production") process.exit(0);
+        process.exit(0);
       }
     )
     .command(
@@ -83,25 +87,41 @@ export function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
           queueUrl: config.queueWorkers[name].queueUrl,
           visibilityTimeout: config.queueWorkers[name].visibilityTimeout,
           heartbeatInterval: config.queueWorkers[name].heartbeatInterval,
-          batchSize: 10,
+          batchSize: 3,
           handleMessage: async (message) => {
-            const payload = parser(message.Body!);
-            const context = container.get<WorkerContext>(WorkerContext);
+            logger.info("Start processing message", { payload: message.Body });
             try {
-              logger.info("Start processing message", { payload });
               const duration = await stopwatch(async () => {
-                await handler(payload, context, config.queueWorkers[name]);
+                return await new Promise<void>((resolve, reject) => {
+                  fork(
+                    script,
+                    [
+                      "run",
+                      message.Body!,
+                      ...(script.endsWith(".ts") ? ["-r", "ts-node/register"] : []),
+                    ],
+                    {
+                      stdio: "inherit",
+                      timeout: 90_000,
+                      env: process.env,
+                    }
+                  ).on("close", (code) => {
+                    if (code === 0) {
+                      resolve();
+                    } else {
+                      reject();
+                    }
+                  });
+                });
               });
               logger.info(`Successfully processed message in ${duration}ms`, {
-                payload,
+                payload: message.Body,
                 duration,
               });
-            } catch (error) {
-              if (error instanceof Error) {
-                context.logger.error(error.message, { stack: error.stack });
-              } else {
-                context.logger.error(error);
-              }
+            } catch {
+              logger.info(`Error processing message`, {
+                payload: message.Body,
+              });
             }
           },
           sqs: new SQSClient({
@@ -133,5 +153,7 @@ export function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
         }
         consumer.start();
       }
-    ).argv;
+    )
+    .demandCommand()
+    .recommendCommands().argv;
 }

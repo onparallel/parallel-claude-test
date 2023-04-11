@@ -1,4 +1,3 @@
-import { spawn } from "child_process";
 import { PathLike } from "fs";
 import { mkdir, rm, stat, writeFile } from "fs/promises";
 import { inject, injectable } from "inversify";
@@ -19,6 +18,7 @@ import {
 import { evaluateFieldVisibility } from "../util/fieldVisibility";
 import { isFileTypeField } from "../util/isFileTypeField";
 import { pFlatMap } from "../util/promises/pFlatMap";
+import { ChildProcessNonSuccessError, spawn } from "../util/spawn";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
 import { ILogger, LOGGER } from "./Logger";
@@ -197,42 +197,58 @@ export class PetitionBinder implements IPetitionBinder {
   }
 
   private async mergeFiles(paths: string[], output: string, dpi: number) {
-    await this.execute("gs", [
-      "-sDEVICE=pdfwrite",
-      "-dBATCH",
-      "-dPDFSETTINGS=/screen",
-      "-dNOPAUSE",
-      "-dQUIET",
-      "-dCompatibilityLevel=1.5",
-      "-dSubsetFonts=true",
-      "-dCompressFonts=true",
-      "-dEmbedAllFonts=true",
-      "-sProcessColorModel=DeviceRGB",
-      "-sColorConversionStrategy=RGB",
-      "-sColorConversionStrategyForImages=RGB",
-      "-dConvertCMYKImagesToRGB=true",
-      "-dDetectDuplicateImages=true",
-      "-dColorImageDownsampleType=/Bicubic",
-      "-dGrayImageDownsampleType=/Bicubic",
-      "-dMonoImageDownsampleType=/Bicubic",
-      "-dDownsampleColorImages=true",
-      "-dDoThumbnails=false",
-      "-dCreateJobTicket=false",
-      "-dPreserveEPSInfo=false",
-      "-dPreserveOPIComments=false",
-      "-dPreserveOverprintSettings=false",
-      "-dUCRandBGInfo=/Remove",
-      `-dColorImageResolution=${dpi}`,
-      `-dGrayImageResolution=${dpi}`,
-      `-dMonoImageResolution=${dpi}`,
-      `-sOutputFile=${output}`,
-      ...paths,
-    ]);
+    await spawn(
+      "gs",
+      [
+        "-sDEVICE=pdfwrite",
+        "-dBATCH",
+        "-dPDFSETTINGS=/screen",
+        "-dNOPAUSE",
+        "-dQUIET",
+        "-dCompatibilityLevel=1.5",
+        "-dSubsetFonts=true",
+        "-dCompressFonts=true",
+        "-dEmbedAllFonts=true",
+        "-sProcessColorModel=DeviceRGB",
+        "-sColorConversionStrategy=RGB",
+        "-sColorConversionStrategyForImages=RGB",
+        "-dConvertCMYKImagesToRGB=true",
+        "-dDetectDuplicateImages=true",
+        "-dColorImageDownsampleType=/Bicubic",
+        "-dGrayImageDownsampleType=/Bicubic",
+        "-dMonoImageDownsampleType=/Bicubic",
+        "-dDownsampleColorImages=true",
+        "-dDoThumbnails=false",
+        "-dCreateJobTicket=false",
+        "-dPreserveEPSInfo=false",
+        "-dPreserveOPIComments=false",
+        "-dPreserveOverprintSettings=false",
+        "-dUCRandBGInfo=/Remove",
+        `-dColorImageResolution=${dpi}`,
+        `-dGrayImageResolution=${dpi}`,
+        `-dMonoImageResolution=${dpi}`,
+        `-sOutputFile=${output}`,
+        ...paths,
+      ],
+      { timeout: 60_000, stdio: "inherit" }
+    );
   }
 
   private async stripMetadata(path: string, output: string) {
-    await this.execute("exiftool", ["-all=", "-overwrite_original", path]);
-    await this.execute("qpdf", ["--linearize", path, output]);
+    await spawn("exiftool", ["-all=", "-overwrite_original", path], {
+      timeout: 60_000,
+      stdio: "inherit",
+    });
+    try {
+      await spawn("qpdf", ["--linearize", path, output], { timeout: 60_000, stdio: "inherit" });
+    } catch (e) {
+      if (e instanceof ChildProcessNonSuccessError && e.exitCode === 3) {
+        // it's just warnings
+        return;
+      } else {
+        throw e;
+      }
+    }
   }
 
   private async convertImage(fileS3Path: string, contentType: string) {
@@ -242,14 +258,18 @@ export class PetitionBinder implements IPetitionBinder {
 
     const outputFormat = ["image/png", "image/gif"].includes(contentType) ? "png" : "jpeg";
     const output = resolve(this.temporaryDirectory, `${random(10)}.${outputFormat}`);
-    await this.execute("convert", [
-      // for GIF images, we only need the first frame
-      contentType === "image/gif" ? `${tmpPath}[0]` : tmpPath,
-      "-background",
-      "white",
-      "-flatten",
-      output,
-    ]);
+    await spawn(
+      "convert",
+      [
+        // for GIF images, we only need the first frame
+        contentType === "image/gif" ? `${tmpPath}[0]` : tmpPath,
+        "-background",
+        "white",
+        "-flatten",
+        output,
+      ],
+      { timeout: 60_000, stdio: "inherit" }
+    );
     return output;
   }
 
@@ -319,20 +339,6 @@ export class PetitionBinder implements IPetitionBinder {
     const path = resolve(this.temporaryDirectory, random(10));
     await writeFile(path, await stream);
     return path;
-  }
-
-  private async execute(command: string, args?: ReadonlyArray<string>) {
-    return await new Promise<void>((resolve, reject) => {
-      spawn(command, args)
-        .on("error", reject)
-        .on("close", (code) => {
-          if (code === 0) {
-            resolve();
-          } else {
-            reject(new Error(`Error running "${command}" with args ${args}`));
-          }
-        });
-    });
   }
 
   private async buildTmpDir() {
