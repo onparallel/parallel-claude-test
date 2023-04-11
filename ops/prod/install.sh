@@ -1,20 +1,20 @@
-COMMIT_SHA=$1
+INSTANCE_NAME=$1
 ENV=$2
+RELEASE=$3
+INSTANCE_NUMBER=$4
+BUILD_ID="parallel-${ENV}-${RELEASE}"
 
-sudo hostnamectl set-hostname "parallel-${ENV}-${COMMIT_SHA}"
+sudo hostnamectl set-hostname "$INSTANCE_NAME"
 
 # mount shared folder
 sudo mkdir -p /nfs/parallel
 sudo mount -t efs -o tls -O _netdev fs-05b0e1c4df3ecd227:/ /nfs/parallel
 
 cd /home/ec2-user
-sed -i "s/#ENV#/${ENV}/g" \
-  main/ops/prod/systemd/parallel-client.service \
-  main/ops/prod/systemd/parallel-server.service \
-  main/ops/prod/amazon-cloudwatch-agent/config.json
-sed -i "s/#COMMIT_SHA#/${COMMIT_SHA}/g" \
+sed -i -e "s/#INSTANCE_NAME#/$INSTANCE_NAME/g;s/#ENV#/$ENV/g;s/#RELEASE#/$RELEASE/g;s/#INSTANCE_NUMBER#/$INSTANCE_NUMBER/g;s/#BUILD_ID#/$BUILD_ID/g" \
   main/ops/prod/nginx/helpers/common.conf \
-  main/ops/prod/systemd/parallel-client.service \
+  main/ops/prod/workers.sh \
+  main/ops/prod/systemd/*.service \
   main/ops/prod/amazon-cloudwatch-agent/config.json
 sudo cp main/ops/prod/systemd/* /lib/systemd/system
 sudo cp -r main/ops/prod/nginx/* /etc/nginx/

@@ -6,6 +6,8 @@ After=network.target
 Environment=PORT=4000
 Environment=NODE_ENV=production
 Environment=ENV=#ENV#
+Environment=INSTANCE_NUMBER=#INSTANCE_NUMBER#
+Environment=INSTANCE_NAME=#INSTANCE_NAME#
 Environment=DOTENV_PATH=/home/ec2-user/main/server
 WorkingDirectory=/home/ec2-user/main/server
 Type=simple

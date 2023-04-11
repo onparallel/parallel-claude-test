@@ -9,6 +9,7 @@ import {
   DescribeAddressesCommand,
   DescribeInstancesCommand,
   EC2Client,
+  InstanceStateName,
 } from "@aws-sdk/client-ec2";
 import {
   DeregisterInstancesFromLoadBalancerCommand,
@@ -57,7 +58,7 @@ async function main() {
         Filters: [
           { Name: "tag:Release", Values: [commit] },
           { Name: "tag:Environment", Values: [env] },
-          { Name: "instance-state-name", Values: ["running"] },
+          { Name: "instance-state-name", Values: [InstanceStateName.running] },
         ],
       })
     )
@@ -130,7 +131,6 @@ async function main() {
           d.Origins!.Items!.some((o) => o.Id === `S3-parallel-static-${env}`)
         )!.Id
     );
-  // find distribution for
   await waitFor(async (iteration) => {
     if (iteration >= 10) {
       throw new Error("Cloudfront is not responding.");
@@ -152,7 +152,7 @@ async function main() {
       }
       throw error;
     }
-  }, 30_000);
+  }, 5_000);
 
   console.log(chalk.green.bold`Invalidation created`);
 
@@ -193,7 +193,7 @@ async function main() {
           .then((r) => r.InstanceStates!.every((i) => i.State === "OutOfService"));
       },
       chalk.yellow.italic`...Waiting for old instances to become out of service`,
-      3000
+      3_000
     );
     console.log(chalk.green.bold`Old instances deregistered`);
   }

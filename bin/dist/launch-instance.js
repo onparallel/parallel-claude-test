@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const client_ec2_1 = require("@aws-sdk/client-ec2");
 const chalk_1 = __importDefault(require("chalk"));
 const child_process_1 = require("child_process");
+const p_map_1 = __importDefault(require("p-map"));
+const remeda_1 = require("remeda");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 const wait_1 = require("./utils/wait");
@@ -21,9 +23,14 @@ const SECURITY_GROUP_IDS = {
 };
 const SUBNET_ID = "subnet-d3cc68b9";
 const REGION = "eu-central-1";
-const AVAILABILITY_ZONE = `${REGION}a`;
 const ENHANCED_MONITORING = true;
-const OPS_DIR = "/home/ec2-user/parallel/ops/prod";
+const HOME_DIR = "/home/ec2-user";
+const OPS_DIR = `${HOME_DIR}/parallel/ops/prod`;
+const AVAILABILITY_ZONES = [`${REGION}a`, `${REGION}b`, `${REGION}c`];
+const numInstances = {
+    production: 1,
+    staging: 1,
+};
 const ec2 = new client_ec2_1.EC2Client({});
 async function main() {
     const { commit: _commit, env: _env } = await yargs_1.default
@@ -40,72 +47,63 @@ async function main() {
     }).argv;
     const commit = _commit.slice(0, 7);
     const env = _env;
-    const result = await ec2.send(new client_ec2_1.RunInstancesCommand({
-        ImageId: IMAGE_ID,
-        KeyName: KEY_NAME,
-        SecurityGroupIds: SECURITY_GROUP_IDS[env],
-        IamInstanceProfile: {
-            Name: `parallel-server-${env}`,
-        },
-        InstanceType: INSTANCE_TYPES[env],
-        Placement: {
-            AvailabilityZone: AVAILABILITY_ZONE,
-            Tenancy: client_ec2_1.Tenancy.default,
-        },
-        SubnetId: SUBNET_ID,
-        MaxCount: 1,
-        MinCount: 1,
-        Monitoring: {
-            Enabled: ENHANCED_MONITORING,
-        },
-        TagSpecifications: [
-            {
-                ResourceType: client_ec2_1.ResourceType.volume,
-                Tags: [{ Key: "Name", Value: `parallel-${env}-${commit}` }],
+    (0, p_map_1.default)((0, remeda_1.range)(0, numInstances[env]), async (i) => {
+        const name = `parallel-${env}-${commit}-${i + 1}`;
+        const result = await ec2.send(new client_ec2_1.RunInstancesCommand({
+            ImageId: IMAGE_ID,
+            KeyName: KEY_NAME,
+            SecurityGroupIds: SECURITY_GROUP_IDS[env],
+            IamInstanceProfile: {
+                Name: `parallel-server-${env}`,
             },
-            {
-                ResourceType: client_ec2_1.ResourceType.instance,
-                Tags: [
-                    {
-                        Key: "Name",
-                        Value: `parallel-${env}-${commit}`,
-                    },
-                    {
-                        Key: "Release",
-                        Value: commit,
-                    },
-                    {
-                        Key: "Environment",
-                        Value: env,
-                    },
-                ],
+            InstanceType: INSTANCE_TYPES[env],
+            Placement: {
+                AvailabilityZone: AVAILABILITY_ZONES[i % AVAILABILITY_ZONES.length],
+                Tenancy: client_ec2_1.Tenancy.default,
             },
-        ],
-        MetadataOptions: {
-            HttpEndpoint: client_ec2_1.InstanceMetadataEndpointState.enabled,
-            HttpTokens: client_ec2_1.HttpTokensState.required,
-        },
-    }));
-    const instanceId = result.Instances[0].InstanceId;
-    const ipAddress = result.Instances[0].PrivateIpAddress;
-    console.log((0, chalk_1.default) `Launched instance {bold ${instanceId}} on {bold ${ipAddress}}`);
-    await (0, wait_1.wait)(5000);
-    await (0, wait_1.waitFor)(async () => {
-        var _a, _b, _c;
-        const result = await ec2.send(new client_ec2_1.DescribeInstanceStatusCommand({ InstanceIds: [instanceId] }));
-        return ((_c = (_b = (_a = result.InstanceStatuses) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.InstanceState) === null || _c === void 0 ? void 0 : _c.Name) === client_ec2_1.InstanceStateName.running;
-    }, (0, chalk_1.default) `Instance {yellow pending}. Waiting 10 more seconds...`, 10000);
-    console.log((0, chalk_1.default) `Instance {green ✓ running}`);
-    await waitForInstance(ipAddress);
-    console.log("Uploading install script to the new instance.");
-    (0, child_process_1.execSync)(`scp \
-    -o "UserKnownHostsFile=/dev/null" \
-    -o "StrictHostKeyChecking=no" \
-    ${OPS_DIR}/bootstrap.sh ${ipAddress}:/home/ec2-user/`);
-    (0, child_process_1.execSync)(`ssh \
-    -o "UserKnownHostsFile=/dev/null" \
-    -o StrictHostKeyChecking=no \
-    ${ipAddress} /home/ec2-user/bootstrap.sh ${commit} ${env}`);
+            SubnetId: SUBNET_ID,
+            MaxCount: 1,
+            MinCount: 1,
+            Monitoring: {
+                Enabled: ENHANCED_MONITORING,
+            },
+            TagSpecifications: [
+                {
+                    ResourceType: client_ec2_1.ResourceType.volume,
+                    Tags: [{ Key: "Name", Value: name }],
+                },
+                {
+                    ResourceType: client_ec2_1.ResourceType.instance,
+                    Tags: [
+                        { Key: "Name", Value: name },
+                        { Key: "Release", Value: commit },
+                        { Key: "Environment", Value: env },
+                        { Key: "InstanceNumber", Value: `${i + 1}` },
+                    ],
+                },
+            ],
+            MetadataOptions: {
+                HttpEndpoint: client_ec2_1.InstanceMetadataEndpointState.enabled,
+                HttpTokens: client_ec2_1.HttpTokensState.required,
+                InstanceMetadataTags: client_ec2_1.InstanceMetadataTagsState.enabled,
+            },
+        }));
+        const instance = result.Instances[0];
+        const instanceId = instance.InstanceId;
+        const ipAddress = instance.PrivateIpAddress;
+        console.log((0, chalk_1.default) `Launched instance {bold ${instanceId}} on {bold ${ipAddress}}`);
+        await (0, wait_1.wait)(5000);
+        await (0, wait_1.waitFor)(async () => {
+            var _a, _b, _c;
+            const result = await ec2.send(new client_ec2_1.DescribeInstanceStatusCommand({ InstanceIds: [instanceId] }));
+            return ((_c = (_b = (_a = result.InstanceStatuses) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.InstanceState) === null || _c === void 0 ? void 0 : _c.Name) === client_ec2_1.InstanceStateName.running;
+        }, (0, chalk_1.default) `Instance {bold ${instanceId}} {yellow pending}. Waiting 10 more seconds...`, 10000);
+        console.log((0, chalk_1.default) `Instance {bold ${instanceId}} {green ✓ running}`);
+        await waitForInstance(ipAddress);
+        console.log((0, chalk_1.default) `Uploading install script to {bold ${instanceId}}.`);
+        copyToRemoteServer(ipAddress, `${OPS_DIR}/bootstrap.sh`, `${HOME_DIR}/`);
+        executeRemoteCommand(ipAddress, `${HOME_DIR}/bootstrap.sh`);
+    }, { concurrency: 4 });
 }
 (0, run_1.run)(main);
 async function waitForInstance(ipAddress) {
@@ -122,4 +120,16 @@ async function waitForInstance(ipAddress) {
             return false;
         }
     }, (0, chalk_1.default) `SSH not available. Waiting 5 more seconds...`, 5000);
+}
+function executeRemoteCommand(ipAddress, command) {
+    (0, child_process_1.execSync)(`ssh \
+  -o "UserKnownHostsFile=/dev/null" \
+  -o StrictHostKeyChecking=no \
+  ${ipAddress} ${command}`);
+}
+function copyToRemoteServer(ipAddress, from, to) {
+    (0, child_process_1.execSync)(`scp \
+  -o "UserKnownHostsFile=/dev/null" \
+  -o StrictHostKeyChecking=no \
+  ${from} ${ipAddress}:${to}`);
 }

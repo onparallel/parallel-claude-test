@@ -41,7 +41,7 @@ async function main() {
         Filters: [
             { Name: "tag:Release", Values: [commit] },
             { Name: "tag:Environment", Values: [env] },
-            { Name: "instance-state-name", Values: ["running"] },
+            { Name: "instance-state-name", Values: [client_ec2_1.InstanceStateName.running] },
         ],
     }))
         .then((r) => r.Reservations.flatMap((r) => r.Instances));
@@ -93,7 +93,6 @@ async function main() {
     const distributionId = await cloudfront
         .send(new client_cloudfront_1.ListDistributionsCommand({}))
         .then((result) => result.DistributionList.Items.find((d) => d.Origins.Items.some((o) => o.Id === `S3-parallel-static-${env}`)).Id);
-    // find distribution for
     await (0, wait_1.waitFor)(async (iteration) => {
         if (iteration >= 10) {
             throw new Error("Cloudfront is not responding.");
@@ -114,7 +113,7 @@ async function main() {
             }
             throw error;
         }
-    }, 30000);
+    }, 5000);
     console.log(chalk_1.default.green.bold `Invalidation created`);
     await (0, wait_1.waitFor)(async () => {
         return await elb

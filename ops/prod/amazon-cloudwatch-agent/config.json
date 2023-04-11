@@ -42,7 +42,8 @@
       "InstanceId": "${aws:InstanceId}",
       "InstanceType": "${aws:InstanceType}",
       "Environment": "#ENV#",
-      "Release": "#COMMIT_SHA#"
+      "Release": "#RELEASE#",
+      "InstanceNumber": "#INSTANCE_NUMBER#"
     },
     "metrics_collected": {
       "collectd": {
