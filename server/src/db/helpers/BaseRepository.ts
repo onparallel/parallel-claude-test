@@ -16,29 +16,19 @@ import {
   PetitionSignatureConfig,
   PetitionSignatureConfigSigner,
 } from "../repositories/PetitionRepository";
-import {
-  CreatePetition,
-  CreatePetitionSignatureRequest,
-  CreateProfileTypeField,
-  Organization,
-  Petition,
-  PetitionSignatureRequest,
-  ProfileTypeField,
-  TableCreateTypes as _TableCreateTypes,
-  TableTypes as _TableTypes,
-} from "../__types";
+import type * as db from "../__types";
 
 export interface TableTypes
   extends Replace<
-    _TableTypes,
+    db.TableTypes,
     {
       petition_event: PetitionEvent;
       petition_user_notification: PetitionUserNotification;
       system_event: SystemEvent;
-      organization: Replace<Organization, { usage_details: OrganizationUsageDetails }>;
-      petition: Replace<Petition, { signature_config: PetitionSignatureConfig | null }>;
+      organization: Replace<db.Organization, { usage_details: OrganizationUsageDetails }>;
+      petition: Replace<db.Petition, { signature_config: PetitionSignatureConfig | null }>;
       petition_signature_request: Replace<
-        PetitionSignatureRequest,
+        db.PetitionSignatureRequest,
         {
           signature_config: Replace<
             PetitionSignatureConfig,
@@ -46,23 +36,24 @@ export interface TableTypes
           >;
         }
       >;
-      profile_type_field: Replace<ProfileTypeField, { name: LocalizableUserText }>;
+      profile_type: Replace<db.ProfileType, { name: LocalizableUserText }>;
+      profile_type_field: Replace<db.ProfileTypeField, { name: LocalizableUserText }>;
     }
   > {}
 
 export interface TableCreateTypes
   extends Replace<
-    _TableCreateTypes,
+    db.TableCreateTypes,
     {
       petition_event: CreatePetitionEvent;
       system_event: CreateSystemEvent;
       petition_user_notification: CreatePetitionUserNotification;
-      petition: Replace<CreatePetition, { signature_config?: PetitionSignatureConfig | null }>;
+      petition: Replace<db.CreatePetition, { signature_config?: PetitionSignatureConfig | null }>;
       petition_signature_request: Replace<
-        CreatePetitionSignatureRequest,
+        db.CreatePetitionSignatureRequest,
         { signature_config: PetitionSignatureConfig }
       >;
-      profile_type_field: Replace<CreateProfileTypeField, { name: LocalizableUserText }>;
+      profile_type_field: Replace<db.CreateProfileTypeField, { name: LocalizableUserText }>;
     }
   > {}
 

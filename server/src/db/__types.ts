@@ -316,18 +316,22 @@ export const PetitionUserNotificationTypeValues = [
 
 export type ProfileEventType =
   | "PROFILE_CREATED"
-  | "PROFILE_UPDATED"
-  | "PROFILE_DELETED"
   | "PROFILE_FIELD_VALUE_UPDATED"
   | "PROFILE_FIELD_VALUE_DELETED";
 
 export const ProfileEventTypeValues = [
   "PROFILE_CREATED",
-  "PROFILE_UPDATED",
-  "PROFILE_DELETED",
   "PROFILE_FIELD_VALUE_UPDATED",
   "PROFILE_FIELD_VALUE_DELETED",
 ] as ProfileEventType[];
+
+export type ProfileTypeFieldPermission = "HIDDEN" | "READ" | "WRITE";
+
+export const ProfileTypeFieldPermissionValues = [
+  "HIDDEN",
+  "READ",
+  "WRITE",
+] as ProfileTypeFieldPermission[];
 
 export type ProfileTypeFieldType = "TEXT" | "SHORT_TEXT" | "FILE" | "DATE" | "PHONE" | "NUMBER";
 
@@ -432,6 +436,7 @@ export interface TableTypes {
   petition_user_notification: PetitionUserNotification;
   profile: Profile;
   profile_event: ProfileEvent;
+  profile_field_file: ProfileFieldFile;
   profile_field_value: ProfileFieldValue;
   profile_type: ProfileType;
   profile_type_field: ProfileTypeField;
@@ -487,6 +492,7 @@ export interface TableCreateTypes {
   petition_user_notification: CreatePetitionUserNotification;
   profile: CreateProfile;
   profile_event: CreateProfileEvent;
+  profile_field_file: CreateProfileFieldFile;
   profile_field_value: CreateProfileFieldValue;
   profile_type: CreateProfileType;
   profile_type_field: CreateProfileTypeField;
@@ -542,6 +548,7 @@ export interface TablePrimaryKeys {
   petition_user_notification: "id";
   profile: "id";
   profile_event: "id";
+  profile_field_file: "id";
   profile_field_value: "id";
   profile_type: "id";
   profile_type_field: "id";
@@ -1405,31 +1412,64 @@ export type CreateProfileEvent = PartialProps<
   "data" | "created_at" | "processed_at"
 >;
 
+export interface ProfileFieldFile {
+  id: number; // int4
+  profile_id: number; // int4
+  profile_type_field_id: number; // int4
+  file_upload_id: number; // int4
+  expires_at: Maybe<Date>; // timestamptz
+  created_at: Date; // timestamptz
+  created_by_user_id: number; // int4
+  removed_at: Maybe<Date>; // timestamptz
+  removed_by_user_id: Maybe<number>; // int4
+  anonymized_at: Maybe<Date>; // timestamptz
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateProfileFieldFile = PartialProps<
+  Omit<ProfileFieldFile, "id">,
+  | "expires_at"
+  | "created_at"
+  | "removed_at"
+  | "removed_by_user_id"
+  | "anonymized_at"
+  | "deleted_at"
+  | "deleted_by"
+>;
+
 export interface ProfileFieldValue {
   id: number; // int4
   profile_id: number; // int4
   profile_type_field_id: number; // int4
   content: any; // jsonb
-  user_id: number; // int4
   expires_at: Maybe<Date>; // timestamptz
-  is_current: boolean; // bool
-  version: number; // int4
+  created_by_user_id: number; // int4
   created_at: Date; // timestamptz
-  created_by: Maybe<string>; // varchar
+  removed_at: Maybe<Date>; // timestamptz
+  removed_by_user_id: Maybe<number>; // int4
   anonymized_at: Maybe<Date>; // timestamptz
-  replaced_at: Maybe<Date>; // timestamptz
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
 }
 
 export type CreateProfileFieldValue = PartialProps<
   Omit<ProfileFieldValue, "id">,
-  "content" | "expires_at" | "created_at" | "created_by" | "anonymized_at" | "replaced_at"
+  | "content"
+  | "expires_at"
+  | "created_at"
+  | "removed_at"
+  | "removed_by_user_id"
+  | "anonymized_at"
+  | "deleted_at"
+  | "deleted_by"
 >;
 
 export interface ProfileType {
   id: number; // int4
   org_id: number; // int4
   name: any; // jsonb
-  profile_name_pattern: Maybe<string>; // text
+  profile_name_pattern: Maybe<any>; // jsonb
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
@@ -1459,6 +1499,7 @@ export interface ProfileTypeField {
   options: any; // jsonb
   alias: Maybe<string>; // varchar
   is_expirable: boolean; // bool
+  permission: ProfileTypeFieldPermission; // profile_type_field_permission
   expiry_alert_ahead_time: Maybe<Duration>; // interval
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
@@ -1474,6 +1515,7 @@ export type CreateProfileTypeField = PartialProps<
   | "options"
   | "alias"
   | "is_expirable"
+  | "permission"
   | "expiry_alert_ahead_time"
   | "created_at"
   | "created_by"

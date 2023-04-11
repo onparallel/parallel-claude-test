@@ -21,8 +21,9 @@ import { Scalars, UserLocale } from "@parallel/graphql/__types";
 import { asSupportedUserLocale, useSupportedUserLocales } from "@parallel/utils/locales";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, Ref, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import useMergedRef from "@react-hook/merged-ref";
 import { isDefined } from "remeda";
 
 type LocalizableUserText = Scalars["LocalizableUserText"];
@@ -30,14 +31,16 @@ type LocalizableUserText = Scalars["LocalizableUserText"];
 interface LocalizableUserTextInputProps
   extends Omit<InputGroupProps, "value" | "onChange">,
     ValueProps<LocalizableUserText, false> {
+  inputRef?: Ref<HTMLInputElement>;
   onBlur?: () => void;
   placeholder?: string;
 }
 
 export const LocalizableUserTextInput = chakraForwardRef<"div", LocalizableUserTextInputProps>(
-  function ({ value, onChange, onBlur, placeholder, ...props }, ref) {
+  function ({ value, onChange, onBlur, inputRef: _inputRef, placeholder, ...props }, ref) {
     const intl = useIntl();
     const inputRef = useRef<HTMLInputElement>(null);
+    const mergedInputRef = useMergedRef(inputRef, ...(_inputRef ? [_inputRef] : []));
     const [selectedLocale, setSelectedLocale] = useState(
       () =>
         // initial state, by priority get the first that is defined
@@ -64,7 +67,7 @@ export const LocalizableUserTextInput = chakraForwardRef<"div", LocalizableUserT
     return (
       <InputGroup ref={ref} {...props}>
         <Input
-          ref={inputRef}
+          ref={mergedInputRef}
           placeholder={placeholder}
           value={inputValue}
           onBlur={onBlur}

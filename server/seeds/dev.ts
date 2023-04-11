@@ -2,19 +2,7 @@ import "reflect-metadata";
 // keep this space to prevent import sorting, removing init from top
 import { Knex } from "knex";
 import pMap from "p-map";
-import {
-  Organization,
-  OrganizationTheme,
-  OrganizationUsageLimit,
-  OrgIntegration,
-  Petition,
-  PetitionField,
-  PetitionPermission,
-  User,
-  UserData,
-  UserGroup,
-  UserGroupMember,
-} from "../src/db/__types";
+import { User, UserData } from "../src/db/__types";
 import { EncryptionService } from "../src/services/EncryptionService";
 import { defaultBrandTheme } from "../src/util/BrandTheme";
 import { deleteAllData } from "../src/util/knexUtils";
@@ -32,7 +20,7 @@ export async function seed(knex: Knex): Promise<any> {
     select unnest(enum_range(NULL::feature_flag_name)) as name, true as default_value
   `);
 
-  const orgs = await knex<Organization>("organization").insert(
+  const orgs = await knex("organization").insert(
     [
       {
         name: "Parallel",
@@ -136,7 +124,7 @@ export async function seed(knex: Knex): Promise<any> {
     },
   ] as (User & UserData)[];
 
-  const usersData = await knex<UserData>("user_data").insert(
+  const usersData = await knex("user_data").insert(
     usersInfo.map((u) => ({
       email: u.email,
       cognito_id: u.cognito_id,
@@ -147,7 +135,7 @@ export async function seed(knex: Knex): Promise<any> {
     "*"
   );
 
-  const users = await knex<User>("user").insert(
+  const users = await knex("user").insert(
     usersData.map((ud) => {
       const user = usersInfo.find(({ email }) => email === ud.email)!;
       return {
@@ -165,13 +153,13 @@ export async function seed(knex: Knex): Promise<any> {
     orgUsers,
     async ([orgId, users], i) => {
       const ownerId = users.find((u) => u.organization_role === "OWNER")!.id;
-      await knex<Organization>("organization")
+      await knex("organization")
         .where("id", orgId)
         .update({
           created_by: `User:${ownerId}`,
           updated_by: `User:${ownerId}`,
         });
-      await knex<OrganizationUsageLimit>("organization_usage_limit").insert([
+      await knex("organization_usage_limit").insert([
         {
           org_id: orgId,
           limit_name: "PETITION_SEND",
@@ -187,7 +175,7 @@ export async function seed(knex: Knex): Promise<any> {
           used: 0,
         },
       ]);
-      await knex<OrgIntegration>("org_integration").insert([
+      await knex("org_integration").insert([
         {
           org_id: orgId,
           type: "SIGNATURE",
@@ -207,7 +195,7 @@ export async function seed(knex: Knex): Promise<any> {
         },
       ]);
 
-      const groups = await knex<UserGroup>("user_group").insert(
+      const groups = await knex("user_group").insert(
         [
           {
             org_id: orgIds[0],
@@ -225,7 +213,7 @@ export async function seed(knex: Knex): Promise<any> {
         "id"
       );
 
-      await knex<UserGroupMember>("user_group_member").insert(
+      await knex("user_group_member").insert(
         users.map((u) => ({
           user_group_id: groups[0].id,
           user_id: u.id,
@@ -233,7 +221,7 @@ export async function seed(knex: Knex): Promise<any> {
         }))
       );
 
-      const orgThemes = await knex<OrganizationTheme>("organization_theme").insert(
+      const orgThemes = await knex("organization_theme").insert(
         [
           {
             org_id: orgId,
@@ -257,7 +245,7 @@ export async function seed(knex: Knex): Promise<any> {
         "id"
       );
 
-      const petitions = await knex<Petition>("petition").insert(
+      const petitions = await knex("petition").insert(
         [
           {
             org_id: orgId,
@@ -320,7 +308,7 @@ export async function seed(knex: Knex): Promise<any> {
         "id"
       );
 
-      await knex<PetitionPermission>("petition_permission").insert(
+      await knex("petition_permission").insert(
         petitions.flatMap((p) =>
           users.map((u) => ({
             petition_id: p.id,
@@ -333,7 +321,7 @@ export async function seed(knex: Knex): Promise<any> {
         )
       );
 
-      await knex<PetitionField>("petition_field").insert([
+      await knex("petition_field").insert([
         {
           petition_id: petitions[0].id,
           position: 0,
@@ -535,7 +523,102 @@ export async function seed(knex: Knex): Promise<any> {
           has_comments_enabled: true,
         },
       ]);
+
+      const pts = await knex("profile_type")
+        .insert([
+          { org_id: orgId, name: json({ en: "Individual", es: "Persona física" }) },
+          { org_id: orgId, name: json({ en: "Legal entity", es: "Persona jurídica" }) },
+          { org_id: orgId, name: json({ en: "Contract", es: "Contrato" }) },
+        ])
+        .returning("*");
+
+      const ptfs = await knex("profile_type_field")
+        .insert([
+          ...[
+            {
+              position: 0,
+              profile_type_id: pts[0].id,
+              name: json({ en: "First name", es: "Nombre" }),
+              type: "SHORT_TEXT" as const,
+              alias: "FIRST_NAME",
+            },
+            {
+              position: 1,
+              profile_type_id: pts[0].id,
+              name: json({ en: "Last name", es: "Apellido" }),
+              type: "SHORT_TEXT" as const,
+              alias: "LAST_NAME",
+            },
+            {
+              position: 2,
+              profile_type_id: pts[0].id,
+              name: json({ en: "Birth date", es: "Fecha de nacimiento" }),
+              type: "DATE" as const,
+              alias: "BIRTH_DATE",
+            },
+            {
+              position: 3,
+              profile_type_id: pts[0].id,
+              name: json({ en: "Phone", es: "Teléfono" }),
+              type: "PHONE" as const,
+              alias: "PHONE",
+            },
+            {
+              position: 4,
+              profile_type_id: pts[0].id,
+              name: json({ en: "Email", es: "Correo electrónico" }),
+              type: "SHORT_TEXT" as const,
+              alias: "EMAIL",
+            },
+          ],
+          ...[
+            {
+              position: 0,
+              profile_type_id: pts[1].id,
+              name: json({ en: "Name", es: "Nombre" }),
+              type: "SHORT_TEXT" as const,
+              alias: "NAME",
+            },
+            {
+              position: 1,
+              profile_type_id: pts[1].id,
+              name: json({ en: "Tax ID", es: "CIF" }),
+              type: "SHORT_TEXT" as const,
+              alias: "TAX_ID",
+            },
+            {
+              position: 2,
+              profile_type_id: pts[1].id,
+              name: json({ en: "Address", es: "Dirección" }),
+              type: "TEXT" as const,
+              alias: "ADDRESS",
+            },
+          ],
+          ...[
+            {
+              position: 0,
+              profile_type_id: pts[2].id,
+              name: json({ en: "Name", es: "Nombre" }),
+              type: "SHORT_TEXT" as const,
+              alias: "NAME",
+            },
+          ],
+        ])
+        .returning("*");
+      for (const [profileTypeId, pattern] of [
+        [pts[0].id, json([ptfs[0].id, " ", ptfs[1].id])],
+        [pts[1].id, json(ptfs[5].id)],
+        [pts[0].id, json([ptfs[8].id])],
+      ]) {
+        await knex("profile_type")
+          .where("id", profileTypeId)
+          .update("profile_name_pattern", pattern);
+      }
     },
     { concurrency: 1 }
   );
+
+  function json(value: any) {
+    return knex.raw("?::jsonb", JSON.stringify(value));
+  }
 }

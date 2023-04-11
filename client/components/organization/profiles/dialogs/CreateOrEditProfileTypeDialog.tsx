@@ -3,6 +3,7 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { LocalizableUserTextInput } from "@parallel/components/common/LocalizableUserTextInput";
 import { Scalars } from "@parallel/graphql/__types";
+import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -35,11 +36,13 @@ function CreateOrEditProfileTypeDialog({
       },
     },
   });
+  const focusRef = useRef<HTMLInputElement>(null);
 
   return (
     <ConfirmDialog
       {...props}
       closeOnEsc
+      initialFocusRef={focusRef}
       size="md"
       content={{
         as: "form",
@@ -78,7 +81,7 @@ function CreateOrEditProfileTypeDialog({
               },
             }}
             render={({ field: { value, onChange } }) => (
-              <LocalizableUserTextInput value={value} onChange={onChange} />
+              <LocalizableUserTextInput value={value} onChange={onChange} inputRef={focusRef} />
             )}
           />
           <FormErrorMessage>

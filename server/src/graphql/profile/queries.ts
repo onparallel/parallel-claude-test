@@ -5,9 +5,9 @@ import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { userHasFeatureFlag } from "../petition/authorizers";
-import { userHasAccessToProfileType } from "./authorizers";
+import { userHasAccessToProfile, userHasAccessToProfileType } from "./authorizers";
 
-export const profileTypesQuery = queryField((t) => {
+export const profileTypes = queryField((t) => {
   t.paginationField("profileTypes", {
     type: "ProfileType",
     authorize: authenticateAnd(userHasFeatureFlag("PROFILES")),
@@ -50,6 +50,43 @@ export const profileType = queryField((t) => {
     ),
     resolve: async (_, { profileTypeId }, ctx) => {
       return (await ctx.profiles.loadProfileType(profileTypeId))!;
+    },
+  });
+});
+
+export const profiles = queryField((t) => {
+  t.paginationField("profiles", {
+    type: "Profile",
+    authorize: authenticateAnd(userHasFeatureFlag("PROFILES")),
+    searchable: true,
+    sortableBy: ["createdAt", "name"],
+    resolve: async (_, { limit, offset, search, sortBy }, ctx) => {
+      const columnMap = {
+        createdAt: "created_at",
+        name: "name",
+      } as const;
+      return ctx.profiles.getPaginatedProfileForOrg(ctx.user!.org_id, {
+        limit,
+        offset,
+        search,
+        sortBy: sortBy?.map((value) => {
+          const [field, order] = parseSortBy(value);
+          return { field: columnMap[field], order };
+        }),
+      });
+    },
+  });
+});
+
+export const profile = queryField((t) => {
+  t.field("profile", {
+    type: "Profile",
+    args: {
+      profileId: nonNull(globalIdArg("Profile")),
+    },
+    authorize: authenticateAnd(userHasFeatureFlag("PROFILES"), userHasAccessToProfile("profileId")),
+    resolve: async (_, { profileId }, ctx) => {
+      return (await ctx.profiles.loadProfile(profileId))!;
     },
   });
 });

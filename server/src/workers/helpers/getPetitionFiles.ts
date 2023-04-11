@@ -1,4 +1,3 @@
-import escapeStringRegexp from "escape-string-regexp";
 import { indexBy, isDefined, zip } from "remeda";
 import { PetitionExcelExport } from "../../api/helpers/PetitionExcelExport";
 import { WorkerContext } from "../../context";
@@ -7,6 +6,7 @@ import { ZipFileInput } from "../../util/createZipFile";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
+import { parseTextWithPlaceholders } from "../../util/textWithPlaceholders";
 
 const placeholders = ["field-number", "field-title", "file-name"] as const;
 
@@ -142,20 +142,9 @@ function rename<T extends string>(
   placeholders: readonly T[],
   replacer: (value: T) => string
 ) {
-  const parts = pattern.split(
-    new RegExp(`(\\{\\{(?:${placeholders.map((p) => escapeStringRegexp(p)).join("|")})\\}\\})`, "g")
-  );
-  return parts
-    .map((part) => {
-      if (part.startsWith("{{") && part.endsWith("}}")) {
-        const value = part.slice(2, -2);
-        if (placeholders.includes(value as any)) {
-          return replacer(value as T);
-        } else {
-          return "";
-        }
-      }
-      return part.replaceAll("\\{", "{");
-    })
+  return parseTextWithPlaceholders(pattern)
+    .map((p) =>
+      p.type === "text" ? p.text : placeholders.includes(p.value as T) ? replacer(p.value as T) : ""
+    )
     .join("");
 }

@@ -2832,12 +2832,11 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async createEvent(events: MaybeArray<CreatePetitionEvent>, t?: Knex.Transaction) {
-    const eventsArray = unMaybeArray(events);
-    if (eventsArray.length === 0) {
+    if (Array.isArray(events) && events.length === 0) {
       return [];
     }
 
-    const petitionEvents = await this.insert("petition_event", eventsArray, t);
+    const petitionEvents = await this.insert("petition_event", events, t);
     await this.queues.enqueueEvents(petitionEvents, "petition_event", undefined, t);
 
     return petitionEvents;

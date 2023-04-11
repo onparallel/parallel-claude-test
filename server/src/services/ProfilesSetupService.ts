@@ -40,9 +40,9 @@ export class ProfilesSetupService implements IProfilesSetupService {
         `User:${userId}`,
         t
       );
-      await this.profiles.updateProfileType(
+      await this.profiles.updateProfileTypeProfileNamePattern(
         profileType.id,
-        { profile_name_pattern: `{{${field.id}}}` },
+        [field.id],
         `User:${userId}`,
         t
       );

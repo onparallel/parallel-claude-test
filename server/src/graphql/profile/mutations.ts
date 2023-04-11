@@ -1,4 +1,4 @@
-import { arg, inputObjectType, list, mutationField, nonNull } from "nexus";
+import { arg, inputObjectType, list, mutationField, nonNull, stringArg } from "nexus";
 import { DatabaseError } from "pg";
 import { isDefined } from "remeda";
 import {
@@ -6,9 +6,13 @@ import {
   validateProfileTypeFieldOptions,
 } from "../../db/helpers/profileTypeFieldOptions";
 import { CreateProfileType, CreateProfileTypeField } from "../../db/__types";
+import { fromGlobalId } from "../../util/globalId";
+import { parseTextWithPlaceholders } from "../../util/textWithPlaceholders";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { datetimeArg } from "../helpers/scalars/DateTime";
+import { jsonObjectArg } from "../helpers/scalars/JSON";
 import { SUCCESS } from "../helpers/Success";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
@@ -18,10 +22,13 @@ import { validLocalizableUserText } from "../helpers/validators/validLocalizable
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { contextUserHasRole } from "../users/authorizers";
 import {
+  profileHasProfileTypeFieldId,
   profileTypeFieldBelongsToProfileType,
   userHasAccessToProfile,
   userHasAccessToProfileType,
+  validProfileNamePattern,
 } from "./authorizers";
+import { validProfileFieldValue } from "./validators";
 
 export const createProfileType = mutationField("createProfileType", {
   type: "ProfileType",
@@ -42,32 +49,36 @@ export const updateProfileType = mutationField("updateProfileType", {
   type: nonNull("ProfileType"),
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    userHasAccessToProfileType("id"),
-    contextUserHasRole("ADMIN")
+    userHasAccessToProfileType("profileTypeId"),
+    contextUserHasRole("ADMIN"),
+    validProfileNamePattern("profileTypeId", "profileNamePattern")
   ),
   args: {
-    id: nonNull(globalIdArg("ProfileType")),
-    data: nonNull(
-      inputObjectType({
-        name: "UpdateProfileTypeInput",
-        definition(t) {
-          t.nullable.localizableUserText("name");
-        },
-      }).asArg()
-    ),
+    profileTypeId: nonNull(globalIdArg("ProfileType")),
+    name: arg({ type: "LocalizableUserText" }),
+    profileNamePattern: stringArg(),
   },
   validateArgs: validateAnd(
-    notEmptyObject((args) => args.data, "data"),
-    validLocalizableUserText((args) => args.data.name, "data.name", { maxLength: 200 })
+    validLocalizableUserText((args) => args.name, "data.name", { maxLength: 200 })
   ),
-  resolve: async (_, { id, data }, ctx) => {
+  resolve: async (_, { profileTypeId, name, profileNamePattern }, ctx) => {
     const updateData: Partial<CreateProfileType> = {};
 
-    if (isDefined(data.name)) {
-      updateData.name = data.name;
+    if (isDefined(name)) {
+      updateData.name = name;
     }
-
-    return await ctx.profiles.updateProfileType(id, updateData, `User:${ctx.user!.id}`);
+    await ctx.profiles.updateProfileType(profileTypeId, updateData, `User:${ctx.user!.id}`);
+    if (isDefined(profileNamePattern)) {
+      const pattern = parseTextWithPlaceholders(profileNamePattern).map((p) =>
+        p.type === "placeholder" ? fromGlobalId(p.value, "ProfileTypeField").id : p.text
+      );
+      await ctx.profiles.updateProfileTypeProfileNamePattern(
+        profileTypeId,
+        pattern,
+        `User:${ctx.user!.id}`
+      );
+    }
+    return (await ctx.profiles.loadProfileType(profileTypeId, { refresh: true }))!;
   },
 });
 
@@ -75,15 +86,18 @@ export const deleteProfileType = mutationField("deleteProfileType", {
   type: "Success",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    userHasAccessToProfileType("ids"),
+    userHasAccessToProfileType("profileTypeIds"),
     contextUserHasRole("ADMIN")
   ),
   args: {
-    ids: nonNull(list(nonNull(globalIdArg("ProfileType")))),
+    profileTypeIds: nonNull(list(nonNull(globalIdArg("ProfileType")))),
   },
-  resolve: async (_, { ids }, ctx) => {
-    await ctx.profiles.deleteProfileTypes(ids, `User:${ctx.user!.id}`);
-    await ctx.profiles.deleteProfileTypeFieldsByProfileTypeId(ids, `User:${ctx.user!.id}`);
+  resolve: async (_, { profileTypeIds }, ctx) => {
+    await ctx.profiles.deleteProfileTypes(profileTypeIds, `User:${ctx.user!.id}`);
+    await ctx.profiles.deleteProfileTypeFieldsByProfileTypeId(
+      profileTypeIds,
+      `User:${ctx.user!.id}`
+    );
     return SUCCESS;
   },
 });
@@ -195,7 +209,6 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
         `User:${ctx.user!.id}`
       );
     } catch (e) {
-      console.log(e, e instanceof DatabaseError);
       if (
         e instanceof DatabaseError &&
         e.constraint === "profile_type_field__profile_type_id__alias__unique"
@@ -224,12 +237,23 @@ export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
     profileTypeFieldIds: nonNull(list(nonNull(globalIdArg("ProfileTypeField")))),
   },
   resolve: async (_, { profileTypeId, profileTypeFieldIds }, ctx) => {
+    const profileType = (await ctx.profiles.loadProfileType(profileTypeId))!;
+    if (
+      profileTypeFieldIds.some((id) =>
+        (profileType!.profile_name_pattern as (string | number)[]).includes(id)
+      )
+    ) {
+      throw new ApolloError(
+        "At least one of the provided profile type field ids is being used in the profile name pattern.",
+        "FIELD_USED_IN_PATTERN"
+      );
+    }
     await ctx.profiles.deleteProfileTypeFields(
       profileTypeId,
       profileTypeFieldIds,
       `User:${ctx.user!.id}`
     );
-    return (await ctx.profiles.loadProfileType(profileTypeId))!;
+    return profileType;
   },
 });
 
@@ -271,18 +295,10 @@ export const createProfile = mutationField("createProfile", {
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
-    data: nonNull(
-      inputObjectType({
-        name: "CreateProfileInput",
-        definition(t) {
-          t.nonNull.string("name");
-        },
-      }).asArg()
-    ),
   },
   resolve: async (_, args, ctx) => {
     return await ctx.profiles.createProfile(
-      { name: args.data.name, org_id: ctx.user!.org_id, profile_type_id: args.profileTypeId },
+      { name: "", org_id: ctx.user!.org_id, profile_type_id: args.profileTypeId },
       `User:${ctx.user!.id}`
     );
   },
@@ -301,5 +317,28 @@ export const deleteProfile = mutationField("deleteProfile", {
   resolve: async (_, { profileIds }, ctx) => {
     await ctx.profiles.deleteProfile(profileIds, `User:${ctx.user!.id}`);
     return SUCCESS;
+  },
+});
+
+export const createProfileFieldValue = mutationField("createProfileFieldValue", {
+  type: "Profile",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfile("profileId"),
+    profileHasProfileTypeFieldId("profileId", "profileTypeFieldId")
+  ),
+  args: {
+    profileId: nonNull(globalIdArg("Profile")),
+    profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
+    content: nonNull(jsonObjectArg()),
+    expiresAt: datetimeArg(),
+  },
+  validateArgs: validProfileFieldValue("profileTypeFieldId", "content"),
+  resolve: async (_, { profileId, profileTypeFieldId, content, expiresAt }, ctx) => {
+    return (await ctx.profiles.createProfileFieldValue(
+      profileId,
+      [[profileTypeFieldId, content, expiresAt ?? null]],
+      ctx.user!.id
+    ))!;
   },
 });

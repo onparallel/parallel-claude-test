@@ -215,10 +215,6 @@ input CreateContactInput {
   lastName: String
 }
 
-input CreateProfileInput {
-  name: String!
-}
-
 input CreateProfileTypeFieldInput {
   alias: String
   isExpirable: Boolean
@@ -977,7 +973,13 @@ type Mutation {
   Creates a task for printing a PDF of the petition and sends it to the queue
   """
   createPrintPdfTask(includeNdLinks: Boolean, petitionId: GID!, skipAttachments: Boolean): Task!
-  createProfile(data: CreateProfileInput!, profileTypeId: GID!): Profile!
+  createProfile(profileTypeId: GID!): Profile!
+  createProfileFieldValue(
+    content: JSONObject!
+    expiresAt: DateTime
+    profileId: GID!
+    profileTypeFieldId: GID!
+  ): Profile!
   createProfileType(name: LocalizableUserText!): ProfileType!
   createProfileTypeField(data: CreateProfileTypeFieldInput!, profileTypeId: GID!): ProfileTypeField!
 
@@ -1129,7 +1131,7 @@ type Mutation {
     ids: [GID!]
   ): Success!
   deleteProfile(profileIds: [GID!]!): Success!
-  deleteProfileType(ids: [GID!]!): Success!
+  deleteProfileType(profileTypeIds: [GID!]!): Success!
   deleteProfileTypeField(profileTypeFieldIds: [GID!]!, profileTypeId: GID!): ProfileType!
 
   """
@@ -2017,7 +2019,11 @@ type Mutation {
     petitionIds: [GID!]
     petitionUserNotificationIds: [GID!]
   ): [PetitionUserNotification!]!
-  updateProfileType(data: UpdateProfileTypeInput!, id: GID!): ProfileType!
+  updateProfileType(
+    name: LocalizableUserText
+    profileNamePattern: String
+    profileTypeId: GID!
+  ): ProfileType!
   updateProfileTypeField(
     data: UpdateProfileTypeFieldInput!
     profileTypeFieldId: GID!
@@ -4262,10 +4268,10 @@ type Profile implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
-  fields: [ProfileFieldAndValue!]!
   id: GID!
   name: String!
   profileType: ProfileType!
+  properties: [ProfileFieldProperty!]!
 
   """
   Time when the resource was last updated.
@@ -4273,18 +4279,104 @@ type Profile implements Timestamps {
   updatedAt: DateTime!
 }
 
-type ProfileFieldAndValue {
-  field: ProfileTypeField!
-  value: ProfileFieldValue
-}
-
-type ProfileFieldValue implements CreatedAt {
+type ProfileFieldFile implements ProfileFieldResponse {
   """
-  Time when the resource was created.
+  Time when the response was anonymized.
+  """
+  anonymizedAt: DateTime
+
+  """
+  Time when the response was created.
   """
   createdAt: DateTime!
   createdBy: User
+
+  """
+  Time when the response was created.
+  """
+  expiresAt: DateTime
+  field: ProfileTypeField!
+  file: FileUpload
   id: GID!
+  profile: Profile!
+
+  """
+  Time when the response was removed.
+  """
+  removedAt: DateTime
+  removedBy: User
+}
+
+type ProfileFieldProperty {
+  field: ProfileTypeField!
+  files: [ProfileFieldFile!]
+  value: ProfileFieldValue
+}
+
+interface ProfileFieldResponse {
+  """
+  Time when the response was anonymized.
+  """
+  anonymizedAt: DateTime
+
+  """
+  Time when the response was created.
+  """
+  createdAt: DateTime!
+  createdBy: User
+
+  """
+  Time when the response was created.
+  """
+  expiresAt: DateTime
+  field: ProfileTypeField!
+  profile: Profile!
+
+  """
+  Time when the response was removed.
+  """
+  removedAt: DateTime
+  removedBy: User
+}
+
+type ProfileFieldValue implements ProfileFieldResponse {
+  """
+  Time when the response was anonymized.
+  """
+  anonymizedAt: DateTime
+  content: JSONObject
+
+  """
+  Time when the response was created.
+  """
+  createdAt: DateTime!
+  createdBy: User
+
+  """
+  Time when the response was created.
+  """
+  expiresAt: DateTime
+  field: ProfileTypeField!
+  id: GID!
+  profile: Profile!
+
+  """
+  Time when the response was removed.
+  """
+  removedAt: DateTime
+  removedBy: User
+}
+
+type ProfilePagination {
+  """
+  The requested slice of items.
+  """
+  items: [Profile!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
 }
 
 type ProfileType implements Timestamps {
@@ -4295,6 +4387,7 @@ type ProfileType implements Timestamps {
   fields: [ProfileTypeField!]!
   id: GID!
   name: LocalizableUserText!
+  profileNamePattern: String!
 
   """
   Time when the resource was last updated.
@@ -4306,6 +4399,7 @@ type ProfileTypeField {
   alias: String
   id: GID!
   isExpirable: Boolean!
+  isUsedInProfileName: Boolean!
   myPermission: ProfileTypeFieldPermission!
   name: LocalizableUserText!
   options: JSONObject!
@@ -4315,6 +4409,8 @@ type ProfileTypeField {
 }
 
 enum ProfileTypeFieldPermission {
+  HIDDEN
+  READ
   WRITE
 }
 
@@ -5041,6 +5137,7 @@ type Query {
     sortBy: [QueryPetitions_OrderBy!]
   ): PetitionBaseOrFolderPagination!
   petitionsById(folders: FoldersInput, ids: [GID!]): [PetitionBase]!
+  profile(profileId: GID!): Profile!
   profileType(profileTypeId: GID!): ProfileType!
   profileTypes(
     """
@@ -5064,6 +5161,27 @@ type Query {
     """
     sortBy: [QueryProfileTypes_OrderBy!]
   ): ProfileTypePagination!
+  profiles(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+
+    """
+    Optional text to search in the collection.
+    """
+    search: String
+
+    """
+    Sorting to use on the collection
+    """
+    sortBy: [QueryProfiles_OrderBy!]
+  ): ProfilePagination!
   publicLicenseCode(code: String!, token: ID!): PublicLicenseCode
   publicOrg(id: GID!): PublicOrganization
 
@@ -5217,6 +5335,16 @@ enum QueryPetitions_OrderBy {
 Order to use on Query.profileTypes
 """
 enum QueryProfileTypes_OrderBy {
+  createdAt_ASC
+  createdAt_DESC
+  name_ASC
+  name_DESC
+}
+
+"""
+Order to use on Query.profiles
+"""
+enum QueryProfiles_OrderBy {
   createdAt_ASC
   createdAt_DESC
   name_ASC
@@ -5806,10 +5934,6 @@ input UpdateProfileTypeFieldInput {
   isExpirable: Boolean
   name: LocalizableUserText
   options: JSONObject
-}
-
-input UpdateProfileTypeInput {
-  name: LocalizableUserText
 }
 
 input UpdateTagInput {
