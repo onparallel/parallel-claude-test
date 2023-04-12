@@ -4,6 +4,7 @@ import {
   createPlaceholderPlugin,
   PlaceholderCombobox,
   PlaceholderOption,
+  PlaceholdersProvider,
   removePlaceholderInputElements,
 } from "@parallel/utils/slate/PlaceholderPlugin";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
@@ -255,12 +256,14 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
             hasHeadingButton={toolbarOpts?.headingButton}
             hasListButtons={toolbarOpts?.listButtons}
           />
-          <PlateWithEditorRef<RichTextEditorValue, RichTextPEditor>
-            editorRef={editorRef}
-            editableProps={editableProps}
-          >
-            {hasPlaceholders ? <PlaceholderCombobox placeholders={placeholderOptions} /> : null}
-          </PlateWithEditorRef>
+          <PlaceholdersProvider placeholders={placeholderOptions ?? []}>
+            <PlateWithEditorRef<RichTextEditorValue, RichTextPEditor>
+              editorRef={editorRef}
+              editableProps={editableProps}
+            >
+              {hasPlaceholders ? <PlaceholderCombobox placeholders={placeholderOptions} /> : null}
+            </PlateWithEditorRef>
+          </PlaceholdersProvider>
         </Box>
       </PlateProvider>
     );

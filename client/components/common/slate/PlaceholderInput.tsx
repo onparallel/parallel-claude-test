@@ -7,6 +7,7 @@ import {
   PlaceholderElement,
   PlaceholderInputElement,
   PlaceholderOption,
+  PlaceholdersProvider,
 } from "@parallel/utils/slate/PlaceholderPlugin";
 import { createSingleLinePlugin } from "@parallel/utils/slate/SingleLinePlugin";
 import {
@@ -187,13 +188,15 @@ export const PlaceholderInput = chakraForwardRef<
             },
           }}
         >
-          <PlateWithEditorRef<PlaceholderInputValue, PlaceholderInputEditor>
-            editorRef={editorRef}
-            id={id}
-            editableProps={editableProps}
-          >
-            <PlaceholderCombobox placeholders={placeholders} />
-          </PlateWithEditorRef>
+          <PlaceholdersProvider placeholders={placeholders}>
+            <PlateWithEditorRef<PlaceholderInputValue, PlaceholderInputEditor>
+              editorRef={editorRef}
+              id={id}
+              editableProps={editableProps}
+            >
+              <PlaceholderCombobox placeholders={placeholders} />
+            </PlateWithEditorRef>
+          </PlaceholdersProvider>
           <Center paddingRight={1} height="full">
             <ToolbarPlaceholderButton variant="outline" size="sm" />
           </Center>

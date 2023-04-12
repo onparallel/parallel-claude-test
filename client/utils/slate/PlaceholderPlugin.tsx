@@ -19,7 +19,7 @@ import {
   getMentionOnSelectItem,
   MentionPlugin,
 } from "@udecode/plate-mention";
-import { useCallback, useMemo } from "react";
+import { createContext, ReactNode, useCallback, useContext, useMemo } from "react";
 import { useFocused, useSelected } from "slate-react";
 import { SlateElement, SlateText } from "./types";
 
@@ -128,13 +128,30 @@ const RenderNoItems: RenderFunction<{ search: string }> = function RenderNoItems
   return <Box>No items</Box>;
 };
 
+const PlaceholdersContext = createContext<PlaceholderOption[] | null>(null);
+
+export function PlaceholdersProvider({
+  placeholders,
+  children,
+}: {
+  placeholders: PlaceholderOption[];
+  children?: ReactNode;
+}) {
+  return (
+    <PlaceholdersContext.Provider value={placeholders}>{children} </PlaceholdersContext.Provider>
+  );
+}
+
 function PlaceholderElement({
   attributes,
   children,
   element,
 }: TRenderElementProps<Value, PlaceholderElement>) {
-  const label = element.children[0].text;
-
+  const placeholders = useContext(PlaceholdersContext);
+  if (placeholders === null) {
+    throw new Error("PlaceholdersProvider must be used surrounding <Plate/>");
+  }
+  const label = placeholders.find((p) => p.value === element.placeholder)!.label;
   const isSelected = useSelected();
   const isFocused = useFocused();
 
