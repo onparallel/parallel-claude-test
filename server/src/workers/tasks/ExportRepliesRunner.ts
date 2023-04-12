@@ -22,6 +22,7 @@ export class ExportRepliesRunner extends TaskRunner<"EXPORT_REPLIES"> {
 
     const userData = await this.ctx.users.loadUserDataByUserId(this.task.user_id);
 
+    // TODO: any error inside getPetitionFiles is not being captured. we should fix this...
     const zipFile = createZipFile(
       getPetitionFiles(
         petitionId,
