@@ -415,9 +415,13 @@ export type SignatureWorkerPayload = {
   };
 }[HandlerType];
 
-createQueueWorker("signature-worker", async (data, ctx) => {
-  await handlers[data.type](data.payload as any, ctx);
-});
+createQueueWorker(
+  "signature-worker",
+  async (data, ctx) => {
+    await handlers[data.type](data.payload as any, ctx);
+  },
+  { forkHandlers: true }
+);
 
 async function fetchOrgSignatureIntegration(
   orgIntegrationId: number,

@@ -28,6 +28,7 @@ export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
 }[Q];
 
 export type QueueWorkerOptions<T> = {
+  forkHandlers?: boolean;
   parser?: (message: string) => T;
 };
 
@@ -44,8 +45,9 @@ export function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
 
   const script = process.argv[1];
 
-  const { parser } = {
+  const { parser, forkHandlers } = {
     parser: (message: string) => JSON.parse(message) as QueueWorkerPayload<Q>,
+    forkHandlers: false,
     ...options,
   };
   const container = createContainer();
@@ -64,11 +66,11 @@ export function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
         const context = container.get<WorkerContext>(WorkerContext);
         try {
           await handler(parser(payload), context, config.queueWorkers[name]);
-        } catch (error) {
-          if (error instanceof Error) {
-            context.logger.error(error.message, { stack: error.stack });
+        } catch (e) {
+          if (e instanceof Error) {
+            context.logger.error(e.message, { stack: e.stack });
           } else {
-            context.logger.error(error);
+            context.logger.error(e);
           }
           process.exit(1);
         }
@@ -92,27 +94,37 @@ export function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
             logger.info("Start processing message", { payload: message.Body });
             try {
               const duration = await stopwatch(async () => {
-                return await new Promise<void>((resolve, reject) => {
-                  fork(
-                    script,
-                    [
-                      "run",
-                      message.Body!,
-                      ...(script.endsWith(".ts") ? ["-r", "ts-node/register"] : []),
-                    ],
-                    {
-                      stdio: "inherit",
-                      timeout: 90_000,
-                      env: process.env,
-                    }
-                  ).on("close", (code) => {
-                    if (code === 0) {
-                      resolve();
-                    } else {
-                      reject();
-                    }
+                if (forkHandlers) {
+                  return await new Promise<void>((resolve, reject) => {
+                    fork(
+                      script,
+                      [
+                        "run",
+                        message.Body!,
+                        ...(script.endsWith(".ts") ? ["-r", "ts-node/register"] : []),
+                      ],
+                      { stdio: "inherit", timeout: 90_000, env: process.env }
+                    ).on("close", (code) => {
+                      if (code === 0) {
+                        resolve();
+                      } else {
+                        reject();
+                      }
+                    });
                   });
-                });
+                } else {
+                  try {
+                    const context = container.get<WorkerContext>(WorkerContext);
+                    await handler(parser(message.Body!), context, config.queueWorkers[name]);
+                  } catch (e) {
+                    if (e instanceof Error) {
+                      logger.error(e.message, { stack: e.stack });
+                    } else {
+                      logger.error(e);
+                    }
+                    throw e;
+                  }
+                }
               });
               logger.info(`Successfully processed message in ${duration}ms`, {
                 payload: message.Body,

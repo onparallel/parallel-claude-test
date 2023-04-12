@@ -26,11 +26,15 @@ export type TaskWorkerPayload = {
   taskId: number;
 };
 
-createQueueWorker("task-worker", async ({ taskId }, ctx) => {
-  const task = await ctx.tasks.pickupTask(taskId, `TaskWorker:${taskId}`);
-  if (!isDefined(task)) {
-    return;
-  }
-  const Runner = RUNNERS[task.name];
-  await new Runner(ctx, task).runTask();
-});
+createQueueWorker(
+  "task-worker",
+  async ({ taskId }, ctx) => {
+    const task = await ctx.tasks.pickupTask(taskId, `TaskWorker:${taskId}`);
+    if (!isDefined(task)) {
+      return;
+    }
+    const Runner = RUNNERS[task.name];
+    await new Runner(ctx, task).runTask();
+  },
+  { forkHandlers: true }
+);
