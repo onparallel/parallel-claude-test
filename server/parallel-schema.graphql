@@ -759,6 +759,7 @@ type Mutation {
   Clone petition.
   """
   clonePetitions(keepTitle: Boolean = false, path: String, petitionIds: [GID!]!): [PetitionBase!]!
+  cloneProfileType(name: LocalizableUserText, profileTypeId: GID!): ProfileType!
 
   """
   Clones the user groups with all its members

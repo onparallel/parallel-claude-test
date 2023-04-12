@@ -68,7 +68,7 @@ describe("GraphQL/Profiles", () => {
             alias: "FIRST_NAME",
           },
           {
-            name: json({ en: "First name", es: "Nombre" }),
+            name: json({ en: "Last name", es: "Apellido" }),
             type: "SHORT_TEXT" as const,
             alias: "LAST_NAME",
           },
@@ -452,6 +452,45 @@ describe("GraphQL/Profiles", () => {
           { id: expect.any(String), name: "Duck, Donald" },
         ],
       });
+    });
+  });
+
+  describe("cloneProfileType", () => {
+    it("clones a profile type", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!) {
+            cloneProfileType(profileTypeId: $profileTypeId) {
+              id
+              name
+              profileNamePattern
+              fields {
+                id
+                name
+                alias
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data.cloneProfileType).toEqual({
+        id: expect.any(String),
+        name: { en: "Individual", es: "Persona física" },
+        profileNamePattern: expect.anything(),
+        fields: profileType0Fields.map((f) => ({
+          id: expect.any(String),
+          name: f.name,
+          alias: f.alias,
+        })),
+      });
+      expect(data.cloneProfileType.profileNamePattern).toEqual(
+        `{{${data.cloneProfileType.fields[0].id}}} {{${data.cloneProfileType.fields[1].id}}}`
+      );
     });
   });
 

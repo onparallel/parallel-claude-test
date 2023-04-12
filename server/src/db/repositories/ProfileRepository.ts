@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { indexBy, isDefined, omit, times, uniq } from "remeda";
+import { indexBy, isDefined, omit, pick, times, uniq } from "remeda";
 import { LocalizableUserText } from "../../graphql";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray, Replace } from "../../util/types";
@@ -93,7 +93,7 @@ export class ProfileRepository extends BaseRepository {
   }
 
   async createProfileType(data: CreateProfileType, createdBy: string, t?: Knex.Transaction) {
-    const [profile] = await this.from("profile_type").insert(
+    const [profile] = await this.from("profile_type", t).insert(
       {
         ...data,
         created_by: createdBy,
@@ -123,6 +123,60 @@ export class ProfileRepository extends BaseRepository {
       );
 
     return profileType;
+  }
+
+  async cloneProfileType(
+    id: number,
+    data: Partial<CreateProfileType>,
+    createdBy: string,
+    t?: Knex.Transaction
+  ) {
+    return await this.withTransaction(async (t) => {
+      const sourceProfileType = (await this.loadProfileType.raw(id, t))!;
+      const profileType = await this.createProfileType(
+        { ...pick(sourceProfileType, ["org_id", "name"]), ...data },
+        createdBy,
+        t
+      );
+      const sourceFields = await this.loadProfileTypeFieldsByProfileTypeId.raw(
+        sourceProfileType.id,
+        t
+      );
+      const fields =
+        sourceFields.length === 0
+          ? []
+          : await this.insert(
+              "profile_type_field",
+              sourceFields.map((field) => ({
+                ...omit(field, ["id", "profile_type_id", "created_at", "updated_at"]),
+                profile_type_id: profileType.id,
+                created_by: createdBy,
+                updated_by: createdBy,
+              })),
+              t
+            ).returning("*");
+      // update profile name pattern with new fields
+      const [updatedProfileType] = await this.from("profile_type", t)
+        .where({ id: profileType.id })
+        .whereNull("deleted_at")
+        .update(
+          {
+            profile_name_pattern: this.json(
+              (sourceProfileType.profile_name_pattern as (number | string)[]).map((p) => {
+                if (typeof p === "string") {
+                  return p;
+                } else {
+                  // find cloned by position
+                  const position = sourceFields.find((sf) => sf.id === p)!.position;
+                  return fields.find((f) => f.position === position)!.id;
+                }
+              })
+            ),
+          },
+          "*"
+        );
+      return updatedProfileType;
+    }, t);
   }
 
   async deleteProfileTypes(id: MaybeArray<number>, deletedBy: string) {

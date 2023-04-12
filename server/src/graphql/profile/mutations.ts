@@ -82,6 +82,30 @@ export const updateProfileType = mutationField("updateProfileType", {
   },
 });
 
+export const cloneProfileType = mutationField("cloneProfileType", {
+  type: nonNull("ProfileType"),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfileType("profileTypeId"),
+    contextUserHasRole("ADMIN")
+  ),
+  args: {
+    profileTypeId: nonNull(globalIdArg("ProfileType")),
+    name: arg({ type: "LocalizableUserText" }),
+  },
+  validateArgs: validateAnd(
+    validLocalizableUserText((args) => args.name, "data.name", { maxLength: 200 })
+  ),
+  resolve: async (_, { profileTypeId, name }, ctx) => {
+    const createData: Partial<CreateProfileType> = {};
+
+    if (isDefined(name)) {
+      createData.name = name;
+    }
+    return await ctx.profiles.cloneProfileType(profileTypeId, createData, `User:${ctx.user!.id}`);
+  },
+});
+
 export const deleteProfileType = mutationField("deleteProfileType", {
   type: "Success",
   authorize: authenticateAnd(

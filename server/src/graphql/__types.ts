@@ -1354,6 +1354,7 @@ export interface NexusGenFieldTypes {
     changePetitionFieldType: NexusGenRootTypes["PetitionField"]; // PetitionField!
     clonePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     clonePetitions: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
+    cloneProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
     cloneUserGroups: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     closePetition: NexusGenRootTypes["Petition"]; // Petition!
     completePetition: NexusGenRootTypes["Petition"]; // Petition!
@@ -3256,6 +3257,7 @@ export interface NexusGenFieldTypeNames {
     changePetitionFieldType: "PetitionField";
     clonePetitionField: "PetitionField";
     clonePetitions: "PetitionBase";
+    cloneProfileType: "ProfileType";
     cloneUserGroups: "UserGroup";
     closePetition: "Petition";
     completePetition: "Petition";
@@ -4876,6 +4878,11 @@ export interface NexusGenArgTypes {
       keepTitle?: boolean | null; // Boolean
       path?: string | null; // String
       petitionIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    cloneProfileType: {
+      // args
+      name?: NexusGenScalars["LocalizableUserText"] | null; // LocalizableUserText
+      profileTypeId: NexusGenScalars["GID"]; // GID!
     };
     cloneUserGroups: {
       // args
