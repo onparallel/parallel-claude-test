@@ -9,6 +9,7 @@ import {
 } from "@parallel/utils/slate/MentionPlugin";
 import { isEmptyParagraph } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { CustomEditor, SlateElement, SlateText } from "@parallel/utils/slate/types";
+import { structuredClone } from "@parallel/utils/structuredClone";
 import { Maybe } from "@parallel/utils/types";
 import { useConstant } from "@parallel/utils/useConstant";
 import { ValueProps } from "@parallel/utils/ValueProps";

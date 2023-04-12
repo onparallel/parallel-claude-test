@@ -8,6 +8,7 @@ import {
 } from "@parallel/utils/slate/PlaceholderPlugin";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { CustomEditor } from "@parallel/utils/slate/types";
+import { structuredClone } from "@parallel/utils/structuredClone";
 import { useConstant } from "@parallel/utils/useConstant";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { createAutoformatPlugin } from "@udecode/plate-autoformat";
