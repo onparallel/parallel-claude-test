@@ -35,7 +35,9 @@ export async function* getPetitionFiles(
     .filter(([, isVisible]) => isVisible)
     .map(([field]) => field);
 
-  const fileReplies = fieldReplies.flat().filter((r) => isFileTypeField(r.type));
+  const fileReplies = fieldReplies
+    .flat()
+    .filter((r) => isFileTypeField(r.type) && isDefined(r.content["file_upload_id"]));
 
   const files = await ctx.files.loadFileUpload(
     fileReplies.map((reply) => reply.content["file_upload_id"])
