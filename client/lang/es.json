@@ -4140,11 +4140,6 @@
     "context": "Select a country..."
   },
   {
-    "term": "component.placeholder-input.hint",
-    "definition": "Presiona # para añadir parámetros a sustituir",
-    "context": "Press # to add replaceable placeholders"
-  },
-  {
     "term": "component.preview-comments-dialog.template-no-comments-added",
     "definition": "<b>Solo previsualización</b> - los comentarios están desactivados.",
     "context": "<b>Preview only</b> - comments are disabled."
@@ -4573,11 +4568,6 @@
     "term": "component.react-select.loading",
     "definition": "Cargando...",
     "context": "Loading..."
-  },
-  {
-    "term": "component.react-select.no-options",
-    "definition": "Sin resultados",
-    "context": "No options"
   },
   {
     "term": "component.recipient-portal-header.hello-name",
@@ -7603,6 +7593,11 @@
     "term": "generic.no-deadline",
     "definition": "Sin vencimiento",
     "context": "No deadline"
+  },
+  {
+    "term": "generic.no-results",
+    "definition": "Sin resultados",
+    "context": "No results"
   },
   {
     "term": "generic.not-available",

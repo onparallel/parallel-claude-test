@@ -20,6 +20,7 @@ import {
   MentionPlugin,
 } from "@udecode/plate-mention";
 import { createContext, ReactNode, useCallback, useContext, useMemo } from "react";
+import { FormattedMessage } from "react-intl";
 import { useFocused, useSelected } from "slate-react";
 import { SlateElement, SlateText } from "./types";
 
@@ -124,8 +125,12 @@ const RenderPlaceholderOption: RenderFunction<ComboboxItemProps<PlaceholderOptio
     );
   };
 
-const RenderNoItems: RenderFunction<{ search: string }> = function RenderNoItems({ search }) {
-  return <Box>No items</Box>;
+const RenderNoItems: RenderFunction<{ search: string }> = function RenderNoItems() {
+  return (
+    <Box textStyle="hint" textAlign="center" paddingY={2} paddingX={3}>
+      <FormattedMessage id="generic.no-results" defaultMessage="No results" />
+    </Box>
+  );
 };
 
 const PlaceholdersContext = createContext<PlaceholderOption[] | null>(null);

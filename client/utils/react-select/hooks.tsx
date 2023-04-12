@@ -404,7 +404,7 @@ const DropdownIndicator = rsComponent("DropdownIndicator", function (props) {
 const NoOptionsMessage = rsComponent("NoOptionsMessage", function () {
   return (
     <Text as="div" textStyle="hint" textAlign="center" paddingY={2}>
-      <FormattedMessage id="component.react-select.no-options" defaultMessage="No options" />
+      <FormattedMessage id="generic.no-results" defaultMessage="No results" />
     </Text>
   );
 });
