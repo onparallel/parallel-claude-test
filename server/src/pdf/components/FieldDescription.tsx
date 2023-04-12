@@ -229,7 +229,7 @@ function MdList({ token }: { token: marked.Tokens.List }) {
               ordered ? (
                 <Text>{`${i}.`}</Text>
               ) : (
-                <View style={styles.listItemBulletSymbolContainer}>
+                <View style={styles.listItemBulletSymbolContainer} wrap={false}>
                   <View
                     style={
                       [styles.listItemBulletLevel0, styles.listItemBulletLevel1][level] ??
