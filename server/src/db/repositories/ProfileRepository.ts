@@ -361,6 +361,9 @@ export class ProfileRepository extends BaseRepository {
     orgId: number,
     opts: {
       search?: string | null;
+      filter?: {
+        profileTypeId?: number[] | null;
+      } | null;
       sortBy?: SortBy<"created_at" | "name">[];
     } & PageOpts
   ) {
@@ -369,11 +372,14 @@ export class ProfileRepository extends BaseRepository {
         .where("org_id", orgId)
         .whereNull("deleted_at")
         .mmodify((q) => {
-          const { search, sortBy } = opts;
+          const { search, sortBy, filter } = opts;
           if (search) {
             q.whereEscapedILike("name", `%${escapeLike(search, "\\")}%`);
           }
-          if (sortBy) {
+          if (isDefined(filter?.profileTypeId)) {
+            q.where("profile_type_id", filter?.profileTypeId);
+          }
+          if (isDefined(sortBy)) {
             q.orderBy(
               sortBy.map(({ field, order }) => {
                 return { column: field, order };

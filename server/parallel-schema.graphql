@@ -4368,6 +4368,10 @@ type ProfileFieldValue implements ProfileFieldResponse {
   removedBy: User
 }
 
+input ProfileFilter {
+  profileTypeId: [GID!]
+}
+
 type ProfilePagination {
   """
   The requested slice of items.
@@ -5163,6 +5167,8 @@ type Query {
     sortBy: [QueryProfileTypes_OrderBy!]
   ): ProfileTypePagination!
   profiles(
+    filter: ProfileFilter
+
     """
     Number of elements to take from the list.
     """

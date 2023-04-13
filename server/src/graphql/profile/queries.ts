@@ -1,4 +1,4 @@
-import { arg, nonNull, queryField } from "nexus";
+import { arg, inputObjectType, nonNull, queryField } from "nexus";
 import { isDefined } from "remeda";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
@@ -60,7 +60,15 @@ export const profiles = queryField((t) => {
     authorize: authenticateAnd(userHasFeatureFlag("PROFILES")),
     searchable: true,
     sortableBy: ["createdAt", "name"],
-    resolve: async (_, { limit, offset, search, sortBy }, ctx) => {
+    extendArgs: {
+      filter: inputObjectType({
+        name: "ProfileFilter",
+        definition(t) {
+          t.nullable.list.nonNull.globalId("profileTypeId", { prefixName: "ProfileType" });
+        },
+      }),
+    },
+    resolve: async (_, { limit, offset, search, sortBy, filter }, ctx) => {
       const columnMap = {
         createdAt: "created_at",
         name: "name",
@@ -69,6 +77,7 @@ export const profiles = queryField((t) => {
         limit,
         offset,
         search,
+        filter,
         sortBy: sortBy?.map((value) => {
           const [field, order] = parseSortBy(value);
           return { field: columnMap[field], order };

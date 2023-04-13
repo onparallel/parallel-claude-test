@@ -219,6 +219,10 @@ export interface NexusGenInputs {
     operator: NexusGenEnums["PetitionTagFilterLineOperator"]; // PetitionTagFilterLineOperator!
     value: NexusGenScalars["GID"][]; // [GID!]!
   };
+  ProfileFilter: {
+    // input type
+    profileTypeId?: NexusGenScalars["GID"][] | null; // [GID!]
+  };
   PublicPetitionSignerDataInput: {
     // input type
     email: string; // String!
@@ -6055,6 +6059,7 @@ export interface NexusGenArgTypes {
     };
     profiles: {
       // args
+      filter?: NexusGenInputs["ProfileFilter"] | null; // ProfileFilter
       limit?: number | null; // Int
       offset?: number | null; // Int
       search?: string | null; // String
