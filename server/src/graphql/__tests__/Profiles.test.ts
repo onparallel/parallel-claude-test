@@ -453,6 +453,29 @@ describe("GraphQL/Profiles", () => {
         ],
       });
     });
+
+    it("fails when passing a profile name pattern without fields in it", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $profileNamePattern: String!) {
+            updateProfileType(
+              profileTypeId: $profileTypeId
+              profileNamePattern: $profileNamePattern
+            ) {
+              id
+              profileNamePattern
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileNamePattern: "Hello",
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_NAME_PATTERN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("cloneProfileType", () => {

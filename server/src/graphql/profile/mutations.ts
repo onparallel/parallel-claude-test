@@ -26,9 +26,8 @@ import {
   profileTypeFieldBelongsToProfileType,
   userHasAccessToProfile,
   userHasAccessToProfileType,
-  validProfileNamePattern,
 } from "./authorizers";
-import { validProfileFieldValue } from "./validators";
+import { validProfileFieldValue, validProfileNamePattern } from "./validators";
 
 export const createProfileType = mutationField("createProfileType", {
   type: "ProfileType",
@@ -50,8 +49,7 @@ export const updateProfileType = mutationField("updateProfileType", {
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfileType("profileTypeId"),
-    contextUserHasRole("ADMIN"),
-    validProfileNamePattern("profileTypeId", "profileNamePattern")
+    contextUserHasRole("ADMIN")
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
@@ -59,7 +57,8 @@ export const updateProfileType = mutationField("updateProfileType", {
     profileNamePattern: stringArg(),
   },
   validateArgs: validateAnd(
-    validLocalizableUserText((args) => args.name, "data.name", { maxLength: 200 })
+    validLocalizableUserText((args) => args.name, "data.name", { maxLength: 200 }),
+    validProfileNamePattern("profileTypeId", "profileNamePattern")
   ),
   resolve: async (_, { profileTypeId, name, profileNamePattern }, ctx) => {
     const updateData: Partial<CreateProfileType> = {};

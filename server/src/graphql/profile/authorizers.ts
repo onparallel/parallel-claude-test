@@ -1,9 +1,7 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isDefined, uniq } from "remeda";
+import { isDefined } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
-import { fromGlobalId } from "../../util/globalId";
-import { parseTextWithPlaceholders } from "../../util/textWithPlaceholders";
-import { Maybe, MaybeArray } from "../../util/types";
+import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 
 export function userHasAccessToProfileType<
@@ -88,35 +86,6 @@ export function userHasAccessToProfile<
 
       const profiles = await ctx.profiles.loadProfile(ids);
       return profiles.every((p) => isDefined(p) && p.org_id === ctx.user!.org_id);
-    } catch {
-      return false;
-    }
-  };
-}
-
-export function validProfileNamePattern<
-  TypeName extends string,
-  FieldName extends string,
-  TProfileId extends Arg<TypeName, FieldName, number>,
-  TProfileNamePattern extends Arg<TypeName, FieldName, Maybe<string> | undefined>
->(
-  profileTypeIdArg: TProfileId,
-  profileNamePatternArg: TProfileNamePattern
-): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    try {
-      const profileTypeId = args[profileTypeIdArg] as unknown as number;
-      const pattern = args[profileNamePatternArg] as unknown as Maybe<string>;
-      if (isDefined(pattern)) {
-        const fieldIds = parseTextWithPlaceholders(pattern)
-          .filter((p) => p.type === "placeholder" && p.value.match(/^\d+$/))
-          .map((p) => fromGlobalId(p.value!, "ProfileTypeField").id);
-        const fields = await ctx.profiles.loadProfileTypeField(uniq(fieldIds));
-        return fields.every(
-          (f) => isDefined(f) && f.profile_type_id === profileTypeId && f.type === "SHORT_TEXT"
-        );
-      }
-      return true;
     } catch {
       return false;
     }
