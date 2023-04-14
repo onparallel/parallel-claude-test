@@ -19,6 +19,7 @@ generates:
       useTypeImports: true
       strictScalars: true
       scalars:
+        Date: string
         DateTime: string
         JSON: any
         JSONObject: "{ [key: string]: any }"
