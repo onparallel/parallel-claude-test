@@ -230,6 +230,11 @@ interface CreatedAt {
 }
 
 """
+A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar Date
+
+"""
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
 scalar DateTime
@@ -975,12 +980,12 @@ type Mutation {
   """
   createPrintPdfTask(includeNdLinks: Boolean, petitionId: GID!, skipAttachments: Boolean): Task!
   createProfile(profileTypeId: GID!): Profile!
-  createProfileFieldValue(
-    content: JSONObject!
+  createProfileFieldFileUploadLink(
+    data: [FileUploadInput!]!
     expiresAt: DateTime
     profileId: GID!
     profileTypeFieldId: GID!
-  ): Profile!
+  ): ProfileFieldPropertyAndFileWithUploadData!
   createProfileType(name: LocalizableUserText!): ProfileType!
   createProfileTypeField(data: CreateProfileTypeFieldInput!, profileTypeId: GID!): ProfileTypeField!
 
@@ -1318,6 +1323,11 @@ type Mutation {
     fieldId: GID!
     petitionId: GID!
   ): PetitionFieldAttachment!
+  profileFieldFileUploadComplete(
+    profileFieldFileIds: [GID!]!
+    profileId: GID!
+    profileTypeFieldId: GID!
+  ): [ProfileFieldFile!]!
   publicCheckVerificationCode(code: String!, keycode: ID!, token: ID!): VerificationCodeCheck!
 
   """
@@ -2020,6 +2030,7 @@ type Mutation {
     petitionIds: [GID!]
     petitionUserNotificationIds: [GID!]
   ): [PetitionUserNotification!]!
+  updateProfileFieldValue(fields: [UpdateProfileFieldValueInput!]!, profileId: GID!): Profile!
   updateProfileType(
     name: LocalizableUserText
     profileNamePattern: String
@@ -4308,10 +4319,20 @@ type ProfileFieldFile implements ProfileFieldResponse {
   removedBy: User
 }
 
+type ProfileFieldFileWithUploadData {
+  file: ProfileFieldFile!
+  presignedPostData: AWSPresignedPostData!
+}
+
 type ProfileFieldProperty {
   field: ProfileTypeField!
   files: [ProfileFieldFile!]
   value: ProfileFieldValue
+}
+
+type ProfileFieldPropertyAndFileWithUploadData {
+  property: ProfileFieldProperty!
+  uploads: [ProfileFieldFileWithUploadData!]!
 }
 
 interface ProfileFieldResponse {
@@ -5934,6 +5955,12 @@ input UpdatePetitionInput {
   remindersConfig: RemindersConfigInput
   signatureConfig: SignatureConfigInput
   skipForwardSecurity: Boolean
+}
+
+input UpdateProfileFieldValueInput {
+  content: JSONObject
+  expiresAt: Date
+  profileTypeFieldId: GID!
 }
 
 input UpdateProfileTypeFieldInput {

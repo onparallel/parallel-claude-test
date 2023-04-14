@@ -1,8 +1,10 @@
 import Ajv from "ajv";
+import { isPossiblePhoneNumber } from "libphonenumber-js";
 import { isDefined, uniq } from "remeda";
 import { TableTypes } from "../../db/helpers/BaseRepository";
 import { fromGlobalId } from "../../util/globalId";
 import { parseTextWithPlaceholders } from "../../util/textWithPlaceholders";
+import { isValidDate } from "../../util/time";
 import { Maybe } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
@@ -67,15 +69,47 @@ const STRING_VALUE_SCHEMA = {
     value: { type: "string" },
   },
   additionalProperties: false,
-};
+} as const;
 
-function validateProfileFieldValue(field: TableTypes["profile_type_field"], content: any) {
+export function validateProfileFieldValue(field: TableTypes["profile_type_field"], content: any) {
   const ajv = new Ajv();
   switch (field.type) {
-    case "SHORT_TEXT":
+    case "SHORT_TEXT": {
       const valid = ajv.validate(STRING_VALUE_SCHEMA, content);
       if (!valid) {
         throw new Error(ajv.errorsText());
       }
+      if (content.value.includes("\n")) {
+        return new Error("Value can't include newlines");
+      }
+      return;
+    }
+    case "TEXT": {
+      const valid = ajv.validate(STRING_VALUE_SCHEMA, content);
+      if (!valid) {
+        throw new Error(ajv.errorsText());
+      }
+      return;
+    }
+    case "DATE": {
+      const valid = ajv.validate(STRING_VALUE_SCHEMA, content);
+      if (!valid) {
+        throw new Error(ajv.errorsText());
+      }
+      if (isValidDate(content.value)) {
+        return new Error("Value is not a valid datetime");
+      }
+      return;
+    }
+    case "PHONE": {
+      const valid = ajv.validate(STRING_VALUE_SCHEMA, content);
+      if (!valid) {
+        throw new Error(ajv.errorsText());
+      }
+      if (!isPossiblePhoneNumber(content.value)) {
+        return new Error("Value is not a valid phone number");
+      }
+      return;
+    }
   }
 }

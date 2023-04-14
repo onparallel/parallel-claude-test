@@ -1,5 +1,6 @@
 import { booleanArg, list, mutationField, nonNull } from "nexus";
 import { maxBy, zip } from "remeda";
+import { toBytes } from "../../../util/fileSize";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";
@@ -18,9 +19,6 @@ import {
 } from "../authorizers";
 import { petitionCanUploadAttachments } from "./authorizers";
 
-const _50MB = 50 * 1024 * 1024;
-const _100MB = 100 * 1024 * 1024;
-
 export const createPetitionFieldAttachmentUploadLink = mutationField(
   "createPetitionFieldAttachmentUploadLink",
   {
@@ -36,7 +34,11 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
       fieldId: nonNull(globalIdArg("PetitionField")),
       data: nonNull("FileUploadInput"),
     },
-    validateArgs: validFileUploadInput((args) => args.data, { maxSizeBytes: _100MB }, "data"),
+    validateArgs: validFileUploadInput(
+      (args) => args.data,
+      { maxSizeBytes: toBytes(100, "MB") },
+      "data"
+    ),
     resolve: async (_, args, ctx) => {
       const attachments = await ctx.petitions.loadFieldAttachmentsByFieldId(args.fieldId);
       if (attachments.length + 1 > 10) {
@@ -184,7 +186,7 @@ export const createPetitionAttachmentUploadLink = mutationField(
     },
     validateArgs: validFileUploadInput(
       (args) => args.data,
-      { maxSizeBytes: _50MB, contentType: "application/pdf" },
+      { maxSizeBytes: toBytes(50, "MB"), contentType: "application/pdf" },
       "data"
     ),
     resolve: async (_, args, ctx) => {

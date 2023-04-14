@@ -2,6 +2,10 @@ import { Knex } from "knex";
 import { timestamps } from "./helpers/timestamps";
 
 export async function up(knex: Knex): Promise<void> {
+  await knex.schema.alterTable("organization", (t) => {
+    t.string("default_timezone", 50).notNullable().defaultTo("Etc/UTC");
+  });
+
   await knex.schema.createTable("profile_type", (t) => {
     t.increments("id");
     t.integer("org_id").notNullable().references("organization.id");
@@ -126,7 +130,13 @@ export async function up(knex: Knex): Promise<void> {
     t.integer("profile_id").notNullable().references("profile.id");
     t.enum(
       "type",
-      ["PROFILE_CREATED", "PROFILE_FIELD_VALUE_UPDATED", "PROFILE_FIELD_VALUE_DELETED"],
+      [
+        "PROFILE_CREATED",
+        "PROFILE_FIELD_VALUE_UPDATED",
+        "PROFILE_FIELD_FILE_ADDED",
+        "PROFILE_FIELD_FILE_REMOVED",
+        "PROFILE_FIELD_EXPIRY_UPDATED",
+      ],
       {
         enumName: "profile_event_type",
         useNative: true,
@@ -150,5 +160,6 @@ export async function down(knex: Knex): Promise<void> {
     drop type if exists "profile_type_field_permission";
     drop type if exists "profile_type_field_type";
     drop type if exists "profile_event_type";
+    alter table organization drop column if exists default_timezone;
   `);
 }

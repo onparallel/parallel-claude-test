@@ -19,3 +19,10 @@ export function fileSize(
   }
   return `${intl.formatNumber(_value, opts)} ${UNITS[unit]}`;
 }
+
+export function toBytes(value: number, unit: (typeof UNITS)[number]) {
+  if (!UNITS.includes(unit)) {
+    throw new Error("Invalid unit");
+  }
+  return value * Math.pow(1024, UNITS.indexOf(unit));
+}

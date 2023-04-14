@@ -13,6 +13,7 @@ import {
   CreateProfileType,
   CreateProfileTypeField,
   Profile,
+  ProfileFieldValue,
   ProfileType,
   UserLocale,
 } from "../__types";
@@ -351,9 +352,17 @@ export class ProfileRepository extends BaseRepository {
     "profile_id",
     (q) => q.whereNull("removed_at").whereNull("deleted_at")
   );
+  readonly loadProfileFieldFileById = this.buildLoadBy("profile_field_file", "id", (q) =>
+    q.whereNull("removed_at").whereNull("deleted_at")
+  );
   readonly loadProfileFieldFilesByProfileId = this.buildLoadMultipleBy(
     "profile_field_file",
     "profile_id",
+    (q) => q.whereNull("removed_at").whereNull("deleted_at")
+  );
+  readonly loadProfileFieldFilesByProfileTypeFieldId = this.buildLoadMultipleBy(
+    "profile_field_file",
+    "profile_type_field_id",
     (q) => q.whereNull("removed_at").whereNull("deleted_at")
   );
 
@@ -467,7 +476,11 @@ export class ProfileRepository extends BaseRepository {
 
   async createProfileFieldValue(
     profileId: number,
-    contents: [profileTypeFieldId: number, content: any, expiresAt: Date | null][],
+    fields: {
+      profileTypeFieldId: number;
+      content?: Record<string, any> | null;
+      expiresAt?: Date | null;
+    }[],
     userId: number
   ) {
     return await this.withTransaction(async (t) => {
@@ -478,37 +491,69 @@ export class ProfileRepository extends BaseRepository {
         .where("profile_id", profileId)
         .whereIn(
           "profile_type_field_id",
-          contents.map(([profileTypeFieldId]) => profileTypeFieldId)
+          fields.map((f) => f.profileTypeFieldId)
         )
         .update({ removed_at: this.now(), removed_by_user_id: userId })
         .returning("*");
       const previousByPtfId = indexBy(previousValues, (v) => v.profile_type_field_id);
       const currentValues = await this.insert(
         "profile_field_value",
-        contents.map(([profileTypeFieldId, content, expiresAt]) => ({
-          profile_id: profileId,
-          profile_type_field_id: profileTypeFieldId,
-          content,
-          expires_at: expiresAt,
-          created_by_user_id: userId,
-        })),
+        fields
+          .filter((f) => isDefined(f.content))
+          .map((f) => ({
+            profile_id: profileId,
+            profile_type_field_id: f.profileTypeFieldId,
+            content: f.content,
+            created_by_user_id: userId,
+            ...(f.expiresAt !== undefined
+              ? { expires_at: f.expiresAt }
+              : { expires_at: previousByPtfId[f.profileTypeFieldId]?.expires_at ?? null }),
+          })),
         t
       );
       const currentByPtfId = indexBy(currentValues, (v) => v.profile_type_field_id);
       await this.createEvent(
-        contents.map(([profileTypeFieldId]) => ({
-          org_id: profileType.org_id,
-          profile_id: profileId,
-          type: "PROFILE_FIELD_VALUE_UPDATED",
-          data: {
-            current_value: currentByPtfId[profileTypeFieldId].id,
-            previous_value: previousByPtfId[profileTypeFieldId]?.id,
-          },
-        })),
+        fields.flatMap((f) => {
+          const current = currentByPtfId[f.profileTypeFieldId] as ProfileFieldValue | undefined;
+          const previous = previousByPtfId[f.profileTypeFieldId] as ProfileFieldValue | undefined;
+          const expiryChanged =
+            f.expiresAt !== undefined &&
+            (previous?.expires_at?.valueOf() ?? null) !== (f.expiresAt?.valueOf() ?? null);
+          return [
+            ...(isDefined(current) || isDefined(previous)
+              ? [
+                  {
+                    org_id: profileType.org_id,
+                    profile_id: profileId,
+                    type: "PROFILE_FIELD_VALUE_UPDATED",
+                    data: {
+                      current_profile_field_value_id: current?.id,
+                      previous_profile_field_value_id: previous?.id,
+                    },
+                  } as CreateProfileEvent,
+                ]
+              : []),
+            ...(expiryChanged
+              ? [
+                  {
+                    org_id: profileType.org_id,
+                    profile_id: profileId,
+                    type: "PROFILE_FIELD_EXPIRY_UPDATED",
+                    data: {
+                      current_profile_field_value_id: current?.id,
+                      previous_profile_field_value_id: previous?.id,
+                      previous_expires_at: previous?.expires_at?.toISOString() ?? null,
+                      current_expires_at: current?.expires_at?.toISOString() ?? null,
+                    },
+                  } as CreateProfileEvent,
+                ]
+              : []),
+          ];
+        }),
         t
       );
       const pattern = profileType.profile_name_pattern as (string | number)[];
-      if (contents.some(([profileTypeFieldId]) => pattern.includes(profileTypeFieldId))) {
+      if (fields.some((f) => pattern.includes(f.profileTypeFieldId))) {
         const [profile] = await this.raw<Profile>(
           /* sql */ `
           with profile_values as (
@@ -540,6 +585,51 @@ export class ProfileRepository extends BaseRepository {
       } else {
         return await this.loadProfile.raw(profileId, t);
       }
+    });
+  }
+
+  async createProfileFieldFile(
+    profileId: number,
+    profileTypeFieldId: number,
+    fileUploadIds: number[],
+    expiresAt: Date | null | undefined,
+    userId: number
+  ) {
+    return await this.withTransaction(async (t) => {
+      const profileType = (await this.loadProfileTypeForProfileId.raw(profileId, t))!;
+      // TODO
+      // let _expiresAt = expiresAt
+      // if (expiresAt !== )
+      await this.from("profile_field_file", t)
+        .whereNull("deleted_at")
+        .whereNull("removed_at")
+        .where("profile_id", profileId)
+        .where("profile_type_field_id", profileTypeFieldId)
+        .update({ expires_at: expiresAt })
+        .returning("*");
+      const profileFieldFiles = await this.insert(
+        "profile_field_file",
+        fileUploadIds.map((fileUploadId) => ({
+          profile_id: profileId,
+          profile_type_field_id: profileTypeFieldId,
+          file_upload_id: fileUploadId,
+          expires_at: expiresAt,
+          created_by_user_id: userId,
+        })),
+        t
+      );
+      await this.createEvent(
+        profileFieldFiles.map((pff) => ({
+          org_id: profileType.org_id,
+          profile_id: pff.profile_id,
+          type: "PROFILE_FIELD_FILE_ADDED",
+          data: {
+            profile_field_file: pff.id,
+          },
+        })),
+        t
+      );
+      return profileFieldFiles;
     });
   }
 

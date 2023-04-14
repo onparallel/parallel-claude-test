@@ -174,3 +174,19 @@ export const ProfileFieldFile = objectType({
     t.nullable.field("file", { type: "FileUpload" });
   },
 });
+
+export const ProfileFieldPropertyAndFileWithUploadData = objectType({
+  name: "ProfileFieldPropertyAndFileWithUploadData",
+  definition(t) {
+    t.field("property", { type: "ProfileFieldProperty" });
+    t.list.field("uploads", {
+      type: objectType({
+        name: "ProfileFieldFileWithUploadData",
+        definition(t) {
+          t.field("file", { type: "ProfileFieldFile" });
+          t.field("presignedPostData", { type: "AWSPresignedPostData" });
+        },
+      }),
+    });
+  },
+});

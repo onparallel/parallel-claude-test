@@ -1,5 +1,7 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { zip } from "remeda";
+import { ILogger, LOGGER } from "../../services/Logger";
 import { unMaybeArray } from "../../util/arrays";
 import { pMapChunk } from "../../util/promises/pMapChunk";
 import { MaybeArray } from "../../util/types";
@@ -15,7 +17,7 @@ import {
 
 @injectable()
 export class FileRepository extends BaseRepository {
-  constructor(@inject(KNEX) knex: Knex) {
+  constructor(@inject(KNEX) knex: Knex, @inject(LOGGER) public logger: ILogger) {
     super(knex);
   }
 
@@ -25,15 +27,25 @@ export class FileRepository extends BaseRepository {
   );
 
   async createFileUpload(data: MaybeArray<CreateFileUpload>, createdBy: string) {
-    const dataArr = unMaybeArray(data);
-    return await this.insert(
+    const fileUploads = await this.insert(
       "file_upload",
-      dataArr.map((data) => ({
+      unMaybeArray(data).map((data) => ({
         ...data,
         created_by: createdBy,
         updated_by: createdBy,
       }))
     ).returning("*");
+    // Tengo las sospecha de que los errores de 403 vengan de que el orden en que retornamos
+    // esto no coincide con el orden de insercion
+    if (
+      !zip(fileUploads, unMaybeArray(data)).every(
+        ([fu, d]) =>
+          fu.content_type === d.content_type && fu.size === d.size && fu.filename === d.filename
+      )
+    ) {
+      this.logger.error(new Error("fileUpload order doesn't match insert data. should guarantee"));
+    }
+    return fileUploads;
   }
 
   async cloneFileUpload(id: MaybeArray<number>, t?: Knex.Transaction) {
@@ -62,7 +74,7 @@ export class FileRepository extends BaseRepository {
     );
   }
 
-  async markFileUploadComplete(id: number, updatedBy: string) {
+  async markFileUploadComplete(id: MaybeArray<number>, updatedBy: string) {
     await this.from("file_upload")
       .update(
         {
@@ -72,7 +84,8 @@ export class FileRepository extends BaseRepository {
         },
         "*"
       )
-      .where({ id: id, upload_complete: false });
+      .whereIn("id", unMaybeArray(id))
+      .where("upload_complete", false);
   }
 
   /** gets deleted file_upload's whose paths are not repeated on another not deleted file_upload */

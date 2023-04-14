@@ -1,5 +1,6 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isDefined } from "remeda";
+import { ProfileTypeFieldType } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
@@ -69,6 +70,31 @@ export function profileHasProfileTypeFieldId<
           (p) => isDefined(p) && p.profile_type_id === profile!.profile_type_id
         )
       );
+    } catch {
+      return false;
+    }
+  };
+}
+
+export function profileTypeFieldIsOfType<
+  TypeName extends string,
+  FieldName extends string,
+  TProfileTypeFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(
+  profileTypeFieldIdArg: TProfileTypeFieldId,
+  types: ProfileTypeFieldType[] | ((type: ProfileTypeFieldType) => boolean)
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const profileTypeFieldIds = unMaybeArray(
+        args[profileTypeFieldIdArg] as unknown as MaybeArray<number>
+      );
+      const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
+      const predicate = Array.isArray(types)
+        ? (type: ProfileTypeFieldType) => types.includes(type)
+        : types;
+
+      return profileTypeFields.every((p) => isDefined(p) && predicate(p.type));
     } catch {
       return false;
     }

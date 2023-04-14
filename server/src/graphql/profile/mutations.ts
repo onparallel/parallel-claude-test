@@ -1,33 +1,44 @@
+import { format, zonedTimeToUtc } from "date-fns-tz";
 import { arg, inputObjectType, list, mutationField, nonNull, stringArg } from "nexus";
+import pMap from "p-map";
 import { DatabaseError } from "pg";
-import { isDefined } from "remeda";
+import { indexBy, isDefined, zip } from "remeda";
 import {
   defaultProfileTypeFieldOptions,
   validateProfileTypeFieldOptions,
 } from "../../db/helpers/profileTypeFieldOptions";
-import { CreateProfileType, CreateProfileTypeField } from "../../db/__types";
+import {
+  CreateProfileType,
+  CreateProfileTypeField,
+  ProfileFieldFile,
+  ProfileTypeField,
+} from "../../db/__types";
+import { toBytes } from "../../util/fileSize";
 import { fromGlobalId } from "../../util/globalId";
 import { parseTextWithPlaceholders } from "../../util/textWithPlaceholders";
+import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
-import { ApolloError, ArgValidationError } from "../helpers/errors";
+import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { datetimeArg } from "../helpers/scalars/DateTime";
-import { jsonObjectArg } from "../helpers/scalars/JSON";
 import { SUCCESS } from "../helpers/Success";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
+import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 import { validateRegex } from "../helpers/validators/validateRegex";
+import { validFileUploadInput } from "../helpers/validators/validFileUploadInput";
 import { validLocalizableUserText } from "../helpers/validators/validLocalizableUserText";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { contextUserHasRole } from "../users/authorizers";
 import {
   profileHasProfileTypeFieldId,
   profileTypeFieldBelongsToProfileType,
+  profileTypeFieldIsOfType,
   userHasAccessToProfile,
   userHasAccessToProfileType,
 } from "./authorizers";
-import { validProfileFieldValue, validProfileNamePattern } from "./validators";
+import { validateProfileFieldValue, validProfileNamePattern } from "./validators";
 
 export const createProfileType = mutationField("createProfileType", {
   type: "ProfileType",
@@ -343,25 +354,179 @@ export const deleteProfile = mutationField("deleteProfile", {
   },
 });
 
-export const createProfileFieldValue = mutationField("createProfileFieldValue", {
+export const updateProfileFieldValue = mutationField("updateProfileFieldValue", {
   type: "Profile",
+  authorize: authenticateAnd(userHasFeatureFlag("PROFILES"), userHasAccessToProfile("profileId")),
+  args: {
+    profileId: nonNull(globalIdArg("Profile")),
+    fields: nonNull(
+      list(
+        nonNull(
+          arg({
+            type: inputObjectType({
+              name: "UpdateProfileFieldValueInput",
+              definition(t) {
+                t.nonNull.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
+                t.nullable.jsonObject("content");
+                t.nullable.date("expiresAt");
+              },
+            }),
+          })
+        )
+      )
+    ),
+  },
+  resolve: async (_, { profileId, fields }, ctx) => {
+    const [profileTypeFields, profile] = await Promise.all([
+      ctx.profiles.loadProfileTypeField(fields.map((f) => f.profileTypeFieldId)),
+      ctx.profiles.loadProfile(profileId),
+    ]);
+    // check profileTypeFieldIds match the profileId
+    if (
+      !isDefined(profile) ||
+      profileTypeFields.some(
+        (p) => !isDefined(p) || p.profile_type_id !== profile!.profile_type_id || p.type === "FILE"
+      )
+    ) {
+      throw new ForbiddenError("Not authorized");
+    }
+    const profileTypeFieldsById = indexBy(profileTypeFields as ProfileTypeField[], (ptf) => ptf.id);
+    // validate contents and expiresAt
+    for (const { profileTypeFieldId, content, expiresAt } of fields) {
+      const profileTypeField = profileTypeFieldsById[profileTypeFieldId];
+      if (isDefined(content)) {
+        try {
+          validateProfileFieldValue(profileTypeField, content);
+        } catch (e) {
+          if (e instanceof Error) {
+            throw new ApolloError(
+              `Invalid profile field value: ${e.message}`,
+              "INVALID_PROFILE_FIELD_VALUE"
+            );
+          }
+        }
+      }
+      if (expiresAt !== undefined && !profileTypeField.is_expirable) {
+        throw new ApolloError(`Can't set expiry on a non expirable field`, "INVALID_EXPIRY");
+      }
+      if (expiresAt !== undefined && !isDefined(content)) {
+        throw new ApolloError(`Can't set expiry on a non replied field`, "INVALID_EXPIRY");
+      }
+    }
+    const fieldsWithZonedExpires = fields.map((field) => ({
+      ...field,
+      expiresAt:
+        field.expiresAt &&
+        zonedTimeToUtc(format(field.expiresAt, "yyyy-MM-dd"), ctx.organization!.default_timezone),
+    }));
+    return (await ctx.profiles.createProfileFieldValue(
+      profileId,
+      fieldsWithZonedExpires,
+      ctx.user!.id
+    ))!;
+  },
+});
+
+export const createProfileFieldFileUploadLink = mutationField("createProfileFieldFileUploadLink", {
+  type: "ProfileFieldPropertyAndFileWithUploadData",
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfile("profileId"),
-    profileHasProfileTypeFieldId("profileId", "profileTypeFieldId")
+    profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
+    profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"])
   ),
   args: {
     profileId: nonNull(globalIdArg("Profile")),
     profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
-    content: nonNull(jsonObjectArg()),
+    data: nonNull(list(nonNull("FileUploadInput"))),
     expiresAt: datetimeArg(),
   },
-  validateArgs: validProfileFieldValue("profileTypeFieldId", "content"),
-  resolve: async (_, { profileId, profileTypeFieldId, content, expiresAt }, ctx) => {
-    return (await ctx.profiles.createProfileFieldValue(
+  validateArgs: validateAnd(
+    validFileUploadInput((args) => args.data, { maxSizeBytes: toBytes(100, "MB") }, "data"),
+    notEmptyArray((args) => args.data, "data")
+  ),
+  resolve: async (_, { profileId, profileTypeFieldId, data, expiresAt }, ctx) => {
+    const fileUploads = await ctx.files.createFileUpload(
+      data.map((data) => ({
+        path: random(16),
+        filename: data.filename,
+        size: data.size.toString(),
+        content_type: data.contentType,
+        upload_complete: false,
+      })),
+      `User:${ctx.user!.id}`
+    );
+    const presignedPostDatas = await Promise.all(
+      fileUploads.map((file) =>
+        ctx.storage.fileUploads.getSignedUploadEndpoint(
+          file.path,
+          file.content_type,
+          parseInt(file.size)
+        )
+      )
+    );
+    const files = await ctx.profiles.createProfileFieldFile(
       profileId,
-      [[profileTypeFieldId, content, expiresAt ?? null]],
+      profileTypeFieldId,
+      fileUploads.map((f) => f.id),
+      expiresAt &&
+        zonedTimeToUtc(format(expiresAt, "yyyy-MM-dd"), ctx.organization!.default_timezone),
       ctx.user!.id
-    ))!;
+    );
+    const [field, allFiles] = await Promise.all([
+      ctx.profiles.loadProfileTypeField(profileTypeFieldId),
+      ctx.profiles.loadProfileFieldFilesByProfileTypeFieldId(profileTypeFieldId),
+    ]);
+    return {
+      property: [field!, null, allFiles],
+      uploads: zip(presignedPostDatas, files).map(([presignedPostData, file]) => ({
+        file,
+        presignedPostData,
+      })),
+    };
+  },
+});
+
+export const profileFieldFileUploadComplete = mutationField("profileFieldFileUploadComplete", {
+  type: list("ProfileFieldFile"),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfile("profileId"),
+    profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
+    profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"])
+  ),
+  args: {
+    profileId: nonNull(globalIdArg("Profile")),
+    profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
+    profileFieldFileIds: nonNull(list(nonNull(globalIdArg("ProfileFieldFile")))),
+  },
+  validateArgs: notEmptyArray((args) => args.profileFieldFileIds, "profileFieldFileIds"),
+  resolve: async (_, { profileId, profileTypeFieldId, profileFieldFileIds }, ctx) => {
+    const profileFieldFiles = await ctx.profiles.loadProfileFieldFileById(profileFieldFileIds);
+    if (
+      profileFieldFiles.some(
+        (pff) =>
+          !isDefined(pff) ||
+          pff.profile_id !== profileId ||
+          pff.profile_type_field_id !== profileTypeFieldId
+      )
+    ) {
+      throw new ForbiddenError("Not authorized");
+    }
+    const fileUploads = await ctx.files.loadFileUpload(
+      (profileFieldFiles as ProfileFieldFile[]).map((pff) => pff.file_upload_id)
+    );
+
+    await pMap(fileUploads, async (fu) => {
+      await ctx.storage.fileUploads.getFileMetadata(fu!.path);
+    });
+    await ctx.files.markFileUploadComplete(
+      fileUploads.map((fu) => fu!.id),
+      `User:${ctx.user!.id}`
+    );
+    for (const fu of fileUploads) {
+      ctx.files.loadFileUpload.dataloader.clear(fu!.id);
+    }
+    return profileFieldFiles as ProfileFieldFile[];
   },
 });

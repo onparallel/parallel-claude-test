@@ -1,6 +1,6 @@
 import { gql } from "graphql-request";
 import { Knex } from "knex";
-import { last, times } from "remeda";
+import { isDefined, times } from "remeda";
 import { defaultProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
@@ -29,6 +29,10 @@ describe("GraphQL/Profiles", () => {
     mocks = new Mocks(knex);
 
     ({ organization } = await mocks.createSessionUserAndOrganization("ADMIN"));
+    await knex
+      .from("organization")
+      .update({ default_timezone: "Europe/Madrid" })
+      .where("id", organization.id);
 
     await mocks.createFeatureFlags([{ name: "PROFILES", default_value: true }]);
 
@@ -59,7 +63,7 @@ describe("GraphQL/Profiles", () => {
     profileType0Fields = await mocks.createRandomProfileTypeFields(
       organization.id,
       profileTypes[0].id,
-      5,
+      6,
       (i) =>
         [
           {
@@ -86,6 +90,12 @@ describe("GraphQL/Profiles", () => {
             name: json({ en: "Email", es: "Correo electrónico" }),
             type: "SHORT_TEXT" as const,
             alias: "EMAIL",
+          },
+          {
+            name: json({ en: "Passport", es: "Pasaporte" }),
+            type: "SHORT_TEXT" as const,
+            alias: "PASSPORT",
+            is_expirable: true,
           },
         ][i]
     );
@@ -257,12 +267,7 @@ describe("GraphQL/Profiles", () => {
       expect(data?.createProfileType).toEqual({
         id: expect.any(String),
         name: { en: "Individual" },
-        fields: [
-          {
-            id: expect.any(String),
-            name: { en: "Name", es: "Nombre" },
-          },
-        ],
+        fields: [{ id: expect.any(String), name: { en: "Name", es: "Nombre" } }],
       });
     });
 
@@ -279,9 +284,7 @@ describe("GraphQL/Profiles", () => {
             }
           }
         `,
-        {
-          name: { en: "Individual" },
-        }
+        { name: { en: "Individual" } }
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -347,29 +350,28 @@ describe("GraphQL/Profiles", () => {
             profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           }
         );
-        for (const [profileTypeFieldId, value] of [
-          [profileType0Fields[0].id, firstName],
-          [profileType0Fields[1].id, lastName],
-        ]) {
-          await testClient.execute(
-            gql`
-              mutation ($profileId: GID!, $profileTypeFieldId: GID!, $content: JSONObject!) {
-                createProfileFieldValue(
-                  profileId: $profileId
-                  profileTypeFieldId: $profileTypeFieldId
-                  content: $content
-                ) {
-                  id
-                }
+        await testClient.execute(
+          gql`
+            mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+              updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+                id
               }
-            `,
-            {
-              profileId: data.createProfile.id,
-              profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFieldId),
-              content: { value },
             }
-          );
-        }
+          `,
+          {
+            profileId: data.createProfile.id,
+            fields: [
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+                content: { value: firstName },
+              },
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+                content: { value: lastName },
+              },
+            ],
+          }
+        );
       }
       await createIndividualProfile("Mickey", "Mouse");
       await createIndividualProfile("Donald", "Duck");
@@ -1020,22 +1022,31 @@ describe("GraphQL/Profiles", () => {
     });
   });
 
-  describe("createProfileFieldValue", () => {
-    it("creates field values and updates the name", async () => {
-      const profileFragment = gql`
-        fragment ProfileFragment on Profile {
-          id
-          name
-          properties {
-            field {
-              id
-            }
-            value {
-              content
-            }
+  describe("updateProfileFieldValue", () => {
+    const profileFragment = gql`
+      fragment ProfileFragment on Profile {
+        id
+        name
+        properties {
+          field {
+            id
+            isExpirable
+          }
+          value {
+            content
+            expiresAt
           }
         }
-      `;
+      }
+    `;
+
+    type UpdateProfileFieldValueInput = {
+      profileTypeFieldId: string;
+      content?: Record<string, any> | null;
+      expiresAt?: string | null;
+    };
+
+    async function createProfile(profileTypeId: string, fields?: UpdateProfileFieldValueInput[]) {
       const { data } = await testClient.execute(
         gql`
           mutation ($profileTypeId: GID!) {
@@ -1045,80 +1056,166 @@ describe("GraphQL/Profiles", () => {
           }
           ${profileFragment}
         `,
-        {
-          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-        }
+        { profileTypeId }
       );
-      expect(data.createProfile).toEqual({
+      if (isDefined(fields) && fields.length > 0) {
+        return await updateProfileValue(data.createProfile.id, fields);
+      } else {
+        return data.createProfile;
+      }
+    }
+
+    async function updateProfileValue(profileId: number, fields: UpdateProfileFieldValueInput[]) {
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              ...ProfileFragment
+            }
+          }
+          ${profileFragment}
+        `,
+        { profileId, fields }
+      );
+      if (isDefined(errors)) {
+        throw errors;
+      }
+      return data.updateProfileFieldValue;
+    }
+
+    it("updates field values and updates the name", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      expect(profile).toEqual({
         id: expect.any(String),
         name: "",
         properties: profileType0Fields.map((f) => ({
-          field: { id: toGlobalId("ProfileTypeField", f.id) },
+          field: { id: toGlobalId("ProfileTypeField", f.id), isExpirable: f.is_expirable },
           value: null,
         })),
       });
-      const { data: data2 } = await testClient.execute(
-        gql`
-          mutation ($profileId: GID!, $profileTypeFieldId: GID!, $content: JSONObject!) {
-            createProfileFieldValue(
-              profileId: $profileId
-              profileTypeFieldId: $profileTypeFieldId
-              content: $content
-            ) {
-              ...ProfileFragment
-            }
-          }
-          ${profileFragment}
-        `,
+
+      const profile2 = await updateProfileValue(profile.id, [
         {
-          profileId: data.createProfile.id,
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
           content: { value: "John" },
-        }
-      );
+        },
+      ]);
 
-      expect(data2?.createProfileFieldValue).toEqual({
+      expect(profile2).toEqual({
         id: expect.any(String),
         name: "John",
         properties: profileType0Fields.map((f) => ({
-          field: { id: toGlobalId("ProfileTypeField", f.id) },
-          value: f.id === profileType0Fields[0].id ? { content: { value: "John" } } : null,
-        })),
-      });
-
-      const { data: data3 } = await testClient.execute(
-        gql`
-          mutation ($profileId: GID!, $profileTypeFieldId: GID!, $content: JSONObject!) {
-            createProfileFieldValue(
-              profileId: $profileId
-              profileTypeFieldId: $profileTypeFieldId
-              content: $content
-            ) {
-              ...ProfileFragment
-            }
-          }
-          ${profileFragment}
-        `,
-        {
-          profileId: data.createProfile.id,
-          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
-          content: { value: "Wick" },
-        }
-      );
-
-      expect(data3?.createProfileFieldValue).toEqual({
-        id: expect.any(String),
-        name: "John Wick",
-        properties: profileType0Fields.map((f) => ({
-          field: { id: toGlobalId("ProfileTypeField", f.id) },
+          field: { id: toGlobalId("ProfileTypeField", f.id), isExpirable: f.is_expirable },
           value:
             f.id === profileType0Fields[0].id
-              ? { content: { value: "John" } }
-              : f.id === profileType0Fields[1].id
-              ? { content: { value: "Wick" } }
+              ? { content: { value: "John" }, expiresAt: null }
               : null,
         })),
       });
+
+      const profile3 = await updateProfileValue(profile.id, [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+          content: { value: "Wick" },
+        },
+      ]);
+
+      expect(profile3).toEqual({
+        id: expect.any(String),
+        name: "John Wick",
+        properties: profileType0Fields.map((f) => ({
+          field: { id: toGlobalId("ProfileTypeField", f.id), isExpirable: f.is_expirable },
+          value:
+            f.id === profileType0Fields[0].id
+              ? { content: { value: "John" }, expiresAt: null }
+              : f.id === profileType0Fields[1].id
+              ? { content: { value: "Wick" }, expiresAt: null }
+              : null,
+        })),
+      });
+    });
+
+    it("updates the expiry date on fields that expire", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          content: { value: "Harry" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+          content: { value: "Potter" },
+        },
+      ]);
+
+      const profile2 = await updateProfileValue(profile.id, [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[5].id),
+          content: { value: "123456" },
+          expiresAt: "2030-01-01",
+        },
+      ]);
+
+      expect(profile2).toEqual({
+        id: expect.any(String),
+        name: "Harry Potter",
+        properties: profileType0Fields.map((f) => ({
+          field: { id: toGlobalId("ProfileTypeField", f.id), isExpirable: f.is_expirable },
+          value:
+            f.id === profileType0Fields[0].id
+              ? { content: { value: "Harry" }, expiresAt: null }
+              : f.id === profileType0Fields[1].id
+              ? { content: { value: "Potter" }, expiresAt: null }
+              : f.id === profileType0Fields[5].id
+              ? { content: { value: "123456" }, expiresAt: new Date("2029-12-31T23:00:00.000Z") }
+              : null,
+        })),
+      });
+    });
+
+    it("fails if trying to set expiry in a non expirable field", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          content: { value: "Harry" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+          content: { value: "Potter" },
+        },
+      ]);
+
+      await expect(
+        updateProfileValue(profile.id, [
+          {
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+            content: { value: "1988-12-15" },
+            expiresAt: "2030-01-01",
+          },
+        ])
+      ).rejects.toContainGraphQLError("INVALID_EXPIRY");
+    });
+
+    it("fails if trying to set expiry in when removing field", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          content: { value: "Harry" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+          content: { value: "Potter" },
+        },
+      ]);
+
+      await expect(
+        updateProfileValue(profile.id, [
+          {
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+            content: null,
+            expiresAt: "2030-01-01",
+          },
+        ])
+      ).rejects.toContainGraphQLError("INVALID_EXPIRY");
     });
   });
 });

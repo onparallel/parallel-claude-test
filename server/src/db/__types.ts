@@ -317,12 +317,16 @@ export const PetitionUserNotificationTypeValues = [
 export type ProfileEventType =
   | "PROFILE_CREATED"
   | "PROFILE_FIELD_VALUE_UPDATED"
-  | "PROFILE_FIELD_VALUE_DELETED";
+  | "PROFILE_FIELD_FILE_ADDED"
+  | "PROFILE_FIELD_FILE_REMOVED"
+  | "PROFILE_FIELD_EXPIRY_UPDATED";
 
 export const ProfileEventTypeValues = [
   "PROFILE_CREATED",
   "PROFILE_FIELD_VALUE_UPDATED",
-  "PROFILE_FIELD_VALUE_DELETED",
+  "PROFILE_FIELD_FILE_ADDED",
+  "PROFILE_FIELD_FILE_REMOVED",
+  "PROFILE_FIELD_EXPIRY_UPDATED",
 ] as ProfileEventType[];
 
 export type ProfileTypeFieldPermission = "HIDDEN" | "READ" | "WRITE";
@@ -780,6 +784,7 @@ export interface Organization {
   icon_public_file_id: Maybe<number>; // int4
   appsumo_license: Maybe<any>; // jsonb
   anonymize_petitions_after_months: Maybe<number>; // int4
+  default_timezone: string; // varchar
 }
 
 export type CreateOrganization = PartialProps<
@@ -797,6 +802,7 @@ export type CreateOrganization = PartialProps<
   | "icon_public_file_id"
   | "appsumo_license"
   | "anonymize_petitions_after_months"
+  | "default_timezone"
 >;
 
 export interface OrganizationTheme {
