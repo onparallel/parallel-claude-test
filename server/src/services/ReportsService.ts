@@ -5,7 +5,7 @@ import {
   ReplyCreatedEvent,
   ReplyDeletedEvent,
   ReplyUpdatedEvent,
-} from "../db/events";
+} from "../db/events/PetitionEvent";
 import { readOnly } from "../db/knex";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { PetitionTimeStatistics, TaskOutput } from "../db/repositories/TaskRepository";

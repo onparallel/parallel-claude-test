@@ -45,7 +45,7 @@ import {
   ReplyDeletedEvent,
   ReplyStatusChangedEvent,
   ReplyUpdatedEvent,
-} from "../events";
+} from "../events/PetitionEvent";
 import { BaseRepository, PageOpts, TableCreateTypes, TableTypes } from "../helpers/BaseRepository";
 import { defaultFieldOptions, validateFieldOptions } from "../helpers/fieldOptions";
 import { escapeLike, isValueCompatible, SortBy } from "../helpers/utils";

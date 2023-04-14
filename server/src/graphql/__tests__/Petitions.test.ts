@@ -2,7 +2,7 @@ import gql from "graphql-tag";
 import { faker } from "@faker-js/faker";
 import { Knex } from "knex";
 import { range, sortBy } from "remeda";
-import { PetitionEvent } from "../../db/events";
+import { PetitionEvent } from "../../db/events/PetitionEvent";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {

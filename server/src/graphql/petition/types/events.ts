@@ -107,7 +107,7 @@ export const PetitionEvent = interfaceType({
         return "ReplyStatusChangedEvent";
     }
   },
-  sourceType: "events.PetitionEvent",
+  sourceType: "petitionEvents.PetitionEvent",
 });
 
 function createPetitionEvent<TypeName extends string>(
@@ -120,7 +120,7 @@ function createPetitionEvent<TypeName extends string>(
       t.implements("PetitionEvent");
       definition(t);
     },
-    sourceType: `events.${name}`,
+    sourceType: `petitionEvents.${name}`,
   });
 }
 

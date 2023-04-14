@@ -9,7 +9,8 @@ import { unMaybeArray } from "../../util/arrays";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
 import { KeysOfType, MaybeArray, Replace } from "../../util/types";
-import { CreatePetitionEvent, CreateSystemEvent, PetitionEvent, SystemEvent } from "../events";
+import { CreatePetitionEvent, PetitionEvent } from "../events/PetitionEvent";
+import { CreateSystemEvent, SystemEvent } from "../events/SystemEvent";
 import { CreatePetitionUserNotification, PetitionUserNotification } from "../notifications";
 import { OrganizationUsageDetails } from "../repositories/OrganizationRepository";
 import {

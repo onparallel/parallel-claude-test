@@ -3,7 +3,7 @@ import { Knex } from "knex";
 import { QUEUES_SERVICE, IQueuesService } from "../../services/QueuesService";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
-import { CreateSystemEvent } from "../events";
+import { CreateSystemEvent } from "../events/SystemEvent";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 

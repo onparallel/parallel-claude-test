@@ -11,7 +11,7 @@ import {
   SignatureCancelledEvent,
   SignatureCompletedEvent,
   UserPermissionAddedEvent,
-} from "../../db/events";
+} from "../../db/events/PetitionEvent";
 import { getMentions } from "../../util/slate";
 import { EventListener } from "../event-processor";
 

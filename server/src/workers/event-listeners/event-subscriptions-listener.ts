@@ -1,6 +1,6 @@
 import { sign } from "crypto";
 import pMap from "p-map";
-import { PetitionEvent } from "../../db/events";
+import { PetitionEvent } from "../../db/events/PetitionEvent";
 import { mapEvent } from "../../util/eventMapper";
 import { EventListener } from "../event-processor";
 

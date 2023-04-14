@@ -1,7 +1,7 @@
 import { json, RequestHandler, Router } from "express";
 import { isDefined, maxBy } from "remeda";
 import { ApiContext } from "../../context";
-import { SignatureStartedEvent } from "../../db/events";
+import { SignatureStartedEvent } from "../../db/events/PetitionEvent";
 import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
 import { fullName } from "../../util/fullName";
 import { fromGlobalId } from "../../util/globalId";

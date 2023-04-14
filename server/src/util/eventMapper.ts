@@ -1,5 +1,5 @@
 import { isDefined } from "remeda";
-import { PetitionEvent } from "../db/events";
+import { PetitionEvent } from "../db/events/PetitionEvent";
 import { toGlobalId } from "./globalId";
 
 export function mapEventPayload(event: PetitionEvent) {

@@ -2,8 +2,8 @@ import type { FileUpload } from "graphql-upload/Upload.js";
 import type { Duration } from "date-fns";
 import type { LocalizableUserText } from "./helpers/scalars/LocalizableUserText";
 import type * as db from "./../db/__types";
-import type * as events from "./../db/events";
 import type * as notifications from "./../db/notifications";
+import type * as petitionEvents from "./../db/events/PetitionEvent";
 import type { ApiContext } from "./../context";
 import type {
   GlobalIdOutputFieldConfigSpread,
@@ -457,12 +457,12 @@ export interface NexusGenObjects {
     fields: NexusGenScalars["JSONObject"]; // JSONObject!
     url: string; // String!
   };
-  AccessActivatedEvent: events.AccessActivatedEvent;
-  AccessActivatedFromPublicPetitionLinkEvent: events.AccessActivatedFromPublicPetitionLinkEvent;
+  AccessActivatedEvent: petitionEvents.AccessActivatedEvent;
+  AccessActivatedFromPublicPetitionLinkEvent: petitionEvents.AccessActivatedFromPublicPetitionLinkEvent;
   AccessActivatedFromPublicPetitionLinkUserNotification: notifications.AccessActivatedFromPublicPetitionLinkUserNotification;
-  AccessDeactivatedEvent: events.AccessDeactivatedEvent;
-  AccessDelegatedEvent: events.AccessDelegatedEvent;
-  AccessOpenedEvent: events.AccessOpenedEvent;
+  AccessDeactivatedEvent: petitionEvents.AccessDeactivatedEvent;
+  AccessDelegatedEvent: petitionEvents.AccessDelegatedEvent;
+  AccessOpenedEvent: petitionEvents.AccessOpenedEvent;
   AsyncFieldCompletionResponse: {
     // root type
     type: string; // String!
@@ -474,8 +474,8 @@ export interface NexusGenObjects {
     errors?: NexusGenScalars["JSON"][] | null; // [JSON!]
   };
   CommentCreatedUserNotification: notifications.CommentCreatedUserNotification;
-  CommentDeletedEvent: events.CommentDeletedEvent;
-  CommentPublishedEvent: events.CommentPublishedEvent;
+  CommentDeletedEvent: petitionEvents.CommentDeletedEvent;
+  CommentPublishedEvent: petitionEvents.CommentPublishedEvent;
   ConnectionMetadata: {
     // root type
     browserName?: string | null; // String
@@ -600,9 +600,9 @@ export interface NexusGenObjects {
     apiKey: string; // String!
     userAuthToken: NexusGenRootTypes["UserAuthenticationToken"]; // UserAuthenticationToken!
   };
-  GroupPermissionAddedEvent: events.GroupPermissionAddedEvent;
-  GroupPermissionEditedEvent: events.GroupPermissionEditedEvent;
-  GroupPermissionRemovedEvent: events.GroupPermissionRemovedEvent;
+  GroupPermissionAddedEvent: petitionEvents.GroupPermissionAddedEvent;
+  GroupPermissionEditedEvent: petitionEvents.GroupPermissionEditedEvent;
+  GroupPermissionRemovedEvent: petitionEvents.GroupPermissionRemovedEvent;
   IOrgIntegrationPagination: {
     // root type
     items: NexusGenRootTypes["IOrgIntegration"][]; // [IOrgIntegration!]!
@@ -616,10 +616,10 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["LandingTemplate"][]; // [LandingTemplate!]!
     totalCount: number; // Int!
   };
-  MessageCancelledEvent: events.MessageCancelledEvent;
+  MessageCancelledEvent: petitionEvents.MessageCancelledEvent;
   MessageEmailBouncedUserNotification: notifications.MessageEmailBouncedUserNotification;
-  MessageScheduledEvent: events.MessageScheduledEvent;
-  MessageSentEvent: events.MessageSentEvent;
+  MessageScheduledEvent: petitionEvents.MessageScheduledEvent;
+  MessageSentEvent: petitionEvents.MessageSentEvent;
   Mutation: {};
   OrgIntegration: db.OrgIntegration;
   OrgLicense: {
@@ -647,7 +647,7 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["OrganizationUsageLimit"][]; // [OrganizationUsageLimit!]!
     totalCount: number; // Int!
   };
-  OwnershipTransferredEvent: events.OwnershipTransferredEvent;
+  OwnershipTransferredEvent: petitionEvents.OwnershipTransferredEvent;
   Petition: db.Petition;
   PetitionAccess: db.PetitionAccess;
   PetitionAccessPagination: {
@@ -655,7 +655,7 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     totalCount: number; // Int!
   };
-  PetitionAnonymizedEvent: events.PetitionAnonymizedEvent;
+  PetitionAnonymizedEvent: petitionEvents.PetitionAnonymizedEvent;
   PetitionAttachment: db.PetitionAttachment;
   PetitionAttachmentUploadData: {
     // root type
@@ -674,13 +674,13 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["PetitionBaseOrFolder"][]; // [PetitionBaseOrFolder!]!
     totalCount: number; // Int!
   };
-  PetitionClonedEvent: events.PetitionClonedEvent;
-  PetitionClosedEvent: events.PetitionClosedEvent;
-  PetitionClosedNotifiedEvent: events.PetitionClosedNotifiedEvent;
-  PetitionCompletedEvent: events.PetitionCompletedEvent;
+  PetitionClonedEvent: petitionEvents.PetitionClonedEvent;
+  PetitionClosedEvent: petitionEvents.PetitionClosedEvent;
+  PetitionClosedNotifiedEvent: petitionEvents.PetitionClosedNotifiedEvent;
+  PetitionCompletedEvent: petitionEvents.PetitionCompletedEvent;
   PetitionCompletedUserNotification: notifications.PetitionCompletedUserNotification;
-  PetitionCreatedEvent: events.PetitionCreatedEvent;
-  PetitionDeletedEvent: events.PetitionDeletedEvent;
+  PetitionCreatedEvent: petitionEvents.PetitionCreatedEvent;
+  PetitionDeletedEvent: petitionEvents.PetitionDeletedEvent;
   PetitionEventPagination: {
     // root type
     items: NexusGenRootTypes["PetitionEvent"][]; // [PetitionEvent!]!
@@ -752,15 +752,15 @@ export interface NexusGenObjects {
     field: NexusGenEnums["PetitionListViewSortField"]; // PetitionListViewSortField!
   };
   PetitionMessage: db.PetitionMessage;
-  PetitionMessageBouncedEvent: events.PetitionMessageBouncedEvent;
+  PetitionMessageBouncedEvent: petitionEvents.PetitionMessageBouncedEvent;
   PetitionProgress: {
     // root type
     external: NexusGenRootTypes["PetitionFieldProgress"]; // PetitionFieldProgress!
     internal: NexusGenRootTypes["PetitionFieldProgress"]; // PetitionFieldProgress!
   };
   PetitionReminder: db.PetitionReminder;
-  PetitionReminderBouncedEvent: events.PetitionReminderBouncedEvent;
-  PetitionReopenedEvent: events.PetitionReopenedEvent;
+  PetitionReminderBouncedEvent: petitionEvents.PetitionReminderBouncedEvent;
+  PetitionReopenedEvent: petitionEvents.PetitionReopenedEvent;
   PetitionSharedUserNotification: notifications.PetitionSharedUserNotification;
   PetitionSignatureRequest: db.PetitionSignatureRequest;
   PetitionSignatureRequestSignerStatus: {
@@ -866,9 +866,9 @@ export interface NexusGenObjects {
   };
   PublicUser: db.User;
   Query: {};
-  RecipientSignedEvent: events.RecipientSignedEvent;
+  RecipientSignedEvent: petitionEvents.RecipientSignedEvent;
   ReminderEmailBouncedUserNotification: notifications.ReminderEmailBouncedUserNotification;
-  ReminderSentEvent: events.ReminderSentEvent;
+  ReminderSentEvent: petitionEvents.ReminderSentEvent;
   RemindersConfig: {
     offset: number;
     limit: number;
@@ -876,21 +876,21 @@ export interface NexusGenObjects {
     timezone: string;
     weekdaysOnly: boolean;
   };
-  RemindersOptOutEvent: events.RemindersOptOutEvent;
+  RemindersOptOutEvent: petitionEvents.RemindersOptOutEvent;
   RemindersOptOutNotification: notifications.RemindersOptOutNotification;
-  ReplyCreatedEvent: events.ReplyCreatedEvent;
-  ReplyDeletedEvent: events.ReplyDeletedEvent;
-  ReplyStatusChangedEvent: events.ReplyStatusChangedEvent;
-  ReplyUpdatedEvent: events.ReplyUpdatedEvent;
+  ReplyCreatedEvent: petitionEvents.ReplyCreatedEvent;
+  ReplyDeletedEvent: petitionEvents.ReplyDeletedEvent;
+  ReplyStatusChangedEvent: petitionEvents.ReplyStatusChangedEvent;
+  ReplyUpdatedEvent: petitionEvents.ReplyUpdatedEvent;
   SendPetitionResult: {
     // root type
     accesses?: NexusGenRootTypes["PetitionAccess"][] | null; // [PetitionAccess!]
     petition?: NexusGenRootTypes["Petition"] | null; // Petition
     result: NexusGenEnums["Result"]; // Result!
   };
-  SignatureCancelledEvent: events.SignatureCancelledEvent;
+  SignatureCancelledEvent: petitionEvents.SignatureCancelledEvent;
   SignatureCancelledUserNotification: notifications.SignatureCancelledUserNotification;
-  SignatureCompletedEvent: events.SignatureCompletedEvent;
+  SignatureCompletedEvent: petitionEvents.SignatureCompletedEvent;
   SignatureCompletedUserNotification: notifications.SignatureCompletedUserNotification;
   SignatureConfig: {
     orgIntegrationId: number;
@@ -904,10 +904,10 @@ export interface NexusGenObjects {
     review?: boolean;
     allowAdditionalSigners?: boolean;
   };
-  SignatureOpenedEvent: events.SignatureOpenedEvent;
+  SignatureOpenedEvent: petitionEvents.SignatureOpenedEvent;
   SignatureOrgIntegration: db.OrgIntegration;
-  SignatureReminderEvent: events.SignatureReminderEvent;
-  SignatureStartedEvent: events.SignatureStartedEvent;
+  SignatureReminderEvent: petitionEvents.SignatureReminderEvent;
+  SignatureStartedEvent: petitionEvents.SignatureStartedEvent;
   SupportMethodResponse: {
     // root type
     message?: string | null; // String
@@ -928,7 +928,7 @@ export interface NexusGenObjects {
   };
   TemplateDefaultUserGroupPermission: db.TemplateDefaultPermission;
   TemplateDefaultUserPermission: db.TemplateDefaultPermission;
-  TemplateUsedEvent: events.TemplateUsedEvent;
+  TemplateUsedEvent: petitionEvents.TemplateUsedEvent;
   User: db.User;
   UserAuthenticationToken: db.UserAuthenticationToken;
   UserGroup: db.UserGroup;
@@ -948,9 +948,9 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["User"][]; // [User!]!
     totalCount: number; // Int!
   };
-  UserPermissionAddedEvent: events.UserPermissionAddedEvent;
-  UserPermissionEditedEvent: events.UserPermissionEditedEvent;
-  UserPermissionRemovedEvent: events.UserPermissionRemovedEvent;
+  UserPermissionAddedEvent: petitionEvents.UserPermissionAddedEvent;
+  UserPermissionEditedEvent: petitionEvents.UserPermissionEditedEvent;
+  UserPermissionRemovedEvent: petitionEvents.UserPermissionRemovedEvent;
   VerificationCodeCheck: {
     // root type
     remainingAttempts?: number | null; // Int
@@ -978,7 +978,7 @@ export interface NexusGenInterfaces {
     | NexusGenRootTypes["OrgIntegration"]
     | NexusGenRootTypes["SignatureOrgIntegration"];
   PetitionBase: db.Petition;
-  PetitionEvent: events.PetitionEvent;
+  PetitionEvent: petitionEvents.PetitionEvent;
   PetitionPermission: db.PetitionPermission;
   PetitionUserNotification: db.PetitionUserNotification;
   ProfileFieldResponse: db.ProfileFieldValue | db.ProfileFieldFile;

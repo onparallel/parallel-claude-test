@@ -5,10 +5,6 @@ import {
   AccessActivatedFromPublicPetitionLinkEvent,
   AccessOpenedEvent,
   CommentPublishedEvent,
-  EmailOpenedSystemEvent,
-  EmailVerifiedSystemEvent,
-  InviteSentSystemEvent,
-  OrganizationLimitReachedSystemEvent,
   PetitionClonedEvent,
   PetitionClosedEvent,
   PetitionCompletedEvent,
@@ -22,9 +18,15 @@ import {
   SignatureReminderEvent,
   SignatureStartedEvent,
   TemplateUsedEvent,
+} from "../../db/events/PetitionEvent";
+import {
+  EmailOpenedSystemEvent,
+  EmailVerifiedSystemEvent,
+  InviteSentSystemEvent,
+  OrganizationLimitReachedSystemEvent,
   UserCreatedEvent,
   UserLoggedInEvent,
-} from "../../db/events";
+} from "../../db/events/SystemEvent";
 import { EventListener } from "../event-processor";
 
 async function loadPetitionOwner(petitionId: number, ctx: WorkerContext) {

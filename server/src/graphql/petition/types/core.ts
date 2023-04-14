@@ -1,7 +1,7 @@
 import { extension } from "mime-types";
 import { arg, enumType, inputObjectType, interfaceType, objectType, unionType } from "nexus";
 import { findLast, isDefined, minBy } from "remeda";
-import { ReplyStatusChangedEvent } from "../../../db/events";
+import { ReplyStatusChangedEvent } from "../../../db/events/PetitionEvent";
 import {
   ContactLocaleValues,
   PetitionAttachment,

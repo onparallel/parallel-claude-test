@@ -1,7 +1,7 @@
 import { RequestHandler, Router, urlencoded } from "express";
 import { isDefined, pick } from "remeda";
 import { ApiContext } from "../../context";
-import { SignatureStartedEvent } from "../../db/events";
+import { SignatureStartedEvent } from "../../db/events/PetitionEvent";
 import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
 import { SignaturitEvents } from "../../services/signature-clients/SignaturitClient";
 import { fromGlobalId } from "../../util/globalId";
