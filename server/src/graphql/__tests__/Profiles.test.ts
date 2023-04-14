@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { isDefined, times } from "remeda";
@@ -186,9 +187,9 @@ describe("GraphQL/Profiles", () => {
           {
             id: toGlobalId("ProfileType", profileTypes[0].id),
             name: { en: "Individual", es: "Persona física" },
-            fields: times(5, (i) => ({
+            fields: profileType0Fields.map((f, i) => ({
               position: i,
-              name: { es: expect.any(String), en: expect.any(String) },
+              name: f.name,
             })),
           },
           {
@@ -236,7 +237,7 @@ describe("GraphQL/Profiles", () => {
           {
             id: toGlobalId("ProfileType", profileTypes[0].id),
             name: { en: "Individual", es: "Persona física" },
-            fields: times(5, (i) => ({ position: i })),
+            fields: profileType0Fields.map((f, i) => ({ position: i })),
           },
         ],
       });
@@ -580,7 +581,7 @@ describe("GraphQL/Profiles", () => {
           {
             id: toGlobalId("ProfileType", profileTypes[0].id),
             name: { en: "Individual", es: "Persona física" },
-            fields: times(5, (i) => ({ position: i })),
+            fields: profileType0Fields.map((f, i) => ({ position: i })),
           },
         ],
       });
@@ -812,6 +813,7 @@ describe("GraphQL/Profiles", () => {
 
   describe("updateProfileTypeFieldPositions", () => {
     it("reorders positions of profile type fields", async () => {
+      const newOrder = faker.helpers.shuffle(profileType0Fields.map((f) => f.id));
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($profileTypeId: GID!, $profileTypeFieldIds: [GID!]!) {
@@ -829,26 +831,17 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-          profileTypeFieldIds: [
-            toGlobalId("ProfileTypeField", profileType0Fields[3].id),
-            toGlobalId("ProfileTypeField", profileType0Fields[4].id),
-            toGlobalId("ProfileTypeField", profileType0Fields[0].id),
-            toGlobalId("ProfileTypeField", profileType0Fields[2].id),
-            toGlobalId("ProfileTypeField", profileType0Fields[1].id),
-          ],
+          profileTypeFieldIds: newOrder.map((id) => toGlobalId("ProfileTypeField", id)),
         }
       );
 
       expect(errors).toBeUndefined();
       expect(data?.updateProfileTypeFieldPositions).toEqual({
         id: toGlobalId("ProfileType", profileTypes[0].id),
-        fields: [
-          { id: toGlobalId("ProfileTypeField", profileType0Fields[3].id), position: 0 },
-          { id: toGlobalId("ProfileTypeField", profileType0Fields[4].id), position: 1 },
-          { id: toGlobalId("ProfileTypeField", profileType0Fields[0].id), position: 2 },
-          { id: toGlobalId("ProfileTypeField", profileType0Fields[2].id), position: 3 },
-          { id: toGlobalId("ProfileTypeField", profileType0Fields[1].id), position: 4 },
-        ],
+        fields: newOrder.map((id, i) => ({
+          id: toGlobalId("ProfileTypeField", id),
+          position: i,
+        })),
       });
     });
 
@@ -916,6 +909,7 @@ describe("GraphQL/Profiles", () => {
 
   describe("deleteProfileTypeField", () => {
     it("deletes a profile type field and reorders the positions", async () => {
+      const removedPtfId = profileType0Fields[2].id;
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($profileTypeId: GID!, $profileTypeFieldIds: [GID!]!) {
@@ -929,7 +923,7 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-          profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[2].id)],
+          profileTypeFieldIds: [toGlobalId("ProfileTypeField", removedPtfId)],
         }
       );
 
@@ -940,40 +934,25 @@ describe("GraphQL/Profiles", () => {
 
       const { errors: queryErrors, data: queryData } = await testClient.execute(
         gql`
-          query ($limit: Int, $offset: Int, $sortBy: [QueryProfileTypes_OrderBy!]) {
-            profileTypes(limit: $limit, offset: $offset, sortBy: $sortBy) {
-              totalCount
-              items {
+          query ($profileTypeId: GID!) {
+            profileType(profileTypeId: $profileTypeId) {
+              id
+              fields {
                 id
-                fields {
-                  id
-                  position
-                }
+                position
               }
             }
           }
         `,
-        {
-          limit: 1,
-          offset: 0,
-          sortBy: ["createdAt_ASC"],
-        }
+        { profileTypeId: toGlobalId("ProfileType", profileTypes[0].id) }
       );
 
       expect(queryErrors).toBeUndefined();
-      expect(queryData?.profileTypes).toEqual({
-        totalCount: 3,
-        items: [
-          {
-            id: toGlobalId("ProfileType", profileTypes[0].id),
-            fields: [
-              { id: toGlobalId("ProfileTypeField", profileType0Fields[0].id), position: 0 },
-              { id: toGlobalId("ProfileTypeField", profileType0Fields[1].id), position: 1 },
-              { id: toGlobalId("ProfileTypeField", profileType0Fields[3].id), position: 2 },
-              { id: toGlobalId("ProfileTypeField", profileType0Fields[4].id), position: 3 },
-            ],
-          },
-        ],
+      expect(queryData?.profileType).toEqual({
+        id: toGlobalId("ProfileType", profileTypes[0].id),
+        fields: profileType0Fields
+          .filter((f) => f.id !== removedPtfId)
+          .map((f, i) => ({ id: toGlobalId("ProfileTypeField", f.id), position: i })),
       });
     });
 
@@ -1016,7 +995,6 @@ describe("GraphQL/Profiles", () => {
           profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType0Fields[0].id)],
         }
       );
-
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
@@ -1192,7 +1170,7 @@ describe("GraphQL/Profiles", () => {
             expiresAt: "2030-01-01",
           },
         ])
-      ).rejects.toContainGraphQLError("INVALID_EXPIRY");
+      ).rejects.toContainGraphQLError("EXPIRY_ON_NON_EXPIRABLE_FIELD");
     });
 
     it("fails if trying to set expiry in when removing field", async () => {
@@ -1215,7 +1193,7 @@ describe("GraphQL/Profiles", () => {
             expiresAt: "2030-01-01",
           },
         ])
-      ).rejects.toContainGraphQLError("INVALID_EXPIRY");
+      ).rejects.toContainGraphQLError("EXPIRY_ON_NON_EXPIRABLE_FIELD");
     });
   });
 });

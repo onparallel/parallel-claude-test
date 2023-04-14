@@ -474,7 +474,7 @@ export class ProfileRepository extends BaseRepository {
     });
   }
 
-  async createProfileFieldValue(
+  async updateProfileFieldValue(
     profileId: number,
     fields: {
       profileTypeFieldId: number;
@@ -511,6 +511,7 @@ export class ProfileRepository extends BaseRepository {
           })),
         t
       );
+      this.loadProfileFieldValuesByProfileId.dataloader.clear(profileId);
       const currentByPtfId = indexBy(currentValues, (v) => v.profile_type_field_id);
       await this.createEvent(
         fields.flatMap((f) => {
@@ -540,10 +541,8 @@ export class ProfileRepository extends BaseRepository {
                     profile_id: profileId,
                     type: "PROFILE_FIELD_EXPIRY_UPDATED",
                     data: {
-                      current_profile_field_value_id: current?.id,
-                      previous_profile_field_value_id: previous?.id,
-                      previous_expires_at: previous?.expires_at?.toISOString() ?? null,
-                      current_expires_at: current?.expires_at?.toISOString() ?? null,
+                      profile_type_field_id: current?.profile_type_field_id,
+                      expires_at: current?.expires_at?.toISOString() ?? null,
                     },
                   } as CreateProfileEvent,
                 ]
@@ -588,7 +587,7 @@ export class ProfileRepository extends BaseRepository {
     });
   }
 
-  async createProfileFieldFile(
+  async createProfileFieldFiles(
     profileId: number,
     profileTypeFieldId: number,
     fileUploadIds: number[],
@@ -597,36 +596,59 @@ export class ProfileRepository extends BaseRepository {
   ) {
     return await this.withTransaction(async (t) => {
       const profileType = (await this.loadProfileTypeForProfileId.raw(profileId, t))!;
-      // TODO
-      // let _expiresAt = expiresAt
-      // if (expiresAt !== )
-      await this.from("profile_field_file", t)
-        .whereNull("deleted_at")
-        .whereNull("removed_at")
-        .where("profile_id", profileId)
-        .where("profile_type_field_id", profileTypeFieldId)
-        .update({ expires_at: expiresAt })
-        .returning("*");
+      const previousFiles =
+        expiresAt === undefined
+          ? await this.from("profile_field_file", t)
+              .whereNull("deleted_at")
+              .whereNull("removed_at")
+              .where("profile_id", profileId)
+              .where("profile_type_field_id", profileTypeFieldId)
+              .select("*")
+          : await this.from("profile_field_file", t)
+              .whereNull("deleted_at")
+              .whereNull("removed_at")
+              .where("profile_id", profileId)
+              .where("profile_type_field_id", profileTypeFieldId)
+              .update({ expires_at: expiresAt })
+              .returning("*");
       const profileFieldFiles = await this.insert(
         "profile_field_file",
         fileUploadIds.map((fileUploadId) => ({
           profile_id: profileId,
           profile_type_field_id: profileTypeFieldId,
           file_upload_id: fileUploadId,
-          expires_at: expiresAt,
+          expires_at: previousFiles[0]?.expires_at ?? null,
           created_by_user_id: userId,
         })),
         t
       );
       await this.createEvent(
-        profileFieldFiles.map((pff) => ({
-          org_id: profileType.org_id,
-          profile_id: pff.profile_id,
-          type: "PROFILE_FIELD_FILE_ADDED",
-          data: {
-            profile_field_file: pff.id,
-          },
-        })),
+        [
+          ...profileFieldFiles.map(
+            (pff) =>
+              ({
+                org_id: profileType.org_id,
+                profile_id: pff.profile_id,
+                type: "PROFILE_FIELD_FILE_ADDED",
+                data: {
+                  profile_field_file: pff.id,
+                },
+              } as CreateProfileEvent)
+          ),
+          ...(expiresAt !== undefined
+            ? [
+                {
+                  org_id: profileType.org_id,
+                  profile_id: profileId,
+                  type: "PROFILE_FIELD_EXPIRY_UPDATED",
+                  data: {
+                    profile_type_field_id: profileTypeFieldId,
+                    expires_at: expiresAt?.toISOString() ?? null,
+                  },
+                } as CreateProfileEvent,
+              ]
+            : []),
+        ],
         t
       );
       return profileFieldFiles;

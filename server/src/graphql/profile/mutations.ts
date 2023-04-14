@@ -392,6 +392,8 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
     }
     const profileTypeFieldsById = indexBy(profileTypeFields as ProfileTypeField[], (ptf) => ptf.id);
     // validate contents and expiresAt
+    const values = await ctx.profiles.loadProfileFieldValuesByProfileId(profileId);
+    const valuesByPtfId = indexBy(values, (v) => v.profile_type_field_id);
     for (const { profileTypeFieldId, content, expiresAt } of fields) {
       const profileTypeField = profileTypeFieldsById[profileTypeFieldId];
       if (isDefined(content)) {
@@ -407,19 +409,33 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
         }
       }
       if (expiresAt !== undefined && !profileTypeField.is_expirable) {
-        throw new ApolloError(`Can't set expiry on a non expirable field`, "INVALID_EXPIRY");
+        throw new ApolloError(
+          `Can't set expiry on a non expirable field`,
+          "EXPIRY_ON_NON_EXPIRABLE_FIELD"
+        );
       }
-      if (expiresAt !== undefined && !isDefined(content)) {
-        throw new ApolloError(`Can't set expiry on a non replied field`, "INVALID_EXPIRY");
+      if (expiresAt !== undefined && content === null) {
+        throw new ApolloError(`Can't set expiry when removing a field`, "EXPIRY_ON_REMOVED_FIELD");
+      }
+      if (
+        expiresAt !== undefined &&
+        content === undefined &&
+        !isDefined(valuesByPtfId[profileTypeFieldId])
+      ) {
+        throw new ApolloError(
+          `Can't set expiry on a field with no value`,
+          "EXPIRY_ON_NONEXISTING_VALUE"
+        );
       }
     }
+    const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
     const fieldsWithZonedExpires = fields.map((field) => ({
       ...field,
       expiresAt:
         field.expiresAt &&
-        zonedTimeToUtc(format(field.expiresAt, "yyyy-MM-dd"), ctx.organization!.default_timezone),
+        zonedTimeToUtc(format(field.expiresAt, "yyyy-MM-dd"), organization!.default_timezone),
     }));
-    return (await ctx.profiles.createProfileFieldValue(
+    return (await ctx.profiles.updateProfileFieldValue(
       profileId,
       fieldsWithZonedExpires,
       ctx.user!.id
@@ -465,12 +481,12 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
         )
       )
     );
-    const files = await ctx.profiles.createProfileFieldFile(
+    const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
+    const files = await ctx.profiles.createProfileFieldFiles(
       profileId,
       profileTypeFieldId,
       fileUploads.map((f) => f.id),
-      expiresAt &&
-        zonedTimeToUtc(format(expiresAt, "yyyy-MM-dd"), ctx.organization!.default_timezone),
+      expiresAt && zonedTimeToUtc(format(expiresAt, "yyyy-MM-dd"), organization!.default_timezone),
       ctx.user!.id
     );
     const [field, allFiles] = await Promise.all([
