@@ -333,7 +333,7 @@ export const createProfile = mutationField("createProfile", {
   resolve: async (_, args, ctx) => {
     return await ctx.profiles.createProfile(
       { name: "", org_id: ctx.user!.org_id, profile_type_id: args.profileTypeId },
-      `User:${ctx.user!.id}`
+      ctx.user!.id
     );
   },
 });

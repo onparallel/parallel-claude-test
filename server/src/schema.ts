@@ -41,6 +41,7 @@ export const schema = makeSchema({
     modules: [
       { module: resolve("./db/__types.ts"), alias: "db" },
       { module: resolve("./db/events/PetitionEvent.ts"), alias: "petitionEvents" },
+      { module: resolve("./db/events/ProfileEvent.ts"), alias: "profileEvents" },
       { module: resolve("./db/events/SystemEvent.ts"), alias: "systemEvents" },
       { module: resolve("./db/notifications.ts"), alias: "notifications" },
       { module: resolve("./context.ts"), alias: "ctx" },

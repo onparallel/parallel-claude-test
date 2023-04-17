@@ -4280,6 +4280,21 @@ type Profile implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
+
+  """
+  The events for the profile.
+  """
+  events(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+  ): ProfileEventPagination!
   id: GID!
   name: String!
   profileType: ProfileType!
@@ -4289,6 +4304,49 @@ type Profile implements Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+type ProfileCreatedEvent implements ProfileEvent {
+  createdAt: DateTime!
+  id: GID!
+  profile: Profile
+  type: ProfileEventType!
+  user: User
+}
+
+interface ProfileEvent {
+  createdAt: DateTime!
+  id: GID!
+  profile: Profile
+  type: ProfileEventType!
+}
+
+type ProfileEventPagination {
+  """
+  The requested slice of items.
+  """
+  items: [ProfileEvent!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
+}
+
+enum ProfileEventType {
+  PROFILE_CREATED
+  PROFILE_FIELD_EXPIRY_UPDATED
+  PROFILE_FIELD_FILE_ADDED
+  PROFILE_FIELD_FILE_REMOVED
+  PROFILE_FIELD_VALUE_UPDATED
+}
+
+type ProfileFieldExpiryUpdatedEvent implements ProfileEvent {
+  createdAt: DateTime!
+  id: GID!
+  profile: Profile
+  type: ProfileEventType!
+  user: User
 }
 
 type ProfileFieldFile implements ProfileFieldResponse {
@@ -4317,6 +4375,22 @@ type ProfileFieldFile implements ProfileFieldResponse {
   """
   removedAt: DateTime
   removedBy: User
+}
+
+type ProfileFieldFileAddedEvent implements ProfileEvent {
+  createdAt: DateTime!
+  id: GID!
+  profile: Profile
+  type: ProfileEventType!
+  user: User
+}
+
+type ProfileFieldFileRemovedEvent implements ProfileEvent {
+  createdAt: DateTime!
+  id: GID!
+  profile: Profile
+  type: ProfileEventType!
+  user: User
 }
 
 type ProfileFieldFileWithUploadData {
@@ -4387,6 +4461,14 @@ type ProfileFieldValue implements ProfileFieldResponse {
   """
   removedAt: DateTime
   removedBy: User
+}
+
+type ProfileFieldValueUpdatedEvent implements ProfileEvent {
+  createdAt: DateTime!
+  id: GID!
+  profile: Profile
+  type: ProfileEventType!
+  user: User
 }
 
 input ProfileFilter {

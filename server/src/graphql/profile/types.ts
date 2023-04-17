@@ -97,6 +97,16 @@ export const Profile = objectType({
         );
       },
     });
+    t.paginationField("events", {
+      type: "ProfileEvent",
+      description: "The events for the profile.",
+      resolve: (root, { offset, limit }, ctx) => {
+        return ctx.profiles.getPaginatedEventsForProfile(root.id, {
+          offset,
+          limit,
+        });
+      },
+    });
     t.implements("Timestamps");
   },
 });

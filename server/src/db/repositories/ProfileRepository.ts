@@ -4,15 +4,21 @@ import { indexBy, isDefined, omit, pick, times, uniq } from "remeda";
 import { LocalizableUserText } from "../../graphql";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray, Replace } from "../../util/types";
+import {
+  CreateProfileEvent,
+  ProfileFieldExpiryUpdatedEvent,
+  ProfileFieldFileAddedEvent,
+  ProfileFieldValueUpdatedEvent,
+} from "../events/ProfileEvent";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
   CreateProfile,
-  CreateProfileEvent,
   CreateProfileType,
   CreateProfileTypeField,
   Profile,
+  ProfileEvent,
   ProfileFieldValue,
   ProfileType,
   UserLocale,
@@ -402,16 +408,27 @@ export class ProfileRepository extends BaseRepository {
     );
   }
 
-  async createProfile(data: CreateProfile, createdBy: string) {
-    const [profile] = await this.from("profile").insert(
-      {
-        ...data,
-        created_at: this.now(),
-        created_by: createdBy,
-      },
-      "*"
-    );
-    return profile;
+  async createProfile(data: CreateProfile, userId: number) {
+    return await this.withTransaction(async (t) => {
+      const [profile] = await this.insert(
+        "profile",
+        {
+          ...data,
+          created_at: this.now(),
+          created_by: `User:${userId}`,
+        },
+        t
+      );
+      await this.createEvent({
+        org_id: data.org_id,
+        profile_id: profile.id,
+        type: "PROFILE_CREATED",
+        data: {
+          user_id: userId,
+        },
+      });
+      return profile;
+    });
   }
 
   async updateProfile(profileId: number, data: Partial<CreateProfile>, updatedBy: string) {
@@ -528,10 +545,12 @@ export class ProfileRepository extends BaseRepository {
                     profile_id: profileId,
                     type: "PROFILE_FIELD_VALUE_UPDATED",
                     data: {
-                      current_profile_field_value_id: current?.id,
-                      previous_profile_field_value_id: previous?.id,
+                      user_id: userId,
+                      profile_type_field_id: f.profileTypeFieldId,
+                      current_profile_field_value_id: current?.id ?? null,
+                      previous_profile_field_value_id: previous?.id ?? null,
                     },
-                  } as CreateProfileEvent,
+                  } satisfies ProfileFieldValueUpdatedEvent<true>,
                 ]
               : []),
             ...(expiryChanged
@@ -541,10 +560,11 @@ export class ProfileRepository extends BaseRepository {
                     profile_id: profileId,
                     type: "PROFILE_FIELD_EXPIRY_UPDATED",
                     data: {
-                      profile_type_field_id: current?.profile_type_field_id,
+                      user_id: userId,
+                      profile_type_field_id: f.profileTypeFieldId,
                       expires_at: current?.expires_at?.toISOString() ?? null,
                     },
-                  } as CreateProfileEvent,
+                  } satisfies ProfileFieldExpiryUpdatedEvent<true>,
                 ]
               : []),
           ];
@@ -631,9 +651,11 @@ export class ProfileRepository extends BaseRepository {
                 profile_id: pff.profile_id,
                 type: "PROFILE_FIELD_FILE_ADDED",
                 data: {
-                  profile_field_file: pff.id,
+                  user_id: userId,
+                  profile_type_field_id: profileTypeFieldId,
+                  profile_field_file_id: pff.id,
                 },
-              } as CreateProfileEvent)
+              } satisfies ProfileFieldFileAddedEvent<true>)
           ),
           ...(expiresAt !== undefined
             ? [
@@ -642,10 +664,11 @@ export class ProfileRepository extends BaseRepository {
                   profile_id: profileId,
                   type: "PROFILE_FIELD_EXPIRY_UPDATED",
                   data: {
+                    user_id: userId,
                     profile_type_field_id: profileTypeFieldId,
                     expires_at: expiresAt?.toISOString() ?? null,
                   },
-                } as CreateProfileEvent,
+                } satisfies ProfileFieldExpiryUpdatedEvent<true>,
               ]
             : []),
         ],
@@ -653,6 +676,19 @@ export class ProfileRepository extends BaseRepository {
       );
       return profileFieldFiles;
     });
+  }
+
+  getPaginatedEventsForProfile(profileId: number, opts: PageOpts) {
+    return this.getPagination<ProfileEvent>(
+      this.from("profile_event")
+        .where("profile_id", profileId)
+        .orderBy([
+          { column: "created_at", order: "desc" },
+          { column: "id", order: "desc" },
+        ])
+        .select("*"),
+      opts
+    );
   }
 
   async createEvent(events: MaybeArray<CreateProfileEvent>, t?: Knex.Transaction) {

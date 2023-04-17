@@ -65,5 +65,6 @@ export * from "./views/types";
 export * from "./views/mutations";
 
 export * from "./profile/types";
+export * from "./profile/events";
 export * from "./profile/queries";
 export * from "./profile/mutations";
