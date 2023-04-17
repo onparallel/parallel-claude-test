@@ -243,7 +243,7 @@ async function sendSignatureReminder(
     const signatureClient = ctx.signature.getClient(integration);
     await signatureClient.sendPendingSignatureReminder(signature.external_id.replace(/^.*?\//, ""));
 
-    ctx.petitions.createEvent({
+    await ctx.petitions.createEvent({
       type: "SIGNATURE_REMINDER",
       petition_id: signature.petition_id,
       data: {
