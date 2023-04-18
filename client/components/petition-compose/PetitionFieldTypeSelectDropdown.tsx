@@ -7,7 +7,6 @@ import {
   MenuGroup,
   MenuItem,
   MenuList,
-  MenuListProps,
   Text,
   useMenuContext,
 } from "@chakra-ui/react";
@@ -23,7 +22,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionFieldTypeLabel } from "./PetitionFieldTypeLabel";
 import { PetitionFieldTypeText } from "./PetitionFieldTypeText";
 
-export interface PetitionFieldTypeSelectDropdownProps extends MenuListProps {
+export interface PetitionFieldTypeSelectDropdownProps {
   showHeader?: boolean;
   showDescription?: boolean;
   onSelectFieldType: (type: PetitionFieldType) => void;

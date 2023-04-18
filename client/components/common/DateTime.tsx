@@ -1,4 +1,4 @@
-import { Text, TextProps } from "@chakra-ui/react";
+import { Text, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { DateTimeFormatOptions } from "@parallel/utils/dates";
 import { useForceUpdate } from "@parallel/utils/useForceUpdate";
@@ -6,7 +6,7 @@ import classNames from "classnames";
 import { useEffect } from "react";
 import { FormattedDate, FormattedMessage, FormattedRelativeTime, useIntl } from "react-intl";
 
-export interface DateTimeProps extends TextProps {
+export interface DateTimeProps extends ThemingProps<"Text"> {
   value: Date | string | number;
   format: DateTimeFormatOptions;
   useRelativeTime?: boolean | "always";
@@ -58,10 +58,10 @@ export const DateTime = chakraForwardRef<"time", DateTimeProps>(function DateTim
   }, [_useRelativeTime]);
   return (
     <Text
-      ref={ref as any}
+      ref={ref}
       as="time"
       title={_useRelativeTime ? intl.formatDate(date, format) : undefined}
-      {...props}
+      {...(props as any)}
       {...{ dateTime: date.toISOString() }}
       className={classNames(props.className, "notranslate")}
       suppressHydrationWarning

@@ -1,13 +1,13 @@
-import { Badge, BadgeProps, BoxProps, Placement, Text, TextProps } from "@chakra-ui/react";
+import { Badge, BoxProps, Placement, Text, TextProps, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "./SmallPopover";
 
-export type InternalFieldBadgeProps = {
+export interface InternalFieldBadgeProps extends ThemingProps<"Badge"> {
   placement?: Placement;
   popoverWidth?: BoxProps["width"];
   fontSize?: TextProps["fontSize"];
-} & BadgeProps;
+}
 
 export const InternalFieldBadge = chakraForwardRef<"span", InternalFieldBadgeProps>(
   function InternalFieldBadge(

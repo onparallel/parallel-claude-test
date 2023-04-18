@@ -1,9 +1,17 @@
-import { Box, omitThemingProps, SelectProps, useMultiStyleConfig } from "@chakra-ui/react";
+import {
+  Box,
+  ButtonOptions,
+  omitThemingProps,
+  ThemingProps,
+  useMultiStyleConfig,
+} from "@chakra-ui/react";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { omit } from "remeda";
 
-export const SelectLikeButton = chakraForwardRef<"div", SelectProps>(
+interface SelectLikeButtonProps extends ButtonOptions, ThemingProps<"Button"> {}
+
+export const SelectLikeButton = chakraForwardRef<"button", SelectLikeButtonProps>(
   function PetitionFieldTypeSelectButton({ children, isDisabled, ...props }, ref) {
     const styles = useMultiStyleConfig("Select", props);
     const { color, ...rest } = omitThemingProps(props as any);

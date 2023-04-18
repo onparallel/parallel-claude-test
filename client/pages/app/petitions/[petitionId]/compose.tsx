@@ -620,7 +620,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   );
 }
 
-PetitionCompose.fragments = {
+const _fragments = {
   get PetitionBase() {
     return gql`
       fragment PetitionCompose_PetitionBase on PetitionBase {
@@ -756,7 +756,7 @@ const _mutations = [
       }
     }
     ${PetitionLayout.fragments.PetitionBase}
-    ${PetitionCompose.fragments.PetitionField}
+    ${_fragments.PetitionField}
   `,
   gql`
     mutation PetitionCompose_clonePetitionField($petitionId: GID!, $fieldId: GID!) {
@@ -772,7 +772,7 @@ const _mutations = [
       }
     }
     ${PetitionLayout.fragments.PetitionBase}
-    ${PetitionCompose.fragments.PetitionField}
+    ${_fragments.PetitionField}
   `,
   gql`
     mutation PetitionCompose_deletePetitionField(
@@ -809,7 +809,7 @@ const _mutations = [
         }
       }
     }
-    ${PetitionCompose.fragments.PetitionField}
+    ${_fragments.PetitionField}
   `,
   gql`
     mutation PetitionCompose_changePetitionFieldType(
@@ -835,7 +835,7 @@ const _mutations = [
         }
       }
     }
-    ${PetitionCompose.fragments.PetitionField}
+    ${_fragments.PetitionField}
   `,
 ];
 
@@ -844,7 +844,7 @@ const _queries = [
     query PetitionCompose_user {
       ...PetitionCompose_Query
     }
-    ${PetitionCompose.fragments.Query}
+    ${_fragments.Query}
   `,
   gql`
     query PetitionCompose_petition($id: GID!) {
@@ -852,7 +852,7 @@ const _queries = [
         ...PetitionCompose_PetitionBase
       }
     }
-    ${PetitionCompose.fragments.PetitionBase}
+    ${_fragments.PetitionBase}
   `,
 ];
 

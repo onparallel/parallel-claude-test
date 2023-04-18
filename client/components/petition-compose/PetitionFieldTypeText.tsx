@@ -1,9 +1,9 @@
-import { Text, TextProps } from "@chakra-ui/react";
+import { Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { usePetitionFieldTypeLabel } from "@parallel/utils/petitionFields";
 
-interface PetitionFieldTypeTextProps extends TextProps {
+interface PetitionFieldTypeTextProps {
   type: PetitionFieldType;
 }
 

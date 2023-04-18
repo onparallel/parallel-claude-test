@@ -6,7 +6,6 @@ import {
   Image,
   Input,
   InputGroup,
-  InputGroupProps,
   InputRightAddon,
   Menu,
   MenuButton,
@@ -21,16 +20,14 @@ import { Scalars, UserLocale } from "@parallel/graphql/__types";
 import { asSupportedUserLocale, useSupportedUserLocales } from "@parallel/utils/locales";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { ValueProps } from "@parallel/utils/ValueProps";
+import useMergedRef from "@react-hook/merged-ref";
 import { ChangeEvent, Ref, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import useMergedRef from "@react-hook/merged-ref";
 import { isDefined } from "remeda";
 
 type LocalizableUserText = Scalars["LocalizableUserText"];
 
-interface LocalizableUserTextInputProps
-  extends Omit<InputGroupProps, "value" | "onChange">,
-    ValueProps<LocalizableUserText, false> {
+interface LocalizableUserTextInputProps extends ValueProps<LocalizableUserText, false> {
   inputRef?: Ref<HTMLInputElement>;
   onBlur?: () => void;
   placeholder?: string;

@@ -8,7 +8,7 @@ import {
   Box,
   BoxProps,
   Button,
-  ButtonProps,
+  ButtonOptions,
   Center,
   Grid,
   Heading,
@@ -16,6 +16,7 @@ import {
   IconButton,
   Stack,
   Text,
+  ThemingProps,
   Tooltip,
 } from "@chakra-ui/react";
 import {
@@ -450,7 +451,7 @@ function PetitionRepliesFieldAttachments({
   );
 }
 
-interface CommentsButtonProps extends ButtonProps {
+interface CommentsButtonProps extends ButtonOptions, ThemingProps<"Button"> {
   commentCount: number;
   hasUnreadComments: boolean;
   isActive: boolean;

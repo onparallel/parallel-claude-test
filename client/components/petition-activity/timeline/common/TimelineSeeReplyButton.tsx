@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
-import { Button, ButtonProps, Text } from "@chakra-ui/react";
+import { Button, ButtonOptions, Text, ThemingProps } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { TimelineSeeReplyButton_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { FormattedMessage } from "react-intl";
 import { isDefined } from "remeda";
 
-interface TimelineSeeReplyButton extends ButtonProps {
+interface TimelineSeeReplyButton extends ButtonOptions, ThemingProps<"Button"> {
   field?: TimelineSeeReplyButton_PetitionFieldFragment | null;
   replyId?: string;
 }

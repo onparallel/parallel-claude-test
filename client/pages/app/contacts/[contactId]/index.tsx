@@ -4,12 +4,13 @@ import {
   Button,
   Flex,
   FormControl,
+  FormControlOptions,
   FormErrorMessage,
   FormLabel,
   Input,
-  InputProps,
   Stack,
   Text,
+  ThemingProps,
 } from "@chakra-ui/react";
 import { DeleteIcon, EditIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -449,7 +450,7 @@ Contact.queries = [
   `,
 ];
 
-interface ToggleInputProps extends InputProps {
+interface ToggleInputProps extends ThemingProps<"Input">, FormControlOptions {
   isEditing: boolean;
 }
 

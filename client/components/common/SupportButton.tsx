@@ -1,9 +1,9 @@
-import { Button, ButtonProps } from "@chakra-ui/react";
+import { Button, ButtonOptions, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { isDefined } from "remeda";
 import { NakedLink } from "./Link";
 
-interface SupportButton extends ButtonProps {
+interface SupportButton extends ButtonOptions, ThemingProps<"Button"> {
   message: string;
 }
 
@@ -13,7 +13,7 @@ export const SupportButton = chakraForwardRef<"a", SupportButton>(function Suppo
 ) {
   if (isDisabled) {
     return (
-      <Button ref={ref as any} as="a" {...props} isDisabled={isDisabled}>
+      <Button ref={ref as any} as="a" {...(props as any)} isDisabled={isDisabled}>
         {children}
       </Button>
     );
@@ -24,13 +24,13 @@ export const SupportButton = chakraForwardRef<"a", SupportButton>(function Suppo
       <Button
         ref={ref as any}
         as="a"
-        {...props}
+        {...(props as any)}
         onClick={(event) => {
           if (isDefined(window.Intercom)) {
             event.preventDefault();
             window.Intercom("showNewMessage", message);
           }
-          onClick?.(event);
+          onClick?.(event as any);
         }}
       >
         {children}

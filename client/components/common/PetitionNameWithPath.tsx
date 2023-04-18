@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client";
-import { Text, TextProps } from "@chakra-ui/react";
+import { Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionName_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
-interface PetitionNameWithPathProps extends TextProps {
+interface PetitionNameWithPathProps {
   petition: PetitionName_PetitionBaseFragment;
   relativePath?: string;
 }

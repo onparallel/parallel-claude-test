@@ -1,4 +1,4 @@
-import { IconButtonProps, PlacementWithLogical } from "@chakra-ui/react";
+import { ButtonOptions, PlacementWithLogical, ThemingProps } from "@chakra-ui/react";
 import { ClipboardIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import copy from "copy-to-clipboard";
@@ -6,7 +6,7 @@ import { MouseEvent, ReactElement, useState } from "react";
 import { useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
 
-export interface CopyToClipboardButtonProps extends Omit<IconButtonProps, "icon" | "aria-label"> {
+export interface CopyToClipboardButtonProps extends ButtonOptions, ThemingProps<"Button"> {
   text: string;
   placement?: PlacementWithLogical;
   "aria-label"?: string;

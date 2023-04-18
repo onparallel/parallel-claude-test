@@ -1,10 +1,10 @@
-import { chakra, Flex, Text, TextProps } from "@chakra-ui/react";
+import { chakra, Flex, Text, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Maybe } from "@parallel/graphql/__types";
 import useMergedRef from "@react-hook/merged-ref";
 import { useEffect, useRef, useState } from "react";
 
-export interface FileNameProps extends TextProps {
+export interface FileNameProps extends ThemingProps<"Text"> {
   value: Maybe<string>;
 }
 

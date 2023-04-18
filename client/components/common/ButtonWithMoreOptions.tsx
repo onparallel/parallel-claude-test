@@ -1,9 +1,11 @@
 import {
   Button,
   ButtonGroup,
+  ButtonOptions,
   ButtonProps,
   layoutPropNames,
   omitThemingProps,
+  ThemingProps,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -12,7 +14,7 @@ import { omit, pick } from "remeda";
 import { Divider } from "../common/Divider";
 import { MoreOptionsMenuButton } from "./MoreOptionsMenuButton";
 
-export interface ButtonWithMoreOptionsProps extends ButtonProps {
+export interface ButtonWithMoreOptionsProps extends ButtonOptions, ThemingProps<"Button"> {
   options: ReactNode;
   moreOptionsButtonProps?: ButtonProps;
 }

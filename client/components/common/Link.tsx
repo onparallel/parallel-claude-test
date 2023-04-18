@@ -1,9 +1,10 @@
-import { Link as ChakraLink, LinkProps as ChakraLinkProps } from "@chakra-ui/react";
+import { Link as ChakraLink, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import NextLink, { LinkProps as NextLinkProps } from "next/link";
 import { PropsWithChildren, ReactNode } from "react";
 
-interface LinkProps extends Pick<NextLinkProps, "href">, Omit<ChakraLinkProps, "href"> {
+interface LinkProps extends Pick<NextLinkProps, "href">, ThemingProps<"Link"> {
+  isExternal?: boolean;
   next?: Omit<NextLinkProps, "href">;
   children?: ReactNode;
 }

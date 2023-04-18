@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import {
-  ButtonProps,
+  ButtonOptions,
   HStack,
   Menu,
   MenuButton,
@@ -10,6 +10,7 @@ import {
   Portal,
   Stack,
   Text,
+  ThemingProps,
 } from "@chakra-ui/react";
 import { HelpOutlineIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -21,7 +22,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { NakedHelpCenterLink } from "../common/HelpCenterLink";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
-export interface AliasOptionsMenuProps extends Omit<ButtonProps, "children"> {
+export interface AliasOptionsMenuProps extends ButtonOptions, ThemingProps<"Button"> {
   field: AliasOptionsMenu_PetitionFieldFragment;
   onCreateAlias?: () => Promise<string>;
 }

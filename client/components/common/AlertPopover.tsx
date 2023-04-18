@@ -1,15 +1,15 @@
-import { Box, BoxProps, IconProps, Placement, TextProps } from "@chakra-ui/react";
+import { Box, BoxProps, Placement, TextProps } from "@chakra-ui/react";
 import { AlertCircleFilledIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ReactNode } from "react";
 import { SmallPopover } from "./SmallPopover";
 
-export type AlertPopoverProps = {
+export interface AlertPopoverProps {
   children: ReactNode;
   placement?: Placement;
   popoverWidth?: BoxProps["width"];
   fontSize?: TextProps["fontSize"];
-} & IconProps;
+}
 
 export const AlertPopover = chakraForwardRef<"svg", AlertPopoverProps>(function (
   { children, placement = "bottom", popoverWidth, fontSize = "sm", ...props },

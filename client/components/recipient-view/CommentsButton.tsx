@@ -1,11 +1,11 @@
-import { Button, ButtonProps } from "@chakra-ui/react";
+import { Button, ButtonOptions, ThemingProps } from "@chakra-ui/react";
 import { CommentIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { useIntl } from "react-intl";
 import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
 
-interface CommentsButtonProps extends ButtonProps {
+interface CommentsButtonProps extends ButtonOptions, ThemingProps<"Button"> {
   commentCount: number;
   hasUnreadComments: boolean;
 }

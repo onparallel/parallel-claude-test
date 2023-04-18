@@ -3,10 +3,10 @@ import {
   Editable,
   EditableInput,
   EditablePreview,
-  EditableProps,
   Flex,
   Text,
   Tooltip,
+  UseEditableProps,
 } from "@chakra-ui/react";
 import { CloudErrorIcon, CloudOkIcon, CloudUploadIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -15,7 +15,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { useImperativeHandle, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 
-export interface HeaderNameEditableProps extends EditableProps {
+export interface HeaderNameEditableProps extends UseEditableProps {
   petition: HeaderNameEditable_PetitionBaseFragment;
   onNameChange: (value: string) => void;
   state: "SAVED" | "SAVING" | "ERROR";

@@ -3,10 +3,11 @@ import {
   Box,
   BoxProps,
   Button,
-  ButtonProps,
+  ButtonOptions,
   Flex,
   HTMLChakraProps,
   IconButton,
+  ThemingProps,
 } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -409,29 +410,28 @@ export const PetitionComposeFieldList = Object.assign(
       [setHoveredFieldId, setFocusedFieldId, onFieldSettingsClick]
     );
     const addButtonMouseHandlers = useMemoFactory(
-      (fieldId) =>
-        ({
-          onMouseEnter() {
-            clearTimeout(timeoutRef.current);
-          },
-          onFocus() {
-            clearTimeout(timeoutRef.current);
-          },
-          onSelectFieldType(type) {
-            const { fields } = fieldsDataRef.current;
-            onAddField(type, fields.findIndex((f) => f.id === fieldId) + 1);
-          },
-          onOpen() {
-            assignRef(isMenuOpenedRef, true);
-          },
-          onClose() {
-            assignRef(isMenuOpenedRef, false);
-            if (hoveredFieldIdRef.current !== hoveredFieldIdWhileMenuOpenedRef.current) {
-              setHoveredFieldId(hoveredFieldIdWhileMenuOpenedRef.current);
-            }
-          },
-          user,
-        } as ButtonProps & AddFieldPopoverProps),
+      (fieldId) => ({
+        onMouseEnter() {
+          clearTimeout(timeoutRef.current);
+        },
+        onFocus() {
+          clearTimeout(timeoutRef.current);
+        },
+        onSelectFieldType(type: PetitionFieldType) {
+          const { fields } = fieldsDataRef.current;
+          onAddField(type, fields.findIndex((f) => f.id === fieldId) + 1);
+        },
+        onOpen() {
+          assignRef(isMenuOpenedRef, true);
+        },
+        onClose() {
+          assignRef(isMenuOpenedRef, false);
+          if (hoveredFieldIdRef.current !== hoveredFieldIdWhileMenuOpenedRef.current) {
+            setHoveredFieldId(hoveredFieldIdWhileMenuOpenedRef.current);
+          }
+        },
+        user,
+      }),
       []
     );
 
@@ -525,11 +525,10 @@ export const PetitionComposeFieldList = Object.assign(
   }
 );
 
+interface AddFieldButtonProps extends ButtonOptions, ThemingProps<"Button">, AddFieldPopoverProps {}
+
 const AddFieldButton = memo(
-  chakraForwardRef<"button", ButtonProps & AddFieldPopoverProps>(function AddFieldButton(
-    props,
-    ref
-  ) {
+  chakraForwardRef<"button", AddFieldButtonProps>(function AddFieldButton(props, ref) {
     const intl = useIntl();
     return (
       <AddFieldPopover
@@ -560,11 +559,13 @@ const AddFieldButton = memo(
   })
 );
 
+interface BigAddFieldButtonProps
+  extends ButtonOptions,
+    ThemingProps<"Button">,
+    AddFieldPopoverProps {}
+
 const BigAddFieldButton = memo(
-  chakraForwardRef<"button", ButtonProps & AddFieldPopoverProps>(function BigAddFieldButton(
-    props,
-    ref
-  ) {
+  chakraForwardRef<"button", BigAddFieldButtonProps>(function BigAddFieldButton(props, ref) {
     return (
       <AddFieldPopover as={Button} leftIcon={<AddIcon />} {...props}>
         <FormattedMessage

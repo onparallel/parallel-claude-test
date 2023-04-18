@@ -6,7 +6,6 @@ import {
   FormErrorMessageProps,
   HStack,
   Input,
-  InputProps,
   List,
   Stack,
 } from "@chakra-ui/react";
@@ -26,6 +25,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ComponentProps,
   forwardRef,
+  KeyboardEvent,
   MouseEvent,
   useImperativeHandle,
   useRef,
@@ -175,7 +175,7 @@ export function RecipientViewPetitionFieldShortText({
   const formats = useShortTextFormats();
   const format = isDefined(options.format) ? formats.find((f) => f.value === options.format) : null;
 
-  const inputProps: ComponentProps<typeof ShortTextInput> = {
+  const inputProps = {
     id: `reply-${field.id}-new`,
     ref: newReplyRef,
     paddingRight: 10,
@@ -183,7 +183,7 @@ export function RecipientViewPetitionFieldShortText({
     isInvalid: isInvalidReply[field.id],
     maxLength: field.options.maxLength ?? undefined,
     value,
-    onKeyDown: async (event) => {
+    onKeyDown: async (event: KeyboardEvent) => {
       if (options.format === "EMAIL" && !EMAIL_REGEX.test(value)) {
         return;
       }
@@ -213,7 +213,7 @@ export function RecipientViewPetitionFieldShortText({
         setShowNewReply(false);
       }
     },
-    onValueChange: (value) => {
+    onValueChange: (value: string) => {
       if (isInvalidReply[field.id] && format?.validate && format.validate(value)) {
         handleInvalidReply(field.id, false);
       }
@@ -426,13 +426,15 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
   );
 });
 
-const ShortTextInput = chakraForwardRef<
-  "input",
-  InputProps & {
-    onValueChange: (value: string) => void;
-    format?: Maybe<ShortTextFormat>;
-  }
->(function ShortTextInput({ format, onValueChange, ...props }, ref) {
+interface ShortTextInput {
+  onValueChange: (value: string) => void;
+  format?: Maybe<ShortTextFormat>;
+}
+
+const ShortTextInput = chakraForwardRef<"input", ShortTextInput>(function ShortTextInput(
+  { format, onValueChange, ...props },
+  ref
+) {
   const inputRef = useRef<any>(null);
   useImperativeHandle(
     ref,
