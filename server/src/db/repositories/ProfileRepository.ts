@@ -419,14 +419,17 @@ export class ProfileRepository extends BaseRepository {
         },
         t
       );
-      await this.createEvent({
-        org_id: data.org_id,
-        profile_id: profile.id,
-        type: "PROFILE_CREATED",
-        data: {
-          user_id: userId,
+      await this.createEvent(
+        {
+          org_id: data.org_id,
+          profile_id: profile.id,
+          type: "PROFILE_CREATED",
+          data: {
+            user_id: userId,
+          },
         },
-      });
+        t
+      );
       return profile;
     });
   }
