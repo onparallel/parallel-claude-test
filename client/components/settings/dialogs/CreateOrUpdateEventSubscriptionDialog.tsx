@@ -36,12 +36,12 @@ import {
 } from "@parallel/graphql/__types";
 import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { genericRsComponent, useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { Maybe } from "@parallel/utils/types";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { components } from "react-select";
+import { components, OptionProps, SingleValueProps } from "react-select";
 import Select from "react-select/async";
 import { isDefined } from "remeda";
 
@@ -147,7 +147,7 @@ export function CreateOrUpdateEventSubscriptionDialog({
   const reactSelectProps = useReactSelectProps<
     CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment,
     false
-  >({ components: { Option, SingleValue } });
+  >({ components: { Option, SingleValue } as any });
 
   const options = useMemo(
     () => eventTypes.map((event) => ({ label: event as string, value: event })),
@@ -470,12 +470,7 @@ export function CreateOrUpdateEventSubscriptionDialog({
   );
 }
 
-const rsComponent = genericRsComponent<
-  CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment,
-  false
->();
-
-const Option = rsComponent("Option", function (props) {
+function Option(props: OptionProps<CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment>) {
   return (
     <components.Option {...props}>
       {props.data.name ?? (
@@ -485,9 +480,11 @@ const Option = rsComponent("Option", function (props) {
       )}
     </components.Option>
   );
-});
+}
 
-const SingleValue = rsComponent("SingleValue", function (props) {
+function SingleValue(
+  props: SingleValueProps<CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment>
+) {
   return (
     <components.SingleValue {...props}>
       {props.data.name ?? (
@@ -497,7 +494,7 @@ const SingleValue = rsComponent("SingleValue", function (props) {
       )}
     </components.SingleValue>
   );
-});
+}
 
 CreateOrUpdateEventSubscriptionDialog.fragments = {
   get PetitionEventSubscription() {

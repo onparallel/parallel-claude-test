@@ -1,16 +1,21 @@
 import { CloseButton, Flex, Text, useFormControl, useTheme } from "@chakra-ui/react";
 import { ChevronDownIcon, CloseIcon } from "@parallel/chakra/icons";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
-import { ComponentPropsWithRef, ComponentType, useMemo } from "react";
+import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
+  ClearIndicatorProps,
   components,
+  ContainerProps,
+  ControlProps,
   CSSObjectWithLabel,
+  DropdownIndicatorProps,
   GroupBase,
   mergeStyles,
+  MultiValueProps,
+  OptionProps,
+  PlaceholderProps,
   Props as SelectProps,
-  SelectComponentsConfig,
-  StylesConfig,
   Theme,
 } from "react-select";
 import { isDefined, omit } from "remeda";
@@ -125,21 +130,24 @@ export function useReactSelectProps<
   );
 
   const styles = useMemo(() => {
-    const styles = rsStyles<OptionType, IsMulti, GroupType>({
-      menuPortal: (styles) => ({
+    const styles = {
+      menuPortal: (styles: CSSObjectWithLabel) => ({
         ...styles,
         zIndex: 40,
       }),
-      container: (styles, { isDisabled }) => ({
+      container: (styles: CSSObjectWithLabel, { isDisabled }: ContainerProps) => ({
         ...styles,
         cursor: isDisabled ? "not-allowed" : "default",
         pointerEvents: undefined,
       }),
-      input: (styles) => ({
+      input: (styles: CSSObjectWithLabel) => ({
         ...styles,
         margin: "0 2px",
       }),
-      control: (styles, { isDisabled, isFocused, theme, selectProps }) => {
+      control: (
+        styles: CSSObjectWithLabel,
+        { isDisabled, isFocused, theme, selectProps }: ControlProps & ExtendComponentProps
+      ) => {
         const { isInvalid } = selectProps;
         const {
           colors: { error, primary: borderColor, neutral30: borderColorHover },
@@ -163,7 +171,7 @@ export function useReactSelectProps<
           },
         };
       },
-      placeholder: (styles, { theme }) => {
+      placeholder: (styles: CSSObjectWithLabel, { theme }: PlaceholderProps) => {
         const {
           colors: { neutral40: placeholderColor },
         } = theme;
@@ -173,7 +181,10 @@ export function useReactSelectProps<
           whiteSpace: "nowrap",
         };
       },
-      valueContainer: (styles, { theme }) => {
+      valueContainer: (
+        styles: CSSObjectWithLabel,
+        { theme }: ContainerProps & ExtendComponentProps
+      ) => {
         const {
           spacing: { padding },
         } = theme;
@@ -183,7 +194,10 @@ export function useReactSelectProps<
           paddingRight: 0,
         };
       },
-      option: (styles, { theme, selectProps }) => {
+      option: (
+        styles: CSSObjectWithLabel,
+        { theme, selectProps }: OptionProps & ExtendComponentProps
+      ) => {
         const {
           fontSize,
           spacing: { padding },
@@ -206,25 +220,28 @@ export function useReactSelectProps<
               }),
         };
       },
-      menu: (styles) => {
+      menu: (styles: CSSObjectWithLabel) => {
         return {
           ...styles,
           overflow: "hidden", // when using OptimizedMenuList this is needed
         };
       },
-      menuList: (styles) => {
+      menuList: (styles: CSSObjectWithLabel) => {
         return {
           ...styles,
           paddingTop: "0.5rem",
           paddingBottom: "0.5rem",
         };
       },
-      singleValue: (styles, { selectProps }) => {
+      singleValue: (styles: CSSObjectWithLabel) => {
         return {
           ...omit(styles, ["color"]),
         };
       },
-      multiValue: (styles, { data, theme }) => {
+      multiValue: (
+        styles: CSSObjectWithLabel,
+        { data, theme }: MultiValueProps & ExtendComponentProps
+      ) => {
         const {
           colors: { neutral20: backgroundColor, error20: backgroundColorError },
         } = theme;
@@ -237,7 +254,10 @@ export function useReactSelectProps<
           borderRadius: radii["sm"],
         };
       },
-      multiValueRemove: (styles, { data, theme }) => {
+      multiValueRemove: (
+        styles: CSSObjectWithLabel,
+        { data, theme }: MultiValueProps & ExtendComponentProps
+      ) => {
         const {
           colors: {
             neutral30: backgroundColorHover,
@@ -257,25 +277,14 @@ export function useReactSelectProps<
           },
         };
       },
-      multiValueLabel: (styles) => {
+      multiValueLabel: (styles: CSSObjectWithLabel) => {
         return {
           ...omit(styles, ["borderRadius"]),
         };
       },
-    });
-    return isDefined(_styles) ? mergeStyles(styles, _styles) : styles;
+    };
+    return isDefined(_styles) ? mergeStyles(styles as any, _styles) : styles;
   }, [_styles]);
-
-  const components = {
-    SelectContainer,
-    IndicatorSeparator,
-    ClearIndicator,
-    DropdownIndicator,
-    NoOptionsMessage,
-    MultiValueRemove,
-    LoadingMessage,
-    ...props.components,
-  } as SelectComponentsConfig<OptionType, IsMulti, GroupType>;
 
   const rehydrated = useRehydrated();
   return {
@@ -284,14 +293,23 @@ export function useReactSelectProps<
     menuPortalTarget: usePortal && rehydrated ? document.body : undefined,
     menuPlacement: "auto",
     theme,
-    components,
+    components: {
+      SelectContainer,
+      IndicatorSeparator,
+      ClearIndicator,
+      DropdownIndicator,
+      NoOptionsMessage,
+      MultiValueRemove,
+      LoadingMessage,
+      ...props.components,
+    },
     styles,
     // Extension props
     ...({ size, isInvalid, singleLineOptions } as any),
-  };
+  } as any;
 }
 
-export type ExtendComponentProps = {
+interface ExtendComponentProps {
   theme: {
     spacing: {
       padding: number;
@@ -304,56 +322,9 @@ export type ExtendComponentProps = {
     isInvalid?: boolean;
     size: "sm" | "md" | "lg";
   };
-};
-
-type SelectStyles = keyof StylesConfig;
-type _SelectStyleProps<
-  T extends SelectStyles,
-  Option = unknown,
-  IsMulti extends boolean = boolean,
-  Group extends GroupBase<Option> = GroupBase<Option>
-> = Parameters<Exclude<StylesConfig<Option, IsMulti, Group>[T], undefined>>[1];
-type _StylesConfigFunction<Props> = (base: CSSObjectWithLabel, props: Props) => CSSObjectWithLabel;
-
-export function rsStyles<
-  Option = unknown,
-  IsMulti extends boolean = boolean,
-  Group extends GroupBase<Option> = GroupBase<Option>
->(styles: {
-  [K in SelectStyles]?: _StylesConfigFunction<
-    _SelectStyleProps<K, Option, IsMulti, Group> & ExtendComponentProps
-  >;
-}): StylesConfig<Option, IsMulti, Group> {
-  return styles as any;
 }
 
-export function genericRsComponent<
-  Option = unknown,
-  IsMulti extends boolean = boolean,
-  Group extends GroupBase<Option> = GroupBase<Option>,
-  TProps extends {} = {}
->() {
-  return <TComponent extends keyof SelectComponentsConfig<Option, IsMulti, Group>>(
-    name: TComponent,
-    component: ComponentType<
-      ComponentPropsWithRef<
-        NonNullable<SelectComponentsConfig<Option, IsMulti, Group>[TComponent]>
-      > &
-        TProps &
-        ExtendComponentProps
-    >
-  ): NonNullable<SelectComponentsConfig<Option, IsMulti, Group>[TComponent]> => {
-    return (
-      process.env.NODE_ENV === "development"
-        ? Object.assign(component, { displayName: name })
-        : component
-    ) as any;
-  };
-}
-
-export const rsComponent = genericRsComponent<any, any, any>();
-
-const SelectContainer = rsComponent("SelectContainer", function ({ innerProps, ...props }) {
+function SelectContainer({ innerProps, ...props }: ContainerProps) {
   return (
     <components.SelectContainer
       innerProps={{
@@ -366,13 +337,13 @@ const SelectContainer = rsComponent("SelectContainer", function ({ innerProps, .
       {...props}
     />
   );
-});
+}
 
-const IndicatorSeparator = rsComponent("IndicatorSeparator", function () {
+function IndicatorSeparator() {
   return <></>;
-});
+}
 
-const ClearIndicator = rsComponent("ClearIndicator", function ({ innerProps }) {
+function ClearIndicator({ innerProps }: ClearIndicatorProps) {
   const intl = useIntl();
   return (
     <CloseButton
@@ -385,9 +356,9 @@ const ClearIndicator = rsComponent("ClearIndicator", function ({ innerProps }) {
       {...(innerProps as any)}
     />
   );
-});
+}
 
-const DropdownIndicator = rsComponent("DropdownIndicator", function (props) {
+function DropdownIndicator(props: DropdownIndicatorProps & ExtendComponentProps) {
   const { theme } = props;
   return (
     <Flex
@@ -399,17 +370,17 @@ const DropdownIndicator = rsComponent("DropdownIndicator", function (props) {
       <ChevronDownIcon display="block" position="relative" top="1px" />
     </Flex>
   );
-});
+}
 
-const NoOptionsMessage = rsComponent("NoOptionsMessage", function () {
+function NoOptionsMessage() {
   return (
     <Text as="div" textStyle="hint" textAlign="center" paddingY={2}>
       <FormattedMessage id="generic.no-results" defaultMessage="No results" />
     </Text>
   );
-});
+}
 
-const MultiValueRemove = rsComponent("MultiValueRemove", function ({ innerProps, ...props }) {
+function MultiValueRemove({ innerProps, ...props }: MultiValueProps) {
   const intl = useIntl();
   return (
     <components.MultiValueRemove
@@ -428,12 +399,12 @@ const MultiValueRemove = rsComponent("MultiValueRemove", function ({ innerProps,
       <CloseIcon boxSize="10px" marginX={1} />
     </components.MultiValueRemove>
   );
-});
+}
 
-const LoadingMessage = rsComponent("LoadingMessage", function () {
+function LoadingMessage() {
   return (
     <Text as="div" color="gray.400" textAlign="center" paddingY={2}>
       <FormattedMessage id="component.react-select.loading" defaultMessage="Loading..." />
     </Text>
   );
-});
+}

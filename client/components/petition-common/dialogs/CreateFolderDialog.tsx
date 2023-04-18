@@ -16,12 +16,12 @@ import {
   CreateFolderDialog_petitionsDocument,
 } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { genericRsComponent, useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { isNotEmptyText } from "@parallel/utils/strings";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { components } from "react-select";
+import { components, MultiValueGenericProps, NoticeProps, OptionProps } from "react-select";
 import AsyncSelect from "react-select/async";
 
 interface CreateFolderDialogProps {
@@ -64,7 +64,7 @@ function CreateFolderDialog({
     CreateFolderDialog_PetitionBaseFragment,
     true,
     never
-  >({ components: { Option, MultiValueLabel, NoOptionsMessage } });
+  >({ components: { Option, MultiValueLabel, NoOptionsMessage } as any });
 
   const apollo = useApolloClient();
   const loadPetitions = useCallback(
@@ -177,6 +177,7 @@ function CreateFolderDialog({
                           defaultMessage: "Select parallels to add to the folder",
                         })
                   }
+                  {...({ isTemplate } as any)}
                 />
               )}
             />
@@ -263,34 +264,42 @@ function PetitionName({
   );
 }
 
-const rsComponent = genericRsComponent<
-  CreateFolderDialog_PetitionBaseFragment,
-  true,
-  never,
-  {
-    selectProps: {
-      isTemplate: boolean;
-    };
-  }
->();
+interface ReactSelectExtraProps {
+  isTemplate: boolean;
+}
 
-const Option = rsComponent("Option", function (props) {
+function Option(
+  props: OptionProps<CreateFolderDialog_PetitionBaseFragment> & {
+    selectProps: ReactSelectExtraProps;
+  }
+) {
   return (
     <components.Option {...props}>
       <PetitionName name={props.data.name} isTemplate={props.selectProps.isTemplate} />
     </components.Option>
   );
-});
+}
 
-const MultiValueLabel = rsComponent("MultiValueLabel", function ({ children, ...props }) {
+function MultiValueLabel({
+  children,
+  ...props
+}: MultiValueGenericProps<CreateFolderDialog_PetitionBaseFragment> & {
+  selectProps: {
+    isTemplate: boolean;
+  };
+}) {
   return (
     <components.MultiValueLabel {...props}>
       <PetitionName name={props.data.name} isTemplate={props.selectProps.isTemplate} />
     </components.MultiValueLabel>
   );
-});
+}
 
-const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
+function NoOptionsMessage(
+  props: NoticeProps & {
+    selectProps: ReactSelectExtraProps;
+  }
+) {
   return (
     <Box textAlign="center" color="gray.400" padding={4}>
       <Text as="div" marginTop={2}>
@@ -309,4 +318,4 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
       </Text>
     </Box>
   );
-});
+}

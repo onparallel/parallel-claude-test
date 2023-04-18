@@ -22,11 +22,7 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useDeleteTag } from "@parallel/utils/mutations/useDeleteTag";
 import { withError } from "@parallel/utils/promises/withError";
-import {
-  genericRsComponent,
-  rsStyles,
-  useReactSelectProps,
-} from "@parallel/utils/react-select/hooks";
+import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomAsyncSelectProps } from "@parallel/utils/react-select/types";
 import { isNotEmptyText } from "@parallel/utils/strings";
 import { If, MaybeArray, unMaybeArray } from "@parallel/utils/types";
@@ -48,7 +44,17 @@ import {
 } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { components, SelectComponentsConfig, SelectInstance } from "react-select";
+import {
+  components,
+  CSSObjectWithLabel,
+  MenuListProps,
+  MultiValueProps,
+  NoticeProps,
+  OptionProps,
+  SelectComponentsConfig,
+  SelectInstance,
+  SingleValueProps,
+} from "react-select";
 import AsyncSelect from "react-select/async";
 import AsyncCreatableSelect from "react-select/async-creatable";
 import { indexBy, isDefined, zip } from "remeda";
@@ -134,28 +140,33 @@ export const TagSelect = Object.assign(
         } as unknown as SelectComponentsConfig<TagSelection, IsMulti, never>),
         ...props.components,
       },
-      styles: rsStyles({
-        valueContainer: (styles) => ({
-          ...styles,
-          paddingLeft: "0.5rem",
-          paddingRight: "0.5rem",
-          paddingTop: "2px",
-          paddingBottom: "2px",
-          gridGap: "0.25rem",
-        }),
-        option: (styles) => ({
-          ...styles,
-          display: "flex",
-          padding: "0.25rem 1rem",
-        }),
-        menuList: (styles, { selectProps }) => {
-          return {
+      styles: {
+        ...({
+          valueContainer: (styles: CSSObjectWithLabel) => ({
             ...styles,
-            ...((selectProps as any).canEditTags ? { paddingBottom: 0 } : {}),
-          };
-        },
+            paddingLeft: "0.5rem",
+            paddingRight: "0.5rem",
+            paddingTop: "2px",
+            paddingBottom: "2px",
+            gridGap: "0.25rem",
+          }),
+          option: (styles: CSSObjectWithLabel) => ({
+            ...styles,
+            display: "flex",
+            padding: "0.25rem 1rem",
+          }),
+          menuList: (
+            styles: CSSObjectWithLabel,
+            { selectProps }: MenuListProps<TagSelection> & ReactSelectExtraProps
+          ) => {
+            return {
+              ...styles,
+              ...((selectProps as any).canEditTags ? { paddingBottom: 0 } : {}),
+            };
+          },
+        } as any),
         ...props.styles,
-      }),
+      },
     });
 
     const valueRef = useUpdatingRef(_value);
@@ -264,20 +275,13 @@ const _mutations = [
   `,
 ];
 
-const rsComponent = genericRsComponent<
-  TagSelection,
-  boolean,
-  never,
-  {
-    selectProps: {
-      newTagColor: string;
-      canEditTags?: () => void;
-      canCreateTags?: boolean;
-    };
-  }
->();
+interface ReactSelectExtraProps {
+  newTagColor: string;
+  canEditTags?: () => void;
+  canCreateTags?: boolean;
+}
 
-const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
+function NoOptionsMessage(props: NoticeProps & { selectProps: ReactSelectExtraProps }) {
   const {
     selectProps: { canCreateTags },
   } = props;
@@ -325,9 +329,9 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
       )}
     </Stack>
   );
-});
+}
 
-const SingleValue = rsComponent("SingleValue", function (props) {
+function SingleValue(props: SingleValueProps<TagSelection>) {
   return (
     <components.SingleValue {...props}>
       <Flex>
@@ -335,9 +339,9 @@ const SingleValue = rsComponent("SingleValue", function (props) {
       </Flex>
     </components.SingleValue>
   );
-});
+}
 
-const MultiValue = rsComponent("MultiValue", function ({ data, removeProps, innerProps }) {
+function MultiValue({ data, removeProps, innerProps }: MultiValueProps<TagSelection>) {
   return (
     <Tag
       tag={data}
@@ -347,9 +351,9 @@ const MultiValue = rsComponent("MultiValue", function ({ data, removeProps, inne
       {...(innerProps as any)}
     />
   );
-});
+}
 
-const Option = rsComponent("Option", function (props) {
+function Option(props: OptionProps<TagSelection> & { selectProps: ReactSelectExtraProps }) {
   const {
     selectProps: { newTagColor },
   } = props;
@@ -380,9 +384,9 @@ const Option = rsComponent("Option", function (props) {
       <Tag flex="0 1 auto" minWidth="0" tag={props.data as TagSelection} />
     </components.Option>
   );
-});
+}
 
-const MenuList = rsComponent("MenuList", function (props) {
+function MenuList(props: MenuListProps<TagSelection> & { selectProps: ReactSelectExtraProps }) {
   const {
     selectProps: { canEditTags },
   } = props;
@@ -409,7 +413,7 @@ const MenuList = rsComponent("MenuList", function (props) {
       ) : null}
     </components.MenuList>
   );
-});
+}
 
 function useGetTagValues<IsMulti extends boolean = false>(
   value: If<IsMulti, TagSelection[] | string[], TagSelection | string | null>,

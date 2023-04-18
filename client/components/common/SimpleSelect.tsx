@@ -1,9 +1,5 @@
 import { isDefined } from "@chakra-ui/utils";
-import {
-  rsComponent,
-  useReactSelectProps,
-  UseReactSelectProps,
-} from "@parallel/utils/react-select/hooks";
+import { useReactSelectProps, UseReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { OptionBase } from "@parallel/utils/react-select/types";
 import { If } from "@parallel/utils/types";
 import {
@@ -15,7 +11,12 @@ import {
   useMemo,
 } from "react";
 import { IntlShape, useIntl } from "react-intl";
-import Select, { Props as SelectProps, SelectInstance, components } from "react-select";
+import Select, {
+  components,
+  OptionProps,
+  Props as SelectProps,
+  SelectInstance,
+} from "react-select";
 import { indexBy } from "remeda";
 
 export interface SimpleOption<T extends string = string> extends OptionBase {
@@ -49,7 +50,7 @@ export const SimpleSelect = forwardRef(function SimpleSelect<
   const rsProps = useReactSelectProps({
     ...props,
     components: {
-      Option,
+      ...({ Option } as any),
       ...props.components,
     },
   });
@@ -96,11 +97,11 @@ export function useSimpleSelectOptions<T extends string = string>(
   return useMemo(() => factory(intl), [intl.locale, ...(deps ?? [])]);
 }
 
-const Option = rsComponent("Option", function ({ innerProps, ...props }) {
+function Option({ innerProps, ...props }: OptionProps<SimpleOption>) {
   return (
     <components.Option
       innerProps={{ ...innerProps, "data-value": props.data.value } as any}
       {...props}
     />
   );
-});
+}

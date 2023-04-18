@@ -5,18 +5,19 @@ import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common
 import { PetitionFieldSelect_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { FieldOptions, usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
-import {
-  genericRsComponent,
-  rsStyles,
-  useReactSelectProps,
-} from "@parallel/utils/react-select/hooks";
+import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
 import { If } from "@parallel/utils/types";
 import { memo, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select, { ActionMeta, components } from "react-select";
+import Select, {
+  ActionMeta,
+  components,
+  CSSObjectWithLabel,
+  OptionProps,
+  SingleValueProps,
+} from "react-select";
 import { zip } from "remeda";
-
 export interface PetitionFieldSelectProps<
   T extends PetitionFieldSelect_PetitionFieldFragment,
   ExpandFields extends boolean = false
@@ -48,13 +49,13 @@ export function PetitionFieldSelect<
       SingleValue,
       Option,
     },
-    styles: rsStyles({
-      option: (styles) => ({
+    styles: {
+      option: (styles: CSSObjectWithLabel) => ({
         ...styles,
         display: "flex",
         padding: "6px 8px",
       }),
-    }),
+    },
   });
 
   const { options, _value } = useMemo(() => {
@@ -226,10 +227,7 @@ const getOptionLabel = (option: PetitionFieldSelectOption<any>) => {
   }
 };
 
-const rsComponent =
-  genericRsComponent<PetitionFieldSelectOption<PetitionFieldSelect_PetitionFieldFragment>>();
-
-const SingleValue = rsComponent("SingleValue", function (props) {
+function SingleValue(props: SingleValueProps<PetitionFieldSelectOption<any>>) {
   return (
     <components.SingleValue {...props}>
       <Flex>
@@ -240,12 +238,12 @@ const SingleValue = rsComponent("SingleValue", function (props) {
       </Flex>
     </components.SingleValue>
   );
-});
+}
 
-const Option = rsComponent("Option", function (props) {
+function Option(props: OptionProps<PetitionFieldSelectOption<any>>) {
   return (
     <components.Option {...props}>
       <PetitionFieldSelectItem option={props.data} highlight={props.selectProps.inputValue ?? ""} />
     </components.Option>
   );
-});
+}

@@ -1,12 +1,12 @@
 import { gql, useApolloClient } from "@apollo/client";
-import { Stack, Text, Image } from "@chakra-ui/react";
+import { Image, Stack, Text } from "@chakra-ui/react";
 import {
   UserSelect_UserGroupFragment,
   useSearchUserGroups_searchUserGroupsDocument,
 } from "@parallel/graphql/__types";
-import { genericRsComponent } from "@parallel/utils/react-select/hooks";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { NoticeProps } from "react-select";
 import { UserSelect, UserSelectProps } from "./UserSelect";
 
 interface UserGroupSelectProps<IsMulti extends boolean>
@@ -22,7 +22,7 @@ export function UserGroupSelect<IsMulti extends boolean>({
     <UserSelect
       isMulti={isMulti}
       includeGroups
-      components={{ NoOptionsMessage }}
+      components={{ NoOptionsMessage } as any}
       placeholder={intl.formatMessage({
         id: "component.user-group-select.placeholder",
         defaultMessage: "Select teams from your organization",
@@ -32,9 +32,7 @@ export function UserGroupSelect<IsMulti extends boolean>({
   );
 }
 
-const rsComponent = genericRsComponent<UserSelect_UserGroupFragment, any, never>();
-
-const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
+function NoOptionsMessage(props: NoticeProps) {
   const {
     selectProps: { inputValue: search },
   } = props;
@@ -65,7 +63,7 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
       )}
     </Stack>
   );
-});
+}
 
 export function useSearchUserGroups() {
   const client = useApolloClient();

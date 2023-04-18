@@ -1,11 +1,17 @@
 import { gql } from "@apollo/client";
 import { Badge, Box, Button, HStack, Stack, Text } from "@chakra-ui/react";
 import { DocumentThemeSelect_OrganizationThemeFragment } from "@parallel/graphql/__types";
-import { genericRsComponent, useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
 import { ForwardedRef, forwardRef, ReactElement, RefAttributes } from "react";
 import { FormattedMessage } from "react-intl";
-import Select, { components, SelectInstance } from "react-select";
+import Select, {
+  components,
+  NoticeProps,
+  OptionProps,
+  SelectInstance,
+  SingleValueProps,
+} from "react-select";
 
 type Selection = DocumentThemeSelect_OrganizationThemeFragment;
 export type DocumentThemeSelectInstance = SelectInstance<Selection>;
@@ -70,19 +76,12 @@ export const DocumentThemeSelect = Object.assign(
   }
 );
 
-const rsComponent = genericRsComponent<
-  Selection,
-  false,
-  never,
-  {
-    selectProps: {
-      onCreateNewTheme: () => void;
-      isCreateNewThemeDisabled?: boolean;
-    };
-  }
->();
+interface ReactSelectExtraProps {
+  onCreateNewTheme: () => void;
+  isCreateNewThemeDisabled?: boolean;
+}
 
-const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
+function NoOptionsMessage(props: NoticeProps & { selectProps: ReactSelectExtraProps }) {
   const {
     selectProps: { onCreateNewTheme, isCreateNewThemeDisabled },
   } = props;
@@ -106,9 +105,9 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
       </Button>
     </Stack>
   );
-});
+}
 
-const SingleValue = rsComponent("SingleValue", function (props) {
+function SingleValue(props: SingleValueProps<Selection>) {
   return (
     <components.SingleValue {...props}>
       <HStack>
@@ -123,9 +122,9 @@ const SingleValue = rsComponent("SingleValue", function (props) {
       </HStack>
     </components.SingleValue>
   );
-});
+}
 
-const Option = rsComponent("Option", function ({ children, ...props }) {
+function Option({ children, ...props }: OptionProps<Selection>) {
   return (
     <components.Option {...props}>
       <HStack>
@@ -140,4 +139,4 @@ const Option = rsComponent("Option", function ({ children, ...props }) {
       </HStack>
     </components.Option>
   );
-});
+}

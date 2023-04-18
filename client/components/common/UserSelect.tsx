@@ -9,13 +9,21 @@ import {
   UserSelect_UserGroupFragment,
   UserSelect_UserGroupFragmentDoc,
 } from "@parallel/graphql/__types";
-import { genericRsComponent, useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
 import { If, MaybeArray, unMaybeArray } from "@parallel/utils/types";
 import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import { ForwardedRef, forwardRef, ReactElement, RefAttributes, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select, { components, SelectComponentsConfig, SelectInstance } from "react-select";
+import Select, {
+  components,
+  MultiValueGenericProps,
+  NoticeProps,
+  OptionProps,
+  SelectComponentsConfig,
+  SelectInstance,
+  SingleValueProps,
+} from "react-select";
 import AsyncSelect from "react-select/async";
 import { indexBy, zip } from "remeda";
 import { OverflownText } from "./OverflownText";
@@ -302,19 +310,12 @@ const getOptionLabel = (option: UserSelectSelection<any>) => {
 
 const getOptionValue = (option: UserSelectSelection<any>) => option.id;
 
-const rsComponent = genericRsComponent<
-  UserSelectSelection<boolean>,
-  boolean,
-  never,
-  {
-    selectProps: {
-      canCreateUsers?: boolean;
-      includeGroups?: boolean;
-    };
-  }
->();
+interface ReactSelectExtraProps {
+  canCreateUsers?: boolean;
+  includeGroups?: boolean;
+}
 
-const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
+function NoOptionsMessage(props: NoticeProps & { selectProps: ReactSelectExtraProps }) {
   const {
     selectProps: { inputValue: search, canCreateUsers, includeGroups },
   } = props;
@@ -325,19 +326,22 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
       includeGroups={includeGroups}
     />
   );
-});
+}
 
-const SingleValue = rsComponent("SingleValue", function (props) {
+function SingleValue(props: SingleValueProps<UserSelectSelection<boolean>>) {
   return (
     <components.SingleValue {...props}>
       <UserSelectOption data={props.data} isDisabled={props.isDisabled} />
     </components.SingleValue>
   );
-});
+}
 
-const MultiValueLabel = rsComponent("MultiValueLabel", function ({ children, ...props }) {
+function MultiValueLabel({
+  children,
+  ...props
+}: MultiValueGenericProps<UserSelectSelection<boolean>>) {
   const intl = useIntl();
-  const data = props.data as unknown as UserSelectSelection<any>;
+  const data = props.data;
   return (
     <components.MultiValueLabel {...(props as any)}>
       {data.__typename === "User" ? (
@@ -366,9 +370,9 @@ const MultiValueLabel = rsComponent("MultiValueLabel", function ({ children, ...
       ) : null}
     </components.MultiValueLabel>
   );
-});
+}
 
-const Option = rsComponent("Option", function ({ children, ...props }) {
+function Option({ children, ...props }: OptionProps<UserSelectSelection<boolean>>) {
   return (
     <components.Option
       {...props}
@@ -394,4 +398,4 @@ const Option = rsComponent("Option", function ({ children, ...props }) {
       />
     </components.Option>
   );
-});
+}

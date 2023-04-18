@@ -1,8 +1,7 @@
 import { Box, Stack, Text } from "@chakra-ui/react";
-import { genericRsComponent, rsStyles } from "@parallel/utils/react-select/hooks";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
-import { components } from "react-select";
+import { components, CSSObjectWithLabel, OptionProps, SingleValueProps } from "react-select";
 import { SimpleOption, SimpleSelect, SimpleSelectProps } from "./SimpleSelect";
 
 export const DEFAULT_COLORS = [
@@ -80,23 +79,21 @@ export type TagColorSelectProps = Omit<
 
 export function TagColorSelect(props: TagColorSelectProps) {
   const options = useTagColors();
-  const styles = rsStyles<SimpleOption, false>({
-    valueContainer: (styles) => ({
-      ...styles,
-      flexWrap: "nowrap",
-    }),
-    option: (styles) => ({
-      ...styles,
-      display: "flex",
-      padding: "0.25rem 1rem",
-    }),
-  });
-
   return (
     <SimpleSelect
       options={options}
-      components={{ SingleValue, Option }}
-      styles={styles}
+      components={{ SingleValue, Option } as any}
+      styles={{
+        valueContainer: (styles: CSSObjectWithLabel) => ({
+          ...styles,
+          flexWrap: "nowrap",
+        }),
+        option: (styles: CSSObjectWithLabel) => ({
+          ...styles,
+          display: "flex",
+          padding: "0.25rem 1rem",
+        }),
+      }}
       {...props}
     />
   );
@@ -113,20 +110,18 @@ function TagColorOption({ color }: { color: SimpleOption }) {
   );
 }
 
-const rsComponent = genericRsComponent<SimpleOption, false>();
-
-const SingleValue = rsComponent("SingleValue", function (props) {
+function SingleValue(props: SingleValueProps<SimpleOption<string>>) {
   return (
     <components.SingleValue {...props}>
       <TagColorOption color={props.data} />
     </components.SingleValue>
   );
-});
+}
 
-const Option = rsComponent("Option", function (props) {
+function Option(props: OptionProps<SimpleOption<string>>) {
   return (
     <components.Option {...props}>
       <TagColorOption color={props.data} />
     </components.Option>
   );
-});
+}

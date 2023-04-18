@@ -2,11 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Text, Tooltip } from "@chakra-ui/react";
 import { AlertCircleFilledIcon, UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
-import {
-  genericRsComponent,
-  useReactSelectProps,
-  UseReactSelectProps,
-} from "@parallel/utils/react-select/hooks";
+import { useReactSelectProps, UseReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/types";
 import { Maybe, unMaybeArray } from "@parallel/utils/types";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
@@ -22,7 +18,16 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { components, InputActionMeta, SelectInstance } from "react-select";
+import {
+  components,
+  InputActionMeta,
+  InputProps,
+  MultiValueProps,
+  NoticeProps,
+  OptionProps,
+  SelectInstance,
+  SingleValueProps,
+} from "react-select";
 import AsyncCreatableSelect, { AsyncCreatableProps } from "react-select/async-creatable";
 import { isDefined, pick } from "remeda";
 import { DeletedContact } from "./DeletedContact";
@@ -228,22 +233,20 @@ function useContactSelectReactSelectProps<IsMulti extends boolean>(
 ): AsyncCreatableProps<ContactSelectSelection, IsMulti, never> {
   const rsProps = useReactSelectProps<ContactSelectSelection, IsMulti, never>(props);
 
-  const components = {
-    ...rsProps.components,
-    NoOptionsMessage,
-    MultiValueLabel,
-    SingleValue,
-    Option,
-    Input,
-  };
-
   return {
     ...rsProps,
     getOptionLabel,
     getOptionValue,
     isValidNewOption,
     formatCreateLabel,
-    components,
+    components: {
+      ...rsProps.components,
+      NoOptionsMessage,
+      MultiValueLabel,
+      SingleValue,
+      Option,
+      Input,
+    } as any,
   };
 }
 
@@ -273,18 +276,7 @@ const formatCreateLabel = (label: string) => {
   );
 };
 
-const rsComponent = genericRsComponent<
-  ContactSelectSelection,
-  any,
-  never,
-  {
-    selectProps: {
-      onPasteEmails?: (emails: string[]) => void;
-    };
-  }
->();
-
-const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
+function NoOptionsMessage(props: NoticeProps) {
   const search = props.selectProps.inputValue;
   return (
     <Box textAlign="center" color="gray.400" padding={4}>
@@ -318,9 +310,9 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
       )}
     </Box>
   );
-});
+}
 
-const MultiValueLabel = rsComponent("MultiValueLabel", function ({ children, ...props }) {
+function MultiValueLabel({ children, ...props }: MultiValueProps<ContactSelectSelection>) {
   const { fullName, email, isDeleted, hasBouncedEmail } = props.data;
   const intl = useIntl();
   const showHasBounced = !isDeleted && hasBouncedEmail;
@@ -343,9 +335,9 @@ const MultiValueLabel = rsComponent("MultiValueLabel", function ({ children, ...
       ) : null}
     </>
   );
-});
+}
 
-const SingleValue = rsComponent("SingleValue", function (props) {
+function SingleValue(props: SingleValueProps<ContactSelectSelection>) {
   const { fullName, email, isDeleted, hasBouncedEmail } = props.data;
   const intl = useIntl();
   return (
@@ -365,9 +357,9 @@ const SingleValue = rsComponent("SingleValue", function (props) {
       ) : null}
     </components.SingleValue>
   );
-});
+}
 
-const Option = rsComponent("Option", function ({ children, ...props }) {
+function Option({ children, ...props }: OptionProps<ContactSelectSelection>) {
   if ((props.data as any).__isNew__) {
     return (
       <components.Option
@@ -378,7 +370,7 @@ const Option = rsComponent("Option", function ({ children, ...props }) {
       </components.Option>
     );
   } else {
-    const contact = props.data as ContactSelectSelection;
+    const contact = props.data;
     return (
       <components.Option
         {...props}
@@ -398,9 +390,15 @@ const Option = rsComponent("Option", function ({ children, ...props }) {
       </components.Option>
     );
   }
-});
+}
 
-const Input = rsComponent("Input", function (props) {
+function Input(
+  props: InputProps & {
+    selectProps: {
+      onPasteEmails?: (emails: string[]) => void;
+    };
+  }
+) {
   return (
     <components.Input
       {...props}
@@ -420,4 +418,4 @@ const Input = rsComponent("Input", function (props) {
       }}
     />
   );
-});
+}
