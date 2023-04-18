@@ -1,11 +1,10 @@
-import { getParent } from "@udecode/plate-common";
-import { isElement } from "@udecode/plate-core";
+import { getParentNode, isElement } from "@udecode/plate-core";
 import { toggleList } from "@udecode/plate-list";
 import { CustomEditor } from "./types";
 
 export function formatList(editor: CustomEditor, elementType: string) {
   if (editor.selection) {
-    const parentEntry = getParent(editor as any, editor.selection);
+    const parentEntry = getParentNode(editor as any, editor.selection);
     if (!parentEntry) return;
     const [node] = parentEntry;
     if (isElement(node)) {

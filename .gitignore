@@ -4,6 +4,7 @@ client/.next
 client/.env.local
 client/public/static/lang
 client/tsconfig.tsbuildinfo
+client/tracing
 
 server/dist
 server/bin/localtunnel-dev.url
@@ -15,3 +16,4 @@ e2e/playwright-report/
 e2e/playwright/.cache/
 
 .DS_Store
+yarn-error.log

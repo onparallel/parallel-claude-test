@@ -2,8 +2,12 @@ import { BracesIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ELEMENT_PLACEHOLDER_INPUT } from "@parallel/utils/slate/PlaceholderPlugin";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import { getPreventDefaultHandler } from "@udecode/plate-common";
-import { focusEditor, insertNode, usePlateEditorRef } from "@udecode/plate-core";
+import {
+  focusEditor,
+  getPreventDefaultHandler,
+  insertNode,
+  usePlateEditorRef,
+} from "@udecode/plate-core";
 import { isSelectionInMentionInput } from "@udecode/plate-mention";
 import { useCallback } from "react";
 import { useIntl } from "react-intl";

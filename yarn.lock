@@ -7037,6 +7037,20 @@
     "@typescript-eslint/types" "5.50.0"
     eslint-visitor-keys "^3.3.0"
 
+"@typescript/analyze-trace@^0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@typescript/analyze-trace/-/analyze-trace-0.10.0.tgz#bfe366bf37e5ce7a2cb4423f8e9545aefefb199f"
+  integrity sha512-VNoPaIcGrMnI0MQinlxg8IFAN7+xbqB0AdymUTHh6hIZqlhHFZr1X7xUBonTpL0xiDupHl+/GtP59pdOFOCqjw==
+  dependencies:
+    chalk "^4.1.2"
+    exit "^0.1.2"
+    jsonparse "^1.3.1"
+    jsonstream-next "^3.0.0"
+    p-limit "^3.1.0"
+    split2 "^3.2.2"
+    treeify "^1.1.0"
+    yargs "^16.2.0"
+
 "@udecode/plate-autoformat@^19.2.0":
   version "19.2.0"
   resolved "https://registry.yarnpkg.com/@udecode/plate-autoformat/-/plate-autoformat-19.2.0.tgz#b9350996ec545f8678f37b018302092340fcffe1"
@@ -7074,14 +7088,6 @@
     "@udecode/plate-floating" "19.2.0"
     downshift "^6.1.7"
 
-"@udecode/plate-common@^7.0.2":
-  version "7.0.2"
-  resolved "https://registry.yarnpkg.com/@udecode/plate-common/-/plate-common-7.0.2.tgz#cd2fc3ffdc70c41a43a71356742a9cf61b7991c7"
-  integrity sha512-FYggaasSk7Acy+l/N+dMCuBrVKXwEyRFATry4c5crjQqqhz7PPKtNmmpBGVOLFrEuI76gzZXzk3IrXRwPQebbQ==
-  dependencies:
-    "@udecode/plate-core" "7.0.2"
-    is-hotkey "^0.1.6"
-
 "@udecode/plate-core@19.2.0", "@udecode/plate-core@^19.2.0":
   version "19.2.0"
   resolved "https://registry.yarnpkg.com/@udecode/plate-core/-/plate-core-19.2.0.tgz#36413cf296249c0463374ec50c22a15d163b3241"
@@ -7096,15 +7102,6 @@
     react-hotkeys-hook "^3.4.6"
     use-deep-compare "^1.1.0"
     zustand "^3.7.2"
-
-"@udecode/plate-core@7.0.2":
-  version "7.0.2"
-  resolved "https://registry.yarnpkg.com/@udecode/plate-core/-/plate-core-7.0.2.tgz#7205e65945ab43f5df9f8d328515553ddbe29484"
-  integrity sha512-YFmzVRcRWkWRbqRuD/guCHuSb/NSdUtUocSz1XL7I/oCzZgXY5ddqsj6Aciu2hiiI0s9PeeAPwmegOi1lsClRg==
-  dependencies:
-    clsx "^1.1.1"
-    lodash "^4.17.21"
-    zustand "^3.4.2"
 
 "@udecode/plate-floating@19.2.0":
   version "19.2.0"
@@ -13427,10 +13424,18 @@ jsonlines@^0.1.1:
   resolved "https://registry.yarnpkg.com/jsonlines/-/jsonlines-0.1.1.tgz#4fcd246dc5d0e38691907c44ab002f782d1d94cc"
   integrity sha512-ekDrAGso79Cvf+dtm+mL8OBI2bmAOt3gssYs833De/C9NmIpWDWyUO4zPgB5x2/OhY366dkhgfPMYfwZF7yOZA==
 
-jsonparse@^1.3.1:
+jsonparse@^1.2.0, jsonparse@^1.3.1:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/jsonparse/-/jsonparse-1.3.1.tgz#3f4dae4a91fac315f71062f8521cc239f1366280"
   integrity sha512-POQXvpdL69+CluYsillJ7SUhKvytYjW9vG/GKpnf+xP8UWgYEM/RaMzHHofbALDiKbbP1W8UEYmgGl39WkPZsg==
+
+jsonstream-next@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/jsonstream-next/-/jsonstream-next-3.0.0.tgz#45664fb89e50799fb220b4e9017cbc458b5917e4"
+  integrity sha512-aAi6oPhdt7BKyQn1SrIIGZBt0ukKuOUE1qV6kJ3GgioSOYzsRc8z9Hfr1BVmacA/jLe9nARfmgMGgn68BqIAgg==
+  dependencies:
+    jsonparse "^1.2.0"
+    through2 "^4.0.2"
 
 jsonwebtoken@^9.0.0:
   version "9.0.0"
@@ -16879,6 +16884,15 @@ readable-stream@1.1.x:
     isarray "0.0.1"
     string_decoder "~0.10.x"
 
+readable-stream@3, readable-stream@^3.0.0:
+  version "3.6.2"
+  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-3.6.2.tgz#56a9b36ea965c00c5a93ef31eb111a0f11056967"
+  integrity sha512-9u/sniCrY3D5WdsERHzHE4G2YCXqoG5FTHUiCC4SIbr6XcLZBY05ya9EKjYek9O5xOAwjGq+1JdGBAS7Q9ScoA==
+  dependencies:
+    inherits "^2.0.3"
+    string_decoder "^1.1.1"
+    util-deprecate "^1.0.1"
+
 readable-stream@^2.0.0, readable-stream@^2.0.2, readable-stream@^2.0.5, readable-stream@^2.0.6, readable-stream@^2.2.2, readable-stream@~2.3.6:
   version "2.3.7"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-2.3.7.tgz#1eca1cf711aef814c04f62252a36a62f6cb23b57"
@@ -18054,6 +18068,13 @@ split-string@^3.0.1, split-string@^3.0.2:
   dependencies:
     extend-shallow "^3.0.0"
 
+split2@^3.2.2:
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/split2/-/split2-3.2.2.tgz#bf2cf2a37d838312c249c89206fd7a17dd12365f"
+  integrity sha512-9NThjpgZnifTkJpzTZ7Eue85S49QwpNhZTq6GRJwObb6jnLFNGB7Qm73V5HewTROPyxD0C29xqmaI68bQtV+hg==
+  dependencies:
+    readable-stream "^3.0.0"
+
 split2@^4.0.0, split2@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/split2/-/split2-4.1.0.tgz#101907a24370f85bb782f08adaabe4e281ecf809"
@@ -18573,6 +18594,13 @@ throttle-debounce@^2.1.0:
   resolved "https://registry.yarnpkg.com/throttle-debounce/-/throttle-debounce-2.3.0.tgz#fd31865e66502071e411817e241465b3e9c372e2"
   integrity sha512-H7oLPV0P7+jgvrk+6mwwwBDmxTaxnu9HMXmloNLXwnNO0ZxZ31Orah2n8lU1eMPvsaowP2CX+USCgyovXfdOFQ==
 
+through2@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/through2/-/through2-4.0.2.tgz#a7ce3ac2a7a8b0b966c80e7c49f0484c3b239764"
+  integrity sha512-iOqSav00cVxEEICeD7TjLB1sueEL+81Wpzp2bY17uZjZN0pWZPuo4suZ/61VujxmqSGFfgOcNuTZ85QJwNZQpw==
+  dependencies:
+    readable-stream "3"
+
 through@^2.3.6, through@^2.3.8:
   version "2.3.8"
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
@@ -18737,6 +18765,11 @@ tree-kill@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/tree-kill/-/tree-kill-1.2.2.tgz#4ca09a9092c88b73a7cdc5e8a01b507b0790a0cc"
   integrity sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==
+
+treeify@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/treeify/-/treeify-1.1.0.tgz#4e31c6a463accd0943879f30667c4fdaff411bb8"
+  integrity sha512-1m4RA7xVAJrSGrrXGs0L3YTwyvBs2S8PbRHaLZAkFw7JR8oIFwYtysxlBZhYIa7xSyiYJKZ3iGrrk55cGA3i9A==
 
 triple-beam@^1.3.0:
   version "1.3.0"
@@ -20035,7 +20068,7 @@ zip-stream@^4.1.0:
     compress-commons "^4.1.0"
     readable-stream "^3.6.0"
 
-zustand@^3.4.2, zustand@^3.7.2:
+zustand@^3.7.2:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/zustand/-/zustand-3.7.2.tgz#7b44c4f4a5bfd7a8296a3957b13e1c346f42514d"
   integrity sha512-PIJDIZKtokhof+9+60cpockVOq05sJzHCriyvaLBmEJixseQ1a5Kdov6fWZfWOu5SK9c+FhH1jU0tntLxRJYMA==

@@ -39,7 +39,6 @@
     "@udecode/plate-basic-marks": "^19.2.0",
     "@udecode/plate-break": "^19.2.0",
     "@udecode/plate-combobox": "^19.2.0",
-    "@udecode/plate-common": "^7.0.2",
     "@udecode/plate-core": "^19.2.0",
     "@udecode/plate-heading": "^19.2.0",
     "@udecode/plate-link": "^19.2.0",

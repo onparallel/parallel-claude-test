@@ -8,7 +8,7 @@ import { getMinMaxCheckboxLimit } from "@parallel/utils/petitionFields";
 import { isEmptyParagraph } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { SlateElement, SlateText } from "@parallel/utils/slate/types";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import { isSelectionExpanded } from "@udecode/plate-common";
+import { isSelectionExpanded } from "@udecode/plate-core";
 import {
   forwardRef,
   KeyboardEvent,
@@ -84,7 +84,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
 
       const handleKeyDown = useCallback(
         (event: KeyboardEvent) => {
-          if (editor.selection && isSelectionExpanded(editor)) {
+          if (editor.selection && isSelectionExpanded(editor as any)) {
             return;
           }
           const anchor = editor.selection?.anchor;

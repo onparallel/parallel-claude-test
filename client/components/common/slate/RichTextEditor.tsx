@@ -23,7 +23,6 @@ import {
 } from "@udecode/plate-basic-marks";
 import { createExitBreakPlugin } from "@udecode/plate-break";
 import { createComboboxPlugin } from "@udecode/plate-combobox";
-import { withProps } from "@udecode/plate-common";
 import {
   createHistoryPlugin,
   createPlugins,
@@ -31,6 +30,7 @@ import {
   focusEditor,
   PlatePlugin,
   PlateProvider,
+  withProps,
 } from "@udecode/plate-core";
 import { createHeadingPlugin, ELEMENT_H1, ELEMENT_H2 } from "@udecode/plate-heading";
 import { createLinkPlugin, ELEMENT_LINK } from "@udecode/plate-link";

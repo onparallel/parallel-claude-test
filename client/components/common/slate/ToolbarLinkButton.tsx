@@ -6,12 +6,15 @@ import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterW
 import { SlateElement, SlateText } from "@parallel/utils/slate/types";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import {
-  getAbove,
+  focusEditor,
+  getAboveNode,
   getPreventDefaultHandler,
   insertNodes,
   isCollapsed,
-} from "@udecode/plate-common";
-import { focusEditor, moveSelection, select, usePlateEditorRef } from "@udecode/plate-core";
+  moveSelection,
+  select,
+  usePlateEditorRef,
+} from "@udecode/plate-core";
 import { upsertLink } from "@udecode/plate-link";
 import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -42,7 +45,7 @@ export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonPro
           Editor.end(editorRef.current as any, [])
         );
         const linkNode = editorRef.current.selection
-          ? getAbove<LinkNode>(editorRef.current as any, { match: { type: "link" } })
+          ? getAboveNode<LinkNode>(editorRef.current as any, { match: { type: "link" } })
           : undefined;
         const [_, link] = await withError(
           showAddLinkDialog({

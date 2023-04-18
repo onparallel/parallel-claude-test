@@ -1,6 +1,10 @@
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { getPreventDefaultHandler, isMarkActive, toggleMark } from "@udecode/plate-common";
-import { usePlateEditorRef } from "@udecode/plate-core";
+import {
+  getPreventDefaultHandler,
+  isMarkActive,
+  toggleMark,
+  usePlateEditorRef,
+} from "@udecode/plate-core";
 import { ToolbarButton, ToolbarButtonProps } from "./ToolbarButton";
 
 export interface ToolbarMarkButtonProps extends Omit<ToolbarButtonProps, "isToggeable" | "type"> {
@@ -14,7 +18,7 @@ export const ToolbarMarkButton = chakraForwardRef<"button", ToolbarMarkButtonPro
     return (
       <ToolbarButton
         ref={ref}
-        onMouseDown={getPreventDefaultHandler(toggleMark, editor as any, type)}
+        onMouseDown={getPreventDefaultHandler(toggleMark, editor as any, { key: type })}
         isToggleable
         isActive={isActive}
         {...props}
