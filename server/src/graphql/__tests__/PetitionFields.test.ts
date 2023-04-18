@@ -2038,6 +2038,63 @@ describe("GraphQL/Petition Fields", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("sets petition to PENDING if rejecting a reply", async () => {
+      const [completedPetition] = await mocks.createRandomPetitions(
+        organization.id,
+        user.id,
+        1,
+        () => ({ status: "COMPLETED" })
+      );
+      const [field] = await mocks.createRandomPetitionFields(completedPetition.id, 1, () => ({
+        type: "TEXT",
+      }));
+
+      const [reply] = await mocks.createRandomTextReply(field.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $petitionFieldReplyIds: [GID!]!
+            $status: PetitionFieldReplyStatus!
+          ) {
+            updatePetitionFieldRepliesStatus(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              petitionFieldReplyIds: $petitionFieldReplyIds
+              status: $status
+            ) {
+              id
+              petition {
+                id
+                ... on Petition {
+                  status
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", completedPetition.id),
+          petitionFieldId: toGlobalId("PetitionField", field.id),
+          petitionFieldReplyIds: [toGlobalId("PetitionFieldReply", reply.id)],
+          status: "REJECTED",
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updatePetitionFieldRepliesStatus).toEqual({
+        id: toGlobalId("PetitionField", field.id),
+        petition: {
+          id: toGlobalId("Petition", completedPetition.id),
+          status: "PENDING",
+        },
+      });
+    });
   });
 
   describe("approveOrRejectPetitionFieldReplies", () => {
