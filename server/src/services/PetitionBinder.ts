@@ -292,7 +292,13 @@ export class PetitionBinder implements IPetitionBinder {
       .map(([field]) => field);
 
     return pFlatMap(visibleFieldWithReplies, async ({ replies, ...field }) => {
-      const files = await this.files.loadFileUpload(replies.map((r) => r.content.file_upload_id));
+      const fileUploadIds: number[] = replies
+        .map((r) => r.content.file_upload_id)
+        .filter(isDefined);
+      if (fileUploadIds.length === 0) {
+        return [];
+      }
+      const files = await this.files.loadFileUpload(fileUploadIds);
       const printable = files
         .filter(isDefined)
         .filter((f) => f.upload_complete && isPrintableContentType(f.content_type));
