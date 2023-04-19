@@ -22,7 +22,7 @@ import {
   getEndPoint,
   PlateProvider,
   withProps,
-} from "@udecode/plate-core";
+} from "@udecode/plate-common";
 import { ELEMENT_MENTION_INPUT } from "@udecode/plate-mention";
 import { createParagraphPlugin, ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";

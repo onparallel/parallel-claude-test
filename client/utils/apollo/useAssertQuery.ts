@@ -3,7 +3,10 @@ import { QueryHookOptions, QueryResult, useApolloClient, useQuery } from "@apoll
 import { assignRef } from "@chakra-ui/hooks";
 import { useRef } from "react";
 
-export function useAssertQuery<TData = any, TVariables = OperationVariables>(
+export function useAssertQuery<
+  TData = any,
+  TVariables extends OperationVariables = OperationVariables
+>(
   query: DocumentNode | TypedDocumentNode<TData, TVariables>,
   options?: QueryHookOptions<TData, TVariables>
 ): QueryResult<TData, TVariables> & { data: TData } {
@@ -20,7 +23,10 @@ export function useAssertQuery<TData = any, TVariables = OperationVariables>(
   };
 }
 
-export function useAssertQueryOrPreviousData<TData = any, TVariables = OperationVariables>(
+export function useAssertQueryOrPreviousData<
+  TData = any,
+  TVariables extends OperationVariables = OperationVariables
+>(
   query: DocumentNode | TypedDocumentNode<TData, TVariables>,
   options?: QueryHookOptions<TData, TVariables>
 ): QueryResult<TData, TVariables> & { data: TData } {

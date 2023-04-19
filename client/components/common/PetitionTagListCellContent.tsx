@@ -38,7 +38,6 @@ export function PetitionTagListCellContent({
         });
       } else {
         await scrollIntoView(selectWrapperRef.current!, {
-          duration: 0,
           scrollMode: "if-needed",
           block: "nearest",
           inline: "nearest",

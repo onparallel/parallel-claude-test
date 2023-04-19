@@ -19,7 +19,7 @@ import {
   toDOMNode,
   useEditorState,
   useEventEditorSelectors,
-} from "@udecode/plate-core";
+} from "@udecode/plate-common";
 import { flip, offset, shift, useVirtualFloating } from "@udecode/plate-floating";
 import { useCallback, useEffect, useState } from "react";
 import { Card } from "../Card";

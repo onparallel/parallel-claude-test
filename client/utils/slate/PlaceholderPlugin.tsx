@@ -12,7 +12,7 @@ import {
   TRenderElementProps,
   usePlateEditorRef,
   Value,
-} from "@udecode/plate-core";
+} from "@udecode/plate-common";
 import {
   createMentionPlugin,
   ELEMENT_MENTION_INPUT,

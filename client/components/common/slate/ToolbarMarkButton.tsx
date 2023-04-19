@@ -1,10 +1,6 @@
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import {
-  getPreventDefaultHandler,
-  isMarkActive,
-  toggleMark,
-  usePlateEditorRef,
-} from "@udecode/plate-core";
+import { getPreventDefaultHandler } from "@parallel/utils/events";
+import { isMarkActive, toggleMark, usePlateEditorRef } from "@udecode/plate-common";
 import { ToolbarButton, ToolbarButtonProps } from "./ToolbarButton";
 
 export interface ToolbarMarkButtonProps extends Omit<ToolbarButtonProps, "isToggeable" | "type"> {

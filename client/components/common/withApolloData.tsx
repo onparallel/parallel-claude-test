@@ -13,7 +13,7 @@ import Router from "next/router";
 
 export type WithApolloDataContext = NextPageContext & {
   apollo: ApolloClient<any>;
-  fetchQuery<TData = any, TVariables = OperationVariables>(
+  fetchQuery<TData = any, TVariables extends OperationVariables = OperationVariables>(
     query: DocumentNode | TypedDocumentNode<TData, TVariables>,
     options?: {
       variables?: TVariables;
@@ -71,7 +71,10 @@ export function withApolloData<P = {}>(
               (await getInitialProps?.({
                 ...context,
                 apollo,
-                async fetchQuery<TData = any, TVariables = OperationVariables>(
+                async fetchQuery<
+                  TData = any,
+                  TVariables extends OperationVariables = OperationVariables
+                >(
                   query: DocumentNode | TypedDocumentNode<TData, TVariables>,
                   options?: {
                     variables?: TVariables;

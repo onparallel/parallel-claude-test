@@ -1,4 +1,4 @@
-import { PlateEditor, TDescendant, TElement, TText } from "@udecode/plate-core";
+import { PlateEditor, TDescendant, TElement, TText } from "@udecode/plate-common";
 
 export type CustomEditor<Value extends SlateElement[] = SlateElement[]> = PlateEditor<Value>;
 

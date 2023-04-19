@@ -1,6 +1,7 @@
 import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { LinkIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { getPreventDefaultHandler } from "@parallel/utils/events";
 import { withError } from "@parallel/utils/promises/withError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { SlateElement, SlateText } from "@parallel/utils/slate/types";
@@ -8,13 +9,12 @@ import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import {
   focusEditor,
   getAboveNode,
-  getPreventDefaultHandler,
   insertNodes,
   isCollapsed,
   moveSelection,
   select,
   usePlateEditorRef,
-} from "@udecode/plate-core";
+} from "@udecode/plate-common";
 import { upsertLink } from "@udecode/plate-link";
 import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";

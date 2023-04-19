@@ -1,5 +1,5 @@
 import { assignRef } from "@parallel/utils/assignRef";
-import { Plate, PlateEditor, PlateProps, usePlateEditorRef, Value } from "@udecode/plate-core";
+import { Plate, PlateEditor, PlateProps, usePlateEditorRef, Value } from "@udecode/plate-common";
 import { Ref } from "react";
 
 interface PlateWithEditorRefProps<

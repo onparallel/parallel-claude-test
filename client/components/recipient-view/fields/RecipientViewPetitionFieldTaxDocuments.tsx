@@ -4,7 +4,7 @@ import { useTone } from "@parallel/components/common/ToneProvider";
 import { centeredPopup, openNewWindow } from "@parallel/utils/openNewWindow";
 import { useInterval } from "@parallel/utils/useInterval";
 import { useWindowEvent } from "@parallel/utils/useWindowEvent";
-import { isDefined } from "@udecode/plate-core";
+import { isDefined } from "@udecode/plate-common";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";

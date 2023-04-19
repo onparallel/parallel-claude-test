@@ -8,7 +8,7 @@ import { getMinMaxCheckboxLimit } from "@parallel/utils/petitionFields";
 import { isEmptyParagraph } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { SlateElement, SlateText } from "@parallel/utils/slate/types";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import { isSelectionExpanded } from "@udecode/plate-core";
+import { isSelectionExpanded } from "@udecode/plate-common";
 import {
   forwardRef,
   KeyboardEvent,

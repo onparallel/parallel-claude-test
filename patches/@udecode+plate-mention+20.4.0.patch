@@ -1,12 +1,10 @@
 diff --git a/node_modules/@udecode/plate-mention/dist/index.es.js b/node_modules/@udecode/plate-mention/dist/index.es.js
-index 7ebb95a..cf5abcb 100644
+index a816045..c4fa3d8 100644
 --- a/node_modules/@udecode/plate-mention/dist/index.es.js
 +++ b/node_modules/@udecode/plate-mention/dist/index.es.js
-@@ -576,8 +576,9 @@ const getMentionOnSelectItem = ({
-       search: (_comboboxSelectors$te = comboboxSelectors.text()) !== null && _comboboxSelectors$te !== void 0 ? _comboboxSelectors$te : ''
+@@ -577,7 +577,7 @@ const getMentionOnSelectItem = ({
      });
      select(editor, targetRange);
-+    isNodeMentionInput
      withoutMergingHistory(editor, () => removeNodes(editor, {
 -      match: node => node.type === ELEMENT_MENTION_INPUT
 +      match: node => isNodeMentionInput(editor, node)
@@ -14,15 +12,15 @@ index 7ebb95a..cf5abcb 100644
      insertNodes(editor, {
        type,
 diff --git a/node_modules/@udecode/plate-mention/dist/index.js b/node_modules/@udecode/plate-mention/dist/index.js
-index eb7ac41..2c2eff9 100644
+index 726baf9..4e17212 100644
 --- a/node_modules/@udecode/plate-mention/dist/index.js
 +++ b/node_modules/@udecode/plate-mention/dist/index.js
 @@ -581,7 +581,7 @@ const getMentionOnSelectItem = ({
      });
-     plateCore.select(editor, targetRange);
-     plateCore.withoutMergingHistory(editor, () => plateCore.removeNodes(editor, {
+     plateCommon.select(editor, targetRange);
+     plateCommon.withoutMergingHistory(editor, () => plateCommon.removeNodes(editor, {
 -      match: node => node.type === ELEMENT_MENTION_INPUT
-+      match: node => isNodeMentionInput(editor, node),
++      match: node => isNodeMentionInput(editor, node)
      }));
-     plateCore.insertNodes(editor, {
+     plateCommon.insertNodes(editor, {
        type,

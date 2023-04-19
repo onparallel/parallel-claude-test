@@ -72,7 +72,7 @@ export function useShortTextFormats() {
             const prefix = (value + appended).slice(0, 2);
             const mask = compiledMasks.find((m) => {
               return ((m as any).country as string).startsWith(prefix);
-            });
+            })!;
             return mask;
           },
         },

@@ -175,7 +175,6 @@ export function RecipientSelectGroups({
       if (recipientGroupSelectRef[index].current) {
         recipientGroupSelectRef[index].current?.focus();
         scrollIntoView(recipientGroupFormControlRef[index].current!, {
-          duration: 0,
           scrollMode: "if-needed",
           block: "start",
         });

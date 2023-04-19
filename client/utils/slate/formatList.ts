@@ -1,4 +1,4 @@
-import { getParentNode, isElement } from "@udecode/plate-core";
+import { getParentNode, isElement } from "@udecode/plate-common";
 import { toggleList } from "@udecode/plate-list";
 import { CustomEditor } from "./types";
 

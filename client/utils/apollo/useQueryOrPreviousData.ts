@@ -4,7 +4,10 @@ import { assignRef } from "@chakra-ui/hooks";
 import { useRef } from "react";
 import { isDefined } from "remeda";
 
-export function useQueryOrPreviousData<TData = any, TVariables = OperationVariables>(
+export function useQueryOrPreviousData<
+  TData = any,
+  TVariables extends OperationVariables = OperationVariables
+>(
   query: DocumentNode | TypedDocumentNode<TData, TVariables>,
   options?: QueryHookOptions<TData, TVariables>,
   usePrevious: (

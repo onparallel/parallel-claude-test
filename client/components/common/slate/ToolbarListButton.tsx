@@ -1,5 +1,6 @@
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { getPreventDefaultHandler, someNode, usePlateEditorRef } from "@udecode/plate-core";
+import { getPreventDefaultHandler } from "@parallel/utils/events";
+import { someNode, usePlateEditorRef } from "@udecode/plate-common";
 import { toggleList } from "@udecode/plate-list";
 import { ToolbarButton, ToolbarButtonProps } from "./ToolbarButton";
 

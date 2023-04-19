@@ -31,7 +31,7 @@ import {
   PlatePlugin,
   PlateProvider,
   withProps,
-} from "@udecode/plate-core";
+} from "@udecode/plate-common";
 import { createHeadingPlugin, ELEMENT_H1, ELEMENT_H2 } from "@udecode/plate-heading";
 import { createLinkPlugin, ELEMENT_LINK } from "@udecode/plate-link";
 import {

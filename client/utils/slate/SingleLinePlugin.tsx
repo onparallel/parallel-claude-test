@@ -5,7 +5,7 @@ import {
   OnChange,
   toDOMNode,
   toDOMRange,
-} from "@udecode/plate-core";
+} from "@udecode/plate-common";
 import { CustomEditor } from "./types";
 
 const onChangeKeepCaretOnScreen: OnChange = (editor) => {

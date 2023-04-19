@@ -2,14 +2,14 @@ import { Box, Menu, MenuButton, MenuItemOption, MenuList, MenuOptionGroup } from
 import { CheckIcon, FontSizeIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { assignRef } from "@parallel/utils/assignRef";
+import { getPreventDefaultHandler } from "@parallel/utils/events";
 import {
   focusEditor,
-  getPreventDefaultHandler,
   select,
   someNode,
   toggleNodeType,
   usePlateEditorRef,
-} from "@udecode/plate-core";
+} from "@udecode/plate-common";
 import { useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Selection } from "slate";
