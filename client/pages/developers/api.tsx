@@ -1,9 +1,38 @@
 import { InferGetServerSidePropsType } from "next";
 import { default as nodeFetch } from "node-fetch";
-import { RedocStandalone } from "redoc";
 import Head from "next/head";
+import { useEffect, useRef } from "react";
 
 function DeveloperApi({ spec }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    (window as any).Redoc?.init(
+      spec,
+      {
+        expandResponses: "all",
+        pathInMiddlePanel: true,
+        jsonSampleExpandLevel: 3,
+        expandSingleSchemaField: true,
+        showExtensions: false,
+        hideLoading: true,
+        theme: {
+          logo: {
+            gutter: "16px 36px 8px 24px",
+          },
+          typography: {
+            fontFamily: "'IBM Plex Sans',sans-serif",
+            headings: {
+              fontFamily: "'IBM Plex Sans',sans-serif",
+            },
+          },
+          spacing: {
+            sectionVertical: 20,
+          },
+        } as any,
+      },
+      ref.current
+    );
+  }, []);
   return (
     <>
       <Head>
@@ -14,32 +43,9 @@ function DeveloperApi({ spec }: InferGetServerSidePropsType<typeof getServerSide
           rel="stylesheet"
           href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/styles/api.css`}
         />
+        <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>;
       </Head>
-      <RedocStandalone
-        spec={spec}
-        options={{
-          expandResponses: "all",
-          pathInMiddlePanel: true,
-          jsonSampleExpandLevel: 3,
-          expandSingleSchemaField: true,
-          showExtensions: false,
-          hideLoading: true,
-          theme: {
-            logo: {
-              gutter: "16px 36px 8px 24px",
-            },
-            typography: {
-              fontFamily: "'IBM Plex Sans',sans-serif",
-              headings: {
-                fontFamily: "'IBM Plex Sans',sans-serif",
-              },
-            },
-            spacing: {
-              sectionVertical: 20,
-            },
-          } as any,
-        }}
-      />
+      <div ref={ref} />
     </>
   );
 }
