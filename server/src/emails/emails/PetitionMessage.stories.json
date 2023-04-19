@@ -18,7 +18,7 @@
         "keycode": "asdfghjkl",
         "parallelUrl": "https://staging.onparallel.com",
         "assetsUrl": "https://static-staging.onparallel.com",
-        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
+        "logoUrl": "https://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel",
         "removeWhyWeUseParallel": false,
         "removeParallelBranding": false,

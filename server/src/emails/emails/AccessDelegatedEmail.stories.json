@@ -20,7 +20,7 @@
         "deadline": "2022-12-11T17:29:24.601Z",
         "parallelUrl": "https://staging.onparallel.com",
         "assetsUrl": "https://static-staging.onparallel.com",
-        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
+        "logoUrl": "https://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel",
         "removeWhyWeUseParallel": false,
         "removeParallelBranding": false,

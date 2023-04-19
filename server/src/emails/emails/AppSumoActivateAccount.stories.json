@@ -12,7 +12,7 @@
         "redirectUrl": "https://staging.onparallel.com/signup?token=abcd",
         "parallelUrl": "https://staging.onparallel.com",
         "assetsUrl": "https://static-staging.onparallel.com",
-        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
+        "logoUrl": "https://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel",
         "theme": {
           "color": "#f75959",

@@ -16,7 +16,7 @@
         "bodyPlainText": "Hola Derek,\\n\\nYa hemos revisado toda la información. Te confirmamos que está todo correcto.\\n\\nVamos a ponernos a trabajar y si tenemos cualquier duda o necesitamos cualquier información más te lo haremos saber.\\n\\nUn saludo.",
         "parallelUrl": "https://staging.onparallel.com",
         "assetsUrl": "https://static-staging.onparallel.com",
-        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
+        "logoUrl": "https://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel",
         "removeParallelBranding": false,
         "theme": {
