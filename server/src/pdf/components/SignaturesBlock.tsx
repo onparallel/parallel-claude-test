@@ -39,7 +39,7 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
     ...FORMATS.L,
   });
 
-  const signers = [
+  const signers: SignatureBoxProps[] = [
     ...(process.env.NODE_ENV === "production" && isDefined(templateId)
       ? [
           "EAwW2jXkP4C9LjU2b3",
@@ -53,7 +53,7 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
               signatureImageUrl:
                 "https://static.onparallel.com/static/images/signatures/guillermo-preckler-brickbro.png",
               date,
-            } as SignatureBoxProps,
+            },
           ]
         : templateId === "EAwW2jXkP4C9LbfNRp"
         ? [
@@ -62,7 +62,7 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
               signatureImageUrl:
                 "https://static.onparallel.com/static/images/signatures/sello-tiko.png",
               date,
-            } as SignatureBoxProps,
+            },
           ]
         : ["zas25KHxAByKWUgG8U2", "zas25KHxAByKWUhxeC6"].includes(templateId)
         ? [
@@ -71,7 +71,7 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
               signatureImageUrl:
                 "https://static.onparallel.com/static/images/signatures/marta-blanco-maseda-imasd.png",
               date,
-            } as SignatureBoxProps,
+            },
           ]
         : [
             "zas25KHxAByKWmEFbpV",
@@ -85,7 +85,7 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
               signatureImageUrl:
                 "https://static.onparallel.com/static/images/signatures/carlos-guerrero-martin-debify.png",
               date,
-            } as SignatureBoxProps,
+            },
           ]
         : [
             "zas25KHxAByKWmFx9gf",
@@ -104,7 +104,7 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
               signatureImageUrl:
                 "https://static.onparallel.com/static/images/signatures/jorge-arturo-caceres-rive.png",
               date,
-            } as SignatureBoxProps,
+            },
           ]
         : ["zas25KHxAByKWmKNDXb", "zas25KHxAByKWmKRZgb"].includes(templateId)
         ? [
@@ -115,16 +115,22 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
               date,
             },
           ]
+        : ["zas25KHxAByKWu4g76M"].includes(templateId)
+        ? [
+            {
+              fullName: "Fernando López Clemente",
+              signatureImageUrl:
+                "https://static.onparallel.com/static/images/signatures/fernando-lopez-clemente-anticipa.png",
+              date,
+            },
+          ]
         : []
       : []),
-    ...signatureConfig.signers!.map(
-      (signer, i) =>
-        ({
-          wordAnchor: `3cb39pzCQA9wJ${i}`,
-          fullName: signer!.fullName,
-          date,
-        } as SignatureBoxProps)
-    ),
+    ...signatureConfig.signers!.map((signer, i) => ({
+      wordAnchor: `3cb39pzCQA9wJ${i}`,
+      fullName: signer!.fullName,
+      date,
+    })),
   ];
 
   return (
