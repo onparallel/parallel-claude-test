@@ -87,7 +87,7 @@ export function useBuildAliasInterpolation(
   const { type, multiple, options } = field;
 
   return useCallback(
-    (alias) => {
+    (alias: string | null | undefined) => {
       const defaultFilter = type === "NUMBER" ? " | number" : "";
       const loopVariable = intl.formatMessage({
         id: "component.reference-options-menu.loop-variable",

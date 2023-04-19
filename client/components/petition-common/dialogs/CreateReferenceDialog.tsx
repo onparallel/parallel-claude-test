@@ -53,7 +53,7 @@ export function CreateReferenceDialog({
   });
 
   const updateField = useCallback(
-    async (fieldId, data) => {
+    async (fieldId: string, data: UpdatePetitionFieldInput) => {
       if (!onFieldEdit) return;
       try {
         await onFieldEdit(fieldId, data);

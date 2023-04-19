@@ -5,11 +5,9 @@ import { I18nProps, I18nProvider } from "@parallel/components/common/I18nProvide
 import { LiquidProvider } from "@parallel/utils/useLiquid";
 import { AppProps } from "next/app";
 import Router from "next/router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 type MyAppProps = AppProps & I18nProps;
-
-const styles = {};
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
@@ -30,15 +28,25 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
     window.dispatchEvent(new CustomEvent("NEXTJS_REHYDRATION_COMPLETE"));
   }, []);
 
+  const toastPortalRef = useRef<HTMLDivElement>(null);
+
   return (
     <LiquidProvider>
       <I18nProvider {...props}>
-        <ChakraProvider theme={theme} resetCSS portalZIndex={40} cssVarsRoot="body">
-          {/* default StylesProvider so useStyles doesn't break */}
-          <StylesProvider value={styles}>
-            <Fonts />
-            <Component {...pageProps} />
-          </StylesProvider>
+        <ChakraProvider
+          theme={theme}
+          resetCSS
+          portalZIndex={40}
+          cssVarsRoot="body"
+          toastOptions={{
+            portalProps: {
+              containerRef: toastPortalRef,
+            },
+          }}
+        >
+          <Fonts />
+          <Component {...pageProps} />
+          <div ref={toastPortalRef} />
         </ChakraProvider>
       </I18nProvider>
     </LiquidProvider>

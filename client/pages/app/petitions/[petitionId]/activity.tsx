@@ -215,7 +215,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const confirmDeactivateAccess = useConfirmDeactivateAccessDialog();
   const [deactivateAccess] = useMutation(PetitionActivity_deactivateAccessesDocument);
   const handleDeactivateAccess = useCallback(
-    async (accessId) => {
+    async (accessId: string) => {
       const access = petition.accesses.find((a) => a.id === accessId)!;
       try {
         await confirmDeactivateAccess({ access });

@@ -4,6 +4,7 @@ import { resolveUrl } from "@parallel/utils/next";
 import { Maybe } from "@parallel/utils/types";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import Script from "next/script";
 import { ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { PublicFooter } from "./PublicFooter";
@@ -51,7 +52,7 @@ export function PublicLayout({
               />
             ))
         )}
-        <title>{title} | Parallel</title>
+        <title>{`${title} | Parallel`}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
           name="description"
@@ -65,12 +66,15 @@ export function PublicLayout({
           }
         />
         <link rel="canonical" href={buildUrl(pathname, query, canonicalLocale ?? locale!)} />
-        <script src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/js/consent.js`} defer />
-        <script
-          src="https://unpkg.com/@segment/consent-manager@5.5.0/standalone/consent-manager.js"
-          defer
-        />
       </Head>
+      <Script
+        src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/js/consent.js`}
+        strategy="beforeInteractive"
+      />
+      <Script
+        src="https://unpkg.com/@segment/consent-manager@5.5.0/standalone/consent-manager.js"
+        strategy="afterInteractive"
+      />
       {(canonicalLocale ? [canonicalLocale] : languages.map((lang) => lang.locale)).map(
         (locale) => (
           <Head key={locale}>

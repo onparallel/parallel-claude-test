@@ -13,7 +13,7 @@ export const SubscribedNotificationsIcon = chakraForwardRef<"svg">(
           defaultMessage: "Subscribed to notifications",
         })}
       >
-        <BellOnIcon ref={ref} {...props} />
+        <BellOnIcon ref={ref} {...(props as any)} />
       </Tooltip>
     );
   }

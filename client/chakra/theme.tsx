@@ -233,7 +233,7 @@ Menu.defaultProps = {
   strategy: "fixed",
 } as any;
 
-Popover.defaultProps = {
+(Popover as any).defaultProps = {
   openDelay: 250,
   isLazy: true,
   strategy: "fixed",

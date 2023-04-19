@@ -97,7 +97,7 @@ export const PetitionSignatureRequestSignerStatusIcon = Object.assign(
             content={<DatesList sentAt={sentAt} openedAt={openedAt} signedAt={signedAt} />}
             width="auto"
           >
-            <CheckIcon ref={ref} color="green.500" {...props} />
+            <CheckIcon ref={ref} color="green.500" {...(props as any)} />
           </SmallPopover>
         );
       case "BOUNCED":
@@ -115,7 +115,7 @@ export const PetitionSignatureRequestSignerStatusIcon = Object.assign(
             }
             width="auto"
           >
-            <CloseIcon ref={ref} color="red.500" fontSize="12px" {...props} />
+            <CloseIcon ref={ref} color="red.500" fontSize="12px" {...(props as any)} />
           </SmallPopover>
         );
       case "PENDING":
@@ -125,7 +125,7 @@ export const PetitionSignatureRequestSignerStatusIcon = Object.assign(
             content={<DatesList sentAt={sentAt} openedAt={openedAt} />}
             width="auto"
           >
-            <TimeIcon ref={ref} color="yellow.500" {...props} />
+            <TimeIcon ref={ref} color="yellow.500" {...(props as any)} />
           </SmallPopover>
         );
       default:

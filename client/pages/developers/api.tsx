@@ -2,6 +2,7 @@ import { InferGetServerSidePropsType } from "next";
 import { default as nodeFetch } from "node-fetch";
 import Head from "next/head";
 import { useEffect, useRef } from "react";
+import Script from "next/script";
 
 function DeveloperApi({ spec }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const ref = useRef<HTMLDivElement>(null);
@@ -43,8 +44,11 @@ function DeveloperApi({ spec }: InferGetServerSidePropsType<typeof getServerSide
           rel="stylesheet"
           href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/styles/api.css`}
         />
-        <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>;
       </Head>
+      <Script
+        src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"
+        strategy="beforeInteractive"
+      />
       <div ref={ref} />
     </>
   );

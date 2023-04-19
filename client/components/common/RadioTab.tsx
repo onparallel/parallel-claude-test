@@ -1,12 +1,11 @@
 import {
   chakra,
-  StylesProvider,
+  createStylesContext,
   ThemingProps,
   useMultiStyleConfig,
   useRadio,
   useRadioGroup,
   UseRadioGroupProps,
-  useStyles,
 } from "@chakra-ui/react";
 import { cx } from "@chakra-ui/utils";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -16,6 +15,8 @@ const RadioTabContext = createContext<ReturnType<typeof useRadioGroup>["getRadio
   null as any
 );
 interface RadioTabListProps extends Omit<UseRadioGroupProps, "isNative">, ThemingProps<"Tabs"> {}
+
+const [StylesProvider, useStyles] = createStylesContext("Tabs");
 
 export const RadioTabList = chakraForwardRef<"div", RadioTabListProps>(function ViewTabs(
   { value, defaultValue, onChange, isDisabled, isFocusable, name, ...props },

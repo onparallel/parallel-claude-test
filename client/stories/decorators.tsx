@@ -7,7 +7,7 @@ import { AnimateSharedLayout } from "framer-motion";
 import { useMemo } from "react";
 import { IntlProvider } from "react-intl";
 
-export const StoryDecorator: DecoratorFunction = function StoryDecorator(story, { globals }) {
+export const StoryDecorator: DecoratorFunction = function StoryDecorator(story: any, { globals }) {
   const messages = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const data = require(`../lang/${globals.locale}.json`);

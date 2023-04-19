@@ -3,6 +3,7 @@ import { Box, Circle, Flex, LinkBox, LinkOverlay, Stack, Text } from "@chakra-ui
 import { EmailIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { NakedLink } from "@parallel/components/common/Link";
 import { PetitionUserNotification_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
@@ -89,7 +90,7 @@ export const PetitionUserNotification = Object.assign(
           {icon}
         </Flex>
         <Stack flex="1 1 auto" minWidth="0" spacing={0} ref={bodyRef}>
-          <Link href={`/${intl.locale}/app/petitions/${petition.id}${path}`} passHref>
+          <NakedLink href={`/${intl.locale}/app/petitions/${petition.id}${path}`}>
             <LinkOverlay
               ref={linkRef}
               draggable="false"
@@ -130,7 +131,7 @@ export const PetitionUserNotification = Object.assign(
                       }))}
               </Text>
             </LinkOverlay>
-          </Link>
+          </NakedLink>
           <Text
             data-testid="notification-text"
             noOfLines={3}

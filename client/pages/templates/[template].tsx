@@ -135,7 +135,7 @@ function LandingTemplateDetails({
                           renderItem={({ value }) => (
                             <Link
                               key={value.slug}
-                              next={{ locale: template.locale }}
+                              locale={template.locale}
                               href={`/templates/categories/${value.slug}`}
                             >
                               {`${value.label}`}

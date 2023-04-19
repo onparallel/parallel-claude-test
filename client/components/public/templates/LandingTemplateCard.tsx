@@ -35,7 +35,7 @@ export function LandingTemplateCard({ template }: LandingTemplateCardProps) {
           />
         </Center>
         <Stack padding={4} gap={2}>
-          <NakedLink locale={locale} passHref href={`/templates/${slug}`}>
+          <NakedLink locale={locale} href={`/templates/${slug}`}>
             <LinkOverlay display="block" height="72px" fontWeight="semibold" noOfLines={3}>
               {name}
             </LinkOverlay>

@@ -83,7 +83,7 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
       <RadioTabList
         variant="enclosed"
         name="comments"
-        value={tabIsNotes ? 1 : 0}
+        value={tabIsNotes ? "1" : "0"}
         onChange={(value) => onTabChange(value === "1")}
         flex={1}
         minWidth={0}
@@ -92,7 +92,7 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
         position="relative"
       >
         <RadioTab
-          value={0}
+          value="0"
           borderTopLeftRadius={0}
           isDisabled={!hasCommentsEnabled}
           cursor={hasCommentsEnabled ? "pointer" : "not-allowed"}
@@ -106,7 +106,7 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
           />
         </RadioTab>
         <RadioTab
-          value={1}
+          value="1"
           _checked={{
             color: "blue.600",
             bg: "yellow.100",

@@ -5,7 +5,7 @@ export function PaddedCollapse({ children, ...props }: CollapseProps) {
     <Box>
       <Box margin={-1}>
         <Collapse {...props}>
-          <Box padding={1}>{children}</Box>
+          <Box padding={1}>{children as any}</Box>
         </Collapse>
       </Box>
     </Box>

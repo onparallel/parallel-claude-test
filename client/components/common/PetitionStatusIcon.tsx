@@ -23,7 +23,7 @@ export const PetitionStatusIcon = chakraForwardRef<"svg", PetitionStatusIconProp
             color={color}
             role="presentation"
             tabIndex={disableTooltip ? undefined : 0}
-            {...props}
+            {...(props as any)}
           />
         ) : status === "PENDING" ? (
           <TimeIcon
@@ -32,7 +32,7 @@ export const PetitionStatusIcon = chakraForwardRef<"svg", PetitionStatusIconProp
             color={color}
             role="presentation"
             tabIndex={disableTooltip ? undefined : 0}
-            {...props}
+            {...(props as any)}
           />
         ) : status === "COMPLETED" ? (
           <CheckIcon
@@ -41,7 +41,7 @@ export const PetitionStatusIcon = chakraForwardRef<"svg", PetitionStatusIconProp
             color={color}
             role="presentation"
             tabIndex={disableTooltip ? undefined : 0}
-            {...props}
+            {...(props as any)}
           />
         ) : status === "CLOSED" ? (
           <DoubleCheckIcon
@@ -50,7 +50,7 @@ export const PetitionStatusIcon = chakraForwardRef<"svg", PetitionStatusIconProp
             color={color}
             role="presentation"
             tabIndex={disableTooltip ? undefined : 0}
-            {...props}
+            {...(props as any)}
           />
         ) : null}
       </Tooltip>

@@ -79,6 +79,7 @@ export function TemplateIconDefaultPermissions({
                       size="xs"
                       backgroundColor="gray.200"
                       icon={<UsersIcon boxSize={3.5} />}
+                      color="gray.800"
                     />
                     <Flex marginLeft={2} direction="row" alignItems="center" gap={1}>
                       <Text noOfLines={1} wordBreak="break-all">

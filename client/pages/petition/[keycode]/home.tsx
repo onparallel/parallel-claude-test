@@ -418,7 +418,7 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
           width="100%"
         >
           <Stack spacing={0}>
-            <NakedLink href={`/petition/${keycode}`} passHref>
+            <NakedLink href={`/petition/${keycode}`}>
               <LinkOverlay
                 fontWeight={600}
                 noOfLines={[2, 1]}

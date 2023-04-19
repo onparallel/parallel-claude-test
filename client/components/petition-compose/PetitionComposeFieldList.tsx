@@ -324,7 +324,7 @@ export const PetitionComposeFieldList = Object.assign(
     const hoveredFieldIdRef = useRef<string>(null);
     const hoveredFieldIdWhileMenuOpenedRef = useRef<string>(null);
     const setHoveredFieldId = useCallback(
-      (fieldId) => {
+      (fieldId: string | null) => {
         _setHoveredFieldId(fieldId);
         assignRef(hoveredFieldIdRef, fieldId);
       },
@@ -333,7 +333,7 @@ export const PetitionComposeFieldList = Object.assign(
     const [focusedFieldId, _setFocusedFieldId] = useState<string | null>(null);
     const focusedFieldIdRef = useRef<string>(null);
     const setFocusedFieldId = useCallback(
-      (fieldId) => {
+      (fieldId: string | null) => {
         _setFocusedFieldId(fieldId);
         assignRef(focusedFieldIdRef, fieldId);
       },

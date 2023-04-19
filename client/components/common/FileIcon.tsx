@@ -26,7 +26,9 @@ export const FileIcon = chakraForwardRef<"svg", FileIconProps>(function FileIcon
   ref
 ) {
   const [Icon, label] = useGetIconAndLabelForFile({ filename, contentType, hasFailed });
-  return <Icon ref={ref} color={hasFailed ? "red.500" : "inherit"} alt={label} {...props} />;
+  return (
+    <Icon ref={ref} color={hasFailed ? "red.500" : "inherit"} alt={label} {...(props as any)} />
+  );
 });
 
 interface FileType {

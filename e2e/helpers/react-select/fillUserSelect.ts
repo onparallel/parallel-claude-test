@@ -1,4 +1,5 @@
 import { Locator, Page } from "@playwright/test";
+import { getAriaControls } from "../aria/getAriaControls";
 import { waitForSelectLoading } from "./waitForSelectLoading";
 
 type UserOrGroup = string | { type: "User"; email: string } | { type: "UserGroup"; name: string };
@@ -6,8 +7,7 @@ type UserOrGroup = string | { type: "User"; email: string } | { type: "UserGroup
 export async function fillUserSelect(page: Page, select: Locator, usersOrGroups: UserOrGroup[]) {
   await select.click();
   const input = select.locator("input");
-  const controls = await input.getAttribute("aria-controls");
-  const menu = page.locator(`#${controls}`);
+  const menu = await getAriaControls(page, input);
   for (const userOrGroup of usersOrGroups) {
     if (typeof userOrGroup === "string" || userOrGroup.type === "User") {
       const email = typeof userOrGroup === "string" ? userOrGroup : userOrGroup.email;

@@ -55,6 +55,7 @@ export function UserListPopover({
                         size="xs"
                         backgroundColor="gray.200"
                         icon={<UsersIcon boxSize={3.5} />}
+                        color="gray.800"
                       />
                       <Text flex="1" marginLeft={2} noOfLines={1} wordBreak="break-all">
                         {u.name}

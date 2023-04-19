@@ -21,10 +21,7 @@ export function withOrgRole<P = {}>(role: OrganizationRole, orPath = "/app") {
     Component: NextComponentType<WithApolloDataContext, P, P>
   ): NextComponentType<WithApolloDataContext, P, P> {
     const { getInitialProps, displayName, ...rest } = Component;
-    const WithOrgRole: NextComponentType<WithApolloDataContext, P, P> = function (props) {
-      return <Component {...props} />;
-    };
-    return Object.assign(WithOrgRole, rest, {
+    return Object.assign(Component, rest, {
       displayName: `WithOrgRole(${displayName ?? Component.name})`,
       getInitialProps: async (context: WithApolloDataContext) => {
         if (!context.apollo) {

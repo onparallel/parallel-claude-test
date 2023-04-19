@@ -16,6 +16,7 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FORMATS } from "@parallel/utils/dates";
 import { withError } from "@parallel/utils/promises/withError";
+import { MaybePromise } from "@parallel/utils/types";
 import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useRouter } from "next/router";
@@ -28,7 +29,7 @@ export function useSendPetitionHandler(
   petition: useSendPetitionHandler_PetitionFragment | null,
   onUpdatePetition: (data: UpdatePetitionInput) => Promise<any>,
   validator: () => Promise<boolean>,
-  onRefetch?: () => void,
+  onRefetch?: () => MaybePromise<any>,
   options: { redirect: boolean } = { redirect: true }
 ) {
   const intl = useIntl();
@@ -184,10 +185,12 @@ export function useSendPetitionHandler(
           ),
         });
       }
+      await onRefetch?.();
       if (options.redirect) {
-        router.push("/app/petitions");
+        setTimeout(() => {
+          router.push("/app/petitions");
+        }, 500);
       }
-      onRefetch?.();
     } catch (e) {
       if (isApolloError(e, "PETITION_SEND_LIMIT_REACHED")) {
         await withError(showPetitionLimitReachedErrorDialog());

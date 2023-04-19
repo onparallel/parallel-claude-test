@@ -1,5 +1,6 @@
 import { Locator, Page } from "@playwright/test";
 import { isDefined } from "remeda";
+import { getAriaControls } from "../aria/getAriaControls";
 import { waitForSelectLoading } from "./waitForSelectLoading";
 
 export async function fillContactSelect(
@@ -9,8 +10,7 @@ export async function fillContactSelect(
 ) {
   await select.click();
   const input = select.locator("input");
-  const controls = await input.getAttribute("aria-controls");
-  const menu = page.locator(`#${controls}`);
+  const menu = await getAriaControls(page, input);
   for (const recipient of recipients) {
     await input.type(recipient.email);
     await waitForSelectLoading(page, select);

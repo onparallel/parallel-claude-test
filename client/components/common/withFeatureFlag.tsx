@@ -20,10 +20,7 @@ export function withFeatureFlag(featureFlag: FeatureFlag, orPath = "/path") {
     Component: NextComponentType<WithApolloDataContext, P, P>
   ): NextComponentType<WithApolloDataContext, P, P> {
     const { getInitialProps, displayName, ...rest } = Component;
-    const WithFeatureFlag: NextComponentType<WithApolloDataContext, P, P> = function (props) {
-      return <Component {...props} />;
-    };
-    return Object.assign(WithFeatureFlag, rest, {
+    return Object.assign(Component, rest, {
       displayName: `WithFeatureFlag(${featureFlag})(${displayName ?? Component.name})`,
       getInitialProps: async (context: WithApolloDataContext) => {
         if (!context.apollo) {

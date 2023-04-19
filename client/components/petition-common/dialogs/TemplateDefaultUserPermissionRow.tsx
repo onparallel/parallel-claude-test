@@ -50,6 +50,7 @@ export function TemplateDefaultUserPermissionRow({
           icon={<UserIcon fontSize="md" />}
           role="presentation"
           size="sm"
+          color="gray.800"
         />
       )}
 

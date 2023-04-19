@@ -7,6 +7,7 @@ import { useConfirmDiscardDraftDialog_PetitionBaseFragment } from "@parallel/gra
 import { assignRef } from "@parallel/utils/assignRef";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { usePreventNavigation } from "@parallel/utils/usePreventNavigation";
+import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { useCallback, useEffect, useRef } from "react";
 import { FormattedMessage } from "react-intl";
 
@@ -75,12 +76,15 @@ export function useConfirmDiscardDraftDialog(
     }
   }, [isDraft]);
 
+  const ref = useUpdatingRef({ isDraft, shouldConfirmNavigation });
+
   const deletePetitions = useDeletePetitions();
   return usePreventNavigation({
-    shouldConfirmNavigation: (path: string) => {
+    shouldConfirmNavigation: useCallback((path: string) => {
       const exitingPetition = !path.includes(`/app/petitions/${petition.id}`);
+      const { isDraft, shouldConfirmNavigation } = ref.current;
       return isDraft && exitingPetition && shouldConfirmNavigation;
-    },
+    }, []),
     confirmNavigation: useCallback(async () => {
       try {
         if ((await showConfirmDiscardDraftDialog()) === "DISCARD") {

@@ -38,6 +38,7 @@ export interface LayoutProps {
   removeParallelBranding?: boolean;
   theme: BrandTheme;
   head?: ReactNode;
+  children?: ReactNode;
 }
 
 export const Layout: FC<LayoutProps> = function Layout({ theme, ...props }) {

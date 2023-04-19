@@ -115,7 +115,7 @@ export function CreateOrUpdateEventSubscriptionDialog({
 
   const apollo = useApolloClient();
 
-  const loadTemplates = useCallback(async (search) => {
+  const loadTemplates = useCallback(async (search: string | null | undefined) => {
     const result = await apollo.query({
       query: CreateOrUpdateEventSubscriptionDialog_petitionsDocument,
       variables: {

@@ -131,10 +131,7 @@ export function useReactSelectProps<
 
   const styles = useMemo(() => {
     const styles = {
-      menuPortal: (styles: CSSObjectWithLabel) => ({
-        ...styles,
-        zIndex: 40,
-      }),
+      menuPortal: (styles: CSSObjectWithLabel) => omit(styles, ["zIndex"]),
       container: (styles: CSSObjectWithLabel, { isDisabled }: ContainerProps) => ({
         ...styles,
         cursor: isDisabled ? "not-allowed" : "default",
@@ -223,6 +220,7 @@ export function useReactSelectProps<
       menu: (styles: CSSObjectWithLabel) => {
         return {
           ...styles,
+          zIndex: 40,
           overflow: "hidden", // when using OptimizedMenuList this is needed
         };
       },

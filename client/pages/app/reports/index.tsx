@@ -194,7 +194,7 @@ const ReportsCard = chakraForwardRef<"div", ReportsCardProps>(function ReportsCa
                 </Badge>
               </>
             ) : (
-              <NakedLink passHref href={href}>
+              <NakedLink href={href}>
                 <LinkOverlay>
                   <Text as="h2" fontSize="2xl" fontWeight="bold">
                     {title}

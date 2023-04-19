@@ -92,18 +92,18 @@ export function BrandingGeneralPreview({ user, brand, logo }: BrandingGeneralPre
             </Stack>
 
             <Stack padding={4} spacing={2.5} backgroundColor="gray.100" borderRadius="md">
-              <SkeletonText noOfLines={1} width="20%" speed={0} endColor="gray.400" />
-              <SkeletonText noOfLines={1} width="100%" speed={0} endColor="gray.400" />
+              <SkeletonText noOfLines={1} width="20%" speed={0} startColor="gray.400" />
+              <SkeletonText noOfLines={1} width="100%" speed={0} startColor="gray.400" />
               <SkeletonText
                 noOfLines={1}
                 width="70%"
                 paddingBottom={3}
                 speed={0}
-                endColor="gray.400"
+                startColor="gray.400"
               />
 
-              <SkeletonText noOfLines={1} width="10%" speed={0} endColor="gray.400" />
-              <SkeletonText noOfLines={1} width="30%" speed={0} endColor="gray.400" />
+              <SkeletonText noOfLines={1} width="10%" speed={0} startColor="gray.400" />
+              <SkeletonText noOfLines={1} width="30%" speed={0} startColor="gray.400" />
             </Stack>
             <UnorderedList paddingLeft={4}>
               <ListItem>
@@ -129,8 +129,8 @@ export function BrandingGeneralPreview({ user, brand, logo }: BrandingGeneralPre
                 />
               </Button>
 
-              <SkeletonText noOfLines={1} width="95%" speed={0} endColor="gray.300" />
-              <SkeletonText noOfLines={1} width="40%" speed={0} endColor="gray.300" />
+              <SkeletonText noOfLines={1} width="95%" speed={0} startColor="gray.300" />
+              <SkeletonText noOfLines={1} width="40%" speed={0} startColor="gray.300" />
             </Stack>
           </OverrideWithOrganizationTheme>
         </Stack>

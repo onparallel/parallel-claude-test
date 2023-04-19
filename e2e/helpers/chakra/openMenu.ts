@@ -1,9 +1,9 @@
 import { Locator, Page } from "@playwright/test";
+import { getAriaControls } from "../aria/getAriaControls";
 
 export async function openMenu(page: Page, locator: Locator) {
-  const ariaControls = await locator.getAttribute("aria-controls");
   const ariaExpanded = await locator.getAttribute("aria-expanded");
-  const menu = page.locator(`#${ariaControls}`);
+  const menu = await getAriaControls(page, locator);
   if (ariaExpanded === "false") {
     await Promise.all([menu.waitFor({ state: "visible" }), locator.click()]);
   }

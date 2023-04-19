@@ -812,8 +812,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
                       border="1px solid"
                       borderColor={color}
                     >
-                      {fieldIndex}
-                      {letter.next().value}
+                      {`${fieldIndex}${letter.next().value}`}
                     </Center>
                     <Text as="span">{label}</Text>
                   </ListItem>

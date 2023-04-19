@@ -27,6 +27,6 @@ export const ProfileTypeFieldTypeIcon = chakraForwardRef<"svg", ProfileTypeField
         TEXT: FieldTextIcon,
       } as Record<ProfileTypeFieldType, ElementType>
     )[type];
-    return <Icon as={icon} {...props} ref={ref} />;
+    return <Icon as={icon} {...(props as any)} ref={ref} />;
   }
 );

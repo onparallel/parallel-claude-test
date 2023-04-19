@@ -40,7 +40,7 @@ export const IntegrationLinkCard = chakraForwardRef<"div", IntegrationLinkCardPr
                     {title}
                   </Text>
                 ) : (
-                  <NakedLink passHref href={href}>
+                  <NakedLink href={href}>
                     <LinkOverlay isExternal={isExternal}>
                       <Text fontSize="xl" as="h3" fontWeight="bold">
                         {title}

@@ -68,7 +68,7 @@ function CreateFolderDialog({
 
   const apollo = useApolloClient();
   const loadPetitions = useCallback(
-    async (search) => {
+    async (search: string) => {
       const result = await apollo.query({
         query: CreateFolderDialog_petitionsDocument,
         variables: {

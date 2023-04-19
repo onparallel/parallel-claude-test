@@ -44,11 +44,10 @@ function ChooseOrg({ organizations }: ChooseOrgProps) {
     <>
       <Head>
         <title>
-          {intl.formatMessage({
+          {`${intl.formatMessage({
             id: "page.choose-org.title",
             defaultMessage: "Choose organization",
-          })}
-          {" | Parallel"}
+          })} | Parallel`}
         </title>
       </Head>
       <Flex direction="column" minHeight="100vh">

@@ -1,23 +1,11 @@
-import { Link as ChakraLink, ThemingProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Link as ChakraLink } from "@chakra-ui/react";
 import NextLink, { LinkProps as NextLinkProps } from "next/link";
-import { PropsWithChildren, ReactNode } from "react";
+import { PropsWithChildren } from "react";
 
-interface LinkProps extends Pick<NextLinkProps, "href">, ThemingProps<"Link"> {
-  isExternal?: boolean;
-  next?: Omit<NextLinkProps, "href">;
-  children?: ReactNode;
-}
-
-export const Link = chakraForwardRef<"a", LinkProps>(function Link({ next, href, ...props }, ref) {
-  return (
-    <NextLink href={href} {...next} passHref>
-      <ChakraLink ref={ref} {...props} />
-    </NextLink>
-  );
-});
+export { Link } from "@chakra-ui/next-js";
 
 export function NakedLink(props: PropsWithChildren<NextLinkProps>) {
-  return <NextLink passHref {...props} />;
+  return <NextLink passHref legacyBehavior {...props} />;
 }
+
 export const NormalLink = ChakraLink;

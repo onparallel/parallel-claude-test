@@ -74,7 +74,7 @@ export function withDialogs<P = {}>(
   // eslint-disable-next-line @typescript-eslint/naming-convention
   Component: NextComponentType<any, P, P>
 ): NextComponentType<any, P, P> {
-  const WithDialogs: NextComponentType = function ({ ...props }) {
+  const WithDialogs: NextComponentType<any, P, P> = function ({ ...props }) {
     return (
       <DialogOpenerProvider>
         <Component {...(props as any)} />
