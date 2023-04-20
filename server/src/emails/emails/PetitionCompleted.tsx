@@ -99,14 +99,11 @@ const email: Email<PetitionCompletedProps> = {
 
       ${
         isManualStartSignature
-          ? intl.formatMessage(
-              {
-                id: "petition-completed.signature-required.text",
-                defaultMessage:
-                  "You can access the information and start the signature to complete the process.",
-              },
-              { recipient: `${contactName} (${contactEmail})` }
-            )
+          ? intl.formatMessage({
+              id: "petition-completed.signature-required.text",
+              defaultMessage:
+                "You can access the information and start the signature to complete the process.",
+            })
           : null
       }
 

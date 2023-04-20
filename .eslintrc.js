@@ -48,7 +48,7 @@ module.exports = {
     "react/display-name": "off",
     "react/prop-types": "off",
     "formatjs/enforce-default-message": ["error", "literal"],
-    "formatjs/enforce-placeholders": ["error", { ignoreList: ["b"] }],
+    "formatjs/enforce-placeholders": ["error", { ignoreList: ["b", "tone"] }],
     "formatjs/no-multiple-whitespaces": "error",
   },
   plugins: ["formatjs", "prettier"],

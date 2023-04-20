@@ -362,14 +362,11 @@ function OrganizationUsers() {
             id: "organization.user-invitation-not-sent-error.toast-title",
             defaultMessage: "Invitation not sent",
           }),
-          description: intl.formatMessage(
-            {
-              id: "organization.user-invitation-status-error.toast-description",
-              defaultMessage:
-                "It seems the user has already logged in. There is no need to resend the invitation.",
-            },
-            { email: selectedRows[0].email }
-          ),
+          description: intl.formatMessage({
+            id: "organization.user-invitation-status-error.toast-description",
+            defaultMessage:
+              "It seems the user has already logged in. There is no need to resend the invitation.",
+          }),
           status: "error",
           duration: 5000,
           isClosable: true,
@@ -380,13 +377,10 @@ function OrganizationUsers() {
             id: "organization.user-invitation-not-sent-error.toast-title",
             defaultMessage: "Invitation not sent",
           }),
-          description: intl.formatMessage(
-            {
-              id: "organization.user-invitation-inactive-error.toast-description",
-              defaultMessage: "The selected user is inactive. Refresh your browser and try again.",
-            },
-            { email: selectedRows[0].email }
-          ),
+          description: intl.formatMessage({
+            id: "organization.user-invitation-inactive-error.toast-description",
+            defaultMessage: "The selected user is inactive. Refresh your browser and try again.",
+          }),
           status: "error",
           duration: 5000,
           isClosable: true,
@@ -397,13 +391,10 @@ function OrganizationUsers() {
             id: "organization.user-invitation-not-sent-error.toast-title",
             defaultMessage: "Invitation not sent",
           }),
-          description: intl.formatMessage(
-            {
-              id: "organization.user-invitation-sso-error.toast-description",
-              defaultMessage: "We can't resend the invitation to SSO users.",
-            },
-            { email: selectedRows[0].email }
-          ),
+          description: intl.formatMessage({
+            id: "organization.user-invitation-sso-error.toast-description",
+            defaultMessage: "We can't resend the invitation to SSO users.",
+          }),
           status: "error",
           duration: 5000,
           isClosable: true,

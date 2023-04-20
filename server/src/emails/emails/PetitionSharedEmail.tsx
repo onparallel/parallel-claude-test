@@ -76,7 +76,7 @@ const email: Email<PetitionSharedEmailProps> = {
             defaultMessage:
               "{owner} has shared the following {isTemplate, select, true{templates} other{parallels}} with you:",
           },
-          { owner: `${ownerName} (${ownerEmail})`, ownerEmail, isTemplate }
+          { owner: `${ownerName} (${ownerEmail})`, isTemplate }
         )}
 
         ${petitions
@@ -109,7 +109,7 @@ const email: Email<PetitionSharedEmailProps> = {
             defaultMessage:
               "{owner} has shared the following {isTemplate, select, true{template} other{parallel}} with you.",
           },
-          { owner: `${ownerName} (${ownerEmail})`, ownerEmail, isTemplate }
+          { owner: `${ownerName} (${ownerEmail})`, isTemplate }
         )}
 
         ${

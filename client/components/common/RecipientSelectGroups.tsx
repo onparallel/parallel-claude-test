@@ -318,9 +318,6 @@ export function RecipientSelectGroups({
             <FormattedMessage
               id="component.recipient-select-groups.same-petition-warning"
               defaultMessage="Recipients will receive <b>a single parallel</b>. Add another parallel to send them separate forms."
-              values={{
-                recipientCount: validRecipients(0).length,
-              }}
             />
           </Text>
         </CloseableAlert>
