@@ -122,6 +122,7 @@ function OrganizationProfileTypes() {
   const handleDeleteClick = async () => {
     try {
       await deleteProfileType({ profileTypes: selectedRows });
+      await refetch();
     } catch {}
   };
 
