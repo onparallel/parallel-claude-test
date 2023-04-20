@@ -631,7 +631,7 @@
   },
   {
     "term": "component.confirm-delete-profile-type.want-delete-profile-types",
-    "definition": "¿Estás seguro de que quieres eliminar {count, plural, =1{<b>{name}</b>} other {<b># tipos de perfil</b> seleccionados}}?",
+    "definition": "¿Estás seguro de que quieres eliminar {count, plural, =1{<b>{name}</b>} other {los <b># tipos de perfil</b> seleccionados}}?",
     "context": "Are you sure you want to delete <b>{count, plural, =1 {{name}} other {# selected profile types}}</b>?"
   },
   {
@@ -1130,6 +1130,56 @@
     "context": "Set as default theme"
   },
   {
+    "term": "component.create-or-update-property-dialog.edit-profile-type-field",
+    "definition": "Editar propiedad",
+    "context": "Edit property"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.expiration",
+    "definition": "Caducidad/Vencimiento",
+    "context": "Expiration"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.expiration-description",
+    "definition": "Selecciona si esta propiedad tendrá una fecha de vencimiento. Ejemplo: Pasaportes y contratos.",
+    "context": "Select if this property will have an expiration date. Example: Passports and contracts."
+  },
+  {
+    "term": "component.create-or-update-property-dialog.new-property",
+    "definition": "Nueva propiedad",
+    "context": "New property"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.property-name",
+    "definition": "Nombre de la propiedad",
+    "context": "Property name"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.remember-from",
+    "definition": "Recordar a partir de:",
+    "context": "Remember from:"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.type-of-property",
+    "definition": "Tipo de propiedad",
+    "context": "Type of property"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.unique-identifier",
+    "definition": "Identificador único",
+    "context": "Unique identifier"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.unique-identifier-alredy-exists",
+    "definition": "Este identificador ya está siendo utilizado",
+    "context": "This identifier is already in use"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.unique-identifier-help",
+    "definition": "Permite identificar fácilmente la propiedad en las respuestas de la API.",
+    "context": "Allows to easily identify the property in API replies."
+  },
+  {
     "term": "component.create-or-update-user-dialog.included-in",
     "definition": "Incluido en (opcional)",
     "context": "Included in (optional)"
@@ -1585,6 +1635,26 @@
     "context": "File name"
   },
   {
+    "term": "component.draggable-list.delete-property",
+    "definition": "Eliminar propiedad",
+    "context": "Delete property"
+  },
+  {
+    "term": "component.draggable-list.drag-to-sort-label",
+    "definition": "Arrastrar para ordenar esta propiedad",
+    "context": "Drag to sort this property"
+  },
+  {
+    "term": "component.draggable-list.edit-property",
+    "definition": "Editar propiedad",
+    "context": "Edit property"
+  },
+  {
+    "term": "component.draggable-list.heading",
+    "definition": "Propiedades",
+    "context": "Properties"
+  },
+  {
     "term": "component.email-verification-required-alert.body",
     "definition": "Por favor, active su cuenta a través del enlace de activación que se envió a su correo electrónico e inténtelo nuevamente.",
     "context": "Please activate your account through the activation link that was sent to your email and try again."
@@ -1948,6 +2018,16 @@
     "term": "component.feature-flag-descriptions.prefill-secret-public-links-name",
     "definition": "Pre-rellenar respuestas con JWT en la query",
     "context": "Pre-fill public links with JWT query"
+  },
+  {
+    "term": "component.feature-flag-descriptions.profiles-description",
+    "definition": "Concede acceso a los perfiles",
+    "context": "Grants access to profiles"
+  },
+  {
+    "term": "component.feature-flag-descriptions.profiles-name",
+    "definition": "Perfiles",
+    "context": "Profiles"
   },
   {
     "term": "component.feature-flag-descriptions.remove-parallel-branding-description",
@@ -2743,6 +2823,21 @@
     "term": "component.overwrite-documentation-dialog.header",
     "definition": "Sobrescribir documentación",
     "context": "Overwrite documentation"
+  },
+  {
+    "term": "component.overwrite-name-pattern-dialog.body",
+    "definition": "Hay <b>{count, plural, =1 {# perfil} other {# profiles}}</b> que {count, plural, =1 {utiliza} other {utilizan}} este tipo de perfil. Si continúas, su nombre se actualizará según la nueva configuración. ¿Estás seguro de que quieres continuar?",
+    "context": "There <b>{count, plural, =1 {is # profile} other {are # profiles}}</b> that use this type of profile. If you continue, {count, plural, =1 {its} other {their}} name will be updated according to the new rule. Would you like to continue?"
+  },
+  {
+    "term": "component.overwrite-name-pattern-dialog.change-name",
+    "definition": "Cambiar nombre",
+    "context": "Change name"
+  },
+  {
+    "term": "component.overwrite-name-pattern-dialog.title",
+    "definition": "Sobreescribir nombre",
+    "context": "Overwrite name"
   },
   {
     "term": "component.password-input.hide",
@@ -4195,6 +4290,31 @@
     "context": "Delete profile type"
   },
   {
+    "term": "component.profile-type-settings.add-profile-type-field-to-name-error",
+    "definition": "Por favor, agrega una propiedad al nombre",
+    "context": "Please add a property to the name"
+  },
+  {
+    "term": "component.profile-type-settings.name-of-each-profile-help",
+    "definition": "Especifique cómo se generará el nombre de los perfiles de tipo <b>{ProfileName}</b>. Si lo cambia, se actualizarán los perfiles existentes de este tipo.",
+    "context": "Specify how the name of the profiles of type <b>{ProfileName}</b> will be generated. If you change it, existing profiles of this type will be updated."
+  },
+  {
+    "term": "component.profile-type-settings.profile-name-pattern",
+    "definition": "Nombre de cada perfil",
+    "context": "Profile name"
+  },
+  {
+    "term": "component.profile-type-settings.profile-name-pattern-placeholder",
+    "definition": "Selecciona una propiedad",
+    "context": "Select a property"
+  },
+  {
+    "term": "component.profile-type-settings.settings",
+    "definition": "Ajustes",
+    "context": "Settings"
+  },
+  {
     "term": "component.profile-types-table.new-type",
     "definition": "Nuevo tipo",
     "context": "New type"
@@ -4208,6 +4328,16 @@
     "term": "component.profile-types-table.no-results",
     "definition": "No encontramos tipos de perfiles con este criterio",
     "context": "There's no profile types matching your criteria"
+  },
+  {
+    "term": "component.property-used-in-pattern-dialog.body",
+    "definition": "{count, plural, =1 {Esta propiedad se está} other {Algunas de las propiedades se están}} utilizando como parte del nombre para perfiles de tipo {type}. Para continuar, tendrás que {count, plural, =1 {quitarla} other {quitarlas}} del nombre.",
+    "context": "{count, plural, =1 {This property is} other {Some of the properties are}} being used as part of the name for profiles of type {type}. To continue, first you need to remove {count, plural, =1 {it} other {them}} from the name."
+  },
+  {
+    "term": "component.property-used-in-pattern-dialog.title",
+    "definition": "{count, plural, =1 {Propiedad utilizada} other {Propiedades utilizadas}} en el nombre del perfil",
+    "context": "{count, plural, =1 {Property} other {Properties}} used in profile name"
   },
   {
     "term": "component.public-signup-form-experience.captcha-error",
@@ -6200,6 +6330,21 @@
     "context": "Years"
   },
   {
+    "term": "component.update-profile-type-field-dialog.expiration",
+    "definition": "Caducidad/Vencimiento",
+    "context": "Expiration"
+  },
+  {
+    "term": "component.update-profile-type-field-dialog.expiration-description",
+    "definition": "Selecciona si esta propiedad tendrá una fecha de vencimiento. Ejemplo: Pasaportes y contratos.",
+    "context": "Select if this property will have an expiration date. Example: Passports and contracts."
+  },
+  {
+    "term": "component.update-profile-type-field-dialog.title",
+    "definition": "Editar {count} propiedades",
+    "context": "Edit {count} properties"
+  },
+  {
     "term": "component.use-create-contact.create-contact",
     "definition": "Crear contacto",
     "context": "Create contact"
@@ -6281,7 +6426,7 @@
   },
   {
     "term": "component.use-delete-profile-type.profiles-in-use",
-    "definition": "Hay <b>{count, plural, =1 {1 perfil} other {# perfiles}}</b> creados que utilizan este tipo de perfil.",
+    "definition": "Hay {count, plural, =1 {<b>1 perfil</b> creado que utiliza} other {<b># perfiles</b> creados que utilizan}} este tipo de perfil.",
     "context": "There are <b>{count, plural, =1 {1 profile} other {# profiles}}</b> created using this profile type."
   },
   {
@@ -7170,6 +7315,11 @@
     "context": "Drag the file here, or click to select it"
   },
   {
+    "term": "generic.duplicate",
+    "definition": "Duplicar",
+    "context": "Duplicate"
+  },
+  {
     "term": "generic.e-signature",
     "definition": "Firma digital",
     "context": "eSignature"
@@ -7178,6 +7328,11 @@
     "term": "generic.edit",
     "definition": "Editar",
     "context": "Edit"
+  },
+  {
+    "term": "generic.edit-name",
+    "definition": "Editar nombre",
+    "context": "Edit name"
   },
   {
     "term": "generic.edited-indicator",
@@ -7550,9 +7705,29 @@
     "context": "Move to..."
   },
   {
+    "term": "generic.n-days-after",
+    "definition": "{count, plural, =1 {1 día} other {# días}} después",
+    "context": "{count, plural, =1 {1 day} other {# days}} after"
+  },
+  {
+    "term": "generic.n-days-before",
+    "definition": "{count, plural, =1 {1 día} other {# días}} antes",
+    "context": "{count, plural, =1 {1 day} other {# days}} before"
+  },
+  {
     "term": "generic.n-group-members",
     "definition": "{count, plural, =1 {1 miembro} other {# miembros}}",
     "context": "{count, plural, =1 {1 member} other {# members}}"
+  },
+  {
+    "term": "generic.n-months-after",
+    "definition": "{count, plural, =1 {1 mes} other {# meses}} después",
+    "context": "{count, plural, =1 {1 month} other {# months}} after"
+  },
+  {
+    "term": "generic.n-months-before",
+    "definition": "{count, plural, =1 {1 mes} other {# meses}} antes",
+    "context": "{count, plural, =1 {1 month} other {# months}} before"
   },
   {
     "term": "generic.n-more",
@@ -7693,6 +7868,36 @@
     "term": "generic.previous-page",
     "definition": "Página anterior",
     "context": "Previous page"
+  },
+  {
+    "term": "generic.profile-type-field-type.date",
+    "definition": "Fecha",
+    "context": "Date"
+  },
+  {
+    "term": "generic.profile-type-field-type.file-upload",
+    "definition": "Documentos y archivos",
+    "context": "Documents and files"
+  },
+  {
+    "term": "generic.profile-type-field-type.number",
+    "definition": "Números",
+    "context": "Numbers"
+  },
+  {
+    "term": "generic.profile-type-field-type.phone",
+    "definition": "Teléfono",
+    "context": "Phone number"
+  },
+  {
+    "term": "generic.profile-type-field-type.short-text",
+    "definition": "Respuestas cortas",
+    "context": "Short replies"
+  },
+  {
+    "term": "generic.profile-type-field-type.text",
+    "definition": "Respuestas largas",
+    "context": "Long replies"
   },
   {
     "term": "generic.recommended",
@@ -7890,6 +8095,11 @@
     "context": "Please type {confirmation} to confirm"
   },
   {
+    "term": "generic.unamed-profile-type",
+    "definition": "Tipo de perfil sin nombre",
+    "context": "Unnamed profile type"
+  },
+  {
     "term": "generic.unavailable",
     "definition": "No disponible",
     "context": "Unavailable"
@@ -7923,6 +8133,11 @@
     "term": "generic.unnamed-profile-type",
     "definition": "Tipo de perfil sin nombre",
     "context": "Unnamed profile type"
+  },
+  {
+    "term": "generic.unnamed-profile-type-field",
+    "definition": "Propiedad sin nombre",
+    "context": "Unnamed property"
   },
   {
     "term": "generic.unnamed-template",
@@ -8620,6 +8835,21 @@
     "context": "{amount} years"
   },
   {
+    "term": "page.organization-profile-type.add-profile-type-field",
+    "definition": "Añadir propiedad",
+    "context": "Add property"
+  },
+  {
+    "term": "page.organization-profile-type.changes-saved",
+    "definition": "Cambios guardados",
+    "context": "Changes saved"
+  },
+  {
+    "term": "page.organization-profile-type.changes-saved-body",
+    "definition": "Los cambios de \"Nombre de cada perfil\" han sido guardados.",
+    "context": "The \"Name of each profile\" changes have been saved."
+  },
+  {
     "term": "page.organizations.features-active",
     "definition": "Funcionalidades activadas",
     "context": "Enabled features"
@@ -8628,11 +8858,6 @@
     "term": "page.petition-replies.export-pdf",
     "definition": "Exportar a PDF",
     "context": "Export to PDF"
-  },
-  {
-    "term": "page.petitions-list.actions-clone",
-    "definition": "Duplicar",
-    "context": "Duplicate"
   },
   {
     "term": "page.petitions-list.actions-rename",
@@ -11638,11 +11863,6 @@
     "term": "view.admin-organizations-subscriptions.users-header",
     "definition": "Usuarios",
     "context": "Users"
-  },
-  {
-    "term": "view.group.edit-name",
-    "definition": "Editar nombre",
-    "context": "Edit name"
   },
   {
     "term": "view.group.no-results",

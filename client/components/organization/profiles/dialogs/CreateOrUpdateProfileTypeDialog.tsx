@@ -10,26 +10,27 @@ import { isDefined } from "remeda";
 
 type LocalizableUserText = Scalars["LocalizableUserText"];
 
-interface CreateOrEditProfileTypeDialogProps {
+interface CreateOrUpdateProfileTypeDialogProps {
   name?: LocalizableUserText;
   isEditing?: boolean;
 }
 
-interface CreateOrEditProfileTypeDialogResult {
+interface CreateOrUpdateProfileTypeDialogResult {
   name: LocalizableUserText;
 }
 
-function CreateOrEditProfileTypeDialog({
+function CreateOrUpdateProfileTypeDialog({
   name,
   isEditing,
   ...props
-}: DialogProps<CreateOrEditProfileTypeDialogProps, CreateOrEditProfileTypeDialogResult>) {
+}: DialogProps<CreateOrUpdateProfileTypeDialogProps, CreateOrUpdateProfileTypeDialogResult>) {
   const intl = useIntl();
+
   const {
     control,
     formState: { errors },
     handleSubmit,
-  } = useForm<CreateOrEditProfileTypeDialogResult>({
+  } = useForm<CreateOrUpdateProfileTypeDialogResult>({
     defaultValues: {
       name: name ?? {
         [intl.locale]: "",
@@ -101,6 +102,6 @@ function CreateOrEditProfileTypeDialog({
   );
 }
 
-export function useCreateOrEditProfileTypeDialog() {
-  return useDialog(CreateOrEditProfileTypeDialog);
+export function useCreateOrUpdateProfileTypeDialog() {
+  return useDialog(CreateOrUpdateProfileTypeDialog);
 }

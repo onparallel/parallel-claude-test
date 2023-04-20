@@ -288,6 +288,17 @@ export function useFeatureFlags() {
                 "Allows you to pre-fill public links with data from the preview page.",
             }),
           },
+          {
+            name: "PROFILES",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.profiles-name",
+              defaultMessage: "Profiles",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.profiles-description",
+              defaultMessage: "Grants access to profiles",
+            }),
+          },
         ],
       },
     ],

@@ -57,10 +57,9 @@ export async function up(knex: Knex): Promise<void> {
 
   await knex.schema.createTable("profile", (t) => {
     t.increments("id");
-    t.integer("org_id").notNullable();
-    t.integer("profile_type_id").notNullable();
+    t.integer("org_id").notNullable().references("organization.id");
+    t.integer("profile_type_id").notNullable().references("profile_type.id");
     t.string("name").notNullable();
-    t.foreign(["org_id", "profile_type_id"]).references(["profile_type.org_id", "profile_type.id"]);
     timestamps(t);
   });
   await knex.raw(/* sql */ `

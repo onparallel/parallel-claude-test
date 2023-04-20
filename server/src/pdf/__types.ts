@@ -13,6 +13,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
+  Date: string;
   /** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
   DateTime: string;
   Duration: Duration;
@@ -187,10 +189,6 @@ export type CreateContactInput = {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName?: InputMaybe<Scalars["String"]>;
-};
-
-export type CreateProfileInput = {
-  name: Scalars["String"];
 };
 
 export type CreateProfileTypeFieldInput = {
@@ -586,6 +584,7 @@ export type Mutation = {
   clonePetitionField: PetitionField;
   /** Clone petition. */
   clonePetitions: Array<PetitionBase>;
+  cloneProfileType: ProfileType;
   /** Clones the user groups with all its members */
   cloneUserGroups: Array<UserGroup>;
   /** Closes an open petition. */
@@ -638,6 +637,7 @@ export type Mutation = {
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
   createPrintPdfTask: Task;
   createProfile: Profile;
+  createProfileFieldFileUploadLink: ProfileFieldPropertyAndFileWithUploadData;
   createProfileType: ProfileType;
   createProfileTypeField: ProfileTypeField;
   /** Creates a public link from a user's template */
@@ -727,6 +727,7 @@ export type Mutation = {
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
+  profileFieldFileUploadComplete: Array<ProfileFieldFile>;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
    * Marks a filled petition as COMPLETED.
@@ -890,6 +891,7 @@ export type Mutation = {
    *   - petitionFieldCommentIds
    */
   updatePetitionUserNotificationReadStatus: Array<PetitionUserNotification>;
+  updateProfileFieldValue: Profile;
   updateProfileType: ProfileType;
   updateProfileTypeField: ProfileTypeField;
   updateProfileTypeFieldPositions: ProfileType;
@@ -988,6 +990,11 @@ export type MutationclonePetitionsArgs = {
   keepTitle?: InputMaybe<Scalars["Boolean"]>;
   path?: InputMaybe<Scalars["String"]>;
   petitionIds: Array<Scalars["GID"]>;
+};
+
+export type MutationcloneProfileTypeArgs = {
+  name?: InputMaybe<Scalars["LocalizableUserText"]>;
+  profileTypeId: Scalars["GID"];
 };
 
 export type MutationcloneUserGroupsArgs = {
@@ -1130,8 +1137,14 @@ export type MutationcreatePrintPdfTaskArgs = {
 };
 
 export type MutationcreateProfileArgs = {
-  data: CreateProfileInput;
   profileTypeId: Scalars["GID"];
+};
+
+export type MutationcreateProfileFieldFileUploadLinkArgs = {
+  data: Array<FileUploadInput>;
+  expiresAt?: InputMaybe<Scalars["DateTime"]>;
+  profileId: Scalars["GID"];
+  profileTypeFieldId: Scalars["GID"];
 };
 
 export type MutationcreateProfileTypeArgs = {
@@ -1264,7 +1277,7 @@ export type MutationdeleteProfileArgs = {
 };
 
 export type MutationdeleteProfileTypeArgs = {
-  ids: Array<Scalars["GID"]>;
+  profileTypeIds: Array<Scalars["GID"]>;
 };
 
 export type MutationdeleteProfileTypeFieldArgs = {
@@ -1385,6 +1398,12 @@ export type MutationpetitionFieldAttachmentUploadCompleteArgs = {
   attachmentId: Scalars["GID"];
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+};
+
+export type MutationprofileFieldFileUploadCompleteArgs = {
+  profileFieldFileIds: Array<Scalars["GID"]>;
+  profileId: Scalars["GID"];
+  profileTypeFieldId: Scalars["GID"];
 };
 
 export type MutationpublicCheckVerificationCodeArgs = {
@@ -1854,9 +1873,15 @@ export type MutationupdatePetitionUserNotificationReadStatusArgs = {
   petitionUserNotificationIds?: InputMaybe<Array<Scalars["GID"]>>;
 };
 
+export type MutationupdateProfileFieldValueArgs = {
+  fields: Array<UpdateProfileFieldValueInput>;
+  profileId: Scalars["GID"];
+};
+
 export type MutationupdateProfileTypeArgs = {
-  data: UpdateProfileTypeInput;
-  id: Scalars["GID"];
+  name?: InputMaybe<Scalars["LocalizableUserText"]>;
+  profileNamePattern?: InputMaybe<Scalars["String"]>;
+  profileTypeId: Scalars["GID"];
 };
 
 export type MutationupdateProfileTypeFieldArgs = {
@@ -3203,24 +3228,88 @@ export type PetitionUserPermission = PetitionPermission &
 export type Profile = Timestamps & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
-  fields: Array<ProfileFieldAndValue>;
   id: Scalars["GID"];
   name: Scalars["String"];
   profileType: ProfileType;
+  properties: Array<ProfileFieldProperty>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
 
-export type ProfileFieldAndValue = {
+export type ProfileFieldFile = ProfileFieldResponse & {
+  /** Time when the response was anonymized. */
+  anonymizedAt: Maybe<Scalars["DateTime"]>;
+  /** Time when the response was created. */
+  createdAt: Scalars["DateTime"];
+  createdBy: Maybe<User>;
+  /** Time when the response was created. */
+  expiresAt: Maybe<Scalars["DateTime"]>;
   field: ProfileTypeField;
+  file: Maybe<FileUpload>;
+  id: Scalars["GID"];
+  profile: Profile;
+  /** Time when the response was removed. */
+  removedAt: Maybe<Scalars["DateTime"]>;
+  removedBy: Maybe<User>;
+};
+
+export type ProfileFieldFileWithUploadData = {
+  file: ProfileFieldFile;
+  presignedPostData: AWSPresignedPostData;
+};
+
+export type ProfileFieldProperty = {
+  field: ProfileTypeField;
+  files: Maybe<Array<ProfileFieldFile>>;
   value: Maybe<ProfileFieldValue>;
 };
 
-export type ProfileFieldValue = CreatedAt & {
-  /** Time when the resource was created. */
+export type ProfileFieldPropertyAndFileWithUploadData = {
+  property: ProfileFieldProperty;
+  uploads: Array<ProfileFieldFileWithUploadData>;
+};
+
+export type ProfileFieldResponse = {
+  /** Time when the response was anonymized. */
+  anonymizedAt: Maybe<Scalars["DateTime"]>;
+  /** Time when the response was created. */
   createdAt: Scalars["DateTime"];
   createdBy: Maybe<User>;
+  /** Time when the response was created. */
+  expiresAt: Maybe<Scalars["DateTime"]>;
+  field: ProfileTypeField;
+  profile: Profile;
+  /** Time when the response was removed. */
+  removedAt: Maybe<Scalars["DateTime"]>;
+  removedBy: Maybe<User>;
+};
+
+export type ProfileFieldValue = ProfileFieldResponse & {
+  /** Time when the response was anonymized. */
+  anonymizedAt: Maybe<Scalars["DateTime"]>;
+  content: Maybe<Scalars["JSONObject"]>;
+  /** Time when the response was created. */
+  createdAt: Scalars["DateTime"];
+  createdBy: Maybe<User>;
+  /** Time when the response was created. */
+  expiresAt: Maybe<Scalars["DateTime"]>;
+  field: ProfileTypeField;
   id: Scalars["GID"];
+  profile: Profile;
+  /** Time when the response was removed. */
+  removedAt: Maybe<Scalars["DateTime"]>;
+  removedBy: Maybe<User>;
+};
+
+export type ProfileFilter = {
+  profileTypeId?: InputMaybe<Array<Scalars["GID"]>>;
+};
+
+export type ProfilePagination = {
+  /** The requested slice of items. */
+  items: Array<Profile>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
 };
 
 export type ProfileType = Timestamps & {
@@ -3229,6 +3318,7 @@ export type ProfileType = Timestamps & {
   fields: Array<ProfileTypeField>;
   id: Scalars["GID"];
   name: Scalars["LocalizableUserText"];
+  profileNamePattern: Scalars["String"];
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
@@ -3237,6 +3327,7 @@ export type ProfileTypeField = {
   alias: Maybe<Scalars["String"]>;
   id: Scalars["GID"];
   isExpirable: Scalars["Boolean"];
+  isUsedInProfileName: Scalars["Boolean"];
   myPermission: ProfileTypeFieldPermission;
   name: Scalars["LocalizableUserText"];
   options: Scalars["JSONObject"];
@@ -3245,7 +3336,7 @@ export type ProfileTypeField = {
   type: ProfileTypeFieldType;
 };
 
-export type ProfileTypeFieldPermission = "WRITE";
+export type ProfileTypeFieldPermission = "HIDDEN" | "READ" | "WRITE";
 
 export type ProfileTypeFieldType = "DATE" | "FILE" | "NUMBER" | "PHONE" | "SHORT_TEXT" | "TEXT";
 
@@ -3568,8 +3659,10 @@ export type Query = {
   /** The petitions of the user */
   petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
+  profile: Profile;
   profileType: ProfileType;
   profileTypes: ProfileTypePagination;
+  profiles: ProfilePagination;
   publicLicenseCode: Maybe<PublicLicenseCode>;
   publicOrg: Maybe<PublicOrganization>;
   /** The comments for this field. */
@@ -3726,6 +3819,10 @@ export type QuerypetitionsByIdArgs = {
   ids?: InputMaybe<Array<Scalars["GID"]>>;
 };
 
+export type QueryprofileArgs = {
+  profileId: Scalars["GID"];
+};
+
 export type QueryprofileTypeArgs = {
   profileTypeId: Scalars["GID"];
 };
@@ -3736,6 +3833,14 @@ export type QueryprofileTypesArgs = {
   offset?: InputMaybe<Scalars["Int"]>;
   search?: InputMaybe<Scalars["String"]>;
   sortBy?: InputMaybe<Array<QueryProfileTypes_OrderBy>>;
+};
+
+export type QueryprofilesArgs = {
+  filter?: InputMaybe<ProfileFilter>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+  search?: InputMaybe<Scalars["String"]>;
+  sortBy?: InputMaybe<Array<QueryProfiles_OrderBy>>;
 };
 
 export type QuerypublicLicenseCodeArgs = {
@@ -3849,6 +3954,9 @@ export type QueryProfileTypes_OrderBy =
   | "createdAt_DESC"
   | "name_ASC"
   | "name_DESC";
+
+/** Order to use on Query.profiles */
+export type QueryProfiles_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
 
 /** Order to use on Query.userGroups */
 export type QueryUserGroups_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
@@ -4257,15 +4365,17 @@ export type UpdatePetitionInput = {
   skipForwardSecurity?: InputMaybe<Scalars["Boolean"]>;
 };
 
+export type UpdateProfileFieldValueInput = {
+  content?: InputMaybe<Scalars["JSONObject"]>;
+  expiresAt?: InputMaybe<Scalars["Date"]>;
+  profileTypeFieldId: Scalars["GID"];
+};
+
 export type UpdateProfileTypeFieldInput = {
   alias?: InputMaybe<Scalars["String"]>;
   isExpirable?: InputMaybe<Scalars["Boolean"]>;
   name?: InputMaybe<Scalars["LocalizableUserText"]>;
   options?: InputMaybe<Scalars["JSONObject"]>;
-};
-
-export type UpdateProfileTypeInput = {
-  name?: InputMaybe<Scalars["LocalizableUserText"]>;
 };
 
 export type UpdateTagInput = {

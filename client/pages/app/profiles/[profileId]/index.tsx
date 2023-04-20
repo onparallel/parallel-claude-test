@@ -4,74 +4,50 @@ import { EyeOffIcon, LockClosedIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { Divider } from "@parallel/components/common/Divider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { MoreOptionsMenuProfile } from "@parallel/components/profiles/MoreOptionsMenuProfile";
-import { ProfileDetail_userDocument } from "@parallel/graphql/__types";
+import {
+  ProfileDetail_profileDocument,
+  ProfileDetail_userDocument,
+} from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useDeleteProfile } from "@parallel/utils/mutations/useDeleteProfile";
+import { UnwrapPromise } from "@parallel/utils/types";
 import { FormattedMessage, useIntl } from "react-intl";
+import { partition } from "remeda";
 
-function ProfileDetail() {
+type ProfileDetailProps = UnwrapPromise<ReturnType<typeof ProfileDetail.getInitialProps>>;
+
+function ProfileDetail({ profileId }: ProfileDetailProps) {
   const intl = useIntl();
 
   const {
     data: { me, realMe },
   } = useAssertQuery(ProfileDetail_userDocument);
 
-  const data = {
-    id: 2131541,
-    profileName: "Binford Ltd.",
-    type: "persona jurídica",
-    fields: [
-      {
-        title: "Company name",
-        type: "SHORT_TEXT",
-        value: "Binford Ltd.",
-      },
-      {
-        title: "Phone number",
-        type: "PHONE",
-        value: "",
-      },
-      {
-        title: "Type",
-        type: "SHORT_TEXT",
-        value: "",
-      },
-      {
-        title: "City",
-        type: "SHORT_TEXT",
-        value: "Madrid",
-      },
-      {
-        title: "Postal code",
-        type: "SHORT_TEXT",
-        value: "497881",
-      },
-      {
-        title: "Number of employees",
-        type: "NUMBER",
-        value: "40",
-      },
-      {
-        title: "Annual revenue",
-        type: "SHORT_TEXT",
-        value: "",
-      },
-    ],
-    hiddenFields: [
-      { id: "1231", name: "Industry" },
-      { id: "21312", name: "Annual revenue" },
-    ],
-  };
+  const {
+    data: { profile },
+  } = useAssertQuery(ProfileDetail_profileDocument, {
+    variables: {
+      profileId,
+    },
+  });
+
+  console.log(profile);
+
+  const [properties, hiddenProperties] = partition(
+    profile.properties,
+    (property) => property.field.myPermission !== "HIDDEN"
+  );
 
   const deleteProfile = useDeleteProfile();
   const handleDeleteProfile = async () => {
     try {
-      deleteProfile({ id: "someid" });
+      deleteProfile({ id: profile.id });
     } catch {}
   };
 
@@ -93,7 +69,7 @@ function ProfileDetail() {
     >
       <HStack padding={4} justify="space-between" paddingX={4}>
         <Heading as="h2" size="md" fontWeight={400}>
-          {data.profileName}
+          {profile.name}
         </Heading>
         <MoreOptionsMenuProfile onDelete={handleDeleteProfile} onClone={handleCloneProfile} />
       </HStack>
@@ -105,19 +81,33 @@ function ProfileDetail() {
               id="page.profile-details.about-this-profile-type"
               defaultMessage="About this {type}"
               values={{
-                type: data.type,
+                type: (
+                  <LocalizableUserTextRender
+                    value={profile.profileType.name}
+                    default={intl.formatMessage({
+                      id: "generic.unnamed-profile-type",
+                      defaultMessage: "Unnamed profile type",
+                    })}
+                  />
+                ),
               }}
             />
           </Heading>
           <Stack as="ul">
-            {data.fields.map(({ title, value }, i) => {
+            {properties.map(({ field: { id, name, type }, files, value }, i) => {
               return (
-                <Stack as="li" key={i}>
+                <Stack as="li" key={id}>
                   <Text fontSize="sm" fontWeight={400} color="gray.600">
-                    {title}
+                    <LocalizableUserTextRender
+                      value={name}
+                      default={intl.formatMessage({
+                        id: "generic.unnamed-profile-type-field",
+                        defaultMessage: "Unnamed property",
+                      })}
+                    />
                   </Text>
                   <Box paddingLeft={2}>
-                    <Input value={value} isReadOnly variant={"unstyled"} />
+                    <Input value={""} isReadOnly variant={"unstyled"} />
                   </Box>
                 </Stack>
               );
@@ -143,10 +133,18 @@ function ProfileDetail() {
             </HelpPopover>
           </HStack>
           <Stack>
-            {data.hiddenFields.map(({ id, name }) => {
+            {hiddenProperties.map(({ field: { id, name } }) => {
               return (
                 <HStack key={id} justify="space-between">
-                  <Text>{name}</Text>
+                  <Text>
+                    <LocalizableUserTextRender
+                      value={name}
+                      default={intl.formatMessage({
+                        id: "generic.unnamed-profile-type-field",
+                        defaultMessage: "Unnamed property",
+                      })}
+                    />
+                  </Text>
                   <EyeOffIcon />
                 </HStack>
               );
@@ -158,6 +156,81 @@ function ProfileDetail() {
   );
 }
 
+const _fragments = {
+  get ProfileTypeField() {
+    return gql`
+      fragment ProfileDetail_ProfileTypeField on ProfileTypeField {
+        id
+        name
+        position
+        type
+        myPermission
+      }
+    `;
+  },
+  get ProfileFieldFile() {
+    return gql`
+      fragment ProfileDetail_ProfileFieldFile on ProfileFieldFile {
+        id
+        file {
+          filename
+          contentType
+          isComplete
+          size
+        }
+      }
+    `;
+  },
+  get ProfileFieldValue() {
+    return gql`
+      fragment ProfileDetail_ProfileFieldValue on ProfileFieldValue {
+        id
+        field {
+          id
+        }
+        content
+        createdAt
+      }
+    `;
+  },
+  get ProfileFieldProperty() {
+    return gql`
+      fragment ProfileDetail_ProfileFieldProperty on ProfileFieldProperty {
+        field {
+          ...ProfileDetail_ProfileTypeField
+        }
+        files {
+          ...ProfileDetail_ProfileFieldFile
+        }
+        value {
+          ...ProfileDetail_ProfileFieldValue
+        }
+      }
+      ${this.ProfileTypeField}
+      ${this.ProfileFieldFile}
+      ${this.ProfileFieldValue}
+    `;
+  },
+  get Profile() {
+    return gql`
+      fragment ProfileDetail_Profile on Profile {
+        id
+        name
+        profileType {
+          id
+          name
+        }
+        properties {
+          ...ProfileDetail_ProfileFieldProperty
+        }
+        createdAt
+        updatedAt
+      }
+      ${this.ProfileFieldProperty}
+    `;
+  },
+};
+
 const _queries = [
   gql`
     query ProfileDetail_user {
@@ -165,11 +238,25 @@ const _queries = [
     }
     ${AppLayout.fragments.Query}
   `,
+  gql`
+    query ProfileDetail_profile($profileId: GID!) {
+      profile(profileId: $profileId) {
+        ...ProfileDetail_Profile
+      }
+    }
+    ${_fragments.Profile}
+  `,
 ];
 
 ProfileDetail.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  await fetchQuery(ProfileDetail_userDocument);
-  return {};
+  const profileId = query.profileId as string;
+
+  await Promise.all([
+    fetchQuery(ProfileDetail_profileDocument, { variables: { profileId } }),
+    fetchQuery(ProfileDetail_userDocument),
+  ]);
+
+  return { profileId };
 };
 
 export default compose(

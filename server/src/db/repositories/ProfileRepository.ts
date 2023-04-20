@@ -44,7 +44,7 @@ export class ProfileRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at").orderBy("position", "asc")
   );
 
-  readonly loadProfileTypeForProfileId = this.buildLoader<number, ProfileType | null>(
+  private readonly loadProfileTypeForProfileId = this.buildLoader<number, ProfileType | null>(
     async (keys, t) => {
       const profileTypes = await this.raw<ProfileType & { profile_id: number }>(
         /* sql */ `
@@ -353,19 +353,23 @@ export class ProfileRepository extends BaseRepository {
   }
 
   readonly loadProfile = this.buildLoadBy("profile", "id", (q) => q.whereNull("deleted_at"));
+
   readonly loadProfileFieldValuesByProfileId = this.buildLoadMultipleBy(
     "profile_field_value",
     "profile_id",
     (q) => q.whereNull("removed_at").whereNull("deleted_at")
   );
+
   readonly loadProfileFieldFileById = this.buildLoadBy("profile_field_file", "id", (q) =>
     q.whereNull("removed_at").whereNull("deleted_at")
   );
+
   readonly loadProfileFieldFilesByProfileId = this.buildLoadMultipleBy(
     "profile_field_file",
     "profile_id",
     (q) => q.whereNull("removed_at").whereNull("deleted_at")
   );
+
   readonly loadProfileFieldFilesByProfileTypeFieldId = this.buildLoadMultipleBy(
     "profile_field_file",
     "profile_type_field_id",
@@ -392,7 +396,7 @@ export class ProfileRepository extends BaseRepository {
             q.whereEscapedILike("name", `%${escapeLike(search, "\\")}%`);
           }
           if (isDefined(filter?.profileTypeId)) {
-            q.where("profile_type_id", filter?.profileTypeId);
+            q.whereIn("profile_type_id", filter!.profileTypeId);
           }
           if (isDefined(sortBy)) {
             q.orderBy(
@@ -698,7 +702,6 @@ export class ProfileRepository extends BaseRepository {
     if (Array.isArray(events) && events.length === 0) {
       return [];
     }
-    const profileEvents = await this.insert("profile_event", events, t);
-    return profileEvents;
+    return await this.insert("profile_event", events, t);
   }
 }

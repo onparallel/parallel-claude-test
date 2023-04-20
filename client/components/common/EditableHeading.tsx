@@ -81,7 +81,7 @@ export function EditableHeading({ isDisabled, value, onChange }: EditableHeading
             fontSize={18}
             _hover={{ backgroundColor: "white", color: "gray.600" }}
             label={intl.formatMessage({
-              id: "view.group.edit-name",
+              id: "generic.edit-name",
               defaultMessage: "Edit name",
             })}
           />

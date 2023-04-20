@@ -823,9 +823,7 @@ function usePetitionListActions({
       isDisabled: hasSelectedFolders || user.role === "COLLABORATOR",
       onClick: onCloneClick,
       leftIcon: <CopyIcon />,
-      children: (
-        <FormattedMessage id="page.petitions-list.actions-clone" defaultMessage="Duplicate" />
-      ),
+      children: <FormattedMessage id="generic.duplicate" defaultMessage="Duplicate" />,
       wrap: restrictToCollaborators,
     },
     {

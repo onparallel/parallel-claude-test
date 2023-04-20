@@ -55,7 +55,7 @@ export const ProfileTypeField = objectType({
         return profileType.profile_name_pattern.includes(root.id);
       },
     });
-    t.field("myPermission", { type: "ProfileTypeFieldPermission", resolve: (o) => "WRITE" });
+    t.field("myPermission", { type: "ProfileTypeFieldPermission", resolve: (o) => o.permission });
     t.jsonObject("options", { resolve: (o) => o.options });
     t.nullable.string("alias");
     t.boolean("isExpirable", { resolve: (o) => o.is_expirable });

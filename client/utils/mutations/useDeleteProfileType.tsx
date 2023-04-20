@@ -1,73 +1,109 @@
+import { gql, useLazyQuery, useMutation } from "@apollo/client";
 import { Alert, AlertDescription, AlertIcon, Button, Stack, Text } from "@chakra-ui/react";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import {
+  useDeleteProfileType_deleteProfileTypeDocument,
+  useDeleteProfileType_profilesDocument,
+  useDeleteProfileType_ProfileTypeFragment,
+} from "@parallel/graphql/__types";
 import { useCallback } from "react";
-import { FormattedMessage } from "react-intl";
-import { isApolloError } from "../apollo/isApolloError";
+import { FormattedMessage, useIntl } from "react-intl";
 
 export function useDeleteProfileType() {
-  // const [deleteProfileType] = useMutation(useDeleteProfileType_deleteProfileDocument);
+  const [deleteProfileType] = useMutation(useDeleteProfileType_deleteProfileTypeDocument);
+
+  const [getProfile] = useLazyQuery(useDeleteProfileType_profilesDocument, {
+    fetchPolicy: "network-only",
+  });
 
   const showConfirmDelete = useDialog(ConfirmDeleteProfileTypeDialog);
   const showConfirmDeleteWithProfiles = useConfirmDeleteProfileTypeDialog();
-  //TODO delete profile types
 
-  return async function ({ profileTypes }: { profileTypes: any[] }) {
+  return async function ({
+    profileTypes,
+  }: {
+    profileTypes: useDeleteProfileType_ProfileTypeFragment[];
+  }) {
     try {
-      // const { data } = await deleteProfileType({
-      //   variables: { id },
-      //   update(cache) {
-      //     cache.evict({ id });
-      //     cache.gc();
-      //   },
-      // });
-      // return data!.deleteProfileType;
-      const random = Math.floor(Math.random() * 10) + 1;
-      if (random % 2 === 0) {
-        await showConfirmDelete({
+      const { data } = await getProfile({
+        variables: {
+          filter: {
+            profileTypeId: profileTypes.map((pt) => pt.id),
+          },
+        },
+      });
+
+      const profilesCount = data?.profiles.totalCount;
+
+      if (profilesCount) {
+        await showConfirmDeleteWithProfiles({
+          profilesCount,
           profileTypes,
         });
       } else {
-        await showConfirmDeleteWithProfiles({
-          profilesCount: random,
+        await showConfirmDelete({
           profileTypes,
         });
       }
 
-      return;
-    } catch (e) {
-      if (isApolloError(e, "PROFILE_TYPE_IS_USED")) {
-        await showConfirmDeleteWithProfiles({
-          profilesCount: (e.graphQLErrors[0].extensions as any)?.data?.propertiesInUsee ?? 0,
-          profileTypes,
-        });
-        // const { data } = await deleteProfileType({
-        //   variables: { id, force: true },
-        //   update(cache) {
-        //     cache.evict({ id });
-        //     cache.gc();
-        //   },
-        // });
+      const { data: res } = await deleteProfileType({
+        variables: { profileTypeIds: profileTypes.map((profileType) => profileType.id) },
+        update(cache) {
+          for (const profile of profileTypes) {
+            cache.evict({ id: profile.id });
+          }
+          cache.gc();
+        },
+      });
 
-        // return data!.deleteProfileType;
-      }
-    }
+      return res?.deleteProfileType;
+    } catch {}
   };
 }
 
-// useDeleteProfileType.mutations = [
-//   gql`
-//     mutation useDeleteProfileType_deleteProfileType($id: GID!, $force: Boolean) {
-//       deleteProfileType(id: $id, force: $force)
-//     }
-//   `,
-// ];
+useDeleteProfileType.fragments = {
+  get ProfileType() {
+    return gql`
+      fragment useDeleteProfileType_ProfileType on ProfileType {
+        id
+        name
+      }
+    `;
+  },
+};
+
+useDeleteProfileType.queries = [
+  gql`
+    query useDeleteProfileType_profiles($filter: ProfileFilter) {
+      profiles(filter: $filter) {
+        totalCount
+      }
+    }
+  `,
+];
+
+useDeleteProfileType.mutations = [
+  gql`
+    mutation useDeleteProfileType_deleteProfileType($profileTypeIds: [GID!]!) {
+      deleteProfileType(profileTypeIds: $profileTypeIds)
+    }
+  `,
+];
 
 function useConfirmDeleteProfileTypeDialog() {
   const showDialog = useConfirmDeleteDialog();
+  const intl = useIntl();
   return useCallback(
-    async ({ profilesCount, profileTypes }: { profilesCount: number; profileTypes: any[] }) => {
+    async ({
+      profilesCount,
+      profileTypes,
+    }: {
+      profilesCount: number;
+      profileTypes: useDeleteProfileType_ProfileTypeFragment[];
+    }) => {
       return await showDialog({
         size: "lg",
         header: (
@@ -112,7 +148,14 @@ function useConfirmDeleteProfileTypeDialog() {
                 defaultMessage="Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other {these profile types}}?"
                 values={{
                   count: profileTypes.length,
-                  name: profileTypes[0].name,
+                  name: localizableUserTextRender({
+                    value: profileTypes[0].name,
+                    intl,
+                    default: intl.formatMessage({
+                      id: "generic.unamed-profile-type",
+                      defaultMessage: "Unnamed profile type",
+                    }),
+                  }),
                 }}
               />
             </Text>
@@ -128,8 +171,10 @@ function ConfirmDeleteProfileTypeDialog({
   profileTypes,
   ...props
 }: DialogProps<{
-  profileTypes: any[];
+  profileTypes: useDeleteProfileType_ProfileTypeFragment[];
 }>) {
+  const intl = useIntl();
+
   return (
     <ConfirmDialog
       {...props}
@@ -149,7 +194,14 @@ function ConfirmDeleteProfileTypeDialog({
             defaultMessage="Are you sure you want to delete <b>{count, plural, =1 {{name}} other {# selected profile types}}</b>?"
             values={{
               count: profileTypes.length,
-              name: profileTypes[0].name,
+              name: localizableUserTextRender({
+                value: profileTypes[0].name,
+                intl,
+                default: intl.formatMessage({
+                  id: "generic.unamed-profile-type",
+                  defaultMessage: "Unnamed profile type",
+                }),
+              }),
             }}
           />
         </Text>

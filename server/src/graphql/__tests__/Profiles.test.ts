@@ -1001,23 +1001,6 @@ describe("GraphQL/Profiles", () => {
   });
 
   describe("updateProfileFieldValue", () => {
-    const profileFragment = gql`
-      fragment ProfileFragment on Profile {
-        id
-        name
-        properties {
-          field {
-            id
-            isExpirable
-          }
-          value {
-            content
-            expiresAt
-          }
-        }
-      }
-    `;
-
     type UpdateProfileFieldValueInput = {
       profileTypeFieldId: string;
       content?: Record<string, any> | null;
@@ -1029,10 +1012,20 @@ describe("GraphQL/Profiles", () => {
         gql`
           mutation ($profileTypeId: GID!) {
             createProfile(profileTypeId: $profileTypeId) {
-              ...ProfileFragment
+              id
+              name
+              properties {
+                field {
+                  id
+                  isExpirable
+                }
+                value {
+                  content
+                  expiresAt
+                }
+              }
             }
           }
-          ${profileFragment}
         `,
         { profileTypeId }
       );
@@ -1048,10 +1041,20 @@ describe("GraphQL/Profiles", () => {
         gql`
           mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
             updateProfileFieldValue(profileId: $profileId, fields: $fields) {
-              ...ProfileFragment
+              id
+              name
+              properties {
+                field {
+                  id
+                  isExpirable
+                }
+                value {
+                  content
+                  expiresAt
+                }
+              }
             }
           }
-          ${profileFragment}
         `,
         { profileId, fields }
       );

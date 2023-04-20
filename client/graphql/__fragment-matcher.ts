@@ -9,7 +9,6 @@ const result: PossibleTypesResultData = {
       "PetitionFieldAttachment",
       "PetitionMessage",
       "PetitionReminder",
-      "ProfileFieldValue",
       "UserAuthenticationToken",
     ],
     DowJonesKycEntityProfileResult: [
@@ -81,6 +80,14 @@ const result: PossibleTypesResultData = {
       "SignatureCancelledUserNotification",
       "SignatureCompletedUserNotification",
     ],
+    ProfileEvent: [
+      "ProfileCreatedEvent",
+      "ProfileFieldExpiryUpdatedEvent",
+      "ProfileFieldFileAddedEvent",
+      "ProfileFieldFileRemovedEvent",
+      "ProfileFieldValueUpdatedEvent",
+    ],
+    ProfileFieldResponse: ["ProfileFieldFile", "ProfileFieldValue"],
     PublicUserOrContact: ["PublicContact", "PublicUser"],
     TemplateDefaultPermission: [
       "TemplateDefaultUserGroupPermission",

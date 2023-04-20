@@ -1,18 +1,18 @@
 import { Icon } from "@chakra-ui/react";
 import {
+  DowJonesIcon,
+  FieldCheckboxIcon,
+  FieldDateIcon,
+  FieldDateTimeIcon,
   FieldDynamicSelectIcon,
   FieldFileUploadIcon,
   FieldHeadingIcon,
-  FieldSelectIcon,
-  FieldTextIcon,
-  FieldShortTextIcon,
-  FieldCheckboxIcon,
   FieldNumberIcon,
-  FieldDateIcon,
-  FieldDateTimeIcon,
   FieldPhoneIcon,
+  FieldSelectIcon,
+  FieldShortTextIcon,
   FieldTaxDocumentsIcon,
-  DowJonesIcon,
+  FieldTextIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";

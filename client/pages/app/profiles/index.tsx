@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
@@ -14,17 +14,34 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, RepeatIcon } from "@parallel/chakra/icons";
+import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import {
+  LocalizableUserTextRender,
+  localizableUserTextRender,
+} from "@parallel/components/common/LocalizableUserTextRender";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { Profiles_userDocument } from "@parallel/graphql/__types";
+import { useCreateProfileDialog } from "@parallel/components/profiles/dialogs/CreateProfileDialog";
+import {
+  Profiles_createProfileDocument,
+  Profiles_ProfileFragment,
+  Profiles_profilesDocument,
+  Profiles_profileTypesDocument,
+  Profiles_userDocument,
+  UserLocale,
+} from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
+import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
+import { FORMATS } from "@parallel/utils/dates";
+import { useHandleNavigation } from "@parallel/utils/navigation";
 import {
   integer,
   QueryStateFrom,
@@ -36,16 +53,11 @@ import {
   values,
 } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useSelection } from "@parallel/utils/useSelectionState";
 import { ChangeEvent, MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useSelection } from "@parallel/utils/useSelectionState";
-import { TableColumn } from "@parallel/components/common/Table";
-import { DateTime } from "@parallel/components/common/DateTime";
-import { FORMATS } from "@parallel/utils/dates";
-import { useCreateProfileDialog } from "@parallel/components/profiles/dialogs/CreateProfileDialog";
-import { useHandleNavigation } from "@parallel/utils/navigation";
 
-const SORTING = ["name", "type", "createdAt"] as const;
+const SORTING = ["name", "createdAt"] as const;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -59,34 +71,57 @@ const QUERY_STATE = {
 type ProfilesQueryState = QueryStateFrom<typeof QUERY_STATE>;
 
 function Profiles() {
+  const intl = useIntl();
   const {
     data: { me, realMe },
   } = useAssertQuery(Profiles_userDocument);
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
 
-  const loading = false;
+  const { data, loading, refetch } = useQueryOrPreviousData(Profiles_profilesDocument, {
+    variables: {
+      offset: queryState.items * (queryState.page - 1),
+      limit: queryState.items,
+      search: queryState.search,
+      sortBy: [`${queryState.sort.field}_${queryState.sort.direction}` as const],
+    },
+    fetchPolicy: "cache-and-network",
+  });
 
-  const { onChangeSelectedIds } = useSelection([{}] as any[], "id");
+  const { data: _profileTypesData } = useQueryOrPreviousData(Profiles_profileTypesDocument, {
+    variables: {
+      offset: 0,
+      limit: 999,
+      locale: intl.locale as UserLocale,
+    },
+    fetchPolicy: "cache-and-network",
+  });
+
+  const profiles = data?.profiles;
+  const profileTypes = _profileTypesData?.profileTypes;
+
+  const { onChangeSelectedIds } = useSelection(profiles?.items, "id");
 
   const columns = useProfileTableColumns();
 
   const [profileType, setProfileType] = useState<string>("All the profiles");
 
-  const profileTypes = [
-    { id: "1231", name: "Some other profile" },
-    { id: "wda1231", name: "Contracts" },
-  ];
-
+  const [createProfile] = useMutation(Profiles_createProfileDocument);
   const showCreateProfileDialog = useCreateProfileDialog();
   const handleCreateProfile = async () => {
     try {
-      const data = await showCreateProfileDialog();
-      console.log("new profile data: ", data);
+      const { profileTypeId } = await showCreateProfileDialog();
+      // console.log("new profile data: ", data);
+      await createProfile({
+        variables: {
+          profileTypeId,
+        },
+      });
+      refetch();
     } catch {}
   };
 
   const navigate = useHandleNavigation();
-  const handleRowClick = useCallback((row: any, event: MouseEvent) => {
+  const handleRowClick = useCallback((row: Profiles_ProfileFragment, event: MouseEvent) => {
     navigate(`/app/profiles/${row.id}`, event);
   }, []);
 
@@ -120,15 +155,21 @@ function Profiles() {
                     >
                       {"All the profiles"}
                     </MenuItemOption>
-                    {profileTypes.map(({ id, name }) => {
+                    {profileTypes?.items.map(({ id, name }) => {
                       return (
                         <MenuItemOption
                           key={id}
-                          value={name}
-                          onClick={() => setProfileType(name)}
-                          data-testid={`profile-type-${name}`}
+                          value={id}
+                          onClick={() => setProfileType(id)}
+                          data-testid={`profile-type-${id}`}
                         >
-                          {name}
+                          <LocalizableUserTextRender
+                            value={name}
+                            default={intl.formatMessage({
+                              id: "generic.unamed-profile-type",
+                              defaultMessage: "Unnamed profile type",
+                            })}
+                          />
                         </MenuItemOption>
                       );
                     })}
@@ -147,7 +188,7 @@ function Profiles() {
             flex="0 1 auto"
             minHeight={0}
             columns={columns}
-            rows={[] as any[]}
+            rows={profiles?.items}
             rowKeyProp="id"
             context={context}
             isSelectable
@@ -156,7 +197,7 @@ function Profiles() {
             onRowClick={handleRowClick}
             page={queryState.page}
             pageSize={queryState.items}
-            totalCount={300}
+            totalCount={profiles?.totalCount}
             onSelectionChange={onChangeSelectedIds}
             sort={queryState.sort}
             onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
@@ -169,11 +210,11 @@ function Profiles() {
                 shape={QUERY_STATE}
                 state={queryState}
                 onStateChange={setQueryState}
-                onReload={() => {}}
+                onReload={refetch}
               />
             }
             body={
-              !loading ? (
+              profiles && profiles.totalCount === 0 && !loading ? (
                 queryState.search ? (
                   <Flex flex="1" alignItems="center" justifyContent="center">
                     <Text color="gray.300" fontSize="lg">
@@ -252,7 +293,7 @@ function ProfilesListHeader({ shape, state, onStateChange, onReload }: ProfilesL
   );
 }
 
-function useProfileTableColumns(): TableColumn<any>[] {
+function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[] {
   const intl = useIntl();
   return useMemo(
     () => [
@@ -282,8 +323,23 @@ function useProfileTableColumns(): TableColumn<any>[] {
           width: "42%",
           minWidth: "240px",
         },
-        CellContent: ({ row }) => {
-          return <Text as="span">{row.type}</Text>;
+        CellContent: ({
+          row: {
+            profileType: { name },
+          },
+        }) => {
+          return (
+            <Text as="span">
+              {localizableUserTextRender({
+                value: name,
+                intl,
+                default: intl.formatMessage({
+                  id: "generic.unnamed-profile-type",
+                  defaultMessage: "Unnamed profile type",
+                }),
+              })}
+            </Text>
+          );
         },
       },
       {
@@ -302,12 +358,91 @@ function useProfileTableColumns(): TableColumn<any>[] {
   );
 }
 
+const _fragments = {
+  get ProfileType() {
+    return gql`
+      fragment Profiles_ProfileType on ProfileType {
+        id
+        name
+        createdAt
+      }
+    `;
+  },
+  get Profile() {
+    return gql`
+      fragment Profiles_Profile on Profile {
+        id
+        name
+        profileType {
+          id
+          name
+        }
+        createdAt
+      }
+    `;
+  },
+  get ProfileTypePagination() {
+    return gql`
+      fragment Profiles_ProfileTypePagination on ProfileTypePagination {
+        items {
+          ...Profiles_ProfileType
+        }
+        totalCount
+      }
+      ${this.ProfileType}
+    `;
+  },
+  get ProfilePagination() {
+    return gql`
+      fragment Profiles_ProfilePagination on ProfilePagination {
+        items {
+          ...Profiles_Profile
+        }
+        totalCount
+      }
+      ${this.Profile}
+    `;
+  },
+};
+
 const _queries = [
   gql`
     query Profiles_user {
       ...AppLayout_Query
     }
     ${AppLayout.fragments.Query}
+  `,
+  gql`
+    query Profiles_profileTypes($offset: Int, $limit: Int, $locale: UserLocale) {
+      profileTypes(offset: $offset, limit: $limit, locale: $locale) {
+        ...Profiles_ProfileTypePagination
+      }
+    }
+    ${_fragments.ProfileTypePagination}
+  `,
+  gql`
+    query Profiles_profiles(
+      $offset: Int
+      $limit: Int
+      $search: String
+      $sortBy: [QueryProfiles_OrderBy!]
+    ) {
+      profiles(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy) {
+        ...Profiles_ProfilePagination
+      }
+    }
+    ${_fragments.ProfilePagination}
+  `,
+];
+
+const _mutations = [
+  gql`
+    mutation Profiles_createProfile($profileTypeId: GID!) {
+      createProfile(profileTypeId: $profileTypeId) {
+        ...Profiles_Profile
+      }
+    }
+    ${_fragments.Profile}
   `,
 ];
 

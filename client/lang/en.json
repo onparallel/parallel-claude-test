@@ -1130,6 +1130,56 @@
     "context": "Set as default theme"
   },
   {
+    "term": "component.create-or-update-property-dialog.edit-profile-type-field",
+    "definition": "Edit property",
+    "context": "Edit property"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.expiration",
+    "definition": "Expiration",
+    "context": "Expiration"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.expiration-description",
+    "definition": "Select if this property will have an expiration date. Example: Passports and contracts.",
+    "context": "Select if this property will have an expiration date. Example: Passports and contracts."
+  },
+  {
+    "term": "component.create-or-update-property-dialog.new-property",
+    "definition": "New property",
+    "context": "New property"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.property-name",
+    "definition": "Property name",
+    "context": "Property name"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.remember-from",
+    "definition": "Remember from:",
+    "context": "Remember from:"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.type-of-property",
+    "definition": "Type of property",
+    "context": "Type of property"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.unique-identifier",
+    "definition": "Unique identifier",
+    "context": "Unique identifier"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.unique-identifier-alredy-exists",
+    "definition": "This identifier is already in use",
+    "context": "This identifier is already in use"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.unique-identifier-help",
+    "definition": "Allows to easily identify the property in API replies.",
+    "context": "Allows to easily identify the property in API replies."
+  },
+  {
     "term": "component.create-or-update-user-dialog.included-in",
     "definition": "Included in (optional)",
     "context": "Included in (optional)"
@@ -1585,6 +1635,26 @@
     "context": "File name"
   },
   {
+    "term": "component.draggable-list.delete-property",
+    "definition": "Delete property",
+    "context": "Delete property"
+  },
+  {
+    "term": "component.draggable-list.drag-to-sort-label",
+    "definition": "Drag to sort this property",
+    "context": "Drag to sort this property"
+  },
+  {
+    "term": "component.draggable-list.edit-property",
+    "definition": "Edit property",
+    "context": "Edit property"
+  },
+  {
+    "term": "component.draggable-list.heading",
+    "definition": "Properties",
+    "context": "Properties"
+  },
+  {
     "term": "component.email-verification-required-alert.body",
     "definition": "Please activate your account through the activation link that was sent to your email and try again.",
     "context": "Please activate your account through the activation link that was sent to your email and try again."
@@ -1948,6 +2018,16 @@
     "term": "component.feature-flag-descriptions.prefill-secret-public-links-name",
     "definition": "Pre-fill public links with JWT query",
     "context": "Pre-fill public links with JWT query"
+  },
+  {
+    "term": "component.feature-flag-descriptions.profiles-description",
+    "definition": "Grants access to profiles",
+    "context": "Grants access to profiles"
+  },
+  {
+    "term": "component.feature-flag-descriptions.profiles-name",
+    "definition": "Profiles",
+    "context": "Profiles"
   },
   {
     "term": "component.feature-flag-descriptions.remove-parallel-branding-description",
@@ -2743,6 +2823,21 @@
     "term": "component.overwrite-documentation-dialog.header",
     "definition": "Overwrite documentation",
     "context": "Overwrite documentation"
+  },
+  {
+    "term": "component.overwrite-name-pattern-dialog.body",
+    "definition": "There <b>{count, plural, =1 {is # profile} other {are # profiles}}</b> that use this type of profile. If you continue, {count, plural, =1 {its} other {their}} name will be updated according to the new rule. Would you like to continue?",
+    "context": "There <b>{count, plural, =1 {is # profile} other {are # profiles}}</b> that use this type of profile. If you continue, {count, plural, =1 {its} other {their}} name will be updated according to the new rule. Would you like to continue?"
+  },
+  {
+    "term": "component.overwrite-name-pattern-dialog.change-name",
+    "definition": "Change name",
+    "context": "Change name"
+  },
+  {
+    "term": "component.overwrite-name-pattern-dialog.title",
+    "definition": "Overwrite name",
+    "context": "Overwrite name"
   },
   {
     "term": "component.password-input.hide",
@@ -4195,6 +4290,31 @@
     "context": "Delete profile type"
   },
   {
+    "term": "component.profile-type-settings.add-profile-type-field-to-name-error",
+    "definition": "Please add a property to the name",
+    "context": "Please add a property to the name"
+  },
+  {
+    "term": "component.profile-type-settings.name-of-each-profile-help",
+    "definition": "Specify how the name of the profiles of type <b>{ProfileName}</b> will be generated. If you change it, existing profiles of this type will be updated.",
+    "context": "Specify how the name of the profiles of type <b>{ProfileName}</b> will be generated. If you change it, existing profiles of this type will be updated."
+  },
+  {
+    "term": "component.profile-type-settings.profile-name-pattern",
+    "definition": "Profile name",
+    "context": "Profile name"
+  },
+  {
+    "term": "component.profile-type-settings.profile-name-pattern-placeholder",
+    "definition": "Select a property",
+    "context": "Select a property"
+  },
+  {
+    "term": "component.profile-type-settings.settings",
+    "definition": "Settings",
+    "context": "Settings"
+  },
+  {
     "term": "component.profile-types-table.new-type",
     "definition": "New type",
     "context": "New type"
@@ -4208,6 +4328,16 @@
     "term": "component.profile-types-table.no-results",
     "definition": "There's no profile types matching your criteria",
     "context": "There's no profile types matching your criteria"
+  },
+  {
+    "term": "component.property-used-in-pattern-dialog.body",
+    "definition": "{count, plural, =1 {This property is} other {Some of the properties are}} being used as part of the name for profiles of type {type}. To continue, first you need to remove {count, plural, =1 {it} other {them}} from the name.",
+    "context": "{count, plural, =1 {This property is} other {Some of the properties are}} being used as part of the name for profiles of type {type}. To continue, first you need to remove {count, plural, =1 {it} other {them}} from the name."
+  },
+  {
+    "term": "component.property-used-in-pattern-dialog.title",
+    "definition": "{count, plural, =1 {Property} other {Properties}} used in profile name",
+    "context": "{count, plural, =1 {Property} other {Properties}} used in profile name"
   },
   {
     "term": "component.public-signup-form-experience.captcha-error",
@@ -6200,6 +6330,21 @@
     "context": "Years"
   },
   {
+    "term": "component.update-profile-type-field-dialog.expiration",
+    "definition": "Expiration",
+    "context": "Expiration"
+  },
+  {
+    "term": "component.update-profile-type-field-dialog.expiration-description",
+    "definition": "Select if this property will have an expiration date. Example: Passports and contracts.",
+    "context": "Select if this property will have an expiration date. Example: Passports and contracts."
+  },
+  {
+    "term": "component.update-profile-type-field-dialog.title",
+    "definition": "Edit {count} properties",
+    "context": "Edit {count} properties"
+  },
+  {
     "term": "component.use-create-contact.create-contact",
     "definition": "Create contact",
     "context": "Create contact"
@@ -7170,6 +7315,11 @@
     "context": "Drag the file here, or click to select it"
   },
   {
+    "term": "generic.duplicate",
+    "definition": "Duplicate",
+    "context": "Duplicate"
+  },
+  {
     "term": "generic.e-signature",
     "definition": "eSignature",
     "context": "eSignature"
@@ -7178,6 +7328,11 @@
     "term": "generic.edit",
     "definition": "Edit",
     "context": "Edit"
+  },
+  {
+    "term": "generic.edit-name",
+    "definition": "Edit name",
+    "context": "Edit name"
   },
   {
     "term": "generic.edited-indicator",
@@ -7550,9 +7705,29 @@
     "context": "Move to..."
   },
   {
+    "term": "generic.n-days-after",
+    "definition": "{count, plural, =1 {1 day} other {# days}} after",
+    "context": "{count, plural, =1 {1 day} other {# days}} after"
+  },
+  {
+    "term": "generic.n-days-before",
+    "definition": "{count, plural, =1 {1 day} other {# days}} before",
+    "context": "{count, plural, =1 {1 day} other {# days}} before"
+  },
+  {
     "term": "generic.n-group-members",
     "definition": "{count, plural, =1 {1 member} other {# members}}",
     "context": "{count, plural, =1 {1 member} other {# members}}"
+  },
+  {
+    "term": "generic.n-months-after",
+    "definition": "{count, plural, =1 {1 month} other {# months}} after",
+    "context": "{count, plural, =1 {1 month} other {# months}} after"
+  },
+  {
+    "term": "generic.n-months-before",
+    "definition": "{count, plural, =1 {1 month} other {# months}} before",
+    "context": "{count, plural, =1 {1 month} other {# months}} before"
   },
   {
     "term": "generic.n-more",
@@ -7693,6 +7868,36 @@
     "term": "generic.previous-page",
     "definition": "Previous page",
     "context": "Previous page"
+  },
+  {
+    "term": "generic.profile-type-field-type.date",
+    "definition": "Date",
+    "context": "Date"
+  },
+  {
+    "term": "generic.profile-type-field-type.file-upload",
+    "definition": "Documents and files",
+    "context": "Documents and files"
+  },
+  {
+    "term": "generic.profile-type-field-type.number",
+    "definition": "Numbers",
+    "context": "Numbers"
+  },
+  {
+    "term": "generic.profile-type-field-type.phone",
+    "definition": "Phone number",
+    "context": "Phone number"
+  },
+  {
+    "term": "generic.profile-type-field-type.short-text",
+    "definition": "Short replies",
+    "context": "Short replies"
+  },
+  {
+    "term": "generic.profile-type-field-type.text",
+    "definition": "Long replies",
+    "context": "Long replies"
   },
   {
     "term": "generic.recommended",
@@ -7890,6 +8095,11 @@
     "context": "Please type {confirmation} to confirm"
   },
   {
+    "term": "generic.unamed-profile-type",
+    "definition": "Unnamed profile type",
+    "context": "Unnamed profile type"
+  },
+  {
     "term": "generic.unavailable",
     "definition": "Unavailable",
     "context": "Unavailable"
@@ -7923,6 +8133,11 @@
     "term": "generic.unnamed-profile-type",
     "definition": "Unnamed profile type",
     "context": "Unnamed profile type"
+  },
+  {
+    "term": "generic.unnamed-profile-type-field",
+    "definition": "Unnamed property",
+    "context": "Unnamed property"
   },
   {
     "term": "generic.unnamed-template",
@@ -8620,6 +8835,21 @@
     "context": "{amount} years"
   },
   {
+    "term": "page.organization-profile-type.add-profile-type-field",
+    "definition": "Add property",
+    "context": "Add property"
+  },
+  {
+    "term": "page.organization-profile-type.changes-saved",
+    "definition": "Changes saved",
+    "context": "Changes saved"
+  },
+  {
+    "term": "page.organization-profile-type.changes-saved-body",
+    "definition": "The \"Name of each profile\" changes have been saved.",
+    "context": "The \"Name of each profile\" changes have been saved."
+  },
+  {
     "term": "page.organizations.features-active",
     "definition": "Enabled features",
     "context": "Enabled features"
@@ -8628,11 +8858,6 @@
     "term": "page.petition-replies.export-pdf",
     "definition": "Export to PDF",
     "context": "Export to PDF"
-  },
-  {
-    "term": "page.petitions-list.actions-clone",
-    "definition": "Duplicate",
-    "context": "Duplicate"
   },
   {
     "term": "page.petitions-list.actions-rename",
@@ -11638,11 +11863,6 @@
     "term": "view.admin-organizations-subscriptions.users-header",
     "definition": "Users",
     "context": "Users"
-  },
-  {
-    "term": "view.group.edit-name",
-    "definition": "Edit name",
-    "context": "Edit name"
   },
   {
     "term": "view.group.no-results",

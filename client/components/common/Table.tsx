@@ -45,6 +45,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { noop } from "remeda";
 import { Card } from "./Card";
 import { HelpPopover } from "./HelpPopover";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
@@ -260,7 +261,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
               <Checkbox
                 isChecked={anySelected && allSelected}
                 isIndeterminate={anySelected && !allSelected}
-                onChange={function () {}}
+                onChange={noop}
                 colorScheme="primary"
               />
             </Center>
@@ -274,7 +275,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         CellContent: ({ isSelected, onToggleSelection }) => {
           return (
             <Center as="label" boxSize="40px" cursor="pointer" onClick={onToggleSelection}>
-              <Checkbox isChecked={isSelected} colorScheme="primary" onChange={function () {}} />
+              <Checkbox isChecked={isSelected} colorScheme="primary" onChange={noop} />
             </Center>
           );
         },

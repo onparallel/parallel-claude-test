@@ -166,17 +166,31 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
     ),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.profiles.createProfileTypeField(
-      args.profileTypeId,
-      {
-        name: args.data.name,
-        type: args.data.type,
-        alias: args.data.alias || null,
-        is_expirable: args.data.isExpirable ?? false,
-        options: defaultProfileTypeFieldOptions(args.data.type),
-      },
-      `User:${ctx.user!.id}`
-    );
+    try {
+      return await ctx.profiles.createProfileTypeField(
+        args.profileTypeId,
+        {
+          name: args.data.name,
+          type: args.data.type,
+          alias: args.data.alias || null,
+          is_expirable: args.data.isExpirable ?? false,
+          options: defaultProfileTypeFieldOptions(args.data.type),
+        },
+        `User:${ctx.user!.id}`
+      );
+    } catch (e) {
+      if (
+        e instanceof DatabaseError &&
+        e.constraint === "profile_type_field__profile_type_id__alias__unique"
+      ) {
+        throw new ApolloError(
+          "The alias for this field already exists in this profile type",
+          "ALIAS_ALREADY_EXISTS"
+        );
+      } else {
+        throw e;
+      }
+    }
   },
 });
 
