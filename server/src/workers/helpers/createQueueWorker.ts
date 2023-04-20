@@ -103,7 +103,7 @@ export function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                         message.Body!,
                         ...(script.endsWith(".ts") ? ["-r", "ts-node/register"] : []),
                       ],
-                      { stdio: "inherit", timeout: 90_000, env: process.env }
+                      { stdio: "inherit", timeout: 120_000, env: process.env }
                     ).on("close", (code) => {
                       if (code === 0) {
                         resolve();

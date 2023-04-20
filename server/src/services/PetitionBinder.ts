@@ -166,19 +166,22 @@ export class PetitionBinder implements IPetitionBinder {
     }
   }
 
-  private async merge(paths: string[], opts?: { maxOutputSize?: number; outputFileName?: string }) {
+  private async merge(
+    filePaths: string[],
+    opts?: { maxOutputSize?: number; outputFileName?: string }
+  ) {
     const DPIValues = [144, 110, 96, 72];
-    let iteration = -1;
-    let mergedFileSize = 0;
-    const file = resolve(this.temporaryDirectory, `${random(10)}.pdf`);
-    do {
-      iteration++;
-      await this.mergeFiles(paths, file, DPIValues[iteration]);
-      mergedFileSize = await this.getFileSize(file);
-    } while (
-      mergedFileSize > (opts?.maxOutputSize ?? Infinity) &&
-      iteration < DPIValues.length - 1
-    );
+    let resultFilePath = resolve(this.temporaryDirectory, `${random(10)}.pdf`);
+
+    await this.mergeFiles(filePaths, resultFilePath);
+
+    let iteration = 0;
+    let mergedFileSize = await this.getFileSize(resultFilePath);
+
+    while (mergedFileSize > (opts?.maxOutputSize ?? Infinity) && DPIValues[iteration]) {
+      resultFilePath = await this.compressFile(resultFilePath, DPIValues[iteration++]);
+      mergedFileSize = await this.getFileSize(resultFilePath);
+    }
 
     if (mergedFileSize > (opts?.maxOutputSize ?? Infinity)) {
       throw new Error("MAX_SIZE_EXCEEDED");
@@ -188,7 +191,7 @@ export class PetitionBinder implements IPetitionBinder {
     const path = resolve(tmpdir(), random(10));
     await mkdir(path, { recursive: true });
     const output = resolve(path, `${opts?.outputFileName ?? random(10)}.pdf`);
-    await this.stripMetadata(file, output);
+    await this.stripMetadata(resultFilePath, output);
     return output;
   }
 
@@ -196,7 +199,9 @@ export class PetitionBinder implements IPetitionBinder {
     return (await stat(path)).size;
   }
 
-  private async mergeFiles(paths: string[], output: string, dpi: number) {
+  private async compressFile(path: string, dpi: number) {
+    // gs can't overwrite input with output, so we create a random output path on temporary directory
+    const output = resolve(this.temporaryDirectory, `${random(10)}.pdf`);
     await spawn(
       "gs",
       [
@@ -228,19 +233,21 @@ export class PetitionBinder implements IPetitionBinder {
         `-dGrayImageResolution=${dpi}`,
         `-dMonoImageResolution=${dpi}`,
         `-sOutputFile=${output}`,
-        ...paths,
+        path,
       ],
-      { timeout: 60_000, stdio: "inherit" }
+      { timeout: 120_000, stdio: "inherit" }
     );
+
+    return output;
   }
 
   private async stripMetadata(path: string, output: string) {
     await spawn("exiftool", ["-all=", "-overwrite_original", path], {
-      timeout: 60_000,
+      timeout: 120_000,
       stdio: "inherit",
     });
     try {
-      await spawn("qpdf", ["--linearize", path, output], { timeout: 60_000, stdio: "inherit" });
+      await spawn("qpdf", ["--linearize", path, output], { timeout: 120_000, stdio: "inherit" });
     } catch (e) {
       if (e instanceof ChildProcessNonSuccessError && e.exitCode === 3) {
         // it's just warnings
@@ -249,6 +256,13 @@ export class PetitionBinder implements IPetitionBinder {
         throw e;
       }
     }
+  }
+
+  private async mergeFiles(paths: string[], output: string) {
+    await spawn("qpdf", ["--empty", "--pages", ...paths, "--", output], {
+      timeout: 120_000,
+      stdio: "inherit",
+    });
   }
 
   private async convertImage(fileS3Path: string, contentType: string) {
@@ -268,7 +282,7 @@ export class PetitionBinder implements IPetitionBinder {
         "-flatten",
         output,
       ],
-      { timeout: 60_000, stdio: "inherit" }
+      { timeout: 120_000, stdio: "inherit" }
     );
     return output;
   }
