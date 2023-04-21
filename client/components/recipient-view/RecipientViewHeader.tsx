@@ -161,6 +161,11 @@ export const RecipientViewHeader = Object.assign(
 
     const publicPrintPdfTask = usePublicPrintPdfTask();
 
+    const showExportPdfInMenu = useBreakpointValue({
+      base: true,
+      md: false,
+    });
+
     return (
       <Box
         ref={ref as any}
@@ -329,16 +334,17 @@ export const RecipientViewHeader = Object.assign(
                       </HStack>
 
                       <MenuDivider />
-                      <MenuItem
-                        display={{ base: "flex", md: "none" }}
-                        onClick={() => publicPrintPdfTask(keycode)}
-                        icon={<DownloadIcon display="block" boxSize={4} />}
-                      >
-                        <FormattedMessage
-                          id="recipient-view.export-to-pdf"
-                          defaultMessage="Export to PDF"
-                        />
-                      </MenuItem>
+                      {showExportPdfInMenu ? (
+                        <MenuItem
+                          onClick={() => publicPrintPdfTask(keycode)}
+                          icon={<DownloadIcon display="block" boxSize={4} />}
+                        >
+                          <FormattedMessage
+                            id="recipient-view.export-to-pdf"
+                            defaultMessage="Export to PDF"
+                          />
+                        </MenuItem>
+                      ) : null}
                       <NakedLink href={`/petition/${keycode}/home`}>
                         <MenuItem as="a" icon={<HomeIcon display="block" boxSize={4} />}>
                           <HStack justifyContent="space-between">
