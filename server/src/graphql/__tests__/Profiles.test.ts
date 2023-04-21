@@ -45,10 +45,12 @@ describe("GraphQL/Profiles", () => {
   });
 
   beforeEach(async () => {
-    await mocks.knex.from("profile_field_file").update({ deleted_at: new Date() });
-    await mocks.knex.from("profile_field_value").update({ deleted_at: new Date() });
-    await mocks.knex.from("profile_type_field").update({ deleted_at: new Date() });
-    await mocks.knex.from("profile_type").update({ deleted_at: new Date() });
+    await mocks.knex.from("profile_field_file").delete();
+    await mocks.knex.from("profile_field_value").delete();
+    await mocks.knex.from("profile_type_field").delete();
+    await mocks.knex.from("profile_event").delete();
+    await mocks.knex.from("profile").delete();
+    await mocks.knex.from("profile_type").delete();
 
     profileTypes = await mocks.createRandomProfileTypes(
       organization.id,
