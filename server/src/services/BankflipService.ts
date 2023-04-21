@@ -246,9 +246,14 @@ export class BankflipService implements IBankflipService {
       ];
     }
 
-    // a set of documents with the same name will be all part of the same PetitionFieldReply
-    const groupedByName = groupBy(modelRequestOutcome.documents ?? [], (d) => d.name);
-    return await pMap(Object.values(groupedByName), async (docs) => {
+    // a set of documents with the same name and request model will be all part of the same PetitionFieldReply
+    const groupedByModelRequest = groupBy(modelRequestOutcome.documents ?? [], (d) =>
+      // TODO group only by name when Bankflip releases unique name
+      [d.name, d.model.type, d.model.year, d.model.quarter, d.model.month]
+        .filter(isDefined)
+        .join("_")
+    );
+    return await pMap(Object.values(groupedByModelRequest), async (docs) => {
       const documents: Record<string, Maybe<ModelRequestDocument>> = {};
       ["pdf", "json"].forEach((extension) => {
         documents[extension] = docs.find((d) => d.extension === extension) ?? null;
