@@ -351,10 +351,14 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
     >
       <Box padding={4}>
         <Stack spacing={6} maxWidth="container.lg">
-          <ProfileTypeSettings profileType={profileType} onSave={handleChangeProfileTypePattern} />
+          <ProfileTypeSettings
+            key={profileType.id}
+            profileType={profileType}
+            onSave={handleChangeProfileTypePattern}
+          />
           <DraggableList
             key={profileType.id}
-            w="full"
+            width="full"
             rows={profileType.fields}
             rowKeyProp="id"
             actions={actions}
