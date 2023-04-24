@@ -7,7 +7,6 @@ import { NakedLink } from "@parallel/components/common/Link";
 import { PetitionUserNotification_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
-import Link from "next/link";
 import { forwardRef, ReactNode, useEffect, useRef } from "react";
 import { useIntl } from "react-intl";
 export interface PetitionUserNotificationProps {
