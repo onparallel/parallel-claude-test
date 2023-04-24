@@ -16,7 +16,7 @@ const INSTANCE_TYPES = {
     staging: "t2.medium",
 };
 const KEY_NAME = "ops";
-const IMAGE_ID = "ami-0e024d60e45009eec";
+const IMAGE_ID = "ami-0065b333408e471ff";
 const SECURITY_GROUP_IDS = {
     production: ["sg-078abc8a772035e7a"],
     staging: ["sg-083d7b4facd31a090"],
