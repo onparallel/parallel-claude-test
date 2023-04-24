@@ -17,6 +17,7 @@ const INSTANCE_TYPES = {
 };
 const KEY_NAME = "ops";
 const IMAGE_ID = "ami-0065b333408e471ff";
+const KMS_KEY_ID = "acf1d245-abe5-4ff8-a490-09dba3834c45";
 const SECURITY_GROUP_IDS = {
     production: ["sg-078abc8a772035e7a"],
     staging: ["sg-083d7b4facd31a090"],
@@ -53,6 +54,11 @@ async function main() {
     }).argv;
     const commit = _commit.slice(0, 7);
     const env = _env;
+    const image = await ec2
+        .send(new client_ec2_1.DescribeImagesCommand({
+        ImageIds: [IMAGE_ID],
+    }))
+        .then((res) => res.Images[0]);
     (0, p_map_1.default)((0, remeda_1.range)(0, numInstances[env]), async (i) => {
         const name = `parallel-${env}-${commit}-${i + 1}`;
         const result = await (async () => {
@@ -74,6 +80,19 @@ async function main() {
                         SubnetId: SUBNET_ID[az],
                         MaxCount: 1,
                         MinCount: 1,
+                        BlockDeviceMappings: [
+                            {
+                                DeviceName: "/dev/xvda",
+                                Ebs: {
+                                    KmsKeyId: KMS_KEY_ID,
+                                    Encrypted: true,
+                                    VolumeSize: 30,
+                                    DeleteOnTermination: true,
+                                    VolumeType: "gp2",
+                                    SnapshotId: image.BlockDeviceMappings[0].Ebs.SnapshotId,
+                                },
+                            },
+                        ],
                         Monitoring: {
                             Enabled: ENHANCED_MONITORING,
                         },

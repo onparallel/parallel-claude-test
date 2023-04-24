@@ -25,6 +25,7 @@ import { wait, waitFor } from "./utils/wait";
 const INSTANCE_TYPE = "t2.large";
 const KEY_NAME = "ops";
 const SECURITY_GROUP_IDS = ["sg-0a7b2cbb5cd5e9020"];
+const KMS_KEY_ID = "acf1d245-abe5-4ff8-a490-09dba3834c45";
 const SUBNET_ID = "subnet-d3cc68b9";
 const REGION = "eu-central-1";
 const AVAILABILITY_ZONE = `${REGION}a`;
@@ -63,6 +64,8 @@ async function main() {
         {
           DeviceName: "/dev/xvda",
           Ebs: {
+            KmsKeyId: KMS_KEY_ID,
+            Encrypted: true,
             VolumeSize: 30,
             DeleteOnTermination: true,
             VolumeType: "gp2",
@@ -139,7 +142,11 @@ async function main() {
         })
       );
       const imageState = result.Images?.[0].State;
-      if ([ImageState.available, ImageState.pending].includes(imageState as ImageState)) {
+      if (
+        ([ImageState.available, ImageState.pending] as ImageState[]).includes(
+          imageState as ImageState
+        )
+      ) {
         return imageState === ImageState.available;
       } else {
         throw new Error(`Error creating image ${imageId}, state: ${imageState}`);
