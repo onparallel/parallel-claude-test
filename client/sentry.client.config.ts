@@ -9,6 +9,7 @@ Sentry.init({
   tracesSampleRate: 1,
   replaysOnErrorSampleRate: 1.0,
   replaysSessionSampleRate: 0.01,
+  normalizeDepth: 6,
   integrations: [
     new Sentry.Replay({
       maskAllText: true,
