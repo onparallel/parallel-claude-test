@@ -438,6 +438,7 @@ usePetitionsTableColumns.fragments = {
       ...PetitionTagListCellContent_PetitionBase
       ... on Petition {
         accesses {
+          id
           status
           contact {
             ...ContactReference_Contact

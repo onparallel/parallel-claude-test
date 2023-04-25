@@ -500,6 +500,7 @@ AddPetitionAccessDialog.fragments = {
         }
       }
       accesses {
+        id
         isContactless
         recipientUrl
         ...ConfirmPetitionSignersDialog_PetitionAccess

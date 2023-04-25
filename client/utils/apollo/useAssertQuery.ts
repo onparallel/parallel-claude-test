@@ -15,9 +15,9 @@ export function useAssertQuery<
   if (!data) {
     console.log((rest as any).diff.missing);
     throw new Error(
-      `Expected data to be present on the Apollo cache, ${stringify(
+      `Expected data to be present on the Apollo cache, ${stringify(rest.error)}, ${stringify(
         (rest as any).diff.missing
-      )}, ${stringify(rest.error)}`
+      )}`
     );
   }
   return {

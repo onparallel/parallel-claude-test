@@ -197,6 +197,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                 });
               },
             },
+            accesses: { merge: mergeArraysBy(["id"]) },
             emailBody: { merge: false },
             signatureConfig: { merge: true },
           },

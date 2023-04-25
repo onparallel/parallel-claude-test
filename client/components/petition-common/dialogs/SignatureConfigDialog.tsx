@@ -223,6 +223,7 @@ SignatureConfigDialog.fragments = {
         ... on Petition {
           status
           accesses {
+            id
             status
             contact {
               id

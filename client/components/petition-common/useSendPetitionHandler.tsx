@@ -216,6 +216,7 @@ useSendPetitionHandler.fragments = {
     fragment useSendPetitionHandler_Petition on Petition {
       id
       accesses {
+        id
         contact {
           id
         }

@@ -8570,9 +8570,9 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   };
   accesses: Array<{
     __typename?: "PetitionAccess";
+    id: string;
     isContactless: boolean;
     recipientUrl?: string | null;
-    id: string;
     status: PetitionAccessStatus;
     contact?: {
       __typename?: "Contact";
@@ -8657,9 +8657,9 @@ export type AddPetitionAccessDialog_createPetitionAccessMutation = {
       };
       accesses: Array<{
         __typename?: "PetitionAccess";
+        id: string;
         isContactless: boolean;
         recipientUrl?: string | null;
-        id: string;
         status: PetitionAccessStatus;
         contact?: {
           __typename?: "Contact";
@@ -10082,6 +10082,7 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
   name?: string | null;
   accesses: Array<{
     __typename?: "PetitionAccess";
+    id: string;
     status: PetitionAccessStatus;
     contact?: {
       __typename?: "Contact";
@@ -10550,9 +10551,9 @@ export type useSendPetitionHandler_PetitionFragment = {
   emailBody?: any | null;
   accesses: Array<{
     __typename?: "PetitionAccess";
+    id: string;
     isContactless: boolean;
     recipientUrl?: string | null;
-    id: string;
     status: PetitionAccessStatus;
     contact?: {
       __typename?: "Contact";
@@ -10667,9 +10668,9 @@ export type useSendPetitionHandler_addPetitionPermissionMutation = {
         emailBody?: any | null;
         accesses: Array<{
           __typename?: "PetitionAccess";
+          id: string;
           isContactless: boolean;
           recipientUrl?: string | null;
-          id: string;
           status: PetitionAccessStatus;
           contact?: {
             __typename?: "Contact";
@@ -11579,6 +11580,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
   } | null;
   accesses: Array<{
     __typename?: "PetitionAccess";
+    id: string;
     status: PetitionAccessStatus;
     contact?: {
       __typename?: "Contact";
@@ -13693,8 +13695,8 @@ export type PetitionSignaturesCard_PetitionFragment = {
   }>;
   accesses: Array<{
     __typename?: "PetitionAccess";
-    status: PetitionAccessStatus;
     id: string;
+    status: PetitionAccessStatus;
     contact?: {
       __typename?: "Contact";
       id: string;
@@ -13796,8 +13798,8 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
         }>;
         accesses: Array<{
           __typename?: "PetitionAccess";
-          status: PetitionAccessStatus;
           id: string;
+          status: PetitionAccessStatus;
           contact?: {
             __typename?: "Contact";
             id: string;
@@ -13948,8 +13950,8 @@ export type PetitionSignaturesCard_completePetitionMutation = {
     }>;
     accesses: Array<{
       __typename?: "PetitionAccess";
-      status: PetitionAccessStatus;
       id: string;
+      status: PetitionAccessStatus;
       contact?: {
         __typename?: "Contact";
         id: string;
@@ -14051,8 +14053,8 @@ export type PetitionSignaturesCard_petitionQuery = {
         }>;
         accesses: Array<{
           __typename?: "PetitionAccess";
-          status: PetitionAccessStatus;
           id: string;
+          status: PetitionAccessStatus;
           contact?: {
             __typename?: "Contact";
             id: string;
@@ -21034,10 +21036,10 @@ export type PetitionCompose_updatePetitionMutation = {
         };
         accesses: Array<{
           __typename?: "PetitionAccess";
+          id: string;
           isContactless: boolean;
           recipientUrl?: string | null;
           status: PetitionAccessStatus;
-          id: string;
           contact?: {
             __typename?: "Contact";
             id: string;
@@ -25164,6 +25166,7 @@ export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
   } | null;
   accesses: Array<{
     __typename?: "PetitionAccess";
+    id: string;
     status: PetitionAccessStatus;
     nextReminderAt?: string | null;
     contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
@@ -25422,6 +25425,7 @@ export type Petitions_petitionsQuery = {
           } | null;
           accesses: Array<{
             __typename?: "PetitionAccess";
+            id: string;
             status: PetitionAccessStatus;
             nextReminderAt?: string | null;
             contact?: {
@@ -28936,8 +28940,8 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
         }>;
         accesses: Array<{
           __typename?: "PetitionAccess";
-          status: PetitionAccessStatus;
           id: string;
+          status: PetitionAccessStatus;
           contact?: {
             __typename?: "Contact";
             id: string;
@@ -29013,6 +29017,7 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   status: PetitionStatus;
   accesses: Array<{
     __typename?: "PetitionAccess";
+    id: string;
     status: PetitionAccessStatus;
     nextReminderAt?: string | null;
     contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
@@ -32033,6 +32038,7 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
       }
     }
     accesses {
+      id
       isContactless
       recipientUrl
       ...ConfirmPetitionSignersDialog_PetitionAccess
@@ -32051,6 +32057,7 @@ export const useSendPetitionHandler_PetitionFragmentDoc = gql`
   fragment useSendPetitionHandler_Petition on Petition {
     id
     accesses {
+      id
       contact {
         id
       }
@@ -32204,6 +32211,7 @@ export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
     ... on Petition {
       status
       accesses {
+        id
         status
         contact {
           id
@@ -33709,6 +33717,7 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
     ...PetitionTagListCellContent_PetitionBase
     ... on Petition {
       accesses {
+        id
         status
         contact {
           ...ContactReference_Contact
