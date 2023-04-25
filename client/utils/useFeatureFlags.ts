@@ -12,6 +12,7 @@ interface FeatureFlagInformation {
   title: string;
   description: string;
   articleId?: number;
+  disabled?: boolean;
 }
 
 export function useFeatureFlags() {
@@ -298,6 +299,7 @@ export function useFeatureFlags() {
               id: "component.feature-flag-descriptions.profiles-description",
               defaultMessage: "Grants access to profiles",
             }),
+            disabled: true,
           },
         ],
       },

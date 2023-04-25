@@ -101,7 +101,7 @@ function AdminOrganizationsFeatures({ organizationId }: AdminOrganizationsFeatur
                 return (
                   <Stack key={category}>
                     <Text fontWeight={500}>{category}</Text>
-                    {featureFlags.map(({ name, title, description, articleId }) => {
+                    {featureFlags.map(({ name, title, description, articleId, disabled }) => {
                       const index = fields.findIndex((f) => f.name === name)!;
                       return (
                         <FormControl key={fields[index].id} as={HStack} alignItems="center">
@@ -132,7 +132,10 @@ function AdminOrganizationsFeatures({ organizationId }: AdminOrganizationsFeatur
                                 />
                               </Badge>
                             ) : null}
-                            <Switch {...register(`features.${index}.value`)} />
+                            <Switch
+                              {...register(`features.${index}.value`)}
+                              isDisabled={disabled}
+                            />
                           </HStack>
                         </FormControl>
                       );
