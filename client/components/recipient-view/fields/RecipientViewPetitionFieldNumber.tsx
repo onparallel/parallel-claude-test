@@ -99,7 +99,9 @@ export function RecipientViewPetitionFieldNumber({
         const index = field.replies.findIndex((r) => r.id === replyId);
         if (index > 0) {
           const prevId = field.replies[index - 1].id;
-          replyRefs[prevId].current!.selectionStart = replyRefs[prevId].current!.value.length;
+          try {
+            replyRefs[prevId].current!.selectionStart = replyRefs[prevId].current!.value.length;
+          } catch {}
           replyRefs[prevId].current!.focus();
         }
       }
