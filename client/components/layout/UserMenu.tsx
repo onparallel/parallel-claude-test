@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import {
   AvatarBadge,
+  Box,
   Button,
   HStack,
   Menu,
@@ -99,6 +100,22 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
       </Tooltip>
       <Portal>
         <MenuList>
+          <Box
+            boxSize={1}
+            position="absolute"
+            bottom={0}
+            right={0}
+            aria-hidden
+            cursor="crosshair"
+            overflow="hidden"
+            userSelect="none"
+            opacity={0}
+            onClick={() => {
+              throw new Error("Debug");
+            }}
+          >
+            This is to test sentry errors
+          </Box>
           <HStack paddingX={3.5} paddingY={1}>
             <UserAvatar user={me} size="sm" />
             <Stack spacing={0}>

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const { withSentryConfig } = require("@sentry/nextjs");
 const { createSecureHeaders } = require("next-secure-headers");
 
 /** @type {import('next').NextConfig} */
@@ -92,6 +91,17 @@ module.exports = [
   require("@next/bundle-analyzer")({ enabled: Boolean(process.env.ANALYZE) }),
   require("next-plugin-graphql"),
   ...(process.env.SENTRY_AUTH_TOKEN
-    ? [(config) => withSentryConfig(config, { silent: true })]
+    ? [
+        (config) =>
+          require("@sentry/nextjs")(
+            config,
+            { silent: true, org: "parallel-org", project: "parallel" },
+            {
+              widenClientFileUpload: true,
+              transpileClientSDK: true,
+              hideSourceMaps: true,
+            }
+          ),
+      ]
     : [({ sentry, ...config }) => config]),
 ].reduce((acc, curr) => curr(acc), config);
