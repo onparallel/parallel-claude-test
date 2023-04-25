@@ -26,6 +26,7 @@ async function loadMessages(locale: string): Promise<IntlConfig["messages"]> {
 }
 
 const POLYFILLS = [
+  "globalThis",
   "matchMedia",
   "requestAnimationFrame",
   "Array.prototype.at",
