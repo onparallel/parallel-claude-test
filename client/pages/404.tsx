@@ -36,11 +36,9 @@ export default function Custom404() {
       </Text>
       <List>
         <ListItem>
-          <NextLink href="/" passHref>
-            <NormalLink>
-              <FormattedMessage id="public.home-link" defaultMessage="Home" />
-            </NormalLink>
-          </NextLink>
+          <NormalLink href="/">
+            <FormattedMessage id="public.home-link" defaultMessage="Home" />
+          </NormalLink>
         </ListItem>
         <ListItem>
           <NormalLink href={`https://help.onparallel.com/${intl.locale}`}>
