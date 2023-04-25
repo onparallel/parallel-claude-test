@@ -93,7 +93,7 @@ module.exports = [
   ...(process.env.SENTRY_AUTH_TOKEN
     ? [
         (config) =>
-          require("@sentry/nextjs")(
+          require("@sentry/nextjs").withSentryConfig(
             config,
             { silent: true, org: "parallel-org", project: "parallel" },
             {
