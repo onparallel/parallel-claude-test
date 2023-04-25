@@ -13,7 +13,6 @@ export function useAssertQuery<
 ): QueryResult<TData, TVariables> & { data: TData } {
   const { data, ...rest } = useQuery(query, options);
   const apollo = useApolloClient();
-  console.log((apollo.cache as any).data.data);
   if (!data) {
     try {
       console.log(JSON.parse(stringify((apollo.cache as any).data.data)));
