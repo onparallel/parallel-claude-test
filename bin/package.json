@@ -24,11 +24,11 @@
     "cnc": "node dist/clear-nginx-cache.js"
   },
   "dependencies": {
-    "@aws-sdk/client-cloudfront": "^3.315.0",
-    "@aws-sdk/client-ec2": "^3.315.0",
-    "@aws-sdk/client-elastic-load-balancing": "^3.315.0",
-    "@aws-sdk/client-route-53": "^3.315.0",
-    "@aws-sdk/credential-providers": "^3.315.0",
+    "@aws-sdk/client-cloudfront": "^3.319.0",
+    "@aws-sdk/client-ec2": "^3.319.0",
+    "@aws-sdk/client-elastic-load-balancing": "^3.319.0",
+    "@aws-sdk/client-route-53": "^3.319.0",
+    "@aws-sdk/credential-providers": "^3.319.0",
     "@formatjs/cli": "^6.1.0",
     "@formatjs/icu-messageformat-parser": "^2.3.1",
     "chalk": "^4.1.2",
@@ -37,13 +37,13 @@
     "cli-table3": "^0.6.3",
     "outdent": "^0.8.0",
     "p-map": "^4.0.0",
-    "remeda": "^1.12.0",
+    "remeda": "^1.14.0",
     "rimraf": "^5.0.0",
     "yargs": "^17.7.1"
   },
   "devDependencies": {
     "@types/cli-progress": "^3.11.0",
-    "@types/node": "^18.15.11",
+    "@types/node": "^18.16.1",
     "@types/rimraf": "^3.0.2",
     "@types/yargs": "^17.0.24",
     "node-fetch": "^2.6.7",
