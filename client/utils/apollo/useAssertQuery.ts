@@ -15,7 +15,7 @@ export function useAssertQuery<
   const apollo = useApolloClient();
   if (!data) {
     try {
-      console.log(JSON.parse(stringify((apollo.cache as any).data.data)));
+      console.log(stringify((apollo.cache as any).data.data));
       console.log((rest as any).diff);
     } catch {}
     throw new Error(`Expected data to be present on the Apollo cache`);
