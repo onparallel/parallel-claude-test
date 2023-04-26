@@ -3,7 +3,6 @@ import { useSetLocale } from "@parallel/components/common/I18nProvider";
 import { NormalLink } from "@parallel/components/common/Link";
 import { ErrorPage } from "@parallel/components/public/ErrorPage";
 import languages from "@parallel/lang/languages.json";
-import NextLink from "next/link";
 import { useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
