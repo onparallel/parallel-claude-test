@@ -42,8 +42,7 @@
     "run-ts-script": "ts-node --project tsconfig.json --transpile-only",
     "flush-sqs": "docker-compose -f ../ops/dev/docker-compose.yml restart queue",
     "archive-migrations": "ts-node ./migrations/scripts/archive-migrations.ts",
-    "sync-migrations": "ts-node ./migrations/scripts/sync-migrations.ts",
-    "fix-bankflip": "ts-node-dev --transpile-only ./migrations/scripts/fix-bankflip-models.ts"
+    "sync-migrations": "ts-node ./migrations/scripts/sync-migrations.ts"
   },
   "dependencies": {
     "@apollo/server": "^4.7.0",

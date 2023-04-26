@@ -1,17 +1,17 @@
-import "./../../src/init";
+import "./init";
 //
 import { Knex } from "knex";
 import fetch from "node-fetch";
 import pMap from "p-map";
 import yargs from "yargs";
-import { CONFIG, Config } from "../../src/config";
-import { createContainer } from "../../src/container";
-import { KNEX } from "../../src/db/knex";
-import { FileRepository } from "../../src/db/repositories/FileRepository";
-import { PetitionRepository } from "../../src/db/repositories/PetitionRepository";
-import { PetitionFieldReply } from "../../src/db/__types";
-import { IStorageService, STORAGE_SERVICE } from "../../src/services/StorageService";
-import { random } from "../../src/util/token";
+import { CONFIG, Config } from "./config";
+import { createContainer } from "./container";
+import { KNEX } from "./db/knex";
+import { FileRepository } from "./db/repositories/FileRepository";
+import { PetitionRepository } from "./db/repositories/PetitionRepository";
+import { PetitionFieldReply } from "./db/__types";
+import { IStorageService, STORAGE_SERVICE } from "./services/StorageService";
+import { random } from "./util/token";
 import { groupBy, isDefined } from "remeda";
 
 async function main() {
