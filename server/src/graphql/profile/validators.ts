@@ -41,30 +41,6 @@ export function validProfileNamePattern<
   };
 }
 
-export function validProfileFieldValue<
-  TypeName extends string,
-  FieldName extends string,
-  TFieldIdArg extends Arg<TypeName, FieldName, number>,
-  TValuedArg extends Arg<TypeName, FieldName, any>
->(profileTypeFieldId: TFieldIdArg, valueArg: TValuedArg) {
-  return (async (_, args, ctx, info) => {
-    const value = args[valueArg] as any;
-    const field = (await ctx.profiles.loadProfileTypeField(
-      args[profileTypeFieldId] as unknown as number
-    ))!;
-    try {
-      validateProfileFieldValue(field, value);
-    } catch (e) {
-      if (e instanceof Error) {
-        throw new ApolloError(
-          `Invalid profile field value: ${e.message}`,
-          "INVALID_PROFILE_FIELD_VALUE"
-        );
-      }
-    }
-  }) as FieldValidateArgsResolver<TypeName, FieldName>;
-}
-
 export function validProfileTypeFieldOptions<
   TypeName extends string,
   FieldName extends string,
@@ -102,7 +78,7 @@ export function validateProfileFieldValue(field: TableTypes["profile_type_field"
         throw new Error(ajv.errorsText());
       }
       if (content.value.includes("\n")) {
-        return new Error("Value can't include newlines");
+        throw new Error("Value can't include newlines");
       }
       return;
     }
@@ -118,8 +94,8 @@ export function validateProfileFieldValue(field: TableTypes["profile_type_field"
       if (!valid) {
         throw new Error(ajv.errorsText());
       }
-      if (isValidDate(content.value)) {
-        return new Error("Value is not a valid datetime");
+      if (!isValidDate(content.value)) {
+        throw new Error("Value is not a valid datetime");
       }
       return;
     }
@@ -129,7 +105,7 @@ export function validateProfileFieldValue(field: TableTypes["profile_type_field"
         throw new Error(ajv.errorsText());
       }
       if (!isPossiblePhoneNumber(content.value)) {
-        return new Error("Value is not a valid phone number");
+        throw new Error("Value is not a valid phone number");
       }
       return;
     }

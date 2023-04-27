@@ -2,14 +2,12 @@ import { faker } from "@faker-js/faker";
 import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { isDefined, times } from "remeda";
+import { Organization, ProfileType, ProfileTypeField } from "../../db/__types";
 import { defaultProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, ProfileType, ProfileTypeField } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { initServer, TestClient } from "./server";
-import { createProfile } from "../profile/mutations";
-import { parseISO } from "date-fns";
+import { TestClient, initServer } from "./server";
 
 type UpdateProfileFieldValueInput = {
   profileTypeFieldId: string;
@@ -25,6 +23,7 @@ describe("GraphQL/Profiles", () => {
   let profileTypes: ProfileType[] = [];
 
   let profileType0Fields: ProfileTypeField[] = [];
+  let profileType2Fields: ProfileTypeField[] = [];
 
   let normalUserApiKey = "";
 
@@ -201,6 +200,26 @@ describe("GraphQL/Profiles", () => {
             name: json({ en: "Address", es: "Dirección" }),
             type: "TEXT" as const,
             alias: "ADDRESS",
+          },
+        ][i]
+    );
+
+    profileType2Fields = await mocks.createRandomProfileTypeFields(
+      organization.id,
+      profileTypes[2].id,
+      2,
+      (i) =>
+        [
+          {
+            name: json({ en: "Address", es: "Dirección" }),
+            type: "TEXT" as const,
+            alias: "ADDRESS",
+            is_expirable: true,
+          },
+          {
+            name: json({ en: "ID", es: "DNI" }),
+            type: "FILE" as const,
+            alias: "ID_PHOTO",
           },
         ][i]
     );
@@ -417,7 +436,16 @@ describe("GraphQL/Profiles", () => {
           {
             id: toGlobalId("ProfileType", profileTypes[2].id),
             name: { en: "Contract", es: "Contrato" },
-            fields: [],
+            fields: [
+              {
+                name: { en: "Address", es: "Dirección" },
+                position: 0,
+              },
+              {
+                name: { en: "ID", es: "DNI" },
+                position: 1,
+              },
+            ],
           },
         ],
       });
@@ -722,8 +750,8 @@ describe("GraphQL/Profiles", () => {
     it("clones a profile type", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($profileTypeId: GID!) {
-            cloneProfileType(profileTypeId: $profileTypeId) {
+          mutation ($profileTypeId: GID!, $name: LocalizableUserText) {
+            cloneProfileType(profileTypeId: $profileTypeId, name: $name) {
               id
               name
               profileNamePattern
@@ -737,13 +765,14 @@ describe("GraphQL/Profiles", () => {
         `,
         {
           profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          name: { en: "cloned profile" },
         }
       );
 
       expect(errors).toBeUndefined();
       expect(data.cloneProfileType).toEqual({
         id: expect.any(String),
-        name: { en: "Individual", es: "Persona física" },
+        name: { en: "cloned profile" },
         profileNamePattern: expect.anything(),
         fields: profileType0Fields.map((f) => ({
           id: expect.any(String),
@@ -871,6 +900,7 @@ describe("GraphQL/Profiles", () => {
             expiryAlertAheadTime: { months: 1 },
             name: { en: "my new field" },
             type: "SHORT_TEXT",
+            options: {},
           },
         }
       );
@@ -908,6 +938,56 @@ describe("GraphQL/Profiles", () => {
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("fails when creating a field with used alias", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $data: CreateProfileTypeFieldInput!) {
+            createProfileTypeField(profileTypeId: $profileTypeId, data: $data) {
+              id
+              alias
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          data: {
+            alias: "LAST_NAME",
+            name: { en: "Address", es: "Dirección" },
+            type: "TEXT",
+          },
+        }
+      );
+
+      expect(errors).toContainGraphQLError("ALIAS_ALREADY_EXISTS");
+      expect(data).toBeNull();
+    });
+
+    it("fails when creating a field with unknown option", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $data: CreateProfileTypeFieldInput!) {
+            createProfileTypeField(profileTypeId: $profileTypeId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          data: {
+            alias: "unknown",
+            isExpirable: true,
+            expiryAlertAheadTime: { months: 1 },
+            name: { en: "my new field" },
+            type: "TEXT",
+            options: { unknown: false },
+          },
+        }
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
   });
@@ -1052,6 +1132,44 @@ describe("GraphQL/Profiles", () => {
       );
       expect(errors).toContainGraphQLError("ALIAS_ALREADY_EXISTS");
       expect(data).toBeNull();
+    });
+
+    it("updates the options of a DATE type field", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+              options
+              isExpirable
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+          data: {
+            options: { useReplyAsExpiryDate: false },
+            isExpirable: true,
+            expiryAlertAheadTime: { months: 3 },
+          },
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileTypeField).toEqual({
+        id: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+        options: { useReplyAsExpiryDate: false },
+        isExpirable: true,
+      });
     });
   });
 
@@ -1349,7 +1467,7 @@ describe("GraphQL/Profiles", () => {
       await expect(
         updateProfileValue(profile.id, [
           {
-            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[3].id),
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
             content: { value: "1988-12-15" },
             expiresAt: "2030-01-01",
           },
@@ -1378,6 +1496,225 @@ describe("GraphQL/Profiles", () => {
           },
         ])
       ).rejects.toContainGraphQLError("EXPIRY_ON_REMOVED_FIELD");
+    });
+
+    it("fails if trying to update the value of a FILE type field", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+
+      await expect(
+        updateProfileValue(profile.id, [
+          {
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+            content: { value: "aaa" },
+          },
+        ])
+      ).rejects.toContainGraphQLError("FORBIDDEN");
+    });
+
+    it("fails if passing invalid content", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+
+      await expect(
+        updateProfileValue(profile.id, [
+          {
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[0].id),
+            content: { value: 123456 },
+          },
+        ])
+      ).rejects.toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
+    });
+
+    it("fails if setting expiry on a field with no value", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+
+      await expect(
+        updateProfileValue(profile.id, [
+          {
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[0].id),
+            expiresAt: "2030-01-01",
+          },
+        ])
+      ).rejects.toContainGraphQLError("EXPIRY_ON_NONEXISTING_VALUE");
+    });
+  });
+
+  describe("deleteProfile", () => {
+    it("deletes a profile", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+
+      const { errors: query1Errors, data: query1Data } = await testClient.execute(gql`
+        query {
+          profiles(offset: 0, limit: 10) {
+            items {
+              id
+            }
+            totalCount
+          }
+        }
+      `);
+      expect(query1Errors).toBeUndefined();
+      expect(query1Data.profiles).toEqual({ items: [{ id: profile.id }], totalCount: 1 });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            deleteProfile(profileIds: $profileIds)
+          }
+        `,
+        {
+          profileIds: [profile.id],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deleteProfile).toEqual("SUCCESS");
+
+      const { errors: query2Errors, data: query2Data } = await testClient.execute(gql`
+        query {
+          profiles(offset: 0, limit: 10) {
+            items {
+              id
+            }
+            totalCount
+          }
+        }
+      `);
+      expect(query2Errors).toBeUndefined();
+      expect(query2Data.profiles).toEqual({ items: [], totalCount: 0 });
+    });
+  });
+
+  describe("createProfileFieldFileUploadLink", () => {
+    it("creates a FILE reply on a profile field and returns the upload URL", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+      const { errors: createErrors, data: createData } = await testClient.execute(
+        gql`
+          mutation (
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+            $data: [FileUploadInput!]!
+            $expiresAt: DateTime
+          ) {
+            createProfileFieldFileUploadLink(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+              expiresAt: $expiresAt
+            ) {
+              property {
+                field {
+                  id
+                }
+                files {
+                  id
+                  field {
+                    id
+                  }
+                  profile {
+                    id
+                  }
+                  removedBy {
+                    id
+                  }
+                  removedAt
+                  anonymizedAt
+                }
+                value {
+                  id
+                }
+              }
+              uploads {
+                file {
+                  id
+                  file {
+                    isComplete
+                    contentType
+                    filename
+                    size
+                  }
+                }
+                presignedPostData {
+                  fields
+                  url
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          data: [{ contentType: "image/png", size: 1024, filename: "ID.png" }],
+          expiresAt: new Date(),
+        }
+      );
+
+      expect(createErrors).toBeUndefined();
+      expect(createData?.createProfileFieldFileUploadLink).toEqual({
+        property: {
+          field: {
+            id: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          },
+          files: [
+            {
+              id: expect.any(String),
+              field: { id: toGlobalId("ProfileTypeField", profileType2Fields[1].id) },
+              profile: { id: profile.id },
+              removedBy: null,
+              removedAt: null,
+              anonymizedAt: null,
+            },
+          ],
+          value: null,
+        },
+        uploads: [
+          {
+            file: {
+              id: expect.any(String),
+              file: { isComplete: false, contentType: "image/png", size: 1024, filename: "ID.png" },
+            },
+            presignedPostData: { fields: {}, url: "" },
+          },
+        ],
+      });
+
+      const { errors: completeErrors, data: completeData } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $profileTypeFieldId: GID!, $profileFieldFileIds: [GID!]!) {
+            profileFieldFileUploadComplete(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              profileFieldFileIds: $profileFieldFileIds
+            ) {
+              id
+              field {
+                id
+              }
+              file {
+                isComplete
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          profileFieldFileIds: [createData!.createProfileFieldFileUploadLink.property.files[0].id],
+        }
+      );
+
+      expect(completeErrors).toBeUndefined();
+      expect(completeData?.profileFieldFileUploadComplete).toEqual([
+        {
+          id: createData!.createProfileFieldFileUploadLink.property.files[0].id,
+          field: {
+            id: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          },
+          file: {
+            isComplete: true,
+          },
+        },
+      ]);
     });
   });
 });

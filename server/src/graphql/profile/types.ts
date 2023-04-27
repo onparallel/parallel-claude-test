@@ -182,7 +182,10 @@ export const ProfileFieldFile = objectType({
   definition(t) {
     t.globalId("id");
     t.implements("ProfileFieldResponse");
-    t.nullable.field("file", { type: "FileUpload" });
+    t.nullable.field("file", {
+      type: "FileUpload",
+      resolve: async (o, _, ctx) => await ctx.files.loadFileUpload(o.file_upload_id),
+    });
   },
 });
 
