@@ -95,27 +95,34 @@ export function useCreateFileUploadReply() {
       uploads: MutableRefObject<Record<string, AbortController>>;
     }) {
       await pMap(
-        content,
-        async (file) => {
-          const { data } = await createFileUploadReply({
-            variables: {
-              keycode,
-              fieldId: fieldId,
-              data: {
-                filename: file.name,
-                size: file.size,
-                contentType: file.type,
+        // create file upload replies without concurrency, upload concurrently
+        await pMap(
+          content,
+          async (file) => {
+            const { data } = await createFileUploadReply({
+              variables: {
+                keycode,
+                fieldId: fieldId,
+                data: {
+                  filename: file.name,
+                  size: file.size,
+                  contentType: file.type,
+                },
               },
-            },
-            update(cache, { data }) {
-              const reply = data!.publicCreateFileUploadReply.reply;
-              updateReplyContent(cache, reply.id, (content) => ({
-                ...content,
-                progress: 0,
-              }));
-            },
-          });
-          const { reply, presignedPostData } = data!.publicCreateFileUploadReply;
+              update(cache, { data }) {
+                const reply = data!.publicCreateFileUploadReply.reply;
+                updateReplyContent(cache, reply.id, (content) => ({
+                  ...content,
+                  progress: 0,
+                }));
+              },
+            });
+            const { reply, presignedPostData } = data!.publicCreateFileUploadReply;
+            return { file, reply, presignedPostData };
+          },
+          { concurrency: 1 }
+        ),
+        async ({ file, reply, presignedPostData }) => {
           const controller = new AbortController();
           uploads.current[reply.id] = controller;
           try {
@@ -144,7 +151,7 @@ export function useCreateFileUploadReply() {
             variables: { keycode, replyId: reply.id },
           });
         },
-        { concurrency: 3 }
+        { concurrency: 5 }
       );
     },
     [createFileUploadReply, fileUploadReplyComplete]
