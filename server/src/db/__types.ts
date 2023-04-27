@@ -33,7 +33,6 @@ export type FeatureFlagName =
   | "PUBLIC_PETITION_LINK_PREFILL_DATA"
   | "DOCUSIGN_SANDBOX_PROVIDER"
   | "CLIENT_PORTAL"
-  | "STATISTICS_VIEW"
   | "PROFILES";
 
 export const FeatureFlagNameValues = [
@@ -56,7 +55,6 @@ export const FeatureFlagNameValues = [
   "PUBLIC_PETITION_LINK_PREFILL_DATA",
   "DOCUSIGN_SANDBOX_PROVIDER",
   "CLIENT_PORTAL",
-  "STATISTICS_VIEW",
   "PROFILES",
 ] as FeatureFlagName[];
 

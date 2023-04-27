@@ -347,7 +347,6 @@ export type FeatureFlag =
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SKIP_FORWARD_SECURITY"
-  | "STATISTICS_VIEW"
   | "TEMPLATE_REPLIES_PREVIEW_URL";
 
 /** A feature flag name with his value */
@@ -3228,12 +3227,56 @@ export type PetitionUserPermission = PetitionPermission &
 export type Profile = Timestamps & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** The events for the profile. */
+  events: ProfileEventPagination;
   id: Scalars["GID"];
   name: Scalars["String"];
   profileType: ProfileType;
   properties: Array<ProfileFieldProperty>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
+};
+
+export type ProfileeventsArgs = {
+  limit?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+};
+
+export type ProfileCreatedEvent = ProfileEvent & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  profile: Maybe<Profile>;
+  type: ProfileEventType;
+  user: Maybe<User>;
+};
+
+export type ProfileEvent = {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  profile: Maybe<Profile>;
+  type: ProfileEventType;
+};
+
+export type ProfileEventPagination = {
+  /** The requested slice of items. */
+  items: Array<ProfileEvent>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+};
+
+export type ProfileEventType =
+  | "PROFILE_CREATED"
+  | "PROFILE_FIELD_EXPIRY_UPDATED"
+  | "PROFILE_FIELD_FILE_ADDED"
+  | "PROFILE_FIELD_FILE_REMOVED"
+  | "PROFILE_FIELD_VALUE_UPDATED";
+
+export type ProfileFieldExpiryUpdatedEvent = ProfileEvent & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  profile: Maybe<Profile>;
+  type: ProfileEventType;
+  user: Maybe<User>;
 };
 
 export type ProfileFieldFile = ProfileFieldResponse & {
@@ -3251,6 +3294,22 @@ export type ProfileFieldFile = ProfileFieldResponse & {
   /** Time when the response was removed. */
   removedAt: Maybe<Scalars["DateTime"]>;
   removedBy: Maybe<User>;
+};
+
+export type ProfileFieldFileAddedEvent = ProfileEvent & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  profile: Maybe<Profile>;
+  type: ProfileEventType;
+  user: Maybe<User>;
+};
+
+export type ProfileFieldFileRemovedEvent = ProfileEvent & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  profile: Maybe<Profile>;
+  type: ProfileEventType;
+  user: Maybe<User>;
 };
 
 export type ProfileFieldFileWithUploadData = {
@@ -3299,6 +3358,14 @@ export type ProfileFieldValue = ProfileFieldResponse & {
   /** Time when the response was removed. */
   removedAt: Maybe<Scalars["DateTime"]>;
   removedBy: Maybe<User>;
+};
+
+export type ProfileFieldValueUpdatedEvent = ProfileEvent & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  profile: Maybe<Profile>;
+  type: ProfileEventType;
+  user: Maybe<User>;
 };
 
 export type ProfileFilter = {

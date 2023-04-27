@@ -250,22 +250,18 @@ export function ReportsTemplates() {
               templateId={activeTemplateId!}
               templateName={templateName}
             />
-            {me.hasStatisticsView ? (
-              <>
-                <ReportsStatisticsConversion
-                  report={report}
-                  range={activeRange}
-                  templateId={activeTemplateId!}
-                  templateName={templateName}
-                />
-                <ReportsStatisticsTime
-                  report={report}
-                  range={activeRange}
-                  templateId={activeTemplateId!}
-                  templateName={templateName}
-                />
-              </>
-            ) : null}
+            <ReportsStatisticsConversion
+              report={report}
+              range={activeRange}
+              templateId={activeTemplateId!}
+              templateName={templateName}
+            />
+            <ReportsStatisticsTime
+              report={report}
+              range={activeRange}
+              templateId={activeTemplateId!}
+              templateName={templateName}
+            />
           </Stack>
         ) : (
           <Stack minHeight="340px" alignItems="center" justifyContent="center" textAlign="center">
@@ -312,9 +308,6 @@ ReportsTemplates.queries = [
   gql`
     query ReportsTemplates_user {
       ...ReportsSidebarLayout_Query
-      me {
-        hasStatisticsView: hasFeatureFlag(featureFlag: STATISTICS_VIEW)
-      }
     }
     ${ReportsSidebarLayout.fragments.Query}
   `,
