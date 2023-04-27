@@ -3322,12 +3322,20 @@ export type ProfileFieldFileWithUploadData = {
 export type ProfileFieldProperty = {
   field: ProfileTypeField;
   files: Maybe<Array<ProfileFieldFile>>;
+  profile: Profile;
   value: Maybe<ProfileFieldValue>;
 };
 
 export type ProfileFieldPropertyAndFileWithUploadData = {
   property: ProfileFieldProperty;
   uploads: Array<ProfileFieldFileWithUploadData>;
+};
+
+export type ProfileFieldPropertyPagination = {
+  /** The requested slice of items. */
+  items: Array<ProfileFieldProperty>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
 };
 
 export type ProfileFieldResponse = {
@@ -3379,6 +3387,11 @@ export type ProfilePagination = {
   items: Array<Profile>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
+};
+
+export type ProfilePropertyFilter = {
+  profileTypeFieldId?: InputMaybe<Array<Scalars["GID"]>>;
+  profileTypeId?: InputMaybe<Array<Scalars["GID"]>>;
 };
 
 export type ProfileType = Timestamps & {
@@ -3700,6 +3713,7 @@ export type Query = {
   dowJonesKycEntitySearch: DowJonesKycEntitySearchResultPagination;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
+  expiringProfileProperties: ProfileFieldPropertyPagination;
   /** Exports basic petition + fields configuration as JSON object */
   exportPetitionToJson: SupportMethodResponse;
   /** Get the user who owns an API Token */
@@ -3799,6 +3813,13 @@ export type QuerydowJonesKycEntitySearchArgs = {
 
 export type QueryemailIsAvailableArgs = {
   email: Scalars["String"];
+};
+
+export type QueryexpiringProfilePropertiesArgs = {
+  filter?: InputMaybe<ProfilePropertyFilter>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+  search?: InputMaybe<Scalars["String"]>;
 };
 
 export type QueryexportPetitionToJsonArgs = {

@@ -109,3 +109,30 @@ export const profile = queryField((t) => {
     },
   });
 });
+
+export const expiringProfileProperties = queryField((t) => {
+  t.paginationField("expiringProfileProperties", {
+    type: "ProfileFieldProperty",
+    authorize: authenticateAnd(userHasFeatureFlag("PROFILES")),
+    searchable: true,
+    extendArgs: {
+      filter: inputObjectType({
+        name: "ProfilePropertyFilter",
+        definition(t) {
+          t.nullable.list.nonNull.globalId("profileTypeId", { prefixName: "ProfileType" });
+          t.nullable.list.nonNull.globalId("profileTypeFieldId", {
+            prefixName: "ProfileTypeField",
+          });
+        },
+      }),
+    },
+    resolve: async (_, { limit, offset, search, filter }, ctx) => {
+      return ctx.profiles.getPaginatedExpirableProfileFieldProperties({
+        search,
+        filter,
+        limit,
+        offset,
+      });
+    },
+  });
+});

@@ -1,9 +1,9 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { indexBy, isDefined, omit, pick, times, uniq } from "remeda";
+import { groupBy, indexBy, isDefined, omit, pick, times, uniq } from "remeda";
 import { LocalizableUserText } from "../../graphql";
 import { unMaybeArray } from "../../util/arrays";
-import { MaybeArray, Replace } from "../../util/types";
+import { Maybe, MaybeArray, Replace } from "../../util/types";
 import {
   CreateProfileEvent,
   ProfileFieldExpiryUpdatedEvent,
@@ -19,10 +19,12 @@ import {
   CreateProfileTypeField,
   Profile,
   ProfileEvent,
+  ProfileFieldFile,
   ProfileFieldValue,
   ProfileType,
   UserLocale,
 } from "../__types";
+import { keyBuilder } from "../../util/keyBuilder";
 
 @injectable()
 export class ProfileRepository extends BaseRepository {
@@ -376,6 +378,46 @@ export class ProfileRepository extends BaseRepository {
     (q) => q.whereNull("removed_at").whereNull("deleted_at")
   );
 
+  readonly loadProfileFieldValue = this.buildLoader<
+    {
+      profileId: number;
+      profileTypeFieldId: number;
+    },
+    ProfileFieldValue | null,
+    string
+  >(
+    async (keys, t) => {
+      const values = await this.from("profile_field_value", t)
+        .whereIn("profile_id", uniq(keys.map((k) => k.profileId)))
+        .whereIn("profile_type_field_id", uniq(keys.map((k) => k.profileTypeFieldId)))
+        .whereNull("removed_at")
+        .whereNull("deleted_at");
+      const byKey = indexBy(values, keyBuilder(["profile_id", "profile_type_field_id"]));
+      return keys.map(keyBuilder(["profileId", "profileTypeFieldId"])).map((k) => byKey[k] ?? null);
+    },
+    { cacheKeyFn: keyBuilder(["profileId", "profileTypeFieldId"]) }
+  );
+
+  readonly loadProfileFieldFiles = this.buildLoader<
+    {
+      profileId: number;
+      profileTypeFieldId: number;
+    },
+    ProfileFieldFile[] | null,
+    string
+  >(
+    async (keys, t) => {
+      const files = await this.from("profile_field_file", t)
+        .whereIn("profile_id", uniq(keys.map((k) => k.profileId)))
+        .whereIn("profile_type_field_id", uniq(keys.map((k) => k.profileTypeFieldId)))
+        .whereNull("removed_at")
+        .whereNull("deleted_at");
+      const byKey = groupBy(files, keyBuilder(["profile_id", "profile_type_field_id"]));
+      return keys.map(keyBuilder(["profileId", "profileTypeFieldId"])).map((k) => byKey[k] ?? null);
+    },
+    { cacheKeyFn: keyBuilder(["profileId", "profileTypeFieldId"]) }
+  );
+
   readonly loadProfileFieldFileById = this.buildLoadBy("profile_field_file", "id", (q) =>
     q.whereNull("removed_at").whereNull("deleted_at")
   );
@@ -383,12 +425,6 @@ export class ProfileRepository extends BaseRepository {
   readonly loadProfileFieldFilesByProfileId = this.buildLoadMultipleBy(
     "profile_field_file",
     "profile_id",
-    (q) => q.whereNull("removed_at").whereNull("deleted_at")
-  );
-
-  readonly loadProfileFieldFilesByProfileTypeFieldId = this.buildLoadMultipleBy(
-    "profile_field_file",
-    "profile_type_field_id",
     (q) => q.whereNull("removed_at").whereNull("deleted_at")
   );
 
@@ -719,5 +755,75 @@ export class ProfileRepository extends BaseRepository {
       return [];
     }
     return await this.insert("profile_event", events, t);
+  }
+
+  getPaginatedExpirableProfileFieldProperties(
+    opts: {
+      search?: Maybe<string>;
+      filter?: Maybe<{
+        profileTypeFieldId?: Maybe<number[]>;
+        profileTypeId?: Maybe<number[]>;
+      }>;
+    } & PageOpts
+  ) {
+    return this.getPagination<{ profile_id: number; profile_type_field_id: number }>(
+      this.knex
+        .with(
+          "pfv",
+          this.from("profile_field_value")
+            .whereNotNull("expires_at")
+            .whereNull("removed_at")
+            .whereNull("deleted_at")
+            .select("profile_id", "profile_type_field_id", "expires_at")
+        )
+        .with(
+          "pff",
+          this.from("profile_field_file")
+            .whereNotNull("expires_at")
+            .whereNull("removed_at")
+            .whereNull("deleted_at")
+            .groupBy("profile_id", "profile_type_field_id")
+            .select(
+              "profile_id",
+              "profile_type_field_id",
+              this.knex.raw("max(expires_at) expires_at")
+            )
+        )
+        .with(
+          "profile_properties",
+          this.knex.raw(/* sql */ `select * from "pfv" union select * from "pff"`)
+        )
+        .from("profile_properties")
+        .mmodify((q) => {
+          if (
+            isDefined(opts.search) ||
+            (isDefined(opts.filter?.profileTypeId) && opts.filter!.profileTypeId.length > 0)
+          ) {
+            q.join("profile", "profile.id", "profile_properties.profile_id");
+          }
+
+          if (isDefined(opts.search)) {
+            q.whereEscapedILike("profile.name", `%${escapeLike(opts.search, "\\")}%`, "\\");
+          }
+
+          if (isDefined(opts.filter?.profileTypeId) && opts.filter!.profileTypeId.length > 0) {
+            q.whereIn("profile.profile_type_id", opts.filter!.profileTypeId);
+          }
+
+          if (
+            isDefined(opts.filter?.profileTypeFieldId) &&
+            opts.filter!.profileTypeFieldId.length > 0
+          ) {
+            q.whereIn("profile_properties.profile_type_field_id", opts.filter!.profileTypeFieldId);
+          }
+        })
+        .select("profile_properties.profile_id", "profile_properties.profile_type_field_id")
+        .orderBy([
+          { column: "profile_properties.expires_at", order: "asc" },
+          { column: "profile_properties.profile_id", order: "desc" },
+          { column: "profile_properties.profile_type_field_id", order: "desc" },
+        ]),
+      opts
+    );
   }
 }

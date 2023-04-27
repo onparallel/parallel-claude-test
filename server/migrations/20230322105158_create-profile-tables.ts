@@ -94,6 +94,13 @@ export async function up(knex: Knex): Promise<void> {
 
     create index profile_field_value__not_anonymized on profile_field_value (id)
     where anonymized_at is null and (removed_at is not null or deleted_at is not null);
+
+    create index profile_field_value__expires_at 
+      on "profile_field_value" (profile_id, profile_type_field_id)
+      include (expires_at)
+      where removed_at is null
+      and deleted_at is null 
+      and expires_at is not null;
   `);
 
   await knex.schema.createTable("profile_field_file", (t) => {
@@ -121,6 +128,13 @@ export async function up(knex: Knex): Promise<void> {
     create index profile_field_file__ptf_id on profile_field_file (profile_type_field_id) where deleted_at is null;
     create index profile_field_file__not_anonymized on profile_field_file (id)
     where anonymized_at is null and (removed_at is not null or deleted_at is not null);
+
+    create index profile_field_file__expires_at 
+      on "profile_field_file" (profile_id, profile_type_field_id)
+      include (expires_at)
+      where removed_at is null
+      and deleted_at is null 
+      and expires_at is not null;
   `);
 
   await knex.schema.createTable("profile_event", (t) => {

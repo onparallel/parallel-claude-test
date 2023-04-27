@@ -1,8 +1,7 @@
 import { enumType, interfaceType, nonNull, objectType } from "nexus";
-import { groupBy, indexBy, map, pipe, sortBy } from "remeda";
+import { sortBy } from "remeda";
 import { ProfileTypeFieldPermissionValues, ProfileTypeFieldTypeValues } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { NexusGenObjects } from "../__types";
 
 export const ProfileType = objectType({
   name: "ProfileType",
@@ -77,25 +76,13 @@ export const Profile = objectType({
     t.list.field("properties", {
       type: "ProfileFieldProperty",
       resolve: async (root, _, ctx) => {
-        const [fields, values, files] = await Promise.all([
-          ctx.profiles.loadProfileTypeFieldsByProfileTypeId(root.profile_type_id),
-          ctx.profiles.loadProfileFieldValuesByProfileId(root.id),
-          ctx.profiles.loadProfileFieldFilesByProfileId(root.id),
-        ]);
-        const valuesByFieldId = indexBy(values, (v) => v.profile_type_field_id);
-        const filesByFieldId = groupBy(files, (v) => v.profile_type_field_id);
-        return pipe(
-          fields,
-          sortBy((f) => f.position),
-          map(
-            (f) =>
-              [
-                f,
-                valuesByFieldId[f.id] ?? null,
-                filesByFieldId[f.id] ?? null,
-              ] as NexusGenObjects["ProfileFieldProperty"]
-          )
+        const fields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+          root.profile_type_id
         );
+        return sortBy(fields, (f) => f.position).map((field) => ({
+          profile_id: root.id,
+          profile_type_field_id: field.id,
+        }));
       },
     });
     t.paginationField("events", {
@@ -157,11 +144,46 @@ export const ProfileFieldResponse = interfaceType({
 export const ProfileFieldProperty = objectType({
   name: "ProfileFieldProperty",
   definition(t) {
-    t.field("field", { type: "ProfileTypeField", resolve: ([ptf]) => ptf });
-    t.nullable.field("value", { type: "ProfileFieldValue", resolve: ([, value]) => value });
-    t.nullable.list.field("files", { type: "ProfileFieldFile", resolve: ([, , files]) => files });
+    t.field("profile", {
+      type: "Profile",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.profiles.loadProfile(o.profile_id))!;
+      },
+    });
+    t.field("field", {
+      type: "ProfileTypeField",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.profiles.loadProfileTypeField(o.profile_type_field_id))!;
+      },
+    });
+    t.nullable.field("value", {
+      type: "ProfileFieldValue",
+      resolve: async (o, _, ctx) => {
+        return await ctx.profiles.loadProfileFieldValue({
+          profileId: o.profile_id,
+          profileTypeFieldId: o.profile_type_field_id,
+        });
+      },
+    });
+    t.nullable.list.field("files", {
+      type: "ProfileFieldFile",
+      resolve: async (o, _, ctx) => {
+        const field = await ctx.profiles.loadProfileTypeField(o.profile_type_field_id);
+        if (field?.type === "FILE") {
+          return await ctx.profiles.loadProfileFieldFiles({
+            profileId: o.profile_id,
+            profileTypeFieldId: o.profile_type_field_id,
+          });
+        } else {
+          return null;
+        }
+      },
+    });
   },
-  sourceType: `[db.ProfileTypeField, db.ProfileFieldValue | null, db.ProfileFieldFile[] | null]`,
+  sourceType: `{
+    profile_id: number;
+    profile_type_field_id: number;
+  }`,
 });
 
 export const ProfileFieldValue = objectType({

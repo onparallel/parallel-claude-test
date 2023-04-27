@@ -4402,12 +4402,25 @@ type ProfileFieldFileWithUploadData {
 type ProfileFieldProperty {
   field: ProfileTypeField!
   files: [ProfileFieldFile!]
+  profile: Profile!
   value: ProfileFieldValue
 }
 
 type ProfileFieldPropertyAndFileWithUploadData {
   property: ProfileFieldProperty!
   uploads: [ProfileFieldFileWithUploadData!]!
+}
+
+type ProfileFieldPropertyPagination {
+  """
+  The requested slice of items.
+  """
+  items: [ProfileFieldProperty!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
 }
 
 interface ProfileFieldResponse {
@@ -4486,6 +4499,11 @@ type ProfilePagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+input ProfilePropertyFilter {
+  profileTypeFieldId: [GID!]
+  profileTypeId: [GID!]
 }
 
 type ProfileType implements Timestamps {
@@ -5110,6 +5128,24 @@ type Query {
   Checks if the provided email is available to be registered as a user on Parallel
   """
   emailIsAvailable(email: String!): Boolean!
+  expiringProfileProperties(
+    filter: ProfilePropertyFilter
+
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+
+    """
+    Optional text to search in the collection.
+    """
+    search: String
+  ): ProfileFieldPropertyPagination!
 
   """
   Exports basic petition + fields configuration as JSON object

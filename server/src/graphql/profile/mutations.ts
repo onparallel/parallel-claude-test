@@ -530,12 +530,9 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
       expiresAt && zonedTimeToUtc(format(expiresAt, "yyyy-MM-dd"), organization!.default_timezone),
       ctx.user!.id
     );
-    const [field, allFiles] = await Promise.all([
-      ctx.profiles.loadProfileTypeField(profileTypeFieldId),
-      ctx.profiles.loadProfileFieldFilesByProfileTypeFieldId(profileTypeFieldId),
-    ]);
+
     return {
-      property: [field!, null, allFiles],
+      property: { profile_id: profileId, profile_type_field_id: profileTypeFieldId },
       uploads: zip(presignedPostDatas, files).map(([presignedPostData, file]) => ({
         file,
         presignedPostData,

@@ -240,6 +240,11 @@ export interface NexusGenInputs {
     // input type
     profileTypeId?: NexusGenScalars["GID"][] | null; // [GID!]
   };
+  ProfilePropertyFilter: {
+    // input type
+    profileTypeFieldId?: NexusGenScalars["GID"][] | null; // [GID!]
+    profileTypeId?: NexusGenScalars["GID"][] | null; // [GID!]
+  };
   PublicPetitionSignerDataInput: {
     // input type
     email: string; // String!
@@ -807,15 +812,19 @@ export interface NexusGenObjects {
     file: NexusGenRootTypes["ProfileFieldFile"]; // ProfileFieldFile!
     presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
   };
-  ProfileFieldProperty: [
-    db.ProfileTypeField,
-    db.ProfileFieldValue | null,
-    db.ProfileFieldFile[] | null
-  ];
+  ProfileFieldProperty: {
+    profile_id: number;
+    profile_type_field_id: number;
+  };
   ProfileFieldPropertyAndFileWithUploadData: {
     // root type
     property: NexusGenRootTypes["ProfileFieldProperty"]; // ProfileFieldProperty!
     uploads: NexusGenRootTypes["ProfileFieldFileWithUploadData"][]; // [ProfileFieldFileWithUploadData!]!
+  };
+  ProfileFieldPropertyPagination: {
+    // root type
+    items: NexusGenRootTypes["ProfileFieldProperty"][]; // [ProfileFieldProperty!]!
+    totalCount: number; // Int!
   };
   ProfileFieldValue: db.ProfileFieldValue;
   ProfileFieldValueUpdatedEvent: profileEvents.ProfileFieldValueUpdatedEvent;
@@ -2224,12 +2233,18 @@ export interface NexusGenFieldTypes {
     // field return type
     field: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     files: NexusGenRootTypes["ProfileFieldFile"][] | null; // [ProfileFieldFile!]
+    profile: NexusGenRootTypes["Profile"]; // Profile!
     value: NexusGenRootTypes["ProfileFieldValue"] | null; // ProfileFieldValue
   };
   ProfileFieldPropertyAndFileWithUploadData: {
     // field return type
     property: NexusGenRootTypes["ProfileFieldProperty"]; // ProfileFieldProperty!
     uploads: NexusGenRootTypes["ProfileFieldFileWithUploadData"][]; // [ProfileFieldFileWithUploadData!]!
+  };
+  ProfileFieldPropertyPagination: {
+    // field return type
+    items: NexusGenRootTypes["ProfileFieldProperty"][]; // [ProfileFieldProperty!]!
+    totalCount: number; // Int!
   };
   ProfileFieldValue: {
     // field return type
@@ -2466,6 +2481,7 @@ export interface NexusGenFieldTypes {
     dowJonesKycEntityProfile: NexusGenRootTypes["DowJonesKycEntityProfileResult"]; // DowJonesKycEntityProfileResult!
     dowJonesKycEntitySearch: NexusGenRootTypes["DowJonesKycEntitySearchResultPagination"]; // DowJonesKycEntitySearchResultPagination!
     emailIsAvailable: boolean; // Boolean!
+    expiringProfileProperties: NexusGenRootTypes["ProfileFieldPropertyPagination"]; // ProfileFieldPropertyPagination!
     exportPetitionToJson: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     getApiTokenOwner: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     getSlugForPublicPetitionLink: string; // String!
@@ -4193,12 +4209,18 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     field: "ProfileTypeField";
     files: "ProfileFieldFile";
+    profile: "Profile";
     value: "ProfileFieldValue";
   };
   ProfileFieldPropertyAndFileWithUploadData: {
     // field return type name
     property: "ProfileFieldProperty";
     uploads: "ProfileFieldFileWithUploadData";
+  };
+  ProfileFieldPropertyPagination: {
+    // field return type name
+    items: "ProfileFieldProperty";
+    totalCount: "Int";
   };
   ProfileFieldValue: {
     // field return type name
@@ -4435,6 +4457,7 @@ export interface NexusGenFieldTypeNames {
     dowJonesKycEntityProfile: "DowJonesKycEntityProfileResult";
     dowJonesKycEntitySearch: "DowJonesKycEntitySearchResultPagination";
     emailIsAvailable: "Boolean";
+    expiringProfileProperties: "ProfileFieldPropertyPagination";
     exportPetitionToJson: "SupportMethodResponse";
     getApiTokenOwner: "SupportMethodResponse";
     getSlugForPublicPetitionLink: "String";
@@ -6149,6 +6172,13 @@ export interface NexusGenArgTypes {
     emailIsAvailable: {
       // args
       email: string; // String!
+    };
+    expiringProfileProperties: {
+      // args
+      filter?: NexusGenInputs["ProfilePropertyFilter"] | null; // ProfilePropertyFilter
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+      search?: string | null; // String
     };
     exportPetitionToJson: {
       // args

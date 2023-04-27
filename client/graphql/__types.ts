@@ -3433,6 +3433,7 @@ export interface ProfileFieldProperty {
   __typename?: "ProfileFieldProperty";
   field: ProfileTypeField;
   files?: Maybe<Array<ProfileFieldFile>>;
+  profile: Profile;
   value?: Maybe<ProfileFieldValue>;
 }
 
@@ -3440,6 +3441,14 @@ export interface ProfileFieldPropertyAndFileWithUploadData {
   __typename?: "ProfileFieldPropertyAndFileWithUploadData";
   property: ProfileFieldProperty;
   uploads: Array<ProfileFieldFileWithUploadData>;
+}
+
+export interface ProfileFieldPropertyPagination {
+  __typename?: "ProfileFieldPropertyPagination";
+  /** The requested slice of items. */
+  items: Array<ProfileFieldProperty>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
 }
 
 export interface ProfileFieldResponse {
@@ -3494,6 +3503,11 @@ export interface ProfilePagination {
   items: Array<Profile>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
+}
+
+export interface ProfilePropertyFilter {
+  profileTypeFieldId?: InputMaybe<Array<Scalars["GID"]>>;
+  profileTypeId?: InputMaybe<Array<Scalars["GID"]>>;
 }
 
 export interface ProfileType extends Timestamps {
@@ -3837,6 +3851,7 @@ export interface Query {
   dowJonesKycEntitySearch: DowJonesKycEntitySearchResultPagination;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
+  expiringProfileProperties: ProfileFieldPropertyPagination;
   /** Exports basic petition + fields configuration as JSON object */
   exportPetitionToJson: SupportMethodResponse;
   /** Get the user who owns an API Token */
@@ -3936,6 +3951,13 @@ export interface QuerydowJonesKycEntitySearchArgs {
 
 export interface QueryemailIsAvailableArgs {
   email: Scalars["String"];
+}
+
+export interface QueryexpiringProfilePropertiesArgs {
+  filter?: InputMaybe<ProfilePropertyFilter>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+  search?: InputMaybe<Scalars["String"]>;
 }
 
 export interface QueryexportPetitionToJsonArgs {
