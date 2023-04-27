@@ -2,12 +2,14 @@ import Ajv from "ajv";
 import { isPossiblePhoneNumber } from "libphonenumber-js";
 import { isDefined, uniq } from "remeda";
 import { TableTypes } from "../../db/helpers/BaseRepository";
+import { validateProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import { fromGlobalId } from "../../util/globalId";
 import { parseTextWithPlaceholders } from "../../util/textWithPlaceholders";
 import { isValidDate } from "../../util/time";
 import { Maybe } from "../../util/types";
+import { NexusGenInputs } from "../__types";
 import { Arg } from "../helpers/authorize";
-import { ApolloError } from "../helpers/errors";
+import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 
 export function validProfileNamePattern<
@@ -58,6 +60,26 @@ export function validProfileFieldValue<
           `Invalid profile field value: ${e.message}`,
           "INVALID_PROFILE_FIELD_VALUE"
         );
+      }
+    }
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+export function validProfileTypeFieldOptions<
+  TypeName extends string,
+  FieldName extends string,
+  TDataArg extends Arg<TypeName, FieldName, NexusGenInputs["CreateProfileTypeFieldInput"]>
+>(dataArg: TDataArg, argName: string) {
+  return (async (_, args, ctx, info) => {
+    const data = args[dataArg] as unknown as NexusGenInputs["CreateProfileTypeFieldInput"];
+    if (isDefined(data.options)) {
+      try {
+        validateProfileTypeFieldOptions(data.type, data.options);
+      } catch (e) {
+        if (e instanceof Error) {
+          throw new ArgValidationError(info, argName, e.message);
+        }
+        throw e;
       }
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

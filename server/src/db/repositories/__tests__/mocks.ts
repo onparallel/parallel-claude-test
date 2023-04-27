@@ -1199,7 +1199,14 @@ function randomProfileTypeFieldType() {
 }
 
 function randomProfileTypeFieldOptions(type: ProfileTypeFieldType) {
-  return {};
+  switch (type) {
+    case "DATE": {
+      return { useReplyAsExpiryDate: faker.datatype.boolean() };
+    }
+    default: {
+      return {};
+    }
+  }
 }
 
 function randomPetitionFieldOptions(type: PetitionFieldType) {

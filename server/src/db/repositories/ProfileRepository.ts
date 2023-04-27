@@ -155,8 +155,18 @@ export class ProfileRepository extends BaseRepository {
           : await this.insert(
               "profile_type_field",
               sourceFields.map((field) => ({
-                ...omit(field, ["id", "profile_type_id", "created_at", "updated_at"]),
+                ...omit(field, [
+                  "id",
+                  "profile_type_id",
+                  "expiry_alert_ahead_time",
+                  "created_at",
+                  "updated_at",
+                ]),
                 profile_type_id: profileType.id,
+                expiry_alert_ahead_time:
+                  field.is_expirable && field.expiry_alert_ahead_time
+                    ? this.interval(field.expiry_alert_ahead_time)
+                    : null,
                 created_by: createdBy,
                 updated_by: createdBy,
               })),
@@ -217,6 +227,9 @@ export class ProfileRepository extends BaseRepository {
           profile_type_id: profileTypeId,
           position: max === null ? 0 : max + 1,
           ...data,
+          expiry_alert_ahead_time: isDefined(data.expiry_alert_ahead_time)
+            ? this.interval(data.expiry_alert_ahead_time)
+            : data.expiry_alert_ahead_time,
           created_by: createdBy,
           updated_by: createdBy,
         },
@@ -238,6 +251,9 @@ export class ProfileRepository extends BaseRepository {
       .update(
         {
           ...data,
+          expiry_alert_ahead_time: isDefined(data.expiry_alert_ahead_time)
+            ? this.interval(data.expiry_alert_ahead_time)
+            : data.expiry_alert_ahead_time,
           updated_by: updatedBy,
           updated_at: this.now(),
         },

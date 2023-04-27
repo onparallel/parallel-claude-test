@@ -11,6 +11,7 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Portal,
   Spacer,
   Text,
 } from "@chakra-ui/react";
@@ -100,28 +101,30 @@ function LocaleSelect({ value, onChange, localizableUserText, ...props }: Locale
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/countries/flags/${current.flag}.png`}
         />
       </MenuButton>
-      <MenuList>
-        {locales.map((locale) => (
-          <MenuItem as={HStack} key={locale.key} onClick={() => onChange(locale.key)}>
-            <Image
-              alt={locale.localizedLabel}
-              boxSize={6}
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/countries/flags/${locale.flag}.png`}
-            />
-            <Text as="span">{locale.localizedLabel}</Text>
-            <Spacer />
-            {isDefined(localizableUserText[locale.key]) &&
-            localizableUserText[locale.key]!.trim().length ? (
-              <Badge variant="subtle" colorScheme="green">
-                <FormattedMessage
-                  id="component.localizable-user-text-input.translated-badge"
-                  defaultMessage="Translated"
-                />
-              </Badge>
-            ) : null}
-          </MenuItem>
-        ))}
-      </MenuList>
+      <Portal>
+        <MenuList>
+          {locales.map((locale) => (
+            <MenuItem as={HStack} key={locale.key} onClick={() => onChange(locale.key)}>
+              <Image
+                alt={locale.localizedLabel}
+                boxSize={6}
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/countries/flags/${locale.flag}.png`}
+              />
+              <Text as="span">{locale.localizedLabel}</Text>
+              <Spacer />
+              {isDefined(localizableUserText[locale.key]) &&
+              localizableUserText[locale.key]!.trim().length ? (
+                <Badge variant="subtle" colorScheme="green">
+                  <FormattedMessage
+                    id="component.localizable-user-text-input.translated-badge"
+                    defaultMessage="Translated"
+                  />
+                </Badge>
+              ) : null}
+            </MenuItem>
+          ))}
+        </MenuList>
+      </Portal>
     </Menu>
   );
 }

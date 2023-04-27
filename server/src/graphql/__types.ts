@@ -125,8 +125,10 @@ export interface NexusGenInputs {
   CreateProfileTypeFieldInput: {
     // input type
     alias?: string | null; // String
+    expiryAlertAheadTime?: NexusGenScalars["Duration"] | null; // Duration
     isExpirable?: boolean | null; // Boolean
     name: NexusGenScalars["LocalizableUserText"]; // LocalizableUserText!
+    options?: NexusGenScalars["JSONObject"] | null; // JSONObject
     type: NexusGenEnums["ProfileTypeFieldType"]; // ProfileTypeFieldType!
   };
   FileUploadInput: {
@@ -317,6 +319,7 @@ export interface NexusGenInputs {
   UpdateProfileTypeFieldInput: {
     // input type
     alias?: string | null; // String
+    expiryAlertAheadTime?: NexusGenScalars["Duration"] | null; // Duration
     isExpirable?: boolean | null; // Boolean
     name?: NexusGenScalars["LocalizableUserText"] | null; // LocalizableUserText
     options?: NexusGenScalars["JSONObject"] | null; // JSONObject
@@ -2266,6 +2269,7 @@ export interface NexusGenFieldTypes {
   ProfileTypeField: {
     // field return type
     alias: string | null; // String
+    expiryAlertAheadTime: NexusGenScalars["Duration"] | null; // Duration
     id: NexusGenScalars["GID"]; // GID!
     isExpirable: boolean; // Boolean!
     isUsedInProfileName: boolean; // Boolean!
@@ -4234,6 +4238,7 @@ export interface NexusGenFieldTypeNames {
   ProfileTypeField: {
     // field return type name
     alias: "String";
+    expiryAlertAheadTime: "Duration";
     id: "GID";
     isExpirable: "Boolean";
     isUsedInProfileName: "Boolean";

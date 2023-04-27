@@ -209,8 +209,10 @@ export interface CreateContactInput {
 
 export interface CreateProfileTypeFieldInput {
   alias?: InputMaybe<Scalars["String"]>;
+  expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]>;
   isExpirable?: InputMaybe<Scalars["Boolean"]>;
   name: Scalars["LocalizableUserText"];
+  options?: InputMaybe<Scalars["JSONObject"]>;
   type: ProfileTypeFieldType;
 }
 
@@ -3509,6 +3511,7 @@ export interface ProfileType extends Timestamps {
 export interface ProfileTypeField {
   __typename?: "ProfileTypeField";
   alias?: Maybe<Scalars["String"]>;
+  expiryAlertAheadTime?: Maybe<Scalars["Duration"]>;
   id: Scalars["GID"];
   isExpirable: Scalars["Boolean"];
   isUsedInProfileName: Scalars["Boolean"];
@@ -4603,6 +4606,7 @@ export interface UpdateProfileFieldValueInput {
 
 export interface UpdateProfileTypeFieldInput {
   alias?: InputMaybe<Scalars["String"]>;
+  expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]>;
   isExpirable?: InputMaybe<Scalars["Boolean"]>;
   name?: InputMaybe<Scalars["LocalizableUserText"]>;
   options?: InputMaybe<Scalars["JSONObject"]>;
@@ -7047,8 +7051,9 @@ export type useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment = {
   name: { [locale in UserLocale]?: string };
   type: ProfileTypeFieldType;
   alias?: string | null;
-  isExpirable: boolean;
   options: { [key: string]: any };
+  isExpirable: boolean;
+  expiryAlertAheadTime?: Duration | null;
 };
 
 export type useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldMutationVariables =
@@ -7064,8 +7069,9 @@ export type useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldMutati
     name: { [locale in UserLocale]?: string };
     type: ProfileTypeFieldType;
     alias?: string | null;
-    isExpirable: boolean;
     options: { [key: string]: any };
+    isExpirable: boolean;
+    expiryAlertAheadTime?: Duration | null;
   };
 };
 
@@ -7083,8 +7089,9 @@ export type useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldMutati
     name: { [locale in UserLocale]?: string };
     type: ProfileTypeFieldType;
     alias?: string | null;
-    isExpirable: boolean;
     options: { [key: string]: any };
+    isExpirable: boolean;
+    expiryAlertAheadTime?: Duration | null;
   };
 };
 
@@ -7092,6 +7099,7 @@ export type useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment = {
   __typename?: "ProfileTypeField";
   id: string;
   isExpirable: boolean;
+  expiryAlertAheadTime?: Duration | null;
 };
 
 export type EmailEventsIndicator_PetitionMessageFragment = {
@@ -17198,13 +17206,11 @@ export type OrganizationProfileType_ProfileTypeFieldFragment = {
   __typename?: "ProfileTypeField";
   id: string;
   name: { [locale in UserLocale]?: string };
-  alias?: string | null;
-  position: number;
   type: ProfileTypeFieldType;
-  isExpirable: boolean;
-  isUsedInProfileName: boolean;
+  alias?: string | null;
   options: { [key: string]: any };
-  myPermission: ProfileTypeFieldPermission;
+  isExpirable: boolean;
+  expiryAlertAheadTime?: Duration | null;
 };
 
 export type OrganizationProfileType_ProfileTypeFragment = {
@@ -17217,13 +17223,11 @@ export type OrganizationProfileType_ProfileTypeFragment = {
     __typename?: "ProfileTypeField";
     id: string;
     name: { [locale in UserLocale]?: string };
-    alias?: string | null;
-    position: number;
     type: ProfileTypeFieldType;
-    isExpirable: boolean;
-    isUsedInProfileName: boolean;
+    alias?: string | null;
     options: { [key: string]: any };
-    myPermission: ProfileTypeFieldPermission;
+    isExpirable: boolean;
+    expiryAlertAheadTime?: Duration | null;
   }>;
 };
 
@@ -17242,13 +17246,11 @@ export type OrganizationProfileType_profileTypeQuery = {
       __typename?: "ProfileTypeField";
       id: string;
       name: { [locale in UserLocale]?: string };
-      alias?: string | null;
-      position: number;
       type: ProfileTypeFieldType;
-      isExpirable: boolean;
-      isUsedInProfileName: boolean;
+      alias?: string | null;
       options: { [key: string]: any };
-      myPermission: ProfileTypeFieldPermission;
+      isExpirable: boolean;
+      expiryAlertAheadTime?: Duration | null;
     }>;
   };
 };
@@ -17311,13 +17313,11 @@ export type OrganizationProfileType_updateProfileTypeMutation = {
       __typename?: "ProfileTypeField";
       id: string;
       name: { [locale in UserLocale]?: string };
-      alias?: string | null;
-      position: number;
       type: ProfileTypeFieldType;
-      isExpirable: boolean;
-      isUsedInProfileName: boolean;
+      alias?: string | null;
       options: { [key: string]: any };
-      myPermission: ProfileTypeFieldPermission;
+      isExpirable: boolean;
+      expiryAlertAheadTime?: Duration | null;
     }>;
   };
 };
@@ -17338,13 +17338,11 @@ export type OrganizationProfileType_cloneProfileTypeMutation = {
       __typename?: "ProfileTypeField";
       id: string;
       name: { [locale in UserLocale]?: string };
-      alias?: string | null;
-      position: number;
       type: ProfileTypeFieldType;
-      isExpirable: boolean;
-      isUsedInProfileName: boolean;
+      alias?: string | null;
       options: { [key: string]: any };
-      myPermission: ProfileTypeFieldPermission;
+      isExpirable: boolean;
+      expiryAlertAheadTime?: Duration | null;
     }>;
   };
 };
@@ -17365,13 +17363,11 @@ export type OrganizationProfileType_updateProfileTypeFieldPositionsMutation = {
       __typename?: "ProfileTypeField";
       id: string;
       name: { [locale in UserLocale]?: string };
-      alias?: string | null;
-      position: number;
       type: ProfileTypeFieldType;
-      isExpirable: boolean;
-      isUsedInProfileName: boolean;
+      alias?: string | null;
       options: { [key: string]: any };
-      myPermission: ProfileTypeFieldPermission;
+      isExpirable: boolean;
+      expiryAlertAheadTime?: Duration | null;
     }>;
   };
 };
@@ -17387,13 +17383,11 @@ export type OrganizationProfileType_updateProfileTypeFieldMutation = {
     __typename?: "ProfileTypeField";
     id: string;
     name: { [locale in UserLocale]?: string };
-    alias?: string | null;
-    position: number;
     type: ProfileTypeFieldType;
-    isExpirable: boolean;
-    isUsedInProfileName: boolean;
+    alias?: string | null;
     options: { [key: string]: any };
-    myPermission: ProfileTypeFieldPermission;
+    isExpirable: boolean;
+    expiryAlertAheadTime?: Duration | null;
   };
 };
 
@@ -17413,13 +17407,11 @@ export type OrganizationProfileType_deleteProfileTypeFieldMutation = {
       __typename?: "ProfileTypeField";
       id: string;
       name: { [locale in UserLocale]?: string };
-      alias?: string | null;
-      position: number;
       type: ProfileTypeFieldType;
-      isExpirable: boolean;
-      isUsedInProfileName: boolean;
+      alias?: string | null;
       options: { [key: string]: any };
-      myPermission: ProfileTypeFieldPermission;
+      isExpirable: boolean;
+      expiryAlertAheadTime?: Duration | null;
     }>;
   };
 };
@@ -17533,13 +17525,11 @@ export type OrganizationProfileTypes_cloneProfileTypeMutation = {
       __typename?: "ProfileTypeField";
       id: string;
       name: { [locale in UserLocale]?: string };
-      alias?: string | null;
-      position: number;
       type: ProfileTypeFieldType;
-      isExpirable: boolean;
-      isUsedInProfileName: boolean;
+      alias?: string | null;
       options: { [key: string]: any };
-      myPermission: ProfileTypeFieldPermission;
+      isExpirable: boolean;
+      expiryAlertAheadTime?: Duration | null;
     }>;
   };
 };
@@ -29778,6 +29768,7 @@ export const useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc = gql`
   fragment useUpdateProfileTypeFieldDialog_ProfileTypeField on ProfileTypeField {
     id
     isExpirable
+    expiryAlertAheadTime
   }
 ` as unknown as DocumentNode<useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment, unknown>;
 export const PetitionRemindersConfig_RemindersConfigFragmentDoc = gql`
@@ -30756,7 +30747,9 @@ export const useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragmentDoc
     name
     type
     alias
+    options
     isExpirable
+    expiryAlertAheadTime
     options
   }
 ` as unknown as DocumentNode<
@@ -30774,13 +30767,7 @@ export const OrganizationProfileType_ProfileTypeFieldFragmentDoc = gql`
   fragment OrganizationProfileType_ProfileTypeField on ProfileTypeField {
     id
     name
-    alias
-    position
     type
-    isExpirable
-    isUsedInProfileName
-    options
-    myPermission
     ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
     ...ProfileTypeSettings_ProfileTypeField
   }

@@ -1,7 +1,7 @@
 import { arg, inputObjectType, nonNull, queryField } from "nexus";
 import { isDefined } from "remeda";
 import { authenticateAnd } from "../helpers/authorize";
-import { ApolloError } from "../helpers/errors";
+import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { userHasFeatureFlag } from "../petition/authorizers";
@@ -16,10 +16,20 @@ export const profileTypes = queryField((t) => {
     extendArgs: {
       locale: arg({ type: "UserLocale" }),
     },
-    resolve: async (_, { locale, limit, offset, search, sortBy }, ctx) => {
-      if (sortBy?.some((s) => s.startsWith("name_")) && !isDefined(locale)) {
-        throw new ApolloError(`"locale" must be provided when sorting by "name"`);
+    validateArgs: (_, args, ctx, info) => {
+      if (
+        isDefined(args.sortBy) &&
+        args.sortBy.some((s) => s.startsWith("name_")) &&
+        !isDefined(args.locale)
+      ) {
+        throw new ArgValidationError(
+          info,
+          "locale",
+          `"locale" must be provided when sorting by "name"`
+        );
       }
+    },
+    resolve: async (_, { locale, limit, offset, search, sortBy }, ctx) => {
       const columnMap = {
         createdAt: "created_at",
         name: "name",

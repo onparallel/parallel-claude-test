@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Center,
+  Checkbox,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -13,29 +14,31 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
-import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { LocalizableUserTextInput } from "@parallel/components/common/LocalizableUserTextInput";
-import {
-  SimpleOption,
-  SimpleSelect,
-  useSimpleSelectOptions,
-} from "@parallel/components/common/SimpleSelect";
+import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
+import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
+import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
   CreateProfileTypeFieldInput,
   ProfileTypeFieldType,
-  useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldDocument,
   useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment,
+  useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldDocument,
   useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useProfileTypeFieldTypes } from "@parallel/utils/profileFields";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { useRef } from "react";
+import {
+  ExpirationOption,
+  durationToExpiration,
+  expirationToDuration,
+  useExpirationOptions,
+} from "@parallel/utils/useExpirationOptions";
+import { useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { components, OptionProps, SingleValueProps } from "react-select";
+import { OptionProps, SingleValueProps, components } from "react-select";
 import { isDefined, omit } from "remeda";
 import { ProfileTypeFieldTypeLabel } from "../ProfileTypeFieldTypeLabel";
 
@@ -44,8 +47,9 @@ interface CreateOrUpdateProfileTypeFieldDialogProps {
   profileTypeField?: useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment;
 }
 
-interface CreateOrUpdateProfileTypeFieldDialogData extends CreateProfileTypeFieldInput {
-  expiration: string;
+interface CreateOrUpdateProfileTypeFieldDialogData
+  extends Omit<CreateProfileTypeFieldInput, "expiryAlertAheadTime"> {
+  expiryAlertAheadTime: ExpirationOption;
 }
 
 function CreateOrUpdateProfileTypeFieldDialog({
@@ -65,6 +69,8 @@ function CreateOrUpdateProfileTypeFieldDialog({
     type = "SHORT_TEXT",
     alias,
     isExpirable,
+    expiryAlertAheadTime,
+    options,
   } = profileTypeField ?? {};
 
   const {
@@ -74,13 +80,18 @@ function CreateOrUpdateProfileTypeFieldDialog({
     handleSubmit,
     watch,
     setError,
+    setValue,
   } = useForm<CreateOrUpdateProfileTypeFieldDialogData>({
     defaultValues: {
       name,
       type,
       alias,
       isExpirable,
-      expiration: "1_MONTHS_BEFORE",
+      options,
+      expiryAlertAheadTime:
+        expiryAlertAheadTime === null && isExpirable
+          ? "DO_NOT_REMEMBER"
+          : durationToExpiration(expiryAlertAheadTime ?? { months: 1 }),
     },
   });
 
@@ -93,54 +104,17 @@ function CreateOrUpdateProfileTypeFieldDialog({
   });
 
   const _isExpirable = watch("isExpirable");
+  const selectedType = watch("type");
+
+  useEffect(() => {
+    if (selectedType !== "DATE") {
+      setValue("options.useReplyAsExpiryDate", undefined);
+    }
+  }, [selectedType]);
 
   const profileTypeFieldTypes = useProfileTypeFieldTypes();
 
-  const expirationOptions = useSimpleSelectOptions(
-    (intl) => [
-      ...([3, 2, 1] as const).map((count) => ({
-        value: `${count}_MONTHS_BEFORE` as const,
-        label: intl.formatMessage(
-          {
-            id: "generic.n-months-before",
-            defaultMessage: "{count, plural, =1 {1 month} other {# months}} before",
-          },
-          { count }
-        ),
-      })),
-      ...([15, 7, 1] as const).map((count) => ({
-        value: `${count}_DAYS_BEFORE` as const,
-        label: intl.formatMessage(
-          {
-            id: "generic.n-days-before",
-            defaultMessage: "{count, plural, =1 {1 day} other {# days}} before",
-          },
-          { count }
-        ),
-      })),
-      {
-        value: "7_DAYS_AFTER",
-        label: intl.formatMessage(
-          {
-            id: "generic.n-days-after",
-            defaultMessage: "{count, plural, =1 {1 day} other {# days}} after",
-          },
-          { count: 7 }
-        ),
-      },
-      {
-        value: "1_MONTHS_AFTER",
-        label: intl.formatMessage(
-          {
-            id: "generic.n-months-after",
-            defaultMessage: "{count, plural, =1 {1 month} other {# months}} after",
-          },
-          { count: 1 }
-        ),
-      },
-    ],
-    []
-  );
+  const expirationOptions = useExpirationOptions();
 
   const [createProfileTypeField] = useMutation(
     useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldDocument
@@ -160,19 +134,30 @@ function CreateOrUpdateProfileTypeFieldDialog({
         as: "form",
         onSubmit: handleSubmit(async (data) => {
           try {
+            const expiryAlertAheadTime =
+              data.isExpirable && data.expiryAlertAheadTime !== "DO_NOT_REMEMBER"
+                ? expirationToDuration(data.expiryAlertAheadTime)
+                : null;
+
             if (isDefined(profileTypeField)) {
               await updateProfileTypeField({
                 variables: {
                   profileTypeId,
                   profileTypeFieldId: profileTypeField.id,
-                  data: omit(data, ["expiration", "type"]),
+                  data: {
+                    ...omit(data, ["expiryAlertAheadTime", "type"]),
+                    expiryAlertAheadTime,
+                  },
                 },
               });
             } else {
               await createProfileTypeField({
                 variables: {
                   profileTypeId,
-                  data: omit(data, ["expiration"]),
+                  data: {
+                    ...omit(data, ["expiryAlertAheadTime"]),
+                    expiryAlertAheadTime,
+                  },
                 },
               });
             }
@@ -186,7 +171,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
         }),
       }}
       header={
-        isDefined(name) ? (
+        isDefined(profileTypeField) ? (
           <FormattedMessage
             id="component.create-or-update-property-dialog.edit-profile-type-field"
             defaultMessage="Edit property"
@@ -279,52 +264,80 @@ function CreateOrUpdateProfileTypeFieldDialog({
               />
             </FormErrorMessage>
           </FormControl>
-          <HStack>
-            <Stack spacing={1}>
-              <Text fontWeight={600}>
-                <FormattedMessage
-                  id="component.create-or-update-property-dialog.expiration"
-                  defaultMessage="Expiration"
-                />
-              </Text>
-              <Text color="gray.600" fontSize="sm">
-                <FormattedMessage
-                  id="component.create-or-update-property-dialog.expiration-description"
-                  defaultMessage="Select if this property will have an expiration date. Example: Passports and contracts."
-                />
-              </Text>
-            </Stack>
-            <Center>
-              <Switch {...register("isExpirable")} />
-            </Center>
-          </HStack>
-          {_isExpirable ? (
-            <HStack spacing={4}>
-              <Text fontSize="sm" whiteSpace="nowrap">
-                <FormattedMessage
-                  id="component.create-or-update-property-dialog.remember-from"
-                  defaultMessage="Remember from:"
-                />
-              </Text>
-              <Box width="100%">
-                <Controller
-                  name="expiration"
-                  control={control}
-                  rules={{
-                    required: _isExpirable ? true : false,
-                  }}
-                  render={({ field: { value, onChange } }) => (
-                    <SimpleSelect
-                      size="sm"
-                      value={value ?? null}
-                      options={expirationOptions}
-                      onChange={onChange}
+          <Stack spacing={2}>
+            <FormControl isInvalid={!!errors.isExpirable}>
+              <HStack>
+                <Stack as={FormLabel} spacing={1} margin={0}>
+                  <Text fontWeight={600}>
+                    <FormattedMessage
+                      id="component.create-or-update-property-dialog.expiration"
+                      defaultMessage="Expiration"
                     />
-                  )}
-                />
-              </Box>
-            </HStack>
-          ) : null}
+                  </Text>
+                  <Text color="gray.600" fontSize="sm" fontWeight="normal">
+                    <FormattedMessage
+                      id="component.create-or-update-property-dialog.expiration-description"
+                      defaultMessage="Select if this property will have an expiration date. Example: Passports and contracts."
+                    />
+                  </Text>
+                </Stack>
+                <Center>
+                  <Switch {...register("isExpirable")} />
+                </Center>
+              </HStack>
+            </FormControl>
+            {_isExpirable ? (
+              <>
+                {selectedType === "DATE" ? (
+                  <FormControl>
+                    <HStack spacing={2}>
+                      <Controller
+                        name="options.useReplyAsExpiryDate"
+                        control={control}
+                        render={({ field: { value, onChange } }) => (
+                          <Checkbox isChecked={value} value={value} onChange={onChange} />
+                        )}
+                      />
+                      <FormLabel fontSize="sm" whiteSpace="nowrap" fontWeight="normal">
+                        <FormattedMessage
+                          id="component.create-or-update-property-dialog.use-reply-as-expiry-date"
+                          defaultMessage="Use reply as expiry date"
+                        />
+                      </FormLabel>
+                    </HStack>
+                  </FormControl>
+                ) : null}
+                <FormControl isInvalid={!!errors.expiryAlertAheadTime}>
+                  <HStack spacing={4}>
+                    <FormLabel fontSize="sm" whiteSpace="nowrap" fontWeight="normal" margin={0}>
+                      <FormattedMessage
+                        id="component.create-or-update-property-dialog.expiry-alert-ahead-time-label"
+                        defaultMessage="Remind on:"
+                      />
+                    </FormLabel>
+                    <Box width="100%">
+                      <Controller
+                        name="expiryAlertAheadTime"
+                        control={control}
+                        rules={{
+                          required: _isExpirable ? true : false,
+                        }}
+                        render={({ field: { value, onChange, ref } }) => (
+                          <SimpleSelect
+                            ref={ref}
+                            size="sm"
+                            value={value ?? null}
+                            options={expirationOptions}
+                            onChange={onChange}
+                          />
+                        )}
+                      />
+                    </Box>
+                  </HStack>
+                </FormControl>
+              </>
+            ) : null}
+          </Stack>
         </Stack>
       }
       confirm={
@@ -367,7 +380,9 @@ useCreateOrUpdateProfileTypeFieldDialog.fragments = {
       name
       type
       alias
+      options
       isExpirable
+      expiryAlertAheadTime
       options
     }
   `,

@@ -23,9 +23,11 @@ const SCHEMAS = {
   },
   DATE: {
     type: "object",
-    required: [],
+    required: ["useReplyAsExpiryDate"],
     additionalProperties: false,
-    properties: {},
+    properties: {
+      useReplyAsExpiryDate: { type: "boolean" },
+    },
   },
   PHONE: {
     type: "object",
@@ -52,5 +54,8 @@ export function validateProfileTypeFieldOptions(type: ProfileTypeFieldType, opti
 }
 
 export function defaultProfileTypeFieldOptions(type: ProfileTypeFieldType) {
+  if (type === "DATE") {
+    return { useReplyAsExpiryDate: false };
+  }
   return {};
 }

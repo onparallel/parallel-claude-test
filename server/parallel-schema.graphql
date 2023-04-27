@@ -217,8 +217,10 @@ input CreateContactInput {
 
 input CreateProfileTypeFieldInput {
   alias: String
+  expiryAlertAheadTime: Duration
   isExpirable: Boolean
   name: LocalizableUserText!
+  options: JSONObject
   type: ProfileTypeFieldType!
 }
 
@@ -4504,6 +4506,7 @@ type ProfileType implements Timestamps {
 
 type ProfileTypeField {
   alias: String
+  expiryAlertAheadTime: Duration
   id: GID!
   isExpirable: Boolean!
   isUsedInProfileName: Boolean!
@@ -6046,6 +6049,7 @@ input UpdateProfileFieldValueInput {
 
 input UpdateProfileTypeFieldInput {
   alias: String
+  expiryAlertAheadTime: Duration
   isExpirable: Boolean
   name: LocalizableUserText
   options: JSONObject

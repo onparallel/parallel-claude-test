@@ -1,10 +1,26 @@
 import { gql } from "@apollo/client";
-import { Button, Center, HStack, Stack, Switch, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  HStack,
+  Stack,
+} from "@chakra-ui/react";
+import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
-import { useForm } from "react-hook-form";
+import {
+  ExpirationOption,
+  durationToExpiration,
+  useExpirationOptions,
+} from "@parallel/utils/useExpirationOptions";
+import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
+import { uniq } from "remeda";
 
 interface UpdateProfileTypeFieldDialogProps {
   fields: useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment[];
@@ -13,12 +29,44 @@ interface UpdateProfileTypeFieldDialogProps {
 function UpdateProfileTypeFieldDialog({
   fields,
   ...props
-}: DialogProps<UpdateProfileTypeFieldDialogProps, { isExpirable: boolean }>) {
-  const { register, handleSubmit } = useForm<{ isExpirable: boolean }>({
+}: DialogProps<
+  UpdateProfileTypeFieldDialogProps,
+  { isExpirable: boolean; expiryAlertAheadTime: ExpirationOption }
+>) {
+  const uniqueExpiryAlertAheadTimes = uniq(
+    fields.map((f) =>
+      f.isExpirable && f.expiryAlertAheadTime === null
+        ? "DO_NOT_REMEMBER"
+        : f.expiryAlertAheadTime
+        ? durationToExpiration(f.expiryAlertAheadTime)
+        : null
+    )
+  );
+
+  const {
+    handleSubmit,
+    watch,
+    control,
+    setValue,
+    formState: { errors },
+  } = useForm<{
+    isExpirable: boolean | null;
+    expiryAlertAheadTime: ExpirationOption | null;
+  }>({
     defaultValues: {
-      isExpirable: fields.every((field) => field.isExpirable),
+      isExpirable: fields.every((f) => f.isExpirable)
+        ? true
+        : fields.some((f) => f.isExpirable)
+        ? null
+        : false,
+      expiryAlertAheadTime:
+        uniqueExpiryAlertAheadTimes.length === 1 ? uniqueExpiryAlertAheadTimes[0] : undefined,
     },
   });
+
+  const _isExpirable = watch("isExpirable");
+
+  const expirationOptions = useExpirationOptions();
 
   return (
     <ConfirmDialog
@@ -27,8 +75,11 @@ function UpdateProfileTypeFieldDialog({
       size="md"
       content={{
         as: "form",
-        onSubmit: handleSubmit(({ isExpirable }) => {
-          props.onResolve({ isExpirable });
+        onSubmit: handleSubmit((data) => {
+          props.onResolve({
+            isExpirable: data.isExpirable!,
+            expiryAlertAheadTime: data.expiryAlertAheadTime!,
+          });
         }),
       }}
       header={
@@ -41,25 +92,80 @@ function UpdateProfileTypeFieldDialog({
         />
       }
       body={
-        <HStack>
-          <Stack spacing={1}>
-            <Text fontWeight={600}>
-              <FormattedMessage
-                id="component.update-profile-type-field-dialog.expiration"
-                defaultMessage="Expiration"
+        <Stack>
+          <FormControl isInvalid={!!errors.isExpirable}>
+            <HStack>
+              <Stack as={FormLabel} spacing={1} margin={0}>
+                <Box>
+                  <FormattedMessage
+                    id="component.update-profile-type-field-dialog.is-expirable-label"
+                    defaultMessage="Expiration"
+                  />
+                </Box>
+                <Box color="gray.600" fontSize="sm" fontWeight="normal">
+                  <FormattedMessage
+                    id="component.update-profile-type-field-dialog.is-expirable-description"
+                    defaultMessage="Select if these properties have an expiration date (e.g., passports and contracts)."
+                  />
+                </Box>
+              </Stack>
+              <Controller
+                name="isExpirable"
+                control={control}
+                rules={{ required: _isExpirable === null ? true : false }}
+                render={({ field: { value, onChange } }) => {
+                  return (
+                    <Checkbox
+                      size="lg"
+                      isChecked={value === true}
+                      isIndeterminate={value === null}
+                      onChange={onChange}
+                      colorScheme="primary"
+                    />
+                  );
+                }}
               />
-            </Text>
-            <Text color="gray.600" fontSize="sm">
-              <FormattedMessage
-                id="component.update-profile-type-field-dialog.expiration-description"
-                defaultMessage="Select if this property will have an expiration date. Example: Passports and contracts."
-              />
-            </Text>
-          </Stack>
-          <Center>
-            <Switch {...register("isExpirable")} />
-          </Center>
-        </HStack>
+            </HStack>
+            <FormErrorMessage>
+              <FormattedMessage id="generic.required-field" defaultMessage="Required field" />
+            </FormErrorMessage>
+          </FormControl>
+          {_isExpirable !== false ? (
+            <FormControl isInvalid={!!errors.expiryAlertAheadTime}>
+              <HStack spacing={4}>
+                <FormLabel fontSize="sm" whiteSpace="nowrap" fontWeight="normal" margin={0}>
+                  <FormattedMessage
+                    id="component.create-or-update-property-dialog.expiry-alert-ahead-time-label"
+                    defaultMessage="Remind on:"
+                  />
+                </FormLabel>
+                <Box width="100%">
+                  <Controller
+                    name="expiryAlertAheadTime"
+                    control={control}
+                    rules={{ required: _isExpirable ? true : false }}
+                    render={({ field: { value, onChange, ref } }) => (
+                      <SimpleSelect
+                        ref={ref}
+                        size="sm"
+                        value={value}
+                        options={expirationOptions}
+                        placeholder="-"
+                        onChange={(value) => {
+                          onChange(value);
+                          setValue("isExpirable", true);
+                        }}
+                      />
+                    )}
+                  />
+                </Box>
+              </HStack>
+              <FormErrorMessage>
+                <FormattedMessage id="generic.required-field" defaultMessage="Required field" />
+              </FormErrorMessage>
+            </FormControl>
+          ) : null}
+        </Stack>
       }
       confirm={
         <Button colorScheme="primary" type="submit">
@@ -75,6 +181,7 @@ useUpdateProfileTypeFieldDialog.fragments = {
     fragment useUpdateProfileTypeFieldDialog_ProfileTypeField on ProfileTypeField {
       id
       isExpirable
+      expiryAlertAheadTime
     }
   `,
 };

@@ -1145,6 +1145,11 @@
     "context": "Select if this property will have an expiration date. Example: Passports and contracts."
   },
   {
+    "term": "component.create-or-update-property-dialog.expiry-alert-ahead-time-label",
+    "definition": "Recordar a partir de:",
+    "context": "Remind on:"
+  },
+  {
     "term": "component.create-or-update-property-dialog.new-property",
     "definition": "Nueva propiedad",
     "context": "New property"
@@ -1153,11 +1158,6 @@
     "term": "component.create-or-update-property-dialog.property-name",
     "definition": "Nombre de la propiedad",
     "context": "Property name"
-  },
-  {
-    "term": "component.create-or-update-property-dialog.remember-from",
-    "definition": "Recordar a partir de:",
-    "context": "Remember from:"
   },
   {
     "term": "component.create-or-update-property-dialog.type-of-property",
@@ -1178,6 +1178,11 @@
     "term": "component.create-or-update-property-dialog.unique-identifier-help",
     "definition": "Permite identificar fácilmente la propiedad en las respuestas de la API.",
     "context": "Allows to easily identify the property in API replies."
+  },
+  {
+    "term": "component.create-or-update-property-dialog.use-reply-as-expiry-date",
+    "definition": "Utilizar respuesta como fecha de vencimiento",
+    "context": "Use reply as expiry date"
   },
   {
     "term": "component.create-or-update-user-dialog.included-in",
@@ -6330,14 +6335,14 @@
     "context": "Years"
   },
   {
-    "term": "component.update-profile-type-field-dialog.expiration",
-    "definition": "Caducidad/Vencimiento",
-    "context": "Expiration"
+    "term": "component.update-profile-type-field-dialog.is-expirable-description",
+    "definition": "Selecciona si esta propiedad tendrá una fecha de vencimiento. Ejemplo: Pasaportes y contratos.",
+    "context": "Select if these properties have an expiration date (e.g., passports and contracts)."
   },
   {
-    "term": "component.update-profile-type-field-dialog.expiration-description",
-    "definition": "Selecciona si esta propiedad tendrá una fecha de vencimiento. Ejemplo: Pasaportes y contratos.",
-    "context": "Select if this property will have an expiration date. Example: Passports and contracts."
+    "term": "component.update-profile-type-field-dialog.is-expirable-label",
+    "definition": "Caducidad/Vencimiento",
+    "context": "Expiration"
   },
   {
     "term": "component.update-profile-type-field-dialog.title",
@@ -6473,6 +6478,11 @@
     "term": "component.use-delete-tag.views-count",
     "definition": "{count, plural, =1 {# vista} other {# vistas}}",
     "context": "{count, plural, =1 {# view} other {# views}}"
+  },
+  {
+    "term": "component.use-expiration-options.do-not-remember",
+    "definition": "No recordar",
+    "context": "Do not remember"
   },
   {
     "term": "component.user-dropdown-empty.invite-button",

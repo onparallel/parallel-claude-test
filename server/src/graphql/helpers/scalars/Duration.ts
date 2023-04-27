@@ -29,7 +29,7 @@ function ensureDuration(value: any, strict: boolean): _Duration {
     throw new Error(`Value is not a valid Duration: ${value} ${ajv.errorsText()}`);
   }
   return Object.fromEntries(
-    KEYS.map((key) => [key, value[key]]).filter(([, value]) => isDefined(value) && value > 0)
+    KEYS.map((key) => [key, value[key]]).filter(([, value]) => isDefined(value) && value !== 0)
   );
 }
 

@@ -59,6 +59,7 @@ export const ProfileTypeField = objectType({
     t.jsonObject("options", { resolve: (o) => o.options });
     t.nullable.string("alias");
     t.boolean("isExpirable", { resolve: (o) => o.is_expirable });
+    t.nullable.duration("expiryAlertAheadTime", { resolve: (o) => o.expiry_alert_ahead_time });
   },
 });
 

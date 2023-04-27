@@ -193,8 +193,10 @@ export type CreateContactInput = {
 
 export type CreateProfileTypeFieldInput = {
   alias?: InputMaybe<Scalars["String"]>;
+  expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]>;
   isExpirable?: InputMaybe<Scalars["Boolean"]>;
   name: Scalars["LocalizableUserText"];
+  options?: InputMaybe<Scalars["JSONObject"]>;
   type: ProfileTypeFieldType;
 };
 
@@ -3392,6 +3394,7 @@ export type ProfileType = Timestamps & {
 
 export type ProfileTypeField = {
   alias: Maybe<Scalars["String"]>;
+  expiryAlertAheadTime: Maybe<Scalars["Duration"]>;
   id: Scalars["GID"];
   isExpirable: Scalars["Boolean"];
   isUsedInProfileName: Scalars["Boolean"];
@@ -4440,6 +4443,7 @@ export type UpdateProfileFieldValueInput = {
 
 export type UpdateProfileTypeFieldInput = {
   alias?: InputMaybe<Scalars["String"]>;
+  expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]>;
   isExpirable?: InputMaybe<Scalars["Boolean"]>;
   name?: InputMaybe<Scalars["LocalizableUserText"]>;
   options?: InputMaybe<Scalars["JSONObject"]>;

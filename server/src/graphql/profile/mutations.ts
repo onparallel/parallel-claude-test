@@ -38,7 +38,12 @@ import {
   userHasAccessToProfile,
   userHasAccessToProfileType,
 } from "./authorizers";
-import { validateProfileFieldValue, validProfileNamePattern } from "./validators";
+import {
+  validateProfileFieldValue,
+  validProfileNamePattern,
+  validProfileTypeFieldOptions,
+} from "./validators";
+import { parseISO } from "date-fns";
 
 export const createProfileType = mutationField("createProfileType", {
   type: "ProfileType",
@@ -147,7 +152,8 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
     notEmptyObject((args) => args.data, "data"),
     validLocalizableUserText((args) => args.data.name, "data.name", { maxLength: 200 }),
     maxLength((args) => args.data.alias, "data.alias", 100),
-    validateRegex((args) => args.data.alias, "data.alias", /^[A-Za-z0-9_]+$/)
+    validateRegex((args) => args.data.alias, "data.alias", /^[A-Za-z0-9_]+$/),
+    validProfileTypeFieldOptions("data", "data")
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
@@ -159,8 +165,10 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
           t.nonNull.field("type", {
             type: "ProfileTypeFieldType",
           });
+          t.nullable.jsonObject("options");
           t.nullable.string("alias");
           t.nullable.boolean("isExpirable");
+          t.nullable.duration("expiryAlertAheadTime");
         },
       })
     ),
@@ -174,7 +182,8 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
           type: args.data.type,
           alias: args.data.alias || null,
           is_expirable: args.data.isExpirable ?? false,
-          options: defaultProfileTypeFieldOptions(args.data.type),
+          expiry_alert_ahead_time: args.data.isExpirable ? args.data.expiryAlertAheadTime : null,
+          options: args.data.options ?? defaultProfileTypeFieldOptions(args.data.type),
         },
         `User:${ctx.user!.id}`
       );
@@ -212,6 +221,7 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
           t.nullable.field("name", { type: "LocalizableUserText" });
           t.nullable.string("alias");
           t.nullable.boolean("isExpirable");
+          t.nullable.duration("expiryAlertAheadTime");
           t.nullable.jsonObject("options");
         },
       }).asArg()
@@ -236,6 +246,9 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     }
     if (isDefined(args.data.isExpirable)) {
       updateData.is_expirable = args.data.isExpirable;
+      updateData.expiry_alert_ahead_time = args.data.isExpirable
+        ? args.data.expiryAlertAheadTime
+        : null;
     }
     if (isDefined(args.data.options)) {
       try {
@@ -408,11 +421,15 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
     // validate contents and expiresAt
     const values = await ctx.profiles.loadProfileFieldValuesByProfileId(profileId);
     const valuesByPtfId = indexBy(values, (v) => v.profile_type_field_id);
-    for (const { profileTypeFieldId, content, expiresAt } of fields) {
-      const profileTypeField = profileTypeFieldsById[profileTypeFieldId];
-      if (isDefined(content)) {
+
+    const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
+
+    const fieldsWithZonedExpires = fields.map((field) => {
+      const profileTypeField = profileTypeFieldsById[field.profileTypeFieldId];
+
+      if (isDefined(field.content)) {
         try {
-          validateProfileFieldValue(profileTypeField, content);
+          validateProfileFieldValue(profileTypeField, field.content);
         } catch (e) {
           if (e instanceof Error) {
             throw new ApolloError(
@@ -422,33 +439,43 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
           }
         }
       }
-      if (expiresAt !== undefined && !profileTypeField.is_expirable) {
+      if (field.expiresAt !== undefined && !profileTypeField.is_expirable) {
         throw new ApolloError(
           `Can't set expiry on a non expirable field`,
           "EXPIRY_ON_NON_EXPIRABLE_FIELD"
         );
       }
-      if (expiresAt !== undefined && content === null) {
+      if (field.expiresAt !== undefined && field.content === null) {
         throw new ApolloError(`Can't set expiry when removing a field`, "EXPIRY_ON_REMOVED_FIELD");
       }
       if (
-        expiresAt !== undefined &&
-        content === undefined &&
-        !isDefined(valuesByPtfId[profileTypeFieldId])
+        field.expiresAt !== undefined &&
+        field.content === undefined &&
+        !isDefined(valuesByPtfId[field.profileTypeFieldId])
       ) {
         throw new ApolloError(
           `Can't set expiry on a field with no value`,
           "EXPIRY_ON_NONEXISTING_VALUE"
         );
       }
-    }
-    const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
-    const fieldsWithZonedExpires = fields.map((field) => ({
-      ...field,
-      expiresAt:
-        field.expiresAt &&
-        zonedTimeToUtc(format(field.expiresAt, "yyyy-MM-dd"), organization!.default_timezone),
-    }));
+
+      return {
+        ...field,
+        expiresAt: field.expiresAt
+          ? // priorize expiresAt argument if set
+            zonedTimeToUtc(format(field.expiresAt, "yyyy-MM-dd"), organization!.default_timezone)
+          : // else, check option useReplyAsExpiryDate for DATE replies
+          profileTypeField.type === "DATE" &&
+            profileTypeField.options.useReplyAsExpiryDate &&
+            isDefined(field.content?.value)
+          ? zonedTimeToUtc(
+              format(parseISO(field.content!.value), "yyyy-MM-dd"),
+              organization!.default_timezone
+            )
+          : null,
+      };
+    });
+
     return (await ctx.profiles.updateProfileFieldValue(
       profileId,
       fieldsWithZonedExpires,

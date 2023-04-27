@@ -64,6 +64,7 @@ import {
   useState,
 } from "react";
 import { identity, noop } from "remeda";
+import { expirationToDuration } from "@parallel/utils/useExpirationOptions";
 
 type OrganizationProfileTypeProps = UnwrapPromise<
   ReturnType<typeof OrganizationProfileType.getInitialProps>
@@ -232,7 +233,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
   const handleEditProperty = async (fields: OrganizationProfileType_ProfileTypeFieldFragment[]) => {
     try {
       if (fields.length > 1) {
-        const { isExpirable } = await showUpdateProfileTypeFieldDialog({
+        const { isExpirable, expiryAlertAheadTime } = await showUpdateProfileTypeFieldDialog({
           fields,
         });
         for (const field of fields) {
@@ -242,6 +243,11 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
               profileTypeFieldId: field.id,
               data: {
                 isExpirable,
+                expiryAlertAheadTime: isExpirable
+                  ? expiryAlertAheadTime === "DO_NOT_REMEMBER"
+                    ? null
+                    : expirationToDuration(expiryAlertAheadTime)
+                  : undefined,
               },
             },
           });
@@ -352,7 +358,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
       <Box padding={4}>
         <Stack spacing={6} maxWidth="container.lg">
           <ProfileTypeSettings
-            key={profileType.id}
+            key={`${profileType.id}-settings`}
             profileType={profileType}
             onSave={handleChangeProfileTypePattern}
           />
@@ -686,16 +692,11 @@ const _fragments = {
       fragment OrganizationProfileType_ProfileTypeField on ProfileTypeField {
         id
         name
-        alias
-        position
         type
-        isExpirable
-        isUsedInProfileName
-        options
-        myPermission
         ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
         ...ProfileTypeSettings_ProfileTypeField
       }
+      ${useUpdateProfileTypeFieldDialog.fragments.ProfileTypeField}
       ${useCreateOrUpdateProfileTypeFieldDialog.fragments.ProfileTypeField}
       ${ProfileTypeSettings.fragments.ProfileTypeField}
     `;

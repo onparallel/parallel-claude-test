@@ -8,6 +8,14 @@ import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, ProfileType, ProfileTypeField } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
+import { createProfile } from "../profile/mutations";
+import { parseISO } from "date-fns";
+
+type UpdateProfileFieldValueInput = {
+  profileTypeFieldId: string;
+  content?: Record<string, any> | null;
+  expiresAt?: string | null;
+};
 
 describe("GraphQL/Profiles", () => {
   let testClient: TestClient;
@@ -22,6 +30,63 @@ describe("GraphQL/Profiles", () => {
 
   function json(value: any) {
     return mocks.knex.raw("?::jsonb", JSON.stringify(value));
+  }
+
+  async function createProfile(profileTypeId: string, fields?: UpdateProfileFieldValueInput[]) {
+    const { data } = await testClient.execute(
+      gql`
+        mutation ($profileTypeId: GID!) {
+          createProfile(profileTypeId: $profileTypeId) {
+            id
+            name
+            properties {
+              field {
+                id
+                isExpirable
+              }
+              value {
+                content
+                expiresAt
+              }
+            }
+          }
+        }
+      `,
+      { profileTypeId }
+    );
+    if (isDefined(fields) && fields.length > 0) {
+      return await updateProfileValue(data.createProfile.id, fields);
+    } else {
+      return data.createProfile;
+    }
+  }
+
+  async function updateProfileValue(profileId: number, fields: UpdateProfileFieldValueInput[]) {
+    const { data, errors } = await testClient.execute(
+      gql`
+        mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+          updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+            id
+            name
+            properties {
+              field {
+                id
+                isExpirable
+              }
+              value {
+                content
+                expiresAt
+              }
+            }
+          }
+        }
+      `,
+      { profileId, fields }
+    );
+    if (isDefined(errors)) {
+      throw errors;
+    }
+    return data.updateProfileFieldValue;
   }
 
   beforeAll(async () => {
@@ -73,32 +138,40 @@ describe("GraphQL/Profiles", () => {
             name: json({ en: "First name", es: "Nombre" }),
             type: "SHORT_TEXT" as const,
             alias: "FIRST_NAME",
+            options: {},
           },
           {
             name: json({ en: "Last name", es: "Apellido" }),
             type: "SHORT_TEXT" as const,
             alias: "LAST_NAME",
+            options: {},
           },
           {
             name: json({ en: "Birth date", es: "Fecha de nacimiento" }),
             type: "DATE" as const,
             alias: "BIRTH_DATE",
+            is_expirable: true,
+            options: { useReplyAsExpiryDate: true },
           },
           {
             name: json({ en: "Phone", es: "Teléfono" }),
             type: "PHONE" as const,
             alias: "PHONE",
+            options: {},
           },
           {
             name: json({ en: "Email", es: "Correo electrónico" }),
             type: "SHORT_TEXT" as const,
             alias: "EMAIL",
+            options: {},
           },
           {
             name: json({ en: "Passport", es: "Pasaporte" }),
             type: "SHORT_TEXT" as const,
             alias: "PASSPORT",
             is_expirable: true,
+            expiry_alert_ahead_time: mocks.knex.raw(`'1 month'::interval`) as any,
+            options: {},
           },
         ][i]
     );
@@ -141,6 +214,153 @@ describe("GraphQL/Profiles", () => {
 
   afterAll(async () => {
     await testClient.stop();
+  });
+
+  describe("profile", () => {
+    it("queries a profile", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          content: { value: "Harry" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+          content: { value: "Potter" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+          content: { value: "2029-01-01" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[5].id),
+          content: { value: "AA1234567" },
+          expiresAt: "2024-10-28",
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($profileId: GID!) {
+            profile(profileId: $profileId) {
+              id
+              name
+              profileType {
+                id
+                name
+              }
+              properties {
+                field {
+                  id
+                  name
+                  options
+                  isExpirable
+                }
+                files {
+                  id
+                }
+                value {
+                  expiresAt
+                  content
+                }
+              }
+              events(limit: 10, offset: 0) {
+                items {
+                  type
+                }
+                totalCount
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profile).toEqual({
+        id: profile.id,
+        name: profile.name,
+        profileType: {
+          id: toGlobalId("ProfileType", profileTypes[0].id),
+          name: { es: "Persona física", en: "Individual" },
+        },
+        properties: [
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+              name: { en: "First name", es: "Nombre" },
+              options: {},
+              isExpirable: false,
+            },
+            files: null,
+            value: { expiresAt: null, content: { value: "Harry" } },
+          },
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+              name: { en: "Last name", es: "Apellido" },
+              options: {},
+              isExpirable: false,
+            },
+            files: null,
+            value: { expiresAt: null, content: { value: "Potter" } },
+          },
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+              name: { en: "Birth date", es: "Fecha de nacimiento" },
+              options: { useReplyAsExpiryDate: true },
+              isExpirable: true,
+            },
+            files: null,
+            value: { expiresAt: expect.any(Date), content: { value: "2029-01-01" } },
+          },
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[3].id),
+              name: { en: "Phone", es: "Teléfono" },
+              options: {},
+              isExpirable: false,
+            },
+            files: null,
+            value: null,
+          },
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[4].id),
+              name: { en: "Email", es: "Correo electrónico" },
+              options: {},
+              isExpirable: false,
+            },
+            files: null,
+            value: null,
+          },
+          {
+            field: {
+              id: toGlobalId("ProfileTypeField", profileType0Fields[5].id),
+              name: { en: "Passport", es: "Pasaporte" },
+              options: {},
+              isExpirable: true,
+            },
+            files: null,
+            value: { expiresAt: expect.any(Date), content: { value: "AA1234567" } },
+          },
+        ],
+        events: {
+          items: [
+            { type: "PROFILE_FIELD_EXPIRY_UPDATED" },
+            { type: "PROFILE_FIELD_VALUE_UPDATED" },
+            { type: "PROFILE_FIELD_EXPIRY_UPDATED" },
+            { type: "PROFILE_FIELD_VALUE_UPDATED" },
+            { type: "PROFILE_FIELD_VALUE_UPDATED" },
+            { type: "PROFILE_FIELD_VALUE_UPDATED" },
+            { type: "PROFILE_CREATED" },
+          ],
+          totalCount: 7,
+        },
+      });
+    });
   });
 
   describe("profileTypes", () => {
@@ -243,6 +463,21 @@ describe("GraphQL/Profiles", () => {
           },
         ],
       });
+    });
+
+    it("sends error when querying profile types and sorting by name with no locale", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($limit: Int, $offset: Int, $sortBy: [QueryProfileTypes_OrderBy!]) {
+            profileTypes(limit: $limit, offset: $offset, sortBy: $sortBy) {
+              totalCount
+            }
+          }
+        `,
+        { limit: 10, offset: 0, sortBy: ["name_ASC"] }
+      );
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
     });
   });
 
@@ -615,6 +850,7 @@ describe("GraphQL/Profiles", () => {
               name
               alias
               isExpirable
+              expiryAlertAheadTime
               options
               position
               type
@@ -632,6 +868,7 @@ describe("GraphQL/Profiles", () => {
           data: {
             alias: "alias",
             isExpirable: true,
+            expiryAlertAheadTime: { months: 1 },
             name: { en: "my new field" },
             type: "SHORT_TEXT",
           },
@@ -644,6 +881,7 @@ describe("GraphQL/Profiles", () => {
         name: { en: "my new field" },
         alias: "alias",
         isExpirable: true,
+        expiryAlertAheadTime: { months: 1 },
         options: defaultProfileTypeFieldOptions("SHORT_TEXT"),
         position: 3,
         type: "SHORT_TEXT",
@@ -682,7 +920,11 @@ describe("GraphQL/Profiles", () => {
         organization.id,
         profileTypes[1].id,
         2,
-        (i) => ({ is_expirable: true, alias: i === 0 ? "alias" : null })
+        (i) => ({
+          is_expirable: true,
+          expiry_alert_ahead_time: mocks.knex.raw(`'1 month'::interval`) as any,
+          alias: i === 0 ? "alias" : null,
+        })
       );
     });
 
@@ -1003,69 +1245,6 @@ describe("GraphQL/Profiles", () => {
   });
 
   describe("updateProfileFieldValue", () => {
-    type UpdateProfileFieldValueInput = {
-      profileTypeFieldId: string;
-      content?: Record<string, any> | null;
-      expiresAt?: string | null;
-    };
-
-    async function createProfile(profileTypeId: string, fields?: UpdateProfileFieldValueInput[]) {
-      const { data } = await testClient.execute(
-        gql`
-          mutation ($profileTypeId: GID!) {
-            createProfile(profileTypeId: $profileTypeId) {
-              id
-              name
-              properties {
-                field {
-                  id
-                  isExpirable
-                }
-                value {
-                  content
-                  expiresAt
-                }
-              }
-            }
-          }
-        `,
-        { profileTypeId }
-      );
-      if (isDefined(fields) && fields.length > 0) {
-        return await updateProfileValue(data.createProfile.id, fields);
-      } else {
-        return data.createProfile;
-      }
-    }
-
-    async function updateProfileValue(profileId: number, fields: UpdateProfileFieldValueInput[]) {
-      const { data, errors } = await testClient.execute(
-        gql`
-          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
-            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
-              id
-              name
-              properties {
-                field {
-                  id
-                  isExpirable
-                }
-                value {
-                  content
-                  expiresAt
-                }
-              }
-            }
-          }
-        `,
-        { profileId, fields }
-      );
-      if (isDefined(errors)) {
-        throw errors;
-      }
-      return data.updateProfileFieldValue;
-    }
-
     it("updates field values and updates the name", async () => {
       const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
       expect(profile).toEqual({
@@ -1170,7 +1349,7 @@ describe("GraphQL/Profiles", () => {
       await expect(
         updateProfileValue(profile.id, [
           {
-            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[3].id),
             content: { value: "1988-12-15" },
             expiresAt: "2030-01-01",
           },
@@ -1198,7 +1377,7 @@ describe("GraphQL/Profiles", () => {
             expiresAt: "2030-01-01",
           },
         ])
-      ).rejects.toContainGraphQLError("EXPIRY_ON_NON_EXPIRABLE_FIELD");
+      ).rejects.toContainGraphQLError("EXPIRY_ON_REMOVED_FIELD");
     });
   });
 });
