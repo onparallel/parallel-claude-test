@@ -219,7 +219,16 @@ export default function PetitionExport({
                         ) : null}
                       </View>
                     ) : (
-                      <View key={i} style={styles.field} wrap={false}>
+                      <View
+                        key={i}
+                        style={styles.field}
+                        wrap={
+                          field.type === "TEXT" &&
+                          field.replies.some((r) => approxTextHeight(r.content.value) > 20)
+                            ? true
+                            : false
+                        }
+                      >
                         {field.title ? (
                           <Text style={[styles.text, styles.fieldTitle]}>
                             {cleanupText(field.title)}
@@ -367,6 +376,18 @@ export default function PetitionExport({
       </LiquidScopeProvider>
     </LiquidProvider>
   );
+}
+
+function approxTextHeight(text: string) {
+  let lines = 1;
+  let current = 0;
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] === "\n" || ++current > 80) {
+      lines++;
+      current = 0;
+    }
+  }
+  return lines;
 }
 
 function groupFieldsByPages<T extends PetitionExport_PetitionFieldFragment>(
