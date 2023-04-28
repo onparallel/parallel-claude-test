@@ -104,7 +104,9 @@ async function main() {
         console.log(`${index + 1}/${missingDocuments.slice(0, one ? 1 : undefined).length}`);
 
         const docsByRequestModel = groupBy(d.documents, (d: any) =>
-          [d.model.type, d.model.year, d.model.quarter, d.model.month].filter(isDefined).join("_")
+          [d.model.type, d.model.year, d.model.quarter, d.model.month, d.model.licensePlate]
+            .filter(isDefined)
+            .join("_")
         );
 
         // each request model can have many docs, one per extension. in this case we only use pdf and json

@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { RequestInit } from "node-fetch";
 import pMap from "p-map";
 import { groupBy, isDefined } from "remeda";
-import { Config, CONFIG } from "../config";
+import { CONFIG, Config } from "../config";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import { FileRepository } from "../db/repositories/FileRepository";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
@@ -15,10 +15,10 @@ import { Maybe } from "../util/types";
 import { FETCH_SERVICE, IFetchService } from "./FetchService";
 import { IImageService, IMAGE_SERVICE } from "./ImageService";
 import {
-  OrganizationCreditsService,
   ORGANIZATION_CREDITS_SERVICE,
+  OrganizationCreditsService,
 } from "./OrganizationCreditsService";
-import { StorageService, STORAGE_SERVICE } from "./StorageService";
+import { STORAGE_SERVICE, StorageService } from "./StorageService";
 
 type SessionMetadata =
   | { fieldId: string; orgId: string } & ({ userId: string } | { accessId: string });
@@ -246,14 +246,14 @@ export class BankflipService implements IBankflipService {
       ];
     }
 
-    // a set of documents with the same name and request model will be all part of the same PetitionFieldReply
-    const groupedByModelRequest = groupBy(modelRequestOutcome.documents ?? [], (d) =>
-      // TODO group only by name when Bankflip releases unique name
-      [d.name, d.model.type, d.model.year, d.model.quarter, d.model.month]
-        .filter(isDefined)
+    // a set of documents with the same request model will be all part of the same PetitionFieldReply
+    const groupedByRequestModel = groupBy(modelRequestOutcome.documents ?? [], (d) =>
+      Object.keys(d.model)
+        .sort()
+        .map((key) => d.model[key as keyof ModelRequest])
         .join("_")
     );
-    return await pMap(Object.values(groupedByModelRequest), async (docs) => {
+    return await pMap(Object.values(groupedByRequestModel), async (docs) => {
       const documents: Record<string, Maybe<ModelRequestDocument>> = {};
       ["pdf", "json"].forEach((extension) => {
         documents[extension] = docs.find((d) => d.extension === extension) ?? null;
