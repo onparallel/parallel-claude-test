@@ -50,6 +50,7 @@ async function main() {
         'AEAT_309_IVA_LIQUIDACION_NO_PERIODICA',
         'AEAT_349_IVA_OPERACIONES_INTRACOMUNITARIAS'
         )
+        and content->'bankflip_session_id' is not null;
     `);
     return data.rows;
   });
@@ -58,40 +59,50 @@ async function main() {
     [r.petition_field_id, r.content.request.type].join("_")
   );
 
-  const missingDocuments = await pMap(
-    // more than 1 reply of the same request type is assumed to be a complete reply (e.g.: the 4 quarters of a given model)
-    // this ensures we only process incomplete replies (all models are supposed to have at least 1 document)
-    Object.values(groupedReplies).filter((r) => r.length === 1),
-    async ([row]) => {
-      const bankflipSession = await (
-        await fetch(`https://core.bankflip.io/session/${row.content.bankflip_session_id}/summary`, {
-          headers: {
-            Authorization: `Bearer ${config.bankflip.saldadosApiKey}`,
-          },
-        })
-      ).json();
+  const missingDocuments = (
+    await pMap(
+      // more than 1 reply of the same request type is assumed to be a complete reply (e.g.: the 4 quarters of a given model)
+      // this ensures we only process incomplete replies (all models are supposed to have at least 1 document)
+      Object.values(groupedReplies).filter((r) => r.length === 1),
+      async ([row]) => {
+        const bankflipSession = await (
+          await fetch(
+            `https://core.bankflip.io/session/${row.content.bankflip_session_id}/summary`,
+            {
+              headers: {
+                Authorization: `Bearer ${config.bankflip.saldadosApiKey}`,
+              },
+            }
+          )
+        ).json();
 
-      const requestDocuments = bankflipSession.modelRequestOutcomes
-        .find((o: any) => o.modelRequest.model.type === row.content.request.type)
-        .documents.filter((d: any) => d.extension === "pdf" || d.extension === "json");
+        const requestDocuments = bankflipSession.modelRequestOutcomes
+          .find((o: any) => o.modelRequest.model.type === row.content.request.type)
+          .documents.filter((d: any) => d.extension === "pdf" || d.extension === "json");
 
-      return {
-        old_petition_field_reply_id: row.id,
-        old_file_upload_id: row.content.file_upload_id,
-        petition_field_id: row.petition_field_id,
-        petition_access_id: row.petition_access_id,
-        user_id: row.user_id,
-        created_by: row.created_by,
-        documents: requestDocuments,
-      };
-    },
-    { concurrency: 1 }
-  );
+        // if the session has only 1 document, it will be the same as the already created reply
+        if (requestDocuments.length === 1) {
+          return null;
+        }
+
+        return {
+          old_petition_field_reply_id: row.id,
+          old_file_upload_id: row.content.file_upload_id,
+          petition_field_id: row.petition_field_id,
+          petition_access_id: row.petition_access_id,
+          user_id: row.user_id,
+          created_by: row.created_by,
+          documents: requestDocuments,
+        };
+      },
+      { concurrency: 1 }
+    )
+  ).filter(isDefined);
 
   console.log(
     "missing documents, total:",
     missingDocuments.length,
-    JSON.stringify(missingDocuments, null, 2)
+    JSON.stringify(missingDocuments.slice(0, one ? 1 : undefined), null, 2)
   );
 
   if (!dryrun) {
