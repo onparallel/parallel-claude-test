@@ -127,12 +127,16 @@ export const expiringProfileProperties = queryField((t) => {
       }),
     },
     resolve: async (_, { limit, offset, search, filter }, ctx) => {
-      return ctx.profiles.getPaginatedExpirableProfileFieldProperties({
-        search,
-        filter,
-        limit,
-        offset,
-      });
+      return ctx.profiles.getPaginatedExpirableProfileFieldProperties(
+        ctx.user!.id,
+        ctx.user!.org_id,
+        {
+          search,
+          filter,
+          limit,
+          offset,
+        }
+      );
     },
   });
 });

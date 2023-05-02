@@ -758,6 +758,8 @@ export class ProfileRepository extends BaseRepository {
   }
 
   getPaginatedExpirableProfileFieldProperties(
+    userId: number,
+    orgId: number,
     opts: {
       search?: Maybe<string>;
       filter?: Maybe<{
@@ -766,63 +768,76 @@ export class ProfileRepository extends BaseRepository {
       }>;
     } & PageOpts
   ) {
+    const filter = (q: Knex.QueryBuilder) => {
+      if (isDefined(opts.search)) {
+        q.whereEscapedILike("p.name", `%${escapeLike(opts.search, "\\")}%`, "\\");
+      }
+      if (isDefined(opts.filter?.profileTypeId) && opts.filter!.profileTypeId.length > 0) {
+        q.whereIn("p.profile_type_id", opts.filter!.profileTypeId);
+      }
+      if (
+        isDefined(opts.filter?.profileTypeFieldId) &&
+        opts.filter!.profileTypeFieldId.length > 0
+      ) {
+        q.whereIn("pfx.profile_type_field_id", opts.filter!.profileTypeFieldId);
+      }
+    };
     return this.getPagination<{ profile_id: number; profile_type_field_id: number }>(
       this.knex
-        .with(
-          "pfv",
-          this.from("profile_field_value")
-            .whereNotNull("expires_at")
-            .whereNull("removed_at")
-            .whereNull("deleted_at")
-            .select("profile_id", "profile_type_field_id", "expires_at")
-        )
-        .with(
-          "pff",
-          this.from("profile_field_file")
-            .whereNotNull("expires_at")
-            .whereNull("removed_at")
-            .whereNull("deleted_at")
-            .groupBy("profile_id", "profile_type_field_id")
-            .select(
-              "profile_id",
-              "profile_type_field_id",
-              this.knex.raw("max(expires_at) expires_at")
+        .unionAll([
+          this.knex
+            .from(this.knex.ref("profile").as("p"))
+            .join(this.knex.ref("profile_field_value").as("pfx"), "p.id", "pfx.profile_id")
+            .join(
+              this.knex.ref("profile_type_field").as("ptf"),
+              "ptf.id",
+              "pfx.profile_type_field_id"
             )
-        )
-        .with(
-          "profile_properties",
-          this.knex.raw(/* sql */ `select * from "pfv" union select * from "pff"`)
-        )
-        .from("profile_properties")
-        .mmodify((q) => {
-          if (
-            isDefined(opts.search) ||
-            (isDefined(opts.filter?.profileTypeId) && opts.filter!.profileTypeId.length > 0)
-          ) {
-            q.join("profile", "profile.id", "profile_properties.profile_id");
-          }
-
-          if (isDefined(opts.search)) {
-            q.whereEscapedILike("profile.name", `%${escapeLike(opts.search, "\\")}%`, "\\");
-          }
-
-          if (isDefined(opts.filter?.profileTypeId) && opts.filter!.profileTypeId.length > 0) {
-            q.whereIn("profile.profile_type_id", opts.filter!.profileTypeId);
-          }
-
-          if (
-            isDefined(opts.filter?.profileTypeFieldId) &&
-            opts.filter!.profileTypeFieldId.length > 0
-          ) {
-            q.whereIn("profile_properties.profile_type_field_id", opts.filter!.profileTypeFieldId);
-          }
-        })
-        .select("profile_properties.profile_id", "profile_properties.profile_type_field_id")
-        .orderBy([
-          { column: "profile_properties.expires_at", order: "asc" },
-          { column: "profile_properties.profile_id", order: "desc" },
-          { column: "profile_properties.profile_type_field_id", order: "desc" },
-        ]),
+            .where("p.org_id", orgId)
+            .whereNull("p.deleted_at")
+            .whereNotNull("pfx.expires_at")
+            .whereNull("pfx.removed_at")
+            .whereNull("pfx.deleted_at")
+            .whereNotNull("ptf.expiry_alert_ahead_time")
+            .modify(filter)
+            .select(
+              "pfx.profile_id",
+              "pfx.profile_type_field_id",
+              "pfx.expires_at",
+              this.knex.raw(
+                /* sql */ `pfx.expires_at - ptf.expiry_alert_ahead_time < now() as in_alert`
+              )
+            ),
+          this.knex
+            .from(this.knex.ref("profile").as("p"))
+            .join(this.knex.ref("profile_field_file").as("pfx"), "p.id", "pfx.profile_id")
+            .join(
+              this.knex.ref("profile_type_field").as("ptf"),
+              "ptf.id",
+              "pfx.profile_type_field_id"
+            )
+            .where("p.org_id", orgId)
+            .whereNull("p.deleted_at")
+            .whereNotNull("pfx.expires_at")
+            .whereNull("pfx.removed_at")
+            .whereNull("pfx.deleted_at")
+            .whereNotNull("ptf.expiry_alert_ahead_time")
+            .modify(filter)
+            .distinctOn("pfx.profile_id", "pfx.profile_type_field_id")
+            .select(
+              "pfx.profile_id",
+              "pfx.profile_type_field_id",
+              "expires_at",
+              this.knex.raw(
+                /* sql */ `pfx.expires_at - ptf.expiry_alert_ahead_time < now() as in_alert`
+              )
+            ),
+        ])
+        .select("profile_id", "profile_type_field_id")
+        .orderBy("in_alert", "desc")
+        .orderBy("expires_at", "asc")
+        .orderBy("profile_id")
+        .orderBy("profile_type_field_id"),
       opts
     );
   }
