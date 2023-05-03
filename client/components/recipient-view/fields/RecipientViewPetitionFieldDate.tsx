@@ -18,6 +18,7 @@ import {
   RecipientViewPetitionFieldCard_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { useMetadata } from "@parallel/utils/withMetadata";
 
 export interface RecipientViewPetitionFieldDateProps
   extends Omit<
@@ -48,6 +49,8 @@ export function RecipientViewPetitionFieldDate({
 
   const newReplyRef = useRef<HTMLInputElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
+
+  const { browserName } = useMetadata();
 
   function handleAddNewReply() {
     setShowNewReply(true);
@@ -198,9 +201,12 @@ export function RecipientViewPetitionFieldDate({
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
           <DateInput {...inputProps} />
-          <Center boxSize={10} position="absolute" right={0} bottom={0} pointerEvents="none">
-            <FieldDateIcon fontSize="18px" color={isDisabled ? "gray.400" : undefined} />
-          </Center>
+          {browserName !== "Firefox" ? (
+            <Center boxSize={10} position="absolute" right={0} bottom={0} pointerEvents="none">
+              <FieldDateIcon fontSize="18px" color={isDisabled ? "gray.400" : undefined} />
+            </Center>
+          ) : null}
+
           <Center boxSize={10} position="absolute" right={8} bottom={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
           </Center>
@@ -229,6 +235,8 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.value ?? "");
   const [isSaving, setIsSaving] = useState(false);
+
+  const { browserName } = useMetadata();
 
   const debouncedUpdateReply = useDebouncedCallback(
     async (value: string) => {
@@ -287,12 +295,15 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
     <Stack direction="row">
       <Flex flex="1" position="relative">
         <DateInput {...props} />
-        <Center boxSize={10} position="absolute" right={0} bottom={0} pointerEvents="none">
-          <FieldDateIcon
-            fontSize="18px"
-            color={isDisabled || reply.status === "APPROVED" ? "gray.400" : undefined}
-          />
-        </Center>
+        {browserName !== "Firefox" || reply.status === "APPROVED" || isDisabled ? (
+          <Center boxSize={10} position="absolute" right={0} bottom={0} pointerEvents="none">
+            <FieldDateIcon
+              fontSize="18px"
+              color={isDisabled || reply.status === "APPROVED" ? "gray.400" : undefined}
+            />
+          </Center>
+        ) : null}
+
         <Center boxSize={10} position="absolute" right={8} bottom={0}>
           <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
         </Center>

@@ -20,6 +20,7 @@ import {
   RecipientViewPetitionFieldCard_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { useMetadata } from "@parallel/utils/withMetadata";
 
 type FieldDateTimeReply = {
   datetime: string;
@@ -56,6 +57,8 @@ export function RecipientViewPetitionFieldDateTime({
   const newReplyRef = useRef<HTMLInputElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const { browserName } = useMetadata();
 
   function handleAddNewReply() {
     setShowNewReply(true);
@@ -204,9 +207,12 @@ export function RecipientViewPetitionFieldDateTime({
         <Stack>
           <Flex flex="1" position="relative" marginTop={2}>
             <DateInput {...inputProps} type="datetime-local" />
-            <Center boxSize={10} position="absolute" right={0} bottom={0} pointerEvents="none">
-              <FieldDateIcon fontSize="18px" color={isDisabled ? "gray.400" : undefined} />
-            </Center>
+            {browserName !== "Firefox" ? (
+              <Center boxSize={10} position="absolute" right={0} bottom={0} pointerEvents="none">
+                <FieldDateIcon fontSize="18px" color={isDisabled ? "gray.400" : undefined} />
+              </Center>
+            ) : null}
+
             <Center boxSize={10} position="absolute" right={8} bottom={0}>
               <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
             </Center>
@@ -240,6 +246,8 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const [timezone, setTimezone] = useState(reply.content.timezone);
   const [showTimezone, setShowTimezone] = useState(false);
+
+  const { browserName } = useMetadata();
 
   const debouncedUpdateReply = useDebouncedCallback(
     async (value: string, timezone: string) => {
@@ -327,12 +335,15 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
       <Stack direction={showTimezone ? { base: "column", lg: "row" } : "row"}>
         <Flex flex="1" position="relative">
           <DateInput {...props} />
-          <Center boxSize={10} position="absolute" right={0} bottom={0} pointerEvents="none">
-            <FieldDateIcon
-              fontSize="18px"
-              color={isDisabled || reply.status === "APPROVED" ? "gray.400" : undefined}
-            />
-          </Center>
+          {browserName !== "Firefox" || reply.status === "APPROVED" ? (
+            <Center boxSize={10} position="absolute" right={0} bottom={0} pointerEvents="none">
+              <FieldDateIcon
+                fontSize="18px"
+                color={isDisabled || reply.status === "APPROVED" ? "gray.400" : undefined}
+              />
+            </Center>
+          ) : null}
+
           <Center boxSize={10} position="absolute" right={8} bottom={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
           </Center>
