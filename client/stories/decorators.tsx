@@ -3,7 +3,6 @@ import { Fonts } from "@parallel/chakra/fonts";
 import { theme } from "@parallel/chakra/theme";
 import { LiquidProvider } from "@parallel/utils/useLiquid";
 import { DecoratorFunction } from "@storybook/csf";
-import { AnimateSharedLayout } from "framer-motion";
 import { useMemo } from "react";
 import { IntlProvider } from "react-intl";
 
@@ -25,7 +24,7 @@ export const StoryDecorator: DecoratorFunction = function StoryDecorator(story: 
       >
         <ChakraProvider theme={theme} resetCSS portalZIndex={40}>
           <Fonts />
-          <AnimateSharedLayout>{story()}</AnimateSharedLayout>
+          {story()}
         </ChakraProvider>
       </IntlProvider>
     </LiquidProvider>

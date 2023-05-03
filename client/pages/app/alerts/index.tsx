@@ -1,0 +1,436 @@
+import { gql } from "@apollo/client";
+import { Box, Flex, Heading, HStack, Stack, Text } from "@chakra-ui/react";
+import { RepeatIcon, TimeAlarmIcon } from "@parallel/chakra/icons";
+import { DateTime } from "@parallel/components/common/DateTime";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { OverflownText } from "@parallel/components/common/OverflownText";
+import { SearchInput } from "@parallel/components/common/SearchInput";
+import { SmallPopover } from "@parallel/components/common/SmallPopover";
+import { TableColumn } from "@parallel/components/common/Table";
+import { TablePage } from "@parallel/components/common/TablePage";
+import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
+import { AppLayout } from "@parallel/components/layout/AppLayout";
+import {
+  Alerts_expiringProfilePropertiesDocument,
+  Alerts_ProfileFieldPropertyFragment,
+  Alerts_userDocument,
+} from "@parallel/graphql/__types";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
+import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
+import { compose } from "@parallel/utils/compose";
+import { FORMATS } from "@parallel/utils/dates";
+import { useHandleNavigation } from "@parallel/utils/navigation";
+import {
+  integer,
+  QueryStateFrom,
+  QueryStateOf,
+  SetQueryState,
+  string,
+  useQueryState,
+  values,
+} from "@parallel/utils/queryState";
+import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { isPast, sub } from "date-fns";
+import { ChangeEvent, useCallback, useMemo, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+
+const QUERY_STATE = {
+  page: integer({ min: 1 }).orDefault(1),
+  items: values([10, 25, 50]).orDefault(10),
+  search: string(),
+};
+
+type AlertsQueryState = QueryStateFrom<typeof QUERY_STATE>;
+
+function Alerts() {
+  const intl = useIntl();
+
+  const {
+    data: { me, realMe },
+  } = useAssertQuery(Alerts_userDocument);
+  const [queryState, setQueryState] = useQueryState(QUERY_STATE);
+
+  const { data, loading, refetch } = useQueryOrPreviousData(
+    Alerts_expiringProfilePropertiesDocument,
+    {
+      variables: {
+        offset: queryState.items * (queryState.page - 1),
+        limit: queryState.items,
+        search: queryState.search,
+      },
+      fetchPolicy: "cache-and-network",
+    }
+  );
+
+  const items = data?.expiringProfileProperties.items ?? [];
+  const totalCount = data?.expiringProfileProperties.totalCount ?? 0;
+
+  console.log("items: ", items);
+  console.log("totalCount: ", totalCount);
+
+  const columns = useAlertsTableColumns();
+  const context = useMemo(() => ({ user: me! }), [me]);
+
+  const navigate = useHandleNavigation();
+  const handleRowClick = useCallback((row: Alerts_ProfileFieldPropertyFragment, event: any) => {
+    const {
+      profile,
+      field: { id },
+    } = row.value!;
+
+    navigate(`/app/profiles/${profile.id}?field=${id}`, event);
+  }, []);
+
+  return (
+    <AppLayout
+      title={intl.formatMessage({ id: "page.alerts.title", defaultMessage: "Alerts" })}
+      me={me}
+      realMe={realMe}
+    >
+      <Stack minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
+        <HStack padding={2}>
+          <TimeAlarmIcon boxSize={5} />
+          <Heading as="h2" size="lg">
+            <FormattedMessage id="page.alerts.title" defaultMessage="Alerts" />
+          </Heading>
+        </HStack>
+        <Box flex="1" paddingBottom={16}>
+          <TablePage
+            flex="0 1 auto"
+            minHeight={0}
+            columns={columns}
+            rows={items}
+            rowKeyProp={(row) => row.value!.field.id}
+            context={context}
+            isHighlightable
+            loading={loading}
+            onRowClick={handleRowClick}
+            page={queryState.page}
+            pageSize={queryState.items}
+            totalCount={totalCount}
+            onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+            onPageSizeChange={(items) =>
+              setQueryState((s) => ({ ...s, items: items as any, page: 1 }))
+            }
+            onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
+            header={
+              <AlertsListHeader
+                shape={QUERY_STATE}
+                state={queryState}
+                onStateChange={setQueryState}
+                onReload={refetch}
+              />
+            }
+            body={
+              totalCount === 0 && !loading ? (
+                queryState.search ? (
+                  <Flex flex="1" alignItems="center" justifyContent="center">
+                    <Text color="gray.300" fontSize="lg">
+                      <FormattedMessage
+                        id="page.alerts.no-results"
+                        defaultMessage="There's no alerts matching your criteria"
+                      />
+                    </Text>
+                  </Flex>
+                ) : (
+                  <Flex flex="1" alignItems="center" justifyContent="center">
+                    <Text fontSize="lg">
+                      <FormattedMessage
+                        id="page.alerts.no-alerts"
+                        defaultMessage="You have no alerts yet."
+                      />
+                    </Text>
+                  </Flex>
+                )
+              ) : null
+            }
+          />
+        </Box>
+      </Stack>
+    </AppLayout>
+  );
+}
+
+interface AlertsListHeaderProps {
+  shape: QueryStateOf<AlertsQueryState>;
+  state: AlertsQueryState;
+  onStateChange: SetQueryState<Partial<AlertsQueryState>>;
+  onReload: () => void;
+}
+
+function AlertsListHeader({ shape, state, onStateChange, onReload }: AlertsListHeaderProps) {
+  const intl = useIntl();
+  const [search, setSearch] = useState(state.search ?? "");
+
+  const debouncedOnSearchChange = useDebouncedCallback(
+    (search) =>
+      onStateChange(({ ...current }) => ({
+        ...current,
+        search,
+        page: 1,
+      })),
+    300,
+    [onStateChange]
+  );
+
+  const handleSearchChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const value = event.target.value;
+      setSearch(value);
+      debouncedOnSearchChange(value || null);
+    },
+    [debouncedOnSearchChange]
+  );
+
+  return (
+    <HStack padding={2}>
+      <IconButtonWithTooltip
+        onClick={() => onReload()}
+        icon={<RepeatIcon />}
+        placement="bottom"
+        variant="outline"
+        label={intl.formatMessage({
+          id: "generic.reload-data",
+          defaultMessage: "Reload",
+        })}
+      />
+      <Box flex="0 1 400px">
+        <SearchInput value={search ?? ""} onChange={handleSearchChange} />
+      </Box>
+    </HStack>
+  );
+}
+
+function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragment>[] {
+  const intl = useIntl();
+  return useMemo(
+    () => [
+      {
+        key: "status",
+        header: "",
+        CellContent: ({ row: { value } }) => {
+          const {
+            expiresAt,
+            field: { expiryAlertAheadTime },
+          } = value!;
+          if (isPast(sub(new Date(expiresAt!), expiryAlertAheadTime!))) {
+            return (
+              <SmallPopover
+                content={
+                  <Box fontSize="sm">
+                    <FormattedMessage
+                      id="component.use-alerts-table-columns.alert-active-help"
+                      defaultMessage="The property is expired or about to expire. Update it to deactivate this alert."
+                    />
+                  </Box>
+                }
+              >
+                <TimeAlarmIcon color="yellow.500" />
+              </SmallPopover>
+            );
+          } else {
+            return (
+              <SmallPopover
+                content={
+                  <Box fontSize="sm">
+                    <FormattedMessage
+                      id="component.use-alerts-table-columns.alert-inactive-help"
+                      defaultMessage="The alert will be activated on {date}."
+                      values={{
+                        date: expiresAt,
+                      }}
+                    />
+                  </Box>
+                }
+              >
+                <TimeAlarmIcon color="gray.400" />
+              </SmallPopover>
+            );
+          }
+        },
+      },
+      {
+        key: "profile",
+        header: intl.formatMessage({
+          id: "component.alerts-table-columns.profile",
+          defaultMessage: "Profile",
+        }),
+        cellProps: {
+          maxWidth: 0,
+          width: "28%",
+          minWidth: "240px",
+        },
+        CellContent: ({ row: { value } }) => {
+          const {
+            profile: { name },
+          } = value!;
+          return <OverflownText>{name}</OverflownText>;
+        },
+      },
+      {
+        key: "property",
+        header: intl.formatMessage({
+          id: "component.alerts-table-columns.properties",
+          defaultMessage: "Properties",
+        }),
+        cellProps: {
+          width: "20%",
+          minWidth: "240px",
+        },
+        CellContent: ({ row: { value } }) => {
+          const {
+            field: { name },
+          } = value!;
+          return (
+            <Text as="span">
+              <LocalizableUserTextRender
+                value={name}
+                default={intl.formatMessage({
+                  id: "generic.unnamed-profile-type-field",
+                  defaultMessage: "Unnamed property",
+                })}
+              />
+            </Text>
+          );
+        },
+      },
+      {
+        key: "expirationDate",
+        header: intl.formatMessage({
+          id: "component.alerts-table-columns.expiration-date",
+          defaultMessage: "Expiration date",
+        }),
+        cellProps: {
+          width: "12%",
+          minWidth: "220px",
+        },
+        CellContent: ({ row: { value } }) => {
+          const { expiresAt } = value!;
+          return (
+            <DateTime
+              color={isPast(new Date(expiresAt!)) ? "red.600" : undefined}
+              value={expiresAt!}
+              format={FORMATS.LLL}
+              whiteSpace="nowrap"
+            />
+          );
+        },
+      },
+      {
+        key: "subscribers",
+        header: intl.formatMessage({
+          id: "component.alerts-table-columns.subscribers",
+          defaultMessage: "Subscribers",
+        }),
+        cellProps: {
+          width: "20%",
+          minWidth: "240px",
+        },
+        CellContent: ({ row, column }) => {
+          return (
+            <Flex justifyContent={column.align}>
+              <UserAvatarList usersOrGroups={[]} />
+            </Flex>
+          );
+        },
+      },
+      {
+        key: "profileType",
+        header: intl.formatMessage({
+          id: "component.alerts-table-columns.profile-type",
+          defaultMessage: "Profile Type",
+        }),
+        cellProps: {
+          width: "20%",
+          minWidth: "240px",
+        },
+        CellContent: ({ row: { value } }) => {
+          const {
+            profile: {
+              profileType: { name },
+            },
+          } = value!;
+          return (
+            <Text as="span">
+              <LocalizableUserTextRender
+                value={name}
+                default={intl.formatMessage({
+                  id: "generic.unnamed-profile-type",
+                  defaultMessage: "Unnamed profile type",
+                })}
+              />
+            </Text>
+          );
+        },
+      },
+    ],
+    [intl.locale]
+  );
+}
+
+const _fragments = {
+  ProfileFieldProperty: gql`
+    fragment Alerts_ProfileFieldProperty on ProfileFieldProperty {
+      value {
+        id
+        expiresAt
+        field {
+          id
+          name
+          isExpirable
+          expiryAlertAheadTime
+        }
+        profile {
+          id
+          name
+          profileType {
+            name
+          }
+        }
+      }
+    }
+  `,
+};
+
+const _queries = [
+  gql`
+    query Alerts_user {
+      ...AppLayout_Query
+    }
+    ${AppLayout.fragments.Query}
+  `,
+  gql`
+    query Alerts_expiringProfileProperties(
+      $offset: Int
+      $limit: Int
+      $search: String
+      $filter: ProfilePropertyFilter
+    ) {
+      expiringProfileProperties(offset: $offset, limit: $limit, search: $search, filter: $filter) {
+        items {
+          ...Alerts_ProfileFieldProperty
+        }
+        totalCount
+      }
+    }
+    ${_fragments.ProfileFieldProperty}
+  `,
+];
+
+Alerts.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
+  await Promise.all([
+    fetchQuery(Alerts_userDocument),
+    fetchQuery(Alerts_expiringProfilePropertiesDocument),
+  ]);
+  return {};
+};
+
+export default compose(
+  withDialogs,
+  withFeatureFlag("PROFILES", "/app/petitions"),
+  withApolloData
+)(Alerts);

@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, indexBy, isDefined, omit, pick, times, uniq } from "remeda";
+import { groupBy, indexBy, isDefined, omit, pick, times, uniq, values } from "remeda";
 import { LocalizableUserText } from "../../graphql";
 import { unMaybeArray } from "../../util/arrays";
 import { Maybe, MaybeArray, Replace } from "../../util/types";
@@ -25,6 +25,7 @@ import {
   UserLocale,
 } from "../__types";
 import { keyBuilder } from "../../util/keyBuilder";
+import { LazyPromise } from "../../util/promises/LazyPromise";
 
 @injectable()
 export class ProfileRepository extends BaseRepository {
@@ -782,63 +783,80 @@ export class ProfileRepository extends BaseRepository {
         q.whereIn("pfx.profile_type_field_id", opts.filter!.profileTypeFieldId);
       }
     };
-    return this.getPagination<{ profile_id: number; profile_type_field_id: number }>(
-      this.knex
-        .unionAll([
+    const valuesQuery = this.knex
+      .from(this.knex.ref("profile").as("p"))
+      .join(this.knex.ref("profile_field_value").as("pfx"), "p.id", "pfx.profile_id")
+      .join(this.knex.ref("profile_type_field").as("ptf"), "ptf.id", "pfx.profile_type_field_id")
+      .where("p.org_id", orgId)
+      .whereNull("p.deleted_at")
+      .whereNotNull("pfx.expires_at")
+      .whereNull("pfx.removed_at")
+      .whereNull("pfx.deleted_at")
+      .whereNotNull("ptf.expiry_alert_ahead_time")
+      .modify(filter);
+    const filesQuery = this.knex
+      .from(this.knex.ref("profile").as("p"))
+      .join(this.knex.ref("profile_field_file").as("pfx"), "p.id", "pfx.profile_id")
+      .join(this.knex.ref("profile_type_field").as("ptf"), "ptf.id", "pfx.profile_type_field_id")
+      .where("p.org_id", orgId)
+      .whereNull("p.deleted_at")
+      .whereNotNull("pfx.expires_at")
+      .whereNull("pfx.removed_at")
+      .whereNull("pfx.deleted_at")
+      .whereNotNull("ptf.expiry_alert_ahead_time")
+      .modify(filter);
+    return {
+      totalCount: LazyPromise.from(async () => {
+        const counts = await this.knex.unionAll([
+          valuesQuery.clone().select<{ count: number }[]>(this.count()),
           this.knex
-            .from(this.knex.ref("profile").as("p"))
-            .join(this.knex.ref("profile_field_value").as("pfx"), "p.id", "pfx.profile_id")
-            .join(
-              this.knex.ref("profile_type_field").as("ptf"),
-              "ptf.id",
-              "pfx.profile_type_field_id"
+            .fromRaw(
+              this.knex.raw("(?) t", [
+                filesQuery.clone().distinct("pfx.profile_id", "pfx.profile_type_field_id"),
+              ])
             )
-            .where("p.org_id", orgId)
-            .whereNull("p.deleted_at")
-            .whereNotNull("pfx.expires_at")
-            .whereNull("pfx.removed_at")
-            .whereNull("pfx.deleted_at")
-            .whereNotNull("ptf.expiry_alert_ahead_time")
-            .modify(filter)
-            .select(
-              "pfx.profile_id",
-              "pfx.profile_type_field_id",
-              "pfx.expires_at",
-              this.knex.raw(
-                /* sql */ `pfx.expires_at - ptf.expiry_alert_ahead_time < now() as in_alert`
-              )
-            ),
-          this.knex
-            .from(this.knex.ref("profile").as("p"))
-            .join(this.knex.ref("profile_field_file").as("pfx"), "p.id", "pfx.profile_id")
-            .join(
-              this.knex.ref("profile_type_field").as("ptf"),
-              "ptf.id",
-              "pfx.profile_type_field_id"
-            )
-            .where("p.org_id", orgId)
-            .whereNull("p.deleted_at")
-            .whereNotNull("pfx.expires_at")
-            .whereNull("pfx.removed_at")
-            .whereNull("pfx.deleted_at")
-            .whereNotNull("ptf.expiry_alert_ahead_time")
-            .modify(filter)
-            .distinctOn("pfx.profile_id", "pfx.profile_type_field_id")
-            .select(
-              "pfx.profile_id",
-              "pfx.profile_type_field_id",
-              "expires_at",
-              this.knex.raw(
-                /* sql */ `pfx.expires_at - ptf.expiry_alert_ahead_time < now() as in_alert`
-              )
-            ),
-        ])
-        .select("profile_id", "profile_type_field_id")
-        .orderBy("in_alert", "desc")
-        .orderBy("expires_at", "asc")
-        .orderBy("profile_id")
-        .orderBy("profile_type_field_id"),
-      opts
-    );
+            .select<{ count: number }[]>(this.count()),
+        ]);
+        return counts[0].count + counts[1].count;
+      }),
+      items: LazyPromise.from(async () => {
+        const properties: {
+          profile_id: number;
+          profile_type_field_id: number;
+          in_alert: boolean;
+          expires_at: Date;
+        }[] = await this.knex
+          .unionAll([
+            valuesQuery
+              .clone()
+              .select(
+                "pfx.profile_id",
+                "pfx.profile_type_field_id",
+                "pfx.expires_at",
+                this.knex.raw(
+                  /* sql */ `pfx.expires_at - ptf.expiry_alert_ahead_time < now() as in_alert`
+                )
+              ),
+            filesQuery
+              .clone()
+              .distinctOn("pfx.profile_id", "pfx.profile_type_field_id")
+              .select(
+                "pfx.profile_id",
+                "pfx.profile_type_field_id",
+                "pfx.expires_at",
+                this.knex.raw(
+                  /* sql */ `pfx.expires_at - ptf.expiry_alert_ahead_time < now() as in_alert`
+                )
+              ),
+          ])
+          .orderBy("in_alert", "desc")
+          .orderBy("expires_at", "asc")
+          .orderBy("profile_id")
+          .orderBy("profile_type_field_id")
+          .offset(opts.offset ?? 0)
+          .limit(opts.limit ?? 0);
+        return properties.map(omit(["in_alert", "expires_at"]));
+      }),
+    };
   }
 }

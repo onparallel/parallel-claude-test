@@ -17,6 +17,7 @@ import {
   NewsIcon,
   ProfilesIcon,
   ReportsIcon,
+  TimeAlarmIcon,
   UsersIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -97,6 +98,17 @@ export const AppLayoutNavbar = Object.assign(
                   text: intl.formatMessage({
                     id: "component.app-layout-navbar.profiles-link",
                     defaultMessage: "Profiles",
+                  }),
+                },
+                {
+                  section: "alerts",
+                  href: "/app/alerts",
+                  icon: <TimeAlarmIcon />,
+                  isActive: pathname.startsWith("/app/alerts"),
+                  isAvailable: true,
+                  text: intl.formatMessage({
+                    id: "component.app-layout-navbar.alerts-link",
+                    defaultMessage: "Alerts",
                   }),
                 },
               ]

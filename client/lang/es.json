@@ -200,6 +200,31 @@
     "context": "Users"
   },
   {
+    "term": "component.alerts-table-columns.expiration-date",
+    "definition": "Fecha de vencimiento",
+    "context": "Expiration date"
+  },
+  {
+    "term": "component.alerts-table-columns.profile",
+    "definition": "Perfil",
+    "context": "Profile"
+  },
+  {
+    "term": "component.alerts-table-columns.profile-type",
+    "definition": "Tipo de perfil",
+    "context": "Profile Type"
+  },
+  {
+    "term": "component.alerts-table-columns.properties",
+    "definition": "Propiedades",
+    "context": "Properties"
+  },
+  {
+    "term": "component.alerts-table-columns.subscribers",
+    "definition": "Subscriptores",
+    "context": "Subscribers"
+  },
+  {
     "term": "component.api-tokens-table.confirm-delete-body",
     "definition": "¿Estás seguro que quieres eliminar {count, plural, =1 {el token seleccionado} other {los # tokens seleccionados}}?",
     "context": "Are you sure you want to delete the {count, plural, =1 {selected access token} other {# selected access tokens}}?"
@@ -243,6 +268,11 @@
     "term": "component.api-tokens-table.title",
     "definition": "Tokens API",
     "context": "API Tokens"
+  },
+  {
+    "term": "component.app-layout-navbar.alerts-link",
+    "definition": "Alertas",
+    "context": "Alerts"
   },
   {
     "term": "component.app-layout-navbar.contacts-link",
@@ -6350,6 +6380,26 @@
     "context": "Edit {count} properties"
   },
   {
+    "term": "component.use-alerts-table-columns.alert-active-help",
+    "definition": "La propiedad está vencida o a punto de vencer. Actualízala para desactivar esta alerta.",
+    "context": "The property is expired or about to expire. Update it to deactivate this alert."
+  },
+  {
+    "term": "component.use-alerts-table-columns.alert-inactive-help",
+    "definition": "La alerta se activará el {date}.",
+    "context": "The alert will be activated on {date}."
+  },
+  {
+    "term": "component.use-confirm-delete-profile-dialog.description",
+    "definition": "Estás a punto de eliminar {profileCount, plural, =1 {este perfil} other {los perfiles seleccionados}}. Por favor, ten en cuenta que hay <b>{count, plural, =1 {1 propiedad respondida} other {# propiedades respondidas}}</b> en {profileCount, plural, =1 {este perfil} other {estos perfiles}}, y si continúas, {count, plural, =1 {esta respuesta se eliminará} other {estas respuestas se eliminarán}} permanentemente.",
+    "context": "You are about to delete {profileCount, plural, =1 {this profile} other {the selected profiles}}. Please note that there <b>{count, plural, =1 {is 1 property} other {are # properties}}</b> responded to {profileCount, plural, =1 {on this profile} other {in these profiles}}, and if you proceed, {count, plural, =1 {this reply} other {these replies}} will be permanently deleted."
+  },
+  {
+    "term": "component.use-confirm-delete-profile-dialog.header",
+    "definition": "Eliminar {count, plural, =1 {perfil} other {# perfiles}}",
+    "context": "Delete {count, plural, =1 {profile} other {# profiles}}"
+  },
+  {
     "term": "component.use-create-contact.create-contact",
     "definition": "Crear contacto",
     "context": "Create contact"
@@ -8748,6 +8798,21 @@
     "term": "organizations.header.user-count",
     "definition": "Usuarios",
     "context": "Users"
+  },
+  {
+    "term": "page.alerts.no-alerts",
+    "definition": "Aún no tienes alertas.",
+    "context": "You have no alerts yet."
+  },
+  {
+    "term": "page.alerts.no-results",
+    "definition": "No encontramos alertas con este criterio",
+    "context": "There's no alerts matching your criteria"
+  },
+  {
+    "term": "page.alerts.title",
+    "definition": "Alertas",
+    "context": "Alerts"
   },
   {
     "term": "page.choose-org.header",

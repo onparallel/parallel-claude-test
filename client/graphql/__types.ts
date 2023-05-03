@@ -16060,6 +16060,130 @@ export type AdminSupportMethods_userQuery = {
   };
 };
 
+export type Alerts_ProfileFieldPropertyFragment = {
+  __typename?: "ProfileFieldProperty";
+  value?: {
+    __typename?: "ProfileFieldValue";
+    id: string;
+    expiresAt?: string | null;
+    field: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      isExpirable: boolean;
+      expiryAlertAheadTime?: Duration | null;
+    };
+    profile: {
+      __typename?: "Profile";
+      id: string;
+      name: string;
+      profileType: { __typename?: "ProfileType"; name: { [locale in UserLocale]?: string } };
+    };
+  } | null;
+};
+
+export type Alerts_ProfileFieldPropertyPaginationFragment = {
+  __typename?: "ProfileFieldPropertyPagination";
+  totalCount: number;
+  items: Array<{
+    __typename?: "ProfileFieldProperty";
+    value?: {
+      __typename?: "ProfileFieldValue";
+      id: string;
+      expiresAt?: string | null;
+      field: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        isExpirable: boolean;
+        expiryAlertAheadTime?: Duration | null;
+      };
+      profile: {
+        __typename?: "Profile";
+        id: string;
+        name: string;
+        profileType: { __typename?: "ProfileType"; name: { [locale in UserLocale]?: string } };
+      };
+    } | null;
+  }>;
+};
+
+export type Alerts_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type Alerts_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    lastActiveAt?: string | null;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasProfilesAccess: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      petitionsSubscriptionEndDate?: string | null;
+      iconUrl92?: string | null;
+      isPetitionUsageLimitReached: boolean;
+      currentUsagePeriod?: {
+        __typename?: "OrganizationUsageLimit";
+        id: string;
+        limit: number;
+      } | null;
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
+export type Alerts_expiringProfilePropertiesQueryVariables = Exact<{
+  offset?: InputMaybe<Scalars["Int"]>;
+  limit?: InputMaybe<Scalars["Int"]>;
+  search?: InputMaybe<Scalars["String"]>;
+  filter?: InputMaybe<ProfilePropertyFilter>;
+}>;
+
+export type Alerts_expiringProfilePropertiesQuery = {
+  expiringProfileProperties: {
+    __typename?: "ProfileFieldPropertyPagination";
+    totalCount: number;
+    items: Array<{
+      __typename?: "ProfileFieldProperty";
+      value?: {
+        __typename?: "ProfileFieldValue";
+        id: string;
+        expiresAt?: string | null;
+        field: {
+          __typename?: "ProfileTypeField";
+          id: string;
+          name: { [locale in UserLocale]?: string };
+          isExpirable: boolean;
+          expiryAlertAheadTime?: Duration | null;
+        };
+        profile: {
+          __typename?: "Profile";
+          id: string;
+          name: string;
+          profileType: { __typename?: "ProfileType"; name: { [locale in UserLocale]?: string } };
+        };
+      } | null;
+    }>;
+  };
+};
+
 export type Contact_ContactFragment = {
   __typename?: "Contact";
   id: string;
@@ -30554,6 +30678,36 @@ export const AdminOrganizations_OrganizationFragmentDoc = gql`
     usageDetails
   }
 ` as unknown as DocumentNode<AdminOrganizations_OrganizationFragment, unknown>;
+export const Alerts_ProfileFieldPropertyFragmentDoc = gql`
+  fragment Alerts_ProfileFieldProperty on ProfileFieldProperty {
+    value {
+      id
+      expiresAt
+      field {
+        id
+        name
+        isExpirable
+        expiryAlertAheadTime
+      }
+      profile {
+        id
+        name
+        profileType {
+          name
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<Alerts_ProfileFieldPropertyFragment, unknown>;
+export const Alerts_ProfileFieldPropertyPaginationFragmentDoc = gql`
+  fragment Alerts_ProfileFieldPropertyPagination on ProfileFieldPropertyPagination {
+    items {
+      ...Alerts_ProfileFieldProperty
+    }
+    totalCount
+  }
+  ${Alerts_ProfileFieldPropertyFragmentDoc}
+` as unknown as DocumentNode<Alerts_ProfileFieldPropertyPaginationFragment, unknown>;
 export const Contact_Contact_ProfileFragmentDoc = gql`
   fragment Contact_Contact_Profile on Contact {
     id
@@ -36937,6 +37091,28 @@ export const AdminSupportMethods_userDocument = gql`
   }
   ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<AdminSupportMethods_userQuery, AdminSupportMethods_userQueryVariables>;
+export const Alerts_userDocument = gql`
+  query Alerts_user {
+    ...AppLayout_Query
+  }
+  ${AppLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<Alerts_userQuery, Alerts_userQueryVariables>;
+export const Alerts_expiringProfilePropertiesDocument = gql`
+  query Alerts_expiringProfileProperties(
+    $offset: Int
+    $limit: Int
+    $search: String
+    $filter: ProfilePropertyFilter
+  ) {
+    expiringProfileProperties(offset: $offset, limit: $limit, search: $search, filter: $filter) {
+      ...Alerts_ProfileFieldPropertyPagination
+    }
+  }
+  ${Alerts_ProfileFieldPropertyPaginationFragmentDoc}
+` as unknown as DocumentNode<
+  Alerts_expiringProfilePropertiesQuery,
+  Alerts_expiringProfilePropertiesQueryVariables
+>;
 export const Contact_updateContactDocument = gql`
   mutation Contact_updateContact($id: GID!, $data: UpdateContactInput!) {
     updateContact(id: $id, data: $data) {

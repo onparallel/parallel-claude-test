@@ -2432,3 +2432,22 @@ export const ProfilesIcon = createIcon({
     </g>
   ),
 });
+
+export const TimeAlarmIcon = createIcon({
+  displayName: "TimeAlarmIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m12 22.2119c4.9706 0 9-4.0294 9-9 0-4.97055-4.0294-8.99999-9-8.99999-4.97056 0-9 4.02944-9 8.99999 0 4.9706 4.02944 9 9 9z" />
+      <path d="m18 2.21191 4 4" />
+      <path d="m2 6.21191 4-4" />
+      <path d="m12 8.21191v4.99999h3.5" />
+    </g>
+  ),
+});
