@@ -581,6 +581,11 @@ export const SignatureCancelledEvent = createPetitionEvent("SignatureCancelledEv
       return data.cancel_reason === "REQUEST_ERROR" ? data.cancel_data?.error_code ?? null : null;
     },
   });
+  t.nullable.string("errorMessage", {
+    resolve: ({ data }) => {
+      return data.cancel_reason === "REQUEST_ERROR" ? data.cancel_data.error ?? null : null;
+    },
+  });
   t.nullable.json("extraErrorData", {
     resolve: ({ data }) => {
       return data.cancel_reason === "REQUEST_ERROR" ? data.cancel_data?.extra ?? null : null;

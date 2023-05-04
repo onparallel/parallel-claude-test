@@ -1,16 +1,16 @@
-import stringify from "fast-safe-stringify";
 import { readFile, unlink } from "fs/promises";
 import pMap from "p-map";
-import { isDefined, pick } from "remeda";
+import { isDefined } from "remeda";
 import { WorkerContext } from "../context";
+import { ContactLocale, OrgIntegration } from "../db/__types";
 import { IntegrationSettings, SignatureProvider } from "../db/repositories/IntegrationRepository";
 import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
-import { ContactLocale, OrgIntegration } from "../db/__types";
 import { InvalidCredentialsError } from "../integrations/GenericIntegration";
 import {
   CancelAbortedError,
   SignatureResponse,
 } from "../services/signature-clients/SignatureClient";
+import { SignaturitRequestError } from "../services/signature-clients/SignaturitClient";
 import { fullName } from "../util/fullName";
 import { removeKeys } from "../util/remedaExtensions";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
@@ -141,7 +141,7 @@ async function startSignatureProcess(
       error instanceof Error &&
       [
         "MAX_SIZE_EXCEEDED", // pdf binder for signature failed
-        "INSUFFICIENT_SIGNATURE_CREDITS", // org lacks signature credits for shared signaturit apikey.includes(error.message)
+        "INSUFFICIENT_SIGNATURE_CREDITS", // org lacks signature credits for shared signaturit apikey
       ].includes(error.message)
         ? error.message
         : error instanceof InvalidCredentialsError &&
@@ -151,13 +151,18 @@ async function startSignatureProcess(
             "INVALID_CREDENTIALS", // signaturit apikey is invalid
           ].includes(error.code)
         ? error.code
+        : error instanceof SignaturitRequestError
+        ? error.code
         : "UNKNOWN_ERROR";
 
     await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature, {
       cancel_reason: "REQUEST_ERROR",
       cancel_data: {
         error_code: errorCode,
-        error: error instanceof Error ? pick(error, ["message", "stack"]) : stringify(error),
+        error:
+          isDefined(error) && typeof error === "object" && "message" in error
+            ? error.message
+            : null,
       },
     });
 

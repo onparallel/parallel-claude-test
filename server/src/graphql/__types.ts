@@ -2069,6 +2069,9 @@ export interface NexusGenFieldTypes {
     cancelReason: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     environment: NexusGenEnums["SignatureOrgIntegrationEnvironment"]; // SignatureOrgIntegrationEnvironment!
+    errorCode: string | null; // String
+    errorMessage: string | null; // String
+    extraErrorData: NexusGenScalars["JSON"] | null; // JSON
     id: NexusGenScalars["GID"]; // GID!
     isAnonymized: boolean; // Boolean!
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -2637,6 +2640,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     errorCode: string | null; // String
+    errorMessage: string | null; // String
     extraErrorData: NexusGenScalars["JSON"] | null; // JSON
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["Petition"] | null; // Petition
@@ -4045,6 +4049,9 @@ export interface NexusGenFieldTypeNames {
     cancelReason: "String";
     createdAt: "DateTime";
     environment: "SignatureOrgIntegrationEnvironment";
+    errorCode: "String";
+    errorMessage: "String";
+    extraErrorData: "JSON";
     id: "GID";
     isAnonymized: "Boolean";
     metadata: "JSONObject";
@@ -4613,6 +4620,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     data: "JSONObject";
     errorCode: "String";
+    errorMessage: "String";
     extraErrorData: "JSON";
     id: "GID";
     petition: "Petition";

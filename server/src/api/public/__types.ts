@@ -3002,6 +3002,9 @@ export type PetitionSignatureRequest = Timestamps & {
   createdAt: Scalars["DateTime"];
   /** The environment of the petition signature. */
   environment: SignatureOrgIntegrationEnvironment;
+  errorCode: Maybe<Scalars["String"]>;
+  errorMessage: Maybe<Scalars["String"]>;
+  extraErrorData: Maybe<Scalars["JSON"]>;
   id: Scalars["GID"];
   isAnonymized: Scalars["Boolean"];
   /** Metadata for this signature request. */
@@ -4188,6 +4191,7 @@ export type SignatureCancelledEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   data: Scalars["JSONObject"];
   errorCode: Maybe<Scalars["String"]>;
+  errorMessage: Maybe<Scalars["String"]>;
   extraErrorData: Maybe<Scalars["JSON"]>;
   id: Scalars["GID"];
   petition: Maybe<Petition>;

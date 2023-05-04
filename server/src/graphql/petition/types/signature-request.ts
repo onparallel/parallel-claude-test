@@ -88,6 +88,21 @@ export const PetitionSignatureRequest = objectType({
     t.nullable.string("cancelReason", {
       resolve: (o) => o.cancel_reason,
     });
+    t.nullable.string("errorCode", {
+      resolve: (o) => {
+        return o.cancel_reason === "REQUEST_ERROR" ? o.cancel_data?.error_code ?? null : null;
+      },
+    });
+    t.nullable.string("errorMessage", {
+      resolve: (o) => {
+        return o.cancel_reason === "REQUEST_ERROR" ? o.cancel_data?.error ?? null : null;
+      },
+    });
+    t.nullable.json("extraErrorData", {
+      resolve: (o) => {
+        return o.cancel_reason === "REQUEST_ERROR" ? o.cancel_data?.extra ?? null : null;
+      },
+    });
     t.field("environment", {
       type: "SignatureOrgIntegrationEnvironment",
       description: "The environment of the petition signature.",

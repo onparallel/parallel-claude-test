@@ -6,9 +6,12 @@ import { NakedLink } from "@parallel/components/common/Link";
 import { SignerReference } from "@parallel/components/common/SignerReference";
 import { TimelineSignatureCancelledEvent_SignatureCancelledEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
+import { useSignatureCancelledRequestErrorMessage } from "@parallel/utils/useSignatureCancelledRequestErrorMessage";
 import { FormattedMessage } from "react-intl";
-import { useDeclinedSignatureReasonDialog } from "../../dialogs/DeclinedSignatureReasonDialog";
+import { isDefined } from "remeda";
 import { UserOrContactReference } from "../../UserOrContactReference";
+import { useDeclinedSignatureReasonDialog } from "../../dialogs/DeclinedSignatureReasonDialog";
+import { useSignatureCancelledRequestErrorDialog } from "../../dialogs/SignatureCancelledRequestErrorDialog";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
@@ -27,6 +30,19 @@ export function TimelineSignatureCancelledEvent({
       await showDeclinedSignatureReason({
         signer: event.canceller ?? null,
         declineReason: event.cancellerReason!,
+      });
+    } catch {}
+  }
+
+  const requestErrorMessage = useSignatureCancelledRequestErrorMessage();
+  const showSignatureCancelledRequestErrorDialog = useSignatureCancelledRequestErrorDialog();
+  async function handleSeeRequestErrorMessageClick(
+    event: TimelineSignatureCancelledEvent_SignatureCancelledEventFragment
+  ) {
+    try {
+      await showSignatureCancelledRequestErrorDialog({
+        message: requestErrorMessage(event),
+        reason: event.errorMessage!,
       });
     } catch {}
   }
@@ -74,70 +90,22 @@ export function TimelineSignatureCancelledEvent({
               }}
             />
           )}
-          {event.cancelType === "REQUEST_ERROR" ? (
-            event.errorCode === "INSUFFICIENT_SIGNATURE_CREDITS" ? (
-              <FormattedMessage
-                id="timeline.signature-cancelled-request-error.insufficient-credits.description"
-                defaultMessage="The eSignature could not be started due to lack of signature credits {timeAgo}"
-                values={{
-                  timeAgo: (
-                    <DateTime
-                      value={event.createdAt}
-                      format={FORMATS.LLL}
-                      useRelativeTime="always"
-                    />
-                  ),
-                }}
-              />
-            ) : (
-              <FormattedMessage
-                id="timeline.signature-cancelled-request-error.description"
-                defaultMessage="The eSignature has been cancelled due to an error from the provider {timeAgo}: {message}"
-                values={{
-                  timeAgo: (
-                    <DateTime
-                      value={event.createdAt}
-                      format={FORMATS.LLL}
-                      useRelativeTime="always"
-                    />
-                  ),
-                  message:
-                    event.errorCode === "EMAIL_BOUNCED" ? (
-                      <FormattedMessage
-                        id="timeline.signature-cancelled-request-error.email-bounced.description"
-                        defaultMessage="{hasEmail, select, true{The email<{signerEmail}>} other{an email}} has bounced."
-                        values={{
-                          hasEmail: Boolean(event.extraErrorData?.email),
-                          signerEmail: event.extraErrorData?.email,
-                        }}
-                      />
-                    ) : event.errorCode === "MAX_SIZE_EXCEEDED" ? (
-                      <FormattedMessage
-                        id="timeline.signature-cancelled-request-error.max-size-exceeded.description"
-                        defaultMessage="The document exceeds the maximum size allowed. Please, reduce the size of the annexed files and try it again."
-                      />
-                    ) : event.errorCode === "CONSENT_REQUIRED" ||
-                      event.errorCode === "ACCOUNT_SUSPENDED" ? (
-                      <FormattedMessage
-                        id="timeline.signature-cancelled-request-error.consent-required.description"
-                        defaultMessage="The integration has expired and needs to be reauthorized."
-                      />
-                    ) : event.errorCode === "INVALID_CREDENTIALS" ? (
-                      <FormattedMessage
-                        id="timeline.signature-cancelled-request-error.invalid-credentials.description"
-                        defaultMessage="The provided credentials are not valid anymore and need to be updated."
-                      />
-                    ) : (
-                      <FormattedMessage
-                        id="timeline.signature-cancelled-request-error.unknown.description"
-                        defaultMessage="An unknown error happened."
-                      />
-                    ),
-                }}
-              />
-            )
-          ) : null}
+          {event.cancelType === "REQUEST_ERROR" ? requestErrorMessage(event) : null}
         </Box>
+        {event.cancelType === "REQUEST_ERROR" && isDefined(event.errorMessage) ? (
+          <Button
+            onClick={() => handleSeeRequestErrorMessageClick(event)}
+            size="sm"
+            variant="outline"
+            marginLeft={4}
+            background="white"
+          >
+            <FormattedMessage
+              id="timeline.signature-declined.see-reason"
+              defaultMessage="See reason"
+            />
+          </Button>
+        ) : null}
         {event.cancelType === "DECLINED_BY_SIGNER" && event.cancellerReason && (
           <Button
             onClick={handleSeeMessageClick}
@@ -171,6 +139,7 @@ export function TimelineSignatureCancelledEvent({
 TimelineSignatureCancelledEvent.fragments = {
   SignatureCancelledEvent: gql`
     fragment TimelineSignatureCancelledEvent_SignatureCancelledEvent on SignatureCancelledEvent {
+      ...useSignatureCancelledRequestErrorMessage_SignatureCancelledEvent
       cancelledBy {
         ...UserOrContactReference_UserOrPetitionAccess
       }
@@ -179,10 +148,11 @@ TimelineSignatureCancelledEvent.fragments = {
       }
       cancelType
       errorCode
-      extraErrorData
+      errorMessage
       cancellerReason
       createdAt
     }
+    ${useSignatureCancelledRequestErrorMessage.fragments.SignatureCancelledEvent}
     ${UserOrContactReference.fragments.UserOrPetitionAccess}
     ${SignerReference.fragments.PetitionSigner}
   `,

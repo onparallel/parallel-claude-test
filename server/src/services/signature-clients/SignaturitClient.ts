@@ -52,6 +52,12 @@ interface SignaturitError {
   message: string;
 }
 
+export class SignaturitRequestError extends Error {
+  constructor(public code: string, message?: string) {
+    super(message);
+  }
+}
+
 @injectable()
 export class SignaturitClient implements ISignatureClient {
   constructor(
@@ -195,6 +201,7 @@ export class SignaturitClient implements ISignatureClient {
             petitionId,
             context.apiKeyHint
           );
+          throw new SignaturitRequestError("SIGNATURIT_ACCOUNT_DEPLETED_CREDITS", error.message);
         }
         throw error;
       }

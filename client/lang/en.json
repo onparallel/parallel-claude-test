@@ -5820,6 +5820,46 @@
     "context": "This template has not been shared yet."
   },
   {
+    "term": "component.signature-cancelled-request-error-dialog.header",
+    "definition": "Error sending",
+    "context": "Error sending"
+  },
+  {
+    "term": "component.signature-cancelled-request-error.consent-required.description",
+    "definition": "The integration has expired and needs to be reauthorized.",
+    "context": "The integration has expired and needs to be reauthorized."
+  },
+  {
+    "term": "component.signature-cancelled-request-error.description",
+    "definition": "The eSignature has been cancelled due to an error from the provider {timeAgo}: {message}",
+    "context": "The eSignature has been cancelled due to an error from the provider {timeAgo}: {message}"
+  },
+  {
+    "term": "component.signature-cancelled-request-error.email-bounced.description",
+    "definition": "{hasEmail, select, true{The email<{signerEmail}>} other{an email}} has bounced.",
+    "context": "{hasEmail, select, true{The email<{signerEmail}>} other{an email}} has bounced."
+  },
+  {
+    "term": "component.signature-cancelled-request-error.insufficient-credits.description",
+    "definition": "The eSignature could not be started due to lack of signature credits {timeAgo}",
+    "context": "The eSignature could not be started due to lack of signature credits {timeAgo}"
+  },
+  {
+    "term": "component.signature-cancelled-request-error.invalid-credentials.description",
+    "definition": "The provided credentials are not valid anymore and need to be updated.",
+    "context": "The provided credentials are not valid anymore and need to be updated."
+  },
+  {
+    "term": "component.signature-cancelled-request-error.max-size-exceeded.description",
+    "definition": "The document exceeds the maximum size allowed. Please, reduce the size of the annexed files and try it again.",
+    "context": "The document exceeds the maximum size allowed. Please, reduce the size of the annexed files and try it again."
+  },
+  {
+    "term": "component.signature-cancelled-request-error.unknown.description",
+    "definition": "An unknown error happened.",
+    "context": "An unknown error happened."
+  },
+  {
     "term": "component.signature-config-dialog.allow-additional-signers.help",
     "definition": "If this option is disabled, only the indicated people will be able to sign the document.",
     "context": "If this option is disabled, only the indicated people will be able to sign the document."
@@ -6388,16 +6428,6 @@
     "term": "component.use-alerts-table-columns.alert-inactive-help",
     "definition": "The alert will be activated on {date}.",
     "context": "The alert will be activated on {date}."
-  },
-  {
-    "term": "component.use-confirm-delete-profile-dialog.description",
-    "definition": "You are about to delete {profileCount, plural, =1 {this profile} other {the selected profiles}}. Please note that there <b>{count, plural, =1 {is 1 property} other {are # properties}}</b> responded to {profileCount, plural, =1 {on this profile} other {in these profiles}}, and if you proceed, {count, plural, =1 {this reply} other {these replies}} will be permanently deleted.",
-    "context": "You are about to delete {profileCount, plural, =1 {this profile} other {the selected profiles}}. Please note that there <b>{count, plural, =1 {is 1 property} other {are # properties}}</b> responded to {profileCount, plural, =1 {on this profile} other {in these profiles}}, and if you proceed, {count, plural, =1 {this reply} other {these replies}} will be permanently deleted."
-  },
-  {
-    "term": "component.use-confirm-delete-profile-dialog.header",
-    "definition": "Delete {count, plural, =1 {profile} other {# profiles}}",
-    "context": "Delete {count, plural, =1 {profile} other {# profiles}}"
   },
   {
     "term": "component.use-create-contact.create-contact",
@@ -11773,41 +11803,6 @@
     "term": "timeline.signature-cancelled-by-user.description",
     "definition": "{userIsYou, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}"
-  },
-  {
-    "term": "timeline.signature-cancelled-request-error.consent-required.description",
-    "definition": "The integration has expired and needs to be reauthorized.",
-    "context": "The integration has expired and needs to be reauthorized."
-  },
-  {
-    "term": "timeline.signature-cancelled-request-error.description",
-    "definition": "The eSignature has been cancelled due to an error from the provider {timeAgo}: {message}",
-    "context": "The eSignature has been cancelled due to an error from the provider {timeAgo}: {message}"
-  },
-  {
-    "term": "timeline.signature-cancelled-request-error.email-bounced.description",
-    "definition": "{hasEmail, select, true{The email<{signerEmail}>} other{an email}} has bounced.",
-    "context": "{hasEmail, select, true{The email<{signerEmail}>} other{an email}} has bounced."
-  },
-  {
-    "term": "timeline.signature-cancelled-request-error.insufficient-credits.description",
-    "definition": "The eSignature could not be started due to lack of signature credits {timeAgo}",
-    "context": "The eSignature could not be started due to lack of signature credits {timeAgo}"
-  },
-  {
-    "term": "timeline.signature-cancelled-request-error.invalid-credentials.description",
-    "definition": "The provided credentials are not valid anymore and need to be updated.",
-    "context": "The provided credentials are not valid anymore and need to be updated."
-  },
-  {
-    "term": "timeline.signature-cancelled-request-error.max-size-exceeded.description",
-    "definition": "The document exceeds the maximum size allowed. Please, reduce the size of the annexed files and try it again.",
-    "context": "The document exceeds the maximum size allowed. Please, reduce the size of the annexed files and try it again."
-  },
-  {
-    "term": "timeline.signature-cancelled-request-error.unknown.description",
-    "definition": "An unknown error happened.",
-    "context": "An unknown error happened."
   },
   {
     "term": "timeline.signature-completed-description",

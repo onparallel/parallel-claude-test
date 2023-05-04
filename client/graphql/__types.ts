@@ -3101,6 +3101,9 @@ export interface PetitionSignatureRequest extends Timestamps {
   createdAt: Scalars["DateTime"];
   /** The environment of the petition signature. */
   environment: SignatureOrgIntegrationEnvironment;
+  errorCode?: Maybe<Scalars["String"]>;
+  errorMessage?: Maybe<Scalars["String"]>;
+  extraErrorData?: Maybe<Scalars["JSON"]>;
   id: Scalars["GID"];
   isAnonymized: Scalars["Boolean"];
   /** Metadata for this signature request. */
@@ -4338,6 +4341,7 @@ export interface SignatureCancelledEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"];
   data: Scalars["JSONObject"];
   errorCode?: Maybe<Scalars["String"]>;
+  errorMessage?: Maybe<Scalars["String"]>;
   extraErrorData?: Maybe<Scalars["JSON"]>;
   id: Scalars["GID"];
   petition?: Maybe<Petition>;
@@ -7801,9 +7805,10 @@ export type PetitionActivityTimeline_PetitionFragment = {
           id: string;
           cancelType: PetitionSignatureCancelReason;
           errorCode?: string | null;
-          extraErrorData?: any | null;
+          errorMessage?: string | null;
           cancellerReason?: string | null;
           createdAt: string;
+          extraErrorData?: any | null;
           cancelledBy?:
             | {
                 __typename?: "PetitionAccess";
@@ -8364,9 +8369,10 @@ export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragm
   id: string;
   cancelType: PetitionSignatureCancelReason;
   errorCode?: string | null;
-  extraErrorData?: any | null;
+  errorMessage?: string | null;
   cancellerReason?: string | null;
   createdAt: string;
+  extraErrorData?: any | null;
   cancelledBy?:
     | {
         __typename?: "PetitionAccess";
@@ -9194,9 +9200,10 @@ export type TimelineSignatureCancelledEvent_SignatureCancelledEventFragment = {
   __typename?: "SignatureCancelledEvent";
   cancelType: PetitionSignatureCancelReason;
   errorCode?: string | null;
-  extraErrorData?: any | null;
+  errorMessage?: string | null;
   cancellerReason?: string | null;
   createdAt: string;
+  extraErrorData?: any | null;
   cancelledBy?:
     | {
         __typename?: "PetitionAccess";
@@ -13356,6 +13363,10 @@ export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
   metadata: { [key: string]: any };
   isAnonymized: boolean;
   auditTrailFilename?: string | null;
+  errorCode?: string | null;
+  errorMessage?: string | null;
+  extraErrorData?: any | null;
+  createdAt: string;
   cancelReason?: string | null;
   signerStatus: Array<{
     __typename?: "PetitionSignatureRequestSignerStatus";
@@ -13699,6 +13710,10 @@ export type PetitionSignaturesCard_PetitionFragment = {
     isAnonymized: boolean;
     metadata: { [key: string]: any };
     auditTrailFilename?: string | null;
+    errorCode?: string | null;
+    errorMessage?: string | null;
+    extraErrorData?: any | null;
+    createdAt: string;
     cancelReason?: string | null;
     signatureConfig: {
       __typename?: "SignatureConfig";
@@ -13802,6 +13817,10 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           isAnonymized: boolean;
           metadata: { [key: string]: any };
           auditTrailFilename?: string | null;
+          errorCode?: string | null;
+          errorMessage?: string | null;
+          extraErrorData?: any | null;
+          createdAt: string;
           cancelReason?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
@@ -13954,6 +13973,10 @@ export type PetitionSignaturesCard_completePetitionMutation = {
       isAnonymized: boolean;
       metadata: { [key: string]: any };
       auditTrailFilename?: string | null;
+      errorCode?: string | null;
+      errorMessage?: string | null;
+      extraErrorData?: any | null;
+      createdAt: string;
       cancelReason?: string | null;
       signatureConfig: {
         __typename?: "SignatureConfig";
@@ -14057,6 +14080,10 @@ export type PetitionSignaturesCard_petitionQuery = {
           isAnonymized: boolean;
           metadata: { [key: string]: any };
           auditTrailFilename?: string | null;
+          errorCode?: string | null;
+          errorMessage?: string | null;
+          extraErrorData?: any | null;
+          createdAt: string;
           cancelReason?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
@@ -18581,9 +18608,10 @@ export type PetitionActivity_PetitionFragment = {
           id: string;
           cancelType: PetitionSignatureCancelReason;
           errorCode?: string | null;
-          extraErrorData?: any | null;
+          errorMessage?: string | null;
           cancellerReason?: string | null;
           createdAt: string;
+          extraErrorData?: any | null;
           cancelledBy?:
             | {
                 __typename?: "PetitionAccess";
@@ -19497,9 +19525,10 @@ export type PetitionActivity_updatePetitionMutation = {
                 id: string;
                 cancelType: PetitionSignatureCancelReason;
                 errorCode?: string | null;
-                extraErrorData?: any | null;
+                errorMessage?: string | null;
                 cancellerReason?: string | null;
                 createdAt: string;
+                extraErrorData?: any | null;
                 cancelledBy?:
                   | {
                       __typename?: "PetitionAccess";
@@ -20438,9 +20467,10 @@ export type PetitionActivity_petitionQuery = {
                 id: string;
                 cancelType: PetitionSignatureCancelReason;
                 errorCode?: string | null;
-                extraErrorData?: any | null;
+                errorMessage?: string | null;
                 cancellerReason?: string | null;
                 createdAt: string;
+                extraErrorData?: any | null;
                 cancelledBy?:
                   | {
                       __typename?: "PetitionAccess";
@@ -24203,6 +24233,10 @@ export type PetitionReplies_PetitionFragment = {
     isAnonymized: boolean;
     metadata: { [key: string]: any };
     auditTrailFilename?: string | null;
+    errorCode?: string | null;
+    errorMessage?: string | null;
+    extraErrorData?: any | null;
+    createdAt: string;
     cancelReason?: string | null;
     signatureConfig: {
       __typename?: "SignatureConfig";
@@ -24632,6 +24666,10 @@ export type PetitionReplies_closePetitionMutation = {
       isAnonymized: boolean;
       metadata: { [key: string]: any };
       auditTrailFilename?: string | null;
+      errorCode?: string | null;
+      errorMessage?: string | null;
+      extraErrorData?: any | null;
+      createdAt: string;
       cancelReason?: string | null;
       signatureConfig: {
         __typename?: "SignatureConfig";
@@ -24859,6 +24897,10 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       isAnonymized: boolean;
       metadata: { [key: string]: any };
       auditTrailFilename?: string | null;
+      errorCode?: string | null;
+      errorMessage?: string | null;
+      extraErrorData?: any | null;
+      createdAt: string;
       cancelReason?: string | null;
       signatureConfig: {
         __typename?: "SignatureConfig";
@@ -25192,6 +25234,10 @@ export type PetitionReplies_petitionQuery = {
           isAnonymized: boolean;
           metadata: { [key: string]: any };
           auditTrailFilename?: string | null;
+          errorCode?: string | null;
+          errorMessage?: string | null;
+          extraErrorData?: any | null;
+          createdAt: string;
           cancelReason?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
@@ -29049,6 +29095,10 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
           isAnonymized: boolean;
           metadata: { [key: string]: any };
           auditTrailFilename?: string | null;
+          errorCode?: string | null;
+          errorMessage?: string | null;
+          extraErrorData?: any | null;
+          createdAt: string;
           cancelReason?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
@@ -29341,6 +29391,13 @@ export type useSearchUsers_searchUsersQuery = {
 };
 
 export type useSettingsSections_UserFragment = { __typename?: "User"; hasDeveloperAccess: boolean };
+
+export type useSignatureCancelledRequestErrorMessage_SignatureCancelledEventFragment = {
+  __typename?: "SignatureCancelledEvent";
+  errorCode?: string | null;
+  extraErrorData?: any | null;
+  createdAt: string;
+};
 
 export type validatePetitionFields_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -31697,8 +31754,19 @@ export const TimelineSignatureCompletedEvent_SignatureCompletedEventFragmentDoc 
   TimelineSignatureCompletedEvent_SignatureCompletedEventFragment,
   unknown
 >;
+export const useSignatureCancelledRequestErrorMessage_SignatureCancelledEventFragmentDoc = gql`
+  fragment useSignatureCancelledRequestErrorMessage_SignatureCancelledEvent on SignatureCancelledEvent {
+    errorCode
+    extraErrorData
+    createdAt
+  }
+` as unknown as DocumentNode<
+  useSignatureCancelledRequestErrorMessage_SignatureCancelledEventFragment,
+  unknown
+>;
 export const TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc = gql`
   fragment TimelineSignatureCancelledEvent_SignatureCancelledEvent on SignatureCancelledEvent {
+    ...useSignatureCancelledRequestErrorMessage_SignatureCancelledEvent
     cancelledBy {
       ...UserOrContactReference_UserOrPetitionAccess
     }
@@ -31707,10 +31775,11 @@ export const TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc 
     }
     cancelType
     errorCode
-    extraErrorData
+    errorMessage
     cancellerReason
     createdAt
   }
+  ${useSignatureCancelledRequestErrorMessage_SignatureCancelledEventFragmentDoc}
   ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
   ${SignerReference_PetitionSignerFragmentDoc}
 ` as unknown as DocumentNode<
@@ -33605,6 +33674,10 @@ export const OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc = gql
     metadata
     isAnonymized
     auditTrailFilename
+    errorCode
+    errorMessage
+    extraErrorData
+    createdAt
   }
   ${PetitionSignatureRequestStatusText_PetitionSignatureRequestFragmentDoc}
   ${SignerReference_PetitionSignerFragmentDoc}

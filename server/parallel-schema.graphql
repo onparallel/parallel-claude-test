@@ -3862,6 +3862,9 @@ type PetitionSignatureRequest implements Timestamps {
   The environment of the petition signature.
   """
   environment: SignatureOrgIntegrationEnvironment!
+  errorCode: String
+  errorMessage: String
+  extraErrorData: JSON
   id: GID!
   isAnonymized: Boolean!
 
@@ -5682,6 +5685,7 @@ type SignatureCancelledEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   errorCode: String
+  errorMessage: String
   extraErrorData: JSON
   id: GID!
   petition: Petition

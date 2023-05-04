@@ -7,12 +7,13 @@ import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { ButtonWithMoreOptions } from "../common/ButtonWithMoreOptions";
 import { Divider } from "../common/Divider";
-import { NakedLink } from "../common/Link";
 import { NetDocumentsIconButton } from "../common/NetDocumentsLink";
 import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
 import { SignerReference } from "../common/SignerReference";
 import { PetitionSignatureRequestSignerStatusIcon } from "./PetitionSignatureRequestSignerStatusIcon";
 import { PetitionSignatureRequestStatusText } from "./PetitionSignatureRequestStatusText";
+import { useSignatureCancelledRequestErrorMessage } from "@parallel/utils/useSignatureCancelledRequestErrorMessage";
+import { useSignatureCancelledRequestErrorDialog } from "../petition-activity/dialogs/SignatureCancelledRequestErrorDialog";
 
 export function OlderSignatureRequestRows({
   signatures,
@@ -22,6 +23,23 @@ export function OlderSignatureRequestRows({
   onDownload: (petitionSignatureRequestId: string, downloadAuditTrail: boolean) => void;
 }) {
   const intl = useIntl();
+
+  const requestErrorMessage = useSignatureCancelledRequestErrorMessage();
+  const showSignatureCancelledRequestErrorDialog = useSignatureCancelledRequestErrorDialog();
+  async function handleSeeRequestErrorMessageClick(
+    signature: OlderSignatureRequestRows_PetitionSignatureRequestFragment
+  ) {
+    try {
+      await showSignatureCancelledRequestErrorDialog({
+        message: requestErrorMessage({
+          errorCode: signature.errorCode!,
+          createdAt: signature.createdAt,
+          extraErrorData: signature.extraErrorData,
+        }),
+        reason: signature.errorMessage!,
+      });
+    } catch {}
+  }
 
   return (
     <>
@@ -102,15 +120,13 @@ export function OlderSignatureRequestRows({
                   }
                 />
               </HStack>
-            ) : signature.status === "CANCELLED" ? (
-              <NakedLink href={`/app/petitions/${signature.petition.id}/activity`}>
-                <Button size="xs">
-                  <FormattedMessage
-                    id="component.petition-signatures-card.more-info-button"
-                    defaultMessage="More information"
-                  />
-                </Button>
-              </NakedLink>
+            ) : signature.status === "CANCELLED" && isDefined(signature.errorMessage) ? (
+              <Button size="sm" onClick={() => handleSeeRequestErrorMessageClick(signature)}>
+                <FormattedMessage
+                  id="component.petition-signatures-card.more-info-button"
+                  defaultMessage="More information"
+                />
+              </Button>
             ) : null}
           </GridItem>
         </Fragment>
@@ -137,6 +153,10 @@ OlderSignatureRequestRows.fragments = {
       metadata
       isAnonymized
       auditTrailFilename
+      errorCode
+      errorMessage
+      extraErrorData
+      createdAt
     }
     ${PetitionSignatureRequestStatusText.fragments.PetitionSignatureRequest}
     ${SignerReference.fragments.PetitionSigner}
