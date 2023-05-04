@@ -1,18 +1,11 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, indexBy, isDefined, omit, pick, times, uniq, values } from "remeda";
+import { groupBy, indexBy, isDefined, omit, pick, times, uniq } from "remeda";
 import { LocalizableUserText } from "../../graphql";
 import { unMaybeArray } from "../../util/arrays";
+import { keyBuilder } from "../../util/keyBuilder";
+import { LazyPromise } from "../../util/promises/LazyPromise";
 import { Maybe, MaybeArray, Replace } from "../../util/types";
-import {
-  CreateProfileEvent,
-  ProfileFieldExpiryUpdatedEvent,
-  ProfileFieldFileAddedEvent,
-  ProfileFieldValueUpdatedEvent,
-} from "../events/ProfileEvent";
-import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
-import { escapeLike, SortBy } from "../helpers/utils";
-import { KNEX } from "../knex";
 import {
   CreateProfile,
   CreateProfileType,
@@ -24,8 +17,15 @@ import {
   ProfileType,
   UserLocale,
 } from "../__types";
-import { keyBuilder } from "../../util/keyBuilder";
-import { LazyPromise } from "../../util/promises/LazyPromise";
+import {
+  CreateProfileEvent,
+  ProfileFieldExpiryUpdatedEvent,
+  ProfileFieldFileAddedEvent,
+  ProfileFieldValueUpdatedEvent,
+} from "../events/ProfileEvent";
+import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
+import { SortBy, escapeLike } from "../helpers/utils";
+import { KNEX } from "../knex";
 
 @injectable()
 export class ProfileRepository extends BaseRepository {
