@@ -10,10 +10,11 @@ export async function seed(knex: Knex): Promise<any> {
     .where("organization_role", "OWNER");
   for (const owner of owners) {
     await knex.transaction(async (t) => {
-      const [individual, legalEntity] = await t.from("profile_type").insert(
+      const [individual, legalEntity, contract] = await t.from("profile_type").insert(
         [
           { name: { en: "Individual", es: "Persona física" } },
           { name: { en: "Legal entity", es: "Persona jurídica" } },
+          { name: { en: "Contract", es: "Contrato" } },
         ].map((data) => ({
           ...data,
           org_id: owner.org_id,
@@ -27,19 +28,35 @@ export async function seed(knex: Knex): Promise<any> {
         [
           {
             type: "SHORT_TEXT" as const,
-            name: { en: "First Name", es: "Nombre" },
+            name: { en: "First name", es: "Nombre" },
+            alias: "FIRST_NAME",
           },
           {
             type: "SHORT_TEXT" as const,
-            name: { en: "Last Name", es: "Apellido" },
+            name: { en: "Last name", es: "Apellido" },
+            alias: "LAST_NAME",
+          },
+          {
+            type: "FILE" as const,
+            name: { en: "Documento de identificación", es: "ID" },
+            is_expirable: true,
+            expiry_alert_ahead_time: knex.raw(`make_interval(months => ?)`, [1]),
+            alias: "ID",
           },
           {
             type: "DATE" as const,
-            name: { en: "Date of Birth", es: "Fecha de nacimiento" },
+            name: { en: "Date of birth", es: "Fecha de nacimiento" },
+            alias: "DATE_OF_BIRTH",
+          },
+          {
+            type: "PHONE" as const,
+            name: { en: "Phone number", es: "Número de teléfono" },
+            alias: "PHONE_NUMBER",
           },
           {
             type: "TEXT" as const,
             name: { en: "Address", es: "Dirección" },
+            alias: "ADDRESS",
           },
         ].map((data, index) => ({
           ...data,
@@ -64,15 +81,23 @@ export async function seed(knex: Knex): Promise<any> {
         [
           {
             type: "SHORT_TEXT" as const,
-            name: { en: "Name", es: "Nombre" },
+            name: { en: "Corporate name", es: "Denominación social" },
+            alias: "NAME",
           },
           {
             type: "DATE" as const,
-            name: { en: "Foundation Date", es: "Fecha de constitución" },
+            name: { en: "Date of incorporation", es: "Fecha de constitución" },
+            alias: "DATE_OF_INCORPORATION",
+          },
+          {
+            type: "SHORT_TEXT" as const,
+            name: { en: "Tax ID", es: "Número de identificación fiscal" },
+            alias: "TAX_ID",
           },
           {
             type: "TEXT" as const,
-            name: { en: "Address", es: "Dirección" },
+            name: { en: "Address", es: "Domicilio" },
+            alias: "ADDRESS",
           },
         ].map((data, index) => ({
           ...data,
@@ -88,6 +113,61 @@ export async function seed(knex: Knex): Promise<any> {
         .where("id", legalEntity.id)
         .update({
           profile_name_pattern: knex.raw("?::jsonb", [JSON.stringify([name.id])]),
+        });
+
+      const [type, counterparty] = await t.from("profile_type_field").insert(
+        [
+          {
+            type: "SHORT_TEXT" as const,
+            name: { en: "Type of contract", es: "Tipo de contrato" },
+            alias: "TYPE",
+          },
+          {
+            type: "SHORT_TEXT" as const,
+            name: { en: "Counterparty", es: "Contraparte" },
+            alias: "COUNTERPARTY",
+          },
+          {
+            type: "TEXT" as const,
+            name: { en: "Short description", es: "Descripción breve" },
+            alias: "DESCRIPTION",
+          },
+          {
+            type: "DATE" as const,
+            name: { en: "Start date", es: "Fecha de inicio" },
+            alias: "START_DATE",
+          },
+          {
+            type: "DATE" as const,
+            name: { en: "Expiry date", es: "Fecha de vencimiento" },
+            alias: "EXPIRY_DATE",
+          },
+          {
+            type: "NUMBER" as const,
+            name: { en: "Amount", es: "Importe" },
+            alias: "AMOUNT",
+          },
+          {
+            type: "FILE" as const,
+            name: { en: "Document", es: "Documento" },
+            alias: "DOCUMENT",
+          },
+        ].map((data, index) => ({
+          ...data,
+          profile_type_id: contract.id,
+          position: index,
+          created_by: `User:${owner.id}`,
+          updated_by: `User:${owner.id}`,
+        })),
+        "*"
+      );
+      await t
+        .from("profile_type")
+        .where("id", contract.id)
+        .update({
+          profile_name_pattern: knex.raw("?::jsonb", [
+            JSON.stringify([type.id, " - ", counterparty.id]),
+          ]),
         });
     });
   }
