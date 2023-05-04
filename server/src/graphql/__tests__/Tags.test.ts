@@ -397,25 +397,6 @@ describe("GraphQL/Tags", () => {
       });
     });
 
-    it("sends error when trying to tag a petition with the same tag more than once", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($tagId: GID!, $petitionId: GID!) {
-            tagPetition(tagId: $tagId, petitionId: $petitionId) {
-              id
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", petition.id),
-          tagId: toGlobalId("Tag", tags[3].id),
-        },
-      });
-
-      expect(errors).toContainGraphQLError("PETITION_ALREADY_TAGGED");
-      expect(data).toBeNull();
-    });
-
     it("sends error when trying to apply a private tag to a petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`

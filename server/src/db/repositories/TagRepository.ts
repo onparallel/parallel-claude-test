@@ -87,15 +87,21 @@ export class TagRepository extends BaseRepository {
       return;
     }
 
-    await this.insert(
-      "petition_tag",
-      petitionIdArr.flatMap((petitionId) =>
-        tagIdArr.map((tagId) => ({
-          tag_id: tagId,
-          petition_id: petitionId,
-          created_by: `User:${user.id}`,
-        }))
-      ),
+    await this.raw(
+      /* sql */ `
+    ? on conflict do nothing;
+    `,
+      [
+        this.from("petition_tag").insert(
+          petitionIdArr.flatMap((petitionId) =>
+            tagIdArr.map((tagId) => ({
+              tag_id: tagId,
+              petition_id: petitionId,
+              created_by: `User:${user.id}`,
+            }))
+          )
+        ),
+      ],
       t
     );
   }

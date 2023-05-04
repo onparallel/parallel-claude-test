@@ -190,19 +190,8 @@ export const tagPetition = mutationField("tagPetition", {
     petitionsAreNotPublicTemplates("petitionId")
   ),
   resolve: async (_, args, ctx) => {
-    try {
-      await ctx.tags.tagPetition(args.tagId, args.petitionId, ctx.user!);
-      return (await ctx.petitions.loadPetition(args.petitionId))!;
-    } catch (error: any) {
-      if (error.constraint === "petition_tag__petition_id__tag_id__unique") {
-        throw new ApolloError(
-          `Petition ${args.petitionId} is already tagged with tag ${args.tagId}`,
-          "PETITION_ALREADY_TAGGED"
-        );
-      } else {
-        throw error;
-      }
-    }
+    await ctx.tags.tagPetition(args.tagId, args.petitionId, ctx.user!);
+    return (await ctx.petitions.loadPetition(args.petitionId))!;
   },
 });
 
