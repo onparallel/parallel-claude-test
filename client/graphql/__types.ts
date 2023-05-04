@@ -13263,6 +13263,9 @@ export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
   isAnonymized: boolean;
   metadata: { [key: string]: any };
   auditTrailFilename?: string | null;
+  errorCode?: string | null;
+  errorMessage?: string | null;
+  extraErrorData?: any | null;
   cancelReason?: string | null;
   signerStatus: Array<{
     __typename?: "PetitionSignatureRequestSignerStatus";
@@ -16107,32 +16110,6 @@ export type Alerts_ProfileFieldPropertyFragment = {
       profileType: { __typename?: "ProfileType"; name: { [locale in UserLocale]?: string } };
     };
   } | null;
-};
-
-export type Alerts_ProfileFieldPropertyPaginationFragment = {
-  __typename?: "ProfileFieldPropertyPagination";
-  totalCount: number;
-  items: Array<{
-    __typename?: "ProfileFieldProperty";
-    value?: {
-      __typename?: "ProfileFieldValue";
-      id: string;
-      expiresAt?: string | null;
-      field: {
-        __typename?: "ProfileTypeField";
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        isExpirable: boolean;
-        expiryAlertAheadTime?: Duration | null;
-      };
-      profile: {
-        __typename?: "Profile";
-        id: string;
-        name: string;
-        profileType: { __typename?: "ProfileType"; name: { [locale in UserLocale]?: string } };
-      };
-    } | null;
-  }>;
 };
 
 export type Alerts_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -30756,15 +30733,6 @@ export const Alerts_ProfileFieldPropertyFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<Alerts_ProfileFieldPropertyFragment, unknown>;
-export const Alerts_ProfileFieldPropertyPaginationFragmentDoc = gql`
-  fragment Alerts_ProfileFieldPropertyPagination on ProfileFieldPropertyPagination {
-    items {
-      ...Alerts_ProfileFieldProperty
-    }
-    totalCount
-  }
-  ${Alerts_ProfileFieldPropertyFragmentDoc}
-` as unknown as DocumentNode<Alerts_ProfileFieldPropertyPaginationFragment, unknown>;
 export const Contact_Contact_ProfileFragmentDoc = gql`
   fragment Contact_Contact_Profile on Contact {
     id
@@ -33652,6 +33620,9 @@ export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gq
     }
     metadata
     auditTrailFilename
+    errorCode
+    errorMessage
+    extraErrorData
   }
   ${PetitionSignatureRequestStatusText_PetitionSignatureRequestFragmentDoc}
   ${SignerReference_PetitionSignerFragmentDoc}
@@ -37178,10 +37149,13 @@ export const Alerts_expiringProfilePropertiesDocument = gql`
     $filter: ProfilePropertyFilter
   ) {
     expiringProfileProperties(offset: $offset, limit: $limit, search: $search, filter: $filter) {
-      ...Alerts_ProfileFieldPropertyPagination
+      items {
+        ...Alerts_ProfileFieldProperty
+      }
+      totalCount
     }
   }
-  ${Alerts_ProfileFieldPropertyPaginationFragmentDoc}
+  ${Alerts_ProfileFieldPropertyFragmentDoc}
 ` as unknown as DocumentNode<
   Alerts_expiringProfilePropertiesQuery,
   Alerts_expiringProfilePropertiesQueryVariables
