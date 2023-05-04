@@ -140,6 +140,9 @@ export async function seed(knex: Knex): Promise<any> {
           {
             type: "DATE" as const,
             name: { en: "Expiry date", es: "Fecha de vencimiento" },
+            is_expirable: true,
+            expiry_alert_ahead_time: knex.raw(`make_interval(months => ?)`, [1]),
+            options: knex.raw("?::jsonb", JSON.stringify({ useReplyAsExpiryDate: true })),
             alias: "EXPIRY_DATE",
           },
           {
