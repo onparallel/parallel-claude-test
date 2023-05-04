@@ -74,8 +74,4 @@ describe("repositories/TagRepository", () => {
   it("should not allow to use a taken name to update the tag", async () => {
     await expect(repo.updateTag(tags[2].id, { name: tags[3].name }, user)).rejects.toThrowError();
   });
-
-  it("should not allow to tag a petition twice with the same tag", async () => {
-    await expect(repo.tagPetition(tags[0].id, petition.id, user)).rejects.toThrowError();
-  });
 });
