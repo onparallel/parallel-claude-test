@@ -13264,6 +13264,7 @@ export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
   metadata: { [key: string]: any };
   auditTrailFilename?: string | null;
   errorCode?: string | null;
+  createdAt: string;
   errorMessage?: string | null;
   extraErrorData?: any | null;
   cancelReason?: string | null;
@@ -13714,9 +13715,9 @@ export type PetitionSignaturesCard_PetitionFragment = {
     metadata: { [key: string]: any };
     auditTrailFilename?: string | null;
     errorCode?: string | null;
+    createdAt: string;
     errorMessage?: string | null;
     extraErrorData?: any | null;
-    createdAt: string;
     cancelReason?: string | null;
     signatureConfig: {
       __typename?: "SignatureConfig";
@@ -13821,9 +13822,9 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           metadata: { [key: string]: any };
           auditTrailFilename?: string | null;
           errorCode?: string | null;
+          createdAt: string;
           errorMessage?: string | null;
           extraErrorData?: any | null;
-          createdAt: string;
           cancelReason?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
@@ -13977,9 +13978,9 @@ export type PetitionSignaturesCard_completePetitionMutation = {
       metadata: { [key: string]: any };
       auditTrailFilename?: string | null;
       errorCode?: string | null;
+      createdAt: string;
       errorMessage?: string | null;
       extraErrorData?: any | null;
-      createdAt: string;
       cancelReason?: string | null;
       signatureConfig: {
         __typename?: "SignatureConfig";
@@ -14084,9 +14085,9 @@ export type PetitionSignaturesCard_petitionQuery = {
           metadata: { [key: string]: any };
           auditTrailFilename?: string | null;
           errorCode?: string | null;
+          createdAt: string;
           errorMessage?: string | null;
           extraErrorData?: any | null;
-          createdAt: string;
           cancelReason?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
@@ -24211,9 +24212,9 @@ export type PetitionReplies_PetitionFragment = {
     metadata: { [key: string]: any };
     auditTrailFilename?: string | null;
     errorCode?: string | null;
+    createdAt: string;
     errorMessage?: string | null;
     extraErrorData?: any | null;
-    createdAt: string;
     cancelReason?: string | null;
     signatureConfig: {
       __typename?: "SignatureConfig";
@@ -24644,9 +24645,9 @@ export type PetitionReplies_closePetitionMutation = {
       metadata: { [key: string]: any };
       auditTrailFilename?: string | null;
       errorCode?: string | null;
+      createdAt: string;
       errorMessage?: string | null;
       extraErrorData?: any | null;
-      createdAt: string;
       cancelReason?: string | null;
       signatureConfig: {
         __typename?: "SignatureConfig";
@@ -24875,9 +24876,9 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       metadata: { [key: string]: any };
       auditTrailFilename?: string | null;
       errorCode?: string | null;
+      createdAt: string;
       errorMessage?: string | null;
       extraErrorData?: any | null;
-      createdAt: string;
       cancelReason?: string | null;
       signatureConfig: {
         __typename?: "SignatureConfig";
@@ -25212,9 +25213,9 @@ export type PetitionReplies_petitionQuery = {
           metadata: { [key: string]: any };
           auditTrailFilename?: string | null;
           errorCode?: string | null;
+          createdAt: string;
           errorMessage?: string | null;
           extraErrorData?: any | null;
-          createdAt: string;
           cancelReason?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
@@ -29073,9 +29074,9 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
           metadata: { [key: string]: any };
           auditTrailFilename?: string | null;
           errorCode?: string | null;
+          createdAt: string;
           errorMessage?: string | null;
           extraErrorData?: any | null;
-          createdAt: string;
           cancelReason?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
@@ -33621,6 +33622,7 @@ export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gq
     metadata
     auditTrailFilename
     errorCode
+    createdAt
     errorMessage
     extraErrorData
   }

@@ -205,6 +205,7 @@ CurrentSignatureRequestRow.fragments = {
       metadata
       auditTrailFilename
       errorCode
+      createdAt
       errorMessage
       extraErrorData
     }
