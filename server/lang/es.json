@@ -795,6 +795,106 @@
     "context": "Name"
   },
   {
+    "term": "profiles.default-profile-type-field.contract-amount",
+    "definition": "Importe",
+    "context": "Amount"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-counterparty",
+    "definition": "Contraparte",
+    "context": "Counterparty"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-description",
+    "definition": "Descripción breve",
+    "context": "Short description"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-document",
+    "definition": "Documento",
+    "context": "Document"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-expiry-date",
+    "definition": "Fecha de vencimiento",
+    "context": "Expiry date"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-start-date",
+    "definition": "Fecha de inicio",
+    "context": "Start date"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-type",
+    "definition": "Tipo de contrato",
+    "context": "Type of contract"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-address",
+    "definition": "Dirección",
+    "context": "Address"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-date-of-birth",
+    "definition": "Fecha de nacimiento",
+    "context": "Date of birth"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-first-name",
+    "definition": "Nombre",
+    "context": "First name"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-id",
+    "definition": "Documento de identificación",
+    "context": "ID"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-last-name",
+    "definition": "Apellido",
+    "context": "Last name"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-phone-number",
+    "definition": "Número de teléfono",
+    "context": "Phone number"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-address",
+    "definition": "Domicilio",
+    "context": "Address"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-corporate-name",
+    "definition": "Denominación social",
+    "context": "Corporate name"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-date-of-incorporation",
+    "definition": "Fecha de constitución",
+    "context": "Date of incorporation"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-tax-id",
+    "definition": "Número de identificación fiscal",
+    "context": "Tax ID"
+  },
+  {
+    "term": "profiles.default-profile-type.contract",
+    "definition": "Contrato",
+    "context": "Contract"
+  },
+  {
+    "term": "profiles.default-profile-type.individual",
+    "definition": "Persona física",
+    "context": "Individual"
+  },
+  {
+    "term": "profiles.default-profile-type.legal-entity",
+    "definition": "Persona jurídica",
+    "context": "Legal entity"
+  },
+  {
     "term": "public-petition-link.text-1",
     "definition": "{tone, select, INFORMAL{Te enviamos el acceso que has solicitado al formulario de {petitionTitle}.} other{Le enviamos el acceso solicitado al formulario de {petitionTitle}.}}",
     "context": "We send you the requested access to {petitionTitle}."

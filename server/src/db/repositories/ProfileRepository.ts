@@ -103,16 +103,23 @@ export class ProfileRepository extends BaseRepository {
     );
   }
 
-  async createProfileType(data: CreateProfileType, createdBy: string, t?: Knex.Transaction) {
-    const [profile] = await this.from("profile_type", t).insert(
-      {
-        ...data,
+  async createProfileType(
+    data: MaybeArray<CreateProfileType>,
+    createdBy: string,
+    t?: Knex.Transaction
+  ) {
+    const dataArr = unMaybeArray(data);
+    if (dataArr.length === 0) {
+      throw new Error("No data provided");
+    }
+    return await this.from("profile_type", t).insert(
+      dataArr.map((d) => ({
+        ...d,
         created_by: createdBy,
         updated_by: createdBy,
-      },
+      })),
       "*"
     );
-    return profile;
   }
 
   async updateProfileType(
@@ -144,7 +151,7 @@ export class ProfileRepository extends BaseRepository {
   ) {
     return await this.withTransaction(async (t) => {
       const sourceProfileType = (await this.loadProfileType.raw(id, t))!;
-      const profileType = await this.createProfileType(
+      const [profileType] = await this.createProfileType(
         { ...pick(sourceProfileType, ["org_id", "name"]), ...data },
         createdBy,
         t
@@ -213,34 +220,39 @@ export class ProfileRepository extends BaseRepository {
 
   async createProfileTypeField(
     profileTypeId: number,
-    data: Replace<
-      Omit<CreateProfileTypeField, "profile_type_id" | "position">,
-      { name: LocalizableUserText }
+    data: MaybeArray<
+      Replace<
+        Omit<CreateProfileTypeField, "profile_type_id" | "position">,
+        { name: LocalizableUserText }
+      >
     >,
     createdBy: string,
     t?: Knex.Transaction
   ) {
+    const dataArr = unMaybeArray(data);
+    if (dataArr.length === 0) {
+      throw new Error("No data provided");
+    }
+
     return await this.withTransaction(async (t) => {
       const [{ max }] = await this.from("profile_type_field", t)
         .whereNull("deleted_at")
         .where("profile_type_id", profileTypeId)
         .max("position");
-      const [profileTypeField] = await this.insert(
+      return await this.insert(
         "profile_type_field",
-        {
+        dataArr.map((d, index) => ({
           profile_type_id: profileTypeId,
-          position: max === null ? 0 : max + 1,
-          ...data,
-          expiry_alert_ahead_time: isDefined(data.expiry_alert_ahead_time)
-            ? this.interval(data.expiry_alert_ahead_time)
-            : data.expiry_alert_ahead_time,
+          position: max === null ? index : max + 1 + index,
+          ...d,
+          expiry_alert_ahead_time: isDefined(d.expiry_alert_ahead_time)
+            ? this.interval(d.expiry_alert_ahead_time)
+            : d.expiry_alert_ahead_time,
           created_by: createdBy,
           updated_by: createdBy,
-        },
+        })),
         t
       );
-
-      return profileTypeField;
     }, t);
   }
 

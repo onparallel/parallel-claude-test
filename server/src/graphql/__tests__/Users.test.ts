@@ -1235,6 +1235,236 @@ describe("GraphQL/Users", () => {
           },
         },
       });
+
+      await mocks.createFeatureFlags([{ name: "PROFILES", default_value: true }]);
+
+      // make sure profile types were correctly setup on the new organization
+      const { errors: profilesErrors, data: profilesData } = await testClient
+        .withApiKey(apiKey)
+        .execute(
+          gql`
+            query ($limit: Int, $offset: Int) {
+              profileTypes(limit: $limit, offset: $offset) {
+                totalCount
+                items {
+                  name
+                  profileNamePattern
+                  fields {
+                    id
+                    type
+                    name
+                    alias
+                    isExpirable
+                    expiryAlertAheadTime
+                    options
+                    position
+                  }
+                }
+              }
+            }
+          `,
+          {
+            limit: 10,
+            offset: 0,
+          }
+        );
+
+      expect(profilesErrors).toBeUndefined();
+      expect(profilesData).toEqual({
+        profileTypes: {
+          totalCount: 3,
+          items: [
+            {
+              name: { en: "Individual", es: "Persona física" },
+              profileNamePattern: `{{${profilesData.profileTypes.items[0].fields[0].id}}} {{${profilesData.profileTypes.items[0].fields[1].id}}}`,
+              fields: [
+                {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  name: { en: "First name", es: "Nombre" },
+                  alias: "FIRST_NAME",
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 0,
+                },
+                {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  name: { en: "Last name", es: "Apellido" },
+                  alias: "LAST_NAME",
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 1,
+                },
+                {
+                  id: expect.any(String),
+                  type: "FILE",
+                  name: { en: "ID", es: "Documento de identificación" },
+                  alias: "ID",
+                  isExpirable: true,
+                  expiryAlertAheadTime: { months: 1 },
+                  options: {},
+                  position: 2,
+                },
+                {
+                  id: expect.any(String),
+                  type: "DATE",
+                  name: { en: "Date of birth", es: "Fecha de nacimiento" },
+                  alias: "DATE_OF_BIRTH",
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: { useReplyAsExpiryDate: false },
+                  position: 3,
+                },
+                {
+                  id: expect.any(String),
+                  type: "PHONE",
+                  name: { en: "Phone number", es: "Número de teléfono" },
+                  alias: "PHONE_NUMBER",
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 4,
+                },
+                {
+                  id: expect.any(String),
+                  type: "TEXT",
+                  name: { en: "Address", es: "Dirección" },
+                  alias: "ADDRESS",
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 5,
+                },
+              ],
+            },
+            {
+              name: { en: "Legal entity", es: "Persona jurídica" },
+              profileNamePattern: `{{${profilesData.profileTypes.items[1].fields[0].id}}}`,
+              fields: [
+                {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  name: { en: "Corporate name", es: "Denominación social" },
+                  alias: "NAME",
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 0,
+                },
+                {
+                  id: expect.any(String),
+                  type: "DATE",
+                  name: { en: "Date of incorporation", es: "Fecha de constitución" },
+                  alias: "DATE_OF_INCORPORATION",
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: { useReplyAsExpiryDate: false },
+                  position: 1,
+                },
+                {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  name: { en: "Tax ID", es: "Número de identificación fiscal" },
+                  alias: "TAX_ID",
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 2,
+                },
+                {
+                  id: expect.any(String),
+                  type: "TEXT",
+                  name: { en: "Address", es: "Domicilio" },
+                  alias: "ADDRESS",
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 3,
+                },
+              ],
+            },
+            {
+              name: { en: "Contract", es: "Contrato" },
+              profileNamePattern: `{{${profilesData.profileTypes.items[2].fields[0].id}}} - {{${profilesData.profileTypes.items[2].fields[1].id}}}`,
+              fields: [
+                {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT",
+                  name: { en: "Type of contract", es: "Tipo de contrato" },
+                  alias: "TYPE",
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 0,
+                },
+                {
+                  id: expect.any(String),
+                  type: "SHORT_TEXT" as const,
+                  name: { en: "Counterparty", es: "Contraparte" },
+                  alias: "COUNTERPARTY",
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 1,
+                },
+                {
+                  id: expect.any(String),
+                  type: "TEXT" as const,
+                  name: { en: "Short description", es: "Descripción breve" },
+                  alias: "DESCRIPTION",
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 2,
+                },
+                {
+                  id: expect.any(String),
+                  type: "DATE" as const,
+                  name: { en: "Start date", es: "Fecha de inicio" },
+                  alias: "START_DATE",
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: { useReplyAsExpiryDate: false },
+                  position: 3,
+                },
+                {
+                  id: expect.any(String),
+                  type: "DATE" as const,
+                  name: { en: "Expiry date", es: "Fecha de vencimiento" },
+                  alias: "EXPIRY_DATE",
+                  isExpirable: true,
+                  expiryAlertAheadTime: { months: 1 },
+                  options: { useReplyAsExpiryDate: true },
+                  position: 4,
+                },
+                {
+                  id: expect.any(String),
+                  type: "NUMBER" as const,
+                  name: { en: "Amount", es: "Importe" },
+                  alias: "AMOUNT",
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 5,
+                },
+                {
+                  id: expect.any(String),
+                  type: "FILE" as const,
+                  name: { en: "Document", es: "Documento" },
+                  alias: "DOCUMENT",
+                  isExpirable: false,
+                  expiryAlertAheadTime: null,
+                  options: {},
+                  position: 6,
+                },
+              ],
+            },
+          ],
+        },
+      });
     });
   });
 });

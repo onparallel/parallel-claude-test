@@ -795,6 +795,106 @@
     "context": "Name"
   },
   {
+    "term": "profiles.default-profile-type-field.contract-amount",
+    "definition": "Amount",
+    "context": "Amount"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-counterparty",
+    "definition": "Counterparty",
+    "context": "Counterparty"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-description",
+    "definition": "Short description",
+    "context": "Short description"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-document",
+    "definition": "Document",
+    "context": "Document"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-expiry-date",
+    "definition": "Expiry date",
+    "context": "Expiry date"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-start-date",
+    "definition": "Start date",
+    "context": "Start date"
+  },
+  {
+    "term": "profiles.default-profile-type-field.contract-type",
+    "definition": "Type of contract",
+    "context": "Type of contract"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-address",
+    "definition": "Address",
+    "context": "Address"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-date-of-birth",
+    "definition": "Date of birth",
+    "context": "Date of birth"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-first-name",
+    "definition": "First name",
+    "context": "First name"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-id",
+    "definition": "ID",
+    "context": "ID"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-last-name",
+    "definition": "Last name",
+    "context": "Last name"
+  },
+  {
+    "term": "profiles.default-profile-type-field.individual-phone-number",
+    "definition": "Phone number",
+    "context": "Phone number"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-address",
+    "definition": "Address",
+    "context": "Address"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-corporate-name",
+    "definition": "Corporate name",
+    "context": "Corporate name"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-date-of-incorporation",
+    "definition": "Date of incorporation",
+    "context": "Date of incorporation"
+  },
+  {
+    "term": "profiles.default-profile-type-field.legal-entity-tax-id",
+    "definition": "Tax ID",
+    "context": "Tax ID"
+  },
+  {
+    "term": "profiles.default-profile-type.contract",
+    "definition": "Contract",
+    "context": "Contract"
+  },
+  {
+    "term": "profiles.default-profile-type.individual",
+    "definition": "Individual",
+    "context": "Individual"
+  },
+  {
+    "term": "profiles.default-profile-type.legal-entity",
+    "definition": "Legal entity",
+    "context": "Legal entity"
+  },
+  {
     "term": "public-petition-link.text-1",
     "definition": "We send you the requested access to {petitionTitle}.",
     "context": "We send you the requested access to {petitionTitle}."

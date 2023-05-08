@@ -179,7 +179,7 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
   },
   resolve: async (_, args, ctx) => {
     try {
-      return await ctx.profiles.createProfileTypeField(
+      const [profileTypeField] = await ctx.profiles.createProfileTypeField(
         args.profileTypeId,
         {
           name: args.data.name,
@@ -191,6 +191,7 @@ export const createProfileTypeField = mutationField("createProfileTypeField", {
         },
         `User:${ctx.user!.id}`
       );
+      return profileTypeField;
     } catch (e) {
       if (
         e instanceof DatabaseError &&

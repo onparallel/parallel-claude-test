@@ -520,6 +520,8 @@ export const signUp = mutationField("signUp", {
 
     await ctx.tiers.updateOrganizationTier(org, tierKey, `User:${user.id}`);
 
+    await ctx.profilesSetup.createDefaultOrganizationProfileTypesAndFields(org.id, user.id);
+
     if (licenseCode) {
       await ctx.licenseCodes.updateLicenseCode(
         licenseCode.id,

@@ -38,7 +38,7 @@ export async function seed(knex: Knex): Promise<any> {
           },
           {
             type: "FILE" as const,
-            name: { en: "Documento de identificación", es: "ID" },
+            name: { en: "ID", es: "Documento de identificación" },
             is_expirable: true,
             expiry_alert_ahead_time: knex.raw(`make_interval(months => ?)`, [1]),
             alias: "ID",
@@ -47,6 +47,7 @@ export async function seed(knex: Knex): Promise<any> {
             type: "DATE" as const,
             name: { en: "Date of birth", es: "Fecha de nacimiento" },
             alias: "DATE_OF_BIRTH",
+            options: knex.raw("?::jsonb", JSON.stringify({ useReplyAsExpiryDate: false })),
           },
           {
             type: "PHONE" as const,
@@ -88,6 +89,7 @@ export async function seed(knex: Knex): Promise<any> {
             type: "DATE" as const,
             name: { en: "Date of incorporation", es: "Fecha de constitución" },
             alias: "DATE_OF_INCORPORATION",
+            options: knex.raw("?::jsonb", JSON.stringify({ useReplyAsExpiryDate: false })),
           },
           {
             type: "SHORT_TEXT" as const,
@@ -136,6 +138,7 @@ export async function seed(knex: Knex): Promise<any> {
             type: "DATE" as const,
             name: { en: "Start date", es: "Fecha de inicio" },
             alias: "START_DATE",
+            options: knex.raw("?::jsonb", JSON.stringify({ useReplyAsExpiryDate: false })),
           },
           {
             type: "DATE" as const,
