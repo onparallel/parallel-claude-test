@@ -1,4 +1,6 @@
 import { faker } from "@faker-js/faker";
+import { parseISO } from "date-fns";
+import { format, zonedTimeToUtc } from "date-fns-tz";
 import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { isDefined, times } from "remeda";
@@ -25,6 +27,7 @@ describe("GraphQL/Profiles", () => {
 
   let profileType0Fields: ProfileTypeField[] = [];
   let profileType2Fields: ProfileTypeField[] = [];
+  let profileType3Fields: ProfileTypeField[] = [];
 
   let normalUserApiKey = "";
 
@@ -120,12 +123,13 @@ describe("GraphQL/Profiles", () => {
 
     profileTypes = await mocks.createRandomProfileTypes(
       organization.id,
-      3,
+      4,
       (i) =>
         [
           { name: json({ en: "Individual", es: "Persona física" }) },
           { name: json({ en: "Legal entity", es: "Persona jurídica" }) },
           { name: json({ en: "Contract", es: "Contrato" }) },
+          { name: json({ en: "Expirable fields", es: "Campos con expiración" }) },
         ][i]
     );
 
@@ -225,6 +229,35 @@ describe("GraphQL/Profiles", () => {
           },
         ][i]
     );
+
+    profileType3Fields = await mocks.createRandomProfileTypeFields(
+      organization.id,
+      profileTypes[3].id,
+      3,
+      (i) =>
+        [
+          {
+            name: json({ en: "date", es: "fecha" }),
+            type: "DATE" as const,
+            is_expirable: true,
+            options: { useReplyAsExpiryDate: true },
+            expiry_alert_ahead_time: mocks.knex.raw(`'1 month'::interval`) as any,
+          },
+          {
+            name: json({ en: "text", es: "texto" }),
+            type: "TEXT" as const,
+            is_expirable: true,
+            expiry_alert_ahead_time: mocks.knex.raw(`'1 month'::interval`) as any,
+          },
+          {
+            name: json({ en: "no alert", es: "sin alerta" }),
+            type: "TEXT" as const,
+            is_expirable: true,
+            expiry_alert_ahead_time: null,
+          },
+        ][i]
+    );
+
     await mocks.knex
       .from("profile_type")
       .where("id", profileTypes[1].id)
@@ -417,7 +450,7 @@ describe("GraphQL/Profiles", () => {
 
       expect(errors).toBeUndefined();
       expect(data?.profileTypes).toEqual({
-        totalCount: 3,
+        totalCount: 4,
         items: [
           {
             id: toGlobalId("ProfileType", profileTypes[1].id),
@@ -434,6 +467,11 @@ describe("GraphQL/Profiles", () => {
               position: i,
               name: f.name,
             })),
+          },
+          {
+            id: toGlobalId("ProfileType", profileTypes[3].id),
+            name: { en: "Expirable fields", es: "Campos con expiración" },
+            fields: profileType3Fields.map((f, i) => ({ position: i, name: f.name })),
           },
           {
             id: toGlobalId("ProfileType", profileTypes[2].id),
@@ -844,12 +882,17 @@ describe("GraphQL/Profiles", () => {
 
       expect(queryErrors).toBeUndefined();
       expect(queryData?.profileTypes).toEqual({
-        totalCount: 1,
+        totalCount: 2,
         items: [
           {
             id: toGlobalId("ProfileType", profileTypes[0].id),
             name: { en: "Individual", es: "Persona física" },
             fields: profileType0Fields.map((f, i) => ({ position: i })),
+          },
+          {
+            id: toGlobalId("ProfileType", profileTypes[3].id),
+            name: { en: "Expirable fields", es: "Campos con expiración" },
+            fields: profileType3Fields.map((f, i) => ({ position: i })),
           },
         ],
       });
@@ -1906,6 +1949,191 @@ describe("GraphQL/Profiles", () => {
       expect(data?.unsubscribeFromProfile).toEqual({
         id: profile.id,
         subscribers: [],
+      });
+    });
+  });
+
+  describe("expiringProfileProperties", () => {
+    let profile: any;
+    beforeEach(async () => {
+      profile = await createProfile(toGlobalId("ProfileType", profileTypes[3].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[0].id),
+          content: { value: "2024-03-03" },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[1].id),
+          content: { value: "text reply" },
+          expiresAt: "2025-01-01",
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[2].id),
+          content: { value: "text reply" },
+        },
+      ]);
+    });
+
+    it("queries all the user profile expiring properties", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($limit: Int, $offset: Int) {
+            expiringProfileProperties(limit: $limit, offset: $offset) {
+              totalCount
+              items {
+                profile {
+                  id
+                }
+                field {
+                  id
+                }
+                value {
+                  id
+                  content
+                  expiresAt
+                }
+                files {
+                  id
+                  expiresAt
+                }
+              }
+            }
+          }
+        `,
+        {
+          limit: 100,
+          offset: 0,
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.expiringProfileProperties).toEqual({
+        totalCount: 2,
+        items: [
+          {
+            profile: { id: profile.id },
+            field: { id: toGlobalId("ProfileTypeField", profileType3Fields[0].id) },
+            value: {
+              id: expect.any(String),
+              content: { value: "2024-03-03" },
+              expiresAt: zonedTimeToUtc(
+                format(parseISO("2024-03-03"), "yyyy-MM-dd"),
+                "Europe/Madrid"
+              ),
+            },
+            files: null,
+          },
+          {
+            profile: { id: profile.id },
+            field: { id: toGlobalId("ProfileTypeField", profileType3Fields[1].id) },
+            value: {
+              id: expect.any(String),
+              content: { value: "text reply" },
+              expiresAt: zonedTimeToUtc(
+                format(parseISO("2025-01-01"), "yyyy-MM-dd"),
+                "Europe/Madrid"
+              ),
+            },
+            files: null,
+          },
+        ],
+      });
+    });
+
+    it("filters expiring profile properties by profile type id", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($limit: Int, $offset: Int, $filter: ProfilePropertyFilter) {
+            expiringProfileProperties(limit: $limit, offset: $offset, filter: $filter) {
+              totalCount
+              items {
+                profile {
+                  id
+                }
+                field {
+                  id
+                }
+                value {
+                  id
+                  content
+                  expiresAt
+                }
+                files {
+                  id
+                  expiresAt
+                }
+              }
+            }
+          }
+        `,
+        {
+          limit: 100,
+          offset: 0,
+          filter: {
+            profileTypeId: [toGlobalId("ProfileType", profileTypes[0].id)],
+          },
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.expiringProfileProperties).toEqual({
+        totalCount: 0,
+        items: [],
+      });
+    });
+
+    it("filters expiring profile properties by profile type field id", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($limit: Int, $offset: Int, $filter: ProfilePropertyFilter) {
+            expiringProfileProperties(limit: $limit, offset: $offset, filter: $filter) {
+              totalCount
+              items {
+                profile {
+                  id
+                }
+                field {
+                  id
+                }
+                value {
+                  id
+                  content
+                  expiresAt
+                }
+                files {
+                  id
+                  expiresAt
+                }
+              }
+            }
+          }
+        `,
+        {
+          limit: 100,
+          offset: 0,
+          filter: {
+            profileTypeFieldId: [toGlobalId("ProfileTypeField", profileType3Fields[0].id)],
+          },
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.expiringProfileProperties).toEqual({
+        totalCount: 1,
+        items: [
+          {
+            profile: { id: profile.id },
+            field: { id: toGlobalId("ProfileTypeField", profileType3Fields[0].id) },
+            value: {
+              id: expect.any(String),
+              content: { value: "2024-03-03" },
+              expiresAt: zonedTimeToUtc(
+                format(parseISO("2024-03-03"), "yyyy-MM-dd"),
+                "Europe/Madrid"
+              ),
+            },
+            files: null,
+          },
+        ],
       });
     });
   });
