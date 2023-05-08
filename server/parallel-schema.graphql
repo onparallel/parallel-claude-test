@@ -1742,6 +1742,7 @@ type Mutation {
   """
   startAsyncFieldCompletion(fieldId: GID!, petitionId: GID!): AsyncFieldCompletionResponse!
   startSignatureRequest(message: String, petitionId: GID!): PetitionSignatureRequest!
+  subscribeToProfile(profileId: GID!, userIds: [GID!]!): Profile!
 
   """
   Switches automatic reminders for the specified petition accesses.
@@ -1777,6 +1778,7 @@ type Mutation {
   Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions.
   """
   transferPetitionOwnership(petitionIds: [GID!]!, userId: GID!): [PetitionBase!]!
+  unsubscribeFromProfile(profileId: GID!, userIds: [GID!]!): Profile!
 
   """
   Removes the given tag from the given petition
@@ -4327,6 +4329,7 @@ type Profile implements Timestamps {
   name: String!
   profileType: ProfileType!
   properties: [ProfileFieldProperty!]!
+  subscribers: [ProfileSubscription!]!
 
   """
   Time when the resource was last updated.
@@ -4532,6 +4535,11 @@ type ProfilePagination {
 input ProfilePropertyFilter {
   profileTypeFieldId: [GID!]
   profileTypeId: [GID!]
+}
+
+type ProfileSubscription {
+  id: GID!
+  user: User!
 }
 
 type ProfileType implements Timestamps {

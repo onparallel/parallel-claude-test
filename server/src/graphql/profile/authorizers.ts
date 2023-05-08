@@ -1,5 +1,5 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isDefined } from "remeda";
+import { isDefined, uniq } from "remeda";
 import { ProfileTypeFieldType } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
@@ -164,6 +164,33 @@ export function fileUploadCanBeAttachedToProfileTypeField<
         "MAX_FILES_EXCEEDED"
       );
     }
+    return true;
+  };
+}
+
+export function contextUserCanSubscribeUsersToProfile<
+  TypeName extends string,
+  FieldName extends string,
+  TUserIdsArg extends Arg<TypeName, FieldName, number[]>
+>(userIdsArg: TUserIdsArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const userIds = uniq(args[userIdsArg] as unknown as number[]);
+
+    const users = await ctx.users.loadUser(userIds);
+
+    // every user has to belong to same organization as context user
+    if (users.some((u) => !isDefined(u) || u.org_id !== ctx.user!.org_id)) {
+      return false;
+    }
+
+    // collaborators can only subscribe/unsubscribe themselves
+    if (
+      ctx.user!.organization_role === "COLLABORATOR" &&
+      userIds.some((id) => id !== ctx.user!.id)
+    ) {
+      return false;
+    }
+
     return true;
   };
 }

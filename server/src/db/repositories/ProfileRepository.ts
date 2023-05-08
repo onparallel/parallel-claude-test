@@ -876,4 +876,42 @@ export class ProfileRepository extends BaseRepository {
       }),
     };
   }
+
+  async subscribeUsersToProfile(profileId: number, userIds: number[], createdBy: string) {
+    if (userIds.length === 0) {
+      throw new Error("expected userIds to be non-empty");
+    }
+
+    await this.raw(
+      /* sql */ `
+      ? 
+      ON CONFLICT (profile_id, user_id)
+      WHERE deleted_at is NULL
+      DO NOTHING`,
+      [
+        this.from("profile_subscription").insert(
+          userIds.map((userId) => ({
+            profile_id: profileId,
+            user_id: userId,
+            created_by: createdBy,
+          }))
+        ),
+      ]
+    );
+  }
+
+  async unsubscribeUsersFromProfile(profileId: number, userIds: number[], deletedBy: string) {
+    await this.from("profile_subscription")
+      .where("profile_id", profileId)
+      .whereIn("user_id", userIds)
+      .whereNull("deleted_at")
+      .update({
+        deleted_at: this.now(),
+        deleted_by: deletedBy,
+      });
+  }
+
+  loadProfileSubscribers = this.buildLoadMultipleBy("profile_subscription", "profile_id", (q) =>
+    q.whereNull("deleted_at")
+  );
 }

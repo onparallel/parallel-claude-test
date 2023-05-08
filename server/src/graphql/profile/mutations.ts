@@ -34,6 +34,7 @@ import { validateRegex } from "../helpers/validators/validateRegex";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { contextUserHasRole } from "../users/authorizers";
 import {
+  contextUserCanSubscribeUsersToProfile,
   fileUploadCanBeAttachedToProfileTypeField,
   profileFieldFileHasProfileTypeFieldId,
   profileHasProfileTypeFieldId,
@@ -673,5 +674,41 @@ export const profileFieldFileDownloadLink = mutationField("profileFieldFileDownl
         result: RESULT.FAILURE,
       };
     }
+  },
+});
+
+export const subscribeToProfile = mutationField("subscribeToProfile", {
+  type: "Profile",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfile("profileId"),
+    contextUserCanSubscribeUsersToProfile("userIds")
+  ),
+  args: {
+    profileId: nonNull(globalIdArg("Profile")),
+    userIds: nonNull(list(nonNull(globalIdArg("User")))),
+  },
+  validateArgs: notEmptyArray((args) => args.userIds, "userIds"),
+  resolve: async (_, { profileId, userIds }, ctx) => {
+    await ctx.profiles.subscribeUsersToProfile(profileId, userIds, `User:${ctx.user!.id}`);
+    return (await ctx.profiles.loadProfile(profileId))!;
+  },
+});
+
+export const unsubscribeFromProfile = mutationField("unsubscribeFromProfile", {
+  type: "Profile",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfile("profileId"),
+    contextUserCanSubscribeUsersToProfile("userIds")
+  ),
+  args: {
+    profileId: nonNull(globalIdArg("Profile")),
+    userIds: nonNull(list(nonNull(globalIdArg("User")))),
+  },
+  validateArgs: notEmptyArray((args) => args.userIds, "userIds"),
+  resolve: async (_, { profileId, userIds }, ctx) => {
+    await ctx.profiles.unsubscribeUsersFromProfile(profileId, userIds, `User:${ctx.user!.id}`);
+    return (await ctx.profiles.loadProfile(profileId))!;
   },
 });

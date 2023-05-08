@@ -95,8 +95,28 @@ export const Profile = objectType({
         });
       },
     });
+    t.nonNull.list.nonNull.field("subscribers", {
+      type: "ProfileSubscription",
+      resolve: async (root, _, ctx) => {
+        return await ctx.profiles.loadProfileSubscribers(root.id);
+      },
+    });
     t.implements("Timestamps");
   },
+});
+
+export const ProfileSubscription = objectType({
+  name: "ProfileSubscription",
+  definition(t) {
+    t.globalId("id", { prefixName: "ProfileSubscription" });
+    t.nonNull.field("user", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.users.loadUser(root.user_id))!;
+      },
+    });
+  },
+  sourceType: "db.ProfileSubscription",
 });
 
 export const ProfileFieldResponse = interfaceType({

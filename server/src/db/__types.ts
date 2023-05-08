@@ -440,6 +440,7 @@ export interface TableTypes {
   profile_event: ProfileEvent;
   profile_field_file: ProfileFieldFile;
   profile_field_value: ProfileFieldValue;
+  profile_subscription: ProfileSubscription;
   profile_type: ProfileType;
   profile_type_field: ProfileTypeField;
   public_file_upload: PublicFileUpload;
@@ -496,6 +497,7 @@ export interface TableCreateTypes {
   profile_event: CreateProfileEvent;
   profile_field_file: CreateProfileFieldFile;
   profile_field_value: CreateProfileFieldValue;
+  profile_subscription: CreateProfileSubscription;
   profile_type: CreateProfileType;
   profile_type_field: CreateProfileTypeField;
   public_file_upload: CreatePublicFileUpload;
@@ -552,6 +554,7 @@ export interface TablePrimaryKeys {
   profile_event: "id";
   profile_field_file: "id";
   profile_field_value: "id";
+  profile_subscription: "id";
   profile_type: "id";
   profile_type_field: "id";
   public_file_upload: "id";
@@ -1469,6 +1472,21 @@ export type CreateProfileFieldValue = PartialProps<
   | "anonymized_at"
   | "deleted_at"
   | "deleted_by"
+>;
+
+export interface ProfileSubscription {
+  id: number; // int4
+  profile_id: number; // int4
+  user_id: number; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateProfileSubscription = PartialProps<
+  Omit<ProfileSubscription, "id">,
+  "created_at" | "created_by" | "deleted_at" | "deleted_by"
 >;
 
 export interface ProfileType {

@@ -2,11 +2,11 @@ import { faker } from "@faker-js/faker";
 import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { isDefined, times } from "remeda";
-import { Organization, ProfileType, ProfileTypeField } from "../../db/__types";
+import { Organization, Profile, ProfileType, ProfileTypeField, User } from "../../db/__types";
 import { defaultProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { toGlobalId } from "../../util/globalId";
+import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
 
 type UpdateProfileFieldValueInput = {
@@ -20,6 +20,7 @@ describe("GraphQL/Profiles", () => {
 
   let mocks: Mocks;
   let organization: Organization;
+  let sessionUser: User;
   let profileTypes: ProfileType[] = [];
 
   let profileType0Fields: ProfileTypeField[] = [];
@@ -93,7 +94,7 @@ describe("GraphQL/Profiles", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    ({ organization } = await mocks.createSessionUserAndOrganization("ADMIN"));
+    ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization("ADMIN"));
     await knex
       .from("organization")
       .update({ default_timezone: "Europe/Madrid" })
@@ -113,6 +114,7 @@ describe("GraphQL/Profiles", () => {
     await mocks.knex.from("profile_field_value").delete();
     await mocks.knex.from("profile_type_field").delete();
     await mocks.knex.from("profile_event").delete();
+    await mocks.knex.from("profile_subscription").delete();
     await mocks.knex.from("profile").delete();
     await mocks.knex.from("profile_type").delete();
 
@@ -1739,6 +1741,172 @@ describe("GraphQL/Profiles", () => {
           },
         },
       ]);
+    });
+  });
+
+  describe("deleteProfileFieldFile", () => {
+    it("deletes a file from a profile field", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+      const [file] = await mocks.createRandomFileUpload(1);
+      await mocks.knex.from("profile_field_file").insert({
+        file_upload_id: file.id,
+        profile_id: fromGlobalId(profile.id).id,
+        profile_type_field_id: profileType2Fields[1].id,
+        type: "FILE" as const,
+        created_by_user_id: sessionUser.id,
+      });
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(
+        gql`
+          query ($profileId: GID!) {
+            profile(profileId: $profileId) {
+              properties {
+                files {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+        }
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData.profile).toEqual({
+        properties: [{ files: null }, { files: [{ id: expect.any(String) }] }],
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $profileTypeFieldId: GID!, $profileFieldFileIds: [GID!]!) {
+            deleteProfileFieldFile(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              profileFieldFileIds: $profileFieldFileIds
+            )
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          profileFieldFileIds: [queryData.profile.properties[1].files[0].id],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data.deleteProfileFieldFile).toEqual("SUCCESS");
+    });
+  });
+
+  describe("subscribeToProfile", () => {
+    let profile: Profile;
+    let users: User[];
+    let collaboratorApiKey: string;
+
+    beforeEach(async () => {
+      profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      users = await mocks.createRandomUsers(organization.id, 3, (i) => ({
+        organization_role: i === 0 ? "COLLABORATOR" : "NORMAL",
+      }));
+
+      ({ apiKey: collaboratorApiKey } = await mocks.createUserAuthToken(
+        "collaborator-apikey",
+        users[0].id
+      ));
+    });
+
+    it("subscribes to a profile", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $userIds: [GID!]!) {
+            subscribeToProfile(profileId: $profileId, userIds: $userIds) {
+              id
+              subscribers {
+                user {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        { profileId: profile.id, userIds: users.map((u) => toGlobalId("User", u.id)) }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.subscribeToProfile).toEqual({
+        id: profile.id,
+        subscribers: [
+          { user: { id: toGlobalId("User", users[0].id) } },
+          { user: { id: toGlobalId("User", users[1].id) } },
+          { user: { id: toGlobalId("User", users[2].id) } },
+        ],
+      });
+    });
+
+    it("sends error if collaborator tries to subscribe someone else", async () => {
+      const { errors, data } = await testClient.withApiKey(collaboratorApiKey).execute(
+        gql`
+          mutation ($profileId: GID!, $userIds: [GID!]!) {
+            subscribeToProfile(profileId: $profileId, userIds: $userIds) {
+              id
+              subscribers {
+                user {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          userIds: users.slice(1).map((u) => toGlobalId("User", u.id)),
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("unsubscribeFromProfile", () => {
+    let profile: any;
+    let users: User[];
+
+    beforeEach(async () => {
+      profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      users = await mocks.createRandomUsers(organization.id, 1);
+      await mocks.knex
+        .from("profile_subscription")
+        .insert({ user_id: users[0].id, profile_id: fromGlobalId(profile.id as string).id });
+    });
+
+    it("unsubscribes from a profile", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $userIds: [GID!]!) {
+            unsubscribeFromProfile(profileId: $profileId, userIds: $userIds) {
+              id
+              subscribers {
+                user {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          userIds: [toGlobalId("User", users[0].id)],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.unsubscribeFromProfile).toEqual({
+        id: profile.id,
+        subscribers: [],
+      });
     });
   });
 });
