@@ -1582,6 +1582,30 @@ describe("GraphQL/Profiles", () => {
       expect(query2Errors).toBeUndefined();
       expect(query2Data.profiles).toEqual({ items: [], totalCount: 0 });
     });
+
+    it("fails if profile has replies and force is not passed", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          content: { value: "William" },
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!, $force: Boolean) {
+            deleteProfile(profileIds: $profileIds, force: $force)
+          }
+        `,
+        {
+          profileIds: [profile.id],
+          force: false,
+        }
+      );
+
+      expect(errors).toContainGraphQLError("PROFILE_HAS_REPLIES_ERROR", { count: 1 });
+      expect(data).toBeNull();
+    });
   });
 
   describe("createProfileFieldFileUploadLink", () => {

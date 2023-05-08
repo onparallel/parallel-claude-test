@@ -215,9 +215,9 @@
     "context": "Profile Type"
   },
   {
-    "term": "component.alerts-table-columns.properties",
-    "definition": "Properties",
-    "context": "Properties"
+    "term": "component.alerts-table-columns.property",
+    "definition": "Property",
+    "context": "Property"
   },
   {
     "term": "component.alerts-table-columns.subscribers",
@@ -1245,14 +1245,14 @@
     "context": "New profile"
   },
   {
-    "term": "component.create-profile-dialog.profile-name",
-    "definition": "Profile name",
-    "context": "Profile name"
-  },
-  {
     "term": "component.create-profile-dialog.profile-type",
     "definition": "Profile type",
     "context": "Profile type"
+  },
+  {
+    "term": "component.create-profile-dialog.select-profile-type",
+    "definition": "Select a profile type",
+    "context": "Select a profile type"
   },
   {
     "term": "component.create-profile-type-dialog.edit-profile-type-name",
@@ -2473,11 +2473,6 @@
     "term": "component.more-options-menu-profile.delete-profile",
     "definition": "Delete profile",
     "context": "Delete profile"
-  },
-  {
-    "term": "component.more-options-menu-profile.duplicate-profile",
-    "definition": "Duplicate profile",
-    "context": "Duplicate profile"
   },
   {
     "term": "component.move-to-folder-dialog.currently-in",
@@ -4308,6 +4303,26 @@
     "term": "component.print-pdf-task.header",
     "definition": "Generating PDF file...",
     "context": "Generating PDF file..."
+  },
+  {
+    "term": "component.profile-field-file-upload.invalid-attachment-message.file-too-large",
+    "definition": "Only attachments of up to {size} are allowed.",
+    "context": "Only attachments of up to {size} are allowed."
+  },
+  {
+    "term": "component.profile-field-file-upload.invalid-attachment-message.too-many-files",
+    "definition": "You can upload up to {max} files.",
+    "context": "You can upload up to {max} files."
+  },
+  {
+    "term": "component.profile-file.aria-label",
+    "definition": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete.",
+    "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
+  },
+  {
+    "term": "component.profile-file.remove-attachment",
+    "definition": "Remove attachment",
+    "context": "Remove attachment"
   },
   {
     "term": "component.profile-table-columns.type",
@@ -6430,6 +6445,16 @@
     "context": "The alert will be activated on {date}."
   },
   {
+    "term": "component.use-confirm-delete-profile-dialog.description",
+    "definition": "You are about to delete {profileCount, plural, =1 {this profile} other {the selected profiles}}. Please note that there <b>{count, plural, =1 {is 1 property} other {are # properties}}</b> responded to {profileCount, plural, =1 {on this profile} other {in these profiles}}, and if you proceed, {count, plural, =1 {this reply} other {these replies}} will be permanently deleted.",
+    "context": "You are about to delete {profileCount, plural, =1 {this profile} other {the selected profiles}}. Please note that there <b>{count, plural, =1 {is 1 property} other {are # properties}}</b> responded to {profileCount, plural, =1 {on this profile} other {in these profiles}}, and if you proceed, {count, plural, =1 {this reply} other {these replies}} will be permanently deleted."
+  },
+  {
+    "term": "component.use-confirm-delete-profile-dialog.header",
+    "definition": "Delete {count, plural, =1 {profile} other {# profiles}}",
+    "context": "Delete {count, plural, =1 {profile} other {# profiles}}"
+  },
+  {
     "term": "component.use-create-contact.create-contact",
     "definition": "Create contact",
     "context": "Create contact"
@@ -6518,16 +6543,6 @@
     "term": "component.use-delete-profile-type.want-delete-profile-types",
     "definition": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other {these profile types}}?",
     "context": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other {these profile types}}?"
-  },
-  {
-    "term": "component.use-delete-profile.confirm-profile-header",
-    "definition": "Delete profile",
-    "context": "Delete profile"
-  },
-  {
-    "term": "component.use-delete-profile.properties-in-use",
-    "definition": "You are about to delete this profile. Please note that there <b>{count, plural, =1 {is 1 property} other {are # properties}}</b> responded to on this profile, and if you proceed, {count, plural, =1 {this reply} other {these replies}} will be permanently deleted.",
-    "context": "You are about to delete this profile. Please note that there <b>{count, plural, =1 {is 1 property} other {are # properties}}</b> responded to on this profile, and if you proceed, {count, plural, =1 {this reply} other {these replies}} will be permanently deleted."
   },
   {
     "term": "component.use-delete-tag.confirm-tag-header",
@@ -8220,6 +8235,11 @@
     "context": "Unnamed parallel"
   },
   {
+    "term": "generic.unnamed-profile",
+    "definition": "Unnamed profile",
+    "context": "Unnamed profile"
+  },
+  {
     "term": "generic.unnamed-profile-type",
     "definition": "Unnamed profile type",
     "context": "Unnamed profile type"
@@ -9185,9 +9205,24 @@
     "context": "Request permission to see these properties."
   },
   {
+    "term": "page.profile-details.n-fields-edited",
+    "definition": "{count, plural, =1 {# property} other{# properties}} changed",
+    "context": "{count, plural, =1 {# property} other{# properties}} changed"
+  },
+  {
+    "term": "page.profile-details.saving-changes",
+    "definition": "Saving {count, plural, =1 {# change} other{# changes}}...",
+    "context": "Saving {count, plural, =1 {# change} other{# changes}}..."
+  },
+  {
     "term": "page.profile-details.title",
     "definition": "Profile details",
     "context": "Profile details"
+  },
+  {
+    "term": "page.profiles.all-profile-types",
+    "definition": "All profile types",
+    "context": "All profile types"
   },
   {
     "term": "page.profiles.create-profile",
@@ -9203,6 +9238,11 @@
     "term": "page.profiles.no-results",
     "definition": "There's no profiles matching your criteria",
     "context": "There's no profiles matching your criteria"
+  },
+  {
+    "term": "page.profiles.title",
+    "definition": "Profiles",
+    "context": "Profiles"
   },
   {
     "term": "page.reports-overview.choose-date-range",
@@ -10398,6 +10438,11 @@
     "term": "petitions.title-templates",
     "definition": "Templates",
     "context": "Templates"
+  },
+  {
+    "term": "profilespage.profile-details.max-files-exceeded-error.message",
+    "definition": "You exceeded the maximum amount of files you can upload on the field.",
+    "context": "You exceeded the maximum amount of files you can upload on the field."
   },
   {
     "term": "public-petition-email-exists.body",

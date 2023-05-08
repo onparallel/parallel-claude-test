@@ -138,14 +138,14 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
               />
             )}
           />
-          <FormErrorMessage>
-            {errors.pattern?.type === "invalid_pattern" ? (
+          {errors.pattern?.type === "invalid_pattern" ? (
+            <FormErrorMessage>
               <FormattedMessage
                 id="component.profile-type-settings.add-profile-type-field-to-name-error"
                 defaultMessage="Please add a property to the name"
               />
-            ) : null}
-          </FormErrorMessage>
+            </FormErrorMessage>
+          ) : null}
         </Stack>
         <Box paddingTop={{ base: 2, lg: 0 }} alignSelf={{ base: "end", lg: "start" }}>
           <Button isDisabled={!isDirty} colorScheme="primary" type="submit">

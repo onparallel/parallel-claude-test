@@ -1,0 +1,340 @@
+import { gql, useMutation } from "@apollo/client";
+import { Center, Flex, IconButton, Stack, Text } from "@chakra-ui/react";
+import { CloseIcon } from "@parallel/chakra/icons";
+import { Dropzone } from "@parallel/components/common/Dropzone";
+import { FileIcon } from "@parallel/components/common/FileIcon";
+import { FileName } from "@parallel/components/common/FileName";
+import { FileSize } from "@parallel/components/common/FileSize";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import { ProfileFieldFileUpload_profileFieldFileDownloadLinkDocument } from "@parallel/graphql/__types";
+import { ProfilesFormData } from "@parallel/pages/app/profiles/[profileId]";
+import { openNewWindow } from "@parallel/utils/openNewWindow";
+import { withError } from "@parallel/utils/promises/withError";
+import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
+import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
+import { nanoid } from "nanoid";
+import { useRef } from "react";
+import { Controller, useFormContext } from "react-hook-form";
+import { FormattedMessage, useIntl } from "react-intl";
+import { countBy, isDefined } from "remeda";
+import { ProfileFieldProps } from "./ProfileField";
+
+interface ProfileFieldFileUploadProps extends ProfileFieldProps {}
+
+export type ProfileFieldFileValue = {
+  id: string;
+  type: "ADD" | "DELETE";
+  file?: File;
+};
+
+export function ProfileFieldFileUpload({
+  profileId,
+  field,
+  files,
+  index,
+}: ProfileFieldFileUploadProps) {
+  const MAX_FILE_SIZE = 1024 * 1024 * 100; // 100 MB
+  const { control } = useFormContext<ProfilesFormData>();
+  const intl = useIntl();
+  const [profileFieldFileDownloadLink] = useMutation(
+    ProfileFieldFileUpload_profileFieldFileDownloadLinkDocument
+  );
+
+  const handleDownloadAttachment = async (profileFieldFileId: string, preview?: boolean) => {
+    await withError(
+      openNewWindow(async () => {
+        const { data } = await profileFieldFileDownloadLink({
+          variables: { profileId, profileTypeFieldId: field.id, profileFieldFileId, preview },
+        });
+        const { url } = data!.profileFieldFileDownloadLink;
+        return url!;
+      })
+    );
+  };
+
+  const downloadLocalFile = async (file: File) => {
+    const response = await fetch(URL.createObjectURL(file));
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = file.name;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadLocalFile = async (file: File, preview: boolean) => {
+    if (!preview) {
+      downloadLocalFile(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result;
+        if (result) {
+          const type = file.type;
+          switch (type) {
+            case "image/jpeg":
+            case "image/png":
+            case "image/gif":
+            case "image/webp":
+              const image = new Image();
+              image.src = result.toString();
+              const w = window.open("", "_blank");
+              if (w) {
+                w.document.write(image.outerHTML);
+              }
+              break;
+            default:
+              downloadLocalFile(file);
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const showErrorDialog = useErrorDialog();
+
+  return (
+    <Controller
+      name={`fields.${index}.content.value`}
+      control={control}
+      render={({ field: { onChange, value, ...rest } }) => {
+        return (
+          <Stack>
+            <Flex gap={2} wrap="wrap">
+              {files
+                ?.filter(
+                  (file) =>
+                    !(value as ProfileFieldFileValue[]).find((event) => event.id === file.id)
+                )
+                .map(({ id, file }) => {
+                  if (!isDefined(file)) return null;
+                  const { filename, contentType, size } = file;
+                  return (
+                    <ProfileFile
+                      key={id}
+                      name={filename}
+                      type={contentType}
+                      size={size}
+                      onPreview={(preview) => handleDownloadAttachment(id, preview)}
+                      onRemove={() => onChange([...value, { type: "DELETE", id }])}
+                    />
+                  );
+                })}
+              {(value as ProfileFieldFileValue[]).map(({ id, file }) => {
+                if (!isDefined(file)) return null;
+                return (
+                  <ProfileFile
+                    key={id}
+                    name={file.name}
+                    type={file.type}
+                    size={file.size}
+                    onPreview={(preview) => handleDownloadLocalFile(file, preview)}
+                    onRemove={() => {
+                      onChange([
+                        ...(value as ProfileFieldFileValue[]).filter((event) => !(event.id === id)),
+                      ]);
+                    }}
+                  />
+                );
+              })}
+            </Flex>
+            <Dropzone
+              as={Center}
+              maxSize={MAX_FILE_SIZE}
+              maxFiles={10}
+              disabled={
+                (files ?? []).length +
+                  countBy(value, (v: ProfileFieldFileValue) => v.type === "ADD") -
+                  countBy(value, (v: ProfileFieldFileValue) => v.type === "DELETE") >=
+                10
+              }
+              multiple={true}
+              onDrop={async (acceptedFiles, rejectedFiles) => {
+                if (rejectedFiles.some((f) => f.errors.some((e) => e.code === "file-too-large"))) {
+                  await showErrorDialog({
+                    message: intl.formatMessage(
+                      {
+                        id: "component.profile-field-file-upload.invalid-attachment-message.file-too-large",
+                        defaultMessage: "Only attachments of up to {size} are allowed.",
+                      },
+                      { size: <FileSize value={MAX_FILE_SIZE} /> }
+                    ),
+                  });
+                } else if (
+                  rejectedFiles.some((f) => f.errors.some((e) => e.code === "too-many-files"))
+                ) {
+                  await showErrorDialog({
+                    message: intl.formatMessage(
+                      {
+                        id: "component.profile-field-file-upload.invalid-attachment-message.too-many-files",
+                        defaultMessage: "You can upload up to {max} files.",
+                      },
+                      { max: 10 }
+                    ),
+                  });
+                } else {
+                  onChange([
+                    ...value,
+                    ...acceptedFiles.map((file) => ({ id: nanoid(), type: "ADD", file })),
+                  ]);
+                }
+              }}
+              {...rest}
+            >
+              <Text pointerEvents="none" fontSize="sm">
+                <FormattedMessage
+                  id="generic.dropzone-single.default"
+                  defaultMessage="Drag the file here, or click to select it"
+                />
+              </Text>
+            </Dropzone>
+          </Stack>
+        );
+      }}
+    />
+  );
+}
+
+interface ProfileFileProps {
+  name: string;
+  type: string;
+  size: number;
+  onRemove: () => void;
+  onPreview: (preview: boolean) => void;
+}
+
+function ProfileFile({ name, type, size, onRemove, onPreview }: ProfileFileProps) {
+  const intl = useIntl();
+
+  const nameRef = useRef<HTMLSpanElement>(null);
+  const isMouseOver = useIsMouseOver(nameRef);
+  const isShiftDown = useIsGlobalKeyDown("Shift");
+
+  return (
+    <Flex
+      tabIndex={0}
+      borderRadius="sm"
+      border="1px solid"
+      borderColor="gray.200"
+      paddingX={2}
+      height={8}
+      alignItems="center"
+      color="gray.600"
+      transition="200ms ease"
+      outline="none"
+      _hover={{
+        borderColor: "gray.300",
+        backgroundColor: "white",
+        color: "gray.700",
+      }}
+      _focus={{
+        borderColor: "gray.400",
+        backgroundColor: "white",
+        color: "gray.700",
+        shadow: "outline",
+      }}
+      aria-label={intl.formatMessage(
+        {
+          id: "component.profile-file.aria-label",
+          defaultMessage:
+            "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete.",
+        },
+        { filename: name }
+      )}
+      onKeyDown={(e) => {
+        switch (e.key) {
+          case "Enter":
+            onPreview(isShiftDown ? false : true);
+            break;
+          case "Delete":
+          case "Backspace":
+            onRemove();
+            break;
+        }
+      }}
+    >
+      <FileIcon boxSize="18px" filename={name} contentType={type} hasFailed={false} />
+      <Flex marginX={2}>
+        <FileName
+          ref={nameRef}
+          value={name}
+          fontSize="sm"
+          fontWeight="500"
+          role="button"
+          cursor="pointer"
+          maxWidth="200px"
+          onClick={() => onPreview(isMouseOver && isShiftDown ? false : true)}
+        />
+        <Text as="span" fontSize="sm" color="gray.500" marginLeft={1} whiteSpace="nowrap">
+          (<FileSize value={size} />)
+        </Text>
+      </Flex>
+      <IconButton
+        tabIndex={-1}
+        variant="ghost"
+        aria-label={intl.formatMessage({
+          id: "component.profile-file.remove-attachment",
+          defaultMessage: "Remove attachment",
+        })}
+        _active={{
+          shadow: "none",
+        }}
+        _focus={{
+          shadow: "none",
+        }}
+        icon={<CloseIcon />}
+        boxSize={5}
+        minWidth={0}
+        fontSize="9px"
+        paddingX={0}
+        shadow="none"
+        onClick={onRemove}
+      />
+    </Flex>
+  );
+}
+
+ProfileFieldFileUpload.fragments = {
+  get ProfileFieldFile() {
+    return gql`
+      fragment ProfileFieldFileUpload_ProfileFieldFile on ProfileFieldFile {
+        id
+        file {
+          contentType
+          filename
+          isComplete
+          size
+        }
+      }
+    `;
+  },
+};
+
+const _mutations = [
+  gql`
+    mutation ProfileFieldFileUpload_profileFieldFileDownloadLink(
+      $profileId: GID!
+      $profileTypeFieldId: GID!
+      $profileFieldFileId: GID!
+      $preview: Boolean
+    ) {
+      profileFieldFileDownloadLink(
+        profileId: $profileId
+        profileTypeFieldId: $profileTypeFieldId
+        profileFieldFileId: $profileFieldFileId
+        preview: $preview
+      ) {
+        file {
+          contentType
+          filename
+          isComplete
+          size
+        }
+        result
+        url
+      }
+    }
+  `,
+];

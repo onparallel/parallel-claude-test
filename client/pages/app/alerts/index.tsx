@@ -274,8 +274,8 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
       {
         key: "property",
         header: intl.formatMessage({
-          id: "component.alerts-table-columns.properties",
-          defaultMessage: "Properties",
+          id: "component.alerts-table-columns.property",
+          defaultMessage: "Property",
         }),
         cellProps: {
           width: "20%",

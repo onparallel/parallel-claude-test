@@ -1420,6 +1420,7 @@ export interface ProfileFieldFile {
   id: number; // int4
   profile_id: number; // int4
   profile_type_field_id: number; // int4
+  type: ProfileTypeFieldType; // profile_type_field_type
   file_upload_id: number; // int4
   expires_at: Maybe<Date>; // timestamptz
   created_at: Date; // timestamptz
@@ -1446,6 +1447,7 @@ export interface ProfileFieldValue {
   id: number; // int4
   profile_id: number; // int4
   profile_type_field_id: number; // int4
+  type: ProfileTypeFieldType; // profile_type_field_type
   content: any; // jsonb
   expires_at: Maybe<Date>; // timestamptz
   created_by_user_id: number; // int4

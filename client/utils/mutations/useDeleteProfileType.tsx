@@ -14,7 +14,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 export function useDeleteProfileType() {
   const [deleteProfileType] = useMutation(useDeleteProfileType_deleteProfileTypeDocument);
-
   const [getProfile] = useLazyQuery(useDeleteProfileType_profilesDocument, {
     fetchPolicy: "network-only",
   });

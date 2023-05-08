@@ -238,6 +238,7 @@ export interface NexusGenInputs {
   };
   ProfileFilter: {
     // input type
+    profileId?: NexusGenScalars["GID"][] | null; // [GID!]
     profileTypeId?: NexusGenScalars["GID"][] | null; // [GID!]
   };
   ProfilePropertyFilter: {
@@ -1466,6 +1467,7 @@ export interface NexusGenFieldTypes {
     deletePetitionReply: NexusGenRootTypes["PetitionField"]; // PetitionField!
     deletePetitions: NexusGenEnums["Success"]; // Success!
     deleteProfile: NexusGenEnums["Success"]; // Success!
+    deleteProfileFieldFile: NexusGenEnums["Result"]; // Result!
     deleteProfileType: NexusGenEnums["Success"]; // Success!
     deleteProfileTypeField: NexusGenRootTypes["ProfileType"]; // ProfileType!
     deleteSignatureIntegration: NexusGenEnums["Result"]; // Result!
@@ -1489,6 +1491,7 @@ export interface NexusGenFieldTypes {
     petitionAttachmentUploadComplete: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
     petitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionFieldAttachmentUploadComplete: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
+    profileFieldFileDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     profileFieldFileUploadComplete: NexusGenRootTypes["ProfileFieldFile"][]; // [ProfileFieldFile!]!
     publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
@@ -3446,6 +3449,7 @@ export interface NexusGenFieldTypeNames {
     deletePetitionReply: "PetitionField";
     deletePetitions: "Success";
     deleteProfile: "Success";
+    deleteProfileFieldFile: "Result";
     deleteProfileType: "Success";
     deleteProfileTypeField: "ProfileType";
     deleteSignatureIntegration: "Result";
@@ -3469,6 +3473,7 @@ export interface NexusGenFieldTypeNames {
     petitionAttachmentUploadComplete: "PetitionAttachment";
     petitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionFieldAttachmentUploadComplete: "PetitionFieldAttachment";
+    profileFieldFileDownloadLink: "FileUploadDownloadLinkResult";
     profileFieldFileUploadComplete: "ProfileFieldFile";
     publicCheckVerificationCode: "VerificationCodeCheck";
     publicCompletePetition: "PublicPetition";
@@ -5375,7 +5380,14 @@ export interface NexusGenArgTypes {
     };
     deleteProfile: {
       // args
+      force?: boolean | null; // Boolean
       profileIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    deleteProfileFieldFile: {
+      // args
+      profileFieldFileIds: NexusGenScalars["GID"][]; // [GID!]!
+      profileId: NexusGenScalars["GID"]; // GID!
+      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
     };
     deleteProfileType: {
       // args
@@ -5500,6 +5512,13 @@ export interface NexusGenArgTypes {
       attachmentId: NexusGenScalars["GID"]; // GID!
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    profileFieldFileDownloadLink: {
+      // args
+      preview?: boolean | null; // Boolean
+      profileFieldFileId: NexusGenScalars["GID"]; // GID!
+      profileId: NexusGenScalars["GID"]; // GID!
+      profileTypeFieldId: NexusGenScalars["GID"]; // GID!
     };
     profileFieldFileUploadComplete: {
       // args

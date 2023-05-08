@@ -665,17 +665,6 @@ function useProfileTypeFieldsActions({
         />
       ),
     },
-    // {
-    //   key: "visibility",
-    //   onClick: onConfigureVisibilityClick,
-    //   leftIcon: <EyeIcon />,
-    //   children: (
-    //     <FormattedMessage
-    //       id="component.draggable-list.configure-visiblity"
-    //       defaultMessage="Configure visibility"
-    //     />
-    //   ),
-    // },
     {
       key: "delete",
       onClick: onDeleteClick,

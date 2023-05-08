@@ -11,7 +11,7 @@ export const PhoneInputLazy = withDynamicLoadingProps((useLoadingProps) =>
       const { defaultCountry: _, inputRef, ...props } = useLoadingProps();
       return (
         <InputGroup>
-          <InputLeftElement pointerEvents="none">
+          <InputLeftElement pointerEvents="none" color={props.value ? undefined : "gray.400"}>
             <FieldPhoneIcon />
           </InputLeftElement>
           <Input ref={inputRef} type="tel" {...props} />

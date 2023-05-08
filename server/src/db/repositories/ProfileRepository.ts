@@ -15,6 +15,7 @@ import {
   ProfileFieldFile,
   ProfileFieldValue,
   ProfileType,
+  ProfileTypeFieldType,
   UserLocale,
 } from "../__types";
 import {
@@ -429,11 +430,30 @@ export class ProfileRepository extends BaseRepository {
     (q) => q.whereNull("removed_at").whereNull("deleted_at")
   );
 
+  readonly loadProfileFieldFilesByProfileTypeFieldId = this.buildLoadMultipleBy(
+    "profile_field_file",
+    "profile_type_field_id",
+    (q) => q.whereNull("removed_at").whereNull("deleted_at")
+  );
+
+  async deleteProfileFieldFiles(profileFieldFileId: MaybeArray<number>, userId: number) {
+    const ids = unMaybeArray(profileFieldFileId);
+    if (ids.length === 0) {
+      return;
+    }
+
+    await this.from("profile_field_file").whereIn("id", ids).update({
+      removed_at: this.now(),
+      removed_by_user_id: userId,
+    });
+  }
+
   getPaginatedProfileForOrg(
     orgId: number,
     opts: {
       search?: string | null;
       filter?: {
+        profileId?: number[] | null;
         profileTypeId?: number[] | null;
       } | null;
       sortBy?: SortBy<"created_at" | "name">[];
@@ -447,6 +467,9 @@ export class ProfileRepository extends BaseRepository {
           const { search, sortBy, filter } = opts;
           if (search) {
             q.whereEscapedILike("name", `%${escapeLike(search, "\\")}%`);
+          }
+          if (isDefined(filter?.profileId)) {
+            q.whereIn("id", filter!.profileId);
           }
           if (isDefined(filter?.profileTypeId)) {
             q.whereIn("profile_type_id", filter!.profileTypeId);
@@ -509,14 +532,25 @@ export class ProfileRepository extends BaseRepository {
       await this.raw(
         /* sql */ `
         with profile_values as (
-          select p.id, jsonb_object_agg(pfv.profile_type_field_id, pfv.content->>'value') as values
+          select 
+            p.id, 
+            jsonb_object_agg(
+              pfv.profile_type_field_id, 
+              case when pfv.removed_at is null 
+                then pfv.content->>'value'
+                else ''
+              end) as values
           from "profile" p
           join profile_field_value pfv on pfv.profile_id = p.id
           where pfv.profile_type_field_id in ?
-            and p.deleted_at is null and pfv.removed_at is null and pfv.deleted_at is null
+            and p.deleted_at is null and pfv.deleted_at is null
           group by p.id
         ) update "profile" p set
-          "name" =  trim(both from concat(${times(pattern.length, () => "?::text").join(",")})),
+          "name" = substring(
+            trim(both from concat(${times(pattern.length, () => "?::text").join(",")})),
+            1,
+            255
+          ),
           updated_by = ?,
           updated_at = NOW()
         from profile_values pv
@@ -555,6 +589,7 @@ export class ProfileRepository extends BaseRepository {
     profileId: number,
     fields: {
       profileTypeFieldId: number;
+      type: ProfileTypeFieldType;
       content?: Record<string, any> | null;
       expiresAt?: Date | null;
     }[],
@@ -573,21 +608,24 @@ export class ProfileRepository extends BaseRepository {
         .update({ removed_at: this.now(), removed_by_user_id: userId })
         .returning("*");
       const previousByPtfId = indexBy(previousValues, (v) => v.profile_type_field_id);
-      const currentValues = await this.insert(
-        "profile_field_value",
-        fields
-          .filter((f) => isDefined(f.content))
-          .map((f) => ({
-            profile_id: profileId,
-            profile_type_field_id: f.profileTypeFieldId,
-            content: f.content,
-            created_by_user_id: userId,
-            ...(f.expiresAt !== undefined
-              ? { expires_at: f.expiresAt }
-              : { expires_at: previousByPtfId[f.profileTypeFieldId]?.expires_at ?? null }),
-          })),
-        t
-      );
+      const fieldsWithContent = fields.filter((f) => isDefined(f.content));
+      const currentValues =
+        fieldsWithContent.length > 0
+          ? await this.insert(
+              "profile_field_value",
+              fieldsWithContent.map((f) => ({
+                profile_id: profileId,
+                profile_type_field_id: f.profileTypeFieldId,
+                type: f.type,
+                content: f.content,
+                created_by_user_id: userId,
+                ...(f.expiresAt !== undefined
+                  ? { expires_at: f.expiresAt }
+                  : { expires_at: previousByPtfId[f.profileTypeFieldId]?.expires_at ?? null }),
+              })),
+              t
+            )
+          : [];
       this.loadProfileFieldValuesByProfileId.dataloader.clear(profileId);
       const currentByPtfId = indexBy(currentValues, (v) => v.profile_type_field_id);
       await this.createEvent(
@@ -633,37 +671,15 @@ export class ProfileRepository extends BaseRepository {
       );
       const pattern = profileType.profile_name_pattern as (string | number)[];
       if (fields.some((f) => pattern.includes(f.profileTypeFieldId))) {
-        const [profile] = await this.raw<Profile>(
-          /* sql */ `
-          with profile_values as (
-            select p.id, jsonb_object_agg(pfv.profile_type_field_id, pfv.content->>'value') as values
-            from "profile" p
-            join profile_field_value pfv on pfv.profile_id = p.id
-            where pfv.profile_id = ? and pfv.profile_type_field_id in ?
-              and p.deleted_at is null and pfv.removed_at is null and pfv.deleted_at is null
-            group by p.id
-          ) update "profile" p set
-            "name" =  trim(both from concat(${times(pattern.length, () => "?::text").join(",")})),
-            updated_by = ?,
-            updated_at = NOW()
-          from profile_values pv
-          where pv.id = p.id
-          returning p.*
-        `,
-          [
-            profileId,
-            this.sqlIn(pattern.filter((p) => typeof p === "number")),
-            ...pattern.map((p) =>
-              typeof p === "string" ? p : this.knex.raw(`coalesce(pv.values->>?, '')`, [`${p}`])
-            ),
-            `User:${userId}`,
-          ],
+        await this.updateProfileTypeProfileNamePattern(
+          profileType.id,
+          pattern,
+          `User:${userId}`,
           t
         );
-        return profile;
-      } else {
-        return await this.loadProfile.raw(profileId, t);
       }
+
+      return await this.loadProfile.raw(profileId, t);
     });
   }
 
@@ -696,6 +712,7 @@ export class ProfileRepository extends BaseRepository {
         fileUploadIds.map((fileUploadId) => ({
           profile_id: profileId,
           profile_type_field_id: profileTypeFieldId,
+          type: "FILE" as const,
           file_upload_id: fileUploadId,
           expires_at: previousFiles[0]?.expires_at ?? null,
           created_by_user_id: userId,

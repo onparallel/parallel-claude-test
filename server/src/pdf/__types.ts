@@ -685,6 +685,7 @@ export type Mutation = {
   /** Delete petitions and folders. */
   deletePetitions: Success;
   deleteProfile: Success;
+  deleteProfileFieldFile: Result;
   deleteProfileType: Success;
   deleteProfileTypeField: ProfileType;
   /** Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests */
@@ -728,6 +729,8 @@ export type Mutation = {
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
+  /** Generates a download link for a profile field file */
+  profileFieldFileDownloadLink: FileUploadDownloadLinkResult;
   profileFieldFileUploadComplete: Array<ProfileFieldFile>;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
@@ -1274,7 +1277,14 @@ export type MutationdeletePetitionsArgs = {
 };
 
 export type MutationdeleteProfileArgs = {
+  force?: InputMaybe<Scalars["Boolean"]>;
   profileIds: Array<Scalars["GID"]>;
+};
+
+export type MutationdeleteProfileFieldFileArgs = {
+  profileFieldFileIds: Array<Scalars["GID"]>;
+  profileId: Scalars["GID"];
+  profileTypeFieldId: Scalars["GID"];
 };
 
 export type MutationdeleteProfileTypeArgs = {
@@ -1399,6 +1409,13 @@ export type MutationpetitionFieldAttachmentUploadCompleteArgs = {
   attachmentId: Scalars["GID"];
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+};
+
+export type MutationprofileFieldFileDownloadLinkArgs = {
+  preview?: InputMaybe<Scalars["Boolean"]>;
+  profileFieldFileId: Scalars["GID"];
+  profileId: Scalars["GID"];
+  profileTypeFieldId: Scalars["GID"];
 };
 
 export type MutationprofileFieldFileUploadCompleteArgs = {
@@ -3382,6 +3399,7 @@ export type ProfileFieldValueUpdatedEvent = ProfileEvent & {
 };
 
 export type ProfileFilter = {
+  profileId?: InputMaybe<Array<Scalars["GID"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]>>;
 };
 

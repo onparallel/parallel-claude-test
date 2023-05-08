@@ -13,7 +13,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { ChevronDownIcon, RepeatIcon } from "@parallel/chakra/icons";
+import { ChevronDownIcon, DeleteIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -34,6 +34,7 @@ import {
   Profiles_ProfileFragment,
   Profiles_profilesDocument,
   Profiles_profileTypesDocument,
+  Profiles_updateProfileFieldValueDocument,
   Profiles_userDocument,
   UserLocale,
 } from "@parallel/graphql/__types";
@@ -41,6 +42,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { useDeleteProfile } from "@parallel/utils/mutations/useDeleteProfile";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import {
   integer,
@@ -56,6 +58,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { ChangeEvent, MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 
 const SORTING = ["name", "createdAt"] as const;
 
@@ -67,6 +70,7 @@ const QUERY_STATE = {
     field: "createdAt",
     direction: "ASC",
   }),
+  profileType: string(),
 };
 type ProfilesQueryState = QueryStateFrom<typeof QUERY_STATE>;
 
@@ -83,6 +87,9 @@ function Profiles() {
       limit: queryState.items,
       search: queryState.search,
       sortBy: [`${queryState.sort.field}_${queryState.sort.direction}` as const],
+      filter: {
+        profileTypeId: queryState.profileType ? [queryState.profileType] : undefined,
+      },
     },
     fetchPolicy: "cache-and-network",
   });
@@ -99,22 +106,40 @@ function Profiles() {
   const profiles = data?.profiles;
   const profileTypes = _profileTypesData?.profileTypes;
 
-  const { onChangeSelectedIds } = useSelection(profiles?.items, "id");
+  const { selectedIds, onChangeSelectedIds } = useSelection(profiles?.items, "id");
 
   const columns = useProfileTableColumns();
 
-  const [profileType, setProfileType] = useState<string>("All the profiles");
-
   const [createProfile] = useMutation(Profiles_createProfileDocument);
+  const [updateProfileFieldValue] = useMutation(Profiles_updateProfileFieldValueDocument);
   const showCreateProfileDialog = useCreateProfileDialog();
   const handleCreateProfile = async () => {
     try {
-      const { profileTypeId } = await showCreateProfileDialog();
-      // console.log("new profile data: ", data);
-      await createProfile({
+      const { profileTypeId, fieldValues } = await showCreateProfileDialog();
+      const { data } = await createProfile({
         variables: {
           profileTypeId,
         },
+      });
+
+      if (isDefined(data)) {
+        await updateProfileFieldValue({
+          variables: {
+            profileId: data!.createProfile.id,
+            fields: fieldValues,
+          },
+        });
+      }
+
+      refetch();
+    } catch {}
+  };
+
+  const deleteProfile = useDeleteProfile();
+  const handleDeleteClick = async () => {
+    try {
+      await deleteProfile({
+        profileIds: selectedIds,
       });
       refetch();
     } catch {}
@@ -127,8 +152,20 @@ function Profiles() {
 
   const context = useMemo(() => ({ user: me! }), [me]);
 
+  const profileType = queryState.profileType
+    ? profileTypes?.items.find((pt) => pt.id === queryState.profileType) ?? null
+    : null;
+
+  const actions = useProfileListActions({
+    onDeleteClick: handleDeleteClick,
+  });
+
   return (
-    <AppLayout title={"Profiles"} me={me} realMe={realMe}>
+    <AppLayout
+      title={intl.formatMessage({ id: "page.profiles.title", defaultMessage: "Profiles" })}
+      me={me}
+      realMe={realMe}
+    >
       <Stack minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
         <Flex alignItems="center">
           <Box minWidth="0" width="fit-content">
@@ -143,28 +180,38 @@ function Profiles() {
                 data-testid="profile-type-menu-button"
                 rightIcon={<ChevronDownIcon boxSize={5} />}
               >
-                {profileType}
+                {isDefined(profileType)
+                  ? localizableUserTextRender({ intl, value: profileType.name, default: "" })
+                  : intl.formatMessage({
+                      id: "page.profiles.all-profile-types",
+                      defaultMessage: "All profile types",
+                    })}
               </MenuButton>
               <Portal>
                 <MenuList minWidth="154px">
-                  <MenuOptionGroup value={profileType}>
+                  <MenuOptionGroup value={queryState.profileType ?? ""}>
                     <MenuItemOption
-                      value={"All the profiles"}
-                      onClick={() => setProfileType("All the profiles")}
+                      value=""
+                      onClick={() => setQueryState((s) => ({ ...s, profileType: null }))}
                       data-testid="profile-type-all"
                     >
-                      {"All the profiles"}
+                      <FormattedMessage
+                        id="page.profiles.all-profile-types"
+                        defaultMessage="All profile types"
+                      />
                     </MenuItemOption>
-                    {profileTypes?.items.map(({ id, name }) => {
+                    {profileTypes?.items.map((profileType) => {
                       return (
                         <MenuItemOption
-                          key={id}
-                          value={id}
-                          onClick={() => setProfileType(id)}
-                          data-testid={`profile-type-${id}`}
+                          key={profileType.id}
+                          value={profileType.id}
+                          onClick={() =>
+                            setQueryState((s) => ({ ...s, profileType: profileType.id }))
+                          }
+                          data-testid={`profile-type-${profileType.id}`}
                         >
                           <LocalizableUserTextRender
-                            value={name}
+                            value={profileType.name}
                             default={intl.formatMessage({
                               id: "generic.unamed-profile-type",
                               defaultMessage: "Unnamed profile type",
@@ -205,6 +252,7 @@ function Profiles() {
               setQueryState((s) => ({ ...s, items: items as any, page: 1 }))
             }
             onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
+            actions={actions}
             header={
               <ProfilesListHeader
                 shape={QUERY_STATE}
@@ -241,6 +289,18 @@ function Profiles() {
       </Stack>
     </AppLayout>
   );
+}
+
+function useProfileListActions({ onDeleteClick }: { onDeleteClick: () => void }) {
+  return [
+    {
+      key: "delete",
+      onClick: onDeleteClick,
+      leftIcon: <DeleteIcon />,
+      children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
+      colorScheme: "red",
+    },
+  ];
 }
 
 interface ProfilesListHeaderProps {
@@ -305,22 +365,29 @@ function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[] {
           defaultMessage: "Name",
         }),
         cellProps: {
-          width: "43%",
+          width: "40%",
           minWidth: "240px",
         },
         CellContent: ({ row }) => {
-          return <Text as="span">{row.name}</Text>;
+          return (
+            <Text as="span" textStyle={row.name ? undefined : "hint"}>
+              {row.name ||
+                intl.formatMessage({
+                  id: "generic.unnamed-profile",
+                  defaultMessage: "Unnamed profile",
+                })}
+            </Text>
+          );
         },
       },
       {
         key: "type",
-        isSortable: true,
         header: intl.formatMessage({
           id: "component.profile-table-columns.type",
           defaultMessage: "Type",
         }),
         cellProps: {
-          width: "42%",
+          width: "40%",
           minWidth: "240px",
         },
         CellContent: ({
@@ -349,6 +416,10 @@ function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[] {
           id: "generic.created-at",
           defaultMessage: "Created at",
         }),
+        cellProps: {
+          width: "20%",
+          minWidth: "160px",
+        },
         CellContent: ({ row: { createdAt } }) => (
           <DateTime value={createdAt} format={FORMATS.LLL} whiteSpace="nowrap" />
         ),
@@ -426,8 +497,9 @@ const _queries = [
       $limit: Int
       $search: String
       $sortBy: [QueryProfiles_OrderBy!]
+      $filter: ProfileFilter
     ) {
-      profiles(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy) {
+      profiles(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filter: $filter) {
         ...Profiles_ProfilePagination
       }
     }
@@ -439,6 +511,17 @@ const _mutations = [
   gql`
     mutation Profiles_createProfile($profileTypeId: GID!) {
       createProfile(profileTypeId: $profileTypeId) {
+        ...Profiles_Profile
+      }
+    }
+    ${_fragments.Profile}
+  `,
+  gql`
+    mutation Profiles_updateProfileFieldValue(
+      $profileId: GID!
+      $fields: [UpdateProfileFieldValueInput!]!
+    ) {
+      updateProfileFieldValue(profileId: $profileId, fields: $fields) {
         ...Profiles_Profile
       }
     }

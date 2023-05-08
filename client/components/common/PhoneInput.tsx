@@ -123,7 +123,7 @@ const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInpu
 
   return (
     <InputGroup>
-      <InputLeftElement pointerEvents="none">
+      <InputLeftElement pointerEvents="none" color={inputValue ? undefined : "gray.400"}>
         {country ? (
           <Image
             alt={countries?.[country]}

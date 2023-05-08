@@ -1,37 +1,41 @@
+import { parseISO } from "date-fns";
 import { format, zonedTimeToUtc } from "date-fns-tz";
-import { arg, inputObjectType, list, mutationField, nonNull, stringArg } from "nexus";
+import { arg, booleanArg, inputObjectType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
 import { DatabaseError } from "pg";
 import { indexBy, isDefined, zip } from "remeda";
-import {
-  defaultProfileTypeFieldOptions,
-  validateProfileTypeFieldOptions,
-} from "../../db/helpers/profileTypeFieldOptions";
 import {
   CreateProfileType,
   CreateProfileTypeField,
   ProfileFieldFile,
   ProfileTypeField,
 } from "../../db/__types";
+import {
+  defaultProfileTypeFieldOptions,
+  validateProfileTypeFieldOptions,
+} from "../../db/helpers/profileTypeFieldOptions";
 import { toBytes } from "../../util/fileSize";
 import { fromGlobalId } from "../../util/globalId";
 import { parseTextWithPlaceholders } from "../../util/textWithPlaceholders";
 import { random } from "../../util/token";
+import { RESULT } from "../helpers/Result";
+import { SUCCESS } from "../helpers/Success";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { datetimeArg } from "../helpers/scalars/DateTime";
-import { SUCCESS } from "../helpers/Success";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../helpers/validators/notEmptyObject";
-import { validateRegex } from "../helpers/validators/validateRegex";
 import { validFileUploadInput } from "../helpers/validators/validFileUploadInput";
 import { validLocalizableUserText } from "../helpers/validators/validLocalizableUserText";
+import { validateRegex } from "../helpers/validators/validateRegex";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { contextUserHasRole } from "../users/authorizers";
 import {
+  fileUploadCanBeAttachedToProfileTypeField,
+  profileFieldFileHasProfileTypeFieldId,
   profileHasProfileTypeFieldId,
   profileTypeFieldBelongsToProfileType,
   profileTypeFieldIsOfType,
@@ -39,11 +43,10 @@ import {
   userHasAccessToProfileType,
 } from "./authorizers";
 import {
-  validateProfileFieldValue,
   validProfileNamePattern,
   validProfileTypeFieldOptions,
+  validateProfileFieldValue,
 } from "./validators";
-import { parseISO } from "date-fns";
 
 export const createProfileType = mutationField("createProfileType", {
   type: "ProfileType",
@@ -374,8 +377,18 @@ export const deleteProfile = mutationField("deleteProfile", {
   ),
   args: {
     profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
+    force: booleanArg({ description: "pass force=true to delete profiles with replies" }),
   },
-  resolve: async (_, { profileIds }, ctx) => {
+  resolve: async (_, { profileIds, force }, ctx) => {
+    const values = (await ctx.profiles.loadProfileFieldValuesByProfileId(profileIds)).flat();
+    const files = (await ctx.profiles.loadProfileFieldFilesByProfileId(profileIds)).flat();
+
+    if (values.length + files.length > 0 && !force) {
+      throw new ApolloError(`Profile has replies`, "PROFILE_HAS_REPLIES_ERROR", {
+        count: values.length + files.length,
+      });
+    }
+
     await ctx.profiles.deleteProfile(profileIds, `User:${ctx.user!.id}`);
     return SUCCESS;
   },
@@ -461,6 +474,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
 
       return {
         ...field,
+        type: profileTypeField.type,
         expiresAt: field.expiresAt
           ? // priorize expiresAt argument if set
             zonedTimeToUtc(format(field.expiresAt, "yyyy-MM-dd"), organization!.default_timezone)
@@ -490,7 +504,8 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfile("profileId"),
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
-    profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"])
+    profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"]),
+    fileUploadCanBeAttachedToProfileTypeField("profileId", "profileTypeFieldId", "data")
   ),
   args: {
     profileId: nonNull(globalIdArg("Profile")),
@@ -531,6 +546,7 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
       ctx.user!.id
     );
 
+    ctx.profiles.loadProfileFieldFiles.dataloader.clear({ profileId, profileTypeFieldId });
     return {
       property: { profile_id: profileId, profile_type_field_id: profileTypeFieldId },
       uploads: zip(presignedPostDatas, files).map(([presignedPostData, file]) => ({
@@ -582,5 +598,80 @@ export const profileFieldFileUploadComplete = mutationField("profileFieldFileUpl
       ctx.files.loadFileUpload.dataloader.clear(fu!.id);
     }
     return profileFieldFiles as ProfileFieldFile[];
+  },
+});
+
+export const deleteProfileFieldFile = mutationField("deleteProfileFieldFile", {
+  type: "Result",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfile("profileId"),
+    profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
+    profileFieldFileHasProfileTypeFieldId("profileFieldFileIds", "profileTypeFieldId"),
+    profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"])
+  ),
+  args: {
+    profileId: nonNull(globalIdArg("Profile")),
+    profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
+    profileFieldFileIds: nonNull(list(nonNull(globalIdArg("ProfileFieldFile")))),
+  },
+  resolve: async (_, { profileFieldFileIds }, ctx) => {
+    try {
+      await ctx.profiles.deleteProfileFieldFiles(profileFieldFileIds, ctx.user!.id);
+      return RESULT.SUCCESS;
+    } catch {
+      return RESULT.FAILURE;
+    }
+  },
+});
+
+export const profileFieldFileDownloadLink = mutationField("profileFieldFileDownloadLink", {
+  type: "FileUploadDownloadLinkResult",
+  description: "Generates a download link for a profile field file",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToProfile("profileId"),
+    profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
+    profileFieldFileHasProfileTypeFieldId("profileFieldFileId", "profileTypeFieldId"),
+    profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"])
+  ),
+  args: {
+    profileId: nonNull(globalIdArg("Profile")),
+    profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
+    profileFieldFileId: nonNull(globalIdArg("ProfileFieldFile")),
+    preview: booleanArg({
+      description: "If true will use content-disposition inline instead of attachment",
+    }),
+  },
+  resolve: async (_, args, ctx) => {
+    try {
+      const profileFieldFile = (await ctx.profiles.loadProfileFieldFileById(
+        args.profileFieldFileId
+      ))!;
+
+      const file = await ctx.files.loadFileUpload(profileFieldFile.file_upload_id);
+      if (!file) {
+        throw new Error(`FileUpload:${profileFieldFile.file_upload_id} not found`);
+      }
+      if (!file.upload_complete) {
+        await ctx.storage.fileUploads.getFileMetadata(file!.path);
+        await ctx.files.markFileUploadComplete(file.id, `User:${ctx.user!.id}`);
+      }
+      return {
+        result: RESULT.SUCCESS,
+        file: file.upload_complete
+          ? file
+          : await ctx.files.loadFileUpload(file.id, { refresh: true }),
+        url: await ctx.storage.fileUploads.getSignedDownloadEndpoint(
+          file!.path,
+          file!.filename,
+          args.preview ? "inline" : "attachment"
+        ),
+      };
+    } catch {
+      return {
+        result: RESULT.FAILURE,
+      };
+    }
   },
 });

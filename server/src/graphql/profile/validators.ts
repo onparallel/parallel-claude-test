@@ -61,19 +61,23 @@ export function validProfileTypeFieldOptions<
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
 
-const STRING_VALUE_SCHEMA = {
-  type: "object",
-  properties: {
-    value: { type: "string" },
-  },
-  additionalProperties: false,
-} as const;
+const stringValueSchema = (maxLength?: number) =>
+  ({
+    type: "object",
+    properties: {
+      value: { type: "string", maxLength },
+    },
+    additionalProperties: false,
+  } as const);
+
+const MAX_SHORT_TEXT_SIZE = 1_000;
+const MAX_TEXT_SIZE = 10_000;
 
 export function validateProfileFieldValue(field: TableTypes["profile_type_field"], content: any) {
   const ajv = new Ajv();
   switch (field.type) {
     case "SHORT_TEXT": {
-      const valid = ajv.validate(STRING_VALUE_SCHEMA, content);
+      const valid = ajv.validate(stringValueSchema(MAX_SHORT_TEXT_SIZE), content);
       if (!valid) {
         throw new Error(ajv.errorsText());
       }
@@ -83,14 +87,15 @@ export function validateProfileFieldValue(field: TableTypes["profile_type_field"
       return;
     }
     case "TEXT": {
-      const valid = ajv.validate(STRING_VALUE_SCHEMA, content);
+      const valid = ajv.validate(stringValueSchema(MAX_TEXT_SIZE), content);
       if (!valid) {
         throw new Error(ajv.errorsText());
       }
+
       return;
     }
     case "DATE": {
-      const valid = ajv.validate(STRING_VALUE_SCHEMA, content);
+      const valid = ajv.validate(stringValueSchema(), content);
       if (!valid) {
         throw new Error(ajv.errorsText());
       }
@@ -100,7 +105,7 @@ export function validateProfileFieldValue(field: TableTypes["profile_type_field"
       return;
     }
     case "PHONE": {
-      const valid = ajv.validate(STRING_VALUE_SCHEMA, content);
+      const valid = ajv.validate(stringValueSchema(), content);
       if (!valid) {
         throw new Error(ajv.errorsText());
       }

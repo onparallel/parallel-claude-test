@@ -107,10 +107,11 @@ function CreateOrUpdateProfileTypeFieldDialog({
   const selectedType = watch("type");
 
   useEffect(() => {
-    if (selectedType !== "DATE") {
-      setValue("options.useReplyAsExpiryDate", undefined);
-    }
-  }, [selectedType]);
+    setValue(
+      "options.useReplyAsExpiryDate",
+      selectedType !== "DATE" ? undefined : options?.useReplyAsExpiryDate ?? true
+    );
+  }, [selectedType, options]);
 
   const profileTypeFieldTypes = useProfileTypeFieldTypes();
 

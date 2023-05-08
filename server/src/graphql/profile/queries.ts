@@ -75,6 +75,7 @@ export const profiles = queryField((t) => {
         name: "ProfileFilter",
         definition(t) {
           t.nullable.list.nonNull.globalId("profileTypeId", { prefixName: "ProfileType" });
+          t.nullable.list.nonNull.globalId("profileId", { prefixName: "Profile" });
         },
       }),
     },

@@ -730,6 +730,7 @@ export interface Mutation {
   /** Delete petitions and folders. */
   deletePetitions: Success;
   deleteProfile: Success;
+  deleteProfileFieldFile: Result;
   deleteProfileType: Success;
   deleteProfileTypeField: ProfileType;
   /** Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests */
@@ -773,6 +774,8 @@ export interface Mutation {
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
+  /** Generates a download link for a profile field file */
+  profileFieldFileDownloadLink: FileUploadDownloadLinkResult;
   profileFieldFileUploadComplete: Array<ProfileFieldFile>;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
@@ -1319,7 +1322,14 @@ export interface MutationdeletePetitionsArgs {
 }
 
 export interface MutationdeleteProfileArgs {
+  force?: InputMaybe<Scalars["Boolean"]>;
   profileIds: Array<Scalars["GID"]>;
+}
+
+export interface MutationdeleteProfileFieldFileArgs {
+  profileFieldFileIds: Array<Scalars["GID"]>;
+  profileId: Scalars["GID"];
+  profileTypeFieldId: Scalars["GID"];
 }
 
 export interface MutationdeleteProfileTypeArgs {
@@ -1444,6 +1454,13 @@ export interface MutationpetitionFieldAttachmentUploadCompleteArgs {
   attachmentId: Scalars["GID"];
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+}
+
+export interface MutationprofileFieldFileDownloadLinkArgs {
+  preview?: InputMaybe<Scalars["Boolean"]>;
+  profileFieldFileId: Scalars["GID"];
+  profileId: Scalars["GID"];
+  profileTypeFieldId: Scalars["GID"];
 }
 
 export interface MutationprofileFieldFileUploadCompleteArgs {
@@ -3497,6 +3514,7 @@ export interface ProfileFieldValueUpdatedEvent extends ProfileEvent {
 }
 
 export interface ProfileFilter {
+  profileId?: InputMaybe<Array<Scalars["GID"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]>>;
 }
 
@@ -14262,6 +14280,13 @@ export type useCreateProfileDialog_ProfileTypeFragment = {
   id: string;
   name: { [locale in UserLocale]?: string };
   createdAt: string;
+  fields: Array<{
+    __typename?: "ProfileTypeField";
+    id: string;
+    type: ProfileTypeFieldType;
+    name: { [locale in UserLocale]?: string };
+    isUsedInProfileName: boolean;
+  }>;
 };
 
 export type useCreateProfileDialog_ProfileTypePaginationFragment = {
@@ -14272,6 +14297,13 @@ export type useCreateProfileDialog_ProfileTypePaginationFragment = {
     id: string;
     name: { [locale in UserLocale]?: string };
     createdAt: string;
+    fields: Array<{
+      __typename?: "ProfileTypeField";
+      id: string;
+      type: ProfileTypeFieldType;
+      name: { [locale in UserLocale]?: string };
+      isUsedInProfileName: boolean;
+    }>;
   }>;
 };
 
@@ -14290,7 +14322,73 @@ export type useCreateProfileDialog_profileTypesQuery = {
       id: string;
       name: { [locale in UserLocale]?: string };
       createdAt: string;
+      fields: Array<{
+        __typename?: "ProfileTypeField";
+        id: string;
+        type: ProfileTypeFieldType;
+        name: { [locale in UserLocale]?: string };
+        isUsedInProfileName: boolean;
+      }>;
     }>;
+  };
+};
+
+export type ProfileField_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  name: { [locale in UserLocale]?: string };
+  type: ProfileTypeFieldType;
+};
+
+export type ProfileField_ProfileFieldValueFragment = {
+  __typename?: "ProfileFieldValue";
+  id: string;
+  content?: { [key: string]: any } | null;
+};
+
+export type ProfileField_ProfileFieldFileFragment = {
+  __typename?: "ProfileFieldFile";
+  id: string;
+  file?: {
+    __typename?: "FileUpload";
+    contentType: string;
+    filename: string;
+    isComplete: boolean;
+    size: number;
+  } | null;
+};
+
+export type ProfileFieldFileUpload_ProfileFieldFileFragment = {
+  __typename?: "ProfileFieldFile";
+  id: string;
+  file?: {
+    __typename?: "FileUpload";
+    contentType: string;
+    filename: string;
+    isComplete: boolean;
+    size: number;
+  } | null;
+};
+
+export type ProfileFieldFileUpload_profileFieldFileDownloadLinkMutationVariables = Exact<{
+  profileId: Scalars["GID"];
+  profileTypeFieldId: Scalars["GID"];
+  profileFieldFileId: Scalars["GID"];
+  preview?: InputMaybe<Scalars["Boolean"]>;
+}>;
+
+export type ProfileFieldFileUpload_profileFieldFileDownloadLinkMutation = {
+  profileFieldFileDownloadLink: {
+    __typename?: "FileUploadDownloadLinkResult";
+    result: Result;
+    url?: string | null;
+    file?: {
+      __typename?: "FileUpload";
+      contentType: string;
+      filename: string;
+      isComplete: boolean;
+      size: number;
+    } | null;
   };
 };
 
@@ -26123,8 +26221,8 @@ export type ProfileDetail_ProfileFieldFileFragment = {
   id: string;
   file?: {
     __typename?: "FileUpload";
-    filename: string;
     contentType: string;
+    filename: string;
     isComplete: boolean;
     size: number;
   } | null;
@@ -26135,7 +26233,6 @@ export type ProfileDetail_ProfileFieldValueFragment = {
   id: string;
   content?: { [key: string]: any } | null;
   createdAt: string;
-  field: { __typename?: "ProfileTypeField"; id: string };
 };
 
 export type ProfileDetail_ProfileFieldPropertyFragment = {
@@ -26153,8 +26250,8 @@ export type ProfileDetail_ProfileFieldPropertyFragment = {
     id: string;
     file?: {
       __typename?: "FileUpload";
-      filename: string;
       contentType: string;
+      filename: string;
       isComplete: boolean;
       size: number;
     } | null;
@@ -26164,7 +26261,6 @@ export type ProfileDetail_ProfileFieldPropertyFragment = {
     id: string;
     content?: { [key: string]: any } | null;
     createdAt: string;
-    field: { __typename?: "ProfileTypeField"; id: string };
   } | null;
 };
 
@@ -26194,8 +26290,8 @@ export type ProfileDetail_ProfileFragment = {
       id: string;
       file?: {
         __typename?: "FileUpload";
-        filename: string;
         contentType: string;
+        filename: string;
         isComplete: boolean;
         size: number;
       } | null;
@@ -26205,7 +26301,6 @@ export type ProfileDetail_ProfileFragment = {
       id: string;
       content?: { [key: string]: any } | null;
       createdAt: string;
-      field: { __typename?: "ProfileTypeField"; id: string };
     } | null;
   }>;
 };
@@ -26213,6 +26308,11 @@ export type ProfileDetail_ProfileFragment = {
 export type ProfileDetail_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ProfileDetail_userQuery = {
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    country?: string | null;
+    browserName?: string | null;
+  };
   me: {
     __typename?: "User";
     id: string;
@@ -26282,8 +26382,8 @@ export type ProfileDetail_profileQuery = {
         id: string;
         file?: {
           __typename?: "FileUpload";
-          filename: string;
           contentType: string;
+          filename: string;
           isComplete: boolean;
           size: number;
         } | null;
@@ -26293,11 +26393,146 @@ export type ProfileDetail_profileQuery = {
         id: string;
         content?: { [key: string]: any } | null;
         createdAt: string;
-        field: { __typename?: "ProfileTypeField"; id: string };
       } | null;
     }>;
   };
 };
+
+export type ProfileDetail_updateProfileFieldValueMutationVariables = Exact<{
+  profileId: Scalars["GID"];
+  fields: Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput;
+}>;
+
+export type ProfileDetail_updateProfileFieldValueMutation = {
+  updateProfileFieldValue: {
+    __typename?: "Profile";
+    id: string;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+    profileType: {
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+    };
+    properties: Array<{
+      __typename?: "ProfileFieldProperty";
+      field: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        position: number;
+        type: ProfileTypeFieldType;
+        myPermission: ProfileTypeFieldPermission;
+      };
+      files?: Array<{
+        __typename?: "ProfileFieldFile";
+        id: string;
+        file?: {
+          __typename?: "FileUpload";
+          contentType: string;
+          filename: string;
+          isComplete: boolean;
+          size: number;
+        } | null;
+      }> | null;
+      value?: {
+        __typename?: "ProfileFieldValue";
+        id: string;
+        content?: { [key: string]: any } | null;
+        createdAt: string;
+      } | null;
+    }>;
+  };
+};
+
+export type ProfileDetail_createProfileFieldFileUploadLinkMutationVariables = Exact<{
+  profileId: Scalars["GID"];
+  profileTypeFieldId: Scalars["GID"];
+  data: Array<FileUploadInput> | FileUploadInput;
+  expiresAt?: InputMaybe<Scalars["DateTime"]>;
+}>;
+
+export type ProfileDetail_createProfileFieldFileUploadLinkMutation = {
+  createProfileFieldFileUploadLink: {
+    __typename?: "ProfileFieldPropertyAndFileWithUploadData";
+    uploads: Array<{
+      __typename?: "ProfileFieldFileWithUploadData";
+      presignedPostData: {
+        __typename?: "AWSPresignedPostData";
+        url: string;
+        fields: { [key: string]: any };
+      };
+      file: {
+        __typename?: "ProfileFieldFile";
+        id: string;
+        file?: {
+          __typename?: "FileUpload";
+          contentType: string;
+          filename: string;
+          isComplete: boolean;
+          size: number;
+        } | null;
+      };
+    }>;
+    property: {
+      __typename?: "ProfileFieldProperty";
+      field: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        position: number;
+        type: ProfileTypeFieldType;
+        myPermission: ProfileTypeFieldPermission;
+      };
+      files?: Array<{
+        __typename?: "ProfileFieldFile";
+        id: string;
+        file?: {
+          __typename?: "FileUpload";
+          contentType: string;
+          filename: string;
+          isComplete: boolean;
+          size: number;
+        } | null;
+      }> | null;
+      value?: {
+        __typename?: "ProfileFieldValue";
+        id: string;
+        content?: { [key: string]: any } | null;
+        createdAt: string;
+      } | null;
+    };
+  };
+};
+
+export type ProfileDetail_profileFieldFileUploadCompleteMutationVariables = Exact<{
+  profileId: Scalars["GID"];
+  profileTypeFieldId: Scalars["GID"];
+  profileFieldFileIds: Array<Scalars["GID"]> | Scalars["GID"];
+}>;
+
+export type ProfileDetail_profileFieldFileUploadCompleteMutation = {
+  profileFieldFileUploadComplete: Array<{
+    __typename?: "ProfileFieldFile";
+    id: string;
+    file?: {
+      __typename?: "FileUpload";
+      contentType: string;
+      filename: string;
+      isComplete: boolean;
+      size: number;
+    } | null;
+  }>;
+};
+
+export type ProfileDetail_deleteProfileFieldFileMutationVariables = Exact<{
+  profileId: Scalars["GID"];
+  profileTypeFieldId: Scalars["GID"];
+  profileFieldFileIds: Array<Scalars["GID"]> | Scalars["GID"];
+}>;
+
+export type ProfileDetail_deleteProfileFieldFileMutation = { deleteProfileFieldFile: Result };
 
 export type Profiles_ProfileTypeFragment = {
   __typename?: "ProfileType";
@@ -26410,6 +26645,7 @@ export type Profiles_profilesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars["Int"]>;
   search?: InputMaybe<Scalars["String"]>;
   sortBy?: InputMaybe<Array<QueryProfiles_OrderBy> | QueryProfiles_OrderBy>;
+  filter?: InputMaybe<ProfileFilter>;
 }>;
 
 export type Profiles_profilesQuery = {
@@ -26436,6 +26672,25 @@ export type Profiles_createProfileMutationVariables = Exact<{
 
 export type Profiles_createProfileMutation = {
   createProfile: {
+    __typename?: "Profile";
+    id: string;
+    name: string;
+    createdAt: string;
+    profileType: {
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+    };
+  };
+};
+
+export type Profiles_updateProfileFieldValueMutationVariables = Exact<{
+  profileId: Scalars["GID"];
+  fields: Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput;
+}>;
+
+export type Profiles_updateProfileFieldValueMutation = {
+  updateProfileFieldValue: {
     __typename?: "Profile";
     id: string;
     name: string;
@@ -28549,6 +28804,13 @@ export type useDeletePetitions_deletePetitionsMutationVariables = Exact<{
 
 export type useDeletePetitions_deletePetitionsMutation = { deletePetitions: Success };
 
+export type useDeleteProfile_deleteProfileMutationVariables = Exact<{
+  profileIds: Array<Scalars["GID"]> | Scalars["GID"];
+  force?: InputMaybe<Scalars["Boolean"]>;
+}>;
+
+export type useDeleteProfile_deleteProfileMutation = { deleteProfile: Success };
+
 export type useDeleteProfileType_ProfileTypeFragment = {
   __typename?: "ProfileType";
   id: string;
@@ -30466,6 +30728,12 @@ export const useCreateProfileDialog_ProfileTypeFragmentDoc = gql`
     id
     name
     createdAt
+    fields {
+      id
+      type
+      name
+      isUsedInProfileName
+    }
   }
 ` as unknown as DocumentNode<useCreateProfileDialog_ProfileTypeFragment, unknown>;
 export const useCreateProfileDialog_ProfileTypePaginationFragmentDoc = gql`
@@ -34036,6 +34304,13 @@ export const NewPetition_PetitionBaseOrFolderFragmentDoc = gql`
   ${PublicTemplateCard_PetitionTemplateFragmentDoc}
   ${FolderCard_PetitionFolderFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_PetitionBaseOrFolderFragment, unknown>;
+export const ProfileField_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileField_ProfileTypeField on ProfileTypeField {
+    id
+    name
+    type
+  }
+` as unknown as DocumentNode<ProfileField_ProfileTypeFieldFragment, unknown>;
 export const ProfileDetail_ProfileTypeFieldFragmentDoc = gql`
   fragment ProfileDetail_ProfileTypeField on ProfileTypeField {
     id
@@ -34043,28 +34318,48 @@ export const ProfileDetail_ProfileTypeFieldFragmentDoc = gql`
     position
     type
     myPermission
+    ...ProfileField_ProfileTypeField
   }
+  ${ProfileField_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<ProfileDetail_ProfileTypeFieldFragment, unknown>;
-export const ProfileDetail_ProfileFieldFileFragmentDoc = gql`
-  fragment ProfileDetail_ProfileFieldFile on ProfileFieldFile {
+export const ProfileFieldFileUpload_ProfileFieldFileFragmentDoc = gql`
+  fragment ProfileFieldFileUpload_ProfileFieldFile on ProfileFieldFile {
     id
     file {
-      filename
       contentType
+      filename
       isComplete
       size
     }
   }
+` as unknown as DocumentNode<ProfileFieldFileUpload_ProfileFieldFileFragment, unknown>;
+export const ProfileField_ProfileFieldFileFragmentDoc = gql`
+  fragment ProfileField_ProfileFieldFile on ProfileFieldFile {
+    ...ProfileFieldFileUpload_ProfileFieldFile
+  }
+  ${ProfileFieldFileUpload_ProfileFieldFileFragmentDoc}
+` as unknown as DocumentNode<ProfileField_ProfileFieldFileFragment, unknown>;
+export const ProfileDetail_ProfileFieldFileFragmentDoc = gql`
+  fragment ProfileDetail_ProfileFieldFile on ProfileFieldFile {
+    id
+    ...ProfileField_ProfileFieldFile
+  }
+  ${ProfileField_ProfileFieldFileFragmentDoc}
 ` as unknown as DocumentNode<ProfileDetail_ProfileFieldFileFragment, unknown>;
+export const ProfileField_ProfileFieldValueFragmentDoc = gql`
+  fragment ProfileField_ProfileFieldValue on ProfileFieldValue {
+    id
+    content
+  }
+` as unknown as DocumentNode<ProfileField_ProfileFieldValueFragment, unknown>;
 export const ProfileDetail_ProfileFieldValueFragmentDoc = gql`
   fragment ProfileDetail_ProfileFieldValue on ProfileFieldValue {
     id
-    field {
-      id
-    }
     content
     createdAt
+    ...ProfileField_ProfileFieldValue
   }
+  ${ProfileField_ProfileFieldValueFragmentDoc}
 ` as unknown as DocumentNode<ProfileDetail_ProfileFieldValueFragment, unknown>;
 export const ProfileDetail_ProfileFieldPropertyFragmentDoc = gql`
   fragment ProfileDetail_ProfileFieldProperty on ProfileFieldProperty {
@@ -36326,6 +36621,33 @@ export const useCreateProfileDialog_profileTypesDocument = gql`
   useCreateProfileDialog_profileTypesQuery,
   useCreateProfileDialog_profileTypesQueryVariables
 >;
+export const ProfileFieldFileUpload_profileFieldFileDownloadLinkDocument = gql`
+  mutation ProfileFieldFileUpload_profileFieldFileDownloadLink(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $profileFieldFileId: GID!
+    $preview: Boolean
+  ) {
+    profileFieldFileDownloadLink(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      profileFieldFileId: $profileFieldFileId
+      preview: $preview
+    ) {
+      file {
+        contentType
+        filename
+        isComplete
+        size
+      }
+      result
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  ProfileFieldFileUpload_profileFieldFileDownloadLinkMutation,
+  ProfileFieldFileUpload_profileFieldFileDownloadLinkMutationVariables
+>;
 export const PublicSignupForm_emailIsAvailableDocument = gql`
   query PublicSignupForm_emailIsAvailable($email: String!) {
     emailIsAvailable(email: $email)
@@ -38560,6 +38882,10 @@ export const NewPetition_templateDocument = gql`
 export const ProfileDetail_userDocument = gql`
   query ProfileDetail_user {
     ...AppLayout_Query
+    metadata {
+      country
+      browserName
+    }
   }
   ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<ProfileDetail_userQuery, ProfileDetail_userQueryVariables>;
@@ -38571,6 +38897,89 @@ export const ProfileDetail_profileDocument = gql`
   }
   ${ProfileDetail_ProfileFragmentDoc}
 ` as unknown as DocumentNode<ProfileDetail_profileQuery, ProfileDetail_profileQueryVariables>;
+export const ProfileDetail_updateProfileFieldValueDocument = gql`
+  mutation ProfileDetail_updateProfileFieldValue(
+    $profileId: GID!
+    $fields: [UpdateProfileFieldValueInput!]!
+  ) {
+    updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+      ...ProfileDetail_Profile
+    }
+  }
+  ${ProfileDetail_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  ProfileDetail_updateProfileFieldValueMutation,
+  ProfileDetail_updateProfileFieldValueMutationVariables
+>;
+export const ProfileDetail_createProfileFieldFileUploadLinkDocument = gql`
+  mutation ProfileDetail_createProfileFieldFileUploadLink(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $data: [FileUploadInput!]!
+    $expiresAt: DateTime
+  ) {
+    createProfileFieldFileUploadLink(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      data: $data
+      expiresAt: $expiresAt
+    ) {
+      uploads {
+        presignedPostData {
+          ...uploadFile_AWSPresignedPostData
+        }
+        file {
+          ...ProfileDetail_ProfileFieldFile
+        }
+      }
+      property {
+        ...ProfileDetail_ProfileFieldProperty
+      }
+    }
+  }
+  ${uploadFile_AWSPresignedPostDataFragmentDoc}
+  ${ProfileDetail_ProfileFieldFileFragmentDoc}
+  ${ProfileDetail_ProfileFieldPropertyFragmentDoc}
+` as unknown as DocumentNode<
+  ProfileDetail_createProfileFieldFileUploadLinkMutation,
+  ProfileDetail_createProfileFieldFileUploadLinkMutationVariables
+>;
+export const ProfileDetail_profileFieldFileUploadCompleteDocument = gql`
+  mutation ProfileDetail_profileFieldFileUploadComplete(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $profileFieldFileIds: [GID!]!
+  ) {
+    profileFieldFileUploadComplete(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      profileFieldFileIds: $profileFieldFileIds
+    ) {
+      id
+      ...ProfileDetail_ProfileFieldFile
+    }
+  }
+  ${ProfileDetail_ProfileFieldFileFragmentDoc}
+` as unknown as DocumentNode<
+  ProfileDetail_profileFieldFileUploadCompleteMutation,
+  ProfileDetail_profileFieldFileUploadCompleteMutationVariables
+>;
+export const ProfileDetail_deleteProfileFieldFileDocument = gql`
+  mutation ProfileDetail_deleteProfileFieldFile(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $profileFieldFileIds: [GID!]!
+  ) {
+    deleteProfileFieldFile(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      profileFieldFileIds: $profileFieldFileIds
+    )
+  }
+` as unknown as DocumentNode<
+  ProfileDetail_deleteProfileFieldFileMutation,
+  ProfileDetail_deleteProfileFieldFileMutationVariables
+>;
 export const Profiles_userDocument = gql`
   query Profiles_user {
     ...AppLayout_Query
@@ -38591,8 +39000,9 @@ export const Profiles_profilesDocument = gql`
     $limit: Int
     $search: String
     $sortBy: [QueryProfiles_OrderBy!]
+    $filter: ProfileFilter
   ) {
-    profiles(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy) {
+    profiles(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filter: $filter) {
       ...Profiles_ProfilePagination
     }
   }
@@ -38608,6 +39018,20 @@ export const Profiles_createProfileDocument = gql`
 ` as unknown as DocumentNode<
   Profiles_createProfileMutation,
   Profiles_createProfileMutationVariables
+>;
+export const Profiles_updateProfileFieldValueDocument = gql`
+  mutation Profiles_updateProfileFieldValue(
+    $profileId: GID!
+    $fields: [UpdateProfileFieldValueInput!]!
+  ) {
+    updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+      ...Profiles_Profile
+    }
+  }
+  ${Profiles_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  Profiles_updateProfileFieldValueMutation,
+  Profiles_updateProfileFieldValueMutationVariables
 >;
 export const Reports_userDocument = gql`
   query Reports_user {
@@ -39266,6 +39690,14 @@ export const useDeletePetitions_deletePetitionsDocument = gql`
 ` as unknown as DocumentNode<
   useDeletePetitions_deletePetitionsMutation,
   useDeletePetitions_deletePetitionsMutationVariables
+>;
+export const useDeleteProfile_deleteProfileDocument = gql`
+  mutation useDeleteProfile_deleteProfile($profileIds: [GID!]!, $force: Boolean) {
+    deleteProfile(profileIds: $profileIds, force: $force)
+  }
+` as unknown as DocumentNode<
+  useDeleteProfile_deleteProfileMutation,
+  useDeleteProfile_deleteProfileMutationVariables
 >;
 export const useDeleteProfileType_profilesDocument = gql`
   query useDeleteProfileType_profiles($filter: ProfileFilter) {

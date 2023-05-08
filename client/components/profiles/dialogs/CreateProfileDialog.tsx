@@ -1,32 +1,27 @@
 import { gql, useQuery } from "@apollo/client";
 import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
-import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { UserLocale, useCreateProfileDialog_profileTypesDocument } from "@parallel/graphql/__types";
-import { isNotEmptyText } from "@parallel/utils/strings";
-import { Controller, useForm } from "react-hook-form";
+import {
+  LocalizableUserTextRender,
+  localizableUserTextRender,
+} from "@parallel/components/common/LocalizableUserTextRender";
+import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
+import {
+  UpdateProfileFieldValueInput,
+  useCreateProfileDialog_profileTypesDocument,
+  UserLocale,
+} from "@parallel/graphql/__types";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 
 interface CreateProfileDialogResult {
   profileTypeId: string;
-  name: string;
+  fieldValues: UpdateProfileFieldValueInput[];
 }
 
 function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogResult>) {
   const intl = useIntl();
-  const {
-    control,
-    register,
-    formState: { errors },
-    handleSubmit,
-  } = useForm<{ profileTypeId: string | null; name: string }>({
-    defaultValues: {
-      profileTypeId: null,
-      name: "",
-    },
-  });
 
   const { data } = useQuery(useCreateProfileDialog_profileTypesDocument, {
     variables: {
@@ -39,6 +34,24 @@ function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogRe
 
   const profileTypes = data?.profileTypes.items ?? [];
 
+  const {
+    control,
+    formState: { errors },
+    reset,
+    register,
+    watch,
+    handleSubmit,
+  } = useForm<CreateProfileDialogResult>({
+    defaultValues: {
+      profileTypeId: "",
+      fieldValues: [],
+    },
+  });
+
+  const { fields } = useFieldArray({ name: "fieldValues", control });
+  const profileTypeId = watch("profileTypeId");
+  const profileType = profileTypes.find((pt) => pt.id === profileTypeId);
+
   return (
     <ConfirmDialog
       {...props}
@@ -46,8 +59,8 @@ function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogRe
       size="md"
       content={{
         as: "form",
-        onSubmit: handleSubmit(({ name, profileTypeId }) => {
-          props.onResolve({ name, profileTypeId: profileTypeId! });
+        onSubmit: handleSubmit(({ profileTypeId, fieldValues }) => {
+          props.onResolve({ profileTypeId: profileTypeId!, fieldValues });
         }),
       }}
       header={
@@ -71,7 +84,7 @@ function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogRe
               rules={{
                 required: true,
               }}
-              render={({ field: { value, onChange } }) => (
+              render={({ field: { value } }) => (
                 <SimpleSelect
                   value={value}
                   options={profileTypes.map((profileType) => ({
@@ -85,7 +98,20 @@ function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogRe
                       }),
                     }),
                   }))}
-                  onChange={onChange}
+                  placeholder={intl.formatMessage({
+                    id: "component.create-profile-dialog.select-profile-type",
+                    defaultMessage: "Select a profile type",
+                  })}
+                  onChange={(id) => {
+                    const profileType = profileTypes.find((pt) => pt.id === id);
+                    reset({
+                      profileTypeId: id!,
+                      fieldValues:
+                        profileType?.fields
+                          .filter((f) => f.isUsedInProfileName)
+                          .map((pt) => ({ profileTypeFieldId: pt.id, content: undefined })) ?? [],
+                    });
+                  }}
                 />
               )}
             />
@@ -96,21 +122,19 @@ function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogRe
               />
             </FormErrorMessage>
           </FormControl>
-          <FormControl isInvalid={!!errors.name}>
-            <FormLabel fontWeight={400}>
-              <FormattedMessage
-                id="component.create-profile-dialog.profile-name"
-                defaultMessage="Profile name"
-              />
-            </FormLabel>
-            <Input {...register("name", { required: true, validate: { isNotEmptyText } })} />
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.field-required-error"
-                defaultMessage="This field is required"
-              />
-            </FormErrorMessage>
-          </FormControl>
+          {profileType?.fields
+            .filter((f) => f.isUsedInProfileName)
+            .map(({ id, name }) => {
+              const index = fields.findIndex((f) => f.profileTypeFieldId === id)!;
+              return (
+                <FormControl key={fields[index].id}>
+                  <FormLabel fontWeight={400}>
+                    <LocalizableUserTextRender value={name} default="" />
+                  </FormLabel>
+                  <Input {...register(`fieldValues.${index}.content.value`)} />
+                </FormControl>
+              );
+            })}
         </Stack>
       }
       confirm={
@@ -133,6 +157,12 @@ const _fragments = {
         id
         name
         createdAt
+        fields {
+          id
+          type
+          name
+          isUsedInProfileName
+        }
       }
     `;
   },

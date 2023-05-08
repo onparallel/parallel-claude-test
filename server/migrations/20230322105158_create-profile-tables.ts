@@ -70,6 +70,7 @@ export async function up(knex: Knex): Promise<void> {
     t.increments("id");
     t.integer("profile_id").notNullable().references("profile.id");
     t.integer("profile_type_field_id").notNullable().references("profile_type_field.id");
+    t.specificType("type", "profile_type_field_type").notNullable();
     t.jsonb("content").notNullable().defaultTo(knex.raw("'{}'::jsonb"));
     t.timestamp("expires_at").nullable().defaultTo(null);
 
@@ -107,6 +108,7 @@ export async function up(knex: Knex): Promise<void> {
     t.increments("id");
     t.integer("profile_id").notNullable().references("profile.id");
     t.integer("profile_type_field_id").notNullable().references("profile_type_field.id");
+    t.specificType("type", "profile_type_field_type").notNullable();
     t.integer("file_upload_id").notNullable().references("file_upload.id");
     t.timestamp("expires_at").nullable().defaultTo(null);
 

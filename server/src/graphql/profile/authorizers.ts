@@ -3,7 +3,9 @@ import { isDefined } from "remeda";
 import { ProfileTypeFieldType } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
+import { NexusGenInputs } from "../__types";
 import { Arg } from "../helpers/authorize";
+import { ApolloError } from "../helpers/errors";
 
 export function userHasAccessToProfileType<
   TypeName extends string,
@@ -67,9 +69,33 @@ export function profileHasProfileTypeFieldId<
       return (
         isDefined(profile) &&
         profileTypeFields.every(
-          (p) => isDefined(p) && p.profile_type_id === profile!.profile_type_id
+          (p) => isDefined(p) && p.profile_type_id === profile.profile_type_id
         )
       );
+    } catch {
+      return false;
+    }
+  };
+}
+
+export function profileFieldFileHasProfileTypeFieldId<
+  TypeName extends string,
+  FieldName extends string,
+  TProfileFieldFileId extends Arg<TypeName, FieldName, MaybeArray<number>>,
+  TProfileTypeFieldId extends Arg<TypeName, FieldName, number>
+>(
+  profileFieldFileIdArg: TProfileFieldFileId,
+  profileTypeFieldIdArg: TProfileTypeFieldId
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const profileFieldFileIds = unMaybeArray(
+        args[profileFieldFileIdArg] as unknown as MaybeArray<number>
+      );
+      const profileTypeFieldId = args[profileTypeFieldIdArg] as unknown as number;
+      const profileFieldFiles = await ctx.profiles.loadProfileFieldFileById(profileFieldFileIds);
+
+      return profileFieldFiles.every((pff) => pff?.profile_type_field_id === profileTypeFieldId);
     } catch {
       return false;
     }
@@ -82,7 +108,7 @@ export function profileTypeFieldIsOfType<
   TProfileTypeFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(
   profileTypeFieldIdArg: TProfileTypeFieldId,
-  types: ProfileTypeFieldType[] | ((type: ProfileTypeFieldType) => boolean)
+  types: ProfileTypeFieldType[]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -90,11 +116,8 @@ export function profileTypeFieldIsOfType<
         args[profileTypeFieldIdArg] as unknown as MaybeArray<number>
       );
       const profileTypeFields = await ctx.profiles.loadProfileTypeField(profileTypeFieldIds);
-      const predicate = Array.isArray(types)
-        ? (type: ProfileTypeFieldType) => types.includes(type)
-        : types;
 
-      return profileTypeFields.every((p) => isDefined(p) && predicate(p.type));
+      return profileTypeFields.every((p) => isDefined(p) && types.includes(p.type));
     } catch {
       return false;
     }
@@ -115,5 +138,32 @@ export function userHasAccessToProfile<
     } catch {
       return false;
     }
+  };
+}
+
+export function fileUploadCanBeAttachedToProfileTypeField<
+  TypeName extends string,
+  FieldName extends string,
+  TProfileId extends Arg<TypeName, FieldName, number>,
+  TProfileTypeFieldId extends Arg<TypeName, FieldName, number>,
+  TData extends Arg<TypeName, FieldName, NexusGenInputs["FileUploadInput"][]>
+>(
+  profileIdArg: TProfileId,
+  profileTypeFieldIdArg: TProfileTypeFieldId,
+  dataArg: TData
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const profileId = args[profileIdArg] as unknown as number;
+    const profileTypeFieldId = args[profileTypeFieldIdArg] as unknown as number;
+    const data = args[dataArg] as unknown as NexusGenInputs["FileUploadInput"][];
+    const files = await ctx.profiles.loadProfileFieldFiles({ profileId, profileTypeFieldId });
+
+    if ((files ?? []).length + data.length > 10) {
+      throw new ApolloError(
+        "You cannot upload more than 10 files on the same profile field",
+        "MAX_FILES_EXCEEDED"
+      );
+    }
+    return true;
   };
 }

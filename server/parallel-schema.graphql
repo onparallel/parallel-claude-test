@@ -1137,7 +1137,18 @@ type Mutation {
     force: Boolean = false
     ids: [GID!]
   ): Success!
-  deleteProfile(profileIds: [GID!]!): Success!
+  deleteProfile(
+    """
+    pass force=true to delete profiles with replies
+    """
+    force: Boolean
+    profileIds: [GID!]!
+  ): Success!
+  deleteProfileFieldFile(
+    profileFieldFileIds: [GID!]!
+    profileId: GID!
+    profileTypeFieldId: GID!
+  ): Result!
   deleteProfileType(profileTypeIds: [GID!]!): Success!
   deleteProfileTypeField(profileTypeFieldIds: [GID!]!, profileTypeId: GID!): ProfileType!
 
@@ -1324,6 +1335,19 @@ type Mutation {
     fieldId: GID!
     petitionId: GID!
   ): PetitionFieldAttachment!
+
+  """
+  Generates a download link for a profile field file
+  """
+  profileFieldFileDownloadLink(
+    """
+    If true will use content-disposition inline instead of attachment
+    """
+    preview: Boolean
+    profileFieldFileId: GID!
+    profileId: GID!
+    profileTypeFieldId: GID!
+  ): FileUploadDownloadLinkResult!
   profileFieldFileUploadComplete(
     profileFieldFileIds: [GID!]!
     profileId: GID!
@@ -4489,6 +4513,7 @@ type ProfileFieldValueUpdatedEvent implements ProfileEvent {
 }
 
 input ProfileFilter {
+  profileId: [GID!]
   profileTypeId: [GID!]
 }
 
