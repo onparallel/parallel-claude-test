@@ -3,7 +3,8 @@ import { parseISO } from "date-fns";
 import { format, zonedTimeToUtc } from "date-fns-tz";
 import { gql } from "graphql-request";
 import { Knex } from "knex";
-import { isDefined, times } from "remeda";
+import { outdent } from "outdent";
+import { isDefined, range, times } from "remeda";
 import { Organization, Profile, ProfileType, ProfileTypeField, User } from "../../db/__types";
 import { defaultProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import { KNEX } from "../../db/knex";
@@ -166,7 +167,7 @@ describe("GraphQL/Profiles", () => {
           },
           {
             name: json({ en: "Email", es: "Correo electrónico" }),
-            type: "SHORT_TEXT" as const,
+            type: "TEXT" as const,
             alias: "EMAIL",
             options: {},
           },
@@ -1581,6 +1582,298 @@ describe("GraphQL/Profiles", () => {
         ])
       ).rejects.toContainGraphQLError("EXPIRY_ON_NONEXISTING_VALUE");
     });
+
+    it("fails if trying to exceed max chars for SHORT_TEXT value", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              name
+              properties {
+                field {
+                  id
+                  isExpirable
+                }
+                value {
+                  content
+                  expiresAt
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+              content: { value: "x".repeat(1001) },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
+      expect(data).toBeNull();
+    });
+
+    it("fails if trying to pass invalid content to SHORT_TEXT value", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              name
+              properties {
+                field {
+                  id
+                  isExpirable
+                }
+                value {
+                  content
+                  expiresAt
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+              content: { value: 123456 },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
+      expect(data).toBeNull();
+    });
+
+    it("fails if trying to pass multiline content to SHORT_TEXT value", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              name
+              properties {
+                field {
+                  id
+                  isExpirable
+                }
+                value {
+                  content
+                  expiresAt
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+              content: {
+                value: outdent`
+                hello!
+                goodbye.`,
+              },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
+      expect(data).toBeNull();
+    });
+
+    it("fails if trying to exceed max chars for TEXT value", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              name
+              properties {
+                field {
+                  id
+                  isExpirable
+                }
+                value {
+                  content
+                  expiresAt
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[4].id),
+              content: { value: "x".repeat(10_001) },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
+      expect(data).toBeNull();
+    });
+
+    it("fails if trying to pass unknown date to DATE value", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              name
+              properties {
+                field {
+                  id
+                  isExpirable
+                }
+                value {
+                  content
+                  expiresAt
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+              content: { value: "May the 4th" },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
+      expect(data).toBeNull();
+    });
+
+    it("fails if trying to pass invalid content to DATE value", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              name
+              properties {
+                field {
+                  id
+                  isExpirable
+                }
+                value {
+                  content
+                  expiresAt
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+              content: { value: 1234 },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
+      expect(data).toBeNull();
+    });
+
+    it("fails if trying to pass invalid content to PHONE value", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              name
+              properties {
+                field {
+                  id
+                  isExpirable
+                }
+                value {
+                  content
+                  expiresAt
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[3].id),
+              content: { value: 1234 },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
+      expect(data).toBeNull();
+    });
+
+    it("fails if trying to pass unknown number to PHONE value", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      const { data, errors } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $fields: [UpdateProfileFieldValueInput!]!) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              name
+              properties {
+                field {
+                  id
+                  isExpirable
+                }
+                value {
+                  content
+                  expiresAt
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[3].id),
+              content: { value: "0800-333-parallel" },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
+      expect(data).toBeNull();
+    });
   });
 
   describe("deleteProfile", () => {
@@ -1784,6 +2077,46 @@ describe("GraphQL/Profiles", () => {
           },
         },
       ]);
+    });
+
+    it("fails if trying to upload more than 10 files", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+            $data: [FileUploadInput!]!
+            $expiresAt: DateTime
+          ) {
+            createProfileFieldFileUploadLink(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+              expiresAt: $expiresAt
+            ) {
+              property {
+                field {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          data: range(0, 11).map(() => ({
+            contentType: "image/png",
+            size: 1024,
+            filename: "ID.png",
+          })),
+          expiresAt: new Date(),
+        }
+      );
+
+      expect(errors).toContainGraphQLError("MAX_FILES_EXCEEDED");
+      expect(data).toBeNull();
     });
   });
 
