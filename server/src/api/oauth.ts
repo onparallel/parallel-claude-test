@@ -3,6 +3,8 @@ import { Container } from "inversify";
 import { DocusignIntegration } from "../integrations/DocusignIntegration";
 
 export function oauth(container: Container) {
-  const docusign = container.get<DocusignIntegration>(DocusignIntegration);
-  return Router().use("/docusign", docusign.handler());
+  return Router().use("/docusign", (req, res, next) => {
+    const docusign = container.get<DocusignIntegration>(DocusignIntegration);
+    return docusign.handler()(req, res, next);
+  });
 }
