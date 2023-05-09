@@ -921,7 +921,7 @@
   },
   {
     "term": "reminder.text",
-    "definition": "{tone, select, INFORMAL{Te recordamos que {senderName} ({senderEmail}) te compartió un enlace en el que queda información pendiente de completar.} other{Le recordamos que {senderName} ({senderEmail}) le compartio un enlace del que queda información pendiente de completar.}}",
+    "definition": "{tone, select, INFORMAL{Te recordamos que {senderName} ({senderEmail}) te compartió un enlace en el que queda información pendiente de completar.} other{Le recordamos que {senderName} ({senderEmail}) le compartió un enlace del que queda información pendiente de completar.}}",
     "context": "We remind you that {senderName} ({senderEmail}) shared with you a link and some of the requested information has not yet been submitted."
   },
   {
