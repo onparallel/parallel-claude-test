@@ -20,7 +20,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { FormattedMessage } from "react-intl";
-import { isDefined } from "remeda";
+import { isDefined, noop } from "remeda";
 import userflow from "userflow.js";
 import { CloseableAlert } from "../common/CloseableAlert";
 import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
@@ -142,6 +142,7 @@ export const AppLayout = Object.assign(
         ) {
           return;
         }
+        userflow.load().catch(noop);
         userflow.init(process.env.NEXT_PUBLIC_USERFLOW_TOKEN);
         userflow.identify(me.id, {
           name: me.fullName,
