@@ -65,6 +65,7 @@ async function main() {
             while (AVAILABILITY_ZONES.length > 0) {
                 const az = AVAILABILITY_ZONES.pop();
                 try {
+                    console.log((0, chalk_1.default) `Launching instance in ${az}...`);
                     return await ec2.send(new client_ec2_1.RunInstancesCommand({
                         ImageId: IMAGE_ID,
                         KeyName: KEY_NAME,

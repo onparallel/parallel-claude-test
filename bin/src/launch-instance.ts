@@ -82,6 +82,7 @@ async function main() {
         while (AVAILABILITY_ZONES.length > 0) {
           const az = AVAILABILITY_ZONES.pop()!;
           try {
+            console.log(chalk`Launching instance in ${az}...`);
             return await ec2.send(
               new RunInstancesCommand({
                 ImageId: IMAGE_ID,
