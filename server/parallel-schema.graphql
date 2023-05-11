@@ -980,7 +980,14 @@ type Mutation {
   Creates a task for printing a PDF of the petition and sends it to the queue
   """
   createPrintPdfTask(includeNdLinks: Boolean, petitionId: GID!, skipAttachments: Boolean): Task!
-  createProfile(profileTypeId: GID!): Profile!
+  createProfile(
+    profileTypeId: GID!
+
+    """
+    Subscribe the context user to profile notifications
+    """
+    subscribe: Boolean
+  ): Profile!
   createProfileFieldFileUploadLink(
     data: [FileUploadInput!]!
     expiresAt: DateTime

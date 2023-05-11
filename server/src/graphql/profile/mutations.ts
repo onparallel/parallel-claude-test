@@ -361,12 +361,23 @@ export const createProfile = mutationField("createProfile", {
   ),
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
+    subscribe: booleanArg({ description: "Subscribe the context user to profile notifications" }),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.profiles.createProfile(
+    const profile = await ctx.profiles.createProfile(
       { name: "", org_id: ctx.user!.org_id, profile_type_id: args.profileTypeId },
       ctx.user!.id
     );
+
+    if (args.subscribe) {
+      await ctx.profiles.subscribeUsersToProfile(
+        profile.id,
+        [ctx.user!.id],
+        `User:${ctx.user!.id}}`
+      );
+    }
+
+    return profile;
   },
 });
 

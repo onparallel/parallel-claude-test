@@ -550,6 +550,47 @@ describe("GraphQL/Profiles", () => {
     });
   });
 
+  describe("createProfile", () => {
+    it("creates a profile and subscribes the user", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $subscribe: Boolean) {
+            createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe) {
+              id
+              profileType {
+                id
+              }
+              subscribers {
+                user {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          subscribe: true,
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createProfile).toEqual({
+        id: expect.any(String),
+        profileType: {
+          id: toGlobalId("ProfileType", profileTypes[0].id),
+        },
+        subscribers: [
+          {
+            user: {
+              id: toGlobalId("User", sessionUser.id),
+            },
+          },
+        ],
+      });
+    });
+  });
+
   describe("createProfileType", () => {
     it("creates a new profile type on organization", async () => {
       const { errors, data } = await testClient.execute(

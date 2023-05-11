@@ -5262,6 +5262,7 @@ export interface NexusGenArgTypes {
     createProfile: {
       // args
       profileTypeId: NexusGenScalars["GID"]; // GID!
+      subscribe?: boolean | null; // Boolean
     };
     createProfileFieldFileUploadLink: {
       // args
