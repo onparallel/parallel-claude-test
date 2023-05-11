@@ -21,3 +21,9 @@ sudo certbot delete --cert-name onboarding.glvm.me --config-dir /nfs/parallel/ce
 ```
 sudo certbot renew --config-dir /nfs/parallel/certs/ --dry-run
 ```
+
+## Upgrade certbot
+
+```
+sudo /opt/certbot/bin/pip install --upgrade certbot
+```
