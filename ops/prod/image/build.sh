@@ -2,15 +2,15 @@
 
 
 # versions
-nodejs_version="16"
-nginx_version="1.23.4" # http://nginx.org/en/download.html
-modsecurity_version="3.0.8" # https://github.com/SpiderLabs/ModSecurity/releases
+nodejs_version="18" # https://nodejs.org/en
+nginx_version="1.24.0" # http://nginx.org/en/download.html
+modsecurity_version="3.0.9" # https://github.com/SpiderLabs/ModSecurity/releases
 modsecurity_nginx_version="1.0.3" # https://github.com/SpiderLabs/ModSecurity-nginx/releases
 coreruleset_version="3.3.4" # https://github.com/coreruleset/coreruleset/releases
 ngx_devel_kit_version="0.3.2" # https://github.com/vision5/ngx_devel_kit/releases
 set_misc_nginx_module_version="0.33" # https://github.com/openresty/set-misc-nginx-module/tags
 headers_more_nginx_module_version="0.34" # https://github.com/openresty/headers-more-nginx-module/tags
-image_exiftool_version="12.59" # https://exiftool.org/
+image_exiftool_version="12.62" # https://exiftool.org/
 
 echo "Adding public keys"
 cat authorized_keys >> .ssh/authorized_keys
@@ -20,13 +20,12 @@ sudo yum update -y
 
 # install binary dependencies
 sudo yum install -y \
+  git \
   amazon-cloudwatch-agent \
   ghostscript \
   ImageMagick \
   qpdf \
-  amazon-efs-utils
-
-sudo amazon-linux-extras install -y \
+  amazon-efs-utils \
   collectd
 
 function download_and_untar() {
@@ -61,7 +60,7 @@ sudo yum install -y \
   libtool \
   automake \
   yajl-devel \
-  GeoIP-devel
+  libmaxminddb-devel
 ./build.sh
 ./configure
 make
@@ -74,10 +73,10 @@ pushd nginx
 sudo yum install -y \
   gcc \
   pcre-devel \
-  openssl11-devel \
+  openssl-devel \
   perl-ExtUtils-Embed \
-  zlib-devel \
-  GeoIP-devel
+  zlib-devel
+
 ./configure \
     --prefix=/usr/share/nginx \
     --sbin-path=/usr/sbin/nginx \
@@ -113,7 +112,6 @@ sudo yum install -y \
     --with-http_stub_status_module \
     --with-http_perl_module=dynamic \
     --with-http_auth_request_module \
-    --with-http_geoip_module \
     --with-mail=dynamic \
     --with-mail_ssl_module \
     --with-pcre \
@@ -142,12 +140,6 @@ make test
 sudo make install
 popd
 
-if node -v | grep -q "v${nodejs_version}."; then
-  echo "Node.js.......ok"
-else
-  echo "Node.js.......failed"
-  exit 1 
-fi
 if /usr/sbin/nginx -v 2>&1 | grep -q "nginx version: nginx/${nginx_version}"; then
   echo "Nginx.........ok"
 else
