@@ -256,6 +256,9 @@ function PetitionExportField({
     sumBy(field.replies, (r) =>
       field.type === "TEXT" ? approxTextHeight(r.content.value ?? "") : 1
     ) +
+    // more space for activity
+    sumBy(field.replies, () => (field.showActivityInPdf ? 3 : 0)) +
+    // space for separation between replies
     (field.replies.length > 1 ? (field.replies.length - 1) * 1 : 0);
   return (
     <View style={{ marginBottom: "5mm" }}>
