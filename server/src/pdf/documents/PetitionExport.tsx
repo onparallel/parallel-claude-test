@@ -15,7 +15,7 @@ import { SignaturesBlock } from "../components/SignaturesBlock";
 import { cleanupText } from "../utils/cleanupText";
 import { PdfDocumentGetProps } from "../utils/pdf";
 import { ThemeProvider } from "../utils/ThemeProvider";
-import { LiquidProvider, LiquidScopeProvider } from "../utils/useLiquid";
+import { LiquidProvider, LiquidScopeProvider, useLiquidRender } from "../utils/useLiquid";
 import { useLiquidScope } from "../utils/useLiquidScope";
 import {
   PetitionExport_PetitionBaseFragment,
@@ -166,6 +166,8 @@ export default function PetitionExport({
     return !(field.type === "HEADING" && !field.title && !field.description);
   }
 
+  const liquidRender = useLiquidRender();
+
   return (
     <LiquidProvider>
       <LiquidScopeProvider scope={scope}>
@@ -199,7 +201,7 @@ export default function PetitionExport({
                 ) : null}
                 {page.filter(notEmptyHeading).map((field, i) => {
                   const approxNumberLines =
-                    approxTextHeight(field.description ?? "") +
+                    (field.description ? approxTextHeight(liquidRender(field.description)) : 0) +
                     sumBy(field.replies, (r) =>
                       field.type === "TEXT" ? approxTextHeight(r.content.value ?? "") : 1
                     ) +

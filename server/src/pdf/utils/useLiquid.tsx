@@ -131,16 +131,23 @@ export function LiquidScopeProvider({ scope, children }: PropsWithChildren<{ sco
 }
 
 export function useLiquid(text: string) {
+  const render = useLiquidRender();
+  return render(text);
+}
+
+export function useLiquidRender() {
   const intl = useIntl();
   const scope = useContext(LiquidScopeContext);
   const liquid = useContext(LiquidContext)!;
-  if (text.includes("{{") || text.includes("{%")) {
-    try {
-      return liquid.parseAndRenderSync(text, scope, { globals: { intl } });
-    } catch {
-      return "";
+  return (text: string) => {
+    if (text.includes("{{") || text.includes("{%")) {
+      try {
+        return liquid.parseAndRenderSync(text, scope, { globals: { intl } });
+      } catch {
+        return "";
+      }
+    } else {
+      return text;
     }
-  } else {
-    return text;
-  }
+  };
 }
