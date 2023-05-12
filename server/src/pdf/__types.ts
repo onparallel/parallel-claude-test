@@ -825,6 +825,7 @@ export type Mutation = {
   /** Starts the completion of an async field */
   startAsyncFieldCompletion: AsyncFieldCompletionResponse;
   startSignatureRequest: PetitionSignatureRequest;
+  subscribeToProfile: Profile;
   /** Switches automatic reminders for the specified petition accesses. */
   switchAutomaticReminders: Array<PetitionAccess>;
   /** Tags a petition */
@@ -833,6 +834,7 @@ export type Mutation = {
   transferOrganizationOwnership: SupportMethodResponse;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<PetitionBase>;
+  unsubscribeFromProfile: Profile;
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
   /** Updates a contact. */
@@ -1142,6 +1144,7 @@ export type MutationcreatePrintPdfTaskArgs = {
 
 export type MutationcreateProfileArgs = {
   profileTypeId: Scalars["GID"];
+  subscribe?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type MutationcreateProfileFieldFileUploadLinkArgs = {
@@ -1697,6 +1700,11 @@ export type MutationstartSignatureRequestArgs = {
   petitionId: Scalars["GID"];
 };
 
+export type MutationsubscribeToProfileArgs = {
+  profileId: Scalars["GID"];
+  userIds: Array<Scalars["GID"]>;
+};
+
 export type MutationswitchAutomaticRemindersArgs = {
   accessIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
@@ -1717,6 +1725,11 @@ export type MutationtransferOrganizationOwnershipArgs = {
 export type MutationtransferPetitionOwnershipArgs = {
   petitionIds: Array<Scalars["GID"]>;
   userId: Scalars["GID"];
+};
+
+export type MutationunsubscribeFromProfileArgs = {
+  profileId: Scalars["GID"];
+  userIds: Array<Scalars["GID"]>;
 };
 
 export type MutationuntagPetitionArgs = {
@@ -3255,6 +3268,7 @@ export type Profile = Timestamps & {
   name: Scalars["String"];
   profileType: ProfileType;
   properties: Array<ProfileFieldProperty>;
+  subscribers: Array<ProfileSubscription>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
@@ -3413,6 +3427,11 @@ export type ProfilePagination = {
 export type ProfilePropertyFilter = {
   profileTypeFieldId?: InputMaybe<Array<Scalars["GID"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]>>;
+};
+
+export type ProfileSubscription = {
+  id: Scalars["GID"];
+  user: User;
 };
 
 export type ProfileType = Timestamps & {
@@ -4720,12 +4739,12 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
     };
   } | null;
   fields: Array<{
-    options: { [key: string]: any };
     type: PetitionFieldType;
     multiple: boolean;
     alias: string | null;
     id: string;
     title: string | null;
+    options: { [key: string]: any };
     description: string | null;
     showInPdf: boolean;
     showActivityInPdf: boolean;
@@ -4753,12 +4772,12 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
   id: string;
   name: string | null;
   fields: Array<{
-    options: { [key: string]: any };
     type: PetitionFieldType;
     multiple: boolean;
     alias: string | null;
     id: string;
     title: string | null;
+    options: { [key: string]: any };
     description: string | null;
     showInPdf: boolean;
     showActivityInPdf: boolean;
@@ -4827,12 +4846,12 @@ export type PetitionExport_petitionQuery = {
           };
         } | null;
         fields: Array<{
-          options: { [key: string]: any };
           type: PetitionFieldType;
           multiple: boolean;
           alias: string | null;
           id: string;
           title: string | null;
+          options: { [key: string]: any };
           description: string | null;
           showInPdf: boolean;
           showActivityInPdf: boolean;
@@ -4859,12 +4878,12 @@ export type PetitionExport_petitionQuery = {
         id: string;
         name: string | null;
         fields: Array<{
-          options: { [key: string]: any };
           type: PetitionFieldType;
           multiple: boolean;
           alias: string | null;
           id: string;
           title: string | null;
+          options: { [key: string]: any };
           description: string | null;
           showInPdf: boolean;
           showActivityInPdf: boolean;
@@ -4965,6 +4984,7 @@ export const PetitionExport_PetitionFieldFragmentDoc = gql`
     showInPdf
     showActivityInPdf
     visibility
+    options
     replies {
       id
       status
@@ -5002,7 +5022,6 @@ export const PetitionExport_PetitionBaseFragmentDoc = gql`
     id
     name
     fields {
-      options
       ...PetitionExport_PetitionField
     }
     organization {
