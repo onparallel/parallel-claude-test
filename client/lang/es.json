@@ -9316,7 +9316,7 @@
   },
   {
     "term": "page.profile-details.subscribe",
-    "definition": "Subscribirme",
+    "definition": "Suscribirme",
     "context": "Subscribe"
   },
   {
@@ -9326,7 +9326,7 @@
   },
   {
     "term": "page.profile-details.unsubscribe",
-    "definition": "Desubscribirme",
+    "definition": "Desuscribirme",
     "context": "Unsubscribe"
   },
   {
