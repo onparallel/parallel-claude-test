@@ -1427,7 +1427,7 @@ export interface ProfileFieldFile {
   profile_type_field_id: number; // int4
   type: ProfileTypeFieldType; // profile_type_field_type
   file_upload_id: number; // int4
-  expires_at: Maybe<Date>; // timestamptz
+  expiry_date: Maybe<string>; // date
   created_at: Date; // timestamptz
   created_by_user_id: number; // int4
   removed_at: Maybe<Date>; // timestamptz
@@ -1439,7 +1439,7 @@ export interface ProfileFieldFile {
 
 export type CreateProfileFieldFile = PartialProps<
   Omit<ProfileFieldFile, "id">,
-  | "expires_at"
+  | "expiry_date"
   | "created_at"
   | "removed_at"
   | "removed_by_user_id"
@@ -1454,7 +1454,7 @@ export interface ProfileFieldValue {
   profile_type_field_id: number; // int4
   type: ProfileTypeFieldType; // profile_type_field_type
   content: any; // jsonb
-  expires_at: Maybe<Date>; // timestamptz
+  expiry_date: Maybe<string>; // date
   created_by_user_id: number; // int4
   created_at: Date; // timestamptz
   removed_at: Maybe<Date>; // timestamptz
@@ -1467,7 +1467,7 @@ export interface ProfileFieldValue {
 export type CreateProfileFieldValue = PartialProps<
   Omit<ProfileFieldValue, "id">,
   | "content"
-  | "expires_at"
+  | "expiry_date"
   | "created_at"
   | "removed_at"
   | "removed_by_user_id"

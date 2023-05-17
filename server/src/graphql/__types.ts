@@ -319,7 +319,7 @@ export interface NexusGenInputs {
   UpdateProfileFieldValueInput: {
     // input type
     content?: NexusGenScalars["JSONObject"] | null; // JSONObject
-    expiresAt?: NexusGenScalars["Date"] | null; // Date
+    expiryDate?: NexusGenScalars["Date"] | null; // Date
     profileTypeFieldId: NexusGenScalars["GID"]; // GID!
   };
   UpdateProfileTypeFieldInput: {
@@ -452,7 +452,7 @@ export interface NexusGenScalars {
   Float: number;
   Boolean: boolean;
   ID: string;
-  Date: Date;
+  Date: string;
   DateTime: Date;
   Duration: Duration;
   GID: number;
@@ -2220,6 +2220,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     createdBy: NexusGenRootTypes["User"] | null; // User
     expiresAt: NexusGenScalars["DateTime"] | null; // DateTime
+    expiryDate: string | null; // String
     field: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     file: NexusGenRootTypes["FileUpload"] | null; // FileUpload
     id: NexusGenScalars["GID"]; // GID!
@@ -2272,6 +2273,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     createdBy: NexusGenRootTypes["User"] | null; // User
     expiresAt: NexusGenScalars["DateTime"] | null; // DateTime
+    expiryDate: string | null; // String
     field: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     id: NexusGenScalars["GID"]; // GID!
     profile: NexusGenRootTypes["Profile"]; // Profile!
@@ -3017,6 +3019,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     createdBy: NexusGenRootTypes["User"] | null; // User
     expiresAt: NexusGenScalars["DateTime"] | null; // DateTime
+    expiryDate: string | null; // String
     field: NexusGenRootTypes["ProfileTypeField"]; // ProfileTypeField!
     profile: NexusGenRootTypes["Profile"]; // Profile!
     removedAt: NexusGenScalars["DateTime"] | null; // DateTime
@@ -4218,6 +4221,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     createdBy: "User";
     expiresAt: "DateTime";
+    expiryDate: "String";
     field: "ProfileTypeField";
     file: "FileUpload";
     id: "GID";
@@ -4270,6 +4274,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     createdBy: "User";
     expiresAt: "DateTime";
+    expiryDate: "String";
     field: "ProfileTypeField";
     id: "GID";
     profile: "Profile";
@@ -5015,6 +5020,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     createdBy: "User";
     expiresAt: "DateTime";
+    expiryDate: "String";
     field: "ProfileTypeField";
     profile: "Profile";
     removedAt: "DateTime";
@@ -5285,7 +5291,7 @@ export interface NexusGenArgTypes {
     createProfileFieldFileUploadLink: {
       // args
       data: NexusGenInputs["FileUploadInput"][]; // [FileUploadInput!]!
-      expiresAt?: NexusGenScalars["DateTime"] | null; // DateTime
+      expiryDate?: NexusGenScalars["Date"] | null; // Date
       profileId: NexusGenScalars["GID"]; // GID!
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
     };

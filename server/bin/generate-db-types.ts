@@ -295,6 +295,7 @@ function getColumnType(type: string, enums: Map<string, DbEnum>): string {
     case "jsonb":
       return "any";
     case "date":
+      return "string";
     case "timestamp":
     case "timestamptz":
       return "Date";

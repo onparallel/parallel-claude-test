@@ -128,9 +128,11 @@ export const expiringProfileProperties = queryField((t) => {
       }),
     },
     resolve: async (_, { limit, offset, search, filter }, ctx) => {
+      const org = (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
       return ctx.profiles.getPaginatedExpirableProfileFieldProperties(
         ctx.user!.id,
         ctx.user!.org_id,
+        org.default_timezone,
         {
           search,
           filter,

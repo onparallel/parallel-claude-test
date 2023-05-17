@@ -23,7 +23,7 @@ import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useAutoConfirmDiscardChangesDialog } from "@parallel/components/organization/dialogs/ConfirmDiscardChangesDialog";
 import { MoreOptionsMenuProfile } from "@parallel/components/profiles/MoreOptionsMenuProfile";
 import { ProfileField } from "@parallel/components/profiles/fields/ProfileField";
-import { ProfileFieldFileValue } from "@parallel/components/profiles/fields/ProfileFieldFileUpload";
+import { ProfileFieldFileAction } from "@parallel/components/profiles/fields/ProfileFieldFileUpload";
 import {
   ProfileDetail_ProfileFieldPropertyFragment,
   ProfileDetail_createProfileFieldFileUploadLinkDocument,
@@ -38,6 +38,7 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { discriminator } from "@parallel/utils/discriminator";
 import { useDeleteProfile } from "@parallel/utils/mutations/useDeleteProfile";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import { withError } from "@parallel/utils/promises/withError";
@@ -88,21 +89,25 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
 
   const mapPropertiesToFields = (properties: ProfileDetail_ProfileFieldPropertyFragment[]) => {
     return properties.map((prop) => {
-      const { id: profileTypeFieldId, type } = prop.field;
+      const { id: profileTypeFieldId, type, isExpirable } = prop.field;
       let content = {};
+      let expiryDate = null;
 
       if (type === "FILE") {
         content = {
           value: [],
         };
+        expiryDate = prop.files?.[0]?.expiryDate;
       } else {
-        content = prop.value?.content ?? {};
+        content = prop.value?.content ?? { value: "" };
+        expiryDate = prop.value?.expiryDate;
       }
 
       return {
         type,
         profileTypeFieldId,
         content,
+        expiryDate: expiryDate && isExpirable ? expiryDate : null,
       };
     });
   };
@@ -124,8 +129,12 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
   };
 
   useTempQueryParam("field", async (fieldId) => {
-    const index = fields.findIndex((f) => f.profileTypeFieldId === fieldId)!;
-    setFocus(`fields.${index}.content.value`);
+    try {
+      const index = fields.findIndex((f) => f.profileTypeFieldId === fieldId)!;
+      setFocus(`fields.${index}.content.value`);
+    } catch {
+      // ignore FILE .focus() errors
+    }
   });
 
   const [updateProfileFieldValue] = useMutation(ProfileDetail_updateProfileFieldValueDocument);
@@ -142,6 +151,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
   const editedFieldsCount = formState.dirtyFields.fields?.filter((f) => isDefined(f)).length;
 
   const showErrorDialog = useErrorDialog();
+
   return (
     <AppLayout
       title={intl.formatMessage({
@@ -165,7 +175,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
           onSubmit={form.handleSubmit(async (formData) => {
             try {
               const editedFields = formData.fields.filter(
-                (_, i) => formState.dirtyFields.fields?.[i]?.content
+                (_, i) => formState.dirtyFields.fields?.[i]
               );
 
               const [fileFields, fields] = partition(
@@ -177,10 +187,23 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
                 await updateProfileFieldValue({
                   variables: {
                     profileId: profile.id,
-                    fields: fields.map(({ content, profileTypeFieldId }) => {
+                    fields: fields.map(({ content, profileTypeFieldId, expiryDate }) => {
+                      const prop = profile.properties?.find(
+                        (prop) => prop.field.id === profileTypeFieldId
+                      );
+
+                      const useValueAsExpiryDate =
+                        prop?.field.type === "DATE" && prop?.field.options?.useReplyAsExpiryDate;
+
                       return {
                         profileTypeFieldId,
                         content: content?.value ? content : null,
+                        expiryDate:
+                          content?.value && prop?.field.isExpirable
+                            ? useValueAsExpiryDate
+                              ? content?.value || null
+                              : expiryDate || null
+                            : undefined,
                       };
                     }),
                   },
@@ -190,13 +213,22 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
               await pMap(
                 fileFields,
                 async (fileField) => {
-                  const { profileTypeFieldId, content } = fileField;
-                  const events = content!.value as ProfileFieldFileValue[];
+                  const { profileTypeFieldId, content, expiryDate } = fileField;
+                  const events = content!.value as ProfileFieldFileAction[];
+                  const deleteFiles = events.filter(discriminator("type", "DELETE"));
+                  const addFiles = events.filter(discriminator("type", "ADD"));
+                  const updateExpiresAt = events.filter(discriminator("type", "UPDATE"));
 
-                  const [addFiles, deleteFiles] = partition(
-                    events,
-                    (event) => event.type === "ADD"
-                  );
+                  if (updateExpiresAt.length && !addFiles.length) {
+                    await createProfileFieldFileUploadLink({
+                      variables: {
+                        profileId,
+                        profileTypeFieldId,
+                        data: [],
+                        expiryDate,
+                      },
+                    });
+                  }
 
                   if (deleteFiles.length) {
                     await deleteProfileFieldFile({
@@ -214,10 +246,11 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
                         profileId,
                         profileTypeFieldId,
                         data: addFiles.map((event) => ({
-                          filename: event.file!.name,
-                          size: event.file!.size,
-                          contentType: event.file!.type,
+                          filename: event.file.name,
+                          size: event.file.size,
+                          contentType: event.file.type,
                         })),
+                        expiryDate,
                       },
                     });
 
@@ -228,7 +261,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
                       async ({ presignedPostData, file }, i) => {
                         try {
                           const controller = new AbortController();
-                          await uploadFile(addFiles[i].file!, presignedPostData, {
+                          await uploadFile(addFiles[i].file, presignedPostData, {
                             signal: controller.signal,
                           });
                         } catch (e) {
@@ -291,12 +324,14 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
             }
           })}
         >
-          <HStack
-            padding={4}
-            justify="space-between"
-            minHeight="64px"
+          <Stack
+            spacing={0}
+            paddingX={4}
+            paddingY={2}
             borderBottom="1px solid"
             borderColor="gray.200"
+            minHeight="65px"
+            justifyContent="center"
           >
             <Heading
               as="h2"
@@ -310,7 +345,17 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
                   defaultMessage: "Unnamed profile",
                 })}
             </Heading>
-          </HStack>
+            <Box fontSize="sm" color="gray.600" lineHeight="22px">
+              <LocalizableUserTextRender
+                value={profile.profileType.name}
+                default={intl.formatMessage({
+                  id: "generic.unnamed-profile-type",
+                  defaultMessage: "Unnamed profile type",
+                })}
+              />
+            </Box>
+          </Stack>
+
           {editedFieldsCount ? (
             <Alert overflow="visible">
               <AlertDescription
@@ -375,23 +420,6 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
           ) : null}
           <Stack divider={<Divider />} padding={4} spacing={4} overflow="auto">
             <Stack spacing={4} width="100%">
-              <Heading as="h3" size="sm" fontWeight={600} marginBottom={2}>
-                <FormattedMessage
-                  id="page.profile-details.about-this-profile-type"
-                  defaultMessage="About this {type}"
-                  values={{
-                    type: (
-                      <LocalizableUserTextRender
-                        value={profile.profileType.name}
-                        default={intl.formatMessage({
-                          id: "generic.unnamed-profile-type",
-                          defaultMessage: "Unnamed profile type",
-                        })}
-                      />
-                    ),
-                  }}
-                />
-              </Heading>
               <FormProvider {...form}>
                 <Stack as="ul">
                   {properties.map(({ field, value, files }, i) => {
@@ -458,7 +486,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
           <Flex
             backgroundColor="white"
             paddingX={4}
-            height={16}
+            minHeight="65px"
             justifyContent="flex-end"
             alignItems="center"
             minWidth="0"
@@ -503,6 +531,7 @@ const _fragments = {
         id
         content
         createdAt
+        expiryDate
         ...ProfileField_ProfileFieldValue
       }
       ${ProfileField.fragments.ProfileFieldValue}
@@ -584,13 +613,13 @@ const _mutations = [
       $profileId: GID!
       $profileTypeFieldId: GID!
       $data: [FileUploadInput!]!
-      $expiresAt: DateTime
+      $expiryDate: Date
     ) {
       createProfileFieldFileUploadLink(
         profileId: $profileId
         profileTypeFieldId: $profileTypeFieldId
         data: $data
-        expiresAt: $expiresAt
+        expiryDate: $expiryDate
       ) {
         uploads {
           presignedPostData {
@@ -658,8 +687,8 @@ ProfileDetail.getInitialProps = async ({ query, fetchQuery }: WithApolloDataCont
 };
 
 export default compose(
-  withMetadata,
   withDialogs,
+  withMetadata,
   withFeatureFlag("PROFILES", "/app/petitions"),
   withApolloData
 )(ProfileDetail);

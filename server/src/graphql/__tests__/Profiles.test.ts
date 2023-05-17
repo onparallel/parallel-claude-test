@@ -15,7 +15,7 @@ import { TestClient, initServer } from "./server";
 type UpdateProfileFieldValueInput = {
   profileTypeFieldId: string;
   content?: Record<string, any> | null;
-  expiresAt?: string | null;
+  expiryDate?: string | null;
 };
 
 describe("GraphQL/Profiles", () => {
@@ -27,6 +27,7 @@ describe("GraphQL/Profiles", () => {
   let profileTypes: ProfileType[] = [];
 
   let profileType0Fields: ProfileTypeField[] = [];
+  let profileType1Fields: ProfileTypeField[] = [];
   let profileType2Fields: ProfileTypeField[] = [];
   let profileType3Fields: ProfileTypeField[] = [];
 
@@ -50,7 +51,7 @@ describe("GraphQL/Profiles", () => {
               }
               value {
                 content
-                expiresAt
+                expiryDate
               }
             }
           }
@@ -79,7 +80,7 @@ describe("GraphQL/Profiles", () => {
               }
               value {
                 content
-                expiresAt
+                expiryDate
               }
             }
           }
@@ -187,7 +188,7 @@ describe("GraphQL/Profiles", () => {
       .update({
         profile_name_pattern: json([profileType0Fields[0].id, " ", profileType0Fields[1].id]),
       });
-    const profileType1Fields = await mocks.createRandomProfileTypeFields(
+    profileType1Fields = await mocks.createRandomProfileTypeFields(
       organization.id,
       profileTypes[1].id,
       3,
@@ -289,7 +290,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[5].id),
           content: { value: "AA1234567" },
-          expiresAt: "2024-10-28",
+          expiryDate: "2024-10-28",
         },
       ]);
 
@@ -314,7 +315,7 @@ describe("GraphQL/Profiles", () => {
                   id
                 }
                 value {
-                  expiresAt
+                  expiryDate
                   content
                 }
               }
@@ -349,7 +350,7 @@ describe("GraphQL/Profiles", () => {
               isExpirable: false,
             },
             files: null,
-            value: { expiresAt: null, content: { value: "Harry" } },
+            value: { expiryDate: null, content: { value: "Harry" } },
           },
           {
             field: {
@@ -359,7 +360,7 @@ describe("GraphQL/Profiles", () => {
               isExpirable: false,
             },
             files: null,
-            value: { expiresAt: null, content: { value: "Potter" } },
+            value: { expiryDate: null, content: { value: "Potter" } },
           },
           {
             field: {
@@ -369,7 +370,7 @@ describe("GraphQL/Profiles", () => {
               isExpirable: true,
             },
             files: null,
-            value: { expiresAt: expect.any(Date), content: { value: "2029-01-01" } },
+            value: { expiryDate: "2029-01-01", content: { value: "2029-01-01" } },
           },
           {
             field: {
@@ -399,7 +400,7 @@ describe("GraphQL/Profiles", () => {
               isExpirable: true,
             },
             files: null,
-            value: { expiresAt: expect.any(Date), content: { value: "AA1234567" } },
+            value: { expiryDate: "2024-10-28", content: { value: "AA1234567" } },
           },
         ],
         events: {
@@ -1091,6 +1092,7 @@ describe("GraphQL/Profiles", () => {
           is_expirable: true,
           expiry_alert_ahead_time: mocks.knex.raw(`'1 month'::interval`) as any,
           alias: i === 0 ? "alias" : null,
+          type: "TEXT",
         })
       );
     });
@@ -1256,6 +1258,95 @@ describe("GraphQL/Profiles", () => {
         id: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
         options: { useReplyAsExpiryDate: false },
         isExpirable: true,
+      });
+    });
+
+    it("removes values expiry date when disabling caducity of profile field type", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
+          content: { value: "abcd" },
+          expiryDate: "2023-08-08",
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+              isExpirable
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
+          data: { isExpirable: false },
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileTypeField).toEqual({
+        id: toGlobalId("ProfileTypeField", profileTypeField.id),
+        isExpirable: false,
+      });
+
+      const { errors: query2Errors, data: query2Data } = await testClient.execute(
+        gql`
+          query ($profileId: GID!) {
+            profile(profileId: $profileId) {
+              id
+              properties {
+                field {
+                  id
+                }
+                value {
+                  content
+                  expiryDate
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+        }
+      );
+
+      expect(query2Errors).toBeUndefined();
+      expect(query2Data?.profile).toEqual({
+        id: profile.id,
+        properties: [
+          {
+            field: { id: toGlobalId("ProfileTypeField", profileType1Fields[0].id) },
+            value: null,
+          },
+          {
+            field: { id: toGlobalId("ProfileTypeField", profileType1Fields[1].id) },
+            value: null,
+          },
+          {
+            field: { id: toGlobalId("ProfileTypeField", profileType1Fields[2].id) },
+            value: null,
+          },
+          {
+            field: { id: toGlobalId("ProfileTypeField", profileTypeField.id) },
+            value: { content: { value: "abcd" }, expiryDate: null },
+          },
+          {
+            field: { id: toGlobalId("ProfileTypeField", profileTypeField2.id) },
+            value: null,
+          },
+        ],
       });
     });
   });
@@ -1475,7 +1566,7 @@ describe("GraphQL/Profiles", () => {
           field: { id: toGlobalId("ProfileTypeField", f.id), isExpirable: f.is_expirable },
           value:
             f.id === profileType0Fields[0].id
-              ? { content: { value: "John" }, expiresAt: null }
+              ? { content: { value: "John" }, expiryDate: null }
               : null,
         })),
       });
@@ -1494,9 +1585,9 @@ describe("GraphQL/Profiles", () => {
           field: { id: toGlobalId("ProfileTypeField", f.id), isExpirable: f.is_expirable },
           value:
             f.id === profileType0Fields[0].id
-              ? { content: { value: "John" }, expiresAt: null }
+              ? { content: { value: "John" }, expiryDate: null }
               : f.id === profileType0Fields[1].id
-              ? { content: { value: "Wick" }, expiresAt: null }
+              ? { content: { value: "Wick" }, expiryDate: null }
               : null,
         })),
       });
@@ -1518,7 +1609,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[5].id),
           content: { value: "123456" },
-          expiresAt: "2030-01-01",
+          expiryDate: "2030-01-01",
         },
       ]);
 
@@ -1529,11 +1620,11 @@ describe("GraphQL/Profiles", () => {
           field: { id: toGlobalId("ProfileTypeField", f.id), isExpirable: f.is_expirable },
           value:
             f.id === profileType0Fields[0].id
-              ? { content: { value: "Harry" }, expiresAt: null }
+              ? { content: { value: "Harry" }, expiryDate: null }
               : f.id === profileType0Fields[1].id
-              ? { content: { value: "Potter" }, expiresAt: null }
+              ? { content: { value: "Potter" }, expiryDate: null }
               : f.id === profileType0Fields[5].id
-              ? { content: { value: "123456" }, expiresAt: new Date("2029-12-31T23:00:00.000Z") }
+              ? { content: { value: "123456" }, expiryDate: "2030-01-01" }
               : null,
         })),
       });
@@ -1556,7 +1647,7 @@ describe("GraphQL/Profiles", () => {
           {
             profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
             content: { value: "1988-12-15" },
-            expiresAt: "2030-01-01",
+            expiryDate: "2030-01-01",
           },
         ])
       ).rejects.toContainGraphQLError("EXPIRY_ON_NON_EXPIRABLE_FIELD");
@@ -1579,7 +1670,7 @@ describe("GraphQL/Profiles", () => {
           {
             profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
             content: null,
-            expiresAt: "2030-01-01",
+            expiryDate: "2030-01-01",
           },
         ])
       ).rejects.toContainGraphQLError("EXPIRY_ON_REMOVED_FIELD");
@@ -1618,7 +1709,7 @@ describe("GraphQL/Profiles", () => {
         updateProfileValue(profile.id, [
           {
             profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[0].id),
-            expiresAt: "2030-01-01",
+            expiryDate: "2030-01-01",
           },
         ])
       ).rejects.toContainGraphQLError("EXPIRY_ON_NONEXISTING_VALUE");
@@ -1639,7 +1730,7 @@ describe("GraphQL/Profiles", () => {
                 }
                 value {
                   content
-                  expiresAt
+                  expiryDate
                 }
               }
             }
@@ -1675,7 +1766,7 @@ describe("GraphQL/Profiles", () => {
                 }
                 value {
                   content
-                  expiresAt
+                  expiryDate
                 }
               }
             }
@@ -1711,7 +1802,7 @@ describe("GraphQL/Profiles", () => {
                 }
                 value {
                   content
-                  expiresAt
+                  expiryDate
                 }
               }
             }
@@ -1751,7 +1842,7 @@ describe("GraphQL/Profiles", () => {
                 }
                 value {
                   content
-                  expiresAt
+                  expiryDate
                 }
               }
             }
@@ -1787,7 +1878,7 @@ describe("GraphQL/Profiles", () => {
                 }
                 value {
                   content
-                  expiresAt
+                  expiryDate
                 }
               }
             }
@@ -1823,7 +1914,7 @@ describe("GraphQL/Profiles", () => {
                 }
                 value {
                   content
-                  expiresAt
+                  expiryDate
                 }
               }
             }
@@ -1859,7 +1950,7 @@ describe("GraphQL/Profiles", () => {
                 }
                 value {
                   content
-                  expiresAt
+                  expiryDate
                 }
               }
             }
@@ -1895,7 +1986,7 @@ describe("GraphQL/Profiles", () => {
                 }
                 value {
                   content
-                  expiresAt
+                  expiryDate
                 }
               }
             }
@@ -1996,13 +2087,13 @@ describe("GraphQL/Profiles", () => {
             $profileId: GID!
             $profileTypeFieldId: GID!
             $data: [FileUploadInput!]!
-            $expiresAt: DateTime
+            $expiryDate: Date
           ) {
             createProfileFieldFileUploadLink(
               profileId: $profileId
               profileTypeFieldId: $profileTypeFieldId
               data: $data
-              expiresAt: $expiresAt
+              expiryDate: $expiryDate
             ) {
               property {
                 field {
@@ -2010,6 +2101,7 @@ describe("GraphQL/Profiles", () => {
                 }
                 files {
                   id
+                  expiryDate
                   field {
                     id
                   }
@@ -2029,6 +2121,7 @@ describe("GraphQL/Profiles", () => {
               uploads {
                 file {
                   id
+                  expiryDate
                   file {
                     isComplete
                     contentType
@@ -2048,9 +2141,17 @@ describe("GraphQL/Profiles", () => {
           profileId: profile.id,
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
           data: [{ contentType: "image/png", size: 1024, filename: "ID.png" }],
-          expiresAt: new Date(),
+          expiryDate: "2025-10-01",
         }
       );
+
+      const rows = await mocks.knex
+        .from("profile_field_file")
+        .where(
+          "id",
+          fromGlobalId(createData?.createProfileFieldFileUploadLink.property.files[0].id).id
+        )
+        .select("*");
 
       expect(createErrors).toBeUndefined();
       expect(createData?.createProfileFieldFileUploadLink).toEqual({
@@ -2061,6 +2162,7 @@ describe("GraphQL/Profiles", () => {
           files: [
             {
               id: expect.any(String),
+              expiryDate: "2025-10-01",
               field: { id: toGlobalId("ProfileTypeField", profileType2Fields[1].id) },
               profile: { id: profile.id },
               removedBy: null,
@@ -2074,6 +2176,7 @@ describe("GraphQL/Profiles", () => {
           {
             file: {
               id: expect.any(String),
+              expiryDate: "2025-10-01",
               file: { isComplete: false, contentType: "image/png", size: 1024, filename: "ID.png" },
             },
             presignedPostData: { fields: {}, url: "" },
@@ -2120,21 +2223,151 @@ describe("GraphQL/Profiles", () => {
       ]);
     });
 
-    it("fails if trying to upload more than 10 files", async () => {
+    it("updates expires_at field if passing an empty list of files", async () => {
       const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+      const { errors: createErrors, data: createData } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $profileTypeFieldId: GID!, $data: [FileUploadInput!]!) {
+            createProfileFieldFileUploadLink(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              property {
+                field {
+                  id
+                }
+                files {
+                  id
+                  expiryDate
+                }
+              }
+              uploads {
+                file {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          data: [{ contentType: "image/png", size: 1024, filename: "ID.png" }],
+        }
+      );
+
+      expect(createErrors).toBeUndefined();
+      expect(createData?.createProfileFieldFileUploadLink).toEqual({
+        property: {
+          field: {
+            id: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          },
+          files: [
+            {
+              id: expect.any(String),
+              expiryDate: null,
+            },
+          ],
+        },
+        uploads: [{ file: { id: expect.any(String) } }],
+      });
+
       const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $profileId: GID!
             $profileTypeFieldId: GID!
             $data: [FileUploadInput!]!
-            $expiresAt: DateTime
+            $expiryDate: Date
           ) {
             createProfileFieldFileUploadLink(
               profileId: $profileId
               profileTypeFieldId: $profileTypeFieldId
               data: $data
-              expiresAt: $expiresAt
+              expiryDate: $expiryDate
+            ) {
+              property {
+                files {
+                  id
+                  expiryDate
+                }
+              }
+              uploads {
+                file {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          data: [],
+          expiryDate: "2024-10-10",
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createProfileFieldFileUploadLink).toEqual({
+        property: {
+          files: [
+            {
+              id: createData!.createProfileFieldFileUploadLink.property.files[0].id,
+              expiryDate: "2024-10-10",
+            },
+          ],
+        },
+        uploads: [], // empty array as no files were passed
+      });
+    });
+
+    it("sends error if passing empty list of files and no expiryDate", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $profileTypeFieldId: GID!, $data: [FileUploadInput!]!) {
+            createProfileFieldFileUploadLink(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              property {
+                files {
+                  id
+                  expiryDate
+                }
+              }
+              uploads {
+                file {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          data: [],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("VALIDATOR_CONDITION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("fails if trying to upload more than 10 files", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $profileTypeFieldId: GID!, $data: [FileUploadInput!]!) {
+            createProfileFieldFileUploadLink(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
             ) {
               property {
                 field {
@@ -2152,7 +2385,6 @@ describe("GraphQL/Profiles", () => {
             size: 1024,
             filename: "ID.png",
           })),
-          expiresAt: new Date(),
         }
       );
 
@@ -2338,7 +2570,7 @@ describe("GraphQL/Profiles", () => {
         {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[1].id),
           content: { value: "text reply" },
-          expiresAt: "2025-01-01",
+          expiryDate: "2025-01-01",
         },
         {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[2].id),
@@ -2363,11 +2595,11 @@ describe("GraphQL/Profiles", () => {
                 value {
                   id
                   content
-                  expiresAt
+                  expiryDate
                 }
                 files {
                   id
-                  expiresAt
+                  expiryDate
                 }
               }
             }
@@ -2389,10 +2621,7 @@ describe("GraphQL/Profiles", () => {
             value: {
               id: expect.any(String),
               content: { value: "2024-03-03" },
-              expiresAt: zonedTimeToUtc(
-                format(parseISO("2024-03-03"), "yyyy-MM-dd"),
-                "Europe/Madrid"
-              ),
+              expiryDate: "2024-03-03",
             },
             files: null,
           },
@@ -2402,10 +2631,7 @@ describe("GraphQL/Profiles", () => {
             value: {
               id: expect.any(String),
               content: { value: "text reply" },
-              expiresAt: zonedTimeToUtc(
-                format(parseISO("2025-01-01"), "yyyy-MM-dd"),
-                "Europe/Madrid"
-              ),
+              expiryDate: "2025-01-01",
             },
             files: null,
           },
@@ -2429,11 +2655,11 @@ describe("GraphQL/Profiles", () => {
                 value {
                   id
                   content
-                  expiresAt
+                  expiryDate
                 }
                 files {
                   id
-                  expiresAt
+                  expiryDate
                 }
               }
             }
@@ -2471,11 +2697,11 @@ describe("GraphQL/Profiles", () => {
                 value {
                   id
                   content
-                  expiresAt
+                  expiryDate
                 }
                 files {
                   id
-                  expiresAt
+                  expiryDate
                 }
               }
             }
@@ -2500,10 +2726,7 @@ describe("GraphQL/Profiles", () => {
             value: {
               id: expect.any(String),
               content: { value: "2024-03-03" },
-              expiresAt: zonedTimeToUtc(
-                format(parseISO("2024-03-03"), "yyyy-MM-dd"),
-                "Europe/Madrid"
-              ),
+              expiryDate: "2024-03-03",
             },
             files: null,
           },

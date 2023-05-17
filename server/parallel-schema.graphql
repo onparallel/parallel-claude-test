@@ -991,7 +991,7 @@ type Mutation {
   ): Profile!
   createProfileFieldFileUploadLink(
     data: [FileUploadInput!]!
-    expiresAt: DateTime
+    expiryDate: Date
     profileId: GID!
     profileTypeFieldId: GID!
   ): ProfileFieldPropertyAndFileWithUploadData!
@@ -4425,9 +4425,10 @@ type ProfileFieldFile implements ProfileFieldResponse {
   createdBy: User
 
   """
-  Time when the response was created.
+  Expiration datetime of the value, considering organization's timezone.
   """
   expiresAt: DateTime
+  expiryDate: String
   field: ProfileTypeField!
   file: FileUpload
   id: GID!
@@ -4498,9 +4499,10 @@ interface ProfileFieldResponse {
   createdBy: User
 
   """
-  Time when the response was created.
+  Expiration datetime of the value, considering organization's timezone.
   """
   expiresAt: DateTime
+  expiryDate: String
   field: ProfileTypeField!
   profile: Profile!
 
@@ -4525,9 +4527,10 @@ type ProfileFieldValue implements ProfileFieldResponse {
   createdBy: User
 
   """
-  Time when the response was created.
+  Expiration datetime of the value, considering organization's timezone.
   """
   expiresAt: DateTime
+  expiryDate: String
   field: ProfileTypeField!
   id: GID!
   profile: Profile!
@@ -6148,7 +6151,7 @@ input UpdatePetitionInput {
 
 input UpdateProfileFieldValueInput {
   content: JSONObject
-  expiresAt: Date
+  expiryDate: Date
   profileTypeFieldId: GID!
 }
 

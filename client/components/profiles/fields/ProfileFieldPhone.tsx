@@ -1,16 +1,19 @@
 import { PhoneInputLazy } from "@parallel/components/common/PhoneInputLazy";
+import { ProfilesFormData } from "@parallel/pages/app/profiles/[profileId]";
 import { Controller, useFormContext } from "react-hook-form";
+import { isDefined } from "remeda";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldInputGroup } from "./ProfileFieldInputGroup";
-import { isDefined } from "remeda";
-import { ProfilesFormData } from "@parallel/pages/app/profiles/[profileId]";
 
-interface ProfileFieldPhoneProps extends ProfileFieldProps {}
+interface ProfileFieldPhoneProps extends ProfileFieldProps {
+  showExpiryDateDialog: (force?: boolean) => void;
+}
 
-export function ProfileFieldPhone({ index }: ProfileFieldPhoneProps) {
+export function ProfileFieldPhone({ index, field, showExpiryDateDialog }: ProfileFieldPhoneProps) {
   const { control, setError, clearErrors } = useFormContext<ProfilesFormData>();
+
   return (
-    <ProfileFieldInputGroup>
+    <ProfileFieldInputGroup index={index} field={field}>
       <Controller
         name={`fields.${index}.content.value`}
         control={control}
@@ -29,6 +32,12 @@ export function ProfileFieldPhone({ index }: ProfileFieldPhoneProps) {
             }}
             inputRef={ref}
             {...rest}
+            onBlur={(value) => {
+              console.log(value);
+              if (value) {
+                return showExpiryDateDialog();
+              }
+            }}
           />
         )}
       />

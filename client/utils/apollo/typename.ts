@@ -1,5 +1,6 @@
 import { partition } from "remeda";
-import { MaybeArray } from "../types";
+import { MaybeArray, Prettify } from "../types";
+import { discriminator } from "../discriminator";
 
 export function assertTypename<
   T extends { __typename?: string },
@@ -10,12 +11,11 @@ export function assertTypename<
   }
 }
 
-export function isTypename<Typename extends string>(typename: MaybeArray<Typename>) {
-  return function _isTypename<T extends { __typename?: string }>(
-    value: T
-  ): value is T & { __typename: Typename } {
-    return value.__typename === typename;
-  };
+export function isTypename<
+  T extends { __typename?: string },
+  Typename extends T["__typename"] & string
+>(typename: MaybeArray<Typename>): (item: T) => item is Prettify<T & { __typename: Typename }> {
+  return discriminator<T, "__typename", Typename>("__typename", typename);
 }
 
 export function assertTypenameArray<

@@ -14,3 +14,14 @@ export function validIsDefined<TypeName extends string, FieldName extends string
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
+
+export function validIsNotUndefined<TypeName extends string, FieldName extends string>(
+  prop: (args: core.ArgsValue<TypeName, FieldName>) => any | null | undefined,
+  argName: string
+) {
+  return ((_, args, ctx, info) => {
+    if (prop(args) === undefined) {
+      throw new ArgValidationError(info, argName, `Expected ${argName} not to be undefined`);
+    }
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}

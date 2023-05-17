@@ -30,6 +30,11 @@
     "context": "Themes"
   },
   {
+    "term": "component..update-profile-field-expiration-dialog.title",
+    "definition": "Configurar vencimiento",
+    "context": "Configure expiration date"
+  },
+  {
     "term": "component.account-delegates.delegates",
     "definition": "Delegados",
     "context": "Delegates"
@@ -4325,6 +4330,26 @@
     "context": "You can upload up to {max} files."
   },
   {
+    "term": "component.profile-field-input-group.alert-active",
+    "definition": "La propiedad está vencida o a punto de vencer. Actualízala para desactivar esta alerta.",
+    "context": "The property is expired or about to expire. Update it to deactivate this alert."
+  },
+  {
+    "term": "component.profile-field-input-group.alert-inactive",
+    "definition": "La alerta se activará el {date}.",
+    "context": "The alert will be activated on {date}."
+  },
+  {
+    "term": "component.profile-field.expiration-date",
+    "definition": "Vencimiento: {date}",
+    "context": "Expires at: {date}"
+  },
+  {
+    "term": "component.profile-field.set-expiration-button-label",
+    "definition": "Configurar vencimiento",
+    "context": "Set expiration"
+  },
+  {
     "term": "component.profile-file.aria-label",
     "definition": "Archivo adjunto: {filename}. Para ver el archivo, pulsa la tecla Intro. Para eliminarlo, pulsa Suprimir.",
     "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
@@ -6428,6 +6453,36 @@
     "term": "component.update-organization-usage-details-dialog.years-label",
     "definition": "Años",
     "context": "Years"
+  },
+  {
+    "term": "component.update-profile-field-expiration-dialog.alert-date",
+    "definition": "Se avisará a partir del {date}.",
+    "context": "We will notify starting from {date}"
+  },
+  {
+    "term": "component.update-profile-field-expiration-dialog.alert-duration-days",
+    "definition": "Te avisaremos {count, select, 1 {un día} 7 {siete días} 15 {quince días} other {# días}} {isAfter, select, true {después} other {antes}}.",
+    "context": "We will let you know {count, select, 1 {one day} 7 {seven days} 15 {fifteen days} other {# days}} {isAfter, select, true {after} other {before}}."
+  },
+  {
+    "term": "component.update-profile-field-expiration-dialog.alert-duration-months",
+    "definition": "Te avisaremos {count, select, 1 {un mes} 2 {dos meses} 3 {tres meses} other {# meses}} {isAfter, select, true {después} other {antes}}.",
+    "context": "We will let you know {count, select, 1 {one month} 2 {two months} 3 {three months} other {# months}} {isAfter, select, true {after} other {before}}."
+  },
+  {
+    "term": "component.update-profile-field-expiration-dialog.date-expired-alert",
+    "definition": "La fecha introducida ya ha pasado.",
+    "context": "The set date has already passed."
+  },
+  {
+    "term": "component.update-profile-field-expiration-dialog.date-label",
+    "definition": "Fecha de vencimiento de {fieldName}",
+    "context": "Expiration date of {fieldName}"
+  },
+  {
+    "term": "component.update-profile-field-expiration-dialog.no-alert-duration",
+    "definition": "Esta propiedad no tiene ninguna alerta establecida.",
+    "context": "This property does not have any established alerts."
   },
   {
     "term": "component.update-profile-type-field-dialog.is-expirable-description",
@@ -9198,11 +9253,6 @@
     "term": "page.pricing.zapier-integration",
     "definition": "Integración con Zapier",
     "context": "Zapier integration"
-  },
-  {
-    "term": "page.profile-details.about-this-profile-type",
-    "definition": "Sobre {type}",
-    "context": "About this {type}"
   },
   {
     "term": "page.profile-details.hidden-properties",

@@ -1,5 +1,4 @@
-import { parseISO } from "date-fns";
-import { format, zonedTimeToUtc } from "date-fns-tz";
+import { PresignedPost } from "@aws-sdk/s3-presigned-post";
 import { arg, booleanArg, inputObjectType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
 import { DatabaseError } from "pg";
@@ -7,6 +6,7 @@ import { indexBy, isDefined, zip } from "remeda";
 import {
   CreateProfileType,
   CreateProfileTypeField,
+  FileUpload,
   ProfileFieldFile,
   ProfileTypeField,
 } from "../../db/__types";
@@ -23,12 +23,13 @@ import { SUCCESS } from "../helpers/Success";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { datetimeArg } from "../helpers/scalars/DateTime";
-import { validateAnd } from "../helpers/validateArgs";
+import { dateArg } from "../helpers/scalars/DateTime";
+import { validateAnd, validateOr } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 import { validFileUploadInput } from "../helpers/validators/validFileUploadInput";
+import { validIsNotUndefined } from "../helpers/validators/validIsDefined";
 import { validLocalizableUserText } from "../helpers/validators/validLocalizableUserText";
 import { validateRegex } from "../helpers/validators/validateRegex";
 import { userHasFeatureFlag } from "../petition/authorizers";
@@ -269,11 +270,27 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     }
 
     try {
-      return await ctx.profiles.updateProfileTypeField(
-        args.profileTypeFieldId,
-        updateData,
-        `User:${ctx.user!.id}`
-      );
+      return await ctx.profiles.withTransaction(async (t) => {
+        if (updateData.is_expirable === false) {
+          // if removing caducity, remove expiry dates from all profile replies
+          await ctx.profiles.updateProfileFieldValuesByProfileTypeFieldId(
+            args.profileTypeFieldId,
+            { expiry_date: null },
+            t
+          );
+          await ctx.profiles.updateProfileFieldFilesByProfileTypeFieldId(
+            args.profileTypeFieldId,
+            { expiry_date: null },
+            t
+          );
+        }
+        return await ctx.profiles.updateProfileTypeField(
+          args.profileTypeFieldId,
+          updateData,
+          `User:${ctx.user!.id}`,
+          t
+        );
+      });
     } catch (e) {
       if (
         e instanceof DatabaseError &&
@@ -421,7 +438,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
               definition(t) {
                 t.nonNull.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
                 t.nullable.jsonObject("content");
-                t.nullable.date("expiresAt");
+                t.nullable.date("expiryDate");
               },
             }),
           })
@@ -444,11 +461,9 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
       throw new ForbiddenError("Not authorized");
     }
     const profileTypeFieldsById = indexBy(profileTypeFields as ProfileTypeField[], (ptf) => ptf.id);
-    // validate contents and expiresAt
+    // validate contents and expiryDate
     const values = await ctx.profiles.loadProfileFieldValuesByProfileId(profileId);
     const valuesByPtfId = indexBy(values, (v) => v.profile_type_field_id);
-
-    const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
 
     const fieldsWithZonedExpires = fields.map((field) => {
       const profileTypeField = profileTypeFieldsById[field.profileTypeFieldId];
@@ -465,17 +480,17 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
           }
         }
       }
-      if (field.expiresAt !== undefined && !profileTypeField.is_expirable) {
+      if (field.expiryDate !== undefined && !profileTypeField.is_expirable) {
         throw new ApolloError(
           `Can't set expiry on a non expirable field`,
           "EXPIRY_ON_NON_EXPIRABLE_FIELD"
         );
       }
-      if (field.expiresAt !== undefined && field.content === null) {
+      if (field.expiryDate !== undefined && field.content === null) {
         throw new ApolloError(`Can't set expiry when removing a field`, "EXPIRY_ON_REMOVED_FIELD");
       }
       if (
-        field.expiresAt !== undefined &&
+        field.expiryDate !== undefined &&
         field.content === undefined &&
         !isDefined(valuesByPtfId[field.profileTypeFieldId])
       ) {
@@ -488,17 +503,14 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
       return {
         ...field,
         type: profileTypeField.type,
-        expiresAt: field.expiresAt
-          ? // priorize expiresAt argument if set
-            zonedTimeToUtc(format(field.expiresAt, "yyyy-MM-dd"), organization!.default_timezone)
+        expiryDate: field.expiryDate
+          ? // priorize expiryDate argument if set
+            field.expiryDate
           : // else, check option useReplyAsExpiryDate for DATE replies
           profileTypeField.type === "DATE" &&
             profileTypeField.options.useReplyAsExpiryDate &&
             isDefined(field.content?.value)
-          ? zonedTimeToUtc(
-              format(parseISO(field.content!.value), "yyyy-MM-dd"),
-              organization!.default_timezone
-            )
+          ? (field.content!.value as string)
           : null,
       };
     });
@@ -524,42 +536,71 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
     profileId: nonNull(globalIdArg("Profile")),
     profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
     data: nonNull(list(nonNull("FileUploadInput"))),
-    expiresAt: datetimeArg(),
+    expiryDate: dateArg(),
   },
   validateArgs: validateAnd(
     validFileUploadInput((args) => args.data, { maxSizeBytes: toBytes(100, "MB") }, "data"),
-    notEmptyArray((args) => args.data, "data")
+    validateOr(
+      notEmptyArray((args) => args.data, "data"),
+      validIsNotUndefined((args) => args.expiryDate, "expiryDate")
+    )
   ),
-  resolve: async (_, { profileId, profileTypeFieldId, data, expiresAt }, ctx) => {
-    const fileUploads = await ctx.files.createFileUpload(
-      data.map((data) => ({
-        path: random(16),
-        filename: data.filename,
-        size: data.size.toString(),
-        content_type: data.contentType,
-        upload_complete: false,
-      })),
-      `User:${ctx.user!.id}`
-    );
-    const presignedPostDatas = await Promise.all(
-      fileUploads.map((file) =>
-        ctx.storage.fileUploads.getSignedUploadEndpoint(
-          file.path,
-          file.content_type,
-          parseInt(file.size)
+  resolve: async (_, { profileId, profileTypeFieldId, data, expiryDate }, ctx) => {
+    let fileUploads: FileUpload[] = [];
+    let presignedPostDatas: PresignedPost[] = [];
+    let files: ProfileFieldFile[] = [];
+
+    if (data.length > 0) {
+      fileUploads = await ctx.files.createFileUpload(
+        data.map((data) => ({
+          path: random(16),
+          filename: data.filename,
+          size: data.size.toString(),
+          content_type: data.contentType,
+          upload_complete: false,
+        })),
+        `User:${ctx.user!.id}`
+      );
+
+      presignedPostDatas = await Promise.all(
+        fileUploads.map((file) =>
+          ctx.storage.fileUploads.getSignedUploadEndpoint(
+            file.path,
+            file.content_type,
+            parseInt(file.size)
+          )
         )
-      )
-    );
-    const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
-    const files = await ctx.profiles.createProfileFieldFiles(
-      profileId,
-      profileTypeFieldId,
-      fileUploads.map((f) => f.id),
-      expiresAt && zonedTimeToUtc(format(expiresAt, "yyyy-MM-dd"), organization!.default_timezone),
-      ctx.user!.id
-    );
+      );
+
+      files = await ctx.profiles.createProfileFieldFiles(
+        profileId,
+        profileTypeFieldId,
+        fileUploads.map((f) => f.id),
+        expiryDate,
+        ctx.user!.id
+      );
+    } else {
+      // no new files, update expiryDate on all uploaded files
+      await ctx.profiles.updateProfileFieldFilesExpiryDate(
+        profileId,
+        profileTypeFieldId,
+        expiryDate ?? null
+      );
+
+      await ctx.profiles.createEvent({
+        type: "PROFILE_FIELD_EXPIRY_UPDATED",
+        org_id: ctx.user!.org_id,
+        profile_id: profileId,
+        data: {
+          user_id: ctx.user!.id,
+          expiry_date: expiryDate ?? null,
+          profile_type_field_id: profileTypeFieldId,
+        },
+      });
+    }
 
     ctx.profiles.loadProfileFieldFiles.dataloader.clear({ profileId, profileTypeFieldId });
+
     return {
       property: { profile_id: profileId, profile_type_field_id: profileTypeFieldId },
       uploads: zip(presignedPostDatas, files).map(([presignedPostData, file]) => ({

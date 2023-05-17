@@ -19,6 +19,9 @@ pg.types.setTypeParser(pg.types.builtins.INTERVAL, (value: string) => {
   return rest;
 });
 
+// don't parse Date objects
+pg.types.setTypeParser(pg.types.builtins.DATE, (value) => value);
+
 export const KNEX = Symbol.for("KNEX");
 
 export const readOnly = createTaggedDecorator({ key: "db", value: "read-only" });

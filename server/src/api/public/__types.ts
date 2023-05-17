@@ -1150,7 +1150,7 @@ export type MutationcreateProfileArgs = {
 
 export type MutationcreateProfileFieldFileUploadLinkArgs = {
   data: Array<FileUploadInput>;
-  expiresAt?: InputMaybe<Scalars["DateTime"]>;
+  expiryDate?: InputMaybe<Scalars["Date"]>;
   profileId: Scalars["GID"];
   profileTypeFieldId: Scalars["GID"];
 };
@@ -3335,8 +3335,9 @@ export type ProfileFieldFile = ProfileFieldResponse & {
   /** Time when the response was created. */
   createdAt: Scalars["DateTime"];
   createdBy: Maybe<User>;
-  /** Time when the response was created. */
+  /** Expiration datetime of the value, considering organization's timezone. */
   expiresAt: Maybe<Scalars["DateTime"]>;
+  expiryDate: Maybe<Scalars["String"]>;
   field: ProfileTypeField;
   file: Maybe<FileUpload>;
   id: Scalars["GID"];
@@ -3392,8 +3393,9 @@ export type ProfileFieldResponse = {
   /** Time when the response was created. */
   createdAt: Scalars["DateTime"];
   createdBy: Maybe<User>;
-  /** Time when the response was created. */
+  /** Expiration datetime of the value, considering organization's timezone. */
   expiresAt: Maybe<Scalars["DateTime"]>;
+  expiryDate: Maybe<Scalars["String"]>;
   field: ProfileTypeField;
   profile: Profile;
   /** Time when the response was removed. */
@@ -3408,8 +3410,9 @@ export type ProfileFieldValue = ProfileFieldResponse & {
   /** Time when the response was created. */
   createdAt: Scalars["DateTime"];
   createdBy: Maybe<User>;
-  /** Time when the response was created. */
+  /** Expiration datetime of the value, considering organization's timezone. */
   expiresAt: Maybe<Scalars["DateTime"]>;
+  expiryDate: Maybe<Scalars["String"]>;
   field: ProfileTypeField;
   id: Scalars["GID"];
   profile: Profile;
@@ -4513,7 +4516,7 @@ export type UpdatePetitionInput = {
 
 export type UpdateProfileFieldValueInput = {
   content?: InputMaybe<Scalars["JSONObject"]>;
-  expiresAt?: InputMaybe<Scalars["Date"]>;
+  expiryDate?: InputMaybe<Scalars["Date"]>;
   profileTypeFieldId: Scalars["GID"];
 };
 

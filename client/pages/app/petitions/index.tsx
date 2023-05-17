@@ -282,11 +282,11 @@ function Petitions() {
       await showPetitionSharingDialog({
         userId: me.id,
         petitionIds: selectedRowsRef.current
-          .filter((c) => c.__typename !== "PetitionFolder")
-          .map((p) => (p as any).id as string),
+          .filter(isTypename(["Petition", "PetitionTemplate"]))
+          .map((p) => p.id),
         folderIds: selectedRowsRef.current
-          .filter((c) => c.__typename === "PetitionFolder")
-          .map((p) => (p as any).folderId as string),
+          .filter(isTypename("PetitionFolder"))
+          .map((p) => p.folderId),
         type: state.type,
         currentPath: stateRef.current.path,
       });
@@ -377,11 +377,9 @@ function Petitions() {
       await movePetitions({
         variables: {
           ids: selectedRowsRef.current
-            .filter((r) => r.__typename !== "PetitionFolder")
+            .filter(isTypename(["Petition", "PetitionTemplate"]))
             .map(rowKeyProp),
-          folderIds: selectedRowsRef.current
-            .filter((r) => r.__typename === "PetitionFolder")
-            .map(rowKeyProp),
+          folderIds: selectedRowsRef.current.filter(isTypename("PetitionFolder")).map(rowKeyProp),
           source: stateRef.current.path,
           destination: destinationPath,
           type: stateRef.current.type,

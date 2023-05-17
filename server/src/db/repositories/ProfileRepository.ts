@@ -8,6 +8,8 @@ import { LazyPromise } from "../../util/promises/LazyPromise";
 import { Maybe, MaybeArray, Replace } from "../../util/types";
 import {
   CreateProfile,
+  CreateProfileFieldFile,
+  CreateProfileFieldValue,
   CreateProfileType,
   CreateProfileTypeField,
   Profile,
@@ -259,9 +261,10 @@ export class ProfileRepository extends BaseRepository {
   async updateProfileTypeField(
     id: number,
     data: Partial<Omit<CreateProfileTypeField, "position">>,
-    updatedBy: string
+    updatedBy: string,
+    t?: Knex.Transaction
   ) {
-    const [profileTypeField] = await this.from("profile_type_field")
+    const [profileTypeField] = await this.from("profile_type_field", t)
       .where("id", id)
       .whereNull("deleted_at")
       .update(
@@ -603,7 +606,7 @@ export class ProfileRepository extends BaseRepository {
       profileTypeFieldId: number;
       type: ProfileTypeFieldType;
       content?: Record<string, any> | null;
-      expiresAt?: Date | null;
+      expiryDate?: string | null;
     }[],
     userId: number
   ) {
@@ -631,9 +634,9 @@ export class ProfileRepository extends BaseRepository {
                 type: f.type,
                 content: f.content,
                 created_by_user_id: userId,
-                ...(f.expiresAt !== undefined
-                  ? { expires_at: f.expiresAt }
-                  : { expires_at: previousByPtfId[f.profileTypeFieldId]?.expires_at ?? null }),
+                ...(f.expiryDate !== undefined
+                  ? { expiry_date: f.expiryDate }
+                  : { expiry_date: previousByPtfId[f.profileTypeFieldId]?.expiry_date ?? null }),
               })),
               t
             )
@@ -645,8 +648,8 @@ export class ProfileRepository extends BaseRepository {
           const current = currentByPtfId[f.profileTypeFieldId] as ProfileFieldValue | undefined;
           const previous = previousByPtfId[f.profileTypeFieldId] as ProfileFieldValue | undefined;
           const expiryChanged =
-            f.expiresAt !== undefined &&
-            (previous?.expires_at?.valueOf() ?? null) !== (f.expiresAt?.valueOf() ?? null);
+            f.expiryDate !== undefined &&
+            (previous?.expiry_date?.valueOf() ?? null) !== (f.expiryDate?.valueOf() ?? null);
           return [
             ...(isDefined(current) || isDefined(previous)
               ? [
@@ -672,7 +675,7 @@ export class ProfileRepository extends BaseRepository {
                     data: {
                       user_id: userId,
                       profile_type_field_id: f.profileTypeFieldId,
-                      expires_at: current?.expires_at?.toISOString() ?? null,
+                      expiry_date: current?.expiry_date ?? null,
                     },
                   } satisfies ProfileFieldExpiryUpdatedEvent<true>,
                 ]
@@ -695,17 +698,37 @@ export class ProfileRepository extends BaseRepository {
     });
   }
 
+  async updateProfileFieldValuesByProfileTypeFieldId(
+    profileTypeFieldId: number,
+    data: Partial<CreateProfileFieldValue>,
+    t?: Knex.Transaction
+  ) {
+    await this.from("profile_field_value", t)
+      .where("profile_type_field_id", profileTypeFieldId)
+      .update(data);
+  }
+
+  async updateProfileFieldFilesByProfileTypeFieldId(
+    profileTypeFieldId: number,
+    data: Partial<CreateProfileFieldFile>,
+    t?: Knex.Transaction
+  ) {
+    await this.from("profile_field_file", t)
+      .where("profile_type_field_id", profileTypeFieldId)
+      .update(data);
+  }
+
   async createProfileFieldFiles(
     profileId: number,
     profileTypeFieldId: number,
     fileUploadIds: number[],
-    expiresAt: Date | null | undefined,
+    expiryDate: string | null | undefined,
     userId: number
   ) {
     return await this.withTransaction(async (t) => {
       const profileType = (await this.loadProfileTypeForProfileId.raw(profileId, t))!;
       const previousFiles =
-        expiresAt === undefined
+        expiryDate === undefined
           ? await this.from("profile_field_file", t)
               .whereNull("deleted_at")
               .whereNull("removed_at")
@@ -717,7 +740,7 @@ export class ProfileRepository extends BaseRepository {
               .whereNull("removed_at")
               .where("profile_id", profileId)
               .where("profile_type_field_id", profileTypeFieldId)
-              .update({ expires_at: expiresAt })
+              .update({ expiry_date: expiryDate })
               .returning("*");
       const profileFieldFiles = await this.insert(
         "profile_field_file",
@@ -726,7 +749,7 @@ export class ProfileRepository extends BaseRepository {
           profile_type_field_id: profileTypeFieldId,
           type: "FILE" as const,
           file_upload_id: fileUploadId,
-          expires_at: previousFiles[0]?.expires_at ?? null,
+          expiry_date: previousFiles[0]?.expiry_date ?? expiryDate ?? null,
           created_by_user_id: userId,
         })),
         t
@@ -746,7 +769,7 @@ export class ProfileRepository extends BaseRepository {
                 },
               } satisfies ProfileFieldFileAddedEvent<true>)
           ),
-          ...(expiresAt !== undefined
+          ...(expiryDate !== undefined
             ? [
                 {
                   org_id: profileType.org_id,
@@ -755,7 +778,7 @@ export class ProfileRepository extends BaseRepository {
                   data: {
                     user_id: userId,
                     profile_type_field_id: profileTypeFieldId,
-                    expires_at: expiresAt?.toISOString() ?? null,
+                    expiry_date: expiryDate ?? null,
                   },
                 } satisfies ProfileFieldExpiryUpdatedEvent<true>,
               ]
@@ -765,6 +788,21 @@ export class ProfileRepository extends BaseRepository {
       );
       return profileFieldFiles;
     });
+  }
+
+  async updateProfileFieldFilesExpiryDate(
+    profileId: number,
+    profileTypeFieldId: number,
+    expiryDate: Maybe<string>
+  ) {
+    return await this.from("profile_field_file")
+      .where({
+        profile_id: profileId,
+        profile_type_field_id: profileTypeFieldId,
+        deleted_at: null,
+        removed_at: null,
+      })
+      .update({ expiry_date: expiryDate }, "*");
   }
 
   getPaginatedEventsForProfile(profileId: number, opts: PageOpts) {
@@ -790,6 +828,7 @@ export class ProfileRepository extends BaseRepository {
   getPaginatedExpirableProfileFieldProperties(
     userId: number,
     orgId: number,
+    defaultTimezone: string,
     opts: {
       search?: Maybe<string>;
       filter?: Maybe<{
@@ -818,7 +857,7 @@ export class ProfileRepository extends BaseRepository {
       .join(this.knex.ref("profile_type_field").as("ptf"), "ptf.id", "pfx.profile_type_field_id")
       .where("p.org_id", orgId)
       .whereNull("p.deleted_at")
-      .whereNotNull("pfx.expires_at")
+      .whereNotNull("pfx.expiry_date")
       .whereNull("pfx.removed_at")
       .whereNull("pfx.deleted_at")
       .whereNotNull("ptf.expiry_alert_ahead_time")
@@ -829,7 +868,7 @@ export class ProfileRepository extends BaseRepository {
       .join(this.knex.ref("profile_type_field").as("ptf"), "ptf.id", "pfx.profile_type_field_id")
       .where("p.org_id", orgId)
       .whereNull("p.deleted_at")
-      .whereNotNull("pfx.expires_at")
+      .whereNotNull("pfx.expiry_date")
       .whereNull("pfx.removed_at")
       .whereNull("pfx.deleted_at")
       .whereNotNull("ptf.expiry_alert_ahead_time")
@@ -853,7 +892,7 @@ export class ProfileRepository extends BaseRepository {
           profile_id: number;
           profile_type_field_id: number;
           in_alert: boolean;
-          expires_at: Date;
+          expiry_date: Date;
         }[] = await this.knex
           .unionAll([
             valuesQuery
@@ -861,9 +900,10 @@ export class ProfileRepository extends BaseRepository {
               .select(
                 "pfx.profile_id",
                 "pfx.profile_type_field_id",
-                "pfx.expires_at",
+                "pfx.expiry_date",
                 this.knex.raw(
-                  /* sql */ `pfx.expires_at - ptf.expiry_alert_ahead_time < now() as in_alert`
+                  /* sql */ `(pfx.expiry_date at time zone ?) - ptf.expiry_alert_ahead_time < now() as in_alert`,
+                  [defaultTimezone]
                 )
               ),
             filesQuery
@@ -872,19 +912,20 @@ export class ProfileRepository extends BaseRepository {
               .select(
                 "pfx.profile_id",
                 "pfx.profile_type_field_id",
-                "pfx.expires_at",
+                "pfx.expiry_date",
                 this.knex.raw(
-                  /* sql */ `pfx.expires_at - ptf.expiry_alert_ahead_time < now() as in_alert`
+                  /* sql */ `(pfx.expiry_date at time zone ?) - ptf.expiry_alert_ahead_time < now() as in_alert`,
+                  [defaultTimezone]
                 )
               ),
           ])
           .orderBy("in_alert", "desc")
-          .orderBy("expires_at", "asc")
+          .orderBy("expiry_date", "asc")
           .orderBy("profile_id")
           .orderBy("profile_type_field_id")
           .offset(opts.offset ?? 0)
           .limit(opts.limit ?? 0);
-        return properties.map(omit(["in_alert", "expires_at"]));
+        return properties.map(omit(["in_alert", "expiry_date"]));
       }),
     };
   }

@@ -30,6 +30,7 @@ import { OverflownText } from "./OverflownText";
 import { UserDropdownEmpty } from "./UserDropdownEmpty";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
 import { UserSelectOption } from "./UserSelectOption";
+import { isTypename } from "@parallel/utils/apollo/typename";
 
 export type UserSelectSelection<IncludeGroups extends boolean = false> =
   | UserSelect_UserFragment
@@ -185,8 +186,8 @@ export const UserSelect = Object.assign(
           const items = unMaybeArray(_value ?? []) as UserSelectSelection<boolean>[];
           return await onSearch(
             search,
-            items.filter((item) => item.__typename === "User").map((item) => item.id),
-            items.filter((item) => item.__typename === "UserGroup").map((item) => item.id)
+            items.filter(isTypename("User")).map((item) => item.id),
+            items.filter(isTypename("UserGroup")).map((item) => item.id)
           );
         }),
       [onSearch, _value]

@@ -2,6 +2,7 @@ import { enumType, interfaceType, nonNull, objectType } from "nexus";
 import { sortBy } from "remeda";
 import { ProfileTypeFieldPermissionValues, ProfileTypeFieldTypeValues } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
+import { zonedTimeToUtc } from "date-fns-tz";
 
 export const ProfileType = objectType({
   name: "ProfileType",
@@ -138,8 +139,14 @@ export const ProfileFieldResponse = interfaceType({
       resolve: async (root, _, ctx) => await ctx.users.loadUser(root.created_by_user_id),
     });
     t.nullable.datetime("expiresAt", {
-      description: "Time when the response was created.",
-      resolve: (o) => o.expires_at,
+      description: "Expiration datetime of the value, considering organization's timezone.",
+      resolve: async (o, _, ctx) => {
+        const org = (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
+        return o.expiry_date ? zonedTimeToUtc(o.expiry_date, org.default_timezone) : null;
+      },
+    });
+    t.nullable.string("expiryDate", {
+      resolve: (o) => o.expiry_date,
     });
     t.datetime("createdAt", {
       description: "Time when the response was created.",

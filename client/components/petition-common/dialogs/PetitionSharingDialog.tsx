@@ -60,6 +60,7 @@ import { UserAvatar } from "../../common/UserAvatar";
 import { UserSelect, UserSelectInstance, UserSelectSelection } from "../../common/UserSelect";
 import { PetitionPermissionTypeText } from "../PetitionPermissionType";
 import { PetitionPermissionTypeSelect } from "../PetitionPermissionTypeSelect";
+import { isTypename } from "@parallel/utils/apollo/typename";
 
 type PetitionSharingDialogData = {
   selection: UserSelectSelection<true>[];
@@ -245,8 +246,8 @@ export function PetitionSharingDialog({
 
   const handleAddPetitionPermissions = handleSubmit(
     async ({ selection, notify, subscribe, message }) => {
-      const users = selection.filter((s) => s.__typename === "User").map((u) => u.id);
-      const groups = selection.filter((s) => s.__typename === "UserGroup").map((g) => g.id);
+      const users = selection.filter(isTypename("User")).map((u) => u.id);
+      const groups = selection.filter(isTypename("UserGroup")).map((g) => g.id);
 
       try {
         await addPetitionPermission({

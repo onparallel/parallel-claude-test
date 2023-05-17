@@ -72,7 +72,7 @@ export async function up(knex: Knex): Promise<void> {
     t.integer("profile_type_field_id").notNullable().references("profile_type_field.id");
     t.specificType("type", "profile_type_field_type").notNullable();
     t.jsonb("content").notNullable().defaultTo(knex.raw("'{}'::jsonb"));
-    t.timestamp("expires_at").nullable().defaultTo(null);
+    t.date("expiry_date").nullable().defaultTo(null);
 
     t.integer("created_by_user_id").notNullable().references("user.id");
     t.timestamp("created_at").notNullable().defaultTo(knex.raw("CURRENT_TIMESTAMP"));
@@ -96,12 +96,12 @@ export async function up(knex: Knex): Promise<void> {
     create index profile_field_value__not_anonymized on profile_field_value (id)
     where anonymized_at is null and (removed_at is not null or deleted_at is not null);
 
-    create index profile_field_value__expires_at 
+    create index profile_field_value__expiring_values 
       on "profile_field_value" (profile_id, profile_type_field_id)
-      include (expires_at)
+      include ("expiry_date")
       where removed_at is null
       and deleted_at is null 
-      and expires_at is not null;
+      and "expiry_date" is not null;
   `);
 
   await knex.schema.createTable("profile_field_file", (t) => {
@@ -110,7 +110,7 @@ export async function up(knex: Knex): Promise<void> {
     t.integer("profile_type_field_id").notNullable().references("profile_type_field.id");
     t.specificType("type", "profile_type_field_type").notNullable();
     t.integer("file_upload_id").notNullable().references("file_upload.id");
-    t.timestamp("expires_at").nullable().defaultTo(null);
+    t.date("expiry_date").nullable().defaultTo(null);
 
     t.timestamp("created_at").notNullable().defaultTo(knex.raw("CURRENT_TIMESTAMP"));
     t.integer("created_by_user_id").notNullable().references("user.id");
@@ -131,12 +131,12 @@ export async function up(knex: Knex): Promise<void> {
     create index profile_field_file__not_anonymized on profile_field_file (id)
     where anonymized_at is null and (removed_at is not null or deleted_at is not null);
 
-    create index profile_field_file__expires_at 
+    create index profile_field_file__expiring_files 
       on "profile_field_file" (profile_id, profile_type_field_id)
-      include (expires_at)
+      include ("expiry_date")
       where removed_at is null
       and deleted_at is null 
-      and expires_at is not null;
+      and "expiry_date" is not null;
   `);
 
   await knex.schema.createTable("profile_event", (t) => {

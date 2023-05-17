@@ -24,7 +24,7 @@ export type ProfileEventPayload<TType extends ProfileEventType> = {
   PROFILE_FIELD_EXPIRY_UPDATED: {
     user_id: number;
     profile_type_field_id: number;
-    expires_at: string | null;
+    expiry_date: string | null;
   };
 }[TType];
 

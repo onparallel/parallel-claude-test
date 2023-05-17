@@ -69,20 +69,12 @@ function Alerts() {
   const items = data?.expiringProfileProperties.items ?? [];
   const totalCount = data?.expiringProfileProperties.totalCount ?? 0;
 
-  console.log("items: ", items);
-  console.log("totalCount: ", totalCount);
-
   const columns = useAlertsTableColumns();
   const context = useMemo(() => ({ user: me! }), [me]);
 
   const navigate = useHandleNavigation();
   const handleRowClick = useCallback((row: Alerts_ProfileFieldPropertyFragment, event: any) => {
-    const {
-      profile,
-      field: { id },
-    } = row.value!;
-
-    navigate(`/app/profiles/${profile.id}?field=${id}`, event);
+    navigate(`/app/profiles/${row.profile.id}?field=${row.field.id}`, event);
   }, []);
 
   return (
@@ -104,7 +96,7 @@ function Alerts() {
             minHeight={0}
             columns={columns}
             rows={items}
-            rowKeyProp={(row) => row.value!.field.id}
+            rowKeyProp={(row) => row.field.id}
             context={context}
             isHighlightable
             loading={loading}
@@ -212,12 +204,14 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
       {
         key: "status",
         header: "",
-        CellContent: ({ row: { value } }) => {
-          const {
-            expiresAt,
-            field: { expiryAlertAheadTime },
-          } = value!;
-          if (isPast(sub(new Date(expiresAt!), expiryAlertAheadTime!))) {
+        CellContent: ({ row }) => {
+          const expiryDate = row.value?.expiryDate ?? row.files![0].expiryDate!;
+          const expiresAt = row.value?.expiresAt ?? row.files![0].expiresAt!;
+          const expiryAlertAheadTime = row.field.expiryAlertAheadTime!;
+
+          const alertActivationAt = sub(new Date(expiresAt), expiryAlertAheadTime);
+          const alertActivationDate = sub(new Date(expiryDate), expiryAlertAheadTime);
+          if (isPast(alertActivationAt)) {
             return (
               <SmallPopover
                 content={
@@ -241,7 +235,10 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
                       id="component.use-alerts-table-columns.alert-inactive-help"
                       defaultMessage="The alert will be activated on {date}."
                       values={{
-                        date: expiresAt,
+                        date: intl.formatDate(alertActivationDate, {
+                          ...FORMATS.LL,
+                          timeZone: "UTC",
+                        }),
                       }}
                     />
                   </Box>
@@ -264,10 +261,11 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
           width: "28%",
           minWidth: "240px",
         },
-        CellContent: ({ row: { value } }) => {
-          const {
+        CellContent: ({
+          row: {
             profile: { name },
-          } = value!;
+          },
+        }) => {
           return <OverflownText>{name}</OverflownText>;
         },
       },
@@ -281,10 +279,11 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
           width: "20%",
           minWidth: "240px",
         },
-        CellContent: ({ row: { value } }) => {
-          const {
+        CellContent: ({
+          row: {
             field: { name },
-          } = value!;
+          },
+        }) => {
           return (
             <Text as="span">
               <LocalizableUserTextRender
@@ -308,13 +307,14 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
           width: "12%",
           minWidth: "220px",
         },
-        CellContent: ({ row: { value } }) => {
-          const { expiresAt } = value!;
+        CellContent: ({ row }) => {
+          const expiresAt = row.value?.expiresAt ?? row.files![0].expiresAt!;
+          const expiryDate = row.value?.expiryDate ?? row.files![0].expiryDate!;
           return (
             <DateTime
-              color={isPast(new Date(expiresAt!)) ? "red.600" : undefined}
-              value={expiresAt!}
-              format={FORMATS.LLL}
+              color={isPast(new Date(expiresAt)) ? "red.600" : undefined}
+              value={expiryDate}
+              format={{ ...FORMATS.LL, timeZone: "UTC" }}
               whiteSpace="nowrap"
             />
           );
@@ -348,12 +348,13 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
           width: "20%",
           minWidth: "240px",
         },
-        CellContent: ({ row: { value } }) => {
-          const {
+        CellContent: ({
+          row: {
             profile: {
               profileType: { name },
             },
-          } = value!;
+          },
+        }) => {
           return (
             <Text as="span">
               <LocalizableUserTextRender
@@ -375,22 +376,28 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
 const _fragments = {
   ProfileFieldProperty: gql`
     fragment Alerts_ProfileFieldProperty on ProfileFieldProperty {
+      field {
+        id
+        name
+        expiryAlertAheadTime
+      }
+      profile {
+        id
+        name
+        profileType {
+          id
+          name
+        }
+      }
       value {
         id
         expiresAt
-        field {
-          id
-          name
-          isExpirable
-          expiryAlertAheadTime
-        }
-        profile {
-          id
-          name
-          profileType {
-            name
-          }
-        }
+        expiryDate
+      }
+      files {
+        id
+        expiresAt
+        expiryDate
       }
     }
   `,

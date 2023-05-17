@@ -1195,7 +1195,7 @@ export interface MutationcreateProfileArgs {
 
 export interface MutationcreateProfileFieldFileUploadLinkArgs {
   data: Array<FileUploadInput>;
-  expiresAt?: InputMaybe<Scalars["DateTime"]>;
+  expiryDate?: InputMaybe<Scalars["Date"]>;
   profileId: Scalars["GID"];
   profileTypeFieldId: Scalars["GID"];
 }
@@ -3443,8 +3443,9 @@ export interface ProfileFieldFile extends ProfileFieldResponse {
   /** Time when the response was created. */
   createdAt: Scalars["DateTime"];
   createdBy?: Maybe<User>;
-  /** Time when the response was created. */
+  /** Expiration datetime of the value, considering organization's timezone. */
   expiresAt?: Maybe<Scalars["DateTime"]>;
+  expiryDate?: Maybe<Scalars["String"]>;
   field: ProfileTypeField;
   file?: Maybe<FileUpload>;
   id: Scalars["GID"];
@@ -3506,8 +3507,9 @@ export interface ProfileFieldResponse {
   /** Time when the response was created. */
   createdAt: Scalars["DateTime"];
   createdBy?: Maybe<User>;
-  /** Time when the response was created. */
+  /** Expiration datetime of the value, considering organization's timezone. */
   expiresAt?: Maybe<Scalars["DateTime"]>;
+  expiryDate?: Maybe<Scalars["String"]>;
   field: ProfileTypeField;
   profile: Profile;
   /** Time when the response was removed. */
@@ -3523,8 +3525,9 @@ export interface ProfileFieldValue extends ProfileFieldResponse {
   /** Time when the response was created. */
   createdAt: Scalars["DateTime"];
   createdBy?: Maybe<User>;
-  /** Time when the response was created. */
+  /** Expiration datetime of the value, considering organization's timezone. */
   expiresAt?: Maybe<Scalars["DateTime"]>;
+  expiryDate?: Maybe<Scalars["String"]>;
   field: ProfileTypeField;
   id: Scalars["GID"];
   profile: Profile;
@@ -4679,7 +4682,7 @@ export interface UpdatePetitionInput {
 
 export interface UpdateProfileFieldValueInput {
   content?: InputMaybe<Scalars["JSONObject"]>;
-  expiresAt?: InputMaybe<Scalars["Date"]>;
+  expiryDate?: InputMaybe<Scalars["Date"]>;
   profileTypeFieldId: Scalars["GID"];
 }
 
@@ -14373,6 +14376,9 @@ export type ProfileField_ProfileTypeFieldFragment = {
   id: string;
   name: { [locale in UserLocale]?: string };
   type: ProfileTypeFieldType;
+  isExpirable: boolean;
+  expiryAlertAheadTime?: Duration | null;
+  options: { [key: string]: any };
 };
 
 export type ProfileField_ProfileFieldValueFragment = {
@@ -14384,6 +14390,7 @@ export type ProfileField_ProfileFieldValueFragment = {
 export type ProfileField_ProfileFieldFileFragment = {
   __typename?: "ProfileFieldFile";
   id: string;
+  expiryDate?: string | null;
   file?: {
     __typename?: "FileUpload";
     contentType: string;
@@ -14396,6 +14403,7 @@ export type ProfileField_ProfileFieldFileFragment = {
 export type ProfileFieldFileUpload_ProfileFieldFileFragment = {
   __typename?: "ProfileFieldFile";
   id: string;
+  expiryDate?: string | null;
   file?: {
     __typename?: "FileUpload";
     contentType: string;
@@ -14425,6 +14433,14 @@ export type ProfileFieldFileUpload_profileFieldFileDownloadLinkMutation = {
       size: number;
     } | null;
   };
+};
+
+export type ProfileFieldInputGroup_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  type: ProfileTypeFieldType;
+  isExpirable: boolean;
+  expiryAlertAheadTime?: Duration | null;
 };
 
 export type PublicSignupForm_emailIsAvailableQueryVariables = Exact<{
@@ -16305,24 +16321,34 @@ export type AdminSupportMethods_userQuery = {
 
 export type Alerts_ProfileFieldPropertyFragment = {
   __typename?: "ProfileFieldProperty";
+  field: {
+    __typename?: "ProfileTypeField";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    expiryAlertAheadTime?: Duration | null;
+  };
+  profile: {
+    __typename?: "Profile";
+    id: string;
+    name: string;
+    profileType: {
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+    };
+  };
   value?: {
     __typename?: "ProfileFieldValue";
     id: string;
     expiresAt?: string | null;
-    field: {
-      __typename?: "ProfileTypeField";
-      id: string;
-      name: { [locale in UserLocale]?: string };
-      isExpirable: boolean;
-      expiryAlertAheadTime?: Duration | null;
-    };
-    profile: {
-      __typename?: "Profile";
-      id: string;
-      name: string;
-      profileType: { __typename?: "ProfileType"; name: { [locale in UserLocale]?: string } };
-    };
+    expiryDate?: string | null;
   } | null;
+  files?: Array<{
+    __typename?: "ProfileFieldFile";
+    id: string;
+    expiresAt?: string | null;
+    expiryDate?: string | null;
+  }> | null;
 };
 
 export type Alerts_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -16379,24 +16405,34 @@ export type Alerts_expiringProfilePropertiesQuery = {
     totalCount: number;
     items: Array<{
       __typename?: "ProfileFieldProperty";
+      field: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        expiryAlertAheadTime?: Duration | null;
+      };
+      profile: {
+        __typename?: "Profile";
+        id: string;
+        name: string;
+        profileType: {
+          __typename?: "ProfileType";
+          id: string;
+          name: { [locale in UserLocale]?: string };
+        };
+      };
       value?: {
         __typename?: "ProfileFieldValue";
         id: string;
         expiresAt?: string | null;
-        field: {
-          __typename?: "ProfileTypeField";
-          id: string;
-          name: { [locale in UserLocale]?: string };
-          isExpirable: boolean;
-          expiryAlertAheadTime?: Duration | null;
-        };
-        profile: {
-          __typename?: "Profile";
-          id: string;
-          name: string;
-          profileType: { __typename?: "ProfileType"; name: { [locale in UserLocale]?: string } };
-        };
+        expiryDate?: string | null;
       } | null;
+      files?: Array<{
+        __typename?: "ProfileFieldFile";
+        id: string;
+        expiresAt?: string | null;
+        expiryDate?: string | null;
+      }> | null;
     }>;
   };
 };
@@ -26328,11 +26364,15 @@ export type ProfileDetail_ProfileTypeFieldFragment = {
   position: number;
   type: ProfileTypeFieldType;
   myPermission: ProfileTypeFieldPermission;
+  isExpirable: boolean;
+  expiryAlertAheadTime?: Duration | null;
+  options: { [key: string]: any };
 };
 
 export type ProfileDetail_ProfileFieldFileFragment = {
   __typename?: "ProfileFieldFile";
   id: string;
+  expiryDate?: string | null;
   file?: {
     __typename?: "FileUpload";
     contentType: string;
@@ -26347,6 +26387,7 @@ export type ProfileDetail_ProfileFieldValueFragment = {
   id: string;
   content?: { [key: string]: any } | null;
   createdAt: string;
+  expiryDate?: string | null;
 };
 
 export type ProfileDetail_ProfileFieldPropertyFragment = {
@@ -26358,10 +26399,14 @@ export type ProfileDetail_ProfileFieldPropertyFragment = {
     position: number;
     type: ProfileTypeFieldType;
     myPermission: ProfileTypeFieldPermission;
+    isExpirable: boolean;
+    expiryAlertAheadTime?: Duration | null;
+    options: { [key: string]: any };
   };
   files?: Array<{
     __typename?: "ProfileFieldFile";
     id: string;
+    expiryDate?: string | null;
     file?: {
       __typename?: "FileUpload";
       contentType: string;
@@ -26375,6 +26420,7 @@ export type ProfileDetail_ProfileFieldPropertyFragment = {
     id: string;
     content?: { [key: string]: any } | null;
     createdAt: string;
+    expiryDate?: string | null;
   } | null;
 };
 
@@ -26398,10 +26444,14 @@ export type ProfileDetail_ProfileFragment = {
       position: number;
       type: ProfileTypeFieldType;
       myPermission: ProfileTypeFieldPermission;
+      isExpirable: boolean;
+      expiryAlertAheadTime?: Duration | null;
+      options: { [key: string]: any };
     };
     files?: Array<{
       __typename?: "ProfileFieldFile";
       id: string;
+      expiryDate?: string | null;
       file?: {
         __typename?: "FileUpload";
         contentType: string;
@@ -26415,6 +26465,7 @@ export type ProfileDetail_ProfileFragment = {
       id: string;
       content?: { [key: string]: any } | null;
       createdAt: string;
+      expiryDate?: string | null;
     } | null;
   }>;
 };
@@ -26490,10 +26541,14 @@ export type ProfileDetail_profileQuery = {
         position: number;
         type: ProfileTypeFieldType;
         myPermission: ProfileTypeFieldPermission;
+        isExpirable: boolean;
+        expiryAlertAheadTime?: Duration | null;
+        options: { [key: string]: any };
       };
       files?: Array<{
         __typename?: "ProfileFieldFile";
         id: string;
+        expiryDate?: string | null;
         file?: {
           __typename?: "FileUpload";
           contentType: string;
@@ -26507,6 +26562,7 @@ export type ProfileDetail_profileQuery = {
         id: string;
         content?: { [key: string]: any } | null;
         createdAt: string;
+        expiryDate?: string | null;
       } | null;
     }>;
   };
@@ -26538,10 +26594,14 @@ export type ProfileDetail_updateProfileFieldValueMutation = {
         position: number;
         type: ProfileTypeFieldType;
         myPermission: ProfileTypeFieldPermission;
+        isExpirable: boolean;
+        expiryAlertAheadTime?: Duration | null;
+        options: { [key: string]: any };
       };
       files?: Array<{
         __typename?: "ProfileFieldFile";
         id: string;
+        expiryDate?: string | null;
         file?: {
           __typename?: "FileUpload";
           contentType: string;
@@ -26555,6 +26615,7 @@ export type ProfileDetail_updateProfileFieldValueMutation = {
         id: string;
         content?: { [key: string]: any } | null;
         createdAt: string;
+        expiryDate?: string | null;
       } | null;
     }>;
   };
@@ -26564,7 +26625,7 @@ export type ProfileDetail_createProfileFieldFileUploadLinkMutationVariables = Ex
   profileId: Scalars["GID"];
   profileTypeFieldId: Scalars["GID"];
   data: Array<FileUploadInput> | FileUploadInput;
-  expiresAt?: InputMaybe<Scalars["DateTime"]>;
+  expiryDate?: InputMaybe<Scalars["Date"]>;
 }>;
 
 export type ProfileDetail_createProfileFieldFileUploadLinkMutation = {
@@ -26580,6 +26641,7 @@ export type ProfileDetail_createProfileFieldFileUploadLinkMutation = {
       file: {
         __typename?: "ProfileFieldFile";
         id: string;
+        expiryDate?: string | null;
         file?: {
           __typename?: "FileUpload";
           contentType: string;
@@ -26598,10 +26660,14 @@ export type ProfileDetail_createProfileFieldFileUploadLinkMutation = {
         position: number;
         type: ProfileTypeFieldType;
         myPermission: ProfileTypeFieldPermission;
+        isExpirable: boolean;
+        expiryAlertAheadTime?: Duration | null;
+        options: { [key: string]: any };
       };
       files?: Array<{
         __typename?: "ProfileFieldFile";
         id: string;
+        expiryDate?: string | null;
         file?: {
           __typename?: "FileUpload";
           contentType: string;
@@ -26615,6 +26681,7 @@ export type ProfileDetail_createProfileFieldFileUploadLinkMutation = {
         id: string;
         content?: { [key: string]: any } | null;
         createdAt: string;
+        expiryDate?: string | null;
       } | null;
     };
   };
@@ -26630,6 +26697,7 @@ export type ProfileDetail_profileFieldFileUploadCompleteMutation = {
   profileFieldFileUploadComplete: Array<{
     __typename?: "ProfileFieldFile";
     id: string;
+    expiryDate?: string | null;
     file?: {
       __typename?: "FileUpload";
       contentType: string;
@@ -31128,22 +31196,28 @@ export const AdminOrganizations_OrganizationFragmentDoc = gql`
 ` as unknown as DocumentNode<AdminOrganizations_OrganizationFragment, unknown>;
 export const Alerts_ProfileFieldPropertyFragmentDoc = gql`
   fragment Alerts_ProfileFieldProperty on ProfileFieldProperty {
+    field {
+      id
+      name
+      expiryAlertAheadTime
+    }
+    profile {
+      id
+      name
+      profileType {
+        id
+        name
+      }
+    }
     value {
       id
       expiresAt
-      field {
-        id
-        name
-        isExpirable
-        expiryAlertAheadTime
-      }
-      profile {
-        id
-        name
-        profileType {
-          name
-        }
-      }
+      expiryDate
+    }
+    files {
+      id
+      expiresAt
+      expiryDate
     }
   }
 ` as unknown as DocumentNode<Alerts_ProfileFieldPropertyFragment, unknown>;
@@ -34441,12 +34515,25 @@ export const NewPetition_PetitionBaseOrFolderFragmentDoc = gql`
   ${PublicTemplateCard_PetitionTemplateFragmentDoc}
   ${FolderCard_PetitionFolderFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_PetitionBaseOrFolderFragment, unknown>;
+export const ProfileFieldInputGroup_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileFieldInputGroup_ProfileTypeField on ProfileTypeField {
+    id
+    type
+    isExpirable
+    expiryAlertAheadTime
+  }
+` as unknown as DocumentNode<ProfileFieldInputGroup_ProfileTypeFieldFragment, unknown>;
 export const ProfileField_ProfileTypeFieldFragmentDoc = gql`
   fragment ProfileField_ProfileTypeField on ProfileTypeField {
     id
     name
     type
+    isExpirable
+    expiryAlertAheadTime
+    options
+    ...ProfileFieldInputGroup_ProfileTypeField
   }
+  ${ProfileFieldInputGroup_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<ProfileField_ProfileTypeFieldFragment, unknown>;
 export const ProfileDetail_ProfileTypeFieldFragmentDoc = gql`
   fragment ProfileDetail_ProfileTypeField on ProfileTypeField {
@@ -34462,6 +34549,7 @@ export const ProfileDetail_ProfileTypeFieldFragmentDoc = gql`
 export const ProfileFieldFileUpload_ProfileFieldFileFragmentDoc = gql`
   fragment ProfileFieldFileUpload_ProfileFieldFile on ProfileFieldFile {
     id
+    expiryDate
     file {
       contentType
       filename
@@ -34494,6 +34582,7 @@ export const ProfileDetail_ProfileFieldValueFragmentDoc = gql`
     id
     content
     createdAt
+    expiryDate
     ...ProfileField_ProfileFieldValue
   }
   ${ProfileField_ProfileFieldValueFragmentDoc}
@@ -39068,13 +39157,13 @@ export const ProfileDetail_createProfileFieldFileUploadLinkDocument = gql`
     $profileId: GID!
     $profileTypeFieldId: GID!
     $data: [FileUploadInput!]!
-    $expiresAt: DateTime
+    $expiryDate: Date
   ) {
     createProfileFieldFileUploadLink(
       profileId: $profileId
       profileTypeFieldId: $profileTypeFieldId
       data: $data
-      expiresAt: $expiresAt
+      expiryDate: $expiryDate
     ) {
       uploads {
         presignedPostData {

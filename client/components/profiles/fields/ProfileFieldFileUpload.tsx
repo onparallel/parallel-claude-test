@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Center, Flex, IconButton, Stack, Text } from "@chakra-ui/react";
+import { Center, Flex, HStack, IconButton, Stack, Text } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileIcon } from "@parallel/components/common/FileIcon";
@@ -16,29 +16,35 @@ import { nanoid } from "nanoid";
 import { useRef } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { countBy, isDefined } from "remeda";
+import { differenceWith, isDefined, sumBy } from "remeda";
 import { ProfileFieldProps } from "./ProfileField";
+import { ProfileFieldExpiresAtIcon } from "./ProfileFieldInputGroup";
+import { discriminator } from "@parallel/utils/discriminator";
 
-interface ProfileFieldFileUploadProps extends ProfileFieldProps {}
+interface ProfileFieldFileUploadProps extends ProfileFieldProps {
+  showExpiryDateDialog: (force?: boolean) => void;
+}
 
-export type ProfileFieldFileValue = {
-  id: string;
-  type: "ADD" | "DELETE";
-  file?: File;
-};
+export type ProfileFieldFileAction =
+  | { type: "ADD"; file: File; id: string }
+  | { type: "DELETE"; id: string }
+  | { type: "UPDATE" };
 
 export function ProfileFieldFileUpload({
   profileId,
   field,
   files,
   index,
+  showExpiryDateDialog,
 }: ProfileFieldFileUploadProps) {
   const MAX_FILE_SIZE = 1024 * 1024 * 100; // 100 MB
-  const { control } = useFormContext<ProfilesFormData>();
+  const { control, watch } = useFormContext<ProfilesFormData>();
   const intl = useIntl();
   const [profileFieldFileDownloadLink] = useMutation(
     ProfileFieldFileUpload_profileFieldFileDownloadLinkDocument
   );
+
+  const { expiryDate } = watch(`fields.${index}`);
 
   const handleDownloadAttachment = async (profileFieldFileId: string, preview?: boolean) => {
     await withError(
@@ -100,16 +106,19 @@ export function ProfileFieldFileUpload({
       name={`fields.${index}.content.value`}
       control={control}
       render={({ field: { onChange, value, ...rest } }) => {
+        const actions = value as ProfileFieldFileAction[];
         return (
           <Stack>
-            <Flex gap={2} wrap="wrap">
-              {files
-                ?.filter(
-                  (file) =>
-                    !(value as ProfileFieldFileValue[]).find((event) => event.id === file.id)
-                )
-                .map(({ id, file }) => {
-                  if (!isDefined(file)) return null;
+            <HStack align="start">
+              <Flex gap={2} wrap="wrap" flex="1">
+                {differenceWith(
+                  files ?? [],
+                  actions.filter(discriminator("type", "DELETE")),
+                  (file, action) => action.id === file.id
+                ).map(({ id, file }) => {
+                  if (!isDefined(file)) {
+                    return null;
+                  }
                   const { filename, contentType, size } = file;
                   return (
                     <ProfileFile
@@ -122,32 +131,36 @@ export function ProfileFieldFileUpload({
                     />
                   );
                 })}
-              {(value as ProfileFieldFileValue[]).map(({ id, file }) => {
-                if (!isDefined(file)) return null;
-                return (
-                  <ProfileFile
-                    key={id}
-                    name={file.name}
-                    type={file.type}
-                    size={file.size}
-                    onPreview={(preview) => handleDownloadLocalFile(file, preview)}
-                    onRemove={() => {
-                      onChange([
-                        ...(value as ProfileFieldFileValue[]).filter((event) => !(event.id === id)),
-                      ]);
-                    }}
-                  />
-                );
-              })}
-            </Flex>
+                {actions.filter(discriminator("type", "ADD")).map(({ id, file }) => {
+                  return (
+                    <ProfileFile
+                      key={id}
+                      name={file.name}
+                      type={file.type}
+                      size={file.size}
+                      onPreview={(preview) => handleDownloadLocalFile(file, preview)}
+                      onRemove={() => {
+                        onChange(actions.filter((a) => !(a.type === "ADD" && a.id === id)));
+                      }}
+                    />
+                  );
+                })}
+              </Flex>
+              {field.isExpirable && expiryDate ? (
+                <ProfileFieldExpiresAtIcon
+                  expiryDate={expiryDate}
+                  expiryAlertAheadTime={field.expiryAlertAheadTime}
+                  paddingTop={2}
+                />
+              ) : null}
+            </HStack>
             <Dropzone
               as={Center}
               maxSize={MAX_FILE_SIZE}
               maxFiles={10}
               disabled={
                 (files ?? []).length +
-                  countBy(value, (v: ProfileFieldFileValue) => v.type === "ADD") -
-                  countBy(value, (v: ProfileFieldFileValue) => v.type === "DELETE") >=
+                  sumBy(actions, (a) => (a.type === "ADD" ? 1 : a.type === "DELETE" ? -1 : 0)) >=
                 10
               }
               multiple={true}
@@ -179,6 +192,7 @@ export function ProfileFieldFileUpload({
                     ...value,
                     ...acceptedFiles.map((file) => ({ id: nanoid(), type: "ADD", file })),
                   ]);
+                  showExpiryDateDialog(true);
                 }
               }}
               {...rest}
@@ -301,6 +315,7 @@ ProfileFieldFileUpload.fragments = {
     return gql`
       fragment ProfileFieldFileUpload_ProfileFieldFile on ProfileFieldFile {
         id
+        expiryDate
         file {
           contentType
           filename
