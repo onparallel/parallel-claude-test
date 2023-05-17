@@ -11,10 +11,11 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { EyeOffIcon, LockClosedIcon } from "@parallel/chakra/icons";
+import { BellIcon, BellOnIcon, EyeOffIcon, LockClosedIcon } from "@parallel/chakra/icons";
 import { Divider } from "@parallel/components/common/Divider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
@@ -22,6 +23,8 @@ import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useAutoConfirmDiscardChangesDialog } from "@parallel/components/organization/dialogs/ConfirmDiscardChangesDialog";
 import { MoreOptionsMenuProfile } from "@parallel/components/profiles/MoreOptionsMenuProfile";
+import { ProfileSubscribers } from "@parallel/components/profiles/ProfileSubscribers";
+import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
 import { ProfileField } from "@parallel/components/profiles/fields/ProfileField";
 import { ProfileFieldFileAction } from "@parallel/components/profiles/fields/ProfileFieldFileUpload";
 import {
@@ -30,6 +33,8 @@ import {
   ProfileDetail_deleteProfileFieldFileDocument,
   ProfileDetail_profileDocument,
   ProfileDetail_profileFieldFileUploadCompleteDocument,
+  ProfileDetail_subscribeToProfileDocument,
+  ProfileDetail_unsubscribeFromProfileDocument,
   ProfileDetail_updateProfileFieldValueDocument,
   ProfileDetail_userDocument,
   ProfileTypeFieldType,
@@ -149,6 +154,41 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
   const [deleteProfileFieldFile] = useMutation(ProfileDetail_deleteProfileFieldFileDocument);
 
   const editedFieldsCount = formState.dirtyFields.fields?.filter((f) => isDefined(f)).length;
+
+  const [subscribeToProfile] = useMutation(ProfileDetail_subscribeToProfileDocument);
+  const [unsubscribeFromProfile] = useMutation(ProfileDetail_unsubscribeFromProfileDocument);
+  const iAmSubscribed = profile.subscribers.some(({ user }) => user.isMe);
+
+  const handleMySubscription = async () => {
+    if (iAmSubscribed) {
+      await unsubscribeFromProfile({
+        variables: {
+          profileIds: [profile.id],
+          userIds: [me.id],
+        },
+      });
+    } else {
+      await subscribeToProfile({
+        variables: {
+          profileIds: [profile.id],
+          userIds: [me.id],
+        },
+      });
+    }
+  };
+
+  const showSubscribersDialog = useProfileSubscribersDialog();
+
+  const handleSubscribersClick = async () => {
+    try {
+      await showSubscribersDialog({
+        profileIds: [profile.id],
+        me,
+        users: profile.subscribers.map(({ user }) => user),
+        isSubscribed: profile.subscribers.some(({ user }) => user.isMe),
+      });
+    } catch {}
+  };
 
   const showErrorDialog = useErrorDialog();
 
@@ -483,7 +523,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
           </Stack>
         </Flex>
         <Stack spacing={0} backgroundColor="gray.50" flex={2} height="full">
-          <Flex
+          <HStack
             backgroundColor="white"
             paddingX={4}
             minHeight="65px"
@@ -493,8 +533,28 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
             borderBottom="1px solid"
             borderColor="gray.200"
           >
-            <MoreOptionsMenuProfile onDelete={handleDeleteProfile} />
-          </Flex>
+            <ProfileSubscribers users={profile.subscribers.map(({ user }) => user)} />
+            <ResponsiveButtonIcon
+              icon={iAmSubscribed ? <BellOnIcon boxSize={5} /> : <BellIcon boxSize={5} />}
+              colorScheme={iAmSubscribed ? undefined : "primary"}
+              label={
+                iAmSubscribed
+                  ? intl.formatMessage({
+                      id: "page.profile-details.unsubscribe",
+                      defaultMessage: "Unsubscribe",
+                    })
+                  : intl.formatMessage({
+                      id: "page.profile-details.subscribe",
+                      defaultMessage: "Subscribe",
+                    })
+              }
+              onClick={handleMySubscription}
+            />
+            <MoreOptionsMenuProfile
+              onDelete={handleDeleteProfile}
+              onSubscribe={handleSubscribersClick}
+            />
+          </HStack>
           <Box></Box>
         </Stack>
       </Flex>
@@ -523,6 +583,21 @@ const _fragments = {
         ...ProfileField_ProfileFieldFile
       }
       ${ProfileField.fragments.ProfileFieldFile}
+    `;
+  },
+  get ProfileSubscription() {
+    return gql`
+      fragment ProfileDetail_ProfileSubscription on ProfileSubscription {
+        id
+        user {
+          id
+          isMe
+          ...ProfileSubscribers_User
+          ...useProfileSubscribersDialog_User
+        }
+      }
+      ${ProfileSubscribers.fragments.User}
+      ${useProfileSubscribersDialog.fragments.User}
     `;
   },
   get ProfileFieldValue() {
@@ -567,10 +642,14 @@ const _fragments = {
         properties {
           ...ProfileDetail_ProfileFieldProperty
         }
+        subscribers {
+          ...ProfileDetail_ProfileSubscription
+        }
         createdAt
         updatedAt
       }
       ${this.ProfileFieldProperty}
+      ${this.ProfileSubscription}
     `;
   },
 };
@@ -579,12 +658,16 @@ const _queries = [
   gql`
     query ProfileDetail_user {
       ...AppLayout_Query
+      me {
+        ...ProfileSubscribers_User
+      }
       metadata {
         country
         browserName
       }
     }
     ${AppLayout.fragments.Query}
+    ${ProfileSubscribers.fragments.User}
   `,
   gql`
     query ProfileDetail_profile($profileId: GID!) {
@@ -597,6 +680,22 @@ const _queries = [
 ];
 
 const _mutations = [
+  gql`
+    mutation ProfileDetail_subscribeToProfile($profileIds: [GID!]!, $userIds: [GID!]!) {
+      subscribeToProfile(profileIds: $profileIds, userIds: $userIds) {
+        ...ProfileDetail_Profile
+      }
+    }
+    ${_fragments.Profile}
+  `,
+  gql`
+    mutation ProfileDetail_unsubscribeFromProfile($profileIds: [GID!]!, $userIds: [GID!]!) {
+      unsubscribeFromProfile(profileIds: $profileIds, userIds: $userIds) {
+        ...ProfileDetail_Profile
+      }
+    }
+    ${_fragments.Profile}
+  `,
   gql`
     mutation ProfileDetail_updateProfileFieldValue(
       $profileId: GID!

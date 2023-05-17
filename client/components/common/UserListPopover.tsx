@@ -38,7 +38,7 @@ export function UserListPopover({
       <Portal>
         <PopoverContent width="fit-content">
           <PopoverArrow />
-          <PopoverBody paddingX={0} paddingY={2} overflow="auto" maxHeight="300px">
+          <PopoverBody paddingX={0} paddingY={2} overflow="auto" maxHeight="300px" as={Stack}>
             <Stack as={List}>
               {usersOrGroups.map((u) => (
                 <Flex key={u.id} as={ListItem} alignItems="center" paddingX={4}>

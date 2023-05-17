@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import {
   ButtonOptions,
-  HStack,
+  Heading,
   Menu,
   MenuButton,
   MenuDivider,
@@ -59,14 +59,19 @@ export const AliasOptionsMenu = Object.assign(
         />
         <Portal>
           <MenuList width="min-content" minWidth="20rem">
-            <HStack paddingX={4} paddingTop={1} paddingBottom={1.5} alignItems="center">
-              <Text fontSize="sm" textTransform="uppercase" flex="1">
-                <FormattedMessage
-                  id="component.reference-options-menu.formulas"
-                  defaultMessage="Formulas"
-                />
-              </Text>
-            </HStack>
+            <Heading
+              paddingX={4}
+              paddingTop={1}
+              paddingBottom={1.5}
+              as="h4"
+              size="xs"
+              textTransform="uppercase"
+            >
+              <FormattedMessage
+                id="component.reference-options-menu.formulas"
+                defaultMessage="Formulas"
+              />
+            </Heading>
             {formulas.map(({ title, description, formula }, index) => (
               <MenuItem
                 onClick={async (event) => {

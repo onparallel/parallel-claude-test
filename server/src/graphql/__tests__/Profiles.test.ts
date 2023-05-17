@@ -2469,8 +2469,8 @@ describe("GraphQL/Profiles", () => {
     it("subscribes to a profile", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($profileId: GID!, $userIds: [GID!]!) {
-            subscribeToProfile(profileId: $profileId, userIds: $userIds) {
+          mutation ($profileIds: [GID!]!, $userIds: [GID!]!) {
+            subscribeToProfile(profileIds: $profileIds, userIds: $userIds) {
               id
               subscribers {
                 user {
@@ -2480,25 +2480,27 @@ describe("GraphQL/Profiles", () => {
             }
           }
         `,
-        { profileId: profile.id, userIds: users.map((u) => toGlobalId("User", u.id)) }
+        { profileIds: [profile.id], userIds: users.map((u) => toGlobalId("User", u.id)) }
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.subscribeToProfile).toEqual({
-        id: profile.id,
-        subscribers: [
-          { user: { id: toGlobalId("User", users[0].id) } },
-          { user: { id: toGlobalId("User", users[1].id) } },
-          { user: { id: toGlobalId("User", users[2].id) } },
-        ],
-      });
+      expect(data?.subscribeToProfile).toEqual([
+        {
+          id: profile.id,
+          subscribers: [
+            { user: { id: toGlobalId("User", users[0].id) } },
+            { user: { id: toGlobalId("User", users[1].id) } },
+            { user: { id: toGlobalId("User", users[2].id) } },
+          ],
+        },
+      ]);
     });
 
     it("sends error if collaborator tries to subscribe someone else", async () => {
       const { errors, data } = await testClient.withApiKey(collaboratorApiKey).execute(
         gql`
-          mutation ($profileId: GID!, $userIds: [GID!]!) {
-            subscribeToProfile(profileId: $profileId, userIds: $userIds) {
+          mutation ($profileIds: [GID!]!, $userIds: [GID!]!) {
+            subscribeToProfile(profileIds: $profileIds, userIds: $userIds) {
               id
               subscribers {
                 user {
@@ -2509,7 +2511,7 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
-          profileId: profile.id,
+          profileIds: [profile.id],
           userIds: users.slice(1).map((u) => toGlobalId("User", u.id)),
         }
       );
@@ -2534,8 +2536,8 @@ describe("GraphQL/Profiles", () => {
     it("unsubscribes from a profile", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($profileId: GID!, $userIds: [GID!]!) {
-            unsubscribeFromProfile(profileId: $profileId, userIds: $userIds) {
+          mutation ($profileIds: [GID!]!, $userIds: [GID!]!) {
+            unsubscribeFromProfile(profileIds: $profileIds, userIds: $userIds) {
               id
               subscribers {
                 user {
@@ -2546,16 +2548,18 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
-          profileId: profile.id,
+          profileIds: [profile.id],
           userIds: [toGlobalId("User", users[0].id)],
         }
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.unsubscribeFromProfile).toEqual({
-        id: profile.id,
-        subscribers: [],
-      });
+      expect(data?.unsubscribeFromProfile).toEqual([
+        {
+          id: profile.id,
+          subscribers: [],
+        },
+      ]);
     });
   });
 

@@ -116,7 +116,7 @@ export function useSelection<T>(items: T[] | undefined, keyProp: KeyProp<T>) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const selectedRows = useMemo(
     () => selectedIds.map((id) => items?.find((r) => getKey(r, keyProp) === id)).filter(isDefined),
-    [selectedIds, (items ?? []).map((r) => getKey(r, keyProp)).join(",")]
+    [selectedIds, items, keyProp]
   );
   return {
     selectedIds,

@@ -930,9 +930,12 @@ export class ProfileRepository extends BaseRepository {
     };
   }
 
-  async subscribeUsersToProfile(profileId: number, userIds: number[], createdBy: string) {
+  async subscribeUsersToProfiles(profileIds: number[], userIds: number[], createdBy: string) {
     if (userIds.length === 0) {
       throw new Error("expected userIds to be non-empty");
+    }
+    if (profileIds.length === 0) {
+      throw new Error("expected profileIds to be non-empty");
     }
 
     await this.raw(
@@ -943,19 +946,28 @@ export class ProfileRepository extends BaseRepository {
       DO NOTHING`,
       [
         this.from("profile_subscription").insert(
-          userIds.map((userId) => ({
-            profile_id: profileId,
-            user_id: userId,
-            created_by: createdBy,
-          }))
+          profileIds.flatMap((profileId) =>
+            userIds.map((userId) => ({
+              profile_id: profileId,
+              user_id: userId,
+              created_by: createdBy,
+            }))
+          )
         ),
       ]
     );
   }
 
-  async unsubscribeUsersFromProfile(profileId: number, userIds: number[], deletedBy: string) {
+  async unsubscribeUsersFromProfiles(profileIds: number[], userIds: number[], deletedBy: string) {
+    if (userIds.length === 0) {
+      throw new Error("expected userIds to be non-empty");
+    }
+    if (profileIds.length === 0) {
+      throw new Error("expected profileIds to be non-empty");
+    }
+
     await this.from("profile_subscription")
-      .where("profile_id", profileId)
+      .whereIn("profile_id", profileIds)
       .whereIn("user_id", userIds)
       .whereNull("deleted_at")
       .update({

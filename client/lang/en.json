@@ -2490,6 +2490,11 @@
     "context": "Delete profile"
   },
   {
+    "term": "component.more-options-menu-profile.manage-profile-subscriptions",
+    "definition": "Manage subscriptions",
+    "context": "Manage subscriptions"
+  },
+  {
     "term": "component.move-to-folder-dialog.currently-in",
     "definition": "Currently in {folder}",
     "context": "Currently in {folder}"
@@ -4358,6 +4363,36 @@
     "term": "component.profile-file.remove-attachment",
     "definition": "Remove attachment",
     "context": "Remove attachment"
+  },
+  {
+    "term": "component.profile-subscribers-dialog.header",
+    "definition": "Profile subscriptions",
+    "context": "Profile subscriptions"
+  },
+  {
+    "term": "component.profile-subscribers-dialog.not-subscribed",
+    "definition": "Not subscribed",
+    "context": "Not subscribed"
+  },
+  {
+    "term": "component.profile-subscribers-dialog.subscribed",
+    "definition": "Subscribed",
+    "context": "Subscribed"
+  },
+  {
+    "term": "component.profile-subscribers-dialog.unsubscribe",
+    "definition": "Unsubscribe",
+    "context": "Unsubscribe"
+  },
+  {
+    "term": "component.profile-subscribers.no-subscribers-button",
+    "definition": "No subscribers",
+    "context": "No subscribers"
+  },
+  {
+    "term": "component.profile-table-columns.subscribed",
+    "definition": "Subscribed",
+    "context": "Subscribed"
   },
   {
     "term": "component.profile-table-columns.type",
@@ -8200,6 +8235,11 @@
     "context": "Submit"
   },
   {
+    "term": "generic.subscribe",
+    "definition": "Subscribe",
+    "context": "Subscribe"
+  },
+  {
     "term": "generic.subscribed",
     "definition": "Subscribed",
     "context": "Subscribed"
@@ -9275,9 +9315,19 @@
     "context": "Saving {count, plural, =1 {# change} other{# changes}}..."
   },
   {
+    "term": "page.profile-details.subscribe",
+    "definition": "Subscribe",
+    "context": "Subscribe"
+  },
+  {
     "term": "page.profile-details.title",
     "definition": "Profile details",
     "context": "Profile details"
+  },
+  {
+    "term": "page.profile-details.unsubscribe",
+    "definition": "Unsubscribe",
+    "context": "Unsubscribe"
   },
   {
     "term": "page.profiles.all-profile-types",

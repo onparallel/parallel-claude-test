@@ -1750,7 +1750,7 @@ type Mutation {
   """
   startAsyncFieldCompletion(fieldId: GID!, petitionId: GID!): AsyncFieldCompletionResponse!
   startSignatureRequest(message: String, petitionId: GID!): PetitionSignatureRequest!
-  subscribeToProfile(profileId: GID!, userIds: [GID!]!): Profile!
+  subscribeToProfile(profileIds: [GID!]!, userIds: [GID!]!): [Profile!]!
 
   """
   Switches automatic reminders for the specified petition accesses.
@@ -1786,7 +1786,7 @@ type Mutation {
   Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions.
   """
   transferPetitionOwnership(petitionIds: [GID!]!, userId: GID!): [PetitionBase!]!
-  unsubscribeFromProfile(profileId: GID!, userIds: [GID!]!): Profile!
+  unsubscribeFromProfile(profileIds: [GID!]!, userIds: [GID!]!): [Profile!]!
 
   """
   Removes the given tag from the given petition

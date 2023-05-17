@@ -13,7 +13,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { ChevronDownIcon, DeleteIcon, RepeatIcon } from "@parallel/chakra/icons";
+import { BellIcon, ChevronDownIcon, DeleteIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -25,10 +25,12 @@ import { SearchInput } from "@parallel/components/common/SearchInput";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
+import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useCreateProfileDialog } from "@parallel/components/profiles/dialogs/CreateProfileDialog";
+import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
 import {
   Profiles_createProfileDocument,
   Profiles_ProfileFragment,
@@ -106,7 +108,7 @@ function Profiles() {
   const profiles = data?.profiles;
   const profileTypes = _profileTypesData?.profileTypes;
 
-  const { selectedIds, onChangeSelectedIds } = useSelection(profiles?.items, "id");
+  const { selectedIds, selectedRows, onChangeSelectedIds } = useSelection(profiles?.items, "id");
 
   const columns = useProfileTableColumns();
 
@@ -156,8 +158,33 @@ function Profiles() {
     ? profileTypes?.items.find((pt) => pt.id === queryState.profileType) ?? null
     : null;
 
+  const showSubscribersDialog = useProfileSubscribersDialog();
+  const handleSubscribeClick = useCallback(async () => {
+    const isSubscribed = selectedRows.every((row) =>
+      row.subscribers.some((s) => s.user.id === me!.id)
+    )
+      ? true
+      : selectedRows.every((row) => row.subscribers.every((s) => s.user.id !== me!.id))
+      ? false
+      : undefined;
+    try {
+      await showSubscribersDialog({
+        me,
+        profileIds: selectedIds,
+        users:
+          selectedRows.length === 1
+            ? selectedRows[0].subscribers.map((s) => s.user)
+            : isSubscribed
+            ? [me]
+            : ([] as any),
+        isSubscribed,
+      });
+    } catch {}
+  }, [selectedRows, selectedIds.join(",")]);
+
   const actions = useProfileListActions({
     onDeleteClick: handleDeleteClick,
+    onSubscribeClick: handleSubscribeClick,
   });
 
   return (
@@ -291,8 +318,20 @@ function Profiles() {
   );
 }
 
-function useProfileListActions({ onDeleteClick }: { onDeleteClick: () => void }) {
+function useProfileListActions({
+  onDeleteClick,
+  onSubscribeClick,
+}: {
+  onDeleteClick: () => void;
+  onSubscribeClick: () => void;
+}) {
   return [
+    {
+      key: "subscribe",
+      onClick: onSubscribeClick,
+      leftIcon: <BellIcon />,
+      children: <FormattedMessage id="generic.subscribe" defaultMessage="Subscribe" />,
+    },
     {
       key: "delete",
       onClick: onDeleteClick,
@@ -365,7 +404,7 @@ function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[] {
           defaultMessage: "Name",
         }),
         cellProps: {
-          width: "40%",
+          width: "30%",
           minWidth: "240px",
         },
         CellContent: ({ row }) => {
@@ -387,7 +426,7 @@ function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[] {
           defaultMessage: "Type",
         }),
         cellProps: {
-          width: "40%",
+          width: "30%",
           minWidth: "240px",
         },
         CellContent: ({
@@ -406,6 +445,27 @@ function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[] {
                 }),
               })}
             </Text>
+          );
+        },
+      },
+      {
+        key: "subscribed",
+        header: intl.formatMessage({
+          id: "component.profile-table-columns.subscribed",
+          defaultMessage: "Subscribed",
+        }),
+        align: "left",
+        cellProps: { width: "20%", minWidth: "132px" },
+        CellContent: ({ row, column }) => {
+          const { subscribers } = row;
+
+          if (!subscribers?.length) {
+            return <></>;
+          }
+          return (
+            <Flex justifyContent={column.align}>
+              <UserAvatarList usersOrGroups={subscribers?.map((s) => s.user)} />
+            </Flex>
           );
         },
       },
@@ -448,8 +508,18 @@ const _fragments = {
           id
           name
         }
+        subscribers {
+          id
+          user {
+            id
+            ...UserAvatarList_User
+            ...useProfileSubscribersDialog_User
+          }
+        }
         createdAt
       }
+      ${UserAvatarList.fragments.User}
+      ${useProfileSubscribersDialog.fragments.User}
     `;
   },
   get ProfileTypePagination() {
@@ -480,8 +550,12 @@ const _queries = [
   gql`
     query Profiles_user {
       ...AppLayout_Query
+      me {
+        ...useProfileSubscribersDialog_User
+      }
     }
     ${AppLayout.fragments.Query}
+    ${useProfileSubscribersDialog.fragments.User}
   `,
   gql`
     query Profiles_profileTypes($offset: Int, $limit: Int, $locale: UserLocale) {

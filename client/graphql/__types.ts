@@ -870,7 +870,7 @@ export interface Mutation {
   /** Starts the completion of an async field */
   startAsyncFieldCompletion: AsyncFieldCompletionResponse;
   startSignatureRequest: PetitionSignatureRequest;
-  subscribeToProfile: Profile;
+  subscribeToProfile: Array<Profile>;
   /** Switches automatic reminders for the specified petition accesses. */
   switchAutomaticReminders: Array<PetitionAccess>;
   /** Tags a petition */
@@ -879,7 +879,7 @@ export interface Mutation {
   transferOrganizationOwnership: SupportMethodResponse;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<PetitionBase>;
-  unsubscribeFromProfile: Profile;
+  unsubscribeFromProfile: Array<Profile>;
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
   /** Updates a contact. */
@@ -1747,7 +1747,7 @@ export interface MutationstartSignatureRequestArgs {
 }
 
 export interface MutationsubscribeToProfileArgs {
-  profileId: Scalars["GID"];
+  profileIds: Array<Scalars["GID"]>;
   userIds: Array<Scalars["GID"]>;
 }
 
@@ -1774,7 +1774,7 @@ export interface MutationtransferPetitionOwnershipArgs {
 }
 
 export interface MutationunsubscribeFromProfileArgs {
-  profileId: Scalars["GID"];
+  profileIds: Array<Scalars["GID"]>;
   userIds: Array<Scalars["GID"]>;
 }
 
@@ -14313,6 +14313,14 @@ export type ExportRepliesProgressDialog_petitionQuery = {
     | null;
 };
 
+export type ProfileSubscribers_UserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: string | null;
+  avatarUrl?: string | null;
+  initials?: string | null;
+};
+
 export type useCreateProfileDialog_ProfileTypeFragment = {
   __typename?: "ProfileType";
   id: string;
@@ -14369,6 +14377,80 @@ export type useCreateProfileDialog_profileTypesQuery = {
       }>;
     }>;
   };
+};
+
+export type useProfileSubscribersDialog_UserFragment = {
+  __typename?: "User";
+  id: string;
+  email: string;
+  fullName?: string | null;
+  avatarUrl?: string | null;
+  initials?: string | null;
+};
+
+export type useProfileSubscribersDialog_ProfileFragment = {
+  __typename?: "Profile";
+  id: string;
+  subscribers: Array<{
+    __typename?: "ProfileSubscription";
+    id: string;
+    user: {
+      __typename?: "User";
+      id: string;
+      email: string;
+      fullName?: string | null;
+      avatarUrl?: string | null;
+      initials?: string | null;
+    };
+  }>;
+};
+
+export type useProfileSubscribersDialog_subscribeToProfileMutationVariables = Exact<{
+  profileIds: Array<Scalars["GID"]> | Scalars["GID"];
+  userIds: Array<Scalars["GID"]> | Scalars["GID"];
+}>;
+
+export type useProfileSubscribersDialog_subscribeToProfileMutation = {
+  subscribeToProfile: Array<{
+    __typename?: "Profile";
+    id: string;
+    subscribers: Array<{
+      __typename?: "ProfileSubscription";
+      id: string;
+      user: {
+        __typename?: "User";
+        id: string;
+        email: string;
+        fullName?: string | null;
+        avatarUrl?: string | null;
+        initials?: string | null;
+      };
+    }>;
+  }>;
+};
+
+export type useProfileSubscribersDialog_unsubscribeFromProfileMutationVariables = Exact<{
+  profileIds: Array<Scalars["GID"]> | Scalars["GID"];
+  userIds: Array<Scalars["GID"]> | Scalars["GID"];
+}>;
+
+export type useProfileSubscribersDialog_unsubscribeFromProfileMutation = {
+  unsubscribeFromProfile: Array<{
+    __typename?: "Profile";
+    id: string;
+    subscribers: Array<{
+      __typename?: "ProfileSubscription";
+      id: string;
+      user: {
+        __typename?: "User";
+        id: string;
+        email: string;
+        fullName?: string | null;
+        avatarUrl?: string | null;
+        initials?: string | null;
+      };
+    }>;
+  }>;
 };
 
 export type ProfileField_ProfileTypeFieldFragment = {
@@ -16325,6 +16407,7 @@ export type Alerts_ProfileFieldPropertyFragment = {
     __typename?: "ProfileTypeField";
     id: string;
     name: { [locale in UserLocale]?: string };
+    isExpirable: boolean;
     expiryAlertAheadTime?: Duration | null;
   };
   profile: {
@@ -16336,6 +16419,17 @@ export type Alerts_ProfileFieldPropertyFragment = {
       id: string;
       name: { [locale in UserLocale]?: string };
     };
+    subscribers: Array<{
+      __typename?: "ProfileSubscription";
+      id: string;
+      user: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        avatarUrl?: string | null;
+        initials?: string | null;
+      };
+    }>;
   };
   value?: {
     __typename?: "ProfileFieldValue";
@@ -16409,6 +16503,7 @@ export type Alerts_expiringProfilePropertiesQuery = {
         __typename?: "ProfileTypeField";
         id: string;
         name: { [locale in UserLocale]?: string };
+        isExpirable: boolean;
         expiryAlertAheadTime?: Duration | null;
       };
       profile: {
@@ -16420,6 +16515,17 @@ export type Alerts_expiringProfilePropertiesQuery = {
           id: string;
           name: { [locale in UserLocale]?: string };
         };
+        subscribers: Array<{
+          __typename?: "ProfileSubscription";
+          id: string;
+          user: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            avatarUrl?: string | null;
+            initials?: string | null;
+          };
+        }>;
       };
       value?: {
         __typename?: "ProfileFieldValue";
@@ -26382,6 +26488,20 @@ export type ProfileDetail_ProfileFieldFileFragment = {
   } | null;
 };
 
+export type ProfileDetail_ProfileSubscriptionFragment = {
+  __typename?: "ProfileSubscription";
+  id: string;
+  user: {
+    __typename?: "User";
+    id: string;
+    isMe: boolean;
+    email: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  };
+};
+
 export type ProfileDetail_ProfileFieldValueFragment = {
   __typename?: "ProfileFieldValue";
   id: string;
@@ -26468,16 +26588,24 @@ export type ProfileDetail_ProfileFragment = {
       expiryDate?: string | null;
     } | null;
   }>;
+  subscribers: Array<{
+    __typename?: "ProfileSubscription";
+    id: string;
+    user: {
+      __typename?: "User";
+      id: string;
+      isMe: boolean;
+      email: string;
+      fullName?: string | null;
+      avatarUrl?: string | null;
+      initials?: string | null;
+    };
+  }>;
 };
 
 export type ProfileDetail_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ProfileDetail_userQuery = {
-  metadata: {
-    __typename?: "ConnectionMetadata";
-    country?: string | null;
-    browserName?: string | null;
-  };
   me: {
     __typename?: "User";
     id: string;
@@ -26505,6 +26633,11 @@ export type ProfileDetail_userQuery = {
         limit: number;
       } | null;
     };
+  };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    country?: string | null;
+    browserName?: string | null;
   };
   realMe: {
     __typename?: "User";
@@ -26565,7 +26698,152 @@ export type ProfileDetail_profileQuery = {
         expiryDate?: string | null;
       } | null;
     }>;
+    subscribers: Array<{
+      __typename?: "ProfileSubscription";
+      id: string;
+      user: {
+        __typename?: "User";
+        id: string;
+        isMe: boolean;
+        email: string;
+        fullName?: string | null;
+        avatarUrl?: string | null;
+        initials?: string | null;
+      };
+    }>;
   };
+};
+
+export type ProfileDetail_subscribeToProfileMutationVariables = Exact<{
+  profileIds: Array<Scalars["GID"]> | Scalars["GID"];
+  userIds: Array<Scalars["GID"]> | Scalars["GID"];
+}>;
+
+export type ProfileDetail_subscribeToProfileMutation = {
+  subscribeToProfile: Array<{
+    __typename?: "Profile";
+    id: string;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+    profileType: {
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+    };
+    properties: Array<{
+      __typename?: "ProfileFieldProperty";
+      field: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        position: number;
+        type: ProfileTypeFieldType;
+        myPermission: ProfileTypeFieldPermission;
+        isExpirable: boolean;
+        expiryAlertAheadTime?: Duration | null;
+        options: { [key: string]: any };
+      };
+      files?: Array<{
+        __typename?: "ProfileFieldFile";
+        id: string;
+        expiryDate?: string | null;
+        file?: {
+          __typename?: "FileUpload";
+          contentType: string;
+          filename: string;
+          isComplete: boolean;
+          size: number;
+        } | null;
+      }> | null;
+      value?: {
+        __typename?: "ProfileFieldValue";
+        id: string;
+        content?: { [key: string]: any } | null;
+        createdAt: string;
+        expiryDate?: string | null;
+      } | null;
+    }>;
+    subscribers: Array<{
+      __typename?: "ProfileSubscription";
+      id: string;
+      user: {
+        __typename?: "User";
+        id: string;
+        isMe: boolean;
+        email: string;
+        fullName?: string | null;
+        avatarUrl?: string | null;
+        initials?: string | null;
+      };
+    }>;
+  }>;
+};
+
+export type ProfileDetail_unsubscribeFromProfileMutationVariables = Exact<{
+  profileIds: Array<Scalars["GID"]> | Scalars["GID"];
+  userIds: Array<Scalars["GID"]> | Scalars["GID"];
+}>;
+
+export type ProfileDetail_unsubscribeFromProfileMutation = {
+  unsubscribeFromProfile: Array<{
+    __typename?: "Profile";
+    id: string;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+    profileType: {
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+    };
+    properties: Array<{
+      __typename?: "ProfileFieldProperty";
+      field: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        position: number;
+        type: ProfileTypeFieldType;
+        myPermission: ProfileTypeFieldPermission;
+        isExpirable: boolean;
+        expiryAlertAheadTime?: Duration | null;
+        options: { [key: string]: any };
+      };
+      files?: Array<{
+        __typename?: "ProfileFieldFile";
+        id: string;
+        expiryDate?: string | null;
+        file?: {
+          __typename?: "FileUpload";
+          contentType: string;
+          filename: string;
+          isComplete: boolean;
+          size: number;
+        } | null;
+      }> | null;
+      value?: {
+        __typename?: "ProfileFieldValue";
+        id: string;
+        content?: { [key: string]: any } | null;
+        createdAt: string;
+        expiryDate?: string | null;
+      } | null;
+    }>;
+    subscribers: Array<{
+      __typename?: "ProfileSubscription";
+      id: string;
+      user: {
+        __typename?: "User";
+        id: string;
+        isMe: boolean;
+        email: string;
+        fullName?: string | null;
+        avatarUrl?: string | null;
+        initials?: string | null;
+      };
+    }>;
+  }>;
 };
 
 export type ProfileDetail_updateProfileFieldValueMutationVariables = Exact<{
@@ -26617,6 +26895,19 @@ export type ProfileDetail_updateProfileFieldValueMutation = {
         createdAt: string;
         expiryDate?: string | null;
       } | null;
+    }>;
+    subscribers: Array<{
+      __typename?: "ProfileSubscription";
+      id: string;
+      user: {
+        __typename?: "User";
+        id: string;
+        isMe: boolean;
+        email: string;
+        fullName?: string | null;
+        avatarUrl?: string | null;
+        initials?: string | null;
+      };
     }>;
   };
 };
@@ -26733,6 +27024,18 @@ export type Profiles_ProfileFragment = {
     id: string;
     name: { [locale in UserLocale]?: string };
   };
+  subscribers: Array<{
+    __typename?: "ProfileSubscription";
+    id: string;
+    user: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      email: string;
+      avatarUrl?: string | null;
+      initials?: string | null;
+    };
+  }>;
 };
 
 export type Profiles_ProfileTypePaginationFragment = {
@@ -26759,6 +27062,18 @@ export type Profiles_ProfilePaginationFragment = {
       id: string;
       name: { [locale in UserLocale]?: string };
     };
+    subscribers: Array<{
+      __typename?: "ProfileSubscription";
+      id: string;
+      user: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        email: string;
+        avatarUrl?: string | null;
+        initials?: string | null;
+      };
+    }>;
   }>;
 };
 
@@ -26844,6 +27159,18 @@ export type Profiles_profilesQuery = {
         id: string;
         name: { [locale in UserLocale]?: string };
       };
+      subscribers: Array<{
+        __typename?: "ProfileSubscription";
+        id: string;
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          email: string;
+          avatarUrl?: string | null;
+          initials?: string | null;
+        };
+      }>;
     }>;
   };
 };
@@ -26863,6 +27190,18 @@ export type Profiles_createProfileMutation = {
       id: string;
       name: { [locale in UserLocale]?: string };
     };
+    subscribers: Array<{
+      __typename?: "ProfileSubscription";
+      id: string;
+      user: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        email: string;
+        avatarUrl?: string | null;
+        initials?: string | null;
+      };
+    }>;
   };
 };
 
@@ -26882,6 +27221,18 @@ export type Profiles_updateProfileFieldValueMutation = {
       id: string;
       name: { [locale in UserLocale]?: string };
     };
+    subscribers: Array<{
+      __typename?: "ProfileSubscription";
+      id: string;
+      user: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        email: string;
+        avatarUrl?: string | null;
+        initials?: string | null;
+      };
+    }>;
   };
 };
 
@@ -30928,6 +31279,27 @@ export const useCreateProfileDialog_ProfileTypePaginationFragmentDoc = gql`
   }
   ${useCreateProfileDialog_ProfileTypeFragmentDoc}
 ` as unknown as DocumentNode<useCreateProfileDialog_ProfileTypePaginationFragment, unknown>;
+export const useProfileSubscribersDialog_UserFragmentDoc = gql`
+  fragment useProfileSubscribersDialog_User on User {
+    id
+    email
+    ...UserAvatar_User
+  }
+  ${UserAvatar_UserFragmentDoc}
+` as unknown as DocumentNode<useProfileSubscribersDialog_UserFragment, unknown>;
+export const useProfileSubscribersDialog_ProfileFragmentDoc = gql`
+  fragment useProfileSubscribersDialog_Profile on Profile {
+    id
+    subscribers {
+      id
+      user {
+        id
+        ...useProfileSubscribersDialog_User
+      }
+    }
+  }
+  ${useProfileSubscribersDialog_UserFragmentDoc}
+` as unknown as DocumentNode<useProfileSubscribersDialog_ProfileFragment, unknown>;
 export const LandingTemplateCard_LandingTemplateFragmentDoc = gql`
   fragment LandingTemplateCard_LandingTemplate on LandingTemplate {
     id
@@ -31199,6 +31571,7 @@ export const Alerts_ProfileFieldPropertyFragmentDoc = gql`
     field {
       id
       name
+      isExpirable
       expiryAlertAheadTime
     }
     profile {
@@ -31207,6 +31580,13 @@ export const Alerts_ProfileFieldPropertyFragmentDoc = gql`
       profileType {
         id
         name
+      }
+      subscribers {
+        id
+        user {
+          id
+          ...UserAvatarList_User
+        }
       }
     }
     value {
@@ -31220,6 +31600,7 @@ export const Alerts_ProfileFieldPropertyFragmentDoc = gql`
       expiryDate
     }
   }
+  ${UserAvatarList_UserFragmentDoc}
 ` as unknown as DocumentNode<Alerts_ProfileFieldPropertyFragment, unknown>;
 export const Contact_Contact_ProfileFragmentDoc = gql`
   fragment Contact_Contact_Profile on Contact {
@@ -34603,6 +34984,26 @@ export const ProfileDetail_ProfileFieldPropertyFragmentDoc = gql`
   ${ProfileDetail_ProfileFieldFileFragmentDoc}
   ${ProfileDetail_ProfileFieldValueFragmentDoc}
 ` as unknown as DocumentNode<ProfileDetail_ProfileFieldPropertyFragment, unknown>;
+export const ProfileSubscribers_UserFragmentDoc = gql`
+  fragment ProfileSubscribers_User on User {
+    id
+    ...UserAvatarList_User
+  }
+  ${UserAvatarList_UserFragmentDoc}
+` as unknown as DocumentNode<ProfileSubscribers_UserFragment, unknown>;
+export const ProfileDetail_ProfileSubscriptionFragmentDoc = gql`
+  fragment ProfileDetail_ProfileSubscription on ProfileSubscription {
+    id
+    user {
+      id
+      isMe
+      ...ProfileSubscribers_User
+      ...useProfileSubscribersDialog_User
+    }
+  }
+  ${ProfileSubscribers_UserFragmentDoc}
+  ${useProfileSubscribersDialog_UserFragmentDoc}
+` as unknown as DocumentNode<ProfileDetail_ProfileSubscriptionFragment, unknown>;
 export const ProfileDetail_ProfileFragmentDoc = gql`
   fragment ProfileDetail_Profile on Profile {
     id
@@ -34614,10 +35015,14 @@ export const ProfileDetail_ProfileFragmentDoc = gql`
     properties {
       ...ProfileDetail_ProfileFieldProperty
     }
+    subscribers {
+      ...ProfileDetail_ProfileSubscription
+    }
     createdAt
     updatedAt
   }
   ${ProfileDetail_ProfileFieldPropertyFragmentDoc}
+  ${ProfileDetail_ProfileSubscriptionFragmentDoc}
 ` as unknown as DocumentNode<ProfileDetail_ProfileFragment, unknown>;
 export const Profiles_ProfileTypeFragmentDoc = gql`
   fragment Profiles_ProfileType on ProfileType {
@@ -34643,8 +35048,18 @@ export const Profiles_ProfileFragmentDoc = gql`
       id
       name
     }
+    subscribers {
+      id
+      user {
+        id
+        ...UserAvatarList_User
+        ...useProfileSubscribersDialog_User
+      }
+    }
     createdAt
   }
+  ${UserAvatarList_UserFragmentDoc}
+  ${useProfileSubscribersDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<Profiles_ProfileFragment, unknown>;
 export const Profiles_ProfilePaginationFragmentDoc = gql`
   fragment Profiles_ProfilePagination on ProfilePagination {
@@ -36846,6 +37261,31 @@ export const useCreateProfileDialog_profileTypesDocument = gql`
 ` as unknown as DocumentNode<
   useCreateProfileDialog_profileTypesQuery,
   useCreateProfileDialog_profileTypesQueryVariables
+>;
+export const useProfileSubscribersDialog_subscribeToProfileDocument = gql`
+  mutation useProfileSubscribersDialog_subscribeToProfile($profileIds: [GID!]!, $userIds: [GID!]!) {
+    subscribeToProfile(profileIds: $profileIds, userIds: $userIds) {
+      ...useProfileSubscribersDialog_Profile
+    }
+  }
+  ${useProfileSubscribersDialog_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  useProfileSubscribersDialog_subscribeToProfileMutation,
+  useProfileSubscribersDialog_subscribeToProfileMutationVariables
+>;
+export const useProfileSubscribersDialog_unsubscribeFromProfileDocument = gql`
+  mutation useProfileSubscribersDialog_unsubscribeFromProfile(
+    $profileIds: [GID!]!
+    $userIds: [GID!]!
+  ) {
+    unsubscribeFromProfile(profileIds: $profileIds, userIds: $userIds) {
+      ...useProfileSubscribersDialog_Profile
+    }
+  }
+  ${useProfileSubscribersDialog_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  useProfileSubscribersDialog_unsubscribeFromProfileMutation,
+  useProfileSubscribersDialog_unsubscribeFromProfileMutationVariables
 >;
 export const ProfileFieldFileUpload_profileFieldFileDownloadLinkDocument = gql`
   mutation ProfileFieldFileUpload_profileFieldFileDownloadLink(
@@ -39123,12 +39563,16 @@ export const NewPetition_templateDocument = gql`
 export const ProfileDetail_userDocument = gql`
   query ProfileDetail_user {
     ...AppLayout_Query
+    me {
+      ...ProfileSubscribers_User
+    }
     metadata {
       country
       browserName
     }
   }
   ${AppLayout_QueryFragmentDoc}
+  ${ProfileSubscribers_UserFragmentDoc}
 ` as unknown as DocumentNode<ProfileDetail_userQuery, ProfileDetail_userQueryVariables>;
 export const ProfileDetail_profileDocument = gql`
   query ProfileDetail_profile($profileId: GID!) {
@@ -39138,6 +39582,28 @@ export const ProfileDetail_profileDocument = gql`
   }
   ${ProfileDetail_ProfileFragmentDoc}
 ` as unknown as DocumentNode<ProfileDetail_profileQuery, ProfileDetail_profileQueryVariables>;
+export const ProfileDetail_subscribeToProfileDocument = gql`
+  mutation ProfileDetail_subscribeToProfile($profileIds: [GID!]!, $userIds: [GID!]!) {
+    subscribeToProfile(profileIds: $profileIds, userIds: $userIds) {
+      ...ProfileDetail_Profile
+    }
+  }
+  ${ProfileDetail_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  ProfileDetail_subscribeToProfileMutation,
+  ProfileDetail_subscribeToProfileMutationVariables
+>;
+export const ProfileDetail_unsubscribeFromProfileDocument = gql`
+  mutation ProfileDetail_unsubscribeFromProfile($profileIds: [GID!]!, $userIds: [GID!]!) {
+    unsubscribeFromProfile(profileIds: $profileIds, userIds: $userIds) {
+      ...ProfileDetail_Profile
+    }
+  }
+  ${ProfileDetail_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  ProfileDetail_unsubscribeFromProfileMutation,
+  ProfileDetail_unsubscribeFromProfileMutationVariables
+>;
 export const ProfileDetail_updateProfileFieldValueDocument = gql`
   mutation ProfileDetail_updateProfileFieldValue(
     $profileId: GID!
@@ -39224,8 +39690,12 @@ export const ProfileDetail_deleteProfileFieldFileDocument = gql`
 export const Profiles_userDocument = gql`
   query Profiles_user {
     ...AppLayout_Query
+    me {
+      ...useProfileSubscribersDialog_User
+    }
   }
   ${AppLayout_QueryFragmentDoc}
+  ${useProfileSubscribersDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<Profiles_userQuery, Profiles_userQueryVariables>;
 export const Profiles_profileTypesDocument = gql`
   query Profiles_profileTypes($offset: Int, $limit: Int, $locale: UserLocale) {

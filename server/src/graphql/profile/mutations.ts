@@ -7,6 +7,7 @@ import {
   CreateProfileType,
   CreateProfileTypeField,
   FileUpload,
+  Profile,
   ProfileFieldFile,
   ProfileTypeField,
 } from "../../db/__types";
@@ -387,8 +388,8 @@ export const createProfile = mutationField("createProfile", {
     );
 
     if (args.subscribe) {
-      await ctx.profiles.subscribeUsersToProfile(
-        profile.id,
+      await ctx.profiles.subscribeUsersToProfiles(
+        [profile.id],
         [ctx.user!.id],
         `User:${ctx.user!.id}}`
       );
@@ -731,37 +732,43 @@ export const profileFieldFileDownloadLink = mutationField("profileFieldFileDownl
 });
 
 export const subscribeToProfile = mutationField("subscribeToProfile", {
-  type: "Profile",
+  type: list("Profile"),
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    userHasAccessToProfile("profileId"),
+    userHasAccessToProfile("profileIds"),
     contextUserCanSubscribeUsersToProfile("userIds")
   ),
   args: {
-    profileId: nonNull(globalIdArg("Profile")),
+    profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
   },
-  validateArgs: notEmptyArray((args) => args.userIds, "userIds"),
-  resolve: async (_, { profileId, userIds }, ctx) => {
-    await ctx.profiles.subscribeUsersToProfile(profileId, userIds, `User:${ctx.user!.id}`);
-    return (await ctx.profiles.loadProfile(profileId))!;
+  validateArgs: validateAnd(
+    notEmptyArray((args) => args.userIds, "userIds"),
+    notEmptyArray((args) => args.profileIds, "profileIds")
+  ),
+  resolve: async (_, { profileIds, userIds }, ctx) => {
+    await ctx.profiles.subscribeUsersToProfiles(profileIds, userIds, `User:${ctx.user!.id}`);
+    return (await ctx.profiles.loadProfile(profileIds)) as Profile[];
   },
 });
 
 export const unsubscribeFromProfile = mutationField("unsubscribeFromProfile", {
-  type: "Profile",
+  type: list("Profile"),
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
-    userHasAccessToProfile("profileId"),
+    userHasAccessToProfile("profileIds"),
     contextUserCanSubscribeUsersToProfile("userIds")
   ),
   args: {
-    profileId: nonNull(globalIdArg("Profile")),
+    profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
   },
-  validateArgs: notEmptyArray((args) => args.userIds, "userIds"),
-  resolve: async (_, { profileId, userIds }, ctx) => {
-    await ctx.profiles.unsubscribeUsersFromProfile(profileId, userIds, `User:${ctx.user!.id}`);
-    return (await ctx.profiles.loadProfile(profileId))!;
+  validateArgs: validateAnd(
+    notEmptyArray((args) => args.userIds, "userIds"),
+    notEmptyArray((args) => args.profileIds, "profileIds")
+  ),
+  resolve: async (_, { profileIds, userIds }, ctx) => {
+    await ctx.profiles.unsubscribeUsersFromProfiles(profileIds, userIds, `User:${ctx.user!.id}`);
+    return (await ctx.profiles.loadProfile(profileIds)) as Profile[];
   },
 });

@@ -106,7 +106,7 @@
   },
   {
     "term": "component.add-petition-access-dialog.subscribe-to-notifications",
-    "definition": "Subscribir a {name} a las notificaciones",
+    "definition": "Suscribir a {name} a las notificaciones",
     "context": "Subscribe {name} to notifications"
   },
   {
@@ -226,7 +226,7 @@
   },
   {
     "term": "component.alerts-table-columns.subscribers",
-    "definition": "Subscriptores",
+    "definition": "Suscriptores",
     "context": "Subscribers"
   },
   {
@@ -531,7 +531,7 @@
   },
   {
     "term": "component.confirm-comment-mention-and-share-dialog.body-subscribe-to-notifications",
-    "definition": "Subscribir a las notificaciones",
+    "definition": "Suscribir a las notificaciones",
     "context": "Subscribe to notifications"
   },
   {
@@ -2490,6 +2490,11 @@
     "context": "Delete profile"
   },
   {
+    "term": "component.more-options-menu-profile.manage-profile-subscriptions",
+    "definition": "Gestionar suscripciones",
+    "context": "Manage subscriptions"
+  },
+  {
     "term": "component.move-to-folder-dialog.currently-in",
     "definition": "Actualmente en {folder}",
     "context": "Currently in {folder}"
@@ -4026,7 +4031,7 @@
   },
   {
     "term": "component.petition-sharing-dialog.subscribe",
-    "definition": "Subscribir a las notificaciones",
+    "definition": "Suscribir a las notificaciones",
     "context": "Subscribe to notifications"
   },
   {
@@ -4358,6 +4363,36 @@
     "term": "component.profile-file.remove-attachment",
     "definition": "Quitar adjunto",
     "context": "Remove attachment"
+  },
+  {
+    "term": "component.profile-subscribers-dialog.header",
+    "definition": "Suscripciones al perfil",
+    "context": "Profile subscriptions"
+  },
+  {
+    "term": "component.profile-subscribers-dialog.not-subscribed",
+    "definition": "No suscrito",
+    "context": "Not subscribed"
+  },
+  {
+    "term": "component.profile-subscribers-dialog.subscribed",
+    "definition": "Suscrito",
+    "context": "Subscribed"
+  },
+  {
+    "term": "component.profile-subscribers-dialog.unsubscribe",
+    "definition": "Desuscribir",
+    "context": "Unsubscribe"
+  },
+  {
+    "term": "component.profile-subscribers.no-subscribers-button",
+    "definition": "Sin suscritos",
+    "context": "No subscribers"
+  },
+  {
+    "term": "component.profile-table-columns.subscribed",
+    "definition": "Suscritos",
+    "context": "Subscribed"
   },
   {
     "term": "component.profile-table-columns.type",
@@ -6056,7 +6091,7 @@
   },
   {
     "term": "component.subscribed-notifications-icon.label",
-    "definition": "Subscrito a notificaciones",
+    "definition": "suscrito a notificaciones",
     "context": "Subscribed to notifications"
   },
   {
@@ -6221,7 +6256,7 @@
   },
   {
     "term": "component.template-default-permissions-dialog.subscribe",
-    "definition": "Subscribir a las notificaciones",
+    "definition": "Suscribir a las notificaciones",
     "context": "Subscribe to notifications"
   },
   {
@@ -8200,8 +8235,13 @@
     "context": "Submit"
   },
   {
+    "term": "generic.subscribe",
+    "definition": "Suscribir",
+    "context": "Subscribe"
+  },
+  {
     "term": "generic.subscribed",
-    "definition": "Subscrito",
+    "definition": "suscrito",
     "context": "Subscribed"
   },
   {
@@ -8321,7 +8361,7 @@
   },
   {
     "term": "generic.unsubscribed",
-    "definition": "No subscrito",
+    "definition": "No suscrito",
     "context": "Unsubscribed"
   },
   {
@@ -9275,9 +9315,19 @@
     "context": "Saving {count, plural, =1 {# change} other{# changes}}..."
   },
   {
+    "term": "page.profile-details.subscribe",
+    "definition": "Subscribirme",
+    "context": "Subscribe"
+  },
+  {
     "term": "page.profile-details.title",
     "definition": "Datos del perfil",
     "context": "Profile details"
+  },
+  {
+    "term": "page.profile-details.unsubscribe",
+    "definition": "Desubscribirme",
+    "context": "Unsubscribe"
   },
   {
     "term": "page.profiles.all-profile-types",

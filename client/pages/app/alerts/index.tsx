@@ -333,7 +333,7 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
         CellContent: ({ row, column }) => {
           return (
             <Flex justifyContent={column.align}>
-              <UserAvatarList usersOrGroups={[]} />
+              <UserAvatarList usersOrGroups={row.profile.subscribers.map((s) => s.user)} />
             </Flex>
           );
         },
@@ -379,6 +379,7 @@ const _fragments = {
       field {
         id
         name
+        isExpirable
         expiryAlertAheadTime
       }
       profile {
@@ -387,6 +388,13 @@ const _fragments = {
         profileType {
           id
           name
+        }
+        subscribers {
+          id
+          user {
+            id
+            ...UserAvatarList_User
+          }
         }
       }
       value {
@@ -400,6 +408,7 @@ const _fragments = {
         expiryDate
       }
     }
+    ${UserAvatarList.fragments.User}
   `,
 };
 

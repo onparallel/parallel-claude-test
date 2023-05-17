@@ -1542,12 +1542,12 @@ export interface NexusGenFieldTypes {
     signedPetitionDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     startAsyncFieldCompletion: NexusGenRootTypes["AsyncFieldCompletionResponse"]; // AsyncFieldCompletionResponse!
     startSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
-    subscribeToProfile: NexusGenRootTypes["Profile"]; // Profile!
+    subscribeToProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     tagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     transferOrganizationOwnership: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     transferPetitionOwnership: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
-    unsubscribeFromProfile: NexusGenRootTypes["Profile"]; // Profile!
+    unsubscribeFromProfile: NexusGenRootTypes["Profile"][]; // [Profile!]!
     untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
@@ -5843,7 +5843,7 @@ export interface NexusGenArgTypes {
     };
     subscribeToProfile: {
       // args
-      profileId: NexusGenScalars["GID"]; // GID!
+      profileIds: NexusGenScalars["GID"][]; // [GID!]!
       userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     switchAutomaticReminders: {
@@ -5870,7 +5870,7 @@ export interface NexusGenArgTypes {
     };
     unsubscribeFromProfile: {
       // args
-      profileId: NexusGenScalars["GID"]; // GID!
+      profileIds: NexusGenScalars["GID"][]; // [GID!]!
       userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     untagPetition: {

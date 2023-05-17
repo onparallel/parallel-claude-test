@@ -13,11 +13,12 @@ interface UserAvatarListProps {
   usersOrGroups: (UserAvatarList_UserFragment | UserAvatarList_UserGroupFragment)[];
   size?: string;
   max?: number;
+  boxSize?: number;
 }
 
 export const UserAvatarList = Object.assign(
   chakraForwardRef<"div", UserAvatarListProps>(function UserAvatarList(
-    { usersOrGroups, size = "xs", max = 3 },
+    { usersOrGroups, size = "xs", max = 3, boxSize = 7 },
     ref
   ) {
     const styles = useMultiStyleConfig("Avatar", { size });
@@ -38,17 +39,18 @@ export const UserAvatarList = Object.assign(
         {excess && (
           <UserListPopover usersOrGroups={usersOrGroups}>
             <Flex
+              marginX={0.5}
               alignItems="center"
               fontSize="2xs"
               borderRadius="full"
               paddingLeft="8px"
-              sx={styles.excessLabel}
+              sx={{ ...styles.label, ...styles.excessLabel }}
             >
               <Box as="span">+{excess}</Box>
             </Flex>
           </UserListPopover>
         )}
-        {slice.map((u) => {
+        {slice.map((u, i) => {
           const tooltipDisabled =
             u.__typename === "User" ? !u.fullName : u.__typename === "UserGroup" ? !u.name : true;
 
@@ -66,7 +68,7 @@ export const UserAvatarList = Object.assign(
             <Tooltip key={u.id} label={label} isDisabled={tooltipDisabled}>
               <Box
                 marginY={-1}
-                marginRight={-2}
+                marginRight={i === 0 && !excess ? 0 : -2}
                 sx={{
                   ":hover > *": {
                     transform: "translateY(-0.25rem)",
@@ -76,22 +78,22 @@ export const UserAvatarList = Object.assign(
               >
                 {u.__typename === "User" ? (
                   <UserAvatar
-                    size="xs"
+                    size={size}
                     user={u}
                     transitionProperty="transform"
                     transitionDuration="150ms"
-                    boxSize={7}
+                    boxSize={boxSize}
                     borderWidth="2px"
                     borderColor="white"
                   />
                 ) : u.__typename === "UserGroup" ? (
                   <Avatar
-                    size="xs"
+                    size={size}
                     name={u.name}
                     getInitials={() => u.initials}
                     transitionProperty="transform"
                     transitionDuration="150ms"
-                    boxSize={7}
+                    boxSize={boxSize}
                     borderWidth="2px"
                     borderColor="white"
                   />
