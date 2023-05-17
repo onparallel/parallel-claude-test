@@ -870,6 +870,7 @@ export interface Mutation {
   /** Starts the completion of an async field */
   startAsyncFieldCompletion: AsyncFieldCompletionResponse;
   startSignatureRequest: PetitionSignatureRequest;
+  subscribeToProfile: Profile;
   /** Switches automatic reminders for the specified petition accesses. */
   switchAutomaticReminders: Array<PetitionAccess>;
   /** Tags a petition */
@@ -878,6 +879,7 @@ export interface Mutation {
   transferOrganizationOwnership: SupportMethodResponse;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<PetitionBase>;
+  unsubscribeFromProfile: Profile;
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
   /** Updates a contact. */
@@ -1085,6 +1087,7 @@ export interface MutationcreateDowJonesProfileDownloadTaskArgs {
 export interface MutationcreateEventSubscriptionArgs {
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
+  fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]>>;
   fromTemplateId?: InputMaybe<Scalars["GID"]>;
   name?: InputMaybe<Scalars["String"]>;
 }
@@ -1187,6 +1190,7 @@ export interface MutationcreatePrintPdfTaskArgs {
 
 export interface MutationcreateProfileArgs {
   profileTypeId: Scalars["GID"];
+  subscribe?: InputMaybe<Scalars["Boolean"]>;
 }
 
 export interface MutationcreateProfileFieldFileUploadLinkArgs {
@@ -1742,6 +1746,11 @@ export interface MutationstartSignatureRequestArgs {
   petitionId: Scalars["GID"];
 }
 
+export interface MutationsubscribeToProfileArgs {
+  profileId: Scalars["GID"];
+  userIds: Array<Scalars["GID"]>;
+}
+
 export interface MutationswitchAutomaticRemindersArgs {
   accessIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
@@ -1764,6 +1773,11 @@ export interface MutationtransferPetitionOwnershipArgs {
   userId: Scalars["GID"];
 }
 
+export interface MutationunsubscribeFromProfileArgs {
+  profileId: Scalars["GID"];
+  userIds: Array<Scalars["GID"]>;
+}
+
 export interface MutationuntagPetitionArgs {
   petitionId: Scalars["GID"];
   tagId: Scalars["GID"];
@@ -1777,6 +1791,7 @@ export interface MutationupdateContactArgs {
 export interface MutationupdateEventSubscriptionArgs {
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl?: InputMaybe<Scalars["String"]>;
+  fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]>>;
   fromTemplateId?: InputMaybe<Scalars["GID"]>;
   id: Scalars["GID"];
   isEnabled?: InputMaybe<Scalars["Boolean"]>;
@@ -2618,6 +2633,7 @@ export interface PetitionEventSubscription {
   eventTypes?: Maybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
   fromTemplate?: Maybe<PetitionBaseMini>;
+  fromTemplateFields?: Maybe<Array<PetitionFieldMini>>;
   id: Scalars["GID"];
   isEnabled: Scalars["Boolean"];
   isFailing: Scalars["Boolean"];
@@ -2772,6 +2788,18 @@ export interface PetitionFieldCommentUserMention {
   __typename?: "PetitionFieldCommentUserMention";
   mentionedId: Scalars["GID"];
   user?: Maybe<User>;
+}
+
+export interface PetitionFieldMini {
+  __typename?: "PetitionFieldMini";
+  /** The ID of the petition field. */
+  id: Scalars["GID"];
+  /** The options of the petition field. */
+  options: Scalars["JSONObject"];
+  /** The title of the petition field. */
+  title?: Maybe<Scalars["String"]>;
+  /** The type of the petition field. */
+  type: PetitionFieldType;
 }
 
 /** The progress of the petition */
@@ -3358,6 +3386,7 @@ export interface Profile extends Timestamps {
   name: Scalars["String"];
   profileType: ProfileType;
   properties: Array<ProfileFieldProperty>;
+  subscribers: Array<ProfileSubscription>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 }
@@ -3529,6 +3558,12 @@ export interface ProfilePagination {
 export interface ProfilePropertyFilter {
   profileTypeFieldId?: InputMaybe<Array<Scalars["GID"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]>>;
+}
+
+export interface ProfileSubscription {
+  __typename?: "ProfileSubscription";
+  id: Scalars["GID"];
+  user: User;
 }
 
 export interface ProfileType extends Timestamps {
@@ -15361,6 +15396,7 @@ export type WebhookSubscriptionsTable_PetitionEventSubscriptionFragment = {
     id: string;
     publicKey: string;
   }>;
+  fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
 };
 
 export type WebhookSubscriptionsTable_createEventSubscriptionMutationVariables = Exact<{
@@ -15368,6 +15404,7 @@ export type WebhookSubscriptionsTable_createEventSubscriptionMutationVariables =
   eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
   name?: InputMaybe<Scalars["String"]>;
   fromTemplateId?: InputMaybe<Scalars["GID"]>;
+  fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
 }>;
 
 export type WebhookSubscriptionsTable_createEventSubscriptionMutation = {
@@ -15385,6 +15422,7 @@ export type WebhookSubscriptionsTable_createEventSubscriptionMutation = {
       id: string;
       publicKey: string;
     }>;
+    fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
   };
 };
 
@@ -15395,6 +15433,7 @@ export type WebhookSubscriptionsTable_updateEventSubscriptionMutationVariables =
   eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
   name?: InputMaybe<Scalars["String"]>;
   fromTemplateId?: InputMaybe<Scalars["GID"]>;
+  fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
 }>;
 
 export type WebhookSubscriptionsTable_updateEventSubscriptionMutation = {
@@ -15412,6 +15451,7 @@ export type WebhookSubscriptionsTable_updateEventSubscriptionMutation = {
       id: string;
       publicKey: string;
     }>;
+    fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
   };
 };
 
@@ -15453,6 +15493,7 @@ export type CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragm
   isFailing: boolean;
   name?: string | null;
   fromTemplate?: { __typename?: "PetitionBaseMini"; id: string; name?: string | null } | null;
+  fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
   signatureKeys: Array<{
     __typename?: "EventSubscriptionSignatureKey";
     id: string;
@@ -15482,6 +15523,46 @@ export type CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKeyF
   publicKey: string;
 };
 
+export type CreateOrUpdateEventSubscriptionDialog_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  isReadOnly: boolean;
+  id: string;
+  type: PetitionFieldType;
+  title?: string | null;
+  options: { [key: string]: any };
+};
+
+export type CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  fields: Array<{
+    __typename?: "PetitionField";
+    isReadOnly: boolean;
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    options: { [key: string]: any };
+  }>;
+};
+
+export type CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields_PetitionTemplate_Fragment =
+  {
+    __typename?: "PetitionTemplate";
+    id: string;
+    fields: Array<{
+      __typename?: "PetitionField";
+      isReadOnly: boolean;
+      id: string;
+      type: PetitionFieldType;
+      title?: string | null;
+      options: { [key: string]: any };
+    }>;
+  };
+
+export type CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFieldsFragment =
+  | CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields_Petition_Fragment
+  | CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields_PetitionTemplate_Fragment;
+
 export type CreateOrUpdateEventSubscriptionDialog_petitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
@@ -15499,6 +15580,39 @@ export type CreateOrUpdateEventSubscriptionDialog_petitionsQuery = {
       | { __typename?: "PetitionTemplate"; id: string; name?: string | null }
     >;
   };
+};
+
+export type CreateOrUpdateEventSubscriptionDialog_petitionWithFieldsQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type CreateOrUpdateEventSubscriptionDialog_petitionWithFieldsQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        fields: Array<{
+          __typename?: "PetitionField";
+          isReadOnly: boolean;
+          id: string;
+          type: PetitionFieldType;
+          title?: string | null;
+          options: { [key: string]: any };
+        }>;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        fields: Array<{
+          __typename?: "PetitionField";
+          isReadOnly: boolean;
+          id: string;
+          type: PetitionFieldType;
+          title?: string | null;
+          options: { [key: string]: any };
+        }>;
+      }
+    | null;
 };
 
 export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables = Exact<{
@@ -27082,6 +27196,7 @@ export type Developers_subscriptionsQuery = {
       id: string;
       publicKey: string;
     }>;
+    fromTemplateFields?: Array<{ __typename?: "PetitionFieldMini"; id: string }> | null;
   }>;
 };
 
@@ -30850,6 +30965,9 @@ export const CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFrag
       id
       name
     }
+    fromTemplateFields {
+      id
+    }
     signatureKeys {
       ...CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKey
     }
@@ -30884,6 +31002,33 @@ export const CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragmentDoc = gql
     name
   }
 ` as unknown as DocumentNode<CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment, unknown>;
+export const PetitionFieldSelect_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldSelect_PetitionField on PetitionField {
+    id
+    type
+    title
+    options
+  }
+` as unknown as DocumentNode<PetitionFieldSelect_PetitionFieldFragment, unknown>;
+export const CreateOrUpdateEventSubscriptionDialog_PetitionFieldFragmentDoc = gql`
+  fragment CreateOrUpdateEventSubscriptionDialog_PetitionField on PetitionField {
+    ...PetitionFieldSelect_PetitionField
+    isReadOnly
+  }
+  ${PetitionFieldSelect_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<CreateOrUpdateEventSubscriptionDialog_PetitionFieldFragment, unknown>;
+export const CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFieldsFragmentDoc = gql`
+  fragment CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields on PetitionBase {
+    id
+    fields {
+      ...CreateOrUpdateEventSubscriptionDialog_PetitionField
+    }
+  }
+  ${CreateOrUpdateEventSubscriptionDialog_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<
+  CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFieldsFragment,
+  unknown
+>;
 export const AdminOrganizationsFeatures_OrganizationFragmentDoc = gql`
   fragment AdminOrganizationsFeatures_Organization on Organization {
     id
@@ -32853,14 +32998,6 @@ export const PetitionFieldOptionsListEditor_PetitionFieldFragmentDoc = gql`
     options
   }
 ` as unknown as DocumentNode<PetitionFieldOptionsListEditor_PetitionFieldFragment, unknown>;
-export const PetitionFieldSelect_PetitionFieldFragmentDoc = gql`
-  fragment PetitionFieldSelect_PetitionField on PetitionField {
-    id
-    type
-    title
-    options
-  }
-` as unknown as DocumentNode<PetitionFieldSelect_PetitionFieldFragment, unknown>;
 export const PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc = gql`
   fragment PetitionFieldVisibilityEditor_PetitionField on PetitionField {
     id
@@ -37082,12 +37219,14 @@ export const WebhookSubscriptionsTable_createEventSubscriptionDocument = gql`
     $eventTypes: [PetitionEventType!]
     $name: String
     $fromTemplateId: GID
+    $fromTemplateFieldIds: [GID!]
   ) {
     createEventSubscription(
       eventsUrl: $eventsUrl
       eventTypes: $eventTypes
       name: $name
       fromTemplateId: $fromTemplateId
+      fromTemplateFieldIds: $fromTemplateFieldIds
     ) {
       ...WebhookSubscriptionsTable_PetitionEventSubscription
     }
@@ -37105,6 +37244,7 @@ export const WebhookSubscriptionsTable_updateEventSubscriptionDocument = gql`
     $eventTypes: [PetitionEventType!]
     $name: String
     $fromTemplateId: GID
+    $fromTemplateFieldIds: [GID!]
   ) {
     updateEventSubscription(
       id: $id
@@ -37113,6 +37253,7 @@ export const WebhookSubscriptionsTable_updateEventSubscriptionDocument = gql`
       eventTypes: $eventTypes
       name: $name
       fromTemplateId: $fromTemplateId
+      fromTemplateFieldIds: $fromTemplateFieldIds
     ) {
       ...WebhookSubscriptionsTable_PetitionEventSubscription
       ...CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription
@@ -37169,6 +37310,17 @@ export const CreateOrUpdateEventSubscriptionDialog_petitionsDocument = gql`
 ` as unknown as DocumentNode<
   CreateOrUpdateEventSubscriptionDialog_petitionsQuery,
   CreateOrUpdateEventSubscriptionDialog_petitionsQueryVariables
+>;
+export const CreateOrUpdateEventSubscriptionDialog_petitionWithFieldsDocument = gql`
+  query CreateOrUpdateEventSubscriptionDialog_petitionWithFields($petitionId: GID!) {
+    petition(id: $petitionId) {
+      ...CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields
+    }
+  }
+  ${CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFieldsFragmentDoc}
+` as unknown as DocumentNode<
+  CreateOrUpdateEventSubscriptionDialog_petitionWithFieldsQuery,
+  CreateOrUpdateEventSubscriptionDialog_petitionWithFieldsQueryVariables
 >;
 export const GenerateNewTokenDialog_generateUserAuthTokenDocument = gql`
   mutation GenerateNewTokenDialog_generateUserAuthToken($tokenName: String!) {

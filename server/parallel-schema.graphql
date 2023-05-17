@@ -824,6 +824,7 @@ type Mutation {
   createEventSubscription(
     eventTypes: [PetitionEventType!]
     eventsUrl: String!
+    fromTemplateFieldIds: [GID!]
     fromTemplateId: GID
     name: String
   ): PetitionEventSubscription!
@@ -1803,6 +1804,7 @@ type Mutation {
   updateEventSubscription(
     eventTypes: [PetitionEventType!]
     eventsUrl: String
+    fromTemplateFieldIds: [GID!]
     fromTemplateId: GID
     id: GID!
     isEnabled: Boolean
@@ -3088,6 +3090,7 @@ type PetitionEventSubscription {
   eventTypes: [PetitionEventType!]
   eventsUrl: String!
   fromTemplate: PetitionBaseMini
+  fromTemplateFields: [PetitionFieldMini!]
   id: GID!
   isEnabled: Boolean!
   isFailing: Boolean!
@@ -3326,6 +3329,28 @@ A user mention on a petition field comment
 type PetitionFieldCommentUserMention {
   mentionedId: GID!
   user: User
+}
+
+type PetitionFieldMini {
+  """
+  The ID of the petition field.
+  """
+  id: GID!
+
+  """
+  The options of the petition field.
+  """
+  options: JSONObject!
+
+  """
+  The title of the petition field.
+  """
+  title: String
+
+  """
+  The type of the petition field.
+  """
+  type: PetitionFieldType!
 }
 
 """

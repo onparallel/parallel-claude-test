@@ -1040,6 +1040,16 @@
     "context": "Your URL does not seem to accept POST requests."
   },
   {
+    "term": "component.create-event-subscription-dialog.filter-fields",
+    "definition": "Filtra eventos provenientes de campos específicos de la plantilla. Deja en blanco para recibir todos los eventos.",
+    "context": "Filter for events coming from specific fields of the template. Leave blank to receive all events."
+  },
+  {
+    "term": "component.create-event-subscription-dialog.filter-fields-placeholder",
+    "definition": "Selecciona campos para filtrar eventos...",
+    "context": "Select fields to filter events..."
+  },
+  {
     "term": "component.create-event-subscription-dialog.from-template-label",
     "definition": "Filtrar eventos provinientes de parallels creados a partir de una plantilla específica (Opcional).",
     "context": "Filter events from parallels created from a specific template (Optional)."

@@ -1,4 +1,4 @@
-import { ApolloError, gql, useApolloClient } from "@apollo/client";
+import { ApolloError, gql, useApolloClient, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
@@ -25,25 +25,31 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
-import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
+import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
+import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { Steps } from "@parallel/components/common/Steps";
 import {
   CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment,
   CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment,
   CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment,
+  CreateOrUpdateEventSubscriptionDialog_PetitionFieldFragment,
   CreateOrUpdateEventSubscriptionDialog_petitionsDocument,
+  CreateOrUpdateEventSubscriptionDialog_petitionWithFieldsDocument,
   PetitionEventType,
 } from "@parallel/graphql/__types";
 import { assertTypenameArray } from "@parallel/utils/apollo/typename";
+import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { Maybe } from "@parallel/utils/types";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { components, OptionProps, SingleValueProps } from "react-select";
 import Select from "react-select/async";
-import { isDefined } from "remeda";
+import { isDefined, zip } from "remeda";
 
 interface CreateOrUpdateEventSubscriptionDialogProps {
   eventSubscription?: CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment;
@@ -55,6 +61,7 @@ interface CreateOrUpdateEventSubscriptionDialogProps {
       eventTypes: PetitionEventType[] | null;
       name: string | null;
       fromTemplateId: string | null;
+      fromTemplateFieldIds: string[] | null;
     }
   ) => Promise<string>;
   onAddSignatureKey: (
@@ -71,7 +78,60 @@ interface CreateOrUpdateEventSubscriptionDialogFormData {
   fromTemplate: Maybe<
     Omit<CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment, "__typename">
   >;
+  fromTemplateFields: CreateOrUpdateEventSubscriptionDialog_PetitionFieldFragment[];
 }
+
+const EVENT_TYPES: PetitionEventType[] = [
+  "ACCESS_ACTIVATED",
+  "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
+  "ACCESS_DEACTIVATED",
+  "ACCESS_DELEGATED",
+  "ACCESS_OPENED",
+  "COMMENT_DELETED",
+  "COMMENT_PUBLISHED",
+  "GROUP_PERMISSION_ADDED",
+  "GROUP_PERMISSION_EDITED",
+  "GROUP_PERMISSION_REMOVED",
+  "MESSAGE_CANCELLED",
+  "MESSAGE_SCHEDULED",
+  "MESSAGE_SENT",
+  "OWNERSHIP_TRANSFERRED",
+  "PETITION_CLONED",
+  "PETITION_CLOSED",
+  "PETITION_CLOSED_NOTIFIED",
+  "PETITION_COMPLETED",
+  "PETITION_CREATED",
+  "PETITION_MESSAGE_BOUNCED",
+  "PETITION_REMINDER_BOUNCED",
+  "PETITION_REOPENED",
+  "PETITION_DELETED",
+  "RECIPIENT_SIGNED",
+  "REMINDER_SENT",
+  "REPLY_CREATED",
+  "REPLY_DELETED",
+  "REPLY_UPDATED",
+  "SIGNATURE_OPENED",
+  "SIGNATURE_CANCELLED",
+  "SIGNATURE_COMPLETED",
+  "SIGNATURE_REMINDER",
+  "SIGNATURE_STARTED",
+  "TEMPLATE_USED",
+  "USER_PERMISSION_ADDED",
+  "USER_PERMISSION_EDITED",
+  "USER_PERMISSION_REMOVED",
+  "REMINDERS_OPT_OUT",
+  "PETITION_ANONYMIZED",
+  "REPLY_STATUS_CHANGED",
+];
+
+const FIELD_EVENTS: PetitionEventType[] = [
+  "COMMENT_DELETED",
+  "COMMENT_PUBLISHED",
+  "REPLY_CREATED",
+  "REPLY_DELETED",
+  "REPLY_STATUS_CHANGED",
+  "REPLY_UPDATED",
+];
 
 export function CreateOrUpdateEventSubscriptionDialog({
   eventSubscription,
@@ -98,7 +158,9 @@ export function CreateOrUpdateEventSubscriptionDialog({
     register,
     control,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
+    resetField,
     setError,
     clearErrors,
   } = useForm<CreateOrUpdateEventSubscriptionDialogFormData>({
@@ -108,29 +170,35 @@ export function CreateOrUpdateEventSubscriptionDialog({
       eventsMode: isDefined(eventSubscription?.eventTypes) ? "SPECIFIC" : "ALL",
       eventTypes: eventSubscription?.eventTypes ?? [],
       fromTemplate: eventSubscription?.fromTemplate,
+      fromTemplateFields: [],
     },
   });
-
   const eventsMode = watch("eventsMode");
+  const eventTypes = watch("eventTypes");
 
   const apollo = useApolloClient();
 
-  const loadTemplates = useCallback(async (search: string | null | undefined) => {
-    const result = await apollo.query({
-      query: CreateOrUpdateEventSubscriptionDialog_petitionsDocument,
-      variables: {
-        offset: 0,
-        limit: 100,
-        filters: {
-          type: "TEMPLATE",
+  const loadTemplates = useDebouncedAsync(
+    async (search: string | null | undefined) => {
+      const result = await apollo.query({
+        query: CreateOrUpdateEventSubscriptionDialog_petitionsDocument,
+        variables: {
+          offset: 0,
+          limit: 100,
+          filters: {
+            type: "TEMPLATE",
+          },
+          search,
+          sortBy: "lastUsedAt_DESC",
         },
-        search,
-        sortBy: "lastUsedAt_DESC",
-      },
-    });
-    assertTypenameArray(result.data.petitions.items, "PetitionTemplate");
-    return result.data.petitions.items;
-  }, []);
+        fetchPolicy: "no-cache",
+      });
+      assertTypenameArray(result.data.petitions.items, "PetitionTemplate");
+      return result.data.petitions.items;
+    },
+    300,
+    []
+  );
 
   const eventsUrlInputRef = useRef<HTMLInputElement>(null);
   const eventsUrlInputProps = useRegisterWithRef(eventsUrlInputRef, register, "eventsUrl", {
@@ -149,8 +217,8 @@ export function CreateOrUpdateEventSubscriptionDialog({
     false
   >({ components: { Option, SingleValue } as any });
 
-  const options = useMemo(
-    () => eventTypes.map((event) => ({ label: event as string, value: event })),
+  const options = useSimpleSelectOptions(
+    () => EVENT_TYPES.map((event) => ({ label: event, value: event })),
     []
   );
 
@@ -182,6 +250,47 @@ export function CreateOrUpdateEventSubscriptionDialog({
     } catch {}
   }
 
+  const fromTemplate = watch("fromTemplate");
+
+  const { data } = useQuery(CreateOrUpdateEventSubscriptionDialog_petitionWithFieldsDocument, {
+    variables: fromTemplate ? { petitionId: fromTemplate.id } : undefined,
+    skip: !isDefined(fromTemplate),
+    fetchPolicy: "no-cache",
+  });
+
+  const fields = data?.petition?.fields ?? [];
+  const indices = useFieldIndices(fields);
+
+  useEffectSkipFirst(() => {
+    // reset fields when template changes
+    setValue("fromTemplateFields", []);
+  }, [fromTemplate?.id]);
+
+  const initialFieldsSetRef = useRef(false);
+  useEffect(() => {
+    // set initial fields
+    setTimeout(() => {
+      if (
+        isDefined(eventSubscription) &&
+        isDefined(eventSubscription.fromTemplateFields) &&
+        fields.length > 0 &&
+        !initialFieldsSetRef.current
+      ) {
+        resetField("fromTemplateFields", {
+          defaultValue: fields.filter((field) =>
+            eventSubscription.fromTemplateFields?.some((f) => field.id === f.id)
+          ),
+        });
+        initialFieldsSetRef.current = true;
+      }
+    });
+  }, [eventSubscription?.fromTemplateFields, fields]);
+
+  const { _fields, _indices } = useMemo(() => {
+    const x = zip(fields, indices).filter(([f]) => !f.isReadOnly);
+    return { _fields: x.map(([f]) => f), _indices: x.map(([, i]) => i) };
+  }, [fields, indices]);
+
   return (
     <ConfirmDialog
       size="xl"
@@ -200,6 +309,10 @@ export function CreateOrUpdateEventSubscriptionDialog({
                   eventsUrl: data.eventsUrl,
                   eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes,
                   fromTemplateId: data.fromTemplate?.id ?? null,
+                  fromTemplateFieldIds:
+                    isDefined(data.fromTemplate) && data.fromTemplateFields.length > 0
+                      ? data.fromTemplateFields.map((f) => f.id)
+                      : null,
                 })
               );
 
@@ -390,6 +503,42 @@ export function CreateOrUpdateEventSubscriptionDialog({
                 </FormControl>
               </Stack>
             </PaddedCollapse>
+            <PaddedCollapse
+              in={
+                isDefined(fromTemplate) &&
+                eventsMode === "SPECIFIC" &&
+                eventTypes.length > 0 &&
+                eventTypes.every((e) => FIELD_EVENTS.includes(e))
+              }
+            >
+              <Stack paddingLeft={6}>
+                <Text fontSize="sm">
+                  <FormattedMessage
+                    id="component.create-event-subscription-dialog.filter-fields"
+                    defaultMessage="Filter for events coming from specific fields of the template. Leave blank to receive all events."
+                  />
+                </Text>
+                <FormControl>
+                  <Controller
+                    name="fromTemplateFields"
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <PetitionFieldSelect
+                        isMulti
+                        value={value}
+                        fields={_fields}
+                        indices={_indices}
+                        onChange={onChange}
+                        placeholder={intl.formatMessage({
+                          id: "component.create-event-subscription-dialog.filter-fields-placeholder",
+                          defaultMessage: "Select fields to filter events...",
+                        })}
+                      />
+                    )}
+                  />
+                </FormControl>
+              </Stack>
+            </PaddedCollapse>
           </Stack>
           <Stack>
             <Text>
@@ -510,6 +659,9 @@ CreateOrUpdateEventSubscriptionDialog.fragments = {
           id
           name
         }
+        fromTemplateFields {
+          id
+        }
         signatureKeys {
           ...CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKey
         }
@@ -525,13 +677,32 @@ CreateOrUpdateEventSubscriptionDialog.fragments = {
       }
     `;
   },
-
   get EventSubscriptionSignatureKey() {
     return gql`
       fragment CreateOrUpdateEventSubscriptionDialog_EventSubscriptionSignatureKey on EventSubscriptionSignatureKey {
         id
         publicKey
       }
+    `;
+  },
+  get PetitionField() {
+    return gql`
+      fragment CreateOrUpdateEventSubscriptionDialog_PetitionField on PetitionField {
+        ...PetitionFieldSelect_PetitionField
+        isReadOnly
+      }
+      ${PetitionFieldSelect.fragments.PetitionField}
+    `;
+  },
+  get PetitionBaseWithFields() {
+    return gql`
+      fragment CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields on PetitionBase {
+        id
+        fields {
+          ...CreateOrUpdateEventSubscriptionDialog_PetitionField
+        }
+      }
+      ${this.PetitionField}
     `;
   },
 };
@@ -559,54 +730,19 @@ const _queries = [
     }
     ${CreateOrUpdateEventSubscriptionDialog.fragments.PetitionBase}
   `,
+  gql`
+    query CreateOrUpdateEventSubscriptionDialog_petitionWithFields($petitionId: GID!) {
+      petition(id: $petitionId) {
+        ...CreateOrUpdateEventSubscriptionDialog_PetitionBaseWithFields
+      }
+    }
+    ${CreateOrUpdateEventSubscriptionDialog.fragments.PetitionBaseWithFields}
+  `,
 ];
 
 export function useCreateOrUpdateEventSubscriptionDialog() {
   return useDialog(CreateOrUpdateEventSubscriptionDialog);
 }
-
-const eventTypes: PetitionEventType[] = [
-  "ACCESS_ACTIVATED",
-  "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK",
-  "ACCESS_DEACTIVATED",
-  "ACCESS_DELEGATED",
-  "ACCESS_OPENED",
-  "COMMENT_DELETED",
-  "COMMENT_PUBLISHED",
-  "GROUP_PERMISSION_ADDED",
-  "GROUP_PERMISSION_EDITED",
-  "GROUP_PERMISSION_REMOVED",
-  "MESSAGE_CANCELLED",
-  "MESSAGE_SCHEDULED",
-  "MESSAGE_SENT",
-  "OWNERSHIP_TRANSFERRED",
-  "PETITION_CLONED",
-  "PETITION_CLOSED",
-  "PETITION_CLOSED_NOTIFIED",
-  "PETITION_COMPLETED",
-  "PETITION_CREATED",
-  "PETITION_MESSAGE_BOUNCED",
-  "PETITION_REMINDER_BOUNCED",
-  "PETITION_REOPENED",
-  "PETITION_DELETED",
-  "RECIPIENT_SIGNED",
-  "REMINDER_SENT",
-  "REPLY_CREATED",
-  "REPLY_DELETED",
-  "REPLY_UPDATED",
-  "SIGNATURE_OPENED",
-  "SIGNATURE_CANCELLED",
-  "SIGNATURE_COMPLETED",
-  "SIGNATURE_REMINDER",
-  "SIGNATURE_STARTED",
-  "TEMPLATE_USED",
-  "USER_PERMISSION_ADDED",
-  "USER_PERMISSION_EDITED",
-  "USER_PERMISSION_REMOVED",
-  "REMINDERS_OPT_OUT",
-  "PETITION_ANONYMIZED",
-  "REPLY_STATUS_CHANGED",
-];
 
 function useDeleteWebhookSignatureKeysDialog() {
   const showDialog = useConfirmDeleteDialog();

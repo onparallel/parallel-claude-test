@@ -4,7 +4,7 @@ import { PetitionEventSubscription } from "../../db/__types";
 import { IFetchService } from "../../services/FetchService";
 import { generateEDKeyPair } from "../../util/keyPairs";
 import { withError } from "../../util/promises/withError";
-import { and, authenticateAnd, ifArgDefined } from "../helpers/authorize";
+import { and, argIsDefined, authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/Result";
@@ -12,9 +12,12 @@ import { validUrl } from "../helpers/validators/validUrl";
 import { petitionsAreOfTypeTemplate, userHasAccessToPetitions } from "../petition/authorizers";
 import {
   eventSubscriptionHasSignatureKeysLessThan,
+  petitionFieldsBelongsToTemplate,
   userHasAccessToEventSubscription,
   userHasAccessToEventSubscriptionSignatureKeys,
 } from "./authorizers";
+import { validateAnd } from "../helpers/validateArgs";
+import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 
 async function challengeWebhookUrl(url: string, fetch: IFetchService) {
   const [, response] = await withError(
@@ -41,6 +44,13 @@ export const createEventSubscription = mutationField("createEventSubscription", 
         petitionsAreOfTypeTemplate("fromTemplateId" as never),
         userHasAccessToPetitions("fromTemplateId" as never)
       )
+    ),
+    ifArgDefined(
+      "fromTemplateFieldIds",
+      and(
+        argIsDefined("fromTemplateId"),
+        petitionFieldsBelongsToTemplate("fromTemplateFieldIds" as never, "fromTemplateId" as never)
+      )
     )
   ),
   args: {
@@ -48,8 +58,12 @@ export const createEventSubscription = mutationField("createEventSubscription", 
     eventTypes: list(nonNull("PetitionEventType")),
     name: stringArg(),
     fromTemplateId: globalIdArg("Petition"),
+    fromTemplateFieldIds: list(nonNull(globalIdArg("PetitionField"))),
   },
-  validateArgs: validUrl((args) => args.eventsUrl, "eventsUrl"),
+  validateArgs: validateAnd(
+    validUrl((args) => args.eventsUrl, "eventsUrl"),
+    notEmptyArray((args) => args.fromTemplateFieldIds, "fromTemplateFieldIds")
+  ),
   resolve: async (_, args, ctx) => {
     const challengePassed = await challengeWebhookUrl(args.eventsUrl, ctx.fetch);
     if (!challengePassed) {
@@ -66,6 +80,7 @@ export const createEventSubscription = mutationField("createEventSubscription", 
         endpoint: args.eventsUrl,
         event_types: args.eventTypes,
         from_template_id: args.fromTemplateId,
+        from_template_field_ids: args.fromTemplateFieldIds,
       },
       `User:${ctx.user!.id}`
     );
@@ -75,7 +90,23 @@ export const createEventSubscription = mutationField("createEventSubscription", 
 export const updateEventSubscription = mutationField("updateEventSubscription", {
   description: "Updates an existing event subscription for the user's petitions",
   type: "PetitionEventSubscription",
-  authorize: authenticateAnd(userHasAccessToEventSubscription("id")),
+  authorize: authenticateAnd(
+    userHasAccessToEventSubscription("id"),
+    ifArgDefined(
+      "fromTemplateId",
+      and(
+        petitionsAreOfTypeTemplate("fromTemplateId" as never),
+        userHasAccessToPetitions("fromTemplateId" as never)
+      )
+    ),
+    ifArgDefined(
+      "fromTemplateFieldIds",
+      and(
+        argIsDefined("fromTemplateId"),
+        petitionFieldsBelongsToTemplate("fromTemplateFieldIds" as never, "fromTemplateId" as never)
+      )
+    )
+  ),
   args: {
     id: nonNull(globalIdArg("PetitionEventSubscription")),
     isEnabled: booleanArg(),
@@ -83,8 +114,12 @@ export const updateEventSubscription = mutationField("updateEventSubscription", 
     eventTypes: list(nonNull("PetitionEventType")),
     name: stringArg(),
     fromTemplateId: globalIdArg("Petition"),
+    fromTemplateFieldIds: list(nonNull(globalIdArg("PetitionField"))),
   },
-  validateArgs: validUrl((args) => args.eventsUrl, "eventsUrl"),
+  validateArgs: validateAnd(
+    validUrl((args) => args.eventsUrl, "eventsUrl"),
+    notEmptyArray((args) => args.fromTemplateFieldIds, "fromTemplateFieldIds")
+  ),
   resolve: async (_, args, ctx) => {
     const data: Partial<PetitionEventSubscription> = {};
     if (isDefined(args.isEnabled)) {
@@ -109,6 +144,10 @@ export const updateEventSubscription = mutationField("updateEventSubscription", 
     if (args.fromTemplateId !== undefined) {
       data.from_template_id = args.fromTemplateId;
     }
+    if (args.fromTemplateFieldIds !== undefined) {
+      data.from_template_field_ids = args.fromTemplateFieldIds;
+    }
+
     return await ctx.subscriptions.updateSubscription(args.id, data, `User:${ctx.user!.id}`);
   },
 });

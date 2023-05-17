@@ -1074,6 +1074,7 @@ export interface PetitionEventSubscription {
   name: Maybe<string>; // varchar
   from_template_id: Maybe<number>; // int4
   is_failing: boolean; // bool
+  from_template_field_ids: Maybe<number[]>; // int4[]
 }
 
 export type CreatePetitionEventSubscription = PartialProps<
@@ -1089,6 +1090,7 @@ export type CreatePetitionEventSubscription = PartialProps<
   | "name"
   | "from_template_id"
   | "is_failing"
+  | "from_template_field_ids"
 >;
 
 export interface PetitionField {

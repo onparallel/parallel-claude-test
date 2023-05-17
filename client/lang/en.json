@@ -1040,6 +1040,16 @@
     "context": "Your URL does not seem to accept POST requests."
   },
   {
+    "term": "component.create-event-subscription-dialog.filter-fields",
+    "definition": "Filter for events coming from specific fields of the template. Leave blank to receive all events.",
+    "context": "Filter for events coming from specific fields of the template. Leave blank to receive all events."
+  },
+  {
+    "term": "component.create-event-subscription-dialog.filter-fields-placeholder",
+    "definition": "Select fields to filter events...",
+    "context": "Select fields to filter events..."
+  },
+  {
     "term": "component.create-event-subscription-dialog.from-template-label",
     "definition": "Filter events from parallels created from a specific template (Optional).",
     "context": "Filter events from parallels created from a specific template (Optional)."

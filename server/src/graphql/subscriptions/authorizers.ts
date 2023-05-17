@@ -45,3 +45,21 @@ export function userHasAccessToEventSubscriptionSignatureKeys<
     return subscriptions.every((s) => s?.user_id === ctx.user!.id);
   };
 }
+
+export function petitionFieldsBelongsToTemplate<
+  TypeName extends string,
+  FieldName extends string,
+  TFieldIdsArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
+  TPetitionIdArg extends Arg<TypeName, FieldName, number>
+>(
+  fieldIdsArg: TFieldIdsArg,
+  petitionIdArg: TPetitionIdArg
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const fieldIds = unMaybeArray(args[fieldIdsArg] as unknown as MaybeArray<number>);
+    const petitionId = args[petitionIdArg] as unknown as number;
+    const fields = await ctx.petitions.loadField(fieldIds);
+
+    return fields.every((f) => isDefined(f) && f.petition_id === petitionId);
+  };
+}

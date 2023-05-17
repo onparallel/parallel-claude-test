@@ -14,32 +14,40 @@ import Select, {
   ActionMeta,
   components,
   CSSObjectWithLabel,
+  MultiValueProps,
+  OnChangeValue,
   OptionProps,
   SingleValueProps,
 } from "react-select";
-import { zip } from "remeda";
+import { isDefined, zip } from "remeda";
+
+type PetitionFieldSelectSelection = PetitionFieldSelect_PetitionFieldFragment;
+
 export interface PetitionFieldSelectProps<
-  T extends PetitionFieldSelect_PetitionFieldFragment,
-  ExpandFields extends boolean = false
-> extends CustomSelectProps<If<ExpandFields, T | [T, number], T>, false, never> {
+  T extends PetitionFieldSelectSelection,
+  ExpandFields extends boolean = false,
+  IsMulti extends boolean = false
+> extends CustomSelectProps<If<ExpandFields, T | [T, number], T>, IsMulti, never> {
   fields: T[];
   indices: PetitionFieldIndex[];
   expandFields?: ExpandFields;
 }
 
 export function PetitionFieldSelect<
-  OptionType extends PetitionFieldSelect_PetitionFieldFragment,
-  ExpandFields extends boolean
+  OptionType extends PetitionFieldSelectSelection,
+  ExpandFields extends boolean = false,
+  IsMulti extends boolean = false
 >({
   value,
   onChange,
   fields,
   indices,
+  isMulti,
   expandFields,
   ...props
-}: PetitionFieldSelectProps<OptionType, ExpandFields>) {
+}: PetitionFieldSelectProps<OptionType, ExpandFields, IsMulti>) {
   const intl = useIntl();
-  const rsProps = useReactSelectProps<PetitionFieldSelectOption<OptionType>, false, never>({
+  const rsProps = useReactSelectProps<PetitionFieldSelectOption<OptionType>, IsMulti, never>({
     placeholder: intl.formatMessage({
       id: "component.petition-field-select.placeholder",
       defaultMessage: "Select a field",
@@ -47,6 +55,7 @@ export function PetitionFieldSelect<
     ...(props as any),
     components: {
       SingleValue,
+      MultiValueLabel,
       Option,
     },
     styles: {
@@ -77,39 +86,42 @@ export function PetitionFieldSelect<
         }
       }
     );
-    const [field, column]: [OptionType | null | undefined] | [OptionType, number | undefined] = (
-      Array.isArray(value) ? value : [value]
-    ) as any;
-    const _value = !field
-      ? null
-      : column !== undefined
-      ? options.find(
-          (o) =>
-            o.type === "DYNAMIC_SELECT_OPTION" && o.field.id === field.id && o.column === column
-        ) ?? null
-      : options.find((o) => o.type === "FIELD" && o.field.id === field.id) ?? null;
+
+    const _value = isMulti
+      ? (value as OptionType[]).map((v) => mapValue(v, options)!)
+      : mapValue(value as [OptionType, number] | OptionType | null, options);
     return { options, _value };
   }, [fields, indices, expandFields, value]);
+
   const handleChange = useCallback(
     (
-      value: PetitionFieldSelectOption<OptionType>,
+      value: OnChangeValue<PetitionFieldSelectOption<OptionType>, IsMulti>,
       actionMeta: ActionMeta<PetitionFieldSelectOption<OptionType>>
     ) => {
-      if (value.type === "FIELD") {
-        onChange(value.field as any, actionMeta as any);
+      if (isMulti) {
+        onChange(
+          (value as PetitionFieldSelectOption<OptionType>[]).map(unMapValue) as any,
+          actionMeta as any
+        );
       } else {
-        onChange([value.field, value.column] as any, actionMeta as any);
+        onChange(
+          unMapValue(value as PetitionFieldSelectOption<OptionType> | null) as any,
+          actionMeta as any
+        );
       }
     },
-    [onChange]
+    [onChange, isMulti]
   );
+
   return (
     <Select
       options={options}
-      value={_value}
+      isMulti={isMulti}
+      value={_value as any}
       onChange={handleChange as any}
       getOptionValue={getOptionValue}
       getOptionLabel={getOptionLabel}
+      {...(props as any)}
       {...rsProps}
     />
   );
@@ -126,7 +138,7 @@ PetitionFieldSelect.fragments = {
   `,
 };
 
-type PetitionFieldSelectOption<T extends PetitionFieldSelect_PetitionFieldFragment> =
+type PetitionFieldSelectOption<T extends PetitionFieldSelectSelection> =
   | {
       type: "FIELD";
       field: T;
@@ -140,7 +152,7 @@ type PetitionFieldSelectOption<T extends PetitionFieldSelect_PetitionFieldFragme
     };
 
 const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
-  T extends PetitionFieldSelect_PetitionFieldFragment
+  T extends PetitionFieldSelectSelection
 >({ option, highlight }: { option: PetitionFieldSelectOption<T>; highlight?: string }) {
   const color = usePetitionFieldTypeColor(option.field.type);
   if (option.type === "FIELD") {
@@ -227,6 +239,33 @@ const getOptionLabel = (option: PetitionFieldSelectOption<any>) => {
   }
 };
 
+function mapValue<T extends PetitionFieldSelectSelection>(
+  value: [T, number] | T | null,
+  options: PetitionFieldSelectOption<T>[]
+) {
+  const [field, column]: [T | null | undefined] | [T, number | undefined] = (
+    Array.isArray(value) ? value : [value]
+  ) as any;
+  const _value = !field
+    ? null
+    : column !== undefined
+    ? options.find(
+        (o) => o.type === "DYNAMIC_SELECT_OPTION" && o.field.id === field.id && o.column === column
+      ) ?? null
+    : options.find((o) => o.type === "FIELD" && o.field.id === field.id) ?? null;
+  return _value;
+}
+
+function unMapValue<T extends PetitionFieldSelectSelection>(
+  value: PetitionFieldSelectOption<T> | null
+) {
+  return isDefined(value)
+    ? value.type === "FIELD"
+      ? value.field
+      : ([value.field, value.column] as [T, number])
+    : null;
+}
+
 function SingleValue(props: SingleValueProps<PetitionFieldSelectOption<any>>) {
   return (
     <components.SingleValue {...props}>
@@ -237,6 +276,19 @@ function SingleValue(props: SingleValueProps<PetitionFieldSelectOption<any>>) {
         />
       </Flex>
     </components.SingleValue>
+  );
+}
+
+function MultiValueLabel({ children, ...props }: MultiValueProps<PetitionFieldSelectOption<any>>) {
+  return (
+    <components.MultiValueLabel {...props}>
+      <Flex flexWrap="nowrap">
+        <PetitionFieldSelectItem
+          option={props.data}
+          highlight={props.selectProps.inputValue ?? ""}
+        />
+      </Flex>
+    </components.MultiValueLabel>
   );
 }
 

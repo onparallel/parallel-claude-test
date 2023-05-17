@@ -708,6 +708,7 @@ export interface NexusGenObjects {
   PetitionFieldComment: db.PetitionFieldComment;
   PetitionFieldCommentUserGroupMention: { __type: "UserGroup"; user_group_id: number };
   PetitionFieldCommentUserMention: { __type: "User"; user_id: number };
+  PetitionFieldMini: db.PetitionField;
   PetitionFieldProgress: {
     // root type
     approved: number; // Int!
@@ -1857,6 +1858,7 @@ export interface NexusGenFieldTypes {
     eventTypes: NexusGenEnums["PetitionEventType"][] | null; // [PetitionEventType!]
     eventsUrl: string; // String!
     fromTemplate: NexusGenRootTypes["PetitionBaseMini"] | null; // PetitionBaseMini
+    fromTemplateFields: NexusGenRootTypes["PetitionFieldMini"][] | null; // [PetitionFieldMini!]
     id: NexusGenScalars["GID"]; // GID!
     isEnabled: boolean; // Boolean!
     isFailing: boolean; // Boolean!
@@ -1924,6 +1926,13 @@ export interface NexusGenFieldTypes {
     // field return type
     mentionedId: NexusGenScalars["GID"]; // GID!
     user: NexusGenRootTypes["User"] | null; // User
+  };
+  PetitionFieldMini: {
+    // field return type
+    id: NexusGenScalars["GID"]; // GID!
+    options: NexusGenScalars["JSONObject"]; // JSONObject!
+    title: string | null; // String
+    type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
   };
   PetitionFieldProgress: {
     // field return type
@@ -3847,6 +3856,7 @@ export interface NexusGenFieldTypeNames {
     eventTypes: "PetitionEventType";
     eventsUrl: "String";
     fromTemplate: "PetitionBaseMini";
+    fromTemplateFields: "PetitionFieldMini";
     id: "GID";
     isEnabled: "Boolean";
     isFailing: "Boolean";
@@ -3914,6 +3924,13 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     mentionedId: "GID";
     user: "User";
+  };
+  PetitionFieldMini: {
+    // field return type name
+    id: "GID";
+    options: "JSONObject";
+    title: "String";
+    type: "PetitionFieldType";
   };
   PetitionFieldProgress: {
     // field return type name
@@ -5160,6 +5177,7 @@ export interface NexusGenArgTypes {
       // args
       eventTypes?: NexusGenEnums["PetitionEventType"][] | null; // [PetitionEventType!]
       eventsUrl: string; // String!
+      fromTemplateFieldIds?: NexusGenScalars["GID"][] | null; // [GID!]
       fromTemplateId?: NexusGenScalars["GID"] | null; // GID
       name?: string | null; // String
     };
@@ -5863,6 +5881,7 @@ export interface NexusGenArgTypes {
       // args
       eventTypes?: NexusGenEnums["PetitionEventType"][] | null; // [PetitionEventType!]
       eventsUrl?: string | null; // String
+      fromTemplateFieldIds?: NexusGenScalars["GID"][] | null; // [GID!]
       fromTemplateId?: NexusGenScalars["GID"] | null; // GID
       id: NexusGenScalars["GID"]; // GID!
       isEnabled?: boolean | null; // Boolean

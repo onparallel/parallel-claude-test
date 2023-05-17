@@ -1042,6 +1042,7 @@ export type MutationcreateDowJonesProfileDownloadTaskArgs = {
 export type MutationcreateEventSubscriptionArgs = {
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
+  fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]>>;
   fromTemplateId?: InputMaybe<Scalars["GID"]>;
   name?: InputMaybe<Scalars["String"]>;
 };
@@ -1745,6 +1746,7 @@ export type MutationupdateContactArgs = {
 export type MutationupdateEventSubscriptionArgs = {
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl?: InputMaybe<Scalars["String"]>;
+  fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]>>;
   fromTemplateId?: InputMaybe<Scalars["GID"]>;
   id: Scalars["GID"];
   isEnabled?: InputMaybe<Scalars["Boolean"]>;
@@ -2558,6 +2560,7 @@ export type PetitionEventSubscription = {
   eventTypes: Maybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
   fromTemplate: Maybe<PetitionBaseMini>;
+  fromTemplateFields: Maybe<Array<PetitionFieldMini>>;
   id: Scalars["GID"];
   isEnabled: Scalars["Boolean"];
   isFailing: Scalars["Boolean"];
@@ -2704,6 +2707,17 @@ export type PetitionFieldCommentUserGroupMention = {
 export type PetitionFieldCommentUserMention = {
   mentionedId: Scalars["GID"];
   user: Maybe<User>;
+};
+
+export type PetitionFieldMini = {
+  /** The ID of the petition field. */
+  id: Scalars["GID"];
+  /** The options of the petition field. */
+  options: Scalars["JSONObject"];
+  /** The title of the petition field. */
+  title: Maybe<Scalars["String"]>;
+  /** The type of the petition field. */
+  type: PetitionFieldType;
 };
 
 /** The progress of the petition */

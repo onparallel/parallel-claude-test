@@ -345,6 +345,28 @@ export const PetitionBaseMini = objectType({
   },
 });
 
+export const PetitionFieldMini = objectType({
+  name: "PetitionFieldMini",
+  sourceType: "db.PetitionField",
+  definition(t) {
+    t.globalId("id", {
+      prefixName: "PetitionField",
+      description: "The ID of the petition field.",
+    });
+    t.field("type", {
+      type: "PetitionFieldType",
+      description: "The type of the petition field.",
+    });
+    t.nullable.string("title", {
+      description: "The title of the petition field.",
+    });
+    t.jsonObject("options", {
+      description: "The options of the petition field.",
+      resolve: (o) => o.options,
+    });
+  },
+});
+
 export const Petition = objectType({
   name: "Petition",
   description: "A petition",

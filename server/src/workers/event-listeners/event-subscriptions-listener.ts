@@ -1,7 +1,9 @@
 import { sign } from "crypto";
 import pMap from "p-map";
+import { isDefined } from "remeda";
 import { PetitionEvent } from "../../db/events/PetitionEvent";
 import { mapEvent } from "../../util/eventMapper";
+import { pFilter } from "../../util/promises/pFilter";
 import { EventListener } from "../event-processor";
 
 export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (event, ctx) => {
@@ -23,15 +25,34 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
     }
   }
 
-  const userSubscriptions = (await ctx.subscriptions.loadSubscriptionsByUserId(userIds))
-    .flat()
-    .filter((s) => {
-      return (
-        s.is_enabled &&
-        (s.event_types === null || s.event_types.includes(event.type)) &&
-        (s.from_template_id === null || s.from_template_id === petition.from_template_id)
-      );
-    });
+  const activeSubscriptions = (await ctx.subscriptions.loadSubscriptionsByUserId(userIds)).flat();
+
+  const userSubscriptions = await pFilter(
+    activeSubscriptions,
+    async (s) => {
+      if (!s.is_enabled) {
+        return false;
+      }
+      if (s.event_types !== null && !s.event_types.includes(event.type)) {
+        return false;
+      }
+      if (s.from_template_id !== null && s.from_template_id !== petition.from_template_id) {
+        return false;
+      }
+      if (isDefined(s.from_template_field_ids) && "petition_field_id" in event.data) {
+        const field = await ctx.petitions.loadField(event.data.petition_field_id);
+        if (
+          isDefined(field) &&
+          isDefined(field.from_petition_field_id) &&
+          !s.from_template_field_ids.includes(field.from_petition_field_id)
+        ) {
+          return false;
+        }
+      }
+      return true;
+    },
+    { concurrency: 5 }
+  );
 
   if (userSubscriptions.length === 0) {
     return;

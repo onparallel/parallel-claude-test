@@ -3,8 +3,8 @@ import {
   Badge,
   Button,
   Center,
-  Heading,
   HStack,
+  Heading,
   List,
   ListItem,
   Stack,
@@ -14,7 +14,6 @@ import {
 } from "@chakra-ui/react";
 import { AlertCircleFilledIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
-import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { Link } from "@parallel/components/common/Link";
@@ -22,13 +21,14 @@ import { OverflownText } from "@parallel/components/common/OverflownText";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableColumn } from "@parallel/components/common/Table";
+import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import {
   PetitionEventType,
+  WebhookSubscriptionsTable_PetitionEventSubscriptionFragment,
   WebhookSubscriptionsTable_createEventSubscriptionDocument,
   WebhookSubscriptionsTable_createEventSubscriptionSignatureKeyDocument,
-  WebhookSubscriptionsTable_deleteEventSubscriptionsDocument,
   WebhookSubscriptionsTable_deleteEventSubscriptionSignatureKeysDocument,
-  WebhookSubscriptionsTable_PetitionEventSubscriptionFragment,
+  WebhookSubscriptionsTable_deleteEventSubscriptionsDocument,
   WebhookSubscriptionsTable_updateEventSubscriptionDocument,
 } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
@@ -80,6 +80,7 @@ export function WebhookSubscriptionsTable({
         eventTypes: PetitionEventType[] | null;
         name: string | null;
         fromTemplateId: string | null;
+        fromTemplateFieldIds: string[] | null;
       }
     ) => {
       let subscriptionId = id;
@@ -88,9 +89,10 @@ export function WebhookSubscriptionsTable({
           variables: {
             id,
             name: data.name,
-            fromTemplateId: data.fromTemplateId,
             eventsUrl: data.eventsUrl,
             eventTypes: data.eventTypes,
+            fromTemplateId: data.fromTemplateId,
+            fromTemplateFieldIds: data.fromTemplateFieldIds,
           },
         });
       } else {
@@ -476,12 +478,14 @@ const _mutations = [
       $eventTypes: [PetitionEventType!]
       $name: String
       $fromTemplateId: GID
+      $fromTemplateFieldIds: [GID!]
     ) {
       createEventSubscription(
         eventsUrl: $eventsUrl
         eventTypes: $eventTypes
         name: $name
         fromTemplateId: $fromTemplateId
+        fromTemplateFieldIds: $fromTemplateFieldIds
       ) {
         ...WebhookSubscriptionsTable_PetitionEventSubscription
       }
@@ -496,6 +500,7 @@ const _mutations = [
       $eventTypes: [PetitionEventType!]
       $name: String
       $fromTemplateId: GID
+      $fromTemplateFieldIds: [GID!]
     ) {
       updateEventSubscription(
         id: $id
@@ -504,6 +509,7 @@ const _mutations = [
         eventTypes: $eventTypes
         name: $name
         fromTemplateId: $fromTemplateId
+        fromTemplateFieldIds: $fromTemplateFieldIds
       ) {
         ...WebhookSubscriptionsTable_PetitionEventSubscription
         ...CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription
