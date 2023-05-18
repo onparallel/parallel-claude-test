@@ -6060,6 +6060,7 @@ export interface NexusGenArgTypes {
     updateProfileTypeField: {
       // args
       data: NexusGenInputs["UpdateProfileTypeFieldInput"]; // UpdateProfileTypeFieldInput!
+      force?: boolean | null; // Boolean
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
       profileTypeId: NexusGenScalars["GID"]; // GID!
     };

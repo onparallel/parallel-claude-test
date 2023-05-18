@@ -698,6 +698,26 @@ export class ProfileRepository extends BaseRepository {
     });
   }
 
+  async profileFieldRepliesHaveExpiryDateSet(
+    profileTypeFieldId: number,
+    type: ProfileTypeFieldType,
+    t?: Knex.Transaction
+  ) {
+    const [{ count }] = await this.from(
+      type === "FILE" ? "profile_field_file" : "profile_field_value",
+      t
+    )
+      .where({
+        profile_type_field_id: profileTypeFieldId,
+        removed_at: null,
+        deleted_at: null,
+      })
+      .whereNotNull("expiry_date")
+      .select<{ count: number }[]>(this.count());
+
+    return count > 0;
+  }
+
   async updateProfileFieldValuesByProfileTypeFieldId(
     profileTypeFieldId: number,
     data: Partial<CreateProfileFieldValue>,
@@ -705,6 +725,8 @@ export class ProfileRepository extends BaseRepository {
   ) {
     await this.from("profile_field_value", t)
       .where("profile_type_field_id", profileTypeFieldId)
+      .whereNull("deleted_at")
+      .whereNull("removed_at")
       .update(data);
   }
 
@@ -715,6 +737,8 @@ export class ProfileRepository extends BaseRepository {
   ) {
     await this.from("profile_field_file", t)
       .where("profile_type_field_id", profileTypeFieldId)
+      .whereNull("deleted_at")
+      .whereNull("removed_at")
       .update(data);
   }
 

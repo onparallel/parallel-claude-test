@@ -1919,6 +1919,7 @@ export type MutationupdateProfileTypeArgs = {
 
 export type MutationupdateProfileTypeFieldArgs = {
   data: UpdateProfileTypeFieldInput;
+  force?: InputMaybe<Scalars["Boolean"]>;
   profileTypeFieldId: Scalars["GID"];
   profileTypeId: Scalars["GID"];
 };

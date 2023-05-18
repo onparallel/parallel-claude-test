@@ -1964,6 +1964,7 @@ export interface MutationupdateProfileTypeArgs {
 
 export interface MutationupdateProfileTypeFieldArgs {
   data: UpdateProfileTypeFieldInput;
+  force?: InputMaybe<Scalars["Boolean"]>;
   profileTypeFieldId: Scalars["GID"];
   profileTypeId: Scalars["GID"];
 }
@@ -7162,6 +7163,7 @@ export type useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldMutati
     profileTypeId: Scalars["GID"];
     profileTypeFieldId: Scalars["GID"];
     data: UpdateProfileTypeFieldInput;
+    force?: InputMaybe<Scalars["Boolean"]>;
   }>;
 
 export type useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldMutation = {
@@ -17881,6 +17883,7 @@ export type OrganizationProfileType_updateProfileTypeFieldMutationVariables = Ex
   profileTypeId: Scalars["GID"];
   profileTypeFieldId: Scalars["GID"];
   data: UpdateProfileTypeFieldInput;
+  force?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
 export type OrganizationProfileType_updateProfileTypeFieldMutation = {
@@ -36143,11 +36146,13 @@ export const useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocum
     $profileTypeId: GID!
     $profileTypeFieldId: GID!
     $data: UpdateProfileTypeFieldInput!
+    $force: Boolean
   ) {
     updateProfileTypeField(
       profileTypeId: $profileTypeId
       profileTypeFieldId: $profileTypeFieldId
       data: $data
+      force: $force
     ) {
       ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
     }
@@ -38603,11 +38608,13 @@ export const OrganizationProfileType_updateProfileTypeFieldDocument = gql`
     $profileTypeId: GID!
     $profileTypeFieldId: GID!
     $data: UpdateProfileTypeFieldInput!
+    $force: Boolean
   ) {
     updateProfileTypeField(
       profileTypeId: $profileTypeId
       profileTypeFieldId: $profileTypeFieldId
       data: $data
+      force: $force
     ) {
       ...OrganizationProfileType_ProfileTypeField
     }

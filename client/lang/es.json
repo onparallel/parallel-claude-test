@@ -1175,6 +1175,16 @@
     "context": "Set as default theme"
   },
   {
+    "term": "component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog.description",
+    "definition": "Hay algunas propiedades con fechas de caducidad asignadas. Si eliminas la caducidad de este campo, estas fechas se eliminarán. ¿Estás seguro de que quieres continuar?",
+    "context": "There are some properties with expiration dates set. If you remove the expiration from this field, these dates will be removed. Would you like to continue?"
+  },
+  {
+    "term": "component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog.header",
+    "definition": "Eliminar fechas de caducidad",
+    "context": "Remove expiration dates"
+  },
+  {
     "term": "component.create-or-update-property-dialog.edit-profile-type-field",
     "definition": "Editar propiedad",
     "context": "Edit property"
@@ -7375,6 +7385,11 @@
     "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}"
   },
   {
+    "term": "generic.confirm",
+    "definition": "Confirmar",
+    "context": "Confirm"
+  },
+  {
     "term": "generic.confirm-continue",
     "definition": "¿Estás seguro que quieres continuar?",
     "context": "Are you sure you want to continue?"
@@ -7973,6 +7988,11 @@
     "term": "generic.no-deadline",
     "definition": "Sin vencimiento",
     "context": "No deadline"
+  },
+  {
+    "term": "generic.no-go-back",
+    "definition": "No, volver atrás",
+    "context": "No, go back"
   },
   {
     "term": "generic.no-results",

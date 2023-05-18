@@ -1,5 +1,14 @@
 import { PresignedPost } from "@aws-sdk/s3-presigned-post";
-import { arg, booleanArg, inputObjectType, list, mutationField, nonNull, stringArg } from "nexus";
+import {
+  arg,
+  booleanArg,
+  inputObjectType,
+  list,
+  mutationField,
+  nonNull,
+  nullable,
+  stringArg,
+} from "nexus";
 import pMap from "p-map";
 import { DatabaseError } from "pg";
 import { indexBy, isDefined, zip } from "remeda";
@@ -233,6 +242,12 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
         },
       }).asArg()
     ),
+    force: nullable(
+      booleanArg({
+        description:
+          "Pass force=true to remove expirations from values and files when setting isExpirable to false",
+      })
+    ),
   },
   validateArgs: validateAnd(
     notEmptyObject((args) => args.data, "data"),
@@ -273,6 +288,17 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
     try {
       return await ctx.profiles.withTransaction(async (t) => {
         if (updateData.is_expirable === false) {
+          const repliesHaveExpirySet = await ctx.profiles.profileFieldRepliesHaveExpiryDateSet(
+            args.profileTypeFieldId,
+            profileTypeField.type,
+            t
+          );
+          if (repliesHaveExpirySet && !args.force) {
+            throw new ApolloError(
+              `Cannot remove expiry date from field because some profiles have expiry dates set for this field.`,
+              "REMOVE_PROFILE_TYPE_FIELD_IS_EXPIRABLE_ERROR"
+            );
+          }
           // if removing caducity, remove expiry dates from all profile replies
           await ctx.profiles.updateProfileFieldValuesByProfileTypeFieldId(
             args.profileTypeFieldId,

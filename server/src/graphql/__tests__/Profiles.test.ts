@@ -1276,11 +1276,13 @@ describe("GraphQL/Profiles", () => {
             $profileTypeId: GID!
             $profileTypeFieldId: GID!
             $data: UpdateProfileTypeFieldInput!
+            $force: Boolean
           ) {
             updateProfileTypeField(
               profileTypeId: $profileTypeId
               profileTypeFieldId: $profileTypeFieldId
               data: $data
+              force: $force
             ) {
               id
               isExpirable
@@ -1291,6 +1293,7 @@ describe("GraphQL/Profiles", () => {
           profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
           data: { isExpirable: false },
+          force: true,
         }
       );
 
@@ -1348,6 +1351,43 @@ describe("GraphQL/Profiles", () => {
           },
         ],
       });
+    });
+
+    it("sends error when removing when disabling caducity of profile field type, values have caducity and not passing force flag", async () => {
+      await createProfile(toGlobalId("ProfileType", profileTypes[1].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
+          content: { value: "abcd" },
+          expiryDate: "2023-08-08",
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileTypeId: GID!
+            $profileTypeFieldId: GID!
+            $data: UpdateProfileTypeFieldInput!
+          ) {
+            updateProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              id
+              isExpirable
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[1].id),
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeField.id),
+          data: { isExpirable: false },
+        }
+      );
+
+      expect(errors).toContainGraphQLError("REMOVE_PROFILE_TYPE_FIELD_IS_EXPIRABLE_ERROR");
+      expect(data).toBeNull();
     });
   });
 

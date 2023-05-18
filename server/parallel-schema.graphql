@@ -2074,6 +2074,11 @@ type Mutation {
   ): ProfileType!
   updateProfileTypeField(
     data: UpdateProfileTypeFieldInput!
+
+    """
+    Pass force=true to remove expirations from values and files when setting isExpirable to false
+    """
+    force: Boolean
     profileTypeFieldId: GID!
     profileTypeId: GID!
   ): ProfileTypeField!

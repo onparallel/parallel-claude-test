@@ -772,11 +772,13 @@ const _mutations = [
       $profileTypeId: GID!
       $profileTypeFieldId: GID!
       $data: UpdateProfileTypeFieldInput!
+      $force: Boolean
     ) {
       updateProfileTypeField(
         profileTypeId: $profileTypeId
         profileTypeFieldId: $profileTypeFieldId
         data: $data
+        force: $force
       ) {
         ...OrganizationProfileType_ProfileTypeField
       }

@@ -17,6 +17,7 @@ import {
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { LocalizableUserTextInput } from "@parallel/components/common/LocalizableUserTextInput";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
+import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
@@ -120,9 +121,62 @@ function CreateOrUpdateProfileTypeFieldDialog({
   const [createProfileTypeField] = useMutation(
     useCreateOrUpdateProfileTypeFieldDialog_createProfileTypeFieldDocument
   );
-  const [updateProfileTypeField] = useMutation(
-    useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocument
-  );
+
+  function useUpdateProfileTypeFieldWithForce() {
+    const intl = useIntl();
+    const [updateProfileTypeField] = useMutation(
+      useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeFieldDocument
+    );
+    const showRemoveProfileTypeFieldIsExpirableErrorDialog = useConfirmDeleteDialog();
+
+    return async (options: Parameters<typeof updateProfileTypeField>[0]) => {
+      try {
+        await updateProfileTypeField(options);
+      } catch (e) {
+        if (isApolloError(e, "REMOVE_PROFILE_TYPE_FIELD_IS_EXPIRABLE_ERROR")) {
+          await showRemoveProfileTypeFieldIsExpirableErrorDialog({
+            header: intl.formatMessage({
+              id: "component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog.header",
+              defaultMessage: "Remove expiration dates",
+            }),
+            description: (
+              <FormattedMessage
+                id="component.create-or-update-profile-type-field-dialog.remove-profile-type-field-is-expirable-error-dialog.description"
+                defaultMessage="There are some properties with expiration dates set. If you remove the expiration from this field, these dates will be removed. Would you like to continue?"
+              />
+            ),
+            confirmation: intl
+              .formatMessage({
+                id: "generic.confirm",
+                defaultMessage: "Confirm",
+              })
+              .toLocaleLowerCase(),
+            cancel: (
+              <Button onClick={() => props.onReject("CANCEL")}>
+                <FormattedMessage id="generic.no-go-back" defaultMessage="No, go back" />
+              </Button>
+            ),
+            confirm: (
+              <Button colorScheme="red" type="submit">
+                <FormattedMessage id="generic.yes-continue" defaultMessage="Yes, continue" />
+              </Button>
+            ),
+          });
+          await updateProfileTypeField({
+            ...options,
+            variables: {
+              ...options!.variables!,
+              force: true,
+            },
+          });
+        } else {
+          throw e;
+        }
+      }
+    };
+  }
+
+  const updateProfileTypeField = useUpdateProfileTypeFieldWithForce();
 
   return (
     <ConfirmDialog
@@ -406,11 +460,13 @@ const _mutations = [
       $profileTypeId: GID!
       $profileTypeFieldId: GID!
       $data: UpdateProfileTypeFieldInput!
+      $force: Boolean
     ) {
       updateProfileTypeField(
         profileTypeId: $profileTypeId
         profileTypeFieldId: $profileTypeFieldId
         data: $data
+        force: $force
       ) {
         ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
       }
