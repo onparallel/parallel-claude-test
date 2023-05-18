@@ -14,7 +14,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { unCamelCase } from "@parallel/utils/strings";
 import { Maybe, UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 type AdminSupportMethodsProps = Exclude<
@@ -29,6 +29,12 @@ function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethod
   } = useAssertQuery(AdminSupportMethods_userDocument);
 
   const [search, setSearch] = useState("");
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   const filteredAdminSupportMethods = useMemo(() => {
     return supportMethods.filter(({ field }) => {
@@ -57,7 +63,7 @@ function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethod
     >
       <Box marginX="auto" width="100%" maxWidth="container.md" paddingX={4} paddingBottom={16}>
         <Box paddingY={4}>
-          <SearchInput value={search} onChange={(e) => setSearch(e.target.value)} />
+          <SearchInput ref={inputRef} value={search} onChange={(e) => setSearch(e.target.value)} />
         </Box>
         <Stack>
           {filteredAdminSupportMethods.map((method) => (
