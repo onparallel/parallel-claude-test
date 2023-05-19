@@ -83,6 +83,8 @@ function Profiles() {
   } = useAssertQuery(Profiles_userDocument);
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
 
+  const navigate = useHandleNavigation();
+
   const { data, loading, refetch } = useQueryOrPreviousData(Profiles_profilesDocument, {
     variables: {
       offset: queryState.items * (queryState.page - 1),
@@ -131,9 +133,8 @@ function Profiles() {
             fields: fieldValues,
           },
         });
+        navigate(`/app/profiles/${data.createProfile.id}`);
       }
-
-      refetch();
     } catch {}
   };
 
@@ -147,7 +148,6 @@ function Profiles() {
     } catch {}
   };
 
-  const navigate = useHandleNavigation();
   const handleRowClick = useCallback((row: Profiles_ProfileFragment, event: MouseEvent) => {
     navigate(`/app/profiles/${row.id}`, event);
   }, []);
