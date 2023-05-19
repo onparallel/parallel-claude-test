@@ -21,13 +21,18 @@
     "create-cert": "node dist/create-cert.js",
     "build-image": "node dist/build-image.js",
     "clear-nginx-cache": "node dist/clear-nginx-cache.js",
-    "cnc": "node dist/clear-nginx-cache.js"
+    "cnc": "node dist/clear-nginx-cache.js",
+    "temp-admin-credentials": "node dist/temp-admin-credentials.js",
+    "tac": "node dist/temp-admin-credentials.js"
   },
   "dependencies": {
     "@aws-sdk/client-cloudfront": "^3.319.0",
     "@aws-sdk/client-ec2": "^3.319.0",
     "@aws-sdk/client-elastic-load-balancing": "^3.319.0",
+    "@aws-sdk/client-iam": "^3.332.0",
     "@aws-sdk/client-route-53": "^3.319.0",
+    "@aws-sdk/client-sts": "^3.332.0",
+    "@aws-sdk/credential-provider-ini": "^3.332.0",
     "@aws-sdk/credential-providers": "^3.319.0",
     "@formatjs/cli": "^6.1.0",
     "@formatjs/icu-messageformat-parser": "^2.3.1",
