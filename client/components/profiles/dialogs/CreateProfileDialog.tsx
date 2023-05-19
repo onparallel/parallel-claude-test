@@ -6,14 +6,16 @@ import {
   LocalizableUserTextRender,
   localizableUserTextRender,
 } from "@parallel/components/common/LocalizableUserTextRender";
-import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
+import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import {
   UpdateProfileFieldValueInput,
   useCreateProfileDialog_profileTypesDocument,
   UserLocale,
 } from "@parallel/graphql/__types";
+import { useEffect, useRef } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { SelectInstance } from "react-select";
 
 interface CreateProfileDialogResult {
   profileTypeId: string;
@@ -22,6 +24,8 @@ interface CreateProfileDialogResult {
 
 function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogResult>) {
   const intl = useIntl();
+
+  const selectRef = useRef<SelectInstance>(null);
 
   const { data } = useQuery(useCreateProfileDialog_profileTypesDocument, {
     variables: {
@@ -37,10 +41,11 @@ function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogRe
   const {
     control,
     formState: { errors },
-    reset,
+    resetField,
     register,
     watch,
     handleSubmit,
+    setFocus,
   } = useForm<CreateProfileDialogResult>({
     defaultValues: {
       profileTypeId: "",
@@ -51,6 +56,35 @@ function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogRe
   const { fields } = useFieldArray({ name: "fieldValues", control });
   const profileTypeId = watch("profileTypeId");
   const profileType = profileTypes.find((pt) => pt.id === profileTypeId);
+
+  const profileTypeOptions = useSimpleSelectOptions(
+    (intl) =>
+      profileTypes.map((pt) => ({
+        value: pt.id,
+        label: localizableUserTextRender({
+          value: pt.name,
+          intl,
+          default: intl.formatMessage({
+            id: "generic.unnamed-profile-type",
+            defaultMessage: "Unnamed profile type",
+          }),
+        }),
+      })),
+    [profileTypes]
+  );
+
+  useEffect(() => {
+    resetField("fieldValues", {
+      defaultValue:
+        profileType?.fields
+          .filter((f) => f.isUsedInProfileName)
+          .map((ptf) => ({
+            profileTypeFieldId: ptf.id,
+            content: { value: "" },
+          })) ?? [],
+    });
+    setTimeout(() => setFocus(`fieldValues.0.content.value`));
+  }, [profileType]);
 
   return (
     <ConfirmDialog
@@ -63,6 +97,7 @@ function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogRe
           props.onResolve({ profileTypeId: profileTypeId!, fieldValues });
         }),
       }}
+      initialFocusRef={selectRef}
       header={
         <FormattedMessage
           id="component.create-profile-dialog.new-profile"
@@ -84,34 +119,15 @@ function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogRe
               rules={{
                 required: true,
               }}
-              render={({ field: { value } }) => (
+              render={({ field: { value, onChange } }) => (
                 <SimpleSelect
                   value={value}
-                  options={profileTypes.map((profileType) => ({
-                    value: profileType.id,
-                    label: localizableUserTextRender({
-                      value: profileType.name,
-                      intl,
-                      default: intl.formatMessage({
-                        id: "generic.unnamed-profile-type",
-                        defaultMessage: "Unnamed profile type",
-                      }),
-                    }),
-                  }))}
+                  options={profileTypeOptions}
                   placeholder={intl.formatMessage({
                     id: "component.create-profile-dialog.select-profile-type",
                     defaultMessage: "Select a profile type",
                   })}
-                  onChange={(id) => {
-                    const profileType = profileTypes.find((pt) => pt.id === id);
-                    reset({
-                      profileTypeId: id!,
-                      fieldValues:
-                        profileType?.fields
-                          .filter((f) => f.isUsedInProfileName)
-                          .map((pt) => ({ profileTypeFieldId: pt.id, content: undefined })) ?? [],
-                    });
-                  }}
+                  onChange={onChange}
                 />
               )}
             />
@@ -127,7 +143,7 @@ function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogRe
             .map(({ id, name }) => {
               const index = fields.findIndex((f) => f.profileTypeFieldId === id)!;
               return (
-                <FormControl key={fields[index].id}>
+                <FormControl key={id}>
                   <FormLabel fontWeight={400}>
                     <LocalizableUserTextRender value={name} default="" />
                   </FormLabel>
