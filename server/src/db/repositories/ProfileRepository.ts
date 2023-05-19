@@ -209,12 +209,12 @@ export class ProfileRepository extends BaseRepository {
     }, t);
   }
 
-  async deleteProfileTypes(id: MaybeArray<number>, deletedBy: string) {
+  async deleteProfileTypes(id: MaybeArray<number>, deletedBy: string, t?: Knex.Transaction) {
     const ids = unMaybeArray(id);
     if (ids.length === 0) {
       return;
     }
-    await this.from("profile_type").whereIn("id", ids).whereNull("deleted_at").update({
+    await this.from("profile_type", t).whereIn("id", ids).whereNull("deleted_at").update({
       deleted_at: this.now(),
       deleted_by: deletedBy,
     });
@@ -328,13 +328,14 @@ export class ProfileRepository extends BaseRepository {
 
   async deleteProfileTypeFieldsByProfileTypeId(
     profileTypeId: MaybeArray<number>,
-    deletedBy: string
+    deletedBy: string,
+    t?: Knex.Transaction
   ) {
     const profileTypeIds = unMaybeArray(profileTypeId);
     if (profileTypeIds.length === 0) {
       return;
     }
-    await this.from("profile_type_field")
+    await this.from("profile_type_field", t)
       .whereIn("profile_type_id", profileTypeIds)
       .whereNull("deleted_at")
       .update({
@@ -589,12 +590,27 @@ export class ProfileRepository extends BaseRepository {
     }, t);
   }
 
-  async deleteProfile(profileId: MaybeArray<number>, deletedBy: string) {
+  async deleteProfile(profileId: MaybeArray<number>, deletedBy: string, t?: Knex.Transaction) {
     const ids = unMaybeArray(profileId);
     if (ids.length === 0) {
       return;
     }
-    await this.from("profile").whereIn("id", ids).whereNull("deleted_at").update({
+    await this.from("profile", t).whereIn("id", ids).whereNull("deleted_at").update({
+      deleted_at: this.now(),
+      deleted_by: deletedBy,
+    });
+  }
+
+  async deleteProfilesByProfileTypeId(
+    profileTypeIds: MaybeArray<number>,
+    deletedBy: string,
+    t?: Knex.Transaction
+  ) {
+    const ids = unMaybeArray(profileTypeIds);
+    if (ids.length === 0) {
+      return;
+    }
+    await this.from("profile", t).whereIn("profile_type_id", ids).whereNull("deleted_at").update({
       deleted_at: this.now(),
       deleted_by: deletedBy,
     });

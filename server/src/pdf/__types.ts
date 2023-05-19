@@ -825,7 +825,7 @@ export type Mutation = {
   /** Starts the completion of an async field */
   startAsyncFieldCompletion: AsyncFieldCompletionResponse;
   startSignatureRequest: PetitionSignatureRequest;
-  subscribeToProfile: Profile;
+  subscribeToProfile: Array<Profile>;
   /** Switches automatic reminders for the specified petition accesses. */
   switchAutomaticReminders: Array<PetitionAccess>;
   /** Tags a petition */
@@ -834,7 +834,7 @@ export type Mutation = {
   transferOrganizationOwnership: SupportMethodResponse;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<PetitionBase>;
-  unsubscribeFromProfile: Profile;
+  unsubscribeFromProfile: Array<Profile>;
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
   /** Updates a contact. */
@@ -1702,7 +1702,7 @@ export type MutationstartSignatureRequestArgs = {
 };
 
 export type MutationsubscribeToProfileArgs = {
-  profileId: Scalars["GID"];
+  profileIds: Array<Scalars["GID"]>;
   userIds: Array<Scalars["GID"]>;
 };
 
@@ -1729,7 +1729,7 @@ export type MutationtransferPetitionOwnershipArgs = {
 };
 
 export type MutationunsubscribeFromProfileArgs = {
-  profileId: Scalars["GID"];
+  profileIds: Array<Scalars["GID"]>;
   userIds: Array<Scalars["GID"]>;
 };
 

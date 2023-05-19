@@ -147,11 +147,15 @@ export const deleteProfileType = mutationField("deleteProfileType", {
     profileTypeIds: nonNull(list(nonNull(globalIdArg("ProfileType")))),
   },
   resolve: async (_, { profileTypeIds }, ctx) => {
-    await ctx.profiles.deleteProfileTypes(profileTypeIds, `User:${ctx.user!.id}`);
-    await ctx.profiles.deleteProfileTypeFieldsByProfileTypeId(
-      profileTypeIds,
-      `User:${ctx.user!.id}`
-    );
+    await ctx.profiles.withTransaction(async (t) => {
+      await ctx.profiles.deleteProfilesByProfileTypeId(profileTypeIds, `User:${ctx.user!.id}`, t);
+      await ctx.profiles.deleteProfileTypeFieldsByProfileTypeId(
+        profileTypeIds,
+        `User:${ctx.user!.id}`,
+        t
+      );
+      await ctx.profiles.deleteProfileTypes(profileTypeIds, `User:${ctx.user!.id}`, t);
+    });
     return SUCCESS;
   },
 });

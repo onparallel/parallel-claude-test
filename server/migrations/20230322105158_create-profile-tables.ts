@@ -63,7 +63,7 @@ export async function up(knex: Knex): Promise<void> {
     timestamps(t);
   });
   await knex.raw(/* sql */ `
-    create index "profile__org_id" on profile_type (org_id) where deleted_at is null; 
+    create index "profile__org_id" on "profile" (org_id) where deleted_at is null; 
   `);
 
   await knex.schema.createTable("profile_field_value", (t) => {
