@@ -22,10 +22,11 @@ import { isNotEmptyText } from "@parallel/utils/strings";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useAutoConfirmDiscardChangesDialog } from "../dialogs/ConfirmDiscardChangesDialog";
+import { MaybePromise } from "@parallel/utils/types";
 
 interface ProfileTypeSettingsProps extends CardProps {
   profileType: ProfileTypeSettings_ProfileTypeFragment;
-  onSave: (pattern: string) => void;
+  onSave: (pattern: string) => MaybePromise<void>;
 }
 
 export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTypeSettingsProps) {
@@ -64,7 +65,7 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
       onSubmit={handleSubmit(async (data) => {
         try {
           await onSave(data.pattern);
-          reset();
+          reset(data);
         } catch (e) {
           if (isApolloError(e, "INVALID_PROFILE_NAME_PATTERN")) {
             setError("pattern", { type: "invalid_pattern" });

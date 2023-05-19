@@ -549,17 +549,18 @@ export class ProfileRepository extends BaseRepository {
         /* sql */ `
         with profile_values as (
           select 
-            p.id, 
+            p.id,
             jsonb_object_agg(
-              pfv.profile_type_field_id, 
-              case when pfv.removed_at is null 
-                then pfv.content->>'value'
-                else ''
-              end) as values
+              coalesce(pfv.profile_type_field_id, 0), 
+              pfv.content->>'value'
+            ) as values
           from "profile" p
-          join profile_field_value pfv on pfv.profile_id = p.id
-          where pfv.profile_type_field_id in ?
-            and p.deleted_at is null and pfv.deleted_at is null
+          left join profile_field_value pfv
+            on pfv.profile_id = p.id and pfv.profile_type_field_id in ?
+            and pfv.deleted_at is null and pfv.removed_at is null
+          where
+            p.profile_type_id = ?
+            and p.deleted_at is null 
           group by p.id
         ) update "profile" p set
           "name" = substring(
@@ -574,6 +575,7 @@ export class ProfileRepository extends BaseRepository {
       `,
         [
           this.sqlIn(pattern.filter((p) => typeof p === "number")),
+          profileTypeId,
           ...pattern.map((p) =>
             typeof p === "string" ? p : this.knex.raw(`coalesce(pv.values->>?, '')`, [`${p}`])
           ),
@@ -702,15 +704,49 @@ export class ProfileRepository extends BaseRepository {
       );
       const pattern = profileType.profile_name_pattern as (string | number)[];
       if (fields.some((f) => pattern.includes(f.profileTypeFieldId))) {
-        await this.updateProfileTypeProfileNamePattern(
-          profileType.id,
-          pattern,
-          `User:${userId}`,
+        const [profile] = await this.raw<Profile>(
+          /* sql */ `
+          with profile_values as (
+            select
+              p.id,
+              jsonb_object_agg(
+                coalesce(pfv.profile_type_field_id, 0),
+                pfv.content->>'value'
+              ) as values
+            from "profile" p
+            left join profile_field_value pfv
+              on pfv.profile_id = p.id and pfv.profile_type_field_id in ?
+              and pfv.removed_at is null and pfv.deleted_at is null
+            where
+              p.id = ?
+              and p.deleted_at is null
+            group by p.id
+          ) update "profile" p set
+            "name" = substring(
+              trim(both from concat(${times(pattern.length, () => "?::text").join(",")})),
+              1,
+              255
+            ),
+            updated_by = ?,
+            updated_at = NOW()
+          from profile_values pv
+          where pv.id = p.id
+          returning p.*
+        `,
+          [
+            this.sqlIn(pattern.filter((p) => typeof p === "number")),
+            profileId,
+            ...pattern.map((p) =>
+              typeof p === "string" ? p : this.knex.raw(`coalesce(pv.values->>?, '')`, [`${p}`])
+            ),
+            `User:${userId}`,
+          ],
           t
         );
+        return profile;
+      } else {
+        return await this.loadProfile.raw(profileId, t);
       }
-
-      return await this.loadProfile.raw(profileId, t);
     });
   }
 

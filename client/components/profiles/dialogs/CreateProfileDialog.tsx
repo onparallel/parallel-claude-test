@@ -94,7 +94,10 @@ function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogRe
       content={{
         as: "form",
         onSubmit: handleSubmit(({ profileTypeId, fieldValues }) => {
-          props.onResolve({ profileTypeId: profileTypeId!, fieldValues });
+          props.onResolve({
+            profileTypeId: profileTypeId!,
+            fieldValues: fieldValues.filter((f) => f.content?.value.trim() !== ""),
+          });
         }),
       }}
       initialFocusRef={selectRef}
