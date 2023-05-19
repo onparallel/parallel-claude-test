@@ -96,7 +96,7 @@ function Alerts() {
             minHeight={0}
             columns={columns}
             rows={items}
-            rowKeyProp={(row) => row.field.id}
+            rowKeyProp={(row) => [row.profile.id, row.field.id].join(":")}
             context={context}
             isHighlightable
             loading={loading}
