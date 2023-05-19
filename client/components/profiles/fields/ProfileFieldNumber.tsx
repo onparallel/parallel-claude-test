@@ -1,8 +1,8 @@
-import { NumberInput, NumberInputField } from "@chakra-ui/react";
 import { ProfilesFormData } from "@parallel/pages/app/profiles/[profileId]";
 import { Controller, useFormContext } from "react-hook-form";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldInputGroup } from "./ProfileFieldInputGroup";
+import { NumeralInput } from "@parallel/components/common/NumeralInput";
 
 interface ProfileFieldNumberProps extends ProfileFieldProps {
   showExpiryDateDialog: (force?: boolean) => void;
@@ -20,20 +20,22 @@ export function ProfileFieldNumber({
       <Controller
         name={`fields.${index}.content.value`}
         control={control}
-        render={({ field: { value, ...rest } }) => (
-          <NumberInput
-            width="full"
-            value={value ?? ""}
-            onBlur={(e) => {
-              console.log(value);
-              if (value) {
-                return showExpiryDateDialog();
-              }
-            }}
-          >
-            <NumberInputField borderColor="transparent" {...rest} />
-          </NumberInput>
-        )}
+        render={({ field: { value, onChange, ...rest } }) => {
+          return (
+            <NumeralInput
+              {...rest}
+              value={value.length ? value : undefined}
+              onChange={(value) => {
+                onChange(value?.toString() ?? "");
+              }}
+              onBlur={() => {
+                if (value) {
+                  return showExpiryDateDialog();
+                }
+              }}
+            />
+          );
+        }}
       />
     </ProfileFieldInputGroup>
   );

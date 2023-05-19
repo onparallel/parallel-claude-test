@@ -33,7 +33,6 @@ export function ProfileFieldPhone({ index, field, showExpiryDateDialog }: Profil
             inputRef={ref}
             {...rest}
             onBlur={(value) => {
-              console.log(value);
               if (value) {
                 return showExpiryDateDialog();
               }
