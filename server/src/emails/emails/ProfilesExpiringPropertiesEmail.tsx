@@ -74,6 +74,7 @@ const email: Email<ProfilesExpiringPropertiesEmailProps> = {
     logoAlt,
     theme,
   }: ProfilesExpiringPropertiesEmailProps) {
+    const intl = useIntl();
     return (
       <Layout
         assetsUrl={assetsUrl}
@@ -124,7 +125,7 @@ const email: Email<ProfilesExpiringPropertiesEmailProps> = {
         </MjmlSection>
         <MjmlSection paddingBottom={0}>
           <MjmlColumn>
-            <Button href="https://www.google.com">
+            <Button href={`${parallelUrl}/${intl.locale}/app/alerts`}>
               <FormattedMessage
                 id="profiles-expiring-properties.view-alerts-button"
                 defaultMessage="View alerts"
