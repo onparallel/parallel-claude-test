@@ -210,8 +210,8 @@ function Profiles() {
                 {isDefined(profileType)
                   ? localizableUserTextRender({ intl, value: profileType.name, default: "" })
                   : intl.formatMessage({
-                      id: "page.profiles.all-profile-types",
-                      defaultMessage: "All profile types",
+                      id: "page.profiles.all-profiles",
+                      defaultMessage: "All profiles",
                     })}
               </MenuButton>
               <Portal>
@@ -223,8 +223,8 @@ function Profiles() {
                       data-testid="profile-type-all"
                     >
                       <FormattedMessage
-                        id="page.profiles.all-profile-types"
-                        defaultMessage="All profile types"
+                        id="page.profiles.all-profiles"
+                        defaultMessage="All profiles"
                       />
                     </MenuItemOption>
                     {profileTypes?.items.map((profileType) => {
@@ -392,7 +392,7 @@ function ProfilesListHeader({ shape, state, onStateChange, onReload }: ProfilesL
   );
 }
 
-function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[] {
+export function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[] {
   const intl = useIntl();
   return useMemo(
     () => [

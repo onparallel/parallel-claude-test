@@ -241,7 +241,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         minWidth="0"
         position="relative"
         overflowX="auto"
-        minHeight="240px"
+        minHeight={props.minHeight ? props.minHeight : "240px"}
       >
         {!isDefined(rows) && loading ? (
           <Flex

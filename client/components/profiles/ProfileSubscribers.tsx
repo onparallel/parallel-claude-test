@@ -7,7 +7,7 @@ import { UserAvatarList } from "../common/UserAvatarList";
 export function ProfileSubscribers({ users }: { users: ProfileSubscribers_UserFragment[] }) {
   if (!users?.length) {
     return (
-      <Text fontWeight={400} fontStyle="italic" color="gray.600">
+      <Text fontWeight={400} fontStyle="italic" color="gray.600" paddingX={2}>
         <FormattedMessage
           id="component.profile-subscribers.no-subscribers-button"
           defaultMessage="No subscribers"

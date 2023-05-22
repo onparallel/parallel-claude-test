@@ -15,6 +15,7 @@ import { BellIcon, BellOnIcon, EyeOffIcon, LockClosedIcon } from "@parallel/chak
 import { Divider } from "@parallel/components/common/Divider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { OverflownText } from "@parallel/components/common/OverflownText";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
@@ -22,6 +23,7 @@ import { WithApolloDataContext, withApolloData } from "@parallel/components/comm
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useAutoConfirmDiscardChangesDialog } from "@parallel/components/organization/dialogs/ConfirmDiscardChangesDialog";
+import { FakeProfileTables } from "@parallel/components/profiles/FakeProfileTables";
 import { MoreOptionsMenuProfile } from "@parallel/components/profiles/MoreOptionsMenuProfile";
 import { ProfileSubscribers } from "@parallel/components/profiles/ProfileSubscribers";
 import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
@@ -373,9 +375,9 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
             minHeight="65px"
             justifyContent="center"
           >
-            <Heading
+            <OverflownText
               as="h2"
-              size="md"
+              fontSize="xl"
               fontWeight={400}
               textStyle={profile.name ? undefined : "hint"}
             >
@@ -384,7 +386,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
                   id: "generic.unnamed-profile",
                   defaultMessage: "Unnamed profile",
                 })}
-            </Heading>
+            </OverflownText>
             <Box fontSize="sm" color="gray.600" lineHeight="22px">
               <LocalizableUserTextRender
                 value={profile.profileType.name}
@@ -555,7 +557,9 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
               onSubscribe={handleSubscribersClick}
             />
           </HStack>
-          <Box></Box>
+          <Box padding={4}>
+            <FakeProfileTables me={me} />
+          </Box>
         </Stack>
       </Flex>
     </AppLayout>

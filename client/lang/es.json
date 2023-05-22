@@ -4400,6 +4400,16 @@
     "context": "No subscribers"
   },
   {
+    "term": "component.profile-table-columns.profile-type",
+    "definition": "Tipo de perfil",
+    "context": "Profile type"
+  },
+  {
+    "term": "component.profile-table-columns.relationship",
+    "definition": "Relación",
+    "context": "Relationship"
+  },
+  {
     "term": "component.profile-table-columns.subscribed",
     "definition": "Suscritos",
     "context": "Subscribed"
@@ -9350,9 +9360,9 @@
     "context": "Unsubscribe"
   },
   {
-    "term": "page.profiles.all-profile-types",
-    "definition": "Todo tipo de perfiles",
-    "context": "All profile types"
+    "term": "page.profiles.all-profiles",
+    "definition": "Todos los perfiles",
+    "context": "All profiles"
   },
   {
     "term": "page.profiles.create-profile",

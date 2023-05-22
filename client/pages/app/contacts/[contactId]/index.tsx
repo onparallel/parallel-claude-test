@@ -230,6 +230,7 @@ function Contact({ contactId }: ContactProps) {
             </CardHeader>
             {contact!.accesses.items.length ? (
               <Table
+                isHighlightable
                 columns={columns}
                 context={context}
                 rows={contact!.accesses.items}
@@ -316,7 +317,7 @@ function useContactPetitionAccessesColumns() {
             id: "petitions.header.shared",
             defaultMessage: "Shared",
           }),
-          align: "center",
+          align: "left",
           cellProps: { width: "1%" },
           CellContent: ({ row: { petition }, column }) => (
             <Flex justifyContent={column.align}>

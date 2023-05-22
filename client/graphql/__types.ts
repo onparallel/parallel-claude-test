@@ -14315,6 +14315,72 @@ export type ExportRepliesProgressDialog_petitionQuery = {
     | null;
 };
 
+export type FakeProfileTables_PetitionFragment = {
+  __typename?: "Petition";
+  id: string;
+  name?: string | null;
+  createdAt: string;
+  sentAt?: string | null;
+  status: PetitionStatus;
+  permissions: Array<
+    | {
+        __typename?: "PetitionUserGroupPermission";
+        permissionType: PetitionPermissionType;
+        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+      }
+    | {
+        __typename?: "PetitionUserPermission";
+        permissionType: PetitionPermissionType;
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          avatarUrl?: string | null;
+          initials?: string | null;
+        };
+      }
+  >;
+  accesses: Array<{
+    __typename?: "PetitionAccess";
+    id: string;
+    status: PetitionAccessStatus;
+    nextReminderAt?: string | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+    reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
+  }>;
+  progress: {
+    __typename?: "PetitionProgress";
+    external: {
+      __typename?: "PetitionFieldProgress";
+      approved: number;
+      replied: number;
+      optional: number;
+      total: number;
+    };
+    internal: {
+      __typename?: "PetitionFieldProgress";
+      approved: number;
+      replied: number;
+      optional: number;
+      total: number;
+    };
+  };
+  currentSignatureRequest?: {
+    __typename?: "PetitionSignatureRequest";
+    status: PetitionSignatureRequestStatus;
+    cancelReason?: string | null;
+    environment: SignatureOrgIntegrationEnvironment;
+  } | null;
+  signatureConfig?: {
+    __typename?: "SignatureConfig";
+    review: boolean;
+    integration?: {
+      __typename?: "SignatureOrgIntegration";
+      environment: SignatureOrgIntegrationEnvironment;
+    } | null;
+  } | null;
+};
+
 export type ProfileSubscribers_UserFragment = {
   __typename?: "User";
   id: string;
@@ -31260,6 +31326,106 @@ export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
   ${useFilenamePlaceholdersRename_PetitionFieldFragmentDoc}
   ${useFilenamePlaceholdersRename_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<ExportRepliesProgressDialog_PetitionFragment, unknown>;
+export const PetitionProgressBar_PetitionFieldProgressFragmentDoc = gql`
+  fragment PetitionProgressBar_PetitionFieldProgress on PetitionFieldProgress {
+    approved
+    replied
+    optional
+    total
+  }
+` as unknown as DocumentNode<PetitionProgressBar_PetitionFieldProgressFragment, unknown>;
+export const PetitionProgressBar_PetitionFragmentDoc = gql`
+  fragment PetitionProgressBar_Petition on Petition {
+    status
+    progress {
+      external {
+        ...PetitionProgressBar_PetitionFieldProgress
+      }
+      internal {
+        ...PetitionProgressBar_PetitionFieldProgress
+      }
+    }
+  }
+  ${PetitionProgressBar_PetitionFieldProgressFragmentDoc}
+` as unknown as DocumentNode<PetitionProgressBar_PetitionFragment, unknown>;
+export const PetitionStatusCellContent_PetitionFragmentDoc = gql`
+  fragment PetitionStatusCellContent_Petition on Petition {
+    ...PetitionProgressBar_Petition
+    status
+  }
+  ${PetitionProgressBar_PetitionFragmentDoc}
+` as unknown as DocumentNode<PetitionStatusCellContent_PetitionFragment, unknown>;
+export const getPetitionSignatureStatus_PetitionFragmentDoc = gql`
+  fragment getPetitionSignatureStatus_Petition on Petition {
+    status
+    currentSignatureRequest {
+      status
+      cancelReason
+    }
+    signatureConfig {
+      review
+    }
+  }
+` as unknown as DocumentNode<getPetitionSignatureStatus_PetitionFragment, unknown>;
+export const getPetitionSignatureEnvironment_PetitionFragmentDoc = gql`
+  fragment getPetitionSignatureEnvironment_Petition on Petition {
+    currentSignatureRequest {
+      environment
+    }
+    signatureConfig {
+      integration {
+        environment
+      }
+    }
+  }
+` as unknown as DocumentNode<getPetitionSignatureEnvironment_PetitionFragment, unknown>;
+export const PetitionSignatureCellContent_PetitionFragmentDoc = gql`
+  fragment PetitionSignatureCellContent_Petition on Petition {
+    ...getPetitionSignatureStatus_Petition
+    ...getPetitionSignatureEnvironment_Petition
+  }
+  ${getPetitionSignatureStatus_PetitionFragmentDoc}
+  ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
+` as unknown as DocumentNode<PetitionSignatureCellContent_PetitionFragment, unknown>;
+export const FakeProfileTables_PetitionFragmentDoc = gql`
+  fragment FakeProfileTables_Petition on Petition {
+    id
+    name
+    createdAt
+    permissions {
+      permissionType
+      ... on PetitionUserPermission {
+        user {
+          ...UserAvatarList_User
+        }
+      }
+      ... on PetitionUserGroupPermission {
+        group {
+          ...UserAvatarList_UserGroup
+        }
+      }
+    }
+    accesses {
+      id
+      status
+      contact {
+        ...ContactReference_Contact
+      }
+      nextReminderAt
+      reminders {
+        createdAt
+      }
+    }
+    sentAt
+    ...PetitionStatusCellContent_Petition
+    ...PetitionSignatureCellContent_Petition
+  }
+  ${UserAvatarList_UserFragmentDoc}
+  ${UserAvatarList_UserGroupFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
+  ${PetitionStatusCellContent_PetitionFragmentDoc}
+  ${PetitionSignatureCellContent_PetitionFragmentDoc}
+` as unknown as DocumentNode<FakeProfileTables_PetitionFragment, unknown>;
 export const useCreateProfileDialog_ProfileTypeFragmentDoc = gql`
   fragment useCreateProfileDialog_ProfileType on ProfileType {
     id
@@ -31621,67 +31787,6 @@ export const useDeleteContacts_ContactFragmentDoc = gql`
     email
   }
 ` as unknown as DocumentNode<useDeleteContacts_ContactFragment, unknown>;
-export const PetitionProgressBar_PetitionFieldProgressFragmentDoc = gql`
-  fragment PetitionProgressBar_PetitionFieldProgress on PetitionFieldProgress {
-    approved
-    replied
-    optional
-    total
-  }
-` as unknown as DocumentNode<PetitionProgressBar_PetitionFieldProgressFragment, unknown>;
-export const PetitionProgressBar_PetitionFragmentDoc = gql`
-  fragment PetitionProgressBar_Petition on Petition {
-    status
-    progress {
-      external {
-        ...PetitionProgressBar_PetitionFieldProgress
-      }
-      internal {
-        ...PetitionProgressBar_PetitionFieldProgress
-      }
-    }
-  }
-  ${PetitionProgressBar_PetitionFieldProgressFragmentDoc}
-` as unknown as DocumentNode<PetitionProgressBar_PetitionFragment, unknown>;
-export const PetitionStatusCellContent_PetitionFragmentDoc = gql`
-  fragment PetitionStatusCellContent_Petition on Petition {
-    ...PetitionProgressBar_Petition
-    status
-  }
-  ${PetitionProgressBar_PetitionFragmentDoc}
-` as unknown as DocumentNode<PetitionStatusCellContent_PetitionFragment, unknown>;
-export const getPetitionSignatureStatus_PetitionFragmentDoc = gql`
-  fragment getPetitionSignatureStatus_Petition on Petition {
-    status
-    currentSignatureRequest {
-      status
-      cancelReason
-    }
-    signatureConfig {
-      review
-    }
-  }
-` as unknown as DocumentNode<getPetitionSignatureStatus_PetitionFragment, unknown>;
-export const getPetitionSignatureEnvironment_PetitionFragmentDoc = gql`
-  fragment getPetitionSignatureEnvironment_Petition on Petition {
-    currentSignatureRequest {
-      environment
-    }
-    signatureConfig {
-      integration {
-        environment
-      }
-    }
-  }
-` as unknown as DocumentNode<getPetitionSignatureEnvironment_PetitionFragment, unknown>;
-export const PetitionSignatureCellContent_PetitionFragmentDoc = gql`
-  fragment PetitionSignatureCellContent_Petition on Petition {
-    ...getPetitionSignatureStatus_Petition
-    ...getPetitionSignatureEnvironment_Petition
-  }
-  ${getPetitionSignatureStatus_PetitionFragmentDoc}
-  ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
-` as unknown as DocumentNode<PetitionSignatureCellContent_PetitionFragment, unknown>;
 export const Contact_PetitionFragmentDoc = gql`
   fragment Contact_Petition on Petition {
     id
