@@ -21,6 +21,7 @@ import {
   LocalizableUserTextRender,
   localizableUserTextRender,
 } from "@parallel/components/common/LocalizableUserTextRender";
+import { OverflownText } from "@parallel/components/common/OverflownText";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -195,7 +196,7 @@ function Profiles() {
     >
       <Stack minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
         <Flex alignItems="center">
-          <Box minWidth="0" width="fit-content">
+          <Flex minWidth="0" width="fit-content">
             <Menu matchWidth>
               <MenuButton
                 as={Button}
@@ -207,15 +208,17 @@ function Profiles() {
                 data-testid="profile-type-menu-button"
                 rightIcon={<ChevronDownIcon boxSize={5} />}
               >
-                {isDefined(profileType)
-                  ? localizableUserTextRender({ intl, value: profileType.name, default: "" })
-                  : intl.formatMessage({
-                      id: "page.profiles.all-profiles",
-                      defaultMessage: "All profiles",
-                    })}
+                <OverflownText>
+                  {isDefined(profileType)
+                    ? localizableUserTextRender({ intl, value: profileType.name, default: "" })
+                    : intl.formatMessage({
+                        id: "page.profiles.all-profiles",
+                        defaultMessage: "All profiles",
+                      })}
+                </OverflownText>
               </MenuButton>
               <Portal>
-                <MenuList minWidth="154px">
+                <MenuList minWidth="180px" maxWidth="320px">
                   <MenuOptionGroup value={queryState.profileType ?? ""}>
                     <MenuItemOption
                       value=""
@@ -237,13 +240,15 @@ function Profiles() {
                           }
                           data-testid={`profile-type-${profileType.id}`}
                         >
-                          <LocalizableUserTextRender
-                            value={profileType.name}
-                            default={intl.formatMessage({
-                              id: "generic.unamed-profile-type",
-                              defaultMessage: "Unnamed profile type",
-                            })}
-                          />
+                          <Text noOfLines={2}>
+                            <LocalizableUserTextRender
+                              value={profileType.name}
+                              default={intl.formatMessage({
+                                id: "generic.unamed-profile-type",
+                                defaultMessage: "Unnamed profile type",
+                              })}
+                            />
+                          </Text>
                         </MenuItemOption>
                       );
                     })}
@@ -251,11 +256,13 @@ function Profiles() {
                 </MenuList>
               </Portal>
             </Menu>
+          </Flex>
+          <Spacer minW={4} />
+          <Box>
+            <Button colorScheme="primary" onClick={handleCreateProfile}>
+              <FormattedMessage id="page.profiles.create-profile" defaultMessage="Create profile" />
+            </Button>
           </Box>
-          <Spacer />
-          <Button colorScheme="primary" onClick={handleCreateProfile}>
-            <FormattedMessage id="page.profiles.create-profile" defaultMessage="Create profile" />
-          </Button>
         </Flex>
         <Box flex="1" paddingBottom={16}>
           <TablePage
@@ -404,18 +411,19 @@ export function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[
           defaultMessage: "Name",
         }),
         cellProps: {
+          maxWidth: 0,
           width: "30%",
           minWidth: "240px",
         },
         CellContent: ({ row }) => {
           return (
-            <Text as="span" textStyle={row.name ? undefined : "hint"}>
+            <OverflownText textStyle={row.name ? undefined : "hint"}>
               {row.name ||
                 intl.formatMessage({
                   id: "generic.unnamed-profile",
                   defaultMessage: "Unnamed profile",
                 })}
-            </Text>
+            </OverflownText>
           );
         },
       },
@@ -426,6 +434,7 @@ export function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[
           defaultMessage: "Type",
         }),
         cellProps: {
+          maxWidth: 0,
           width: "30%",
           minWidth: "240px",
         },
@@ -435,7 +444,7 @@ export function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[
           },
         }) => {
           return (
-            <Text as="span">
+            <OverflownText textStyle={name ? undefined : "hint"}>
               {localizableUserTextRender({
                 value: name,
                 intl,
@@ -444,7 +453,7 @@ export function useProfileTableColumns(): TableColumn<Profiles_ProfileFragment>[
                   defaultMessage: "Unnamed profile type",
                 }),
               })}
-            </Text>
+            </OverflownText>
           );
         },
       },

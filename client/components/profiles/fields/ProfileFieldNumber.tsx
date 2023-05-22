@@ -24,6 +24,7 @@ export function ProfileFieldNumber({
           return (
             <NumeralInput
               {...rest}
+              borderColor="transparent"
               value={value.length ? value : undefined}
               onChange={(value) => {
                 onChange(value?.toString() ?? "");

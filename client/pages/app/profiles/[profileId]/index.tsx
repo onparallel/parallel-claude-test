@@ -387,7 +387,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
                   defaultMessage: "Unnamed profile",
                 })}
             </OverflownText>
-            <Box fontSize="sm" color="gray.600" lineHeight="22px">
+            <Box fontSize="sm" color="gray.600" lineHeight="18px">
               <LocalizableUserTextRender
                 value={profile.profileType.name}
                 default={intl.formatMessage({
@@ -524,7 +524,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
             ) : null}
           </Stack>
         </Flex>
-        <Stack spacing={0} backgroundColor="gray.50" flex={2} height="full">
+        <Stack spacing={0} backgroundColor="gray.50" flex={2} height="full" overflow="auto">
           <HStack
             backgroundColor="white"
             paddingX={4}
@@ -557,9 +557,8 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
               onSubscribe={handleSubscribersClick}
             />
           </HStack>
-          <Box padding={4}>
-            <FakeProfileTables me={me} />
-          </Box>
+
+          <FakeProfileTables me={me} />
         </Stack>
       </Flex>
     </AppLayout>

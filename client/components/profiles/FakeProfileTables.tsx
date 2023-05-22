@@ -129,64 +129,61 @@ export function FakeProfileTables({ me }: { me: any }) {
   const columnsProfiles = useFakeProfileTableColumns();
   const columnsParallels = useFakePetitionColumns();
   return (
-    <Stack spacing={6}>
-      <Box flex="1">
-        <TablePage
-          flex="0 1 auto"
-          minHeight="200px"
-          columns={columnsProfiles}
-          rows={fakeProfilesItems}
-          rowKeyProp="id"
-          context={me}
-          isHighlightable
-          loading={false}
-          onRowClick={noop}
-          page={1}
-          pageSize={10}
-          totalCount={fakeProfilesItems.length}
-          onPageChange={noop}
-          onPageSizeChange={noop}
-          onSortChange={noop}
-          header={
-            <Box paddingX={4} paddingY={3}>
-              <Heading size="md">
-                <FormattedMessage
-                  id="component.app-layout-navbar.profiles-link"
-                  defaultMessage="Profiles"
-                />
-              </Heading>
-            </Box>
-          }
-          body={null}
-        />
-      </Box>
-      <Box flex="1">
-        <TablePage
-          flex="0 1 auto"
-          minHeight="200px"
-          columns={columnsParallels}
-          rows={fakeParallelsItems}
-          rowKeyProp="id"
-          context={me}
-          isHighlightable
-          loading={false}
-          onRowClick={noop}
-          page={1}
-          pageSize={10}
-          totalCount={fakeParallelsItems.length}
-          onPageChange={noop}
-          onPageSizeChange={noop}
-          onSortChange={noop}
-          header={
-            <Box paddingX={4} paddingY={3}>
-              <Heading size="md">
-                <FormattedMessage id="generic.root-petitions" defaultMessage="Parallels" />
-              </Heading>
-            </Box>
-          }
-          body={null}
-        />
-      </Box>
+    <Stack spacing={6} padding={4}>
+      <TablePage
+        flex="0 1 auto"
+        minHeight="200px"
+        columns={columnsProfiles}
+        rows={fakeProfilesItems}
+        rowKeyProp="id"
+        context={me}
+        isHighlightable
+        loading={false}
+        onRowClick={noop}
+        page={1}
+        pageSize={10}
+        totalCount={fakeProfilesItems.length}
+        onPageChange={noop}
+        onPageSizeChange={noop}
+        onSortChange={noop}
+        header={
+          <Box paddingX={4} paddingY={3}>
+            <Heading size="md">
+              <FormattedMessage
+                id="component.app-layout-navbar.profiles-link"
+                defaultMessage="Profiles"
+              />
+            </Heading>
+          </Box>
+        }
+        body={null}
+      />
+
+      <TablePage
+        flex="0 1 auto"
+        minHeight="200px"
+        columns={columnsParallels}
+        rows={fakeParallelsItems}
+        rowKeyProp="id"
+        context={me}
+        isHighlightable
+        loading={false}
+        onRowClick={noop}
+        page={1}
+        pageSize={10}
+        totalCount={fakeParallelsItems.length}
+        onPageChange={noop}
+        onPageSizeChange={noop}
+        onSortChange={noop}
+        header={
+          <Box paddingX={4} paddingY={3}>
+            <Heading size="md">
+              <FormattedMessage id="generic.root-petitions" defaultMessage="Parallels" />
+            </Heading>
+          </Box>
+        }
+        body={null}
+      />
     </Stack>
   );
 }

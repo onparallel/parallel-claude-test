@@ -39,6 +39,11 @@ export function ProfileFieldInputGroup({ index, field, children }: ProfileFieldI
             display: "flex",
           },
         }}
+        sx={{
+          "input:not(:focus)": {
+            textOverflow: "ellipsis",
+          },
+        }}
       >
         {children}
         {browserName === "Firefox" && field.type === "DATE" ? null : (
