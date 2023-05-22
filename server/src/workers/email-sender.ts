@@ -15,6 +15,7 @@ import { petitionMessage } from "./emails/petition-message";
 import { petitionMessageBounced } from "./emails/petition-message-bounced";
 import { petitionReminder } from "./emails/petition-reminder";
 import { petitionShared } from "./emails/petition-shared";
+import { profilesExpiringProperties } from "./emails/profiles-expiring-properties";
 import { publicPetitionLinkAccess } from "./emails/public-petition-link-access";
 import { sendFromDatabase } from "./emails/send-from-database";
 import { signatureCancelledDeclinedBySigner } from "./emails/signature-cancelled-declined-by-signer";
@@ -45,6 +46,7 @@ const builders = {
   invitation,
   "from-database": sendFromDatabase,
   "transfer-parallels": transferParallels,
+  "profiles-expiring-properties": profilesExpiringProperties,
 };
 
 export type EmailType = keyof typeof builders;

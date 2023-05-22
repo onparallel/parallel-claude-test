@@ -155,6 +155,7 @@ export class WorkerContext {
     public readonly userGroups: UserGroupRepository,
     public readonly subscriptions: SubscriptionRepository,
     public readonly tasks: TaskRepository,
+    public readonly profiles: ProfileRepository,
 
     @readOnly public readonly readonlyContacts: ContactRepository,
     @readOnly public readonly readonlyPetitions: PetitionRepository,

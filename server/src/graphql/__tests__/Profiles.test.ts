@@ -2263,7 +2263,143 @@ describe("GraphQL/Profiles", () => {
       ]);
     });
 
-    it("updates expires_at field if passing an empty list of files", async () => {
+    it("updates expiry_date field if passing an empty list of files", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+      const { errors: createErrors, data: createData } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $profileTypeFieldId: GID!, $data: [FileUploadInput!]!) {
+            createProfileFieldFileUploadLink(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              property {
+                field {
+                  id
+                }
+                files {
+                  id
+                  expiryDate
+                }
+              }
+              uploads {
+                file {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          data: [{ contentType: "image/png", size: 1024, filename: "ID.png" }],
+        }
+      );
+
+      expect(createErrors).toBeUndefined();
+      expect(createData?.createProfileFieldFileUploadLink).toEqual({
+        property: {
+          field: {
+            id: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          },
+          files: [
+            {
+              id: expect.any(String),
+              expiryDate: null,
+            },
+          ],
+        },
+        uploads: [{ file: { id: expect.any(String) } }],
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+            $data: [FileUploadInput!]!
+            $expiryDate: Date
+          ) {
+            createProfileFieldFileUploadLink(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+              expiryDate: $expiryDate
+            ) {
+              property {
+                files {
+                  id
+                  expiryDate
+                }
+              }
+              uploads {
+                file {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          data: [],
+          expiryDate: "2024-10-10",
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createProfileFieldFileUploadLink).toEqual({
+        property: {
+          files: [
+            {
+              id: createData!.createProfileFieldFileUploadLink.property.files[0].id,
+              expiryDate: "2024-10-10",
+            },
+          ],
+        },
+        uploads: [], // empty array as no files were passed
+      });
+    });
+
+    it("sends error if passing empty list of files and no expiryDate", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!, $profileTypeFieldId: GID!, $data: [FileUploadInput!]!) {
+            createProfileFieldFileUploadLink(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              property {
+                files {
+                  id
+                  expiryDate
+                }
+              }
+              uploads {
+                file {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+          data: [],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("VALIDATOR_CONDITION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("fails if trying to upload more than 10 files", async () => {
       const profile = await createProfile(toGlobalId("ProfileType", profileTypes[2].id));
       const { errors: createErrors, data: createData } = await testClient.execute(
         gql`

@@ -188,6 +188,14 @@
           "append_dimensions": {
             "Process": "parallel-old-notifications-cron"
           }
+        },
+        {
+          "pid_file": "/var/run/parallel-expiring-properties-cron.pid",
+          "measurement": ["cpu_usage", "memory_rss"],
+          "metrics_collection_interval": 10,
+          "append_dimensions": {
+            "Process": "parallel-expiring-properties-cron"
+          }
         }
       ]
     }

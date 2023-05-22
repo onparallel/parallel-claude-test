@@ -4,13 +4,14 @@ import emailProviders from "email-providers/all.json";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import pMap from "p-map";
-import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
 import { OrganizationUsageLimitName } from "../db/__types";
+import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
+import { ProfilesExpiringPropertiesEmailProps } from "../emails/emails/ProfilesExpiringPropertiesEmail";
 import { EMAIL_REGEX } from "../graphql/helpers/validators/validEmail";
 import { unMaybeArray } from "../util/arrays";
 import { Maybe, MaybeArray } from "../util/types";
 import { EmailPayload } from "../workers/email-sender";
-import { QueuesService, QUEUES_SERVICE } from "./QueuesService";
+import { QUEUES_SERVICE, QueuesService } from "./QueuesService";
 
 export interface IEmailsService {
   sendPetitionMessageEmail(messageIds: MaybeArray<number>): Promise<void>;
@@ -84,6 +85,10 @@ export interface IEmailsService {
   sendSignatureCancelledRequestErrorEmail(petitionSignatureRequestId: number): Promise<void>;
   sendSignatureCancelledDeclinedBySignerEmail(petitionSignatureRequestId: number): Promise<void>;
   sendTransferParallelsEmail(userExternalId: string, orgId: number): Promise<void>;
+  sendProfilesExpiringPropertiesEmail(
+    userId: number,
+    payload: Pick<ProfilesExpiringPropertiesEmailProps, "organizationName" | "properties">
+  ): Promise<void>;
 }
 export const EMAILS = Symbol.for("EMAILS");
 
@@ -342,6 +347,17 @@ export class EmailsService implements IEmailsService {
     return await this.enqueueEmail("signature-cancelled-declined-by-signer", {
       id: this.buildQueueId("SignatureCancelledDeclinedBySigner", petitionSignatureRequestId),
       petition_signature_request_id: petitionSignatureRequestId,
+    });
+  }
+
+  async sendProfilesExpiringPropertiesEmail(
+    userId: number,
+    payload: Pick<ProfilesExpiringPropertiesEmailProps, "organizationName" | "properties">
+  ): Promise<void> {
+    return await this.enqueueEmail("profiles-expiring-properties", {
+      id: this.buildQueueId("ProfilesExpiringProperties", userId),
+      userId,
+      ...payload,
     });
   }
 

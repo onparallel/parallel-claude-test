@@ -790,6 +790,41 @@
     "context": "Follow the link below link to access."
   },
   {
+    "term": "profiles-expiring-properties.footer-message-1",
+    "definition": "This email includes notifications to which you are subscribed.",
+    "context": "This email includes notifications to which you are subscribed."
+  },
+  {
+    "term": "profiles-expiring-properties.footer-message-2",
+    "definition": "🔔 If this message has ended up in your promotions or spam folder, click on it and drag it to your main inbox to make sure you don't miss the next ones.",
+    "context": "🔔 If this message has ended up in your promotions or spam folder, click on it and drag it to your main inbox to make sure you don't miss the next ones."
+  },
+  {
+    "term": "profiles-expiring-properties.showing-active-alerts-count",
+    "definition": "Showing {count}/{totalCount} of active alarms",
+    "context": "Showing {count}/{totalCount} of active alarms"
+  },
+  {
+    "term": "profiles-expiring-properties.subject",
+    "definition": "Expiration alerts in {orgName}",
+    "context": "Expiration alerts in {orgName}"
+  },
+  {
+    "term": "profiles-expiring-properties.title",
+    "definition": "Your pending alerts",
+    "context": "Your pending alerts"
+  },
+  {
+    "term": "profiles-expiring-properties.untitled-property",
+    "definition": "Untitled property",
+    "context": "Untitled property"
+  },
+  {
+    "term": "profiles-expiring-properties.view-alerts-button",
+    "definition": "View alerts",
+    "context": "View alerts"
+  },
+  {
     "term": "profiles.default-field-name",
     "definition": "Name",
     "context": "Name"

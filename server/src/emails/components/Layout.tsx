@@ -36,6 +36,7 @@ export interface LayoutProps {
   omitGdprDisclaimer?: boolean;
   utmCampaign?: string;
   removeParallelBranding?: boolean;
+  removeLinks?: boolean;
   theme: BrandTheme;
   head?: ReactNode;
   children?: ReactNode;
@@ -61,6 +62,7 @@ const ThemedLayout: FC<Omit<LayoutProps, "theme">> = function ThemedLayout({
   omitGdprDisclaimer,
   utmCampaign,
   removeParallelBranding,
+  removeLinks,
   head,
 }) {
   const { locale } = useIntl();
@@ -148,11 +150,11 @@ const ThemedLayout: FC<Omit<LayoutProps, "theme">> = function ThemedLayout({
                       width="120px"
                       alt="Parallel"
                       src={`${assetsUrl}/static/emails/logo.png`}
-                      href={`https://www.onparallel.com/${locale}?${utm}`}
+                      href={removeLinks ? undefined : `https://www.onparallel.com/${locale}?${utm}`}
                     />
                   </>
                 )}
-                {useAlternativeSlogan ? null : (
+                {useAlternativeSlogan || removeLinks ? null : (
                   <MjmlSocial align="center" icon-padding="1px">
                     <MjmlSocialElement
                       alt="LinkedIn"
@@ -180,7 +182,7 @@ const ThemedLayout: FC<Omit<LayoutProps, "theme">> = function ThemedLayout({
                     />
                   </MjmlSocial>
                 )}
-                {useAlternativeSlogan ? null : (
+                {useAlternativeSlogan || removeLinks ? null : (
                   <MjmlText align="center">
                     <a
                       className="link"

@@ -437,11 +437,8 @@ const _queries = [
   `,
 ];
 
-Alerts.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  await Promise.all([
-    fetchQuery(Alerts_userDocument),
-    fetchQuery(Alerts_expiringProfilePropertiesDocument),
-  ]);
+Alerts.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
+  await Promise.all([fetchQuery(Alerts_userDocument)]);
   return {};
 };
 

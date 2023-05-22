@@ -786,6 +786,7 @@ export interface Organization {
   appsumo_license: Maybe<any>; // jsonb
   anonymize_petitions_after_months: Maybe<number>; // int4
   default_timezone: string; // varchar
+  last_profile_digest_at: Maybe<Date>; // timestamptz
 }
 
 export type CreateOrganization = PartialProps<
@@ -804,6 +805,7 @@ export type CreateOrganization = PartialProps<
   | "appsumo_license"
   | "anonymize_petitions_after_months"
   | "default_timezone"
+  | "last_profile_digest_at"
 >;
 
 export interface OrganizationTheme {

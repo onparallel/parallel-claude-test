@@ -131,6 +131,9 @@ export function buildConfig() {
       "old-notifications": {
         rule: process.env.WORKERS_OLD_NOTIFICATIONS_RULE!,
       },
+      "expiring-properties": {
+        rule: process.env.WORKERS_EXPIRING_PROPERTIES_RULE!,
+      },
     },
     imageProxy: {
       secret: process.env.IMAGE_PROXY_SIGNATURE_SECRET!,

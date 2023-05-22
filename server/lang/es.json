@@ -790,6 +790,41 @@
     "context": "Follow the link below link to access."
   },
   {
+    "term": "profiles-expiring-properties.footer-message-1",
+    "definition": "Este correo incluye notificaciones a las que estás suscrito.",
+    "context": "This email includes notifications to which you are subscribed."
+  },
+  {
+    "term": "profiles-expiring-properties.footer-message-2",
+    "definition": "🔔 Si este mensaje ha acabado en tu bandeja de promociones o spam, hazle click y arrástralo a tu bandeja principal para asegurarte de no perderte los próximos.",
+    "context": "🔔 If this message has ended up in your promotions or spam folder, click on it and drag it to your main inbox to make sure you don't miss the next ones."
+  },
+  {
+    "term": "profiles-expiring-properties.showing-active-alerts-count",
+    "definition": "Mostrando {count}/{totalCount} de alarmas activas",
+    "context": "Showing {count}/{totalCount} of active alarms"
+  },
+  {
+    "term": "profiles-expiring-properties.subject",
+    "definition": "Alertas de vencimientos en {orgName}",
+    "context": "Expiration alerts in {orgName}"
+  },
+  {
+    "term": "profiles-expiring-properties.title",
+    "definition": "Tus alertas pendientes",
+    "context": "Your pending alerts"
+  },
+  {
+    "term": "profiles-expiring-properties.untitled-property",
+    "definition": "Propiedad sin título",
+    "context": "Untitled property"
+  },
+  {
+    "term": "profiles-expiring-properties.view-alerts-button",
+    "definition": "Ver alertas",
+    "context": "View alerts"
+  },
+  {
     "term": "profiles.default-field-name",
     "definition": "Nombre",
     "context": "Name"

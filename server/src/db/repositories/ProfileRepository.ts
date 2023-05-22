@@ -12,12 +12,14 @@ import {
   CreateProfileFieldValue,
   CreateProfileType,
   CreateProfileTypeField,
+  Organization,
   Profile,
   ProfileEvent,
   ProfileFieldFile,
   ProfileFieldValue,
   ProfileType,
   ProfileTypeFieldType,
+  User,
   UserLocale,
 } from "../__types";
 import {
@@ -902,7 +904,6 @@ export class ProfileRepository extends BaseRepository {
   }
 
   getPaginatedExpirableProfileFieldProperties(
-    userId: number,
     orgId: number,
     defaultTimezone: string,
     opts: {
@@ -910,6 +911,8 @@ export class ProfileRepository extends BaseRepository {
       filter?: Maybe<{
         profileTypeFieldId?: Maybe<number[]>;
         profileTypeId?: Maybe<number[]>;
+        isInAlert?: boolean;
+        subscribedByUserId?: number;
       }>;
     } & PageOpts
   ) {
@@ -925,6 +928,17 @@ export class ProfileRepository extends BaseRepository {
         opts.filter!.profileTypeFieldId.length > 0
       ) {
         q.whereIn("pfx.profile_type_field_id", opts.filter!.profileTypeFieldId);
+      }
+      if (isDefined(opts.filter?.isInAlert)) {
+        q.whereRaw(
+          /* sql */ `(pfx.expiry_date at time zone ?) - ptf.expiry_alert_ahead_time < now()`,
+          [defaultTimezone]
+        );
+      }
+      if (isDefined(opts.filter?.subscribedByUserId)) {
+        q.join(this.knex.ref("profile_subscription").as("ps"), "ps.profile_id", "p.id")
+          .whereNull("ps.deleted_at")
+          .where("ps.user_id", opts.filter!.subscribedByUserId);
       }
     };
     const valuesQuery = this.knex
@@ -950,7 +964,7 @@ export class ProfileRepository extends BaseRepository {
       .whereNotNull("ptf.expiry_alert_ahead_time")
       .modify(filter);
     return {
-      totalCount: LazyPromise.from(async () => {
+      totalCount: LazyPromise.from<number>(async () => {
         const counts = await this.knex.unionAll([
           valuesQuery.clone().select<{ count: number }[]>(this.count()),
           this.knex
@@ -966,33 +980,46 @@ export class ProfileRepository extends BaseRepository {
       items: LazyPromise.from(async () => {
         const properties: {
           profile_id: number;
+          profile_name: string;
           profile_type_field_id: number;
+          profile_type_field_name: LocalizableUserText;
           in_alert: boolean;
-          expiry_date: Date;
+          expiry_date: string;
+          is_expired: boolean;
         }[] = await this.knex
           .unionAll([
             valuesQuery
               .clone()
               .select(
                 "pfx.profile_id",
+                "p.name as profile_name",
                 "pfx.profile_type_field_id",
                 "pfx.expiry_date",
                 this.knex.raw(
                   /* sql */ `(pfx.expiry_date at time zone ?) - ptf.expiry_alert_ahead_time < now() as in_alert`,
                   [defaultTimezone]
-                )
+                ),
+                "ptf.name as profile_type_field_name",
+                this.knex.raw(/* sql */ `(pfx.expiry_date at time zone ?) < now() as is_expired`, [
+                  defaultTimezone,
+                ])
               ),
             filesQuery
               .clone()
               .distinctOn("pfx.profile_id", "pfx.profile_type_field_id")
               .select(
                 "pfx.profile_id",
+                "p.name as profile_name",
                 "pfx.profile_type_field_id",
                 "pfx.expiry_date",
                 this.knex.raw(
                   /* sql */ `(pfx.expiry_date at time zone ?) - ptf.expiry_alert_ahead_time < now() as in_alert`,
                   [defaultTimezone]
-                )
+                ),
+                "ptf.name as profile_type_field_name",
+                this.knex.raw(/* sql */ `(pfx.expiry_date at time zone ?) < now() as is_expired`, [
+                  defaultTimezone,
+                ])
               ),
           ])
           .orderBy("in_alert", "desc")
@@ -1001,7 +1028,8 @@ export class ProfileRepository extends BaseRepository {
           .orderBy("profile_type_field_id")
           .offset(opts.offset ?? 0)
           .limit(opts.limit ?? 0);
-        return properties.map(omit(["in_alert", "expiry_date"]));
+
+        return properties;
       }),
     };
   }
@@ -1055,4 +1083,37 @@ export class ProfileRepository extends BaseRepository {
   loadProfileSubscribers = this.buildLoadMultipleBy("profile_subscription", "profile_id", (q) =>
     q.whereNull("deleted_at")
   );
+
+  /**
+   * @returns Organizations that
+   * - have profiles feature enabled
+   * - have not received a digest in the last 6 days
+   * - their current time is after the passed date
+   */
+  async getOrganizationsForProfileAlertsDigest(afterDate: Date) {
+    return await this.raw<Organization>(
+      /* sql */ `
+      select o.* from "organization" o
+      join "feature_flag" ff on ff.name = 'PROFILES'
+      left join "feature_flag_override" ffo on ffo.feature_flag_name = ff.name and ffo.org_id = o.id and ffo.user_id is null
+      where o.deleted_at is null
+      and coalesce(ffo.value, ff.default_value) = true
+      and ?::timestamp at time zone o.default_timezone < now()
+      and (o.last_profile_digest_at is null or o.last_profile_digest_at + make_interval(days=>6) < now())
+    `,
+      [afterDate.toISOString()]
+    );
+  }
+
+  async getOrganizationUsersSubscribedToProfileAlerts(orgId: number) {
+    return await this.from("user")
+      .join(this.knex.ref("profile_subscription").as("ps"), "user.id", "ps.user_id")
+      .where({
+        "ps.deleted_at": null,
+        "user.deleted_at": null,
+        "user.status": "ACTIVE",
+        "user.org_id": orgId,
+      })
+      .select<User[]>("user.*");
+  }
 }

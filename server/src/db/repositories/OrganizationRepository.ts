@@ -163,6 +163,13 @@ export class OrganizationRepository extends BaseRepository {
     return org;
   }
 
+  async updateOrganizationLastProfileDigest(orgId: number) {
+    await this.from("organization")
+      .where("id", orgId)
+      .whereNull("deleted_at")
+      .update({ last_profile_digest_at: this.now() });
+  }
+
   async updateOrganizationUsageDetails(
     orgId: number,
     details: Partial<OrganizationUsageDetails>,
