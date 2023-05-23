@@ -233,7 +233,7 @@ export const createPetition = mutationField("createPetition", {
                         {
                           id: "petition-completing-message-body",
                           defaultMessage:
-                            "We have notified {name} that they will receive the information in order to continue with the process.",
+                            "We informed {name} that you have completed the information to continue with the process.",
                         },
                         { name: "{{ user-first-name }}" }
                       )

@@ -18,11 +18,10 @@ import {
   PetitionTemplateCompletingMessageCard_PetitionTemplateFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
-import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/textWithPlaceholder";
-import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
-import { outdent } from "outdent";
+import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/textWithPlaceholder";
+import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Card, CardHeader } from "../common/Card";
@@ -37,21 +36,13 @@ interface PetitionTemplateCompletingMessageCardProps {
 }
 
 const messagesSubject: Record<PetitionLocale, string> = {
-  en: outdent`
-    Thank you for completing
-  `,
-  es: outdent`
-    Gracias por completar
-  `,
+  en: "Thank you for completing",
+  es: "Gracias por completar",
 };
 
 const messagesBody: Record<PetitionLocale, string> = {
-  en: outdent`
-    We have notified {{user-first-name}} that he will receive the information in order to continue with the process.
-  `,
-  es: outdent`
-    Hemos notificado a {{user-first-name}} que recibirá la información para poder continuar con el proceso.
-  `,
+  en: "We informed {{ user-first-name }} that you have completed the information to continue with the process",
+  es: "Hemos informado a {{ user-first-name }} de que se ha completado la información para continuar con el proceso",
 };
 
 export const PetitionTemplateCompletingMessageCard = Object.assign(

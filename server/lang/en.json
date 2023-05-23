@@ -711,8 +711,8 @@
   },
   {
     "term": "petition-completing-message-body",
-    "definition": "We have notified {name} that they will receive the information in order to continue with the process.",
-    "context": "We have notified {name} that they will receive the information in order to continue with the process."
+    "definition": "We informed {name} that you have completed the information to continue with the process.",
+    "context": "We informed {name} that you have completed the information to continue with the process."
   },
   {
     "term": "petition-completing-message-subject",
