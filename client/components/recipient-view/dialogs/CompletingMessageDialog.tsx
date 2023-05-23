@@ -201,9 +201,6 @@ function CompletingMessageDialog({
                   />
                 </Text>
               </Button>
-              <Button colorScheme="primary" onClick={() => props.onResolve()}>
-                <FormattedMessage id="generic.close" defaultMessage="Close" />
-              </Button>
             </Flex>
           </Flex>
         </ModalFooter>
