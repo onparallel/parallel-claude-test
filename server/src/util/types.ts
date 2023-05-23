@@ -10,6 +10,8 @@ export type Maybe<T> = T | null;
 
 export type Replace<T, U extends Partial<Record<keyof T, any>>> = Omit<T, keyof U> & U;
 
+export type Prettify<T> = { [K in keyof T]: T[K] } & {};
+
 export type If<Condition extends boolean | undefined, Then, Else = never> = Condition extends true
   ? Then
   : Else;

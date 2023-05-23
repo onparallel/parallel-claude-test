@@ -3,6 +3,7 @@ import { isPossiblePhoneNumber } from "libphonenumber-js";
 import { isDefined, uniq } from "remeda";
 import { TableTypes } from "../../db/helpers/BaseRepository";
 import { validateProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
+import { discriminator } from "../../util/discriminator";
 import { fromGlobalId } from "../../util/globalId";
 import { parseTextWithPlaceholders } from "../../util/textWithPlaceholders";
 import { isValidDate } from "../../util/time";
@@ -26,8 +27,8 @@ export function validProfileNamePattern<
     const pattern = args[profileNamePatternArg] as unknown as Maybe<string>;
     if (isDefined(pattern)) {
       const fieldIds = parseTextWithPlaceholders(pattern)
-        .filter((p) => p.type === "placeholder")
-        .map((p) => fromGlobalId(p.value!, "ProfileTypeField").id);
+        .filter(discriminator("type", "placeholder"))
+        .map((p) => fromGlobalId(p.value, "ProfileTypeField").id);
       const fields = await ctx.profiles.loadProfileTypeField(uniq(fieldIds));
       if (
         fields.length === 0 ||
