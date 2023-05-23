@@ -710,6 +710,16 @@
     "context": "{recipient} completed {parallelName} 🎉"
   },
   {
+    "term": "petition-completing-message-body",
+    "definition": "Hemos notificado a {name} que recibirá la información para poder continuar con el proceso.",
+    "context": "We have notified {name} that they will receive the information in order to continue with the process."
+  },
+  {
+    "term": "petition-completing-message-subject",
+    "definition": "Gracias por completar",
+    "context": "Thank you for completing"
+  },
+  {
     "term": "petition-excel-export.comments",
     "definition": "Comentarios",
     "context": "Comments"

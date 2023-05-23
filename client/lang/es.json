@@ -505,6 +505,21 @@
     "context": "When finishing, the parallel will remain closed. You can come back anytime to review the information."
   },
   {
+    "term": "component.completing-message-dialog.go-to-pending-processes-button",
+    "definition": "Ir a mis procesos pendientes",
+    "context": "Go to my pending processes"
+  },
+  {
+    "term": "component.completing-message-dialog.go-to-processes-button",
+    "definition": "Ir a mis procesos",
+    "context": "Go to my processes"
+  },
+  {
+    "term": "component.completing-message-dialog.pending-processes-count",
+    "definition": "{tone, select, INFORMAL{Tienes} other{Tiene}} {count, plural, =1{# proceso pendiente} other{# procesos pendientes}}",
+    "context": "You have {count, plural, =1{# pending process} other{# pending processes}}"
+  },
+  {
     "term": "component.configure-reminder-settings-dialog.header",
     "definition": "Configurar recordatorios automáticos",
     "context": "Configure automatic reminders"

@@ -139,6 +139,10 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
               showCompletingMessageDialog({
                 petition,
                 granter,
+                hasClientPortalAccess: access.hasClientPortalAccess,
+                pendingPetitions: pending,
+                keycode,
+                tone,
               })
             );
           }

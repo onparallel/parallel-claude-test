@@ -14,9 +14,8 @@ import {
 } from "nexus";
 import { outdent } from "outdent";
 import pMap from "p-map";
+import { DatabaseError } from "pg";
 import { isDefined, omit, sumBy, uniq, zip } from "remeda";
-import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
-import { isValueCompatible } from "../../../db/helpers/utils";
 import {
   CreatePetition,
   CreatePetitionField,
@@ -24,13 +23,18 @@ import {
   Petition,
   PetitionPermission,
 } from "../../../db/__types";
+import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
+import { isValueCompatible } from "../../../db/helpers/utils";
 import { chunkWhile, unMaybeArray } from "../../../util/arrays";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { pFlatMap } from "../../../util/promises/pFlatMap";
 import { withError } from "../../../util/promises/withError";
+import { parseTextWithPlaceholders } from "../../../util/textWithPlaceholders";
 import { hash, random } from "../../../util/token";
 import { userHasAccessToContactGroups } from "../../contact/authorizers";
+import { RESULT } from "../../helpers/Result";
+import { SUCCESS } from "../../helpers/Success";
 import {
   and,
   argIsDefined,
@@ -43,10 +47,8 @@ import {
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { importFromExcel } from "../../helpers/importDataFromExcel";
 import { parseDynamicSelectValues } from "../../helpers/parseDynamicSelectValues";
-import { RESULT } from "../../helpers/Result";
 import { datetimeArg } from "../../helpers/scalars/DateTime";
 import { jsonArg, jsonObjectArg } from "../../helpers/scalars/JSON";
-import { SUCCESS } from "../../helpers/Success";
 import { uploadArg } from "../../helpers/scalars/Upload";
 import { validateAnd, validateIf, validateIfDefined, validateOr } from "../../helpers/validateArgs";
 import { inRange } from "../../helpers/validators/inRange";
@@ -55,8 +57,6 @@ import { maxLength } from "../../helpers/validators/maxLength";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
 import { notEmptyString } from "../../helpers/validators/notEmptyString";
-import { validateFile } from "../../helpers/validators/validateFile";
-import { validateRegex } from "../../helpers/validators/validateRegex";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 import { validFieldVisibilityJson } from "../../helpers/validators/validFieldVisibility";
 import { validFolderId } from "../../helpers/validators/validFolderId";
@@ -65,6 +65,8 @@ import { validPath } from "../../helpers/validators/validPath";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
 import { validSignatureConfig } from "../../helpers/validators/validSignatureConfig";
+import { validateFile } from "../../helpers/validators/validateFile";
+import { validateRegex } from "../../helpers/validators/validateRegex";
 import { userHasAccessToOrganizationTheme } from "../../organization/authorizers";
 import { contextUserHasRole } from "../../users/authorizers";
 import {
@@ -102,7 +104,6 @@ import {
   userHasAccessToPublicPetitionLink,
   userHasAccessToUserOrUserGroupPermissions,
 } from "./authorizers";
-import { DatabaseError } from "pg";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create parallel.",
@@ -209,6 +210,7 @@ export const createPetition = mutationField("createPetition", {
         });
       }
     } else {
+      const intl = await ctx.i18n.getIntl(locale!);
       petition = await ctx.petitions.createPetition(
         {
           name,
@@ -216,6 +218,34 @@ export const createPetition = mutationField("createPetition", {
           email_subject: name,
           is_template: isTemplate,
           path: path ?? undefined,
+          ...(isTemplate
+            ? {
+                is_completing_message_enabled: true,
+                completing_message_subject: intl.formatMessage({
+                  id: "petition-completing-message-subject",
+                  defaultMessage: "Thank you for completing",
+                }),
+                completing_message_body: JSON.stringify([
+                  {
+                    type: "paragraph",
+                    children: parseTextWithPlaceholders(
+                      intl.formatMessage(
+                        {
+                          id: "petition-completing-message-body",
+                          defaultMessage:
+                            "We have notified {name} that they will receive the information in order to continue with the process.",
+                        },
+                        { name: "{{ user-first-name }}" }
+                      )
+                    ).map((p) =>
+                      p.type === "text"
+                        ? { text: p.text }
+                        : { type: "placeholder", placeholder: p.value, children: [{ text: "" }] }
+                    ),
+                  },
+                ]),
+              }
+            : {}),
         },
         ctx.user!
       );

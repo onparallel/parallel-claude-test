@@ -13,13 +13,15 @@ import {
   ModalHeader,
   Text,
 } from "@chakra-ui/react";
-import { CircleCheckFilledIcon } from "@parallel/chakra/icons";
+import { CircleCheckFilledIcon, TimeIcon } from "@parallel/chakra/icons";
 import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Divider } from "@parallel/components/common/Divider";
 import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
-import { Link, NormalLink } from "@parallel/components/common/Link";
+import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import {
+  Tone,
   useCompletingMessageDialog_PublicPetitionFragment,
   useCompletingMessageDialog_PublicUserFragment,
 } from "@parallel/graphql/__types";
@@ -28,11 +30,19 @@ import { FormattedMessage, useIntl } from "react-intl";
 function CompletingMessageDialog({
   petition,
   granter,
+  hasClientPortalAccess,
+  pendingPetitions,
+  keycode,
+  tone,
   ...props
 }: DialogProps<
   {
     petition: useCompletingMessageDialog_PublicPetitionFragment;
     granter: useCompletingMessageDialog_PublicUserFragment;
+    hasClientPortalAccess: boolean;
+    pendingPetitions: number;
+    keycode: string;
+    tone: Tone;
   },
   void
 >) {
@@ -91,14 +101,51 @@ function CompletingMessageDialog({
               {petition.completingMessageSubject}
             </Text>
           ) : null}
+
           {petition.completingMessageBody ? (
             <HtmlBlock
               dangerousInnerHtml={petition.completingMessageBody}
               fontSize="16px"
-              marginBottom={4}
+              marginBottom={10}
               textAlign="center"
-              minHeight="200px"
+              minHeight="100px"
             />
+          ) : null}
+          {hasClientPortalAccess ? (
+            <>
+              <Divider borderColor="gray.200" width="100%" />
+              <Flex padding={6} gap={6} wrap="wrap" justify="center">
+                {pendingPetitions ? (
+                  <HStack>
+                    <TimeIcon color="yellow.600" />
+                    <Text>
+                      <FormattedMessage
+                        id="component.completing-message-dialog.pending-processes-count"
+                        defaultMessage="You have {count, plural, =1{# pending process} other{# pending processes}}"
+                        values={{ count: pendingPetitions, tone }}
+                      />
+                    </Text>
+                  </HStack>
+                ) : null}
+                <NakedLink
+                  href={`/petition/${keycode}/home${pendingPetitions ? "?status=PENDING" : ""}`}
+                >
+                  <Button colorScheme="primary">
+                    {pendingPetitions ? (
+                      <FormattedMessage
+                        id="component.completing-message-dialog.go-to-pending-processes-button"
+                        defaultMessage="Go to my pending processes"
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="component.completing-message-dialog.go-to-processes-button"
+                        defaultMessage="Go to my processes"
+                      />
+                    )}
+                  </Button>
+                </NakedLink>
+              </Flex>
+            </>
           ) : null}
         </ModalBody>
 

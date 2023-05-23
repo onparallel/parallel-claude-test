@@ -1,4 +1,6 @@
-export function parseTextWithPlaceholders(text: string) {
+export function parseTextWithPlaceholders(
+  text: string
+): ({ type: "placeholder"; value: string } | { type: "text"; text: string })[] {
   const parts = text.split(new RegExp(`(\\{\\{(?:[^{}]+)}})`, "g"));
 
   return parts.map((part) => {
