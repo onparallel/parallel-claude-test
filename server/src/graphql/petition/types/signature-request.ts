@@ -1,4 +1,5 @@
 import { enumType, objectType } from "nexus";
+import { isDefined } from "remeda";
 
 export const PetitionSignatureRequestStatus = enumType({
   name: "PetitionSignatureRequestStatus",
@@ -94,8 +95,16 @@ export const PetitionSignatureRequest = objectType({
       },
     });
     t.nullable.string("errorMessage", {
-      resolve: (o) => {
-        return o.cancel_reason === "REQUEST_ERROR" ? o.cancel_data?.error ?? null : null;
+      resolve: ({ data }) => {
+        // expose error message only for specific errors
+        return data.cancel_reason === "REQUEST_ERROR" &&
+          isDefined(data.cancel_data.error_code) &&
+          ["SIGNATURIT_ACCOUNT_DEPLETED_CREDITS", "EMAIL_BOUNCED"].includes(
+            data.cancel_data.error_code
+          ) &&
+          typeof data.cancel_data.error === "string"
+          ? data.cancel_data.error ?? null
+          : null;
       },
     });
     t.nullable.json("extraErrorData", {
