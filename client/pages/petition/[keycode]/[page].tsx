@@ -50,7 +50,7 @@ import useResizeObserver from "@react-hook/resize-observer";
 import { AnimatePresence } from "framer-motion";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
@@ -74,6 +74,10 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
   const pending = access.hasClientPortalAccess
     ? accesessData!.pending.totalCount - (access.petition.status === "PENDING" ? 1 : 0)
     : 0;
+
+  useEffect(() => {
+    refetchAccessesCount();
+  }, [access.petition.status]);
 
   const petition = access!.petition!;
   const granter = access!.granter!;
@@ -146,7 +150,6 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
               })
             );
           }
-          refetchAccessesCount();
         } else {
           // go to first repliable field without replies
           let page = 1;
@@ -184,7 +187,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
         }
       }
     },
-    [petition.fields, visibility, granter, router.query, refetchAccessesCount]
+    [petition.fields, visibility, granter, router.query, pending]
   );
 
   const [sidebarTop, setSidebarTop] = useState(0);
@@ -227,7 +230,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
               message={message}
               recipients={recipients}
               hasClientPortalAccess={access.hasClientPortalAccess}
-              pendingPetitions={pending}
+              pendingPetitions={accesessData!.pending.totalCount}
               keycode={keycode}
               isClosed={["COMPLETED", "CLOSED"].includes(petition.status)}
             />

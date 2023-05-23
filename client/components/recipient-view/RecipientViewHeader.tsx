@@ -302,7 +302,7 @@ export const RecipientViewHeader = Object.assign(
                         size="md"
                         getInitials={contact.initials ? () => contact.initials! : undefined}
                       />
-                      {pendingPetitions ? (
+                      {pendingPetitions > 0 ? (
                         <Circle
                           size="16px"
                           background="yellow.500"
