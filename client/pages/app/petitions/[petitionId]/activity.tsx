@@ -147,7 +147,10 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const handleSendReminders = useCallback(
     async (accesses: PetitionAccessTable_PetitionAccessFragment[]) => {
       try {
-        const { message } = await confirmSendReminder({ accesses });
+        const { message } = await confirmSendReminder({
+          accesses,
+          petitionStatus: petition.status,
+        });
         try {
           const accessIds = accesses.map((selected) => selected.id);
           await sendReminders({

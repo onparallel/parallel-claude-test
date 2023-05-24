@@ -38,7 +38,7 @@ export async function petitionReminder(
     if (!petition) {
       return; // if the petition was deleted, return without throwing error
     }
-    if (petition.status !== "PENDING") {
+    if (!["PENDING", "COMPLETED"].includes(petition.status!)) {
       throw new Error(
         `Can not sent reminder for petition ${access.petition_id} with status "${petition.status}"`
       );

@@ -114,7 +114,7 @@ export function PetitionAccessesTable({
                   <MenuList minWidth="160px">
                     <MenuItem
                       isDisabled={
-                        petition.status !== "PENDING" ||
+                        petition.status === "CLOSED" ||
                         selected.some((a) => a.status === "INACTIVE")
                       }
                       onClick={handleSendReminders}
@@ -394,7 +394,7 @@ function usePetitionAccessesColumns(): TableColumn<
                 <>
                   <IconButtonWithTooltip
                     isDisabled={
-                      petition.status !== "PENDING" ||
+                      petition.status === "CLOSED" ||
                       petition.isAnonymized ||
                       myEffectivePermission === "READ"
                     }

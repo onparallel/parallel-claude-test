@@ -4769,8 +4769,8 @@ describe("GraphQL/Petitions", () => {
       await mocks.knex.from("petition_access").where("id", access.id).update("reminders_left", 10);
     });
 
-    it("sends error if petition is not pending", async () => {
-      await mocks.knex.from("petition").where("id", petition.id).update("status", "COMPLETED");
+    it("sends error if petition is CLOSED", async () => {
+      await mocks.knex.from("petition").where("id", petition.id).update("status", "CLOSED");
 
       const { errors, data } = await testClient.execute(
         gql`

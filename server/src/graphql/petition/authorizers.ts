@@ -570,7 +570,9 @@ export function signatureRequestIsNotAnonymized<
 }
 
 export const petitionHasStatus = createPetitionAuthorizer(
-  (petition, status: PetitionStatus) => petition.status === status
+  (petition, status: MaybeArray<PetitionStatus>) => {
+    return !petition.is_template && unMaybeArray(status).includes(petition.status!);
+  }
 );
 
 export function userHasPermissionInFolders<

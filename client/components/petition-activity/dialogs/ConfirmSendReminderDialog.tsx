@@ -18,7 +18,10 @@ import {
   RichTextEditor,
   RichTextEditorInstance,
 } from "@parallel/components/common/slate/RichTextEditor";
-import { PetitionAccessTable_PetitionAccessFragment } from "@parallel/graphql/__types";
+import {
+  PetitionAccessTable_PetitionAccessFragment,
+  PetitionStatus,
+} from "@parallel/graphql/__types";
 import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
 import { emptyRTEValue } from "@parallel/utils/slate/RichTextEditor/emptyRTEValue";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
@@ -28,9 +31,10 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 export function ConfirmSendReminderDialog({
   accesses,
+  petitionStatus,
   ...props
 }: DialogProps<
-  { accesses: PetitionAccessTable_PetitionAccessFragment[] },
+  { accesses: PetitionAccessTable_PetitionAccessFragment[]; petitionStatus: PetitionStatus },
   { message: null | RichTextEditorValue }
 >) {
   const intl = useIntl();
@@ -87,10 +91,17 @@ export function ConfirmSendReminderDialog({
             </Alert>
           ) : null}
           <Text>
-            <FormattedMessage
-              id="component.confirm-send-reminder-dialog.body"
-              defaultMessage="Are you sure you want to send a reminder to the selected contacts?"
-            />
+            {petitionStatus === "COMPLETED" ? (
+              <FormattedMessage
+                id="component.confirm-send-reminder-dialog.body-completed"
+                defaultMessage="This parallel has already been completed, are you sure you want to send a reminder to the selected contacts?"
+              />
+            ) : (
+              <FormattedMessage
+                id="component.confirm-send-reminder-dialog.body"
+                defaultMessage="Are you sure you want to send a reminder to the selected contacts?"
+              />
+            )}
           </Text>
           <Stack>
             <Checkbox

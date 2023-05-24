@@ -1637,7 +1637,7 @@ export const sendReminders = mutationField("sendReminders", {
     accessesHaveStatus("accessIds", "ACTIVE"),
     accessesHaveRemindersLeft("accessIds"),
     petitionIsNotAnonymized("petitionId"),
-    petitionHasStatus("petitionId", "PENDING")
+    petitionHasStatus("petitionId", ["PENDING", "COMPLETED"])
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),

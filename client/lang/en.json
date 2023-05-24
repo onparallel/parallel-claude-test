@@ -870,6 +870,11 @@
     "context": "Are you sure you want to send a reminder to the selected contacts?"
   },
   {
+    "term": "component.confirm-send-reminder-dialog.body-completed",
+    "definition": "This parallel has already been completed, are you sure you want to send a reminder to the selected contacts?",
+    "context": "This parallel has already been completed, are you sure you want to send a reminder to the selected contacts?"
+  },
+  {
     "term": "component.confirm-send-reminder-dialog.confirm",
     "definition": "Yes, send",
     "context": "Yes, send"
