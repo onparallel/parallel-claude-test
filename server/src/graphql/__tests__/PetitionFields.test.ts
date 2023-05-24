@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import gql from "graphql-tag";
 import { Knex } from "knex";
 import { pick } from "remeda";
-import { defaultFieldOptions } from "../../db/helpers/fieldOptions";
+import { defaultFieldProperties } from "../../db/helpers/fieldOptions";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
@@ -102,6 +102,7 @@ describe("GraphQL/Petition Fields", () => {
                   options
                   hasCommentsEnabled
                   isReadOnly
+                  requireApproval
                   replies {
                     id
                   }
@@ -138,6 +139,7 @@ describe("GraphQL/Petition Fields", () => {
                 maxLength: null,
               },
               isReadOnly: false,
+              requireApproval: true,
               replies: [],
               comments: [],
             },
@@ -164,6 +166,7 @@ describe("GraphQL/Petition Fields", () => {
                   options
                   hasCommentsEnabled
                   isReadOnly
+                  requireApproval
                   replies {
                     id
                   }
@@ -195,6 +198,7 @@ describe("GraphQL/Petition Fields", () => {
               optional: true,
               multiple: false,
               hasCommentsEnabled: false,
+              requireApproval: false,
               options: {
                 hasPageBreak: false,
               },
@@ -225,6 +229,7 @@ describe("GraphQL/Petition Fields", () => {
                   hasCommentsEnabled
                   options
                   isReadOnly
+                  requireApproval
                   replies {
                     id
                   }
@@ -256,6 +261,7 @@ describe("GraphQL/Petition Fields", () => {
               optional: false,
               multiple: true,
               hasCommentsEnabled: true,
+              requireApproval: true,
               options: {
                 accepts: null,
                 attachToPdf: false,
@@ -1042,7 +1048,7 @@ describe("GraphQL/Petition Fields", () => {
         return {
           type,
           is_fixed: index === 0,
-          options: defaultFieldOptions(type).options,
+          options: defaultFieldProperties(type).options,
         };
       });
 
@@ -1512,6 +1518,103 @@ describe("GraphQL/Petition Fields", () => {
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
+
+    it("sends error when trying to set the require approval option on a heading field", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: fieldGIDs[0], // HEADING
+          data: {
+            requireApproval: true,
+          },
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("changes the require approval option to false when setting field to internal", async () => {
+      expect(fields[1].require_approval).toBe(true);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              id
+              isInternal
+              requireApproval
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: fieldGIDs[1], // TEXT
+          data: {
+            isInternal: true,
+          },
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updatePetitionField).toEqual({
+        id: fieldGIDs[1],
+        isInternal: true,
+        requireApproval: false,
+      });
+    });
+
+    it("updates field reply status to PENDING if its APPROVED/REJECTED and field require_approval is set to false", async () => {
+      const [field] = await mocks.createRandomPetitionFields(userPetition.id, 1, () => ({
+        type: "TEXT",
+        require_approval: true,
+      }));
+
+      const [reply] = await mocks.createRandomTextReply(field.id, undefined, 1, () => ({
+        user_id: user.id,
+        content: { value: "abc" },
+        status: "APPROVED",
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              id
+              requireApproval
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", field.id),
+          data: {
+            requireApproval: false,
+          },
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updatePetitionField).toEqual({
+        id: toGlobalId("PetitionField", field.id),
+        requireApproval: false,
+      });
+
+      const [updatedReply] = await mocks.knex
+        .from("petition_field_reply")
+        .where("id", reply.id)
+        .select("*");
+
+        expect(updatedReply).toMatchObject({
+          status: "PENDING",
+        })
+    });
   });
 
   describe("changePetitionFieldType", () => {
@@ -1840,6 +1943,7 @@ describe("GraphQL/Petition Fields", () => {
     let access: PetitionAccess;
     let fields: PetitionField[];
     let field2Replies: PetitionFieldReply[];
+    let field4Reply: PetitionFieldReply;
 
     beforeEach(async () => {
       [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
@@ -1847,14 +1951,19 @@ describe("GraphQL/Petition Fields", () => {
       [contact] = await mocks.createRandomContacts(organization.id, 1);
       [access] = await mocks.createPetitionAccess(petition.id, user.id, [contact.id], user.id);
 
-      fields = await mocks.createRandomPetitionFields(petition.id, 3, () => ({
+      fields = await mocks.createRandomPetitionFields(petition.id, 4, (index) => ({
         type: "TEXT",
         options: {
           placeholder: faker.random.words(3),
         },
+        require_approval: index === 3 ? false : true,
       }));
 
       field2Replies = await mocks.createRandomTextReply(fields[2].id, access.id, 2, () => ({
+        status: "PENDING",
+      }));
+
+      [field4Reply] = await mocks.createRandomTextReply(fields[3].id, access.id, 1, () => ({
         status: "PENDING",
       }));
     });
@@ -2095,17 +2204,47 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
     });
+
+    it("sends error if trying to update status of a reply on a field with require_approval set to false", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $petitionFieldReplyIds: [GID!]!
+            $status: PetitionFieldReplyStatus!
+          ) {
+            updatePetitionFieldRepliesStatus(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              petitionFieldReplyIds: $petitionFieldReplyIds
+              status: $status
+            ) {
+              id
+              petition {
+                id
+                ... on Petition {
+                  status
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fields[3].id),
+          petitionFieldReplyIds: [toGlobalId("PetitionFieldReply", field4Reply.id)],
+          status: "REJECTED",
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("approveOrRejectPetitionFieldReplies", () => {
     it("should send error when trying to update reply status with READ access", async () => {
-      const [readPetitionReply] = await mocks.createRandomTextReply(
-        readPetitionField.id,
-        undefined,
-        1,
-        () => ({ user_id: user.id })
-      );
-
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionId: GID!, $status: PetitionFieldReplyStatus!) {
@@ -2121,6 +2260,66 @@ describe("GraphQL/Petition Fields", () => {
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
+    });
+
+    it("changes status of replies of fields with require_approval set to true", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const fields = await mocks.createRandomPetitionFields(petition.id, 2, (i) => ({
+        type: "TEXT",
+        require_approval: i === 0,
+      }));
+      const field0Replies = await mocks.createRandomTextReply(fields[0].id, undefined, 2, () => ({
+        user_id: user.id,
+        content: { value: "aaaa" },
+        status: "PENDING",
+      }));
+      const field1Replies = await mocks.createRandomTextReply(fields[1].id, undefined, 1, () => ({
+        user_id: user.id,
+        content: { value: "bbbb" },
+        status: "PENDING",
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $status: PetitionFieldReplyStatus!) {
+            approveOrRejectPetitionFieldReplies(petitionId: $petitionId, status: $status) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          status: "APPROVED",
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.approveOrRejectPetitionFieldReplies).toEqual({
+        id: toGlobalId("Petition", petition.id),
+      });
+
+      const field0UpdatedReplies = await mocks.knex
+        .from("petition_field_reply")
+        .whereIn(
+          "id",
+          field0Replies.map((r) => r.id)
+        )
+        .select("*");
+
+      const field1UpdatedReplies = await mocks.knex
+        .from("petition_field_reply")
+        .whereIn(
+          "id",
+          field1Replies.map((r) => r.id)
+        )
+        .select("*");
+
+      expect(field0UpdatedReplies).toMatchObject([
+        { id: field0Replies[0].id, status: "APPROVED" },
+        { id: field0Replies[1].id, status: "APPROVED" },
+      ]);
+
+      expect(field1UpdatedReplies).toMatchObject([{ id: field1Replies[0].id, status: "PENDING" }]);
     });
   });
 });

@@ -2718,6 +2718,8 @@ export interface PetitionField {
   previewReplies: Array<PetitionFieldReply>;
   /** The replies to the petition field */
   replies: Array<PetitionFieldReply>;
+  /** Determines if the field needs to be approved. */
+  requireApproval: Scalars["Boolean"];
   /** Determines if the field last activity is visible in PDF export. */
   showActivityInPdf: Scalars["Boolean"];
   /** Determines if the field is visible in PDF export. */
@@ -4654,6 +4656,7 @@ export interface UpdatePetitionFieldInput {
   multiple?: InputMaybe<Scalars["Boolean"]>;
   optional?: InputMaybe<Scalars["Boolean"]>;
   options?: InputMaybe<Scalars["JSONObject"]>;
+  requireApproval?: InputMaybe<Scalars["Boolean"]>;
   showActivityInPdf?: InputMaybe<Scalars["Boolean"]>;
   showInPdf?: InputMaybe<Scalars["Boolean"]>;
   title?: InputMaybe<Scalars["String"]>;
@@ -12062,6 +12065,7 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   visibility?: { [key: string]: any } | null;
   alias?: string | null;
   hasCommentsEnabled: boolean;
+  requireApproval: boolean;
 };
 
 export type SettingsRowAlias_PetitionFieldFragment = {
@@ -13465,6 +13469,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
       id: string;
       type: PetitionFieldType;
       options: { [key: string]: any };
+      requireApproval: boolean;
     } | null;
     updatedBy?:
       | {
@@ -13512,6 +13517,7 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
     id: string;
     type: PetitionFieldType;
     options: { [key: string]: any };
+    requireApproval: boolean;
   } | null;
   updatedBy?:
     | {
@@ -13694,6 +13700,7 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
     id: string;
     type: PetitionFieldType;
     options: { [key: string]: any };
+    requireApproval: boolean;
   } | null;
   updatedBy?:
     | {
@@ -21181,6 +21188,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     position: number;
     alias?: string | null;
     hasCommentsEnabled: boolean;
+    requireApproval: boolean;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
@@ -21306,6 +21314,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     position: number;
     alias?: string | null;
     hasCommentsEnabled: boolean;
+    requireApproval: boolean;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
       id: string;
@@ -21420,6 +21429,7 @@ export type PetitionCompose_PetitionFieldFragment = {
   position: number;
   alias?: string | null;
   hasCommentsEnabled: boolean;
+  requireApproval: boolean;
   attachments: Array<{
     __typename?: "PetitionFieldAttachment";
     id: string;
@@ -21750,6 +21760,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
     position: number;
     alias?: string | null;
     hasCommentsEnabled: boolean;
+    requireApproval: boolean;
     petition:
       | {
           __typename?: "Petition";
@@ -21829,6 +21840,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
     position: number;
     alias?: string | null;
     hasCommentsEnabled: boolean;
+    requireApproval: boolean;
     petition:
       | {
           __typename?: "Petition";
@@ -21953,6 +21965,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
     position: number;
     alias?: string | null;
     hasCommentsEnabled: boolean;
+    requireApproval: boolean;
     petition:
       | { __typename?: "Petition"; status: PetitionStatus; id: string; updatedAt: string }
       | { __typename?: "PetitionTemplate"; id: string; updatedAt: string };
@@ -22003,6 +22016,7 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
     position: number;
     alias?: string | null;
     hasCommentsEnabled: boolean;
+    requireApproval: boolean;
     petition:
       | { __typename?: "Petition"; status: PetitionStatus; id: string; updatedAt: string }
       | { __typename?: "PetitionTemplate"; id: string; updatedAt: string };
@@ -22183,6 +22197,7 @@ export type PetitionCompose_petitionQuery = {
           position: number;
           alias?: string | null;
           hasCommentsEnabled: boolean;
+          requireApproval: boolean;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
             id: string;
@@ -22322,6 +22337,7 @@ export type PetitionCompose_petitionQuery = {
           position: number;
           alias?: string | null;
           hasCommentsEnabled: boolean;
+          requireApproval: boolean;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
             id: string;
@@ -24494,6 +24510,7 @@ export type PetitionReplies_PetitionFragment = {
     alias?: string | null;
     isReadOnly: boolean;
     optional: boolean;
+    requireApproval: boolean;
     options: { [key: string]: any };
     visibility?: { [key: string]: any } | null;
     title?: string | null;
@@ -24518,6 +24535,7 @@ export type PetitionReplies_PetitionFragment = {
         id: string;
         type: PetitionFieldType;
         options: { [key: string]: any };
+        requireApproval: boolean;
       } | null;
       updatedBy?:
         | {
@@ -24689,6 +24707,7 @@ export type PetitionReplies_PetitionFragment = {
 export type PetitionReplies_PetitionFieldFragment = {
   __typename?: "PetitionField";
   isReadOnly: boolean;
+  requireApproval: boolean;
   id: string;
   type: PetitionFieldType;
   title?: string | null;
@@ -24713,6 +24732,7 @@ export type PetitionReplies_PetitionFieldFragment = {
       id: string;
       type: PetitionFieldType;
       options: { [key: string]: any };
+      requireApproval: boolean;
     } | null;
     updatedBy?:
       | {
@@ -24927,6 +24947,7 @@ export type PetitionReplies_closePetitionMutation = {
       alias?: string | null;
       isReadOnly: boolean;
       optional: boolean;
+      requireApproval: boolean;
       options: { [key: string]: any };
       visibility?: { [key: string]: any } | null;
       title?: string | null;
@@ -24951,6 +24972,7 @@ export type PetitionReplies_closePetitionMutation = {
           id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
+          requireApproval: boolean;
         } | null;
         updatedBy?:
           | {
@@ -25158,6 +25180,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       alias?: string | null;
       isReadOnly: boolean;
       optional: boolean;
+      requireApproval: boolean;
       options: { [key: string]: any };
       visibility?: { [key: string]: any } | null;
       title?: string | null;
@@ -25182,6 +25205,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
           id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
+          requireApproval: boolean;
         } | null;
         updatedBy?:
           | {
@@ -25495,6 +25519,7 @@ export type PetitionReplies_petitionQuery = {
           alias?: string | null;
           isReadOnly: boolean;
           optional: boolean;
+          requireApproval: boolean;
           options: { [key: string]: any };
           visibility?: { [key: string]: any } | null;
           title?: string | null;
@@ -25519,6 +25544,7 @@ export type PetitionReplies_petitionQuery = {
               id: string;
               type: PetitionFieldType;
               options: { [key: string]: any };
+              requireApproval: boolean;
             } | null;
             updatedBy?:
               | {
@@ -33640,6 +33666,7 @@ export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
     visibility
     alias
     hasCommentsEnabled
+    requireApproval
     ...SettingsRowAlias_PetitionField
   }
   ${SettingsRowAlias_PetitionFieldFragmentDoc}
@@ -34408,6 +34435,7 @@ export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
       id
       type
       options
+      requireApproval
     }
     updatedBy {
       ...UserOrContactReference_UserOrPetitionAccess
@@ -34493,6 +34521,7 @@ export const ExportRepliesDialog_PetitionFieldFragmentDoc = gql`
 export const PetitionReplies_PetitionFieldFragmentDoc = gql`
   fragment PetitionReplies_PetitionField on PetitionField {
     isReadOnly
+    requireApproval
     ...PetitionRepliesField_PetitionField
     ...PetitionContents_PetitionField
     ...PetitionRepliesFieldComments_PetitionField

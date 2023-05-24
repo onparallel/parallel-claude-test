@@ -283,7 +283,7 @@ export function validateFieldOptions(type: PetitionFieldType, options: any) {
   }
 }
 
-export function defaultFieldOptions(
+export function defaultFieldProperties(
   type: PetitionFieldType,
   field?: PetitionField
 ): Partial<CreatePetitionField> {
@@ -422,6 +422,8 @@ export function defaultFieldOptions(
     show_in_pdf: type === "DOW_JONES_KYC" ? false : field?.show_in_pdf ?? true,
     alias,
     has_comments_enabled: type === "HEADING" ? false : true,
+    require_approval:
+      type === "HEADING" || field?.is_internal ? false : field?.require_approval ?? true,
     options,
   };
 }

@@ -598,6 +598,10 @@ export const PetitionField = objectType({
       description: "Determines if the field accepts replies",
       resolve: ({ type }) => ["HEADING"].includes(type),
     });
+    t.boolean("requireApproval", {
+      description: "Determines if the field requires approval for the petition to be closed.",
+      resolve: (f) => f.type !== "HEADING" && f.require_approval,
+    });
     t.list.nonNull.field("replies", {
       type: "PetitionFieldReply",
       description: "The replies to the petition field",

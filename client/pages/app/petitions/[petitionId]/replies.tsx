@@ -396,14 +396,14 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       }
 
       const hasUnreviewedReplies = petition.fields.some((f) =>
-        f.replies.some((r) => r.status === "PENDING")
+        f.replies.some((r) => r.status === "PENDING" && f.requireApproval)
       );
 
       const option = hasUnreviewedReplies ? await showSolveUnreviewedRepliesDialog() : "APPROVE";
 
       await handleFinishPetition({ requiredMessage: false });
 
-      if (hasUnreviewedReplies)
+      if (hasUnreviewedReplies && option !== "NOTHING")
         await approveOrRejectReplies({
           variables: {
             petitionId,
@@ -703,6 +703,7 @@ PetitionReplies.fragments = {
     return gql`
       fragment PetitionReplies_PetitionField on PetitionField {
         isReadOnly
+        requireApproval
         ...PetitionRepliesField_PetitionField
         ...PetitionContents_PetitionField
         ...PetitionRepliesFieldComments_PetitionField

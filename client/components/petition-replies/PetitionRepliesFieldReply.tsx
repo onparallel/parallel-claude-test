@@ -243,38 +243,45 @@ export function PetitionRepliesFieldReply({
           )}
         </GridItem>
       </Grid>
-      <Stack direction="row" spacing={1} alignSelf="flex-start" data-section="approve-reject-reply">
-        <IconButtonWithTooltip
-          data-action="approve-reply"
-          icon={<CheckIcon />}
-          label={intl.formatMessage({
-            id: "petition-replies.petition-field-reply.approve",
-            defaultMessage: "Approve",
-          })}
-          size="xs"
-          placement="bottom"
-          colorScheme={reply.status === "APPROVED" ? "green" : "gray"}
-          role="switch"
-          aria-checked={reply.status === "APPROVED"}
-          onClick={() => onUpdateStatus(reply.status === "APPROVED" ? "PENDING" : "APPROVED")}
-          isDisabled={isDisabled || reply.isAnonymized}
-        />
-        <IconButtonWithTooltip
-          data-action="reject-reply"
-          icon={<CloseIcon />}
-          label={intl.formatMessage({
-            id: "petition-replies.petition-field-reply.reject",
-            defaultMessage: "Reject",
-          })}
-          size="xs"
-          placement="bottom"
-          role="switch"
-          colorScheme={reply.status === "REJECTED" ? "red" : "gray"}
-          aria-checked={reply.status === "REJECTED"}
-          onClick={() => onUpdateStatus(reply.status === "REJECTED" ? "PENDING" : "REJECTED")}
-          isDisabled={isDisabled || reply.isAnonymized}
-        />
-      </Stack>
+      {reply.field?.requireApproval ? (
+        <Stack
+          direction="row"
+          spacing={1}
+          alignSelf="flex-start"
+          data-section="approve-reject-reply"
+        >
+          <IconButtonWithTooltip
+            data-action="approve-reply"
+            icon={<CheckIcon />}
+            label={intl.formatMessage({
+              id: "petition-replies.petition-field-reply.approve",
+              defaultMessage: "Approve",
+            })}
+            size="xs"
+            placement="bottom"
+            colorScheme={reply.status === "APPROVED" ? "green" : "gray"}
+            role="switch"
+            aria-checked={reply.status === "APPROVED"}
+            onClick={() => onUpdateStatus(reply.status === "APPROVED" ? "PENDING" : "APPROVED")}
+            isDisabled={isDisabled || reply.isAnonymized}
+          />
+          <IconButtonWithTooltip
+            data-action="reject-reply"
+            icon={<CloseIcon />}
+            label={intl.formatMessage({
+              id: "petition-replies.petition-field-reply.reject",
+              defaultMessage: "Reject",
+            })}
+            size="xs"
+            placement="bottom"
+            role="switch"
+            colorScheme={reply.status === "REJECTED" ? "red" : "gray"}
+            aria-checked={reply.status === "REJECTED"}
+            onClick={() => onUpdateStatus(reply.status === "REJECTED" ? "PENDING" : "REJECTED")}
+            isDisabled={isDisabled || reply.isAnonymized}
+          />
+        </Stack>
+      ) : null}
     </HStack>
   );
 }
@@ -291,6 +298,7 @@ PetitionRepliesFieldReply.fragments = {
         id
         type
         options
+        requireApproval
       }
       updatedBy {
         ...UserOrContactReference_UserOrPetitionAccess

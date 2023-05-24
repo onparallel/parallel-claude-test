@@ -290,6 +290,7 @@ export interface NexusGenInputs {
     multiple?: boolean | null; // Boolean
     optional?: boolean | null; // Boolean
     options?: NexusGenScalars["JSONObject"] | null; // JSONObject
+    requireApproval?: boolean | null; // Boolean
     showActivityInPdf?: boolean | null; // Boolean
     showInPdf?: boolean | null; // Boolean
     title?: string | null; // String
@@ -1884,6 +1885,7 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     position: number; // Int!
     replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
+    requireApproval: boolean; // Boolean!
     showActivityInPdf: boolean; // Boolean!
     showInPdf: boolean; // Boolean!
     title: string | null; // String
@@ -3885,6 +3887,7 @@ export interface NexusGenFieldTypeNames {
     petition: "PetitionBase";
     position: "Int";
     replies: "PetitionFieldReply";
+    requireApproval: "Boolean";
     showActivityInPdf: "Boolean";
     showInPdf: "Boolean";
     title: "String";

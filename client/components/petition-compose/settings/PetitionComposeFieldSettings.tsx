@@ -60,32 +60,6 @@ export const PetitionComposeFieldSettings = Object.assign(
 
       const commonSettings = (
         <>
-          {isOnlyInternal ? null : (
-            <SettingsRow
-              isDisabled={isReadOnly || field.isInternal}
-              label={
-                <FormattedMessage
-                  id="component.petition-settings.petition-comments-enable"
-                  defaultMessage="Allow comments"
-                />
-              }
-              controlId="enable-comments"
-            >
-              <Switch
-                height="20px"
-                display="block"
-                id="enable-comments"
-                color="green"
-                isChecked={field.isInternal ? false : field.hasCommentsEnabled}
-                onChange={(event) =>
-                  onFieldEdit(field.id, {
-                    hasCommentsEnabled: event.target.checked,
-                  })
-                }
-                isDisabled={isReadOnly || field.isInternal}
-              />
-            </SettingsRow>
-          )}
           <SettingsRow
             isDisabled={isReadOnly || field.isFixed || isOnlyInternal}
             label={
@@ -124,12 +98,71 @@ export const PetitionComposeFieldSettings = Object.assign(
                   onFieldEdit(field.id, {
                     isInternal: event.target.checked,
                     showInPdf: !event.target.checked,
+                    requireApproval: !event.target.checked,
                   })
                 }
                 isDisabled={isReadOnly || field.isFixed || isOnlyInternal}
               />
             </RestrictedFeaturePopover>
           </SettingsRow>
+          {isOnlyInternal ? null : (
+            <SettingsRow
+              isDisabled={isReadOnly || field.isInternal}
+              label={
+                <FormattedMessage
+                  id="component.petition-settings.petition-comments-enable"
+                  defaultMessage="Allow comments"
+                />
+              }
+              controlId="enable-comments"
+            >
+              <Switch
+                height="20px"
+                display="block"
+                id="enable-comments"
+                color="green"
+                isChecked={field.isInternal ? false : field.hasCommentsEnabled}
+                onChange={(event) =>
+                  onFieldEdit(field.id, {
+                    hasCommentsEnabled: event.target.checked,
+                  })
+                }
+                isDisabled={isReadOnly || field.isInternal}
+              />
+            </SettingsRow>
+          )}
+          {!["HEADING"].includes(field.type) && (
+            <SettingsRow
+              isDisabled={isReadOnly}
+              label={
+                <FormattedMessage
+                  id="component.petition-settings.include-approval"
+                  defaultMessage="Include approval"
+                />
+              }
+              description={
+                <FormattedMessage
+                  id="field-settings.include-approval-description"
+                  defaultMessage="Enabling this option will include the buttons for approving and rejecting replies."
+                />
+              }
+              controlId="include-approval"
+            >
+              <Switch
+                height="20px"
+                display="block"
+                id="include-approval"
+                color="green"
+                isChecked={field.requireApproval}
+                onChange={(event) =>
+                  onFieldEdit(field.id, {
+                    requireApproval: event.target.checked,
+                  })
+                }
+                isDisabled={isReadOnly}
+              />
+            </SettingsRow>
+          )}
           {isOnlyInternal ? null : (
             <>
               <SettingsRow
@@ -366,6 +399,7 @@ export const PetitionComposeFieldSettings = Object.assign(
           visibility
           alias
           hasCommentsEnabled
+          requireApproval
           ...SettingsRowAlias_PetitionField
         }
         ${SettingsRowAlias.fragments.PetitionField}

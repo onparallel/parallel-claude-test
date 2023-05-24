@@ -47,7 +47,7 @@ import {
   ReplyUpdatedEvent,
 } from "../events/PetitionEvent";
 import { BaseRepository, PageOpts, TableCreateTypes, TableTypes } from "../helpers/BaseRepository";
-import { defaultFieldOptions, validateFieldOptions } from "../helpers/fieldOptions";
+import { defaultFieldProperties, validateFieldOptions } from "../helpers/fieldOptions";
 import { escapeLike, isValueCompatible, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
@@ -1392,7 +1392,7 @@ export class PetitionRepository extends BaseRepository {
         await this.insert(
           "petition_field",
           (["HEADING", "SHORT_TEXT"] as PetitionFieldType[]).map((type, index) => ({
-            ...defaultFieldOptions(type),
+            ...defaultFieldProperties(type),
             petition_id: petition.id,
             type,
             is_fixed: type === "HEADING",
@@ -2095,7 +2095,12 @@ export class PetitionRepository extends BaseRepository {
     updater: User
   ) {
     const fields = await this.loadFieldsForPetition(petitionId);
-    const fieldIds = fields.flatMap((f) => f.id);
+    // only update reply status on fields that have require_approval set to true
+    const fieldIds = fields.filter((f) => f.require_approval).map((f) => f.id);
+
+    if (fieldIds.length === 0) {
+      return [];
+    }
 
     const replies = await this.from("petition_field_reply")
       .whereIn("petition_field_id", fieldIds)
@@ -2139,6 +2144,25 @@ export class PetitionRepository extends BaseRepository {
       },
       "*"
     );
+  }
+
+  async updatePetitionFieldReplyStatusesByPetitionFieldId(
+    petitionFieldId: number,
+    status: PetitionFieldReplyStatus,
+    updatedBy: string
+  ) {
+    return await this.from("petition_field_reply")
+      .where("petition_field_id", petitionFieldId)
+      .whereNot("status", status)
+      .whereNull("deleted_at")
+      .update(
+        {
+          status,
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*"
+      );
   }
 
   async completePetition(
@@ -3737,7 +3761,7 @@ export class PetitionRepository extends BaseRepository {
         fieldId,
         {
           type,
-          ...defaultFieldOptions(type, field),
+          ...defaultFieldProperties(type, field),
         },
         user,
         t

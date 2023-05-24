@@ -2643,6 +2643,8 @@ export type PetitionField = {
   position: Scalars["Int"];
   /** The replies to the petition field */
   replies: Array<PetitionFieldReply>;
+  /** Determines if the field requires approval for the petition to be closed. */
+  requireApproval: Scalars["Boolean"];
   /** Determines if the field last activity is visible in PDF export. */
   showActivityInPdf: Scalars["Boolean"];
   /** Determines if the field is visible in PDF export. */
@@ -4488,6 +4490,7 @@ export type UpdatePetitionFieldInput = {
   multiple?: InputMaybe<Scalars["Boolean"]>;
   optional?: InputMaybe<Scalars["Boolean"]>;
   options?: InputMaybe<Scalars["JSONObject"]>;
+  requireApproval?: InputMaybe<Scalars["Boolean"]>;
   showActivityInPdf?: InputMaybe<Scalars["Boolean"]>;
   showInPdf?: InputMaybe<Scalars["Boolean"]>;
   title?: InputMaybe<Scalars["String"]>;

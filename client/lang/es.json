@@ -3975,6 +3975,11 @@
     "context": "By enabling this, the contents card in the recipient view will be hidden."
   },
   {
+    "term": "component.petition-settings.include-approval",
+    "definition": "Incluir aprobación",
+    "context": "Include approval"
+  },
+  {
     "term": "component.petition-settings.link-copied-toast",
     "definition": "Enlace copiado al portapapeles",
     "context": "Link copied to clipboard"
@@ -6110,6 +6115,11 @@
     "context": "Approve unreviewed replies"
   },
   {
+    "term": "component.solve-unreviewed-replies-dialog.do-nothing",
+    "definition": "No hacer nada",
+    "context": "Do nothing"
+  },
+  {
     "term": "component.solve-unreviewed-replies-dialog.heading",
     "definition": "Hay algunas respuestas sin revisar",
     "context": "There are some unreviewed replies"
@@ -7198,6 +7208,11 @@
     "term": "field-settings.heading-page-break-visibility",
     "definition": "No se puede añadir saltos de página en secciones con condiciones de visibilidad",
     "context": "Can't add page breaks on headings with visibility conditions"
+  },
+  {
+    "term": "field-settings.include-approval-description",
+    "definition": "Al activar esta opción se incluirán los botones de aprovar y rechazar respuestas.",
+    "context": "Enabling this option will include the buttons for approving and rejecting replies."
   },
   {
     "term": "field-settings.internal-field-description",

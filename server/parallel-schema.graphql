@@ -3220,6 +3220,11 @@ type PetitionField {
   replies: [PetitionFieldReply!]!
 
   """
+  Determines if the field requires approval for the petition to be closed.
+  """
+  requireApproval: Boolean!
+
+  """
   Determines if the field last activity is visible in PDF export.
   """
   showActivityInPdf: Boolean!
@@ -6127,6 +6132,7 @@ input UpdatePetitionFieldInput {
   multiple: Boolean
   optional: Boolean
   options: JSONObject
+  requireApproval: Boolean
   showActivityInPdf: Boolean
   showInPdf: Boolean
   title: String

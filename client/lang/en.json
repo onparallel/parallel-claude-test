@@ -516,8 +516,8 @@
   },
   {
     "term": "component.completing-message-dialog.pending-processes-count",
-    "definition": "You have {pendingPetitions} pending processes",
-    "context": "You have {pendingPetitions} pending processes"
+    "definition": "You have {count, plural, =1{# pending process} other{# pending processes}}",
+    "context": "You have {count, plural, =1{# pending process} other{# pending processes}}"
   },
   {
     "term": "component.configure-reminder-settings-dialog.header",
@@ -3975,6 +3975,11 @@
     "context": "By enabling this, the contents card in the recipient view will be hidden."
   },
   {
+    "term": "component.petition-settings.include-approval",
+    "definition": "Include approval",
+    "context": "Include approval"
+  },
+  {
     "term": "component.petition-settings.link-copied-toast",
     "definition": "Link copied to clipboard",
     "context": "Link copied to clipboard"
@@ -6110,6 +6115,11 @@
     "context": "Approve unreviewed replies"
   },
   {
+    "term": "component.solve-unreviewed-replies-dialog.do-nothing",
+    "definition": "Do nothing",
+    "context": "Do nothing"
+  },
+  {
     "term": "component.solve-unreviewed-replies-dialog.heading",
     "definition": "There are some unreviewed replies",
     "context": "There are some unreviewed replies"
@@ -7198,6 +7208,11 @@
     "term": "field-settings.heading-page-break-visibility",
     "definition": "Can't add page breaks on headings with visibility conditions",
     "context": "Can't add page breaks on headings with visibility conditions"
+  },
+  {
+    "term": "field-settings.include-approval-description",
+    "definition": "Enabling this option will include the buttons for approving and rejecting replies.",
+    "context": "Enabling this option will include the buttons for approving and rejecting replies."
   },
   {
     "term": "field-settings.internal-field-description",

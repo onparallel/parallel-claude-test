@@ -196,3 +196,18 @@ export function verifyCaptcha<
     );
   };
 }
+
+/**
+ * negates the result of the given resolver
+ */
+export function not<TypeName extends string, FieldName extends string>(
+  resolver: FieldAuthorizeResolver<TypeName, FieldName>
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (root, args, ctx, info) => {
+    try {
+      return !(await resolver(root, args, ctx, info));
+    } catch {
+      return true;
+    }
+  };
+}

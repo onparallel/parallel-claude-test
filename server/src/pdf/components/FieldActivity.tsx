@@ -48,7 +48,7 @@ export function FieldActivity({
           }}
         />
       </Text>
-      {isDefined(reply.approvedBy) ? (
+      {isDefined(reply.approvedBy) && reply.field?.requireApproval ? (
         <View style={[{ flexDirection: "row", marginTop: "1mm" }]}>
           <Svg viewBox="0 0 14 14" style={{ width: "12px", height: "12px" }}>
             <Polygon
@@ -94,6 +94,9 @@ FieldActivity.fragments = {
         ...UserReference_User
       }
       approvedAt
+      field {
+        requireApproval
+      }
     }
     ${UserReference.fragments.User}
     ${UserOrContactReference.fragments.UserOrPetitionAccess}

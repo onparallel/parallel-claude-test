@@ -1119,6 +1119,7 @@ export interface PetitionField {
   show_in_pdf: boolean; // bool
   has_comments_enabled: boolean; // bool
   show_activity_in_pdf: boolean; // bool
+  require_approval: boolean; // bool
 }
 
 export type CreatePetitionField = PartialProps<
@@ -1143,6 +1144,7 @@ export type CreatePetitionField = PartialProps<
   | "show_in_pdf"
   | "has_comments_enabled"
   | "show_activity_in_pdf"
+  | "require_approval"
 >;
 
 export interface PetitionFieldAttachment {

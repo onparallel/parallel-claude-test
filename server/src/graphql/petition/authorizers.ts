@@ -348,6 +348,21 @@ export function repliesBelongsToField<
   };
 }
 
+export function replyStatusCanBeUpdated<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>
+>(argNameFieldId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const field = (await ctx.petitions.loadField(args[argNameFieldId] as unknown as number))!;
+      return field.require_approval;
+    } catch {
+      return false;
+    }
+  };
+}
+
 export function accessesBelongToPetition<
   TypeName extends string,
   FieldName extends string,

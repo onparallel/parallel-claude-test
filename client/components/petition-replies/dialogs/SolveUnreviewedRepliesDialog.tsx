@@ -1,12 +1,12 @@
 import { Box, Button, Flex, Radio, RadioGroup, Stack, Text, useTheme } from "@chakra-ui/react";
-import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
+import { CheckIcon, CloseIcon, ForbiddenIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import deepmerge from "deepmerge";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 
-type SolveUnreviewedRepliesDialogAction = "APPROVE" | "REJECT";
+type SolveUnreviewedRepliesDialogAction = "APPROVE" | "REJECT" | "NOTHING";
 
 export function SolveUnreviewedRepliesDialog(
   props: DialogProps<{}, SolveUnreviewedRepliesDialogAction>
@@ -96,6 +96,35 @@ export function SolveUnreviewedRepliesDialog(
                   <FormattedMessage
                     id="component.solve-unreviewed-replies-dialog.reject"
                     defaultMessage="Reject unreviewed replies"
+                  />
+                </Button>
+              </Radio>
+              <Radio
+                value="NOTHING"
+                isChecked={value === "NOTHING"}
+                size="lg"
+                styleConfig={radioStyleConfig}
+              >
+                <Button
+                  as="div"
+                  width="100%"
+                  justifyContent="flex-start"
+                  variant="outline"
+                  isActive={value === "NOTHING"}
+                >
+                  <Flex
+                    justifyContent="center"
+                    alignItems="center"
+                    backgroundColor="gray.400"
+                    borderRadius="md"
+                    boxSize={6}
+                    marginRight={2}
+                  >
+                    <ForbiddenIcon boxSize={4} color="white" />
+                  </Flex>
+                  <FormattedMessage
+                    id="component.solve-unreviewed-replies-dialog.do-nothing"
+                    defaultMessage="Do nothing"
                   />
                 </Button>
               </Radio>

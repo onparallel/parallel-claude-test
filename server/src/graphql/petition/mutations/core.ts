@@ -23,7 +23,7 @@ import {
   Petition,
   PetitionPermission,
 } from "../../../db/__types";
-import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
+import { defaultFieldProperties } from "../../../db/helpers/fieldOptions";
 import { isValueCompatible } from "../../../db/helpers/utils";
 import { chunkWhile, unMaybeArray } from "../../../util/arrays";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
@@ -42,6 +42,7 @@ import {
   ifArgDefined,
   ifArgEquals,
   ifSomeDefined,
+  not,
   or,
 } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -78,6 +79,7 @@ import {
   defaultOnBehalfUserBelongsToContextOrganization,
   fieldHasType,
   fieldIsNotFixed,
+  replyStatusCanBeUpdated,
   fieldsBelongsToPetition,
   foldersAreInPath,
   messageBelongToPetition,
@@ -904,7 +906,7 @@ export const createPetitionField = mutationField("createPetitionField", {
       args.petitionId,
       {
         type: args.type,
-        ...defaultFieldOptions(args.type),
+        ...defaultFieldProperties(args.type),
       },
       args.position ?? -1,
       ctx.user!
@@ -977,7 +979,8 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     fieldsBelongsToPetition("petitionId", "fieldId"),
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
+    ifArgDefined((args) => args.data.requireApproval, not(fieldHasType("fieldId", "HEADING")))
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -997,6 +1000,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           t.nullable.field("visibility", { type: "JSONObject" });
           t.nullable.string("alias");
           t.nullable.boolean("hasCommentsEnabled");
+          t.nullable.boolean("requireApproval");
         },
       }).asArg()
     ),
@@ -1033,6 +1037,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       showInPdf,
       showActivityInPdf,
       hasCommentsEnabled,
+      requireApproval,
     } = args.data;
     const data: Partial<CreatePetitionField> = {};
     if (title !== undefined) {
@@ -1047,8 +1052,14 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     if (isDefined(multiple)) {
       data.multiple = multiple;
     }
+    if (isDefined(requireApproval)) {
+      data.require_approval = requireApproval;
+    }
     if (isDefined(isInternal)) {
       data.is_internal = isInternal;
+      if (isInternal) {
+        data.require_approval = false;
+      }
     }
 
     if (isDefined(showInPdf)) {
@@ -1113,6 +1124,14 @@ export const updatePetitionField = mutationField("updatePetitionField", {
 
     try {
       ctx.petitions.loadPetition.dataloader.clear(args.petitionId);
+      if (data.require_approval === false) {
+        // If the field is not required to be approved anymore, we need to update its reply statuses to PENDING
+        await ctx.petitions.updatePetitionFieldReplyStatusesByPetitionFieldId(
+          args.fieldId,
+          "PENDING",
+          `User:${ctx.user!.id}`
+        );
+      }
       return await ctx.petitions.updatePetitionField(
         args.petitionId,
         args.fieldId,
@@ -1278,7 +1297,8 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
-    repliesBelongsToField("petitionFieldId", "petitionFieldReplyIds")
+    repliesBelongsToField("petitionFieldId", "petitionFieldReplyIds"),
+    replyStatusCanBeUpdated("petitionFieldId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
