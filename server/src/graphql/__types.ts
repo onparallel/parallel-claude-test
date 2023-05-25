@@ -5440,6 +5440,7 @@ export interface NexusGenArgTypes {
     };
     deleteProfileTypeField: {
       // args
+      force?: boolean | null; // Boolean
       profileTypeFieldIds: NexusGenScalars["GID"][]; // [GID!]!
       profileTypeId: NexusGenScalars["GID"]; // GID!
     };

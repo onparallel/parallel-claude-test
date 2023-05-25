@@ -4,25 +4,24 @@ import { EditIcon, TimeAlarmIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { ProfileFieldInputGroup_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
-import { ProfilesFormData } from "@parallel/pages/app/profiles/[profileId]";
 import { FORMATS } from "@parallel/utils/dates";
 import { useMetadata } from "@parallel/utils/withMetadata";
 import { isPast, sub } from "date-fns";
 import { ReactNode } from "react";
-import { useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
 interface ProfileFieldInputGroupProps {
-  index: number;
   field: ProfileFieldInputGroup_ProfileTypeFieldFragment;
   children: ReactNode;
+  expiryDate?: string | null;
 }
 
-export function ProfileFieldInputGroup({ index, field, children }: ProfileFieldInputGroupProps) {
-  const { watch } = useFormContext<ProfilesFormData>();
+export function ProfileFieldInputGroup({
+  field,
+  expiryDate,
+  children,
+}: ProfileFieldInputGroupProps) {
   const { browserName } = useMetadata();
-  const { expiryDate } = watch(`fields.${index}`);
-
   return (
     <HStack align="start">
       <InputGroup

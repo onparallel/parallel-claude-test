@@ -349,6 +349,12 @@ export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
   args: {
     profileTypeId: nonNull(globalIdArg("ProfileType")),
     profileTypeFieldIds: nonNull(list(nonNull(globalIdArg("ProfileTypeField")))),
+    force: nullable(
+      booleanArg({
+        description:
+          "Pass force=true delete the field even if it has values or files associated with it.",
+      })
+    ),
   },
   resolve: async (_, { profileTypeId, profileTypeFieldIds }, ctx) => {
     const profileType = (await ctx.profiles.loadProfileType(profileTypeId))!;
@@ -362,6 +368,10 @@ export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
         "FIELD_USED_IN_PATTERN"
       );
     }
+
+    // TODO: Check if field has value or files attached to it
+    // if does, return error FIELD_HAS_VALUE_OR_FILES
+
     await ctx.profiles.deleteProfileTypeFields(
       profileTypeId,
       profileTypeFieldIds,

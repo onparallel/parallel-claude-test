@@ -51,10 +51,12 @@ import { useHandleNavigation } from "@parallel/utils/navigation";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
+import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { withMetadata } from "@parallel/utils/withMetadata";
 import pMap from "p-map";
-import { FormProvider, useFieldArray, useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, partition } from "remeda";
 
@@ -119,17 +121,29 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
     });
   };
 
-  const form = useForm<ProfilesFormData>({
+  const {
+    register,
+    formState,
+    reset,
+    control,
+    setFocus,
+    setError,
+    clearErrors,
+    handleSubmit,
+    setValue,
+  } = useForm<ProfilesFormData>({
     defaultValues: {
       fields: mapPropertiesToFields(properties),
     },
   });
 
-  const { formState, reset, control, setFocus } = form;
-
   useAutoConfirmDiscardChangesDialog(formState.isDirty);
 
   const { fields } = useFieldArray({ name: "fields", control });
+
+  useEffectSkipFirst(() => {
+    handleResetForm(properties);
+  }, [profile]);
 
   const handleResetForm = (properties?: ProfileDetail_ProfileFieldPropertyFragment[]) => {
     reset(properties ? { fields: mapPropertiesToFields(properties) } : undefined);
@@ -214,7 +228,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
           flex={1}
           maxWidth="container.xs"
           minWidth="container.3xs"
-          onSubmit={form.handleSubmit(async (formData) => {
+          onSubmit={handleSubmit(async (formData) => {
             try {
               const editedFields = formData.fields.filter(
                 (_, i) => formState.dirtyFields.fields?.[i]
@@ -342,13 +356,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
                 }
               );
 
-              const { data } = await refetch();
-
-              const properties = (data?.profile?.properties.filter(
-                (property) => property.field.myPermission !== "HIDDEN"
-              ) ?? []) as ProfileDetail_ProfileFieldPropertyFragment[];
-
-              handleResetForm(properties);
+              await refetch();
             } catch (e) {
               if (isApolloError(e, "MAX_FILES_EXCEEDED")) {
                 await withError(
@@ -397,91 +405,35 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
               />
             </Box>
           </Stack>
-
           {editedFieldsCount ? (
-            <Alert overflow="visible">
-              <AlertDescription
-                flex="1"
-                fontSize="sm"
-                display="flex"
-                position="sticky"
-                top={0}
-                flexDirection="row"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                {formState.isSubmitting ? (
-                  <HStack>
-                    <Spinner
-                      thickness="3px"
-                      speed="0.65s"
-                      emptyColor="transparent"
-                      color="blue.500"
-                      width={4}
-                      height={4}
-                    />
-                    <Text>
-                      <FormattedMessage
-                        id="page.profile-details.saving-changes"
-                        defaultMessage="Saving {count, plural, =1 {# change} other{# changes}}..."
-                        values={{
-                          count: editedFieldsCount,
-                        }}
-                      />
-                    </Text>
-                  </HStack>
-                ) : (
-                  <FormattedMessage
-                    id="page.profile-details.n-fields-edited"
-                    defaultMessage="{count, plural, =1 {# property} other{# properties}} changed"
-                    values={{
-                      count: editedFieldsCount,
-                    }}
-                  />
-                )}
-
-                <HStack>
-                  {formState.isSubmitting ? null : (
-                    <Button size="sm" bgColor="white" onClick={() => handleResetForm()}>
-                      <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-                    </Button>
-                  )}
-                  <Button
-                    size="sm"
-                    colorScheme="purple"
-                    type="submit"
-                    isDisabled={
-                      formState.isSubmitting || Object.keys(formState.errors).length !== 0
-                    }
-                  >
-                    <FormattedMessage id="generic.save" defaultMessage="Save" />
-                  </Button>
-                </HStack>
-              </AlertDescription>
-            </Alert>
+            <EditedFieldsAlert
+              editedFieldsCount={editedFieldsCount}
+              isSubmitting={formState.isSubmitting}
+              hasErrors={Object.keys(formState.errors).length !== 0}
+              onCancel={() => handleResetForm()}
+            />
           ) : null}
           <Stack divider={<Divider />} padding={4} spacing={4} overflow="auto">
-            <Stack spacing={4} width="100%">
-              <FormProvider {...form}>
-                <Stack as="ul">
-                  {properties.map(({ field, value, files }, i) => {
-                    const index = fields.findIndex((f) => f.profileTypeFieldId === field.id)!;
+            <Stack as="ul" width="100%">
+              {properties.map(({ field, value, files }, i) => {
+                const index = fields.findIndex((f) => f.profileTypeFieldId === field.id)!;
 
-                    return (
-                      <ProfileField
-                        key={field.id}
-                        profileId={profileId}
-                        field={field}
-                        value={value}
-                        files={files}
-                        index={index}
-                        isDirty={!!formState.dirtyFields?.fields?.at(index)}
-                        isInvalid={!!formState.errors.fields?.[index]}
-                      />
-                    );
-                  })}
-                </Stack>
-              </FormProvider>
+                return (
+                  <ProfileField
+                    key={field.id}
+                    profileId={profileId}
+                    field={field}
+                    value={value}
+                    files={files}
+                    index={index}
+                    setValue={setValue}
+                    control={control}
+                    register={register}
+                    setError={setError}
+                    clearErrors={clearErrors}
+                  />
+                );
+              })}
             </Stack>
             {hiddenProperties.length ? (
               <Stack width="sm" spacing={4}>
@@ -562,6 +514,79 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
         </Stack>
       </Flex>
     </AppLayout>
+  );
+}
+
+function EditedFieldsAlert({
+  isSubmitting,
+  hasErrors,
+  editedFieldsCount,
+  onCancel,
+}: {
+  isSubmitting: boolean;
+  hasErrors: boolean;
+  editedFieldsCount: number;
+  onCancel: () => void;
+}) {
+  return (
+    <Alert overflow="visible">
+      <AlertDescription
+        flex="1"
+        fontSize="sm"
+        display="flex"
+        position="sticky"
+        top={0}
+        flexDirection="row"
+        justifyContent="space-between"
+        alignItems="center"
+      >
+        {isSubmitting ? (
+          <HStack>
+            <Spinner
+              thickness="3px"
+              speed="0.65s"
+              emptyColor="transparent"
+              color="blue.500"
+              width={4}
+              height={4}
+            />
+            <Text>
+              <FormattedMessage
+                id="page.profile-details.saving-changes"
+                defaultMessage="Saving {count, plural, =1 {# change} other{# changes}}..."
+                values={{
+                  count: editedFieldsCount,
+                }}
+              />
+            </Text>
+          </HStack>
+        ) : (
+          <FormattedMessage
+            id="page.profile-details.n-fields-edited"
+            defaultMessage="{count, plural, =1 {# property} other{# properties}} changed"
+            values={{
+              count: editedFieldsCount,
+            }}
+          />
+        )}
+
+        <HStack>
+          {isSubmitting ? null : (
+            <Button size="sm" bgColor="white" onClick={onCancel}>
+              <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+            </Button>
+          )}
+          <Button
+            size="sm"
+            colorScheme="purple"
+            type="submit"
+            isDisabled={isSubmitting || hasErrors}
+          >
+            <FormattedMessage id="generic.save" defaultMessage="Save" />
+          </Button>
+        </HStack>
+      </AlertDescription>
+    </Alert>
   );
 }
 

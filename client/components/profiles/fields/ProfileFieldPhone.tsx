@@ -1,32 +1,37 @@
 import { PhoneInputLazy } from "@parallel/components/common/PhoneInputLazy";
-import { ProfilesFormData } from "@parallel/pages/app/profiles/[profileId]";
-import { Controller, useFormContext } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { isDefined } from "remeda";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldInputGroup } from "./ProfileFieldInputGroup";
 
 interface ProfileFieldPhoneProps extends ProfileFieldProps {
   showExpiryDateDialog: (force?: boolean) => void;
+  expiryDate?: string | null;
 }
 
-export function ProfileFieldPhone({ index, field, showExpiryDateDialog }: ProfileFieldPhoneProps) {
-  const { control, setError, clearErrors } = useFormContext<ProfilesFormData>();
-
+export function ProfileFieldPhone({
+  index,
+  field,
+  control,
+  clearErrors,
+  setError,
+  expiryDate,
+  showExpiryDateDialog,
+}: ProfileFieldPhoneProps) {
   return (
-    <ProfileFieldInputGroup index={index} field={field}>
+    <ProfileFieldInputGroup field={field} expiryDate={expiryDate}>
       <Controller
         name={`fields.${index}.content.value`}
         control={control}
-        render={({ field: { ref, onChange, value, ...rest } }) => (
+        render={({ field: { ref, onChange, value, ...rest }, fieldState }) => (
           <PhoneInputLazy
             borderColor="transparent"
             value={value ?? ""}
             onChange={(value: string, { isValid }) => {
               onChange(value ?? "");
-
-              if (isDefined(value) && !isValid) {
+              if (isDefined(value) && !isValid && !fieldState.error) {
                 setError(`fields.${index}.content.value`, { type: "validate" });
-              } else {
+              } else if (isValid && fieldState.error) {
                 clearErrors(`fields.${index}.content.value`);
               }
             }}

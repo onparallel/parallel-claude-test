@@ -1,21 +1,24 @@
 import { Center, Flex } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { DateInput } from "@parallel/components/common/DateInput";
-import { ProfilesFormData } from "@parallel/pages/app/profiles/[profileId]";
 import { useMetadata } from "@parallel/utils/withMetadata";
-import { useFormContext } from "react-hook-form";
-import { ProfileFieldProps } from "./ProfileField";
-import { ProfileFieldInputGroup } from "./ProfileFieldInputGroup";
 import { isPast, sub } from "date-fns";
 import { isDefined } from "remeda";
+import { ProfileFieldProps } from "./ProfileField";
+import { ProfileFieldInputGroup } from "./ProfileFieldInputGroup";
 
 interface ProfileFieldDateProps extends ProfileFieldProps {
   showExpiryDateDialog: (force?: boolean) => void;
+  expiryDate?: string | null;
 }
 
-export function ProfileFieldDate({ index, field, showExpiryDateDialog }: ProfileFieldDateProps) {
-  const { register, watch } = useFormContext<ProfilesFormData>();
-  const expiryDate = watch(`fields.${index}.expiryDate`);
+export function ProfileFieldDate({
+  index,
+  field,
+  expiryDate,
+  register,
+  showExpiryDateDialog,
+}: ProfileFieldDateProps) {
   const { browserName } = useMetadata();
 
   const alertIsActive =
@@ -24,7 +27,7 @@ export function ProfileFieldDate({ index, field, showExpiryDateDialog }: Profile
     isPast(sub(new Date(expiryDate), field.expiryAlertAheadTime));
 
   return (
-    <ProfileFieldInputGroup index={index} field={field}>
+    <ProfileFieldInputGroup field={field} expiryDate={expiryDate}>
       <Flex flex="1" position="relative">
         <DateInput
           {...register(`fields.${index}.content.value`)}

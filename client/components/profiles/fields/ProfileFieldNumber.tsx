@@ -1,22 +1,22 @@
-import { ProfilesFormData } from "@parallel/pages/app/profiles/[profileId]";
-import { Controller, useFormContext } from "react-hook-form";
+import { NumeralInput } from "@parallel/components/common/NumeralInput";
+import { Controller } from "react-hook-form";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldInputGroup } from "./ProfileFieldInputGroup";
-import { NumeralInput } from "@parallel/components/common/NumeralInput";
 
 interface ProfileFieldNumberProps extends ProfileFieldProps {
   showExpiryDateDialog: (force?: boolean) => void;
+  expiryDate?: string | null;
 }
 
 export function ProfileFieldNumber({
   index,
   field,
+  control,
+  expiryDate,
   showExpiryDateDialog,
 }: ProfileFieldNumberProps) {
-  const { control } = useFormContext<ProfilesFormData>();
-
   return (
-    <ProfileFieldInputGroup index={index} field={field}>
+    <ProfileFieldInputGroup field={field} expiryDate={expiryDate}>
       <Controller
         name={`fields.${index}.content.value`}
         control={control}

@@ -1,18 +1,21 @@
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
-import { ProfilesFormData } from "@parallel/pages/app/profiles/[profileId]";
-import { useFormContext } from "react-hook-form";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldInputGroup } from "./ProfileFieldInputGroup";
 
 interface ProfileFieldTextProps extends ProfileFieldProps {
   showExpiryDateDialog: (force?: boolean) => void;
+  expiryDate?: string | null;
 }
 
-export function ProfileFieldText({ index, field, showExpiryDateDialog }: ProfileFieldTextProps) {
-  const { register } = useFormContext<ProfilesFormData>();
-
+export function ProfileFieldText({
+  index,
+  field,
+  register,
+  expiryDate,
+  showExpiryDateDialog,
+}: ProfileFieldTextProps) {
   return (
-    <ProfileFieldInputGroup index={index} field={field}>
+    <ProfileFieldInputGroup field={field} expiryDate={expiryDate}>
       <GrowingTextarea
         borderColor="transparent"
         maxLength={10_000}

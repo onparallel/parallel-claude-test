@@ -65,6 +65,7 @@ import {
 } from "react";
 import { identity, noop } from "remeda";
 import { expirationToDuration } from "@parallel/utils/useExpirationOptions";
+import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 
 type OrganizationProfileTypeProps = UnwrapPromise<
   ReturnType<typeof OrganizationProfileType.getInitialProps>
@@ -185,6 +186,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
     OrganizationProfileType_deleteProfileTypeFieldDocument
   );
   const showUsedInPattern = useProfileTypeFieldsInPatternDialog();
+  const showConfirmDeleteProfileTypeFieldDialog = useConfirmDeleteProfileTypeFieldDialog();
   const handleDeleteProperty = async (profileTypeFieldIds: string[]) => {
     try {
       await deleteProfileTypeField({
@@ -208,6 +210,11 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
             }),
           });
         } catch {}
+      } else if (isApolloError(e, "FIELD_HAS_VALUE_OR_FILES")) {
+        await showConfirmDeleteProfileTypeFieldDialog({
+          profileCount: 1,
+          profileFieldsCount: profileTypeFieldIds.length,
+        });
       }
     }
   };
@@ -675,6 +682,45 @@ function useProfileTypeFieldsActions({
   ];
 }
 
+function useConfirmDeleteProfileTypeFieldDialog() {
+  const showDialog = useConfirmDeleteDialog();
+  return useCallback(
+    async ({
+      profileCount,
+      profileFieldsCount,
+    }: {
+      profileCount: number;
+      profileFieldsCount: number;
+    }) => {
+      return await showDialog({
+        size: "lg",
+        header: (
+          <FormattedMessage
+            id="component.use-confirm-delete-profile-type-field-dialog.header"
+            defaultMessage="Delete {count, plural, =1 {property} other {# properties}}"
+            values={{
+              count: profileCount,
+            }}
+          />
+        ),
+        description: (
+          <Text>
+            <FormattedMessage
+              id="component.use-confirm-delete-profile-type-field-dialog.description"
+              defaultMessage="You are about to delete {count, plural, =1 {this property} other {# properties}}. Please note that there {profileCount, plural, =1{is # profile that has} other{are # profiles that have}} an answer on {count, plural, =1 {this property} other {one of these properties}}, and if you continue, these answers will be deleted permanently."
+              values={{
+                profileCount,
+                count: profileFieldsCount,
+              }}
+            />
+          </Text>
+        ),
+      });
+    },
+    []
+  );
+}
+
 const _fragments = {
   get ProfileTypeField() {
     return gql`
@@ -789,10 +835,12 @@ const _mutations = [
     mutation OrganizationProfileType_deleteProfileTypeField(
       $profileTypeId: GID!
       $profileTypeFieldIds: [GID!]!
+      $force: Boolean
     ) {
       deleteProfileTypeField(
         profileTypeId: $profileTypeId
         profileTypeFieldIds: $profileTypeFieldIds
+        force: $force
       ) {
         ...OrganizationProfileType_ProfileType
       }

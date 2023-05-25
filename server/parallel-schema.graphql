@@ -1158,7 +1158,14 @@ type Mutation {
     profileTypeFieldId: GID!
   ): Result!
   deleteProfileType(profileTypeIds: [GID!]!): Success!
-  deleteProfileTypeField(profileTypeFieldIds: [GID!]!, profileTypeId: GID!): ProfileType!
+  deleteProfileTypeField(
+    """
+    Pass force=true delete the field even if it has values or files associated with it.
+    """
+    force: Boolean
+    profileTypeFieldIds: [GID!]!
+    profileTypeId: GID!
+  ): ProfileType!
 
   """
   Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests
@@ -3220,7 +3227,7 @@ type PetitionField {
   replies: [PetitionFieldReply!]!
 
   """
-  Determines if the field requires approval for the petition to be closed.
+  Determines if the field requires approval.
   """
   requireApproval: Boolean!
 

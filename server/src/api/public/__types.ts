@@ -1296,6 +1296,7 @@ export type MutationdeleteProfileTypeArgs = {
 };
 
 export type MutationdeleteProfileTypeFieldArgs = {
+  force?: InputMaybe<Scalars["Boolean"]>;
   profileTypeFieldIds: Array<Scalars["GID"]>;
   profileTypeId: Scalars["GID"];
 };
@@ -2643,7 +2644,7 @@ export type PetitionField = {
   position: Scalars["Int"];
   /** The replies to the petition field */
   replies: Array<PetitionFieldReply>;
-  /** Determines if the field requires approval for the petition to be closed. */
+  /** Determines if the field requires approval. */
   requireApproval: Scalars["Boolean"];
   /** Determines if the field last activity is visible in PDF export. */
   showActivityInPdf: Scalars["Boolean"];

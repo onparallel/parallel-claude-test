@@ -6605,6 +6605,16 @@
     "context": "Delete {count, plural, =1 {profile} other {# profiles}}"
   },
   {
+    "term": "component.use-confirm-delete-profile-type-field-dialog.description",
+    "definition": "Estás a punto de eliminar {count, plural, =1 {esta propiedad} other {# propiedades}}. Por favor, ten en cuenta que hay {profileCount, plural, =1{# perfil que tiene} other{# perfiles que tienen}} respuesta en {count, plural, =1 {esta propiedad} other {alguna de estas propiedades}}, y si continúas, estas respuestas se eliminarán permanentemente.",
+    "context": "You are about to delete {count, plural, =1 {this property} other {# properties}}. Please note that there {profileCount, plural, =1{is # profile that has} other{are # profiles that have}} an answer on {count, plural, =1 {this property} other {one of these properties}}, and if you continue, these answers will be deleted permanently."
+  },
+  {
+    "term": "component.use-confirm-delete-profile-type-field-dialog.header",
+    "definition": "Eliminar {count, plural, =1 {propiedad} other {# propiedades}}",
+    "context": "Delete {count, plural, =1 {property} other {# properties}}"
+  },
+  {
     "term": "component.use-create-contact.create-contact",
     "definition": "Crear contacto",
     "context": "Create contact"

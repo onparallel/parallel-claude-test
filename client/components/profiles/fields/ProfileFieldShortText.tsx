@@ -1,21 +1,21 @@
 import { Input } from "@chakra-ui/react";
-import { ProfilesFormData } from "@parallel/pages/app/profiles/[profileId]";
-import { useFormContext } from "react-hook-form";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldInputGroup } from "./ProfileFieldInputGroup";
 
 interface ProfileFieldShortTextProps extends ProfileFieldProps {
   showExpiryDateDialog: (force?: boolean) => void;
+  expiryDate?: string | null;
 }
 
 export function ProfileFieldShortText({
   index,
   field,
+  register,
+  expiryDate,
   showExpiryDateDialog,
 }: ProfileFieldShortTextProps) {
-  const { register } = useFormContext<ProfilesFormData>();
   return (
-    <ProfileFieldInputGroup index={index} field={field}>
+    <ProfileFieldInputGroup field={field} expiryDate={expiryDate}>
       <Input
         borderColor="transparent"
         maxLength={1_000}

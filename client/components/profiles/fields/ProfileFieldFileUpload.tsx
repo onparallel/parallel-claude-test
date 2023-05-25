@@ -7,22 +7,22 @@ import { FileName } from "@parallel/components/common/FileName";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { ProfileFieldFileUpload_profileFieldFileDownloadLinkDocument } from "@parallel/graphql/__types";
-import { ProfilesFormData } from "@parallel/pages/app/profiles/[profileId]";
+import { discriminator } from "@parallel/utils/discriminator";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import { nanoid } from "nanoid";
 import { useRef } from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { differenceWith, isDefined, sumBy } from "remeda";
 import { ProfileFieldProps } from "./ProfileField";
 import { ProfileFieldExpiresAtIcon } from "./ProfileFieldInputGroup";
-import { discriminator } from "@parallel/utils/discriminator";
 
 interface ProfileFieldFileUploadProps extends ProfileFieldProps {
   showExpiryDateDialog: (force?: boolean) => void;
+  expiryDate?: string | null;
 }
 
 export type ProfileFieldFileAction =
@@ -35,16 +35,15 @@ export function ProfileFieldFileUpload({
   field,
   files,
   index,
+  control,
+  expiryDate,
   showExpiryDateDialog,
 }: ProfileFieldFileUploadProps) {
   const MAX_FILE_SIZE = 1024 * 1024 * 100; // 100 MB
-  const { control, watch } = useFormContext<ProfilesFormData>();
   const intl = useIntl();
   const [profileFieldFileDownloadLink] = useMutation(
     ProfileFieldFileUpload_profileFieldFileDownloadLinkDocument
   );
-
-  const { expiryDate } = watch(`fields.${index}`);
 
   const handleDownloadAttachment = async (profileFieldFileId: string, preview?: boolean) => {
     await withError(

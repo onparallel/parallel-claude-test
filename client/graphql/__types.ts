@@ -1341,6 +1341,7 @@ export interface MutationdeleteProfileTypeArgs {
 }
 
 export interface MutationdeleteProfileTypeFieldArgs {
+  force?: InputMaybe<Scalars["Boolean"]>;
   profileTypeFieldIds: Array<Scalars["GID"]>;
   profileTypeId: Scalars["GID"];
 }
@@ -2718,7 +2719,7 @@ export interface PetitionField {
   previewReplies: Array<PetitionFieldReply>;
   /** The replies to the petition field */
   replies: Array<PetitionFieldReply>;
-  /** Determines if the field needs to be approved. */
+  /** Determines if the field requires approval. */
   requireApproval: Scalars["Boolean"];
   /** Determines if the field last activity is visible in PDF export. */
   showActivityInPdf: Scalars["Boolean"];
@@ -17975,6 +17976,7 @@ export type OrganizationProfileType_updateProfileTypeFieldMutation = {
 export type OrganizationProfileType_deleteProfileTypeFieldMutationVariables = Exact<{
   profileTypeId: Scalars["GID"];
   profileTypeFieldIds: Array<Scalars["GID"]> | Scalars["GID"];
+  force?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
 export type OrganizationProfileType_deleteProfileTypeFieldMutation = {
@@ -38762,10 +38764,12 @@ export const OrganizationProfileType_deleteProfileTypeFieldDocument = gql`
   mutation OrganizationProfileType_deleteProfileTypeField(
     $profileTypeId: GID!
     $profileTypeFieldIds: [GID!]!
+    $force: Boolean
   ) {
     deleteProfileTypeField(
       profileTypeId: $profileTypeId
       profileTypeFieldIds: $profileTypeFieldIds
+      force: $force
     ) {
       ...OrganizationProfileType_ProfileType
     }

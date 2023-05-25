@@ -14,7 +14,15 @@ import { discriminator } from "@parallel/utils/discriminator";
 import usePrevious from "@react-hook/previous";
 import { isPast, sub } from "date-fns";
 import { useCallback, useEffect, useRef } from "react";
-import { useFormContext } from "react-hook-form";
+import {
+  Control,
+  UseFormClearErrors,
+  UseFormRegister,
+  UseFormSetError,
+  UseFormSetValue,
+  useFormState,
+  useWatch,
+} from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, noop } from "remeda";
 import { useUpdateProfileFieldExpirationDialog } from "../dialogs/UpdateProfileFieldExpirationDialog";
@@ -29,8 +37,11 @@ import { ProfileFieldText } from "./ProfileFieldText";
 
 export interface ProfileFieldProps {
   index: number;
-  isDirty: boolean;
-  isInvalid: boolean;
+  control: Control<ProfilesFormData, any>;
+  register: UseFormRegister<ProfilesFormData>;
+  setValue: UseFormSetValue<ProfilesFormData>;
+  clearErrors: UseFormClearErrors<ProfilesFormData>;
+  setError: UseFormSetError<ProfilesFormData>;
   profileId: string;
   field: ProfileField_ProfileTypeFieldFragment;
   value?: ProfileField_ProfileFieldValueFragment | null;
@@ -39,9 +50,21 @@ export interface ProfileFieldProps {
 
 export function ProfileField(props: ProfileFieldProps) {
   const intl = useIntl();
-  const { index, field, files, isDirty, isInvalid } = props;
-  const { watch, setValue } = useFormContext<ProfilesFormData>();
-  const { expiryDate, content } = watch(`fields.${index}`);
+  const { index, field, files, control, setValue } = props;
+  const { dirtyFields, errors } = useFormState({
+    control,
+  });
+
+  const fieldValue = useWatch({
+    control,
+    name: `fields.${index}`,
+  });
+
+  const expiryDate = fieldValue?.expiryDate;
+  const content = fieldValue?.content;
+
+  const isDirty = !!dirtyFields?.fields?.[index];
+  const isInvalid = !!errors.fields?.[index];
 
   const handleSetExpiryDate = (value: string | null) => {
     if (
@@ -63,16 +86,18 @@ export function ProfileField(props: ProfileFieldProps) {
     isDirty,
     expiryAlertAheadTime: field.expiryAlertAheadTime,
     fieldName: field.name,
+    expiryDate,
+    setValue,
   });
 
   let fieldIsEmpty = true;
-  if ((field.type === "FILE" && files && files?.length > 0) || content?.value.length > 0) {
+  if ((field.type === "FILE" && files && files?.length > 0) || content?.value?.length > 0) {
     fieldIsEmpty = false;
   } else if (
     field.type !== "FILE" &&
     isDefined(content?.value) &&
     typeof content?.value === "string" &&
-    content?.value.length > 0
+    content?.value?.length > 0
   ) {
     fieldIsEmpty = false;
   }
@@ -82,6 +107,7 @@ export function ProfileField(props: ProfileFieldProps) {
 
   const commonProps = {
     ...props,
+    expiryDate,
     showExpiryDateDialog: needsExpirationDialog ? showModifyExpirationDialog : noop,
   };
 
@@ -209,11 +235,15 @@ export function useModifyExpirationDialog({
   isDirty,
   expiryAlertAheadTime,
   fieldName,
+  setValue,
+  expiryDate,
 }: {
   index: number;
   isDirty: boolean;
   expiryAlertAheadTime?: Duration | null;
   fieldName: Scalars["LocalizableUserText"];
+  setValue: UseFormSetValue<ProfilesFormData>;
+  expiryDate?: string | null;
 }) {
   const hasBeenShown = useRef(false);
   const prevIsDirty = usePrevious(isDirty);
@@ -224,8 +254,6 @@ export function useModifyExpirationDialog({
     }
   }, [isDirty, prevIsDirty]);
 
-  const { watch, setValue } = useFormContext<ProfilesFormData>();
-  const expiryDate = watch(`fields.${index}.expiryDate`);
   const showUpdateExpiration = useUpdateProfileFieldExpirationDialog();
 
   return useCallback(
