@@ -105,7 +105,7 @@ export function ProfileFieldFileUpload({
       name={`fields.${index}.content.value`}
       control={control}
       render={({ field: { onChange, value, ...rest } }) => {
-        const actions = value as ProfileFieldFileAction[];
+        const actions = (value as ProfileFieldFileAction[]) ?? [];
         return (
           <Stack>
             <HStack align="start">

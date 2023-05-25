@@ -356,7 +356,7 @@ export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
       })
     ),
   },
-  resolve: async (_, { profileTypeId, profileTypeFieldIds }, ctx) => {
+  resolve: async (_, { profileTypeId, profileTypeFieldIds, force }, ctx) => {
     const profileType = (await ctx.profiles.loadProfileType(profileTypeId))!;
     if (
       profileTypeFieldIds.some((id) =>
@@ -368,9 +368,19 @@ export const deleteProfileTypeField = mutationField("deleteProfileTypeField", {
         "FIELD_USED_IN_PATTERN"
       );
     }
+    const profileCount = await ctx.profiles.countProfilesWithValuesOrFilesByProfileTypeFieldId(
+      profileTypeFieldIds
+    );
 
-    // TODO: Check if field has value or files attached to it
-    // if does, return error FIELD_HAS_VALUE_OR_FILES
+    if (Number(profileCount) > 0 && !force) {
+      throw new ApolloError(
+        "At least one of the provided profile type field ids has value or files.",
+        "FIELD_HAS_VALUE_OR_FILES",
+        {
+          profileCount,
+        }
+      );
+    }
 
     await ctx.profiles.deleteProfileTypeFields(
       profileTypeId,

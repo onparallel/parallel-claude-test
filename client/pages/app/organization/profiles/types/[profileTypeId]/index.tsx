@@ -211,10 +211,19 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
           });
         } catch {}
       } else if (isApolloError(e, "FIELD_HAS_VALUE_OR_FILES")) {
-        await showConfirmDeleteProfileTypeFieldDialog({
-          profileCount: 1,
-          profileFieldsCount: profileTypeFieldIds.length,
-        });
+        try {
+          await showConfirmDeleteProfileTypeFieldDialog({
+            profileCount: e.graphQLErrors[0]?.extensions?.profileCount as number,
+            profileFieldsCount: profileTypeFieldIds.length,
+          });
+          await deleteProfileTypeField({
+            variables: {
+              profileTypeId,
+              profileTypeFieldIds,
+              force: true,
+            },
+          });
+        } catch {}
       }
     }
   };
@@ -699,7 +708,7 @@ function useConfirmDeleteProfileTypeFieldDialog() {
             id="component.use-confirm-delete-profile-type-field-dialog.header"
             defaultMessage="Delete {count, plural, =1 {property} other {# properties}}"
             values={{
-              count: profileCount,
+              count: profileFieldsCount,
             }}
           />
         ),

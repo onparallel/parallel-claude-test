@@ -55,7 +55,6 @@ import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { withMetadata } from "@parallel/utils/withMetadata";
 import pMap from "p-map";
-import { useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, partition } from "remeda";

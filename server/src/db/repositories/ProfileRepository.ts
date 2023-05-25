@@ -448,12 +448,6 @@ export class ProfileRepository extends BaseRepository {
     (q) => q.whereNull("removed_at").whereNull("deleted_at")
   );
 
-  readonly loadProfileFieldFilesByProfileTypeFieldId = this.buildLoadMultipleBy(
-    "profile_field_file",
-    "profile_type_field_id",
-    (q) => q.whereNull("removed_at").whereNull("deleted_at")
-  );
-
   async deleteProfileFieldFiles(profileFieldFileId: MaybeArray<number>, userId: number) {
     const ids = unMaybeArray(profileFieldFileId);
     if (ids.length === 0) {
@@ -538,6 +532,26 @@ export class ProfileRepository extends BaseRepository {
       .update({ ...data, updated_at: this.now(), updated_by: updatedBy }, "*");
 
     return profile;
+  }
+
+  async countProfilesWithValuesOrFilesByProfileTypeFieldId(profileTypeFieldIds: number[]) {
+    const [{ count }] = await this.raw<{ count: number }>(
+      /* sql */ `
+        with from_values as (
+            select distinct profile_id from profile_field_value
+            where profile_type_field_id in ? and deleted_at is null and removed_at is null
+          ), from_files as (
+            select distinct profile_id from profile_field_file
+            where profile_type_field_id in ? and deleted_at is null and removed_at is null
+          ), from_all as (
+            select profile_id from from_values
+            union
+            select profile_id from from_files
+          ) select count(*) from from_all
+    `,
+      [this.sqlIn(profileTypeFieldIds), this.sqlIn(profileTypeFieldIds)]
+    );
+    return count;
   }
 
   async updateProfileTypeProfileNamePattern(
