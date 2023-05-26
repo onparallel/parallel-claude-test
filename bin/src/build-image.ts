@@ -31,9 +31,7 @@ const REGION = "eu-central-1";
 const AVAILABILITY_ZONE = `${REGION}a`;
 const ENHANCED_MONITORING = true;
 
-const ec2 = new EC2Client({
-  credentials: fromIni({ profile: "santi-admin" }),
-});
+const ec2 = new EC2Client({});
 
 async function main() {
   const name = `parallel-server-${timestamp()}`;

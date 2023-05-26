@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_ec2_1 = require("@aws-sdk/client-ec2");
-const credential_providers_1 = require("@aws-sdk/credential-providers");
 const assert_1 = __importDefault(require("assert"));
 const chalk_1 = __importDefault(require("chalk"));
 const child_process_1 = require("child_process");
@@ -21,9 +20,7 @@ const SUBNET_ID = "subnet-d3cc68b9";
 const REGION = "eu-central-1";
 const AVAILABILITY_ZONE = `${REGION}a`;
 const ENHANCED_MONITORING = true;
-const ec2 = new client_ec2_1.EC2Client({
-    credentials: (0, credential_providers_1.fromIni)({ profile: "santi-admin" }),
-});
+const ec2 = new client_ec2_1.EC2Client({});
 async function main() {
     const name = `parallel-server-${(0, timestamp_1.timestamp)()}`;
     const instanceResult = await ec2.send(new client_ec2_1.RunInstancesCommand({
