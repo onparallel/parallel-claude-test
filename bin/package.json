@@ -13,17 +13,17 @@
     "launch-instance": "node dist/launch-instance.js",
     "switch-release": "node dist/switch-release.js",
     "list-instances": "node dist/list-instances.js",
-    "li": "node dist/list-instances.js",
+    "li": "yarn list-instances",
     "prune-instances": "node dist/prune-instances.js",
     "full-release": "node dist/full-release.js",
-    "fr": "node dist/full-release.js",
+    "fr": "yarn full-release",
     "strip-js": "node dist/strip-js.js",
     "create-cert": "node dist/create-cert.js",
     "build-image": "node dist/build-image.js",
     "clear-nginx-cache": "node dist/clear-nginx-cache.js",
-    "cnc": "node dist/clear-nginx-cache.js",
-    "temp-admin-credentials": "node dist/temp-admin-credentials.js",
-    "tac": "node dist/temp-admin-credentials.js"
+    "cnc": "yarn clear-nginx-cache",
+    "temp-admin-credentials": "AWS_ACCESS_KEY_ID= AWS_SECRET_ACCESS_KEY= AWS_SESSION_TOKEN= node dist/temp-admin-credentials.js",
+    "tac": "yarn temp-admin-credentials"
   },
   "dependencies": {
     "@aws-sdk/client-cloudfront": "^3.319.0",
