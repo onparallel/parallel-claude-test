@@ -71,7 +71,7 @@ const QUERY_STATE = {
   search: string(),
   sort: sorting(SORTING).orDefault({
     field: "createdAt",
-    direction: "ASC",
+    direction: "DESC",
   }),
   profileType: string(),
 };
@@ -593,7 +593,7 @@ const _queries = [
 const _mutations = [
   gql`
     mutation Profiles_createProfile($profileTypeId: GID!) {
-      createProfile(profileTypeId: $profileTypeId) {
+      createProfile(profileTypeId: $profileTypeId, subscribe: true) {
         ...Profiles_Profile
       }
     }

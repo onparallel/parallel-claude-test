@@ -39866,7 +39866,7 @@ export const Profiles_profilesDocument = gql`
 ` as unknown as DocumentNode<Profiles_profilesQuery, Profiles_profilesQueryVariables>;
 export const Profiles_createProfileDocument = gql`
   mutation Profiles_createProfile($profileTypeId: GID!) {
-    createProfile(profileTypeId: $profileTypeId) {
+    createProfile(profileTypeId: $profileTypeId, subscribe: true) {
       ...Profiles_Profile
     }
   }
