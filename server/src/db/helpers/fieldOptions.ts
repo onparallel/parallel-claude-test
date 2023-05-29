@@ -388,7 +388,13 @@ export function defaultFieldProperties(
       case "ES_TAX_DOCUMENTS":
         return {
           attachToPdf: false,
-          legacy: true, // TODO Bankflip Legacy: remove when this is deprecated
+          requests: [
+            {
+              model: {
+                type: "AEAT_IRPF_DATOS_FISCALES",
+              },
+            },
+          ],
         };
       case "DYNAMIC_SELECT": {
         return {
