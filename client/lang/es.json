@@ -205,6 +205,31 @@
     "context": "Users"
   },
   {
+    "term": "component.alerts-contact-us-dialog.body-1",
+    "definition": "Anticípate a las renovaciones de documentos y actualizaciones de datos.",
+    "context": "Program alerts on your profiles for deadline reviews."
+  },
+  {
+    "term": "component.alerts-contact-us-dialog.body-2",
+    "definition": "Contacta con nosotros para activarlo en tu organización.",
+    "context": "Contact us to activate it in your organization."
+  },
+  {
+    "term": "component.alerts-contact-us-dialog.contact-us",
+    "definition": "Contactar",
+    "context": "Contact us"
+  },
+  {
+    "term": "component.alerts-contact-us-dialog.header",
+    "definition": "Alertas",
+    "context": "Alerts"
+  },
+  {
+    "term": "component.alerts-contact-us-dialog.learn-more-button",
+    "definition": "Más información",
+    "context": "Learn more"
+  },
+  {
     "term": "component.alerts-table-columns.expiration-date",
     "definition": "Fecha de vencimiento",
     "context": "Expiration date"
@@ -4495,6 +4520,31 @@
     "context": "There's no profile types matching your criteria"
   },
   {
+    "term": "component.profiles-contact-us-dialog.body-1",
+    "definition": "Saca el máximo rendimiento a la gestión de tus datos legales, creando bases de datos a medida.",
+    "context": "Get the most out of your legal data management by creating customized databases."
+  },
+  {
+    "term": "component.profiles-contact-us-dialog.body-2",
+    "definition": "Contacta con nosotros para activarlo en tu organización.",
+    "context": "Contact us to activate it in your organization."
+  },
+  {
+    "term": "component.profiles-contact-us-dialog.contact-us",
+    "definition": "Contactar",
+    "context": "Contact us"
+  },
+  {
+    "term": "component.profiles-contact-us-dialog.header",
+    "definition": "Perfiles",
+    "context": "Profiles"
+  },
+  {
+    "term": "component.profiles-contact-us-dialog.learn-more-button",
+    "definition": "Más información",
+    "context": "Learn more"
+  },
+  {
     "term": "component.property-used-in-pattern-dialog.body",
     "definition": "{count, plural, =1 {Esta propiedad se está} other {Algunas de las propiedades se están}} utilizando como parte del nombre para perfiles de tipo {type}. Para continuar, tendrás que {count, plural, =1 {quitarla} other {quitarlas}} del nombre.",
     "context": "{count, plural, =1 {This property is} other {Some of the properties are}} being used as part of the name for profiles of type {type}. To continue, first you need to remove {count, plural, =1 {it} other {them}} from the name."
@@ -6795,6 +6845,11 @@
     "context": "You reached the maximum amount of users you can create, <a>reach out to us to upgrade your plan.</a>"
   },
   {
+    "term": "component.user-menu.alerts",
+    "definition": "Alerts",
+    "context": "Alerts"
+  },
+  {
     "term": "component.user-menu.back-to-account",
     "definition": "Volver a mi cuenta",
     "context": "Back to my account"
@@ -6813,6 +6868,11 @@
     "term": "component.user-menu.notifications",
     "definition": "Notificaciones",
     "context": "Notifications"
+  },
+  {
+    "term": "component.user-menu.profiles",
+    "definition": "Profiles",
+    "context": "Profiles"
   },
   {
     "term": "component.user-select.placeholder-multi-with-groups",
@@ -8023,6 +8083,11 @@
     "term": "generic.never-used",
     "definition": "No se ha usado",
     "context": "Never used"
+  },
+  {
+    "term": "generic.new",
+    "definition": "Nuevo",
+    "context": "New"
   },
   {
     "term": "generic.new-petition",

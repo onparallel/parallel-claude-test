@@ -31,6 +31,8 @@ import { NakedLink } from "../common/Link";
 import { Logo } from "../common/Logo";
 import { Spacer } from "../common/Spacer";
 import { SupportLink } from "../common/SupportLink";
+import { useAlertsContactUsDialog } from "../common/dialogs/AlertsContactUsDialog";
+import { useProfilesContactUsDialog } from "../common/dialogs/ProfilesContactUsDialog";
 import { NotificationsButton } from "../notifications/NotificationsButton";
 import { AppLayoutNavbarLink } from "./AppLayoutNavbarLink";
 import { UserMenu } from "./UserMenu";
@@ -50,6 +52,21 @@ export const AppLayoutNavbar = Object.assign(
       const { pathname, query } = router;
 
       const hasAdminRole = isAtLeast("ADMIN", me.role);
+
+      const showProfilesContactUsDialog = useProfilesContactUsDialog();
+      const handleProfilesClick = async () => {
+        try {
+          await showProfilesContactUsDialog();
+        } catch {}
+      };
+
+      const showAlertsContactUsDialog = useAlertsContactUsDialog();
+      const handleAlertsClick = async () => {
+        try {
+          await showAlertsContactUsDialog();
+        } catch {}
+      };
+
       const items = useMemo(
         () => [
           {
@@ -87,32 +104,32 @@ export const AppLayoutNavbar = Object.assign(
                 )
               : undefined,
           },
-          ...(me.hasProfilesAccess
-            ? [
-                {
-                  section: "profiles",
-                  href: "/app/profiles",
-                  icon: <ProfilesIcon />,
-                  isActive: pathname.startsWith("/app/profiles"),
-                  isAvailable: true,
-                  text: intl.formatMessage({
-                    id: "component.app-layout-navbar.profiles-link",
-                    defaultMessage: "Profiles",
-                  }),
-                },
-                {
-                  section: "alerts",
-                  href: "/app/alerts",
-                  icon: <TimeAlarmIcon />,
-                  isActive: pathname.startsWith("/app/alerts"),
-                  isAvailable: true,
-                  text: intl.formatMessage({
-                    id: "component.app-layout-navbar.alerts-link",
-                    defaultMessage: "Alerts",
-                  }),
-                },
-              ]
-            : []),
+
+          {
+            section: "profiles",
+            href: "/app/profiles",
+            icon: <ProfilesIcon />,
+            isActive: pathname.startsWith("/app/profiles"),
+            isAvailable: me.hasProfilesAccess,
+            onClick: me.hasProfilesAccess ? undefined : handleProfilesClick,
+            text: intl.formatMessage({
+              id: "component.app-layout-navbar.profiles-link",
+              defaultMessage: "Profiles",
+            }),
+          },
+          {
+            section: "alerts",
+            href: "/app/alerts",
+            icon: <TimeAlarmIcon />,
+            isActive: pathname.startsWith("/app/alerts"),
+            isAvailable: me.hasProfilesAccess,
+            onClick: me.hasProfilesAccess ? undefined : handleAlertsClick,
+            text: intl.formatMessage({
+              id: "component.app-layout-navbar.alerts-link",
+              defaultMessage: "Alerts",
+            }),
+          },
+
           {
             section: "contacts",
             href: "/app/contacts",
@@ -197,7 +214,7 @@ export const AppLayoutNavbar = Object.assign(
               </Box>
             </NakedLink>
           </Center>
-          <Flex justifyContent="center" alignItems="center">
+          <Flex justifyContent="center" alignItems="center" display={{ base: "none", sm: "flex" }}>
             <NakedLink href={`/app/petitions/new`}>
               <IconButtonWithTooltip
                 data-testid="create-new-petition-button"
@@ -220,11 +237,11 @@ export const AppLayoutNavbar = Object.assign(
             alignSelf="stretch"
             flexDirection={{ base: "row", sm: "column" }}
             flex={{ base: 1, sm: "none" }}
-            justifyContent="center"
             marginX={{ base: 2, sm: 0 }}
             marginY={{ base: 0, sm: 2 }}
+            justifyContent="space-evenly"
           >
-            {items.map(({ section, href, isActive, isAvailable, icon, text, warning }) => (
+            {items.map(({ section, href, isActive, isAvailable, icon, text, warning, onClick }) => (
               <ListItem key={section}>
                 <AppLayoutNavbarLink
                   section={section}
@@ -233,6 +250,7 @@ export const AppLayoutNavbar = Object.assign(
                   isActive={isActive}
                   icon={icon}
                   warningPopover={warning}
+                  onClick={onClick}
                 >
                   {text}
                 </AppLayoutNavbarLink>

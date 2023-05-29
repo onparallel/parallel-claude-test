@@ -4,6 +4,7 @@ import { cloneElement, ReactElement, ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 import { SmallPopover } from "../common/SmallPopover";
+import { isDefined } from "remeda";
 
 export interface AppLayoutNavbarLinkProps {
   section: string;
@@ -13,6 +14,7 @@ export interface AppLayoutNavbarLinkProps {
   isAvailable?: boolean;
   children: ReactNode;
   warningPopover?: ReactNode;
+  onClick?: () => void;
 }
 
 export function AppLayoutNavbarLink({
@@ -23,56 +25,65 @@ export function AppLayoutNavbarLink({
   isAvailable,
   children,
   warningPopover,
+  onClick,
 }: AppLayoutNavbarLinkProps) {
   const intl = useIntl();
   const isMobile = useBreakpointValue({ base: true, sm: false });
-  return isAvailable ? (
-    <NakedLink href={href!}>
-      <Box
-        as="a"
-        data-link={`navbar-${section}`}
-        position="relative"
-        display="block"
-        userSelect="none"
-        aria-current={isActive ? "page" : undefined}
-        _focus={{
-          boxShadow: "none",
-          textDecoration: "underline",
-        }}
-        sx={{
-          color: "gray.600",
-          _hover: { color: "gray.700" },
-          _active: { color: "gray.800" },
-          _activeLink: {
-            color: "primary.600",
-            _hover: { color: "primary.700" },
-            _active: { color: "primary.800" },
-            _after: {
-              base: {
-                display: "block",
-                position: "absolute",
-                content: "''",
-                height: "4px",
-                width: "100%",
-                top: 0,
-                left: 0,
-                backgroundColor: "primary.600",
-              },
-              sm: {
-                width: "4px",
-                height: "100%",
-                left: 0,
-                top: 0,
-              },
+
+  const navbarBox = (
+    <Box
+      as={isDefined(onClick) ? "button" : "a"}
+      cursor="pointer"
+      data-link={`navbar-${section}`}
+      position="relative"
+      display="block"
+      width="100%"
+      userSelect="none"
+      aria-current={isActive ? "page" : undefined}
+      _focus={{
+        boxShadow: "none",
+        textDecoration: "underline",
+      }}
+      sx={{
+        color: "gray.600",
+        _hover: { color: "gray.700" },
+        _active: { color: "gray.800" },
+        _activeLink: {
+          color: "primary.600",
+          _hover: { color: "primary.700" },
+          _active: { color: "primary.800" },
+          _after: {
+            base: {
+              display: "block",
+              position: "absolute",
+              content: "''",
+              height: "4px",
+              width: "100%",
+              top: 0,
+              left: 0,
+              backgroundColor: "primary.600",
+            },
+            sm: {
+              width: "4px",
+              height: "100%",
+              left: 0,
+              top: 0,
             },
           },
-        }}
-      >
-        <AppLayoutNavbarLinkContent icon={icon} warningPopover={warningPopover}>
-          {children}
-        </AppLayoutNavbarLinkContent>
-      </Box>
-    </NakedLink>
+        },
+      }}
+      onClick={onClick}
+    >
+      <AppLayoutNavbarLinkContent icon={icon} warningPopover={warningPopover}>
+        {children}
+      </AppLayoutNavbarLinkContent>
+    </Box>
+  );
+
+  return isAvailable ? (
+    <NakedLink href={href!}>{navbarBox}</NakedLink>
+  ) : isDefined(onClick) ? (
+    navbarBox
   ) : (
     <Tooltip
       label={intl.formatMessage({
@@ -104,8 +115,8 @@ function AppLayoutNavbarLinkContent({
   return (
     <Box
       textAlign="center"
-      paddingX={{ base: 1.5, sm: 0 }}
-      paddingY={{ base: 2, sm: 3 }}
+      paddingX={{ base: 2.5, sm: 0 }}
+      paddingY={{ base: 4, sm: 3 }}
       sx={
         isDisabled
           ? {}
@@ -119,7 +130,7 @@ function AppLayoutNavbarLinkContent({
       <Box marginBottom={1}>
         {cloneElement(icon, {
           "aria-hidden": "true",
-          boxSize: "24px",
+          boxSize: { base: "28px", sm: "24px" },
           transition: "transform 150ms ease",
         })}
         {warningPopover ? (
@@ -134,7 +145,13 @@ function AppLayoutNavbarLinkContent({
           </SmallPopover>
         ) : null}
       </Box>
-      <Text as="div" textTransform="uppercase" fontSize="xs" fontWeight="600">
+      <Text
+        as="div"
+        textTransform="uppercase"
+        fontSize="xs"
+        fontWeight="600"
+        display={{ base: "none", sm: "block" }}
+      >
         {children}
       </Text>
     </Box>
