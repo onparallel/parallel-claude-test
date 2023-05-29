@@ -335,7 +335,7 @@ export const createOrganization = mutationField("createOrganization", {
       true
     );
 
-    await ctx.users.createUser(
+    const user = await ctx.users.createUser(
       {
         org_id: org.id,
         organization_role: "OWNER",
@@ -352,6 +352,8 @@ export const createOrganization = mutationField("createOrganization", {
       },
       `User:${ctx.user!.id}`
     );
+
+    await ctx.profilesSetup.createDefaultOrganizationProfileTypesAndFields(org.id, user.id);
 
     await ctx.tiers.updateOrganizationTier(org, "FREE", `User:${ctx.user!.id}`);
     // load org to get updated usage_details
