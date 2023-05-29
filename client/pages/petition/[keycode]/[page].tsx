@@ -230,7 +230,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
               message={message}
               recipients={recipients}
               hasClientPortalAccess={access.hasClientPortalAccess}
-              pendingPetitions={accesessData!.pending.totalCount}
+              pendingPetitions={pending}
               keycode={keycode}
               isClosed={["COMPLETED", "CLOSED"].includes(petition.status)}
             />
