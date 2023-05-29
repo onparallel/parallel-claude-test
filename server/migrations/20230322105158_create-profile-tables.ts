@@ -3,7 +3,7 @@ import { timestamps } from "./helpers/timestamps";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.alterTable("organization", (t) => {
-    t.string("default_timezone", 50).nullable().defaultTo("Etc/UTC");
+    t.string("default_timezone", 50).nullable();
   });
 
   await knex.schema.createTable("profile_type", (t) => {
