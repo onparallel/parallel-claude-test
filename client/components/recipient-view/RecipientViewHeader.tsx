@@ -345,7 +345,11 @@ export const RecipientViewHeader = Object.assign(
                           />
                         </MenuItem>
                       ) : null}
-                      <NakedLink href={`/petition/${keycode}/home`}>
+                      <NakedLink
+                        href={`/petition/${keycode}/home${
+                          pendingPetitions ? "?status=PENDING" : ""
+                        }`}
+                      >
                         <MenuItem as="a" icon={<HomeIcon display="block" boxSize={4} />}>
                           <HStack justifyContent="space-between">
                             <Text as="span">
