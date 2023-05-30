@@ -512,7 +512,7 @@ updatePreviewFieldReplies.fragments = {
 function updateReplyContent(
   proxy: DataProxy,
   replyId: string,
-  updateFn: (cached: Scalars["JSONObject"]) => Scalars["JSONObject"]
+  updateFn: (cached: Record<string, any>) => Record<string, any>
 ) {
   updateFragment(proxy, {
     fragment: PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc,

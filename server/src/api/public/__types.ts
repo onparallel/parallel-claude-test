@@ -6,39 +6,48 @@ export type InputMaybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = {
+  [_ in K]?: never;
+};
+export type Incremental<T> =
+  | T
+  | { [P in keyof T]?: P extends " $fragmentName" | "__typename" ? T[P] : never };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: string;
-  String: string;
-  Boolean: boolean;
-  Int: number;
-  Float: number;
+  ID: { input: string | number; output: string };
+  String: { input: string; output: string };
+  Boolean: { input: boolean; output: boolean };
+  Int: { input: number; output: number };
+  Float: { input: number; output: number };
   /** A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
-  Date: string;
+  Date: { input: string; output: string };
   /** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
-  DateTime: string;
-  Duration: Duration;
-  GID: string;
+  DateTime: { input: string; output: string };
+  Duration: { input: Duration; output: Duration };
+  GID: { input: string; output: string };
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
-  JSON: any;
+  JSON: { input: any; output: any };
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
-  JSONObject: { [key: string]: any };
-  LocalizableUserText: { [locale in UserLocale]?: string };
+  JSONObject: { input: { [key: string]: any }; output: { [key: string]: any } };
+  LocalizableUserText: {
+    input: { [locale in UserLocale]?: string };
+    output: { [locale in UserLocale]?: string };
+  };
   /** The `Upload` scalar type represents a file upload. */
-  Upload: any;
+  Upload: { input: any; output: any };
 };
 
 /** JSON with AWS S3 url and required form data to make a POST request */
 export type AWSPresignedPostData = {
-  fields: Scalars["JSONObject"];
-  url: Scalars["String"];
+  fields: Scalars["JSONObject"]["output"];
+  url: Scalars["String"]["output"];
 };
 
 export type AccessActivatedEvent = PetitionEvent & {
   access: PetitionAccess;
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
@@ -46,36 +55,36 @@ export type AccessActivatedEvent = PetitionEvent & {
 
 export type AccessActivatedFromPublicPetitionLinkEvent = PetitionEvent & {
   access: PetitionAccess;
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 export type AccessActivatedFromPublicPetitionLinkUserNotification = PetitionUserNotification & {
   access: PetitionAccess;
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  isRead: Scalars["Boolean"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  isRead: Scalars["Boolean"]["output"];
   petition: PetitionBase;
 };
 
 export type AccessDeactivatedEvent = PetitionEvent & {
   access: PetitionAccess;
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
-  reason: Scalars["String"];
+  reason: Scalars["String"]["output"];
   type: PetitionEventType;
   user: Maybe<User>;
 };
 
 export type AccessDelegatedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   newAccess: PetitionAccess;
   originalAccess: PetitionAccess;
   petition: Maybe<Petition>;
@@ -84,21 +93,21 @@ export type AccessDelegatedEvent = PetitionEvent & {
 
 export type AccessOpenedEvent = PetitionEvent & {
   access: PetitionAccess;
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 export type AsyncFieldCompletionResponse = {
-  type: Scalars["String"];
-  url: Scalars["String"];
+  type: Scalars["String"]["output"];
+  url: Scalars["String"]["output"];
 };
 
 export type BulkCreateContactsReturnType = {
   contacts: Array<Contact>;
-  errors: Maybe<Array<Scalars["JSON"]>>;
+  errors: Maybe<Array<Scalars["JSON"]["output"]>>;
 };
 
 export type BulkSendSigningMode =
@@ -113,42 +122,42 @@ export type ChangePasswordResult = "INCORRECT_PASSWORD" | "INVALID_NEW_PASSWORD"
 
 export type CommentCreatedUserNotification = PetitionUserNotification & {
   comment: PetitionFieldComment;
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   field: PetitionField;
-  id: Scalars["GID"];
-  isMention: Scalars["Boolean"];
-  isRead: Scalars["Boolean"];
+  id: Scalars["GID"]["output"];
+  isMention: Scalars["Boolean"]["output"];
+  isRead: Scalars["Boolean"]["output"];
   petition: PetitionBase;
 };
 
 export type CommentDeletedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   deletedBy: Maybe<UserOrPetitionAccess>;
   field: Maybe<PetitionField>;
-  id: Scalars["GID"];
-  isInternal: Scalars["Boolean"];
+  id: Scalars["GID"]["output"];
+  isInternal: Scalars["Boolean"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 export type CommentPublishedEvent = PetitionEvent & {
   comment: Maybe<PetitionFieldComment>;
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   field: Maybe<PetitionField>;
-  id: Scalars["GID"];
-  isInternal: Scalars["Boolean"];
+  id: Scalars["GID"]["output"];
+  isInternal: Scalars["Boolean"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 /** Information from the connection. */
 export type ConnectionMetadata = {
-  browserName: Maybe<Scalars["String"]>;
-  browserVersion: Maybe<Scalars["String"]>;
-  country: Maybe<Scalars["String"]>;
-  ip: Maybe<Scalars["String"]>;
+  browserName: Maybe<Scalars["String"]["output"]>;
+  browserVersion: Maybe<Scalars["String"]["output"]>;
+  country: Maybe<Scalars["String"]["output"]>;
+  ip: Maybe<Scalars["String"]["output"]>;
 };
 
 /** A contact in the system. */
@@ -156,140 +165,140 @@ export type Contact = Timestamps & {
   /** The petition accesses for this contact */
   accesses: PetitionAccessPagination;
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   /** The email of the contact. */
-  email: Scalars["String"];
+  email: Scalars["String"]["output"];
   /** The first name of the contact. */
-  firstName: Scalars["String"];
+  firstName: Scalars["String"]["output"];
   /** The full name of the contact. */
-  fullName: Scalars["String"];
-  hasBouncedEmail: Scalars["Boolean"];
+  fullName: Scalars["String"]["output"];
+  hasBouncedEmail: Scalars["Boolean"]["output"];
   /** The ID of the contact. */
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   /** The last name of the contact. */
-  lastName: Maybe<Scalars["String"]>;
+  lastName: Maybe<Scalars["String"]["output"]>;
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 /** A contact in the system. */
 export type ContactaccessesArgs = {
-  limit?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type ContactPagination = {
   /** The requested slice of items. */
   items: Array<Contact>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type CreateContactInput = {
-  email: Scalars["String"];
-  firstName: Scalars["String"];
-  lastName?: InputMaybe<Scalars["String"]>;
+  email: Scalars["String"]["input"];
+  firstName: Scalars["String"]["input"];
+  lastName?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type CreateProfileTypeFieldInput = {
-  alias?: InputMaybe<Scalars["String"]>;
-  expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]>;
-  isExpirable?: InputMaybe<Scalars["Boolean"]>;
-  name: Scalars["LocalizableUserText"];
-  options?: InputMaybe<Scalars["JSONObject"]>;
+  alias?: InputMaybe<Scalars["String"]["input"]>;
+  expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]["input"]>;
+  isExpirable?: InputMaybe<Scalars["Boolean"]["input"]>;
+  name: Scalars["LocalizableUserText"]["input"];
+  options?: InputMaybe<Scalars["JSONObject"]["input"]>;
   type: ProfileTypeFieldType;
 };
 
 export type CreatedAt = {
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
 };
 
 export type DowJonesKycEntityDate = {
-  day: Maybe<Scalars["Int"]>;
-  month: Maybe<Scalars["Int"]>;
-  year: Maybe<Scalars["Int"]>;
+  day: Maybe<Scalars["Int"]["output"]>;
+  month: Maybe<Scalars["Int"]["output"]>;
+  year: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type DowJonesKycEntityPlace = {
-  countryCode: Scalars["String"];
-  descriptor: Scalars["String"];
+  countryCode: Scalars["String"]["output"];
+  descriptor: Scalars["String"]["output"];
 };
 
 export type DowJonesKycEntityProfileResult = {
-  iconHints: Array<Scalars["String"]>;
-  id: Scalars["ID"];
-  name: Scalars["String"];
-  profileId: Scalars["ID"];
+  iconHints: Array<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  name: Scalars["String"]["output"];
+  profileId: Scalars["ID"]["output"];
   relationships: Array<DowJonesKycEntityRelationship>;
   sanctions: Array<DowJonesKycEntitySanction>;
   type: DowJonesKycEntityType;
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 export type DowJonesKycEntityProfileResultEntity = DowJonesKycEntityProfileResult & {
   dateOfRegistration: Maybe<DowJonesKycEntityDate>;
-  iconHints: Array<Scalars["String"]>;
-  id: Scalars["ID"];
-  name: Scalars["String"];
-  profileId: Scalars["ID"];
+  iconHints: Array<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  name: Scalars["String"]["output"];
+  profileId: Scalars["ID"]["output"];
   relationships: Array<DowJonesKycEntityRelationship>;
   sanctions: Array<DowJonesKycEntitySanction>;
   type: DowJonesKycEntityType;
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 export type DowJonesKycEntityProfileResultPerson = DowJonesKycEntityProfileResult & {
   citizenship: Maybe<DowJonesKycEntityPlace>;
   dateOfBirth: Maybe<DowJonesKycEntityDate>;
-  iconHints: Array<Scalars["String"]>;
-  id: Scalars["ID"];
-  isDeceased: Scalars["Boolean"];
+  iconHints: Array<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  isDeceased: Scalars["Boolean"]["output"];
   jurisdiction: Maybe<DowJonesKycEntityPlace>;
-  name: Scalars["String"];
+  name: Scalars["String"]["output"];
   placeOfBirth: Maybe<DowJonesKycEntityPlace>;
-  profileId: Scalars["ID"];
+  profileId: Scalars["ID"]["output"];
   relationships: Array<DowJonesKycEntityRelationship>;
   residence: Maybe<DowJonesKycEntityPlace>;
   sanctions: Array<DowJonesKycEntitySanction>;
   type: DowJonesKycEntityType;
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 export type DowJonesKycEntityRelationship = {
-  connectionType: Scalars["String"];
-  iconHints: Array<Scalars["String"]>;
-  name: Maybe<Scalars["String"]>;
-  profileId: Scalars["ID"];
+  connectionType: Scalars["String"]["output"];
+  iconHints: Array<Scalars["String"]["output"]>;
+  name: Maybe<Scalars["String"]["output"]>;
+  profileId: Scalars["ID"]["output"];
   type: DowJonesKycEntityType;
 };
 
 export type DowJonesKycEntitySanction = {
   fromDate: Maybe<DowJonesKycEntityDate>;
-  id: Scalars["ID"];
-  name: Scalars["String"];
-  sources: Array<Scalars["String"]>;
+  id: Scalars["ID"]["output"];
+  name: Scalars["String"]["output"];
+  sources: Array<Scalars["String"]["output"]>;
 };
 
 export type DowJonesKycEntitySearchResult = {
-  countryTerritoryName: Maybe<Scalars["String"]>;
-  iconHints: Array<Scalars["String"]>;
-  id: Scalars["ID"];
-  isSubsidiary: Scalars["Boolean"];
-  name: Scalars["String"];
-  profileId: Scalars["ID"];
-  title: Scalars["String"];
+  countryTerritoryName: Maybe<Scalars["String"]["output"]>;
+  iconHints: Array<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  isSubsidiary: Scalars["Boolean"]["output"];
+  name: Scalars["String"]["output"];
+  profileId: Scalars["ID"]["output"];
+  title: Scalars["String"]["output"];
   type: DowJonesKycEntityType;
 };
 
 export type DowJonesKycEntitySearchResultEntity = DowJonesKycEntitySearchResult & {
-  countryTerritoryName: Maybe<Scalars["String"]>;
-  iconHints: Array<Scalars["String"]>;
-  id: Scalars["ID"];
-  isSubsidiary: Scalars["Boolean"];
-  name: Scalars["String"];
-  profileId: Scalars["ID"];
-  title: Scalars["String"];
+  countryTerritoryName: Maybe<Scalars["String"]["output"]>;
+  iconHints: Array<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  isSubsidiary: Scalars["Boolean"]["output"];
+  name: Scalars["String"]["output"];
+  profileId: Scalars["ID"]["output"];
+  title: Scalars["String"]["output"];
   type: DowJonesKycEntityType;
 };
 
@@ -297,19 +306,19 @@ export type DowJonesKycEntitySearchResultPagination = {
   /** The requested slice of items. */
   items: Array<DowJonesKycEntitySearchResult>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type DowJonesKycEntitySearchResultPerson = DowJonesKycEntitySearchResult & {
-  countryTerritoryName: Maybe<Scalars["String"]>;
+  countryTerritoryName: Maybe<Scalars["String"]["output"]>;
   dateOfBirth: Maybe<DowJonesKycEntityDate>;
-  gender: Scalars["String"];
-  iconHints: Array<Scalars["String"]>;
-  id: Scalars["ID"];
-  isSubsidiary: Scalars["Boolean"];
-  name: Scalars["String"];
-  profileId: Scalars["ID"];
-  title: Scalars["String"];
+  gender: Scalars["String"]["output"];
+  iconHints: Array<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  isSubsidiary: Scalars["Boolean"]["output"];
+  name: Scalars["String"]["output"];
+  profileId: Scalars["ID"]["output"];
+  title: Scalars["String"]["output"];
   type: DowJonesKycEntityType;
 };
 
@@ -318,15 +327,15 @@ export type DowJonesKycEntityType = "Entity" | "Person";
 /** The effective permission for a petition and user */
 export type EffectivePetitionUserPermission = {
   /** wether user is subscribed or not to emails and alerts of the petition */
-  isSubscribed: Scalars["Boolean"];
+  isSubscribed: Scalars["Boolean"]["output"];
   /** The type of the permission. */
   permissionType: PetitionPermissionType;
   user: User;
 };
 
 export type EventSubscriptionSignatureKey = {
-  id: Scalars["GID"];
-  publicKey: Scalars["String"];
+  id: Scalars["GID"]["output"];
+  publicKey: Scalars["String"]["output"];
 };
 
 export type FeatureFlag =
@@ -354,26 +363,26 @@ export type FeatureFlag =
 /** A feature flag name with his value */
 export type FeatureFlagNameValue = {
   name: FeatureFlag;
-  value: Scalars["Boolean"];
+  value: Scalars["Boolean"]["output"];
 };
 
 export type FileUpload = {
-  contentType: Scalars["String"];
-  filename: Scalars["String"];
-  isComplete: Scalars["Boolean"];
-  size: Scalars["Int"];
+  contentType: Scalars["String"]["output"];
+  filename: Scalars["String"]["output"];
+  isComplete: Scalars["Boolean"]["output"];
+  size: Scalars["Int"]["output"];
 };
 
 export type FileUploadDownloadLinkResult = {
   file: Maybe<FileUpload>;
   result: Result;
-  url: Maybe<Scalars["String"]>;
+  url: Maybe<Scalars["String"]["output"]>;
 };
 
 export type FileUploadInput = {
-  contentType: Scalars["String"];
-  filename: Scalars["String"];
-  size: Scalars["Int"];
+  contentType: Scalars["String"]["input"];
+  filename: Scalars["String"]["input"];
+  size: Scalars["Int"]["input"];
 };
 
 export type FileUploadReplyResponse = {
@@ -390,19 +399,19 @@ export type FilterSharedWithOperator =
   | "SHARED_WITH";
 
 export type FoldersInput = {
-  folderIds: Array<Scalars["ID"]>;
+  folderIds: Array<Scalars["ID"]["input"]>;
   type: PetitionBaseType;
 };
 
 export type GenerateUserAuthTokenResponse = {
-  apiKey: Scalars["String"];
+  apiKey: Scalars["String"]["output"];
   userAuthToken: UserAuthenticationToken;
 };
 
 export type GroupPermissionAddedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   permissionGroup: Maybe<UserGroup>;
   permissionType: PetitionPermissionType;
   petition: Maybe<Petition>;
@@ -411,9 +420,9 @@ export type GroupPermissionAddedEvent = PetitionEvent & {
 };
 
 export type GroupPermissionEditedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   permissionGroup: Maybe<UserGroup>;
   permissionType: PetitionPermissionType;
   petition: Maybe<Petition>;
@@ -422,9 +431,9 @@ export type GroupPermissionEditedEvent = PetitionEvent & {
 };
 
 export type GroupPermissionRemovedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   permissionGroup: Maybe<UserGroup>;
   petition: Maybe<Petition>;
   type: PetitionEventType;
@@ -432,12 +441,12 @@ export type GroupPermissionRemovedEvent = PetitionEvent & {
 };
 
 export type IOrgIntegration = {
-  id: Scalars["GID"];
-  invalidCredentials: Scalars["Boolean"];
+  id: Scalars["GID"]["output"];
+  invalidCredentials: Scalars["Boolean"]["output"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
-  isDefault: Scalars["Boolean"];
+  isDefault: Scalars["Boolean"]["output"];
   /** Custom name of this integration, provided by the user */
-  name: Scalars["String"];
+  name: Scalars["String"]["output"];
   /** The type of the integration. */
   type: IntegrationType;
 };
@@ -446,7 +455,7 @@ export type IOrgIntegrationPagination = {
   /** The requested slice of items. */
   items: Array<IOrgIntegration>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type ImageOptions = {
@@ -455,8 +464,8 @@ export type ImageOptions = {
 
 export type ImageOptionsResize = {
   fit?: InputMaybe<ImageOptionsResizeFit>;
-  height?: InputMaybe<Scalars["Int"]>;
-  width?: InputMaybe<Scalars["Int"]>;
+  height?: InputMaybe<Scalars["Int"]["input"]>;
+  width?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type ImageOptionsResizeFit = "contain" | "cover" | "fill" | "inside" | "outside";
@@ -464,7 +473,7 @@ export type ImageOptionsResizeFit = "contain" | "cover" | "fill" | "inside" | "o
 /** A feature flag name with his value */
 export type InputFeatureFlagNameValue = {
   name: FeatureFlag;
-  value: Scalars["Boolean"];
+  value: Scalars["Boolean"]["input"];
 };
 
 /** The types of integrations available. */
@@ -472,45 +481,45 @@ export type IntegrationType = "DOW_JONES_KYC" | "SIGNATURE" | "SSO" | "USER_PROV
 
 /** A public template on landing page */
 export type LandingTemplate = {
-  backgroundColor: Maybe<Scalars["String"]>;
-  categories: Maybe<Array<Scalars["String"]>>;
-  descriptionHtml: Maybe<Scalars["String"]>;
-  fieldCount: Scalars["Int"];
+  backgroundColor: Maybe<Scalars["String"]["output"]>;
+  categories: Maybe<Array<Scalars["String"]["output"]>>;
+  descriptionHtml: Maybe<Scalars["String"]["output"]>;
+  fieldCount: Scalars["Int"]["output"];
   fields: Array<LandingTemplateField>;
-  hasConditionals: Scalars["Boolean"];
-  id: Scalars["GID"];
-  imageUrl: Maybe<Scalars["String"]>;
+  hasConditionals: Scalars["Boolean"]["output"];
+  id: Scalars["GID"]["output"];
+  imageUrl: Maybe<Scalars["String"]["output"]>;
   locale: PetitionLocale;
-  name: Maybe<Scalars["String"]>;
-  organizationName: Scalars["String"];
-  ownerAvatarUrl: Maybe<Scalars["String"]>;
-  ownerFullName: Scalars["String"];
-  publicLinkUrl: Maybe<Scalars["String"]>;
-  shortDescription: Maybe<Scalars["String"]>;
-  slug: Scalars["String"];
-  updatedAt: Scalars["DateTime"];
+  name: Maybe<Scalars["String"]["output"]>;
+  organizationName: Scalars["String"]["output"];
+  ownerAvatarUrl: Maybe<Scalars["String"]["output"]>;
+  ownerFullName: Scalars["String"]["output"];
+  publicLinkUrl: Maybe<Scalars["String"]["output"]>;
+  shortDescription: Maybe<Scalars["String"]["output"]>;
+  slug: Scalars["String"]["output"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 /** A public template on landing page */
 export type LandingTemplateimageUrlArgs = {
-  small?: InputMaybe<Scalars["Boolean"]>;
+  small?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type LandingTemplateCategorySample = {
-  category: Scalars["String"];
+  category: Scalars["String"]["output"];
   templates: LandingTemplatePagination;
 };
 
 export type LandingTemplateCategorySampletemplatesArgs = {
-  limit?: InputMaybe<Scalars["Int"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
   locale: PetitionLocale;
-  offset?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 /** A public template field */
 export type LandingTemplateField = {
-  id: Scalars["GID"];
-  title: Maybe<Scalars["String"]>;
+  id: Scalars["GID"]["output"];
+  title: Maybe<Scalars["String"]["output"]>;
   type: PetitionFieldType;
 };
 
@@ -518,41 +527,41 @@ export type LandingTemplatePagination = {
   /** The requested slice of items. */
   items: Array<LandingTemplate>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type MessageCancelledEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   message: PetitionMessage;
   petition: Maybe<Petition>;
-  reason: Scalars["String"];
+  reason: Scalars["String"]["output"];
   type: PetitionEventType;
   user: Maybe<User>;
 };
 
 export type MessageEmailBouncedUserNotification = PetitionUserNotification & {
   access: PetitionAccess;
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  isRead: Scalars["Boolean"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  isRead: Scalars["Boolean"]["output"];
   petition: PetitionBase;
 };
 
 export type MessageScheduledEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   message: PetitionMessage;
   petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 export type MessageSentEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   message: PetitionMessage;
   petition: Maybe<Petition>;
   type: PetitionEventType;
@@ -644,7 +653,7 @@ export type Mutation = {
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
   /** Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition. */
-  createPublicPetitionLinkPrefillData: Scalars["String"];
+  createPublicPetitionLinkPrefillData: Scalars["String"]["output"];
   /** Creates a new Signaturit integration on the user's organization */
   createSignaturitIntegration: SignatureOrgIntegration;
   /** Creates a tag in the user's organization */
@@ -759,7 +768,7 @@ export type Mutation = {
   /** Generates a download link for a file reply on a public context. */
   publicFileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Returns a signed download url for tasks with file output on a recipient context */
-  publicGetTaskResultFileUrl: Scalars["String"];
+  publicGetTaskResultFileUrl: Scalars["String"]["output"];
   /** Marks the specified comments as read. */
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
   /** Generates a download link for a field attachment on a public context. */
@@ -925,867 +934,867 @@ export type Mutation = {
 };
 
 export type MutationactivateUserArgs = {
-  userIds: Array<Scalars["GID"]>;
+  userIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationaddPetitionPermissionArgs = {
-  message?: InputMaybe<Scalars["String"]>;
-  notify?: InputMaybe<Scalars["Boolean"]>;
+  message?: InputMaybe<Scalars["String"]["input"]>;
+  notify?: InputMaybe<Scalars["Boolean"]["input"]>;
   permissionType: PetitionPermissionTypeRW;
-  petitionIds: Array<Scalars["GID"]>;
-  subscribe?: InputMaybe<Scalars["Boolean"]>;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
-  userIds?: InputMaybe<Array<Scalars["GID"]>>;
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationaddUsersToUserGroupArgs = {
-  userGroupId: Scalars["GID"];
-  userIds: Array<Scalars["GID"]>;
+  userGroupId: Scalars["GID"]["input"];
+  userIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationanonymizePetitionArgs = {
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationapproveOrRejectPetitionFieldRepliesArgs = {
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
   status: PetitionFieldReplyStatus;
 };
 
 export type MutationbulkCreateContactsArgs = {
-  file: Scalars["Upload"];
-  force?: InputMaybe<Scalars["Boolean"]>;
+  file: Scalars["Upload"]["input"];
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type MutationbulkCreatePetitionRepliesArgs = {
-  petitionId: Scalars["GID"];
-  replies: Scalars["JSONObject"];
+  petitionId: Scalars["GID"]["input"];
+  replies: Scalars["JSONObject"]["input"];
 };
 
 export type MutationcancelScheduledMessageArgs = {
-  messageId: Scalars["GID"];
-  petitionId: Scalars["GID"];
+  messageId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationcancelSignatureRequestArgs = {
-  petitionSignatureRequestId: Scalars["GID"];
+  petitionSignatureRequestId: Scalars["GID"]["input"];
 };
 
 export type MutationchangeOrganizationArgs = {
-  orgId?: InputMaybe<Scalars["GID"]>;
+  orgId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
 export type MutationchangePasswordArgs = {
-  newPassword: Scalars["String"];
-  password: Scalars["String"];
+  newPassword: Scalars["String"]["input"];
+  password: Scalars["String"]["input"];
 };
 
 export type MutationchangePetitionFieldTypeArgs = {
-  fieldId: Scalars["GID"];
-  force?: InputMaybe<Scalars["Boolean"]>;
-  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"]["input"];
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
   type: PetitionFieldType;
 };
 
 export type MutationclonePetitionFieldArgs = {
-  fieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationclonePetitionsArgs = {
-  keepTitle?: InputMaybe<Scalars["Boolean"]>;
-  path?: InputMaybe<Scalars["String"]>;
-  petitionIds: Array<Scalars["GID"]>;
+  keepTitle?: InputMaybe<Scalars["Boolean"]["input"]>;
+  path?: InputMaybe<Scalars["String"]["input"]>;
+  petitionIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationcloneProfileTypeArgs = {
-  name?: InputMaybe<Scalars["LocalizableUserText"]>;
-  profileTypeId: Scalars["GID"];
+  name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
 };
 
 export type MutationcloneUserGroupsArgs = {
   locale: UserLocale;
-  userGroupIds: Array<Scalars["GID"]>;
+  userGroupIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationclosePetitionArgs = {
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationcompletePetitionArgs = {
   additionalSigners?: InputMaybe<Array<PublicPetitionSignerDataInput>>;
-  message?: InputMaybe<Scalars["String"]>;
-  petitionId: Scalars["GID"];
+  message?: InputMaybe<Scalars["String"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateContactArgs = {
   data: CreateContactInput;
-  force?: InputMaybe<Scalars["Boolean"]>;
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type MutationcreateDowJonesKycIntegrationArgs = {
-  clientId: Scalars["String"];
-  password: Scalars["String"];
-  username: Scalars["String"];
+  clientId: Scalars["String"]["input"];
+  password: Scalars["String"]["input"];
+  username: Scalars["String"]["input"];
 };
 
 export type MutationcreateDowJonesKycReplyArgs = {
-  fieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
-  profileId: Scalars["ID"];
+  fieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  profileId: Scalars["ID"]["input"];
 };
 
 export type MutationcreateDowJonesProfileDownloadTaskArgs = {
-  profileId: Scalars["ID"];
+  profileId: Scalars["ID"]["input"];
 };
 
 export type MutationcreateEventSubscriptionArgs = {
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
-  eventsUrl: Scalars["String"];
-  fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]>>;
-  fromTemplateId?: InputMaybe<Scalars["GID"]>;
-  name?: InputMaybe<Scalars["String"]>;
+  eventsUrl: Scalars["String"]["input"];
+  fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationcreateEventSubscriptionSignatureKeyArgs = {
-  subscriptionId: Scalars["GID"];
+  subscriptionId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateExportExcelTaskArgs = {
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateExportRepliesTaskArgs = {
-  pattern?: InputMaybe<Scalars["String"]>;
-  petitionId: Scalars["GID"];
+  pattern?: InputMaybe<Scalars["String"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateFileUploadReplyArgs = {
-  fieldId: Scalars["GID"];
+  fieldId: Scalars["GID"]["input"];
   file: FileUploadInput;
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateFileUploadReplyCompleteArgs = {
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  replyId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateOrganizationArgs = {
-  email: Scalars["String"];
-  firstName: Scalars["String"];
-  lastName: Scalars["String"];
+  email: Scalars["String"]["input"];
+  firstName: Scalars["String"]["input"];
+  lastName: Scalars["String"]["input"];
   locale: UserLocale;
-  name: Scalars["String"];
+  name: Scalars["String"]["input"];
   status: OrganizationStatus;
 };
 
 export type MutationcreateOrganizationPdfDocumentThemeArgs = {
-  isDefault: Scalars["Boolean"];
-  name: Scalars["String"];
+  isDefault: Scalars["Boolean"]["input"];
+  name: Scalars["String"]["input"];
 };
 
 export type MutationcreatePetitionArgs = {
   locale?: InputMaybe<PetitionLocale>;
-  name?: InputMaybe<Scalars["String"]>;
-  path?: InputMaybe<Scalars["String"]>;
-  petitionId?: InputMaybe<Scalars["GID"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  path?: InputMaybe<Scalars["String"]["input"]>;
+  petitionId?: InputMaybe<Scalars["GID"]["input"]>;
   type?: InputMaybe<PetitionBaseType>;
 };
 
 export type MutationcreatePetitionAccessArgs = {
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationcreatePetitionAttachmentUploadLinkArgs = {
   data: Array<FileUploadInput>;
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
   type: PetitionAttachmentType;
 };
 
 export type MutationcreatePetitionFieldArgs = {
-  petitionId: Scalars["GID"];
-  position?: InputMaybe<Scalars["Int"]>;
+  petitionId: Scalars["GID"]["input"];
+  position?: InputMaybe<Scalars["Int"]["input"]>;
   type: PetitionFieldType;
 };
 
 export type MutationcreatePetitionFieldAttachmentUploadLinkArgs = {
   data: FileUploadInput;
-  fieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationcreatePetitionFieldCommentArgs = {
-  content: Scalars["JSON"];
-  isInternal: Scalars["Boolean"];
-  petitionFieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
-  sharePetition?: InputMaybe<Scalars["Boolean"]>;
+  content: Scalars["JSON"]["input"];
+  isInternal: Scalars["Boolean"]["input"];
+  petitionFieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  sharePetition?: InputMaybe<Scalars["Boolean"]["input"]>;
   sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
-  sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]>;
-  throwOnNoPermission?: InputMaybe<Scalars["Boolean"]>;
+  sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]["input"]>;
+  throwOnNoPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type MutationcreatePetitionFieldReplyArgs = {
-  fieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
-  reply: Scalars["JSON"];
+  fieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  reply: Scalars["JSON"]["input"];
 };
 
 export type MutationcreatePetitionListViewArgs = {
   data: PetitionListViewDataInput;
-  name: Scalars["String"];
+  name: Scalars["String"]["input"];
 };
 
 export type MutationcreatePrintPdfTaskArgs = {
-  includeNdLinks?: InputMaybe<Scalars["Boolean"]>;
-  petitionId: Scalars["GID"];
-  skipAttachments?: InputMaybe<Scalars["Boolean"]>;
+  includeNdLinks?: InputMaybe<Scalars["Boolean"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
+  skipAttachments?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type MutationcreateProfileArgs = {
-  profileTypeId: Scalars["GID"];
-  subscribe?: InputMaybe<Scalars["Boolean"]>;
+  profileTypeId: Scalars["GID"]["input"];
+  subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type MutationcreateProfileFieldFileUploadLinkArgs = {
   data: Array<FileUploadInput>;
-  expiryDate?: InputMaybe<Scalars["Date"]>;
-  profileId: Scalars["GID"];
-  profileTypeFieldId: Scalars["GID"];
+  expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateProfileTypeArgs = {
-  name: Scalars["LocalizableUserText"];
+  name: Scalars["LocalizableUserText"]["input"];
 };
 
 export type MutationcreateProfileTypeFieldArgs = {
   data: CreateProfileTypeFieldInput;
-  profileTypeId: Scalars["GID"];
+  profileTypeId: Scalars["GID"]["input"];
 };
 
 export type MutationcreatePublicPetitionLinkArgs = {
-  description: Scalars["String"];
-  prefillSecret?: InputMaybe<Scalars["String"]>;
-  slug?: InputMaybe<Scalars["String"]>;
-  templateId: Scalars["GID"];
-  title: Scalars["String"];
+  description: Scalars["String"]["input"];
+  prefillSecret?: InputMaybe<Scalars["String"]["input"]>;
+  slug?: InputMaybe<Scalars["String"]["input"]>;
+  templateId: Scalars["GID"]["input"];
+  title: Scalars["String"]["input"];
 };
 
 export type MutationcreatePublicPetitionLinkPrefillDataArgs = {
-  data: Scalars["JSONObject"];
-  path?: InputMaybe<Scalars["String"]>;
-  publicPetitionLinkId: Scalars["GID"];
+  data: Scalars["JSONObject"]["input"];
+  path?: InputMaybe<Scalars["String"]["input"]>;
+  publicPetitionLinkId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateSignaturitIntegrationArgs = {
-  apiKey: Scalars["String"];
-  isDefault?: InputMaybe<Scalars["Boolean"]>;
-  name: Scalars["String"];
+  apiKey: Scalars["String"]["input"];
+  isDefault?: InputMaybe<Scalars["Boolean"]["input"]>;
+  name: Scalars["String"]["input"];
 };
 
 export type MutationcreateTagArgs = {
-  color: Scalars["String"];
-  name: Scalars["String"];
+  color: Scalars["String"]["input"];
+  name: Scalars["String"]["input"];
 };
 
 export type MutationcreateTemplateRepliesReportTaskArgs = {
-  endDate?: InputMaybe<Scalars["DateTime"]>;
-  petitionId: Scalars["GID"];
-  startDate?: InputMaybe<Scalars["DateTime"]>;
-  timezone: Scalars["String"];
+  endDate?: InputMaybe<Scalars["DateTime"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
+  startDate?: InputMaybe<Scalars["DateTime"]["input"]>;
+  timezone: Scalars["String"]["input"];
 };
 
 export type MutationcreateTemplateStatsReportTaskArgs = {
-  endDate?: InputMaybe<Scalars["DateTime"]>;
-  startDate?: InputMaybe<Scalars["DateTime"]>;
-  templateId: Scalars["GID"];
+  endDate?: InputMaybe<Scalars["DateTime"]["input"]>;
+  startDate?: InputMaybe<Scalars["DateTime"]["input"]>;
+  templateId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateTemplatesOverviewReportTaskArgs = {
-  endDate?: InputMaybe<Scalars["DateTime"]>;
-  startDate?: InputMaybe<Scalars["DateTime"]>;
+  endDate?: InputMaybe<Scalars["DateTime"]["input"]>;
+  startDate?: InputMaybe<Scalars["DateTime"]["input"]>;
 };
 
 export type MutationcreateUserGroupArgs = {
-  name: Scalars["String"];
-  userIds: Array<Scalars["GID"]>;
+  name: Scalars["String"]["input"];
+  userIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationdeactivateAccessesArgs = {
-  accessIds: Array<Scalars["GID"]>;
-  petitionId: Scalars["GID"];
+  accessIds: Array<Scalars["GID"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationdeactivateUserArgs = {
-  includeDrafts?: InputMaybe<Scalars["Boolean"]>;
-  tagIds?: InputMaybe<Array<Scalars["GID"]>>;
-  transferToUserId: Scalars["GID"];
-  userIds: Array<Scalars["GID"]>;
+  includeDrafts?: InputMaybe<Scalars["Boolean"]["input"]>;
+  tagIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  transferToUserId: Scalars["GID"]["input"];
+  userIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationdeleteContactsArgs = {
-  force?: InputMaybe<Scalars["Boolean"]>;
-  ids: Array<Scalars["GID"]>;
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  ids: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationdeleteEventSubscriptionSignatureKeysArgs = {
-  ids: Array<Scalars["GID"]>;
+  ids: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationdeleteEventSubscriptionsArgs = {
-  ids: Array<Scalars["GID"]>;
+  ids: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationdeleteOrganizationPdfDocumentThemeArgs = {
-  orgThemeId: Scalars["GID"];
+  orgThemeId: Scalars["GID"]["input"];
 };
 
 export type MutationdeletePetitionAttachmentArgs = {
-  attachmentId: Scalars["GID"];
-  petitionId: Scalars["GID"];
+  attachmentId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationdeletePetitionFieldArgs = {
-  fieldId: Scalars["GID"];
-  force?: InputMaybe<Scalars["Boolean"]>;
-  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"]["input"];
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationdeletePetitionFieldAttachmentArgs = {
-  attachmentId: Scalars["GID"];
-  fieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
+  attachmentId: Scalars["GID"]["input"];
+  fieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationdeletePetitionFieldCommentArgs = {
-  petitionFieldCommentId: Scalars["GID"];
-  petitionFieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
+  petitionFieldCommentId: Scalars["GID"]["input"];
+  petitionFieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationdeletePetitionListViewArgs = {
-  id: Scalars["GID"];
+  id: Scalars["GID"]["input"];
 };
 
 export type MutationdeletePetitionReplyArgs = {
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  replyId: Scalars["GID"]["input"];
 };
 
 export type MutationdeletePetitionsArgs = {
-  dryrun?: InputMaybe<Scalars["Boolean"]>;
+  dryrun?: InputMaybe<Scalars["Boolean"]["input"]>;
   folders?: InputMaybe<FoldersInput>;
-  force?: InputMaybe<Scalars["Boolean"]>;
-  ids?: InputMaybe<Array<Scalars["GID"]>>;
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  ids?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationdeleteProfileArgs = {
-  force?: InputMaybe<Scalars["Boolean"]>;
-  profileIds: Array<Scalars["GID"]>;
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  profileIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationdeleteProfileFieldFileArgs = {
-  profileFieldFileIds: Array<Scalars["GID"]>;
-  profileId: Scalars["GID"];
-  profileTypeFieldId: Scalars["GID"];
+  profileFieldFileIds: Array<Scalars["GID"]["input"]>;
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
 };
 
 export type MutationdeleteProfileTypeArgs = {
-  profileTypeIds: Array<Scalars["GID"]>;
+  profileTypeIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationdeleteProfileTypeFieldArgs = {
-  force?: InputMaybe<Scalars["Boolean"]>;
-  profileTypeFieldIds: Array<Scalars["GID"]>;
-  profileTypeId: Scalars["GID"];
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  profileTypeFieldIds: Array<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
 };
 
 export type MutationdeleteSignatureIntegrationArgs = {
-  force?: InputMaybe<Scalars["Boolean"]>;
-  id: Scalars["GID"];
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  id: Scalars["GID"]["input"];
 };
 
 export type MutationdeleteTagArgs = {
-  force?: InputMaybe<Scalars["Boolean"]>;
-  id: Scalars["GID"];
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  id: Scalars["GID"]["input"];
 };
 
 export type MutationdeleteUserGroupArgs = {
-  ids: Array<Scalars["GID"]>;
+  ids: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationdynamicSelectFieldFileDownloadLinkArgs = {
-  fieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationeditPetitionPermissionArgs = {
   permissionType: PetitionPermissionType;
-  petitionIds: Array<Scalars["GID"]>;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
-  userIds?: InputMaybe<Array<Scalars["GID"]>>;
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationfileUploadReplyDownloadLinkArgs = {
-  petitionId: Scalars["GID"];
-  preview?: InputMaybe<Scalars["Boolean"]>;
-  replyId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  preview?: InputMaybe<Scalars["Boolean"]["input"]>;
+  replyId: Scalars["GID"]["input"];
 };
 
 export type MutationforceUpdateSignatureOrganizationBrandingsArgs = {
-  orgId: Scalars["GID"];
+  orgId: Scalars["GID"]["input"];
 };
 
 export type MutationgenerateUserAuthTokenArgs = {
-  tokenName: Scalars["String"];
+  tokenName: Scalars["String"]["input"];
 };
 
 export type MutationgetTaskResultFileArgs = {
-  preview?: InputMaybe<Scalars["Boolean"]>;
-  taskId: Scalars["GID"];
+  preview?: InputMaybe<Scalars["Boolean"]["input"]>;
+  taskId: Scalars["GID"]["input"];
 };
 
 export type MutationimportPetitionFromJsonArgs = {
-  json: Scalars["String"];
-  userId: Scalars["GID"];
+  json: Scalars["String"]["input"];
+  userId: Scalars["GID"]["input"];
 };
 
 export type MutationinviteUserToOrganizationArgs = {
-  email: Scalars["String"];
-  firstName: Scalars["String"];
-  lastName: Scalars["String"];
+  email: Scalars["String"]["input"];
+  firstName: Scalars["String"]["input"];
+  lastName: Scalars["String"]["input"];
   locale: UserLocale;
-  orgId?: InputMaybe<Scalars["GID"]>;
+  orgId?: InputMaybe<Scalars["GID"]["input"]>;
   role: OrganizationRole;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationloginAsArgs = {
-  userId: Scalars["GID"];
+  userId: Scalars["GID"]["input"];
 };
 
 export type MutationmarkPetitionListViewAsDefaultArgs = {
-  petitionListViewId?: InputMaybe<Scalars["GID"]>;
+  petitionListViewId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
 export type MutationmarkSignatureIntegrationAsDefaultArgs = {
-  id: Scalars["GID"];
+  id: Scalars["GID"]["input"];
 };
 
 export type MutationmodifyCurrentUsagePeriodArgs = {
   limitName: OrganizationUsageLimitName;
-  newLimit: Scalars["Int"];
-  orgId: Scalars["GID"];
+  newLimit: Scalars["Int"]["input"];
+  orgId: Scalars["GID"]["input"];
 };
 
 export type MutationmodifyPetitionCustomPropertyArgs = {
-  key: Scalars["String"];
-  petitionId: Scalars["GID"];
-  value?: InputMaybe<Scalars["String"]>;
+  key: Scalars["String"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  value?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationmovePetitionsArgs = {
-  destination: Scalars["String"];
-  folderIds?: InputMaybe<Array<Scalars["ID"]>>;
-  ids?: InputMaybe<Array<Scalars["GID"]>>;
-  source: Scalars["String"];
+  destination: Scalars["String"]["input"];
+  folderIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  ids?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  source: Scalars["String"]["input"];
   type: PetitionBaseType;
 };
 
 export type MutationpetitionAttachmentDownloadLinkArgs = {
-  attachmentId: Scalars["GID"];
-  petitionId: Scalars["GID"];
-  preview?: InputMaybe<Scalars["Boolean"]>;
+  attachmentId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  preview?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type MutationpetitionAttachmentUploadCompleteArgs = {
-  attachmentId: Scalars["GID"];
-  petitionId: Scalars["GID"];
+  attachmentId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationpetitionFieldAttachmentDownloadLinkArgs = {
-  attachmentId: Scalars["GID"];
-  fieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
+  attachmentId: Scalars["GID"]["input"];
+  fieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationpetitionFieldAttachmentUploadCompleteArgs = {
-  attachmentId: Scalars["GID"];
-  fieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
+  attachmentId: Scalars["GID"]["input"];
+  fieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationprofileFieldFileDownloadLinkArgs = {
-  preview?: InputMaybe<Scalars["Boolean"]>;
-  profileFieldFileId: Scalars["GID"];
-  profileId: Scalars["GID"];
-  profileTypeFieldId: Scalars["GID"];
+  preview?: InputMaybe<Scalars["Boolean"]["input"]>;
+  profileFieldFileId: Scalars["GID"]["input"];
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
 };
 
 export type MutationprofileFieldFileUploadCompleteArgs = {
-  profileFieldFileIds: Array<Scalars["GID"]>;
-  profileId: Scalars["GID"];
-  profileTypeFieldId: Scalars["GID"];
+  profileFieldFileIds: Array<Scalars["GID"]["input"]>;
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
 };
 
 export type MutationpublicCheckVerificationCodeArgs = {
-  code: Scalars["String"];
-  keycode: Scalars["ID"];
-  token: Scalars["ID"];
+  code: Scalars["String"]["input"];
+  keycode: Scalars["ID"]["input"];
+  token: Scalars["ID"]["input"];
 };
 
 export type MutationpublicCompletePetitionArgs = {
   additionalSigners?: InputMaybe<Array<PublicPetitionSignerDataInput>>;
-  keycode: Scalars["ID"];
-  message?: InputMaybe<Scalars["String"]>;
+  keycode: Scalars["ID"]["input"];
+  message?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationpublicCreateAndSendPetitionFromPublicLinkArgs = {
-  contactEmail: Scalars["String"];
-  contactFirstName: Scalars["String"];
-  contactLastName: Scalars["String"];
-  force?: InputMaybe<Scalars["Boolean"]>;
-  prefill?: InputMaybe<Scalars["String"]>;
-  prefillDataKey?: InputMaybe<Scalars["ID"]>;
-  slug: Scalars["ID"];
+  contactEmail: Scalars["String"]["input"];
+  contactFirstName: Scalars["String"]["input"];
+  contactLastName: Scalars["String"]["input"];
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  prefill?: InputMaybe<Scalars["String"]["input"]>;
+  prefillDataKey?: InputMaybe<Scalars["ID"]["input"]>;
+  slug: Scalars["ID"]["input"];
 };
 
 export type MutationpublicCreateFileUploadReplyArgs = {
   data: FileUploadInput;
-  fieldId: Scalars["GID"];
-  keycode: Scalars["ID"];
+  fieldId: Scalars["GID"]["input"];
+  keycode: Scalars["ID"]["input"];
 };
 
 export type MutationpublicCreatePetitionFieldCommentArgs = {
-  content: Scalars["JSON"];
-  keycode: Scalars["ID"];
-  petitionFieldId: Scalars["GID"];
+  content: Scalars["JSON"]["input"];
+  keycode: Scalars["ID"]["input"];
+  petitionFieldId: Scalars["GID"]["input"];
 };
 
 export type MutationpublicCreatePetitionFieldReplyArgs = {
-  fieldId: Scalars["GID"];
-  keycode: Scalars["ID"];
-  reply: Scalars["JSON"];
+  fieldId: Scalars["GID"]["input"];
+  keycode: Scalars["ID"]["input"];
+  reply: Scalars["JSON"]["input"];
 };
 
 export type MutationpublicCreatePrintPdfTaskArgs = {
-  keycode: Scalars["ID"];
+  keycode: Scalars["ID"]["input"];
 };
 
 export type MutationpublicDelegateAccessToContactArgs = {
-  email: Scalars["String"];
-  firstName: Scalars["String"];
-  keycode: Scalars["ID"];
-  lastName: Scalars["String"];
-  messageBody: Scalars["JSON"];
+  email: Scalars["String"]["input"];
+  firstName: Scalars["String"]["input"];
+  keycode: Scalars["ID"]["input"];
+  lastName: Scalars["String"]["input"];
+  messageBody: Scalars["JSON"]["input"];
 };
 
 export type MutationpublicDeletePetitionFieldCommentArgs = {
-  keycode: Scalars["ID"];
-  petitionFieldCommentId: Scalars["GID"];
-  petitionFieldId: Scalars["GID"];
+  keycode: Scalars["ID"]["input"];
+  petitionFieldCommentId: Scalars["GID"]["input"];
+  petitionFieldId: Scalars["GID"]["input"];
 };
 
 export type MutationpublicDeletePetitionFieldReplyArgs = {
-  keycode: Scalars["ID"];
-  replyId: Scalars["GID"];
+  keycode: Scalars["ID"]["input"];
+  replyId: Scalars["GID"]["input"];
 };
 
 export type MutationpublicFileUploadReplyCompleteArgs = {
-  keycode: Scalars["ID"];
-  replyId: Scalars["GID"];
+  keycode: Scalars["ID"]["input"];
+  replyId: Scalars["GID"]["input"];
 };
 
 export type MutationpublicFileUploadReplyDownloadLinkArgs = {
-  keycode: Scalars["ID"];
-  preview?: InputMaybe<Scalars["Boolean"]>;
-  replyId: Scalars["GID"];
+  keycode: Scalars["ID"]["input"];
+  preview?: InputMaybe<Scalars["Boolean"]["input"]>;
+  replyId: Scalars["GID"]["input"];
 };
 
 export type MutationpublicGetTaskResultFileUrlArgs = {
-  keycode: Scalars["ID"];
-  taskId: Scalars["GID"];
+  keycode: Scalars["ID"]["input"];
+  taskId: Scalars["GID"]["input"];
 };
 
 export type MutationpublicMarkPetitionFieldCommentsAsReadArgs = {
-  keycode: Scalars["ID"];
-  petitionFieldCommentIds: Array<Scalars["GID"]>;
+  keycode: Scalars["ID"]["input"];
+  petitionFieldCommentIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationpublicPetitionFieldAttachmentDownloadLinkArgs = {
-  attachmentId: Scalars["GID"];
-  fieldId: Scalars["GID"];
-  keycode: Scalars["ID"];
-  preview?: InputMaybe<Scalars["Boolean"]>;
+  attachmentId: Scalars["GID"]["input"];
+  fieldId: Scalars["GID"]["input"];
+  keycode: Scalars["ID"]["input"];
+  preview?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type MutationpublicRemindersOptOutArgs = {
-  keycode: Scalars["ID"];
-  other: Scalars["String"];
-  reason: Scalars["String"];
-  referer?: InputMaybe<Scalars["String"]>;
+  keycode: Scalars["ID"]["input"];
+  other: Scalars["String"]["input"];
+  reason: Scalars["String"]["input"];
+  referer?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationpublicResetTempPasswordArgs = {
-  email: Scalars["String"];
+  email: Scalars["String"]["input"];
   locale: UserLocale;
 };
 
 export type MutationpublicSendReminderArgs = {
-  contactEmail: Scalars["String"];
-  keycode?: InputMaybe<Scalars["ID"]>;
-  slug?: InputMaybe<Scalars["ID"]>;
+  contactEmail: Scalars["String"]["input"];
+  keycode?: InputMaybe<Scalars["ID"]["input"]>;
+  slug?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
 export type MutationpublicSendVerificationCodeArgs = {
-  email?: InputMaybe<Scalars["String"]>;
-  firstName?: InputMaybe<Scalars["String"]>;
-  keycode: Scalars["ID"];
-  lastName?: InputMaybe<Scalars["String"]>;
+  email?: InputMaybe<Scalars["String"]["input"]>;
+  firstName?: InputMaybe<Scalars["String"]["input"]>;
+  keycode: Scalars["ID"]["input"];
+  lastName?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationpublicStartAsyncFieldCompletionArgs = {
-  fieldId: Scalars["GID"];
-  keycode: Scalars["ID"];
+  fieldId: Scalars["GID"]["input"];
+  keycode: Scalars["ID"]["input"];
 };
 
 export type MutationpublicUpdatePetitionFieldCommentArgs = {
-  content: Scalars["JSON"];
-  keycode: Scalars["ID"];
-  petitionFieldCommentId: Scalars["GID"];
-  petitionFieldId: Scalars["GID"];
+  content: Scalars["JSON"]["input"];
+  keycode: Scalars["ID"]["input"];
+  petitionFieldCommentId: Scalars["GID"]["input"];
+  petitionFieldId: Scalars["GID"]["input"];
 };
 
 export type MutationpublicUpdatePetitionFieldReplyArgs = {
-  keycode: Scalars["ID"];
-  reply: Scalars["JSON"];
-  replyId: Scalars["GID"];
+  keycode: Scalars["ID"]["input"];
+  reply: Scalars["JSON"]["input"];
+  replyId: Scalars["GID"]["input"];
 };
 
 export type MutationreactivateAccessesArgs = {
-  accessIds: Array<Scalars["GID"]>;
-  petitionId: Scalars["GID"];
+  accessIds: Array<Scalars["GID"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationremovePetitionPasswordArgs = {
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationremovePetitionPermissionArgs = {
-  petitionIds: Array<Scalars["GID"]>;
-  removeAll?: InputMaybe<Scalars["Boolean"]>;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
-  userIds?: InputMaybe<Array<Scalars["GID"]>>;
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  removeAll?: InputMaybe<Scalars["Boolean"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationremoveUsersFromGroupArgs = {
-  userGroupId: Scalars["GID"];
-  userIds: Array<Scalars["GID"]>;
+  userGroupId: Scalars["GID"]["input"];
+  userIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationrenameFolderArgs = {
-  folderId: Scalars["ID"];
-  name?: InputMaybe<Scalars["String"]>;
+  folderId: Scalars["ID"]["input"];
+  name?: InputMaybe<Scalars["String"]["input"]>;
   type: PetitionBaseType;
 };
 
 export type MutationreopenPetitionArgs = {
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationreorderPetitionAttachmentsArgs = {
-  attachmentIds: Array<Scalars["GID"]>;
+  attachmentIds: Array<Scalars["GID"]["input"]>;
   attachmentType: PetitionAttachmentType;
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationreorderPetitionListViewsArgs = {
-  ids: Array<Scalars["GID"]>;
+  ids: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationresendVerificationEmailArgs = {
-  email: Scalars["String"];
+  email: Scalars["String"]["input"];
   locale: UserLocale;
 };
 
 export type MutationresetTempPasswordArgs = {
-  email: Scalars["String"];
+  email: Scalars["String"]["input"];
   locale: UserLocale;
 };
 
 export type MutationresetUserPasswordArgs = {
-  email: Scalars["String"];
+  email: Scalars["String"]["input"];
   locale: UserLocale;
 };
 
 export type MutationrestoreDeletedPetitionArgs = {
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationrevokeUserAuthTokenArgs = {
-  authTokenIds: Array<Scalars["GID"]>;
+  authTokenIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationsendPetitionArgs = {
-  body: Scalars["JSON"];
+  body: Scalars["JSON"]["input"];
   bulkSendSigningMode?: InputMaybe<BulkSendSigningMode>;
-  contactIdGroups: Array<Array<Scalars["GID"]>>;
-  petitionId: Scalars["GID"];
+  contactIdGroups: Array<Array<Scalars["GID"]["input"]>>;
+  petitionId: Scalars["GID"]["input"];
   remindersConfig?: InputMaybe<RemindersConfigInput>;
-  scheduledAt?: InputMaybe<Scalars["DateTime"]>;
-  senderId?: InputMaybe<Scalars["GID"]>;
-  subject: Scalars["String"];
+  scheduledAt?: InputMaybe<Scalars["DateTime"]["input"]>;
+  senderId?: InputMaybe<Scalars["GID"]["input"]>;
+  subject: Scalars["String"]["input"];
 };
 
 export type MutationsendPetitionClosedNotificationArgs = {
-  attachPdfExport: Scalars["Boolean"];
-  emailBody: Scalars["JSON"];
-  force?: InputMaybe<Scalars["Boolean"]>;
-  pdfExportTitle?: InputMaybe<Scalars["String"]>;
-  petitionId: Scalars["GID"];
+  attachPdfExport: Scalars["Boolean"]["input"];
+  emailBody: Scalars["JSON"]["input"];
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  pdfExportTitle?: InputMaybe<Scalars["String"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationsendRemindersArgs = {
-  accessIds: Array<Scalars["GID"]>;
-  body?: InputMaybe<Scalars["JSON"]>;
-  petitionId: Scalars["GID"];
+  accessIds: Array<Scalars["GID"]["input"]>;
+  body?: InputMaybe<Scalars["JSON"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationsendSignatureRequestRemindersArgs = {
-  petitionSignatureRequestId: Scalars["GID"];
+  petitionSignatureRequestId: Scalars["GID"]["input"];
 };
 
 export type MutationsetUserDelegatesArgs = {
-  delegateIds: Array<Scalars["GID"]>;
+  delegateIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationshareSignaturitApiKeyArgs = {
-  duration: Scalars["Duration"];
-  limit: Scalars["Int"];
-  orgId: Scalars["GID"];
+  duration: Scalars["Duration"]["input"];
+  limit: Scalars["Int"]["input"];
+  orgId: Scalars["GID"]["input"];
 };
 
 export type MutationsignUpArgs = {
-  captcha: Scalars["String"];
-  email: Scalars["String"];
-  firstName: Scalars["String"];
-  industry?: InputMaybe<Scalars["String"]>;
-  lastName: Scalars["String"];
-  licenseCode?: InputMaybe<Scalars["String"]>;
+  captcha: Scalars["String"]["input"];
+  email: Scalars["String"]["input"];
+  firstName: Scalars["String"]["input"];
+  industry?: InputMaybe<Scalars["String"]["input"]>;
+  lastName: Scalars["String"]["input"];
+  licenseCode?: InputMaybe<Scalars["String"]["input"]>;
   locale: UserLocale;
-  organizationLogo?: InputMaybe<Scalars["Upload"]>;
-  organizationName: Scalars["String"];
-  password: Scalars["String"];
-  position?: InputMaybe<Scalars["String"]>;
-  role?: InputMaybe<Scalars["String"]>;
+  organizationLogo?: InputMaybe<Scalars["Upload"]["input"]>;
+  organizationName: Scalars["String"]["input"];
+  password: Scalars["String"]["input"];
+  position?: InputMaybe<Scalars["String"]["input"]>;
+  role?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationsignaturitIntegrationShowSecurityStampArgs = {
-  integrationId: Scalars["Int"];
-  showCsv: Scalars["Boolean"];
+  integrationId: Scalars["Int"]["input"];
+  showCsv: Scalars["Boolean"]["input"];
 };
 
 export type MutationsignedPetitionDownloadLinkArgs = {
-  downloadAuditTrail?: InputMaybe<Scalars["Boolean"]>;
-  petitionSignatureRequestId: Scalars["GID"];
-  preview?: InputMaybe<Scalars["Boolean"]>;
+  downloadAuditTrail?: InputMaybe<Scalars["Boolean"]["input"]>;
+  petitionSignatureRequestId: Scalars["GID"]["input"];
+  preview?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type MutationstartAsyncFieldCompletionArgs = {
-  fieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationstartSignatureRequestArgs = {
-  message?: InputMaybe<Scalars["String"]>;
-  petitionId: Scalars["GID"];
+  message?: InputMaybe<Scalars["String"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationsubscribeToProfileArgs = {
-  profileIds: Array<Scalars["GID"]>;
-  userIds: Array<Scalars["GID"]>;
+  profileIds: Array<Scalars["GID"]["input"]>;
+  userIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationswitchAutomaticRemindersArgs = {
-  accessIds: Array<Scalars["GID"]>;
-  petitionId: Scalars["GID"];
+  accessIds: Array<Scalars["GID"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
   remindersConfig?: InputMaybe<RemindersConfigInput>;
-  start: Scalars["Boolean"];
+  start: Scalars["Boolean"]["input"];
 };
 
 export type MutationtagPetitionArgs = {
-  petitionId: Scalars["GID"];
-  tagId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  tagId: Scalars["GID"]["input"];
 };
 
 export type MutationtransferOrganizationOwnershipArgs = {
-  orgId: Scalars["GID"];
-  userId: Scalars["GID"];
+  orgId: Scalars["GID"]["input"];
+  userId: Scalars["GID"]["input"];
 };
 
 export type MutationtransferPetitionOwnershipArgs = {
-  petitionIds: Array<Scalars["GID"]>;
-  userId: Scalars["GID"];
+  petitionIds: Array<Scalars["GID"]["input"]>;
+  userId: Scalars["GID"]["input"];
 };
 
 export type MutationunsubscribeFromProfileArgs = {
-  profileIds: Array<Scalars["GID"]>;
-  userIds: Array<Scalars["GID"]>;
+  profileIds: Array<Scalars["GID"]["input"]>;
+  userIds: Array<Scalars["GID"]["input"]>;
 };
 
 export type MutationuntagPetitionArgs = {
-  petitionId: Scalars["GID"];
-  tagId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  tagId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateContactArgs = {
   data: UpdateContactInput;
-  id: Scalars["GID"];
+  id: Scalars["GID"]["input"];
 };
 
 export type MutationupdateEventSubscriptionArgs = {
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
-  eventsUrl?: InputMaybe<Scalars["String"]>;
-  fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]>>;
-  fromTemplateId?: InputMaybe<Scalars["GID"]>;
-  id: Scalars["GID"];
-  isEnabled?: InputMaybe<Scalars["Boolean"]>;
-  name?: InputMaybe<Scalars["String"]>;
+  eventsUrl?: InputMaybe<Scalars["String"]["input"]>;
+  fromTemplateFieldIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
+  id: Scalars["GID"]["input"];
+  isEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationupdateFeatureFlagsArgs = {
   featureFlags: Array<InputFeatureFlagNameValue>;
-  orgId: Scalars["GID"];
+  orgId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateFieldPositionsArgs = {
-  fieldIds: Array<Scalars["GID"]>;
-  petitionId: Scalars["GID"];
+  fieldIds: Array<Scalars["GID"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateFileUploadReplyArgs = {
   file: FileUploadInput;
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  replyId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateFileUploadReplyCompleteArgs = {
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  replyId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateLandingTemplateMetadataArgs = {
-  backgroundColor?: InputMaybe<Scalars["String"]>;
-  categories?: InputMaybe<Scalars["String"]>;
-  description?: InputMaybe<Scalars["String"]>;
-  image?: InputMaybe<Scalars["Upload"]>;
-  slug?: InputMaybe<Scalars["String"]>;
-  templateId: Scalars["GID"];
+  backgroundColor?: InputMaybe<Scalars["String"]["input"]>;
+  categories?: InputMaybe<Scalars["String"]["input"]>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  image?: InputMaybe<Scalars["Upload"]["input"]>;
+  slug?: InputMaybe<Scalars["String"]["input"]>;
+  templateId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateOrganizationAutoAnonymizePeriodArgs = {
-  months?: InputMaybe<Scalars["Int"]>;
+  months?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type MutationupdateOrganizationBrandThemeArgs = {
@@ -1793,185 +1802,185 @@ export type MutationupdateOrganizationBrandThemeArgs = {
 };
 
 export type MutationupdateOrganizationLogoArgs = {
-  file: Scalars["Upload"];
-  isIcon?: InputMaybe<Scalars["Boolean"]>;
+  file: Scalars["Upload"]["input"];
+  isIcon?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type MutationupdateOrganizationPdfDocumentThemeArgs = {
   data?: InputMaybe<OrganizationPdfDocumentThemeInput>;
-  isDefault?: InputMaybe<Scalars["Boolean"]>;
-  name?: InputMaybe<Scalars["String"]>;
-  orgThemeId: Scalars["GID"];
+  isDefault?: InputMaybe<Scalars["Boolean"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  orgThemeId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateOrganizationTierArgs = {
-  orgId: Scalars["GID"];
-  tier: Scalars["String"];
+  orgId: Scalars["GID"]["input"];
+  tier: Scalars["String"]["input"];
 };
 
 export type MutationupdateOrganizationUsageDetailsArgs = {
-  duration: Scalars["Duration"];
-  limit: Scalars["Int"];
+  duration: Scalars["Duration"]["input"];
+  limit: Scalars["Int"]["input"];
   limitName: OrganizationUsageLimitName;
-  orgId: Scalars["GID"];
-  renewalCycles: Scalars["Int"];
-  startNewPeriod: Scalars["Boolean"];
+  orgId: Scalars["GID"]["input"];
+  renewalCycles: Scalars["Int"]["input"];
+  startNewPeriod: Scalars["Boolean"]["input"];
 };
 
 export type MutationupdateOrganizationUserArgs = {
   role: OrganizationRole;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
-  userId: Scalars["GID"];
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  userId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateOrganizationUserLimitArgs = {
-  limit: Scalars["Int"];
-  orgId: Scalars["GID"];
+  limit: Scalars["Int"]["input"];
+  orgId: Scalars["GID"]["input"];
 };
 
 export type MutationupdatePetitionArgs = {
   data: UpdatePetitionInput;
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationupdatePetitionAttachmentTypeArgs = {
-  attachmentId: Scalars["GID"];
-  petitionId: Scalars["GID"];
+  attachmentId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
   type: PetitionAttachmentType;
 };
 
 export type MutationupdatePetitionFieldArgs = {
   data: UpdatePetitionFieldInput;
-  fieldId: Scalars["GID"];
-  force?: InputMaybe<Scalars["Boolean"]>;
-  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"]["input"];
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationupdatePetitionFieldCommentArgs = {
-  content: Scalars["JSON"];
-  petitionFieldCommentId: Scalars["GID"];
-  petitionFieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
-  sharePetition?: InputMaybe<Scalars["Boolean"]>;
+  content: Scalars["JSON"]["input"];
+  petitionFieldCommentId: Scalars["GID"]["input"];
+  petitionFieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  sharePetition?: InputMaybe<Scalars["Boolean"]["input"]>;
   sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
-  sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]>;
-  throwOnNoPermission?: InputMaybe<Scalars["Boolean"]>;
+  sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]["input"]>;
+  throwOnNoPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type MutationupdatePetitionFieldRepliesStatusArgs = {
-  petitionFieldId: Scalars["GID"];
-  petitionFieldReplyIds: Array<Scalars["GID"]>;
-  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"]["input"];
+  petitionFieldReplyIds: Array<Scalars["GID"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
   status: PetitionFieldReplyStatus;
 };
 
 export type MutationupdatePetitionFieldReplyArgs = {
-  petitionId: Scalars["GID"];
-  reply: Scalars["JSON"];
-  replyId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  reply: Scalars["JSON"]["input"];
+  replyId: Scalars["GID"]["input"];
 };
 
 export type MutationupdatePetitionFieldReplyMetadataArgs = {
-  metadata: Scalars["JSONObject"];
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
+  metadata: Scalars["JSONObject"]["input"];
+  petitionId: Scalars["GID"]["input"];
+  replyId: Scalars["GID"]["input"];
 };
 
 export type MutationupdatePetitionListViewArgs = {
   data?: InputMaybe<PetitionListViewDataInput>;
-  name?: InputMaybe<Scalars["String"]>;
-  petitionListViewId: Scalars["GID"];
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  petitionListViewId: Scalars["GID"]["input"];
 };
 
 export type MutationupdatePetitionMetadataArgs = {
-  metadata: Scalars["JSONObject"];
-  petitionId: Scalars["GID"];
+  metadata: Scalars["JSONObject"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationupdatePetitionPermissionSubscriptionArgs = {
-  isSubscribed: Scalars["Boolean"];
-  petitionId: Scalars["GID"];
+  isSubscribed: Scalars["Boolean"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationupdatePetitionRestrictionArgs = {
-  isRestricted: Scalars["Boolean"];
-  password?: InputMaybe<Scalars["String"]>;
-  petitionId: Scalars["GID"];
+  isRestricted: Scalars["Boolean"]["input"];
+  password?: InputMaybe<Scalars["String"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationupdatePetitionUserNotificationReadStatusArgs = {
   filter?: InputMaybe<PetitionUserNotificationFilter>;
-  isRead: Scalars["Boolean"];
-  petitionFieldCommentIds?: InputMaybe<Array<Scalars["GID"]>>;
-  petitionIds?: InputMaybe<Array<Scalars["GID"]>>;
-  petitionUserNotificationIds?: InputMaybe<Array<Scalars["GID"]>>;
+  isRead: Scalars["Boolean"]["input"];
+  petitionFieldCommentIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  petitionIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  petitionUserNotificationIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type MutationupdateProfileFieldValueArgs = {
   fields: Array<UpdateProfileFieldValueInput>;
-  profileId: Scalars["GID"];
+  profileId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateProfileTypeArgs = {
-  name?: InputMaybe<Scalars["LocalizableUserText"]>;
-  profileNamePattern?: InputMaybe<Scalars["String"]>;
-  profileTypeId: Scalars["GID"];
+  name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
+  profileNamePattern?: InputMaybe<Scalars["String"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateProfileTypeFieldArgs = {
   data: UpdateProfileTypeFieldInput;
-  force?: InputMaybe<Scalars["Boolean"]>;
-  profileTypeFieldId: Scalars["GID"];
-  profileTypeId: Scalars["GID"];
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  profileTypeFieldId: Scalars["GID"]["input"];
+  profileTypeId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateProfileTypeFieldPositionsArgs = {
-  profileTypeFieldIds: Array<Scalars["GID"]>;
-  profileTypeId: Scalars["GID"];
+  profileTypeFieldIds: Array<Scalars["GID"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
 };
 
 export type MutationupdatePublicPetitionLinkArgs = {
-  description?: InputMaybe<Scalars["String"]>;
-  isActive?: InputMaybe<Scalars["Boolean"]>;
-  prefillSecret?: InputMaybe<Scalars["String"]>;
-  publicPetitionLinkId: Scalars["GID"];
-  slug?: InputMaybe<Scalars["String"]>;
-  title?: InputMaybe<Scalars["String"]>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  isActive?: InputMaybe<Scalars["Boolean"]["input"]>;
+  prefillSecret?: InputMaybe<Scalars["String"]["input"]>;
+  publicPetitionLinkId: Scalars["GID"]["input"];
+  slug?: InputMaybe<Scalars["String"]["input"]>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationupdatePublicTemplateVisibilityArgs = {
-  isPublic: Scalars["Boolean"];
-  templateId: Scalars["GID"];
+  isPublic: Scalars["Boolean"]["input"];
+  templateId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateSignatureRequestMetadataArgs = {
-  metadata: Scalars["JSONObject"];
-  petitionSignatureRequestId: Scalars["GID"];
+  metadata: Scalars["JSONObject"]["input"];
+  petitionSignatureRequestId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateTagArgs = {
   data: UpdateTagInput;
-  id: Scalars["GID"];
+  id: Scalars["GID"]["input"];
 };
 
 export type MutationupdateTemplateDefaultPermissionsArgs = {
   permissions: Array<UserOrUserGroupPermissionInput>;
-  templateId: Scalars["GID"];
+  templateId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateTemplateDocumentThemeArgs = {
-  orgThemeId: Scalars["GID"];
-  templateId: Scalars["GID"];
+  orgThemeId: Scalars["GID"]["input"];
+  templateId: Scalars["GID"]["input"];
 };
 
 export type MutationupdateUserArgs = {
-  firstName?: InputMaybe<Scalars["String"]>;
-  lastName?: InputMaybe<Scalars["String"]>;
+  firstName?: InputMaybe<Scalars["String"]["input"]>;
+  lastName?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type MutationupdateUserGroupArgs = {
   data: UpdateUserGroupInput;
-  id: Scalars["GID"];
+  id: Scalars["GID"]["input"];
 };
 
 export type MutationupdateUserPreferredLocaleArgs = {
@@ -1979,38 +1988,38 @@ export type MutationupdateUserPreferredLocaleArgs = {
 };
 
 export type MutationuploadDynamicSelectFieldFileArgs = {
-  fieldId: Scalars["GID"];
-  file: Scalars["Upload"];
-  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"]["input"];
+  file: Scalars["Upload"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationuploadUserAvatarArgs = {
-  image: Scalars["Upload"];
-  userId: Scalars["GID"];
+  image: Scalars["Upload"]["input"];
+  userId: Scalars["GID"]["input"];
 };
 
 export type MutationverifyPublicAccessArgs = {
-  ip?: InputMaybe<Scalars["String"]>;
-  keycode: Scalars["ID"];
-  token: Scalars["ID"];
-  userAgent?: InputMaybe<Scalars["String"]>;
+  ip?: InputMaybe<Scalars["String"]["input"]>;
+  keycode: Scalars["ID"]["input"];
+  token: Scalars["ID"]["input"];
+  userAgent?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type OrgIntegration = IOrgIntegration & {
-  id: Scalars["GID"];
-  invalidCredentials: Scalars["Boolean"];
+  id: Scalars["GID"]["output"];
+  invalidCredentials: Scalars["Boolean"]["output"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
-  isDefault: Scalars["Boolean"];
+  isDefault: Scalars["Boolean"]["output"];
   /** Custom name of this integration, provided by the user */
-  name: Scalars["String"];
+  name: Scalars["String"]["output"];
   /** The type of the integration. */
   type: IntegrationType;
 };
 
 /** An object describing the license of an organization */
 export type OrgLicense = {
-  externalId: Scalars["String"];
-  name: Scalars["String"];
+  externalId: Scalars["String"]["output"];
+  name: Scalars["String"]["output"];
   source: OrgLicenseSource;
 };
 
@@ -2019,39 +2028,39 @@ export type OrgLicenseSource = "APPSUMO";
 /** An organization in the system. */
 export type Organization = Timestamps & {
   /** The total number of active users */
-  activeUserCount: Scalars["Int"];
-  anonymizePetitionsAfterMonths: Maybe<Scalars["Int"]>;
+  activeUserCount: Scalars["Int"]["output"];
+  anonymizePetitionsAfterMonths: Maybe<Scalars["Int"]["output"]>;
   brandTheme: OrganizationBrandThemeData;
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   currentUsagePeriod: Maybe<OrganizationUsageLimit>;
   /** Custom host used in petition links and public links. */
-  customHost: Maybe<Scalars["String"]>;
+  customHost: Maybe<Scalars["String"]["output"]>;
   /** A list of all feature flag and the value asigned to this org */
   features: Array<FeatureFlagNameValue>;
-  hasIntegration: Scalars["Boolean"];
+  hasIntegration: Scalars["Boolean"]["output"];
   /** Whether the organization has an SSO provider configured. */
-  hasSsoProvider: Scalars["Boolean"];
+  hasSsoProvider: Scalars["Boolean"]["output"];
   /** URL of the organization logo */
-  iconUrl: Maybe<Scalars["String"]>;
+  iconUrl: Maybe<Scalars["String"]["output"]>;
   /** The ID of the organization. */
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   /** A paginated list with enabled integrations for the organization */
   integrations: IOrgIntegrationPagination;
-  isUsageLimitReached: Scalars["Boolean"];
+  isUsageLimitReached: Scalars["Boolean"]["output"];
   /** Current license for the organization */
   license: Maybe<OrgLicense>;
   /** URL of the organization logo */
-  logoUrl: Maybe<Scalars["String"]>;
+  logoUrl: Maybe<Scalars["String"]["output"]>;
   /** The name of the organization. */
-  name: Scalars["String"];
+  name: Scalars["String"]["output"];
   pdfDocumentThemes: Array<OrganizationTheme>;
   /** The status of the organization. */
   status: OrganizationStatus;
-  subscriptionEndDate: Maybe<Scalars["DateTime"]>;
+  subscriptionEndDate: Maybe<Scalars["DateTime"]["output"]>;
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
-  usageDetails: Scalars["JSONObject"];
+  updatedAt: Scalars["DateTime"]["output"];
+  usageDetails: Scalars["JSONObject"]["output"];
   usagePeriods: OrganizationUsageLimitPagination;
   /** The users in the organization. */
   users: UserPagination;
@@ -2065,7 +2074,7 @@ export type OrganizationcurrentUsagePeriodArgs = {
 /** An organization in the system. */
 export type OrganizationhasIntegrationArgs = {
   integration: IntegrationType;
-  provider?: InputMaybe<Scalars["String"]>;
+  provider?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 /** An organization in the system. */
@@ -2075,8 +2084,8 @@ export type OrganizationiconUrlArgs = {
 
 /** An organization in the system. */
 export type OrganizationintegrationsArgs = {
-  limit?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
   type?: InputMaybe<IntegrationType>;
 };
 
@@ -2097,30 +2106,30 @@ export type OrganizationsubscriptionEndDateArgs = {
 
 /** An organization in the system. */
 export type OrganizationusagePeriodsArgs = {
-  limit?: InputMaybe<Scalars["Int"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
   limitName: OrganizationUsageLimitName;
-  offset?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 /** An organization in the system. */
 export type OrganizationusersArgs = {
-  exclude?: InputMaybe<Array<Scalars["GID"]>>;
-  includeInactive?: InputMaybe<Scalars["Boolean"]>;
-  limit?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  search?: InputMaybe<Scalars["String"]>;
+  exclude?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  includeInactive?: InputMaybe<Scalars["Boolean"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy>>;
 };
 
 export type OrganizationBrandThemeData = {
-  color: Scalars["String"];
-  fontFamily: Maybe<Scalars["String"]>;
+  color: Scalars["String"]["output"];
+  fontFamily: Maybe<Scalars["String"]["output"]>;
   preferredTone: Tone;
 };
 
 export type OrganizationBrandThemeInput = {
-  color?: InputMaybe<Scalars["String"]>;
-  fontFamily?: InputMaybe<Scalars["String"]>;
+  color?: InputMaybe<Scalars["String"]["input"]>;
+  fontFamily?: InputMaybe<Scalars["String"]["input"]>;
   preferredTone?: InputMaybe<Tone>;
 };
 
@@ -2128,30 +2137,30 @@ export type OrganizationPagination = {
   /** The requested slice of items. */
   items: Array<Organization>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type OrganizationPdfDocumentThemeInput = {
   legalText?: InputMaybe<OrganizationPdfDocumentThemeInputLegalText>;
-  marginBottom?: InputMaybe<Scalars["Float"]>;
-  marginLeft?: InputMaybe<Scalars["Float"]>;
-  marginRight?: InputMaybe<Scalars["Float"]>;
-  marginTop?: InputMaybe<Scalars["Float"]>;
-  showLogo?: InputMaybe<Scalars["Boolean"]>;
-  textColor?: InputMaybe<Scalars["String"]>;
-  textFontFamily?: InputMaybe<Scalars["String"]>;
-  textFontSize?: InputMaybe<Scalars["Float"]>;
-  title1Color?: InputMaybe<Scalars["String"]>;
-  title1FontFamily?: InputMaybe<Scalars["String"]>;
-  title1FontSize?: InputMaybe<Scalars["Float"]>;
-  title2Color?: InputMaybe<Scalars["String"]>;
-  title2FontFamily?: InputMaybe<Scalars["String"]>;
-  title2FontSize?: InputMaybe<Scalars["Float"]>;
+  marginBottom?: InputMaybe<Scalars["Float"]["input"]>;
+  marginLeft?: InputMaybe<Scalars["Float"]["input"]>;
+  marginRight?: InputMaybe<Scalars["Float"]["input"]>;
+  marginTop?: InputMaybe<Scalars["Float"]["input"]>;
+  showLogo?: InputMaybe<Scalars["Boolean"]["input"]>;
+  textColor?: InputMaybe<Scalars["String"]["input"]>;
+  textFontFamily?: InputMaybe<Scalars["String"]["input"]>;
+  textFontSize?: InputMaybe<Scalars["Float"]["input"]>;
+  title1Color?: InputMaybe<Scalars["String"]["input"]>;
+  title1FontFamily?: InputMaybe<Scalars["String"]["input"]>;
+  title1FontSize?: InputMaybe<Scalars["Float"]["input"]>;
+  title2Color?: InputMaybe<Scalars["String"]["input"]>;
+  title2FontFamily?: InputMaybe<Scalars["String"]["input"]>;
+  title2FontSize?: InputMaybe<Scalars["Float"]["input"]>;
 };
 
 export type OrganizationPdfDocumentThemeInputLegalText = {
-  en?: InputMaybe<Scalars["JSON"]>;
-  es?: InputMaybe<Scalars["JSON"]>;
+  en?: InputMaybe<Scalars["JSON"]["input"]>;
+  es?: InputMaybe<Scalars["JSON"]["input"]>;
 };
 
 /** The roles of a user within an organization. */
@@ -2171,20 +2180,20 @@ export type OrganizationStatus =
   | "ROOT";
 
 export type OrganizationTheme = {
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
-  isDefault: Scalars["Boolean"];
-  name: Scalars["String"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  isDefault: Scalars["Boolean"]["output"];
+  name: Scalars["String"]["output"];
 };
 
 export type OrganizationUsageLimit = {
-  cycleNumber: Scalars["Int"];
-  id: Scalars["GID"];
-  limit: Scalars["Int"];
-  period: Scalars["Duration"];
-  periodEndDate: Maybe<Scalars["DateTime"]>;
-  periodStartDate: Scalars["DateTime"];
-  used: Scalars["Int"];
+  cycleNumber: Scalars["Int"]["output"];
+  id: Scalars["GID"]["output"];
+  limit: Scalars["Int"]["output"];
+  period: Scalars["Duration"]["output"];
+  periodEndDate: Maybe<Scalars["DateTime"]["output"]>;
+  periodStartDate: Scalars["DateTime"]["output"];
+  used: Scalars["Int"]["output"];
 };
 
 export type OrganizationUsageLimitName = "PETITION_SEND" | "SIGNATURIT_SHARED_APIKEY";
@@ -2193,7 +2202,7 @@ export type OrganizationUsageLimitPagination = {
   /** The requested slice of items. */
   items: Array<OrganizationUsageLimit>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 /** Order to use on Organization.users */
@@ -2212,9 +2221,9 @@ export type OrganizationUsers_OrderBy =
   | "lastName_DESC";
 
 export type OwnershipTransferredEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   owner: Maybe<User>;
   petition: Maybe<Petition>;
   previousOwner: Maybe<User>;
@@ -2227,65 +2236,65 @@ export type Petition = PetitionBase & {
   /** The accesses for this petition */
   accesses: Array<PetitionAccess>;
   /** How many months to wait since the petition is closed to anonymize. */
-  anonymizeAfterMonths: Maybe<Scalars["Int"]>;
+  anonymizeAfterMonths: Maybe<Scalars["Int"]["output"]>;
   /** Purpose of the anonymization */
-  anonymizePurpose: Maybe<Scalars["String"]>;
+  anonymizePurpose: Maybe<Scalars["String"]["output"]>;
   /** The attachments linked to this petition */
   attachmentsList: PetitionAttachmentsList;
   /** Time when the petition was closed. */
-  closedAt: Maybe<Scalars["DateTime"]>;
+  closedAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The closing email body of the petition. */
-  closingEmailBody: Maybe<Scalars["JSON"]>;
+  closingEmailBody: Maybe<Scalars["JSON"]["output"]>;
   /** The body of the optional completing message to be show to recipients */
-  completingMessageBody: Maybe<Scalars["JSON"]>;
+  completingMessageBody: Maybe<Scalars["JSON"]["output"]>;
   /** The subject of the optional completing message to be show to recipients */
-  completingMessageSubject: Maybe<Scalars["String"]>;
+  completingMessageSubject: Maybe<Scalars["String"]["output"]>;
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   /** The current signature request. */
   currentSignatureRequest: Maybe<PetitionSignatureRequest>;
   /** Custom user properties */
-  customProperties: Scalars["JSONObject"];
+  customProperties: Scalars["JSONObject"]["output"];
   /** The deadline of the petition. */
-  deadline: Maybe<Scalars["DateTime"]>;
+  deadline: Maybe<Scalars["DateTime"]["output"]>;
   defaultOnBehalf: Maybe<User>;
   /** The effective permissions on the petition */
   effectivePermissions: Array<EffectivePetitionUserPermission>;
   /** The body of the petition. */
-  emailBody: Maybe<Scalars["JSON"]>;
+  emailBody: Maybe<Scalars["JSON"]["output"]>;
   /** The subject of the petition. */
-  emailSubject: Maybe<Scalars["String"]>;
+  emailSubject: Maybe<Scalars["String"]["output"]>;
   /** The events for the petition. */
   events: PetitionEventPagination;
   /** The number of fields in the petition. */
-  fieldCount: Scalars["Int"];
+  fieldCount: Scalars["Int"]["output"];
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
   /** The template used for this petition */
   fromTemplate: Maybe<PetitionBaseMini>;
   /** The ID of the petition or template. */
-  id: Scalars["GID"];
-  isAnonymized: Scalars["Boolean"];
+  id: Scalars["GID"]["output"];
+  isAnonymized: Scalars["Boolean"]["output"];
   /** Wether the completion message will be shown to the recipients or not. */
-  isCompletingMessageEnabled: Scalars["Boolean"];
+  isCompletingMessageEnabled: Scalars["Boolean"]["output"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
    */
-  isRecipientViewContentsHidden: Scalars["Boolean"];
-  isRestricted: Scalars["Boolean"];
-  isRestrictedWithPassword: Scalars["Boolean"];
+  isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
+  isRestricted: Scalars["Boolean"]["output"];
+  isRestrictedWithPassword: Scalars["Boolean"]["output"];
   /** The locale of the parallel. */
   locale: PetitionLocale;
   /** Metadata for this petition. */
-  metadata: Scalars["JSONObject"];
+  metadata: Scalars["JSONObject"]["output"];
   /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
-  name: Maybe<Scalars["String"]>;
+  name: Maybe<Scalars["String"]["output"]>;
   organization: Organization;
   owner: User;
-  path: Scalars["String"];
+  path: Scalars["String"]["output"];
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   /** The progress of the petition. */
@@ -2294,13 +2303,13 @@ export type Petition = PetitionBase & {
   remindersConfig: Maybe<RemindersConfig>;
   selectedDocumentTheme: OrganizationTheme;
   /** Date when the petition was first sent */
-  sentAt: Maybe<Scalars["DateTime"]>;
+  sentAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The signature configuration for the petition. */
   signatureConfig: Maybe<SignatureConfig>;
   /** The list of signature requests. */
   signatureRequests: Array<PetitionSignatureRequest>;
   /** Whether to skip the forward security check on the recipient view. */
-  skipForwardSecurity: Scalars["Boolean"];
+  skipForwardSecurity: Scalars["Boolean"]["output"];
   /** The status of the petition. */
   status: PetitionStatus;
   /** The tags linked to the petition */
@@ -2308,13 +2317,13 @@ export type Petition = PetitionBase & {
   /** The preferred tone of organization. */
   tone: Tone;
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 /** A petition */
 export type PetitioneventsArgs = {
-  limit?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 /** A petition access */
@@ -2322,42 +2331,42 @@ export type PetitionAccess = Timestamps & {
   /** The contact of this access. */
   contact: Maybe<Contact>;
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   /** The original user who granted the access as other user. */
   delegateGranter: Maybe<User>;
   /** The user who granted the original access. */
   granter: Maybe<User>;
   /** The ID of the petition access. */
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   /** It will be true if doesn't have contact assigned */
-  isContactless: Scalars["Boolean"];
+  isContactless: Scalars["Boolean"]["output"];
   /** When the next reminder will be sent. */
-  nextReminderAt: Maybe<Scalars["DateTime"]>;
+  nextReminderAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The petition for this message access. */
   petition: Maybe<Petition>;
-  recipientUrl: Maybe<Scalars["String"]>;
+  recipientUrl: Maybe<Scalars["String"]["output"]>;
   /** Number of reminders sent. */
-  reminderCount: Scalars["Int"];
+  reminderCount: Scalars["Int"]["output"];
   reminders: Array<PetitionReminder>;
   /** Whether automatic reminders are active or not for this petition access */
-  remindersActive: Scalars["Boolean"];
+  remindersActive: Scalars["Boolean"]["output"];
   /** The reminder settings of the petition. */
   remindersConfig: Maybe<RemindersConfig>;
   /** Number of reminders left. */
-  remindersLeft: Scalars["Int"];
+  remindersLeft: Scalars["Int"]["output"];
   /** Whether contact has opted out from receiving reminders for this petition */
-  remindersOptOut: Scalars["Boolean"];
+  remindersOptOut: Scalars["Boolean"]["output"];
   /** The status of the petition access */
   status: PetitionAccessStatus;
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 export type PetitionAccessPagination = {
   /** The requested slice of items. */
   items: Array<PetitionAccess>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 /** The status of a petition access. */
@@ -2368,16 +2377,16 @@ export type PetitionAccessStatus =
   | "INACTIVE";
 
 export type PetitionAnonymizedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 export type PetitionAttachment = {
   file: FileUpload;
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   petition: PetitionBase;
   type: PetitionAttachmentType;
 };
@@ -2397,55 +2406,55 @@ export type PetitionAttachmentsList = {
 
 export type PetitionBase = {
   /** How many months to wait since the petition is closed to anonymize. */
-  anonymizeAfterMonths: Maybe<Scalars["Int"]>;
+  anonymizeAfterMonths: Maybe<Scalars["Int"]["output"]>;
   /** Purpose of the anonymization */
-  anonymizePurpose: Maybe<Scalars["String"]>;
+  anonymizePurpose: Maybe<Scalars["String"]["output"]>;
   /** The attachments linked to this petition */
   attachmentsList: PetitionAttachmentsList;
   /** The closing email body of the petition. */
-  closingEmailBody: Maybe<Scalars["JSON"]>;
+  closingEmailBody: Maybe<Scalars["JSON"]["output"]>;
   /** The body of the optional completing message to be show to recipients */
-  completingMessageBody: Maybe<Scalars["JSON"]>;
+  completingMessageBody: Maybe<Scalars["JSON"]["output"]>;
   /** The subject of the optional completing message to be show to recipients */
-  completingMessageSubject: Maybe<Scalars["String"]>;
+  completingMessageSubject: Maybe<Scalars["String"]["output"]>;
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   /** Custom user properties */
-  customProperties: Scalars["JSONObject"];
+  customProperties: Scalars["JSONObject"]["output"];
   defaultOnBehalf: Maybe<User>;
   /** The effective permissions on the petition */
   effectivePermissions: Array<EffectivePetitionUserPermission>;
   /** The body of the petition. */
-  emailBody: Maybe<Scalars["JSON"]>;
+  emailBody: Maybe<Scalars["JSON"]["output"]>;
   /** The subject of the petition. */
-  emailSubject: Maybe<Scalars["String"]>;
+  emailSubject: Maybe<Scalars["String"]["output"]>;
   /** The number of fields in the petition. */
-  fieldCount: Scalars["Int"];
+  fieldCount: Scalars["Int"]["output"];
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
-  id: Scalars["GID"];
-  isAnonymized: Scalars["Boolean"];
+  id: Scalars["GID"]["output"];
+  isAnonymized: Scalars["Boolean"]["output"];
   /** Wether the completion message will be shown to the recipients or not. */
-  isCompletingMessageEnabled: Scalars["Boolean"];
+  isCompletingMessageEnabled: Scalars["Boolean"]["output"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
    */
-  isRecipientViewContentsHidden: Scalars["Boolean"];
-  isRestricted: Scalars["Boolean"];
-  isRestrictedWithPassword: Scalars["Boolean"];
+  isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
+  isRestricted: Scalars["Boolean"]["output"];
+  isRestrictedWithPassword: Scalars["Boolean"]["output"];
   /** The locale of the parallel. */
   locale: PetitionLocale;
   /** Metadata for this petition. */
-  metadata: Scalars["JSONObject"];
+  metadata: Scalars["JSONObject"]["output"];
   /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
-  name: Maybe<Scalars["String"]>;
+  name: Maybe<Scalars["String"]["output"]>;
   organization: Organization;
   owner: User;
-  path: Scalars["String"];
+  path: Scalars["String"]["output"];
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   /** The reminders configuration for the petition. */
@@ -2454,20 +2463,20 @@ export type PetitionBase = {
   /** The signature configuration for the petition. */
   signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
-  skipForwardSecurity: Scalars["Boolean"];
+  skipForwardSecurity: Scalars["Boolean"]["output"];
   /** The tags linked to the petition */
   tags: Array<Tag>;
   /** The preferred tone of organization. */
   tone: Tone;
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 export type PetitionBaseMini = {
   /** The ID of the petition or template. */
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   /** The name of the petition. */
-  name: Maybe<Scalars["String"]>;
+  name: Maybe<Scalars["String"]["output"]>;
 };
 
 export type PetitionBaseOrFolder = Petition | PetitionFolder | PetitionTemplate;
@@ -2476,24 +2485,24 @@ export type PetitionBaseOrFolderPagination = {
   /** The requested slice of items. */
   items: Array<PetitionBaseOrFolder>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type PetitionBaseType = "PETITION" | "TEMPLATE";
 
 export type PetitionClonedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
 
 export type PetitionClosedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
@@ -2501,9 +2510,9 @@ export type PetitionClosedEvent = PetitionEvent & {
 
 export type PetitionClosedNotifiedEvent = PetitionEvent & {
   access: PetitionAccess;
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
@@ -2511,42 +2520,42 @@ export type PetitionClosedNotifiedEvent = PetitionEvent & {
 
 export type PetitionCompletedEvent = PetitionEvent & {
   completedBy: Maybe<UserOrPetitionAccess>;
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 export type PetitionCompletedUserNotification = PetitionUserNotification & {
   completedBy: Maybe<UserOrPetitionAccess>;
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  isRead: Scalars["Boolean"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  isRead: Scalars["Boolean"]["output"];
   petition: PetitionBase;
 };
 
 export type PetitionCreatedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
 
 export type PetitionDeletedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 export type PetitionEvent = {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
 };
@@ -2555,18 +2564,18 @@ export type PetitionEventPagination = {
   /** The requested slice of items. */
   items: Array<PetitionEvent>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type PetitionEventSubscription = {
   eventTypes: Maybe<Array<PetitionEventType>>;
-  eventsUrl: Scalars["String"];
+  eventsUrl: Scalars["String"]["output"];
   fromTemplate: Maybe<PetitionBaseMini>;
   fromTemplateFields: Maybe<Array<PetitionFieldMini>>;
-  id: Scalars["GID"];
-  isEnabled: Scalars["Boolean"];
-  isFailing: Scalars["Boolean"];
-  name: Maybe<Scalars["String"]>;
+  id: Scalars["GID"]["output"];
+  isEnabled: Scalars["Boolean"]["output"];
+  isFailing: Scalars["Boolean"]["output"];
+  name: Maybe<Scalars["String"]["output"]>;
   signatureKeys: Array<EventSubscriptionSignatureKey>;
 };
 
@@ -2615,57 +2624,57 @@ export type PetitionEventType =
 /** A field within a petition. */
 export type PetitionField = {
   /** The alias of the petition field. */
-  alias: Maybe<Scalars["String"]>;
+  alias: Maybe<Scalars["String"]["output"]>;
   /** A list of files attached to this field. */
   attachments: Array<PetitionFieldAttachment>;
-  commentCount: Scalars["Int"];
+  commentCount: Scalars["Int"]["output"];
   /** The comments for this field. */
   comments: Array<PetitionFieldComment>;
   /** The description of the petition field. */
-  description: Maybe<Scalars["String"]>;
+  description: Maybe<Scalars["String"]["output"]>;
   /** The field GID used from which this field was cloned */
-  fromPetitionFieldId: Maybe<Scalars["GID"]>;
-  hasCommentsEnabled: Scalars["Boolean"];
+  fromPetitionFieldId: Maybe<Scalars["GID"]["output"]>;
+  hasCommentsEnabled: Scalars["Boolean"]["output"];
   /** The ID of the petition field. */
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   /** Determines if the field can be moved or deleted. */
-  isFixed: Scalars["Boolean"];
+  isFixed: Scalars["Boolean"]["output"];
   /** Determines if the field is visible by the recipients. */
-  isInternal: Scalars["Boolean"];
+  isInternal: Scalars["Boolean"]["output"];
   /** Determines if the field accepts replies */
-  isReadOnly: Scalars["Boolean"];
+  isReadOnly: Scalars["Boolean"]["output"];
   /** Determines if this field allows multiple replies. */
-  multiple: Scalars["Boolean"];
+  multiple: Scalars["Boolean"]["output"];
   /** Determines if this field is optional. */
-  optional: Scalars["Boolean"];
+  optional: Scalars["Boolean"]["output"];
   /** The options of the petition field. */
-  options: Scalars["JSONObject"];
+  options: Scalars["JSONObject"]["output"];
   petition: PetitionBase;
-  position: Scalars["Int"];
+  position: Scalars["Int"]["output"];
   /** The replies to the petition field */
   replies: Array<PetitionFieldReply>;
   /** Determines if the field requires approval. */
-  requireApproval: Scalars["Boolean"];
+  requireApproval: Scalars["Boolean"]["output"];
   /** Determines if the field last activity is visible in PDF export. */
-  showActivityInPdf: Scalars["Boolean"];
+  showActivityInPdf: Scalars["Boolean"]["output"];
   /** Determines if the field is visible in PDF export. */
-  showInPdf: Scalars["Boolean"];
+  showInPdf: Scalars["Boolean"]["output"];
   /** The title of the petition field. */
-  title: Maybe<Scalars["String"]>;
+  title: Maybe<Scalars["String"]["output"]>;
   /** The type of the petition field. */
   type: PetitionFieldType;
-  unreadCommentCount: Scalars["Int"];
+  unreadCommentCount: Scalars["Int"]["output"];
   /** A JSON object representing the conditions for the field to be visible */
-  visibility: Maybe<Scalars["JSONObject"]>;
+  visibility: Maybe<Scalars["JSONObject"]["output"]>;
 };
 
 /** A file attachment on the petition */
 export type PetitionFieldAttachment = CreatedAt & {
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   field: PetitionField;
   file: FileUpload;
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
 };
 
 export type PetitionFieldAttachmentUploadData = {
@@ -2678,21 +2687,21 @@ export type PetitionFieldComment = {
   /** The author of the comment. */
   author: Maybe<UserOrPetitionAccess>;
   /** The JSON content of the comment. */
-  content: Maybe<Scalars["JSON"]>;
+  content: Maybe<Scalars["JSON"]["output"]>;
   /** The HTML content of the comment. */
-  contentHtml: Maybe<Scalars["String"]>;
+  contentHtml: Maybe<Scalars["String"]["output"]>;
   /** Time when the comment was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   field: PetitionField;
   /** The ID of the petition field comment. */
-  id: Scalars["GID"];
-  isAnonymized: Scalars["Boolean"];
+  id: Scalars["GID"]["output"];
+  isAnonymized: Scalars["Boolean"]["output"];
   /** Whether the comment has been edited after being published. */
-  isEdited: Scalars["Boolean"];
+  isEdited: Scalars["Boolean"]["output"];
   /** Whether the comment is internal (only visible to org users) or public (visible for users and accesses) */
-  isInternal: Scalars["Boolean"];
+  isInternal: Scalars["Boolean"]["output"];
   /** Whether the comment has been read or not. */
-  isUnread: Scalars["Boolean"];
+  isUnread: Scalars["Boolean"]["output"];
   /** The mentions of the comments. */
   mentions: Array<PetitionFieldCommentMention>;
 };
@@ -2703,23 +2712,23 @@ export type PetitionFieldCommentMention =
 
 /** A user group mention on a petition field comment */
 export type PetitionFieldCommentUserGroupMention = {
-  mentionedId: Scalars["GID"];
+  mentionedId: Scalars["GID"]["output"];
   userGroup: Maybe<UserGroup>;
 };
 
 /** A user mention on a petition field comment */
 export type PetitionFieldCommentUserMention = {
-  mentionedId: Scalars["GID"];
+  mentionedId: Scalars["GID"]["output"];
   user: Maybe<User>;
 };
 
 export type PetitionFieldMini = {
   /** The ID of the petition field. */
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   /** The options of the petition field. */
-  options: Scalars["JSONObject"];
+  options: Scalars["JSONObject"]["output"];
   /** The title of the petition field. */
-  title: Maybe<Scalars["String"]>;
+  title: Maybe<Scalars["String"]["output"]>;
   /** The type of the petition field. */
   type: PetitionFieldType;
 };
@@ -2727,40 +2736,40 @@ export type PetitionFieldMini = {
 /** The progress of the petition */
 export type PetitionFieldProgress = {
   /** Number of fields approved */
-  approved: Scalars["Int"];
+  approved: Scalars["Int"]["output"];
   /** Number of optional fields not replied or approved */
-  optional: Scalars["Int"];
+  optional: Scalars["Int"]["output"];
   /** Number of fields with a reply and not approved */
-  replied: Scalars["Int"];
+  replied: Scalars["Int"]["output"];
   /** Total number of fields in the petition */
-  total: Scalars["Int"];
+  total: Scalars["Int"]["output"];
 };
 
 /** A reply to a petition field */
 export type PetitionFieldReply = Timestamps & {
   /** The content of the reply. */
-  content: Scalars["JSONObject"];
+  content: Scalars["JSONObject"]["output"];
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   /** The petition field for this reply. */
   field: Maybe<PetitionField>;
   /** The ID of the petition field reply. */
-  id: Scalars["GID"];
-  isAnonymized: Scalars["Boolean"];
+  id: Scalars["GID"]["output"];
+  isAnonymized: Scalars["Boolean"]["output"];
   /** When the reply was reviewed. */
-  lastReviewedAt: Maybe<Scalars["DateTime"]>;
+  lastReviewedAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The person that reviewed the reply. */
   lastReviewedBy: Maybe<User>;
   /** Metadata for this reply. */
-  metadata: Scalars["JSONObject"];
+  metadata: Scalars["JSONObject"]["output"];
   /** When the reply was created or last updated */
-  repliedAt: Scalars["DateTime"];
+  repliedAt: Scalars["DateTime"]["output"];
   /** The person that created the reply or the last person that edited the reply. */
   repliedBy: Maybe<UserOrPetitionAccess>;
   /** The status of the reply. */
   status: PetitionFieldReplyStatus;
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
   /** The last updater of the field reply. */
   updatedBy: Maybe<UserOrPetitionAccess>;
 };
@@ -2804,62 +2813,62 @@ export type PetitionFieldType =
   | "TEXT";
 
 export type PetitionFilter = {
-  fromTemplateId?: InputMaybe<Array<Scalars["GID"]>>;
+  fromTemplateId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   locale?: InputMaybe<PetitionLocale>;
-  path?: InputMaybe<Scalars["String"]>;
+  path?: InputMaybe<Scalars["String"]["input"]>;
   sharedWith?: InputMaybe<PetitionSharedWithFilter>;
   signature?: InputMaybe<Array<PetitionSignatureStatusFilter>>;
   status?: InputMaybe<Array<PetitionStatus>>;
-  tagIds?: InputMaybe<Array<Scalars["GID"]>>;
+  tagIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   tags?: InputMaybe<PetitionTagFilter>;
   type?: InputMaybe<PetitionBaseType>;
 };
 
 export type PetitionFolder = {
   /** The ID of the petition folder. */
-  id: Scalars["ID"];
+  id: Scalars["ID"]["output"];
   /** The lowest permission the user has in the petitions inside the folder. */
   minimumPermissionType: PetitionPermissionType;
   /** The name of the folder. */
-  name: Scalars["String"];
+  name: Scalars["String"]["output"];
   /** The full path of the folder. */
-  path: Scalars["String"];
+  path: Scalars["String"]["output"];
   /** The name petitions in the folder. */
-  petitionCount: Scalars["Int"];
+  petitionCount: Scalars["Int"]["output"];
 };
 
 export type PetitionListView = {
   data: PetitionListViewData;
-  id: Scalars["GID"];
-  isDefault: Scalars["Boolean"];
-  name: Scalars["String"];
+  id: Scalars["GID"]["output"];
+  isDefault: Scalars["Boolean"]["output"];
+  name: Scalars["String"]["output"];
   user: User;
 };
 
 export type PetitionListViewData = {
-  fromTemplateId: Maybe<Array<Scalars["GID"]>>;
-  path: Scalars["String"];
-  search: Maybe<Scalars["String"]>;
+  fromTemplateId: Maybe<Array<Scalars["GID"]["output"]>>;
+  path: Scalars["String"]["output"];
+  search: Maybe<Scalars["String"]["output"]>;
   searchIn: PetitionListViewSearchIn;
   sharedWith: Maybe<PetitionListViewDataSharedWith>;
   signature: Maybe<Array<PetitionSignatureStatusFilter>>;
   sort: Maybe<PetitionListViewSort>;
   status: Maybe<Array<PetitionStatus>>;
   /** @deprecated use tagsFilters */
-  tags: Maybe<Array<Scalars["GID"]>>;
+  tags: Maybe<Array<Scalars["GID"]["output"]>>;
   tagsFilters: Maybe<PetitionListViewDataTags>;
 };
 
 export type PetitionListViewDataInput = {
-  fromTemplateId?: InputMaybe<Array<Scalars["GID"]>>;
-  path?: InputMaybe<Scalars["String"]>;
-  search?: InputMaybe<Scalars["String"]>;
+  fromTemplateId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  path?: InputMaybe<Scalars["String"]["input"]>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
   searchIn?: InputMaybe<PetitionListViewSearchIn>;
   sharedWith?: InputMaybe<PetitionSharedWithFilter>;
   signature?: InputMaybe<Array<PetitionSignatureStatusFilter>>;
   sort?: InputMaybe<PetitionListViewSortInput>;
   status?: InputMaybe<Array<PetitionStatus>>;
-  tags?: InputMaybe<Array<Scalars["GID"]>>;
+  tags?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   tagsFilters?: InputMaybe<PetitionTagFilter>;
 };
 
@@ -2870,7 +2879,7 @@ export type PetitionListViewDataSharedWith = {
 
 export type PetitionListViewDataSharedWithFilters = {
   operator: FilterSharedWithOperator;
-  value: Scalars["ID"];
+  value: Scalars["ID"]["output"];
 };
 
 export type PetitionListViewDataTags = {
@@ -2880,7 +2889,7 @@ export type PetitionListViewDataTags = {
 
 export type PetitionListViewDataTagsFilters = {
   operator: PetitionTagFilterLineOperator;
-  value: Array<Scalars["GID"]>;
+  value: Array<Scalars["GID"]["output"]>;
 };
 
 export type PetitionListViewSearchIn = "CURRENT_FOLDER" | "EVERYWHERE";
@@ -2907,34 +2916,34 @@ export type PetitionMessage = CreatedAt & {
   /** The access of this petition message. */
   access: PetitionAccess;
   /** Tells when the email bounced. */
-  bouncedAt: Maybe<Scalars["DateTime"]>;
+  bouncedAt: Maybe<Scalars["DateTime"]["output"]>;
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   /** Tells when the email was delivered. */
-  deliveredAt: Maybe<Scalars["DateTime"]>;
+  deliveredAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The body of the petition message on HTML format. */
-  emailBody: Maybe<Scalars["String"]>;
+  emailBody: Maybe<Scalars["String"]["output"]>;
   /** The subject of the petition message. */
-  emailSubject: Maybe<Scalars["JSON"]>;
+  emailSubject: Maybe<Scalars["JSON"]["output"]>;
   /** The ID of the petition message. */
-  id: Scalars["GID"];
-  isAnonymized: Scalars["Boolean"];
+  id: Scalars["GID"]["output"];
+  isAnonymized: Scalars["Boolean"]["output"];
   /** Tells when the email was opened for the first time. */
-  openedAt: Maybe<Scalars["DateTime"]>;
+  openedAt: Maybe<Scalars["DateTime"]["output"]>;
   /** Time at which the message will be sent. */
-  scheduledAt: Maybe<Scalars["DateTime"]>;
+  scheduledAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The sender of this petition message. */
   sender: User;
   /** If already sent, the date at which the email was sent. */
-  sentAt: Maybe<Scalars["DateTime"]>;
+  sentAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The status of the petition message */
   status: PetitionMessageStatus;
 };
 
 export type PetitionMessageBouncedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   message: PetitionMessage;
   petition: Maybe<Petition>;
   type: PetitionEventType;
@@ -2953,15 +2962,15 @@ export type PetitionMessageStatus =
 
 export type PetitionPermission = {
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   /** wether user is subscribed or not to emails and alerts of the petition */
-  isSubscribed: Scalars["Boolean"];
+  isSubscribed: Scalars["Boolean"]["output"];
   /** The type of the permission. */
   permissionType: PetitionPermissionType;
   /** The petition linked to the permission. */
   petition: Petition;
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 /** The type of permission for a petition user. */
@@ -2982,10 +2991,10 @@ export type PetitionReminder = CreatedAt & {
   /** The access of this petition message. */
   access: PetitionAccess;
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   /** The body of the message in HTML format. */
-  emailBody: Maybe<Scalars["String"]>;
-  id: Scalars["GID"];
+  emailBody: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["GID"]["output"];
   /** The sender of this petition message. */
   sender: Maybe<User>;
   /** The type of the reminder. */
@@ -2993,9 +3002,9 @@ export type PetitionReminder = CreatedAt & {
 };
 
 export type PetitionReminderBouncedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   reminder: PetitionReminder;
   type: PetitionEventType;
@@ -3009,18 +3018,18 @@ export type PetitionReminderType =
   | "MANUAL";
 
 export type PetitionReopenedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
 
 export type PetitionSharedUserNotification = PetitionUserNotification & {
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  isRead: Scalars["Boolean"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  isRead: Scalars["Boolean"]["output"];
   owner: User;
   permissionType: PetitionPermissionTypeRW;
   petition: PetitionBase;
@@ -3034,7 +3043,7 @@ export type PetitionSharedWithFilter = {
 
 export type PetitionSharedWithFilterLine = {
   operator: FilterSharedWithOperator;
-  value: Scalars["ID"];
+  value: Scalars["ID"]["input"];
 };
 
 export type PetitionSignatureCancelReason =
@@ -3044,39 +3053,39 @@ export type PetitionSignatureCancelReason =
   | "REQUEST_RESTARTED";
 
 export type PetitionSignatureRequest = Timestamps & {
-  auditTrailFilename: Maybe<Scalars["String"]>;
-  cancelReason: Maybe<Scalars["String"]>;
+  auditTrailFilename: Maybe<Scalars["String"]["output"]>;
+  cancelReason: Maybe<Scalars["String"]["output"]>;
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   /** The environment of the petition signature. */
   environment: SignatureOrgIntegrationEnvironment;
-  errorCode: Maybe<Scalars["String"]>;
-  errorMessage: Maybe<Scalars["String"]>;
-  extraErrorData: Maybe<Scalars["JSON"]>;
-  id: Scalars["GID"];
-  isAnonymized: Scalars["Boolean"];
+  errorCode: Maybe<Scalars["String"]["output"]>;
+  errorMessage: Maybe<Scalars["String"]["output"]>;
+  extraErrorData: Maybe<Scalars["JSON"]["output"]>;
+  id: Scalars["GID"]["output"];
+  isAnonymized: Scalars["Boolean"]["output"];
   /** Metadata for this signature request. */
-  metadata: Scalars["JSONObject"];
+  metadata: Scalars["JSONObject"]["output"];
   petition: Petition;
   /** The signature configuration for the request. */
   signatureConfig: SignatureConfig;
-  signedDocumentFilename: Maybe<Scalars["String"]>;
+  signedDocumentFilename: Maybe<Scalars["String"]["output"]>;
   signerStatus: Array<PetitionSignatureRequestSignerStatus>;
   /** The status of the petition signature. */
   status: PetitionSignatureRequestStatus;
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 export type PetitionSignatureRequestSignerStatus = {
-  bouncedAt: Maybe<Scalars["DateTime"]>;
-  declinedAt: Maybe<Scalars["DateTime"]>;
-  openedAt: Maybe<Scalars["DateTime"]>;
-  sentAt: Maybe<Scalars["DateTime"]>;
-  signedAt: Maybe<Scalars["DateTime"]>;
+  bouncedAt: Maybe<Scalars["DateTime"]["output"]>;
+  declinedAt: Maybe<Scalars["DateTime"]["output"]>;
+  openedAt: Maybe<Scalars["DateTime"]["output"]>;
+  sentAt: Maybe<Scalars["DateTime"]["output"]>;
+  signedAt: Maybe<Scalars["DateTime"]["output"]>;
   signer: PetitionSigner;
   /** The signing status of the individual contact. */
-  status: Scalars["String"];
+  status: Scalars["String"]["output"];
 };
 
 export type PetitionSignatureRequestStatus =
@@ -3104,11 +3113,11 @@ export type PetitionSignatureStatusFilter =
 
 /** Information about a signer of the petition */
 export type PetitionSigner = {
-  contactId: Maybe<Scalars["GID"]>;
-  email: Scalars["String"];
-  firstName: Scalars["String"];
-  fullName: Scalars["String"];
-  lastName: Maybe<Scalars["String"]>;
+  contactId: Maybe<Scalars["GID"]["output"]>;
+  email: Scalars["String"]["output"];
+  firstName: Scalars["String"]["output"];
+  fullName: Scalars["String"]["output"];
+  lastName: Maybe<Scalars["String"]["output"]>;
 };
 
 /** The status of a petition. */
@@ -3129,7 +3138,7 @@ export type PetitionTagFilter = {
 
 export type PetitionTagFilterLine = {
   operator: PetitionTagFilterLineOperator;
-  value: Array<Scalars["GID"]>;
+  value: Array<Scalars["GID"]["input"]>;
 };
 
 export type PetitionTagFilterLineOperator = "CONTAINS" | "DOES_NOT_CONTAIN" | "IS_EMPTY";
@@ -3139,68 +3148,68 @@ export type PetitionTagFilterLogicalOperator = "AND" | "OR";
 /** A petition template */
 export type PetitionTemplate = PetitionBase & {
   /** How many months to wait since the petition is closed to anonymize. */
-  anonymizeAfterMonths: Maybe<Scalars["Int"]>;
+  anonymizeAfterMonths: Maybe<Scalars["Int"]["output"]>;
   /** Purpose of the anonymization */
-  anonymizePurpose: Maybe<Scalars["String"]>;
+  anonymizePurpose: Maybe<Scalars["String"]["output"]>;
   /** The attachments linked to this petition */
   attachmentsList: PetitionAttachmentsList;
-  backgroundColor: Maybe<Scalars["String"]>;
-  categories: Maybe<Array<Scalars["String"]>>;
+  backgroundColor: Maybe<Scalars["String"]["output"]>;
+  categories: Maybe<Array<Scalars["String"]["output"]>>;
   /** The closing email body of the petition. */
-  closingEmailBody: Maybe<Scalars["JSON"]>;
+  closingEmailBody: Maybe<Scalars["JSON"]["output"]>;
   /** The body of the optional completing message to be show to recipients */
-  completingMessageBody: Maybe<Scalars["JSON"]>;
+  completingMessageBody: Maybe<Scalars["JSON"]["output"]>;
   /** The subject of the optional completing message to be show to recipients */
-  completingMessageSubject: Maybe<Scalars["String"]>;
+  completingMessageSubject: Maybe<Scalars["String"]["output"]>;
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   /** Custom user properties */
-  customProperties: Scalars["JSONObject"];
+  customProperties: Scalars["JSONObject"]["output"];
   defaultOnBehalf: Maybe<User>;
-  defaultPath: Scalars["String"];
+  defaultPath: Scalars["String"]["output"];
   defaultPermissions: Array<TemplateDefaultPermission>;
   /** Description of the template. */
-  description: Maybe<Scalars["JSON"]>;
+  description: Maybe<Scalars["JSON"]["output"]>;
   /** HTML description of the template. */
-  descriptionHtml: Maybe<Scalars["String"]>;
+  descriptionHtml: Maybe<Scalars["String"]["output"]>;
   /** The default effective permissions on the template */
   effectiveDefaultPermissions: Array<EffectivePetitionUserPermission>;
   /** The effective permissions on the petition */
   effectivePermissions: Array<EffectivePetitionUserPermission>;
   /** The body of the petition. */
-  emailBody: Maybe<Scalars["JSON"]>;
+  emailBody: Maybe<Scalars["JSON"]["output"]>;
   /** The subject of the petition. */
-  emailSubject: Maybe<Scalars["String"]>;
+  emailSubject: Maybe<Scalars["String"]["output"]>;
   /** The number of fields in the petition. */
-  fieldCount: Scalars["Int"];
+  fieldCount: Scalars["Int"]["output"];
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
-  id: Scalars["GID"];
-  imageUrl: Maybe<Scalars["String"]>;
-  isAnonymized: Scalars["Boolean"];
+  id: Scalars["GID"]["output"];
+  imageUrl: Maybe<Scalars["String"]["output"]>;
+  isAnonymized: Scalars["Boolean"]["output"];
   /** Wether the completion message will be shown to the recipients or not. */
-  isCompletingMessageEnabled: Scalars["Boolean"];
+  isCompletingMessageEnabled: Scalars["Boolean"]["output"];
   /** Whether the template is publicly available or not */
-  isPublic: Scalars["Boolean"];
+  isPublic: Scalars["Boolean"]["output"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
    */
-  isRecipientViewContentsHidden: Scalars["Boolean"];
-  isRestricted: Scalars["Boolean"];
-  isRestrictedWithPassword: Scalars["Boolean"];
+  isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
+  isRestricted: Scalars["Boolean"]["output"];
+  isRestrictedWithPassword: Scalars["Boolean"]["output"];
   /** The locale of the parallel. */
   locale: PetitionLocale;
   /** Metadata for this petition. */
-  metadata: Scalars["JSONObject"];
+  metadata: Scalars["JSONObject"]["output"];
   /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
-  name: Maybe<Scalars["String"]>;
+  name: Maybe<Scalars["String"]["output"]>;
   organization: Organization;
   owner: User;
-  path: Scalars["String"];
+  path: Scalars["String"]["output"];
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
   /** The public link linked to this template */
@@ -3211,13 +3220,13 @@ export type PetitionTemplate = PetitionBase & {
   /** The signature configuration for the petition. */
   signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
-  skipForwardSecurity: Scalars["Boolean"];
+  skipForwardSecurity: Scalars["Boolean"]["output"];
   /** The tags linked to the petition */
   tags: Array<Tag>;
   /** The preferred tone of organization. */
   tone: Tone;
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 /** A petition template */
@@ -3229,23 +3238,23 @@ export type PetitionTemplateimageUrlArgs = {
 export type PetitionUserGroupPermission = PetitionPermission &
   Timestamps & {
     /** Time when the resource was created. */
-    createdAt: Scalars["DateTime"];
+    createdAt: Scalars["DateTime"]["output"];
     /** The group linked to the permission */
     group: UserGroup;
     /** wether user is subscribed or not to emails and alerts of the petition */
-    isSubscribed: Scalars["Boolean"];
+    isSubscribed: Scalars["Boolean"]["output"];
     /** The type of the permission. */
     permissionType: PetitionPermissionType;
     /** The petition linked to the permission. */
     petition: Petition;
     /** Time when the resource was last updated. */
-    updatedAt: Scalars["DateTime"];
+    updatedAt: Scalars["DateTime"]["output"];
   };
 
 export type PetitionUserNotification = {
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  isRead: Scalars["Boolean"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  isRead: Scalars["Boolean"]["output"];
   petition: PetitionBase;
 };
 
@@ -3262,49 +3271,49 @@ export type PetitionUserNotificationFilter =
 export type PetitionUserPermission = PetitionPermission &
   Timestamps & {
     /** Time when the resource was created. */
-    createdAt: Scalars["DateTime"];
+    createdAt: Scalars["DateTime"]["output"];
     /** wether user is subscribed or not to emails and alerts of the petition */
-    isSubscribed: Scalars["Boolean"];
+    isSubscribed: Scalars["Boolean"]["output"];
     /** The type of the permission. */
     permissionType: PetitionPermissionType;
     /** The petition linked to the permission. */
     petition: Petition;
     /** Time when the resource was last updated. */
-    updatedAt: Scalars["DateTime"];
+    updatedAt: Scalars["DateTime"]["output"];
     /** The user linked to the permission */
     user: User;
   };
 
 export type Profile = Timestamps & {
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   /** The events for the profile. */
   events: ProfileEventPagination;
-  id: Scalars["GID"];
-  name: Scalars["String"];
+  id: Scalars["GID"]["output"];
+  name: Scalars["String"]["output"];
   profileType: ProfileType;
   properties: Array<ProfileFieldProperty>;
   subscribers: Array<ProfileSubscription>;
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 export type ProfileeventsArgs = {
-  limit?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type ProfileCreatedEvent = ProfileEvent & {
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
   user: Maybe<User>;
 };
 
 export type ProfileEvent = {
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
 };
@@ -3313,7 +3322,7 @@ export type ProfileEventPagination = {
   /** The requested slice of items. */
   items: Array<ProfileEvent>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type ProfileEventType =
@@ -3324,8 +3333,8 @@ export type ProfileEventType =
   | "PROFILE_FIELD_VALUE_UPDATED";
 
 export type ProfileFieldExpiryUpdatedEvent = ProfileEvent & {
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
   user: Maybe<User>;
@@ -3333,33 +3342,33 @@ export type ProfileFieldExpiryUpdatedEvent = ProfileEvent & {
 
 export type ProfileFieldFile = ProfileFieldResponse & {
   /** Time when the response was anonymized. */
-  anonymizedAt: Maybe<Scalars["DateTime"]>;
+  anonymizedAt: Maybe<Scalars["DateTime"]["output"]>;
   /** Time when the response was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   createdBy: Maybe<User>;
   /** Expiration datetime of the value, considering organization's timezone. */
-  expiresAt: Maybe<Scalars["DateTime"]>;
-  expiryDate: Maybe<Scalars["String"]>;
+  expiresAt: Maybe<Scalars["DateTime"]["output"]>;
+  expiryDate: Maybe<Scalars["String"]["output"]>;
   field: ProfileTypeField;
   file: Maybe<FileUpload>;
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   profile: Profile;
   /** Time when the response was removed. */
-  removedAt: Maybe<Scalars["DateTime"]>;
+  removedAt: Maybe<Scalars["DateTime"]["output"]>;
   removedBy: Maybe<User>;
 };
 
 export type ProfileFieldFileAddedEvent = ProfileEvent & {
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
   user: Maybe<User>;
 };
 
 export type ProfileFieldFileRemovedEvent = ProfileEvent & {
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
   user: Maybe<User>;
@@ -3386,94 +3395,94 @@ export type ProfileFieldPropertyPagination = {
   /** The requested slice of items. */
   items: Array<ProfileFieldProperty>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type ProfileFieldResponse = {
   /** Time when the response was anonymized. */
-  anonymizedAt: Maybe<Scalars["DateTime"]>;
+  anonymizedAt: Maybe<Scalars["DateTime"]["output"]>;
   /** Time when the response was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   createdBy: Maybe<User>;
   /** Expiration datetime of the value, considering organization's timezone. */
-  expiresAt: Maybe<Scalars["DateTime"]>;
-  expiryDate: Maybe<Scalars["String"]>;
+  expiresAt: Maybe<Scalars["DateTime"]["output"]>;
+  expiryDate: Maybe<Scalars["String"]["output"]>;
   field: ProfileTypeField;
   profile: Profile;
   /** Time when the response was removed. */
-  removedAt: Maybe<Scalars["DateTime"]>;
+  removedAt: Maybe<Scalars["DateTime"]["output"]>;
   removedBy: Maybe<User>;
 };
 
 export type ProfileFieldValue = ProfileFieldResponse & {
   /** Time when the response was anonymized. */
-  anonymizedAt: Maybe<Scalars["DateTime"]>;
-  content: Maybe<Scalars["JSONObject"]>;
+  anonymizedAt: Maybe<Scalars["DateTime"]["output"]>;
+  content: Maybe<Scalars["JSONObject"]["output"]>;
   /** Time when the response was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   createdBy: Maybe<User>;
   /** Expiration datetime of the value, considering organization's timezone. */
-  expiresAt: Maybe<Scalars["DateTime"]>;
-  expiryDate: Maybe<Scalars["String"]>;
+  expiresAt: Maybe<Scalars["DateTime"]["output"]>;
+  expiryDate: Maybe<Scalars["String"]["output"]>;
   field: ProfileTypeField;
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   profile: Profile;
   /** Time when the response was removed. */
-  removedAt: Maybe<Scalars["DateTime"]>;
+  removedAt: Maybe<Scalars["DateTime"]["output"]>;
   removedBy: Maybe<User>;
 };
 
 export type ProfileFieldValueUpdatedEvent = ProfileEvent & {
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
   user: Maybe<User>;
 };
 
 export type ProfileFilter = {
-  profileId?: InputMaybe<Array<Scalars["GID"]>>;
-  profileTypeId?: InputMaybe<Array<Scalars["GID"]>>;
+  profileId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type ProfilePagination = {
   /** The requested slice of items. */
   items: Array<Profile>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type ProfilePropertyFilter = {
-  profileTypeFieldId?: InputMaybe<Array<Scalars["GID"]>>;
-  profileTypeId?: InputMaybe<Array<Scalars["GID"]>>;
+  profileTypeFieldId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type ProfileSubscription = {
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   user: User;
 };
 
 export type ProfileType = Timestamps & {
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   fields: Array<ProfileTypeField>;
-  id: Scalars["GID"];
-  name: Scalars["LocalizableUserText"];
-  profileNamePattern: Scalars["String"];
+  id: Scalars["GID"]["output"];
+  name: Scalars["LocalizableUserText"]["output"];
+  profileNamePattern: Scalars["String"]["output"];
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 export type ProfileTypeField = {
-  alias: Maybe<Scalars["String"]>;
-  expiryAlertAheadTime: Maybe<Scalars["Duration"]>;
-  id: Scalars["GID"];
-  isExpirable: Scalars["Boolean"];
-  isUsedInProfileName: Scalars["Boolean"];
+  alias: Maybe<Scalars["String"]["output"]>;
+  expiryAlertAheadTime: Maybe<Scalars["Duration"]["output"]>;
+  id: Scalars["GID"]["output"];
+  isExpirable: Scalars["Boolean"]["output"];
+  isUsedInProfileName: Scalars["Boolean"]["output"];
   myPermission: ProfileTypeFieldPermission;
-  name: Scalars["LocalizableUserText"];
-  options: Scalars["JSONObject"];
-  position: Scalars["Int"];
+  name: Scalars["LocalizableUserText"]["output"];
+  options: Scalars["JSONObject"]["output"];
+  position: Scalars["Int"]["output"];
   profileType: ProfileType;
   type: ProfileTypeFieldType;
 };
@@ -3486,34 +3495,34 @@ export type ProfileTypePagination = {
   /** The requested slice of items. */
   items: Array<ProfileType>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type PublicAccessVerification = {
-  cookieName: Maybe<Scalars["String"]>;
-  cookieValue: Maybe<Scalars["String"]>;
-  email: Maybe<Scalars["String"]>;
-  isAllowed: Scalars["Boolean"];
-  isContactlessAccess: Maybe<Scalars["Boolean"]>;
+  cookieName: Maybe<Scalars["String"]["output"]>;
+  cookieValue: Maybe<Scalars["String"]["output"]>;
+  email: Maybe<Scalars["String"]["output"]>;
+  isAllowed: Scalars["Boolean"]["output"];
+  isContactlessAccess: Maybe<Scalars["Boolean"]["output"]>;
   organization: Maybe<PublicOrganization>;
-  ownerName: Maybe<Scalars["String"]>;
+  ownerName: Maybe<Scalars["String"]["output"]>;
 };
 
 /** A public view of a contact */
 export type PublicContact = {
   /** The email of the user. */
-  email: Scalars["String"];
+  email: Scalars["String"]["output"];
   /** The first name of the user. */
-  firstName: Scalars["String"];
+  firstName: Scalars["String"]["output"];
   /** The full name of the user. */
-  fullName: Scalars["String"];
+  fullName: Scalars["String"]["output"];
   /** The ID of the contact. */
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   /** The initials of the user. */
-  initials: Maybe<Scalars["String"]>;
-  isMe: Scalars["Boolean"];
+  initials: Maybe<Scalars["String"]["output"]>;
+  isMe: Scalars["Boolean"]["output"];
   /** The last name of the user. */
-  lastName: Maybe<Scalars["String"]>;
+  lastName: Maybe<Scalars["String"]["output"]>;
 };
 
 export type PublicCreateFileUploadReply = {
@@ -3522,22 +3531,22 @@ export type PublicCreateFileUploadReply = {
 };
 
 export type PublicLicenseCode = {
-  code: Scalars["String"];
-  details: Scalars["JSONObject"];
-  source: Scalars["String"];
+  code: Scalars["String"]["output"];
+  details: Scalars["JSONObject"]["output"];
+  source: Scalars["String"]["output"];
 };
 
 /** A public view of an organization */
 export type PublicOrganization = {
   brandTheme: OrganizationBrandThemeData;
   /** If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled */
-  hasRemoveParallelBranding: Scalars["Boolean"];
+  hasRemoveParallelBranding: Scalars["Boolean"]["output"];
   /** The ID of the organization. */
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   /** The logo of the organization. */
-  logoUrl: Maybe<Scalars["String"]>;
+  logoUrl: Maybe<Scalars["String"]["output"]>;
   /** The name of the organization. */
-  name: Scalars["String"];
+  name: Scalars["String"]["output"];
 };
 
 /** A public view of an organization */
@@ -3548,26 +3557,26 @@ export type PublicOrganizationlogoUrlArgs = {
 /** A public view of the petition */
 export type PublicPetition = Timestamps & {
   /** The body of the optional completing message to be show to recipients. */
-  completingMessageBody: Maybe<Scalars["String"]>;
+  completingMessageBody: Maybe<Scalars["String"]["output"]>;
   /** The subject of the optional completing message to be show to recipients */
-  completingMessageSubject: Maybe<Scalars["String"]>;
+  completingMessageSubject: Maybe<Scalars["String"]["output"]>;
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   /** The deadline of the petition. */
-  deadline: Maybe<Scalars["DateTime"]>;
+  deadline: Maybe<Scalars["DateTime"]["output"]>;
   /** The field definition of the petition. */
   fields: Array<PublicPetitionField>;
   /** Shows if the petition has unread comments */
-  hasUnreadComments: Scalars["Boolean"];
+  hasUnreadComments: Scalars["Boolean"]["output"];
   /** The ID of the petition. */
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   /** Wether the completion message will be shown to the recipients or not. */
-  isCompletingMessageEnabled: Scalars["Boolean"];
+  isCompletingMessageEnabled: Scalars["Boolean"]["output"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
    */
-  isRecipientViewContentsHidden: Scalars["Boolean"];
+  isRecipientViewContentsHidden: Scalars["Boolean"]["output"];
   /** The locale of the parallel. */
   locale: PetitionLocale;
   /** The organization of the petition. */
@@ -3584,16 +3593,16 @@ export type PublicPetition = Timestamps & {
   /** The preferred tone of organization. */
   tone: Tone;
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 /** A public view of a petition access */
 export type PublicPetitionAccess = {
   contact: Maybe<PublicContact>;
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   granter: Maybe<PublicUser>;
-  hasClientPortalAccess: Scalars["Boolean"];
-  keycode: Scalars["ID"];
+  hasClientPortalAccess: Scalars["Boolean"]["output"];
+  keycode: Scalars["ID"]["output"];
   message: Maybe<PublicPetitionMessage>;
   petition: PublicPetition;
 };
@@ -3602,43 +3611,43 @@ export type PublicPetitionAccessPagination = {
   /** The requested slice of items. */
   items: Array<PublicPetitionAccess>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 /** A field within a petition. */
 export type PublicPetitionField = {
   /** Alias of the petition field. */
-  alias: Maybe<Scalars["String"]>;
+  alias: Maybe<Scalars["String"]["output"]>;
   /** A list of files attached to this field. */
   attachments: Array<PetitionFieldAttachment>;
-  commentCount: Scalars["Int"];
+  commentCount: Scalars["Int"]["output"];
   /** The comments for this field. */
   comments: Array<PublicPetitionFieldComment>;
   /** The description of the petition field. */
-  description: Maybe<Scalars["String"]>;
-  hasCommentsEnabled: Scalars["Boolean"];
+  description: Maybe<Scalars["String"]["output"]>;
+  hasCommentsEnabled: Scalars["Boolean"]["output"];
   /** The ID of the petition field. */
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   /** Determines if the field is visible by the recipients. */
-  isInternal: Scalars["Boolean"];
+  isInternal: Scalars["Boolean"]["output"];
   /** Determines if the field accepts replies */
-  isReadOnly: Scalars["Boolean"];
+  isReadOnly: Scalars["Boolean"]["output"];
   /** Determines if this field allows multiple replies. */
-  multiple: Scalars["Boolean"];
+  multiple: Scalars["Boolean"]["output"];
   /** Determines if this field is optional. */
-  optional: Scalars["Boolean"];
+  optional: Scalars["Boolean"]["output"];
   /** The options of the petition field. */
-  options: Scalars["JSONObject"];
+  options: Scalars["JSONObject"]["output"];
   petition: PublicPetition;
   /** The replies to the petition field */
   replies: Array<PublicPetitionFieldReply>;
   /** The title of the petition field. */
-  title: Maybe<Scalars["String"]>;
+  title: Maybe<Scalars["String"]["output"]>;
   /** The type of the petition field. */
   type: PetitionFieldType;
-  unreadCommentCount: Scalars["Int"];
+  unreadCommentCount: Scalars["Int"]["output"];
   /** A JSON object representing the conditions for the field to be visible */
-  visibility: Maybe<Scalars["JSONObject"]>;
+  visibility: Maybe<Scalars["JSONObject"]["output"]>;
 };
 
 /** A comment on a petition field */
@@ -3646,86 +3655,86 @@ export type PublicPetitionFieldComment = {
   /** The author of the comment. */
   author: Maybe<PublicUserOrContact>;
   /** The JSON content of the comment. */
-  content: Maybe<Scalars["JSON"]>;
+  content: Maybe<Scalars["JSON"]["output"]>;
   /** The HTML content of the comment. */
-  contentHtml: Maybe<Scalars["String"]>;
+  contentHtml: Maybe<Scalars["String"]["output"]>;
   /** Time when the comment was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   field: PublicPetitionField;
   /** The ID of the petition field comment. */
-  id: Scalars["GID"];
-  isAnonymized: Scalars["Boolean"];
+  id: Scalars["GID"]["output"];
+  isAnonymized: Scalars["Boolean"]["output"];
   /** Whether the comment has been read or not. */
-  isUnread: Scalars["Boolean"];
+  isUnread: Scalars["Boolean"]["output"];
 };
 
 /** The progress of a petition. */
 export type PublicPetitionFieldProgress = {
   /** Number of optional fields not replied or approved */
-  optional: Scalars["Int"];
+  optional: Scalars["Int"]["output"];
   /** Number of fields with a reply and not approved */
-  replied: Scalars["Int"];
+  replied: Scalars["Int"]["output"];
   /** Total number of fields in the petition */
-  total: Scalars["Int"];
+  total: Scalars["Int"]["output"];
 };
 
 /** A reply to a petition field */
 export type PublicPetitionFieldReply = Timestamps & {
   /** The public content of the reply */
-  content: Scalars["JSONObject"];
+  content: Scalars["JSONObject"]["output"];
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   field: PublicPetitionField;
   /** The ID of the petition field reply. */
-  id: Scalars["GID"];
-  isAnonymized: Scalars["Boolean"];
+  id: Scalars["GID"]["output"];
+  isAnonymized: Scalars["Boolean"]["output"];
   /** The status of the petition field reply. */
   status: PetitionFieldReplyStatus;
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 export type PublicPetitionLink = {
-  description: Scalars["String"];
-  id: Scalars["GID"];
-  isActive: Scalars["Boolean"];
+  description: Scalars["String"]["output"];
+  id: Scalars["GID"]["output"];
+  isActive: Scalars["Boolean"]["output"];
   owner: User;
-  prefillSecret: Maybe<Scalars["String"]>;
-  slug: Scalars["String"];
+  prefillSecret: Maybe<Scalars["String"]["output"]>;
+  slug: Scalars["String"]["output"];
   template: PetitionTemplate;
-  title: Scalars["String"];
-  url: Scalars["String"];
+  title: Scalars["String"]["output"];
+  url: Scalars["String"]["output"];
 };
 
 /** A public message in a petition */
 export type PublicPetitionMessage = {
   /** The ID of the message. */
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   /** Date when the petition was first sent */
-  sentAt: Maybe<Scalars["DateTime"]>;
+  sentAt: Maybe<Scalars["DateTime"]["output"]>;
   /** Subject of a email. */
-  subject: Maybe<Scalars["String"]>;
+  subject: Maybe<Scalars["String"]["output"]>;
 };
 
 export type PublicPetitionSignerDataInput = {
-  email: Scalars["String"];
-  firstName: Scalars["String"];
-  lastName: Scalars["String"];
+  email: Scalars["String"]["input"];
+  firstName: Scalars["String"]["input"];
+  lastName: Scalars["String"]["input"];
 };
 
 export type PublicPublicPetitionLink = {
-  description: Scalars["String"];
-  isActive: Scalars["Boolean"];
+  description: Scalars["String"]["output"];
+  isActive: Scalars["Boolean"]["output"];
   /** If the organization has enough credits to send a petition with this public link or not */
-  isAvailable: Scalars["Boolean"];
+  isAvailable: Scalars["Boolean"]["output"];
   owner: PublicUser;
-  slug: Scalars["String"];
-  title: Scalars["String"];
+  slug: Scalars["String"]["output"];
+  title: Scalars["String"]["output"];
 };
 
 export type PublicRemindersOptOut = {
-  orgLogoUrl: Maybe<Scalars["String"]>;
-  orgName: Scalars["String"];
+  orgLogoUrl: Maybe<Scalars["String"]["output"]>;
+  orgName: Scalars["String"]["output"];
 };
 
 /** The public signature settings of a petition */
@@ -3733,9 +3742,9 @@ export type PublicSignatureConfig = {
   /** The signers assigned by the petition recipient */
   additionalSigners: Array<PetitionSigner>;
   /** If true, allows the recipients or users of the petition to select additional signers */
-  allowAdditionalSigners: Scalars["Boolean"];
+  allowAdditionalSigners: Scalars["Boolean"]["output"];
   /** If true, lets the user review the replies before starting the signature process */
-  review: Scalars["Boolean"];
+  review: Scalars["Boolean"]["output"];
   /** The contacts that need to sign the generated document. */
   signers: Array<PetitionSigner>;
 };
@@ -3745,15 +3754,15 @@ export type PublicSignatureStatus = "COMPLETED" | "STARTED";
 /** A public view of a user */
 export type PublicUser = {
   /** The email of the user. */
-  email: Scalars["String"];
+  email: Scalars["String"]["output"];
   /** The first name of the user. */
-  firstName: Maybe<Scalars["String"]>;
+  firstName: Maybe<Scalars["String"]["output"]>;
   /** The full name of the user. */
-  fullName: Scalars["String"];
+  fullName: Scalars["String"]["output"];
   /** The ID of the user. */
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   /** The last name of the user. */
-  lastName: Maybe<Scalars["String"]>;
+  lastName: Maybe<Scalars["String"]["output"]>;
   /** The organization of the user. */
   organization: PublicOrganization;
 };
@@ -3771,20 +3780,20 @@ export type Query = {
   dowJonesKycEntityProfile: DowJonesKycEntityProfileResult;
   dowJonesKycEntitySearch: DowJonesKycEntitySearchResultPagination;
   /** Checks if the provided email is available to be registered as a user on Parallel */
-  emailIsAvailable: Scalars["Boolean"];
+  emailIsAvailable: Scalars["Boolean"]["output"];
   expiringProfileProperties: ProfileFieldPropertyPagination;
   /** Exports basic petition + fields configuration as JSON object */
   exportPetitionToJson: SupportMethodResponse;
   /** Get the user who owns an API Token */
   getApiTokenOwner: SupportMethodResponse;
-  getSlugForPublicPetitionLink: Scalars["String"];
+  getSlugForPublicPetitionLink: Scalars["String"]["output"];
   /** Get users or groups from IDs */
   getUsersOrGroups: Array<UserOrUserGroup>;
   /** Decodes the given Global ID into an entity in the database. */
   globalIdDecode: SupportMethodResponse;
   /** Encodes the given ID into a Global ID. */
   globalIdEncode: SupportMethodResponse;
-  isValidPublicPetitionLinkSlug: Scalars["Boolean"];
+  isValidPublicPetitionLinkSlug: Scalars["Boolean"]["output"];
   landingTemplateBySlug: Maybe<LandingTemplate>;
   landingTemplateCategorySamples: Array<LandingTemplateCategorySample>;
   landingTemplates: LandingTemplatePagination;
@@ -3798,7 +3807,7 @@ export type Query = {
   /** A field of the petition. */
   petitionField: PetitionField;
   /** Lists every path of the user's petitions as a string array */
-  petitionFolders: Array<Scalars["String"]>;
+  petitionFolders: Array<Scalars["String"]["output"]>;
   /** The petitions of the user */
   petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
@@ -3812,7 +3821,7 @@ export type Query = {
   publicPetitionField: PublicPetitionField;
   publicPetitionLinkBySlug: Maybe<PublicPublicPetitionLink>;
   publicTask: Task;
-  publicTemplateCategories: Array<Scalars["String"]>;
+  publicTemplateCategories: Array<Scalars["String"]["output"]>;
   realMe: User;
   /** Exposes minimal information for reminders page so the contact doesn't need to be verified */
   remindersOptOut: Maybe<PublicRemindersOptOut>;
@@ -3832,238 +3841,238 @@ export type Query = {
 };
 
 export type QueryaccessArgs = {
-  keycode: Scalars["ID"];
+  keycode: Scalars["ID"]["input"];
 };
 
 export type QueryaccessesArgs = {
-  keycode: Scalars["ID"];
-  limit?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  search?: InputMaybe<Scalars["String"]>;
+  keycode: Scalars["ID"]["input"];
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
   status?: InputMaybe<Array<PetitionStatus>>;
 };
 
 export type QuerycontactArgs = {
-  id: Scalars["GID"];
+  id: Scalars["GID"]["input"];
 };
 
 export type QuerycontactsArgs = {
-  exclude?: InputMaybe<Array<Scalars["GID"]>>;
-  limit?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  search?: InputMaybe<Scalars["String"]>;
+  exclude?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<QueryContacts_OrderBy>>;
 };
 
 export type QuerycontactsByEmailArgs = {
-  emails: Array<Scalars["String"]>;
+  emails: Array<Scalars["String"]["input"]>;
 };
 
 export type QuerydowJonesKycEntityProfileArgs = {
-  profileId: Scalars["ID"];
+  profileId: Scalars["ID"]["input"];
 };
 
 export type QuerydowJonesKycEntitySearchArgs = {
-  dateOfBirth?: InputMaybe<Scalars["DateTime"]>;
-  limit?: InputMaybe<Scalars["Int"]>;
-  name: Scalars["String"];
-  offset?: InputMaybe<Scalars["Int"]>;
+  dateOfBirth?: InputMaybe<Scalars["DateTime"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  name: Scalars["String"]["input"];
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type QueryemailIsAvailableArgs = {
-  email: Scalars["String"];
+  email: Scalars["String"]["input"];
 };
 
 export type QueryexpiringProfilePropertiesArgs = {
   filter?: InputMaybe<ProfilePropertyFilter>;
-  limit?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  search?: InputMaybe<Scalars["String"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type QueryexportPetitionToJsonArgs = {
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type QuerygetApiTokenOwnerArgs = {
-  token: Scalars["String"];
+  token: Scalars["String"]["input"];
 };
 
 export type QuerygetSlugForPublicPetitionLinkArgs = {
-  petitionName?: InputMaybe<Scalars["String"]>;
+  petitionName?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type QuerygetUsersOrGroupsArgs = {
-  ids: Array<Scalars["ID"]>;
+  ids: Array<Scalars["ID"]["input"]>;
 };
 
 export type QueryglobalIdDecodeArgs = {
-  id: Scalars["ID"];
+  id: Scalars["ID"]["input"];
 };
 
 export type QueryglobalIdEncodeArgs = {
-  id: Scalars["String"];
-  type: Scalars["String"];
+  id: Scalars["String"]["input"];
+  type: Scalars["String"]["input"];
 };
 
 export type QueryisValidPublicPetitionLinkSlugArgs = {
-  slug: Scalars["String"];
+  slug: Scalars["String"]["input"];
 };
 
 export type QuerylandingTemplateBySlugArgs = {
-  slug: Scalars["String"];
+  slug: Scalars["String"]["input"];
 };
 
 export type QuerylandingTemplatesArgs = {
-  categories?: InputMaybe<Array<Scalars["String"]>>;
-  limit?: InputMaybe<Scalars["Int"]>;
+  categories?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
   locale: PetitionLocale;
-  offset?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type QuerymetadataArgs = {
-  keycode?: InputMaybe<Scalars["ID"]>;
+  keycode?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
 export type QueryorganizationArgs = {
-  id: Scalars["GID"];
+  id: Scalars["GID"]["input"];
 };
 
 export type QueryorganizationsArgs = {
-  limit?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  search?: InputMaybe<Scalars["String"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<QueryOrganizations_OrderBy>>;
   status?: InputMaybe<OrganizationStatus>;
 };
 
 export type QuerypetitionArgs = {
-  id: Scalars["GID"];
+  id: Scalars["GID"]["input"];
 };
 
 export type QuerypetitionEventsArgs = {
-  before?: InputMaybe<Scalars["GID"]>;
+  before?: InputMaybe<Scalars["GID"]["input"]>;
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
 };
 
 export type QuerypetitionFieldArgs = {
-  petitionFieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type QuerypetitionFoldersArgs = {
-  currentPath?: InputMaybe<Scalars["String"]>;
+  currentPath?: InputMaybe<Scalars["String"]["input"]>;
   type: PetitionBaseType;
 };
 
 export type QuerypetitionsArgs = {
   filters?: InputMaybe<PetitionFilter>;
-  limit?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  search?: InputMaybe<Scalars["String"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<QueryPetitions_OrderBy>>;
 };
 
 export type QuerypetitionsByIdArgs = {
   folders?: InputMaybe<FoldersInput>;
-  ids?: InputMaybe<Array<Scalars["GID"]>>;
+  ids?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type QueryprofileArgs = {
-  profileId: Scalars["GID"];
+  profileId: Scalars["GID"]["input"];
 };
 
 export type QueryprofileTypeArgs = {
-  profileTypeId: Scalars["GID"];
+  profileTypeId: Scalars["GID"]["input"];
 };
 
 export type QueryprofileTypesArgs = {
-  limit?: InputMaybe<Scalars["Int"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
   locale?: InputMaybe<UserLocale>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  search?: InputMaybe<Scalars["String"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<QueryProfileTypes_OrderBy>>;
 };
 
 export type QueryprofilesArgs = {
   filter?: InputMaybe<ProfileFilter>;
-  limit?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  search?: InputMaybe<Scalars["String"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<QueryProfiles_OrderBy>>;
 };
 
 export type QuerypublicLicenseCodeArgs = {
-  code: Scalars["String"];
-  token: Scalars["ID"];
+  code: Scalars["String"]["input"];
+  token: Scalars["ID"]["input"];
 };
 
 export type QuerypublicOrgArgs = {
-  id: Scalars["GID"];
+  id: Scalars["GID"]["input"];
 };
 
 export type QuerypublicPetitionFieldArgs = {
-  keycode: Scalars["ID"];
-  petitionFieldId: Scalars["GID"];
+  keycode: Scalars["ID"]["input"];
+  petitionFieldId: Scalars["GID"]["input"];
 };
 
 export type QuerypublicPetitionLinkBySlugArgs = {
-  prefill?: InputMaybe<Scalars["String"]>;
-  slug: Scalars["ID"];
+  prefill?: InputMaybe<Scalars["String"]["input"]>;
+  slug: Scalars["ID"]["input"];
 };
 
 export type QuerypublicTaskArgs = {
-  keycode: Scalars["ID"];
-  taskId: Scalars["GID"];
+  keycode: Scalars["ID"]["input"];
+  taskId: Scalars["GID"]["input"];
 };
 
 export type QueryremindersOptOutArgs = {
-  keycode: Scalars["ID"];
+  keycode: Scalars["ID"]["input"];
 };
 
 export type QuerysearchUserGroupsArgs = {
-  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]>>;
-  search: Scalars["String"];
+  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  search: Scalars["String"]["input"];
 };
 
 export type QuerysearchUsersArgs = {
-  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]>>;
-  excludeUsers?: InputMaybe<Array<Scalars["GID"]>>;
-  includeGroups?: InputMaybe<Scalars["Boolean"]>;
-  includeInactive?: InputMaybe<Scalars["Boolean"]>;
-  search: Scalars["String"];
+  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  excludeUsers?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  includeGroups?: InputMaybe<Scalars["Boolean"]["input"]>;
+  includeInactive?: InputMaybe<Scalars["Boolean"]["input"]>;
+  search: Scalars["String"]["input"];
 };
 
 export type QuerytagsArgs = {
-  limit?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  search?: InputMaybe<Scalars["String"]>;
-  tagIds?: InputMaybe<Array<Scalars["GID"]>>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
+  tagIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
 
 export type QuerytaskArgs = {
-  id: Scalars["GID"];
+  id: Scalars["GID"]["input"];
 };
 
 export type QuerytemplatesArgs = {
-  category?: InputMaybe<Scalars["String"]>;
-  isOwner?: InputMaybe<Scalars["Boolean"]>;
-  isPublic: Scalars["Boolean"];
-  limit?: InputMaybe<Scalars["Int"]>;
+  category?: InputMaybe<Scalars["String"]["input"]>;
+  isOwner?: InputMaybe<Scalars["Boolean"]["input"]>;
+  isPublic: Scalars["Boolean"]["input"];
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
   locale?: InputMaybe<PetitionLocale>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  path?: InputMaybe<Scalars["String"]>;
-  search?: InputMaybe<Scalars["String"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  path?: InputMaybe<Scalars["String"]["input"]>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type QueryuserGroupArgs = {
-  id: Scalars["GID"];
+  id: Scalars["GID"]["input"];
 };
 
 export type QueryuserGroupsArgs = {
-  limit?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  search?: InputMaybe<Scalars["String"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
   sortBy?: InputMaybe<Array<QueryUserGroups_OrderBy>>;
 };
 
@@ -4112,9 +4121,9 @@ export type QueryProfiles_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name_A
 export type QueryUserGroups_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
 
 export type RecipientSignedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   signer: Maybe<PetitionSigner>;
   type: PetitionEventType;
@@ -4122,16 +4131,16 @@ export type RecipientSignedEvent = PetitionEvent & {
 
 export type ReminderEmailBouncedUserNotification = PetitionUserNotification & {
   access: PetitionAccess;
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  isRead: Scalars["Boolean"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  isRead: Scalars["Boolean"]["output"];
   petition: PetitionBase;
 };
 
 export type ReminderSentEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   reminder: PetitionReminder;
   type: PetitionEventType;
@@ -4140,78 +4149,78 @@ export type ReminderSentEvent = PetitionEvent & {
 /** The reminder settings of a petition */
 export type RemindersConfig = {
   /** The maximum amount of reminders. */
-  limit: Scalars["Int"];
+  limit: Scalars["Int"]["output"];
   /** The amount of days between reminders. */
-  offset: Scalars["Int"];
+  offset: Scalars["Int"]["output"];
   /** The time at which the reminder should be sent. */
-  time: Scalars["String"];
+  time: Scalars["String"]["output"];
   /** The timezone the time is referring to. */
-  timezone: Scalars["String"];
+  timezone: Scalars["String"]["output"];
   /** Whether to send reminders only from monday to friday. */
-  weekdaysOnly: Scalars["Boolean"];
+  weekdaysOnly: Scalars["Boolean"]["output"];
 };
 
 /** The reminders settings for the petition */
 export type RemindersConfigInput = {
   /** The maximum amount of reminders. */
-  limit: Scalars["Int"];
+  limit: Scalars["Int"]["input"];
   /** The amount of days between reminders. */
-  offset: Scalars["Int"];
+  offset: Scalars["Int"]["input"];
   /** The time at which the reminder should be sent. */
-  time: Scalars["String"];
+  time: Scalars["String"]["input"];
   /** The timezone the time is referring to. */
-  timezone: Scalars["String"];
+  timezone: Scalars["String"]["input"];
   /** Whether to send reminders only from monday to friday. */
-  weekdaysOnly: Scalars["Boolean"];
+  weekdaysOnly: Scalars["Boolean"]["input"];
 };
 
 export type RemindersOptOutEvent = PetitionEvent & {
   access: PetitionAccess;
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
-  other: Maybe<Scalars["String"]>;
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  other: Maybe<Scalars["String"]["output"]>;
   petition: Maybe<Petition>;
-  reason: Scalars["String"];
+  reason: Scalars["String"]["output"];
   type: PetitionEventType;
 };
 
 export type RemindersOptOutNotification = PetitionUserNotification & {
   access: PetitionAccess;
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  isRead: Scalars["Boolean"];
-  other: Maybe<Scalars["String"]>;
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  isRead: Scalars["Boolean"]["output"];
+  other: Maybe<Scalars["String"]["output"]>;
   petition: PetitionBase;
-  reason: Scalars["String"];
+  reason: Scalars["String"]["output"];
 };
 
 export type ReplyCreatedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   createdBy: Maybe<UserOrPetitionAccess>;
-  data: Scalars["JSONObject"];
+  data: Scalars["JSONObject"]["output"];
   field: Maybe<PetitionField>;
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   reply: Maybe<PetitionFieldReply>;
   type: PetitionEventType;
 };
 
 export type ReplyDeletedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   deletedBy: Maybe<UserOrPetitionAccess>;
   field: Maybe<PetitionField>;
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 export type ReplyStatusChangedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   field: Maybe<PetitionField>;
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   reply: Maybe<PetitionFieldReply>;
   status: PetitionFieldReplyStatus;
@@ -4220,10 +4229,10 @@ export type ReplyStatusChangedEvent = PetitionEvent & {
 };
 
 export type ReplyUpdatedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
   field: Maybe<PetitionField>;
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   reply: Maybe<PetitionFieldReply>;
   type: PetitionEventType;
@@ -4243,84 +4252,84 @@ export type SignatureCancelledEvent = PetitionEvent & {
   cancelType: PetitionSignatureCancelReason;
   cancelledBy: Maybe<UserOrPetitionAccess>;
   canceller: Maybe<PetitionSigner>;
-  cancellerReason: Maybe<Scalars["String"]>;
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  errorCode: Maybe<Scalars["String"]>;
-  errorMessage: Maybe<Scalars["String"]>;
-  extraErrorData: Maybe<Scalars["JSON"]>;
-  id: Scalars["GID"];
+  cancellerReason: Maybe<Scalars["String"]["output"]>;
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  errorCode: Maybe<Scalars["String"]["output"]>;
+  errorMessage: Maybe<Scalars["String"]["output"]>;
+  extraErrorData: Maybe<Scalars["JSON"]["output"]>;
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 export type SignatureCancelledUserNotification = PetitionUserNotification & {
-  createdAt: Scalars["DateTime"];
-  errorCode: Maybe<Scalars["String"]>;
-  extraErrorData: Maybe<Scalars["JSON"]>;
-  id: Scalars["GID"];
-  isRead: Scalars["Boolean"];
+  createdAt: Scalars["DateTime"]["output"];
+  errorCode: Maybe<Scalars["String"]["output"]>;
+  extraErrorData: Maybe<Scalars["JSON"]["output"]>;
+  id: Scalars["GID"]["output"];
+  isRead: Scalars["Boolean"]["output"];
   petition: PetitionBase;
 };
 
 export type SignatureCompletedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 export type SignatureCompletedUserNotification = PetitionUserNotification & {
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  isRead: Scalars["Boolean"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  isRead: Scalars["Boolean"]["output"];
   petition: PetitionBase;
 };
 
 /** The signature settings of a petition */
 export type SignatureConfig = {
   /** If true, allows the recipients or users of the petition to select additional signers */
-  allowAdditionalSigners: Scalars["Boolean"];
+  allowAdditionalSigners: Scalars["Boolean"]["output"];
   /** The signature integration selected for this signature config. */
   integration: Maybe<SignatureOrgIntegration>;
   /** If true, lets the user review the replies before starting the signature process */
-  review: Scalars["Boolean"];
+  review: Scalars["Boolean"]["output"];
   /** The signers of the generated document. */
   signers: Array<Maybe<PetitionSigner>>;
   /** The timezone used to generate the document. */
-  timezone: Scalars["String"];
+  timezone: Scalars["String"]["output"];
   /** Title of the signature document */
-  title: Maybe<Scalars["String"]>;
+  title: Maybe<Scalars["String"]["output"]>;
 };
 
 /** The signature settings for the petition */
 export type SignatureConfigInput = {
   /** If true, allows the recipients or users of the petition to select additional signers */
-  allowAdditionalSigners: Scalars["Boolean"];
+  allowAdditionalSigners: Scalars["Boolean"]["input"];
   /** The Global ID of the signature integration to be used. */
-  orgIntegrationId: Scalars["GID"];
+  orgIntegrationId: Scalars["GID"]["input"];
   /** If true, lets the user review the replies before starting the signature process */
-  review: Scalars["Boolean"];
+  review: Scalars["Boolean"]["input"];
   signersInfo: Array<SignatureConfigInputSigner>;
   /** The timezone used to generate the document. */
-  timezone: Scalars["String"];
+  timezone: Scalars["String"]["input"];
   /** The title of the signing document */
-  title?: InputMaybe<Scalars["String"]>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 /** The signer that need to sign the generated document. */
 export type SignatureConfigInputSigner = {
-  contactId?: InputMaybe<Scalars["GID"]>;
-  email: Scalars["String"];
-  firstName: Scalars["String"];
-  lastName?: InputMaybe<Scalars["String"]>;
+  contactId?: InputMaybe<Scalars["GID"]["input"]>;
+  email: Scalars["String"]["input"];
+  firstName: Scalars["String"]["input"];
+  lastName?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type SignatureOpenedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   signer: Maybe<PetitionSigner>;
   type: PetitionEventType;
@@ -4329,12 +4338,12 @@ export type SignatureOpenedEvent = PetitionEvent & {
 export type SignatureOrgIntegration = IOrgIntegration & {
   /** Environment of this integration, to differentiate between sandbox and production-ready integrations */
   environment: SignatureOrgIntegrationEnvironment;
-  id: Scalars["GID"];
-  invalidCredentials: Scalars["Boolean"];
+  id: Scalars["GID"]["output"];
+  invalidCredentials: Scalars["Boolean"]["output"];
   /** Wether this integration is the default to be used if the user has more than one of the same type */
-  isDefault: Scalars["Boolean"];
+  isDefault: Scalars["Boolean"]["output"];
   /** Custom name of this integration, provided by the user */
-  name: Scalars["String"];
+  name: Scalars["String"]["output"];
   provider: SignatureOrgIntegrationProvider;
   /** The type of the integration. */
   type: IntegrationType;
@@ -4345,21 +4354,21 @@ export type SignatureOrgIntegrationEnvironment = "DEMO" | "PRODUCTION";
 export type SignatureOrgIntegrationProvider = "DOCUSIGN" | "SIGNATURIT";
 
 export type SignatureReminderEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
 
 export type SignatureStartedEvent = PetitionEvent & {
-  bouncedAt: Maybe<Scalars["DateTime"]>;
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  deliveredAt: Maybe<Scalars["DateTime"]>;
-  id: Scalars["GID"];
-  openedAt: Maybe<Scalars["DateTime"]>;
+  bouncedAt: Maybe<Scalars["DateTime"]["output"]>;
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  deliveredAt: Maybe<Scalars["DateTime"]["output"]>;
+  id: Scalars["GID"]["output"];
+  openedAt: Maybe<Scalars["DateTime"]["output"]>;
   petition: Maybe<Petition>;
   type: PetitionEventType;
 };
@@ -4369,32 +4378,32 @@ export type Success = "SUCCESS";
 
 /** Return type for all support methods */
 export type SupportMethodResponse = {
-  message: Maybe<Scalars["String"]>;
+  message: Maybe<Scalars["String"]["output"]>;
   result: Result;
-  type: Maybe<Scalars["String"]>;
+  type: Maybe<Scalars["String"]["output"]>;
 };
 
 export type Tag = {
   /** The color of the tag in hex format (example: #FFFFFF) */
-  color: Scalars["String"];
+  color: Scalars["String"]["output"];
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  name: Scalars["String"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  name: Scalars["String"]["output"];
 };
 
 export type TagPagination = {
   /** The requested slice of items. */
   items: Array<Tag>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type Task = {
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   name: TaskName;
-  output: Maybe<Scalars["JSON"]>;
-  progress: Maybe<Scalars["Int"]>;
+  output: Maybe<Scalars["JSON"]["output"]>;
+  progress: Maybe<Scalars["Int"]["output"]>;
   status: TaskStatus;
 };
 
@@ -4408,166 +4417,166 @@ export type TaskName =
   | "TEMPLATE_STATS_REPORT";
 
 export type TaskResultFile = {
-  filename: Scalars["String"];
-  url: Scalars["String"];
+  filename: Scalars["String"]["output"];
+  url: Scalars["String"]["output"];
 };
 
 export type TaskStatus = "COMPLETED" | "ENQUEUED" | "FAILED" | "PROCESSING";
 
 export type TemplateDefaultPermission = {
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
   /** wether user is will be subscribed or not to emails and alerts of the generated petition */
-  isSubscribed: Scalars["Boolean"];
+  isSubscribed: Scalars["Boolean"]["output"];
   /** The type of the permission. */
   permissionType: PetitionPermissionType;
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 /** The permission for a petition and user group */
 export type TemplateDefaultUserGroupPermission = TemplateDefaultPermission &
   Timestamps & {
     /** Time when the resource was created. */
-    createdAt: Scalars["DateTime"];
+    createdAt: Scalars["DateTime"]["output"];
     /** The group linked to the permission */
     group: UserGroup;
-    id: Scalars["GID"];
+    id: Scalars["GID"]["output"];
     /** wether user is will be subscribed or not to emails and alerts of the generated petition */
-    isSubscribed: Scalars["Boolean"];
+    isSubscribed: Scalars["Boolean"]["output"];
     /** The type of the permission. */
     permissionType: PetitionPermissionType;
     /** Time when the resource was last updated. */
-    updatedAt: Scalars["DateTime"];
+    updatedAt: Scalars["DateTime"]["output"];
   };
 
 /** The permission for a petition and user */
 export type TemplateDefaultUserPermission = TemplateDefaultPermission &
   Timestamps & {
     /** Time when the resource was created. */
-    createdAt: Scalars["DateTime"];
-    id: Scalars["GID"];
+    createdAt: Scalars["DateTime"]["output"];
+    id: Scalars["GID"]["output"];
     /** wether user is will be subscribed or not to emails and alerts of the generated petition */
-    isSubscribed: Scalars["Boolean"];
+    isSubscribed: Scalars["Boolean"]["output"];
     /** The type of the permission. */
     permissionType: PetitionPermissionType;
     /** Time when the resource was last updated. */
-    updatedAt: Scalars["DateTime"];
+    updatedAt: Scalars["DateTime"]["output"];
     /** The user linked to the permission */
     user: User;
   };
 
 export type TemplateUsedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 export type Timestamps = {
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 /** The preferred tone of organization */
 export type Tone = "FORMAL" | "INFORMAL";
 
 export type UpdateContactInput = {
-  firstName?: InputMaybe<Scalars["String"]>;
-  lastName?: InputMaybe<Scalars["String"]>;
+  firstName?: InputMaybe<Scalars["String"]["input"]>;
+  lastName?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type UpdatePetitionFieldInput = {
-  alias?: InputMaybe<Scalars["String"]>;
-  description?: InputMaybe<Scalars["String"]>;
-  hasCommentsEnabled?: InputMaybe<Scalars["Boolean"]>;
-  isInternal?: InputMaybe<Scalars["Boolean"]>;
-  multiple?: InputMaybe<Scalars["Boolean"]>;
-  optional?: InputMaybe<Scalars["Boolean"]>;
-  options?: InputMaybe<Scalars["JSONObject"]>;
-  requireApproval?: InputMaybe<Scalars["Boolean"]>;
-  showActivityInPdf?: InputMaybe<Scalars["Boolean"]>;
-  showInPdf?: InputMaybe<Scalars["Boolean"]>;
-  title?: InputMaybe<Scalars["String"]>;
-  visibility?: InputMaybe<Scalars["JSONObject"]>;
+  alias?: InputMaybe<Scalars["String"]["input"]>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  hasCommentsEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
+  isInternal?: InputMaybe<Scalars["Boolean"]["input"]>;
+  multiple?: InputMaybe<Scalars["Boolean"]["input"]>;
+  optional?: InputMaybe<Scalars["Boolean"]["input"]>;
+  options?: InputMaybe<Scalars["JSONObject"]["input"]>;
+  requireApproval?: InputMaybe<Scalars["Boolean"]["input"]>;
+  showActivityInPdf?: InputMaybe<Scalars["Boolean"]["input"]>;
+  showInPdf?: InputMaybe<Scalars["Boolean"]["input"]>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+  visibility?: InputMaybe<Scalars["JSONObject"]["input"]>;
 };
 
 export type UpdatePetitionInput = {
-  anonymizeAfterMonths?: InputMaybe<Scalars["Int"]>;
-  anonymizePurpose?: InputMaybe<Scalars["String"]>;
-  closingEmailBody?: InputMaybe<Scalars["JSON"]>;
-  completingMessageBody?: InputMaybe<Scalars["JSON"]>;
-  completingMessageSubject?: InputMaybe<Scalars["String"]>;
-  deadline?: InputMaybe<Scalars["DateTime"]>;
-  defaultOnBehalfId?: InputMaybe<Scalars["GID"]>;
-  defaultPath?: InputMaybe<Scalars["String"]>;
-  description?: InputMaybe<Scalars["JSON"]>;
-  emailBody?: InputMaybe<Scalars["JSON"]>;
-  emailSubject?: InputMaybe<Scalars["String"]>;
-  isCompletingMessageEnabled?: InputMaybe<Scalars["Boolean"]>;
-  isRecipientViewContentsHidden?: InputMaybe<Scalars["Boolean"]>;
+  anonymizeAfterMonths?: InputMaybe<Scalars["Int"]["input"]>;
+  anonymizePurpose?: InputMaybe<Scalars["String"]["input"]>;
+  closingEmailBody?: InputMaybe<Scalars["JSON"]["input"]>;
+  completingMessageBody?: InputMaybe<Scalars["JSON"]["input"]>;
+  completingMessageSubject?: InputMaybe<Scalars["String"]["input"]>;
+  deadline?: InputMaybe<Scalars["DateTime"]["input"]>;
+  defaultOnBehalfId?: InputMaybe<Scalars["GID"]["input"]>;
+  defaultPath?: InputMaybe<Scalars["String"]["input"]>;
+  description?: InputMaybe<Scalars["JSON"]["input"]>;
+  emailBody?: InputMaybe<Scalars["JSON"]["input"]>;
+  emailSubject?: InputMaybe<Scalars["String"]["input"]>;
+  isCompletingMessageEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
+  isRecipientViewContentsHidden?: InputMaybe<Scalars["Boolean"]["input"]>;
   locale?: InputMaybe<PetitionLocale>;
-  name?: InputMaybe<Scalars["String"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
   remindersConfig?: InputMaybe<RemindersConfigInput>;
   signatureConfig?: InputMaybe<SignatureConfigInput>;
-  skipForwardSecurity?: InputMaybe<Scalars["Boolean"]>;
+  skipForwardSecurity?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type UpdateProfileFieldValueInput = {
-  content?: InputMaybe<Scalars["JSONObject"]>;
-  expiryDate?: InputMaybe<Scalars["Date"]>;
-  profileTypeFieldId: Scalars["GID"];
+  content?: InputMaybe<Scalars["JSONObject"]["input"]>;
+  expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
+  profileTypeFieldId: Scalars["GID"]["input"];
 };
 
 export type UpdateProfileTypeFieldInput = {
-  alias?: InputMaybe<Scalars["String"]>;
-  expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]>;
-  isExpirable?: InputMaybe<Scalars["Boolean"]>;
-  name?: InputMaybe<Scalars["LocalizableUserText"]>;
-  options?: InputMaybe<Scalars["JSONObject"]>;
+  alias?: InputMaybe<Scalars["String"]["input"]>;
+  expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]["input"]>;
+  isExpirable?: InputMaybe<Scalars["Boolean"]["input"]>;
+  name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
+  options?: InputMaybe<Scalars["JSONObject"]["input"]>;
 };
 
 export type UpdateTagInput = {
-  color?: InputMaybe<Scalars["String"]>;
-  name?: InputMaybe<Scalars["String"]>;
+  color?: InputMaybe<Scalars["String"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type UpdateUserGroupInput = {
-  name?: InputMaybe<Scalars["String"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 /** A user in the system. */
 export type User = Timestamps & {
   /** URL to the user avatar */
-  avatarUrl: Maybe<Scalars["String"]>;
-  canCreateUsers: Scalars["Boolean"];
+  avatarUrl: Maybe<Scalars["String"]["output"]>;
+  canCreateUsers: Scalars["Boolean"]["output"];
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
+  createdAt: Scalars["DateTime"]["output"];
   /** Users that the user can send on behalf of */
   delegateOf: Array<User>;
   /** Users that the user allows to send on their behalf */
   delegates: Array<User>;
   /** The email of the user. */
-  email: Scalars["String"];
+  email: Scalars["String"]["output"];
   /** The first name of the user. */
-  firstName: Maybe<Scalars["String"]>;
+  firstName: Maybe<Scalars["String"]["output"]>;
   /** The full name of the user. */
-  fullName: Maybe<Scalars["String"]>;
-  hasFeatureFlag: Scalars["Boolean"];
+  fullName: Maybe<Scalars["String"]["output"]>;
+  hasFeatureFlag: Scalars["Boolean"]["output"];
   /** The ID of the user. */
-  id: Scalars["GID"];
+  id: Scalars["GID"]["output"];
   /** The initials of the user. */
-  initials: Maybe<Scalars["String"]>;
-  isMe: Scalars["Boolean"];
-  isSsoUser: Scalars["Boolean"];
-  isSuperAdmin: Scalars["Boolean"];
-  lastActiveAt: Maybe<Scalars["DateTime"]>;
+  initials: Maybe<Scalars["String"]["output"]>;
+  isMe: Scalars["Boolean"]["output"];
+  isSsoUser: Scalars["Boolean"]["output"];
+  isSuperAdmin: Scalars["Boolean"]["output"];
+  lastActiveAt: Maybe<Scalars["DateTime"]["output"]>;
   /** The last name of the user. */
-  lastName: Maybe<Scalars["String"]>;
+  lastName: Maybe<Scalars["String"]["output"]>;
   /** Read and unread user notifications about events on their petitions */
   notifications: UserNotifications_Pagination;
   organization: Organization;
@@ -4580,9 +4589,9 @@ export type User = Timestamps & {
   status: UserStatus;
   /** Lists the API tokens this user has. */
   tokens: Array<UserAuthenticationToken>;
-  unreadNotificationIds: Array<Scalars["GID"]>;
+  unreadNotificationIds: Array<Scalars["GID"]["output"]>;
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
   userGroups: Array<UserGroup>;
 };
 
@@ -4598,37 +4607,37 @@ export type UserhasFeatureFlagArgs = {
 
 /** A user in the system. */
 export type UsernotificationsArgs = {
-  before?: InputMaybe<Scalars["DateTime"]>;
+  before?: InputMaybe<Scalars["DateTime"]["input"]>;
   filter?: InputMaybe<PetitionUserNotificationFilter>;
-  limit?: InputMaybe<Scalars["Int"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type UserAuthenticationToken = CreatedAt & {
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
-  hint: Maybe<Scalars["String"]>;
-  id: Scalars["GID"];
-  lastUsedAt: Maybe<Scalars["DateTime"]>;
-  tokenName: Scalars["String"];
+  createdAt: Scalars["DateTime"]["output"];
+  hint: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["GID"]["output"];
+  lastUsedAt: Maybe<Scalars["DateTime"]["output"]>;
+  tokenName: Scalars["String"]["output"];
 };
 
 export type UserGroup = Timestamps & {
   /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  imMember: Scalars["Boolean"];
-  initials: Scalars["String"];
-  memberCount: Scalars["Int"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  imMember: Scalars["Boolean"]["output"];
+  initials: Scalars["String"]["output"];
+  memberCount: Scalars["Int"]["output"];
   members: Array<UserGroupMember>;
-  name: Scalars["String"];
+  name: Scalars["String"]["output"];
   /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
 export type UserGroupMember = {
   /** The time the user was added to the user group. */
-  addedAt: Scalars["DateTime"];
-  id: Scalars["GID"];
+  addedAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
   user: User;
 };
 
@@ -4636,7 +4645,7 @@ export type UserGroupPagination = {
   /** The requested slice of items. */
   items: Array<UserGroup>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 /** The preferred locale for the user */
@@ -4644,7 +4653,7 @@ export type UserLocale = "en" | "es";
 
 export type UserNotifications_Pagination = {
   /** Whether this resource has more items. */
-  hasMore: Scalars["Boolean"];
+  hasMore: Scalars["Boolean"]["output"];
   /** The requested slice of items. */
   items: Array<PetitionUserNotification>;
 };
@@ -4654,23 +4663,23 @@ export type UserOrPetitionAccess = PetitionAccess | User;
 export type UserOrUserGroup = User | UserGroup;
 
 export type UserOrUserGroupPermissionInput = {
-  isSubscribed: Scalars["Boolean"];
+  isSubscribed: Scalars["Boolean"]["input"];
   permissionType: PetitionPermissionType;
-  userGroupId?: InputMaybe<Scalars["GID"]>;
-  userId?: InputMaybe<Scalars["GID"]>;
+  userGroupId?: InputMaybe<Scalars["GID"]["input"]>;
+  userId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
 export type UserPagination = {
   /** The requested slice of items. */
   items: Array<User>;
   /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type UserPermissionAddedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   permissionType: PetitionPermissionType;
   permissionUser: Maybe<User>;
   petition: Maybe<Petition>;
@@ -4679,9 +4688,9 @@ export type UserPermissionAddedEvent = PetitionEvent & {
 };
 
 export type UserPermissionEditedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   permissionType: PetitionPermissionType;
   permissionUser: Maybe<User>;
   petition: Maybe<Petition>;
@@ -4690,9 +4699,9 @@ export type UserPermissionEditedEvent = PetitionEvent & {
 };
 
 export type UserPermissionRemovedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
   permissionUser: Maybe<User>;
   petition: Maybe<Petition>;
   type: PetitionEventType;
@@ -4702,14 +4711,14 @@ export type UserPermissionRemovedEvent = PetitionEvent & {
 export type UserStatus = "ACTIVE" | "INACTIVE" | "ON_HOLD";
 
 export type VerificationCodeCheck = {
-  remainingAttempts: Maybe<Scalars["Int"]>;
+  remainingAttempts: Maybe<Scalars["Int"]["output"]>;
   result: Result;
 };
 
 export type VerificationCodeRequest = {
-  expiresAt: Scalars["DateTime"];
-  remainingAttempts: Scalars["Int"];
-  token: Scalars["ID"];
+  expiresAt: Scalars["DateTime"]["output"];
+  remainingAttempts: Scalars["Int"]["output"];
+  token: Scalars["ID"]["output"];
 };
 
 export type AWSPresignedPostDataFragment = { fields: { [key: string]: any }; url: string };
@@ -4926,8 +4935,8 @@ export type SubscriptionFragment = {
 export type TaskFragment = { id: string; progress: number | null; status: TaskStatus };
 
 export type getTags_tagsQueryVariables = Exact<{
-  offset: Scalars["Int"];
-  limit: Scalars["Int"];
+  offset: Scalars["Int"]["input"];
+  limit: Scalars["Int"]["input"];
 }>;
 
 export type getTags_tagsQuery = {
@@ -4935,7 +4944,7 @@ export type getTags_tagsQuery = {
 };
 
 export type waitForTask_TaskQueryVariables = Exact<{
-  id: Scalars["GID"];
+  id: Scalars["GID"]["input"];
 }>;
 
 export type waitForTask_TaskQuery = {
@@ -4943,7 +4952,7 @@ export type waitForTask_TaskQuery = {
 };
 
 export type getTaskResultFileUrl_getTaskResultFileMutationVariables = Exact<{
-  taskId: Scalars["GID"];
+  taskId: Scalars["GID"]["input"];
 }>;
 
 export type getTaskResultFileUrl_getTaskResultFileMutation = { getTaskResultFile: { url: string } };
@@ -4962,9 +4971,9 @@ export type GetMe_userQuery = {
 };
 
 export type GetTags_tagsQueryVariables = Exact<{
-  offset: Scalars["Int"];
-  limit: Scalars["Int"];
-  search?: InputMaybe<Scalars["String"]>;
+  offset: Scalars["Int"]["input"];
+  limit: Scalars["Int"]["input"];
+  search?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type GetTags_tagsQuery = {
@@ -4972,18 +4981,18 @@ export type GetTags_tagsQuery = {
 };
 
 export type GetPetitions_petitionsQueryVariables = Exact<{
-  offset: Scalars["Int"];
-  limit: Scalars["Int"];
+  offset: Scalars["Int"]["input"];
+  limit: Scalars["Int"]["input"];
   status?: InputMaybe<Array<PetitionStatus> | PetitionStatus>;
   tags?: InputMaybe<PetitionTagFilter>;
   sortBy?: InputMaybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
-  includeRecipients: Scalars["Boolean"];
-  includeFields: Scalars["Boolean"];
-  includeTags: Scalars["Boolean"];
-  includeRecipientUrl: Scalars["Boolean"];
-  includeReplies: Scalars["Boolean"];
-  includeProgress: Scalars["Boolean"];
-  fromTemplateId?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  includeRecipients: Scalars["Boolean"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeTags: Scalars["Boolean"]["input"];
+  includeRecipientUrl: Scalars["Boolean"]["input"];
+  includeReplies: Scalars["Boolean"]["input"];
+  includeProgress: Scalars["Boolean"]["input"];
+  fromTemplateId?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
 }>;
 
 export type GetPetitions_petitionsQuery = {
@@ -5064,14 +5073,14 @@ export type GetPetitions_petitionsQuery = {
 };
 
 export type CreatePetition_petitionMutationVariables = Exact<{
-  name?: InputMaybe<Scalars["String"]>;
-  templateId?: InputMaybe<Scalars["GID"]>;
-  includeRecipients: Scalars["Boolean"];
-  includeFields: Scalars["Boolean"];
-  includeTags: Scalars["Boolean"];
-  includeRecipientUrl: Scalars["Boolean"];
-  includeReplies: Scalars["Boolean"];
-  includeProgress: Scalars["Boolean"];
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  templateId?: InputMaybe<Scalars["GID"]["input"]>;
+  includeRecipients: Scalars["Boolean"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeTags: Scalars["Boolean"]["input"];
+  includeRecipientUrl: Scalars["Boolean"]["input"];
+  includeReplies: Scalars["Boolean"]["input"];
+  includeProgress: Scalars["Boolean"]["input"];
 }>;
 
 export type CreatePetition_petitionMutation = {
@@ -5148,13 +5157,13 @@ export type CreatePetition_petitionMutation = {
 };
 
 export type GetPetition_petitionQueryVariables = Exact<{
-  petitionId: Scalars["GID"];
-  includeRecipients: Scalars["Boolean"];
-  includeFields: Scalars["Boolean"];
-  includeTags: Scalars["Boolean"];
-  includeRecipientUrl: Scalars["Boolean"];
-  includeReplies: Scalars["Boolean"];
-  includeProgress: Scalars["Boolean"];
+  petitionId: Scalars["GID"]["input"];
+  includeRecipients: Scalars["Boolean"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeTags: Scalars["Boolean"]["input"];
+  includeRecipientUrl: Scalars["Boolean"]["input"];
+  includeReplies: Scalars["Boolean"]["input"];
+  includeProgress: Scalars["Boolean"]["input"];
 }>;
 
 export type GetPetition_petitionQuery = {
@@ -5232,14 +5241,14 @@ export type GetPetition_petitionQuery = {
 };
 
 export type UpdatePetition_updatePetitionMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
   data: UpdatePetitionInput;
-  includeRecipients: Scalars["Boolean"];
-  includeFields: Scalars["Boolean"];
-  includeTags: Scalars["Boolean"];
-  includeRecipientUrl: Scalars["Boolean"];
-  includeReplies: Scalars["Boolean"];
-  includeProgress: Scalars["Boolean"];
+  includeRecipients: Scalars["Boolean"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeTags: Scalars["Boolean"]["input"];
+  includeRecipientUrl: Scalars["Boolean"]["input"];
+  includeReplies: Scalars["Boolean"]["input"];
+  includeProgress: Scalars["Boolean"]["input"];
 }>;
 
 export type UpdatePetition_updatePetitionMutation = {
@@ -5316,14 +5325,14 @@ export type UpdatePetition_updatePetitionMutation = {
 };
 
 export type DeletePetition_deletePetitionsMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  force: Scalars["Boolean"];
+  petitionId: Scalars["GID"]["input"];
+  force: Scalars["Boolean"]["input"];
 }>;
 
 export type DeletePetition_deletePetitionsMutation = { deletePetitions: Success };
 
 export type ReadPetitionCustomPropertiesQueryVariables = Exact<{
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 }>;
 
 export type ReadPetitionCustomPropertiesQuery = {
@@ -5335,9 +5344,9 @@ export type ReadPetitionCustomPropertiesQuery = {
 
 export type CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyMutationVariables =
   Exact<{
-    petitionId: Scalars["GID"];
-    key: Scalars["String"];
-    value?: InputMaybe<Scalars["String"]>;
+    petitionId: Scalars["GID"]["input"];
+    key: Scalars["String"]["input"];
+    value?: InputMaybe<Scalars["String"]["input"]>;
   }>;
 
 export type CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyMutation = {
@@ -5347,8 +5356,8 @@ export type CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyMut
 };
 
 export type DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  key: Scalars["String"];
+  petitionId: Scalars["GID"]["input"];
+  key: Scalars["String"]["input"];
 }>;
 
 export type DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutation = {
@@ -5356,7 +5365,7 @@ export type DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutation = 
 };
 
 export type CreatePetitionRecipients_contactQueryVariables = Exact<{
-  email: Scalars["String"];
+  email: Scalars["String"]["input"];
 }>;
 
 export type CreatePetitionRecipients_contactQuery = {
@@ -5364,7 +5373,7 @@ export type CreatePetitionRecipients_contactQuery = {
 };
 
 export type CreatePetitionRecipients_updateContactMutationVariables = Exact<{
-  contactId: Scalars["GID"];
+  contactId: Scalars["GID"]["input"];
   data: UpdateContactInput;
 }>;
 
@@ -5377,7 +5386,7 @@ export type CreatePetitionRecipients_createContactMutationVariables = Exact<{
 export type CreatePetitionRecipients_createContactMutation = { createContact: { id: string } };
 
 export type CreatePetitionRecipients_petitionQueryVariables = Exact<{
-  id: Scalars["GID"];
+  id: Scalars["GID"]["input"];
 }>;
 
 export type CreatePetitionRecipients_petitionQuery = {
@@ -5388,18 +5397,18 @@ export type CreatePetitionRecipients_petitionQuery = {
 };
 
 export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  contactIds: Array<Scalars["GID"]> | Scalars["GID"];
-  subject: Scalars["String"];
-  body: Scalars["JSON"];
-  scheduledAt?: InputMaybe<Scalars["DateTime"]>;
+  petitionId: Scalars["GID"]["input"];
+  contactIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+  subject: Scalars["String"]["input"];
+  body: Scalars["JSON"]["input"];
+  scheduledAt?: InputMaybe<Scalars["DateTime"]["input"]>;
   remindersConfig?: InputMaybe<RemindersConfigInput>;
-  includeRecipients: Scalars["Boolean"];
-  includeFields: Scalars["Boolean"];
-  includeTags: Scalars["Boolean"];
-  includeRecipientUrl: Scalars["Boolean"];
-  includeReplies: Scalars["Boolean"];
-  includeProgress: Scalars["Boolean"];
+  includeRecipients: Scalars["Boolean"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeTags: Scalars["Boolean"]["input"];
+  includeRecipientUrl: Scalars["Boolean"]["input"];
+  includeReplies: Scalars["Boolean"]["input"];
+  includeProgress: Scalars["Boolean"]["input"];
 }>;
 
 export type CreatePetitionRecipients_sendPetitionMutation = {
@@ -5477,7 +5486,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
 };
 
 export type GetPetitionRecipients_petitionAccessesQueryVariables = Exact<{
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 }>;
 
 export type GetPetitionRecipients_petitionAccessesQuery = {
@@ -5514,7 +5523,7 @@ export type GetPetitionRecipients_petitionAccessesQuery = {
 };
 
 export type PetitionReplies_repliesQueryVariables = Exact<{
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 }>;
 
 export type PetitionReplies_repliesQuery = {
@@ -5563,10 +5572,10 @@ export type PetitionReplies_repliesQuery = {
 };
 
 export type UpdatePetitionField_updatePetitionFieldMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  fieldId: Scalars["GID"];
-  title?: InputMaybe<Scalars["String"]>;
-  description?: InputMaybe<Scalars["String"]>;
+  petitionId: Scalars["GID"]["input"];
+  fieldId: Scalars["GID"]["input"];
+  title?: InputMaybe<Scalars["String"]["input"]>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type UpdatePetitionField_updatePetitionFieldMutation = {
@@ -5583,15 +5592,15 @@ export type UpdatePetitionField_updatePetitionFieldMutation = {
 };
 
 export type DeleteReply_deletePetitionReplyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  replyId: Scalars["GID"]["input"];
 }>;
 
 export type DeleteReply_deletePetitionReplyMutation = { deletePetitionReply: { id: string } };
 
 export type DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  replyId: Scalars["GID"]["input"];
 }>;
 
 export type DownloadFileReply_fileUploadReplyDownloadLinkMutation = {
@@ -5599,8 +5608,8 @@ export type DownloadFileReply_fileUploadReplyDownloadLinkMutation = {
 };
 
 export type ExportPetitionReplies_createExportRepliesTaskMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  pattern?: InputMaybe<Scalars["String"]>;
+  petitionId: Scalars["GID"]["input"];
+  pattern?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type ExportPetitionReplies_createExportRepliesTaskMutation = {
@@ -5608,7 +5617,7 @@ export type ExportPetitionReplies_createExportRepliesTaskMutation = {
 };
 
 export type ExportPetitionReplies_createPrintPdfTaskMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 }>;
 
 export type ExportPetitionReplies_createPrintPdfTaskMutation = {
@@ -5616,7 +5625,7 @@ export type ExportPetitionReplies_createPrintPdfTaskMutation = {
 };
 
 export type GetPermissions_permissionsQueryVariables = Exact<{
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 }>;
 
 export type GetPermissions_permissionsQuery = {
@@ -5671,9 +5680,9 @@ export type SharePetition_usersQuery = {
 };
 
 export type SharePetition_addPetitionPermissionMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  userIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  userGroupIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  petitionId: Scalars["GID"]["input"];
+  userIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
 }>;
 
 export type SharePetition_addPetitionPermissionMutation = {
@@ -5722,7 +5731,7 @@ export type SharePetition_addPetitionPermissionMutation = {
 };
 
 export type StopSharing_removePetitionPermissionMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 }>;
 
 export type StopSharing_removePetitionPermissionMutation = {
@@ -5730,8 +5739,8 @@ export type StopSharing_removePetitionPermissionMutation = {
 };
 
 export type RemoveUserPermission_removePetitionPermissionMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  userId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  userId: Scalars["GID"]["input"];
 }>;
 
 export type RemoveUserPermission_removePetitionPermissionMutation = {
@@ -5739,8 +5748,8 @@ export type RemoveUserPermission_removePetitionPermissionMutation = {
 };
 
 export type RemoveUserGroupPermission_removePetitionPermissionMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  userGroupId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  userGroupId: Scalars["GID"]["input"];
 }>;
 
 export type RemoveUserGroupPermission_removePetitionPermissionMutation = {
@@ -5748,7 +5757,7 @@ export type RemoveUserGroupPermission_removePetitionPermissionMutation = {
 };
 
 export type TransferPetition_searchUserByEmailQueryVariables = Exact<{
-  search?: InputMaybe<Scalars["String"]>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type TransferPetition_searchUserByEmailQuery = {
@@ -5756,8 +5765,8 @@ export type TransferPetition_searchUserByEmailQuery = {
 };
 
 export type TransferPetition_transferPetitionOwnershipMutationVariables = Exact<{
-  userId: Scalars["GID"];
-  petitionId: Scalars["GID"];
+  userId: Scalars["GID"]["input"];
+  petitionId: Scalars["GID"]["input"];
 }>;
 
 export type TransferPetition_transferPetitionOwnershipMutation = {
@@ -5806,7 +5815,7 @@ export type TransferPetition_transferPetitionOwnershipMutation = {
 };
 
 export type GetSignatures_petitionSignaturesQueryVariables = Exact<{
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 }>;
 
 export type GetSignatures_petitionSignaturesQuery = {
@@ -5826,7 +5835,7 @@ export type GetSignatures_petitionSignaturesQuery = {
 };
 
 export type DownloadSignedDocument_downloadSignedDocMutationVariables = Exact<{
-  signatureId: Scalars["GID"];
+  signatureId: Scalars["GID"]["input"];
 }>;
 
 export type DownloadSignedDocument_downloadSignedDocMutation = {
@@ -5834,7 +5843,7 @@ export type DownloadSignedDocument_downloadSignedDocMutation = {
 };
 
 export type DownloadSignedDocument_downloadAuditTrailMutationVariables = Exact<{
-  signatureId: Scalars["GID"];
+  signatureId: Scalars["GID"]["input"];
 }>;
 
 export type DownloadSignedDocument_downloadAuditTrailMutation = {
@@ -5842,12 +5851,12 @@ export type DownloadSignedDocument_downloadAuditTrailMutation = {
 };
 
 export type GetTemplates_templatesQueryVariables = Exact<{
-  offset: Scalars["Int"];
-  limit: Scalars["Int"];
+  offset: Scalars["Int"]["input"];
+  limit: Scalars["Int"]["input"];
   tags?: InputMaybe<PetitionTagFilter>;
   sortBy?: InputMaybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
-  includeFields: Scalars["Boolean"];
-  includeTags: Scalars["Boolean"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeTags: Scalars["Boolean"]["input"];
 }>;
 
 export type GetTemplates_templatesQuery = {
@@ -5879,9 +5888,9 @@ export type GetTemplates_templatesQuery = {
 };
 
 export type GetTemplate_templateQueryVariables = Exact<{
-  templateId: Scalars["GID"];
-  includeFields: Scalars["Boolean"];
-  includeTags: Scalars["Boolean"];
+  templateId: Scalars["GID"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeTags: Scalars["Boolean"]["input"];
 }>;
 
 export type GetTemplate_templateQuery = {
@@ -5910,15 +5919,15 @@ export type GetTemplate_templateQuery = {
 };
 
 export type DeleteTemplate_deletePetitionsMutationVariables = Exact<{
-  templateId: Scalars["GID"];
-  force: Scalars["Boolean"];
+  templateId: Scalars["GID"]["input"];
+  force: Scalars["Boolean"]["input"];
 }>;
 
 export type DeleteTemplate_deletePetitionsMutation = { deletePetitions: Success };
 
 export type GetContacts_contactsQueryVariables = Exact<{
-  offset: Scalars["Int"];
-  limit: Scalars["Int"];
+  offset: Scalars["Int"]["input"];
+  limit: Scalars["Int"]["input"];
   sortBy?: InputMaybe<Array<QueryContacts_OrderBy> | QueryContacts_OrderBy>;
 }>;
 
@@ -5954,7 +5963,7 @@ export type CreateContact_contactMutation = {
 };
 
 export type GetContact_contactQueryVariables = Exact<{
-  contactId: Scalars["GID"];
+  contactId: Scalars["GID"]["input"];
 }>;
 
 export type GetContact_contactQuery = {
@@ -5970,8 +5979,8 @@ export type GetContact_contactQuery = {
 };
 
 export type GetOrganizationUsers_usersQueryVariables = Exact<{
-  offset: Scalars["Int"];
-  limit: Scalars["Int"];
+  offset: Scalars["Int"]["input"];
+  limit: Scalars["Int"]["input"];
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy> | OrganizationUsers_OrderBy>;
 }>;
 
@@ -6006,10 +6015,10 @@ export type EventSubscriptions_getSubscriptionsQuery = {
 };
 
 export type EventSubscriptions_createSubscriptionMutationVariables = Exact<{
-  eventsUrl: Scalars["String"];
+  eventsUrl: Scalars["String"]["input"];
   eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
-  name?: InputMaybe<Scalars["String"]>;
-  fromTemplateId?: InputMaybe<Scalars["GID"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
 }>;
 
 export type EventSubscriptions_createSubscriptionMutation = {
@@ -6024,13 +6033,13 @@ export type EventSubscriptions_createSubscriptionMutation = {
 };
 
 export type EventSubscriptions_deleteSubscriptionMutationVariables = Exact<{
-  ids: Array<Scalars["GID"]> | Scalars["GID"];
+  ids: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
 }>;
 
 export type EventSubscriptions_deleteSubscriptionMutation = { deleteEventSubscriptions: Result };
 
 export type GetPetitionEvents_PetitionEventsQueryVariables = Exact<{
-  before?: InputMaybe<Scalars["GID"]>;
+  before?: InputMaybe<Scalars["GID"]["input"]>;
   eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
 }>;
 
@@ -6320,9 +6329,9 @@ export type GetPetitionEvents_PetitionEventsQuery = {
 };
 
 export type SubmitReply_createPetitionFieldReplyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  fieldId: Scalars["GID"];
-  reply: Scalars["JSON"];
+  petitionId: Scalars["GID"]["input"];
+  fieldId: Scalars["GID"]["input"];
+  reply: Scalars["JSON"]["input"];
 }>;
 
 export type SubmitReply_createPetitionFieldReplyMutation = {
@@ -6337,8 +6346,8 @@ export type SubmitReply_createPetitionFieldReplyMutation = {
 };
 
 export type SubmitReply_createFileUploadReplyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  fieldId: Scalars["GID"]["input"];
   file: FileUploadInput;
 }>;
 
@@ -6357,8 +6366,8 @@ export type SubmitReply_createFileUploadReplyMutation = {
 };
 
 export type SubmitReply_createFileUploadReplyCompleteMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  replyId: Scalars["GID"]["input"];
 }>;
 
 export type SubmitReply_createFileUploadReplyCompleteMutation = {
@@ -6373,9 +6382,9 @@ export type SubmitReply_createFileUploadReplyCompleteMutation = {
 };
 
 export type UpdateReplyStatus_updatePetitionFieldRepliesStatusMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  fieldId: Scalars["GID"];
-  replyIds: Array<Scalars["GID"]> | Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  fieldId: Scalars["GID"]["input"];
+  replyIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
   status: PetitionFieldReplyStatus;
 }>;
 
@@ -6394,9 +6403,9 @@ export type UpdateReplyStatus_updatePetitionFieldRepliesStatusMutation = {
 };
 
 export type UpdateReply_updatePetitionFieldReplyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
-  reply: Scalars["JSON"];
+  petitionId: Scalars["GID"]["input"];
+  replyId: Scalars["GID"]["input"];
+  reply: Scalars["JSON"]["input"];
 }>;
 
 export type UpdateReply_updatePetitionFieldReplyMutation = {
@@ -6412,8 +6421,8 @@ export type UpdateReply_updatePetitionFieldReplyMutation = {
 };
 
 export type UpdateReply_updateFileUploadReplyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  replyId: Scalars["GID"]["input"];
   file: FileUploadInput;
 }>;
 
@@ -6432,8 +6441,8 @@ export type UpdateReply_updateFileUploadReplyMutation = {
 };
 
 export type UpdateReply_updateFileUploadReplyCompleteMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
+  replyId: Scalars["GID"]["input"];
 }>;
 
 export type UpdateReply_updateFileUploadReplyCompleteMutation = {
@@ -6449,14 +6458,14 @@ export type UpdateReply_updateFileUploadReplyCompleteMutation = {
 };
 
 export type SubmitReplies_bulkCreatePetitionRepliesMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  replies: Scalars["JSONObject"];
-  includeFields: Scalars["Boolean"];
-  includeTags: Scalars["Boolean"];
-  includeRecipients: Scalars["Boolean"];
-  includeRecipientUrl: Scalars["Boolean"];
-  includeReplies: Scalars["Boolean"];
-  includeProgress: Scalars["Boolean"];
+  petitionId: Scalars["GID"]["input"];
+  replies: Scalars["JSONObject"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeTags: Scalars["Boolean"]["input"];
+  includeRecipients: Scalars["Boolean"]["input"];
+  includeRecipientUrl: Scalars["Boolean"]["input"];
+  includeReplies: Scalars["Boolean"]["input"];
+  includeProgress: Scalars["Boolean"]["input"];
 }>;
 
 export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
@@ -6531,7 +6540,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
 };
 
 export type UpdateReply_petitionQueryVariables = Exact<{
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 }>;
 
 export type UpdateReply_petitionQuery = {
@@ -6556,7 +6565,7 @@ export type UpdateReply_petitionQuery = {
 };
 
 export type SubmitReply_petitionQueryVariables = Exact<{
-  petitionId: Scalars["GID"];
+  petitionId: Scalars["GID"]["input"];
 }>;
 
 export type SubmitReply_petitionQuery = {

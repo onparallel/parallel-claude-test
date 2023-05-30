@@ -4,15 +4,15 @@ import {
   IconButtonWithTooltip,
   IconButtonWithTooltipProps,
 } from "@parallel/components/common/IconButtonWithTooltip";
+import { LocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
 import { useIntl } from "react-intl";
 import { useUpdateProfileFieldExpirationDialog } from "../dialogs/UpdateProfileFieldExpirationDialog";
-import { Scalars } from "@parallel/graphql/__types";
 
 interface ProfileFieldExpirationButtonProps
   extends Omit<IconButtonWithTooltipProps, "onChange" | "label"> {
   isDisabled: boolean;
   onChange: (expiryDate: string | null) => void;
-  fieldName: Scalars["LocalizableUserText"];
+  fieldName: LocalizableUserText;
   expiryDate?: string | null;
   expiryAlertAheadTime?: Duration | null;
 }

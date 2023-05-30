@@ -8,16 +8,16 @@
     "report": "playwright show-report"
   },
   "devDependencies": {
-    "@playwright/test": "^1.32.3",
-    "@types/imapflow": "^1.0.12",
+    "@playwright/test": "^1.34.3",
+    "@types/imapflow": "^1.0.13",
     "@types/mailparser": "^3.4.0"
   },
   "dependencies": {
-    "@faker-js/faker": "^7.6.0",
+    "@faker-js/faker": "^8.0.2",
     "dotenv": "^16.0.3",
     "imapflow": "^1.0.128",
     "mailparser": "^3.6.4",
-    "remeda": "^1.14.0"
+    "remeda": "^1.19.0"
   },
   "main": "index.js"
 }

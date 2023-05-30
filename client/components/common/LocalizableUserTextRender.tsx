@@ -4,8 +4,10 @@ import { ReactNode } from "react";
 import { IntlShape, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
+export type LocalizableUserText = Scalars["LocalizableUserText"]["input"];
+
 interface LocalizableUserTextRenderProps {
-  value: Scalars["LocalizableUserText"];
+  value: LocalizableUserText;
   locale?: UserLocale;
   default: ReactNode;
 }
@@ -27,7 +29,7 @@ export function LocalizableUserTextRender({
 
 interface LocalizableUserTextRenderOptions {
   intl: IntlShape;
-  value: Scalars["LocalizableUserText"];
+  value: LocalizableUserText;
   locale?: UserLocale;
   default: string;
 }

@@ -1,12 +1,14 @@
 import { gql } from "@apollo/client";
 import { Badge, FormControl, FormLabel, HStack, Text } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
-import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import {
+  LocalizableUserText,
+  LocalizableUserTextRender,
+} from "@parallel/components/common/LocalizableUserTextRender";
 import {
   ProfileField_ProfileFieldFileFragment,
   ProfileField_ProfileFieldValueFragment,
   ProfileField_ProfileTypeFieldFragment,
-  Scalars,
 } from "@parallel/graphql/__types";
 import { ProfilesFormData } from "@parallel/pages/app/profiles/[profileId]";
 import { FORMATS } from "@parallel/utils/dates";
@@ -241,7 +243,7 @@ export function useModifyExpirationDialog({
   index: number;
   isDirty: boolean;
   expiryAlertAheadTime?: Duration | null;
-  fieldName: Scalars["LocalizableUserText"];
+  fieldName: LocalizableUserText;
   setValue: UseFormSetValue<ProfilesFormData>;
   expiryDate?: string | null;
 }) {

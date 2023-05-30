@@ -11,7 +11,7 @@ index fd24c61..91debf3 100644
                  result.data = diff.result;
              }
 diff --git a/node_modules/@apollo/client/core/core.cjs b/node_modules/@apollo/client/core/core.cjs
-index 87549a3..0829c96 100644
+index 86f7d1e..e5b6f6d 100644
 --- a/node_modules/@apollo/client/core/core.cjs
 +++ b/node_modules/@apollo/client/core/core.cjs
 @@ -215,6 +215,7 @@ var ObservableQuery = (function (_super) {

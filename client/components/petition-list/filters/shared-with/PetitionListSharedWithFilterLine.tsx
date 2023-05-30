@@ -82,7 +82,7 @@ export function PetitionListSharedWithFilterLine({
         <UserSelect
           size="sm"
           includeGroups={value.operator !== "IS_OWNER"}
-          value={value.value}
+          value={value.value as string}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
               e.preventDefault();

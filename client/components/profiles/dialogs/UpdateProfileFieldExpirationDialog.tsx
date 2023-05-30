@@ -13,10 +13,12 @@ import {
 } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { DateInput } from "@parallel/components/common/DateInput";
-import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import {
+  LocalizableUserText,
+  LocalizableUserTextRender,
+} from "@parallel/components/common/LocalizableUserTextRender";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Scalars } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useMetadata } from "@parallel/utils/withMetadata";
@@ -33,7 +35,7 @@ interface UpdateProfileFieldExpirationDialogResult {
 interface UpdateProfileFieldExpirationDialogProps {
   expiryDate?: string | null;
   expiryAlertAheadTime?: Duration | null;
-  fieldName: Scalars["LocalizableUserText"];
+  fieldName: LocalizableUserText;
 }
 
 function UpdateProfileFieldExpirationDialog({

@@ -17,16 +17,15 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Scalars, UserLocale } from "@parallel/graphql/__types";
+import { UserLocale } from "@parallel/graphql/__types";
+import { ValueProps } from "@parallel/utils/ValueProps";
 import { asSupportedUserLocale, useSupportedUserLocales } from "@parallel/utils/locales";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
-import { ValueProps } from "@parallel/utils/ValueProps";
 import useMergedRef from "@react-hook/merged-ref";
 import { ChangeEvent, Ref, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-
-type LocalizableUserText = Scalars["LocalizableUserText"];
+import { LocalizableUserText } from "./LocalizableUserTextRender";
 
 interface LocalizableUserTextInputProps extends ValueProps<LocalizableUserText, false> {
   inputRef?: Ref<HTMLInputElement>;

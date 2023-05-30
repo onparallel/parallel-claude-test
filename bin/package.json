@@ -26,33 +26,33 @@
     "tac": "yarn temp-admin-credentials"
   },
   "dependencies": {
-    "@aws-sdk/client-cloudfront": "^3.319.0",
-    "@aws-sdk/client-ec2": "^3.319.0",
-    "@aws-sdk/client-elastic-load-balancing": "^3.319.0",
-    "@aws-sdk/client-iam": "^3.332.0",
-    "@aws-sdk/client-route-53": "^3.319.0",
-    "@aws-sdk/client-sts": "^3.332.0",
-    "@aws-sdk/credential-provider-ini": "^3.332.0",
-    "@aws-sdk/credential-providers": "^3.319.0",
-    "@formatjs/cli": "^6.1.0",
-    "@formatjs/icu-messageformat-parser": "^2.3.1",
+    "@aws-sdk/client-cloudfront": "^3.341.0",
+    "@aws-sdk/client-ec2": "^3.341.0",
+    "@aws-sdk/client-elastic-load-balancing": "^3.341.0",
+    "@aws-sdk/client-iam": "^3.341.0",
+    "@aws-sdk/client-route-53": "^3.341.0",
+    "@aws-sdk/client-sts": "^3.341.0",
+    "@aws-sdk/credential-provider-ini": "^3.341.0",
+    "@aws-sdk/credential-providers": "^3.341.0",
+    "@formatjs/cli": "^6.1.1",
+    "@formatjs/icu-messageformat-parser": "^2.4.0",
     "chalk": "^4.1.2",
     "cheerio": "^1.0.0-rc.12",
     "cli-progress": "^3.12.0",
     "cli-table3": "^0.6.3",
     "outdent": "^0.8.0",
     "p-map": "^4.0.0",
-    "remeda": "^1.14.0",
-    "rimraf": "^5.0.0",
-    "yargs": "^17.7.1"
+    "remeda": "^1.19.0",
+    "rimraf": "^5.0.1",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@types/cli-progress": "^3.11.0",
-    "@types/node": "^18.16.1",
+    "@types/node": "^20.2.5",
     "@types/rimraf": "^3.0.2",
     "@types/yargs": "^17.0.24",
     "node-fetch": "^2.6.7",
-    "rimraf": "^5.0.0",
+    "rimraf": "^5.0.1",
     "typescript": "^5.0.4"
   }
 }
