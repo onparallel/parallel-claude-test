@@ -12,6 +12,7 @@ import { formatList } from "@parallel/utils/slate/formatList";
 import { CustomEditor } from "@parallel/utils/slate/types";
 import { structuredClone } from "@parallel/utils/structuredClone";
 import { useConstant } from "@parallel/utils/useConstant";
+import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { createAutoformatPlugin } from "@udecode/plate-autoformat";
 import {
   MARK_BOLD,
@@ -48,7 +49,6 @@ import { createPipe, identity, isDefined, omit, pick } from "remeda";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { PlateWithEditorRef } from "./PlateWithEditorRef";
 import { RichTextEditorToolbar } from "./RichTextEditorToolbar";
-import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 
 const components = {
   [ELEMENT_H1]: withProps(RenderElement, {
@@ -243,6 +243,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
               overflow: "auto",
             },
             "[data-slate-placeholder]": {
+              top: "unset !important",
               width: "auto !important",
               opacity: "1 !important",
               color: "gray.400",

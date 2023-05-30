@@ -175,6 +175,7 @@ export const PlaceholderInput = chakraForwardRef<
           display="flex"
           sx={{
             "[data-slate-placeholder]": {
+              top: "unset !important",
               width: "auto !important",
               opacity: "1 !important",
               color: "gray.400",

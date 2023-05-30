@@ -224,6 +224,7 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
               overflow: "auto",
             },
             "[data-slate-placeholder]": {
+              top: "unset !important",
               width: "auto !important",
               opacity: "1 !important",
               color: "gray.400",
