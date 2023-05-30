@@ -3,12 +3,13 @@ import { useRef } from "react";
 import { isDefined, omit } from "remeda";
 import { MaybePromise } from "./types";
 import { useAsyncEffect } from "./useAsyncEffect";
+import { useUpdatingRef } from "./useUpdatingRef";
 
 export function useTempQueryParam(
   paramName: string,
   effect: (value: string) => MaybePromise<boolean | undefined | void>
 ) {
-  const routerRef = useRef(useRouter());
+  const routerRef = useUpdatingRef(useRouter());
   useAsyncEffect(async (isMounted) => {
     const { query, pathname } = routerRef.current;
     if (isDefined(query[paramName])) {
