@@ -1,5 +1,8 @@
 import Ajv from "ajv";
 import { core } from "nexus";
+import { isDefined } from "remeda";
+import { fromGlobalId, isGlobalId } from "../../../util/globalId";
+import { SlateNode } from "../../../util/slate/render";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
@@ -118,15 +121,51 @@ export function validateRichTextContent(json: any) {
 
 export function validRichTextContent<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => any,
+  /**
+   * if defined, this validator will check that any globalId placeholder in the RTE belongs to a PetitionField on this Petition (deleted PetitionFields are OK)
+   * if not defined and the RTE contains globalId placeholders, an error will be thrown
+   */
+  petitionIdProp: ((args: core.ArgsValue<TypeName, FieldName>) => number) | undefined,
   argName: string
 ) {
-  return ((_, args, ctx, info) => {
+  return (async (_, args, ctx, info) => {
+    async function validateGlobalIdReferences(nodes: SlateNode[], petitionId: number) {
+      for (const node of nodes) {
+        if (
+          node.type === "placeholder" &&
+          isDefined(node.placeholder) &&
+          isGlobalId(node.placeholder)
+        ) {
+          if (!isGlobalId(node.placeholder, "PetitionField")) {
+            throw new Error(`Expected ${node.placeholder} to be a PetitionField`);
+          }
+
+          const fieldId = fromGlobalId(node.placeholder).id;
+          const field = await ctx.petitions.loadField(fieldId);
+
+          if (isDefined(field) && field.petition_id !== petitionId) {
+            throw new Error(
+              `Expected PetitionField:${field.id} to belong to Petition:${petitionId}`
+            );
+          }
+        }
+
+        if (isDefined(node.children)) {
+          await validateGlobalIdReferences(node.children, petitionId);
+        }
+      }
+    }
+
     try {
       const value = prop(args);
       if (!value) {
         return;
       }
       validateRichTextContent(value);
+
+      if (isDefined(petitionIdProp)) {
+        await validateGlobalIdReferences(value as SlateNode[], petitionIdProp(args));
+      }
     } catch (e: any) {
       throw new ArgValidationError(info, argName, e.message);
     }

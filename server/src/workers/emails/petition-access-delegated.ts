@@ -3,8 +3,7 @@ import { buildEmail } from "../../emails/buildEmail";
 import AccessDelegatedEmail from "../../emails/emails/AccessDelegatedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { loadOriginalMessageByPetitionAccess } from "../../util/loadOriginalMessageByPetitionAccess";
-import { toHtml, toPlainText } from "../../util/slate";
+import { renderSlateToHtml, renderSlateToText } from "../../util/slate/render";
 
 export async function petitionAccessDelegated(
   payload: {
@@ -34,10 +33,9 @@ export async function petitionAccessDelegated(
     newAccess.contact_id ? context.contacts.loadContact(newAccess.contact_id) : null,
     originalAccess.contact_id ? context.contacts.loadContact(originalAccess.contact_id) : null,
     context.users.loadUserDataByUserId(originalAccess.granter_id),
-    loadOriginalMessageByPetitionAccess(
+    context.petitions.loadOriginalMessageByPetitionAccess(
       payload.original_access_id,
-      payload.petition_id,
-      context.petitions
+      payload.petition_id
     ),
   ]);
 
@@ -61,6 +59,7 @@ export async function petitionAccessDelegated(
     "REMOVE_WHY_WE_USE_PARALLEL"
   );
   const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(orgId);
+
   const { html, text, subject, from } = await buildEmail(
     AccessDelegatedEmail,
     {
@@ -69,8 +68,8 @@ export async function petitionAccessDelegated(
       petitionOwnerFullName: fullName(petitionOwnerData.first_name, petitionOwnerData.last_name)!,
       petitionOwnerEmail: petitionOwnerData.email,
       deadline: petition.deadline,
-      bodyHtml: toHtml(payload.message_body),
-      bodyPlainText: toPlainText(payload.message_body),
+      bodyHtml: renderSlateToHtml(payload.message_body),
+      bodyPlainText: renderSlateToText(payload.message_body),
       emailSubject: originalMessage?.email_subject ?? null,
       keycode: newAccess.keycode,
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,

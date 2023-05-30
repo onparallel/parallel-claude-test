@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Alert,
   AlertDescription,
@@ -11,30 +12,26 @@ import {
   UnorderedList,
 } from "@chakra-ui/react";
 import { ContactReference } from "@parallel/components/common/ContactReference";
+import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   RichTextEditor,
   RichTextEditorInstance,
 } from "@parallel/components/common/slate/RichTextEditor";
-import {
-  PetitionAccessTable_PetitionAccessFragment,
-  PetitionStatus,
-} from "@parallel/graphql/__types";
-import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
+import { useConfirmSendReminderDialog_PetitionFragment } from "@parallel/graphql/__types";
 import { emptyRTEValue } from "@parallel/utils/slate/RichTextEditor/emptyRTEValue";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
+import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export function ConfirmSendReminderDialog({
-  accesses,
-  petitionStatus,
+  petition,
   ...props
 }: DialogProps<
-  { accesses: PetitionAccessTable_PetitionAccessFragment[]; petitionStatus: PetitionStatus },
+  { petition: useConfirmSendReminderDialog_PetitionFragment },
   { message: null | RichTextEditorValue }
 >) {
   const intl = useIntl();
@@ -43,9 +40,9 @@ export function ConfirmSendReminderDialog({
   const [hasMessage, setHasMessage] = useState(false);
   const messageRef = useRef<RichTextEditorInstance>(null);
 
-  const optedOut = accesses.filter((access) => access.remindersOptOut);
+  const optedOut = petition.accesses?.filter((access) => access.remindersOptOut) ?? [];
 
-  const placeholderOptions = usePetitionMessagePlaceholderOptions();
+  const placeholderOptions = usePetitionMessagePlaceholderOptions({ petition });
   return (
     <ConfirmDialog
       size="xl"
@@ -62,7 +59,7 @@ export function ConfirmSendReminderDialog({
               <Flex alignItems="center" justifyContent="flex-start">
                 <AlertIcon color="yellow.500" />
                 <AlertDescription>
-                  {accesses.length > 1 ? (
+                  {petition.accesses.length > 1 ? (
                     <>
                       <Text>
                         <FormattedMessage
@@ -91,7 +88,7 @@ export function ConfirmSendReminderDialog({
             </Alert>
           ) : null}
           <Text>
-            {petitionStatus === "COMPLETED" ? (
+            {petition.status === "COMPLETED" ? (
               <FormattedMessage
                 id="component.confirm-send-reminder-dialog.body-completed"
                 defaultMessage="This parallel has already been completed, are you sure you want to send a reminder to the selected contacts?"
@@ -164,3 +161,21 @@ export function ConfirmSendReminderDialog({
 export function useConfirmSendReminderDialog() {
   return useDialog(ConfirmSendReminderDialog);
 }
+
+useConfirmSendReminderDialog.fragments = {
+  Petition: gql`
+    fragment useConfirmSendReminderDialog_Petition on Petition {
+      status
+      accesses {
+        id
+        remindersOptOut
+        contact {
+          ...ContactReference_Contact
+        }
+      }
+      ...usePetitionMessagePlaceholderOptions_PetitionBase
+    }
+    ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}
+    ${ContactReference.fragments.Contact}
+  `,
+};

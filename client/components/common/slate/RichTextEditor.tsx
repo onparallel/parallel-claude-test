@@ -1,53 +1,54 @@
 import { Box, Text, useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
-import { formatList } from "@parallel/utils/slate/formatList";
+import { ValueProps } from "@parallel/utils/ValueProps";
 import {
-  createPlaceholderPlugin,
   PlaceholderCombobox,
   PlaceholderOption,
   PlaceholdersProvider,
+  createPlaceholderPlugin,
   removePlaceholderInputElements,
 } from "@parallel/utils/slate/PlaceholderPlugin";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
+import { formatList } from "@parallel/utils/slate/formatList";
 import { CustomEditor } from "@parallel/utils/slate/types";
 import { structuredClone } from "@parallel/utils/structuredClone";
 import { useConstant } from "@parallel/utils/useConstant";
-import { ValueProps } from "@parallel/utils/ValueProps";
 import { createAutoformatPlugin } from "@udecode/plate-autoformat";
 import {
-  createBoldPlugin,
-  createItalicPlugin,
-  createUnderlinePlugin,
   MARK_BOLD,
   MARK_ITALIC,
   MARK_UNDERLINE,
+  createBoldPlugin,
+  createItalicPlugin,
+  createUnderlinePlugin,
 } from "@udecode/plate-basic-marks";
 import { createExitBreakPlugin } from "@udecode/plate-break";
 import { createComboboxPlugin } from "@udecode/plate-combobox";
 import {
+  PlatePlugin,
+  PlateProvider,
   createHistoryPlugin,
   createPlugins,
   createReactPlugin,
   focusEditor,
-  PlatePlugin,
-  PlateProvider,
   withProps,
 } from "@udecode/plate-common";
-import { createHeadingPlugin, ELEMENT_H1, ELEMENT_H2 } from "@udecode/plate-heading";
-import { createLinkPlugin, ELEMENT_LINK } from "@udecode/plate-link";
+import { ELEMENT_H1, ELEMENT_H2, createHeadingPlugin } from "@udecode/plate-heading";
+import { ELEMENT_LINK, createLinkPlugin } from "@udecode/plate-link";
 import {
-  createListPlugin,
   ELEMENT_LI,
   ELEMENT_LIC,
   ELEMENT_OL,
   ELEMENT_UL,
+  createListPlugin,
   unwrapList,
 } from "@udecode/plate-list";
-import { createParagraphPlugin, ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
+import { ELEMENT_PARAGRAPH, createParagraphPlugin } from "@udecode/plate-paragraph";
 import { forwardRef, useImperativeHandle, useRef } from "react";
 import { createPipe, identity, isDefined, omit, pick } from "remeda";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { PlateWithEditorRef } from "./PlateWithEditorRef";
 import { RichTextEditorToolbar } from "./RichTextEditorToolbar";
+import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 
 const components = {
   [ELEMENT_H1]: withProps(RenderElement, {
@@ -112,6 +113,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
     ref
   ) {
     const hasPlaceholders = isDefined(placeholderOptions) && placeholderOptions.length > 0;
+    const placeholdersRef = useUpdatingRef(placeholderOptions ?? []);
     const plugins = useConstant(() =>
       createPlugins<RichTextEditorValue, RichTextPEditor>(
         [
@@ -143,11 +145,10 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
             },
           }),
           ...(hasPlaceholders
-            ? ([createComboboxPlugin(), createPlaceholderPlugin()] as PlatePlugin<
-                any,
-                RichTextEditorValue,
-                RichTextPEditor
-              >[])
+            ? ([
+                createComboboxPlugin(),
+                createPlaceholderPlugin({ placeholdersRef }),
+              ] as PlatePlugin<any, RichTextEditorValue, RichTextPEditor>[])
             : []),
           createHeadingPlugin({ options: { levels: 2 } }),
           createLinkPlugin(),
@@ -233,10 +234,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
           {...inputStyles}
           {...props}
           sx={{
-            '[contenteditable="false"]': {
-              width: "auto !important",
-            },
-            '> [role="textbox"]': {
+            "[data-slate-editor]": {
               minHeight: "120px !important",
               paddingX: 4,
               paddingY: 3,
@@ -244,6 +242,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
               overflow: "auto",
             },
             "[data-slate-placeholder]": {
+              width: "auto !important",
               opacity: "1 !important",
               color: "gray.400",
             },
@@ -256,14 +255,21 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
             hasHeadingButton={toolbarOpts?.headingButton}
             hasListButtons={toolbarOpts?.listButtons}
           />
-          <PlaceholdersProvider placeholders={placeholderOptions ?? []}>
+          {hasPlaceholders ? (
+            <PlaceholdersProvider placeholders={placeholderOptions}>
+              <PlateWithEditorRef<RichTextEditorValue, RichTextPEditor>
+                editorRef={editorRef}
+                editableProps={editableProps}
+              >
+                <PlaceholderCombobox placeholders={placeholderOptions} />
+              </PlateWithEditorRef>
+            </PlaceholdersProvider>
+          ) : (
             <PlateWithEditorRef<RichTextEditorValue, RichTextPEditor>
               editorRef={editorRef}
               editableProps={editableProps}
-            >
-              {hasPlaceholders ? <PlaceholderCombobox placeholders={placeholderOptions} /> : null}
-            </PlateWithEditorRef>
-          </PlaceholdersProvider>
+            />
+          )}
         </Box>
       </PlateProvider>
     );

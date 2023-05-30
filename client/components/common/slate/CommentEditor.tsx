@@ -216,10 +216,7 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
           {...formControlProps}
           {...inputStyles}
           sx={{
-            '[contenteditable="false"]': {
-              width: "auto !important",
-            },
-            '> [role="textbox"]': {
+            "[data-slate-editor]": {
               minHeight: "40px !important",
               paddingX: 3,
               paddingY: 2,
@@ -227,6 +224,7 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
               overflow: "auto",
             },
             "[data-slate-placeholder]": {
+              width: "auto !important",
               opacity: "1 !important",
               color: "gray.400",
             },

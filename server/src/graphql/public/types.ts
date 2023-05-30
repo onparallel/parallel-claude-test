@@ -1,15 +1,14 @@
 import { extension } from "mime-types";
 import { arg, core, enumType, inputObjectType, objectType, unionType } from "nexus";
 import { isDefined, minBy } from "remeda";
-import { PetitionAccess, PetitionMessage } from "../../db/__types";
 import { defaultBrandTheme } from "../../util/BrandTheme";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { getInitials } from "../../util/initials";
 import { isFileTypeField } from "../../util/isFileTypeField";
-import { loadOriginalMessageByPetitionAccess } from "../../util/loadOriginalMessageByPetitionAccess";
 import { safeJsonParse } from "../../util/safeJsonParse";
-import { toHtml } from "../../util/slate";
+import { renderSlateWithMentionsToHtml } from "../../util/slate/mentions";
+import { renderSlateWithPlaceholdersToHtml } from "../../util/slate/placeholders";
 
 export const PublicPetitionAccess = objectType({
   name: "PublicPetitionAccess",
@@ -39,7 +38,7 @@ export const PublicPetitionAccess = objectType({
       type: "PublicPetitionMessage",
       resolve: async (root, _, ctx) => {
         return (
-          (await loadOriginalMessageByPetitionAccess(root.id, root.petition_id, ctx.petitions)) ??
+          (await ctx.petitions.loadOriginalMessageByPetitionAccess(root.id, root.petition_id)) ??
           null
         );
       },
@@ -192,39 +191,22 @@ export const PublicPetition = objectType({
       description: "The body of the optional completing message to be show to recipients.",
       resolve: async (o, _, ctx) => {
         if (o.completing_message_body) {
-          const [contact, user] = await Promise.all([
-            ctx.contacts.loadContactByAccessId(ctx.access!.id),
-            ctx.petitions.loadPetitionOwner(ctx.access!.petition_id),
-          ]);
+          const user = await ctx.petitions.loadPetitionOwner(ctx.access!.petition_id);
 
-          let firstMessage: PetitionMessage | null = null;
-          let petitionAccesses: PetitionAccess[] = [];
-          let originalAccess = ctx.access!;
+          const getValues = await ctx.petitionMessageContext.fetchPlaceholderValues(
+            {
+              petitionId: o.id,
+              contactId: ctx.access!.contact_id,
+              userId: user?.id,
+              petitionAccessId: ctx.access!.id,
+            },
+            { publicContext: true }
+          );
 
-          try {
-            // if delegator_contact_id is defined, this access was delegated from another access and does not have a linked PetitionMessage
-            // here we need to recursively search for the original access
-            if (isDefined(originalAccess.delegator_contact_id)) {
-              petitionAccesses = await ctx.petitions.loadAccessesForPetition(
-                ctx.access!.petition_id
-              );
-              // max 100 cycles, it shouldn't be a problem but this can avoid infinite looping
-              for (let i = 0; i < 100 && isDefined(originalAccess.delegator_contact_id); i++) {
-                originalAccess = petitionAccesses.find(
-                  (a) => a.contact_id === originalAccess.delegator_contact_id!
-                )!;
-              }
-            }
-
-            [firstMessage] = await ctx.petitions.loadMessagesByPetitionAccessId(originalAccess.id);
-          } catch {}
-
-          return toHtml(safeJsonParse(o.completing_message_body), {
-            // in a public context, the petition title is instead the subject of the first message
-            petition: { ...o, name: firstMessage?.email_subject },
-            contact,
-            user: await ctx.users.loadUserDataByUserId(user!.id),
-          });
+          return renderSlateWithPlaceholdersToHtml(
+            safeJsonParse(o.completing_message_body),
+            getValues
+          );
         }
         return null;
       },
@@ -273,7 +255,9 @@ export const PublicPetitionMessage = objectType({
     });
     t.nullable.string("subject", {
       description: "Subject of a email.",
-      resolve: (m) => m.email_subject,
+      resolve: (m) => {
+        return m.email_subject;
+      },
     });
     t.nullable.datetime("sentAt", {
       description: "Date when the petition was first sent",
@@ -633,8 +617,9 @@ export const PublicPetitionFieldComment = objectType({
     });
     t.nullable.string("contentHtml", {
       description: "The HTML content of the comment.",
-      resolve: async (root) => {
-        return isDefined(root.content_json) ? toHtml(root.content_json) : null;
+      resolve: (root) => {
+        if (!isDefined(root.content_json)) return null;
+        return renderSlateWithMentionsToHtml(root.content_json);
       },
     });
     t.datetime("createdAt", {

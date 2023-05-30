@@ -46,7 +46,7 @@ const messages: Record<PetitionLocale, string> = {
 export const PetitionTemplateClosingMessageCard = Object.assign(
   chakraForwardRef<"section", PetitionTemplateClosingMessageCardProps>(
     function PetitionTemplateClosingMessageCard({ petition, onUpdatePetition, ...props }, ref) {
-      const placeholders = usePetitionMessagePlaceholderOptions();
+      const placeholders = usePetitionMessagePlaceholderOptions({ petition });
       const [closingEmailBody, setClosingEmailBody] = useState<RichTextEditorValue>(
         petition.closingEmailBody ??
           textWithPlaceholderToSlateNodes(messages[petition.locale], placeholders)
@@ -79,6 +79,7 @@ export const PetitionTemplateClosingMessageCard = Object.assign(
               showErrors={false}
               body={closingEmailBody}
               onBodyChange={handleclosingEmailBodyChange}
+              petition={petition}
               isReadOnly={
                 petition.isRestricted || petition.isPublic || myEffectivePermission === "READ"
               }
@@ -100,7 +101,9 @@ export const PetitionTemplateClosingMessageCard = Object.assign(
           myEffectivePermission {
             permissionType
           }
+          ...usePetitionMessagePlaceholderOptions_PetitionBase
         }
+        ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}
       `,
     },
   }

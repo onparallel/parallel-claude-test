@@ -11,7 +11,7 @@ import {
 } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { pFlatMap } from "../../util/promises/pFlatMap";
-import { toPlainText } from "../../util/slate";
+import { renderSlateWithMentionsToText } from "../../util/slate/mentions";
 import { Maybe } from "../../util/types";
 import { ExcelWorksheet } from "./ExcelWorksheet";
 
@@ -98,7 +98,7 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
       this.addRows({
         authorEmail: author.email,
         authorFullName: fullName(author.first_name, author.last_name),
-        content: toPlainText(comment.content_json),
+        content: renderSlateWithMentionsToText(comment.content_json),
         createdAt: comment.created_at.toISOString(),
         fieldName: field.title,
         isInternal: comment.is_internal

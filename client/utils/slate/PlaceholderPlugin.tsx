@@ -1,33 +1,53 @@
-import { Box } from "@chakra-ui/react";
+import { gql } from "@apollo/client";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import { HighlightText } from "@parallel/components/common/HighlightText";
+import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import {
   ComboboxItemProps,
   ComboboxProps,
   PlateCombobox,
 } from "@parallel/components/common/slate/PlateCombobox";
+import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import {
-  getPluginOptions,
+  createPlaceholderPlugin_PetitionBaseFragment,
+  createPlaceholderPlugin_PetitionFieldFragment,
+} from "@parallel/graphql/__types";
+import { TComboboxItem } from "@udecode/plate-combobox";
+import {
   PlateEditor,
   RenderFunction,
   TRenderElementProps,
-  usePlateEditorRef,
   Value,
+  getPluginOptions,
+  usePlateEditorRef,
 } from "@udecode/plate-common";
 import {
-  createMentionPlugin,
   ELEMENT_MENTION_INPUT,
-  getMentionOnSelectItem,
   MentionPlugin,
+  createMentionPlugin,
+  getMentionOnSelectItem,
+  withMention,
 } from "@udecode/plate-mention";
-import { createContext, ReactNode, useCallback, useContext, useMemo } from "react";
-import { FormattedMessage } from "react-intl";
+import { ReactNode, RefObject, createContext, useCallback, useContext } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
+import { Node } from "slate";
 import { useFocused, useSelected } from "slate-react";
+import { usePetitionFieldTypeColor } from "../petitionFields";
+import { parseTextWithPlaceholders } from "./textWithPlaceholder";
 import { SlateElement, SlateText } from "./types";
 
-export interface PlaceholderOption {
-  value: string;
-  label: string;
-}
+type ComboboxItemData =
+  | undefined
+  | { group: string }
+  | {
+      group: string;
+      field: createPlaceholderPlugin_PetitionFieldFragment;
+      petition: createPlaceholderPlugin_PetitionBaseFragment;
+      index: number;
+    };
+
+export type PlaceholderOption = TComboboxItem<ComboboxItemData>;
 
 export const ELEMENT_PLACEHOLDER = "placeholder" as const;
 export const ELEMENT_PLACEHOLDER_INPUT = "placeholder_input" as const;
@@ -42,18 +62,17 @@ export interface PlaceholderInputElement
 export function createPlaceholderPlugin<
   TValue extends Value = Value,
   TEditor extends PlateEditor<TValue> = PlateEditor<TValue>
->() {
+>({ placeholdersRef }: { placeholdersRef: RefObject<PlaceholderOption[]> }) {
   return createMentionPlugin<MentionPlugin<PlaceholderOption>, TValue, TEditor>({
     key: ELEMENT_PLACEHOLDER,
     options: {
       trigger: "{",
       insertSpaceAfterMention: true,
       createMentionNode(item) {
-        const option = item.data;
         return {
           type: ELEMENT_PLACEHOLDER,
-          placeholder: option.value,
-          children: [{ text: option.label }],
+          placeholder: item.key,
+          children: [{ text: "" }],
         };
       },
     },
@@ -64,6 +83,54 @@ export function createPlaceholderPlugin<
       },
     },
     component: PlaceholderElement,
+    withOverrides: function (_editor, plugin) {
+      const editor = withMention<TValue, TEditor>(_editor, plugin as any);
+      const { insertText } = editor;
+      editor.insertText = (text, options) => {
+        for (const part of parseTextWithPlaceholders(text)) {
+          if (part.type === "placeholder") {
+            const placeholder = placeholdersRef.current?.find(
+              (p) =>
+                p.key === part.value ||
+                ("data" in p && "field" in p.data && p.data.field.alias === part.value)
+            );
+            if (isDefined(placeholder)) {
+              editor.insertNode({
+                type: ELEMENT_PLACEHOLDER,
+                placeholder: placeholder.key,
+                children: [{ text: "" }],
+              });
+            }
+          } else {
+            insertText(part.text, options);
+          }
+        }
+      };
+      const { insertNodes } = editor;
+      editor.insertNodes = (nodes, options) => {
+        // remove invalid nodes
+        insertNodes(visitNodes(nodes), options);
+      };
+      function filterNodes(nodes: Node[]) {
+        return nodes.filter((node) => {
+          if ("type" in node && node.type === ELEMENT_PLACEHOLDER) {
+            const placeholder = placeholdersRef.current?.find(
+              (n) => n.key === (node as PlaceholderElement).placeholder
+            );
+            return isDefined(placeholder);
+          }
+          return true;
+        });
+      }
+      function visitNodes(node: Node | Node[]): Node | Node[] {
+        return Array.isArray(node)
+          ? filterNodes(node).map((n) => visitNodes(n) as Node)
+          : "children" in node
+          ? { ...node, children: filterNodes(node.children).map((n) => visitNodes(n) as Node) }
+          : node;
+      }
+      return editor;
+    },
   });
 }
 
@@ -73,14 +140,6 @@ export interface PlaceholderComboboxProps
   pluginKey?: string;
 }
 
-function mapPlaceholderOption(option: PlaceholderOption) {
-  return {
-    key: option.value,
-    text: option.label,
-    data: option,
-  };
-}
-
 export function PlaceholderCombobox({
   placeholders,
   pluginKey = ELEMENT_PLACEHOLDER,
@@ -88,27 +147,22 @@ export function PlaceholderCombobox({
 }: PlaceholderComboboxProps) {
   const editor = usePlateEditorRef()!;
   const { trigger } = getPluginOptions<MentionPlugin>(editor, pluginKey);
+
   const handleSearchItems = useCallback(
     async (search: string) => {
-      return placeholders
-        .filter((p) => p.label.toLowerCase().includes(search.toLowerCase()))
-        .map(mapPlaceholderOption);
+      return placeholders.filter((p) => p.text.toLowerCase().includes(search.toLowerCase()));
     },
     [placeholders]
   );
 
-  const defaultItems = useMemo(() => {
-    return placeholders?.map(mapPlaceholderOption) ?? [];
-  }, [placeholders]);
-
   return (
-    <PlateCombobox<PlaceholderOption>
+    <PlateCombobox<ComboboxItemData>
       id={id}
       inputType={ELEMENT_PLACEHOLDER_INPUT}
       trigger={trigger!}
       controlled
-      defaultItems={defaultItems as any}
-      onSearchItems={handleSearchItems as any}
+      defaultItems={placeholders}
+      onSearchItems={handleSearchItems}
       onRenderItem={RenderPlaceholderOption}
       onRenderNoItems={RenderNoItems}
       onSelectItem={getMentionOnSelectItem({ key: pluginKey })}
@@ -116,11 +170,42 @@ export function PlaceholderCombobox({
   );
 }
 
-const RenderPlaceholderOption: RenderFunction<ComboboxItemProps<PlaceholderOption>> =
+const RenderPlaceholderOption: RenderFunction<ComboboxItemProps<ComboboxItemData>> =
   function RenderPlaceholderOption({ item, search }) {
+    if ("data" in item && "field" in item.data && item.data.field) {
+      return (
+        <Flex alignItems="center" flex="1" minWidth={0}>
+          <PetitionFieldTypeIndicator
+            as="div"
+            isTooltipDisabled
+            marginRight={2}
+            fieldIndex={item.data.index!}
+            type={item.data.field.type}
+          />
+          {item.data.field.title ? (
+            <HighlightText
+              textAlign="left"
+              as="div"
+              flex={1}
+              minWidth={0}
+              overflow="hidden"
+              textOverflow="ellipsis"
+              whiteSpace="nowrap"
+              search={search ?? ""}
+            >
+              {item.text}
+            </HighlightText>
+          ) : (
+            <Text as="div" textStyle="hint">
+              <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+            </Text>
+          )}
+        </Flex>
+      );
+    }
     return (
       <HighlightText as="div" whiteSpace="nowrap" search={search ?? ""} textTransform="capitalize">
-        {item.data.label}
+        {item.text}
       </HighlightText>
     );
   };
@@ -143,7 +228,7 @@ export function PlaceholdersProvider({
   children?: ReactNode;
 }) {
   return (
-    <PlaceholdersContext.Provider value={placeholders}>{children} </PlaceholdersContext.Provider>
+    <PlaceholdersContext.Provider value={placeholders}>{children}</PlaceholdersContext.Provider>
   );
 }
 
@@ -152,42 +237,145 @@ function PlaceholderElement({
   children,
   element,
 }: TRenderElementProps<Value, PlaceholderElement>) {
+  const intl = useIntl();
   const placeholders = useContext(PlaceholdersContext);
   if (placeholders === null) {
     throw new Error("PlaceholdersProvider must be used surrounding <Plate/>");
   }
-  const label = placeholders.find((p) => p.value === element.placeholder)!.label;
+  const placeholder = placeholders.find((p) => p.key === element.placeholder);
+  const color = usePetitionFieldTypeColor(
+    isDefined(placeholder) && "data" in placeholder && "field" in placeholder.data
+      ? placeholder.data.field.type
+      : (undefined as any)
+  );
   const isSelected = useSelected();
   const isFocused = useFocused();
 
+  const hasNoReplies =
+    isDefined(placeholder) &&
+    "data" in placeholder &&
+    "field" in placeholder.data &&
+    placeholder.data.petition.__typename === "Petition" &&
+    placeholder.data.field.replies.length === 0;
+
   return (
-    <Box
-      className="slate-placeholder"
-      contentEditable={false}
-      data-placeholder={element.placeholder}
-      {...attributes}
-      as="span"
-      display="inline-block"
-      fontSize="sm"
-      height="21px"
-      backgroundColor="blue.100"
-      color="blue.800"
-      fontWeight="semibold"
-      textTransform="capitalize"
-      borderRadius="sm"
-      boxShadow={isSelected && isFocused ? "outline" : "none"}
-      paddingX={1}
+    <SmallPopover
+      isDisabled={!(hasNoReplies || !isDefined(placeholder))}
+      content={
+        !isDefined(placeholder) ? (
+          <Text fontSize="sm">
+            <FormattedMessage
+              id="placeholder-plugin.deleted-field"
+              defaultMessage="This field has been deleted. Nothing will show here."
+            />
+          </Text>
+        ) : hasNoReplies ? (
+          <Text fontSize="sm">
+            <FormattedMessage
+              id="placeholder-plugin.field-without-replies"
+              defaultMessage="This field has no replies. Nothing will show here."
+            />
+          </Text>
+        ) : null
+      }
     >
       <Box
+        className="slate-placeholder"
+        contentEditable={false}
+        data-placeholder={element.placeholder}
+        {...attributes}
         as="span"
-        data-placeholder-label={label}
-        _before={{ content: `attr(data-placeholder-label)` }}
-      />
-      <Box as="span" fontSize={0} aria-hidden>
-        {`{{ ${label} }}`}
+        fontSize="sm"
+        height="21px"
+        {...(!isDefined(placeholder)
+          ? {
+              backgroundColor: "gray.100",
+              color: "gray.800",
+            }
+          : hasNoReplies
+          ? {
+              backgroundColor: "yellow.200",
+              color: "yellow.800",
+            }
+          : {
+              backgroundColor: "blue.100",
+              color: "blue.800",
+            })}
+        fontWeight="semibold"
+        borderRadius="sm"
+        boxShadow={isSelected && isFocused ? "outline" : "none"}
+        paddingX={1}
+      >
+        {!isDefined(placeholder) ? (
+          <>
+            <Box
+              as="span"
+              data-placeholder-label={intl.formatMessage({
+                id: "generic.deleted-field",
+                defaultMessage: "Deleted field",
+              })}
+              _before={{
+                content: `attr(data-placeholder-label)`,
+                fontStyle: "italic",
+                fontWeight: "normal",
+              }}
+            />
+            {children}
+          </>
+        ) : "data" in placeholder &&
+          "field" in placeholder.data &&
+          isDefined(placeholder.data.field) ? (
+          <>
+            <Box
+              as="span"
+              data-placeholder-label={
+                placeholder.text.length > 30
+                  ? placeholder.text.slice(0, 30) + "..."
+                  : placeholder.text
+              }
+              data-placeholder-field-index={placeholder.data.index}
+              _after={{
+                content: `attr(data-placeholder-label)`,
+                ...(placeholder.data.field.title
+                  ? {}
+                  : {
+                      fontStyle: "italic",
+                      fontWeight: "normal",
+                    }),
+              }}
+              _before={{
+                content: `attr(data-placeholder-field-index)`,
+                position: "relative",
+                top: "-1.5px",
+                backgroundColor: color,
+                borderRadius: "sm",
+                color: "white",
+                fontSize: "2xs",
+                height: 3.5,
+                paddingX: 1,
+                marginRight: 1,
+              }}
+            />
+            <Box as="span" fontSize={0} aria-hidden>
+              {`{{ ${placeholder.key} }}`}
+            </Box>
+            {children}
+          </>
+        ) : (
+          <>
+            <Box
+              as="span"
+              data-placeholder-label={placeholder.text}
+              _before={{ content: `attr(data-placeholder-label)` }}
+            />
+            <Box as="span" fontSize={0} aria-hidden>
+              {`{{ ${placeholder.key} }}`}
+            </Box>
+            {children}
+          </>
+        )}
       </Box>
-      {children}
-    </Box>
+    </SmallPopover>
   );
 }
 
@@ -219,3 +407,30 @@ export function removePlaceholderInputElements<T extends SlateElement<any, any>[
       "children" in e ? { ...e, children: removePlaceholderInputElements(e.children as any) } : e
     ) as T;
 }
+
+createPlaceholderPlugin.fragments = {
+  get PetitionBase() {
+    return gql`
+      fragment createPlaceholderPlugin_PetitionBase on PetitionBase {
+        id
+        fields {
+          ...createPlaceholderPlugin_PetitionField
+        }
+      }
+      ${this.PetitionField}
+    `;
+  },
+  get PetitionField() {
+    return gql`
+      fragment createPlaceholderPlugin_PetitionField on PetitionField {
+        id
+        title
+        alias
+        type
+        replies {
+          id
+        }
+      }
+    `;
+  },
+};

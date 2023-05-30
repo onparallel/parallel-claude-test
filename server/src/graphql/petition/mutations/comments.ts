@@ -1,5 +1,5 @@
 import { arg, booleanArg, mutationField, nonNull } from "nexus";
-import { getMentions } from "../../../util/slate";
+import { collectMentionsFromSlate } from "../../../util/slate/mentions";
 import { and, authenticateAnd, ifArgEquals } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -61,7 +61,7 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
   resolve: async (_, args, ctx) => {
     try {
       await ctx.petitions.checkUserMentions(
-        getMentions(args.content),
+        collectMentionsFromSlate(args.content),
         args.petitionId,
         args.throwOnNoPermission ?? true,
         ctx.user!.id,
@@ -166,7 +166,7 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
   resolve: async (_, args, ctx) => {
     try {
       await ctx.petitions.checkUserMentions(
-        getMentions(args.content),
+        collectMentionsFromSlate(args.content),
         args.petitionId,
         args.throwOnNoPermission ?? true,
         ctx.user!.id,

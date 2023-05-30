@@ -12,7 +12,7 @@ import {
   SignatureCompletedEvent,
   UserPermissionAddedEvent,
 } from "../../db/events/PetitionEvent";
-import { getMentions } from "../../util/slate";
+import { collectMentionsFromSlate } from "../../util/slate/mentions";
 import { EventListener } from "../event-processor";
 
 async function createPetitionCompletedUserNotifications(
@@ -55,7 +55,7 @@ async function createCommentPublishedUserNotifications(
     return;
   }
 
-  const mentions = getMentions(comment.content_json);
+  const mentions = collectMentionsFromSlate(comment.content_json);
   const [userMentions, groupMentions] = partition(mentions, (m) => m.type === "User");
   const groupMembers = await ctx.userGroups.loadUserGroupMembers(groupMentions.map((m) => m.id));
 

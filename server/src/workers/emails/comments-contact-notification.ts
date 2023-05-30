@@ -5,7 +5,6 @@ import { buildEmail } from "../../emails/buildEmail";
 import PetitionCommentsContactNotification from "../../emails/emails/PetitionCommentsContactNotification";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { loadOriginalMessageByPetitionAccess } from "../../util/loadOriginalMessageByPetitionAccess";
 import { buildFieldWithComments } from "../helpers/getFieldWithComments";
 
 export async function commentsContactNotification(
@@ -21,10 +20,9 @@ export async function commentsContactNotification(
     context.contacts.loadContactByAccessId(payload.petition_access_id),
     context.petitions.loadAccess(payload.petition_access_id),
     context.petitions.loadPetitionFieldComment(payload.petition_field_comment_ids),
-    loadOriginalMessageByPetitionAccess(
+    context.petitions.loadOriginalMessageByPetitionAccess(
       payload.petition_access_id,
-      payload.petition_id,
-      context.petitions
+      payload.petition_id
     ),
   ]);
   if (!petition) {

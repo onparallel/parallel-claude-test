@@ -1,10 +1,10 @@
-import { MjmlColumn, IMjmlProps, MjmlSection, MjmlText, MjmlWrapper } from "@faire/mjml-react";
+import { IMjmlProps, MjmlColumn, MjmlSection, MjmlText, MjmlWrapper } from "@faire/mjml-react";
 import { FormattedMessage } from "react-intl";
-import { SlateNode, toHtml } from "../../util/slate";
+import { SlateNode, renderSlateToHtml, renderSlateToReactNodes } from "../../util/slate/render";
 import { Maybe } from "../../util/types";
 import { UserMessageBox } from "./UserMessageBox";
 
-type FieldComment = {
+interface FieldComment {
   id: number;
   content: SlateNode[];
   mentions: { id: string; highlight: boolean }[];
@@ -12,18 +12,18 @@ type FieldComment = {
     id: string;
     name: string;
   };
-};
+}
 
-export type PetitionFieldAndComments = {
+export interface PetitionFieldAndComments {
   id: number;
   title: Maybe<string>;
   position: Maybe<number>;
   comments: FieldComment[];
-};
+}
 
-export type PetitionFieldAndCommentsProps = {
+export interface PetitionFieldAndCommentsProps {
   fields: PetitionFieldAndComments[];
-};
+}
 
 export function PetitionFieldAndComments({ fields }: PetitionFieldAndCommentsProps) {
   /** group together consecutive comments of the same author */
@@ -83,23 +83,22 @@ export function PetitionFieldAndComments({ fields }: PetitionFieldAndCommentsPro
                       )}
                       <MjmlText padding="0" lineHeight="24px">
                         <UserMessageBox
-                          dangerouslySetInnerHTML={toHtml(
-                            content,
-                            {},
-                            {
-                              replace: (node: any) => {
+                          dangerouslySetInnerHTML={renderSlateToHtml(content, {
+                            override: {
+                              mention: (node) => {
                                 if (node && node.type === "mention") {
-                                  const { children } = node.props;
-                                  const mention = mentions.find(
-                                    (m) => m.id === node.props["data-mention-id"]
-                                  );
+                                  const mention = mentions.find((m) => m.id === node.mention!);
                                   if (mention) {
-                                    return <Mention mention={mention}>{children}</Mention>;
+                                    return (
+                                      <Mention mention={mention}>
+                                        {renderSlateToReactNodes(node.children!)}
+                                      </Mention>
+                                    );
                                   }
                                 }
                               },
-                            }
-                          )}
+                            },
+                          })}
                         />
                       </MjmlText>
                     </MjmlColumn>

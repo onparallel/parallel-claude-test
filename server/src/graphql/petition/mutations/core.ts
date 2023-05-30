@@ -28,9 +28,12 @@ import { isValueCompatible } from "../../../db/helpers/utils";
 import { chunkWhile, unMaybeArray } from "../../../util/arrays";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
+import {
+  parseTextWithPlaceholders,
+  renderTextWithPlaceholders,
+} from "../../../util/slate/placeholders";
 import { pFlatMap } from "../../../util/promises/pFlatMap";
 import { withError } from "../../../util/promises/withError";
-import { parseTextWithPlaceholders } from "../../../util/textWithPlaceholders";
 import { hash, random } from "../../../util/token";
 import { userHasAccessToContactGroups } from "../../contact/authorizers";
 import { RESULT } from "../../helpers/Result";
@@ -66,6 +69,7 @@ import { validPath } from "../../helpers/validators/validPath";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
 import { validSignatureConfig } from "../../helpers/validators/validSignatureConfig";
+import { validTextWithPlaceholders } from "../../helpers/validators/validTextWithPlaceholders";
 import { validateFile } from "../../helpers/validators/validateFile";
 import { validateRegex } from "../../helpers/validators/validateRegex";
 import { userHasAccessToOrganizationTheme } from "../../organization/authorizers";
@@ -79,7 +83,6 @@ import {
   defaultOnBehalfUserBelongsToContextOrganization,
   fieldHasType,
   fieldIsNotFixed,
-  replyStatusCanBeUpdated,
   fieldsBelongsToPetition,
   foldersAreInPath,
   messageBelongToPetition,
@@ -94,6 +97,7 @@ import {
   petitionsArePublicTemplates,
   repliesBelongsToField,
   repliesBelongsToPetition,
+  replyStatusCanBeUpdated,
   templateDoesNotHavePublicPetitionLink,
   userHasAccessToPetitions,
   userHasFeatureFlag,
@@ -756,13 +760,34 @@ export const updatePetition = mutationField("updatePetition", {
   validateArgs: validateAnd(
     notEmptyObject((args) => args.data, "data"),
     maxLength((args) => args.data.name, "data.name", 255),
-    maxLength((args) => args.data.emailSubject, "data.emailSubject", 255),
+    maxLength((args) => args.data.emailSubject, "data.emailSubject", 1000),
     maxLength((args) => args.data.completingMessageSubject, "data.completingMessageSubject", 255),
     maxLength((args) => args.data.description, "data.description", 1000),
-    validRichTextContent((args) => args.data.emailBody, "data.emailBody"),
-    validRichTextContent((args) => args.data.closingEmailBody, "data.closingEmailBody"),
-    validRichTextContent((args) => args.data.description, "data.description"),
-    validRichTextContent((args) => args.data.completingMessageBody, "data.completingMessageBody"),
+    validTextWithPlaceholders(
+      (args) => args.data.emailSubject,
+      (args) => args.petitionId,
+      "data.emailSubject"
+    ),
+    validRichTextContent(
+      (args) => args.data.emailBody,
+      (args) => args.petitionId,
+      "data.emailBody"
+    ),
+    validRichTextContent(
+      (args) => args.data.closingEmailBody,
+      (args) => args.petitionId,
+      "data.closingEmailBody"
+    ),
+    validRichTextContent(
+      (args) => args.data.description,
+      undefined, // template description does not include PetitionField references
+      "data.description"
+    ),
+    validRichTextContent(
+      (args) => args.data.completingMessageBody,
+      (args) => args.petitionId,
+      "data.completingMessageBody"
+    ),
     validRemindersConfig((args) => args.data.remindersConfig, "data.remindersConfig"),
     validSignatureConfig((args) => args.data.signatureConfig, "data.signatureConfig"),
     inRange((args) => args.data.anonymizeAfterMonths, "data.anonymizeAfterMonths", 1),
@@ -1463,9 +1488,18 @@ export const sendPetition = mutationField("sendPetition", {
   },
   validateArgs: validateAnd(
     notEmptyArray((args) => args.contactIdGroups, "contactIdGroups"),
-    maxLength((args) => args.subject, "subject", 255),
+    maxLength((args) => args.subject, "subject", 1000),
     notEmptyString((args) => args.subject, "subject"),
-    validRichTextContent((args) => args.body, "body"),
+    validTextWithPlaceholders(
+      (args) => args.subject,
+      (args) => args.petitionId,
+      "subject"
+    ),
+    validRichTextContent(
+      (args) => args.body,
+      (args) => args.petitionId,
+      "body"
+    ),
     validRemindersConfig((args) => args.remindersConfig, "remindersConfig"),
     (_, { contactIdGroups }, ctx, info) => {
       // check that contactIds do not repeat inside each group
@@ -1524,10 +1558,7 @@ export const sendPetition = mutationField("sendPetition", {
           await ctx.petitions.clonePetition(
             args.petitionId,
             owner, // set the owner of the original petition as owner of the cloned ones
-            {
-              credits_used: 1,
-              name: `${petition.name ?? args.subject} (${index + 1})`,
-            },
+            { credits_used: 1 },
             { cloneReplies: true }, // also clone the petition replies
             `User:${ctx.user!.id}`
           ),
@@ -1577,12 +1608,33 @@ export const sendPetition = mutationField("sendPetition", {
 
       const baseDate = new Date();
       const results = await pFlatMap(petitionChunks, async (currentChunk, index) => {
-        return await pMap(currentChunk, async ([petition, contactIds]) => {
-          return await ctx.petitions.createAccessesAndMessages(
+        return await pMap(currentChunk, async ([petition, contactIds], groupIndex) => {
+          const messageSubject = renderTextWithPlaceholders(
+            args.subject,
+            await ctx.petitionMessageContext.fetchPlaceholderValues({
+              petitionId: petition.id,
+              userId: ctx.user!.id,
+              contactId: contactIds[0],
+            })
+          );
+
+          const [updatedPetition] = await ctx.petitions.updatePetition(
+            petition.id,
+            {
+              name: (petition.name ?? messageSubject)
+                .slice(0, 255)
+                .concat(groupIndex === 0 ? "" : ` (${groupIndex + 1})`),
+              status: "PENDING",
+              closed_at: null,
+            },
+            `User:${ctx.user!.id}`
+          );
+          const accessAndMessages = await ctx.petitions.createAccessesAndMessages(
             petition,
             contactIds,
             {
               ...args,
+              subject: messageSubject,
               scheduledAt:
                 index === 0
                   ? args.scheduledAt
@@ -1592,6 +1644,8 @@ export const sendPetition = mutationField("sendPetition", {
             sender,
             false
           );
+
+          return { petition: updatedPetition, ...accessAndMessages };
         });
       });
 
@@ -1644,7 +1698,11 @@ export const sendReminders = mutationField("sendReminders", {
     body: jsonArg(),
     accessIds: nonNull(list(nonNull(globalIdArg("PetitionAccess")))),
   },
-  validateArgs: validRichTextContent((args) => args.body, "body"),
+  validateArgs: validRichTextContent(
+    (args) => args.body,
+    (args) => args.petitionId,
+    "body"
+  ),
   resolve: async (_, args, ctx) => {
     try {
       const reminders = await ctx.petitions.createReminders(
@@ -1825,7 +1883,11 @@ export const sendPetitionClosedNotification = mutationField("sendPetitionClosedN
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionIsNotAnonymized("petitionId")
   ),
-  validateArgs: validRichTextContent((args) => args.emailBody, "emailBody"),
+  validateArgs: validRichTextContent(
+    (args) => args.emailBody,
+    (args) => args.petitionId,
+    "emailBody"
+  ),
   resolve: async (_, args, ctx) => {
     const shouldSendNotification = await ctx.petitions.shouldNotifyPetitionClosed(args.petitionId);
     if (!shouldSendNotification && !args.force) {

@@ -49,7 +49,7 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
   chakraForwardRef<"section", PetitionTemplateCompletingMessageCardProps>(
     function PetitionTemplateCompletingMessageCard({ petition, onUpdatePetition, ...props }, ref) {
       const intl = useIntl();
-      const placeholders = usePetitionMessagePlaceholderOptions();
+      const placeholders = usePetitionMessagePlaceholderOptions({ petition });
       const [isEnabled, setIsEnabled] = useState(petition.isCompletingMessageEnabled);
       const [subject, setSubject] = useState(
         petition.completingMessageSubject ?? messagesSubject[petition.locale]
@@ -92,7 +92,6 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
 
       const isReadOnly =
         petition.isRestricted || petition.isPublic || myEffectivePermission === "READ";
-      const placeholderOptions = usePetitionMessagePlaceholderOptions();
 
       return (
         <Card {...props}>
@@ -169,7 +168,7 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
                     defaultMessage:
                       "Write the message that your recipients will see when they finalize",
                   })}
-                  placeholderOptions={placeholderOptions}
+                  placeholderOptions={placeholders}
                   isDisabled={isReadOnly}
                 />
               </FormControl>
@@ -196,7 +195,9 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
           myEffectivePermission {
             permissionType
           }
+          ...usePetitionMessagePlaceholderOptions_PetitionBase
         }
+        ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}
       `,
     },
   }

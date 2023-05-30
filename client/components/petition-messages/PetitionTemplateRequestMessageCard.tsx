@@ -119,6 +119,7 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
               body={messages.emailBody}
               onSubjectChange={handleMessagesEmailSubjectChange}
               onBodyChange={handleMessagesEmailBodyChange}
+              petition={petition}
               isReadOnly={
                 petition.isRestricted || petition.isPublic || myEffectivePermission === "READ"
               }
@@ -143,8 +144,10 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
           defaultOnBehalf {
             ...UserSelect_User
           }
+          ...MessageEmailEditor_PetitionBase
         }
         ${UserSelect.fragments.User}
+        ${MessageEmailEditor.fragments.PetitionBase}
       `,
       User: gql`
         fragment PetitionTemplateRequestMessageCard_User on User {

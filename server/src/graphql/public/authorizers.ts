@@ -6,7 +6,7 @@ import { isDefined, partition } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
 import { verify } from "../../util/jwt";
-import { getMentions } from "../../util/slate";
+import { collectMentionsFromSlate } from "../../util/slate/mentions";
 import { MaybeArray } from "../../util/types";
 import { Arg, chain } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
@@ -307,7 +307,7 @@ export function validPetitionFieldCommentContent<
     if (allowMentions) {
       const field = (await ctx.petitions.loadField(fieldId))!;
       const petition = (await ctx.petitions.loadPetition(field.petition_id))!;
-      const mentions = getMentions(content);
+      const mentions = collectMentionsFromSlate(content);
       const [userMentions, userGroupMentions] = partition(mentions, (m) => m.type === "User");
       return await ctx.petitions.canBeMentionedInPetitionFieldComment(
         petition.org_id,

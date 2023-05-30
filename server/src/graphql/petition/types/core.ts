@@ -1,19 +1,19 @@
 import { extension } from "mime-types";
 import { arg, enumType, inputObjectType, interfaceType, objectType, unionType } from "nexus";
 import { findLast, isDefined, minBy } from "remeda";
-import { ReplyStatusChangedEvent } from "../../../db/events/PetitionEvent";
 import {
   ContactLocaleValues,
   PetitionAttachment,
   PetitionAttachmentType,
   PetitionAttachmentTypeValues,
 } from "../../../db/__types";
+import { ReplyStatusChangedEvent } from "../../../db/events/PetitionEvent";
 import { defaultBrandTheme } from "../../../util/BrandTheme";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { safeJsonParse } from "../../../util/safeJsonParse";
-import { toHtml, toPlainText } from "../../../util/slate";
+import { renderSlateToHtml, renderSlateToText } from "../../../util/slate/render";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -468,7 +468,9 @@ export const PetitionTemplate = objectType({
       description: "HTML description of the template.",
       resolve: (o) => {
         return o.template_description
-          ? toHtml(safeJsonParse(o.template_description), {}, { startingHeadingLevel: 3 })
+          ? renderSlateToHtml(safeJsonParse(o.template_description), {
+              startingHeadingLevel: 3,
+            })
           : null;
       },
     });
@@ -477,7 +479,7 @@ export const PetitionTemplate = objectType({
       resolve: (o) => {
         if (o.template_description) {
           const content = safeJsonParse(o.template_description);
-          return toPlainText([content[0]]).slice(0, 200);
+          return renderSlateToText([content[0]]).slice(0, 200);
         }
         return null;
       },

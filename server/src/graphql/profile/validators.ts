@@ -5,13 +5,13 @@ import { TableTypes } from "../../db/helpers/BaseRepository";
 import { validateProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import { discriminator } from "../../util/discriminator";
 import { fromGlobalId } from "../../util/globalId";
-import { parseTextWithPlaceholders } from "../../util/textWithPlaceholders";
 import { isValidDate } from "../../util/time";
 import { Maybe } from "../../util/types";
 import { NexusGenInputs } from "../__types";
 import { Arg } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
+import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
 
 export function validProfileNamePattern<
   TypeName extends string,
@@ -27,7 +27,7 @@ export function validProfileNamePattern<
     const pattern = args[profileNamePatternArg] as unknown as Maybe<string>;
     if (isDefined(pattern)) {
       const fieldIds = parseTextWithPlaceholders(pattern)
-        .filter(discriminator("type", "placeholder"))
+        .filter(discriminator("type", "placeholder" as const))
         .map((p) => fromGlobalId(p.value, "ProfileTypeField").id);
       const fields = await ctx.profiles.loadProfileTypeField(uniq(fieldIds));
       if (

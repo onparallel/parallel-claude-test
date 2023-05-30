@@ -21,41 +21,28 @@ import {
 } from "remeda";
 import { RESULT } from "../../graphql";
 import { ILogger, LOGGER } from "../../services/Logger";
-import { QueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
+import { QUEUES_SERVICE, QueuesService } from "../../services/QueuesService";
 import { TemplateStatsReportInput } from "../../services/ReportsService";
 import { average, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
-import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fieldVisibility";
-import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { PetitionFieldVisibility, evaluateFieldVisibility } from "../../util/fieldVisibility";
+import { fromGlobalId, isGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { keyBuilder } from "../../util/keyBuilder";
+import {
+  replacePlaceholdersInSlate,
+  replacePlaceholdersInText,
+} from "../../util/slate/placeholders";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
 import { removeNotDefined } from "../../util/remedaExtensions";
-import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/reminderUtils";
-import { getMentions } from "../../util/slate";
+import { PetitionAccessReminderConfig, calculateNextReminder } from "../../util/reminderUtils";
+import { safeJsonParse } from "../../util/safeJsonParse";
+import { SlateNode } from "../../util/slate/render";
+import { collectMentionsFromSlate } from "../../util/slate/mentions";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray, Replace, UnwrapArray } from "../../util/types";
 import { validateReplyValue } from "../../util/validateReplyValue";
-import {
-  CreatePetitionEvent,
-  GenericPetitionEvent,
-  PetitionEvent,
-  ReplyCreatedEvent,
-  ReplyDeletedEvent,
-  ReplyStatusChangedEvent,
-  ReplyUpdatedEvent,
-} from "../events/PetitionEvent";
-import { BaseRepository, PageOpts, TableCreateTypes, TableTypes } from "../helpers/BaseRepository";
-import { defaultFieldProperties, validateFieldOptions } from "../helpers/fieldOptions";
-import { escapeLike, isValueCompatible, SortBy } from "../helpers/utils";
-import { KNEX } from "../knex";
-import {
-  CommentCreatedUserNotification,
-  CreatePetitionUserNotification,
-  GenericPetitionUserNotification,
-  PetitionUserNotification,
-} from "../notifications";
 import {
   Contact,
   ContactLocale,
@@ -93,8 +80,28 @@ import {
   TemplateDefaultPermission,
   User,
 } from "../__types";
+import {
+  CreatePetitionEvent,
+  GenericPetitionEvent,
+  PetitionEvent,
+  ReplyCreatedEvent,
+  ReplyDeletedEvent,
+  ReplyStatusChangedEvent,
+  ReplyUpdatedEvent,
+} from "../events/PetitionEvent";
+import { BaseRepository, PageOpts, TableCreateTypes, TableTypes } from "../helpers/BaseRepository";
+import { defaultFieldProperties, validateFieldOptions } from "../helpers/fieldOptions";
+import { SortBy, escapeLike, isValueCompatible } from "../helpers/utils";
+import { KNEX } from "../knex";
+import {
+  CommentCreatedUserNotification,
+  CreatePetitionUserNotification,
+  GenericPetitionUserNotification,
+  PetitionUserNotification,
+} from "../notifications";
 import { FileRepository } from "./FileRepository";
 import { OrganizationRepository } from "./OrganizationRepository";
+
 type PetitionType = "PETITION" | "TEMPLATE";
 
 type PetitionSharedWithFilter = {
@@ -2422,6 +2429,37 @@ export class PetitionRepository extends BaseRepository {
           sortBy(clonedFields, (f) => f.position!).map((f) => f.id)
         )
       );
+
+      // on RTE texts, replace globalId placeholders with the field ids of the cloned petition
+      const rteUpdateData: Partial<Petition> = {};
+      if (isDefined(cloned.email_subject)) {
+        rteUpdateData.email_subject = replacePlaceholdersInText(
+          cloned.email_subject,
+          (placeholder) => {
+            if (isGlobalId(placeholder, "PetitionField")) {
+              return toGlobalId("PetitionField", newFieldIds[fromGlobalId(placeholder).id]);
+            }
+            return placeholder;
+          }
+        );
+      }
+
+      for (const key of ["email_body", "closing_email_body", "completing_message_body"] as const) {
+        if (isDefined(cloned[key])) {
+          rteUpdateData[key] = JSON.stringify(
+            replacePlaceholdersInSlate(safeJsonParse(cloned[key]) as SlateNode[], (placeholder) => {
+              if (isGlobalId(placeholder, "PetitionField")) {
+                return toGlobalId("PetitionField", newFieldIds[fromGlobalId(placeholder).id]);
+              }
+              return placeholder;
+            })
+          );
+        }
+      }
+
+      if (Object.keys(rteUpdateData).length > 0) {
+        await this.updatePetition(cloned.id, rteUpdateData, createdBy, t);
+      }
 
       if (options?.cloneReplies) {
         // insert petition replies into cloned fields
@@ -5902,7 +5940,7 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async checkUserMentions(
-    mentions: ReturnType<typeof getMentions>,
+    mentions: ReturnType<typeof collectMentionsFromSlate>,
     petitionId: number,
     throwOnNoPermission: boolean,
     userId: number,
@@ -6038,14 +6076,7 @@ export class PetitionRepository extends BaseRepository {
         userDelegate ? userDelegate : user
       );
 
-      const [updatedPetition] = await this.updatePetition(
-        petition.id,
-        { name: petition.name ?? args.subject, status: "PENDING", closed_at: null },
-        `User:${user.id}`
-      );
-
       return {
-        petition: updatedPetition,
         accesses,
         messages,
         result: RESULT.SUCCESS,
@@ -6190,5 +6221,21 @@ export class PetitionRepository extends BaseRepository {
         .where("id", petitionId)
         .update({ deleted_at: null, deleted_by: null });
     });
+  }
+
+  async loadOriginalMessageByPetitionAccess(petitionAccessId: number, petitionId: number) {
+    const allAccesses = await this.loadAccessesForPetition(petitionId);
+    let access = await this.loadAccess(petitionAccessId);
+
+    let triesLeft = 10;
+    while (access?.delegator_contact_id && triesLeft > 0) {
+      access = allAccesses.find((a) => a.contact_id === access!.delegator_contact_id) ?? null;
+      triesLeft--;
+    }
+    if (access) {
+      const [firstMessage] = await this.loadMessagesByPetitionAccessId(access.id);
+      return firstMessage;
+    }
+    return null;
   }
 }

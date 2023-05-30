@@ -3,7 +3,7 @@ import { isDefined } from "remeda";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { safeJsonParse } from "../../util/safeJsonParse";
-import { toHtml } from "../../util/slate";
+import { renderSlateToHtml } from "../../util/slate/render";
 
 export const LandingTemplateField = objectType({
   name: "LandingTemplateField",
@@ -25,7 +25,9 @@ export const LandingTemplate = objectType({
     t.nullable.string("name", { resolve: (o) => o.name });
     t.nullable.string("descriptionHtml", {
       resolve: (o) => {
-        return o.template_description ? toHtml(safeJsonParse(o.template_description)) : null;
+        return o.template_description
+          ? renderSlateToHtml(safeJsonParse(o.template_description))
+          : null;
       },
     });
     t.string("slug", {

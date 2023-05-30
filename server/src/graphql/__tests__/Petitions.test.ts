@@ -24,7 +24,7 @@ import {
 } from "../../db/__types";
 import { AUTH, IAuth } from "../../services/AuthService";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
-import { fromPlainText } from "../../util/slate";
+import { fromPlainText } from "../../util/slate/utils";
 import { initServer, TestClient } from "./server";
 
 function petitionsBuilder(orgId: number, signatureIntegrationId: number) {

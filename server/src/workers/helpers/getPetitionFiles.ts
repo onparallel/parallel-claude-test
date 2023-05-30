@@ -5,10 +5,8 @@ import { UserLocale } from "../../db/__types";
 import { ZipFileInput } from "../../util/createZipFile";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { isFileTypeField } from "../../util/isFileTypeField";
+import { renderTextWithPlaceholders } from "../../util/slate/placeholders";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
-import { parseTextWithPlaceholders } from "../../util/textWithPlaceholders";
-
-const placeholders = ["field-number", "field-title", "file-name"] as const;
 
 export async function* getPetitionFiles(
   petitionId: number,
@@ -78,17 +76,22 @@ export async function* getPetitionFiles(
         const file = filesById[reply.content["file_upload_id"]];
         if (file?.upload_complete) {
           const extension = file.filename.match(/\.[a-z0-9]+$/i)?.[0] ?? "";
-          const name = rename(options.pattern ?? "{{file-name}}", placeholders, (placeholder) => {
-            switch (placeholder) {
-              case "field-number":
-                return `${field.position! + 1 - headingCount}`;
-              case "field-title":
-                return field.title ?? "";
-              case "file-name":
-                // remove file extension since it's added back later
-                return file.filename.replace(/\.[a-z0-9]+$/, "");
+          const name = renderTextWithPlaceholders(
+            options.pattern ?? "{{file-name}}",
+            (placeholder) => {
+              switch (placeholder) {
+                case "field-number":
+                  return `${field.position! + 1 - headingCount}`;
+                case "field-title":
+                  return field.title ?? "";
+                case "file-name":
+                  // remove file extension since it's added back later
+                  return file.filename.replace(/\.[a-z0-9]+$/, "");
+                default:
+                  return "";
+              }
             }
-          });
+          );
           let filename = sanitizeFilenameWithSuffix(name, extension.toLowerCase());
           let counter = 1;
           while (seen.has(filename)) {
@@ -137,16 +140,4 @@ export async function* getPetitionFiles(
       }
     }
   }
-}
-
-function rename<T extends string>(
-  pattern: string,
-  placeholders: readonly T[],
-  replacer: (value: T) => string
-) {
-  return parseTextWithPlaceholders(pattern)
-    .map((p) =>
-      p.type === "text" ? p.text : placeholders.includes(p.value as T) ? replacer(p.value as T) : ""
-    )
-    .join("");
 }

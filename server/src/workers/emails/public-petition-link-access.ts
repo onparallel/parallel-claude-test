@@ -3,7 +3,11 @@ import { buildEmail } from "../../emails/buildEmail";
 import PublicPetitionLinkAccess from "../../emails/emails/PublicPetitionLinkAccess";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { toHtml, toPlainText } from "../../util/slate";
+import {
+  renderSlateWithPlaceholdersToHtml,
+  renderSlateWithPlaceholdersToText,
+  renderTextWithPlaceholders,
+} from "../../util/slate/placeholders";
 
 export async function publicPetitionLinkAccess(
   payload: { petition_message_id: number },
@@ -13,9 +17,8 @@ export async function publicPetitionLinkAccess(
   if (!message) {
     throw new Error(`PetitionMessage:${payload.petition_message_id} not found`);
   }
-  const [petition, sender, senderData, access] = await Promise.all([
+  const [petition, senderData, access] = await Promise.all([
     context.petitions.loadPetition(message.petition_id),
-    context.users.loadUser(message.sender_id),
     context.users.loadUserDataByUserId(message.sender_id),
     context.petitions.loadAccess(message.petition_access_id),
   ]);
@@ -26,9 +29,6 @@ export async function publicPetitionLinkAccess(
     throw new Error(
       `Petition:${message.petition_id} should have defined property 'from_public_petition_link_id'`
     );
-  }
-  if (!sender) {
-    throw new Error(`User:${message.sender_id} not found`);
   }
   if (!senderData) {
     throw new Error(`UserData not found for User:${message.sender_id}`);
@@ -47,27 +47,38 @@ export async function publicPetitionLinkAccess(
     throw new Error(`PublicPetitionLink:${petition.from_public_petition_link_id} not found`);
   }
 
-  const orgId = sender.org_id;
+  const orgId = petition.org_id;
   const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
     orgId,
     "REMOVE_WHY_WE_USE_PARALLEL"
   );
 
   const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
-  const renderContext = { contact, user: senderData, petition };
 
   const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(orgId);
+
+  const getValues = await context.petitionMessageContext.fetchPlaceholderValues(
+    {
+      petitionId: message.petition_id,
+      contactId: access.contact_id,
+      userId: message.sender_id,
+      petitionAccessId: access.id,
+    },
+    { publicContext: true }
+  );
   const { html, text, subject, from } = await buildEmail(
     PublicPetitionLinkAccess,
     {
       name: contact.first_name,
       fullName: fullName(contact.first_name, contact.last_name),
       senderName: fullName(senderData.first_name, senderData.last_name)!,
-      emailSubject: petition.email_subject,
+      emailSubject: petition.email_subject
+        ? renderTextWithPlaceholders(petition.email_subject, getValues)
+        : null,
       petitionTitle: publicPetitionLink.title,
       keycode: access.keycode,
-      bodyHtml: toHtml(bodyJson, renderContext),
-      bodyPlainText: toPlainText(bodyJson, renderContext),
+      bodyHtml: renderSlateWithPlaceholdersToHtml(bodyJson, getValues),
+      bodyPlainText: renderSlateWithPlaceholdersToText(bodyJson, getValues),
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       ...layoutProps,
     },

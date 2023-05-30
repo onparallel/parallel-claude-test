@@ -128,7 +128,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
               tone,
             });
           }
-          await publicCompletePetition({
+          const { data } = await publicCompletePetition({
             variables: {
               keycode,
               additionalSigners: confirmSignerInfoData?.additionalSigners,
@@ -138,10 +138,10 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
           if (petition.signatureConfig?.review) {
             await showReviewBeforeSigningDialog({ granter, tone });
           }
-          if (showFullScreenDialog) {
+          if (showFullScreenDialog && isDefined(data)) {
             await withError(
               showCompletingMessageDialog({
-                petition,
+                petition: data!.publicCompletePetition,
                 granter,
                 hasClientPortalAccess: access.hasClientPortalAccess,
                 pendingPetitions: pending,

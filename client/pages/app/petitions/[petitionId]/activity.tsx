@@ -147,10 +147,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const handleSendReminders = useCallback(
     async (accesses: PetitionAccessTable_PetitionAccessFragment[]) => {
       try {
-        const { message } = await confirmSendReminder({
-          accesses,
-          petitionStatus: petition.status,
-        });
+        const { message } = await confirmSendReminder({ petition });
         try {
           const accessIds = accesses.map((selected) => selected.id);
           await sendReminders({
@@ -387,6 +384,7 @@ const _fragments = {
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
       }
+      ...useConfirmSendReminderDialog_Petition
     }
     ${PetitionLayout.fragments.PetitionBase}
     ${PetitionAccessesTable.fragments.Petition}
@@ -398,6 +396,7 @@ const _fragments = {
     ${FieldErrorDialog.fragments.PetitionField}
     ${ConfirmDeactivateAccessDialog.fragments.PetitionAccess}
     ${ConfirmReactivateAccessDialog.fragments.PetitionAccess}
+    ${useConfirmSendReminderDialog.fragments.Petition}
   `,
   Query: gql`
     fragment PetitionActivity_Query on Query {

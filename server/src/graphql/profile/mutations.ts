@@ -26,7 +26,7 @@ import {
 } from "../../db/helpers/profileTypeFieldOptions";
 import { toBytes } from "../../util/fileSize";
 import { fromGlobalId } from "../../util/globalId";
-import { parseTextWithPlaceholders } from "../../util/textWithPlaceholders";
+import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
 import { random } from "../../util/token";
 import { RESULT } from "../helpers/Result";
 import { SUCCESS } from "../helpers/Success";

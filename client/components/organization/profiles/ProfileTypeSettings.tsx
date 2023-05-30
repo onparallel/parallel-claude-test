@@ -47,8 +47,8 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
   const placeholders = profileType.fields
     .filter((field) => field.type === "SHORT_TEXT")
     .map((field) => ({
-      value: field.id,
-      label: localizableUserTextRender({
+      key: field.id,
+      text: localizableUserTextRender({
         value: field.name,
         intl,
         default: intl.formatMessage({

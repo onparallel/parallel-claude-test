@@ -400,6 +400,7 @@ export function AddPetitionAccessDialog({
               onSubjectChange={handleSubjectChange}
               onBodyChange={handleBodyChange}
               labelProps={{ fontWeight: "normal" }}
+              petition={petition}
             />
           </Box>
           <PetitionRemindersConfig
@@ -508,7 +509,9 @@ AddPetitionAccessDialog.fragments = {
       defaultOnBehalf {
         id
       }
+      ...MessageEmailEditor_PetitionBase
     }
+    ${MessageEmailEditor.fragments.PetitionBase}
     ${PetitionRemindersConfig.fragments.RemindersConfig}
     ${CopySignatureConfigDialog.fragments.PetitionSigner}
     ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}

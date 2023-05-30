@@ -3,22 +3,26 @@ import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitio
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { RichTextEditor } from "../common/slate/RichTextEditor";
+import { gql } from "@apollo/client";
+import { MessageClosingEmailEditor_PetitionBaseFragment } from "@parallel/graphql/__types";
 
 export function MessageClosingEmailEditor({
   id,
   showErrors,
   body,
   onBodyChange,
+  petition,
   isReadOnly,
 }: {
   id: string;
   showErrors: boolean;
   body: RichTextEditorValue;
   onBodyChange: (value: RichTextEditorValue) => void;
+  petition: MessageClosingEmailEditor_PetitionBaseFragment;
   isReadOnly?: boolean;
 }) {
   const intl = useIntl();
-  const placeholderOptions = usePetitionMessagePlaceholderOptions();
+  const placeholderOptions = usePetitionMessagePlaceholderOptions({ petition });
   return (
     <FormControl isInvalid={showErrors} id="petition-closing-message-body">
       <FormLabel marginBottom={3.5}>
@@ -41,3 +45,12 @@ export function MessageClosingEmailEditor({
     </FormControl>
   );
 }
+
+MessageClosingEmailEditor.fragments = {
+  PetitionBase: gql`
+    fragment MessageClosingEmailEditor_PetitionBase on PetitionBase {
+      ...usePetitionMessagePlaceholderOptions_PetitionBase
+    }
+    ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}
+  `,
+};

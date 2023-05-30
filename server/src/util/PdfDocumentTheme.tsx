@@ -1,4 +1,4 @@
-import { SlateNode } from "./slate";
+import { SlateNode } from "./slate/render";
 
 export interface PdfDocumentTheme {
   marginLeft: number;

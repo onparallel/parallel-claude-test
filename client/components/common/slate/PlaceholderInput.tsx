@@ -1,13 +1,14 @@
 import { Box, Center, Text, useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { ValueProps } from "@parallel/utils/ValueProps";
 import {
-  createPlaceholderPlugin,
   ELEMENT_PLACEHOLDER_INPUT,
   PlaceholderCombobox,
   PlaceholderElement,
   PlaceholderInputElement,
   PlaceholderOption,
   PlaceholdersProvider,
+  createPlaceholderPlugin,
 } from "@parallel/utils/slate/PlaceholderPlugin";
 import { createSingleLinePlugin } from "@parallel/utils/slate/SingleLinePlugin";
 import {
@@ -16,20 +17,20 @@ import {
 } from "@parallel/utils/slate/textWithPlaceholder";
 import { CustomEditor, SlateElement, SlateText } from "@parallel/utils/slate/types";
 import { useConstant } from "@parallel/utils/useConstant";
-import { ValueProps } from "@parallel/utils/ValueProps";
+import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { createComboboxPlugin } from "@udecode/plate-combobox";
 import {
+  PlateProvider,
   createHistoryPlugin,
   createPlugins,
   createReactPlugin,
   focusEditor,
   getEndPoint,
-  PlateProvider,
   withProps,
 } from "@udecode/plate-common";
 import { ELEMENT_MENTION_INPUT } from "@udecode/plate-mention";
-import { createParagraphPlugin, ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
-import { useImperativeHandle, useRef } from "react";
+import { ELEMENT_PARAGRAPH, createParagraphPlugin } from "@udecode/plate-paragraph";
+import { useImperativeHandle, useMemo, useRef } from "react";
 import { omit, pick } from "remeda";
 import { Editor, Transforms } from "slate";
 import { EditableProps } from "slate-react/dist/components/editable";
@@ -87,6 +88,7 @@ export const PlaceholderInput = chakraForwardRef<
     },
     ref
   ) => {
+    const placeholdersRef = useUpdatingRef(placeholders);
     const plugins = useConstant(() =>
       createPlugins<PlaceholderInputValue, PlaceholderInputEditor>(
         [
@@ -95,7 +97,7 @@ export const PlaceholderInput = chakraForwardRef<
           createParagraphPlugin(),
           createSingleLinePlugin(),
           createComboboxPlugin(),
-          createPlaceholderPlugin(),
+          createPlaceholderPlugin({ placeholdersRef }),
         ],
         {
           components,
@@ -130,8 +132,9 @@ export const PlaceholderInput = chakraForwardRef<
       },
     }));
 
-    const initialValue = useConstant(
-      () => textWithPlaceholderToSlateNodes(value, placeholders) as PlaceholderInputValue
+    const initialValue = useMemo(
+      () => textWithPlaceholderToSlateNodes(value, placeholders) as PlaceholderInputValue,
+      [placeholders]
     );
 
     const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
@@ -171,20 +174,18 @@ export const PlaceholderInput = chakraForwardRef<
           {...inputStyles}
           display="flex"
           sx={{
-            '[contenteditable="false"]': {
+            "[data-slate-placeholder]": {
               width: "auto !important",
+              opacity: "1 !important",
+              color: "gray.400",
             },
-            '> [role="textbox"]': {
+            "[data-slate-editor]": {
               flex: 1,
               ...pick(inputStyleConfig, ["px"]),
               whiteSpace: "pre",
               overflow: "hidden",
               display: "flex",
               alignItems: "center",
-            },
-            "[data-slate-placeholder]": {
-              opacity: "1 !important",
-              color: "gray.400",
             },
           }}
         >

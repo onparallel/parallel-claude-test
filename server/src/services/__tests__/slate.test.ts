@@ -1,5 +1,6 @@
 import { outdent } from "outdent";
-import { toHtml, toPlainText } from "../slate";
+import { renderSlateWithPlaceholdersToHtml } from "../../util/slate/placeholders";
+import { renderSlateToHtml, renderSlateToText } from "../../util/slate/render";
 
 const rootNode = (...children: string[]) => children.join("");
 const paragraph = (...children: string[]) => `<p style="margin:0">${children.join("")}</p>`;
@@ -7,11 +8,11 @@ const bulletList = (...children: string[]) =>
   `<ul style="margin:0;margin-left:24px;padding-left:0">${children.join("")}</ul>`;
 const listItem = (...children: string[]) => `<li style="margin-left:0">${children.join("")}</li>`;
 
-describe("Slate", () => {
-  describe("toHTML", () => {
+describe("slate/placeholders", () => {
+  describe("renderSlateToHtml", () => {
     it("one paragraph", () => {
       expect(
-        toHtml([
+        renderSlateToHtml([
           {
             children: [{ text: "Hello World!" }],
           },
@@ -21,7 +22,7 @@ describe("Slate", () => {
 
     it("two paragraphs", () => {
       expect(
-        toHtml([
+        renderSlateToHtml([
           { type: "paragraph", children: [{ text: "Hello World!" }] },
           { type: "paragraph", children: [{ text: "Goodbye." }] },
         ])
@@ -32,7 +33,7 @@ describe("Slate", () => {
 
     it("with bold text", () => {
       expect(
-        toHtml([
+        renderSlateToHtml([
           {
             children: [{ text: "Hello", bold: true }, { text: "World!" }],
           },
@@ -45,7 +46,7 @@ describe("Slate", () => {
     it("old style bulleted list", () => {
       // first child on list-item used to be a paragraph
       expect(
-        toHtml([
+        renderSlateToHtml([
           {
             type: "bulleted-list",
             children: [
@@ -72,7 +73,7 @@ describe("Slate", () => {
 
     it("bulleted list", () => {
       expect(
-        toHtml([
+        renderSlateToHtml([
           {
             type: "bulleted-list",
             children: [
@@ -99,7 +100,7 @@ describe("Slate", () => {
 
     it("message with rich content and placeholders", () => {
       expect(
-        toHtml(
+        renderSlateWithPlaceholdersToHtml(
           [
             {
               children: [
@@ -162,7 +163,12 @@ describe("Slate", () => {
               ],
             },
           ],
-          { contact: { first_name: "Mariano" } }
+          (placeholder) => {
+            if (placeholder === "contact-first-name") {
+              return "Mariano";
+            }
+            return "";
+          }
         )
       ).toEqual(
         rootNode(
@@ -195,7 +201,7 @@ describe("Slate", () => {
 
     it("escapes HTML passed as text", () => {
       expect(
-        toHtml([
+        renderSlateToHtml([
           {
             type: "paragraph",
             children: [{ text: '<div style="color:red">im a malicious script!</div>' }],
@@ -212,7 +218,7 @@ describe("Slate", () => {
 
     it("adds the right amount of whitespace", () => {
       expect(
-        toHtml([
+        renderSlateToHtml([
           {
             type: "paragraph",
             children: [{ text: "hola que  tal   estas?" }],
@@ -222,10 +228,10 @@ describe("Slate", () => {
     });
   });
 
-  describe("toPlainText", () => {
+  describe("renderSlateToText", () => {
     it("two paragraphs", () => {
       expect(
-        toPlainText([
+        renderSlateToText([
           { type: "paragraph", children: [{ text: "Hello World!" }] },
           { type: "paragraph", children: [{ text: "Goodbye." }] },
         ])
@@ -238,7 +244,7 @@ describe("Slate", () => {
     it("old style bulleted list", () => {
       // first child on list-item used to be a paragraph
       expect(
-        toPlainText([
+        renderSlateToText([
           { type: "paragraph", children: [{ text: "Hello World!" }] },
           {
             type: "bulleted-list",
@@ -263,7 +269,7 @@ describe("Slate", () => {
 
     it("bulleted list", () => {
       expect(
-        toPlainText([
+        renderSlateToText([
           { type: "paragraph", children: [{ text: "Hello World!" }] },
           {
             type: "bulleted-list",
@@ -288,7 +294,7 @@ describe("Slate", () => {
 
     it("nested unordered lists", () => {
       expect(
-        toPlainText([
+        renderSlateToText([
           { type: "paragraph", children: [{ text: "Hello World!" }] },
           {
             type: "bulleted-list",
@@ -344,7 +350,7 @@ describe("Slate", () => {
 
     it("nested ordered lists", () => {
       expect(
-        toPlainText([
+        renderSlateToText([
           { type: "paragraph", children: [{ text: "Hello World!" }] },
           {
             type: "numbered-list",

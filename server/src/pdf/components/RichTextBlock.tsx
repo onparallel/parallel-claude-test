@@ -1,6 +1,7 @@
 import { Link, Text, View } from "@react-pdf/renderer";
 import { Fragment, ReactNode } from "react";
-import { paragraphIsEmpty, renderWhiteSpace, SlateNode } from "../../util/slate";
+import { renderWhiteSpace, SlateNode } from "../../util/slate/render";
+import { paragraphIsEmpty } from "../../util/slate/utils";
 
 interface RichTextBlockProps {
   children: SlateNode[];

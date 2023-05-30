@@ -313,12 +313,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
       try {
         const data = await showClosePetitionDialog({
-          id: petition.id,
-          locale: petition.locale,
-          petitionName: petition.name ?? null,
+          petition,
           requiredMessage,
-          showNotify: petition.accesses.length > 0,
-          emailMessage: petition.closingEmailBody,
         });
 
         message = data.message;

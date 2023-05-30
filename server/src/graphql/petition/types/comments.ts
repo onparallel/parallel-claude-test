@@ -1,6 +1,9 @@
 import { objectType, unionType } from "nexus";
 import { isDefined } from "remeda";
-import { getMentions, toHtml } from "../../../util/slate";
+import {
+  collectMentionsFromSlate,
+  renderSlateWithMentionsToHtml,
+} from "../../../util/slate/mentions";
 
 export const UserOrPetitionAccess = unionType({
   name: "UserOrPetitionAccess",
@@ -105,15 +108,17 @@ export const PetitionFieldComment = objectType({
     });
     t.nullable.string("contentHtml", {
       description: "The HTML content of the comment.",
-      resolve: async (root) => {
-        return isDefined(root.content_json) ? toHtml(root.content_json) : null;
+      resolve: async (root, _, ctx) => {
+        return isDefined(root.content_json)
+          ? renderSlateWithMentionsToHtml(root.content_json)
+          : null;
       },
     });
     t.list.field("mentions", {
       type: "PetitionFieldCommentMention",
       description: "The mentions of the comments.",
       resolve: async (root, _, ctx) => {
-        return getMentions(root.content_json).map((m) => {
+        return collectMentionsFromSlate(root.content_json).map((m) => {
           if (m.type === "User") {
             return { __type: "User", user_id: m.id };
           } else if (m.type === "UserGroup") {

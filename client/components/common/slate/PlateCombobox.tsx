@@ -1,27 +1,28 @@
-import { Box, Center, Portal, Spinner } from "@chakra-ui/react";
+import { Box, Center, Portal, Spinner, Text } from "@chakra-ui/react";
 import { MaybePromise } from "@parallel/utils/types";
 import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
 import {
-  comboboxActions,
-  comboboxSelectors,
   ComboboxState,
   ComboboxStateById,
   Data,
-  getComboboxStoreById,
   NoData,
   TComboboxItem,
+  comboboxActions,
+  comboboxSelectors,
+  getComboboxStoreById,
   useComboboxControls,
   useComboboxSelectors,
 } from "@udecode/plate-combobox";
 import {
-  getAboveNode,
   RenderFunction,
+  getAboveNode,
   toDOMNode,
   useEditorState,
   useEventEditorSelectors,
 } from "@udecode/plate-common";
 import { flip, offset, shift, useVirtualFloating } from "@udecode/plate-floating";
 import { useCallback, useEffect, useState } from "react";
+import { groupBy } from "remeda";
 import { Card } from "../Card";
 
 export interface ComboboxItemProps<TData> {
@@ -150,34 +151,63 @@ const ComboboxContent = <TData extends Data = NoData>(
         maxWidth="320px"
       >
         {filteredItems.length > 0 ? (
-          filteredItems.map((item, index) => {
-            const isHighlighted = index === highlightedIndex;
-            return (
-              <Box
-                key={item.key}
-                backgroundColor={isHighlighted ? "gray.100" : undefined}
-                paddingX={4}
-                paddingY={1}
-                cursor="pointer"
-                {...combobox.getItemProps({
-                  item,
-                  index,
-                })}
-                whiteSpace="nowrap"
-                onMouseEnter={(e) => {
-                  comboboxActions.highlightedIndex(index);
-                }}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  const onSelectItem = getComboboxStoreById(
-                    comboboxSelectors.activeId()
-                  )?.get.onSelectItem();
-                  onSelectItem?.(editor, item);
-                }}
-              >
-                <Item search={text} item={item as TComboboxItem<TData>} />
-              </Box>
-            );
+          Object.entries(
+            groupBy(
+              filteredItems.map((item, index) => ({ item, index })),
+              ({ item }) => (item as any)?.data?.group ?? ""
+            )
+          ).map(([group, items]) => {
+            const list = items.map(({ item, index }) => {
+              const isHighlighted = index === highlightedIndex;
+              return (
+                <Box
+                  as="button"
+                  type="button"
+                  display="flex"
+                  width="100%"
+                  key={item.key}
+                  backgroundColor={isHighlighted ? "gray.100" : undefined}
+                  paddingX={4}
+                  paddingY={1}
+                  cursor="pointer"
+                  {...combobox.getItemProps({
+                    item,
+                    index,
+                  })}
+                  whiteSpace="nowrap"
+                  onMouseEnter={(e) => {
+                    comboboxActions.highlightedIndex(index);
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    const onSelectItem = getComboboxStoreById(
+                      comboboxSelectors.activeId()
+                    )?.get.onSelectItem();
+                    onSelectItem?.(editor, item);
+                  }}
+                >
+                  <Item search={text} item={item as TComboboxItem<TData>} />
+                </Box>
+              );
+            });
+            if (group === "") {
+              return list;
+            } else {
+              return (
+                <Box key={group} role="group">
+                  <Text
+                    paddingX={4}
+                    fontSize="xs"
+                    textTransform="uppercase"
+                    color="gray.600"
+                    paddingY={1}
+                  >
+                    {group}
+                  </Text>
+                  <>{list}</>
+                </Box>
+              );
+            }
           })
         ) : isLoading ? (
           <Center minHeight={40}>

@@ -9980,6 +9980,11 @@
     "context": "Recipient full name"
   },
   {
+    "term": "petition-message.placeholder-option.contact-information",
+    "definition": "Contact Information",
+    "context": "Contact Information"
+  },
+  {
     "term": "petition-message.placeholder-option.contact-last-name",
     "definition": "Recipient last name",
     "context": "Recipient last name"
@@ -9988,6 +9993,11 @@
     "term": "petition-message.placeholder-option.parallel-title",
     "definition": "Parallel title",
     "context": "Parallel title"
+  },
+  {
+    "term": "petition-message.placeholder-option.references",
+    "definition": "References",
+    "context": "References"
   },
   {
     "term": "petition-message.placeholder-option.user-first-name",
@@ -10688,6 +10698,16 @@
     "term": "petitions.title-templates",
     "definition": "Templates",
     "context": "Templates"
+  },
+  {
+    "term": "placeholder-plugin.deleted-field",
+    "definition": "This field has been deleted. Nothing will show here.",
+    "context": "This field has been deleted. Nothing will show here."
+  },
+  {
+    "term": "placeholder-plugin.field-without-replies",
+    "definition": "This field has no replies. Nothing will show here.",
+    "context": "This field has no replies. Nothing will show here."
   },
   {
     "term": "profilespage.profile-details.max-files-exceeded-error.message",

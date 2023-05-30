@@ -1,7 +1,5 @@
 import gql from "graphql-tag";
 import { Knex } from "knex";
-import { KNEX } from "../../db/knex";
-import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
   Organization,
   Petition,
@@ -9,9 +7,11 @@ import {
   PetitionFieldComment,
   User,
 } from "../../db/__types";
+import { KNEX } from "../../db/knex";
+import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { toGlobalId } from "../../util/globalId";
-import { toHtml } from "../../util/slate";
-import { initServer, TestClient } from "./server";
+import { renderSlateWithMentionsToHtml } from "../../util/slate/mentions";
+import { TestClient, initServer } from "./server";
 
 describe("GraphQL/Petition Fields Comments", () => {
   let testClient: TestClient;
@@ -178,7 +178,7 @@ describe("GraphQL/Petition Fields Comments", () => {
       expect(errors).toBeUndefined();
       expect(data?.createPetitionFieldComment).toEqual({
         id: data!.createPetitionFieldComment.id,
-        contentHtml: toHtml(content),
+        contentHtml: renderSlateWithMentionsToHtml(content),
         isInternal: false,
         field: {
           id: toGlobalId("PetitionField", headingField.id),
@@ -226,7 +226,7 @@ describe("GraphQL/Petition Fields Comments", () => {
       expect(errors).toBeUndefined();
       expect(data?.createPetitionFieldComment).toEqual({
         id: data!.createPetitionFieldComment.id,
-        contentHtml: toHtml(content),
+        contentHtml: renderSlateWithMentionsToHtml(content),
         isInternal: true,
         field: {
           id: toGlobalId("PetitionField", textFieldWithCommentsDisabled.id),

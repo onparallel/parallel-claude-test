@@ -1,5 +1,5 @@
 import { enumType, objectType } from "nexus";
-import { toHtml } from "../../../util/slate";
+import { renderSlateWithPlaceholdersToHtml } from "../../../util/slate/placeholders";
 
 export const PetitionMessageStatus = enumType({
   name: "PetitionMessageStatus",
@@ -42,24 +42,26 @@ export const PetitionMessage = objectType({
     });
     t.nullable.json("emailSubject", {
       description: "The subject of the petition message.",
-      resolve: (o) => o.email_subject,
+      resolve: (o) => {
+        return o.email_subject;
+      },
     });
     t.nullable.string("emailBody", {
       description: "The body of the petition message on HTML format.",
       resolve: async (o, _, ctx) => {
         if (!o.email_body) return null;
+        const contact = await ctx.contacts.loadContactByAccessId(o.petition_access_id);
+        const getValues = await ctx.petitionMessageContext.fetchPlaceholderValues(
+          {
+            petitionId: o.petition_id,
+            userId: o.sender_id,
+            contactId: contact?.id,
+            petitionAccessId: o.petition_access_id,
+          },
+          { publicContext: true }
+        );
 
-        const [contact, petition, userData] = await Promise.all([
-          ctx.contacts.loadContactByAccessId(o.petition_access_id),
-          ctx.petitions.loadPetition(o.petition_id),
-          ctx.user ? ctx.users.loadUserData(ctx.user.user_data_id) : null,
-        ]);
-
-        return toHtml(JSON.parse(o.email_body), {
-          petition,
-          contact,
-          user: userData,
-        });
+        return renderSlateWithPlaceholdersToHtml(JSON.parse(o.email_body), getValues);
       },
     });
     t.field("status", {

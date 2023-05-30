@@ -5,8 +5,10 @@ import PetitionReminder from "../../emails/emails/PetitionReminder";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fullName } from "../../util/fullName";
-import { loadOriginalMessageByPetitionAccess } from "../../util/loadOriginalMessageByPetitionAccess";
-import { toHtml, toPlainText } from "../../util/slate";
+import {
+  renderSlateWithPlaceholdersToHtml,
+  renderSlateWithPlaceholdersToText,
+} from "../../util/slate/placeholders";
 
 export async function petitionReminder(
   payload: { petition_reminder_id: number },
@@ -27,13 +29,12 @@ export async function petitionReminder(
         `Petition access not found for id petition_reminder.petition_access_id ${reminder.petition_access_id}`
       );
     }
-    const [petition, granter, granterData, contact, fields, originalMessage] = await Promise.all([
+    const [petition, granterData, contact, fields, originalMessage] = await Promise.all([
       context.petitions.loadPetition(access.petition_id),
-      context.users.loadUser(access.granter_id),
       context.users.loadUserDataByUserId(access.granter_id),
       access.contact_id ? context.contacts.loadContact(access.contact_id) : null,
       context.petitions.loadFieldsForPetition(access.petition_id),
-      loadOriginalMessageByPetitionAccess(access.id, access.petition_id, context.petitions),
+      context.petitions.loadOriginalMessageByPetitionAccess(access.id, access.petition_id),
     ]);
     if (!petition) {
       return; // if the petition was deleted, return without throwing error
@@ -42,9 +43,6 @@ export async function petitionReminder(
       throw new Error(
         `Can not sent reminder for petition ${access.petition_id} with status "${petition.status}"`
       );
-    }
-    if (!granter) {
-      throw new Error(`User not found for petition_access.granter_id ${access.granter_id}`);
     }
     if (!granterData) {
       throw new Error(`UserData not found for User:${access.granter_id}`);
@@ -70,15 +68,24 @@ export async function petitionReminder(
       ([field, isVisible]) => isVisible && field.type !== "HEADING" && field.is_internal === false
     );
 
-    const orgId = granter.org_id;
+    const orgId = petition.org_id;
     const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
       orgId,
       "REMOVE_WHY_WE_USE_PARALLEL"
     );
     const missingFieldCount = countBy(repliableFields, ([field]) => field.replies.length === 0);
     const bodyJson = reminder.email_body ? JSON.parse(reminder.email_body) : null;
-    const renderContext = { contact, user: granterData, petition };
     const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(orgId);
+
+    const getValues = await context.petitionMessageContext.fetchPlaceholderValues(
+      {
+        petitionId: access.petition_id,
+        contactId: access.contact_id,
+        userId: access.granter_id,
+        petitionAccessId: access.id,
+      },
+      { publicContext: true }
+    );
     const { html, text, subject, from } = await buildEmail(
       PetitionReminder,
       {
@@ -89,8 +96,8 @@ export async function petitionReminder(
         senderEmail: granterData.email,
         missingFieldCount,
         totalFieldCount: repliableFields.length,
-        bodyHtml: bodyJson ? toHtml(bodyJson, renderContext) : null,
-        bodyPlainText: bodyJson ? toPlainText(bodyJson, renderContext) : null,
+        bodyHtml: bodyJson ? renderSlateWithPlaceholdersToHtml(bodyJson, getValues) : null,
+        bodyPlainText: bodyJson ? renderSlateWithPlaceholdersToText(bodyJson, getValues) : null,
         deadline: petition.deadline,
         keycode: access.keycode,
         removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,

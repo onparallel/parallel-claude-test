@@ -58,6 +58,10 @@ import { ISignatureService, SIGNATURE } from "./services/SignatureService";
 import { ISmtp, SMTP } from "./services/Smtp";
 import { IStorageService, STORAGE_SERVICE } from "./services/StorageService";
 import { ITiersService, TIERS_SERVICE } from "./services/TiersService";
+import {
+  PETITION_MESSAGE_CONTEXT_SERVICE,
+  PetitionMessageContextService,
+} from "./services/PetitionMessageContextService";
 
 @injectable()
 export class ApiContext {
@@ -89,6 +93,8 @@ export class ApiContext {
     @inject(BANKFLIP_LEGACY_SERVICE) public readonly bankflipLegacy: IBankflipLegacyService,
     @inject(PETITION_IMPORT_EXPORT_SERVICE)
     public readonly petitionImportExport: IPetitionImportExportService,
+    @inject(PETITION_MESSAGE_CONTEXT_SERVICE)
+    public readonly petitionMessageContext: PetitionMessageContextService,
 
     // Setup services
     @inject(ACCOUNT_SETUP_SERVICE) public readonly accountSetup: IAccountSetupService,
@@ -141,6 +147,8 @@ export class WorkerContext {
     @inject(FETCH_SERVICE) public readonly fetch: IFetchService,
     @inject(REPORTS_SERVICE) public readonly reports: IReportsService,
     @inject(ENCRYPTION_SERVICE) public readonly encryption: EncryptionService,
+    @inject(PETITION_MESSAGE_CONTEXT_SERVICE)
+    public readonly petitionMessageContext: PetitionMessageContextService,
 
     // Repositories
     public readonly contacts: ContactRepository,

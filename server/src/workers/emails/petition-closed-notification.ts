@@ -5,8 +5,11 @@ import { buildEmail } from "../../emails/buildEmail";
 import PetitionClosedNotification from "../../emails/emails/PetitionClosedNotification";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
+import {
+  renderSlateWithPlaceholdersToHtml,
+  renderSlateWithPlaceholdersToText,
+} from "../../util/slate/placeholders";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
-import { toHtml, toPlainText } from "../../util/slate";
 import { random } from "../../util/token";
 
 export async function petitionClosedNotification(
@@ -55,7 +58,15 @@ export async function petitionClosedNotification(
       continue;
     }
 
-    const renderContext = { contact, user: senderData, petition };
+    const getValues = await context.petitionMessageContext.fetchPlaceholderValues(
+      {
+        contactId: contact.id,
+        petitionId: payload.petition_id,
+        userId: payload.user_id,
+        petitionAccessId: accessId,
+      },
+      { publicContext: true }
+    );
 
     const { html, text, subject, from } = await buildEmail(
       PetitionClosedNotification,
@@ -63,8 +74,8 @@ export async function petitionClosedNotification(
         contactFullName: fullName(contact.first_name, contact.last_name)!,
         senderName: fullName(granterData.first_name, granterData.last_name)!,
         senderEmail: granterData.email,
-        bodyHtml: toHtml(payload.message, renderContext),
-        bodyPlainText: toPlainText(payload.message, renderContext),
+        bodyHtml: renderSlateWithPlaceholdersToHtml(payload.message, getValues),
+        bodyPlainText: renderSlateWithPlaceholdersToText(payload.message, getValues),
         ...layoutProps,
       },
       { locale: petition.recipient_locale }

@@ -4,33 +4,33 @@ import {
   useFilenamePlaceholdersRename_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { getFieldIndices } from "@parallel/utils/fieldIndices";
-import escapeStringRegexp from "escape-string-regexp";
 import { useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { sanitizeFilenameWithSuffix } from "./sanitizeFilenameWithSuffix";
 import { PlaceholderOption } from "./slate/PlaceholderPlugin";
+import { parseTextWithPlaceholders } from "./slate/textWithPlaceholder";
 
 export function useFilenamePlaceholders(): PlaceholderOption[] {
   const intl = useIntl();
   return useMemo(
     () => [
       {
-        value: "field-number",
-        label: intl.formatMessage({
+        key: "field-number",
+        text: intl.formatMessage({
           id: "component.download-dialog.placeholder-field-number",
           defaultMessage: "Field number",
         }),
       },
       {
-        value: "field-title",
-        label: intl.formatMessage({
+        key: "field-title",
+        text: intl.formatMessage({
           id: "component.download-dialog.placeholder-field-title",
           defaultMessage: "Field title",
         }),
       },
       {
-        value: "file-name",
-        label: intl.formatMessage({
+        key: "file-name",
+        text: intl.formatMessage({
           id: "component.download-dialog.placeholder-file-name",
           defaultMessage: "File name",
         }),
@@ -57,17 +57,10 @@ export function useFilenamePlaceholdersRename() {
         }
         const index = indices[fields.findIndex((f) => f.id === field.id)];
         const extension = (reply.content.filename as string).match(/\.[a-z0-9]+$/)?.[0] ?? "";
-        const parts = pattern.split(
-          new RegExp(
-            `(\\{\\{(?:${placeholders.map((p) => escapeStringRegexp(p.value)).join("|")})\\}\\})`,
-            "g"
-          )
-        );
-        const name = parts
+        const name = parseTextWithPlaceholders(pattern)
           .map((part) => {
-            if (part.startsWith("{{") && part.endsWith("}}")) {
-              const value = part.slice(2, -2);
-              switch (value) {
+            if (part.type === "placeholder") {
+              switch (part.value) {
                 case "field-number":
                   return index;
                 case "field-title":
@@ -78,8 +71,9 @@ export function useFilenamePlaceholdersRename() {
                 default:
                   return "";
               }
+            } else {
+              return part.text;
             }
-            return part.replaceAll("\\{", "{");
           })
           .join("");
 

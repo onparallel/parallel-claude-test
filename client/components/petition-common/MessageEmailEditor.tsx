@@ -1,34 +1,36 @@
-import { FormControl, FormErrorMessage, FormLabel, FormLabelProps, Input } from "@chakra-ui/react";
-import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
+import { FormControl, FormErrorMessage, FormLabel, FormLabelProps } from "@chakra-ui/react";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
-import { Ref } from "react";
+import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
 import { FormattedMessage, useIntl } from "react-intl";
+import { PlaceholderInput } from "../common/slate/PlaceholderInput";
 import { RichTextEditor } from "../common/slate/RichTextEditor";
+import { gql } from "@apollo/client";
+import { MessageEmailEditor_PetitionBaseFragment } from "@parallel/graphql/__types";
 
 export function MessageEmailEditor({
   id,
   showErrors,
-  subjectRef,
   subject,
   body,
   onSubjectChange,
   onBodyChange,
   isReadOnly,
+  petition,
   labelProps,
 }: {
   id: string;
   showErrors: boolean;
-  subjectRef?: Ref<HTMLInputElement>;
   subject: string;
   body: RichTextEditorValue;
   onSubjectChange: (value: string) => void;
   onBodyChange: (value: RichTextEditorValue) => void;
   isReadOnly?: boolean;
+  petition: MessageEmailEditor_PetitionBaseFragment;
   labelProps?: FormLabelProps;
 }) {
   const intl = useIntl();
-  const placeholderOptions = usePetitionMessagePlaceholderOptions();
+  const placeholderOptions = usePetitionMessagePlaceholderOptions({ petition });
   return (
     <>
       <FormControl isInvalid={showErrors && !subject} isDisabled={isReadOnly}>
@@ -40,18 +42,17 @@ export function MessageEmailEditor({
             />
           }
         </FormLabel>
-        <Input
+        <PlaceholderInput
           data-testid="petition-email-subject-input"
-          type="text"
-          ref={subjectRef}
           value={subject}
           maxLength={255}
-          onChange={(event) => onSubjectChange(event.target.value)}
+          onChange={(value) => onSubjectChange(value)}
           onBlur={() => onSubjectChange(subject.trim())}
           placeholder={intl.formatMessage({
             id: "component.message-email-editor.subject-placeholder",
             defaultMessage: "Enter the subject of the email",
           })}
+          placeholders={placeholderOptions}
           isDisabled={isReadOnly}
         />
         <FormErrorMessage>
@@ -88,3 +89,12 @@ export function MessageEmailEditor({
     </>
   );
 }
+
+MessageEmailEditor.fragments = {
+  PetitionBase: gql`
+    fragment MessageEmailEditor_PetitionBase on PetitionBase {
+      ...usePetitionMessagePlaceholderOptions_PetitionBase
+    }
+    ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}
+  `,
+};

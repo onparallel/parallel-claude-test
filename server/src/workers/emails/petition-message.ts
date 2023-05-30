@@ -4,7 +4,10 @@ import { buildEmail } from "../../emails/buildEmail";
 import PetitionMessage from "../../emails/emails/PetitionMessage";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { toHtml, toPlainText } from "../../util/slate";
+import {
+  renderSlateWithPlaceholdersToHtml,
+  renderSlateWithPlaceholdersToText,
+} from "../../util/slate/placeholders";
 
 export async function petitionMessage(
   payload: { petition_message_id: number },
@@ -14,18 +17,15 @@ export async function petitionMessage(
   if (!message) {
     throw new Error(`Parallel message not found for id ${payload.petition_message_id}`);
   }
-  const [petition, sender, senderData, access, accesses] = await Promise.all([
-    context.petitions.loadPetition(message.petition_id),
-    context.users.loadUser(message.sender_id),
+
+  const [petition, senderData, access, accesses] = await Promise.all([
+    context.readonlyPetitions.loadPetition(message.petition_id),
     context.users.loadUserDataByUserId(message.sender_id),
-    context.petitions.loadAccess(message.petition_access_id),
-    context.petitions.loadAccessesForPetition(message.petition_id),
+    context.readonlyPetitions.loadAccess(message.petition_access_id),
+    context.readonlyPetitions.loadAccessesForPetition(message.petition_id),
   ]);
   if (!petition) {
     return; // if the petition was deleted, return without throwing error
-  }
-  if (!sender) {
-    throw new Error(`User not found for petition_message.sender_id ${message.sender_id}`);
   }
   if (!senderData) {
     throw new Error(`UserData not found for User:${message.sender_id}`);
@@ -40,11 +40,10 @@ export async function petitionMessage(
     throw new Error(`Contact not found for petition_access.contact_id ${access.contact_id}`);
   }
 
-  const orgId = sender.org_id;
+  const orgId = petition.org_id;
 
   const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(orgId);
   const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
-  const renderContext = { contact, user: senderData, petition };
 
   const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
     orgId,
@@ -63,14 +62,24 @@ export async function petitionMessage(
       }))
     : null;
 
+  const getValue = await context.petitionMessageContext.fetchPlaceholderValues(
+    {
+      petitionId: message.petition_id,
+      userId: message.sender_id,
+      contactId: access.contact_id,
+      petitionAccessId: access.id,
+    },
+    { publicContext: true }
+  );
+
   const { html, text, subject, from } = await buildEmail(
     PetitionMessage,
     {
       senderName: fullName(senderData.first_name, senderData.last_name)!,
       senderEmail: senderData.email,
-      subject: message.email_subject,
-      bodyHtml: toHtml(bodyJson, renderContext),
-      bodyPlainText: toPlainText(bodyJson, renderContext),
+      subject: message.email_subject ?? null,
+      bodyHtml: renderSlateWithPlaceholdersToHtml(bodyJson, getValue),
+      bodyPlainText: renderSlateWithPlaceholdersToText(bodyJson, getValue),
       deadline: petition.deadline,
       keycode: access.keycode,
       recipients,

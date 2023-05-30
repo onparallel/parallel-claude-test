@@ -213,6 +213,7 @@ useCompletingMessageDialog.fragments = {
   get PublicPetition() {
     return gql`
       fragment useCompletingMessageDialog_PublicPetition on PublicPetition {
+        id
         completingMessageBody
         completingMessageSubject
       }

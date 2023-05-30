@@ -156,7 +156,11 @@ export function validateTheme<TypeName extends string, FieldName extends string>
       inRange((args) => prop(args)?.[`${p}FontSize`], `${argName}.${p}FontSize`, 5, 72),
     ]),
     ...["es", "en"].map((p) =>
-      validRichTextContent((args) => prop(args)?.legalText?.[p], `${argName}.legalText.${p}`)
+      validRichTextContent(
+        (args) => prop(args)?.legalText?.[p],
+        undefined, // this legal text cannot contain PetitionField references
+        `${argName}.legalText.${p}`
+      )
     )
   ) as unknown as FieldValidateArgsResolver<TypeName, FieldName>;
 }

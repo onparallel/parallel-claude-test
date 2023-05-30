@@ -4,7 +4,7 @@ import { WorkerContext } from "../../context";
 import { PetitionField, PetitionFieldComment } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
-import { getMentions } from "../../util/slate";
+import { collectMentionsFromSlate } from "../../util/slate/mentions";
 
 async function fetchCommentAuthor(c: PetitionFieldComment, context: WorkerContext) {
   if (c.user_id) {
@@ -44,7 +44,7 @@ export async function buildFieldWithComments(
           id: c.id,
           content: c.content_json,
           mentions: await pMap(
-            getMentions(c.content_json),
+            collectMentionsFromSlate(c.content_json),
             async (m) => {
               if (m.type === "User") {
                 return { id: toGlobalId("User", m.id), highlight: m.id === userId };

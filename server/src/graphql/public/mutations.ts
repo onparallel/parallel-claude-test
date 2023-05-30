@@ -14,10 +14,11 @@ import { outdent } from "outdent";
 import { DatabaseError } from "pg";
 import { isDefined } from "remeda";
 import { getClientIp } from "request-ip";
-import { Task } from "../../db/repositories/TaskRepository";
 import { PetitionAccess, User } from "../../db/__types";
+import { Task } from "../../db/repositories/TaskRepository";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
+import { renderTextWithPlaceholders } from "../../util/slate/placeholders";
 import { stallFor } from "../../util/promises/stallFor";
 import { and, chain, checkClientServerToken, ifArgDefined } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
@@ -534,7 +535,7 @@ export const publicDelegateAccessToContact = mutationField("publicDelegateAccess
     messageBody: nonNull(jsonArg()),
   },
   authorize: authenticatePublicAccess("keycode"),
-  validateArgs: validRichTextContent((args) => args.messageBody, "messageBody"),
+  validateArgs: validRichTextContent((args) => args.messageBody, undefined, "messageBody"),
   resolve: async (_, args, ctx) => {
     const access = ctx.access!;
     const recipient = ctx.contact!;
@@ -764,11 +765,31 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
           `PublicPetitionLink:${link.id}`
         );
 
+        const messageSubject = petition.email_subject
+          ? renderTextWithPlaceholders(
+              petition.email_subject,
+              await ctx.petitionMessageContext.fetchPlaceholderValues({
+                petitionId: petition.id,
+                contactId: contact.id,
+                userId: owner.user.id,
+              })
+            )
+          : link!.title;
+
+        await ctx.petitions.updatePetition(
+          petition.id,
+          {
+            name: (petition.name ?? messageSubject).slice(0, 255),
+            status: "PENDING",
+            closed_at: null,
+          },
+          `PublicPetitionLink:${link.id}`
+        );
         const { messages } = await ctx.petitions.createAccessesAndMessages(
           petition,
           [contact.id],
           {
-            subject: petition.email_subject ?? link!.title,
+            subject: messageSubject,
             body: JSON.parse(petition.email_body!),
             remindersConfig: petition.reminders_config ?? null,
           },

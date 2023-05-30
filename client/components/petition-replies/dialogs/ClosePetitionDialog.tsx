@@ -12,7 +12,7 @@ import {
 import { PaperPlaneIcon, ThumbUpIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { PetitionLocale } from "@parallel/graphql/__types";
+import { PetitionLocale, useClosePetitionDialog_PetitionFragment } from "@parallel/graphql/__types";
 import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/textWithPlaceholder";
 import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
@@ -26,12 +26,8 @@ import { PaddedCollapse } from "../../common/PaddedCollapse";
 import { RichTextEditor, RichTextEditorInstance } from "../../common/slate/RichTextEditor";
 
 interface ClosePetitionDialogInput {
-  id: string;
-  locale: PetitionLocale;
-  petitionName: Maybe<string>;
+  petition: useClosePetitionDialog_PetitionFragment;
   requiredMessage: boolean;
-  showNotify: boolean;
-  emailMessage?: RichTextEditorValue;
 }
 
 interface ClosePetitionDialogNotification {
@@ -61,26 +57,25 @@ const messages: Record<PetitionLocale, string> = {
 };
 
 export function ClosePetitionDialog({
-  id,
-  locale,
-  petitionName,
+  petition,
   requiredMessage,
-  showNotify,
-  emailMessage,
   ...props
 }: DialogProps<ClosePetitionDialogInput, ClosePetitionDialogNotification>) {
   const intl = useIntl();
-  const placeholders = usePetitionMessagePlaceholderOptions();
+  const placeholders = usePetitionMessagePlaceholderOptions({ petition });
   const [message, setMessage] = useState(
-    emailMessage ??
-      (textWithPlaceholderToSlateNodes(messages[locale], placeholders) as RichTextEditorValue)
+    petition.closingEmailBody ??
+      (textWithPlaceholderToSlateNodes(
+        messages[petition.locale],
+        placeholders
+      ) as RichTextEditorValue)
   );
   const [sendMessage, setSendMessage] = useState(requiredMessage);
   const messageRef = useRef<RichTextEditorInstance>(null);
 
   const [attachPdfExport, setAttachPdfExport] = useState(false);
   const pdfExportTitleRef = useRef<HTMLInputElement>(null);
-  const [pdfExportTitle, setPdfExportTitle] = useState(petitionName ?? "");
+  const [pdfExportTitle, setPdfExportTitle] = useState(petition.name ?? "");
 
   const [isInvalid, setIsInvalid] = useState(false);
 
@@ -90,8 +85,6 @@ export function ClosePetitionDialog({
       setIsInvalid(false);
     }
   };
-
-  const placeholderOptions = usePetitionMessagePlaceholderOptions();
 
   return (
     <ConfirmDialog
@@ -117,28 +110,29 @@ export function ClosePetitionDialog({
               defaultMessage="When finishing, the parallel will remain closed. You can come back anytime to review the information."
             />
           </Text>
-          {showNotify ? (
+          {petition.accesses.length > 0 ? (
             <Stack>
-              <Checkbox
-                hidden={requiredMessage}
-                isChecked={sendMessage}
-                onChange={(e) => {
-                  const isChecked = e.target.checked;
-                  if (isChecked) {
-                    setTimeout(() => messageRef.current?.focus());
-                  }
-                  setSendMessage(isChecked);
-                }}
-              >
-                <FormattedMessage
-                  id="component.close-petition-dialog.notify-recipient.notify-recipient"
-                  defaultMessage="Notify the recipient that everything is reviewed."
-                />
-              </Checkbox>
+              {requiredMessage ? null : (
+                <Checkbox
+                  isChecked={sendMessage}
+                  onChange={(e) => {
+                    const isChecked = e.target.checked;
+                    if (isChecked) {
+                      setTimeout(() => messageRef.current?.focus());
+                    }
+                    setSendMessage(isChecked);
+                  }}
+                >
+                  <FormattedMessage
+                    id="component.close-petition-dialog.notify-recipient.notify-recipient"
+                    defaultMessage="Notify the recipient that everything is reviewed."
+                  />
+                </Checkbox>
+              )}
               <PaddedCollapse in={requiredMessage || sendMessage}>
                 <Stack>
                   <RichTextEditor
-                    id={`close-petition-message-${id}`}
+                    id={`close-petition-message-${petition.id}`}
                     isInvalid={isInvalid}
                     ref={messageRef}
                     value={message}
@@ -147,7 +141,7 @@ export function ClosePetitionDialog({
                       id: "component.close-petition-dialog.notify-recipient.message-placeholder",
                       defaultMessage: "Add a message to include in the email",
                     })}
-                    placeholderOptions={placeholderOptions}
+                    placeholderOptions={placeholders}
                   />
                   <Checkbox
                     colorScheme="primary"
@@ -200,14 +194,15 @@ export function ClosePetitionDialog({
           colorScheme="primary"
           onClick={() => {
             if (sendMessage && (isEmptyRTEValue(message) || (attachPdfExport && !pdfExportTitle))) {
-              if (isEmptyRTEValue(message)) setIsInvalid(true);
-              return;
+              if (isEmptyRTEValue(message)) {
+                setIsInvalid(true);
+              }
+            } else {
+              props.onResolve({
+                message: sendMessage ? message : null,
+                pdfExportTitle: attachPdfExport ? pdfExportTitle : null,
+              });
             }
-
-            props.onResolve({
-              message: sendMessage ? message : null,
-              pdfExportTitle: attachPdfExport ? pdfExportTitle : null,
-            });
           }}
         >
           {sendMessage ? (
@@ -236,7 +231,14 @@ useClosePetitionDialog.fragments = {
   Petition: gql`
     fragment useClosePetitionDialog_Petition on Petition {
       id
+      locale
+      name
+      accesses {
+        id
+      }
       closingEmailBody
+      ...usePetitionMessagePlaceholderOptions_PetitionBase
     }
+    ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}
   `,
 };
