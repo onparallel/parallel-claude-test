@@ -196,7 +196,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
     const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
     const inputStyles = {
       ...omit(inputStyleConfig as any, ["px", "h", "_focus", "_invalid"]),
-      _focusWithin: (inputStyleConfig as any)._focus,
+      _focusWithin: (inputStyleConfig as any)._focusVisible,
       _invalid: (inputStyleConfig as any)._invalid,
     } as any;
 
@@ -235,6 +235,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
           {...props}
           sx={{
             "[data-slate-editor]": {
+              outline: "none",
               minHeight: "120px !important",
               paddingX: 4,
               paddingY: 3,
