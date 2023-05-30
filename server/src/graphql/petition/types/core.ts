@@ -474,16 +474,6 @@ export const PetitionTemplate = objectType({
           : null;
       },
     });
-    t.nullable.string("descriptionExcerpt", {
-      description: "HTML excerpt of the template description.",
-      resolve: (o) => {
-        if (o.template_description) {
-          const content = safeJsonParse(o.template_description);
-          return renderSlateToText([content[0]]).slice(0, 200);
-        }
-        return null;
-      },
-    });
     t.nullable.field("publicLink", {
       type: "PublicPetitionLink",
       description: "The public link linked to this template",

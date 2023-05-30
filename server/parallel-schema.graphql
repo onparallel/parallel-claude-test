@@ -4137,11 +4137,6 @@ type PetitionTemplate implements PetitionBase {
   description: JSON
 
   """
-  HTML excerpt of the template description.
-  """
-  descriptionExcerpt: String
-
-  """
   HTML description of the template.
   """
   descriptionHtml: String

@@ -3161,8 +3161,6 @@ export type PetitionTemplate = PetitionBase & {
   defaultPermissions: Array<TemplateDefaultPermission>;
   /** Description of the template. */
   description: Maybe<Scalars["JSON"]>;
-  /** HTML excerpt of the template description. */
-  descriptionExcerpt: Maybe<Scalars["String"]>;
   /** HTML description of the template. */
   descriptionHtml: Maybe<Scalars["String"]>;
   /** The default effective permissions on the template */

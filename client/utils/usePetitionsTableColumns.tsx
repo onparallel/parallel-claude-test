@@ -453,7 +453,6 @@ usePetitionsTableColumns.fragments = {
         ...PetitionSignatureCellContent_Petition
       }
       ... on PetitionTemplate {
-        descriptionExcerpt
         ...TemplateActiveSettingsIcons_PetitionTemplate
       }
     }

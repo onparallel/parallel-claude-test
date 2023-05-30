@@ -120,7 +120,6 @@ export const PublicTemplateCard = Object.assign(
         fragment PublicTemplateCard_PetitionTemplate on PetitionTemplate {
           id
           name
-          descriptionExcerpt
           backgroundColor
           categories
           imageUrl(options: { resize: { height: 212 } })

@@ -2422,33 +2422,6 @@ describe("GraphQL/Petitions", () => {
       });
     });
 
-    it("updates template description with given value", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionId: GID!, $description: JSON) {
-            updatePetition(petitionId: $petitionId, data: { description: $description }) {
-              id
-              ... on PetitionTemplate {
-                descriptionExcerpt
-              }
-              __typename
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", petitions[6].id),
-          description: fromPlainText("this is the description"),
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data!.updatePetition).toEqual({
-        id: toGlobalId("Petition", petitions[6].id),
-        descriptionExcerpt: "this is the description",
-        __typename: "PetitionTemplate",
-      });
-    });
-
     it("trims name and emailSubject before updating petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`

@@ -2133,7 +2133,6 @@ export interface NexusGenFieldTypes {
     defaultPath: string; // String!
     defaultPermissions: NexusGenRootTypes["TemplateDefaultPermission"][]; // [TemplateDefaultPermission!]!
     description: NexusGenScalars["JSON"] | null; // JSON
-    descriptionExcerpt: string | null; // String
     descriptionHtml: string | null; // String
     effectiveDefaultPermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
     effectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
@@ -4135,7 +4134,6 @@ export interface NexusGenFieldTypeNames {
     defaultPath: "String";
     defaultPermissions: "TemplateDefaultPermission";
     description: "JSON";
-    descriptionExcerpt: "String";
     descriptionHtml: "String";
     effectiveDefaultPermissions: "EffectivePetitionUserPermission";
     effectivePermissions: "EffectivePetitionUserPermission";

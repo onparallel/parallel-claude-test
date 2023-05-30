@@ -3264,8 +3264,6 @@ export interface PetitionTemplate extends PetitionBase {
   defaultPermissions: Array<TemplateDefaultPermission>;
   /** Description of the template. */
   description?: Maybe<Scalars["JSON"]>;
-  /** HTML excerpt of the template description. */
-  descriptionExcerpt?: Maybe<Scalars["String"]>;
   /** HTML description of the template. */
   descriptionHtml?: Maybe<Scalars["String"]>;
   /** The default effective permissions on the template */
@@ -12647,7 +12645,6 @@ export type PublicTemplateCard_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
-  descriptionExcerpt?: string | null;
   backgroundColor?: string | null;
   categories?: Array<string> | null;
   imageUrl?: string | null;
@@ -26133,7 +26130,6 @@ export type Petitions_PetitionBaseOrFolder_PetitionFolder_Fragment = {
 export type Petitions_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   isPublic: boolean;
-  descriptionExcerpt?: string | null;
   id: string;
   name?: string | null;
   createdAt: string;
@@ -26395,7 +26391,6 @@ export type Petitions_petitionsQuery = {
       | {
           __typename?: "PetitionTemplate";
           isPublic: boolean;
-          descriptionExcerpt?: string | null;
           id: string;
           name?: string | null;
           createdAt: string;
@@ -26520,7 +26515,6 @@ export type NewPetition_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
-  descriptionExcerpt?: string | null;
   backgroundColor?: string | null;
   categories?: Array<string> | null;
   imageUrl?: string | null;
@@ -26625,7 +26619,6 @@ export type NewPetition_templatesQuery = {
           __typename?: "PetitionTemplate";
           id: string;
           name?: string | null;
-          descriptionExcerpt?: string | null;
           backgroundColor?: string | null;
           categories?: Array<string> | null;
           imageUrl?: string | null;
@@ -30488,7 +30481,6 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
 
 export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-  descriptionExcerpt?: string | null;
   id: string;
   name?: string | null;
   createdAt: string;
@@ -35369,7 +35361,6 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
       ...PetitionSignatureCellContent_Petition
     }
     ... on PetitionTemplate {
-      descriptionExcerpt
       ...TemplateActiveSettingsIcons_PetitionTemplate
     }
   }
@@ -35435,7 +35426,6 @@ export const PublicTemplateCard_PetitionTemplateFragmentDoc = gql`
   fragment PublicTemplateCard_PetitionTemplate on PetitionTemplate {
     id
     name
-    descriptionExcerpt
     backgroundColor
     categories
     imageUrl(options: { resize: { height: 212 } })
