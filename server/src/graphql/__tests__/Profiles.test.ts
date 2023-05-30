@@ -686,7 +686,7 @@ describe("GraphQL/Profiles", () => {
     });
 
     it("updates profile names when chaging the profile name pattern", async () => {
-      async function createIndividualProfile(firstName: string, lastName: string) {
+      async function createIndividualProfile(firstName?: string, lastName?: string) {
         const { data } = await testClient.execute(
           gql`
             mutation ($profileTypeId: GID!) {
@@ -724,6 +724,9 @@ describe("GraphQL/Profiles", () => {
       }
       await createIndividualProfile("Mickey", "Mouse");
       await createIndividualProfile("Donald", "Duck");
+      await createIndividualProfile("Trump", "");
+      await createIndividualProfile("", "Obama");
+      await createIndividualProfile();
 
       const { data } = await testClient.execute(
         gql`
@@ -745,10 +748,13 @@ describe("GraphQL/Profiles", () => {
         }
       );
       expect(data.profiles).toEqual({
-        totalCount: 2,
+        totalCount: 5,
         items: [
+          { id: expect.any(String), name: "Trump" },
+          { id: expect.any(String), name: "Obama" },
           { id: expect.any(String), name: "Mickey Mouse" },
           { id: expect.any(String), name: "Donald Duck" },
+          { id: expect.any(String), name: "" },
         ],
       });
       const firstName = toGlobalId("ProfileTypeField", profileType0Fields[0].id);
@@ -797,12 +803,94 @@ describe("GraphQL/Profiles", () => {
         }
       );
       expect(data3.profiles).toEqual({
-        totalCount: 2,
+        totalCount: 5,
         items: [
+          { id: expect.any(String), name: ", Trump" },
+          { id: expect.any(String), name: "Obama," },
           { id: expect.any(String), name: "Mouse, Mickey" },
           { id: expect.any(String), name: "Duck, Donald" },
+          { id: expect.any(String), name: "," },
         ],
       });
+
+      const emptyField = toGlobalId("ProfileTypeField", profileType0Fields[5].id);
+      const { errors: errorsEmptyField, data: dataEmptyField } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $profileNamePattern: String!) {
+            updateProfileType(
+              profileTypeId: $profileTypeId
+              profileNamePattern: $profileNamePattern
+            ) {
+              id
+              profileNamePattern
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileNamePattern: `{{${emptyField}}}-static-text`,
+        }
+      );
+
+      expect(errorsEmptyField).toBeUndefined();
+      expect(dataEmptyField.updateProfileType).toEqual({
+        id: toGlobalId("ProfileType", profileTypes[0].id),
+        profileNamePattern: `{{${emptyField}}}-static-text`,
+      });
+
+      const { data: dataProfilesEmptyField } = await testClient.execute(
+        gql`
+          query ($limit: Int, $offset: Int, $sortBy: [QueryProfiles_OrderBy!]) {
+            profiles(limit: $limit, offset: $offset, sortBy: $sortBy) {
+              totalCount
+              items {
+                id
+                name
+              }
+            }
+          }
+        `,
+        {
+          limit: 10,
+          offset: 0,
+          sortBy: ["name_DESC"],
+          locale: "en",
+        }
+      );
+      expect(dataProfilesEmptyField.profiles).toEqual({
+        totalCount: 5,
+        items: [
+          { id: expect.any(String), name: "-static-text" },
+          { id: expect.any(String), name: "-static-text" },
+          { id: expect.any(String), name: "-static-text" },
+          { id: expect.any(String), name: "-static-text" },
+          { id: expect.any(String), name: "-static-text" },
+        ],
+      });
+    });
+
+    it("fails when passing a profile name pattern whit invalid fields in it", async () => {
+      const phoneField = toGlobalId("ProfileTypeField", profileType0Fields[3].id);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $profileNamePattern: String!) {
+            updateProfileType(
+              profileTypeId: $profileTypeId
+              profileNamePattern: $profileNamePattern
+            ) {
+              id
+              profileNamePattern
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          profileNamePattern: `{{${phoneField}}}`,
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PROFILE_NAME_PATTERN");
+      expect(data).toBeNull();
     });
 
     it("fails when passing a profile name pattern without fields in it", async () => {
@@ -1592,14 +1680,14 @@ describe("GraphQL/Profiles", () => {
         })),
       });
 
-      const profile2 = await updateProfileValue(profile.id, [
+      const updateProfileFieldInPattern = await updateProfileValue(profile.id, [
         {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
           content: { value: "John" },
         },
       ]);
 
-      expect(profile2).toEqual({
+      expect(updateProfileFieldInPattern).toEqual({
         id: expect.any(String),
         name: "John",
         properties: profileType0Fields.map((f) => ({
@@ -1611,14 +1699,14 @@ describe("GraphQL/Profiles", () => {
         })),
       });
 
-      const profile3 = await updateProfileValue(profile.id, [
+      const updateProfileFieldInPattern2 = await updateProfileValue(profile.id, [
         {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
           content: { value: "Wick" },
         },
       ]);
 
-      expect(profile3).toEqual({
+      expect(updateProfileFieldInPattern2).toEqual({
         id: expect.any(String),
         name: "John Wick",
         properties: profileType0Fields.map((f) => ({
@@ -1629,6 +1717,39 @@ describe("GraphQL/Profiles", () => {
               : f.id === profileType0Fields[1].id
               ? { content: { value: "Wick" }, expiryDate: null }
               : null,
+        })),
+      });
+
+      const removesOneValue = await updateProfileValue(profile.id, [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+          content: null,
+        },
+      ]);
+      expect(removesOneValue).toEqual({
+        id: expect.any(String),
+        name: "John",
+        properties: profileType0Fields.map((f) => ({
+          field: { id: toGlobalId("ProfileTypeField", f.id), isExpirable: f.is_expirable },
+          value:
+            f.id === profileType0Fields[0].id
+              ? { content: { value: "John" }, expiryDate: null }
+              : null,
+        })),
+      });
+
+      const removesAllValuesInNamePattern = await updateProfileValue(profile.id, [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+          content: null,
+        },
+      ]);
+      expect(removesAllValuesInNamePattern).toEqual({
+        id: expect.any(String),
+        name: "",
+        properties: profileType0Fields.map((f) => ({
+          field: { id: toGlobalId("ProfileTypeField", f.id), isExpirable: f.is_expirable },
+          value: null,
         })),
       });
     });
