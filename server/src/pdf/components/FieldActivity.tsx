@@ -48,7 +48,9 @@ export function FieldActivity({
           }}
         />
       </Text>
-      {isDefined(reply.approvedBy) && reply.field?.requireApproval ? (
+      {isDefined(reply.lastReviewedBy) &&
+      reply.status === "APPROVED" &&
+      reply.field?.requireApproval ? (
         <View style={[{ flexDirection: "row", marginTop: "1mm" }]}>
           <Svg viewBox="0 0 14 14" style={{ width: "12px", height: "12px" }}>
             <Polygon
@@ -63,13 +65,13 @@ export function FieldActivity({
               values={{
                 name: (
                   <UserReference
-                    user={reply.approvedBy}
+                    user={reply.lastReviewedBy}
                     _deleted={{ textTransform: "lowercase" }}
                   />
                 ),
                 date: (
                   <DateTime
-                    value={reply.approvedAt ?? 0}
+                    value={reply.lastReviewedAt ?? 0}
                     format={{ timeZone: "UTC", timeZoneName: "short", ...FORMATS.LLL }}
                   />
                 ),
@@ -86,14 +88,15 @@ FieldActivity.fragments = {
   PetitionFieldReply: gql`
     fragment FieldActivity_PetitionFieldReply on PetitionFieldReply {
       id
+      status
       repliedBy {
         ...UserOrContactReference_UserOrPetitionAccess
       }
       repliedAt
-      approvedBy {
+      lastReviewedBy {
         ...UserReference_User
       }
-      approvedAt
+      lastReviewedAt
       field {
         requireApproval
       }

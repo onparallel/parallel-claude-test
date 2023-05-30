@@ -1945,13 +1945,13 @@ export interface NexusGenFieldTypes {
   };
   PetitionFieldReply: {
     // field return type
-    approvedAt: NexusGenScalars["DateTime"] | null; // DateTime
-    approvedBy: NexusGenRootTypes["User"] | null; // User
     content: NexusGenScalars["JSONObject"]; // JSONObject!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: NexusGenScalars["GID"]; // GID!
     isAnonymized: boolean; // Boolean!
+    lastReviewedAt: NexusGenScalars["DateTime"] | null; // DateTime
+    lastReviewedBy: NexusGenRootTypes["User"] | null; // User
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     repliedAt: NexusGenScalars["DateTime"]; // DateTime!
     repliedBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
@@ -3947,13 +3947,13 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionFieldReply: {
     // field return type name
-    approvedAt: "DateTime";
-    approvedBy: "User";
     content: "JSONObject";
     createdAt: "DateTime";
     field: "PetitionField";
     id: "GID";
     isAnonymized: "Boolean";
+    lastReviewedAt: "DateTime";
+    lastReviewedBy: "User";
     metadata: "JSONObject";
     repliedAt: "DateTime";
     repliedBy: "UserOrPetitionAccess";

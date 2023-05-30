@@ -3400,16 +3400,6 @@ A reply to a petition field
 """
 type PetitionFieldReply implements Timestamps {
   """
-  When the reply was created or last updated
-  """
-  approvedAt: DateTime
-
-  """
-  The person that approved the reply.
-  """
-  approvedBy: User
-
-  """
   The content of the reply.
   """
   content: JSONObject!
@@ -3429,6 +3419,16 @@ type PetitionFieldReply implements Timestamps {
   """
   id: GID!
   isAnonymized: Boolean!
+
+  """
+  When the reply was reviewed.
+  """
+  lastReviewedAt: DateTime
+
+  """
+  The person that reviewed the reply.
+  """
+  lastReviewedBy: User
 
   """
   Metadata for this reply.

@@ -2738,10 +2738,6 @@ export type PetitionFieldProgress = {
 
 /** A reply to a petition field */
 export type PetitionFieldReply = Timestamps & {
-  /** When the reply was created or last updated */
-  approvedAt: Maybe<Scalars["DateTime"]>;
-  /** The person that approved the reply. */
-  approvedBy: Maybe<User>;
   /** The content of the reply. */
   content: Scalars["JSONObject"];
   /** Time when the resource was created. */
@@ -2751,6 +2747,10 @@ export type PetitionFieldReply = Timestamps & {
   /** The ID of the petition field reply. */
   id: Scalars["GID"];
   isAnonymized: Scalars["Boolean"];
+  /** When the reply was reviewed. */
+  lastReviewedAt: Maybe<Scalars["DateTime"]>;
+  /** The person that reviewed the reply. */
+  lastReviewedBy: Maybe<User>;
   /** Metadata for this reply. */
   metadata: Scalars["JSONObject"];
   /** When the reply was created or last updated */
@@ -4718,13 +4718,14 @@ export type ContactReference_ContactFragment = { id: string; fullName: string };
 
 export type FieldActivity_PetitionFieldReplyFragment = {
   id: string;
+  status: PetitionFieldReplyStatus;
   repliedAt: string;
-  approvedAt: string | null;
+  lastReviewedAt: string | null;
   repliedBy:
     | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
     | { __typename: "User"; id: string; fullName: string | null }
     | null;
-  approvedBy: { id: string; fullName: string | null } | null;
+  lastReviewedBy: { id: string; fullName: string | null } | null;
   field: { requireApproval: boolean } | null;
 };
 
@@ -4778,12 +4779,12 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
       status: PetitionFieldReplyStatus;
       metadata: { [key: string]: any };
       repliedAt: string;
-      approvedAt: string | null;
+      lastReviewedAt: string | null;
       repliedBy:
         | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
         | { __typename: "User"; id: string; fullName: string | null }
         | null;
-      approvedBy: { id: string; fullName: string | null } | null;
+      lastReviewedBy: { id: string; fullName: string | null } | null;
       field: { requireApproval: boolean } | null;
     }>;
   }>;
@@ -4812,12 +4813,12 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
       status: PetitionFieldReplyStatus;
       metadata: { [key: string]: any };
       repliedAt: string;
-      approvedAt: string | null;
+      lastReviewedAt: string | null;
       repliedBy:
         | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
         | { __typename: "User"; id: string; fullName: string | null }
         | null;
-      approvedBy: { id: string; fullName: string | null } | null;
+      lastReviewedBy: { id: string; fullName: string | null } | null;
       field: { requireApproval: boolean } | null;
     }>;
   }>;
@@ -4844,12 +4845,12 @@ export type PetitionExport_PetitionFieldFragment = {
     content: { [key: string]: any };
     metadata: { [key: string]: any };
     repliedAt: string;
-    approvedAt: string | null;
+    lastReviewedAt: string | null;
     repliedBy:
       | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
       | { __typename: "User"; id: string; fullName: string | null }
       | null;
-    approvedBy: { id: string; fullName: string | null } | null;
+    lastReviewedBy: { id: string; fullName: string | null } | null;
     field: { requireApproval: boolean } | null;
   }>;
 };
@@ -4888,12 +4889,12 @@ export type PetitionExport_petitionQuery = {
             status: PetitionFieldReplyStatus;
             metadata: { [key: string]: any };
             repliedAt: string;
-            approvedAt: string | null;
+            lastReviewedAt: string | null;
             repliedBy:
               | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
               | { __typename: "User"; id: string; fullName: string | null }
               | null;
-            approvedBy: { id: string; fullName: string | null } | null;
+            lastReviewedBy: { id: string; fullName: string | null } | null;
             field: { requireApproval: boolean } | null;
           }>;
         }>;
@@ -4921,12 +4922,12 @@ export type PetitionExport_petitionQuery = {
             status: PetitionFieldReplyStatus;
             metadata: { [key: string]: any };
             repliedAt: string;
-            approvedAt: string | null;
+            lastReviewedAt: string | null;
             repliedBy:
               | { __typename: "PetitionAccess"; contact: { id: string; fullName: string } | null }
               | { __typename: "User"; id: string; fullName: string | null }
               | null;
-            approvedBy: { id: string; fullName: string | null } | null;
+            lastReviewedBy: { id: string; fullName: string | null } | null;
             field: { requireApproval: boolean } | null;
           }>;
         }>;
@@ -4990,14 +4991,15 @@ export const UserOrContactReference_UserOrPetitionAccessFragmentDoc = gql`
 export const FieldActivity_PetitionFieldReplyFragmentDoc = gql`
   fragment FieldActivity_PetitionFieldReply on PetitionFieldReply {
     id
+    status
     repliedBy {
       ...UserOrContactReference_UserOrPetitionAccess
     }
     repliedAt
-    approvedBy {
+    lastReviewedBy {
       ...UserReference_User
     }
-    approvedAt
+    lastReviewedAt
     field {
       requireApproval
     }

@@ -231,15 +231,41 @@ export function PetitionRepliesFieldReply({
               <EsTaxDocumentsContentErrorMessage error={reply.content.error} />
             ) : null
           ) : (
-            <Text color="gray.500">
-              {reply.updatedBy?.__typename === "User" && reply.updatedBy.isMe ? (
-                <FormattedMessage id="generic.you" defaultMessage="You" />
-              ) : (
-                <UserOrContactReference userOrAccess={reply.updatedBy} isLink={false} />
-              )}
-              {", "}
-              <DateTime as="span" value={reply.createdAt} format={FORMATS.LLL} />
-            </Text>
+            <HStack
+              wrap={"wrap"}
+              spacing={0}
+              gap={{ base: 1.5, lg: 2 }}
+              lineHeight="1.2"
+              divider={<Text as="span">{"·"}</Text>}
+            >
+              <Text color="gray.500">
+                {reply.updatedBy?.__typename === "User" && reply.updatedBy.isMe ? (
+                  <FormattedMessage id="generic.you" defaultMessage="You" />
+                ) : (
+                  <UserOrContactReference userOrAccess={reply.updatedBy} isLink={false} />
+                )}
+                {", "}
+                <DateTime as="span" value={reply.createdAt} format={FORMATS.LLL} />
+              </Text>
+              {reply.lastReviewedAt && reply.lastReviewedBy && reply.status !== "PENDING" ? (
+                <HStack>
+                  {reply.status === "APPROVED" ? (
+                    <CheckIcon color="gray.600" boxSize={3.5} />
+                  ) : (
+                    <CloseIcon color="gray.600" boxSize={3} />
+                  )}
+                  <Text color="gray.500">
+                    {reply.lastReviewedBy.isMe ? (
+                      <FormattedMessage id="generic.you" defaultMessage="You" />
+                    ) : (
+                      <UserOrContactReference userOrAccess={reply.lastReviewedBy} isLink={false} />
+                    )}
+                    {", "}
+                    <DateTime as="span" value={reply.lastReviewedAt} format={FORMATS.LLL} />
+                  </Text>
+                </HStack>
+              ) : null}
+            </HStack>
           )}
         </GridItem>
       </Grid>
@@ -306,6 +332,11 @@ PetitionRepliesFieldReply.fragments = {
           isMe
         }
       }
+      lastReviewedBy {
+        isMe
+        ...UserOrContactReference_UserOrPetitionAccess
+      }
+      lastReviewedAt
       isAnonymized
       ...CopyOrDownloadReplyButton_PetitionFieldReply
     }

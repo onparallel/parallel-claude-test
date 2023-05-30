@@ -2822,10 +2822,6 @@ export interface PetitionFieldProgress {
 /** A reply to a petition field */
 export interface PetitionFieldReply extends Timestamps {
   __typename?: "PetitionFieldReply";
-  /** When the reply was created or last updated */
-  approvedAt?: Maybe<Scalars["DateTime"]>;
-  /** The person that approved the reply. */
-  approvedBy?: Maybe<User>;
   /** The content of the reply. */
   content: Scalars["JSONObject"];
   /** Time when the resource was created. */
@@ -2835,6 +2831,10 @@ export interface PetitionFieldReply extends Timestamps {
   /** The ID of the petition field reply. */
   id: Scalars["GID"];
   isAnonymized: Scalars["Boolean"];
+  /** When the reply was reviewed. */
+  lastReviewedAt?: Maybe<Scalars["DateTime"]>;
+  /** The person that reviewed the reply. */
+  lastReviewedBy?: Maybe<User>;
   /** Metadata for this reply. */
   metadata: Scalars["JSONObject"];
   /** When the reply was created or last updated */
@@ -13464,6 +13464,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
     status: PetitionFieldReplyStatus;
     createdAt: string;
     metadata: { [key: string]: any };
+    lastReviewedAt?: string | null;
     isAnonymized: boolean;
     field?: {
       __typename?: "PetitionField";
@@ -13485,6 +13486,13 @@ export type PetitionRepliesField_PetitionFieldFragment = {
           status: UserStatus;
         }
       | null;
+    lastReviewedBy?: {
+      __typename?: "User";
+      isMe: boolean;
+      id: string;
+      fullName?: string | null;
+      status: UserStatus;
+    } | null;
   }>;
   comments: Array<{
     __typename?: "PetitionFieldComment";
@@ -13512,6 +13520,7 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
   status: PetitionFieldReplyStatus;
   createdAt: string;
   metadata: { [key: string]: any };
+  lastReviewedAt?: string | null;
   isAnonymized: boolean;
   field?: {
     __typename?: "PetitionField";
@@ -13533,6 +13542,13 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
         status: UserStatus;
       }
     | null;
+  lastReviewedBy?: {
+    __typename?: "User";
+    isMe: boolean;
+    id: string;
+    fullName?: string | null;
+    status: UserStatus;
+  } | null;
 };
 
 export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutationVariables = Exact<{
@@ -13695,6 +13711,7 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
   status: PetitionFieldReplyStatus;
   createdAt: string;
   metadata: { [key: string]: any };
+  lastReviewedAt?: string | null;
   isAnonymized: boolean;
   field?: {
     __typename?: "PetitionField";
@@ -13716,6 +13733,13 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
         status: UserStatus;
       }
     | null;
+  lastReviewedBy?: {
+    __typename?: "User";
+    isMe: boolean;
+    id: string;
+    fullName?: string | null;
+    status: UserStatus;
+  } | null;
 };
 
 export type DatesList_SignerStatusFragment = {
@@ -24532,6 +24556,7 @@ export type PetitionReplies_PetitionFragment = {
       status: PetitionFieldReplyStatus;
       createdAt: string;
       metadata: { [key: string]: any };
+      lastReviewedAt?: string | null;
       field?: {
         __typename?: "PetitionField";
         id: string;
@@ -24557,6 +24582,13 @@ export type PetitionReplies_PetitionFragment = {
             status: UserStatus;
           }
         | null;
+      lastReviewedBy?: {
+        __typename?: "User";
+        isMe: boolean;
+        id: string;
+        fullName?: string | null;
+        status: UserStatus;
+      } | null;
     }>;
     comments: Array<{
       __typename?: "PetitionFieldComment";
@@ -24729,6 +24761,7 @@ export type PetitionReplies_PetitionFieldFragment = {
     status: PetitionFieldReplyStatus;
     createdAt: string;
     metadata: { [key: string]: any };
+    lastReviewedAt?: string | null;
     field?: {
       __typename?: "PetitionField";
       id: string;
@@ -24749,6 +24782,13 @@ export type PetitionReplies_PetitionFieldFragment = {
           status: UserStatus;
         }
       | null;
+    lastReviewedBy?: {
+      __typename?: "User";
+      isMe: boolean;
+      id: string;
+      fullName?: string | null;
+      status: UserStatus;
+    } | null;
   }>;
   comments: Array<{
     __typename?: "PetitionFieldComment";
@@ -24969,6 +25009,7 @@ export type PetitionReplies_closePetitionMutation = {
         status: PetitionFieldReplyStatus;
         createdAt: string;
         metadata: { [key: string]: any };
+        lastReviewedAt?: string | null;
         field?: {
           __typename?: "PetitionField";
           id: string;
@@ -24994,6 +25035,13 @@ export type PetitionReplies_closePetitionMutation = {
               status: UserStatus;
             }
           | null;
+        lastReviewedBy?: {
+          __typename?: "User";
+          isMe: boolean;
+          id: string;
+          fullName?: string | null;
+          status: UserStatus;
+        } | null;
       }>;
       comments: Array<{
         __typename?: "PetitionFieldComment";
@@ -25202,6 +25250,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         status: PetitionFieldReplyStatus;
         createdAt: string;
         metadata: { [key: string]: any };
+        lastReviewedAt?: string | null;
         field?: {
           __typename?: "PetitionField";
           id: string;
@@ -25227,6 +25276,13 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
               status: UserStatus;
             }
           | null;
+        lastReviewedBy?: {
+          __typename?: "User";
+          isMe: boolean;
+          id: string;
+          fullName?: string | null;
+          status: UserStatus;
+        } | null;
       }>;
       comments: Array<{
         __typename?: "PetitionFieldComment";
@@ -25409,6 +25465,43 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
       __typename?: "PetitionFieldReply";
       id: string;
       status: PetitionFieldReplyStatus;
+      content: { [key: string]: any };
+      createdAt: string;
+      metadata: { [key: string]: any };
+      lastReviewedAt?: string | null;
+      isAnonymized: boolean;
+      field?: {
+        __typename?: "PetitionField";
+        id: string;
+        type: PetitionFieldType;
+        options: { [key: string]: any };
+        requireApproval: boolean;
+      } | null;
+      updatedBy?:
+        | {
+            __typename?: "PetitionAccess";
+            contact?: {
+              __typename?: "Contact";
+              id: string;
+              fullName: string;
+              email: string;
+            } | null;
+          }
+        | {
+            __typename?: "User";
+            isMe: boolean;
+            id: string;
+            fullName?: string | null;
+            status: UserStatus;
+          }
+        | null;
+      lastReviewedBy?: {
+        __typename?: "User";
+        isMe: boolean;
+        id: string;
+        fullName?: string | null;
+        status: UserStatus;
+      } | null;
     }>;
   };
 };
@@ -25541,6 +25634,7 @@ export type PetitionReplies_petitionQuery = {
             status: PetitionFieldReplyStatus;
             createdAt: string;
             metadata: { [key: string]: any };
+            lastReviewedAt?: string | null;
             field?: {
               __typename?: "PetitionField";
               id: string;
@@ -25566,6 +25660,13 @@ export type PetitionReplies_petitionQuery = {
                   status: UserStatus;
                 }
               | null;
+            lastReviewedBy?: {
+              __typename?: "User";
+              isMe: boolean;
+              id: string;
+              fullName?: string | null;
+              status: UserStatus;
+            } | null;
           }>;
           comments: Array<{
             __typename?: "PetitionFieldComment";
@@ -34445,6 +34546,11 @@ export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
         isMe
       }
     }
+    lastReviewedBy {
+      isMe
+      ...UserOrContactReference_UserOrPetitionAccess
+    }
+    lastReviewedAt
     isAnonymized
     ...CopyOrDownloadReplyButton_PetitionFieldReply
   }
@@ -39545,9 +39651,11 @@ export const PetitionReplies_updatePetitionFieldRepliesStatusDocument = gql`
       replies {
         id
         status
+        ...PetitionRepliesFieldReply_PetitionFieldReply
       }
     }
   }
+  ${PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionReplies_updatePetitionFieldRepliesStatusMutation,
   PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables

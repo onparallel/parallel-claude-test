@@ -2738,10 +2738,6 @@ export type PetitionFieldProgress = {
 
 /** A reply to a petition field */
 export type PetitionFieldReply = Timestamps & {
-  /** When the reply was created or last updated */
-  approvedAt: Maybe<Scalars["DateTime"]>;
-  /** The person that approved the reply. */
-  approvedBy: Maybe<User>;
   /** The content of the reply. */
   content: Scalars["JSONObject"];
   /** Time when the resource was created. */
@@ -2751,6 +2747,10 @@ export type PetitionFieldReply = Timestamps & {
   /** The ID of the petition field reply. */
   id: Scalars["GID"];
   isAnonymized: Scalars["Boolean"];
+  /** When the reply was reviewed. */
+  lastReviewedAt: Maybe<Scalars["DateTime"]>;
+  /** The person that reviewed the reply. */
+  lastReviewedBy: Maybe<User>;
   /** Metadata for this reply. */
   metadata: Scalars["JSONObject"];
   /** When the reply was created or last updated */

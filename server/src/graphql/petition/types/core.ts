@@ -1000,39 +1000,41 @@ export const PetitionFieldReply = objectType({
         return event.created_at;
       },
     });
-    t.nullable.field("approvedBy", {
+    t.nullable.field("lastReviewedBy", {
       type: "User",
-      description: "The person that approved the reply.",
+      description: "The person that reviewed the reply.",
       resolve: async (root, _, ctx) => {
-        if (root.status !== "APPROVED") {
+        if (root.status === "PENDING") {
           return null;
         }
         const event = findLast(
           await ctx.petitions.loadPetitionFieldReplyEvents(root.id),
           (e) => e.type === "REPLY_STATUS_CHANGED"
         ) as ReplyStatusChangedEvent;
-        if (!isDefined(event) || event.data.status !== "APPROVED") {
+        if (!isDefined(event)) {
           return null;
         }
+
         return ctx.users.loadUser(event.data.user_id!);
       },
     });
-    t.nullable.datetime("approvedAt", {
-      description: "When the reply was created or last updated",
+    t.nullable.datetime("lastReviewedAt", {
+      description: "When the reply was reviewed.",
       resolve: async (root, _, ctx) => {
-        if (root.status !== "APPROVED") {
+        if (root.status === "PENDING") {
           return null;
         }
         const event = findLast(
           await ctx.petitions.loadPetitionFieldReplyEvents(root.id),
           (e) => e.type === "REPLY_STATUS_CHANGED"
         ) as ReplyStatusChangedEvent;
-        if (!isDefined(event) || event.data.status !== "APPROVED") {
+        if (!isDefined(event)) {
           return null;
         }
         return event.created_at;
       },
     });
+
     t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });
   },
 });

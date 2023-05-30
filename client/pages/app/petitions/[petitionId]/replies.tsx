@@ -46,6 +46,7 @@ import {
   PetitionRepliesFieldProps,
 } from "@parallel/components/petition-replies/PetitionRepliesField";
 import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
+import { PetitionRepliesFieldReply } from "@parallel/components/petition-replies/PetitionRepliesFieldReply";
 import { PetitionRepliesFilterButton } from "@parallel/components/petition-replies/PetitionRepliesFilterButton";
 import { PetitionRepliesFilteredFields } from "@parallel/components/petition-replies/PetitionRepliesFilteredFields";
 import { PetitionSignaturesCard } from "@parallel/components/petition-replies/PetitionSignaturesCard";
@@ -807,8 +808,11 @@ const _mutations = [
         replies {
           id
           status
+          ...PetitionRepliesFieldReply_PetitionFieldReply
         }
+        
       }
+      ${PetitionRepliesFieldReply.fragments.PetitionFieldReply}
     }
   `,
   gql`
