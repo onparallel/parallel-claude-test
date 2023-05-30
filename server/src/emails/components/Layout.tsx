@@ -163,18 +163,6 @@ const ThemedLayout: FC<Omit<LayoutProps, "theme">> = function ThemedLayout({
                       backgroundColor={theme.colors.primary[500]}
                     />
                     <MjmlSocialElement
-                      alt="Slack"
-                      src={`${assetsUrl}/static/emails/slack.png`}
-                      href="https://joinparallel.slack.com/join/shared_invite/zt-sda28ew5-tCZBQzZpPupCIsd85RgwGA#/shared-invite/email"
-                      backgroundColor={theme.colors.primary[500]}
-                    />
-                    <MjmlSocialElement
-                      alt="Facebook"
-                      name="facebook-noshare"
-                      href="https://www.facebook.com/parallel.so"
-                      backgroundColor={theme.colors.primary[500]}
-                    />
-                    <MjmlSocialElement
                       alt="Twitter"
                       name="twitter-noshare"
                       href="https://twitter.com/Parallel_SO"
