@@ -45,7 +45,6 @@ export function MessageEmailEditor({
         <PlaceholderInput
           data-testid="petition-email-subject-input"
           value={subject}
-          maxLength={255}
           onChange={(value) => onSubjectChange(value)}
           onBlur={() => onSubjectChange(subject.trim())}
           placeholder={intl.formatMessage({

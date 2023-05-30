@@ -258,7 +258,7 @@ export function useModifyExpirationDialog({
 
   return useCallback(
     async (force?: boolean) => {
-      if (!hasBeenShown.current || force === true) {
+      if (isDirty && (!hasBeenShown.current || force === true)) {
         try {
           const data = await showUpdateExpiration({
             expiryDate,

@@ -1,4 +1,4 @@
-import { Box, Center, Portal, Spinner, Text } from "@chakra-ui/react";
+import { Box, Center, Flex, Portal, Spinner, Text } from "@chakra-ui/react";
 import { MaybePromise } from "@parallel/utils/types";
 import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
 import {
@@ -160,16 +160,13 @@ const ComboboxContent = <TData extends Data = NoData>(
             const list = items.map(({ item, index }) => {
               const isHighlighted = index === highlightedIndex;
               return (
-                <Box
-                  as="button"
-                  type="button"
-                  display="flex"
-                  width="100%"
+                <Flex
                   key={item.key}
+                  as="button"
+                  width="100%"
                   backgroundColor={isHighlighted ? "gray.100" : undefined}
                   paddingX={4}
                   paddingY={1}
-                  cursor="pointer"
                   {...combobox.getItemProps({
                     item,
                     index,
@@ -187,7 +184,7 @@ const ComboboxContent = <TData extends Data = NoData>(
                   }}
                 >
                   <Item search={text} item={item as TComboboxItem<TData>} />
-                </Box>
+                </Flex>
               );
             });
             if (group === "") {

@@ -66,7 +66,7 @@ function Alerts() {
     }
   );
 
-  const items = data?.expiringProfileProperties.items ?? [];
+  const items = data?.expiringProfileProperties.items;
   const totalCount = data?.expiringProfileProperties.totalCount ?? 0;
 
   const columns = useAlertsTableColumns();
