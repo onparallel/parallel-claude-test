@@ -1611,9 +1611,9 @@ describe("GraphQL/Petition Fields", () => {
         .where("id", reply.id)
         .select("*");
 
-        expect(updatedReply).toMatchObject({
-          status: "PENDING",
-        })
+      expect(updatedReply).toMatchObject({
+        status: "PENDING",
+      });
     });
   });
 
@@ -1954,7 +1954,7 @@ describe("GraphQL/Petition Fields", () => {
       fields = await mocks.createRandomPetitionFields(petition.id, 4, (index) => ({
         type: "TEXT",
         options: {
-          placeholder: faker.random.words(3),
+          placeholder: faker.word.words(3),
         },
         require_approval: index === 3 ? false : true,
       }));

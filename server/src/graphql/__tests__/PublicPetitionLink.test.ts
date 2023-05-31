@@ -729,8 +729,8 @@ describe("GraphQL/PublicPetitionLink", () => {
         `,
         variables: {
           slug: publicPetitionLink.slug,
-          contactFirstName: faker.name.firstName(),
-          contactLastName: faker.name.lastName(),
+          contactFirstName: faker.person.firstName(),
+          contactLastName: faker.person.lastName(),
           contactEmail: faker.internet.email(),
         },
       });

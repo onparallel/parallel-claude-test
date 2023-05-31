@@ -128,8 +128,8 @@ test.describe("Full e2e send petition", () => {
           [
             {
               email: address,
-              firstName: faker.name.firstName(),
-              lastName: faker.name.lastName(),
+              firstName: faker.person.firstName(),
+              lastName: faker.person.lastName(),
             },
           ],
         ],

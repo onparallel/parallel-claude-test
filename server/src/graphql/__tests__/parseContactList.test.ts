@@ -4,9 +4,13 @@ import { range } from "remeda";
 describe("parseContactList", () => {
   it("parses a list of contacts", async () => {
     const list = range(0, 10).map((i) => {
-      const firstName = faker.name.firstName();
-      const lastName = faker.name.lastName();
-      const email = faker.internet.email(firstName, lastName, i === 0 ? "fake.com" : "test.com");
+      const firstName = faker.person.firstName();
+      const lastName = faker.person.lastName();
+      const email = faker.internet.email({
+        firstName,
+        lastName,
+        provider: i === 0 ? "fake.com" : "test.com",
+      });
       return [firstName, lastName, email];
     });
 

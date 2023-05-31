@@ -15,7 +15,7 @@ import {
 import { outdent } from "outdent";
 import pMap from "p-map";
 import { DatabaseError } from "pg";
-import { isDefined, omit, sumBy, uniq, zip } from "remeda";
+import { isDefined, omit, pipe, range, sumBy, uniq, zip, zipWith } from "remeda";
 import {
   CreatePetition,
   CreatePetitionField,
@@ -28,12 +28,12 @@ import { isValueCompatible } from "../../../db/helpers/utils";
 import { chunkWhile, unMaybeArray } from "../../../util/arrays";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
+import { pFlatMap } from "../../../util/promises/pFlatMap";
+import { withError } from "../../../util/promises/withError";
 import {
   parseTextWithPlaceholders,
   renderTextWithPlaceholders,
 } from "../../../util/slate/placeholders";
-import { pFlatMap } from "../../../util/promises/pFlatMap";
-import { withError } from "../../../util/promises/withError";
 import { hash, random } from "../../../util/token";
 import { userHasAccessToContactGroups } from "../../contact/authorizers";
 import { RESULT } from "../../helpers/Result";
@@ -1554,11 +1554,14 @@ export const sendPetition = mutationField("sendPetition", {
 
       const clonedPetitions = await pMap(
         args.contactIdGroups.slice(1),
-        async (_, index) =>
+        async () =>
           await ctx.petitions.clonePetition(
             args.petitionId,
             owner, // set the owner of the original petition as owner of the cloned ones
-            { credits_used: 1 },
+            {
+              credits_used: 1,
+              email_subject: args.subject, // pass email subject so field placeholders are correctly replaced on the cloned petition
+            },
             { cloneReplies: true }, // also clone the petition replies
             `User:${ctx.user!.id}`
           ),
@@ -1597,20 +1600,25 @@ export const sendPetition = mutationField("sendPetition", {
 
       const sender = isDefined(args.senderId) ? await ctx.users.loadUser(args.senderId) : null;
 
+      // we chunk petitions in chunks of less than 20 contactIds
       const petitionChunks = chunkWhile(
-        zip([petition, ...clonedPetitions], args.contactIdGroups),
-        (chunk, [_, current]) =>
+        pipe(
+          [petition, ...clonedPetitions],
+          zipWith((petition, contactIds) => ({ petition, contactIds }), args.contactIdGroups),
+          zipWith((x, index) => ({ ...x, index }), range(0, args.contactIdGroups.length))
+        ),
+        (currentChunk, item) =>
           // current chunk is empty, or
-          chunk.length === 0 ||
-          // (number of contactIds in the accumulated chunk) + (number of contactIds in the current sendGroup) <= 20
-          sumBy(chunk, ([_, curr]) => curr.length) + current.length <= 20
+          currentChunk.length === 0 ||
+          // (number of contactIds in the accumulated chunk) + (number of contactIds in the current item) <= 20
+          sumBy(currentChunk, (x) => x.contactIds.length) + item.contactIds.length <= 20
       );
 
       const baseDate = new Date();
-      const results = await pFlatMap(petitionChunks, async (currentChunk, index) => {
-        return await pMap(currentChunk, async ([petition, contactIds], groupIndex) => {
+      const results = await pFlatMap(petitionChunks, async (currentChunk, chunkIndex) => {
+        return await pMap(currentChunk, async ({ petition, contactIds, index }) => {
           const messageSubject = renderTextWithPlaceholders(
-            args.subject,
+            index === 0 ? args.subject : petition.email_subject ?? args.subject,
             await ctx.petitionMessageContext.fetchPlaceholderValues({
               petitionId: petition.id,
               userId: ctx.user!.id,
@@ -1623,7 +1631,7 @@ export const sendPetition = mutationField("sendPetition", {
             {
               name: (petition.name ?? messageSubject)
                 .slice(0, 255)
-                .concat(groupIndex === 0 ? "" : ` (${groupIndex + 1})`),
+                .concat(index === 0 ? "" : ` (${index + 1})`),
               status: "PENDING",
               closed_at: null,
             },
@@ -1636,9 +1644,9 @@ export const sendPetition = mutationField("sendPetition", {
               ...args,
               subject: messageSubject,
               scheduledAt:
-                index === 0
+                chunkIndex === 0
                   ? args.scheduledAt
-                  : addMinutes(args.scheduledAt ?? baseDate, index * 5),
+                  : addMinutes(args.scheduledAt ?? baseDate, chunkIndex * 5),
             },
             ctx.user!,
             sender,

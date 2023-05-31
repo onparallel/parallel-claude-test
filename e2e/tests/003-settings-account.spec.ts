@@ -17,8 +17,8 @@ test.beforeEach(async ({ page }) => {
 test.describe("Settings > Account", () => {
   test("should let you change the name", async ({ page }) => {
     const account = new SettingsAccount(page);
-    const firstName = faker.name.firstName();
-    const lastName = faker.name.lastName();
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
     await account.fillChangeNameForm({ firstName, lastName });
     await Promise.all([
       waitForGraphQL(page, (o) => o.operationName === "Account_updateAccount"),
@@ -39,7 +39,7 @@ test.describe("Settings > Account", () => {
 
   test("should not let you change the name without a last name", async ({ page }) => {
     const account = new SettingsAccount(page);
-    await account.fillChangeNameForm({ firstName: faker.name.firstName(), lastName: "" });
+    await account.fillChangeNameForm({ firstName: faker.person.firstName(), lastName: "" });
     await account.submitChangeNameForm();
     await expect(page.getByTestId("last-name-input")).toHaveAttribute("aria-invalid", "true");
   });

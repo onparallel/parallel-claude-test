@@ -2290,7 +2290,7 @@ export class PetitionRepository extends BaseRepository {
         })
         .select("*");
 
-      const [cloned] = await this.insert(
+      let [cloned] = await this.insert(
         "petition",
         {
           ...omit(sourcePetition!, [
@@ -2458,7 +2458,7 @@ export class PetitionRepository extends BaseRepository {
       }
 
       if (Object.keys(rteUpdateData).length > 0) {
-        await this.updatePetition(cloned.id, rteUpdateData, createdBy, t);
+        [cloned] = await this.updatePetition(cloned.id, rteUpdateData, createdBy, t);
       }
 
       if (options?.cloneReplies) {

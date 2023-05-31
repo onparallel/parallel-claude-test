@@ -59,8 +59,8 @@ describe("repositories/OrganizationRepository", () => {
           };
         default:
           return {
-            first_name: faker.name.firstName(),
-            last_name: faker.name.lastName(),
+            first_name: faker.person.firstName(),
+            last_name: faker.person.lastName(),
             email: faker.internet.email(),
           };
       }

@@ -458,7 +458,7 @@ describe("GraphQL/Petitions", () => {
       const { items } = templates!.templates;
 
       // pick a random templateId that is not on first position of items array
-      const index = faker.datatype.number({ min: 1, max: items.length - 1 });
+      const index = faker.number.int({ min: 1, max: items.length - 1 });
       const templateId = items[index].id;
 
       // use this random template to create a petition
@@ -581,7 +581,7 @@ describe("GraphQL/Petitions", () => {
       const { items } = data!.templates;
 
       // pick a random templateId that is not on first position of items array
-      const index = faker.datatype.number({ min: 1, max: items.length - 1 });
+      const index = faker.number.int({ min: 1, max: items.length - 1 });
       const templateId = items[index].id;
 
       // use this random template to create a petition
@@ -3652,6 +3652,57 @@ describe("GraphQL/Petitions", () => {
         },
       ]);
     });
+
+    it("bulk sends should correctly set petition names and match field placeholders", async () => {
+      // make sure petition has no name set so email subject with placeholders will be used
+      await mocks.knex.from("petition").where("id", petition.id).update({ name: null });
+
+      await mocks.createRandomTextReply(field.id, undefined, 1, () => ({
+        user_id: sessionUser.id,
+        content: { value: "my reply" },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $contactIdGroups: [[GID!]!]!
+            $subject: String!
+            $body: JSON!
+          ) {
+            sendPetition(
+              petitionId: $petitionId
+              contactIdGroups: $contactIdGroups
+              subject: $subject
+              body: $body
+            ) {
+              result
+              petition {
+                id
+                name
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactIdGroups: range(0, 50).map((i) => [toGlobalId("Contact", contacts[i % 3].id)]),
+          subject: `Sent: {{ ${toGlobalId("PetitionField", field.id)} }}`, // reference from original petition field, should match replies on every cloned petition
+          body: [],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.sendPetition).toEqual(
+        range(0, 50).map((i) => ({
+          result: "SUCCESS",
+          petition: {
+            id: expect.any(String),
+            name: `Sent: my reply`.concat(i === 0 ? "" : ` (${i + 1})`),
+          },
+        }))
+      );
+    });
   });
 
   describe("modifyPetitionCustomProperty", () => {
@@ -3847,24 +3898,24 @@ describe("GraphQL/Petitions", () => {
 
       signers = [
         {
-          email: faker.internet.email(undefined, undefined, "onparallel.com"),
-          firstName: faker.name.firstName(),
-          lastName: faker.name.lastName(),
+          email: faker.internet.email({ provider: "onparallel.com" }),
+          firstName: faker.person.firstName(),
+          lastName: faker.person.lastName(),
         },
         {
-          email: faker.internet.email(undefined, undefined, "onparallel.com"),
-          firstName: faker.name.firstName(),
-          lastName: faker.name.lastName(),
+          email: faker.internet.email({ provider: "onparallel.com" }),
+          firstName: faker.person.firstName(),
+          lastName: faker.person.lastName(),
         },
         {
-          email: faker.internet.email(undefined, undefined, "onparallel.com"),
-          firstName: faker.name.firstName(),
-          lastName: faker.name.lastName(),
+          email: faker.internet.email({ provider: "onparallel.com" }),
+          firstName: faker.person.firstName(),
+          lastName: faker.person.lastName(),
         },
       ];
 
       contacts = await mocks.createRandomContacts(organization.id, 2, () => ({
-        email: faker.internet.email(undefined, undefined, "onparallel.com"),
+        email: faker.internet.email({ provider: "onparallel.com" }),
       }));
 
       [otherOrgContact] = await mocks.createRandomContacts(otherOrg.id, 1);

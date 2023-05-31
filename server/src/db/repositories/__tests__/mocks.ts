@@ -182,13 +182,13 @@ export class Mocks {
   ) {
     const userDatas = await this.knex<UserData>("user_data").insert(
       range(0, amount).map<CreateUserData>((index) => {
-        const firstName = faker.name.firstName();
-        const lastName = faker.name.lastName();
+        const firstName = faker.person.firstName();
+        const lastName = faker.person.lastName();
         return {
           first_name: firstName,
           last_name: lastName,
-          email: faker.internet.email(firstName, lastName).toLowerCase(),
-          cognito_id: faker.datatype.uuid(),
+          email: faker.internet.email({ firstName, lastName }).toLowerCase(),
+          cognito_id: faker.string.uuid(),
           preferred_locale: randomUserPreferredLocale(),
           ...userDataBuilder?.(index),
         };
@@ -236,13 +236,13 @@ export class Mocks {
     return await this.knex<Contact>("contact")
       .insert(
         range(0, amount).map<CreateContact>((index) => {
-          const firstName = faker.name.firstName();
-          const lastName = faker.name.lastName();
+          const firstName = faker.person.firstName();
+          const lastName = faker.person.lastName();
           return {
             org_id: orgId,
             first_name: firstName,
             last_name: lastName,
-            email: faker.internet.email(firstName, lastName).toLowerCase(),
+            email: faker.internet.email({ firstName, lastName }).toLowerCase(),
             ...builder?.(index),
           };
         })
@@ -273,7 +273,7 @@ export class Mocks {
             org_id: orgId,
             is_template: false,
             status: builder?.(index).is_template ? null : randomPetitionStatus(),
-            name: faker.random.words(),
+            name: faker.word.words(),
             recipient_locale: locale,
             document_organization_theme_id: theme.id,
             ...builder?.(index),
@@ -317,7 +317,7 @@ export class Mocks {
             org_id: orgId,
             is_template: true,
             status: null,
-            name: faker.random.words(),
+            name: faker.word.words(),
             recipient_locale: locale,
             document_organization_theme_id: theme.id,
             ...builder?.(index),
@@ -356,7 +356,7 @@ export class Mocks {
           return {
             petition_id: petitionId,
             position: isDefined(data.deleted_at) ? null : (count as number) + index,
-            title: faker.random.words(),
+            title: faker.word.words(),
             type: type,
             options: randomPetitionFieldOptions(type),
             ...removeNotDefined(data),
@@ -401,7 +401,7 @@ export class Mocks {
           return {
             petition_field_id: numberFieldId,
             content: {
-              value: faker.datatype.number({
+              value: faker.number.int({
                 min,
                 max,
               }),
@@ -621,7 +621,7 @@ export class Mocks {
       .insert(
         range(0, amount || 1).map<CreateTag>((index) => ({
           color: "#000000",
-          name: faker.random.words(3),
+          name: faker.word.words(3),
           organization_id: orgId,
           ...builder?.(index),
         }))
@@ -708,7 +708,7 @@ export class Mocks {
   ) {
     return await this.knex<UserGroup>("user_group").insert(
       range(0, amount).map<CreateUserGroup>((index) => ({
-        name: faker.name.jobArea(),
+        name: faker.person.jobArea(),
         org_id: orgId,
         ...builder?.(index),
       })),
@@ -787,7 +787,7 @@ export class Mocks {
   }
 
   createRandomCommentContent() {
-    return range(0, faker.datatype.number({ min: 1, max: 5 })).map(() => ({
+    return range(0, faker.number.int({ min: 1, max: 5 })).map(() => ({
       type: "paragraph" as const,
       children: [{ text: faker.lorem.words() }],
     }));
@@ -1100,7 +1100,7 @@ export class Mocks {
       .insert(
         range(0, amount || 1).map((i) => ({
           org_id: orgId,
-          name: faker.name.jobDescriptor(),
+          name: faker.person.jobDescriptor(),
           data: defaultPdfDocumentTheme,
           is_default: false,
           ...builder?.(i),
@@ -1139,7 +1139,7 @@ export class Mocks {
         org_id: orgId,
         name: this.knex.raw(
           "?::jsonb",
-          JSON.stringify({ es: faker.random.words(2), en: faker.random.words(2) })
+          JSON.stringify({ es: faker.word.words(2), en: faker.word.words(2) })
         ),
         ...builder?.(i),
       })),
@@ -1166,7 +1166,7 @@ export class Mocks {
           position: (max ?? -1) + 1 + i,
           name: this.knex.raw(
             "?::jsonb",
-            JSON.stringify({ es: faker.random.words(2), en: faker.random.words(2) })
+            JSON.stringify({ es: faker.word.words(2), en: faker.word.words(2) })
           ),
           type,
           options: randomProfileTypeFieldOptions(type),
@@ -1219,12 +1219,12 @@ function randomPetitionFieldOptions(type: PetitionFieldType) {
     }
     case "TEXT": {
       return {
-        placeholder: faker.random.words(3),
+        placeholder: faker.word.words(3),
       };
     }
     case "SHORT_TEXT": {
       return {
-        placeholder: faker.random.words(3),
+        placeholder: faker.word.words(3),
       };
     }
     case "SELECT": {
