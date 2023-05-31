@@ -427,7 +427,7 @@ export class Mocks {
           return {
             petition_field_id: dateFieldId,
             content: {
-              value: faker.date.soon(10).toISOString().substring(0, 10),
+              value: faker.date.soon({ days: 10 }).toISOString().substring(0, 10),
             },
             type: "DATE",
             petition_access_id: access_id,
@@ -447,7 +447,7 @@ export class Mocks {
     return await this.knex<PetitionFieldReply>("petition_field_reply")
       .insert(
         range(0, amount || 1).map<CreatePetitionFieldReply>((index) => {
-          const value = faker.date.soon(10).toISOString();
+          const value = faker.date.soon({ days: 10 }).toISOString();
           return {
             petition_field_id: dateFieldId,
             content: {
