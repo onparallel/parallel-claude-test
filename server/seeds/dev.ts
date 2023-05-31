@@ -524,96 +524,166 @@ export async function seed(knex: Knex): Promise<any> {
         },
       ]);
 
-      const pts = await knex("profile_type")
-        .insert([
-          { org_id: orgId, name: json({ en: "Individual", es: "Persona física" }) },
-          { org_id: orgId, name: json({ en: "Legal entity", es: "Persona jurídica" }) },
-          { org_id: orgId, name: json({ en: "Contract", es: "Contrato" }) },
-        ])
-        .returning("*");
+      // profile types
+      await knex.transaction(async (t) => {
+        const [individual, legalEntity, contract] = await t.from("profile_type").insert(
+          [
+            { name: { en: "Individual", es: "Persona física" } },
+            { name: { en: "Legal entity", es: "Persona jurídica" } },
+            { name: { en: "Contract", es: "Contrato" } },
+          ].map((data) => ({
+            ...data,
+            org_id: orgId,
+            created_by: `User:${ownerId}`,
+            updated_by: `User:${ownerId}`,
+          })),
+          "*"
+        );
 
-      const ptfs = await knex("profile_type_field")
-        .insert([
-          ...[
+        const [firstName, lastName] = await t.from("profile_type_field").insert(
+          [
             {
-              position: 0,
-              profile_type_id: pts[0].id,
-              name: json({ en: "First name", es: "Nombre" }),
               type: "SHORT_TEXT" as const,
+              name: { en: "First name", es: "Nombre" },
               alias: "FIRST_NAME",
             },
             {
-              position: 1,
-              profile_type_id: pts[0].id,
-              name: json({ en: "Last name", es: "Apellido" }),
               type: "SHORT_TEXT" as const,
+              name: { en: "Last name", es: "Apellido" },
               alias: "LAST_NAME",
             },
             {
-              position: 2,
-              profile_type_id: pts[0].id,
-              name: json({ en: "Birth date", es: "Fecha de nacimiento" }),
+              type: "FILE" as const,
+              name: { en: "ID", es: "Documento de identificación" },
+              is_expirable: true,
+              expiry_alert_ahead_time: knex.raw(`make_interval(months => ?)`, [1]),
+              alias: "ID",
+            },
+            {
               type: "DATE" as const,
-              alias: "BIRTH_DATE",
+              name: { en: "Date of birth", es: "Fecha de nacimiento" },
+              alias: "DATE_OF_BIRTH",
+              options: knex.raw("?::jsonb", JSON.stringify({ useReplyAsExpiryDate: false })),
             },
             {
-              position: 3,
-              profile_type_id: pts[0].id,
-              name: json({ en: "Phone", es: "Teléfono" }),
               type: "PHONE" as const,
-              alias: "PHONE",
+              name: { en: "Phone number", es: "Número de teléfono" },
+              alias: "PHONE_NUMBER",
             },
             {
-              position: 4,
-              profile_type_id: pts[0].id,
-              name: json({ en: "Email", es: "Correo electrónico" }),
-              type: "SHORT_TEXT" as const,
-              alias: "EMAIL",
+              type: "TEXT" as const,
+              name: { en: "Address", es: "Dirección" },
+              alias: "ADDRESS",
             },
-          ],
-          ...[
+          ].map((data, index) => ({
+            ...data,
+            profile_type_id: individual.id,
+            position: index,
+            created_by: `User:${ownerId}`,
+            updated_by: `User:${ownerId}`,
+          })),
+          "*"
+        );
+
+        await t
+          .from("profile_type")
+          .where("id", individual.id)
+          .update({ profile_name_pattern: json([firstName.id, " ", lastName.id]) });
+
+        const [name] = await t.from("profile_type_field").insert(
+          [
             {
-              position: 0,
-              profile_type_id: pts[1].id,
-              name: json({ en: "Name", es: "Nombre" }),
               type: "SHORT_TEXT" as const,
+              name: { en: "Corporate name", es: "Denominación social" },
               alias: "NAME",
             },
             {
-              position: 1,
-              profile_type_id: pts[1].id,
-              name: json({ en: "Tax ID", es: "CIF" }),
+              type: "DATE" as const,
+              name: { en: "Date of incorporation", es: "Fecha de constitución" },
+              alias: "DATE_OF_INCORPORATION",
+              options: knex.raw("?::jsonb", JSON.stringify({ useReplyAsExpiryDate: false })),
+            },
+            {
               type: "SHORT_TEXT" as const,
+              name: { en: "Tax ID", es: "Número de identificación fiscal" },
               alias: "TAX_ID",
             },
             {
-              position: 2,
-              profile_type_id: pts[1].id,
-              name: json({ en: "Address", es: "Dirección" }),
               type: "TEXT" as const,
+              name: { en: "Address", es: "Domicilio" },
               alias: "ADDRESS",
             },
-          ],
-          ...[
+          ].map((data, index) => ({
+            ...data,
+            profile_type_id: legalEntity.id,
+            position: index,
+            created_by: `User:${ownerId}`,
+            updated_by: `User:${ownerId}`,
+          })),
+          "*"
+        );
+
+        await t
+          .from("profile_type")
+          .where("id", legalEntity.id)
+          .update({ profile_name_pattern: json([name.id]) });
+
+        const [type, counterparty] = await t.from("profile_type_field").insert(
+          [
             {
-              position: 0,
-              profile_type_id: pts[2].id,
-              name: json({ en: "Name", es: "Nombre" }),
               type: "SHORT_TEXT" as const,
-              alias: "NAME",
+              name: { en: "Type of contract", es: "Tipo de contrato" },
+              alias: "TYPE",
             },
-          ],
-        ])
-        .returning("*");
-      for (const [profileTypeId, pattern] of [
-        [pts[0].id, json([ptfs[0].id, " ", ptfs[1].id])],
-        [pts[1].id, json(ptfs[5].id)],
-        [pts[0].id, json([ptfs[8].id])],
-      ]) {
-        await knex("profile_type")
-          .where("id", profileTypeId)
-          .update("profile_name_pattern", pattern);
-      }
+            {
+              type: "SHORT_TEXT" as const,
+              name: { en: "Counterparty", es: "Contraparte" },
+              alias: "COUNTERPARTY",
+            },
+            {
+              type: "TEXT" as const,
+              name: { en: "Short description", es: "Descripción breve" },
+              alias: "DESCRIPTION",
+            },
+            {
+              type: "DATE" as const,
+              name: { en: "Start date", es: "Fecha de inicio" },
+              alias: "START_DATE",
+              options: knex.raw("?::jsonb", JSON.stringify({ useReplyAsExpiryDate: false })),
+            },
+            {
+              type: "DATE" as const,
+              name: { en: "Expiry date", es: "Fecha de vencimiento" },
+              is_expirable: true,
+              expiry_alert_ahead_time: knex.raw(`make_interval(months => ?)`, [1]),
+              options: knex.raw("?::jsonb", JSON.stringify({ useReplyAsExpiryDate: true })),
+              alias: "EXPIRY_DATE",
+            },
+            {
+              type: "NUMBER" as const,
+              name: { en: "Amount", es: "Importe" },
+              alias: "AMOUNT",
+            },
+            {
+              type: "FILE" as const,
+              name: { en: "Document", es: "Documento" },
+              alias: "DOCUMENT",
+            },
+          ].map((data, index) => ({
+            ...data,
+            profile_type_id: contract.id,
+            position: index,
+            created_by: `User:${ownerId}`,
+            updated_by: `User:${ownerId}`,
+          })),
+          "*"
+        );
+
+        await t
+          .from("profile_type")
+          .where("id", contract.id)
+          .update({ profile_name_pattern: json([type.id, " - ", counterparty.id]) });
+      });
     },
     { concurrency: 1 }
   );
