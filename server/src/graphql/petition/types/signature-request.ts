@@ -95,15 +95,15 @@ export const PetitionSignatureRequest = objectType({
       },
     });
     t.nullable.string("errorMessage", {
-      resolve: ({ data }) => {
+      resolve: (o) => {
         // expose error message only for specific errors
-        return data.cancel_reason === "REQUEST_ERROR" &&
-          isDefined(data.cancel_data.error_code) &&
+        return o.cancel_reason === "REQUEST_ERROR" &&
+          isDefined(o.cancel_data?.error_code) &&
           ["SIGNATURIT_ACCOUNT_DEPLETED_CREDITS", "EMAIL_BOUNCED"].includes(
-            data.cancel_data.error_code
+            o.cancel_data.error_code
           ) &&
-          typeof data.cancel_data.error === "string"
-          ? data.cancel_data.error ?? null
+          typeof o.cancel_data.error === "string"
+          ? o.cancel_data.error ?? null
           : null;
       },
     });
