@@ -181,7 +181,7 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
         "bg",
       ]),
       backgroundColor: "white",
-      _focusWithin: (inputStyleConfig as any)._focus,
+      _focusWithin: (inputStyleConfig as any)._focusVisible,
       _invalid: (inputStyleConfig as any)._invalid,
     } as any;
 
@@ -217,6 +217,7 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
           {...inputStyles}
           sx={{
             "[data-slate-editor]": {
+              outline: "none",
               minHeight: "40px !important",
               paddingX: 3,
               paddingY: 2,

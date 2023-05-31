@@ -141,7 +141,7 @@ export const PlaceholderInput = chakraForwardRef<
     const inputStyles = {
       ...omit(inputStyleConfig as any, ["px", "_focus", "_invalid", "bg"]),
       backgroundColor: "white",
-      _focusWithin: (inputStyleConfig as any)._focus,
+      _focusWithin: (inputStyleConfig as any)._focusVisible,
       _invalid: (inputStyleConfig as any)._invalid,
     } as any;
 
@@ -181,6 +181,7 @@ export const PlaceholderInput = chakraForwardRef<
               color: "gray.400",
             },
             "[data-slate-editor]": {
+              outline: "none",
               flex: 1,
               ...pick(inputStyleConfig, ["px"]),
               whiteSpace: "pre",
