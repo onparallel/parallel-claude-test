@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { RequestInit } from "node-fetch";
 import pMap from "p-map";
-import { groupBy, isDefined } from "remeda";
+import { groupBy, isDefined, zip } from "remeda";
 import { CONFIG, Config } from "../config";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import { FileRepository } from "../db/repositories/FileRepository";
@@ -247,56 +247,74 @@ export class BankflipService implements IBankflipService {
     }
 
     // a set of documents with the same request model will be all part of the same PetitionFieldReply
+    // TODO cambiar la manera de agrupar documentos una vez Bankflip implemente una solución que lo permita de manera fácil (ya hablado con ellos)
     const groupedByRequestModel = groupBy(modelRequestOutcome.documents ?? [], (d) =>
       Object.keys(d.model)
         .sort()
         .map((key) => d.model[key as keyof ModelRequest])
         .join("_")
     );
-    return await pMap(Object.values(groupedByRequestModel), async (docs) => {
-      const documents: Record<string, Maybe<ModelRequestDocument>> = {};
+    return await pFlatMap(Object.values(groupedByRequestModel), async (docs) => {
+      const documents: Record<string, ModelRequestDocument[]> = {};
       ["pdf", "json"].forEach((extension) => {
-        documents[extension] = docs.find((d) => d.extension === extension) ?? null;
+        documents[extension] = docs.filter((d) => d.extension === extension);
       });
 
-      if (!documents.pdf) {
+      if (documents.pdf.length === 0) {
         // should not happen
-        return {
-          file_upload_id: null,
-          request: modelRequestOutcome.modelRequest,
-          error: [],
-        };
+        return [
+          {
+            file_upload_id: null,
+            request: modelRequestOutcome.modelRequest,
+            error: [],
+          },
+        ];
       }
 
-      const pdfBuffer = await this.apiRequest<Buffer>(
-        metadata.orgId,
-        `/document/${documents.pdf.id}/content`,
-        {},
-        "buffer"
+      const pdfBuffers = await pMap(
+        documents.pdf,
+        async ({ id }) =>
+          await this.apiRequest<Buffer>(metadata.orgId, `/document/${id}/content`, {}, "buffer"),
+        { concurrency: 1 }
       );
 
-      const path = random(16);
-      const res = await this.storage.fileUploads.uploadFile(path, "application/pdf", pdfBuffer);
-      const [file] = await this.files.createFileUpload(
-        {
-          path,
-          content_type: "application/pdf",
-          filename: `${documents.pdf.name}.pdf`,
-          size: res["ContentLength"]!.toString(),
-          upload_complete: true,
-        },
-        "userId" in metadata
-          ? `User:${fromGlobalId(metadata.userId, "User").id}`
-          : `PetitionAccess:${fromGlobalId(metadata.accessId, "PetitionAccess").id}`
-      );
+      const results: any[] = [];
+      for (const [request, pdfBuffer] of zip(documents.pdf, pdfBuffers)) {
+        const path = random(16);
+        const res = await this.storage.fileUploads.uploadFile(path, "application/pdf", pdfBuffer);
+        const [file] = await this.files.createFileUpload(
+          {
+            path,
+            content_type: "application/pdf",
+            filename: `${request.name}.pdf`,
+            size: res["ContentLength"]!.toString(),
+            upload_complete: true,
+          },
+          "userId" in metadata
+            ? `User:${fromGlobalId(metadata.userId, "User").id}`
+            : `PetitionAccess:${fromGlobalId(metadata.accessId, "PetitionAccess").id}`
+        );
 
-      return {
-        file_upload_id: file.id,
-        request: documents.pdf.model,
-        json_contents: documents.json
-          ? await this.apiRequest<any>(metadata.orgId, `/document/${documents.json.id}/content`)
-          : null,
-      };
+        results.push({
+          file_upload_id: file.id,
+          request: request,
+          json_contents:
+            // TODO: el modelo CARP_CIUD_CERT_CATASTRO devuelve multiples pdfs y jsons con el mismo "request".
+            // actualmente no se puede identificar cuál json corresponde a cada pdf.
+            // hablé con Gabriel para implementar algo que permita identificarlos, pero por ahora
+            // ignoramos los json de este modelo. De todas formas aún no lo están parseando.
+            // Cuando esté implementada la solución en Bankflip, hay que cambiar la manera de agrupar documentos (comentado más arriba)
+            request.model.type === "CARP_CIUD_CERT_CATASTRO"
+              ? null
+              : documents.json.length === 1
+              ? await this.apiRequest<any>(
+                  metadata.orgId,
+                  `/document/${documents.json[0].id}/content`
+                )
+              : null,
+        });
+      }
+      return results;
     });
   }
 }

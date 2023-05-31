@@ -1790,6 +1790,11 @@
     "context": "Error"
   },
   {
+    "term": "component.es-tax-documents-content-error-message.action-required-from-user",
+    "definition": "No se pueden recuperar los datos de filiación necesarios para obtener esta información. No se han podido obtener sus datos de manera automática.",
+    "context": "The affiliation data required to obtain this information cannot be retrieved. Your data could not be obtained automatically."
+  },
+  {
     "term": "component.es-tax-documents-content-error-message.blocked-credentials",
     "definition": "La Administración Pública bloqueó su acceso por razones de seguridad. Por favor, vuelva a intentarlo más tarde.",
     "context": "The Public Administration has blocked your access for security reasons. Please, try again later."
@@ -6845,11 +6850,6 @@
     "context": "You reached the maximum amount of users you can create, <a>reach out to us to upgrade your plan.</a>"
   },
   {
-    "term": "component.user-menu.alerts",
-    "definition": "Alerts",
-    "context": "Alerts"
-  },
-  {
     "term": "component.user-menu.back-to-account",
     "definition": "Volver a mi cuenta",
     "context": "Back to my account"
@@ -6868,11 +6868,6 @@
     "term": "component.user-menu.notifications",
     "definition": "Notificaciones",
     "context": "Notifications"
-  },
-  {
-    "term": "component.user-menu.profiles",
-    "definition": "Profiles",
-    "context": "Profiles"
   },
   {
     "term": "component.user-select.placeholder-multi-with-groups",

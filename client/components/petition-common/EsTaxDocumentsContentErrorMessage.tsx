@@ -41,6 +41,11 @@ export function EsTaxDocumentsContentErrorMessage({
         defaultMessage:
           "The Public Administration took too long to process your request. Please, try again.",
       }),
+      action_required_from_user: intl.formatMessage({
+        id: "component.es-tax-documents-content-error-message.action-required-from-user",
+        defaultMessage:
+          "The affiliation data required to obtain this information cannot be retrieved. Your data could not be obtained automatically.",
+      }),
       generic: intl.formatMessage({
         id: "component.es-tax-documents-content-error-message.generic",
         defaultMessage: "An unknown error happened.",
