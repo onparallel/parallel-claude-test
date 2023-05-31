@@ -8,7 +8,9 @@ export async function seed(knex: Knex): Promise<any> {
     .from("user")
     .whereNull("deleted_at")
     .where("organization_role", "OWNER");
+  let i = 0;
   for (const owner of owners) {
+    console.log(`Progress ${++i}/${owners.length}`);
     await knex.transaction(async (t) => {
       const [individual, legalEntity, contract] = await t.from("profile_type").insert(
         [
