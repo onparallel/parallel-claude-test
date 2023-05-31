@@ -98,7 +98,7 @@ export const PetitionComposeFieldSettings = Object.assign(
                   onFieldEdit(field.id, {
                     isInternal: event.target.checked,
                     showInPdf: !event.target.checked,
-                    requireApproval: !event.target.checked,
+                    requireApproval: field.type === "HEADING" ? undefined : !event.target.checked,
                   })
                 }
                 isDisabled={isReadOnly || field.isFixed || isOnlyInternal}
