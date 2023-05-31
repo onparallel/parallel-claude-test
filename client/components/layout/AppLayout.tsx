@@ -68,7 +68,7 @@ export const AppLayout = Object.assign(
         router.events.off("routeChangeError", handleRouteChangeComplete);
         router.events.off("routeChangeComplete", handleRouteChangeComplete);
       };
-      function handleRouteChangeStart(_, options: { shallow: boolean }) {
+      function handleRouteChangeStart(_: any, options: { shallow: boolean }) {
         if (options.shallow) {
           return;
         }
