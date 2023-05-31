@@ -4,10 +4,9 @@ import {
   RecipientViewPetitionFieldMutations_publicDeletePetitionFieldReplyDocument,
   RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDocument,
   RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragmentDoc,
-  Scalars,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
-import { uploadFile, UploadFileError } from "@parallel/utils/uploadFile";
+import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import pMap from "p-map";
 import { MutableRefObject, useCallback } from "react";
 import { RecipientViewPetitionFieldCard } from "./RecipientViewPetitionFieldCard";

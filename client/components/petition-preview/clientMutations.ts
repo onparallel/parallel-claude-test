@@ -9,11 +9,10 @@ import {
   PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment,
   PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragmentDoc,
   PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc,
-  Scalars,
   useCreatePetitionFieldReply_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
-import { uploadFile, UploadFileError } from "@parallel/utils/uploadFile";
+import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import { customAlphabet } from "nanoid";
 import pMap from "p-map";
 import { MutableRefObject, useCallback } from "react";

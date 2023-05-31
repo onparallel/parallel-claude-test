@@ -1,5 +1,4 @@
 import { useRouter } from "next/router";
-import { useRef } from "react";
 import { isDefined, omit } from "remeda";
 import { MaybePromise } from "./types";
 import { useAsyncEffect } from "./useAsyncEffect";

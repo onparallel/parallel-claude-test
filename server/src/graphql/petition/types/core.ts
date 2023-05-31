@@ -13,7 +13,7 @@ import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { safeJsonParse } from "../../../util/safeJsonParse";
-import { renderSlateToHtml, renderSlateToText } from "../../../util/slate/render";
+import { renderSlateToHtml } from "../../../util/slate/render";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
