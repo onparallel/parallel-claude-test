@@ -1174,6 +1174,7 @@ export class PetitionRepository extends BaseRepository {
             "petition_message",
             data.map((item) => ({
               ...item,
+              email_subject: item.email_subject?.slice(0, 255),
               scheduled_at: scheduledAt,
               petition_id: petitionId,
               sender_id: user.id,
