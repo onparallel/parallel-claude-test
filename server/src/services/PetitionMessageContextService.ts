@@ -93,7 +93,8 @@ export class PetitionMessageContextService implements IPetitionMessageContextSer
               })} (${reply.content.timezone})`;
             case "DYNAMIC_SELECT":
               return intl.formatList(
-                (reply.content.value as [prop: string, value: string][]).map(([, value]) => value)
+                (reply.content.value as [prop: string, value: string][]).map(([, value]) => value),
+                { type: "unit", style: "short" }
               );
             default:
               return reply.content.value;
