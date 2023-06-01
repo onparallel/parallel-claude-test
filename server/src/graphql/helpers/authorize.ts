@@ -145,13 +145,14 @@ export function ifArgEquals<
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName>
 >(
-  argName: TArg,
+  prop: TArg | ((args: core.ArgsValue<TypeName, FieldName>) => any),
   expectedValue: core.ArgsValue<TypeName, FieldName>[TArg],
   thenAuthorizer: FieldAuthorizeResolver<TypeName, FieldName>,
   elseAuthorizer?: FieldAuthorizeResolver<TypeName, FieldName>
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
-    if (args[argName] === expectedValue) {
+    const value = typeof prop === "string" ? (args as any)[prop] : (prop as any)(args);
+    if (value === expectedValue) {
       return await thenAuthorizer(root, args, ctx, info);
     } else if (elseAuthorizer) {
       return await elseAuthorizer(root, args, ctx, info);

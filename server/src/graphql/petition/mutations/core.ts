@@ -1005,7 +1005,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    ifArgDefined((args) => args.data.requireApproval, not(fieldHasType("fieldId", "HEADING")))
+    ifArgEquals((args) => args.data.requireApproval, true, not(fieldHasType("fieldId", "HEADING")))
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
