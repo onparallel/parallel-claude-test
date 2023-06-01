@@ -1,5 +1,5 @@
 import { enumType, objectType } from "nexus";
-import { renderSlateWithPlaceholdersToHtml } from "../../../util/slate/placeholders";
+import { renderSlateToHtml } from "../../../util/slate/render";
 
 export const PetitionReminderType = enumType({
   name: "PetitionReminderType",
@@ -35,25 +35,9 @@ export const PetitionReminder = objectType({
     });
     t.nullable.string("emailBody", {
       description: "The body of the message in HTML format.",
-      resolve: async (o, _, ctx) => {
+      resolve: (o) => {
         if (!o.email_body) return null;
-
-        const [contact, access] = await Promise.all([
-          ctx.contacts.loadContactByAccessId(o.petition_access_id),
-          ctx.petitions.loadAccess(o.petition_access_id),
-        ]);
-
-        const getValues = await ctx.petitionMessageContext.fetchPlaceholderValues(
-          {
-            petitionId: access?.petition_id,
-            userId: o.sender_id,
-            contactId: contact?.id,
-            petitionAccessId: access?.id,
-          },
-          { publicContext: true }
-        );
-
-        return renderSlateWithPlaceholdersToHtml(JSON.parse(o.email_body), getValues);
+        return renderSlateToHtml(JSON.parse(o.email_body));
       },
     });
     t.nullable.field("sender", {

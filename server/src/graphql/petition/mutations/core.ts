@@ -19,6 +19,7 @@ import { isDefined, omit, pipe, range, sumBy, uniq, zip, zipWith } from "remeda"
 import {
   CreatePetition,
   CreatePetitionField,
+  CreatePetitionReminder,
   CreatePublicPetitionLink,
   Petition,
   PetitionPermission,
@@ -31,6 +32,7 @@ import { isFileTypeField } from "../../../util/isFileTypeField";
 import { pFlatMap } from "../../../util/promises/pFlatMap";
 import { withError } from "../../../util/promises/withError";
 import {
+  interpolatePlaceholdersInSlate,
   parseTextWithPlaceholders,
   renderTextWithPlaceholders,
 } from "../../../util/slate/placeholders";
@@ -1617,13 +1619,15 @@ export const sendPetition = mutationField("sendPetition", {
       const baseDate = new Date();
       const results = await pFlatMap(petitionChunks, async (currentChunk, chunkIndex) => {
         return await pMap(currentChunk, async ({ petition, contactIds, index }) => {
+          const getValues = await ctx.petitionMessageContext.fetchPlaceholderValues({
+            petitionId: petition.id,
+            userId: ctx.user!.id,
+            contactId: contactIds[0],
+          });
+
           const messageSubject = renderTextWithPlaceholders(
             index === 0 ? args.subject : petition.email_subject ?? args.subject,
-            await ctx.petitionMessageContext.fetchPlaceholderValues({
-              petitionId: petition.id,
-              userId: ctx.user!.id,
-              contactId: contactIds[0],
-            })
+            getValues
           );
 
           const [updatedPetition] = await ctx.petitions.updatePetition(
@@ -1641,7 +1645,8 @@ export const sendPetition = mutationField("sendPetition", {
             petition,
             contactIds,
             {
-              ...args,
+              remindersConfig: args.remindersConfig,
+              body: interpolatePlaceholdersInSlate(args.body, getValues),
               subject: messageSubject,
               scheduledAt:
                 chunkIndex === 0
@@ -1713,16 +1718,37 @@ export const sendReminders = mutationField("sendReminders", {
   ),
   resolve: async (_, args, ctx) => {
     try {
-      const reminders = await ctx.petitions.createReminders(
-        args.accessIds.map((accessId) => ({
-          type: "MANUAL",
-          status: "PROCESSING",
-          petition_access_id: accessId,
-          sender_id: ctx.user!.id,
-          email_body: args.body ? JSON.stringify(args.body) : null,
-          created_by: `User:${ctx.user!.id}`,
-        }))
+      const remindersData = await pMap(
+        args.accessIds,
+        async (accessId) => {
+          const contact = await ctx.contacts.loadContactByAccessId(accessId);
+          const getValues = await ctx.petitionMessageContext.fetchPlaceholderValues(
+            {
+              petitionId: args.petitionId,
+              userId: ctx.user!.id,
+              contactId: contact?.id,
+              petitionAccessId: accessId,
+            },
+            { publicContext: true }
+          );
+
+          const emailBody = args.body
+            ? JSON.stringify(interpolatePlaceholdersInSlate(args.body, getValues))
+            : null;
+
+          return {
+            type: "MANUAL",
+            status: "PROCESSING",
+            petition_access_id: accessId,
+            sender_id: ctx.user!.id,
+            email_body: emailBody,
+            created_by: `User:${ctx.user!.id}`,
+          } as CreatePetitionReminder;
+        },
+        { concurrency: 1 }
       );
+
+      const reminders = await ctx.petitions.createReminders(remindersData);
 
       await ctx.petitions.createEvent(
         reminders.filter(isDefined).map((reminder) => ({

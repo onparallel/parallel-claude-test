@@ -4,10 +4,7 @@ import { buildEmail } from "../../emails/buildEmail";
 import PetitionMessage from "../../emails/emails/PetitionMessage";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import {
-  renderSlateWithPlaceholdersToHtml,
-  renderSlateWithPlaceholdersToText,
-} from "../../util/slate/placeholders";
+import { renderSlateToHtml, renderSlateToText } from "../../util/slate/render";
 
 export async function petitionMessage(
   payload: { petition_message_id: number },
@@ -62,24 +59,14 @@ export async function petitionMessage(
       }))
     : null;
 
-  const getValue = await context.petitionMessageContext.fetchPlaceholderValues(
-    {
-      petitionId: message.petition_id,
-      userId: message.sender_id,
-      contactId: access.contact_id,
-      petitionAccessId: access.id,
-    },
-    { publicContext: true }
-  );
-
   const { html, text, subject, from } = await buildEmail(
     PetitionMessage,
     {
       senderName: fullName(senderData.first_name, senderData.last_name)!,
       senderEmail: senderData.email,
       subject: message.email_subject ?? null,
-      bodyHtml: renderSlateWithPlaceholdersToHtml(bodyJson, getValue),
-      bodyPlainText: renderSlateWithPlaceholdersToText(bodyJson, getValue),
+      bodyHtml: renderSlateToHtml(bodyJson),
+      bodyPlainText: renderSlateToText(bodyJson),
       deadline: petition.deadline,
       keycode: access.keycode,
       recipients,

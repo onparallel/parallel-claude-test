@@ -1,5 +1,5 @@
 import { enumType, objectType } from "nexus";
-import { renderSlateWithPlaceholdersToHtml } from "../../../util/slate/placeholders";
+import { renderSlateToHtml } from "../../../util/slate/render";
 
 export const PetitionMessageStatus = enumType({
   name: "PetitionMessageStatus",
@@ -48,20 +48,9 @@ export const PetitionMessage = objectType({
     });
     t.nullable.string("emailBody", {
       description: "The body of the petition message on HTML format.",
-      resolve: async (o, _, ctx) => {
+      resolve: (o) => {
         if (!o.email_body) return null;
-        const contact = await ctx.contacts.loadContactByAccessId(o.petition_access_id);
-        const getValues = await ctx.petitionMessageContext.fetchPlaceholderValues(
-          {
-            petitionId: o.petition_id,
-            userId: o.sender_id,
-            contactId: contact?.id,
-            petitionAccessId: o.petition_access_id,
-          },
-          { publicContext: true }
-        );
-
-        return renderSlateWithPlaceholdersToHtml(JSON.parse(o.email_body), getValues);
+        return renderSlateToHtml(JSON.parse(o.email_body));
       },
     });
     t.field("status", {

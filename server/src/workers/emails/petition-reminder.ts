@@ -5,10 +5,7 @@ import PetitionReminder from "../../emails/emails/PetitionReminder";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fullName } from "../../util/fullName";
-import {
-  renderSlateWithPlaceholdersToHtml,
-  renderSlateWithPlaceholdersToText,
-} from "../../util/slate/placeholders";
+import { renderSlateToHtml, renderSlateToText } from "../../util/slate/render";
 
 export async function petitionReminder(
   payload: { petition_reminder_id: number },
@@ -77,15 +74,6 @@ export async function petitionReminder(
     const bodyJson = reminder.email_body ? JSON.parse(reminder.email_body) : null;
     const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(orgId);
 
-    const getValues = await context.petitionMessageContext.fetchPlaceholderValues(
-      {
-        petitionId: access.petition_id,
-        contactId: access.contact_id,
-        userId: access.granter_id,
-        petitionAccessId: access.id,
-      },
-      { publicContext: true }
-    );
     const { html, text, subject, from } = await buildEmail(
       PetitionReminder,
       {
@@ -96,8 +84,8 @@ export async function petitionReminder(
         senderEmail: granterData.email,
         missingFieldCount,
         totalFieldCount: repliableFields.length,
-        bodyHtml: bodyJson ? renderSlateWithPlaceholdersToHtml(bodyJson, getValues) : null,
-        bodyPlainText: bodyJson ? renderSlateWithPlaceholdersToText(bodyJson, getValues) : null,
+        bodyHtml: bodyJson ? renderSlateToHtml(bodyJson) : null,
+        bodyPlainText: bodyJson ? renderSlateToText(bodyJson) : null,
         deadline: petition.deadline,
         keycode: access.keycode,
         removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,

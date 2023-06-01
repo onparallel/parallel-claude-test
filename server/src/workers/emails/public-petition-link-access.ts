@@ -3,11 +3,8 @@ import { buildEmail } from "../../emails/buildEmail";
 import PublicPetitionLinkAccess from "../../emails/emails/PublicPetitionLinkAccess";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import {
-  renderSlateWithPlaceholdersToHtml,
-  renderSlateWithPlaceholdersToText,
-  renderTextWithPlaceholders,
-} from "../../util/slate/placeholders";
+import { renderTextWithPlaceholders } from "../../util/slate/placeholders";
+import { renderSlateToHtml, renderSlateToText } from "../../util/slate/render";
 
 export async function publicPetitionLinkAccess(
   payload: { petition_message_id: number },
@@ -77,8 +74,8 @@ export async function publicPetitionLinkAccess(
         : null,
       petitionTitle: publicPetitionLink.title,
       keycode: access.keycode,
-      bodyHtml: renderSlateWithPlaceholdersToHtml(bodyJson, getValues),
-      bodyPlainText: renderSlateWithPlaceholdersToText(bodyJson, getValues),
+      bodyHtml: renderSlateToHtml(bodyJson),
+      bodyPlainText: renderSlateToText(bodyJson),
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       ...layoutProps,
     },

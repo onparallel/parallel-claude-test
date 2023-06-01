@@ -18,7 +18,10 @@ import { PetitionAccess, User } from "../../db/__types";
 import { Task } from "../../db/repositories/TaskRepository";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
-import { renderTextWithPlaceholders } from "../../util/slate/placeholders";
+import {
+  interpolatePlaceholdersInSlate,
+  renderTextWithPlaceholders,
+} from "../../util/slate/placeholders";
 import { stallFor } from "../../util/promises/stallFor";
 import { and, chain, checkClientServerToken, ifArgDefined } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
@@ -765,46 +768,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
           `PublicPetitionLink:${link.id}`
         );
 
-        const messageSubject = petition.email_subject
-          ? renderTextWithPlaceholders(
-              petition.email_subject,
-              await ctx.petitionMessageContext.fetchPlaceholderValues({
-                petitionId: petition.id,
-                contactId: contact.id,
-                userId: owner.user.id,
-              })
-            )
-          : link!.title;
-
-        await ctx.petitions.updatePetition(
-          petition.id,
-          {
-            name: (petition.name ?? messageSubject).slice(0, 255),
-            status: "PENDING",
-            closed_at: null,
-          },
-          `PublicPetitionLink:${link.id}`
-        );
-        const { messages } = await ctx.petitions.createAccessesAndMessages(
-          petition,
-          [contact.id],
-          {
-            subject: messageSubject,
-            body: JSON.parse(petition.email_body!),
-            remindersConfig: petition.reminders_config ?? null,
-          },
-          owner.user,
-          null,
-          true
-        );
-
-        await ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
-          petition.id,
-          link.template_id,
-          "PublicPetitionLink",
-          link.id
-        );
-
+        // prefill before creating message subject and body so replies are available on PetitionMessageContext
         if (isDefined(args.prefill)) {
           const payload = decode(args.prefill) as JwtPayload;
           if ("replies" in payload && typeof payload.replies === "object") {
@@ -821,6 +785,49 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
             `PublicPetitionLink:${link.id}`
           );
         }
+
+        const getValues = await ctx.petitionMessageContext.fetchPlaceholderValues({
+          petitionId: petition.id,
+          contactId: contact.id,
+          userId: owner.user.id,
+        });
+
+        const messageSubject = petition.email_subject
+          ? renderTextWithPlaceholders(petition.email_subject, getValues)
+          : link!.title;
+
+        const messageBody = petition.email_body
+          ? interpolatePlaceholdersInSlate(JSON.parse(petition.email_body), getValues)
+          : null;
+
+        await ctx.petitions.updatePetition(
+          petition.id,
+          {
+            name: (petition.name ?? messageSubject).slice(0, 255),
+            status: "PENDING",
+            closed_at: null,
+          },
+          `PublicPetitionLink:${link.id}`
+        );
+        const { messages } = await ctx.petitions.createAccessesAndMessages(
+          petition,
+          [contact.id],
+          {
+            subject: messageSubject,
+            body: messageBody,
+            remindersConfig: petition.reminders_config ?? null,
+          },
+          owner.user,
+          null,
+          true
+        );
+
+        await ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
+          petition.id,
+          link.template_id,
+          "PublicPetitionLink",
+          link.id
+        );
 
         // trigger emails and events
         // in this case the messages array should always have one unscheduled message, so there is no need to check what to send

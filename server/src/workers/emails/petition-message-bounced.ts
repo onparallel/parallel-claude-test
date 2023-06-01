@@ -4,10 +4,7 @@ import MessageBouncedEmail from "../../emails/emails/MessageBouncedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
-import {
-  renderSlateWithPlaceholdersToHtml,
-  renderSlateWithPlaceholdersToText,
-} from "../../util/slate/placeholders";
+import { renderSlateToHtml, renderSlateToText } from "../../util/slate/render";
 
 export async function petitionMessageBounced(
   payload: { petition_message_id: number },
@@ -40,12 +37,6 @@ export async function petitionMessageBounced(
 
   const { emailFrom, ...layoutProps } = await context.layouts.getLayoutProps(petition.org_id);
 
-  const getValues = await context.petitionMessageContext.fetchPlaceholderValues({
-    petitionId: message.petition_id,
-    contactId: access.contact_id,
-    userId: message.sender_id,
-  });
-
   const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
   const { html, text, subject, from } = await buildEmail(
     MessageBouncedEmail,
@@ -54,8 +45,8 @@ export async function petitionMessageBounced(
       senderName: fullName(senderData.first_name, senderData.last_name)!,
       petitionId: toGlobalId("Petition", petition.id),
       petitionName: petition.name,
-      bodyHtml: renderSlateWithPlaceholdersToHtml(bodyJson, getValues),
-      bodyPlainText: renderSlateWithPlaceholdersToText(bodyJson, getValues),
+      bodyHtml: renderSlateToHtml(bodyJson),
+      bodyPlainText: renderSlateToText(bodyJson),
       contactEmail: contact.email,
       ...layoutProps,
     },

@@ -81,3 +81,14 @@ export function renderSlateWithPlaceholdersToHtml(
     },
   });
 }
+
+export function interpolatePlaceholdersInSlate(
+  nodes: SlateNode[],
+  getPlaceholder?: (value: string) => string
+) {
+  return walkSlateNodes(nodes, (node) => {
+    if (node.type === "placeholder") {
+      return { text: getPlaceholder?.(node.placeholder!) ?? "" };
+    }
+  });
+}
