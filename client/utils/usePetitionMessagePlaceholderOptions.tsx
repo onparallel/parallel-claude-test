@@ -1,12 +1,10 @@
 import { gql } from "@apollo/client";
-import {
-  PetitionFieldType,
-  usePetitionMessagePlaceholderOptions_PetitionBaseFragment,
-} from "@parallel/graphql/__types";
+import { usePetitionMessagePlaceholderOptions_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 import { zip } from "remeda";
 import { useFieldIndices } from "./fieldIndices";
+import { isFileTypeField } from "./isFileTypeField";
 import { PlaceholderOption, createPlaceholderPlugin } from "./slate/PlaceholderPlugin";
 
 export function usePetitionMessagePlaceholderOptions({
@@ -85,9 +83,7 @@ export function usePetitionMessagePlaceholderOptions({
         },
       })),
       ...zip(petition.fields, indices)
-        .filter(([field]) =>
-          (["SHORT_TEXT", "NUMBER", "DATE", "SELECT"] as PetitionFieldType[]).includes(field.type)
-        )
+        .filter(([field]) => field.isInternal && !isFileTypeField(field.type))
         .map(([field, index]) => ({
           key: field.id,
           text:
@@ -111,6 +107,10 @@ usePetitionMessagePlaceholderOptions.fragments = {
   PetitionBase: gql`
     fragment usePetitionMessagePlaceholderOptions_PetitionBase on PetitionBase {
       ...createPlaceholderPlugin_PetitionBase
+      fields {
+        type
+        isInternal
+      }
     }
     ${createPlaceholderPlugin.fragments.PetitionBase}
   `,
