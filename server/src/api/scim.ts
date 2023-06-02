@@ -77,12 +77,12 @@ scim
         active,
         name: { familyName, givenName },
         emails,
-      }: {
+      } = req.body as {
         externalId: string;
         active: boolean;
         name: { givenName: string; familyName: string };
-        emails: { type: string; value: string }[];
-      } = req.body;
+        emails?: { type: string; value: string }[];
+      };
       let user = await req.context.users.loadUserByExternalId({
         externalId,
         orgId: req.context.organization!.id,
@@ -128,7 +128,7 @@ scim
           orgId,
           "SSO"
         );
-        const email = emails.find((e) => e.type === "work")?.value;
+        const email = emails?.find((e) => e.type === "work")?.value;
         if (ssoIntegrations.length > 0 && email) {
           const user = await req.context.users.createUser(
             {
