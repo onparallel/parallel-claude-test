@@ -8691,6 +8691,7 @@ export type AddPetitionAccessDialog_PetitionFragment = {
     __typename?: "PetitionField";
     type: PetitionFieldType;
     isInternal: boolean;
+    isReadOnly: boolean;
     id: string;
     title?: string | null;
     alias?: string | null;
@@ -8787,6 +8788,7 @@ export type AddPetitionAccessDialog_createPetitionAccessMutation = {
         __typename?: "PetitionField";
         type: PetitionFieldType;
         isInternal: boolean;
+        isReadOnly: boolean;
         id: string;
         title?: string | null;
         alias?: string | null;
@@ -8843,6 +8845,7 @@ export type useConfirmSendReminderDialog_PetitionFragment = {
     __typename?: "PetitionField";
     type: PetitionFieldType;
     isInternal: boolean;
+    isReadOnly: boolean;
     id: string;
     title?: string | null;
     alias?: string | null;
@@ -9410,6 +9413,7 @@ export type MessageClosingEmailEditor_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionField";
     type: PetitionFieldType;
     isInternal: boolean;
+    isReadOnly: boolean;
     id: string;
     title?: string | null;
     alias?: string | null;
@@ -9424,6 +9428,7 @@ export type MessageClosingEmailEditor_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "PetitionField";
     type: PetitionFieldType;
     isInternal: boolean;
+    isReadOnly: boolean;
     id: string;
     title?: string | null;
     alias?: string | null;
@@ -9442,6 +9447,7 @@ export type MessageEmailEditor_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionField";
     type: PetitionFieldType;
     isInternal: boolean;
+    isReadOnly: boolean;
     id: string;
     title?: string | null;
     alias?: string | null;
@@ -9456,6 +9462,7 @@ export type MessageEmailEditor_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "PetitionField";
     type: PetitionFieldType;
     isInternal: boolean;
+    isReadOnly: boolean;
     id: string;
     title?: string | null;
     alias?: string | null;
@@ -10837,6 +10844,7 @@ export type useSendPetitionHandler_PetitionFragment = {
     __typename?: "PetitionField";
     type: PetitionFieldType;
     isInternal: boolean;
+    isReadOnly: boolean;
     id: string;
     title?: string | null;
     alias?: string | null;
@@ -10963,6 +10971,7 @@ export type useSendPetitionHandler_addPetitionPermissionMutation = {
           __typename?: "PetitionField";
           type: PetitionFieldType;
           isInternal: boolean;
+          isReadOnly: boolean;
           id: string;
           title?: string | null;
           alias?: string | null;
@@ -12587,6 +12596,7 @@ export type PetitionTemplateClosingMessageCard_PetitionTemplateFragment = {
     __typename?: "PetitionField";
     type: PetitionFieldType;
     isInternal: boolean;
+    isReadOnly: boolean;
     id: string;
     title?: string | null;
     alias?: string | null;
@@ -12612,6 +12622,7 @@ export type PetitionTemplateCompletingMessageCard_PetitionTemplateFragment = {
     __typename?: "PetitionField";
     type: PetitionFieldType;
     isInternal: boolean;
+    isReadOnly: boolean;
     id: string;
     title?: string | null;
     alias?: string | null;
@@ -12640,6 +12651,7 @@ export type PetitionTemplateRequestMessageCard_PetitionTemplateFragment = {
     __typename?: "PetitionField";
     type: PetitionFieldType;
     isInternal: boolean;
+    isReadOnly: boolean;
     id: string;
     title?: string | null;
     alias?: string | null;
@@ -14430,6 +14442,7 @@ export type useClosePetitionDialog_PetitionFragment = {
     __typename?: "PetitionField";
     type: PetitionFieldType;
     isInternal: boolean;
+    isReadOnly: boolean;
     id: string;
     title?: string | null;
     alias?: string | null;
@@ -18596,6 +18609,7 @@ export type PetitionActivity_PetitionFragment = {
     id: string;
     type: PetitionFieldType;
     isInternal: boolean;
+    isReadOnly: boolean;
     title?: string | null;
     options: { [key: string]: any };
     alias?: string | null;
@@ -19481,6 +19495,7 @@ export type PetitionActivity_updatePetitionMutation = {
           id: string;
           type: PetitionFieldType;
           isInternal: boolean;
+          isReadOnly: boolean;
           title?: string | null;
           options: { [key: string]: any };
           alias?: string | null;
@@ -20426,6 +20441,7 @@ export type PetitionActivity_petitionQuery = {
           id: string;
           type: PetitionFieldType;
           isInternal: boolean;
+          isReadOnly: boolean;
           title?: string | null;
           options: { [key: string]: any };
           alias?: string | null;
@@ -21378,13 +21394,13 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     type: PetitionFieldType;
     options: { [key: string]: any };
     isInternal: boolean;
+    isReadOnly: boolean;
     title?: string | null;
     alias?: string | null;
     description?: string | null;
     optional: boolean;
     multiple: boolean;
     isFixed: boolean;
-    isReadOnly: boolean;
     visibility?: { [key: string]: any } | null;
     showInPdf: boolean;
     showActivityInPdf: boolean;
@@ -21831,6 +21847,7 @@ export type PetitionCompose_updatePetitionMutation = {
           __typename?: "PetitionField";
           type: PetitionFieldType;
           isInternal: boolean;
+          isReadOnly: boolean;
           id: string;
           title?: string | null;
           alias?: string | null;
@@ -22396,13 +22413,13 @@ export type PetitionCompose_petitionQuery = {
           type: PetitionFieldType;
           options: { [key: string]: any };
           isInternal: boolean;
+          isReadOnly: boolean;
           title?: string | null;
           alias?: string | null;
           description?: string | null;
           optional: boolean;
           multiple: boolean;
           isFixed: boolean;
-          isReadOnly: boolean;
           visibility?: { [key: string]: any } | null;
           showInPdf: boolean;
           showActivityInPdf: boolean;
@@ -22717,6 +22734,7 @@ export type PetitionMessages_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "PetitionField";
     type: PetitionFieldType;
     isInternal: boolean;
+    isReadOnly: boolean;
     id: string;
     title?: string | null;
     alias?: string | null;
@@ -22863,6 +22881,7 @@ export type PetitionMessages_petitionQuery = {
           __typename?: "PetitionField";
           type: PetitionFieldType;
           isInternal: boolean;
+          isReadOnly: boolean;
           id: string;
           title?: string | null;
           alias?: string | null;
@@ -22926,6 +22945,7 @@ export type PetitionMessages_updatePetitionMutation = {
           __typename?: "PetitionField";
           type: PetitionFieldType;
           isInternal: boolean;
+          isReadOnly: boolean;
           id: string;
           title?: string | null;
           alias?: string | null;
@@ -23448,11 +23468,11 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     multiple: boolean;
     alias?: string | null;
     isInternal: boolean;
+    isReadOnly: boolean;
     title?: string | null;
     options: { [key: string]: any };
     visibility?: { [key: string]: any } | null;
     optional: boolean;
-    isReadOnly: boolean;
     commentCount: number;
     unreadCommentCount: number;
     hasCommentsEnabled: boolean;
@@ -23842,11 +23862,11 @@ export type PetitionPreview_updatePetitionMutation = {
           multiple: boolean;
           alias?: string | null;
           isInternal: boolean;
+          isReadOnly: boolean;
           title?: string | null;
           options: { [key: string]: any };
           visibility?: { [key: string]: any } | null;
           optional: boolean;
-          isReadOnly: boolean;
           commentCount: number;
           unreadCommentCount: number;
           hasCommentsEnabled: boolean;
@@ -24187,11 +24207,11 @@ export type PetitionPreview_completePetitionMutation = {
       multiple: boolean;
       alias?: string | null;
       isInternal: boolean;
+      isReadOnly: boolean;
       title?: string | null;
       options: { [key: string]: any };
       visibility?: { [key: string]: any } | null;
       optional: boolean;
-      isReadOnly: boolean;
       commentCount: number;
       unreadCommentCount: number;
       hasCommentsEnabled: boolean;
@@ -24390,11 +24410,11 @@ export type PetitionPreview_petitionQuery = {
           multiple: boolean;
           alias?: string | null;
           isInternal: boolean;
+          isReadOnly: boolean;
           title?: string | null;
           options: { [key: string]: any };
           visibility?: { [key: string]: any } | null;
           optional: boolean;
-          isReadOnly: boolean;
           commentCount: number;
           unreadCommentCount: number;
           hasCommentsEnabled: boolean;
@@ -30305,6 +30325,7 @@ export type usePetitionMessagePlaceholderOptions_PetitionBase_Petition_Fragment 
     __typename?: "PetitionField";
     type: PetitionFieldType;
     isInternal: boolean;
+    isReadOnly: boolean;
     id: string;
     title?: string | null;
     alias?: string | null;
@@ -30319,6 +30340,7 @@ export type usePetitionMessagePlaceholderOptions_PetitionBase_PetitionTemplate_F
     __typename?: "PetitionField";
     type: PetitionFieldType;
     isInternal: boolean;
+    isReadOnly: boolean;
     id: string;
     title?: string | null;
     alias?: string | null;
@@ -31267,6 +31289,7 @@ export const usePetitionMessagePlaceholderOptions_PetitionBaseFragmentDoc = gql`
     fields {
       type
       isInternal
+      isReadOnly
     }
   }
   ${createPlaceholderPlugin_PetitionBaseFragmentDoc}

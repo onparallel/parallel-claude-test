@@ -83,7 +83,7 @@ export function usePetitionMessagePlaceholderOptions({
         },
       })),
       ...zip(petition.fields, indices)
-        .filter(([field]) => field.isInternal && !isFileTypeField(field.type))
+        .filter(([field]) => field.isInternal && !field.isReadOnly && !isFileTypeField(field.type))
         .map(([field, index]) => ({
           key: field.id,
           text:
@@ -110,6 +110,7 @@ usePetitionMessagePlaceholderOptions.fragments = {
       fields {
         type
         isInternal
+        isReadOnly
       }
     }
     ${createPlaceholderPlugin.fragments.PetitionBase}
