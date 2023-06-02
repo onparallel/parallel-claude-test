@@ -285,6 +285,7 @@ function PlaceholderElement({
         data-placeholder={element.placeholder}
         {...attributes}
         as="span"
+        display="inline-block"
         fontSize="sm"
         height="21px"
         {...(!isDefined(placeholder)
@@ -301,6 +302,7 @@ function PlaceholderElement({
               backgroundColor: "blue.100",
               color: "blue.800",
             })}
+        whiteSpace="nowrap"
         fontWeight="semibold"
         borderRadius="sm"
         boxShadow={isSelected && isFocused ? "outline" : "none"}
