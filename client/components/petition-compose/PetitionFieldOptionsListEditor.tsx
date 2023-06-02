@@ -158,6 +158,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
         <Slate editor={editor} initialValue={value} onChange={onChange as any}>
           <Box maxHeight="200px" overflow="auto" fontSize="sm">
             <Editable
+              style={{ outline: "none" }}
               renderElement={renderElement}
               renderLeaf={renderLeaf}
               {...props}
