@@ -18,7 +18,12 @@ import {
   RenderFunction,
   TRenderElementProps,
   Value,
+  getEditorString,
   getPluginOptions,
+  getPointAfter,
+  getPointBefore,
+  getRange,
+  insertNodes,
   usePlateEditorRef,
 } from "@udecode/plate-common";
 import {
@@ -26,6 +31,7 @@ import {
   MentionPlugin,
   createMentionPlugin,
   getMentionOnSelectItem,
+  isSelectionInMentionInput,
   withMention,
 } from "@udecode/plate-mention";
 import { ReactNode, RefObject, createContext, useCallback, useContext } from "react";
@@ -63,10 +69,11 @@ export function createPlaceholderPlugin<
   TValue extends Value = Value,
   TEditor extends PlateEditor<TValue> = PlateEditor<TValue>
 >({ placeholdersRef }: { placeholdersRef: RefObject<PlaceholderOption[]> }) {
+  const trigger = "{";
   return createMentionPlugin<MentionPlugin<PlaceholderOption>, TValue, TEditor>({
     key: ELEMENT_PLACEHOLDER,
     options: {
-      trigger: "{",
+      trigger,
       insertSpaceAfterMention: true,
       createMentionNode(item) {
         return {
@@ -84,32 +91,66 @@ export function createPlaceholderPlugin<
     },
     component: PlaceholderElement,
     withOverrides: function (_editor, plugin) {
+      const { trigger, query } = plugin.options;
+      const { insertText: _insertText } = _editor;
       const editor = withMention<TValue, TEditor>(_editor, plugin as any);
-      const { insertText } = editor;
+
       editor.insertText = (text, options) => {
-        for (const part of parseTextWithPlaceholders(text)) {
-          if (part.type === "placeholder") {
-            const placeholder = placeholdersRef.current?.find(
-              (p) =>
-                p.key === part.value ||
-                ("data" in p && "field" in p.data && p.data.field.alias === part.value)
-            );
-            if (isDefined(placeholder)) {
-              editor.insertNode({
-                type: ELEMENT_PLACEHOLDER,
-                placeholder: placeholder.key,
-                children: [{ text: "" }],
-              });
+        if (
+          !editor.selection ||
+          text !== trigger ||
+          (query && !query<TValue, TEditor>(editor)) ||
+          isSelectionInMentionInput(editor)
+        ) {
+          for (const part of parseTextWithPlaceholders(text)) {
+            if (part.type === "placeholder") {
+              const placeholder = placeholdersRef.current?.find(
+                (p) =>
+                  p.key === part.value ||
+                  ("data" in p && "field" in p.data && p.data.field.alias === part.value)
+              );
+              if (isDefined(placeholder)) {
+                editor.insertNode({
+                  type: ELEMENT_PLACEHOLDER,
+                  placeholder: placeholder.key,
+                  children: [{ text: "" }],
+                });
+              }
+            } else {
+              _insertText(part.text, options);
             }
-          } else {
-            insertText(part.text, options);
           }
+          return;
         }
+
+        // Make sure a mention input is created at the beginning of line or after a whitespace
+        const previousChar = getEditorString(
+          editor,
+          getRange(editor, editor.selection, getPointBefore(editor, editor.selection))
+        );
+
+        const nextChar = getEditorString(
+          editor,
+          getRange(editor, editor.selection, getPointAfter(editor, editor.selection))
+        );
+
+        const beginningOfLine = previousChar === "";
+        const endOfLine = nextChar === "";
+        const data = {
+          type: ELEMENT_PLACEHOLDER_INPUT,
+          children: [{ text: "" }],
+          trigger,
+        };
+        return insertNodes(
+          editor,
+          beginningOfLine && !endOfLine ? [{ text: "" }, data] : (data as any)
+        );
       };
-      const { insertNodes } = editor;
+
+      const { insertNodes: _insertNodes } = editor;
       editor.insertNodes = (nodes, options) => {
         // remove invalid nodes
-        insertNodes(visitNodes(nodes), options);
+        _insertNodes(visitNodes(nodes), options);
       };
       function filterNodes(nodes: Node[]) {
         return nodes.filter((node) => {
@@ -283,11 +324,13 @@ function PlaceholderElement({
         className="slate-placeholder"
         contentEditable={false}
         data-placeholder={element.placeholder}
+        data-selected={(isSelected && isFocused) || undefined}
         {...attributes}
         as="span"
         display="inline-block"
         fontSize="sm"
         height="21px"
+        marginX="1px"
         {...(!isDefined(placeholder)
           ? {
               backgroundColor: "gray.100",
@@ -305,7 +348,11 @@ function PlaceholderElement({
         whiteSpace="nowrap"
         fontWeight="semibold"
         borderRadius="sm"
-        boxShadow={isSelected && isFocused ? "outline" : "none"}
+        _selected={{
+          boxShadow: "outline",
+          position: "relative",
+          zIndex: 1,
+        }}
         paddingX={1}
       >
         {!isDefined(placeholder) ? (
@@ -393,7 +440,7 @@ export const PlaceholderInputElement = (props: any) => {
       backgroundColor="blue.100"
       borderRadius="sm"
       paddingX={1}
-      marginX="0.1em"
+      marginX="1px"
       _before={{ content: '"{{ "' }}
       {...attributes}
     >

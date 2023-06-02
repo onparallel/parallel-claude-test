@@ -13,14 +13,14 @@ import {
   useComboboxControls,
   useComboboxSelectors,
 } from "@udecode/plate-combobox";
+import { RenderFunction, useEditorState, useEventEditorSelectors } from "@udecode/plate-common";
 import {
-  RenderFunction,
-  getAboveNode,
-  toDOMNode,
-  useEditorState,
-  useEventEditorSelectors,
-} from "@udecode/plate-common";
-import { flip, offset, shift, useVirtualFloating } from "@udecode/plate-floating";
+  flip,
+  getRangeBoundingClientRect,
+  offset,
+  shift,
+  useVirtualFloating,
+} from "@udecode/plate-floating";
 import { useCallback, useEffect, useState } from "react";
 import { groupBy } from "remeda";
 import { Card } from "../Card";
@@ -104,26 +104,10 @@ const ComboboxContent = <TData extends Data = NoData>(
   );
 
   // Get target range rect
-  const getBoundingClientRect = useCallback(() => {
-    const match = getAboveNode(editor as any, {
-      at: targetRange ?? undefined,
-      match: (node) => node.type === inputType,
-    });
-    const node = match && match[0];
-    const domNode = node && toDOMNode(editor, node);
-    return (
-      domNode?.getBoundingClientRect() ?? {
-        width: 0,
-        height: 0,
-        x: 0,
-        y: 0,
-        top: -9999,
-        left: -9999,
-        right: 9999,
-        bottom: 9999,
-      }
-    );
-  }, [editor, targetRange]);
+  const getBoundingClientRect = useCallback(
+    () => getRangeBoundingClientRect(editor, targetRange),
+    [editor, targetRange]
+  );
 
   // Update popper position
   const { style, floating } = useVirtualFloating({

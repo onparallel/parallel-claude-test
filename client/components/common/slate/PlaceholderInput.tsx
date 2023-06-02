@@ -149,6 +149,8 @@ export const PlaceholderInput = chakraForwardRef<
       readOnly: isDisabled,
       "aria-disabled": formControl.disabled,
       placeholder,
+      "aria-multiline": undefined,
+      disableDefaultStyles: true,
       ...props,
     };
 
@@ -181,6 +183,7 @@ export const PlaceholderInput = chakraForwardRef<
               color: "gray.400",
             },
             "[data-slate-editor]": {
+              position: "relative",
               outline: "none",
               flex: 1,
               ...pick(inputStyleConfig, ["px"]),
