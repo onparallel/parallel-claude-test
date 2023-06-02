@@ -146,7 +146,7 @@ export const PlaceholderInput = chakraForwardRef<
     } as any;
 
     const editableProps = {
-      readOnly: isDisabled,
+      readOnly: formControl.disabled,
       "aria-disabled": formControl.disabled,
       placeholder,
       "aria-multiline": undefined,
@@ -154,17 +154,9 @@ export const PlaceholderInput = chakraForwardRef<
       ...props,
     };
 
-    const formControlProps = pick(formControl, [
-      "id",
-      "aria-invalid",
-      "aria-required",
-      "aria-readonly",
-      "aria-describedby",
-    ]);
-
     return (
       <PlateProvider<PlaceholderInputValue, PlaceholderInputEditor>
-        id={id}
+        id={formControl.id}
         plugins={plugins}
         initialValue={initialValue}
         onChange={(value) => onChange(slateNodesToTextWithPlaceholders(value, placeholders))}
@@ -172,7 +164,13 @@ export const PlaceholderInput = chakraForwardRef<
         <Box
           overflow="hidden"
           position="relative"
-          {...formControlProps}
+          aria-disabled={formControl.disabled}
+          {...(pick(formControl, [
+            "aria-invalid",
+            "aria-required",
+            "aria-readonly",
+            "aria-describedby",
+          ]) as any)}
           {...inputStyles}
           display="flex"
           sx={{
@@ -196,15 +194,19 @@ export const PlaceholderInput = chakraForwardRef<
         >
           <PlaceholdersProvider placeholders={placeholders}>
             <PlateWithEditorRef<PlaceholderInputValue, PlaceholderInputEditor>
+              id={formControl.id}
               editorRef={editorRef}
-              id={id}
               editableProps={editableProps}
             >
               <PlaceholderCombobox placeholders={placeholders} />
             </PlateWithEditorRef>
           </PlaceholdersProvider>
           <Center paddingRight={1} height="full">
-            <ToolbarPlaceholderButton variant="outline" size="sm" />
+            <ToolbarPlaceholderButton
+              isDisabled={formControl.disabled}
+              variant="outline"
+              size="sm"
+            />
           </Center>
         </Box>
       </PlateProvider>

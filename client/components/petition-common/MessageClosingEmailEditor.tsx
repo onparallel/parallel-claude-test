@@ -24,7 +24,7 @@ export function MessageClosingEmailEditor({
   const intl = useIntl();
   const placeholderOptions = usePetitionMessagePlaceholderOptions({ petition });
   return (
-    <FormControl isInvalid={showErrors} id="petition-closing-message-body">
+    <FormControl isInvalid={showErrors} id={`email-closing-message-${id}`} isDisabled={isReadOnly}>
       <FormLabel marginBottom={3.5}>
         <FormattedMessage
           id="component.message-closing-email-editor.body-label"
@@ -32,7 +32,6 @@ export function MessageClosingEmailEditor({
         />
       </FormLabel>
       <RichTextEditor
-        id={`email-closing-message-${id}`}
         value={body}
         onChange={onBodyChange}
         placeholder={intl.formatMessage({
@@ -40,7 +39,6 @@ export function MessageClosingEmailEditor({
           defaultMessage: "Write a message to include in the email",
         })}
         placeholderOptions={placeholderOptions}
-        isDisabled={isReadOnly}
       />
     </FormControl>
   );

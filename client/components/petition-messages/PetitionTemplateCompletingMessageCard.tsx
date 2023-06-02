@@ -137,7 +137,7 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
                   </AlertDescription>
                 </CloseableAlert>
               ) : null}
-              <FormControl>
+              <FormControl isDisabled={isReadOnly}>
                 <FormLabel paddingBottom={0}>
                   <FormattedMessage
                     id="component.petition-template-completing-message.subject-label"
@@ -155,12 +155,14 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
                     id: "component.petition-template-completing-message.subject-placeholder",
                     defaultMessage: "Enter a title or subject for your message",
                   })}
-                  isDisabled={isReadOnly}
                 />
               </FormControl>
-              <FormControl marginTop={4}>
+              <FormControl
+                marginTop={4}
+                id={`completing-message-${petition.id}`}
+                isDisabled={isReadOnly}
+              >
                 <RichTextEditor
-                  id={`completing-message-${petition.id}`}
                   value={body}
                   onChange={handleBodyChange}
                   placeholder={intl.formatMessage({
@@ -169,7 +171,6 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
                       "Write the message that your recipients will see when they finalize",
                   })}
                   placeholderOptions={placeholders}
-                  isDisabled={isReadOnly}
                 />
               </FormControl>
             </PaddedCollapse>

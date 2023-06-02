@@ -88,8 +88,6 @@ export interface CommentEditorProps
     Omit<EditableProps, "value" | "onChange">,
     Pick<MentionComboboxProps, "defaultMentionables">,
     Partial<Pick<MentionComboboxProps, "onSearchMentionables">> {
-  // we need an id to pass it to the Plate element
-  id: string;
   placeholder?: string;
   isDisabled?: boolean;
   isInvalid?: boolean;
@@ -186,7 +184,7 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
     } as any;
 
     const editableProps = {
-      readOnly: isDisabled,
+      readOnly: formControl.disabled,
       "aria-disabled": formControl.disabled,
       placeholder,
       ...props,
@@ -195,17 +193,9 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
     // for some reason frozen objects from the apollo cache cause issues when typing
     const initialValue = useConstant(() => structuredClone(value));
 
-    const formControlProps = pick(formControl, [
-      "id",
-      "aria-invalid",
-      "aria-required",
-      "aria-readonly",
-      "aria-describedby",
-    ]);
-
     return (
       <PlateProvider<CommentEditorValue, CommentPEditor>
-        id={id}
+        id={formControl.id}
         plugins={plugins}
         initialValue={initialValue}
         onChange={!isDisabled ? onChange : undefined}
@@ -213,7 +203,12 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
         <Box
           overflow="hidden"
           aria-disabled={formControl.disabled}
-          {...formControlProps}
+          {...(pick(formControl, [
+            "aria-invalid",
+            "aria-required",
+            "aria-readonly",
+            "aria-describedby",
+          ]) as any)}
           {...inputStyles}
           sx={{
             "[data-slate-editor]": {
@@ -233,8 +228,8 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
           }}
         >
           <PlateWithEditorRef<CommentEditorValue, CommentPEditor>
+            id={formControl.id}
             editorRef={editorRef}
-            id={id}
             editableProps={editableProps}
           >
             {onSearchMentionables ? (

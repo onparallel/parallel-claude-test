@@ -33,7 +33,7 @@ export function MessageEmailEditor({
   const placeholderOptions = usePetitionMessagePlaceholderOptions({ petition });
   return (
     <>
-      <FormControl isInvalid={showErrors && !subject} isDisabled={isReadOnly}>
+      <FormControl isInvalid={showErrors && !subject} isDisabled={isReadOnly} id={`${id}-subject`}>
         <FormLabel paddingBottom={0} {...labelProps}>
           {
             <FormattedMessage
@@ -61,13 +61,8 @@ export function MessageEmailEditor({
           />
         </FormErrorMessage>
       </FormControl>
-      <FormControl
-        isInvalid={showErrors && isEmptyRTEValue(body)}
-        marginTop={4}
-        id="petition-message-body"
-      >
+      <FormControl isInvalid={showErrors && isEmptyRTEValue(body)} marginTop={4} id={`${id}-body`}>
         <RichTextEditor
-          id={`email-message-${id}`}
           data-testid="petition-email-body-rte"
           value={body}
           onChange={onBodyChange}

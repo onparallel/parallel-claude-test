@@ -77,8 +77,6 @@ type RichTextPEditor = CustomEditor<RichTextEditorValue>;
 export interface RichTextEditorProps
   extends ValueProps<RichTextEditorValue, false>,
     Omit<EditableProps, "value" | "onChange"> {
-  // we need an id to pass it to the Plate element
-  id: string;
   placeholder?: string;
   isDisabled?: boolean;
   isInvalid?: boolean;
@@ -201,23 +199,16 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
     } as any;
 
     const editableProps = {
-      readOnly: isDisabled,
+      readOnly: formControl.disabled,
       "aria-disabled": formControl.disabled,
       placeholder,
     };
 
     const initialValue = useConstant(() => structuredClone(value));
 
-    const formControlProps = pick(formControl, [
-      "id",
-      "aria-invalid",
-      "aria-required",
-      "aria-readonly",
-      "aria-describedby",
-    ]);
-
     return (
       <PlateProvider<RichTextEditorValue, RichTextPEditor>
+        id={formControl.id}
         plugins={plugins}
         initialValue={initialValue}
         onChange={
@@ -230,7 +221,12 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
           role="application"
           overflow="hidden"
           aria-disabled={formControl.disabled}
-          {...formControlProps}
+          {...(pick(formControl, [
+            "aria-invalid",
+            "aria-required",
+            "aria-readonly",
+            "aria-describedby",
+          ]) as any)}
           {...inputStyles}
           {...props}
           sx={{
@@ -260,6 +256,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
           {hasPlaceholders ? (
             <PlaceholdersProvider placeholders={placeholderOptions}>
               <PlateWithEditorRef<RichTextEditorValue, RichTextPEditor>
+                id={formControl.id}
                 editorRef={editorRef}
                 editableProps={editableProps}
               >
@@ -268,6 +265,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
             </PlaceholdersProvider>
           ) : (
             <PlateWithEditorRef<RichTextEditorValue, RichTextPEditor>
+              id={formControl.id}
               editorRef={editorRef}
               editableProps={editableProps}
             />

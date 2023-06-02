@@ -58,7 +58,6 @@ const ComboboxContent = <TData extends Data = NoData>(
   >
 ) => {
   const {
-    inputType,
     defaultItems,
     onSearchItems,
     onRenderItem: Item = ({ item }) => item.text,

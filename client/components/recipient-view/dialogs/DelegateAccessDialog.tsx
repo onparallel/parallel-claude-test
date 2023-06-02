@@ -181,7 +181,7 @@ function DelegateAccessDialog({
               </FormErrorMessage>
             )}
           </FormControl>
-          <FormControl id="message" isInvalid={!!errors.messageBody}>
+          <FormControl isInvalid={!!errors.messageBody} id="delegate-access-message">
             <FormLabel>
               <FormattedMessage id="generic.forms.message-label" defaultMessage="Message" />
             </FormLabel>
@@ -193,7 +193,6 @@ function DelegateAccessDialog({
               }}
               render={({ field: { value, onChange } }) => (
                 <RichTextEditor
-                  id="delegate-access-message"
                   value={value}
                   onChange={onChange}
                   placeholder={intl.formatMessage({
