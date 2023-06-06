@@ -853,52 +853,12 @@ export class PetitionRepository extends BaseRepository {
         total: number;
       };
     }
-  >(async (petitionIds, t) => {
-    const [fields, fieldReplies] = await Promise.all([
-      this.from("petition_field", t)
-        .whereIn("petition_id", petitionIds)
-        .whereNull("deleted_at")
-        .whereNot("type", "HEADING"),
-      this.raw<PetitionFieldReply & { upload_complete: boolean | null }>(
-        /* sql */ `
-          select pfr.*, fu.upload_complete
-          from petition_field_reply as pfr
-          join petition_field as pf on pf.id = pfr.petition_field_id 
-          left join file_upload fu
-            on pfr.type in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'DOW_JONES_KYC')
-            and (pfr.content->>'file_upload_id')::int = fu.id
-          where pfr.deleted_at is null and pf.petition_id in ? and pf.deleted_at is null
-        `,
-        [this.sqlIn(petitionIds)],
-        t
-      ),
-    ]);
+  >(async (petitionIds) => {
+    const fieldsWithRepliesByPetitionId = await this.getPetitionFieldsWithReplies(
+      petitionIds as number[]
+    );
 
-    const fieldsByPetition = groupBy(fields, (f) => f.petition_id);
-
-    return petitionIds.map((id) => {
-      const fieldsWithReplies = (fieldsByPetition[id] ?? [])
-        .map((field) => ({
-          ...field,
-          replies: fieldReplies
-            .filter((r) => r.petition_field_id === field.id && r.content !== null)
-            .filter((r) => (isFileTypeField(field.type) ? r.upload_complete : true))
-            .map((reply) => {
-              return {
-                content: isFileTypeField(field.type)
-                  ? {
-                      ...reply.content,
-                      uploadComplete: true,
-                    }
-                  : reply.content,
-                status: reply.status,
-                anonymized_at: reply.anonymized_at,
-              };
-            })
-            .filter((r) => r.content !== null),
-        }))
-        .sort((a, b) => a.position! - b.position!);
-
+    return fieldsWithRepliesByPetitionId.map((fieldsWithReplies) => {
       const visibleFields = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
         .filter(([field, isVisible]) => isVisible && !field.is_internal)
         .map(([field]) => field);
@@ -961,51 +921,12 @@ export class PetitionRepository extends BaseRepository {
       optional: number;
       total: number;
     }
-  >(async (petitionIds, t) => {
-    const [fields, fieldReplies] = await Promise.all([
-      this.from("petition_field", t)
-        .whereIn("petition_id", petitionIds)
-        .whereNull("deleted_at")
-        .whereNot("type", "HEADING"),
-      this.raw<PetitionFieldReply & { upload_complete: boolean | null }>(
-        /* sql */ `
-          select pfr.*, fu.upload_complete
-          from petition_field_reply as pfr
-          join petition_field as pf on pf.id = pfr.petition_field_id 
-          left join file_upload fu
-            on pfr.type in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'DOW_JONES_KYC')
-            and (pfr.content->>'file_upload_id')::int = fu.id
-          where pfr.deleted_at is null and pf.petition_id in ? and pf.deleted_at is null
-        `,
-        [this.sqlIn(petitionIds)],
-        t
-      ),
-    ]);
+  >(async (petitionIds) => {
+    const fieldsWithRepliesByPetitionId = await this.getPetitionFieldsWithReplies(
+      petitionIds as number[]
+    );
 
-    const fieldsByPetition = groupBy(fields, (f) => f.petition_id);
-
-    return petitionIds.map((id) => {
-      const fieldsWithReplies = (fieldsByPetition[id] ?? [])
-        .map((field) => ({
-          ...field,
-          replies: fieldReplies
-            .filter((r) => r.petition_field_id === field.id && r.content !== null)
-            .filter((r) => (isFileTypeField(field.type) ? r.upload_complete : true))
-            .map((reply) => {
-              return {
-                content: isFileTypeField(field.type)
-                  ? {
-                      ...reply.content,
-                      uploadComplete: true,
-                    }
-                  : reply.content,
-                status: reply.status,
-                anonymized_at: reply.anonymized_at,
-              };
-            }),
-        }))
-        .sort((a, b) => a.position! - b.position!);
-
+    return fieldsWithRepliesByPetitionId.map((fieldsWithReplies) => {
       const visibleFields = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
         .filter(([field, isVisible]) => isVisible && !field.is_internal)
         .map(([field]) => field);
@@ -2173,6 +2094,53 @@ export class PetitionRepository extends BaseRepository {
       );
   }
 
+  async getPetitionFieldsWithReplies(petitionIds: number[]) {
+    const [fields, fieldReplies] = await Promise.all([
+      this.from("petition_field")
+        .whereIn("petition_id", petitionIds)
+        .whereNull("deleted_at")
+        .whereNot("type", "HEADING"),
+      this.raw<PetitionFieldReply & { upload_complete: boolean | null }>(
+        /* sql */ `
+          select pfr.*, fu.upload_complete
+          from petition_field_reply as pfr
+          join petition_field as pf on pf.id = pfr.petition_field_id 
+          left join file_upload fu
+            on pfr.type in ('FILE_UPLOAD', 'ES_TAX_DOCUMENTS', 'DOW_JONES_KYC')
+            and (pfr.content->>'file_upload_id')::int = fu.id
+          where pfr.deleted_at is null and pf.petition_id in ? and pf.deleted_at is null
+        `,
+        [this.sqlIn(petitionIds)]
+      ),
+    ]);
+
+    const fieldsByPetition = groupBy(fields, (f) => f.petition_id);
+
+    return petitionIds.map((id) => {
+      return (fieldsByPetition[id] ?? [])
+        .map((field) => ({
+          ...field,
+          replies: fieldReplies
+            .filter((r) => r.petition_field_id === field.id && r.content !== null)
+            .filter((r) => (isFileTypeField(field.type) ? r.upload_complete : true))
+            .map((reply) => {
+              return {
+                content: isFileTypeField(field.type)
+                  ? {
+                      ...reply.content,
+                      uploadComplete: true,
+                    }
+                  : reply.content,
+                status: reply.status,
+                anonymized_at: reply.anonymized_at,
+              };
+            })
+            .filter((r) => r.content !== null),
+        }))
+        .sort((a, b) => a.position! - b.position!);
+    });
+  }
+
   async completePetition(
     petitionId: number,
     userOrAccess: User | PetitionAccess,
@@ -2181,23 +2149,8 @@ export class PetitionRepository extends BaseRepository {
   ) {
     const isAccess = "keycode" in userOrAccess;
     const updatedBy = `${isAccess ? "PetitionAccess" : "User"}:${userOrAccess.id}`;
-    const [petition, fields] = await Promise.all([
-      this.loadPetition(petitionId),
-      this.loadFieldsForPetition(petitionId),
-    ]);
-    if (!petition || !fields) {
-      throw new Error();
-    }
-    if (petition.status === "CLOSED") {
-      throw new Error("Can't complete a closed petition");
-    }
-    const fieldsIds = fields.map((f) => f.id);
-    const replies = await this.loadRepliesForField(fieldsIds);
-    const repliesByFieldId = Object.fromEntries(fieldsIds.map((id, index) => [id, replies[index]]));
-    const fieldsWithReplies = fields.map((f) => ({
-      ...f,
-      replies: repliesByFieldId[f.id],
-    }));
+
+    const [fieldsWithReplies] = await this.getPetitionFieldsWithReplies([petitionId]);
 
     const canComplete = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies)).every(
       ([field, isVisible]) =>
