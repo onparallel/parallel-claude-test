@@ -235,6 +235,7 @@ export type EnumParameterOptions<
   TArray extends boolean | undefined = undefined,
   TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined
 > = ParameterOptions<T, TRequired, TArray, TDefaultValue> & {
+  schemaTitle?: string;
   values: T[];
 };
 
@@ -246,7 +247,7 @@ export function enumParam<
 >(
   options: EnumParameterOptions<T, TRequired, TArray, TDefaultValue>
 ): RestParameter<GeneratedParameterType<T, TRequired, TArray, TDefaultValue>> {
-  const { values } = options;
+  const { values, schemaTitle } = options;
   return {
     parse: buildParse(options, (value: string) => {
       if (!values.includes(value as T)) {
@@ -258,6 +259,7 @@ export function enumParam<
       return value as T;
     }),
     spec: buildDefinition(options, {
+      title: schemaTitle,
       type: "string",
       enum: values,
     }),

@@ -281,6 +281,7 @@ export const api = new RestApi({
 
 const petitionIncludeParam = {
   include: enumParam({
+    schemaTitle: "PetitionIncludeInResponse",
     description: "Include optional fields in the response",
     array: true,
     required: false,
@@ -290,6 +291,7 @@ const petitionIncludeParam = {
 
 const templateIncludeParam = {
   include: enumParam({
+    schemaTitle: "TemplateIncludeInResponse",
     description: "Include optional fields in the response",
     array: true,
     required: false,
