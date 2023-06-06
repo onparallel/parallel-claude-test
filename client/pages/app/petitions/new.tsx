@@ -194,7 +194,7 @@ function NewPetition() {
   }, [goToPetition, createPetition, state.path]);
 
   useEffect(() => {
-    if (!hasTemplates && !state.public) {
+    if (!hasTemplates && !state.public && me.role !== "COLLABORATOR") {
       handleTabChange(1);
     }
   }, []);
