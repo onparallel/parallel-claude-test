@@ -3,7 +3,7 @@ import { FromSchema } from "json-schema-to-ts";
 import { outdent } from "outdent";
 import { PetitionEventType, PetitionFieldReplyStatusValues } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { titleize } from "../../util/strings";
+import { pascalCase } from "../../util/strings";
 import { JsonSchema, JsonSchemaFor, schema } from "../rest/schemas";
 
 function _ListOf<T extends JsonSchema>(item: T) {
@@ -86,6 +86,7 @@ const _Organization = {
 
 const _UserWithOrg = {
   ..._User,
+  title: "UserWithOrg",
   required: [..._User.required, "organization"],
   properties: { ..._User.properties, organization: _Organization },
   example: {
@@ -236,6 +237,7 @@ const _PetitionAccess = {
 } as const;
 
 const _PetitionField = {
+  title: "PetitionField",
   type: "object",
   additionalProperties: false,
   required: ["id", "title", "type", "multiple"],
@@ -1003,6 +1005,7 @@ const _DateTimeReplySubmitContent = {
 
 const _PetitionFieldReplyStatus = {
   type: "string",
+  title: "PetitionFieldReplyStatus",
   description:
     "Optionally, you can pass a status for the reply. `APPROVED` replies can't be updated or deleted. This can be useful when you don't want your replies to be modified.",
   enum: ["PENDING", "APPROVED", "REJECTED"],
@@ -1054,6 +1057,7 @@ export const FieldReplyDownloadContent = schema({
 
 const _PetitionSigner = {
   type: "object",
+  title: "PetitionSigner",
   description: "Information about the signer",
   properties: {
     firstName: { type: "string" },
@@ -1778,6 +1782,7 @@ const PetitionEventSchemas = {
 export const petitionEventTypes = Object.keys(PetitionEventSchemas) as PetitionEventType[];
 
 export const _PetitionEvent = {
+  title: "PetitionEvent",
   type: "object",
   oneOf: Object.entries(PetitionEventSchemas)
     .sort(([a], [b]) => a.localeCompare(b))
@@ -1785,7 +1790,7 @@ export const _PetitionEvent = {
       ([event, data]) =>
         ({
           type: "object",
-          title: titleize(event),
+          title: `${pascalCase(event)}Event`,
           description: data.description, // should be visible after merging https://github.com/Redocly/redoc/pull/1497
           additionalProperties: false,
           properties: {
