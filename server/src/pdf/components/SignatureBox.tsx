@@ -37,7 +37,7 @@ export function SignatureBox({
       padding: "2mm",
     },
     anchor: {
-      color: "#FFFFFF00",
+      color: "#FFFFFF",
       fontSize: 8,
       position: "absolute",
       top: 0,
