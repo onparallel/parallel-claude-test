@@ -693,11 +693,12 @@ const _CommonPermission = {
 } as const;
 
 const _Permission = {
-  title: "Permission",
+  title: "PetitionPermission",
   type: "object",
   anyOf: [
     {
       type: "object",
+      title: "UserPetitionPermission",
       required: ["permissionType", "user", "createdAt"],
       additionalProperties: false,
       properties: {
@@ -710,6 +711,7 @@ const _Permission = {
     },
     {
       type: "object",
+      title: "UserGroupPetitionPermission",
       required: ["permissionType", "group", "createdAt"],
       additionalProperties: false,
       properties: {
