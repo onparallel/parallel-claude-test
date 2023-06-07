@@ -1,16 +1,16 @@
 import { isDefined } from "remeda";
 import { WorkerContext } from "../context";
-import { Task } from "../db/repositories/TaskRepository";
 import { TaskName } from "../db/__types";
-import { createQueueWorker } from "./helpers/createQueueWorker";
+import { Task } from "../db/repositories/TaskRepository";
 import { TaskRunner } from "./helpers/TaskRunner";
+import { createQueueWorker } from "./helpers/createQueueWorker";
 import { DowJonesProfileDownloadRunner } from "./tasks/DowJonesProfileDownloadRunner";
 import { ExportExcelRunner } from "./tasks/ExportExcelRunner";
 import { ExportRepliesRunner } from "./tasks/ExportRepliesRunner";
 import { PrintPdfRunner } from "./tasks/PrintPdfRunner";
 import { TemplateRepliesReportRunner } from "./tasks/TemplateRepliesReportRunner";
-import { TemplatesOverviewReportRunner } from "./tasks/TemplatesOverviewReportRunner";
 import { TemplateStatsReportRunner } from "./tasks/TemplateStatsReportRunner";
+import { TemplatesOverviewReportRunner } from "./tasks/TemplatesOverviewReportRunner";
 
 const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => TaskRunner<any>> = {
   PRINT_PDF: PrintPdfRunner,
@@ -36,5 +36,10 @@ createQueueWorker(
     const Runner = RUNNERS[task.name];
     await new Runner(ctx, task).runTask();
   },
-  { forkHandlers: true }
+  {
+    forkHandlers: true,
+    async onForkTimeout({ taskId }: TaskWorkerPayload, context) {
+      await context.tasks.taskFailed(taskId, { message: "Timeout" }, `TaskWorker:${taskId}`);
+    },
+  }
 );

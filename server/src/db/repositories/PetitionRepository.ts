@@ -4798,22 +4798,19 @@ export class PetitionRepository extends BaseRepository {
   async updatePetitionSignatureRequestAsCancelled<
     CancelReason extends PetitionSignatureCancelReason
   >(
-    petitionSignatures: MaybeArray<Pick<PetitionSignatureRequest, "id" | "petition_id">>,
+    ids: MaybeArray<number>,
     data?: Replace<
       Partial<PetitionSignatureRequest>,
       { cancel_reason: CancelReason; cancel_data: PetitionSignatureRequestCancelData<CancelReason> }
     >,
     t?: Knex.Transaction
   ) {
-    const signatures = unMaybeArray(petitionSignatures);
-    if (signatures.length === 0) {
+    const signatureIds = unMaybeArray(ids);
+    if (signatureIds.length === 0) {
       return [];
     }
     const rows = await this.from("petition_signature_request", t)
-      .whereIn(
-        "id",
-        signatures.map((s) => s.id)
-      )
+      .whereIn("id", signatureIds)
       .whereNotIn("status", ["COMPLETED", "CANCELLED"])
       .update({
         ...data,

@@ -17,6 +17,8 @@ import { EmailSenderWorkerPayload } from "../email-sender";
 import { EventProcessorPayload } from "../event-processor";
 import { SignatureWorkerPayload } from "../signature-worker";
 import { TaskWorkerPayload } from "../task-worker";
+import { MaybePromise } from "nexus/dist/core";
+import { noop } from "remeda";
 
 export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
   "email-events": EmailEventsWorkerPayload;
@@ -27,9 +29,15 @@ export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
   "delay-queue": DelayQueuePayload;
 }[Q];
 
-export type QueueWorkerOptions<T> = {
+export type QueueWorkerOptions<Q extends keyof Config["queueWorkers"]> = {
   forkHandlers?: boolean;
-  parser?: (message: string) => T;
+  forkTimeout?: number;
+  onForkTimeout?: (
+    message: QueueWorkerPayload<Q>,
+    context: WorkerContext,
+    config: Config["queueWorkers"][Q]
+  ) => MaybePromise<void>;
+  parser?: (message: string) => QueueWorkerPayload<Q>;
 };
 
 export function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
@@ -39,15 +47,17 @@ export function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
     context: WorkerContext,
     config: Config["queueWorkers"][Q]
   ) => Promise<void>,
-  options?: QueueWorkerOptions<QueueWorkerPayload<Q>>
+  options?: QueueWorkerOptions<Q>
 ) {
   loadEnv(`.${name}.env`);
 
   const script = process.argv[1];
 
-  const { parser, forkHandlers } = {
+  const { parser, forkHandlers, forkTimeout, onForkTimeout } = {
     parser: (message: string) => JSON.parse(message) as QueueWorkerPayload<Q>,
     forkHandlers: false,
+    forkTimeout: 120_000,
+    onForkTimeout: noop,
     ...options,
   };
   const container = createContainer();
@@ -95,23 +105,37 @@ export function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
             try {
               const duration = await stopwatch(async () => {
                 if (forkHandlers) {
-                  return await new Promise<void>((resolve, reject) => {
-                    fork(
-                      script,
-                      [
-                        "run",
-                        message.Body!,
-                        ...(script.endsWith(".ts") ? ["-r", "ts-node/register"] : []),
-                      ],
-                      { stdio: "inherit", timeout: 120_000, env: process.env }
-                    ).on("close", (code) => {
-                      if (code === 0) {
-                        resolve();
-                      } else {
-                        reject();
-                      }
+                  try {
+                    return await new Promise<void>((resolve, reject) => {
+                      fork(
+                        script,
+                        [
+                          "run",
+                          message.Body!,
+                          ...(script.endsWith(".ts") ? ["-r", "ts-node/register"] : []),
+                        ],
+                        { stdio: "inherit", timeout: forkTimeout, env: process.env }
+                      ).on("close", (code, signal) => {
+                        if (code === 0) {
+                          resolve();
+                        } else if (signal === "SIGTERM") {
+                          reject("SIGTERM");
+                        } else {
+                          reject();
+                        }
+                      });
                     });
-                  });
+                  } catch (e) {
+                    if (e === "SIGTERM") {
+                      logger.error("Timeout processing task");
+                      await onForkTimeout?.(
+                        parser(message.Body!),
+                        container.get<WorkerContext>(WorkerContext),
+                        config.queueWorkers[name]
+                      );
+                    }
+                    throw e;
+                  }
                 } else {
                   try {
                     const context = container.get<WorkerContext>(WorkerContext);

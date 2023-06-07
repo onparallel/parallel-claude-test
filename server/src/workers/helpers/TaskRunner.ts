@@ -14,15 +14,7 @@ export abstract class TaskRunner<T extends TaskName> {
 
   async runTask() {
     this.abort = new AbortController();
-    process.on("SIGTERM", async () => {
-      this.ctx.logger.info(`Received SIGTERM. Shutting down task runner`);
-      await this.ctx.tasks.taskFailed(
-        this.task.id,
-        { message: "Timeout" },
-        `TaskWorker:${this.task.id}`
-      );
-      process.exit(1);
-    });
+
     try {
       const output = await this.run({ signal: this.abort.signal });
       await this.ctx.tasks.taskCompleted(this.task.id, output, `TaskWorker:${this.task.id}`);

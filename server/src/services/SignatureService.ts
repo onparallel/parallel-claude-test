@@ -274,7 +274,7 @@ export class SignatureService implements ISignatureService {
 
     // cancel pending signature request before starting a new one
     if (enqueuedSignatureRequest) {
-      await this.petitions.updatePetitionSignatureRequestAsCancelled(enqueuedSignatureRequest, {
+      await this.petitions.updatePetitionSignatureRequestAsCancelled(enqueuedSignatureRequest.id, {
         cancel_reason: "REQUEST_RESTARTED",
         cancel_data: isAccess ? { petition_access_id: canceller.id } : { user_id: canceller.id },
       });

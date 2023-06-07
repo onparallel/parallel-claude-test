@@ -455,7 +455,7 @@ export class SignaturitClient implements ISignatureClient {
         (s) => s.externalId === declinedDocument.id
       )!;
       const canceller = signatureRequest.signature_config.signersInfo[cancellerIndex];
-      await this.petitions.updatePetitionSignatureRequestAsCancelled(signatureRequest, {
+      await this.petitions.updatePetitionSignatureRequestAsCancelled(signatureRequest.id, {
         cancel_reason: "DECLINED_BY_SIGNER",
         cancel_data: {
           decline_reason: declinedDocument.decline_reason,

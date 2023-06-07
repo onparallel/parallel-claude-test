@@ -284,7 +284,7 @@ async function envelopeVoided(ctx: ApiContext, body: DocuSignEventBody, petition
     `DOCUSIGN/${body.data.envelopeId}`
   ))!;
   const [canceller, cancellerIndex] = [signature.signature_config.signersInfo[0], 0];
-  await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature, {
+  await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature.id, {
     cancel_reason: "DECLINED_BY_SIGNER",
     cancel_data: {
       canceller,

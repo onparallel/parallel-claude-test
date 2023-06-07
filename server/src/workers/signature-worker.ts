@@ -155,7 +155,7 @@ async function startSignatureProcess(
         ? error.code
         : "UNKNOWN_ERROR";
 
-    await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature, {
+    await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature.id, {
       cancel_reason: "REQUEST_ERROR",
       cancel_data: {
         error_code: errorCode,
@@ -218,7 +218,7 @@ async function cancelSignatureProcess(
     await signatureClient.cancelSignatureRequest(signature.external_id.replace(/^.*?\//, ""));
 
     // after signature client confirmed the cancellation, it's safe to move the signature from CANCELLING to CANCELLED
-    await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature);
+    await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature.id);
   } catch (error) {
     if (!(error instanceof InvalidCredentialsError) && !(error instanceof CancelAbortedError)) {
       throw error;
@@ -425,7 +425,23 @@ createQueueWorker(
   async (data, ctx) => {
     await handlers[data.type](data.payload as any, ctx);
   },
-  { forkHandlers: true }
+  {
+    forkHandlers: true,
+    async onForkTimeout(message: SignatureWorkerPayload, context) {
+      if (message.type === "start-signature-process") {
+        await context.petitions.updatePetitionSignatureRequestAsCancelled(
+          message.payload.petitionSignatureRequestId,
+          {
+            cancel_reason: "REQUEST_ERROR",
+            cancel_data: {
+              error: "fork process timed out",
+              error_code: "TIMEOUT",
+            },
+          }
+        );
+      }
+    },
+  }
 );
 
 async function fetchOrgSignatureIntegration(

@@ -131,7 +131,7 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
     data.document
   );
 
-  await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature, {
+  await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature.id, {
     cancel_reason: "DECLINED_BY_SIGNER",
     cancel_data: {
       canceller,
@@ -200,7 +200,7 @@ async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petition
   }
 
   const [, signerIndex] = findSigner(signature.signature_config.signersInfo, data.document);
-  await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature, {
+  await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature.id, {
     cancel_reason: "REQUEST_ERROR",
     cancel_data: {
       error: data.reason ?? `email ${data.document.email} bounced`,
