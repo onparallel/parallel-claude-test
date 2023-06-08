@@ -16,10 +16,10 @@ export async function petitionMessage(
   }
 
   const [petition, senderData, access, accesses] = await Promise.all([
-    context.readonlyPetitions.loadPetition(message.petition_id),
+    context.petitions.loadPetition(message.petition_id),
     context.users.loadUserDataByUserId(message.sender_id),
-    context.readonlyPetitions.loadAccess(message.petition_access_id),
-    context.readonlyPetitions.loadAccessesForPetition(message.petition_id),
+    context.petitions.loadAccess(message.petition_access_id),
+    context.petitions.loadAccessesForPetition(message.petition_id),
   ]);
   if (!petition) {
     return; // if the petition was deleted, return without throwing error
