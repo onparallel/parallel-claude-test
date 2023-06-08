@@ -26,6 +26,7 @@ import { createExitBreakPlugin } from "@udecode/plate-break";
 import { createComboboxPlugin } from "@udecode/plate-combobox";
 import {
   PlatePlugin,
+  PlatePluginComponent,
   PlateProvider,
   createHistoryPlugin,
   createPlugins,
@@ -70,7 +71,7 @@ const components = {
   [MARK_BOLD]: withProps(RenderElement, { as: "strong" }),
   [MARK_ITALIC]: withProps(RenderElement, { as: "em" }),
   [MARK_UNDERLINE]: withProps(RenderElement, { as: "u" }),
-};
+} as Record<string, PlatePluginComponent>;
 
 type RichTextPEditor = CustomEditor<RichTextEditorValue>;
 

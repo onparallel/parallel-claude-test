@@ -411,7 +411,8 @@ api
       query: {
         ...paginationParams(),
         ...sortByParam(["createdAt", "name"]),
-        status: enumParam({
+        // for some reason types are doing weird things here
+        status: enumParam<"DRAFT" | "PENDING" | "COMPLETED" | "CLOSED", false>({
           description: "Optionally filter parallels by their status",
           required: false,
           values: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"],

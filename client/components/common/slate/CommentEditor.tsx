@@ -20,6 +20,7 @@ import {
   createReactPlugin,
   focusEditor,
   getEndPoint,
+  PlatePluginComponent,
   PlateProvider,
   withProps,
 } from "@udecode/plate-common";
@@ -33,7 +34,7 @@ import { PlateWithEditorRef } from "./PlateWithEditorRef";
 
 const components = {
   [ELEMENT_PARAGRAPH]: withProps(RenderElement, { as: "p" }),
-};
+} as Record<string, PlatePluginComponent>;
 
 export type CommentEditorValue = CommentEditorBlock[];
 interface CommentEditorBlock extends SlateElement<"paragraph", CommentEditorBlockContent> {}

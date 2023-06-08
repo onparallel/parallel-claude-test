@@ -20,6 +20,7 @@ import { useConstant } from "@parallel/utils/useConstant";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { createComboboxPlugin } from "@udecode/plate-combobox";
 import {
+  PlatePluginComponent,
   PlateProvider,
   createHistoryPlugin,
   createPlugins,
@@ -62,7 +63,7 @@ export interface PlaceholderInputInstance {
 
 const components = {
   [ELEMENT_PARAGRAPH]: withProps(RenderElement, { as: "p" }),
-};
+} as Record<string, PlatePluginComponent>;
 
 function RenderElement({ attributes, nodeProps, styles, element, editor, ...props }: any) {
   return <Text {...attributes} {...props} />;
