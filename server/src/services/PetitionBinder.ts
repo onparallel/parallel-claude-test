@@ -6,15 +6,15 @@ import pMap from "p-map";
 import { resolve } from "path";
 import { isDefined, zip } from "remeda";
 import sanitizeFilename from "sanitize-filename";
-import { FileRepository } from "../db/repositories/FileRepository";
-import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
-import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import {
   FileUpload,
   OrganizationTheme,
   PetitionAttachmentType,
   PetitionAttachmentTypeValues,
 } from "../db/__types";
+import { FileRepository } from "../db/repositories/FileRepository";
+import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
+import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { evaluateFieldVisibility } from "../util/fieldVisibility";
 import { isFileTypeField } from "../util/isFileTypeField";
 import { pFlatMap } from "../util/promises/pFlatMap";

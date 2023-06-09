@@ -1,5 +1,6 @@
 import { injectable } from "inversify";
 import { chunk, countBy, difference, findLast, isDefined, sortBy } from "remeda";
+import { PetitionStatus } from "../db/__types";
 import {
   PetitionEvent,
   ReplyCreatedEvent,
@@ -9,7 +10,6 @@ import {
 import { readOnly } from "../db/knex";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { PetitionTimeStatistics, TaskOutput } from "../db/repositories/TaskRepository";
-import { PetitionStatus } from "../db/__types";
 import { average, median, quartiles } from "../util/arrays";
 import { toGlobalId } from "../util/globalId";
 import { Maybe } from "../util/types";

@@ -2,6 +2,12 @@ import { Container, inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { countBy, omit } from "remeda";
 import { CONFIG, Config } from "../config";
+import {
+  PetitionAccess,
+  PetitionSignatureCancelReason,
+  PetitionSignatureRequest,
+  User,
+} from "../db/__types";
 import { IntegrationRepository, SignatureProvider } from "../db/repositories/IntegrationRepository";
 import {
   PetitionRepository,
@@ -9,12 +15,6 @@ import {
   PetitionSignatureConfigSigner,
   PetitionSignatureRequestCancelData,
 } from "../db/repositories/PetitionRepository";
-import {
-  PetitionAccess,
-  PetitionSignatureCancelReason,
-  PetitionSignatureRequest,
-  User,
-} from "../db/__types";
 import { unMaybeArray } from "../util/arrays";
 import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";

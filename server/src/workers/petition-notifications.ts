@@ -1,10 +1,10 @@
 import { differenceInMinutes } from "date-fns";
 import { difference, groupBy, maxBy } from "remeda";
-import { Config } from "../config";
 import { WorkerContext } from "../context";
 import { SignatureCancelledUserNotification } from "../db/notifications";
 import { PetitionContactNotification, PetitionUserNotification } from "../db/__types";
 import { createCronWorker } from "./helpers/createCronWorker";
+import { Config } from "../config";
 
 function shouldBeProcessed(
   notifications: (PetitionUserNotification | PetitionContactNotification)[],
@@ -30,7 +30,7 @@ async function processCommentCreatedUserNotifications(
   if (notifications.length > 0) {
     const groupedUserNotifications = groupBy(notifications, (n) => `${n.petition_id},${n.user_id}`);
     for (const group of Object.values(groupedUserNotifications)) {
-      if (shouldBeProcessed(group, config.minutesBeforeNotify)) {
+      if (shouldBeProcessed(group, config.minutesBeforeNotify!)) {
         const petitionId = group[0].petition_id;
         const userId = group[0].user_id;
         const isSubscribed = await context.petitions.isUserSubscribedToPetition(userId, petitionId);
@@ -67,7 +67,7 @@ async function processCommentCreatedContactNotifications(
       (n) => `${n.petition_id},${n.petition_access_id}`
     );
     for (const group of Object.values(groupedContactNotifications)) {
-      if (shouldBeProcessed(group, config.minutesBeforeNotify)) {
+      if (shouldBeProcessed(group, config.minutesBeforeNotify!)) {
         const petitionId = group[0].petition_id;
         const accessId = group[0].petition_access_id;
 

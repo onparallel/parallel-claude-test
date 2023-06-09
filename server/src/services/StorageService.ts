@@ -6,7 +6,7 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
-import { createPresignedPost, PresignedPost } from "@aws-sdk/s3-presigned-post";
+import { PresignedPost, createPresignedPost } from "@aws-sdk/s3-presigned-post";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import contentDisposition from "content-disposition";
 import { inject, injectable } from "inversify";
@@ -14,7 +14,7 @@ import { chunk } from "remeda";
 import { Readable } from "stream";
 import { buffer } from "stream/consumers";
 import { Memoize } from "typescript-memoize";
-import { Config, CONFIG } from "../config";
+import { CONFIG, Config } from "../config";
 import { unMaybeArray } from "../util/arrays";
 import { awsLogger } from "../util/awsLogger";
 import { retry } from "../util/retry";

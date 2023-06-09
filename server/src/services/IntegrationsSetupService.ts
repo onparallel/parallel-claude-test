@@ -1,11 +1,10 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { CONFIG, Config } from "../config";
+import { CreateOrgIntegration } from "../db/__types";
 import {
   EnhancedOrgIntegration,
   IntegrationCredentials,
 } from "../db/repositories/IntegrationRepository";
-import { CreateOrgIntegration } from "../db/__types";
 import { DowJonesIntegration } from "../integrations/DowJonesIntegration";
 import {
   SignaturitEnvironment,
@@ -36,7 +35,6 @@ export interface IIntegrationsSetupService {
 @injectable()
 export class IntegrationsSetupService implements IIntegrationsSetupService {
   constructor(
-    @inject(CONFIG) private config: Config,
     @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(SignaturitIntegration) private signaturitIntegration: SignaturitIntegration,
     @inject(DowJonesIntegration) private dowJonesIntegration: DowJonesIntegration

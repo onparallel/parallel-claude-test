@@ -3,6 +3,8 @@ import "reflect-metadata";
 import { SQSClient } from "@aws-sdk/client-sqs";
 import { Consumer } from "@rxfork/sqs-consumer";
 import { fork } from "child_process";
+import { MaybePromise } from "nexus/dist/core";
+import { noop } from "remeda";
 import yargs from "yargs";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
@@ -17,8 +19,6 @@ import { EmailSenderWorkerPayload } from "../email-sender";
 import { EventProcessorPayload } from "../event-processor";
 import { SignatureWorkerPayload } from "../signature-worker";
 import { TaskWorkerPayload } from "../task-worker";
-import { MaybePromise } from "nexus/dist/core";
-import { noop } from "remeda";
 
 export type QueueWorkerPayload<Q extends keyof Config["queueWorkers"]> = {
   "email-events": EmailEventsWorkerPayload;
@@ -40,7 +40,7 @@ export type QueueWorkerOptions<Q extends keyof Config["queueWorkers"]> = {
   parser?: (message: string) => QueueWorkerPayload<Q>;
 };
 
-export function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
+export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
   name: Q,
   handler: (
     payload: QueueWorkerPayload<Q>,
@@ -49,7 +49,7 @@ export function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
   ) => Promise<void>,
   options?: QueueWorkerOptions<Q>
 ) {
-  loadEnv(`.${name}.env`);
+  await loadEnv(`.${name}.env`);
 
   const script = process.argv[1];
 

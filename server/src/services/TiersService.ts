@@ -1,12 +1,12 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { pick } from "remeda";
+import { FeatureFlagName, Organization } from "../db/__types";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import {
   OrganizationRepository,
   OrganizationUsageDetails,
 } from "../db/repositories/OrganizationRepository";
-import { FeatureFlagName, Organization } from "../db/__types";
 import { SIGNATURE, SignatureService } from "./SignatureService";
 
 export const TIERS_SERVICE = Symbol.for("TIERS_SERVICE");

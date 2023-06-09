@@ -38,6 +38,7 @@ import { getClientIp } from "request-ip";
 import { Memoize } from "typescript-memoize";
 import { URL, URLSearchParams } from "url";
 import { CONFIG, Config } from "../config";
+import { User, UserLocale, UserLocaleValues } from "../db/__types";
 import {
   IntegrationRepository,
   IntegrationSettings,
@@ -46,7 +47,6 @@ import { OrganizationRepository } from "../db/repositories/OrganizationRepositor
 import { SystemRepository } from "../db/repositories/SystemRepository";
 import { UserAuthenticationRepository } from "../db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
-import { User, UserLocale, UserLocaleValues } from "../db/__types";
 import { ApolloError, ForbiddenError } from "../graphql/helpers/errors";
 import { awsLogger } from "../util/awsLogger";
 import { fullName } from "../util/fullName";

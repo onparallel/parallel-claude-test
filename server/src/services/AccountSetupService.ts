@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { CONFIG, Config } from "../config";
-import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { CreateOrganization, Organization } from "../db/__types";
+import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { IIntegrationsSetupService, INTEGRATIONS_SETUP_SERVICE } from "./IntegrationsSetupService";
 
 export const ACCOUNT_SETUP_SERVICE = Symbol.for("ACCOUNT_SETUP_SERVICE");

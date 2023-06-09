@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { isDefined } from "remeda";
-import { Config, CONFIG } from "../config";
+import { CONFIG, Config } from "../config";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { BrandTheme } from "../util/BrandTheme";

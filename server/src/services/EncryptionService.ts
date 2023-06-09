@@ -1,6 +1,6 @@
 import { createCipheriv, createDecipheriv, randomBytes } from "crypto";
 import { inject, injectable } from "inversify";
-import { Config, CONFIG } from "../config";
+import { CONFIG, Config } from "../config";
 
 export const ENCRYPTION_SERVICE = Symbol.for("ENCRYPTION_SERVICE");
 

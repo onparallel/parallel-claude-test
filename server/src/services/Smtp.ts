@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
-import { createTransport, SentMessageInfo, Transporter } from "nodemailer";
-import { Config, CONFIG } from "../config";
+import { SentMessageInfo, Transporter, createTransport } from "nodemailer";
+import { CONFIG, Config } from "../config";
 
 type MailOptions = Pick<
   Parameters<Transporter<SentMessageInfo>["sendMail"]>[0],

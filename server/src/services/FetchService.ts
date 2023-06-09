@@ -1,7 +1,7 @@
 import { injectable } from "inversify";
 import fetch, { RequestInfo, RequestInit, Response } from "node-fetch";
 import { isDefined } from "remeda";
-import { retry, RetryOptions, StopRetryError } from "../util/retry";
+import { RetryOptions, StopRetryError, retry } from "../util/retry";
 
 export const FETCH_SERVICE = Symbol.for("FETCH_SERVICE");
 

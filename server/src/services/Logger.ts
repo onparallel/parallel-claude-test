@@ -3,7 +3,7 @@ import stringify from "fast-safe-stringify";
 import { interfaces } from "inversify";
 import winston from "winston";
 import WinstonCloudWatch from "winston-cloudwatch";
-import { Config, CONFIG } from "../config";
+import { CONFIG, Config } from "../config";
 
 export const LOGGER = Symbol.for("LOGGER");
 

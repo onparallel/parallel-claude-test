@@ -1,8 +1,7 @@
 import Analytics from "analytics-node";
 import { inject, injectable } from "inversify";
 import { isDefined } from "remeda";
-import { Config, CONFIG } from "../config";
-import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
+import { CONFIG, Config } from "../config";
 import {
   OrganizationUsageLimitName,
   PetitionSignatureCancelReason,
@@ -10,6 +9,7 @@ import {
   User,
   UserData,
 } from "../db/__types";
+import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { unMaybeArray } from "../util/arrays";
 import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";

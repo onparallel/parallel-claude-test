@@ -2,8 +2,6 @@ import Ajv from "ajv";
 import { inject, injectable } from "inversify";
 import pMap from "p-map";
 import { isDefined, omit } from "remeda";
-import { validateFieldOptions } from "../db/helpers/fieldOptions";
-import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import {
   ContactLocale,
   ContactLocaleValues,
@@ -11,6 +9,8 @@ import {
   PetitionFieldTypeValues,
   User,
 } from "../db/__types";
+import { validateFieldOptions } from "../db/helpers/fieldOptions";
+import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { validateFieldVisibilityConditions } from "../graphql/helpers/validators/validFieldVisibility";
 import { validateRichTextContent } from "../graphql/helpers/validators/validRichTextContent";
 import { safeJsonParse } from "../util/safeJsonParse";

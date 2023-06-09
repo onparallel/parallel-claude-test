@@ -2,19 +2,19 @@ import { Request } from "express";
 import { inject, injectable } from "inversify";
 import { RequestInit, Response } from "node-fetch";
 import { omit } from "remeda";
-import { Config, CONFIG } from "../config";
+import { CONFIG, Config } from "../config";
+import { FeatureFlagName, OrgIntegration } from "../db/__types";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
 import {
   IntegrationRepository,
   IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
-import { FeatureFlagName, OrgIntegration } from "../db/__types";
-import { FetchService, FETCH_SERVICE } from "../services/FetchService";
+import { ENCRYPTION_SERVICE, EncryptionService } from "../services/EncryptionService";
+import { FETCH_SERVICE, FetchService } from "../services/FetchService";
 import { IRedis, REDIS } from "../services/Redis";
-import { EncryptionService, ENCRYPTION_SERVICE } from "../services/EncryptionService";
 import { Replace } from "../util/types";
 import { InvalidCredentialsError } from "./GenericIntegration";
-import { OauthCredentials, OAuthIntegration, OauthIntegrationState } from "./OAuthIntegration";
+import { OAuthIntegration, OauthCredentials, OauthIntegrationState } from "./OAuthIntegration";
 
 export interface DocusignIntegrationContext {
   environment: DocusignEnvironment;

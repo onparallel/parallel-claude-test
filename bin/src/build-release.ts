@@ -1,3 +1,4 @@
+import { GetSecretValueCommand, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
 import chalk from "chalk";
 import { execSync } from "child_process";
 import yargs from "yargs";
@@ -44,24 +45,20 @@ async function main() {
   );
 
   console.log("Getting the secrets 🤫");
-  execSync("git clone --depth 1 git@github.com:onparallel/secrets.git secrets", {
-    cwd: WORK_DIR,
-    encoding: "utf-8",
-  });
-  for (const dir of ["server", "client"]) {
-    execSync(`cp -a secrets/${env}/${dir}/. ${buildDir}/${dir}/`, {
-      cwd: WORK_DIR,
-      encoding: "utf-8",
-    });
-  }
-  execSync("rm -rf secrets", { cwd: WORK_DIR, encoding: "utf-8" });
+  // move environment specific values into .env.production.local file (used on staging and production)
+  execSync(`cp ${buildDir}/client/.env.${env} ${buildDir}/client/.env.production.local`);
+  // remove temporary production and staging env variables files, as those are already into .env.production.local
+  execSync(`rm ${buildDir}/client/.env.production ${buildDir}/client/.env.staging`);
+
   // Generate tokens
   const CLIENT_SERVER_TOKEN = token(32);
   const SECURITY_SERVICE_JWT_SECRET = token(32);
+
   execSync(`echo "" >> ${buildDir}/client/.env.local`, {
     cwd: WORK_DIR,
     encoding: "utf-8",
   });
+
   execSync(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/client/.env.local`, {
     cwd: WORK_DIR,
     encoding: "utf-8",
@@ -79,8 +76,17 @@ async function main() {
     { cwd: WORK_DIR, encoding: "utf-8" }
   );
 
+  const secretsManagerClient = new SecretsManagerClient({});
+  const response = await secretsManagerClient.send(
+    new GetSecretValueCommand({
+      SecretId:
+        "arn:aws:secretsmanager:eu-central-1:749273139513:secret:ops/sentry-auth-token-609sGa",
+    })
+  );
+  const sentryAuthToken = response.SecretString!;
+
   console.log("Building the client");
-  execSync(`ENV=${env} BUILD_ID=${buildId} yarn build-ops`, {
+  execSync(`ENV=${env} BUILD_ID=${buildId} SENTRY_AUTH_TOKEN=${sentryAuthToken} yarn build-ops`, {
     cwd: `${buildDir}/client`,
     encoding: "utf-8",
   });

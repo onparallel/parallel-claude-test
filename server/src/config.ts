@@ -1,3 +1,4 @@
+import { fromEnv, fromInstanceMetadata } from "@aws-sdk/credential-providers";
 import { DeepReadonly } from "ts-essentials";
 
 export const CONFIG = Symbol.for("CONFIG");
@@ -34,15 +35,14 @@ export function buildConfig() {
       port: parseInt(process.env.REDIS_PORT!),
     },
     aws: {
-      ...(process.env.NODE_ENV === "development"
-        ? {
-            credentials: {
-              accessKeyId: process.env._AWS_ACCESS_KEY_ID!,
-              secretAccessKey: process.env._AWS_SECRET_ACCESS_KEY!,
-            },
-          }
-        : {}),
-      region: process.env._AWS_REGION!,
+      credentials:
+        process.env.NODE_ENV === "development"
+          ? fromEnv()
+          : fromInstanceMetadata({
+              maxRetries: 3,
+              timeout: 3_000,
+            }),
+      region: process.env.AWS_REGION!,
     },
     s3: {
       fileUploadsBucketName: process.env.S3_FILE_UPLOADS_BUCKET_NAME!,
@@ -62,7 +62,7 @@ export function buildConfig() {
       },
     },
     analytics: {
-      writeKey: process.env.ANALYTICS_SEGMENT_WRITE_KEY, // can be undefined
+      writeKey: process.env.ANALYTICS_SEGMENT_WRITE_KEY,
     },
     security: {
       jwtSecret: process.env.SECURITY_SERVICE_JWT_SECRET!,

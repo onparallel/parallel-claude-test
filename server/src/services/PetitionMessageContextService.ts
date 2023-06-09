@@ -1,15 +1,15 @@
 import { inject, injectable } from "inversify";
+import { format as formatPhoneNumber } from "libphonenumber-js";
 import { flatten, groupBy, isDefined, mapValues, pipe } from "remeda";
 import { ContactRepository } from "../db/repositories/ContactRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
+import { FORMATS } from "../util/dates";
 import { fullName } from "../util/fullName";
 import { fromGlobalId, isGlobalId } from "../util/globalId";
 import { isFileTypeField } from "../util/isFileTypeField";
 import { Maybe } from "../util/types";
 import { I18N_SERVICE, II18nService } from "./I18nService";
-import { format as formatPhoneNumber } from "libphonenumber-js";
-import { FORMATS } from "../util/dates";
 
 export interface IPetitionMessageContextService {
   fetchPlaceholderValues(

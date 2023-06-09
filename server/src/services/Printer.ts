@@ -1,7 +1,7 @@
 import { GraphQLClient } from "graphql-request";
 import { inject, injectable } from "inversify";
-import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { ContactLocale } from "../db/__types";
+import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { buildPdf } from "../pdf/buildPdf";
 import AnnexCoverPage, { AnnexCoverPageProps } from "../pdf/documents/AnnexCoverPage";
 import ImageToPdf, { ImageToPdfProps } from "../pdf/documents/ImageToPdf";

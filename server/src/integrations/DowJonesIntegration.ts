@@ -1,13 +1,13 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { CreateOrgIntegration } from "../db/__types";
 import {
   EnhancedOrgIntegration,
   IntegrationCredentials,
   IntegrationRepository,
 } from "../db/repositories/IntegrationRepository";
-import { CreateOrgIntegration } from "../db/__types";
-import { FetchService, FETCH_SERVICE } from "../services/FetchService";
-import { EncryptionService, ENCRYPTION_SERVICE } from "../services/EncryptionService";
+import { ENCRYPTION_SERVICE, EncryptionService } from "../services/EncryptionService";
+import { FETCH_SERVICE, FetchService } from "../services/FetchService";
 import { ExpirableCredentialsIntegration } from "./ExpirableCredentialsIntegration";
 import { InvalidCredentialsError } from "./GenericIntegration";
 

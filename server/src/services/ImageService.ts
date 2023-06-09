@@ -1,6 +1,6 @@
 import { createHmac } from "crypto";
 import { inject, injectable } from "inversify";
-import { Config, CONFIG } from "../config";
+import { CONFIG, Config } from "../config";
 
 export const IMAGE_SERVICE = Symbol.for("IMAGE_SERVICE");
 

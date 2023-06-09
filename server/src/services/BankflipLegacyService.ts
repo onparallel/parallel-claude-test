@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { isDefined } from "remeda";
-import { Config, CONFIG } from "../config";
+import { CONFIG, Config } from "../config";
 import { getBaseWebhookUrl } from "../util/getBaseWebhookUrl";
 import { sign } from "../util/jwt";
 import { FETCH_SERVICE, IFetchService } from "./FetchService";

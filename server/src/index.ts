@@ -4,6 +4,7 @@ import "./init";
 import { ApolloServer, ApolloServerPlugin } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginLandingPageDisabled } from "@apollo/server/plugin/disabled";
+import assert from "assert";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { json } from "express";
@@ -15,19 +16,8 @@ import { UnknownError } from "./graphql/helpers/errors";
 import { schema } from "./schema";
 import { ILogger, LOGGER } from "./services/Logger";
 import { IRedis, REDIS } from "./services/Redis";
+import { loadEnv } from "./util/loadEnv";
 import { stopwatchEnd } from "./util/stopwatch";
-import assert from "assert";
-
-const app = express();
-app.disable("x-powered-by");
-
-const container = createContainer();
-
-app.get("/ping", (req, res, next) =>
-  res.set("content-type", "text/plain").status(200).send("pong")
-);
-
-app.use("/api", cors(), cookieParser(), api(container));
 
 const server = new ApolloServer({
   // this allows us to send the error stacktrace to the context logger (cloudwatch)
@@ -87,29 +77,37 @@ if (process.env.TS_NODE_DEV) {
 }
 
 (async function start() {
+  await loadEnv();
+  const container = createContainer();
   const redis = container.get<IRedis>(REDIS);
   await Promise.all([redis.connect(), server.start()]);
-  app.use(
-    "/graphql",
-    cors(),
-    json({ limit: "2mb" }),
-    graphqlUploadExpress(),
-    expressMiddleware(server, {
-      context: async ({ req }) => {
-        const context = container.get<ApiContext>(ApiContext);
-        context.req = req;
-        return context;
-      },
-    })
-  );
 
   const port = process.env.PORT || 4000;
-  app.listen(port, () => {
-    const host = `http://localhost:${port}`;
-    const logger = container.get<ILogger>(LOGGER);
-    logger.info(`Ready on ${host}`);
-    if (process.env.NODE_ENV !== "production") {
-      logger.info(`GraphQL playground available on ${host}/graphql`);
-    }
-  });
+  express()
+    .disable("x-powered-by")
+    .get("/ping", (req, res, next) =>
+      res.set("content-type", "text/plain").status(200).send("pong")
+    )
+    .use("/api", cors(), cookieParser(), api(container))
+    .use(
+      "/graphql",
+      cors(),
+      json({ limit: "2mb" }),
+      graphqlUploadExpress(),
+      expressMiddleware(server, {
+        context: async ({ req }) => {
+          const context = container.get<ApiContext>(ApiContext);
+          context.req = req;
+          return context;
+        },
+      })
+    )
+    .listen(port, () => {
+      const host = `http://localhost:${port}`;
+      const logger = container.get<ILogger>(LOGGER);
+      logger.info(`Ready on ${host}`);
+      if (process.env.NODE_ENV !== "production") {
+        logger.info(`GraphQL playground available on ${host}/graphql`);
+      }
+    });
 })().then();

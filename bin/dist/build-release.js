@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const client_secrets_manager_1 = require("@aws-sdk/client-secrets-manager");
 const chalk_1 = __importDefault(require("chalk"));
 const child_process_1 = require("child_process");
 const yargs_1 = __importDefault(require("yargs"));
@@ -40,17 +41,10 @@ async function main() {
         encoding: "utf-8",
     });
     console.log("Getting the secrets 🤫");
-    (0, child_process_1.execSync)("git clone --depth 1 git@github.com:onparallel/secrets.git secrets", {
-        cwd: WORK_DIR,
-        encoding: "utf-8",
-    });
-    for (const dir of ["server", "client"]) {
-        (0, child_process_1.execSync)(`cp -a secrets/${env}/${dir}/. ${buildDir}/${dir}/`, {
-            cwd: WORK_DIR,
-            encoding: "utf-8",
-        });
-    }
-    (0, child_process_1.execSync)("rm -rf secrets", { cwd: WORK_DIR, encoding: "utf-8" });
+    // move environment specific values into .env.production.local file (used on staging and production)
+    (0, child_process_1.execSync)(`cp ${buildDir}/client/.env.${env} ${buildDir}/client/.env.production.local`);
+    // remove temporary production and staging env variables files, as those are already into .env.production.local
+    (0, child_process_1.execSync)(`rm ${buildDir}/client/.env.production ${buildDir}/client/.env.staging`);
     // Generate tokens
     const CLIENT_SERVER_TOKEN = (0, token_1.token)(32);
     const SECURITY_SERVICE_JWT_SECRET = (0, token_1.token)(32);
@@ -71,8 +65,13 @@ async function main() {
         encoding: "utf-8",
     });
     (0, child_process_1.execSync)(`echo "SECURITY_SERVICE_JWT_SECRET=${SECURITY_SERVICE_JWT_SECRET}" >> ${buildDir}/server/.env`, { cwd: WORK_DIR, encoding: "utf-8" });
+    const secretsManagerClient = new client_secrets_manager_1.SecretsManagerClient({});
+    const response = await secretsManagerClient.send(new client_secrets_manager_1.GetSecretValueCommand({
+        SecretId: "arn:aws:secretsmanager:eu-central-1:749273139513:secret:ops/sentry-auth-token-609sGa",
+    }));
+    const sentryAuthToken = response.SecretString;
     console.log("Building the client");
-    (0, child_process_1.execSync)(`ENV=${env} BUILD_ID=${buildId} yarn build-ops`, {
+    (0, child_process_1.execSync)(`ENV=${env} BUILD_ID=${buildId} SENTRY_AUTH_TOKEN=${sentryAuthToken} yarn build-ops`, {
         cwd: `${buildDir}/client`,
         encoding: "utf-8",
     });

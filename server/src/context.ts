@@ -1,6 +1,7 @@
 import express from "express";
 import { inject, injectable } from "inversify";
 import { CONFIG, Config } from "./config";
+import { Contact, Organization, PetitionAccess, User } from "./db/__types";
 import { readOnly } from "./db/knex";
 import { ContactRepository } from "./db/repositories/ContactRepository";
 import { EmailLogRepository } from "./db/repositories/EmailLogRepository";
@@ -19,7 +20,6 @@ import { TaskRepository } from "./db/repositories/TaskRepository";
 import { UserAuthenticationRepository } from "./db/repositories/UserAuthenticationRepository";
 import { UserGroupRepository } from "./db/repositories/UserGroupRepository";
 import { UserRepository } from "./db/repositories/UserRepository";
-import { Contact, Organization, PetitionAccess, User } from "./db/__types";
 import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./services/AccountSetupService";
 import { ANALYTICS, IAnalyticsService } from "./services/AnalyticsService";
 import { AUTH, IAuth } from "./services/AuthService";
@@ -27,7 +27,7 @@ import { BANKFLIP_LEGACY_SERVICE, IBankflipLegacyService } from "./services/Bank
 import { BANKFLIP_SERVICE, IBankflipService } from "./services/BankflipService";
 import { DOW_JONES_CLIENT, IDowJonesClient } from "./services/DowJonesClient";
 import { EMAILS, IEmailsService } from "./services/EmailsService";
-import { EncryptionService, ENCRYPTION_SERVICE } from "./services/EncryptionService";
+import { ENCRYPTION_SERVICE, EncryptionService } from "./services/EncryptionService";
 import { FETCH_SERVICE, IFetchService } from "./services/FetchService";
 import { I18N_SERVICE, II18nService } from "./services/I18nService";
 import { IImageService, IMAGE_SERVICE } from "./services/ImageService";
@@ -49,6 +49,10 @@ import {
   IPetitionImportExportService,
   PETITION_IMPORT_EXPORT_SERVICE,
 } from "./services/PetitionImportExportService";
+import {
+  PETITION_MESSAGE_CONTEXT_SERVICE,
+  PetitionMessageContextService,
+} from "./services/PetitionMessageContextService";
 import { IPrinter, PRINTER } from "./services/Printer";
 import { IProfilesSetupService, PROFILES_SETUP_SERVICE } from "./services/ProfilesSetupService";
 import { IQueuesService, QUEUES_SERVICE } from "./services/QueuesService";
@@ -58,10 +62,6 @@ import { ISignatureService, SIGNATURE } from "./services/SignatureService";
 import { ISmtp, SMTP } from "./services/Smtp";
 import { IStorageService, STORAGE_SERVICE } from "./services/StorageService";
 import { ITiersService, TIERS_SERVICE } from "./services/TiersService";
-import {
-  PETITION_MESSAGE_CONTEXT_SERVICE,
-  PetitionMessageContextService,
-} from "./services/PetitionMessageContextService";
 
 @injectable()
 export class ApiContext {

@@ -1,12 +1,12 @@
 import { createTaggedDecorator, interfaces } from "inversify";
 import { Knex, knex } from "knex";
-import { CONFIG, Config } from "../config";
-import { ILogger, LOGGER } from "../services/Logger";
-import "./helpers/knexExtensions";
-import { TableTypes } from "./__types";
 import pg from "pg";
 import { parse } from "postgres-interval";
 import { isDefined } from "remeda";
+import { CONFIG, Config } from "../config";
+import { ILogger, LOGGER } from "../services/Logger";
+import { TableTypes } from "./__types";
+import "./helpers/knexExtensions";
 
 pg.types.setTypeParser(pg.types.builtins.INTERVAL, (value: string) => {
   const { milliseconds, seconds, ...rest } = parse(value);

@@ -1,9 +1,9 @@
 import { Container } from "inversify";
-import { buildConfig, Config, CONFIG } from "./config";
+import { CONFIG, Config, buildConfig } from "./config";
 import { ApiContext, WorkerContext } from "./context";
 import { dbModule } from "./db/module";
-import { servicesModule } from "./services/module";
 import { integrationsModule } from "./integrations/module";
+import { servicesModule } from "./services/module";
 import { signatureClientsModule } from "./services/signature-clients/module";
 
 export function createContainer() {

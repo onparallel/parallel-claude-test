@@ -4,7 +4,7 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { chunk, isDefined } from "remeda";
 import { Memoize } from "typescript-memoize";
-import { Config, CONFIG } from "../config";
+import { CONFIG, Config } from "../config";
 import { TableTypes } from "../db/helpers/BaseRepository";
 import { unMaybeArray } from "../util/arrays";
 import { awsLogger } from "../util/awsLogger";

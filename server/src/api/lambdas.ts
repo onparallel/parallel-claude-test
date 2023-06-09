@@ -1,11 +1,11 @@
 import Ajv, { JSONSchemaType, Schema } from "ajv";
-import { Handler, json, RequestHandler, Router } from "express";
-import { Config } from "../config";
+import { Handler, RequestHandler, Router, json } from "express";
 import { UserLocale, UserLocaleValues } from "../db/__types";
 import { buildEmail } from "../emails/buildEmail";
 import AccountVerification from "../emails/emails/AccountVerification";
 import ForgotPassword from "../emails/emails/ForgotPassword";
 import Invitation from "../emails/emails/Invitation";
+import { Config } from "../config";
 import { defaultBrandTheme } from "../util/BrandTheme";
 import { fullName } from "../util/fullName";
 

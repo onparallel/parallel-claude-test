@@ -2,19 +2,19 @@ import "reflect-metadata";
 // keep this space to prevent import sorting, removing init from top
 import { CronJob } from "cron";
 import { EventEmitter } from "events";
-import { Config, CONFIG } from "../../config";
+import yargs from "yargs";
 import { createContainer } from "../../container";
 import { WorkerContext } from "../../context";
-import { LOGGER, ILogger } from "../../services/Logger";
+import { CONFIG, Config } from "../../config";
+import { ILogger, LOGGER } from "../../services/Logger";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
-import yargs from "yargs";
 
-export function createCronWorker<Q extends keyof Config["cronWorkers"]>(
+export async function createCronWorker<Q extends keyof Config["cronWorkers"]>(
   name: Q,
   handler: (context: WorkerContext, config: Config["cronWorkers"][Q]) => Promise<void>
 ) {
-  loadEnv(`.${name}.env`);
+  await loadEnv(`.${name}.env`);
 
   const container = createContainer();
   const config = container.get<Config>(CONFIG);

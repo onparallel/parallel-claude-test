@@ -7,10 +7,9 @@ import pMap from "p-map";
 import { flatten } from "q-flat";
 import { isDefined, omit } from "remeda";
 import { URLSearchParams } from "url";
-import { CONFIG, Config } from "../../config";
+import { ContactLocale } from "../../db/__types";
 import { OrganizationRepository } from "../../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../../db/repositories/PetitionRepository";
-import { ContactLocale } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
 import SignatureCancelledEmail from "../../emails/emails/SignatureCancelledEmail";
 import SignatureCompletedEmail from "../../emails/emails/SignatureCompletedEmail";
@@ -26,6 +25,7 @@ import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../util/globalId";
 import { downloadImageBase64 } from "../../util/images";
 import { retry } from "../../util/retry";
+import { CONFIG, Config } from "../../config";
 import { EMAILS, IEmailsService } from "../EmailsService";
 import { FETCH_SERVICE, IFetchService } from "../FetchService";
 import { I18N_SERVICE, II18nService } from "../I18nService";
@@ -35,8 +35,8 @@ import {
 } from "../OrganizationCreditsService";
 import {
   IOrganizationLayoutService,
-  OrganizationLayout,
   ORGANIZATION_LAYOUT_SERVICE,
+  OrganizationLayout,
 } from "../OrganizationLayoutService";
 import { SIGNATURE, SignatureService } from "../SignatureService";
 import {

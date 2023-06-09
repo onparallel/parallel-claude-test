@@ -3,7 +3,6 @@ import stringify from "fast-safe-stringify";
 import { readFile, stat } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { basename, extname } from "path";
-import { Config, CONFIG } from "../../config";
 import {
   DocusignIntegration,
   DocusignIntegrationContext,
@@ -20,6 +19,7 @@ import {
   SignatureOptions,
   SignatureResponse,
 } from "./SignatureClient";
+import { CONFIG, Config } from "../../config";
 
 interface UserInfoResponse {
   accounts: { accountId: string; baseUri: string; isDefault: "true" | "false" }[];

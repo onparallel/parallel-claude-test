@@ -78,9 +78,6 @@ const config = {
       },
     ];
   },
-  sentry: {
-    hideSourceMaps: true,
-  },
   experimental: {
     largePageDataBytes: 0.5 * 1024 * 1024,
   },
@@ -102,5 +99,5 @@ module.exports = [
             }
           ),
       ]
-    : [({ sentry, ...config }) => config]),
+    : []),
 ].reduce((acc, curr) => curr(acc), config);

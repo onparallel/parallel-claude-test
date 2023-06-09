@@ -1,13 +1,13 @@
 import assert from "assert";
 import gql from "graphql-tag";
 import { Knex } from "knex";
-import { Config, CONFIG } from "../../config";
+import { CONFIG, Config } from "../../config";
+import { EventSubscriptionSignatureKey, PetitionEventSubscription, User } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { EventSubscriptionSignatureKey, PetitionEventSubscription, User } from "../../db/__types";
-import { IEncryptionService, ENCRYPTION_SERVICE } from "../../services/EncryptionService";
+import { ENCRYPTION_SERVICE, IEncryptionService } from "../../services/EncryptionService";
 import { toGlobalId } from "../../util/globalId";
-import { initServer, TestClient } from "./server";
+import { TestClient, initServer } from "./server";
 
 describe("GraphQL/EventSubscriptionSignatureKeys", () => {
   let testClient: TestClient;
