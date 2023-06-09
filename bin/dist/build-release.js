@@ -60,11 +60,11 @@ async function main() {
         cwd: WORK_DIR,
         encoding: "utf-8",
     });
-    (0, child_process_1.execSync)(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/server/.env`, {
+    (0, child_process_1.execSync)(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/server/.env.${env}`, {
         cwd: WORK_DIR,
         encoding: "utf-8",
     });
-    (0, child_process_1.execSync)(`echo "SECURITY_SERVICE_JWT_SECRET=${SECURITY_SERVICE_JWT_SECRET}" >> ${buildDir}/server/.env`, { cwd: WORK_DIR, encoding: "utf-8" });
+    (0, child_process_1.execSync)(`echo "SECURITY_SERVICE_JWT_SECRET=${SECURITY_SERVICE_JWT_SECRET}" >> ${buildDir}/server/.env.${env}`, { cwd: WORK_DIR, encoding: "utf-8" });
     const secretsManagerClient = new client_secrets_manager_1.SecretsManagerClient({});
     const response = await secretsManagerClient.send(new client_secrets_manager_1.GetSecretValueCommand({
         SecretId: "arn:aws:secretsmanager:eu-central-1:749273139513:secret:ops/sentry-auth-token-609sGa",

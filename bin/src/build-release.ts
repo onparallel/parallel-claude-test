@@ -67,12 +67,12 @@ async function main() {
     cwd: WORK_DIR,
     encoding: "utf-8",
   });
-  execSync(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/server/.env`, {
+  execSync(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/server/.env.${env}`, {
     cwd: WORK_DIR,
     encoding: "utf-8",
   });
   execSync(
-    `echo "SECURITY_SERVICE_JWT_SECRET=${SECURITY_SERVICE_JWT_SECRET}" >> ${buildDir}/server/.env`,
+    `echo "SECURITY_SERVICE_JWT_SECRET=${SECURITY_SERVICE_JWT_SECRET}" >> ${buildDir}/server/.env.${env}`,
     { cwd: WORK_DIR, encoding: "utf-8" }
   );
 
