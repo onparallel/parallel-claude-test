@@ -1,0 +1,7 @@
+[Definition]
+
+failregex = ^\{"transaction":\{"client_ip":"<HOST>",.*"http_code":403,.*Inbound Anomaly Score Exceeded.*$
+
+ignoreregex =
+
+datepattern = ^.*"time_stamp":"(.*) %%b %%d %%H:%%M:%%S %%ExY"

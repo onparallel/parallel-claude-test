@@ -49,6 +49,7 @@ sudo systemctl enable parallel-organization-limits-cron.service
 sudo systemctl enable parallel-anonymizer-cron.service
 sudo systemctl enable parallel-old-notifications-cron.service
 sudo systemctl enable parallel-expiring-properties-cron.service
+sudo systemctl enable fail2ban
 sudo systemctl enable nginx.service 
 
 sudo amazon-cloudwatch-agent-ctl -a fetch-config -s -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json

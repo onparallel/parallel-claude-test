@@ -4,6 +4,7 @@
 # versions
 nodejs_version="18" # https://nodejs.org/en
 nginx_version="1.24.0" # http://nginx.org/en/download.html
+fail2ban_version="1.0.2" # https://github.com/fail2ban/fail2ban/releases
 modsecurity_version="3.0.9" # https://github.com/SpiderLabs/ModSecurity/releases
 modsecurity_nginx_version="1.0.3" # https://github.com/SpiderLabs/ModSecurity-nginx/releases
 coreruleset_version="3.3.4" # https://github.com/coreruleset/coreruleset/releases
@@ -45,6 +46,7 @@ sudo yum -y install yarn
 
 echo "Installing nginx"
 download_and_untar nginx https://nginx.org/download/nginx-${nginx_version}.tar.gz
+download_and_untar fail2ban https://github.com/fail2ban/fail2ban/archive/refs/tags/${fail2ban_version}.tar.gz
 download_and_untar modsecurity https://github.com/SpiderLabs/ModSecurity/releases/download/v${modsecurity_version}/modsecurity-v${modsecurity_version}.tar.gz
 download_and_untar modsecurity-nginx https://github.com/SpiderLabs/ModSecurity-nginx/releases/download/v${modsecurity_nginx_version}/modsecurity-nginx-v${modsecurity_nginx_version}.tar.gz
 download_and_untar modsecurity-crs https://github.com/coreruleset/coreruleset/archive/refs/tags/v${coreruleset_version}.tar.gz
@@ -52,6 +54,14 @@ download_and_untar nginx-accept-language-module https://github.com/giom/nginx_ac
 download_and_untar ngx-devel-kit https://github.com/vision5/ngx_devel_kit/archive/refs/tags/v${ngx_devel_kit_version}.tar.gz
 download_and_untar set-misc-nginx-module https://github.com/openresty/set-misc-nginx-module/archive/refs/tags/v${set_misc_nginx_module_version}.tar.gz
 download_and_untar headers-more-nginx-module https://github.com/openresty/headers-more-nginx-module/archive/refs/tags/v${headers_more_nginx_module_version}.tar.gz
+
+pushd fail2ban
+sudo yum install -y 2to3
+./fail2ban-2to3
+python3.9 setup.py build
+sudo python3.9 setup.py install
+sudo cp ./build/fail2ban.service /etc/systemd/system/fail2ban.service
+popd
 
 pushd modsecurity
 sudo yum install -y \

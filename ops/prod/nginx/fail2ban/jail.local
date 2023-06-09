@@ -1,0 +1,66 @@
+[INCLUDES]
+
+before = paths-fedora.conf
+
+[DEFAULT]
+
+
+#
+# MISCELLANEOUS OPTIONS
+#
+
+bantime.increment = true
+
+#
+# ACTIONS
+#
+
+destemail = santi@onparallel.com
+sender = fail2ban@onparallel.com
+mta = sendmail
+
+#
+# JAILS
+#
+
+#
+# SSH servers
+#
+
+[sshd]
+
+# To use more aggressive sshd modes set filter parameter "mode" in jail.local:
+# normal (default), ddos, extra or aggressive (combines all).
+# See "tests/files/logs/sshd" or "filter.d/sshd.conf" for usage example and details.
+#mode   = normal
+port    = ssh
+logpath = %(sshd_log)s
+backend = %(sshd_backend)s
+
+#
+# HTTP servers
+#
+
+# To use more aggressive http-auth modes set filter parameter "mode" in jail.local:
+# normal (default), aggressive (combines all), auth or fallback
+# See "tests/files/logs/nginx-http-auth" or "filter.d/nginx-http-auth.conf" for usage example and details.
+[nginx-http-auth]
+# mode = normal
+port    = http,https
+logpath = %(nginx_error_log)s
+
+# To use 'nginx-limit-req' jail you should have `ngx_http_limit_req_module` 
+# and define `limit_req` and `limit_req_zone` as described in nginx documentation
+# http://nginx.org/en/docs/http/ngx_http_limit_req_module.html
+# or for example see in 'config/filter.d/nginx-limit-req.conf'
+[nginx-limit-req]
+port    = http,https
+logpath = %(nginx_error_log)s
+
+[modsec]
+enabled = true
+port     = http,https
+logpath  = /var/log/modsec_audit.log
+action   = nginx-block-map[blck_lst_file="/nfs/parallel/fail2ban/blacklisted-ips.conf"]
+findtime = 5m
+maxretry = 10
