@@ -5,6 +5,7 @@ import { Readable } from "stream";
 import { PetitionFieldReply, PetitionMessage } from "../../db/__types";
 import { FORMATS } from "../../util/dates";
 import { getFieldIndices } from "../../util/fieldIndices";
+import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
@@ -43,7 +44,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       includePreviewUrl,
       petitionsAccesses,
       petitionsMessages,
-      petitionsFields,
+      petitionsFieldsWithReplies,
       petitionsOwner,
       petitionsTags,
       petitionsEvents,
@@ -51,7 +52,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       this.ctx.featureFlags.orgHasFeatureFlag(template!.org_id, "TEMPLATE_REPLIES_PREVIEW_URL"),
       this.ctx.readonlyPetitions.loadAccessesForPetition(petitions.map((p) => p.id)),
       this.ctx.readonlyPetitions.loadMessagesByPetitionId(petitions.map((p) => p.id)),
-      this.ctx.readonlyPetitions.loadFieldsForPetition(petitions.map((p) => p.id)),
+      this.ctx.readonlyPetitions.getPetitionFieldsWithReplies(petitions.map((p) => p.id)),
       this.ctx.readonlyPetitions.loadPetitionOwner(petitions.map((p) => p.id)),
       this.ctx.readonlyTags.loadTagsByPetitionId(petitions.map((p) => p.id)),
       this.ctx.readonlyPetitions.loadPetitionEventsByPetitionId(petitions.map((p) => p.id)),
@@ -60,11 +61,6 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
     const petitionsAccessesContacts = await Promise.all(
       petitionsAccesses.map((accesses) =>
         this.ctx.readonlyContacts.loadContactByAccessId(accesses.map((a) => a.id))
-      )
-    );
-    const petitionsFieldsReplies = await Promise.all(
-      petitionsFields.map((fields) =>
-        this.ctx.readonlyPetitions.loadRepliesForField(fields.map((f) => f.id))
       )
     );
 
@@ -88,8 +84,8 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
     );
 
     const rows = petitions.map((petition, petitionIndex) => {
-      const petitionFields = petitionsFields[petitionIndex];
-      const petitionFieldsReplies = petitionsFieldsReplies[petitionIndex];
+      const petitionFields = petitionsFieldsWithReplies[petitionIndex];
+
       const contacts = petitionsAccessesContacts[petitionIndex].filter(isDefined);
       const petitionFirstMessage = petitionsFirstMessage[petitionIndex];
       const petitionFirstMessageUserData = petitionsFirstMessageUserData[petitionIndex];
@@ -280,26 +276,28 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       const fixedColsLength = Object.keys(row).length;
 
       const fieldIndexes = getFieldIndices(petitionFields);
-      zip(petitionFields, fieldIndexes).forEach(([field, fieldIndex], i) => {
-        if (field.type !== "HEADING") {
-          const replies = petitionFieldsReplies[i];
+      const visibilities = evaluateFieldVisibility(petitionFields);
+      zip(petitionFields, fieldIndexes)
+        .filter((_, i) => visibilities[i])
+        .forEach(([field, fieldIndex]) => {
           row[`${field.from_petition_field_id ?? field.id}`] = {
             position: (fieldIndex as number) - 1 + fixedColsLength,
             title: field.type === "DATE_TIME" ? field.title + " (UTC)" : field.title,
             content: !isFileTypeField(field.type)
-              ? replies.map((r) => this.replyContent(r, intl as IntlShape)).join("; ")
-              : replies.length > 0
+              ? field.replies
+                  .map((r) => this.replyContent({ ...r, type: field.type }, intl as IntlShape))
+                  .join("; ")
+              : field.replies.length > 0
               ? intl.formatMessage(
                   {
                     id: "export-template-report.file-cell-content",
                     defaultMessage: "{count, plural, =1{1 file} other {# files}}",
                   },
-                  { count: replies.length }
+                  { count: field.replies.length }
                 )
               : "",
           };
-        }
-      });
+        });
 
       return row;
     });
@@ -321,7 +319,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
     return { temporary_file_id: tmpFile.id };
   }
 
-  private replyContent(r: PetitionFieldReply, intl: IntlShape) {
+  private replyContent(r: Pick<PetitionFieldReply, "content" | "type">, intl: IntlShape) {
     switch (r.type) {
       case "CHECKBOX":
         return (r.content.value as string[]).join(", ");
