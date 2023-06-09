@@ -23,7 +23,6 @@ import { UserRepository } from "./db/repositories/UserRepository";
 import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./services/AccountSetupService";
 import { ANALYTICS, IAnalyticsService } from "./services/AnalyticsService";
 import { AUTH, IAuth } from "./services/AuthService";
-import { BANKFLIP_LEGACY_SERVICE, IBankflipLegacyService } from "./services/BankflipLegacyService";
 import { BANKFLIP_SERVICE, IBankflipService } from "./services/BankflipService";
 import { DOW_JONES_CLIENT, IDowJonesClient } from "./services/DowJonesClient";
 import { EMAILS, IEmailsService } from "./services/EmailsService";
@@ -89,8 +88,6 @@ export class ApiContext {
     @inject(DOW_JONES_CLIENT) public readonly dowJonesKyc: IDowJonesClient,
     @inject(REDIS) public readonly redis: IRedis,
     @inject(BANKFLIP_SERVICE) public readonly bankflip: IBankflipService,
-    // TODO Bankflip Legacy: old version of Bankflip API. Soon to be deprecated by them */
-    @inject(BANKFLIP_LEGACY_SERVICE) public readonly bankflipLegacy: IBankflipLegacyService,
     @inject(PETITION_IMPORT_EXPORT_SERVICE)
     public readonly petitionImportExport: IPetitionImportExportService,
     @inject(PETITION_MESSAGE_CONTEXT_SERVICE)

@@ -6,11 +6,6 @@ import {
 } from "./AccountSetupService";
 import { ANALYTICS, AnalyticsService, IAnalyticsService } from "./AnalyticsService";
 import { AUTH, Auth, IAuth } from "./AuthService";
-import {
-  BANKFLIP_LEGACY_SERVICE,
-  BankflipLegacyService,
-  IBankflipLegacyService,
-} from "./BankflipLegacyService";
 import { BANKFLIP_SERVICE, BankflipService, IBankflipService } from "./BankflipService";
 import { DOW_JONES_CLIENT, DowJonesClient, IDowJonesClient } from "./DowJonesClient";
 import { EMAILS, EmailsService, IEmailsService } from "./EmailsService";
@@ -79,7 +74,6 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IOrganizationCreditsService>(ORGANIZATION_CREDITS_SERVICE).to(OrganizationCreditsService);
   bind<IDowJonesClient>(DOW_JONES_CLIENT).to(DowJonesClient);
   bind<IBankflipService>(BANKFLIP_SERVICE).to(BankflipService);
-  bind<IBankflipLegacyService>(BANKFLIP_LEGACY_SERVICE).to(BankflipLegacyService); // TODO Bankflip Legacy: remove when deprecated
   bind<IPetitionImportExportService>(PETITION_IMPORT_EXPORT_SERVICE).to(
     PetitionImportExportService
   );

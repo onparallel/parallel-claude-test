@@ -3,9 +3,9 @@ import { booleanArg, idArg, mutationField, nonNull, objectType } from "nexus";
 import { toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { random } from "../../../util/token";
+import { RESULT } from "../../helpers/Result";
 import { and, chain } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { RESULT } from "../../helpers/Result";
 import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
 import {
   fieldCanBeReplied,
@@ -301,26 +301,17 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
       fieldCanBeReplied("fieldId")
     )
   ),
-  resolve: async (_, { fieldId }, ctx) => {
-    const field = await ctx.petitions.loadField(fieldId);
-    if (field?.options.legacy) {
-      return ctx.bankflipLegacy.createContactRequest({
-        fieldId: toGlobalId("PetitionField", fieldId),
-        accessId: toGlobalId("PetitionAccess", ctx.access!.id),
-        keycode: ctx.access!.keycode,
-      });
-    } else {
-      const petition = await ctx.petitions.loadPetition(field!.petition_id);
-      const session = await ctx.bankflip.createSession({
-        orgId: toGlobalId("Organization", petition!.org_id),
-        fieldId: toGlobalId("PetitionField", fieldId),
-        accessId: toGlobalId("PetitionAccess", ctx.access!.id),
-      });
+  resolve: async (_, { keycode, fieldId }, ctx) => {
+    const petition = await ctx.petitions.loadPetition(ctx.access!.petition_id);
+    const session = await ctx.bankflip.createSession({
+      orgId: toGlobalId("Organization", petition!.org_id),
+      fieldId: toGlobalId("PetitionField", fieldId),
+      accessId: toGlobalId("PetitionAccess", ctx.access!.id),
+    });
 
-      return {
-        type: "WINDOW",
-        url: session.widgetLink,
-      };
-    }
+    return {
+      type: "WINDOW",
+      url: session.widgetLink,
+    };
   },
 });

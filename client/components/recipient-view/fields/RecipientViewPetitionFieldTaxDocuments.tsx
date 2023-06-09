@@ -84,23 +84,16 @@ export function RecipientViewPetitionFieldTaxDocuments({
     (e) => {
       const popup = popupRef.current;
       if (isDefined(popup) && e.source === popup) {
-        // TODO Bankflip Legacy: legacy event, will be removed by Bankflip on May 2023
-        if (field.options.legacy) {
+        if (e.data.name === "session_completed") {
+          setBankflipSessionReady(true);
+        }
+        if (e.data.name === "user_requested_closure") {
           onRefreshField();
           popup.close();
-          setState("IDLE");
-        } else {
-          if (e.data.name === "session_completed") {
-            setBankflipSessionReady(true);
-          }
-          if (e.data.name === "user_requested_closure") {
-            onRefreshField();
-            popup.close();
-          }
-          if (e.data.name === "session_expired") {
-            popup.close();
-            setState("ERROR");
-          }
+        }
+        if (e.data.name === "session_expired") {
+          popup.close();
+          setState("ERROR");
         }
       }
     },

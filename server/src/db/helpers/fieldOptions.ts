@@ -196,17 +196,11 @@ const SCHEMAS = {
   },
   ES_TAX_DOCUMENTS: {
     type: "object",
-    // TODO Bankflip Legacy: make "requests" a required property when legacy is removed
-    required: ["attachToPdf"],
+    required: ["attachToPdf", "requests"],
     additionalProperties: false,
     properties: {
       attachToPdf: {
         type: "boolean",
-      },
-      // TODO Bankflip Legacy: remove when legacy API is removed
-      legacy: {
-        type: "boolean",
-        description: "set to true to use bankflip legacy API",
       },
       requests: {
         type: "array",
