@@ -1,6 +1,6 @@
+import Fuse from "fuse.js";
 import { list, nonNull, queryField } from "nexus";
 import { authenticateAnd } from "../helpers/authorize";
-import Fuse from "fuse.js";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { userHasAccessToTags } from "./authorizers";
 

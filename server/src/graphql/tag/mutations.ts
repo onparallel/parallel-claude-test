@@ -13,6 +13,7 @@ import { petitionsAreNotPublicTemplates, userHasAccessToPetitions } from "../pet
 import { contextUserHasRole } from "../users/authorizers";
 import { userHasAccessToTags } from "./authorizers";
 import { validateHexColor } from "./validators";
+import { DatabaseError } from "pg";
 
 export const createTag = mutationField("createTag", {
   description: "Creates a tag in the user's organization",
@@ -36,8 +37,11 @@ export const createTag = mutationField("createTag", {
         },
         ctx.user!
       );
-    } catch (error: any) {
-      if (error.constraint === "tag__organization_id__name__unique") {
+    } catch (error) {
+      if (
+        error instanceof DatabaseError &&
+        error.constraint === "tag__organization_id__name__unique"
+      ) {
         throw new ApolloError(
           "The organization already has a tag with this name",
           "TAG_ALREADY_EXISTS"
@@ -81,8 +85,11 @@ export const updateTag = mutationField("updateTag", {
     }
     try {
       return await ctx.tags.updateTag(args.id, data, ctx.user!);
-    } catch (error: any) {
-      if (error.constraint === "tag__organization_id__name__unique") {
+    } catch (error) {
+      if (
+        error instanceof DatabaseError &&
+        error.constraint === "tag__organization_id__name__unique"
+      ) {
         throw new ApolloError(
           "The organization already has a tag with this name",
           "TAG_ALREADY_EXISTS"

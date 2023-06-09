@@ -2279,3 +2279,18 @@ export const SubmitPetitionRepliesResponse = schema({
     },
   },
 } as const);
+
+export const TagPetition = schema({
+  title: "TagPetition",
+  type: "object",
+  additionalProperties: false,
+  required: ["name"],
+  properties: {
+    name: {
+      type: "string",
+      description: "Name of the tag.",
+      maxLength: 100,
+      examples: ["priority"],
+    },
+  },
+} as const);

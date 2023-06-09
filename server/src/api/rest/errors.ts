@@ -36,6 +36,13 @@ export class BadRequestError extends HttpError {
   }
 }
 
+export class ResourceNotFoundError extends HttpError {
+  static readonly code = "ResourceNotFound";
+  constructor(public override message: string) {
+    super(404, ResourceNotFoundError.code, message);
+  }
+}
+
 export class ForbiddenError extends HttpError {
   static readonly code = "ForbiddenError";
   constructor(public override message: string, extra = {}) {

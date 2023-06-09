@@ -7,7 +7,13 @@ import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
 import { toGlobalId } from "../../util/globalId";
 import { Body, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
 import { RestApi } from "../rest/core";
-import { BadRequestError, ConflictError, ForbiddenError, UnauthorizedError } from "../rest/errors";
+import {
+  BadRequestError,
+  ConflictError,
+  ForbiddenError,
+  ResourceNotFoundError,
+  UnauthorizedError,
+} from "../rest/errors";
 import { booleanParam, enumParam, stringParam } from "../rest/params";
 import {
   Created,
@@ -18,6 +24,73 @@ import {
   RedirectResponse,
   SuccessResponse,
 } from "../rest/responses";
+import {
+  CreateContact_contactDocument,
+  CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
+  CreatePetition_petitionDocument,
+  CreatePetitionRecipients_contactDocument,
+  CreatePetitionRecipients_createContactDocument,
+  CreatePetitionRecipients_petitionDocument,
+  CreatePetitionRecipients_sendPetitionDocument,
+  CreatePetitionRecipients_updateContactDocument,
+  DeletePetition_deletePetitionsDocument,
+  DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
+  DeleteReply_deletePetitionReplyDocument,
+  DeleteTemplate_deletePetitionsDocument,
+  DownloadFileReply_fileUploadReplyDownloadLinkDocument,
+  DownloadSignedDocument_downloadAuditTrailDocument,
+  DownloadSignedDocument_downloadSignedDocDocument,
+  EventSubscriptions_createSubscriptionDocument,
+  EventSubscriptions_deleteSubscriptionDocument,
+  EventSubscriptions_getSubscriptionsDocument,
+  ExportPetitionReplies_createExportRepliesTaskDocument,
+  ExportPetitionReplies_createPrintPdfTaskDocument,
+  GetContact_contactDocument,
+  GetContacts_contactsDocument,
+  GetMe_userDocument,
+  GetOrganizationUsers_usersDocument,
+  GetPermissions_permissionsDocument,
+  GetPetition_petitionDocument,
+  GetPetitionEvents_PetitionEventsDocument,
+  GetPetitionRecipients_petitionAccessesDocument,
+  GetPetitions_petitionsDocument,
+  GetSignatures_petitionSignaturesDocument,
+  GetTags_tagsDocument,
+  GetTemplate_templateDocument,
+  GetTemplates_templatesDocument,
+  Maybe,
+  OrganizationFragmentDoc,
+  PetitionFragment as PetitionFragmentType,
+  PetitionReplies_repliesDocument,
+  PetitionTagFilter,
+  ReadPetitionCustomPropertiesDocument,
+  RemoveUserGroupPermission_removePetitionPermissionDocument,
+  RemoveUserPermission_removePetitionPermissionDocument,
+  SharePetition_addPetitionPermissionDocument,
+  SharePetition_usersDocument,
+  StopSharing_removePetitionPermissionDocument,
+  SubmitReplies_bulkCreatePetitionRepliesDocument,
+  SubmitReply_createFileUploadReplyCompleteDocument,
+  SubmitReply_createFileUploadReplyDocument,
+  SubmitReply_createPetitionFieldReplyDocument,
+  SubmitReply_petitionDocument,
+  TagFragmentDoc,
+  TagPetition_createTagDocument,
+  TagPetition_tagPetitionDocument,
+  TagPetition_tagsDocument,
+  TemplateFragment as TemplateFragmentType,
+  TransferPetition_searchUserByEmailDocument,
+  TransferPetition_transferPetitionOwnershipDocument,
+  UntagPetition_untagPetitionDocument,
+  UpdatePetition_updatePetitionDocument,
+  UpdatePetitionField_updatePetitionFieldDocument,
+  UpdateReply_petitionDocument,
+  UpdateReply_updateFileUploadReplyCompleteDocument,
+  UpdateReply_updateFileUploadReplyDocument,
+  UpdateReply_updatePetitionFieldReplyDocument,
+  UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
+  UserFragmentDoc,
+} from "./__types";
 import { description, newParallelEvent } from "./descriptions";
 import {
   ContactFragment,
@@ -26,6 +99,7 @@ import {
   PetitionFieldFragment,
   PetitionFieldWithRepliesFragment,
   PetitionFragment,
+  PetitionTagFragment,
   SubscriptionFragment,
   TaskFragment,
   TemplateFragment,
@@ -50,6 +124,7 @@ import {
 } from "./helpers";
 import { singleFileUploadMiddleware } from "./middleware";
 import {
+  _PetitionEvent,
   Contact,
   CreateContact,
   CreateOrUpdatePetitionCustomProperty,
@@ -78,75 +153,12 @@ import {
   SubmitPetitionRepliesResponse,
   SubmitReply,
   Subscription,
+  TagPetition,
   Template,
   UpdatePetition,
   UpdatePetitionField,
   UserWithOrg,
-  _PetitionEvent,
 } from "./schemas";
-import {
-  CreateContact_contactDocument,
-  CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
-  CreatePetitionRecipients_contactDocument,
-  CreatePetitionRecipients_createContactDocument,
-  CreatePetitionRecipients_petitionDocument,
-  CreatePetitionRecipients_sendPetitionDocument,
-  CreatePetitionRecipients_updateContactDocument,
-  CreatePetition_petitionDocument,
-  DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
-  DeletePetition_deletePetitionsDocument,
-  DeleteReply_deletePetitionReplyDocument,
-  DeleteTemplate_deletePetitionsDocument,
-  DownloadFileReply_fileUploadReplyDownloadLinkDocument,
-  DownloadSignedDocument_downloadAuditTrailDocument,
-  DownloadSignedDocument_downloadSignedDocDocument,
-  EventSubscriptions_createSubscriptionDocument,
-  EventSubscriptions_deleteSubscriptionDocument,
-  EventSubscriptions_getSubscriptionsDocument,
-  ExportPetitionReplies_createExportRepliesTaskDocument,
-  ExportPetitionReplies_createPrintPdfTaskDocument,
-  GetContacts_contactsDocument,
-  GetContact_contactDocument,
-  GetMe_userDocument,
-  GetOrganizationUsers_usersDocument,
-  GetPermissions_permissionsDocument,
-  GetPetitionEvents_PetitionEventsDocument,
-  GetPetitionRecipients_petitionAccessesDocument,
-  GetPetitions_petitionsDocument,
-  GetPetition_petitionDocument,
-  GetSignatures_petitionSignaturesDocument,
-  GetTags_tagsDocument,
-  GetTemplates_templatesDocument,
-  GetTemplate_templateDocument,
-  Maybe,
-  OrganizationFragmentDoc,
-  PetitionFragment as PetitionFragmentType,
-  PetitionReplies_repliesDocument,
-  PetitionTagFilter,
-  ReadPetitionCustomPropertiesDocument,
-  RemoveUserGroupPermission_removePetitionPermissionDocument,
-  RemoveUserPermission_removePetitionPermissionDocument,
-  SharePetition_addPetitionPermissionDocument,
-  SharePetition_usersDocument,
-  StopSharing_removePetitionPermissionDocument,
-  SubmitReplies_bulkCreatePetitionRepliesDocument,
-  SubmitReply_createFileUploadReplyCompleteDocument,
-  SubmitReply_createFileUploadReplyDocument,
-  SubmitReply_createPetitionFieldReplyDocument,
-  SubmitReply_petitionDocument,
-  TagFragmentDoc,
-  TemplateFragment as TemplateFragmentType,
-  TransferPetition_searchUserByEmailDocument,
-  TransferPetition_transferPetitionOwnershipDocument,
-  UpdatePetitionField_updatePetitionFieldDocument,
-  UpdatePetition_updatePetitionDocument,
-  UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
-  UpdateReply_petitionDocument,
-  UpdateReply_updateFileUploadReplyCompleteDocument,
-  UpdateReply_updateFileUploadReplyDocument,
-  UpdateReply_updatePetitionFieldReplyDocument,
-  UserFragmentDoc,
-} from "./__types";
 
 function assert(condition: any): asserts condition {}
 function assertType<T>(value: any): asserts value is T {}
@@ -681,6 +693,131 @@ api
         }
         throw error;
       }
+    }
+  );
+
+api.path("/petitions/:petitionId/tags", { params: { petitionId } }).post(
+  {
+    operationId: "TagPetition",
+    summary: "Tag a parallel",
+    description: "Tag a parallel with the specified label",
+    body: JsonBody(TagPetition),
+    responses: { 201: SuccessResponse(Petition) },
+    tags: ["Tags"],
+  },
+  async ({ client, params, body }) => {
+    const _query = gql`
+      query TagPetition_tags($search: String) {
+        tags(offset: 0, limit: 1000, search: $search) {
+          items {
+            ...Tag
+          }
+        }
+      }
+      ${PetitionTagFragment}
+    `;
+    const queryResult = await client.request(TagPetition_tagsDocument, { search: body.name });
+    // must have a 100% match on the result
+    let tagId = queryResult.tags.items.find((t) => t.name === body.name)?.id;
+
+    if (!isDefined(tagId)) {
+      const _mutation = gql`
+        mutation TagPetition_createTag($name: String!, $color: String!) {
+          createTag(name: $name, color: $color) {
+            ...Tag
+          }
+        }
+        ${PetitionTagFragment}
+      `;
+
+      const createTagResult = await client.request(TagPetition_createTagDocument, {
+        name: body.name,
+        color: "#E2E8F0",
+      });
+
+      tagId = createTagResult.createTag!.id;
+    }
+
+    const _mutation = gql`
+      mutation TagPetition_tagPetition(
+        $petitionId: GID!
+        $tagId: GID!
+        $includeRecipients: Boolean!
+        $includeFields: Boolean!
+        $includeTags: Boolean!
+        $includeRecipientUrl: Boolean!
+        $includeReplies: Boolean!
+        $includeProgress: Boolean!
+      ) {
+        tagPetition(petitionId: $petitionId, tagId: $tagId) {
+          ...Petition
+        }
+      }
+      ${PetitionFragment}
+    `;
+    const tagResult = await client.request(TagPetition_tagPetitionDocument, {
+      petitionId: params.petitionId,
+      tagId: tagId!,
+      includeFields: false,
+      includeReplies: false,
+      includeRecipients: false,
+      includeRecipientUrl: false,
+      includeProgress: false,
+      includeTags: true,
+    });
+    assert("id" in tagResult.tagPetition!);
+    return Created(mapPetition(tagResult.tagPetition!));
+  }
+);
+
+api
+  .path("/petitions/:petitionId/tags/:name", {
+    params: { petitionId, name: stringParam({ description: "The name of the tag to remove" }) },
+  })
+  .delete(
+    {
+      operationId: "UntagPetition",
+      summary: "Untag a parallel",
+      description: "Untag a parallel with the specified tag name",
+      responses: {
+        204: SuccessResponse(),
+        404: ErrorResponse({ description: "Tag name not found" }),
+      },
+
+      tags: ["Tags"],
+    },
+    async ({ client, params }) => {
+      const _query = gql`
+        query UntagPetition_tags($search: String) {
+          tags(offset: 0, limit: 1000, search: $search) {
+            items {
+              ...Tag
+            }
+          }
+        }
+        ${PetitionTagFragment}
+      `;
+      const queryResult = await client.request(TagPetition_tagsDocument, { search: params.name });
+      const tagId = queryResult.tags.items.find((tag) => tag.name === params.name)?.id;
+
+      if (!isDefined(tagId)) {
+        throw new ResourceNotFoundError(`Label '${params.name}' not found`);
+      }
+
+      const _mutation = gql`
+        mutation UntagPetition_untagPetition($petitionId: GID!, $tagId: GID!) {
+          untagPetition(petitionId: $petitionId, tagId: $tagId) {
+            id
+          }
+        }
+      `;
+
+      await client.request(UntagPetition_untagPetitionDocument, {
+        petitionId: params.petitionId,
+        tagId: tagId!,
+      });
+
+      return NoContent();
     }
   );
 

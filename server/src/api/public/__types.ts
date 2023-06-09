@@ -5331,6 +5331,118 @@ export type DeletePetition_deletePetitionsMutationVariables = Exact<{
 
 export type DeletePetition_deletePetitionsMutation = { deletePetitions: Success };
 
+export type TagPetition_tagsQueryVariables = Exact<{
+  search?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type TagPetition_tagsQuery = { tags: { items: Array<{ id: string; name: string }> } };
+
+export type TagPetition_createTagMutationVariables = Exact<{
+  name: Scalars["String"]["input"];
+  color: Scalars["String"]["input"];
+}>;
+
+export type TagPetition_createTagMutation = { createTag: { id: string; name: string } };
+
+export type TagPetition_tagPetitionMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  tagId: Scalars["GID"]["input"];
+  includeRecipients: Scalars["Boolean"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeTags: Scalars["Boolean"]["input"];
+  includeRecipientUrl: Scalars["Boolean"]["input"];
+  includeReplies: Scalars["Boolean"]["input"];
+  includeProgress: Scalars["Boolean"]["input"];
+}>;
+
+export type TagPetition_tagPetitionMutation = {
+  tagPetition:
+    | {
+        id: string;
+        name: string | null;
+        status: PetitionStatus;
+        deadline: string | null;
+        locale: PetitionLocale;
+        createdAt: string;
+        customProperties: { [key: string]: any };
+        fromTemplate: { id: string } | null;
+        recipients: Array<{
+          recipientUrl: string | null;
+          id: string;
+          status: PetitionAccessStatus;
+          reminderCount: number;
+          remindersLeft: number;
+          remindersActive: boolean;
+          nextReminderAt: string | null;
+          createdAt: string;
+          contact: {
+            id: string;
+            email: string;
+            fullName: string;
+            firstName: string;
+            lastName: string | null;
+            createdAt: string;
+            updatedAt: string;
+          } | null;
+          granter: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          } | null;
+        }>;
+        fields?: Array<{
+          id: string;
+          title: string | null;
+          description: string | null;
+          type: PetitionFieldType;
+          fromPetitionFieldId: string | null;
+          alias: string | null;
+          options: { [key: string]: any };
+          multiple: boolean;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+          }>;
+        }>;
+        replies: Array<{
+          alias: string | null;
+          type: PetitionFieldType;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            metadata: { [key: string]: any };
+          }>;
+        }>;
+        tags?: Array<{ id: string; name: string }>;
+        progress?: {
+          external: { approved: number; replied: number; optional: number; total: number };
+          internal: { approved: number; replied: number; optional: number; total: number };
+        };
+      }
+    | {};
+};
+
+export type UntagPetition_tagsQueryVariables = Exact<{
+  search?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type UntagPetition_tagsQuery = { tags: { items: Array<{ id: string; name: string }> } };
+
+export type UntagPetition_untagPetitionMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  tagId: Scalars["GID"]["input"];
+}>;
+
+export type UntagPetition_untagPetitionMutation = {
+  untagPetition: { id: string } | { id: string };
+};
+
 export type ReadPetitionCustomPropertiesQueryVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
 }>;
@@ -6921,6 +7033,64 @@ export const DeletePetition_deletePetitionsDocument = gql`
 ` as unknown as DocumentNode<
   DeletePetition_deletePetitionsMutation,
   DeletePetition_deletePetitionsMutationVariables
+>;
+export const TagPetition_tagsDocument = gql`
+  query TagPetition_tags($search: String) {
+    tags(offset: 0, limit: 1000, search: $search) {
+      items {
+        ...Tag
+      }
+    }
+  }
+  ${TagFragmentDoc}
+` as unknown as DocumentNode<TagPetition_tagsQuery, TagPetition_tagsQueryVariables>;
+export const TagPetition_createTagDocument = gql`
+  mutation TagPetition_createTag($name: String!, $color: String!) {
+    createTag(name: $name, color: $color) {
+      ...Tag
+    }
+  }
+  ${TagFragmentDoc}
+` as unknown as DocumentNode<TagPetition_createTagMutation, TagPetition_createTagMutationVariables>;
+export const TagPetition_tagPetitionDocument = gql`
+  mutation TagPetition_tagPetition(
+    $petitionId: GID!
+    $tagId: GID!
+    $includeRecipients: Boolean!
+    $includeFields: Boolean!
+    $includeTags: Boolean!
+    $includeRecipientUrl: Boolean!
+    $includeReplies: Boolean!
+    $includeProgress: Boolean!
+  ) {
+    tagPetition(petitionId: $petitionId, tagId: $tagId) {
+      ...Petition
+    }
+  }
+  ${PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  TagPetition_tagPetitionMutation,
+  TagPetition_tagPetitionMutationVariables
+>;
+export const UntagPetition_tagsDocument = gql`
+  query UntagPetition_tags($search: String) {
+    tags(offset: 0, limit: 1000, search: $search) {
+      items {
+        ...Tag
+      }
+    }
+  }
+  ${TagFragmentDoc}
+` as unknown as DocumentNode<UntagPetition_tagsQuery, UntagPetition_tagsQueryVariables>;
+export const UntagPetition_untagPetitionDocument = gql`
+  mutation UntagPetition_untagPetition($petitionId: GID!, $tagId: GID!) {
+    untagPetition(petitionId: $petitionId, tagId: $tagId) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  UntagPetition_untagPetitionMutation,
+  UntagPetition_untagPetitionMutationVariables
 >;
 export const ReadPetitionCustomPropertiesDocument = gql`
   query ReadPetitionCustomProperties($petitionId: GID!) {
