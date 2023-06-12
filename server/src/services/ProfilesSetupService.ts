@@ -8,10 +8,10 @@ export const PROFILES_SETUP_SERVICE = Symbol.for("PROFILES_SETUP_SERVICE");
 export interface IProfilesSetupService {
   createDefaultProfileType(
     orgId: number,
-    userId: number,
-    name: LocalizableUserText
+    name: LocalizableUserText,
+    createdBy: string
   ): Promise<ProfileType>;
-  createDefaultOrganizationProfileTypesAndFields(orgId: number, userId: number): Promise<void>;
+  createDefaultOrganizationProfileTypesAndFields(orgId: number, createdBy: string): Promise<void>;
 }
 
 @injectable()
@@ -21,7 +21,7 @@ export class ProfilesSetupService implements IProfilesSetupService {
     private profiles: ProfileRepository
   ) {}
 
-  async createDefaultProfileType(orgId: number, userId: number, name: LocalizableUserText) {
+  async createDefaultProfileType(orgId: number, name: LocalizableUserText, createdBy: string) {
     const fieldName = await this.intl.getLocalizableUserText({
       id: "profiles.default-field-name",
       defaultMessage: "Name",
@@ -29,7 +29,7 @@ export class ProfilesSetupService implements IProfilesSetupService {
     return await this.profiles.withTransaction(async (t) => {
       const [profileType] = await this.profiles.createProfileType(
         { name, org_id: orgId },
-        `User:${userId}`,
+        createdBy,
         t
       );
       const [field] = await this.profiles.createProfileTypeField(
@@ -38,20 +38,20 @@ export class ProfilesSetupService implements IProfilesSetupService {
           type: "SHORT_TEXT",
           name: fieldName,
         },
-        `User:${userId}`,
+        createdBy,
         t
       );
       await this.profiles.updateProfileTypeProfileNamePattern(
         profileType.id,
         [field.id],
-        `User:${userId}`,
+        createdBy,
         t
       );
       return profileType;
     });
   }
 
-  async createDefaultOrganizationProfileTypesAndFields(orgId: number, userId: number) {
+  async createDefaultOrganizationProfileTypesAndFields(orgId: number, createdBy: string) {
     const names = await Promise.all([
       this.intl.getLocalizableUserText({
         id: "profiles.default-profile-type.individual",
@@ -69,7 +69,7 @@ export class ProfilesSetupService implements IProfilesSetupService {
     await this.profiles.withTransaction(async (t) => {
       const [individual, legalEntity, contract] = await this.profiles.createProfileType(
         names.map((name) => ({ name, org_id: orgId })),
-        `User:${userId}`,
+        createdBy,
         t
       );
 
@@ -128,14 +128,14 @@ export class ProfilesSetupService implements IProfilesSetupService {
             alias: "ADDRESS",
           }))(),
         ]),
-        `User:${userId}`,
+        createdBy,
         t
       );
 
       await this.profiles.updateProfileTypeProfileNamePattern(
         individual.id,
         [firstName.id, " ", lastName.id],
-        `User:${userId}`,
+        createdBy,
         t
       );
 
@@ -176,14 +176,14 @@ export class ProfilesSetupService implements IProfilesSetupService {
             alias: "ADDRESS",
           }))(),
         ]),
-        `User:${userId}`,
+        createdBy,
         t
       );
 
       await this.profiles.updateProfileTypeProfileNamePattern(
         legalEntity.id,
         [corporateName.id],
-        `User:${userId}`,
+        createdBy,
         t
       );
 
@@ -251,14 +251,14 @@ export class ProfilesSetupService implements IProfilesSetupService {
             alias: "DOCUMENT",
           }))(),
         ]),
-        `User:${userId}`,
+        createdBy,
         t
       );
 
       await this.profiles.updateProfileTypeProfileNamePattern(
         contract.id,
         [contractType.id, " - ", counterParty.id],
-        `User:${userId}`,
+        createdBy,
         t
       );
     });

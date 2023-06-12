@@ -12,6 +12,7 @@ import { withError } from "../../util/promises/withError";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
 import { Maybe } from "../../util/types";
+import { RESULT } from "../helpers/Result";
 import {
   and,
   authenticate,
@@ -23,7 +24,6 @@ import {
 } from "../helpers/authorize";
 import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { RESULT } from "../helpers/Result";
 import { uploadArg } from "../helpers/scalars/Upload";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
@@ -32,9 +32,9 @@ import { maxActiveUsers } from "../helpers/validators/maxActiveUsers";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArray";
-import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validPassword } from "../helpers/validators/validPassword";
+import { validateFile } from "../helpers/validators/validateFile";
 import { orgCanCreateNewUser, orgDoesNotHaveSsoProvider } from "../organization/authorizers";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { argUserHasStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
@@ -447,6 +447,12 @@ export const signUp = mutationField("signUp", {
           "INVALID_LICENSE_CODE"
         );
       }
+
+      await ctx.licenseCodes.updateLicenseCode(
+        licenseCode.id,
+        { status: "REDEEMED" },
+        `UserSignUp:${args.email}`
+      );
     }
 
     const source = licenseCode?.source ?? "self-service";
@@ -480,7 +486,8 @@ export const signUp = mutationField("signUp", {
       );
     }
 
-    const org = await ctx.accountSetup.createOrganization(
+    const { user } = await ctx.accountSetup.createOrganization(
+      tierKey,
       {
         name: args.organizationName,
         status: source !== "self-service" ? "ACTIVE" : "DEMO",
@@ -492,15 +499,6 @@ export const signUp = mutationField("signUp", {
                 events: [licenseCode.details],
               }
             : null,
-      },
-      `UserSignUp:${args.email}`
-    );
-
-    const user = await ctx.users.createUser(
-      {
-        organization_role: "OWNER",
-        org_id: org.id,
-        status: "ACTIVE",
       },
       {
         cognito_id: cognitoId!,
@@ -517,18 +515,6 @@ export const signUp = mutationField("signUp", {
       },
       `UserSignUp:${args.email}`
     );
-
-    await ctx.tiers.updateOrganizationTier(org, tierKey, `User:${user.id}`);
-
-    await ctx.profilesSetup.createDefaultOrganizationProfileTypesAndFields(org.id, user.id);
-
-    if (licenseCode) {
-      await ctx.licenseCodes.updateLicenseCode(
-        licenseCode.id,
-        { status: "REDEEMED" },
-        `User:${user.id}`
-      );
-    }
 
     return user;
   },

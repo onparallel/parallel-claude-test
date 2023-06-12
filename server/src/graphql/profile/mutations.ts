@@ -69,8 +69,8 @@ export const createProfileType = mutationField("createProfileType", {
   resolve: async (_, args, ctx) => {
     return await ctx.profilesSetup.createDefaultProfileType(
       ctx.user!.org_id,
-      ctx.user!.id,
-      args.name
+      args.name,
+      `User:${ctx.user!.id}`
     );
   },
 });

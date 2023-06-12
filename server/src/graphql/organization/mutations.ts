@@ -316,14 +316,6 @@ export const createOrganization = mutationField("createOrganization", {
     }
   ),
   resolve: async (_, args, ctx) => {
-    const org = await ctx.accountSetup.createOrganization(
-      {
-        name: args.name.trim(),
-        status: args.status,
-      },
-      `User:${ctx.user!.id}`
-    );
-
     const email = args.email.trim().toLowerCase();
     const userData = (await ctx.users.loadUserData(ctx.user!.user_data_id))!;
     const cognitoId = await ctx.auth.getOrCreateCognitoUser(
@@ -333,16 +325,17 @@ export const createOrganization = mutationField("createOrganization", {
       args.lastName,
       {
         locale: args.locale,
-        organizationName: org.name,
+        organizationName: args.name.trim(),
         organizationUser: fullName(userData.first_name, userData.last_name),
       },
       true
     );
 
-    const user = await ctx.users.createUser(
+    const { organization } = await ctx.accountSetup.createOrganization(
+      "FREE",
       {
-        org_id: org.id,
-        organization_role: "OWNER",
+        name: args.name.trim(),
+        status: args.status,
       },
       {
         cognito_id: cognitoId,
@@ -357,11 +350,7 @@ export const createOrganization = mutationField("createOrganization", {
       `User:${ctx.user!.id}`
     );
 
-    await ctx.profilesSetup.createDefaultOrganizationProfileTypesAndFields(org.id, user.id);
-
-    await ctx.tiers.updateOrganizationTier(org, "FREE", `User:${ctx.user!.id}`);
-    // load org to get updated usage_details
-    return (await ctx.organizations.loadOrg(org.id))!;
+    return organization;
   },
 });
 
