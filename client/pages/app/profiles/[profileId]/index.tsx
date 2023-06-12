@@ -23,6 +23,7 @@ import { WithApolloDataContext, withApolloData } from "@parallel/components/comm
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useAutoConfirmDiscardChangesDialog } from "@parallel/components/organization/dialogs/ConfirmDiscardChangesDialog";
+import { FakeProfileTables } from "@parallel/components/profiles/FakeProfileTables";
 import { MoreOptionsMenuProfile } from "@parallel/components/profiles/MoreOptionsMenuProfile";
 import { ProfileSubscribers } from "@parallel/components/profiles/ProfileSubscribers";
 import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
@@ -507,6 +508,7 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
               onSubscribe={handleSubscribersClick}
             />
           </HStack>
+          {process.env.NEXT_PUBLIC_ENVIRONMENT === "staging" ? <FakeProfileTables me={me} /> : null}
         </Stack>
       </Flex>
     </AppLayout>
