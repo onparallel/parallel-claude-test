@@ -102,6 +102,7 @@ export const MapFieldsTable = Object.assign(
         <Table
           variant="unstyled"
           sx={{
+            tableLayout: "fixed",
             borderCollapse: "separate",
             borderSpacing: 0,
             "& th": {
@@ -139,7 +140,7 @@ export const MapFieldsTable = Object.assign(
                   defaultMessage="Field"
                 />
               </Th>
-              <Th width="1%"></Th>
+              <Th width="32px"></Th>
               <Th width="33%">
                 <FormattedMessage
                   id="component.map-fields-table.import-from-header"
