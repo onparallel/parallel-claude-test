@@ -919,6 +919,7 @@ export const PetitionFieldReply = objectType({
             : null;
           return file
             ? {
+                id: toGlobalId("FileUpload", file.id),
                 filename: file.filename,
                 size: file.size,
                 contentType: file.content_type,

@@ -1,6 +1,6 @@
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { countBy, isDefined, uniq } from "remeda";
+import { countBy, isDefined, uniq, zip } from "remeda";
 import {
   FeatureFlagName,
   IntegrationType,
@@ -136,12 +136,23 @@ export function fieldsBelongsToPetition<
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
   TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
->(argNamePetitionId: TArg1, argNameFieldIds: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
+>(
+  argNamePetitionId: TArg1,
+  argNameFieldIds: TArg2 | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>)
+): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
+      const fieldIds = uniq(
+        unMaybeArray(
+          (typeof argNameFieldIds === "function"
+            ? (argNameFieldIds as any)(args)
+            : (args as any)[argNameFieldIds]) as MaybeArray<number>
+        )
+      );
+
       return await ctx.petitions.fieldsBelongToPetition(
         args[argNamePetitionId] as unknown as number,
-        unMaybeArray(args[argNameFieldIds] as unknown as MaybeArray<number>)
+        fieldIds
       );
     } catch {}
     return false;
@@ -179,20 +190,37 @@ export function fieldsAreNotInternal<
 export function fieldCanBeReplied<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
->(fieldIdArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
+  TOverwrite extends Arg<TypeName, FieldName, boolean | null | undefined>
+>(
+  fieldIdArg: TArg | ((args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<number>),
+  overWriteArg?: TOverwrite
+): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const fieldId = args[fieldIdArg] as unknown as number;
-    const [field, replies] = await Promise.all([
-      ctx.petitions.loadField(fieldId),
-      ctx.petitions.loadRepliesForField(fieldId),
+    const fieldIds = uniq(
+      unMaybeArray(
+        (typeof fieldIdArg === "function"
+          ? (fieldIdArg as any)(args)
+          : (args as any)[fieldIdArg]) as MaybeArray<number>
+      )
+    );
+
+    const overwriteExisting = isDefined(overWriteArg)
+      ? (args[overWriteArg] as boolean | null | undefined) ?? false
+      : false;
+
+    const [fields, fieldsReplies] = await Promise.all([
+      ctx.petitions.loadField(fieldIds),
+      ctx.petitions.loadRepliesForField(fieldIds),
     ]);
 
-    if (!field || (!field.multiple && replies.length > 0)) {
-      throw new ApolloError(
-        "The field is already replied and does not accept multiple replies",
-        "FIELD_ALREADY_REPLIED_ERROR"
-      );
+    for (const [field, replies] of zip(fields, fieldsReplies)) {
+      if (!field || (!field.multiple && replies.length > 0 && !overwriteExisting)) {
+        throw new ApolloError(
+          "The field is already replied and does not accept multiple replies",
+          "FIELD_ALREADY_REPLIED_ERROR"
+        );
+      }
     }
 
     return true;

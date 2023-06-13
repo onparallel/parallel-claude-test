@@ -1,0 +1,38 @@
+import { gql } from "@apollo/client";
+import { Box, Text } from "@chakra-ui/react";
+import { PetitionSelectOption_PetitionBaseFragment } from "@parallel/graphql/__types";
+import { FormattedMessage } from "react-intl";
+import { HighlightText } from "./HighlightText";
+
+interface PetitionSelectOptionProps {
+  data: PetitionSelectOption_PetitionBaseFragment;
+  highlight?: string;
+  isDisabled?: boolean;
+}
+
+export function PetitionSelectOption({ data, highlight, isDisabled }: PetitionSelectOptionProps) {
+  return (
+    <Box verticalAlign="baseline" noOfLines={1} wordBreak="break-all">
+      {data.name ? (
+        <HighlightText search={highlight} as="span">
+          {data.name}
+        </HighlightText>
+      ) : data.__typename === "Petition" ? (
+        <Text as="span" textStyle="hint">
+          <FormattedMessage id="generic.unnamed-parallel" defaultMessage="Unnamed parallel" />
+        </Text>
+      ) : data.__typename === "PetitionTemplate" ? (
+        <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
+      ) : null}
+    </Box>
+  );
+}
+
+PetitionSelectOption.fragments = {
+  PetitionBase: gql`
+    fragment PetitionSelectOption_PetitionBase on PetitionBase {
+      id
+      name
+    }
+  `,
+};

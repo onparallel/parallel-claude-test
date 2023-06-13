@@ -9,7 +9,15 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChangeEvent, forwardRef, KeyboardEvent, MouseEvent, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  forwardRef,
+  KeyboardEvent,
+  MouseEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useIntl } from "react-intl";
 import { pick } from "remeda";
 import {
@@ -53,6 +61,12 @@ export function RecipientViewPetitionFieldText({
   const replyRefs = useMultipleRefs<HTMLTextAreaElement>();
 
   const options = field.options as FieldOptions["TEXT"];
+
+  useEffect(() => {
+    if (field.multiple && field.replies.length > 0 && showNewReply) {
+      setShowNewReply(false);
+    }
+  }, [field.replies]);
 
   function handleAddNewReply() {
     setShowNewReply(true);

@@ -1,8 +1,7 @@
 import gql from "graphql-tag";
 import { Knex } from "knex";
+import { extension } from "mime-types";
 import { omit } from "remeda";
-import { KNEX } from "../../db/knex";
-import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
   Contact,
   FileUpload,
@@ -11,10 +10,13 @@ import {
   PetitionAccess,
   PetitionField,
   PetitionFieldReply,
+  PetitionFieldType,
   User,
 } from "../../db/__types";
+import { KNEX } from "../../db/knex";
+import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
-import { initServer, TestClient } from "./server";
+import { TestClient, initServer } from "./server";
 
 describe("GraphQL/Petition Field Replies", () => {
   let testClient: TestClient;
@@ -2633,6 +2635,7 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(data?.createFileUploadReplyComplete).toEqual({
         id: fileUploadReplyGID,
         content: {
+          id: expect.any(String),
           filename: "my_file.txt",
           size: "500",
           contentType: "text/plain",
@@ -2701,6 +2704,7 @@ describe("GraphQL/Petition Field Replies", () => {
         reply: {
           id: data!.createFileUploadReply.reply.id,
           content: {
+            id: expect.any(String),
             filename: "my_file.txt",
             size: "50",
             contentType: "text/plain",
@@ -2851,6 +2855,7 @@ describe("GraphQL/Petition Field Replies", () => {
         reply: {
           id: toGlobalId("PetitionFieldReply", fileUploadReply.id),
           content: {
+            id: expect.any(String),
             filename: "my_file.txt",
             size: "500",
             contentType: "text/plain",
@@ -2890,6 +2895,7 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(data?.updateFileUploadReplyComplete).toEqual({
         id: toGlobalId("PetitionFieldReply", fileUploadReply.id),
         content: {
+          id: expect.any(String),
           filename: "my_file.txt",
           size: "500",
           contentType: "text/plain",
@@ -3254,6 +3260,1049 @@ describe("GraphQL/Petition Field Replies", () => {
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
+    });
+  });
+
+  describe("createPetitionFieldReplies", () => {
+    let shortText: PetitionField;
+    let text: PetitionField;
+    let select: PetitionField;
+    let dynamicSelect: PetitionField;
+    let checkbox: PetitionField;
+    let number: PetitionField;
+    let phone: PetitionField;
+    let date: PetitionField;
+    let dateTime: PetitionField;
+    let fileUpload: PetitionField;
+    let esTaxDocuments: PetitionField;
+    let dowJonesKyc: PetitionField;
+
+    let fileUploadReply: PetitionFieldReply;
+    let esTaxDocsReply: PetitionFieldReply;
+    let dowJonesKycReply: PetitionFieldReply;
+    let file: FileUpload;
+
+    beforeAll(async () => {
+      [
+        shortText,
+        text,
+        select,
+        dynamicSelect,
+        checkbox,
+        number,
+        phone,
+        date,
+        dateTime,
+        fileUpload,
+        esTaxDocuments,
+        dowJonesKyc,
+      ] = await mocks.createRandomPetitionFields(petition.id, 12, (i) => ({
+        type: [
+          "SHORT_TEXT",
+          "TEXT",
+          "SELECT",
+          "DYNAMIC_SELECT",
+          "CHECKBOX",
+          "NUMBER",
+          "PHONE",
+          "DATE",
+          "DATE_TIME",
+          "FILE_UPLOAD",
+          "ES_TAX_DOCUMENTS",
+          "DOW_JONES_KYC",
+        ][i] as PetitionFieldType,
+        multiple: i === 0 ? false : true,
+      }));
+
+      [file] = await mocks.createRandomFileUpload(1);
+
+      const [petitionWithFiles] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [fileUploadField, esTaxDocsField, dowJonesField] =
+        await mocks.createRandomPetitionFields(petitionWithFiles.id, 3, (i) => ({
+          type: i === 0 ? "FILE_UPLOAD" : i === 1 ? "ES_TAX_DOCUMENTS" : "DOW_JONES_KYC",
+          multiple: true,
+        }));
+      [fileUploadReply] = await mocks.createRandomFileReply(fileUploadField.id, 1, () => ({
+        content: { file_upload_id: file.id },
+        type: "FILE_UPLOAD",
+        user_id: user.id,
+      }));
+      [esTaxDocsReply] = await mocks.createRandomFileReply(esTaxDocsField.id, 1, () => ({
+        content: { file_upload_id: file.id },
+        type: "ES_TAX_DOCUMENTS",
+        user_id: user.id,
+      }));
+      [dowJonesKycReply] = await mocks.createRandomFileReply(dowJonesField.id, 1, () => ({
+        content: { file_upload_id: file.id },
+        type: "DOW_JONES_KYC",
+        user_id: user.id,
+      }));
+    });
+
+    afterEach(async () => {
+      await mocks.knex
+        .from("petition_field_reply")
+        .whereNotIn("id", [fileUploadReply.id, esTaxDocsReply.id, dowJonesKycReply.id])
+        .delete();
+    });
+
+    it("creates a simple SHORT_TEXT reply", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", shortText.id),
+              content: { value: "My SHORT_TEXT reply" },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionFieldReplies).toEqual([
+        {
+          id: expect.any(String),
+          field: {
+            id: toGlobalId("PetitionField", shortText.id),
+            type: "SHORT_TEXT",
+          },
+          content: { value: "My SHORT_TEXT reply" },
+        },
+      ]);
+    });
+
+    it("creates a simple TEXT reply", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", text.id),
+              content: { value: "My TEXT reply" },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionFieldReplies).toEqual([
+        {
+          id: expect.any(String),
+          field: {
+            id: toGlobalId("PetitionField", text.id),
+            type: "TEXT",
+          },
+          content: { value: "My TEXT reply" },
+        },
+      ]);
+    });
+
+    it("creates a simple SELECT reply", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", select.id),
+              content: { value: "Option 2" },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionFieldReplies).toEqual([
+        {
+          id: expect.any(String),
+          field: {
+            id: toGlobalId("PetitionField", select.id),
+            type: "SELECT",
+          },
+          content: { value: "Option 2" },
+        },
+      ]);
+    });
+
+    it("creates a simple DYNAMIC_SELECT reply", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", dynamicSelect.id),
+              content: {
+                value: [
+                  ["Country", "Spain"],
+                  ["City", "Barcelona"],
+                ],
+              },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionFieldReplies).toEqual([
+        {
+          id: expect.any(String),
+          field: {
+            id: toGlobalId("PetitionField", dynamicSelect.id),
+            type: "DYNAMIC_SELECT",
+          },
+          content: {
+            value: [
+              ["Country", "Spain"],
+              ["City", "Barcelona"],
+            ],
+          },
+        },
+      ]);
+    });
+
+    it("creates a simple CHECKBOX reply", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", checkbox.id),
+              content: { value: ["A", "C"] },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionFieldReplies).toEqual([
+        {
+          id: expect.any(String),
+          field: {
+            id: toGlobalId("PetitionField", checkbox.id),
+            type: "CHECKBOX",
+          },
+          content: {
+            value: ["A", "C"],
+          },
+        },
+      ]);
+    });
+
+    it("creates a simple NUMBER reply", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", number.id),
+              content: { value: 1001 },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionFieldReplies).toEqual([
+        {
+          id: expect.any(String),
+          field: {
+            id: toGlobalId("PetitionField", number.id),
+            type: "NUMBER",
+          },
+          content: {
+            value: 1001,
+          },
+        },
+      ]);
+    });
+
+    it("creates a simple PHONE reply", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", phone.id),
+              content: { value: "+34611677677" },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionFieldReplies).toEqual([
+        {
+          id: expect.any(String),
+          field: {
+            id: toGlobalId("PetitionField", phone.id),
+            type: "PHONE",
+          },
+          content: {
+            value: "+34611677677",
+          },
+        },
+      ]);
+    });
+
+    it("creates a simple DATE reply", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", date.id),
+              content: { value: "2022-10-19" },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionFieldReplies).toEqual([
+        {
+          id: expect.any(String),
+          field: {
+            id: toGlobalId("PetitionField", date.id),
+            type: "DATE",
+          },
+          content: {
+            value: "2022-10-19",
+          },
+        },
+      ]);
+    });
+
+    it("creates a simple DATE_TIME reply", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", dateTime.id),
+              content: { datetime: "2022-02-28T10:00", timezone: "Europe/Madrid" },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionFieldReplies).toEqual([
+        {
+          id: expect.any(String),
+          field: {
+            id: toGlobalId("PetitionField", dateTime.id),
+            type: "DATE_TIME",
+          },
+          content: {
+            datetime: "2022-02-28T10:00",
+            timezone: "Europe/Madrid",
+            value: "2022-02-28T09:00:00.000Z",
+          },
+        },
+      ]);
+    });
+
+    it("creates a simple FILE_UPLOAD reply", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", fileUpload.id),
+              content: {
+                petitionFieldReplyId: toGlobalId("PetitionFieldReply", fileUploadReply.id),
+              },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionFieldReplies).toEqual([
+        {
+          id: expect.any(String),
+          field: {
+            id: toGlobalId("PetitionField", fileUpload.id),
+            type: "FILE_UPLOAD",
+          },
+          content: {
+            id: expect.any(String),
+            filename: file.filename,
+            size: file.size,
+            contentType: file.content_type,
+            extension: extension(file.content_type) || null,
+            uploadComplete: file.upload_complete,
+          },
+        },
+      ]);
+    });
+
+    it("sends error when passing invalid replyId to create a FILE_UPLOAD reply", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", fileUpload.id),
+              content: {
+                petitionFieldReplyId: toGlobalId("PetitionFieldReply", dowJonesKycReply.id),
+              },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("creates a simple ES_TAX_DOCUMENTS reply", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", esTaxDocuments.id),
+              content: {
+                petitionFieldReplyId: toGlobalId("PetitionFieldReply", esTaxDocsReply.id),
+              },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionFieldReplies).toEqual([
+        {
+          id: expect.any(String),
+          field: {
+            id: toGlobalId("PetitionField", esTaxDocuments.id),
+            type: "ES_TAX_DOCUMENTS",
+          },
+          content: {
+            id: expect.any(String),
+            filename: file.filename,
+            size: file.size,
+            contentType: file.content_type,
+            extension: extension(file.content_type) || null,
+            uploadComplete: file.upload_complete,
+          },
+        },
+      ]);
+    });
+
+    it("creates a simple DOW_JONES_KYC reply", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", dowJonesKyc.id),
+              content: {
+                petitionFieldReplyId: toGlobalId("PetitionFieldReply", dowJonesKycReply.id),
+              },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionFieldReplies).toEqual([
+        {
+          id: expect.any(String),
+          field: {
+            id: toGlobalId("PetitionField", dowJonesKyc.id),
+            type: "DOW_JONES_KYC",
+          },
+          content: {
+            id: expect.any(String),
+            filename: file.filename,
+            size: file.size,
+            contentType: file.content_type,
+            extension: extension(file.content_type) || null,
+            uploadComplete: file.upload_complete,
+          },
+        },
+      ]);
+    });
+
+    it("sends error when passing replyId of a petition not shared to me", async () => {
+      const [otherUser] = await mocks.createRandomUsers(organization.id, 1);
+      const [otherPetition] = await mocks.createRandomPetitions(organization.id, otherUser.id, 1);
+      const [field] = await mocks.createRandomPetitionFields(otherPetition.id, 1, () => ({
+        type: "FILE_UPLOAD",
+      }));
+      const [reply] = await mocks.createRandomFileReply(field.id, 1, () => ({
+        user_id: otherUser.id,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", fileUpload.id),
+              content: { petitionFieldReplyId: toGlobalId("PetitionFieldReply", reply.id) },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when passing invalid NUMBER with min-max options", async () => {
+      const [limitedNumber] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "NUMBER",
+        options: {
+          range: {
+            min: 100,
+            max: 1000,
+          },
+        },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", limitedNumber.id),
+              content: { value: 10 },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when passing unknown option on SELECT", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", select.id),
+              content: { value: "Option unknown" },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when passing unknown option on CHECKBOX", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", checkbox.id),
+              content: { value: ["unknown option"] },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when passing invalid amount of values on CHECKBOX", async () => {
+      const [limitedCheckbox] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "CHECKBOX",
+        options: {
+          limit: { type: "RANGE", min: 2, max: 3 },
+          values: ["A", "B", "C"],
+        },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", limitedCheckbox.id),
+              content: { value: ["C"] },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when passing multiple replies on a single-reply field", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+              field {
+                id
+                type
+              }
+              content
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", shortText.id),
+              content: { value: "first reply" },
+            },
+            {
+              id: toGlobalId("PetitionField", shortText.id),
+              content: { value: "second reply" },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when passing empty fields array", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("creates replies on multiple fields at once", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              field {
+                id
+                type
+                replies {
+                  id
+                  content
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", shortText.id),
+              content: { value: "short reply" },
+            },
+            {
+              id: toGlobalId("PetitionField", select.id),
+              content: { value: "Option 2" },
+            },
+            {
+              id: toGlobalId("PetitionField", number.id),
+              content: { value: 101 },
+            },
+            {
+              id: toGlobalId("PetitionField", fileUpload.id),
+              content: {
+                petitionFieldReplyId: toGlobalId("PetitionFieldReply", fileUploadReply.id),
+              },
+            },
+            {
+              id: toGlobalId("PetitionField", number.id),
+              content: { value: 109 },
+            },
+            {
+              id: toGlobalId("PetitionField", checkbox.id),
+              content: { value: ["B", "C"] },
+            },
+          ],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetitionFieldReplies).toEqual([
+        {
+          field: {
+            id: toGlobalId("PetitionField", shortText.id),
+            type: "SHORT_TEXT",
+            replies: [{ id: expect.any(String), content: { value: "short reply" } }],
+          },
+        },
+        {
+          field: {
+            id: toGlobalId("PetitionField", select.id),
+            type: "SELECT",
+            replies: [{ id: expect.any(String), content: { value: "Option 2" } }],
+          },
+        },
+        {
+          field: {
+            id: toGlobalId("PetitionField", number.id),
+            type: "NUMBER",
+            replies: [
+              { id: expect.any(String), content: { value: 101 } },
+              { id: expect.any(String), content: { value: 109 } },
+            ],
+          },
+        },
+        {
+          field: {
+            id: toGlobalId("PetitionField", fileUpload.id),
+            type: "FILE_UPLOAD",
+            replies: [
+              {
+                id: expect.any(String),
+                content: {
+                  id: expect.any(String),
+                  filename: file.filename,
+                  size: file.size,
+                  contentType: file.content_type,
+                  extension: extension(file.content_type) || null,
+                  uploadComplete: file.upload_complete,
+                },
+              },
+            ],
+          },
+        },
+        {
+          field: {
+            id: toGlobalId("PetitionField", number.id),
+            type: "NUMBER",
+            replies: [
+              { id: expect.any(String), content: { value: 101 } },
+              { id: expect.any(String), content: { value: 109 } },
+            ],
+          },
+        },
+        {
+          field: {
+            id: toGlobalId("PetitionField", checkbox.id),
+            type: "CHECKBOX",
+            replies: [{ id: expect.any(String), content: { value: ["B", "C"] } }],
+          },
+        },
+      ]);
+    });
+
+    it("overwrites previously created replies with new ones", async () => {
+      const { errors: errors1, data: data1 } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fields: [CreatePetitionFieldReplyInput!]!) {
+            createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
+              field {
+                id
+                type
+                replies {
+                  id
+                  content
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", shortText.id),
+              content: { value: "my first reply" },
+            },
+          ],
+        }
+      );
+
+      expect(errors1).toBeUndefined();
+      expect(data1?.createPetitionFieldReplies).toEqual([
+        {
+          field: {
+            id: toGlobalId("PetitionField", shortText.id),
+            type: "SHORT_TEXT",
+            replies: [{ id: expect.any(String), content: { value: "my first reply" } }],
+          },
+        },
+      ]);
+
+      const { errors: errors2, data: data2 } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $fields: [CreatePetitionFieldReplyInput!]!
+            $overwriteExisting: Boolean
+          ) {
+            createPetitionFieldReplies(
+              petitionId: $petitionId
+              fields: $fields
+              overwriteExisting: $overwriteExisting
+            ) {
+              field {
+                id
+                type
+                replies {
+                  id
+                  content
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          fields: [
+            {
+              id: toGlobalId("PetitionField", shortText.id),
+              content: { value: "my second reply" },
+            },
+          ],
+          overwriteExisting: true,
+        }
+      );
+
+      expect(errors2).toBeUndefined();
+      expect(data2?.createPetitionFieldReplies).toEqual([
+        {
+          field: {
+            id: toGlobalId("PetitionField", shortText.id),
+            type: "SHORT_TEXT",
+            replies: [{ id: expect.any(String), content: { value: "my second reply" } }],
+          },
+        },
+      ]);
     });
   });
 });

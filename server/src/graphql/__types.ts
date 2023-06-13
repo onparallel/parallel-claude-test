@@ -122,6 +122,11 @@ export interface NexusGenInputs {
     firstName: string; // String!
     lastName?: string | null; // String
   };
+  CreatePetitionFieldReplyInput: {
+    // input type
+    content?: NexusGenScalars["JSON"] | null; // JSON
+    id: NexusGenScalars["GID"]; // GID!
+  };
   CreateProfileTypeFieldInput: {
     // input type
     alias?: string | null; // String
@@ -1440,6 +1445,7 @@ export interface NexusGenFieldTypes {
     createPetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createPetitionFieldAttachmentUploadLink: NexusGenRootTypes["PetitionFieldAttachmentUploadData"]; // PetitionFieldAttachmentUploadData!
     createPetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
+    createPetitionFieldReplies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
     createPetitionFieldReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createPetitionListView: NexusGenRootTypes["PetitionListView"]; // PetitionListView!
     createPrintPdfTask: NexusGenRootTypes["Task"]; // Task!
@@ -3441,6 +3447,7 @@ export interface NexusGenFieldTypeNames {
     createPetitionField: "PetitionField";
     createPetitionFieldAttachmentUploadLink: "PetitionFieldAttachmentUploadData";
     createPetitionFieldComment: "PetitionFieldComment";
+    createPetitionFieldReplies: "PetitionFieldReply";
     createPetitionFieldReply: "PetitionFieldReply";
     createPetitionListView: "PetitionListView";
     createPrintPdfTask: "Task";
@@ -5266,6 +5273,12 @@ export interface NexusGenArgTypes {
       sharePetitionPermission?: NexusGenEnums["PetitionPermissionTypeRW"] | null; // PetitionPermissionTypeRW
       sharePetitionSubscribed?: boolean | null; // Boolean
       throwOnNoPermission?: boolean | null; // Boolean
+    };
+    createPetitionFieldReplies: {
+      // args
+      fields: NexusGenInputs["CreatePetitionFieldReplyInput"][]; // [CreatePetitionFieldReplyInput!]!
+      overwriteExisting?: boolean | null; // Boolean
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     createPetitionFieldReply: {
       // args

@@ -462,6 +462,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       realMe={realMe}
       petition={petition}
       onUpdatePetition={handleUpdatePetition}
+      onRefetch={() => refetch()}
       section="replies"
       headerActions={
         <Box display={{ base: "none", lg: "block" }}>

@@ -27,6 +27,7 @@ import {
   forwardRef,
   KeyboardEvent,
   MouseEvent,
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -76,6 +77,12 @@ export function RecipientViewPetitionFieldShortText({
   const replyRefs = useMultipleRefs<HTMLInputElement>();
 
   const options = field.options as FieldOptions["SHORT_TEXT"];
+
+  useEffect(() => {
+    if (field.multiple && field.replies.length > 0 && showNewReply) {
+      setShowNewReply(false);
+    }
+  }, [field.replies]);
 
   function handleAddNewReply() {
     setShowNewReply(true);

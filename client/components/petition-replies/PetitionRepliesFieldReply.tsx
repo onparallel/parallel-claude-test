@@ -345,7 +345,7 @@ PetitionRepliesFieldReply.fragments = {
   `,
 };
 
-function ReplyNotAvailable({ type }: { type?: PetitionFieldType }) {
+export function ReplyNotAvailable({ type }: { type?: PetitionFieldType }) {
   return (
     <Text textStyle="hint">
       {type && isFileTypeField(type) ? (

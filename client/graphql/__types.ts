@@ -216,6 +216,11 @@ export interface CreateContactInput {
   lastName?: InputMaybe<Scalars["String"]["input"]>;
 }
 
+export interface CreatePetitionFieldReplyInput {
+  content?: InputMaybe<Scalars["JSON"]["input"]>;
+  id: Scalars["GID"]["input"];
+}
+
 export interface CreateProfileTypeFieldInput {
   alias?: InputMaybe<Scalars["String"]["input"]>;
   expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]["input"]>;
@@ -368,6 +373,7 @@ export interface EventSubscriptionSignatureKey {
 export type FeatureFlag =
   | "AUTO_ANONYMIZE"
   | "CLIENT_PORTAL"
+  | "COPY_PETITION_REPLIES"
   | "CUSTOM_HOST_UI"
   | "DEVELOPER_ACCESS"
   | "DOCUSIGN_SANDBOX_PROVIDER"
@@ -685,7 +691,12 @@ export interface Mutation {
   createPetitionFieldAttachmentUploadLink: PetitionFieldAttachmentUploadData;
   /** Create a petition field comment. */
   createPetitionFieldComment: PetitionFieldComment;
-  /** Creates a reply on a petition field */
+  /** Creates multiple replies for a petition at once */
+  createPetitionFieldReplies: Array<PetitionFieldReply>;
+  /**
+   * Creates a reply on a petition field
+   * @deprecated use createPetitionFieldReplies
+   */
   createPetitionFieldReply: PetitionFieldReply;
   /** Creates a view with custom filters and ordering on the user's petitions list */
   createPetitionListView: PetitionListView;
@@ -1178,6 +1189,12 @@ export interface MutationcreatePetitionFieldCommentArgs {
   sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
   sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]["input"]>;
   throwOnNoPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
+}
+
+export interface MutationcreatePetitionFieldRepliesArgs {
+  fields: Array<CreatePetitionFieldReplyInput>;
+  overwriteExisting?: InputMaybe<Scalars["Boolean"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
 }
 
 export interface MutationcreatePetitionFieldReplyArgs {
@@ -5018,6 +5035,58 @@ export type FileAttachmentButton_FileUploadFragment = {
   isComplete: boolean;
 };
 
+export type MapFieldsTable_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  id: string;
+  status: PetitionFieldReplyStatus;
+  content: { [key: string]: any };
+  isAnonymized: boolean;
+};
+
+export type MapFieldsTable_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  title?: string | null;
+  type: PetitionFieldType;
+  visibility?: { [key: string]: any } | null;
+  options: { [key: string]: any };
+  multiple: boolean;
+  isInternal: boolean;
+  isReadOnly: boolean;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    isAnonymized: boolean;
+  }>;
+};
+
+export type MapFieldsTable_ProfileFieldPropertyFragment = {
+  __typename?: "ProfileFieldProperty";
+  field: {
+    __typename?: "ProfileTypeField";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    type: ProfileTypeFieldType;
+  };
+  files?: Array<{
+    __typename?: "ProfileFieldFile";
+    id: string;
+    file?: {
+      __typename?: "FileUpload";
+      filename: string;
+      contentType: string;
+      size: number;
+    } | null;
+  }> | null;
+  value?: {
+    __typename?: "ProfileFieldValue";
+    id: string;
+    content?: { [key: string]: any } | null;
+  } | null;
+};
+
 export type Mention_PetitionFieldCommentMention_PetitionFieldCommentUserGroupMention_Fragment = {
   __typename?: "PetitionFieldCommentUserGroupMention";
   mentionedId: string;
@@ -5176,6 +5245,69 @@ export type PetitionProgressBar_PetitionFragment = {
     };
   };
 };
+
+export type PetitionSelect_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  name?: string | null;
+};
+
+export type PetitionSelect_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  name?: string | null;
+};
+
+export type PetitionSelect_PetitionBaseFragment =
+  | PetitionSelect_PetitionBase_Petition_Fragment
+  | PetitionSelect_PetitionBase_PetitionTemplate_Fragment;
+
+export type PetitionSelect_petitionsQueryVariables = Exact<{
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
+  filters?: InputMaybe<PetitionFilter>;
+  sortBy?: InputMaybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
+}>;
+
+export type PetitionSelect_petitionsQuery = {
+  petitions: {
+    __typename?: "PetitionBaseOrFolderPagination";
+    totalCount: number;
+    items: Array<
+      | { __typename?: "Petition"; id: string; name?: string | null }
+      | { __typename?: "PetitionFolder" }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null }
+    >;
+  };
+};
+
+export type PetitionSelect_petitionQueryVariables = Exact<{
+  id: Scalars["GID"]["input"];
+}>;
+
+export type PetitionSelect_petitionQuery = {
+  petition?:
+    | { __typename?: "Petition"; id: string; name?: string | null }
+    | { __typename?: "PetitionTemplate"; id: string; name?: string | null }
+    | null;
+};
+
+export type PetitionSelectOption_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  name?: string | null;
+};
+
+export type PetitionSelectOption_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  name?: string | null;
+};
+
+export type PetitionSelectOption_PetitionBaseFragment =
+  | PetitionSelectOption_PetitionBase_Petition_Fragment
+  | PetitionSelectOption_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionSignatureCellContent_PetitionFragment = {
   __typename?: "Petition";
@@ -5831,7 +5963,7 @@ export type PetitionHeader_PetitionBaseFragment =
   | PetitionHeader_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionHeader_QueryFragment = {
-  me: { __typename?: "User"; id: string; role: OrganizationRole };
+  me: { __typename?: "User"; id: string; role: OrganizationRole; canCopyPetitionReplies: boolean };
 };
 
 export type PetitionHeader_PetitionBase_updatePath_Petition_Fragment = {
@@ -5937,6 +6069,7 @@ export type PetitionLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
     organization: {
       __typename?: "Organization";
@@ -9628,6 +9761,69 @@ export type GenericFolderDialog_foldersQueryVariables = Exact<{
 }>;
 
 export type GenericFolderDialog_foldersQuery = { petitionFolders: Array<string> };
+
+export type ImportRepliesDialog_petitionQueryVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+}>;
+
+export type ImportRepliesDialog_petitionQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          title?: string | null;
+          type: PetitionFieldType;
+          visibility?: { [key: string]: any } | null;
+          options: { [key: string]: any };
+          multiple: boolean;
+          isInternal: boolean;
+          isReadOnly: boolean;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
+            isAnonymized: boolean;
+          }>;
+        }>;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          title?: string | null;
+          type: PetitionFieldType;
+          visibility?: { [key: string]: any } | null;
+          options: { [key: string]: any };
+          multiple: boolean;
+          isInternal: boolean;
+          isReadOnly: boolean;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
+            isAnonymized: boolean;
+          }>;
+        }>;
+      }
+    | null;
+};
+
+export type ImportRepliesDialog_createPetitionFieldRepliesMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  fields: Array<CreatePetitionFieldReplyInput> | CreatePetitionFieldReplyInput;
+  overwriteExisting?: InputMaybe<Scalars["Boolean"]["input"]>;
+}>;
+
+export type ImportRepliesDialog_createPetitionFieldRepliesMutation = {
+  createPetitionFieldReplies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+};
 
 export type PetitionSharingModal_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
@@ -19413,6 +19609,7 @@ export type PetitionActivity_QueryFragment = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -21294,6 +21491,7 @@ export type PetitionActivity_userQuery = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -21683,6 +21881,7 @@ export type PetitionCompose_QueryFragment = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
@@ -22286,6 +22485,7 @@ export type PetitionCompose_userQuery = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
@@ -22760,6 +22960,7 @@ export type PetitionMessages_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -22802,6 +23003,7 @@ export type PetitionMessages_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -23756,6 +23958,7 @@ export type PetitionPreview_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -24698,6 +24901,7 @@ export type PetitionPreview_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasPublicLinkPrefill: boolean;
+    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -25103,6 +25307,7 @@ export type PetitionReplies_QueryFragment = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
     hasExportCuatrecasas: boolean;
     hasPetitionSignature: boolean;
@@ -25767,6 +25972,7 @@ export type PetitionReplies_userQuery = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
     hasExportCuatrecasas: boolean;
     hasPetitionSignature: boolean;
@@ -29844,6 +30050,32 @@ export type useUpdateIsReadNotification_updatePetitionUserNotificationReadStatus
   >;
 };
 
+export type mapReplyContents_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
+  multiple: boolean;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+  }>;
+};
+
+export type isReplyContentCompatible_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
+  multiple: boolean;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+  }>;
+};
+
 export type useOrgRole_MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type useOrgRole_MeQuery = { me: { __typename?: "User"; role: OrganizationRole } };
@@ -30837,6 +31069,88 @@ export const ContactSelect_ContactFragmentDoc = gql`
     hasBouncedEmail
   }
 ` as unknown as DocumentNode<ContactSelect_ContactFragment, unknown>;
+export const MapFieldsTable_PetitionFieldReplyFragmentDoc = gql`
+  fragment MapFieldsTable_PetitionFieldReply on PetitionFieldReply {
+    id
+    status
+    content
+    isAnonymized
+  }
+` as unknown as DocumentNode<MapFieldsTable_PetitionFieldReplyFragment, unknown>;
+export const PetitionFieldSelect_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldSelect_PetitionField on PetitionField {
+    id
+    type
+    title
+    options
+  }
+` as unknown as DocumentNode<PetitionFieldSelect_PetitionFieldFragment, unknown>;
+export const isReplyContentCompatible_PetitionFieldFragmentDoc = gql`
+  fragment isReplyContentCompatible_PetitionField on PetitionField {
+    id
+    type
+    options
+    multiple
+    replies {
+      id
+      content
+    }
+  }
+` as unknown as DocumentNode<isReplyContentCompatible_PetitionFieldFragment, unknown>;
+export const MapFieldsTable_PetitionFieldFragmentDoc = gql`
+  fragment MapFieldsTable_PetitionField on PetitionField {
+    id
+    title
+    type
+    visibility
+    options
+    multiple
+    isInternal
+    isReadOnly
+    replies {
+      ...MapFieldsTable_PetitionFieldReply
+    }
+    ...PetitionFieldSelect_PetitionField
+    ...isReplyContentCompatible_PetitionField
+  }
+  ${MapFieldsTable_PetitionFieldReplyFragmentDoc}
+  ${PetitionFieldSelect_PetitionFieldFragmentDoc}
+  ${isReplyContentCompatible_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<MapFieldsTable_PetitionFieldFragment, unknown>;
+export const MapFieldsTable_ProfileFieldPropertyFragmentDoc = gql`
+  fragment MapFieldsTable_ProfileFieldProperty on ProfileFieldProperty {
+    field {
+      id
+      name
+      type
+    }
+    files {
+      id
+      file {
+        filename
+        contentType
+        size
+      }
+    }
+    value {
+      id
+      content
+    }
+  }
+` as unknown as DocumentNode<MapFieldsTable_ProfileFieldPropertyFragment, unknown>;
+export const PetitionSelectOption_PetitionBaseFragmentDoc = gql`
+  fragment PetitionSelectOption_PetitionBase on PetitionBase {
+    id
+    name
+  }
+` as unknown as DocumentNode<PetitionSelectOption_PetitionBaseFragment, unknown>;
+export const PetitionSelect_PetitionBaseFragmentDoc = gql`
+  fragment PetitionSelect_PetitionBase on PetitionBase {
+    id
+    ...PetitionSelectOption_PetitionBase
+  }
+  ${PetitionSelectOption_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<PetitionSelect_PetitionBaseFragment, unknown>;
 export const UserGroupMembersPopover_UserGroupFragmentDoc = gql`
   fragment UserGroupMembersPopover_UserGroup on UserGroup {
     id
@@ -32079,14 +32393,6 @@ export const CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragmentDoc = gql
     name
   }
 ` as unknown as DocumentNode<CreateOrUpdateEventSubscriptionDialog_PetitionBaseFragment, unknown>;
-export const PetitionFieldSelect_PetitionFieldFragmentDoc = gql`
-  fragment PetitionFieldSelect_PetitionField on PetitionField {
-    id
-    type
-    title
-    options
-  }
-` as unknown as DocumentNode<PetitionFieldSelect_PetitionFieldFragment, unknown>;
 export const CreateOrUpdateEventSubscriptionDialog_PetitionFieldFragmentDoc = gql`
   fragment CreateOrUpdateEventSubscriptionDialog_PetitionField on PetitionField {
     ...PetitionFieldSelect_PetitionField
@@ -33786,6 +34092,7 @@ export const PetitionHeader_QueryFragmentDoc = gql`
     me {
       id
       role
+      canCopyPetitionReplies: hasFeatureFlag(featureFlag: COPY_PETITION_REPLIES)
     }
   }
 ` as unknown as DocumentNode<PetitionHeader_QueryFragment, unknown>;
@@ -36343,6 +36650,18 @@ export const useUpdateIsReadNotification_PetitionFieldCommentFragmentDoc = gql`
     isUnread
   }
 ` as unknown as DocumentNode<useUpdateIsReadNotification_PetitionFieldCommentFragment, unknown>;
+export const mapReplyContents_PetitionFieldFragmentDoc = gql`
+  fragment mapReplyContents_PetitionField on PetitionField {
+    id
+    type
+    options
+    multiple
+    replies {
+      id
+      content
+    }
+  }
+` as unknown as DocumentNode<mapReplyContents_PetitionFieldFragment, unknown>;
 export const createMentionPlugin_UserOrUserGroupFragmentDoc = gql`
   fragment createMentionPlugin_UserOrUserGroup on UserOrUserGroup {
     ... on User {
@@ -36388,6 +36707,31 @@ export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`
     fields
   }
 ` as unknown as DocumentNode<uploadFile_AWSPresignedPostDataFragment, unknown>;
+export const PetitionSelect_petitionsDocument = gql`
+  query PetitionSelect_petitions(
+    $offset: Int
+    $limit: Int
+    $search: String
+    $filters: PetitionFilter
+    $sortBy: [QueryPetitions_OrderBy!]
+  ) {
+    petitions(offset: $offset, limit: $limit, search: $search, filters: $filters, sortBy: $sortBy) {
+      items {
+        ...PetitionSelect_PetitionBase
+      }
+      totalCount
+    }
+  }
+  ${PetitionSelect_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<PetitionSelect_petitionsQuery, PetitionSelect_petitionsQueryVariables>;
+export const PetitionSelect_petitionDocument = gql`
+  query PetitionSelect_petition($id: GID!) {
+    petition(id: $id) {
+      ...PetitionSelect_PetitionBase
+    }
+  }
+  ${PetitionSelect_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<PetitionSelect_petitionQuery, PetitionSelect_petitionQueryVariables>;
 export const PetitionTagListCellContent_tagPetitionDocument = gql`
   mutation PetitionTagListCellContent_tagPetition($tagId: GID!, $petitionId: GID!) {
     tagPetition(tagId: $tagId, petitionId: $petitionId) {
@@ -36821,6 +37165,40 @@ export const GenericFolderDialog_foldersDocument = gql`
 ` as unknown as DocumentNode<
   GenericFolderDialog_foldersQuery,
   GenericFolderDialog_foldersQueryVariables
+>;
+export const ImportRepliesDialog_petitionDocument = gql`
+  query ImportRepliesDialog_petition($petitionId: GID!) {
+    petition(id: $petitionId) {
+      id
+      fields {
+        ...MapFieldsTable_PetitionField
+        ...mapReplyContents_PetitionField
+      }
+    }
+  }
+  ${MapFieldsTable_PetitionFieldFragmentDoc}
+  ${mapReplyContents_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<
+  ImportRepliesDialog_petitionQuery,
+  ImportRepliesDialog_petitionQueryVariables
+>;
+export const ImportRepliesDialog_createPetitionFieldRepliesDocument = gql`
+  mutation ImportRepliesDialog_createPetitionFieldReplies(
+    $petitionId: GID!
+    $fields: [CreatePetitionFieldReplyInput!]!
+    $overwriteExisting: Boolean
+  ) {
+    createPetitionFieldReplies(
+      petitionId: $petitionId
+      fields: $fields
+      overwriteExisting: $overwriteExisting
+    ) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  ImportRepliesDialog_createPetitionFieldRepliesMutation,
+  ImportRepliesDialog_createPetitionFieldRepliesMutationVariables
 >;
 export const PetitionSharingModal_addPetitionPermissionDocument = gql`
   mutation PetitionSharingModal_addPetitionPermission(

@@ -215,6 +215,11 @@ input CreateContactInput {
   lastName: String
 }
 
+input CreatePetitionFieldReplyInput {
+  content: JSON
+  id: GID!
+}
+
 input CreateProfileTypeFieldInput {
   alias: String
   expiryAlertAheadTime: Duration
@@ -385,6 +390,7 @@ type EventSubscriptionSignatureKey {
 enum FeatureFlag {
   AUTO_ANONYMIZE
   CLIENT_PORTAL
+  COPY_PETITION_REPLIES
   CUSTOM_HOST_UI
   DEVELOPER_ACCESS
   DOCUSIGN_SANDBOX_PROVIDER
@@ -968,9 +974,23 @@ type Mutation {
   ): PetitionFieldComment!
 
   """
+  Creates multiple replies for a petition at once
+  """
+  createPetitionFieldReplies(
+    fields: [CreatePetitionFieldReplyInput!]!
+
+    """
+    pass true to remove existing replies for the given fields
+    """
+    overwriteExisting: Boolean
+    petitionId: GID!
+  ): [PetitionFieldReply!]!
+
+  """
   Creates a reply on a petition field
   """
   createPetitionFieldReply(fieldId: GID!, petitionId: GID!, reply: JSON!): PetitionFieldReply!
+    @deprecated(reason: "use createPetitionFieldReplies")
 
   """
   Creates a view with custom filters and ordering on the user's petitions list

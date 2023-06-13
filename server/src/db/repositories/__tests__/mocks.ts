@@ -1232,6 +1232,22 @@ function randomPetitionFieldOptions(type: PetitionFieldType) {
         values: ["Option 1", "Option 2", "Option 3"],
       };
     }
+    case "CHECKBOX": {
+      return {
+        values: ["A", "B", "C"],
+        limit: { type: "UNLIMITED" },
+      };
+    }
+    case "DYNAMIC_SELECT": {
+      return {
+        labels: ["Country", "City"],
+        values: [
+          ["Spain", ["Madrid", "Barcelona", "Sevilla"]],
+          ["France", ["Paris", "Lyon"]],
+          ["Italy", ["Rome", "Milan", "Venice"]],
+        ],
+      };
+    }
     default:
       return {};
   }

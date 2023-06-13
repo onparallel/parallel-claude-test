@@ -2457,3 +2457,21 @@ export const TimeAlarmIcon = createIcon({
     </g>
   ),
 });
+
+export const ImportIcon = createIcon({
+  displayName: "ImportIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m9.75 3h-5.75c-.55228 0-1 .44772-1 1v16c0 .5523.44772 1 1 1h16c.5523 0 1-.4477 1-1v-6.5" />
+      <path d="m21 3-7.8749 7.8749" />
+      <path d="m12 6.37495v5.62495h5.6249" />
+    </g>
+  ),
+});

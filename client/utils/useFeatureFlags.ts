@@ -300,6 +300,17 @@ export function useFeatureFlags() {
               defaultMessage: "Grants access to profiles",
             }),
           },
+          {
+            name: "COPY_PETITION_REPLIES",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.copy-petition-replies-name",
+              defaultMessage: "Import replies from another petition",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.copy-petition-replies-description",
+              defaultMessage: "Grants access import replies dialog in the petition",
+            }),
+          },
         ],
       },
     ],

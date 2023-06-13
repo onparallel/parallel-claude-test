@@ -200,6 +200,11 @@ export type CreateContactInput = {
   lastName?: InputMaybe<Scalars["String"]["input"]>;
 };
 
+export type CreatePetitionFieldReplyInput = {
+  content?: InputMaybe<Scalars["JSON"]["input"]>;
+  id: Scalars["GID"]["input"];
+};
+
 export type CreateProfileTypeFieldInput = {
   alias?: InputMaybe<Scalars["String"]["input"]>;
   expiryAlertAheadTime?: InputMaybe<Scalars["Duration"]["input"]>;
@@ -341,6 +346,7 @@ export type EventSubscriptionSignatureKey = {
 export type FeatureFlag =
   | "AUTO_ANONYMIZE"
   | "CLIENT_PORTAL"
+  | "COPY_PETITION_REPLIES"
   | "CUSTOM_HOST_UI"
   | "DEVELOPER_ACCESS"
   | "DOCUSIGN_SANDBOX_PROVIDER"
@@ -640,7 +646,12 @@ export type Mutation = {
   createPetitionFieldAttachmentUploadLink: PetitionFieldAttachmentUploadData;
   /** Create a petition field comment. */
   createPetitionFieldComment: PetitionFieldComment;
-  /** Creates a reply on a petition field */
+  /** Creates multiple replies for a petition at once */
+  createPetitionFieldReplies: Array<PetitionFieldReply>;
+  /**
+   * Creates a reply on a petition field
+   * @deprecated use createPetitionFieldReplies
+   */
   createPetitionFieldReply: PetitionFieldReply;
   /** Creates a view with custom filters and ordering on the user's petitions list */
   createPetitionListView: PetitionListView;
@@ -1133,6 +1144,12 @@ export type MutationcreatePetitionFieldCommentArgs = {
   sharePetitionPermission?: InputMaybe<PetitionPermissionTypeRW>;
   sharePetitionSubscribed?: InputMaybe<Scalars["Boolean"]["input"]>;
   throwOnNoPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
+};
+
+export type MutationcreatePetitionFieldRepliesArgs = {
+  fields: Array<CreatePetitionFieldReplyInput>;
+  overwriteExisting?: InputMaybe<Scalars["Boolean"]["input"]>;
+  petitionId: Scalars["GID"]["input"];
 };
 
 export type MutationcreatePetitionFieldReplyArgs = {

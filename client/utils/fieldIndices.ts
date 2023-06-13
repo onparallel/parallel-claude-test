@@ -1,5 +1,6 @@
 import { PetitionField } from "@parallel/graphql/__types";
 import { useMemo } from "react";
+import { zip } from "remeda";
 
 export type PetitionFieldIndex = number | string;
 
@@ -40,10 +41,30 @@ export function getFieldIndices(fields: Pick<PetitionField, "type">[]): Petition
     f.type === "HEADING" ? (letter.next().value as string) : (number.next().value as number)
   );
 }
+
+export function unzipFieldsWithIndices<T extends Pick<PetitionField, "type">>(
+  fieldsWithIndices: [T, PetitionFieldIndex][]
+): { fields: T[]; indices: PetitionFieldIndex[] } {
+  return {
+    fields: fieldsWithIndices.map(([field]) => field),
+    indices: fieldsWithIndices.map(([, index]) => index),
+  };
+}
+
 /**
- * iterates every field and returns an array representing the index of each one in the same order
+ * Returns an array representing the index of each one in the same order
  * @param fields fields to iterate.
  */
 export function useFieldIndices(fields: Pick<PetitionField, "type">[]): PetitionFieldIndex[] {
   return useMemo(() => getFieldIndices(fields), [fields.map((f) => f.type).join(",")]);
+}
+
+/**
+ * Returns an array of tuples [field, index]
+ * @param fields fields to iterate.
+ */
+export function useFieldWithIndices<T extends Pick<PetitionField, "type">>(
+  fields: T[]
+): [T, PetitionFieldIndex][] {
+  return useMemo(() => zip(fields, getFieldIndices(fields)), [fields.map((f) => f.type).join(",")]);
 }

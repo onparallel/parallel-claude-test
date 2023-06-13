@@ -91,7 +91,7 @@ import {
 } from "../events/PetitionEvent";
 import { BaseRepository, PageOpts, TableCreateTypes, TableTypes } from "../helpers/BaseRepository";
 import { defaultFieldProperties, validateFieldOptions } from "../helpers/fieldOptions";
-import { SortBy, escapeLike, isValueCompatible } from "../helpers/utils";
+import { SortBy, escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
   CommentCreatedUserNotification,
@@ -101,6 +101,7 @@ import {
 } from "../notifications";
 import { FileRepository } from "./FileRepository";
 import { OrganizationRepository } from "./OrganizationRepository";
+import { isValueCompatible } from "../../util/isValueCompatible";
 
 type PetitionType = "PETITION" | "TEMPLATE";
 
@@ -1638,16 +1639,14 @@ export class PetitionRepository extends BaseRepository {
     }, t);
   }
 
-  async deletePetitionFieldReplies(fieldId: number, user: User, t?: Knex.Transaction) {
-    return await this.from("petition_field_reply", t)
+  async deletePetitionFieldReplies(fieldIds: number[], user: User, t?: Knex.Transaction) {
+    await this.from("petition_field_reply", t)
       .update({
         deleted_at: this.now(),
         deleted_by: `User:${user.id}`,
       })
-      .where({
-        petition_field_id: fieldId,
-        deleted_at: null,
-      });
+      .whereIn("petition_field_id", fieldIds)
+      .whereNull("deleted_at");
   }
 
   async deletePetitionField(petitionId: number, fieldId: number, user: User) {
@@ -1810,41 +1809,40 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async createPetitionFieldReply(
-    petitionFieldId: number,
-    data: MaybeArray<Omit<CreatePetitionFieldReply, "petition_field_id">>,
+    petitionId: number,
+    data: MaybeArray<CreatePetitionFieldReply>,
     createdBy: string
   ) {
     const dataArray = unMaybeArray(data);
 
-    const field = await this.loadField(petitionFieldId);
-    if (!field) {
-      throw new Error(`PetitionField:${petitionFieldId} not found`);
-    }
-    const petition = (await this.loadPetition(field.petition_id))!;
+    const fieldIds = uniq(dataArray.map((d) => d.petition_field_id));
+    const fields = await this.loadField(fieldIds);
 
-    this.loadRepliesForField.dataloader.clear(petitionFieldId);
+    for (const fieldId of fieldIds) {
+      this.loadRepliesForField.dataloader.clear(fieldId);
+    }
 
     const replies = await this.insert(
       "petition_field_reply",
       dataArray.map((data) => ({
         ...data,
-        petition_field_id: petitionFieldId,
         updated_by: createdBy,
         created_by: createdBy,
       }))
     );
 
-    await this.updatePetition(
-      field.petition_id,
-      {
-        status: !field.is_internal ? "PENDING" : petition.status,
-        closed_at: !field.is_internal ? null : petition.closed_at,
-        credits_used: 1,
-      },
-      createdBy
-    );
-    // clear cache to make sure petition status is updated in next graphql calls
-    this.loadPetition.dataloader.clear(field.petition_id);
+    if (fields.some((f) => isDefined(f) && !f.is_internal)) {
+      await this.updatePetition(
+        petitionId,
+        {
+          status: "PENDING",
+          closed_at: null,
+        },
+        createdBy
+      );
+      // clear cache to make sure petition status is updated in next graphql calls
+      this.loadPetition.dataloader.clear(petitionId);
+    }
 
     await pMap(
       replies,
@@ -1852,7 +1850,7 @@ export class PetitionRepository extends BaseRepository {
         await this.createEventWithDelay(
           {
             type: "REPLY_CREATED",
-            petition_id: field.petition_id,
+            petition_id: petitionId,
             data: {
               ...(createdBy.startsWith("User")
                 ? { user_id: reply.user_id! }
@@ -6059,9 +6057,10 @@ export class PetitionRepository extends BaseRepository {
             : { value: reply };
 
         await this.createPetitionFieldReply(
-          fieldId,
+          petitionId,
           {
             user_id: owner.id,
+            petition_field_id: fieldId,
             content,
             type: fieldType,
           },
@@ -6188,5 +6187,18 @@ export class PetitionRepository extends BaseRepository {
       return firstMessage;
     }
     return null;
+  }
+
+  async userhasAccessToPetitionFieldReply(petitionFieldReplyId: number, userId: number) {
+    const [reply, field] = await Promise.all([
+      this.loadFieldReply(petitionFieldReplyId),
+      this.loadFieldForReply(petitionFieldReplyId),
+    ]);
+
+    if (!reply || !field) {
+      return false;
+    }
+
+    return await this.userHasAccessToPetitions(userId, [field.petition_id]);
   }
 }

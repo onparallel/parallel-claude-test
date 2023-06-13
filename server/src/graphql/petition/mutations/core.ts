@@ -25,7 +25,6 @@ import {
   PetitionPermission,
 } from "../../../db/__types";
 import { defaultFieldProperties } from "../../../db/helpers/fieldOptions";
-import { isValueCompatible } from "../../../db/helpers/utils";
 import { chunkWhile, unMaybeArray } from "../../../util/arrays";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
@@ -112,6 +111,7 @@ import {
   userHasAccessToPublicPetitionLink,
   userHasAccessToUserOrUserGroupPermissions,
 } from "./authorizers";
+import { isValueCompatible } from "../../../util/isValueCompatible";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create parallel.",
@@ -1120,7 +1120,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           }
 
           if (replies.length > 0) {
-            await ctx.petitions.deletePetitionFieldReplies(args.fieldId, ctx.user!);
+            await ctx.petitions.deletePetitionFieldReplies([args.fieldId], ctx.user!);
           }
         }
       } catch (e: any) {

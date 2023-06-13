@@ -442,6 +442,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         realMe={realMe}
         petition={petition}
         onUpdatePetition={handleUpdatePetition}
+        onRefetch={() => refetch()}
         section="compose"
         headerActions={
           petition?.__typename === "Petition" &&

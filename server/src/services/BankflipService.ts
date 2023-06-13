@@ -21,7 +21,11 @@ import {
 import { STORAGE_SERVICE, StorageService } from "./StorageService";
 
 type SessionMetadata =
-  | { fieldId: string; orgId: string } & ({ userId: string } | { accessId: string });
+  | {
+      petitionId: string;
+      fieldId: string;
+      orgId: string;
+    } & ({ userId: string } | { accessId: string });
 
 /** When the Session is completed. (every requested model has been extracted) */
 export interface SessionCompletedWebhookEvent {
@@ -201,6 +205,7 @@ export class BankflipService implements IBankflipService {
     );
 
     const fieldId = fromGlobalId(metadata.fieldId, "PetitionField").id;
+    const petitionId = fromGlobalId(metadata.petitionId, "Petition").id;
     const data =
       "userId" in metadata
         ? { user_id: fromGlobalId(metadata.userId, "User").id }
@@ -210,8 +215,9 @@ export class BankflipService implements IBankflipService {
       "user_id" in data ? `User:${data.user_id}` : `PetitionAccess:${data.petition_access_id}`;
 
     await this.petitions.createPetitionFieldReply(
-      fieldId,
+      petitionId,
       replyContents.map((content) => ({
+        petition_field_id: fieldId,
         type: "ES_TAX_DOCUMENTS",
         content: { ...content, bankflip_session_id: event.payload.sessionId },
         ...data,

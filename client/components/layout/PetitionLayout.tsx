@@ -17,10 +17,10 @@ import { useStateSlice } from "@parallel/utils/useStateSlice";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import {
   ComponentType,
-  createContext,
   Dispatch,
   ReactNode,
   SetStateAction,
+  createContext,
   useCallback,
   useContext,
   useMemo,
@@ -40,6 +40,7 @@ export interface PetitionLayoutProps extends PetitionLayout_QueryFragment {
   section: PetitionSection;
   headerActions?: ReactNode;
   subHeader?: ReactNode;
+  onRefetch?: () => void;
 }
 
 export const PetitionLayout = Object.assign(
@@ -53,6 +54,7 @@ export const PetitionLayout = Object.assign(
       headerActions,
       children,
       subHeader,
+      onRefetch,
       ...props
     },
     ref
@@ -130,6 +132,7 @@ export const PetitionLayout = Object.assign(
           petition={petition}
           me={me}
           onUpdatePetition={onUpdatePetition}
+          onRefetch={onRefetch}
           section={section!}
           actions={headerActions}
         />

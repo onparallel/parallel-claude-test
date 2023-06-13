@@ -16,6 +16,7 @@ import {
   MenuList,
   MenuOptionGroup,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import {
   CopyIcon,
@@ -23,6 +24,7 @@ import {
   DownloadIcon,
   EditIcon,
   FolderIcon,
+  ImportIcon,
   LockClosedIcon,
   TableIcon,
   UserArrowIcon,
@@ -49,6 +51,7 @@ import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions
 import { isAtLeast } from "@parallel/utils/roles";
 import { usePrintPdfTask } from "@parallel/utils/tasks/usePrintPdfTask";
 import { useTemplateRepliesReportTask } from "@parallel/utils/tasks/useTemplateRepliesReportTask";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useRouter } from "next/router";
 import { ReactNode, useCallback, useImperativeHandle, useMemo, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -59,6 +62,8 @@ import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
 import { PathName } from "../common/PathName";
 import { PetitionStatusLabel } from "../common/PetitionStatusLabel";
 import { SmallPopover } from "../common/SmallPopover";
+import { isDialogError } from "../common/dialogs/DialogProvider";
+import { useImportRepliesDialog } from "../petition-common/dialogs/ImportRepliesDialog";
 import { useMoveToFolderDialog } from "../petition-common/dialogs/MoveToFolderDialog";
 import { usePetitionSharingDialog } from "../petition-common/dialogs/PetitionSharingDialog";
 import { useConfirmReopenPetitionDialog } from "../petition-replies/dialogs/ConfirmReopenPetitionDialog";
@@ -71,6 +76,7 @@ export interface PetitionHeaderProps extends PetitionHeader_QueryFragment {
   onUpdatePetition: (value: UpdatePetitionInput) => void;
   section: PetitionSection;
   actions?: ReactNode;
+  onRefetch?: () => void;
 }
 
 export interface PetitionHeaderInstance {
@@ -79,7 +85,7 @@ export interface PetitionHeaderInstance {
 
 export const PetitionHeader = Object.assign(
   chakraForwardRef<"div", PetitionHeaderProps, PetitionHeaderInstance>(function PetitionHeader(
-    { petition, me, onUpdatePetition, section: current, actions, ...props },
+    { petition, me, onUpdatePetition, section: current, actions, onRefetch, ...props },
     ref
   ) {
     const intl = useIntl();
@@ -318,6 +324,36 @@ export const PetitionHeader = Object.assign(
     const editableRef = useRef<HeaderNameEditableInstance>(null);
     useImperativeHandle(ref, () => ({ focusName: () => editableRef.current?.focus() }));
 
+    const showErrorToast = useGenericErrorToast(
+      intl.formatMessage({
+        id: "component.petition-header.import-replies-error",
+        defaultMessage: "Failed to import data",
+      })
+    );
+    const toast = useToast();
+
+    const showImportRepliesDialog = useImportRepliesDialog();
+    const handleImportRepliesClick = async () => {
+      try {
+        await showImportRepliesDialog({ petitionId: petition.id });
+        onRefetch?.();
+        toast({
+          title: intl.formatMessage({
+            id: "component.petition-header.import-replies-success-title",
+            defaultMessage: "Replies succesfully imported",
+          }),
+          status: "success",
+          isClosable: true,
+        });
+      } catch (error) {
+        if (isDialogError(error)) {
+          return;
+        } else {
+          showErrorToast(error);
+        }
+      }
+    };
+
     return (
       <Grid
         backgroundColor="white"
@@ -447,6 +483,18 @@ export const PetitionHeader = Object.assign(
                       />
                     )}
                   </MenuItem>
+                  {isPetition && me.canCopyPetitionReplies ? (
+                    <MenuItem
+                      onClick={handleImportRepliesClick}
+                      isDisabled={isAnonymized || myEffectivePermission === "READ"}
+                      icon={<ImportIcon display="block" boxSize={4} />}
+                    >
+                      <FormattedMessage
+                        id="component.petition-header.import-replies"
+                        defaultMessage="Import replies"
+                      />
+                    </MenuItem>
+                  ) : null}
                   <MenuItem
                     onClick={() => handlePrintPdfTask(petition.id)}
                     isDisabled={isAnonymized}
@@ -663,6 +711,7 @@ export const PetitionHeader = Object.assign(
             me {
               id
               role
+              canCopyPetitionReplies: hasFeatureFlag(featureFlag: COPY_PETITION_REPLIES)
             }
           }
         `;

@@ -1,12 +1,23 @@
 import { zonedTimeToUtc } from "date-fns-tz";
-import { idArg, mutationField, nonNull, objectType } from "nexus";
+import {
+  booleanArg,
+  idArg,
+  inputObjectType,
+  list,
+  mutationField,
+  nonNull,
+  objectType,
+} from "nexus";
+import { isDefined, uniq } from "remeda";
 import { InvalidCredentialsError } from "../../../integrations/GenericIntegration";
-import { toGlobalId } from "../../../util/globalId";
+import { fromGlobalId, toGlobalId } from "../../../util/globalId";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { ApolloError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonObjectArg } from "../../helpers/scalars/JSON";
+import { validateAnd } from "../../helpers/validateArgs";
+import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
 import {
   fieldCanBeReplied,
@@ -20,9 +31,18 @@ import {
   userHasEnabledIntegration,
   userHasFeatureFlag,
 } from "../authorizers";
-import { validateFieldReply, validateReplyUpdate } from "../validations";
+import {
+  validateFieldReplyContent,
+  validateFieldReplyValue,
+  validateReplyUpdate,
+} from "../validations";
+import { isFileTypeField } from "../../../util/isFileTypeField";
+import { CreatePetitionFieldReply } from "../../../db/__types";
+import pMap from "p-map";
 
+/** @deprecated */
 export const createPetitionFieldReply = mutationField("createPetitionFieldReply", {
+  deprecation: "use createPetitionFieldReplies",
   description: "Creates a reply on a petition field",
   type: "PetitionFieldReply",
   args: {
@@ -47,7 +67,10 @@ export const createPetitionFieldReply = mutationField("createPetitionFieldReply"
     fieldCanBeReplied("fieldId"),
     petitionIsNotAnonymized("petitionId")
   ),
-  validateArgs: validateFieldReply("fieldId", "reply", "reply"),
+  validateArgs: validateFieldReplyValue(
+    (args) => [{ id: args.fieldId, value: args.reply }],
+    "reply"
+  ),
   resolve: async (_, args, ctx) => {
     const { type } = (await ctx.petitions.loadField(args.fieldId))!;
 
@@ -62,8 +85,9 @@ export const createPetitionFieldReply = mutationField("createPetitionFieldReply"
           : { value: args.reply };
 
       const [reply] = await ctx.petitions.createPetitionFieldReply(
-        args.fieldId,
+        args.petitionId,
         {
+          petition_field_id: args.fieldId,
           user_id: ctx.user!.id,
           type,
           status: "PENDING",
@@ -183,8 +207,9 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
       const [presignedPostData, [reply]] = await Promise.all([
         ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
         ctx.petitions.createPetitionFieldReply(
-          args.fieldId,
+          args.petitionId,
           {
+            petition_field_id: args.fieldId,
             user_id: ctx.user!.id,
             type: "FILE_UPLOAD",
             content: { file_upload_id: file.id },
@@ -362,8 +387,9 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
     fieldCanBeReplied("fieldId")
   ),
-  resolve: async (_, { fieldId }, ctx) => {
+  resolve: async (_, { petitionId, fieldId }, ctx) => {
     const session = await ctx.bankflip.createSession({
+      petitionId: toGlobalId("Petition", petitionId),
       orgId: toGlobalId("Organization", ctx.user!.org_id),
       fieldId: toGlobalId("PetitionField", fieldId),
       userId: toGlobalId("User", ctx.user!.id),
@@ -453,8 +479,9 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
       );
 
       const [reply] = await ctx.petitions.createPetitionFieldReply(
-        args.fieldId,
+        args.petitionId,
         {
+          petition_field_id: args.fieldId,
           user_id: ctx.user!.id,
           type: "DOW_JONES_KYC",
           content: {
@@ -485,6 +512,120 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
         );
       } else if (error instanceof InvalidCredentialsError && error.code === "FORBIDDEN") {
         throw new ApolloError("Forbidden", "INVALID_CREDENTIALS");
+      }
+      throw error;
+    }
+  },
+});
+
+export const createPetitionFieldReplies = mutationField("createPetitionFieldReplies", {
+  description: "Creates multiple replies for a petition at once",
+  type: list("PetitionFieldReply"),
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    fieldsBelongsToPetition("petitionId", (args) => args.fields.map((field) => field.id)),
+    fieldCanBeReplied((args) => args.fields.map((field) => field.id), "overwriteExisting"),
+    petitionIsNotAnonymized("petitionId")
+  ),
+  validateArgs: validateAnd(
+    notEmptyArray((args) => args.fields, "fields"),
+    validateFieldReplyContent((args) => args.fields, "fields")
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    fields: nonNull(
+      list(
+        nonNull(
+          inputObjectType({
+            name: "CreatePetitionFieldReplyInput",
+            definition(t) {
+              t.nonNull.globalId("id", { prefixName: "PetitionField" });
+              t.nullable.json("content");
+            },
+          })
+        )
+      )
+    ),
+    overwriteExisting: booleanArg({
+      description: "pass true to remove existing replies for the given fields",
+    }),
+  },
+  resolve: async (_, args, ctx) => {
+    try {
+      await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
+
+      const fields = await ctx.petitions.loadField(uniq(args.fields.map((field) => field.id)));
+
+      const fileReplyIds = args.fields
+        .filter((field) => isFileTypeField(fields.find((f) => f!.id === field.id)!.type))
+        .map((field) => fromGlobalId(field.content.petitionFieldReplyId, "PetitionFieldReply").id);
+
+      const fileReplies =
+        fileReplyIds.length > 0
+          ? (await ctx.petitions.loadFieldReply(fileReplyIds)).filter(isDefined)
+          : [];
+
+      if (args.overwriteExisting) {
+        await ctx.petitions.deletePetitionFieldReplies(
+          args.fields.map((field) => field.id),
+          ctx.user!
+        );
+      }
+
+      const data: CreatePetitionFieldReply[] = await pMap(
+        args.fields,
+        async (fieldReply) => {
+          const field = fields.find((f) => f!.id === fieldReply.id)!;
+          if (isFileTypeField(field.type)) {
+            // on FILE replies, clone the FileUpload from the passed reply and insert it as a new one
+            const reply = fileReplies.find(
+              (r) =>
+                r.id ===
+                fromGlobalId(fieldReply.content.petitionFieldReplyId, "PetitionFieldReply").id
+            )!;
+            const [fileUpload] = await ctx.files.cloneFileUpload(reply.content.file_upload_id);
+            return {
+              content: { file_upload_id: fileUpload.id },
+              petition_field_id: field.id,
+              type: field.type,
+              user_id: ctx.user!.id,
+              status: "PENDING",
+            };
+          } else {
+            return {
+              content:
+                field.type === "DATE_TIME"
+                  ? {
+                      ...fieldReply.content,
+                      value: zonedTimeToUtc(
+                        fieldReply.content.datetime,
+                        fieldReply.content.timezone
+                      ).toISOString(),
+                    }
+                  : fieldReply.content,
+              petition_field_id: field.id,
+              type: field.type,
+              user_id: ctx.user!.id,
+              status: "PENDING",
+            };
+          }
+        },
+        {
+          concurrency: 10,
+        }
+      );
+
+      return await ctx.petitions.createPetitionFieldReply(
+        args.petitionId,
+        data,
+        `User:${ctx.user!.id}`
+      );
+    } catch (error: any) {
+      if (error.message === "PETITION_SEND_LIMIT_REACHED") {
+        throw new ApolloError(
+          "Can't submit a reply due to lack of credits",
+          "PETITION_SEND_LIMIT_REACHED"
+        );
       }
       throw error;
     }

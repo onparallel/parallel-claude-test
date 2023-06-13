@@ -11,7 +11,15 @@ import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { isValidDateString } from "@parallel/utils/validation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChangeEvent, forwardRef, KeyboardEvent, MouseEvent, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  forwardRef,
+  KeyboardEvent,
+  MouseEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   RecipientViewPetitionFieldCard,
@@ -59,6 +67,12 @@ export function RecipientViewPetitionFieldDateTime({
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const { browserName } = useMetadata();
+
+  useEffect(() => {
+    if (field.multiple && field.replies.length > 0 && showNewReply) {
+      setShowNewReply(false);
+    }
+  }, [field.replies]);
 
   function handleAddNewReply() {
     setShowNewReply(true);

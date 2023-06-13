@@ -11,7 +11,7 @@ import { waitFor } from "@parallel/utils/promises/waitFor";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
-import { forwardRef, useMemo, useRef, useState } from "react";
+import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { SelectInstance as _SelectInstance } from "react-select";
 import {
@@ -60,6 +60,12 @@ export function RecipientViewPetitionFieldSelect({
     () => options.values.map((option) => toSimpleSelectOption(option)!),
     [field.options]
   );
+
+  useEffect(() => {
+    if (field.multiple && field.replies.length > 0 && showNewReply) {
+      setShowNewReply(false);
+    }
+  }, [field.replies]);
 
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: string) => {

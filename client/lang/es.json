@@ -1975,6 +1975,16 @@
     "context": "Client portal"
   },
   {
+    "term": "component.feature-flag-descriptions.copy-petition-replies-description",
+    "definition": "Concede acceso al diálogo de importación de respuestas en la petición",
+    "context": "Grants access import replies dialog in the petition"
+  },
+  {
+    "term": "component.feature-flag-descriptions.copy-petition-replies-name",
+    "definition": "Importar respuestas de otra petición",
+    "context": "Import replies from another petition"
+  },
+  {
     "term": "component.feature-flag-descriptions.custom-host-ui-description",
     "definition": "Quita los banner de enterprise alrededor del botón de solicitar un cambio de subdominio.",
     "context": "Remove the enterprise banners around the button to request a subdomain change."
@@ -2375,6 +2385,46 @@
     "context": "Field not visible"
   },
   {
+    "term": "component.import-replies-dialog.checkbox-overwrite-replies",
+    "definition": "Sobreescribir respuestas existentes",
+    "context": "Overwrite existing replies"
+  },
+  {
+    "term": "component.import-replies-dialog.limport-button",
+    "definition": "Importar",
+    "context": "Import"
+  },
+  {
+    "term": "component.import-replies-dialog.mapping-despcription",
+    "definition": "Relaciona cada campo del parallel actual con el campo correspondiente del parallel",
+    "context": "Map each field of the current parallel to the corresponding field from the source"
+  },
+  {
+    "term": "component.import-replies-dialog.next-button",
+    "definition": "Siguiente",
+    "context": "Next"
+  },
+  {
+    "term": "component.import-replies-dialog.select-petition-error",
+    "definition": "Por favor, seleccione un parallel para continuar",
+    "context": "Please, select a parallel to continue"
+  },
+  {
+    "term": "component.import-replies-dialog.select-replies-import-error",
+    "definition": "Por favor, selecciona al menos una respuesta para importar",
+    "context": "Please, select at least one reply to import"
+  },
+  {
+    "term": "component.import-replies-dialog.source-petition-label",
+    "definition": "Selecciona un parallel del que importar sus respuestas",
+    "context": "Select the parallel to import the replies from"
+  },
+  {
+    "term": "component.import-replies-dialog.title",
+    "definition": "Importar respuestas",
+    "context": "Import replies"
+  },
+  {
     "term": "component.internal-field-badge.popover",
     "definition": "Los campos internos no serán visibles para el destinatario.",
     "context": "The internal fields will not be visible to the recipient."
@@ -2493,6 +2543,51 @@
     "term": "component.localizable-user-text-input.translated-badge",
     "definition": "Traducido",
     "context": "Translated"
+  },
+  {
+    "term": "component.map-fields-table.and-n-more",
+    "definition": "y {count} más",
+    "context": "and {count} more"
+  },
+  {
+    "term": "component.map-fields-table.field-visibility-alert",
+    "definition": "Este campo puede no ser visible ya que está sujeto a condiciones de visibilidad.",
+    "context": "This field may not be visible as it is subject to visibility conditions."
+  },
+  {
+    "term": "component.map-fields-table.has-replies-approved-conflict-alert",
+    "definition": "No se pueden importar nuevas respuestas a este campo porque tiene respuestas aprobadas.",
+    "context": "You cannot import new answers to this field because it has approved answers."
+  },
+  {
+    "term": "component.map-fields-table.has-replies-conflict-alert",
+    "definition": "No se pueden importar nuevas respuestas a este campo porque ya contiene al menos una respuesta.",
+    "context": "New answers cannot be imported into this field because it already contains at least one answer."
+  },
+  {
+    "term": "component.map-fields-table.import-from-header",
+    "definition": "Importar de",
+    "context": "Import from"
+  },
+  {
+    "term": "component.map-fields-table.multi-replies-conflict-alert",
+    "definition": "Este campo tiene múltiples respuestas. Solo se importará la primera respuesta.",
+    "context": "This field has multiple responses. Only the first response will be imported."
+  },
+  {
+    "term": "component.map-fields-table.no-import-field",
+    "definition": "No importar",
+    "context": "Don't import"
+  },
+  {
+    "term": "component.map-fields-table.petition-field-header",
+    "definition": "Campos",
+    "context": "Field"
+  },
+  {
+    "term": "component.map-fields-table.reply-preview",
+    "definition": "Previsualizar",
+    "context": "Preview"
   },
   {
     "term": "component.message-closing-email-editor.body-label",
@@ -3655,6 +3750,21 @@
     "context": "Export to PDF"
   },
   {
+    "term": "component.petition-header.import-replies",
+    "definition": "Importar respuestas",
+    "context": "Import replies"
+  },
+  {
+    "term": "component.petition-header.import-replies-error",
+    "definition": "Error al importar los datos",
+    "context": "Failed to import data"
+  },
+  {
+    "term": "component.petition-header.import-replies-success-title",
+    "definition": "Respuestas importadas con éxito",
+    "context": "Replies succesfully imported"
+  },
+  {
     "term": "component.petition-header.not-subscribed-description",
     "definition": "No recibir notificaciones sobre este parallel.",
     "context": "Don't get notifications about this parallel."
@@ -3928,6 +4038,16 @@
     "term": "component.petition-replies-filtered-fields.hidden-fields-explanation",
     "definition": "Campos no mostrados al destinatario por no cumplirse las condiciones necesarias.",
     "context": "Fields not shown to the recipient because the visibility conditions are not met."
+  },
+  {
+    "term": "component.petition-select.placeholder-petition",
+    "definition": "Selecciona {isMulti, select, true{parallels} other {un parallel}}",
+    "context": "Select {isMulti, select, true{parallels} other {a parallel}}"
+  },
+  {
+    "term": "component.petition-select.placeholder-petition-template",
+    "definition": "Selecciona {isMulti, select, true{plantillas} other {una plantilla}}",
+    "context": "Select {isMulti, select, true{templates} other {a template}}"
   },
   {
     "term": "component.petition-settings.adjustments-for-parallels",

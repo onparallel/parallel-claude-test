@@ -93,7 +93,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const {
     data: { me, realMe },
   } = useAssertQuery(PetitionPreview_userDocument);
-  const { data } = useAssertQuery(PetitionPreview_petitionDocument, {
+  const { data, refetch } = useAssertQuery(PetitionPreview_petitionDocument, {
     variables: { id: petitionId },
   });
 
@@ -373,6 +373,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         realMe={realMe}
         petition={petition}
         onUpdatePetition={handleUpdatePetition}
+        onRefetch={() => refetch()}
         section="preview"
         headerActions={
           isPetition &&

@@ -13,7 +13,7 @@ import {
   replyCanBeUpdated,
   replyIsForFieldOfType,
 } from "../../petition/authorizers";
-import { validateFieldReply, validateReplyUpdate } from "../../petition/validations";
+import { validateFieldReplyValue, validateReplyUpdate } from "../../petition/validations";
 import {
   authenticatePublicAccess,
   fieldBelongsToAccess,
@@ -49,7 +49,10 @@ export const publicCreatePetitionFieldReply = mutationField("publicCreatePetitio
       fieldCanBeReplied("fieldId")
     )
   ),
-  validateArgs: validateFieldReply("fieldId", "reply", "reply"),
+  validateArgs: validateFieldReplyValue(
+    (args) => [{ id: args.fieldId, value: args.reply }],
+    "reply"
+  ),
   resolve: async (_, args, ctx) => {
     const field = (await ctx.petitions.loadField(args.fieldId))!;
 
@@ -62,8 +65,9 @@ export const publicCreatePetitionFieldReply = mutationField("publicCreatePetitio
         : { value: args.reply };
 
     const [reply] = await ctx.petitions.createPetitionFieldReply(
-      args.fieldId,
+      field.petition_id,
       {
+        petition_field_id: args.fieldId,
         petition_access_id: ctx.access!.id,
         type: field.type,
         content,
@@ -216,8 +220,9 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
     const [presignedPostData, [reply]] = await Promise.all([
       ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
       ctx.petitions.createPetitionFieldReply(
-        args.fieldId,
+        ctx.access!.petition_id,
         {
+          petition_field_id: args.fieldId,
           petition_access_id: ctx.access!.id,
           type: "FILE_UPLOAD",
           content: { file_upload_id: file.id },
@@ -301,9 +306,10 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
       fieldCanBeReplied("fieldId")
     )
   ),
-  resolve: async (_, { keycode, fieldId }, ctx) => {
+  resolve: async (_, { fieldId }, ctx) => {
     const petition = await ctx.petitions.loadPetition(ctx.access!.petition_id);
     const session = await ctx.bankflip.createSession({
+      petitionId: toGlobalId("Petition", petition!.id),
       orgId: toGlobalId("Organization", petition!.org_id),
       fieldId: toGlobalId("PetitionField", fieldId),
       accessId: toGlobalId("PetitionAccess", ctx.access!.id),

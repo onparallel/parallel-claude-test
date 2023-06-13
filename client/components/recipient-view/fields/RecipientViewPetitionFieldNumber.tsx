@@ -65,6 +65,12 @@ export function RecipientViewPetitionFieldNumber({
         defaultMessage: "Enter your answer",
       });
 
+  useEffect(() => {
+    if (field.multiple && field.replies.length > 0 && showNewReply) {
+      setShowNewReply(false);
+    }
+  }, [field.replies]);
+
   function handleAddNewReply() {
     setShowNewReply(true);
     setTimeout(() => {

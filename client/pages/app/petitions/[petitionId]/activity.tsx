@@ -328,6 +328,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       realMe={realMe}
       petition={petition}
       onUpdatePetition={handleUpdatePetition}
+      onRefetch={() => refetch()}
       section="activity"
       headerActions={
         <Box display={{ base: "none", lg: "block" }}>

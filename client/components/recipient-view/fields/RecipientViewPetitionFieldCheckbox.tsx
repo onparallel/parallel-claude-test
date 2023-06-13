@@ -1,7 +1,7 @@
 import { Box, Checkbox, HStack, Stack, Text } from "@chakra-ui/react";
 import { RadioButtonSelected } from "@parallel/chakra/icons";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import {
   RecipientViewPetitionFieldCard,
@@ -58,6 +58,12 @@ export function RecipientViewPetitionFieldCheckbox({
 
   const [checkedItems, setCheckedItems] = useState<string[]>(reply?.content?.value ?? []);
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (haveChanges({ checked: checkedItems, value: reply?.content?.value ?? [], max: max })) {
+      setCheckedItems(reply?.content?.value ?? []);
+    }
+  }, [reply]);
 
   const handleUpdate = async (value: string[]) => {
     setIsSaving(true);

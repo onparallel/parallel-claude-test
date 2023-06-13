@@ -4,7 +4,7 @@ import { useIntl } from "react-intl";
 import * as Sentry from "@sentry/nextjs";
 import { isDefined } from "remeda";
 
-export function useGenericErrorToast() {
+export function useGenericErrorToast(title?: string, description?: string) {
   const intl = useIntl();
   const toast = useToast();
 
@@ -14,14 +14,18 @@ export function useGenericErrorToast() {
         Sentry.captureException(error);
       }
       toast({
-        title: intl.formatMessage({
-          id: "generic.something-went-wrong",
-          defaultMessage: "Something went wrong",
-        }),
-        description: intl.formatMessage({
-          id: "generic.please-try-again-later",
-          defaultMessage: "Please try again later",
-        }),
+        title:
+          title ??
+          intl.formatMessage({
+            id: "generic.something-went-wrong",
+            defaultMessage: "Something went wrong",
+          }),
+        description:
+          description ??
+          intl.formatMessage({
+            id: "generic.please-try-again-later",
+            defaultMessage: "Please try again later",
+          }),
         status: "error",
         isClosable: true,
       });
