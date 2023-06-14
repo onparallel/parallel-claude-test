@@ -17,6 +17,8 @@ sed -i -e "s/#INSTANCE_NAME#/$INSTANCE_NAME/g;s/#ENV#/$ENV/g;s/#RELEASE#/$RELEAS
   main/ops/prod/systemd/*.service \
   main/ops/prod/amazon-cloudwatch-agent/config.json
 sudo cp main/ops/prod/systemd/* /lib/systemd/system
+sudo cp -r main/ops/prod/nginx/fail2ban/* /etc/fail2ban/
+sudo rm -r main/ops/prod/nginx/fail2ban
 sudo cp -r main/ops/prod/nginx/* /etc/nginx/
 sudo rm /etc/nginx/modsec/modsecurity-crs/rules/REQUEST-903.*
 sudo cp main/ops/prod/amazon-cloudwatch-agent/config.json /opt/aws/amazon-cloudwatch-agent/bin/config.json
