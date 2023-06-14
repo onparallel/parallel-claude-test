@@ -60,7 +60,6 @@ sudo yum install -y 2to3
 ./fail2ban-2to3
 python3.9 setup.py build
 sudo python3.9 setup.py install
-sudo cp ./build/fail2ban.service /etc/systemd/system/fail2ban.service
 popd
 
 pushd modsecurity
