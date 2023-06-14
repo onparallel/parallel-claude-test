@@ -7,8 +7,8 @@ PartOf=iptables.service firewalld.service ip6tables.service ipset.service nftabl
 
 [Service]
 Type=simple
-Environment="PYTHONNOUSERSITE=1"
-Environment="PYTHONPATH=/usr/local/lib/python3.9/site-packages"
+Environment=PYTHONNOUSERSITE=1
+Environment=PYTHONPATH=/usr/local/lib/python3.9/site-packages
 ExecStartPre=/bin/mkdir -p /run/fail2ban
 ExecStart=/usr/local/bin/fail2ban-server -xf start
 # if should be logged in systemd journal, use following line or set logtarget to sysout in fail2ban.local
