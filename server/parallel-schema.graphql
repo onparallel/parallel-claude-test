@@ -5381,6 +5381,11 @@ type Query {
     search: String
 
     """
+    Search applies only on petition name
+    """
+    searchByNameOnly: Boolean
+
+    """
     Sorting to use on the collection
     """
     sortBy: [QueryPetitions_OrderBy!]

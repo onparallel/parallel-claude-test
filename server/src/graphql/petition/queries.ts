@@ -52,6 +52,9 @@ export const petitionsQuery = queryField((t) => {
           t.nullable.list.nonNull.globalId("fromTemplateId", { prefixName: "Petition" });
         },
       }).asArg(),
+      searchByNameOnly: booleanArg({
+        description: "Search applies only on petition name",
+      }),
     },
     searchable: true,
     sortableBy: ["createdAt", "sentAt", "name", "lastUsedAt"] as any,
@@ -83,7 +86,7 @@ export const petitionsQuery = queryField((t) => {
         }
       }
     ),
-    resolve: async (_, { offset, limit, search, sortBy, filters }, ctx) => {
+    resolve: async (_, { offset, limit, search, sortBy, filters, searchByNameOnly }, ctx) => {
       return ctx.petitions.getPaginatedPetitionsForUser(ctx.user!.org_id, ctx.user!.id, {
         search,
         offset,
@@ -93,6 +96,7 @@ export const petitionsQuery = queryField((t) => {
           return { field: field, order };
         }),
         limit,
+        searchByNameOnly: searchByNameOnly ?? false,
       });
     },
   });

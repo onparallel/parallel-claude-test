@@ -3987,6 +3987,7 @@ export type QuerypetitionsArgs = {
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
+  searchByNameOnly?: InputMaybe<Scalars["Boolean"]["input"]>;
   sortBy?: InputMaybe<Array<QueryPetitions_OrderBy>>;
 };
 

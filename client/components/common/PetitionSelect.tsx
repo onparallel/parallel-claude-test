@@ -59,6 +59,7 @@ const _queries = [
         search: $search
         filters: $filters
         sortBy: $sortBy
+        searchByNameOnly: true
       ) {
         items {
           ...PetitionSelect_PetitionBase

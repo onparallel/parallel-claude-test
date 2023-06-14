@@ -426,6 +426,7 @@ export class PetitionRepository extends BaseRepository {
     userId: number,
     opts: {
       search?: string | null;
+      searchByNameOnly?: boolean;
       sortBy?: SortBy<"name" | "lastUsedAt" | "sentAt" | "createdAt">[];
       filters?: PetitionFilter | null;
     } & PageOpts
@@ -447,7 +448,11 @@ export class PetitionRepository extends BaseRepository {
     ];
     if (search) {
       builders.push((q) => {
-        if (type === "PETITION") {
+        if (opts.searchByNameOnly) {
+          q.whereRaw(/* sql */ `p.name ilike :search escape '\\'`, {
+            search: `%${escapeLike(search, "\\")}%`,
+          });
+        } else if (type === "PETITION") {
           q.joinRaw(/* sql */ `left join petition_access pa on p.id = pa.petition_id `)
             .joinRaw(
               /* sql */ `left join contact c on pa.contact_id = c.id and c.deleted_at is null`

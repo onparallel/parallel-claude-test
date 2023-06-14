@@ -6357,6 +6357,7 @@ export interface NexusGenArgTypes {
       limit?: number | null; // Int
       offset?: number | null; // Int
       search?: string | null; // String
+      searchByNameOnly?: boolean | null; // Boolean
       sortBy?: NexusGenEnums["QueryPetitions_OrderBy"][] | null; // [QueryPetitions_OrderBy!]
     };
     petitionsById: {

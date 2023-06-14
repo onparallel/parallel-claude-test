@@ -4127,6 +4127,7 @@ export interface QuerypetitionsArgs {
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
+  searchByNameOnly?: InputMaybe<Scalars["Boolean"]["input"]>;
   sortBy?: InputMaybe<Array<QueryPetitions_OrderBy>>;
 }
 
@@ -36715,7 +36716,14 @@ export const PetitionSelect_petitionsDocument = gql`
     $filters: PetitionFilter
     $sortBy: [QueryPetitions_OrderBy!]
   ) {
-    petitions(offset: $offset, limit: $limit, search: $search, filters: $filters, sortBy: $sortBy) {
+    petitions(
+      offset: $offset
+      limit: $limit
+      search: $search
+      filters: $filters
+      sortBy: $sortBy
+      searchByNameOnly: true
+    ) {
       items {
         ...PetitionSelect_PetitionBase
       }
