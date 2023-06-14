@@ -38,269 +38,277 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         endDate
       ),
     ]);
+
+    let rows: Record<
+      string,
+      { position: number; content: Maybe<string | Date>; title: Maybe<string> }
+    >[] = [];
+
     const intl = await this.ctx.i18n.getIntl(template!.recipient_locale);
 
-    const [
-      includePreviewUrl,
-      petitionsAccesses,
-      petitionsMessages,
-      petitionsFieldsWithReplies,
-      petitionsOwner,
-      petitionsTags,
-      petitionsEvents,
-    ] = await Promise.all([
-      this.ctx.featureFlags.orgHasFeatureFlag(template!.org_id, "TEMPLATE_REPLIES_PREVIEW_URL"),
-      this.ctx.readonlyPetitions.loadAccessesForPetition(petitions.map((p) => p.id)),
-      this.ctx.readonlyPetitions.loadMessagesByPetitionId(petitions.map((p) => p.id)),
-      this.ctx.readonlyPetitions.getPetitionFieldsWithReplies(petitions.map((p) => p.id)),
-      this.ctx.readonlyPetitions.loadPetitionOwner(petitions.map((p) => p.id)),
-      this.ctx.readonlyTags.loadTagsByPetitionId(petitions.map((p) => p.id)),
-      this.ctx.readonlyPetitions.loadPetitionEventsByPetitionId(petitions.map((p) => p.id)),
-    ]);
+    if (petitions.length > 0) {
+      const [
+        includePreviewUrl,
+        petitionsAccesses,
+        petitionsMessages,
+        petitionsFieldsWithReplies,
+        petitionsOwner,
+        petitionsTags,
+        petitionsEvents,
+      ] = await Promise.all([
+        this.ctx.featureFlags.orgHasFeatureFlag(template!.org_id, "TEMPLATE_REPLIES_PREVIEW_URL"),
+        this.ctx.readonlyPetitions.loadAccessesForPetition(petitions.map((p) => p.id)),
+        this.ctx.readonlyPetitions.loadMessagesByPetitionId(petitions.map((p) => p.id)),
+        this.ctx.readonlyPetitions.getPetitionFieldsWithReplies(petitions.map((p) => p.id)),
+        this.ctx.readonlyPetitions.loadPetitionOwner(petitions.map((p) => p.id)),
+        this.ctx.readonlyTags.loadTagsByPetitionId(petitions.map((p) => p.id)),
+        this.ctx.readonlyPetitions.loadPetitionEventsByPetitionId(petitions.map((p) => p.id)),
+      ]);
 
-    const petitionsAccessesContacts = await Promise.all(
-      petitionsAccesses.map((accesses) =>
-        this.ctx.readonlyContacts.loadContactByAccessId(accesses.map((a) => a.id))
-      )
-    );
+      const petitionsAccessesContacts = await Promise.all(
+        petitionsAccesses.map((accesses) =>
+          this.ctx.readonlyContacts.loadContactByAccessId(accesses.map((a) => a.id))
+        )
+      );
 
-    const petitionsOwnerUserData = await Promise.all(
-      petitionsOwner.map((user) => this.ctx.users.loadUserDataByUserId(user!.id))
-    );
+      const petitionsOwnerUserData = await Promise.all(
+        petitionsOwner.map((user) => this.ctx.users.loadUserDataByUserId(user!.id))
+      );
 
-    const petitionsFirstMessage = petitionsMessages.reduce(
-      (result: Maybe<PetitionMessage>[], messages) => {
-        const firstMessage =
-          minBy(messages, (m) => m.scheduled_at?.valueOf() ?? m.created_at.valueOf()) ?? null;
-        return result.concat(firstMessage);
-      },
-      []
-    );
-
-    const petitionsFirstMessageUserData = await Promise.all(
-      petitionsFirstMessage.map((m) =>
-        m ? this.ctx.users.loadUserDataByUserId(m.sender_id) : null
-      )
-    );
-
-    const rows = petitions.map((petition, petitionIndex) => {
-      const petitionFields = petitionsFieldsWithReplies[petitionIndex];
-
-      const contacts = petitionsAccessesContacts[petitionIndex].filter(isDefined);
-      const petitionFirstMessage = petitionsFirstMessage[petitionIndex];
-      const petitionFirstMessageUserData = petitionsFirstMessageUserData[petitionIndex];
-      const firstSendDate =
-        petitionFirstMessage?.scheduled_at ?? petitionFirstMessage?.created_at ?? null;
-
-      const contactNames = contacts.map((c) => fullName(c.first_name, c.last_name));
-      const contactEmails = contacts.map((c) => c.email);
-
-      const dateParts = firstSendDate
-        ? intl.formatDateToParts(firstSendDate, {
-            timeZone: timezone,
-            day: "numeric",
-            month: "numeric",
-            year: "numeric",
-            hour: "numeric",
-            minute: "numeric",
-            hour12: false,
-          })
-        : [];
-
-      const year = dateParts.find((p) => p.type === "year")!;
-      const month = dateParts.find((p) => p.type === "month")!;
-      const day = dateParts.find((p) => p.type === "day")!;
-      const hour = dateParts.find((p) => p.type === "hour")!;
-      const minute = dateParts.find((p) => p.type === "minute")!;
-
-      const petitionOwner = petitionsOwnerUserData[petitionIndex];
-      const petitionTags = petitionsTags[petitionIndex];
-      const petitionEvents = petitionsEvents[petitionIndex];
-      const latestPetitionCompletedEvent = petitionEvents
-        .filter((e) => e.type === "PETITION_COMPLETED")
-        .at(-1);
-      const latestPetitionClosedEvent = petitionEvents
-        .filter((e) => e.type === "PETITION_CLOSED")
-        .at(-1);
-      const latestSignatureCompletedEvent = petitionEvents
-        .filter((e) => e.type === "SIGNATURE_COMPLETED")
-        .at(-1);
-
-      const row: Record<
-        string,
-        { position: number; content: Maybe<string | Date>; title: Maybe<string> }
-      > = {
-        "parallel-id": {
-          position: 0,
-          title: intl.formatMessage({
-            id: "export-template-report.column-header.petition-id",
-            defaultMessage: "Parallel ID",
-          }),
-          content: toGlobalId("Petition", petition.id),
+      const petitionsFirstMessage = petitionsMessages.reduce(
+        (result: Maybe<PetitionMessage>[], messages) => {
+          const firstMessage =
+            minBy(messages, (m) => m.scheduled_at?.valueOf() ?? m.created_at.valueOf()) ?? null;
+          return result.concat(firstMessage);
         },
-        "parallel-name": {
-          position: 1,
-          title: intl.formatMessage({
-            id: "export-template-report.column-header.petition-name",
-            defaultMessage: "Parallel name",
-          }),
-          content: petition.name || "",
-        },
-        "recipient-names": {
-          position: 2,
-          title: intl.formatMessage({
-            id: "export-template-report.column-header.recipient-names",
-            defaultMessage: "Recipient names",
-          }),
-          content: contactNames.join(", ") || "",
-        },
-        "recipient-emails": {
-          position: 3,
-          title: intl.formatMessage({
-            id: "export-template-report.column-header.recipient-emails",
-            defaultMessage: "Recipient emails",
-          }),
-          content: contactEmails.join(", ") || "",
-        },
-        "send-date": {
-          position: 4,
-          title: intl.formatMessage({
-            id: "export-template-report.column-header.sent-at",
-            defaultMessage: "Sent at",
-          }),
-          content: firstSendDate
-            ? new Date(
-                Date.UTC(
-                  parseInt(year.value),
-                  parseInt(month.value) - 1, // months go from 0 (Jan) to 11 (Dec)
-                  parseInt(day.value),
-                  parseInt(hour.value),
-                  parseInt(minute.value)
+        []
+      );
+
+      const petitionsFirstMessageUserData = await Promise.all(
+        petitionsFirstMessage.map((m) =>
+          m ? this.ctx.users.loadUserDataByUserId(m.sender_id) : null
+        )
+      );
+
+      rows = petitions.map((petition, petitionIndex) => {
+        const petitionFields = petitionsFieldsWithReplies[petitionIndex];
+
+        const contacts = petitionsAccessesContacts[petitionIndex].filter(isDefined);
+        const petitionFirstMessage = petitionsFirstMessage[petitionIndex];
+        const petitionFirstMessageUserData = petitionsFirstMessageUserData[petitionIndex];
+        const firstSendDate =
+          petitionFirstMessage?.scheduled_at ?? petitionFirstMessage?.created_at ?? null;
+
+        const contactNames = contacts.map((c) => fullName(c.first_name, c.last_name));
+        const contactEmails = contacts.map((c) => c.email);
+
+        const dateParts = firstSendDate
+          ? intl.formatDateToParts(firstSendDate, {
+              timeZone: timezone,
+              day: "numeric",
+              month: "numeric",
+              year: "numeric",
+              hour: "numeric",
+              minute: "numeric",
+              hour12: false,
+            })
+          : [];
+
+        const year = dateParts.find((p) => p.type === "year")!;
+        const month = dateParts.find((p) => p.type === "month")!;
+        const day = dateParts.find((p) => p.type === "day")!;
+        const hour = dateParts.find((p) => p.type === "hour")!;
+        const minute = dateParts.find((p) => p.type === "minute")!;
+
+        const petitionOwner = petitionsOwnerUserData[petitionIndex];
+        const petitionTags = petitionsTags[petitionIndex];
+        const petitionEvents = petitionsEvents[petitionIndex];
+        const latestPetitionCompletedEvent = petitionEvents
+          .filter((e) => e.type === "PETITION_COMPLETED")
+          .at(-1);
+        const latestPetitionClosedEvent = petitionEvents
+          .filter((e) => e.type === "PETITION_CLOSED")
+          .at(-1);
+        const latestSignatureCompletedEvent = petitionEvents
+          .filter((e) => e.type === "SIGNATURE_COMPLETED")
+          .at(-1);
+
+        const row: Record<
+          string,
+          { position: number; content: Maybe<string | Date>; title: Maybe<string> }
+        > = {
+          "parallel-id": {
+            position: 0,
+            title: intl.formatMessage({
+              id: "export-template-report.column-header.petition-id",
+              defaultMessage: "Parallel ID",
+            }),
+            content: toGlobalId("Petition", petition.id),
+          },
+          "parallel-name": {
+            position: 1,
+            title: intl.formatMessage({
+              id: "export-template-report.column-header.petition-name",
+              defaultMessage: "Parallel name",
+            }),
+            content: petition.name || "",
+          },
+          "recipient-names": {
+            position: 2,
+            title: intl.formatMessage({
+              id: "export-template-report.column-header.recipient-names",
+              defaultMessage: "Recipient names",
+            }),
+            content: contactNames.join(", ") || "",
+          },
+          "recipient-emails": {
+            position: 3,
+            title: intl.formatMessage({
+              id: "export-template-report.column-header.recipient-emails",
+              defaultMessage: "Recipient emails",
+            }),
+            content: contactEmails.join(", ") || "",
+          },
+          "send-date": {
+            position: 4,
+            title: intl.formatMessage({
+              id: "export-template-report.column-header.sent-at",
+              defaultMessage: "Sent at",
+            }),
+            content: firstSendDate
+              ? new Date(
+                  Date.UTC(
+                    parseInt(year.value),
+                    parseInt(month.value) - 1, // months go from 0 (Jan) to 11 (Dec)
+                    parseInt(day.value),
+                    parseInt(hour.value),
+                    parseInt(minute.value)
+                  )
                 )
-              )
-            : null,
-        },
-        "sent-by": {
-          position: 5,
-          title: intl.formatMessage({
-            id: "export-template-report.column-header.sent-by",
-            defaultMessage: "Sent by",
-          }),
-          content: fullName(
-            petitionFirstMessageUserData?.first_name,
-            petitionFirstMessageUserData?.last_name
-          ),
-        },
-        "parallel-owner": {
-          position: 6,
-          title: intl.formatMessage({
-            id: "export-template-report.column-header.parallel-owner",
-            defaultMessage: "Owner",
-          }),
-          content: fullName(petitionOwner?.first_name, petitionOwner?.last_name),
-        },
-        tags: {
-          position: 7,
-          title: intl.formatMessage({
-            id: "export-template-report.column-header.parallel-tags",
-            defaultMessage: "Tags",
-          }),
-          content: petitionTags.map((t) => t.name).join(", "),
-        },
-        status: {
-          position: 8,
-          title: intl.formatMessage({
-            id: "export-template-report.column-header.parallel-status",
-            defaultMessage: "Status",
-          }),
-          content: petition.status
-            ? {
-                DRAFT: intl.formatMessage({
-                  id: "export-template-report.petition-status.draft",
-                  defaultMessage: "DRAFT",
-                }),
-                PENDING: intl.formatMessage({
-                  id: "export-template-report.petition-status.pending",
-                  defaultMessage: "PENDING",
-                }),
-                COMPLETED: intl.formatMessage({
-                  id: "export-template-report.petition-status.completed",
-                  defaultMessage: "COMPLETED",
-                }),
-                CLOSED: intl.formatMessage({
-                  id: "export-template-report.petition-status.closed",
-                  defaultMessage: "CLOSED",
-                }),
-              }[petition.status]
-            : null,
-        },
-        "completed-at": {
-          position: 9,
-          title: intl.formatMessage({
-            id: "export-template-report.column-header.parallel-completed-at",
-            defaultMessage: "Completed at",
-          }),
-          content: latestPetitionCompletedEvent?.created_at ?? null,
-        },
-        "closed-at": {
-          position: 10,
-          title: intl.formatMessage({
-            id: "export-template-report.column-header.parallel-closed-at",
-            defaultMessage: "Closed at",
-          }),
-          content: latestPetitionClosedEvent?.created_at ?? null,
-        },
-        "signed-at": {
-          position: 11,
-          title: intl.formatMessage({
-            id: "export-template-report.column-header.parallel-signed-at",
-            defaultMessage: "Signed at",
-          }),
-          content: latestSignatureCompletedEvent?.created_at ?? null,
-        },
-      };
-
-      if (includePreviewUrl) {
-        row["preview-url"] = {
-          position: Object.keys(row).length,
-          title: intl.formatMessage({
-            id: "export-template-report.column-header.preview-url",
-            defaultMessage: "Preview URL",
-          }),
-          content: `${this.ctx.config.misc.parallelUrl}/${intl.locale}/app/petitions/${toGlobalId(
-            "Petition",
-            petition.id
-          )}/preview`,
+              : null,
+          },
+          "sent-by": {
+            position: 5,
+            title: intl.formatMessage({
+              id: "export-template-report.column-header.sent-by",
+              defaultMessage: "Sent by",
+            }),
+            content: fullName(
+              petitionFirstMessageUserData?.first_name,
+              petitionFirstMessageUserData?.last_name
+            ),
+          },
+          "parallel-owner": {
+            position: 6,
+            title: intl.formatMessage({
+              id: "export-template-report.column-header.parallel-owner",
+              defaultMessage: "Owner",
+            }),
+            content: fullName(petitionOwner?.first_name, petitionOwner?.last_name),
+          },
+          tags: {
+            position: 7,
+            title: intl.formatMessage({
+              id: "export-template-report.column-header.parallel-tags",
+              defaultMessage: "Tags",
+            }),
+            content: petitionTags.map((t) => t.name).join(", "),
+          },
+          status: {
+            position: 8,
+            title: intl.formatMessage({
+              id: "export-template-report.column-header.parallel-status",
+              defaultMessage: "Status",
+            }),
+            content: petition.status
+              ? {
+                  DRAFT: intl.formatMessage({
+                    id: "export-template-report.petition-status.draft",
+                    defaultMessage: "DRAFT",
+                  }),
+                  PENDING: intl.formatMessage({
+                    id: "export-template-report.petition-status.pending",
+                    defaultMessage: "PENDING",
+                  }),
+                  COMPLETED: intl.formatMessage({
+                    id: "export-template-report.petition-status.completed",
+                    defaultMessage: "COMPLETED",
+                  }),
+                  CLOSED: intl.formatMessage({
+                    id: "export-template-report.petition-status.closed",
+                    defaultMessage: "CLOSED",
+                  }),
+                }[petition.status]
+              : null,
+          },
+          "completed-at": {
+            position: 9,
+            title: intl.formatMessage({
+              id: "export-template-report.column-header.parallel-completed-at",
+              defaultMessage: "Completed at",
+            }),
+            content: latestPetitionCompletedEvent?.created_at ?? null,
+          },
+          "closed-at": {
+            position: 10,
+            title: intl.formatMessage({
+              id: "export-template-report.column-header.parallel-closed-at",
+              defaultMessage: "Closed at",
+            }),
+            content: latestPetitionClosedEvent?.created_at ?? null,
+          },
+          "signed-at": {
+            position: 11,
+            title: intl.formatMessage({
+              id: "export-template-report.column-header.parallel-signed-at",
+              defaultMessage: "Signed at",
+            }),
+            content: latestSignatureCompletedEvent?.created_at ?? null,
+          },
         };
-      }
-      const fixedColsLength = Object.keys(row).length;
 
-      const fieldIndexes = getFieldIndices(petitionFields);
-      const visibilities = evaluateFieldVisibility(petitionFields);
-      zip(petitionFields, fieldIndexes)
-        .filter((_, i) => visibilities[i])
-        .forEach(([field, fieldIndex]) => {
-          row[`${field.from_petition_field_id ?? field.id}`] = {
-            position: (fieldIndex as number) - 1 + fixedColsLength,
-            title: field.type === "DATE_TIME" ? field.title + " (UTC)" : field.title,
-            content: !isFileTypeField(field.type)
-              ? field.replies
-                  .map((r) => this.replyContent({ ...r, type: field.type }, intl as IntlShape))
-                  .join("; ")
-              : field.replies.length > 0
-              ? intl.formatMessage(
-                  {
-                    id: "export-template-report.file-cell-content",
-                    defaultMessage: "{count, plural, =1{1 file} other {# files}}",
-                  },
-                  { count: field.replies.length }
-                )
-              : "",
+        if (includePreviewUrl) {
+          row["preview-url"] = {
+            position: Object.keys(row).length,
+            title: intl.formatMessage({
+              id: "export-template-report.column-header.preview-url",
+              defaultMessage: "Preview URL",
+            }),
+            content: `${this.ctx.config.misc.parallelUrl}/${intl.locale}/app/petitions/${toGlobalId(
+              "Petition",
+              petition.id
+            )}/preview`,
           };
-        });
+        }
+        const fixedColsLength = Object.keys(row).length;
 
-      return row;
-    });
+        const fieldIndexes = getFieldIndices(petitionFields);
+        const visibilities = evaluateFieldVisibility(petitionFields);
+        zip(petitionFields, fieldIndexes)
+          .filter((_, i) => visibilities[i])
+          .forEach(([field, fieldIndex]) => {
+            row[`${field.from_petition_field_id ?? field.id}`] = {
+              position: (fieldIndex as number) - 1 + fixedColsLength,
+              title: field.type === "DATE_TIME" ? field.title + " (UTC)" : field.title,
+              content: !isFileTypeField(field.type)
+                ? field.replies
+                    .map((r) => this.replyContent({ ...r, type: field.type }, intl as IntlShape))
+                    .join("; ")
+                : field.replies.length > 0
+                ? intl.formatMessage(
+                    {
+                      id: "export-template-report.file-cell-content",
+                      defaultMessage: "{count, plural, =1{1 file} other {# files}}",
+                    },
+                    { count: field.replies.length }
+                  )
+                : "",
+            };
+          });
+
+        return row;
+      });
+    }
 
     const stream = await this.exportToExcel(rows);
 
