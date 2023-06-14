@@ -10,19 +10,19 @@ import { isFileTypeField } from "./isFileTypeField";
 import { FieldOptions } from "./petitionFields";
 
 export const mapReplyContents = ({
-  value,
-  target,
-  origin,
+  mapping: mapping,
+  fields: fields,
+  sourcePetitionFields: sourcePetitionFields,
 }: {
-  value: { [key: string]: string };
-  target: mapReplyContents_PetitionFieldFragment[];
-  origin: mapReplyContents_PetitionFieldFragment[];
+  mapping: { [key: string]: string };
+  fields: mapReplyContents_PetitionFieldFragment[];
+  sourcePetitionFields: mapReplyContents_PetitionFieldFragment[];
 }) => {
   let result = [] as CreatePetitionFieldReplyInput[];
 
-  for (const [targetId, originId] of Object.entries(value)) {
-    const targetField = target.find((field) => field.id === targetId);
-    const originField = origin.find((field) => field.id === originId);
+  for (const [targetId, originId] of Object.entries(mapping)) {
+    const targetField = fields.find((field) => field.id === targetId);
+    const originField = sourcePetitionFields.find((field) => field.id === originId);
 
     if (isDefined(targetField) && isDefined(originField)) {
       const replies = targetField.multiple ? originField.replies : [originField.replies[0]];

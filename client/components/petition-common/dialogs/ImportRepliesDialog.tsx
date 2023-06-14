@@ -11,18 +11,24 @@ import {
   Text,
   useCounter,
 } from "@chakra-ui/react";
-import { MapFieldsTable } from "@parallel/components/common/MapFieldsTable";
+import {
+  MapFieldsTable,
+  excludedFieldsOrigin,
+  excludedFieldsTarget,
+} from "@parallel/components/common/MapFieldsTable";
 import { PetitionSelect, PetitionSelectInstance } from "@parallel/components/common/PetitionSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
   ImportRepliesDialog_createPetitionFieldRepliesDocument,
   ImportRepliesDialog_petitionDocument,
+  ImportRepliesDialog_petitionQuery,
 } from "@parallel/graphql/__types";
-import { mapReplyContents } from "@parallel/utils/petitionFieldsReplies";
+import { isReplyContentCompatible, mapReplyContents } from "@parallel/utils/petitionFieldsReplies";
 import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
+import { isDefined } from "remeda";
 
 export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ petitionId: string }>) {
   const {
@@ -39,6 +45,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
     resetField,
     formState: { errors },
     setError,
+    setValue,
   } = useForm<{
     sourcePetitionId: null | string;
     mapping: Record<string, string>;
@@ -67,6 +74,46 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
     ImportRepliesDialog_createPetitionFieldRepliesDocument
   );
 
+  const setInitialMapping = async (
+    sourcePetition: ImportRepliesDialog_petitionQuery | undefined | null
+  ) => {
+    const mapping = {} as Record<string, string>;
+
+    const fields = petitionData?.petition?.fields ?? [];
+    const sourcePetitionFields = sourcePetition?.petition?.fields ?? [];
+
+    const filteredFields = fields.filter(
+      (f) => !excludedFieldsTarget.includes(f.type) && mapping[f.id] === undefined
+    );
+    const filteredSourceFields = sourcePetitionFields.filter(
+      (f) => !excludedFieldsOrigin.includes(f.type)
+    );
+
+    for (const field of filteredFields) {
+      const replyIsApproved = field.replies.length === 1 && field.replies[0].status === "APPROVED";
+      const isFieldDisabled = (field.replies.length > 0 && !field.multiple) || replyIsApproved;
+      if (!isFieldDisabled && field.replies.length === 0) {
+        const matchingField =
+          (isDefined(field.alias) &&
+            filteredSourceFields.find((f) => {
+              return field.alias === f.alias && isReplyContentCompatible(field, f);
+            })) ||
+          (isDefined(field.fromPetitionFieldId) &&
+            filteredSourceFields.find((f) => {
+              return (
+                field.fromPetitionFieldId === f.fromPetitionFieldId &&
+                isReplyContentCompatible(field, f)
+              );
+            })) ||
+          null;
+        if (isDefined(matchingField)) {
+          mapping[field.id] = matchingField.id;
+        }
+      }
+    }
+    setValue("mapping", mapping);
+  };
+
   return (
     <ConfirmDialog
       closeOnEsc={false}
@@ -79,18 +126,20 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
         onSubmit: handleSubmit(async (data) => {
           if (currentStep === 0) {
             if (data.sourcePetitionId) {
-              await getSelectedPetition({
+              const res = await getSelectedPetition({
                 variables: {
                   petitionId: data.sourcePetitionId,
                 },
               });
+
+              setInitialMapping(res.data);
               nextStep();
             }
           } else {
             const mappedFields = mapReplyContents({
-              value: data.mapping,
-              target: petitionData?.petition?.fields ?? [],
-              origin: selectedPetitionData?.petition?.fields ?? [],
+              mapping: data.mapping,
+              fields: petitionData?.petition?.fields ?? [],
+              sourcePetitionFields: selectedPetitionData?.petition?.fields ?? [],
             });
             if (mappedFields.length) {
               await createPetitionFieldReplies({
@@ -160,13 +209,21 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
             </FormErrorMessage>
           </FormControl>
         ) : (
-          <Stack>
+          <Stack spacing={4}>
             <Text>
               <FormattedMessage
                 id="component.import-replies-dialog.mapping-despcription"
                 defaultMessage="Map each field of the current parallel to the corresponding field from the source"
               />
             </Text>
+            <FormControl isDisabled={isSubmitting}>
+              <Checkbox {...register("overwriteExisting")}>
+                <FormattedMessage
+                  id="component.import-replies-dialog.checkbox-overwrite-replies"
+                  defaultMessage="Overwrite existing replies"
+                />
+              </Checkbox>
+            </FormControl>
             <FormControl isInvalid={!!errors.mapping}>
               <Controller
                 name="mapping"
@@ -186,14 +243,6 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
                   );
                 }}
               />
-            </FormControl>
-            <FormControl isDisabled={isSubmitting}>
-              <Checkbox {...register("overwriteExisting")}>
-                <FormattedMessage
-                  id="component.import-replies-dialog.checkbox-overwrite-replies"
-                  defaultMessage="Overwrite existing replies"
-                />
-              </Checkbox>
             </FormControl>
           </Stack>
         )

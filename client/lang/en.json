@@ -2575,9 +2575,24 @@
     "context": "This field has multiple responses. Only the first response will be imported."
   },
   {
+    "term": "component.map-fields-table.no-compatible-fields-alert",
+    "definition": "You cannot import replies to this field because no compatible fields have been found.",
+    "context": "You cannot import replies to this field because no compatible fields have been found."
+  },
+  {
     "term": "component.map-fields-table.no-import-field",
     "definition": "Don't import",
     "context": "Don't import"
+  },
+  {
+    "term": "component.map-fields-table.no-replies-to-this-field",
+    "definition": "No replies to this field",
+    "context": "No replies to this field"
+  },
+  {
+    "term": "component.map-fields-table.overwrite-alert",
+    "definition": "An existing reply will be overwritten.",
+    "context": "An existing reply will be overwritten."
   },
   {
     "term": "component.map-fields-table.petition-field-header",

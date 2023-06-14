@@ -12,6 +12,7 @@ import {
   Thead,
   Tr,
   VisuallyHidden,
+  useMergeRefs,
 } from "@chakra-ui/react";
 import {
   ArrowBackIcon,
@@ -37,7 +38,7 @@ import { formatNumberWithPrefix } from "@parallel/utils/formatNumberWithPrefix";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { isReplyContentCompatible } from "@parallel/utils/petitionFieldsReplies";
-import { Fragment, useEffect, useMemo } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, omit } from "remeda";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
@@ -56,14 +57,14 @@ export interface MapFieldsTableProps {
   isDisabled?: boolean;
 }
 
-const excludedFieldsTarget = [
+export const excludedFieldsTarget = [
   "HEADING",
   "ES_TAX_DOCUMENTS",
   "DYNAMIC_SELECT",
   "DOW_JONES_KYC",
 ] as PetitionFieldType[];
 
-const excludedFieldsOrigin = [
+export const excludedFieldsOrigin = [
   "HEADING",
   "ES_TAX_DOCUMENTS",
   "DYNAMIC_SELECT",
@@ -75,6 +76,7 @@ export const MapFieldsTable = Object.assign(
     ref
   ) {
     const fieldsWithIndices = useFieldWithIndices(fields);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
       if (!overwriteExisting) {
@@ -93,11 +95,12 @@ export const MapFieldsTable = Object.assign(
 
     return (
       <TableContainer
-        ref={ref}
+        ref={useMergeRefs(ref, containerRef)}
         overflowY="auto"
         border="1px solid"
         borderColor="gray.200"
         {...props}
+        id="map-fields-table-container"
       >
         <Table
           variant="unstyled"
@@ -174,6 +177,7 @@ export const MapFieldsTable = Object.assign(
                   sourcePetitionFields={sourcePetitionFields}
                   allowOverwrite={overwriteExisting}
                   isDisabled={isDisabled}
+                  containerRef={containerRef}
                 />
               ))}
           </Tbody>
@@ -204,6 +208,8 @@ export const MapFieldsTable = Object.assign(
             multiple
             isInternal
             isReadOnly
+            alias
+            fromPetitionFieldId
             replies {
               ...MapFieldsTable_PetitionFieldReply
             }
@@ -250,6 +256,7 @@ function TableRow({
   onChange,
   allowOverwrite,
   isDisabled,
+  containerRef,
 }: {
   field: MapFieldsTable_PetitionFieldFragment;
   fieldIndex: PetitionFieldIndex;
@@ -258,6 +265,7 @@ function TableRow({
   onChange: (fieldId: string | null) => void;
   allowOverwrite: boolean;
   isDisabled?: boolean;
+  containerRef: React.RefObject<HTMLDivElement>;
 }) {
   const intl = useIntl();
 
@@ -282,9 +290,41 @@ function TableRow({
   const isFieldDisabled =
     (field.replies.length > 0 && !allowOverwrite && !field.multiple) ||
     replyIsApproved ||
+    selectFieldsAndIndices.fields.length === 0 ||
     isDisabled;
 
   const opacity = isDisabled ? 0.5 : 1;
+
+  const alertOrArrow =
+    allowOverwrite && field.replies.length > 0 && !field.multiple ? (
+      <AlertPopover boxSize={5} padding={0} margin={0}>
+        <Text>
+          <FormattedMessage
+            id="component.map-fields-table.overwrite-alert"
+            defaultMessage="An existing reply will be overwritten."
+          />
+        </Text>
+      </AlertPopover>
+    ) : (
+      <ArrowBackIcon />
+    );
+
+  //Fix to close the menu when the user scrolls
+  const [menuIsOpen, setMenuOpen] = useState(false);
+
+  // The scroll listener
+  const handleScroll = useCallback(() => {
+    if (menuIsOpen) {
+      setMenuOpen(false);
+    }
+  }, [menuIsOpen]);
+
+  // Attach the scroll listener to the div
+  useEffect(() => {
+    const tableContainer = containerRef.current;
+    tableContainer?.addEventListener("scroll", handleScroll);
+    return () => tableContainer?.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
   return (
     <Tr>
@@ -315,6 +355,11 @@ function TableRow({
                     id="component.map-fields-table.has-replies-approved-conflict-alert"
                     defaultMessage="You cannot import new answers to this field because it has approved answers."
                   />
+                ) : selectFieldsAndIndices.fields.length === 0 ? (
+                  <FormattedMessage
+                    id="component.map-fields-table.no-compatible-fields-alert"
+                    defaultMessage="You cannot import replies to this field because no compatible fields have been found."
+                  />
                 ) : (
                   <FormattedMessage
                     id="component.map-fields-table.has-replies-conflict-alert"
@@ -327,9 +372,9 @@ function TableRow({
           >
             <ForbiddenIcon />
           </SmallPopover>
-        ) : (
-          <ArrowBackIcon />
-        )}
+        ) : selectedField ? (
+          alertOrArrow
+        ) : null}
       </Td>
       <Td padding={2} minWidth="240px">
         <PetitionFieldSelect
@@ -343,6 +388,10 @@ function TableRow({
           isDisabled={isFieldDisabled}
           isInvalid={isFieldDisabled ? false : undefined}
           isClearable
+          captureMenuScroll
+          menuIsOpen={menuIsOpen}
+          onMenuOpen={() => setMenuOpen(true)}
+          onMenuClose={() => setMenuOpen(false)}
         />
       </Td>
       <Td padding={2} paddingRight={4} minWidth={0} maxWidth="200px" opacity={opacity}>
@@ -378,7 +427,12 @@ function TableRow({
                   );
                 })
               ) : (
-                <ReplyNotAvailable type={selectedField.type} />
+                <Text textStyle="hint">
+                  <FormattedMessage
+                    id="component.map-fields-table.no-replies-to-this-field"
+                    defaultMessage="No replies to this field"
+                  />
+                </Text>
               )}
             </Stack>
           ) : (
@@ -386,7 +440,7 @@ function TableRow({
           )}
 
           {hasMultipleRepliesConflict ? (
-            <AlertPopover>
+            <AlertPopover boxSize={5}>
               <Text>
                 <FormattedMessage
                   id="component.map-fields-table.multi-replies-conflict-alert"

@@ -5054,6 +5054,8 @@ export type MapFieldsTable_PetitionFieldFragment = {
   multiple: boolean;
   isInternal: boolean;
   isReadOnly: boolean;
+  alias?: string | null;
+  fromPetitionFieldId?: string | null;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -9782,6 +9784,8 @@ export type ImportRepliesDialog_petitionQuery = {
           multiple: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
+          alias?: string | null;
+          fromPetitionFieldId?: string | null;
           replies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
@@ -9804,6 +9808,8 @@ export type ImportRepliesDialog_petitionQuery = {
           multiple: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
+          alias?: string | null;
+          fromPetitionFieldId?: string | null;
           replies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
@@ -31108,6 +31114,8 @@ export const MapFieldsTable_PetitionFieldFragmentDoc = gql`
     multiple
     isInternal
     isReadOnly
+    alias
+    fromPetitionFieldId
     replies {
       ...MapFieldsTable_PetitionFieldReply
     }
