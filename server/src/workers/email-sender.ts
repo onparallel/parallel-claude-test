@@ -107,12 +107,16 @@ createQueueWorker("email-sender", async (payload, context, config) => {
           { concurrency: 1 }
         ),
       });
-      await context.emailLogs.updateWithResponse(email.id, {
-        response: JSON.stringify(result),
-        external_id: result.response.startsWith("250 Ok")
-          ? result.response.replace(/^250 Ok /, "")
-          : null,
-      });
+      await context.emailLogs.updateWithResponse(
+        email.id,
+        {
+          response: JSON.stringify(result),
+          external_id: result.response.startsWith("250 Ok")
+            ? result.response.replace(/^250 Ok /, "")
+            : null,
+        },
+        context.config.instanceName
+      );
     }
   }
 });

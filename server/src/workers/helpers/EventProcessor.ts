@@ -30,6 +30,11 @@ export class EventProcessor {
           for (const listener of this.listeners.get(event.type)!) {
             try {
               await listener(event, ctx);
+              if (payload.table_name === "petition_event") {
+                await ctx.petitions.markEventAsProcessed(event.id, ctx.config.instanceName);
+              } else if (payload.table_name === "system_event") {
+                await ctx.system.markEventAsProcessed(event.id, ctx.config.instanceName);
+              }
             } catch (error: any) {
               // log error and continue to other listeners
               ctx.logger.error(error.message, { stack: error.stack });

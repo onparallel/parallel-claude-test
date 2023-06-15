@@ -47,12 +47,12 @@ createQueueWorker(
           context.petitions.markPetitionAccessEmailBounceStatus(
             message.petition_access_id,
             true,
-            `EmailEventsWorker:${emailLogId}`
+            context.config.instanceName
           ),
           context.petitions.deactivateAccesses(
             message.petition_id,
             [message.petition_access_id],
-            `EmailEventsWorker:${emailLogId}`
+            context.config.instanceName
           ),
           context.emails.sendPetitionMessageBouncedEmail(message.id),
           context.petitions.createEvent({
@@ -68,7 +68,7 @@ createQueueWorker(
           context.petitions.markPetitionAccessEmailBounceStatus(
             access.id,
             true,
-            `EmailEventsWorker:${emailLogId}`
+            context.config.instanceName
           ),
           context.petitions.updateRemindersForPetition(access.petition_id, null),
           context.petitions.cancelScheduledMessagesByAccessIds([access.id]),
@@ -119,7 +119,7 @@ createQueueWorker(
         await context.petitions.markPetitionAccessEmailBounceStatus(
           message?.petition_access_id ?? reminder!.petition_access_id,
           false,
-          `EmailEventsWorker:${emailLogId}`
+          context.config.instanceName
         );
       }
     }

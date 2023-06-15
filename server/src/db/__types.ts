@@ -675,6 +675,8 @@ export interface EmailLog {
   external_id: Maybe<string>; // varchar
   reply_to: Maybe<string>; // text
   anonymized_at: Maybe<Date>; // timestamptz
+  processed_at: Maybe<Date>; // timestamptz
+  processed_by: Maybe<string>; // varchar
 }
 
 export type CreateEmailLog = PartialProps<
@@ -686,6 +688,8 @@ export type CreateEmailLog = PartialProps<
   | "external_id"
   | "reply_to"
   | "anonymized_at"
+  | "processed_at"
+  | "processed_by"
 >;
 
 export interface EventSubscriptionSignatureKey {
@@ -1056,11 +1060,12 @@ export interface PetitionEvent {
   data: Maybe<any>; // jsonb
   created_at: Date; // timestamptz
   processed_at: Maybe<Date>; // timestamptz
+  processed_by: Maybe<string>; // varchar
 }
 
 export type CreatePetitionEvent = PartialProps<
   Omit<PetitionEvent, "id">,
-  "data" | "created_at" | "processed_at"
+  "data" | "created_at" | "processed_at" | "processed_by"
 >;
 
 export interface PetitionEventSubscription {
@@ -1348,6 +1353,8 @@ export interface PetitionSignatureRequest {
   signer_status: any; // jsonb
   anonymized_at: Maybe<Date>; // timestamptz
   temporary_file_document_id: Maybe<number>; // int4
+  processed_at: Maybe<Date>; // timestamptz
+  processed_by: Maybe<string>; // varchar
 }
 
 export type CreatePetitionSignatureRequest = PartialProps<
@@ -1366,6 +1373,8 @@ export type CreatePetitionSignatureRequest = PartialProps<
   | "signer_status"
   | "anonymized_at"
   | "temporary_file_document_id"
+  | "processed_at"
+  | "processed_by"
 >;
 
 export interface PetitionTag {
@@ -1618,11 +1627,12 @@ export interface SystemEvent {
   data: Maybe<any>; // jsonb
   created_at: Date; // timestamptz
   processed_at: Maybe<Date>; // timestamptz
+  processed_by: Maybe<string>; // varchar
 }
 
 export type CreateSystemEvent = PartialProps<
   Omit<SystemEvent, "id">,
-  "data" | "created_at" | "processed_at"
+  "data" | "created_at" | "processed_at" | "processed_by"
 >;
 
 export interface Tag {
@@ -1658,8 +1668,13 @@ export interface Task {
   updated_by: Maybe<string>; // varchar
   petition_access_id: Maybe<number>; // int4
   started_at: Maybe<Date>; // timestamptz
+  /**
+   * @deprecated
+   */
   finished_at: Maybe<Date>; // timestamptz
   anonymized_at: Maybe<Date>; // timestamptz
+  processed_at: Maybe<Date>; // timestamptz
+  processed_by: Maybe<string>; // varchar
 }
 
 export type CreateTask = PartialProps<
@@ -1678,6 +1693,8 @@ export type CreateTask = PartialProps<
   | "started_at"
   | "finished_at"
   | "anonymized_at"
+  | "processed_at"
+  | "processed_by"
 >;
 
 export interface TemplateDefaultPermission {

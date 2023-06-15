@@ -31,4 +31,11 @@ export class SystemRepository extends BaseRepository {
 
     return count;
   }
+
+  async markEventAsProcessed(id: number, processedBy: string) {
+    await this.from("system_event").where("id", id).update({
+      processed_by: processedBy,
+      processed_at: this.now(),
+    });
+  }
 }

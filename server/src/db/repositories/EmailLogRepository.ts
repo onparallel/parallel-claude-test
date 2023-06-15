@@ -44,12 +44,14 @@ export class EmailLogRepository extends BaseRepository {
     return rows;
   }
 
-  async updateWithResponse(id: number, data: Partial<EmailLog>) {
+  async updateWithResponse(id: number, data: Partial<EmailLog>, processedBy: string) {
     return await this.from("email_log")
       .update(
         {
           ...data,
           sent_at: this.now(),
+          processed_by: processedBy,
+          processed_at: this.now(),
         },
         "*"
       )

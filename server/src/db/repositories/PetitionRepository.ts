@@ -4759,6 +4759,7 @@ export class PetitionRepository extends BaseRepository {
       .update({
         ...data,
         updated_at: this.now(),
+        processed_at: data.status === "PROCESSED" ? this.now() : undefined,
       })
       .returning("*");
 
@@ -5979,6 +5980,13 @@ export class PetitionRepository extends BaseRepository {
       .returning("*");
 
     return event as unknown as TableTypes[TName] | undefined;
+  }
+
+  async markEventAsProcessed(id: number, processedBy: string) {
+    await this.from("petition_event").where("id", id).update({
+      processed_at: this.now(),
+      processed_by: processedBy,
+    });
   }
 
   /**

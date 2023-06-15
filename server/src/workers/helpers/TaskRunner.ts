@@ -17,7 +17,7 @@ export abstract class TaskRunner<T extends TaskName> {
 
     try {
       const output = await this.run({ signal: this.abort.signal });
-      await this.ctx.tasks.taskCompleted(this.task.id, output, `TaskWorker:${this.task.id}`);
+      await this.ctx.tasks.taskCompleted(this.task.id, output, this.ctx.config.instanceName);
     } catch (error) {
       this.abort.abort();
       if (error instanceof Error) {
@@ -25,14 +25,14 @@ export abstract class TaskRunner<T extends TaskName> {
         await this.ctx.tasks.taskFailed(
           this.task.id,
           { message: error.message, stack: error.stack },
-          `TaskWorker:${this.task.id}`
+          this.ctx.config.instanceName
         );
       } else {
         this.ctx.logger.error(`Unknnown Error ${fastSafeStringify(error)}`);
         await this.ctx.tasks.taskFailed(
           this.task.id,
           { message: `Unknnown Error ${fastSafeStringify(error)}` },
-          `TaskWorker:${this.task.id}`
+          this.ctx.config.instanceName
         );
       }
     }
@@ -51,7 +51,7 @@ export abstract class TaskRunner<T extends TaskName> {
         status: "PROCESSING",
         progress: Math.round(value),
       },
-      `Task:${this.task.id}`
+      this.ctx.config.instanceName
     );
   }
 
@@ -74,7 +74,7 @@ export abstract class TaskRunner<T extends TaskName> {
         filename,
         size: res["ContentLength"]!.toString(),
       },
-      `TaskWorker:${this.task.id}`
+      this.ctx.config.instanceName
     );
   }
 }

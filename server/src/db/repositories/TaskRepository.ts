@@ -160,6 +160,8 @@ export class TaskRepository extends BaseRepository {
         progress: 100,
         output: this.json(output),
         finished_at: this.now(),
+        processed_at: this.now(),
+        processed_by: updatedBy,
       },
       updatedBy
     );
@@ -172,6 +174,8 @@ export class TaskRepository extends BaseRepository {
         status: "FAILED",
         error_data: errorData,
         finished_at: this.now(),
+        processed_at: this.now(),
+        processed_by: updatedBy,
       },
       updatedBy
     );

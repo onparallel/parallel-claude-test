@@ -72,12 +72,7 @@ async function startSignatureProcess(
       includeAnnexedDocuments: true,
     });
 
-    const documentTmpFile = await storeTemporaryDocument(
-      documentTmpPath,
-      outputFileName,
-      integration.id,
-      ctx
-    );
+    const documentTmpFile = await storeTemporaryDocument(documentTmpPath, outputFileName, ctx);
 
     await ctx.petitions.updatePetitionSignatures(signature.id, {
       temporary_file_document_id: documentTmpFile.id,
@@ -135,6 +130,7 @@ async function startSignatureProcess(
         signersInfo: updatedSignersInfo,
       },
       status: "PROCESSED",
+      processed_by: ctx.config.instanceName,
     });
   } catch (error) {
     const errorCode =
@@ -175,7 +171,7 @@ async function startSignatureProcess(
           signersInfo: signature.signature_config.signersInfo,
         },
       },
-      `SignatureWorker:${payload.petitionSignatureRequestId}`
+      ctx.config.instanceName
     );
 
     if (errorCode === "UNKNOWN_ERROR") {
@@ -316,7 +312,7 @@ async function storeSignedDocument(
     await ctx.petitions.updatePetition(
       petition.id,
       { signature_config: null }, // when completed, set signature_config to null so the signatures card on replies page don't show a "pending start" row
-      `SignatureWorker:${payload.petitionSignatureRequestId}`
+      ctx.config.instanceName
     );
 
     const petitionSignatures = await ctx.petitions.loadPetitionSignaturesByPetitionId(petition.id);
@@ -327,7 +323,7 @@ async function storeSignedDocument(
       await ctx.emails.sendPetitionCompletedEmail(
         petition.id,
         { signer: payload.signer },
-        `SignatureWorker:${payload.petitionSignatureRequestId}`
+        ctx.config.instanceName
       );
     }
   } catch (error) {
@@ -524,17 +520,12 @@ async function storeDocument(
       size: res["ContentLength"]!.toString(),
       upload_complete: true,
     },
-    `OrgIntegration:${integrationId}`
+    ctx.config.instanceName
   );
   return file;
 }
 
-async function storeTemporaryDocument(
-  filePath: string,
-  filename: string,
-  integrationId: number,
-  ctx: WorkerContext
-) {
+async function storeTemporaryDocument(filePath: string, filename: string, ctx: WorkerContext) {
   const path = random(16);
   const buffer = await readFile(filePath);
   const res = await ctx.storage.temporaryFiles.uploadFile(path, "application/pdf", buffer);
@@ -546,7 +537,7 @@ async function storeTemporaryDocument(
       path,
       size: res["ContentLength"]!.toString(),
     },
-    `OrgIntegration:${integrationId}`
+    ctx.config.instanceName
   );
 }
 

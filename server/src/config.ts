@@ -7,6 +7,7 @@ export type Config = ReturnType<typeof buildConfig>;
 
 export function buildConfig() {
   return deepFreeze({
+    instanceName: process.env.INSTANCE_NAME!,
     db: {
       "read-write": {
         host: process.env.DB_HOST!,

@@ -103,7 +103,7 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
           await ctx.subscriptions.updateSubscription(
             subscription.id,
             { is_failing: false },
-            `EventProcessorWorker:${event.id}`
+            ctx.config.instanceName
           );
         }
       } catch (e) {
@@ -117,7 +117,7 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
           await ctx.subscriptions.updateSubscription(
             subscription.id,
             { is_failing: true },
-            `EventProcessorWorker:${event.id}`
+            ctx.config.instanceName
           );
         }
       }

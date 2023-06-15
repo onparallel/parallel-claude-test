@@ -29,7 +29,7 @@ export type TaskWorkerPayload = {
 createQueueWorker(
   "task-worker",
   async ({ taskId }, ctx) => {
-    const task = await ctx.tasks.pickupTask(taskId, `TaskWorker:${taskId}`);
+    const task = await ctx.tasks.pickupTask(taskId, ctx.config.instanceName);
     if (!isDefined(task)) {
       return;
     }
@@ -38,8 +38,8 @@ createQueueWorker(
   },
   {
     forkHandlers: true,
-    async onForkTimeout({ taskId }: TaskWorkerPayload, context) {
-      await context.tasks.taskFailed(taskId, { message: "Timeout" }, `TaskWorker:${taskId}`);
+    async onForkTimeout({ taskId }, ctx) {
+      await ctx.tasks.taskFailed(taskId, { message: "Timeout" }, ctx.config.instanceName);
     },
   }
 );
