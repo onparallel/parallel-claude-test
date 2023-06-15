@@ -44,7 +44,7 @@ const SUBNET_ID = {
   "eu-central-1c": "subnet-eb22c4a7",
 };
 const numInstances = {
-  production: 1,
+  production: 2,
   staging: 1,
 };
 
