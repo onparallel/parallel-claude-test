@@ -7,8 +7,10 @@ import { EncryptionService } from "../src/services/EncryptionService";
 import { defaultBrandTheme } from "../src/util/BrandTheme";
 import { deleteAllData } from "../src/util/knexUtils";
 import { defaultPdfDocumentTheme } from "../src/util/PdfDocumentTheme";
+import { loadEnv } from "../src/util/loadEnv";
 
 export async function seed(knex: Knex): Promise<any> {
+  await loadEnv();
   await deleteAllData(knex);
 
   const encryption = new EncryptionService({
