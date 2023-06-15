@@ -80,6 +80,7 @@ export function buildConfig() {
         queueUrl: process.env.WORKERS_EMAIL_SENDER_ENDPOINT!,
         visibilityTimeout: parseInt(process.env.WORKERS_EMAIL_SENDER_VISIBILITY_TIMEOUT!),
         heartbeatInterval: parseInt(process.env.WORKERS_EMAIL_SENDER_HEARTBEAT_INTERVAL!),
+        rateLimit: parseInt(process.env.WORKERS_EMAIL_SENDER_RATE_LIMIT!),
       },
       "email-events": {
         queueUrl: process.env.WORKERS_EMAIL_EVENTS_ENDPOINT!,

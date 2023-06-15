@@ -23,6 +23,7 @@ import { signatureCancelledNoCreditsLeft } from "./emails/signature-cancelled-no
 import { signatureCancelledRequestError } from "./emails/signature-cancelled-request-error";
 import { transferParallels } from "./emails/transfer-parallels";
 import { createQueueWorker } from "./helpers/createQueueWorker";
+import { RateLimitGuard } from "./helpers/RateLimitGuard";
 
 const builders = {
   "petition-completed": petitionCompleted,
@@ -62,7 +63,10 @@ export type EmailSenderWorkerPayload = {
   };
 }[EmailType];
 
-createQueueWorker("email-sender", async (payload, context) => {
+let limiter: RateLimitGuard | undefined;
+
+createQueueWorker("email-sender", async (payload, context, config) => {
+  limiter ??= new RateLimitGuard(config.rateLimit);
   const builder = builders[payload.type];
   const emails = await builder(payload.payload as any, context);
   for (const email of unMaybeArray(emails)) {
@@ -81,6 +85,7 @@ createQueueWorker("email-sender", async (payload, context) => {
         continue;
       }
       const attachments = await context.emailLogs.getEmailAttachments(email.id);
+      await limiter.waitUntilAllowed();
       const result = await context.smtp.sendEmail({
         from: email.from,
         to: email.to,

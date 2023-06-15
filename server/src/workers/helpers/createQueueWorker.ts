@@ -60,8 +60,6 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
     onForkTimeout: noop,
     ...options,
   };
-  const container = createContainer();
-  const config = container.get<Config>(CONFIG);
   yargs
     .command(
       "run [payload]",
@@ -73,9 +71,12 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
           demandOption: true,
         }),
       async ({ payload }: { payload: string }) => {
+        const container = createContainer();
+        const config = container.get<Config>(CONFIG);
         const context = container.get<WorkerContext>(WorkerContext);
+        const queueConfig = config.queueWorkers[name];
         try {
-          await handler(parser(payload), context, config.queueWorkers[name]);
+          await handler(parser(payload), context, queueConfig);
         } catch (e) {
           if (e instanceof Error) {
             context.logger.error(e.message, { stack: e.stack });
@@ -91,14 +92,16 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
       "start",
       "Start listening to the queue",
       () => {},
-      () => {
+      async () => {
+        const container = createContainer();
         const logger = container.get<ILogger>(LOGGER);
         const config = container.get<Config>(CONFIG);
 
+        const queueConfig = config.queueWorkers[name];
         const consumer = Consumer.create({
-          queueUrl: config.queueWorkers[name].queueUrl,
-          visibilityTimeout: config.queueWorkers[name].visibilityTimeout,
-          heartbeatInterval: config.queueWorkers[name].heartbeatInterval,
+          queueUrl: queueConfig.queueUrl,
+          visibilityTimeout: queueConfig.visibilityTimeout,
+          heartbeatInterval: queueConfig.heartbeatInterval,
           batchSize: 3,
           handleMessage: async (message) => {
             logger.info("Start processing message", { payload: message.Body });
@@ -131,7 +134,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                       await onForkTimeout?.(
                         parser(message.Body!),
                         container.get<WorkerContext>(WorkerContext),
-                        config.queueWorkers[name]
+                        queueConfig
                       );
                     }
                     throw e;
