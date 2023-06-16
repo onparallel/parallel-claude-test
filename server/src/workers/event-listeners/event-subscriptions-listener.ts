@@ -92,7 +92,7 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
           body,
           headers,
           maxRetries: 3,
-          delay: 5_000,
+          timeout: 15_000,
         });
         if (!response.ok) {
           throw new Error(
