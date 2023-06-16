@@ -122,6 +122,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         data: { user_id: users[0].id },
         created_at: event.created_at,
         processed_at: event.processed_at,
+        processed_by: event.processed_by,
       },
       ctx
     );
@@ -147,7 +148,7 @@ describe("Worker - Event Subscriptions Listener", () => {
           "Content-Type": "application/json",
           "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
         },
-        delay: 5_000,
+        timeout: 15_000,
         maxRetries: 3,
       }
     );
@@ -161,7 +162,7 @@ describe("Worker - Event Subscriptions Listener", () => {
           "Content-Type": "application/json",
           "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
         },
-        delay: 5_000,
+        timeout: 15_000,
         maxRetries: 3,
       }
     );
@@ -175,7 +176,7 @@ describe("Worker - Event Subscriptions Listener", () => {
           "Content-Type": "application/json",
           "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
         },
-        delay: 5_000,
+        timeout: 15_000,
         maxRetries: 3,
       }
     );
@@ -193,6 +194,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         data: { user_id: users[1].id },
         created_at: event.created_at,
         processed_at: event.processed_at,
+        processed_by: event.processed_by,
       },
       ctx
     );
@@ -218,7 +220,7 @@ describe("Worker - Event Subscriptions Listener", () => {
           "Content-Type": "application/json",
           "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
         },
-        delay: 5_000,
+        timeout: 15_000,
         maxRetries: 3,
       }
     );
@@ -245,6 +247,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         data: { user_id: users[1].id },
         created_at: event.created_at,
         processed_at: event.processed_at,
+        processed_by: event.processed_by,
       },
       ctx
     );
@@ -270,7 +273,7 @@ describe("Worker - Event Subscriptions Listener", () => {
           "Content-Type": "application/json",
           "User-Agent": "Parallel Webhooks (https://www.onparallel.com)",
         },
-        delay: 5_000,
+        timeout: 15_000,
         maxRetries: 3,
       }
     );
@@ -287,7 +290,7 @@ describe("Worker - Event Subscriptions Listener", () => {
           "X-Parallel-Signature-1": expect.any(String),
           "X-Parallel-Signature-2": expect.any(String),
         },
-        delay: 5_000,
+        timeout: 15_000,
         maxRetries: 3,
       }
     );
@@ -329,6 +332,7 @@ describe("Worker - Event Subscriptions Listener", () => {
         data: { user_id: users[0].id },
         created_at: event.created_at,
         processed_at: event.processed_at,
+        processed_by: event.processed_by,
       },
       ctx
     );
