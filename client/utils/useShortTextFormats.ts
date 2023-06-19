@@ -14,9 +14,8 @@ export type ShortTextFormat = ShortTextFormatImplementation & {
   inputProps?: any;
   validate?: (value: string) => boolean;
 };
-type ShortTextFormatImplementation =
-  | { type: "INPUT" }
-  | { type: "MASK"; maskProps: IMask.AnyMaskedOptions };
+
+type ShortTextFormatImplementation = { type: "INPUT" } | { type: "MASK"; maskProps: any };
 
 const prepare = (str: string) => str.toUpperCase();
 
@@ -68,9 +67,9 @@ export function useShortTextFormats() {
             };
           }),
           prepare,
-          dispatch: function (appended, { value, compiledMasks }) {
+          dispatch: function (appended: string, { value, compiledMasks }: any) {
             const prefix = (value + appended).slice(0, 2);
-            const mask = compiledMasks.find((m) => {
+            const mask = compiledMasks.find((m: any) => {
               return ((m as any).country as string).startsWith(prefix);
             })!;
             return mask;
