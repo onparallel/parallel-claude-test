@@ -1,7 +1,7 @@
 import "reflect-metadata";
 // keep this space to prevent import sorting, removing init from top
 import { SQSClient } from "@aws-sdk/client-sqs";
-import { Consumer } from "@rxfork/sqs-consumer";
+import { Consumer } from "sqs-consumer";
 import { fork } from "child_process";
 import { MaybePromise } from "nexus/dist/core";
 import { noop } from "remeda";
@@ -38,6 +38,7 @@ export type QueueWorkerOptions<Q extends keyof Config["queueWorkers"]> = {
     config: Config["queueWorkers"][Q]
   ) => MaybePromise<void>;
   parser?: (message: string) => QueueWorkerPayload<Q>;
+  batchSize?: number;
 };
 
 export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
@@ -53,11 +54,12 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
 
   const script = process.argv[1];
 
-  const { parser, forkHandlers, forkTimeout, onForkTimeout } = {
+  const { parser, forkHandlers, forkTimeout, onForkTimeout, batchSize } = {
     parser: (message: string) => JSON.parse(message) as QueueWorkerPayload<Q>,
     forkHandlers: false,
     forkTimeout: 120_000,
     onForkTimeout: noop,
+    batchSize: 3,
     ...options,
   };
   yargs
@@ -102,7 +104,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
           queueUrl: queueConfig.queueUrl,
           visibilityTimeout: queueConfig.visibilityTimeout,
           heartbeatInterval: queueConfig.heartbeatInterval,
-          batchSize: 3,
+          batchSize,
           handleMessage: async (message) => {
             logger.info("Start processing message", { payload: message.Body });
             try {

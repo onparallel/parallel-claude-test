@@ -778,7 +778,7 @@
     tslib "^2.5.0"
     uuid "^8.3.2"
 
-"@aws-sdk/client-sqs@^3.354.0":
+"@aws-sdk/client-sqs@^3.348.0", "@aws-sdk/client-sqs@^3.354.0":
   version "3.354.0"
   resolved "https://registry.yarnpkg.com/@aws-sdk/client-sqs/-/client-sqs-3.354.0.tgz#e2773ebbd2ce05e7f36b1a62b58042b2b30e0b1c"
   integrity sha512-zHhOU0nbxtwVBeuR4HJQyKjh5eBth+n2wULZet83RwMPT1EICAJbREKWbBW6Cyg395Lxtuc41Ie4lQZoKx2how==
@@ -5899,13 +5899,6 @@
     "@types/estree" "^1.0.0"
     estree-walker "^2.0.2"
     picomatch "^2.3.1"
-
-"@rxfork/sqs-consumer@^6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@rxfork/sqs-consumer/-/sqs-consumer-6.0.0.tgz#4fafa7896c4e8cc102ecb65afbf8fc1be5bf3017"
-  integrity sha512-PdxLrHUSbvsHsN1OG6g8V1Ooq9OurnhET+DNNGYiMKZ6oQ94CWZIA9dAgVp/+OS1YMcSKYtqlqi3LtTSZIOiLg==
-  dependencies:
-    debug "^4.1.1"
 
 "@segment/loosely-validate-event@^2.0.0":
   version "2.0.0"
@@ -18878,6 +18871,14 @@ sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
   integrity sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==
+
+sqs-consumer@^7.2.0:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/sqs-consumer/-/sqs-consumer-7.2.0.tgz#92fbe7e83f33c2df7a84b8c157edd5505ebfd83b"
+  integrity sha512-Ewosn9/ui8O0bNGHwIqAvHDpb7fyJ77MiqAiD4Of0Jmi8oxAkAyztsuMEo5JvVJBPh+J2/FY5ky8TOCrDP2sEw==
+  dependencies:
+    "@aws-sdk/client-sqs" "^3.348.0"
+    debug "^4.3.4"
 
 ssri@^10.0.0:
   version "10.0.3"
