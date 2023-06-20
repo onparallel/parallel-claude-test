@@ -8,6 +8,7 @@ import { lambdas } from "./lambdas";
 import { oauth } from "./oauth";
 import { api as publicApi } from "./public/index";
 import { webhooks } from "./webhooks";
+import { monitor } from "./monitor";
 
 export function api(container: Container) {
   const logger = container.get<ILogger>(LOGGER);
@@ -34,6 +35,7 @@ export function api(container: Container) {
     .use("/v1", publicApi.handler())
     .use("/docs", publicApi.spec())
     .use("/oauth", oauth(container))
+    .use("/monitor", monitor(container))
     .use(((err, req, res, next) => {
       logger.error(err?.message, { stack: err?.stack });
       next(err);

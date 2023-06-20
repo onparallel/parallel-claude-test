@@ -24,6 +24,51 @@ export class RestResponseWrapper<T> implements ResponseWrapper<T> {
   }
 }
 
+export class PlainTextResponseWrapper implements ResponseWrapper<string> {
+  constructor(
+    public readonly status: number,
+    public readonly body: string,
+    public readonly headers: Record<string, string> = {}
+  ) {}
+  apply(res: Response) {
+    res.status(this.status);
+    if (this.headers) {
+      for (const [name, value] of Object.entries(this.headers)) {
+        res.header(name, value);
+      }
+    }
+    if (this.body !== undefined) {
+      res.contentType("text/plain").send(this.body);
+    } else {
+      res.contentType("text/plain").send("");
+    }
+  }
+}
+
+export function Text(
+  value: string,
+  { status = 200 }: { status?: number } = {}
+): ResponseWrapper<string> {
+  return new PlainTextResponseWrapper(status, value);
+}
+
+interface ResponseOptions {
+  description: string;
+}
+
+export function PlainTextResponse({ description }: ResponseOptions): RestResponse<string> {
+  return {
+    description,
+    content: {
+      "text/plain": {
+        schema: {
+          type: "string",
+        },
+      },
+    },
+  };
+}
+
 interface Redirect {
   __type?: "REDIRECT";
 }
@@ -50,8 +95,7 @@ export function NoContent(): ResponseWrapper<void> {
   return new RestResponseWrapper(204, undefined);
 }
 
-export interface JsonResponseOptions<T> {
-  description: string;
+export interface JsonResponseOptions<T> extends ResponseOptions {
   schema?: JsonSchemaFor<T>;
 }
 
@@ -69,21 +113,13 @@ export function JsonResponse<T = any>({
   };
 }
 
-export interface ErrorResponseOptions {
-  description: string;
-}
-
-export function ErrorResponse({ description }: ErrorResponseOptions): JsonResponseOptions<never> {
+export function ErrorResponse({ description }: ResponseOptions): RestResponse<never> {
   return {
     description,
   };
 }
 
-export interface NoContentResponseOptions {
-  description: string;
-}
-
-export function NoContentResponse({ description }: NoContentResponseOptions): RestResponse<void> {
+export function NoContentResponse({ description }: ResponseOptions): RestResponse<void> {
   return {
     description,
   };

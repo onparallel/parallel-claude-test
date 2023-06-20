@@ -1,36 +1,41 @@
 import { waitFor } from "../../util/promises/waitFor";
 
+interface RateLimitBucket {
+  lastSlot: bigint;
+  queue: (() => void)[];
+  isRunning: boolean;
+}
+
 export class RateLimitGuard {
   private intervalInNs: bigint;
-  private lastSlot = 0n;
-  private queue: (() => void)[] = [];
-  private isRunning = false;
+  private buckets: Record<string, RateLimitBucket> = {};
 
   constructor(rateLimitPerSecond: number) {
-    this.intervalInNs = BigInt(1e9) / BigInt(rateLimitPerSecond);
+    this.intervalInNs = BigInt(1e9 / rateLimitPerSecond);
   }
 
-  waitUntilAllowed(): Promise<void> {
+  waitUntilAllowed(bucketName = "undefined"): Promise<void> {
     const promise = new Promise<void>((resolve) => {
-      this.queue.push(() => resolve());
+      this.buckets[bucketName] ??= { lastSlot: 0n, queue: [], isRunning: false };
+      this.buckets[bucketName].queue.push(() => resolve());
     });
-    this.runQueue().then();
+    this.runQueue(bucketName).then();
     return promise;
   }
 
-  private async runQueue() {
-    if (this.isRunning) {
+  private async runQueue(bucketName: string) {
+    if (this.buckets[bucketName].isRunning) {
       return;
     }
     try {
-      this.isRunning = true;
-      while (this.queue.length > 0) {
+      this.buckets[bucketName].isRunning = true;
+      while (this.buckets[bucketName].queue.length > 0) {
         const now = process.hrtime.bigint();
-        const ellapsed = now - this.lastSlot;
+        const ellapsed = now - this.buckets[bucketName].lastSlot;
         if (ellapsed > this.intervalInNs) {
-          this.lastSlot = now;
-          this.queue.shift()!();
-          if (this.queue.length === 0) {
+          this.buckets[bucketName].lastSlot = now;
+          this.buckets[bucketName].queue.shift()!();
+          if (this.buckets[bucketName].queue.length === 0) {
             return;
           }
           await waitFor(Number(this.intervalInNs / BigInt(1e6)));
@@ -39,7 +44,7 @@ export class RateLimitGuard {
         }
       }
     } finally {
-      this.isRunning = false;
+      this.buckets[bucketName].isRunning = false;
     }
   }
 }

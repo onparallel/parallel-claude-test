@@ -188,8 +188,14 @@ const _PathResolver: any = (function () {
         );
       }
       this.router[method](this.path, ...unMaybeArray(middleware), async (req, res, next) => {
-        const response: ResponseWrapper<any> = await (async () => {
+        const response = await (async () => {
+          const controller = new AbortController();
           try {
+            req.once("close", () => {
+              if (!res.headersSent) {
+                controller.abort();
+              }
+            });
             const context: RestApiContext<TContext> = ((await this.apiOptions.context?.({
               req,
               res,
@@ -235,9 +241,13 @@ const _PathResolver: any = (function () {
                 }
               }
             );
+            context.signal = controller.signal;
             body?.validate?.(req, context);
             return await resolver(context);
           } catch (error: any) {
+            if (controller.signal.aborted) {
+              return;
+            }
             if (error instanceof HttpError) {
               return error;
             } else if (this.apiOptions.errorHandler) {
@@ -257,7 +267,7 @@ const _PathResolver: any = (function () {
         if (operationOptions.deprecated) {
           res.header("Warning", "Deprecated API");
         }
-        response.apply(res);
+        response?.apply(res);
       });
       return this;
     };
@@ -276,7 +286,7 @@ type ErrorHandler = (error: Error) => MaybePromise<ResponseWrapper<any>>;
 export interface RestApiOptions<TContext = {}> {
   openapi: string;
   info: OpenAPIV3.InfoObject & {
-    "x-logo": {
+    "x-logo"?: {
       /**
        * The URL pointing to the spec logo.
        * MUST be in the format of a URL.
@@ -312,6 +322,7 @@ export type RestApiContext<TContext = {}, TParams = any, TQuery = any, TBody = a
   query: TQuery;
   body: TBody;
   files: Record<string, File[]>;
+  signal: AbortSignal;
 };
 
 export class RestApi<TContext = {}> {
@@ -332,7 +343,7 @@ export class RestApi<TContext = {}> {
   private paths: PathResolver<TContext, any, any>[] = [];
   private _spec: Omit<RestApiOptions, "middleware">;
 
-  constructor(private apiOptions: RestApiOptions<TContext>) {
+  constructor(private apiOptions: RestApiOptions<TContext> = {} as RestApiOptions<TContext>) {
     this._spec = omit(apiOptions, ["context", "errorHandler"]);
   }
 
