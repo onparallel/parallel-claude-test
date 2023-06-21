@@ -168,6 +168,11 @@ export function buildConfig() {
       saldadosHost: process.env.BANKFLIP_SALDADOS_HOST!,
       saldadosApiKey: process.env.BANKFLIP_SALDADOS_API_KEY!,
       saldadosWebhookSecret: process.env.BANKFLIP_SALDADOS_WEBHOOK_SECRET!,
+      // same for Debify
+      debifyOrgId: process.env.BANKFLIP_DEBIFY_ORG_GID,
+      debifyHost: process.env.BANKFLIP_DEBIFY_HOST!,
+      debifyApiKey: process.env.BANKFLIP_DEBIFY_API_KEY!,
+      debifyWebhookSecret: process.env.BANKFLIP_DEBIFY_WEBHOOK_SECRET!,
     },
     oauth: {
       docusign: {

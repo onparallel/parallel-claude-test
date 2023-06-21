@@ -113,21 +113,36 @@ export class BankflipService implements IBankflipService {
   ) {}
 
   public webhookSecret(orgId: string) {
-    return orgId === this.config.bankflip.saldadosOrgId
-      ? this.config.bankflip.saldadosWebhookSecret
-      : this.config.bankflip.webhookSecret;
+    switch (orgId) {
+      case this.config.bankflip.saldadosOrgId:
+        return this.config.bankflip.saldadosWebhookSecret;
+      case this.config.bankflip.debifyOrgId:
+        return this.config.bankflip.debifyWebhookSecret;
+      default:
+        return this.config.bankflip.webhookSecret;
+    }
   }
 
   private bankflipHost(orgId: string) {
-    return orgId === this.config.bankflip.saldadosOrgId
-      ? this.config.bankflip.saldadosHost
-      : this.config.bankflip.host;
+    switch (orgId) {
+      case this.config.bankflip.saldadosOrgId:
+        return this.config.bankflip.saldadosHost;
+      case this.config.bankflip.debifyOrgId:
+        return this.config.bankflip.debifyHost;
+      default:
+        return this.config.bankflip.host;
+    }
   }
 
   private bankflipApiKey(orgId: string) {
-    return orgId === this.config.bankflip.saldadosOrgId
-      ? this.config.bankflip.saldadosApiKey
-      : this.config.bankflip.apiKey;
+    switch (orgId) {
+      case this.config.bankflip.saldadosOrgId:
+        return this.config.bankflip.saldadosApiKey;
+      case this.config.bankflip.debifyOrgId:
+        return this.config.bankflip.debifyApiKey;
+      default:
+        return this.config.bankflip.apiKey;
+    }
   }
 
   private async apiRequest<T>(
