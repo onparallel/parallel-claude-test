@@ -62,7 +62,9 @@ async function main() {
             head: [],
         },
     });
-    table.push(...instances.map((i) => {
+    table.push(...instances
+        .filter((i) => { var _a; return ((_a = i.State) === null || _a === void 0 ? void 0 : _a.Name) !== "terminated"; })
+        .map((i) => {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         const state = (() => {
             var _a, _b;

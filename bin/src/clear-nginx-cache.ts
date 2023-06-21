@@ -3,8 +3,9 @@ import {
   DescribeInstanceHealthCommand,
   ElasticLoadBalancingClient,
 } from "@aws-sdk/client-elastic-load-balancing";
-import { execSync } from "child_process";
+import pMap from "p-map";
 import { run } from "./utils/run";
+import { executeRemoteCommand } from "./utils/ssh";
 
 const ec2 = new EC2Client({});
 const elb = new ElasticLoadBalancingClient({});
@@ -23,18 +24,13 @@ async function main() {
       LoadBalancerName: "parallel-production",
     })
   );
-  for (const state of descriptions.InstanceStates!) {
-    if (state.State === "InService") {
-      const instance = instances.find((i) => i.InstanceId === state.InstanceId);
-      execSync(
-        `ssh \
-        -o "UserKnownHostsFile=/dev/null" \
-        -o StrictHostKeyChecking=no \
-        ${instance?.PrivateIpAddress} sudo rm -r /var/cache/nginx/*`,
-        { encoding: "utf-8", stdio: "inherit" }
-      );
+  await pMap(
+    descriptions.InstanceStates!.filter((s) => s.State === "InService"),
+    async (state) => {
+      const instance = instances.find((i) => i.InstanceId === state.InstanceId)!;
+      await executeRemoteCommand(instance.PrivateIpAddress!, "sudo rm -r /var/cache/nginx/*");
     }
-  }
+  );
 }
 
 run(main);

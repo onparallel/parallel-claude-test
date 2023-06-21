@@ -5,11 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_ec2_1 = require("@aws-sdk/client-ec2");
 const chalk_1 = __importDefault(require("chalk"));
-const child_process_1 = require("child_process");
 const p_map_1 = __importDefault(require("p-map"));
 const remeda_1 = require("remeda");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
+const ssh_1 = require("./utils/ssh");
 const wait_1 = require("./utils/wait");
 const INSTANCE_TYPES = {
     production: "t2.large",
@@ -142,35 +142,19 @@ async function main() {
         console.log((0, chalk_1.default) `Instance {bold ${instanceId}} {green ✓ running}`);
         await waitForInstance(ipAddress);
         console.log((0, chalk_1.default) `Uploading install script to {bold ${instanceId}}.`);
-        copyToRemoteServer(ipAddress, `${OPS_DIR}/bootstrap.sh`, `${HOME_DIR}/`);
-        executeRemoteCommand(ipAddress, `${HOME_DIR}/bootstrap.sh`);
+        await (0, ssh_1.copyToRemoteServer)(ipAddress, `${OPS_DIR}/bootstrap.sh`, `${HOME_DIR}/`);
+        await (0, ssh_1.executeRemoteCommand)(ipAddress, `${HOME_DIR}/bootstrap.sh`);
     }, { concurrency: 4 });
 }
 (0, run_1.run)(main);
 async function waitForInstance(ipAddress) {
     await (0, wait_1.waitFor)(async () => {
         try {
-            (0, child_process_1.execSync)(`ssh \
-            -o ConnectTimeout=1 \
-            -o "UserKnownHostsFile=/dev/null" \
-            -o StrictHostKeyChecking=no \
-            ec2-user@${ipAddress} true >/dev/null 2>&1`);
+            await (0, ssh_1.pingSsh)(ipAddress);
             return true;
         }
         catch {
             return false;
         }
     }, (0, chalk_1.default) `SSH not available. Waiting 5 more seconds...`, 5000);
-}
-function executeRemoteCommand(ipAddress, command) {
-    (0, child_process_1.execSync)(`ssh \
-  -o "UserKnownHostsFile=/dev/null" \
-  -o StrictHostKeyChecking=no \
-  ${ipAddress} ${command}`);
-}
-function copyToRemoteServer(ipAddress, from, to) {
-    (0, child_process_1.execSync)(`scp \
-  -o "UserKnownHostsFile=/dev/null" \
-  -o StrictHostKeyChecking=no \
-  ${from} ${ipAddress}:${to}`);
 }

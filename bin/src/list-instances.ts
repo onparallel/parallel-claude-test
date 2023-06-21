@@ -70,41 +70,43 @@ async function main() {
     },
   });
   table.push(
-    ...instances.map((i) => {
-      const state = (() => {
-        switch (i.State?.Name) {
-          case "running":
-            return chalk.green("✓ Running");
-          case "stopped":
-            return chalk.red("⨯ Stopped");
-          case "terminated":
-            return chalk.red("⨯ Terminated");
-          default:
-            return chalk.yellow(i.State?.Name);
-        }
-      })();
-      const health = (() => {
-        switch (instancesToLbState[i.InstanceId!]) {
-          case "InService":
-            return chalk.green("✓ InService");
-          case undefined:
-            return chalk.red("⨯");
-          default:
-            return chalk.yellow(`… ${instancesToLbState[i.InstanceId!]}`);
-        }
-      })();
-      return [
-        i.InstanceId!,
-        i.PrivateIpAddress!,
-        i.Tags?.find((t) => t.Key === "Name")?.Value ?? chalk.gray`-`,
-        i.Tags?.find((t) => t.Key === "Release")?.Value ?? chalk.gray`-`,
-        i.Placement?.AvailabilityZone,
-        state,
-        instancesToLb[i.InstanceId!] ?? chalk.red`⨯`,
-        health,
-        i.LaunchTime?.toLocaleString("en-GB"),
-      ];
-    })
+    ...instances
+      .filter((i) => i.State?.Name !== "terminated")
+      .map((i) => {
+        const state = (() => {
+          switch (i.State?.Name) {
+            case "running":
+              return chalk.green("✓ Running");
+            case "stopped":
+              return chalk.red("⨯ Stopped");
+            case "terminated":
+              return chalk.red("⨯ Terminated");
+            default:
+              return chalk.yellow(i.State?.Name);
+          }
+        })();
+        const health = (() => {
+          switch (instancesToLbState[i.InstanceId!]) {
+            case "InService":
+              return chalk.green("✓ InService");
+            case undefined:
+              return chalk.red("⨯");
+            default:
+              return chalk.yellow(`… ${instancesToLbState[i.InstanceId!]}`);
+          }
+        })();
+        return [
+          i.InstanceId!,
+          i.PrivateIpAddress!,
+          i.Tags?.find((t) => t.Key === "Name")?.Value ?? chalk.gray`-`,
+          i.Tags?.find((t) => t.Key === "Release")?.Value ?? chalk.gray`-`,
+          i.Placement?.AvailabilityZone,
+          state,
+          instancesToLb[i.InstanceId!] ?? chalk.red`⨯`,
+          health,
+          i.LaunchTime?.toLocaleString("en-GB"),
+        ];
+      })
   );
   console.log(table.toString());
 }

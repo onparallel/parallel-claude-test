@@ -19,11 +19,11 @@ import {
   RegisterInstancesWithLoadBalancerCommand,
 } from "@aws-sdk/client-elastic-load-balancing";
 import chalk from "chalk";
-import { execSync } from "child_process";
 import pMap from "p-map";
 import { zip } from "remeda";
 import yargs from "yargs";
 import { run } from "./utils/run";
+import { executeRemoteCommand } from "./utils/ssh";
 import { waitFor } from "./utils/wait";
 
 const ec2 = new EC2Client({});
@@ -81,7 +81,7 @@ async function main() {
       throw new Error("Not enough available elastic IPs");
     }
 
-    for (const [instance, address] of zip(newInstances, availableAddresses)) {
+    await pMap(zip(newInstances, availableAddresses), async ([instance, address]) => {
       const addressName = address.Tags!.find((t) => t.Key === "Name")!.Value!;
       console.log(`Associating address ${addressName} with instance ${instance.InstanceId}`);
       await ec2.send(
@@ -90,15 +90,15 @@ async function main() {
           AllocationId: address.AllocationId,
         })
       );
-    }
+    });
   }
 
-  for (const instance of newInstances) {
+  await pMap(newInstances, async (instance) => {
     const ipAddress = instance.PrivateIpAddress!;
     const instanceName = instance.Tags?.find((t) => t.Key === "Name")!.Value;
-    executeRemoteCommand(ipAddress, `${OPS_DIR}/server.sh start`);
+    await executeRemoteCommand(ipAddress, `${OPS_DIR}/server.sh start`);
     console.log(chalk.green`Server started in ${instance.InstanceId} ${instanceName}`);
-  }
+  });
 
   const oldInstancesFull = oldInstances.length
     ? await ec2
@@ -110,7 +110,7 @@ async function main() {
     const ipAddress = instance.PrivateIpAddress!;
     const instanceName = instance.Tags?.find((t) => t.Key === "Name")!.Value;
     console.log(chalk.yellow`Stopping workers on ${instance.InstanceId!} ${instanceName}`);
-    executeRemoteCommand(ipAddress, `${OPS_DIR}/workers.sh stop`);
+    await executeRemoteCommand(ipAddress, `${OPS_DIR}/workers.sh stop`);
     console.log(chalk.green.bold`Workers stopped on ${instance.InstanceId!} ${instanceName}`);
   });
 
@@ -202,23 +202,16 @@ async function main() {
     const ipAddress = instance.PrivateIpAddress!;
     const instanceName = instance.Tags?.find((t) => t.Key === "Name")!.Value;
     console.log(chalk.yellow`Starting workers on ${instance.InstanceId!} ${instanceName}`);
-    executeRemoteCommand(ipAddress, `${OPS_DIR}/workers.sh start`);
+    await executeRemoteCommand(ipAddress, `${OPS_DIR}/workers.sh start`);
     console.log(chalk.green.bold`Workers started on ${instance.InstanceId!} ${instanceName}`);
   });
 
   await pMap(oldInstancesFull, async (instance) => {
     const ipAddress = instance.PrivateIpAddress!;
     const instanceName = instance.Tags?.find((t) => t.Key === "Name")!.Value;
-    executeRemoteCommand(ipAddress, `${OPS_DIR}/server.sh stop`);
+    await executeRemoteCommand(ipAddress, `${OPS_DIR}/server.sh stop`);
     console.log(chalk.green`Server stopped in ${instance.InstanceId} ${instanceName}`);
   });
 }
 
 run(main);
-
-function executeRemoteCommand(ipAddress: string, command: string) {
-  execSync(`ssh \
-  -o "UserKnownHostsFile=/dev/null" \
-  -o StrictHostKeyChecking=no \
-  ${ipAddress} ${command}`);
-}

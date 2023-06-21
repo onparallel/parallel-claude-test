@@ -7,18 +7,17 @@ const client_cloudfront_1 = require("@aws-sdk/client-cloudfront");
 const client_ec2_1 = require("@aws-sdk/client-ec2");
 const client_elastic_load_balancing_1 = require("@aws-sdk/client-elastic-load-balancing");
 const chalk_1 = __importDefault(require("chalk"));
-const child_process_1 = require("child_process");
 const p_map_1 = __importDefault(require("p-map"));
 const remeda_1 = require("remeda");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
+const ssh_1 = require("./utils/ssh");
 const wait_1 = require("./utils/wait");
 const ec2 = new client_ec2_1.EC2Client({});
 const elb = new client_elastic_load_balancing_1.ElasticLoadBalancingClient({});
 const cloudfront = new client_cloudfront_1.CloudFrontClient({});
 const OPS_DIR = "/home/ec2-user/main/ops/prod";
 async function main() {
-    var _a;
     const { commit: _commit, env } = await yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")
         .option("commit", {
@@ -56,21 +55,22 @@ async function main() {
         if (availableAddresses.length < newInstances.length) {
             throw new Error("Not enough available elastic IPs");
         }
-        for (const [instance, address] of (0, remeda_1.zip)(newInstances, availableAddresses)) {
+        await (0, p_map_1.default)((0, remeda_1.zip)(newInstances, availableAddresses), async ([instance, address]) => {
             const addressName = address.Tags.find((t) => t.Key === "Name").Value;
             console.log(`Associating address ${addressName} with instance ${instance.InstanceId}`);
             await ec2.send(new client_ec2_1.AssociateAddressCommand({
                 InstanceId: instance.InstanceId,
                 AllocationId: address.AllocationId,
             }));
-        }
+        });
     }
-    for (const instance of newInstances) {
+    await (0, p_map_1.default)(newInstances, async (instance) => {
+        var _a;
         const ipAddress = instance.PrivateIpAddress;
         const instanceName = (_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value;
-        executeRemoteCommand(ipAddress, `${OPS_DIR}/server.sh start`);
+        await (0, ssh_1.executeRemoteCommand)(ipAddress, `${OPS_DIR}/server.sh start`);
         console.log(chalk_1.default.green `Server started in ${instance.InstanceId} ${instanceName}`);
-    }
+    });
     const oldInstancesFull = oldInstances.length
         ? await ec2
             .send(new client_ec2_1.DescribeInstancesCommand({ InstanceIds: oldInstances.map((i) => i.InstanceId) }))
@@ -81,7 +81,7 @@ async function main() {
         const ipAddress = instance.PrivateIpAddress;
         const instanceName = (_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value;
         console.log(chalk_1.default.yellow `Stopping workers on ${instance.InstanceId} ${instanceName}`);
-        executeRemoteCommand(ipAddress, `${OPS_DIR}/workers.sh stop`);
+        await (0, ssh_1.executeRemoteCommand)(ipAddress, `${OPS_DIR}/workers.sh stop`);
         console.log(chalk_1.default.green.bold `Workers stopped on ${instance.InstanceId} ${instanceName}`);
     });
     console.log(chalk_1.default.yellow `Registering new instances on LB`);
@@ -145,21 +145,15 @@ async function main() {
         const ipAddress = instance.PrivateIpAddress;
         const instanceName = (_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value;
         console.log(chalk_1.default.yellow `Starting workers on ${instance.InstanceId} ${instanceName}`);
-        executeRemoteCommand(ipAddress, `${OPS_DIR}/workers.sh start`);
+        await (0, ssh_1.executeRemoteCommand)(ipAddress, `${OPS_DIR}/workers.sh start`);
         console.log(chalk_1.default.green.bold `Workers started on ${instance.InstanceId} ${instanceName}`);
     });
     await (0, p_map_1.default)(oldInstancesFull, async (instance) => {
         var _a;
         const ipAddress = instance.PrivateIpAddress;
         const instanceName = (_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value;
-        executeRemoteCommand(ipAddress, `${OPS_DIR}/server.sh stop`);
+        await (0, ssh_1.executeRemoteCommand)(ipAddress, `${OPS_DIR}/server.sh stop`);
         console.log(chalk_1.default.green `Server stopped in ${instance.InstanceId} ${instanceName}`);
     });
 }
 (0, run_1.run)(main);
-function executeRemoteCommand(ipAddress, command) {
-    (0, child_process_1.execSync)(`ssh \
-  -o "UserKnownHostsFile=/dev/null" \
-  -o StrictHostKeyChecking=no \
-  ${ipAddress} ${command}`);
-}

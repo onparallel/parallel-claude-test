@@ -39,7 +39,13 @@ async function main() {
         if (!liveInstances.includes(instanceId)) {
             const instanceName = (_a = instance.Tags.find((t) => t.Key === "Name")) === null || _a === void 0 ? void 0 : _a.Value;
             const instanceState = instance.State.Name;
-            if (instanceState === "running") {
+            if (env === "staging" && ["running", "stopped", "stopping"].includes(instanceState)) {
+                console.log((0, chalk_1.default) `Terminating instance {bold ${instanceId}} {red {bold ${instanceName}}}`);
+                if (!dryRun) {
+                    await ec2.send(new client_ec2_1.TerminateInstancesCommand({ InstanceIds: [instanceId] }));
+                }
+            }
+            else if (instanceState === "running") {
                 console.log((0, chalk_1.default) `Stopping instance {bold ${instanceId}} {yellow {bold ${instanceName}}}`);
                 if (!dryRun) {
                     await ec2.send(new client_ec2_1.StopInstancesCommand({ InstanceIds: [instanceId] }));

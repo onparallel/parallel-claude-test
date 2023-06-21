@@ -1,6 +1,8 @@
 import {
+  DescribeImagesCommand,
   DescribeInstanceStatusCommand,
   EC2Client,
+  EC2ServiceException,
   HttpTokensState,
   InstanceMetadataEndpointState,
   InstanceMetadataTagsState,
@@ -8,15 +10,13 @@ import {
   ResourceType,
   RunInstancesCommand,
   Tenancy,
-  EC2ServiceException,
-  DescribeImagesCommand,
 } from "@aws-sdk/client-ec2";
 import chalk from "chalk";
-import { execSync } from "child_process";
 import pMap from "p-map";
 import { range } from "remeda";
 import yargs from "yargs";
 import { run } from "./utils/run";
+import { copyToRemoteServer, executeRemoteCommand, pingSsh } from "./utils/ssh";
 import { wait, waitFor } from "./utils/wait";
 
 const INSTANCE_TYPES = {
@@ -166,8 +166,8 @@ async function main() {
       await waitForInstance(ipAddress);
 
       console.log(chalk`Uploading install script to {bold ${instanceId}}.`);
-      copyToRemoteServer(ipAddress, `${OPS_DIR}/bootstrap.sh`, `${HOME_DIR}/`);
-      executeRemoteCommand(ipAddress, `${HOME_DIR}/bootstrap.sh`);
+      await copyToRemoteServer(ipAddress, `${OPS_DIR}/bootstrap.sh`, `${HOME_DIR}/`);
+      await executeRemoteCommand(ipAddress, `${HOME_DIR}/bootstrap.sh`);
     },
     { concurrency: 4 }
   );
@@ -179,13 +179,7 @@ async function waitForInstance(ipAddress: string) {
   await waitFor(
     async () => {
       try {
-        execSync(
-          `ssh \
-            -o ConnectTimeout=1 \
-            -o "UserKnownHostsFile=/dev/null" \
-            -o StrictHostKeyChecking=no \
-            ec2-user@${ipAddress} true >/dev/null 2>&1`
-        );
+        await pingSsh(ipAddress);
         return true;
       } catch {
         return false;
@@ -194,18 +188,4 @@ async function waitForInstance(ipAddress: string) {
     chalk`SSH not available. Waiting 5 more seconds...`,
     5000
   );
-}
-
-function executeRemoteCommand(ipAddress: string, command: string) {
-  execSync(`ssh \
-  -o "UserKnownHostsFile=/dev/null" \
-  -o StrictHostKeyChecking=no \
-  ${ipAddress} ${command}`);
-}
-
-function copyToRemoteServer(ipAddress: string, from: string, to: string) {
-  execSync(`scp \
-  -o "UserKnownHostsFile=/dev/null" \
-  -o StrictHostKeyChecking=no \
-  ${from} ${ipAddress}:${to}`);
 }

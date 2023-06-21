@@ -8,7 +8,7 @@ INSTANCE_NUMBER=`curl --silent -H "X-aws-ec2-metadata-token: $TOKEN" http://169.
 BUILD_ID="parallel-${ENV}-${RELEASE}"
 
 cd ${WORK_DIR}
-aws s3 cp s3://parallel-builds-${ENV}/${BUILD_ID}.tar.gz ${BUILD_ID}.tar.gz
+aws s3 cp s3://parallel-builds-${ENV}/${BUILD_ID}.tar.gz ${BUILD_ID}.tar.gz --quiet
 tar -zxpf ${BUILD_ID}.tar.gz
 ln -s ${BUILD_ID} main
 

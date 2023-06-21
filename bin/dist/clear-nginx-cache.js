@@ -1,9 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_ec2_1 = require("@aws-sdk/client-ec2");
 const client_elastic_load_balancing_1 = require("@aws-sdk/client-elastic-load-balancing");
-const child_process_1 = require("child_process");
+const p_map_1 = __importDefault(require("p-map"));
 const run_1 = require("./utils/run");
+const ssh_1 = require("./utils/ssh");
 const ec2 = new client_ec2_1.EC2Client({});
 const elb = new client_elastic_load_balancing_1.ElasticLoadBalancingClient({});
 async function main() {
@@ -15,14 +19,9 @@ async function main() {
     const descriptions = await elb.send(new client_elastic_load_balancing_1.DescribeInstanceHealthCommand({
         LoadBalancerName: "parallel-production",
     }));
-    for (const state of descriptions.InstanceStates) {
-        if (state.State === "InService") {
-            const instance = instances.find((i) => i.InstanceId === state.InstanceId);
-            (0, child_process_1.execSync)(`ssh \
-        -o "UserKnownHostsFile=/dev/null" \
-        -o StrictHostKeyChecking=no \
-        ${instance === null || instance === void 0 ? void 0 : instance.PrivateIpAddress} sudo rm -r /var/cache/nginx/*`, { encoding: "utf-8", stdio: "inherit" });
-        }
-    }
+    await (0, p_map_1.default)(descriptions.InstanceStates.filter((s) => s.State === "InService"), async (state) => {
+        const instance = instances.find((i) => i.InstanceId === state.InstanceId);
+        await (0, ssh_1.executeRemoteCommand)(instance.PrivateIpAddress, "sudo rm -r /var/cache/nginx/*");
+    });
 }
 (0, run_1.run)(main);
