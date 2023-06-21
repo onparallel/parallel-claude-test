@@ -237,7 +237,7 @@ async function recipientDelivered(ctx: ApiContext, body: DocuSignEventBody, peti
   });
 }
 
-/** signer declined the document. Whole signature process will be cancelled */
+/** signer declined the document. Whole signature process is automatically cancelled by Docusign */
 async function recipientDeclined(ctx: ApiContext, body: DocuSignEventBody, petitionId: number) {
   const signature = (await ctx.petitions.loadPetitionSignatureByExternalId(
     `DOCUSIGN/${body.data.envelopeId}`
@@ -251,23 +251,17 @@ async function recipientDeclined(ctx: ApiContext, body: DocuSignEventBody, petit
     (s) => s.recipientId === body.data.recipientId!
   )?.declinedReason;
 
-  await ctx.signature.cancelSignatureRequest(
-    signature,
-    "DECLINED_BY_SIGNER",
-    {
-      canceller,
-      decline_reason: declineReason,
-    },
-    {
-      signer_status: {
-        ...signature.signer_status,
-        [cancellerIndex]: {
-          ...signature.signer_status[cancellerIndex],
-          declined_at: new Date(body.generatedDateTime),
-        },
+  await ctx.petitions.updatePetitionSignatureRequestAsCancelled(signature.id, {
+    cancel_reason: "DECLINED_BY_SIGNER",
+    cancel_data: { canceller, decline_reason: declineReason },
+    signer_status: {
+      ...signature.signer_status,
+      [cancellerIndex]: {
+        ...signature.signer_status[cancellerIndex],
+        declined_at: new Date(body.generatedDateTime),
       },
-    }
-  );
+    },
+  });
 }
 
 /**
