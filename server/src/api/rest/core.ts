@@ -8,6 +8,7 @@ import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray, MaybePromise } from "../../util/types";
 import { HttpError, InvalidParameterError, InvalidRequestBodyError, UnknownError } from "./errors";
 import { ParseError } from "./params";
+import { Text } from "./responses";
 import { JsonSchemaFor } from "./schemas";
 
 export type File = Exclude<Request["file"], undefined>;
@@ -267,7 +268,7 @@ const _PathResolver: any = (function () {
         if (operationOptions.deprecated) {
           res.header("Warning", "Deprecated API");
         }
-        response?.apply(res);
+        (response ?? Text("")).apply(res);
       });
       return this;
     };

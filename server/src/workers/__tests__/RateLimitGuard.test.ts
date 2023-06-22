@@ -18,12 +18,10 @@ describe("RateLimitGuard", () => {
     const start = process.hrtime.bigint();
     const spy = jest.fn();
     await Promise.all([
-      Promise.all(
-        range(0, 100).map(async () => {
-          await guard.waitUntilAllowed();
-          spy();
-        })
-      ),
+      ...range(0, 100).map(async () => {
+        await guard.waitUntilAllowed();
+        spy();
+      }),
       (async () => {
         while (jest.getTimerCount() > 0) {
           await jest.advanceTimersToNextTimerAsync();
@@ -37,7 +35,6 @@ describe("RateLimitGuard", () => {
   it("ratelimits acccordingly on random calls", async () => {
     const rateLimit = 10;
     const guard = new RateLimitGuard(rateLimit);
-    const start = process.hrtime.bigint();
     const spy = jest.fn();
     let lastCall = 0n;
     await Promise.all([
@@ -45,7 +42,7 @@ describe("RateLimitGuard", () => {
         for (const i of range(0, 100)) {
           await guard.waitUntilAllowed();
           expect(process.hrtime.bigint() - lastCall).toBeGreaterThanOrEqual((1 / rateLimit) * 1e9);
-          spy();
+          spy(i);
           lastCall = process.hrtime.bigint();
           // random rate limit but still on average more intense than rateLimit
           if (i < 99) {
@@ -59,6 +56,9 @@ describe("RateLimitGuard", () => {
         }
       })(),
     ]);
-    expect(spy).toHaveBeenCalledTimes(100);
+    let counter = 1;
+    for (const i of range(0, 100)) {
+      expect(spy).toHaveBeenNthCalledWith(counter++, i);
+    }
   });
 });
