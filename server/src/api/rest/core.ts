@@ -191,7 +191,7 @@ const _PathResolver: any = (function () {
         const response = await (async () => {
           const controller = new AbortController();
           try {
-            req.once("close", () => {
+            req.socket.once("close", () => {
               if (!res.headersSent) {
                 controller.abort();
               }
