@@ -232,6 +232,7 @@ const _PetitionAccess = {
     recipientUrl: {
       description: "URL of the recipient portal for this parallel access",
       type: ["string", "null"],
+      example: "https://www.onparallel.com/petition/38s5hnjATHXJp5XWHYcucQm",
     },
   },
 } as const;
@@ -292,6 +293,7 @@ const _PetitionField = {
       description:
         "For fields of type `SELECT`, `DYNAMIC_SELECT` and `CHECKBOX`. An array with valid options for the reply.",
       items: { type: "string" },
+      example: [],
     },
     multiple: {
       type: "boolean",

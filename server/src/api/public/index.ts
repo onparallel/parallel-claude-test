@@ -25,6 +25,7 @@ import {
   SuccessResponse,
 } from "../rest/responses";
 import {
+  ActivatePetitionRecipient_reactivateAccessesDocument,
   CreateContact_contactDocument,
   CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   CreatePetition_petitionDocument,
@@ -33,6 +34,7 @@ import {
   CreatePetitionRecipients_petitionDocument,
   CreatePetitionRecipients_sendPetitionDocument,
   CreatePetitionRecipients_updateContactDocument,
+  DeactivatePetitionRecipient_deactivateAccessesDocument,
   DeletePetition_deletePetitionsDocument,
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   DeleteReply_deletePetitionReplyDocument,
@@ -143,6 +145,7 @@ import {
   PaginatedTemplates,
   PaginatedUsers,
   Petition,
+  PetitionAccess,
   PetitionCustomProperties,
   petitionEventTypes,
   PetitionField,
@@ -205,6 +208,7 @@ export const api = new RestApi({
       tags: [
         "Parallels",
         "Parallel replies",
+        "Parallel recipients",
         "Signatures",
         "Parallel Sharing",
         "Templates",
@@ -224,7 +228,11 @@ export const api = new RestApi({
     },
     {
       name: "Parallel replies",
-      description: "See what your clients replied in your parallels",
+      description: "See the replies to your parallels",
+    },
+    {
+      name: "Parallel recipients",
+      description: "See to whom your parallels have been sent to",
     },
     {
       name: "Signatures",
@@ -343,6 +351,10 @@ const subscriptionId = idParam({
 const signatureId = idParam({
   type: "PetitionSignatureRequest",
   description: "The ID of the signature request",
+});
+const accessId = idParam({
+  type: "PetitionAccess",
+  description: "The ID of the parallel access",
 });
 
 api.path("/me").get(
@@ -707,7 +719,7 @@ api.path("/petitions/:petitionId/reopen", { params: { petitionId } }).post(
     },
     responses: {
       200: SuccessResponse(Petition),
-      403: ErrorResponse({ description: "You don't have access to this parallel" }),
+      403: ErrorResponse({ description: "You don't have access to this resource" }),
       409: ErrorResponse({ description: "The parallel is not closed or completed" }),
     },
     tags: ["Parallels"],
@@ -748,7 +760,7 @@ api.path("/petitions/:petitionId/reopen", { params: { petitionId } }).post(
         if (containsGraphQLError(error, "PETITION_STATUS_ERROR")) {
           throw new ConflictError("The parallel is not closed or completed");
         } else if (containsGraphQLError(error, "FORBIDDEN")) {
-          throw new ForbiddenError("You don't have access to this parallel");
+          throw new ForbiddenError("You don't have access to this resource");
         }
       }
       throw error;
@@ -1235,7 +1247,7 @@ api.path("/petitions/:petitionId/recipients", { params: { petitionId } }).get(
         Returns the list of recipients this parallel has been sent to.
       `,
     responses: { 200: SuccessResponse(ListOfPetitionAccesses) },
-    tags: ["Parallels"],
+    tags: ["Parallel recipients"],
   },
   async ({ client, params }) => {
     const _query = gql`
@@ -1258,6 +1270,100 @@ api.path("/petitions/:petitionId/recipients", { params: { petitionId } }).get(
     return Ok(result.petition!.accesses);
   }
 );
+
+api
+  .path("/petitions/:petitionId/recipients/:accessId/activate", {
+    params: { petitionId, accessId },
+  })
+  .post(
+    {
+      operationId: "ActivatePetitionRecipient",
+      summary: "Activate a parallel recipient",
+      description: "Activates the access of a recipient to a parallel.",
+      tags: ["Parallel recipients"],
+      responses: {
+        200: SuccessResponse(PetitionAccess),
+        403: ErrorResponse({ description: "You don't have access to this resource" }),
+      },
+    },
+    async ({ client, params }) => {
+      const _mutation = gql`
+        mutation ActivatePetitionRecipient_reactivateAccesses($petitionId: GID!, $accessId: GID!) {
+          reactivateAccesses(petitionId: $petitionId, accessIds: [$accessId]) {
+            ...PetitionAccess
+          }
+        }
+        ${PetitionAccessFragment}
+      `;
+
+      try {
+        const result = await client.request(ActivatePetitionRecipient_reactivateAccessesDocument, {
+          petitionId: params.petitionId,
+          accessId: params.accessId,
+        });
+
+        assert(result.reactivateAccesses.length === 1);
+        assert("id" in result.reactivateAccesses[0]);
+
+        return Ok(result.reactivateAccesses[0]);
+      } catch (error) {
+        if (error instanceof ClientError && containsGraphQLError(error, "FORBIDDEN")) {
+          throw new ForbiddenError("You don't have access to this resource");
+        }
+        throw error;
+      }
+    }
+  );
+
+api
+  .path("/petitions/:petitionId/recipients/:accessId/deactivate", {
+    params: { petitionId, accessId },
+  })
+  .post(
+    {
+      operationId: "DeactivatePetitionRecipient",
+      summary: "Deactivate a parallel recipient",
+      description: "Deactivates the access of a recipient to a parallel.",
+      tags: ["Parallel recipients"],
+      responses: {
+        200: SuccessResponse(PetitionAccess),
+        403: ErrorResponse({ description: "You don't have access to this resource" }),
+      },
+    },
+    async ({ client, params }) => {
+      const _mutation = gql`
+        mutation DeactivatePetitionRecipient_deactivateAccesses(
+          $petitionId: GID!
+          $accessId: GID!
+        ) {
+          deactivateAccesses(petitionId: $petitionId, accessIds: [$accessId]) {
+            ...PetitionAccess
+          }
+        }
+        ${PetitionAccessFragment}
+      `;
+
+      try {
+        const result = await client.request(
+          DeactivatePetitionRecipient_deactivateAccessesDocument,
+          {
+            petitionId: params.petitionId,
+            accessId: params.accessId,
+          }
+        );
+
+        assert(result.deactivateAccesses.length === 1);
+        assert("id" in result.deactivateAccesses[0]);
+
+        return Ok(result.deactivateAccesses[0]);
+      } catch (error) {
+        if (error instanceof ClientError && containsGraphQLError(error, "FORBIDDEN")) {
+          throw new ForbiddenError("You don't have access to this resource");
+        }
+        throw error;
+      }
+    }
+  );
 
 api.path("/petitions/:petitionId/fields", { params: { petitionId } }).get(
   {

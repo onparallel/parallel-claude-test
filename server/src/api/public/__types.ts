@@ -5733,6 +5733,72 @@ export type GetPetitionRecipients_petitionAccessesQuery = {
     | null;
 };
 
+export type ActivatePetitionRecipient_reactivateAccessesMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  accessId: Scalars["GID"]["input"];
+}>;
+
+export type ActivatePetitionRecipient_reactivateAccessesMutation = {
+  reactivateAccesses: Array<{
+    id: string;
+    status: PetitionAccessStatus;
+    reminderCount: number;
+    remindersLeft: number;
+    remindersActive: boolean;
+    nextReminderAt: string | null;
+    createdAt: string;
+    contact: {
+      id: string;
+      email: string;
+      fullName: string;
+      firstName: string;
+      lastName: string | null;
+      createdAt: string;
+      updatedAt: string;
+    } | null;
+    granter: {
+      id: string;
+      email: string;
+      fullName: string | null;
+      firstName: string | null;
+      lastName: string | null;
+    } | null;
+  }>;
+};
+
+export type DeactivatePetitionRecipient_deactivateAccessesMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  accessId: Scalars["GID"]["input"];
+}>;
+
+export type DeactivatePetitionRecipient_deactivateAccessesMutation = {
+  deactivateAccesses: Array<{
+    id: string;
+    status: PetitionAccessStatus;
+    reminderCount: number;
+    remindersLeft: number;
+    remindersActive: boolean;
+    nextReminderAt: string | null;
+    createdAt: string;
+    contact: {
+      id: string;
+      email: string;
+      fullName: string;
+      firstName: string;
+      lastName: string | null;
+      createdAt: string;
+      updatedAt: string;
+    } | null;
+    granter: {
+      id: string;
+      email: string;
+      fullName: string | null;
+      firstName: string | null;
+      lastName: string | null;
+    } | null;
+  }>;
+};
+
 export type PetitionReplies_repliesQueryVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
 }>;
@@ -7339,6 +7405,28 @@ export const GetPetitionRecipients_petitionAccessesDocument = gql`
 ` as unknown as DocumentNode<
   GetPetitionRecipients_petitionAccessesQuery,
   GetPetitionRecipients_petitionAccessesQueryVariables
+>;
+export const ActivatePetitionRecipient_reactivateAccessesDocument = gql`
+  mutation ActivatePetitionRecipient_reactivateAccesses($petitionId: GID!, $accessId: GID!) {
+    reactivateAccesses(petitionId: $petitionId, accessIds: [$accessId]) {
+      ...PetitionAccess
+    }
+  }
+  ${PetitionAccessFragmentDoc}
+` as unknown as DocumentNode<
+  ActivatePetitionRecipient_reactivateAccessesMutation,
+  ActivatePetitionRecipient_reactivateAccessesMutationVariables
+>;
+export const DeactivatePetitionRecipient_deactivateAccessesDocument = gql`
+  mutation DeactivatePetitionRecipient_deactivateAccesses($petitionId: GID!, $accessId: GID!) {
+    deactivateAccesses(petitionId: $petitionId, accessIds: [$accessId]) {
+      ...PetitionAccess
+    }
+  }
+  ${PetitionAccessFragmentDoc}
+` as unknown as DocumentNode<
+  DeactivatePetitionRecipient_deactivateAccessesMutation,
+  DeactivatePetitionRecipient_deactivateAccessesMutationVariables
 >;
 export const PetitionReplies_repliesDocument = gql`
   query PetitionReplies_replies($petitionId: GID!) {

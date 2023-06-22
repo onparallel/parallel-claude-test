@@ -13,8 +13,8 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   ACCESS_ACTIVATED: { petition_access_id: number; user_id: number };
   ACCESS_DEACTIVATED: {
     petition_access_id: number;
-    user_id?: number; // if user_id is undefined, the access was deactivated automatically because an email bounce ocurred
-    reason: "DEACTIVATED_BY_USER" | "EMAIL_BOUNCED";
+    user_id?: number; // set only if reason is DEACTIVATED_BY_USER
+    reason: "DEACTIVATED_BY_USER" | "EMAIL_BOUNCED" | "PETITION_ANONYMIZED";
   };
   ACCESS_OPENED: { petition_access_id: number };
   ACCESS_DELEGATED: {

@@ -1200,24 +1200,50 @@ export class PetitionRepository extends BaseRepository {
     ]);
 
     await this.createEvent(
-      [
-        ...accesses.map((access) => ({
-          type: "ACCESS_DEACTIVATED" as const,
-          petition_id: petitionId,
-          data: {
-            petition_access_id: access.id,
-            user_id: userId,
-            reason:
-              updatedBy === "AnonymizerWorker"
-                ? "PETITION_ANONYMIZED"
-                : ((isDefined(userId) ? "DEACTIVATED_BY_USER" : "EMAIL_BOUNCED") as any),
-          },
-        })),
-      ],
+      accesses.map((access) => ({
+        type: "ACCESS_DEACTIVATED" as const,
+        petition_id: petitionId,
+        data: {
+          petition_access_id: access.id,
+          user_id: userId,
+          reason: isDefined(userId) ? "DEACTIVATED_BY_USER" : "EMAIL_BOUNCED",
+        },
+      })),
       t
     );
+  }
 
-    return accesses;
+  async anonymizeAccesses(
+    petitionId: number,
+    accessIds: number[],
+    updatedBy: string,
+    t?: Knex.Transaction
+  ) {
+    const [accesses] = await Promise.all([
+      this.from("petition_access", t).whereIn("id", accessIds).where("status", "ACTIVE").update(
+        {
+          reminders_active: false,
+          next_reminder_at: null,
+          status: "INACTIVE",
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*"
+      ),
+      this.cancelScheduledMessagesByAccessIds(accessIds, undefined, t),
+    ]);
+
+    await this.createEvent(
+      accesses.map((access) => ({
+        type: "ACCESS_DEACTIVATED" as const,
+        petition_id: petitionId,
+        data: {
+          petition_access_id: access.id,
+          reason: "PETITION_ANONYMIZED",
+        },
+      })),
+      t
+    );
   }
 
   async reactivateAccesses(petitionId: number, accessIds: number[], user: User) {
@@ -1242,7 +1268,6 @@ export class PetitionRepository extends BaseRepository {
         },
       }))
     );
-    return accesses;
   }
 
   async addContactToPetitionAccess(
@@ -5396,11 +5421,10 @@ export class PetitionRepository extends BaseRepository {
           comments.map((c) => c.id),
           t
         ),
-        this.deactivateAccesses(
+        this.anonymizeAccesses(
           petitionId,
           accesses.map((a) => a.id),
           "AnonymizerWorker",
-          undefined,
           t
         ),
       ]);
