@@ -16,6 +16,7 @@ import {
   PetitionFieldType,
   PetitionPermission,
   PetitionSignatureRequest,
+  PetitionStatus,
   Tag,
   TemplateDefaultPermission,
   User,
@@ -4398,6 +4399,33 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("should not allow to reopen a petition in a status different than COMPLETED or CLOSED", async () => {
+      const [pending] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({
+          status: ["PENDING", "DRAFT"][Math.round(Math.random())] as PetitionStatus
+        })
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!) {
+            reopenPetition(petitionId: $petitionId) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", pending.id),
+        }
+      );
+
+      expect(errors).toContainGraphQLError("PETITION_STATUS_ERROR");
+      expect(data).toBeNull();
+    });
   });
 
   describe("READ permission", () => {
@@ -4807,7 +4835,7 @@ describe("GraphQL/Petitions", () => {
           accessIds: [toGlobalId("PetitionAccess", access.id)],
         }
       );
-      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(errors).toContainGraphQLError("PETITION_STATUS_ERROR");
       expect(data).toBeNull();
 
       await mocks.knex.from("petition").where("id", petition.id).update("status", "PENDING");
@@ -4998,7 +5026,7 @@ describe("GraphQL/Petitions", () => {
           },
         }
       );
-      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(errors).toContainGraphQLError("PETITION_STATUS_ERROR");
       expect(data).toBeNull();
 
       await mocks.knex.from("petition").where("id", petition.id).update("status", "PENDING");

@@ -66,6 +66,7 @@ import {
   ReadPetitionCustomPropertiesDocument,
   RemoveUserGroupPermission_removePetitionPermissionDocument,
   RemoveUserPermission_removePetitionPermissionDocument,
+  ReopenPetition_reopenPetitionDocument,
   SharePetition_addPetitionPermissionDocument,
   SharePetition_usersDocument,
   StopSharing_removePetitionPermissionDocument,
@@ -695,6 +696,65 @@ api
       }
     }
   );
+
+api.path("/petitions/:petitionId/reopen", { params: { petitionId } }).post(
+  {
+    operationId: "ReopenPetition",
+    summary: "Reopen a parallel",
+    description: "Reopen a closed or completed parallel",
+    query: {
+      ...petitionIncludeParam,
+    },
+    responses: {
+      200: SuccessResponse(Petition),
+      403: ErrorResponse({ description: "You don't have access to this parallel" }),
+      409: ErrorResponse({ description: "The parallel is not closed or completed" }),
+    },
+    tags: ["Parallels"],
+  },
+  async ({ client, params, query }) => {
+    const _mutation = gql`
+      mutation ReopenPetition_reopenPetition(
+        $petitionId: GID!
+        $includeRecipients: Boolean!
+        $includeFields: Boolean!
+        $includeTags: Boolean!
+        $includeRecipientUrl: Boolean!
+        $includeReplies: Boolean!
+        $includeProgress: Boolean!
+      ) {
+        reopenPetition(petitionId: $petitionId) {
+          ...Petition
+        }
+      }
+      ${PetitionFragment}
+    `;
+
+    try {
+      const result = await client.request(ReopenPetition_reopenPetitionDocument, {
+        petitionId: params.petitionId,
+        includeFields: query.include?.includes("fields") ?? false,
+        includeReplies: query.include?.includes("replies") ?? false,
+        includeRecipients: query.include?.includes("recipients") ?? false,
+        includeTags: query.include?.includes("tags") ?? false,
+        includeRecipientUrl: false,
+        includeProgress: query.include?.includes("progress") ?? false,
+      });
+
+      assert("id" in result.reopenPetition!);
+      return Ok(mapPetition(result.reopenPetition!));
+    } catch (error) {
+      if (error instanceof ClientError) {
+        if (containsGraphQLError(error, "PETITION_STATUS_ERROR")) {
+          throw new ConflictError("The parallel is not closed or completed");
+        } else if (containsGraphQLError(error, "FORBIDDEN")) {
+          throw new ForbiddenError("You don't have access to this parallel");
+        }
+      }
+      throw error;
+    }
+  }
+);
 
 api.path("/petitions/:petitionId/tags", { params: { petitionId } }).post(
   {

@@ -1965,7 +1965,8 @@ export const reopenPetition = mutationField("reopenPetition", {
   type: "Petition",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
+    petitionHasStatus("petitionId", ["COMPLETED", "CLOSED"])
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),

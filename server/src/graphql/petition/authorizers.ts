@@ -24,15 +24,12 @@ function createPetitionAuthorizer<TRest extends any[] = []>(
 ) {
   return ((argName, ...rest: TRest) => {
     return async (_, args, ctx) => {
-      try {
-        const petitionIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
-        if (petitionIds.length === 0) {
-          return true;
-        }
-        const petitions = await ctx.petitions.loadPetition(petitionIds);
-        return petitions.every((petition) => isDefined(petition) && predicate(petition, ...rest));
-      } catch {}
-      return false;
+      const petitionIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      if (petitionIds.length === 0) {
+        return true;
+      }
+      const petitions = await ctx.petitions.loadPetition(petitionIds);
+      return petitions.every((petition) => isDefined(petition) && predicate(petition, ...rest));
     };
   }) as ArgAuthorizer<MaybeArray<number>, TRest>;
 }
@@ -599,7 +596,18 @@ export function signatureRequestIsNotAnonymized<
 
 export const petitionHasStatus = createPetitionAuthorizer(
   (petition, status: MaybeArray<PetitionStatus>) => {
-    return !petition.is_template && unMaybeArray(status).includes(petition.status!);
+    const statuses = unMaybeArray(status);
+    if (petition.is_template) {
+      return false;
+    }
+    if (!statuses.includes(petition.status!)) {
+      throw new ApolloError(
+        `Expected petition to have status ${statuses.join(" or ")} but got ${petition.status}`,
+        "PETITION_STATUS_ERROR"
+      );
+    }
+
+    return true;
   }
 );
 
