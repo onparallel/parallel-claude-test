@@ -1697,7 +1697,7 @@ export const sendPetition = mutationField("sendPetition", {
 
 export const sendReminders = mutationField("sendReminders", {
   description: "Sends a reminder for the specified petition accesses.",
-  type: "Result",
+  type: nonNull(list(nonNull("PetitionReminder"))),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     accessesBelongToPetition("petitionId", "accessIds"),
@@ -1717,55 +1717,51 @@ export const sendReminders = mutationField("sendReminders", {
     "body"
   ),
   resolve: async (_, args, ctx) => {
-    try {
-      const remindersData = await pMap(
-        args.accessIds,
-        async (accessId) => {
-          const contact = await ctx.contacts.loadContactByAccessId(accessId);
-          const getValues = await ctx.petitionMessageContext.fetchPlaceholderValues(
-            {
-              petitionId: args.petitionId,
-              userId: ctx.user!.id,
-              contactId: contact?.id,
-              petitionAccessId: accessId,
-            },
-            { publicContext: true }
-          );
-
-          const emailBody = args.body
-            ? JSON.stringify(interpolatePlaceholdersInSlate(args.body, getValues))
-            : null;
-
-          return {
-            type: "MANUAL",
-            status: "PROCESSING",
-            petition_access_id: accessId,
-            sender_id: ctx.user!.id,
-            email_body: emailBody,
-            created_by: `User:${ctx.user!.id}`,
-          } as CreatePetitionReminder;
-        },
-        { concurrency: 1 }
-      );
-
-      const reminders = await ctx.petitions.createReminders(remindersData);
-
-      await ctx.petitions.createEvent(
-        reminders.filter(isDefined).map((reminder) => ({
-          type: "REMINDER_SENT",
-          petition_id: args.petitionId,
-          data: {
-            petition_reminder_id: reminder.id,
+    const remindersData = await pMap(
+      args.accessIds,
+      async (accessId) => {
+        const contact = await ctx.contacts.loadContactByAccessId(accessId);
+        const getValues = await ctx.petitionMessageContext.fetchPlaceholderValues(
+          {
+            petitionId: args.petitionId,
+            userId: ctx.user!.id,
+            contactId: contact?.id,
+            petitionAccessId: accessId,
           },
-        }))
-      );
+          { publicContext: true }
+        );
 
-      await ctx.emails.sendPetitionReminderEmail(reminders.map((r) => r.id));
+        const emailBody = args.body
+          ? JSON.stringify(interpolatePlaceholdersInSlate(args.body, getValues))
+          : null;
 
-      return RESULT.SUCCESS;
-    } catch (error: any) {
-      return RESULT.FAILURE;
-    }
+        return {
+          type: "MANUAL",
+          status: "PROCESSING",
+          petition_access_id: accessId,
+          sender_id: ctx.user!.id,
+          email_body: emailBody,
+          created_by: `User:${ctx.user!.id}`,
+        } as CreatePetitionReminder;
+      },
+      { concurrency: 1 }
+    );
+
+    const reminders = await ctx.petitions.createReminders(remindersData);
+
+    await ctx.petitions.createEvent(
+      reminders.map((reminder) => ({
+        type: "REMINDER_SENT",
+        petition_id: args.petitionId,
+        data: {
+          petition_reminder_id: reminder.id,
+        },
+      }))
+    );
+
+    await ctx.emails.sendPetitionReminderEmail(reminders.map((r) => r.id));
+
+    return reminders;
   },
 });
 

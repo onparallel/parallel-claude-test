@@ -4406,7 +4406,7 @@ describe("GraphQL/Petitions", () => {
         sessionUser.id,
         1,
         () => ({
-          status: ["PENDING", "DRAFT"][Math.round(Math.random())] as PetitionStatus
+          status: ["PENDING", "DRAFT"][Math.round(Math.random())] as PetitionStatus,
         })
       );
 
@@ -4552,7 +4552,9 @@ describe("GraphQL/Petitions", () => {
         const { errors, data } = await testClient.execute(
           gql`
             mutation ($petitionId: GID!, $accessIds: [GID!]!) {
-              sendReminders(petitionId: $petitionId, accessIds: $accessIds)
+              sendReminders(petitionId: $petitionId, accessIds: $accessIds) {
+                id
+              }
             }
           `,
           {
@@ -4787,7 +4789,9 @@ describe("GraphQL/Petitions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionId: GID!, $accessIds: [GID!]!) {
-            sendReminders(petitionId: $petitionId, accessIds: $accessIds)
+            sendReminders(petitionId: $petitionId, accessIds: $accessIds) {
+              id
+            }
           }
         `,
         {
@@ -4807,7 +4811,9 @@ describe("GraphQL/Petitions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionId: GID!, $accessIds: [GID!]!) {
-            sendReminders(petitionId: $petitionId, accessIds: $accessIds)
+            sendReminders(petitionId: $petitionId, accessIds: $accessIds) {
+              id
+            }
           }
         `,
         {
@@ -4827,7 +4833,9 @@ describe("GraphQL/Petitions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionId: GID!, $accessIds: [GID!]!) {
-            sendReminders(petitionId: $petitionId, accessIds: $accessIds)
+            sendReminders(petitionId: $petitionId, accessIds: $accessIds) {
+              id
+            }
           }
         `,
         {
@@ -4852,7 +4860,12 @@ describe("GraphQL/Petitions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionId: GID!, $accessIds: [GID!]!) {
-            sendReminders(petitionId: $petitionId, accessIds: $accessIds)
+            sendReminders(petitionId: $petitionId, accessIds: $accessIds) {
+              id
+              access {
+                id
+              }
+            }
           }
         `,
         {
@@ -4861,7 +4874,14 @@ describe("GraphQL/Petitions", () => {
         }
       );
       expect(errors).toBeUndefined();
-      expect(data?.sendReminders).toEqual("SUCCESS");
+      expect(data?.sendReminders).toEqual([
+        {
+          id: expect.any(String),
+          access: {
+            id: toGlobalId("PetitionAccess", access.id),
+          },
+        },
+      ]);
 
       const [accessAfter] = await mocks.knex
         .from("petition_access")

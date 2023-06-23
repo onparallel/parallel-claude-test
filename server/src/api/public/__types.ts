@@ -829,7 +829,7 @@ export type Mutation = {
   /** Sends an email to all contacts of the petition confirming the replies are ok */
   sendPetitionClosedNotification: Petition;
   /** Sends a reminder for the specified petition accesses. */
-  sendReminders: Result;
+  sendReminders: Array<PetitionReminder>;
   /** Sends a reminder email to the pending signers */
   sendSignatureRequestReminders: Result;
   /** Set the delegades of a user */
@@ -5799,6 +5799,43 @@ export type DeactivatePetitionRecipient_deactivateAccessesMutation = {
   }>;
 };
 
+export type RemindPetitionRecipient_sendRemindersMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  accessId: Scalars["GID"]["input"];
+  body?: InputMaybe<Scalars["JSON"]["input"]>;
+}>;
+
+export type RemindPetitionRecipient_sendRemindersMutation = {
+  sendReminders: Array<{
+    id: string;
+    access: {
+      id: string;
+      status: PetitionAccessStatus;
+      reminderCount: number;
+      remindersLeft: number;
+      remindersActive: boolean;
+      nextReminderAt: string | null;
+      createdAt: string;
+      contact: {
+        id: string;
+        email: string;
+        fullName: string;
+        firstName: string;
+        lastName: string | null;
+        createdAt: string;
+        updatedAt: string;
+      } | null;
+      granter: {
+        id: string;
+        email: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+      } | null;
+    };
+  }>;
+};
+
 export type PetitionReplies_repliesQueryVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
 }>;
@@ -7427,6 +7464,20 @@ export const DeactivatePetitionRecipient_deactivateAccessesDocument = gql`
 ` as unknown as DocumentNode<
   DeactivatePetitionRecipient_deactivateAccessesMutation,
   DeactivatePetitionRecipient_deactivateAccessesMutationVariables
+>;
+export const RemindPetitionRecipient_sendRemindersDocument = gql`
+  mutation RemindPetitionRecipient_sendReminders($petitionId: GID!, $accessId: GID!, $body: JSON) {
+    sendReminders(petitionId: $petitionId, accessIds: [$accessId], body: $body) {
+      id
+      access {
+        ...PetitionAccess
+      }
+    }
+  }
+  ${PetitionAccessFragmentDoc}
+` as unknown as DocumentNode<
+  RemindPetitionRecipient_sendRemindersMutation,
+  RemindPetitionRecipient_sendRemindersMutationVariables
 >;
 export const PetitionReplies_repliesDocument = gql`
   query PetitionReplies_replies($petitionId: GID!) {

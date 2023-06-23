@@ -431,7 +431,9 @@ PetitionActivity.mutations = [
   `,
   gql`
     mutation PetitionActivity_sendReminders($petitionId: GID!, $accessIds: [GID!]!, $body: JSON) {
-      sendReminders(petitionId: $petitionId, accessIds: $accessIds, body: $body)
+      sendReminders(petitionId: $petitionId, accessIds: $accessIds, body: $body) {
+        id
+      }
     }
   `,
   gql`

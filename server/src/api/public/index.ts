@@ -66,6 +66,7 @@ import {
   PetitionReplies_repliesDocument,
   PetitionTagFilter,
   ReadPetitionCustomPropertiesDocument,
+  RemindPetitionRecipient_sendRemindersDocument,
   RemoveUserGroupPermission_removePetitionPermissionDocument,
   RemoveUserPermission_removePetitionPermissionDocument,
   ReopenPetition_reopenPetitionDocument,
@@ -109,6 +110,7 @@ import {
   UserFragment,
 } from "./fragments";
 import {
+  bodyMessageToRTE,
   buildTagsFilter,
   containsGraphQLError,
   getTags,
@@ -151,6 +153,7 @@ import {
   PetitionField,
   PetitionFieldReply,
   SendPetition,
+  SendReminder,
   SharePetition,
   SubmitFileReply,
   SubmitPetitionReplies,
@@ -1132,11 +1135,8 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         },
         { concurrency: 3 }
       );
-      let message = isDefined(body.message)
-        ? body.message.format === "PLAIN_TEXT"
-          ? body.message.content.split("\n").map((line) => ({ children: [{ text: line }] }))
-          : [{ children: [{ text: "" }] }]
-        : null;
+      let message = bodyMessageToRTE(body.message);
+
       let subject = body.subject;
       const _query = gql`
         query CreatePetitionRecipients_petition($id: GID!) {
@@ -1359,6 +1359,68 @@ api
       } catch (error) {
         if (error instanceof ClientError && containsGraphQLError(error, "FORBIDDEN")) {
           throw new ForbiddenError("You don't have access to this resource");
+        }
+        throw error;
+      }
+    }
+  );
+
+api
+  .path("/petitions/:petitionId/recipients/:accessId/remind", {
+    params: { petitionId, accessId },
+  })
+  .post(
+    {
+      operationId: "RemindPetitionRecipient",
+      summary: "Remind a parallel recipient",
+      description: "Sends the petition recipient a reminder email to complete the information.",
+      tags: ["Parallel recipients"],
+      body: JsonBody(SendReminder),
+      responses: {
+        200: SuccessResponse(PetitionAccess),
+        403: ErrorResponse({ description: "You don't have access to this resource" }),
+        409: ErrorResponse({ description: "The parallel is not pending or completed" }),
+      },
+    },
+    async ({ client, params, body }) => {
+      const _mutation = gql`
+        mutation RemindPetitionRecipient_sendReminders(
+          $petitionId: GID!
+          $accessId: GID!
+          $body: JSON
+        ) {
+          sendReminders(petitionId: $petitionId, accessIds: [$accessId], body: $body) {
+            id
+            access {
+              ...PetitionAccess
+            }
+          }
+        }
+        ${PetitionAccessFragment}
+      `;
+
+      try {
+        const message = bodyMessageToRTE(body.message);
+
+        const result = await client.request(RemindPetitionRecipient_sendRemindersDocument, {
+          petitionId: params.petitionId,
+          accessId: params.accessId,
+          body: message,
+        });
+
+        assert(result.sendReminders.length === 1);
+        assert("id" in result.sendReminders[0].access);
+
+        return Ok(result.sendReminders[0].access);
+      } catch (error) {
+        if (error instanceof ClientError) {
+          if (containsGraphQLError(error, "PETITION_STATUS_ERROR")) {
+            throw new ConflictError("The parallel is not pending or completed");
+          } else if (containsGraphQLError(error, "NO_REMINDERS_LEFT")) {
+            throw new ConflictError("You can't send any more reminders to this recipient");
+          } else if (containsGraphQLError(error, "FORBIDDEN")) {
+            throw new ForbiddenError("You don't have access to this resource");
+          }
         }
         throw error;
       }

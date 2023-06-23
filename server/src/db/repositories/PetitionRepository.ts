@@ -2686,8 +2686,7 @@ export class PetitionRepository extends BaseRepository {
             case when "reminders_left" <= 1 then false else "reminders_active" end
           `),
         });
-      const reminders = await this.insert("petition_reminder", data, t).returning("*");
-      return reminders;
+      return await this.insert("petition_reminder", data, t).returning("*");
     });
   }
 

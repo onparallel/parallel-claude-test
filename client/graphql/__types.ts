@@ -874,7 +874,7 @@ export interface Mutation {
   /** Sends an email to all contacts of the petition confirming the replies are ok */
   sendPetitionClosedNotification: Petition;
   /** Sends a reminder for the specified petition accesses. */
-  sendReminders: Result;
+  sendReminders: Array<PetitionReminder>;
   /** Sends a reminder email to the pending signers */
   sendSignatureRequestReminders: Result;
   /** Set the delegades of a user */
@@ -20540,7 +20540,9 @@ export type PetitionActivity_sendRemindersMutationVariables = Exact<{
   body?: InputMaybe<Scalars["JSON"]["input"]>;
 }>;
 
-export type PetitionActivity_sendRemindersMutation = { sendReminders: Result };
+export type PetitionActivity_sendRemindersMutation = {
+  sendReminders: Array<{ __typename?: "PetitionReminder"; id: string }>;
+};
 
 export type PetitionActivity_deactivateAccessesMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
@@ -39879,7 +39881,9 @@ export const PetitionActivity_updatePetitionDocument = gql`
 >;
 export const PetitionActivity_sendRemindersDocument = gql`
   mutation PetitionActivity_sendReminders($petitionId: GID!, $accessIds: [GID!]!, $body: JSON) {
-    sendReminders(petitionId: $petitionId, accessIds: $accessIds, body: $body)
+    sendReminders(petitionId: $petitionId, accessIds: $accessIds, body: $body) {
+      id
+    }
   }
 ` as unknown as DocumentNode<
   PetitionActivity_sendRemindersMutation,

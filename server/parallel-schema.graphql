@@ -1694,7 +1694,7 @@ type Mutation {
   """
   Sends a reminder for the specified petition accesses.
   """
-  sendReminders(accessIds: [GID!]!, body: JSON, petitionId: GID!): Result!
+  sendReminders(accessIds: [GID!]!, body: JSON, petitionId: GID!): [PetitionReminder!]!
 
   """
   Sends a reminder email to the pending signers

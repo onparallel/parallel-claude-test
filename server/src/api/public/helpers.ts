@@ -36,6 +36,7 @@ import {
   TemplateFragment,
   waitForTask_TaskDocument,
 } from "./__types";
+import { emptyRTEValue, fromPlainText } from "../../util/slate/utils";
 
 export function paginationParams() {
   return {
@@ -374,4 +375,12 @@ export function buildTagsFilter(
       operator: "AND",
     };
   }
+}
+
+export function bodyMessageToRTE(message?: Maybe<{ format: "PLAIN_TEXT"; content: string }>) {
+  return isDefined(message)
+    ? message.format === "PLAIN_TEXT"
+      ? fromPlainText(message.content)
+      : emptyRTEValue()
+    : null;
 }

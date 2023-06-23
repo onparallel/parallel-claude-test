@@ -2296,3 +2296,16 @@ export const TagPetition = schema({
     },
   },
 } as const);
+
+export const SendReminder = schema({
+  title: "SendReminder",
+  type: "object",
+  additionalProperties: false,
+  required: ["message"],
+  properties: {
+    message: _OrNull({
+      ..._MessageBody,
+      description: "Optional message to include in the reminder email",
+    }),
+  },
+} as const);

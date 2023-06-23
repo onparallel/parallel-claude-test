@@ -1540,7 +1540,7 @@ export interface NexusGenFieldTypes {
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
     sendPetitionClosedNotification: NexusGenRootTypes["Petition"]; // Petition!
-    sendReminders: NexusGenEnums["Result"]; // Result!
+    sendReminders: NexusGenRootTypes["PetitionReminder"][]; // [PetitionReminder!]!
     sendSignatureRequestReminders: NexusGenEnums["Result"]; // Result!
     setUserDelegates: NexusGenRootTypes["User"]; // User!
     shareSignaturitApiKey: NexusGenRootTypes["Organization"]; // Organization!
@@ -3542,7 +3542,7 @@ export interface NexusGenFieldTypeNames {
     revokeUserAuthToken: "Result";
     sendPetition: "SendPetitionResult";
     sendPetitionClosedNotification: "Petition";
-    sendReminders: "Result";
+    sendReminders: "PetitionReminder";
     sendSignatureRequestReminders: "Result";
     setUserDelegates: "User";
     shareSignaturitApiKey: "Organization";

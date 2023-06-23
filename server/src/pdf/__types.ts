@@ -829,7 +829,7 @@ export type Mutation = {
   /** Sends an email to all contacts of the petition confirming the replies are ok */
   sendPetitionClosedNotification: Petition;
   /** Sends a reminder for the specified petition accesses. */
-  sendReminders: Result;
+  sendReminders: Array<PetitionReminder>;
   /** Sends a reminder email to the pending signers */
   sendSignatureRequestReminders: Result;
   /** Set the delegades of a user */

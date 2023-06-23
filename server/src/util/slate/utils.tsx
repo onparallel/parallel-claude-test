@@ -8,6 +8,10 @@ export function fromPlainText(value: string): SlateNode[] {
   return value.split("\n").map((line) => ({ type: "paragraph", children: [{ text: line }] }));
 }
 
+export function emptyRTEValue(): SlateNode[] {
+  return [{ type: "paragraph", children: [{ text: "" }] }];
+}
+
 export function walkSlateNodes(
   nodes: SlateNode[],
   visit: (input: SlateNode) => SlateNode | void
