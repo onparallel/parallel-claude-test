@@ -79,8 +79,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
     if (replyId) {
       setShowNewReply(false);
       setTimeout(() => {
-        const instance = replyRefs[replyId].current!;
-        instance.focus(1);
+        replyRefs[replyId].current?.focus(1);
       });
     }
   }
