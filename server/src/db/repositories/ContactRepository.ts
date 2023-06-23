@@ -345,8 +345,8 @@ export class ContactRepository extends BaseRepository {
       })
       .update({
         access_log: this.knex.raw(
-          /* sql */ `jsonb_path_query_array(?::jsonb || "access_log", '$[0 to 99]')`,
-          JSON.stringify({ ...access, timestamp: Date.now() })
+          /* sql */ `jsonb_path_query_array(? || "access_log", '$[0 to 99]')`,
+          this.json({ ...access, timestamp: Date.now() })
         ),
       });
   }

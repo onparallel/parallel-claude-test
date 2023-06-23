@@ -1084,6 +1084,7 @@ export interface PetitionEventSubscription {
   from_template_id: Maybe<number>; // int4
   is_failing: boolean; // bool
   from_template_field_ids: Maybe<number[]>; // int4[]
+  error_log: any; // jsonb
 }
 
 export type CreatePetitionEventSubscription = PartialProps<
@@ -1100,6 +1101,7 @@ export type CreatePetitionEventSubscription = PartialProps<
   | "from_template_id"
   | "is_failing"
   | "from_template_field_ids"
+  | "error_log"
 >;
 
 export interface PetitionField {

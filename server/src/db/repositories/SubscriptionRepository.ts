@@ -73,6 +73,20 @@ export class SubscriptionRepository extends BaseRepository {
     return row;
   }
 
+  async appendErrorLog(id: number, errorLog: any, updatedBy: string) {
+    await this.from("petition_event_subscription")
+      .where({ id: id, deleted_at: null })
+      .update({
+        is_failing: true,
+        error_log: this.knex.raw(
+          /* sql */ `jsonb_path_query_array(? || "error_log", '$[0 to 99]')`,
+          this.json({ ...errorLog, timestamp: Date.now() })
+        ),
+        updated_at: this.now(),
+        updated_by: updatedBy,
+      });
+  }
+
   async deleteSubscriptions(ids: MaybeArray<number>, deletedBy: string) {
     await this.from("petition_event_subscription")
       .whereIn("id", unMaybeArray(ids))

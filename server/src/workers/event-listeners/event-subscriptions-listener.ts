@@ -1,4 +1,5 @@
 import { sign } from "crypto";
+import stringify from "fast-safe-stringify";
 import pMap from "p-map";
 import { isDefined } from "remeda";
 import { PetitionEvent } from "../../db/events/PetitionEvent";
@@ -107,19 +108,20 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (e
           );
         }
       } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : stringify(e);
         if (!subscription.is_failing) {
           await ctx.emails.sendDeveloperWebhookFailedEmail(
             subscription.id,
             petition.id,
-            (e as any)?.message ?? "",
+            errorMessage,
             mappedEvent
           );
-          await ctx.subscriptions.updateSubscription(
-            subscription.id,
-            { is_failing: true },
-            ctx.config.instanceName
-          );
         }
+        await ctx.subscriptions.appendErrorLog(
+          subscription.id,
+          { error: errorMessage, event: mappedEvent },
+          ctx.config.instanceName
+        );
       }
     },
     { concurrency: 10 }
