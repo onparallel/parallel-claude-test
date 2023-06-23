@@ -238,7 +238,7 @@ export class PetitionBinder implements IPetitionBinder {
       await spawn("qpdf", ["--linearize", path, output], { timeout: 120_000, stdio: "inherit" });
     } catch (e) {
       if (e instanceof ChildProcessNonSuccessError && e.exitCode === 3) {
-        // it's just warnings
+        this.logger.info("qpdf exited with warnings");
         return;
       } else {
         throw e;
@@ -247,10 +247,19 @@ export class PetitionBinder implements IPetitionBinder {
   }
 
   private async mergeFiles(paths: string[], output: string) {
-    await spawn("qpdf", ["--empty", "--pages", ...paths, "--", output], {
-      timeout: 120_000,
-      stdio: "inherit",
-    });
+    try {
+      await spawn("qpdf", ["--empty", "--pages", ...paths, "--", output], {
+        timeout: 120_000,
+        stdio: "inherit",
+      });
+    } catch (e) {
+      if (e instanceof ChildProcessNonSuccessError && e.exitCode === 3) {
+        this.logger.info("qpdf exited with warnings");
+        return;
+      } else {
+        throw e;
+      }
+    }
   }
 
   private async convertImage(fileS3Path: string, contentType: string) {
