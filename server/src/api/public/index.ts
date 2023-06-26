@@ -6,7 +6,7 @@ import { isDefined, omit, pick, uniq } from "remeda";
 import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
 import { toGlobalId } from "../../util/globalId";
 import { Body, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
-import { RestApi } from "../rest/core";
+import { RestApi, RestParameter } from "../rest/core";
 import {
   BadRequestError,
   ConflictError,
@@ -305,15 +305,43 @@ export const api = new RestApi({
   },
 });
 
-const petitionIncludeParam = {
-  include: enumParam({
-    schemaTitle: "PetitionIncludeInResponse",
-    description: "Include optional fields in the response",
-    array: true,
-    required: false,
-    values: ["recipients", "fields", "tags", "replies", "progress", "signers"],
-  }),
-};
+function petitionIncludeParam({ includeRecipientUrl }: { includeRecipientUrl?: boolean } = {}) {
+  return {
+    include: enumParam({
+      schemaTitle: "PetitionIncludeInResponse",
+      description: "Include optional fields in the response",
+      array: true,
+      required: false,
+      values: [
+        "recipients",
+        "fields",
+        "tags",
+        "replies",
+        "progress",
+        "signers",
+        ...(includeRecipientUrl ? ["recipients.recipientUrl" as const] : []),
+      ],
+    }),
+  };
+}
+
+function getPetitionIncludesFromQuery<
+  Q extends {
+    include: ReturnType<typeof petitionIncludeParam>["include"] extends RestParameter<infer T>
+      ? T
+      : never;
+  }
+>(query: Q) {
+  return {
+    includeFields: query.include?.includes("fields") ?? false,
+    includeReplies: query.include?.includes("replies") ?? false,
+    includeRecipients: query.include?.includes("recipients") ?? false,
+    includeTags: query.include?.includes("tags") ?? false,
+    includeRecipientUrl: query.include?.includes("recipients.recipientUrl") ?? false,
+    includeProgress: query.include?.includes("progress") ?? false,
+    includeSigners: query.include?.includes("signers") ?? false,
+  };
+}
 
 const templateIncludeParam = {
   include: enumParam({
@@ -459,7 +487,7 @@ api
           required: false,
           array: true,
         }),
-        ...petitionIncludeParam,
+        ...petitionIncludeParam(),
       },
       responses: { 200: SuccessResponse(PaginatedPetitions) },
       tags: ["Parallels"],
@@ -515,13 +543,7 @@ api
       const result = await client.request(GetPetitions_petitionsDocument, {
         ...pick(query, ["offset", "limit", "status", "fromTemplateId", "sortBy"]),
         tags,
-        includeFields: query.include?.includes("fields") ?? false,
-        includeReplies: query.include?.includes("replies") ?? false,
-        includeRecipients: query.include?.includes("recipients") ?? false,
-        includeTags: query.include?.includes("tags") ?? false,
-        includeRecipientUrl: false,
-        includeProgress: query.include?.includes("progress") ?? false,
-        includeSigners: query.include?.includes("signers") ?? false,
+        ...getPetitionIncludesFromQuery(query),
       });
       const { items, totalCount } = result.petitions;
       assertType<PetitionFragmentType[]>(items);
@@ -535,7 +557,7 @@ api
       description: outdent`Create a new parallel based on a template.`,
       body: JsonBody(CreatePetition),
       query: {
-        ...petitionIncludeParam,
+        ...petitionIncludeParam(),
       },
       responses: { 201: SuccessResponse(Petition) },
       tags: ["Parallels"],
@@ -561,13 +583,7 @@ api
       `;
       const result = await client.request(CreatePetition_petitionDocument, {
         ...body,
-        includeFields: query.include?.includes("fields") ?? false,
-        includeReplies: query.include?.includes("replies") ?? false,
-        includeRecipients: query.include?.includes("recipients") ?? false,
-        includeTags: query.include?.includes("tags") ?? false,
-        includeRecipientUrl: false,
-        includeProgress: query.include?.includes("progress") ?? false,
-        includeSigners: query.include?.includes("signers") ?? false,
+        ...getPetitionIncludesFromQuery(query),
       });
       assert("id" in result.createPetition);
       return Created(mapPetition(result.createPetition));
@@ -584,7 +600,7 @@ api
         Returns the specified parallel.
       `,
       query: {
-        ...petitionIncludeParam,
+        ...petitionIncludeParam(),
       },
       responses: { 200: SuccessResponse(Petition) },
       tags: ["Parallels"],
@@ -609,13 +625,7 @@ api
       `;
       const result = await client.request(GetPetition_petitionDocument, {
         petitionId: params.petitionId,
-        includeFields: query.include?.includes("fields") ?? false,
-        includeReplies: query.include?.includes("replies") ?? false,
-        includeRecipients: query.include?.includes("recipients") ?? false,
-        includeTags: query.include?.includes("tags") ?? false,
-        includeRecipientUrl: false,
-        includeProgress: query.include?.includes("progress") ?? false,
-        includeSigners: query.include?.includes("signers") ?? false,
+        ...getPetitionIncludesFromQuery(query),
       });
       assert("id" in result.petition!);
       return Ok(mapPetition(result.petition!));
@@ -630,7 +640,7 @@ api
       `,
       body: JsonBody(UpdatePetition),
       query: {
-        ...petitionIncludeParam,
+        ...petitionIncludeParam(),
       },
       responses: {
         200: SuccessResponse(Petition),
@@ -705,13 +715,7 @@ api
         const result = await client.request(UpdatePetition_updatePetitionDocument, {
           petitionId: params.petitionId,
           data: inputData,
-          includeFields: query.include?.includes("fields") ?? false,
-          includeReplies: query.include?.includes("replies") ?? false,
-          includeRecipients: query.include?.includes("recipients") ?? false,
-          includeTags: query.include?.includes("tags") ?? false,
-          includeRecipientUrl: false,
-          includeProgress: query.include?.includes("progress") ?? false,
-          includeSigners: query.include?.includes("signers") ?? false,
+          ...getPetitionIncludesFromQuery(query),
         });
         assert("id" in result.updatePetition!);
         return Ok(mapPetition(result.updatePetition!));
@@ -786,7 +790,7 @@ api.path("/petitions/:petitionId/reopen", { params: { petitionId } }).post(
     summary: "Reopen a parallel",
     description: "Reopen a closed or completed parallel",
     query: {
-      ...petitionIncludeParam,
+      ...petitionIncludeParam(),
     },
     responses: {
       200: SuccessResponse(Petition),
@@ -817,13 +821,7 @@ api.path("/petitions/:petitionId/reopen", { params: { petitionId } }).post(
     try {
       const result = await client.request(ReopenPetition_reopenPetitionDocument, {
         petitionId: params.petitionId,
-        includeFields: query.include?.includes("fields") ?? false,
-        includeReplies: query.include?.includes("replies") ?? false,
-        includeRecipients: query.include?.includes("recipients") ?? false,
-        includeTags: query.include?.includes("tags") ?? false,
-        includeRecipientUrl: false,
-        includeProgress: query.include?.includes("progress") ?? false,
-        includeSigners: query.include?.includes("signers") ?? false,
+        ...getPetitionIncludesFromQuery(query),
       });
 
       assert("id" in result.reopenPetition!);
@@ -846,11 +844,14 @@ api.path("/petitions/:petitionId/tags", { params: { petitionId } }).post(
     operationId: "TagPetition",
     summary: "Tag a parallel",
     description: "Tag a parallel with the specified label",
+    query: {
+      ...petitionIncludeParam(),
+    },
     body: JsonBody(TagPetition),
     responses: { 201: SuccessResponse(Petition) },
     tags: ["Tags"],
   },
-  async ({ client, params, body }) => {
+  async ({ client, params, body, query }) => {
     const _query = gql`
       query TagPetition_tags($search: String) {
         tags(offset: 0, limit: 1000, search: $search) {
@@ -904,13 +905,8 @@ api.path("/petitions/:petitionId/tags", { params: { petitionId } }).post(
     const tagResult = await client.request(TagPetition_tagPetitionDocument, {
       petitionId: params.petitionId,
       tagId: tagId!,
-      includeFields: false,
-      includeReplies: false,
-      includeRecipients: false,
-      includeRecipientUrl: false,
-      includeProgress: false,
+      ...getPetitionIncludesFromQuery(query),
       includeTags: true,
-      includeSigners: false,
     });
     assert("id" in tagResult.tagPetition!);
     return Created(mapPetition(tagResult.tagPetition!));
@@ -1126,12 +1122,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
     `,
     body: JsonBody(SendPetition),
     query: {
-      include: enumParam({
-        description: "Include optional fields in the response",
-        array: true,
-        required: false,
-        values: ["recipients", "fields", "tags", "recipients.recipientUrl", "progress"],
-      }),
+      ...petitionIncludeParam({ includeRecipientUrl: true }),
     },
     responses: {
       200: SuccessResponse(Petition),
@@ -1279,13 +1270,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
           limit: 10,
           ...body.remindersConfig,
         },
-        includeFields: query.include?.includes("fields") ?? false,
-        includeReplies: false,
-        includeRecipients: query.include?.includes("recipients") ?? false,
-        includeTags: query.include?.includes("tags") ?? false,
-        includeRecipientUrl: query.include?.includes("recipients.recipientUrl") ?? false,
-        includeProgress: query.include?.includes("progress") ?? false,
-        includeSigners: query.include?.includes("signers") ?? false,
+        ...getPetitionIncludesFromQuery(query),
       });
 
       assert(result.sendPetition[0].petition !== null);
@@ -2011,20 +1996,18 @@ api
         }),
       },
       body: JsonBody(SubmitPetitionReplies),
+      query: {
+        ...petitionIncludeParam(),
+      },
       tags: ["Parallel replies"],
     },
-    async ({ client, params, body }) => {
+    async ({ client, params, body, query }) => {
       try {
         const res = await client.request(SubmitReplies_bulkCreatePetitionRepliesDocument, {
           petitionId: params.petitionId,
           replies: body,
+          ...getPetitionIncludesFromQuery(query),
           includeFields: true,
-          includeRecipients: false,
-          includeTags: false,
-          includeRecipientUrl: false,
-          includeReplies: false,
-          includeProgress: false,
-          includeSigners: false,
         });
 
         return Ok(mapPetition(res.bulkCreatePetitionReplies));
