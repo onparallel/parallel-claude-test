@@ -228,10 +228,13 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
   };
 }
 
-function mapPetitionBase<T extends Pick<PetitionFragment, "fromTemplate">>(petition: T) {
+function mapPetitionBase<T extends Pick<PetitionFragment, "fromTemplate" | "signatureConfig">>(
+  petition: T
+) {
   return {
-    ...omit(petition, ["fromTemplate"]),
+    ...omit(petition, ["fromTemplate", "signatureConfig"]),
     fromTemplateId: petition.fromTemplate?.id ?? null,
+    signers: petition.signatureConfig?.signers ?? null,
   };
 }
 

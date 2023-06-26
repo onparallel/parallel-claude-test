@@ -138,6 +138,13 @@ export const PetitionFragment = gql`
     tags @include(if: $includeTags) {
       ...Tag
     }
+    signatureConfig @include(if: $includeSigners) {
+      signers {
+        email
+        firstName
+        lastName
+      }
+    }
     progress @include(if: $includeProgress) {
       external {
         approved

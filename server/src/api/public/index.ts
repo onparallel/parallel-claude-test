@@ -2,7 +2,7 @@ import { unlink } from "fs/promises";
 import { ClientError, gql, GraphQLClient } from "graphql-request";
 import { outdent } from "outdent";
 import pMap from "p-map";
-import { isDefined, pick, uniq } from "remeda";
+import { isDefined, omit, pick, uniq } from "remeda";
 import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
 import { toGlobalId } from "../../util/globalId";
 import { Body, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
@@ -86,8 +86,10 @@ import {
   TransferPetition_searchUserByEmailDocument,
   TransferPetition_transferPetitionOwnershipDocument,
   UntagPetition_untagPetitionDocument,
+  UpdatePetition_petitionDocument,
   UpdatePetition_updatePetitionDocument,
   UpdatePetitionField_updatePetitionFieldDocument,
+  UpdatePetitionInput,
   UpdateReply_petitionDocument,
   UpdateReply_updateFileUploadReplyCompleteDocument,
   UpdateReply_updateFileUploadReplyDocument,
@@ -309,7 +311,7 @@ const petitionIncludeParam = {
     description: "Include optional fields in the response",
     array: true,
     required: false,
-    values: ["recipients", "fields", "tags", "replies", "progress"],
+    values: ["recipients", "fields", "tags", "replies", "progress", "signers"],
   }),
 };
 
@@ -488,6 +490,7 @@ api
           $includeRecipientUrl: Boolean!
           $includeReplies: Boolean!
           $includeProgress: Boolean!
+          $includeSigners: Boolean!
           $fromTemplateId: [GID!]
         ) {
           petitions(
@@ -518,6 +521,7 @@ api
         includeTags: query.include?.includes("tags") ?? false,
         includeRecipientUrl: false,
         includeProgress: query.include?.includes("progress") ?? false,
+        includeSigners: query.include?.includes("signers") ?? false,
       });
       const { items, totalCount } = result.petitions;
       assertType<PetitionFragmentType[]>(items);
@@ -547,6 +551,7 @@ api
           $includeRecipientUrl: Boolean!
           $includeReplies: Boolean!
           $includeProgress: Boolean!
+          $includeSigners: Boolean!
         ) {
           createPetition(name: $name, petitionId: $templateId) {
             ...Petition
@@ -562,6 +567,7 @@ api
         includeTags: query.include?.includes("tags") ?? false,
         includeRecipientUrl: false,
         includeProgress: query.include?.includes("progress") ?? false,
+        includeSigners: query.include?.includes("signers") ?? false,
       });
       assert("id" in result.createPetition);
       return Created(mapPetition(result.createPetition));
@@ -593,6 +599,7 @@ api
           $includeRecipientUrl: Boolean!
           $includeReplies: Boolean!
           $includeProgress: Boolean!
+          $includeSigners: Boolean!
         ) {
           petition(id: $petitionId) {
             ...Petition
@@ -608,6 +615,7 @@ api
         includeTags: query.include?.includes("tags") ?? false,
         includeRecipientUrl: false,
         includeProgress: query.include?.includes("progress") ?? false,
+        includeSigners: query.include?.includes("signers") ?? false,
       });
       assert("id" in result.petition!);
       return Ok(mapPetition(result.petition!));
@@ -624,10 +632,32 @@ api
       query: {
         ...petitionIncludeParam,
       },
-      responses: { 200: SuccessResponse(Petition) },
+      responses: {
+        200: SuccessResponse(Petition),
+        400: ErrorResponse({ description: "Invalid request body" }),
+        403: ErrorResponse({ description: "You don't have access to this resource" }),
+        409: ErrorResponse({
+          description: "Cannot update signers on a petition without a signature configuration",
+        }),
+      },
       tags: ["Parallels"],
     },
     async ({ client, params, body, query }) => {
+      const _query = gql`
+        query UpdatePetition_petition($petitionId: GID!) {
+          petition(id: $petitionId) {
+            signatureConfig {
+              allowAdditionalSigners
+              integration {
+                id
+              }
+              review
+              timezone
+              title
+            }
+          }
+        }
+      `;
       const _mutation = gql`
         mutation UpdatePetition_updatePetition(
           $petitionId: GID!
@@ -638,6 +668,7 @@ api
           $includeRecipientUrl: Boolean!
           $includeReplies: Boolean!
           $includeProgress: Boolean!
+          $includeSigners: Boolean!
         ) {
           updatePetition(petitionId: $petitionId, data: $data) {
             ...Petition
@@ -645,18 +676,55 @@ api
         }
         ${PetitionFragment}
       `;
-      const result = await client.request(UpdatePetition_updatePetitionDocument, {
-        petitionId: params.petitionId,
-        data: body,
-        includeFields: query.include?.includes("fields") ?? false,
-        includeReplies: query.include?.includes("replies") ?? false,
-        includeRecipients: query.include?.includes("recipients") ?? false,
-        includeTags: query.include?.includes("tags") ?? false,
-        includeRecipientUrl: false,
-        includeProgress: query.include?.includes("progress") ?? false,
-      });
-      assert("id" in result.updatePetition!);
-      return Ok(mapPetition(result.updatePetition!));
+
+      const inputData: UpdatePetitionInput = omit(body, ["signers"]);
+      if (isDefined(body.signers)) {
+        const queryResult = await client.request(UpdatePetition_petitionDocument, {
+          petitionId: params.petitionId,
+        });
+
+        if (!isDefined(queryResult.petition!.signatureConfig)) {
+          throw new ConflictError(
+            "Cannot update signers on a petition without a signature configuration"
+          );
+        }
+
+        inputData.signatureConfig = {
+          allowAdditionalSigners: queryResult.petition!.signatureConfig!.allowAdditionalSigners,
+          orgIntegrationId: queryResult.petition!.signatureConfig!.integration!.id,
+          review: queryResult.petition!.signatureConfig!.review,
+          timezone: queryResult.petition!.signatureConfig!.timezone,
+          title: queryResult.petition!.signatureConfig!.title,
+          signersInfo: body.signers,
+        };
+      } else if (body.signers === null) {
+        inputData.signatureConfig = null;
+      }
+
+      try {
+        const result = await client.request(UpdatePetition_updatePetitionDocument, {
+          petitionId: params.petitionId,
+          data: inputData,
+          includeFields: query.include?.includes("fields") ?? false,
+          includeReplies: query.include?.includes("replies") ?? false,
+          includeRecipients: query.include?.includes("recipients") ?? false,
+          includeTags: query.include?.includes("tags") ?? false,
+          includeRecipientUrl: false,
+          includeProgress: query.include?.includes("progress") ?? false,
+          includeSigners: query.include?.includes("signers") ?? false,
+        });
+        assert("id" in result.updatePetition!);
+        return Ok(mapPetition(result.updatePetition!));
+      } catch (error) {
+        if (error instanceof ClientError) {
+          if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+            throw new BadRequestError(
+              error.response.errors?.[0]?.message ?? "ARG_VALIDATION_ERROR"
+            );
+          }
+        }
+        throw error;
+      }
     }
   )
   .delete(
@@ -737,6 +805,7 @@ api.path("/petitions/:petitionId/reopen", { params: { petitionId } }).post(
         $includeRecipientUrl: Boolean!
         $includeReplies: Boolean!
         $includeProgress: Boolean!
+        $includeSigners: Boolean!
       ) {
         reopenPetition(petitionId: $petitionId) {
           ...Petition
@@ -754,6 +823,7 @@ api.path("/petitions/:petitionId/reopen", { params: { petitionId } }).post(
         includeTags: query.include?.includes("tags") ?? false,
         includeRecipientUrl: false,
         includeProgress: query.include?.includes("progress") ?? false,
+        includeSigners: query.include?.includes("signers") ?? false,
       });
 
       assert("id" in result.reopenPetition!);
@@ -823,6 +893,7 @@ api.path("/petitions/:petitionId/tags", { params: { petitionId } }).post(
         $includeRecipientUrl: Boolean!
         $includeReplies: Boolean!
         $includeProgress: Boolean!
+        $includeSigners: Boolean!
       ) {
         tagPetition(petitionId: $petitionId, tagId: $tagId) {
           ...Petition
@@ -839,6 +910,7 @@ api.path("/petitions/:petitionId/tags", { params: { petitionId } }).post(
       includeRecipientUrl: false,
       includeProgress: false,
       includeTags: true,
+      includeSigners: false,
     });
     assert("id" in tagResult.tagPetition!);
     return Created(mapPetition(tagResult.tagPetition!));
@@ -1160,6 +1232,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
           $includeRecipientUrl: Boolean!
           $includeReplies: Boolean!
           $includeProgress: Boolean!
+          $includeSigners: Boolean!
         ) {
           sendPetition(
             petitionId: $petitionId
@@ -1212,6 +1285,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         includeTags: query.include?.includes("tags") ?? false,
         includeRecipientUrl: query.include?.includes("recipients.recipientUrl") ?? false,
         includeProgress: query.include?.includes("progress") ?? false,
+        includeSigners: query.include?.includes("signers") ?? false,
       });
 
       assert(result.sendPetition[0].petition !== null);
@@ -1950,6 +2024,7 @@ api
           includeRecipientUrl: false,
           includeReplies: false,
           includeProgress: false,
+          includeSigners: false,
         });
 
         return Ok(mapPetition(res.bulkCreatePetitionReplies));

@@ -437,6 +437,24 @@ const _PetitionFieldWithReplies = {
   },
 } as const;
 
+const _PetitionSigner = {
+  type: "object",
+  title: "PetitionSigner",
+  description: "Information about the signer",
+  required: ["email", "firstName", "lastName"],
+  additionalProperties: false,
+  properties: {
+    firstName: { type: "string" },
+    lastName: { type: ["string", "null"] },
+    email: { type: "string" },
+  },
+  example: {
+    firstName: "Tywin",
+    lastName: "Lannister",
+    email: "tywin@casterlyrock.com",
+  },
+} as const;
+
 const _Petition = {
   title: "Petition",
   type: "object",
@@ -552,6 +570,11 @@ const _Petition = {
           total: 0,
         },
       },
+    },
+    signers: {
+      description:
+        "If parameter `include` contains `signers`, this will be the list of signers of the parallel.",
+      ...ListOf(_PetitionSigner),
     },
   },
 } as const;
@@ -751,8 +774,15 @@ export const UpdatePetition = schema({
       enum: ["en", "es"],
       example: "en",
     },
+    signers: {
+      description: "The list of signers of the parallel",
+      ..._ListOf(_PetitionSigner),
+      type: ["array", "null"],
+      minItems: 1,
+    },
   },
 } as const);
+
 export const CreatePetition = schema({
   title: "CreatePetition",
   type: "object",
@@ -1058,22 +1088,6 @@ export const FieldReplyDownloadContent = schema({
   example: "Jon Snow",
   description: "The text-content of the reply, or a download URL for `FILE` replies",
 } as const);
-
-const _PetitionSigner = {
-  type: "object",
-  title: "PetitionSigner",
-  description: "Information about the signer",
-  properties: {
-    firstName: { type: "string" },
-    lastName: { type: ["string", "null"] },
-    email: { type: "string" },
-  },
-  example: {
-    firstName: "Tywin",
-    lastName: "Lannister",
-    email: "tywin@casterlyrock.com",
-  },
-} as const;
 
 const PetitionEventSchemas = {
   ACCESS_ACTIVATED: {
