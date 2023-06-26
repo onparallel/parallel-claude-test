@@ -25,8 +25,12 @@ export async function profilesExpiringProperties(
   context: WorkerContext
 ) {
   const user = await context.users.loadUser(payload.userId);
-  if (!user || user.status !== "ACTIVE") {
-    throw new Error(`User:${payload.userId} not found or not active`);
+  if (!user) {
+    throw new Error(`User:${payload.userId} not found`);
+  }
+  if (user.status !== "ACTIVE") {
+    // inactive users can still be subscribed to profiles
+    return;
   }
   const userData = (await context.users.loadUserData(user.user_data_id))!;
 
