@@ -192,15 +192,16 @@ function OrganizationCompliance() {
                     name="period"
                     control={control}
                     rules={{ required: isActive, min: 1 }}
-                    render={({ field: { ref, value, ...restField } }) => (
+                    render={({ field: { ref, value, name, onChange, onBlur } }) => (
                       <NumberInput
-                        {...restField}
+                        onChange={onChange as any}
+                        onBlur={onBlur}
                         value={value ?? 1}
                         min={1}
                         clampValueOnBlur={true}
                         maxWidth="100px"
                       >
-                        <NumberInputField ref={ref} name={restField.name} />
+                        <NumberInputField ref={ref} name={name} />
                         <NumberInputStepper>
                           <NumberIncrementStepper />
                           <NumberDecrementStepper />

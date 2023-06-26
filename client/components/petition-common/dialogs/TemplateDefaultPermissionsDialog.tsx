@@ -250,7 +250,7 @@ export function TemplateDefaultPermissionsDialog({
                   render={({ field: { value, onChange } }) => (
                     <PetitionPermissionTypeSelect
                       value={value}
-                      onChange={onChange}
+                      onChange={(value) => onChange(value!)}
                       disableOwner={
                         !!ownerPermission ||
                         editors.length > 1 ||

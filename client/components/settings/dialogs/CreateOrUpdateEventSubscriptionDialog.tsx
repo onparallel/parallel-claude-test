@@ -434,7 +434,7 @@ export function CreateOrUpdateEventSubscriptionDialog({
                 control={control}
                 rules={{ required: true }}
                 render={({ field: { onChange, value } }) => (
-                  <RadioGroup value={value} onChange={onChange}>
+                  <RadioGroup value={value} onChange={onChange as any}>
                     <Stack>
                       <Radio value="ALL">
                         <FormattedMessage

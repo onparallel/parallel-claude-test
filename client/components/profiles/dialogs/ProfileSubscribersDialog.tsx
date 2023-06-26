@@ -149,7 +149,7 @@ function ProfileSubscribersDialog({
                       e.preventDefault();
                     }
                   }}
-                  onChange={onChange}
+                  onChange={onChange as any}
                   onBlur={onBlur}
                   onSearch={handleSearchUsers}
                 />

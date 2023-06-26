@@ -372,7 +372,7 @@ export function PublicSignupFormExperience({
               <ReCaptcha
                 hl={intl.locale}
                 sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                onChange={onChange}
+                onChange={onChange as any}
               />
             )}
           />

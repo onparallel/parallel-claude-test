@@ -82,7 +82,7 @@ export function CompliancePeriodDialog({
               name="anonymizeAfterMonths"
               control={control}
               rules={{ required: true, min: 1 }}
-              render={({ field: { ref, value, ...restField } }) => (
+              render={({ field: { ref, value, name, onChange, onBlur } }) => (
                 <HStack as={FormLabel} margin={0}>
                   <FormattedMessage
                     id="component.petition-compliance-period-dialog.anonymize-after-label"
@@ -92,13 +92,13 @@ export function CompliancePeriodDialog({
                       input: (
                         <NumberInput
                           marginX={2}
-                          {...restField}
+                          onChange={onChange as any}
                           value={value ?? 1}
                           min={1}
                           clampValueOnBlur={true}
                           maxWidth="100px"
                         >
-                          <NumberInputField ref={ref} name={restField.name} type="number" />
+                          <NumberInputField ref={ref} name={name} type="number" />
                           <NumberInputStepper>
                             <NumberIncrementStepper />
                             <NumberDecrementStepper />

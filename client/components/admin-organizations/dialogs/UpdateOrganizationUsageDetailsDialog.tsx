@@ -243,13 +243,15 @@ export function UpdateOrganizationUsageDetailsDialog({
                 <Controller
                   name="periodUnits"
                   control={control}
-                  render={({ field }) => (
+                  render={({ field: { value, onChange, onBlur } }) => (
                     <SimpleSelect<string>
                       options={Object.entries(durationOptions).map(([value, label]) => ({
                         value,
                         label,
                       }))}
-                      {...field}
+                      value={value}
+                      onChange={(value) => onChange(value!)}
+                      onBlur={onBlur}
                     />
                   )}
                 />

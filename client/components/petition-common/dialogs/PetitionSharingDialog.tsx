@@ -367,7 +367,7 @@ export function PetitionSharingDialog({
                   render={({ field: { value, onChange } }) => (
                     <PetitionPermissionTypeSelect
                       value={value}
-                      onChange={onChange}
+                      onChange={(value) => onChange(value! as "READ" | "WRITE")}
                       hideOwner={true}
                       isDisabled={petitionsOwnedWrite.length === 0}
                     />

@@ -114,7 +114,7 @@ export function DocumentThemeEditor({
                   onlyPositive
                   suffix=" mm"
                   value={value}
-                  onChange={onChange}
+                  onChange={(value) => onChange(value as number)}
                   onBlur={onBlur}
                 />
               )}
@@ -137,7 +137,7 @@ export function DocumentThemeEditor({
                   onlyPositive
                   suffix=" mm"
                   value={value}
-                  onChange={onChange}
+                  onChange={(value) => onChange(value as number)}
                   onBlur={onBlur}
                 />
               )}
@@ -160,7 +160,7 @@ export function DocumentThemeEditor({
                   onlyPositive
                   suffix=" mm"
                   value={value}
-                  onChange={onChange}
+                  onChange={(value) => onChange(value as number)}
                   onBlur={onBlur}
                 />
               )}

@@ -130,7 +130,7 @@ function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogRe
                     id: "component.create-profile-dialog.select-profile-type",
                     defaultMessage: "Select a profile type",
                   })}
-                  onChange={onChange}
+                  onChange={(value) => onChange(value!)}
                 />
               )}
             />

@@ -380,7 +380,7 @@ function SignatureConfigDialogBodyStep1({
               }
               getOptionValue={(p) => p.id}
               value={integrations.find((i) => i.id === value.id)}
-              onChange={onChange}
+              onChange={(value) => onChange(value!)}
               options={integrations}
               isSearchable={false}
             />

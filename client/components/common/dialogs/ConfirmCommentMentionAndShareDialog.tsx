@@ -135,8 +135,14 @@ function ConfirmCommentMentionAndShareDialog({
               <Controller
                 name="sharePetitionPermission"
                 control={control}
-                render={({ field }) => (
-                  <PetitionPermissionTypeSelect {...field} hideOwner isSearchable={false} />
+                render={({ field: { value, onChange, onBlur } }) => (
+                  <PetitionPermissionTypeSelect
+                    value={value}
+                    onChange={(value) => onChange(value! as "WRITE" | "READ")}
+                    onBlur={onBlur}
+                    hideOwner
+                    isSearchable={false}
+                  />
                 )}
               />
             </FormControl>

@@ -333,7 +333,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                   as={Stack}
                   spacing={2}
                   isDisabled={!hasAdminRole}
-                  onChange={onChange}
+                  onChange={(value) => onChange(value as Tone)}
                   value={value}
                 >
                   <Radio backgroundColor="white" value="INFORMAL">

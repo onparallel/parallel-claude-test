@@ -280,10 +280,10 @@ function CreateOrUpdateProfileTypeFieldDialog({
                 required: true,
               }}
               render={({ field: { value, onChange } }) => (
-                <SimpleSelect
+                <SimpleSelect<ProfileTypeFieldType, false>
                   value={value}
                   options={profileTypeFieldTypes}
-                  onChange={onChange}
+                  onChange={(value) => onChange(value!)}
                   components={{ SingleValue, Option }}
                   isDisabled={isDefined(profileTypeField)}
                 />
@@ -383,7 +383,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                             size="sm"
                             value={value ?? null}
                             options={expirationOptions}
-                            onChange={onChange}
+                            onChange={(value) => onChange(value!)}
                           />
                         )}
                       />
