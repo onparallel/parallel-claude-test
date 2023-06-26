@@ -234,12 +234,18 @@ function mapPetitionBase<T extends Pick<PetitionFragment, "fromTemplate" | "sign
   return {
     ...omit(petition, ["fromTemplate", "signatureConfig"]),
     fromTemplateId: petition.fromTemplate?.id ?? null,
-    signers: petition.signatureConfig?.signers ?? null,
+    signers:
+      petition.signatureConfig === undefined
+        ? undefined // signers not included in response
+        : petition.signatureConfig?.signers ?? null,
   };
 }
 
 export function mapPetition<
-  T extends Pick<PetitionFragment, "fromTemplate" | "tags" | "fields" | "replies">
+  T extends Pick<
+    PetitionFragment,
+    "fromTemplate" | "tags" | "fields" | "replies" | "signatureConfig"
+  >
 >(petition: T) {
   return pipe(
     petition,
