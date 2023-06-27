@@ -489,8 +489,8 @@ export class Auth implements IAuth {
       } else {
         res.status(401).send({ error: "UnknownError" });
       }
-    } catch (error: any) {
-      if (error instanceof InvalidPasswordException) {
+    } catch (error) {
+      if (error instanceof InvalidPasswordException || error instanceof NotAuthorizedException) {
         res.status(403).send({ error: "InvalidPasswordException" });
       } else {
         next(error);

@@ -96,6 +96,7 @@ enum BulkSendSigningMode {
 enum ChangePasswordResult {
   INCORRECT_PASSWORD
   INVALID_NEW_PASSWORD
+  LIMIT_EXCEEDED
   SUCCESS
 }
 

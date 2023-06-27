@@ -128,7 +128,11 @@ export type BulkSendSigningMode =
   /** Let recipients of each group to choose who will sign the petitions. */
   | "LET_RECIPIENT_CHOOSE";
 
-export type ChangePasswordResult = "INCORRECT_PASSWORD" | "INVALID_NEW_PASSWORD" | "SUCCESS";
+export type ChangePasswordResult =
+  | "INCORRECT_PASSWORD"
+  | "INVALID_NEW_PASSWORD"
+  | "LIMIT_EXCEEDED"
+  | "SUCCESS";
 
 export interface CommentCreatedUserNotification extends PetitionUserNotification {
   __typename?: "CommentCreatedUserNotification";

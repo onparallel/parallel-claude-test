@@ -1,5 +1,7 @@
 import {
+  InvalidParameterException,
   InvalidPasswordException,
+  LimitExceededException,
   NotAuthorizedException,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { differenceInMinutes } from "date-fns";
@@ -79,7 +81,7 @@ export const changePassword = mutationField("changePassword", {
   description: "Changes the password for the current logged in user.",
   type: enumType({
     name: "ChangePasswordResult",
-    members: ["SUCCESS", "INCORRECT_PASSWORD", "INVALID_NEW_PASSWORD"],
+    members: ["SUCCESS", "INCORRECT_PASSWORD", "INVALID_NEW_PASSWORD", "LIMIT_EXCEEDED"],
   }),
   authorize: authenticateAnd(contextUserIsNotSso()),
   args: {
@@ -90,11 +92,13 @@ export const changePassword = mutationField("changePassword", {
     try {
       await ctx.auth.changePassword(ctx.req, password, newPassword);
       return "SUCCESS";
-    } catch (error: any) {
-      if (error instanceof NotAuthorizedException) {
+    } catch (error) {
+      if (error instanceof NotAuthorizedException || error instanceof InvalidParameterException) {
         return "INCORRECT_PASSWORD";
       } else if (error instanceof InvalidPasswordException) {
         return "INVALID_NEW_PASSWORD";
+      } else if (error instanceof LimitExceededException) {
+        return "LIMIT_EXCEEDED";
       } else {
         throw error;
       }

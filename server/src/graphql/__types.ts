@@ -356,7 +356,11 @@ export interface NexusGenInputs {
 
 export interface NexusGenEnums {
   BulkSendSigningMode: "COPY_SIGNATURE_SETTINGS" | "DISABLE_SIGNATURE" | "LET_RECIPIENT_CHOOSE";
-  ChangePasswordResult: "INCORRECT_PASSWORD" | "INVALID_NEW_PASSWORD" | "SUCCESS";
+  ChangePasswordResult:
+    | "INCORRECT_PASSWORD"
+    | "INVALID_NEW_PASSWORD"
+    | "LIMIT_EXCEEDED"
+    | "SUCCESS";
   DowJonesKycEntityType: "Entity" | "Person";
   FeatureFlag: db.FeatureFlagName;
   FilterSharedWithLogicalOperator: "AND" | "OR";

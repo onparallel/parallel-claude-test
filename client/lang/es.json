@@ -7980,6 +7980,11 @@
     "context": "Last name"
   },
   {
+    "term": "generic.forms.limit-exceeded-error",
+    "definition": "Has superado el número de intentos. Por favor, inténtalo de nuevo más tarde.",
+    "context": "You have exceeded the number of attempts. Please try again later."
+  },
+  {
     "term": "generic.forms.message-label",
     "definition": "Mensaje",
     "context": "Message"

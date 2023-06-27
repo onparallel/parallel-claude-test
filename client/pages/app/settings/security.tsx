@@ -62,6 +62,9 @@ function Security() {
         case "INCORRECT_PASSWORD":
           setError("password", { type: "validate" });
           break;
+        case "LIMIT_EXCEEDED":
+          setError("password", { type: "limit-exceeded" });
+          break;
         case "SUCCESS":
           reset();
           toast({
@@ -133,6 +136,11 @@ function Security() {
                   <FormattedMessage
                     id="generic.forms.invalid-old-password-error"
                     defaultMessage="Old password is incorrect"
+                  />
+                ) : errors.password?.type === "limit-exceeded" ? (
+                  <FormattedMessage
+                    id="generic.forms.limit-exceeded-error"
+                    defaultMessage="You have exceeded the number of attempts. Please try again later."
                   />
                 ) : null}
               </FormErrorMessage>
