@@ -66,6 +66,7 @@ import {
 import { identity, noop } from "remeda";
 import { expirationToDuration } from "@parallel/utils/useExpirationOptions";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
+import { withOrgRole } from "@parallel/components/common/withOrgRole";
 
 type OrganizationProfileTypeProps = UnwrapPromise<
   ReturnType<typeof OrganizationProfileType.getInitialProps>
@@ -869,6 +870,7 @@ OrganizationProfileType.getInitialProps = async ({ query, fetchQuery }: WithApol
 
 export default compose(
   withDialogs,
+  withOrgRole("ADMIN", "/app/organization"),
   withFeatureFlag("PROFILES", "/app/organization"),
   withApolloData
 )(OrganizationProfileType);

@@ -27249,13 +27249,13 @@ export type ProfileDetail_userQueryVariables = Exact<{ [key: string]: never }>;
 export type ProfileDetail_userQuery = {
   me: {
     __typename?: "User";
+    role: OrganizationRole;
     id: string;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
     email: string;
     createdAt: string;
-    role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -27723,13 +27723,13 @@ export type Profiles_userQueryVariables = Exact<{ [key: string]: never }>;
 export type Profiles_userQuery = {
   me: {
     __typename?: "User";
+    role: OrganizationRole;
     id: string;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
     email: string;
     createdAt: string;
-    role: OrganizationRole;
     lastActiveAt?: string | null;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -40591,6 +40591,7 @@ export const ProfileDetail_userDocument = gql`
   query ProfileDetail_user {
     ...AppLayout_Query
     me {
+      role
       ...ProfileSubscribers_User
     }
     metadata {
@@ -40718,6 +40719,7 @@ export const Profiles_userDocument = gql`
   query Profiles_user {
     ...AppLayout_Query
     me {
+      role
       ...useProfileSubscribersDialog_User
     }
   }

@@ -24,6 +24,7 @@ import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { useDeleteContacts } from "@parallel/utils/mutations/useDeleteContacts";
 import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
+import { isAtLeast } from "@parallel/utils/roles";
 import { UnwrapArray } from "@parallel/utils/types";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useMemo } from "react";
@@ -58,6 +59,7 @@ function Contacts() {
   });
 
   const contacts = data?.contacts;
+  const hasAdminRole = isAtLeast("ADMIN", me.role);
 
   const createContact = useCreateContact();
 
@@ -130,7 +132,7 @@ function Contacts() {
           columns={columns}
           rows={contacts?.items}
           rowKeyProp={"id"}
-          isSelectable
+          isSelectable={hasAdminRole}
           isHighlightable
           loading={loading}
           onRowClick={handleRowClick}

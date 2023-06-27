@@ -49,6 +49,7 @@ import { discriminator } from "@parallel/utils/discriminator";
 import { useDeleteProfile } from "@parallel/utils/mutations/useDeleteProfile";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import { withError } from "@parallel/utils/promises/withError";
+import { isAtLeast } from "@parallel/utils/roles";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
@@ -80,6 +81,9 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
       profileId,
     },
   });
+
+  const hasNormalRole = isAtLeast("NORMAL", me.role);
+  const hasAdminRole = isAtLeast("ADMIN", me.role);
 
   const [properties, hiddenProperties] = partition(
     profile.properties,
@@ -503,10 +507,13 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
               }
               onClick={handleMySubscription}
             />
-            <MoreOptionsMenuProfile
-              onDelete={handleDeleteProfile}
-              onSubscribe={handleSubscribersClick}
-            />
+            {hasNormalRole ? (
+              <MoreOptionsMenuProfile
+                canDelete={hasAdminRole}
+                onDelete={handleDeleteProfile}
+                onSubscribe={handleSubscribersClick}
+              />
+            ) : null}
           </HStack>
           {process.env.NEXT_PUBLIC_ENVIRONMENT === "staging" ? <FakeProfileTables me={me} /> : null}
         </Stack>
@@ -685,6 +692,7 @@ const _queries = [
     query ProfileDetail_user {
       ...AppLayout_Query
       me {
+        role
         ...ProfileSubscribers_User
       }
       metadata {

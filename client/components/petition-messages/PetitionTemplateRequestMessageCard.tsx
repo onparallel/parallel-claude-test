@@ -108,6 +108,9 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
                   value={onBehalf}
                   onChange={handleDefaultOnBehalf}
                   isClearable
+                  isDisabled={
+                    petition.isRestricted || petition.isPublic || myEffectivePermission === "READ"
+                  }
                 />
               </>
             ) : null}

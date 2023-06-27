@@ -30,7 +30,7 @@ export function useOrganizationSections(user: useOrganizationSections_UserFragme
         }),
         path: "/app/organization/general",
       },
-      ...(user.hasProfilesAccess
+      ...(user.hasProfilesAccess && userIsAdmin
         ? [
             {
               title: intl.formatMessage({

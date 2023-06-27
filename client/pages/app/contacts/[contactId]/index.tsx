@@ -38,6 +38,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useDeleteContacts } from "@parallel/utils/mutations/useDeleteContacts";
 import { useHandleNavigation } from "@parallel/utils/navigation";
+import { isAtLeast } from "@parallel/utils/roles";
 import { isNotEmptyText } from "@parallel/utils/strings";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
@@ -62,6 +63,9 @@ function Contact({ contactId }: ContactProps) {
   } = useAssertQuery(Contact_contactDocument, {
     variables: { id: contactId },
   });
+
+  const hasAdminRole = isAtLeast("ADMIN", me.role);
+
   const [isEditing, setIsEditing] = useState(false);
   const [updateContact, { loading }] = useMutation(Contact_updateContactDocument);
   const {
@@ -134,15 +138,17 @@ function Contact({ contactId }: ContactProps) {
               headingLevel="h2"
               headingSize="md"
               rightAction={
-                <IconButtonWithTooltip
-                  icon={<DeleteIcon />}
-                  variant="outline"
-                  label={intl.formatMessage({
-                    id: "generic.delete",
-                    defaultMessage: "Delete",
-                  })}
-                  onClick={handleDeleteClick}
-                />
+                hasAdminRole ? (
+                  <IconButtonWithTooltip
+                    icon={<DeleteIcon />}
+                    variant="outline"
+                    label={intl.formatMessage({
+                      id: "generic.delete",
+                      defaultMessage: "Delete",
+                    })}
+                    onClick={handleDeleteClick}
+                  />
+                ) : undefined
               }
             >
               {`${contact!.fullName ?? ""} <${contact!.email}>`}

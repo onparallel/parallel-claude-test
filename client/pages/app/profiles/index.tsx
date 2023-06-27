@@ -57,6 +57,7 @@ import {
   useQueryState,
   values,
 } from "@parallel/utils/queryState";
+import { isAtLeast } from "@parallel/utils/roles";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { ChangeEvent, MouseEvent, useCallback, useMemo, useState } from "react";
@@ -85,6 +86,7 @@ function Profiles() {
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
 
   const navigate = useHandleNavigation();
+  const hasNormalRole = isAtLeast("NORMAL", me.role);
 
   const { data, loading, refetch } = useQueryOrPreviousData(Profiles_profilesDocument, {
     variables: {
@@ -184,6 +186,7 @@ function Profiles() {
   }, [selectedRows, selectedIds.join(",")]);
 
   const actions = useProfileListActions({
+    canDelete: me.role === "ADMIN",
     onDeleteClick: handleDeleteClick,
     onSubscribeClick: handleSubscribeClick,
   });
@@ -272,7 +275,7 @@ function Profiles() {
             rows={profiles?.items}
             rowKeyProp="id"
             context={context}
-            isSelectable
+            isSelectable={hasNormalRole}
             isHighlightable
             loading={loading}
             onRowClick={handleRowClick}
@@ -328,9 +331,11 @@ function Profiles() {
 function useProfileListActions({
   onDeleteClick,
   onSubscribeClick,
+  canDelete,
 }: {
   onDeleteClick: () => void;
   onSubscribeClick: () => void;
+  canDelete: boolean;
 }) {
   return [
     {
@@ -345,6 +350,7 @@ function useProfileListActions({
       leftIcon: <DeleteIcon />,
       children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
       colorScheme: "red",
+      isDisabled: !canDelete,
     },
   ];
 }
@@ -560,6 +566,7 @@ const _queries = [
     query Profiles_user {
       ...AppLayout_Query
       me {
+        role
         ...useProfileSubscribersDialog_User
       }
     }

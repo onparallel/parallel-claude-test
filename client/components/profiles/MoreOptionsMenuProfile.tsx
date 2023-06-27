@@ -4,11 +4,16 @@ import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMe
 import { FormattedMessage } from "react-intl";
 
 interface MoreOptionsMenuProfileProps {
+  canDelete: boolean;
   onDelete: () => void;
   onSubscribe: () => void;
 }
 
-export function MoreOptionsMenuProfile({ onDelete, onSubscribe }: MoreOptionsMenuProfileProps) {
+export function MoreOptionsMenuProfile({
+  canDelete,
+  onDelete,
+  onSubscribe,
+}: MoreOptionsMenuProfileProps) {
   return (
     <MoreOptionsMenuButton
       variant="outline"
@@ -25,6 +30,7 @@ export function MoreOptionsMenuProfile({ onDelete, onSubscribe }: MoreOptionsMen
             color="red.500"
             icon={<DeleteIcon display="block" boxSize={4} />}
             onClick={onDelete}
+            isDisabled={!canDelete}
           >
             <FormattedMessage
               id="component.more-options-menu-profile.delete-profile"
