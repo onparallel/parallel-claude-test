@@ -2241,22 +2241,23 @@ export class PetitionRepository extends BaseRepository {
       this.loadPetition(petitionId),
       this.loadUserPermissionsByPetitionId(petitionId),
     ]);
+
+    if (!isDefined(sourcePetition)) {
+      throw new Error(`Petition:${petitionId} not found`);
+    }
+
     return await this.withTransaction(async (t) => {
       // if cloning a petition, clone the petition from_template_id
       let fromTemplateId: Maybe<number>;
-      if (data?.is_template === true) {
+      if (data.is_template ?? sourcePetition.is_template) {
         // if we are creating a template then from_template_id is null
         fromTemplateId = null;
-      } else if (data?.is_template === false) {
+      } else {
         // if we are creating a petition, use the source petition id as
         // from_template_id only if it's a template. otherwise copy it.
-        fromTemplateId = sourcePetition!.is_template
-          ? sourcePetition!.id
-          : sourcePetition!.from_template_id;
-      } else {
-        // when cloning petitions we clone the petition from_template_id
-        // if we are cloning templates then from_template_id is null
-        fromTemplateId = sourcePetition!.is_template ? null : sourcePetition!.from_template_id;
+        fromTemplateId = sourcePetition.is_template
+          ? sourcePetition.id
+          : sourcePetition.from_template_id;
       }
 
       const defaultSignatureOrgIntegration = await this.getDefaultSignatureOrgIntegration(
@@ -2275,7 +2276,7 @@ export class PetitionRepository extends BaseRepository {
       let [cloned] = await this.insert(
         "petition",
         {
-          ...omit(sourcePetition!, [
+          ...omit(sourcePetition, [
             "id",
             "created_at",
             "updated_at",
@@ -2284,27 +2285,26 @@ export class PetitionRepository extends BaseRepository {
             "anonymized_at",
             "credits_used",
             // avoid copying deadline data if creating a template or cloning from a template
-            ...(data?.is_template || sourcePetition?.is_template
+            ...(data?.is_template || sourcePetition.is_template
               ? (["deadline"] as const)
               : ([] as const)),
             // avoid copying template_description if creating a petition
-            ...(sourcePetition?.is_template &&
-            (data?.is_template === undefined || data?.is_template)
+            ...(sourcePetition.is_template && (data?.is_template === undefined || data?.is_template)
               ? ([] as const)
               : (["template_description"] as const)),
             // avoid copying public_metadata and custom_properties if creating from a public template
-            ...(sourcePetition?.is_template && sourcePetition.template_public
+            ...(sourcePetition.is_template && sourcePetition.template_public
               ? (["public_metadata", "custom_properties"] as const)
               : ([] as const)),
           ]),
           org_id: owner.org_id,
-          status: sourcePetition?.is_template ? null : "DRAFT",
+          status: sourcePetition.is_template ? null : "DRAFT",
           created_by: createdBy,
           updated_by: createdBy,
           from_template_id: fromTemplateId,
           // if source petition is from another organization, update signatureConfig org_integration.id and empty signers array
           signature_config:
-            sourcePetition?.signature_config && sourcePetition.org_id !== owner.org_id
+            sourcePetition.signature_config && sourcePetition.org_id !== owner.org_id
               ? defaultSignatureOrgIntegration
                 ? {
                     ...sourcePetition.signature_config,
@@ -2313,16 +2313,16 @@ export class PetitionRepository extends BaseRepository {
                     orgIntegrationId: defaultSignatureOrgIntegration.id,
                   }
                 : null // if new owner does not have a default signature integration, remove the signature config on the cloned petition
-              : sourcePetition?.signature_config,
+              : sourcePetition.signature_config,
 
           // if coming from a public template, update document_organization_theme_id to the default of user organization
-          document_organization_theme_id: sourcePetition!.template_public
+          document_organization_theme_id: sourcePetition.template_public
             ? defaultOrganizationTheme.id
-            : sourcePetition!.document_organization_theme_id,
+            : sourcePetition.document_organization_theme_id,
           path:
-            sourcePetition!.is_template && data?.is_template === false
-              ? sourcePetition!.default_path // if creating a petition from a template, use default_path
-              : sourcePetition!.path, // else, use path
+            sourcePetition.is_template && data?.is_template === false
+              ? sourcePetition.default_path // if creating a petition from a template, use default_path
+              : sourcePetition.path, // else, use path
           ...data,
         },
         t
@@ -2344,13 +2344,23 @@ export class PetitionRepository extends BaseRepository {
           ? []
           : await this.insert(
               "petition_field",
-              fields.map((field) => ({
-                ...omit(field, ["id", "petition_id", "created_at", "updated_at"]),
-                petition_id: cloned.id,
-                from_petition_field_id: field.from_petition_field_id ?? field.id,
-                created_by: createdBy,
-                updated_by: createdBy,
-              })),
+              fields.map((field) => {
+                let fromPetitionFieldId: Maybe<number>;
+                if (data.is_template ?? sourcePetition.is_template) {
+                  fromPetitionFieldId = null;
+                } else {
+                  fromPetitionFieldId = sourcePetition.is_template
+                    ? field.id
+                    : field.from_petition_field_id;
+                }
+                return {
+                  ...omit(field, ["id", "petition_id", "created_at", "updated_at"]),
+                  petition_id: cloned.id,
+                  from_petition_field_id: fromPetitionFieldId,
+                  created_by: createdBy,
+                  updated_by: createdBy,
+                };
+              }),
               t
             ).returning("*");
 
@@ -2363,7 +2373,7 @@ export class PetitionRepository extends BaseRepository {
             user_id: owner.id,
             type: "OWNER",
             // if cloning a petition clone, the is_subscribed from the original
-            is_subscribed: sourcePetition!.is_template
+            is_subscribed: sourcePetition.is_template
               ? true
               : userPermissions.find((p) => p.user_id === owner.id)?.is_subscribed ?? true,
             created_by: createdBy,
@@ -2373,7 +2383,7 @@ export class PetitionRepository extends BaseRepository {
         );
       }
 
-      if (sourcePetition?.org_id === owner.org_id) {
+      if (sourcePetition.org_id === owner.org_id) {
         // clone tags if source petition is from same org
         await this.raw(
           /* sql */ `
@@ -2386,7 +2396,7 @@ export class PetitionRepository extends BaseRepository {
       }
 
       if (
-        sourcePetition?.org_id === owner.org_id &&
+        sourcePetition.org_id === owner.org_id &&
         sourcePetition.is_template &&
         (data.is_template === undefined || data.is_template === true)
       ) {

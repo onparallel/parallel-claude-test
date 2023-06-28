@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 import { faker } from "@faker-js/faker";
 import { Knex } from "knex";
-import { range, sortBy } from "remeda";
+import { omit, range, sortBy } from "remeda";
 import { PetitionEvent } from "../../db/events/PetitionEvent";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
@@ -1593,6 +1593,271 @@ describe("GraphQL/Petitions", () => {
           { permissionType: "READ", user: { id: toGlobalId("User", sessionUser.id) } },
         ],
       });
+    });
+
+    it("creating from scratch does not set from_template_id", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($type: PetitionBaseType) {
+            createPetition(type: $type, locale: es) {
+              id
+            }
+          }
+        `,
+        {
+          type: ["PETITION", "TEMPLATE"][Math.round(Math.random())],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      const fromScratch = await mocks.knex
+        .from("petition")
+        .where({ id: fromGlobalId(data?.createPetition.id).id })
+        .select("*");
+
+      expect(fromScratch).toHaveLength(1);
+      expect(fromScratch[0].from_template_id).toBeNull();
+    });
+
+    it("creating a template from a base template or petition does not set from_template_id", async () => {
+      const [template] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: true })
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID, $type: PetitionBaseType) {
+            createPetition(petitionId: $petitionId, type: $type) {
+              id
+            }
+          }
+        `,
+        {
+          type: "TEMPLATE",
+          petitionId: toGlobalId("Petition", template.id),
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      const fromBaseTemplate = await mocks.knex
+        .from("petition")
+        .where({ id: fromGlobalId(data?.createPetition.id).id })
+        .select("*");
+
+      expect(fromBaseTemplate).toHaveLength(1);
+      expect(fromBaseTemplate[0].from_template_id).toEqual(null);
+    });
+
+    it("creating a petition from a template sets from_template_id", async () => {
+      const [template] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: true })
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID, $type: PetitionBaseType) {
+            createPetition(petitionId: $petitionId, type: $type) {
+              id
+            }
+          }
+        `,
+        {
+          type: "PETITION",
+          petitionId: toGlobalId("Petition", template.id),
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      const fromBaseTemplate = await mocks.knex
+        .from("petition")
+        .where({ id: fromGlobalId(data?.createPetition.id).id })
+        .select("*");
+
+      expect(fromBaseTemplate).toHaveLength(1);
+      expect(fromBaseTemplate[0].from_template_id).toEqual(template.id);
+    });
+
+    it("creating a petition from a petition sets from_template_id equal to the from_template_id of the petition", async () => {
+      const [template] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: true })
+      );
+      const [petition] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: false, from_template_id: template.id })
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID, $type: PetitionBaseType) {
+            createPetition(petitionId: $petitionId, type: $type) {
+              id
+            }
+          }
+        `,
+        {
+          type: "PETITION",
+          petitionId: toGlobalId("Petition", petition.id),
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      const fromBasePetition = await mocks.knex
+        .from("petition")
+        .where({ id: fromGlobalId(data?.createPetition.id).id })
+        .select("*");
+
+      expect(fromBasePetition).toHaveLength(1);
+      expect(fromBasePetition[0].from_template_id).toEqual(petition.from_template_id);
+    });
+
+    it("creating a template from another template or petition does not set from_petition_field_id on the fields", async () => {
+      const [template] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: true })
+      );
+      await mocks.createRandomPetitionFields(template.id, 3);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($type: PetitionBaseType, $petitionId: GID) {
+            createPetition(type: $type, locale: es, petitionId: $petitionId) {
+              id
+              fields {
+                id
+              }
+            }
+          }
+        `,
+        {
+          type: "TEMPLATE",
+          petitionId: toGlobalId("Petition", template.id),
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      const clonedFields = await mocks.knex
+        .from("petition_field")
+        .where({ petition_id: fromGlobalId(data?.createPetition.id).id })
+        .select("*");
+
+      expect(clonedFields).toHaveLength(3);
+      for (const field of clonedFields) {
+        expect(field.from_petition_field_id).toBeNull();
+      }
+    });
+
+    it("creating a petition from another template sets from_petition_field_id on the fields", async () => {
+      const [template] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: true })
+      );
+      const fields = await mocks.createRandomPetitionFields(template.id, 3);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($type: PetitionBaseType, $petitionId: GID) {
+            createPetition(type: $type, locale: es, petitionId: $petitionId) {
+              id
+              fields {
+                id
+              }
+            }
+          }
+        `,
+        {
+          type: "PETITION",
+          petitionId: toGlobalId("Petition", template.id),
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      const clonedFields = await mocks.knex
+        .from("petition_field")
+        .where({ petition_id: fromGlobalId(data?.createPetition.id).id })
+        .select("from_petition_field_id");
+
+      expect(clonedFields).toHaveLength(3);
+      expect(clonedFields).toEqual([
+        {
+          from_petition_field_id: fields[0].id,
+        },
+        {
+          from_petition_field_id: fields[1].id,
+        },
+        {
+          from_petition_field_id: fields[2].id,
+        },
+      ]);
+    });
+
+    it("creating a petition from another petition sets from_petition_field_id equal to the from_petition_field_id on the fields", async () => {
+      const [template] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: true })
+      );
+      const templateFields = await mocks.createRandomPetitionFields(template.id, 3);
+      const [petition] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: false, from_template_id: template.id })
+      );
+      const petitionFields = await mocks.createRandomPetitionFields(petition.id, 3, (i) => ({
+        from_petition_field_id: templateFields[i].id,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($type: PetitionBaseType, $petitionId: GID) {
+            createPetition(type: $type, locale: es, petitionId: $petitionId) {
+              id
+              fields {
+                id
+              }
+            }
+          }
+        `,
+        {
+          type: "PETITION",
+          petitionId: toGlobalId("Petition", petition.id),
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      const clonedFields = await mocks.knex
+        .from("petition_field")
+        .where({ petition_id: fromGlobalId(data?.createPetition.id).id })
+        .select("from_petition_field_id");
+
+      expect(clonedFields).toHaveLength(3);
+      expect(clonedFields).toEqual([
+        {
+          from_petition_field_id: petitionFields[0].from_petition_field_id,
+        },
+        {
+          from_petition_field_id: petitionFields[1].from_petition_field_id,
+        },
+        {
+          from_petition_field_id: petitionFields[2].from_petition_field_id,
+        },
+      ]);
     });
   });
 
