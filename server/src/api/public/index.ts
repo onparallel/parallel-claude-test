@@ -3269,7 +3269,7 @@ api
         ...getProfileIncludesFromQuery({ include: ["fields"] }),
       });
 
-      return Ok(mapProfile(result.profile).fields);
+      return Ok(mapProfile(result.profile).fields!);
     }
   )
   .put(
