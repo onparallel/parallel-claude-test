@@ -2,7 +2,7 @@ import Excel from "exceljs";
 import { IntlShape } from "react-intl";
 import { isDefined, minBy, zip } from "remeda";
 import { Readable } from "stream";
-import { PetitionFieldReply, PetitionMessage } from "../../db/__types";
+import { PetitionField, PetitionFieldReply, PetitionMessage } from "../../db/__types";
 import { FORMATS } from "../../util/dates";
 import { getFieldIndices } from "../../util/fieldIndices";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
@@ -30,8 +30,9 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
     if (!hasAccess) {
       throw new Error(`User ${this.task.user_id} has no access to petition ${templateId}`);
     }
-    const [template, petitions] = await Promise.all([
+    const [template, templateFields, petitions] = await Promise.all([
       this.ctx.readonlyPetitions.loadPetition(templateId),
+      this.ctx.readonlyPetitions.loadFieldsForPetition(templateId),
       this.ctx.readonlyPetitions.getPetitionsForTemplateRepliesReport(
         templateId,
         startDate,
@@ -89,6 +90,9 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           m ? this.ctx.users.loadUserDataByUserId(m.sender_id) : null
         )
       );
+
+      // templateFields are already ordered by position
+      const fieldPositions = templateFields.map((f) => f.id);
 
       rows = petitions.map((petition, petitionIndex) => {
         const petitionFields = petitionsFieldsWithReplies[petitionIndex];
@@ -286,9 +290,9 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         const visibilities = evaluateFieldVisibility(petitionFields);
         zip(petitionFields, fieldIndexes)
           .filter((_, i) => visibilities[i])
-          .forEach(([field, fieldIndex]) => {
+          .forEach(([field]) => {
             row[`${field.from_petition_field_id ?? field.id}`] = {
-              position: (fieldIndex as number) - 1 + fixedColsLength,
+              position: this.getFieldPosition(field, fieldPositions) + fixedColsLength,
               title: field.type === "DATE_TIME" ? field.title + " (UTC)" : field.title,
               content: !isFileTypeField(field.type)
                 ? field.replies
@@ -325,6 +329,24 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
     });
 
     return { temporary_file_id: tmpFile.id };
+  }
+
+  private getFieldPosition(
+    field: Pick<PetitionField, "id" | "from_petition_field_id">,
+    orderArray: number[]
+  ) {
+    if (isDefined(field.from_petition_field_id)) {
+      const position = orderArray.indexOf(field.from_petition_field_id);
+      if (position === -1) {
+        orderArray.push(field.from_petition_field_id);
+        return orderArray.length - 1;
+      } else {
+        return position;
+      }
+    } else {
+      orderArray.push(field.id);
+      return orderArray.length - 1;
+    }
   }
 
   private replyContent(r: Pick<PetitionFieldReply, "content" | "type">, intl: IntlShape) {
