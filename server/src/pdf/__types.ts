@@ -1316,7 +1316,7 @@ export type MutationdeleteProfileArgs = {
 };
 
 export type MutationdeleteProfileFieldFileArgs = {
-  profileFieldFileIds: Array<Scalars["GID"]["input"]>;
+  profileFieldFileIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
 };

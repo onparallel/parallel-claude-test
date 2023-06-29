@@ -1,10 +1,16 @@
 import { JSONSchema6TypeName } from "json-schema";
 import { FromSchema } from "json-schema-to-ts";
 import { outdent } from "outdent";
-import { PetitionEventType, PetitionFieldReplyStatusValues } from "../../db/__types";
+import {
+  PetitionEventType,
+  PetitionFieldReplyStatusValues,
+  ProfileTypeFieldTypeValues,
+  UserLocaleValues,
+} from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { pascalCase } from "../../util/strings";
 import { JsonSchema, JsonSchemaFor, schema } from "../rest/schemas";
+import deepmerge from "deepmerge";
 
 function _ListOf<T extends JsonSchema>(item: T) {
   return {
@@ -2321,5 +2327,334 @@ export const SendReminder = schema({
       ..._MessageBody,
       description: "Optional message to include in the reminder email",
     }),
+  },
+} as const);
+
+const _LocalizableUserText = {
+  name: "LocalizableUserText",
+  type: "object",
+  additionalProperties: false,
+  anyOf: UserLocaleValues.map((key) => ({ required: [key] })),
+  properties: Object.fromEntries(UserLocaleValues.map((key) => [key, { type: "string" }])),
+  example: { es: "Persona Jurídica", en: "Legal Entity" },
+} as const;
+
+const _ProfileTypeField = {
+  title: "ProfileTypeField",
+  type: "object",
+  additionalProperties: false,
+  required: ["id", "name", "alias", "type", "isExpirable"],
+  properties: {
+    id: {
+      type: "string",
+      description: "ID of the profile type field",
+      example: toGlobalId("ProfileTypeField", 1),
+    },
+    name: _LocalizableUserText,
+    alias: {
+      type: ["string", "null"],
+      description: "Alias of the profile type field",
+      example: "name",
+    },
+    type: {
+      type: "string",
+      description: "Type of the profile type field",
+      example: "TEXT",
+      enum: ProfileTypeFieldTypeValues,
+    },
+    isExpirable: {
+      type: "boolean",
+      description: "Whether the profile type field is expirable",
+      example: false,
+    },
+  },
+} as const;
+
+const _ProfileFieldValue = {
+  title: "ProfileFieldValue",
+  type: "object",
+  additionalProperties: false,
+  required: ["id", "content", "expiresAt", "createdAt"],
+  properties: {
+    id: {
+      type: "string",
+      description: "ID of the profile field value",
+      example: toGlobalId("ProfileFieldValue", 1),
+    },
+    content: {
+      type: "object",
+      description: "Content of the profile field value",
+      example: { value: "Parallel Solutions" },
+    },
+    expiresAt: {
+      type: ["string", "null"],
+      description: "Expiration date of the profile field value",
+      example: new Date(2026, 1, 2).toISOString(),
+    },
+    createdAt: {
+      type: "string",
+      description: "Creation date of the profile field value",
+      example: new Date(2023, 1, 2).toISOString(),
+    },
+  },
+} as const;
+
+const _ProfileFieldFile = {
+  title: "ProfileFieldFile",
+  type: "object",
+  additionalProperties: false,
+  required: ["id", "file", "expiresAt", "createdAt"],
+  properties: {
+    id: {
+      type: "string",
+      description: "ID of the profile field file",
+      example: toGlobalId("ProfileFieldFile", 1),
+    },
+    file: {
+      type: "object",
+      required: ["filename", "size", "contentType"],
+      properties: {
+        filename: {
+          type: "string",
+          example: "file.pdf",
+        },
+        size: {
+          type: "number",
+          example: 1024 ^ 4,
+        },
+        contentType: {
+          type: "string",
+          example: "application/pdf",
+        },
+      },
+    },
+    expiresAt: {
+      type: ["string", "null"],
+      description: "Expiration date of the profile field file",
+      example: new Date(2026, 1, 2).toISOString(),
+    },
+    createdAt: {
+      type: "string",
+      description: "Creation date of the profile field file",
+      example: new Date(2023, 1, 2).toISOString(),
+    },
+  },
+} as const;
+
+const _ProfileFieldProperty = {
+  title: "ProfileFieldProperty",
+  type: "object",
+  additionalProperties: false,
+  anyOf: [
+    {
+      title: "ProfileFieldPropertyValue",
+      required: ["field", "value"],
+      properties: {
+        field: deepmerge(
+          _ProfileTypeField,
+          {
+            properties: {
+              type: {
+                enum: ProfileTypeFieldTypeValues.filter((v) => v !== "FILE"),
+              },
+            },
+          },
+          {
+            arrayMerge: (_, src) => src, // don't merge arrays
+          }
+        ),
+        value: { ..._ProfileFieldValue, type: ["object", "null"] },
+      },
+    },
+    {
+      title: "ProfileFieldPropertyFiles",
+      required: ["field", "files"],
+      properties: {
+        field: deepmerge(_ProfileTypeField, {
+          properties: {
+            type: {
+              const: "FILE",
+              enum: null,
+            },
+          },
+        }),
+        files: { type: ["array", "null"], items: _ProfileFieldFile },
+      },
+    },
+  ],
+} as const;
+
+const _ProfileSubscription = {
+  title: "ProfileSubscription",
+  type: "object",
+  additionalProperties: false,
+  required: ["user"],
+  properties: {
+    user: _User,
+  },
+} as const;
+
+const _Profile = {
+  title: "Profile",
+  type: "object",
+  additionalProperties: false,
+  required: ["id", "name", "profileType", "createdAt"],
+  properties: {
+    id: {
+      type: "string",
+      description: "ID of the profile",
+      example: toGlobalId("Profile", 101),
+    },
+    name: {
+      type: "string",
+      description: "The name of the profile",
+      example: "Parallel Solutions",
+    },
+    profileType: {
+      title: "ProfileType",
+      type: "object",
+      additionalProperties: false,
+      required: ["id", "name"],
+      properties: {
+        id: {
+          type: "string",
+          description: "ID of the profile type",
+          example: toGlobalId("ProfileType", 1),
+        },
+        name: _LocalizableUserText,
+      },
+    },
+    fields: {
+      ...ListOf(_ProfileFieldProperty as any),
+      description:
+        "If parameter `include` contains `fields`, this will be the list of profile fields and files",
+    },
+    fieldsByAlias: {
+      type: "object",
+      description:
+        "If parameter `include` contains `fieldsByAlias`, this will be the list of profile fields and files indexed by alias",
+      example: {
+        name: "Parallel Solutions",
+      },
+    },
+    subscribers: {
+      type: "array",
+      description:
+        "If parameter `include` contains `subscribers`, this will be the list of users subscribed to the profile",
+      items: _ProfileSubscription,
+    },
+    createdAt: {
+      type: "string",
+      format: "date-time",
+      description: "Date and time when the profile was created",
+      example: new Date(2020, 2, 15).toISOString(),
+    },
+  },
+} as const;
+
+export const PaginatedProfiles = schema(_PaginationOf(_Profile as JsonSchema));
+export const Profile = schema(_Profile as JsonSchema);
+export const CreateProfile = schema({
+  title: "CreateProfile",
+  type: "object",
+  additionalProperties: false,
+  required: ["profileTypeId"],
+  properties: {
+    profileTypeId: {
+      description: "The ID of the profile type to use",
+      type: "string",
+      example: toGlobalId("ProfileType", 42),
+    },
+    subscribe: {
+      type: ["boolean"],
+      description: "Whether to subscribe the user to the profile type",
+      example: true,
+    },
+    fields: {
+      type: "array",
+      description: "The profile fields to assign to the created profile",
+      items: {
+        type: "object",
+        title: "UpdateProfileFieldValueInput",
+        additionalProperties: false,
+        required: ["profileTypeFieldId"],
+        properties: {
+          profileTypeFieldId: {
+            type: "string",
+            description: "The ID of the profile type field to update",
+            example: toGlobalId("ProfileTypeField", 1),
+          },
+          content: {
+            type: ["object", "null"],
+            description: "The content of the profile field",
+            example: {
+              value: "Parallel Solutions",
+            },
+          },
+          expiryDate: {
+            type: ["string", "null"],
+            description: "The expiry date of the profile field",
+            example: "2026-10-15",
+          },
+        },
+      },
+    },
+  },
+} as const);
+
+export const ListOfProfileSubscriptions = ListOf(_ProfileSubscription);
+
+export const ProfileSubscriptionInput = (subscribe: boolean) =>
+  schema({
+    title: "ProfileSubscriptionInput",
+    type: "object",
+    additionalProperties: false,
+    required: ["userIds"],
+    properties: {
+      userIds: {
+        type: "array",
+        description: subscribe
+          ? "The IDs of the users to subscribe to the profile"
+          : "The IDs of the users to unsubscribe from the profile",
+        minItems: 1,
+        items: {
+          type: "string",
+          example: toGlobalId("User", 42),
+        },
+      },
+    },
+  } as const);
+
+export const ListOfProfileProperties = ListOf(_ProfileFieldProperty as any);
+
+export const CreateProfileFieldValue = schema({
+  type: "object",
+  example: { name: "John Doe", amount: 500, date: "2023-06-27" },
+} as const);
+
+export const UpdateProfileFieldValueFormDataBody = schema({
+  type: "object",
+  required: ["value"],
+  additionalProperties: false,
+  properties: {
+    value: {
+      anyOf: [
+        _ListOf({
+          format: "binary",
+          title: "File",
+          description: "File to be uploaded to the profile field",
+        }),
+        {
+          type: ["string", "null"],
+          description:
+            "For fields of type other than `FILE`, this contains the value to be uploaded, or pass `null` to remove it.",
+        },
+      ],
+    },
+    expiryDate: {
+      type: ["string", "null"],
+      description:
+        "Pass a date in format YYYY-MM-DD to specify when the value should expire. The field must be previously configured to allow expiration.",
+    },
   },
 } as const);

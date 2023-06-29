@@ -115,5 +115,17 @@ export function validateProfileFieldValue(field: TableTypes["profile_type_field"
       }
       return;
     }
+    case "NUMBER": {
+      const valid = ajv.validate(stringValueSchema(), content);
+      if (!valid) {
+        throw new Error(ajv.errorsText());
+      }
+      if (isNaN(Number(content.value))) {
+        throw new Error("Value is not a valid number");
+      }
+      return;
+    }
+    case "FILE":
+      throw new Error("Can't validate file field");
   }
 }

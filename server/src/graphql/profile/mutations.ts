@@ -30,7 +30,7 @@ import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
 import { random } from "../../util/token";
 import { RESULT } from "../helpers/Result";
 import { SUCCESS } from "../helpers/Success";
-import { authenticateAnd } from "../helpers/authorize";
+import { authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { dateArg } from "../helpers/scalars/DateTime";
@@ -712,17 +712,27 @@ export const deleteProfileFieldFile = mutationField("deleteProfileFieldFile", {
     userHasFeatureFlag("PROFILES"),
     userHasAccessToProfile("profileId"),
     profileHasProfileTypeFieldId("profileId", "profileTypeFieldId"),
-    profileFieldFileHasProfileTypeFieldId("profileFieldFileIds", "profileTypeFieldId"),
+    ifArgDefined(
+      "profileFieldFileIds",
+      profileFieldFileHasProfileTypeFieldId("profileFieldFileIds" as never, "profileTypeFieldId")
+    ),
     profileTypeFieldIsOfType("profileTypeFieldId", ["FILE"])
   ),
   args: {
     profileId: nonNull(globalIdArg("Profile")),
     profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
-    profileFieldFileIds: nonNull(list(nonNull(globalIdArg("ProfileFieldFile")))),
+    profileFieldFileIds: list(nonNull(globalIdArg("ProfileFieldFile"))),
   },
-  resolve: async (_, { profileFieldFileIds }, ctx) => {
+  resolve: async (_, { profileFieldFileIds, profileTypeFieldId }, ctx) => {
     try {
-      await ctx.profiles.deleteProfileFieldFiles(profileFieldFileIds, ctx.user!.id);
+      if (isDefined(profileFieldFileIds)) {
+        await ctx.profiles.deleteProfileFieldFiles(profileFieldFileIds, ctx.user!.id);
+      } else {
+        await ctx.profiles.deleteProfileFieldFilesByProfileTypeFieldId(
+          profileTypeFieldId,
+          ctx.user!.id
+        );
+      }
       return RESULT.SUCCESS;
     } catch {
       return RESULT.FAILURE;

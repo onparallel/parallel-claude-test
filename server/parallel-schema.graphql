@@ -1174,7 +1174,7 @@ type Mutation {
     profileIds: [GID!]!
   ): Success!
   deleteProfileFieldFile(
-    profileFieldFileIds: [GID!]!
+    profileFieldFileIds: [GID!]
     profileId: GID!
     profileTypeFieldId: GID!
   ): Result!

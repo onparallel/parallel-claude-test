@@ -1316,7 +1316,7 @@ export type MutationdeleteProfileArgs = {
 };
 
 export type MutationdeleteProfileFieldFileArgs = {
-  profileFieldFileIds: Array<Scalars["GID"]["input"]>;
+  profileFieldFileIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
 };
@@ -4959,6 +4959,110 @@ export type SubscriptionFragment = {
 
 export type TaskFragment = { id: string; progress: number | null; status: TaskStatus };
 
+export type ProfileTypeFieldFragment = {
+  id: string;
+  name: { [locale in UserLocale]?: string };
+  alias: string | null;
+  type: ProfileTypeFieldType;
+  isExpirable: boolean;
+};
+
+export type ProfileFieldValueFragment = {
+  id: string;
+  content: { [key: string]: any } | null;
+  expiresAt: string | null;
+  createdAt: string;
+};
+
+export type ProfileFieldFileFragment = {
+  id: string;
+  expiresAt: string | null;
+  createdAt: string;
+  file: { filename: string; size: number; contentType: string } | null;
+};
+
+export type ProfileTypeFragment = { id: string; name: { [locale in UserLocale]?: string } };
+
+export type ProfileFieldPropertyFragment = {
+  field: {
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    alias: string | null;
+    type: ProfileTypeFieldType;
+    isExpirable: boolean;
+  };
+  value: {
+    id: string;
+    content: { [key: string]: any } | null;
+    expiresAt: string | null;
+    createdAt: string;
+  } | null;
+  files: Array<{
+    id: string;
+    expiresAt: string | null;
+    createdAt: string;
+    file: { filename: string; size: number; contentType: string } | null;
+  }> | null;
+};
+
+export type ProfileFragment = {
+  id: string;
+  name: string;
+  createdAt: string;
+  profileType: { id: string; name: { [locale in UserLocale]?: string } };
+  properties?: Array<{
+    field: {
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      alias: string | null;
+      type: ProfileTypeFieldType;
+      isExpirable: boolean;
+    };
+    value: {
+      id: string;
+      content: { [key: string]: any } | null;
+      expiresAt: string | null;
+      createdAt: string;
+    } | null;
+    files: Array<{
+      id: string;
+      expiresAt: string | null;
+      createdAt: string;
+      file: { filename: string; size: number; contentType: string } | null;
+    }> | null;
+  }>;
+  propertiesByAlias: Array<{
+    field: {
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      alias: string | null;
+      type: ProfileTypeFieldType;
+      isExpirable: boolean;
+    };
+    value: {
+      id: string;
+      content: { [key: string]: any } | null;
+      expiresAt: string | null;
+      createdAt: string;
+    } | null;
+    files: Array<{
+      id: string;
+      expiresAt: string | null;
+      createdAt: string;
+      file: { filename: string; size: number; contentType: string } | null;
+    }> | null;
+  }>;
+  subscribers?: Array<{
+    user: {
+      id: string;
+      email: string;
+      fullName: string | null;
+      firstName: string | null;
+      lastName: string | null;
+    };
+  }>;
+};
+
 export type getTags_tagsQueryVariables = Exact<{
   offset: Scalars["Int"]["input"];
   limit: Scalars["Int"]["input"];
@@ -6704,6 +6808,734 @@ export type GetPetitionEvents_PetitionEventsQuery = {
   >;
 };
 
+export type GetProfiles_profilesQueryVariables = Exact<{
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  sortBy?: InputMaybe<Array<QueryProfiles_OrderBy> | QueryProfiles_OrderBy>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
+  profileIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  profileTypeIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  includeFields: Scalars["Boolean"]["input"];
+  includeFieldsByAlias: Scalars["Boolean"]["input"];
+  includeSubscribers: Scalars["Boolean"]["input"];
+}>;
+
+export type GetProfiles_profilesQuery = {
+  profiles: {
+    totalCount: number;
+    items: Array<{
+      id: string;
+      name: string;
+      createdAt: string;
+      profileType: { id: string; name: { [locale in UserLocale]?: string } };
+      properties?: Array<{
+        field: {
+          id: string;
+          name: { [locale in UserLocale]?: string };
+          alias: string | null;
+          type: ProfileTypeFieldType;
+          isExpirable: boolean;
+        };
+        value: {
+          id: string;
+          content: { [key: string]: any } | null;
+          expiresAt: string | null;
+          createdAt: string;
+        } | null;
+        files: Array<{
+          id: string;
+          expiresAt: string | null;
+          createdAt: string;
+          file: { filename: string; size: number; contentType: string } | null;
+        }> | null;
+      }>;
+      propertiesByAlias: Array<{
+        field: {
+          id: string;
+          name: { [locale in UserLocale]?: string };
+          alias: string | null;
+          type: ProfileTypeFieldType;
+          isExpirable: boolean;
+        };
+        value: {
+          id: string;
+          content: { [key: string]: any } | null;
+          expiresAt: string | null;
+          createdAt: string;
+        } | null;
+        files: Array<{
+          id: string;
+          expiresAt: string | null;
+          createdAt: string;
+          file: { filename: string; size: number; contentType: string } | null;
+        }> | null;
+      }>;
+      subscribers?: Array<{
+        user: {
+          id: string;
+          email: string;
+          fullName: string | null;
+          firstName: string | null;
+          lastName: string | null;
+        };
+      }>;
+    }>;
+  };
+};
+
+export type CreateProfile_createProfileMutationVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+  subscribe?: InputMaybe<Scalars["Boolean"]["input"]>;
+  includeFields: Scalars["Boolean"]["input"];
+  includeFieldsByAlias: Scalars["Boolean"]["input"];
+  includeSubscribers: Scalars["Boolean"]["input"];
+}>;
+
+export type CreateProfile_createProfileMutation = {
+  createProfile: {
+    id: string;
+    name: string;
+    createdAt: string;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    properties?: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    propertiesByAlias: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    subscribers?: Array<{
+      user: {
+        id: string;
+        email: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+      };
+    }>;
+  };
+};
+
+export type CreateProfile_updateProfileFieldValueMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  fields: Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput;
+  includeFields: Scalars["Boolean"]["input"];
+  includeFieldsByAlias: Scalars["Boolean"]["input"];
+  includeSubscribers: Scalars["Boolean"]["input"];
+}>;
+
+export type CreateProfile_updateProfileFieldValueMutation = {
+  updateProfileFieldValue: {
+    id: string;
+    name: string;
+    createdAt: string;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    properties?: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    propertiesByAlias: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    subscribers?: Array<{
+      user: {
+        id: string;
+        email: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+      };
+    }>;
+  };
+};
+
+export type GetProfile_profileQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeFieldsByAlias: Scalars["Boolean"]["input"];
+  includeSubscribers: Scalars["Boolean"]["input"];
+}>;
+
+export type GetProfile_profileQuery = {
+  profile: {
+    id: string;
+    name: string;
+    createdAt: string;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    properties?: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    propertiesByAlias: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    subscribers?: Array<{
+      user: {
+        id: string;
+        email: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+      };
+    }>;
+  };
+};
+
+export type GetProfileFields_profileQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeFieldsByAlias: Scalars["Boolean"]["input"];
+  includeSubscribers: Scalars["Boolean"]["input"];
+}>;
+
+export type GetProfileFields_profileQuery = {
+  profile: {
+    id: string;
+    name: string;
+    createdAt: string;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    properties?: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    propertiesByAlias: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    subscribers?: Array<{
+      user: {
+        id: string;
+        email: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+      };
+    }>;
+  };
+};
+
+export type CreateProfileFieldValue_profileQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeFieldsByAlias: Scalars["Boolean"]["input"];
+  includeSubscribers: Scalars["Boolean"]["input"];
+}>;
+
+export type CreateProfileFieldValue_profileQuery = {
+  profile: {
+    id: string;
+    name: string;
+    createdAt: string;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    properties?: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    propertiesByAlias: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    subscribers?: Array<{
+      user: {
+        id: string;
+        email: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+      };
+    }>;
+  };
+};
+
+export type CreateProfileFieldValue_updateProfileFieldValueMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  fields: Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput;
+}>;
+
+export type CreateProfileFieldValue_updateProfileFieldValueMutation = {
+  updateProfileFieldValue: { id: string };
+};
+
+export type CreateProfileFieldValue_createProfileFieldFileUploadLinkMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+  data: Array<FileUploadInput> | FileUploadInput;
+}>;
+
+export type CreateProfileFieldValue_createProfileFieldFileUploadLinkMutation = {
+  createProfileFieldFileUploadLink: {
+    uploads: Array<{
+      file: { id: string };
+      presignedPostData: { fields: { [key: string]: any }; url: string };
+    }>;
+  };
+};
+
+export type CreateProfileFieldValue_profileFieldFileUploadCompleteMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+  profileFieldFileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type CreateProfileFieldValue_profileFieldFileUploadCompleteMutation = {
+  profileFieldFileUploadComplete: Array<{ id: string }>;
+};
+
+export type DeleteProfileFieldValue_profileQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+}>;
+
+export type DeleteProfileFieldValue_profileQuery = {
+  profile: { properties: Array<{ field: { id: string; type: ProfileTypeFieldType } }> };
+};
+
+export type DeleteProfileFieldValue_updateProfileFieldValueMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  fields: Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput;
+}>;
+
+export type DeleteProfileFieldValue_updateProfileFieldValueMutation = {
+  updateProfileFieldValue: { id: string };
+};
+
+export type DeleteProfileFieldValue_deleteProfileFieldFileMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+}>;
+
+export type DeleteProfileFieldValue_deleteProfileFieldFileMutation = {
+  deleteProfileFieldFile: Result;
+};
+
+export type UpdateProfileFieldValue_profileQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeFieldsByAlias: Scalars["Boolean"]["input"];
+  includeSubscribers: Scalars["Boolean"]["input"];
+}>;
+
+export type UpdateProfileFieldValue_profileQuery = {
+  profile: {
+    id: string;
+    name: string;
+    createdAt: string;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    properties?: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    propertiesByAlias: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    subscribers?: Array<{
+      user: {
+        id: string;
+        email: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+      };
+    }>;
+  };
+};
+
+export type UpdateProfileFieldValue_updateProfileFieldValueMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  fields: Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput;
+}>;
+
+export type UpdateProfileFieldValue_updateProfileFieldValueMutation = {
+  updateProfileFieldValue: { id: string };
+};
+
+export type UpdateProfileFieldValue_createProfileFieldFileUploadLinkMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+  data: Array<FileUploadInput> | FileUploadInput;
+  expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
+}>;
+
+export type UpdateProfileFieldValue_createProfileFieldFileUploadLinkMutation = {
+  createProfileFieldFileUploadLink: {
+    uploads: Array<{
+      file: { id: string };
+      presignedPostData: { fields: { [key: string]: any }; url: string };
+    }>;
+  };
+};
+
+export type UpdateProfileFieldValue_profileFieldFileUploadCompleteMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  profileTypeFieldId: Scalars["GID"]["input"];
+  profileFieldFileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+}>;
+
+export type UpdateProfileFieldValue_profileFieldFileUploadCompleteMutation = {
+  profileFieldFileUploadComplete: Array<{ id: string }>;
+};
+
+export type GetProfileSubscribers_profileQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+}>;
+
+export type GetProfileSubscribers_profileQuery = {
+  profile: {
+    subscribers: Array<{
+      user: {
+        id: string;
+        email: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+      };
+    }>;
+  };
+};
+
+export type SubscribeToProfile_subscribeToProfileMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  userIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeFieldsByAlias: Scalars["Boolean"]["input"];
+  includeSubscribers: Scalars["Boolean"]["input"];
+}>;
+
+export type SubscribeToProfile_subscribeToProfileMutation = {
+  subscribeToProfile: Array<{
+    id: string;
+    name: string;
+    createdAt: string;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    properties?: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    propertiesByAlias: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    subscribers?: Array<{
+      user: {
+        id: string;
+        email: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+      };
+    }>;
+  }>;
+};
+
+export type UnsubscribeFromProfile_unsubscribeFromProfileMutationVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+  userIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeFieldsByAlias: Scalars["Boolean"]["input"];
+  includeSubscribers: Scalars["Boolean"]["input"];
+}>;
+
+export type UnsubscribeFromProfile_unsubscribeFromProfileMutation = {
+  unsubscribeFromProfile: Array<{
+    id: string;
+    name: string;
+    createdAt: string;
+    profileType: { id: string; name: { [locale in UserLocale]?: string } };
+    properties?: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    propertiesByAlias: Array<{
+      field: {
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        alias: string | null;
+        type: ProfileTypeFieldType;
+        isExpirable: boolean;
+      };
+      value: {
+        id: string;
+        content: { [key: string]: any } | null;
+        expiresAt: string | null;
+        createdAt: string;
+      } | null;
+      files: Array<{
+        id: string;
+        expiresAt: string | null;
+        createdAt: string;
+        file: { filename: string; size: number; contentType: string } | null;
+      }> | null;
+    }>;
+    subscribers?: Array<{
+      user: {
+        id: string;
+        email: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+      };
+    }>;
+  }>;
+};
+
 export type SubmitReply_createPetitionFieldReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
   fieldId: Scalars["GID"]["input"];
@@ -7164,6 +7996,81 @@ export const TaskFragmentDoc = gql`
     status
   }
 ` as unknown as DocumentNode<TaskFragment, unknown>;
+export const ProfileTypeFragmentDoc = gql`
+  fragment ProfileType on ProfileType {
+    id
+    name
+  }
+` as unknown as DocumentNode<ProfileTypeFragment, unknown>;
+export const ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileTypeField on ProfileTypeField {
+    id
+    name
+    alias
+    type
+    isExpirable
+  }
+` as unknown as DocumentNode<ProfileTypeFieldFragment, unknown>;
+export const ProfileFieldValueFragmentDoc = gql`
+  fragment ProfileFieldValue on ProfileFieldValue {
+    id
+    content
+    expiresAt
+    createdAt
+  }
+` as unknown as DocumentNode<ProfileFieldValueFragment, unknown>;
+export const ProfileFieldFileFragmentDoc = gql`
+  fragment ProfileFieldFile on ProfileFieldFile {
+    id
+    file {
+      filename
+      size
+      contentType
+    }
+    expiresAt
+    createdAt
+  }
+` as unknown as DocumentNode<ProfileFieldFileFragment, unknown>;
+export const ProfileFieldPropertyFragmentDoc = gql`
+  fragment ProfileFieldProperty on ProfileFieldProperty {
+    field {
+      ...ProfileTypeField
+    }
+    value {
+      ...ProfileFieldValue
+    }
+    files {
+      ...ProfileFieldFile
+    }
+  }
+  ${ProfileTypeFieldFragmentDoc}
+  ${ProfileFieldValueFragmentDoc}
+  ${ProfileFieldFileFragmentDoc}
+` as unknown as DocumentNode<ProfileFieldPropertyFragment, unknown>;
+export const ProfileFragmentDoc = gql`
+  fragment Profile on Profile {
+    id
+    name
+    profileType {
+      ...ProfileType
+    }
+    properties @include(if: $includeFields) {
+      ...ProfileFieldProperty
+    }
+    propertiesByAlias: properties @include(if: $includeFieldsByAlias) {
+      ...ProfileFieldProperty
+    }
+    subscribers @include(if: $includeSubscribers) {
+      user {
+        ...User
+      }
+    }
+    createdAt
+  }
+  ${ProfileTypeFragmentDoc}
+  ${ProfileFieldPropertyFragmentDoc}
+  ${UserFragmentDoc}
+` as unknown as DocumentNode<ProfileFragment, unknown>;
 export const getTags_tagsDocument = gql`
   query getTags_tags($offset: Int!, $limit: Int!) {
     tags(offset: $offset, limit: $limit) {
@@ -7942,6 +8849,329 @@ export const GetPetitionEvents_PetitionEventsDocument = gql`
 ` as unknown as DocumentNode<
   GetPetitionEvents_PetitionEventsQuery,
   GetPetitionEvents_PetitionEventsQueryVariables
+>;
+export const GetProfiles_profilesDocument = gql`
+  query GetProfiles_profiles(
+    $offset: Int
+    $limit: Int
+    $sortBy: [QueryProfiles_OrderBy!]
+    $search: String
+    $profileIds: [GID!]
+    $profileTypeIds: [GID!]
+    $includeFields: Boolean!
+    $includeFieldsByAlias: Boolean!
+    $includeSubscribers: Boolean!
+  ) {
+    profiles(
+      offset: $offset
+      limit: $limit
+      sortBy: $sortBy
+      search: $search
+      filter: { profileId: $profileIds, profileTypeId: $profileTypeIds }
+    ) {
+      totalCount
+      items {
+        ...Profile
+      }
+    }
+  }
+  ${ProfileFragmentDoc}
+` as unknown as DocumentNode<GetProfiles_profilesQuery, GetProfiles_profilesQueryVariables>;
+export const CreateProfile_createProfileDocument = gql`
+  mutation CreateProfile_createProfile(
+    $profileTypeId: GID!
+    $subscribe: Boolean
+    $includeFields: Boolean!
+    $includeFieldsByAlias: Boolean!
+    $includeSubscribers: Boolean!
+  ) {
+    createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe) {
+      ...Profile
+    }
+  }
+  ${ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  CreateProfile_createProfileMutation,
+  CreateProfile_createProfileMutationVariables
+>;
+export const CreateProfile_updateProfileFieldValueDocument = gql`
+  mutation CreateProfile_updateProfileFieldValue(
+    $profileId: GID!
+    $fields: [UpdateProfileFieldValueInput!]!
+    $includeFields: Boolean!
+    $includeFieldsByAlias: Boolean!
+    $includeSubscribers: Boolean!
+  ) {
+    updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+      ...Profile
+    }
+  }
+  ${ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  CreateProfile_updateProfileFieldValueMutation,
+  CreateProfile_updateProfileFieldValueMutationVariables
+>;
+export const GetProfile_profileDocument = gql`
+  query GetProfile_profile(
+    $profileId: GID!
+    $includeFields: Boolean!
+    $includeFieldsByAlias: Boolean!
+    $includeSubscribers: Boolean!
+  ) {
+    profile(profileId: $profileId) {
+      ...Profile
+    }
+  }
+  ${ProfileFragmentDoc}
+` as unknown as DocumentNode<GetProfile_profileQuery, GetProfile_profileQueryVariables>;
+export const GetProfileFields_profileDocument = gql`
+  query GetProfileFields_profile(
+    $profileId: GID!
+    $includeFields: Boolean!
+    $includeFieldsByAlias: Boolean!
+    $includeSubscribers: Boolean!
+  ) {
+    profile(profileId: $profileId) {
+      ...Profile
+    }
+  }
+  ${ProfileFragmentDoc}
+` as unknown as DocumentNode<GetProfileFields_profileQuery, GetProfileFields_profileQueryVariables>;
+export const CreateProfileFieldValue_profileDocument = gql`
+  query CreateProfileFieldValue_profile(
+    $profileId: GID!
+    $includeFields: Boolean!
+    $includeFieldsByAlias: Boolean!
+    $includeSubscribers: Boolean!
+  ) {
+    profile(profileId: $profileId) {
+      ...Profile
+    }
+  }
+  ${ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  CreateProfileFieldValue_profileQuery,
+  CreateProfileFieldValue_profileQueryVariables
+>;
+export const CreateProfileFieldValue_updateProfileFieldValueDocument = gql`
+  mutation CreateProfileFieldValue_updateProfileFieldValue(
+    $profileId: GID!
+    $fields: [UpdateProfileFieldValueInput!]!
+  ) {
+    updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  CreateProfileFieldValue_updateProfileFieldValueMutation,
+  CreateProfileFieldValue_updateProfileFieldValueMutationVariables
+>;
+export const CreateProfileFieldValue_createProfileFieldFileUploadLinkDocument = gql`
+  mutation CreateProfileFieldValue_createProfileFieldFileUploadLink(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $data: [FileUploadInput!]!
+  ) {
+    createProfileFieldFileUploadLink(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      data: $data
+    ) {
+      uploads {
+        file {
+          id
+        }
+        presignedPostData {
+          fields
+          url
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  CreateProfileFieldValue_createProfileFieldFileUploadLinkMutation,
+  CreateProfileFieldValue_createProfileFieldFileUploadLinkMutationVariables
+>;
+export const CreateProfileFieldValue_profileFieldFileUploadCompleteDocument = gql`
+  mutation CreateProfileFieldValue_profileFieldFileUploadComplete(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $profileFieldFileIds: [GID!]!
+  ) {
+    profileFieldFileUploadComplete(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      profileFieldFileIds: $profileFieldFileIds
+    ) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  CreateProfileFieldValue_profileFieldFileUploadCompleteMutation,
+  CreateProfileFieldValue_profileFieldFileUploadCompleteMutationVariables
+>;
+export const DeleteProfileFieldValue_profileDocument = gql`
+  query DeleteProfileFieldValue_profile($profileId: GID!) {
+    profile(profileId: $profileId) {
+      properties {
+        field {
+          id
+          type
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  DeleteProfileFieldValue_profileQuery,
+  DeleteProfileFieldValue_profileQueryVariables
+>;
+export const DeleteProfileFieldValue_updateProfileFieldValueDocument = gql`
+  mutation DeleteProfileFieldValue_updateProfileFieldValue(
+    $profileId: GID!
+    $fields: [UpdateProfileFieldValueInput!]!
+  ) {
+    updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  DeleteProfileFieldValue_updateProfileFieldValueMutation,
+  DeleteProfileFieldValue_updateProfileFieldValueMutationVariables
+>;
+export const DeleteProfileFieldValue_deleteProfileFieldFileDocument = gql`
+  mutation DeleteProfileFieldValue_deleteProfileFieldFile(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+  ) {
+    deleteProfileFieldFile(profileId: $profileId, profileTypeFieldId: $profileTypeFieldId)
+  }
+` as unknown as DocumentNode<
+  DeleteProfileFieldValue_deleteProfileFieldFileMutation,
+  DeleteProfileFieldValue_deleteProfileFieldFileMutationVariables
+>;
+export const UpdateProfileFieldValue_profileDocument = gql`
+  query UpdateProfileFieldValue_profile(
+    $profileId: GID!
+    $includeFields: Boolean!
+    $includeFieldsByAlias: Boolean!
+    $includeSubscribers: Boolean!
+  ) {
+    profile(profileId: $profileId) {
+      ...Profile
+    }
+  }
+  ${ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  UpdateProfileFieldValue_profileQuery,
+  UpdateProfileFieldValue_profileQueryVariables
+>;
+export const UpdateProfileFieldValue_updateProfileFieldValueDocument = gql`
+  mutation UpdateProfileFieldValue_updateProfileFieldValue(
+    $profileId: GID!
+    $fields: [UpdateProfileFieldValueInput!]!
+  ) {
+    updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  UpdateProfileFieldValue_updateProfileFieldValueMutation,
+  UpdateProfileFieldValue_updateProfileFieldValueMutationVariables
+>;
+export const UpdateProfileFieldValue_createProfileFieldFileUploadLinkDocument = gql`
+  mutation UpdateProfileFieldValue_createProfileFieldFileUploadLink(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $data: [FileUploadInput!]!
+    $expiryDate: Date
+  ) {
+    createProfileFieldFileUploadLink(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      data: $data
+      expiryDate: $expiryDate
+    ) {
+      uploads {
+        file {
+          id
+        }
+        presignedPostData {
+          fields
+          url
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  UpdateProfileFieldValue_createProfileFieldFileUploadLinkMutation,
+  UpdateProfileFieldValue_createProfileFieldFileUploadLinkMutationVariables
+>;
+export const UpdateProfileFieldValue_profileFieldFileUploadCompleteDocument = gql`
+  mutation UpdateProfileFieldValue_profileFieldFileUploadComplete(
+    $profileId: GID!
+    $profileTypeFieldId: GID!
+    $profileFieldFileIds: [GID!]!
+  ) {
+    profileFieldFileUploadComplete(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      profileFieldFileIds: $profileFieldFileIds
+    ) {
+      id
+    }
+  }
+` as unknown as DocumentNode<
+  UpdateProfileFieldValue_profileFieldFileUploadCompleteMutation,
+  UpdateProfileFieldValue_profileFieldFileUploadCompleteMutationVariables
+>;
+export const GetProfileSubscribers_profileDocument = gql`
+  query GetProfileSubscribers_profile($profileId: GID!) {
+    profile(profileId: $profileId) {
+      subscribers {
+        user {
+          ...User
+        }
+      }
+    }
+  }
+  ${UserFragmentDoc}
+` as unknown as DocumentNode<
+  GetProfileSubscribers_profileQuery,
+  GetProfileSubscribers_profileQueryVariables
+>;
+export const SubscribeToProfile_subscribeToProfileDocument = gql`
+  mutation SubscribeToProfile_subscribeToProfile(
+    $profileId: GID!
+    $userIds: [GID!]!
+    $includeFields: Boolean!
+    $includeFieldsByAlias: Boolean!
+    $includeSubscribers: Boolean!
+  ) {
+    subscribeToProfile(profileIds: [$profileId], userIds: $userIds) {
+      ...Profile
+    }
+  }
+  ${ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  SubscribeToProfile_subscribeToProfileMutation,
+  SubscribeToProfile_subscribeToProfileMutationVariables
+>;
+export const UnsubscribeFromProfile_unsubscribeFromProfileDocument = gql`
+  mutation UnsubscribeFromProfile_unsubscribeFromProfile(
+    $profileId: GID!
+    $userIds: [GID!]!
+    $includeFields: Boolean!
+    $includeFieldsByAlias: Boolean!
+    $includeSubscribers: Boolean!
+  ) {
+    unsubscribeFromProfile(profileIds: [$profileId], userIds: $userIds) {
+      ...Profile
+    }
+  }
+  ${ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  UnsubscribeFromProfile_unsubscribeFromProfileMutation,
+  UnsubscribeFromProfile_unsubscribeFromProfileMutationVariables
 >;
 export const SubmitReply_createPetitionFieldReplyDocument = gql`
   mutation SubmitReply_createPetitionFieldReply($petitionId: GID!, $fieldId: GID!, $reply: JSON!) {

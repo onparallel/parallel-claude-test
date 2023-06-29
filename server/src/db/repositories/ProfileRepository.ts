@@ -454,10 +454,19 @@ export class ProfileRepository extends BaseRepository {
       return;
     }
 
-    await this.from("profile_field_file").whereIn("id", ids).update({
+    await this.from("profile_field_file").whereIn("id", ids).where({ removed_at: null }).update({
       removed_at: this.now(),
       removed_by_user_id: userId,
     });
+  }
+
+  async deleteProfileFieldFilesByProfileTypeFieldId(profileTypeFieldId: number, userId: number) {
+    await this.from("profile_field_file")
+      .where({ removed_at: null, profile_type_field_id: profileTypeFieldId })
+      .update({
+        removed_at: this.now(),
+        removed_by_user_id: userId,
+      });
   }
 
   getPaginatedProfileForOrg(

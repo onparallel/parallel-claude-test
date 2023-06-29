@@ -5445,7 +5445,7 @@ export interface NexusGenArgTypes {
     };
     deleteProfileFieldFile: {
       // args
-      profileFieldFileIds: NexusGenScalars["GID"][]; // [GID!]!
+      profileFieldFileIds?: NexusGenScalars["GID"][] | null; // [GID!]
       profileId: NexusGenScalars["GID"]; // GID!
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
     };

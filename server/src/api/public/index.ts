@@ -1,11 +1,12 @@
+import stringify from "fast-safe-stringify";
 import { unlink } from "fs/promises";
-import { ClientError, gql, GraphQLClient } from "graphql-request";
+import { gql, GraphQLClient } from "graphql-request";
 import { outdent } from "outdent";
 import pMap from "p-map";
-import { isDefined, omit, pick, uniq } from "remeda";
+import { isDefined, omit, pick, uniq, zip } from "remeda";
 import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
 import { toGlobalId } from "../../util/globalId";
-import { Body, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
+import { Body, FormDataBody, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
 import { RestApi, RestParameter } from "../rest/core";
 import {
   BadRequestError,
@@ -34,9 +35,18 @@ import {
   CreatePetitionRecipients_petitionDocument,
   CreatePetitionRecipients_sendPetitionDocument,
   CreatePetitionRecipients_updateContactDocument,
+  CreateProfile_createProfileDocument,
+  CreateProfile_updateProfileFieldValueDocument,
+  CreateProfileFieldValue_createProfileFieldFileUploadLinkDocument,
+  CreateProfileFieldValue_profileDocument,
+  CreateProfileFieldValue_profileFieldFileUploadCompleteDocument,
+  CreateProfileFieldValue_updateProfileFieldValueDocument,
   DeactivatePetitionRecipient_deactivateAccessesDocument,
   DeletePetition_deletePetitionsDocument,
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
+  DeleteProfileFieldValue_deleteProfileFieldFileDocument,
+  DeleteProfileFieldValue_profileDocument,
+  DeleteProfileFieldValue_updateProfileFieldValueDocument,
   DeleteReply_deletePetitionReplyDocument,
   DeleteTemplate_deletePetitionsDocument,
   DownloadFileReply_fileUploadReplyDownloadLinkDocument,
@@ -56,6 +66,10 @@ import {
   GetPetitionEvents_PetitionEventsDocument,
   GetPetitionRecipients_petitionAccessesDocument,
   GetPetitions_petitionsDocument,
+  GetProfile_profileDocument,
+  GetProfileFields_profileDocument,
+  GetProfiles_profilesDocument,
+  GetProfileSubscribers_profileDocument,
   GetSignatures_petitionSignaturesDocument,
   GetTags_tagsDocument,
   GetTemplate_templateDocument,
@@ -78,6 +92,7 @@ import {
   SubmitReply_createFileUploadReplyDocument,
   SubmitReply_createPetitionFieldReplyDocument,
   SubmitReply_petitionDocument,
+  SubscribeToProfile_subscribeToProfileDocument,
   TagFragmentDoc,
   TagPetition_createTagDocument,
   TagPetition_tagPetitionDocument,
@@ -85,11 +100,17 @@ import {
   TemplateFragment as TemplateFragmentType,
   TransferPetition_searchUserByEmailDocument,
   TransferPetition_transferPetitionOwnershipDocument,
+  UnsubscribeFromProfile_unsubscribeFromProfileDocument,
   UntagPetition_untagPetitionDocument,
   UpdatePetition_petitionDocument,
   UpdatePetition_updatePetitionDocument,
   UpdatePetitionField_updatePetitionFieldDocument,
   UpdatePetitionInput,
+  UpdateProfileFieldValue_createProfileFieldFileUploadLinkDocument,
+  UpdateProfileFieldValue_profileDocument,
+  UpdateProfileFieldValue_profileFieldFileUploadCompleteDocument,
+  UpdateProfileFieldValue_updateProfileFieldValueDocument,
+  UpdateProfileFieldValueInput,
   UpdateReply_petitionDocument,
   UpdateReply_updateFileUploadReplyCompleteDocument,
   UpdateReply_updateFileUploadReplyDocument,
@@ -106,6 +127,7 @@ import {
   PetitionFieldWithRepliesFragment,
   PetitionFragment,
   PetitionTagFragment,
+  ProfileFragment,
   SubscriptionFragment,
   TaskFragment,
   TemplateFragment,
@@ -121,6 +143,7 @@ import {
   mapPetition,
   mapPetitionField,
   mapPetitionFieldRepliesContent,
+  mapProfile,
   mapReplyResponse,
   mapSubscription,
   mapTemplate,
@@ -129,22 +152,27 @@ import {
   uploadFile,
   waitForTask,
 } from "./helpers";
-import { singleFileUploadMiddleware } from "./middleware";
+import { anyFileUploadMiddleware, singleFileUploadMiddleware } from "./middleware";
 import {
   _PetitionEvent,
   Contact,
   CreateContact,
   CreateOrUpdatePetitionCustomProperty,
   CreatePetition,
+  CreateProfile,
+  CreateProfileFieldValue,
   CreateSubscription,
   ListOfPermissions,
   ListOfPetitionAccesses,
   ListOfPetitionEvents,
   ListOfPetitionFieldsWithReplies,
+  ListOfProfileProperties,
+  ListOfProfileSubscriptions,
   ListOfSignatureRequests,
   ListOfSubscriptions,
   PaginatedContacts,
   PaginatedPetitions,
+  PaginatedProfiles,
   PaginatedTags,
   PaginatedTemplates,
   PaginatedUsers,
@@ -154,6 +182,8 @@ import {
   petitionEventTypes,
   PetitionField,
   PetitionFieldReply,
+  Profile,
+  ProfileSubscriptionInput,
   SendPetition,
   SendReminder,
   SharePetition,
@@ -166,6 +196,7 @@ import {
   Template,
   UpdatePetition,
   UpdatePetitionField,
+  UpdateProfileFieldValueFormDataBody,
   UserWithOrg,
 } from "./schemas";
 
@@ -222,6 +253,7 @@ export const api = new RestApi({
         "Users",
         "Subscriptions",
         "Parallel Events",
+        "Profiles",
       ],
     },
     { name: "Events", tags: ["Parallel Event"] },
@@ -277,6 +309,7 @@ export const api = new RestApi({
       name: "Parallel Event",
       description: '<SchemaDefinition schemaRef="#/components/schemas/PetitionEvent" />',
     },
+    { name: "Profiles", description: "Profiles allow you to store all your relevant information" },
   ],
   context: ({ req }) => {
     const authorization = req.header("authorization");
@@ -290,17 +323,12 @@ export const api = new RestApi({
     };
   },
   errorHandler: (error: Error) => {
-    if (error instanceof ClientError && error.response.errors?.[0]) {
-      const code = (error.response.errors[0] as any)?.extensions?.code as string;
-      switch (code) {
-        case "UNAUTHENTICATED":
-          throw new UnauthorizedError("API token is invalid");
-        case "FORBIDDEN":
-          throw new UnauthorizedError("You don't have access to this resource");
-        default:
-          console.log({ code, error });
-      }
+    if (containsGraphQLError(error, "UNAUTHENTICATED")) {
+      throw new UnauthorizedError("API token is invalid");
+    } else if (containsGraphQLError(error, "FORBIDDEN")) {
+      throw new ForbiddenError("You don't have access to this resource");
     }
+    console.log(stringify(error));
     throw error;
   },
 });
@@ -353,6 +381,28 @@ const templateIncludeParam = {
   }),
 };
 
+const profileIncludeParam = {
+  include: enumParam({
+    schemaTitle: "ProfileIncludeInResponse",
+    description: "Include optional fields in the response",
+    array: true,
+    required: false,
+    values: ["fields", "fieldsByAlias", "subscribers"],
+  }),
+};
+
+function getProfileIncludesFromQuery<
+  Q extends {
+    include: (typeof profileIncludeParam)["include"] extends RestParameter<infer T> ? T : never;
+  }
+>(query: Q) {
+  return {
+    includeFields: query.include?.includes("fields") ?? false,
+    includeFieldsByAlias: query.include?.includes("fieldsByAlias") ?? false,
+    includeSubscribers: query.include?.includes("subscribers") ?? false,
+  };
+}
+
 const petitionId = idParam({
   type: "Petition",
   description: "The ID of the parallel",
@@ -388,6 +438,14 @@ const signatureId = idParam({
 const accessId = idParam({
   type: "PetitionAccess",
   description: "The ID of the parallel access",
+});
+const profileId = idParam({
+  type: "Profile",
+  description: "The ID of the profile",
+});
+const profileTypeFieldId = idParam({
+  type: "ProfileTypeField",
+  description: "The ID of the profile type field",
 });
 
 api.path("/me").get(
@@ -720,13 +778,10 @@ api
         assert("id" in result.updatePetition!);
         return Ok(mapPetition(result.updatePetition!));
       } catch (error) {
-        if (error instanceof ClientError) {
-          if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
-            throw new BadRequestError(
-              error.response.errors?.[0]?.message ?? "ARG_VALIDATION_ERROR"
-            );
-          }
+        if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+          throw new BadRequestError(error.response.errors?.[0]?.message ?? "ARG_VALIDATION_ERROR");
         }
+
         throw error;
       }
     }
@@ -770,11 +825,8 @@ api
           force: query.force ?? false,
         });
         return NoContent();
-      } catch (error: any) {
-        if (
-          error instanceof ClientError &&
-          containsGraphQLError(error, "DELETE_SHARED_PETITION_ERROR")
-        ) {
+      } catch (error) {
+        if (containsGraphQLError(error, "DELETE_SHARED_PETITION_ERROR")) {
           throw new BadRequestError(
             "The parallel is being shared with another user. Set force=true to delete."
           );
@@ -827,13 +879,10 @@ api.path("/petitions/:petitionId/reopen", { params: { petitionId } }).post(
       assert("id" in result.reopenPetition!);
       return Ok(mapPetition(result.reopenPetition!));
     } catch (error) {
-      if (error instanceof ClientError) {
-        if (containsGraphQLError(error, "PETITION_STATUS_ERROR")) {
-          throw new ConflictError("The parallel is not closed or completed");
-        } else if (containsGraphQLError(error, "FORBIDDEN")) {
-          throw new ForbiddenError("You don't have access to this resource");
-        }
+      if (containsGraphQLError(error, "PETITION_STATUS_ERROR")) {
+        throw new ConflictError("The parallel is not closed or completed");
       }
+
       throw error;
     }
   }
@@ -1033,11 +1082,8 @@ api
           { petitionId: params.petitionId, key: body.key, value: body.value }
         );
         return Ok(result.modifyPetitionCustomProperty.customProperties);
-      } catch (error: any) {
-        if (
-          error instanceof ClientError &&
-          containsGraphQLError(error, "CUSTOM_PROPERTIES_LIMIT_ERROR")
-        ) {
+      } catch (error) {
+        if (containsGraphQLError(error, "CUSTOM_PROPERTIES_LIMIT_ERROR")) {
           throw new ConflictError(
             "You reached the maximum limit of custom properties on the parallel."
           );
@@ -1277,22 +1323,21 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
       assert("id" in result.sendPetition[0].petition);
 
       return Ok(mapPetition(result.sendPetition[0].petition));
-    } catch (error: any) {
-      if (error instanceof ClientError) {
-        if (containsGraphQLError(error, "PETITION_ALREADY_SENT_ERROR")) {
-          throw new ConflictError("The parallel was already sent to some of the provided contacts");
-        } else if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
-          const { email, error_code: errorCode } = error.response.errors![0].extensions.extra as {
-            email: string;
-            error_code: string;
-          };
-          if (errorCode === "INVALID_EMAIL_ERROR" || errorCode === "INVALID_MX_EMAIL_ERROR") {
-            throw new BadRequestError(`${email} is not a valid email`);
-          }
-        } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
-          throw new ForbiddenError("You don't have enough credits to send this parallel");
+    } catch (error) {
+      if (containsGraphQLError(error, "PETITION_ALREADY_SENT_ERROR")) {
+        throw new ConflictError("The parallel was already sent to some of the provided contacts");
+      } else if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+        const { email, error_code: errorCode } = error.response.errors![0].extensions.extra as {
+          email: string;
+          error_code: string;
+        };
+        if (errorCode === "INVALID_EMAIL_ERROR" || errorCode === "INVALID_MX_EMAIL_ERROR") {
+          throw new BadRequestError(`${email} is not a valid email`);
         }
+      } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
+        throw new ForbiddenError("You don't have enough credits to send this parallel");
       }
+
       throw error;
     }
   }
@@ -1355,22 +1400,15 @@ api
         ${PetitionAccessFragment}
       `;
 
-      try {
-        const result = await client.request(ActivatePetitionRecipient_reactivateAccessesDocument, {
-          petitionId: params.petitionId,
-          accessId: params.accessId,
-        });
+      const result = await client.request(ActivatePetitionRecipient_reactivateAccessesDocument, {
+        petitionId: params.petitionId,
+        accessId: params.accessId,
+      });
 
-        assert(result.reactivateAccesses.length === 1);
-        assert("id" in result.reactivateAccesses[0]);
+      assert(result.reactivateAccesses.length === 1);
+      assert("id" in result.reactivateAccesses[0]);
 
-        return Ok(result.reactivateAccesses[0]);
-      } catch (error) {
-        if (error instanceof ClientError && containsGraphQLError(error, "FORBIDDEN")) {
-          throw new ForbiddenError("You don't have access to this resource");
-        }
-        throw error;
-      }
+      return Ok(result.reactivateAccesses[0]);
     }
   );
 
@@ -1402,25 +1440,15 @@ api
         ${PetitionAccessFragment}
       `;
 
-      try {
-        const result = await client.request(
-          DeactivatePetitionRecipient_deactivateAccessesDocument,
-          {
-            petitionId: params.petitionId,
-            accessId: params.accessId,
-          }
-        );
+      const result = await client.request(DeactivatePetitionRecipient_deactivateAccessesDocument, {
+        petitionId: params.petitionId,
+        accessId: params.accessId,
+      });
 
-        assert(result.deactivateAccesses.length === 1);
-        assert("id" in result.deactivateAccesses[0]);
+      assert(result.deactivateAccesses.length === 1);
+      assert("id" in result.deactivateAccesses[0]);
 
-        return Ok(result.deactivateAccesses[0]);
-      } catch (error) {
-        if (error instanceof ClientError && containsGraphQLError(error, "FORBIDDEN")) {
-          throw new ForbiddenError("You don't have access to this resource");
-        }
-        throw error;
-      }
+      return Ok(result.deactivateAccesses[0]);
     }
   );
 
@@ -1472,15 +1500,12 @@ api
 
         return Ok(result.sendReminders[0].access);
       } catch (error) {
-        if (error instanceof ClientError) {
-          if (containsGraphQLError(error, "PETITION_STATUS_ERROR")) {
-            throw new ConflictError("The parallel is not pending or completed");
-          } else if (containsGraphQLError(error, "NO_REMINDERS_LEFT")) {
-            throw new ConflictError("You can't send any more reminders to this recipient");
-          } else if (containsGraphQLError(error, "FORBIDDEN")) {
-            throw new ForbiddenError("You don't have access to this resource");
-          }
+        if (containsGraphQLError(error, "PETITION_STATUS_ERROR")) {
+          throw new ConflictError("The parallel is not pending or completed");
+        } else if (containsGraphQLError(error, "NO_REMINDERS_LEFT")) {
+          throw new ConflictError("You can't send any more reminders to this recipient");
         }
+
         throw error;
       }
     }
@@ -1562,7 +1587,7 @@ api
   );
 
 const replyBodyDescription = outdent`
-  For \`FILE_UPLOAD\` fields the request mut be a \`multipart/form-data\` request containing the file to upload.
+  For \`FILE_UPLOAD\` fields the request must be a \`multipart/form-data\` request containing the file to upload.
   For other types of fields the request will be a normal \`application/json\` request containing the value of the reply.
     - For \`TEXT\`, \`SHORT_TEXT\` and \`SELECT\` fields, the reply must be a string.
     - For \`PHONE\` fields, the repy must be a string with a valid phone number in e164 format.
@@ -1694,21 +1719,20 @@ api
         }
 
         return Ok(mapReplyResponse(newReply));
-      } catch (error: any) {
-        if (error instanceof ClientError) {
-          if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
-            const { subcode } = error.response.errors?.[0].extensions?.extra as { subcode: string };
-            throw new BadRequestError(error.response.errors?.[0].message ?? "INVALID_REPLY_ERROR", {
-              subcode,
-            });
-          } else if (containsGraphQLError(error, "FIELD_ALREADY_REPLIED_ERROR")) {
-            throw new BadRequestError(
-              "The field is already replied and does not accept any more replies."
-            );
-          } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
-            throw new ForbiddenError("You don't have enough credits to submit a reply");
-          }
+      } catch (error) {
+        if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
+          const { subcode } = error.response.errors?.[0].extensions?.extra as { subcode: string };
+          throw new BadRequestError(error.response.errors?.[0].message ?? "INVALID_REPLY_ERROR", {
+            subcode,
+          });
+        } else if (containsGraphQLError(error, "FIELD_ALREADY_REPLIED_ERROR")) {
+          throw new BadRequestError(
+            "The field is already replied and does not accept any more replies."
+          );
+        } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
+          throw new ForbiddenError("You don't have enough credits to submit a reply");
         }
+
         throw error;
       }
     }
@@ -1862,17 +1886,16 @@ api
             throw new BadRequestError(`Can't submit a reply for a field of type ${fieldType}`);
         }
         return Ok(mapReplyResponse(updatedReply));
-      } catch (error: any) {
-        if (error instanceof ClientError) {
-          if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
-            const { subcode } = error.response.errors?.[0].extensions?.extra as { subcode: string };
-            throw new BadRequestError(error.response.errors?.[0].message ?? "INVALID_REPLY_ERROR", {
-              subcode,
-            });
-          } else if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
-            throw new BadRequestError("The reply is already approved and cannot be modified.");
-          }
+      } catch (error) {
+        if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
+          const { subcode } = error.response.errors?.[0].extensions?.extra as { subcode: string };
+          throw new BadRequestError(error.response.errors?.[0].message ?? "INVALID_REPLY_ERROR", {
+            subcode,
+          });
+        } else if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
+          throw new BadRequestError("The reply is already approved and cannot be modified.");
         }
+
         throw error;
       }
     }
@@ -1901,11 +1924,8 @@ api
         `;
         await client.request(DeleteReply_deletePetitionReplyDocument, params);
         return NoContent();
-      } catch (error: any) {
-        if (
-          error instanceof ClientError &&
-          containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")
-        ) {
+      } catch (error) {
+        if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
           throw new ConflictError("The reply is already approved and cannot be deleted.");
         }
         throw error;
@@ -2012,10 +2032,7 @@ api
 
         return Ok(mapPetition(res.bulkCreatePetitionReplies));
       } catch (error) {
-        if (
-          error instanceof ClientError &&
-          containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")
-        ) {
+        if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
           throw new ForbiddenError("You don't have enough credits to submit a reply");
         }
         throw error;
@@ -2073,8 +2090,8 @@ api
           params
         );
         return Redirect(result.fileUploadReplyDownloadLink.url!);
-      } catch (error: any) {
-        if (error instanceof ClientError && containsGraphQLError(error, "INVALID_FIELD_TYPE")) {
+      } catch (error) {
+        if (containsGraphQLError(error, "INVALID_FIELD_TYPE")) {
           throw new BadRequestError(`Reply "${params.replyId}" is not of "FILE" type`);
         }
         throw error;
@@ -2143,7 +2160,7 @@ api
           await waitForTask(client, result.createExportRepliesTask);
           const url = await getTaskResultFileUrl(client, result.createExportRepliesTask);
           return Redirect(url);
-        } catch (error: any) {
+        } catch (error) {
           throw error;
         }
       } else if (query.format === "pdf") {
@@ -2729,11 +2746,8 @@ api
           force: query.force ?? false,
         });
         return NoContent();
-      } catch (error: any) {
-        if (
-          error instanceof ClientError &&
-          containsGraphQLError(error, "DELETE_SHARED_PETITION_ERROR")
-        ) {
+      } catch (error) {
+        if (containsGraphQLError(error, "DELETE_SHARED_PETITION_ERROR")) {
           throw new BadRequestError(
             "The template is being shared with another user. Set force=true to delete."
           );
@@ -2800,7 +2814,7 @@ api
         `;
         const result = await client.request(CreateContact_contactDocument, { data: body });
         return Created(result.createContact!);
-      } catch (error: any) {
+      } catch (error) {
         throw error;
       }
     }
@@ -2965,14 +2979,13 @@ api
 
         return Created(mapSubscription(result.createEventSubscription));
       } catch (error) {
-        if (error instanceof ClientError) {
-          if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
-            throw new BadRequestError("Invalid request body. Please verify your eventsUrl");
-          }
-          if (containsGraphQLError(error, "WEBHOOK_CHALLENGE_FAILED")) {
-            throw new BadRequestError(`Your URL does not seem to accept POST requests.`);
-          }
+        if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
+          throw new BadRequestError("Invalid request body. Please verify your eventsUrl");
         }
+        if (containsGraphQLError(error, "WEBHOOK_CHALLENGE_FAILED")) {
+          throw new BadRequestError(`Your URL does not seem to accept POST requests.`);
+        }
+
         throw error;
       }
     }
@@ -3053,3 +3066,740 @@ api.path("/petition-events").get(
     );
   }
 );
+
+api
+  .path("/profiles")
+  .get(
+    {
+      operationId: "GetProfiles",
+      summary: "Get your profiles",
+      description: "Returns a paginated list with all your organization profiles",
+      query: {
+        ...paginationParams(),
+        ...profileIncludeParam,
+        ...sortByParam(["createdAt", "name"]),
+        search: stringParam({
+          description: "Search profiles by name",
+          required: false,
+        }),
+        profileIds: stringParam({
+          description: "List of profile IDs to filter by",
+          example: [toGlobalId("Profile", 101), toGlobalId("Profile", 57)].join(","),
+          required: false,
+          array: true,
+        }),
+        profileTypeIds: stringParam({
+          description: "List of profile type IDs to filter by",
+          example: [toGlobalId("ProfileType", 1), toGlobalId("ProfileType", 2)].join(","),
+          required: false,
+          array: true,
+        }),
+      },
+      responses: { 200: SuccessResponse(PaginatedProfiles) },
+      tags: ["Profiles"],
+    },
+    async ({ client, query }) => {
+      const _query = gql`
+        query GetProfiles_profiles(
+          $offset: Int
+          $limit: Int
+          $sortBy: [QueryProfiles_OrderBy!]
+          $search: String
+          $profileIds: [GID!]
+          $profileTypeIds: [GID!]
+          $includeFields: Boolean!
+          $includeFieldsByAlias: Boolean!
+          $includeSubscribers: Boolean!
+        ) {
+          profiles(
+            offset: $offset
+            limit: $limit
+            sortBy: $sortBy
+            search: $search
+            filter: { profileId: $profileIds, profileTypeId: $profileTypeIds }
+          ) {
+            totalCount
+            items {
+              ...Profile
+            }
+          }
+        }
+        ${ProfileFragment}
+      `;
+
+      const result = await client.request(GetProfiles_profilesDocument, {
+        ...pick(query, ["offset", "limit", "sortBy", "search", "profileIds", "profileTypeIds"]),
+        ...getProfileIncludesFromQuery(query),
+      });
+      return Ok({
+        totalCount: result.profiles.totalCount,
+        items: result.profiles.items.map(mapProfile),
+      });
+    }
+  )
+  .post(
+    {
+      operationId: "CreateProfile",
+      summary: "Create a profile",
+      description: "Creates a new profile on your organization",
+      body: JsonBody(CreateProfile),
+      query: profileIncludeParam,
+      responses: {
+        201: SuccessResponse(Profile),
+        403: ErrorResponse({ description: "You don't have access to this resource" }),
+      },
+      tags: ["Profiles"],
+    },
+    async ({ client, body, query }) => {
+      const _mutations = [
+        gql`
+          mutation CreateProfile_createProfile(
+            $profileTypeId: GID!
+            $subscribe: Boolean
+            $includeFields: Boolean!
+            $includeFieldsByAlias: Boolean!
+            $includeSubscribers: Boolean!
+          ) {
+            createProfile(profileTypeId: $profileTypeId, subscribe: $subscribe) {
+              ...Profile
+            }
+          }
+          ${ProfileFragment}
+        `,
+        gql`
+          mutation CreateProfile_updateProfileFieldValue(
+            $profileId: GID!
+            $fields: [UpdateProfileFieldValueInput!]!
+            $includeFields: Boolean!
+            $includeFieldsByAlias: Boolean!
+            $includeSubscribers: Boolean!
+          ) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              ...Profile
+            }
+          }
+          ${ProfileFragment}
+        `,
+      ];
+
+      const result = await client.request(CreateProfile_createProfileDocument, {
+        profileTypeId: body.profileTypeId,
+        subscribe: body.subscribe,
+        ...getProfileIncludesFromQuery(query),
+      });
+      assert("id" in result.createProfile);
+
+      if (!isDefined(body.fields)) {
+        return Created(mapProfile(result.createProfile));
+      }
+
+      const updatedProfileResult = await client.request(
+        CreateProfile_updateProfileFieldValueDocument,
+        {
+          profileId: result.createProfile.id,
+          fields: body.fields,
+          ...getProfileIncludesFromQuery(query),
+        }
+      );
+
+      return Created(mapProfile(updatedProfileResult.updateProfileFieldValue));
+    }
+  );
+
+api.path("/profiles/:profileId", { params: { profileId } }).get(
+  {
+    operationId: "GetProfile",
+    summary: "Get a profile",
+    description: "Returns the specified profile",
+    query: profileIncludeParam,
+    responses: { 200: SuccessResponse(Profile) },
+    tags: ["Profiles"],
+  },
+  async ({ client, params, query }) => {
+    const _query = gql`
+      query GetProfile_profile(
+        $profileId: GID!
+        $includeFields: Boolean!
+        $includeFieldsByAlias: Boolean!
+        $includeSubscribers: Boolean!
+      ) {
+        profile(profileId: $profileId) {
+          ...Profile
+        }
+      }
+      ${ProfileFragment}
+    `;
+
+    const result = await client.request(GetProfile_profileDocument, {
+      profileId: params.profileId,
+      ...getProfileIncludesFromQuery(query),
+    });
+    assert("id" in result.profile);
+    return Ok(mapProfile(result.profile));
+  }
+);
+
+api
+  .path("/profiles/:profileId/fields", { params: { profileId } })
+  .get(
+    {
+      operationId: "GetProfileFields",
+      summary: "List profile fields",
+      description: "Returns a list with all the fields of the specified profile",
+      responses: { 200: SuccessResponse(ListOfProfileProperties) },
+      tags: ["Profiles"],
+    },
+    async ({ client, params }) => {
+      const _query = gql`
+        query GetProfileFields_profile(
+          $profileId: GID!
+          $includeFields: Boolean!
+          $includeFieldsByAlias: Boolean!
+          $includeSubscribers: Boolean!
+        ) {
+          profile(profileId: $profileId) {
+            ...Profile
+          }
+        }
+        ${ProfileFragment}
+      `;
+
+      const result = await client.request(GetProfileFields_profileDocument, {
+        profileId: params.profileId,
+        ...getProfileIncludesFromQuery({ include: ["fields"] }),
+      });
+
+      return Ok(mapProfile(result.profile).fields);
+    }
+  )
+  .put(
+    {
+      operationId: "CreateProfileFieldValue",
+      summary: "Submit values by profile field alias",
+      description: outdent`
+      Submit a list of values on a profile given a form-data where each key is a field alias.
+      `,
+      middleware: anyFileUploadMiddleware(),
+      body: FormDataBody(CreateProfileFieldValue, {
+        description: outdent`
+          A multipart/form-data body where each key is a field alias and the value is the value to submit.
+
+          e.g.: \`{ "name": "John Doe", "amount": 500, "date": "2023-06-27" }\` will submit the values \`"John Doe"\` for the field with alias \`"name"\`, \`500\` for the field with alias \`"amount"\` and \`"2023-06-27"\` for the field with alias \`"date"\`.
+
+          If any of the keys does not match a field alias, it will be ignored.
+
+          Have in mind that the value must match with the profile field type. For example, if the field is a \`DATE\` field, the value must be a valid date string. If the field is a \`FILE\` field, value must be a selection of Files to upload.
+          `,
+      }),
+      tags: ["Profiles"],
+      responses: {
+        200: SuccessResponse(Profile),
+        400: ErrorResponse({ description: "Bad request input" }),
+      },
+    },
+    async ({ client, params, body }) => {
+      const _query = gql`
+        query CreateProfileFieldValue_profile(
+          $profileId: GID!
+          $includeFields: Boolean!
+          $includeFieldsByAlias: Boolean!
+          $includeSubscribers: Boolean!
+        ) {
+          profile(profileId: $profileId) {
+            ...Profile
+          }
+        }
+        ${ProfileFragment}
+      `;
+
+      const _mutations = [
+        gql`
+          mutation CreateProfileFieldValue_updateProfileFieldValue(
+            $profileId: GID!
+            $fields: [UpdateProfileFieldValueInput!]!
+          ) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        gql`
+          mutation CreateProfileFieldValue_createProfileFieldFileUploadLink(
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+            $data: [FileUploadInput!]!
+          ) {
+            createProfileFieldFileUploadLink(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+            ) {
+              uploads {
+                file {
+                  id
+                }
+                presignedPostData {
+                  fields
+                  url
+                }
+              }
+            }
+          }
+        `,
+        gql`
+          mutation CreateProfileFieldValue_profileFieldFileUploadComplete(
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+            $profileFieldFileIds: [GID!]!
+          ) {
+            profileFieldFileUploadComplete(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              profileFieldFileIds: $profileFieldFileIds
+            ) {
+              id
+            }
+          }
+        `,
+      ];
+
+      const queryResponse = await client.request(CreateProfileFieldValue_profileDocument, {
+        profileId: params.profileId,
+        ...getProfileIncludesFromQuery({ include: ["fields"] }),
+      });
+      const profileFields = queryResponse.profile.properties!.map((p) => p.field);
+
+      const simpleTextUpdateFields: UpdateProfileFieldValueInput[] = [];
+      const fileUpdateFields: { profileTypeFieldId: string; files: Express.Multer.File[] }[] = [];
+
+      for (const [alias, value] of Object.entries(body)) {
+        const field = profileFields.find((f) => f.alias === alias);
+        if (field && value !== undefined) {
+          if (field.type === "FILE") {
+            if (typeof value !== "object") {
+              throw new BadRequestError(
+                `Invalid value for field ${field.alias}. Expected an array of files.`
+              );
+            }
+            fileUpdateFields.push({
+              profileTypeFieldId: field.id,
+              files: value as Express.Multer.File[],
+            });
+          } else {
+            if (typeof value !== "string") {
+              throw new BadRequestError(
+                `Invalid value for field ${field.alias}. Expected a string.`
+              );
+            }
+            simpleTextUpdateFields.push({ profileTypeFieldId: field.id, content: { value } });
+          }
+        }
+      }
+
+      try {
+        if (simpleTextUpdateFields.length > 0) {
+          await client.request(CreateProfileFieldValue_updateProfileFieldValueDocument, {
+            profileId: params.profileId,
+            fields: simpleTextUpdateFields,
+          });
+        }
+
+        if (fileUpdateFields.length > 0) {
+          for (const fileUpdate of fileUpdateFields) {
+            const fileUpdateResponse = await client.request(
+              CreateProfileFieldValue_createProfileFieldFileUploadLinkDocument,
+              {
+                profileId: params.profileId,
+                profileTypeFieldId: fileUpdate.profileTypeFieldId,
+                data: fileUpdate.files.map((file) => ({
+                  filename: file.filename,
+                  contentType: file.mimetype,
+                  size: file.size,
+                })),
+              }
+            );
+            for (const [file, presignedPostData] of zip(
+              fileUpdate.files,
+              fileUpdateResponse.createProfileFieldFileUploadLink.uploads.map(
+                (u) => u.presignedPostData
+              )
+            )) {
+              await uploadFile(file, presignedPostData);
+            }
+
+            await client.request(CreateProfileFieldValue_profileFieldFileUploadCompleteDocument, {
+              profileId: params.profileId,
+              profileTypeFieldId: fileUpdate.profileTypeFieldId,
+              profileFieldFileIds: fileUpdateResponse.createProfileFieldFileUploadLink.uploads.map(
+                (u) => u.file.id
+              ),
+            });
+          }
+        }
+
+        const response = await client.request(CreateProfileFieldValue_profileDocument, {
+          profileId: params.profileId,
+          ...getProfileIncludesFromQuery({ include: ["fieldsByAlias"] }),
+        });
+
+        assert("id" in response.profile);
+        return Ok(mapProfile(response.profile));
+      } catch (error) {
+        if (containsGraphQLError(error, "INVALID_PROFILE_FIELD_VALUE")) {
+          throw new BadRequestError(
+            error.response.errors?.[0]?.message ?? "INVALID_PROFILE_FIELD_VALUE"
+          );
+        }
+        throw error;
+      }
+    }
+  );
+
+api
+  .path("/profiles/:profileId/fields/:profileTypeFieldId", {
+    params: { profileId, profileTypeFieldId },
+  })
+  .delete(
+    {
+      operationId: "DeleteProfileFieldValue",
+      summary: "Remove a value on the profile field",
+      description: outdent`
+      Removes a value on the profile field.
+      If the field is of type \`FILE\`, the related files will be deleted.
+    `,
+      tags: ["Profiles"],
+      responses: { 200: SuccessResponse() },
+    },
+    async ({ client, params }) => {
+      const _query = gql`
+        query DeleteProfileFieldValue_profile($profileId: GID!) {
+          profile(profileId: $profileId) {
+            properties {
+              field {
+                id
+                type
+              }
+            }
+          }
+        }
+      `;
+
+      const _mutations = [
+        gql`
+          mutation DeleteProfileFieldValue_updateProfileFieldValue(
+            $profileId: GID!
+            $fields: [UpdateProfileFieldValueInput!]!
+          ) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        gql`
+          mutation DeleteProfileFieldValue_deleteProfileFieldFile(
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+          ) {
+            deleteProfileFieldFile(profileId: $profileId, profileTypeFieldId: $profileTypeFieldId)
+          }
+        `,
+      ];
+
+      const queryResponse = await client.request(DeleteProfileFieldValue_profileDocument, {
+        profileId: params.profileId,
+      });
+
+      const field = queryResponse.profile.properties!.find(
+        (p) => p.field.id === params.profileTypeFieldId
+      )?.field;
+
+      if (!field) {
+        throw new ForbiddenError("You don't have access to this profile field");
+      }
+
+      if (field.type === "FILE") {
+        await client.request(DeleteProfileFieldValue_deleteProfileFieldFileDocument, {
+          profileId: params.profileId,
+          profileTypeFieldId: params.profileTypeFieldId,
+        });
+      } else {
+        await client.request(DeleteProfileFieldValue_updateProfileFieldValueDocument, {
+          profileId: params.profileId,
+          fields: [{ profileTypeFieldId: params.profileTypeFieldId, content: null }],
+        });
+      }
+
+      return NoContent();
+    }
+  )
+  .put(
+    {
+      operationId: "UpdateProfileFieldValue",
+      summary: "Submit values",
+      description: outdent`
+      Creates or updates a value of a profile field.
+      `,
+      tags: ["Profiles"],
+      middleware: anyFileUploadMiddleware(),
+      body: FormDataBody(UpdateProfileFieldValueFormDataBody, {
+        description:
+          "The request must be a `multipart/form-data` request containing the value or file(s) to upload.",
+      }),
+      responses: {
+        200: SuccessResponse(Profile),
+        403: ErrorResponse({ description: "You don't have access to this resource" }),
+      },
+    },
+    async ({ client, params, body }) => {
+      const _query = gql`
+        query UpdateProfileFieldValue_profile(
+          $profileId: GID!
+          $includeFields: Boolean!
+          $includeFieldsByAlias: Boolean!
+          $includeSubscribers: Boolean!
+        ) {
+          profile(profileId: $profileId) {
+            ...Profile
+          }
+        }
+        ${ProfileFragment}
+      `;
+
+      const _mutations = [
+        gql`
+          mutation UpdateProfileFieldValue_updateProfileFieldValue(
+            $profileId: GID!
+            $fields: [UpdateProfileFieldValueInput!]!
+          ) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        gql`
+          mutation UpdateProfileFieldValue_createProfileFieldFileUploadLink(
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+            $data: [FileUploadInput!]!
+            $expiryDate: Date
+          ) {
+            createProfileFieldFileUploadLink(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              data: $data
+              expiryDate: $expiryDate
+            ) {
+              uploads {
+                file {
+                  id
+                }
+                presignedPostData {
+                  fields
+                  url
+                }
+              }
+            }
+          }
+        `,
+        gql`
+          mutation UpdateProfileFieldValue_profileFieldFileUploadComplete(
+            $profileId: GID!
+            $profileTypeFieldId: GID!
+            $profileFieldFileIds: [GID!]!
+          ) {
+            profileFieldFileUploadComplete(
+              profileId: $profileId
+              profileTypeFieldId: $profileTypeFieldId
+              profileFieldFileIds: $profileFieldFileIds
+            ) {
+              id
+            }
+          }
+        `,
+      ];
+
+      const queryResponse = await client.request(UpdateProfileFieldValue_profileDocument, {
+        profileId: params.profileId,
+        includeFields: true,
+        includeFieldsByAlias: false,
+        includeSubscribers: false,
+      });
+
+      const field = queryResponse.profile.properties!.find(
+        (p) => p.field.id === params.profileTypeFieldId
+      )?.field;
+
+      if (!isDefined(field)) {
+        throw new ForbiddenError("You don't have access to this profile field");
+      }
+
+      if (field.type === "FILE") {
+        if (typeof body.value !== "object") {
+          throw new BadRequestError(`Invalid value for field. Expected an array of files.`);
+        }
+        const createUploadLinkResponse = await client.request(
+          UpdateProfileFieldValue_createProfileFieldFileUploadLinkDocument,
+          {
+            profileId: params.profileId,
+            profileTypeFieldId: params.profileTypeFieldId,
+            data: (body.value as Express.Multer.File[]).map((file) => ({
+              filename: file.originalname,
+              contentType: file.mimetype,
+              size: file.size,
+            })),
+            expiryDate: body.expiryDate,
+          }
+        );
+
+        for (const [file, uploadData] of zip(
+          body.value as Express.Multer.File[],
+          createUploadLinkResponse.createProfileFieldFileUploadLink.uploads
+        )) {
+          await uploadFile(file, uploadData.presignedPostData);
+        }
+
+        await client.request(UpdateProfileFieldValue_profileFieldFileUploadCompleteDocument, {
+          profileId: params.profileId,
+          profileTypeFieldId: params.profileTypeFieldId,
+          profileFieldFileIds:
+            createUploadLinkResponse.createProfileFieldFileUploadLink.uploads.map(
+              (upload) => upload.file.id
+            ),
+        });
+      } else {
+        if (typeof body.value === "object") {
+          throw new BadRequestError(`Invalid value for field. Expected a string.`);
+        }
+
+        await client.request(UpdateProfileFieldValue_updateProfileFieldValueDocument, {
+          profileId: params.profileId,
+          fields: [
+            {
+              profileTypeFieldId: params.profileTypeFieldId,
+              content: { value: body.value },
+              expiryDate: body.expiryDate,
+            },
+          ],
+        });
+      }
+
+      const profileQuery = await client.request(UpdateProfileFieldValue_profileDocument, {
+        profileId: params.profileId,
+        ...getProfileIncludesFromQuery({ include: ["fields"] }),
+      });
+
+      assert("id" in profileQuery.profile);
+      return Ok(mapProfile(profileQuery.profile));
+    }
+  );
+
+api
+  .path("/profiles/:profileId/subscribers", { params: { profileId } })
+  .get(
+    {
+      operationId: "GetProfileSubscribers",
+      summary: "List profile subscribers",
+      description: "Returns a list with all the users subscribed to the specified profile",
+      tags: ["Profiles"],
+      responses: { 200: SuccessResponse(ListOfProfileSubscriptions) },
+    },
+    async ({ client, params }) => {
+      const _query = gql`
+        query GetProfileSubscribers_profile($profileId: GID!) {
+          profile(profileId: $profileId) {
+            subscribers {
+              user {
+                ...User
+              }
+            }
+          }
+        }
+        ${UserFragment}
+      `;
+
+      const result = await client.request(GetProfileSubscribers_profileDocument, {
+        profileId: params.profileId,
+      });
+
+      return Ok(result.profile.subscribers);
+    }
+  )
+  .post(
+    {
+      operationId: "SubscribeToProfile",
+      summary: "Subscribe to a profile",
+      description: "Subscribes a user to the specified profile",
+      tags: ["Profiles"],
+      body: JsonBody(ProfileSubscriptionInput(true)),
+      query: profileIncludeParam,
+      responses: {
+        201: SuccessResponse(Profile),
+      },
+    },
+    async ({ client, params, body, query }) => {
+      const _mutation = gql`
+        mutation SubscribeToProfile_subscribeToProfile(
+          $profileId: GID!
+          $userIds: [GID!]!
+          $includeFields: Boolean!
+          $includeFieldsByAlias: Boolean!
+          $includeSubscribers: Boolean!
+        ) {
+          subscribeToProfile(profileIds: [$profileId], userIds: $userIds) {
+            ...Profile
+          }
+        }
+        ${ProfileFragment}
+      `;
+      const response = await client.request(SubscribeToProfile_subscribeToProfileDocument, {
+        profileId: params.profileId,
+        userIds: body.userIds,
+        ...getProfileIncludesFromQuery(query),
+      });
+
+      assert(response.subscribeToProfile.length === 1);
+      assert("id" in response.subscribeToProfile[0]);
+
+      return Created(mapProfile(response.subscribeToProfile[0]));
+    }
+  )
+  .delete(
+    {
+      operationId: "UnsubscribeFromProfile",
+      summary: "Unsubscribe from a profile",
+      description: "Unsubscribes a user from the specified profile",
+      tags: ["Profiles"],
+      query: profileIncludeParam,
+      body: JsonBody(ProfileSubscriptionInput(false)),
+      responses: {
+        200: SuccessResponse(Profile),
+      },
+    },
+    async ({ client, params, query, body }) => {
+      const _mutation = gql`
+        mutation UnsubscribeFromProfile_unsubscribeFromProfile(
+          $profileId: GID!
+          $userIds: [GID!]!
+          $includeFields: Boolean!
+          $includeFieldsByAlias: Boolean!
+          $includeSubscribers: Boolean!
+        ) {
+          unsubscribeFromProfile(profileIds: [$profileId], userIds: $userIds) {
+            ...Profile
+          }
+        }
+        ${ProfileFragment}
+      `;
+
+      const response = await client.request(UnsubscribeFromProfile_unsubscribeFromProfileDocument, {
+        profileId: params.profileId,
+        userIds: body.userIds,
+        ...getProfileIncludesFromQuery(query),
+      });
+
+      assert(response.unsubscribeFromProfile.length === 1);
+      assert("id" in response.unsubscribeFromProfile[0]);
+
+      return Ok(mapProfile(response.unsubscribeFromProfile[0]));
+    }
+  );

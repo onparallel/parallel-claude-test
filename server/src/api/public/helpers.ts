@@ -3,11 +3,12 @@ import { createReadStream } from "fs";
 import { ClientError, gql, GraphQLClient } from "graphql-request";
 import fetch from "node-fetch";
 import { performance } from "perf_hooks";
-import { isDefined, omit, pipe } from "remeda";
+import { isDefined, omit, pick, pipe } from "remeda";
 import { promisify } from "util";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { waitFor } from "../../util/promises/waitFor";
+import { emptyRTEValue, fromPlainText } from "../../util/slate/utils";
 import { Maybe } from "../../util/types";
 import { File, RestParameter } from "../rest/core";
 import { InternalError } from "../rest/errors";
@@ -20,7 +21,6 @@ import {
   intParam,
   ParseError,
 } from "../rest/params";
-import { TaskFragment } from "./fragments";
 import {
   AWSPresignedPostDataFragment,
   getTags_tagsDocument,
@@ -30,13 +30,14 @@ import {
   PetitionFieldType,
   PetitionFragment,
   PetitionTagFilter,
+  ProfileFragment,
   SubscriptionFragment,
   TagFragmentDoc,
   TaskFragment as TaskType,
   TemplateFragment,
   waitForTask_TaskDocument,
 } from "./__types";
-import { emptyRTEValue, fromPlainText } from "../../util/slate/utils";
+import { TaskFragment } from "./fragments";
 
 export function paginationParams() {
   return {
@@ -98,7 +99,11 @@ export function idParam<
   };
 }
 
-export function containsGraphQLError(error: ClientError, errorCode: string) {
+export function containsGraphQLError(error: unknown, errorCode: string): error is ClientError {
+  if (!(error instanceof ClientError)) {
+    return false;
+  }
+
   return ((error.response.errors![0] as any).extensions.code as string) === errorCode;
 }
 
@@ -392,4 +397,38 @@ export function bodyMessageToRTE(message?: Maybe<{ format: "PLAIN_TEXT"; content
       ? fromPlainText(message.content)
       : emptyRTEValue()
     : null;
+}
+
+function mapProfileProperties<T extends Pick<ProfileFragment, "properties" | "propertiesByAlias">>(
+  profile: T
+) {
+  return {
+    ...omit(profile, ["properties", "propertiesByAlias"]),
+    fields: profile.properties?.map((prop) =>
+      pick(prop, ["field", prop.field.type === "FILE" ? "files" : "value"])
+    ),
+    fieldsByAlias: isDefined(profile.propertiesByAlias)
+      ? fillPropertiesByAlias(profile.propertiesByAlias)
+      : undefined,
+  };
+}
+
+function fillPropertiesByAlias(props: ProfileFragment["propertiesByAlias"]) {
+  return props.reduce((acc, prop) => {
+    if (isDefined(prop.field.alias)) {
+      if (prop.field.type === "FILE") {
+        acc[prop.field.alias] = prop.files?.map((f) => f.file) ?? null;
+      } else {
+        acc[prop.field.alias] = prop.value?.content?.value ?? null;
+      }
+    }
+
+    return acc;
+  }, {} as Record<string, any>);
+}
+
+export function mapProfile<T extends Pick<ProfileFragment, "properties" | "propertiesByAlias">>(
+  profile: T
+) {
+  return pipe(profile, mapProfileProperties);
 }

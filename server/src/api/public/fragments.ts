@@ -223,3 +223,84 @@ export const TaskFragment = gql`
     status
   }
 `;
+
+export const ProfileTypeFieldFragment = gql`
+  fragment ProfileTypeField on ProfileTypeField {
+    id
+    name
+    alias
+    type
+    isExpirable
+  }
+`;
+
+export const ProfileFieldValueFragment = gql`
+  fragment ProfileFieldValue on ProfileFieldValue {
+    id
+    content
+    expiresAt
+    createdAt
+  }
+`;
+
+export const ProfileFieldFileFragment = gql`
+  fragment ProfileFieldFile on ProfileFieldFile {
+    id
+    file {
+      filename
+      size
+      contentType
+    }
+    expiresAt
+    createdAt
+  }
+`;
+
+export const ProfileTypeFragment = gql`
+  fragment ProfileType on ProfileType {
+    id
+    name
+  }
+`;
+
+export const ProfileFieldPropertyFragment = gql`
+  fragment ProfileFieldProperty on ProfileFieldProperty {
+    field {
+      ...ProfileTypeField
+    }
+    value {
+      ...ProfileFieldValue
+    }
+    files {
+      ...ProfileFieldFile
+    }
+  }
+  ${ProfileTypeFieldFragment}
+  ${ProfileFieldValueFragment}
+  ${ProfileFieldFileFragment}
+`;
+
+export const ProfileFragment = gql`
+  fragment Profile on Profile {
+    id
+    name
+    profileType {
+      ...ProfileType
+    }
+    properties @include(if: $includeFields) {
+      ...ProfileFieldProperty
+    }
+    propertiesByAlias: properties @include(if: $includeFieldsByAlias) {
+      ...ProfileFieldProperty
+    }
+    subscribers @include(if: $includeSubscribers) {
+      user {
+        ...User
+      }
+    }
+    createdAt
+  }
+  ${ProfileTypeFragment}
+  ${ProfileFieldPropertyFragment}
+  ${UserFragment}
+`;

@@ -31,3 +31,7 @@ export function singleFileUploadMiddleware(fieldName: string): RequestHandler[] 
     }) as any,
   ];
 }
+
+export function anyFileUploadMiddleware(): RequestHandler[] {
+  return [multerUploadFile.any()];
+}
