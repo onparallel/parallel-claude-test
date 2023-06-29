@@ -112,18 +112,24 @@ export class PetitionImportExportService implements IPetitionImportExportService
 
     if (!petition) throw new Error(`Petition:${petitionId} not found`);
 
-    const customFieldIds: number[] = [];
+    // add a random number to every field id, so its easier to merge fields of many petitions
+    const randomNumber = Math.floor(Math.random() * 1_000_000_000);
+    /**
+     * [key] = original field id from DB
+     * [value] = random incremental integer
+     */
+    const customFieldIds: Record<number, number> = {};
     return {
       name: petition.name,
       locale: petition.recipient_locale,
       isTemplate: petition.is_template,
       templateDescription: safeJsonParse(petition.template_description),
       fields: fields.map((field) => {
-        customFieldIds.push(field.id);
+        customFieldIds[field.id] = field.id + randomNumber;
         return {
           // replace the DB id with incremental integers to not expose database info.
           // This is required to reconstruct visibility conditions
-          id: customFieldIds.length - 1,
+          id: customFieldIds[field.id],
           type: field.type,
           title: field.title,
           description: field.description,
@@ -135,7 +141,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
                 ...field.visibility,
                 conditions: field.visibility.conditions.map((c: any) => ({
                   ...c,
-                  fieldId: customFieldIds.indexOf(c.fieldId as number),
+                  fieldId: customFieldIds[c.fieldId],
                 })),
               }
             : null,
@@ -193,7 +199,11 @@ export class PetitionImportExportService implements IPetitionImportExportService
         t
       );
 
-      const newFieldIds: number[] = [];
+      /**
+       * [key] = random incremental integer
+       * [value] = new field id from DB
+       */
+      const newFieldIds: Record<number, number> = {};
       await pMap(
         fieldsWithPositions,
         async (jsonField) => {
@@ -231,7 +241,7 @@ export class PetitionImportExportService implements IPetitionImportExportService
             t
           );
 
-          newFieldIds.push(field.id);
+          newFieldIds[jsonField.id] = field.id;
           return field;
         },
         { concurrency: 1 }
