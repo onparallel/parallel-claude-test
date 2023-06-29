@@ -19,6 +19,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import {
+  ArrowDiagonalRightIcon,
   CopyIcon,
   DeleteIcon,
   DownloadIcon,
@@ -26,6 +27,7 @@ import {
   FolderIcon,
   ImportIcon,
   LockClosedIcon,
+  ProfilesIcon,
   TableIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
@@ -41,9 +43,11 @@ import {
   PetitionHeader_QueryFragment,
   PetitionHeader_reopenPetitionDocument,
   PetitionHeader_updatePetitionPermissionSubscriptionDocument,
+  PetitionsHeader_associateProfileToPetitionDocument,
   PetitionsHeader_movePetitionDocument,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
+import { assertTypename } from "@parallel/utils/apollo/typename";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
@@ -63,6 +67,7 @@ import { PathName } from "../common/PathName";
 import { PetitionStatusLabel } from "../common/PetitionStatusLabel";
 import { SmallPopover } from "../common/SmallPopover";
 import { isDialogError } from "../common/dialogs/DialogProvider";
+import { useAssociateProfileToPetitionDialog } from "../petition-common/dialogs/AssociateProfileToPetitionDialog";
 import { useImportRepliesDialog } from "../petition-common/dialogs/ImportRepliesDialog";
 import { useMoveToFolderDialog } from "../petition-common/dialogs/MoveToFolderDialog";
 import { usePetitionSharingDialog } from "../petition-common/dialogs/PetitionSharingDialog";
@@ -90,6 +95,7 @@ export const PetitionHeader = Object.assign(
   ) {
     const intl = useIntl();
     const router = useRouter();
+    const toast = useToast();
     const [state] = usePetitionState();
     const [shouldConfirmNavigation, setShouldConfirmNavigation] =
       usePetitionShouldConfirmNavigation();
@@ -330,7 +336,6 @@ export const PetitionHeader = Object.assign(
         defaultMessage: "Failed to import data",
       })
     );
-    const toast = useToast();
 
     const showImportRepliesDialog = useImportRepliesDialog();
     const handleImportRepliesClick = async () => {
@@ -354,6 +359,45 @@ export const PetitionHeader = Object.assign(
       }
     };
 
+    const [associateProfileToPetition] = useMutation(
+      PetitionsHeader_associateProfileToPetitionDocument
+    );
+    const showAssociateProfileToPetitionDialog = useAssociateProfileToPetitionDialog();
+    const handleProfilesClick = async (forceAssociateNewProfile?: boolean) => {
+      assertTypename(petition, "Petition");
+      try {
+        if (forceAssociateNewProfile) {
+          const profileId = await showAssociateProfileToPetitionDialog({
+            excludeProfiles: petition.profiles.map((p) => p.id),
+          });
+
+          await associateProfileToPetition({
+            variables: { petitionId: petition.id, profileId },
+          });
+
+          toast({
+            isClosable: true,
+            status: "success",
+            title: intl.formatMessage({
+              id: "component.petition-header.profile-asociated-toast-title",
+              defaultMessage: "Profile associated",
+            }),
+            description: intl.formatMessage({
+              id: "component.petition-header.profile-asociated-toast-description",
+              defaultMessage: "You can include the information you need",
+            }),
+          });
+          goToPetition(petition.id, "replies", {
+            query: { profile: profileId },
+          });
+        } else {
+          goToPetition(petition.id, "replies", {
+            query: petition.profiles.length > 0 ? { profile: petition.profiles.at(-1)!.id } : {},
+          });
+        }
+      } catch {}
+    };
+
     return (
       <Grid
         backgroundColor="white"
@@ -361,9 +405,9 @@ export const PetitionHeader = Object.assign(
         borderBottomColor="gray.200"
         position="relative"
         paddingX={4}
-        gridTemplateColumns={{ base: "1fr min-content", md: "1fr min-content 1fr" }}
-        gridTemplateRows={{ base: "4rem 2.5rem", md: "4rem" }}
-        gridTemplateAreas={{ base: '"a b" "c c"', md: '"a c b"' }}
+        gridTemplateColumns={{ base: "1fr min-content", lg: "1fr min-content 1fr" }}
+        gridTemplateRows={{ base: "4rem 2.5rem", lg: "4rem" }}
+        gridTemplateAreas={{ base: '"a b" "c c"', lg: '"a c b"' }}
         {...props}
       >
         <GridItem area="a" as={Flex} flexDirection="column" justifyContent="center" minWidth={0}>
@@ -427,6 +471,32 @@ export const PetitionHeader = Object.assign(
                 </>
               )}
             />
+            {petition.__typename === "Petition" ? (
+              <>
+                <Divider isVertical height={3.5} color="gray.500" />
+                <Button
+                  leftIcon={<ProfilesIcon boxSize={4} />}
+                  color="gray.600"
+                  size="xs"
+                  variant="ghost"
+                  paddingX={1.5}
+                  fontSize="sm"
+                  fontWeight="normal"
+                  onClick={() => handleProfilesClick(petition.profiles.length === 0)}
+                  isDisabled={isAnonymized}
+                >
+                  <Box whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
+                    <FormattedMessage
+                      id="component.petition-header.x-profiles"
+                      defaultMessage="{count, plural, =1 {# profile} other {# profiles}}"
+                      values={{
+                        count: petition.profiles.length,
+                      }}
+                    />
+                  </Box>
+                </Button>
+              </>
+            ) : null}
           </HStack>
         </GridItem>
         <GridItem area="c" as={List} display="flex" alignItems="stretch" justifyContent="center">
@@ -503,6 +573,16 @@ export const PetitionHeader = Object.assign(
                     <FormattedMessage
                       id="component.petition-header.export-pdf"
                       defaultMessage="Export to PDF"
+                    />
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => handleProfilesClick(true)}
+                    isDisabled={isAnonymized}
+                    icon={<ArrowDiagonalRightIcon display="block" boxSize={4} />}
+                  >
+                    <FormattedMessage
+                      id="component.petition-header.associate-profile"
+                      defaultMessage="Associate profile"
                     />
                   </MenuItem>
                   {hasAdminRole && !isPetition ? (
@@ -664,6 +744,9 @@ export const PetitionHeader = Object.assign(
             status
             isRestricted
             isAnonymized
+            profiles {
+              id
+            }
             myEffectivePermission {
               isSubscribed
               permissionType
@@ -759,6 +842,18 @@ const _mutations = [
       $type: PetitionBaseType!
     ) {
       movePetitions(ids: [$id], source: $source, destination: $destination, type: $type)
+    }
+  `,
+  gql`
+    mutation PetitionsHeader_associateProfileToPetition($petitionId: GID!, $profileId: GID!) {
+      associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
+        petition {
+          id
+          profiles {
+            id
+          }
+        }
+      }
     }
   `,
 ];

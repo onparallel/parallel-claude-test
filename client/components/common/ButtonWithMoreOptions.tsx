@@ -6,6 +6,7 @@ import {
   layoutPropNames,
   omitThemingProps,
   ThemingProps,
+  useStyleConfig,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -24,15 +25,18 @@ export const ButtonWithMoreOptions = chakraForwardRef<"button", ButtonWithMoreOp
     const layoutProps = pick(props, layoutPropNames as any);
     const otherProps = omitThemingProps(omit(props, layoutPropNames as any));
     const themingProps = pick(props, ["styleConfig", "size", "variant", "colorScheme"]);
+    const style = useStyleConfig("Button", { ...props });
 
     return (
       <ButtonGroup isAttached {...(layoutProps as any)} {...themingProps}>
         <Button ref={ref} as={as} flex="1" {...(otherProps as any)} />
-        <Divider
-          isVertical
-          opacity={props.isDisabled ? 0.4 : undefined}
-          color={`${props.colorScheme ?? "gray"}.600`}
-        />
+        {style.border ? null : (
+          <Divider
+            isVertical
+            opacity={props.isDisabled ? 0.4 : undefined}
+            color={(style as any)._active.bg}
+          />
+        )}
         <MoreOptionsMenuButton
           icon={<ChevronDownIcon />}
           isDisabled={props.isDisabled}

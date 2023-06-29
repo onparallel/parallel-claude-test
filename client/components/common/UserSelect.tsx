@@ -382,11 +382,13 @@ function Option({ children, ...props }: OptionProps<UserSelectSelection<boolean>
         ...(props.data.__typename === "User"
           ? {
               "data-option-type": "User",
+              "data-user-id": props.data.id,
               "data-email": props.data.email,
             }
           : props.data.__typename === "UserGroup"
           ? {
               "data-option-type": "UserGroup",
+              "data-user-group-id": props.data.id,
               "data-name": props.data.name,
             }
           : {}),

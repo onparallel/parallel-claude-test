@@ -65,6 +65,7 @@ import {
   PetitionSignatureRequest,
   PetitionStatus,
   PetitionUserNotification,
+  Profile,
   ProfileType,
   ProfileTypeField,
   ProfileTypeFieldType,
@@ -1173,6 +1174,23 @@ export class Mocks {
           ...builder?.(i),
         };
       }),
+      "*"
+    );
+  }
+
+  async createRandomProfiles(
+    orgId: number,
+    profileTypeId: number,
+    amount?: number,
+    builder?: (i: number) => Partial<Profile>
+  ) {
+    return await this.knex<Profile>("profile").insert(
+      range(0, amount || 1).map((i) => ({
+        name: faker.word.words(2),
+        org_id: orgId,
+        profile_type_id: profileTypeId,
+        ...builder?.(i),
+      })),
       "*"
     );
   }

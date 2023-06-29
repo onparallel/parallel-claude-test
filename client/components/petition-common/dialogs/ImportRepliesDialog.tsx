@@ -197,6 +197,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
                       resetField("mapping");
                     }}
                     onBlur={onBlur}
+                    excludePetitions={[petitionId]}
                   />
                 )}
               />

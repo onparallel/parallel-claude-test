@@ -20,12 +20,12 @@ export function ProfileFieldNumber({
       <Controller
         name={`fields.${index}.content.value`}
         control={control}
-        render={({ field: { value, onChange, ...rest } }) => {
+        render={({ field: { name, value, onChange } }) => {
           return (
             <NumeralInput
-              {...rest}
+              name={name}
               borderColor="transparent"
-              value={value.length ? value : undefined}
+              value={value || undefined}
               onChange={(value) => {
                 onChange(value?.toString() ?? "");
               }}

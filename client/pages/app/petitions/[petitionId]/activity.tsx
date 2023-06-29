@@ -25,8 +25,11 @@ import {
   useConfirmReactivateAccessDialog,
 } from "@parallel/components/petition-activity/dialogs/ConfirmReactivateAccessDialog";
 import { useConfirmSendReminderDialog } from "@parallel/components/petition-activity/dialogs/ConfirmSendReminderDialog";
+import { useConfirmDeassociateProfileDialog } from "@parallel/components/petition-activity/dialogs/ConfirmDeassociateProfileDialog";
 import { PetitionAccessesTable } from "@parallel/components/petition-activity/PetitionAccessesTable";
 import { PetitionActivityTimeline } from "@parallel/components/petition-activity/PetitionActivityTimeline";
+import { PetitionProfilesTable } from "@parallel/components/petition-activity/PetitionProfilesTable";
+import { useAssociateProfileToPetitionDialog } from "@parallel/components/petition-common/dialogs/AssociateProfileToPetitionDialog";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
@@ -34,11 +37,13 @@ import {
   PetitionAccessTable_PetitionAccessFragment,
   PetitionActivity_cancelScheduledMessageDocument,
   PetitionActivity_deactivateAccessesDocument,
+  PetitionActivity_associateProfileToPetitionDocument,
   PetitionActivity_petitionDocument,
   PetitionActivity_PetitionFragment,
   PetitionActivity_reactivateAccessesDocument,
   PetitionActivity_sendRemindersDocument,
   PetitionActivity_switchAutomaticRemindersDocument,
+  PetitionActivity_deassociateProfileFromPetitionDocument,
   PetitionActivity_updatePetitionDocument,
   PetitionActivity_userDocument,
   UpdatePetitionInput,
@@ -46,6 +51,7 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { useGoToPetitionSection } from "@parallel/utils/goToPetition";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
@@ -63,6 +69,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const router = useRouter();
   const { query } = router;
 
+  const goToSection = useGoToPetitionSection();
   const {
     data: { me, realMe },
   } = useAssertQuery(PetitionActivity_userDocument);
@@ -321,6 +328,58 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     petition.__typename === "Petition" &&
     petition.status === "DRAFT";
 
+  const [associateProfileToPetition] = useMutation(
+    PetitionActivity_associateProfileToPetitionDocument
+  );
+  const showAssociateProfileToPetitionDialog = useAssociateProfileToPetitionDialog();
+  const handleAddProfileToPetition = async () => {
+    try {
+      const profileId = await showAssociateProfileToPetitionDialog({
+        excludeProfiles: petition.profiles?.map((p) => p.id),
+      });
+
+      await associateProfileToPetition({
+        variables: { petitionId, profileId },
+      });
+
+      toast({
+        isClosable: true,
+        status: "success",
+        title: intl.formatMessage({
+          id: "component.petition-header.profile-asociated-toast-title",
+          defaultMessage: "Profile associated",
+        }),
+        description: intl.formatMessage({
+          id: "component.petition-header.profile-asociated-toast-description",
+          defaultMessage: "You can include the information you need",
+        }),
+      });
+      goToSection("replies", { query: { profileId } });
+    } catch {}
+  };
+
+  const showConfirmDeassociateProfileDialog = useConfirmDeassociateProfileDialog();
+  const [deassociateProfileFromPetition] = useMutation(
+    PetitionActivity_deassociateProfileFromPetitionDocument
+  );
+  const handleDeassociateProfileFromPetition = async (profileId: string) => {
+    try {
+      await showConfirmDeassociateProfileDialog({
+        petitionName:
+          petition.name ??
+          intl.formatMessage({
+            id: "generic.unnamed-parallel",
+            defaultMessage: "Unnamed parallel",
+          }),
+        profileName: petition.profiles.find((p) => p.id === profileId)?.name ?? "",
+      });
+      await deassociateProfileFromPetition({
+        variables: { petitionId, profileId },
+      });
+      refetch();
+    } catch {}
+  };
+
   return (
     <PetitionLayout
       key={petition.id}
@@ -351,6 +410,13 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         onDeactivateAccess={handleDeactivateAccess}
         onConfigureReminders={handleConfigureReminders}
         onPetitionSend={handleNextClick({ redirect: true })}
+      />
+      <PetitionProfilesTable
+        id="petition-profiles"
+        margin={4}
+        petition={petition}
+        onAddProfile={handleAddProfileToPetition}
+        onRemoveProfile={handleDeassociateProfileFromPetition}
       />
       <Box margin={4}>
         <PetitionActivityTimeline
@@ -386,9 +452,11 @@ const _fragments = {
         ...FieldErrorDialog_PetitionField
       }
       ...useConfirmSendReminderDialog_Petition
+      ...PetitionProfilesTable_Petition
     }
     ${PetitionLayout.fragments.PetitionBase}
     ${PetitionAccessesTable.fragments.Petition}
+    ${PetitionProfilesTable.fragments.Petition}
     ${PetitionActivityTimeline.fragments.Petition}
     ${ShareButton.fragments.PetitionBase}
     ${AddPetitionAccessDialog.fragments.Petition}
@@ -475,6 +543,21 @@ PetitionActivity.mutations = [
       ) {
         id
       }
+    }
+  `,
+  gql`
+    mutation PetitionActivity_associateProfileToPetition($petitionId: GID!, $profileId: GID!) {
+      associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
+        petition {
+          id
+          profiles {
+            id
+          }
+        }
+      }
+    }
+    mutation PetitionActivity_deassociateProfileFromPetition($petitionId: GID!, $profileId: GID!) {
+      deassociateProfileFromPetition(petitionId: $petitionId, profileId: $profileId)
     }
   `,
 ];

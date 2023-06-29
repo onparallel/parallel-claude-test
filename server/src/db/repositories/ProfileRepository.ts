@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, indexBy, isDefined, omit, pick, times, uniq } from "remeda";
+import { groupBy, indexBy, isDefined, omit, pick, sortBy, times, uniq } from "remeda";
 import { LocalizableUserText } from "../../graphql";
 import { unMaybeArray } from "../../util/arrays";
 import { keyBuilder } from "../../util/keyBuilder";
@@ -622,6 +622,9 @@ export class ProfileRepository extends BaseRepository {
     if (ids.length === 0) {
       return;
     }
+
+    await this.from("petition_profile", t).whereIn("profile_id", ids).delete();
+
     await this.from("profile", t).whereIn("id", ids).whereNull("deleted_at").update({
       deleted_at: this.now(),
       deleted_by: deletedBy,
@@ -1138,5 +1141,48 @@ export class ProfileRepository extends BaseRepository {
         "user.org_id": orgId,
       })
       .select<User[]>("user.*");
+  }
+
+  readonly loadProfilesByPetitionId = this.buildLoader<number, Profile[]>(
+    async (petitionIds, t) => {
+      const results = await this.from("profile", t)
+        .join("petition_profile", "profile.id", "petition_profile.profile_id")
+        .whereIn("petition_profile.petition_id", petitionIds)
+        .whereNull("profile.deleted_at")
+        .select<Array<Profile & { petition_id: number; pp_created_at: Date }>>(
+          "profile.*",
+          "petition_profile.petition_id",
+          "petition_profile.created_at as pp_created_at"
+        );
+
+      const byPetitionId = groupBy(results, (r) => r.petition_id);
+      return petitionIds.map((id) =>
+        byPetitionId[id]
+          ? sortBy(byPetitionId[id], (p) => p.pp_created_at).map((p) =>
+              omit(p, ["petition_id", "pp_created_at"])
+            )
+          : []
+      );
+    }
+  );
+
+  async associateProfileToPetition(profileId: number, petitionId: number, createdBy: string) {
+    const [petitionProfile] = await this.from("petition_profile").insert(
+      {
+        petition_id: petitionId,
+        profile_id: profileId,
+        created_at: this.now(),
+        created_by: createdBy,
+      },
+      "*"
+    );
+
+    return petitionProfile;
+  }
+
+  async deassociateProfileFromPetition(profileId: number, petitionId: number) {
+    return await this.from("petition_profile")
+      .where({ petition_id: petitionId, profile_id: profileId })
+      .delete();
   }
 }

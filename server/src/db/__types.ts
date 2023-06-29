@@ -148,7 +148,9 @@ export type PetitionEventType =
   | "SIGNATURE_REMINDER"
   | "SIGNATURE_OPENED"
   | "PETITION_ANONYMIZED"
-  | "REPLY_STATUS_CHANGED";
+  | "REPLY_STATUS_CHANGED"
+  | "PROFILE_ASSOCIATED"
+  | "PROFILE_DEASSOCIATED";
 
 export const PetitionEventTypeValues = [
   "PETITION_CREATED",
@@ -191,6 +193,8 @@ export const PetitionEventTypeValues = [
   "SIGNATURE_OPENED",
   "PETITION_ANONYMIZED",
   "REPLY_STATUS_CHANGED",
+  "PROFILE_ASSOCIATED",
+  "PROFILE_DEASSOCIATED",
 ] as PetitionEventType[];
 
 export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";
@@ -434,6 +438,7 @@ export interface TableTypes {
   petition_list_view: PetitionListView;
   petition_message: PetitionMessage;
   petition_permission: PetitionPermission;
+  petition_profile: PetitionProfile;
   petition_reminder: PetitionReminder;
   petition_signature_request: PetitionSignatureRequest;
   petition_tag: PetitionTag;
@@ -491,6 +496,7 @@ export interface TableCreateTypes {
   petition_list_view: CreatePetitionListView;
   petition_message: CreatePetitionMessage;
   petition_permission: CreatePetitionPermission;
+  petition_profile: CreatePetitionProfile;
   petition_reminder: CreatePetitionReminder;
   petition_signature_request: CreatePetitionSignatureRequest;
   petition_tag: CreatePetitionTag;
@@ -548,6 +554,7 @@ export interface TablePrimaryKeys {
   petition_list_view: "id";
   petition_message: "id";
   petition_permission: "id";
+  petition_profile: "id";
   petition_reminder: "id";
   petition_signature_request: "id";
   petition_tag: "id";
@@ -1317,6 +1324,19 @@ export type CreatePetitionPermission = PartialProps<
   | "deleted_by"
   | "user_group_id"
   | "from_user_group_id"
+>;
+
+export interface PetitionProfile {
+  id: number; // int4
+  petition_id: number; // int4
+  profile_id: number; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+}
+
+export type CreatePetitionProfile = PartialProps<
+  Omit<PetitionProfile, "id">,
+  "created_at" | "created_by"
 >;
 
 export interface PetitionReminder {

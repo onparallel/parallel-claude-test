@@ -448,6 +448,12 @@ export const Petition = objectType({
       description: "Time when the petition was closed.",
       resolve: (o) => o.closed_at,
     });
+    t.nonNull.list.nonNull.field("profiles", {
+      type: "Profile",
+      resolve: async (o, _, ctx) => {
+        return await ctx.profiles.loadProfilesByPetitionId(o.id);
+      },
+    });
   },
 });
 

@@ -588,6 +588,8 @@ export type Mutation = {
   anonymizePetition: SupportMethodResponse;
   /** Updates the status of a PENDING petition field replies to APPROVED or REJECTED */
   approveOrRejectPetitionFieldReplies: Petition;
+  /** Associates a profile to a petition */
+  associateProfileToPetition: PetitionProfile;
   /** Load contacts from an excel file, creating the ones not found on database */
   bulkCreateContacts: BulkCreateContactsReturnType;
   /** Submits multiple replies on a petition at once given a JSON input where the keys are field aliases and values are the replie(s) for that field. */
@@ -685,6 +687,8 @@ export type Mutation = {
   deactivateAccesses: Array<PetitionAccess>;
   /** Updates user status to INACTIVE and transfers their owned petitions to another user in the org. */
   deactivateUser: Array<User>;
+  /** Deassociates a profile from a petition */
+  deassociateProfileFromPetition: Success;
   /** Delete contacts. */
   deleteContacts: Result;
   /** Removes the DOW JONES integration of the user's organization */
@@ -976,6 +980,11 @@ export type MutationapproveOrRejectPetitionFieldRepliesArgs = {
   status: PetitionFieldReplyStatus;
 };
 
+export type MutationassociateProfileToPetitionArgs = {
+  petitionId: Scalars["GID"]["input"];
+  profileId: Scalars["GID"]["input"];
+};
+
 export type MutationbulkCreateContactsArgs = {
   file: Scalars["Upload"]["input"];
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -1252,6 +1261,11 @@ export type MutationdeactivateUserArgs = {
   tagIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   transferToUserId: Scalars["GID"]["input"];
   userIds: Array<Scalars["GID"]["input"]>;
+};
+
+export type MutationdeassociateProfileFromPetitionArgs = {
+  petitionId: Scalars["GID"]["input"];
+  profileId: Scalars["GID"]["input"];
 };
 
 export type MutationdeleteContactsArgs = {
@@ -2318,6 +2332,7 @@ export type Petition = PetitionBase & {
   path: Scalars["String"]["output"];
   /** The permissions linked to the petition */
   permissions: Array<PetitionPermission>;
+  profiles: Array<Profile>;
   /** The progress of the petition. */
   progress: PetitionProgress;
   /** The reminders configuration for the petition. */
@@ -2625,6 +2640,8 @@ export type PetitionEventType =
   | "PETITION_MESSAGE_BOUNCED"
   | "PETITION_REMINDER_BOUNCED"
   | "PETITION_REOPENED"
+  | "PROFILE_ASSOCIATED"
+  | "PROFILE_DEASSOCIATED"
   | "RECIPIENT_SIGNED"
   | "REMINDERS_OPT_OUT"
   | "REMINDER_SENT"
@@ -3000,6 +3017,11 @@ export type PetitionPermissionType = "OWNER" | "READ" | "WRITE";
 /** The READ and WRITE permissions for a petition user. */
 export type PetitionPermissionTypeRW = "READ" | "WRITE";
 
+export type PetitionProfile = {
+  petition: Petition;
+  profile: Profile;
+};
+
 /** The progress of a petition. */
 export type PetitionProgress = {
   /** The progress of the petition exlude internal fields. */
@@ -3312,6 +3334,7 @@ export type Profile = Timestamps & {
   events: ProfileEventPagination;
   id: Scalars["GID"]["output"];
   name: Scalars["String"]["output"];
+  petitions: Array<Petition>;
   profileType: ProfileType;
   properties: Array<ProfileFieldProperty>;
   subscribers: Array<ProfileSubscription>;
@@ -3324,11 +3347,31 @@ export type ProfileeventsArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
+export type ProfileAssociatedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition: Maybe<Petition>;
+  profile: Maybe<Profile>;
+  type: PetitionEventType;
+  user: Maybe<User>;
+};
+
 export type ProfileCreatedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];
   id: Scalars["GID"]["output"];
   profile: Maybe<Profile>;
   type: ProfileEventType;
+  user: Maybe<User>;
+};
+
+export type ProfileDeassociatedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  data: Scalars["JSONObject"]["output"];
+  id: Scalars["GID"]["output"];
+  petition: Maybe<Petition>;
+  profile: Maybe<Profile>;
+  type: PetitionEventType;
   user: Maybe<User>;
 };
 
@@ -3987,6 +4030,7 @@ export type QuerypetitionFoldersArgs = {
 };
 
 export type QuerypetitionsArgs = {
+  excludeAnonymized?: InputMaybe<Scalars["Boolean"]["input"]>;
   filters?: InputMaybe<PetitionFilter>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
@@ -6525,6 +6569,20 @@ export type GetPetitionEvents_PetitionEventsQueryVariables = Exact<{
 
 export type GetPetitionEvents_PetitionEventsQuery = {
   petitionEvents: Array<
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
     | {
         id: string;
         data: { [key: string]: any };

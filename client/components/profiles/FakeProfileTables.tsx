@@ -1,5 +1,9 @@
-import { Box, Flex, Heading, Stack, Text } from "@chakra-ui/react";
+import { gql } from "@apollo/client";
+import { Box, Flex, Heading, Text } from "@chakra-ui/react";
+import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { Link } from "@parallel/components/common/Link";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { PetitionSignatureCellContent } from "@parallel/components/common/PetitionSignatureCellContent";
@@ -7,19 +11,14 @@ import { PetitionStatusCellContent } from "@parallel/components/common/PetitionS
 import { TableColumn } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { FakeProfileTables_PetitionFragment, ProfileType } from "@parallel/graphql/__types";
-import { FORMATS } from "@parallel/utils/dates";
-import { useMemo } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-import { noop } from "remeda";
-import { TablePage } from "../common/TablePage";
-import { gql } from "@apollo/client";
-import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
-import { ContactReference } from "@parallel/components/common/ContactReference";
-import { Link } from "@parallel/components/common/Link";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
+import { FORMATS } from "@parallel/utils/dates";
 import { useGoToContact } from "@parallel/utils/goToContact";
-import { MouseEvent } from "react";
-import { isDefined } from "remeda";
+import { MouseEvent, useMemo } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined, noop } from "remeda";
+import { TablePage } from "../common/TablePage";
+
 type FakeProfilesType = {
   id: string;
   name: string;
@@ -129,7 +128,7 @@ export function FakeProfileTables({ me }: { me: any }) {
   const columnsProfiles = useFakeProfileTableColumns();
   const columnsParallels = useFakePetitionColumns();
   return (
-    <Stack spacing={6} padding={4}>
+    <>
       <TablePage
         flex="0 1 auto"
         minHeight="200px"
@@ -184,7 +183,7 @@ export function FakeProfileTables({ me }: { me: any }) {
         }
         body={null}
       />
-    </Stack>
+    </>
   );
 }
 

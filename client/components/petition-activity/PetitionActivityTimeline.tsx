@@ -40,6 +40,8 @@ import { TimelineSignatureStartedEvent } from "./timeline/events/TimelineSignatu
 import { TimelineUserPermissionAddedEvent } from "./timeline/events/TimelineUserPermissionAddedEvent";
 import { TimelineUserPermissionEditedEvent } from "./timeline/events/TimelineUserPermissionEditedEvent";
 import { TimelineUserPermissionRemovedEvent } from "./timeline/events/TimelineUserPermissionRemovedEvent";
+import { TimelineProfileDeassociatedEvent } from "./timeline/events/TimelineProfileDeassociatedEvent";
+import { TimelineProfileAssociatedEvent } from "./timeline/events/TimelineProfileAssociatedEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -142,6 +144,10 @@ export function PetitionActivityTimeline({
               <TimelinePetitionAnonymizedEvent event={event} />
             ) : event.__typename === "ReplyStatusChangedEvent" ? (
               <TimelineReplyStatusChangedEvent event={event} userId={userId} />
+            ) : event.__typename === "ProfileAssociatedEvent" ? (
+              <TimelineProfileAssociatedEvent event={event} />
+            ) : event.__typename === "ProfileDeassociatedEvent" ? (
+              <TimelineProfileDeassociatedEvent event={event} />
             ) : null}
           </Box>
         ))}
@@ -278,6 +284,12 @@ PetitionActivityTimeline.fragments = {
       ... on ReplyStatusChangedEvent {
         ...TimelineReplyStatusChangedEvent_ReplyStatusChangedEvent
       }
+      ... on ProfileAssociatedEvent {
+        ...TimelineProfileAssociatedEvent_ProfileAssociatedEvent
+      }
+      ... on ProfileDeassociatedEvent {
+        ...TimelineProfileDeassociatedEvent_ProfileDeassociatedEvent
+      }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -317,5 +329,7 @@ PetitionActivityTimeline.fragments = {
     ${TimelinePetitionReminderBouncedEvent.fragments.PetitionReminderBouncedEvent}
     ${TimelinePetitionAnonymizedEvent.fragments.PetitionAnonymizedEvent}
     ${TimelineReplyStatusChangedEvent.fragments.ReplyStatusChangedEvent}
+    ${TimelineProfileAssociatedEvent.fragments.ProfileAssociatedEvent}
+    ${TimelineProfileDeassociatedEvent.fragments.ProfileDeassociatedEvent}
   `,
 };

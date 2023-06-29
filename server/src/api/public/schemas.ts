@@ -1801,6 +1801,36 @@ const PetitionEventSchemas = {
       },
     },
   },
+  PROFILE_ASSOCIATED: {
+    description: "A user associated a profile with a parallel",
+    properties: {
+      userId: {
+        description: "The ID of the user that associated the profile",
+        type: "string",
+        example: toGlobalId("User", 5),
+      },
+      profileId: {
+        description: "The ID of the profile that was associated",
+        type: "string",
+        example: toGlobalId("Profile", 5),
+      },
+    },
+  },
+  PROFILE_DEASSOCIATED: {
+    description: "A user deassociated a profile from a parallel",
+    properties: {
+      userId: {
+        description: "The ID of the user that deassociated the profile",
+        type: "string",
+        example: toGlobalId("User", 5),
+      },
+      profileId: {
+        description: "The ID of the profile that was deassociated",
+        type: "string",
+        example: toGlobalId("Profile", 5),
+      },
+    },
+  },
 } as Record<PetitionEventType, JsonSchema>;
 
 export const petitionEventTypes = Object.keys(PetitionEventSchemas) as PetitionEventType[];

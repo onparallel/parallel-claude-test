@@ -318,6 +318,18 @@ export function mapEventPayload(event: PetitionEvent) {
         petitionFieldReplyId: toGlobalId("PetitionFieldReply", event.data.petition_field_reply_id),
       };
     }
+    case "PROFILE_ASSOCIATED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+        profileId: toGlobalId("Profile", event.data.profile_id),
+      };
+    }
+    case "PROFILE_DEASSOCIATED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+        profileId: toGlobalId("Profile", event.data.profile_id),
+      };
+    }
     default:
       return {};
   }

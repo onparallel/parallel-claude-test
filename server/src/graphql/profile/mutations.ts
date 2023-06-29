@@ -42,7 +42,12 @@ import { validFileUploadInput } from "../helpers/validators/validFileUploadInput
 import { validIsNotUndefined } from "../helpers/validators/validIsDefined";
 import { validLocalizableUserText } from "../helpers/validators/validLocalizableUserText";
 import { validateRegex } from "../helpers/validators/validateRegex";
-import { userHasFeatureFlag } from "../petition/authorizers";
+import {
+  petitionIsNotAnonymized,
+  petitionsAreNotPublicTemplates,
+  userHasAccessToPetitions,
+  userHasFeatureFlag,
+} from "../petition/authorizers";
 import { contextUserHasRole } from "../users/authorizers";
 import {
   contextUserCanSubscribeUsersToProfile,
@@ -830,5 +835,88 @@ export const unsubscribeFromProfile = mutationField("unsubscribeFromProfile", {
   resolve: async (_, { profileIds, userIds }, ctx) => {
     await ctx.profiles.unsubscribeUsersFromProfiles(profileIds, userIds, `User:${ctx.user!.id}`);
     return (await ctx.profiles.loadProfile(profileIds)) as Profile[];
+  },
+});
+
+export const associateProfileToPetition = mutationField("associateProfileToPetition", {
+  description: "Associates a profile to a petition",
+  type: "PetitionProfile",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToPetitions("petitionId"),
+    userHasAccessToProfile("profileId"),
+    petitionsAreNotPublicTemplates("petitionId"),
+    petitionIsNotAnonymized("petitionId")
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    profileId: nonNull(globalIdArg("Profile")),
+  },
+  resolve: async (_, { petitionId, profileId }, ctx) => {
+    try {
+      const petitionProfile = await ctx.profiles.associateProfileToPetition(
+        profileId,
+        petitionId,
+        `User:${ctx.user!.id}`
+      );
+
+      await ctx.petitions.createEvent({
+        type: "PROFILE_ASSOCIATED",
+        petition_id: petitionId,
+        data: {
+          user_id: ctx.user!.id,
+          profile_id: profileId,
+        },
+      });
+
+      return petitionProfile;
+    } catch (e) {
+      if (
+        e instanceof DatabaseError &&
+        e.constraint === "petition_profile__petition_id__profile_id"
+      ) {
+        throw new ApolloError(
+          "Profile already associated to petition",
+          "PROFILE_ALREADY_ASSOCIATED_TO_PETITION"
+        );
+      }
+
+      throw e;
+    }
+  },
+});
+
+export const deassociateProfileFromPetition = mutationField("deassociateProfileFromPetition", {
+  description: "Deassociates a profile from a petition",
+  type: "Success",
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PROFILES"),
+    userHasAccessToPetitions("petitionId"),
+    userHasAccessToProfile("profileId"),
+    petitionIsNotAnonymized("petitionId")
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    profileId: nonNull(globalIdArg("Profile")),
+  },
+  resolve: async (_, { petitionId, profileId }, ctx) => {
+    const count = await ctx.profiles.deassociateProfileFromPetition(profileId, petitionId);
+    if (count === 0) {
+      throw new ApolloError(
+        "Profile not associated to petition",
+        "PROFILE_NOT_ASSOCIATED_TO_PETITION"
+      );
+    }
+
+    await ctx.petitions.createEvent({
+      type: "PROFILE_DEASSOCIATED",
+      petition_id: petitionId,
+      data: {
+        user_id: ctx.user!.id,
+        profile_id: profileId,
+      },
+    });
+
+    return RESULT.SUCCESS;
   },
 });

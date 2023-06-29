@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
+import { Box, chakra } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
@@ -15,10 +15,12 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useStateSlice } from "@parallel/utils/useStateSlice";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ComponentType,
   Dispatch,
   ReactNode,
+  RefObject,
   SetStateAction,
   createContext,
   useCallback,
@@ -31,6 +33,9 @@ import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { useConfirmDiscardDraftDialog } from "../petition-compose/dialogs/ConfirmDiscardDraftDialog";
+import { Focusable } from "@parallel/utils/types";
+import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
+import useResizeObserver from "@react-hook/resize-observer";
 export type PetitionSection = "compose" | "preview" | "replies" | "activity" | "messages";
 
 export interface PetitionLayoutProps extends PetitionLayout_QueryFragment {
@@ -40,6 +45,8 @@ export interface PetitionLayoutProps extends PetitionLayout_QueryFragment {
   section: PetitionSection;
   headerActions?: ReactNode;
   subHeader?: ReactNode;
+  drawer?: ReactNode;
+  drawerInitialFocusRef?: RefObject<Focusable>;
   onRefetch?: () => void;
 }
 
@@ -54,6 +61,8 @@ export const PetitionLayout = Object.assign(
       headerActions,
       children,
       subHeader,
+      drawer,
+      drawerInitialFocusRef,
       onRefetch,
       ...props
     },
@@ -109,6 +118,18 @@ export const PetitionLayout = Object.assign(
 
     useConfirmDiscardDraftDialog(petition);
 
+    const drawerIsOpenRef = useUpdatingRef(isDefined(drawer));
+    const bodyRef = useRef<HTMLDivElement>(null);
+    const [bodyScrollbarWidth, setBodyScrollbarWidth] = useState(0);
+    useResizeObserver(bodyRef, ({ target }) => {
+      if (bodyRef.current) {
+        const width = bodyRef.current!.offsetWidth - bodyRef.current!.clientWidth;
+        if (bodyScrollbarWidth !== width) {
+          setBodyScrollbarWidth(width);
+        }
+      }
+    });
+
     return (
       <AppLayout
         ref={ref}
@@ -126,6 +147,7 @@ export const PetitionLayout = Object.assign(
         } - ${title}`}
         me={me}
         realMe={realMe}
+        position="relative"
       >
         <PetitionHeader
           ref={headerRef}
@@ -137,9 +159,37 @@ export const PetitionLayout = Object.assign(
           actions={headerActions}
         />
         {subHeader ? <Box>{subHeader}</Box> : null}
-        <Box flex="1" overflow="auto" {...props} id="petition-layout-body">
+        <Box ref={bodyRef} flex="1" overflow="auto" {...props} id="petition-layout-body">
           {children}
         </Box>
+        <AnimatePresence>
+          {drawer ? (
+            <MotionSection
+              borderLeft={{ base: "none", lg: "1px solid" }}
+              borderColor={{ base: "none", lg: "gray.200" }}
+              position="absolute"
+              boxShadow={{ base: "none", lg: "short" }}
+              width={{ base: "full", lg: `${495 + bodyScrollbarWidth}px` }}
+              top={{ base: "105px", lg: "66px" }}
+              bottom={0}
+              right={0}
+              zIndex={1}
+              initial={{ x: "100%" }}
+              animate={{ x: 0, transition: { type: "spring", bounce: 0, duration: 0.2 } }}
+              exit={{
+                x: "100%",
+                transition: { type: "spring", bounce: 0, duration: 0.2 },
+              }}
+              onAnimationComplete={() => {
+                if (drawerIsOpenRef.current) {
+                  drawerInitialFocusRef?.current?.focus();
+                }
+              }}
+            >
+              {drawer}
+            </MotionSection>
+          ) : null}
+        </AnimatePresence>
       </AppLayout>
     );
   }),
@@ -166,6 +216,8 @@ export const PetitionLayout = Object.assign(
     },
   }
 );
+
+const MotionSection = chakra(motion.section);
 
 type PetitionState = "SAVED" | "SAVING" | "ERROR";
 

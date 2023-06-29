@@ -102,6 +102,12 @@ export const Profile = objectType({
         return await ctx.profiles.loadProfileSubscribers(root.id);
       },
     });
+    t.nonNull.list.nonNull.field("petitions", {
+      type: "Petition",
+      resolve: async (o, _, ctx) => {
+        return await ctx.petitions.loadPetitionsByProfileId(o.id);
+      },
+    });
     t.implements("Timestamps");
   },
 });
@@ -250,6 +256,24 @@ export const ProfileFieldPropertyAndFileWithUploadData = objectType({
           t.field("presignedPostData", { type: "AWSPresignedPostData" });
         },
       }),
+    });
+  },
+});
+
+export const PetitionProfile = objectType({
+  name: "PetitionProfile",
+  definition(t) {
+    t.nonNull.field("petition", {
+      type: "Petition",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.petitions.loadPetition(o.petition_id))!;
+      },
+    });
+    t.nonNull.field("profile", {
+      type: "Profile",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.profiles.loadProfile(o.profile_id))!;
+      },
     });
   },
 });

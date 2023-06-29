@@ -1328,6 +1328,23 @@ export const CloseIcon = createIcon({
   ),
 });
 
+export const CloseIconSmall = createIcon({
+  displayName: "CloseIconSmall",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+    >
+      <path d="m19.5001 4.49976-15.00066 15.00004" />
+      <path d="m4.50024 4.50024 14.99996 14.99996" />
+    </g>
+  ),
+});
+
 export const FieldFileUploadIcon = createIcon({
   displayName: "FieldFileUploadIcon",
   viewBox: "0 0 24 24",
@@ -2472,6 +2489,23 @@ export const ImportIcon = createIcon({
       <path d="m9.75 3h-5.75c-.55228 0-1 .44772-1 1v16c0 .5523.44772 1 1 1h16c.5523 0 1-.4477 1-1v-6.5" />
       <path d="m21 3-7.8749 7.8749" />
       <path d="m12 6.37495v5.62495h5.6249" />
+    </g>
+  ),
+});
+
+export const ArrowDiagonalRightIcon = createIcon({
+  displayName: "ArrowDiagonalRightIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m4.5 19.5 15-15" />
+      <path d="m4.5 4.5h15v15" />
     </g>
   ),
 });

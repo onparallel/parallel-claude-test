@@ -175,6 +175,14 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     petition_field_id: number;
     petition_field_reply_id: number;
   };
+  PROFILE_ASSOCIATED: {
+    user_id: number;
+    profile_id: number;
+  };
+  PROFILE_DEASSOCIATED: {
+    user_id: number;
+    profile_id: number;
+  };
 }[TType];
 
 export type GenericPetitionEvent<
@@ -354,6 +362,15 @@ export type ReplyStatusChangedEvent<IsCreate extends boolean = false> = GenericP
   IsCreate
 >;
 
+export type ProfileAssociatedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "PROFILE_ASSOCIATED",
+  IsCreate
+>;
+export type ProfileDeassociatedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "PROFILE_DEASSOCIATED",
+  IsCreate
+>;
+
 export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionCreatedEvent<IsCreate>
   | PetitionCompletedEvent<IsCreate>
@@ -394,6 +411,8 @@ export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionReminderBouncedEvent<IsCreate>
   | PetitionMessageBouncedEvent<IsCreate>
   | PetitionAnonymizedEvent<IsCreate>
-  | ReplyStatusChangedEvent<IsCreate>;
+  | ReplyStatusChangedEvent<IsCreate>
+  | ProfileAssociatedEvent<IsCreate>
+  | ProfileDeassociatedEvent<IsCreate>;
 
 export type CreatePetitionEvent = PetitionEvent<true>;

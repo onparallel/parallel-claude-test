@@ -5,7 +5,14 @@ import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { outdent } from "outdent";
 import { isDefined, range, times } from "remeda";
-import { Organization, Profile, ProfileType, ProfileTypeField, User } from "../../db/__types";
+import {
+  Organization,
+  Petition,
+  Profile,
+  ProfileType,
+  ProfileTypeField,
+  User,
+} from "../../db/__types";
 import { defaultProfileTypeFieldOptions } from "../../db/helpers/profileTypeFieldOptions";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
@@ -120,6 +127,7 @@ describe("GraphQL/Profiles", () => {
     await mocks.knex.from("profile_type_field").delete();
     await mocks.knex.from("profile_event").delete();
     await mocks.knex.from("profile_subscription").delete();
+    await mocks.knex.from("petition_profile").delete();
     await mocks.knex.from("profile").delete();
     await mocks.knex.from("profile_type").delete();
 
@@ -3032,6 +3040,470 @@ describe("GraphQL/Profiles", () => {
             files: null,
           },
         ],
+      });
+    });
+  });
+
+  describe("associateProfileToPetition", () => {
+    let petition: Petition;
+    let profile: Profile;
+
+    beforeEach(async () => {
+      [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+      [profile] = await mocks.createRandomProfiles(organization.id, profileTypes[0].id);
+    });
+
+    it("links a profile to a petition", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $profileId: GID!) {
+            associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
+              profile {
+                id
+                petitions {
+                  id
+                }
+              }
+              petition {
+                id
+                profiles {
+                  id
+                }
+                events(limit: 10, offset: 0) {
+                  items {
+                    type
+                    data
+                  }
+                  totalCount
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          profileId: toGlobalId("Profile", profile.id),
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.associateProfileToPetition).toEqual({
+        profile: {
+          id: toGlobalId("Profile", profile.id),
+          petitions: [{ id: toGlobalId("Petition", petition.id) }],
+        },
+        petition: {
+          id: toGlobalId("Petition", petition.id),
+          profiles: [{ id: toGlobalId("Profile", profile.id) }],
+          events: {
+            totalCount: 1,
+            items: [
+              {
+                type: "PROFILE_ASSOCIATED",
+                data: {
+                  userId: toGlobalId("User", sessionUser.id),
+                  profileId: toGlobalId("Profile", profile.id),
+                },
+              },
+            ],
+          },
+        },
+      });
+    });
+
+    it("sends error if linking same petition and profile multiple times", async () => {
+      const { errors: link1Errors, data: link1Data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $profileId: GID!) {
+            associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
+              profile {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          profileId: toGlobalId("Profile", profile.id),
+        }
+      );
+
+      expect(link1Errors).toBeUndefined();
+      expect(link1Data?.associateProfileToPetition).toEqual({
+        profile: {
+          id: toGlobalId("Profile", profile.id),
+        },
+      });
+
+      const { errors: link2Errors, data: link2Data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $profileId: GID!) {
+            associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
+              profile {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          profileId: toGlobalId("Profile", profile.id),
+        }
+      );
+
+      expect(link2Errors).toContainGraphQLError("PROFILE_ALREADY_ASSOCIATED_TO_PETITION");
+      expect(link2Data).toBeNull();
+
+      const petitionProfiles = await mocks.knex
+        .from("petition_profile")
+        .where({ petition_id: petition.id })
+        .select("*");
+
+      expect(petitionProfiles).toHaveLength(1);
+    });
+
+    it("sends error if user doesn't have access to a petition", async () => {
+      const [otherUser] = await mocks.createRandomUsers(organization.id, 1);
+      const [otherPetition] = await mocks.createRandomPetitions(organization.id, otherUser.id, 1);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $profileId: GID!) {
+            associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
+              profile {
+                id
+                petitions {
+                  id
+                }
+              }
+              petition {
+                id
+                profiles {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", otherPetition.id),
+          profileId: toGlobalId("Profile", profile.id),
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if user doesn't have access to a profile", async () => {
+      const [otherOrg] = await mocks.createRandomOrganizations(1);
+      const [otherProfileType] = await mocks.createRandomProfileTypes(otherOrg.id, 1);
+      const [otherProfile] = await mocks.createRandomProfiles(otherOrg.id, otherProfileType.id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $profileId: GID!) {
+            associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
+              profile {
+                id
+                petitions {
+                  id
+                }
+              }
+              petition {
+                id
+                profiles {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          profileId: toGlobalId("Profile", otherProfile.id),
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("removes relation between profile and petition if petition is deleted", async () => {
+      const { errors: linkErrors, data: linkData } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $profileId: GID!) {
+            associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
+              profile {
+                id
+                petitions {
+                  id
+                }
+              }
+              petition {
+                id
+                profiles {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          profileId: toGlobalId("Profile", profile.id),
+        }
+      );
+
+      expect(linkErrors).toBeUndefined();
+      expect(linkData?.associateProfileToPetition).toEqual({
+        profile: {
+          id: toGlobalId("Profile", profile.id),
+          petitions: [{ id: toGlobalId("Petition", petition.id) }],
+        },
+        petition: {
+          id: toGlobalId("Petition", petition.id),
+          profiles: [{ id: toGlobalId("Profile", profile.id) }],
+        },
+      });
+
+      const { errors: deleteError, data: deleteData } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!) {
+            deletePetitions(ids: [$petitionId])
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+        }
+      );
+
+      expect(deleteError).toBeUndefined();
+      expect(deleteData?.deletePetitions).toEqual("SUCCESS");
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(
+        gql`
+          query ($profileId: GID!) {
+            profile(profileId: $profileId) {
+              id
+              petitions {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileId: toGlobalId("Profile", profile.id),
+        }
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData?.profile).toEqual({
+        id: toGlobalId("Profile", profile.id),
+        petitions: [],
+      });
+
+      const petitionProfile = await mocks.knex
+        .from("petition_profile")
+        .where({
+          petition_id: petition.id,
+          profile_id: profile.id,
+        })
+        .select("*");
+
+      expect(petitionProfile).toHaveLength(0);
+    });
+
+    it("removes relation between profile and petition if profile is deleted", async () => {
+      const { errors: linkErrors, data: linkData } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $profileId: GID!) {
+            associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
+              profile {
+                id
+                petitions {
+                  id
+                }
+              }
+              petition {
+                id
+                profiles {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          profileId: toGlobalId("Profile", profile.id),
+        }
+      );
+
+      expect(linkErrors).toBeUndefined();
+      expect(linkData?.associateProfileToPetition).toEqual({
+        profile: {
+          id: toGlobalId("Profile", profile.id),
+          petitions: [{ id: toGlobalId("Petition", petition.id) }],
+        },
+        petition: {
+          id: toGlobalId("Petition", petition.id),
+          profiles: [{ id: toGlobalId("Profile", profile.id) }],
+        },
+      });
+
+      const { errors: deleteError, data: deleteData } = await testClient.execute(
+        gql`
+          mutation ($profileId: GID!) {
+            deleteProfile(profileIds: [$profileId])
+          }
+        `,
+        { profileId: toGlobalId("Profile", profile.id) }
+      );
+
+      expect(deleteError).toBeUndefined();
+      expect(deleteData?.deleteProfile).toEqual("SUCCESS");
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(
+        gql`
+          query ($petitionId: GID!) {
+            petition(id: $petitionId) {
+              id
+              ... on Petition {
+                profiles {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+        }
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData?.petition).toEqual({
+        id: toGlobalId("Petition", petition.id),
+        profiles: [],
+      });
+
+      const petitionProfile = await mocks.knex
+        .from("petition_profile")
+        .where({
+          petition_id: petition.id,
+          profile_id: profile.id,
+        })
+        .select("*");
+
+      expect(petitionProfile).toHaveLength(0);
+    });
+  });
+
+  describe("deassociateProfileFromPetition", () => {
+    let petitions: Petition[];
+    let profiles: Profile[];
+
+    beforeEach(async () => {
+      await mocks.knex.from("petition_profile").delete();
+
+      petitions = await mocks.createRandomPetitions(organization.id, sessionUser.id, 3);
+      profiles = await mocks.createRandomProfiles(organization.id, profileTypes[1].id, 3);
+      await mocks.knex("petition_profile").insert([
+        {
+          petition_id: petitions[0].id,
+          profile_id: profiles[0].id,
+        },
+        {
+          petition_id: petitions[0].id,
+          profile_id: profiles[2].id,
+        },
+        {
+          petition_id: petitions[1].id,
+          profile_id: profiles[0].id,
+        },
+        {
+          petition_id: petitions[1].id,
+          profile_id: profiles[1].id,
+        },
+        {
+          petition_id: petitions[1].id,
+          profile_id: profiles[2].id,
+        },
+      ]);
+    });
+
+    it("unlinks profile from petition", async () => {
+      const { errors: unlinkErrors, data: unlinkData } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $profileId: GID!) {
+            deassociateProfileFromPetition(petitionId: $petitionId, profileId: $profileId)
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petitions[1].id),
+          profileId: toGlobalId("Profile", profiles[0].id),
+        }
+      );
+
+      expect(unlinkErrors).toBeUndefined();
+      expect(unlinkData?.deassociateProfileFromPetition).toEqual("SUCCESS");
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(
+        gql`
+          query ($petitionId: GID!, $profileId: GID!) {
+            petition(id: $petitionId) {
+              id
+              ... on Petition {
+                events(limit: 10, offset: 0) {
+                  items {
+                    type
+                    data
+                  }
+                  totalCount
+                }
+                profiles {
+                  id
+                }
+              }
+            }
+            profile(profileId: $profileId) {
+              id
+              petitions {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petitions[1].id),
+          profileId: toGlobalId("Profile", profiles[0].id),
+        }
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData?.petition).toEqual({
+        id: toGlobalId("Petition", petitions[1].id),
+        profiles: [
+          { id: toGlobalId("Profile", profiles[1].id) },
+          { id: toGlobalId("Profile", profiles[2].id) },
+        ],
+        events: {
+          items: [
+            {
+              type: "PROFILE_DEASSOCIATED",
+              data: {
+                userId: toGlobalId("User", sessionUser.id),
+                profileId: toGlobalId("Profile", profiles[0].id),
+              },
+            },
+          ],
+          totalCount: 1,
+        },
+      });
+      expect(queryData?.profile).toEqual({
+        id: toGlobalId("Profile", profiles[0].id),
+        petitions: [{ id: toGlobalId("Petition", petitions[0].id) }],
       });
     });
   });

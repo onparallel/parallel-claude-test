@@ -16,19 +16,18 @@ export const TwoPaneLayout = chakraForwardRef<"div", PaneWithFlyoutProps>(functi
   return (
     <Flex ref={ref} minHeight="100%" {...props}>
       <Box
-        flex="2"
+        flex="1"
         minWidth={0}
-        display={{ base: isSidePaneActive ? "none" : "block", md: "block" }}
+        display={{ base: isSidePaneActive ? "none" : "block", lg: "block" }}
       >
         {children}
       </Box>
       <Box
-        flex="1"
-        minWidth={{ base: 0, sm: "320px" }}
-        display={{ base: isSidePaneActive ? "block" : "none", md: "block" }}
+        width={{ base: "auto", lg: "495px" }}
+        display={{ base: isSidePaneActive ? "block" : "none", lg: "block" }}
       >
         {sidePane ? (
-          <Box position={{ base: "relative", md: "sticky" }} top={top}>
+          <Box position={{ base: "relative", lg: "sticky" }} top={top}>
             {sidePane}
           </Box>
         ) : null}

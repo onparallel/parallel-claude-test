@@ -725,6 +725,11 @@ type Mutation {
   ): Petition!
 
   """
+  Associates a profile to a petition
+  """
+  associateProfileToPetition(petitionId: GID!, profileId: GID!): PetitionProfile!
+
+  """
   Load contacts from an excel file, creating the ones not found on database
   """
   bulkCreateContacts(
@@ -1092,6 +1097,11 @@ type Mutation {
     transferToUserId: GID!
     userIds: [GID!]!
   ): [User!]!
+
+  """
+  Deassociates a profile from a petition
+  """
+  deassociateProfileFromPetition(petitionId: GID!, profileId: GID!): Success!
 
   """
   Delete contacts.
@@ -2667,6 +2677,7 @@ type Petition implements PetitionBase {
   The permissions linked to the petition
   """
   permissions: [PetitionPermission!]!
+  profiles: [Profile!]!
 
   """
   The progress of the petition.
@@ -3156,6 +3167,8 @@ enum PetitionEventType {
   PETITION_MESSAGE_BOUNCED
   PETITION_REMINDER_BOUNCED
   PETITION_REOPENED
+  PROFILE_ASSOCIATED
+  PROFILE_DEASSOCIATED
   RECIPIENT_SIGNED
   REMINDERS_OPT_OUT
   REMINDER_SENT
@@ -3842,6 +3855,11 @@ enum PetitionPermissionTypeRW {
   WRITE
 }
 
+type PetitionProfile {
+  petition: Petition!
+  profile: Profile!
+}
+
 """
 The progress of a petition.
 """
@@ -4392,6 +4410,7 @@ type Profile implements Timestamps {
   ): ProfileEventPagination!
   id: GID!
   name: String!
+  petitions: [Petition!]!
   profileType: ProfileType!
   properties: [ProfileFieldProperty!]!
   subscribers: [ProfileSubscription!]!
@@ -4402,11 +4421,31 @@ type Profile implements Timestamps {
   updatedAt: DateTime!
 }
 
+type ProfileAssociatedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: Petition
+  profile: Profile
+  type: PetitionEventType!
+  user: User
+}
+
 type ProfileCreatedEvent implements ProfileEvent {
   createdAt: DateTime!
   id: GID!
   profile: Profile
   type: ProfileEventType!
+  user: User
+}
+
+type ProfileDeassociatedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: Petition
+  profile: Profile
+  type: PetitionEventType!
   user: User
 }
 
@@ -5364,6 +5403,10 @@ type Query {
   The petitions of the user
   """
   petitions(
+    """
+    Exclude anonymized petitions from result
+    """
+    excludeAnonymized: Boolean
     filters: PetitionFilter
 
     """

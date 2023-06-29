@@ -126,7 +126,7 @@ export function ProfileFieldFileUpload({
                       type={contentType}
                       size={size}
                       onPreview={(preview) => handleDownloadAttachment(id, preview)}
-                      onRemove={() => onChange([...value, { type: "DELETE", id }])}
+                      onRemove={() => onChange([...(value ?? []), { type: "DELETE", id }])}
                     />
                   );
                 })}

@@ -2,89 +2,70 @@ import { gql, useQuery } from "@apollo/client";
 import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import {
-  LocalizableUserTextRender,
-  localizableUserTextRender,
-} from "@parallel/components/common/LocalizableUserTextRender";
-import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
+import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { ProfileTypeSelect } from "@parallel/components/common/ProfileTypeSelect";
 import {
   UpdateProfileFieldValueInput,
-  useCreateProfileDialog_profileTypesDocument,
-  UserLocale,
+  useCreateProfileDialog_profileTypeDocument,
 } from "@parallel/graphql/__types";
 import { useEffect, useRef } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 import { SelectInstance } from "react-select";
+import { isDefined } from "remeda";
 
 interface CreateProfileDialogResult {
   profileTypeId: string;
   fieldValues: UpdateProfileFieldValueInput[];
 }
 
-function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogResult>) {
-  const intl = useIntl();
-
+function CreateProfileDialog({
+  defaultProfileTypeId,
+  suggestedName = "",
+  ...props
+}: DialogProps<
+  { defaultProfileTypeId?: string | null; suggestedName?: string },
+  CreateProfileDialogResult
+>) {
   const selectRef = useRef<SelectInstance>(null);
-
-  const { data } = useQuery(useCreateProfileDialog_profileTypesDocument, {
-    variables: {
-      offset: 0,
-      limit: 999,
-      locale: intl.locale as UserLocale,
-    },
-    fetchPolicy: "cache-and-network",
-  });
-
-  const profileTypes = data?.profileTypes.items ?? [];
 
   const {
     control,
     formState: { errors },
-    resetField,
     register,
     watch,
     handleSubmit,
     setFocus,
-  } = useForm<CreateProfileDialogResult>({
+  } = useForm<{ profileTypeId: string | null; fieldValues: UpdateProfileFieldValueInput[] }>({
     defaultValues: {
-      profileTypeId: "",
+      profileTypeId: defaultProfileTypeId ?? null,
       fieldValues: [],
     },
   });
 
-  const { fields } = useFieldArray({ name: "fieldValues", control });
+  const { fields, replace } = useFieldArray({ name: "fieldValues", control });
   const profileTypeId = watch("profileTypeId");
-  const profileType = profileTypes.find((pt) => pt.id === profileTypeId);
 
-  const profileTypeOptions = useSimpleSelectOptions(
-    (intl) =>
-      profileTypes.map((pt) => ({
-        value: pt.id,
-        label: localizableUserTextRender({
-          value: pt.name,
-          intl,
-          default: intl.formatMessage({
-            id: "generic.unnamed-profile-type",
-            defaultMessage: "Unnamed profile type",
-          }),
-        }),
-      })),
-    [profileTypes]
-  );
+  const { data: profileTypeData } = useQuery(useCreateProfileDialog_profileTypeDocument, {
+    variables: { profileTypeId: profileTypeId! },
+    skip: !isDefined(profileTypeId),
+  });
 
   useEffect(() => {
-    resetField("fieldValues", {
-      defaultValue:
-        profileType?.fields
-          .filter((f) => f.isUsedInProfileName)
-          .map((ptf) => ({
-            profileTypeFieldId: ptf.id,
-            content: { value: "" },
-          })) ?? [],
-    });
-    setTimeout(() => setFocus(`fieldValues.0.content.value`));
-  }, [profileType]);
+    if (isDefined(profileTypeData)) {
+      const fields = profileTypeData.profileType.fields.filter((f) => f.isUsedInProfileName);
+      const suggestions = suggestedName.split(" ");
+      replace(
+        fields.map((field, i) => ({
+          profileTypeFieldId: field.id,
+          content: {
+            value: i < fields.length - 1 ? suggestions[i] ?? "" : suggestions.slice(i).join(" "),
+          },
+        })) ?? []
+      );
+      setTimeout(() => setFocus(`fieldValues.0.content.value`));
+    }
+  }, [profileTypeData]);
 
   return (
     <ConfirmDialog
@@ -123,14 +104,11 @@ function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogRe
                 required: true,
               }}
               render={({ field: { value, onChange } }) => (
-                <SimpleSelect
+                <ProfileTypeSelect
+                  ref={selectRef as any}
+                  defaultOptions
                   value={value}
-                  options={profileTypeOptions}
-                  placeholder={intl.formatMessage({
-                    id: "component.create-profile-dialog.select-profile-type",
-                    defaultMessage: "Select a profile type",
-                  })}
-                  onChange={(value) => onChange(value!)}
+                  onChange={(v) => onChange(v?.id ?? "")}
                 />
               )}
             />
@@ -141,10 +119,11 @@ function CreateProfileDialog({ ...props }: DialogProps<{}, CreateProfileDialogRe
               />
             </FormErrorMessage>
           </FormControl>
-          {profileType?.fields
+          {profileTypeData?.profileType?.fields
             .filter((f) => f.isUsedInProfileName)
             .map(({ id, name }) => {
               const index = fields.findIndex((f) => f.profileTypeFieldId === id)!;
+
               return (
                 <FormControl key={id}>
                   <FormLabel fontWeight={400}>
@@ -200,11 +179,11 @@ const _fragments = {
 
 const _queries = [
   gql`
-    query useCreateProfileDialog_profileTypes($offset: Int!, $limit: Int!, $locale: UserLocale) {
-      profileTypes(offset: $offset, limit: $limit, locale: $locale) {
-        ...useCreateProfileDialog_ProfileTypePagination
+    query useCreateProfileDialog_profileType($profileTypeId: GID!) {
+      profileType(profileTypeId: $profileTypeId) {
+        ...useCreateProfileDialog_ProfileType
       }
     }
-    ${_fragments.ProfileTypePagination}
+    ${_fragments.ProfileType}
   `,
 ];

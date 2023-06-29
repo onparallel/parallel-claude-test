@@ -23,6 +23,10 @@ export async function removePetitionEvent(knex: Knex, eventName: string) {
       .map((f) => `'${f}'`)
       .join(",")});
 
+    delete from "user_petition_event_log" where petition_event_id in (
+      select id from petition_event where type = '${eventName}'
+    );
+
     delete from petition_event where type = '${eventName}';
     alter table petition_event alter column "type" type petition_event_type using "type"::varchar::petition_event_type;
     drop type petition_event_type_old;

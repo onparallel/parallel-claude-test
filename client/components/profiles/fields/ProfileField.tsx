@@ -10,7 +10,6 @@ import {
   ProfileField_ProfileFieldValueFragment,
   ProfileField_ProfileTypeFieldFragment,
 } from "@parallel/graphql/__types";
-import { ProfilesFormData } from "@parallel/pages/app/profiles/[profileId]";
 import { FORMATS } from "@parallel/utils/dates";
 import { discriminator } from "@parallel/utils/discriminator";
 import usePrevious from "@react-hook/previous";
@@ -36,14 +35,15 @@ import { ProfileFieldNumber } from "./ProfileFieldNumber";
 import { ProfileFieldPhone } from "./ProfileFieldPhone";
 import { ProfileFieldShortText } from "./ProfileFieldShortText";
 import { ProfileFieldText } from "./ProfileFieldText";
+import { ProfileFormData } from "../ProfileForm";
 
 export interface ProfileFieldProps {
   index: number;
-  control: Control<ProfilesFormData, any>;
-  register: UseFormRegister<ProfilesFormData>;
-  setValue: UseFormSetValue<ProfilesFormData>;
-  clearErrors: UseFormClearErrors<ProfilesFormData>;
-  setError: UseFormSetError<ProfilesFormData>;
+  control: Control<ProfileFormData, any>;
+  register: UseFormRegister<ProfileFormData>;
+  setValue: UseFormSetValue<ProfileFormData>;
+  clearErrors: UseFormClearErrors<ProfileFormData>;
+  setError: UseFormSetError<ProfileFormData>;
   profileId: string;
   field: ProfileField_ProfileTypeFieldFragment;
   value?: ProfileField_ProfileFieldValueFragment | null;
@@ -244,7 +244,7 @@ export function useModifyExpirationDialog({
   isDirty: boolean;
   expiryAlertAheadTime?: Duration | null;
   fieldName: LocalizableUserText;
-  setValue: UseFormSetValue<ProfilesFormData>;
+  setValue: UseFormSetValue<ProfileFormData>;
   expiryDate?: string | null;
 }) {
   const hasBeenShown = useRef(false);

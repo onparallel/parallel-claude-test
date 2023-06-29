@@ -55,6 +55,9 @@ export const petitionsQuery = queryField((t) => {
       searchByNameOnly: booleanArg({
         description: "Search applies only on petition name",
       }),
+      excludeAnonymized: booleanArg({
+        description: "Exclude anonymized petitions from result",
+      }),
     },
     searchable: true,
     sortableBy: ["createdAt", "sentAt", "name", "lastUsedAt"] as any,
@@ -86,7 +89,11 @@ export const petitionsQuery = queryField((t) => {
         }
       }
     ),
-    resolve: async (_, { offset, limit, search, sortBy, filters, searchByNameOnly }, ctx) => {
+    resolve: async (
+      _,
+      { offset, limit, search, sortBy, filters, searchByNameOnly, excludeAnonymized },
+      ctx
+    ) => {
       return ctx.petitions.getPaginatedPetitionsForUser(ctx.user!.org_id, ctx.user!.id, {
         search,
         offset,
@@ -97,6 +104,7 @@ export const petitionsQuery = queryField((t) => {
         }),
         limit,
         searchByNameOnly: searchByNameOnly ?? false,
+        excludeAnonymized: excludeAnonymized ?? false,
       });
     },
   });

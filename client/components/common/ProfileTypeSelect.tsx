@@ -1,17 +1,20 @@
 import { gql, useApolloClient } from "@apollo/client";
+import { Box, Text } from "@chakra-ui/react";
 import {
-  PetitionSelect_PetitionBaseFragmentDoc,
-  PetitionSelect_petitionDocument,
-  PetitionSelect_petitionsDocument,
+  ProfileTypeSelect_ProfileTypeFragment,
+  ProfileTypeSelect_ProfileTypeFragmentDoc,
+  ProfileTypeSelect_profileTypeDocument,
+  ProfileTypeSelect_profileTypesDocument,
+  UserLocale,
 } from "@parallel/graphql/__types";
-import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
 import { If, MaybeArray, unMaybeArray } from "@parallel/utils/types";
 import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+import pMap from "p-map";
 import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useCallback, useMemo } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import Select, {
   MultiValueGenericProps,
   OptionProps,
@@ -21,82 +24,75 @@ import Select, {
   components,
 } from "react-select";
 import AsyncSelect from "react-select/async";
-import { PetitionSelect_PetitionBaseFragment } from "../../graphql/__types";
-import { OverflownText } from "./OverflownText";
-import { PetitionSelectOption } from "./PetitionSelectOption";
 import { indexBy, isDefined, zip } from "remeda";
-import pMap from "p-map";
+import { LocalizableUserTextRender, localizableUserTextRender } from "./LocalizableUserTextRender";
+import { OverflownText } from "./OverflownText";
 
-export type PetitionSelectSelection = PetitionSelect_PetitionBaseFragment;
+export type ProfileTypeSelectSelection = ProfileTypeSelect_ProfileTypeFragment;
 
-export type PetitionSelectInstance<
+export type ProfileTypeSelectInstance<
   IsMulti extends boolean,
-  OptionType extends PetitionSelectSelection = PetitionSelectSelection
+  OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection
 > = SelectInstance<OptionType, IsMulti, never>;
 
 const fragments = {
-  PetitionBase: gql`
-    fragment PetitionSelect_PetitionBase on PetitionBase {
+  ProfileType: gql`
+    fragment ProfileTypeSelect_ProfileType on ProfileType {
       id
-      ...PetitionSelectOption_PetitionBase
+      name
     }
-    ${PetitionSelectOption.fragments.PetitionBase}
   `,
 };
 
 const _queries = [
   gql`
-    query PetitionSelect_petitions(
+    query ProfileTypeSelect_profileTypes(
       $offset: Int
       $limit: Int
       $search: String
-      $filters: PetitionFilter
-      $sortBy: [QueryPetitions_OrderBy!]
+      $locale: UserLocale
+      $sortBy: [QueryProfileTypes_OrderBy!]
     ) {
-      petitions(
+      profileTypes(
         offset: $offset
         limit: $limit
         search: $search
-        filters: $filters
+        locale: $locale
         sortBy: $sortBy
-        searchByNameOnly: true
-        excludeAnonymized: true
       ) {
         items {
-          ...PetitionSelect_PetitionBase
+          ...ProfileTypeSelect_ProfileType
         }
         totalCount
       }
     }
-    ${fragments.PetitionBase}
+    ${fragments.ProfileType}
   `,
   gql`
-    query PetitionSelect_petition($id: GID!) {
-      petition(id: $id) {
-        ...PetitionSelect_PetitionBase
+    query ProfileTypeSelect_profileType($profileTypeId: GID!) {
+      profileType(profileTypeId: $profileTypeId) {
+        ...ProfileTypeSelect_ProfileType
       }
     }
-    ${fragments.PetitionBase}
+    ${fragments.ProfileType}
   `,
 ];
 
-export interface PetitionSelectProps<
+export interface ProfileTypeSelectProps<
   IsMulti extends boolean = false,
   IsSync extends boolean = false,
-  OptionType extends PetitionSelectSelection = PetitionSelectSelection
+  OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection
 > extends Omit<CustomSelectProps<OptionType, IsMulti, never>, "value"> {
   value: If<IsMulti, OptionType[] | string[], OptionType | string | null>;
-  type?: "PETITION" | "TEMPLATE";
-  excludePetitions?: string[];
   isSync?: IsSync;
   defaultOptions?: boolean;
 }
 
-export const PetitionSelect = Object.assign(
-  forwardRef(function PetitionSelect<
+export const ProfileTypeSelect = Object.assign(
+  forwardRef(function ProfileTypeSelect<
     IsMulti extends boolean = false,
     IsSync extends boolean = false,
-    OptionType extends PetitionSelectSelection = PetitionSelectSelection
+    OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection
   >(
     {
       value,
@@ -105,55 +101,46 @@ export const PetitionSelect = Object.assign(
       options,
       isMulti,
       placeholder: _placeholder,
-      type = "PETITION",
-      excludePetitions,
       ...props
-    }: PetitionSelectProps<IsMulti, IsSync, OptionType>,
-    ref: ForwardedRef<PetitionSelectInstance<IsMulti, OptionType>>
+    }: ProfileTypeSelectProps<IsMulti, IsSync, OptionType>,
+    ref: ForwardedRef<ProfileTypeSelectInstance<IsMulti, OptionType>>
   ) {
+    const intl = useIntl();
     const needsLoading =
       typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
 
     const apollo = useApolloClient();
 
-    const loadPetitions = useDebouncedAsync(
+    const loadProfileTypes = useDebouncedAsync(
       async (search: string | null | undefined) => {
         const result = await apollo.query({
-          query: PetitionSelect_petitionsDocument,
+          query: ProfileTypeSelect_profileTypesDocument,
           variables: {
             offset: 0,
             limit: 100,
-            filters: {
-              type,
-            },
+            locale: intl.locale as UserLocale,
             search,
-            sortBy: "lastUsedAt_DESC",
+            sortBy: "name_ASC",
           },
           fetchPolicy: "no-cache",
         });
-        assertTypenameArray(
-          result.data.petitions.items,
-          type === "PETITION" ? "Petition" : "PetitionTemplate"
-        );
 
-        return result.data.petitions.items.filter((p) =>
-          excludePetitions ? !excludePetitions?.includes(p.id) : true
-        ) as any[];
+        return result.data.profileTypes.items as any[];
       },
       300,
-      [excludePetitions?.join(",")]
+      [intl.locale]
     );
 
-    const getPetitions = useGetPetitions();
+    const getProfileTypes = useGetProfileTypes();
 
     const _value = useAsyncMemo(async () => {
       if (value === null) {
         return null;
       }
       if (needsLoading) {
-        return await getPetitions(value as any);
+        return await getProfileTypes(value as any);
       } else {
-        return value as MaybeArray<PetitionSelectSelection>;
+        return value as MaybeArray<ProfileTypeSelectSelection>;
       }
     }, [
       needsLoading,
@@ -163,34 +150,24 @@ export const PetitionSelect = Object.assign(
         : needsLoading
         ? // value is string | string[]
           unMaybeArray(value as any).join(",")
-        : // value is PetitionSelection[]
+        : // value is ProfileSelection[]
           unMaybeArray(value as any)
             .map((x) => x.id)
             .join(","),
     ]);
-    const intl = useIntl();
+
     const placeholder = useMemo(() => {
       return (
         _placeholder ??
-        (type === "PETITION"
-          ? intl.formatMessage(
-              {
-                id: "component.petition-select.placeholder-petition",
-                defaultMessage: "Select {isMulti, select, true{parallels} other {a parallel}}",
-              },
-              {
-                isMulti,
-              }
-            )
-          : intl.formatMessage(
-              {
-                id: "component.petition-select.placeholder-petition-template",
-                defaultMessage: "Select {isMulti, select, true{templates} other {a template}}",
-              },
-              {
-                isMulti,
-              }
-            ))
+        intl.formatMessage(
+          {
+            id: "component.profile-type-select.placeholder",
+            defaultMessage: "Select {isMulti, select, true{profiles types} other {a profile type}}",
+          },
+          {
+            isMulti,
+          }
+        )
       );
     }, [_placeholder, isMulti]);
 
@@ -203,6 +180,17 @@ export const PetitionSelect = Object.assign(
         ...props.components,
       } as unknown as SelectComponentsConfig<OptionType, IsMulti, never>,
     });
+
+    const getOptionLabel = (option: ProfileTypeSelectSelection) => {
+      return localizableUserTextRender({
+        value: option.name,
+        intl,
+        default: intl.formatMessage({
+          id: "generic.unnamed-profile-type",
+          defaultMessage: "Unnamed profile type",
+        }),
+      });
+    };
 
     return isSync ? (
       <Select<OptionType, IsMulti, never>
@@ -224,7 +212,7 @@ export const PetitionSelect = Object.assign(
         value={_value as any}
         onChange={onChange as any}
         isMulti={isMulti}
-        loadOptions={loadPetitions}
+        loadOptions={loadProfileTypes}
         getOptionLabel={getOptionLabel}
         getOptionValue={getOptionValue}
         placeholder={placeholder}
@@ -236,45 +224,45 @@ export const PetitionSelect = Object.assign(
   }) as <
     IsMulti extends boolean = false,
     IsSync extends boolean = false,
-    OptionType extends PetitionSelectSelection = PetitionSelectSelection
+    OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection
   >(
-    props: PetitionSelectProps<IsMulti, IsSync, OptionType> &
-      RefAttributes<PetitionSelectInstance<IsMulti, OptionType>>
+    props: ProfileTypeSelectProps<IsMulti, IsSync, OptionType> &
+      RefAttributes<ProfileTypeSelectInstance<IsMulti, OptionType>>
   ) => ReactElement,
   { fragments }
 );
 
-function useGetPetitions() {
+function useGetProfileTypes() {
   const client = useApolloClient();
   return useCallback(async (ids: MaybeArray<string>) => {
     const _ids = unMaybeArray(ids);
     const fromCache = zip(
       _ids,
       _ids.map((id) => {
-        const petition = client.readFragment({
-          fragment: PetitionSelect_PetitionBaseFragmentDoc,
+        const profile = client.readFragment({
+          fragment: ProfileTypeSelect_ProfileTypeFragmentDoc,
           id,
-          fragmentName: "PetitionSelect_PetitionBase",
+          fragmentName: "ProfileTypeSelect_ProfileType",
         });
 
-        return petition ?? null;
+        return profile ?? null;
       })
     );
-    const missing = fromCache.filter(([, value]) => value === null).map(([id]) => id);
+    const missing = fromCache.filter(([id, value]) => value === null && id).map(([id]) => id);
 
     if (missing.length) {
-      const petitions = await pMap(
+      const profiles = await pMap(
         missing,
-        async (id, i) => {
+        async (profileTypeId, i) => {
           try {
             const fromServer = await client.query({
-              query: PetitionSelect_petitionDocument,
+              query: ProfileTypeSelect_profileTypeDocument,
               variables: {
-                id,
+                profileTypeId,
               },
               fetchPolicy: "network-only",
             });
-            return fromServer.data.petition;
+            return fromServer.data.profileType;
           } catch (e) {}
         },
         {
@@ -282,7 +270,7 @@ function useGetPetitions() {
         }
       );
 
-      const fromServerById = indexBy(petitions.filter(isDefined), (x) => x.id);
+      const fromServerById = indexBy(profiles.filter(isDefined), (x) => x.id);
       const result = fromCache.map(([id, value]) => value ?? fromServerById[id]!);
       return Array.isArray(ids) ? result : result[0];
     } else {
@@ -292,21 +280,20 @@ function useGetPetitions() {
   }, []);
 }
 
-const getOptionLabel = (option: PetitionSelectSelection) => {
-  return option.name ?? "";
-};
+const getOptionValue = (option: ProfileTypeSelectSelection) => option.id;
 
-const getOptionValue = (option: PetitionSelectSelection) => option.id;
-
-function SingleValue(props: SingleValueProps<PetitionSelectSelection>) {
+function SingleValue(props: SingleValueProps<ProfileTypeSelectSelection>) {
   return (
     <components.SingleValue {...props}>
-      <PetitionSelectOption data={props.data} isDisabled={props.isDisabled} />
+      <ProfileTypeSelectOption data={props.data} isDisabled={props.isDisabled} />
     </components.SingleValue>
   );
 }
 
-function MultiValueLabel({ children, ...props }: MultiValueGenericProps<PetitionSelectSelection>) {
+function MultiValueLabel({
+  children,
+  ...props
+}: MultiValueGenericProps<ProfileTypeSelectSelection>) {
   const data = props.data;
   return (
     <components.MultiValueLabel {...(props as any)}>
@@ -315,20 +302,44 @@ function MultiValueLabel({ children, ...props }: MultiValueGenericProps<Petition
   );
 }
 
-function Option({ children, ...props }: OptionProps<PetitionSelectSelection>) {
+function Option({ children, ...props }: OptionProps<ProfileTypeSelectSelection>) {
   return (
     <components.Option
       {...props}
       innerProps={{
         ...props.innerProps,
-        ...(props.data ? { "data-petition-id": props.data.id } : {}),
+        ...(props.data.name ? { "data-profile-type-id": props.data.id } : {}),
       }}
     >
-      <PetitionSelectOption
+      <ProfileTypeSelectOption
         data={props.data}
         highlight={props.selectProps.inputValue}
         isDisabled={props.isDisabled}
       />
     </components.Option>
+  );
+}
+
+interface ProfileTypeSelectOptionProps {
+  data: ProfileTypeSelectSelection;
+  highlight?: string;
+  isDisabled?: boolean;
+}
+
+function ProfileTypeSelectOption({ data, highlight, isDisabled }: ProfileTypeSelectOptionProps) {
+  return (
+    <Box verticalAlign="baseline" noOfLines={1} wordBreak="break-all">
+      <Text as="span">
+        <LocalizableUserTextRender
+          value={data.name}
+          default={
+            <FormattedMessage
+              id="generic.unnamed-profile-type"
+              defaultMessage="Unnamed profile type"
+            />
+          }
+        />
+      </Text>
+    </Box>
   );
 }

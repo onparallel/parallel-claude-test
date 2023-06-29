@@ -370,6 +370,46 @@
     "context": "Enter a meaningful name for the view"
   },
   {
+    "term": "component.associate-petition-to-profile-dialog.associate",
+    "definition": "Associate",
+    "context": "Associate"
+  },
+  {
+    "term": "component.associate-petition-to-profile-dialog.header",
+    "definition": "Associate parallel",
+    "context": "Associate parallel"
+  },
+  {
+    "term": "component.associate-petition-to-profile-dialog.parallel-error",
+    "definition": "Please, select a parallel",
+    "context": "Please, select a parallel"
+  },
+  {
+    "term": "component.associate-petition-to-profile-dialog.parallel-label",
+    "definition": "Parallel",
+    "context": "Parallel"
+  },
+  {
+    "term": "component.associate-profile-to-parallel-dialog.associate",
+    "definition": "Associate",
+    "context": "Associate"
+  },
+  {
+    "term": "component.associate-profile-to-parallel-dialog.header",
+    "definition": "Associate profile",
+    "context": "Associate profile"
+  },
+  {
+    "term": "component.associate-profile-to-parallel-dialog.profile-error",
+    "definition": "Please, select a profile",
+    "context": "Please, select a profile"
+  },
+  {
+    "term": "component.associate-profile-to-parallel-dialog.profile-label",
+    "definition": "Profile",
+    "context": "Profile"
+  },
+  {
     "term": "component.branding-document-preview.document-title",
     "definition": "Document title",
     "context": "Document title"
@@ -678,6 +718,26 @@
     "term": "component.confirm-deactivate-user-dialog.transfer-parallels",
     "definition": "Transfer parallels",
     "context": "Transfer parallels"
+  },
+  {
+    "term": "component.confirm-deassociate-profile-dialog.body",
+    "definition": "Are you sure you want to deassoaciate <b>{profileName}</b> from parallel <b>{petitionName}</b>?",
+    "context": "Are you sure you want to deassoaciate <b>{profileName}</b> from parallel <b>{petitionName}</b>?"
+  },
+  {
+    "term": "component.confirm-deassociate-profile-dialog.body-2",
+    "definition": "If you continue, the data will remain intact and only the association will be removed.",
+    "context": "If you continue, the data will remain intact and only the association will be removed."
+  },
+  {
+    "term": "component.confirm-deassociate-profile-dialog.confirm",
+    "definition": "Yes, deassociate",
+    "context": "Yes, deassociate"
+  },
+  {
+    "term": "component.confirm-deassociate-profile-dialog.header",
+    "definition": "Remove association",
+    "context": "Remove association"
   },
   {
     "term": "component.confirm-delete-petitions-dialog.body",
@@ -1318,11 +1378,6 @@
     "term": "component.create-profile-dialog.profile-type",
     "definition": "Profile type",
     "context": "Profile type"
-  },
-  {
-    "term": "component.create-profile-dialog.select-profile-type",
-    "definition": "Select a profile type",
-    "context": "Select a profile type"
   },
   {
     "term": "component.create-profile-type-dialog.edit-profile-type-name",
@@ -3735,6 +3790,11 @@
     "context": "Edit parallel"
   },
   {
+    "term": "component.petition-header.associate-profile",
+    "definition": "Associate profile",
+    "context": "Associate profile"
+  },
+  {
     "term": "component.petition-header.compose-tab.readonly",
     "definition": "Edition restricted. To make changes, you can disable the protection on the Settings tab.",
     "context": "Edition restricted. To make changes, you can disable the protection on the Settings tab."
@@ -3785,6 +3845,16 @@
     "context": "Don't get notifications about this parallel."
   },
   {
+    "term": "component.petition-header.profile-asociated-toast-description",
+    "definition": "You can include the information you need",
+    "context": "You can include the information you need"
+  },
+  {
+    "term": "component.petition-header.profile-asociated-toast-title",
+    "definition": "Profile associated",
+    "context": "Profile associated"
+  },
+  {
     "term": "component.petition-header.reopen-button",
     "definition": "Reopen parallel",
     "context": "Reopen parallel"
@@ -3808,6 +3878,11 @@
     "term": "component.petition-header.subscribed-description",
     "definition": "Get email notifications about activity in this parallel.",
     "context": "Get email notifications about activity in this parallel."
+  },
+  {
+    "term": "component.petition-header.x-profiles",
+    "definition": "{count, plural, =1 {# profile} other {# profiles}}",
+    "context": "{count, plural, =1 {# profile} other {# profiles}}"
   },
   {
     "term": "component.petition-limit-reached-alert.title",
@@ -3933,6 +4008,51 @@
     "term": "component.petition-preview-signature-review-alert.signature-review",
     "definition": "If you make any changes, don't forget to click the <b>Finish</b> button again.",
     "context": "If you make any changes, don't forget to click the <b>Finish</b> button again."
+  },
+  {
+    "term": "component.petition-profiles-table.add-profile",
+    "definition": "Add profile",
+    "context": "Add profile"
+  },
+  {
+    "term": "component.petition-profiles-table.associate-profile",
+    "definition": "<a>Associate a profile</a>",
+    "context": "<a>Associate a profile</a>"
+  },
+  {
+    "term": "component.petition-profiles-table.name-header",
+    "definition": "Name",
+    "context": "Name"
+  },
+  {
+    "term": "component.petition-profiles-table.no-profiles-associated",
+    "definition": "There are no profiles associated to this parallel yet.",
+    "context": "There are no profiles associated to this parallel yet."
+  },
+  {
+    "term": "component.petition-profiles-table.no-subscribers-profile",
+    "definition": "No subscribers to this profile",
+    "context": "No subscribers to this profile"
+  },
+  {
+    "term": "component.petition-profiles-table.profile-type-header",
+    "definition": "Type",
+    "context": "Type"
+  },
+  {
+    "term": "component.petition-profiles-table.profiles",
+    "definition": "Profiles",
+    "context": "Profiles"
+  },
+  {
+    "term": "component.petition-profiles-table.remove-profile-button",
+    "definition": "Remove association",
+    "context": "Remove association"
+  },
+  {
+    "term": "component.petition-profiles-table.subscribers-header",
+    "definition": "Subscribers",
+    "context": "Subscribers"
   },
   {
     "term": "component.petition-progress-bar.all-pending",
@@ -4565,6 +4685,41 @@
     "context": "Remove attachment"
   },
   {
+    "term": "component.profile-form.max-files-exceeded-error.message",
+    "definition": "You exceeded the maximum amount of files you can upload on the field.",
+    "context": "You exceeded the maximum amount of files you can upload on the field."
+  },
+  {
+    "term": "component.profile-petitions-table.add-petition",
+    "definition": "Add parallel",
+    "context": "Add parallel"
+  },
+  {
+    "term": "component.profile-petitions-table.no-parallels-associated",
+    "definition": "There are no parallels associated to this profile yet.",
+    "context": "There are no parallels associated to this profile yet."
+  },
+  {
+    "term": "component.profile-petitions-table.remove-profile-button",
+    "definition": "Remove association",
+    "context": "Remove association"
+  },
+  {
+    "term": "component.profile-select.add-profile",
+    "definition": "Add profile",
+    "context": "Add profile"
+  },
+  {
+    "term": "component.profile-select.create-new-profile",
+    "definition": "Create new profile for: <b>{label}</b>",
+    "context": "Create new profile for: <b>{label}</b>"
+  },
+  {
+    "term": "component.profile-select.placeholder",
+    "definition": "Select {isMulti, select, true{profiles} other {a profile}}",
+    "context": "Select {isMulti, select, true{profiles} other {a profile}}"
+  },
+  {
     "term": "component.profile-subscribers-dialog.header",
     "definition": "Profile subscriptions",
     "context": "Profile subscriptions"
@@ -4618,6 +4773,11 @@
     "term": "component.profile-type-header.delete-label",
     "definition": "Delete profile type",
     "context": "Delete profile type"
+  },
+  {
+    "term": "component.profile-type-select.placeholder",
+    "definition": "Select {isMulti, select, true{profiles types} other {a profile type}}",
+    "context": "Select {isMulti, select, true{profiles types} other {a profile type}}"
   },
   {
     "term": "component.profile-type-settings.add-profile-type-field-to-name-error",
@@ -7725,6 +7885,11 @@
     "context": "Deleted field"
   },
   {
+    "term": "generic.deleted-profile",
+    "definition": "Deleted profile",
+    "context": "Deleted profile"
+  },
+  {
     "term": "generic.deleted-user",
     "definition": "Deleted user",
     "context": "Deleted user"
@@ -10185,9 +10350,14 @@
     "context": "Your signature is on its way."
   },
   {
+    "term": "petition-replies.associate-profile.button",
+    "definition": "Associate profile",
+    "context": "Associate profile"
+  },
+  {
     "term": "petition-replies.export-replies",
-    "definition": "Export replies",
-    "context": "Export replies"
+    "definition": "Export",
+    "context": "Export"
   },
   {
     "term": "petition-replies.field-comments.disabled-comments-2",
@@ -10213,6 +10383,11 @@
     "term": "petition-replies.notify-petition-reviewed.button",
     "definition": "Notify that it is correct",
     "context": "Notify that it is correct"
+  },
+  {
+    "term": "petition-replies.open-profile.button",
+    "definition": "Open profile",
+    "context": "Open profile"
   },
   {
     "term": "petition-replies.petition-field-reply.approve",
@@ -10843,11 +11018,6 @@
     "term": "placeholder-plugin.field-without-replies",
     "definition": "This field has no replies. Nothing will show here.",
     "context": "This field has no replies. Nothing will show here."
-  },
-  {
-    "term": "profilespage.profile-details.max-files-exceeded-error.message",
-    "definition": "You exceeded the maximum amount of files you can upload on the field.",
-    "context": "You exceeded the maximum amount of files you can upload on the field."
   },
   {
     "term": "public-petition-email-exists.body",
@@ -12173,6 +12343,16 @@
     "term": "timeline.petition-reopened-description",
     "definition": "{userIsYou, select, true {You} other {{user}}} reopened the parallel {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} reopened the parallel {timeAgo}"
+  },
+  {
+    "term": "timeline.profile-associated-description",
+    "definition": "{userIsYou, select, true {You} other {{user}}} associated the parallel with {profileName} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} associated the parallel with {profileName} {timeAgo}"
+  },
+  {
+    "term": "timeline.profile-deassociated-description",
+    "definition": "{userIsYou, select, true {You} other {{user}}} removed the association with {profileName} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} removed the association with {profileName} {timeAgo}"
   },
   {
     "term": "timeline.public-petition-link-created-description",

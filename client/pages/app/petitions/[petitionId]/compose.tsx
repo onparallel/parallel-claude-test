@@ -483,7 +483,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             <Flex
               direction="column"
               paddingX={4}
-              paddingLeft={{ md: 0 }}
+              paddingLeft={{ lg: 0 }}
               maxHeight={{
                 base: "calc(100vh - 188px)",
                 sm: "calc(100vh - 122px)",

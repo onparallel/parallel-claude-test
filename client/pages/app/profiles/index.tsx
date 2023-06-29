@@ -122,7 +122,7 @@ function Profiles() {
   const showCreateProfileDialog = useCreateProfileDialog();
   const handleCreateProfile = async () => {
     try {
-      const { profileTypeId, fieldValues } = await showCreateProfileDialog();
+      const { profileTypeId, fieldValues } = await showCreateProfileDialog({});
       const { data } = await createProfile({
         variables: {
           profileTypeId,

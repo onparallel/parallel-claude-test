@@ -280,6 +280,7 @@ export const AppLayout = Object.assign(
               size="60px"
               bottom="20px"
               right="20px"
+              zIndex={2147483001}
             />
           ) : null}
           <NotificationsDrawer />

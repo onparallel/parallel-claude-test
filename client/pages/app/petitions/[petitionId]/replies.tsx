@@ -7,6 +7,7 @@ import {
   DownloadIcon,
   FilePdfIcon,
   ListIcon,
+  ProfilesIcon,
   RepeatIcon,
   ThumbUpIcon,
 } from "@parallel/chakra/icons";
@@ -21,6 +22,7 @@ import {
 } from "@parallel/components/common/dialogs/DialogProvider";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { ProfileSelectInstance } from "@parallel/components/common/ProfileSelect";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import {
@@ -29,6 +31,7 @@ import {
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
 import { TwoPaneLayout } from "@parallel/components/layout/TwoPaneLayout";
+import { useAssociateProfileToPetitionDialog } from "@parallel/components/petition-common/dialogs/AssociateProfileToPetitionDialog";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
@@ -50,11 +53,13 @@ import { PetitionRepliesFieldReply } from "@parallel/components/petition-replies
 import { PetitionRepliesFilterButton } from "@parallel/components/petition-replies/PetitionRepliesFilterButton";
 import { PetitionRepliesFilteredFields } from "@parallel/components/petition-replies/PetitionRepliesFilteredFields";
 import { PetitionSignaturesCard } from "@parallel/components/petition-replies/PetitionSignaturesCard";
+import { ProfileDrawer } from "@parallel/components/petition-replies/ProfileDrawer";
 import { RecipientViewCommentsBadge } from "@parallel/components/recipient-view/RecipientViewCommentsBadge";
 import {
   PetitionFieldReply,
   PetitionFieldReplyStatus,
   PetitionReplies_approveOrRejectPetitionFieldRepliesDocument,
+  PetitionReplies_associateProfileToPetitionDocument,
   PetitionReplies_closePetitionDocument,
   PetitionReplies_fileUploadReplyDownloadLinkDocument,
   PetitionReplies_petitionDocument,
@@ -98,6 +103,8 @@ import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
 import { useLiquidScope } from "@parallel/utils/useLiquidScope";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
+import { withMetadata } from "@parallel/utils/withMetadata";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -106,6 +113,7 @@ type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getI
 
 const QUERY_STATE = {
   comments: string(),
+  profile: string(),
 };
 
 function PetitionReplies({ petitionId }: PetitionRepliesProps) {
@@ -138,6 +146,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     setQueryState,
     "comments"
   );
+  const [profileId, setProfileId] = useQueryStateSlice(queryState, setQueryState, "profile");
+
   const activeField = activeFieldId ? petition.fields.find((f) => f.id === activeFieldId) : null;
   const fieldRefs = useMultipleRefs<HTMLElement>();
   const signaturesRef = useRef<HTMLElement>(null);
@@ -455,6 +465,36 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     minHeight: 0,
   } as const;
 
+  const [associateProfileToPetition] = useMutation(
+    PetitionReplies_associateProfileToPetitionDocument
+  );
+  const showAssociateProfileToPetitionDialog = useAssociateProfileToPetitionDialog();
+  const handleAssociateProfile = async () => {
+    try {
+      const profileId = await showAssociateProfileToPetitionDialog({
+        excludeProfiles: petition.profiles?.map((p) => p.id),
+      });
+      await associateProfileToPetition({
+        variables: { petitionId, profileId },
+      });
+      toast({
+        isClosable: true,
+        status: "success",
+        title: intl.formatMessage({
+          id: "component.petition-header.profile-asociated-toast-title",
+          defaultMessage: "Profile associated",
+        }),
+        description: intl.formatMessage({
+          id: "component.petition-header.profile-asociated-toast-description",
+          defaultMessage: "You can include the information you need",
+        }),
+      });
+
+      setProfileId(profileId);
+    } catch {}
+  };
+  const drawerInitialRef = useRef<ProfileSelectInstance<false>>(null);
+
   return (
     <PetitionLayout
       key={petition.id}
@@ -521,9 +561,36 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 />
               </Button>
             )}
+            <Button
+              data-action="associate-profile"
+              colorScheme="primary"
+              leftIcon={<ProfilesIcon />}
+              isDisabled={petition.isAnonymized}
+              onClick={() =>
+                petition.profiles.length
+                  ? setQueryState({
+                      comments: null,
+                      profile: petition.profiles.at(-1)!.id,
+                    })
+                  : handleAssociateProfile()
+              }
+            >
+              <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
+                {petition.profiles.length ? (
+                  <FormattedMessage
+                    id="petition-replies.open-profile.button"
+                    defaultMessage="Open profile"
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="petition-replies.associate-profile.button"
+                    defaultMessage="Associate profile"
+                  />
+                )}
+              </Text>
+            </Button>
             {showDownloadAll && !petition.isAnonymized ? (
               <ButtonWithMoreOptions
-                colorScheme="primary"
                 leftIcon={<DownloadIcon fontSize="lg" display="block" />}
                 onClick={handleDownloadAllClick}
                 options={
@@ -543,71 +610,89 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                   </MenuList>
                 }
               >
-                <FormattedMessage
-                  id="petition-replies.export-replies"
-                  defaultMessage="Export replies"
-                />
+                <FormattedMessage id="petition-replies.export-replies" defaultMessage="Export" />
               </ButtonWithMoreOptions>
             ) : null}
           </Stack>
           <Divider />
         </>
       }
+      drawer={
+        profileId ? (
+          <ProfileDrawer
+            ref={drawerInitialRef}
+            profileId={profileId}
+            profiles={petition.profiles}
+            onChangeProfile={setProfileId}
+            onAssociateProfile={handleAssociateProfile}
+            isReadOnly={petition.isAnonymized}
+          />
+        ) : null
+      }
+      drawerInitialFocusRef={drawerInitialRef}
     >
       <TwoPaneLayout
         top={4}
         isSidePaneActive={Boolean(activeFieldId)}
         sidePane={
-          <Flex
-            direction="column"
-            paddingX={4}
-            paddingLeft={{ md: 0 }}
-            maxHeight={{
-              base: "calc(100vh - 244px)",
-              sm: "calc(100vh - 178px)",
-              md: "calc(100vh - 138px)",
-            }}
-            paddingBottom={{ base: 4, sm: "80px" }}
-          >
-            {activeFieldId && !!activeField ? (
-              <PetitionRepliesFieldComments
-                key={activeFieldId}
-                petitionId={petition.id}
-                field={activeField}
-                isDisabled={petition.isAnonymized}
-                onClose={() => setActiveFieldId(null)}
-                onAddComment={handleAddComment}
-                onUpdateComment={handleUpdateComment}
-                onDeleteComment={handleDeleteComment}
-                onMarkAsUnread={handleMarkAsUnread}
-                onlyReadPermission={myEffectivePermission === "READ"}
-                {...extendFlexColumn}
-              />
-            ) : (
-              <Card {...extendFlexColumn}>
-                <CardHeader
-                  leftIcon={<ListIcon fontSize="18px" role="presentation" />}
-                  rightAction={<PetitionRepliesFilterButton value={filter} onChange={setFilter} />}
-                >
-                  <FormattedMessage id="petition.contents" defaultMessage="Contents" />
-                </CardHeader>
-                <Box overflow="auto">
-                  <PetitionContents
-                    fields={petition.fields}
-                    filter={filter}
-                    fieldIndices={indices}
-                    fieldVisibility={fieldVisibility}
-                    onFieldClick={handlePetitionContentsFieldClick}
-                    fieldIndicators={PetitionContentsIndicators}
-                    signatureStatus={petitionSignatureStatus}
-                    signatureEnvironment={petitionSignatureEnvironment}
-                    onSignatureStatusClick={handlePetitionContentsSignatureClick}
-                    showAliasButtons={false}
+          <AnimatePresence>
+            {profileId ? null : (
+              <Flex
+                as={motion.div}
+                exit={{ opacity: 1, transition: { delay: 0.2, duration: 0 } }}
+                direction="column"
+                paddingX={4}
+                paddingLeft={{ lg: 0 }}
+                maxHeight={{
+                  base: "calc(100vh - 244px)",
+                  sm: "calc(100vh - 178px)",
+                  md: "calc(100vh - 138px)",
+                }}
+                paddingBottom={{ base: 4, sm: "80px" }}
+              >
+                {activeFieldId && !!activeField ? (
+                  <PetitionRepliesFieldComments
+                    key={activeFieldId}
+                    petitionId={petition.id}
+                    field={activeField}
+                    isDisabled={petition.isAnonymized}
+                    onClose={() => setActiveFieldId(null)}
+                    onAddComment={handleAddComment}
+                    onUpdateComment={handleUpdateComment}
+                    onDeleteComment={handleDeleteComment}
+                    onMarkAsUnread={handleMarkAsUnread}
+                    onlyReadPermission={myEffectivePermission === "READ"}
+                    {...extendFlexColumn}
                   />
-                </Box>
-              </Card>
+                ) : (
+                  <Card {...extendFlexColumn}>
+                    <CardHeader
+                      leftIcon={<ListIcon fontSize="18px" role="presentation" />}
+                      rightAction={
+                        <PetitionRepliesFilterButton value={filter} onChange={setFilter} />
+                      }
+                    >
+                      <FormattedMessage id="petition.contents" defaultMessage="Contents" />
+                    </CardHeader>
+                    <Box overflow="auto">
+                      <PetitionContents
+                        fields={petition.fields}
+                        filter={filter}
+                        fieldIndices={indices}
+                        fieldVisibility={fieldVisibility}
+                        onFieldClick={handlePetitionContentsFieldClick}
+                        fieldIndicators={PetitionContentsIndicators}
+                        signatureStatus={petitionSignatureStatus}
+                        signatureEnvironment={petitionSignatureEnvironment}
+                        onSignatureStatusClick={handlePetitionContentsSignatureClick}
+                        showAliasButtons={false}
+                      />
+                    </Box>
+                  </Card>
+                )}
+              </Flex>
             )}
-          </Flex>
+          </AnimatePresence>
         }
       >
         <Box padding={4}>
@@ -638,9 +723,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                       fieldIndex={x.fieldIndex}
                       onAction={handleAction}
                       isActive={activeFieldId === x.field.id}
-                      onToggleComments={() =>
-                        setActiveFieldId(activeFieldId === x.field.id ? null : x.field.id)
-                      }
+                      onToggleComments={() => {
+                        setQueryState({
+                          comments: activeFieldId === x.field.id ? null : x.field.id,
+                          profile: null,
+                        });
+                      }}
                       onUpdateReplyStatus={(replyId, status) =>
                         handleUpdateRepliesStatus(x.field.id, [replyId], status)
                       }
@@ -681,6 +769,9 @@ PetitionReplies.fragments = {
           permissionType
         }
         isAnonymized
+        profiles {
+          ...ProfileDrawer_Profile
+        }
         ...PetitionSignaturesCard_Petition
         ...getPetitionSignatureStatus_Petition
         ...getPetitionSignatureEnvironment_Petition
@@ -695,6 +786,7 @@ PetitionReplies.fragments = {
       ${getPetitionSignatureEnvironment.fragments.Petition}
       ${useClosePetitionDialog.fragments.Petition}
       ${useLiquidScope.fragments.PetitionBase}
+      ${ProfileDrawer.fragments.Profile}
     `;
   },
   get PetitionField() {
@@ -831,6 +923,18 @@ const _mutations = [
       }
     }
   `,
+  gql`
+    mutation PetitionReplies_associateProfileToPetition($petitionId: GID!, $profileId: GID!) {
+      associateProfileToPetition(petitionId: $petitionId, profileId: $profileId) {
+        petition {
+          id
+          profiles {
+            id
+          }
+        }
+      }
+    }
+  `,
 ];
 
 function useDownloadReplyFile() {
@@ -943,6 +1047,10 @@ PetitionReplies.queries = [
   gql`
     query PetitionReplies_user {
       ...PetitionReplies_Query
+      metadata {
+        country
+        browserName
+      }
     }
     ${PetitionReplies.fragments.Query}
   `,
@@ -958,13 +1066,21 @@ PetitionReplies.queries = [
 
 PetitionReplies.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const petitionId = query.petitionId as string;
-  await fetchQuery(PetitionReplies_userDocument);
+  const {
+    data: { metadata },
+  } = await fetchQuery(PetitionReplies_userDocument);
   await fetchQuery(PetitionReplies_petitionDocument, {
     variables: {
       id: petitionId,
     },
   });
-  return { petitionId };
+
+  return { petitionId, metadata };
 };
 
-export default compose(withPetitionLayoutContext, withDialogs, withApolloData)(PetitionReplies);
+export default compose(
+  withPetitionLayoutContext,
+  withDialogs,
+  withMetadata,
+  withApolloData
+)(PetitionReplies);

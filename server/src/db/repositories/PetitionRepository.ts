@@ -427,6 +427,7 @@ export class PetitionRepository extends BaseRepository {
     opts: {
       search?: string | null;
       searchByNameOnly?: boolean;
+      excludeAnonymized?: boolean;
       sortBy?: SortBy<"name" | "lastUsedAt" | "sentAt" | "createdAt">[];
       filters?: PetitionFilter | null;
     } & PageOpts
@@ -636,6 +637,12 @@ export class PetitionRepository extends BaseRepository {
 
     if (filters?.fromTemplateId && filters.fromTemplateId.length > 0) {
       builders.push((q) => q.whereIn("p.from_template_id", filters.fromTemplateId!));
+    }
+
+    if (opts.excludeAnonymized) {
+      builders.push((q) => {
+        q.whereNull("p.anonymized_at");
+      });
     }
 
     const countPromise = LazyPromise.from(async () => {
@@ -1468,6 +1475,7 @@ export class PetitionRepository extends BaseRepository {
           })
           .returning("*"),
         this.deletePetitionAttachmentByPetitionId(petitionIds, user, t),
+        this.from("petition_profile", t).whereIn("petition_id", petitionIds).delete(),
       ]);
 
       return petitions;
@@ -6247,4 +6255,27 @@ export class PetitionRepository extends BaseRepository {
 
     return await this.userHasAccessToPetitions(userId, [field.petition_id]);
   }
+
+  readonly loadPetitionsByProfileId = this.buildLoader<number, Petition[]>(
+    async (profileIds, t) => {
+      const results = await this.from("petition", t)
+        .join("petition_profile", "petition.id", "petition_profile.petition_id")
+        .whereIn("petition_profile.profile_id", profileIds)
+        .whereNull("petition.deleted_at")
+        .select<Array<Petition & { profile_id: number; pp_created_at: Date }>>(
+          "petition.*",
+          "petition_profile.profile_id",
+          "petition_profile.created_at as pp_created_at"
+        );
+
+      const byProfileId = groupBy(results, (r) => r.profile_id);
+      return profileIds.map((id) =>
+        byProfileId[id]
+          ? sortBy(byProfileId[id], (p) => p.pp_created_at).map((p) =>
+              omit(p, ["profile_id", "pp_created_at"])
+            )
+          : []
+      );
+    }
+  );
 }
