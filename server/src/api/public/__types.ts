@@ -6871,7 +6871,6 @@ export type GetProfiles_profilesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   sortBy?: InputMaybe<Array<QueryProfiles_OrderBy> | QueryProfiles_OrderBy>;
   search?: InputMaybe<Scalars["String"]["input"]>;
-  profileIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
   profileTypeIds?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
   includeFields: Scalars["Boolean"]["input"];
   includeFieldsByAlias: Scalars["Boolean"]["input"];
@@ -8914,7 +8913,6 @@ export const GetProfiles_profilesDocument = gql`
     $limit: Int
     $sortBy: [QueryProfiles_OrderBy!]
     $search: String
-    $profileIds: [GID!]
     $profileTypeIds: [GID!]
     $includeFields: Boolean!
     $includeFieldsByAlias: Boolean!
@@ -8925,7 +8923,7 @@ export const GetProfiles_profilesDocument = gql`
       limit: $limit
       sortBy: $sortBy
       search: $search
-      filter: { profileId: $profileIds, profileTypeId: $profileTypeIds }
+      filter: { profileTypeId: $profileTypeIds }
     ) {
       totalCount
       items {

@@ -327,6 +327,9 @@ export const api = new RestApi({
       throw new UnauthorizedError("API token is invalid");
     } else if (containsGraphQLError(error, "FORBIDDEN")) {
       throw new ForbiddenError("You don't have access to this resource");
+    } else if (containsGraphQLError(error, "BAD_USER_INPUT")) {
+      // malformed gql request
+      throw new BadRequestError(error.response.errors?.[0].message ?? "Bad user input");
     }
     console.log(stringify(error));
     throw error;
@@ -3082,12 +3085,6 @@ api
           description: "Search profiles by name",
           required: false,
         }),
-        profileIds: stringParam({
-          description: "List of profile IDs to filter by",
-          example: [toGlobalId("Profile", 101), toGlobalId("Profile", 57)].join(","),
-          required: false,
-          array: true,
-        }),
         profileTypeIds: stringParam({
           description: "List of profile type IDs to filter by",
           example: [toGlobalId("ProfileType", 1), toGlobalId("ProfileType", 2)].join(","),
@@ -3105,7 +3102,6 @@ api
           $limit: Int
           $sortBy: [QueryProfiles_OrderBy!]
           $search: String
-          $profileIds: [GID!]
           $profileTypeIds: [GID!]
           $includeFields: Boolean!
           $includeFieldsByAlias: Boolean!
@@ -3116,7 +3112,7 @@ api
             limit: $limit
             sortBy: $sortBy
             search: $search
-            filter: { profileId: $profileIds, profileTypeId: $profileTypeIds }
+            filter: { profileTypeId: $profileTypeIds }
           ) {
             totalCount
             items {
@@ -3128,7 +3124,7 @@ api
       `;
 
       const result = await client.request(GetProfiles_profilesDocument, {
-        ...pick(query, ["offset", "limit", "sortBy", "search", "profileIds", "profileTypeIds"]),
+        ...pick(query, ["offset", "limit", "sortBy", "search", "profileTypeIds"]),
         ...getProfileIncludesFromQuery(query),
       });
       return Ok({
@@ -3146,6 +3142,7 @@ api
       query: profileIncludeParam,
       responses: {
         201: SuccessResponse(Profile),
+        400: ErrorResponse({ description: "Invalid request body" }),
         403: ErrorResponse({ description: "You don't have access to this resource" }),
       },
       tags: ["Profiles"],
@@ -3182,27 +3179,34 @@ api
         `,
       ];
 
-      const result = await client.request(CreateProfile_createProfileDocument, {
-        profileTypeId: body.profileTypeId,
-        subscribe: body.subscribe,
-        ...getProfileIncludesFromQuery(query),
-      });
-      assert("id" in result.createProfile);
-
-      if (!isDefined(body.fields)) {
-        return Created(mapProfile(result.createProfile));
-      }
-
-      const updatedProfileResult = await client.request(
-        CreateProfile_updateProfileFieldValueDocument,
-        {
-          profileId: result.createProfile.id,
-          fields: body.fields,
+      try {
+        const result = await client.request(CreateProfile_createProfileDocument, {
+          profileTypeId: body.profileTypeId,
+          subscribe: body.subscribe,
           ...getProfileIncludesFromQuery(query),
-        }
-      );
+        });
+        assert("id" in result.createProfile);
 
-      return Created(mapProfile(updatedProfileResult.updateProfileFieldValue));
+        if (!isDefined(body.fields)) {
+          return Created(mapProfile(result.createProfile));
+        }
+
+        const updatedProfileResult = await client.request(
+          CreateProfile_updateProfileFieldValueDocument,
+          {
+            profileId: result.createProfile.id,
+            fields: body.fields,
+            ...getProfileIncludesFromQuery(query),
+          }
+        );
+
+        return Created(mapProfile(updatedProfileResult.updateProfileFieldValue));
+      } catch (error) {
+        if (containsGraphQLError(error, "EXPIRY_ON_NON_EXPIRABLE_FIELD")) {
+          throw new BadRequestError("You can't set an expiry date on a non-expirable field");
+        }
+        throw error;
+      }
     }
   );
 
