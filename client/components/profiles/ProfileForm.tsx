@@ -330,7 +330,7 @@ export const ProfileForm = Object.assign(
             onCancel={() => handleResetForm()}
           />
         ) : null}
-        <Stack divider={<Divider />} padding={4} spacing={4} overflow="auto">
+        <Stack divider={<Divider />} padding={4} paddingBottom={24} spacing={4} overflow="auto">
           <Stack as="ul" width="100%">
             {properties.map(({ field, value, files }, i) => {
               const index = fields.findIndex((f) => f.profileTypeFieldId === field.id)!;
