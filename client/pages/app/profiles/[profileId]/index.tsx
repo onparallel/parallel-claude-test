@@ -190,14 +190,14 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
             ) : null}
           </HStack>
           <Stack spacing={6} padding={4} paddingBottom={24}>
+            {process.env.NEXT_PUBLIC_ENVIRONMENT === "staging" ? (
+              <FakeProfileTables me={me} />
+            ) : null}
             <ProfilePetitionsTable
               petitions={profile.petitions}
               onAddPetition={handleAddPetition}
               onRemovePetition={handleRemovePetition}
             />
-            {process.env.NEXT_PUBLIC_ENVIRONMENT === "staging" ? (
-              <FakeProfileTables me={me} />
-            ) : null}
           </Stack>
         </Stack>
       </Flex>
