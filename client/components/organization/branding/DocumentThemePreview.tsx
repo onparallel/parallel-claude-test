@@ -55,11 +55,11 @@ export function DocumentThemePreview({ organization, theme }: DocumentThemePrevi
   return (
     <Box width="100%" paddingBottom={8}>
       <>
-        {uniq([theme.title1FontFamily, theme.title2FontFamily, theme.textFontFamily]).map(
-          (font) => (
+        {uniq([theme.title1FontFamily, theme.title2FontFamily, theme.textFontFamily])
+          .filter((font) => font !== "IBM Plex Sans" && font !== "Source Sans Pro")
+          .map((font) => (
             <Fonts key={font} family={font} />
-          )
-        )}
+          ))}
       </>
       <Box
         backgroundColor="white"
