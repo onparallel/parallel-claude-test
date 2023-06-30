@@ -240,7 +240,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
 
   return (
     <AdminOrganizationsLayout
-      tabKey="subscriptions"
+      currentTabKey="subscriptions"
       me={me}
       organization={organization}
       realMe={realMe}

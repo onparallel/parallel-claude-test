@@ -134,7 +134,7 @@ function OrganizationProfileTypes() {
   });
 
   return (
-    <OrganizationProfilesLayout tabKey="types" me={me} realMe={realMe}>
+    <OrganizationProfilesLayout currentTabKey="types" me={me} realMe={realMe}>
       <Box flex="1" padding={4} paddingBottom={16}>
         <TablePage
           flex="0 1 auto"

@@ -78,7 +78,12 @@ function AdminOrganizationsFeatures({ organizationId }: AdminOrganizationsFeatur
   const featureFlagsCategories = useFeatureFlags();
 
   return (
-    <AdminOrganizationsLayout tabKey="features" me={me} organization={organization} realMe={realMe}>
+    <AdminOrganizationsLayout
+      currentTabKey="features"
+      me={me}
+      organization={organization}
+      realMe={realMe}
+    >
       <Box padding={4}>
         <Card maxWidth="container.sm" as="form" onSubmit={handleSubmit(handleSubmitFeatureFlags)}>
           <CardHeader>

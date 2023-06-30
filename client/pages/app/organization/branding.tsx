@@ -1,14 +1,17 @@
 import { gql } from "@apollo/client";
-import { Heading, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
+import { Heading } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
+import { SettingsTabsInnerLayout } from "@parallel/components/layout/SettingsTabsInnerLayout";
 import { BrandingDocumentTheme } from "@parallel/components/organization/branding/BrandingDocumentTheme";
 import { BrandingGeneral } from "@parallel/components/organization/branding/BrandingGeneral";
 import { OrganizationBranding_userDocument } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { useQueryState, useQueryStateSlice, values } from "@parallel/utils/queryState";
+import { useBuildStateUrl, useQueryState, values } from "@parallel/utils/queryState";
+import { useRouter } from "next/router";
+import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const styles = ["general", "document"] as ("general" | "document")[];
@@ -18,13 +21,35 @@ const QUERY_STATE = {
 
 function OrganizationBranding() {
   const intl = useIntl();
+  const router = useRouter();
 
   const {
     data: { me, realMe },
   } = useAssertQueryOrPreviousData(OrganizationBranding_userDocument);
 
-  const [state, setQueryState] = useQueryState(QUERY_STATE);
-  const [style, setStyle] = useQueryStateSlice(state, setQueryState, "style");
+  const [{ style }] = useQueryState(QUERY_STATE);
+  const buildStateUrl = useBuildStateUrl(QUERY_STATE);
+  const tabs = useMemo(
+    () => [
+      {
+        key: "general" as const,
+        title: intl.formatMessage({
+          id: "organization.branding.general.tab",
+          defaultMessage: "General",
+        }),
+        href: buildStateUrl({ style: "general" as const }),
+      },
+      {
+        key: "document" as const,
+        title: intl.formatMessage({
+          id: "organization.branding.documents.tab",
+          defaultMessage: "Documents",
+        }),
+        href: buildStateUrl({ style: "document" as const }),
+      },
+    ],
+    [intl.locale, router.pathname, router.query]
+  );
 
   return (
     <OrganizationSettingsLayout
@@ -40,49 +65,9 @@ function OrganizationBranding() {
         </Heading>
       }
     >
-      <Tabs
-        variant="enclosed"
-        index={styles.indexOf(style)}
-        onChange={(index) => setStyle(styles[index], { type: "push" })}
-        isManual
-        isLazy
-        lazyBehavior="unmount"
-      >
-        <TabList paddingLeft={6} background="white" paddingTop={2}>
-          <Tab
-            fontWeight="500"
-            _selected={{
-              backgroundColor: "gray.50",
-              borderColor: "gray.200",
-              borderBottom: "1px solid",
-              borderBottomColor: "transparent",
-              color: "blue.600",
-            }}
-          >
-            <FormattedMessage id="organization.branding.general.tab" defaultMessage="General" />
-          </Tab>
-          <Tab
-            fontWeight="500"
-            _selected={{
-              backgroundColor: "gray.50",
-              borderColor: "gray.200",
-              borderBottom: "1px solid",
-              borderBottomColor: "transparent",
-              color: "blue.600",
-            }}
-          >
-            <FormattedMessage id="organization.branding.documents.tab" defaultMessage="Documents" />
-          </Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel padding={0}>
-            <BrandingGeneral user={me} />
-          </TabPanel>
-          <TabPanel padding={0}>
-            <BrandingDocumentTheme user={me} />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
+      <SettingsTabsInnerLayout tabs={tabs} currentTabKey={style}>
+        {style === "general" ? <BrandingGeneral user={me} /> : <BrandingDocumentTheme user={me} />}
+      </SettingsTabsInnerLayout>
     </OrganizationSettingsLayout>
   );
 }

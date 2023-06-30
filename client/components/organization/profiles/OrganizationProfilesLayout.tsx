@@ -1,28 +1,47 @@
 import { gql } from "@apollo/client";
-import { Heading, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
-import { NakedLink } from "@parallel/components/common/Link";
+import { Heading } from "@chakra-ui/react";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
+import { SettingsTabsInnerLayout } from "@parallel/components/layout/SettingsTabsInnerLayout";
 import { OrganizationProfilesLayout_QueryFragment } from "@parallel/graphql/__types";
-import { useRouter } from "next/router";
 import { ReactNode, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 type ProfilesOrganizationSection = "types" | "relationships";
 
 interface OrganizationProfilesLayoutProps extends OrganizationProfilesLayout_QueryFragment {
-  tabKey: ProfilesOrganizationSection;
+  currentTabKey: ProfilesOrganizationSection;
   children: ReactNode;
 }
 
 export function OrganizationProfilesLayout({
-  tabKey,
+  currentTabKey,
   me,
   realMe,
   children,
 }: OrganizationProfilesLayoutProps) {
-  const router = useRouter();
-  const tabs = useProfilesOrganizationTabs();
-  const currentTab = tabs.find((t) => t.key === tabKey)!;
+  const intl = useIntl();
+  const tabs = useMemo(
+    () => [
+      {
+        key: "types" as const,
+        title: intl.formatMessage({
+          id: "organization.profiles.profile-types",
+          defaultMessage: "Profile types",
+        }),
+        href: "/app/organization/profiles/types",
+      },
+      {
+        key: "relationships" as const,
+        title: intl.formatMessage({
+          id: "organization.profiles.relationships",
+          defaultMessage: "Relationships",
+        }),
+        isDisabled: true,
+      },
+    ],
+    [intl.locale]
+  );
+  const currentTab = tabs.find((t) => t.key === currentTabKey)!;
 
   return (
     <OrganizationSettingsLayout
@@ -35,72 +54,10 @@ export function OrganizationProfilesLayout({
         </Heading>
       }
     >
-      <Tabs
-        variant="enclosed"
-        index={tabs.findIndex((t) => t.key === tabKey)!}
-        onChange={(index) => {
-          if (index >= 0) {
-            router.push(`/app/organization/profiles/${tabs[index].key}`);
-          }
-        }}
-      >
-        <TabList paddingLeft={6} background="white" paddingTop={2}>
-          {tabs.map(({ key, title, isDisabled }) =>
-            isDisabled ? (
-              <Tab key={key} fontWeight="500" color="gray.400" cursor="not-allowed" isDisabled>
-                {title}
-              </Tab>
-            ) : (
-              <NakedLink key={key} href={`/app/organization/profiles/${key}`}>
-                <Tab
-                  as="a"
-                  fontWeight="500"
-                  _selected={{
-                    backgroundColor: "gray.50",
-                    borderColor: "gray.200",
-                    borderBottom: "1px solid transparent",
-                    color: "blue.600",
-                  }}
-                >
-                  {title}
-                </Tab>
-              </NakedLink>
-            )
-          )}
-        </TabList>
-        <TabPanels>
-          {tabs.map((t) => (
-            <TabPanel padding={0} key={t.key}>
-              {t.key === tabKey ? children : null}
-            </TabPanel>
-          ))}
-        </TabPanels>
-      </Tabs>
+      <SettingsTabsInnerLayout tabs={tabs} currentTabKey={currentTabKey}>
+        {children}
+      </SettingsTabsInnerLayout>
     </OrganizationSettingsLayout>
-  );
-}
-
-function useProfilesOrganizationTabs() {
-  const intl = useIntl();
-  return useMemo(
-    () => [
-      {
-        key: "types" as const,
-        title: intl.formatMessage({
-          id: "organization.profiles.profile-types",
-          defaultMessage: "Profile types",
-        }),
-      },
-      {
-        key: "relationships" as const,
-        title: intl.formatMessage({
-          id: "organization.profiles.relationships",
-          defaultMessage: "Relationships",
-        }),
-        isDisabled: true,
-      },
-    ],
-    [intl.locale]
   );
 }
 
