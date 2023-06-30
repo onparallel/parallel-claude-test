@@ -142,6 +142,7 @@ export const ProfileForm = Object.assign(
 
     return (
       <Flex
+        ref={ref}
         direction="column"
         as="form"
         height="100%"

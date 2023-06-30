@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import { Box, Button, HStack, IconButton, Stack } from "@chakra-ui/react";
+import { Box, Button, Flex, HStack, IconButton } from "@chakra-ui/react";
 import { AddIcon, CloseIcon } from "@parallel/chakra/icons";
 import { ProfileForm } from "@parallel/components/profiles/ProfileForm";
 import {
@@ -47,7 +47,7 @@ export const ProfileDrawer = Object.assign(
     };
 
     return (
-      <Stack background="white" height="full" width="full">
+      <Flex direction="column" background="white" height="100%">
         <HStack
           borderBottom="1px solid"
           borderColor="gray.200"
@@ -77,12 +77,15 @@ export const ProfileDrawer = Object.assign(
             icon={<CloseIcon boxSize={4} />}
           />
         </HStack>
-        <Box marginTop={1}>
-          {profileData?.profile ? (
-            <ProfileForm profile={profileData!.profile} refetch={handleRefetchProfile} />
-          ) : null}
-        </Box>
-      </Stack>
+        {profileData?.profile ? (
+          <ProfileForm
+            profile={profileData!.profile}
+            refetch={handleRefetchProfile}
+            flex={1}
+            minHeight={0}
+          />
+        ) : null}
+      </Flex>
     );
   }),
   {
