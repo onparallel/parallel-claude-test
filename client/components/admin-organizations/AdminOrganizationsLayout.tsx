@@ -6,7 +6,7 @@ import {
   AdminOrganizationsLayout_QueryFragment,
 } from "@parallel/graphql/__types";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect, useMemo, useRef } from "react";
+import { ReactNode, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 
@@ -28,10 +28,6 @@ export function AdminOrganizationsLayout({
   const router = useRouter();
   const tabs = useAdminOrganizationsTabs();
   const currentTab = tabs.find((t) => t.key === tabKey)!;
-  const currentTabRef = useRef<HTMLAnchorElement>(null);
-  useEffect(() => {
-    setTimeout(() => currentTabRef.current?.focus());
-  }, []);
 
   return (
     <AdminSettingsLayout
@@ -60,7 +56,6 @@ export function AdminOrganizationsLayout({
             <NakedLink key={t.key} href={`/app/admin/organizations/${organization.id}/${t.key}`}>
               <Tab
                 as="a"
-                ref={t.key === tabKey ? (currentTabRef as any) : undefined}
                 fontWeight="500"
                 _selected={{
                   backgroundColor: "gray.50",

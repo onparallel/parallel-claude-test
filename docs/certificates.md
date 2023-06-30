@@ -13,7 +13,7 @@ sudo less /var/log/letsencrypt/letsencrypt.log
 ## Delete certificate
 
 ```
-sudo certbot delete --cert-name onboarding.glvm.me --config-dir /nfs/parallel/certs/
+sudo certbot delete --cert-name onboarding.tryb.agency --config-dir /nfs/parallel/certs/
 ```
 
 ## Renew certificates

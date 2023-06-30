@@ -4,7 +4,7 @@ import { NakedLink } from "@parallel/components/common/Link";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { OrganizationProfilesLayout_QueryFragment } from "@parallel/graphql/__types";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect, useMemo, useRef } from "react";
+import { ReactNode, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 type ProfilesOrganizationSection = "types" | "relationships";
@@ -23,10 +23,6 @@ export function OrganizationProfilesLayout({
   const router = useRouter();
   const tabs = useProfilesOrganizationTabs();
   const currentTab = tabs.find((t) => t.key === tabKey)!;
-  const currentTabRef = useRef<HTMLAnchorElement>(null);
-  useEffect(() => {
-    setTimeout(() => currentTabRef.current?.focus());
-  }, []);
 
   return (
     <OrganizationSettingsLayout
@@ -49,20 +45,15 @@ export function OrganizationProfilesLayout({
         }}
       >
         <TabList paddingLeft={6} background="white" paddingTop={2}>
-          {tabs.map(({ key, title, isDisabled }) => {
-            if (isDisabled) {
-              return (
-                <Tab key={key} fontWeight="500" color="gray.400" cursor="not-allowed" isDisabled>
-                  {title}
-                </Tab>
-              );
-            }
-
-            return (
+          {tabs.map(({ key, title, isDisabled }) =>
+            isDisabled ? (
+              <Tab key={key} fontWeight="500" color="gray.400" cursor="not-allowed" isDisabled>
+                {title}
+              </Tab>
+            ) : (
               <NakedLink key={key} href={`/app/organization/profiles/${key}`}>
                 <Tab
                   as="a"
-                  ref={key === tabKey ? (currentTabRef as any) : undefined}
                   fontWeight="500"
                   _selected={{
                     backgroundColor: "gray.50",
@@ -74,8 +65,8 @@ export function OrganizationProfilesLayout({
                   {title}
                 </Tab>
               </NakedLink>
-            );
-          })}
+            )
+          )}
         </TabList>
         <TabPanels>
           {tabs.map((t) => (
