@@ -35,7 +35,10 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
       );
 
       if (!petition.signature_config) {
-        throw new Error(`Petition:${petition.id} was expected to have signature_config set`);
+        throw new ApolloError(
+          `Petition:${petition.id} was expected to have signature_config set`,
+          "MISSING_SIGNATURE_CONFIG_ERROR"
+        );
       }
 
       const { signatureRequest } = await ctx.signature.createSignatureRequest(
@@ -45,12 +48,19 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
       );
 
       return signatureRequest;
-    } catch (error: any) {
-      if (error.message === "PETITION_SEND_LIMIT_REACHED") {
-        throw new ApolloError(
-          "Can't complete the parallel due to lack of credits",
-          "PETITION_SEND_LIMIT_REACHED"
-        );
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === "PETITION_SEND_LIMIT_REACHED") {
+          throw new ApolloError(
+            "Can't complete the parallel due to lack of credits",
+            "PETITION_SEND_LIMIT_REACHED"
+          );
+        } else if (error.message === "REQUIRED_SIGNER_INFO_ERROR") {
+          throw new ApolloError(
+            "Can't complete the petition without signers information",
+            "REQUIRED_SIGNER_INFO_ERROR"
+          );
+        }
       }
       throw error;
     }

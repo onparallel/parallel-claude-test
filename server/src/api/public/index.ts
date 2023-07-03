@@ -86,6 +86,7 @@ import {
   ReopenPetition_reopenPetitionDocument,
   SharePetition_addPetitionPermissionDocument,
   SharePetition_usersDocument,
+  StartSignature_startSignatureRequestDocument,
   StopSharing_removePetitionPermissionDocument,
   SubmitReplies_bulkCreatePetitionRepliesDocument,
   SubmitReply_createFileUploadReplyCompleteDocument,
@@ -126,6 +127,7 @@ import {
   PetitionFieldFragment,
   PetitionFieldWithRepliesFragment,
   PetitionFragment,
+  PetitionSignatureRequestFragment,
   PetitionTagFragment,
   ProfileFragment,
   SubscriptionFragment,
@@ -187,6 +189,8 @@ import {
   SendPetition,
   SendReminder,
   SharePetition,
+  SignatureRequest,
+  SignatureRequestInput,
   SubmitFileReply,
   SubmitPetitionReplies,
   SubmitPetitionRepliesResponse,
@@ -2461,40 +2465,89 @@ api
     }
   );
 
-api.path("/petitions/:petitionId/signatures", { params: { petitionId } }).get(
-  {
-    operationId: "GetSignatures",
-    summary: "List parallel signatures",
-    description: "List every signature request linked with your parallel.",
-    responses: { 204: SuccessResponse(ListOfSignatureRequests) },
-    tags: ["Signatures"],
-  },
-  async ({ client, params }) => {
-    gql`
-      query GetSignatures_petitionSignatures($petitionId: GID!) {
-        petition(id: $petitionId) {
-          __typename
-          ... on Petition {
-            signatureRequests {
-              id
-              status
-              environment
-              createdAt
-              updatedAt
+api
+  .path("/petitions/:petitionId/signatures", { params: { petitionId } })
+  .get(
+    {
+      operationId: "GetSignatures",
+      summary: "List parallel signatures",
+      description: "List every signature request linked with your parallel.",
+      responses: { 204: SuccessResponse(ListOfSignatureRequests) },
+      tags: ["Signatures"],
+    },
+    async ({ client, params }) => {
+      gql`
+        query GetSignatures_petitionSignatures($petitionId: GID!) {
+          petition(id: $petitionId) {
+            __typename
+            ... on Petition {
+              signatureRequests {
+                ...PetitionSignatureRequest
+              }
             }
           }
         }
-      }
-    `;
-    const data = await client.request(GetSignatures_petitionSignaturesDocument, params);
+        ${PetitionSignatureRequestFragment}
+      `;
+      const data = await client.request(GetSignatures_petitionSignaturesDocument, params);
 
-    if (data.petition?.__typename === "PetitionTemplate") {
-      return Ok([]);
-    } else {
-      return Ok(data.petition?.signatureRequests ?? []);
+      if (data.petition?.__typename === "PetitionTemplate") {
+        return Ok([]);
+      } else {
+        return Ok(data.petition?.signatureRequests ?? []);
+      }
     }
-  }
-);
+  )
+  .post(
+    {
+      operationId: "StartSignature",
+      summary: "Start a signature request",
+      description: outdent`
+        Start a signature request for the specified parallel.
+        If the parallel doesn't have a signature configured, an error will be thrown.
+        If the parallel has an ongoing eSignature request, it will be cancelled and a new eSignature request will be started.
+      `,
+      tags: ["Signatures"],
+      body: JsonBody(SignatureRequestInput, { required: false }),
+      responses: {
+        201: SuccessResponse(SignatureRequest),
+        403: ErrorResponse({
+          description: "You don't have enough credits to complete this parallel.",
+        }),
+        409: ErrorResponse({ description: "You can't start a signature request on the parallel." }),
+      },
+    },
+    async ({ client, params, body }) => {
+      const _mutation = gql`
+        mutation StartSignature_startSignatureRequest($petitionId: GID!, $message: String) {
+          startSignatureRequest(petitionId: $petitionId, message: $message) {
+            ...PetitionSignatureRequest
+          }
+        }
+        ${PetitionSignatureRequestFragment}
+      `;
+
+      try {
+        const response = await client.request(StartSignature_startSignatureRequestDocument, {
+          petitionId: params.petitionId,
+          message: body.message,
+        });
+
+        assert("id" in response.startSignatureRequest);
+        return Created(response.startSignatureRequest);
+      } catch (error) {
+        if (containsGraphQLError(error, "MISSING_SIGNATURE_CONFIG_ERROR")) {
+          throw new ConflictError("The parallel does not have a signature configuration");
+        } else if (containsGraphQLError(error, "REQUIRED_SIGNER_INFO_ERROR")) {
+          throw new ConflictError("The parallel requires signer information");
+        } else if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
+          throw new ForbiddenError("You don't have enough credits to complete this parallel");
+        }
+
+        throw error;
+      }
+    }
+  );
 
 api
   .path("/petitions/:petitionId/signatures/:signatureId/document", {

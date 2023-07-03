@@ -304,3 +304,13 @@ export const ProfileFragment = gql`
   ${ProfileFieldPropertyFragment}
   ${UserFragment}
 `;
+
+export const PetitionSignatureRequestFragment = gql`
+  fragment PetitionSignatureRequest on PetitionSignatureRequest {
+    id
+    status
+    environment
+    createdAt
+    updatedAt
+  }
+`;

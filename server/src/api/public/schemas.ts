@@ -2071,13 +2071,27 @@ const _SignatureRequest = {
     },
     status: {
       type: "string",
-      enum: ["ENQUEUED", "PROCESSING", "PROCESSED", "CANCELLED", "COMPLETED"],
+      enum: ["ENQUEUED", "PROCESSING", "PROCESSED", "CANCELLING", "CANCELLED", "COMPLETED"],
       description: "Current status of the signature request",
       example: "COMPLETED",
     },
   },
 } as const;
 export const ListOfSignatureRequests = ListOf(_SignatureRequest);
+export const SignatureRequest = schema(_SignatureRequest);
+export const SignatureRequestInput = schema({
+  title: "SignatureRequestInput",
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    message: {
+      description: "An optional message to be displayed to the signer",
+      type: "string",
+      example: "Please, sign this petition",
+      maxLength: 1000,
+    },
+  },
+});
 
 export const SubmitPetitionReplies = schema({
   title: "SubmitPetitionReplies",

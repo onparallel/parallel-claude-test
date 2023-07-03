@@ -5125,6 +5125,14 @@ export type ProfileFragment = {
   }>;
 };
 
+export type PetitionSignatureRequestFragment = {
+  id: string;
+  status: PetitionSignatureRequestStatus;
+  environment: SignatureOrgIntegrationEnvironment;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type getTags_tagsQueryVariables = Exact<{
   offset: Scalars["Int"]["input"];
   limit: Scalars["Int"]["input"];
@@ -6374,6 +6382,21 @@ export type GetSignatures_petitionSignaturesQuery = {
       }
     | { __typename: "PetitionTemplate" }
     | null;
+};
+
+export type StartSignature_startSignatureRequestMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  message?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type StartSignature_startSignatureRequestMutation = {
+  startSignatureRequest: {
+    id: string;
+    status: PetitionSignatureRequestStatus;
+    environment: SignatureOrgIntegrationEnvironment;
+    createdAt: string;
+    updatedAt: string;
+  };
 };
 
 export type DownloadSignedDocument_downloadSignedDocMutationVariables = Exact<{
@@ -8146,6 +8169,15 @@ export const ProfileFragmentDoc = gql`
   ${ProfileFieldPropertyFragmentDoc}
   ${UserFragmentDoc}
 ` as unknown as DocumentNode<ProfileFragment, unknown>;
+export const PetitionSignatureRequestFragmentDoc = gql`
+  fragment PetitionSignatureRequest on PetitionSignatureRequest {
+    id
+    status
+    environment
+    createdAt
+    updatedAt
+  }
+` as unknown as DocumentNode<PetitionSignatureRequestFragment, unknown>;
 export const getTags_tagsDocument = gql`
   query getTags_tags($offset: Int!, $limit: Int!) {
     tags(offset: $offset, limit: $limit) {
@@ -8746,18 +8778,26 @@ export const GetSignatures_petitionSignaturesDocument = gql`
       __typename
       ... on Petition {
         signatureRequests {
-          id
-          status
-          environment
-          createdAt
-          updatedAt
+          ...PetitionSignatureRequest
         }
       }
     }
   }
+  ${PetitionSignatureRequestFragmentDoc}
 ` as unknown as DocumentNode<
   GetSignatures_petitionSignaturesQuery,
   GetSignatures_petitionSignaturesQueryVariables
+>;
+export const StartSignature_startSignatureRequestDocument = gql`
+  mutation StartSignature_startSignatureRequest($petitionId: GID!, $message: String) {
+    startSignatureRequest(petitionId: $petitionId, message: $message) {
+      ...PetitionSignatureRequest
+    }
+  }
+  ${PetitionSignatureRequestFragmentDoc}
+` as unknown as DocumentNode<
+  StartSignature_startSignatureRequestMutation,
+  StartSignature_startSignatureRequestMutationVariables
 >;
 export const DownloadSignedDocument_downloadSignedDocDocument = gql`
   mutation DownloadSignedDocument_downloadSignedDoc($signatureId: GID!) {

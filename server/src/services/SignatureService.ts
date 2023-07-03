@@ -88,38 +88,12 @@ export class SignatureService implements ISignatureService {
     signatureConfig: PetitionSignatureConfig,
     starter: User | PetitionAccess
   ) {
-    await this.verifySignatureIntegration(petitionId, signatureConfig.orgIntegrationId);
+    await this.verifySignatureConfig(petitionId, signatureConfig);
 
     const isAccess = "keycode" in starter;
     const updatedBy = isAccess ? `Contact:${starter.contact_id}` : `User:${starter.id}`;
 
     let updatedPetition = null;
-
-    const allSigners = [
-      ...signatureConfig.signersInfo,
-      ...(signatureConfig.additionalSignersInfo ?? []),
-    ];
-
-    const emails = allSigners.map((s) => s.email);
-    if (process.env.NODE_ENV === "development") {
-      if (
-        !emails.every((email) =>
-          this.config.development.whitelistedEmails.some((e) => {
-            const [l, d] = e.split("@");
-            const [local, domain] = email.split("@");
-            return d === domain && (l === local || local.startsWith(l + "+"));
-          })
-        )
-      ) {
-        throw new Error(
-          "DEVELOPMENT: Every recipient email must be whitelisted in .development.env"
-        );
-      }
-    }
-
-    if (allSigners.length === 0) {
-      throw new Error(`REQUIRED_SIGNER_INFO_ERROR`);
-    }
 
     if ((signatureConfig.additionalSignersInfo ?? [])?.length > 0) {
       [updatedPetition] = await this.petitions.updatePetition(
@@ -133,7 +107,7 @@ export class SignatureService implements ISignatureService {
 
     const signatureRequest = await this.petitions.createPetitionSignature(petitionId, {
       signature_config: {
-        ...(omit(signatureConfig, ["additionalSignersInfo"]) as any),
+        ...omit(signatureConfig, ["additionalSignersInfo"]),
         signersInfo: signatureConfig.signersInfo.concat(
           signatureConfig.additionalSignersInfo ?? []
         ),
@@ -297,11 +271,11 @@ export class SignatureService implements ISignatureService {
    * checks that the signature integration exists and is valid.
    * also checks the usage limit if the integration uses our shared sandbox API_KEY
    */
-  private async verifySignatureIntegration(
+  private async verifySignatureConfig(
     petitionId: number,
-    orgIntegrationId: number | undefined
+    signatureConfig: PetitionSignatureConfig
   ) {
-    if (orgIntegrationId === undefined) {
+    if (signatureConfig.orgIntegrationId === undefined) {
       throw new Error(`undefined orgIntegrationId on signature_config. Petition:${petitionId}`);
     }
     const petition = await this.petitions.loadPetition(petitionId);
@@ -309,15 +283,40 @@ export class SignatureService implements ISignatureService {
       throw new Error(`Petition:${petitionId} not found`);
     }
 
-    const integration = await this.integrations.loadIntegration(orgIntegrationId);
+    const integration = await this.integrations.loadIntegration(signatureConfig.orgIntegrationId);
     if (!integration || integration.type !== "SIGNATURE") {
       throw new Error(
-        `Couldn't find an enabled signature integration for OrgIntegration:${orgIntegrationId}`
+        `Couldn't find an enabled signature integration for OrgIntegration:${signatureConfig.orgIntegrationId}`
       );
     }
 
     if (petition.org_id !== integration.org_id) {
       throw new Error(`Invalid OrgIntegration:${integration.id} on Petition:${petitionId}`);
+    }
+
+    const allSigners = [
+      ...signatureConfig.signersInfo,
+      ...(signatureConfig.additionalSignersInfo ?? []),
+    ];
+
+    if (allSigners.length === 0) {
+      throw new Error(`REQUIRED_SIGNER_INFO_ERROR`);
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      if (
+        !allSigners.every((s) =>
+          this.config.development.whitelistedEmails.some((e) => {
+            const [l, d] = e.split("@");
+            const [local, domain] = s.email.split("@");
+            return d === domain && (l === local || local.startsWith(l + "+"));
+          })
+        )
+      ) {
+        throw new Error(
+          "DEVELOPMENT: Every recipient email must be whitelisted in .development.env"
+        );
+      }
     }
   }
 }
