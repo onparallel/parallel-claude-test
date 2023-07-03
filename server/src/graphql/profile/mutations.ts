@@ -868,6 +868,15 @@ export const associateProfileToPetition = mutationField("associateProfileToPetit
           profile_id: profileId,
         },
       });
+      await ctx.profiles.createEvent({
+        type: "PETITION_ASSOCIATED",
+        org_id: ctx.user!.org_id,
+        profile_id: profileId,
+        data: {
+          user_id: ctx.user!.id,
+          petition_id: petitionId,
+        },
+      });
 
       return petitionProfile;
     } catch (e) {
@@ -914,6 +923,15 @@ export const deassociateProfileFromPetition = mutationField("deassociateProfileF
       data: {
         user_id: ctx.user!.id,
         profile_id: profileId,
+      },
+    });
+    await ctx.profiles.createEvent({
+      type: "PETITION_DEASSOCIATED",
+      org_id: ctx.user!.org_id,
+      profile_id: profileId,
+      data: {
+        user_id: ctx.user!.id,
+        petition_id: petitionId,
       },
     });
 

@@ -2848,6 +2848,14 @@ type PetitionAnonymizedEvent implements PetitionEvent {
   type: PetitionEventType!
 }
 
+type PetitionAssociatedEvent implements ProfileEvent {
+  createdAt: DateTime!
+  id: GID!
+  profile: Profile
+  type: ProfileEventType!
+  user: User
+}
+
 type PetitionAttachment {
   file: FileUpload!
   id: GID!
@@ -3099,6 +3107,14 @@ type PetitionCreatedEvent implements PetitionEvent {
   id: GID!
   petition: Petition
   type: PetitionEventType!
+  user: User
+}
+
+type PetitionDeassociatedEvent implements ProfileEvent {
+  createdAt: DateTime!
+  id: GID!
+  profile: Profile
+  type: ProfileEventType!
   user: User
 }
 
@@ -4469,6 +4485,8 @@ type ProfileEventPagination {
 }
 
 enum ProfileEventType {
+  PETITION_ASSOCIATED
+  PETITION_DEASSOCIATED
   PROFILE_CREATED
   PROFILE_FIELD_EXPIRY_UPDATED
   PROFILE_FIELD_FILE_ADDED

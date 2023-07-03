@@ -83,6 +83,8 @@ const result: PossibleTypesResultData = {
       "SignatureCompletedUserNotification",
     ],
     ProfileEvent: [
+      "PetitionAssociatedEvent",
+      "PetitionDeassociatedEvent",
       "ProfileCreatedEvent",
       "ProfileFieldExpiryUpdatedEvent",
       "ProfileFieldFileAddedEvent",

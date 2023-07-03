@@ -323,7 +323,9 @@ export type ProfileEventType =
   | "PROFILE_FIELD_VALUE_UPDATED"
   | "PROFILE_FIELD_FILE_ADDED"
   | "PROFILE_FIELD_FILE_REMOVED"
-  | "PROFILE_FIELD_EXPIRY_UPDATED";
+  | "PROFILE_FIELD_EXPIRY_UPDATED"
+  | "PETITION_ASSOCIATED"
+  | "PETITION_DEASSOCIATED";
 
 export const ProfileEventTypeValues = [
   "PROFILE_CREATED",
@@ -331,6 +333,8 @@ export const ProfileEventTypeValues = [
   "PROFILE_FIELD_FILE_ADDED",
   "PROFILE_FIELD_FILE_REMOVED",
   "PROFILE_FIELD_EXPIRY_UPDATED",
+  "PETITION_ASSOCIATED",
+  "PETITION_DEASSOCIATED",
 ] as ProfileEventType[];
 
 export type ProfileTypeFieldPermission = "HIDDEN" | "READ" | "WRITE";

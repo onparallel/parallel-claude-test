@@ -2420,6 +2420,14 @@ export type PetitionAnonymizedEvent = PetitionEvent & {
   type: PetitionEventType;
 };
 
+export type PetitionAssociatedEvent = ProfileEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  profile: Maybe<Profile>;
+  type: ProfileEventType;
+  user: Maybe<User>;
+};
+
 export type PetitionAttachment = {
   file: FileUpload;
   id: Scalars["GID"]["output"];
@@ -2577,6 +2585,14 @@ export type PetitionCreatedEvent = PetitionEvent & {
   id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
+  user: Maybe<User>;
+};
+
+export type PetitionDeassociatedEvent = ProfileEvent & {
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  profile: Maybe<Profile>;
+  type: ProfileEventType;
   user: Maybe<User>;
 };
 
@@ -3390,6 +3406,8 @@ export type ProfileEventPagination = {
 };
 
 export type ProfileEventType =
+  | "PETITION_ASSOCIATED"
+  | "PETITION_DEASSOCIATED"
   | "PROFILE_CREATED"
   | "PROFILE_FIELD_EXPIRY_UPDATED"
   | "PROFILE_FIELD_FILE_ADDED"

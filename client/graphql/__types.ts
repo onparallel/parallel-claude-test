@@ -2478,6 +2478,15 @@ export interface PetitionAnonymizedEvent extends PetitionEvent {
   type: PetitionEventType;
 }
 
+export interface PetitionAssociatedEvent extends ProfileEvent {
+  __typename?: "PetitionAssociatedEvent";
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  profile?: Maybe<Profile>;
+  type: ProfileEventType;
+  user?: Maybe<User>;
+}
+
 export interface PetitionAttachment {
   __typename?: "PetitionAttachment";
   file: FileUpload;
@@ -2647,6 +2656,15 @@ export interface PetitionCreatedEvent extends PetitionEvent {
   id: Scalars["GID"]["output"];
   petition?: Maybe<Petition>;
   type: PetitionEventType;
+  user?: Maybe<User>;
+}
+
+export interface PetitionDeassociatedEvent extends ProfileEvent {
+  __typename?: "PetitionDeassociatedEvent";
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["GID"]["output"];
+  profile?: Maybe<Profile>;
+  type: ProfileEventType;
   user?: Maybe<User>;
 }
 
@@ -3499,6 +3517,8 @@ export interface ProfileEventPagination {
 }
 
 export type ProfileEventType =
+  | "PETITION_ASSOCIATED"
+  | "PETITION_DEASSOCIATED"
   | "PROFILE_CREATED"
   | "PROFILE_FIELD_EXPIRY_UPDATED"
   | "PROFILE_FIELD_FILE_ADDED"

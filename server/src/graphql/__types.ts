@@ -677,6 +677,7 @@ export interface NexusGenObjects {
     totalCount: number; // Int!
   };
   PetitionAnonymizedEvent: petitionEvents.PetitionAnonymizedEvent;
+  PetitionAssociatedEvent: profileEvents.PetitionAssociatedEvent;
   PetitionAttachment: db.PetitionAttachment;
   PetitionAttachmentUploadData: {
     // root type
@@ -701,6 +702,7 @@ export interface NexusGenObjects {
   PetitionCompletedEvent: petitionEvents.PetitionCompletedEvent;
   PetitionCompletedUserNotification: notifications.PetitionCompletedUserNotification;
   PetitionCreatedEvent: petitionEvents.PetitionCreatedEvent;
+  PetitionDeassociatedEvent: profileEvents.PetitionDeassociatedEvent;
   PetitionDeletedEvent: petitionEvents.PetitionDeletedEvent;
   PetitionEventPagination: {
     // root type
@@ -1775,6 +1777,14 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
+  PetitionAssociatedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    profile: NexusGenRootTypes["Profile"] | null; // Profile
+    type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
+    user: NexusGenRootTypes["User"] | null; // User
+  };
   PetitionAttachment: {
     // field return type
     file: NexusGenRootTypes["FileUpload"]; // FileUpload!
@@ -1855,6 +1865,14 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+    user: NexusGenRootTypes["User"] | null; // User
+  };
+  PetitionDeassociatedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    profile: NexusGenRootTypes["Profile"] | null; // Profile
+    type: NexusGenEnums["ProfileEventType"]; // ProfileEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
   PetitionDeletedEvent: {
@@ -3806,6 +3824,14 @@ export interface NexusGenFieldTypeNames {
     petition: "Petition";
     type: "PetitionEventType";
   };
+  PetitionAssociatedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    profile: "Profile";
+    type: "ProfileEventType";
+    user: "User";
+  };
   PetitionAttachment: {
     // field return type name
     file: "FileUpload";
@@ -3886,6 +3912,14 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     petition: "Petition";
     type: "PetitionEventType";
+    user: "User";
+  };
+  PetitionDeassociatedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    profile: "Profile";
+    type: "ProfileEventType";
     user: "User";
   };
   PetitionDeletedEvent: {
@@ -6634,6 +6668,8 @@ export interface NexusGenAbstractTypeMembers {
     | "SignatureCancelledUserNotification"
     | "SignatureCompletedUserNotification";
   ProfileEvent:
+    | "PetitionAssociatedEvent"
+    | "PetitionDeassociatedEvent"
     | "ProfileCreatedEvent"
     | "ProfileFieldExpiryUpdatedEvent"
     | "ProfileFieldFileAddedEvent"
@@ -6687,12 +6723,14 @@ export interface NexusGenTypeInterfaces {
   Petition: "PetitionBase";
   PetitionAccess: "Timestamps";
   PetitionAnonymizedEvent: "PetitionEvent";
+  PetitionAssociatedEvent: "ProfileEvent";
   PetitionClonedEvent: "PetitionEvent";
   PetitionClosedEvent: "PetitionEvent";
   PetitionClosedNotifiedEvent: "PetitionEvent";
   PetitionCompletedEvent: "PetitionEvent";
   PetitionCompletedUserNotification: "PetitionUserNotification";
   PetitionCreatedEvent: "PetitionEvent";
+  PetitionDeassociatedEvent: "ProfileEvent";
   PetitionDeletedEvent: "PetitionEvent";
   PetitionFieldAttachment: "CreatedAt";
   PetitionFieldReply: "Timestamps";

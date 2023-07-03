@@ -26,6 +26,14 @@ export type ProfileEventPayload<TType extends ProfileEventType> = {
     profile_type_field_id: number;
     expiry_date: string | null;
   };
+  PETITION_ASSOCIATED: {
+    user_id: number;
+    petition_id: number;
+  };
+  PETITION_DEASSOCIATED: {
+    user_id: number;
+    petition_id: number;
+  };
 }[TType];
 
 export type GenericProfileEvent<
@@ -56,12 +64,22 @@ export type ProfileFieldExpiryUpdatedEvent<IsCreate extends boolean = false> = G
   "PROFILE_FIELD_EXPIRY_UPDATED",
   IsCreate
 >;
+export type PetitionAssociatedEvent<IsCreate extends boolean = false> = GenericProfileEvent<
+  "PETITION_ASSOCIATED",
+  IsCreate
+>;
+export type PetitionDeassociatedEvent<IsCreate extends boolean = false> = GenericProfileEvent<
+  "PETITION_DEASSOCIATED",
+  IsCreate
+>;
 
 export type ProfileEvent<IsCreate extends boolean = false> =
   | ProfileCreatedEvent<IsCreate>
   | ProfileFieldValueUpdatedEvent<IsCreate>
   | ProfileFieldFileAddedEvent<IsCreate>
   | ProfileFieldFileRemovedEvent<IsCreate>
-  | ProfileFieldExpiryUpdatedEvent<IsCreate>;
+  | ProfileFieldExpiryUpdatedEvent<IsCreate>
+  | PetitionAssociatedEvent<IsCreate>
+  | PetitionDeassociatedEvent<IsCreate>;
 
 export type CreateProfileEvent = ProfileEvent<true>;
