@@ -24,7 +24,18 @@ export function useSignatureCancelledRequestErrorMessage() {
               }}
             />
           );
-
+        case "UNKNOWN_ERROR":
+          return (
+            <FormattedMessage
+              id="component.signature-cancelled-request-error.unknown-error.description"
+              defaultMessage="The eSignature could not be started due to an unknown error {timeAgo}"
+              values={{
+                timeAgo: (
+                  <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                ),
+              }}
+            />
+          );
         default:
           return (
             <FormattedMessage

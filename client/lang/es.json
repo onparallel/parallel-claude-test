@@ -6335,6 +6335,11 @@
     "context": "The document exceeds the maximum size allowed. Please, reduce the size of the annexed files and try it again."
   },
   {
+    "term": "component.signature-cancelled-request-error.unknown-error.description",
+    "definition": "La firma no se ha podido iniciar debido a un error desconocido {timeAgo}",
+    "context": "The eSignature could not be started due to an unknown error {timeAgo}"
+  },
+  {
     "term": "component.signature-cancelled-request-error.unknown.description",
     "definition": "Ocurrió un error desconocido.",
     "context": "An unknown error happened."
