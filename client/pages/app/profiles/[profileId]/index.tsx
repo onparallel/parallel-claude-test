@@ -193,11 +193,11 @@ function ProfileDetail({ profileId }: ProfileDetailProps) {
             {process.env.NEXT_PUBLIC_ENVIRONMENT === "staging" ? (
               <FakeProfileTables me={me} />
             ) : null}
-            <ProfilePetitionsTable
+            {/* <ProfilePetitionsTable
               petitions={profile.petitions}
               onAddPetition={handleAddPetition}
               onRemovePetition={handleRemovePetition}
-            />
+            /> */}
           </Stack>
         </Stack>
       </Flex>
