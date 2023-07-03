@@ -6132,7 +6132,13 @@ export type PetitionHeader_PetitionBaseFragment =
   | PetitionHeader_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionHeader_QueryFragment = {
-  me: { __typename?: "User"; id: string; role: OrganizationRole; canCopyPetitionReplies: boolean };
+  me: {
+    __typename?: "User";
+    id: string;
+    role: OrganizationRole;
+    hasProfilesAccess: boolean;
+    canCopyPetitionReplies: boolean;
+  };
 };
 
 export type PetitionHeader_PetitionBase_updatePath_Petition_Fragment = {
@@ -6255,8 +6261,8 @@ export type PetitionLayout_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
+    canCopyPetitionReplies: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -20315,8 +20321,8 @@ export type PetitionActivity_QueryFragment = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
-    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
+    canCopyPetitionReplies: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -22316,8 +22322,8 @@ export type PetitionActivity_userQuery = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
-    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
+    canCopyPetitionReplies: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -22707,8 +22713,8 @@ export type PetitionCompose_QueryFragment = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
-    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
+    canCopyPetitionReplies: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasAutoAnonymize: boolean;
@@ -23316,8 +23322,8 @@ export type PetitionCompose_userQuery = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
-    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
+    canCopyPetitionReplies: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasAutoAnonymize: boolean;
@@ -23793,8 +23799,8 @@ export type PetitionMessages_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
+    canCopyPetitionReplies: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -23836,8 +23842,8 @@ export type PetitionMessages_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
+    canCopyPetitionReplies: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -24794,8 +24800,8 @@ export type PetitionPreview_QueryFragment = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
+    canCopyPetitionReplies: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -25740,8 +25746,8 @@ export type PetitionPreview_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasPublicLinkPrefill: boolean;
-    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
+    canCopyPetitionReplies: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
@@ -26156,8 +26162,8 @@ export type PetitionReplies_QueryFragment = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
-    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
+    canCopyPetitionReplies: boolean;
     hasExportCuatrecasas: boolean;
     hasPetitionSignature: boolean;
     organization: {
@@ -26863,8 +26869,8 @@ export type PetitionReplies_userQuery = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
-    canCopyPetitionReplies: boolean;
     hasProfilesAccess: boolean;
+    canCopyPetitionReplies: boolean;
     hasExportCuatrecasas: boolean;
     hasPetitionSignature: boolean;
     organization: {
@@ -35233,6 +35239,7 @@ export const PetitionHeader_QueryFragmentDoc = gql`
     me {
       id
       role
+      hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
       canCopyPetitionReplies: hasFeatureFlag(featureFlag: COPY_PETITION_REPLIES)
     }
   }
@@ -41369,6 +41376,9 @@ export const PetitionActivity_petitionDocument = gql`
 export const PetitionActivity_userDocument = gql`
   query PetitionActivity_user {
     ...PetitionActivity_Query
+    me {
+      hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
+    }
   }
   ${PetitionActivity_QueryFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivity_userQuery, PetitionActivity_userQueryVariables>;
@@ -41890,6 +41900,9 @@ export const PetitionReplies_userDocument = gql`
     metadata {
       country
       browserName
+    }
+    me {
+      hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
     }
   }
   ${PetitionReplies_QueryFragmentDoc}

@@ -471,7 +471,10 @@ export const PetitionHeader = Object.assign(
                 </>
               )}
             />
-            {petition.__typename === "Petition" ? (
+            {me.hasProfilesAccess &&
+            petition.__typename === "Petition" &&
+            ((!petition.isAnonymized && myEffectivePermission !== "READ") ||
+              petition.profiles.length > 0) ? (
               <>
                 <Divider isVertical height={3.5} color="gray.500" />
                 <Button
@@ -575,16 +578,21 @@ export const PetitionHeader = Object.assign(
                       defaultMessage="Export to PDF"
                     />
                   </MenuItem>
-                  <MenuItem
-                    onClick={() => handleProfilesClick(true)}
-                    isDisabled={isAnonymized}
-                    icon={<ArrowDiagonalRightIcon display="block" boxSize={4} />}
-                  >
-                    <FormattedMessage
-                      id="component.petition-header.associate-profile"
-                      defaultMessage="Associate profile"
-                    />
-                  </MenuItem>
+                  {me.hasProfilesAccess &&
+                  petition.__typename === "Petition" &&
+                  !petition.isAnonymized &&
+                  myEffectivePermission !== "READ" ? (
+                    <MenuItem
+                      onClick={() => handleProfilesClick(true)}
+                      isDisabled={isAnonymized}
+                      icon={<ArrowDiagonalRightIcon display="block" boxSize={4} />}
+                    >
+                      <FormattedMessage
+                        id="component.petition-header.associate-profile"
+                        defaultMessage="Associate profile"
+                      />
+                    </MenuItem>
+                  ) : null}
                   {hasAdminRole && !isPetition ? (
                     <MenuItem
                       onClick={() => handleTemplateRepliesReportTask(petition.id)}
@@ -794,6 +802,7 @@ export const PetitionHeader = Object.assign(
             me {
               id
               role
+              hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
               canCopyPetitionReplies: hasFeatureFlag(featureFlag: COPY_PETITION_REPLIES)
             }
           }

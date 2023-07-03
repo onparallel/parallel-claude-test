@@ -561,34 +561,38 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 />
               </Button>
             )}
-            <Button
-              data-action="associate-profile"
-              colorScheme="primary"
-              leftIcon={<ProfilesIcon />}
-              isDisabled={petition.isAnonymized}
-              onClick={() =>
-                petition.profiles.length
-                  ? setQueryState({
-                      comments: null,
-                      profile: petition.profiles.at(-1)!.id,
-                    })
-                  : handleAssociateProfile()
-              }
-            >
-              <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
-                {petition.profiles.length ? (
-                  <FormattedMessage
-                    id="petition-replies.open-profile.button"
-                    defaultMessage="Open profile"
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="petition-replies.associate-profile.button"
-                    defaultMessage="Associate profile"
-                  />
-                )}
-              </Text>
-            </Button>
+            {me.hasProfilesAccess &&
+            ((!petition.isAnonymized && myEffectivePermission !== "READ") ||
+              petition.profiles.length > 0) ? (
+              <Button
+                data-action="associate-profile"
+                colorScheme="primary"
+                leftIcon={<ProfilesIcon />}
+                isDisabled={petition.isAnonymized}
+                onClick={() =>
+                  petition.profiles.length
+                    ? setQueryState({
+                        comments: null,
+                        profile: petition.profiles.at(-1)!.id,
+                      })
+                    : handleAssociateProfile()
+                }
+              >
+                <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
+                  {petition.profiles.length ? (
+                    <FormattedMessage
+                      id="petition-replies.open-profile.button"
+                      defaultMessage="Open profile"
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="petition-replies.associate-profile.button"
+                      defaultMessage="Associate profile"
+                    />
+                  )}
+                </Text>
+              </Button>
+            ) : null}
             {showDownloadAll && !petition.isAnonymized ? (
               <ButtonWithMoreOptions
                 leftIcon={<DownloadIcon fontSize="lg" display="block" />}
@@ -1050,6 +1054,9 @@ PetitionReplies.queries = [
       metadata {
         country
         browserName
+      }
+      me {
+        hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
       }
     }
     ${PetitionReplies.fragments.Query}

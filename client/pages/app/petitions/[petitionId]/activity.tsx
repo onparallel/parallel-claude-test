@@ -411,13 +411,15 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         onConfigureReminders={handleConfigureReminders}
         onPetitionSend={handleNextClick({ redirect: true })}
       />
-      <PetitionProfilesTable
-        id="petition-profiles"
-        margin={4}
-        petition={petition}
-        onAddProfile={handleAddProfileToPetition}
-        onRemoveProfile={handleDeassociateProfileFromPetition}
-      />
+      {me.hasProfilesAccess ? (
+        <PetitionProfilesTable
+          id="petition-profiles"
+          margin={4}
+          petition={petition}
+          onAddProfile={handleAddProfileToPetition}
+          onRemoveProfile={handleDeassociateProfileFromPetition}
+        />
+      ) : null}
       <Box margin={4}>
         <PetitionActivityTimeline
           id="petition-activity-timeline"
@@ -574,6 +576,9 @@ const _queries = [
   gql`
     query PetitionActivity_user {
       ...PetitionActivity_Query
+      me {
+        hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
+      }
     }
     ${_fragments.Query}
   `,
